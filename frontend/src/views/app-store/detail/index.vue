@@ -58,8 +58,8 @@
                             <el-icon class="ml-1.5"><Promotion /></el-icon>
                         </el-link>
                     </el-descriptions-item>
-                    <el-descriptions-item :label="$t('app.requireMemory')" v-if="appDetail.memoryLimit > 0">
-                        <span>{{ appDetail.memoryLimit }} MB</span>
+                    <el-descriptions-item :label="$t('app.requireMemory')" v-if="appDetail.memoryRequired > 0">
+                        <span>{{ computeSizeFromMB(appDetail.memoryRequired) }}</span>
                     </el-descriptions-item>
                     <el-descriptions-item :label="$t('app.supportedArchitectures')" v-if="architectures.length > 0">
                         <el-tag v-for="(arch, index) in architectures" :key="index" class="mx-1">
@@ -81,8 +81,9 @@ import { ref } from 'vue';
 import Install from './install/index.vue';
 import router from '@/routers';
 import { GlobalStore } from '@/store';
-import { getLanguage } from '@/utils/util';
+import { getLanguage, computeSizeFromMB } from '@/utils/util';
 import { storeToRefs } from 'pinia';
+
 const globalStore = GlobalStore();
 const { isDarkTheme } = storeToRefs(globalStore);
 

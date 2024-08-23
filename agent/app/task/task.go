@@ -120,7 +120,10 @@ func (t *Task) AddSubTaskWithIgnoreErr(name string, action ActionFunc) {
 }
 
 func (s *SubTask) Execute() error {
-	s.RootTask.Log(s.Name)
+	subTaskName := s.Name
+	if s.Name == "" {
+		subTaskName = i18n.GetMsgByKey("SubTask")
+	}
 	var err error
 	for i := 0; i < s.Retry+1; i++ {
 		if i > 0 {
@@ -136,12 +139,12 @@ func (s *SubTask) Execute() error {
 
 		select {
 		case <-ctx.Done():
-			s.RootTask.Log(i18n.GetWithName("TaskTimeout", s.Name))
+			s.RootTask.Log(i18n.GetWithName("TaskTimeout", subTaskName))
 		case err = <-done:
 			if err != nil {
-				s.RootTask.Log(i18n.GetWithNameAndErr("SubTaskFailed", s.Name, err))
+				s.RootTask.Log(i18n.GetWithNameAndErr("SubTaskFailed", subTaskName, err))
 			} else {
-				s.RootTask.Log(i18n.GetWithName("SubTaskSuccess", s.Name))
+				s.RootTask.Log(i18n.GetWithName("SubTaskSuccess", subTaskName))
 				return nil
 			}
 		}

@@ -49,7 +49,7 @@ export namespace App {
         dockerCompose: string;
         image: string;
         hostMode?: boolean;
-        memoryLimit: number;
+        memoryRequired: number;
         architectures: string;
     }
 

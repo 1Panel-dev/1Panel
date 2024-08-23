@@ -235,19 +235,19 @@ var UpdateWebsiteDomain = &gormigrate.Migration{
 	},
 }
 
-var UpdateApp = &gormigrate.Migration{
-	ID: "20240822-update-app",
-	Migrate: func(tx *gorm.DB) error {
-		return tx.AutoMigrate(
-			&model.App{})
-	},
-}
-
 var AddTaskDB = &gormigrate.Migration{
 	ID: "20240822-add-task-table",
 	Migrate: func(tx *gorm.DB) error {
 		return global.TaskDB.AutoMigrate(
 			&model.Task{},
 		)
+	},
+}
+
+var UpdateApp = &gormigrate.Migration{
+	ID: "20240823-update-app",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(
+			&model.App{})
 	},
 }
