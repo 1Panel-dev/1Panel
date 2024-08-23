@@ -72,30 +72,52 @@
             </ComplexTable>
         </el-drawer>
 
+        <el-dialog
+            v-model="open"
+            :title="isBackup ? $t('commons.button.backup') : $t('commons.button.recover') + ' - ' + name"
+            width="40%"
+            :close-on-click-modal="false"
+            :before-close="handleClose"
+        >
+            <el-form ref="backupForm" label-position="left" v-loading="loading">
+                <el-form-item
+                    :label="$t('setting.compressPassword')"
+                    style="margin-top: 10px"
+                    v-if="type === 'app' || type === 'website'"
+                >
+                    <el-input v-model="secret" :placeholder="$t('setting.backupRecoverMessage')" />
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="handleClose" :disabled="loading">
+                        {{ $t('commons.button.cancel') }}
+                    </el-button>
+                    <el-button type="primary" @click="onSubmit" :disabled="loading">
+                        {{ $t('commons.button.confirm') }}
+                    </el-button>
+                </span>
+            </template>
+        </el-dialog>
+
         <OpDialog ref="opRef" @search="search" />
     </div>
-
-    <AppBackUp ref="backupRef" @close="search" />
-    <AppRecover ref="recoverRef" />
 </template>
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import { computeSize, dateFormat, downloadFile } from '@/utils/util';
-import { getBackupList } from '@/api/modules/setting';
+import { getBackupList, handleBackup, handleRecover } from '@/api/modules/setting';
 import i18n from '@/lang';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { deleteBackupRecord, downloadBackupRecord, searchBackupRecords } from '@/api/modules/setting';
 import { Backup } from '@/api/interface/backup';
 import router from '@/routers';
-import AppBackUp from '@/views/app-store/installed/backup/index.vue';
-import AppRecover from '@/views/app-store/installed/recover/index.vue';
+import { MsgSuccess } from '@/utils/message';
 
 const selects = ref<any>([]);
 const loading = ref();
 const opRef = ref();
-const backupRef = ref();
-const recoverRef = ref();
 
 const data = ref();
 const paginationConfig = reactive({
@@ -112,6 +134,10 @@ const detailName = ref();
 const backupPath = ref();
 const status = ref();
 const secret = ref();
+
+const open = ref();
+const isBackup = ref();
+const currentRow = ref();
 
 interface DialogProps {
     type: string;
@@ -132,6 +158,9 @@ const acceptParams = (params: DialogProps): void => {
 };
 const handleClose = () => {
     backupVisible.value = false;
+};
+const handleBackupClose = () => {
+    open.value = false;
 };
 
 const loadBackupDir = () => {
@@ -175,25 +204,84 @@ const search = async () => {
 };
 
 const onBackup = async () => {
+    isBackup.value = true;
+    if (type.value !== 'app' && type.value !== 'website') {
+        ElMessageBox.confirm(
+            i18n.global.t('commons.msg.backupHelper', [name.value + '( ' + detailName.value + ' )']),
+            i18n.global.t('commons.button.backup'),
+            {
+                confirmButtonText: i18n.global.t('commons.button.confirm'),
+                cancelButtonText: i18n.global.t('commons.button.cancel'),
+            },
+        ).then(async () => {
+            onSubmit();
+        });
+        return;
+    }
+    open.value = true;
+};
+
+const onSubmit = async () => {
+    if (isBackup.value) {
+        let params = {
+            type: type.value,
+            name: name.value,
+            detailName: detailName.value,
+            secret: secret.value,
+        };
+        loading.value = true;
+        await handleBackup(params)
+            .then(() => {
+                loading.value = false;
+                handleClose();
+                handleBackupClose();
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                search();
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+        return;
+    }
     let params = {
+        source: currentRow.value.source,
         type: type.value,
         name: name.value,
         detailName: detailName.value,
+        file: currentRow.value.fileDir + '/' + currentRow.value.fileName,
         secret: secret.value,
     };
-    backupRef.value.acceptParams(params);
+    loading.value = true;
+    await handleRecover(params)
+        .then(() => {
+            loading.value = false;
+            handleClose();
+            handleBackupClose();
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            search();
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const onRecover = async (row: Backup.RecordInfo) => {
-    let params = {
-        source: row.source,
-        type: type.value,
-        name: name.value,
-        detailName: detailName.value,
-        file: row.fileDir + '/' + row.fileName,
-        secret: secret.value,
-    };
-    recoverRef.value.acceptParams(params);
+    isBackup.value = false;
+    currentRow.value = row;
+    if (type.value !== 'app' && type.value !== 'website') {
+        ElMessageBox.confirm(
+            i18n.global.t('commons.msg.recoverHelper', [name.value + '( ' + detailName.value + ' )']),
+            i18n.global.t('commons.button.recover'),
+            {
+                confirmButtonText: i18n.global.t('commons.button.confirm'),
+                cancelButtonText: i18n.global.t('commons.button.cancel'),
+            },
+        ).then(async () => {
+            onSubmit();
+        });
+        return;
+    }
+    open.value = true;
 };
 
 const onDownload = async (row: Backup.RecordInfo) => {
