@@ -13,7 +13,8 @@ func (a *AppRouter) InitRouter(Router *gin.RouterGroup) {
 
 	baseApi := v2.ApiGroupApp.BaseApi
 	{
-		appRouter.POST("/sync", baseApi.SyncApp)
+		appRouter.POST("/sync/remote", baseApi.SyncApp)
+		appRouter.POST("/sync/local", baseApi.SyncLocalApp)
 		appRouter.GET("/checkupdate", baseApi.GetAppListUpdate)
 		appRouter.POST("/search", baseApi.SearchApp)
 		appRouter.GET("/:key", baseApi.GetApp)

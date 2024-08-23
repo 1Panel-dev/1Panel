@@ -235,4 +235,5 @@ AppLink: 'Associated Application'
 EnableSSL: "Enable HTTPS"
 AppStore: "App Store"
 TaskSync: "Sync"
+LocalApp: "Local App"
 

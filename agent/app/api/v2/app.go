@@ -72,7 +72,11 @@ func (b *BaseApi) SyncApp(c *gin.Context) {
 // @Router /apps/sync/local [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"应用商店同步","formatEN":"App store synchronization"}
 func (b *BaseApi) SyncLocalApp(c *gin.Context) {
-	go appService.SyncAppListFromLocal()
+	var req dto.OperateWithTask
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	go appService.SyncAppListFromLocal(req.TaskID)
 	helper.SuccessWithOutData(c)
 }
 

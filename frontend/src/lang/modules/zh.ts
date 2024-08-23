@@ -1686,7 +1686,7 @@ const message = {
         noService: '无{0}',
         toInstall: '去安装',
         param: '参数配置',
-        syncAppList: '更新应用列表',
+        syncAppList: '更新远程应用',
         alreadyRun: '已安装',
         less1Minute: '小于1分钟',
         appOfficeWebsite: '官方网站',
@@ -1745,6 +1745,7 @@ const message = {
         supportedArchitectures: '支持架构',
         link: '链接',
         showCurrentArch: '仅显示当前服务器架构应用',
+        syncLocalApp: '同步本地应用',
     },
     website: {
         website: '网站',

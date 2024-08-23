@@ -237,4 +237,5 @@ AppLink: '關聯應用'
 EnableSSL: "開啟 HTTPS"
 AppStore: "應用商店"
 TaskSync: "同步"
+LocalApp: "本地應用"
 
