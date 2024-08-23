@@ -198,6 +198,10 @@ func (u *DockerService) UpdateConf(req dto.SettingUpdate) error {
 	}
 	if len(daemonMap) == 0 {
 		_ = os.Remove(constant.DaemonJsonPath)
+		stdout, err := cmd.Exec("systemctl restart docker")
+		if err != nil {
+			return errors.New(string(stdout))
+		}
 		return nil
 	}
 	newJson, err := json.MarshalIndent(daemonMap, "", "\t")
@@ -304,6 +308,10 @@ func (u *DockerService) UpdateIpv6Option(req dto.Ipv6Option) error {
 func (u *DockerService) UpdateConfByFile(req dto.DaemonJsonUpdateByFile) error {
 	if len(req.File) == 0 {
 		_ = os.Remove(constant.DaemonJsonPath)
+		stdout, err := cmd.Exec("systemctl restart docker")
+		if err != nil {
+			return errors.New(string(stdout))
+		}
 		return nil
 	}
 	err := createIfNotExistDaemonJsonFile()
