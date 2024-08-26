@@ -29,6 +29,10 @@ const buttons = [
         path: '/apps/upgrade',
         count: 0,
     },
+    {
+        label: i18n.global.t('commons.button.set'),
+        path: '/apps/setting',
+    },
 ];
 
 const search = () => {

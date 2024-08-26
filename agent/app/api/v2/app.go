@@ -209,3 +209,39 @@ func (b *BaseApi) GetAppListUpdate(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, res)
 }
+
+// @Tags App
+// @Summary Update appstore config
+// @Description 更新应用商店配置
+// @Accept json
+// @Param request body request.AppstoreUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /apps/store/update [post]
+func (b *BaseApi) UpdateAppstoreConfig(c *gin.Context) {
+	var req request.AppstoreUpdate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	err := appService.UpdateAppstoreConfig(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}
+
+// @Tags App
+// @Summary Get appstore config
+// @Description 获取应用商店配置
+// @Success 200 {object} response.AppstoreConfig
+// @Security ApiKeyAuth
+// @Router /apps/store/config [get]
+func (b *BaseApi) GetAppstoreConfig(c *gin.Context) {
+	res, err := appService.GetAppstoreConfig()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}

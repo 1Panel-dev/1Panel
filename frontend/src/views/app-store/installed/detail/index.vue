@@ -7,27 +7,29 @@
         </template>
         <div v-if="!edit">
             <el-descriptions border :column="1">
+                <el-descriptions-item :label="$t('app.webUI')">
+                    <span v-if="!openConfig">
+                        {{ appConfigUpdate.webUI }}
+                        <el-button type="primary" @click="openConfig = true">
+                            {{ $t('commons.button.edit') }}
+                        </el-button>
+                    </span>
+                    <el-input v-else v-model="appConfigUpdate.webUI" :placeholder="$t('app.webUIPlaceholder')">
+                        <template #append>
+                            <el-button type="primary" @click="updateAppConfig">
+                                {{ $t('commons.button.confirm') }}
+                            </el-button>
+                        </template>
+                    </el-input>
+                </el-descriptions-item>
                 <el-descriptions-item v-for="(param, key) in params" :label="getLabel(param)" :key="key">
                     <span>{{ param.showValue && param.showValue != '' ? param.showValue : param.value }}</span>
                 </el-descriptions-item>
             </el-descriptions>
-            <el-form label-position="top" class="mt-2">
-                <el-form-item v-if="appType == 'website'" :label="$t('app.webUI')">
-                    <el-input v-model="appConfigUpdate.webUI" :placeholder="$t('app.webUIPlaceholder')"></el-input>
-                </el-form-item>
-                <el-form-item>
-                    <el-button type="primary" :disabled="loading" @click="updateAppConfig">
-                        {{ $t('commons.button.confirm') }}
-                    </el-button>
-                </el-form-item>
-            </el-form>
         </div>
         <div v-else v-loading="loading">
             <el-alert :title="$t('app.updateHelper')" type="warning" :closable="false" class="common-prompt" />
             <el-form @submit.prevent ref="paramForm" :model="paramModel" label-position="top" :rules="rules">
-                <el-form-item v-if="appType == 'website'" :label="$t('app.webUI')">
-                    <el-input v-model="appConfigUpdate.webUI" :placeholder="$t('app.webUIPlaceholder')"></el-input>
-                </el-form-item>
                 <div v-for="(p, index) in params" :key="index">
                     <el-form-item :prop="p.key" :label="getLabel(p)">
                         <el-input
@@ -150,6 +152,7 @@ const appConfigUpdate = ref<App.AppConfigUpdate>({
     installID: 0,
     webUI: '',
 });
+const openConfig = ref(false);
 
 const acceptParams = async (props: ParamProps) => {
     submitModel.value.installId = props.id;
@@ -159,6 +162,7 @@ const acceptParams = async (props: ParamProps) => {
     edit.value = false;
     await get();
     open.value = true;
+    openConfig.value = false;
 };
 
 const handleClose = () => {

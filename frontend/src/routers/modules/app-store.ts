@@ -50,6 +50,17 @@ const appStoreRouter = {
                         requiresAuth: false,
                     },
                 },
+                {
+                    path: 'setting',
+                    name: 'AppStoreSetting',
+                    component: () => import('@/views/app-store/setting/index.vue'),
+                    props: true,
+                    hidden: true,
+                    meta: {
+                        activeMenu: '/apps',
+                        requiresAuth: false,
+                    },
+                },
             ],
         },
     ],

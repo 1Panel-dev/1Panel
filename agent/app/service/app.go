@@ -45,6 +45,9 @@ type IAppService interface {
 	GetAppDetailByID(id uint) (*response.AppDetailDTO, error)
 	SyncAppListFromLocal(taskID string)
 	GetIgnoredApp() ([]response.IgnoredApp, error)
+
+	GetAppstoreConfig() (*response.AppstoreConfig, error)
+	UpdateAppstoreConfig(req request.AppstoreUpdate) error
 }
 
 func NewIAppService() IAppService {
@@ -1066,4 +1069,16 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 	}()
 
 	return nil
+}
+
+func (a AppService) UpdateAppstoreConfig(req request.AppstoreUpdate) error {
+	settingService := NewISettingService()
+	return settingService.Update("AppDefaultDomain", req.DefaultDomain)
+}
+
+func (a AppService) GetAppstoreConfig() (*response.AppstoreConfig, error) {
+	defaultDomain, _ := settingRepo.Get(settingRepo.WithByKey("AppDefaultDomain"))
+	res := &response.AppstoreConfig{}
+	res.DefaultDomain = defaultDomain.Value
+	return res, nil
 }

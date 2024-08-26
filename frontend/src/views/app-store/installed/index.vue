@@ -175,23 +175,6 @@
                                                             </el-button>
                                                         </el-tooltip>
                                                     </span>
-                                                    <span class="ml-1">
-                                                        <el-tooltip
-                                                            v-if="installed.webUI !== ''"
-                                                            effect="dark"
-                                                            :content="installed.webUI"
-                                                            placement="top"
-                                                        >
-                                                            <el-button
-                                                                type="primary"
-                                                                link
-                                                                @click="toLink(installed.webUI)"
-                                                            >
-                                                                <el-icon><Promotion /></el-icon>
-                                                            </el-button>
-                                                        </el-tooltip>
-                                                    </span>
-
                                                     <el-button
                                                         class="h-button"
                                                         plain
@@ -254,7 +237,6 @@
                                                         v-if="installed.httpPort > 0"
                                                         @click="goDashboard(installed.httpPort, 'http')"
                                                         class="tagMargin"
-                                                        icon="Position"
                                                         plain
                                                         size="small"
                                                     >
@@ -265,12 +247,59 @@
                                                         v-if="installed.httpsPort > 0"
                                                         @click="goDashboard(installed.httpsPort, 'https')"
                                                         class="tagMargin"
-                                                        icon="Position"
                                                         plain
                                                         size="small"
                                                     >
                                                         {{ $t('app.busPort') }}：{{ installed.httpsPort }}
                                                     </el-button>
+
+                                                    <el-popover
+                                                        placement="top-start"
+                                                        trigger="hover"
+                                                        v-if="installed.appType == 'website'"
+                                                        :width="260"
+                                                    >
+                                                        <template #reference>
+                                                            <el-button plain icon="Promotion" size="small">
+                                                                {{ $t('app.toLink') }}
+                                                            </el-button>
+                                                        </template>
+                                                        <table>
+                                                            <tbody>
+                                                                <tr v-if="defaultLink != ''">
+                                                                    <td>
+                                                                        <el-button
+                                                                            type="primary"
+                                                                            link
+                                                                            @click="
+                                                                                toLink(
+                                                                                    defaultLink +
+                                                                                        ':' +
+                                                                                        installed.httpPort,
+                                                                                )
+                                                                            "
+                                                                        >
+                                                                            {{ defaultLink + ':' + installed.httpPort }}
+                                                                        </el-button>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr v-if="installed.webUI != ''">
+                                                                    <td>
+                                                                        <el-button
+                                                                            type="primary"
+                                                                            link
+                                                                            @click="toLink(installed.webUI)"
+                                                                        >
+                                                                            {{ installed.webUI }}
+                                                                        </el-button>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                        <span v-if="defaultLink == '' && installed.webUI == ''">
+                                                            {{ $t('app.webUIConfig') }}
+                                                        </span>
+                                                    </el-popover>
 
                                                     <div class="description">
                                                         <span>
@@ -339,6 +368,7 @@ import {
     SyncInstalledApp,
     AppInstalledDeleteCheck,
     GetAppTags,
+    GetAppStoreConfig,
 } from '@/api/modules/app';
 import { onMounted, onUnmounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
@@ -401,6 +431,8 @@ const activeName = ref(i18n.global.t('app.installed'));
 const mode = ref('installed');
 const moreTag = ref('');
 const language = getLanguage();
+const defaultLink = ref('');
+
 const options = {
     modifiers: [
         {
@@ -670,7 +702,17 @@ const toLink = (link: string) => {
     window.open(link, '_blank');
 };
 
+const getAppstoreConfig = async () => {
+    try {
+        const res = await GetAppStoreConfig();
+        if (res.data.defaultDomain != '') {
+            defaultLink.value = res.data.defaultDomain;
+        }
+    } catch (error) {}
+};
+
 onMounted(() => {
+    getAppstoreConfig();
     const path = router.currentRoute.value.path;
     if (path == '/apps/upgrade') {
         activeName.value = i18n.global.t('app.canUpgrade');
