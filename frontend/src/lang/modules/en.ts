@@ -344,8 +344,6 @@ const message = {
         kernelArch: 'Kernel arch',
         network: 'Network',
         io: 'Disk IO',
-        ip: 'Ip Addr',
-        proxy: 'System Proxy',
         baseInfo: 'Base info',
         totalSend: 'Total send',
         totalRecv: 'Total recv',

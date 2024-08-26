@@ -1,10 +1,8 @@
 package service
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
-	"os"
 	"sort"
 	"strings"
 	"sync"
@@ -96,20 +94,11 @@ func (u *DashboardService) LoadBaseInfo(ioOption string, netOption string) (*dto
 	baseInfo.KernelVersion = hostInfo.KernelVersion
 	ss, _ := json.Marshal(hostInfo)
 	baseInfo.VirtualizationSystem = string(ss)
-	baseInfo.IpV4Addr=host.IpV4AddrWithContext(context.Background())
-	httpProxy := os.Getenv("http_proxy")
-	if httpProxy == "" {
-		httpProxy = os.Getenv("HTTP_PROXY") // 也检查大写的环境变量名
-	}
-	if httpProxy!=""{
-		baseInfo.SystemProxy=httpProxy
-	}
-	baseInfo.SystemProxy="noProxy"
+
 	appInstall, err := appInstallRepo.ListBy()
 	if err != nil {
 		return nil, err
 	}
-	
 	baseInfo.AppInstalledNumber = len(appInstall)
 	postgresqlDbs, err := postgresqlRepo.List()
 	if err != nil {

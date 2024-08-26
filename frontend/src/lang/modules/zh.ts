@@ -337,8 +337,6 @@ const message = {
         kernelArch: '系统类型',
         network: '流量',
         io: '磁盘 IO',
-        ip: 'IP地址',
-        proxy: '系统代理',
         baseInfo: '基本信息',
         totalSend: '总发送',
         totalRecv: '总接收',
