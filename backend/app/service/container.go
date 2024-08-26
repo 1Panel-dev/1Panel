@@ -445,6 +445,7 @@ func (u *ContainerService) ContainerInfo(req dto.OperationWithName) (*dto.Contai
 		}
 	}
 
+	data.ExposedPorts, _ = loadContainerPortForInfo(req.Name, client)
 	networkSettings := oldContainer.NetworkSettings
 	bridgeNetworkSettings := networkSettings.Networks[data.Network]
 	if bridgeNetworkSettings.IPAMConfig != nil {
@@ -465,19 +466,7 @@ func (u *ContainerService) ContainerInfo(req dto.OperationWithName) (*dto.Contai
 	for key, val := range oldContainer.Config.Labels {
 		data.Labels = append(data.Labels, fmt.Sprintf("%s=%s", key, val))
 	}
-	for key, val := range oldContainer.HostConfig.PortBindings {
-		var itemPort dto.PortHelper
-		if !strings.Contains(string(key), "/") {
-			continue
-		}
-		itemPort.ContainerPort = strings.Split(string(key), "/")[0]
-		itemPort.Protocol = strings.Split(string(key), "/")[1]
-		for _, binds := range val {
-			itemPort.HostIP = binds.HostIP
-			itemPort.HostPort = binds.HostPort
-			data.ExposedPorts = append(data.ExposedPorts, itemPort)
-		}
-	}
+
 	data.AutoRemove = oldContainer.HostConfig.AutoRemove
 	data.Privileged = oldContainer.HostConfig.Privileged
 	data.PublishAllPorts = oldContainer.HostConfig.PublishAllPorts
@@ -1201,7 +1190,7 @@ func reCreateAfterUpdate(name string, client *client.Client, config *container.C
 	if err := client.ContainerStart(ctx, oldContainer.ID, container.StartOptions{}); err != nil {
 		global.LOG.Errorf("restart after container update failed, err: %v", err)
 	}
-	global.LOG.Errorf("recreate after container update successful")
+	global.LOG.Info("recreate after container update successful")
 }
 
 func loadVolumeBinds(binds []types.MountPoint) []dto.VolumeHelper {
@@ -1309,4 +1298,48 @@ func simplifyPort(ports []types.Port) []string {
 		}
 	}
 	return datas
+}
+
+func loadContainerPortForInfo(id string, client *client.Client) ([]dto.PortHelper, error) {
+	var exposedPorts []dto.PortHelper
+	containers, err := client.ContainerList(context.Background(), container.ListOptions{})
+	if err != nil {
+		return nil, err
+	}
+	samePortMap := make(map[string]dto.PortHelper)
+	for _, container := range containers {
+		if container.ID == id {
+			ports := loadContainerPort(container.Ports)
+			var itemPort dto.PortHelper
+			for _, item := range ports {
+				itemStr := strings.Split(item, "->")
+				if len(itemStr) < 2 {
+					continue
+				}
+				lastIndex := strings.LastIndex(itemStr[0], ":")
+				if lastIndex == -1 {
+					continue
+				}
+				itemContainer := strings.Split(itemStr[1], "/")
+				if len(itemContainer) != 2 {
+					continue
+				}
+				itemPort.HostIP = itemStr[0][0:lastIndex]
+				itemPort.HostPort = itemStr[0][lastIndex+1:]
+				itemPort.ContainerPort = itemContainer[0]
+				itemPort.Protocol = itemContainer[1]
+				keyItem := fmt.Sprintf("%s->%s/%s", itemPort.HostPort, itemPort.ContainerPort, itemPort.Protocol)
+				if val, ok := samePortMap[keyItem]; ok {
+					val.HostIP = ""
+					samePortMap[keyItem] = val
+				} else {
+					samePortMap[keyItem] = itemPort
+				}
+			}
+		}
+	}
+	for _, val := range samePortMap {
+		exposedPorts = append(exposedPorts, val)
+	}
+	return exposedPorts, nil
 }
