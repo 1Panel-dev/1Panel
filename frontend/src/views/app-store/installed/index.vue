@@ -175,6 +175,22 @@
                                                             </el-button>
                                                         </el-tooltip>
                                                     </span>
+                                                    <span class="ml-1">
+                                                        <el-tooltip
+                                                            v-if="installed.webUI !== ''"
+                                                            effect="dark"
+                                                            :content="installed.webUI"
+                                                            placement="top"
+                                                        >
+                                                            <el-button
+                                                                type="primary"
+                                                                link
+                                                                @click="toLink(installed.webUI)"
+                                                            >
+                                                                <el-icon><Promotion /></el-icon>
+                                                            </el-button>
+                                                        </el-tooltip>
+                                                    </span>
 
                                                     <el-button
                                                         class="h-button"
@@ -648,6 +664,10 @@ const openLog = (row: any) => {
         default:
             composeLogRef.value.acceptParams({ compose: row.path + '/docker-compose.yml', resource: row.name });
     }
+};
+
+const toLink = (link: string) => {
+    window.open(link, '_blank');
 };
 
 onMounted(() => {

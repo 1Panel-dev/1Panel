@@ -1749,6 +1749,8 @@ const message = {
         memoryRequiredHelper: '当前应用内存需求 {0}',
         gpuConfig: '开启 GPU 支持',
         gpuConfigHelper: '请确保机器有 NVIDIA GPU 并且安装 NVIDIA 驱动 和 NVIDIA docker Container Toolkit',
+        webUI: 'Web 访问地址',
+        webUIPlaceholder: '例如：http://example.com:8080/login',
     },
     website: {
         website: '网站',

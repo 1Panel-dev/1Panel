@@ -5,15 +5,29 @@
                 {{ edit ? $t('app.detail') : $t('commons.button.edit') }}
             </el-button>
         </template>
-        <el-descriptions border :column="1" v-if="!edit">
-            <el-descriptions-item v-for="(param, key) in params" :label="getLabel(param)" :key="key">
-                <span>{{ param.showValue && param.showValue != '' ? param.showValue : param.value }}</span>
-            </el-descriptions-item>
-        </el-descriptions>
-
+        <div v-if="!edit">
+            <el-descriptions border :column="1">
+                <el-descriptions-item v-for="(param, key) in params" :label="getLabel(param)" :key="key">
+                    <span>{{ param.showValue && param.showValue != '' ? param.showValue : param.value }}</span>
+                </el-descriptions-item>
+            </el-descriptions>
+            <el-form label-position="top" class="mt-2">
+                <el-form-item v-if="appType == 'website'" :label="$t('app.webUI')">
+                    <el-input v-model="appConfigUpdate.webUI" :placeholder="$t('app.webUIPlaceholder')"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" :disabled="loading" @click="updateAppConfig">
+                        {{ $t('commons.button.confirm') }}
+                    </el-button>
+                </el-form-item>
+            </el-form>
+        </div>
         <div v-else v-loading="loading">
             <el-alert :title="$t('app.updateHelper')" type="warning" :closable="false" class="common-prompt" />
             <el-form @submit.prevent ref="paramForm" :model="paramModel" label-position="top" :rules="rules">
+                <el-form-item v-if="appType == 'website'" :label="$t('app.webUI')">
+                    <el-input v-model="appConfigUpdate.webUI" :placeholder="$t('app.webUIPlaceholder')"></el-input>
+                </el-form-item>
                 <div v-for="(p, index) in params" :key="index">
                     <el-form-item :prop="p.key" :label="getLabel(p)">
                         <el-input
@@ -93,7 +107,7 @@
 </template>
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';
-import { GetAppInstallParams, UpdateAppInstallParams } from '@/api/modules/app';
+import { GetAppInstallParams, UpdateAppInstallParams, UpdateInstallConfig } from '@/api/modules/app';
 import { reactive, ref } from 'vue';
 import { FormInstance } from 'element-plus';
 import { Rules, checkNumberRange } from '@/global/form-rules';
@@ -128,7 +142,14 @@ const rules = reactive({
     memoryLimit: [Rules.requiredInput, checkNumberRange(0, 9999999999)],
     containerName: [Rules.containerName],
 });
-const submitModel = ref<any>({});
+const submitModel = ref<any>({
+    webUI: '',
+});
+const appType = ref('');
+const appConfigUpdate = ref<App.AppConfigUpdate>({
+    installID: 0,
+    webUI: '',
+});
 
 const acceptParams = async (props: ParamProps) => {
     submitModel.value.installId = props.id;
@@ -188,6 +209,8 @@ const get = async () => {
         paramModel.value.advanced = false;
         paramModel.value.dockerCompose = res.data.dockerCompose;
         paramModel.value.isHostMode = res.data.hostMode;
+        appConfigUpdate.value.webUI = res.data.webUI;
+        appType.value = res.data.type;
     } catch (error) {
     } finally {
         loading.value = false;
@@ -238,6 +261,17 @@ const submit = async (formEl: FormInstance) => {
             }
         });
     });
+};
+
+const updateAppConfig = async () => {
+    try {
+        await UpdateInstallConfig({
+            installID: Number(paramData.value.id),
+            webUI: appConfigUpdate.value.webUI,
+        });
+        MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
+        handleClose();
+    } catch (error) {}
 };
 
 defineExpose({ acceptParams });

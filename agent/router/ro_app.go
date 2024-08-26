@@ -38,5 +38,6 @@ func (a *AppRouter) InitRouter(Router *gin.RouterGroup) {
 		appRouter.POST("/installed/ignore", baseApi.IgnoreUpgrade)
 		appRouter.GET("/ignored/detail", baseApi.GetIgnoredApp)
 		appRouter.POST("/installed/update/versions", baseApi.GetUpdateVersions)
+		appRouter.POST("/installed/config/update", baseApi.UpdateAppConfig)
 	}
 }

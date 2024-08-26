@@ -1883,6 +1883,8 @@ const message = {
         gpuConfig: 'Enable GPU Support',
         gpuConfigHelper:
             'Please ensure the machine has an NVIDIA GPU and that NVIDIA drivers and the NVIDIA Docker Container Toolkit are installed',
+        webUI: 'Web Access Address',
+        webUIPlaceholder: 'For example: http://example.com:8080/login',
     },
     website: {
         website: 'Website',

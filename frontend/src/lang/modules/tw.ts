@@ -1748,6 +1748,8 @@ const message = {
         memoryRequiredHelper: '目前應用記憶體需求 {0}',
         gpuConfig: '開啟 GPU 支援',
         gpuConfigHelper: '請確保機器有 NVIDIA GPU 並且安裝 NVIDIA 驅動 和 NVIDIA docker Container Toolkit',
+        webUI: 'Web 訪問地址',
+        webUIPlaceholder: '例如：http://example.com:8080/login',
     },
     website: {
         website: '網站',

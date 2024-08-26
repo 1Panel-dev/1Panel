@@ -59,6 +59,7 @@ type IAppInstallService interface {
 	GetDefaultConfigByKey(key, name string) (string, error)
 	DeleteCheck(installId uint) ([]dto.AppResource, error)
 
+	UpdateAppConfig(req request.AppConfigUpdate) error
 	GetInstallList() ([]dto.AppInstallInfo, error)
 }
 
@@ -302,6 +303,18 @@ func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
 	default:
 		return errors.New("operate not support")
 	}
+}
+
+func (a *AppInstallService) UpdateAppConfig(req request.AppConfigUpdate) error {
+	installed, err := appInstallRepo.GetFirst(commonRepo.WithByID(req.InstallID))
+	if err != nil {
+		return err
+	}
+	installed.WebUI = ""
+	if req.WebUI != "" {
+		installed.WebUI = req.WebUI
+	}
+	return appInstallRepo.Save(context.Background(), &installed)
 }
 
 func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
@@ -767,6 +780,8 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 	}
 	res.AppContainerConfig = config
 	res.HostMode = isHostModel(install.DockerCompose)
+	res.WebUI = install.WebUI
+	res.Type = install.App.Type
 	return &res, nil
 }
 

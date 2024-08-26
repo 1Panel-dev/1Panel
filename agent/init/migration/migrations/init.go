@@ -251,3 +251,11 @@ var UpdateApp = &gormigrate.Migration{
 			&model.App{})
 	},
 }
+
+var UpdateAppInstall = &gormigrate.Migration{
+	ID: "20240828-update-app-install",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(
+			&model.AppInstall{})
+	},
+}
