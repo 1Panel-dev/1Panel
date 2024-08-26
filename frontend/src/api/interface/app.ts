@@ -263,4 +263,8 @@ export namespace App {
         installID: number;
         webUI: string;
     }
+
+    export interface AppStoreConfig {
+        defaultDomain: string;
+    }
 }

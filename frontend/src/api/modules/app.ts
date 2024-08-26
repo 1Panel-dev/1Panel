@@ -110,3 +110,11 @@ export const GetIgnoredApp = () => {
 export const UpdateInstallConfig = (req: App.AppConfigUpdate) => {
     return http.post(`apps/installed/config/update`, req);
 };
+
+export const GetAppStoreConfig = () => {
+    return http.get<App.AppStoreConfig>(`apps/store/config`);
+};
+
+export const UpdateAppStoreConfig = (req: App.AppStoreConfig) => {
+    return http.post(`apps/store/update`, req);
+};

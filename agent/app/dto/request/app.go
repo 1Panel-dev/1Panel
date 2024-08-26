@@ -125,3 +125,7 @@ type AppUpdateVersion struct {
 	AppInstallID  uint   `json:"appInstallID" validate:"required"`
 	UpdateVersion string `json:"updateVersion"`
 }
+
+type AppstoreUpdate struct {
+	DefaultDomain string `json:"defaultDomain"`
+}

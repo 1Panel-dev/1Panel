@@ -159,3 +159,7 @@ type AppConfig struct {
 	Params []AppParam `json:"params"`
 	request.AppContainerConfig
 }
+
+type AppstoreConfig struct {
+	DefaultDomain string `json:"defaultDomain"`
+}

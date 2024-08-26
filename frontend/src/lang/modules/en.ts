@@ -1885,6 +1885,11 @@ const message = {
             'Please ensure the machine has an NVIDIA GPU and that NVIDIA drivers and the NVIDIA Docker Container Toolkit are installed',
         webUI: 'Web Access Address',
         webUIPlaceholder: 'For example: http://example.com:8080/login',
+        defaultWebDomain: 'Default Access Address',
+        defaultWebDomainHepler:
+            'The default access is used for application port forwarding. For example, if the application port is 8080, the forwarding address would be http(s)://default-access-address:8080',
+        webUIConfig: 'Please add the access address in the application parameters or the app store settings',
+        toLink: 'Open',
     },
     website: {
         website: 'Website',

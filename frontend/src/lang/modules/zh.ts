@@ -1751,6 +1751,10 @@ const message = {
         gpuConfigHelper: '请确保机器有 NVIDIA GPU 并且安装 NVIDIA 驱动 和 NVIDIA docker Container Toolkit',
         webUI: 'Web 访问地址',
         webUIPlaceholder: '例如：http://example.com:8080/login',
+        defaultWebDomain: '默认访问地址',
+        defaultWebDomainHepler: '默认访问用于应用端口跳转，例如应用端口为 8080 则跳转地址为http(s)://默认访问地址:8080',
+        webUIConfig: '请在应用参数或者应用商店设置处添加访问地址',
+        toLink: '跳转',
     },
     website: {
         website: '网站',

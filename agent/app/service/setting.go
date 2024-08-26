@@ -46,14 +46,16 @@ func (u *SettingService) Update(key, value string) error {
 	case "AppStoreLastModified":
 		exist, _ := settingRepo.Get(settingRepo.WithByKey("AppStoreLastModified"))
 		if exist.ID == 0 {
-			_ = settingRepo.Create("AppStoreLastModified", value)
-			return nil
+			return settingRepo.Create("AppStoreLastModified", value)
+		}
+	case "AppDefaultDomain":
+		exist, _ := settingRepo.Get(settingRepo.WithByKey("AppDefaultDomain"))
+		if exist.ID == 0 {
+			return settingRepo.Create("AppDefaultDomain", value)
 		}
 	}
-
 	if err := settingRepo.Update(key, value); err != nil {
 		return err
 	}
-
 	return nil
 }
