@@ -96,6 +96,7 @@ type AppProperty struct {
 	Document           string   `json:"document"`
 	Architectures      []string `json:"architectures"`
 	MemoryRequired     int      `json:"memoryRequired"`
+	GpuSupport         bool     `json:"gpuSupport"`
 }
 
 type AppConfigVersion struct {

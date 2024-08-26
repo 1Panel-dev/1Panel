@@ -44,6 +44,7 @@ type AppDto struct {
 	Tags        []model.Tag `json:"tags"`
 	Github      string      `json:"github"`
 	Website     string      `json:"website"`
+	GpuSupport  bool        `json:"gpuSupport"`
 }
 
 type TagDTO struct {
@@ -73,6 +74,7 @@ type AppDetailDTO struct {
 	HostMode       bool        `json:"hostMode"`
 	Architectures  string      `json:"architectures"`
 	MemoryRequired int         `json:"memoryRequired"`
+	GpuSupport     bool        `json:"gpuSupport"`
 }
 
 type IgnoredApp struct {

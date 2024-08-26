@@ -1880,6 +1880,9 @@ const message = {
         showCurrentArch: 'Architecture',
         syncLocalApp: 'Sync Local App',
         memoryRequiredHelper: 'Current application memory requirement {0}',
+        gpuConfig: 'Enable GPU Support',
+        gpuConfigHelper:
+            'Please ensure the machine has an NVIDIA GPU and that NVIDIA drivers and the NVIDIA Docker Container Toolkit are installed',
     },
     website: {
         website: 'Website',
