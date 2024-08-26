@@ -225,6 +225,25 @@
                                     </template>
                                     {{ loadUpTime(currentInfo.uptime) }}
                                 </el-descriptions-item>
+                                <el-descriptions-item v-if="baseInfo.ipv4Addr" class-name="system-content">
+                                    <template #label>
+                                        <span class="system-label">
+                                            {{ $t('home.ip') }}
+                                        </span>
+                                    </template>
+                                    {{ baseInfo.ipv4Addr }}
+                                </el-descriptions-item>
+                                <el-descriptions-item
+                                    v-if="baseInfo.systemProxy && baseInfo.systemProxy !== 'noProxy'"
+                                    class-name="system-content"
+                                >
+                                    <template #label>
+                                        <span class="system-label">
+                                            {{ $t('home.proxy') }}
+                                        </span>
+                                    </template>
+                                    {{ baseInfo.systemProxy }}
+                                </el-descriptions-item>
                             </el-descriptions>
                         </el-scrollbar>
                     </template>
@@ -303,7 +322,8 @@ const baseInfo = ref<Dashboard.BaseInfo>({
     kernelArch: '',
     kernelVersion: '',
     virtualizationSystem: '',
-
+    ipv4Addr: '',
+    systemProxy: '',
     cpuCores: 0,
     cpuLogicalCores: 0,
     cpuModelName: '',
@@ -391,6 +411,7 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
         timeNetDatas.value = [];
     }
     const res = await loadBaseInfo(searchInfo.ioOption, searchInfo.netOption);
+    console.log(res.data);
     baseInfo.value = res.data;
     currentInfo.value = baseInfo.value.currentInfo;
     await onLoadCurrentInfo();
