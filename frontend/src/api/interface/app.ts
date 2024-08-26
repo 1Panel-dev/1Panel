@@ -239,6 +239,8 @@ export namespace App {
         allowPort: boolean;
         dockerCompose: string;
         hostMode?: boolean;
+        type: string;
+        webUI: string;
     }
 
     export interface IgnoredApp {
@@ -255,5 +257,10 @@ export namespace App {
 
     export interface AppStoreSync {
         taskID: string;
+    }
+
+    export interface AppConfigUpdate {
+        installID: number;
+        webUI: string;
     }
 }

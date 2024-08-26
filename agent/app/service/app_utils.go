@@ -1363,6 +1363,7 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool)
 			AppType:     installed.App.Type,
 			Path:        installed.GetPath(),
 			CreatedAt:   installed.CreatedAt,
+			WebUI:       installed.WebUI,
 			App: response.AppDetail{
 				Github:   installed.App.Github,
 				Website:  installed.App.Website,

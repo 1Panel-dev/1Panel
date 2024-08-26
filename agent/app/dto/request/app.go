@@ -37,6 +37,8 @@ type AppContainerConfig struct {
 	HostMode      bool    `json:"hostMode"`
 	PullImage     bool    `json:"pullImage"`
 	GpuConfig     bool    `json:"gpuConfig"`
+	WebUI         string  `json:"webUI"`
+	Type          string  `json:"type"`
 }
 
 type AppInstalledSearch struct {
@@ -101,6 +103,11 @@ type AppInstalledUpdate struct {
 	InstallId uint                   `json:"installId" validate:"required"`
 	Params    map[string]interface{} `json:"params" validate:"required"`
 	AppContainerConfig
+}
+
+type AppConfigUpdate struct {
+	InstallID uint   `json:"installID" validate:"required"`
+	WebUI     string `json:"webUI"`
 }
 
 type AppInstalledIgnoreUpgrade struct {

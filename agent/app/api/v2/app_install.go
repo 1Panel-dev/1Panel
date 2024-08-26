@@ -325,3 +325,24 @@ func (b *BaseApi) IgnoreUpgrade(c *gin.Context) {
 	}
 	helper.SuccessWithOutData(c)
 }
+
+// @Tags App
+// @Summary Update app config
+// @Description 更新应用配置
+// @Accept json
+// @Param request body request.AppConfigUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /apps/installed/config/update [post]
+// @x-panel-log {"bodyKeys":["installID","webUI"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"应用配置更新 [installID]","formatEN":"Application config update [installID]"}
+func (b *BaseApi) UpdateAppConfig(c *gin.Context) {
+	var req request.AppConfigUpdate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := appInstallService.UpdateAppConfig(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}

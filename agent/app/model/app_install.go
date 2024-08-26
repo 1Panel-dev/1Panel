@@ -21,8 +21,9 @@ type AppInstall struct {
 	Message       string `json:"message"`
 	ContainerName string `json:"containerName" gorm:"not null"`
 	ServiceName   string `json:"serviceName" gorm:"not null"`
-	HttpPort      int    `json:"httpPort" gorm:"not null"`
-	HttpsPort     int    `json:"httpsPort" gorm:"not null"`
+	HttpPort      int    `json:"httpPort"`
+	HttpsPort     int    `json:"httpsPort"`
+	WebUI         string `json:"webUI"`
 	App           App    `json:"app" gorm:"-:migration"`
 }
 
