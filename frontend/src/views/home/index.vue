@@ -225,6 +225,25 @@
                                     </template>
                                     {{ loadUpTime(currentInfo.uptime) }}
                                 </el-descriptions-item>
+                                <el-descriptions-item class-name="system-content">
+                                    <template #label>
+                                        <span class="system-label">
+                                            {{ $t('home.ip') }}
+                                        </span>
+                                        {{ baseInfo.IpV4Addr }}
+                                    </template>
+                                </el-descriptions-item>
+                                <el-descriptions-item
+                                    v-if="baseInfo.httpProxy !== 'noProxy'"
+                                    class-name="system-content"
+                                >
+                                    <template #label>
+                                        <span class="system-label">
+                                            {{ $t('home.proxy') }}
+                                        </span>
+                                        {{ baseInfo.httpProxy }}
+                                    </template>
+                                </el-descriptions-item>
                             </el-descriptions>
                         </el-scrollbar>
                     </template>
@@ -303,7 +322,8 @@ const baseInfo = ref<Dashboard.BaseInfo>({
     kernelArch: '',
     kernelVersion: '',
     virtualizationSystem: '',
-
+    IpV4Addr: '',
+    httpProxy: '',
     cpuCores: 0,
     cpuLogicalCores: 0,
     cpuModelName: '',
