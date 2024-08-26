@@ -225,7 +225,10 @@
                                     </template>
                                     {{ loadUpTime(currentInfo.uptime) }}
                                 </el-descriptions-item>
-                                <el-descriptions-item v-if="baseInfo.ipv4Addr" class-name="system-content">
+                                <el-descriptions-item
+                                    v-if="baseInfo.ipv4Addr && baseInfo.ipv4Addr !== 'IPNotFound'"
+                                    class-name="system-content"
+                                >
                                     <template #label>
                                         <span class="system-label">
                                             {{ $t('home.ip') }}
@@ -411,7 +414,6 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
         timeNetDatas.value = [];
     }
     const res = await loadBaseInfo(searchInfo.ioOption, searchInfo.netOption);
-    console.log(res.data);
     baseInfo.value = res.data;
     currentInfo.value = baseInfo.value.currentInfo;
     await onLoadCurrentInfo();

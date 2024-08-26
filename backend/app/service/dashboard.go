@@ -3,7 +3,6 @@ package service
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	network "net"
 	"os"
 	"sort"
@@ -224,7 +223,7 @@ func GetOutboundIP() string {
 	conn, err := network.Dial("udp", "8.8.8.8:80")
 
 	if err != nil {
-		log.Fatal(err)
+		return "IPNotFound"
 	}
 	defer conn.Close()
 
