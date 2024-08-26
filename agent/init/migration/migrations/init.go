@@ -245,7 +245,7 @@ var AddTaskDB = &gormigrate.Migration{
 }
 
 var UpdateApp = &gormigrate.Migration{
-	ID: "20240823-update-app",
+	ID: "20240826-update-app",
 	Migrate: func(tx *gorm.DB) error {
 		return tx.AutoMigrate(
 			&model.App{})

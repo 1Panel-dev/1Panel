@@ -1120,6 +1120,7 @@ func getApps(oldApps []model.App, items []dto.AppDefine) map[string]model.App {
 		app.ReadMe = item.ReadMe
 		app.MemoryRequired = config.MemoryRequired
 		app.Architectures = strings.Join(config.Architectures, ",")
+		app.GpuSupport = config.GpuSupport
 		apps[key] = app
 	}
 	return apps
@@ -1508,6 +1509,17 @@ func addDockerComposeCommonParam(composeMap map[string]interface{}, serviceName 
 	resource["limits"] = map[string]interface{}{
 		"cpus":   "${CPUS}",
 		"memory": "${MEMORY_LIMIT}",
+	}
+	if req.GpuConfig {
+		resource["reservations"] = map[string]interface{}{
+			"devices": []map[string]interface{}{
+				{
+					"driver":       "nvidia",
+					"count":        "all",
+					"capabilities": []string{"gpu"},
+				},
+			},
+		}
 	}
 	deploy["resources"] = resource
 	serviceValue["deploy"] = deploy

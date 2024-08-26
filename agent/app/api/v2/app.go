@@ -5,7 +5,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/constant"
-	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/gin-gonic/gin"
 )
@@ -56,11 +55,10 @@ func (b *BaseApi) SyncApp(c *gin.Context) {
 		}
 		return
 	}
-	go func() {
-		if err = appService.SyncAppListFromRemote(req.TaskID); err != nil {
-			global.LOG.Errorf("Synchronization with the App Store failed [%s]", err.Error())
-		}
-	}()
+	if err = appService.SyncAppListFromRemote(req.TaskID); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
 	helper.SuccessWithData(c, nil)
 }
 

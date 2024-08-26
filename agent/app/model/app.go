@@ -28,6 +28,7 @@ type App struct {
 	LastModified       int    `json:"lastModified"`
 	Architectures      string `json:"architectures"`
 	MemoryRequired     int    `json:"memoryRequired"`
+	GpuSupport         bool   `json:"gpuSupport"`
 
 	Details []AppDetail `json:"-" gorm:"-:migration"`
 	TagsKey []string    `json:"tags" yaml:"tags" gorm:"-"`

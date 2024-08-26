@@ -1746,6 +1746,8 @@ const message = {
         showCurrentArch: '僅顯示當前架構',
         syncLocalApp: '同步本地應用',
         memoryRequiredHelper: '目前應用記憶體需求 {0}',
+        gpuConfig: '開啟 GPU 支援',
+        gpuConfigHelper: '請確保機器有 NVIDIA GPU 並且安裝 NVIDIA 驅動 和 NVIDIA docker Container Toolkit',
     },
     website: {
         website: '網站',

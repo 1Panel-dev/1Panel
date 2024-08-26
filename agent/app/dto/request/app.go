@@ -36,6 +36,7 @@ type AppContainerConfig struct {
 	DockerCompose string  `json:"dockerCompose"`
 	HostMode      bool    `json:"hostMode"`
 	PullImage     bool    `json:"pullImage"`
+	GpuConfig     bool    `json:"gpuConfig"`
 }
 
 type AppInstalledSearch struct {

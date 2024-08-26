@@ -51,6 +51,7 @@ export namespace App {
         hostMode?: boolean;
         memoryRequired: number;
         architectures: string;
+        gpuSupport: boolean;
     }
 
     export interface AppReq extends ReqPage {

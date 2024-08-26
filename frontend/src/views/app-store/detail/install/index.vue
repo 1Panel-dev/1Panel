@@ -90,6 +90,10 @@
                         {{ $t('container.limitHelper', [limits.memory]) }}{{ req.memoryUnit }}B
                     </span>
                 </el-form-item>
+                <el-form-item pro="gpuConfig" v-if="gpuSupport">
+                    <el-checkbox v-model="req.gpuConfig" :label="$t('app.gpuConfig')" size="large" />
+                    <span class="input-help">{{ $t('app.gpuConfigHelper') }}</span>
+                </el-form-item>
                 <el-form-item pro="pullImage">
                     <el-checkbox v-model="req.pullImage" :label="$t('container.forcePull')" size="large" />
                     <span class="input-help">{{ $t('container.forcePullHelper') }}</span>
@@ -170,6 +174,7 @@ const initData = () => ({
     appID: '',
     pullImage: true,
     taskID: '',
+    gpuConfig: false,
 });
 const req = reactive(initData());
 const limits = ref<Container.ResourceLimit>({
@@ -189,6 +194,7 @@ const paramKey = ref(1);
 const isHostMode = ref(false);
 const taskLogRef = ref();
 const memoryRequired = ref(0);
+const gpuSupport = ref(false);
 
 const changeUnit = () => {
     if (req.memoryUnit == 'M') {
@@ -237,6 +243,7 @@ const getAppDetail = async (version: string) => {
         installData.value.params = res.data.params;
         paramKey.value++;
         memoryRequired.value = res.data.memoryRequired;
+        gpuSupport.value = res.data.gpuSupport;
     } catch (error) {
     } finally {
         loading.value = false;

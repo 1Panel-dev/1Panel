@@ -111,6 +111,7 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 			Limit:       ap.Limit,
 			Website:     ap.Website,
 			Github:      ap.Github,
+			GpuSupport:  ap.GpuSupport,
 		}
 		appDTOs = append(appDTOs, appDTO)
 		appTags, err := appTagRepo.GetByAppId(ap.ID)
@@ -263,7 +264,8 @@ func (a AppService) GetAppDetail(appID uint, version, appType string) (response.
 		appDetailDTO.Enable = false
 	}
 	appDetailDTO.Architectures = app.Architectures
-	appDetailDTO.MemoryLimit = app.MemoryLimit
+	appDetailDTO.MemoryRequired = app.MemoryRequired
+	appDetailDTO.GpuSupport = app.GpuSupport
 	return appDetailDTO, nil
 }
 func (a AppService) GetAppDetailByID(id uint) (*response.AppDetailDTO, error) {
@@ -1057,5 +1059,11 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 		return nil
 	}, nil)
 
-	return syncTask.Execute()
+	go func() {
+		if err = syncTask.Execute(); err != nil {
+			_ = NewISettingService().Update("AppStoreSyncStatus", constant.Error)
+		}
+	}()
+
+	return nil
 }
