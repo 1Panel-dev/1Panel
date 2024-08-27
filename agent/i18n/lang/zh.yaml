@@ -65,6 +65,7 @@ UpgradeAppSuccess: "应用  {{ .name }} 升级成功"
 AppStoreIsLastVersion: "应用商店已经是最新版本"
 AppStoreSyncSuccess: "应用商店同步成功"
 SyncAppDetail: "同步应用配置"
+AppVersionNotMatch: "{{ .name }} 应用需要更新 1Panel，跳过同步"
 
 #file
 ErrFileCanNotRead: "此文件不支持预览"

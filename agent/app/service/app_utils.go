@@ -1091,13 +1091,17 @@ func getAppDetails(details []model.AppDetail, versions []dto.AppConfigVersion) m
 	return appDetails
 }
 
-func getApps(oldApps []model.App, items []dto.AppDefine) map[string]model.App {
+func getApps(oldApps []model.App, items []dto.AppDefine, systemVersion string, task *task.Task) map[string]model.App {
 	apps := make(map[string]model.App, len(oldApps))
 	for _, old := range oldApps {
 		old.Status = constant.AppTakeDown
 		apps[old.Key] = old
 	}
 	for _, item := range items {
+		if item.AppProperty.Version > 0 && common.CompareVersion(strconv.FormatFloat(item.AppProperty.Version, 'f', -1, 64), systemVersion) {
+			task.Log(i18n.GetWithName("AppVersionNotMatch", item.Name))
+			continue
+		}
 		config := item.AppProperty
 		key := config.Key
 		app, ok := apps[key]
