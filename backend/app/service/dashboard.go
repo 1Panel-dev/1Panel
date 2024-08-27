@@ -3,6 +3,8 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	network "net"
+	"os"
 	"sort"
 	"strings"
 	"sync"
@@ -94,11 +96,20 @@ func (u *DashboardService) LoadBaseInfo(ioOption string, netOption string) (*dto
 	baseInfo.KernelVersion = hostInfo.KernelVersion
 	ss, _ := json.Marshal(hostInfo)
 	baseInfo.VirtualizationSystem = string(ss)
-
+	baseInfo.IpV4Addr = GetOutboundIP()
+	httpProxy := os.Getenv("http_proxy")
+	if httpProxy == "" {
+		httpProxy = os.Getenv("HTTP_PROXY")
+	}
+	if httpProxy != "" {
+		baseInfo.SystemProxy = httpProxy
+	}
+	baseInfo.SystemProxy = "noProxy"
 	appInstall, err := appInstallRepo.ListBy()
 	if err != nil {
 		return nil, err
 	}
+
 	baseInfo.AppInstalledNumber = len(appInstall)
 	postgresqlDbs, err := postgresqlRepo.List()
 	if err != nil {
@@ -206,6 +217,18 @@ func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *d
 
 	currentInfo.ShotTime = time.Now()
 	return &currentInfo
+}
+
+func GetOutboundIP() string {
+	conn, err := network.Dial("udp", "8.8.8.8:80")
+
+	if err != nil {
+		return "IPNotFound"
+	}
+	defer conn.Close()
+
+	localAddr := conn.LocalAddr().(*network.UDPAddr)
+	return localAddr.IP.String()
 }
 
 type diskInfo struct {

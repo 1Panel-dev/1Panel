@@ -16,10 +16,11 @@ type DashboardBase struct {
 	KernelArch           string `json:"kernelArch"`
 	KernelVersion        string `json:"kernelVersion"`
 	VirtualizationSystem string `json:"virtualizationSystem"`
-
-	CPUCores        int    `json:"cpuCores"`
-	CPULogicalCores int    `json:"cpuLogicalCores"`
-	CPUModelName    string `json:"cpuModelName"`
+	IpV4Addr             string `json:"ipv4Addr"`
+	SystemProxy          string `json:"SystemProxy"`
+	CPUCores             int    `json:"cpuCores"`
+	CPULogicalCores      int    `json:"cpuLogicalCores"`
+	CPUModelName         string `json:"cpuModelName"`
 
 	CurrentInfo DashboardCurrent `json:"currentInfo"`
 }

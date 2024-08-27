@@ -22,6 +22,8 @@ export namespace Dashboard {
         kernelArch: string;
         kernelVersion: string;
         virtualizationSystem: string;
+        ipv4Addr: string;
+        systemProxy: string;
 
         cpuCores: number;
         cpuLogicalCores: number;
