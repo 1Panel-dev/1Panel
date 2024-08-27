@@ -65,6 +65,7 @@ UpgradeAppSuccess: "App {{ .name }} upgraded successfully"
 AppStoreIsLastVersion: "The app store is up to date"
 AppStoreSyncSuccess: "App store synchronized successfully"
 SyncAppDetail: "Synchronize app configuration"
+AppVersionNotMatch: "{{ .name }} app requires an update to 1Panel, skipping synchronization"
 
 
 #file

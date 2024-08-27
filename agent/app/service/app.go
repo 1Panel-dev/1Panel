@@ -867,7 +867,12 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 
 		transport := xpack.LoadRequestTransport()
 		baseRemoteUrl := fmt.Sprintf("%s/%s/1panel", global.CONF.System.AppRepo, global.CONF.System.Mode)
-		appsMap := getApps(oldApps, list.Apps)
+
+		setting, err := NewISettingService().GetSettingInfo()
+		if err != nil {
+			return err
+		}
+		appsMap := getApps(oldApps, list.Apps, setting.SystemVersion, t)
 
 		t.LogStart(i18n.GetMsgByKey("SyncAppDetail"))
 		for _, l := range list.Apps {
