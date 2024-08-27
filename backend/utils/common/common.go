@@ -338,3 +338,7 @@ func FormatBytes(bytes uint64) string {
 		return fmt.Sprintf("%.2fGB", float64(bytes)/float64(gb))
 	}
 }
+
+func FormatPercent(percent float64) string {
+	return fmt.Sprintf("%.2f%%", percent)
+}
