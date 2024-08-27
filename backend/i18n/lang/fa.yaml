@@ -1,0 +1,206 @@
+ErrInvalidParams: "خطای پارامتر درخواست: {{ .detail }}"
+ErrTokenParse: "خطای تولید توکن: {{ .detail }}"
+ErrInitialPassword: "خطای رمز عبور اولیه"
+ErrInternalServer: "خطای داخلی سرویس: {{ .detail }}"
+ErrRecordExist: "سند از قبل وجود دارد"
+ErrRecordNotFound: "سندها یافت نشد"
+ErrStructTransform: "شکست تبدیل نوع: {{ .detail }}"
+ErrNotLogin: "کاربر وارد نشده است: {{ .detail }}"
+ErrPasswordExpired: "رمز عبور فعلی منقضی شده است: {{ .detail }}"
+ErrNotSupportType: "سیستم نوع فعلی را پشتیبانی نمی‌کند: {{ .detail }}"
+
+#common
+ErrNameIsExist: "نام از قبل وجود دارد"
+ErrDemoEnvironment: "سرور آزمایشی، این عملیات ممنوع است!"
+ErrCmdTimeout: "زمان اجرای دستور به پایان رسید!"
+ErrCmdIllegal: "دستور شامل کاراکترهای غیرقانونی است. لطفاً آن را اصلاح کنید و دوباره تلاش کنید!"
+ErrPortExist: '{{ .port }} پورت در حال حاضر توسط {{ .type }} [{{ .name }}] اشغال شده است'
+TYPE_APP: "برنامه"
+TYPE_RUNTIME: "محیط اجرایی"
+TYPE_DOMAIN: "نام دامنه"
+ErrTypePort: 'فرمت پورت {{ .name }} اشتباه است'
+ErrTypePortRange: 'دامنه پورت باید بین 1-65535 باشد'
+Success: "موفقیت"
+Failed: "شکست"
+SystemRestart: "راه‌اندازی مجدد سیستم باعث قطع وظیفه می‌شود"
+
+#app
+ErrPortInUsed: "{{ .detail }} پورت در حال حاضر در حال استفاده است"
+ErrAppLimit: "برنامه از حد نصب تجاوز کرده است"
+ErrAppRequired: "{{ .detail }} برنامه ضروری است"
+ErrNotInstall: "برنامه نصب نشده است"
+ErrPortInOtherApp: "{{ .port }} پورت در حال حاضر توسط برنامه {{ .apps }} استفاده می‌شود"
+ErrDbUserNotValid: "پایگاه داده سهام، نام کاربری و رمز عبور مطابقت ندارد!"
+ErrDockerComposeNotValid: "خطای فرمت فایل docker-compose!"
+ErrUpdateBuWebsite: 'برنامه با موفقیت به‌روزرسانی شد، اما تغییر فایل پیکربندی وب‌سایت با شکست مواجه شد، لطفاً پیکربندی را بررسی کنید!'
+Err1PanelNetworkFailed: 'ایجاد شبکه پیش‌فرض کانتینر با شکست مواجه شد! {{ .detail }}'
+ErrFileParse: 'تحلیل فایل docker-compose برنامه با شکست مواجه شد!'
+ErrInstallDirNotFound: 'دایرکتوری نصب وجود ندارد'
+AppStoreIsUpToDate: 'فروشگاه برنامه به‌روز است!'
+LocalAppVersionNull: 'برنامه {{.name}} با نسخه همگام‌سازی نشده است! نمی‌توان آن را به لیست برنامه‌ها اضافه کرد'
+LocalAppVersionErr: '{{.name}} همگام‌سازی نسخه {{.version}} با شکست مواجه شد! {{.err}}'
+ErrFileNotFound: '{{.name}} فایل وجود ندارد'
+ErrFileParseApp: 'تحلیل فایل {{.name}} با شکست مواجه شد {{.err}}'
+ErrAppDirNull: 'پوشه نسخه وجود ندارد'
+LocalAppErr: "همگام‌سازی برنامه {{.name}} با شکست مواجه شد! {{.err}}"
+ErrContainerName: "ContainerName از قبل وجود دارد"
+ErrAppSystemRestart: "راه‌اندازی مجدد 1Panel باعث خاتمه وظیفه می‌شود"
+ErrCreateHttpClient: "ساخت درخواست HTTP با شکست مواجه شد {{.err}}"
+ErrHttpReqTimeOut: "درخواست به پایان رسید {{.err}}"
+ErrHttpReqFailed: "درخواست شکست خورد {{.err}}"
+ErrHttpReqNotFound: "فایل وجود ندارد"
+ErrNoSuchHost: "اتصال شبکه با شکست مواجه شد"
+ErrImagePullTimeOut: 'زمان کشیدن تصویر به پایان رسید'
+ErrContainerNotFound: '{{ .name }} کانتینر وجود ندارد'
+ErrContainerMsg: '{{ .name }} کانتینر غیرعادی است، لطفاً برای جزئیات، لاگ را در صفحه کانتینر بررسی کنید'
+ErrAppBackup: '{{ .name }} نسخه پشتیبان برنامه با شکست مواجه شد {{.err}}'
+ErrImagePull: '{{ .name }} کشیدن تصویر با شکست مواجه شد {{.err}}'
+ErrVersionTooLow: 'نسخه فعلی 1Panel برای به‌روزرسانی فروشگاه برنامه خیلی پایین است، لطفاً نسخه را به‌روزرسانی کنید'
+ErrAppNameExist: 'نام برنامه از قبل وجود دارد'
+AppStoreIsSyncing: 'فروشگاه برنامه در حال همگام‌سازی است، لطفاً بعداً تلاش کنید'
+ErrGetCompose: "دریافت فایل docker-compose.yml با شکست مواجه شد! {{ .detail }}"
+ErrAppWarn: "وضعیت غیرعادی، لطفاً لاگ را بررسی کنید"
+ErrAppParamKey: "استثنا در فیلد پارامتر {{ .name }}"
+ErrAppUpgrade: "به‌روزرسانی برنامه {{ .name }} با شکست مواجه شد {{ .err }}"
+AppRecover: "برنامه {{ .name }} به حالت قبلی برگشت"
+PullImageStart: "شروع کشیدن تصویر {{ .name }}"
+PullImageSuccess: "کشیدن تصویر با موفقیت انجام شد"
+UpgradeAppStart: "شروع به‌روزرسانی برنامه {{ .name }}"
+UpgradeAppSuccess: "برنامه {{ .name }} با موفقیت به‌روزرسانی شد"
+
+#file
+ErrFileCanNotRead: "فایل قابل خواندن نیست"
+ErrFileToLarge: "فایل خیلی بزرگ است"
+ErrPathNotFound: "مسیر پیدا نشد"
+ErrMovePathFailed: "مسیر هدف نمی‌تواند شامل مسیر اصلی باشد!"
+ErrLinkPathNotFound: "مسیر هدف وجود ندارد!"
+ErrFileIsExist: "فایل یا دایرکتوری از قبل وجود دارد!"
+ErrFileUpload: "بارگذاری فایل {{.name}} با شکست مواجه شد {{.detail}}"
+ErrFileDownloadDir: "پوشه دانلود پشتیبانی نمی‌شود"
+ErrCmdNotFound: "{{ .name}} دستور وجود ندارد، لطفاً این دستور را ابتدا در میزبان نصب کنید"
+ErrSourcePathNotFound: "دایرکتوری منبع وجود ندارد"
+ErrFavoriteExist: "این مسیر از قبل جمع‌آوری شده است"
+ErrInvalidChar: "کاراکترهای غیرقانونی ممنوع است"
+
+#website
+ErrDomainIsExist: "دامنه از قبل وجود دارد"
+ErrAliasIsExist: "نام مستعار از قبل وجود دارد"
+ErrAppDelete: 'سایر وب‌سایت‌ها از این برنامه استفاده می‌کنند'
+ErrGroupIsUsed: 'گروه در حال استفاده است و نمی‌توان آن را حذف کرد'
+ErrBackupMatch: 'فایل پشتیبان با داده‌های جزئی فعلی وب‌سایت مطابقت ندارد: {{ .detail}}'
+ErrBackupExist: 'فایل پشتیبان به بخشی از داده‌های اصلی که وجود ندارد مربوط می‌شود: {{ .detail}}'
+ErrPHPResource: 'محیط اجرایی محلی از تعویض پشتیبانی نمی‌کند!'
+ErrPathPermission: 'فولدر با مجوزهای غیر 1000:1000 در دایرکتوری ایندکس شناسایی شد، که ممکن است باعث خطای دسترسی غیرمجاز هنگام دسترسی به وب‌سایت شود. لطفاً دکمه ذخیره را در بالا کلیک کنید'
+ErrDomainIsUsed: "دامنه توسط وب‌سایت {{ .name }} از قبل استفاده شده است"
+ErrDomainFormat: "{{ .name }} خطای فرمت دامنه"
+ErrDefaultAlias: "کد پیش‌فرض یک نام کد رزرو شده است، لطفاً از نام کد دیگری استفاده کنید"
+ErrImageNotExist: "تصویر محیط اجرایی {{.name}} وجود ندارد، لطفاً محیط اجرایی را دوباره ویرایش کنید"
+
+#ssl
+ErrSSLCannotDelete: "گواهینامه {{ .name }} توسط وب‌سایت استفاده می‌شود و نمی‌توان آن را حذف کرد"
+ErrAccountCannotDelete: "گواهینامه مرتبط با حساب را نمی‌توان حذف کرد"
+ErrSSLApply: "گواهینامه همچنان با موفقیت امضا می‌شود، اما بارگذاری openresty با شکست مواجه شد، لطفاً پیکربندی را بررسی کنید!"
+ErrEmailIsExist: 'ایمیل از قبل وجود دارد'
+ErrSSLKeyNotFound: 'فایل کلید خصوصی وجود ندارد'
+ErrSSLCertificateNotFound: 'فایل گواهینامه وجود ندارد'
+ErrSSLKeyFormat: 'خطای تأیید فایل کلید خصوصی'
+ErrSSLCertificateFormat: 'خطای فرمت فایل گواهینامه، لطفاً از فرمت pem استفاده کنید'
+ErrEabKidOrEabHmacKeyCannotBlank: 'EabKid یا EabHmacKey نمی‌تواند خالی باشد'
+ErrOpenrestyNotFound: 'حالت HTTP نیاز به نصب Openresty دارد'
+ApplySSLStart: 'شروع درخواست گواهینامه، نام دامنه [{{ .domain }}] روش درخواست [{{ .type }}]'
+dnsAccount: "DNS خودکار"
+dnsManual: "DNS دستی"
+http: "HTTP"
+ApplySSLFailed: 'درخواست برای گواهینامه [{{ .domain }}] با شکست مواجه شد، {{.detail}}'
+ApplySSLSuccess: 'درخواست برای گواهینامه [{{ .domain }}] با موفقیت انجام شد!!'
+DNSAccountName: 'حساب DNS [{{ .name }}] سازنده [{{.type}}]'
+PushDirLog: 'گواهینامه به دایرکتوری [{{ .path }}] {{ .status }} ارسال شد'
+ErrDeleteCAWithSSL: "در حال حاضر گواهینامه‌ای در سازمان جاری صادر شده است و نمی‌توان آن را حذف کرد"
+ErrDeleteWithPanelSSL: "پیکربندی SSL پانل از این گواهینامه استفاده می‌کند و نمی‌توان آن را حذف کرد"
+ErrDefaultCA: "سازمان پیش‌فرض قابل حذف نیست"
+ApplyWebSiteSSLLog: "شروع به‌روزرسانی گواهینامه وب‌سایت {{ .name }}"
+ErrUpdateWebsiteSSL: "به‌روزرسانی گواهینامه وب‌سایت {{ .name }} با شکست مواجه شد: {{ .err }}"
+ApplyWebSiteSSLSuccess: "به‌روزرسانی گواهینامه وب‌سایت با موفقیت انجام شد"
+
+#mysql
+ErrUserIsExist: "کاربر فعلی از قبل وجود دارد. لطفاً کاربر جدیدی وارد کنید"
+ErrDatabaseIsExist: "پایگاه داده فعلی از قبل وجود دارد. لطفاً پایگاه داده جدیدی وارد کنید"
+ErrExecTimeOut: "زمان اجرای SQL به پایان رسید، لطفاً پایگاه داده را بررسی کنید"
+ErrRemoteExist: "پایگاه داده از راه دور با آن نام از قبل وجود دارد، لطفاً آن را اصلاح کنید و دوباره تلاش کنید"
+ErrLocalExist: "پایگاه داده محلی با آن نام از قبل وجود دارد، لطفاً آن را اصلاح کنید و دوباره تلاش کنید"
+
+#redis
+ErrTypeOfRedis: "نوع فایل بازیابی با حالت پایداری فعلی مطابقت ندارد. نوع فایل را تغییر داده و دوباره تلاش کنید"
+
+#container
+ErrInUsed: "{{ .detail }} در حال استفاده است و نمی‌توان آن را حذف کرد"
+ErrObjectInUsed: "این شیء در حال استفاده است و نمی‌توان آن را حذف کرد"
+ErrPortRules: "تعداد پورت‌ها مطابقت ندارد، لطفاً دوباره وارد کنید!"
+ErrPgImagePull: "کشیدن تصویر با شکست مواجه شد. لطفاً شتاب‌دهنده تصویر را پیکربندی کنید یا تصویر postgres:16.0-alpine را به صورت دستی کشیده و دوباره تلاش کنید"
+
+#runtime
+ErrDirNotFound: "پوشه ساخت وجود ندارد! لطفاً تمامیت فایل را بررسی کنید!"
+ErrFileNotExist: "{{ .detail }} فایل وجود ندارد! لطفاً تمامیت فایل منبع را بررسی کنید!"
+ErrImageBuildErr: "ساخت تصویر با شکست مواجه شد"
+ErrImageExist: "تصویر از قبل وجود دارد!"
+ErrDelWithWebsite: "محیط اجرایی با یک وب‌سایت مرتبط شده است و نمی‌توان آن را حذف کرد"
+ErrRuntimeStart: "شروع با شکست مواجه شد"
+ErrPackageJsonNotFound: "فایل package.json وجود ندارد"
+ErrScriptsNotFound: "هیچ مورد پیکربندی اسکریپت در package.json یافت نشد"
+ErrContainerNameNotFound: "عدم توانایی در دریافت نام کانتینر، لطفاً فایل .env را بررسی کنید"
+ErrNodeModulesNotFound: "پوشه node_modules وجود ندارد! لطفاً محیط اجرایی را ویرایش کنید یا منتظر بمانید تا محیط اجرایی با موفقیت شروع شود"
+
+#setting
+ErrBackupInUsed: "حساب پشتیبان در حال حاضر در یک cronjob در حال استفاده است و نمی‌توان آن را حذف کرد."
+ErrBackupCheck: "اتصال حساب پشتیبان ناموفق بود {{ .err}}"
+ErrOSSConn: "عدم توانایی در بازیابی آخرین نسخه، لطفاً بررسی کنید که آیا سرور می‌تواند به شبکه خارجی متصل شود."
+ErrEntrance: "خطای اطلاعات ورودی امنیتی. لطفاً بررسی کنید و دوباره تلاش کنید!"
+
+#tool
+ErrConfigNotFound: "فایل پیکربندی وجود ندارد"
+ErrConfigParse: "خطای فرمت فایل پیکربندی"
+ErrConfigIsNull: "فایل پیکربندی نمی‌تواند خالی باشد"
+ErrConfigDirNotFound: "دایرکتوری اجرایی وجود ندارد"
+ErrConfigAlreadyExist: "فایل پیکربندی با همین نام از قبل وجود دارد"
+ErrUserFindErr: "یافتن کاربر {{ .name }} با شکست مواجه شد {{ .err }}"
+
+#ssh
+ErrFirewall: "هیچ سرویس firewalld یا ufw شناسایی نشد. لطفاً بررسی کنید و دوباره تلاش کنید!"
+
+#cronjob
+ErrBashExecute: "خطای اجرای اسکریپت، لطفاً اطلاعات خاص را در ناحیه خروجی وظیفه بررسی کنید."
+ErrCutWebsiteLog: "{{ .name }} برش لاگ وب‌سایت با شکست مواجه شد، خطا {{ .err }}"
+CutWebsiteLogSuccess: "{{ .name }} برش لاگ وب‌سایت با موفقیت انجام شد، مسیر پشتیبان {{ .path }}"
+
+#toolbox
+ErrNotExistUser: "کاربر فعلی وجود ندارد. لطفاً تغییر دهید و دوباره تلاش کنید!"
+ErrBanAction: "تنظیم ناموفق بود، سرویس {{ .name }} فعلی در دسترس نیست، لطفاً بررسی کنید و دوباره تلاش کنید!"
+ErrClamdscanNotFound: "دستور clamdscan شناسایی نشد، لطفاً به مستندات مراجعه کرده و آن را نصب کنید!"
+
+#waf
+ErrScope: "تغییر این پیکربندی پشتیبانی نمی‌شود"
+ErrStateChange: "تغییر وضعیت با شکست مواجه شد"
+ErrRuleExist: "قانون از قبل وجود دارد"
+ErrRuleNotExist: "قانون وجود ندارد"
+ErrParseIP: "خطای فرمت IP"
+ErrDefaultIP: "پیش‌فرض نامی رزرو شده است، لطفاً آن را به نام دیگری تغییر دهید"
+ErrGroupInUse: "گروه IP توسط لیست سیاه/سفید استفاده می‌شود و نمی‌توان آن را حذف کرد"
+ErrGroupExist: "نام گروه IP از قبل وجود دارد"
+ErrIPRange: "دامنه IP اشتباه است"
+ErrIPExist: "IP وجود دارد"
+
+#license
+ErrLicense: "خطای فرمت مجوز، لطفاً بررسی کنید و دوباره تلاش کنید!"
+ErrLicenseCheck: "تأیید مجوز ناموفق بود، لطفاً بررسی کنید و دوباره تلاش کنید!"
+ErrLicenseSave: "ذخیره اطلاعات مجوز با شکست مواجه شد، خطا {{ .err }}, لطفاً دوباره تلاش کنید!"
+ErrLicenseSync: "همگام‌سازی اطلاعات مجوز ناموفق بود، اطلاعات مجوزی در پایگاه داده شناسایی نشد!"
+ErrXpackNotFound: "این بخش ویژگی نسخه حرفه‌ای است، لطفاً ابتدا مجوز را در رابط تنظیمات پنل وارد کنید"
+ErrXpackNotActive: "این بخش ویژگی نسخه حرفه‌ای است، لطفاً ابتدا وضعیت مجوز را در رابط تنظیمات پنل همگام‌سازی کنید"
+ErrXpackOutOfDate: "مجوز فعلی منقضی شده است، لطفاً مجوز را دوباره در رابط تنظیمات پنل وارد کنید"
+
+#license
+ErrAlert: "خطای فرمت اطلاعات هشدار، لطفاً بررسی کنید و دوباره تلاش کنید!"
+ErrAlertPush: "خطای ارسال هشدار، لطفاً بررسی کنید و دوباره تلاش کنید!"
+ErrAlertSave: "خطای ذخیره هشدار، لطفاً بررسی کنید و دوباره تلاش کنید!"
+ErrAlertSync: "خطای همگام‌سازی هشدار، لطفاً بررسی کنید و دوباره تلاش کنید!"
+ErrAlertRemote: "خطای هشدار از راه دور، لطفاً بررسی کنید و دوباره تلاش کنید!"
