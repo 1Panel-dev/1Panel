@@ -29,8 +29,8 @@
                                     <CopyButton :content="loadPgInfo(true)" type="icon" />
                                 </el-descriptions-item>
                                 <el-descriptions-item :label="$t('database.connPort')">
-                                    {{ form.port }}
-                                    <CopyButton :content="form.port + ''" type="icon" />
+                                    5432
+                                    <CopyButton content="5432" type="icon" />
                                 </el-descriptions-item>
                             </el-descriptions>
                         </el-card>
