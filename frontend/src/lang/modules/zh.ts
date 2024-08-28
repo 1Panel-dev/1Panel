@@ -1391,7 +1391,7 @@ const message = {
         snapshot: '快照',
         deleteHelper: '将删除该快照的所有备份文件，包括第三方备份账号中的文件。',
         ignoreRule: '排除规则',
-        ignoreHelper: '快照时将使用该规则对 1Panel 数据目录进行压缩备份，请谨慎修改。',
+        ignoreHelper: '快照时将使用该规则对 1Panel 数据目录进行压缩备份，默认忽略套接字文件。',
         ignoreHelper1: '一行一个，例： \n*.log\n/opt/1panel/cache',
         status: '快照状态',
         panelInfo: '写入 1Panel 基础信息',
