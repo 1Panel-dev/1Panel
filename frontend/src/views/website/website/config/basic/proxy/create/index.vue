@@ -102,9 +102,6 @@
                         <el-button type="primary" @click="addReplaces">
                             {{ $t('website.addReplace') }}
                         </el-button>
-                        <div>
-                            <span class="input-help">{{ $t('website.replacementHelper') }}</span>
-                        </div>
                     </el-form-item>
                 </el-form>
             </el-col>

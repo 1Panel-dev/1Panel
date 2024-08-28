@@ -65,7 +65,7 @@ const deleteReq = ref({
     deleteBackup: false,
     forceDelete: false,
     deleteDB: true,
-    deleteImage: true,
+    deleteImage: false,
     taskID: '',
 });
 const open = ref(false);
@@ -91,7 +91,7 @@ const acceptParams = async (app: App.AppInstallDto) => {
         deleteBackup: false,
         forceDelete: false,
         deleteDB: true,
-        deleteImage: true,
+        deleteImage: false,
         taskID: uuidv4(),
     };
     deleteInfo.value = '';

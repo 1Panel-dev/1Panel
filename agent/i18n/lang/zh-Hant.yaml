@@ -67,6 +67,10 @@ AppStoreIsLastVersion: "應用商店已經是最新版本"
 AppStoreSyncSuccess: "應用商店同步成功"
 SyncAppDetail: "同步應用配置"
 AppVersionNotMatch: "{{ .name }} 應用需要更新 1Panel，跳過同步"
+MoveSiteDir: "當前升級需要遷移 OpenResty 網站目錄"
+MoveSiteToDir: "遷移網站目錄到 {{ .name }}"
+ErrMoveSiteDir: "遷移網站目錄失敗"
+MoveSiteDirSuccess: "遷移網站目錄成功"
 
 
 #file

@@ -66,6 +66,10 @@ AppStoreIsLastVersion: "The app store is up to date"
 AppStoreSyncSuccess: "App store synchronized successfully"
 SyncAppDetail: "Synchronize app configuration"
 AppVersionNotMatch: "{{ .name }} app requires an update to 1Panel, skipping synchronization"
+MoveSiteDir: "The current upgrade requires migrating the OpenResty website directory"
+MoveSiteToDir: "Migrate the website directory to {{ .name }}"
+ErrMoveSiteDir: "Failed to migrate the website directory"
+MoveSiteDirSuccess: "Successfully migrated the website directory"
 
 
 #file
