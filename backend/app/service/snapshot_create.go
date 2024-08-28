@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"path"
-	pathUtils "path"
 	"regexp"
 	"strings"
 	"sync"
@@ -260,11 +259,7 @@ func handleSnapTar(sourceDir, targetDir, name, exclusionRules string, secret str
 		commands = fmt.Sprintf("tar --warning=no-file-changed --ignore-failed-read --exclude-from=<(find %s -type s -print) -zcf %s %s %s %s", sourceDir, " -"+exStr, path, extraCmd, targetDir+"/"+name)
 		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" %s ", secret), "******"))
 	} else {
-		itemPrefix := pathUtils.Base(sourceDir)
-		if itemPrefix == "/" {
-			itemPrefix = ""
-		}
-		commands = fmt.Sprintf("tar --warning=no-file-changed --ignore-failed-read --exclude-from=<(find %s -type s -printf '%s' | sed 's|^|%s/|') -zcf %s %s -C %s .", sourceDir, "%P\n", itemPrefix, targetDir+"/"+name, exStr, sourceDir)
+		commands = fmt.Sprintf("tar --warning=no-file-changed --ignore-failed-read --exclude-from=<(find %s -type s -printf '%s' | sed 's|^|./|') -zcf %s %s -C %s .", sourceDir, "%P\n", targetDir+"/"+name, exStr, sourceDir)
 		global.LOG.Debug(commands)
 	}
 	stdout, err := cmd.ExecWithTimeOut(commands, 30*time.Minute)
