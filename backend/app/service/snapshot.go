@@ -27,7 +27,7 @@ type SnapshotService struct {
 }
 
 type ISnapshotService interface {
-	SearchWithPage(req dto.SearchWithPage) (int64, interface{}, error)
+	SearchWithPage(req dto.PageSnapshot) (int64, interface{}, error)
 	SnapshotCreate(req dto.SnapshotCreate) error
 	SnapshotRecover(req dto.SnapshotRecover) error
 	SnapshotRollback(req dto.SnapshotRecover) error
@@ -46,8 +46,8 @@ func NewISnapshotService() ISnapshotService {
 	return &SnapshotService{}
 }
 
-func (u *SnapshotService) SearchWithPage(req dto.SearchWithPage) (int64, interface{}, error) {
-	total, systemBackups, err := snapshotRepo.Page(req.Page, req.PageSize, commonRepo.WithLikeName(req.Info))
+func (u *SnapshotService) SearchWithPage(req dto.PageSnapshot) (int64, interface{}, error) {
+	total, systemBackups, err := snapshotRepo.Page(req.Page, req.PageSize, commonRepo.WithLikeName(req.Info), commonRepo.WithOrderRuleBy(req.OrderBy, req.Order))
 	if err != nil {
 		return 0, nil, err
 	}

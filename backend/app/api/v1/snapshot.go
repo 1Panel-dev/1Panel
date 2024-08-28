@@ -99,12 +99,12 @@ func (b *BaseApi) UpdateSnapDescription(c *gin.Context) {
 // @Summary Page system snapshot
 // @Description 获取系统快照列表分页
 // @Accept json
-// @Param request body dto.SearchWithPage true "request"
+// @Param request body dto.PageSnapshot true "request"
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
 // @Router /settings/snapshot/search [post]
 func (b *BaseApi) SearchSnapshot(c *gin.Context) {
-	var req dto.SearchWithPage
+	var req dto.PageSnapshot
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}

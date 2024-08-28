@@ -28,6 +28,7 @@
                     :pagination-config="paginationConfig"
                     v-model:selects="selects"
                     :data="data"
+                    @sort-change="search"
                     style="margin-top: 20px"
                     @search="search"
                 >
@@ -37,6 +38,7 @@
                         :label="$t('commons.table.name')"
                         min-width="100"
                         prop="name"
+                        sortable
                         fix
                     />
                     <el-table-column prop="version" :label="$t('app.version')" />
@@ -104,6 +106,7 @@
                     </el-table-column>
                     <el-table-column
                         prop="createdAt"
+                        sortable
                         :label="$t('commons.table.date')"
                         :formatter="dateFormat"
                         show-overflow-tooltip
@@ -216,6 +219,8 @@ const paginationConfig = reactive({
     currentPage: 1,
     pageSize: 10,
     total: 0,
+    orderBy: 'created_at',
+    order: 'null',
 });
 const searchName = ref();
 
@@ -399,11 +404,15 @@ const buttons = [
     },
 ];
 
-const search = async () => {
+const search = async (column?: any) => {
+    paginationConfig.orderBy = column?.order ? column.prop : paginationConfig.orderBy;
+    paginationConfig.order = column?.order ? column.order : paginationConfig.order;
     let params = {
         info: searchName.value,
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
+        orderBy: paginationConfig.orderBy,
+        order: paginationConfig.order,
     };
     loading.value = true;
     await searchSnapshotPage(params)

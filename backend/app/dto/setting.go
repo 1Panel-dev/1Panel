@@ -98,6 +98,12 @@ type PortUpdate struct {
 	ServerPort uint `json:"serverPort" validate:"required,number,max=65535,min=1"`
 }
 
+type PageSnapshot struct {
+	PageInfo
+	Info    string `json:"info"`
+	OrderBy string `json:"orderBy" validate:"required,oneof=name created_at"`
+	Order   string `json:"order" validate:"required,oneof=null ascending descending"`
+}
 type SnapshotStatus struct {
 	Panel      string `json:"panel"`
 	PanelInfo  string `json:"panelInfo"`

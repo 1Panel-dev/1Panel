@@ -1573,7 +1573,7 @@ const message = {
         status: 'Snapshot status',
         ignoreRule: 'Ignore Rule',
         ignoreHelper:
-            'This rule will be used to compress and backup the 1Panel data directory during snapshots, please modify with caution.',
+            'This rule will be used to compress and backup the 1Panel data directory during snapshots, with socket files ignored by default.',
         ignoreHelper1: 'One item per line, e.g.: \n*.log\n/opt/1panel/cache',
         panelInfo: 'Write 1Panel basic information',
         panelBin: 'Backup 1Panel system files',

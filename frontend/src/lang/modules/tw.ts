@@ -1388,7 +1388,7 @@ const message = {
         deleteHelper: '將刪除該快照的所有備份文件，包括第三方備份賬號中的文件。',
         status: '快照狀態',
         ignoreRule: '排除規則',
-        ignoreHelper: '快照時將使用該規則對 1Panel 數據目錄進行壓縮備份，請謹慎修改。',
+        ignoreHelper: '快照時將使用該規則對 1Panel 數據目錄進行壓縮備份，預設忽略套接字檔案。',
         ignoreHelper1: '一行一個，例： \n*.log\n/opt/1panel/cache',
         panelInfo: '寫入 1Panel 基礎信息',
         panelBin: '備份 1Panel 系統文件',
