@@ -204,7 +204,6 @@ const operate = async () => {
         operateReq.taskID = taskID;
         await InstalledOp(operateReq)
             .then(() => {
-                MsgSuccess(i18n.global.t('app.upgradeStart'));
                 bus.emit('upgrade', true);
                 handleClose();
                 openTaskLog(taskID);

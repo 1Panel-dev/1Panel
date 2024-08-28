@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path"
 	"path/filepath"
 	"reflect"
 	"strconv"
@@ -335,6 +336,16 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 		if existDatabases, _ := databaseRepo.GetList(commonRepo.WithByName(req.Name)); len(existDatabases) > 0 {
 			err = buserr.New(constant.ErrRemoteExist)
 			return
+		}
+	}
+	if app.Key == "openresty" && app.Resource == "remote" && common.CompareVersion(appDetail.Version, "1.21.4.3-3-3") {
+		if dir, ok := req.Params["WEBSITE_DIR"]; ok {
+			siteDir := dir.(string)
+			if siteDir == "" || !strings.HasPrefix(siteDir, "/") {
+				siteDir = path.Join(constant.DataDir, dir.(string))
+			}
+			req.Params["WEBSITE_DIR"] = siteDir
+			_ = settingRepo.Create("WEBSITE_DIR", siteDir)
 		}
 	}
 	for key := range req.Params {

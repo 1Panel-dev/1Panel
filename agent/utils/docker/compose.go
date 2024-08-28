@@ -2,10 +2,12 @@ package docker
 
 import (
 	"context"
+	"fmt"
 	"github.com/compose-spec/compose-go/v2/loader"
 	"github.com/compose-spec/compose-go/v2/types"
 	"github.com/docker/compose/v2/pkg/api"
 	"github.com/joho/godotenv"
+	"gopkg.in/yaml.v3"
 	"path"
 	"regexp"
 	"strings"
@@ -53,6 +55,34 @@ type ComposeProject struct {
 
 type Service struct {
 	Image string `yaml:"image"`
+}
+
+func replaceEnvVariables(input string, envVars map[string]string) string {
+	for key, value := range envVars {
+		placeholder := fmt.Sprintf("${%s}", key)
+		input = strings.ReplaceAll(input, placeholder, value)
+	}
+	return input
+}
+func GetDockerComposeImagesV2(env, yml []byte) ([]string, error) {
+	var (
+		compose ComposeProject
+		err     error
+		images  []string
+	)
+	err = yaml.Unmarshal(yml, &compose)
+	if err != nil {
+		return nil, err
+	}
+	envMap, err := godotenv.UnmarshalBytes(env)
+	if err != nil {
+		return nil, err
+	}
+	for _, service := range compose.Services {
+		image := replaceEnvVariables(service.Image, envMap)
+		images = append(images, image)
+	}
+	return images, nil
 }
 
 func GetDockerComposeImages(projectName string, env, yml []byte) ([]string, error) {

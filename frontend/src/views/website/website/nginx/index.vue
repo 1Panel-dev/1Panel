@@ -16,7 +16,7 @@
         </template>
         <template #main>
             <Status v-if="activeName === '1'" :status="status" />
-            <Source v-if="activeName === '2'"></Source>
+            <Source v-if="activeName === '2'" />
             <NginxPer v-if="activeName === '3'" />
             <ContainerLog v-if="activeName === '4'" ref="dialogContainerLogRef" />
         </template>
