@@ -227,6 +227,10 @@ func (c *AcmeClient) ObtainSSL(domains []string, privateKey crypto.PrivateKey) (
 	return *certificates, nil
 }
 
+func (c *AcmeClient) RevokeSSL(pemSSL []byte) error {
+	return c.Client.Certificate.Revoke(pemSSL)
+}
+
 type Resolve struct {
 	Key   string
 	Value string

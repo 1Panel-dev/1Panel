@@ -410,6 +410,19 @@ func (w WebsiteSSLService) Delete(ids []uint) error {
 				return buserr.New("ErrDeleteWithPanelSSL")
 			}
 		}
+		websiteSSL, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(id))
+		if err != nil {
+			return err
+		}
+		acmeAccount, err := websiteAcmeRepo.GetFirst(commonRepo.WithByID(websiteSSL.AcmeAccountID))
+		if err != nil {
+			return err
+		}
+		client, err := ssl.NewAcmeClient(acmeAccount)
+		if err != nil {
+			return err
+		}
+		_ = client.RevokeSSL([]byte(websiteSSL.Pem))
 		_ = websiteSSLRepo.DeleteBy(commonRepo.WithByID(id))
 	}
 	if len(names) > 0 {
