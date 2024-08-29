@@ -24,7 +24,6 @@ import (
 	"github.com/docker/docker/api/types"
 
 	httpUtil "github.com/1Panel-dev/1Panel/agent/utils/http"
-	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 	"github.com/docker/docker/api/types/container"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
@@ -405,25 +404,26 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 
 		switch install.App.Key {
 		case constant.AppOpenresty:
-			websites, _ := websiteRepo.List()
-			for _, website := range websites {
-				if website.AppInstallID > 0 {
-					websiteAppInstall, _ := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
-					if websiteAppInstall.AppId > 0 {
-						websiteApp, _ := appRepo.GetFirst(commonRepo.WithByID(websiteAppInstall.AppId))
-						if websiteApp.Type == constant.RuntimePHP {
-							go func() {
-								_, _ = compose.Down(websiteAppInstall.GetComposePath())
-								_ = op.DeleteDir(websiteAppInstall.GetPath())
-							}()
-							_ = appInstallRepo.Delete(ctx, websiteAppInstall)
-						}
-					}
-				}
-			}
-			_ = websiteRepo.DeleteAll(ctx)
-			_ = websiteDomainRepo.DeleteAll(ctx)
-			xpack.RemoveTamper("")
+			//TODO 删除 Openresty 不再删除网站
+			//websites, _ := websiteRepo.List()
+			//for _, website := range websites {
+			//	if website.AppInstallID > 0 {
+			//		websiteAppInstall, _ := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
+			//		if websiteAppInstall.AppId > 0 {
+			//			websiteApp, _ := appRepo.GetFirst(commonRepo.WithByID(websiteAppInstall.AppId))
+			//			if websiteApp.Type == constant.RuntimePHP {
+			//				go func() {
+			//					_, _ = compose.Down(websiteAppInstall.GetComposePath())
+			//					_ = op.DeleteDir(websiteAppInstall.GetPath())
+			//				}()
+			//				_ = appInstallRepo.Delete(ctx, websiteAppInstall)
+			//			}
+			//		}
+			//	}
+			//}
+			//_ = websiteRepo.DeleteAll(ctx)
+			//_ = websiteDomainRepo.DeleteAll(ctx)
+			//xpack.RemoveTamper("")
 		case constant.AppMysql, constant.AppMariaDB:
 			_ = mysqlRepo.Delete(ctx, mysqlRepo.WithByMysqlName(install.Name))
 		case constant.AppPostgresql:

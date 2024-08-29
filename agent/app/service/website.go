@@ -31,20 +31,18 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/env"
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
+	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
+	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/cmd/server/nginx_conf"
+	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx/components"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx/parser"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/ini.v1"
-	"gorm.io/gorm"
-
-	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
-	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
-	"github.com/1Panel-dev/1Panel/agent/buserr"
-	"github.com/1Panel-dev/1Panel/agent/global"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -72,7 +70,7 @@ type IWebsiteService interface {
 
 	GetNginxConfigByScope(req request.NginxScopeReq) (*response.WebsiteNginxConfig, error)
 	UpdateNginxConfigByScope(req request.NginxConfigUpdate) error
-	GetWebsiteNginxConfig(websiteId uint, configType string) (response.FileInfo, error)
+	GetWebsiteNginxConfig(websiteId uint, configType string) (*response.FileInfo, error)
 	UpdateNginxConfigFile(req request.WebsiteNginxUpdate) error
 	GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, error)
 	OpWebsiteHTTPS(ctx context.Context, req request.WebsiteHTTPSOp) (*response.WebsiteHTTPS, error)
@@ -128,13 +126,6 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 		websiteDTOs []response.WebsiteRes
 		opts        []repo.DBOption
 	)
-	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return 0, nil, nil
-		}
-		return 0, nil, err
-	}
 	opts = append(opts, commonRepo.WithOrderRuleBy(req.OrderBy, req.Order))
 	if req.Name != "" {
 		domains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithDomainLike(req.Name))
@@ -179,7 +170,7 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 			runtimeType = runtime.Type
 			appInstallID = runtime.ID
 		}
-		sitePath := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "www", "sites", web.Alias)
+		sitePath := GetSitePath(web, SiteDir)
 
 		siteDTO := response.WebsiteRes{
 			ID:            web.ID,
@@ -566,13 +557,10 @@ func (w WebsiteService) GetWebsite(id uint) (response.WebsiteDTO, error) {
 	}
 	res.Website = website
 
-	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
-	if err != nil {
-		return res, err
-	}
-	sitePath := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "www", "sites", website.Alias)
-	res.ErrorLogPath = path.Join(sitePath, "log", "error.log")
-	res.AccessLogPath = path.Join(sitePath, "log", "access.log")
+	sitePath := GetSitePath(website, SiteDir)
+
+	res.ErrorLogPath = GetSitePath(website, SiteErrorLog)
+	res.AccessLogPath = GetSitePath(website, SiteAccessLog)
 	res.SitePath = sitePath
 	res.SiteDir = website.SiteDir
 	return res, nil
@@ -893,33 +881,26 @@ func (w WebsiteService) UpdateNginxConfigByScope(req request.NginxConfigUpdate) 
 	return updateNginxConfig(constant.NginxScopeServer, params, &website)
 }
 
-func (w WebsiteService) GetWebsiteNginxConfig(websiteId uint, configType string) (response.FileInfo, error) {
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(websiteId))
+func (w WebsiteService) GetWebsiteNginxConfig(websiteID uint, configType string) (*response.FileInfo, error) {
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(websiteID))
 	if err != nil {
-		return response.FileInfo{}, err
+		return nil, err
 	}
 	configPath := ""
 	switch configType {
 	case constant.AppOpenresty:
-		nginxApp, err := appRepo.GetFirst(appRepo.WithKey(constant.AppOpenresty))
-		if err != nil {
-			return response.FileInfo{}, err
-		}
-		nginxInstall, err := appInstallRepo.GetFirst(appInstallRepo.WithAppId(nginxApp.ID))
-		if err != nil {
-			return response.FileInfo{}, err
-		}
-		configPath = path.Join(nginxInstall.GetPath(), "conf", "conf.d", website.Alias+".conf")
+		configPath = GetSitePath(website, SiteConf)
+		//TODO 删除下面的代码
 	case constant.ConfigFPM:
 		runtimeInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
 		if err != nil {
-			return response.FileInfo{}, err
+			return nil, err
 		}
 		configPath = path.Join(runtimeInstall.GetPath(), "conf", "php-fpm.conf")
 	case constant.ConfigPHP:
 		runtimeInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
 		if err != nil {
-			return response.FileInfo{}, err
+			return nil, err
 		}
 		configPath = path.Join(runtimeInstall.GetPath(), "conf", "php.ini")
 	}
@@ -928,9 +909,9 @@ func (w WebsiteService) GetWebsiteNginxConfig(websiteId uint, configType string)
 		Expand: true,
 	})
 	if err != nil {
-		return response.FileInfo{}, err
+		return nil, err
 	}
-	return response.FileInfo{FileInfo: *info}, nil
+	return &response.FileInfo{FileInfo: *info}, nil
 }
 
 func (w WebsiteService) GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, error) {
@@ -1633,12 +1614,8 @@ func (w WebsiteService) UpdateRewriteConfig(req request.NginxRewriteUpdate) erro
 	if err != nil {
 		return err
 	}
-	nginxFull, err := getNginxFull(&website)
-	if err != nil {
-		return err
-	}
-	includePath := fmt.Sprintf("/www/sites/%s/rewrite/%s.conf", website.Alias, website.PrimaryDomain)
-	absolutePath := path.Join(nginxFull.Install.GetPath(), includePath)
+	includePath := fmt.Sprintf("/www/sites/%s/rewrite/%s.conf", website.Alias, website.Alias)
+	absolutePath := GetSitePath(website, SiteReWritePath)
 	fileOp := files.NewFileOp()
 	var oldRewriteContent []byte
 	if !fileOp.Stat(path.Dir(absolutePath)) {
@@ -1675,11 +1652,7 @@ func (w WebsiteService) GetRewriteConfig(req request.NginxRewriteReq) (*response
 	}
 	var contentByte []byte
 	if req.Name == "current" {
-		nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
-		if err != nil {
-			return nil, err
-		}
-		rewriteConfPath := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "rewrite", fmt.Sprintf("%s.conf", website.PrimaryDomain))
+		rewriteConfPath := GetSitePath(website, SiteReWritePath)
 		fileOp := files.NewFileOp()
 		if fileOp.Stat(rewriteConfPath) {
 			contentByte, err = fileOp.GetContent(rewriteConfPath)
@@ -1743,42 +1716,44 @@ func (w WebsiteService) UpdateSitePermission(req request.WebsiteUpdateDirPermiss
 
 func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error) {
 	var (
-		website      model.Website
-		params       []response.NginxParam
-		nginxInstall model.AppInstall
-		par          *parser.Parser
-		oldContent   []byte
+		website model.Website
+		//params       []response.NginxParam
+		//nginxInstall model.AppInstall
+		par        *parser.Parser
+		oldContent []byte
 	)
 
 	website, err = websiteRepo.GetFirst(commonRepo.WithByID(req.ID))
 	if err != nil {
 		return
 	}
-	params, err = getNginxParamsByKeys(constant.NginxScopeHttp, []string{"proxy_cache"}, &website)
-	if err != nil {
-		return
-	}
-	nginxInstall, err = getAppInstallByKey(constant.AppOpenresty)
-	if err != nil {
-		return
-	}
+	//params, err = getNginxParamsByKeys(constant.NginxScopeHttp, []string{"proxy_cache"}, &website)
+	//if err != nil {
+	//	return
+	//}
+	//nginxInstall, err = getAppInstallByKey(constant.AppOpenresty)
+	//if err != nil {
+	//	return
+	//}
 	fileOp := files.NewFileOp()
-	if len(params) == 0 || len(params[0].Params) == 0 {
-		commonDir := path.Join(nginxInstall.GetPath(), "www", "common", "proxy")
-		proxyTempPath := path.Join(commonDir, "proxy_temp_dir")
-		if !fileOp.Stat(proxyTempPath) {
-			_ = fileOp.CreateDir(proxyTempPath, 0755)
-		}
-		proxyCacheDir := path.Join(commonDir, "proxy_temp_dir")
-		if !fileOp.Stat(proxyCacheDir) {
-			_ = fileOp.CreateDir(proxyCacheDir, 0755)
-		}
-		nginxParams := getNginxParamsFromStaticFile(dto.CACHE, nil)
-		if err = updateNginxConfig(constant.NginxScopeHttp, nginxParams, &website); err != nil {
-			return
-		}
-	}
-	includeDir := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "proxy")
+	//TODO 代理缓存改为单独使用配置
+	//if len(params) == 0 || len(params[0].Params) == 0 {
+	//	commonDir := path.Join(nginxInstall.GetPath(), "www", "common", "proxy")
+	//	proxyTempPath := path.Join(commonDir, "proxy_temp_dir")
+	//	if !fileOp.Stat(proxyTempPath) {
+	//		_ = fileOp.CreateDir(proxyTempPath, 0755)
+	//	}
+	//	proxyCacheDir := path.Join(commonDir, "proxy_temp_dir")
+	//	if !fileOp.Stat(proxyCacheDir) {
+	//		_ = fileOp.CreateDir(proxyCacheDir, 0755)
+	//	}
+	//	nginxParams := getNginxParamsFromStaticFile(dto.CACHE, nil)
+	//	if err = updateNginxConfig(constant.NginxScopeHttp, nginxParams, &website); err != nil {
+	//		return
+	//	}
+	//}
+
+	includeDir := GetSitePath(website, SiteProxyDir)
 	if !fileOp.Stat(includeDir) {
 		_ = fileOp.CreateDir(includeDir, 0755)
 	}
@@ -1873,19 +1848,14 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 
 func (w WebsiteService) GetProxies(id uint) (res []request.WebsiteProxyConfig, err error) {
 	var (
-		website      model.Website
-		nginxInstall model.AppInstall
-		fileList     response.FileInfo
+		website  model.Website
+		fileList response.FileInfo
 	)
 	website, err = websiteRepo.GetFirst(commonRepo.WithByID(id))
 	if err != nil {
 		return
 	}
-	nginxInstall, err = getAppInstallByKey(constant.AppOpenresty)
-	if err != nil {
-		return
-	}
-	includeDir := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "proxy")
+	includeDir := GetSitePath(website, SiteProxyDir)
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(includeDir) {
 		return
@@ -2456,20 +2426,15 @@ func (w WebsiteService) GetAntiLeech(id uint) (*response.NginxAntiLeechRes, erro
 
 func (w WebsiteService) OperateRedirect(req request.NginxRedirectReq) (err error) {
 	var (
-		website      model.Website
-		nginxInstall model.AppInstall
-		oldContent   []byte
+		website    model.Website
+		oldContent []byte
 	)
 
 	website, err = websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
 	if err != nil {
 		return err
 	}
-	nginxInstall, err = getAppInstallByKey(constant.AppOpenresty)
-	if err != nil {
-		return
-	}
-	includeDir := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "redirect")
+	includeDir := GetSitePath(website, SiteRedirectDir)
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(includeDir) {
 		_ = fileOp.CreateDir(includeDir, 0755)
@@ -2610,19 +2575,14 @@ func (w WebsiteService) OperateRedirect(req request.NginxRedirectReq) (err error
 
 func (w WebsiteService) GetRedirect(id uint) (res []response.NginxRedirectConfig, err error) {
 	var (
-		website      model.Website
-		nginxInstall model.AppInstall
-		fileList     response.FileInfo
+		website  model.Website
+		fileList response.FileInfo
 	)
 	website, err = websiteRepo.GetFirst(commonRepo.WithByID(id))
 	if err != nil {
 		return
 	}
-	nginxInstall, err = getAppInstallByKey(constant.AppOpenresty)
-	if err != nil {
-		return
-	}
-	includeDir := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "redirect")
+	includeDir := GetSitePath(website, SiteRedirectDir)
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(includeDir) {
 		return
@@ -2780,11 +2740,7 @@ func (w WebsiteService) LoadWebsiteDirConfig(req request.WebsiteCommonReq) (*res
 		return nil, err
 	}
 	res := &response.WebsiteDirConfig{}
-	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
-	if err != nil {
-		return nil, err
-	}
-	absoluteIndexPath := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "index")
+	absoluteIndexPath := GetSitePath(website, SiteIndexDir)
 	var appFs = afero.NewOsFs()
 	info, err := appFs.Stat(absoluteIndexPath)
 	if err != nil {

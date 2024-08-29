@@ -51,8 +51,7 @@ func getNginxFull(website *model.Website) (dto.NginxFull, error) {
 	if website != nil {
 		nginxFull.Website = *website
 		var siteNginxConfig dto.NginxConfig
-		nginxFileName := website.Alias + ".conf"
-		siteConfigPath := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "conf", "conf.d", nginxFileName)
+		siteConfigPath := GetSitePath(*website, SiteConf)
 		siteNginxConfig.FilePath = siteConfigPath
 		siteNginxContent, err := os.ReadFile(siteConfigPath)
 		if err != nil {

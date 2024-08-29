@@ -433,12 +433,7 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 		if err != nil {
 			return nil, err
 		}
-		nginx, err := getNginxFull(&website)
-		if err != nil {
-			return nil, err
-		}
-		sitePath := path.Join(nginx.SiteDir, "sites", website.Alias)
-		logFilePath = path.Join(sitePath, "log", req.Name)
+		logFilePath = GetSitePath(website, req.Name)
 	case constant.TypePhp:
 		php, err := runtimeRepo.GetFirst(commonRepo.WithByID(req.ID))
 		if err != nil {
