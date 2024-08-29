@@ -541,16 +541,7 @@ func removeSSLListen(website model.Website, binds []string) error {
 }
 
 func createPemFile(website model.Website, websiteSSL model.WebsiteSSL) error {
-	nginxApp, err := appRepo.GetFirst(appRepo.WithKey(constant.AppOpenresty))
-	if err != nil {
-		return err
-	}
-	nginxInstall, err := appInstallRepo.GetFirst(appInstallRepo.WithAppId(nginxApp.ID))
-	if err != nil {
-		return err
-	}
-
-	configDir := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "www", "sites", website.Alias, "ssl")
+	configDir := GetSitePath(website, SiteSSLDir)
 	fileOp := files.NewFileOp()
 
 	if !fileOp.Stat(configDir) {
@@ -1159,4 +1150,57 @@ func getResourceContent(fileOp files.FileOp, resourcePath string) (string, error
 		return string(content), nil
 	}
 	return "", nil
+}
+
+func GetWebSiteRootDir() string {
+	siteSetting, _ := settingRepo.Get(settingRepo.WithByKey("WEBSITE_DIR"))
+	dir := siteSetting.Value
+	if dir == "" {
+		dir = path.Join(constant.DataDir, "www")
+	}
+	return dir
+}
+
+func GteSiteDir(alias string) string {
+	return path.Join(GetWebSiteRootDir(), "sites", alias)
+}
+
+const (
+	SiteConf        = "SiteConf"
+	SiteAccessLog   = "access.log"
+	SiteErrorLog    = "error.log"
+	WebsiteRootDir  = "WebsiteRootDir"
+	SiteDir         = "SiteDir"
+	SiteIndexDir    = "SiteIndexDir"
+	SiteProxyDir    = "SiteProxyDir"
+	SiteSSLDir      = "SiteSSLDir"
+	SiteReWritePath = "SiteReWritePath"
+	SiteRedirectDir = "SiteRedirectDir"
+)
+
+func GetSitePath(website model.Website, confType string) string {
+	switch confType {
+	case SiteConf:
+		return path.Join(GetWebSiteRootDir(), "conf.d", website.Alias+".conf")
+	case SiteAccessLog:
+		return path.Join(GteSiteDir(website.Alias), "log", "access.log")
+	case SiteErrorLog:
+		return path.Join(GteSiteDir(website.Alias), "log", "error.log")
+	case WebsiteRootDir:
+		return GetWebSiteRootDir()
+	case SiteDir:
+		return GteSiteDir(website.Alias)
+	case SiteIndexDir:
+		return path.Join(GteSiteDir(website.Alias), "index")
+	case SiteProxyDir:
+		return path.Join(GteSiteDir(website.Alias), "proxy")
+	case SiteSSLDir:
+		return path.Join(GteSiteDir(website.Alias), "ssl")
+	case SiteReWritePath:
+		return path.Join(GteSiteDir(website.Alias), "rewrite", website.Alias+".conf")
+	case SiteRedirectDir:
+		return path.Join(GteSiteDir(website.Alias), "redirect")
+
+	}
+	return ""
 }

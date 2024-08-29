@@ -91,29 +91,10 @@
                 </div>
             </el-card>
         </div>
-        <div v-if="!data.isExist && !isDB()">
-            <LayoutContent :title="getTitle(key)" :divider="true">
-                <template #main>
-                    <div class="app-warn">
-                        <div class="flx-center">
-                            <span>{{ $t('app.checkInstalledWarn', [data.app]) }}</span>
-                            <span @click="goRouter(key)" class="flx-align-center">
-                                <el-icon class="ml-2"><Position /></el-icon>
-                                {{ $t('database.goInstall') }}
-                            </span>
-                        </div>
-                        <div>
-                            <img src="@/assets/images/no_app.svg" />
-                        </div>
-                    </div>
-                </template>
-            </LayoutContent>
-        </div>
     </div>
 </template>
 <script lang="ts" setup>
 import { CheckAppInstalled, InstalledOp } from '@/api/modules/app';
-import router from '@/routers';
 import { onMounted, reactive, ref, watch } from 'vue';
 import Status from '@/components/status/index.vue';
 import { ElMessageBox } from 'element-plus';
@@ -170,14 +151,6 @@ const httpsPort = ref(0);
 const em = defineEmits(['setting', 'isExist', 'before', 'after', 'update:loading', 'update:maskShow']);
 const setting = () => {
     em('setting', false);
-};
-
-const goRouter = async (key: string) => {
-    router.push({ name: 'AppAll', query: { install: key } });
-};
-
-const isDB = () => {
-    return key.value === 'mysql' || key.value === 'mariadb' || key.value === 'postgresql';
 };
 
 const onCheck = async () => {
@@ -237,19 +210,6 @@ const onOperate = async (operation: string) => {
         .catch(() => {
             em('update:maskShow', true);
         });
-};
-
-const getTitle = (key: string) => {
-    switch (key) {
-        case 'openresty':
-            return i18n.global.t('website.website');
-        case 'mysql':
-            return 'MySQL ' + i18n.global.t('menu.database');
-        case 'postgresql':
-            return 'PostgreSQL ' + i18n.global.t('menu.database');
-        case 'redis':
-            return 'Redis ' + i18n.global.t('menu.database');
-    }
 };
 
 onMounted(() => {

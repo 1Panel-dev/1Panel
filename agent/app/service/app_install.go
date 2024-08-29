@@ -618,10 +618,10 @@ func (a *AppInstallService) DeleteCheck(installID uint) ([]dto.AppResource, erro
 	if err != nil {
 		return nil, err
 	}
-	app, err := appRepo.GetFirst(commonRepo.WithByID(appInstall.AppId))
-	if err != nil {
-		return nil, err
-	}
+	//app, err := appRepo.GetFirst(commonRepo.WithByID(appInstall.AppId))
+	//if err != nil {
+	//	return nil, err
+	//}
 	websites, _ := websiteRepo.GetBy(websiteRepo.WithAppInstallId(appInstall.ID))
 	for _, website := range websites {
 		res = append(res, dto.AppResource{
@@ -629,25 +629,17 @@ func (a *AppInstallService) DeleteCheck(installID uint) ([]dto.AppResource, erro
 			Name: website.PrimaryDomain,
 		})
 	}
-	if app.Key == constant.AppOpenresty {
-		websites, _ := websiteRepo.GetBy()
-		for _, website := range websites {
-			res = append(res, dto.AppResource{
-				Type: "website",
-				Name: website.PrimaryDomain,
-			})
-		}
-	}
-	if app.Type == constant.Runtime {
-		resources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithLinkId(appInstall.ID), commonRepo.WithByFrom(constant.AppResourceLocal))
-		for _, resource := range resources {
-			linkInstall, _ := appInstallRepo.GetFirst(commonRepo.WithByID(resource.AppInstallId))
-			res = append(res, dto.AppResource{
-				Type: "app",
-				Name: linkInstall.Name,
-			})
-		}
-	}
+	//TODO 根据运行环境情况处理
+	//if app.Type == constant.Runtime {
+	//	resources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithLinkId(appInstall.ID), commonRepo.WithByFrom(constant.AppResourceLocal))
+	//	for _, resource := range resources {
+	//		linkInstall, _ := appInstallRepo.GetFirst(commonRepo.WithByID(resource.AppInstallId))
+	//		res = append(res, dto.AppResource{
+	//			Type: "app",
+	//			Name: linkInstall.Name,
+	//		})
+	//	}
+	//}
 	return res, nil
 }
 

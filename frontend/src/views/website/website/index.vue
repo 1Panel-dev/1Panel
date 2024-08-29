@@ -18,22 +18,27 @@
                     @is-exist="checkExist"
                 ></AppStatus>
             </template>
-            <template v-if="nginxIsExist && !openNginxConfig" #leftToolBar>
-                <el-button type="primary" @click="openCreate">
+            <template v-if="!openNginxConfig" #leftToolBar>
+                <el-button type="primary" @click="openCreate" :disabled="nginxStatus != 'Running'">
                     {{ $t('website.create') }}
                 </el-button>
-                <el-button type="primary" plain @click="openGroup">
+                <el-button type="primary" plain @click="openGroup" :disabled="nginxStatus != 'Running'">
                     {{ $t('website.group') }}
                 </el-button>
-                <el-button type="primary" plain @click="openDefault">
+                <el-button type="primary" plain @click="openDefault" :disabled="nginxStatus != 'Running'">
                     {{ $t('website.defaultServer') }}
                 </el-button>
-                <el-button type="primary" plain @click="openDefaultHtml">
+                <el-button type="primary" plain @click="openDefaultHtml" :disabled="nginxStatus != 'Running'">
                     {{ $t('website.defaultHtml') }}
                 </el-button>
             </template>
-            <template v-if="nginxIsExist && !openNginxConfig" #rightToolBar>
-                <el-select v-model="req.websiteGroupId" @change="search()" class="p-w-200 mr-2.5">
+            <template v-if="!openNginxConfig" #rightToolBar>
+                <el-select
+                    v-model="req.websiteGroupId"
+                    @change="search()"
+                    class="p-w-200 mr-2.5"
+                    :disabled="nginxStatus != 'Running'"
+                >
                     <template #prefix>{{ $t('website.group') }}</template>
                     <el-option :label="$t('commons.table.all')" :value="0"></el-option>
                     <el-option
@@ -54,7 +59,7 @@
                     />
                 </div>
             </template>
-            <template v-if="nginxIsExist && !openNginxConfig" #main>
+            <template v-if="!openNginxConfig" #main>
                 <ComplexTable
                     :pagination-config="paginationConfig"
                     :data="data"
