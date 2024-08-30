@@ -550,6 +550,8 @@ const top = () => {
 };
 
 const jump = async (url: string) => {
+    const fileName = url.substring(url.lastIndexOf('/') + 1);
+    const filePath = url.substring(0, url.lastIndexOf('/') + 1);
     history.splice(pointer + 1);
     history.push(url);
     pointer = history.length - 1;
@@ -558,7 +560,7 @@ const jump = async (url: string) => {
     const oldPageSize = req.pageSize;
     // reset search params before exec jump
     Object.assign(req, initData());
-    req.path = url;
+    req.path = filePath;
     req.containSub = false;
     req.search = '';
     req.pageSize = oldPageSize;
@@ -570,6 +572,14 @@ const jump = async (url: string) => {
         req.path = oldUrl;
         MsgWarning(i18n.global.t('commons.res.notFound'));
         return;
+    }
+    if (fileName && fileName.length > 1 && fileName.includes('.')) {
+        const fileData = searchResult.data.items.filter((item) => item.name === fileName);
+        if (fileData && fileData.length === 1) {
+            openView(fileData[0]);
+        } else {
+            MsgWarning(i18n.global.t('commons.res.notFound'));
+        }
     }
     handleSearchResult(searchResult);
     getPaths(req.path);
