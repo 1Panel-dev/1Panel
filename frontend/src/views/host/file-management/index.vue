@@ -551,7 +551,10 @@ const top = () => {
 
 const jump = async (url: string) => {
     const fileName = url.substring(url.lastIndexOf('/') + 1);
-    const filePath = url.substring(0, url.lastIndexOf('/') + 1);
+    let filePath = url.substring(0, url.lastIndexOf('/') + 1);
+    if (!url.includes('.')) {
+        filePath = url;
+    }
     history.splice(pointer + 1);
     history.push(url);
     pointer = history.length - 1;
