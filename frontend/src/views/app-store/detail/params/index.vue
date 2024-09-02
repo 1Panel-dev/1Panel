@@ -42,7 +42,13 @@
                     {{ $t('app.toInstall') }}
                 </el-link>
             </span>
-            <el-select v-model="form[p.envKey]" v-if="p.type == 'select'" :multiple="p.multiple" class="p-w-200">
+            <el-select
+                v-model="form[p.envKey]"
+                v-if="p.type == 'select'"
+                :multiple="p.multiple"
+                :allowCreate="p.allowCreate"
+                filterable
+            >
                 <el-option
                     v-for="service in p.values"
                     :key="service.label"

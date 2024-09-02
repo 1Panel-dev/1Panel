@@ -70,7 +70,7 @@ MoveSiteDir: "The current upgrade requires migrating the OpenResty website direc
 MoveSiteToDir: "Migrate the website directory to {{ .name }}"
 ErrMoveSiteDir: "Failed to migrate the website directory"
 MoveSiteDirSuccess: "Successfully migrated the website directory"
-
+DeleteRuntimePHP: "Delete PHP runtime environment"
 
 #file
 ErrFileCanNotRead: "File can not read"

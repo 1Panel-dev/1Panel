@@ -43,12 +43,14 @@ func Start() {
 	server := &http.Server{
 		Handler: rootRouter,
 	}
+
 	if global.IsMaster {
 		_ = os.Remove("/tmp/agent.sock")
 		listener, err := net.Listen("unix", "/tmp/agent.sock")
 		if err != nil {
 			panic(err)
 		}
+		business.Init()
 		_ = server.Serve(listener)
 		return
 	} else {
@@ -73,8 +75,8 @@ func Start() {
 			Certificates: []tls.Certificate{tlsCert},
 			ClientAuth:   tls.RequireAnyClientCert,
 		}
-		global.LOG.Info("listen at https://0.0.0.0:9999")
 		business.Init()
+		global.LOG.Info("listen at https://0.0.0.0:9999")
 		if err := server.ListenAndServeTLS("", ""); err != nil {
 			panic(err)
 		}

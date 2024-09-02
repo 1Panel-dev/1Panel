@@ -83,6 +83,10 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, e
 		if exist != nil {
 			return nil, buserr.New(constant.ErrImageExist)
 		}
+		portValue, _ := create.Params["PANEL_APP_PORT_HTTP"]
+		if err := checkPortExist(int(portValue.(float64))); err != nil {
+			return nil, err
+		}
 	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo:
 		if !fileOp.Stat(create.CodeDir) {
 			return nil, buserr.New(constant.ErrPathNotFound)
@@ -96,10 +100,10 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, e
 				return nil, err
 			}
 		}
-		if containerName, ok := create.Params["CONTAINER_NAME"]; ok {
-			if err := checkContainerName(containerName.(string)); err != nil {
-				return nil, err
-			}
+	}
+	if containerName, ok := create.Params["CONTAINER_NAME"]; ok {
+		if err := checkContainerName(containerName.(string)); err != nil {
+			return nil, err
 		}
 	}
 
@@ -130,6 +134,7 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, e
 
 	switch create.Type {
 	case constant.RuntimePHP:
+		runtime.Port = int(create.Params["PANEL_APP_PORT_HTTP"].(float64))
 		if err = handlePHP(create, runtime, fileOp, appVersionDir); err != nil {
 			return nil, err
 		}
@@ -263,6 +268,19 @@ func (r *RuntimeService) Get(id uint) (*response.RuntimeDTO, error) {
 		if v, ok := envs["CONTAINER_PACKAGE_URL"]; ok {
 			res.Source = v
 		}
+		res.Params = make(map[string]interface{})
+		for k, v := range envs {
+			if k == "PANEL_APP_PORT_HTTP" {
+				port, err := strconv.Atoi(v)
+				if err != nil {
+					return nil, err
+				}
+				res.Params[k] = port
+				continue
+			}
+			res.Params[k] = v
+		}
+
 		for _, form := range appForm.FormFields {
 			if v, ok := envs[form.EnvKey]; ok {
 				appParam := response.AppParam{
@@ -373,18 +391,6 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 				return err
 			}
 		}
-		if containerName, ok := req.Params["CONTAINER_NAME"]; ok {
-			envs, err := gotenv.Unmarshal(runtime.Env)
-			if err != nil {
-				return err
-			}
-			oldContainerName := envs["CONTAINER_NAME"]
-			if containerName != oldContainerName {
-				if err := checkContainerName(containerName.(string)); err != nil {
-					return err
-				}
-			}
-		}
 
 		appDetail, err := appDetailRepo.GetFirst(commonRepo.WithByID(runtime.AppDetailID))
 		if err != nil {
@@ -402,6 +408,19 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 			}
 			_ = fileOp.Rename(path.Join(runtime.GetPath(), "run.sh"), path.Join(runtime.GetPath(), "run.sh.bak"))
 			_ = fileOp.CopyFile(path.Join(appVersionDir, "run.sh"), runtime.GetPath())
+		}
+	}
+
+	if containerName, ok := req.Params["CONTAINER_NAME"]; ok {
+		envs, err := gotenv.Unmarshal(runtime.Env)
+		if err != nil {
+			return err
+		}
+		oldContainerName := envs["CONTAINER_NAME"]
+		if containerName != oldContainerName {
+			if err := checkContainerName(containerName.(string)); err != nil {
+				return err
+			}
 		}
 	}
 

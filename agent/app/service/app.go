@@ -70,6 +70,10 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 	if req.Resource != "" && req.Resource != "all" {
 		opts = append(opts, appRepo.WithResource(req.Resource))
 	}
+	if req.Type == "php" {
+		info, _ := NewISettingService().GetSettingInfo()
+		opts = append(opts, appRepo.WithPanelVersion(info.SystemVersion))
+	}
 	if req.ShowCurrentArch {
 		info, err := NewIDashboardService().LoadOsInfo()
 		if err != nil {
@@ -202,23 +206,22 @@ func (a AppService) GetAppDetail(appID uint, version, appType string) (response.
 		}
 		switch app.Type {
 		case constant.RuntimePHP:
-			buildPath := filepath.Join(versionPath, "build")
-			paramsPath := filepath.Join(buildPath, "config.json")
+			paramsPath := filepath.Join(versionPath, "data.yml")
 			if !fileOp.Stat(paramsPath) {
-				return appDetailDTO, buserr.New(constant.ErrFileNotExist)
+				return appDetailDTO, buserr.WithDetail(constant.ErrFileNotExist, paramsPath, nil)
 			}
 			param, err := fileOp.GetContent(paramsPath)
 			if err != nil {
 				return appDetailDTO, err
 			}
 			paramMap := make(map[string]interface{})
-			if err := json.Unmarshal(param, &paramMap); err != nil {
+			if err = yaml.Unmarshal(param, &paramMap); err != nil {
 				return appDetailDTO, err
 			}
-			appDetailDTO.Params = paramMap
-			composePath := filepath.Join(buildPath, "docker-compose.yml")
+			appDetailDTO.Params = paramMap["additionalProperties"]
+			composePath := filepath.Join(versionPath, "docker-compose.yml")
 			if !fileOp.Stat(composePath) {
-				return appDetailDTO, buserr.New(constant.ErrFileNotExist)
+				return appDetailDTO, buserr.WithDetail(constant.ErrFileNotExist, composePath, nil)
 			}
 			compose, err := fileOp.GetContent(composePath)
 			if err != nil {

@@ -699,7 +699,7 @@ func (u *ContainerService) ContainerLogs(wsConn *websocket.Conn, containerType, 
 	commandName := "docker"
 	commandArg := []string{"logs", container}
 	if containerType == "compose" {
-		commandName = "docker-compose"
+		commandName = "docker compose"
 		commandArg = []string{"-f", container, "logs"}
 	}
 	if tail != "0" {
@@ -782,7 +782,7 @@ func (u *ContainerService) DownloadContainerLogs(containerType, container, since
 	commandName := "docker"
 	commandArg := []string{"logs", container}
 	if containerType == "compose" {
-		commandName = "docker-compose"
+		commandName = "docker compose"
 		commandArg = []string{"-f", container, "logs"}
 	}
 	if tail != "0" {

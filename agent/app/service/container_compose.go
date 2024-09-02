@@ -141,7 +141,7 @@ func (u *ContainerService) TestCompose(req dto.ComposeCreate) (bool, error) {
 	if err := u.loadPath(&req); err != nil {
 		return false, err
 	}
-	cmd := exec.Command("docker-compose", "-f", req.Path, "config")
+	cmd := exec.Command("docker compose", "-f", req.Path, "config")
 	stdout, err := cmd.CombinedOutput()
 	if err != nil {
 		return false, errors.New(string(stdout))

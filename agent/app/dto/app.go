@@ -160,3 +160,9 @@ type DelAppLink struct {
 	Install     *model.AppInstall
 	ForceDelete bool
 }
+
+type PHPForm struct {
+	AdditionalProperties struct {
+		FormFields []interface{} `yaml:"formFields"`
+	} `yaml:"additionalProperties"`
+}

@@ -2388,7 +2388,7 @@ const message = {
         version: 'Version',
         versionHelper: 'PHP version, e.g. v8.0',
         buildHelper:
-            'The more extensions you select, the more CPU will be occupied during the image making process, so avoid selecting all extensions,If there is no extension you want, you can manually enter it and select it',
+            'The more extensions you select, the more CPU will be used during the image creation process. You can install extensions after the environment is created.',
         openrestyWarn: 'PHP needs to be upgraded to OpenResty to version 1.21.4.1 or later to use',
         toupgrade: 'To Upgrade',
         edit: 'Edit runtime',

@@ -162,13 +162,11 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 			appName = appInstall.Name
 			appInstallID = appInstall.ID
 		case constant.Runtime:
-			runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(web.RuntimeID))
-			if err != nil {
-				return 0, nil, err
+			runtime, _ := runtimeRepo.GetFirst(commonRepo.WithByID(web.RuntimeID))
+			if runtime != nil {
+				runtimeName = runtime.Name
+				runtimeType = runtime.Type
 			}
-			runtimeName = runtime.Name
-			runtimeType = runtime.Type
-			appInstallID = runtime.ID
 		}
 		sitePath := GetSitePath(web, SiteDir)
 
@@ -375,24 +373,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		switch runtime.Type {
 		case constant.RuntimePHP:
 			if runtime.Resource == constant.ResourceAppstore {
-				var (
-					req     request.AppInstallCreate
-					install *model.AppInstall
-				)
-				reg, _ := regexp.Compile(`[^a-z0-9_-]+`)
-				req.Name = reg.ReplaceAllString(strings.ToLower(alias), "")
-				req.AppDetailId = create.AppInstall.AppDetailId
-				req.Params = create.AppInstall.Params
-				req.Params["IMAGE_NAME"] = runtime.Image
-				req.AppContainerConfig = create.AppInstall.AppContainerConfig
-				req.Params["PANEL_WEBSITE_DIR"] = path.Join(nginxInstall.GetPath(), "/www")
-				install, err = NewIAppService().Install(req)
-				if err != nil {
-					return err
-				}
-				website.AppInstallID = install.ID
-				appInstall = install
-				website.Proxy = fmt.Sprintf("127.0.0.1:%d", appInstall.HttpPort)
+				website.Proxy = fmt.Sprintf("127.0.0.1:%d", runtime.Port)
 			} else {
 				website.ProxyType = create.ProxyType
 				if website.ProxyType == constant.RuntimeProxyUnix {

@@ -438,6 +438,12 @@ func (f FileOp) CopyAndReName(src, dst, name string, cover bool) error {
 	}
 }
 
+func (f FileOp) CopyDirWithNewName(src, dst, newName string) error {
+	dstDir := filepath.Join(dst, newName)
+	str := fmt.Sprintf(`cp -rf '%s' '%s'`, src, dstDir)
+	return cmd.ExecCmd(str)
+}
+
 func (f FileOp) CopyDir(src, dst string) error {
 	srcInfo, err := f.Fs.Stat(src)
 	if err != nil {

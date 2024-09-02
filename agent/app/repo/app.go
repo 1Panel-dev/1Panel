@@ -19,6 +19,9 @@ type IAppRepo interface {
 	GetRecommend() DBOption
 	WithResource(resource string) DBOption
 	WithByLikeName(name string) DBOption
+	WithArch(arch string) DBOption
+	WithPanelVersion(panelVersion string) DBOption
+
 	Page(page, size int, opts ...DBOption) (int64, []model.App, error)
 	GetFirst(opts ...DBOption) (model.App, error)
 	GetBy(opts ...DBOption) ([]model.App, error)
@@ -27,7 +30,6 @@ type IAppRepo interface {
 	Create(ctx context.Context, app *model.App) error
 	Save(ctx context.Context, app *model.App) error
 	BatchDelete(ctx context.Context, apps []model.App) error
-	WithArch(arch string) DBOption
 }
 
 func NewIAppRepo() IAppRepo {
@@ -76,6 +78,12 @@ func (a AppRepo) WithResource(resource string) DBOption {
 func (a AppRepo) WithArch(arch string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("architectures like ?", fmt.Sprintf("%%%s%%", arch))
+	}
+}
+
+func (a AppRepo) WithPanelVersion(panelVersion string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("required_panel_version >= ?", panelVersion)
 	}
 }
 
