@@ -641,8 +641,10 @@ func (w WebsiteService) DeleteWebsiteDomain(domainId uint) error {
 				wafSite := wafWebsite
 				oldDomains := wafSite.Domains
 				var newDomains []string
+				removed := false
 				for _, domain := range oldDomains {
-					if domain == webSiteDomain.Domain {
+					if domain == webSiteDomain.Domain && !removed {
+						removed = true
 						continue
 					}
 					newDomains = append(newDomains, domain)
