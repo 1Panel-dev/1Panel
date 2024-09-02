@@ -77,6 +77,7 @@ export namespace App {
         child?: FromFieldChild;
         params?: FromParam[];
         multiple?: boolean;
+        allowCreate?: boolean;
     }
 
     export interface FromFieldChild extends FromField {

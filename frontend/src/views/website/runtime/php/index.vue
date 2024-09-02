@@ -50,8 +50,15 @@
                             <span>{{ $t('runtime.' + toLowerCase(row.resource)) }}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('runtime.version')" prop="version"></el-table-column>
+                    <el-table-column :label="$t('runtime.version')" prop="version">
+                        <template #default="{ row }">{{ row.params['PHP_VERSION'] }}</template>
+                    </el-table-column>
                     <el-table-column :label="$t('runtime.image')" prop="image" show-overflow-tooltip></el-table-column>
+                    <el-table-column :label="$t('commons.table.port')" prop="port">
+                        <template #default="{ row }">
+                            {{ row.port }}
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" prop="status">
                         <template #default="{ row }">
                             <el-popover

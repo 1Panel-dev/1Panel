@@ -70,6 +70,7 @@ MoveSiteDir: "当前升级需要迁移 OpenResty 网站目录"
 MoveSiteToDir: "迁移网站目录到 {{ .name }}"
 ErrMoveSiteDir: "迁移网站目录失败"
 MoveSiteDirSuccess: "迁移网站目录成功"
+DeleteRuntimePHP: "删除 PHP 运行环境"
 
 #file
 ErrFileCanNotRead: "此文件不支持预览"

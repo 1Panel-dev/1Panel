@@ -18,7 +18,7 @@
                     @is-exist="checkExist"
                 ></AppStatus>
             </template>
-            <template v-if="!openNginxConfig" #leftToolBar>
+            <template v-if="!openNginxConfig && nginxIsExist" #leftToolBar>
                 <el-button type="primary" @click="openCreate" :disabled="nginxStatus != 'Running'">
                     {{ $t('website.create') }}
                 </el-button>
@@ -32,7 +32,7 @@
                     {{ $t('website.defaultHtml') }}
                 </el-button>
             </template>
-            <template v-if="!openNginxConfig" #rightToolBar>
+            <template v-if="!openNginxConfig && nginxIsExist" #rightToolBar>
                 <el-select
                     v-model="req.websiteGroupId"
                     @change="search()"
@@ -206,7 +206,13 @@
                     />
                 </ComplexTable>
                 <el-card width="30%" v-if="nginxStatus != 'Running' && maskShow" class="mask-prompt">
-                    <span>{{ $t('commons.service.serviceNotStarted', ['OpenResty']) }}</span>
+                    <span v-if="nginxIsExist">{{ $t('commons.service.serviceNotStarted', ['OpenResty']) }}</span>
+                    <span v-else>
+                        {{ $t('app.checkInstalledWarn', ['OpenResty']) }}
+                        <el-button @click="goRouter('openresty')" link icon="Position" type="primary">
+                            {{ $t('database.goInstall') }}
+                        </el-button>
+                    </span>
                 </el-card>
             </template>
         </LayoutContent>
@@ -301,6 +307,10 @@ let req = reactive({
 const mobile = computed(() => {
     return globalStore.isMobile();
 });
+
+const goRouter = async (key: string) => {
+    router.push({ name: 'AppAll', query: { install: key } });
+};
 
 const changeSort = ({ prop, order }) => {
     if (order) {

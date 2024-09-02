@@ -68,74 +68,107 @@
                     </el-row>
                 </el-form-item>
                 <div v-if="initParam">
-                    <div v-if="runtime.type === 'php'">
-                        <el-form-item :label="$t('runtime.image')" prop="image">
-                            <el-input v-model="runtime.image"></el-input>
-                        </el-form-item>
-                        <el-form-item :label="$t('runtime.source')" prop="source">
-                            <el-select v-model="runtime.source" filterable allow-create default-first-option>
-                                <el-option
-                                    v-for="(source, index) in phpSources"
-                                    :key="index"
-                                    :label="source.label + ' [' + source.value + ']'"
-                                    :value="source.value"
-                                ></el-option>
-                            </el-select>
-                            <span class="input-help">
-                                {{ $t('runtime.phpsourceHelper') }}
-                            </span>
-                        </el-form-item>
-                        <el-form-item :label="$t('php.extensions')">
-                            <el-select v-model="extensions" @change="changePHPExtension()" clearable>
-                                <el-option
-                                    v-for="(extension, index) in phpExtensions"
-                                    :key="index"
-                                    :label="extension.name"
-                                    :value="extension.extensions"
-                                ></el-option>
-                            </el-select>
-                        </el-form-item>
-                        <Params
-                            v-if="mode === 'create'"
-                            v-model:form="runtime.params"
-                            v-model:params="appParams"
-                            v-model:rules="rules"
-                        ></Params>
-                        <EditParams
-                            v-if="mode === 'edit'"
-                            v-model:form="runtime.params"
-                            v-model:params="editParams"
-                            v-model:rules="rules"
-                        ></EditParams>
+                    <el-form-item
+                        :label="getLabel(formFields['PHP_VERSION'])"
+                        :rules="rules.params.PHP_VERSION"
+                        v-if="formFields['PHP_VERSION']"
+                    >
+                        <el-select
+                            v-model="runtime.params['PHP_VERSION']"
+                            filterable
+                            default-first-option
+                            @change="changePHPVersion(runtime.params['PHP_VERSION'])"
+                        >
+                            <el-option
+                                v-for="service in formFields['PHP_VERSION'].values"
+                                :key="service.label"
+                                :value="service.value"
+                                :label="service.label"
+                            ></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item :label="$t('runtime.image')" prop="image">
+                        <el-input v-model="runtime.image"></el-input>
+                    </el-form-item>
+                    <el-form-item
+                        :label="getLabel(formFields['CONTAINER_PACKAGE_URL'])"
+                        :rules="rules.params.CONTAINER_PACKAGE_URL"
+                        v-if="formFields['CONTAINER_PACKAGE_URL']"
+                    >
+                        <el-select v-model="runtime.source" filterable default-first-option>
+                            <el-option
+                                v-for="service in formFields['CONTAINER_PACKAGE_URL'].values"
+                                :key="service.label"
+                                :value="service.value"
+                                :label="service.label"
+                            ></el-option>
+                        </el-select>
+                    </el-form-item>
+
+                    <el-form-item
+                        :label="getLabel(formFields['PANEL_APP_PORT_HTTP'])"
+                        prop="params.PANEL_APP_PORT_HTTP"
+                        v-if="formFields['PANEL_APP_PORT_HTTP']"
+                    >
+                        <el-input
+                            v-model.number="runtime.params['PANEL_APP_PORT_HTTP']"
+                            maxlength="15"
+                            :disabled="mode == 'edit'"
+                        ></el-input>
+                    </el-form-item>
+                    <el-form-item :label="$t('app.containerName')" prop="params.CONTAINER_NAME">
+                        <el-input v-model.trim="runtime.params['CONTAINER_NAME']"></el-input>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-alert type="warning" :closable="false">
+                            <template #default>
+                                <div>{{ $t('runtime.buildHelper') }}</div>
+                                <div>
+                                    <span>{{ $t('runtime.extendHelper') }}</span>
+                                    <el-link
+                                        target="_blank"
+                                        type="primary"
+                                        href="https://1panel.cn/docs/user_manual/websites/php/#php_1"
+                                    >
+                                        {{ $t('php.toExtensionsList') }}
+                                    </el-link>
+                                </div>
+                            </template>
+                        </el-alert>
+                    </el-form-item>
+                    <el-form-item :label="$t('php.extensions')">
+                        <el-select v-model="extensions" @change="changePHPExtension()" clearable>
+                            <el-option
+                                v-for="(extension, index) in phpExtensions"
+                                :key="index"
+                                :label="extension.name"
+                                :value="extension.extensions"
+                            ></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item :label="getLabel(formFields['PHP_EXTENSIONS'])" v-if="formFields['PHP_EXTENSIONS']">
+                        <el-select v-model="runtime.params['PHP_EXTENSIONS']" multiple allowCreate filterable>
+                            <el-option
+                                v-for="service in formFields['PHP_EXTENSIONS'].values"
+                                :key="service.label"
+                                :value="service.value"
+                                :label="service.label"
+                            ></el-option>
+                        </el-select>
+                    </el-form-item>
+
+                    <div v-if="mode == 'edit'">
                         <el-form-item>
-                            <el-alert :title="$t('runtime.buildHelper')" type="warning" :closable="false" />
+                            <el-checkbox v-model="runtime.rebuild">
+                                {{ $t('runtime.rebuild') }}
+                            </el-checkbox>
                         </el-form-item>
                         <el-form-item>
                             <el-alert type="info" :closable="false">
-                                <span>{{ $t('runtime.extendHelper') }}</span>
-                                <el-link
-                                    target="_blank"
-                                    type="primary"
-                                    href="https://1panel.cn/docs/user_manual/websites/php/#php_1"
-                                >
-                                    {{ $t('php.toExtensionsList') }}
-                                </el-link>
+                                <span>{{ $t('runtime.rebuildHelper') }}</span>
                                 <br />
                             </el-alert>
                         </el-form-item>
-                        <div v-if="mode == 'edit'">
-                            <el-form-item>
-                                <el-checkbox v-model="runtime.rebuild">
-                                    {{ $t('runtime.rebuild') }}
-                                </el-checkbox>
-                            </el-form-item>
-                            <el-form-item>
-                                <el-alert type="info" :closable="false">
-                                    <span>{{ $t('runtime.rebuildHelper') }}</span>
-                                    <br />
-                                </el-alert>
-                            </el-form-item>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -169,8 +202,6 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { reactive, ref } from 'vue';
-import Params from '../param/index.vue';
-import EditParams from '../edit/index.vue';
 
 interface OperateRrops {
     id?: number;
@@ -186,7 +217,6 @@ const loading = ref(false);
 const initParam = ref(false);
 const mode = ref('create');
 const appParams = ref<App.AppParams>();
-const editParams = ref<App.InstallParams[]>();
 const appVersions = ref<string[]>([]);
 const phpExtensions = ref([]);
 const appReq = reactive({
@@ -205,6 +235,7 @@ const initData = (type: string) => ({
     source: 'mirrors.ustc.edu.cn',
 });
 const extensions = ref();
+const formFields = ref();
 
 let runtime = reactive<Runtime.RuntimeCreate>(initData('php'));
 
@@ -215,38 +246,22 @@ const rules = ref<any>({
     version: [Rules.requiredInput, Rules.paramCommon],
     image: [Rules.requiredInput, Rules.imageName],
     source: [Rules.requiredSelect],
+    params: {
+        PANEL_APP_PORT_HTTP: [Rules.requiredInput, Rules.port],
+        PHP_VERSION: [Rules.requiredSelect],
+        CONTAINER_PACKAGE_URL: [Rules.requiredSelect],
+        CONTAINER_NAME: [Rules.containerName, Rules.requiredInput],
+    },
 });
 
-const phpSources = [
-    {
-        label: i18n.global.t('runtime.ustc'),
-        value: 'mirrors.ustc.edu.cn',
-    },
-    {
-        label: i18n.global.t('runtime.netease'),
-        value: 'mirrors.163.com',
-    },
-    {
-        label: i18n.global.t('runtime.aliyun'),
-        value: 'mirrors.aliyun.com',
-    },
-    {
-        label: i18n.global.t('runtime.tsinghua'),
-        value: 'mirrors.tuna.tsinghua.edu.cn',
-    },
-    {
-        label: i18n.global.t('runtime.xtomhk'),
-        value: 'mirrors.xtom.com.hk',
-    },
-    {
-        label: i18n.global.t('runtime.xtom'),
-        value: 'mirrors.xtom.com',
-    },
-    {
-        label: i18n.global.t('commons.table.default'),
-        value: 'dl-cdn.alpinelinux.org',
-    },
-];
+const getLabel = (row: App.FromField): string => {
+    const language = localStorage.getItem('lang') || 'zh';
+    if (language == 'zh' || language == 'tw') {
+        return row.labelZh;
+    } else {
+        return row.labelEn;
+    }
+};
 
 const em = defineEmits(['close', 'submit']);
 
@@ -296,6 +311,10 @@ const changeApp = (appId: number) => {
     }
 };
 
+const changePHPVersion = (version: string) => {
+    runtime.image = 'php:' + version;
+};
+
 const changeVersion = () => {
     loading.value = true;
     initParam.value = false;
@@ -305,6 +324,15 @@ const changeVersion = () => {
             runtime.appDetailID = res.data.id;
             runtime.image = res.data.image + ':' + runtime.version;
             appParams.value = res.data.params;
+            const fileds = res.data.params.formFields;
+            formFields.value = {};
+            for (const index in fileds) {
+                formFields.value[fileds[index]['envKey']] = fileds[index];
+                runtime.params[fileds[index]['envKey']] = fileds[index]['default'];
+                if (fileds[index]['envKey'] == 'PHP_VERSION') {
+                    runtime.image = 'php:' + fileds[index]['default'];
+                }
+            }
             initParam.value = true;
         })
         .finally(() => {
@@ -367,7 +395,7 @@ const getRuntime = async (id: number) => {
             name: data.name,
             appDetailID: data.appDetailID,
             image: data.image,
-            params: {},
+            params: data.params,
             type: data.type,
             resource: data.resource,
             appID: data.appID,
@@ -375,12 +403,15 @@ const getRuntime = async (id: number) => {
             rebuild: true,
             source: data.source,
         });
-        editParams.value = data.appParams;
-        if (mode.value == 'create') {
-            searchApp(data.appID);
-        } else {
-            initParam.value = true;
+
+        const fileds = data.appParams;
+        const forms = {};
+        for (const index in fileds) {
+            forms[fileds[index].key] = fileds[index];
         }
+        formFields.value = forms;
+        runtime.params['PHP_EXTENSIONS'] = runtime.params['PHP_EXTENSIONS'].split(',');
+        initParam.value = true;
     } catch (error) {}
 };
 

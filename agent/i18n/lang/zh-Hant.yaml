@@ -71,7 +71,7 @@ MoveSiteDir: "當前升級需要遷移 OpenResty 網站目錄"
 MoveSiteToDir: "遷移網站目錄到 {{ .name }}"
 ErrMoveSiteDir: "遷移網站目錄失敗"
 MoveSiteDirSuccess: "遷移網站目錄成功"
-
+DeleteRuntimePHP: "刪除運行環境 PHP 版本"
 
 #file
 ErrFileCanNotRead: "此文件不支持預覽"

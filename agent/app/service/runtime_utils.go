@@ -2,7 +2,21 @@ package service
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
+	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
+	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/compose"
+	"github.com/1Panel-dev/1Panel/agent/utils/docker"
+	"github.com/1Panel-dev/1Panel/agent/utils/files"
+	httpUtil "github.com/1Panel-dev/1Panel/agent/utils/http"
+	"github.com/pkg/errors"
+	"github.com/subosito/gotenv"
+	"gopkg.in/yaml.v3"
 	"io"
 	"net/http"
 	"os"
@@ -10,19 +24,6 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
-	"time"
-
-	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
-	"github.com/1Panel-dev/1Panel/agent/app/model"
-	"github.com/1Panel-dev/1Panel/agent/buserr"
-	"github.com/1Panel-dev/1Panel/agent/constant"
-	"github.com/1Panel-dev/1Panel/agent/global"
-	"github.com/1Panel-dev/1Panel/agent/utils/docker"
-	"github.com/1Panel-dev/1Panel/agent/utils/files"
-	httpUtil "github.com/1Panel-dev/1Panel/agent/utils/http"
-	"github.com/pkg/errors"
-	"github.com/subosito/gotenv"
-	"gopkg.in/yaml.v3"
 )
 
 func handleNodeAndJava(create request.RuntimeCreate, runtime *model.Runtime, fileOp files.FileOp, appVersionDir string) (err error) {
@@ -66,30 +67,16 @@ func handleNodeAndJava(create request.RuntimeCreate, runtime *model.Runtime, fil
 }
 
 func handlePHP(create request.RuntimeCreate, runtime *model.Runtime, fileOp files.FileOp, appVersionDir string) (err error) {
-	buildDir := path.Join(appVersionDir, "build")
-	if !fileOp.Stat(buildDir) {
-		return buserr.New(constant.ErrDirNotFound)
-	}
 	runtimeDir := path.Join(constant.RuntimeDir, create.Type)
-	tempDir := filepath.Join(runtimeDir, fmt.Sprintf("%d", time.Now().UnixNano()))
-	if err = fileOp.CopyDir(buildDir, tempDir); err != nil {
+	if err = fileOp.CopyDirWithNewName(appVersionDir, runtimeDir, create.Name); err != nil {
 		return
 	}
-	oldDir := path.Join(tempDir, "build")
 	projectDir := path.Join(runtimeDir, create.Name)
 	defer func() {
 		if err != nil {
 			_ = fileOp.DeleteDir(projectDir)
 		}
 	}()
-	if oldDir != projectDir {
-		if err = fileOp.Rename(oldDir, projectDir); err != nil {
-			return
-		}
-		if err = fileOp.DeleteDir(tempDir); err != nil {
-			return
-		}
-	}
 	composeContent, envContent, forms, err := handleParams(create, projectDir)
 	if err != nil {
 		return
@@ -140,9 +127,9 @@ func reCreateRuntime(runtime *model.Runtime) {
 }
 
 func runComposeCmdWithLog(operate string, composePath string, logPath string) error {
-	cmd := exec.Command("docker-compose", "-f", composePath, operate)
+	cmd := exec.Command("docker compose", "-f", composePath, operate)
 	if operate == "up" {
-		cmd = exec.Command("docker-compose", "-f", composePath, operate, "-d")
+		cmd = exec.Command("docker compose", "-f", composePath, operate, "-d")
 	}
 	logFile, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
 	if err != nil {
@@ -218,7 +205,7 @@ func buildRuntime(runtime *model.Runtime, oldImageID string, rebuild bool) {
 		_ = logFile.Close()
 	}()
 
-	cmd := exec.Command("docker-compose", "-f", composePath, "build")
+	cmd := exec.Command("docker", "compose", "-f", composePath, "build")
 	multiWriterStdout := io.MultiWriter(os.Stdout, logFile)
 	cmd.Stdout = multiWriterStdout
 	var stderrBuf bytes.Buffer
@@ -229,8 +216,10 @@ func buildRuntime(runtime *model.Runtime, oldImageID string, rebuild bool) {
 	if err != nil {
 		runtime.Status = constant.RuntimeError
 		runtime.Message = buserr.New(constant.ErrImageBuildErr).Error() + ":" + stderrBuf.String()
+		if stderrBuf.String() == "" {
+			runtime.Message = buserr.New(constant.ErrImageBuildErr).Error() + ":" + err.Error()
+		}
 	} else {
-		runtime.Status = constant.RuntimeNormal
 		runtime.Message = ""
 		if oldImageID != "" {
 			client, err := docker.NewClient()
@@ -272,6 +261,14 @@ func buildRuntime(runtime *model.Runtime, oldImageID string, rebuild bool) {
 				}
 			}
 		}
+		runtime.Status = constant.RuntimeStarting
+		_ = runtimeRepo.Save(runtime)
+		if out, err := compose.Up(composePath); err != nil {
+			runtime.Status = constant.RuntimeStartErr
+			runtime.Message = out
+		} else {
+			runtime.Status = constant.RuntimeRunning
+		}
 	}
 	_ = runtimeRepo.Save(runtime)
 }
@@ -293,7 +290,20 @@ func handleParams(create request.RuntimeCreate, projectDir string) (composeConte
 	switch create.Type {
 	case constant.RuntimePHP:
 		create.Params["IMAGE_NAME"] = create.Image
-		forms, err = fileOp.GetContent(path.Join(projectDir, "config.json"))
+		var fromYml []byte
+		fromYml, err = fileOp.GetContent(path.Join(projectDir, "data.yml"))
+		if err != nil {
+			return
+		}
+		var data dto.PHPForm
+		err = yaml.Unmarshal(fromYml, &data)
+		if err != nil {
+			return
+		}
+		formFields := data.AdditionalProperties.FormFields
+		forms, err = json.MarshalIndent(map[string]interface{}{
+			"formFields": formFields,
+		}, "", "  ")
 		if err != nil {
 			return
 		}
@@ -307,6 +317,8 @@ func handleParams(create request.RuntimeCreate, projectDir string) (composeConte
 			}
 		}
 		create.Params["CONTAINER_PACKAGE_URL"] = create.Source
+		siteDir, _ := settingRepo.Get(settingRepo.WithByKey("WEBSITE_DIR"))
+		create.Params["PANEL_WEBSITE_DIR"] = siteDir.Value
 	case constant.RuntimeNode:
 		create.Params["CODE_DIR"] = create.CodeDir
 		create.Params["NODE_VERSION"] = create.Version

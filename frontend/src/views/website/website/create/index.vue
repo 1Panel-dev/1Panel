@@ -224,39 +224,19 @@
                             </el-form-item>
                         </el-col>
                     </el-row>
-                    <div v-if="website.runtimeType === 'php'">
-                        <Params
-                            v-if="runtimeResource === 'appstore'"
-                            :key="paramKey"
-                            v-model:form="website.appinstall.params"
-                            v-model:rules="rules.appinstall.params"
-                            :params="appParams"
-                            :propStart="'appinstall.params.'"
-                        ></Params>
-                        <div v-else>
-                            <el-form-item :label="$t('website.proxyType')" prop="proxyType">
-                                <el-select v-model="website.proxyType">
-                                    <el-option :label="$t('website.tcp')" :value="'tcp'"></el-option>
-                                    <el-option :label="$t('website.unix')" :value="'unix'"></el-option>
-                                </el-select>
-                            </el-form-item>
-                            <el-form-item
-                                v-if="website.proxyType === 'tcp'"
-                                :label="$t('commons.table.port')"
-                                prop="port"
-                            >
-                                <el-input v-model.number="website.port"></el-input>
-                            </el-form-item>
-                        </div>
+                    <div v-if="website.runtimeType === 'php' && runtimeResource === 'local'">
+                        <el-form-item :label="$t('website.proxyType')" prop="proxyType">
+                            <el-select v-model="website.proxyType">
+                                <el-option :label="$t('website.tcp')" :value="'tcp'"></el-option>
+                                <el-option :label="$t('website.unix')" :value="'unix'"></el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item v-if="website.proxyType === 'tcp'" :label="$t('commons.table.port')" prop="port">
+                            <el-input v-model.number="website.port"></el-input>
+                        </el-form-item>
                     </div>
                 </div>
-                <el-form-item
-                    prop="advanced"
-                    v-if="
-                        (website.type === 'runtime' && website.runtimeType === 'php') ||
-                        (website.type === 'deployment' && website.appType === 'new')
-                    "
-                >
+                <el-form-item prop="advanced" v-if="website.type === 'deployment' && website.appType === 'new'">
                     <el-checkbox v-model="website.appinstall.advanced" :label="$t('app.advanced')" size="large" />
                 </el-form-item>
 
@@ -665,7 +645,7 @@ const runtimeResource = ref('appstore');
 const runtimeReq = ref<Runtime.RuntimeReq>({
     page: 1,
     pageSize: 100,
-    status: 'normal',
+    status: 'running',
 });
 const runtimes = ref<Runtime.RuntimeDTO[]>([]);
 const versionExist = ref(true);
@@ -791,12 +771,7 @@ const getAppDetailByID = (id: number) => {
 
 const changeRuntimeType = () => {
     runtimeReq.value.type = website.value.runtimeType;
-    if (website.value.runtimeType == 'php') {
-        runtimeReq.value.status = 'normal';
-    } else {
-        runtimeReq.value.status = 'running';
-        website.value.appinstall.advanced = false;
-    }
+    website.value.appinstall.advanced = false;
     website.value.runtimeID = undefined;
     getRuntimes();
 };

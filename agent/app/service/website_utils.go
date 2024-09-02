@@ -42,15 +42,11 @@ func handleChineseDomain(domain string) (string, error) {
 }
 
 func createIndexFile(website *model.Website, runtime *model.Runtime) error {
-	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
-	if err != nil {
-		return err
-	}
 	var (
 		indexPath      string
 		indexContent   string
 		websiteService = NewIWebsiteService()
-		indexFolder    = path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "index")
+		indexFolder    = GetSitePath(*website, SiteIndexDir)
 	)
 
 	switch website.Type {
@@ -132,9 +128,8 @@ func createProxyFile(website *model.Website) error {
 	return nil
 }
 
-func createWebsiteFolder(nginxInstall model.AppInstall, website *model.Website, runtime *model.Runtime) error {
-	nginxFolder := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name)
-	siteFolder := path.Join(nginxFolder, "www", "sites", website.Alias)
+func createWebsiteFolder(website *model.Website, runtime *model.Runtime) error {
+	siteFolder := GteSiteDir(website.Alias)
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(siteFolder) {
 		if err := fileOp.CreateDir(siteFolder, 0755); err != nil {
@@ -185,11 +180,10 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 	if err != nil {
 		return err
 	}
-	if err = createWebsiteFolder(nginxInstall, website, runtime); err != nil {
+	if err = createWebsiteFolder(website, runtime); err != nil {
 		return err
 	}
-	nginxFileName := website.Alias + ".conf"
-	configPath := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "conf", "conf.d", nginxFileName)
+	configPath := GetSitePath(*website, SiteConf)
 	nginxContent := string(nginx_conf.WebsiteDefault)
 	config, err := parser.NewStringParser(nginxContent).Parse()
 	if err != nil {
@@ -232,7 +226,7 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 			server.UpdateDirective("error_page", []string{"404", "/404.html"})
 			if runtime.Resource == constant.ResourceLocal {
 				server.UpdateRoot(rootIndex)
-				localPath := path.Join(nginxInstall.GetPath(), rootIndex, "index.php")
+				localPath := path.Join(GetSitePath(*website, SiteIndexDir), "index.php")
 				server.UpdatePHPProxy([]string{website.Proxy}, localPath)
 			} else {
 				server.UpdateRoot(rootIndex)
@@ -381,6 +375,21 @@ func createWafConfig(website *model.Website, domains []model.WebsiteDomain) erro
 }
 
 func delNginxConfig(website model.Website, force bool) error {
+	configPath := GetSitePath(website, SiteConf)
+	fileOp := files.NewFileOp()
+
+	if !fileOp.Stat(configPath) {
+		return nil
+	}
+	if err := fileOp.DeleteFile(configPath); err != nil {
+		return err
+	}
+	sitePath := GteSiteDir(website.Alias)
+	if fileOp.Stat(sitePath) {
+		xpack.RemoveTamper(website.Alias)
+		_ = fileOp.DeleteDir(sitePath)
+	}
+
 	nginxApp, err := appRepo.GetFirst(appRepo.WithKey(constant.AppOpenresty))
 	if err != nil {
 		return err
@@ -392,23 +401,6 @@ func delNginxConfig(website model.Website, force bool) error {
 		}
 		return err
 	}
-
-	nginxFileName := website.Alias + ".conf"
-	configPath := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "conf", "conf.d", nginxFileName)
-	fileOp := files.NewFileOp()
-
-	if !fileOp.Stat(configPath) {
-		return nil
-	}
-	if err := fileOp.DeleteFile(configPath); err != nil {
-		return err
-	}
-	sitePath := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "www", "sites", website.Alias)
-	if fileOp.Stat(sitePath) {
-		xpack.RemoveTamper(website.Alias)
-		_ = fileOp.DeleteDir(sitePath)
-	}
-
 	if err := opNginx(nginxInstall.ContainerName, constant.NginxReload); err != nil {
 		if force {
 			return nil

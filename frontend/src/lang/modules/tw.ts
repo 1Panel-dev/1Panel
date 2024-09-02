@@ -2217,7 +2217,7 @@ const message = {
         localHelper: '本地運行環境需要自行安裝',
         version: '版本',
         versionHelper: 'PHP的版本,例 v8.0',
-        buildHelper: '選擇的擴展越多，製作鏡像過程中占用 CPU 越多，請盡量避免選擇全部擴展',
+        buildHelper: '選擇的擴展越多，製作鏡像過程中占用 CPU 越多，可以在創建完環境之後再安裝擴展',
         openrestyWarn: 'PHP 需要升級  OpenResty 至 1.21.4.1 版本以上才能使用',
         toupgrade: '去升級',
         edit: '編輯運行環境',

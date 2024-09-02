@@ -716,6 +716,18 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 			if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 				return buserr.WithErr(constant.ErrUpdateBuWebsite, err)
 			}
+			t.Log(i18n.GetMsgByKey("DeleteRuntimePHP"))
+			_ = fileOp.DeleteDir(path.Join(constant.RuntimeDir, "php"))
+			websites, _ := websiteRepo.List(commonRepo.WithByType("runtime"))
+			for _, website := range websites {
+				runtime, _ := runtimeRepo.GetFirst(commonRepo.WithByID(website.RuntimeID))
+				if runtime != nil && runtime.Type == "php" {
+					website.Type = constant.Static
+					website.RuntimeID = 0
+					_ = websiteRepo.SaveWithoutCtx(&website)
+				}
+			}
+			_ = runtimeRepo.DeleteBy(commonRepo.WithByType("php"))
 			t.Log(i18n.GetMsgByKey("MoveSiteDirSuccess"))
 		}
 
@@ -1153,6 +1165,7 @@ func getApps(oldApps []model.App, items []dto.AppDefine, systemVersion string, t
 		if !ok {
 			app = model.App{}
 		}
+		app.RequiredPanelVersion = config.Version
 		app.Resource = constant.AppResourceRemote
 		app.Name = item.Name
 		app.Limit = config.Limit

@@ -251,7 +251,7 @@ func restartCompose(composePath string) {
 		if _, err := os.Stat(pathItem); err != nil {
 			continue
 		}
-		upCmd := fmt.Sprintf("docker-compose -f %s up -d", pathItem)
+		upCmd := fmt.Sprintf("docker compose -f %s up -d", pathItem)
 		stdout, err := cmd.Exec(upCmd)
 		if err != nil {
 			global.LOG.Debugf("%s failed, err: %v", upCmd, stdout)
