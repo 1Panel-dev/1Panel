@@ -60,6 +60,41 @@ func ExecWithTimeOut(cmdStr string, timeout time.Duration) (string, error) {
 	return stdout.String(), nil
 }
 
+func ExecWithLogFile(cmdStr string, timeout time.Duration, outputFile string) error {
+	cmd := exec.Command("bash", "-c", cmdStr)
+
+	outFile, err := os.OpenFile(outputFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+	if err != nil {
+		return err
+	}
+	defer outFile.Close()
+
+	cmd.Stdout = outFile
+	cmd.Stderr = outFile
+
+	if err := cmd.Start(); err != nil {
+		return err
+	}
+
+	done := make(chan error, 1)
+	go func() {
+		done <- cmd.Wait()
+	}()
+
+	after := time.After(timeout)
+	select {
+	case <-after:
+		_ = cmd.Process.Kill()
+		return buserr.New(constant.ErrCmdTimeout)
+	case err := <-done:
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func ExecContainerScript(containerName, cmdStr string, timeout time.Duration) error {
 	cmdStr = fmt.Sprintf("docker exec -i %s bash -c '%s'", containerName, cmdStr)
 	out, err := ExecWithTimeOut(cmdStr, timeout)

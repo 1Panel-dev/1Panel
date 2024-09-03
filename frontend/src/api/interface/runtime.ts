@@ -122,4 +122,23 @@ export namespace Runtime {
     export interface PHPExtensionsDelete {
         id: number;
     }
+
+    export interface PHPExtensionsRes {
+        extensions: string[];
+        supportExtensions: SupportExtension[];
+    }
+
+    export interface SupportExtension {
+        name: string;
+        description: string;
+        installed: boolean;
+        check: string;
+        versions: string[];
+    }
+
+    export interface PHPExtensionInstall {
+        name: string;
+        id: number;
+        taskID: string;
+    }
 }

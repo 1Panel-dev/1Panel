@@ -152,6 +152,7 @@ const message = {
             rootInfoErr: '已经是根目录了',
             resetSuccess: '重置成功',
             creatingInfo: '正在创建，无需此操作',
+            installSuccess: '安装成功',
         },
         login: {
             username: '用户名',
@@ -2260,6 +2261,10 @@ const message = {
         javaDirHelper: '目录中要包含 jar 包，子目录中包含也可',
         goHelper: '请填写完整启动命令，例如：go run main.go 或 ./main',
         goDirHelper: '目录中要包含 go 文件或者二进制文件，子目录中包含也可',
+        extension: '扩展',
+        installExtension: '是否确认安装扩展 {0}',
+        loadedExtension: '已加载扩展',
+        popularExtension: '常用扩展',
     },
     process: {
         pid: '进程ID',

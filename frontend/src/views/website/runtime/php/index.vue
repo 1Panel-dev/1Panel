@@ -14,7 +14,7 @@
                     {{ $t('runtime.create') }}
                 </el-button>
 
-                <el-button @click="openExtensions">
+                <el-button type="primary" plain @click="openExtensions">
                     {{ $t('php.extensions') }}
                 </el-button>
 
@@ -94,7 +94,7 @@
                     />
                     <fu-table-operations
                         :ellipsis="10"
-                        width="120px"
+                        width="200px"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         fixed="right"
@@ -109,6 +109,7 @@
         <Log ref="logRef" @close="search" />
         <Extensions ref="extensionsRef" @close="search" />
         <AppResources ref="checkRef" @close="search" />
+        <ExtManagement ref="extManagementRef" @close="search" />
     </div>
 </template>
 
@@ -117,16 +118,17 @@ import { onMounted, onUnmounted, reactive, ref } from 'vue';
 import { Runtime } from '@/api/interface/runtime';
 import { DeleteRuntime, RuntimeDeleteCheck, SearchRuntimes } from '@/api/modules/runtime';
 import { dateFormat, toLowerCase } from '@/utils/util';
-import CreateRuntime from '@/views/website/runtime/php/create/index.vue';
-import Status from '@/components/status/index.vue';
-import i18n from '@/lang';
-import RouterMenu from '../index.vue';
-import Log from '@/components/log-dialog/index.vue';
-import Extensions from './extensions/index.vue';
-import AppResources from '@/views/website/runtime/php/check/index.vue';
 import { ElMessageBox } from 'element-plus';
 import { containerPrune } from '@/api/modules/container';
 import { MsgSuccess } from '@/utils/message';
+import i18n from '@/lang';
+import ExtManagement from './extension-management/index.vue';
+import Extensions from './extension-template/index.vue';
+import AppResources from '@/views/website/runtime/php/check/index.vue';
+import CreateRuntime from '@/views/website/runtime/php/create/index.vue';
+import Status from '@/components/status/index.vue';
+import RouterMenu from '../index.vue';
+import Log from '@/components/log-dialog/index.vue';
 
 const paginationConfig = reactive({
     cacheSizeKey: 'runtime-page-size',
@@ -144,10 +146,22 @@ let timer: NodeJS.Timer | null = null;
 const opRef = ref();
 const logRef = ref();
 const extensionsRef = ref();
-
+const extManagementRef = ref();
 const checkRef = ref();
+const createRef = ref();
+const loading = ref(false);
+const items = ref<Runtime.RuntimeDTO[]>([]);
 
 const buttons = [
+    {
+        label: i18n.global.t('runtime.extension'),
+        click: function (row: Runtime.Runtime) {
+            openExtensionsManagement(row);
+        },
+        disabled: function (row: Runtime.Runtime) {
+            return row.status != 'running';
+        },
+    },
     {
         label: i18n.global.t('commons.button.edit'),
         click: function (row: Runtime.Runtime) {
@@ -167,9 +181,6 @@ const buttons = [
         },
     },
 ];
-const loading = ref(false);
-const items = ref<Runtime.RuntimeDTO[]>([]);
-const createRef = ref();
 
 const search = async () => {
     req.page = paginationConfig.currentPage;
@@ -203,6 +214,10 @@ const openCreateLog = (id: number) => {
 
 const openExtensions = () => {
     extensionsRef.value.acceptParams();
+};
+
+const openExtensionsManagement = (row: Runtime.Runtime) => {
+    extManagementRef.value.acceptParams(row);
 };
 
 const openDelete = async (row: Runtime.Runtime) => {

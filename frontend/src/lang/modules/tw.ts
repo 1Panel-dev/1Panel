@@ -152,6 +152,7 @@ const message = {
             rootInfoErr: '已經是根目錄了',
             resetSuccess: '重置成功',
             creatingInfo: '正在創建，無需此操作',
+            installSuccess: '安裝成功',
         },
         login: {
             username: '用戶名',
@@ -2258,6 +2259,10 @@ const message = {
         javaDirHelper: '目錄中要包含 jar 包，子目錄中包含也可',
         goHelper: '請填寫完整啟動命令，例如：go run main.go 或 ./main',
         goDirHelper: '目錄中要包含 go 文件或者二進制文件，子目錄中包含也可',
+        extension: '擴充',
+        installExtension: '是否確認安裝擴充功能 {0}',
+        loadedExtension: '已載入擴充功能',
+        popularExtension: '常用擴充',
     },
     process: {
         pid: '進程ID',

@@ -43,3 +43,6 @@ var PathAuth []byte
 
 //go:embed upstream.conf
 var Upstream []byte
+
+//go:embed php_extensions.json
+var PHPExtensionsJson []byte

@@ -233,3 +233,46 @@ func (b *BaseApi) SyncStatus(c *gin.Context) {
 	}
 	helper.SuccessWithOutData(c)
 }
+
+// @Tags Runtime
+// @Summary Get php runtime extension
+// @Description 获取 PHP 运行环境扩展
+// @Accept json
+// @Param id path string true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /runtimes/php/:id/extensions [get]
+func (b *BaseApi) GetRuntimeExtension(c *gin.Context) {
+	id, err := helper.GetIntParamByKey(c, "id")
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		return
+	}
+	res, err := runtimeService.GetPHPExtensions(id)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}
+
+// @Tags Runtime
+// @Summary Install php extension
+// @Description 安装 PHP 扩展
+// @Accept json
+// @Param request body request.PHPExtensionsCreate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /runtimes/php/extensions/install [post]
+func (b *BaseApi) InstallPHPExtension(c *gin.Context) {
+	var req request.PHPExtensionInstallReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	err := runtimeService.InstallPHPExtension(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}

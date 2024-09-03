@@ -1,0 +1,135 @@
+[
+  {
+    "name": "ZendGuardLoader",
+    "description": "用于解密ZendGuard加密脚本!",
+    "check": "ZendGuardLoader",
+    "versions": ["53", "54", "55", "56"],
+    "installed": false
+  },
+  {
+    "name": "ionCube",
+    "description": "用于解密ionCube Encoder加密脚本!",
+    "check": "ionCube",
+    "versions": ["56", "70", "71", "72", "73", "74", "81", "82"],
+    "installed": false
+  },
+  {
+    "name": "fileinfo",
+    "description": "",
+    "check": "fileinfo",
+    "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "opcache",
+    "description": "用于加速PHP脚本!",
+    "check": "opcache",
+    "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "xcache",
+    "description": "支持脚本缓存和变量缓存!",
+    "check": "xcache",
+    "versions": ["56"],
+    "installed": false
+  },
+  {
+    "name": "memcache",
+    "description": "强大的内容缓存器",
+    "check": "memcache",
+    "versions": ["56", "70", "71", "72", "73", "74", "80"],
+    "installed": false
+  },
+  {
+    "name": "memcached",
+    "description": "比memcache支持更多高级功能",
+    "check": "memcached",
+    "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "redis",
+    "description": "基于内存亦可持久化的Key-Value数据库",
+    "check": "redis",
+    "versions": [ "56", "70", "71", "72", "73", "74", "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "mcrypt",
+    "description": "mcrypt加密/解密",
+    "check": "mcrypt",
+    "versions": ["70", "71", "72", "73", "74", "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "apcu",
+    "description": "脚本缓存器",
+    "check": "apcu",
+    "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "imagemagick",
+    "description": "Imagick高性能图形库",
+    "check": "imagick",
+    "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "xdebug",
+    "description": "开源的PHP程序调试器",
+    "check": "xdebug",
+    "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "imap",
+    "description": "邮件服务器必备",
+    "check": "imap",
+    "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "exif",
+    "description": "用于读取图片EXIF信息",
+    "check": "exif",
+    "versions": [ "56", "70", "71", "72", "73", "74", "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "intl",
+    "description": "提供国际化支持",
+    "check": "intl",
+    "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "xsl",
+    "description": "xsl解析扩展",
+    "check": "xsl",
+    "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82"],
+    "installed": false
+  },
+  {
+    "name": "mbstring",
+    "description": "mbstring扩展",
+    "check": "mbstring",
+    "versions": ["83"],
+    "installed": false
+  },
+  {
+    "name": "Swoole",
+    "description": "异步、协程高性能网络通信引擎",
+    "check": "swoole",
+    "versions": ["70", "71", "72"],
+    "installed": false
+  },
+  {
+    "name": "zstd",
+    "description": "使用 Zstandard 库进行压缩和解压缩的 PHP 扩展",
+    "check": "zstd",
+    "versions": ["70", "71", "72"],
+    "installed": false
+  }
+]
