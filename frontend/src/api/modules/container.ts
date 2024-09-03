@@ -51,6 +51,9 @@ export const containerPrune = (params: Container.ContainerPrune) => {
 export const inspect = (params: Container.ContainerInspect) => {
     return http.post<string>(`/containers/inspect`, params);
 };
+export const inspectStoppedContainer = (params: { id: string }) => {
+    return http.post<Container.ContainerHelper['exposedPorts']>(`/containers/stoppedinspect`, params);
+};
 
 export const DownloadFile = (params: Container.ContainerLogInfo) => {
     return http.download<BlobPart>('/containers/download/log', params, {

@@ -338,6 +338,7 @@ import {
     containerListStats,
     containerOperator,
     inspect,
+    inspectStoppedContainer,
     loadContainerInfo,
     loadDockerStatus,
     searchContainer,
@@ -537,6 +538,8 @@ function loadMemValue(t: number) {
 const dialogOperateRef = ref();
 const onEdit = async (container: string) => {
     const res = await loadContainerInfo(container);
+    const containerPort = await inspectStoppedContainer({ id: container });
+    res.data.exposedPorts = containerPort.data;
     if (res.data) {
         onOpenDialog('edit', res.data);
     }

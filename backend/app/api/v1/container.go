@@ -1,13 +1,14 @@
 package v1
 
 import (
+	"strconv"
+
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
-	"strconv"
 )
 
 // @Tags Container
@@ -426,6 +427,28 @@ func (b *BaseApi) Inspect(c *gin.Context) {
 	}
 
 	result, err := containerService.Inspect(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, result)
+}
+
+// @Tags Container
+// @Summary Stopped Container inspect
+// @Description 停止容器详情
+// @Accept json
+// @Param request body dto.StoppedInspectReq true "request"
+// @Success 200 {string} result
+// @Security ApiKeyAuth
+// @Router /containers/stoppedinspect [post]
+func (b *BaseApi) InspectStoppedContainer(c *gin.Context) {
+	var req dto.StoppedInspectReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	result, err := containerService.InspectStoppedContainer(req)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

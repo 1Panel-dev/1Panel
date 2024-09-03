@@ -72,6 +72,7 @@ type IContainerService interface {
 	DownloadContainerLogs(containerType, container, since, tail string, c *gin.Context) error
 	ContainerStats(id string) (*dto.ContainerStats, error)
 	Inspect(req dto.InspectReq) (string, error)
+	InspectStoppedContainer(req dto.StoppedInspectReq) ([]ContainerBindingState, error)
 	DeleteNetwork(req dto.BatchDelete) error
 	CreateNetwork(req dto.NetworkCreate) error
 	DeleteVolume(req dto.BatchDelete) error
@@ -81,6 +82,14 @@ type IContainerService interface {
 	Prune(req dto.ContainerPrune) (dto.ContainerPruneReport, error)
 
 	LoadContainerLogs(req dto.OperationWithNameAndType) string
+}
+
+type ContainerBindingState struct {
+	Host          string `json:"host"`
+	HostIP        string `json:"hostIP"`
+	ContainerPort string `json:"containerPort"`
+	HostPort      string `json:"hostPort"`
+	Protocol      string `json:"protocol"`
 }
 
 func NewIContainerService() IContainerService {
@@ -295,6 +304,28 @@ func (u *ContainerService) Inspect(req dto.InspectReq) (string, error) {
 	return string(bytes), nil
 }
 
+func (u *ContainerService) InspectStoppedContainer(req dto.StoppedInspectReq) ([]ContainerBindingState, error) {
+	client, err := docker.NewDockerClient()
+	if err != nil {
+		return []ContainerBindingState{}, err
+	}
+	defer client.Close()
+	bindingList := make([]ContainerBindingState, 0)
+	info, err := client.ContainerInspect(context.Background(), req.ID)
+	if err != nil {
+		return []ContainerBindingState{}, err
+	}
+	for key, value := range info.HostConfig.PortBindings {
+		bindingList = append(bindingList, ContainerBindingState{
+			Host:          value[0].HostIP,
+			HostPort:      value[0].HostPort,
+			HostIP:        value[0].HostIP,
+			Protocol:      key.Proto(),
+			ContainerPort: key.Port(),
+		})
+	}
+	return bindingList, nil
+}
 func (u *ContainerService) Prune(req dto.ContainerPrune) (dto.ContainerPruneReport, error) {
 	report := dto.ContainerPruneReport{}
 	client, err := docker.NewDockerClient()

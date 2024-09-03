@@ -19,6 +19,10 @@ type InspectReq struct {
 	Type string `json:"type" validate:"required"`
 }
 
+type StoppedInspectReq struct {
+	ID string `json:"id" validate:"required"`
+}
+
 type ContainerInfo struct {
 	ContainerID string `json:"containerID"`
 	Name        string `json:"name"`
