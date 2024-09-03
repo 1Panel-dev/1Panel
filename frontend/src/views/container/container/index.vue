@@ -22,15 +22,17 @@
                 </div>
             </template>
             <template #toolbar>
-                <el-row>
-                    <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16">
-                        <el-button type="primary" @click="onOpenDialog('create')">
-                            {{ $t('container.create') }}
-                        </el-button>
-                        <el-button type="primary" plain @click="onClean()">
-                            {{ $t('container.containerPrune') }}
-                        </el-button>
-                        <el-button-group class="ml-4">
+                <div class="flex w-full flex-col gap-4 md:justify-between md:flex-row">
+                    <div class="flex flex-wrap gap-4">
+                        <div>
+                            <el-button type="primary" @click="onOpenDialog('create')">
+                                {{ $t('container.create') }}
+                            </el-button>
+                            <el-button type="primary" plain @click="onClean()">
+                                {{ $t('container.containerPrune') }}
+                            </el-button>
+                        </div>
+                        <el-button-group>
                             <el-button :disabled="checkStatus('start', null)" @click="onOperate('start', null)">
                                 {{ $t('container.start') }}
                             </el-button>
@@ -53,12 +55,12 @@
                                 {{ $t('container.remove') }}
                             </el-button>
                         </el-button-group>
-                    </el-col>
-                    <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
+                    </div>
+                    <div class="flex flex-row gap-2 md:flex-col lg:flex-row">
                         <TableSetting title="container-refresh" @search="refresh()" />
                         <TableSearch @search="search()" v-model:searchName="searchName" />
-                    </el-col>
-                </el-row>
+                    </div>
+                </div>
             </template>
             <template #search>
                 <el-select v-model="searchState" @change="search()" clearable class="p-w-200">
