@@ -67,3 +67,11 @@ export const DeletePHPExtensions = (req: Runtime.PHPExtensionsDelete) => {
 export const SyncRuntime = () => {
     return http.post(`/runtimes/sync`, {});
 };
+
+export const GetPHPExtensions = (id: number) => {
+    return http.get<Runtime.PHPExtensionsRes>(`/runtimes/php/${id}/extensions`);
+};
+
+export const InstallPHPExtension = (req: Runtime.PHPExtensionInstall) => {
+    return http.post(`/runtimes/php/extensions/install`, req);
+};

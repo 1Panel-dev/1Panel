@@ -195,6 +195,7 @@ const initCodemirror = () => {
             });
             let hljsDom = scrollerElement.value.querySelector('.hljs') as HTMLElement;
             hljsDom.style['min-height'] = '100px';
+            hljsDom.style['max-height'] = '400px';
         }
     });
 };

@@ -152,6 +152,7 @@ const message = {
             rootInfoErr: "It's already the root directory",
             resetSuccess: 'Reset successful',
             creatingInfo: 'Creating, no need for this operation',
+            installSuccess: 'Install successful',
         },
         login: {
             username: 'Username',
@@ -2434,6 +2435,10 @@ const message = {
         javaDirHelper: 'The directory must contain jar files, subdirectories are also acceptable',
         goHelper: 'Please provide a complete start command, for example: go run main.go or ./main',
         goDirHelper: 'The directory must contain go files or binary files, subdirectories are also acceptable',
+        extension: 'Extension',
+        installExtension: 'Do you confirm to install the extension {0}',
+        loadedExtension: 'Loaded Extension',
+        popularExtension: 'Popular Extension',
     },
     process: {
         pid: 'Process ID',

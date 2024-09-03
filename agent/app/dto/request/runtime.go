@@ -70,3 +70,9 @@ type NodeModuleOperateReq struct {
 type NodeModuleReq struct {
 	ID uint `json:"ID" validate:"required"`
 }
+
+type PHPExtensionInstallReq struct {
+	ID     uint   `json:"ID" validate:"required"`
+	Name   string `json:"name" validate:"required"`
+	TaskID string `json:"taskID"  validate:"required"`
+}

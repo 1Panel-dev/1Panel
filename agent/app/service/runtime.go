@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/task"
+	"github.com/1Panel-dev/1Panel/agent/cmd/server/nginx_conf"
 	"os"
 	"path"
 	"path/filepath"
@@ -45,6 +47,9 @@ type IRuntimeService interface {
 	SyncForRestart() error
 	SyncRuntimeStatus() error
 	DeleteCheck(installID uint) ([]dto.AppResource, error)
+
+	GetPHPExtensions(runtimeID uint) (response.PHPExtensionRes, error)
+	InstallPHPExtension(req request.PHPExtensionInstallReq) error
 }
 
 func NewRuntimeService() IRuntimeService {
@@ -101,10 +106,12 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, e
 			}
 		}
 	}
-	if containerName, ok := create.Params["CONTAINER_NAME"]; ok {
-		if err := checkContainerName(containerName.(string)); err != nil {
-			return nil, err
-		}
+	containerName, ok := create.Params["CONTAINER_NAME"]
+	if !ok {
+		return nil, buserr.New("ErrContainerNameIsNull")
+	}
+	if err := checkContainerName(containerName.(string)); err != nil {
+		return nil, err
 	}
 
 	appDetail, err := appDetailRepo.GetFirst(commonRepo.WithByID(create.AppDetailID))
@@ -124,12 +131,13 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, e
 	}
 
 	runtime := &model.Runtime{
-		Name:        create.Name,
-		AppDetailID: create.AppDetailID,
-		Type:        create.Type,
-		Image:       create.Image,
-		Resource:    create.Resource,
-		Version:     create.Version,
+		Name:          create.Name,
+		AppDetailID:   create.AppDetailID,
+		Type:          create.Type,
+		Image:         create.Image,
+		Resource:      create.Resource,
+		Version:       create.Version,
+		ContainerName: containerName.(string),
 	}
 
 	switch create.Type {
@@ -204,35 +212,34 @@ func (r *RuntimeService) Delete(runtimeDelete request.RuntimeDelete) error {
 	if website.ID > 0 {
 		return buserr.New(constant.ErrDelWithWebsite)
 	}
-	if runtime.Resource == constant.ResourceAppstore {
-		projectDir := runtime.GetPath()
-		switch runtime.Type {
-		case constant.RuntimePHP:
-			client, err := docker.NewClient()
-			if err != nil {
-				return err
-			}
-			defer client.Close()
-			imageID, err := client.GetImageIDByName(runtime.Image)
-			if err != nil {
-				return err
-			}
-			if imageID != "" {
-				if err := client.DeleteImage(imageID); err != nil {
-					global.LOG.Errorf("delete image id [%s] error %v", imageID, err)
-				}
-			}
-		case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo:
-			if out, err := compose.Down(runtime.GetComposePath()); err != nil && !runtimeDelete.ForceDelete {
-				if out != "" {
-					return errors.New(out)
-				}
-				return err
-			}
+	if runtime.Resource != constant.ResourceAppstore {
+		return runtimeRepo.DeleteBy(commonRepo.WithByID(runtimeDelete.ID))
+	}
+	projectDir := runtime.GetPath()
+	if out, err := compose.Down(runtime.GetComposePath()); err != nil && !runtimeDelete.ForceDelete {
+		if out != "" {
+			return errors.New(out)
 		}
-		if err := files.NewFileOp().DeleteDir(projectDir); err != nil && !runtimeDelete.ForceDelete {
+		return err
+	}
+	if runtime.Type == constant.RuntimePHP {
+		client, err := docker.NewClient()
+		if err != nil {
 			return err
 		}
+		defer client.Close()
+		imageID, err := client.GetImageIDByName(runtime.Image)
+		if err != nil {
+			return err
+		}
+		if imageID != "" {
+			if err := client.DeleteImage(imageID); err != nil {
+				global.LOG.Errorf("delete image id [%s] error %v", imageID, err)
+			}
+		}
+	}
+	if err := files.NewFileOp().DeleteDir(projectDir); err != nil && !runtimeDelete.ForceDelete {
+		return err
 	}
 	return runtimeRepo.DeleteBy(commonRepo.WithByID(runtimeDelete.ID))
 }
@@ -633,5 +640,102 @@ func (r *RuntimeService) SyncRuntimeStatus() error {
 			_ = SyncRuntimeContainerStatus(&runtime)
 		}
 	}
+	return nil
+}
+
+func (r *RuntimeService) GetPHPExtensions(runtimeID uint) (response.PHPExtensionRes, error) {
+	var res response.PHPExtensionRes
+	runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(runtimeID))
+	if err != nil {
+		return res, err
+	}
+	phpCmd := fmt.Sprintf("docker exec -i %s %s", runtime.ContainerName, "php -m")
+	out, err := cmd2.ExecWithTimeOut(phpCmd, 20*time.Second)
+	if err != nil {
+		if out != "" {
+			return res, errors.New(out)
+		}
+		return res, err
+	}
+	extensions := strings.Split(out, "\n")
+	var cleanExtensions []string
+	for _, ext := range extensions {
+		extStr := strings.TrimSpace(ext)
+		if extStr != "" && extStr != "[Zend Modules]" && extStr != "[PHP Modules]" {
+			cleanExtensions = append(cleanExtensions, extStr)
+		}
+	}
+	res.Extensions = cleanExtensions
+	var phpExtensions []response.SupportExtension
+	if err = json.Unmarshal(nginx_conf.PHPExtensionsJson, &phpExtensions); err != nil {
+		return res, err
+	}
+	for _, ext := range phpExtensions {
+		for _, cExt := range cleanExtensions {
+			if ext.Check == cExt {
+				ext.Installed = true
+				break
+			}
+		}
+		res.SupportExtensions = append(res.SupportExtensions, ext)
+	}
+	return res, nil
+}
+
+func (r *RuntimeService) InstallPHPExtension(req request.PHPExtensionInstallReq) error {
+	runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(req.ID))
+	if err != nil {
+		return err
+	}
+
+	installTask, err := task.NewTaskWithOps(req.Name, task.TaskInstall, task.TaskScopeRuntime, req.TaskID, runtime.ID)
+	if err != nil {
+		return err
+	}
+	installTask.AddSubTask("", func(t *task.Task) error {
+		installCmd := fmt.Sprintf("docker exec -i %s %s %s", runtime.ContainerName, "install-ext", req.Name)
+		err = cmd2.ExecWithLogFile(installCmd, 15*time.Minute, t.Task.LogFile)
+		if err != nil {
+			return err
+		}
+		return nil
+	}, nil)
+	go func() {
+		err = installTask.Execute()
+		if err == nil {
+			envs, err := gotenv.Unmarshal(runtime.Env)
+			if err != nil {
+				global.LOG.Errorf("get runtime env error %v", err)
+				return
+			}
+			extensions, ok := envs["PHP_EXTENSIONS"]
+			exist := false
+			var extensionArray []string
+			if ok {
+				extensionArray = strings.Split(extensions, ",")
+				for _, ext := range extensionArray {
+					if ext == req.Name {
+						exist = true
+						break
+					}
+				}
+			}
+			if !exist {
+				extensionArray = append(extensionArray, req.Name)
+				envs["PHP_EXTENSIONS"] = strings.Join(extensionArray, ",")
+				if err = gotenv.Write(envs, runtime.GetEnvPath()); err != nil {
+					global.LOG.Errorf("write runtime env error %v", err)
+					return
+				}
+				envStr, err := gotenv.Marshal(envs)
+				if err != nil {
+					global.LOG.Errorf("marshal runtime env error %v", err)
+					return
+				}
+				runtime.Env = envStr
+				_ = runtimeRepo.Save(runtime)
+			}
+		}
+	}()
 	return nil
 }

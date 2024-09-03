@@ -30,6 +30,9 @@ func (r *RuntimeRouter) InitRouter(Router *gin.RouterGroup) {
 		groupRouter.POST("/php/extensions", baseApi.CreatePHPExtensions)
 		groupRouter.POST("/php/extensions/update", baseApi.UpdatePHPExtensions)
 		groupRouter.POST("/php/extensions/del", baseApi.DeletePHPExtensions)
+
+		groupRouter.GET("/php/:id/extensions", baseApi.GetRuntimeExtension)
+		groupRouter.POST("/php/extensions/install", baseApi.InstallPHPExtension)
 	}
 
 }
