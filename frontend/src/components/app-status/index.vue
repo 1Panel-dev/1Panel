@@ -2,8 +2,8 @@
     <div>
         <div class="app-status" v-if="data.isExist">
             <el-card>
-                <div class="flex items-center justify-between gap-2 sm:justify-start">
-                    <div class="flex flex-col items-center justify-center gap-2 sm:flex-row">
+                <div class="flex items-center justify-between gap-2 sm:gap-10 sm:justify-start">
+                    <div class="flex items-center justify-center gap-2 sm:flex-row">
                         <div>
                             <el-tag effect="dark" type="success">{{ data.app }}</el-tag>
                         </div>
@@ -14,7 +14,7 @@
                             <el-tag>{{ $t('app.version') }}:{{ data.version }}</el-tag>
                         </div>
                     </div>
-                    <div class="flex flex-col flex-wrap sm:flex-row">
+                    <div class="grid grid-cols-4 sm:flex sm:flex-row">
                         <el-button
                             type="primary"
                             v-if="data.status != 'Running'"
