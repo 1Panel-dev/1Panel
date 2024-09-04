@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"os"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/global"
@@ -10,7 +11,8 @@ import (
 
 func Init() {
 	c := global.CONF.System.Cache
-
+	_ = os.RemoveAll(c)
+	_ = os.Mkdir(c, 0644)
 	options := badger.Options{
 		Dir:                c,
 		ValueDir:           c,
