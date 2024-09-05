@@ -9,7 +9,13 @@
         :width="width"
     >
         <div>
-            <highlightjs ref="editorRef" language="JavaScript" :autodetect="false" :code="content"></highlightjs>
+            <highlightjs
+                class="editor-main"
+                ref="editorRef"
+                language="JavaScript"
+                :autodetect="false"
+                :code="content"
+            ></highlightjs>
         </div>
     </el-dialog>
 </template>
@@ -115,6 +121,7 @@ const getContent = (pre: boolean) => {
         }
         end.value = res.data.end;
         nextTick(() => {
+            console.log('scrollerElement', scrollerElement.value);
             if (pre) {
                 if (scrollerElement.value.scrollHeight > 2000) {
                     scrollerElement.value.scrollTop = 2000;
@@ -122,6 +129,8 @@ const getContent = (pre: boolean) => {
             } else {
                 scrollerElement.value.scrollTop = scrollerElement.value.scrollHeight;
             }
+            console.log('scrollHeight', scrollerElement.value.scrollHeight);
+            console.log('scrollTop', scrollerElement.value.scrollTop);
         });
 
         if (readReq.latest) {
@@ -179,6 +188,7 @@ const initCodemirror = () => {
     nextTick(() => {
         if (editorRef.value) {
             scrollerElement.value = editorRef.value.$el as HTMLElement;
+            console.log('scrollerElement', scrollerElement.value);
             scrollerElement.value.addEventListener('scroll', function () {
                 if (isScrolledToBottom(scrollerElement.value)) {
                     readReq.page = maxPage.value;
@@ -194,8 +204,7 @@ const initCodemirror = () => {
                 }
             });
             let hljsDom = scrollerElement.value.querySelector('.hljs') as HTMLElement;
-            hljsDom.style['min-height'] = '100px';
-            hljsDom.style['max-height'] = '400px';
+            hljsDom.style['min-height'] = '400px';
         }
     });
 };
@@ -227,8 +236,11 @@ defineExpose({ openWithResourceID, openWithTaskID });
         height: calc(var(--dialog-max-height) - var(--dialog-header-height) - var(--dialog-padding) * 2);
         overflow: hidden;
     }
-    .log-file {
-        height: 100%;
-    }
+}
+
+.editor-main {
+    width: 100%;
+    overflow: auto;
+    height: 420px;
 }
 </style>

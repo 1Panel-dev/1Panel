@@ -153,6 +153,7 @@ const message = {
             resetSuccess: '重置成功',
             creatingInfo: '正在创建，无需此操作',
             installSuccess: '安装成功',
+            uninstallSuccess: '卸载成功',
         },
         login: {
             username: '用户名',
@@ -2265,6 +2266,7 @@ const message = {
         installExtension: '是否确认安装扩展 {0}',
         loadedExtension: '已加载扩展',
         popularExtension: '常用扩展',
+        uninstallExtension: '是否确认卸载扩展 {0}',
     },
     process: {
         pid: '进程ID',

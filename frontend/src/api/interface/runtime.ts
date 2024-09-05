@@ -139,6 +139,6 @@ export namespace Runtime {
     export interface PHPExtensionInstall {
         name: string;
         id: number;
-        taskID: string;
+        taskID?: string;
     }
 }

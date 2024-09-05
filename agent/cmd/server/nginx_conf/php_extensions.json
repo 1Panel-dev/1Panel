@@ -1,135 +1,331 @@
 [
   {
-    "name": "ZendGuardLoader",
-    "description": "用于解密ZendGuard加密脚本!",
-    "check": "ZendGuardLoader",
-    "versions": ["53", "54", "55", "56"],
-    "installed": false
-  },
-  {
     "name": "ionCube",
-    "description": "用于解密ionCube Encoder加密脚本!",
-    "check": "ionCube",
+    "check": "ioncube_loader",
+    "file": "ioncube_loader.so",
     "versions": ["56", "70", "71", "72", "73", "74", "81", "82"],
     "installed": false
   },
   {
-    "name": "fileinfo",
-    "description": "",
-    "check": "fileinfo",
-    "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82", "83"],
-    "installed": false
-  },
-  {
     "name": "opcache",
-    "description": "用于加速PHP脚本!",
     "check": "opcache",
+    "file": "opcache.so",
     "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82", "83"],
-    "installed": false
-  },
-  {
-    "name": "xcache",
-    "description": "支持脚本缓存和变量缓存!",
-    "check": "xcache",
-    "versions": ["56"],
     "installed": false
   },
   {
     "name": "memcache",
-    "description": "强大的内容缓存器",
     "check": "memcache",
+    "file": "memcache.so",
     "versions": ["56", "70", "71", "72", "73", "74", "80"],
     "installed": false
   },
   {
     "name": "memcached",
-    "description": "比memcache支持更多高级功能",
     "check": "memcached",
+    "file": "memcached.so",
     "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82", "83"],
     "installed": false
   },
   {
     "name": "redis",
-    "description": "基于内存亦可持久化的Key-Value数据库",
     "check": "redis",
+    "file": "redis.so",
     "versions": [ "56", "70", "71", "72", "73", "74", "80", "81", "82", "83"],
     "installed": false
   },
   {
     "name": "mcrypt",
-    "description": "mcrypt加密/解密",
     "check": "mcrypt",
+    "file": "mcrypt.so",
     "versions": ["70", "71", "72", "73", "74", "80", "81", "82", "83"],
     "installed": false
   },
   {
     "name": "apcu",
-    "description": "脚本缓存器",
     "check": "apcu",
+    "file": "apcu.so",
     "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82", "83"],
     "installed": false
   },
   {
-    "name": "imagemagick",
-    "description": "Imagick高性能图形库",
+    "name": "imagick",
     "check": "imagick",
-    "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82", "83"],
+    "file": "imagick.so",
+    "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82"],
     "installed": false
   },
   {
     "name": "xdebug",
-    "description": "开源的PHP程序调试器",
     "check": "xdebug",
+    "file": "xdebug.so",
     "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82", "83"],
     "installed": false
   },
   {
     "name": "imap",
-    "description": "邮件服务器必备",
     "check": "imap",
+    "file": "imap.so",
     "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82", "83"],
     "installed": false
   },
   {
     "name": "exif",
-    "description": "用于读取图片EXIF信息",
     "check": "exif",
+    "file": "exif.so",
     "versions": [ "56", "70", "71", "72", "73", "74", "80", "81", "82", "83"],
     "installed": false
   },
   {
     "name": "intl",
-    "description": "提供国际化支持",
     "check": "intl",
+    "file": "intl.so",
     "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82", "83"],
     "installed": false
   },
   {
     "name": "xsl",
-    "description": "xsl解析扩展",
     "check": "xsl",
+    "file": "xsl.so",
     "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82"],
     "installed": false
   },
   {
-    "name": "mbstring",
-    "description": "mbstring扩展",
-    "check": "mbstring",
-    "versions": ["83"],
-    "installed": false
-  },
-  {
     "name": "Swoole",
-    "description": "异步、协程高性能网络通信引擎",
     "check": "swoole",
-    "versions": ["70", "71", "72"],
+    "file": "swoole.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
     "installed": false
   },
   {
     "name": "zstd",
-    "description": "使用 Zstandard 库进行压缩和解压缩的 PHP 扩展",
     "check": "zstd",
-    "versions": ["70", "71", "72"],
+    "file": "zstd.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "xlswriter",
+    "check": "xlswriter",
+    "file": "xlswriter.so",
+    "versions": ["70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "oci8",
+    "check": "oci8",
+    "file": "oci8.so",
+    "versions": ["70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "pdo_oci",
+    "check": "pdo_oci",
+    "file": "pdo_oci.so",
+    "versions": ["70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "pdo_sqlsrv",
+    "check": "pdo_sqlsrv",
+    "file": "pdo_sqlsrv.so",
+    "versions": ["70", "71", "72",  "73", "74", "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "sqlsrv",
+    "check": "sqlsrv",
+    "file": "sqlsrv.so",
+    "versions": ["70", "71", "72",  "73", "74","80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "yaf",
+    "check": "yaf",
+    "file": "yaf.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "mongodb",
+    "check": "mongodb",
+    "file": "mongodb.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "yac",
+    "check": "yac",
+    "file": "yac.so",
+    "versions": ["70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "pgsql",
+    "check": "pgsql",
+    "file": "pgsql.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "ssh2",
+    "check": "ssh2",
+    "file": "ssh2.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "grpc",
+    "check": "grpc",
+    "file": "grpc.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "xhprof",
+    "check": "xhprof",
+    "file": "xhprof.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "protobuf",
+    "check": "protobuf",
+    "file": "protobuf.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "pdo_pgsql",
+    "check": "pdo_pgsql",
+    "file": "pdo_pgsql.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "snmp",
+    "check": "snmp",
+    "file": "snmp.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "ldap",
+    "check": "ldap",
+    "file": "ldap.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "recode",
+    "check": "recode",
+    "file": "recode.so",
+    "versions": ["56","70", "71", "72",  "73"],
+    "installed": false
+  },
+  {
+    "name": "enchant",
+    "check": "enchant",
+    "file": "enchant.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "pspell",
+    "check": "pspell",
+    "file": "pspell.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "bz2",
+    "check": "bz2",
+    "file": "bz2.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "sysvshm",
+    "check": "sysvshm",
+    "file": "sysvshm.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "calendar",
+    "check": "calendar",
+    "file": "calendar.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "gmp",
+    "check": "gmp",
+    "file": "gmp.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "wddx",
+    "check": "wddx",
+    "file": "wddx.so",
+    "versions": ["56","70", "71", "72",  "73", "74"],
+    "installed": false
+  },
+  {
+    "name": "sysvmsg",
+    "check": "sysvmsg",
+    "file": "sysvmsg.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "igbinary",
+    "check": "igbinary",
+    "file": "igbinary.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "zmq",
+    "check": "zmq",
+    "file": "zmq.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "smbclient",
+    "check": "smbclient",
+    "file": "smbclient.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "event",
+    "check": "event",
+    "file": "event.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "mailparse",
+    "check": "mailparse",
+    "file": "mailparse.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "yaml",
+    "check": "yaml",
+    "file": "yaml.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "installed": false
+  },
+  {
+    "name": "sg11",
+    "check": "SourceGuardian",
+    "file": "sourceguardian.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
     "installed": false
   }
 ]

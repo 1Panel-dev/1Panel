@@ -153,6 +153,7 @@ const message = {
             resetSuccess: '重置成功',
             creatingInfo: '正在創建，無需此操作',
             installSuccess: '安裝成功',
+            uninstallSuccess: '卸載成功',
         },
         login: {
             username: '用戶名',

@@ -64,6 +64,7 @@ type SupportExtension struct {
 	Installed   bool     `json:"installed"`
 	Check       string   `json:"check"`
 	Versions    []string `json:"versions"`
+	File        string   `json:"file"`
 }
 
 type PHPExtensionRes struct {

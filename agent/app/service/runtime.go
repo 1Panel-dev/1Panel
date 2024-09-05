@@ -50,6 +50,7 @@ type IRuntimeService interface {
 
 	GetPHPExtensions(runtimeID uint) (response.PHPExtensionRes, error)
 	InstallPHPExtension(req request.PHPExtensionInstallReq) error
+	UnInstallPHPExtension(req request.PHPExtensionInstallReq) error
 }
 
 func NewRuntimeService() IRuntimeService {
@@ -380,6 +381,7 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 		return runtimeRepo.Save(runtime)
 	}
 	oldImage := runtime.Image
+	oldEnv := runtime.Env
 	switch runtime.Type {
 	case constant.RuntimePHP:
 		exist, _ := runtimeRepo.GetFirst(runtimeRepo.WithImage(req.Name), runtimeRepo.WithNotId(req.ID))
@@ -418,16 +420,9 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 		}
 	}
 
-	if containerName, ok := req.Params["CONTAINER_NAME"]; ok {
-		envs, err := gotenv.Unmarshal(runtime.Env)
-		if err != nil {
+	if containerName, ok := req.Params["CONTAINER_NAME"]; ok && containerName != getRuntimeEnv(runtime.Env, "CONTAINER_NAME") {
+		if err := checkContainerName(containerName.(string)); err != nil {
 			return err
-		}
-		oldContainerName := envs["CONTAINER_NAME"]
-		if containerName != oldContainerName {
-			if err := checkContainerName(containerName.(string)); err != nil {
-				return err
-			}
 		}
 	}
 
@@ -466,7 +461,7 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 		if err != nil {
 			return err
 		}
-		go buildRuntime(runtime, imageID, req.Rebuild)
+		go buildRuntime(runtime, imageID, oldEnv, req.Rebuild)
 	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo:
 		runtime.Version = req.Version
 		runtime.CodeDir = req.CodeDir
@@ -687,7 +682,6 @@ func (r *RuntimeService) InstallPHPExtension(req request.PHPExtensionInstallReq)
 	if err != nil {
 		return err
 	}
-
 	installTask, err := task.NewTaskWithOps(req.Name, task.TaskInstall, task.TaskScopeRuntime, req.TaskID, runtime.ID)
 	if err != nil {
 		return err
@@ -738,4 +732,15 @@ func (r *RuntimeService) InstallPHPExtension(req request.PHPExtensionInstallReq)
 		}
 	}()
 	return nil
+}
+
+func (r *RuntimeService) UnInstallPHPExtension(req request.PHPExtensionInstallReq) error {
+	runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(req.ID))
+	if err != nil {
+		return err
+	}
+	if err := unInstallPHPExtension(runtime, []string{req.Name}); err != nil {
+		return err
+	}
+	return runtimeRepo.Save(runtime)
 }

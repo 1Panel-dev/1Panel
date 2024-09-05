@@ -75,3 +75,7 @@ export const GetPHPExtensions = (id: number) => {
 export const InstallPHPExtension = (req: Runtime.PHPExtensionInstall) => {
     return http.post(`/runtimes/php/extensions/install`, req);
 };
+
+export const UnInstallPHPExtension = (req: Runtime.PHPExtensionInstall) => {
+    return http.post(`/runtimes/php/extensions/uninstall`, req);
+};
