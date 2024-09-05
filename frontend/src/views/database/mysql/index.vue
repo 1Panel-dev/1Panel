@@ -61,8 +61,8 @@
             </template>
 
             <template #toolbar>
-                <el-row>
-                    <el-col :xs="24" :sm="20" :md="20" :lg="20" :xl="20">
+                <div class="flex flex-wrap gap-4 sm:justify-between">
+                    <div class="flex gap-2 flex-wrap items-center justify-start">
                         <el-button
                             v-if="currentDB && (currentDB.from !== 'local' || mysqlStatus === 'Running')"
                             type="primary"
@@ -81,30 +81,34 @@
                         >
                             {{ $t('database.loadFromRemote') }}
                         </el-button>
-                        <el-button @click="goRemoteDB" type="primary" plain>
-                            {{ $t('database.remoteDB') }}
-                        </el-button>
-                        <el-dropdown class="ml-3">
-                            <el-button type="primary" plain>
-                                {{ $t('database.manage') }}
-                                <el-icon class="el-icon--right"><arrow-down /></el-icon>
+                        <div>
+                            <el-button @click="goRemoteDB" type="primary" plain>
+                                {{ $t('database.remoteDB') }}
                             </el-button>
-                            <template #dropdown>
-                                <el-dropdown-menu>
-                                    <el-dropdown-item icon="Position" @click="goDashboard('phpMyAdmin')">
-                                        phpMyAdmin
-                                    </el-dropdown-item>
-                                    <el-dropdown-item icon="Position" @click="goDashboard('Adminer')" divided>
-                                        Adminer
-                                    </el-dropdown-item>
-                                </el-dropdown-menu>
-                            </template>
-                        </el-dropdown>
-                    </el-col>
-                    <el-col :xs="24" :sm="4" :md="4" :lg="4" :xl="4">
+                        </div>
+                        <div>
+                            <el-dropdown>
+                                <el-button type="primary" plain>
+                                    {{ $t('database.manage') }}
+                                    <el-icon class="el-icon--right"><arrow-down /></el-icon>
+                                </el-button>
+                                <template #dropdown>
+                                    <el-dropdown-menu>
+                                        <el-dropdown-item icon="Position" @click="goDashboard('phpMyAdmin')">
+                                            phpMyAdmin
+                                        </el-dropdown-item>
+                                        <el-dropdown-item icon="Position" @click="goDashboard('Adminer')" divided>
+                                            Adminer
+                                        </el-dropdown-item>
+                                    </el-dropdown-menu>
+                                </template>
+                            </el-dropdown>
+                        </div>
+                    </div>
+                    <div>
                         <TableSearch @search="search()" v-model:searchName="searchName" />
-                    </el-col>
-                </el-row>
+                    </div>
+                </div>
             </template>
             <template #main v-if="currentDB">
                 <ComplexTable
