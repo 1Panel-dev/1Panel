@@ -2,17 +2,18 @@
     <div v-loading="loading">
         <div class="app-status" style="margin-top: 20px">
             <el-card>
-                <div>
-                    <el-tag style="float: left" effect="dark" type="success">Docker</el-tag>
-                    <el-tag round class="status-content" v-if="form.status === 'Running'" type="success">
-                        {{ $t('commons.status.running') }}
-                    </el-tag>
-                    <el-tag round class="status-content" v-if="form.status === 'Stopped'" type="info">
-                        {{ $t('commons.status.stopped') }}
-                    </el-tag>
-                    <el-tag class="status-content">{{ $t('app.version') }}: {{ form.version }}</el-tag>
-
-                    <span v-if="form.status === 'Running'" class="buttons">
+                <div class="flex flex-col gap-2 sm:flex-row sm:justify-between">
+                    <div class="flex">
+                        <el-tag style="float: left" effect="dark" type="success">Docker</el-tag>
+                        <el-tag round class="status-content" v-if="form.status === 'Running'" type="success">
+                            {{ $t('commons.status.running') }}
+                        </el-tag>
+                        <el-tag round class="status-content" v-if="form.status === 'Stopped'" type="info">
+                            {{ $t('commons.status.stopped') }}
+                        </el-tag>
+                        <el-tag class="status-content">{{ $t('app.version') }}: {{ form.version }}</el-tag>
+                    </div>
+                    <div class="flex justify-start" v-if="form.status === 'Running'">
                         <el-button type="primary" @click="onOperator('stop')" link>
                             {{ $t('container.stop') }}
                         </el-button>
@@ -20,9 +21,9 @@
                         <el-button type="primary" @click="onOperator('restart')" link>
                             {{ $t('container.restart') }}
                         </el-button>
-                    </span>
+                    </div>
 
-                    <span v-if="form.status === 'Stopped'" class="buttons">
+                    <div clsas="flex justify-start" v-if="form.status === 'Stopped'" class="buttons">
                         <el-button type="primary" @click="onOperator('start')" link>
                             {{ $t('container.start') }}
                         </el-button>
@@ -30,7 +31,7 @@
                         <el-button type="primary" @click="onOperator('restart')" link>
                             {{ $t('container.restart') }}
                         </el-button>
-                    </span>
+                    </div>
                 </div>
             </el-card>
         </div>
@@ -46,13 +47,16 @@
                     <el-col :xs="24" :sm="24" :md="15" :lg="12" :xl="10">
                         <el-form :model="form" label-position="left" :rules="rules" ref="formRef" label-width="120px">
                             <el-form-item :label="$t('container.mirrors')" prop="mirrors">
-                                <div style="width: 100%" v-if="form.mirrors">
+                                <div
+                                    class="flex w-full justify-start flex-col sm:flex-row sm:items-end"
+                                    v-if="form.mirrors"
+                                >
                                     <el-input
                                         type="textarea"
                                         :rows="5"
                                         disabled
                                         v-model="form.mirrors"
-                                        style="width: calc(100% - 80px)"
+                                        class="sm:calc(100% - 80px)"
                                     />
                                     <el-button @click="onChangeMirrors" icon="Setting">
                                         {{ $t('commons.button.set') }}
@@ -65,18 +69,19 @@
                                         </el-button>
                                     </template>
                                 </el-input>
-                                <span class="input-help">{{ $t('container.mirrorsHelper') }}</span>
-                                <span class="input-help flx-align-center" style="display: flex">
-                                    {{ $t('container.mirrorsHelper2') }}
-                                    <el-link
-                                        style="font-size: 12px; margin-left: 5px"
-                                        icon="Position"
-                                        @click="toDoc()"
-                                        type="primary"
-                                    >
-                                        {{ $t('firewall.quickJump') }}
-                                    </el-link>
-                                </span>
+                                <div class="flex">
+                                    <span>
+                                        {{ $t('container.mirrorsHelper') }} {{ $t('container.mirrorsHelper2') }}
+                                        <el-link
+                                            style="font-size: 12px; margin-left: 5px"
+                                            icon="Position"
+                                            @click="toDoc()"
+                                            type="primary"
+                                        >
+                                            {{ $t('firewall.quickJump') }}
+                                        </el-link>
+                                    </span>
+                                </div>
                             </el-form-item>
                             <el-form-item :label="$t('container.registries')" prop="registries">
                                 <div style="width: 100%" v-if="form.registries">
