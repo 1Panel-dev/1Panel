@@ -3,24 +3,26 @@
         <RouterButton :buttons="routerButton" />
         <LayoutContent :title="$t('website.ssl')">
             <template #toolbar>
-                <el-button type="primary" @click="openSSL()">
-                    {{ $t('ssl.create') }}
-                </el-button>
-                <el-button type="primary" @click="openUpload()">
-                    {{ $t('ssl.upload') }}
-                </el-button>
-                <el-button type="primary" plain @click="openCA()">
-                    {{ $t('ssl.selfSigned') }}
-                </el-button>
-                <el-button type="primary" plain @click="openAcmeAccount()">
-                    {{ $t('website.acmeAccountManage') }}
-                </el-button>
-                <el-button type="primary" plain @click="openDnsAccount()">
-                    {{ $t('website.dnsAccountManage') }}
-                </el-button>
-                <el-button plain @click="deleteSSL(null)" :disabled="selects.length === 0">
-                    {{ $t('commons.button.delete') }}
-                </el-button>
+                <div class="flex flex-wrap gap-3 [&>*]:ml-3">
+                    <el-button type="primary" @click="openSSL()">
+                        {{ $t('ssl.create') }}
+                    </el-button>
+                    <el-button type="primary" @click="openUpload()">
+                        {{ $t('ssl.upload') }}
+                    </el-button>
+                    <el-button type="primary" plain @click="openCA()">
+                        {{ $t('ssl.selfSigned') }}
+                    </el-button>
+                    <el-button type="primary" plain @click="openAcmeAccount()">
+                        {{ $t('website.acmeAccountManage') }}
+                    </el-button>
+                    <el-button type="primary" plain @click="openDnsAccount()">
+                        {{ $t('website.dnsAccountManage') }}
+                    </el-button>
+                    <el-button plain @click="deleteSSL(null)" :disabled="selects.length === 0">
+                        {{ $t('commons.button.delete') }}
+                    </el-button>
+                </div>
             </template>
             <template #main>
                 <br />
