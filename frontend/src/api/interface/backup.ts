@@ -6,6 +6,7 @@ export namespace Backup {
         type: string;
         accessKey: string;
         bucket: string;
+        bucketInput: boolean;
         credential: string;
         backupPath: string;
         vars: string;
