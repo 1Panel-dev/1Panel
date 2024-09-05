@@ -2,42 +2,45 @@
     <div>
         <div class="app-status" style="margin-top: 20px">
             <el-card>
-                <div>
-                    <el-tag effect="dark" type="success">{{ baseInfo.name }}</el-tag>
-                    <el-tag round class="status-content" v-if="baseInfo.status === 'running'" type="success">
-                        {{ $t('commons.status.running') }}
-                    </el-tag>
-                    <el-tag round class="status-content" v-if="baseInfo.status === 'not running'" type="info">
-                        {{ $t('commons.status.stopped') }}
-                    </el-tag>
-                    <el-tag class="status-content">{{ $t('app.version') }}: {{ baseInfo.version }}</el-tag>
-
-                    <span v-if="baseInfo.status === 'running'" class="buttons">
-                        <el-button type="primary" @click="onOperate('stop')" link>
-                            {{ $t('commons.button.stop') }}
-                        </el-button>
-                    </span>
-                    <span v-if="baseInfo.status === 'not running'" class="buttons">
-                        <el-button type="primary" @click="onOperate('start')" link>
-                            {{ $t('commons.button.start') }}
-                        </el-button>
-                    </span>
-                    <el-divider direction="vertical" />
-                    <el-button type="primary" @click="onOperate('restart')" link>
-                        {{ $t('container.restart') }}
-                    </el-button>
-                    <span v-if="onPing !== 'None'">
+                <div class="flex flex-row flex-wrap gap-2 sm:justify-between items-center">
+                    <div class="flex flex-row flex-wrap">
+                        <el-tag effect="dark" type="success">{{ baseInfo.name }}</el-tag>
+                        <el-tag round class="status-content" v-if="baseInfo.status === 'running'" type="success">
+                            {{ $t('commons.status.running') }}
+                        </el-tag>
+                        <el-tag round class="status-content" v-if="baseInfo.status === 'not running'" type="info">
+                            {{ $t('commons.status.stopped') }}
+                        </el-tag>
+                        <el-tag class="status-content">{{ $t('app.version') }}: {{ baseInfo.version }}</el-tag>
+                    </div>
+                    <div class="flex flex-wrap items-center">
+                        <div v-if="baseInfo.status === 'running'">
+                            <el-button type="primary" @click="onOperate('stop')" link>
+                                {{ $t('commons.button.stop') }}
+                            </el-button>
+                        </div>
+                        <div v-if="baseInfo.status === 'not running'">
+                            <el-button type="primary" @click="onOperate('start')" link>
+                                {{ $t('commons.button.start') }}
+                            </el-button>
+                        </div>
                         <el-divider direction="vertical" />
-                        <el-button type="primary" link>{{ $t('firewall.noPing') }}</el-button>
-                        <el-switch
-                            size="small"
-                            class="ml-2"
-                            inactive-value="Disable"
-                            active-value="Enable"
-                            @change="onPingOperate"
-                            v-model="onPing"
-                        />
-                    </span>
+                        <el-button type="primary" @click="onOperate('restart')" link>
+                            {{ $t('container.restart') }}
+                        </el-button>
+                        <div v-if="onPing !== 'None'">
+                            <el-divider direction="vertical" />
+                            <el-button type="primary" link>{{ $t('firewall.noPing') }}</el-button>
+                            <el-switch
+                                size="small"
+                                class="ml-2"
+                                inactive-value="Disable"
+                                active-value="Enable"
+                                @change="onPingOperate"
+                                v-model="onPing"
+                            />
+                        </div>
+                    </div>
                 </div>
             </el-card>
         </div>
