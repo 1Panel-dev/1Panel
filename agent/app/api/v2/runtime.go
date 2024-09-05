@@ -297,3 +297,89 @@ func (b *BaseApi) UnInstallPHPExtension(c *gin.Context) {
 	}
 	helper.SuccessWithOutData(c)
 }
+
+// @Tags Runtime
+// @Summary Load php runtime conf
+// @Description 获取 php 运行环境配置
+// @Accept json
+// @Param id path integer true "request"
+// @Success 200 {object} response.PHPConfig
+// @Security ApiKeyAuth
+// @Router /runtimes/php/config/:id [get]
+func (b *BaseApi) GetPHPConfig(c *gin.Context) {
+	id, err := helper.GetParamID(c)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		return
+	}
+	data, err := runtimeService.GetPHPConfig(id)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags Runtime
+// @Summary Update runtime php conf
+// @Description 更新运行环境 PHP 配置
+// @Accept json
+// @Param request body request.PHPConfigUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /runtimes/php/config [post]
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"[domain] PHP 配置修改","formatEN":"[domain] PHP conf update"}
+func (b *BaseApi) UpdatePHPConfig(c *gin.Context) {
+	var req request.PHPConfigUpdate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := runtimeService.UpdatePHPConfig(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags Runtime
+// @Summary Update php conf file
+// @Description 更新 php 配置文件
+// @Accept json
+// @Param request body request.WebsitePHPFileUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /runtimes/php/update [post]
+// @x-panel-log {"bodyKeys":["websiteId"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"websiteId","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"php 配置修改 [domain]","formatEN":"Nginx conf update [domain]"}
+func (b *BaseApi) UpdatePHPFile(c *gin.Context) {
+	var req request.PHPFileUpdate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := runtimeService.UpdatePHPConfigFile(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// 写一个调用 GetPHPConfigFile 的方法
+// @Tags Runtime
+// @Summary Get php conf file
+// @Description 获取 php 配置文件
+// @Accept json
+// @Param request body request.PHPFileReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /runtimes/php/file [post]
+func (b *BaseApi) GetPHPConfigFile(c *gin.Context) {
+	var req request.PHPFileReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	data, err := runtimeService.GetPHPConfigFile(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}

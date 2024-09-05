@@ -39,11 +39,6 @@ func (a *WebsiteRouter) InitRouter(Router *gin.RouterGroup) {
 		websiteRouter.GET("/:id/https", baseApi.GetHTTPSConfig)
 		websiteRouter.POST("/:id/https", baseApi.UpdateHTTPSConfig)
 
-		websiteRouter.GET("/php/config/:id", baseApi.GetWebsitePHPConfig)
-		websiteRouter.POST("/php/config", baseApi.UpdateWebsitePHPConfig)
-		websiteRouter.POST("/php/update", baseApi.UpdatePHPFile)
-		websiteRouter.POST("/php/version", baseApi.ChangePHPVersion)
-
 		websiteRouter.POST("/rewrite", baseApi.GetRewriteConfig)
 		websiteRouter.POST("/rewrite/update", baseApi.UpdateRewriteConfig)
 

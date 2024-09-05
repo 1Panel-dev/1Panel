@@ -76,3 +76,22 @@ type PHPExtensionInstallReq struct {
 	Name   string `json:"name" validate:"required"`
 	TaskID string `json:"taskID"`
 }
+
+type PHPConfigUpdate struct {
+	ID               uint              `json:"id" validate:"required"`
+	Params           map[string]string `json:"params"`
+	Scope            string            `json:"scope" validate:"required"`
+	DisableFunctions []string          `json:"disableFunctions"`
+	UploadMaxSize    string            `json:"uploadMaxSize"`
+}
+
+type PHPFileUpdate struct {
+	ID      uint   `json:"id" validate:"required"`
+	Type    string `json:"type" validate:"required"`
+	Content string `json:"content" validate:"required"`
+}
+
+type PHPFileReq struct {
+	ID   uint   `json:"id" validate:"required"`
+	Type string `json:"type" validate:"required"`
+}

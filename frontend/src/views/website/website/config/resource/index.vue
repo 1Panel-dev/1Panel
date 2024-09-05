@@ -3,12 +3,7 @@
         <el-tab-pane :label="'OpenResty'" name="0">
             <Nginx :id="id" v-if="index == '0'"></Nginx>
         </el-tab-pane>
-        <el-tab-pane :label="'FPM'" name="1" v-if="configPHP">
-            <PHP :id="id" v-if="index == '1'" :installId="installId" :type="'fpm'"></PHP>
-        </el-tab-pane>
-        <el-tab-pane :label="'PHP'" name="2" v-if="configPHP">
-            <PHP :id="id" v-if="index == '2'" :installId="installId" :type="'php'"></PHP>
-        </el-tab-pane>
+      
     </el-tabs>
 </template>
 
@@ -17,7 +12,7 @@ import { GetRuntime } from '@/api/modules/runtime';
 import { GetWebsite } from '@/api/modules/website';
 import { computed, onMounted, ref } from 'vue';
 import Nginx from './nginx/index.vue';
-import PHP from './php-fpm/index.vue';
+
 
 const props = defineProps({
     id: {

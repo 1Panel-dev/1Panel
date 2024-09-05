@@ -1,11 +1,13 @@
 package service
 
 import (
+	"bufio"
 	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/cmd/server/nginx_conf"
+	"gopkg.in/ini.v1"
 	"os"
 	"path"
 	"path/filepath"
@@ -51,6 +53,10 @@ type IRuntimeService interface {
 	GetPHPExtensions(runtimeID uint) (response.PHPExtensionRes, error)
 	InstallPHPExtension(req request.PHPExtensionInstallReq) error
 	UnInstallPHPExtension(req request.PHPExtensionInstallReq) error
+	GetPHPConfig(id uint) (*response.PHPConfig, error)
+	UpdatePHPConfig(req request.PHPConfigUpdate) (err error)
+	UpdatePHPConfigFile(req request.PHPFileUpdate) error
+	GetPHPConfigFile(req request.PHPFileReq) (*response.FileInfo, error)
 }
 
 func NewRuntimeService() IRuntimeService {
@@ -743,4 +749,164 @@ func (r *RuntimeService) UnInstallPHPExtension(req request.PHPExtensionInstallRe
 		return err
 	}
 	return runtimeRepo.Save(runtime)
+}
+
+func (r *RuntimeService) GetPHPConfig(id uint) (*response.PHPConfig, error) {
+	runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(id))
+	if err != nil {
+		return nil, err
+	}
+	phpConfigPath := path.Join(runtime.GetPath(), "conf", "php.ini")
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(phpConfigPath) {
+		return nil, buserr.WithName("ErrFileNotFound", "php.ini")
+	}
+	params := make(map[string]string)
+	configFile, err := fileOp.OpenFile(phpConfigPath)
+	if err != nil {
+		return nil, err
+	}
+	defer configFile.Close()
+	scanner := bufio.NewScanner(configFile)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if strings.HasPrefix(line, ";") {
+			continue
+		}
+		matches := regexp.MustCompile(`^\s*([a-z_]+)\s*=\s*(.*)$`).FindStringSubmatch(line)
+		if len(matches) == 3 {
+			params[matches[1]] = matches[2]
+		}
+	}
+	cfg, err := ini.Load(phpConfigPath)
+	if err != nil {
+		return nil, err
+	}
+	phpConfig, err := cfg.GetSection("PHP")
+	if err != nil {
+		return nil, err
+	}
+	disableFunctionStr := phpConfig.Key("disable_functions").Value()
+	res := &response.PHPConfig{Params: params}
+	if disableFunctionStr != "" {
+		disableFunctions := strings.Split(disableFunctionStr, ",")
+		if len(disableFunctions) > 0 {
+			res.DisableFunctions = disableFunctions
+		}
+	}
+	uploadMaxSize := phpConfig.Key("upload_max_filesize").Value()
+	if uploadMaxSize != "" {
+		res.UploadMaxSize = uploadMaxSize
+	}
+	return res, nil
+}
+
+func (r *RuntimeService) UpdatePHPConfig(req request.PHPConfigUpdate) (err error) {
+	runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(req.ID))
+	if err != nil {
+		return err
+	}
+	phpConfigPath := path.Join(runtime.GetPath(), "conf", "php.ini")
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(phpConfigPath) {
+		return buserr.WithMap("ErrFileNotFound", map[string]interface{}{"name": "php.ini"}, nil)
+	}
+	configFile, err := fileOp.OpenFile(phpConfigPath)
+	if err != nil {
+		return err
+	}
+	defer configFile.Close()
+
+	contentBytes, err := fileOp.GetContent(phpConfigPath)
+	if err != nil {
+		return err
+	}
+
+	content := string(contentBytes)
+	lines := strings.Split(content, "\n")
+	for i, line := range lines {
+		if strings.HasPrefix(line, ";") {
+			continue
+		}
+		switch req.Scope {
+		case "params":
+			for key, value := range req.Params {
+				pattern := "^" + regexp.QuoteMeta(key) + "\\s*=\\s*.*$"
+				if matched, _ := regexp.MatchString(pattern, line); matched {
+					lines[i] = key + " = " + value
+				}
+			}
+		case "disable_functions":
+			pattern := "^" + regexp.QuoteMeta("disable_functions") + "\\s*=\\s*.*$"
+			if matched, _ := regexp.MatchString(pattern, line); matched {
+				lines[i] = "disable_functions" + " = " + strings.Join(req.DisableFunctions, ",")
+				break
+			}
+		case "upload_max_filesize":
+			pattern := "^" + regexp.QuoteMeta("post_max_size") + "\\s*=\\s*.*$"
+			if matched, _ := regexp.MatchString(pattern, line); matched {
+				lines[i] = "post_max_size" + " = " + req.UploadMaxSize
+			}
+			patternUpload := "^" + regexp.QuoteMeta("upload_max_filesize") + "\\s*=\\s*.*$"
+			if matched, _ := regexp.MatchString(patternUpload, line); matched {
+				lines[i] = "upload_max_filesize" + " = " + req.UploadMaxSize
+			}
+		}
+	}
+	updatedContent := strings.Join(lines, "\n")
+	if err := fileOp.WriteFile(phpConfigPath, strings.NewReader(updatedContent), 0755); err != nil {
+		return err
+	}
+
+	err = r.OperateRuntime(request.RuntimeOperate{
+		Operate: constant.RuntimeRestart,
+		ID:      req.ID,
+	})
+	if err != nil {
+		_ = fileOp.WriteFile(phpConfigPath, strings.NewReader(string(contentBytes)), 0755)
+		return err
+	}
+	return
+}
+
+func (r *RuntimeService) GetPHPConfigFile(req request.PHPFileReq) (*response.FileInfo, error) {
+	runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(req.ID))
+	if err != nil {
+		return nil, err
+	}
+	configPath := ""
+	switch req.Type {
+	case constant.ConfigFPM:
+		configPath = path.Join(runtime.GetPath(), "conf", "php-fpm.conf")
+	case constant.ConfigPHP:
+		configPath = path.Join(runtime.GetPath(), "conf", "php.ini")
+	}
+	info, err := files.NewFileInfo(files.FileOption{
+		Path:   configPath,
+		Expand: true,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &response.FileInfo{FileInfo: *info}, nil
+}
+
+func (r *RuntimeService) UpdatePHPConfigFile(req request.PHPFileUpdate) error {
+	runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(req.ID))
+	if err != nil {
+		return err
+	}
+	configPath := ""
+	if req.Type == constant.ConfigFPM {
+		configPath = path.Join(runtime.GetPath(), "conf", "php-fpm.conf")
+	} else {
+		configPath = path.Join(runtime.GetPath(), "conf", "php.ini")
+	}
+	if err := files.NewFileOp().WriteFile(configPath, strings.NewReader(req.Content), 0755); err != nil {
+		return err
+	}
+	if _, err := compose.Restart(runtime.GetComposePath()); err != nil {
+		return err
+	}
+	return nil
 }

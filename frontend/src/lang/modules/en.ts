@@ -2440,6 +2440,9 @@ const message = {
         installExtension: 'Do you confirm to install the extension {0}',
         loadedExtension: 'Loaded Extension',
         popularExtension: 'Popular Extension',
+        uninstallExtension: 'Are you sure you want to uninstall the extension {0}',
+        phpConfigHelper:
+            'Modifying the configuration requires restarting the operating environment, do you want to continue',
     },
     process: {
         pid: 'Process ID',
