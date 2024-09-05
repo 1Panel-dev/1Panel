@@ -32,18 +32,21 @@
                                 </template>
                             </el-input>
                         </el-form-item>
-                        <el-form-item label="Bucket" prop="bucket">
-                            <el-select
-                                style="width: 80%"
-                                @change="errBuckets = false"
+                        <el-form-item label="Bucket" prop="bucket" :rules="Rules.requiredInput">
+                            <el-checkbox v-model="minioData.rowData!.bucketInput" :label="$t('container.input')" />
+                            <el-input
+                                clearable
+                                v-if="minioData.rowData!.bucketInput"
                                 v-model="minioData.rowData!.bucket"
-                            >
-                                <el-option v-for="item in buckets" :key="item" :value="item" />
-                            </el-select>
-                            <el-button style="width: 20%" plain @click="getBuckets(formRef)">
-                                {{ $t('setting.loadBucket') }}
-                            </el-button>
-                            <span v-if="errBuckets" class="input-error">{{ $t('commons.rule.requiredSelect') }}</span>
+                            />
+                            <div v-else class="w-full">
+                                <el-select style="width: 80%" v-model="minioData.rowData!.bucket">
+                                    <el-option v-for="item in buckets" :key="item" :value="item" />
+                                </el-select>
+                                <el-button style="width: 20%" plain @click="getBuckets()">
+                                    {{ $t('setting.loadBucket') }}
+                                </el-button>
+                            </div>
                         </el-form-item>
                         <el-form-item :label="$t('setting.backupDir')" prop="backupPath">
                             <el-input clearable v-model.trim="minioData.rowData!.backupPath" placeholder="/1panel" />
@@ -80,7 +83,6 @@ const loading = ref(false);
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 const buckets = ref();
-const errBuckets = ref();
 
 const endpointProto = ref('http');
 const emit = defineEmits(['search']);
@@ -111,36 +113,28 @@ const handleClose = () => {
     drawerVisible.value = false;
 };
 
-const getBuckets = async (formEl: FormInstance | undefined) => {
-    if (!formEl) return;
-    formEl.validate(async (valid) => {
-        if (!valid) return;
-        loading.value = true;
-        let item = deepCopy(minioData.value.rowData!.varsJson);
-        item['endpoint'] = spliceHttp(endpointProto.value, minioData.value.rowData!.varsJson['endpointItem']);
-        item['endpointItem'] = undefined;
-        listBucket({
-            type: minioData.value.rowData!.type,
-            vars: JSON.stringify(item),
-            accessKey: minioData.value.rowData!.accessKey,
-            credential: minioData.value.rowData!.credential,
+const getBuckets = async () => {
+    loading.value = true;
+    let item = deepCopy(minioData.value.rowData!.varsJson);
+    item['endpoint'] = spliceHttp(endpointProto.value, minioData.value.rowData!.varsJson['endpointItem']);
+    item['endpointItem'] = undefined;
+    listBucket({
+        type: minioData.value.rowData!.type,
+        vars: JSON.stringify(item),
+        accessKey: minioData.value.rowData!.accessKey,
+        credential: minioData.value.rowData!.credential,
+    })
+        .then((res) => {
+            loading.value = false;
+            buckets.value = res.data;
         })
-            .then((res) => {
-                loading.value = false;
-                buckets.value = res.data;
-            })
-            .catch(() => {
-                buckets.value = [];
-                loading.value = false;
-            });
-    });
+        .catch(() => {
+            buckets.value = [];
+            loading.value = false;
+        });
 };
 
 const onSubmit = async (formEl: FormInstance | undefined) => {
-    if (!minioData.value.rowData.bucket) {
-        errBuckets.value = true;
-        return;
-    }
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;

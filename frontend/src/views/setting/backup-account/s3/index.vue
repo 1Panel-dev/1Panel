@@ -35,14 +35,17 @@
                                 </template>
                             </el-input>
                         </el-form-item>
-                        <el-form-item label="Bucket" prop="bucket">
-                            <el-select @change="errBuckets = false" style="width: 80%" v-model="s3Data.rowData!.bucket">
-                                <el-option v-for="item in buckets" :key="item" :value="item" />
-                            </el-select>
-                            <el-button style="width: 20%" plain @click="getBuckets(formRef)">
-                                {{ $t('setting.loadBucket') }}
-                            </el-button>
-                            <span v-if="errBuckets" class="input-error">{{ $t('commons.rule.requiredSelect') }}</span>
+                        <el-form-item label="Bucket" prop="bucket" :rules="Rules.requiredInput">
+                            <el-checkbox v-model="s3Data.rowData!.bucketInput" :label="$t('container.input')" />
+                            <el-input clearable v-if="s3Data.rowData!.bucketInput" v-model="s3Data.rowData!.bucket" />
+                            <div v-else class="w-full">
+                                <el-select style="width: 80%" v-model="s3Data.rowData!.bucket">
+                                    <el-option v-for="item in buckets" :key="item" :value="item" />
+                                </el-select>
+                                <el-button style="width: 20%" plain @click="getBuckets()">
+                                    {{ $t('setting.loadBucket') }}
+                                </el-button>
+                            </div>
                         </el-form-item>
                         <el-form-item
                             :label="$t('setting.scType')"
@@ -98,7 +101,6 @@ const loading = ref(false);
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 const buckets = ref();
-const errBuckets = ref();
 
 const endpointProto = ref('http');
 const emit = defineEmits(['search']);
@@ -132,35 +134,27 @@ const handleClose = () => {
     drawerVisible.value = false;
 };
 
-const getBuckets = async (formEl: FormInstance | undefined) => {
-    if (!formEl) return;
-    formEl.validate(async (valid) => {
-        if (!valid) return;
-        loading.value = true;
-        let item = deepCopy(s3Data.value.rowData!.varsJson);
-        item['endpoint'] = spliceHttp(endpointProto.value, s3Data.value.rowData!.varsJson['endpointItem']);
-        listBucket({
-            type: s3Data.value.rowData!.type,
-            vars: JSON.stringify(item),
-            accessKey: s3Data.value.rowData!.accessKey,
-            credential: s3Data.value.rowData!.credential,
+const getBuckets = async () => {
+    loading.value = true;
+    let item = deepCopy(s3Data.value.rowData!.varsJson);
+    item['endpoint'] = spliceHttp(endpointProto.value, s3Data.value.rowData!.varsJson['endpointItem']);
+    listBucket({
+        type: s3Data.value.rowData!.type,
+        vars: JSON.stringify(item),
+        accessKey: s3Data.value.rowData!.accessKey,
+        credential: s3Data.value.rowData!.credential,
+    })
+        .then((res) => {
+            loading.value = false;
+            buckets.value = res.data;
         })
-            .then((res) => {
-                loading.value = false;
-                buckets.value = res.data;
-            })
-            .catch(() => {
-                buckets.value = [];
-                loading.value = false;
-            });
-    });
+        .catch(() => {
+            buckets.value = [];
+            loading.value = false;
+        });
 };
 
 const onSubmit = async (formEl: FormInstance | undefined) => {
-    if (!s3Data.value.rowData.bucket) {
-        errBuckets.value = true;
-        return;
-    }
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
