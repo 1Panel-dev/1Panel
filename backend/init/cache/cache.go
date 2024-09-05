@@ -12,7 +12,7 @@ import (
 func Init() {
 	c := global.CONF.System.Cache
 	_ = os.RemoveAll(c)
-	_ = os.Mkdir(c, 0644)
+	_ = os.Mkdir(c, 0755)
 	options := badger.Options{
 		Dir:                c,
 		ValueDir:           c,
