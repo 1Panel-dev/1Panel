@@ -77,7 +77,7 @@
             :title="isBackup ? $t('commons.button.backup') : $t('commons.button.recover') + ' - ' + name"
             width="40%"
             :close-on-click-modal="false"
-            :before-close="handleClose"
+            :before-close="handleBackupClose"
         >
             <el-form ref="backupForm" label-position="left" v-loading="loading">
                 <el-form-item
@@ -90,7 +90,7 @@
             </el-form>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="handleClose" :disabled="loading">
+                    <el-button @click="handleBackupClose" :disabled="loading">
                         {{ $t('commons.button.cancel') }}
                     </el-button>
                     <el-button type="primary" @click="onSubmit" :disabled="loading">
