@@ -260,7 +260,7 @@ func (b *BaseApi) GetRuntimeExtension(c *gin.Context) {
 // @Summary Install php extension
 // @Description 安装 PHP 扩展
 // @Accept json
-// @Param request body request.PHPExtensionsCreate true "request"
+// @Param request body request.PHPExtensionInstallReq true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /runtimes/php/extensions/install [post]
@@ -270,6 +270,27 @@ func (b *BaseApi) InstallPHPExtension(c *gin.Context) {
 		return
 	}
 	err := runtimeService.InstallPHPExtension(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}
+
+// @Tags Runtime
+// @Summary UnInstall php extension
+// @Description 卸载 PHP 扩展
+// @Accept json
+// @Param request body request.PHPExtensionInstallReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /runtimes/php/extensions/uninstall [post]
+func (b *BaseApi) UnInstallPHPExtension(c *gin.Context) {
+	var req request.PHPExtensionInstallReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	err := runtimeService.UnInstallPHPExtension(req)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

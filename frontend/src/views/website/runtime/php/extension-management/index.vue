@@ -9,16 +9,15 @@
             <el-text>{{ $t('runtime.popularExtension') }}</el-text>
         </div>
         <ComplexTable :data="supportExtensions" @search="search()" :heightDiff="350" :loading="loading">
-            <el-table-column prop="name" :label="$t('commons.table.name')" width="150" />
-            <el-table-column prop="description" :label="$t('commons.table.description')" />
-            <el-table-column prop="installed" :label="$t('commons.table.status')" width="100">
+            <el-table-column prop="name" :label="$t('commons.table.name')" />
+            <el-table-column prop="installed" :label="$t('commons.table.status')">
                 <template #default="{ row }">
                     <el-icon v-if="row.installed" color="green"><Select /></el-icon>
                     <el-icon v-else><CloseBold /></el-icon>
                 </template>
             </el-table-column>
             <fu-table-operations
-                :ellipsis="10"
+                :ellipsis="2"
                 width="100px"
                 :buttons="buttons"
                 :label="$t('commons.table.operate')"
@@ -27,15 +26,16 @@
             />
         </ComplexTable>
     </DrawerPro>
-    <TaskLog ref="taskLogRef" />
+    <TaskLog ref="taskLogRef" @clos="search()" />
 </template>
 
 <script setup lang="ts">
 import { Runtime } from '@/api/interface/runtime';
-import { GetPHPExtensions, InstallPHPExtension } from '@/api/modules/runtime';
+import { GetPHPExtensions, InstallPHPExtension, UnInstallPHPExtension } from '@/api/modules/runtime';
 import i18n from '@/lang';
 import { ref } from 'vue';
 import { newUUID } from '@/utils/util';
+import { MsgSuccess } from '@/utils/message';
 
 const open = ref(false);
 const runtime = ref();
@@ -58,6 +58,15 @@ const buttons = [
             return !row.installed;
         },
     },
+    {
+        label: i18n.global.t('commons.operate.uninstall'),
+        click: function (row: Runtime.SupportExtension) {
+            unInstallPHPExtension(row);
+        },
+        show: function (row: Runtime.SupportExtension) {
+            return row.installed;
+        },
+    },
 ];
 
 const installExtension = async (row: Runtime.SupportExtension) => {
@@ -76,6 +85,25 @@ const installExtension = async (row: Runtime.SupportExtension) => {
             taskLogRef.value.openWithTaskID(req.taskID);
 
             loading.value = false;
+        } catch (error) {}
+    });
+};
+
+const unInstallPHPExtension = async (row: Runtime.SupportExtension) => {
+    ElMessageBox.confirm(i18n.global.t('runtime.uninstallExtension', [row.name]), i18n.global.t('runtime.extension'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+    }).then(async () => {
+        const req = {
+            id: runtime.value.id,
+            name: row.check,
+        };
+        loading.value = true;
+        try {
+            await UnInstallPHPExtension(req);
+            MsgSuccess(i18n.global.t('commons.msg.uninstallSuccess'));
+            loading.value = false;
+            search();
         } catch (error) {}
     });
 };

@@ -94,7 +94,7 @@
                     />
                     <fu-table-operations
                         :ellipsis="10"
-                        width="200px"
+                        width="300px"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         fixed="right"
@@ -110,13 +110,14 @@
         <Extensions ref="extensionsRef" @close="search" />
         <AppResources ref="checkRef" @close="search" />
         <ExtManagement ref="extManagementRef" @close="search" />
+        <ComposeLogs ref="composeLogRef" />
     </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, reactive, ref } from 'vue';
 import { Runtime } from '@/api/interface/runtime';
-import { DeleteRuntime, RuntimeDeleteCheck, SearchRuntimes } from '@/api/modules/runtime';
+import { DeleteRuntime, OperateRuntime, RuntimeDeleteCheck, SearchRuntimes } from '@/api/modules/runtime';
 import { dateFormat, toLowerCase } from '@/utils/util';
 import { ElMessageBox } from 'element-plus';
 import { containerPrune } from '@/api/modules/container';
@@ -129,6 +130,7 @@ import CreateRuntime from '@/views/website/runtime/php/create/index.vue';
 import Status from '@/components/status/index.vue';
 import RouterMenu from '../index.vue';
 import Log from '@/components/log-dialog/index.vue';
+import ComposeLogs from '@/components/compose-log/index.vue';
 
 const paginationConfig = reactive({
     cacheSizeKey: 'runtime-page-size',
@@ -151,6 +153,7 @@ const checkRef = ref();
 const createRef = ref();
 const loading = ref(false);
 const items = ref<Runtime.RuntimeDTO[]>([]);
+const composeLogRef = ref();
 
 const buttons = [
     {
@@ -160,6 +163,33 @@ const buttons = [
         },
         disabled: function (row: Runtime.Runtime) {
             return row.status != 'running';
+        },
+    },
+    {
+        label: i18n.global.t('container.stop'),
+        click: function (row: Runtime.Runtime) {
+            operateRuntime('down', row.id);
+        },
+        disabled: function (row: Runtime.Runtime) {
+            return row.status === 'recreating' || row.status === 'stopped';
+        },
+    },
+    {
+        label: i18n.global.t('container.start'),
+        click: function (row: Runtime.Runtime) {
+            operateRuntime('up', row.id);
+        },
+        disabled: function (row: Runtime.Runtime) {
+            return row.status === 'starting' || row.status === 'recreating' || row.status === 'running';
+        },
+    },
+    {
+        label: i18n.global.t('container.restart'),
+        click: function (row: Runtime.Runtime) {
+            operateRuntime('restart', row.id);
+        },
+        disabled: function (row: Runtime.Runtime) {
+            return row.status === 'recreating';
         },
     },
     {
@@ -205,11 +235,15 @@ const openDetail = (row: Runtime.Runtime) => {
 };
 
 const openLog = (row: Runtime.RuntimeDTO) => {
-    logRef.value.acceptParams({ id: row.id, type: 'php', tail: row.status == 'building' });
+    if (row.status == 'running') {
+        composeLogRef.value.acceptParams({ compose: row.path + '/docker-compose.yml', resource: row.name });
+    } else {
+        logRef.value.acceptParams({ id: row.id, type: 'php', tail: row.status == 'building', heightDiff: 220 });
+    }
 };
 
 const openCreateLog = (id: number) => {
-    logRef.value.acceptParams({ id: id, type: 'php', tail: true });
+    logRef.value.acceptParams({ id: id, type: 'php', tail: true, heightDiff: 220 });
 };
 
 const openExtensions = () => {
@@ -238,6 +272,28 @@ const openDelete = async (row: Runtime.Runtime) => {
             });
         }
     });
+};
+
+const operateRuntime = async (operate: string, ID: number) => {
+    try {
+        const action = await ElMessageBox.confirm(
+            i18n.global.t('runtime.operatorHelper', [i18n.global.t('commons.operate.' + operate)]),
+            i18n.global.t('commons.operate.' + operate),
+            {
+                confirmButtonText: i18n.global.t('commons.button.confirm'),
+                cancelButtonText: i18n.global.t('commons.button.cancel'),
+                type: 'info',
+            },
+        );
+        if (action === 'confirm') {
+            loading.value = true;
+            await OperateRuntime({ operate: operate, ID: ID });
+            search();
+        }
+    } catch (error) {
+    } finally {
+        loading.value = false;
+    }
 };
 
 const onOpenBuildCache = () => {

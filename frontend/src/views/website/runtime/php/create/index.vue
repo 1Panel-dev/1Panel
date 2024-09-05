@@ -156,20 +156,6 @@
                             ></el-option>
                         </el-select>
                     </el-form-item>
-
-                    <div v-if="mode == 'edit'">
-                        <el-form-item>
-                            <el-checkbox v-model="runtime.rebuild">
-                                {{ $t('runtime.rebuild') }}
-                            </el-checkbox>
-                        </el-form-item>
-                        <el-form-item>
-                            <el-alert type="info" :closable="false">
-                                <span>{{ $t('runtime.rebuildHelper') }}</span>
-                                <br />
-                            </el-alert>
-                        </el-form-item>
-                    </div>
                 </div>
             </div>
             <div v-else>
@@ -410,7 +396,9 @@ const getRuntime = async (id: number) => {
             forms[fileds[index].key] = fileds[index];
         }
         formFields.value = forms;
-        runtime.params['PHP_EXTENSIONS'] = runtime.params['PHP_EXTENSIONS'].split(',');
+        if (data.params['PHP_EXTENSIONS'] != '') {
+            runtime.params['PHP_EXTENSIONS'] = runtime.params['PHP_EXTENSIONS'].split(',');
+        }
         initParam.value = true;
     } catch (error) {}
 };

@@ -16,7 +16,7 @@
             </DrawerHeader>
         </template>
         <div>
-            <LogFile :config="config"></LogFile>
+            <LogFile :config="config" :height-diff="config.heightDiff"></LogFile>
         </div>
     </el-drawer>
 </template>
@@ -39,6 +39,7 @@ interface LogProps {
     style: string;
     name: string;
     tail: boolean;
+    heightDiff: number;
 }
 
 const open = ref(false);
@@ -62,6 +63,7 @@ const loadTooltip = () => {
 
 const acceptParams = (props: LogProps) => {
     config.value = props;
+    console.log('config', config.value);
     open.value = true;
 
     if (!mobile.value) {

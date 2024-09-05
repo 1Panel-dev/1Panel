@@ -74,5 +74,5 @@ type NodeModuleReq struct {
 type PHPExtensionInstallReq struct {
 	ID     uint   `json:"ID" validate:"required"`
 	Name   string `json:"name" validate:"required"`
-	TaskID string `json:"taskID"  validate:"required"`
+	TaskID string `json:"taskID"`
 }

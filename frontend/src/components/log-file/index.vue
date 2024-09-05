@@ -266,6 +266,7 @@ onUnmounted(() => {
 });
 
 onMounted(() => {
+    console.log(props.heightDiff);
     initCodemirror();
     init();
 });

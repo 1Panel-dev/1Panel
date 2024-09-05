@@ -6,10 +6,13 @@ import (
 	"fmt"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
+	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
+	"github.com/1Panel-dev/1Panel/agent/cmd/server/nginx_conf"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	cmd2 "github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/compose"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
@@ -24,6 +27,7 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 func handleNodeAndJava(create request.RuntimeCreate, runtime *model.Runtime, fileOp files.FileOp, appVersionDir string) (err error) {
@@ -86,7 +90,7 @@ func handlePHP(create request.RuntimeCreate, runtime *model.Runtime, fileOp file
 	runtime.Params = string(forms)
 	runtime.Status = constant.RuntimeBuildIng
 
-	go buildRuntime(runtime, "", false)
+	go buildRuntime(runtime, "", "", false)
 	return
 }
 
@@ -127,9 +131,9 @@ func reCreateRuntime(runtime *model.Runtime) {
 }
 
 func runComposeCmdWithLog(operate string, composePath string, logPath string) error {
-	cmd := exec.Command("docker compose", "-f", composePath, operate)
+	cmd := exec.Command("docker", "compose", "-f", composePath, operate)
 	if operate == "up" {
-		cmd = exec.Command("docker compose", "-f", composePath, operate, "-d")
+		cmd = exec.Command("docker", "compose", "-f", composePath, operate, "-d")
 	}
 	logFile, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
 	if err != nil {
@@ -191,7 +195,33 @@ func SyncRuntimeContainerStatus(runtime *model.Runtime) error {
 	return runtimeRepo.Save(runtime)
 }
 
-func buildRuntime(runtime *model.Runtime, oldImageID string, rebuild bool) {
+func getRuntimeEnv(envStr, key string) string {
+	env, err := gotenv.Unmarshal(envStr)
+	if err != nil {
+		return ""
+	}
+	if v, ok := env[key]; ok {
+		return v
+	}
+	return ""
+}
+
+func getFileEnv(filePath, key string) (string, error) {
+	envContent, err := files.NewFileOp().GetContent(filePath)
+	if err != nil {
+		return "", err
+	}
+	env, err := gotenv.Unmarshal(string(envContent))
+	if err != nil {
+		return "", err
+	}
+	if v, ok := env[key]; ok {
+		return v, nil
+	}
+	return "", nil
+}
+
+func buildRuntime(runtime *model.Runtime, oldImageID string, oldEnv string, rebuild bool) {
 	runtimePath := runtime.GetPath()
 	composePath := runtime.GetComposePath()
 	logPath := path.Join(runtimePath, "build.log")
@@ -206,10 +236,9 @@ func buildRuntime(runtime *model.Runtime, oldImageID string, rebuild bool) {
 	}()
 
 	cmd := exec.Command("docker", "compose", "-f", composePath, "build")
-	multiWriterStdout := io.MultiWriter(os.Stdout, logFile)
-	cmd.Stdout = multiWriterStdout
+	cmd.Stdout = logFile
 	var stderrBuf bytes.Buffer
-	multiWriterStderr := io.MultiWriter(&stderrBuf, logFile, os.Stderr)
+	multiWriterStderr := io.MultiWriter(&stderrBuf, logFile)
 	cmd.Stderr = multiWriterStderr
 
 	err = cmd.Run()
@@ -239,34 +268,44 @@ func buildRuntime(runtime *model.Runtime, oldImageID string, rebuild bool) {
 			}
 		}
 		if rebuild && runtime.ID > 0 {
-			websites, _ := websiteRepo.GetBy(websiteRepo.WithRuntimeID(runtime.ID))
-			if len(websites) > 0 {
-				installService := NewIAppInstalledService()
-				installMap := make(map[uint]string)
-				for _, website := range websites {
-					if website.AppInstallID > 0 {
-						installMap[website.AppInstallID] = website.PrimaryDomain
+			extensionsStr := getRuntimeEnv(runtime.Env, "PHP_EXTENSIONS")
+			extensionsArray := strings.Split(extensionsStr, ",")
+			oldExtensionStr := getRuntimeEnv(oldEnv, "PHP_EXTENSIONS")
+			oldExtensionArray := strings.Split(oldExtensionStr, ",")
+			var delExtensions []string
+			for _, oldExt := range oldExtensionArray {
+				exist := false
+				for _, ext := range extensionsArray {
+					if oldExt == ext {
+						exist = true
+						break
 					}
 				}
-				for installID, domain := range installMap {
-					go func(installID uint, domain string) {
-						global.LOG.Infof("rebuild php runtime [%s] domain [%s]", runtime.Name, domain)
-						if err := installService.Operate(request.AppInstalledOperate{
-							InstallId: installID,
-							Operate:   constant.Rebuild,
-						}); err != nil {
-							global.LOG.Errorf("rebuild php runtime [%s] domain [%s] error %v", runtime.Name, domain, err)
-						}
-					}(installID, domain)
+				if !exist {
+					delExtensions = append(delExtensions, oldExt)
 				}
 			}
+
+			if err = unInstallPHPExtension(runtime, delExtensions); err != nil {
+				global.LOG.Errorf("unInstallPHPExtension error %v", err)
+			}
 		}
-		runtime.Status = constant.RuntimeStarting
-		_ = runtimeRepo.Save(runtime)
+
 		if out, err := compose.Up(composePath); err != nil {
 			runtime.Status = constant.RuntimeStartErr
 			runtime.Message = out
 		} else {
+			extensions := getRuntimeEnv(runtime.Env, "PHP_EXTENSIONS")
+			if extensions != "" {
+				installCmd := fmt.Sprintf("docker exec -i %s %s %s", runtime.ContainerName, "install-ext", extensions)
+				err = cmd2.ExecWithLogFile(installCmd, 60*time.Minute, logPath)
+				if err != nil {
+					runtime.Status = constant.RuntimeError
+					runtime.Message = buserr.New(constant.ErrImageBuildErr).Error() + ":" + err.Error()
+					_ = runtimeRepo.Save(runtime)
+					return
+				}
+			}
 			runtime.Status = constant.RuntimeRunning
 		}
 	}
@@ -444,5 +483,51 @@ func checkContainerName(name string) error {
 	if len(names) > 0 {
 		return buserr.New(constant.ErrContainerName)
 	}
+	return nil
+}
+
+func unInstallPHPExtension(runtime *model.Runtime, delExtensions []string) error {
+	dir := runtime.GetPath()
+	fileOP := files.NewFileOp()
+	var phpExtensions []response.SupportExtension
+	if err := json.Unmarshal(nginx_conf.PHPExtensionsJson, &phpExtensions); err != nil {
+		return err
+	}
+	delMap := make(map[string]struct{})
+	for _, ext := range phpExtensions {
+		for _, del := range delExtensions {
+			if ext.Check == del {
+				delMap[ext.Check] = struct{}{}
+				_ = fileOP.DeleteFile(path.Join(dir, "extensions", ext.File))
+				_ = fileOP.DeleteFile(path.Join(dir, "conf", "conf.d", "docker-php-ext-"+ext.Check+".ini"))
+				break
+			}
+		}
+	}
+	extensions := getRuntimeEnv(runtime.Env, "PHP_EXTENSIONS")
+	var (
+		oldExts []string
+		newExts []string
+	)
+	oldExts = strings.Split(extensions, ",")
+	for _, ext := range oldExts {
+		if _, ok := delMap[ext]; !ok {
+			newExts = append(newExts, ext)
+		}
+	}
+	newExtensions := strings.Join(newExts, ",")
+	envs, err := gotenv.Unmarshal(runtime.Env)
+	if err != nil {
+		return err
+	}
+	envs["PHP_EXTENSIONS"] = newExtensions
+	if err = gotenv.Write(envs, runtime.GetEnvPath()); err != nil {
+		return err
+	}
+	envContent, err := gotenv.Marshal(envs)
+	if err != nil {
+		return err
+	}
+	runtime.Env = envContent
 	return nil
 }

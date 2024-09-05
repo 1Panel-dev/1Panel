@@ -153,6 +153,7 @@ const message = {
             resetSuccess: 'Reset successful',
             creatingInfo: 'Creating, no need for this operation',
             installSuccess: 'Install successful',
+            uninstallSuccess: 'Uninstall successful',
         },
         login: {
             username: 'Username',
