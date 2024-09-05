@@ -1118,6 +1118,7 @@ const message = {
         info: '属性',
         linkFile: '软连接文件',
         terminal: '终端',
+        batchoperation: '批量操作',
         shareList: '分享列表',
         zip: '压缩',
         group: '用户组',
