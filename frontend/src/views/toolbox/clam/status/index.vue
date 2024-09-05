@@ -134,6 +134,9 @@ const onOperate = async (service: string, operation: string) => {
     )
         .then(() => {
             em('update:loading', true);
+            if (service === 'FreshClam') {
+                operation = 'fresh-' + operation;
+            }
             updateClamBaseInfo(operation)
                 .then(() => {
                     em('update:maskShow', true);
