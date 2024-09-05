@@ -151,12 +151,12 @@ func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *d
 	currentInfo.Procs = hostInfo.Procs
 
 	currentInfo.CPUTotal, _ = cpu.Counts(true)
-	totalPercent, _ := cpu.Percent(0, false)
+	totalPercent, _ := cpu.Percent(1*time.Second, false)
 	if len(totalPercent) == 1 {
 		currentInfo.CPUUsedPercent = totalPercent[0]
 		currentInfo.CPUUsed = currentInfo.CPUUsedPercent * 0.01 * float64(currentInfo.CPUTotal)
 	}
-	currentInfo.CPUPercent, _ = cpu.Percent(0, true)
+	currentInfo.CPUPercent, _ = cpu.Percent(1*time.Second, true)
 
 	loadInfo, _ := load.Avg()
 	currentInfo.Load1 = loadInfo.Load1
