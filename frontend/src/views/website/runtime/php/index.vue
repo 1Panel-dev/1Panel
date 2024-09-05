@@ -93,7 +93,7 @@
                         fix
                     />
                     <fu-table-operations
-                        :ellipsis="10"
+                        :ellipsis="5"
                         width="300px"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
@@ -111,6 +111,7 @@
         <AppResources ref="checkRef" @close="search" />
         <ExtManagement ref="extManagementRef" @close="search" />
         <ComposeLogs ref="composeLogRef" />
+        <Config ref="configRef" />
     </div>
 </template>
 
@@ -131,6 +132,7 @@ import Status from '@/components/status/index.vue';
 import RouterMenu from '../index.vue';
 import Log from '@/components/log-dialog/index.vue';
 import ComposeLogs from '@/components/compose-log/index.vue';
+import Config from '@/views/website/runtime/php/config/index.vue';
 
 const paginationConfig = reactive({
     cacheSizeKey: 'runtime-page-size',
@@ -154,6 +156,7 @@ const createRef = ref();
 const loading = ref(false);
 const items = ref<Runtime.RuntimeDTO[]>([]);
 const composeLogRef = ref();
+const configRef = ref();
 
 const buttons = [
     {
@@ -171,7 +174,7 @@ const buttons = [
             operateRuntime('down', row.id);
         },
         disabled: function (row: Runtime.Runtime) {
-            return row.status === 'recreating' || row.status === 'stopped';
+            return row.status === 'recreating' || row.status === 'stopped' || row.status === 'building';
         },
     },
     {
@@ -180,7 +183,12 @@ const buttons = [
             operateRuntime('up', row.id);
         },
         disabled: function (row: Runtime.Runtime) {
-            return row.status === 'starting' || row.status === 'recreating' || row.status === 'running';
+            return (
+                row.status === 'starting' ||
+                row.status === 'recreating' ||
+                row.status === 'running' ||
+                row.status === 'building'
+            );
         },
     },
     {
@@ -189,13 +197,22 @@ const buttons = [
             operateRuntime('restart', row.id);
         },
         disabled: function (row: Runtime.Runtime) {
-            return row.status === 'recreating';
+            return row.status === 'recreating' || row.status === 'building';
         },
     },
     {
         label: i18n.global.t('commons.button.edit'),
         click: function (row: Runtime.Runtime) {
             openDetail(row);
+        },
+        disabled: function (row: Runtime.Runtime) {
+            return row.status === 'building';
+        },
+    },
+    {
+        label: i18n.global.t('menu.config'),
+        click: function (row: Runtime.Runtime) {
+            openConfig(row);
         },
         disabled: function (row: Runtime.Runtime) {
             return row.status === 'building';
@@ -232,6 +249,10 @@ const openCreate = () => {
 
 const openDetail = (row: Runtime.Runtime) => {
     createRef.value.acceptParams({ type: row.type, mode: 'edit', id: row.id, appID: row.appID });
+};
+
+const openConfig = (row: Runtime.Runtime) => {
+    configRef.value.acceptParams(row);
 };
 
 const openLog = (row: Runtime.RuntimeDTO) => {

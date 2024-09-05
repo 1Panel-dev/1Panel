@@ -181,20 +181,6 @@ type WebsiteDefaultUpdate struct {
 	ID uint `json:"id"`
 }
 
-type WebsitePHPConfigUpdate struct {
-	ID               uint              `json:"id" validate:"required"`
-	Params           map[string]string `json:"params"`
-	Scope            string            `json:"scope" validate:"required"`
-	DisableFunctions []string          `json:"disableFunctions"`
-	UploadMaxSize    string            `json:"uploadMaxSize"`
-}
-
-type WebsitePHPFileUpdate struct {
-	ID      uint   `json:"id" validate:"required"`
-	Type    string `json:"type" validate:"required"`
-	Content string `json:"content" validate:"required"`
-}
-
 type WebsitePHPVersionReq struct {
 	WebsiteID    uint `json:"websiteID" validate:"required"`
 	RuntimeID    uint `json:"runtimeID" validate:"required"`

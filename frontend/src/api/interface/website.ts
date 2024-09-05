@@ -331,27 +331,6 @@ export namespace Website {
     export interface DefaultServerUpdate {
         id: number;
     }
-
-    export interface PHPConfig {
-        params: any;
-        disableFunctions: string[];
-        uploadMaxSize: string;
-    }
-
-    export interface PHPConfigUpdate {
-        id: number;
-        params?: any;
-        disableFunctions?: string[];
-        scope: string;
-        uploadMaxSize?: string;
-    }
-
-    export interface PHPUpdate {
-        id: number;
-        content: string;
-        type: string;
-    }
-
     export interface RewriteReq {
         websiteID: number;
         name: string;

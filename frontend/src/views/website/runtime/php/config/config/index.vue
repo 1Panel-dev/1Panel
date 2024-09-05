@@ -2,8 +2,7 @@
     <div v-loading="loading">
         <el-form :model="form" :rules="variablesRules" ref="phpFormRef" label-position="top">
             <el-row v-loading="loading">
-                <el-col :span="1"><br /></el-col>
-                <el-col :span="9">
+                <el-col :span="11" :offset="1">
                     <el-form-item label="short_open_tag" prop="short_open_tag">
                         <el-select v-model="form.short_open_tag">
                             <el-option :label="$t('website.isOff')" :value="'Off'"></el-option>
@@ -48,7 +47,7 @@
                     </el-form-item>
                 </el-col>
                 <el-col :span="1"><br /></el-col>
-                <el-col :span="9">
+                <el-col :span="11">
                     <el-form-item label="default_socket_timeout" prop="default_socket_timeout">
                         <el-input clearable v-model.number="form.default_socket_timeout" maxlength="15">
                             <template #append>{{ $t('commons.units.second') }}</template>
@@ -81,18 +80,16 @@
                 </el-col>
             </el-row>
         </el-form>
-        <ConfirmDialog ref="confirmDialogRef" @confirm="submit"></ConfirmDialog>
     </div>
 </template>
 
 <script lang="ts" setup>
-import { GetPHPConfig, UpdatePHPConfig } from '@/api/modules/website';
+import { GetPHPConfig, UpdatePHPConfig } from '@/api/modules/runtime';
 import { checkNumberRange, Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { computed, onMounted, reactive, ref } from 'vue';
-import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 
 const props = defineProps({
     id: {
@@ -106,7 +103,6 @@ const id = computed(() => {
 });
 const loading = ref(false);
 const phpFormRef = ref();
-const confirmDialogRef = ref();
 let form = reactive({
     short_open_tag: 'Off',
     max_execution_time: 50,
@@ -160,12 +156,19 @@ const onSaveStart = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        let params = {
-            header: i18n.global.t('database.confChange'),
-            operationInfo: i18n.global.t('database.restartNowHelper'),
-            submitInputInfo: i18n.global.t('database.restartNow'),
-        };
-        confirmDialogRef.value!.acceptParams(params);
+        const action = await ElMessageBox.confirm(
+            i18n.global.t('runtime.phpConfigHelper'),
+            i18n.global.t('database.confChange'),
+            {
+                confirmButtonText: i18n.global.t('commons.button.confirm'),
+                cancelButtonText: i18n.global.t('commons.button.cancel'),
+                type: 'info',
+            },
+        );
+        if (action === 'confirm') {
+            loading.value = true;
+            submit();
+        }
     });
 };
 

@@ -31,23 +31,21 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/env"
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
+	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
+	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/cmd/server/nginx_conf"
+	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx/components"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx/parser"
 	"golang.org/x/crypto/bcrypt"
-	"gopkg.in/ini.v1"
-
-	"github.com/1Panel-dev/1Panel/agent/app/dto"
-	"github.com/1Panel-dev/1Panel/agent/app/model"
-	"github.com/1Panel-dev/1Panel/agent/constant"
-	"github.com/1Panel-dev/1Panel/agent/utils/files"
 )
 
 type WebsiteService struct {
@@ -78,9 +76,6 @@ type IWebsiteService interface {
 	ChangeDefaultServer(id uint) error
 	PreInstallCheck(req request.WebsiteInstallCheckReq) ([]response.WebsitePreInstallCheck, error)
 
-	GetPHPConfig(id uint) (*response.PHPConfig, error)
-	UpdatePHPConfig(req request.WebsitePHPConfigUpdate) error
-	UpdatePHPConfigFile(req request.WebsitePHPFileUpdate) error
 	ChangePHPVersion(req request.WebsitePHPVersionReq) error
 
 	GetRewriteConfig(req request.NginxRewriteReq) (*response.NginxRewriteRes, error)
@@ -1315,167 +1310,6 @@ func (w WebsiteService) ChangeDefaultServer(id uint) error {
 		}
 		website.DefaultServer = true
 		return websiteRepo.Save(context.Background(), &website)
-	}
-	return nil
-}
-
-func (w WebsiteService) GetPHPConfig(id uint) (*response.PHPConfig, error) {
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(id))
-	if err != nil {
-		return nil, err
-	}
-	appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
-	if err != nil {
-		return nil, err
-	}
-	phpConfigPath := path.Join(appInstall.GetPath(), "conf", "php.ini")
-	fileOp := files.NewFileOp()
-	if !fileOp.Stat(phpConfigPath) {
-		return nil, buserr.WithMap("ErrFileNotFound", map[string]interface{}{"name": "php.ini"}, nil)
-	}
-	params := make(map[string]string)
-	configFile, err := fileOp.OpenFile(phpConfigPath)
-	if err != nil {
-		return nil, err
-	}
-	defer configFile.Close()
-	scanner := bufio.NewScanner(configFile)
-	for scanner.Scan() {
-		line := strings.TrimSpace(scanner.Text())
-		if strings.HasPrefix(line, ";") {
-			continue
-		}
-		matches := regexp.MustCompile(`^\s*([a-z_]+)\s*=\s*(.*)$`).FindStringSubmatch(line)
-		if len(matches) == 3 {
-			params[matches[1]] = matches[2]
-		}
-	}
-	cfg, err := ini.Load(phpConfigPath)
-	if err != nil {
-		return nil, err
-	}
-	phpConfig, err := cfg.GetSection("PHP")
-	if err != nil {
-		return nil, err
-	}
-	disableFunctionStr := phpConfig.Key("disable_functions").Value()
-	res := &response.PHPConfig{Params: params}
-	if disableFunctionStr != "" {
-		disableFunctions := strings.Split(disableFunctionStr, ",")
-		if len(disableFunctions) > 0 {
-			res.DisableFunctions = disableFunctions
-		}
-	}
-	uploadMaxSize := phpConfig.Key("upload_max_filesize").Value()
-	if uploadMaxSize != "" {
-		res.UploadMaxSize = uploadMaxSize
-	}
-	return res, nil
-}
-
-func (w WebsiteService) UpdatePHPConfig(req request.WebsitePHPConfigUpdate) (err error) {
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.ID))
-	if err != nil {
-		return err
-	}
-	appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
-	if err != nil {
-		return err
-	}
-	phpConfigPath := path.Join(appInstall.GetPath(), "conf", "php.ini")
-	fileOp := files.NewFileOp()
-	if !fileOp.Stat(phpConfigPath) {
-		return buserr.WithMap("ErrFileNotFound", map[string]interface{}{"name": "php.ini"}, nil)
-	}
-	configFile, err := fileOp.OpenFile(phpConfigPath)
-	if err != nil {
-		return err
-	}
-	defer configFile.Close()
-
-	contentBytes, err := fileOp.GetContent(phpConfigPath)
-	if err != nil {
-		return err
-	}
-
-	content := string(contentBytes)
-	lines := strings.Split(content, "\n")
-	for i, line := range lines {
-		if strings.HasPrefix(line, ";") {
-			continue
-		}
-		switch req.Scope {
-		case "params":
-			for key, value := range req.Params {
-				pattern := "^" + regexp.QuoteMeta(key) + "\\s*=\\s*.*$"
-				if matched, _ := regexp.MatchString(pattern, line); matched {
-					lines[i] = key + " = " + value
-				}
-			}
-		case "disable_functions":
-			pattern := "^" + regexp.QuoteMeta("disable_functions") + "\\s*=\\s*.*$"
-			if matched, _ := regexp.MatchString(pattern, line); matched {
-				lines[i] = "disable_functions" + " = " + strings.Join(req.DisableFunctions, ",")
-				break
-			}
-		case "upload_max_filesize":
-			pattern := "^" + regexp.QuoteMeta("post_max_size") + "\\s*=\\s*.*$"
-			if matched, _ := regexp.MatchString(pattern, line); matched {
-				lines[i] = "post_max_size" + " = " + req.UploadMaxSize
-			}
-			patternUpload := "^" + regexp.QuoteMeta("upload_max_filesize") + "\\s*=\\s*.*$"
-			if matched, _ := regexp.MatchString(patternUpload, line); matched {
-				lines[i] = "upload_max_filesize" + " = " + req.UploadMaxSize
-			}
-		}
-	}
-	updatedContent := strings.Join(lines, "\n")
-	if err := fileOp.WriteFile(phpConfigPath, strings.NewReader(updatedContent), 0755); err != nil {
-		return err
-	}
-
-	appInstallReq := request.AppInstalledOperate{
-		InstallId: appInstall.ID,
-		Operate:   constant.Restart,
-	}
-	if err = NewIAppInstalledService().Operate(appInstallReq); err != nil {
-		_ = fileOp.WriteFile(phpConfigPath, strings.NewReader(string(contentBytes)), 0755)
-		return err
-	}
-
-	return nil
-}
-
-func (w WebsiteService) UpdatePHPConfigFile(req request.WebsitePHPFileUpdate) error {
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.ID))
-	if err != nil {
-		return err
-	}
-	if website.Type != constant.Runtime {
-		return nil
-	}
-	runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(website.RuntimeID))
-	if err != nil {
-		return err
-	}
-	if runtime.Resource != constant.ResourceAppstore {
-		return nil
-	}
-	runtimeInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
-	if err != nil {
-		return err
-	}
-	configPath := ""
-	if req.Type == constant.ConfigFPM {
-		configPath = path.Join(runtimeInstall.GetPath(), "conf", "php-fpm.conf")
-	} else {
-		configPath = path.Join(runtimeInstall.GetPath(), "conf", "php.ini")
-	}
-	if err := files.NewFileOp().WriteFile(configPath, strings.NewReader(req.Content), 0755); err != nil {
-		return err
-	}
-	if _, err := compose.Restart(runtimeInstall.GetComposePath()); err != nil {
-		return err
 	}
 	return nil
 }

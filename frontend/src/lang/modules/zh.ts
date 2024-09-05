@@ -2267,6 +2267,7 @@ const message = {
         loadedExtension: '已加载扩展',
         popularExtension: '常用扩展',
         uninstallExtension: '是否确认卸载扩展 {0}',
+        phpConfigHelper: '修改配置需要重启运行环境，是否继续',
     },
     process: {
         pid: '进程ID',

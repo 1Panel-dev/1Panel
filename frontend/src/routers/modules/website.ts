@@ -50,7 +50,7 @@ const webSiteRouter = {
         },
         {
             path: '/websites/runtimes/node',
-            name: 'Node',
+            name: 'node',
             hidden: true,
             component: () => import('@/views/website/runtime/node/index.vue'),
             meta: {

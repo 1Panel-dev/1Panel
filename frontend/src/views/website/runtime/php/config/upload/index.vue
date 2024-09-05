@@ -14,14 +14,12 @@
                 </el-button>
             </el-col>
         </el-row>
-        <ConfirmDialog ref="confirmDialogRef" @confirm="submit"></ConfirmDialog>
     </div>
 </template>
 <script setup lang="ts">
-import { GetPHPConfig, UpdatePHPConfig } from '@/api/modules/website';
+import { GetPHPConfig, UpdatePHPConfig } from '@/api/modules/runtime';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import { computed, onMounted, reactive } from 'vue';
-import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { ref } from 'vue';
 import { FormInstance } from 'element-plus';
 import i18n from '@/lang';
@@ -40,7 +38,6 @@ const rules = reactive({
     uploadSize: [Rules.requiredInput, checkNumberRange(0, 999999999)],
 });
 const phpFormRef = ref();
-const confirmDialogRef = ref();
 const loading = ref(false);
 const form = ref({
     uploadSize: 0,
@@ -61,12 +58,19 @@ const openCreate = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        let params = {
-            header: i18n.global.t('database.confChange'),
-            operationInfo: i18n.global.t('database.restartNowHelper'),
-            submitInputInfo: i18n.global.t('database.restartNow'),
-        };
-        confirmDialogRef.value!.acceptParams(params);
+        const action = await ElMessageBox.confirm(
+            i18n.global.t('database.restartNowHelper'),
+            i18n.global.t('database.confChange'),
+            {
+                confirmButtonText: i18n.global.t('commons.button.confirm'),
+                cancelButtonText: i18n.global.t('commons.button.cancel'),
+                type: 'info',
+            },
+        );
+        if (action === 'confirm') {
+            loading.value = true;
+            submit();
+        }
     });
 };
 

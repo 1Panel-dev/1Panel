@@ -2264,6 +2264,8 @@ const message = {
         installExtension: '是否確認安裝擴充功能 {0}',
         loadedExtension: '已載入擴充功能',
         popularExtension: '常用擴充',
+        uninstallExtension: '是否確認卸載擴充功能 {0}',
+        phpConfigHelper: '修改配置需要重新啟動運行環境，是否繼續',
     },
     process: {
         pid: '進程ID',
