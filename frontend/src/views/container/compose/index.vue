@@ -25,17 +25,28 @@
                 </el-alert>
             </template>
             <template #toolbar>
-                <el-row>
-                    <el-col :span="16">
+                <div class="hidden sm:block sm:flex sm:flex-row sm:w-full sm:justify-between">
+                    <div>
                         <el-button type="primary" @click="onOpenDialog()">
                             {{ $t('container.createCompose') }}
                         </el-button>
-                    </el-col>
-                    <el-col :span="8">
+                    </div>
+                    <div class="flex flex-row gap-2">
                         <TableSetting @search="search()" />
                         <TableSearch @search="search()" v-model:searchName="searchName" />
-                    </el-col>
-                </el-row>
+                    </div>
+                </div>
+                <div class="block flex flex-col gap-2 sm:hidden">
+                    <div class="flex justify-between">
+                        <el-button type="primary" @click="onOpenDialog()">
+                            {{ $t('container.createCompose') }}
+                        </el-button>
+                        <TableSetting @search="search()" />
+                    </div>
+                    <div class="flex justify-end">
+                        <TableSearch @search="search()" v-model:searchName="searchName" />
+                    </div>
+                </div>
             </template>
             <template #main>
                 <ComplexTable

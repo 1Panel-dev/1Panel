@@ -8,20 +8,20 @@
 
         <LayoutContent :title="$t('container.composeTemplate')" :class="{ mask: dockerStatus != 'Running' }">
             <template #toolbar>
-                <el-row>
-                    <el-col :span="16">
+                <div class="flex flex-col gap-2 sm:flex-row sm:justify-between">
+                    <div class="flex gap-4">
                         <el-button type="primary" @click="onOpenDialog('create')">
                             {{ $t('container.createComposeTemplate') }}
                         </el-button>
                         <el-button type="primary" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
                             {{ $t('commons.button.delete') }}
                         </el-button>
-                    </el-col>
-                    <el-col :span="8">
+                    </div>
+                    <div class="flex gap-4 sm:gap-2">
                         <TableSetting @search="search()" />
                         <TableSearch @search="search()" v-model:searchName="searchName" />
-                    </el-col>
-                </el-row>
+                    </div>
+                </div>
             </template>
             <template #main>
                 <ComplexTable
