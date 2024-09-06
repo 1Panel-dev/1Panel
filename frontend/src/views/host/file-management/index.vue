@@ -891,12 +891,12 @@ const openView = (item: File.File) => {
         compress: openDeCompress,
         text: () => openCodeEditor(item.path, item.extension),
     };
-
-    return actionMap[fileType] ? actionMap[fileType](item) : openCodeEditor(item.path, item.extension);
+    const path = item.isSymlink ? item.linkPath : item.path;
+    return actionMap[fileType] ? actionMap[fileType](item) : openCodeEditor(path, item.extension);
 };
 
 const openPreview = (item: File.File, fileType: string) => {
-    filePreview.path = item.path;
+    filePreview.path = item.isSymlink ? item.linkPath : item.path;
     filePreview.name = item.name;
     filePreview.extension = item.extension;
     filePreview.fileType = fileType;
