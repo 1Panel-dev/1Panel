@@ -9,7 +9,7 @@
         <LayoutContent :title="$t('container.volume')" :class="{ mask: dockerStatus != 'Running' }">
             <template #toolbar>
                 <div class="flex flex-col gap-4 sm:flex-row justify-between">
-                    <div class="flex flex-wrap [&>*]:ml-3 gap-2">
+                    <div class="flex flex-wrap gap-4">
                         <el-button type="primary" @click="onCreate()">
                             {{ $t('container.createVolume') }}
                         </el-button>

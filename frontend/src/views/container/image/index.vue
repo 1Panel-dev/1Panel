@@ -9,7 +9,7 @@
         <LayoutContent :title="$t('container.image')" :class="{ mask: dockerStatus != 'Running' }">
             <template #toolbar>
                 <div class="flex flex-col gap-4 justify-between items-center flex-wrap sm:flex-row">
-                    <div class="[&>*]:ml-3 flex gap-4 flex-wrap">
+                    <div class="flex gap-4 flex-wrap">
                         <el-button type="primary" plain @click="onOpenPull">
                             {{ $t('container.imagePull') }}
                         </el-button>

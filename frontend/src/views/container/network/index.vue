@@ -9,7 +9,7 @@
         <LayoutContent :title="$t('container.network')" :class="{ mask: dockerStatus != 'Running' }">
             <template #toolbar>
                 <div class="flex flex-col gap-4 justify-between sm:flex-row">
-                    <div class="[&>*]:ml-3">
+                    <div class="flex gap-4">
                         <el-button type="primary" @click="onCreate()">
                             {{ $t('container.createNetwork') }}
                         </el-button>
@@ -20,7 +20,7 @@
                             {{ $t('commons.button.delete') }}
                         </el-button>
                     </div>
-                    <div class="flex flex-row gap-2 ml-3">
+                    <div class="flex flex-row gap-2">
                         <TableSetting @search="search()" />
                         <TableSearch @search="search()" v-model:searchName="searchName" />
                     </div>

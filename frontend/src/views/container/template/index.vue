@@ -9,7 +9,7 @@
         <LayoutContent :title="$t('container.composeTemplate')" :class="{ mask: dockerStatus != 'Running' }">
             <template #toolbar>
                 <div class="flex flex-col gap-2 sm:flex-row sm:justify-between">
-                    <div>
+                    <div class="flex gap-4">
                         <el-button type="primary" @click="onOpenDialog('create')">
                             {{ $t('container.createComposeTemplate') }}
                         </el-button>
