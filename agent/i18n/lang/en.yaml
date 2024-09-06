@@ -243,4 +243,5 @@ AppStore: "App Store"
 TaskSync: "Sync"
 LocalApp: "Local App"
 SubTask: "Subtask"
+RuntimeExtension: "Runtime Extension"
 

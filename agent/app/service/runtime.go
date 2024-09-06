@@ -12,6 +12,7 @@ import (
 	"path"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -536,10 +537,7 @@ func (r *RuntimeService) OperateRuntime(req request.RuntimeOperate) error {
 		}
 		runtime.Status = constant.RuntimeStopped
 	case constant.RuntimeRestart:
-		if err = runComposeCmdWithLog(constant.RuntimeDown, runtime.GetComposePath(), runtime.GetLogPath()); err != nil {
-			return err
-		}
-		if err = runComposeCmdWithLog(constant.RuntimeUp, runtime.GetComposePath(), runtime.GetLogPath()); err != nil {
+		if err = restartRuntime(runtime); err != nil {
 			return err
 		}
 		if err = SyncRuntimeContainerStatus(runtime); err != nil {
@@ -659,27 +657,29 @@ func (r *RuntimeService) GetPHPExtensions(runtimeID uint) (response.PHPExtension
 		return res, err
 	}
 	extensions := strings.Split(out, "\n")
-	var cleanExtensions []string
+	exitExtensions := make(map[string]string)
 	for _, ext := range extensions {
 		extStr := strings.TrimSpace(ext)
 		if extStr != "" && extStr != "[Zend Modules]" && extStr != "[PHP Modules]" {
-			cleanExtensions = append(cleanExtensions, extStr)
+			exitExtensions[strings.ToLower(extStr)] = extStr
 		}
 	}
-	res.Extensions = cleanExtensions
 	var phpExtensions []response.SupportExtension
 	if err = json.Unmarshal(nginx_conf.PHPExtensionsJson, &phpExtensions); err != nil {
 		return res, err
 	}
 	for _, ext := range phpExtensions {
-		for _, cExt := range cleanExtensions {
-			if ext.Check == cExt {
-				ext.Installed = true
-				break
-			}
+		if _, ok := exitExtensions[strings.ToLower(ext.Check)]; ok {
+			ext.Installed = true
 		}
 		res.SupportExtensions = append(res.SupportExtensions, ext)
 	}
+	for _, name := range exitExtensions {
+		res.Extensions = append(res.Extensions, name)
+	}
+	sort.Slice(res.Extensions, func(i, j int) bool {
+		return strings.ToLower(res.Extensions[i]) < strings.ToLower(res.Extensions[j])
+	})
 	return res, nil
 }
 
@@ -688,7 +688,7 @@ func (r *RuntimeService) InstallPHPExtension(req request.PHPExtensionInstallReq)
 	if err != nil {
 		return err
 	}
-	installTask, err := task.NewTaskWithOps(req.Name, task.TaskInstall, task.TaskScopeRuntime, req.TaskID, runtime.ID)
+	installTask, err := task.NewTaskWithOps(req.Name, task.TaskInstall, task.TaskScopeRuntimeExtension, req.TaskID, runtime.ID)
 	if err != nil {
 		return err
 	}
@@ -696,6 +696,27 @@ func (r *RuntimeService) InstallPHPExtension(req request.PHPExtensionInstallReq)
 		installCmd := fmt.Sprintf("docker exec -i %s %s %s", runtime.ContainerName, "install-ext", req.Name)
 		err = cmd2.ExecWithLogFile(installCmd, 15*time.Minute, t.Task.LogFile)
 		if err != nil {
+			return err
+		}
+		client, err := docker.NewClient()
+		defer client.Close()
+		if err == nil {
+			oldImageID, err := client.GetImageIDByName(runtime.Image)
+			commitCmd := fmt.Sprintf("docker commit %s %s", runtime.ContainerName, runtime.Image)
+			err = cmd2.ExecWithLogFile(commitCmd, 15*time.Minute, t.Task.LogFile)
+			if err != nil {
+				return err
+			}
+			newImageID, err := client.GetImageIDByName(runtime.Image)
+			if err == nil && newImageID != oldImageID {
+				if err := client.DeleteImage(oldImageID); err != nil {
+					t.Log(fmt.Sprintf("delete old image error %v", err))
+				} else {
+					t.Log("delete old image success")
+				}
+			}
+		}
+		if err = restartRuntime(runtime); err != nil {
 			return err
 		}
 		return nil
@@ -745,7 +766,10 @@ func (r *RuntimeService) UnInstallPHPExtension(req request.PHPExtensionInstallRe
 	if err != nil {
 		return err
 	}
-	if err := unInstallPHPExtension(runtime, []string{req.Name}); err != nil {
+	if err = unInstallPHPExtension(runtime, []string{req.Name}); err != nil {
+		return err
+	}
+	if err = restartRuntime(runtime); err != nil {
 		return err
 	}
 	return runtimeRepo.Save(runtime)
@@ -858,10 +882,7 @@ func (r *RuntimeService) UpdatePHPConfig(req request.PHPConfigUpdate) (err error
 		return err
 	}
 
-	err = r.OperateRuntime(request.RuntimeOperate{
-		Operate: constant.RuntimeRestart,
-		ID:      req.ID,
-	})
+	err = restartRuntime(runtime)
 	if err != nil {
 		_ = fileOp.WriteFile(phpConfigPath, strings.NewReader(string(contentBytes)), 0755)
 		return err

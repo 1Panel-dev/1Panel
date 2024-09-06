@@ -8,7 +8,7 @@
         <div class="mt-5">
             <el-text>{{ $t('runtime.popularExtension') }}</el-text>
         </div>
-        <ComplexTable :data="supportExtensions" @search="search()" :heightDiff="350" :loading="loading">
+        <ComplexTable :data="supportExtensions" @search="search()" :heightDiff="350" v-loading="loading">
             <el-table-column prop="name" :label="$t('commons.table.name')" />
             <el-table-column prop="installed" :label="$t('commons.table.status')">
                 <template #default="{ row }">
@@ -26,7 +26,7 @@
             />
         </ComplexTable>
     </DrawerPro>
-    <TaskLog ref="taskLogRef" @clos="search()" />
+    <TaskLog ref="taskLogRef" @close="search()" />
 </template>
 
 <script setup lang="ts">
@@ -76,7 +76,7 @@ const installExtension = async (row: Runtime.SupportExtension) => {
     }).then(async () => {
         const req = {
             id: runtime.value.id,
-            name: row.check,
+            name: row.name,
             taskID: newUUID(),
         };
         loading.value = true;
@@ -96,7 +96,7 @@ const unInstallPHPExtension = async (row: Runtime.SupportExtension) => {
     }).then(async () => {
         const req = {
             id: runtime.value.id,
-            name: row.check,
+            name: row.name,
         };
         loading.value = true;
         try {
