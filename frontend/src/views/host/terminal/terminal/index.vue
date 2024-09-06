@@ -407,7 +407,7 @@ defineExpose({
 onMounted(() => {
     if (router.currentRoute.value.query.path) {
         const path = String(router.currentRoute.value.query.path);
-        initCmd.value = `cd ${path} \n`;
+        initCmd.value = `cd "${path}" \n`;
     }
 });
 </script>
