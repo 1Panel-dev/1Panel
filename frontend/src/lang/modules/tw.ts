@@ -1114,6 +1114,7 @@ const message = {
         info: '屬性',
         linkFile: '軟連接文件',
         terminal: '終端',
+        batchoperation: '批量操作',
         shareList: '分享列表',
         zip: '壓縮',
         group: '用戶組',

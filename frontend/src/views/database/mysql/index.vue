@@ -62,7 +62,7 @@
 
             <template #toolbar>
                 <div class="flex flex-wrap gap-4 sm:justify-between">
-                    <div class="flex gap-2 flex-wrap items-center justify-start">
+                    <div class="flex gap-2 flex-wrap items-center justify-start [&>*]:ml-3">
                         <el-button
                             v-if="currentDB && (currentDB.from !== 'local' || mysqlStatus === 'Running')"
                             type="primary"
@@ -81,11 +81,9 @@
                         >
                             {{ $t('database.loadFromRemote') }}
                         </el-button>
-                        <div>
-                            <el-button @click="goRemoteDB" type="primary" plain>
-                                {{ $t('database.remoteDB') }}
-                            </el-button>
-                        </div>
+                        <el-button @click="goRemoteDB" type="primary" plain>
+                            {{ $t('database.remoteDB') }}
+                        </el-button>
                         <div>
                             <el-dropdown>
                                 <el-button type="primary" plain>

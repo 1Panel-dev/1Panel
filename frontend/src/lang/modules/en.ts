@@ -1176,6 +1176,7 @@ const message = {
         info: 'Attribute',
         linkFile: 'Soft link',
         terminal: 'Terminal',
+        batchoperation: 'batch operation',
         shareList: 'Share list',
         zip: 'Compressed',
         group: 'Group',
