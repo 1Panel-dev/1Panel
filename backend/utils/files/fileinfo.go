@@ -102,6 +102,12 @@ func NewFileInfo(op FileOption) (*FileInfo, error) {
 
 	if file.IsSymlink {
 		file.LinkPath = GetSymlink(op.Path)
+		targetInfo, err := appFs.Stat(file.LinkPath)
+		if err != nil {
+			return nil, err
+		}
+		file.IsDir = targetInfo.IsDir()
+		file.Extension = filepath.Ext(file.LinkPath)
 	}
 	if op.Expand {
 		if err := handleExpansion(file, op); err != nil {
@@ -309,6 +315,12 @@ func (f *FileInfo) processFiles(files []FileSearchInfo, option FileOption) ([]*F
 		}
 		if isSymlink {
 			file.LinkPath = GetSymlink(fPath)
+			targetInfo, err := file.Fs.Stat(file.LinkPath)
+			if err != nil {
+				return nil, err
+			}
+			file.IsDir = targetInfo.IsDir()
+			file.Extension = filepath.Ext(file.LinkPath)
 		}
 		if df.Size() > 0 {
 			file.MimeType = GetMimeType(fPath)
