@@ -54,11 +54,12 @@ const (
 )
 
 const (
-	TaskScopeWebsite  = "Website"
-	TaskScopeApp      = "App"
-	TaskScopeRuntime  = "Runtime"
-	TaskScopeDatabase = "Database"
-	TaskScopeAppStore = "AppStore"
+	TaskScopeWebsite          = "Website"
+	TaskScopeApp              = "App"
+	TaskScopeRuntime          = "Runtime"
+	TaskScopeDatabase         = "Database"
+	TaskScopeAppStore         = "AppStore"
+	TaskScopeRuntimeExtension = "RuntimeExtension"
 )
 
 const (

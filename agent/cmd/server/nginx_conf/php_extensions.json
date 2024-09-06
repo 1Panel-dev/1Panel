@@ -8,7 +8,7 @@
   },
   {
     "name": "opcache",
-    "check": "opcache",
+    "check": "Zend OPcache",
     "file": "opcache.so",
     "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82", "83"],
     "installed": false

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -135,7 +136,7 @@ func runComposeCmdWithLog(operate string, composePath string, logPath string) er
 	if operate == "up" {
 		cmd = exec.Command("docker", "compose", "-f", composePath, operate, "-d")
 	}
-	logFile, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
+	logFile, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
 		global.LOG.Errorf("Failed to open log file: %v", err)
 		return err
@@ -149,7 +150,7 @@ func runComposeCmdWithLog(operate string, composePath string, logPath string) er
 
 	err = cmd.Run()
 	if err != nil {
-		return errors.New(buserr.New(constant.ErrRuntimeStart).Error() + ":" + stderrBuf.String())
+		return errors.New(buserr.New(constant.ErrRuntimeStart).Error() + ":" + err.Error())
 	}
 	return nil
 }
@@ -206,21 +207,6 @@ func getRuntimeEnv(envStr, key string) string {
 	return ""
 }
 
-func getFileEnv(filePath, key string) (string, error) {
-	envContent, err := files.NewFileOp().GetContent(filePath)
-	if err != nil {
-		return "", err
-	}
-	env, err := gotenv.Unmarshal(string(envContent))
-	if err != nil {
-		return "", err
-	}
-	if v, ok := env[key]; ok {
-		return v, nil
-	}
-	return "", nil
-}
-
 func buildRuntime(runtime *model.Runtime, oldImageID string, oldEnv string, rebuild bool) {
 	runtimePath := runtime.GetPath()
 	composePath := runtime.GetComposePath()
@@ -249,6 +235,9 @@ func buildRuntime(runtime *model.Runtime, oldImageID string, oldEnv string, rebu
 			runtime.Message = buserr.New(constant.ErrImageBuildErr).Error() + ":" + err.Error()
 		}
 	} else {
+		if err = runComposeCmdWithLog(constant.RuntimeDown, runtime.GetComposePath(), runtime.GetLogPath()); err != nil {
+			return
+		}
 		runtime.Message = ""
 		if oldImageID != "" {
 			client, err := docker.NewClient()
@@ -500,6 +489,7 @@ func unInstallPHPExtension(runtime *model.Runtime, delExtensions []string) error
 				delMap[ext.Check] = struct{}{}
 				_ = fileOP.DeleteFile(path.Join(dir, "extensions", ext.File))
 				_ = fileOP.DeleteFile(path.Join(dir, "conf", "conf.d", "docker-php-ext-"+ext.Check+".ini"))
+				_ = removePHPIniExt(path.Join(dir, "conf", "php.ini"), ext.File)
 				break
 			}
 		}
@@ -530,4 +520,49 @@ func unInstallPHPExtension(runtime *model.Runtime, delExtensions []string) error
 	}
 	runtime.Env = envContent
 	return nil
+}
+
+func removePHPIniExt(filePath, extensionName string) error {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	targetLine1 := `extension="` + extensionName + `"`
+	targetLine2 := `zend_extension="` + extensionName + `"`
+
+	tempFile, err := os.CreateTemp(path.Dir(filePath), "temp_*.txt")
+	if err != nil {
+		return err
+	}
+	defer tempFile.Close()
+
+	scanner := bufio.NewScanner(file)
+	writer := bufio.NewWriter(tempFile)
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		if !strings.Contains(line, targetLine1) && !strings.Contains(line, targetLine2) {
+			_, err := writer.WriteString(line + "\n")
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		return err
+	}
+
+	return os.Rename(tempFile.Name(), filePath)
+}
+
+func restartRuntime(runtime *model.Runtime) (err error) {
+	if err = runComposeCmdWithLog(constant.RuntimeDown, runtime.GetComposePath(), runtime.GetLogPath()); err != nil {
+		return
+	}
+	if err = runComposeCmdWithLog(constant.RuntimeUp, runtime.GetComposePath(), runtime.GetLogPath()); err != nil {
+		return
+	}
+	return
 }
