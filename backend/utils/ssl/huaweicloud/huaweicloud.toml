@@ -1,0 +1,28 @@
+Name = "Huawei Cloud"
+Description = ''''''
+URL = "https://huaweicloud.com"
+Code = "hwdns"
+Since = "v4.18"
+
+Example = '''
+HUAWEICLOUD_ACCESS_KEY_ID=your-access-key-id \
+HUAWEICLOUD_SECRET_ACCESS_KEY=your-secret-access-key \
+HUAWEICLOUD_REGION=cn-south-1 \
+lego --email you@example.com --dns huaweicloud --domains my.example.org run
+'''
+
+[Configuration]
+  [Configuration.Credentials]
+    HUAWEICLOUD_ACCESS_KEY_ID = "Access key ID"
+    HUAWEICLOUD_SECRET_ACCESS_KEY = "Access Key secret"
+    HUAWEICLOUD_REGION = "Region"
+
+  [Configuration.Additional]
+    TENCENTCLOUD_POLLING_INTERVAL = "Time between DNS propagation check"
+    TENCENTCLOUD_PROPAGATION_TIMEOUT = "Maximum waiting time for DNS propagation"
+    TENCENTCLOUD_TTL = "The TTL of the TXT record used for the DNS challenge"
+    TENCENTCLOUD_HTTP_TIMEOUT = "API request timeout"
+
+[Links]
+  API = "https://support.huaweicloud.com/api-dns/zh-cn_topic_0132421999.html"
+
