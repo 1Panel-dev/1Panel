@@ -347,6 +347,19 @@ export function checkCidr(value: string): boolean {
         return false;
     }
 }
+export function checkCidrV6(value: string): boolean {
+    if (value === '') {
+        return true;
+    }
+    if (checkIpV6(value.split('/')[0])) {
+        return true;
+    }
+    const reg = /^(?:[1-9]|[1-9][0-9]|1[0-1][0-9]|12[0-8])$/;
+    if (!reg.test(value.split('/')[1])) {
+        return true;
+    }
+    return false;
+}
 
 export function checkPort(value: string): boolean {
     if (Number(value) <= 0) {

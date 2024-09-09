@@ -56,7 +56,7 @@ import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
 import { Host } from '@/api/interface/host';
 import { operateIPRule, updateAddrRule } from '@/api/modules/host';
-import { checkCidr, checkIpV4V6, deepCopy } from '@/utils/util';
+import { checkCidr, checkCidrV6, checkIpV4V6, deepCopy } from '@/utils/util';
 
 const loading = ref();
 const oldRule = ref<Host.RuleIP>();
@@ -95,8 +95,14 @@ function checkAddress(rule: any, value: any, callback: any) {
     let addrs = dialogData.value.rowData.address.split(',');
     for (const item of addrs) {
         if (item.indexOf('/') !== -1) {
-            if (checkCidr(item)) {
-                return callback(new Error(i18n.global.t('firewall.addressFormatError')));
+            if (item.indexOf(':') !== -1) {
+                if (checkCidrV6(item)) {
+                    return callback(new Error(i18n.global.t('firewall.addressFormatError')));
+                }
+            } else {
+                if (checkCidr(item)) {
+                    return callback(new Error(i18n.global.t('firewall.addressFormatError')));
+                }
             }
         } else {
             if (checkIpV4V6(item)) {
