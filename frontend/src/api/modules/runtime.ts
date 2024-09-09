@@ -96,3 +96,11 @@ export const UpdatePHPFile = (req: Runtime.PHPUpdate) => {
 export const GetPHPConfigFile = (req: Runtime.PHPFileReq) => {
     return http.post<File.File>(`/runtimes/php/file`, req);
 };
+
+export const UpdateFPMConfig = (req: Runtime.FPMConfig) => {
+    return http.post(`/runtimes/php/fpm/config`, req);
+};
+
+export const GetFPMConfig = (id: number) => {
+    return http.get<Runtime.FPMConfig>(`/runtimes/php/fpm/config/${id}`);
+};

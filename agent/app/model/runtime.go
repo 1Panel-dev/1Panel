@@ -37,6 +37,14 @@ func (r *Runtime) GetPath() string {
 	return path.Join(constant.RuntimeDir, r.Type, r.Name)
 }
 
+func (r *Runtime) GetFPMPath() string {
+	return path.Join(constant.RuntimeDir, r.Type, r.Name, "conf", "php-fpm.conf")
+}
+
+func (r *Runtime) GetPHPPath() string {
+	return path.Join(constant.RuntimeDir, r.Type, r.Name, "conf", "php.ini")
+}
+
 func (r *Runtime) GetLogPath() string {
 	return path.Join(r.GetPath(), "build.log")
 }

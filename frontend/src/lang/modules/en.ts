@@ -2443,6 +2443,20 @@ const message = {
         uninstallExtension: 'Are you sure you want to uninstall the extension {0}',
         phpConfigHelper:
             'Modifying the configuration requires restarting the operating environment, do you want to continue',
+        operateMode: 'operation mode',
+        dynamic: 'dynamic',
+        static: 'static',
+        ondemand: 'on-demand',
+        dynamicHelper:
+            'dynamically adjust the number of processes, high flexibility, suitable for websites with large traffic fluctuations or low memory',
+        staticHelper:
+            'fixed number of processes, suitable for websites with high concurrency and stable traffic, high resource consumption',
+        ondemandHelper:
+            'processes are started and destroyed on demand, resource utilization is optimal, but the initial response may be slow',
+        max_children: 'maximum number of processes allowed to be created',
+        start_servers: 'number of processes created at startup',
+        min_spare_servers: 'minimum number of idle processes',
+        max_spare_servers: 'maximum number of idle processes',
     },
     process: {
         pid: 'Process ID',

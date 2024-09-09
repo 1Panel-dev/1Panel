@@ -76,6 +76,13 @@ func (b *BaseApi) DeleteRuntime(c *gin.Context) {
 	helper.SuccessWithOutData(c)
 }
 
+// @Tags Website
+// @Summary Delete runtime
+// @Description 删除运行环境校验
+// @Accept json
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /installed/delete/check/:id [get]
 func (b *BaseApi) DeleteRuntimeCheck(c *gin.Context) {
 	runTimeId, err := helper.GetIntParamByKey(c, "runTimeId")
 	if err != nil {
@@ -362,7 +369,6 @@ func (b *BaseApi) UpdatePHPFile(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// 写一个调用 GetPHPConfigFile 的方法
 // @Tags Runtime
 // @Summary Get php conf file
 // @Description 获取 php 配置文件
@@ -377,6 +383,48 @@ func (b *BaseApi) GetPHPConfigFile(c *gin.Context) {
 		return
 	}
 	data, err := runtimeService.GetPHPConfigFile(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags Runtime
+// @Summary Update fpm config
+// @Description 更新 fpm 配置
+// @Accept json
+// @Param request body request.FPMConfig true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /runtimes/php/fpm/config [post]
+func (b *BaseApi) UpdateFPMConfig(c *gin.Context) {
+	var req request.FPMConfig
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := runtimeService.UpdateFPMConfig(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}
+
+// @Tags Runtime
+// @Summary Get fpm config
+// @Description 获取 fpm 配置
+// @Accept json
+// @Param id path integer true "request"
+// @Success 200 {object} response.FPMConfig
+// @Security ApiKeyAuth
+// @Router /runtimes/php/fpm/config/:id [get]
+func (b *BaseApi) GetFPMConfig(c *gin.Context) {
+	id, err := helper.GetParamID(c)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		return
+	}
+	data, err := runtimeService.GetFPMConfig(id)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
