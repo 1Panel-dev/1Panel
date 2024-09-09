@@ -58,6 +58,8 @@ type IRuntimeService interface {
 	UpdatePHPConfig(req request.PHPConfigUpdate) (err error)
 	UpdatePHPConfigFile(req request.PHPFileUpdate) error
 	GetPHPConfigFile(req request.PHPFileReq) (*response.FileInfo, error)
+	UpdateFPMConfig(req request.FPMConfig) error
+	GetFPMConfig(id uint) (*request.FPMConfig, error)
 }
 
 func NewRuntimeService() IRuntimeService {
@@ -833,7 +835,7 @@ func (r *RuntimeService) UpdatePHPConfig(req request.PHPConfigUpdate) (err error
 	phpConfigPath := path.Join(runtime.GetPath(), "conf", "php.ini")
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(phpConfigPath) {
-		return buserr.WithMap("ErrFileNotFound", map[string]interface{}{"name": "php.ini"}, nil)
+		return buserr.WithName("ErrFileNotFound", "php.ini")
 	}
 	configFile, err := fileOp.OpenFile(phpConfigPath)
 	if err != nil {
@@ -930,4 +932,65 @@ func (r *RuntimeService) UpdatePHPConfigFile(req request.PHPFileUpdate) error {
 		return err
 	}
 	return nil
+}
+
+func (r *RuntimeService) UpdateFPMConfig(req request.FPMConfig) error {
+	runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(req.ID))
+	if err != nil {
+		return err
+	}
+	cfg, err := ini.Load(runtime.GetFPMPath())
+	if err != nil {
+		return err
+	}
+	for k, v := range req.Params {
+		var valueStr string
+		switch v := v.(type) {
+		case string:
+			valueStr = v
+		case int:
+			valueStr = fmt.Sprintf("%d", v)
+		case float64:
+			valueStr = fmt.Sprintf("%.f", v)
+		default:
+			continue
+		}
+		cfg.Section("www").Key(k).SetValue(valueStr)
+	}
+	if err := cfg.SaveTo(runtime.GetFPMPath()); err != nil {
+		return err
+	}
+	return nil
+}
+
+var PmKeys = map[string]struct {
+}{
+	"pm":                   {},
+	"pm.max_children":      {},
+	"pm.start_servers":     {},
+	"pm.min_spare_servers": {},
+	"pm.max_spare_servers": {},
+}
+
+func (r *RuntimeService) GetFPMConfig(id uint) (*request.FPMConfig, error) {
+	runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(id))
+	if err != nil {
+		return nil, err
+	}
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(runtime.GetFPMPath()) {
+		return nil, buserr.WithName("ErrFileNotFound", "php-fpm.conf")
+	}
+	params := make(map[string]interface{})
+	cfg, err := ini.Load(runtime.GetFPMPath())
+	if err != nil {
+		return nil, err
+	}
+	for _, key := range cfg.Section("www").Keys() {
+		if _, ok := PmKeys[key.Name()]; ok {
+			params[key.Name()] = key.Value()
+		}
+	}
+	res := &request.FPMConfig{Params: params}
+	return res, nil
 }

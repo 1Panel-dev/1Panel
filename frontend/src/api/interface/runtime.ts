@@ -166,4 +166,9 @@ export namespace Runtime {
         id: number;
         type: string;
     }
+
+    export interface FPMConfig {
+        id: number;
+        params: any;
+    }
 }

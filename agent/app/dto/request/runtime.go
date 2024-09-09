@@ -95,3 +95,8 @@ type PHPFileReq struct {
 	ID   uint   `json:"id" validate:"required"`
 	Type string `json:"type" validate:"required"`
 }
+
+type FPMConfig struct {
+	ID     uint                   `json:"id" validate:"required"`
+	Params map[string]interface{} `json:"params" validate:"required"`
+}

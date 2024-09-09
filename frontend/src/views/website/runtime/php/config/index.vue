@@ -11,11 +11,14 @@
                 <el-tab-pane :label="$t('php.uploadMaxSize')" name="2">
                     <Upload :id="runtime.id" v-if="index == '2'"></Upload>
                 </el-tab-pane>
-                <el-tab-pane :label="'php-fpm'" name="3">
-                    <PHP :id="runtime.id" v-if="index == '3'" :type="'fpm'"></PHP>
+                <el-tab-pane :label="$t('website.nginxPer')" name="5">
+                    <Performance :id="runtime.id" v-if="index == '5'"></Performance>
                 </el-tab-pane>
-                <el-tab-pane :label="'php'" name="4">
+                <el-tab-pane :label="$t('website.source')" name="4">
                     <PHP :id="runtime.id" v-if="index == '4'" :type="'php'"></PHP>
+                </el-tab-pane>
+                <el-tab-pane :label="'FPM ' + $t('website.source')" name="3">
+                    <PHP :id="runtime.id" v-if="index == '3'" :type="'fpm'"></PHP>
                 </el-tab-pane>
             </el-tabs>
         </template>
@@ -24,11 +27,12 @@
 
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue';
+import { Runtime } from '@/api/interface/runtime';
 import Config from './config/index.vue';
 import Function from './function/index.vue';
 import Upload from './upload/index.vue';
-import { Runtime } from '@/api/interface/runtime';
 import PHP from './php-fpm/index.vue';
+import Performance from './performance/index.vue';
 
 const index = ref('0');
 const open = ref(false);

@@ -13,7 +13,7 @@ func (r *RuntimeRouter) InitRouter(Router *gin.RouterGroup) {
 
 	baseApi := v2.ApiGroupApp.BaseApi
 	{
-		groupRouter.GET("/installed/delete/check/:runTimeId", baseApi.DeleteRuntimeCheck)
+		groupRouter.GET("/installed/delete/check/:id", baseApi.DeleteRuntimeCheck)
 		groupRouter.POST("/search", baseApi.SearchRuntimes)
 		groupRouter.POST("", baseApi.CreateRuntime)
 		groupRouter.POST("/del", baseApi.DeleteRuntime)
@@ -39,6 +39,7 @@ func (r *RuntimeRouter) InitRouter(Router *gin.RouterGroup) {
 		groupRouter.POST("/php/config", baseApi.UpdatePHPConfig)
 		groupRouter.POST("/php/update", baseApi.UpdatePHPFile)
 		groupRouter.POST("/php/file", baseApi.GetPHPConfigFile)
+		groupRouter.POST("/php/fpm/config", baseApi.UpdateFPMConfig)
+		groupRouter.GET("/php/fpm/config/:id", baseApi.GetFPMConfig)
 	}
-
 }

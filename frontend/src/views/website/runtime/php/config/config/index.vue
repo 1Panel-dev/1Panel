@@ -16,7 +16,6 @@
                         </el-input>
                         <span class="input-help">{{ $t('php.max_execution_time') }}</span>
                     </el-form-item>
-
                     <el-form-item label="post_max_size" prop="post_max_size">
                         <el-input clearable v-model.number="form.post_max_size" maxlength="15">
                             <template #append>M</template>
