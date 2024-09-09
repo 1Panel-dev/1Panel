@@ -4,25 +4,27 @@
 
         <div class="app-status" style="margin-top: 20px">
             <el-card>
-                <div>
-                    <el-tag style="float: left" effect="dark" type="success">SSH</el-tag>
-                    <el-tag round class="status-content" v-if="form.status === 'Enable'" type="success">
-                        {{ $t('commons.status.running') }}
-                    </el-tag>
-                    <el-popover
-                        v-if="form.status === 'Disable'"
-                        placement="top-start"
-                        trigger="hover"
-                        width="450"
-                        :content="form.message"
-                    >
-                        <template #reference>
-                            <el-tag round class="status-content" v-if="form.status === 'Disable'" type="info">
-                                {{ $t('commons.status.stopped') }}
-                            </el-tag>
-                        </template>
-                    </el-popover>
-                    <span class="buttons">
+                <div class="flex flex-wrap gap-2 sm:gap-4 sm:justify-between">
+                    <div>
+                        <el-tag style="float: left" effect="dark" type="success">SSH</el-tag>
+                        <el-tag round class="status-content" v-if="form.status === 'Enable'" type="success">
+                            {{ $t('commons.status.running') }}
+                        </el-tag>
+                        <el-popover
+                            v-if="form.status === 'Disable'"
+                            placement="top-start"
+                            trigger="hover"
+                            width="450"
+                            :content="form.message"
+                        >
+                            <template #reference>
+                                <el-tag round class="status-content" v-if="form.status === 'Disable'" type="info">
+                                    {{ $t('commons.status.stopped') }}
+                                </el-tag>
+                            </template>
+                        </el-popover>
+                    </div>
+                    <div class="flex flex-wrap gap-2 sm:gap-4">
                         <el-button v-if="form.status === 'Enable'" type="primary" @click="onOperate('stop')" link>
                             {{ $t('commons.button.stop') }}
                         </el-button>
@@ -45,7 +47,7 @@
                             @change="onOperate(autoStart)"
                             v-model="autoStart"
                         />
-                    </span>
+                    </div>
                 </div>
             </el-card>
         </div>

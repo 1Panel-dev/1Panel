@@ -10,17 +10,19 @@
                 </el-alert>
             </template>
             <template #toolbar>
-                <el-button type="primary" @click="openCreate">
-                    {{ $t('runtime.create') }}
-                </el-button>
+                <div class="flex flex-wrap gap-2 sm:gap-4 items-center justify-start">
+                    <el-button type="primary" @click="openCreate">
+                        {{ $t('runtime.create') }}
+                    </el-button>
 
-                <el-button @click="openExtensions">
-                    {{ $t('php.extensions') }}
-                </el-button>
+                    <el-button @click="openExtensions">
+                        {{ $t('php.extensions') }}
+                    </el-button>
 
-                <el-button type="primary" plain @click="onOpenBuildCache()">
-                    {{ $t('container.cleanBuildCache') }}
-                </el-button>
+                    <el-button type="primary" plain @click="onOpenBuildCache()">
+                        {{ $t('container.cleanBuildCache') }}
+                    </el-button>
+                </div>
             </template>
             <template #main>
                 <ComplexTable :pagination-config="paginationConfig" :data="items" @search="search()">
@@ -258,5 +260,8 @@ onUnmounted(() => {
 .open-warn {
     color: $primary-color;
     cursor: pointer;
+}
+.el-button + .el-button {
+    margin: 0;
 }
 </style>

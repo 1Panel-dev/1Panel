@@ -5,15 +5,17 @@
                 <el-alert type="info" :title="$t('terminal.quickCommandHelper')" :closable="false" />
             </template>
             <template #toolbar>
-                <el-button type="primary" @click="onCreate()">
-                    {{ $t('commons.button.create') }} {{ $t('terminal.quickCommand') }}
-                </el-button>
-                <el-button type="primary" plain @click="onOpenGroupDialog()">
-                    {{ $t('terminal.group') }}
-                </el-button>
-                <el-button type="primary" plain :disabled="selects.length === 0" @click="batchDelete(null)">
-                    {{ $t('commons.button.delete') }}
-                </el-button>
+                <div class="flex flex-wrap gap-2 sm:gap-4 items-center">
+                    <el-button type="primary" @click="onCreate()">
+                        {{ $t('commons.button.create') }} {{ $t('terminal.quickCommand') }}
+                    </el-button>
+                    <el-button type="primary" plain @click="onOpenGroupDialog()">
+                        {{ $t('terminal.group') }}
+                    </el-button>
+                    <el-button type="primary" plain :disabled="selects.length === 0" @click="batchDelete(null)">
+                        {{ $t('commons.button.delete') }}
+                    </el-button>
+                </div>
             </template>
             <template #search>
                 <el-row :gutter="5">

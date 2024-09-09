@@ -2,8 +2,8 @@
     <div>
         <LayoutContent v-loading="loading" :title="$t('terminal.host')">
             <template #toolbar>
-                <el-row>
-                    <el-col :span="20">
+                <div class="flex flex-wrap gap-2 sm:gap-4 justify-between items-center">
+                    <div class="flex flex-wrap gap-2 sm:gap-4">
                         <el-button type="primary" @click="onOpenDialog('create')">
                             {{ $t('terminal.addHost') }}
                         </el-button>
@@ -13,11 +13,11 @@
                         <el-button type="primary" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
                             {{ $t('commons.button.delete') }}
                         </el-button>
-                    </el-col>
-                    <el-col :span="4">
+                    </div>
+                    <div class="flex flex-wrap gap-2 sm:gap-">
                         <TableSearch @search="search()" v-model:searchName="info" />
-                    </el-col>
-                </el-row>
+                    </div>
+                </div>
             </template>
             <template #search>
                 <el-select v-model="group" @change="search()" clearable class="p-w-200">

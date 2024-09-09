@@ -34,4 +34,8 @@ const reload = () => {
 provide('reload', reload);
 </script>
 
-<style scoped lang="scss"></style>
+<style lang="scss">
+.el-button + .el-button {
+    margin: 0;
+}
+</style>

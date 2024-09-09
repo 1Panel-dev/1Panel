@@ -2,29 +2,29 @@
     <div>
         <LayoutContent v-loading="loading" :title="$t('logs.system')">
             <template #toolbar>
-                <el-row>
-                    <el-col :span="16">
-                        <el-button class="tag-button no-active" @click="onChangeRoute('OperationLog')">
-                            {{ $t('logs.operation') }}
-                        </el-button>
-                        <el-button class="tag-button no-active" @click="onChangeRoute('LoginLog')">
-                            {{ $t('logs.login') }}
-                        </el-button>
-                        <el-button class="tag-button" type="primary" @click="onChangeRoute('SystemLog')">
-                            {{ $t('logs.system') }}
-                        </el-button>
-                    </el-col>
-                </el-row>
+                <div class="flex flex-wrap gap-2 sm:gap-4 items-center">
+                    <el-button class="tag-button no-active" @click="onChangeRoute('OperationLog')">
+                        {{ $t('logs.operation') }}
+                    </el-button>
+                    <el-button class="tag-button no-active" @click="onChangeRoute('LoginLog')">
+                        {{ $t('logs.login') }}
+                    </el-button>
+                    <el-button class="tag-button" type="primary" @click="onChangeRoute('SystemLog')">
+                        {{ $t('logs.system') }}
+                    </el-button>
+                </div>
             </template>
             <template #search>
-                <el-select class="float-left p-w-200" v-model="logConfig.name" @change="search()">
-                    <template #prefix>{{ $t('commons.button.log') }}</template>
-                    <el-option v-for="(item, index) in fileList" :key="index" :label="item" :value="item" />
-                </el-select>
-                <div class="watchCheckbox">
-                    <el-checkbox border @change="changeTail" v-model="isWatch">
-                        {{ $t('commons.button.watch') }}
-                    </el-checkbox>
+                <div class="flex flex-wrap gap-2 sm:gap-4 items-center justify-start">
+                    <el-select class="float-left p-w-200" v-model="logConfig.name" @change="search()">
+                        <template #prefix>{{ $t('commons.button.log') }}</template>
+                        <el-option v-for="(item, index) in fileList" :key="index" :label="item" :value="item" />
+                    </el-select>
+                    <div>
+                        <el-checkbox border @change="changeTail" v-model="isWatch">
+                            {{ $t('commons.button.watch') }}
+                        </el-checkbox>
+                    </div>
                 </div>
             </template>
             <template #main>

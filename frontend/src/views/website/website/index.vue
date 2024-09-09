@@ -19,8 +19,8 @@
                 ></AppStatus>
             </template>
             <template v-if="nginxIsExist && !openNginxConfig" #toolbar>
-                <el-row :class="{ mask: nginxStatus != 'Running' }">
-                    <el-col :xs="24" :sm="20" :md="20" :lg="20" :xl="20">
+                <div class="flex flex-row flex-wrap justify-between gap-2 sm:gap-4">
+                    <div class="flex flex-row flex-wrap gap-2 sm:gap-4">
                         <el-button type="primary" @click="openCreate">
                             {{ $t('website.create') }}
                         </el-button>
@@ -33,11 +33,11 @@
                         <el-button type="primary" plain @click="openDefaultHtml">
                             {{ $t('website.defaultHtml') }}
                         </el-button>
-                    </el-col>
-                    <el-col :xs="24" :sm="4" :md="4" :lg="4" :xl="4">
+                    </div>
+                    <div>
                         <TableSearch @search="search()" v-model:searchName="req.name" />
-                    </el-col>
-                </el-row>
+                    </div>
+                </div>
             </template>
             <template v-if="nginxIsExist && !openNginxConfig" #search>
                 <div :class="{ mask: nginxStatus != 'Running' }">
@@ -486,3 +486,9 @@ onMounted(() => {
     listGroup();
 });
 </script>
+
+<style scoped>
+.el-button + .el-button {
+    margin: 0;
+}
+</style>

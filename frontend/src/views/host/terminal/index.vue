@@ -77,4 +77,7 @@ onUnmounted(() => {
         border-radius: 4px;
     }
 }
+.el-button + .el-button {
+    margin: 0;
+}
 </style>

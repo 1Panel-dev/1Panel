@@ -14,13 +14,10 @@
                 </el-select>
             </template>
             <template #toolbar>
-                <el-row>
-                    <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16"></el-col>
-                    <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
-                        <TableSetting @search="search()" />
-                        <TableSearch @search="search()" v-model:searchName="searchInfo" />
-                    </el-col>
-                </el-row>
+                <div class="flex flex-wrap gap-2 sm:gap-4 justify-end items-center">
+                    <TableSetting @search="search()" />
+                    <TableSearch @search="search()" v-model:searchName="searchInfo" />
+                </div>
             </template>
 
             <template #main>

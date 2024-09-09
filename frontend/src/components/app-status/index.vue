@@ -2,8 +2,8 @@
     <div>
         <div class="app-status" v-if="data.isExist">
             <el-card>
-                <div class="flex items-center justify-between gap-2 sm:gap-10 sm:justify-start">
-                    <div class="flex items-center justify-center gap-2 sm:flex-row">
+                <div class="flex flex-wrap items-center justify-between gap-2 sm:gap-10 sm:justify-start">
+                    <div class="flex flex-wrap items-center justify-center gap-2 sm:flex-row">
                         <div>
                             <el-tag effect="dark" type="success">{{ data.app }}</el-tag>
                         </div>

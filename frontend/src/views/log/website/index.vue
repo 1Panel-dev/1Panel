@@ -24,7 +24,7 @@
                 </el-row>
             </template>
             <template #search>
-                <div>
+                <div class="flex flex-wrap gap-2 sm:gap-4 items-center justify-start">
                     <el-select v-model="logConfig.id" @change="changeWebsite()" class="p-w-200">
                         <template #prefix>{{ $t('website.website') }}</template>
                         <el-option
@@ -34,15 +34,15 @@
                             :value="website.id"
                         ></el-option>
                     </el-select>
-                    <el-button class="left-button">
+                    <el-button>
                         <el-checkbox v-model="tailLog" @change="changeTail" :disabled="logConfig.id == undefined">
                             {{ $t('commons.button.watch') }}
                         </el-checkbox>
                     </el-button>
-                    <el-button class="left-button" @click="onDownload" icon="Download" :disabled="!hasContent">
+                    <el-button @click="onDownload" icon="Download" :disabled="!hasContent">
                         {{ $t('file.download') }}
                     </el-button>
-                    <el-button type="primary" plain @click="onClean()" class="left-button" :disabled="!hasContent">
+                    <el-button type="primary" plain @click="onClean()" :disabled="!hasContent">
                         {{ $t('logs.deleteLogs') }}
                     </el-button>
                 </div>
@@ -162,3 +162,8 @@ onMounted(() => {
     getWebsites();
 });
 </script>
+<style scoped>
+.el-button + .el-button {
+    margin: 0;
+}
+</style>

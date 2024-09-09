@@ -2,8 +2,8 @@
     <div>
         <LayoutContent v-loading="loading" v-if="!isRecordShow" :title="$t('setting.snapshot')">
             <template #toolbar>
-                <el-row>
-                    <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16">
+                <div class="flex flex-wrap gap-2 sm:gap-4 items-center justify-between">
+                    <div class="flex flex-wrap gap-2 sm:gap-4 items-center">
                         <el-button type="primary" @click="onCreate()">
                             {{ $t('setting.createSnapshot') }}
                         </el-button>
@@ -16,12 +16,12 @@
                         <el-button type="primary" plain :disabled="selects.length === 0" @click="batchDelete(null)">
                             {{ $t('commons.button.delete') }}
                         </el-button>
-                    </el-col>
-                    <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
+                    </div>
+                    <div class="flex felx-wrap gap-2 sm:gap-4 items-center justify-center">
                         <TableSetting ref="timerRef" @search="search()" />
                         <TableSearch @search="search()" v-model:searchName="searchName" />
-                    </el-col>
-                </el-row>
+                    </div>
+                </div>
             </template>
             <template #main>
                 <ComplexTable
@@ -432,3 +432,8 @@ onMounted(() => {
     loadBackups();
 });
 </script>
+<style scoped>
+.el-button + .el-button {
+    margin: 0;
+}
+</style>
