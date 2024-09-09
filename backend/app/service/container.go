@@ -187,7 +187,7 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 			IsFromApp = true
 		}
 
-		exposePorts, _ := loadContainerPort(item.ID, client)
+		exposePorts := transPortToStr(records[i].Ports)
 		info := dto.ContainerInfo{
 			ContainerID:   item.ID,
 			CreateTime:    time.Unix(item.Created, 0).Format(constant.DateTimeLayout),
@@ -196,7 +196,7 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 			ImageName:     item.Image,
 			State:         item.State,
 			RunTime:       item.Status,
-			Ports:         transPortToStr(exposePorts),
+			Ports:         exposePorts,
 			IsFromApp:     IsFromApp,
 			IsFromCompose: IsFromCompose,
 		}
@@ -445,7 +445,7 @@ func (u *ContainerService) ContainerInfo(req dto.OperationWithName) (*dto.Contai
 		}
 	}
 
-	exposePorts, _ := loadContainerPort(oldContainer.ID, client)
+	exposePorts, _ := loadPortByInspect(oldContainer.ID, client)
 	data.ExposedPorts = loadContainerPortForInfo(exposePorts)
 	networkSettings := oldContainer.NetworkSettings
 	bridgeNetworkSettings := networkSettings.Networks[data.Network]
@@ -1214,7 +1214,7 @@ func loadVolumeBinds(binds []types.MountPoint) []dto.VolumeHelper {
 	return datas
 }
 
-func loadContainerPort(id string, client *client.Client) ([]types.Port, error) {
+func loadPortByInspect(id string, client *client.Client) ([]types.Port, error) {
 	container, err := client.ContainerInspect(context.Background(), id)
 	if err != nil {
 		return nil, err
