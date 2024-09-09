@@ -24,7 +24,7 @@
             <template #toolbar>
                 <div class="flex w-full flex-col gap-4 md:justify-between md:flex-row">
                     <div class="flex flex-wrap gap-4">
-                        <div>
+                        <div class="flex gap-4">
                             <el-button type="primary" @click="onOpenDialog('create')">
                                 {{ $t('container.create') }}
                             </el-button>
