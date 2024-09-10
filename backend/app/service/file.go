@@ -62,8 +62,12 @@ func NewIFileService() IFileService {
 
 func (f *FileService) GetFileList(op request.FileOption) (response.FileInfo, error) {
 	var fileInfo response.FileInfo
-	if _, err := os.Stat(op.Path); err != nil && os.IsNotExist(err) {
+	data, err := os.Stat(op.Path)
+	if err != nil && os.IsNotExist(err) {
 		return fileInfo, nil
+	}
+	if !data.IsDir() {
+		op.FileOption.Path = filepath.Dir(op.FileOption.Path)
 	}
 	info, err := files.NewFileInfo(op.FileOption)
 	if err != nil {
