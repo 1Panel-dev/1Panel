@@ -61,7 +61,7 @@
             </template>
 
             <template #toolbar>
-                <div class="flex justify-between gap-2 flex-wrap sm:flex-row"> 
+                <div class="flex justify-between gap-2 flex-wrap sm:flex-row">
                     <div class="flex flex-wrap gap-3">
                         <el-button
                             v-if="currentDB && (currentDB.from !== 'local' || mysqlStatus === 'Running')"
