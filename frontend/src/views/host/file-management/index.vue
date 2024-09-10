@@ -1097,7 +1097,7 @@ const buttons = [
         label: i18n.global.t('file.deCompress'),
         click: openDeCompress,
         disabled: (row: File.File) => {
-            return row.isDir;
+            return !isDecompressFile(row);
         },
     },
     {
@@ -1136,6 +1136,20 @@ const buttons = [
         click: openDetail,
     },
 ];
+
+const isDecompressFile = (row: File.File) => {
+    if (row.isDir) {
+        return false;
+    }
+    if (getFileType(row.extension) === 'compress') {
+        return true;
+    }
+    if (row.mimeType == 'application/octet-stream') {
+        return false;
+    } else {
+        return Mimetypes.get(row.mimeType) != undefined;
+    }
+};
 
 onMounted(() => {
     if (router.currentRoute.value.query.path) {
