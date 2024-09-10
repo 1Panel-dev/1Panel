@@ -28,8 +28,8 @@
         <div v-if="form.isExist">
             <LayoutContent v-loading="loading" title="FTP">
                 <template #toolbar>
-                    <el-row>
-                        <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16">
+                    <div class="flex justify-between gap-2 flex-wrap sm:flex-row">
+                        <div class="flex flex-wrap gap-3">
                             <el-button type="primary" :disabled="!form.isActive" @click="onOpenDialog('add')">
                                 {{ $t('commons.button.add') }} FTP
                             </el-button>
@@ -39,11 +39,11 @@
                             <el-button plain :disabled="selects.length === 0 || !form.isActive" @click="onDelete(null)">
                                 {{ $t('commons.button.delete') }}
                             </el-button>
-                        </el-col>
-                        <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
+                        </div>
+                        <div class="flex flex-wrap gap-3">
                             <TableSearch @search="search()" v-model:searchName="searchName" />
-                        </el-col>
-                    </el-row>
+                        </div>
+                    </div>
                 </template>
                 <template #main>
                     <ComplexTable

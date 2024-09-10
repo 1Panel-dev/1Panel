@@ -8,24 +8,13 @@
 
         <LayoutContent :title="$t('container.repo')" :class="{ mask: dockerStatus != 'Running' }">
             <template #toolbar>
-                <div class="block flex flex-col gap-2 sm:hidden">
-                    <div class="flex flex-row justify-between">
-                        <el-button type="primary" @click="onOpenDialog('add')">
-                            {{ $t('container.createRepo') }}
-                        </el-button>
-                        <TableSetting @search="search()" />
-                    </div>
-                    <div class="flex flex-row justify-end">
-                        <TableSearch @search="search()" v-model:searchName="searchName" />
-                    </div>
-                </div>
-                <div class="hidden sm:block sm:flex sm:justify-between">
-                    <div>
+                <div class="flex justify-between gap-2 flex-wrap sm:flex-row">
+                    <div class="flex flex-wrap gap-3">
                         <el-button type="primary" @click="onOpenDialog('add')">
                             {{ $t('container.createRepo') }}
                         </el-button>
                     </div>
-                    <div class="flex flex-row gap-2">
+                    <div class="flex flex-wrap gap-3">
                         <TableSetting @search="search()" />
                         <TableSearch @search="search()" v-model:searchName="searchName" />
                     </div>

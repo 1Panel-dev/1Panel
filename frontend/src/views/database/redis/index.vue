@@ -51,12 +51,16 @@
                 </el-select>
             </template>
             <template #toolbar v-if="!isOnSetting">
-                <el-button v-if="currentDB" type="primary" plain @click="onLoadConn">
-                    {{ $t('database.databaseConnInfo') }}
-                </el-button>
-                <el-button @click="goRemoteDB" type="primary" plain>
-                    {{ $t('database.remoteDB') }}
-                </el-button>
+                <div class="flex justify-between gap-2 flex-wrap sm:flex-row">
+                    <div class="flex flex-wrap gap-3">
+                        <el-button v-if="currentDB" type="primary" plain @click="onLoadConn">
+                            {{ $t('database.databaseConnInfo') }}
+                        </el-button>
+                        <el-button @click="goRemoteDB" type="primary" plain>
+                            {{ $t('database.remoteDB') }}
+                        </el-button>
+                    </div>
+                </div>
             </template>
         </LayoutContent>
 

@@ -45,9 +45,3 @@ const buttons = [
     },
 ];
 </script>
-
-<style>
-.el-button + .el-button {
-    margin: 0;
-}
-</style>

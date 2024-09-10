@@ -444,6 +444,12 @@ html {
     cursor: pointer;
 }
 
+.dialog-footer{
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
 .monaco-editor-tree-light .el-tree-node__content:hover {
     background-color: #e5eefd;
 }

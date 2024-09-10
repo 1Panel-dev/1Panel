@@ -5,11 +5,16 @@
                 <back-button name="PostgreSQL" :header="$t('database.remoteDB')" />
             </template>
             <template #toolbar>
-                <el-button type="primary" @click="onOpenDialog('create')">
-                    {{ $t('database.createRemoteDB') }}
-                </el-button>
-
-                <TableSearch @search="search()" v-model:searchName="searchName" />
+                <div class="flex justify-between gap-2 flex-wrap sm:flex-row">
+                    <div class="flex flex-wrap gap-3">
+                        <el-button type="primary" @click="onOpenDialog('create')">
+                            {{ $t('database.createRemoteDB') }}
+                        </el-button>
+                    </div>
+                    <div class="flex flex-wrap gap-3">
+                        <TableSearch @search="search()" v-model:searchName="searchName" />
+                    </div>
+                </div>
             </template>
             <template #main>
                 <ComplexTable :pagination-config="paginationConfig" @sort-change="search" @search="search" :data="data">
