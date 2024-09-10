@@ -1205,6 +1205,7 @@ onMounted(() => {
 .right-section {
     display: flex;
     align-items: center;
+    gap: 1rem;
 }
 
 .left-section > *:not(:first-child) {
