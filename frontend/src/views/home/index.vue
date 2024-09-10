@@ -364,6 +364,7 @@ const currentInfo = ref<Dashboard.CurrentInfo>({
 
     diskData: [],
     gpuData: [],
+    xpuData: [],
 
     netBytesSent: 0,
     netBytesRecv: 0,

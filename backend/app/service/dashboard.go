@@ -178,6 +178,7 @@ func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *d
 
 	currentInfo.DiskData = loadDiskInfo()
 	currentInfo.GPUData = loadGPUInfo()
+	currentInfo.XPUData = loadXpuInfo()
 
 	if ioOption == "all" {
 		diskInfo, _ := disk.IOCounters()
@@ -342,6 +343,22 @@ func loadGPUInfo() []dto.GPUInfo {
 		}
 		dataItem.PowerUsage = dataItem.PowerDraw + " / " + dataItem.MaxPowerLimit
 		dataItem.MemoryUsage = dataItem.MemUsed + " / " + dataItem.MemTotal
+		data = append(data, dataItem)
+	}
+	return data
+}
+
+func loadXpuInfo() []dto.XPUInfo {
+	list := xpack.LoadXpuInfo()
+	if len(list) == 0 {
+		return nil
+	}
+	var data []dto.XPUInfo
+	for _, gpu := range list {
+		var dataItem dto.XPUInfo
+		if err := copier.Copy(&dataItem, &gpu); err != nil {
+			continue
+		}
 		data = append(data, dataItem)
 	}
 	return data
