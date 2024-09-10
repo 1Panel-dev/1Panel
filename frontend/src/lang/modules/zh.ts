@@ -1215,6 +1215,7 @@ const message = {
         noNameFolder: '未命名文件夹',
         noNameFile: '未命名文件',
         minimap: '缩略图',
+        fileCanNotRead: '此文件不支持预览',
     },
     ssh: {
         autoStart: '开机自启',
