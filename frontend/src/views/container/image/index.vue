@@ -8,8 +8,8 @@
 
         <LayoutContent :title="$t('container.image')" :class="{ mask: dockerStatus != 'Running' }">
             <template #toolbar>
-                <div class="flex flex-col gap-4 justify-between items-center flex-wrap sm:flex-row">
-                    <div class="flex gap-4 flex-wrap">
+                <div class="flex justify-between gap-2 flex-wrap sm:flex-row">
+                    <div class="flex flex-wrap gap-3">
                         <el-button type="primary" plain @click="onOpenPull">
                             {{ $t('container.imagePull') }}
                         </el-button>
@@ -26,7 +26,7 @@
                             {{ $t('container.imagePrune') }}
                         </el-button>
                     </div>
-                    <div class="flex ml-2 gap-2">
+                    <div class="flex flex-wrap gap-3">
                         <TableSetting @search="search()" />
                         <TableSearch @search="search()" v-model:searchName="searchName" />
                     </div>

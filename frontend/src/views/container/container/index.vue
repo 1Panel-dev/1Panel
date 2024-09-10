@@ -24,14 +24,13 @@
             <template #toolbar>
                 <div class="flex w-full flex-col gap-4 md:justify-between md:flex-row">
                     <div class="flex flex-wrap gap-4">
-                        <div>
-                            <el-button type="primary" @click="onOpenDialog('create')">
-                                {{ $t('container.create') }}
-                            </el-button>
-                            <el-button type="primary" plain @click="onClean()">
-                                {{ $t('container.containerPrune') }}
-                            </el-button>
-                        </div>
+                        <el-button type="primary" @click="onOpenDialog('create')">
+                            {{ $t('container.create') }}
+                        </el-button>
+                        <el-button type="primary" plain @click="onClean()">
+                            {{ $t('container.containerPrune') }}
+                        </el-button>
+
                         <el-button-group>
                             <el-button :disabled="checkStatus('start', null)" @click="onOperate('start', null)">
                                 {{ $t('container.start') }}

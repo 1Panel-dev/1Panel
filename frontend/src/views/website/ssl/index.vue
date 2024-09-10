@@ -3,7 +3,7 @@
         <RouterButton :buttons="routerButton" />
         <LayoutContent :title="$t('website.ssl')">
             <template #toolbar>
-                <div class="flex flex-wrap gap-3 [&>*]:ml-3">
+                <div class="flex flex-wrap gap-3">
                     <el-button type="primary" @click="openSSL()">
                         {{ $t('ssl.create') }}
                     </el-button>
