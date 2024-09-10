@@ -1277,6 +1277,7 @@ const message = {
         noNameFolder: 'Untitled Folder',
         noNameFile: 'Untitled File',
         minimap: 'Code Mini Map',
+        fileCanNotRead: 'File can not read',
     },
     ssh: {
         autoStart: 'Auto Start',
