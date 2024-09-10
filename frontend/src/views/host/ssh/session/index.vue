@@ -3,14 +3,11 @@
         <FireRouter />
         <LayoutContent :title="$t('ssh.session')">
             <template #toolbar>
-                <div style="width: 100%">
-                    <el-row :gutter="20">
-                        <el-col :span="8"></el-col>
-                        <el-col :span="8"></el-col>
-                        <el-col :span="8">
-                            <TableSearch @search="search()" v-model:searchName="sshSearch.loginUser" />
-                        </el-col>
-                    </el-row>
+                <div class="flex justify-between gap-2 flex-wrap sm:flex-row">
+                    <div><!-- 占位 --></div>
+                    <div class="flex flex-wrap gap-3">
+                        <TableSearch @search="search()" v-model:searchName="sshSearch.loginUser" />
+                    </div>
                 </div>
             </template>
             <template #main>

@@ -3,37 +3,28 @@
         <FireRouter />
         <LayoutContent :title="$t('menu.process')" v-loading="loading">
             <template #toolbar>
-                <el-row>
-                    <el-col :span="24">
-                        <div style="width: 100%">
-                            <el-form-item class="float-right">
-                                <el-row :gutter="20">
-                                    <el-col :span="8">
-                                        <TableSearch
-                                            @search="search()"
-                                            :placeholder="$t('process.pid')"
-                                            v-model:searchName="processSearch.pid"
-                                        />
-                                    </el-col>
-                                    <el-col :span="8">
-                                        <TableSearch
-                                            @search="search()"
-                                            :placeholder="$t('commons.table.name')"
-                                            v-model:searchName="processSearch.name"
-                                        />
-                                    </el-col>
-                                    <el-col :span="8">
-                                        <TableSearch
-                                            @search="search()"
-                                            :placeholder="$t('commons.table.user')"
-                                            v-model:searchName="processSearch.username"
-                                        />
-                                    </el-col>
-                                </el-row>
-                            </el-form-item>
-                        </div>
-                    </el-col>
-                </el-row>
+                <div class="flex justify-between gap-2 flex-wrap sm:flex-row">
+                    <div><!-- 占位 --></div>
+                    <div class="flex flex-wrap gap-3">
+                        <TableSearch
+                            @search="search()"
+                            :placeholder="$t('process.pid')"
+                            v-model:searchName="processSearch.pid"
+                        />
+
+                        <TableSearch
+                            @search="search()"
+                            :placeholder="$t('commons.table.name')"
+                            v-model:searchName="processSearch.name"
+                        />
+
+                        <TableSearch
+                            @search="search()"
+                            :placeholder="$t('commons.table.user')"
+                            v-model:searchName="processSearch.username"
+                        />
+                    </div>
+                </div>
             </template>
             <template #main>
                 <ComplexTable :data="data" @sort-change="changeSort" @filter-change="changeFilter" ref="tableRef">

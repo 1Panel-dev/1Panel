@@ -8,8 +8,8 @@
 
         <LayoutContent :title="$t('container.composeTemplate')" :class="{ mask: dockerStatus != 'Running' }">
             <template #toolbar>
-                <div class="flex flex-col gap-2 sm:flex-row sm:justify-between">
-                    <div class="flex gap-4">
+                <div class="flex justify-between gap-2 flex-wrap sm:flex-row">
+                    <div class="flex flex-wrap gap-3">
                         <el-button type="primary" @click="onOpenDialog('create')">
                             {{ $t('container.createComposeTemplate') }}
                         </el-button>
@@ -17,7 +17,7 @@
                             {{ $t('commons.button.delete') }}
                         </el-button>
                     </div>
-                    <div class="flex gap-4 sm:gap-2">
+                    <div class="flex flex-wrap gap-3">
                         <TableSetting @search="search()" />
                         <TableSearch @search="search()" v-model:searchName="searchName" />
                     </div>

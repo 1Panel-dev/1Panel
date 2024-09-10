@@ -8,8 +8,8 @@
 
         <LayoutContent :title="$t('container.volume')" :class="{ mask: dockerStatus != 'Running' }">
             <template #toolbar>
-                <div class="flex flex-col gap-4 sm:flex-row justify-between">
-                    <div class="flex flex-wrap gap-4">
+                <div class="flex justify-between gap-2 flex-wrap sm:flex-row">
+                    <div class="flex flex-wrap gap-3">
                         <el-button type="primary" @click="onCreate()">
                             {{ $t('container.createVolume') }}
                         </el-button>
@@ -20,7 +20,7 @@
                             {{ $t('commons.button.delete') }}
                         </el-button>
                     </div>
-                    <div class="flex flex-row flex-wrap gap-2">
+                    <div class="flex flex-wrap gap-3">
                         <TableSetting @search="search()" />
                         <TableSearch @search="search()" v-model:searchName="searchName" />
                     </div>

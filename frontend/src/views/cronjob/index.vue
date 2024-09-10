@@ -10,8 +10,8 @@
         />
         <LayoutContent v-loading="loading" v-if="!isRecordShow" :title="$t('cronjob.cronTask')">
             <template #toolbar>
-                <el-row>
-                    <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16">
+                <div class="flex justify-between gap-2 flex-wrap sm:flex-row">
+                    <div class="flex flex-wrap gap-3">
                         <el-button type="primary" @click="onOpenDialog('create')">
                             {{ $t('commons.button.create') }}{{ $t('cronjob.cronTask') }}
                         </el-button>
@@ -26,12 +26,12 @@
                                 {{ $t('commons.button.delete') }}
                             </el-button>
                         </el-button-group>
-                    </el-col>
-                    <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
+                    </div>
+                    <div class="flex flex-wrap gap-3">
                         <TableSetting @search="search()" />
                         <TableSearch @search="search()" v-model:searchName="searchName" />
-                    </el-col>
-                </el-row>
+                    </div>
+                </div>
             </template>
             <template #main>
                 <ComplexTable

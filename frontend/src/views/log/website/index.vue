@@ -2,26 +2,22 @@
     <div>
         <LayoutContent v-loading="loading" :title="$t('logs.websiteLog')">
             <template #toolbar>
-                <el-row>
-                    <el-col :span="16">
-                        <el-button
-                            class="tag-button"
-                            :class="logConfig.name === 'access.log' ? '' : 'no-active'"
-                            :type="logConfig.name === 'access.log' ? 'primary' : ''"
-                            @click="changeType('access.log')"
-                        >
-                            {{ $t('logs.runLog') }}
-                        </el-button>
-                        <el-button
-                            class="tag-button"
-                            :class="logConfig.name === 'error.log' ? '' : 'no-active'"
-                            :type="logConfig.name === 'error.log' ? 'primary' : ''"
-                            @click="changeType('error.log')"
-                        >
-                            {{ $t('logs.errLog') }}
-                        </el-button>
-                    </el-col>
-                </el-row>
+                <el-button
+                    class="tag-button"
+                    :class="logConfig.name === 'access.log' ? '' : 'no-active'"
+                    :type="logConfig.name === 'access.log' ? 'primary' : ''"
+                    @click="changeType('access.log')"
+                >
+                    {{ $t('logs.runLog') }}
+                </el-button>
+                <el-button
+                    class="tag-button"
+                    :class="logConfig.name === 'error.log' ? '' : 'no-active'"
+                    :type="logConfig.name === 'error.log' ? 'primary' : ''"
+                    @click="changeType('error.log')"
+                >
+                    {{ $t('logs.errLog') }}
+                </el-button>
             </template>
             <template #search>
                 <div>

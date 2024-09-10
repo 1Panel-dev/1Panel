@@ -2,8 +2,8 @@
     <div>
         <LayoutContent v-loading="loading" :title="$t('logs.operation')">
             <template #toolbar>
-                <el-row>
-                    <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16">
+                <div class="flex justify-between gap-2 flex-wrap sm:flex-row">
+                    <div class="flex flex-wrap gap-3">
                         <el-button type="primary" class="tag-button" @click="onChangeRoute('OperationLog')">
                             {{ $t('logs.operation') }}
                         </el-button>
@@ -13,12 +13,12 @@
                         <el-button class="tag-button no-active" @click="onChangeRoute('SystemLog')">
                             {{ $t('logs.system') }}
                         </el-button>
-                    </el-col>
-                    <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
+                    </div>
+                    <div class="flex flex-wrap gap-3">
                         <TableSetting @search="search()" />
                         <TableSearch @search="search()" v-model:searchName="searchName" />
-                    </el-col>
-                </el-row>
+                    </div>
+                </div>
             </template>
             <template #search>
                 <el-select v-model="searchGroup" @change="search()" clearable class="p-w-200">

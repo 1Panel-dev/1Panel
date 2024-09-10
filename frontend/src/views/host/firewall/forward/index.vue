@@ -19,20 +19,20 @@
 
                 <LayoutContent :title="$t('firewall.forwardRule')" :class="{ mask: fireStatus != 'running' }">
                     <template #toolbar>
-                        <el-row>
-                            <el-col :span="16">
+                        <div class="flex justify-between gap-2 flex-wrap sm:flex-row">
+                            <div class="flex flex-wrap gap-3">
                                 <el-button type="primary" @click="onOpenDialog('create')">
                                     {{ $t('commons.button.create') }}{{ $t('firewall.forwardRule') }}
                                 </el-button>
                                 <el-button @click="onDelete(null)" plain :disabled="selects.length === 0">
                                     {{ $t('commons.button.delete') }}
                                 </el-button>
-                            </el-col>
-                            <el-col :span="8">
+                            </div>
+                            <div class="flex flex-wrap gap-3">
                                 <TableSetting @search="search()" />
                                 <TableSearch @search="search()" v-model:searchName="searchName" />
-                            </el-col>
-                        </el-row>
+                            </div>
+                        </div>
                     </template>
                     <template #main>
                         <ComplexTable
