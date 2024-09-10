@@ -724,40 +724,22 @@ const top = () => {
 };
 
 const jump = async (url: string) => {
-    const fileName = url.substring(url.lastIndexOf('/') + 1);
-    let filePath = url.substring(0, url.lastIndexOf('/') + 1);
-    if (!url.includes('.')) {
-        filePath = url;
-    }
     history.splice(pointer + 1);
     history.push(url);
     pointer = history.length - 1;
 
-    const oldUrl = req.path;
-    const oldPageSize = req.pageSize;
-    // reset search params before exec jump
-    Object.assign(req, initData());
-    req.path = filePath;
-    req.containSub = false;
-    req.search = '';
-    req.pageSize = oldPageSize;
+    const { path: oldUrl, pageSize: oldPageSize } = req;
+    Object.assign(req, initData(), { path: url, containSub: false, search: '', pageSize: oldPageSize });
     let searchResult = await searchFile();
-
-    globalStore.setLastFilePath(req.path);
     // check search result,the file is exists?
     if (!searchResult.data.path) {
         req.path = oldUrl;
+        globalStore.setLastFilePath(req.path);
         MsgWarning(i18n.global.t('commons.res.notFound'));
         return;
     }
-    if (fileName && fileName.length > 1 && fileName.includes('.')) {
-        const fileData = searchResult.data.items.filter((item) => item.name === fileName);
-        if (fileData && fileData.length === 1) {
-            openView(fileData[0]);
-        } else {
-            MsgWarning(i18n.global.t('commons.res.notFound'));
-        }
-    }
+    req.path = searchResult.data.path;
+    globalStore.setLastFilePath(req.path);
     handleSearchResult(searchResult);
     getPaths(req.path);
     nextTick(function () {
@@ -896,6 +878,10 @@ const openView = (item: File.File) => {
 };
 
 const openPreview = (item: File.File, fileType: string) => {
+    if (item.mode.toString() == '-' && item.user == '-' && item.group == '-') {
+        MsgWarning(i18n.global.t('file.fileCanNotRead'));
+        return;
+    }
     filePreview.path = item.isSymlink ? item.linkPath : item.path;
     filePreview.name = item.name;
     filePreview.extension = item.extension;
