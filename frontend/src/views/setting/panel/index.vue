@@ -2,81 +2,77 @@
     <div v-loading="loading">
         <LayoutContent :title="$t('setting.panel')" :divider="true">
             <template #main>
-                <el-form :model="form" label-position="left" label-width="150px">
-                    <el-row>
-                        <el-col :span="1"><br /></el-col>
-                        <el-col :xs="24" :sm="20" :md="15" :lg="12" :xl="12">
-                            <el-form-item :label="$t('setting.user')" prop="userName">
-                                <el-input disabled v-model="form.userName">
-                                    <template #append>
-                                        <el-button @click="onChangeUserName()" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                            </el-form-item>
-
-                            <el-form-item :label="$t('setting.passwd')" prop="password">
-                                <el-input type="password" disabled v-model="form.password">
-                                    <template #append>
-                                        <el-button icon="Setting" @click="onChangePassword">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                            </el-form-item>
-
-                            <el-form-item :label="$t('setting.theme')" prop="theme">
-                                <el-radio-group @change="onSave('Theme', form.theme)" v-model="form.theme">
-                                    <el-radio-button v-if="isProductPro" value="dark-gold">
-                                        <span>{{ $t('setting.darkGold') }}</span>
-                                    </el-radio-button>
-                                    <el-radio-button value="light">
-                                        <span>{{ $t('setting.light') }}</span>
-                                    </el-radio-button>
-                                    <el-radio-button value="dark">
-                                        <span>{{ $t('setting.dark') }}</span>
-                                    </el-radio-button>
-                                    <el-radio-button value="auto">
-                                        <span>{{ $t('setting.auto') }}</span>
-                                    </el-radio-button>
-                                </el-radio-group>
-                            </el-form-item>
-
-                            <el-form-item :label="$t('setting.menuTabs')" prop="menuTabs">
-                                <el-radio-group @change="onSave('MenuTabs', form.menuTabs)" v-model="form.menuTabs">
-                                    <el-radio-button value="enable">
-                                        <span>{{ $t('commons.button.enable') }}</span>
-                                    </el-radio-button>
-                                    <el-radio-button value="disable">
-                                        <span>{{ $t('commons.button.disable') }}</span>
-                                    </el-radio-button>
-                                </el-radio-group>
-                            </el-form-item>
-
-                            <el-form-item :label="$t('setting.title')" prop="panelName">
-                                <el-input disabled v-model="form.panelName">
-                                    <template #append>
-                                        <el-button icon="Setting" @click="onChangeTitle">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                            </el-form-item>
-
-                            <el-form-item :label="$t('setting.language')" prop="language">
-                                <el-radio-group
-                                    style="width: 100%"
-                                    @change="onSave('Language', form.language)"
-                                    v-model="form.language"
-                                >
-                                    <el-radio value="zh">中文(简体)</el-radio>
-                                    <el-radio value="tw">中文(繁體)</el-radio>
-                                    <el-radio value="en">English</el-radio>
-                                </el-radio-group>
-                            </el-form-item>
-
-                            <el-form-item :label="$t('setting.sessionTimeout')" prop="sessionTimeout">
+                <el-form :model="form" label-position="left">
+                    <div class="w-full sm:w-1/2 text-[#646a73]">
+                        <div class="flex flex-col gap-2 sm:grid sm:grid-cols-[1fr_5fr] sm:gap-6">
+                            <label for="userName">{{ $t('setting.user') }}</label>
+                            <el-input disabled v-model="form.userName">
+                                <template #append>
+                                    <el-button @click="onChangeUserName()" icon="Setting">
+                                        {{ $t('commons.button.set') }}
+                                    </el-button>
+                                </template>
+                            </el-input>
+                            <label for="password">{{ $t('setting.passwd') }}</label>
+                            <el-input type="password" disabled v-model="form.password">
+                                <template #append>
+                                    <el-button icon="Setting" @click="onChangePassword">
+                                        {{ $t('commons.button.set') }}
+                                    </el-button>
+                                </template>
+                            </el-input>
+                            <label for="theme">
+                                {{ $t('setting.theme') }}
+                            </label>
+                            <el-radio-group @change="onSave('Theme', form.theme)" v-model="form.theme">
+                                <el-radio-button v-if="isProductPro" value="dark-gold">
+                                    <span>{{ $t('setting.darkGold') }}</span>
+                                </el-radio-button>
+                                <el-radio-button value="light">
+                                    <span>{{ $t('setting.light') }}</span>
+                                </el-radio-button>
+                                <el-radio-button value="dark">
+                                    <span>{{ $t('setting.dark') }}</span>
+                                </el-radio-button>
+                                <el-radio-button value="auto">
+                                    <span>{{ $t('setting.auto') }}</span>
+                                </el-radio-button>
+                            </el-radio-group>
+                            <label for="menuTabs">
+                                {{ $t('setting.menuTabs') }}
+                            </label>
+                            <el-radio-group @change="onSave('MenuTabs', form.menuTabs)" v-model="form.menuTabs">
+                                <el-radio-button value="enable">
+                                    <span>{{ $t('commons.button.enable') }}</span>
+                                </el-radio-button>
+                                <el-radio-button value="disable">
+                                    <span>{{ $t('commons.button.disable') }}</span>
+                                </el-radio-button>
+                            </el-radio-group>
+                            <label for="panelName">
+                                {{ $t('setting.title') }}
+                            </label>
+                            <el-input disabled v-model="form.panelName">
+                                <template #append>
+                                    <el-button icon="Setting" @click="onChangeTitle">
+                                        {{ $t('commons.button.set') }}
+                                    </el-button>
+                                </template>
+                            </el-input>
+                            <label for="language">
+                                {{ $t('setting.language') }}
+                            </label>
+                            <el-radio-group
+                                style="width: 100%"
+                                @change="onSave('Language', form.language)"
+                                v-model="form.language"
+                            >
+                                <el-radio value="zh">中文(简体)</el-radio>
+                                <el-radio value="tw">中文(繁體)</el-radio>
+                                <el-radio value="en">English</el-radio>
+                            </el-radio-group>
+                            <label for="sessionTimeout">{{ $t('setting.sessionTimeout') }}</label>
+                            <span class="flex flex-col gap-3">
                                 <el-input disabled v-model.number="form.sessionTimeout">
                                     <template #append>
                                         <el-button @click="onChangeTimeout" icon="Setting">
@@ -87,19 +83,17 @@
                                 <span class="input-help">
                                     {{ $t('setting.sessionTimeoutHelper', [form.sessionTimeout]) }}
                                 </span>
-                            </el-form-item>
-
-                            <el-form-item :label="$t('setting.defaultNetwork')">
-                                <el-input disabled v-model="form.defaultNetworkVal">
-                                    <template #append>
-                                        <el-button v-show="!show" @click="onChangeNetwork" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                            </el-form-item>
-
-                            <el-form-item :label="$t('setting.systemIP')" prop="systemIP">
+                            </span>
+                            <label>{{ $t('setting.defaultNetwork') }}</label>
+                            <el-input disabled v-model="form.defaultNetworkVal">
+                                <template #append>
+                                    <el-button v-show="!show" @click="onChangeNetwork" icon="Setting">
+                                        {{ $t('commons.button.set') }}
+                                    </el-button>
+                                </template>
+                            </el-input>
+                            <label for="systemIP">{{ $t('setting.systemIP') }}</label>
+                            <span>
                                 <el-input disabled v-if="form.systemIP" v-model="form.systemIP">
                                     <template #append>
                                         <el-button @click="onChangeSystemIP" icon="Setting">
@@ -114,19 +108,17 @@
                                         </el-button>
                                     </template>
                                 </el-input>
-                            </el-form-item>
-
-                            <el-form-item :label="$t('setting.proxy')" prop="proxyShow">
-                                <el-input disabled v-model="form.proxyShow">
-                                    <template #append>
-                                        <el-button @click="onChangeProxy" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                            </el-form-item>
-
-                            <el-form-item :label="$t('setting.developerMode')" prop="developerMode">
+                            </span>
+                            <label for="proxyShow">{{ $t('setting.proxy') }}</label>
+                            <el-input disabled v-model="form.proxyShow">
+                                <template #append>
+                                    <el-button @click="onChangeProxy" icon="Setting">
+                                        {{ $t('commons.button.set') }}
+                                    </el-button>
+                                </template>
+                            </el-input>
+                            <label for="developerMode">{{ $t('setting.developerMode') }}</label>
+                            <span class="flex flex-col gap-3">
                                 <el-radio-group
                                     @change="onSave('DeveloperMode', form.developerMode)"
                                     v-model="form.developerMode"
@@ -139,19 +131,17 @@
                                     </el-radio-button>
                                 </el-radio-group>
                                 <span class="input-help">{{ $t('setting.developerModeHelper') }}</span>
-                            </el-form-item>
-
-                            <el-form-item :label="$t('setting.advancedMenuHide')">
-                                <el-input disabled v-model="form.proHideMenus">
-                                    <template #append>
-                                        <el-button v-show="!show" @click="onChangeHideMenus" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                            </el-form-item>
-                        </el-col>
-                    </el-row>
+                            </span>
+                            <label>{{ $t('setting.advancedMenuHide') }}</label>
+                            <el-input disabled v-model="form.proHideMenus">
+                                <template #append>
+                                    <el-button v-show="!show" @click="onChangeHideMenus" icon="Setting">
+                                        {{ $t('commons.button.set') }}
+                                    </el-button>
+                                </template>
+                            </el-input>
+                        </div>
+                    </div>
                 </el-form>
             </template>
         </LayoutContent>
