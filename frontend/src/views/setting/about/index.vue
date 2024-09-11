@@ -8,10 +8,10 @@
                         <PrimaryLogo v-else />
                     </div>
                     <h3 class="description">{{ globalStore.themeConfig.title || $t('setting.description') }}</h3>
-                    <h3>
+                    <div class="flex justify-center">
                         <SystemUpgrade />
-                    </h3>
-                    <div style="margin-top: 10px">
+                    </div>
+                    <div class="flex w-full justify-center my-5 flex-wrap md:flex-row gap-4">
                         <el-link @click="toDoc" class="system-link">
                             <el-icon><Document /></el-icon>
                             <span>{{ $t('setting.doc2') }}</span>

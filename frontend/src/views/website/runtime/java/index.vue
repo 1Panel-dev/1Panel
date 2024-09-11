@@ -84,10 +84,9 @@
                     />
                     <fu-table-operations
                         :ellipsis="mobile ? 0 : 3"
-                        width="300px"
+                        :min-width="mobile ? 'auto' : 300"
                         :buttons="buttons"
-                        :min-width="mobile ? 'auto' : 200"
-                        :fixed="mobile ? false : 'right'"
+                        fixed="right"
                         :label="$t('commons.table.operate')"
                         fix
                     />
