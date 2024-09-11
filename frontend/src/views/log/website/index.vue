@@ -2,22 +2,26 @@
     <div>
         <LayoutContent v-loading="loading" :title="$t('logs.websiteLog')">
             <template #toolbar>
-                <el-button
-                    class="tag-button"
-                    :class="logConfig.name === 'access.log' ? '' : 'no-active'"
-                    :type="logConfig.name === 'access.log' ? 'primary' : ''"
-                    @click="changeType('access.log')"
-                >
-                    {{ $t('logs.runLog') }}
-                </el-button>
-                <el-button
-                    class="tag-button"
-                    :class="logConfig.name === 'error.log' ? '' : 'no-active'"
-                    :type="logConfig.name === 'error.log' ? 'primary' : ''"
-                    @click="changeType('error.log')"
-                >
-                    {{ $t('logs.errLog') }}
-                </el-button>
+                <div class="flex w-full flex-col gap-4 md:justify-between md:flex-row">
+                    <div class="flex flex-wrap gap-4">
+                        <el-button
+                            class="tag-button"
+                            :class="logConfig.name === 'access.log' ? '' : 'no-active'"
+                            :type="logConfig.name === 'access.log' ? 'primary' : ''"
+                            @click="changeType('access.log')"
+                        >
+                            {{ $t('logs.runLog') }}
+                        </el-button>
+                        <el-button
+                            class="tag-button"
+                            :class="logConfig.name === 'error.log' ? '' : 'no-active'"
+                            :type="logConfig.name === 'error.log' ? 'primary' : ''"
+                            @click="changeType('error.log')"
+                        >
+                            {{ $t('logs.errLog') }}
+                        </el-button>
+                    </div>
+                </div>
             </template>
             <template #search>
                 <div class="flex flex-wrap items-center gap-2 sm:gap-4">

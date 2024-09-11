@@ -48,8 +48,8 @@
                     :ref="'t-' + item.index"
                     :key="item.Refresh"
                 ></Terminal>
-                <div>
-                    <el-select v-model="quickCmd" clearable filterable @change="quickInput" style="width: 25%">
+                <div class="flex w-full flex-col md:flex-row">
+                    <el-select v-model="quickCmd" clearable filterable @change="quickInput">
                         <template #prefix>{{ $t('terminal.quickCommand') }}</template>
                         <el-option-group v-for="group in commandTree" :key="group.label" :label="group.label">
                             <el-option
@@ -60,7 +60,7 @@
                             />
                         </el-option-group>
                     </el-select>
-                    <el-input v-model="batchVal" @keyup.enter="batchInput" style="width: 75%">
+                    <el-input v-model="batchVal" @keyup.enter="batchInput">
                         <template #prepend>
                             <el-checkbox :label="$t('terminal.batchInput')" v-model="isBatch" />
                         </template>

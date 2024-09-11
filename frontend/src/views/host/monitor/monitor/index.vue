@@ -4,18 +4,19 @@
 
         <div class="content-container__search">
             <el-card>
-                <span style="font-size: 14px">{{ $t('monitor.globalFilter') }}</span>
-                <el-date-picker
-                    @change="searchGlobal()"
-                    v-model="timeRangeGlobal"
-                    type="datetimerange"
-                    :range-separator="$t('commons.search.timeRange')"
-                    :start-placeholder="$t('commons.search.timeStart')"
-                    :end-placeholder="$t('commons.search.timeEnd')"
-                    :shortcuts="shortcuts"
-                    style="max-width: 360px; width: 100%; margin-left: 10px"
-                    :size="mobile ? 'small' : 'default'"
-                ></el-date-picker>
+                <div :class="mobile ? 'flx-wrap' : 'flx-justify-between'">
+                    <el-date-picker
+                        @change="searchGlobal()"
+                        v-model="timeRangeGlobal"
+                        type="datetimerange"
+                        :range-separator="$t('commons.search.timeRange')"
+                        :start-placeholder="$t('commons.search.timeStart')"
+                        :end-placeholder="$t('commons.search.timeEnd')"
+                        :shortcuts="shortcuts"
+                        style="max-width: 360px; width: 100%"
+                        :size="mobile ? 'small' : 'default'"
+                    ></el-date-picker>
+                </div>
             </el-card>
         </div>
         <el-row :gutter="20" style="margin-top: 20px">
