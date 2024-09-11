@@ -2,29 +2,34 @@
     <div>
         <LayoutContent v-loading="loading" :title="$t('setting.safe')" :divider="true">
             <template #main>
-                <el-form :model="form" v-loading="loading">
-                    <div class="w-full sm:w-1/2 text-[#646a73]">
-                        <div class="flex flex-col gap-2 sm:grid sm:grid-cols-[1fr_5fr] sm:gap-6">
-                            <label for="serverPort">
-                                {{ $t('setting.panelPort') }}
-                            </label>
-                            <el-input disabled v-model.number="form.serverPort">
-                                <template #append>
-                                    <el-button @click="onChangePort" icon="Setting">
-                                        {{ $t('commons.button.set') }}
-                                    </el-button>
-                                </template>
-                            </el-input>
-                            <label for="bindAddress">{{ $t('setting.bindInfo') }}</label>
-                            <el-input disabled v-model="form.bindAddress">
-                                <template #append>
-                                    <el-button @click="onChangeBind" icon="Setting">
-                                        {{ $t('commons.button.set') }}
-                                    </el-button>
-                                </template>
-                            </el-input>
-                            <label>{{ $t('setting.entrance') }}</label>
-                            <span class="flex flex-col gap-4">
+                <el-form
+                    :model="form"
+                    v-loading="loading"
+                    :label-position="mobile ? 'top' : 'left'"
+                    label-width="150px"
+                >
+                    <el-row>
+                        <el-col :span="1"><br /></el-col>
+                        <el-col :xs="24" :sm="20" :md="15" :lg="12" :xl="12">
+                            <el-form-item :label="$t('setting.panelPort')" prop="serverPort">
+                                <el-input disabled v-model.number="form.serverPort">
+                                    <template #append>
+                                        <el-button @click="onChangePort" icon="Setting">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                            </el-form-item>
+                            <el-form-item :label="$t('setting.bindInfo')" prop="bindAddress">
+                                <el-input disabled v-model="form.bindAddress">
+                                    <template #append>
+                                        <el-button @click="onChangeBind" icon="Setting">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                            </el-form-item>
+                            <el-form-item :label="$t('setting.entrance')">
                                 <el-input
                                     type="password"
                                     disabled
@@ -45,17 +50,19 @@
                                     </template>
                                 </el-input>
                                 <span class="input-help">{{ $t('setting.entranceHelper') }}</span>
-                            </span>
-                            <label for="">{{ $t('setting.noAuthSetting') }}</label>
-                            <el-input disabled v-model="form.noAuthSetting">
-                                <template #append>
-                                    <el-button @click="onChangeResponse" icon="Setting">
-                                        {{ $t('commons.button.set') }}
-                                    </el-button>
-                                </template>
-                            </el-input>
-                            <label for="">{{ $t('setting.allowIPs') }}</label>
-                            <span class="flex flex-col gap-2">
+                            </el-form-item>
+
+                            <el-form-item :label="$t('setting.noAuthSetting')">
+                                <el-input disabled v-model="form.noAuthSetting">
+                                    <template #append>
+                                        <el-button @click="onChangeResponse" icon="Setting">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                            </el-form-item>
+
+                            <el-form-item :label="$t('setting.allowIPs')">
                                 <div style="width: 100%" v-if="form.allowIPs">
                                     <el-input
                                         type="textarea"
@@ -76,9 +83,9 @@
                                     </template>
                                 </el-input>
                                 <span class="input-help">{{ $t('setting.allowIPsHelper') }}</span>
-                            </span>
-                            <label for="">{{ $t('setting.bindDomain') }}</label>
-                            <span class="flex flex-col gap-2">
+                            </el-form-item>
+
+                            <el-form-item :label="$t('setting.bindDomain')">
                                 <el-input disabled v-if="form.bindDomain" v-model="form.bindDomain">
                                     <template #append>
                                         <el-button @click="onChangeBindDomain" icon="Setting">
@@ -94,9 +101,9 @@
                                     </template>
                                 </el-input>
                                 <span class="input-help">{{ $t('setting.bindDomainHelper') }}</span>
-                            </span>
-                            <label for="ssl">{{ $t('setting.panelSSL') }}</label>
-                            <span class="flex flex-col gap-2">
+                            </el-form-item>
+
+                            <el-form-item :label="$t('setting.panelSSL')" prop="ssl">
                                 <el-switch
                                     @change="handleSSL"
                                     v-model="form.ssl"
@@ -115,9 +122,9 @@
                                         </el-button>
                                     </div>
                                 </div>
-                            </span>
-                            <label for="expirationTime">{{ $t('setting.expirationTime') }}</label>
-                            <span class="flex flex-col gap-2">
+                            </el-form-item>
+
+                            <el-form-item :label="$t('setting.expirationTime')" prop="expirationTime">
                                 <el-input disabled v-model="form.expirationTime">
                                     <template #append>
                                         <el-button @click="onChangeExpirationTime" icon="Setting">
@@ -133,9 +140,8 @@
                                         {{ $t('setting.noneSetting') }}
                                     </span>
                                 </div>
-                            </span>
-                            <label for="complexityVerification">{{ $t('setting.complexity') }}</label>
-                            <span class="flex flex-col gap-2">
+                            </el-form-item>
+                            <el-form-item :label="$t('setting.complexity')" prop="complexityVerification">
                                 <el-switch
                                     @change="onSaveComplexity"
                                     v-model="form.complexityVerification"
@@ -145,9 +151,9 @@
                                 <span class="input-help">
                                     {{ $t('setting.complexityHelper') }}
                                 </span>
-                            </span>
-                            <label for="">{{ $t('setting.mfa') }}</label>
-                            <span class="flex flex-col gap-2">
+                            </el-form-item>
+
+                            <el-form-item :label="$t('setting.mfa')">
                                 <el-switch
                                     @change="handleMFA"
                                     v-model="form.mfaStatus"
@@ -157,9 +163,9 @@
                                 <span class="input-help">
                                     {{ $t('setting.mfaHelper') }}
                                 </span>
-                            </span>
-                        </div>
-                    </div>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
                 </el-form>
             </template>
         </LayoutContent>
@@ -177,7 +183,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, computed } from 'vue';
 import { ElForm, ElMessageBox } from 'element-plus';
 import PortSetting from '@/views/setting/safe/port/index.vue';
 import BindSetting from '@/views/setting/safe/bind/index.vue';
@@ -207,6 +213,10 @@ const sslRef = ref();
 const sslInfo = ref<Setting.SSLInfo>();
 const domainRef = ref();
 const allowIPsRef = ref();
+
+const mobile = computed(() => {
+    return globalStore.isMobile();
+});
 
 const form = reactive({
     serverPort: 9999,
