@@ -21,36 +21,32 @@
                 </div>
             </template>
             <template #search>
-                <el-select v-model="searchGroup" @change="search()" clearable class="p-w-200">
-                    <template #prefix>{{ $t('logs.resource') }}</template>
-                    <el-option :label="$t('commons.table.all')" value=""></el-option>
-                    <el-option :label="$t('logs.detail.apps')" value="apps"></el-option>
-                    <el-option :label="$t('logs.detail.websites')" value="websites"></el-option>
-                    <el-option :label="$t('logs.detail.runtimes')" value="runtimes"></el-option>
-                    <el-option :label="$t('logs.detail.databases')" value="databases"></el-option>
-                    <el-option :label="$t('logs.detail.containers')" value="containers"></el-option>
-                    <el-option :label="$t('logs.detail.cronjobs')" value="cronjobs"></el-option>
-                    <el-option :label="$t('logs.detail.files')" value="files"></el-option>
-                    <el-option :label="$t('logs.detail.hosts')" value="hosts"></el-option>
-                    <el-option :label="$t('logs.detail.process')" value="process"></el-option>
-                    <el-option :label="$t('logs.detail.logs')" value="logs"></el-option>
-                    <el-option :label="$t('logs.detail.settings')" value="settings"></el-option>
-                </el-select>
-                <el-select
-                    v-model="searchStatus"
-                    @change="search()"
-                    clearable
-                    style="margin-left: 10px"
-                    class="p-w-200"
-                >
-                    <template #prefix>{{ $t('commons.table.status') }}</template>
-                    <el-option :label="$t('commons.table.all')" value=""></el-option>
-                    <el-option :label="$t('commons.status.success')" value="Success"></el-option>
-                    <el-option :label="$t('commons.status.failed')" value="Failed"></el-option>
-                </el-select>
-                <el-button type="primary" style="margin-left: 10px" plain @click="onClean()">
-                    {{ $t('logs.deleteLogs') }}
-                </el-button>
+                <div class="flex flex-wrap gap-2 sm:gap-4 items-center">
+                    <el-select v-model="searchGroup" @change="search()" clearable class="p-w-200">
+                        <template #prefix>{{ $t('logs.resource') }}</template>
+                        <el-option :label="$t('commons.table.all')" value=""></el-option>
+                        <el-option :label="$t('logs.detail.apps')" value="apps"></el-option>
+                        <el-option :label="$t('logs.detail.websites')" value="websites"></el-option>
+                        <el-option :label="$t('logs.detail.runtimes')" value="runtimes"></el-option>
+                        <el-option :label="$t('logs.detail.databases')" value="databases"></el-option>
+                        <el-option :label="$t('logs.detail.containers')" value="containers"></el-option>
+                        <el-option :label="$t('logs.detail.cronjobs')" value="cronjobs"></el-option>
+                        <el-option :label="$t('logs.detail.files')" value="files"></el-option>
+                        <el-option :label="$t('logs.detail.hosts')" value="hosts"></el-option>
+                        <el-option :label="$t('logs.detail.process')" value="process"></el-option>
+                        <el-option :label="$t('logs.detail.logs')" value="logs"></el-option>
+                        <el-option :label="$t('logs.detail.settings')" value="settings"></el-option>
+                    </el-select>
+                    <el-select v-model="searchStatus" @change="search()" clearable class="p-w-200">
+                        <template #prefix>{{ $t('commons.table.status') }}</template>
+                        <el-option :label="$t('commons.table.all')" value=""></el-option>
+                        <el-option :label="$t('commons.status.success')" value="Success"></el-option>
+                        <el-option :label="$t('commons.status.failed')" value="Failed"></el-option>
+                    </el-select>
+                    <el-button type="primary" plain @click="onClean()">
+                        {{ $t('logs.deleteLogs') }}
+                    </el-button>
+                </div>
             </template>
             <template #main>
                 <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
