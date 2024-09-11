@@ -461,11 +461,6 @@ const onLoadCurrentInfo = async (scope: string) => {
             res.data.netBytesSent - currentInfo.value.netBytesSent > 0
                 ? Number(((res.data.netBytesSent - currentInfo.value.netBytesSent) / 1024 / timeInterval).toFixed(2))
                 : 0;
-        console.log('value', res.data.netBytesSent - currentInfo.value.netBytesSent);
-        console.log(
-            'number',
-            Number(((res.data.netBytesSent - currentInfo.value.netBytesSent) / 1024 / timeInterval).toFixed(2)),
-        );
         netBytesSents.value.push(currentChartInfo.netBytesSent);
 
         if (netBytesSents.value.length > 20) {
