@@ -314,3 +314,13 @@ var AddAlertMenu = &gormigrate.Migration{
 		return tx.Model(&model.Setting{}).Where("key", "XpackHideMenu").Updates(map[string]interface{}{"value": string(data)}).Error
 	},
 }
+
+var AddComposeColumn = &gormigrate.Migration{
+	ID: "20240906-add-compose-command",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.Compose{}); err != nil {
+			return err
+		}
+		return nil
+	},
+}

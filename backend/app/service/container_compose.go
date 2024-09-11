@@ -52,6 +52,20 @@ func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface
 	}
 
 	composeCreatedByLocal, _ := composeRepo.ListRecord()
+
+	composeLocalMap := make(map[string]dto.ComposeInfo)
+	for _, localItem := range composeCreatedByLocal {
+		composeItemLocal := dto.ComposeInfo{
+			ContainerNumber: 0,
+			CreatedAt:       localItem.CreatedAt.Format(constant.DateTimeLayout),
+			ConfigFile:      localItem.Path,
+			Workdir:         strings.TrimSuffix(localItem.Path, "/docker-compose.yml"),
+		}
+		composeItemLocal.CreatedBy = "1Panel"
+		composeItemLocal.Path = localItem.Path
+		composeLocalMap[localItem.Name] = composeItemLocal
+	}
+
 	composeMap := make(map[string]dto.ComposeInfo)
 	for _, container := range list {
 		if name, ok := container.Labels[composeProjectLabel]; ok {
@@ -95,12 +109,24 @@ func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface
 			}
 		}
 	}
-	for _, item := range composeCreatedByLocal {
-		if err := composeRepo.DeleteRecord(commonRepo.WithByID(item.ID)); err != nil {
-			global.LOG.Error(err)
+
+	mergedMap := make(map[string]dto.ComposeInfo)
+	for key, localItem := range composeLocalMap {
+		mergedMap[key] = localItem
+	}
+	for key, item := range composeMap {
+		if existingItem, exists := mergedMap[key]; exists {
+			if item.ContainerNumber > 0 {
+				if existingItem.ContainerNumber <= 0 {
+					mergedMap[key] = item
+				}
+			}
+		} else {
+			mergedMap[key] = item
 		}
 	}
-	for key, value := range composeMap {
+
+	for key, value := range mergedMap {
 		value.Name = key
 		records = append(records, value)
 	}
@@ -186,7 +212,7 @@ func (u *ContainerService) CreateCompose(req dto.ComposeCreate) (string, error) 
 			return
 		}
 		global.LOG.Infof("docker-compose up %s successful!", req.Name)
-		_ = composeRepo.CreateRecord(&model.Compose{Name: req.Name})
+		_ = composeRepo.CreateRecord(&model.Compose{Name: req.Name, Path: req.Path})
 		_, _ = file.WriteString("docker-compose up successful!")
 	}()
 
@@ -200,14 +226,27 @@ func (u *ContainerService) ComposeOperation(req dto.ComposeOperation) error {
 	if _, err := os.Stat(req.Path); err != nil {
 		return fmt.Errorf("load file with path %s failed, %v", req.Path, err)
 	}
-	if stdout, err := compose.Operate(req.Path, req.Operation); err != nil {
-		return errors.New(string(stdout))
+	if req.Operation == "up" {
+		if stdout, err := compose.Up(req.Path); err != nil {
+			return errors.New(string(stdout))
+		}
+	} else {
+		if stdout, err := compose.Operate(req.Path, req.Operation); err != nil {
+			return errors.New(string(stdout))
+		}
 	}
 	global.LOG.Infof("docker-compose %s %s successful", req.Operation, req.Name)
 	if req.Operation == "down" {
-		_ = composeRepo.DeleteRecord(commonRepo.WithByName(req.Name))
 		if req.WithFile {
+			_ = composeRepo.DeleteRecord(commonRepo.WithByName(req.Name))
 			_ = os.RemoveAll(path.Dir(req.Path))
+		} else {
+			composeItem, _ := composeRepo.GetRecord(commonRepo.WithByName(req.Name))
+			if composeItem.Path == "" {
+				upMap := make(map[string]interface{})
+				upMap["path"] = req.Path
+				_ = composeRepo.UpdateRecord(req.Name, upMap)
+			}
 		}
 	}
 
