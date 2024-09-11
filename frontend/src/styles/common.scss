@@ -181,14 +181,13 @@ html {
 
 .mask-prompt {
     position: absolute;
-    z-index: 9998;
+    z-index: 1;
     top: 220px;
     left: 45%;
     transform: translate(-50%, -50%);
     width: 400px;
     text-align: center;
     font-size: 14px;
-    z-index: 1;
     .bt {
         margin-top: -2px;
     }
