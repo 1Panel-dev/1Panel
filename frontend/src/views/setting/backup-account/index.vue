@@ -2,31 +2,29 @@
     <div>
         <LayoutContent :title="$t('commons.button.backup')">
             <template #main>
-                <el-form label-width="130px" :v-key="refresh">
-                    <el-row :gutter="20">
-                        <el-col :span="24">
-                            <div class="flx-justify-between">
-                                <span class="flx-align-center">
-                                    <svg-icon class="card-logo" iconName="p-file-folder"></svg-icon>
-                                    <span class="card-title">&nbsp;{{ $t('setting.LOCAL') }}</span>
-                                </span>
-                                <div style="float: right">
-                                    <el-button round @click="onOpenDialog('edit', 'LOCAL', localData)">
-                                        {{ $t('commons.button.edit') }}
-                                    </el-button>
-                                </div>
+                <el-form :v-key="refresh">
+                    <div class="flex flex-col gpa-4">
+                        <div class="flex flex-row justify-between items-center">
+                            <div class="flex gap-1 items-center">
+                                <svg-icon class="card-logo" iconName="p-file-folder"></svg-icon>
+                                <span class="card-title">&nbsp;{{ $t('setting.LOCAL') }}</span>
                             </div>
-                            <el-divider class="divider" />
-                            <div style="margin-left: 20px">
-                                <el-form-item :label="$t('setting.backupDir')">
-                                    {{ localData.varsJson['dir'] }}
-                                </el-form-item>
-                                <el-form-item :label="$t('commons.table.createdAt')">
-                                    {{ dateFormat(0, 0, localData.createdAt) }}
-                                </el-form-item>
+                            <div>
+                                <el-button round @click="onOpenDialog('edit', 'LOCAL', localData)">
+                                    {{ $t('commons.button.edit') }}
+                                </el-button>
                             </div>
-                        </el-col>
-                    </el-row>
+                        </div>
+                        <el-divider class="divider" />
+                        <div class="grid gird-cols-2 items-center justify-center">
+                            <el-form-item :label="$t('setting.backupDir')">
+                                {{ localData.varsJson['dir'] }}
+                            </el-form-item>
+                            <el-form-item :label="$t('commons.table.createdAt')">
+                                {{ dateFormat(0, 0, localData.createdAt) }}
+                            </el-form-item>
+                        </div>
+                    </div>
                 </el-form>
 
                 <div class="common-div">
