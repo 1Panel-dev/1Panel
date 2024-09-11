@@ -20,11 +20,11 @@ func (t TarGzArchiver) Extract(filePath, dstDir string, secret string) error {
 	var err error
 	commands := ""
 	if len(secret) != 0 {
-		extraCmd := "openssl enc -d -aes-256-cbc -k '" + secret + "' -in " + filePath + " | "
-		commands = fmt.Sprintf("%s tar -zxvf - -C %s", extraCmd, dstDir+" > /dev/null 2>&1")
+		extraCmd := fmt.Sprintf("openssl enc -d -aes-256-cbc -k '%s' -in '%s' | ", secret, filePath)
+		commands = fmt.Sprintf("%s tar -zxvf - -C '%s' > /dev/null 2>&1", extraCmd, dstDir)
 		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" %s ", secret), "******"))
 	} else {
-		commands = fmt.Sprintf("tar -zxvf %s %s", filePath+" -C ", dstDir+" > /dev/null 2>&1")
+		commands = fmt.Sprintf("tar -zxvf '%s' -C '%s' > /dev/null 2>&1", filePath, dstDir)
 		global.LOG.Debug(commands)
 	}
 	if err = cmd.ExecCmd(commands); err != nil {
@@ -34,27 +34,25 @@ func (t TarGzArchiver) Extract(filePath, dstDir string, secret string) error {
 }
 
 func (t TarGzArchiver) Compress(sourcePaths []string, dstFile string, secret string) error {
-	var err error
-	path := ""
-	itemDir := ""
+	var itemDirs []string
 	for _, item := range sourcePaths {
-		itemDir += filepath.Base(item) + " "
+		itemDirs = append(itemDirs, fmt.Sprintf("\"%s\"", filepath.Base(item)))
 	}
-	aheadDir := dstFile[:strings.LastIndex(dstFile, "/")]
+	itemDir := strings.Join(itemDirs, " ")
+	aheadDir := filepath.Dir(sourcePaths[0])
 	if len(aheadDir) == 0 {
 		aheadDir = "/"
 	}
-	path += fmt.Sprintf("- -C %s %s", aheadDir, itemDir)
 	commands := ""
 	if len(secret) != 0 {
-		extraCmd := "| openssl enc -aes-256-cbc -salt -k '" + secret + "' -out"
-		commands = fmt.Sprintf("tar -zcf %s %s %s", path, extraCmd, dstFile)
+		extraCmd := fmt.Sprintf("| openssl enc -aes-256-cbc -salt -k '%s' -out '%s'", secret, dstFile)
+		commands = fmt.Sprintf("tar -zcf - -C \"%s\" %s %s", aheadDir, itemDir, extraCmd)
 		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" %s ", secret), "******"))
 	} else {
-		commands = fmt.Sprintf("tar -zcf %s -C %s %s", dstFile, aheadDir, itemDir)
+		commands = fmt.Sprintf("tar -zcf \"%s\" -C \"%s\" %s", dstFile, aheadDir, itemDir)
 		global.LOG.Debug(commands)
 	}
-	if err = cmd.ExecCmd(commands); err != nil {
+	if err := cmd.ExecCmd(commands); err != nil {
 		return err
 	}
 	return nil
