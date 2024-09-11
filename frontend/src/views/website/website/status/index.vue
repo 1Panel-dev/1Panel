@@ -1,20 +1,22 @@
 <template>
     <div class="app-status">
         <el-card>
-            <div>
-                <el-tag effect="dark" type="success">{{ props.primaryDomain }}</el-tag>
-                <span class="status-content">
-                    <Status class="span-font" :key="props.status" :status="props.status"></Status>
-                </span>
-                <span class="status-content">
-                    <el-tag type="info">
-                        {{ $t('website.expireDate') }}:
-                        <span v-if="isEver(props.expireDate)">
-                            {{ $t('website.neverExpire') }}
-                        </span>
-                        <span v-else>{{ dateFormatSimple(props.expireDate) }}</span>
-                    </el-tag>
-                </span>
+            <div class="flex w-full flex-col gap-4 md:flex-row">
+                <div class="flex flex-wrap gap-4">
+                    <el-tag effect="dark" type="success">{{ props.primaryDomain }}</el-tag>
+                    <span>
+                        <Status class="span-font" :key="props.status" :status="props.status"></Status>
+                    </span>
+                    <span>
+                        <el-tag type="info">
+                            {{ $t('website.expireDate') }}:
+                            <span v-if="isEver(props.expireDate)">
+                                {{ $t('website.neverExpire') }}
+                            </span>
+                            <span v-else>{{ dateFormatSimple(props.expireDate) }}</span>
+                        </el-tag>
+                    </span>
+                </div>
             </div>
         </el-card>
     </div>
