@@ -182,7 +182,7 @@ html {
 .mask-prompt {
     position: absolute;
     z-index: 1;
-    top: 220px;
+    top: 320px;
     left: 45%;
     transform: translate(-50%, -50%);
     width: 400px;
@@ -386,7 +386,8 @@ html {
 }
 
 .router-button {
-    margin-right: 20px;
+    margin-right: 30px;
+    padding: 10px;
 }
 
 .text-parent {

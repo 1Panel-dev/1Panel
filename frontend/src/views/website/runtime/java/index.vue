@@ -83,11 +83,12 @@
                         fix
                     />
                     <fu-table-operations
-                        :ellipsis="10"
+                        :ellipsis="mobile ? 0 : 3"
                         width="300px"
                         :buttons="buttons"
+                        :min-width="mobile ? 'auto' : 200"
+                        :fixed="mobile ? false : 'right'"
                         :label="$t('commons.table.operate')"
-                        fixed="right"
                         fix
                     />
                 </ComplexTable>
@@ -102,7 +103,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, reactive, ref } from 'vue';
+import { onMounted, onUnmounted, reactive, ref, computed } from 'vue';
 import { Runtime } from '@/api/interface/runtime';
 import { OperateRuntime, RuntimeDeleteCheck, SearchRuntimes, SyncRuntime } from '@/api/modules/runtime';
 import { dateFormat } from '@/utils/util';
@@ -119,6 +120,7 @@ import AppResources from '@/views/website/runtime/php/check/index.vue';
 import { ElMessageBox } from 'element-plus';
 import { containerPrune } from '@/api/modules/container';
 import { MsgSuccess } from '@/utils/message';
+import { GlobalStore } from '@/store';
 
 let timer: NodeJS.Timer | null = null;
 const loading = ref(false);
@@ -128,6 +130,11 @@ const deleteRef = ref();
 const dialogPortJumpRef = ref();
 const composeLogRef = ref();
 const checkRef = ref();
+
+const globalStore = GlobalStore();
+const mobile = computed(() => {
+    return globalStore.isMobile();
+});
 
 const paginationConfig = reactive({
     cacheSizeKey: 'runtime-page-size',

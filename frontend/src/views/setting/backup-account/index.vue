@@ -16,7 +16,7 @@
                             </div>
                         </div>
                         <el-divider class="divider" />
-                        <div class="grid gird-cols-2 items-center justify-center">
+                        <div class="grid gird-cols-2 items-center ml-5">
                             <el-form-item :label="$t('setting.backupDir')">
                                 {{ localData.varsJson['dir'] }}
                             </el-form-item>
@@ -506,6 +506,7 @@ const localData = ref<Backup.BackupInfo>({
     type: 'LOCAL',
     accessKey: '',
     bucket: '',
+    bucketInput: false,
     credential: '',
     backupPath: '',
     vars: '',
@@ -519,6 +520,7 @@ const ossData = ref<Backup.BackupInfo>({
     type: 'OSS',
     accessKey: '',
     bucket: '',
+    bucketInput: false,
     credential: '',
     backupPath: '',
     vars: '',
@@ -533,6 +535,7 @@ const minioData = ref<Backup.BackupInfo>({
     type: 'MINIO',
     accessKey: '',
     bucket: '',
+    bucketInput: false,
     credential: '',
     backupPath: '',
     vars: '',
@@ -547,6 +550,7 @@ const sftpData = ref<Backup.BackupInfo>({
     type: 'SFTP',
     accessKey: '',
     bucket: '',
+    bucketInput: false,
     credential: '',
     backupPath: '',
     vars: '',
@@ -561,6 +565,7 @@ const webDAVData = ref<Backup.BackupInfo>({
     type: 'WebDAV',
     accessKey: '',
     bucket: '',
+    bucketInput: false,
     credential: '',
     backupPath: '',
     vars: '',
@@ -575,6 +580,7 @@ const oneDriveData = ref<Backup.BackupInfo>({
     type: 'OneDrive',
     accessKey: '',
     bucket: '',
+    bucketInput: false,
     credential: '',
     backupPath: '',
     vars: '',
@@ -590,6 +596,7 @@ const s3Data = ref<Backup.BackupInfo>({
     type: 'S3',
     accessKey: '',
     bucket: '',
+    bucketInput: false,
     credential: '',
     backupPath: '',
     vars: '',
@@ -605,6 +612,7 @@ const cosData = ref<Backup.BackupInfo>({
     type: 'COS',
     accessKey: '',
     bucket: '',
+    bucketInput: false,
     credential: '',
     backupPath: '',
     vars: '',
@@ -620,6 +628,7 @@ const kodoData = ref<Backup.BackupInfo>({
     type: 'KODO',
     accessKey: '',
     bucket: '',
+    bucketInput: false,
     credential: '',
     backupPath: '',
     vars: '',
