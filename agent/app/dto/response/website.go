@@ -13,6 +13,7 @@ type WebsiteDTO struct {
 	SitePath      string `json:"sitePath"`
 	AppName       string `json:"appName"`
 	RuntimeName   string `json:"runtimeName"`
+	RuntimeType   string `json:"runtimeType"`
 	SiteDir       string `json:"siteDir"`
 }
 

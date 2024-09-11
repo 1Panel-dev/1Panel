@@ -70,5 +70,7 @@ func (a *WebsiteRouter) InitRouter(Router *gin.RouterGroup) {
 		websiteRouter.POST("/lbs/del", baseApi.DeleteLoadBalance)
 		websiteRouter.POST("/lbs/update", baseApi.UpdateLoadBalance)
 		websiteRouter.POST("/lbs/file", baseApi.UpdateLoadBalanceFile)
+
+		websiteRouter.POST("/php/version", baseApi.ChangePHPVersion)
 	}
 }

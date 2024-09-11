@@ -27,9 +27,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/spf13/afero"
 
-	"github.com/1Panel-dev/1Panel/agent/utils/compose"
-	"github.com/1Panel-dev/1Panel/agent/utils/env"
-
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
@@ -532,13 +529,18 @@ func (w WebsiteService) GetWebsite(id uint) (response.WebsiteDTO, error) {
 		return res, err
 	}
 	res.Website = website
-
-	sitePath := GetSitePath(website, SiteDir)
-
 	res.ErrorLogPath = GetSitePath(website, SiteErrorLog)
 	res.AccessLogPath = GetSitePath(website, SiteAccessLog)
-	res.SitePath = sitePath
+	res.SitePath = GetSitePath(website, SiteDir)
 	res.SiteDir = website.SiteDir
+	if website.Type == constant.Runtime {
+		runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(website.RuntimeID))
+		if err != nil {
+			return res, err
+		}
+		res.RuntimeType = runtime.Type
+		res.RuntimeName = runtime.Name
+	}
 	return res, nil
 }
 
@@ -1319,108 +1321,61 @@ func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) error
 	if err != nil {
 		return err
 	}
-	runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(req.RuntimeID))
+	if website.Type == constant.Runtime {
+		oldRuntime, err := runtimeRepo.GetFirst(commonRepo.WithByID(website.RuntimeID))
+		if err != nil {
+			return err
+		}
+		if oldRuntime.Resource == constant.ResourceLocal {
+			return buserr.New("ErrPHPResource")
+		}
+	}
+	configPath := GetSitePath(website, SiteConf)
+	nginxContent, err := files.NewFileOp().GetContent(configPath)
 	if err != nil {
 		return err
 	}
-	oldRuntime, err := runtimeRepo.GetFirst(commonRepo.WithByID(website.RuntimeID))
+	config, err := parser.NewStringParser(string(nginxContent)).Parse()
 	if err != nil {
 		return err
 	}
-	if runtime.Resource == constant.ResourceLocal || oldRuntime.Resource == constant.ResourceLocal {
-		return buserr.New("ErrPHPResource")
+	servers := config.FindServers()
+	if len(servers) == 0 {
+		return errors.New("nginx config is not valid")
 	}
-	appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
+	server := servers[0]
+
+	if req.RuntimeID > 0 {
+		runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(req.RuntimeID))
+		if err != nil {
+			return err
+		}
+		if runtime.Resource == constant.ResourceLocal {
+			return buserr.New("ErrPHPResource")
+		}
+		website.RuntimeID = req.RuntimeID
+		phpProxy := fmt.Sprintf("127.0.0.1:%d", runtime.Port)
+		website.Proxy = phpProxy
+		server.UpdatePHPProxy([]string{website.Proxy}, "")
+		website.Type = constant.Runtime
+	} else {
+		website.RuntimeID = 0
+		website.Type = constant.Static
+		website.Proxy = ""
+		server.RemoveDirective("location", []string{"~", "[^/]\\.php(/|$)"})
+	}
+
+	config.FilePath = configPath
+	if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
+		return err
+	}
+	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
 	if err != nil {
 		return err
 	}
-	appDetail, err := appDetailRepo.GetFirst(commonRepo.WithByID(runtime.AppDetailID))
-	if err != nil {
+	if err = nginxCheckAndReload(string(nginxContent), configPath, nginxInstall.ContainerName); err != nil {
 		return err
 	}
-
-	envs := make(map[string]interface{})
-	if err = json.Unmarshal([]byte(appInstall.Env), &envs); err != nil {
-		return err
-	}
-	if out, err := compose.Down(appInstall.GetComposePath()); err != nil {
-		if out != "" {
-			return errors.New(out)
-		}
-		return err
-	}
-
-	var (
-		busErr          error
-		fileOp          = files.NewFileOp()
-		envPath         = appInstall.GetEnvPath()
-		composePath     = appInstall.GetComposePath()
-		confDir         = path.Join(appInstall.GetPath(), "conf")
-		backupConfDir   = path.Join(appInstall.GetPath(), "conf_bak")
-		fpmConfDir      = path.Join(confDir, "php-fpm.conf")
-		phpDir          = path.Join(constant.RuntimeDir, runtime.Type, runtime.Name, "php")
-		oldFmContent, _ = fileOp.GetContent(fpmConfDir)
-		newComposeByte  []byte
-	)
-	envParams := make(map[string]string, len(envs))
-	handleMap(envs, envParams)
-	envParams["IMAGE_NAME"] = runtime.Image
-	defer func() {
-		if busErr != nil {
-			envParams["IMAGE_NAME"] = oldRuntime.Image
-			_ = env.Write(envParams, envPath)
-			_ = fileOp.WriteFile(composePath, strings.NewReader(appInstall.DockerCompose), 0775)
-			if fileOp.Stat(backupConfDir) {
-				_ = fileOp.DeleteDir(confDir)
-				_ = fileOp.Rename(backupConfDir, confDir)
-			}
-		}
-	}()
-
-	if busErr = env.Write(envParams, envPath); busErr != nil {
-		return busErr
-	}
-
-	newComposeByte, busErr = changeServiceName(appDetail.DockerCompose, appInstall.ServiceName)
-	if busErr != nil {
-		return err
-	}
-
-	if busErr = fileOp.WriteFile(composePath, bytes.NewReader(newComposeByte), 0775); busErr != nil {
-		return busErr
-	}
-	if !req.RetainConfig {
-		if busErr = fileOp.Rename(confDir, backupConfDir); busErr != nil {
-			return busErr
-		}
-		_ = fileOp.CreateDir(confDir, 0755)
-		if busErr = fileOp.CopyFile(path.Join(phpDir, "php-fpm.conf"), confDir); busErr != nil {
-			return busErr
-		}
-		if busErr = fileOp.CopyFile(path.Join(phpDir, "php.ini"), confDir); busErr != nil {
-			_ = fileOp.WriteFile(fpmConfDir, bytes.NewReader(oldFmContent), 0775)
-			return busErr
-		}
-	}
-
-	if out, err := compose.Up(appInstall.GetComposePath()); err != nil {
-		if out != "" {
-			busErr = errors.New(out)
-			return busErr
-		}
-		busErr = err
-		return busErr
-	}
-
-	_ = fileOp.DeleteDir(backupConfDir)
-
-	appInstall.AppDetailId = runtime.AppDetailID
-	appInstall.AppId = appDetail.AppId
-	appInstall.Version = appDetail.Version
-	appInstall.DockerCompose = string(newComposeByte)
-
-	_ = appInstallRepo.Save(context.Background(), &appInstall)
-	website.RuntimeID = req.RuntimeID
 	return websiteRepo.Save(context.Background(), &website)
 }
 

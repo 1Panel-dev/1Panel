@@ -27,16 +27,12 @@
                 <el-button type="primary" :plain="index !== 'resource'" @click="changeTab('resource')">
                     {{ $t('website.source') }}
                 </el-button>
-                <el-button type="primary" v-if="configPHP" :plain="index !== 'php'" @click="changeTab('php')">
-                    PHP
-                </el-button>
             </template>
             <template #main>
                 <MainDiv :heightDiff="320">
-                    <Basic :id="id" v-if="index === 'basic'"></Basic>
+                    <Basic :website="website" v-if="index === 'basic'"></Basic>
                     <Log :id="id" v-if="index === 'log'"></Log>
                     <Resource :id="id" v-if="index === 'resource'"></Resource>
-                    <PHP :id="id" v-if="index === 'php'"></PHP>
                 </MainDiv>
             </template>
         </LayoutContent>
@@ -48,7 +44,6 @@ import { onMounted, ref, watch } from 'vue';
 import Basic from './basic/index.vue';
 import Resource from './resource/index.vue';
 import Log from './log/index.vue';
-import PHP from './php/index.vue';
 import router from '@/routers';
 import WebsiteStatus from '@/views/website/website/status/index.vue';
 import { GetWebsite } from '@/api/modules/website';
@@ -65,10 +60,10 @@ const props = defineProps({
     },
 });
 
-let id = ref(0);
-let index = ref('basic');
-let website = ref<any>({});
-let loading = ref(false);
+const id = ref(0);
+const index = ref('basic');
+const website = ref<any>({});
+const loading = ref(false);
 const configPHP = ref(false);
 
 watch(index, (curr, old) => {

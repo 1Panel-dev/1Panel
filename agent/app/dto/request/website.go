@@ -182,9 +182,8 @@ type WebsiteDefaultUpdate struct {
 }
 
 type WebsitePHPVersionReq struct {
-	WebsiteID    uint `json:"websiteID" validate:"required"`
-	RuntimeID    uint `json:"runtimeID" validate:"required"`
-	RetainConfig bool `json:"retainConfig" `
+	WebsiteID uint `json:"websiteID" validate:"required"`
+	RuntimeID uint `json:"runtimeID"`
 }
 
 type WebsiteUpdateDir struct {
