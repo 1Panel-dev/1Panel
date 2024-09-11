@@ -35,6 +35,12 @@ type OsInfo struct {
 	DiskSize int64 `json:"diskSize"`
 }
 
+type DashboardReq struct {
+	Scope     string `json:"scope"`
+	IoOption  string `json:"ioOption"`
+	NetOption string `json:"netOption"`
+}
+
 type DashboardCurrent struct {
 	Uptime          uint64 `json:"uptime"`
 	TimeSinceUptime string `json:"timeSinceUptime"`

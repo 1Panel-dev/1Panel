@@ -2,6 +2,7 @@ package v1
 
 import (
 	"errors"
+	"github.com/1Panel-dev/1Panel/backend/app/dto"
 
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/constant"
@@ -55,25 +56,17 @@ func (b *BaseApi) LoadDashboardBaseInfo(c *gin.Context) {
 // @Tags Dashboard
 // @Summary Load dashboard current info
 // @Description 获取首页实时数据
-// @Accept json
-// @Param ioOption path string true "request"
-// @Param netOption path string true "request"
+// @Accept json、
+// @Param request body dto.DashboardReq true "request"
 // @Success 200 {object} dto.DashboardCurrent
 // @Security ApiKeyAuth
-// @Router /dashboard/current/:ioOption/:netOption [get]
+// @Router /dashboard/current [post]
 func (b *BaseApi) LoadDashboardCurrentInfo(c *gin.Context) {
-	ioOption, ok := c.Params.Get("ioOption")
-	if !ok {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error ioOption in path"))
+	var req dto.DashboardReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	netOption, ok := c.Params.Get("netOption")
-	if !ok {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error netOption in path"))
-		return
-	}
-
-	data := dashboardService.LoadCurrentInfo(ioOption, netOption)
+	data := dashboardService.LoadCurrentInfo(req)
 	helper.SuccessWithData(c, data)
 }
 

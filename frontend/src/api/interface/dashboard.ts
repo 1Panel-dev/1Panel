@@ -105,4 +105,10 @@ export namespace Dashboard {
         power: string;
         memoryUtil: string;
     }
+
+    export interface DashboardReq {
+        scope: string;
+        ioOption: string;
+        netOption: string;
+    }
 }
