@@ -159,7 +159,9 @@
                         />
                     </template>
                 </el-popover>
-                <span class="input-help">{{ computeSize(item.used) }} / {{ computeSize(item.total) }}</span>
+                <span class="input-help" v-if="chartsOption[`disk${index}`]">
+                    {{ computeSize(item.used) }} / {{ computeSize(item.total) }}
+                </span>
             </el-col>
         </template>
         <template v-for="(item, index) of currentInfo.gpuData" :key="index">
@@ -385,15 +387,15 @@ const acceptParams = (current: Dashboard.CurrentInfo, base: Dashboard.BaseInfo, 
                 data: formatNumber(Number(currentInfo.value.gpuData[i].gpuUtil.replaceAll(' %', ''))),
             };
         }
-        if (currentInfo.value.diskData.length + currentInfo.value.gpuData.length > 5) {
-            showMore.value = isInit ? false : showMore.value || false;
-        }
         currentInfo.value.xpuData = currentInfo.value.xpuData || [];
         for (let i = 0; i < currentInfo.value.xpuData.length; i++) {
             chartsOption.value['gpu' + i] = {
                 title: 'GPU-' + currentInfo.value.xpuData[i].deviceID,
                 data: formatNumber(Number(currentInfo.value.xpuData[i].memoryUtil.replaceAll('%', ''))),
             };
+        }
+        if (currentInfo.value.diskData.length + currentInfo.value.gpuData.length > 5) {
+            showMore.value = isInit ? false : showMore.value || false;
         }
     });
 };
