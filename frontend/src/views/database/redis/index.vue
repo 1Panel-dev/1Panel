@@ -2,9 +2,11 @@
     <div v-loading="loading">
         <div class="app-status" style="margin-top: 20px" v-if="currentDB && currentDB.from === 'remote'">
             <el-card>
-                <div>
-                    <el-tag style="float: left" effect="dark" type="success">Redis</el-tag>
-                    <el-tag class="status-content">{{ $t('app.version') }}: {{ currentDB?.version }}</el-tag>
+                <div class="flex w-full flex-col gap-4 md:flex-row">
+                    <div class="flex flex-wrap gap-4">
+                        <el-tag style="float: left" effect="dark" type="success">Redis</el-tag>
+                        <el-tag>{{ $t('app.version') }}: {{ currentDB?.version }}</el-tag>
+                    </div>
                 </div>
             </el-card>
         </div>

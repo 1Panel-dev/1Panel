@@ -2,33 +2,34 @@
     <div>
         <div class="app-status" style="margin-top: 20px">
             <el-card>
-                <div class="flex flex-row flex-wrap gap-2 sm:justify-between items-center">
-                    <div class="flex flex-row flex-wrap">
+                <div class="flex w-full flex-col gap-4 md:flex-row">
+                    <div class="flex flex-wrap gap-4">
                         <el-tag effect="dark" type="success">{{ baseInfo.name }}</el-tag>
-                        <el-tag round class="status-content" v-if="baseInfo.status === 'running'" type="success">
+                        <el-tag round v-if="baseInfo.status === 'running'" type="success">
                             {{ $t('commons.status.running') }}
                         </el-tag>
-                        <el-tag round class="status-content" v-if="baseInfo.status === 'not running'" type="info">
+                        <el-tag round v-if="baseInfo.status === 'not running'" type="info">
                             {{ $t('commons.status.stopped') }}
                         </el-tag>
-                        <el-tag class="status-content">{{ $t('app.version') }}: {{ baseInfo.version }}</el-tag>
+                        <el-tag>{{ $t('app.version') }}: {{ baseInfo.version }}</el-tag>
                     </div>
-                    <div class="flex flex-wrap items-center">
-                        <div v-if="baseInfo.status === 'running'">
-                            <el-button type="primary" @click="onOperate('stop')" link>
-                                {{ $t('commons.button.stop') }}
-                            </el-button>
-                        </div>
-                        <div v-if="baseInfo.status === 'not running'">
-                            <el-button type="primary" @click="onOperate('start')" link>
-                                {{ $t('commons.button.start') }}
-                            </el-button>
-                        </div>
+                    <div class="mt-0.5">
+                        <el-button type="primary" v-if="baseInfo.status === 'running'" @click="onOperate('stop')" link>
+                            {{ $t('commons.button.stop') }}
+                        </el-button>
+                        <el-button
+                            type="primary"
+                            v-if="baseInfo.status === 'not running'"
+                            @click="onOperate('start')"
+                            link
+                        >
+                            {{ $t('commons.button.start') }}
+                        </el-button>
                         <el-divider direction="vertical" />
                         <el-button type="primary" @click="onOperate('restart')" link>
                             {{ $t('container.restart') }}
                         </el-button>
-                        <div v-if="onPing !== 'None'">
+                        <span v-if="onPing !== 'None'">
                             <el-divider direction="vertical" />
                             <el-button type="primary" link>{{ $t('firewall.noPing') }}</el-button>
                             <el-switch
@@ -39,7 +40,7 @@
                                 @change="onPingOperate"
                                 v-model="onPing"
                             />
-                        </div>
+                        </span>
                     </div>
                 </div>
             </el-card>

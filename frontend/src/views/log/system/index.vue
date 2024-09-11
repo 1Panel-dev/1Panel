@@ -31,6 +31,7 @@
                 <LogFile
                     ref="logRef"
                     :config="logConfig"
+                    v-if="showLog"
                     :default-button="false"
                     v-model:loading="loading"
                     v-model:hasContent="hasContent"
