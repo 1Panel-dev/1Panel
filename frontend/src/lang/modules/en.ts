@@ -2129,8 +2129,7 @@ const message = {
         notKeep: 'Do not keep',
         redirectRoot: 'Redirect to the homepage',
         redirectHelper: '301 permanent redirection, 302 temporary redirection',
-        changePHPVersionWarn:
-            'Switching the PHP version will delete the original PHP container (the website code that has been mounted will not be lost), continue? ',
+        changePHPVersionWarn: 'This operation cannot be rolled back, do you want to continue?',
         changeVersion: 'Switch version',
         retainConfig: 'Whether to keep php-fpm.conf and php.ini files',
         runDirHelper2: 'Please ensure that the secondary running directory is under the index directory',
@@ -2187,6 +2186,7 @@ const message = {
         strategy: 'Strategy',
         strategyDown: 'Down',
         strategyBackup: 'Backup',
+        staticChangePHPHelper: 'Currently a static website, you can switch to a PHP website',
     },
     php: {
         short_open_tag: 'Short tag support',

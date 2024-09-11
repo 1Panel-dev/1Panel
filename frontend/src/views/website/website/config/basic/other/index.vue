@@ -24,7 +24,6 @@
                 <el-form-item prop="IPV6">
                     <el-checkbox v-model="form.IPV6" :label="$t('website.ipv6')" size="large" />
                 </el-form-item>
-
                 <el-form-item>
                     <el-button type="primary" @click="submit(websiteForm)" :disabled="loading">
                         {{ $t('commons.button.save') }}

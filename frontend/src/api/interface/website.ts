@@ -472,7 +472,6 @@ export namespace Website {
     export interface PHPVersionChange {
         websiteID: number;
         runtimeID: number;
-        retainConfig: boolean;
     }
 
     export interface DirConfig {

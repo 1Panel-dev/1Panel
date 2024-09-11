@@ -1984,7 +1984,7 @@ const message = {
         notKeep: '不保留',
         redirectRoot: '重定向到首页',
         redirectHelper: '301永久重定向，302临时重定向',
-        changePHPVersionWarn: '切换 PHP 版本会删除原有的 PHP 容器（不会丢失已经挂载的网站代码），是否继续？',
+        changePHPVersionWarn: '此操作不可回滚，是否继续',
         changeVersion: '切换版本',
         retainConfig: '是否保留 php-fpm.conf 和 php.ini 文件',
         runDirHelper2: '请确保二级运行目录位于 index 目录下',
@@ -2035,6 +2035,7 @@ const message = {
         strategy: '策略',
         strategyDown: '停用',
         strategyBackup: '备用',
+        staticChangePHPHelper: '当前为静态网站，可以切换为 PHP 网站',
     },
     php: {
         short_open_tag: '短标签支持',

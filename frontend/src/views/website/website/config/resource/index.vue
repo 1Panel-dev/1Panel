@@ -3,7 +3,6 @@
         <el-tab-pane :label="'OpenResty'" name="0">
             <Nginx :id="id" v-if="index == '0'"></Nginx>
         </el-tab-pane>
-      
     </el-tabs>
 </template>
 
@@ -12,7 +11,6 @@ import { GetRuntime } from '@/api/modules/runtime';
 import { GetWebsite } from '@/api/modules/website';
 import { computed, onMounted, ref } from 'vue';
 import Nginx from './nginx/index.vue';
-
 
 const props = defineProps({
     id: {

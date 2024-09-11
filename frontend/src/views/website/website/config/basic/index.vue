@@ -1,7 +1,7 @@
 <template>
-    <el-tabs tab-position="left" v-model="tabIndex">
+    <el-tabs tab-position="left" v-model="tabIndex" v-if="id > 0">
         <el-tab-pane :label="$t('website.domainConfig')">
-            <Domain :key="id" :id="id" v-if="tabIndex == '0' && id > 0"></Domain>
+            <Domain :key="id" :id="id" v-if="tabIndex == '0'"></Domain>
         </el-tab-pane>
         <el-tab-pane :label="$t('website.sitePath')">
             <SitePath :id="id" v-if="tabIndex == '1'"></SitePath>
@@ -36,6 +36,12 @@
         <el-tab-pane :label="$t('website.other')">
             <Other :id="id" v-if="tabIndex == '11'"></Other>
         </el-tab-pane>
+        <el-tab-pane
+            :label="'PHP'"
+            v-if="(website.type === 'runtime' && website.runtimeType === 'php') || website.type === 'static'"
+        >
+            <PHP :website="website" v-if="tabIndex == '12'"></PHP>
+        </el-tab-pane>
     </el-tabs>
 </template>
 
@@ -54,15 +60,15 @@ import AuthBasic from './auth-basic/index.vue';
 import AntiLeech from './anti-Leech/index.vue';
 import Redirect from './redirect/index.vue';
 import LoadBalance from './load-balance/index.vue';
+import PHP from './php/index.vue';
 
 const props = defineProps({
-    id: {
-        type: Number,
-        default: -1,
+    website: {
+        type: Object,
     },
 });
 const id = computed(() => {
-    return props.id;
+    return props.website.id;
 });
 const tabIndex = ref('0');
 
