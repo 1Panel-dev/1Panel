@@ -53,28 +53,22 @@
         <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center">
             <el-popover placement="bottom" :width="160" trigger="hover" v-if="chartsOption['memory']">
                 <el-tag style="font-weight: 500">{{ $t('home.mem') }}:</el-tag>
-                <el-tag class="tagClass">
-                    {{ $t('home.total') }}: {{ formatNumber(currentInfo.memoryTotal / 1024 / 1024) }} MB
-                </el-tag>
-                <el-tag class="tagClass">
-                    {{ $t('home.used') }}: {{ formatNumber(currentInfo.memoryUsed / 1024 / 1024) }} MB
-                </el-tag>
-                <el-tag class="tagClass">
-                    {{ $t('home.free') }}: {{ formatNumber(currentInfo.memoryAvailable / 1024 / 1024) }} MB
-                </el-tag>
+                <el-tag class="tagClass">{{ $t('home.total') }}: {{ computeSize(currentInfo.memoryTotal) }}</el-tag>
+                <el-tag class="tagClass">{{ $t('home.used') }}: {{ computeSize(currentInfo.memoryUsed) }}</el-tag>
+                <el-tag class="tagClass">{{ $t('home.free') }}: {{ computeSize(currentInfo.memoryAvailable) }}</el-tag>
                 <el-tag class="tagClass">
                     {{ $t('home.percent') }}: {{ formatNumber(currentInfo.memoryUsedPercent) }}%
                 </el-tag>
                 <div v-if="currentInfo.swapMemoryTotal" class="mt-2">
                     <el-tag style="font-weight: 500">{{ $t('home.swapMem') }}:</el-tag>
                     <el-tag class="tagClass">
-                        {{ $t('home.total') }}: {{ formatNumber(currentInfo.swapMemoryTotal / 1024 / 1024) }} MB
+                        {{ $t('home.total') }}: {{ computeSize(currentInfo.swapMemoryTotal) }}
                     </el-tag>
                     <el-tag class="tagClass">
-                        {{ $t('home.used') }}: {{ formatNumber(currentInfo.swapMemoryUsed / 1024 / 1024) }} MB
+                        {{ $t('home.used') }}: {{ computeSize(currentInfo.swapMemoryUsed) }}
                     </el-tag>
                     <el-tag class="tagClass">
-                        {{ $t('home.free') }}: {{ formatNumber(currentInfo.swapMemoryAvailable / 1024 / 1024) }} MB
+                        {{ $t('home.free') }}: {{ computeSize(currentInfo.swapMemoryAvailable) }}
                     </el-tag>
                     <el-tag class="tagClass">
                         {{ $t('home.percent') }}: {{ formatNumber(currentInfo.swapMemoryUsedPercent) }}%
@@ -91,8 +85,7 @@
                 </template>
             </el-popover>
             <span class="input-help">
-                ( {{ formatNumber(currentInfo.memoryUsed / 1024 / 1024) }} /
-                {{ formatNumber(currentInfo.memoryTotal / 1024 / 1024) }} ) MB
+                {{ computeSize(currentInfo.memoryUsed) }} / {{ computeSize(currentInfo.memoryTotal) }}
             </span>
         </el-col>
         <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center">
