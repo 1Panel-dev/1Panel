@@ -186,7 +186,7 @@ func (l *Location) ChangePath(Modifier string, Match string) {
 	l.Match = Match
 }
 
-func (l *Location) AddCache(cacheTime int, cacheUint string) {
+func (l *Location) AddCache(cacheTime int, cacheUint, cacheKey string) {
 	l.RemoveDirective("add_header", []string{"Cache-Control", "no-cache"})
 	l.RemoveDirective("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2)$"`, ")"})
 	directives := l.GetDirectives()
@@ -204,7 +204,7 @@ func (l *Location) AddCache(cacheTime int, cacheUint string) {
 	directives = append(directives, newDir)
 	l.Directives = directives
 	l.UpdateDirective("proxy_ignore_headers", []string{"Set-Cookie", "Cache-Control", "expires"})
-	l.UpdateDirective("proxy_cache", []string{"proxy_cache_panel"})
+	l.UpdateDirective("proxy_cache", []string{cacheKey})
 	l.UpdateDirective("proxy_cache_key", []string{"$host$uri$is_args$args"})
 	l.UpdateDirective("proxy_cache_valid", []string{"200", "304", "301", "302", "10m"})
 	l.Cache = true
@@ -212,10 +212,10 @@ func (l *Location) AddCache(cacheTime int, cacheUint string) {
 	l.CacheUint = cacheUint
 }
 
-func (l *Location) RemoveCache() {
+func (l *Location) RemoveCache(cacheKey string) {
 	l.RemoveDirective("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2)$"`, ")"})
 	l.RemoveDirective("proxy_ignore_headers", []string{"Set-Cookie"})
-	l.RemoveDirective("proxy_cache", []string{"proxy_cache_panel"})
+	l.RemoveDirective("proxy_cache", []string{cacheKey})
 	l.RemoveDirective("proxy_cache_key", []string{"$host$uri$is_args$args"})
 	l.RemoveDirective("proxy_cache_valid", []string{"200"})
 

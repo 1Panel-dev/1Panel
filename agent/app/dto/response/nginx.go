@@ -57,3 +57,13 @@ type NginxRedirectConfig struct {
 type NginxFile struct {
 	Content string `json:"content"`
 }
+
+type NginxProxyCache struct {
+	Open            bool    `json:"open"`
+	CacheLimit      float64 `json:"cacheLimit"`
+	CacheLimitUnit  string  `json:"cacheLimitUnit" `
+	ShareCache      int     `json:"shareCache" `
+	ShareCacheUnit  string  `json:"shareCacheUnit" `
+	CacheExpire     int     `json:"cacheExpire" `
+	CacheExpireUnit string  `json:"cacheExpireUnit" `
+}

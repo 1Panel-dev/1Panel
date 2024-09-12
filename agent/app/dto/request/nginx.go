@@ -36,6 +36,17 @@ type NginxProxyUpdate struct {
 	Name      string `json:"name" validate:"required"`
 }
 
+type NginxProxyCacheUpdate struct {
+	WebsiteID       uint   `json:"websiteID" validate:"required"`
+	Open            bool   `json:"open"`
+	CacheLimit      int    `json:"cacheLimit" validate:"required"`
+	CacheLimitUnit  string `json:"cacheLimitUnit" validate:"required"`
+	ShareCache      int    `json:"shareCache" validate:"required"`
+	ShareCacheUnit  string `json:"shareCacheUnit" validate:"required"`
+	CacheExpire     int    `json:"cacheExpire" validate:"required"`
+	CacheExpireUnit string `json:"cacheExpireUnit" validate:"required"`
+}
+
 type NginxAuthUpdate struct {
 	WebsiteID uint   `json:"websiteID" validate:"required"`
 	Operate   string `json:"operate" validate:"required"`

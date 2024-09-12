@@ -1168,6 +1168,7 @@ const (
 	SiteSSLDir      = "SiteSSLDir"
 	SiteReWritePath = "SiteReWritePath"
 	SiteRedirectDir = "SiteRedirectDir"
+	SiteCacheDir    = "SiteCacheDir"
 )
 
 func GetSitePath(website model.Website, confType string) string {
@@ -1184,6 +1185,8 @@ func GetSitePath(website model.Website, confType string) string {
 		return GteSiteDir(website.Alias)
 	case SiteIndexDir:
 		return path.Join(GteSiteDir(website.Alias), "index")
+	case SiteCacheDir:
+		return path.Join(GteSiteDir(website.Alias), "cache")
 	case SiteProxyDir:
 		return path.Join(GteSiteDir(website.Alias), "proxy")
 	case SiteSSLDir:

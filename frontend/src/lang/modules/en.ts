@@ -2187,6 +2187,13 @@ const message = {
         strategyDown: 'Down',
         strategyBackup: 'Backup',
         staticChangePHPHelper: 'Currently a static website, you can switch to a PHP website',
+        proxyCache: 'Reverse Proxy Cache',
+        cacheLimit: 'Cache Space Limit',
+        shareCahe: 'Cache Count Memory Size',
+        cacheExpire: 'Cache Expiration Time',
+        shareCaheHelper: 'Approximately 8000 cache objects can be stored per 1M of memory',
+        cacheLimitHelper: 'Old cache will be automatically deleted when the limit is exceeded',
+        cacheExpireJHelper: 'Cache will be deleted if it misses after the expiration time',
     },
     php: {
         short_open_tag: 'Short tag support',

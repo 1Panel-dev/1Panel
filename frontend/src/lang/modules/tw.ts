@@ -2035,6 +2035,13 @@ const message = {
         strategyDown: '停用',
         strategyBackup: '備用',
         staticChangePHPHelper: '目前為靜態網站，可切換為 PHP 網站',
+        proxyCache: '反向代理快取',
+        cacheLimit: '快取空間限制',
+        shareCahe: '快取計數內存大小',
+        cacheExpire: '快取過期時間',
+        shareCaheHelper: '每1M內存可以存儲約8000個快取對象',
+        cacheLimitHelper: '超過限制會自動刪除舊的快取',
+        cacheExpireJHelper: '超出時間快取未命中將會被刪除',
     },
     php: {
         short_open_tag: '短標簽支持',
