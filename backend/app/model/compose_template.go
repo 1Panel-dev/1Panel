@@ -12,4 +12,5 @@ type Compose struct {
 	BaseModel
 
 	Name string `gorm:"type:varchar(256)" json:"name"`
+	Path string `gorm:"type:varchar(256)" json:"path"`
 }
