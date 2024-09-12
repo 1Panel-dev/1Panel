@@ -17,11 +17,11 @@
                 </el-row>
             </template>
             <template #search>
-                <el-select class="float-left p-w-200" v-model="logConfig.name" @change="search()">
-                    <template #prefix>{{ $t('commons.button.log') }}</template>
-                    <el-option v-for="(item, index) in fileList" :key="index" :label="item" :value="item" />
-                </el-select>
-                <div class="watchCheckbox">
+                <div class="flex flex-wrap gap-2 sm:gap-4">
+                    <el-select class="p-w-200" v-model="logConfig.name" @change="search()">
+                        <template #prefix>{{ $t('commons.button.log') }}</template>
+                        <el-option v-for="(item, index) in fileList" :key="index" :label="item" :value="item" />
+                    </el-select>
                     <el-checkbox border @change="changeTail" v-model="isWatch">
                         {{ $t('commons.button.watch') }}
                     </el-checkbox>
@@ -31,6 +31,7 @@
                 <LogFile
                     ref="logRef"
                     :config="logConfig"
+                    v-if="showLog"
                     :default-button="false"
                     v-model:loading="loading"
                     v-model:hasContent="hasContent"

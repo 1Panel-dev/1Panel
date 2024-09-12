@@ -2,7 +2,12 @@
     <div>
         <LayoutContent v-loading="loading" :title="$t('setting.safe')" :divider="true">
             <template #main>
-                <el-form :model="form" v-loading="loading" label-position="left" label-width="150px">
+                <el-form
+                    :model="form"
+                    v-loading="loading"
+                    :label-position="mobile ? 'top' : 'left'"
+                    label-width="150px"
+                >
                     <el-row>
                         <el-col :span="1"><br /></el-col>
                         <el-col :xs="24" :sm="20" :md="15" :lg="12" :xl="12">
@@ -178,7 +183,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, computed } from 'vue';
 import { ElForm, ElMessageBox } from 'element-plus';
 import PortSetting from '@/views/setting/safe/port/index.vue';
 import BindSetting from '@/views/setting/safe/bind/index.vue';
@@ -208,6 +213,10 @@ const sslRef = ref();
 const sslInfo = ref<Setting.SSLInfo>();
 const domainRef = ref();
 const allowIPsRef = ref();
+
+const mobile = computed(() => {
+    return globalStore.isMobile();
+});
 
 const form = reactive({
     serverPort: 9999,

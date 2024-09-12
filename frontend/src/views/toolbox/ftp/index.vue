@@ -2,15 +2,17 @@
     <div>
         <div class="app-status" style="margin-top: 20px">
             <el-card v-if="form.isExist">
-                <div>
-                    <el-tag effect="dark" type="success">FTP</el-tag>
-                    <el-tag round class="status-content" v-if="form.isActive" type="success">
-                        {{ $t('commons.status.running') }}
-                    </el-tag>
-                    <el-tag round class="status-content" v-if="!form.isActive" type="info">
-                        {{ $t('commons.status.stopped') }}
-                    </el-tag>
-                    <span class="buttons">
+                <div class="flex w-full flex-col gap-4 md:flex-row">
+                    <div class="flex flex-wrap gap-4">
+                        <el-tag effect="dark" type="success">FTP</el-tag>
+                        <el-tag round v-if="form.isActive" type="success">
+                            {{ $t('commons.status.running') }}
+                        </el-tag>
+                        <el-tag round v-if="!form.isActive" type="info">
+                            {{ $t('commons.status.stopped') }}
+                        </el-tag>
+                    </div>
+                    <div class="mt-0.5">
                         <el-button v-if="form.isActive" type="primary" @click="onOperate('stop')" link>
                             {{ $t('commons.button.stop') }}
                         </el-button>
@@ -21,15 +23,15 @@
                         <el-button type="primary" @click="onOperate('restart')" link>
                             {{ $t('container.restart') }}
                         </el-button>
-                    </span>
+                    </div>
                 </div>
             </el-card>
         </div>
         <div v-if="form.isExist">
             <LayoutContent v-loading="loading" title="FTP">
                 <template #toolbar>
-                    <el-row>
-                        <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16">
+                    <div class="flex justify-between gap-2 flex-wrap sm:flex-row">
+                        <div class="flex flex-wrap gap-3">
                             <el-button type="primary" :disabled="!form.isActive" @click="onOpenDialog('add')">
                                 {{ $t('commons.button.add') }} FTP
                             </el-button>
@@ -39,11 +41,11 @@
                             <el-button plain :disabled="selects.length === 0 || !form.isActive" @click="onDelete(null)">
                                 {{ $t('commons.button.delete') }}
                             </el-button>
-                        </el-col>
-                        <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
+                        </div>
+                        <div class="flex flex-wrap gap-3">
                             <TableSearch @search="search()" v-model:searchName="searchName" />
-                        </el-col>
-                    </el-row>
+                        </div>
+                    </div>
                 </template>
                 <template #main>
                     <ComplexTable

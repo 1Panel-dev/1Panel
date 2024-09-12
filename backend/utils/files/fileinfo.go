@@ -72,6 +72,9 @@ func NewFileInfo(op FileOption) (*FileInfo, error) {
 
 	info, err := appFs.Stat(op.Path)
 	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, buserr.New(constant.ErrLinkPathNotFound)
+		}
 		return nil, err
 	}
 
@@ -101,7 +104,26 @@ func NewFileInfo(op FileOption) (*FileInfo, error) {
 	}
 
 	if file.IsSymlink {
-		file.LinkPath = GetSymlink(op.Path)
+		linkPath := GetSymlink(op.Path)
+		if !filepath.IsAbs(linkPath) {
+			dir := filepath.Dir(op.Path)
+			var err error
+			linkPath, err = filepath.Abs(filepath.Join(dir, linkPath))
+			if err != nil {
+				return nil, err
+			}
+		}
+		file.LinkPath = linkPath
+		targetInfo, err := appFs.Stat(linkPath)
+		if err != nil {
+			file.IsDir = false
+			file.Mode = "-"
+			file.User = "-"
+			file.Group = "-"
+		} else {
+			file.IsDir = targetInfo.IsDir()
+		}
+		file.Extension = filepath.Ext(file.LinkPath)
 	}
 	if op.Expand {
 		if err := handleExpansion(file, op); err != nil {
@@ -308,7 +330,26 @@ func (f *FileInfo) processFiles(files []FileSearchInfo, option FileOption) ([]*F
 			file.FavoriteID = favorite.ID
 		}
 		if isSymlink {
-			file.LinkPath = GetSymlink(fPath)
+			linkPath := GetSymlink(fPath)
+			if !filepath.IsAbs(linkPath) {
+				dir := filepath.Dir(fPath)
+				var err error
+				linkPath, err = filepath.Abs(filepath.Join(dir, linkPath))
+				if err != nil {
+					return nil, err
+				}
+			}
+			file.LinkPath = linkPath
+			targetInfo, err := file.Fs.Stat(linkPath)
+			if err != nil {
+				file.IsDir = false
+				file.Mode = "-"
+				file.User = "-"
+				file.Group = "-"
+			} else {
+				file.IsDir = targetInfo.IsDir()
+			}
+			file.Extension = filepath.Ext(file.LinkPath)
 		}
 		if df.Size() > 0 {
 			file.MimeType = GetMimeType(fPath)

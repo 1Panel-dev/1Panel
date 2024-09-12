@@ -2,9 +2,11 @@
     <div v-loading="loading">
         <div class="app-status" style="margin-top: 20px" v-if="currentDB && currentDB.from === 'remote'">
             <el-card>
-                <div>
-                    <el-tag style="float: left" effect="dark" type="success">Redis</el-tag>
-                    <el-tag class="status-content">{{ $t('app.version') }}: {{ currentDB?.version }}</el-tag>
+                <div class="flex w-full flex-col gap-4 md:flex-row">
+                    <div class="flex flex-wrap gap-4">
+                        <el-tag style="float: left" effect="dark" type="success">Redis</el-tag>
+                        <el-tag>{{ $t('app.version') }}: {{ currentDB?.version }}</el-tag>
+                    </div>
                 </div>
             </el-card>
         </div>
@@ -51,12 +53,16 @@
                 </el-select>
             </template>
             <template #toolbar v-if="!isOnSetting">
-                <el-button v-if="currentDB" type="primary" plain @click="onLoadConn">
-                    {{ $t('database.databaseConnInfo') }}
-                </el-button>
-                <el-button @click="goRemoteDB" type="primary" plain>
-                    {{ $t('database.remoteDB') }}
-                </el-button>
+                <div class="flex justify-between gap-2 flex-wrap sm:flex-row">
+                    <div class="flex flex-wrap gap-3">
+                        <el-button v-if="currentDB" type="primary" plain @click="onLoadConn">
+                            {{ $t('database.databaseConnInfo') }}
+                        </el-button>
+                        <el-button @click="goRemoteDB" type="primary" plain>
+                            {{ $t('database.remoteDB') }}
+                        </el-button>
+                    </div>
+                </div>
             </template>
         </LayoutContent>
 

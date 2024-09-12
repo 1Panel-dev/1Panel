@@ -1,38 +1,47 @@
 <template>
-    <div class="flx-center">
-        <span v-if="props.footer">
-            <el-button type="primary" link @click="toForum">
-                <span class="font-normal">{{ $t('setting.forum') }}</span>
-            </el-button>
-            <el-divider direction="vertical" />
-            <el-button type="primary" link @click="toDoc">
-                <span class="font-normal">{{ $t('setting.doc2') }}</span>
-            </el-button>
-            <el-divider direction="vertical" />
-            <el-button type="primary" link @click="toGithub">
-                <span class="font-normal">{{ $t('setting.project') }}</span>
-            </el-button>
-            <el-divider direction="vertical" />
-        </span>
-        <el-button type="primary" link @click="toHalo">
-            <span class="font-normal">{{ isProductPro ? $t('license.pro') : $t('license.community') }}</span>
-        </el-button>
-        <span class="version" @click="copyText(version)">{{ version }}</span>
-        <el-badge is-dot style="margin-top: -3px" v-if="version !== 'Waiting' && globalStore.hasNewVersion">
-            <el-button type="primary" link @click="onLoadUpgradeInfo">
-                <span class="font-normal">({{ $t('setting.hasNewVersion') }})</span>
-            </el-button>
-        </el-badge>
-        <el-button
-            v-if="version !== 'Waiting' && !globalStore.hasNewVersion"
-            type="primary"
-            link
-            @click="onLoadUpgradeInfo"
-        >
-            <span>({{ $t('setting.upgradeCheck') }})</span>
-        </el-button>
-        <el-tag v-if="version === 'Waiting'" round style="margin-left: 10px">{{ $t('setting.upgrading') }}</el-tag>
+    <div>
+        <div class="flex w-full flex-col gap-2 md:flex-row">
+            <div class="flex flex-wrap" v-if="props.footer">
+                <el-button type="primary" link @click="toForum">
+                    <span class="font-normal">{{ $t('setting.forum') }}</span>
+                </el-button>
+                <el-divider direction="vertical" />
+                <el-button type="primary" link @click="toDoc">
+                    <span class="font-normal">{{ $t('setting.doc2') }}</span>
+                </el-button>
+                <el-divider direction="vertical" />
+                <el-button type="primary" link @click="toGithub">
+                    <span class="font-normal">{{ $t('setting.project') }}</span>
+                </el-button>
+                <el-divider v-if="!mobile" direction="vertical" />
+            </div>
+            <div class="flex flex-wrap">
+                <el-button type="primary" link @click="toHalo">
+                    <span class="font-normal">
+                        {{ isProductPro ? $t('license.pro') : $t('license.community') }}
+                    </span>
+                </el-button>
+                <span class="version" @click="copyText(version)">{{ version }}</span>
+                <el-badge is-dot style="margin-top: -3px" v-if="version !== 'Waiting' && globalStore.hasNewVersion">
+                    <el-button type="primary" link @click="onLoadUpgradeInfo">
+                        <span class="font-normal">({{ $t('setting.hasNewVersion') }})</span>
+                    </el-button>
+                </el-badge>
+                <el-button
+                    v-if="version !== 'Waiting' && !globalStore.hasNewVersion"
+                    type="primary"
+                    link
+                    @click="onLoadUpgradeInfo"
+                >
+                    <span>({{ $t('setting.upgradeCheck') }})</span>
+                </el-button>
+                <el-tag v-if="version === 'Waiting'" round style="margin-left: 10px">
+                    {{ $t('setting.upgrading') }}
+                </el-tag>
+            </div>
+        </div>
     </div>
+
     <el-drawer
         :close-on-click-modal="false"
         :close-on-press-escape="false"
@@ -82,13 +91,17 @@ import i18n from '@/lang';
 import 'md-editor-v3/lib/style.css';
 import { MsgSuccess } from '@/utils/message';
 import { copyText } from '@/utils/util';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 import { GlobalStore } from '@/store';
 import { ElMessageBox } from 'element-plus';
 import { storeToRefs } from 'pinia';
 
 const globalStore = GlobalStore();
 const { isDarkTheme } = storeToRefs(globalStore);
+
+const mobile = computed(() => {
+    return globalStore.isMobile();
+});
 
 const version = ref<string>('');
 const isProductPro = ref();
@@ -192,6 +205,7 @@ onMounted(() => {
     text-decoration: none;
     letter-spacing: 0.5px;
     cursor: pointer;
+    margin-top: 2px;
 }
 .line-height {
     line-height: 25px;

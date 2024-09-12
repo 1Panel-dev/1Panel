@@ -2,9 +2,11 @@
     <div v-loading="loading">
         <div class="app-status" style="margin-top: 20px" v-if="currentDB?.from === 'remote'">
             <el-card>
-                <div>
-                    <el-tag style="float: left" effect="dark" type="success">PostgreSQL</el-tag>
-                    <el-tag class="status-content">{{ $t('app.version') }}: {{ currentDB?.version }}</el-tag>
+                <div class="flex w-full flex-col gap-4 md:flex-row">
+                    <div class="flex flex-wrap gap-4">
+                        <el-tag style="float: left" effect="dark" type="success">PostgreSQL</el-tag>
+                        <el-tag>{{ $t('app.version') }}: {{ currentDB?.version }}</el-tag>
+                    </div>
                 </div>
             </el-card>
         </div>
@@ -53,8 +55,8 @@
             </template>
 
             <template #toolbar>
-                <el-row>
-                    <el-col :xs="24" :sm="20" :md="20" :lg="20" :xl="20">
+                <div class="flex justify-between gap-2 flex-wrap sm:flex-row">
+                    <div class="flex flex-wrap gap-3">
                         <el-button
                             v-if="currentDB && (currentDB.from !== 'local' || postgresqlStatus === 'Running')"
                             type="primary"
@@ -77,11 +79,9 @@
                             {{ $t('database.remoteDB') }}
                         </el-button>
                         <el-button @click="goDashboard()" type="primary" plain>PGAdmin4</el-button>
-                    </el-col>
-                    <el-col :xs="24" :sm="4" :md="4" :lg="4" :xl="4">
-                        <TableSearch @search="search()" v-model:searchName="searchName" />
-                    </el-col>
-                </el-row>
+                    </div>
+                    <div><TableSearch @search="search()" v-model:searchName="searchName" /></div>
+                </div>
             </template>
             <template #main v-if="currentDB">
                 <ComplexTable

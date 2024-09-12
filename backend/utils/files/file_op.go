@@ -613,6 +613,9 @@ func (f FileOp) decompressWithSDK(srcFile string, dst string, cType CompressType
 func (f FileOp) Decompress(srcFile string, dst string, cType CompressType, secret string) error {
 	if cType == Tar || cType == Zip || cType == TarGz {
 		shellArchiver, err := NewShellArchiver(cType)
+		if !f.Stat(dst) {
+			_ = f.CreateDir(dst, 0755)
+		}
 		if err == nil {
 			if err = shellArchiver.Extract(srcFile, dst, secret); err == nil {
 				return nil

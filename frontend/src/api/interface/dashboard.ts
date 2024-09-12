@@ -64,6 +64,7 @@ export namespace Dashboard {
         diskData: Array<DiskInfo>;
 
         gpuData: Array<GPUInfo>;
+        xpuData: Array<XPUInfo>;
 
         netBytesSent: number;
         netBytesRecv: number;
@@ -93,5 +94,21 @@ export namespace Dashboard {
         powerUsage: string;
         memoryUsage: string;
         fanSpeed: string;
+    }
+
+    export interface XPUInfo {
+        deviceID: number;
+        deviceName: string;
+        memory: string;
+        temperature: string;
+        memoryUsed: string;
+        power: string;
+        memoryUtil: string;
+    }
+
+    export interface DashboardReq {
+        scope: string;
+        ioOption: string;
+        netOption: string;
     }
 }

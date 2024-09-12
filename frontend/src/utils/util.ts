@@ -194,6 +194,8 @@ let icons = new Map([
     ['.zip', 'p-file-zip'],
     ['.gz', 'p-file-zip'],
     ['.tar.bz2', 'p-file-zip'],
+    ['.bz2', 'p-file-zip'],
+    ['.xz', 'p-file-zip'],
     ['.tar', 'p-file-zip'],
     ['.tar.gz', 'p-file-zip'],
     ['.war', 'p-file-zip'],
@@ -346,6 +348,19 @@ export function checkCidr(value: string): boolean {
     } else {
         return false;
     }
+}
+export function checkCidrV6(value: string): boolean {
+    if (value === '') {
+        return true;
+    }
+    if (checkIpV6(value.split('/')[0])) {
+        return true;
+    }
+    const reg = /^(?:[1-9]|[1-9][0-9]|1[0-1][0-9]|12[0-8])$/;
+    if (!reg.test(value.split('/')[1])) {
+        return true;
+    }
+    return false;
 }
 
 export function checkPort(value: string): boolean {
@@ -556,7 +571,7 @@ export function emptyLineFilter(str: string, spilt: string) {
 // 文件类型映射
 let fileTypes = {
     image: ['.jpg', '.jpeg', '.png', '.bmp', '.gif', '.tiff', '.ico', '.svg', '.webp'],
-    compress: ['.zip', '.rar', '.gz', '.war', '.tgz', '.7z', '.tar.gz', '.tar'],
+    compress: ['.zip', '.rar', '.gz', '.war', '.tgz', '.7z', '.tar.gz', '.tar', '.bz2', '.xz', '.tar.bz2', '.tar.xz'],
     video: ['.mp4', '.webm', '.mov', '.wmv', '.mkv', '.avi', '.wma', '.flv'],
     audio: ['.mp3', '.wav', '.wma', '.ape', '.acc', '.ogg', '.flac'],
     pdf: ['.pdf'],

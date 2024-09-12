@@ -181,8 +181,8 @@ html {
 
 .mask-prompt {
     position: absolute;
-    z-index: 9998;
-    top: 220px;
+    z-index: 1;
+    top: 320px;
     left: 45%;
     transform: translate(-50%, -50%);
     width: 400px;
@@ -374,7 +374,6 @@ html {
 }
 
 .tag-button {
-    margin-right: 10px;
     &.no-active {
         background: none;
         border: none;
@@ -387,7 +386,8 @@ html {
 }
 
 .router-button {
-    margin-right: 20px;
+    margin-right: 30px;
+    padding: 10px;
 }
 
 .text-parent {
@@ -442,6 +442,12 @@ html {
 
 .el-tag {
     cursor: pointer;
+}
+
+.dialog-footer{
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
 }
 
 .monaco-editor-tree-light .el-tree-node__content:hover {

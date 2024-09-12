@@ -3,6 +3,10 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/shirou/gopsutil/v3/load"
+	"github.com/shirou/gopsutil/v3/mem"
+	"github.com/shirou/gopsutil/v3/net"
 	network "net"
 	"os"
 	"sort"
@@ -11,7 +15,6 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
-	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/copier"
@@ -19,9 +22,6 @@ import (
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/host"
-	"github.com/shirou/gopsutil/v3/load"
-	"github.com/shirou/gopsutil/v3/mem"
-	"github.com/shirou/gopsutil/v3/net"
 )
 
 type DashboardService struct{}
@@ -29,7 +29,7 @@ type DashboardService struct{}
 type IDashboardService interface {
 	LoadOsInfo() (*dto.OsInfo, error)
 	LoadBaseInfo(ioOption string, netOption string) (*dto.DashboardBase, error)
-	LoadCurrentInfo(ioOption string, netOption string) *dto.DashboardCurrent
+	LoadCurrentInfo(req dto.DashboardReq) *dto.DashboardCurrent
 
 	Restart(operation string) error
 }
@@ -139,78 +139,88 @@ func (u *DashboardService) LoadBaseInfo(ioOption string, netOption string) (*dto
 	baseInfo.CPUCores, _ = cpu.Counts(false)
 	baseInfo.CPULogicalCores, _ = cpu.Counts(true)
 
-	baseInfo.CurrentInfo = *u.LoadCurrentInfo(ioOption, netOption)
+	baseInfo.CurrentInfo = *u.LoadCurrentInfo(dto.DashboardReq{
+		Scope:     "ioNet",
+		IoOption:  ioOption,
+		NetOption: netOption,
+	})
 	return &baseInfo, nil
 }
 
-func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *dto.DashboardCurrent {
+func (u *DashboardService) LoadCurrentInfo(req dto.DashboardReq) *dto.DashboardCurrent {
 	var currentInfo dto.DashboardCurrent
+	if req.Scope == "gpu" {
+		currentInfo.GPUData = loadGPUInfo()
+		currentInfo.XPUData = loadXpuInfo()
+	}
+
 	hostInfo, _ := host.Info()
 	currentInfo.Uptime = hostInfo.Uptime
-	currentInfo.TimeSinceUptime = time.Now().Add(-time.Duration(hostInfo.Uptime) * time.Second).Format(constant.DateTimeLayout)
-	currentInfo.Procs = hostInfo.Procs
-
-	currentInfo.CPUTotal, _ = cpu.Counts(true)
-	totalPercent, _ := cpu.Percent(1*time.Second, false)
-	if len(totalPercent) == 1 {
-		currentInfo.CPUUsedPercent = totalPercent[0]
-		currentInfo.CPUUsed = currentInfo.CPUUsedPercent * 0.01 * float64(currentInfo.CPUTotal)
-	}
-	currentInfo.CPUPercent, _ = cpu.Percent(1*time.Second, true)
-
-	loadInfo, _ := load.Avg()
-	currentInfo.Load1 = loadInfo.Load1
-	currentInfo.Load5 = loadInfo.Load5
-	currentInfo.Load15 = loadInfo.Load15
-	currentInfo.LoadUsagePercent = loadInfo.Load1 / (float64(currentInfo.CPUTotal*2) * 0.75) * 100
-
-	memoryInfo, _ := mem.VirtualMemory()
-	currentInfo.MemoryTotal = memoryInfo.Total
-	currentInfo.MemoryAvailable = memoryInfo.Available
-	currentInfo.MemoryUsed = memoryInfo.Used
-	currentInfo.MemoryUsedPercent = memoryInfo.UsedPercent
-
-	swapInfo, _ := mem.SwapMemory()
-	currentInfo.SwapMemoryTotal = swapInfo.Total
-	currentInfo.SwapMemoryAvailable = swapInfo.Free
-	currentInfo.SwapMemoryUsed = swapInfo.Used
-	currentInfo.SwapMemoryUsedPercent = swapInfo.UsedPercent
-
-	currentInfo.DiskData = loadDiskInfo()
-	currentInfo.GPUData = loadGPUInfo()
-
-	if ioOption == "all" {
-		diskInfo, _ := disk.IOCounters()
-		for _, state := range diskInfo {
-			currentInfo.IOReadBytes += state.ReadBytes
-			currentInfo.IOWriteBytes += state.WriteBytes
-			currentInfo.IOCount += (state.ReadCount + state.WriteCount)
-			currentInfo.IOReadTime += state.ReadTime
-			currentInfo.IOWriteTime += state.WriteTime
+	if req.Scope == "basic" {
+		currentInfo.TimeSinceUptime = time.Now().Add(-time.Duration(hostInfo.Uptime) * time.Second).Format(constant.DateTimeLayout)
+		currentInfo.Procs = hostInfo.Procs
+		currentInfo.CPUTotal, _ = cpu.Counts(true)
+		totalPercent, _ := cpu.Percent(100*time.Millisecond, false)
+		if len(totalPercent) == 1 {
+			currentInfo.CPUUsedPercent = totalPercent[0]
+			currentInfo.CPUUsed = currentInfo.CPUUsedPercent * 0.01 * float64(currentInfo.CPUTotal)
 		}
-	} else {
-		diskInfo, _ := disk.IOCounters(ioOption)
-		for _, state := range diskInfo {
-			currentInfo.IOReadBytes += state.ReadBytes
-			currentInfo.IOWriteBytes += state.WriteBytes
-			currentInfo.IOCount += (state.ReadCount + state.WriteCount)
-			currentInfo.IOReadTime += state.ReadTime
-			currentInfo.IOWriteTime += state.WriteTime
-		}
+		currentInfo.CPUPercent, _ = cpu.Percent(100*time.Millisecond, true)
+
+		loadInfo, _ := load.Avg()
+		currentInfo.Load1 = loadInfo.Load1
+		currentInfo.Load5 = loadInfo.Load5
+		currentInfo.Load15 = loadInfo.Load15
+		currentInfo.LoadUsagePercent = loadInfo.Load1 / (float64(currentInfo.CPUTotal*2) * 0.75) * 100
+
+		memoryInfo, _ := mem.VirtualMemory()
+		currentInfo.MemoryTotal = memoryInfo.Total
+		currentInfo.MemoryAvailable = memoryInfo.Available
+		currentInfo.MemoryUsed = memoryInfo.Used
+		currentInfo.MemoryUsedPercent = memoryInfo.UsedPercent
+
+		swapInfo, _ := mem.SwapMemory()
+		currentInfo.SwapMemoryTotal = swapInfo.Total
+		currentInfo.SwapMemoryAvailable = swapInfo.Free
+		currentInfo.SwapMemoryUsed = swapInfo.Used
+		currentInfo.SwapMemoryUsedPercent = swapInfo.UsedPercent
+		currentInfo.DiskData = loadDiskInfo()
 	}
 
-	if netOption == "all" {
-		netInfo, _ := net.IOCounters(false)
-		if len(netInfo) != 0 {
-			currentInfo.NetBytesSent = netInfo[0].BytesSent
-			currentInfo.NetBytesRecv = netInfo[0].BytesRecv
+	if req.Scope == "ioNet" {
+		if req.IoOption == "all" {
+			diskInfo, _ := disk.IOCounters()
+			for _, state := range diskInfo {
+				currentInfo.IOReadBytes += state.ReadBytes
+				currentInfo.IOWriteBytes += state.WriteBytes
+				currentInfo.IOCount += (state.ReadCount + state.WriteCount)
+				currentInfo.IOReadTime += state.ReadTime
+				currentInfo.IOWriteTime += state.WriteTime
+			}
+		} else {
+			diskInfo, _ := disk.IOCounters(req.IoOption)
+			for _, state := range diskInfo {
+				currentInfo.IOReadBytes += state.ReadBytes
+				currentInfo.IOWriteBytes += state.WriteBytes
+				currentInfo.IOCount += (state.ReadCount + state.WriteCount)
+				currentInfo.IOReadTime += state.ReadTime
+				currentInfo.IOWriteTime += state.WriteTime
+			}
 		}
-	} else {
-		netInfo, _ := net.IOCounters(true)
-		for _, state := range netInfo {
-			if state.Name == netOption {
-				currentInfo.NetBytesSent = state.BytesSent
-				currentInfo.NetBytesRecv = state.BytesRecv
+
+		if req.NetOption == "all" {
+			netInfo, _ := net.IOCounters(false)
+			if len(netInfo) != 0 {
+				currentInfo.NetBytesSent = netInfo[0].BytesSent
+				currentInfo.NetBytesRecv = netInfo[0].BytesRecv
+			}
+		} else {
+			netInfo, _ := net.IOCounters(true)
+			for _, state := range netInfo {
+				if state.Name == req.NetOption {
+					currentInfo.NetBytesSent = state.BytesSent
+					currentInfo.NetBytesRecv = state.BytesRecv
+				}
 			}
 		}
 	}
@@ -342,6 +352,22 @@ func loadGPUInfo() []dto.GPUInfo {
 		}
 		dataItem.PowerUsage = dataItem.PowerDraw + " / " + dataItem.MaxPowerLimit
 		dataItem.MemoryUsage = dataItem.MemUsed + " / " + dataItem.MemTotal
+		data = append(data, dataItem)
+	}
+	return data
+}
+
+func loadXpuInfo() []dto.XPUInfo {
+	list := xpack.LoadXpuInfo()
+	if len(list) == 0 {
+		return nil
+	}
+	var data []dto.XPUInfo
+	for _, gpu := range list {
+		var dataItem dto.XPUInfo
+		if err := copier.Copy(&dataItem, &gpu); err != nil {
+			continue
+		}
 		data = append(data, dataItem)
 	}
 	return data

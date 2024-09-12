@@ -53,28 +53,22 @@
         <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center">
             <el-popover placement="bottom" :width="160" trigger="hover" v-if="chartsOption['memory']">
                 <el-tag style="font-weight: 500">{{ $t('home.mem') }}:</el-tag>
-                <el-tag class="tagClass">
-                    {{ $t('home.total') }}: {{ formatNumber(currentInfo.memoryTotal / 1024 / 1024) }} MB
-                </el-tag>
-                <el-tag class="tagClass">
-                    {{ $t('home.used') }}: {{ formatNumber(currentInfo.memoryUsed / 1024 / 1024) }} MB
-                </el-tag>
-                <el-tag class="tagClass">
-                    {{ $t('home.free') }}: {{ formatNumber(currentInfo.memoryAvailable / 1024 / 1024) }} MB
-                </el-tag>
+                <el-tag class="tagClass">{{ $t('home.total') }}: {{ computeSize(currentInfo.memoryTotal) }}</el-tag>
+                <el-tag class="tagClass">{{ $t('home.used') }}: {{ computeSize(currentInfo.memoryUsed) }}</el-tag>
+                <el-tag class="tagClass">{{ $t('home.free') }}: {{ computeSize(currentInfo.memoryAvailable) }}</el-tag>
                 <el-tag class="tagClass">
                     {{ $t('home.percent') }}: {{ formatNumber(currentInfo.memoryUsedPercent) }}%
                 </el-tag>
                 <div v-if="currentInfo.swapMemoryTotal" class="mt-2">
                     <el-tag style="font-weight: 500">{{ $t('home.swapMem') }}:</el-tag>
                     <el-tag class="tagClass">
-                        {{ $t('home.total') }}: {{ formatNumber(currentInfo.swapMemoryTotal / 1024 / 1024) }} MB
+                        {{ $t('home.total') }}: {{ computeSize(currentInfo.swapMemoryTotal) }}
                     </el-tag>
                     <el-tag class="tagClass">
-                        {{ $t('home.used') }}: {{ formatNumber(currentInfo.swapMemoryUsed / 1024 / 1024) }} MB
+                        {{ $t('home.used') }}: {{ computeSize(currentInfo.swapMemoryUsed) }}
                     </el-tag>
                     <el-tag class="tagClass">
-                        {{ $t('home.free') }}: {{ formatNumber(currentInfo.swapMemoryAvailable / 1024 / 1024) }} MB
+                        {{ $t('home.free') }}: {{ computeSize(currentInfo.swapMemoryAvailable) }}
                     </el-tag>
                     <el-tag class="tagClass">
                         {{ $t('home.percent') }}: {{ formatNumber(currentInfo.swapMemoryUsedPercent) }}%
@@ -91,8 +85,7 @@
                 </template>
             </el-popover>
             <span class="input-help">
-                ( {{ formatNumber(currentInfo.memoryUsed / 1024 / 1024) }} /
-                {{ formatNumber(currentInfo.memoryTotal / 1024 / 1024) }} ) MB
+                {{ computeSize(currentInfo.memoryUsed) }} / {{ computeSize(currentInfo.memoryTotal) }}
             </span>
         </el-col>
         <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center">
@@ -166,7 +159,9 @@
                         />
                     </template>
                 </el-popover>
-                <span class="input-help">{{ computeSize(item.used) }} / {{ computeSize(item.total) }}</span>
+                <span class="input-help" v-if="chartsOption[`disk${index}`]">
+                    {{ computeSize(item.used) }} / {{ computeSize(item.total) }}
+                </span>
             </el-col>
         </template>
         <template v-for="(item, index) of currentInfo.gpuData" :key="index">
@@ -222,6 +217,51 @@
                 <span class="input-help" v-else>{{ item.productName }}</span>
             </el-col>
         </template>
+        <template v-for="(item, index) of currentInfo.xpuData" :key="index">
+            <el-col
+                :xs="12"
+                :sm="12"
+                :md="6"
+                :lg="6"
+                :xl="6"
+                align="center"
+                v-if="showMore || index < 4 - currentInfo.diskData.length"
+            >
+                <el-popover placement="bottom" :width="250" trigger="hover" v-if="chartsOption[`gpu${index}`]">
+                    <el-row :gutter="5">
+                        <el-tag style="font-weight: 500">{{ $t('home.baseInfo') }}:</el-tag>
+                    </el-row>
+                    <el-row :gutter="5">
+                        <el-tag class="tagClass">{{ $t('monitor.gpuUtil') }}: {{ item.memoryUtil }}</el-tag>
+                    </el-row>
+                    <el-row :gutter="5">
+                        <el-tag class="tagClass">{{ $t('monitor.temperature') }}: {{ item.temperature }}</el-tag>
+                    </el-row>
+                    <el-row :gutter="5">
+                        <el-tag class="tagClass">{{ $t('monitor.powerUsage') }}: {{ item.power }}</el-tag>
+                    </el-row>
+                    <el-row :gutter="5">
+                        <el-tag class="tagClass">
+                            {{ $t('monitor.memoryUsage') }}: {{ item.memoryUsed }}/{{ item.memory }}
+                        </el-tag>
+                    </el-row>
+                    <template #reference>
+                        <v-charts
+                            @click="goGPU()"
+                            height="160px"
+                            :id="`gpu${index}`"
+                            type="pie"
+                            :option="chartsOption[`gpu${index}`]"
+                            v-if="chartsOption[`gpu${index}`]"
+                        />
+                    </template>
+                </el-popover>
+                <el-tooltip :content="item.deviceName" v-if="item.deviceName.length > 25">
+                    <span class="input-help">{{ item.deviceName.substring(0, 22) }}...</span>
+                </el-tooltip>
+                <span class="input-help" v-else>{{ item.deviceName }}</span>
+            </el-col>
+        </template>
         <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center">
             <el-button v-if="!showMore" link type="primary" @click="showMore = true" class="buttonClass">
                 {{ $t('tabs.more') }}
@@ -268,6 +308,9 @@ const baseInfo = ref<Dashboard.BaseInfo>({
     cpuLogicalCores: 0,
     cpuModelName: '',
     currentInfo: null,
+
+    ipv4Addr: '',
+    systemProxy: '',
 });
 const currentInfo = ref<Dashboard.CurrentInfo>({
     uptime: 0,
@@ -301,6 +344,7 @@ const currentInfo = ref<Dashboard.CurrentInfo>({
 
     diskData: [],
     gpuData: [],
+    xpuData: [],
 
     netBytesSent: 0,
     netBytesRecv: 0,
@@ -341,6 +385,13 @@ const acceptParams = (current: Dashboard.CurrentInfo, base: Dashboard.BaseInfo, 
             chartsOption.value['gpu' + i] = {
                 title: 'GPU-' + currentInfo.value.gpuData[i].index,
                 data: formatNumber(Number(currentInfo.value.gpuData[i].gpuUtil.replaceAll(' %', ''))),
+            };
+        }
+        currentInfo.value.xpuData = currentInfo.value.xpuData || [];
+        for (let i = 0; i < currentInfo.value.xpuData.length; i++) {
+            chartsOption.value['gpu' + i] = {
+                title: 'GPU-' + currentInfo.value.xpuData[i].deviceID,
+                data: formatNumber(Number(currentInfo.value.xpuData[i].memoryUtil.replaceAll('%', ''))),
             };
         }
         if (currentInfo.value.diskData.length + currentInfo.value.gpuData.length > 5) {

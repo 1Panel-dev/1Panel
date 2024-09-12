@@ -2,29 +2,22 @@
     <div v-loading="loading">
         <div class="app-status" style="margin-top: 20px">
             <el-card>
-                <div class="flex flex-col gap-2 sm:flex-row sm:justify-between">
-                    <div class="flex">
+                <div class="flex w-full flex-col gap-4 md:flex-row">
+                    <div class="flex flex-wrap gap-4">
                         <el-tag style="float: left" effect="dark" type="success">Docker</el-tag>
-                        <el-tag round class="status-content" v-if="form.status === 'Running'" type="success">
+                        <el-tag round v-if="form.status === 'Running'" type="success">
                             {{ $t('commons.status.running') }}
                         </el-tag>
-                        <el-tag round class="status-content" v-if="form.status === 'Stopped'" type="info">
+                        <el-tag round v-if="form.status === 'Stopped'" type="info">
                             {{ $t('commons.status.stopped') }}
                         </el-tag>
-                        <el-tag class="status-content">{{ $t('app.version') }}: {{ form.version }}</el-tag>
+                        <el-tag>{{ $t('app.version') }}: {{ form.version }}</el-tag>
                     </div>
-                    <div class="flex justify-start" v-if="form.status === 'Running'">
-                        <el-button type="primary" @click="onOperator('stop')" link>
+                    <div class="mt-0.5">
+                        <el-button type="primary" v-if="form.status === 'Running'" @click="onOperator('stop')" link>
                             {{ $t('container.stop') }}
                         </el-button>
-                        <el-divider direction="vertical" />
-                        <el-button type="primary" @click="onOperator('restart')" link>
-                            {{ $t('container.restart') }}
-                        </el-button>
-                    </div>
-
-                    <div clsas="flex justify-start" v-if="form.status === 'Stopped'" class="buttons">
-                        <el-button type="primary" @click="onOperator('start')" link>
+                        <el-button type="primary" v-if="form.status === 'Stopped'" @click="onOperator('start')" link>
                             {{ $t('container.start') }}
                         </el-button>
                         <el-divider direction="vertical" />

@@ -2,7 +2,7 @@
     <div v-loading="loading">
         <LayoutContent :title="$t('setting.panel')" :divider="true">
             <template #main>
-                <el-form :model="form" label-position="left" label-width="150px">
+                <el-form :model="form" :label-position="mobile ? 'top' : 'left'" label-width="150px">
                     <el-row>
                         <el-col :span="1"><br /></el-col>
                         <el-col :xs="24" :sm="20" :md="15" :lg="12" :xl="12">
@@ -168,7 +168,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, computed } from 'vue';
 import { ElForm } from 'element-plus';
 import { getSettingInfo, updateSetting, getSystemAvailable } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
@@ -193,6 +193,10 @@ const globalStore = GlobalStore();
 const { isProductPro } = storeToRefs(globalStore);
 
 const { switchTheme } = useTheme();
+
+const mobile = computed(() => {
+    return globalStore.isMobile();
+});
 
 const form = reactive({
     userName: '',

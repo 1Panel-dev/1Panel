@@ -35,6 +35,12 @@ type OsInfo struct {
 	DiskSize int64 `json:"diskSize"`
 }
 
+type DashboardReq struct {
+	Scope     string `json:"scope"`
+	IoOption  string `json:"ioOption"`
+	NetOption string `json:"netOption"`
+}
+
 type DashboardCurrent struct {
 	Uptime          uint64 `json:"uptime"`
 	TimeSinceUptime string `json:"timeSinceUptime"`
@@ -73,6 +79,7 @@ type DashboardCurrent struct {
 	NetBytesRecv uint64 `json:"netBytesRecv"`
 
 	GPUData []GPUInfo `json:"gpuData"`
+	XPUData []XPUInfo `json:"xpuData"`
 
 	ShotTime time.Time `json:"shotTime"`
 }
@@ -105,4 +112,14 @@ type GPUInfo struct {
 	MemUsed          string `json:"memUsed"`
 	MemTotal         string `json:"memTotal"`
 	FanSpeed         string `json:"fanSpeed"`
+}
+
+type XPUInfo struct {
+	DeviceID    int    `json:"deviceID"`
+	DeviceName  string `json:"deviceName"`
+	Memory      string `json:"memory"`
+	Temperature string `json:"temperature"`
+	MemoryUsed  string `json:"memoryUsed"`
+	Power       string `json:"power"`
+	MemoryUtil  string `json:"memoryUtil"`
 }

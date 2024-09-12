@@ -2,11 +2,13 @@
     <div v-loading="loading">
         <div class="app-status" style="margin-top: 20px" v-if="currentDB?.from === 'remote'">
             <el-card>
-                <div>
-                    <el-tag style="float: left" effect="dark" type="success">
-                        {{ currentDB?.type === 'mysql' ? 'Mysql' : 'MariaDB' }}
-                    </el-tag>
-                    <el-tag class="status-content">{{ $t('app.version') }}: {{ currentDB?.version }}</el-tag>
+                <div class="flex w-full flex-col gap-4 md:flex-row">
+                    <div class="flex flex-wrap gap-4">
+                        <el-tag style="float: left" effect="dark" type="success">
+                            {{ currentDB?.type === 'mysql' ? 'Mysql' : 'MariaDB' }}
+                        </el-tag>
+                        <el-tag>{{ $t('app.version') }}: {{ currentDB?.version }}</el-tag>
+                    </div>
                 </div>
             </el-card>
         </div>
@@ -61,8 +63,8 @@
             </template>
 
             <template #toolbar>
-                <div class="flex flex-wrap gap-4 sm:justify-between">
-                    <div class="flex gap-2 flex-wrap items-center justify-start [&>*]:ml-3">
+                <div class="flex justify-between gap-2 flex-wrap sm:flex-row">
+                    <div class="flex flex-wrap gap-3">
                         <el-button
                             v-if="currentDB && (currentDB.from !== 'local' || mysqlStatus === 'Running')"
                             type="primary"

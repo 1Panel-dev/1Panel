@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-loading="isLoading">
         <div v-if="defaultButton">
             <el-checkbox border v-model="tailLog" class="float-left" @change="changeTail(false)">
                 {{ $t('commons.button.watch') }}

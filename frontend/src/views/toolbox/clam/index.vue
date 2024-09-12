@@ -20,8 +20,8 @@
                 />
             </template>
             <template #toolbar v-if="clamStatus.isExist">
-                <el-row>
-                    <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16">
+                <div class="flex w-full flex-col gap-4 md:justify-between md:flex-row">
+                    <div class="flex flex-wrap gap-4">
                         <el-button type="primary" :disabled="!clamStatus.isRunning" @click="onOpenDialog('add')">
                             {{ $t('toolbox.clam.clamCreate') }}
                         </el-button>
@@ -32,11 +32,11 @@
                         >
                             {{ $t('commons.button.delete') }}
                         </el-button>
-                    </el-col>
-                    <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
+                    </div>
+                    <div class="flex flex-row gap-2 md:flex-col lg:flex-row">
                         <TableSearch @search="search()" v-model:searchName="searchName" />
-                    </el-col>
-                </el-row>
+                    </div>
+                </div>
             </template>
             <el-card v-if="clamStatus.isExist && !clamStatus.isRunning && maskShow" class="mask-prompt">
                 <span>{{ $t('toolbox.clam.notStart') }}</span>

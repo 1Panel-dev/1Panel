@@ -724,40 +724,22 @@ const top = () => {
 };
 
 const jump = async (url: string) => {
-    const fileName = url.substring(url.lastIndexOf('/') + 1);
-    let filePath = url.substring(0, url.lastIndexOf('/') + 1);
-    if (!url.includes('.')) {
-        filePath = url;
-    }
     history.splice(pointer + 1);
     history.push(url);
     pointer = history.length - 1;
 
-    const oldUrl = req.path;
-    const oldPageSize = req.pageSize;
-    // reset search params before exec jump
-    Object.assign(req, initData());
-    req.path = filePath;
-    req.containSub = false;
-    req.search = '';
-    req.pageSize = oldPageSize;
+    const { path: oldUrl, pageSize: oldPageSize } = req;
+    Object.assign(req, initData(), { path: url, containSub: false, search: '', pageSize: oldPageSize });
     let searchResult = await searchFile();
-
-    globalStore.setLastFilePath(req.path);
     // check search result,the file is exists?
     if (!searchResult.data.path) {
         req.path = oldUrl;
+        globalStore.setLastFilePath(req.path);
         MsgWarning(i18n.global.t('commons.res.notFound'));
         return;
     }
-    if (fileName && fileName.length > 1 && fileName.includes('.')) {
-        const fileData = searchResult.data.items.filter((item) => item.name === fileName);
-        if (fileData && fileData.length === 1) {
-            openView(fileData[0]);
-        } else {
-            MsgWarning(i18n.global.t('commons.res.notFound'));
-        }
-    }
+    req.path = searchResult.data.path;
+    globalStore.setLastFilePath(req.path);
     handleSearchResult(searchResult);
     getPaths(req.path);
     nextTick(function () {
@@ -891,12 +873,16 @@ const openView = (item: File.File) => {
         compress: openDeCompress,
         text: () => openCodeEditor(item.path, item.extension),
     };
-
-    return actionMap[fileType] ? actionMap[fileType](item) : openCodeEditor(item.path, item.extension);
+    const path = item.isSymlink ? item.linkPath : item.path;
+    return actionMap[fileType] ? actionMap[fileType](item) : openCodeEditor(path, item.extension);
 };
 
 const openPreview = (item: File.File, fileType: string) => {
-    filePreview.path = item.path;
+    if (item.mode.toString() == '-' && item.user == '-' && item.group == '-') {
+        MsgWarning(i18n.global.t('file.fileCanNotRead'));
+        return;
+    }
+    filePreview.path = item.isSymlink ? item.linkPath : item.path;
     filePreview.name = item.name;
     filePreview.extension = item.extension;
     filePreview.fileType = fileType;
@@ -1097,7 +1083,7 @@ const buttons = [
         label: i18n.global.t('file.deCompress'),
         click: openDeCompress,
         disabled: (row: File.File) => {
-            return row.isDir;
+            return !isDecompressFile(row);
         },
     },
     {
@@ -1136,6 +1122,20 @@ const buttons = [
         click: openDetail,
     },
 ];
+
+const isDecompressFile = (row: File.File) => {
+    if (row.isDir) {
+        return false;
+    }
+    if (getFileType(row.extension) === 'compress') {
+        return true;
+    }
+    if (row.mimeType == 'application/octet-stream') {
+        return false;
+    } else {
+        return Mimetypes.get(row.mimeType) != undefined;
+    }
+};
 
 onMounted(() => {
     if (router.currentRoute.value.query.path) {
@@ -1205,6 +1205,7 @@ onMounted(() => {
 .right-section {
     display: flex;
     align-items: center;
+    gap: 1rem;
 }
 
 .left-section > *:not(:first-child) {
