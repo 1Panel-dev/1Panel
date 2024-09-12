@@ -171,12 +171,12 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string, websiteSSL model.Web
 		p, err = tencentcloud.NewDNSProviderConfig(tencentCloudConfig)
 	case HuaweiCloud:
 		huaweiCloudConfig := huaweicloud.NewDefaultConfig()
-		huaweiCloudConfig.AccessKeyId = param.AccessKey
+		huaweiCloudConfig.AccessKeyID = param.AccessKey
 		huaweiCloudConfig.SecretAccessKey = param.SecretKey
 		huaweiCloudConfig.Region = param.Region
 		huaweiCloudConfig.PropagationTimeout = propagationTimeout
 		huaweiCloudConfig.PollingInterval = pollingInterval
-		huaweiCloudConfig.TTL = ttl
+		huaweiCloudConfig.TTL = int32(ttl)
 		p, err = huaweicloud.NewDNSProviderConfig(huaweiCloudConfig)
 	}
 	if err != nil {
