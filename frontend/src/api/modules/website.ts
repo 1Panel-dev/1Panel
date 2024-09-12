@@ -303,3 +303,11 @@ export const UpdateLoadBalance = (req: Website.LoadBalanceReq) => {
 export const UpdateLoadBalanceFile = (req: Website.WebsiteLBUpdateFile) => {
     return http.post(`/websites/lbs/file`, req);
 };
+
+export const UpdateCacheConfig = (req: Website.WebsiteCacheConfig) => {
+    return http.post(`/websites/proxy/config`, req);
+};
+
+export const GetCacheConfig = (id: number) => {
+    return http.get<Website.WebsiteCacheConfig>(`/websites/proxy/config/${id}`);
+};

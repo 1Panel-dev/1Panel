@@ -140,6 +140,13 @@ export const Units = [
     { label: i18n.global.t('commons.units.year'), value: 'y' },
 ];
 
+export const sizeUnits = [
+    { label: 'B', value: 'b' },
+    { label: 'KB', value: 'k' },
+    { label: 'MB', value: 'm' },
+    { label: 'GB', value: 'g' },
+];
+
 export const AcmeAccountTypes = [
     { label: "Let's Encrypt", value: 'letsencrypt' },
     { label: 'ZeroSSL', value: 'zerossl' },

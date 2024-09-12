@@ -905,3 +905,44 @@ func (b *BaseApi) ChangeWebsiteGroup(c *gin.Context) {
 	}
 	helper.SuccessWithOutData(c)
 }
+
+// @Tags Website
+// @Summary update website proxy cache config
+// @Description 更新网站反代缓存配置
+// @Accept json
+// @Param request body request.NginxProxyCacheUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/proxy/config [post]
+func (b *BaseApi) UpdateProxyCache(c *gin.Context) {
+	var req request.NginxProxyCacheUpdate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := websiteService.UpdateProxyCache(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}
+
+// @Summary Get website proxy cache config
+// @Description 获取网站反代缓存配置
+// @Accept json
+// @Param id path int true "id"
+// @Success 200 {object} response.NginxProxyCache
+// @Security ApiKeyAuth
+// @Router /websites/proxy/config/{id} [get]
+func (b *BaseApi) GetProxyCache(c *gin.Context) {
+	id, err := helper.GetParamID(c)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		return
+	}
+	res, err := websiteService.GetProxyCache(id)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}

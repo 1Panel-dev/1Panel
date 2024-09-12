@@ -2,6 +2,7 @@
     <ComplexTable :data="data" @search="search" v-loading="loading">
         <template #toolbar>
             <el-button type="primary" plain @click="openCreate">{{ $t('commons.button.create') }}</el-button>
+            <el-button @click="openCache">{{ $t('website.proxyCache') }}</el-button>
         </template>
         <el-table-column :label="$t('commons.table.name')" prop="name"></el-table-column>
         <el-table-column :label="$t('website.proxyPath')" prop="match"></el-table-column>
@@ -34,19 +35,21 @@
     <Create ref="createRef" @close="search()" />
     <File ref="fileRef" @close="search()" />
     <OpDialog ref="opRef" @search="search()" />
+    <Cache ref="cacheRef" @close="search()" />
 </template>
 
 <script lang="ts" setup name="proxy">
 import { Website } from '@/api/interface/website';
 import { OperateProxyConfig, GetProxyConfig } from '@/api/modules/website';
 import { computed, onMounted, ref } from 'vue';
-import Create from './create/index.vue';
-import File from './file/index.vue';
 import { VideoPlay, VideoPause } from '@element-plus/icons-vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
 import { GlobalStore } from '@/store';
+import Create from './create/index.vue';
+import File from './file/index.vue';
+import Cache from './cache/index.vue';
 const globalStore = GlobalStore();
 
 const props = defineProps({
@@ -67,6 +70,7 @@ const data = ref();
 const createRef = ref();
 const fileRef = ref();
 const opRef = ref();
+const cacheRef = ref();
 
 const buttons = [
     {
@@ -112,6 +116,10 @@ const initData = (id: number): Website.ProxyConfig => ({
 
 const openCreate = () => {
     createRef.value.acceptParams(initData(id.value));
+};
+
+const openCache = () => {
+    cacheRef.value.acceptParams(id.value);
 };
 
 const openEdit = (proxyConfig: Website.ProxyConfig) => {

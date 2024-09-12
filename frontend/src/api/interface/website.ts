@@ -588,4 +588,14 @@ export namespace Website {
         name: string;
         content: string;
     }
+
+    export interface WebsiteCacheConfig {
+        open: boolean;
+        cacheLimit: number;
+        cacheLimitUnit: string;
+        shareCache: number;
+        shareCacheUnit: string;
+        cacheExpire: number;
+        cacheExpireUnit: string;
+    }
 }

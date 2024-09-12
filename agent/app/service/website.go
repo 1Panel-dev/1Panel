@@ -84,6 +84,8 @@ type IWebsiteService interface {
 	OperateProxy(req request.WebsiteProxyConfig) (err error)
 	GetProxies(id uint) (res []request.WebsiteProxyConfig, err error)
 	UpdateProxyFile(req request.NginxProxyUpdate) (err error)
+	UpdateProxyCache(req request.NginxProxyCacheUpdate) (err error)
+	GetProxyCache(id uint) (res response.NginxProxyCache, err error)
 
 	GetAntiLeech(id uint) (*response.NginxAntiLeechRes, error)
 	UpdateAntiLeech(req request.NginxAntiLeechUpdate) (err error)
@@ -868,19 +870,6 @@ func (w WebsiteService) GetWebsiteNginxConfig(websiteID uint, configType string)
 	switch configType {
 	case constant.AppOpenresty:
 		configPath = GetSitePath(website, SiteConf)
-		//TODO 删除下面的代码
-	case constant.ConfigFPM:
-		runtimeInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
-		if err != nil {
-			return nil, err
-		}
-		configPath = path.Join(runtimeInstall.GetPath(), "conf", "php-fpm.conf")
-	case constant.ConfigPHP:
-		runtimeInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
-		if err != nil {
-			return nil, err
-		}
-		configPath = path.Join(runtimeInstall.GetPath(), "conf", "php.ini")
 	}
 	info, err := files.NewFileInfo(files.FileOption{
 		Path:   configPath,
@@ -1486,9 +1475,7 @@ func (w WebsiteService) UpdateSitePermission(req request.WebsiteUpdateDirPermiss
 
 func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error) {
 	var (
-		website model.Website
-		//params       []response.NginxParam
-		//nginxInstall model.AppInstall
+		website    model.Website
 		par        *parser.Parser
 		oldContent []byte
 	)
@@ -1497,32 +1484,7 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 	if err != nil {
 		return
 	}
-	//params, err = getNginxParamsByKeys(constant.NginxScopeHttp, []string{"proxy_cache"}, &website)
-	//if err != nil {
-	//	return
-	//}
-	//nginxInstall, err = getAppInstallByKey(constant.AppOpenresty)
-	//if err != nil {
-	//	return
-	//}
 	fileOp := files.NewFileOp()
-	//TODO 代理缓存改为单独使用配置
-	//if len(params) == 0 || len(params[0].Params) == 0 {
-	//	commonDir := path.Join(nginxInstall.GetPath(), "www", "common", "proxy")
-	//	proxyTempPath := path.Join(commonDir, "proxy_temp_dir")
-	//	if !fileOp.Stat(proxyTempPath) {
-	//		_ = fileOp.CreateDir(proxyTempPath, 0755)
-	//	}
-	//	proxyCacheDir := path.Join(commonDir, "proxy_temp_dir")
-	//	if !fileOp.Stat(proxyCacheDir) {
-	//		_ = fileOp.CreateDir(proxyCacheDir, 0755)
-	//	}
-	//	nginxParams := getNginxParamsFromStaticFile(dto.CACHE, nil)
-	//	if err = updateNginxConfig(constant.NginxScopeHttp, nginxParams, &website); err != nil {
-	//		return
-	//	}
-	//}
-
 	includeDir := GetSitePath(website, SiteProxyDir)
 	if !fileOp.Stat(includeDir) {
 		_ = fileOp.CreateDir(includeDir, 0755)
@@ -1592,9 +1554,12 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 	location.UpdateDirective("proxy_set_header", []string{"Host", req.ProxyHost})
 	location.ChangePath(req.Modifier, req.Match)
 	if req.Cache {
-		location.AddCache(req.CacheTime, req.CacheUnit)
+		if err = openProxyCache(website); err != nil {
+			return
+		}
+		location.AddCache(req.CacheTime, req.CacheUnit, fmt.Sprintf("proxy_cache_zone_of_%s", website.Alias))
 	} else {
-		location.RemoveCache()
+		location.RemoveCache(fmt.Sprintf("proxy_cache_zone_of_%s", website.Alias))
 	}
 	if len(req.Replaces) > 0 {
 		location.AddSubFilter(req.Replaces)
@@ -1610,9 +1575,97 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 		return buserr.WithErr(constant.ErrUpdateBuWebsite, err)
 	}
 	nginxInclude := fmt.Sprintf("/www/sites/%s/proxy/*.conf", website.Alias)
-	if err = updateNginxConfig(constant.NginxScopeServer, []dto.NginxParam{{Name: "include", Params: []string{nginxInclude}}}, &website); err != nil {
+	return updateNginxConfig(constant.NginxScopeServer, []dto.NginxParam{{Name: "include", Params: []string{nginxInclude}}}, &website)
+}
+
+func openProxyCache(website model.Website) error {
+	cacheDir := GetSitePath(website, SiteCacheDir)
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(cacheDir) {
+		_ = fileOp.CreateDir(cacheDir, 0755)
+	}
+	content, err := fileOp.GetContent(GetSitePath(website, SiteConf))
+	if err != nil {
+		return err
+	}
+	if strings.Contains(string(content), "proxy_cache_path") {
+		return nil
+	}
+	proxyCachePath := fmt.Sprintf("/www/sites/%s/cache levels=1:2 keys_zone=proxy_cache_zone_of_%s:5m max_size=1g inactive=24h", website.Alias, website.Alias)
+	return updateNginxConfig("", []dto.NginxParam{{Name: "proxy_cache_path", Params: []string{proxyCachePath}}}, &website)
+}
+
+func (w WebsiteService) UpdateProxyCache(req request.NginxProxyCacheUpdate) (err error) {
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	if err != nil {
 		return
 	}
+	cacheDir := GetSitePath(website, SiteCacheDir)
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(cacheDir) {
+		_ = fileOp.CreateDir(cacheDir, 0755)
+	}
+	if req.Open {
+		proxyCachePath := fmt.Sprintf("/www/sites/%s/cache levels=1:2 keys_zone=proxy_cache_zone_of_%s:%d%s max_size=%d%s inactive=%d%s", website.Alias, website.Alias, req.ShareCache, req.ShareCacheUnit, req.CacheLimit, req.CacheLimitUnit, req.CacheExpire, req.CacheExpireUnit)
+		return updateNginxConfig("", []dto.NginxParam{{Name: "proxy_cache_path", Params: []string{proxyCachePath}}}, &website)
+	}
+	return deleteNginxConfig("", []dto.NginxParam{{Name: "proxy_cache_path"}}, &website)
+}
+
+func (w WebsiteService) GetProxyCache(id uint) (res response.NginxProxyCache, err error) {
+	var (
+		website model.Website
+	)
+	website, err = websiteRepo.GetFirst(commonRepo.WithByID(id))
+	if err != nil {
+		return
+	}
+
+	parser, err := parser.NewParser(GetSitePath(website, SiteConf))
+	if err != nil {
+		return
+	}
+	config, err := parser.Parse()
+	if err != nil {
+		return
+	}
+	var params []string
+	for _, d := range config.GetDirectives() {
+		if d.GetName() == "proxy_cache_path" {
+			params = d.GetParameters()
+		}
+	}
+	if len(params) == 0 {
+		return
+	}
+	for _, param := range params {
+		if match, _ := regexp.MatchString(`keys_zone=proxy_cache_zone_of_[\w.]+:\d+[kmgt]?`, param); match {
+			r := regexp.MustCompile(`keys_zone=proxy_cache_zone_of_[\w.]+:(\d+)([kmgt]?)`)
+			matches := r.FindStringSubmatch(param)
+			if len(matches) > 0 {
+				res.ShareCache, _ = strconv.Atoi(matches[1])
+				res.ShareCacheUnit = matches[2]
+			}
+		}
+
+		if match, _ := regexp.MatchString(`max_size=\d+(\.\d+)?[kmgt]?`, param); match {
+			r := regexp.MustCompile(`max_size=([0-9.]+)([kmgt]?)`)
+			matches := r.FindStringSubmatch(param)
+			if len(matches) > 0 {
+				res.CacheLimit, _ = strconv.ParseFloat(matches[1], 64)
+				res.CacheLimitUnit = matches[2]
+			}
+		}
+		if match, _ := regexp.MatchString(`inactive=\d+[smhd]`, param); match {
+			r := regexp.MustCompile(`inactive=(\d+)([smhd])`)
+			matches := r.FindStringSubmatch(param)
+			if len(matches) > 0 {
+				res.CacheExpire, _ = strconv.Atoi(matches[1])
+				res.CacheExpireUnit = matches[2]
+			}
+		}
+	}
+	res.Open = true
 	return
 }
 

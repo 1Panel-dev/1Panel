@@ -2036,6 +2036,13 @@ const message = {
         strategyDown: '停用',
         strategyBackup: '备用',
         staticChangePHPHelper: '当前为静态网站，可以切换为 PHP 网站',
+        proxyCache: '反代缓存',
+        cacheLimit: '缓存空间限制',
+        shareCahe: '缓存计数内存大小',
+        cacheExpire: '缓存过期时间',
+        shareCaheHelper: '每1M内存可以存储约8000个缓存对象',
+        cacheLimitHelper: '超过限制会自动删除旧的缓存',
+        cacheExpireJHelper: '超出时间缓存未命中将会被删除',
     },
     php: {
         short_open_tag: '短标签支持',
