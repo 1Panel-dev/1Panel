@@ -19,6 +19,7 @@ type IComposeTemplateRepo interface {
 	CreateRecord(compose *model.Compose) error
 	DeleteRecord(opts ...DBOption) error
 	ListRecord() ([]model.Compose, error)
+	UpdateRecord(name string, vars map[string]interface{}) error
 }
 
 func NewIComposeTemplateRepo() IComposeTemplateRepo {
@@ -101,4 +102,8 @@ func (u *ComposeTemplateRepo) DeleteRecord(opts ...DBOption) error {
 		db = opt(db)
 	}
 	return db.Delete(&model.Compose{}).Error
+}
+
+func (u *ComposeTemplateRepo) UpdateRecord(name string, vars map[string]interface{}) error {
+	return global.DB.Model(&model.Compose{}).Where("name = ?", name).Updates(vars).Error
 }

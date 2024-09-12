@@ -898,6 +898,10 @@ func (u *ContainerService) LoadContainerLogs(req dto.OperationWithNameAndType) s
 				break
 			}
 		}
+		if len(containers) == 0 {
+			composeItem, _ := composeRepo.GetRecord(commonRepo.WithByName(req.Name))
+			filePath = composeItem.Path
+		}
 	}
 	if _, err := os.Stat(filePath); err != nil {
 		return ""
