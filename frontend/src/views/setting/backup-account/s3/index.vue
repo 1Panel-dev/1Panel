@@ -16,6 +16,12 @@
                         <el-form-item :label="$t('commons.table.type')" prop="type" :rules="Rules.requiredSelect">
                             <el-tag>{{ $t('setting.' + s3Data.rowData!.type) }}</el-tag>
                         </el-form-item>
+                        <el-form-item :label="$t('setting.mode')" prop="varsJson.mode" :rules="Rules.requiredSelect">
+                            <el-radio-group v-model="s3Data.rowData!.varsJson['mode']">
+                                <el-radio value="virtual hosted">Virtual Hosted</el-radio>
+                                <el-radio value="path">Path</el-radio>
+                            </el-radio-group>
+                        </el-form-item>
                         <el-form-item label="Access Key ID" prop="accessKey" :rules="Rules.requiredInput">
                             <el-input v-model.trim="s3Data.rowData!.accessKey" />
                         </el-form-item>
@@ -28,7 +34,7 @@
                         <el-form-item label="Endpoint" prop="varsJson.endpointItem" :rules="Rules.requiredInput">
                             <el-input v-model="s3Data.rowData!.varsJson['endpointItem']">
                                 <template #prepend>
-                                    <el-select v-model.trim="endpointProto" style="width: 100px">
+                                    <el-select v-model="endpointProto" style="width: 120px">
                                         <el-option label="http" value="http" />
                                         <el-option label="https" value="https" />
                                     </el-select>
@@ -117,8 +123,11 @@ const s3Data = ref<DialogProps>({
 const acceptParams = (params: DialogProps): void => {
     buckets.value = [];
     s3Data.value = params;
-    if (params.title === 'create' || (params.title === 'edit' && !s3Data.value.rowData.varsJson['scType'])) {
+    if (!s3Data.value.rowData.varsJson['scType']) {
         s3Data.value.rowData.varsJson['scType'] = 'STANDARD';
+    }
+    if (!s3Data.value.rowData.varsJson['mode']) {
+        s3Data.value.rowData.varsJson['mode'] = 'virtual hosted';
     }
     if (s3Data.value.title === 'edit') {
         let httpItem = splitHttp(s3Data.value.rowData!.varsJson['endpoint']);

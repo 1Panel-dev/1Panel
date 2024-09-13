@@ -1410,6 +1410,7 @@ const message = {
         LOCAL: 'Server Disks',
         OSS: 'Ali OSS',
         S3: 'Amazon S3',
+        mode: 'Mode',
         MINIO: 'MINIO',
         SFTP: 'SFTP',
         WebDAV: 'WebDAV',

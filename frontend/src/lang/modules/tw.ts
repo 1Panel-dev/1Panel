@@ -1323,6 +1323,7 @@ const message = {
         LOCAL: '服務器磁盤',
         OSS: '阿裏雲 OSS',
         S3: '亞馬遜 S3 雲存儲',
+        mode: '模式',
         MINIO: 'MINIO',
         SFTP: 'SFTP',
         WebDAV: 'WebDAV',
