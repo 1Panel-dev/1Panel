@@ -1327,6 +1327,7 @@ const message = {
         LOCAL: '服务器磁盘',
         OSS: '阿里云 OSS',
         S3: '亚马逊 S3 云存储',
+        mode: '模式',
         MINIO: 'MINIO',
         SFTP: 'SFTP',
         WebDAV: 'WebDAV',
