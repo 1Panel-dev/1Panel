@@ -93,3 +93,11 @@ type WebsiteDirConfig struct {
 type WebsiteHtmlRes struct {
 	Content string `json:"content"`
 }
+
+type WebsiteRealIP struct {
+	WebsiteID uint   `json:"websiteID" validate:"required"`
+	Open      bool   `json:"open"`
+	IPFrom    string `json:"ipFrom"`
+	IPHeader  string `json:"ipHeader"`
+	IPOther   string `json:"ipOther"`
+}

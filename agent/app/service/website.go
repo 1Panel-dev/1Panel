@@ -10,6 +10,7 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"net"
 	"os"
 	"path"
 	"reflect"
@@ -107,6 +108,9 @@ type IWebsiteService interface {
 	DeleteLoadBalance(req request.WebsiteLBDelete) error
 	UpdateLoadBalance(req request.WebsiteLBUpdate) error
 	UpdateLoadBalanceFile(req request.WebsiteLBUpdateFile) error
+
+	SetRealIPConfig(req request.WebsiteRealIP) error
+	GetRealIPConfig(websiteID uint) (*response.WebsiteRealIP, error)
 
 	ChangeGroup(group, newGroup uint) error
 }
@@ -1578,23 +1582,6 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 	return updateNginxConfig(constant.NginxScopeServer, []dto.NginxParam{{Name: "include", Params: []string{nginxInclude}}}, &website)
 }
 
-func openProxyCache(website model.Website) error {
-	cacheDir := GetSitePath(website, SiteCacheDir)
-	fileOp := files.NewFileOp()
-	if !fileOp.Stat(cacheDir) {
-		_ = fileOp.CreateDir(cacheDir, 0755)
-	}
-	content, err := fileOp.GetContent(GetSitePath(website, SiteConf))
-	if err != nil {
-		return err
-	}
-	if strings.Contains(string(content), "proxy_cache_path") {
-		return nil
-	}
-	proxyCachePath := fmt.Sprintf("/www/sites/%s/cache levels=1:2 keys_zone=proxy_cache_zone_of_%s:5m max_size=1g inactive=24h", website.Alias, website.Alias)
-	return updateNginxConfig("", []dto.NginxParam{{Name: "proxy_cache_path", Params: []string{proxyCachePath}}}, &website)
-}
-
 func (w WebsiteService) UpdateProxyCache(req request.NginxProxyCacheUpdate) (err error) {
 	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
 	if err != nil {
@@ -2982,4 +2969,84 @@ func (w WebsiteService) UpdateLoadBalanceFile(req request.WebsiteLBUpdateFile) e
 
 func (w WebsiteService) ChangeGroup(group, newGroup uint) error {
 	return websiteRepo.UpdateGroup(group, newGroup)
+}
+
+func (w WebsiteService) SetRealIPConfig(req request.WebsiteRealIP) error {
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	if err != nil {
+		return err
+	}
+	params := []dto.NginxParam{
+		{Name: "real_ip_recursive", Params: []string{"on"}},
+		{Name: "set_real_ip_from", Params: []string{}},
+		{Name: "real_ip_header", Params: []string{}},
+	}
+	if req.Open {
+		if err := deleteNginxConfig(constant.NginxScopeServer, params, &website); err != nil {
+			return err
+		}
+		params = []dto.NginxParam{
+			{Name: "real_ip_recursive", Params: []string{"on"}},
+		}
+		var ips []string
+		ipArray := strings.Split(req.IPFrom, "\n")
+		for _, ip := range ipArray {
+			if ip == "" {
+				continue
+			}
+			if parsedIP := net.ParseIP(ip); parsedIP == nil {
+				if _, _, err := net.ParseCIDR(ip); err != nil {
+					return buserr.New("ErrParseIP")
+				}
+			}
+			ips = append(ips, strings.TrimSpace(ip))
+		}
+		for _, ip := range ips {
+			params = append(params, dto.NginxParam{Name: "set_real_ip_from", Params: []string{ip}})
+		}
+		if req.IPHeader == "other" {
+			params = append(params, dto.NginxParam{Name: "real_ip_header", Params: []string{req.IPOther}})
+		} else {
+			params = append(params, dto.NginxParam{Name: "real_ip_header", Params: []string{req.IPHeader}})
+		}
+		return updateNginxConfig(constant.NginxScopeServer, params, &website)
+	}
+	return deleteNginxConfig(constant.NginxScopeServer, params, &website)
+}
+
+func (w WebsiteService) GetRealIPConfig(websiteID uint) (*response.WebsiteRealIP, error) {
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(websiteID))
+	if err != nil {
+		return nil, err
+	}
+	params, err := getNginxParamsByKeys(constant.NginxScopeServer, []string{"real_ip_recursive"}, &website)
+	if err != nil {
+		return nil, err
+	}
+	if len(params) == 0 || len(params[0].Params) == 0 {
+		return &response.WebsiteRealIP{Open: false}, nil
+	}
+	params, err = getNginxParamsByKeys(constant.NginxScopeServer, []string{"set_real_ip_from", "real_ip_header"}, &website)
+	if err != nil {
+		return nil, err
+	}
+	res := &response.WebsiteRealIP{
+		Open: true,
+	}
+	var ips []string
+	for _, param := range params {
+		if param.Name == "set_real_ip_from" {
+			ips = append(ips, param.Params...)
+		}
+		if param.Name == "real_ip_header" {
+			if _, ok := dto.RealIPKeys[param.Params[0]]; ok {
+				res.IPHeader = param.Params[0]
+			} else {
+				res.IPHeader = "other"
+				res.IPOther = param.Params[0]
+			}
+		}
+	}
+	res.IPFrom = strings.Join(ips, "\n")
+	return res, err
 }

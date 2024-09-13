@@ -24,17 +24,20 @@
         <el-tab-pane :label="'HTTPS'">
             <HTTPS :id="id" v-if="tabIndex == '7'"></HTTPS>
         </el-tab-pane>
+        <el-tab-pane :label="$t('website.realIP')">
+            <RealIP :id="id" v-if="tabIndex == '8'"></RealIP>
+        </el-tab-pane>
         <el-tab-pane :label="$t('website.rewrite')">
-            <Rewrite :id="id" v-if="tabIndex == '8'"></Rewrite>
+            <Rewrite :id="id" v-if="tabIndex == '9'"></Rewrite>
         </el-tab-pane>
         <el-tab-pane :label="$t('website.antiLeech')">
-            <AntiLeech :id="id" v-if="tabIndex == '9'"></AntiLeech>
+            <AntiLeech :id="id" v-if="tabIndex == '10'"></AntiLeech>
         </el-tab-pane>
         <el-tab-pane :label="$t('website.redirect')">
-            <Redirect :id="id" v-if="tabIndex == '10'"></Redirect>
+            <Redirect :id="id" v-if="tabIndex == '11'"></Redirect>
         </el-tab-pane>
         <el-tab-pane :label="$t('website.other')">
-            <Other :id="id" v-if="tabIndex == '11'"></Other>
+            <Other :id="id" v-if="tabIndex == '12'"></Other>
         </el-tab-pane>
         <el-tab-pane
             :label="'PHP'"
@@ -61,6 +64,7 @@ import AntiLeech from './anti-Leech/index.vue';
 import Redirect from './redirect/index.vue';
 import LoadBalance from './load-balance/index.vue';
 import PHP from './php/index.vue';
+import RealIP from './real-ip/index.vue';
 
 const props = defineProps({
     website: {

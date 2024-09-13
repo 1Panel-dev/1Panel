@@ -946,3 +946,47 @@ func (b *BaseApi) GetProxyCache(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, res)
 }
+
+// @Tags Website
+// @Summary Set Real IP
+// @Description 设置真实IP
+// @Accept json
+// @Param request body request.WebsiteRealIP true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/realip [post]
+// @x-panel-log {"bodyKeys":["websiteID"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"websiteID","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"修改 [domain] 网站真实IP配置 ","formatEN":"Modify the real IP configuration of [domain] website"}
+func (b *BaseApi) SetRealIPConfig(c *gin.Context) {
+	var req request.WebsiteRealIP
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := websiteService.SetRealIPConfig(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}
+
+// 写一个调用 GetRealIPConfig 的接口
+// @Tags Website
+// @Summary Get Real IP Config
+// @Description 获取真实 IP 配置
+// @Accept json
+// @Param id path int true "id"
+// @Success 200 {object} response.WebsiteRealIP
+// @Security ApiKeyAuth
+// @Router /websites/realip/config/{id} [get]
+func (b *BaseApi) GetRealIPConfig(c *gin.Context) {
+	id, err := helper.GetParamID(c)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		return
+	}
+	res, err := websiteService.GetRealIPConfig(id)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}

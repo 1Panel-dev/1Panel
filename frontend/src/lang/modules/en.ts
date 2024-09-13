@@ -2194,6 +2194,14 @@ const message = {
         shareCaheHelper: 'Approximately 8000 cache objects can be stored per 1M of memory',
         cacheLimitHelper: 'Old cache will be automatically deleted when the limit is exceeded',
         cacheExpireJHelper: 'Cache will be deleted if it misses after the expiration time',
+        realIP: 'Real IP',
+        ipFrom: 'IP Source',
+        ipFromHelper:
+            "By configuring trusted IP sources, OpenResty will analyze IP information in HTTP headers, accurately identify and record visitors' real IP addresses, including in access logs",
+        ipFromExample1: "If the frontend is a tool like Frp, you can enter Frp's IP address, such as 127.0.0.1",
+        ipFromExample2: "If the frontend is a CDN, you can enter the CDN's IP address range",
+        ipFromExample3:
+            'If unsure, you can enter 0.0.0.0/0 (ipv4) ::/0 (ipv6) [Note: Allowing any source IP is not secure]',
     },
     php: {
         short_open_tag: 'Short tag support',

@@ -266,3 +266,11 @@ type WebsiteLBUpdateFile struct {
 	Name      string `json:"name" validate:"required"`
 	Content   string `json:"content" validate:"required"`
 }
+
+type WebsiteRealIP struct {
+	WebsiteID uint   `json:"websiteID" validate:"required"`
+	Open      bool   `json:"open"`
+	IPFrom    string `json:"ipFrom"`
+	IPHeader  string `json:"ipHeader"`
+	IPOther   string `json:"ipOther"`
+}

@@ -74,5 +74,8 @@ func (a *WebsiteRouter) InitRouter(Router *gin.RouterGroup) {
 		websiteRouter.POST("/lbs/file", baseApi.UpdateLoadBalanceFile)
 
 		websiteRouter.POST("/php/version", baseApi.ChangePHPVersion)
+
+		websiteRouter.POST("/realip/config", baseApi.SetRealIPConfig)
+		websiteRouter.GET("/realip/config/:id", baseApi.GetRealIPConfig)
 	}
 }

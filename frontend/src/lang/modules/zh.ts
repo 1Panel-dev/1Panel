@@ -2043,6 +2043,13 @@ const message = {
         shareCaheHelper: '每1M内存可以存储约8000个缓存对象',
         cacheLimitHelper: '超过限制会自动删除旧的缓存',
         cacheExpireJHelper: '超出时间缓存未命中将会被删除',
+        realIP: '真实 IP',
+        ipFrom: 'IP 来源',
+        ipFromHelper:
+            '通过配置可信 IP 来源，OpenResty 会分析 HTTP Header 中的 IP 信息，准确识别并记录访客的真实 IP 地址，包括在访问日志中',
+        ipFromExample1: '如果前端是 Frp 等工具，可以填写 Frp 的 IP 地址，类似 127.0.0.1',
+        ipFromExample2: '如果前端是 CDN，可以填写 CDN 的 IP 地址段',
+        ipFromExample3: '如果不确定，可以填 0.0.0.0/0（ipv4）  ::/0（ipv6） [注意：允许任意来源 IP 不安全]',
     },
     php: {
         short_open_tag: '短标签支持',

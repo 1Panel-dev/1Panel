@@ -311,3 +311,11 @@ export const UpdateCacheConfig = (req: Website.WebsiteCacheConfig) => {
 export const GetCacheConfig = (id: number) => {
     return http.get<Website.WebsiteCacheConfig>(`/websites/proxy/config/${id}`);
 };
+
+export const UpdateRealIPConfig = (req: Website.WebsiteRealIPConfig) => {
+    return http.post(`/websites/realip/config`, req);
+};
+
+export const GetRealIPConfig = (id: number) => {
+    return http.get<Website.WebsiteRealIPConfig>(`/websites/realip/config/${id}`);
+};

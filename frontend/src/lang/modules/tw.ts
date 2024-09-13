@@ -2042,6 +2042,13 @@ const message = {
         shareCaheHelper: '每1M內存可以存儲約8000個快取對象',
         cacheLimitHelper: '超過限制會自動刪除舊的快取',
         cacheExpireJHelper: '超出時間快取未命中將會被刪除',
+        realIP: '真實 IP',
+        ipFrom: 'IP 來源',
+        ipFromHelper:
+            '通過配置可信 IP 來源，OpenResty 會分析 HTTP Header 中的 IP 資訊，準確識別並記錄訪客的真實 IP 地址，包括在存取日誌中',
+        ipFromExample1: '如果前端是 Frp 等工具，可以填寫 Frp 的 IP 地址，類似 127.0.0.1',
+        ipFromExample2: '如果前端是 CDN，可以填寫 CDN 的 IP 地址段',
+        ipFromExample3: '如果不確定，可以填 0.0.0.0/0（ipv4） ::/0（ipv6） [注意：允許任意來源 IP 不安全]',
     },
     php: {
         short_open_tag: '短標簽支持',
