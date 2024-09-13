@@ -29,7 +29,7 @@
                         >
                             <el-input v-model="kodoData.rowData!.varsJson['domainItem']">
                                 <template #prepend>
-                                    <el-select v-model.trim="domainProto" style="width: 100px">
+                                    <el-select v-model.trim="domainProto" style="width: 120px">
                                         <el-option label="http" value="http" />
                                         <el-option label="https" value="https" />
                                     </el-select>

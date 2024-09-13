@@ -25,7 +25,7 @@
                         <el-form-item label="Endpoint" prop="varsJson.endpointItem" :rules="Rules.requiredInput">
                             <el-input v-model="minioData.rowData!.varsJson['endpointItem']">
                                 <template #prepend>
-                                    <el-select v-model.trim="endpointProto" style="width: 100px">
+                                    <el-select v-model.trim="endpointProto" style="width: 120px">
                                         <el-option label="http" value="http" />
                                         <el-option label="https" value="https" />
                                     </el-select>

@@ -27,12 +27,16 @@ func NewS3Client(vars map[string]interface{}) (*s3Client, error) {
 	if len(scType) == 0 {
 		scType = "Standard"
 	}
+	mode := loadParamFromVars("mode", vars)
+	if len(mode) == 0 {
+		mode = "virtual hosted"
+	}
 	sess, err := session.NewSession(&aws.Config{
 		Credentials:      credentials.NewStaticCredentials(accessKey, secretKey, ""),
 		Endpoint:         aws.String(endpoint),
 		Region:           aws.String(region),
 		DisableSSL:       aws.Bool(true),
-		S3ForcePathStyle: aws.Bool(false),
+		S3ForcePathStyle: aws.Bool(mode == "path"),
 	})
 	if err != nil {
 		return nil, err
