@@ -8,6 +8,21 @@ import (
 )
 
 // @Tags System Setting
+// @Summary Load system snapshot data
+// @Description 获取系统快照数据
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /settings/snapshot/load [get]
+func (b *BaseApi) LoadSnapshotData(c *gin.Context) {
+	data, err := snapshotService.LoadSnapshotData()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags System Setting
 // @Summary Create system snapshot
 // @Description 创建系统快照
 // @Accept json

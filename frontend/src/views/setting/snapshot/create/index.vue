@@ -1,0 +1,485 @@
+<template>
+    <DrawerPro v-model="drawerVisible" :header="$t('setting.snapshot')" :back="handleClose" size="large">
+        <fu-steps
+            v-loading="loading"
+            direction="vertical"
+            class="steps"
+            :space="50"
+            ref="stepsRef"
+            :isLoading="stepLoading"
+            :finishButtonText="$t('commons.button.create')"
+            @finish="submitAddSnapshot"
+            @change="changeStep"
+            :beforeLeave="beforeLeave"
+        >
+            <fu-step id="baseData" :title="$t('setting.stepBaseData')">
+                <el-form
+                    v-loading="loading"
+                    class="mt-5"
+                    label-position="top"
+                    ref="formRef"
+                    :model="form"
+                    :rules="rules"
+                >
+                    <el-form-item :label="$t('setting.backupAccount')" prop="fromAccounts">
+                        <el-select multiple @change="changeAccount" v-model="form.fromAccounts" clearable>
+                            <div v-for="item in backupOptions" :key="item.id">
+                                <el-option
+                                    v-if="item.type !== $t('setting.LOCAL')"
+                                    :value="item.id"
+                                    :label="item.type + ' - ' + item.name"
+                                />
+                                <el-option v-else :value="item.id" :label="item.type" />
+                            </div>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item :label="$t('cronjob.default_download_path')" prop="downloadAccountID">
+                        <el-select v-model="form.downloadAccountID" clearable>
+                            <div v-for="item in accountOptions" :key="item.id">
+                                <el-option
+                                    v-if="item.type !== $t('setting.LOCAL')"
+                                    :value="item.id"
+                                    :label="item.type + ' - ' + item.name"
+                                />
+                                <el-option v-else :value="item.id" :label="item.type" />
+                            </div>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item :label="$t('setting.compressPassword')" prop="secret">
+                        <el-input v-model="form.secret"></el-input>
+                    </el-form-item>
+                    <el-form-item :label="$t('commons.table.description')" prop="description">
+                        <el-input type="textarea" clearable v-model="form.description" />
+                    </el-form-item>
+                </el-form>
+            </fu-step>
+            <fu-step id="appData" :title="$t('setting.stepAppData')">
+                <div>
+                    <el-checkbox
+                        class="ml-6"
+                        v-model="form.backupAllImage"
+                        @change="selectAllImage"
+                        :label="$t('setting.selectAllImage')"
+                        size="large"
+                    />
+                    <el-tree
+                        style="max-width: 600px"
+                        ref="appRef"
+                        node-key="id"
+                        :default-expand-all="true"
+                        :data="form.appData"
+                        :props="defaultProps"
+                        show-checkbox
+                    >
+                        <template #default="{ data }">
+                            <div class="float-left">
+                                <span>{{ loadApp18n(data.label) }}</span>
+                            </div>
+                            <div class="ml-4 float-left">
+                                <span v-if="data.size">{{ computeSize(data.size) }}</span>
+                            </div>
+                        </template>
+                    </el-tree>
+                </div>
+            </fu-step>
+            <fu-step id="panelData" :title="$t('setting.stepPanelData')">
+                <div>
+                    <el-tree
+                        style="max-width: 600px"
+                        ref="panelRef"
+                        node-key="id"
+                        :data="form.panelData"
+                        :props="defaultProps"
+                        show-checkbox
+                    >
+                        <template #default="{ node, data }">
+                            <div class="float-left">
+                                <span>{{ load18n(node, data.label) }}</span>
+                            </div>
+                            <div class="ml-4 float-left">
+                                <span v-if="data.size">{{ computeSize(data.size) }}</span>
+                            </div>
+                        </template>
+                    </el-tree>
+                </div>
+            </fu-step>
+            <fu-step id="backupData" :title="$t('setting.stepBackupData')">
+                <div>
+                    <el-tree
+                        style="max-width: 600px"
+                        ref="backupRef"
+                        node-key="id"
+                        :data="form.backupData"
+                        :props="defaultProps"
+                        show-checkbox
+                    >
+                        <template #default="{ node, data }">
+                            <div class="float-left">
+                                <span>{{ load18n(node, data.label) }}</span>
+                            </div>
+                            <div class="ml-4 float-left">
+                                <span v-if="data.size">{{ computeSize(data.size) }}</span>
+                            </div>
+                        </template>
+                    </el-tree>
+                </div>
+            </fu-step>
+            <fu-step id="otherData" :title="$t('setting.stepOtherData')">
+                <div class="ml-6">
+                    <el-checkbox v-model="form.withLoginLog" :label="$t('setting.loginLog')" size="large" />
+                </div>
+                <div class="ml-6">
+                    <el-checkbox v-model="form.withOperationLog" :label="$t('setting.OperationLog')" size="large" />
+                </div>
+                <div class="ml-6">
+                    <el-checkbox v-model="form.withMonitorData" :label="$t('setting.monitorData')" size="large" />
+                </div>
+            </fu-step>
+        </fu-steps>
+
+        <template #footer>
+            <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
+        </template>
+    </DrawerPro>
+</template>
+<script lang="ts" setup>
+import { ref } from 'vue';
+import { loadSnapshotSetting, snapshotCreate } from '@/api/modules/setting';
+import { computeSize } from '@/utils/util';
+import i18n from '@/lang';
+import { getBackupList } from '@/api/modules/backup';
+import { Rules } from '@/global/form-rules';
+import { ElForm } from 'element-plus';
+import { MsgSuccess } from '@/utils/message';
+
+const loading = ref();
+const stepLoading = ref(false);
+const stepsRef = ref();
+
+const appRef = ref();
+const panelRef = ref();
+const backupRef = ref();
+
+const backupOptions = ref();
+const accountOptions = ref();
+
+type FormInstance = InstanceType<typeof ElForm>;
+const formRef = ref<FormInstance>();
+const form = reactive({
+    id: 0,
+    downloadAccountID: '',
+    fromAccounts: [],
+    sourceAccountIDs: '',
+    description: '',
+    secret: '',
+
+    backupAllImage: false,
+    withLoginLog: false,
+    withOperationLog: false,
+    withMonitorData: false,
+
+    panelData: [],
+    backupData: [],
+    appData: [],
+});
+const rules = reactive({
+    fromAccounts: [Rules.requiredSelect],
+    downloadAccountID: [Rules.requiredSelect],
+});
+
+const defaultProps = {
+    children: 'children',
+    label: 'label',
+    checked: 'isCheck',
+    disabled: 'isDisable',
+};
+const drawerVisible = ref();
+
+const emit = defineEmits(['search']);
+const acceptParams = (): void => {
+    search();
+    loadBackups();
+    drawerVisible.value = true;
+};
+
+const handleClose = () => {
+    drawerVisible.value = false;
+};
+
+const submitForm = async (formEl: any) => {
+    let bool;
+    if (!formEl) return;
+    await formEl.validate((valid: boolean) => {
+        if (valid) {
+            bool = true;
+        } else {
+            bool = false;
+        }
+    });
+    return bool;
+};
+const beforeLeave = async (stepItem: any) => {
+    switch (stepItem.id) {
+        case 'baseData':
+            if (await submitForm(formRef.value)) {
+                stepsRef.value.next();
+                return true;
+            } else {
+                return false;
+            }
+        case 'appData':
+            let appChecks = appRef.value.getCheckedNodes();
+            loadCheckForSubmit(appChecks, form.appData);
+            return true;
+        case 'panelData':
+            let panelChecks = panelRef.value.getCheckedNodes();
+            loadCheckForSubmit(panelChecks, form.panelData);
+            return true;
+        case 'backupData':
+            let backupChecks = backupRef.value.getCheckedNodes();
+            loadCheckForSubmit(backupChecks, form.backupData);
+            return true;
+    }
+};
+
+const loadApp18n = (label: string) => {
+    switch (label) {
+        case 'appData':
+            return i18n.global.t('setting.appDataLabel');
+        case 'appImage':
+        case 'appBackup':
+            return i18n.global.t('setting.' + label);
+        default:
+            return label;
+    }
+};
+
+const loadBackups = async () => {
+    const res = await getBackupList();
+    backupOptions.value = [];
+    for (const item of res.data) {
+        if (item.id !== 0) {
+            backupOptions.value.push({ id: item.id, type: i18n.global.t('setting.' + item.type), name: item.name });
+        }
+    }
+    changeAccount();
+};
+
+const changeStep = (currentStep: any) => {
+    switch (currentStep.id) {
+        case 'appData':
+            if (appRef.value) {
+                return;
+            }
+            nextTick(() => {
+                setAppDefaultCheck(form.appData);
+            });
+            return;
+        case 'panelData':
+            if (panelRef.value) {
+                return;
+            }
+            nextTick(() => {
+                setPanelDefaultCheck(form.panelData);
+                return;
+            });
+            return;
+        case 'backupData':
+            if (backupRef.value) {
+                return;
+            }
+            nextTick(() => {
+                setBackupDefaultCheck(form.backupData);
+                return;
+            });
+            return;
+    }
+};
+
+const changeAccount = async () => {
+    accountOptions.value = [];
+    let isInAccounts = false;
+    for (const item of backupOptions.value) {
+        let exist = false;
+        for (const ac of form.fromAccounts) {
+            if (item.id == ac) {
+                exist = true;
+                break;
+            }
+        }
+        if (exist) {
+            if (item.id === form.downloadAccountID) {
+                isInAccounts = true;
+            }
+            accountOptions.value.push(item);
+        }
+    }
+    if (!isInAccounts) {
+        form.downloadAccountID = form.downloadAccountID ? undefined : form.downloadAccountID;
+    }
+};
+
+const load18n = (node: any, label: string) => {
+    if (node.level === 1) {
+        switch (label) {
+            case 'agent':
+            case 'conf':
+            case 'db':
+            case 'docker':
+            case 'log':
+            case 'runtime':
+            case 'task':
+            case 'app':
+            case 'database':
+            case 'website':
+            case 'directory':
+                return i18n.global.t('setting.' + label + 'Label');
+            default:
+                return label;
+        }
+    }
+    if (node.level === 2) {
+        switch (label) {
+            case 'App':
+                return i18n.global.t('setting.appLabel');
+            case 'AppStore':
+                return i18n.global.t('setting.appStoreLabel');
+            case 'shell':
+                return i18n.global.t('setting.shellLabel');
+            default:
+                return label;
+        }
+    }
+    return label;
+};
+
+const submitAddSnapshot = async () => {
+    loading.value = true;
+    form.sourceAccountIDs = form.fromAccounts.join(',');
+    await snapshotCreate(form)
+        .then(() => {
+            loading.value = false;
+            drawerVisible.value = false;
+            emit('search');
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        })
+        .catch(() => {
+            loading.value = false;
+        });
+};
+
+const loadCheckForSubmit = (checks: any, list: any) => {
+    for (const item of list) {
+        let isCheck = false;
+        for (const check of checks) {
+            if (item.id == check.id) {
+                isCheck = true;
+                break;
+            }
+        }
+        item.isCheck = isCheck;
+        if (item.children) {
+            loadCheckForSubmit(checks, item.children);
+        }
+    }
+};
+
+const selectAllImage = () => {
+    for (const item of form.appData) {
+        for (const item2 of item.children) {
+            if (item2.label === 'appImage') {
+                appRef.value.setChecked(item2.id, form.backupAllImage, false);
+            }
+        }
+    }
+};
+
+const search = async () => {
+    const res = await loadSnapshotSetting();
+    form.panelData = res.data.panelData || [];
+    form.backupData = res.data.backupData || [];
+    form.appData = res.data.appData || [];
+};
+
+const setAppDefaultCheck = async (list: any) => {
+    for (const item of list) {
+        if (item.isCheck) {
+            appRef.value.setChecked(item.id, true, true);
+            continue;
+        }
+        if (item.children) {
+            setAppDefaultCheck(item.children);
+        }
+    }
+};
+const setPanelDefaultCheck = async (list: any) => {
+    for (const item of list) {
+        if (item.isCheck) {
+            panelRef.value.setChecked(item.id, true, true);
+            continue;
+        }
+        if (item.children) {
+            setPanelDefaultCheck(item.children);
+        }
+    }
+};
+const setBackupDefaultCheck = async (list: any) => {
+    for (const item of list) {
+        if (item.isCheck) {
+            backupRef.value.setChecked(item.id, true, true);
+            continue;
+        }
+        if (item.children) {
+            setBackupDefaultCheck(item.children);
+        }
+    }
+};
+
+defineExpose({
+    acceptParams,
+});
+</script>
+
+<style lang="scss" scoped>
+.steps {
+    width: 100%;
+    margin-top: 20px;
+    :deep(.el-step) {
+        .el-step__line {
+            background-color: var(--el-color-primary-light-5);
+        }
+        .el-step__head.is-success {
+            color: var(--el-color-primary-light-5);
+            border-color: var(--el-color-primary-light-5);
+        }
+        .el-step__icon {
+            color: var(--el-color-primary-light-2);
+        }
+        .el-step__icon.is-text {
+            border-radius: 50%;
+            border: 2px solid;
+            border-color: var(--el-color-primary-light-2);
+        }
+
+        .el-step__title.is-finish {
+            color: #717379;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .el-step__description.is-finish {
+            color: #606266;
+        }
+
+        .el-step__title.is-success {
+            font-weight: bold;
+            color: var(--el-color-primary-light-2);
+        }
+
+        .el-step__title.is-process {
+            font-weight: bold;
+            color: var(--el-text-color-regular);
+        }
+    }
+}
+</style>

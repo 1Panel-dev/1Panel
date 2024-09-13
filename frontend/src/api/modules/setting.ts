@@ -88,6 +88,9 @@ export const bindMFA = (param: Setting.MFABind) => {
 };
 
 // snapshot
+export const loadSnapshotSetting = () => {
+    return http.get<Setting.SnapshotData>(`/settings/snapshot/load`);
+};
 export const snapshotCreate = (param: Setting.SnapshotCreate) => {
     return http.post(`/settings/snapshot`, param);
 };

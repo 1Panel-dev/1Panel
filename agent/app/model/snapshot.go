@@ -10,6 +10,13 @@ type Snapshot struct {
 	Message           string `json:"message"`
 	Version           string `json:"version"`
 
+	AppData          string `json:"appData"`
+	PanelData        string `json:"panelData"`
+	BackupData       string `json:"backupData"`
+	WithMonitorData  bool   `json:"withMonitorData"`
+	WithLoginLog     bool   `json:"withLoginLog"`
+	WithOperationLog bool   `json:"withOperationLog"`
+
 	InterruptStep   string `json:"interruptStep"`
 	RecoverStatus   string `json:"recoverStatus"`
 	RecoverMessage  string `json:"recoverMessage"`
@@ -21,11 +28,10 @@ type Snapshot struct {
 
 type SnapshotStatus struct {
 	BaseModel
-	SnapID     uint   `json:"snapID"`
-	Panel      string `json:"panel" gorm:"default:Running"`
-	PanelInfo  string `json:"panelInfo" gorm:"default:Running"`
-	DaemonJson string `json:"daemonJson" gorm:"default:Running"`
-	AppData    string `json:"appData" gorm:"default:Running"`
+	SnapID uint `json:"snapID"`
+
+	BaseData   string `json:"baseData" gorm:"default:Running"`
+	AppImage   string `json:"appImage" gorm:"default:Running"`
 	PanelData  string `json:"panelData" gorm:"default:Running"`
 	BackupData string `json:"backupData" gorm:"default:Running"`
 

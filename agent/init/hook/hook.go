@@ -72,18 +72,18 @@ func handleSnapStatus() {
 	status, _ := snapRepo.GetStatusList()
 	for _, item := range status {
 		updates := make(map[string]interface{})
-		if item.Panel == constant.StatusRunning {
-			updates["panel"] = constant.StatusFailed
-		}
-		if item.PanelInfo == constant.StatusRunning {
-			updates["panel_info"] = constant.StatusFailed
-		}
-		if item.DaemonJson == constant.StatusRunning {
-			updates["daemon_json"] = constant.StatusFailed
-		}
-		if item.AppData == constant.StatusRunning {
-			updates["app_data"] = constant.StatusFailed
-		}
+		// if item.Panel == constant.StatusRunning {
+		// 	updates["panel"] = constant.StatusFailed
+		// }
+		// if item.PanelInfo == constant.StatusRunning {
+		// 	updates["panel_info"] = constant.StatusFailed
+		// }
+		// if item.DaemonJson == constant.StatusRunning {
+		// 	updates["daemon_json"] = constant.StatusFailed
+		// }
+		// if item.AppData == constant.StatusRunning {
+		// 	updates["app_data"] = constant.StatusFailed
+		// }
 		if item.PanelData == constant.StatusRunning {
 			updates["panel_data"] = constant.StatusFailed
 		}

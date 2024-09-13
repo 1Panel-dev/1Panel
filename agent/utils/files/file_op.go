@@ -456,6 +456,48 @@ func (f FileOp) CopyDir(src, dst string) error {
 	return cmd.ExecCmd(fmt.Sprintf(`cp -rf '%s' '%s'`, src, dst+"/"))
 }
 
+func (f FileOp) CopyDirWithExclude(src, dst string, excludeNames []string) error {
+	srcInfo, err := f.Fs.Stat(src)
+	if err != nil {
+		return err
+	}
+	dstDir := filepath.Join(dst, srcInfo.Name())
+	if err = f.Fs.MkdirAll(dstDir, srcInfo.Mode()); err != nil {
+		return err
+	}
+	if len(excludeNames) == 0 {
+		return cmd.ExecCmd(fmt.Sprintf(`cp -rf '%s' '%s'`, src, dst+"/"))
+	}
+	tmpFiles, err := os.ReadDir(src)
+	if err != nil {
+		return err
+	}
+	for _, item := range tmpFiles {
+		isExclude := false
+		for _, name := range excludeNames {
+			if item.Name() == name {
+				isExclude = true
+				break
+			}
+		}
+		if isExclude {
+			continue
+		}
+		if item.IsDir() {
+			fmt.Println(path.Join(src, item.Name()), dstDir)
+			if err := f.CopyDir(path.Join(src, item.Name()), dstDir); err != nil {
+				return err
+			}
+			continue
+		}
+		if err := f.CopyFile(path.Join(src, item.Name()), dstDir); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (f FileOp) CopyFile(src, dst string) error {
 	dst = filepath.Clean(dst) + string(filepath.Separator)
 	return cmd.ExecCmd(fmt.Sprintf(`cp -f '%s' '%s'`, src, dst+"/"))
@@ -669,4 +711,57 @@ func ZipFile(files []archiver.File, dst afero.File) error {
 		}
 	}
 	return nil
+}
+
+func (f FileOp) TarGzCompressPro(withDir bool, src, dst, secret, exclusionRules string) error {
+	workdir := src
+	srcItem := "."
+	if withDir {
+		workdir = path.Dir(src)
+		srcItem = path.Base(src)
+	}
+	commands := ""
+
+	exMap := make(map[string]struct{})
+	exStr := ""
+	excludes := strings.Split(exclusionRules, ";")
+	excludes = append(excludes, "*.sock")
+	for _, exclude := range excludes {
+		if len(exclude) == 0 {
+			continue
+		}
+		if _, ok := exMap[exclude]; ok {
+			continue
+		}
+		exStr += " --exclude "
+		exStr += exclude
+		exMap[exclude] = struct{}{}
+	}
+
+	if len(secret) != 0 {
+		commands = fmt.Sprintf("tar -zcf - %s | openssl enc -aes-256-cbc -salt -pbkdf2 -k '%s' -out %s", srcItem, secret, dst)
+		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" %s ", secret), "******"))
+	} else {
+		commands = fmt.Sprintf("tar zcf %s %s %s", dst, exStr, srcItem)
+		global.LOG.Debug(commands)
+	}
+	return cmd.ExecCmdWithDir(commands, workdir)
+}
+
+func (f FileOp) TarGzExtractPro(src, dst string, secret string) error {
+	if _, err := os.Stat(path.Dir(dst)); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(path.Dir(dst), os.ModePerm); err != nil {
+			return err
+		}
+	}
+
+	commands := ""
+	if len(secret) != 0 {
+		commands = fmt.Sprintf("openssl enc -d -aes-256-cbc -salt -pbkdf2 -k '%s' -in %s | tar -zxf - > /root/log", secret, src)
+		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" %s ", secret), "******"))
+	} else {
+		commands = fmt.Sprintf("tar zxvf %s", src)
+		global.LOG.Debug(commands)
+	}
+	return cmd.ExecCmdWithDir(commands, dst)
 }
