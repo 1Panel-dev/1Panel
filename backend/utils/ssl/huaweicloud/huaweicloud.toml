@@ -1,0 +1,29 @@
+Name = "Huawei Cloud"
+Description = ''''''
+URL = "https://huaweicloud.com"
+Code = "huaweicloud"
+Since = "v4.19"
+
+Example = '''
+HUAWEICLOUD_ACCESS_KEY_ID=your-access-key-id \
+HUAWEICLOUD_SECRET_ACCESS_KEY=your-secret-access-key \
+HUAWEICLOUD_REGION=cn-south-1 \
+lego --email you@example.com --dns huaweicloud --domains my.example.org run
+'''
+
+[Configuration]
+  [Configuration.Credentials]
+    HUAWEICLOUD_ACCESS_KEY_ID = "Access key ID"
+    HUAWEICLOUD_SECRET_ACCESS_KEY = "Access Key secret"
+    HUAWEICLOUD_REGION = "Region"
+
+  [Configuration.Additional]
+    HUAWEICLOUD_POLLING_INTERVAL = "Time between DNS propagation check"
+    HUAWEICLOUD_PROPAGATION_TIMEOUT = "Maximum waiting time for DNS propagation"
+    HUAWEICLOUD_TTL = "The TTL of the TXT record used for the DNS challenge"
+    HUAWEICLOUD_HTTP_TIMEOUT = "API request timeout"
+
+[Links]
+  API = "https://console-intl.huaweicloud.com/apiexplorer/#/openapi/DNS/doc?locale=en-us"
+  CN_API = "https://support.huaweicloud.com/api-dns/zh-cn_topic_0132421999.html"
+  GoClient = "https://github.com/huaweicloud/huaweicloud-sdk-go-v3"

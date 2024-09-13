@@ -3,6 +3,7 @@ package ssl
 import (
 	"crypto"
 	"encoding/json"
+	"github.com/1Panel-dev/1Panel/backend/utils/ssl/huaweicloud"
 	"os"
 	"strings"
 	"time"
@@ -72,6 +73,7 @@ const (
 	NameCom      DnsType = "NameCom"
 	Godaddy      DnsType = "Godaddy"
 	TencentCloud DnsType = "TencentCloud"
+	HuaweiCloud  DnsType = "HuaweiCloud"
 )
 
 type DNSParam struct {
@@ -84,6 +86,7 @@ type DNSParam struct {
 	APIUser   string `json:"apiUser"`
 	APISecret string `json:"apiSecret"`
 	SecretID  string `json:"secretID"`
+	Region    string `json:"region"`
 }
 
 var (
@@ -166,6 +169,15 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string, websiteSSL model.Web
 		tencentCloudConfig.PollingInterval = pollingInterval
 		tencentCloudConfig.TTL = ttl
 		p, err = tencentcloud.NewDNSProviderConfig(tencentCloudConfig)
+	case HuaweiCloud:
+		huaweiCloudConfig := huaweicloud.NewDefaultConfig()
+		huaweiCloudConfig.AccessKeyID = param.AccessKey
+		huaweiCloudConfig.SecretAccessKey = param.SecretKey
+		huaweiCloudConfig.Region = param.Region
+		huaweiCloudConfig.PropagationTimeout = propagationTimeout
+		huaweiCloudConfig.PollingInterval = pollingInterval
+		huaweiCloudConfig.TTL = int32(ttl)
+		p, err = huaweicloud.NewDNSProviderConfig(huaweiCloudConfig)
 	}
 	if err != nil {
 		return err
