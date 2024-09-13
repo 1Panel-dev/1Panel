@@ -598,4 +598,11 @@ export namespace Website {
         cacheExpire: number;
         cacheExpireUnit: string;
     }
+
+    export interface WebsiteRealIPConfig {
+        open: boolean;
+        ipFrom: string;
+        ipHeader: string;
+        ipOther: string;
+    }
 }

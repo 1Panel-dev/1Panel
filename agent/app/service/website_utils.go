@@ -1199,3 +1199,20 @@ func GetSitePath(website model.Website, confType string) string {
 	}
 	return ""
 }
+
+func openProxyCache(website model.Website) error {
+	cacheDir := GetSitePath(website, SiteCacheDir)
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(cacheDir) {
+		_ = fileOp.CreateDir(cacheDir, 0755)
+	}
+	content, err := fileOp.GetContent(GetSitePath(website, SiteConf))
+	if err != nil {
+		return err
+	}
+	if strings.Contains(string(content), "proxy_cache_path") {
+		return nil
+	}
+	proxyCachePath := fmt.Sprintf("/www/sites/%s/cache levels=1:2 keys_zone=proxy_cache_zone_of_%s:5m max_size=1g inactive=24h", website.Alias, website.Alias)
+	return updateNginxConfig("", []dto.NginxParam{{Name: "proxy_cache_path", Params: []string{proxyCachePath}}}, &website)
+}

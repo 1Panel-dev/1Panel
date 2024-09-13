@@ -82,3 +82,5 @@ type NginxUpstreamServer struct {
 }
 
 var LBAlgorithms = map[string]struct{}{"ip_hash": {}, "least_conn": {}}
+
+var RealIPKeys = map[string]struct{}{"X-Forwarded-For": {}, "X-Real-IP": {}, "CF-Connecting-IP": {}}
