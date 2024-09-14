@@ -11,7 +11,7 @@ import { EditorState } from '@codemirror/state';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { StreamLanguage } from '@codemirror/language';
-import { nginx } from '@codemirror/legacy-modes/mode/nginx';
+import { nginx } from './nginx';
 import { yaml } from '@codemirror/legacy-modes/mode/yaml';
 import { dockerFile } from '@codemirror/legacy-modes/mode/dockerfile';
 import { placeholder } from '@codemirror/view';
