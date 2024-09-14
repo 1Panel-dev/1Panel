@@ -632,6 +632,7 @@ const message = {
         emptyUser: '为空时，将使用容器默认的用户登录',
         privileged: '特权模式',
         privilegedHelper: '允许容器在主机上执行某些特权操作，可能会增加容器风险，谨慎开启！',
+        editComposeHelper: '菜单中手动输入的环境变量会覆盖原有的同名变量，如果不存在则新增',
 
         upgradeHelper: '仓库名称/镜像名称:镜像版本',
         upgradeWarning2: '升级操作需要重建容器，任何未持久化的数据将会丢失，是否继续？',
