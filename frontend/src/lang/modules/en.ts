@@ -2202,6 +2202,8 @@ const message = {
         ipFromExample2: "If the frontend is a CDN, you can enter the CDN's IP address range",
         ipFromExample3:
             'If unsure, you can enter 0.0.0.0/0 (ipv4) ::/0 (ipv6) [Note: Allowing any source IP is not secure]',
+        http3Helper:
+            'HTTP/3 is an upgrade to HTTP/2, offering faster connection speeds and better performance, but not all browsers support HTTP/3. Enabling it may cause some browsers to be unable to access the site.',
     },
     php: {
         short_open_tag: 'Short tag support',

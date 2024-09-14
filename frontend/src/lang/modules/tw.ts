@@ -2049,6 +2049,8 @@ const message = {
         ipFromExample1: '如果前端是 Frp 等工具，可以填寫 Frp 的 IP 地址，類似 127.0.0.1',
         ipFromExample2: '如果前端是 CDN，可以填寫 CDN 的 IP 地址段',
         ipFromExample3: '如果不確定，可以填 0.0.0.0/0（ipv4） ::/0（ipv6） [注意：允許任意來源 IP 不安全]',
+        http3Helper:
+            'HTTP/3 是 HTTP/2 的升級版本，提供更快的連線速度和更好的性能，但並非所有瀏覽器都支援 HTTP/3，啟用後可能會導致部分瀏覽器無法訪問',
     },
     php: {
         short_open_tag: '短標簽支持',

@@ -1,6 +1,6 @@
 <template>
     <el-row :gutter="20" v-loading="loading">
-        <el-col :xs="24" :sm="18" :md="18" :lg="18" :xl="14">
+        <el-col :xs="24" :sm="18" :md="18" :lg="14" :xl="14">
             <el-form
                 class="moblie-form"
                 ref="httpsForm"
@@ -29,8 +29,12 @@
                         <el-checkbox v-model="form.hsts">{{ $t('commons.button.enable') }}</el-checkbox>
                         <span class="input-help">{{ $t('website.hstsHelper') }}</span>
                     </el-form-item>
+                    <el-form-item :label="'HTTP3'" prop="http3">
+                        <el-checkbox v-model="form.http3">{{ $t('commons.button.enable') }}</el-checkbox>
+                        <span class="input-help">{{ $t('website.http3Helper') }}</span>
+                    </el-form-item>
                     <el-form-item :label="$t('website.sslConfig')" prop="type">
-                        <el-select v-model="form.type" @change="changeType(form.type)">
+                        <el-select v-model="form.type" @change="changeType(form.type)" class="p-w-400">
                             <el-option :label="$t('website.oldSSL')" :value="'existed'"></el-option>
                             <el-option :label="$t('website.manualSSL')" :value="'manual'"></el-option>
                         </el-select>
@@ -41,6 +45,7 @@
                                 v-model="form.acmeAccountID"
                                 :placeholder="$t('website.selectAcme')"
                                 @change="listSSL"
+                                class="p-w-400"
                             >
                                 <el-option :key="0" :label="$t('website.imported')" :value="0"></el-option>
                                 <el-option
@@ -61,6 +66,7 @@
                                 v-model="form.websiteSSLId"
                                 :placeholder="$t('website.selectSSL')"
                                 @change="changeSSl(form.websiteSSLId)"
+                                class="p-w-400"
                             >
                                 <el-option
                                     v-for="(ssl, index) in ssls"
@@ -205,6 +211,7 @@ const form = reactive({
         'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:!aNULL:!eNULL:!EXPORT:!DSS:!DES:!RC4:!3DES:!MD5:!PSK:!KRB5:!SRP:!CAMELLIA:!SEED',
     SSLProtocol: ['TLSv1.3', 'TLSv1.2', 'TLSv1.1', 'TLSv1'],
     httpsPort: '443',
+    http3: false,
 });
 const loading = ref(false);
 const ssls = ref();
@@ -300,6 +307,7 @@ const get = () => {
                 form.acmeAccountID = data.SSL.acmeAccountId;
             }
             form.hsts = data.hsts;
+            form.http3 = data.http3;
             form.httpsPort = data.httpsPort;
         }
         listSSL();

@@ -296,6 +296,7 @@ export namespace Website {
         httpConfig: string;
         SSLProtocol: string[];
         algorithm: string;
+        http3: boolean;
     }
 
     export interface HTTPSConfig {
@@ -306,6 +307,7 @@ export namespace Website {
         algorithm: string;
         hsts: boolean;
         httpsPort?: string;
+        http3: boolean;
     }
 
     export interface CheckReq {

@@ -620,28 +620,24 @@ func (w WebsiteService) UpdateWebsiteDomain(req request.WebsiteDomainUpdate) err
 	if err != nil {
 		return err
 	}
-	if website.Protocol == constant.ProtocolHTTPS {
-		nginxFull, err := getNginxFull(&website)
-		if err != nil {
-			return nil
-		}
-		nginxConfig := nginxFull.SiteConfig
-		config := nginxFull.SiteConfig.Config
-		server := config.FindServers()[0]
-		var params []string
-		if domain.SSL {
-			params = append(params, "ssl", "http2")
-		}
-		server.UpdateListen(strconv.Itoa(domain.Port), false, params...)
-		if website.IPV6 {
-			server.UpdateListen("[::]:"+strconv.Itoa(domain.Port), false, params...)
-		}
-		if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
-			return err
-		}
-		if err = nginxCheckAndReload(nginxConfig.OldContent, nginxConfig.FilePath, nginxFull.Install.ContainerName); err != nil {
-			return err
-		}
+	nginxFull, err := getNginxFull(&website)
+	if err != nil {
+		return nil
+	}
+	nginxConfig := nginxFull.SiteConfig
+	config := nginxFull.SiteConfig.Config
+	server := config.FindServers()[0]
+	server.DeleteListen(strconv.Itoa(domain.Port))
+	if website.IPV6 {
+		server.DeleteListen("[::]:" + strconv.Itoa(domain.Port))
+	}
+	http3 := isHttp3(server)
+	setListen(server, strconv.Itoa(domain.Port), website.IPV6, http3, website.DefaultServer, domain.SSL && website.Protocol == constant.ProtocolHTTPS)
+	if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
+		return err
+	}
+	if err = nginxCheckAndReload(nginxConfig.OldContent, nginxConfig.FilePath, nginxFull.Install.ContainerName); err != nil {
+		return err
 	}
 	return websiteDomainRepo.Save(context.TODO(), &domain)
 }
@@ -921,7 +917,7 @@ func (w WebsiteService) GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, 
 	} else {
 		res.HttpConfig = constant.HTTPToHTTPS
 	}
-	params, err := getNginxParamsByKeys(constant.NginxScopeServer, []string{"ssl_protocols", "ssl_ciphers", "add_header"}, &website)
+	params, err := getNginxParamsByKeys(constant.NginxScopeServer, []string{"ssl_protocols", "ssl_ciphers", "add_header", "listen"}, &website)
 	if err != nil {
 		return res, err
 	}
@@ -932,8 +928,13 @@ func (w WebsiteService) GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, 
 		if p.Name == "ssl_ciphers" {
 			res.Algorithm = p.Params[0]
 		}
-		if p.Name == "add_header" && len(p.Params) > 0 && p.Params[0] == "Strict-Transport-Security" {
-			res.Hsts = true
+		if p.Name == "add_header" && len(p.Params) > 0 {
+			if p.Params[0] == "Strict-Transport-Security" {
+				res.Hsts = true
+			}
+			if p.Params[0] == "Alt-Svc" {
+				res.Http3 = true
+			}
 		}
 	}
 	return res, nil
@@ -997,6 +998,9 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 			},
 			dto.NginxParam{
 				Name: "ssl_ciphers",
+			},
+			dto.NginxParam{
+				Name: "http2",
 			},
 		)
 		if err = deleteNginxConfig(constant.NginxScopeServer, nginxParams, &website); err != nil {

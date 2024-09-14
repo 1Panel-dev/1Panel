@@ -174,6 +174,19 @@ func (s *Server) AddListen(bind string, defaultServer bool, params ...string) {
 	s.Listens = append(s.Listens, listen)
 }
 
+func isSameArray(arr1, arr2 []string) bool {
+	set1 := make(map[string]struct{})
+	for _, v := range arr1 {
+		set1[v] = struct{}{}
+	}
+	for _, v := range arr2 {
+		if _, exists := set1[v]; !exists {
+			return false
+		}
+	}
+	return true
+}
+
 func (s *Server) UpdateListen(bind string, defaultServer bool, params ...string) {
 	listen := &ServerListen{
 		Bind:       bind,
@@ -185,7 +198,7 @@ func (s *Server) UpdateListen(bind string, defaultServer bool, params ...string)
 	var newListens []*ServerListen
 	exist := false
 	for _, li := range s.Listens {
-		if li.Bind == bind {
+		if li.Bind == bind && isSameArray(li.Parameters, params) {
 			exist = true
 			newListens = append(newListens, listen)
 		} else {
@@ -205,6 +218,17 @@ func (s *Server) DeleteListen(bind string) {
 		if li.Bind != bind {
 			newListens = append(newListens, li)
 		}
+	}
+	s.Listens = newListens
+}
+
+func (s *Server) RemoveListen(bind string, params ...string) {
+	var newListens []*ServerListen
+	for _, li := range s.Listens {
+		if li.Bind == bind && isSameArray(li.Parameters, params) {
+			continue
+		}
+		newListens = append(newListens, li)
 	}
 	s.Listens = newListens
 }
