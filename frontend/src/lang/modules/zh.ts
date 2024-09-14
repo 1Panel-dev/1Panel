@@ -2050,6 +2050,8 @@ const message = {
         ipFromExample1: '如果前端是 Frp 等工具，可以填写 Frp 的 IP 地址，类似 127.0.0.1',
         ipFromExample2: '如果前端是 CDN，可以填写 CDN 的 IP 地址段',
         ipFromExample3: '如果不确定，可以填 0.0.0.0/0（ipv4）  ::/0（ipv6） [注意：允许任意来源 IP 不安全]',
+        http3Helper:
+            'HTTP/3 是 HTTP/2 的升级版本，提供更快的连接速度和更好的性能，但是不是所有浏览器都支持 HTTP/3，开启后可能会导致部分浏览器无法访问',
     },
     php: {
         short_open_tag: '短标签支持',

@@ -64,6 +64,7 @@ type WebsiteHTTPS struct {
 	Hsts        bool             `json:"hsts"`
 	HttpsPorts  []int            `json:"httpsPorts"`
 	HttpsPort   string           `json:"httpsPort"`
+	Http3       bool             `json:"http3"`
 }
 
 type WebsiteLog struct {

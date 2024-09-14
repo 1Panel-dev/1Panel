@@ -198,10 +198,7 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 	var serverNames []string
 	for _, domain := range domains {
 		serverNames = append(serverNames, domain.Domain)
-		server.UpdateListen(strconv.Itoa(domain.Port), false)
-		if website.IPV6 {
-			server.UpdateListen("[::]:"+strconv.Itoa(domain.Port), false)
-		}
+		setListen(server, strconv.Itoa(domain.Port), website.IPV6, false, website.DefaultServer, false)
 	}
 	server.UpdateServerName(serverNames)
 
@@ -463,6 +460,17 @@ func delWafConfig(website model.Website, force bool) error {
 	return nil
 }
 
+func isHttp3(server *components.Server) bool {
+	for _, listen := range server.Listens {
+		for _, param := range listen.Parameters {
+			if param == "quic" {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func addListenAndServerName(website model.Website, domains []model.WebsiteDomain) error {
 	nginxFull, err := getNginxFull(&website)
 	if err != nil {
@@ -471,16 +479,10 @@ func addListenAndServerName(website model.Website, domains []model.WebsiteDomain
 	nginxConfig := nginxFull.SiteConfig
 	config := nginxFull.SiteConfig.Config
 	server := config.FindServers()[0]
+	http3 := isHttp3(server)
 
 	for _, domain := range domains {
-		var params []string
-		if website.Protocol == constant.ProtocolHTTPS && domain.SSL {
-			params = append(params, "ssl", "http2")
-		}
-		server.UpdateListen(strconv.Itoa(domain.Port), false, params...)
-		if website.IPV6 {
-			server.UpdateListen("[::]:"+strconv.Itoa(domain.Port), false, params...)
-		}
+		setListen(server, strconv.Itoa(domain.Port), website.IPV6, http3, website.DefaultServer, website.Protocol == constant.ProtocolHTTPS && domain.SSL)
 		server.UpdateServerName([]string{domain.Domain})
 	}
 
@@ -512,6 +514,24 @@ func deleteListenAndServerName(website model.Website, binds []string, domains []
 	return nginxCheckAndReload(nginxConfig.OldContent, nginxConfig.FilePath, nginxFull.Install.ContainerName)
 }
 
+func setListen(server *components.Server, port string, ipv6, http3, defaultServer, ssl bool) {
+	var params []string
+	if ssl {
+		params = []string{"ssl"}
+	}
+	server.UpdateListen(port, defaultServer, params...)
+	if ssl && http3 {
+		server.UpdateListen(port, defaultServer, "quic")
+	}
+	if !ipv6 {
+		return
+	}
+	server.UpdateListen("[::]:"+port, defaultServer, params...)
+	if ssl && http3 {
+		server.UpdateListen("[::]:"+port, defaultServer, "quic")
+	}
+}
+
 func removeSSLListen(website model.Website, binds []string) error {
 	nginxFull, err := getNginxFull(&website)
 	if err != nil {
@@ -520,11 +540,13 @@ func removeSSLListen(website model.Website, binds []string) error {
 	nginxConfig := nginxFull.SiteConfig
 	config := nginxFull.SiteConfig.Config
 	server := config.FindServers()[0]
+	http3 := isHttp3(server)
 	for _, bind := range binds {
-		server.UpdateListen(bind, false)
+		server.DeleteListen(bind)
 		if website.IPV6 {
-			server.UpdateListen("[::]:"+bind, false)
+			server.DeleteListen("[::]:" + bind)
 		}
+		setListen(server, bind, website.IPV6, http3, website.DefaultServer, website.Protocol == constant.ProtocolHTTPS)
 	}
 	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 		return err
@@ -609,12 +631,10 @@ func applySSL(website *model.Website, websiteSSL model.WebsiteSSL, req request.W
 	httpPortIPV6 := "[::]:" + httpPort
 
 	for _, port := range httpsPort {
-		httpsPortIPV6 := "[::]:" + strconv.Itoa(port)
-		server.UpdateListen(strconv.Itoa(port), website.DefaultServer, "ssl", "http2")
-		if website.IPV6 {
-			server.UpdateListen(httpsPortIPV6, website.DefaultServer, "ssl", "http2")
-		}
+		setListen(server, strconv.Itoa(port), website.IPV6, req.Http3, website.DefaultServer, true)
 	}
+
+	server.UpdateDirective("http2", []string{"on"})
 
 	switch req.HttpConfig {
 	case constant.HTTPSOnly:
@@ -642,11 +662,21 @@ func applySSL(website *model.Website, websiteSSL model.WebsiteSSL, req request.W
 	if !req.Hsts {
 		server.RemoveDirective("add_header", []string{"Strict-Transport-Security", "\"max-age=31536000\""})
 	}
+	if !req.Http3 {
+		for _, port := range httpsPort {
+			server.RemoveListen(strconv.Itoa(port), "quic")
+			if website.IPV6 {
+				httpsPortIPV6 := "[::]:" + strconv.Itoa(port)
+				server.RemoveListen(httpsPortIPV6, "quic")
+			}
+		}
+		server.RemoveDirective("add_header", []string{"Alt-Svc"})
+	}
 
-	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
+	if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 		return err
 	}
-	if err := createPemFile(*website, websiteSSL); err != nil {
+	if err = createPemFile(*website, websiteSSL); err != nil {
 		return err
 	}
 	nginxParams := getNginxParamsFromStaticFile(dto.SSL, []dto.NginxParam{})
@@ -668,6 +698,12 @@ func applySSL(website *model.Website, websiteSSL model.WebsiteSSL, req request.W
 		nginxParams = append(nginxParams, dto.NginxParam{
 			Name:   "add_header",
 			Params: []string{"Strict-Transport-Security", "\"max-age=31536000\""},
+		})
+	}
+	if req.Http3 {
+		nginxParams = append(nginxParams, dto.NginxParam{
+			Name:   "add_header",
+			Params: []string{"Alt-Svc", "'h3=\":443\"; ma=2592000'"},
 		})
 	}
 

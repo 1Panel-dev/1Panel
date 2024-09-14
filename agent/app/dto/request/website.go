@@ -162,6 +162,7 @@ type WebsiteHTTPSOp struct {
 	Algorithm       string   `json:"algorithm"`
 	Hsts            bool     `json:"hsts"`
 	HttpsPorts      []int    `json:"httpsPorts"`
+	Http3           bool     `json:"http3"`
 }
 
 type WebsiteNginxUpdate struct {
