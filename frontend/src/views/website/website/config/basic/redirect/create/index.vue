@@ -1,81 +1,65 @@
 <template>
-    <el-drawer
-        v-model="open"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        size="40%"
-        :before-close="handleClose"
-    >
-        <template #header>
-            <DrawerHeader :header="$t('commons.button.' + redirect.operate)" :back="handleClose" />
-        </template>
-        <el-row v-loading="loading">
-            <el-col :span="22" :offset="1">
-                <el-form ref="redirectForm" label-position="top" :model="redirect" :rules="rules">
-                    <el-form-item :label="$t('commons.table.name')" prop="name">
-                        <el-input
-                            v-model.trim="redirect.name"
-                            :disabled="redirect.operate === 'edit' || redirect.type == '404'"
-                        ></el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('commons.table.type')" prop="type">
-                        <el-select
-                            v-model="redirect.type"
-                            @change="changeType(redirect.type)"
-                            :disabled="redirect.operate === 'edit'"
-                        >
-                            <el-option :label="$t('website.domain')" :value="'domain'"></el-option>
-                            <el-option :label="$t('website.path')" :value="'path'"></el-option>
-                            <el-option :label="'404'" :value="'404'"></el-option>
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item :label="$t('website.redirectWay')" prop="redirect">
-                        <el-select v-model="redirect.redirect">
-                            <el-option :label="'301'" :value="'301'"></el-option>
-                            <el-option :label="'302'" :value="'302'"></el-option>
-                        </el-select>
-                        <span class="input-help">
-                            {{ $t('website.redirectHelper') }}
-                        </span>
-                    </el-form-item>
-                    <el-form-item :label="$t('website.path')" prop="path" v-if="redirect.type == 'path'">
-                        <el-input v-model.trim="redirect.path"></el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('website.domain')" prop="domains" v-if="redirect.type == 'domain'">
-                        <el-select v-model="redirect.domains" multiple>
-                            <el-option
-                                v-for="(item, index) in domains"
-                                :key="index"
-                                :value="item.domain"
-                                :label="item.domain"
-                            />
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item :label="$t('website.redirectRoot')" prop="redirectRoot" v-if="redirect.type == '404'">
-                        <el-switch v-model="redirect.redirectRoot"></el-switch>
-                    </el-form-item>
-                    <el-form-item :label="$t('website.targetURL')" prop="target" v-if="!redirect.redirectRoot">
-                        <el-input v-model.trim="redirect.target"></el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('website.keepPath')" prop="keepPath" v-if="redirect.type !== '404'">
-                        <el-switch v-model="redirect.keepPath"></el-switch>
-                    </el-form-item>
-                </el-form>
-            </el-col>
-        </el-row>
+    <DrawerPro v-model="open" :header="$t('commons.button.' + redirect.operate)" :back="handleClose">
+        <el-form ref="redirectForm" label-position="top" :model="redirect" :rules="rules" v-loading="loading">
+            <el-form-item :label="$t('commons.table.name')" prop="name">
+                <el-input
+                    v-model.trim="redirect.name"
+                    :disabled="redirect.operate === 'edit' || redirect.type == '404'"
+                ></el-input>
+            </el-form-item>
+            <el-form-item :label="$t('commons.table.type')" prop="type">
+                <el-select
+                    v-model="redirect.type"
+                    @change="changeType(redirect.type)"
+                    :disabled="redirect.operate === 'edit'"
+                >
+                    <el-option :label="$t('website.domain')" :value="'domain'"></el-option>
+                    <el-option :label="$t('website.path')" :value="'path'"></el-option>
+                    <el-option :label="'404'" :value="'404'"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item :label="$t('website.redirectWay')" prop="redirect">
+                <el-select v-model="redirect.redirect">
+                    <el-option :label="'301'" :value="'301'"></el-option>
+                    <el-option :label="'302'" :value="'302'"></el-option>
+                </el-select>
+                <span class="input-help">
+                    {{ $t('website.redirectHelper') }}
+                </span>
+            </el-form-item>
+            <el-form-item :label="$t('website.path')" prop="path" v-if="redirect.type == 'path'">
+                <el-input v-model.trim="redirect.path"></el-input>
+            </el-form-item>
+            <el-form-item :label="$t('website.domain')" prop="domains" v-if="redirect.type == 'domain'">
+                <el-select v-model="redirect.domains" multiple>
+                    <el-option
+                        v-for="(item, index) in domains"
+                        :key="index"
+                        :value="item.domain"
+                        :label="item.domain"
+                    />
+                </el-select>
+            </el-form-item>
+            <el-form-item :label="$t('website.redirectRoot')" prop="redirectRoot" v-if="redirect.type == '404'">
+                <el-switch v-model="redirect.redirectRoot"></el-switch>
+            </el-form-item>
+            <el-form-item :label="$t('website.targetURL')" prop="target" v-if="!redirect.redirectRoot">
+                <el-input v-model.trim="redirect.target"></el-input>
+            </el-form-item>
+            <el-form-item :label="$t('website.keepPath')" prop="keepPath" v-if="redirect.type !== '404'">
+                <el-switch v-model="redirect.keepPath"></el-switch>
+            </el-form-item>
+        </el-form>
         <template #footer>
-            <span class="dialog-footer">
-                <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="submit(redirectForm)" :disabled="loading">
-                    {{ $t('commons.button.confirm') }}
-                </el-button>
-            </span>
+            <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
+            <el-button type="primary" @click="submit(redirectForm)" :disabled="loading">
+                {{ $t('commons.button.confirm') }}
+            </el-button>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { ListDomains, OperateRedirectConfig, GetRedirectConfig } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';

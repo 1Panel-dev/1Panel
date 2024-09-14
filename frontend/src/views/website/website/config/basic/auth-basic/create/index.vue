@@ -1,65 +1,49 @@
 <template>
-    <el-drawer
-        v-model="open"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        size="40%"
-        :before-close="handleClose"
-    >
-        <template #header>
-            <DrawerHeader :header="$t('commons.button.' + authBasic.operate)" :back="handleClose" />
-        </template>
-        <el-row v-loading="loading">
-            <el-col :span="22" :offset="1">
-                <el-form-item>
-                    <el-alert
-                        v-if="authBasic.operate === 'edit'"
-                        :title="$t('website.editBasicAuthHelper')"
-                        type="info"
-                        :closable="false"
-                    />
-                </el-form-item>
-                <el-form ref="proxyForm" label-position="top" :model="authBasic" :rules="rules">
-                    <el-form-item :label="$t('commons.table.name')" prop="name" v-if="authBasic.scope != 'root'">
-                        <el-input v-model.trim="authBasic.name" :disabled="authBasic.operate === 'edit'"></el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('website.path')" prop="path" v-if="authBasic.scope != 'root'">
-                        <el-input v-model.trim="authBasic.path" :disabled="authBasic.operate === 'edit'"></el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('commons.login.username')" prop="username">
-                        <el-input
-                            v-model.trim="authBasic.username"
-                            :disabled="authBasic.scope == 'root' && authBasic.operate === 'edit'"
-                        ></el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('commons.login.password')" prop="password">
-                        <el-input type="password" clearable show-password v-model.trim="authBasic.password">
-                            <template #append>
-                                <el-button @click="random">
-                                    {{ $t('commons.button.random') }}
-                                </el-button>
-                            </template>
-                        </el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('website.remark')" prop="remark">
-                        <el-input v-model.trim="authBasic.remark"></el-input>
-                    </el-form-item>
-                </el-form>
-            </el-col>
-        </el-row>
+    <DrawerPro v-model="open" :header="$t('commons.button.' + authBasic.operate)" :back="handleClose">
+        <el-form-item>
+            <el-alert
+                v-if="authBasic.operate === 'edit'"
+                :title="$t('website.editBasicAuthHelper')"
+                type="info"
+                :closable="false"
+            />
+        </el-form-item>
+        <el-form ref="proxyForm" label-position="top" :model="authBasic" :rules="rules">
+            <el-form-item :label="$t('commons.table.name')" prop="name" v-if="authBasic.scope != 'root'">
+                <el-input v-model.trim="authBasic.name" :disabled="authBasic.operate === 'edit'"></el-input>
+            </el-form-item>
+            <el-form-item :label="$t('website.path')" prop="path" v-if="authBasic.scope != 'root'">
+                <el-input v-model.trim="authBasic.path" :disabled="authBasic.operate === 'edit'"></el-input>
+            </el-form-item>
+            <el-form-item :label="$t('commons.login.username')" prop="username">
+                <el-input
+                    v-model.trim="authBasic.username"
+                    :disabled="authBasic.scope == 'root' && authBasic.operate === 'edit'"
+                ></el-input>
+            </el-form-item>
+            <el-form-item :label="$t('commons.login.password')" prop="password">
+                <el-input type="password" clearable show-password v-model.trim="authBasic.password">
+                    <template #append>
+                        <el-button @click="random">
+                            {{ $t('commons.button.random') }}
+                        </el-button>
+                    </template>
+                </el-input>
+            </el-form-item>
+            <el-form-item :label="$t('website.remark')" prop="remark">
+                <el-input v-model.trim="authBasic.remark"></el-input>
+            </el-form-item>
+        </el-form>
         <template #footer>
-            <span class="dialog-footer">
-                <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="submit(proxyForm)" :disabled="loading">
-                    {{ $t('commons.button.confirm') }}
-                </el-button>
-            </span>
+            <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
+            <el-button type="primary" @click="submit(proxyForm)" :disabled="loading">
+                {{ $t('commons.button.confirm') }}
+            </el-button>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { OperateAuthConfig, OperatePathAuthConfig } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
