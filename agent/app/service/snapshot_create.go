@@ -229,7 +229,7 @@ func snapPanelData(snap snapHelper, req dto.SnapshotCreate, targetDir string) {
 		excludes = append(excludes, "."+strings.ReplaceAll(ignore, rootDir, ""))
 	}
 
-	_ = snap.snapAgentDB.Model(&model.Setting{}).Where("key = ?", "SystemIP").Updates(map[string]interface{}{"SystemIP": ""})
+	_ = snap.snapAgentDB.Model(&model.Setting{}).Where("key = ?", "SystemIP").Updates(map[string]interface{}{"value": ""})
 
 	if err := snap.FileOp.TarGzCompressPro(false, rootDir, path.Join(targetDir, "1panel_data.tar.gz"), "", strings.Join(excludes, ";")); err != nil {
 		status = err.Error()

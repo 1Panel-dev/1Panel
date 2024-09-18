@@ -484,7 +484,6 @@ func (f FileOp) CopyDirWithExclude(src, dst string, excludeNames []string) error
 			continue
 		}
 		if item.IsDir() {
-			fmt.Println(path.Join(src, item.Name()), dstDir)
 			if err := f.CopyDir(path.Join(src, item.Name()), dstDir); err != nil {
 				return err
 			}

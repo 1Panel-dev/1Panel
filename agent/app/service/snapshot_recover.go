@@ -181,7 +181,7 @@ func recoverBaseData(src string, fileOp files.FileOp) error {
 }
 
 func recoverDBData(src string, fileOp files.FileOp) error {
-	return fileOp.CopyDir(src, path.Join(global.CONF.System.BaseDir, "1panel", "db"))
+	return fileOp.CopyDirWithExclude(src, path.Join(global.CONF.System.BaseDir, "1panel"), nil)
 }
 
 func restartCompose(composePath string) {
@@ -214,7 +214,7 @@ func backupBeforeRecover(name string) error {
 	if err := FileOp.CopyDirWithExclude(path.Join(global.CONF.System.BaseDir, "1panel"), rootDir, []string{"cache", "tmp"}); err != nil {
 		return err
 	}
-	if err := FileOp.CopyDir(global.CONF.System.Backup, rootDir); err != nil {
+	if err := FileOp.CopyDirWithExclude(global.CONF.System.Backup, rootDir, []string{"system_snapshot"}); err != nil {
 		return err
 	}
 	if err := FileOp.CopyFile("/usr/local/bin/1pctl", baseDir); err != nil {

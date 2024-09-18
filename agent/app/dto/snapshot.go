@@ -49,7 +49,8 @@ type DataTree struct {
 
 	Path string `json:"path"`
 
-	Children []DataTree `json:"children"`
+	RelationItemID string     `json:"relationItemID"`
+	Children       []DataTree `json:"children"`
 }
 type SnapshotRecover struct {
 	IsNew      bool   `json:"isNew"`

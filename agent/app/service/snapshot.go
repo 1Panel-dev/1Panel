@@ -221,9 +221,9 @@ func (u *SnapshotService) HandleSnapshot(isCronjob bool, logPath string, req dto
 	if req.ID == 0 {
 		versionItem, _ := settingRepo.Get(settingRepo.WithByKey("SystemVersion"))
 
-		name := fmt.Sprintf("1panel_%s_%s_%s", versionItem.Value, loadOs(), timeNow)
+		name := fmt.Sprintf("1panel-%s-linux-%s-%s", versionItem.Value, loadOs(), timeNow)
 		if isCronjob {
-			name = fmt.Sprintf("snapshot_1panel_%s_%s_%s", versionItem.Value, loadOs(), timeNow)
+			name = fmt.Sprintf("snapshot-1panel-%s-linux-%s-%s", versionItem.Value, loadOs(), timeNow)
 		}
 		rootDir = path.Join(global.CONF.System.BaseDir, "1panel/tmp/system", name)
 
@@ -507,56 +507,114 @@ func loadApps(fileOp fileUtils.FileOp) ([]dto.DataTree, error) {
 	if err != nil {
 		return data, err
 	}
-	client, err := docker.NewDockerClient()
-	hasDockerClient := true
-	if err != nil {
-		hasDockerClient = false
-		global.LOG.Errorf("new docker client failed, err: %v", err)
-	} else {
-		defer client.Close()
+	openrestyID := 0
+	for _, app := range apps {
+		if app.App.Key == constant.AppOpenresty {
+			openrestyID = int(app.ID)
+		}
 	}
-	imageList, err := client.ImageList(context.Background(), image.ListOptions{})
+	websites, err := websiteRepo.List()
 	if err != nil {
-		hasDockerClient = false
-		global.LOG.Errorf("load image list failed, err: %v", err)
+		return data, err
+	}
+	appRelationMap := make(map[uint]uint)
+	for _, website := range websites {
+		if website.Type == constant.Deployment && website.AppInstallID != 0 {
+			appRelationMap[uint(openrestyID)] = website.AppInstallID
+		}
+	}
+	appRelations, err := appInstallResourceRepo.GetBy()
+	if err != nil {
+		return data, err
+	}
+	for _, relation := range appRelations {
+		appRelationMap[uint(relation.AppInstallId)] = relation.LinkId
+	}
+	appMap := make(map[uint]string)
+	for _, app := range apps {
+		appMap[app.ID] = fmt.Sprintf("%s-%s", app.App.Key, app.Name)
 	}
 
+	appTreeMap := make(map[string]dto.DataTree)
 	for _, app := range apps {
-		itemApp := dto.DataTree{ID: uuid.NewString(), Label: fmt.Sprintf("%s - %s", app.App.Name, app.Name), Key: app.App.Key, Name: app.Name}
+		itemApp := dto.DataTree{
+			ID:    uuid.NewString(),
+			Label: fmt.Sprintf("%s - %s", app.App.Name, app.Name),
+			Key:   app.App.Key,
+			Name:  app.Name,
+		}
 		appPath := path.Join(global.CONF.System.BaseDir, "1panel/apps", app.App.Key, app.Name)
 		itemAppData := dto.DataTree{ID: uuid.NewString(), Label: "appData", Key: app.App.Key, Name: app.Name, IsCheck: true, Path: appPath}
+		if app.App.Key == constant.AppOpenresty && len(websites) != 0 {
+			itemAppData.IsDisable = true
+		}
+		if val, ok := appRelationMap[app.ID]; ok {
+			itemAppData.RelationItemID = appMap[val]
+		}
 		sizeItem, err := fileOp.GetDirSize(appPath)
 		if err == nil {
 			itemAppData.Size = uint64(sizeItem)
 		}
 		itemApp.Size += itemAppData.Size
-		itemApp.Children = append(itemApp.Children, itemAppData)
+		data = append(data, itemApp)
+		appTreeMap[fmt.Sprintf("%s-%s", itemApp.Key, itemApp.Name)] = itemAppData
+	}
 
-		appBackupPath := path.Join(global.CONF.System.BaseDir, "1panel/backup/app", app.App.Key, app.Name)
+	for key, val := range appTreeMap {
+		if valRelation, ok := appTreeMap[val.RelationItemID]; ok {
+			valRelation.IsDisable = true
+			appTreeMap[val.RelationItemID] = valRelation
+
+			val.RelationItemID = valRelation.ID
+			appTreeMap[key] = val
+		}
+	}
+	for i := 0; i < len(data); i++ {
+		if val, ok := appTreeMap[fmt.Sprintf("%s-%s", data[i].Key, data[i].Name)]; ok {
+			data[i].Children = append(data[i].Children, val)
+		}
+	}
+	data = loadAppBackup(data, fileOp)
+	data = loadAppImage(data)
+	return data, nil
+}
+func loadAppBackup(list []dto.DataTree, fileOp fileUtils.FileOp) []dto.DataTree {
+	for i := 0; i < len(list); i++ {
+		appBackupPath := path.Join(global.CONF.System.BaseDir, "1panel/backup/app", list[i].Key, list[i].Name)
 		itemAppBackupTree, err := loadFile(appBackupPath, 8, fileOp)
 		itemAppBackup := dto.DataTree{ID: uuid.NewString(), Label: "appBackup", IsCheck: true, Children: itemAppBackupTree, Path: appBackupPath}
 		if err == nil {
 			backupSizeItem, err := fileOp.GetDirSize(appBackupPath)
 			if err == nil {
 				itemAppBackup.Size = uint64(backupSizeItem)
-				itemApp.Size += itemAppBackup.Size
+				list[i].Size += itemAppBackup.Size
 			}
-			itemApp.Children = append(itemApp.Children, itemAppBackup)
+			list[i].Children = append(list[i].Children, itemAppBackup)
 		}
+	}
+	return list
+}
+func loadAppImage(list []dto.DataTree) []dto.DataTree {
+	client, err := docker.NewDockerClient()
+	if err != nil {
+		global.LOG.Errorf("new docker client failed, err: %v", err)
+		return list
+	}
+	defer client.Close()
+	imageList, err := client.ImageList(context.Background(), image.ListOptions{})
+	if err != nil {
+		global.LOG.Errorf("load image list failed, err: %v", err)
+		return list
+	}
 
+	for i := 0; i < len(list); i++ {
 		itemAppImage := dto.DataTree{ID: uuid.NewString(), Label: "appImage"}
-		stdout, err := cmd.Execf("cat %s | grep image: ", path.Join(global.CONF.System.BaseDir, "1panel/apps", app.App.Key, app.Name, "docker-compose.yml"))
+		stdout, err := cmd.Execf("cat %s | grep image: ", path.Join(global.CONF.System.BaseDir, "1panel/apps", list[i].Key, list[i].Name, "docker-compose.yml"))
 		if err != nil {
-			itemApp.Children = append(itemApp.Children, itemAppImage)
-			data = append(data, itemApp)
+			list[i].Children = append(list[i].Children, itemAppImage)
 			continue
 		}
 		itemAppImage.Name = strings.ReplaceAll(strings.ReplaceAll(strings.TrimSpace(stdout), "\n", ""), "image: ", "")
-		if !hasDockerClient {
-			itemApp.Children = append(itemApp.Children, itemAppImage)
-			data = append(data, itemApp)
-			continue
-		}
 		for _, imageItem := range imageList {
 			for _, tag := range imageItem.RepoTags {
 				if tag == itemAppImage.Name {
@@ -565,10 +623,9 @@ func loadApps(fileOp fileUtils.FileOp) ([]dto.DataTree, error) {
 				}
 			}
 		}
-		itemApp.Children = append(itemApp.Children, itemAppImage)
-		data = append(data, itemApp)
+		list[i].Children = append(list[i].Children, itemAppImage)
 	}
-	return data, nil
+	return list
 }
 
 func loadPanelFile(fileOp fileUtils.FileOp) ([]dto.DataTree, error) {
