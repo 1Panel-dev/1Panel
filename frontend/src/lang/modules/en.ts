@@ -654,6 +654,8 @@ const message = {
         privileged: 'Privileged',
         privilegedHelper:
             'Allows the container to perform certain privileged operations on the host, which may increase container risks. Use with caution!',
+        editComposeHelper:
+            'The environment variables manually entered in the menu will override existing variables with the same name. If they do not exist, they will be added.',
 
         upgradeHelper: 'Repository Name/Image Name: Image Version',
         upgradeWarning2:
