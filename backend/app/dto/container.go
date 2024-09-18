@@ -208,11 +208,12 @@ type ComposeContainer struct {
 	State       string `json:"state"`
 }
 type ComposeCreate struct {
-	Name     string `json:"name"`
-	From     string `json:"from" validate:"required,oneof=edit path template"`
-	File     string `json:"file"`
-	Path     string `json:"path"`
-	Template uint   `json:"template"`
+	Name     string   `json:"name"`
+	From     string   `json:"from" validate:"required,oneof=edit path template"`
+	File     string   `json:"file"`
+	Path     string   `json:"path"`
+	Template uint     `json:"template"`
+	Env      []string `json:"env"`
 }
 type ComposeOperation struct {
 	Name      string `json:"name" validate:"required"`
@@ -221,9 +222,10 @@ type ComposeOperation struct {
 	WithFile  bool   `json:"withFile"`
 }
 type ComposeUpdate struct {
-	Name    string `json:"name" validate:"required"`
-	Path    string `json:"path" validate:"required"`
-	Content string `json:"content" validate:"required"`
+	Name    string   `json:"name" validate:"required"`
+	Path    string   `json:"path" validate:"required"`
+	Content string   `json:"content" validate:"required"`
+	Env     []string `json:"env"`
 }
 
 type ContainerLog struct {
