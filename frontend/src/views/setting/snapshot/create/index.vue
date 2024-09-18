@@ -69,6 +69,7 @@
                         :default-expand-all="true"
                         :data="form.appData"
                         :props="defaultProps"
+                        @check-change="onChangeAppData"
                         show-checkbox
                     >
                         <template #default="{ data }">
@@ -401,6 +402,39 @@ const search = async () => {
     form.appData = res.data.appData || [];
 };
 
+function onChangeAppData(data: any, isCheck: boolean) {
+    if (data.label !== 'appData' || !data.relationItemID) {
+        return;
+    }
+    data.isCheck = isCheck;
+    let isDisable = false;
+    for (const item of form.appData) {
+        if (!item.children) {
+            return;
+        }
+        for (const itemData of item.children) {
+            if (itemData.label === 'appData' && itemData.relationItemID === data.relationItemID && itemData.isCheck) {
+                isDisable = true;
+                break;
+            }
+        }
+    }
+    for (const item of form.appData) {
+        if (!item.children) {
+            return;
+        }
+        for (const relationItem of item.children) {
+            if (relationItem.id !== data.relationItemID) {
+                continue;
+            }
+            relationItem.isDisable = isDisable;
+            if (isDisable) {
+                appRef.value.setChecked(relationItem.id, isDisable, isDisable);
+            }
+            break;
+        }
+    }
+}
 const setAppDefaultCheck = async (list: any) => {
     for (const item of list) {
         if (item.isCheck) {

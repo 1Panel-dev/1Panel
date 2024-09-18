@@ -12,35 +12,19 @@
             </div>
         </template>
         <div v-loading="loading">
-            <el-alert :type="loadStatus(status.panelInfo)" :closable="false">
+            <el-alert :type="loadStatus(status.baseData)" :closable="false">
                 <template #title>
-                    <el-button :icon="loadIcon(status.panelInfo)" link>{{ $t('setting.panelInfo') }}</el-button>
-                    <div v-if="showErrorMsg(status.panelInfo)" class="top-margin">
-                        <span class="err-message">{{ status.panelInfo }}</span>
+                    <el-button :icon="loadIcon(status.baseData)" link>{{ $t('setting.panelInfo') }}</el-button>
+                    <div v-if="showErrorMsg(status.baseData)" class="top-margin">
+                        <span class="err-message">{{ status.baseData }}</span>
                     </div>
                 </template>
             </el-alert>
-            <el-alert :type="loadStatus(status.panel)" :closable="false">
+            <el-alert :type="loadStatus(status.appImage)" :closable="false">
                 <template #title>
-                    <el-button :icon="loadIcon(status.panel)" link>{{ $t('setting.panelBin') }}</el-button>
-                    <div v-if="showErrorMsg(status.panel)" class="top-margin">
-                        <span class="err-message">{{ status.panel }}</span>
-                    </div>
-                </template>
-            </el-alert>
-            <el-alert :type="loadStatus(status.daemonJson)" :closable="false">
-                <template #title>
-                    <el-button :icon="loadIcon(status.daemonJson)" link>{{ $t('setting.daemonJson') }}</el-button>
-                    <div v-if="showErrorMsg(status.daemonJson)" class="top-margin">
-                        <span class="err-message">{{ status.daemonJson }}</span>
-                    </div>
-                </template>
-            </el-alert>
-            <el-alert :type="loadStatus(status.appData)" :closable="false">
-                <template #title>
-                    <el-button :icon="loadIcon(status.appData)" link>{{ $t('setting.appData') }}</el-button>
-                    <div v-if="showErrorMsg(status.appData)" class="top-margin">
-                        <span class="err-message">{{ status.appData }}</span>
+                    <el-button :icon="loadIcon(status.appImage)" link>{{ $t('setting.appData') }}</el-button>
+                    <div v-if="showErrorMsg(status.appImage)" class="top-margin">
+                        <span class="err-message">{{ status.appImage }}</span>
                     </div>
                 </template>
             </el-alert>
@@ -100,10 +84,8 @@ import { loadSnapStatus, snapshotCreate } from '@/api/modules/setting';
 import { nextTick, onBeforeUnmount, reactive, ref } from 'vue';
 
 const status = reactive<Setting.SnapshotStatus>({
-    panel: '',
-    panelInfo: '',
-    daemonJson: '',
-    appData: '',
+    baseData: '',
+    appImage: '',
     panelData: '',
     backupData: '',
 
@@ -147,10 +129,8 @@ const loadCurrentStatus = async () => {
     await loadSnapStatus(snapID.value)
         .then((res) => {
             loading.value = false;
-            status.panel = res.data.panel;
-            status.panelInfo = res.data.panelInfo;
-            status.daemonJson = res.data.daemonJson;
-            status.appData = res.data.appData;
+            status.baseData = res.data.baseData;
+            status.appImage = res.data.appImage;
             status.panelData = res.data.panelData;
             status.backupData = res.data.backupData;
 
@@ -172,10 +152,19 @@ const onRetry = async () => {
     loading.value = true;
     await snapshotCreate({
         id: snapID.value,
-        fromAccounts: [],
-        from: snapFrom.value,
-        defaultDownload: snapDefaultDownload.value,
         description: snapDescription.value,
+
+        downloadAccountID: '',
+        sourceAccountIDs: '',
+        secret: '',
+
+        withLoginLog: false,
+        withOperationLog: false,
+        withMonitorData: false,
+
+        panelData: [],
+        backupData: [],
+        appData: [],
     })
         .then(() => {
             loading.value = false;
@@ -190,10 +179,8 @@ const onWatch = () => {
     timer = setInterval(async () => {
         if (keepLoadStatus()) {
             const res = await loadSnapStatus(snapID.value);
-            status.panel = res.data.panel;
-            status.panelInfo = res.data.panelInfo;
-            status.daemonJson = res.data.daemonJson;
-            status.appData = res.data.appData;
+            status.baseData = res.data.baseData;
+            status.appImage = res.data.appImage;
             status.panelData = res.data.panelData;
             status.backupData = res.data.backupData;
 
@@ -205,16 +192,10 @@ const onWatch = () => {
 };
 
 const keepLoadStatus = () => {
-    if (status.panel === 'Running') {
+    if (status.baseData === 'Running') {
         return true;
     }
-    if (status.panelInfo === 'Running') {
-        return true;
-    }
-    if (status.daemonJson === 'Running') {
-        return true;
-    }
-    if (status.appData === 'Running') {
+    if (status.appImage === 'Running') {
         return true;
     }
     if (status.panelData === 'Running') {
@@ -240,16 +221,10 @@ const showRetry = () => {
     if (keepLoadStatus()) {
         return false;
     }
-    if (status.panel !== 'Running' && status.panel !== 'Done') {
+    if (status.baseData !== 'Running' && status.baseData !== 'Done') {
         return true;
     }
-    if (status.panelInfo !== 'Running' && status.panelInfo !== 'Done') {
-        return true;
-    }
-    if (status.daemonJson !== 'Running' && status.daemonJson !== 'Done') {
-        return true;
-    }
-    if (status.appData !== 'Running' && status.appData !== 'Done') {
+    if (status.appImage !== 'Running' && status.appImage !== 'Done') {
         return true;
     }
     if (status.panelData !== 'Running' && status.panelData !== 'Done') {
