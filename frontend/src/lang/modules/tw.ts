@@ -752,6 +752,7 @@ const message = {
         content: '內容',
         contentEmpty: '編排內容不能為空，請輸入後重試！',
         containerNumber: '容器數量',
+        containerStatus: '容器狀態',
         down: '刪除',
         up: '啟動',
         composeDetailHelper: '該 compose 為 1Panel 編排外部創建。暫不支持啟停操作。',

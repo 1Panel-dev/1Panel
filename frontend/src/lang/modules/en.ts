@@ -783,6 +783,7 @@ const message = {
         content: 'Content',
         contentEmpty: 'Compose content cannot be empty, please enter and try again!',
         containerNumber: 'Container number',
+        containerStatus: 'Container Status',
         down: 'Down',
         up: 'Up',
         composeDetailHelper:
