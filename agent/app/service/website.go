@@ -1155,8 +1155,9 @@ func (w WebsiteService) UpdateNginxConfigFile(req request.WebsiteNginxUpdate) er
 	if err != nil {
 		return err
 	}
+
 	filePath := nginxFull.SiteConfig.FilePath
-	if err := files.NewFileOp().WriteFile(filePath, strings.NewReader(req.Content), 0755); err != nil {
+	if err = files.NewFileOp().WriteFile(filePath, strings.NewReader(req.Content), 0755); err != nil {
 		return err
 	}
 	return nginxCheckAndReload(nginxFull.SiteConfig.OldContent, filePath, nginxFull.Install.ContainerName)

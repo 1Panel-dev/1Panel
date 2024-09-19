@@ -46,15 +46,7 @@
                                 {{ $t('app.reload') }}
                             </el-button>
                             <el-divider v-if="data.app === 'OpenResty'" direction="vertical" />
-                            <el-button
-                                type="primary"
-                                @click="setting"
-                                link
-                                :disabled="
-                                    data.status === 'Installing' ||
-                                    (data.status !== 'Running' && data.app === 'OpenResty')
-                                "
-                            >
+                            <el-button type="primary" @click="setting" link :disabled="data.status === 'Installing'">
                                 {{ $t('commons.button.set') }}
                             </el-button>
                             <el-divider v-if="data.app === 'OpenResty'" direction="vertical" />

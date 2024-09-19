@@ -475,6 +475,22 @@ func checkContainerName(name string) error {
 	return nil
 }
 
+func checkContainerStatus(name string) (string, error) {
+	dockerCli, err := docker.NewClient()
+	if err != nil {
+		return "", err
+	}
+	defer dockerCli.Close()
+	names, err := dockerCli.ListContainersByName([]string{name})
+	if err != nil {
+		return "", err
+	}
+	if len(names) > 0 {
+		return names[0].State, nil
+	}
+	return "", nil
+}
+
 func unInstallPHPExtension(runtime *model.Runtime, delExtensions []string) error {
 	dir := runtime.GetPath()
 	fileOP := files.NewFileOp()

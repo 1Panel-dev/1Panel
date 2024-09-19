@@ -64,7 +64,7 @@ const webSiteRouter = {
             hidden: true,
             component: () => import('@/views/website/runtime/java/index.vue'),
             meta: {
-                activeMenu: '/websites/runtimes/java',
+                activeMenu: '/websites/runtimes/php',
                 requiresAuth: false,
             },
         },
@@ -74,7 +74,7 @@ const webSiteRouter = {
             hidden: true,
             component: () => import('@/views/website/runtime/go/index.vue'),
             meta: {
-                activeMenu: '/websites/runtimes/go',
+                activeMenu: '/websites/runtimes/php',
                 requiresAuth: false,
             },
         },

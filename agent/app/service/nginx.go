@@ -97,10 +97,10 @@ func (n NginxService) GetStatus() (response.NginxStatus, error) {
 func (n NginxService) UpdateConfigFile(req request.NginxConfigFileUpdate) error {
 	fileOp := files.NewFileOp()
 	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
-	filePath := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "conf", "nginx.conf")
 	if err != nil {
 		return err
 	}
+	filePath := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "conf", "nginx.conf")
 	if req.Backup {
 		backupPath := path.Join(path.Dir(filePath), "bak")
 		if !fileOp.Stat(backupPath) {
@@ -122,6 +122,14 @@ func (n NginxService) UpdateConfigFile(req request.NginxConfigFileUpdate) error 
 	}
 	if err = fileOp.WriteFile(filePath, strings.NewReader(req.Content), 0644); err != nil {
 		return err
+	}
+	if status, err := checkContainerStatus(nginxInstall.ContainerName); err == nil && status != "running" {
+		if out, err := compose.DownAndUp(nginxInstall.GetComposePath()); err != nil {
+			_ = fileOp.SaveFile(filePath, string(oldContent), 0644)
+			return fmt.Errorf("nginx restart failed: %v", out)
+		} else {
+			return nginxCheckAndReload(string(oldContent), filePath, nginxInstall.ContainerName)
+		}
 	}
 	return nginxCheckAndReload(string(oldContent), filePath, nginxInstall.ContainerName)
 }
