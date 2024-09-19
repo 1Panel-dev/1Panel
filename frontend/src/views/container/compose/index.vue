@@ -179,7 +179,11 @@ const getContainerStatus = (containers) => {
     const runningCount = safeContainers.filter((container) => container.state.toLowerCase() === 'running').length;
     const totalCount = safeContainers.length;
     const statusText = runningCount > 0 ? 'Running' : 'Exited';
-    return `${statusText} (${runningCount}/${totalCount})`;
+    if (statusText === 'Exited') {
+        return `${statusText}`;
+    } else {
+        return `${statusText} (${runningCount}/${totalCount})`;
+    }
 };
 const backList = async () => {
     isOnDetail.value = false;
