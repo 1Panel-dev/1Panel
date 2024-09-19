@@ -1,6 +1,6 @@
 <template>
     <div v-loading="loading">
-        <CodemirrorPro v-model="content" mode="nginx"></CodemirrorPro>
+        <CodemirrorPro v-model="content" mode="nginx" :heightDiff="350"></CodemirrorPro>
         <div class="mt-2.5">
             <el-button @click="getDefaultConfig()" :disabled="loading">
                 {{ $t('app.defaultConfig') }}

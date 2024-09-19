@@ -4,11 +4,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 )
 
-func Pull(filePath string) (string, error) {
-	stdout, err := cmd.Execf("docker compose -f %s pull", filePath)
-	return stdout, err
-}
-
 func Up(filePath string) (string, error) {
 	stdout, err := cmd.Execf("docker compose -f %s up -d", filePath)
 	return stdout, err
@@ -16,11 +11,6 @@ func Up(filePath string) (string, error) {
 
 func Down(filePath string) (string, error) {
 	stdout, err := cmd.Execf("docker compose -f %s down --remove-orphans", filePath)
-	return stdout, err
-}
-
-func Start(filePath string) (string, error) {
-	stdout, err := cmd.Execf("docker compose -f %s start", filePath)
 	return stdout, err
 }
 
@@ -36,5 +26,14 @@ func Restart(filePath string) (string, error) {
 
 func Operate(filePath, operation string) (string, error) {
 	stdout, err := cmd.Execf("docker compose -f %s %s", filePath, operation)
+	return stdout, err
+}
+
+func DownAndUp(filePath string) (string, error) {
+	stdout, err := cmd.Execf("docker compose -f %s down", filePath)
+	if err != nil {
+		return stdout, err
+	}
+	stdout, err = cmd.Execf("docker compose -f %s up -d", filePath)
 	return stdout, err
 }

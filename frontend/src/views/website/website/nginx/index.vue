@@ -1,7 +1,12 @@
 <template>
     <LayoutContent :title="$t('nginx.nginxConfig')" :reload="true">
         <template #leftToolBar>
-            <el-button type="primary" :plain="activeName !== '1'" @click="changeTab('1')">
+            <el-button
+                type="primary"
+                :plain="activeName !== '1'"
+                @click="changeTab('1')"
+                :disabled="status != 'Running'"
+            >
                 {{ $t('nginx.status') }}
             </el-button>
             <el-button type="primary" :plain="activeName !== '2'" @click="changeTab('2')">
@@ -10,7 +15,12 @@
             <el-button type="primary" :plain="activeName !== '3'" @click="changeTab('3')">
                 {{ $t('website.nginxPer') }}
             </el-button>
-            <el-button type="primary" :plain="activeName !== '4'" @click="changeTab('4')">
+            <el-button
+                type="primary"
+                :plain="activeName !== '4'"
+                @click="changeTab('4')"
+                :disabled="status != 'Running'"
+            >
                 {{ $t('website.log') }}
             </el-button>
         </template>
@@ -30,8 +40,8 @@ import ContainerLog from '@/components/container-log/index.vue';
 import NginxPer from './performance/index.vue';
 import Status from './status/index.vue';
 
-let activeName = ref('1');
-let dialogContainerLogRef = ref();
+const activeName = ref('1');
+const dialogContainerLogRef = ref();
 
 const props = defineProps({
     containerName: {
@@ -55,4 +65,10 @@ const changeTab = (index: string) => {
         });
     }
 };
+
+onMounted(() => {
+    if (props.status != 'Running') {
+        activeName.value = '2';
+    }
+});
 </script>
