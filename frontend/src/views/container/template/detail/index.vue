@@ -7,9 +7,7 @@
         size="50%"
     >
         <template #header>
-            <div class="card-header">
-                <span>{{ $t('commons.button.view') }}</span>
-            </div>
+            <DrawerHeader :header="$t('commons.button.view')" :back="handleClose" />
         </template>
         <codemirror
             :autofocus="true"
@@ -38,6 +36,7 @@ import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { ref } from 'vue';
 import { Codemirror } from 'vue-codemirror';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 const extensions = [javascript(), oneDark];
 
 const detailVisible = ref(false);
@@ -49,6 +48,10 @@ interface DialogProps {
 const acceptParams = (params: DialogProps): void => {
     detailInfo.value = params.content;
     detailVisible.value = true;
+};
+
+const handleClose = () => {
+    detailVisible.value = false;
 };
 
 defineExpose({

@@ -64,12 +64,13 @@
                             <span v-if="row.createdBy === '1Panel'">1Panel</span>
                         </template>
                     </el-table-column>
-                    <el-table-column
-                        :label="$t('container.containerNumber')"
-                        prop="containerNumber"
-                        min-width="80"
-                        fix
-                    />
+                    <el-table-column :label="$t('container.containerStatus')" min-width="80" fix>
+                        <template #default="scope">
+                            <div>
+                                {{ getContainerStatus(scope.row.containers) }}
+                            </div>
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('commons.table.createdAt')" prop="createdAt" min-width="80" fix />
                     <fu-table-operations
                         width="200px"
@@ -172,6 +173,17 @@ const loadDetail = async (row: Container.ComposeInfo) => {
     };
     isOnDetail.value = true;
     composeDetailRef.value!.acceptParams(params);
+};
+const getContainerStatus = (containers) => {
+    const safeContainers = containers || [];
+    const runningCount = safeContainers.filter((container) => container.state.toLowerCase() === 'running').length;
+    const totalCount = safeContainers.length;
+    const statusText = runningCount > 0 ? 'Running' : 'Exited';
+    if (statusText === 'Exited') {
+        return `${statusText}`;
+    } else {
+        return `${statusText} (${runningCount}/${totalCount})`;
+    }
 };
 const backList = async () => {
     isOnDetail.value = false;
