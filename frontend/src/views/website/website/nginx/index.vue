@@ -23,12 +23,16 @@
             >
                 {{ $t('website.log') }}
             </el-button>
+            <el-button type="primary" :plain="activeName !== '5'" @click="changeTab('5')">
+                {{ $t('runtime.module') }}
+            </el-button>
         </template>
         <template #main>
             <Status v-if="activeName === '1'" :status="status" />
             <Source v-if="activeName === '2'" />
             <NginxPer v-if="activeName === '3'" />
             <ContainerLog v-if="activeName === '4'" ref="dialogContainerLogRef" />
+            <Module v-if="activeName === '5'" />
         </template>
     </LayoutContent>
 </template>
@@ -39,6 +43,7 @@ import { nextTick, ref } from 'vue';
 import ContainerLog from '@/components/container-log/index.vue';
 import NginxPer from './performance/index.vue';
 import Status from './status/index.vue';
+import Module from './module/index.vue';
 
 const activeName = ref('1');
 const dialogContainerLogRef = ref();

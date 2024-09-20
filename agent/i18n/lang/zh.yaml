@@ -99,6 +99,7 @@ ErrDomainIsUsed: "域名已被网站【{{ .name }}】使用"
 ErrDomainFormat: "{{ .name }} 域名格式不正确"
 ErrDefaultAlias: "default 为保留代号，请使用其他代号"
 ErrParentWebsite: "需要先删除子网站 {{ .name }}"
+ErrBuildDirNotFound: "构建目录不存在"
 
 #ssl
 ErrSSLCannotDelete: "{{ .name }} 证书正在被网站使用，无法删除"
@@ -248,3 +249,4 @@ TaskSync: "同步"
 LocalApp: "本地应用"
 SubTask: "子任务"
 RuntimeExtension: "运行环境扩展"
+TaskBuild: "构建"

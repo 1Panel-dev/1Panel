@@ -67,3 +67,11 @@ type NginxProxyCache struct {
 	CacheExpire     int     `json:"cacheExpire" `
 	CacheExpireUnit string  `json:"cacheExpireUnit" `
 }
+
+type NginxModule struct {
+	Name     string   `json:"name"`
+	Script   string   `json:"script"`
+	Packages []string `json:"packages"`
+	Params   string   `json:"params"`
+	Enable   bool     `json:"enable"`
+}

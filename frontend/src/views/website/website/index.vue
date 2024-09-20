@@ -83,7 +83,12 @@
                             <el-text type="primary" class="cursor-pointer" @click="openConfig(row.id)">
                                 {{ row.primaryDomain }}
                             </el-text>
-                            <el-popover placement="top-start" trigger="hover" @before-enter="searchDomains(row.id)">
+                            <el-popover
+                                placement="left"
+                                trigger="hover"
+                                :width="300"
+                                @before-enter="searchDomains(row.id)"
+                            >
                                 <template #reference>
                                     <el-button link icon="Promotion" class="ml-2.5"></el-button>
                                 </template>
@@ -94,6 +99,9 @@
                                                 <el-button type="primary" link @click="openUrl(getUrl(domain, row))">
                                                     {{ getUrl(domain, row) }}
                                                 </el-button>
+                                            </td>
+                                            <td>
+                                                <CopyButton :content="getUrl(domain, row)" type="icon" />
                                             </td>
                                         </tr>
                                     </tbody>
