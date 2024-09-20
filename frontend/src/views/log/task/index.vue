@@ -23,6 +23,9 @@
                             <div v-if="row.status === 'Success'">
                                 <el-tag type="success">{{ $t('commons.status.success') }}</el-tag>
                             </div>
+                            <div v-else-if="row.status === 'Running'">
+                                <el-tag type="primary">{{ $t('process.running') }}</el-tag>
+                            </div>
                             <div v-else>
                                 <el-tooltip
                                     class="box-item"

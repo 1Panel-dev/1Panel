@@ -11,7 +11,7 @@ export const GetNginxConfigByScope = (req: Nginx.NginxScopeReq) => {
 };
 
 export const UpdateNginxConfigByScope = (req: Nginx.NginxConfigReq) => {
-    return http.post<any>(`/openresty/update`, req);
+    return http.post(`/openresty/update`, req);
 };
 
 export const GetNginxStatus = () => {
@@ -19,9 +19,21 @@ export const GetNginxStatus = () => {
 };
 
 export const UpdateNginxConfigFile = (req: Nginx.NginxFileUpdate) => {
-    return http.post<any>(`/openresty/file`, req);
+    return http.post(`/openresty/file`, req);
 };
 
 export const ClearNginxCache = () => {
-    return http.post<any>(`/openresty/clear`);
+    return http.post(`/openresty/clear`);
+};
+
+export const BuildNginx = (req: Nginx.NginxBuildReq) => {
+    return http.post(`/openresty/build`, req);
+};
+
+export const GetNginxModules = () => {
+    return http.get<Nginx.NginxModule[]>(`/openresty/modules`);
+};
+
+export const UpdateNginxModule = (req: Nginx.NginxModuleUpdate) => {
+    return http.post(`/openresty/modules/update`, req);
 };

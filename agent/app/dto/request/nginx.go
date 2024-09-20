@@ -106,3 +106,16 @@ type NginxRedirectUpdate struct {
 	Content   string `json:"content" validate:"required"`
 	Name      string `json:"name" validate:"required"`
 }
+
+type NginxBuildReq struct {
+	TaskID string `json:"taskID" validate:"required"`
+}
+
+type NginxModuleUpdate struct {
+	Operate  string `json:"operate" validate:"required,oneof=create delete update"`
+	Name     string `json:"name" validate:"required"`
+	Script   string `json:"script"`
+	Packages string `json:"packages"`
+	Enable   bool   `json:"enable"`
+	Params   string `json:"params"`
+}

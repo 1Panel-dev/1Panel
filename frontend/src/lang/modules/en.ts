@@ -2251,6 +2251,15 @@ const message = {
         clearProxyCache: 'Clear reverse proxy cache',
         clearProxyCacheWarn:
             'Clearing the reverse proxy cache will affect all websites configured with cache and requires restarting OpenResty. Do you want to continue? ',
+        create: 'Add a new module',
+        update: 'Edit a module',
+        params: 'Parameters',
+        packages: 'Packages',
+        script: 'Scripts',
+        module: 'Modules',
+        build: 'Build',
+        buildWarn:
+            'Building OpenResty requires reserving a certain amount of CPU and memory, which may take a long time, please be patient',
     },
     ssl: {
         create: 'Apply',

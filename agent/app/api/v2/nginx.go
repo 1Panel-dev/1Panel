@@ -116,3 +116,60 @@ func (b *BaseApi) ClearNginxProxyCache(c *gin.Context) {
 	}
 	helper.SuccessWithOutData(c)
 }
+
+// @Tags OpenResty
+// @Summary Build OpenResty
+// @Description 构建 OpenResty
+// @Accept json
+// @Param request body request.NginxBuildReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /openresty/build [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"构建 OpenResty","formatEN":"Build OpenResty"}
+func (b *BaseApi) BuildNginx(c *gin.Context) {
+	var req request.NginxBuildReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := nginxService.Build(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}
+
+// @Tags OpenResty
+// @Summary Update OpenResty module
+// @Description 更新 OpenResty 模块
+// @Accept json
+// @Param request body request.NginxModuleUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /openresty/module/update [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新 OpenResty 模块","formatEN":"Update OpenResty module"}
+func (b *BaseApi) UpdateNginxModule(c *gin.Context) {
+	var req request.NginxModuleUpdate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := nginxService.UpdateModule(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}
+
+// @Tags OpenResty
+// @Summary Get OpenResty modules
+// @Description 获取 OpenResty 模块
+// @Success 200 {array} response.NginxModule
+// @Security ApiKeyAuth
+// @Router /openresty/modules [get]
+func (b *BaseApi) GetNginxModules(c *gin.Context) {
+	modules, err := nginxService.GetModules()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, modules)
+}

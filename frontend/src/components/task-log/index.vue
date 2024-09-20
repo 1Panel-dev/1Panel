@@ -9,13 +9,7 @@
         :width="width"
     >
         <div>
-            <highlightjs
-                class="editor-main"
-                ref="editorRef"
-                language="JavaScript"
-                :autodetect="false"
-                :code="content"
-            ></highlightjs>
+            <highlightjs class="editor-main" ref="editorRef" :autodetect="false" :code="content"></highlightjs>
         </div>
     </el-dialog>
 </template>
@@ -98,7 +92,7 @@ const getContent = (pre: boolean) => {
         });
         data.value = res.data;
         if (res.data.content != '') {
-            if (stopSignals.some((signal) => res.data.content.endsWith(signal))) {
+            if (stopSignals.some((signal) => res.data.content.includes(signal))) {
                 onCloseLog();
             }
             if (end.value) {

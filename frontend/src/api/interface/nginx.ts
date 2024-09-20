@@ -28,4 +28,25 @@ export namespace Nginx {
         content: string;
         backup: boolean;
     }
+
+    export interface NginxBuildReq {
+        taskID: string;
+    }
+
+    export interface NginxModule {
+        name: string;
+        script?: string;
+        packages?: string[];
+        enable: boolean;
+        params: string;
+    }
+
+    export interface NginxModuleUpdate {
+        operate: string;
+        name: string;
+        script?: string;
+        packages?: string;
+        enable: boolean;
+        params: string;
+    }
 }

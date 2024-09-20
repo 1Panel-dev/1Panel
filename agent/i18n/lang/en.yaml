@@ -99,6 +99,7 @@ ErrDomainIsUsed: "Domain is already used by website {{ .name }}"
 ErrDomainFormat: "{{ .name }} domain format error"
 ErrDefaultAlias: "default is a reserved code name, please use another code name"
 ErrParentWebsite: "You need to delete the subsite(s) {{ .name }} first"
+ErrBuildDirNotFound: "Build directory does not exist"
 
 #ssl
 ErrSSLCannotDelete: "The certificate {{ .name }} is being used by the website and cannot be removed"
@@ -244,4 +245,5 @@ TaskSync: "Sync"
 LocalApp: "Local App"
 SubTask: "Subtask"
 RuntimeExtension: "Runtime Extension"
+TaskBuild: "Build"
 

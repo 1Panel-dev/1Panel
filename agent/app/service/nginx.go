@@ -1,7 +1,13 @@
 package service
 
 import (
+	"bufio"
+	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/task"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
+	cmd2 "github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	"github.com/subosito/gotenv"
 	"io"
 	"net/http"
 	"os"
@@ -29,6 +35,10 @@ type INginxService interface {
 	GetStatus() (response.NginxStatus, error)
 	UpdateConfigFile(req request.NginxConfigFileUpdate) error
 	ClearProxyCache() error
+
+	Build(req request.NginxBuildReq) error
+	GetModules() ([]response.NginxModule, error)
+	UpdateModule(req request.NginxModuleUpdate) error
 }
 
 func NewINginxService() INginxService {
@@ -151,4 +161,158 @@ func (n NginxService) ClearProxyCache() error {
 		}
 	}
 	return nil
+}
+
+func (n NginxService) Build(req request.NginxBuildReq) error {
+	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return err
+	}
+	fileOp := files.NewFileOp()
+	buildPath := path.Join(nginxInstall.GetPath(), "build")
+	if !fileOp.Stat(buildPath) {
+		return buserr.New("ErrBuildDirNotFound")
+	}
+	moduleConfigPath := path.Join(buildPath, "module.json")
+	moduleContent, err := fileOp.GetContent(moduleConfigPath)
+	if err != nil {
+		return err
+	}
+	var (
+		modules         []response.NginxModule
+		addModuleParams []string
+		addPackages     []string
+	)
+	if len(moduleContent) > 0 {
+		_ = json.Unmarshal(moduleContent, &modules)
+		bashFile, err := os.OpenFile(path.Join(buildPath, "tmp", "pre.sh"), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0755)
+		if err != nil {
+			return err
+		}
+		defer bashFile.Close()
+		bashFileWriter := bufio.NewWriter(bashFile)
+		for _, module := range modules {
+			if !module.Enable {
+				continue
+			}
+			_, err = bashFileWriter.WriteString(module.Script + "\n")
+			if err != nil {
+				return err
+			}
+			addModuleParams = append(addModuleParams, module.Params)
+			addPackages = append(addPackages, module.Packages...)
+		}
+		err = bashFileWriter.Flush()
+		if err != nil {
+			return err
+		}
+	}
+	envs, err := gotenv.Read(nginxInstall.GetEnvPath())
+	if err != nil {
+		return err
+	}
+	envs["RESTY_CONFIG_OPTIONS_MORE"] = ""
+	envs["RESTY_ADD_PACKAGE_BUILDDEPS"] = ""
+	if len(addModuleParams) > 0 {
+		envs["RESTY_CONFIG_OPTIONS_MORE"] = strings.Join(addModuleParams, " ")
+	}
+	if len(addPackages) > 0 {
+		envs["RESTY_ADD_PACKAGE_BUILDDEPS"] = strings.Join(addPackages, " ")
+	}
+	_ = gotenv.Write(envs, nginxInstall.GetEnvPath())
+
+	buildTask, err := task.NewTaskWithOps(nginxInstall.Name, task.TaskBuild, task.TaskScopeApp, req.TaskID, nginxInstall.ID)
+	if err != nil {
+		return err
+	}
+	buildTask.AddSubTask("", func(t *task.Task) error {
+		if err = cmd2.ExecWithLogFile(fmt.Sprintf("docker compose -f %s build", nginxInstall.GetComposePath()), 15*time.Minute, t.Task.LogFile); err != nil {
+			return err
+		}
+		_, err = compose.DownAndUp(nginxInstall.GetComposePath())
+		return err
+	}, nil)
+
+	go func() {
+		_ = buildTask.Execute()
+	}()
+	return nil
+}
+
+func (n NginxService) GetModules() ([]response.NginxModule, error) {
+	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return nil, err
+	}
+	fileOp := files.NewFileOp()
+	var modules []response.NginxModule
+	moduleConfigPath := path.Join(nginxInstall.GetPath(), "build", "module.json")
+	if !fileOp.Stat(moduleConfigPath) {
+		return modules, nil
+	}
+	moduleContent, err := fileOp.GetContent(moduleConfigPath)
+	if err != nil {
+		return nil, err
+	}
+	if len(moduleContent) > 0 {
+		_ = json.Unmarshal(moduleContent, &modules)
+	}
+	return modules, nil
+}
+
+func (n NginxService) UpdateModule(req request.NginxModuleUpdate) error {
+	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return err
+	}
+	fileOp := files.NewFileOp()
+	var modules []response.NginxModule
+	moduleConfigPath := path.Join(nginxInstall.GetPath(), "build", "module.json")
+	if !fileOp.Stat(moduleConfigPath) {
+		_ = fileOp.CreateFile(moduleConfigPath)
+	}
+	moduleContent, err := fileOp.GetContent(moduleConfigPath)
+	if err != nil {
+		return err
+	}
+	if len(moduleContent) > 0 {
+		_ = json.Unmarshal(moduleContent, &modules)
+	}
+	switch req.Operate {
+	case "create":
+		for _, module := range modules {
+			if module.Name == req.Name {
+				return buserr.New("ErrNameIsExist")
+			}
+		}
+		modules = append(modules, response.NginxModule{
+			Name:     req.Name,
+			Script:   req.Script,
+			Packages: strings.Split(req.Packages, " "),
+			Params:   req.Params,
+			Enable:   true,
+		})
+	case "update":
+		for i, module := range modules {
+			if module.Name == req.Name {
+				modules[i].Script = req.Script
+				modules[i].Packages = strings.Split(req.Packages, " ")
+				modules[i].Params = req.Params
+				modules[i].Enable = req.Enable
+				break
+			}
+		}
+	case "delete":
+		for i, module := range modules {
+			if module.Name == req.Name {
+				modules = append(modules[:i], modules[i+1:]...)
+				break
+			}
+		}
+	}
+	moduleByte, err := json.Marshal(modules)
+	if err != nil {
+		return err
+	}
+	return fileOp.SaveFileWithByte(moduleConfigPath, moduleByte, 0644)
 }
