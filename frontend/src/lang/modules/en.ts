@@ -1619,6 +1619,7 @@ const message = {
         shellLabel: 'Script',
         tmpLabel: 'Temporary Directory',
         sslLabel: 'Certificate Directory',
+        reCreate: 'Failed to create snapshot',
         deleteHelper:
             'All backup files for the snapshot, including those in the third-party backup account, will be deleted.',
         status: 'Snapshot status',

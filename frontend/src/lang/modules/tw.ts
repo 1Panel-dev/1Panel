@@ -1437,6 +1437,7 @@ const message = {
         shellLabel: '腳本',
         tmpLabel: '臨時目錄',
         sslLabel: '證書目錄',
+        reCreate: '创建快照失败',
         deleteHelper: '將刪除該快照的所有備份文件，包括第三方備份賬號中的文件。',
         status: '快照狀態',
         ignoreRule: '排除規則',

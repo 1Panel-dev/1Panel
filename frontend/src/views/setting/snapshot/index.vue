@@ -84,7 +84,7 @@
                             >
                                 {{ $t('commons.table.statusWaiting') }}
                             </el-button>
-                            <el-button v-if="row.status === 'Failed'" type="danger" link>
+                            <el-button v-if="row.status === 'Failed'" @click="reCreate(row)" type="danger" link>
                                 {{ $t('commons.status.error') }}
                             </el-button>
                             <el-tag v-if="row.status === 'Success'" type="success">
@@ -130,17 +130,19 @@
                 </el-form>
             </template>
         </OpDialog>
+        <TaskLog ref="taskLogRef" width="70%" />
     </div>
 </template>
 
 <script setup lang="ts">
-import { searchSnapshotPage, snapshotDelete, updateSnapshotDescription } from '@/api/modules/setting';
+import { searchSnapshotPage, snapshotDelete, snapshotRecreate, updateSnapshotDescription } from '@/api/modules/setting';
 import { onMounted, reactive, ref } from 'vue';
 import { computeSize, dateFormat } from '@/utils/util';
 import { ElForm } from 'element-plus';
 import IgnoreRule from '@/views/setting/snapshot/ignore-rule/index.vue';
 import i18n from '@/lang';
 import { Setting } from '@/api/interface/setting';
+import TaskLog from '@/components/task-log/index.vue';
 import RecoverStatus from '@/views/setting/snapshot/status/index.vue';
 import SnapshotImport from '@/views/setting/snapshot/import/index.vue';
 import SnapshotCreate from '@/views/setting/snapshot/create/index.vue';
@@ -164,6 +166,7 @@ const ignoreRef = ref();
 const recoverStatusRef = ref();
 const importRef = ref();
 const isRecordShow = ref();
+const taskLogRef = ref();
 
 const operateIDs = ref();
 const cleanData = ref();
@@ -178,6 +181,27 @@ const onImport = () => {
 
 const onCreate = () => {
     createRef.value.acceptParams();
+};
+
+const reCreate = (row: any) => {
+    ElMessageBox.confirm(row.message, i18n.global.t('setting.reCreate'), {
+        confirmButtonText: i18n.global.t('commons.button.retry'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'error',
+    }).then(async () => {
+        await snapshotRecreate(row.id)
+            .then(() => {
+                loading.value = false;
+                openTaskLog(row.taskID);
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+    });
+};
+const openTaskLog = (taskID: string) => {
+    taskLogRef.value.openWithTaskID(taskID);
 };
 
 const onIgnore = () => {

@@ -28,6 +28,12 @@ export const loadBaseDir = () => {
 export const loadDaemonJsonPath = () => {
     return http.get<string>(`/settings/daemonjson`, {});
 };
+export const updateAgentSetting = (param: Setting.SettingUpdate) => {
+    return http.post(`/settings/update`, param);
+};
+export const getAgentSettingInfo = () => {
+    return http.post<Setting.SettingInfo>(`/settings/search`);
+};
 
 // core
 export const getSettingInfo = () => {
@@ -88,11 +94,14 @@ export const bindMFA = (param: Setting.MFABind) => {
 };
 
 // snapshot
-export const loadSnapshotSetting = () => {
+export const loadSnapshotInfo = () => {
     return http.get<Setting.SnapshotData>(`/settings/snapshot/load`);
 };
 export const snapshotCreate = (param: Setting.SnapshotCreate) => {
     return http.post(`/settings/snapshot`, param);
+};
+export const snapshotRecreate = (id: number) => {
+    return http.post(`/settings/snapshot/recreate`, { id: id });
 };
 export const loadSnapStatus = (id: number) => {
     return http.post<Setting.SnapshotStatus>(`/settings/snapshot/status`, { id: id });

@@ -139,7 +139,7 @@
 </template>
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { loadSnapshotSetting, snapshotCreate } from '@/api/modules/setting';
+import { loadSnapshotInfo, snapshotCreate } from '@/api/modules/setting';
 import { computeSize, newUUID } from '@/utils/util';
 import i18n from '@/lang';
 import TaskLog from '@/components/task-log/index.vue';
@@ -411,7 +411,7 @@ const selectAllImage = () => {
 };
 
 const search = async () => {
-    const res = await loadSnapshotSetting();
+    const res = await loadSnapshotInfo();
     form.panelData = res.data.panelData || [];
     form.backupData = res.data.backupData || [];
     form.appData = res.data.appData || [];
