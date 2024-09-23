@@ -46,7 +46,6 @@ var AddTable = &gormigrate.Migration{
 			&model.Runtime{},
 			&model.Setting{},
 			&model.Snapshot{},
-			&model.SnapshotStatus{},
 			&model.Tag{},
 			&model.Website{},
 			&model.WebsiteAcmeAccount{},
@@ -262,7 +261,7 @@ var UpdateAppInstall = &gormigrate.Migration{
 }
 
 var UpdateSnapshot = &gormigrate.Migration{
-	ID: "20240913-update-snapshot",
+	ID: "20240923-update-snapshot",
 	Migrate: func(tx *gorm.DB) error {
 		return tx.AutoMigrate(&model.Snapshot{})
 	},

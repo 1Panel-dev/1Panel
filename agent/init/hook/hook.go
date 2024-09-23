@@ -66,40 +66,6 @@ func handleSnapStatus() {
 			"rollback_status":  constant.StatusFailed,
 			"rollback_message": msgFailed,
 		}).Error
-
-	snapRepo := repo.NewISnapshotRepo()
-
-	status, _ := snapRepo.GetStatusList()
-	for _, item := range status {
-		updates := make(map[string]interface{})
-		// if item.Panel == constant.StatusRunning {
-		// 	updates["panel"] = constant.StatusFailed
-		// }
-		// if item.PanelInfo == constant.StatusRunning {
-		// 	updates["panel_info"] = constant.StatusFailed
-		// }
-		// if item.DaemonJson == constant.StatusRunning {
-		// 	updates["daemon_json"] = constant.StatusFailed
-		// }
-		// if item.AppData == constant.StatusRunning {
-		// 	updates["app_data"] = constant.StatusFailed
-		// }
-		if item.PanelData == constant.StatusRunning {
-			updates["panel_data"] = constant.StatusFailed
-		}
-		if item.BackupData == constant.StatusRunning {
-			updates["backup_data"] = constant.StatusFailed
-		}
-		if item.Compress == constant.StatusRunning {
-			updates["compress"] = constant.StatusFailed
-		}
-		if item.Upload == constant.StatusUploading {
-			updates["upload"] = constant.StatusFailed
-		}
-		if len(updates) != 0 {
-			_ = snapRepo.UpdateStatus(item.ID, updates)
-		}
-	}
 }
 
 func handleCronjobStatus() {

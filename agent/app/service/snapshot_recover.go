@@ -1,6 +1,7 @@
 package service
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path"
@@ -55,7 +56,7 @@ func (u *SnapshotService) HandleSnapshotRecover(snap model.Snapshot, req dto.Sna
 	if _, err := os.Stat(snapFileDir); err != nil {
 		snapFileDir = baseDir
 	}
-	snapJson, err := u.readFromJson(path.Join(snapFileDir, "base/snapshot.json"))
+	snapJson, err := readFromJson(path.Join(snapFileDir, "base/snapshot.json"))
 	if err != nil {
 		updateRecoverStatus(snap.ID, "Readjson", constant.StatusFailed, fmt.Sprintf("decompress file failed, err: %v", err))
 		return
@@ -284,4 +285,19 @@ func updateRecoverStatus(id uint, interruptStep, status, message string) {
 		global.LOG.Errorf("update snap recover status failed, err: %v", err)
 	}
 	_ = settingRepo.Update("SystemStatus", "Free")
+}
+
+func readFromJson(path string) (SnapshotJson, error) {
+	var snap SnapshotJson
+	if _, err := os.Stat(path); err != nil {
+		return snap, fmt.Errorf("find snapshot json file in recover package failed, err: %v", err)
+	}
+	fileByte, err := os.ReadFile(path)
+	if err != nil {
+		return snap, fmt.Errorf("read file from path %s failed, err: %v", path, err)
+	}
+	if err := json.Unmarshal(fileByte, &snap); err != nil {
+		return snap, fmt.Errorf("unmarshal snapjson failed, err: %v", err)
+	}
+	return snap, nil
 }

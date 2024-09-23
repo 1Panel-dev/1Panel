@@ -3,16 +3,17 @@ package task
 import (
 	"context"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/model"
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
-	"github.com/1Panel-dev/1Panel/agent/constant"
-	"github.com/1Panel-dev/1Panel/agent/i18n"
-	"github.com/google/uuid"
 	"log"
 	"os"
 	"path"
 	"strconv"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/i18n"
+	"github.com/google/uuid"
 )
 
 type ActionFunc func(*Task) error
@@ -60,6 +61,7 @@ const (
 	TaskScopeRuntime          = "Runtime"
 	TaskScopeDatabase         = "Database"
 	TaskScopeAppStore         = "AppStore"
+	TaskScopeSnapshot         = "Snapshot"
 	TaskScopeRuntimeExtension = "RuntimeExtension"
 )
 
@@ -221,6 +223,10 @@ func (t *Task) Log(msg string) {
 	t.Logger.Printf(msg)
 }
 
+func (t *Task) Logf(format string, v ...any) {
+	t.Logger.Printf(format, v...)
+}
+
 func (t *Task) LogFailed(msg string) {
 	t.Logger.Printf(msg + i18n.GetMsgByKey("Failed"))
 }
@@ -231,6 +237,9 @@ func (t *Task) LogFailedWithErr(msg string, err error) {
 
 func (t *Task) LogSuccess(msg string) {
 	t.Logger.Printf(msg + i18n.GetMsgByKey("Success"))
+}
+func (t *Task) LogSuccessf(format string, v ...any) {
+	t.Logger.Printf(fmt.Sprintf(format, v...) + i18n.GetMsgByKey("Success"))
 }
 
 func (t *Task) LogStart(msg string) {

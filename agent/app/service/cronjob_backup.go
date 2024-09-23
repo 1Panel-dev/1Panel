@@ -210,7 +210,7 @@ func (u *CronjobService) handleSnapshot(cronjob model.Cronjob, startTime time.Ti
 		SourceAccountIDs:  record.SourceAccountIDs,
 		DownloadAccountID: cronjob.DownloadAccountID,
 	}
-	name, err := NewISnapshotService().HandleSnapshot(true, logPath, req, startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5), cronjob.Secret)
+	name, err := NewISnapshotService().HandleSnapshot(true, req, startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5), cronjob.Secret)
 	if err != nil {
 		return err
 	}

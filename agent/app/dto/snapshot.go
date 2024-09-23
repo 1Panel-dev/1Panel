@@ -15,6 +15,7 @@ type SnapshotStatus struct {
 
 type SnapshotCreate struct {
 	ID                uint   `json:"id"`
+	TaskID            string `json:"taskID"`
 	SourceAccountIDs  string `json:"sourceAccountIDs" validate:"required"`
 	DownloadAccountID uint   `json:"downloadAccountID" validate:"required"`
 	Description       string `json:"description" validate:"max=256"`
@@ -27,6 +28,8 @@ type SnapshotCreate struct {
 	WithMonitorData  bool `json:"withMonitorData"`
 	WithLoginLog     bool `json:"withLoginLog"`
 	WithOperationLog bool `json:"withOperationLog"`
+	WithSystemLog    bool `json:"withSystemLog"`
+	WithTaskLog      bool `json:"withTaskLog"`
 }
 
 type SnapshotData struct {
@@ -37,6 +40,8 @@ type SnapshotData struct {
 	WithMonitorData  bool `json:"withMonitorData"`
 	WithLoginLog     bool `json:"withLoginLog"`
 	WithOperationLog bool `json:"withOperationLog"`
+	WithSystemLog    bool `json:"withSystemLog"`
+	WithTaskLog      bool `json:"withTaskLog"`
 }
 type DataTree struct {
 	ID        string `json:"id"`
