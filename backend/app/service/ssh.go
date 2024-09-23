@@ -124,6 +124,16 @@ func (u *SSHService) OperateSSH(operation string) error {
 	if operation == "enable" || operation == "disable" {
 		serviceName += ".service"
 	}
+	if operation == "stop" {
+		isSocketActive, _ := systemctl.IsActive(serviceName + ".socket")
+		if isSocketActive {
+			std, err := cmd.Execf("%s systemctl stop %s", sudo, serviceName+".socket")
+			if err != nil {
+				global.LOG.Errorf("handle systemctl stop %s.socket failed, err: %v", serviceName, std)
+			}
+		}
+	}
+
 	stdout, err := cmd.Execf("%s systemctl %s %s", sudo, operation, serviceName)
 	if err != nil {
 		if strings.Contains(stdout, "alias name or linked unit file") {

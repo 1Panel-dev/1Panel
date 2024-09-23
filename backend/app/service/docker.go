@@ -10,8 +10,10 @@ import (
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
+	"github.com/1Panel-dev/1Panel/backend/utils/systemctl"
 	"github.com/pkg/errors"
 )
 
@@ -336,8 +338,15 @@ func (u *DockerService) UpdateConfByFile(req dto.DaemonJsonUpdateByFile) error {
 
 func (u *DockerService) OperateDocker(req dto.DockerOperation) error {
 	service := "docker"
+	sudo := cmd.SudoHandleCmd()
 	if req.Operation == "stop" {
-		service = "docker.socket"
+		isSocketActive, _ := systemctl.IsActive("docker.socket")
+		if isSocketActive {
+			std, err := cmd.Execf("%s systemctl stop docker.socket", sudo)
+			if err != nil {
+				global.LOG.Errorf("handle systemctl stop docker.socket failed, err: %v", std)
+			}
+		}
 	}
 	stdout, err := cmd.Execf("systemctl %s %s ", req.Operation, service)
 	if err != nil {
