@@ -31,7 +31,7 @@ export const BuildNginx = (req: Nginx.NginxBuildReq) => {
 };
 
 export const GetNginxModules = () => {
-    return http.get<Nginx.NginxModule[]>(`/openresty/modules`);
+    return http.get<Nginx.NginxBuildConfig>(`/openresty/modules`);
 };
 
 export const UpdateNginxModule = (req: Nginx.NginxModuleUpdate) => {

@@ -4,40 +4,46 @@
             <template #toolbar>
                 <el-button type="primary" @click="openOperate">{{ $t('commons.button.create') }}</el-button>
                 <el-button type="primary" plain @click="buildNginx">{{ $t('nginx.build') }}</el-button>
+                <el-text type="warning" class="!ml-2">{{ $t('nginx.buildHelper') }}</el-text>
             </template>
             <el-table-column prop="name" :label="$t('commons.table.name')" />
             <el-table-column prop="params" :label="$t('nginx.params')" />
             <el-table-column :label="$t('commons.table.status')" fix>
                 <template #default="{ row }">
-                    <el-switch v-model="row.enable" />
+                    <el-switch v-model="row.enable" @click="updateModule(row)" />
                 </template>
             </el-table-column>
             <fu-table-operations
                 :ellipsis="2"
-                width="100px"
+                width="200px"
                 :buttons="buttons"
                 :label="$t('commons.table.operate')"
                 fixed="right"
                 fix
             />
         </ComplexTable>
-        <TaskLog ref="taskLogRef" />
         <Operate ref="operateRef" @close="search" />
         <OpDialog ref="deleteRef" @search="search" @cancel="search" />
+        <Build ref="buildRef" />
     </div>
 </template>
 <script lang="ts" setup>
-import { BuildNginx, GetNginxModules, UpdateNginxModule } from '@/api/modules/nginx';
-import { newUUID } from '@/utils/util';
-import TaskLog from '@/components/task-log/index.vue';
-import Operate from './operate/index.vue';
+import { GetNginxModules, UpdateNginxModule } from '@/api/modules/nginx';
 import i18n from '@/lang';
 import { Nginx } from '@/api/interface/nginx';
+import { MsgSuccess } from '@/utils/message';
+import Operate from './operate/index.vue';
+import Build from './build/index.vue';
 
-const taskLogRef = ref();
 const data = ref([]);
 const loading = ref(false);
 const buttons = [
+    {
+        label: i18n.global.t('commons.button.edit'),
+        click: function (row: Nginx.NginxModule) {
+            openEdit(row);
+        },
+    },
     {
         label: i18n.global.t('commons.button.delete'),
         click: function (row: Nginx.NginxModule) {
@@ -47,39 +53,44 @@ const buttons = [
 ];
 const operateRef = ref();
 const deleteRef = ref();
+const buildRef = ref();
 
 const buildNginx = async () => {
-    ElMessageBox.confirm(i18n.global.t('nginx.buildWarn'), i18n.global.t('nginx.build'), {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-    }).then(async () => {
-        const taskID = newUUID();
-        try {
-            await BuildNginx({
-                taskID: taskID,
-            });
-            openTaskLog(taskID);
-        } catch (error) {}
-    });
+    buildRef.value.acceptParams();
 };
 
 const search = () => {
     loading.value = true;
     GetNginxModules()
         .then((res) => {
-            data.value = res.data;
+            data.value = res.data.modules;
         })
         .finally(() => {
             loading.value = false;
         });
 };
 
-const openTaskLog = (taskID: string) => {
-    taskLogRef.value.openWithTaskID(taskID);
+const openOperate = () => {
+    operateRef.value.acceptParams('create');
 };
 
-const openOperate = () => {
-    operateRef.value.acceptParams();
+const openEdit = (row: Nginx.NginxModule) => {
+    operateRef.value.acceptParams('update', row);
+};
+
+const updateModule = (row: Nginx.NginxModule) => {
+    loading.value = true;
+    const data = {
+        ...row,
+        operate: 'update',
+    };
+    UpdateNginxModule(data)
+        .then(() => {
+            MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
+        })
+        .finally(() => {
+            loading.value = false;
+        });
 };
 
 const deleteModule = async (row: Nginx.NginxModule) => {

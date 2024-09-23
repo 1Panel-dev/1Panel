@@ -2105,6 +2105,11 @@ const message = {
         module: '模块',
         build: '构建',
         buildWarn: '构建 OpenResty 需要预留一定的 CPU 和内存，时间较长，请耐心等待',
+        mirrorUrl: '软件源',
+        paramsHelper: '例如：--add-module=/tmp/ngx_brotli',
+        packagesHelper: '例如：git,curl 按,分割',
+        scriptHelper: '编译之前执行的脚本，一般为下载模块源码，安装依赖等',
+        buildHelper: '添加/修改模块之后点击构建，构建成功后会自动重启 OpenResty',
     },
     ssl: {
         create: '申请证书',

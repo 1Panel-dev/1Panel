@@ -2104,6 +2104,11 @@ const message = {
         module: '模組',
         build: '建構',
         buildWarn: '建構 OpenResty 需要預留一定的 CPU 和內存，時間較長，請耐心等待',
+        mirrorUrl: '軟體源',
+        paramsHelper: '例如：--add-module=/tmp/ngx_brotli',
+        packagesHelper: '例如：git,curl 以逗號分割',
+        scriptHelper: '編譯之前執行的腳本，通常用於下載模組原始碼，安裝依賴等',
+        buildHelper: '添加/修改模組後點擊構建，構建成功後會自動重啟 OpenResty',
     },
     ssl: {
         create: '申請證書',

@@ -69,9 +69,14 @@ type NginxProxyCache struct {
 }
 
 type NginxModule struct {
-	Name     string   `json:"name"`
-	Script   string   `json:"script"`
-	Packages []string `json:"packages"`
-	Params   string   `json:"params"`
-	Enable   bool     `json:"enable"`
+	Name     string `json:"name"`
+	Script   string `json:"script"`
+	Packages string `json:"packages"`
+	Params   string `json:"params"`
+	Enable   bool   `json:"enable"`
+}
+
+type NginxBuildConfig struct {
+	Mirror  string        `json:"mirror"`
+	Modules []NginxModule `json:"modules"`
 }

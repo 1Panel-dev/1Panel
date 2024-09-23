@@ -2260,6 +2260,13 @@ const message = {
         build: 'Build',
         buildWarn:
             'Building OpenResty requires reserving a certain amount of CPU and memory, which may take a long time, please be patient',
+        mirrorUrl: 'Software Source',
+        paramsHelper: 'For example: --add-module=/tmp/ngx_brotli',
+        packagesHelper: 'For example: git, curl (separated by commas)',
+        scriptHelper:
+            'Scripts to execute before compilation, usually for downloading module source code, installing dependencies, etc.',
+        buildHelper:
+            'Click build after adding/modifying a module. OpenResty will automatically restart upon successful build.',
     },
     ssl: {
         create: 'Apply',

@@ -109,6 +109,7 @@ type NginxRedirectUpdate struct {
 
 type NginxBuildReq struct {
 	TaskID string `json:"taskID" validate:"required"`
+	Mirror string `json:"mirror"  validate:"required"`
 }
 
 type NginxModuleUpdate struct {
