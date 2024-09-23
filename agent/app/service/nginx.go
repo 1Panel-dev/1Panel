@@ -37,7 +37,7 @@ type INginxService interface {
 	ClearProxyCache() error
 
 	Build(req request.NginxBuildReq) error
-	GetModules() ([]response.NginxModule, error)
+	GetModules() (*response.NginxBuildConfig, error)
 	UpdateModule(req request.NginxModuleUpdate) error
 }
 
@@ -179,7 +179,7 @@ func (n NginxService) Build(req request.NginxBuildReq) error {
 		return err
 	}
 	var (
-		modules         []response.NginxModule
+		modules         []dto.NginxModule
 		addModuleParams []string
 		addPackages     []string
 	)
@@ -211,6 +211,7 @@ func (n NginxService) Build(req request.NginxBuildReq) error {
 	if err != nil {
 		return err
 	}
+	envs["CONTAINER_PACKAGE_URL"] = req.Mirror
 	envs["RESTY_CONFIG_OPTIONS_MORE"] = ""
 	envs["RESTY_ADD_PACKAGE_BUILDDEPS"] = ""
 	if len(addModuleParams) > 0 {
@@ -239,16 +240,16 @@ func (n NginxService) Build(req request.NginxBuildReq) error {
 	return nil
 }
 
-func (n NginxService) GetModules() ([]response.NginxModule, error) {
+func (n NginxService) GetModules() (*response.NginxBuildConfig, error) {
 	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
 	if err != nil {
 		return nil, err
 	}
 	fileOp := files.NewFileOp()
-	var modules []response.NginxModule
+	var modules []dto.NginxModule
 	moduleConfigPath := path.Join(nginxInstall.GetPath(), "build", "module.json")
 	if !fileOp.Stat(moduleConfigPath) {
-		return modules, nil
+		return nil, nil
 	}
 	moduleContent, err := fileOp.GetContent(moduleConfigPath)
 	if err != nil {
@@ -257,7 +258,25 @@ func (n NginxService) GetModules() ([]response.NginxModule, error) {
 	if len(moduleContent) > 0 {
 		_ = json.Unmarshal(moduleContent, &modules)
 	}
-	return modules, nil
+	var resList []response.NginxModule
+	for _, module := range modules {
+		resList = append(resList, response.NginxModule{
+			Name:     module.Name,
+			Script:   module.Script,
+			Packages: strings.Join(module.Packages, ","),
+			Params:   module.Params,
+			Enable:   module.Enable,
+		})
+	}
+	envs, err := gotenv.Read(nginxInstall.GetEnvPath())
+	if err != nil {
+		return nil, err
+	}
+
+	return &response.NginxBuildConfig{
+		Mirror:  envs["CONTAINER_PACKAGE_URL"],
+		Modules: resList,
+	}, nil
 }
 
 func (n NginxService) UpdateModule(req request.NginxModuleUpdate) error {
@@ -266,7 +285,9 @@ func (n NginxService) UpdateModule(req request.NginxModuleUpdate) error {
 		return err
 	}
 	fileOp := files.NewFileOp()
-	var modules []response.NginxModule
+	var (
+		modules []dto.NginxModule
+	)
 	moduleConfigPath := path.Join(nginxInstall.GetPath(), "build", "module.json")
 	if !fileOp.Stat(moduleConfigPath) {
 		_ = fileOp.CreateFile(moduleConfigPath)
@@ -278,6 +299,7 @@ func (n NginxService) UpdateModule(req request.NginxModuleUpdate) error {
 	if len(moduleContent) > 0 {
 		_ = json.Unmarshal(moduleContent, &modules)
 	}
+
 	switch req.Operate {
 	case "create":
 		for _, module := range modules {
@@ -285,10 +307,10 @@ func (n NginxService) UpdateModule(req request.NginxModuleUpdate) error {
 				return buserr.New("ErrNameIsExist")
 			}
 		}
-		modules = append(modules, response.NginxModule{
+		modules = append(modules, dto.NginxModule{
 			Name:     req.Name,
 			Script:   req.Script,
-			Packages: strings.Split(req.Packages, " "),
+			Packages: strings.Split(req.Packages, ","),
 			Params:   req.Params,
 			Enable:   true,
 		})
@@ -296,7 +318,7 @@ func (n NginxService) UpdateModule(req request.NginxModuleUpdate) error {
 		for i, module := range modules {
 			if module.Name == req.Name {
 				modules[i].Script = req.Script
-				modules[i].Packages = strings.Split(req.Packages, " ")
+				modules[i].Packages = strings.Split(req.Packages, ",")
 				modules[i].Params = req.Params
 				modules[i].Enable = req.Enable
 				break

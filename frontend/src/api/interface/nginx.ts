@@ -31,22 +31,23 @@ export namespace Nginx {
 
     export interface NginxBuildReq {
         taskID: string;
+        mirror: string;
     }
 
     export interface NginxModule {
         name: string;
         script?: string;
-        packages?: string[];
+        packages?: string;
         enable: boolean;
         params: string;
     }
 
-    export interface NginxModuleUpdate {
+    export interface NginxBuildConfig {
+        mirror: string;
+        modules: NginxModule[];
+    }
+
+    export interface NginxModuleUpdate extends NginxModule {
         operate: string;
-        name: string;
-        script?: string;
-        packages?: string;
-        enable: boolean;
-        params: string;
     }
 }

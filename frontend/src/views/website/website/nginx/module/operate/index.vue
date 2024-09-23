@@ -3,21 +3,26 @@
         v-model="open"
         :header="$t('nginx.' + mode)"
         size="large"
-        :resource="mode === 'edit' ? module.name : ''"
+        :resource="mode === 'update' ? module.name : ''"
         :back="handleClose"
     >
         <el-form ref="moduleForm" label-position="top" :model="module" :rules="rules">
             <el-form-item :label="$t('commons.table.name')" prop="name">
-                <el-input v-model.trim="module.name" :disabled="mode === 'edit'"></el-input>
+                <el-input v-model.trim="module.name" :disabled="mode === 'update'"></el-input>
             </el-form-item>
             <el-form-item :label="$t('nginx.params')" prop="params">
-                <el-input v-model.trim="module.params"></el-input>
+                <el-input v-model.trim="module.params" :placeholder="$t('nginx.paramsHelper')"></el-input>
             </el-form-item>
             <el-form-item :label="$t('nginx.packages')" prop="packages">
-                <el-input v-model.trim="module.packages"></el-input>
+                <el-input v-model.trim="module.packages" :placeholder="$t('nginx.packagesHelper')"></el-input>
             </el-form-item>
             <el-form-item :label="$t('nginx.script')" prop="script">
-                <el-input v-model="module.script" type="textarea" :rows="10"></el-input>
+                <el-input
+                    v-model="module.script"
+                    type="textarea"
+                    :rows="10"
+                    :placeholder="$t('nginx.scriptHelper')"
+                ></el-input>
             </el-form-item>
         </el-form>
         <template #footer>
@@ -30,6 +35,7 @@
 </template>
 
 <script lang="ts" setup>
+import { Nginx } from '@/api/interface/nginx';
 import { UpdateNginxModule } from '@/api/modules/nginx';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
@@ -59,7 +65,18 @@ const handleClose = () => {
     em('close', false);
 };
 
-const acceptParams = async () => {
+const acceptParams = async (operate: string, editModule: Nginx.NginxModule) => {
+    mode.value = operate;
+    if (operate === 'update') {
+        module.value = {
+            name: editModule.name,
+            script: editModule.script,
+            enable: editModule.enable,
+            params: editModule.params,
+            packages: editModule.packages,
+            operate: 'update',
+        };
+    }
     open.value = true;
 };
 
@@ -73,7 +90,7 @@ const submit = async (form: FormInstance) => {
         };
         UpdateNginxModule(data)
             .then(() => {
-                if (mode.value === 'edit') {
+                if (mode.value === 'update') {
                     MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
                 } else if (mode.value === 'create') {
                     MsgSuccess(i18n.global.t('commons.msg.createSuccess'));

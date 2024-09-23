@@ -84,3 +84,11 @@ type NginxUpstreamServer struct {
 var LBAlgorithms = map[string]struct{}{"ip_hash": {}, "least_conn": {}}
 
 var RealIPKeys = map[string]struct{}{"X-Forwarded-For": {}, "X-Real-IP": {}, "CF-Connecting-IP": {}}
+
+type NginxModule struct {
+	Name     string   `json:"name"`
+	Script   string   `json:"script"`
+	Packages []string `json:"packages"`
+	Params   string   `json:"params"`
+	Enable   bool     `json:"enable"`
+}
