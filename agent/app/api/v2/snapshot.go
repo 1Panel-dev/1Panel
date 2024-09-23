@@ -45,6 +45,28 @@ func (b *BaseApi) CreateSnapshot(c *gin.Context) {
 }
 
 // @Tags System Setting
+// @Summary Recreate system snapshot
+// @Description 创建系统快照重试
+// @Accept json
+// @Param request body dto.OperateByID true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /settings/snapshot/recrete [post]
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"snapshots","output_column":"name","output_value":"name"}],"formatZH":"重试创建快照 [name]","formatEN":recrete the snapshot [name]"}
+func (b *BaseApi) RecreateSnapshot(c *gin.Context) {
+	var req dto.OperateByID
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := snapshotService.SnapshotReCreate(req.ID); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags System Setting
 // @Summary Import system snapshot
 // @Description 导入已有快照
 // @Accept json

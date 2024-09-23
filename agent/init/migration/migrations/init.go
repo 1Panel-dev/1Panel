@@ -261,7 +261,7 @@ var UpdateAppInstall = &gormigrate.Migration{
 }
 
 var UpdateSnapshot = &gormigrate.Migration{
-	ID: "20240923-update-snapshot",
+	ID: "20240925-update-snapshot",
 	Migrate: func(tx *gorm.DB) error {
 		return tx.AutoMigrate(&model.Snapshot{})
 	},

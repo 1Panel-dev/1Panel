@@ -3,6 +3,8 @@ package model
 type Snapshot struct {
 	BaseModel
 	Name              string `json:"name" gorm:"not null;unique"`
+	TaskID            string `json:"taskID"`
+	Secret            string `json:"secret"`
 	Description       string `json:"description"`
 	SourceAccountIDs  string `json:"sourceAccountIDs"`
 	DownloadAccountID uint   `json:"downloadAccountID"`

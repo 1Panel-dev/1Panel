@@ -2,6 +2,7 @@ package repo
 
 import (
 	"context"
+
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 
@@ -13,7 +14,7 @@ type TaskRepo struct {
 }
 
 type ITaskRepo interface {
-	Create(ctx context.Context, task *model.Task) error
+	Save(ctx context.Context, task *model.Task) error
 	GetFirst(opts ...DBOption) (model.Task, error)
 	Page(page, size int, opts ...DBOption) (int64, []model.Task, error)
 	Update(ctx context.Context, task *model.Task) error
@@ -64,8 +65,8 @@ func (t TaskRepo) WithResourceID(id uint) DBOption {
 	}
 }
 
-func (t TaskRepo) Create(ctx context.Context, task *model.Task) error {
-	return getTaskTx(ctx).Create(&task).Error
+func (t TaskRepo) Save(ctx context.Context, task *model.Task) error {
+	return getTaskTx(ctx).Save(&task).Error
 }
 
 func (t TaskRepo) GetFirst(opts ...DBOption) (model.Task, error) {

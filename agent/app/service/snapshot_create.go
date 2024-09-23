@@ -19,6 +19,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/compose"
+	"github.com/1Panel-dev/1Panel/agent/utils/copier"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/glebarez/sqlite"
 	"github.com/pkg/errors"
@@ -26,78 +27,82 @@ import (
 )
 
 func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate) error {
-	if _, err := u.HandleSnapshot(false, req, time.Now().Format(constant.DateTimeSlimLayout), req.Secret); err != nil {
+	versionItem, _ := settingRepo.Get(settingRepo.WithByKey("SystemVersion"))
+
+	req.Name = fmt.Sprintf("1panel-%s-linux-%s-%s", versionItem.Value, loadOs(), time.Now().Format(constant.DateTimeSlimLayout))
+	appItem, _ := json.Marshal(req.AppData)
+	panelItem, _ := json.Marshal(req.PanelData)
+	backupItem, _ := json.Marshal(req.BackupData)
+	snap := model.Snapshot{
+		Name:              req.Name,
+		TaskID:            req.TaskID,
+		Secret:            req.Secret,
+		Description:       req.Description,
+		SourceAccountIDs:  req.SourceAccountIDs,
+		DownloadAccountID: req.DownloadAccountID,
+
+		AppData:          string(appItem),
+		PanelData:        string(panelItem),
+		BackupData:       string(backupItem),
+		WithMonitorData:  req.WithMonitorData,
+		WithLoginLog:     req.WithLoginLog,
+		WithOperationLog: req.WithOperationLog,
+		WithTaskLog:      req.WithTaskLog,
+		WithSystemLog:    req.WithSystemLog,
+
+		Version: versionItem.Value,
+		Status:  constant.StatusWaiting,
+	}
+	if err := snapshotRepo.Create(&snap); err != nil {
+		global.LOG.Errorf("create snapshot record to db failed, err: %v", err)
+		return err
+	}
+
+	req.ID = snap.ID
+	if err := u.HandleSnapshot(req); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (u *SnapshotService) HandleSnapshot(isCronjob bool, req dto.SnapshotCreate, timeNow string, secret string) (string, error) {
-	var (
-		rootDir  string
-		taskItem *task.Task
-		snap     model.Snapshot
-		err      error
-	)
-
-	if req.ID == 0 {
-		versionItem, _ := settingRepo.Get(settingRepo.WithByKey("SystemVersion"))
-
-		name := fmt.Sprintf("1panel-%s-linux-%s-%s", versionItem.Value, loadOs(), timeNow)
-		if isCronjob {
-			name = fmt.Sprintf("snapshot-1panel-%s-linux-%s-%s", versionItem.Value, loadOs(), timeNow)
-		}
-		rootDir = path.Join(global.CONF.System.BaseDir, "1panel/tmp/system", name)
-
-		appItem, _ := json.Marshal(req.AppData)
-		panelItem, _ := json.Marshal(req.PanelData)
-		backupItem, _ := json.Marshal(req.BackupData)
-		snap = model.Snapshot{
-			Name:              name,
-			Description:       req.Description,
-			SourceAccountIDs:  req.SourceAccountIDs,
-			DownloadAccountID: req.DownloadAccountID,
-
-			AppData:          string(appItem),
-			PanelData:        string(panelItem),
-			BackupData:       string(backupItem),
-			WithMonitorData:  req.WithMonitorData,
-			WithLoginLog:     req.WithLoginLog,
-			WithOperationLog: req.WithOperationLog,
-			WithTaskLog:      req.WithTaskLog,
-			WithSystemLog:    req.WithSystemLog,
-
-			Version: versionItem.Value,
-			Status:  constant.StatusWaiting,
-		}
-		if err := snapshotRepo.Create(&snap); err != nil {
-			global.LOG.Errorf("create snapshot record to db failed, err: %v", err)
-			return "", err
-		}
-
-		taskItem, err = task.NewTaskWithOps(name, task.TaskCreate, task.TaskScopeSnapshot, req.TaskID, snap.ID)
-		if err != nil {
-			global.LOG.Errorf("new task for create snapshot failed, err: %v", err)
-			return "", err
-		}
-	} else {
-		snap, err = snapshotRepo.Get(commonRepo.WithByID(req.ID))
-		if err != nil {
-			return "", err
-		}
-		taskModel, err := taskRepo.GetFirst(taskRepo.WithResourceID(snap.ID), commonRepo.WithByType(task.TaskScopeSnapshot))
-		if err != nil {
-			return "", err
-		}
-		taskItem, err = task.NewTaskWithOps(snap.Name, task.TaskCreate, task.TaskScopeSnapshot, taskModel.ID, snap.ID)
-		if err != nil {
-			global.LOG.Errorf("new task for create snapshot failed, err: %v", err)
-			return "", err
-		}
-		rootDir = path.Join(global.CONF.System.BaseDir, "1panel/tmp/system", snap.Name)
+func (u *SnapshotService) SnapshotReCreate(id uint) error {
+	snap, err := snapshotRepo.Get(commonRepo.WithByID(id))
+	if err != nil {
+		return err
+	}
+	taskModel, err := taskRepo.GetFirst(taskRepo.WithResourceID(snap.ID), commonRepo.WithByType(task.TaskScopeSnapshot))
+	if err != nil {
+		return err
 	}
 
-	itemHelper := snapHelper{SnapID: snap.ID, Task: *taskItem, FileOp: files.NewFileOp(), Ctx: context.Background()}
+	var req dto.SnapshotCreate
+	_ = copier.Copy(&req, snap)
+	if err := json.Unmarshal([]byte(snap.PanelData), &req.PanelData); err != nil {
+		return err
+	}
+	if err := json.Unmarshal([]byte(snap.AppData), &req.AppData); err != nil {
+		return err
+	}
+	if err := json.Unmarshal([]byte(snap.BackupData), &req.BackupData); err != nil {
+		return err
+	}
+	req.TaskID = taskModel.ID
+	if err := u.HandleSnapshot(req); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (u *SnapshotService) HandleSnapshot(req dto.SnapshotCreate) error {
+	taskItem, err := task.NewTaskWithOps(req.Name, task.TaskCreate, task.TaskScopeSnapshot, req.TaskID, req.ID)
+	if err != nil {
+		global.LOG.Errorf("new task for create snapshot failed, err: %v", err)
+		return err
+	}
+
+	rootDir := path.Join(global.CONF.System.BaseDir, "1panel/tmp/system", req.Name)
+	itemHelper := snapHelper{SnapID: req.ID, Task: *taskItem, FileOp: files.NewFileOp(), Ctx: context.Background()}
 	baseDir := path.Join(rootDir, "base")
 	_ = os.MkdirAll(baseDir, os.ModePerm)
 
@@ -108,37 +113,37 @@ func (u *SnapshotService) HandleSnapshot(isCronjob bool, req dto.SnapshotCreate,
 			nil,
 		)
 
-		if len(snap.InterruptStep) == 0 || snap.InterruptStep == "SnapBaseInfo" {
+		if len(req.InterruptStep) == 0 || req.InterruptStep == "SnapBaseInfo" {
 			taskItem.AddSubTask(
 				i18n.GetMsgByKey("SnapBaseInfo"),
 				func(t *task.Task) error { return snapBaseData(itemHelper, baseDir) },
 				nil,
 			)
-			snap.InterruptStep = ""
+			req.InterruptStep = ""
 		}
-		if len(snap.InterruptStep) == 0 || snap.InterruptStep == "SnapInstallApp" {
+		if len(req.InterruptStep) == 0 || req.InterruptStep == "SnapInstallApp" {
 			taskItem.AddSubTask(
 				i18n.GetMsgByKey("SnapInstallApp"),
 				func(t *task.Task) error { return snapAppImage(itemHelper, req, rootDir) },
 				nil,
 			)
-			snap.InterruptStep = ""
+			req.InterruptStep = ""
 		}
-		if len(snap.InterruptStep) == 0 || snap.InterruptStep == "SnapLocalBackup" {
+		if len(req.InterruptStep) == 0 || req.InterruptStep == "SnapLocalBackup" {
 			taskItem.AddSubTask(
 				i18n.GetMsgByKey("SnapLocalBackup"),
 				func(t *task.Task) error { return snapBackupData(itemHelper, req, rootDir) },
 				nil,
 			)
-			snap.InterruptStep = ""
+			req.InterruptStep = ""
 		}
-		if len(snap.InterruptStep) == 0 || snap.InterruptStep == "SnapPanelData" {
+		if len(req.InterruptStep) == 0 || req.InterruptStep == "SnapPanelData" {
 			taskItem.AddSubTask(
 				i18n.GetMsgByKey("SnapPanelData"),
 				func(t *task.Task) error { return snapPanelData(itemHelper, req, rootDir) },
 				nil,
 			)
-			snap.InterruptStep = ""
+			req.InterruptStep = ""
 		}
 
 		taskItem.AddSubTask(
@@ -151,15 +156,15 @@ func (u *SnapshotService) HandleSnapshot(isCronjob bool, req dto.SnapshotCreate,
 			},
 			nil,
 		)
-		if len(snap.InterruptStep) == 0 || snap.InterruptStep == "SnapCompress" {
+		if len(req.InterruptStep) == 0 || req.InterruptStep == "SnapCompress" {
 			taskItem.AddSubTask(
 				i18n.GetMsgByKey("SnapCompress"),
-				func(t *task.Task) error { return snapCompress(itemHelper, rootDir, secret) },
+				func(t *task.Task) error { return snapCompress(itemHelper, rootDir, req.Secret) },
 				nil,
 			)
-			snap.InterruptStep = ""
+			req.InterruptStep = ""
 		}
-		if len(snap.InterruptStep) == 0 || snap.InterruptStep == "SnapUpload" {
+		if len(req.InterruptStep) == 0 || req.InterruptStep == "SnapUpload" {
 			taskItem.AddSubTask(
 				i18n.GetMsgByKey("SnapUpload"),
 				func(t *task.Task) error {
@@ -167,16 +172,16 @@ func (u *SnapshotService) HandleSnapshot(isCronjob bool, req dto.SnapshotCreate,
 				},
 				nil,
 			)
-			snap.InterruptStep = ""
+			req.InterruptStep = ""
 		}
 		if err := taskItem.Execute(); err != nil {
-			_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error(), "interrupt_step": taskItem.Task.CurrentStep})
+			_ = snapshotRepo.Update(req.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error(), "interrupt_step": taskItem.Task.CurrentStep})
 			return
 		}
-		_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusSuccess, "interrupt_step": ""})
+		_ = snapshotRepo.Update(req.ID, map[string]interface{}{"status": constant.StatusSuccess, "interrupt_step": ""})
 		_ = os.RemoveAll(rootDir)
 	}()
-	return snap.Name, nil
+	return nil
 }
 
 type snapHelper struct {

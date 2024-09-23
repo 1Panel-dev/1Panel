@@ -30,6 +30,7 @@ type ISnapshotService interface {
 	SearchWithPage(req dto.SearchWithPage) (int64, interface{}, error)
 	LoadSnapshotData() (dto.SnapshotData, error)
 	SnapshotCreate(req dto.SnapshotCreate) error
+	SnapshotReCreate(id uint) error
 	SnapshotRecover(req dto.SnapshotRecover) error
 	SnapshotRollback(req dto.SnapshotRecover) error
 	SnapshotImport(req dto.SnapshotImport) error
@@ -37,7 +38,7 @@ type ISnapshotService interface {
 
 	UpdateDescription(req dto.UpdateDescription) error
 
-	HandleSnapshot(isCronjob bool, req dto.SnapshotCreate, timeNow string, secret string) (string, error)
+	HandleSnapshot(req dto.SnapshotCreate) error
 }
 
 func NewISnapshotService() ISnapshotService {

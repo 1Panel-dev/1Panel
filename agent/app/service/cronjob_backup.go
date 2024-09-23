@@ -206,15 +206,18 @@ func (u *CronjobService) handleSnapshot(cronjob model.Cronjob, startTime time.Ti
 	record.DownloadAccountID, record.SourceAccountIDs = cronjob.DownloadAccountID, cronjob.SourceAccountIDs
 	record.FileDir = "system_snapshot"
 
+	versionItem, _ := settingRepo.Get(settingRepo.WithByKey("SystemVersion"))
 	req := dto.SnapshotCreate{
+		Name:   fmt.Sprintf("snapshot-1panel-%s-linux-%s-%s", versionItem.Value, loadOs(), startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5)),
+		Secret: cronjob.Secret,
+
 		SourceAccountIDs:  record.SourceAccountIDs,
 		DownloadAccountID: cronjob.DownloadAccountID,
 	}
-	name, err := NewISnapshotService().HandleSnapshot(true, req, startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5), cronjob.Secret)
-	if err != nil {
+	if err := NewISnapshotService().HandleSnapshot(req); err != nil {
 		return err
 	}
-	record.FileName = name + ".tar.gz"
+	record.FileName = req.Name + ".tar.gz"
 
 	if err := backupRepo.CreateRecord(&record); err != nil {
 		global.LOG.Errorf("save backup record failed, err: %v", err)

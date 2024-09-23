@@ -15,11 +15,13 @@ type SnapshotStatus struct {
 
 type SnapshotCreate struct {
 	ID                uint   `json:"id"`
+	Name              string `json:"name"`
 	TaskID            string `json:"taskID"`
 	SourceAccountIDs  string `json:"sourceAccountIDs" validate:"required"`
 	DownloadAccountID uint   `json:"downloadAccountID" validate:"required"`
 	Description       string `json:"description" validate:"max=256"`
 	Secret            string `json:"secret"`
+	InterruptStep     string `json:"interruptStep"`
 
 	AppData    []DataTree `json:"appData"`
 	BackupData []DataTree `json:"backupData"`
@@ -77,6 +79,7 @@ type SnapshotImport struct {
 type SnapshotInfo struct {
 	ID              uint      `json:"id"`
 	Name            string    `json:"name"`
+	TaskID          string    `json:"taskID"`
 	Description     string    `json:"description" validate:"max=256"`
 	From            string    `json:"from"`
 	DefaultDownload string    `json:"defaultDownload"`

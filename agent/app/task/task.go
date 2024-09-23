@@ -168,7 +168,7 @@ func (t *Task) updateTask(task *model.Task) {
 }
 
 func (t *Task) Execute() error {
-	if err := t.taskRepo.Create(context.Background(), t.Task); err != nil {
+	if err := t.taskRepo.Save(context.Background(), t.Task); err != nil {
 		return err
 	}
 	var err error
