@@ -53,7 +53,9 @@
             <template #prompt>
                 <el-alert type="info" :closable="false">
                     <template #title>
-                        <span v-html="$t('file.fileHeper')"></span>
+                        <span class="input-help whitespace-break-spaces">
+                            {{ $t('file.fileHeper') }}
+                        </span>
                     </template>
                 </el-alert>
             </template>

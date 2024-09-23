@@ -5,7 +5,9 @@
             <template #prompt>
                 <el-alert type="info" :closable="false">
                     <template #title>
-                        <span v-html="$t('runtime.statusHelper')"></span>
+                        <span class="input-help whitespace-break-spaces">
+                            {{ $t('runtime.statusHelper') }}
+                        </span>
                     </template>
                 </el-alert>
             </template>
