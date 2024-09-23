@@ -741,7 +741,7 @@ const message = {
         composeHelper: '通過 1Panel 編輯或者模版創建的編排，將保存在 {0}/docker/compose 路徑下',
         deleteFile: '刪除文件',
         allDelete: '徹底刪除',
-        deleteComposeHelper: '1. 刪除容器編排記錄 <br>2. 刪除容器編排的所有文件，包括配置文件和持久化文件',
+        deleteComposeHelper: '1. 刪除容器編排記錄 \n2. 刪除容器編排的所有文件，包括配置文件和持久化文件',
         deleteCompose: '" 刪除此編排',
         apps: '應用商店',
         local: '本地',

@@ -8,7 +8,9 @@
         <el-form ref="deleteForm" v-loading="loading">
             <el-form-item>
                 <el-checkbox v-model="deleteFile" :label="$t('container.allDelete')" />
-                <span class="input-help" v-html="$t('container.deleteComposeHelper')"></span>
+                <span class="input-help whitespace-break-spaces">
+                    {{ $t('container.deleteComposeHelper') }}
+                </span>
             </el-form-item>
             <el-form-item>
                 <div class="font">

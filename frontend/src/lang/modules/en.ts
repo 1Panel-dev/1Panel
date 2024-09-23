@@ -772,7 +772,7 @@ const message = {
         deleteFile: 'Delete file',
         allDelete: 'Permanently Delete',
         deleteComposeHelper:
-            '1. Delete container orchestration records <br>2. Delete all container orchestration files, including configuration and persistent files',
+            '1. Delete container orchestration records \n2. Delete all container orchestration files, including configuration and persistent files',
         deleteCompose: '" Delete this composition.',
         apps: 'Apps',
         local: 'Local',
