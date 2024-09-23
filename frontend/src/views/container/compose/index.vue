@@ -180,9 +180,9 @@ const getContainerStatus = (containers) => {
     const totalCount = safeContainers.length;
     const statusText = runningCount > 0 ? 'Running' : 'Exited';
     if (statusText === 'Exited') {
-        return `${statusText}`;
+        return i18n.global.t('container.exited');
     } else {
-        return `${statusText} (${runningCount}/${totalCount})`;
+        return i18n.global.t('container.running') + ` (${runningCount}/${totalCount})`;
     }
 };
 const backList = async () => {

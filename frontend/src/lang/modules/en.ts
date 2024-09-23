@@ -770,8 +770,9 @@ const message = {
         composeHelper:
             'The composition created through 1Panel editor or template will be saved in the {0}/docker/compose directory.',
         deleteFile: 'Delete file',
+        allDelete: 'Permanently Delete',
         deleteComposeHelper:
-            'Delete all files in the {0} directory, including persistent files in this directory. Please proceed with caution!',
+            '1. Delete container orchestration records <br>2. Delete all container orchestration files, including configuration and persistent files',
         deleteCompose: '" Delete this composition.',
         apps: 'Apps',
         local: 'Local',
@@ -784,6 +785,8 @@ const message = {
         contentEmpty: 'Compose content cannot be empty, please enter and try again!',
         containerNumber: 'Container number',
         containerStatus: 'Container Status',
+        exited: 'Exited',
+        running: 'Running',
         down: 'Down',
         up: 'Up',
         composeDetailHelper:
