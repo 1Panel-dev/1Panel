@@ -2,13 +2,12 @@
     <DrawerPro v-model="drawerVisible" :header="$t('setting.snapshot')" :back="handleClose" size="large">
         <fu-steps
             v-loading="loading"
-            direction="vertical"
             class="steps"
             :space="50"
             ref="stepsRef"
+            direction="vertical"
             :isLoading="stepLoading"
             :finishButtonText="$t('commons.button.create')"
-            @finish="submitAddSnapshot"
             @change="changeStep"
             :beforeLeave="beforeLeave"
         >
@@ -54,100 +53,96 @@
                 </el-form>
             </fu-step>
             <fu-step id="appData" :title="$t('setting.stepAppData')">
-                <div>
-                    <el-checkbox
-                        class="ml-6"
-                        v-model="form.backupAllImage"
-                        @change="selectAllImage"
-                        :label="$t('setting.selectAllImage')"
-                        size="large"
-                    />
-                    <el-tree
-                        style="max-width: 600px"
-                        ref="appRef"
-                        node-key="id"
-                        :default-expand-all="true"
-                        :data="form.appData"
-                        :props="defaultProps"
-                        @check-change="onChangeAppData"
-                        show-checkbox
-                    >
-                        <template #default="{ data }">
-                            <div class="float-left">
-                                <span>{{ loadApp18n(data.label) }}</span>
-                            </div>
-                            <div class="ml-4 float-left">
-                                <span v-if="data.size">{{ computeSize(data.size) }}</span>
-                            </div>
-                        </template>
-                    </el-tree>
-                </div>
+                <el-checkbox
+                    class="ml-6"
+                    v-model="form.backupAllImage"
+                    @change="selectAllImage"
+                    :label="$t('setting.selectAllImage')"
+                    size="large"
+                />
+                <el-tree
+                    style="max-width: 600px"
+                    ref="appRef"
+                    node-key="id"
+                    :data="form.appData"
+                    :props="defaultProps"
+                    @check-change="onChangeAppData"
+                    show-checkbox
+                >
+                    <template #default="{ data }">
+                        <div class="float-left">
+                            <span>{{ loadApp18n(data.label) }}</span>
+                        </div>
+                        <div class="ml-4 float-left">
+                            <span v-if="data.size">{{ computeSize(data.size) }}</span>
+                        </div>
+                    </template>
+                </el-tree>
             </fu-step>
             <fu-step id="panelData" :title="$t('setting.stepPanelData')">
-                <div>
-                    <el-tree
-                        style="max-width: 600px"
-                        ref="panelRef"
-                        node-key="id"
-                        :data="form.panelData"
-                        :props="defaultProps"
-                        show-checkbox
-                    >
-                        <template #default="{ node, data }">
-                            <div class="float-left">
-                                <span>{{ load18n(node, data.label) }}</span>
-                            </div>
-                            <div class="ml-4 float-left">
-                                <span v-if="data.size">{{ computeSize(data.size) }}</span>
-                            </div>
-                        </template>
-                    </el-tree>
-                </div>
+                <el-tree
+                    style="max-width: 600px"
+                    ref="panelRef"
+                    node-key="id"
+                    :data="form.panelData"
+                    :props="defaultProps"
+                    show-checkbox
+                >
+                    <template #default="{ node, data }">
+                        <div class="float-left">
+                            <span>{{ load18n(node, data.label) }}</span>
+                        </div>
+                        <div class="ml-4 float-left">
+                            <span v-if="data.size">{{ computeSize(data.size) }}</span>
+                        </div>
+                    </template>
+                </el-tree>
             </fu-step>
             <fu-step id="backupData" :title="$t('setting.stepBackupData')">
-                <div>
-                    <el-tree
-                        style="max-width: 600px"
-                        ref="backupRef"
-                        node-key="id"
-                        :data="form.backupData"
-                        :props="defaultProps"
-                        show-checkbox
-                    >
-                        <template #default="{ node, data }">
-                            <div class="float-left">
-                                <span>{{ load18n(node, data.label) }}</span>
-                            </div>
-                            <div class="ml-4 float-left">
-                                <span v-if="data.size">{{ computeSize(data.size) }}</span>
-                            </div>
-                        </template>
-                    </el-tree>
-                </div>
+                <el-tree
+                    style="max-width: 600px"
+                    ref="backupRef"
+                    node-key="id"
+                    :data="form.backupData"
+                    :props="defaultProps"
+                    show-checkbox
+                >
+                    <template #default="{ node, data }">
+                        <div class="float-left">
+                            <span>{{ load18n(node, data.label) }}</span>
+                        </div>
+                        <div class="ml-4 float-left">
+                            <span v-if="data.size">{{ computeSize(data.size) }}</span>
+                        </div>
+                    </template>
+                </el-tree>
             </fu-step>
             <fu-step id="otherData" :title="$t('setting.stepOtherData')">
-                <div class="ml-6">
-                    <el-checkbox v-model="form.withLoginLog" :label="$t('setting.loginLog')" size="large" />
-                </div>
-                <div class="ml-6">
-                    <el-checkbox v-model="form.withOperationLog" :label="$t('setting.OperationLog')" size="large" />
-                </div>
-                <div class="ml-6">
-                    <el-checkbox v-model="form.withMonitorData" :label="$t('setting.monitorData')" size="large" />
-                </div>
+                <el-checkbox v-model="form.withOperationLog" :label="$t('setting.operationLog')" size="large" />
+                <el-checkbox v-model="form.withLoginLog" :label="$t('setting.loginLog')" size="large" />
+                <el-checkbox v-model="form.withSystemLog" :label="$t('setting.systemLog')" size="large" />
+                <el-checkbox v-model="form.withTaskLog" :label="$t('setting.taskLog')" size="large" />
+                <el-checkbox v-model="form.withMonitorData" :label="$t('setting.monitorData')" size="large" />
             </fu-step>
+            <template #footer></template>
         </fu-steps>
-
         <template #footer>
             <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
+            <el-button @click="prev" v-if="nowIndex !== 0">{{ $t('commons.button.prev') }}</el-button>
+            <el-button type="primary" v-if="nowIndex === 4" @click="submitAddSnapshot">
+                {{ $t('commons.button.create') }}
+            </el-button>
+            <el-button @click="next" v-else>{{ $t('commons.button.next') }}</el-button>
         </template>
     </DrawerPro>
+    <TaskLog ref="taskLogRef" width="70%" />
 </template>
 <script lang="ts" setup>
 import { ref } from 'vue';
 import { loadSnapshotSetting, snapshotCreate } from '@/api/modules/setting';
-import { computeSize } from '@/utils/util';
+import { computeSize, newUUID } from '@/utils/util';
 import i18n from '@/lang';
+import TaskLog from '@/components/task-log/index.vue';
 import { getBackupList } from '@/api/modules/backup';
 import { Rules } from '@/global/form-rules';
 import { ElForm } from 'element-plus';
@@ -156,10 +151,12 @@ import { MsgSuccess } from '@/utils/message';
 const loading = ref();
 const stepLoading = ref(false);
 const stepsRef = ref();
+const nowIndex = ref(0);
 
 const appRef = ref();
 const panelRef = ref();
 const backupRef = ref();
+const taskLogRef = ref();
 
 const backupOptions = ref();
 const accountOptions = ref();
@@ -168,6 +165,7 @@ type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 const form = reactive({
     id: 0,
+    taskID: '',
     downloadAccountID: '',
     fromAccounts: [],
     sourceAccountIDs: '',
@@ -177,6 +175,8 @@ const form = reactive({
     backupAllImage: false,
     withLoginLog: false,
     withOperationLog: false,
+    withSystemLog: false,
+    withTaskLog: false,
     withMonitorData: false,
 
     panelData: [],
@@ -243,6 +243,13 @@ const beforeLeave = async (stepItem: any) => {
     }
 };
 
+function next() {
+    stepsRef.value.next();
+}
+function prev() {
+    stepsRef.value.prev();
+}
+
 const loadApp18n = (label: string) => {
     switch (label) {
         case 'appData':
@@ -267,6 +274,7 @@ const loadBackups = async () => {
 };
 
 const changeStep = (currentStep: any) => {
+    nowIndex.value = currentStep.index;
     switch (currentStep.id) {
         case 'appData':
             if (appRef.value) {
@@ -325,7 +333,6 @@ const load18n = (node: any, label: string) => {
         switch (label) {
             case 'agent':
             case 'conf':
-            case 'db':
             case 'docker':
             case 'log':
             case 'runtime':
@@ -335,6 +342,8 @@ const load18n = (node: any, label: string) => {
             case 'website':
             case 'directory':
                 return i18n.global.t('setting.' + label + 'Label');
+            case 'system_snapshot':
+                return i18n.global.t('setting.snapshotLabel');
             default:
                 return label;
         }
@@ -356,17 +365,23 @@ const load18n = (node: any, label: string) => {
 
 const submitAddSnapshot = async () => {
     loading.value = true;
+    form.taskID = newUUID();
     form.sourceAccountIDs = form.fromAccounts.join(',');
     await snapshotCreate(form)
         .then(() => {
             loading.value = false;
             drawerVisible.value = false;
             emit('search');
+            openTaskLog(form.taskID);
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .catch(() => {
             loading.value = false;
         });
+};
+
+const openTaskLog = (taskID: string) => {
+    taskLogRef.value.openWithTaskID(taskID);
 };
 
 const loadCheckForSubmit = (checks: any, list: any) => {

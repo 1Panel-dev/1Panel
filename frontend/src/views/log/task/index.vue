@@ -55,7 +55,7 @@
                 </ComplexTable>
             </template>
         </LayoutContent>
-        <TaskLog ref="taskLogRef" />
+        <TaskLog ref="taskLogRef" width="70%" />
     </div>
 </template>
 

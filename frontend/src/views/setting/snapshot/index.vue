@@ -80,15 +80,14 @@
                             <el-button
                                 v-if="row.status === 'Waiting' || row.status === 'OnSaveData'"
                                 type="primary"
-                                @click="onLoadStatus(row)"
                                 link
                             >
                                 {{ $t('commons.table.statusWaiting') }}
                             </el-button>
-                            <el-button v-if="row.status === 'Failed'" type="danger" @click="onLoadStatus(row)" link>
+                            <el-button v-if="row.status === 'Failed'" type="danger" link>
                                 {{ $t('commons.status.error') }}
                             </el-button>
-                            <el-tag v-if="row.status === 'Success'" @click="onLoadStatus(row)" type="success">
+                            <el-tag v-if="row.status === 'Success'" type="success">
                                 {{ $t('commons.status.success') }}
                             </el-tag>
                         </template>
@@ -117,6 +116,7 @@
         <RecoverStatus ref="recoverStatusRef" @search="search()"></RecoverStatus>
         <SnapshotCreate ref="createRef" @search="search()" />
         <SnapshotImport ref="importRef" @search="search()" />
+        <IgnoreRule ref="ignoreRef" @search="search()" />
 
         <OpDialog ref="opRef" @search="search" @submit="onSubmitDelete()">
             <template #content>
@@ -130,8 +130,6 @@
                 </el-form>
             </template>
         </OpDialog>
-        <SnapStatus ref="snapStatusRef" @search="search" />
-        <IgnoreRule ref="ignoreRef" />
     </div>
 </template>
 
@@ -143,7 +141,6 @@ import { ElForm } from 'element-plus';
 import IgnoreRule from '@/views/setting/snapshot/ignore-rule/index.vue';
 import i18n from '@/lang';
 import { Setting } from '@/api/interface/setting';
-import SnapStatus from '@/views/setting/snapshot/snap_status/index.vue';
 import RecoverStatus from '@/views/setting/snapshot/status/index.vue';
 import SnapshotImport from '@/views/setting/snapshot/import/index.vue';
 import SnapshotCreate from '@/views/setting/snapshot/create/index.vue';
@@ -161,10 +158,9 @@ const paginationConfig = reactive({
 const searchName = ref();
 
 const opRef = ref();
-const ignoreRef = ref();
 
 const createRef = ref();
-const snapStatusRef = ref();
+const ignoreRef = ref();
 const recoverStatusRef = ref();
 const importRef = ref();
 const isRecordShow = ref();
@@ -191,15 +187,6 @@ const onIgnore = () => {
 const onChange = async (info: any) => {
     await updateSnapshotDescription({ id: info.id, description: info.description });
     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-};
-
-const onLoadStatus = (row: Setting.SnapshotInfo) => {
-    snapStatusRef.value.acceptParams({
-        id: row.id,
-        from: row.from,
-        defaultDownload: row.defaultDownload,
-        description: row.description,
-    });
 };
 
 const batchDelete = async (row: Setting.SnapshotInfo | null) => {
