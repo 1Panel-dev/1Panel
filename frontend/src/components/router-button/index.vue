@@ -76,7 +76,6 @@ onMounted(() => {
 <style lang="scss">
 .router_card {
     --el-card-padding: 0;
-    width: 100%;
     .el-card__body {
         display: flex;
         justify-content: space-between;
