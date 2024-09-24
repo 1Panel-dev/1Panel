@@ -48,6 +48,7 @@
                         :label="$t('commons.table.name')"
                         width="170"
                         prop="name"
+                        sortable
                         fix
                         show-overflow-tooltip
                     >
