@@ -118,11 +118,21 @@
                 </el-tree>
             </fu-step>
             <fu-step id="otherData" :title="$t('setting.stepOtherData')">
-                <el-checkbox v-model="form.withOperationLog" :label="$t('setting.operationLog')" size="large" />
-                <el-checkbox v-model="form.withLoginLog" :label="$t('setting.loginLog')" size="large" />
-                <el-checkbox v-model="form.withSystemLog" :label="$t('setting.systemLog')" size="large" />
-                <el-checkbox v-model="form.withTaskLog" :label="$t('setting.taskLog')" size="large" />
-                <el-checkbox v-model="form.withMonitorData" :label="$t('setting.monitorData')" size="large" />
+                <div class="ml-5">
+                    <el-checkbox v-model="form.withOperationLog" :label="$t('logs.operation')" size="large" />
+                </div>
+                <div class="ml-5">
+                    <el-checkbox v-model="form.withLoginLog" :label="$t('logs.login')" size="large" />
+                </div>
+                <div class="ml-5">
+                    <el-checkbox v-model="form.withSystemLog" :label="$t('logs.system')" size="large" />
+                </div>
+                <div class="ml-5">
+                    <el-checkbox v-model="form.withTaskLog" :label="$t('logs.task')" size="large" />
+                </div>
+                <div class="ml-5">
+                    <el-checkbox v-model="form.withMonitorData" :label="$t('setting.monitorData')" size="large" />
+                </div>
             </fu-step>
             <template #footer></template>
         </fu-steps>

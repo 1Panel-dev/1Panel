@@ -139,6 +139,7 @@ export namespace Setting {
     }
     export interface SnapshotRecover {
         id: number;
+        taskID: string;
         isNew: boolean;
         reDownload: boolean;
         secret: string;
@@ -153,14 +154,17 @@ export namespace Setting {
         message: string;
         createdAt: DateTimeFormats;
         version: string;
+        secret: string;
+
+        taskID: string;
+        taskRecoverID: string;
+        taskRollbackID: string;
+
         interruptStep: string;
         recoverStatus: string;
         recoverMessage: string;
-        lastRecoveredAt: string;
         rollbackStatus: string;
         rollbackMessage: string;
-        lastRollbackedAt: string;
-        secret: string;
     }
     export interface SnapshotData {
         appData: Array<DataTree>;

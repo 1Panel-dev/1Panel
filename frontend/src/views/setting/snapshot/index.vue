@@ -77,19 +77,49 @@
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" min-width="80" prop="status">
                         <template #default="{ row }">
-                            <el-button
-                                v-if="row.status === 'Waiting' || row.status === 'OnSaveData'"
-                                type="primary"
-                                link
-                            >
-                                {{ $t('commons.table.statusWaiting') }}
-                            </el-button>
-                            <el-button v-if="row.status === 'Failed'" @click="reCreate(row)" type="danger" link>
-                                {{ $t('commons.status.error') }}
-                            </el-button>
-                            <el-tag v-if="row.status === 'Success'" type="success">
-                                {{ $t('commons.status.success') }}
-                            </el-tag>
+                            <div>
+                                <el-button link v-if="row.status === 'Waiting'" type="primary">
+                                    {{ $t('setting.snapshot') }}{{ $t('commons.table.statusWaiting') }}
+                                </el-button>
+                                <el-button link v-if="row.status === 'Failed'" @click="reCreate(row)" type="danger">
+                                    {{ $t('setting.snapshot') }}{{ $t('commons.status.error') }}
+                                </el-button>
+                                <el-button link v-if="row.status === 'Success'" type="success">
+                                    {{ $t('setting.snapshot') }}{{ $t('commons.status.success') }}
+                                </el-button>
+                            </div>
+                            <div v-if="row.recoverStatus">
+                                <el-button link v-if="row.recoverStatus === 'Waiting'" type="primary">
+                                    {{ $t('commons.button.recover') }}{{ $t('commons.table.statusWaiting') }}
+                                </el-button>
+                                <el-button
+                                    v-if="row.recoverStatus === 'Failed'"
+                                    @click="onRecover(row)"
+                                    type="danger"
+                                    link
+                                >
+                                    {{ $t('commons.button.recover') }}{{ $t('commons.status.error') }}
+                                </el-button>
+                                <el-button link v-if="row.recoverStatus === 'Success'" type="success">
+                                    {{ $t('commons.button.recover') }}{{ $t('commons.status.success') }}
+                                </el-button>
+                            </div>
+                            <div v-if="row.rollbackStatus">
+                                <el-button link v-if="row.rollbackStatus === 'Waiting'" type="primary">
+                                    {{ $t('setting.rollback') }}{{ $t('commons.table.statusWaiting') }}
+                                </el-button>
+                                <el-button
+                                    link
+                                    v-if="row.rollbackStatus === 'Failed'"
+                                    @click="reCreate(row)"
+                                    type="danger"
+                                >
+                                    {{ $t('setting.rollback') }}{{ $t('commons.status.error') }}
+                                </el-button>
+                                <el-button link v-if="row.recoverStatus === 'Success'" type="success">
+                                    {{ $t('setting.rollback') }}{{ $t('commons.status.success') }}
+                                </el-button>
+                            </div>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.description')" prop="description" show-overflow-tooltip>
@@ -104,7 +134,7 @@
                         show-overflow-tooltip
                     />
                     <fu-table-operations
-                        width="200px"
+                        width="240px"
                         :ellipsis="10"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
@@ -131,6 +161,7 @@
             </template>
         </OpDialog>
         <TaskLog ref="taskLogRef" width="70%" />
+        <SnapRecover ref="recoverRef" />
     </div>
 </template>
 
@@ -146,7 +177,9 @@ import TaskLog from '@/components/task-log/index.vue';
 import RecoverStatus from '@/views/setting/snapshot/status/index.vue';
 import SnapshotImport from '@/views/setting/snapshot/import/index.vue';
 import SnapshotCreate from '@/views/setting/snapshot/create/index.vue';
+import SnapRecover from '@/views/setting/snapshot/recover/index.vue';
 import { MsgSuccess } from '@/utils/message';
+import { loadOsInfo } from '@/api/modules/dashboard';
 
 const loading = ref(false);
 const data = ref();
@@ -167,6 +200,7 @@ const recoverStatusRef = ref();
 const importRef = ref();
 const isRecordShow = ref();
 const taskLogRef = ref();
+const recoverRef = ref();
 
 const operateIDs = ref();
 const cleanData = ref();
@@ -213,6 +247,33 @@ const onChange = async (info: any) => {
     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
 };
 
+const onRecover = async (row: any) => {
+    loading.value = true;
+    await loadOsInfo()
+        .then((res) => {
+            loading.value = false;
+            let params = {
+                id: row.id,
+                taskID: row.taskRecoverID,
+                isNew: row.recoverStatus === '',
+                name: row.name,
+                reDownload: false,
+                secret: row.secret,
+
+                arch: res.data.kernelArch,
+                size: row.size,
+                freeSize: res.data.diskSize,
+
+                status: row.recoverStatus,
+                message: row.recoverMessage,
+            };
+            recoverRef.value.acceptParams(params);
+        })
+        .catch(() => {
+            loading.value = false;
+        });
+};
+
 const batchDelete = async (row: Setting.SnapshotInfo | null) => {
     let names = [];
     let ids = [];
@@ -254,9 +315,8 @@ const onSubmitDelete = async () => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.recover'),
-        icon: 'RefreshLeft',
         click: (row: any) => {
-            recoverStatusRef.value.acceptParams({ snapInfo: row });
+            onRecover(row);
         },
         disabled: (row: any) => {
             return !(row.status === 'Success');
