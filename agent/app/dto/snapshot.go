@@ -63,6 +63,7 @@ type SnapshotRecover struct {
 	IsNew      bool   `json:"isNew"`
 	ReDownload bool   `json:"reDownload"`
 	ID         uint   `json:"id" validate:"required"`
+	TaskID     string `json:"taskID"`
 	Secret     string `json:"secret"`
 }
 type SnapshotBatchDelete struct {

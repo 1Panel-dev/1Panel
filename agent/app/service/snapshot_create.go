@@ -18,7 +18,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
-	"github.com/1Panel-dev/1Panel/agent/utils/compose"
 	"github.com/1Panel-dev/1Panel/agent/utils/copier"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/glebarez/sqlite"
@@ -149,7 +148,7 @@ func (u *SnapshotService) HandleSnapshot(req dto.SnapshotCreate) error {
 		taskItem.AddSubTask(
 			i18n.GetMsgByKey("SnapCloseDBConn"),
 			func(t *task.Task) error {
-				taskItem.Log("<######################## 6 / 8 ########################>")
+				taskItem.Log("######################## 6 / 8 ########################")
 				closeDatabase(itemHelper.snapAgentDB)
 				closeDatabase(itemHelper.snapCoreDB)
 				return nil
@@ -195,7 +194,7 @@ type snapHelper struct {
 }
 
 func loadDbConn(snap *snapHelper, targetDir string, req dto.SnapshotCreate) error {
-	snap.Task.Log("<######################## 1 / 8 ########################>")
+	snap.Task.Log("######################## 1 / 8 ########################")
 	snap.Task.LogStart(i18n.GetMsgByKey("SnapDBInfo"))
 	pathDB := path.Join(global.CONF.System.BaseDir, "1panel/db")
 
@@ -247,7 +246,7 @@ func loadDbConn(snap *snapHelper, targetDir string, req dto.SnapshotCreate) erro
 }
 
 func snapBaseData(snap snapHelper, targetDir string) error {
-	snap.Task.Log("<######################## 2 / 8 ########################>")
+	snap.Task.Log("######################## 2 / 8 ########################")
 	snap.Task.LogStart(i18n.GetMsgByKey("SnapBaseInfo"))
 
 	err := common.CopyFile("/usr/local/bin/1panel", targetDir)
@@ -302,7 +301,7 @@ func snapBaseData(snap snapHelper, targetDir string) error {
 }
 
 func snapAppImage(snap snapHelper, req dto.SnapshotCreate, targetDir string) error {
-	snap.Task.Log("<######################## 3 / 8 ########################>")
+	snap.Task.Log("######################## 3 / 8 ########################")
 	snap.Task.LogStart(i18n.GetMsgByKey("SnapInstallApp"))
 
 	var imageList []string
@@ -325,14 +324,16 @@ func snapAppImage(snap snapHelper, req dto.SnapshotCreate, targetDir string) err
 		std, err := cmd.Execf("docker save %s | gzip -c > %s", strings.Join(imageList, " "), path.Join(targetDir, "images.tar.gz"))
 		snap.Task.LogWithStatus(i18n.GetMsgByKey("SnapDockerSave"), errors.New(std))
 		if err != nil {
+			snap.Task.LogFailedWithErr(i18n.GetMsgByKey("SnapDockerSave"), errors.New(std))
 			return errors.New(std)
 		}
+		snap.Task.LogSuccess(i18n.GetMsgByKey("SnapDockerSave"))
 	}
 	return nil
 }
 
 func snapBackupData(snap snapHelper, req dto.SnapshotCreate, targetDir string) error {
-	snap.Task.Log("<######################## 4 / 8 ########################>")
+	snap.Task.Log("######################## 4 / 8 ########################")
 	snap.Task.LogStart(i18n.GetMsgByKey("SnapLocalBackup"))
 
 	excludes := loadBackupExcludes(snap, req.BackupData)
@@ -388,7 +389,7 @@ func loadAppBackupExcludes(req []dto.DataTree) []string {
 }
 
 func snapPanelData(snap snapHelper, req dto.SnapshotCreate, targetDir string) error {
-	snap.Task.Log("<######################## 5 / 8 ########################>")
+	snap.Task.Log("######################## 5 / 8 ########################")
 	snap.Task.LogStart(i18n.GetMsgByKey("SnapPanelData"))
 
 	excludes := loadPanelExcludes(req.PanelData)
@@ -446,7 +447,7 @@ func loadPanelExcludes(req []dto.DataTree) []string {
 }
 
 func snapCompress(snap snapHelper, rootDir string, secret string) error {
-	snap.Task.Log("<######################## 7 / 8 ########################>")
+	snap.Task.Log("######################## 7 / 8 ########################")
 	snap.Task.LogStart(i18n.GetMsgByKey("SnapCompress"))
 
 	tmpDir := path.Join(global.CONF.System.TmpDir, "system")
@@ -470,7 +471,7 @@ func snapCompress(snap snapHelper, rootDir string, secret string) error {
 }
 
 func snapUpload(snap snapHelper, accounts string, file string) error {
-	snap.Task.Log("<######################## 8 / 8 ########################>")
+	snap.Task.Log("######################## 8 / 8 ########################")
 	snap.Task.LogStart(i18n.GetMsgByKey("SnapUpload"))
 
 	source := path.Join(global.CONF.System.TmpDir, "system", path.Base(file))
@@ -513,37 +514,4 @@ func closeDatabase(db *gorm.DB) {
 		return
 	}
 	_ = sqlDB.Close()
-}
-
-func rebuildAllAppInstall() error {
-	global.LOG.Debug("start to rebuild all app")
-	appInstalls, err := appInstallRepo.ListBy()
-	if err != nil {
-		global.LOG.Errorf("get all app installed for rebuild failed, err: %v", err)
-		return err
-	}
-	var wg sync.WaitGroup
-	for i := 0; i < len(appInstalls); i++ {
-		wg.Add(1)
-		appInstalls[i].Status = constant.Rebuilding
-		_ = appInstallRepo.Save(context.Background(), &appInstalls[i])
-		go func(app model.AppInstall) {
-			defer wg.Done()
-			dockerComposePath := app.GetComposePath()
-			out, err := compose.Down(dockerComposePath)
-			if err != nil {
-				_ = handleErr(app, err, out)
-				return
-			}
-			out, err = compose.Up(dockerComposePath)
-			if err != nil {
-				_ = handleErr(app, err, out)
-				return
-			}
-			app.Status = constant.Running
-			_ = appInstallRepo.Save(context.Background(), &app)
-		}(appInstalls[i])
-	}
-	wg.Wait()
-	return nil
 }

@@ -51,6 +51,7 @@ const (
 	TaskUpdate    = "TaskUpdate"
 	TaskRestart   = "TaskRestart"
 	TaskBackup    = "TaskBackup"
+	TaskRecover   = "TaskRecover"
 	TaskSync      = "TaskSync"
 	TaskBuild     = "TaskBuild"
 )

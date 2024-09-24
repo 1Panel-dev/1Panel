@@ -134,44 +134,6 @@ type SnapshotJson struct {
 	Size          uint64 `json:"size"`
 }
 
-func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
-	global.LOG.Info("start to recover panel by snapshot now")
-	snap, err := snapshotRepo.Get(commonRepo.WithByID(req.ID))
-	if err != nil {
-		return err
-	}
-	if hasOs(snap.Name) && !strings.Contains(snap.Name, loadOs()) {
-		return fmt.Errorf("restoring snapshots(%s) between different server architectures(%s) is not supported", snap.Name, loadOs())
-	}
-	if !req.IsNew && len(snap.InterruptStep) != 0 && len(snap.RollbackStatus) != 0 {
-		return fmt.Errorf("the snapshot has been rolled back and cannot be restored again")
-	}
-
-	baseDir := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("system/%s", snap.Name))
-	if _, err := os.Stat(baseDir); err != nil && os.IsNotExist(err) {
-		_ = os.MkdirAll(baseDir, os.ModePerm)
-	}
-
-	_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"recover_status": constant.StatusWaiting})
-	_ = settingRepo.Update("SystemStatus", "Recovering")
-	go u.HandleSnapshotRecover(snap, req)
-	return nil
-}
-
-func (u *SnapshotService) SnapshotRollback(req dto.SnapshotRecover) error {
-	global.LOG.Info("start to rollback now")
-	snap, err := snapshotRepo.Get(commonRepo.WithByID(req.ID))
-	if err != nil {
-		return err
-	}
-	go func() {
-		if err := handleRollback(snap.Name); err != nil {
-			global.LOG.Errorf("handle roll back snapshot failed, err: %v", err)
-		}
-	}()
-	return nil
-}
-
 func (u *SnapshotService) Delete(req dto.SnapshotBatchDelete) error {
 	snaps, _ := snapshotRepo.GetList(commonRepo.WithByIDs(req.Ids))
 	for _, snap := range snaps {
