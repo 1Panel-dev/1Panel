@@ -748,6 +748,7 @@ const message = {
         apps: '应用商店',
         local: '本地',
         createCompose: '创建编排',
+        composeDirectory: '编排目录',
         template: '模版',
         composeTemplate: '编排模版',
         createComposeTemplate: '创建编排模版',
