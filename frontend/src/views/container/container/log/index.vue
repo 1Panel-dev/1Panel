@@ -162,10 +162,8 @@ const searchLogs = async () => {
 };
 
 const onDownload = async () => {
-    let msg =
-        logSearch.tail === 0
-            ? i18n.global.t('container.downLogHelper1', [logSearch.container])
-            : i18n.global.t('container.downLogHelper2', [logSearch.container, logSearch.tail]);
+    logSearch.tail = 0;
+    let msg = i18n.global.t('container.downLogHelper1', [logSearch.container]);
     ElMessageBox.confirm(msg, i18n.global.t('file.download'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
