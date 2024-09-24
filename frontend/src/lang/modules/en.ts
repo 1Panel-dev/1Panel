@@ -777,6 +777,7 @@ const message = {
         apps: 'Apps',
         local: 'Local',
         createCompose: 'Create',
+        composeDirectory: 'Compose Directory',
         template: 'Template',
         composeTemplate: 'Compose template',
         createComposeTemplate: 'Create',

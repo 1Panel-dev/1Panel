@@ -10,20 +10,6 @@
         </el-card>
 
         <LayoutContent v-if="!isOnDetail" :title="$t('container.compose')" :class="{ mask: dockerStatus != 'Running' }">
-            <template #prompt>
-                <el-alert type="info" :closable="false">
-                    <template #title>
-                        <span class="flx-align-center">
-                            <span>{{ $t('container.composeHelper', [baseDir]) }}</span>
-                            <el-button type="primary" link @click="toFolder">
-                                <el-icon>
-                                    <FolderOpened />
-                                </el-icon>
-                            </el-button>
-                        </span>
-                    </template>
-                </el-alert>
-            </template>
             <template #toolbar>
                 <div class="flex justify-between gap-2 flex-wrap sm:flex-row">
                     <div class="flex flex-wrap gap-3">
@@ -63,6 +49,15 @@
                             <span v-if="row.createdBy === ''">{{ $t('container.local') }}</span>
                             <span v-if="row.createdBy === 'Apps'">{{ $t('container.apps') }}</span>
                             <span v-if="row.createdBy === '1Panel'">1Panel</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('container.composeDirectory')" min-width="80" fix>
+                        <template #default="{ row }">
+                            <el-button type="primary" link @click="toComposeFolder(row)">
+                                <el-icon>
+                                    <FolderOpened />
+                                </el-icon>
+                            </el-button>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('container.containerStatus')" min-width="80" fix>
@@ -137,8 +132,8 @@ const goSetting = async () => {
     router.push({ name: 'ContainerSetting' });
 };
 
-const toFolder = async () => {
-    router.push({ path: '/hosts/files', query: { path: baseDir.value + '/docker/compose' } });
+const toComposeFolder = async (row: Container.ComposeInfo) => {
+    router.push({ path: '/hosts/files', query: { path: baseDir.value + '/docker/compose/' + row.name } });
 };
 
 const loadPath = async () => {
