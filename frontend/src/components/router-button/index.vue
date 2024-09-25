@@ -1,6 +1,6 @@
 <template>
     <el-card class="router_card">
-        <div class="flex w-full justify-between items-center md:justify-between md:flex-row">
+        <div class="flex w-full flex-col md:justify-between md:flex-row">
             <el-radio-group v-model="activeName" @change="handleChange">
                 <el-radio-button
                     class="router_card_button"
