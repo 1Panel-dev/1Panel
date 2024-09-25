@@ -60,6 +60,10 @@ type IRuntimeService interface {
 	GetPHPConfigFile(req request.PHPFileReq) (*response.FileInfo, error)
 	UpdateFPMConfig(req request.FPMConfig) error
 	GetFPMConfig(id uint) (*request.FPMConfig, error)
+
+	GetSupervisorProcess(id uint) ([]response.SupervisorProcessConfig, error)
+	OperateSupervisorProcess(req request.PHPSupervisorProcessConfig) error
+	OperateSupervisorProcessFile(req request.PHPSupervisorProcessFileReq) (string, error)
 }
 
 func NewRuntimeService() IRuntimeService {
@@ -993,4 +997,33 @@ func (r *RuntimeService) GetFPMConfig(id uint) (*request.FPMConfig, error) {
 	}
 	res := &request.FPMConfig{Params: params}
 	return res, nil
+}
+
+func (r *RuntimeService) GetSupervisorProcess(id uint) ([]response.SupervisorProcessConfig, error) {
+	runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(id))
+	if err != nil {
+		return nil, err
+	}
+	configDir := path.Join(constant.RuntimeDir, "php", runtime.Name, "supervisor", "supervisor.d")
+	return handleProcessConfig(configDir, runtime.ContainerName)
+}
+
+func (r *RuntimeService) OperateSupervisorProcess(req request.PHPSupervisorProcessConfig) error {
+	runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(req.ID))
+	if err != nil {
+		return err
+	}
+	configDir := path.Join(constant.RuntimeDir, "php", runtime.Name, "supervisor")
+	return handleProcess(configDir, req.SupervisorProcessConfig, runtime.ContainerName)
+}
+
+func (r *RuntimeService) OperateSupervisorProcessFile(req request.PHPSupervisorProcessFileReq) (string, error) {
+	runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(req.ID))
+	if err != nil {
+		return "", err
+	}
+	supervisorDir := path.Join(constant.RuntimeDir, "php", runtime.Name, "supervisor")
+	configDir := path.Join(supervisorDir, "supervisor.d")
+	logFile := path.Join(supervisorDir, "log", fmt.Sprintf("%s.out.log", req.SupervisorProcessFileReq.Name))
+	return handleSupervisorFile(req.SupervisorProcessFileReq, configDir, runtime.ContainerName, logFile)
 }

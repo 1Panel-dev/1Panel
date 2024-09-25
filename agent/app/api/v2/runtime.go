@@ -431,3 +431,67 @@ func (b *BaseApi) GetFPMConfig(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, data)
 }
+
+// @Tags Runtime
+// @Summary Get supervisor process
+// @Description 获取 supervisor 进程
+// @Accept json
+// @Param id path integer true "request"
+// @Success 200 {object} response.SupervisorProcess
+// @Security ApiKeyAuth
+// @Router /runtimes/supervisor/process/:id [get]
+func (b *BaseApi) GetSupervisorProcess(c *gin.Context) {
+	id, err := helper.GetParamID(c)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		return
+	}
+	data, err := runtimeService.GetSupervisorProcess(id)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags Runtime
+// @Summary Operate supervisor process
+// @Description 操作 supervisor 进程
+// @Accept json
+// @Param request body request.PHPSupervisorProcessConfig true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /runtimes/supervisor/process/operate [post]
+func (b *BaseApi) OperateSupervisorProcess(c *gin.Context) {
+	var req request.PHPSupervisorProcessConfig
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	err := runtimeService.OperateSupervisorProcess(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}
+
+// @Tags Runtime
+// @Summary Operate supervisor process file
+// @Description 操作 supervisor 进程文件
+// @Accept json
+// @Param request body request.PHPSupervisorProcessFileReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /runtimes/supervisor/process/file/operate [post]
+func (b *BaseApi) OperateSupervisorProcessFile(c *gin.Context) {
+	var req request.PHPSupervisorProcessFileReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	res, err := runtimeService.OperateSupervisorProcessFile(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}

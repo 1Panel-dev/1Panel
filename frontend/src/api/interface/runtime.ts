@@ -171,4 +171,28 @@ export namespace Runtime {
         id: number;
         params: any;
     }
+
+    export interface ProcessReq {
+        operate: string;
+        name: string;
+        id: number;
+    }
+
+    export interface ProcessFileReq {
+        operate: string;
+        name: string;
+        content?: string;
+        file: string;
+        id: number;
+    }
+
+    export interface SupersivorProcess {
+        operate: string;
+        name: string;
+        command: string;
+        user: string;
+        dir: string;
+        numprocs: string;
+        id: number;
+    }
 }

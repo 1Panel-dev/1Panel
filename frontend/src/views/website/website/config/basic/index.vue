@@ -43,7 +43,7 @@
             :label="'PHP'"
             v-if="(website.type === 'runtime' && website.runtimeType === 'php') || website.type === 'static'"
         >
-            <PHP :website="website" v-if="tabIndex == '12'"></PHP>
+            <PHP :website="website" v-if="tabIndex == '13'"></PHP>
         </el-tab-pane>
     </el-tabs>
 </template>

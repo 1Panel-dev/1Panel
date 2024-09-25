@@ -76,6 +76,7 @@ const submit = async (form: FormInstance) => {
                     taskID: taskID,
                     mirror: build.value.mirror,
                 });
+                handleClose();
                 openTaskLog(taskID);
             } catch (error) {}
         });

@@ -4,6 +4,7 @@ import { Runtime } from '../interface/runtime';
 import { TimeoutEnum } from '@/enums/http-enum';
 import { App } from '@/api/interface/app';
 import { File } from '../interface/file';
+import { HostTool } from '../interface/host-tool';
 
 export const SearchRuntimes = (req: Runtime.RuntimeReq) => {
     return http.post<ResPage<Runtime.RuntimeDTO>>(`/runtimes/search`, req);
@@ -103,4 +104,20 @@ export const UpdateFPMConfig = (req: Runtime.FPMConfig) => {
 
 export const GetFPMConfig = (id: number) => {
     return http.get<Runtime.FPMConfig>(`/runtimes/php/fpm/config/${id}`);
+};
+
+export const GetSupervisorProcess = (id: number) => {
+    return http.get<HostTool.ProcessStatus[]>(`/runtimes/supervisor/process/${id}`);
+};
+
+export const OperateSupervisorProcess = (req: Runtime.ProcessReq) => {
+    return http.post(`/runtimes/supervisor/process`, req, TimeoutEnum.T_60S);
+};
+
+export const OperateSupervisorProcessFile = (req: Runtime.ProcessFileReq) => {
+    return http.post<string>(`/runtimes/supervisor/process/file`, req, TimeoutEnum.T_60S);
+};
+
+export const CreateSupervisorProcess = (req: Runtime.SupersivorProcess) => {
+    return http.post(`/runtimes/supervisor/process`, req);
 };

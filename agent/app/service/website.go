@@ -1344,6 +1344,7 @@ func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) error
 	server := servers[0]
 
 	if req.RuntimeID > 0 {
+		server.RemoveDirective("location", []string{"~", "[^/]\\.php(/|$)"})
 		runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(req.RuntimeID))
 		if err != nil {
 			return err
@@ -1462,11 +1463,7 @@ func (w WebsiteService) UpdateSitePermission(req request.WebsiteUpdateDirPermiss
 	if err != nil {
 		return err
 	}
-	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
-	if err != nil {
-		return err
-	}
-	absoluteIndexPath := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "index")
+	absoluteIndexPath := GetSitePath(website, SiteIndexDir)
 	chownCmd := fmt.Sprintf("chown -R %s:%s %s", req.User, req.Group, absoluteIndexPath)
 	if cmd.HasNoPasswordSudo() {
 		chownCmd = fmt.Sprintf("sudo %s", chownCmd)
