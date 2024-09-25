@@ -112,6 +112,7 @@
         <ExtManagement ref="extManagementRef" @close="search" />
         <ComposeLogs ref="composeLogRef" />
         <Config ref="configRef" />
+        <Supervisor ref="supervisorRef" />
     </div>
 </template>
 
@@ -133,6 +134,7 @@ import RouterMenu from '../index.vue';
 import Log from '@/components/log-dialog/index.vue';
 import ComposeLogs from '@/components/compose-log/index.vue';
 import Config from '@/views/website/runtime/php/config/index.vue';
+import Supervisor from '@/views/website/runtime/php/supervisor/index.vue';
 
 const paginationConfig = reactive({
     cacheSizeKey: 'runtime-page-size',
@@ -157,6 +159,7 @@ const loading = ref(false);
 const items = ref<Runtime.RuntimeDTO[]>([]);
 const composeLogRef = ref();
 const configRef = ref();
+const supervisorRef = ref();
 
 const buttons = [
     {
@@ -219,6 +222,15 @@ const buttons = [
         },
     },
     {
+        label: i18n.global.t('menu.supervisor'),
+        click: function (row: Runtime.Runtime) {
+            openSupervisor(row);
+        },
+        disabled: function (row: Runtime.Runtime) {
+            return row.status === 'building';
+        },
+    },
+    {
         label: i18n.global.t('commons.button.delete'),
         disabled: function (row: Runtime.Runtime) {
             return row.status === 'building';
@@ -253,6 +265,10 @@ const openDetail = (row: Runtime.Runtime) => {
 
 const openConfig = (row: Runtime.Runtime) => {
     configRef.value.acceptParams(row);
+};
+
+const openSupervisor = (row: Runtime.Runtime) => {
+    supervisorRef.value.acceptParams(row.id);
 };
 
 const openLog = (row: Runtime.RuntimeDTO) => {
@@ -344,7 +360,7 @@ onMounted(() => {
     search();
     timer = setInterval(() => {
         search();
-    }, 10000 * 3);
+    }, 10000 * 1);
 });
 
 onUnmounted(() => {

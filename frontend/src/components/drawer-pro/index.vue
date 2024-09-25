@@ -85,6 +85,8 @@ const size = computed(() => {
             return '50%';
         case 'full':
             return '100%';
+        case '60%':
+            return '60%';
         default:
             return '50%';
     }

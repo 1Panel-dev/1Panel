@@ -3,11 +3,13 @@ package service
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"os/exec"
 	"os/user"
 	"path"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
@@ -281,11 +283,6 @@ func (h *HostToolService) GetToolLog(req request.HostToolLogReq) (string, error)
 func (h *HostToolService) OperateSupervisorProcess(req request.SupervisorProcessConfig) error {
 	var (
 		supervisordDir = path.Join(global.CONF.System.BaseDir, "1panel", "tools", "supervisord")
-		logDir         = path.Join(supervisordDir, "log")
-		includeDir     = path.Join(supervisordDir, "supervisor.d")
-		outLog         = path.Join(logDir, fmt.Sprintf("%s.out.log", req.Name))
-		errLog         = path.Join(logDir, fmt.Sprintf("%s.err.log", req.Name))
-		iniPath        = path.Join(includeDir, fmt.Sprintf("%s.ini", req.Name))
 		fileOp         = files.NewFileOp()
 	)
 	if req.Operate == "update" || req.Operate == "create" {
@@ -297,7 +294,22 @@ func (h *HostToolService) OperateSupervisorProcess(req request.SupervisorProcess
 			return buserr.WithMap("ErrUserFindErr", map[string]interface{}{"name": req.User, "err": err.Error()}, err)
 		}
 	}
+	return handleProcess(supervisordDir, req, "")
+}
 
+func handleProcess(supervisordDir string, req request.SupervisorProcessConfig, containerName string) error {
+	var (
+		fileOp     = files.NewFileOp()
+		logDir     = path.Join(supervisordDir, "log")
+		includeDir = path.Join(supervisordDir, "supervisor.d")
+		outLog     = path.Join(logDir, fmt.Sprintf("%s.out.log", req.Name))
+		errLog     = path.Join(logDir, fmt.Sprintf("%s.err.log", req.Name))
+		iniPath    = path.Join(includeDir, fmt.Sprintf("%s.ini", req.Name))
+	)
+	if containerName != "" {
+		outLog = path.Join("/var/log/supervisor", fmt.Sprintf("%s.out.log", req.Name))
+		errLog = path.Join("/var/log/supervisor", fmt.Sprintf("%s.err.log", req.Name))
+	}
 	switch req.Operate {
 	case "create":
 		if fileOp.Stat(iniPath) {
@@ -324,10 +336,10 @@ func (h *HostToolService) OperateSupervisorProcess(req request.SupervisorProcess
 		if err = configFile.SaveTo(iniPath); err != nil {
 			return err
 		}
-		if err := operateSupervisorCtl("reread", "", ""); err != nil {
+		if err := operateSupervisorCtl("reread", "", "", includeDir, containerName); err != nil {
 			return err
 		}
-		return operateSupervisorCtl("update", "", "")
+		return operateSupervisorCtl("update", "", "", includeDir, containerName)
 	case "update":
 		configFile, err := ini.Load(iniPath)
 		if err != nil {
@@ -350,52 +362,54 @@ func (h *HostToolService) OperateSupervisorProcess(req request.SupervisorProcess
 		if err = configFile.SaveTo(iniPath); err != nil {
 			return err
 		}
-		if err := operateSupervisorCtl("reread", "", ""); err != nil {
+		if err := operateSupervisorCtl("reread", "", "", includeDir, containerName); err != nil {
 			return err
 		}
-		return operateSupervisorCtl("update", "", "")
+		return operateSupervisorCtl("update", "", "", includeDir, containerName)
 	case "restart":
-		return operateSupervisorCtl("restart", req.Name, "")
+		return operateSupervisorCtl("restart", req.Name, "", includeDir, containerName)
 	case "start":
-		return operateSupervisorCtl("start", req.Name, "")
+		return operateSupervisorCtl("start", req.Name, "", includeDir, containerName)
 	case "stop":
-		return operateSupervisorCtl("stop", req.Name, "")
+		return operateSupervisorCtl("stop", req.Name, "", includeDir, containerName)
 	case "delete":
-		_ = operateSupervisorCtl("remove", "", req.Name)
-		_ = files.NewFileOp().DeleteFile(iniPath)
-		_ = files.NewFileOp().DeleteFile(outLog)
-		_ = files.NewFileOp().DeleteFile(errLog)
-		if err := operateSupervisorCtl("reread", "", ""); err != nil {
+		_ = operateSupervisorCtl("remove", "", req.Name, includeDir, containerName)
+		_ = fileOp.DeleteFile(iniPath)
+		_ = fileOp.DeleteFile(outLog)
+		_ = fileOp.DeleteFile(errLog)
+		if err := operateSupervisorCtl("reread", "", "", includeDir, containerName); err != nil {
 			return err
 		}
-		return operateSupervisorCtl("update", "", "")
+		return operateSupervisorCtl("update", "", "", includeDir, containerName)
 	}
-
 	return nil
 }
 
-func (h *HostToolService) GetSupervisorProcessConfig() ([]response.SupervisorProcessConfig, error) {
+func handleProcessConfig(configDir, containerName string) ([]response.SupervisorProcessConfig, error) {
 	var (
 		result []response.SupervisorProcessConfig
 	)
-	configDir := path.Join(global.CONF.System.BaseDir, "1panel", "tools", "supervisord", "supervisor.d")
-	fileList, _ := NewIFileService().GetFileList(request.FileOption{FileOption: files.FileOption{Path: configDir, Expand: true, Page: 1, PageSize: 100}})
-	if len(fileList.Items) == 0 {
-		return result, nil
+	entries, err := os.ReadDir(configDir)
+	if err != nil {
+		return nil, err
 	}
-	for _, configFile := range fileList.Items {
-		f, err := ini.Load(configFile.Path)
-		if err != nil {
-			global.LOG.Errorf("get %s file err %s", configFile.Name, err.Error())
+	for _, entry := range entries {
+		if entry.IsDir() {
 			continue
 		}
-		if strings.HasSuffix(configFile.Name, ".ini") {
+		fileName := entry.Name()
+		f, err := ini.Load(path.Join(configDir, fileName))
+		if err != nil {
+			global.LOG.Errorf("get %s file err %s", fileName, err.Error())
+			continue
+		}
+		if strings.HasSuffix(fileName, ".ini") {
 			config := response.SupervisorProcessConfig{}
-			name := strings.TrimSuffix(configFile.Name, ".ini")
+			name := strings.TrimSuffix(fileName, ".ini")
 			config.Name = name
 			section, err := f.GetSection(fmt.Sprintf("program:%s", name))
 			if err != nil {
-				global.LOG.Errorf("get %s file section err %s", configFile.Name, err.Error())
+				global.LOG.Errorf("get %s file section err %s", fileName, err.Error())
 				continue
 			}
 			if command, _ := section.GetKey("command"); command != nil {
@@ -410,52 +424,69 @@ func (h *HostToolService) GetSupervisorProcessConfig() ([]response.SupervisorPro
 			if numprocs, _ := section.GetKey("numprocs"); numprocs != nil {
 				config.Numprocs = numprocs.Value()
 			}
-			_ = getProcessStatus(&config)
+			_ = getProcessStatus(&config, containerName)
 			result = append(result, config)
 		}
 	}
 	return result, nil
 }
 
+func (h *HostToolService) GetSupervisorProcessConfig() ([]response.SupervisorProcessConfig, error) {
+	configDir := path.Join(global.CONF.System.BaseDir, "1panel", "tools", "supervisord", "supervisor.d")
+	return handleProcessConfig(configDir, "")
+}
+
 func (h *HostToolService) OperateSupervisorProcessFile(req request.SupervisorProcessFileReq) (string, error) {
+	var (
+		includeDir = path.Join(global.CONF.System.BaseDir, "1panel", "tools", "supervisord", "supervisor.d")
+	)
+	return handleSupervisorFile(req, includeDir, "", "")
+}
+
+func handleSupervisorFile(req request.SupervisorProcessFileReq, includeDir, containerName, logFile string) (string, error) {
 	var (
 		fileOp     = files.NewFileOp()
 		group      = fmt.Sprintf("program:%s", req.Name)
-		configPath = path.Join(global.CONF.System.BaseDir, "1panel", "tools", "supervisord", "supervisor.d", fmt.Sprintf("%s.ini", req.Name))
+		configPath = path.Join(includeDir, fmt.Sprintf("%s.ini", req.Name))
+		err        error
 	)
 	switch req.File {
 	case "err.log":
-		logPath, err := ini_conf.GetIniValue(configPath, group, "stderr_logfile")
-		if err != nil {
-			return "", err
+		if logFile == "" {
+			logFile, err = ini_conf.GetIniValue(configPath, group, "stderr_logfile")
+			if err != nil {
+				return "", err
+			}
 		}
 		switch req.Operate {
 		case "get":
-			content, err := fileOp.GetContent(logPath)
+			content, err := fileOp.GetContent(logFile)
 			if err != nil {
 				return "", err
 			}
 			return string(content), nil
 		case "clear":
-			if err = fileOp.WriteFile(logPath, strings.NewReader(""), 0755); err != nil {
+			if err = fileOp.WriteFile(logFile, strings.NewReader(""), 0755); err != nil {
 				return "", err
 			}
 		}
 
 	case "out.log":
-		logPath, err := ini_conf.GetIniValue(configPath, group, "stdout_logfile")
-		if err != nil {
-			return "", err
+		if logFile == "" {
+			logFile, err = ini_conf.GetIniValue(configPath, group, "stdout_logfile")
+			if err != nil {
+				return "", err
+			}
 		}
 		switch req.Operate {
 		case "get":
-			content, err := fileOp.GetContent(logPath)
+			content, err := fileOp.GetContent(logFile)
 			if err != nil {
 				return "", err
 			}
 			return string(content), nil
 		case "clear":
-			if err = fileOp.WriteFile(logPath, strings.NewReader(""), 0755); err != nil {
+			if err = fileOp.WriteFile(logFile, strings.NewReader(""), 0755); err != nil {
 				return "", err
 			}
 		}
@@ -475,17 +506,16 @@ func (h *HostToolService) OperateSupervisorProcessFile(req request.SupervisorPro
 			if err := fileOp.WriteFile(configPath, strings.NewReader(req.Content), 0755); err != nil {
 				return "", err
 			}
-			return "", operateSupervisorCtl("update", "", req.Name)
+			return "", operateSupervisorCtl("update", "", req.Name, includeDir, containerName)
 		}
 
 	}
 	return "", nil
 }
 
-func operateSupervisorCtl(operate, name, group string) error {
+func operateSupervisorCtl(operate, name, group, includeDir, containerName string) error {
 	processNames := []string{operate}
 	if name != "" {
-		includeDir := path.Join(global.CONF.System.BaseDir, "1panel", "tools", "supervisord", "supervisor.d")
 		f, err := ini.Load(path.Join(includeDir, fmt.Sprintf("%s.ini", name)))
 		if err != nil {
 			return err
@@ -507,14 +537,21 @@ func operateSupervisorCtl(operate, name, group string) error {
 		processNames = append(processNames, group)
 	}
 
-	output, err := exec.Command("supervisorctl", processNames...).Output()
-	if err != nil {
-		if output != nil {
-			return errors.New(string(output))
-		}
-		return err
+	var (
+		output string
+		err    error
+	)
+	if containerName != "" {
+		output, err = cmd.ExecWithTimeOut(fmt.Sprintf("docker exec  %s supervisorctl %s", containerName, strings.Join(processNames, " ")), 2*time.Second)
+	} else {
+		var out []byte
+		out, err = exec.Command("supervisorctl", processNames...).Output()
+		output = string(out)
 	}
-	return nil
+	if err != nil && output != "" {
+		return errors.New(output)
+	}
+	return err
 }
 
 func getProcessName(name, numprocs string) []string {
@@ -539,14 +576,27 @@ func getProcessName(name, numprocs string) []string {
 	return processNames
 }
 
-func getProcessStatus(config *response.SupervisorProcessConfig) error {
+func getProcessStatus(config *response.SupervisorProcessConfig, containerName string) error {
 	var (
 		processNames = []string{"status"}
+		output       string
+		err          error
 	)
 	processNames = append(processNames, getProcessName(config.Name, config.Numprocs)...)
-	output, _ := exec.Command("supervisorctl", processNames...).Output()
-	lines := strings.Split(string(output), "\n")
+	if containerName != "" {
+		execStr := fmt.Sprintf("docker exec  %s supervisorctl %s", containerName, strings.Join(processNames, " "))
+		output, err = cmd.ExecWithTimeOut(execStr, 3*time.Second)
+	} else {
+		var out []byte
+		out, err = exec.Command("supervisorctl", processNames...).Output()
+		output = string(out)
+	}
+	if containerName == "" && err != nil {
+		return err
+	}
+	lines := strings.Split(output, "\n")
 	for _, line := range lines {
+		line = strings.TrimPrefix(line, "stdout:")
 		fields := strings.Fields(line)
 		if len(fields) >= 5 {
 			status := response.ProcessStatus{

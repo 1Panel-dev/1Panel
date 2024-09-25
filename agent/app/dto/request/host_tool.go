@@ -33,6 +33,7 @@ type SupervisorProcessConfig struct {
 	Dir      string `json:"dir"`
 	Numprocs string `json:"numprocs"`
 }
+
 type SupervisorProcessFileReq struct {
 	Name    string `json:"name" validate:"required"`
 	Operate string `json:"operate" validate:"required,oneof=get clear update" `

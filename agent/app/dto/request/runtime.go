@@ -100,3 +100,13 @@ type FPMConfig struct {
 	ID     uint                   `json:"id" validate:"required"`
 	Params map[string]interface{} `json:"params" validate:"required"`
 }
+
+type PHPSupervisorProcessConfig struct {
+	ID uint `json:"id" validate:"required"`
+	SupervisorProcessConfig
+}
+
+type PHPSupervisorProcessFileReq struct {
+	ID uint `json:"id" validate:"required"`
+	SupervisorProcessFileReq
+}
