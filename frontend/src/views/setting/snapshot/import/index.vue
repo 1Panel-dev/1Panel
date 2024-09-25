@@ -2,15 +2,10 @@
     <DrawerPro v-model="drawerVisible" :header="$t('setting.importSnapshot')" :back="handleClose" size="small">
         <el-form ref="formRef" label-position="top" :model="form" :rules="rules" v-loading="loading">
             <el-form-item :label="$t('setting.backupAccount')" prop="from">
-                <el-select v-model="form.from" @change="loadFiles" clearable>
-                    <el-option
-                        v-for="item in backupOptions"
-                        :key="item.label"
-                        :value="item.value"
-                        :label="item.label"
-                    />
+                <el-select v-model="form.backupAccountID" @change="loadFiles" clearable>
+                    <el-option v-for="item in backupOptions" :key="item.label" :value="item.id" :label="item.label" />
                 </el-select>
-                <div v-if="form.from === 'LOCAL'">
+                <div v-if="form.backupAccountID === 0">
                     <span class="import-help">{{ $t('setting.importHelper') }}</span>
                     <span @click="toFolder()" class="import-link-help">{{ backupPath }}</span>
                 </div>
@@ -61,13 +56,13 @@ const existNames = ref();
 const backupPath = ref('');
 
 const form = reactive({
-    from: '',
+    backupAccountID: 0,
     names: [],
     description: '',
 });
 
 const rules = reactive({
-    from: [Rules.requiredSelect],
+    backupAccountID: [Rules.requiredSelect],
     names: [Rules.requiredSelect],
 });
 
@@ -76,7 +71,7 @@ interface DialogProps {
 }
 
 const acceptParams = (params: DialogProps): void => {
-    form.from = '';
+    form.backupAccountID = undefined;
     existNames.value = params.names;
     form.names = [] as Array<string>;
     loadBackups();
@@ -125,7 +120,11 @@ const loadBackups = async () => {
             loading.value = false;
             backupOptions.value = [];
             for (const item of res.data) {
-                backupOptions.value.push({ label: i18n.global.t('setting.' + item.type), value: item.type });
+                backupOptions.value.push({
+                    id: item.id,
+                    label: i18n.global.t('setting.' + item.type),
+                    value: item.type,
+                });
             }
         })
         .catch(() => {
@@ -135,7 +134,7 @@ const loadBackups = async () => {
 
 const loadFiles = async () => {
     form.names = [];
-    const res = await getFilesFromBackup(form.from);
+    const res = await getFilesFromBackup(form.backupAccountID);
     fileNames.value = res.data || [];
 };
 

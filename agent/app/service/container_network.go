@@ -10,7 +10,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/network"
 )
 
@@ -20,7 +19,7 @@ func (u *ContainerService) PageNetwork(req dto.SearchWithPage) (int64, interface
 		return 0, nil, err
 	}
 	defer client.Close()
-	list, err := client.NetworkList(context.TODO(), types.NetworkListOptions{})
+	list, err := client.NetworkList(context.TODO(), network.ListOptions{})
 	if err != nil {
 		return 0, nil, err
 	}
@@ -83,7 +82,7 @@ func (u *ContainerService) ListNetwork() ([]dto.Options, error) {
 		return nil, err
 	}
 	defer client.Close()
-	list, err := client.NetworkList(context.TODO(), types.NetworkListOptions{})
+	list, err := client.NetworkList(context.TODO(), network.ListOptions{})
 	if err != nil {
 		return nil, err
 	}

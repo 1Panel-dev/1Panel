@@ -192,7 +192,7 @@ func (u *CronjobService) handleSystemLog(cronjob model.Cronjob, startTime time.T
 	return nil
 }
 
-func (u *CronjobService) handleSnapshot(cronjob model.Cronjob, startTime time.Time, logPath string) error {
+func (u *CronjobService) handleSnapshot(cronjob model.Cronjob, startTime time.Time) error {
 	accountMap, err := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
 	if err != nil {
 		return err

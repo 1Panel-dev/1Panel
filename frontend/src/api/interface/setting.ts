@@ -133,7 +133,7 @@ export namespace Setting {
         withOperationLog: boolean;
     }
     export interface SnapshotImport {
-        from: string;
+        backupAccountID: number;
         names: Array<string>;
         description: string;
     }

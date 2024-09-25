@@ -27,8 +27,8 @@ export const searchBackupRecords = (params: Backup.SearchBackupRecord) => {
 export const searchBackupRecordsByCronjob = (params: Backup.SearchBackupRecordByCronjob) => {
     return http.post<ResPage<Backup.RecordInfo>>(`/backups/record/search/bycronjob`, params, TimeoutEnum.T_5M);
 };
-export const getFilesFromBackup = (type: string) => {
-    return http.post<Array<any>>(`/backups/search/files`, { type: type });
+export const getFilesFromBackup = (id: number) => {
+    return http.post<Array<any>>(`/backups/search/files`, { id: id });
 };
 
 // backup-core
