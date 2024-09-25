@@ -42,37 +42,39 @@
 
         <el-row :gutter="20" style="margin-top: 20px">
             <el-col :xs="24" :sm="24" :md="16" :lg="16" :xl="16">
-                <CardWithHeader :header="$t('home.overview')">
+                <CardWithHeader :header="$t('home.overview')" height="166px">
                     <template #body>
                         <div class="h-overview">
-                            <div>
-                                <span>{{ $t('menu.website') }}</span>
-                                <div class="count">
-                                    <span @click="goRouter('/websites')">{{ baseInfo?.websiteNumber }}</span>
-                                </div>
-                            </div>
-                            <div>
-                                <span>{{ $t('menu.database') }} - {{ $t('database.all') }}</span>
-                                <div class="count">
-                                    <span @click="goRouter('/databases')">{{ baseInfo?.databaseNumber }}</span>
-                                </div>
-                            </div>
-                            <div>
-                                <span>{{ $t('menu.cronjob') }}</span>
-                                <div class="count">
-                                    <span @click="goRouter('/cronjobs')">
-                                        {{ baseInfo?.cronjobNumber }}
-                                    </span>
-                                </div>
-                            </div>
-                            <div>
-                                <span>{{ $t('home.appInstalled') }}</span>
-                                <div class="count">
-                                    <span @click="goRouter('/apps/installed')">
-                                        {{ baseInfo?.appInstalledNumber }}
-                                    </span>
-                                </div>
-                            </div>
+                            <el-row>
+                                <el-col :span="6">
+                                    <span>{{ $t('menu.website') }}</span>
+                                    <div class="count">
+                                        <span @click="goRouter('/websites')">{{ baseInfo?.websiteNumber }}</span>
+                                    </div>
+                                </el-col>
+                                <el-col :span="6">
+                                    <span>{{ $t('menu.database') }} - {{ $t('database.all') }}</span>
+                                    <div class="count">
+                                        <span @click="goRouter('/databases')">{{ baseInfo?.databaseNumber }}</span>
+                                    </div>
+                                </el-col>
+                                <el-col :span="6">
+                                    <span>{{ $t('menu.cronjob') }}</span>
+                                    <div class="count">
+                                        <span @click="goRouter('/cronjobs')">
+                                            {{ baseInfo?.cronjobNumber }}
+                                        </span>
+                                    </div>
+                                </el-col>
+                                <el-col :span="6">
+                                    <span>{{ $t('home.appInstalled') }}</span>
+                                    <div class="count">
+                                        <span @click="goRouter('/apps/installed')">
+                                            {{ baseInfo?.appInstalledNumber }}
+                                        </span>
+                                    </div>
+                                </el-col>
+                            </el-row>
                         </div>
                     </template>
                 </CardWithHeader>
@@ -83,44 +85,42 @@
                 </CardWithHeader>
                 <CardWithHeader :header="$t('menu.monitor')" style="margin-top: 20px; margin-bottom: 20px">
                     <template #header-r>
-                        <div
-                            class="float-right flex flex-col items-end flex-wrap sm:items-center gap-2 sm:flex-row sm:gap-4"
+                        <el-radio-group
+                            style="float: right; margin-left: 5px"
+                            v-model="chartOption"
+                            @change="changeOption"
                         >
-                            <el-radio-group v-model="chartOption" @change="changeOption">
-                                <el-radio-button value="network">{{ $t('home.network') }}</el-radio-button>
-                                <el-radio-button value="io">{{ $t('home.io') }}</el-radio-button>
-                            </el-radio-group>
-                            <div>
-                                <el-select
-                                    v-if="chartOption === 'network'"
-                                    @change="onLoadBaseInfo(false, 'network')"
-                                    v-model="searchInfo.netOption"
-                                    class="p-w-200 float-right"
-                                >
-                                    <template #prefix>{{ $t('home.networkCard') }}</template>
-                                    <el-option
-                                        v-for="item in netOptions"
-                                        :key="item"
-                                        :label="item == 'all' ? $t('commons.table.all') : item"
-                                        :value="item"
-                                    />
-                                </el-select>
-                                <el-select
-                                    v-if="chartOption === 'io'"
-                                    v-model="searchInfo.ioOption"
-                                    @change="onLoadBaseInfo(false, 'io')"
-                                    class="p-w-200 float-right"
-                                >
-                                    <template #prefix>{{ $t('home.disk') }}</template>
-                                    <el-option
-                                        v-for="item in ioOptions"
-                                        :key="item"
-                                        :label="item == 'all' ? $t('commons.table.all') : item"
-                                        :value="item"
-                                    />
-                                </el-select>
-                            </div>
-                        </div>
+                            <el-radio-button value="network">{{ $t('home.network') }}</el-radio-button>
+                            <el-radio-button value="io">{{ $t('home.io') }}</el-radio-button>
+                        </el-radio-group>
+                        <el-select
+                            v-if="chartOption === 'network'"
+                            @change="onLoadBaseInfo(false, 'network')"
+                            v-model="searchInfo.netOption"
+                            class="p-w-200 float-right"
+                        >
+                            <template #prefix>{{ $t('home.networkCard') }}</template>
+                            <el-option
+                                v-for="item in netOptions"
+                                :key="item"
+                                :label="item == 'all' ? $t('commons.table.all') : item"
+                                :value="item"
+                            />
+                        </el-select>
+                        <el-select
+                            v-if="chartOption === 'io'"
+                            v-model="searchInfo.ioOption"
+                            @change="onLoadBaseInfo(false, 'io')"
+                            class="p-w-200 float-right"
+                        >
+                            <template #prefix>{{ $t('home.disk') }}</template>
+                            <el-option
+                                v-for="item in ioOptions"
+                                :key="item"
+                                :label="item == 'all' ? $t('commons.table.all') : item"
+                                :value="item"
+                            />
+                        </el-select>
                     </template>
                     <template #body>
                         <div style="position: relative; margin-top: 20px">
@@ -685,20 +685,14 @@ onBeforeUnmount(() => {
 <style lang="scss">
 .h-overview {
     text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    flex-direction: row;
+
     span:first-child {
         font-size: 14px;
         color: var(--el-text-color-regular);
     }
     @media only screen and (max-width: 1300px) {
-        display: grid;
-        gap: 1rem;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
         span:first-child {
-            font-size: 16px;
+            font-size: 12px;
             color: var(--el-text-color-regular);
         }
     }
