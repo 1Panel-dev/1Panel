@@ -3,16 +3,17 @@ package task
 import (
 	"context"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/model"
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
-	"github.com/1Panel-dev/1Panel/agent/constant"
-	"github.com/1Panel-dev/1Panel/agent/i18n"
-	"github.com/google/uuid"
 	"log"
 	"os"
 	"path"
 	"strconv"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/i18n"
+	"github.com/google/uuid"
 )
 
 type ActionFunc func(*Task) error
@@ -33,6 +34,7 @@ type Task struct {
 type SubTask struct {
 	RootTask  *Task
 	Name      string
+	StepAlias string
 	Retry     int
 	Timeout   time.Duration
 	Action    ActionFunc
@@ -50,6 +52,8 @@ const (
 	TaskUpdate    = "TaskUpdate"
 	TaskRestart   = "TaskRestart"
 	TaskBackup    = "TaskBackup"
+	TaskRecover   = "TaskRecover"
+	TaskRollback  = "TaskRollback"
 	TaskSync      = "TaskSync"
 	TaskBuild     = "TaskBuild"
 )
@@ -60,6 +64,7 @@ const (
 	TaskScopeRuntime          = "Runtime"
 	TaskScopeDatabase         = "Database"
 	TaskScopeAppStore         = "AppStore"
+	TaskScopeSnapshot         = "Snapshot"
 	TaskScopeRuntimeExtension = "RuntimeExtension"
 )
 
@@ -108,6 +113,11 @@ func NewTask(name, operate, taskScope, taskID string, resourceID uint) (*Task, e
 
 func (t *Task) AddSubTask(name string, action ActionFunc, rollback RollbackFunc) {
 	subTask := &SubTask{RootTask: t, Name: name, Retry: 0, Timeout: 10 * time.Minute, Action: action, Rollback: rollback}
+	t.SubTasks = append(t.SubTasks, subTask)
+}
+
+func (t *Task) AddSubTaskWithAlias(key string, action ActionFunc, rollback RollbackFunc) {
+	subTask := &SubTask{RootTask: t, Name: i18n.GetMsgByKey(key), StepAlias: key, Retry: 0, Timeout: 10 * time.Minute, Action: action, Rollback: rollback}
 	t.SubTasks = append(t.SubTasks, subTask)
 }
 
@@ -166,13 +176,13 @@ func (t *Task) updateTask(task *model.Task) {
 }
 
 func (t *Task) Execute() error {
-	if err := t.taskRepo.Create(context.Background(), t.Task); err != nil {
+	if err := t.taskRepo.Save(context.Background(), t.Task); err != nil {
 		return err
 	}
 	var err error
 	t.Log(i18n.GetWithName("TaskStart", t.Name))
 	for _, subTask := range t.SubTasks {
-		t.Task.CurrentStep = subTask.Name
+		t.Task.CurrentStep = subTask.StepAlias
 		t.updateTask(t.Task)
 		if err = subTask.Execute(); err == nil {
 			if subTask.Rollback != nil {
@@ -221,6 +231,10 @@ func (t *Task) Log(msg string) {
 	t.Logger.Printf(msg)
 }
 
+func (t *Task) Logf(format string, v ...any) {
+	t.Logger.Printf(format, v...)
+}
+
 func (t *Task) LogFailed(msg string) {
 	t.Logger.Printf(msg + i18n.GetMsgByKey("Failed"))
 }
@@ -231,6 +245,9 @@ func (t *Task) LogFailedWithErr(msg string, err error) {
 
 func (t *Task) LogSuccess(msg string) {
 	t.Logger.Printf(msg + i18n.GetMsgByKey("Success"))
+}
+func (t *Task) LogSuccessf(format string, v ...any) {
+	t.Logger.Printf(fmt.Sprintf(format, v...) + i18n.GetMsgByKey("Success"))
 }
 
 func (t *Task) LogStart(msg string) {

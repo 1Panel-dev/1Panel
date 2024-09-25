@@ -46,7 +46,6 @@ var AddTable = &gormigrate.Migration{
 			&model.Runtime{},
 			&model.Setting{},
 			&model.Snapshot{},
-			&model.SnapshotStatus{},
 			&model.Tag{},
 			&model.Website{},
 			&model.WebsiteAcmeAccount{},
@@ -209,5 +208,61 @@ var InitPHPExtensions = &gormigrate.Migration{
 			return err
 		}
 		return nil
+	},
+}
+
+var AddTask = &gormigrate.Migration{
+	ID: "20240802-add-task",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(
+			&model.Task{})
+	},
+}
+
+var UpdateWebsite = &gormigrate.Migration{
+	ID: "20240812-update-website",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(
+			&model.Website{})
+	},
+}
+
+var UpdateWebsiteDomain = &gormigrate.Migration{
+	ID: "20240808-update-website-domain",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(
+			&model.WebsiteDomain{})
+	},
+}
+
+var AddTaskDB = &gormigrate.Migration{
+	ID: "20240822-add-task-table",
+	Migrate: func(tx *gorm.DB) error {
+		return global.TaskDB.AutoMigrate(
+			&model.Task{},
+		)
+	},
+}
+
+var UpdateApp = &gormigrate.Migration{
+	ID: "20240826-update-app",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(
+			&model.App{})
+	},
+}
+
+var UpdateAppInstall = &gormigrate.Migration{
+	ID: "20240828-update-app-install",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(
+			&model.AppInstall{})
+	},
+}
+
+var UpdateSnapshot = &gormigrate.Migration{
+	ID: "20240926-update-snapshot",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.Snapshot{})
 	},
 }

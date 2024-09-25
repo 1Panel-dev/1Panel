@@ -79,9 +79,8 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 		case "log":
 			err = u.handleSystemLog(*cronjob, record.StartTime)
 		case "snapshot":
-			record.Records = u.generateLogsPath(*cronjob, record.StartTime)
 			_ = cronjobRepo.UpdateRecords(record.ID, map[string]interface{}{"records": record.Records})
-			err = u.handleSnapshot(*cronjob, record.StartTime, record.Records)
+			err = u.handleSnapshot(*cronjob, record.StartTime)
 		}
 
 		if err != nil {

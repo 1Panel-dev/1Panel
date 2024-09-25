@@ -15,8 +15,9 @@ func (s *SettingRouter) InitRouter(Router *gin.RouterGroup) {
 		settingRouter.GET("/search/available", baseApi.GetSystemAvailable)
 		settingRouter.POST("/update", baseApi.UpdateSetting)
 
+		settingRouter.GET("/snapshot/load", baseApi.LoadSnapshotData)
 		settingRouter.POST("/snapshot", baseApi.CreateSnapshot)
-		settingRouter.POST("/snapshot/status", baseApi.LoadSnapShotStatus)
+		settingRouter.POST("/snapshot/recreate", baseApi.RecreateSnapshot)
 		settingRouter.POST("/snapshot/search", baseApi.SearchSnapshot)
 		settingRouter.POST("/snapshot/import", baseApi.ImportSnapshot)
 		settingRouter.POST("/snapshot/del", baseApi.DeleteSnapshot)

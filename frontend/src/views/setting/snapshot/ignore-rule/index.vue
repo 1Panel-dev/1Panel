@@ -44,7 +44,7 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import FileList from '@/components/file-list/index.vue';
 import { FormInstance } from 'element-plus';
-import { getSettingInfo, loadBaseDir, updateSetting } from '@/api/modules/setting';
+import { getAgentSettingInfo, loadBaseDir, updateAgentSetting } from '@/api/modules/setting';
 
 const loading = ref();
 const baseDir = ref();
@@ -78,7 +78,7 @@ function checkData(rule: any, value: any, callback: any) {
 
 const acceptParams = async (): Promise<void> => {
     loadPath();
-    const res = await getSettingInfo();
+    const res = await getAgentSettingInfo();
     tableList.value = [];
     let items = res.data.snapshotIgnore.split(',');
     for (const item of items) {
@@ -118,7 +118,7 @@ const onSave = async () => {
     for (const item of tableList.value) {
         list.push(item.value);
     }
-    await updateSetting({ key: 'SnapshotIgnore', value: list.join(',') })
+    await updateAgentSetting({ key: 'SnapshotIgnore', value: list.join(',') })
         .then(async () => {
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             loading.value = false;

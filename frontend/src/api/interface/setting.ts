@@ -119,19 +119,27 @@ export namespace Setting {
 
     export interface SnapshotCreate {
         id: number;
-        from: string;
-        fromAccounts: Array<string>;
-        defaultDownload: string;
+        sourceAccountIDs: string;
+        downloadAccountID: string;
         description: string;
         secret: string;
+
+        appData: Array<DataTree>;
+        panelData: Array<DataTree>;
+        backupData: Array<DataTree>;
+
+        withMonitorData: boolean;
+        withLoginLog: boolean;
+        withOperationLog: boolean;
     }
     export interface SnapshotImport {
-        from: string;
+        backupAccountID: number;
         names: Array<string>;
         description: string;
     }
     export interface SnapshotRecover {
         id: number;
+        taskID: string;
         isNew: boolean;
         reDownload: boolean;
         secret: string;
@@ -146,20 +154,43 @@ export namespace Setting {
         message: string;
         createdAt: DateTimeFormats;
         version: string;
+        secret: string;
+
+        taskID: string;
+        taskRecoverID: string;
+        taskRollbackID: string;
+
         interruptStep: string;
         recoverStatus: string;
         recoverMessage: string;
-        lastRecoveredAt: string;
         rollbackStatus: string;
         rollbackMessage: string;
-        lastRollbackedAt: string;
-        secret: string;
+    }
+    export interface SnapshotData {
+        appData: Array<DataTree>;
+        panelData: Array<DataTree>;
+        backupData: Array<DataTree>;
+
+        withMonitorData: boolean;
+        withLoginLog: boolean;
+        withOperationLog: boolean;
+    }
+    export interface DataTree {
+        id: string;
+        label: string;
+        key: string;
+        name: string;
+        size: number;
+        isCheck: boolean;
+        isDisable: boolean;
+
+        path: string;
+
+        Children: Array<DataTree>;
     }
     export interface SnapshotStatus {
-        panel: string;
-        panelInfo: string;
-        daemonJson: string;
-        appData: string;
+        baseData: string;
+        appImage: string;
         panelData: string;
         backupData: string;
 

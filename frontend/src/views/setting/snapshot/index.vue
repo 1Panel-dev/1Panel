@@ -77,20 +77,49 @@
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" min-width="80" prop="status">
                         <template #default="{ row }">
-                            <el-button
-                                v-if="row.status === 'Waiting' || row.status === 'OnSaveData'"
-                                type="primary"
-                                @click="onLoadStatus(row)"
-                                link
-                            >
-                                {{ $t('commons.table.statusWaiting') }}
-                            </el-button>
-                            <el-button v-if="row.status === 'Failed'" type="danger" @click="onLoadStatus(row)" link>
-                                {{ $t('commons.status.error') }}
-                            </el-button>
-                            <el-tag v-if="row.status === 'Success'" type="success">
-                                {{ $t('commons.status.success') }}
-                            </el-tag>
+                            <div>
+                                <el-button link v-if="row.status === 'Waiting'" type="primary">
+                                    {{ $t('setting.snapshot') }}{{ $t('commons.table.statusWaiting') }}
+                                </el-button>
+                                <el-button link v-if="row.status === 'Failed'" @click="reCreate(row)" type="danger">
+                                    {{ $t('setting.snapshot') }}{{ $t('commons.status.error') }}
+                                </el-button>
+                                <el-button link v-if="row.status === 'Success'" type="success">
+                                    {{ $t('setting.snapshot') }}{{ $t('commons.status.success') }}
+                                </el-button>
+                            </div>
+                            <div v-if="row.recoverStatus">
+                                <el-button link v-if="row.recoverStatus === 'Waiting'" type="primary">
+                                    {{ $t('commons.button.recover') }}{{ $t('commons.table.statusWaiting') }}
+                                </el-button>
+                                <el-button
+                                    v-if="row.recoverStatus === 'Failed'"
+                                    @click="onRecover(row)"
+                                    type="danger"
+                                    link
+                                >
+                                    {{ $t('commons.button.recover') }}{{ $t('commons.status.error') }}
+                                </el-button>
+                                <el-button link v-if="row.recoverStatus === 'Success'" type="success">
+                                    {{ $t('commons.button.recover') }}{{ $t('commons.status.success') }}
+                                </el-button>
+                            </div>
+                            <div v-if="row.rollbackStatus">
+                                <el-button link v-if="row.rollbackStatus === 'Waiting'" type="primary">
+                                    {{ $t('setting.rollback') }}{{ $t('commons.table.statusWaiting') }}
+                                </el-button>
+                                <el-button
+                                    link
+                                    v-if="row.rollbackStatus === 'Failed'"
+                                    @click="reRollback(row)"
+                                    type="danger"
+                                >
+                                    {{ $t('setting.rollback') }}{{ $t('commons.status.error') }}
+                                </el-button>
+                                <el-button link v-if="row.recoverStatus === 'Success'" type="success">
+                                    {{ $t('setting.rollback') }}{{ $t('commons.status.success') }}
+                                </el-button>
+                            </div>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.description')" prop="description" show-overflow-tooltip>
@@ -105,7 +134,7 @@
                         show-overflow-tooltip
                     />
                     <fu-table-operations
-                        width="200px"
+                        width="240px"
                         :ellipsis="10"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
@@ -115,52 +144,9 @@
             </template>
         </LayoutContent>
         <RecoverStatus ref="recoverStatusRef" @search="search()"></RecoverStatus>
+        <SnapshotCreate ref="createRef" @search="search()" />
         <SnapshotImport ref="importRef" @search="search()" />
-        <DrawerPro v-model="drawerVisible" :header="$t('setting.createSnapshot')" :back="handleClose" size="large">
-            <el-form
-                v-loading="loading"
-                label-position="top"
-                ref="snapRef"
-                label-width="100px"
-                :model="snapInfo"
-                :rules="rules"
-            >
-                <el-form-item :label="$t('setting.backupAccount')" prop="fromAccounts">
-                    <el-select multiple @change="changeAccount" v-model="snapInfo.fromAccounts" clearable>
-                        <el-option
-                            v-for="item in backupOptions"
-                            :key="item.label"
-                            :value="item.value"
-                            :label="item.label"
-                        />
-                    </el-select>
-                </el-form-item>
-                <el-form-item :label="$t('cronjob.default_download_path')" prop="defaultDownload">
-                    <el-select v-model="snapInfo.defaultDownload" clearable>
-                        <el-option
-                            v-for="item in accountOptions"
-                            :key="item.label"
-                            :value="item.value"
-                            :label="item.label"
-                        />
-                    </el-select>
-                </el-form-item>
-                <el-form-item :label="$t('setting.compressPassword')" prop="secret">
-                    <el-input v-model="snapInfo.secret"></el-input>
-                </el-form-item>
-                <el-form-item :label="$t('commons.table.description')" prop="description">
-                    <el-input type="textarea" clearable v-model="snapInfo.description" />
-                </el-form-item>
-            </el-form>
-            <template #footer>
-                <el-button :disabled="loading" @click="drawerVisible = false">
-                    {{ $t('commons.button.cancel') }}
-                </el-button>
-                <el-button :disabled="loading" type="primary" @click="submitAddSnapshot(snapRef)">
-                    {{ $t('commons.button.confirm') }}
-                </el-button>
-            </template>
-        </DrawerPro>
+        <IgnoreRule ref="ignoreRef" @search="search()" />
 
         <OpDialog ref="opRef" @search="search" @submit="onSubmitDelete()">
             <template #content>
@@ -174,25 +160,32 @@
                 </el-form>
             </template>
         </OpDialog>
-        <SnapStatus ref="snapStatusRef" @search="search" />
-        <IgnoreRule ref="ignoreRef" />
+        <TaskLog ref="taskLogRef" width="70%" />
+        <SnapRecover ref="recoverRef" />
     </div>
 </template>
 
 <script setup lang="ts">
-import { snapshotCreate, searchSnapshotPage, snapshotDelete, updateSnapshotDescription } from '@/api/modules/setting';
+import {
+    searchSnapshotPage,
+    snapshotDelete,
+    snapshotRecreate,
+    snapshotRollback,
+    updateSnapshotDescription,
+} from '@/api/modules/setting';
 import { onMounted, reactive, ref } from 'vue';
-import { computeSize, dateFormat } from '@/utils/util';
+import { computeSize, dateFormat, newUUID } from '@/utils/util';
 import { ElForm } from 'element-plus';
-import { Rules } from '@/global/form-rules';
+import IgnoreRule from '@/views/setting/snapshot/ignore-rule/index.vue';
 import i18n from '@/lang';
 import { Setting } from '@/api/interface/setting';
-import IgnoreRule from '@/views/setting/snapshot/ignore-rule/index.vue';
-import SnapStatus from '@/views/setting/snapshot/snap_status/index.vue';
+import TaskLog from '@/components/task-log/index.vue';
 import RecoverStatus from '@/views/setting/snapshot/status/index.vue';
 import SnapshotImport from '@/views/setting/snapshot/import/index.vue';
-import { getBackupList } from '@/api/modules/backup';
+import SnapshotCreate from '@/views/setting/snapshot/create/index.vue';
+import SnapRecover from '@/views/setting/snapshot/recover/index.vue';
 import { MsgSuccess } from '@/utils/message';
+import { loadOsInfo } from '@/api/modules/dashboard';
 
 const loading = ref(false);
 const data = ref();
@@ -206,40 +199,17 @@ const paginationConfig = reactive({
 const searchName = ref();
 
 const opRef = ref();
-const ignoreRef = ref();
 
-const snapStatusRef = ref();
+const createRef = ref();
+const ignoreRef = ref();
 const recoverStatusRef = ref();
 const importRef = ref();
 const isRecordShow = ref();
-const backupOptions = ref();
-const accountOptions = ref();
+const taskLogRef = ref();
+const recoverRef = ref();
 
 const operateIDs = ref();
-
-type FormInstance = InstanceType<typeof ElForm>;
-const snapRef = ref<FormInstance>();
-const rules = reactive({
-    fromAccounts: [Rules.requiredSelect],
-    defaultDownload: [Rules.requiredSelect],
-});
-
-let snapInfo = reactive<Setting.SnapshotCreate>({
-    id: 0,
-    from: '',
-    defaultDownload: '',
-    fromAccounts: [],
-    description: '',
-    secret: '',
-});
 const cleanData = ref();
-
-const drawerVisible = ref<boolean>(false);
-
-const onCreate = async () => {
-    restForm();
-    drawerVisible.value = true;
-};
 
 const onImport = () => {
     let names = [];
@@ -249,30 +219,48 @@ const onImport = () => {
     importRef.value.acceptParams({ names: names });
 };
 
-const onIgnore = () => {
-    ignoreRef.value.acceptParams();
+const onCreate = () => {
+    createRef.value.acceptParams();
 };
 
-const handleClose = () => {
-    drawerVisible.value = false;
-};
-
-const onChange = async (info: any) => {
-    await updateSnapshotDescription({ id: info.id, description: info.description });
-    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-};
-
-const submitAddSnapshot = (formEl: FormInstance | undefined) => {
-    if (!formEl) return;
-    formEl.validate(async (valid) => {
-        if (!valid) return;
-        loading.value = true;
-        snapInfo.from = snapInfo.fromAccounts.join(',');
-        await snapshotCreate(snapInfo)
+const reCreate = (row: any) => {
+    ElMessageBox.confirm(row.message, i18n.global.t('setting.reCreate'), {
+        confirmButtonText: i18n.global.t('commons.button.retry'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'error',
+    }).then(async () => {
+        await snapshotRecreate(row.id)
             .then(() => {
                 loading.value = false;
-                drawerVisible.value = false;
-                search();
+                openTaskLog(row.taskID);
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+    });
+};
+const openTaskLog = (taskID: string) => {
+    taskLogRef.value.openWithTaskID(taskID);
+};
+
+const reRollback = (row: any) => {
+    ElMessageBox.confirm(row.rollbackMessage, i18n.global.t('setting.reRollback'), {
+        confirmButtonText: i18n.global.t('commons.button.retry'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'error',
+    }).then(async () => {
+        let param = {
+            id: row.id,
+            taskID: newUUID(),
+            isNew: false,
+            reDownload: false,
+            secret: '',
+        };
+        await snapshotRollback(param)
+            .then(() => {
+                loading.value = false;
+                openTaskLog(row.taskRollbackID || param.taskID);
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             })
             .catch(() => {
@@ -281,47 +269,41 @@ const submitAddSnapshot = (formEl: FormInstance | undefined) => {
     });
 };
 
-const onLoadStatus = (row: Setting.SnapshotInfo) => {
-    snapStatusRef.value.acceptParams({
-        id: row.id,
-        from: row.from,
-        defaultDownload: row.defaultDownload,
-        description: row.description,
-    });
+const onIgnore = () => {
+    ignoreRef.value.acceptParams();
 };
 
-const loadBackups = async () => {
-    const res = await getBackupList();
-    backupOptions.value = [];
-    for (const item of res.data) {
-        if (item.id !== 0) {
-            backupOptions.value.push({ label: i18n.global.t('setting.' + item.type), value: item.type });
-        }
-    }
-    changeAccount();
+const onChange = async (info: any) => {
+    await updateSnapshotDescription({ id: info.id, description: info.description });
+    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
 };
 
-const changeAccount = async () => {
-    accountOptions.value = [];
-    let isInAccounts = false;
-    for (const item of backupOptions.value) {
-        let exist = false;
-        for (const ac of snapInfo.fromAccounts) {
-            if (item.value == ac) {
-                exist = true;
-                break;
-            }
-        }
-        if (exist) {
-            if (item.value === snapInfo.defaultDownload) {
-                isInAccounts = true;
-            }
-            accountOptions.value.push(item);
-        }
-    }
-    if (!isInAccounts) {
-        snapInfo.defaultDownload = '';
-    }
+const onRecover = async (row: any) => {
+    loading.value = true;
+    await loadOsInfo()
+        .then((res) => {
+            loading.value = false;
+            let params = {
+                id: row.id,
+                taskID: row.taskRecoverID,
+                isNew: row.recoverStatus === '',
+                name: row.name,
+                reDownload: false,
+                secret: row.secret,
+
+                arch: res.data.kernelArch,
+                size: row.size,
+                freeSize: res.data.diskSize,
+
+                interruptStep: row.interruptStep,
+                status: row.recoverStatus,
+                message: row.recoverMessage,
+            };
+            recoverRef.value.acceptParams(params);
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const batchDelete = async (row: Setting.SnapshotInfo | null) => {
@@ -362,17 +344,11 @@ const onSubmitDelete = async () => {
         });
 };
 
-function restForm() {
-    if (snapRef.value) {
-        snapRef.value.resetFields();
-    }
-}
 const buttons = [
     {
         label: i18n.global.t('commons.button.recover'),
-        icon: 'RefreshLeft',
         click: (row: any) => {
-            recoverStatusRef.value.acceptParams({ snapInfo: row });
+            onRecover(row);
         },
         disabled: (row: any) => {
             return !(row.status === 'Success');
@@ -406,6 +382,5 @@ const search = async () => {
 
 onMounted(() => {
     search();
-    loadBackups();
 });
 </script>

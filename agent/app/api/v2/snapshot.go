@@ -8,6 +8,21 @@ import (
 )
 
 // @Tags System Setting
+// @Summary Load system snapshot data
+// @Description 获取系统快照数据
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /settings/snapshot/load [get]
+func (b *BaseApi) LoadSnapshotData(c *gin.Context) {
+	data, err := snapshotService.LoadSnapshotData()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags System Setting
 // @Summary Create system snapshot
 // @Description 创建系统快照
 // @Accept json
@@ -23,6 +38,28 @@ func (b *BaseApi) CreateSnapshot(c *gin.Context) {
 	}
 
 	if err := snapshotService.SnapshotCreate(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags System Setting
+// @Summary Recreate system snapshot
+// @Description 创建系统快照重试
+// @Accept json
+// @Param request body dto.OperateByID true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /settings/snapshot/recrete [post]
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"snapshots","output_column":"name","output_value":"name"}],"formatZH":"重试创建快照 [name]","formatEN":recrete the snapshot [name]"}
+func (b *BaseApi) RecreateSnapshot(c *gin.Context) {
+	var req dto.OperateByID
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := snapshotService.SnapshotReCreate(req.ID); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
@@ -49,28 +86,6 @@ func (b *BaseApi) ImportSnapshot(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithData(c, nil)
-}
-
-// @Tags System Setting
-// @Summary Load Snapshot status
-// @Description 获取快照状态
-// @Accept json
-// @Param request body dto.OperateByID true "request"
-// @Success 200
-// @Security ApiKeyAuth
-// @Router /settings/snapshot/status [post]
-func (b *BaseApi) LoadSnapShotStatus(c *gin.Context) {
-	var req dto.OperateByID
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-
-	data, err := snapshotService.LoadSnapShotStatus(req.ID)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-	helper.SuccessWithData(c, data)
 }
 
 // @Tags System Setting
