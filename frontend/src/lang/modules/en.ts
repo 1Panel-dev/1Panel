@@ -1620,6 +1620,7 @@ const message = {
         tmpLabel: 'Temporary Directory',
         sslLabel: 'Certificate Directory',
         reCreate: 'Failed to create snapshot',
+        reRollback: 'Rollback snapshot failed',
         deleteHelper:
             'All backup files for the snapshot, including those in the third-party backup account, will be deleted.',
         status: 'Snapshot status',

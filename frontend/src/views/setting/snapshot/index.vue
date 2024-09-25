@@ -111,7 +111,7 @@
                                 <el-button
                                     link
                                     v-if="row.rollbackStatus === 'Failed'"
-                                    @click="reCreate(row)"
+                                    @click="reRollback(row)"
                                     type="danger"
                                 >
                                     {{ $t('setting.rollback') }}{{ $t('commons.status.error') }}
@@ -166,9 +166,15 @@
 </template>
 
 <script setup lang="ts">
-import { searchSnapshotPage, snapshotDelete, snapshotRecreate, updateSnapshotDescription } from '@/api/modules/setting';
+import {
+    searchSnapshotPage,
+    snapshotDelete,
+    snapshotRecreate,
+    snapshotRollback,
+    updateSnapshotDescription,
+} from '@/api/modules/setting';
 import { onMounted, reactive, ref } from 'vue';
-import { computeSize, dateFormat } from '@/utils/util';
+import { computeSize, dateFormat, newUUID } from '@/utils/util';
 import { ElForm } from 'element-plus';
 import IgnoreRule from '@/views/setting/snapshot/ignore-rule/index.vue';
 import i18n from '@/lang';
@@ -238,6 +244,31 @@ const openTaskLog = (taskID: string) => {
     taskLogRef.value.openWithTaskID(taskID);
 };
 
+const reRollback = (row: any) => {
+    ElMessageBox.confirm(row.rollbackMessage, i18n.global.t('setting.reRollback'), {
+        confirmButtonText: i18n.global.t('commons.button.retry'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'error',
+    }).then(async () => {
+        let param = {
+            id: row.id,
+            taskID: newUUID(),
+            isNew: false,
+            reDownload: false,
+            secret: '',
+        };
+        await snapshotRollback(param)
+            .then(() => {
+                loading.value = false;
+                openTaskLog(row.taskRollbackID || param.taskID);
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+    });
+};
+
 const onIgnore = () => {
     ignoreRef.value.acceptParams();
 };
@@ -264,6 +295,7 @@ const onRecover = async (row: any) => {
                 size: row.size,
                 freeSize: res.data.diskSize,
 
+                interruptStep: row.interruptStep,
                 status: row.recoverStatus,
                 message: row.recoverMessage,
             };

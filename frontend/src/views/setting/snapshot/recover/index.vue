@@ -47,7 +47,7 @@
                 <el-button @click="handleClose" :disabled="loading">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button @click="onRollback" v-if="!recoverReq.isNew" :disabled="loading">
+                <el-button @click="onRollback" v-if="canRollback()" :disabled="loading">
                     {{ $t('setting.rollback') }}
                 </el-button>
                 <el-button type="primary" @click="submit" v-if="!recoverReq.isNew" :disabled="loading">
@@ -59,6 +59,7 @@
             </span>
         </template>
     </el-dialog>
+    <TaskLog ref="taskLogRef" width="70%" />
 </template>
 
 <script setup lang="ts">
@@ -66,6 +67,7 @@ import { ref } from 'vue';
 import { FormInstance } from 'element-plus';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
+import TaskLog from '@/components/task-log/index.vue';
 import { snapshotRecover, snapshotRollback } from '@/api/modules/setting';
 import { computeSize, newUUID } from '@/utils/util';
 
@@ -74,14 +76,18 @@ let open = ref(false);
 const recoverForm = ref<FormInstance>();
 const emit = defineEmits<{ (e: 'search'): void }>();
 
+const taskLogRef = ref();
+
 interface DialogProps {
     id: number;
     isNew: boolean;
     name: string;
+    taskID: string;
     reDownload: boolean;
     arch: string;
     size: number;
     freeSize: number;
+    interruptStep: string;
     status: string;
     message: string;
 }
@@ -90,11 +96,13 @@ let recoverReq = ref({
     id: 0,
     isNew: true,
     name: '',
+    taskID: '',
     reDownload: true,
     secret: '',
     arch: '',
     size: 0,
     freeSize: 0,
+    interruptStep: '',
     status: '',
     message: '',
 });
@@ -107,11 +115,13 @@ const acceptParams = (params: DialogProps): void => {
         id: params.id,
         isNew: params.isNew,
         name: params.name,
+        taskID: params.taskID,
         reDownload: params.reDownload,
         secret: '',
         arch: params.arch,
         size: params.size,
         freeSize: params.freeSize,
+        interruptStep: params.interruptStep,
         status: params.status,
         message: params.message,
     };
@@ -131,36 +141,58 @@ const isArchOk = () => {
     return recoverReq.value.name.indexOf(recoverReq.value.arch) !== -1;
 };
 
+const canRollback = () => {
+    return (
+        !recoverReq.value.isNew &&
+        recoverReq.value.interruptStep !== '' &&
+        recoverReq.value.interruptStep !== 'RecoverDownload' &&
+        recoverReq.value.interruptStep !== 'RecoverDecompress' &&
+        recoverReq.value.interruptStep !== 'BackupBeforeRecover'
+    );
+};
+
 const submit = async () => {
     loading.value = true;
-    await snapshotRecover({
+    let param = {
         id: recoverReq.value.id,
         taskID: newUUID(),
         isNew: recoverReq.value.isNew,
         reDownload: recoverReq.value.reDownload,
         secret: recoverReq.value.secret,
-    })
+    };
+    await snapshotRecover(param)
         .then(() => {
             emit('search');
             loading.value = false;
             handleClose();
+            openTaskLog(recoverReq.value.taskID || param.taskID);
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .catch(() => {
             loading.value = false;
         });
 };
+const openTaskLog = (taskID: string) => {
+    taskLogRef.value.openWithTaskID(taskID);
+};
 
-const onRollback = async (row: any) => {
+const onRollback = async () => {
     ElMessageBox.confirm(i18n.global.t('setting.rollbackHelper'), i18n.global.t('setting.rollback'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',
     }).then(async () => {
         loading.value = true;
-        await snapshotRollback({ id: row.id, taskID: newUUID(), isNew: false, reDownload: false, secret: '' })
+        await snapshotRollback({
+            id: recoverReq.value.id,
+            taskID: newUUID(),
+            isNew: false,
+            reDownload: false,
+            secret: '',
+        })
             .then(() => {
                 emit('search');
+                handleClose();
                 loading.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             })
