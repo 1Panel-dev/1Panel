@@ -80,7 +80,6 @@ type SnapshotImport struct {
 type SnapshotInfo struct {
 	ID              uint      `json:"id"`
 	Name            string    `json:"name"`
-	TaskID          string    `json:"taskID"`
 	Description     string    `json:"description" validate:"max=256"`
 	From            string    `json:"from"`
 	DefaultDownload string    `json:"defaultDownload"`
@@ -89,6 +88,10 @@ type SnapshotInfo struct {
 	CreatedAt       time.Time `json:"createdAt"`
 	Version         string    `json:"version"`
 	Size            int64     `json:"size"`
+
+	TaskID         string `json:"taskID"`
+	TaskRecoverID  string `json:"taskRecoverID"`
+	TaskRollbackID string `json:"taskRollbackID"`
 
 	InterruptStep    string `json:"interruptStep"`
 	RecoverStatus    string `json:"recoverStatus"`

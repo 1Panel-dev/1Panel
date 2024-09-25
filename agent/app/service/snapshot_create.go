@@ -106,39 +106,39 @@ func (u *SnapshotService) HandleSnapshot(req dto.SnapshotCreate) error {
 	_ = os.MkdirAll(baseDir, os.ModePerm)
 
 	go func() {
-		taskItem.AddSubTask(
-			i18n.GetMsgByKey("SnapDBInfo"),
+		taskItem.AddSubTaskWithAlias(
+			"SnapDBInfo",
 			func(t *task.Task) error { return loadDbConn(&itemHelper, rootDir, req) },
 			nil,
 		)
 
 		if len(req.InterruptStep) == 0 || req.InterruptStep == "SnapBaseInfo" {
-			taskItem.AddSubTask(
-				i18n.GetMsgByKey("SnapBaseInfo"),
+			taskItem.AddSubTaskWithAlias(
+				"SnapBaseInfo",
 				func(t *task.Task) error { return snapBaseData(itemHelper, baseDir) },
 				nil,
 			)
 			req.InterruptStep = ""
 		}
 		if len(req.InterruptStep) == 0 || req.InterruptStep == "SnapInstallApp" {
-			taskItem.AddSubTask(
-				i18n.GetMsgByKey("SnapInstallApp"),
+			taskItem.AddSubTaskWithAlias(
+				"SnapInstallApp",
 				func(t *task.Task) error { return snapAppImage(itemHelper, req, rootDir) },
 				nil,
 			)
 			req.InterruptStep = ""
 		}
 		if len(req.InterruptStep) == 0 || req.InterruptStep == "SnapLocalBackup" {
-			taskItem.AddSubTask(
-				i18n.GetMsgByKey("SnapLocalBackup"),
+			taskItem.AddSubTaskWithAlias(
+				"SnapLocalBackup",
 				func(t *task.Task) error { return snapBackupData(itemHelper, req, rootDir) },
 				nil,
 			)
 			req.InterruptStep = ""
 		}
 		if len(req.InterruptStep) == 0 || req.InterruptStep == "SnapPanelData" {
-			taskItem.AddSubTask(
-				i18n.GetMsgByKey("SnapPanelData"),
+			taskItem.AddSubTaskWithAlias(
+				"SnapPanelData",
 				func(t *task.Task) error { return snapPanelData(itemHelper, req, rootDir) },
 				nil,
 			)
@@ -146,7 +146,7 @@ func (u *SnapshotService) HandleSnapshot(req dto.SnapshotCreate) error {
 		}
 
 		taskItem.AddSubTask(
-			i18n.GetMsgByKey("SnapCloseDBConn"),
+			"SnapCloseDBConn",
 			func(t *task.Task) error {
 				taskItem.Log("######################## 6 / 8 ########################")
 				closeDatabase(itemHelper.snapAgentDB)
@@ -156,16 +156,16 @@ func (u *SnapshotService) HandleSnapshot(req dto.SnapshotCreate) error {
 			nil,
 		)
 		if len(req.InterruptStep) == 0 || req.InterruptStep == "SnapCompress" {
-			taskItem.AddSubTask(
-				i18n.GetMsgByKey("SnapCompress"),
+			taskItem.AddSubTaskWithAlias(
+				"SnapCompress",
 				func(t *task.Task) error { return snapCompress(itemHelper, rootDir, req.Secret) },
 				nil,
 			)
 			req.InterruptStep = ""
 		}
 		if len(req.InterruptStep) == 0 || req.InterruptStep == "SnapUpload" {
-			taskItem.AddSubTask(
-				i18n.GetMsgByKey("SnapUpload"),
+			taskItem.AddSubTaskWithAlias(
+				"SnapUpload",
 				func(t *task.Task) error {
 					return snapUpload(itemHelper, req.SourceAccountIDs, fmt.Sprintf("%s.tar.gz", rootDir))
 				},

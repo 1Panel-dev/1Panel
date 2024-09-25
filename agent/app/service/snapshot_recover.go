@@ -38,7 +38,10 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 		return errors.New(errInfo)
 	}
 	if len(snap.RollbackStatus) != 0 && snap.RollbackStatus != constant.StatusSuccess {
-		return fmt.Errorf("the snapshot has been rolled back and cannot be restored again")
+		req.IsNew = true
+	}
+	if !req.IsNew && (snap.InterruptStep == "RecoverDownload" || snap.InterruptStep == "RecoverDecompress" || snap.InterruptStep == "BackupBeforeRecover") {
+		req.IsNew = true
 	}
 	_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"recover_status": constant.StatusWaiting})
 	_ = settingRepo.Update("SystemStatus", "Recovering")
@@ -69,16 +72,16 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 		}()
 
 		if req.IsNew || snap.InterruptStep == "RecoverDownload" || req.ReDownload {
-			taskItem.AddSubTask(
-				i18n.GetMsgByKey("RecoverDownload"),
+			taskItem.AddSubTaskWithAlias(
+				"RecoverDownload",
 				func(t *task.Task) error { return handleDownloadSnapshot(&itemHelper, snap, rootDir) },
 				nil,
 			)
 			req.IsNew = true
 		}
 		if req.IsNew || snap.InterruptStep == "RecoverDecompress" {
-			taskItem.AddSubTask(
-				i18n.GetMsgByKey("RecoverDecompress"),
+			taskItem.AddSubTaskWithAlias(
+				"RecoverDecompress",
 				func(t *task.Task) error {
 					itemHelper.Task.Log("######################## 2 / 10 ########################")
 					itemHelper.Task.LogStart(i18n.GetWithName("RecoverDecompress", snap.Name))
@@ -91,8 +94,8 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 			req.IsNew = true
 		}
 		if req.IsNew || snap.InterruptStep == "BackupBeforeRecover" {
-			taskItem.AddSubTask(
-				i18n.GetMsgByKey("BackupBeforeRecover"),
+			taskItem.AddSubTaskWithAlias(
+				"BackupBeforeRecover",
 				func(t *task.Task) error { return backupBeforeRecover(snap.Name, &itemHelper) },
 				nil,
 			)
@@ -100,8 +103,8 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 		}
 
 		var snapJson SnapshotJson
-		taskItem.AddSubTask(
-			i18n.GetMsgByKey("Readjson"),
+		taskItem.AddSubTaskWithAlias(
+			"Readjson",
 			func(t *task.Task) error {
 				snapJson, err = readFromJson(path.Join(rootDir, snap.Name), &itemHelper)
 				return err
@@ -109,37 +112,37 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 			nil,
 		)
 		if req.IsNew || snap.InterruptStep == "RecoverApp" {
-			taskItem.AddSubTask(
-				i18n.GetMsgByKey("RecoverApp"),
+			taskItem.AddSubTaskWithAlias(
+				"RecoverApp",
 				func(t *task.Task) error { return recoverAppData(path.Join(rootDir, snap.Name), &itemHelper) },
 				nil,
 			)
 			req.IsNew = true
 		}
 		if req.IsNew || snap.InterruptStep == "RecoverBaseData" {
-			taskItem.AddSubTask(
-				i18n.GetMsgByKey("RecoverBaseData"),
+			taskItem.AddSubTaskWithAlias(
+				"RecoverBaseData",
 				func(t *task.Task) error { return recoverBaseData(path.Join(rootDir, snap.Name, "base"), &itemHelper) },
 				nil,
 			)
 			req.IsNew = true
 		}
 		if req.IsNew || snap.InterruptStep == "RecoverDBData" {
-			taskItem.AddSubTask(
-				i18n.GetMsgByKey("RecoverDBData"),
+			taskItem.AddSubTaskWithAlias(
+				"RecoverDBData",
 				func(t *task.Task) error { return recoverDBData(path.Join(rootDir, snap.Name, "db"), &itemHelper) },
 				nil,
 			)
 			req.IsNew = true
 		}
 		if req.IsNew || snap.InterruptStep == "RecoverBackups" {
-			taskItem.AddSubTask(
-				i18n.GetMsgByKey("RecoverBackups"),
+			taskItem.AddSubTaskWithAlias(
+				"RecoverBackups",
 				func(t *task.Task) error {
 					itemHelper.Task.Log("######################## 8 / 10 ########################")
 					itemHelper.Task.LogStart(i18n.GetWithName("RecoverBackups", snap.Name))
 					err := itemHelper.FileOp.TarGzExtractPro(path.Join(rootDir, snap.Name, "/1panel_backup.tar.gz"), snapJson.BackupDataDir, "")
-					itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("Compress"), err)
+					itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("Decompress"), err)
 					return err
 				},
 				nil,
@@ -147,21 +150,21 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 			req.IsNew = true
 		}
 		if req.IsNew || snap.InterruptStep == "RecoverPanelData" {
-			taskItem.AddSubTask(
-				i18n.GetMsgByKey("RecoverPanelData"),
+			taskItem.AddSubTaskWithAlias(
+				"RecoverPanelData",
 				func(t *task.Task) error {
 					itemHelper.Task.Log("######################## 9 / 10 ########################")
 					itemHelper.Task.LogStart(i18n.GetWithName("RecoverPanelData", snap.Name))
 					err := itemHelper.FileOp.TarGzExtractPro(path.Join(rootDir, snap.Name, "/1panel_data.tar.gz"), path.Join(snapJson.BaseDir, "1panel"), "")
-					itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("Compress"), err)
+					itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("Decompress"), err)
 					return err
 				},
 				nil,
 			)
 			req.IsNew = true
 		}
-		taskItem.AddSubTask(
-			i18n.GetMsgByKey("RecoverDBData"),
+		taskItem.AddSubTaskWithAlias(
+			"RecoverDBData",
 			func(t *task.Task) error {
 				return restartCompose(path.Join(snapJson.BaseDir, "1panel/docker/compose"), &itemHelper)
 			},
@@ -170,7 +173,7 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 
 		if err := taskItem.Execute(); err != nil {
 			_ = settingRepo.Update("SystemStatus", "Free")
-			_ = snapshotRepo.Update(req.ID, map[string]interface{}{"recover_status": constant.StatusFailed, "message": err.Error(), "interrupt_step": taskItem.Task.CurrentStep})
+			_ = snapshotRepo.Update(req.ID, map[string]interface{}{"recover_status": constant.StatusFailed, "recover_message": err.Error(), "interrupt_step": taskItem.Task.CurrentStep})
 			return
 		}
 		_ = os.RemoveAll(rootDir)

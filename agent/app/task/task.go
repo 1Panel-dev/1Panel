@@ -34,6 +34,7 @@ type Task struct {
 type SubTask struct {
 	RootTask  *Task
 	Name      string
+	StepAlias string
 	Retry     int
 	Timeout   time.Duration
 	Action    ActionFunc
@@ -52,6 +53,7 @@ const (
 	TaskRestart   = "TaskRestart"
 	TaskBackup    = "TaskBackup"
 	TaskRecover   = "TaskRecover"
+	TaskRollback  = "TaskRollback"
 	TaskSync      = "TaskSync"
 	TaskBuild     = "TaskBuild"
 )
@@ -111,6 +113,11 @@ func NewTask(name, operate, taskScope, taskID string, resourceID uint) (*Task, e
 
 func (t *Task) AddSubTask(name string, action ActionFunc, rollback RollbackFunc) {
 	subTask := &SubTask{RootTask: t, Name: name, Retry: 0, Timeout: 10 * time.Minute, Action: action, Rollback: rollback}
+	t.SubTasks = append(t.SubTasks, subTask)
+}
+
+func (t *Task) AddSubTaskWithAlias(key string, action ActionFunc, rollback RollbackFunc) {
+	subTask := &SubTask{RootTask: t, Name: i18n.GetMsgByKey(key), StepAlias: key, Retry: 0, Timeout: 10 * time.Minute, Action: action, Rollback: rollback}
 	t.SubTasks = append(t.SubTasks, subTask)
 }
 
@@ -175,7 +182,7 @@ func (t *Task) Execute() error {
 	var err error
 	t.Log(i18n.GetWithName("TaskStart", t.Name))
 	for _, subTask := range t.SubTasks {
-		t.Task.CurrentStep = subTask.Name
+		t.Task.CurrentStep = subTask.StepAlias
 		t.updateTask(t.Task)
 		if err = subTask.Execute(); err == nil {
 			if subTask.Rollback != nil {
