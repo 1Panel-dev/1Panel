@@ -319,3 +319,15 @@ export const UpdateRealIPConfig = (req: Website.WebsiteRealIPConfig) => {
 export const GetRealIPConfig = (id: number) => {
     return http.get<Website.WebsiteRealIPConfig>(`/websites/realip/config/${id}`);
 };
+
+export const GetWebsiteResource = (id: number) => {
+    return http.get<Website.WebsiteResource[]>(`/websites/resource/${id}`);
+};
+
+export const GetWebsiteDatabase = () => {
+    return http.get<Website.WebsiteDatabase[]>(`/websites/databases`);
+};
+
+export const ChangeDatabase = (req: Website.ChangeDatabase) => {
+    return http.post(`/websites/databases`, req);
+};

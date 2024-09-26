@@ -2083,6 +2083,11 @@ const message = {
         ipFromExample3: '如果不确定，可以填 0.0.0.0/0（ipv4）  ::/0（ipv6） [注意：允许任意来源 IP 不安全]',
         http3Helper:
             'HTTP/3 是 HTTP/2 的升级版本，提供更快的连接速度和更好的性能，但是不是所有浏览器都支持 HTTP/3，开启后可能会导致部分浏览器无法访问',
+
+        database: '数据库',
+        changeDatabase: '切换数据库',
+        changeDatabaseHelper1: '数据库关联用于备份恢复网站',
+        changeDatabaseHelper2: '切换其他数据库会导致以前的备份无法恢复',
     },
     php: {
         short_open_tag: '短标签支持',

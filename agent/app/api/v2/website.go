@@ -968,7 +968,6 @@ func (b *BaseApi) SetRealIPConfig(c *gin.Context) {
 	helper.SuccessWithOutData(c)
 }
 
-// 写一个调用 GetRealIPConfig 的接口
 // @Tags Website
 // @Summary Get Real IP Config
 // @Description 获取真实 IP 配置
@@ -989,4 +988,62 @@ func (b *BaseApi) GetRealIPConfig(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithData(c, res)
+}
+
+// @Tags Website
+// @Summary Get website resource
+// @Description 获取网站资源
+// @Accept json
+// @Param id path int true "id"
+// @Success 200 {object} response.WebsiteResource
+// @Security ApiKeyAuth
+// @Router /websites/resource/{id} [get]
+func (b *BaseApi) GetWebsiteResource(c *gin.Context) {
+	id, err := helper.GetParamID(c)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		return
+	}
+	res, err := websiteService.GetWebsiteResource(id)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}
+
+// @Tags Website
+// @Summary Get databases
+// @Description 获取数据库列表
+// @Accept json
+// @Success 200 {object} response.WebsiteDatabase
+// @Security ApiKeyAuth
+// @Router /websites/databases [get]
+func (b *BaseApi) GetWebsiteDatabase(c *gin.Context) {
+	res, err := websiteService.ListDatabases()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}
+
+// @Tags Website
+// @Summary Change website database
+// @Description 切换网站数据库
+// @Accept json
+// @Param request body request.ChangeDatabase true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/databases [post]
+func (b *BaseApi) ChangeWebsiteDatabase(c *gin.Context) {
+	var req request.ChangeDatabase
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := websiteService.ChangeDatabase(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
 }

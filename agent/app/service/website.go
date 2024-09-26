@@ -113,6 +113,10 @@ type IWebsiteService interface {
 	GetRealIPConfig(websiteID uint) (*response.WebsiteRealIP, error)
 
 	ChangeGroup(group, newGroup uint) error
+
+	GetWebsiteResource(websiteID uint) ([]response.Resource, error)
+	ListDatabases() ([]response.Database, error)
+	ChangeDatabase(req request.ChangeDatabase) error
 }
 
 func NewIWebsiteService() IWebsiteService {
@@ -3051,4 +3055,117 @@ func (w WebsiteService) GetRealIPConfig(websiteID uint) (*response.WebsiteRealIP
 	}
 	res.IPFrom = strings.Join(ips, "\n")
 	return res, err
+}
+
+func (w WebsiteService) GetWebsiteResource(websiteID uint) ([]response.Resource, error) {
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(websiteID))
+	if err != nil {
+		return nil, err
+	}
+	var (
+		res          []response.Resource
+		databaseID   uint
+		databaseType string
+	)
+	if website.Type == constant.Runtime {
+		runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(website.RuntimeID))
+		if err != nil {
+			return nil, err
+		}
+		res = append(res, response.Resource{
+			Name:       runtime.Name,
+			Type:       "runtime",
+			ResourceID: runtime.ID,
+			Detail:     runtime,
+		})
+	}
+	if website.Type == constant.Deployment {
+		install, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
+		if err != nil {
+			return nil, err
+		}
+		res = append(res, response.Resource{
+			Name:       install.Name,
+			Type:       "app",
+			ResourceID: install.ID,
+			Detail:     install,
+		})
+		installResources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithAppInstallId(install.ID))
+		for _, resource := range installResources {
+			if resource.Key == constant.AppMysql || resource.Key == constant.AppMariaDB || resource.Key == constant.AppPostgres || resource.Key == constant.AppPostgresql {
+				databaseType = resource.Key
+				databaseID = resource.ResourceId
+			}
+		}
+	}
+	if website.DbID > 0 {
+		databaseType = website.DbType
+		databaseID = website.DbID
+	}
+	if databaseID > 0 {
+		switch databaseType {
+		case constant.AppMysql, constant.AppMariaDB:
+			db, _ := mysqlRepo.Get(commonRepo.WithByID(databaseID))
+			if db.ID > 0 {
+				res = append(res, response.Resource{
+					Name:       db.Name,
+					Type:       "database",
+					ResourceID: db.ID,
+					Detail:     db,
+				})
+			}
+		case constant.AppPostgresql, constant.AppPostgres:
+			db, _ := postgresqlRepo.Get(commonRepo.WithByID(databaseID))
+			if db.ID > 0 {
+				res = append(res, response.Resource{
+					Name:       db.Name,
+					Type:       "database",
+					ResourceID: db.ID,
+					Detail:     db,
+				})
+			}
+		}
+	}
+
+	return res, nil
+}
+
+func (w WebsiteService) ListDatabases() ([]response.Database, error) {
+	var res []response.Database
+	mysqlDBs, _ := mysqlRepo.List()
+	for _, db := range mysqlDBs {
+		database, _ := databaseRepo.Get(commonRepo.WithByName(db.MysqlName))
+		if database.ID > 0 {
+			res = append(res, response.Database{
+				ID:   db.ID,
+				Name: db.Name,
+				Type: database.Type,
+			})
+		}
+	}
+	pgSqls, _ := postgresqlRepo.List()
+	for _, db := range pgSqls {
+		database, _ := databaseRepo.Get(commonRepo.WithByName(db.Name))
+		if database.ID > 0 {
+			res = append(res, response.Database{
+				ID:   db.ID,
+				Name: db.Name,
+				Type: database.Type,
+			})
+		}
+	}
+	return res, nil
+}
+
+func (w WebsiteService) ChangeDatabase(req request.ChangeDatabase) error {
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	if err != nil {
+		return err
+	}
+	if website.DbID == req.DatabaseID {
+		return nil
+	}
+	website.DbID = req.DatabaseID
+	website.DbType = req.DatabaseType
+	return websiteRepo.Save(context.Background(), &website)
 }

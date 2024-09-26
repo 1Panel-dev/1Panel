@@ -1,13 +1,13 @@
 <template>
     <div v-loading="loading">
         <el-row>
-            <el-col :xs="20" :sm="12" :md="10" :lg="10" :xl="8" :offset="1">
-                <el-form>
+            <el-col :xs="20" :sm="12" :md="10" :lg="10" :xl="8">
+                <el-form label-position="right" label-width="80px">
                     <div v-if="website.type === 'static'">
                         <el-text type="info">{{ $t('website.staticChangePHPHelper') }}</el-text>
                     </div>
                     <el-form-item :label="$t('website.changeVersion')">
-                        <el-select v-model="versionReq.runtimeID" style="width: 100%">
+                        <el-select v-model="versionReq.runtimeID" class="w-full">
                             <el-option :key="-1" :label="$t('website.static')" :value="0"></el-option>
                             <el-option
                                 v-for="(item, index) in versions"
