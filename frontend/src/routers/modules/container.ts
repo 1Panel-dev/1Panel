@@ -29,6 +29,17 @@ const containerRouter = {
                     },
                 },
                 {
+                    path: 'container/operate',
+                    name: 'ContainerCreate',
+                    component: () => import('@/views/container/container/operate/index.vue'),
+                    props: true,
+                    hidden: true,
+                    meta: {
+                        activeMenu: '/containers',
+                        requiresAuth: false,
+                    },
+                },
+                {
                     path: 'composeDetail/:filters?',
                     name: 'ComposeDetail',
                     component: () => import('@/views/container/compose/detail/index.vue'),

@@ -8,7 +8,7 @@ type PageContainer struct {
 	PageInfo
 	Name            string `json:"name"`
 	State           string `json:"state" validate:"required,oneof=all created running paused restarting removing exited dead"`
-	OrderBy         string `json:"orderBy" validate:"required,oneof=name state created_at"`
+	OrderBy         string `json:"orderBy" validate:"required,oneof=name created_at"`
 	Order           string `json:"order" validate:"required,oneof=null ascending descending"`
 	Filters         string `json:"filters"`
 	ExcludeAppStore bool   `json:"excludeAppStore"`
@@ -39,6 +39,16 @@ type ContainerInfo struct {
 	Websites       []string `json:"websites"`
 }
 
+type ContainerStatus struct {
+	All        uint `json:"all"`
+	Created    uint `json:"created"`
+	Running    uint `json:"running"`
+	Paused     uint `json:"paused"`
+	Restarting uint `json:"restarting"`
+	Removing   uint `json:"removing"`
+	Exited     uint `json:"exited"`
+	Dead       uint `json:"dead"`
+}
 type ResourceLimit struct {
 	CPU    int    `json:"cpu"`
 	Memory uint64 `json:"memory"`
