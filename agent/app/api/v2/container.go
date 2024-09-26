@@ -54,6 +54,24 @@ func (b *BaseApi) ListContainer(c *gin.Context) {
 	helper.SuccessWithData(c, list)
 }
 
+
+// @Tags Container
+// @Summary Load containers status
+// @Description 获取容器状态
+// @Accept json
+// @Produce json
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /containers/status [get]
+func (b *BaseApi) LoadContainerStatus(c *gin.Context) {
+	data, err := containerService.LoadStatus()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
 // @Tags Container Compose
 // @Summary Page composes
 // @Description 获取编排列表分页

@@ -5,9 +5,73 @@
             <el-button type="primary" class="bt" link @click="goSetting">【 {{ $t('container.setting') }} 】</el-button>
             <span>{{ $t('container.startIn') }}</span>
         </el-card>
+
+        <div class="mt-5">
+            <el-tag @click="searchWithStatus('all')" v-if="countItem.all" effect="plain" size="large">
+                {{ $t('commons.table.all') }} * {{ countItem.all }}
+            </el-tag>
+            <el-tag
+                @click="searchWithStatus('running')"
+                v-if="countItem.running"
+                effect="plain"
+                size="large"
+                class="ml-2"
+            >
+                {{ $t('commons.status.running') }} * {{ countItem.running }}
+            </el-tag>
+            <el-tag
+                @click="searchWithStatus('created')"
+                v-if="countItem.created"
+                effect="plain"
+                size="large"
+                class="ml-2"
+            >
+                {{ $t('commons.status.created') }} * {{ countItem.created }}
+            </el-tag>
+            <el-tag
+                @click="searchWithStatus('paused')"
+                v-if="countItem.paused"
+                effect="plain"
+                size="large"
+                class="ml-2"
+            >
+                {{ $t('commons.status.paused') }} * {{ countItem.paused }}
+            </el-tag>
+            <el-tag
+                @click="searchWithStatus('restarting')"
+                v-if="countItem.restarting"
+                effect="plain"
+                size="large"
+                class="ml-2"
+            >
+                {{ $t('commons.status.restarting') }} * {{ countItem.restarting }}
+            </el-tag>
+            <el-tag
+                @click="searchWithStatus('removing')"
+                v-if="countItem.removing"
+                effect="plain"
+                size="large"
+                class="ml-2"
+            >
+                {{ $t('commons.status.removing') }} * {{ countItem.removing }}
+            </el-tag>
+            <el-tag
+                @click="searchWithStatus('exited')"
+                v-if="countItem.exited"
+                effect="plain"
+                size="large"
+                class="ml-2"
+            >
+                {{ $t('commons.status.exited') }} * {{ countItem.exited }}
+            </el-tag>
+            <el-tag @click="searchWithStatus('dead')" v-if="countItem.dead" effect="plain" size="large" class="ml-2">
+                {{ $t('commons.status.dead') }} * {{ countItem.dead }}
+            </el-tag>
+        </div>
+
         <LayoutContent :title="$t('container.container')" :class="{ mask: dockerStatus != 'Running' }">
             <template #leftToolBar>
-                <el-button type="primary" @click="onOpenDialog('create')">
+                <el-button type="primary" @click="onContainerOperate('')">
                     {{ $t('container.create') }}
                 </el-button>
                 <el-button type="primary" plain @click="onClean()">
@@ -41,17 +105,6 @@
                 <el-checkbox v-model="includeAppStore" @change="search()" class="!mr-2.5">
                     {{ $t('container.includeAppstore') }}
                 </el-checkbox>
-                <el-select v-model="searchState" @change="search()" clearable class="p-w-200 mr-2.5">
-                    <template #prefix>{{ $t('commons.table.status') }}</template>
-                    <el-option :label="$t('commons.table.all')" value="all"></el-option>
-                    <el-option :label="$t('commons.status.created')" value="created"></el-option>
-                    <el-option :label="$t('commons.status.running')" value="running"></el-option>
-                    <el-option :label="$t('commons.status.paused')" value="paused"></el-option>
-                    <el-option :label="$t('commons.status.restarting')" value="restarting"></el-option>
-                    <el-option :label="$t('commons.status.removing')" value="removing"></el-option>
-                    <el-option :label="$t('commons.status.exited')" value="exited"></el-option>
-                    <el-option :label="$t('commons.status.dead')" value="dead"></el-option>
-                </el-select>
                 <TableSearch @search="search()" v-model:searchName="searchName" class="mr-2.5" />
                 <TableSetting title="container-refresh" @search="refresh()" class="mr-2.5" />
                 <fu-table-column-select
@@ -98,9 +151,51 @@
                         min-width="150"
                         prop="imageName"
                     />
-                    <el-table-column :label="$t('commons.table.status')" min-width="100" prop="state" sortable>
+                    <el-table-column :label="$t('commons.table.status')" min-width="100" prop="state">
                         <template #default="{ row }">
-                            <Status :key="row.state" :status="row.state"></Status>
+                            <el-dropdown placement="bottom">
+                                <Status :key="row.state" :status="row.state"></Status>
+                                <template #dropdown>
+                                    <el-dropdown-menu>
+                                        <el-dropdown-item
+                                            :disabled="checkStatus('start', row)"
+                                            @click="onOperate('start', row)"
+                                        >
+                                            {{ $t('container.start') }}
+                                        </el-dropdown-item>
+                                        <el-dropdown-item
+                                            :disabled="checkStatus('stop', row)"
+                                            @click="onOperate('stop', row)"
+                                        >
+                                            {{ $t('container.stop') }}
+                                        </el-dropdown-item>
+                                        <el-dropdown-item
+                                            :disabled="checkStatus('restart', row)"
+                                            @click="onOperate('restart', row)"
+                                        >
+                                            {{ $t('container.restart') }}
+                                        </el-dropdown-item>
+                                        <el-dropdown-item
+                                            :disabled="checkStatus('kill', row)"
+                                            @click="onOperate('kill', row)"
+                                        >
+                                            {{ $t('container.kill') }}
+                                        </el-dropdown-item>
+                                        <el-dropdown-item
+                                            :disabled="checkStatus('pause', row)"
+                                            @click="onOperate('pause', row)"
+                                        >
+                                            {{ $t('container.pause') }}
+                                        </el-dropdown-item>
+                                        <el-dropdown-item
+                                            :disabled="checkStatus('unpause', row)"
+                                            @click="onOperate('unpause', row)"
+                                        >
+                                            {{ $t('container.unpause') }}
+                                        </el-dropdown-item>
+                                    </el-dropdown-menu>
+                                </template>
+                            </el-dropdown>
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -299,7 +394,6 @@
 
         <RenameDialog @search="search" ref="dialogRenameRef" />
         <ContainerLogDialog ref="dialogContainerLogRef" />
-        <OperateDialog @search="search" ref="dialogOperateRef" />
         <UpgradeDialog @search="search" ref="dialogUpgradeRef" />
         <CommitDialog @search="search" ref="dialogCommitRef" />
         <MonitorDialog ref="dialogMonitorRef" />
@@ -312,7 +406,6 @@
 <script lang="ts" setup>
 import PruneDialog from '@/views/container/container/prune/index.vue';
 import RenameDialog from '@/views/container/container/rename/index.vue';
-import OperateDialog from '@/views/container/container/operate/index.vue';
 import UpgradeDialog from '@/views/container/container/upgrade/index.vue';
 import CommitDialog from '@/views/container/container/commit/index.vue';
 import MonitorDialog from '@/views/container/container/monitor/index.vue';
@@ -326,7 +419,7 @@ import {
     containerListStats,
     containerOperator,
     inspect,
-    loadContainerInfo,
+    loadContainerStatus,
     loadDockerStatus,
     searchContainer,
 } from '@/api/modules/container';
@@ -349,17 +442,28 @@ const paginationConfig = reactive({
     currentPage: 1,
     pageSize: 10,
     total: 0,
+    state: 'all',
     orderBy: 'created_at',
     order: 'null',
 });
 const searchName = ref();
-const searchState = ref('all');
 const dialogUpgradeRef = ref();
 const dialogCommitRef = ref();
 const dialogPortJumpRef = ref();
 const opRef = ref();
 const includeAppStore = ref(true);
 const columns = ref([]);
+
+const countItem = reactive({
+    all: 0,
+    created: 0,
+    running: 0,
+    paused: 0,
+    restarting: 0,
+    removing: 0,
+    exited: 0,
+    dead: 0,
+});
 
 const dockerStatus = ref('Running');
 const loadStatus = async () => {
@@ -417,7 +521,7 @@ const search = async (column?: any) => {
     paginationConfig.order = column?.order ? column.order : paginationConfig.order;
     let params = {
         name: searchName.value,
-        state: searchState.value || 'all',
+        state: paginationConfig.state || 'all',
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
         filters: filterItem,
@@ -427,6 +531,7 @@ const search = async (column?: any) => {
     };
     loading.value = true;
     loadStats();
+    loadContainerCount();
     await searchContainer(params)
         .then((res) => {
             loading.value = false;
@@ -438,11 +543,29 @@ const search = async (column?: any) => {
         });
 };
 
+const searchWithStatus = (item: any) => {
+    paginationConfig.state = item;
+    search();
+};
+
+const loadContainerCount = async () => {
+    await loadContainerStatus().then((res) => {
+        countItem.all = res.data.all;
+        countItem.running = res.data.running;
+        countItem.paused = res.data.paused;
+        countItem.restarting = res.data.restarting;
+        countItem.removing = res.data.removing;
+        countItem.created = res.data.created;
+        countItem.dead = res.data.dead;
+        countItem.exited = res.data.exited;
+    });
+};
+
 const refresh = async () => {
     let filterItem = props.filters ? props.filters : '';
     let params = {
         name: searchName.value,
-        state: searchState.value || 'all',
+        state: paginationConfig.state || 'all',
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
         filters: filterItem,
@@ -522,35 +645,8 @@ function loadMemValue(t: number) {
     return Number((t / Math.pow(num, 3)).toFixed(2));
 }
 
-const dialogOperateRef = ref();
-const onEdit = async (container: string) => {
-    const res = await loadContainerInfo(container);
-    if (res.data) {
-        onOpenDialog('edit', res.data);
-    }
-};
-const onOpenDialog = async (
-    title: string,
-    rowData: Partial<Container.ContainerHelper> = {
-        cmd: [],
-        cmdStr: '',
-        publishAllPorts: false,
-        exposedPorts: [],
-        cpuShares: 1024,
-        nanoCPUs: 0,
-        memory: 0,
-        memoryItem: 0,
-        volumes: [],
-        labels: [],
-        env: [],
-        restartPolicy: 'no',
-    },
-) => {
-    let params = {
-        title,
-        rowData: { ...rowData },
-    };
-    dialogOperateRef.value!.acceptParams(params);
+const onContainerOperate = async (containerID: string) => {
+    router.push({ name: 'ContainerCreate', query: { containerID: containerID } });
 };
 
 const dialogMonitorRef = ref();
@@ -654,7 +750,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
         click: (row: Container.ContainerInfo) => {
-            onEdit(row.containerID);
+            onContainerOperate(row.containerID);
         },
     },
     {
@@ -688,60 +784,6 @@ const buttons = [
         },
         disabled: (row: any) => {
             return checkStatus('commit', row);
-        },
-    },
-    {
-        label: i18n.global.t('container.start'),
-        click: (row: Container.ContainerInfo) => {
-            onOperate('start', row);
-        },
-        disabled: (row: any) => {
-            return checkStatus('start', row);
-        },
-    },
-    {
-        label: i18n.global.t('container.stop'),
-        click: (row: Container.ContainerInfo) => {
-            onOperate('stop', row);
-        },
-        disabled: (row: any) => {
-            return checkStatus('stop', row);
-        },
-    },
-    {
-        label: i18n.global.t('container.restart'),
-        click: (row: Container.ContainerInfo) => {
-            onOperate('restart', row);
-        },
-        disabled: (row: any) => {
-            return checkStatus('restart', row);
-        },
-    },
-    {
-        label: i18n.global.t('container.kill'),
-        click: (row: Container.ContainerInfo) => {
-            onOperate('kill', row);
-        },
-        disabled: (row: any) => {
-            return checkStatus('kill', row);
-        },
-    },
-    {
-        label: i18n.global.t('container.pause'),
-        click: (row: Container.ContainerInfo) => {
-            onOperate('pause', row);
-        },
-        disabled: (row: any) => {
-            return checkStatus('pause', row);
-        },
-    },
-    {
-        label: i18n.global.t('container.unpause'),
-        click: (row: Container.ContainerInfo) => {
-            onOperate('unpause', row);
-        },
-        disabled: (row: any) => {
-            return checkStatus('unpause', row);
         },
     },
     {

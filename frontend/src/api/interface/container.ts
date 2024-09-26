@@ -24,6 +24,16 @@ export namespace Container {
         orderBy: string;
         order: string;
     }
+    export interface ContainerStatus {
+        all: number;
+        created: number;
+        running: number;
+        paused: number;
+        restarting: number;
+        removing: number;
+        exited: number;
+        dead: number;
+    }
     export interface ResourceLimit {
         cpu: number;
         memory: number;

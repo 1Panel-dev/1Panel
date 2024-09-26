@@ -51,6 +51,7 @@ type ContainerService struct{}
 type IContainerService interface {
 	Page(req dto.PageContainer) (int64, interface{}, error)
 	List() ([]string, error)
+	LoadStatus() (dto.ContainerStatus, error)
 	PageNetwork(req dto.SearchWithPage) (int64, interface{}, error)
 	ListNetwork() ([]dto.Options, error)
 	PageVolume(req dto.SearchWithPage) (int64, interface{}, error)
@@ -149,13 +150,6 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 			}
 			return list[i].Names[0][1:] > list[j].Names[0][1:]
 		})
-	case "state":
-		sort.Slice(list, func(i, j int) bool {
-			if req.Order == constant.OrderAsc {
-				return list[i].State < list[j].State
-			}
-			return list[i].State > list[j].State
-		})
 	default:
 		sort.Slice(list, func(i, j int) bool {
 			if req.Order == constant.OrderAsc {
@@ -245,6 +239,38 @@ func (u *ContainerService) List() ([]string, error) {
 	return datas, nil
 }
 
+func (u *ContainerService) LoadStatus() (dto.ContainerStatus, error) {
+	var data dto.ContainerStatus
+	client, err := docker.NewDockerClient()
+	if err != nil {
+		return data, err
+	}
+	defer client.Close()
+	containers, err := client.ContainerList(context.Background(), container.ListOptions{All: true})
+	if err != nil {
+		return data, err
+	}
+	data.All = uint(len(containers))
+	for _, item := range containers {
+		switch item.State {
+		case "created":
+			data.Created++
+		case "running":
+			data.Running++
+		case "paused":
+			data.Paused++
+		case "restarting":
+			data.Restarting++
+		case "dead":
+			data.Dead++
+		case "exited":
+			data.Exited++
+		case "removing":
+			data.Removing++
+		}
+	}
+	return data, nil
+}
 func (u *ContainerService) ContainerListStats() ([]dto.ContainerListStats, error) {
 	client, err := docker.NewDockerClient()
 	if err != nil {
