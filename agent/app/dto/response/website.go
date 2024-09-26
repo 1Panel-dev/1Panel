@@ -102,3 +102,16 @@ type WebsiteRealIP struct {
 	IPHeader  string `json:"ipHeader"`
 	IPOther   string `json:"ipOther"`
 }
+
+type Resource struct {
+	Name       string      `json:"name"`
+	Type       string      `json:"type"`
+	ResourceID uint        `json:"resourceID"`
+	Detail     interface{} `json:"detail"`
+}
+
+type Database struct {
+	Name string `json:"name"`
+	Type string `json:"type"`
+	ID   uint   `json:"id"`
+}

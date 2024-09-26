@@ -1,13 +1,13 @@
 <template>
     <div v-loading="loading">
-        <el-row :gutter="20" v-loading="loading">
+        <el-row v-loading="loading">
             <el-col :xs="24" :sm="18" :md="16" :lg="16" :xl="16">
                 <el-form
                     :model="form"
                     :rules="rules"
                     ref="leechRef"
                     label-position="right"
-                    label-width="180px"
+                    label-width="120px"
                     class="moblie-form"
                 >
                     <el-form-item :label="$t('website.enableOrNot')">
@@ -43,11 +43,18 @@
                         <el-form-item :label="$t('website.leechReturn')" prop="return">
                             <el-input v-model="form.return" type="text" :maxlength="35"></el-input>
                         </el-form-item>
+                        <el-form-item>
+                            <el-button
+                                type="primary"
+                                @click="submit(leechRef, true)"
+                                :disabled="loading"
+                                v-if="form.enable"
+                            >
+                                {{ $t('commons.button.save') }}
+                            </el-button>
+                        </el-form-item>
                     </div>
                 </el-form>
-                <el-button type="primary" @click="submit(leechRef, true)" :disabled="loading" v-if="form.enable">
-                    {{ $t('commons.button.save') }}
-                </el-button>
             </el-col>
         </el-row>
     </div>

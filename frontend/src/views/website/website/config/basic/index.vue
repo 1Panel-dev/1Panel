@@ -36,14 +36,19 @@
         <el-tab-pane :label="$t('website.redirect')">
             <Redirect :id="id" v-if="tabIndex == '11'"></Redirect>
         </el-tab-pane>
-        <el-tab-pane :label="$t('website.other')">
-            <Other :id="id" v-if="tabIndex == '12'"></Other>
-        </el-tab-pane>
+
         <el-tab-pane
             :label="'PHP'"
+            name="13"
             v-if="(website.type === 'runtime' && website.runtimeType === 'php') || website.type === 'static'"
         >
             <PHP :website="website" v-if="tabIndex == '13'"></PHP>
+        </el-tab-pane>
+        <el-tab-pane :label="$t('logs.resource')" name="14">
+            <Resource :id="id" :websiteType="website.type" v-if="tabIndex == '14'"></Resource>
+        </el-tab-pane>
+        <el-tab-pane :label="$t('website.other')" name="12">
+            <Other :id="id" v-if="tabIndex == '12'"></Other>
         </el-tab-pane>
     </el-tabs>
 </template>
@@ -65,6 +70,7 @@ import Redirect from './redirect/index.vue';
 import LoadBalance from './load-balance/index.vue';
 import PHP from './php/index.vue';
 import RealIP from './real-ip/index.vue';
+import Resource from './resource/index.vue';
 
 const props = defineProps({
     website: {

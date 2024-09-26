@@ -607,4 +607,23 @@ export namespace Website {
         ipHeader: string;
         ipOther: string;
     }
+
+    export interface WebsiteResource {
+        name: string;
+        type: string;
+        resourceID: number;
+        detail: any;
+    }
+
+    export interface WebsiteDatabase {
+        type: string;
+        databaseID: number;
+        websiteID: number;
+    }
+
+    export interface ChangeDatabase {
+        websiteID: number;
+        databaseID: number;
+        databaseType: string;
+    }
 }

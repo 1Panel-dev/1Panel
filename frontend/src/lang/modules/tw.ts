@@ -2085,6 +2085,11 @@ const message = {
         ipFromExample3: '如果不確定，可以填 0.0.0.0/0（ipv4） ::/0（ipv6） [注意：允許任意來源 IP 不安全]',
         http3Helper:
             'HTTP/3 是 HTTP/2 的升級版本，提供更快的連線速度和更好的性能，但並非所有瀏覽器都支援 HTTP/3，啟用後可能會導致部分瀏覽器無法訪問',
+
+        database: '資料庫',
+        changeDatabase: '切換資料庫',
+        changeDatabaseHelper1: '資料庫關聯用於備份恢復網站。',
+        changeDatabaseHelper2: '切換其他資料庫會導致以前的備份無法恢復。',
     },
     php: {
         short_open_tag: '短標簽支持',

@@ -28,11 +28,13 @@
                     <el-input v-model.number="form.rate" maxlength="15"></el-input>
                     <span class="input-help">{{ $t('website.rateHelper') }}</span>
                 </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="submit(limitForm)" :disabled="loading">
+                        <span v-if="enable">{{ $t('commons.button.save') }}</span>
+                        <span v-else>{{ $t('commons.button.saveAndEnable') }}</span>
+                    </el-button>
+                </el-form-item>
             </el-form>
-            <el-button type="primary" @click="submit(limitForm)" :disabled="loading">
-                <span v-if="enable">{{ $t('commons.button.save') }}</span>
-                <span v-else>{{ $t('commons.button.saveAndEnable') }}</span>
-            </el-button>
         </el-col>
     </el-row>
 </template>

@@ -15,7 +15,6 @@ import (
 
 type ComposeService struct {
 	api.Service
-	project *types.Project
 }
 
 func GetComposeProject(projectName, workDir string, yml []byte, env []byte, skipNormalization bool) (*types.Project, error) {

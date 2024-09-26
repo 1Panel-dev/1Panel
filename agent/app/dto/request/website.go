@@ -275,3 +275,9 @@ type WebsiteRealIP struct {
 	IPHeader  string `json:"ipHeader"`
 	IPOther   string `json:"ipOther"`
 }
+
+type ChangeDatabase struct {
+	WebsiteID    uint   `json:"websiteID" validate:"required"`
+	DatabaseID   uint   `json:"databaseID" validate:"required"`
+	DatabaseType string `json:"databaseType" validate:"required"`
+}
