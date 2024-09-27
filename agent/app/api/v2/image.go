@@ -81,13 +81,12 @@ func (b *BaseApi) ImageBuild(c *gin.Context) {
 		return
 	}
 
-	log, err := imageService.ImageBuild(req)
-	if err != nil {
+	if err := imageService.ImageBuild(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
 
-	helper.SuccessWithData(c, log)
+	helper.SuccessWithOutData(c)
 }
 
 // @Tags Container Image
@@ -105,13 +104,12 @@ func (b *BaseApi) ImagePull(c *gin.Context) {
 		return
 	}
 
-	logPath, err := imageService.ImagePull(req)
-	if err != nil {
+	if err := imageService.ImagePull(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
 
-	helper.SuccessWithData(c, logPath)
+	helper.SuccessWithOutData(c)
 }
 
 // @Tags Container Image
@@ -129,13 +127,12 @@ func (b *BaseApi) ImagePush(c *gin.Context) {
 		return
 	}
 
-	logPath, err := imageService.ImagePush(req)
-	if err != nil {
+	if err := imageService.ImagePush(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
 
-	helper.SuccessWithData(c, logPath)
+	helper.SuccessWithOutData(c)
 }
 
 // @Tags Container Image

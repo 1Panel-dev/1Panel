@@ -10,11 +10,11 @@ ErrNameIsExist: "Name is already exist"
 ErrDemoEnvironment: "Demo server, prohibit this operation!"
 ErrCmdTimeout: "Command execution timed out！"
 ErrCmdIllegal: "The command contains illegal characters. Please modify and try again!"
-ErrPortExist: '{{ .port }} port is already occupied by {{ .type }} [{{ .name }}]'
+ErrPortExist: "{{ .port }} port is already occupied by {{ .type }} [{{ .name }}]"
 TYPE_APP: "Application"
 TYPE_RUNTIME: "Runtime environment"
 TYPE_DOMAIN: "Domain name"
-ErrTypePort: 'Port {{ .name }} format error'
+ErrTypePort: "Port {{ .name }} format error"
 Success: "Success"
 Failed: "Failed"
 SystemRestart: "System restart causes task interruption"
@@ -27,16 +27,16 @@ ErrNotInstall: "App not installed"
 ErrPortInOtherApp: "{{ .port }} port  already in use by app  {{ .apps }}"
 ErrDbUserNotValid: "Stock database, username and password do not match！"
 ErrDockerComposeNotValid: "docker-compose file format error!"
-ErrUpdateBuWebsite: 'The application was updated successfully, but the modification of the website configuration file failed, please check the configuration!'
-Err1PanelNetworkFailed: 'Default container network creation failed! {{ .detail }}'
-ErrFileParse: 'Application docker-compose file parsing failed!'
-ErrInstallDirNotFound: 'installation directory does not exist'
-AppStoreIsUpToDate: 'The app store is already up to date！'
-LocalAppVersionNull: 'The {{.name}} app is not synced to version! Could not add to application list'
-LocalAppVersionErr: '{{.name}} failed to sync version {{.version}}! {{.err}}'
-ErrFileNotFound: '{{.name}} file does not exist'
-ErrFileParseApp: 'Failed to parse {{.name}} file {{.err}}'
-ErrAppDirNull: 'version folder does not exist'
+ErrUpdateBuWebsite: "The application was updated successfully, but the modification of the website configuration file failed, please check the configuration!"
+Err1PanelNetworkFailed: "Default container network creation failed! {{ .detail }}"
+ErrFileParse: "Application docker-compose file parsing failed!"
+ErrInstallDirNotFound: "installation directory does not exist"
+AppStoreIsUpToDate: "The app store is already up to date！"
+LocalAppVersionNull: "The {{.name}} app is not synced to version! Could not add to application list"
+LocalAppVersionErr: "{{.name}} failed to sync version {{.version}}! {{.err}}"
+ErrFileNotFound: "{{.name}} file does not exist"
+ErrFileParseApp: "Failed to parse {{.name}} file {{.err}}"
+ErrAppDirNull: "version folder does not exist"
 LocalAppErr: "App {{.name}} sync failed! {{.err}}"
 ErrContainerName: "ContainerName is already exist"
 ErrAppSystemRestart: "1Panel restart causes the task to terminate"
@@ -45,14 +45,14 @@ ErrHttpReqTimeOut: "Request timed out {{.err}}"
 ErrHttpReqFailed: "Request failed {{.err}}"
 ErrHttpReqNotFound: "The file does not exist"
 ErrNoSuchHost: "Network connection failed"
-ErrImagePullTimeOut: 'Image pull timeout'
-ErrContainerNotFound: '{{ .name }} container does not exist'
-ErrContainerMsg: '{{ .name }} container is abnormal, please check the log on the container page for details'
-ErrAppBackup: '{{ .name }} application backup failed err {{.err}}'
-ErrImagePull: '{{ .name }} image pull failed err {{.err}}'
-ErrVersionTooLow: 'The current 1Panel version is too low to update the app store, please upgrade the version'
-ErrAppNameExist: 'App name is already exist'
-AppStoreIsSyncing: 'The App Store is syncing, please try again later'
+ErrImagePullTimeOut: "Image pull timeout"
+ErrContainerNotFound: "{{ .name }} container does not exist"
+ErrContainerMsg: "{{ .name }} container is abnormal, please check the log on the container page for details"
+ErrAppBackup: "{{ .name }} application backup failed err {{.err}}"
+ErrImagePull: "{{ .name }} image pull failed err {{.err}}"
+ErrVersionTooLow: "The current 1Panel version is too low to update the app store, please upgrade the version"
+ErrAppNameExist: "App name is already exist"
+AppStoreIsSyncing: "The App Store is syncing, please try again later"
 ErrGetCompose: "Failed to obtain docker-compose.yml file! {{ .detail }}"
 ErrAppWarn: "Abnormal status, please check the log"
 ErrAppParamKey: "Parameter {{ .name }} field exception"
@@ -89,12 +89,12 @@ ErrInvalidChar: "Illegal characters are prohibited"
 #website
 ErrDomainIsExist: "Domain is already exist"
 ErrAliasIsExist: "Alias is already exist"
-ErrAppDelete: 'Other Website use this App'
-ErrGroupIsUsed: 'The group is in use and cannot be deleted'
-ErrBackupMatch: 'the backup file does not match the current partial data of the website: {{ .detail}}'
-ErrBackupExist: 'the backup file corresponds to a portion of the original data that does not exist: {{ .detail}}'
-ErrPHPResource: 'The local runtime does not support switching！'
-ErrPathPermission: 'A folder with non-1000:1000 permissions was detected in the index directory, which may cause an Access denied error when accessing the website. Please click the save button above'
+ErrAppDelete: "Other Website use this App"
+ErrGroupIsUsed: "The group is in use and cannot be deleted"
+ErrBackupMatch: "the backup file does not match the current partial data of the website: {{ .detail}}"
+ErrBackupExist: "the backup file corresponds to a portion of the original data that does not exist: {{ .detail}}"
+ErrPHPResource: "The local runtime does not support switching！"
+ErrPathPermission: "A folder with non-1000:1000 permissions was detected in the index directory, which may cause an Access denied error when accessing the website. Please click the save button above"
 ErrDomainIsUsed: "Domain is already used by website {{ .name }}"
 ErrDomainFormat: "{{ .name }} domain format error"
 ErrDefaultAlias: "default is a reserved code name, please use another code name"
@@ -105,21 +105,21 @@ ErrBuildDirNotFound: "Build directory does not exist"
 ErrSSLCannotDelete: "The certificate {{ .name }} is being used by the website and cannot be removed"
 ErrAccountCannotDelete: "The certificate associated with the account cannot be deleted"
 ErrSSLApply: "The certificate continues to be signed successfully, but openresty reload fails, please check the configuration！"
-ErrEmailIsExist: 'Email is already exist'
-ErrSSLKeyNotFound: 'The private key file does not exist'
-ErrSSLCertificateNotFound: 'The certificate file does not exist'
-ErrSSLKeyFormat: 'Private key file verification error'
-ErrSSLCertificateFormat: 'Certificate file format error, please use pem format'
-ErrEabKidOrEabHmacKeyCannotBlank: 'EabKid or EabHmacKey cannot be empty'
-ErrOpenrestyNotFound: 'Http mode requires Openresty to be installed first'
-ApplySSLStart: 'Start applying for certificate, domain name [{{ .domain }}] application method [{{ .type }}] '
+ErrEmailIsExist: "Email is already exist"
+ErrSSLKeyNotFound: "The private key file does not exist"
+ErrSSLCertificateNotFound: "The certificate file does not exist"
+ErrSSLKeyFormat: "Private key file verification error"
+ErrSSLCertificateFormat: "Certificate file format error, please use pem format"
+ErrEabKidOrEabHmacKeyCannotBlank: "EabKid or EabHmacKey cannot be empty"
+ErrOpenrestyNotFound: "Http mode requires Openresty to be installed first"
+ApplySSLStart: "Start applying for certificate, domain name [{{ .domain }}] application method [{{ .type }}] "
 dnsAccount: "DNS Automatic"
 dnsManual: "DNS Manual"
 http: "HTTP"
-ApplySSLFailed: 'Application for [{{ .domain }}] certificate failed, {{.detail}} '
-ApplySSLSuccess: 'Application for [{{ .domain }}] certificate successful! ! '
-DNSAccountName: 'DNS account [{{ .name }}] manufacturer [{{.type}}]'
-PushDirLog: 'Certificate pushed to directory [{{ .path }}] {{ .status }}'
+ApplySSLFailed: "Application for [{{ .domain }}] certificate failed, {{.detail}} "
+ApplySSLSuccess: "Application for [{{ .domain }}] certificate successful! ! "
+DNSAccountName: "DNS account [{{ .name }}] manufacturer [{{.type}}]"
+PushDirLog: "Certificate pushed to directory [{{ .path }}] {{ .status }}"
 ErrDeleteCAWithSSL: "There is an issued certificate under the current organization and cannot be deleted"
 ErrDeleteWithPanelSSL: "Panel SSL configuration uses this certificate and cannot be deleted"
 ErrDefaultCA: "The default organization cannot be deleted"
@@ -220,6 +220,9 @@ TaskUpgrade: "Upgrade"
 TaskUpdate: "Update"
 TaskRestart: "Restart"
 TaskRollback: "Rollback"
+TaskPull: "Pull"
+TaskBuild: "Build"
+TaskPush: "Push"
 Website: "Website"
 App: "App"
 Runtime: "Runtime"
@@ -237,9 +240,11 @@ ExecShell: "Execute {{ .name }} Script"
 PullImage: "Pull Image"
 Start: "Start"
 Run: "Run"
-Stop: 'Stop',
-Image: 'Image',
-AppLink: 'Associated Application'
+Stop: "Stop"
+Image: "Image"
+Container: "Container"
+Compose: "Compose"
+AppLink: "Associated Application"
 EnableSSL: "Enable HTTPS"
 AppStore: "App Store"
 TaskSync: "Sync"
@@ -273,3 +278,26 @@ SnapUpload: "Upload snapshot file"
 SnapLoadBackup: "Get backup account information"
 SnapUploadTo: "Upload snapshot file to {{ .name }}"
 SnapUploadRes: "Upload snapshot file to {{ .name }}"
+
+# task - container
+ContainerNewCliet: "Initialize Docker Client" 
+ContainerImagePull: "Pull container image {{ .name }}" 
+ContainerImageCheck: "Check if the image is pulled successfully" 
+ContainerLoadInfo: "Get basic information of the container" 
+ContainerCreate: "Create new container {{ .name }}" 
+ContainerCreateFailed: "Container creation failed, delete the failed container" 
+ContainerStartCheck: "Check if the container has started" 
+
+# task - image
+ImageBuild: "Image build" 
+ImageBuildStdoutCheck: "Parse image output" 
+ImaegBuildRes: "Image build output: {{ .name }}" 
+ImagePull: "Pull image" 
+ImageRepoAuthFromDB: "Get repository authentication information from database" 
+ImaegPullRes: "Image pull output: {{ .name }}" 
+ImagePush: "Push image" 
+ImageRenameTag: "Rename image tag" 
+ImageNewTag: "New image tag {{ .name }}" 
+ImaegPushRes: "Image push output: {{ .name }}" 
+ComposeCreate: "Create compose" 
+ComposeCreateRes: "Compose creation output: {{ .name }}"

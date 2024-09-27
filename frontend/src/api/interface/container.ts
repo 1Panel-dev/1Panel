@@ -143,12 +143,14 @@ export namespace Container {
         isUsed: boolean;
     }
     export interface ImageBuild {
+        taskID: string;
         from: string;
         name: string;
         dockerfile: string;
         tags: Array<string>;
     }
     export interface ImagePull {
+        taskID: string;
         repoID: number;
         imageName: string;
     }
@@ -157,6 +159,7 @@ export namespace Container {
         targetName: string;
     }
     export interface ImagePush {
+        taskID: string;
         repoID: number;
         tagName: string;
     }
@@ -259,6 +262,7 @@ export namespace Container {
         state: string;
     }
     export interface ComposeCreate {
+        taskID: string;
         name: string;
         from: string;
         file: string;

@@ -54,7 +54,6 @@ func (b *BaseApi) ListContainer(c *gin.Context) {
 	helper.SuccessWithData(c, list)
 }
 
-
 // @Tags Container
 // @Summary Load containers status
 // @Description 获取容器状态
@@ -135,12 +134,11 @@ func (b *BaseApi) CreateCompose(c *gin.Context) {
 		return
 	}
 
-	log, err := containerService.CreateCompose(req)
-	if err != nil {
+	if err := containerService.CreateCompose(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	helper.SuccessWithData(c, log)
+	helper.SuccessWithOutData(c)
 }
 
 // @Tags Container Compose

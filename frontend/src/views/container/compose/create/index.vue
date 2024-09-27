@@ -37,12 +37,7 @@
             </el-form-item>
             <el-form-item>
                 <div v-if="form.from === 'edit' || form.from === 'template'" class="w-full">
-                    <el-radio-group v-model="mode" size="small">
-                        <el-radio-button label="edit">{{ $t('commons.button.edit') }}</el-radio-button>
-                        <el-radio-button label="log">{{ $t('commons.button.log') }}</el-radio-button>
-                    </el-radio-group>
                     <CodemirrorPro
-                        v-if="mode === 'edit'"
                         v-model="form.file"
                         placeholder="#Define or paste the content of your docker-compose file here"
                         mode="yaml"
@@ -50,60 +45,44 @@
                     ></CodemirrorPro>
                 </div>
             </el-form-item>
-            <div class="w-full h-32">
-                <LogFile
-                    ref="logRef"
-                    v-model:is-reading="isReading"
-                    :config="logConfig"
-                    :default-button="false"
-                    v-if="mode === 'log' && showLog"
-                    :height-diff="370"
-                />
-            </div>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="drawerVisible = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button type="primary" :disabled="isStartReading || isReading" @click="onSubmit(formRef)">
+                <el-button type="primary" @click="onSubmit(formRef)">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
         </template>
     </DrawerPro>
+    <TaskLog ref="taskLogRef" width="70%" />
 </template>
 
 <script lang="ts" setup>
-import { nextTick, onBeforeUnmount, reactive, ref } from 'vue';
+import { reactive, ref } from 'vue';
 import FileList from '@/components/file-list/index.vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
-import { ElForm, ElMessageBox } from 'element-plus';
+import { ElForm, ElMessage, ElMessageBox } from 'element-plus';
 import { loadBaseDir } from '@/api/modules/setting';
 import { MsgError } from '@/utils/message';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
+import TaskLog from '@/components/task-log/index.vue';
 import { listComposeTemplate, testCompose, upCompose } from '@/api/modules/container';
+import { newUUID } from '@/utils/util';
 
-const showLog = ref(false);
 const loading = ref();
-const mode = ref('edit');
 const oldFrom = ref('edit');
 const drawerVisible = ref(false);
 const templateOptions = ref();
 const baseDir = ref();
 const composeFile = ref();
-let timer: NodeJS.Timer | null = null;
-const logRef = ref();
-const isStartReading = ref(false);
-const isReading = ref();
-
-const logConfig = reactive({
-    type: 'compose-create',
-    name: '',
-});
+const taskLogRef = ref();
 
 const form = reactive({
+    taskID: '',
     name: '',
     from: 'edit',
     path: '',
@@ -122,7 +101,6 @@ const loadTemplates = async () => {
 };
 
 const acceptParams = (): void => {
-    mode.value = 'edit';
     drawerVisible.value = true;
     form.name = '';
     form.from = 'edit';
@@ -131,7 +109,6 @@ const acceptParams = (): void => {
     form.template = null;
     loadTemplates();
     loadPath();
-    isStartReading.value = false;
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -171,8 +148,6 @@ const changeFrom = () => {
 
 const handleClose = () => {
     emit('search');
-    clearInterval(Number(timer));
-    timer = null;
     drawerVisible.value = false;
 };
 
@@ -196,9 +171,6 @@ const onEdit = (item: string) => {
     if (item === 'form') {
         changeFrom();
     }
-    if (!isReading.value && isStartReading.value) {
-        isStartReading.value = false;
-    }
 };
 const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
@@ -213,16 +185,10 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             .then(async (res) => {
                 loading.value = false;
                 if (res.data) {
-                    mode.value = 'log';
-                    await upCompose(form)
-                        .then((res) => {
-                            logConfig.name = res.data;
-                            loadLogs();
-                            isStartReading.value = true;
-                        })
-                        .catch(() => {
-                            loading.value = false;
-                        });
+                    form.taskID = newUUID();
+                    await upCompose(form);
+                    openTaskLog(form.taskID);
+                    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
                 }
             })
             .catch(() => {
@@ -230,25 +196,13 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             });
     });
 };
-
-const loadLogs = () => {
-    showLog.value = false;
-    nextTick(() => {
-        showLog.value = true;
-        nextTick(() => {
-            logRef.value.changeTail(true);
-        });
-    });
+const openTaskLog = (taskID: string) => {
+    taskLogRef.value.openWithTaskID(taskID);
 };
 
 const loadDir = async (path: string) => {
     form.path = path;
 };
-
-onBeforeUnmount(() => {
-    clearInterval(Number(timer));
-    timer = null;
-});
 
 defineExpose({
     acceptParams,

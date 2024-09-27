@@ -35,7 +35,6 @@ const (
 	uploadPath       = "1panel/uploads"
 	downloadPath     = "1panel/download"
 	logPath          = "1panel/log"
-	dockerLogPath    = "1panel/tmp/docker_logs"
 	taskPath         = "1panel/task"
 )
 
@@ -252,8 +251,6 @@ func (u *DeviceService) Clean(req []dto.Clean) {
 			} else {
 				dropFileOrDir(path.Join(global.CONF.System.BaseDir, logPath, item.Name))
 			}
-		case "docker_log":
-			dropFileOrDir(path.Join(global.CONF.System.BaseDir, dockerLogPath, item.Name))
 		case "task_log":
 			pathItem := path.Join(global.CONF.System.BaseDir, taskPath, item.Name)
 			dropFileOrDir(path.Join(global.CONF.System.BaseDir, taskPath, item.Name))
@@ -344,7 +341,6 @@ func (u *DeviceService) CleanForCronjob() (string, error) {
 		}
 	}
 	timeNow := time.Now().Format(constant.DateTimeLayout)
-	dropFileOrDirWithLog(path.Join(global.CONF.System.BaseDir, dockerLogPath), &logs, &size, &fileCount)
 	logs += fmt.Sprintf("\n%s: total clean: %s, total count: %d", timeNow, common.LoadSizeUnit2F(float64(size)), fileCount)
 
 	_ = settingRepo.Update("LastCleanTime", timeNow)
@@ -501,15 +497,10 @@ func loadLogTree(fileOp fileUtils.FileOp) []dto.CleanTree {
 	}
 	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "system_log", Size: uint64(size), Children: list1, Type: "system_log", IsRecommend: true})
 
-	path2 := path.Join(global.CONF.System.BaseDir, dockerLogPath)
-	list2 := loadTreeWithAllFile(true, path2, "docker_log", path2, fileOp)
+	path2 := path.Join(global.CONF.System.BaseDir, taskPath)
+	list2 := loadTreeWithAllFile(false, path2, "task_log", path2, fileOp)
 	size2, _ := fileOp.GetDirSize(path2)
-	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "docker_log", Size: uint64(size2), Children: list2, Type: "docker_log", IsRecommend: true})
-
-	path3 := path.Join(global.CONF.System.BaseDir, taskPath)
-	list3 := loadTreeWithAllFile(false, path3, "task_log", path3, fileOp)
-	size3, _ := fileOp.GetDirSize(path3)
-	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "task_log", Size: uint64(size3), Children: list3, Type: "task_log"})
+	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "task_log", Size: uint64(size2), Children: list2, Type: "task_log"})
 	return treeData
 }
 
