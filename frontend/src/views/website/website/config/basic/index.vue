@@ -45,7 +45,7 @@
             <PHP :website="website" v-if="tabIndex == '13'"></PHP>
         </el-tab-pane>
         <el-tab-pane :label="$t('logs.resource')" name="14">
-            <Resource :id="id" :websiteType="website.type" v-if="tabIndex == '14'"></Resource>
+            <Resource :id="id" v-if="tabIndex == '14'"></Resource>
         </el-tab-pane>
         <el-tab-pane :label="$t('website.other')" name="12">
             <Other :id="id" v-if="tabIndex == '12'"></Other>

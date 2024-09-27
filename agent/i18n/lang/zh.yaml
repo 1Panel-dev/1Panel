@@ -330,3 +330,12 @@ ImageNewTag: "新镜像 Tag {{ .name }}"
 ImaegPushRes: "镜像推送输出：{{ .name }}" 
 ComposeCreate: "创建编排" 
 ComposeCreateRes: "编排创建输出：{{ .name }}" 
+
+# task - website
+BackupNginxConfig: "备份网站 OpenResty 配置文件"
+CompressFileSuccess: "压缩目录成功，压缩为 {{.name}}"
+CompressDir: "压缩目录"
+DeCompressFile: "解压文件 {{ .name }}"
+ErrCheckValid: "校验备份文件失败，{{ .name }}"
+Rollback: "回滚"
+websiteDir: "网站目录"

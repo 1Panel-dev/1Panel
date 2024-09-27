@@ -11,11 +11,16 @@
             label-position="left"
             label-width="90px"
             class="mt-5"
-            v-if="websiteType === 'static' || websiteType === 'runtime'"
+            v-if="website.type === 'static' || website.type === 'runtime'"
         >
-            <el-form-item :label="$t('website.changeDatabase')" prop="databaseID">
-                <el-select v-model="req.databaseID" class="w-full" @change="changeDatabase">
-                    <el-option v-for="(item, index) in databases" :key="index" :label="item.name" :value="item.id">
+            <el-form-item :label="$t('website.changeDatabase')" prop="db">
+                <el-select v-model="req.db" class="w-full" @change="changeDatabase">
+                    <el-option
+                        v-for="(item, index) in databases"
+                        :key="index"
+                        :label="item.name"
+                        :value="item.id + item.type"
+                    >
                         <div class="flex justify-between items-center">
                             <span>{{ item.name }}</span>
                             <el-tag>{{ item.type }}</el-tag>
@@ -34,7 +39,7 @@
     </div>
 </template>
 <script setup lang="ts">
-import { ChangeDatabase, GetWebsiteDatabase, GetWebsiteResource } from '@/api/modules/website';
+import { ChangeDatabase, GetWebsite, GetWebsiteDatabase, GetWebsiteResource } from '@/api/modules/website';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 
@@ -43,18 +48,20 @@ const props = defineProps({
         type: Number,
         default: 0,
     },
-    websiteType: {
-        type: String,
-        default: '',
-    },
 });
 const data = ref([]);
 const req = reactive({
     websiteID: props.id,
     databaseID: 0,
     databaseType: '',
+    db: '',
 });
 const databases = ref([]);
+const website = ref({
+    type: '',
+    dbID: 0,
+    dbType: '',
+});
 
 const search = async () => {
     try {
@@ -68,13 +75,31 @@ const listDatabases = async () => {
         const res = await GetWebsiteDatabase();
         databases.value = res.data;
         if (databases.value.length > 0) {
-            req.databaseID = databases.value[0].id;
+            if (website.value.dbID > 0) {
+                for (let i = 0; i < databases.value.length; i++) {
+                    if (
+                        databases.value[i].id === website.value.dbID &&
+                        databases.value[i].type === website.value.dbType
+                    ) {
+                        req.db = databases.value[i].id + databases.value[i].type;
+                        break;
+                    }
+                }
+            } else {
+                req.db = databases.value[0];
+            }
         }
     } catch (error) {}
 };
 
 const changeDatabase = () => {
-    req.databaseType = databases.value.find((item) => item.id === req.databaseID)?.type;
+    for (let i = 0; i < databases.value.length; i++) {
+        if (databases.value[i].id + databases.value[i].type === req.db) {
+            req.databaseID = databases.value[i].id;
+            req.databaseType = databases.value[i].type;
+            break;
+        }
+    }
 };
 
 const submit = async () => {
@@ -85,9 +110,17 @@ const submit = async () => {
     } catch (error) {}
 };
 
+const getwebsite = async () => {
+    try {
+        const res = await GetWebsite(props.id);
+        website.value = res.data;
+        req.db = '';
+        search();
+        listDatabases();
+    } catch (error) {}
+};
+
 onMounted(() => {
-    console.log('websiteType', props.websiteType);
-    search();
-    listDatabases();
+    getwebsite();
 });
 </script>

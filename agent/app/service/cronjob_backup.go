@@ -41,7 +41,7 @@ func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time) e
 		record.DownloadAccountID, record.SourceAccountIDs = cronjob.DownloadAccountID, cronjob.SourceAccountIDs
 		backupDir := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("app/%s/%s", app.App.Key, app.Name))
 		record.FileName = fmt.Sprintf("app_%s_%s.tar.gz", app.Name, startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5))
-		if err := handleAppBackup(&app, backupDir, record.FileName, cronjob.ExclusionRules, cronjob.Secret); err != nil {
+		if err := handleAppBackup(&app, nil, backupDir, record.FileName, cronjob.ExclusionRules, cronjob.Secret, ""); err != nil {
 			return err
 		}
 		downloadPath, err := u.uploadCronjobBackFile(cronjob, accountMap, path.Join(backupDir, record.FileName))
@@ -74,7 +74,7 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, startTime time.Tim
 		record.DownloadAccountID, record.SourceAccountIDs = cronjob.DownloadAccountID, cronjob.SourceAccountIDs
 		backupDir := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("website/%s", web.PrimaryDomain))
 		record.FileName = fmt.Sprintf("website_%s_%s.tar.gz", web.PrimaryDomain, startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5))
-		if err := handleWebsiteBackup(&web, backupDir, record.FileName, cronjob.ExclusionRules, cronjob.Secret); err != nil {
+		if err := handleWebsiteBackup(&web, backupDir, record.FileName, cronjob.ExclusionRules, cronjob.Secret, ""); err != nil {
 			return err
 		}
 		downloadPath, err := u.uploadCronjobBackFile(cronjob, accountMap, path.Join(backupDir, record.FileName))
