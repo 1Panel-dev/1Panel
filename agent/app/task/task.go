@@ -56,6 +56,8 @@ const (
 	TaskRollback  = "TaskRollback"
 	TaskSync      = "TaskSync"
 	TaskBuild     = "TaskBuild"
+	TaskPull      = "TaskPull"
+	TaskPush      = "TaskPush"
 )
 
 const (
@@ -65,6 +67,9 @@ const (
 	TaskScopeDatabase         = "Database"
 	TaskScopeAppStore         = "AppStore"
 	TaskScopeSnapshot         = "Snapshot"
+	TaskScopeContainer        = "Container"
+	TaskScopeCompose          = "Compose"
+	TaskScopeImage            = "Image"
 	TaskScopeRuntimeExtension = "RuntimeExtension"
 )
 

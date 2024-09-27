@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"io"
 	"os"
 	"os/exec"
 	"path"
@@ -16,9 +15,11 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/compose"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
@@ -149,48 +150,36 @@ func (u *ContainerService) TestCompose(req dto.ComposeCreate) (bool, error) {
 	return true, nil
 }
 
-func (u *ContainerService) CreateCompose(req dto.ComposeCreate) (string, error) {
+func (u *ContainerService) CreateCompose(req dto.ComposeCreate) error {
 	if cmd.CheckIllegal(req.Name, req.Path) {
-		return "", buserr.New(constant.ErrCmdIllegal)
+		return buserr.New(constant.ErrCmdIllegal)
 	}
 	if err := u.loadPath(&req); err != nil {
-		return "", err
+		return err
 	}
-	global.LOG.Infof("docker-compose.yml %s create successful, start to docker-compose up", req.Name)
-
 	if req.From == "path" {
 		req.Name = path.Base(path.Dir(req.Path))
 	}
-
-	dockerLogDir := path.Join(global.CONF.System.TmpDir, "docker_logs")
-	if _, err := os.Stat(dockerLogDir); err != nil && os.IsNotExist(err) {
-		if err = os.MkdirAll(dockerLogDir, os.ModePerm); err != nil {
-			return "", err
-		}
-	}
-	logItem := fmt.Sprintf("%s/compose_create_%s_%s.log", dockerLogDir, req.Name, time.Now().Format(constant.DateTimeSlimLayout))
-	file, err := os.OpenFile(logItem, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	taskItem, err := task.NewTaskWithOps(req.Name, task.TaskCreate, task.TaskScopeCompose, req.TaskID, 1)
 	if err != nil {
-		return "", err
+		return fmt.Errorf("new task for image build failed, err: %v", err)
 	}
 	go func() {
-		defer file.Close()
-		cmd := exec.Command("docker-compose", "-f", req.Path, "up", "-d")
-		multiWriter := io.MultiWriter(os.Stdout, file)
-		cmd.Stdout = multiWriter
-		cmd.Stderr = multiWriter
-		if err := cmd.Run(); err != nil {
-			global.LOG.Errorf("docker-compose up %s failed, err: %v", req.Name, err)
-			_, _ = compose.Down(req.Path)
-			_, _ = file.WriteString("docker-compose up failed!")
-			return
-		}
-		global.LOG.Infof("docker-compose up %s successful!", req.Name)
-		_ = composeRepo.CreateRecord(&model.Compose{Name: req.Name})
-		_, _ = file.WriteString("docker-compose up successful!")
+		taskItem.AddSubTask(i18n.GetMsgByKey("ComposeCreate"), func(t *task.Task) error {
+			cmd := exec.Command("docker-compose", "-f", req.Path, "up", "-d")
+			out, err := cmd.CombinedOutput()
+			taskItem.Log(i18n.GetWithName("ComposeCreateRes", string(out)))
+			if err != nil {
+				_, _ = compose.Down(req.Path)
+				return err
+			}
+			_ = composeRepo.CreateRecord(&model.Compose{Name: req.Name})
+			return nil
+		}, nil)
+		_ = taskItem.Execute()
 	}()
 
-	return path.Base(logItem), nil
+	return nil
 }
 
 func (u *ContainerService) ComposeOperation(req dto.ComposeOperation) error {

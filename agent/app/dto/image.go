@@ -15,6 +15,7 @@ type ImageLoad struct {
 }
 
 type ImageBuild struct {
+	TaskID     string   `json:"taskID"`
 	From       string   `json:"from" validate:"required"`
 	Name       string   `json:"name" validate:"required"`
 	Dockerfile string   `json:"dockerfile" validate:"required"`
@@ -22,6 +23,7 @@ type ImageBuild struct {
 }
 
 type ImagePull struct {
+	TaskID    string `json:"taskID"`
 	RepoID    uint   `json:"repoID"`
 	ImageName string `json:"imageName" validate:"required"`
 }
@@ -32,6 +34,7 @@ type ImageTag struct {
 }
 
 type ImagePush struct {
+	TaskID  string `json:"taskID"`
 	RepoID  uint   `json:"repoID" validate:"required"`
 	TagName string `json:"tagName" validate:"required"`
 	Name    string `json:"name" validate:"required"`

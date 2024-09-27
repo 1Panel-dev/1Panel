@@ -55,6 +55,7 @@ type ResourceLimit struct {
 }
 
 type ContainerOperate struct {
+	TaskID          string         `json:"taskID"`
 	ContainerID     string         `json:"containerID"`
 	ForcePull       bool           `json:"forcePull"`
 	Name            string         `json:"name" validate:"required"`
@@ -218,6 +219,7 @@ type ComposeContainer struct {
 	State       string `json:"state"`
 }
 type ComposeCreate struct {
+	TaskID   string `json:"taskID"`
 	Name     string `json:"name"`
 	From     string `json:"from" validate:"required,oneof=edit path template"`
 	File     string `json:"file"`

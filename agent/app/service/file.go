@@ -475,8 +475,6 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 			return nil, err
 		}
 		logFilePath = taskModel.LogFile
-	case constant.TypeImagePull, constant.TypeImagePush, constant.TypeImageBuild, constant.TypeComposeCreate:
-		logFilePath = path.Join(global.CONF.System.TmpDir, fmt.Sprintf("docker_logs/%s", req.Name))
 	}
 
 	lines, isEndOfFile, total, err := files.ReadFileByLine(logFilePath, req.Page, req.PageSize, req.Latest)
