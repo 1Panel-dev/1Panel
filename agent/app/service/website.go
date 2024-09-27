@@ -1172,11 +1172,7 @@ func (w WebsiteService) OpWebsiteLog(req request.WebsiteLogReq) (*response.Websi
 	if err != nil {
 		return nil, err
 	}
-	nginx, err := getNginxFull(&website)
-	if err != nil {
-		return nil, err
-	}
-	sitePath := path.Join(nginx.SiteDir, "sites", website.Alias)
+	sitePath := GetSitePath(website, SiteDir)
 	res := &response.WebsiteLog{
 		Content: "",
 	}
@@ -1243,7 +1239,7 @@ func (w WebsiteService) OpWebsiteLog(req request.WebsiteLogReq) (*response.Websi
 			return nil, err
 		}
 	case constant.DeleteLog:
-		logPath := path.Join(nginx.Install.GetPath(), "www", "sites", website.Alias, "log", req.LogType)
+		logPath := path.Join(sitePath, "log", req.LogType)
 		if err := files.NewFileOp().WriteFile(logPath, strings.NewReader(""), 0755); err != nil {
 			return nil, err
 		}
@@ -3145,7 +3141,7 @@ func (w WebsiteService) ListDatabases() ([]response.Database, error) {
 	}
 	pgSqls, _ := postgresqlRepo.List()
 	for _, db := range pgSqls {
-		database, _ := databaseRepo.Get(commonRepo.WithByName(db.Name))
+		database, _ := databaseRepo.Get(commonRepo.WithByName(db.PostgresqlName))
 		if database.ID > 0 {
 			res = append(res, response.Database{
 				ID:   db.ID,

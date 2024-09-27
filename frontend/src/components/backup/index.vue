@@ -85,7 +85,7 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="handleClose" :disabled="loading">
+                <el-button @click="handleBackupClose" :disabled="loading">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
                 <el-button type="primary" @click="onSubmit" :disabled="loading">
@@ -96,11 +96,12 @@
     </el-dialog>
 
     <OpDialog ref="opRef" @search="search" />
+    <TaskLog ref="taskLogRef" @close="search" />
 </template>
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
-import { computeSize, dateFormat, downloadFile } from '@/utils/util';
+import { computeSize, dateFormat, downloadFile, newUUID } from '@/utils/util';
 import {
     getLocalBackupDir,
     handleBackup,
@@ -113,10 +114,12 @@ import i18n from '@/lang';
 import { Backup } from '@/api/interface/backup';
 import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
+import TaskLog from '@/components/task-log/index.vue';
 
 const selects = ref<any>([]);
 const loading = ref();
 const opRef = ref();
+const taskLogRef = ref();
 
 const data = ref();
 const paginationConfig = reactive({
@@ -136,6 +139,7 @@ const secret = ref();
 
 const open = ref();
 const isBackup = ref();
+const recordInfo = ref();
 
 interface DialogProps {
     type: string;
@@ -159,6 +163,7 @@ const handleClose = () => {
 };
 const handleBackupClose = () => {
     open.value = false;
+    search();
 };
 
 const loadBackupDir = async () => {
@@ -190,44 +195,60 @@ const search = async () => {
         });
 };
 
-const onSubmit = async (row?: any) => {
-    if (isBackup.value) {
-        let params = {
-            type: type.value,
-            name: name.value,
-            detailName: detailName.value,
-            secret: secret.value,
-        };
-        loading.value = true;
-        await handleBackup(params)
-            .then(() => {
-                loading.value = false;
-                handleClose();
-                handleBackupClose();
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                search();
-            })
-            .catch(() => {
-                loading.value = false;
-            });
-        return;
+const openTaskLog = (taskID: string) => {
+    taskLogRef.value.openWithTaskID(taskID);
+};
+
+const backup = async (close: boolean) => {
+    const taskID = newUUID();
+    let params = {
+        type: type.value,
+        name: name.value,
+        detailName: detailName.value,
+        secret: secret.value,
+        taskID: taskID,
+    };
+    loading.value = true;
+    try {
+        await handleBackup(params);
+        loading.value = false;
+        if (close) {
+            handleClose();
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            search();
+        } else {
+            openTaskLog(taskID);
+        }
+        handleBackupClose();
+    } catch (error) {
+        loading.value = false;
     }
+};
+
+const recover = async (close: boolean, row?: any) => {
+    const taskID = newUUID();
     let params = {
         downloadAccountID: row.downloadAccountID,
         type: type.value,
         name: name.value,
         detailName: detailName.value,
-        file: row.file,
+        file: row.fileDir + '/' + row.fileName,
         secret: secret.value,
+        taskID: taskID,
+        backupRecordID: row.id,
     };
     loading.value = true;
     await handleRecover(params)
         .then(() => {
             loading.value = false;
-            handleClose();
             handleBackupClose();
-            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            search();
+            if (close) {
+                handleClose();
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                search();
+            } else {
+                openTaskLog(taskID);
+            }
         })
         .catch(() => {
             loading.value = false;
@@ -245,7 +266,7 @@ const onBackup = async () => {
                 cancelButtonText: i18n.global.t('commons.button.cancel'),
             },
         ).then(async () => {
-            onSubmit();
+            backup(true);
         });
         return;
     }
@@ -263,11 +284,20 @@ const onRecover = async (row: Backup.RecordInfo) => {
                 cancelButtonText: i18n.global.t('commons.button.cancel'),
             },
         ).then(async () => {
-            onSubmit(row);
+            recover(true, row);
         });
         return;
     }
+    recordInfo.value = row;
     open.value = true;
+};
+
+const onSubmit = () => {
+    if (isBackup.value) {
+        backup(false);
+    } else {
+        recover(false, recordInfo.value);
+    }
 };
 
 const onDownload = async (row: Backup.RecordInfo) => {

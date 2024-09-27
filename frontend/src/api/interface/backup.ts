@@ -70,6 +70,7 @@ export namespace Backup {
         name: string;
         detailName: string;
         secret: string;
+        taskID: string;
     }
     export interface Recover {
         downloadAccountID: number;
@@ -78,5 +79,6 @@ export namespace Backup {
         detailName: string;
         file: string;
         secret: string;
+        taskID: string;
     }
 }

@@ -24,6 +24,8 @@ export namespace Website {
         accessLog?: boolean;
         errorLog?: boolean;
         childSites?: string[];
+        dbID: number;
+        dbType: string;
     }
 
     export interface WebsiteDTO extends Website {

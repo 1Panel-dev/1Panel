@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/task"
+	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"io/fs"
 	"os"
 	"path"
@@ -36,7 +38,7 @@ func (u *BackupService) AppBackup(req dto.CommonBackup) (*model.BackupRecord, er
 	backupDir := path.Join(global.CONF.System.Backup, itemDir)
 
 	fileName := fmt.Sprintf("%s_%s.tar.gz", req.DetailName, timeNow+common.RandStrAndNum(5))
-	if err := handleAppBackup(&install, backupDir, fileName, "", req.Secret); err != nil {
+	if err := handleAppBackup(&install, nil, backupDir, fileName, "", req.Secret, ""); err != nil {
 		return nil, err
 	}
 
@@ -80,55 +82,86 @@ func (u *BackupService) AppRecover(req dto.CommonRecover) error {
 	return nil
 }
 
-func handleAppBackup(install *model.AppInstall, backupDir, fileName string, excludes string, secret string) error {
-	fileOp := files.NewFileOp()
-	tmpDir := fmt.Sprintf("%s/%s", backupDir, strings.ReplaceAll(fileName, ".tar.gz", ""))
-	if !fileOp.Stat(tmpDir) {
-		if err := os.MkdirAll(tmpDir, os.ModePerm); err != nil {
-			return fmt.Errorf("mkdir %s failed, err: %v", backupDir, err)
+func backupDatabaseWithTask(parentTask *task.Task, resourceKey, tmpDir, name string, databaseID uint) error {
+	switch resourceKey {
+	case constant.AppMysql, constant.AppMariaDB:
+		db, err := mysqlRepo.Get(commonRepo.WithByID(databaseID))
+		if err != nil {
+			return err
 		}
-	}
-	defer func() {
-		_ = os.RemoveAll(tmpDir)
-	}()
-
-	remarkInfo, _ := json.Marshal(install)
-	remarkInfoPath := fmt.Sprintf("%s/app.json", tmpDir)
-	if err := fileOp.SaveFile(remarkInfoPath, string(remarkInfo), fs.ModePerm); err != nil {
-		return err
-	}
-
-	appPath := install.GetPath()
-	if err := handleTar(appPath, tmpDir, "app.tar.gz", excludes, ""); err != nil {
-		return err
-	}
-
-	resources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithAppInstallId(install.ID))
-	for _, resource := range resources {
-		switch resource.Key {
-		case constant.AppMysql, constant.AppMariaDB:
-			db, err := mysqlRepo.Get(commonRepo.WithByID(resource.ResourceId))
-			if err != nil {
-				return err
-			}
-			if err := handleMysqlBackup(db.MysqlName, resource.Key, db.Name, tmpDir, fmt.Sprintf("%s.sql.gz", install.Name)); err != nil {
-				return err
-			}
-		case constant.AppPostgresql:
-			db, err := postgresqlRepo.Get(commonRepo.WithByID(resource.ResourceId))
-			if err != nil {
-				return err
-			}
-			if err := handlePostgresqlBackup(db.PostgresqlName, db.Name, tmpDir, fmt.Sprintf("%s.sql.gz", install.Name)); err != nil {
-				return err
-			}
+		parentTask.LogStart(task.GetTaskName(db.Name, task.TaskBackup, task.TaskScopeDatabase))
+		if err := handleMysqlBackup(db.MysqlName, resourceKey, db.Name, tmpDir, fmt.Sprintf("%s.sql.gz", name)); err != nil {
+			return err
 		}
-	}
-
-	if err := handleTar(tmpDir, backupDir, fileName, "", secret); err != nil {
-		return err
+		parentTask.LogSuccess(task.GetTaskName(db.Name, task.TaskBackup, task.TaskScopeDatabase))
+	case constant.AppPostgresql:
+		db, err := postgresqlRepo.Get(commonRepo.WithByID(databaseID))
+		if err != nil {
+			return err
+		}
+		parentTask.LogStart(task.GetTaskName(db.Name, task.TaskBackup, task.TaskScopeDatabase))
+		if err := handlePostgresqlBackup(db.PostgresqlName, db.Name, tmpDir, fmt.Sprintf("%s.sql.gz", name)); err != nil {
+			return err
+		}
+		parentTask.LogSuccess(task.GetTaskName(db.Name, task.TaskBackup, task.TaskScopeDatabase))
 	}
 	return nil
+}
+
+func handleAppBackup(install *model.AppInstall, parentTask *task.Task, backupDir, fileName, excludes, secret, taskID string) error {
+	var (
+		err        error
+		backupTask *task.Task
+	)
+	backupTask = parentTask
+	if parentTask == nil {
+		backupTask, err = task.NewTaskWithOps(install.Name, task.TaskBackup, task.TaskScopeApp, taskID, install.ID)
+		if err != nil {
+			return err
+		}
+	}
+
+	backupApp := func(t *task.Task) error {
+		fileOp := files.NewFileOp()
+		tmpDir := fmt.Sprintf("%s/%s", backupDir, strings.ReplaceAll(fileName, ".tar.gz", ""))
+		if !fileOp.Stat(tmpDir) {
+			if err := os.MkdirAll(tmpDir, os.ModePerm); err != nil {
+				return fmt.Errorf("mkdir %s failed, err: %v", backupDir, err)
+			}
+		}
+		defer func() {
+			_ = os.RemoveAll(tmpDir)
+		}()
+
+		remarkInfo, _ := json.Marshal(install)
+		remarkInfoPath := fmt.Sprintf("%s/app.json", tmpDir)
+		if err := fileOp.SaveFile(remarkInfoPath, string(remarkInfo), fs.ModePerm); err != nil {
+			return err
+		}
+
+		appPath := install.GetPath()
+		if err := handleTar(appPath, tmpDir, "app.tar.gz", excludes, ""); err != nil {
+			return err
+		}
+
+		resources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithAppInstallId(install.ID))
+		for _, resource := range resources {
+			if err = backupDatabaseWithTask(t, resource.Key, tmpDir, install.Name, resource.ResourceId); err != nil {
+				return err
+			}
+		}
+		t.LogStart(i18n.GetMsgByKey("CompressDir"))
+		if err := handleTar(tmpDir, backupDir, fileName, "", secret); err != nil {
+			return err
+		}
+		t.Log(i18n.GetWithName("CompressFileSuccess", fileName))
+		return nil
+	}
+	backupTask.AddSubTask(task.GetTaskName(install.Name, task.TaskBackup, task.TaskScopeApp), backupApp, nil)
+	if parentTask != nil {
+		return backupApp(parentTask)
+	}
+	return backupTask.Execute()
 }
 
 func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback bool, secret string) error {
@@ -160,7 +193,7 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 
 	if !isRollback {
 		rollbackFile := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("app/%s_%s.tar.gz", install.Name, time.Now().Format(constant.DateTimeSlimLayout)))
-		if err := handleAppBackup(install, path.Dir(rollbackFile), path.Base(rollbackFile), "", ""); err != nil {
+		if err := handleAppBackup(install, nil, path.Dir(rollbackFile), path.Base(rollbackFile), "", "", ""); err != nil {
 			return fmt.Errorf("backup app %s for rollback before recover failed, err: %v", install.Name, err)
 		}
 		defer func() {

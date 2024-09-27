@@ -72,3 +72,13 @@ func (u *BackupRepo) WithByCronID(cronjobID uint) DBOption {
 		return g.Where("cronjob_id = ?", cronjobID)
 	}
 }
+
+func (u *BackupRepo) GetRecord(opts ...DBOption) (*model.BackupRecord, error) {
+	var record *model.BackupRecord
+	db := global.DB.Model(&model.BackupRecord{})
+	for _, opt := range opts {
+		db = opt(db)
+	}
+	err := db.Find(record).Error
+	return record, err
+}

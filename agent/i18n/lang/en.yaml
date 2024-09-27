@@ -251,7 +251,6 @@ TaskSync: "Sync"
 LocalApp: "Local App"
 SubTask: "Subtask"
 RuntimeExtension: "Runtime Extension"
-TaskBuild: "Build"
 
 # task - snapshot 
 Snapshot: "Snapshot"
@@ -301,3 +300,12 @@ ImageNewTag: "New image tag {{ .name }}"
 ImaegPushRes: "Image push output: {{ .name }}" 
 ComposeCreate: "Create compose" 
 ComposeCreateRes: "Compose creation output: {{ .name }}"
+
+# task - website
+BackupNginxConfig: "Backup website OpenResty configuration file"
+CompressFileSuccess: "Directory compression successful, compressed as {{.name}}"
+CompressDir: "Compress directory"
+DeCompressFile: "Decompress file {{ .name }}"
+ErrCheckValid: "Failed to validate backup file, {{ .name }}"
+Rollback: "Rollback"
+websiteDir: "Website directory"

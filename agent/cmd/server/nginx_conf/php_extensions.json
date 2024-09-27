@@ -1,7 +1,7 @@
 [
   {
     "name": "ionCube",
-    "check": "ioncube_loader",
+    "check": "ionCube Loader",
     "file": "ioncube_loader.so",
     "versions": ["56", "70", "71", "72", "73", "74", "81", "82"],
     "installed": false

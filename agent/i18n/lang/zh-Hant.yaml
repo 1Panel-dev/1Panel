@@ -253,7 +253,6 @@ TaskSync: "同步"
 LocalApp: "本地應用"
 SubTask: "子任務"
 RuntimeExtension: "運行環境擴展"
-TaskBuild: "構建"
 
 
 # task - snapshot 
@@ -304,3 +303,12 @@ ImageNewTag: "新鏡像 Tag {{ .name }}"
 ImaegPushRes: "鏡像推送輸出：{{ .name }}" 
 ComposeCreate: "創建編排" 
 ComposeCreateRes: "編排創建輸出：{{ .name }}"
+
+# task - website
+BackupNginxConfig: "備份網站 OpenResty 配置檔案"
+CompressFileSuccess: "壓縮目錄成功，壓縮為 {{.name}}"
+CompressDir: "壓縮目錄"
+DeCompressFile: "解壓檔案 {{ .name }}"
+ErrCheckValid: "校驗備份檔案失敗，{{ .name }}"
+Rollback: "回滾"
+websiteDir: "網站目錄"

@@ -251,7 +251,7 @@ func (t *Task) LogFailedWithErr(msg string, err error) {
 func (t *Task) LogSuccess(msg string) {
 	t.Logger.Printf(msg + i18n.GetMsgByKey("Success"))
 }
-func (t *Task) LogSuccessf(format string, v ...any) {
+func (t *Task) LogSuccessF(format string, v ...any) {
 	t.Logger.Printf(fmt.Sprintf(format, v...) + i18n.GetMsgByKey("Success"))
 }
 
