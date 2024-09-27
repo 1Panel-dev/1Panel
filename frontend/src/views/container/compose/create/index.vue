@@ -66,7 +66,7 @@
                                     placeholder="#Define or paste the content of your docker-compose file here"
                                     :indent-with-tab="true"
                                     :tabSize="4"
-                                    style="width: 100%; height: calc(100vh - 376px)"
+                                    style="width: 100%; height: calc(100vh - 400px)"
                                     :lineWrapping="true"
                                     :matchBrackets="true"
                                     theme="cobalt"
@@ -94,6 +94,18 @@
                                 v-model="form.envStr"
                             />
                         </el-form-item>
+                        <span class="input-help whitespace-break-spaces">{{ $t('container.editComposeHelper') }}</span>
+                        <codemirror
+                            v-model="form.envFileContent"
+                            :autofocus="true"
+                            :indent-with-tab="true"
+                            :tabSize="4"
+                            :lineWrapping="true"
+                            :matchBrackets="true"
+                            theme="cobalt"
+                            :styleActiveLine="true"
+                            :extensions="extensions"
+                        ></codemirror>
                     </el-form>
                 </el-col>
             </el-row>
@@ -153,6 +165,7 @@ const form = reactive({
     template: null as number,
     env: [],
     envStr: '',
+    envFileContent: `env_file:\n  - 1panel.env`,
 });
 const rules = reactive({
     name: [Rules.requiredInput, Rules.imageName],

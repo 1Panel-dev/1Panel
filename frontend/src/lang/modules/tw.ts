@@ -629,7 +629,8 @@ const message = {
         emptyUser: '為空時，將使用容器默認的用戶登錄',
         privileged: '特權模式',
         privilegedHelper: '允許容器在主機上執行某些特權操作，可能會增加容器風險，請謹慎開啟！',
-        editComposeHelper: '在菜單中手動輸入的環境變量會覆蓋原有的同名變量，若不存在則新增。',
+        editComposeHelper:
+            '注意：設置的環境變數會默認寫入 1panel.env 文件。\n若需在容器中使用這些參數，還需在 compose 文件中手動添加 env_file 引用。',
 
         upgradeHelper: '倉庫名稱/鏡像名稱:鏡像版本',
         upgradeWarning2: '升級操作需要重建容器，任何未持久化的數據將會丟失，是否繼續？',

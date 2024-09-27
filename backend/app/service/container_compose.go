@@ -4,12 +4,11 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"gopkg.in/yaml.v3"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path"
+	"path/filepath"
 	"sort"
 	"strings"
 	"time"
@@ -161,7 +160,26 @@ func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface
 		}
 		BackDatas = records[start:end]
 	}
-	return int64(total), BackDatas, nil
+	listItem := loadEnv(BackDatas)
+	return int64(total), listItem, nil
+}
+
+func loadEnv(list []dto.ComposeInfo) []dto.ComposeInfo {
+	for i := 0; i < len(list); i++ {
+		envFilePath := filepath.Join(path.Dir(list[i].Path), "1panel.env")
+		file, err := os.ReadFile(envFilePath)
+		if err != nil {
+			continue
+		}
+		lines := strings.Split(string(file), "\n")
+		for _, line := range lines {
+			lineItem := strings.TrimSpace(line)
+			if len(lineItem) != 0 && !strings.HasPrefix(lineItem, "#") {
+				list[i].Env = append(list[i].Env, lineItem)
+			}
+		}
+	}
+	return list
 }
 
 func (u *ContainerService) TestCompose(req dto.ComposeCreate) (bool, error) {
@@ -175,65 +193,15 @@ func (u *ContainerService) TestCompose(req dto.ComposeCreate) (bool, error) {
 	if err := u.loadPath(&req); err != nil {
 		return false, err
 	}
+	if err := newComposeEnv(req.Path, req.Env); err != nil {
+		return false, err
+	}
 	cmd := exec.Command("docker-compose", "-f", req.Path, "config")
 	stdout, err := cmd.CombinedOutput()
 	if err != nil {
 		return false, errors.New(string(stdout))
 	}
 	return true, nil
-}
-
-func formatYAML(data []byte) []byte {
-	return []byte(strings.ReplaceAll(string(data), "\t", "  "))
-}
-
-func updateDockerComposeWithEnv(req dto.ComposeCreate) error {
-	data, err := ioutil.ReadFile(req.Path)
-	if err != nil {
-		return fmt.Errorf("failed to read docker-compose.yml: %v", err)
-	}
-	var composeItem DockerCompose
-	if err := yaml.Unmarshal(data, &composeItem); err != nil {
-		return fmt.Errorf("failed to parse docker-compose.yml: %v", err)
-	}
-	for serviceName, service := range composeItem.Services {
-		envMap := make(map[string]string)
-		if existingEnv, exists := service["environment"].([]interface{}); exists {
-			for _, env := range existingEnv {
-				envStr := env.(string)
-				parts := strings.SplitN(envStr, "=", 2)
-				if len(parts) == 2 {
-					envMap[parts[0]] = parts[1]
-				}
-			}
-		}
-		for _, env := range req.Env {
-			parts := strings.SplitN(env, "=", 2)
-			if len(parts) == 2 {
-				envMap[parts[0]] = parts[1]
-			}
-		}
-		envVars := []string{}
-		for key, value := range envMap {
-			envVars = append(envVars, key+"="+value)
-		}
-		service["environment"] = envVars
-		composeItem.Services[serviceName] = service
-	}
-	if composeItem.Networks != nil {
-		for key := range composeItem.Networks {
-			composeItem.Networks[key] = map[string]interface{}{}
-		}
-	}
-	newData, err := yaml.Marshal(&composeItem)
-	if err != nil {
-		return fmt.Errorf("failed to marshal docker-compose.yml: %v", err)
-	}
-	formattedData := formatYAML(newData)
-	if err := ioutil.WriteFile(req.Path, formattedData, 0644); err != nil {
-		return fmt.Errorf("failed to write docker-compose.yml: %v", err)
-	}
-	return nil
 }
 
 func (u *ContainerService) CreateCompose(req dto.ComposeCreate) (string, error) {
@@ -260,11 +228,8 @@ func (u *ContainerService) CreateCompose(req dto.ComposeCreate) (string, error) 
 	if err != nil {
 		return "", err
 	}
-	if len(req.Env) > 0 {
-		if err := updateDockerComposeWithEnv(req); err != nil {
-			fmt.Printf("failed to update docker-compose.yml with env: %v\n", err)
-			return "", err
-		}
+	if err := newComposeEnv(req.Path, req.Env); err != nil {
+		return "", err
 	}
 	go func() {
 		defer file.Close()
@@ -320,60 +285,6 @@ func (u *ContainerService) ComposeOperation(req dto.ComposeOperation) error {
 	return nil
 }
 
-func updateComposeWithEnv(req dto.ComposeUpdate) error {
-	var composeItem DockerCompose
-	if err := yaml.Unmarshal([]byte(req.Content), &composeItem); err != nil {
-		return fmt.Errorf("failed to parse docker-compose content: %v", err)
-	}
-	for serviceName, service := range composeItem.Services {
-		envMap := make(map[string]string)
-		for _, env := range req.Env {
-			parts := strings.SplitN(env, "=", 2)
-			if len(parts) == 2 {
-				envMap[parts[0]] = parts[1]
-			}
-		}
-		newEnvVars := []string{}
-		if existingEnv, exists := service["environment"].([]interface{}); exists {
-			for _, env := range existingEnv {
-				envStr := env.(string)
-				parts := strings.SplitN(envStr, "=", 2)
-				if len(parts) == 2 {
-					key := parts[0]
-					if value, found := envMap[key]; found {
-						newEnvVars = append(newEnvVars, key+"="+value)
-						delete(envMap, key)
-					} else {
-						newEnvVars = append(newEnvVars, envStr)
-					}
-				}
-			}
-		}
-		for key, value := range envMap {
-			newEnvVars = append(newEnvVars, key+"="+value)
-		}
-		if len(newEnvVars) > 0 {
-			service["environment"] = newEnvVars
-		} else {
-			delete(service, "environment")
-		}
-		composeItem.Services[serviceName] = service
-	}
-	if composeItem.Networks != nil {
-		for key := range composeItem.Networks {
-			composeItem.Networks[key] = map[string]interface{}{}
-		}
-	}
-	newData, err := yaml.Marshal(&composeItem)
-	if err != nil {
-		return fmt.Errorf("failed to marshal docker-compose.yml: %v", err)
-	}
-	if err := ioutil.WriteFile(req.Path, newData, 0644); err != nil {
-		return fmt.Errorf("failed to write docker-compose.yml to path: %v", err)
-	}
-	return nil
-}
-
 func (u *ContainerService) ComposeUpdate(req dto.ComposeUpdate) error {
 	if cmd.CheckIllegal(req.Name, req.Path) {
 		return buserr.New(constant.ErrCmdIllegal)
@@ -382,21 +293,20 @@ func (u *ContainerService) ComposeUpdate(req dto.ComposeUpdate) error {
 	if err != nil {
 		return fmt.Errorf("load file with path %s failed, %v", req.Path, err)
 	}
-	if len(req.Env) > 0 {
-		if err := updateComposeWithEnv(req); err != nil {
-			return fmt.Errorf("failed to update docker-compose with env: %v", err)
-		}
-	} else {
-		file, err := os.OpenFile(req.Path, os.O_WRONLY|os.O_TRUNC, 0640)
-		if err != nil {
-			return err
-		}
-		defer file.Close()
-		write := bufio.NewWriter(file)
-		_, _ = write.WriteString(req.Content)
-		write.Flush()
-		global.LOG.Infof("docker-compose.yml %s has been replaced", req.Path)
+	file, err := os.OpenFile(req.Path, os.O_WRONLY|os.O_TRUNC, 0640)
+	if err != nil {
+		return err
 	}
+	defer file.Close()
+	write := bufio.NewWriter(file)
+	_, _ = write.WriteString(req.Content)
+	write.Flush()
+
+	global.LOG.Infof("docker-compose.yml %s has been replaced, now start to docker-compose restart", req.Path)
+	if err := newComposeEnv(req.Path, req.Env); err != nil {
+		return err
+	}
+
 	if stdout, err := compose.Up(req.Path); err != nil {
 		if err := recreateCompose(string(oldFile), req.Path); err != nil {
 			return fmt.Errorf("update failed when handle compose up, err: %s, recreate failed: %v", string(stdout), err)
@@ -443,5 +353,28 @@ func recreateCompose(content, path string) error {
 	if stdout, err := compose.Up(path); err != nil {
 		return errors.New(string(stdout))
 	}
+	return nil
+}
+
+func newComposeEnv(pathItem string, env []string) error {
+	if len(env) == 0 {
+		return nil
+	}
+	envFilePath := path.Join(path.Dir(pathItem), "1panel.env")
+
+	file, err := os.OpenFile(envFilePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	if err != nil {
+		global.LOG.Errorf("failed to create env file: %v", err)
+		return err
+	}
+	defer file.Close()
+	for _, env := range env {
+		envItem := strings.TrimSpace(env)
+		if _, err := file.WriteString(fmt.Sprintf("%s\n", envItem)); err != nil {
+			global.LOG.Errorf("failed to write env to file: %v", err)
+			return err
+		}
+	}
+	global.LOG.Infof("1panel.env file successfully created or updated with env variables in %s", envFilePath)
 	return nil
 }
