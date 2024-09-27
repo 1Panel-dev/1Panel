@@ -83,7 +83,7 @@
             </template>
         </LayoutContent>
 
-        <EditDialog ref="dialogEditRef" />
+        <EditDialog @search="search" ref="dialogEditRef" />
         <CreateDialog @search="search" ref="dialogRef" />
         <DeleteDialog @search="search" ref="dialogDelRef" />
     </div>
@@ -211,6 +211,8 @@ const onEdit = async (row: Container.ComposeInfo) => {
         name: row.name,
         path: row.path,
         content: res.data,
+        env: row.env,
+        createdBy: row.createdBy,
     };
     dialogEditRef.value!.acceptParams(params);
 };

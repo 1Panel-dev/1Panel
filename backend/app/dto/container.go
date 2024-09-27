@@ -200,6 +200,7 @@ type ComposeInfo struct {
 	Workdir         string             `json:"workdir"`
 	Path            string             `json:"path"`
 	Containers      []ComposeContainer `json:"containers"`
+	Env             []string           `json:"env"`
 }
 type ComposeContainer struct {
 	ContainerID string `json:"containerID"`
