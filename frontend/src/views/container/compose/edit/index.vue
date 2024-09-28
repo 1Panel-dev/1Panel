@@ -19,7 +19,7 @@
                                 placeholder="#Define or paste the content of your docker-compose file here"
                                 :indent-with-tab="true"
                                 :tabSize="4"
-                                style="width: 100%; height: calc(100vh - 300px)"
+                                :style="{ width: '100%', height: `calc(100vh - ${loadHeight()})` }"
                                 :lineWrapping="true"
                                 :matchBrackets="true"
                                 theme="cobalt"
@@ -28,26 +28,34 @@
                                 v-model="content"
                             />
                         </el-form-item>
-                        <el-form-item :label="$t('container.env')" prop="environmentStr" v-if="createdBy === '1Panel'">
-                            <el-input
-                                type="textarea"
-                                :placeholder="$t('container.tagHelper')"
-                                :rows="3"
-                                v-model="environmentStr"
-                            />
-                        </el-form-item>
-                        <span class="input-help whitespace-break-spaces">{{ $t('container.editComposeHelper') }}</span>
-                        <codemirror
-                            v-model="envFileContent"
-                            :autofocus="true"
-                            :indent-with-tab="true"
-                            :tabSize="4"
-                            :lineWrapping="true"
-                            :matchBrackets="true"
-                            theme="cobalt"
-                            :styleActiveLine="true"
-                            :extensions="extensions"
-                        ></codemirror>
+                        <div v-if="createdBy === '1Panel'">
+                            <el-form-item
+                                :label="$t('container.env')"
+                                prop="environmentStr"
+                                v-if="createdBy === '1Panel'"
+                            >
+                                <el-input
+                                    type="textarea"
+                                    :placeholder="$t('container.tagHelper')"
+                                    :rows="3"
+                                    v-model="environmentStr"
+                                />
+                            </el-form-item>
+                            <span class="input-help whitespace-break-spaces">
+                                {{ $t('container.editComposeHelper') }}
+                            </span>
+                            <codemirror
+                                v-model="envFileContent"
+                                :autofocus="true"
+                                :indent-with-tab="true"
+                                :tabSize="4"
+                                :lineWrapping="true"
+                                :matchBrackets="true"
+                                theme="cobalt"
+                                :styleActiveLine="true"
+                                :extensions="extensions"
+                            ></codemirror>
+                        </div>
                     </el-form>
                 </el-col>
             </el-row>
@@ -120,6 +128,9 @@ interface DialogProps {
     createdBy: string;
 }
 
+const loadHeight = () => {
+    return createdBy.value === '1Panel' ? '300px' : '200px';
+};
 const acceptParams = (props: DialogProps): void => {
     composeVisible.value = true;
     path.value = props.path;
