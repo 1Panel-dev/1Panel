@@ -743,7 +743,7 @@ const message = {
         composeHelper: '通过 1Panel 编辑或者模版创建的编排，将保存在 {0}/docker/compose 路径下',
         deleteFile: '删除文件',
         allDelete: '彻底删除',
-        deleteComposeHelper: '1. 删除容器编排记录 \n2. 删除容器编排的所有文件，包括配置文件和持久化文件',
+        deleteComposeHelper: '删除容器编排的所有文件，包括配置文件和持久化文件，请谨慎操作！',
         deleteCompose: '" 删除此编排',
         apps: '应用商店',
         local: '本地',
@@ -762,6 +762,7 @@ const message = {
         up: '启动',
         composeDetailHelper: '该 compose 为 1Panel 编排外部创建。暂不支持启停操作。',
         composeOperatorHelper: '将对 {0} 进行 {1} 操作，是否继续？',
+        composeDownHelper: '将停止并删除 {0} 编排下所有容器及网络，是否继续？',
 
         setting: '配置',
         operatorStatusHelper: '此操作将{0}Docker 服务，是否继续？',

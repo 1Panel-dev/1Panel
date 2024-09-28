@@ -258,30 +258,20 @@ func (u *ContainerService) ComposeOperation(req dto.ComposeOperation) error {
 	if _, err := os.Stat(req.Path); err != nil {
 		return fmt.Errorf("load file with path %s failed, %v", req.Path, err)
 	}
-	if req.Operation == "up" {
-		if stdout, err := compose.Up(req.Path); err != nil {
+	if req.Operation == "delete" {
+		if stdout, err := compose.Operate(req.Path, "down"); err != nil {
 			return errors.New(string(stdout))
 		}
-	} else {
-		if stdout, err := compose.Operate(req.Path, req.Operation); err != nil {
-			return errors.New(string(stdout))
+		if req.WithFile {
+			_ = os.RemoveAll(path.Dir(req.Path))
 		}
+		_ = composeRepo.DeleteRecord(commonRepo.WithByName(req.Name))
+		return nil
+	}
+	if stdout, err := compose.Operate(req.Path, req.Operation); err != nil {
+		return errors.New(string(stdout))
 	}
 	global.LOG.Infof("docker-compose %s %s successful", req.Operation, req.Name)
-	if req.Operation == "down" {
-		if req.WithFile {
-			_ = composeRepo.DeleteRecord(commonRepo.WithByName(req.Name))
-			_ = os.RemoveAll(path.Dir(req.Path))
-		} else {
-			composeItem, _ := composeRepo.GetRecord(commonRepo.WithByName(req.Name))
-			if composeItem.Path == "" {
-				upMap := make(map[string]interface{})
-				upMap["path"] = req.Path
-				_ = composeRepo.UpdateRecord(req.Name, upMap)
-			}
-		}
-	}
-
 	return nil
 }
 

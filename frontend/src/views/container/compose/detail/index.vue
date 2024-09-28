@@ -260,15 +260,18 @@ const onOperate = async (op: string) => {
 };
 
 const onComposeOperate = async (operation: string) => {
-    ElMessageBox.confirm(
-        i18n.global.t('container.composeOperatorHelper', [composeName.value, i18n.global.t('container.' + operation)]),
-        i18n.global.t('container.' + operation),
-        {
-            confirmButtonText: i18n.global.t('commons.button.confirm'),
-            cancelButtonText: i18n.global.t('commons.button.cancel'),
-            type: 'info',
-        },
-    ).then(async () => {
+    let mes =
+        operation === 'down'
+            ? i18n.global.t('container.composeDownHelper', [composeName.value])
+            : i18n.global.t('container.composeOperatorHelper', [
+                  composeName.value,
+                  i18n.global.t('container.' + operation),
+              ]);
+    ElMessageBox.confirm(mes, i18n.global.t('container.' + operation), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'info',
+    }).then(async () => {
         let params = {
             name: composeName.value,
             path: composePath.value,

@@ -772,7 +772,7 @@ const message = {
         deleteFile: 'Delete file',
         allDelete: 'Permanently Delete',
         deleteComposeHelper:
-            '1. Delete container orchestration records \n2. Delete all container orchestration files, including configuration and persistent files',
+            'Delete all files related to container compose, including configuration files and persistent files. Please proceed with caution!',
         deleteCompose: '" Delete this composition.',
         apps: 'Apps',
         local: 'Local',
@@ -792,6 +792,8 @@ const message = {
         composeDetailHelper:
             'The compose is created external to 1Panel. The start and stop operations are not supported.',
         composeOperatorHelper: '{1} operation will be performed on {0}. Do you want to continue?',
+        composeDownHelper:
+            'This will stop and remove all containers and networks under the {0} compose. Do you want to continue?',
 
         setting: 'Setting',
         operatorStatusHelper: 'This action will {0} Docker service, do you want to continue?',

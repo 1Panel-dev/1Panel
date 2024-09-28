@@ -7,7 +7,7 @@
     >
         <el-form ref="deleteForm" v-loading="loading">
             <el-form-item>
-                <el-checkbox v-model="deleteFile" :label="$t('container.allDelete')" />
+                <el-checkbox v-model="deleteFile" :label="$t('container.deleteFile')" />
                 <span class="input-help whitespace-break-spaces">
                     {{ $t('container.deleteComposeHelper') }}
                 </span>
@@ -69,7 +69,7 @@ const submit = async () => {
     let params = {
         name: composeName.value,
         path: composePath.value,
-        operation: 'down',
+        operation: 'delete',
         withFile: deleteFile.value,
     };
     await composeOperator(params)
