@@ -654,6 +654,8 @@ const message = {
         privileged: 'Privileged',
         privilegedHelper:
             'Allows the container to perform certain privileged operations on the host, which may increase container risks. Use with caution!',
+        editComposeHelper:
+            'Note: The environment variables set will be written to the 1panel.env file by default.\nIf you want to use these parameters in the container, you also need to manually add an env_file reference in the compose file.',
 
         upgradeHelper: 'Repository Name/Image Name: Image Version',
         upgradeWarning2:
@@ -768,12 +770,14 @@ const message = {
         composeHelper:
             'The composition created through 1Panel editor or template will be saved in the {0}/docker/compose directory.',
         deleteFile: 'Delete file',
+        allDelete: 'Permanently Delete',
         deleteComposeHelper:
-            'Delete all files in the {0} directory, including persistent files in this directory. Please proceed with caution!',
+            'Delete all files related to container compose, including configuration files and persistent files. Please proceed with caution!',
         deleteCompose: '" Delete this composition.',
         apps: 'Apps',
         local: 'Local',
         createCompose: 'Create',
+        composeDirectory: 'Compose Directory',
         template: 'Template',
         composeTemplate: 'Compose template',
         createComposeTemplate: 'Create',
@@ -781,11 +785,16 @@ const message = {
         content: 'Content',
         contentEmpty: 'Compose content cannot be empty, please enter and try again!',
         containerNumber: 'Container number',
+        containerStatus: 'Container Status',
+        exited: 'Exited',
+        running: 'Running',
         down: 'Down',
         up: 'Up',
         composeDetailHelper:
             'The compose is created external to 1Panel. The start and stop operations are not supported.',
         composeOperatorHelper: '{1} operation will be performed on {0}. Do you want to continue?',
+        composeDownHelper:
+            'This will stop and remove all containers and networks under the {0} compose. Do you want to continue?',
 
         setting: 'Setting',
         operatorStatusHelper: 'This action will {0} Docker service, do you want to continue?',

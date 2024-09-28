@@ -8,8 +8,8 @@
         <el-form ref="deleteForm" v-loading="loading">
             <el-form-item>
                 <el-checkbox v-model="deleteFile" :label="$t('container.deleteFile')" />
-                <span class="input-help">
-                    {{ $t('container.deleteComposeHelper', [loadComposeDir()]) }}
+                <span class="input-help whitespace-break-spaces">
+                    {{ $t('container.deleteComposeHelper') }}
                 </span>
             </el-form-item>
             <el-form-item>
@@ -64,21 +64,12 @@ const acceptParams = async (prop: DialogProps) => {
     dialogVisible.value = true;
 };
 
-const loadComposeDir = () => {
-    const parts = composePath.value.split('/');
-    if (parts.length <= 2) {
-        return '/';
-    }
-    const parentDirectory = parts.slice(0, -1).join('/');
-    return parentDirectory;
-};
-
 const submit = async () => {
     loading.value = true;
     let params = {
         name: composeName.value,
         path: composePath.value,
-        operation: 'down',
+        operation: 'delete',
         withFile: deleteFile.value,
     };
     await composeOperator(params)

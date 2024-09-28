@@ -10,20 +10,6 @@
         </el-card>
 
         <LayoutContent v-if="!isOnDetail" :title="$t('container.compose')" :class="{ mask: dockerStatus != 'Running' }">
-            <template #prompt>
-                <el-alert type="info" :closable="false">
-                    <template #title>
-                        <span class="flx-align-center">
-                            <span>{{ $t('container.composeHelper', [baseDir]) }}</span>
-                            <el-button type="primary" link @click="toFolder">
-                                <el-icon>
-                                    <FolderOpened />
-                                </el-icon>
-                            </el-button>
-                        </span>
-                    </template>
-                </el-alert>
-            </template>
             <template #toolbar>
                 <div class="flex justify-between gap-2 flex-wrap sm:flex-row">
                     <div class="flex flex-wrap gap-3">
@@ -48,6 +34,7 @@
                         :label="$t('commons.table.name')"
                         width="170"
                         prop="name"
+                        sortable
                         fix
                         show-overflow-tooltip
                     >
@@ -64,12 +51,22 @@
                             <span v-if="row.createdBy === '1Panel'">1Panel</span>
                         </template>
                     </el-table-column>
-                    <el-table-column
-                        :label="$t('container.containerNumber')"
-                        prop="containerNumber"
-                        min-width="80"
-                        fix
-                    />
+                    <el-table-column :label="$t('container.composeDirectory')" min-width="80" fix>
+                        <template #default="{ row }">
+                            <el-button type="primary" link @click="toComposeFolder(row)">
+                                <el-icon>
+                                    <FolderOpened />
+                                </el-icon>
+                            </el-button>
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('container.containerStatus')" min-width="80" fix>
+                        <template #default="scope">
+                            <div>
+                                {{ getContainerStatus(scope.row.containers) }}
+                            </div>
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('commons.table.createdAt')" prop="createdAt" min-width="80" fix />
                     <fu-table-operations
                         width="200px"
@@ -82,7 +79,7 @@
             </template>
         </LayoutContent>
 
-        <EditDialog ref="dialogEditRef" />
+        <EditDialog @search="search" ref="dialogEditRef" />
         <CreateDialog @search="search" ref="dialogRef" />
         <DeleteDialog @search="search" ref="dialogDelRef" />
     </div>
@@ -135,8 +132,8 @@ const goSetting = async () => {
     router.push({ name: 'ContainerSetting' });
 };
 
-const toFolder = async () => {
-    router.push({ path: '/hosts/files', query: { path: baseDir.value + '/docker/compose' } });
+const toComposeFolder = async (row: Container.ComposeInfo) => {
+    router.push({ path: '/hosts/files', query: { path: baseDir.value + '/docker/compose/' + row.name } });
 };
 
 const loadPath = async () => {
@@ -173,6 +170,17 @@ const loadDetail = async (row: Container.ComposeInfo) => {
     isOnDetail.value = true;
     composeDetailRef.value!.acceptParams(params);
 };
+const getContainerStatus = (containers) => {
+    const safeContainers = containers || [];
+    const runningCount = safeContainers.filter((container) => container.state.toLowerCase() === 'running').length;
+    const totalCount = safeContainers.length;
+    const statusText = runningCount > 0 ? 'Running' : 'Exited';
+    if (statusText === 'Exited') {
+        return i18n.global.t('container.exited');
+    } else {
+        return i18n.global.t('container.running') + ` (${runningCount}/${totalCount})`;
+    }
+};
 const backList = async () => {
     isOnDetail.value = false;
     search();
@@ -199,6 +207,8 @@ const onEdit = async (row: Container.ComposeInfo) => {
         name: row.name,
         path: row.path,
         content: res.data,
+        env: row.env,
+        createdBy: row.createdBy,
     };
     dialogEditRef.value!.acceptParams(params);
 };

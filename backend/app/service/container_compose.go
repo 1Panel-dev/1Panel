@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"path/filepath"
 	"sort"
 	"strings"
 	"time"
@@ -30,6 +31,12 @@ const composeProjectLabel = "com.docker.compose.project"
 const composeConfigLabel = "com.docker.compose.project.config_files"
 const composeWorkdirLabel = "com.docker.compose.project.working_dir"
 const composeCreatedBy = "createdBy"
+
+type DockerCompose struct {
+	Version  string                            `yaml:"version"`
+	Services map[string]map[string]interface{} `yaml:"services"`
+	Networks map[string]interface{}            `yaml:"networks"`
+}
 
 func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface{}, error) {
 	var (
@@ -153,7 +160,26 @@ func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface
 		}
 		BackDatas = records[start:end]
 	}
-	return int64(total), BackDatas, nil
+	listItem := loadEnv(BackDatas)
+	return int64(total), listItem, nil
+}
+
+func loadEnv(list []dto.ComposeInfo) []dto.ComposeInfo {
+	for i := 0; i < len(list); i++ {
+		envFilePath := filepath.Join(path.Dir(list[i].Path), "1panel.env")
+		file, err := os.ReadFile(envFilePath)
+		if err != nil {
+			continue
+		}
+		lines := strings.Split(string(file), "\n")
+		for _, line := range lines {
+			lineItem := strings.TrimSpace(line)
+			if len(lineItem) != 0 && !strings.HasPrefix(lineItem, "#") {
+				list[i].Env = append(list[i].Env, lineItem)
+			}
+		}
+	}
+	return list
 }
 
 func (u *ContainerService) TestCompose(req dto.ComposeCreate) (bool, error) {
@@ -165,6 +191,9 @@ func (u *ContainerService) TestCompose(req dto.ComposeCreate) (bool, error) {
 		return false, constant.ErrRecordExist
 	}
 	if err := u.loadPath(&req); err != nil {
+		return false, err
+	}
+	if err := newComposeEnv(req.Path, req.Env); err != nil {
 		return false, err
 	}
 	cmd := exec.Command("docker-compose", "-f", req.Path, "config")
@@ -199,6 +228,9 @@ func (u *ContainerService) CreateCompose(req dto.ComposeCreate) (string, error) 
 	if err != nil {
 		return "", err
 	}
+	if err := newComposeEnv(req.Path, req.Env); err != nil {
+		return "", err
+	}
 	go func() {
 		defer file.Close()
 		cmd := exec.Command("docker-compose", "-f", req.Path, "up", "-d")
@@ -226,30 +258,20 @@ func (u *ContainerService) ComposeOperation(req dto.ComposeOperation) error {
 	if _, err := os.Stat(req.Path); err != nil {
 		return fmt.Errorf("load file with path %s failed, %v", req.Path, err)
 	}
-	if req.Operation == "up" {
-		if stdout, err := compose.Up(req.Path); err != nil {
+	if req.Operation == "delete" {
+		if stdout, err := compose.Operate(req.Path, "down"); err != nil {
 			return errors.New(string(stdout))
 		}
-	} else {
-		if stdout, err := compose.Operate(req.Path, req.Operation); err != nil {
-			return errors.New(string(stdout))
+		if req.WithFile {
+			_ = os.RemoveAll(path.Dir(req.Path))
 		}
+		_ = composeRepo.DeleteRecord(commonRepo.WithByName(req.Name))
+		return nil
+	}
+	if stdout, err := compose.Operate(req.Path, req.Operation); err != nil {
+		return errors.New(string(stdout))
 	}
 	global.LOG.Infof("docker-compose %s %s successful", req.Operation, req.Name)
-	if req.Operation == "down" {
-		if req.WithFile {
-			_ = composeRepo.DeleteRecord(commonRepo.WithByName(req.Name))
-			_ = os.RemoveAll(path.Dir(req.Path))
-		} else {
-			composeItem, _ := composeRepo.GetRecord(commonRepo.WithByName(req.Name))
-			if composeItem.Path == "" {
-				upMap := make(map[string]interface{})
-				upMap["path"] = req.Path
-				_ = composeRepo.UpdateRecord(req.Name, upMap)
-			}
-		}
-	}
-
 	return nil
 }
 
@@ -271,6 +293,10 @@ func (u *ContainerService) ComposeUpdate(req dto.ComposeUpdate) error {
 	write.Flush()
 
 	global.LOG.Infof("docker-compose.yml %s has been replaced, now start to docker-compose restart", req.Path)
+	if err := newComposeEnv(req.Path, req.Env); err != nil {
+		return err
+	}
+
 	if stdout, err := compose.Up(req.Path); err != nil {
 		if err := recreateCompose(string(oldFile), req.Path); err != nil {
 			return fmt.Errorf("update failed when handle compose up, err: %s, recreate failed: %v", string(stdout), err)
@@ -317,5 +343,28 @@ func recreateCompose(content, path string) error {
 	if stdout, err := compose.Up(path); err != nil {
 		return errors.New(string(stdout))
 	}
+	return nil
+}
+
+func newComposeEnv(pathItem string, env []string) error {
+	if len(env) == 0 {
+		return nil
+	}
+	envFilePath := path.Join(path.Dir(pathItem), "1panel.env")
+
+	file, err := os.OpenFile(envFilePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	if err != nil {
+		global.LOG.Errorf("failed to create env file: %v", err)
+		return err
+	}
+	defer file.Close()
+	for _, env := range env {
+		envItem := strings.TrimSpace(env)
+		if _, err := file.WriteString(fmt.Sprintf("%s\n", envItem)); err != nil {
+			global.LOG.Errorf("failed to write env to file: %v", err)
+			return err
+		}
+	}
+	global.LOG.Infof("1panel.env file successfully created or updated with env variables in %s", envFilePath)
 	return nil
 }

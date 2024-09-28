@@ -1,5 +1,5 @@
 <template>
-    <div v-loading="isLoading">
+    <div v-loading="firstLoading">
         <div v-if="defaultButton">
             <el-checkbox border v-model="tailLog" class="float-left" @change="changeTail(false)">
                 {{ $t('commons.button.watch') }}
@@ -78,6 +78,7 @@ const minPage = ref(1);
 const maxPage = ref(1);
 const logs = ref([]);
 const isLoading = ref(false);
+const firstLoading = ref(true);
 
 const readReq = reactive({
     id: 0,
@@ -129,6 +130,7 @@ const getContent = (pre: boolean) => {
     }
     isLoading.value = true;
     ReadByLine(readReq).then((res) => {
+        firstLoading.value = false;
         if (!end.value && res.data.end) {
             lastLogs.value = [...logs.value];
         }
@@ -193,7 +195,7 @@ const getContent = (pre: boolean) => {
             maxPage.value = res.data.total;
             minPage.value = res.data.total;
         }
-        if (logs.value && logs.value.length > 3000) {
+        if (logs.value && logs.value.length > 1000) {
             logs.value.splice(0, readReq.pageSize);
             if (minPage.value > 1) {
                 minPage.value--;
@@ -278,8 +280,6 @@ const init = () => {
     }
     readReq.latest = true;
     search();
-
-    nextTick(() => {});
 };
 
 const clearLog = (): void => {

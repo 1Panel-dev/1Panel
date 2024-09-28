@@ -115,7 +115,9 @@ const acceptParams = (props: EditProps) => {
     isFullscreen.value = fileType.value === 'excel';
 
     loading.value = true;
-    fileUrl.value = `${import.meta.env.VITE_API_URL as string}/files/download?path=${encodeURIComponent(props.path)}`;
+    fileUrl.value = `${import.meta.env.VITE_API_URL as string}/files/download?path=${encodeURIComponent(
+        props.path,
+    )}&timestamp=${new Date().getTime()}`;
     open.value = true;
     loading.value = false;
 };

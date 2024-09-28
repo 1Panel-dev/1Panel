@@ -35,6 +35,7 @@
                         :label="$t('commons.table.name')"
                         min-width="100"
                         prop="name"
+                        sortable
                         fix
                         show-overflow-tooltip
                     >
@@ -47,7 +48,7 @@
                     <el-table-column :label="$t('container.description')" prop="description" min-width="200" fix />
                     <el-table-column :label="$t('commons.table.createdAt')" min-width="80" fix>
                         <template #default="{ row }">
-                            {{ dateFormatSimple(row.createdAt) }}
+                            {{ dateFormat(0, 0, row.createdAt) }}
                         </template>
                     </el-table-column>
                     <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" />
@@ -63,7 +64,7 @@
 
 <script lang="ts" setup>
 import { reactive, onMounted, ref } from 'vue';
-import { dateFormatSimple } from '@/utils/util';
+import { dateFormat } from '@/utils/util';
 import { Container } from '@/api/interface/container';
 import DetailDialog from '@/views/container/template/detail/index.vue';
 import OperatorDialog from '@/views/container/template/operator/index.vue';

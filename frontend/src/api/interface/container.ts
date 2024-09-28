@@ -241,6 +241,8 @@ export namespace Container {
         path: string;
         containers: Array<ComposeContainer>;
         expand: boolean;
+        envStr: string;
+        env: Array<string>;
     }
     export interface ComposeContainer {
         name: string;
@@ -254,6 +256,8 @@ export namespace Container {
         file: string;
         path: string;
         template: number;
+        env: Array<string>;
+        envStr: string;
     }
     export interface ComposeOperation {
         name: string;
@@ -265,6 +269,8 @@ export namespace Container {
         name: string;
         path: string;
         content: string;
+        env: Array<string>;
+        createdBy: string;
     }
 
     export interface TemplateCreate {
