@@ -38,7 +38,7 @@ func (u *BackupService) AppBackup(req dto.CommonBackup) (*model.BackupRecord, er
 	backupDir := path.Join(global.CONF.System.Backup, itemDir)
 
 	fileName := fmt.Sprintf("%s_%s.tar.gz", req.DetailName, timeNow+common.RandStrAndNum(5))
-	if err := handleAppBackup(&install, nil, backupDir, fileName, "", req.Secret, ""); err != nil {
+	if err := handleAppBackup(&install, nil, backupDir, fileName, "", req.Secret, req.TaskID); err != nil {
 		return nil, err
 	}
 
@@ -76,7 +76,7 @@ func (u *BackupService) AppRecover(req dto.CommonRecover) error {
 	if _, err := compose.Down(install.GetComposePath()); err != nil {
 		return err
 	}
-	if err := handleAppRecover(&install, req.File, false, req.Secret); err != nil {
+	if err := handleAppRecover(&install, nil, req.File, false, req.Secret, req.TaskID); err != nil {
 		return err
 	}
 	return nil
@@ -164,151 +164,184 @@ func handleAppBackup(install *model.AppInstall, parentTask *task.Task, backupDir
 	return backupTask.Execute()
 }
 
-func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback bool, secret string) error {
-	isOk := false
-	fileOp := files.NewFileOp()
-	if err := handleUnTar(recoverFile, path.Dir(recoverFile), secret); err != nil {
-		return err
-	}
-	tmpPath := strings.ReplaceAll(recoverFile, ".tar.gz", "")
-	defer func() {
-		_, _ = compose.Up(install.GetComposePath())
-		_ = os.RemoveAll(strings.ReplaceAll(recoverFile, ".tar.gz", ""))
-	}()
-
-	if !fileOp.Stat(tmpPath+"/app.json") || !fileOp.Stat(tmpPath+"/app.tar.gz") {
-		return errors.New("the wrong recovery package does not have app.json or app.tar.gz files")
-	}
-	var oldInstall model.AppInstall
-	appjson, err := os.ReadFile(tmpPath + "/app.json")
-	if err != nil {
-		return err
-	}
-	if err := json.Unmarshal(appjson, &oldInstall); err != nil {
-		return fmt.Errorf("unmarshal app.json failed, err: %v", err)
-	}
-	if oldInstall.App.Key != install.App.Key || oldInstall.Name != install.Name {
-		return errors.New("the current backup file does not match the application")
-	}
-
-	if !isRollback {
-		rollbackFile := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("app/%s_%s.tar.gz", install.Name, time.Now().Format(constant.DateTimeSlimLayout)))
-		if err := handleAppBackup(install, nil, path.Dir(rollbackFile), path.Base(rollbackFile), "", "", ""); err != nil {
-			return fmt.Errorf("backup app %s for rollback before recover failed, err: %v", install.Name, err)
-		}
-		defer func() {
-			if !isOk {
-				global.LOG.Info("recover failed, start to rollback now")
-				if err := handleAppRecover(install, rollbackFile, true, secret); err != nil {
-					global.LOG.Errorf("rollback app %s from %s failed, err: %v", install.Name, rollbackFile, err)
-					return
-				}
-				global.LOG.Infof("rollback app %s from %s successful", install.Name, rollbackFile)
-				_ = os.RemoveAll(rollbackFile)
-			} else {
-				_ = os.RemoveAll(rollbackFile)
-			}
-		}()
-	}
-
-	newEnvFile := ""
-	resources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithAppInstallId(install.ID))
-	for _, resource := range resources {
-		var database model.Database
-		switch resource.From {
-		case constant.AppResourceRemote:
-			database, err = databaseRepo.Get(commonRepo.WithByID(resource.LinkId))
-			if err != nil {
-				return err
-			}
-		case constant.AppResourceLocal:
-			resourceApp, err := appInstallRepo.GetFirst(commonRepo.WithByID(resource.LinkId))
-			if err != nil {
-				return err
-			}
-			database, err = databaseRepo.Get(databaseRepo.WithAppInstallID(resourceApp.ID), commonRepo.WithByType(resource.Key), commonRepo.WithByFrom(constant.AppResourceLocal), commonRepo.WithByName(resourceApp.Name))
-			if err != nil {
-				return err
-			}
-		}
-		switch database.Type {
-		case constant.AppPostgresql:
-			db, err := postgresqlRepo.Get(commonRepo.WithByID(resource.ResourceId))
-			if err != nil {
-				return err
-			}
-			if err := handlePostgresqlRecover(dto.CommonRecover{
-				Name:       database.Name,
-				DetailName: db.Name,
-				File:       fmt.Sprintf("%s/%s.sql.gz", tmpPath, install.Name),
-			}, true); err != nil {
-				global.LOG.Errorf("handle recover from sql.gz failed, err: %v", err)
-				return err
-			}
-		case constant.AppMysql, constant.AppMariaDB:
-			db, err := mysqlRepo.Get(commonRepo.WithByID(resource.ResourceId))
-			if err != nil {
-				return err
-			}
-			newDB, envMap, err := reCreateDB(db.ID, database, oldInstall.Env)
-			if err != nil {
-				return err
-			}
-			oldHost := fmt.Sprintf("\"PANEL_DB_HOST\":\"%v\"", envMap["PANEL_DB_HOST"].(string))
-			newHost := fmt.Sprintf("\"PANEL_DB_HOST\":\"%v\"", database.Address)
-			oldInstall.Env = strings.ReplaceAll(oldInstall.Env, oldHost, newHost)
-			envMap["PANEL_DB_HOST"] = database.Address
-			newEnvFile, err = coverEnvJsonToStr(oldInstall.Env)
-			if err != nil {
-				return err
-			}
-			_ = appInstallResourceRepo.BatchUpdateBy(map[string]interface{}{"resource_id": newDB.ID}, commonRepo.WithByID(resource.ID))
-
-			if err := handleMysqlRecover(dto.CommonRecover{
-				Name:       newDB.MysqlName,
-				DetailName: newDB.Name,
-				File:       fmt.Sprintf("%s/%s.sql.gz", tmpPath, install.Name),
-			}, true); err != nil {
-				global.LOG.Errorf("handle recover from sql.gz failed, err: %v", err)
-				return err
-			}
-		}
-	}
-
-	appDir := install.GetPath()
-	backPath := fmt.Sprintf("%s_bak", appDir)
-	_ = fileOp.Rename(appDir, backPath)
-	_ = fileOp.CreateDir(appDir, 0755)
-
-	if err := handleUnTar(tmpPath+"/app.tar.gz", install.GetAppPath(), ""); err != nil {
-		global.LOG.Errorf("handle recover from app.tar.gz failed, err: %v", err)
-		_ = fileOp.DeleteDir(appDir)
-		_ = fileOp.Rename(backPath, appDir)
-		return err
-	}
-	_ = fileOp.DeleteDir(backPath)
-
-	if len(newEnvFile) != 0 {
-		envPath := fmt.Sprintf("%s/%s/.env", install.GetAppPath(), install.Name)
-		file, err := os.OpenFile(envPath, os.O_WRONLY|os.O_TRUNC, 0640)
+func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverFile string, isRollback bool, secret, taskID string) error {
+	var (
+		err          error
+		recoverTask  *task.Task
+		isOk         = false
+		rollbackFile string
+	)
+	recoverTask = parentTask
+	if parentTask == nil {
+		recoverTask, err = task.NewTaskWithOps(install.Name, task.TaskRecover, task.TaskScopeApp, taskID, install.ID)
 		if err != nil {
 			return err
 		}
-		defer file.Close()
-		_, _ = file.WriteString(newEnvFile)
 	}
 
-	oldInstall.ID = install.ID
-	oldInstall.Status = constant.StatusRunning
-	oldInstall.AppId = install.AppId
-	oldInstall.AppDetailId = install.AppDetailId
-	oldInstall.App.ID = install.AppId
-	if err := appInstallRepo.Save(context.Background(), &oldInstall); err != nil {
-		global.LOG.Errorf("save db app install failed, err: %v", err)
-		return err
-	}
-	isOk = true
+	recoverApp := func(t *task.Task) error {
+		fileOp := files.NewFileOp()
+		if err := handleUnTar(recoverFile, path.Dir(recoverFile), secret); err != nil {
+			return err
+		}
+		tmpPath := strings.ReplaceAll(recoverFile, ".tar.gz", "")
+		defer func() {
+			_, _ = compose.Up(install.GetComposePath())
+			_ = os.RemoveAll(strings.ReplaceAll(recoverFile, ".tar.gz", ""))
+		}()
 
+		if !fileOp.Stat(tmpPath+"/app.json") || !fileOp.Stat(tmpPath+"/app.tar.gz") {
+			return errors.New(i18n.GetMsgByKey("AppBackupFileIncomplete"))
+		}
+		var oldInstall model.AppInstall
+		appJson, err := os.ReadFile(tmpPath + "/app.json")
+		if err != nil {
+			return err
+		}
+		if err := json.Unmarshal(appJson, &oldInstall); err != nil {
+			return fmt.Errorf("unmarshal app.json failed, err: %v", err)
+		}
+		if oldInstall.App.Key != install.App.Key || oldInstall.Name != install.Name {
+			return errors.New(i18n.GetMsgByKey("AppAttributesNotMatch"))
+		}
+
+		if !isRollback {
+			rollbackFile = path.Join(global.CONF.System.TmpDir, fmt.Sprintf("app/%s_%s.tar.gz", install.Name, time.Now().Format(constant.DateTimeSlimLayout)))
+			if err := handleAppBackup(install, nil, path.Dir(rollbackFile), path.Base(rollbackFile), "", "", ""); err != nil {
+				t.Log(fmt.Sprintf("backup app %s for rollback before recover failed, err: %v", install.Name, err))
+			}
+		}
+
+		newEnvFile := ""
+		resources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithAppInstallId(install.ID))
+		for _, resource := range resources {
+			var database model.Database
+			switch resource.From {
+			case constant.AppResourceRemote:
+				database, err = databaseRepo.Get(commonRepo.WithByID(resource.LinkId))
+				if err != nil {
+					return err
+				}
+			case constant.AppResourceLocal:
+				resourceApp, err := appInstallRepo.GetFirst(commonRepo.WithByID(resource.LinkId))
+				if err != nil {
+					return err
+				}
+				database, err = databaseRepo.Get(databaseRepo.WithAppInstallID(resourceApp.ID), commonRepo.WithByType(resource.Key), commonRepo.WithByFrom(constant.AppResourceLocal), commonRepo.WithByName(resourceApp.Name))
+				if err != nil {
+					return err
+				}
+			}
+			switch database.Type {
+			case constant.AppPostgresql:
+				db, err := postgresqlRepo.Get(commonRepo.WithByID(resource.ResourceId))
+				if err != nil {
+					return err
+				}
+				taskName := task.GetTaskName(db.Name, task.TaskRecover, task.TaskScopeDatabase)
+				t.LogStart(taskName)
+				if err := handlePostgresqlRecover(dto.CommonRecover{
+					Name:       database.Name,
+					DetailName: db.Name,
+					File:       fmt.Sprintf("%s/%s.sql.gz", tmpPath, install.Name),
+				}, true); err != nil {
+					t.LogFailedWithErr(taskName, err)
+					return err
+				}
+				t.LogSuccess(taskName)
+			case constant.AppMysql, constant.AppMariaDB:
+				db, err := mysqlRepo.Get(commonRepo.WithByID(resource.ResourceId))
+				if err != nil {
+					return err
+				}
+				newDB, envMap, err := reCreateDB(db.ID, database, oldInstall.Env)
+				if err != nil {
+					return err
+				}
+				oldHost := fmt.Sprintf("\"PANEL_DB_HOST\":\"%v\"", envMap["PANEL_DB_HOST"].(string))
+				newHost := fmt.Sprintf("\"PANEL_DB_HOST\":\"%v\"", database.Address)
+				oldInstall.Env = strings.ReplaceAll(oldInstall.Env, oldHost, newHost)
+				envMap["PANEL_DB_HOST"] = database.Address
+				newEnvFile, err = coverEnvJsonToStr(oldInstall.Env)
+				if err != nil {
+					return err
+				}
+				_ = appInstallResourceRepo.BatchUpdateBy(map[string]interface{}{"resource_id": newDB.ID}, commonRepo.WithByID(resource.ID))
+				taskName := task.GetTaskName(db.Name, task.TaskRecover, task.TaskScopeDatabase)
+				t.LogStart(taskName)
+				if err := handleMysqlRecover(dto.CommonRecover{
+					Name:       newDB.MysqlName,
+					DetailName: newDB.Name,
+					File:       fmt.Sprintf("%s/%s.sql.gz", tmpPath, install.Name),
+				}, true); err != nil {
+					t.LogFailedWithErr(taskName, err)
+					return err
+				}
+				t.LogSuccess(taskName)
+			}
+		}
+
+		appDir := install.GetPath()
+		backPath := fmt.Sprintf("%s_bak", appDir)
+		_ = fileOp.Rename(appDir, backPath)
+		_ = fileOp.CreateDir(appDir, 0755)
+
+		deCompressName := i18n.GetWithName("DeCompressFile", "app.tar.gz")
+		t.LogStart(deCompressName)
+		if err := handleUnTar(tmpPath+"/app.tar.gz", install.GetAppPath(), ""); err != nil {
+			t.LogFailedWithErr(deCompressName, err)
+			_ = fileOp.DeleteDir(appDir)
+			_ = fileOp.Rename(backPath, appDir)
+			return err
+		}
+		t.LogSuccess(deCompressName)
+		_ = fileOp.DeleteDir(backPath)
+
+		if len(newEnvFile) != 0 {
+			envPath := fmt.Sprintf("%s/%s/.env", install.GetAppPath(), install.Name)
+			file, err := os.OpenFile(envPath, os.O_WRONLY|os.O_TRUNC, 0640)
+			if err != nil {
+				return err
+			}
+			defer file.Close()
+			_, _ = file.WriteString(newEnvFile)
+		}
+
+		oldInstall.ID = install.ID
+		oldInstall.Status = constant.StatusRunning
+		oldInstall.AppId = install.AppId
+		oldInstall.AppDetailId = install.AppDetailId
+		oldInstall.App.ID = install.AppId
+		if err := appInstallRepo.Save(context.Background(), &oldInstall); err != nil {
+			global.LOG.Errorf("save db app install failed, err: %v", err)
+			return err
+		}
+		isOk = true
+
+		return nil
+	}
+
+	rollBackApp := func(t *task.Task) {
+		if isRollback {
+			return
+		}
+		if !isOk {
+			t.Log(i18n.GetMsgByKey("RecoverFailedStartRollBack"))
+			if err := handleAppRecover(install, t, rollbackFile, true, secret, ""); err != nil {
+				t.LogFailedWithErr(i18n.GetMsgByKey("Rollback"), err)
+				return
+			}
+			t.LogSuccess(i18n.GetMsgByKey("Rollback"))
+			_ = os.RemoveAll(rollbackFile)
+		} else {
+			_ = os.RemoveAll(rollbackFile)
+		}
+	}
+
+	recoverTask.AddSubTask(task.GetTaskName(install.Name, task.TaskBackup, task.TaskScopeApp), recoverApp, rollBackApp)
+	if parentTask != nil {
+		return recoverApp(parentTask)
+	}
 	return nil
 }
 
