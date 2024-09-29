@@ -201,6 +201,7 @@ const search = async () => {
             hasLicense.value = true;
             if (globalStore.isProductPro) {
                 globalStore.productProExpires = Number(res.data.productPro);
+                globalStore.isTrial = res.data.trial;
             }
             license.licenseName = res.data.licenseName;
             license.message = res.data.message;

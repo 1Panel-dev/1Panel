@@ -38,6 +38,7 @@ const GlobalStore = defineStore({
         defaultNetwork: 'all',
 
         isProductPro: false,
+        isTrial: false,
         productProExpires: 0,
 
         errStatus: '',
