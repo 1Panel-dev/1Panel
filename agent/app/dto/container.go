@@ -48,6 +48,16 @@ type ContainerStatus struct {
 	Removing   uint `json:"removing"`
 	Exited     uint `json:"exited"`
 	Dead       uint `json:"dead"`
+
+	ContainerCount       int `json:"containerCount"`
+	ComposeCount         int `json:"composeCount"`
+	ComposeTemplateCount int `json:"composeTemplateCount"`
+	ImageCount           int `json:"imageCount"`
+	NetworkCount         int `json:"networkCount"`
+	VolumeCount          int `json:"volumeCount"`
+	RepoCount            int `json:"repoCount"`
+
+	ImageSize uint64 `json:"imageSize"`
 }
 type ResourceLimit struct {
 	CPU    int    `json:"cpu"`

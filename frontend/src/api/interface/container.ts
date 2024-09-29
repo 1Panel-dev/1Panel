@@ -33,6 +33,16 @@ export namespace Container {
         removing: number;
         exited: number;
         dead: number;
+
+        containerCount: number;
+        composeCount: number;
+        composeTemplateCount: number;
+        imageCount: number;
+        networkCount: number;
+        volumeCount: number;
+        repoCount: number;
+
+        imageSize: number;
     }
     export interface ResourceLimit {
         cpu: number;

@@ -12,6 +12,10 @@ import i18n from '@/lang';
 
 const buttons = [
     {
+        label: i18n.global.t('home.overview'),
+        path: '/containers/dashboard',
+    },
+    {
         label: i18n.global.t('container.container'),
         path: '/containers/container',
     },

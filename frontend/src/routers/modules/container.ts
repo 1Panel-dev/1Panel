@@ -13,10 +13,21 @@ const containerRouter = {
         {
             path: '/containers',
             name: 'Containers',
-            redirect: '/containers/container',
+            redirect: '/containers/dashboard',
             component: () => import('@/views/container/index.vue'),
             meta: {},
             children: [
+                {
+                    path: 'dashboard',
+                    name: 'ContainerDashboard',
+                    component: () => import('@/views/container/dashboard/index.vue'),
+                    props: true,
+                    hidden: true,
+                    meta: {
+                        activeMenu: '/containers',
+                        requiresAuth: false,
+                    },
+                },
                 {
                     path: 'container',
                     name: 'Container',
