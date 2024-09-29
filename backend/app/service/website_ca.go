@@ -217,15 +217,14 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) (*model.Website
 		if req.Domains != "" {
 			domainArray := strings.Split(req.Domains, "\n")
 			for _, domain := range domainArray {
-				if !common.IsValidDomain(domain) {
-					err = buserr.WithName("ErrDomainFormat", domain)
-					return nil, err
-				} else {
-					if ipAddress := net.ParseIP(domain); ipAddress == nil {
-						domains = append(domains, domain)
-					} else {
-						ips = append(ips, ipAddress)
+				if ipAddress := net.ParseIP(domain); ipAddress == nil {
+					if !common.IsValidDomain(domain) {
+						err = buserr.WithName("ErrDomainFormat", domain)
+						return nil, err
 					}
+					domains = append(domains, domain)
+				} else {
+					ips = append(ips, ipAddress)
 				}
 			}
 			if len(domains) > 0 {
