@@ -174,6 +174,7 @@ export namespace Setting {
     }
     export interface LicenseStatus {
         productPro: string;
+        trial: boolean;
         status: string;
     }
 }
