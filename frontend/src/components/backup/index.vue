@@ -70,7 +70,7 @@
     <el-dialog
         v-model="open"
         :title="isBackup ? $t('commons.button.backup') : $t('commons.button.recover') + ' - ' + name"
-        width="40%"
+        width="30%"
         :close-on-click-modal="false"
         :before-close="handleBackupClose"
     >

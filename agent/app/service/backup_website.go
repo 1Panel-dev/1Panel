@@ -32,7 +32,7 @@ func (u *BackupService) WebsiteBackup(req dto.CommonBackup) error {
 	timeNow := time.Now().Format(constant.DateTimeSlimLayout)
 	itemDir := fmt.Sprintf("website/%s", req.Name)
 	backupDir := path.Join(global.CONF.System.Backup, itemDir)
-	fileName := fmt.Sprintf("%s_%s.tar.gz", website.PrimaryDomain, timeNow+common.RandStrAndNum(5))
+	fileName := fmt.Sprintf("%s_%s.tar.gz", website.Alias, timeNow+common.RandStrAndNum(5))
 
 	go func() {
 		if err = handleWebsiteBackup(&website, backupDir, fileName, "", req.Secret, req.TaskID); err != nil {
@@ -41,7 +41,7 @@ func (u *BackupService) WebsiteBackup(req dto.CommonBackup) error {
 		}
 		record := &model.BackupRecord{
 			Type:              "website",
-			Name:              website.PrimaryDomain,
+			Name:              website.Alias,
 			DetailName:        req.DetailName,
 			SourceAccountIDs:  "1",
 			DownloadAccountID: 1,
@@ -146,7 +146,7 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 			}
 			taskName := task.GetTaskName(app.Name, task.TaskRecover, task.TaskScopeApp)
 			t.LogStart(taskName)
-			if err := handleAppRecover(&app, fmt.Sprintf("%s/%s.app.tar.gz", tmpPath, website.Alias), true, ""); err != nil {
+			if err := handleAppRecover(&app, recoverTask, fmt.Sprintf("%s/%s.app.tar.gz", tmpPath, website.Alias), true, "", ""); err != nil {
 				t.LogFailedWithErr(taskName, err)
 				return err
 			}
@@ -167,6 +167,17 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 				return err
 			}
 			t.LogSuccess(taskName)
+			if oldWebsite.DbID > 0 {
+				if err := recoverWebsiteDatabase(t, oldWebsite.DbID, oldWebsite.DbType, tmpPath, website.Alias); err != nil {
+					return err
+				}
+			}
+		case constant.Static:
+			if oldWebsite.DbID > 0 {
+				if err := recoverWebsiteDatabase(t, oldWebsite.DbID, oldWebsite.DbType, tmpPath, website.Alias); err != nil {
+					return err
+				}
+			}
 		}
 		taskName := i18n.GetMsgByKey("TaskRecover") + i18n.GetMsgByKey("websiteDir")
 		t.Log(taskName)
@@ -189,11 +200,11 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 }
 
 func handleWebsiteBackup(website *model.Website, backupDir, fileName, excludes, secret, taskID string) error {
-	backupTask, err := task.NewTaskWithOps(website.PrimaryDomain, task.TaskBackup, task.TaskScopeWebsite, taskID, website.ID)
+	backupTask, err := task.NewTaskWithOps(website.Alias, task.TaskBackup, task.TaskScopeWebsite, taskID, website.ID)
 	if err != nil {
 		return err
 	}
-	backupTask.AddSubTask(task.GetTaskName(website.PrimaryDomain, task.TaskBackup, task.TaskScopeWebsite), func(t *task.Task) error {
+	backupTask.AddSubTask(task.GetTaskName(website.Alias, task.TaskBackup, task.TaskScopeWebsite), func(t *task.Task) error {
 		fileOp := files.NewFileOp()
 		tmpDir := fmt.Sprintf("%s/%s", backupDir, strings.ReplaceAll(fileName, ".tar.gz", ""))
 		if !fileOp.Stat(tmpDir) {
@@ -237,13 +248,13 @@ func handleWebsiteBackup(website *model.Website, backupDir, fileName, excludes, 
 			}
 			t.LogSuccess(task.GetTaskName(runtime.Name, task.TaskBackup, task.TaskScopeRuntime))
 			if website.DbID > 0 {
-				if err = backupDatabaseWithTask(t, website.DbType, tmpDir, website.PrimaryDomain, website.DbID); err != nil {
+				if err = backupDatabaseWithTask(t, website.DbType, tmpDir, website.Alias, website.DbID); err != nil {
 					return err
 				}
 			}
 		case constant.Static:
 			if website.DbID > 0 {
-				if err = backupDatabaseWithTask(t, website.DbType, tmpDir, website.PrimaryDomain, website.DbID); err != nil {
+				if err = backupDatabaseWithTask(t, website.DbType, tmpDir, website.Alias, website.DbID); err != nil {
 					return err
 				}
 			}
@@ -282,6 +293,44 @@ func checkValidOfWebsite(oldWebsite, website *model.Website) error {
 		if _, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(oldWebsite.WebsiteSSLID)); err != nil {
 			return buserr.WithDetail(constant.ErrBackupMatch, "ssl", nil)
 		}
+	}
+	return nil
+}
+
+func recoverWebsiteDatabase(t *task.Task, dbID uint, dbType, tmpPath, websiteKey string) error {
+	switch dbType {
+	case constant.AppPostgresql:
+		db, err := postgresqlRepo.Get(commonRepo.WithByID(dbID))
+		if err != nil {
+			return err
+		}
+		taskName := task.GetTaskName(db.Name, task.TaskRecover, task.TaskScopeDatabase)
+		t.LogStart(taskName)
+		if err := handlePostgresqlRecover(dto.CommonRecover{
+			Name:       db.PostgresqlName,
+			DetailName: db.Name,
+			File:       fmt.Sprintf("%s/%s.sql.gz", tmpPath, websiteKey),
+		}, true); err != nil {
+			t.LogFailedWithErr(taskName, err)
+			return err
+		}
+		t.LogSuccess(taskName)
+	case constant.AppMysql, constant.AppMariaDB:
+		db, err := mysqlRepo.Get(commonRepo.WithByID(dbID))
+		if err != nil {
+			return err
+		}
+		taskName := task.GetTaskName(db.Name, task.TaskRecover, task.TaskScopeDatabase)
+		t.LogStart(taskName)
+		if err := handleMysqlRecover(dto.CommonRecover{
+			Name:       db.MysqlName,
+			DetailName: db.Name,
+			File:       fmt.Sprintf("%s/%s.sql.gz", tmpPath, websiteKey),
+		}, true); err != nil {
+			t.LogFailedWithErr(taskName, err)
+			return err
+		}
+		t.LogSuccess(taskName)
 	}
 	return nil
 }
