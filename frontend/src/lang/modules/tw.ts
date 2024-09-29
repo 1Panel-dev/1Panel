@@ -763,6 +763,7 @@ const message = {
         composeOperatorHelper: '將對 {0} 進行 {1} 操作，是否繼續？',
 
         setting: '配置',
+        goSetting: '去修改',
         operatorStatusHelper: '此操作將{0}Docker 服務，是否繼續？',
         dockerStatus: 'Docker 服務',
         daemonJsonPathHelper: '請保證配置路徑與 docker.service 中指定的配置路徑保持一致。',

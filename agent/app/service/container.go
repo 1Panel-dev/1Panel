@@ -40,6 +40,7 @@ import (
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/api/types/registry"
+	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
 	"github.com/gorilla/websocket"
@@ -248,7 +249,22 @@ func (u *ContainerService) LoadStatus() (dto.ContainerStatus, error) {
 		return data, err
 	}
 	defer client.Close()
-	containers, err := client.ContainerList(context.Background(), container.ListOptions{All: true})
+	c := context.Background()
+	images, _ := client.ImageList(c, image.ListOptions{})
+	for _, image := range images {
+		data.ImageSize += uint64(image.Size)
+	}
+	data.ImageCount = len(images)
+	repo, _ := imageRepoRepo.List()
+	data.RepoCount = len(repo)
+	templates, _ := composeRepo.List()
+	data.ComposeTemplateCount = len(templates)
+	networks, _ := client.NetworkList(c, network.ListOptions{})
+	data.NetworkCount = len(networks)
+	volumes, _ := client.VolumeList(c, volume.ListOptions{})
+	data.VolumeCount = len(volumes.Volumes)
+	data.ComposeCount = loadComposeCount(client)
+	containers, err := client.ContainerList(c, container.ListOptions{All: true})
 	if err != nil {
 		return data, err
 	}
@@ -271,6 +287,7 @@ func (u *ContainerService) LoadStatus() (dto.ContainerStatus, error) {
 			data.Removing++
 		}
 	}
+	data.ContainerCount = int(data.All)
 	return data, nil
 }
 func (u *ContainerService) ContainerListStats() ([]dto.ContainerListStats, error) {
@@ -1362,4 +1379,30 @@ func simplifyPort(ports []types.Port) []string {
 		}
 	}
 	return datas
+}
+
+func loadComposeCount(client *client.Client) int {
+	options := container.ListOptions{All: true}
+	options.Filters = filters.NewArgs()
+	options.Filters.Add("label", composeProjectLabel)
+	list, err := client.ContainerList(context.Background(), options)
+	if err != nil {
+		return 0
+	}
+	composeCreatedByLocal, _ := composeRepo.ListRecord()
+	composeMap := make(map[string]struct{})
+	for _, container := range list {
+		if name, ok := container.Labels[composeProjectLabel]; ok {
+			if _, has := composeMap[name]; !has {
+				composeMap[name] = struct{}{}
+			}
+		}
+	}
+	for _, compose := range composeCreatedByLocal {
+		if _, has := composeMap[compose.Name]; !has {
+			composeMap[compose.Name] = struct{}{}
+		}
+	}
+
+	return len(composeMap)
 }
