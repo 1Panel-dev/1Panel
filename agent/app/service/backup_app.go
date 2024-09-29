@@ -38,25 +38,36 @@ func (u *BackupService) AppBackup(req dto.CommonBackup) (*model.BackupRecord, er
 	backupDir := path.Join(global.CONF.System.Backup, itemDir)
 
 	fileName := fmt.Sprintf("%s_%s.tar.gz", req.DetailName, timeNow+common.RandStrAndNum(5))
-	if err := handleAppBackup(&install, nil, backupDir, fileName, "", req.Secret, req.TaskID); err != nil {
-		return nil, err
+
+	backupApp := func() (*model.BackupRecord, error) {
+		if err = handleAppBackup(&install, nil, backupDir, fileName, "", req.Secret, req.TaskID); err != nil {
+			global.LOG.Errorf("backup app %s failed, err: %v", req.DetailName, err)
+			return nil, err
+		}
+		record := &model.BackupRecord{
+			Type:              "app",
+			Name:              req.Name,
+			DetailName:        req.DetailName,
+			SourceAccountIDs:  "1",
+			DownloadAccountID: 1,
+			FileDir:           itemDir,
+			FileName:          fileName,
+		}
+		if err := backupRepo.CreateRecord(record); err != nil {
+			global.LOG.Errorf("save backup record failed, err: %v", err)
+			return nil, err
+		}
+		return record, nil
 	}
 
-	record := &model.BackupRecord{
-		Type:              "app",
-		Name:              req.Name,
-		DetailName:        req.DetailName,
-		SourceAccountIDs:  "1",
-		DownloadAccountID: 1,
-		FileDir:           itemDir,
-		FileName:          fileName,
+	if req.TaskID != "" {
+		go func() {
+			_, _ = backupApp()
+		}()
+	} else {
+		return backupApp()
 	}
-
-	if err := backupRepo.CreateRecord(record); err != nil {
-		global.LOG.Errorf("save backup record failed, err: %v", err)
-		return nil, err
-	}
-	return record, nil
+	return nil, nil
 }
 
 func (u *BackupService) AppRecover(req dto.CommonRecover) error {
@@ -76,9 +87,11 @@ func (u *BackupService) AppRecover(req dto.CommonRecover) error {
 	if _, err := compose.Down(install.GetComposePath()); err != nil {
 		return err
 	}
-	if err := handleAppRecover(&install, nil, req.File, false, req.Secret, req.TaskID); err != nil {
-		return err
-	}
+	go func() {
+		if err := handleAppRecover(&install, nil, req.File, false, req.Secret, req.TaskID); err != nil {
+			global.LOG.Errorf("recover app %s failed, err: %v", req.DetailName, err)
+		}
+	}()
 	return nil
 }
 
@@ -338,11 +351,11 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 		}
 	}
 
-	recoverTask.AddSubTask(task.GetTaskName(install.Name, task.TaskBackup, task.TaskScopeApp), recoverApp, rollBackApp)
+	recoverTask.AddSubTask(task.GetTaskName(install.Name, task.TaskRecover, task.TaskScopeApp), recoverApp, rollBackApp)
 	if parentTask != nil {
 		return recoverApp(parentTask)
 	}
-	return nil
+	return recoverTask.Execute()
 }
 
 func reCreateDB(dbID uint, database model.Database, oldEnv string) (*model.DatabaseMysql, map[string]interface{}, error) {
