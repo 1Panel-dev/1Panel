@@ -127,6 +127,9 @@ var AddTablePHPExtensions = &gormigrate.Migration{
 		if err := tx.Create(&model.PHPExtensions{Name: "WordPress", Extensions: "exif,igbinary,imagick,intl,zip,apcu,memcached,opcache,redis,bc,image,shmop,mysqli,pdo_mysql,gd"}).Error; err != nil {
 			return err
 		}
+		if err := tx.Create(&model.PHPExtensions{Name: "BookStack", Extensions: "gd,dom,iconv,mbstring,mysqlnd,openssl,pdo,pdo_mysql,tokenizer,xml"}).Error; err != nil {
+			return err
+		}
 		if err := tx.Create(&model.PHPExtensions{Name: "Flarum", Extensions: "curl,gd,pdo_mysql,mysqli,bz2,exif,yaf,imap"}).Error; err != nil {
 			return err
 		}
