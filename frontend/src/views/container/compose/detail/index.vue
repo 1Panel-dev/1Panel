@@ -143,7 +143,6 @@ const dialogContainerLogRef = ref();
 
 const opRef = ref();
 
-const emit = defineEmits<{ (e: 'back'): void }>();
 interface DialogProps {
     createdBy: string;
     name: string;
@@ -283,11 +282,7 @@ const onComposeOperate = async (operation: string) => {
             .then(() => {
                 loading.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                if (operation === 'down') {
-                    emit('back');
-                } else {
-                    search();
-                }
+                search();
             })
             .catch(() => {
                 loading.value = false;

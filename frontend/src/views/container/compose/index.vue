@@ -1,7 +1,7 @@
 <template>
     <div v-loading="loading">
         <div v-show="isOnDetail">
-            <ComposeDetail @back="backList" ref="composeDetailRef" />
+            <ComposeDetail ref="composeDetailRef" />
         </div>
         <el-card v-if="dockerStatus != 'Running'" class="mask-prompt">
             <span>{{ $t('container.serviceUnavailable') }}</span>
@@ -180,10 +180,6 @@ const getContainerStatus = (containers) => {
     } else {
         return i18n.global.t('container.running') + ` (${runningCount}/${totalCount})`;
     }
-};
-const backList = async () => {
-    isOnDetail.value = false;
-    search();
 };
 
 const dialogRef = ref();

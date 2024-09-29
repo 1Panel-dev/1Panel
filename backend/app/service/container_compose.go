@@ -268,8 +268,14 @@ func (u *ContainerService) ComposeOperation(req dto.ComposeOperation) error {
 		_ = composeRepo.DeleteRecord(commonRepo.WithByName(req.Name))
 		return nil
 	}
-	if stdout, err := compose.Operate(req.Path, req.Operation); err != nil {
-		return errors.New(string(stdout))
+	if req.Operation == "up" {
+		if stdout, err := compose.Up(req.Path); err != nil {
+			return errors.New(string(stdout))
+		}
+	} else {
+		if stdout, err := compose.Operate(req.Path, req.Operation); err != nil {
+			return errors.New(string(stdout))
+		}
 	}
 	global.LOG.Infof("docker-compose %s %s successful", req.Operation, req.Name)
 	return nil
