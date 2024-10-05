@@ -23,6 +23,7 @@ import (
 	"github.com/go-acme/lego/v4/providers/dns/namedotcom"
 	"github.com/go-acme/lego/v4/providers/dns/namesilo"
 	"github.com/go-acme/lego/v4/providers/dns/tencentcloud"
+	"github.com/go-acme/lego/v4/providers/dns/volcengine"
 	"github.com/go-acme/lego/v4/providers/http/webroot"
 	"github.com/go-acme/lego/v4/registration"
 	"github.com/pkg/errors"
@@ -67,6 +68,7 @@ type DnsType string
 const (
 	DnsPod       DnsType = "DnsPod"
 	AliYun       DnsType = "AliYun"
+	Volcengine   DnsType = "Volcengine"
 	CloudFlare   DnsType = "CloudFlare"
 	NameSilo     DnsType = "NameSilo"
 	NameCheap    DnsType = "NameCheap"
@@ -122,6 +124,14 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string, websiteSSL model.Web
 		alidnsConfig.PollingInterval = pollingInterval
 		alidnsConfig.TTL = ttl
 		p, err = alidns.NewDNSProviderConfig(alidnsConfig)
+	case Volcengine:
+		volcConfig := volcengine.NewDefaultConfig()
+		volcConfig.SecretKey = param.SecretKey
+		volcConfig.AccessKey = param.AccessKey
+		volcConfig.PropagationTimeout = propagationTimeout
+		volcConfig.PollingInterval = pollingInterval
+		volcConfig.TTL = ttl
+		p, err = volcengine.NewDNSProviderConfig(volcConfig)
 	case CloudFlare:
 		cloudflareConfig := cloudflare.NewDefaultConfig()
 		cloudflareConfig.AuthEmail = param.Email

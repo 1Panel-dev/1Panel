@@ -169,6 +169,10 @@ export const DNSTypes = [
         value: 'HuaweiCloud',
     },
     {
+        label: i18n.global.t('website.volcengine'),
+        value: 'Volcengine',
+    },
+    {
         label: 'DNSPod (' + i18n.global.t('ssl.deprecated') + ')',
         value: 'DnsPod',
     },

@@ -44,6 +44,14 @@
                     <el-form-item label="Region" prop="authorization.region" v-if="account.type === 'HuaweiCloud'">
                         <el-input v-model.trim="account.authorization['region']" :placeholder="'cn-north-1'"></el-input>
                     </el-form-item>
+                    <div v-if="account.type === 'Volcengine'">
+                        <el-form-item label="Access Key" prop="authorization.accessKey">
+                            <el-input v-model.trim="account.authorization['accessKey']"></el-input>
+                        </el-form-item>
+                        <el-form-item label="Secret Key" prop="authorization.secretKey">
+                            <el-input v-model.trim="account.authorization['secretKey']"></el-input>
+                        </el-form-item>
+                    </div>
                     <div v-if="account.type === 'TencentCloud'">
                         <el-form-item label="Secret ID" prop="authorization.secretID">
                             <el-input v-model.trim="account.authorization['secretID']"></el-input>
