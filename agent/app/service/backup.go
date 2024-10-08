@@ -120,6 +120,7 @@ func (u *BackupService) CheckUsed(id uint) error {
 
 type loadSizeHelper struct {
 	isOk       bool
+	backupName string
 	backupPath string
 	client     cloud_storage.CloudStorageClient
 }

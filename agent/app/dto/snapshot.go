@@ -101,3 +101,11 @@ type SnapshotInfo struct {
 	RollbackMessage  string `json:"rollbackMessage"`
 	LastRollbackedAt string `json:"lastRollbackedAt"`
 }
+
+type SnapshotFile struct {
+	ID              uint   `json:"id"`
+	Name            string `json:"name"`
+	From            string `json:"from"`
+	DefaultDownload string `json:"defaultDownload"`
+	Size            int64  `json:"size"`
+}
