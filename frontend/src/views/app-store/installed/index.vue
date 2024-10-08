@@ -235,7 +235,6 @@
 
                                                     <el-button
                                                         v-if="installed.httpPort > 0"
-                                                        @click="goDashboard(installed.httpPort, 'http')"
                                                         class="tagMargin"
                                                         plain
                                                         size="small"
@@ -245,7 +244,6 @@
 
                                                     <el-button
                                                         v-if="installed.httpsPort > 0"
-                                                        @click="goDashboard(installed.httpsPort, 'https')"
                                                         class="tagMargin"
                                                         plain
                                                         size="small"
@@ -495,10 +493,6 @@ const search = async () => {
     GetAppTags().then((res) => {
         tags.value = res.data;
     });
-};
-
-const goDashboard = async (port: any, protocol: string) => {
-    dialogPortJumpRef.value.acceptParams({ port: port, protocol: protocol });
 };
 
 const openOperate = (row: any, op: string) => {

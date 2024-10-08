@@ -1206,6 +1206,7 @@ const (
 	SiteRedirectDir = "SiteRedirectDir"
 	SiteCacheDir    = "SiteCacheDir"
 	SiteConfDir     = "SiteConfDir"
+	SitesRootDir    = "SitesRootDir"
 )
 
 func GetSitePath(website model.Website, confType string) string {
@@ -1234,6 +1235,8 @@ func GetSitePath(website model.Website, confType string) string {
 		return path.Join(GteSiteDir(website.Alias), "redirect")
 	case SiteConfDir:
 		return path.Join(GetWebSiteRootDir(), "conf.d")
+	case SitesRootDir:
+		return path.Join(GetWebSiteRootDir(), "sites")
 	}
 	return ""
 }

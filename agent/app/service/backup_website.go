@@ -181,7 +181,7 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 		}
 		taskName := i18n.GetMsgByKey("TaskRecover") + i18n.GetMsgByKey("websiteDir")
 		t.Log(taskName)
-		if err = handleUnTar(fmt.Sprintf("%s/%s.web.tar.gz", tmpPath, website.Alias), GetWebSiteRootDir(), ""); err != nil {
+		if err = handleUnTar(fmt.Sprintf("%s/%s.web.tar.gz", tmpPath, website.Alias), GetSitePath(*website, SiteDir), ""); err != nil {
 			t.LogFailedWithErr(taskName, err)
 			return err
 		}

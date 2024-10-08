@@ -1,120 +1,99 @@
 <template>
-    <el-drawer
-        v-model="open"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        size="40%"
-        :before-close="handleClose"
-    >
-        <template #header>
-            <DrawerHeader :header="$t('commons.button.' + proxy.operate)" :back="handleClose" />
-        </template>
-        <el-row v-loading="loading">
-            <el-col :span="22" :offset="1">
-                <el-form ref="proxyForm" label-position="top" :model="proxy" :rules="rules">
-                    <el-form-item :label="$t('commons.table.name')" prop="name">
-                        <el-input v-model.trim="proxy.name" :disabled="proxy.operate === 'edit'"></el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('website.modifier')" prop="modifier">
-                        <el-input v-model.trim="proxy.modifier"></el-input>
-                        <div>
-                            <span class="input-help">{{ $t('website.modifierHelper') }}</span>
-                        </div>
-                    </el-form-item>
-                    <el-form-item :label="$t('website.proxyPath')" prop="match">
-                        <el-input v-model.trim="proxy.match"></el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('website.enableCache')" prop="cache">
-                        <el-switch v-model="proxy.cache" @change="changeCache(proxy.cache)"></el-switch>
-                    </el-form-item>
-                    <el-form-item :label="$t('website.sni')" prop="sni">
-                        <el-switch v-model="proxy.sni"></el-switch>
-                        <span class="input-help">{{ $t('website.sniHelper') }}</span>
-                    </el-form-item>
-                    <el-form-item :label="$t('website.cacheTime')" prop="cacheTime" v-if="proxy.cache">
-                        <el-input v-model.number="proxy.cacheTime" maxlength="15">
-                            <template #append>
-                                <el-select v-model="proxy.cacheUnit" style="width: 100px">
-                                    <el-option
-                                        v-for="(unit, index) in Units"
-                                        :key="index"
-                                        :label="unit.label"
-                                        :value="unit.value"
-                                    ></el-option>
+    <DrawerPro v-model="open" :header="$t('commons.button.' + proxy.operate)" :back="handleClose" size="normal">
+        <el-form ref="proxyForm" label-position="top" :model="proxy" :rules="rules" v-loading="loading">
+            <el-form-item :label="$t('commons.table.name')" prop="name">
+                <el-input v-model.trim="proxy.name" :disabled="proxy.operate === 'edit'"></el-input>
+            </el-form-item>
+            <el-form-item :label="$t('website.modifier')" prop="modifier">
+                <el-input v-model.trim="proxy.modifier"></el-input>
+                <div>
+                    <span class="input-help">{{ $t('website.modifierHelper') }}</span>
+                </div>
+            </el-form-item>
+            <el-form-item :label="$t('website.proxyPath')" prop="match">
+                <el-input v-model.trim="proxy.match"></el-input>
+            </el-form-item>
+            <el-form-item :label="$t('website.enableCache')" prop="cache">
+                <el-switch v-model="proxy.cache" @change="changeCache(proxy.cache)"></el-switch>
+            </el-form-item>
+            <el-form-item :label="$t('website.sni')" prop="sni">
+                <el-switch v-model="proxy.sni"></el-switch>
+                <span class="input-help">{{ $t('website.sniHelper') }}</span>
+            </el-form-item>
+            <el-form-item :label="$t('website.cacheTime')" prop="cacheTime" v-if="proxy.cache">
+                <el-input v-model.number="proxy.cacheTime" maxlength="15">
+                    <template #append>
+                        <el-select v-model="proxy.cacheUnit" style="width: 100px">
+                            <el-option
+                                v-for="(unit, index) in Units"
+                                :key="index"
+                                :label="unit.label"
+                                :value="unit.value"
+                            ></el-option>
+                        </el-select>
+                    </template>
+                </el-input>
+            </el-form-item>
+            <el-row :gutter="10">
+                <el-col :span="12">
+                    <el-form-item :label="$t('website.proxyPass')" prop="proxyPass">
+                        <el-input
+                            v-model.trim="proxy.proxyAddress"
+                            :placeholder="$t('website.proxyHelper')"
+                            @blur="getProxyHost"
+                        >
+                            <template #prepend>
+                                <el-select v-model="proxy.proxyProtocol" class="pre-select">
+                                    <el-option label="http" value="http://" />
+                                    <el-option label="https" value="https://" />
+                                    <el-option :label="$t('website.other')" value="" />
                                 </el-select>
                             </template>
                         </el-input>
-                    </el-form-item>
-                    <el-row :gutter="10">
-                        <el-col :span="12">
-                            <el-form-item :label="$t('website.proxyPass')" prop="proxyPass">
-                                <el-input
-                                    v-model.trim="proxy.proxyAddress"
-                                    :placeholder="$t('website.proxyHelper')"
-                                    @blur="getProxyHost"
-                                >
-                                    <template #prepend>
-                                        <el-select v-model="proxy.proxyProtocol" class="pre-select">
-                                            <el-option label="http" value="http://" />
-                                            <el-option label="https" value="https://" />
-                                            <el-option :label="$t('website.other')" value="" />
-                                        </el-select>
-                                    </template>
-                                </el-input>
-                                <div>
-                                    <span class="input-help">{{ $t('website.proxyPassHelper') }}</span>
-                                </div>
-                            </el-form-item>
-                        </el-col>
-                        <el-col :span="12">
-                            <el-form-item :label="$t('website.proxyHost')" prop="proxyHost">
-                                <el-input v-model.trim="proxy.proxyHost"></el-input>
-                                <div>
-                                    <span class="input-help">{{ $t('website.proxyHostHelper') }}</span>
-                                </div>
-                            </el-form-item>
-                        </el-col>
-                    </el-row>
-                    <el-form-item :label="$t('website.replace')">
-                        <div style="width: 100%" v-for="(replace, index) in replaces" :key="index">
-                            <el-row :gutter="10">
-                                <el-col :span="10">
-                                    <el-input
-                                        v-model.trim="replace.key"
-                                        :placeholder="$t('website.replaced')"
-                                    ></el-input>
-                                </el-col>
-                                <el-col :span="10">
-                                    <el-input
-                                        v-model.trim="replace.value"
-                                        :placeholder="$t('website.replaceText')"
-                                    ></el-input>
-                                </el-col>
-                                <el-col :span="2">
-                                    <el-button link @click="removeReplace(index)" type="danger">
-                                        {{ $t('commons.button.delete') }}
-                                    </el-button>
-                                </el-col>
-                            </el-row>
+                        <div>
+                            <span class="input-help">{{ $t('website.proxyPassHelper') }}</span>
                         </div>
                     </el-form-item>
-                    <el-form-item>
-                        <el-button type="primary" @click="addReplaces">
-                            {{ $t('website.addReplace') }}
-                        </el-button>
+                </el-col>
+                <el-col :span="12">
+                    <el-form-item :label="$t('website.proxyHost')" prop="proxyHost">
+                        <el-input v-model.trim="proxy.proxyHost"></el-input>
+                        <div>
+                            <span class="input-help">{{ $t('website.proxyHostHelper') }}</span>
+                        </div>
                     </el-form-item>
-                </el-form>
-            </el-col>
-        </el-row>
-        <template #footer>
-            <span class="dialog-footer">
-                <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="submit(proxyForm)" :disabled="loading">
-                    {{ $t('commons.button.confirm') }}
+                </el-col>
+            </el-row>
+            <el-form-item :label="$t('website.replace')">
+                <div style="width: 100%" v-for="(replace, index) in replaces" :key="index">
+                    <el-row :gutter="10">
+                        <el-col :span="10">
+                            <el-input v-model.trim="replace.key" :placeholder="$t('website.replaced')"></el-input>
+                        </el-col>
+                        <el-col :span="10">
+                            <el-input v-model.trim="replace.value" :placeholder="$t('website.replaceText')"></el-input>
+                        </el-col>
+                        <el-col :span="2">
+                            <el-button link @click="removeReplace(index)" type="danger">
+                                {{ $t('commons.button.delete') }}
+                            </el-button>
+                        </el-col>
+                    </el-row>
+                </div>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="addReplaces">
+                    {{ $t('website.addReplace') }}
                 </el-button>
-            </span>
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
+            <el-button type="primary" @click="submit(proxyForm)" :disabled="loading">
+                {{ $t('commons.button.confirm') }}
+            </el-button>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>

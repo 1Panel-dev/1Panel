@@ -1,8 +1,5 @@
 <template>
-    <el-drawer :close-on-click-modal="false" :close-on-press-escape="false" v-model="open" size="50%">
-        <template #header>
-            <DrawerHeader :header="$t('ssl.organizationDetail')" :back="handleClose" />
-        </template>
+    <DrawerPro v-model="open" :header="$t('ssl.organizationDetail')" :back="handleClose" size="large">
         <div v-loading="loading">
             <el-radio-group v-model="curr">
                 <el-radio-button value="detail">{{ $t('ssl.organizationDetail') }}</el-radio-button>
@@ -49,7 +46,7 @@
                 </div>
             </div>
         </div>
-    </el-drawer>
+    </DrawerPro>
 </template>
 <script lang="ts" setup>
 import DrawerHeader from '@/components/drawer-header/index.vue';

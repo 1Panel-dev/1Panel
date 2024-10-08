@@ -1,54 +1,51 @@
 <template>
-    <el-drawer
+    <DrawerPro
         v-model="open"
-        :size="globalStore.isFullScreen ? '100%' : '50%'"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        :before-close="handleClose"
+        :header="$t('commons.button.log')"
+        :back="handleClose"
+        :size="globalStore.isFullScreen ? 'full' : 'large'"
+        :resource="resource"
     >
-        <template #header>
-            <DrawerHeader :header="$t('commons.button.log')" :resource="resource" :back="handleClose">
-                <template #extra v-if="!mobile">
-                    <el-tooltip :content="loadTooltip()" placement="top">
-                        <el-button @click="toggleFullscreen" class="fullScreen" icon="FullScreen" plain></el-button>
-                    </el-tooltip>
-                </template>
-            </DrawerHeader>
+        <template #extra v-if="!mobile">
+            <el-tooltip :content="loadTooltip()" placement="top">
+                <el-button @click="toggleFullscreen" class="fullScreen" icon="FullScreen" plain></el-button>
+            </el-tooltip>
         </template>
-        <div class="flex flex-wrap">
-            <el-select @change="searchLogs" v-model="logSearch.mode" class="selectWidth">
-                <template #prefix>{{ $t('container.fetch') }}</template>
-                <el-option v-for="item in timeOptions" :key="item.label" :value="item.value" :label="item.label" />
-            </el-select>
-            <el-select @change="searchLogs" class="ml-5 selectWidth" v-model.number="logSearch.tail">
-                <template #prefix>{{ $t('container.lines') }}</template>
-                <el-option :value="0" :label="$t('commons.table.all')" />
-                <el-option :value="100" :label="100" />
-                <el-option :value="200" :label="200" />
-                <el-option :value="500" :label="500" />
-                <el-option :value="1000" :label="1000" />
-            </el-select>
-            <div class="ml-5">
-                <el-checkbox border @change="searchLogs" v-model="logSearch.isWatch">
-                    {{ $t('commons.button.watch') }}
-                </el-checkbox>
+        <template #content>
+            <div class="flex flex-wrap">
+                <el-select @change="searchLogs" v-model="logSearch.mode" class="selectWidth">
+                    <template #prefix>{{ $t('container.fetch') }}</template>
+                    <el-option v-for="item in timeOptions" :key="item.label" :value="item.value" :label="item.label" />
+                </el-select>
+                <el-select @change="searchLogs" class="ml-5 selectWidth" v-model.number="logSearch.tail">
+                    <template #prefix>{{ $t('container.lines') }}</template>
+                    <el-option :value="0" :label="$t('commons.table.all')" />
+                    <el-option :value="100" :label="100" />
+                    <el-option :value="200" :label="200" />
+                    <el-option :value="500" :label="500" />
+                    <el-option :value="1000" :label="1000" />
+                </el-select>
+                <div class="ml-5">
+                    <el-checkbox border @change="searchLogs" v-model="logSearch.isWatch">
+                        {{ $t('commons.button.watch') }}
+                    </el-checkbox>
+                </div>
+                <el-button class="ml-5" @click="onDownload" icon="Download">
+                    {{ $t('file.download') }}
+                </el-button>
             </div>
-            <el-button class="ml-5" @click="onDownload" icon="Download">
-                {{ $t('file.download') }}
-            </el-button>
-        </div>
 
-        <div class="mt-2.5">
-            <highlightjs
-                v-if="showLog"
-                ref="editorRef"
-                class="editor-main"
-                language="JavaScript"
-                :autodetect="false"
-                :code="logInfo"
-            ></highlightjs>
-        </div>
-    </el-drawer>
+            <div class="mt-2.5">
+                <highlightjs
+                    ref="editorRef"
+                    class="editor-main"
+                    language="JavaScript"
+                    :autodetect="false"
+                    :code="logInfo"
+                ></highlightjs>
+            </div>
+        </template>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -66,7 +63,6 @@ const open = ref(false);
 const resource = ref('');
 const globalStore = GlobalStore();
 const logVisible = ref(false);
-const showLog = ref(false);
 const editorRef = ref();
 const scrollerElement = ref<HTMLElement | null>(null);
 
@@ -136,6 +132,7 @@ const searchLogs = async () => {
     terminalSocket.value.onmessage = (event) => {
         logInfo.value += event.data;
         nextTick(() => {
+            console.log(scrollerElement.value);
             scrollerElement.value.scrollTop = scrollerElement.value.scrollHeight;
         });
     };
@@ -189,21 +186,18 @@ const acceptParams = (props: DialogProps): void => {
             globalStore.isFullScreen = screenfull.isFullscreen;
         });
     }
+    nextTick(() => {
+        if (editorRef.value) {
+            scrollerElement.value = editorRef.value.$el as HTMLElement;
+            let hljsDom = scrollerElement.value.querySelector('.hljs') as HTMLElement;
+            hljsDom.style['min-height'] = '300px';
+            hljsDom.style['flex-grow'] = 1;
+        }
+    });
 };
 
 onBeforeUnmount(() => {
     handleClose();
-});
-
-onMounted(async () => {
-    await nextTick(() => {
-        showLog.value = true;
-    });
-    if (editorRef.value) {
-        scrollerElement.value = editorRef.value.$el as HTMLElement;
-        let hljsDom = scrollerElement.value.querySelector('.hljs') as HTMLElement;
-        hljsDom.style['min-height'] = '500px';
-    }
 });
 
 defineExpose({
@@ -217,9 +211,8 @@ defineExpose({
 }
 
 .editor-main {
-    height: calc(100vh - 100px);
-    width: 100%;
-    min-height: 600px;
-    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    height: 80vh;
 }
 </style>
