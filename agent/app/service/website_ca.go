@@ -10,6 +10,7 @@ import (
 	"crypto/x509/pkix"
 	"encoding/pem"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"log"
 	"math/big"
 	"net"
@@ -26,7 +27,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
-	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/1Panel-dev/1Panel/agent/utils/ssl"
 	"github.com/go-acme/lego/v4/certcrypto"
@@ -218,15 +218,14 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) (*model.Website
 		if req.Domains != "" {
 			domainArray := strings.Split(req.Domains, "\n")
 			for _, domain := range domainArray {
-				if !common.IsValidDomain(domain) {
-					err = buserr.WithName("ErrDomainFormat", domain)
-					return nil, err
-				} else {
-					if ipAddress := net.ParseIP(domain); ipAddress == nil {
-						domains = append(domains, domain)
-					} else {
-						ips = append(ips, ipAddress)
+				if ipAddress := net.ParseIP(domain); ipAddress == nil {
+					if !common.IsValidDomain(domain) {
+						err = buserr.WithName("ErrDomainFormat", domain)
+						return nil, err
 					}
+					domains = append(domains, domain)
+				} else {
+					ips = append(ips, ipAddress)
 				}
 			}
 			if len(domains) > 0 {

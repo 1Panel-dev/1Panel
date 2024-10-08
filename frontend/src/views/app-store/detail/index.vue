@@ -1,14 +1,5 @@
 <template>
-    <el-drawer
-        v-model="open"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        size="50%"
-    >
-        <template #header>
-            <DrawerHeader :header="$t('app.detail')" :back="handleClose" />
-        </template>
+    <DrawerPro v-model="open" :header="$t('app.detail')" :back="handleClose" size="large">
         <div class="brief" v-loading="loadingApp">
             <div class="detail flex">
                 <div class="w-12 h-12 rounded p-1 shadow-md icon">
@@ -70,7 +61,7 @@
             </div>
         </div>
         <MdEditor previewOnly v-model="app.readMe" :theme="isDarkTheme ? 'dark' : 'light'" />
-    </el-drawer>
+    </DrawerPro>
     <Install ref="installRef"></Install>
 </template>
 
