@@ -211,8 +211,8 @@ const onRecover = async (row: File.File) => {
     currentRow.value = row;
     if (type.value !== 'app' && type.value !== 'website') {
         ElMessageBox.confirm(
-            i18n.global.t('commons.msg.backupHelper', [name.value + '( ' + detailName.value + ' )']),
-            i18n.global.t('commons.button.backup'),
+            i18n.global.t('commons.msg.recoverHelper', [row.name]),
+            i18n.global.t('commons.button.recover'),
             {
                 confirmButtonText: i18n.global.t('commons.button.confirm'),
                 cancelButtonText: i18n.global.t('commons.button.cancel'),
