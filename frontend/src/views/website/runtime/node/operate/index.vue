@@ -103,58 +103,8 @@
                     </el-form-item>
                 </el-col>
             </el-row>
-            <el-row :gutter="20">
-                <el-col :span="7">
-                    <el-form-item :label="$t('runtime.appPort')" prop="params.NODE_APP_PORT">
-                        <el-input v-model.number="runtime.params['NODE_APP_PORT']" />
-                        <span class="input-help">{{ $t('runtime.appPortHelper') }}</span>
-                    </el-form-item>
-                </el-col>
-                <el-col :span="7">
-                    <el-form-item :label="$t('runtime.externalPort')" prop="port">
-                        <el-input v-model.number="runtime.port" />
-                        <span class="input-help">{{ $t('runtime.externalPortHelper') }}</span>
-                    </el-form-item>
-                </el-col>
-                <el-col :span="4">
-                    <el-form-item :label="$t('commons.button.add') + $t('commons.table.port')">
-                        <el-button @click="addPort">
-                            <el-icon><Plus /></el-icon>
-                        </el-button>
-                    </el-form-item>
-                </el-col>
-                <el-col :span="6">
-                    <el-form-item :label="$t('app.allowPort')" prop="params.HOST_IP">
-                        <el-switch
-                            v-model="runtime.params['HOST_IP']"
-                            :active-value="'0.0.0.0'"
-                            :inactive-value="'127.0.0.1'"
-                        />
-                    </el-form-item>
-                </el-col>
-            </el-row>
-            <el-row :gutter="20" v-for="(port, index) of runtime.exposedPorts" :key="index">
-                <el-col :span="7">
-                    <el-form-item
-                        :prop="'exposedPorts.' + index + '.containerPort'"
-                        :rules="rules.params.NODE_APP_PORT"
-                    >
-                        <el-input v-model.number="port.containerPort" :placeholder="$t('runtime.appPort')" />
-                    </el-form-item>
-                </el-col>
-                <el-col :span="7">
-                    <el-form-item :prop="'exposedPorts.' + index + '.hostPort'" :rules="rules.params.NODE_APP_PORT">
-                        <el-input v-model.number="port.hostPort" :placeholder="$t('runtime.externalPort')" />
-                    </el-form-item>
-                </el-col>
-                <el-col :span="4">
-                    <el-form-item>
-                        <el-button type="primary" @click="removePort(index)" link>
-                            {{ $t('commons.button.delete') }}
-                        </el-button>
-                    </el-form-item>
-                </el-col>
-            </el-row>
+            <PortConfig :params="runtime.params" :exposedPorts="runtime.exposedPorts" :rules="rules" />
+            <Environment :environments="runtime.environments" />
             <el-form-item :label="$t('runtime.packageManager')" prop="params.PACKAGE_MANAGER">
                 <el-select v-model="runtime.params['PACKAGE_MANAGER']">
                     <el-option label="npm" value="npm"></el-option>
@@ -201,6 +151,8 @@ import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { computed, reactive, ref, watch } from 'vue';
+import PortConfig from '@/views/website/runtime/port/index.vue';
+import Environment from '@/views/website/runtime/environment/index.vue';
 
 interface OperateRrops {
     id?: number;
@@ -237,6 +189,7 @@ const initData = (type: string) => ({
     port: 3000,
     source: 'https://registry.npmjs.org/',
     exposedPorts: [],
+    environments: [],
 });
 let runtime = reactive<Runtime.RuntimeCreate>(initData('node'));
 const rules = ref<any>({
@@ -246,7 +199,6 @@ const rules = ref<any>({
     port: [Rules.requiredInput, Rules.paramPort, checkNumberRange(1, 65535)],
     source: [Rules.requiredSelect],
     params: {
-        NODE_APP_PORT: [Rules.requiredInput, Rules.paramPort, checkNumberRange(1, 65535)],
         PACKAGE_MANAGER: [Rules.requiredSelect],
         HOST_IP: [Rules.requiredSelect],
         EXEC_SCRIPT: [Rules.requiredSelect],
@@ -279,7 +231,7 @@ const imageSources = [
 ];
 
 watch(
-    () => runtime.params['NODE_APP_PORT'],
+    () => runtime.params['APP_PORT'],
     (newVal) => {
         if (newVal && mode.value == 'create') {
             runtime.port = newVal;
@@ -314,17 +266,6 @@ const changeScriptType = () => {
     if (runtime.params['CUSTOM_SCRIPT'] == '0') {
         getScripts();
     }
-};
-
-const addPort = () => {
-    runtime.exposedPorts.push({
-        hostPort: undefined,
-        containerPort: undefined,
-    });
-};
-
-const removePort = (index: number) => {
-    runtime.exposedPorts.splice(index, 1);
 };
 
 const getScripts = () => {
@@ -398,7 +339,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         if (runtime.exposedPorts && runtime.exposedPorts.length > 0) {
             const containerPortMap = new Map();
             const hostPortMap = new Map();
-            containerPortMap[runtime.params['NODE_APP_PORT']] = true;
+            containerPortMap[runtime.params['APP_PORT']] = true;
             hostPortMap[runtime.port] = true;
             for (const port of runtime.exposedPorts) {
                 if (containerPortMap[port.containerPort]) {
@@ -458,6 +399,7 @@ const getRuntime = async (id: number) => {
             port: data.port,
         });
         runtime.exposedPorts = data.exposedPorts || [];
+        runtime.environments = data.environments || [];
         editParams.value = data.appParams;
         searchApp(data.appID);
         if (data.params['CUSTOM_SCRIPT'] == undefined || data.params['CUSTOM_SCRIPT'] == '0') {

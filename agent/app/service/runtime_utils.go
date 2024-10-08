@@ -207,6 +207,33 @@ func getRuntimeEnv(envStr, key string) string {
 	return ""
 }
 
+func getRuntimeEnvironments(composeByte []byte) ([]request.Environment, error) {
+	var environments []request.Environment
+	var composeMap map[string]interface{}
+	if err := yaml.Unmarshal(composeByte, &composeMap); err != nil {
+		return nil, err
+	}
+	services, ok := composeMap["services"].(map[string]interface{})
+	if !ok {
+		return nil, buserr.New(constant.ErrFileParse)
+	}
+	for _, service := range services {
+		envs, ok := service.(map[string]interface{})["environment"].([]interface{})
+		if !ok {
+			continue
+		}
+		for _, env := range envs {
+			envStr := env.(string)
+			envArray := strings.Split(envStr, "=")
+			environments = append(environments, request.Environment{
+				Key:   envArray[0],
+				Value: envArray[1],
+			})
+		}
+	}
+	return environments, nil
+}
+
 func buildRuntime(runtime *model.Runtime, oldImageID string, oldEnv string, rebuild bool) {
 	runtimePath := runtime.GetPath()
 	composePath := runtime.GetComposePath()
@@ -315,6 +342,11 @@ func handleParams(create request.RuntimeCreate, projectDir string) (composeConte
 	if err != nil {
 		return
 	}
+	for k := range env {
+		if strings.HasPrefix(k, "CONTAINER_PORT_") || strings.HasPrefix(k, "HOST_PORT_") {
+			delete(env, k)
+		}
+	}
 	switch create.Type {
 	case constant.RuntimePHP:
 		create.Params["IMAGE_NAME"] = create.Image
@@ -357,7 +389,7 @@ func handleParams(create request.RuntimeCreate, projectDir string) (composeConte
 			create.Params["RUN_INSTALL"] = "0"
 		}
 		create.Params["CONTAINER_PACKAGE_URL"] = create.Source
-
+		create.Params["NODE_APP_PORT"] = create.Params["APP_PORT"]
 		composeContent, err = handleCompose(env, composeContent, create, projectDir)
 		if err != nil {
 			return
@@ -366,6 +398,7 @@ func handleParams(create request.RuntimeCreate, projectDir string) (composeConte
 		create.Params["CODE_DIR"] = create.CodeDir
 		create.Params["JAVA_VERSION"] = create.Version
 		create.Params["PANEL_APP_PORT_HTTP"] = create.Port
+		create.Params["JAVA_APP_PORT"] = create.Params["APP_PORT"]
 		composeContent, err = handleCompose(env, composeContent, create, projectDir)
 		if err != nil {
 			return
@@ -374,6 +407,7 @@ func handleParams(create request.RuntimeCreate, projectDir string) (composeConte
 		create.Params["CODE_DIR"] = create.CodeDir
 		create.Params["GO_VERSION"] = create.Version
 		create.Params["PANEL_APP_PORT_HTTP"] = create.Port
+		create.Params["GO_APP_PORT"] = create.Params["APP_PORT"]
 		composeContent, err = handleCompose(env, composeContent, create, projectDir)
 		if err != nil {
 			return
@@ -416,7 +450,6 @@ func handleCompose(env gotenv.Env, composeContent []byte, create request.Runtime
 		_, ok := serviceValue["ports"].([]interface{})
 		if ok {
 			var ports []interface{}
-
 			switch create.Type {
 			case constant.RuntimeNode:
 				ports = append(ports, "${HOST_IP}:${PANEL_APP_PORT_HTTP}:${NODE_APP_PORT}")
@@ -426,7 +459,6 @@ func handleCompose(env gotenv.Env, composeContent []byte, create request.Runtime
 				ports = append(ports, "${HOST_IP}:${PANEL_APP_PORT_HTTP}:${GO_APP_PORT}")
 
 			}
-
 			for i, port := range create.ExposedPorts {
 				containerPortStr := fmt.Sprintf("CONTAINER_PORT_%d", i)
 				hostPortStr := fmt.Sprintf("HOST_PORT_%d", i)
@@ -437,6 +469,13 @@ func handleCompose(env gotenv.Env, composeContent []byte, create request.Runtime
 				create.Params[hostPortStr] = port.HostPort
 			}
 			serviceValue["ports"] = ports
+		}
+		var environments []interface{}
+		for _, e := range create.Environments {
+			environments = append(environments, fmt.Sprintf("%s:%s", e.Key, e.Value))
+		}
+		if len(environments) > 0 {
+			serviceValue["environment"] = environments
 		}
 		break
 	}
@@ -581,4 +620,31 @@ func restartRuntime(runtime *model.Runtime) (err error) {
 		return
 	}
 	return
+}
+
+func getDockerComposeEnvironments(yml []byte) ([]request.Environment, error) {
+	var (
+		composeProject docker.ComposeProject
+		err            error
+	)
+	err = yaml.Unmarshal(yml, &composeProject)
+	if err != nil {
+		return nil, err
+	}
+	var res []request.Environment
+	for _, service := range composeProject.Services {
+		for _, env := range service.Environment {
+			envArray := strings.Split(env, ":")
+			key := envArray[0]
+			value := ""
+			if len(envArray) > 1 {
+				value = envArray[1]
+			}
+			res = append(res, request.Environment{
+				Key:   key,
+				Value: value,
+			})
+		}
+	}
+	return res, nil
 }

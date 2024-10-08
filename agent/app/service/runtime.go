@@ -161,7 +161,7 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, e
 			return nil, err
 		}
 	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo:
-		runtime.Port = create.Port
+		runtime.Port = int(create.Params["port"].(float64))
 		if err = handleNodeAndJava(create, runtime, fileOp, appVersionDir); err != nil {
 			return nil, err
 		}
@@ -347,7 +347,7 @@ func (r *RuntimeService) Get(id uint) (*response.RuntimeDTO, error) {
 		}
 		for k, v := range envs {
 			switch k {
-			case "NODE_APP_PORT", "PANEL_APP_PORT_HTTP", "JAVA_APP_PORT", "GO_APP_PORT":
+			case "NODE_APP_PORT", "PANEL_APP_PORT_HTTP", "JAVA_APP_PORT", "GO_APP_PORT", "APP_PORT", "port":
 				port, err := strconv.Atoi(v)
 				if err != nil {
 					return nil, err
@@ -379,6 +379,14 @@ func (r *RuntimeService) Get(id uint) (*response.RuntimeDTO, error) {
 		if v, ok := envs["CONTAINER_PACKAGE_URL"]; ok {
 			res.Source = v
 		}
+		composeByte, err := files.NewFileOp().GetContent(runtime.GetComposePath())
+		if err != nil {
+			return nil, err
+		}
+		res.Environments, err = getDockerComposeEnvironments(composeByte)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return &res, nil
@@ -395,6 +403,7 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 	}
 	oldImage := runtime.Image
 	oldEnv := runtime.Env
+	req.Port = int(req.Params["port"].(float64))
 	switch runtime.Type {
 	case constant.RuntimePHP:
 		exist, _ := runtimeRepo.GetFirst(runtimeRepo.WithImage(req.Name), runtimeRepo.WithNotId(req.ID))
@@ -451,6 +460,7 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 			Port:         req.Port,
 			Install:      true,
 			ExposedPorts: req.ExposedPorts,
+			Environments: req.Environments,
 		},
 	}
 	composeContent, envContent, _, err := handleParams(create, projectDir)

@@ -1,6 +1,8 @@
 package request
 
-import "github.com/1Panel-dev/1Panel/agent/app/dto"
+import (
+	"github.com/1Panel-dev/1Panel/agent/app/dto"
+)
 
 type RuntimeSearch struct {
 	dto.PageInfo
@@ -27,6 +29,12 @@ type NodeConfig struct {
 	Clean        bool          `json:"clean"`
 	Port         int           `json:"port"`
 	ExposedPorts []ExposedPort `json:"exposedPorts"`
+	Environments []Environment `json:"environments"`
+}
+
+type Environment struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
 }
 
 type ExposedPort struct {

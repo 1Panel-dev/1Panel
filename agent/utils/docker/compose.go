@@ -53,7 +53,8 @@ type ComposeProject struct {
 }
 
 type Service struct {
-	Image string `yaml:"image"`
+	Image       string   `yaml:"image"`
+	Environment []string `yaml:"environment"`
 }
 
 func replaceEnvVariables(input string, envVars map[string]string) string {

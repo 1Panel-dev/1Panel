@@ -2346,6 +2346,9 @@ const message = {
         start_servers: '启动时创建的进程数',
         min_spare_servers: '最小空闲进程数',
         max_spare_servers: '最大空闲进程数',
+        envKey: '名称',
+        envValue: '值',
+        environment: '环境变量',
     },
     process: {
         pid: '进程ID',

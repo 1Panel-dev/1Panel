@@ -49,7 +49,6 @@
     </DrawerPro>
 </template>
 <script lang="ts" setup>
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { GetCA } from '@/api/modules/website';
 import { ref } from 'vue';
 
