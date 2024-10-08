@@ -34,7 +34,6 @@
                     {{ $t('file.download') }}
                 </el-button>
             </div>
-
             <div class="mt-2.5">
                 <highlightjs
                     ref="editorRef"
@@ -57,8 +56,8 @@ import { GlobalStore } from '@/store';
 import screenfull from 'screenfull';
 import { DownloadFile } from '@/api/modules/container';
 
-const logInfo = ref();
-const terminalSocket = ref<WebSocket>();
+const logInfo = ref('');
+const logSocket = ref<WebSocket>();
 const open = ref(false);
 const resource = ref('');
 const globalStore = GlobalStore();
@@ -78,7 +77,7 @@ const logSearch = reactive({
 });
 
 const handleClose = () => {
-    terminalSocket.value?.send('close conn');
+    logSocket.value?.send('close conn');
     open.value = false;
 };
 
@@ -120,16 +119,16 @@ const searchLogs = async () => {
         MsgError(i18n.global.t('container.linesHelper'));
         return;
     }
-    terminalSocket.value?.send('close conn');
-    terminalSocket.value?.close();
+    logSocket.value?.send('close conn');
+    logSocket.value?.close();
     logInfo.value = '';
     const href = window.location.href;
     const protocol = href.split('//')[0] === 'http:' ? 'ws' : 'wss';
     const host = href.split('//')[1].split('/')[0];
-    terminalSocket.value = new WebSocket(
+    logSocket.value = new WebSocket(
         `${protocol}://${host}/api/v2/containers/compose/search/log?compose=${logSearch.compose}&since=${logSearch.mode}&tail=${logSearch.tail}&follow=${logSearch.isWatch}`,
     );
-    terminalSocket.value.onmessage = (event) => {
+    logSocket.value.onmessage = (event) => {
         logInfo.value += event.data;
         nextTick(() => {
             console.log(scrollerElement.value);
@@ -179,7 +178,6 @@ const acceptParams = (props: DialogProps): void => {
     logSearch.mode = timeOptions.value[3].value;
     logSearch.isWatch = true;
     resource.value = props.resource;
-    searchLogs();
     open.value = true;
     if (!mobile.value) {
         screenfull.on('change', () => {
@@ -188,6 +186,7 @@ const acceptParams = (props: DialogProps): void => {
     }
     nextTick(() => {
         if (editorRef.value) {
+            searchLogs();
             scrollerElement.value = editorRef.value.$el as HTMLElement;
             let hljsDom = scrollerElement.value.querySelector('.hljs') as HTMLElement;
             hljsDom.style['min-height'] = '300px';

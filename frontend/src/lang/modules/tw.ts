@@ -2347,6 +2347,9 @@ const message = {
         start_servers: '啟動時所建立的進程數',
         min_spare_servers: '最小空閒行程數',
         max_spare_servers: '最大空閒行程數',
+        envKey: '名稱',
+        envValue: '值',
+        environment: '環境變數',
     },
     process: {
         pid: '進程ID',

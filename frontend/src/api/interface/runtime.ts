@@ -39,6 +39,7 @@ export namespace Runtime {
         source?: string;
         path?: string;
         exposedPorts?: ExposedPort[];
+        environments?: Environment[];
     }
 
     export interface RuntimeCreate {
@@ -56,11 +57,17 @@ export namespace Runtime {
         codeDir?: string;
         port?: number;
         exposedPorts?: ExposedPort[];
+        environments?: Environment[];
     }
 
     export interface ExposedPort {
         hostPort: number;
         containerPort: number;
+    }
+
+    export interface Environment {
+        key: string;
+        value: string;
     }
 
     export interface RuntimeUpdate {

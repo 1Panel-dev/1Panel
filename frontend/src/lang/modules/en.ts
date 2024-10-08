@@ -2530,6 +2530,9 @@ const message = {
         start_servers: 'number of processes created at startup',
         min_spare_servers: 'minimum number of idle processes',
         max_spare_servers: 'maximum number of idle processes',
+        envKey: 'Name',
+        envValue: 'Value',
+        environment: 'Environment Variable',
     },
     process: {
         pid: 'Process ID',

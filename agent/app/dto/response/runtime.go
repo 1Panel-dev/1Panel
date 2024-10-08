@@ -26,6 +26,7 @@ type RuntimeDTO struct {
 	Port         int                    `json:"port"`
 	Path         string                 `json:"path"`
 	ExposedPorts []request.ExposedPort  `json:"exposedPorts"`
+	Environments []request.Environment  `json:"environments"`
 }
 
 type PackageScripts struct {

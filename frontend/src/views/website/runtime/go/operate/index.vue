@@ -77,67 +77,18 @@
                     </el-form-item>
                 </el-col>
             </el-row>
-            <el-row :gutter="20">
-                <el-col :span="7">
-                    <el-form-item :label="$t('runtime.appPort')" prop="params.GO_APP_PORT">
-                        <el-input v-model.number="runtime.params['GO_APP_PORT']" />
-                        <span class="input-help">{{ $t('runtime.appPortHelper') }}</span>
-                    </el-form-item>
-                </el-col>
-                <el-col :span="7">
-                    <el-form-item :label="$t('runtime.externalPort')" prop="port">
-                        <el-input v-model.number="runtime.port" />
-                        <span class="input-help">{{ $t('runtime.externalPortHelper') }}</span>
-                    </el-form-item>
-                </el-col>
-                <el-col :span="4">
-                    <el-form-item :label="$t('commons.button.add') + $t('commons.table.port')">
-                        <el-button @click="addPort">
-                            <el-icon><Plus /></el-icon>
-                        </el-button>
-                    </el-form-item>
-                </el-col>
-                <el-col :span="6">
-                    <el-form-item :label="$t('app.allowPort')" prop="params.HOST_IP">
-                        <el-switch
-                            v-model="runtime.params['HOST_IP']"
-                            :active-value="'0.0.0.0'"
-                            :inactive-value="'127.0.0.1'"
-                        />
-                    </el-form-item>
-                </el-col>
-            </el-row>
-            <el-row :gutter="20" v-for="(port, index) of runtime.exposedPorts" :key="index">
-                <el-col :span="7">
-                    <el-form-item :prop="'exposedPorts.' + index + '.containerPort'" :rules="rules.params.GO_APP_PORT">
-                        <el-input v-model.number="port.containerPort" :placeholder="$t('runtime.appPort')" />
-                    </el-form-item>
-                </el-col>
-                <el-col :span="7">
-                    <el-form-item :prop="'exposedPorts.' + index + '.hostPort'" :rules="rules.params.GO_APP_PORT">
-                        <el-input v-model.number="port.hostPort" :placeholder="$t('runtime.externalPort')" />
-                    </el-form-item>
-                </el-col>
-                <el-col :span="4">
-                    <el-form-item>
-                        <el-button type="primary" @click="removePort(index)" link>
-                            {{ $t('commons.button.delete') }}
-                        </el-button>
-                    </el-form-item>
-                </el-col>
-            </el-row>
+            <PortConfig :params="runtime.params" :exposedPorts="runtime.exposedPorts" :rules="rules" />
+            <Environment :environments="runtime.environments" />
             <el-form-item :label="$t('app.containerName')" prop="params.CONTAINER_NAME">
                 <el-input v-model.trim="runtime.params['CONTAINER_NAME']"></el-input>
             </el-form-item>
         </el-form>
 
         <template #footer>
-            <span>
-                <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="submit(runtimeForm)" :disabled="loading">
-                    {{ $t('commons.button.confirm') }}
-                </el-button>
-            </span>
+            <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
+            <el-button type="primary" @click="submit(runtimeForm)" :disabled="loading">
+                {{ $t('commons.button.confirm') }}
+            </el-button>
         </template>
     </DrawerPro>
 </template>
@@ -152,6 +103,8 @@ import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { reactive, ref, watch } from 'vue';
+import PortConfig from '@/views/website/runtime/port/index.vue';
+import Environment from '@/views/website/runtime/environment/index.vue';
 
 interface OperateRrops {
     id?: number;
@@ -185,6 +138,7 @@ const initData = (type: string) => ({
     codeDir: '/',
     port: 8080,
     exposedPorts: [],
+    environments: [],
 });
 let runtime = reactive<Runtime.RuntimeCreate>(initData('go'));
 const rules = ref<any>({
@@ -194,7 +148,7 @@ const rules = ref<any>({
     port: [Rules.requiredInput, Rules.paramPort, checkNumberRange(1, 65535)],
     source: [Rules.requiredSelect],
     params: {
-        GO_APP_PORT: [Rules.requiredInput, Rules.paramPort, checkNumberRange(1, 65535)],
+        APP_PORT: [Rules.requiredInput, Rules.paramPort, checkNumberRange(1, 65535)],
         HOST_IP: [Rules.requiredSelect],
         CONTAINER_NAME: [Rules.requiredInput, Rules.containerName],
         EXEC_SCRIPT: [Rules.requiredInput],
@@ -204,7 +158,7 @@ const scripts = ref<Runtime.NodeScripts[]>([]);
 const em = defineEmits(['close']);
 
 watch(
-    () => runtime.params['GO_APP_PORT'],
+    () => runtime.params['APP_PORT'],
     (newVal) => {
         if (newVal && mode.value == 'create') {
             runtime.port = newVal;
@@ -231,17 +185,6 @@ const handleClose = () => {
 
 const getPath = (codeDir: string) => {
     runtime.codeDir = codeDir;
-};
-
-const addPort = () => {
-    runtime.exposedPorts.push({
-        hostPort: undefined,
-        containerPort: undefined,
-    });
-};
-
-const removePort = (index: number) => {
-    runtime.exposedPorts.splice(index, 1);
 };
 
 const searchApp = (appID: number) => {
@@ -303,7 +246,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         if (runtime.exposedPorts && runtime.exposedPorts.length > 0) {
             const containerPortMap = new Map();
             const hostPortMap = new Map();
-            containerPortMap[runtime.params['GO_APP_PORT']] = true;
+            containerPortMap[runtime.params['APP_PORT']] = true;
             hostPortMap[runtime.port] = true;
             for (const port of runtime.exposedPorts) {
                 if (containerPortMap[port.containerPort]) {
@@ -363,6 +306,7 @@ const getRuntime = async (id: number) => {
             port: data.port,
         });
         runtime.exposedPorts = data.exposedPorts || [];
+        runtime.environments = data.environments || [];
         editParams.value = data.appParams;
         searchApp(data.appID);
         open.value = true;
