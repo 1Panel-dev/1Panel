@@ -169,6 +169,7 @@ export namespace Setting {
         assigneeName: string;
         productPro: string;
         trial: boolean;
+        offline: boolean;
         status: string;
         message: string;
     }
