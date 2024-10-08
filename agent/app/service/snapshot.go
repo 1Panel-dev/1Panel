@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -18,7 +19,6 @@ import (
 	"github.com/docker/docker/api/types/image"
 	"github.com/google/uuid"
 	"github.com/jinzhu/copier"
-	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/v3/host"
 )
 
@@ -28,6 +28,7 @@ type SnapshotService struct {
 
 type ISnapshotService interface {
 	SearchWithPage(req dto.SearchWithPage) (int64, interface{}, error)
+	LoadSize(req dto.SearchWithPage) ([]dto.SnapshotFile, error)
 	LoadSnapshotData() (dto.SnapshotData, error)
 	SnapshotCreate(req dto.SnapshotCreate) error
 	SnapshotReCreate(id uint) error
@@ -46,15 +47,64 @@ func NewISnapshotService() ISnapshotService {
 }
 
 func (u *SnapshotService) SearchWithPage(req dto.SearchWithPage) (int64, interface{}, error) {
-	total, systemBackups, err := snapshotRepo.Page(req.Page, req.PageSize, commonRepo.WithByLikeName(req.Info))
+	total, records, err := snapshotRepo.Page(req.Page, req.PageSize, commonRepo.WithByLikeName(req.Info))
 	if err != nil {
 		return 0, nil, err
 	}
-	dtoSnap, err := loadSnapSize(systemBackups)
-	if err != nil {
-		return 0, nil, err
+	var datas []dto.SnapshotInfo
+	for i := 0; i < len(records); i++ {
+		var item dto.SnapshotInfo
+		if err := copier.Copy(&item, &records[i]); err != nil {
+			return 0, nil, err
+		}
+		datas = append(datas, item)
 	}
-	return total, dtoSnap, err
+	return total, datas, err
+}
+
+func (u *SnapshotService) LoadSize(req dto.SearchWithPage) ([]dto.SnapshotFile, error) {
+	_, records, err := snapshotRepo.Page(req.Page, req.PageSize, commonRepo.WithByLikeName(req.Info))
+	if err != nil {
+		return nil, err
+	}
+	var datas []dto.SnapshotFile
+	var wg sync.WaitGroup
+	clientMap := make(map[uint]loadSizeHelper)
+	for i := 0; i < len(records); i++ {
+		itemPath := fmt.Sprintf("system_snapshot/%s.tar.gz", records[i].Name)
+		data := dto.SnapshotFile{ID: records[i].ID, Name: records[i].Name}
+		accounts := strings.Split(records[i].SourceAccountIDs, ",")
+		var accountNames []string
+		for _, account := range accounts {
+			itemVal, _ := strconv.Atoi(account)
+			if _, ok := clientMap[uint(itemVal)]; !ok {
+				backup, client, err := NewBackupClientWithID(uint(itemVal))
+				if err != nil {
+					global.LOG.Errorf("load backup client from db failed, err: %v", err)
+					clientMap[records[i].DownloadAccountID] = loadSizeHelper{}
+					continue
+				}
+				backupName := fmt.Sprintf("%s - %s", backup.Type, backup.Name)
+				clientMap[uint(itemVal)] = loadSizeHelper{backupPath: strings.TrimLeft(backup.BackupPath, "/"), client: client, isOk: true, backupName: backupName}
+				accountNames = append(accountNames, backupName)
+			}
+		}
+		data.DefaultDownload = clientMap[records[i].DownloadAccountID].backupName
+		data.From = strings.Join(accountNames, ",")
+		if clientMap[records[i].DownloadAccountID].isOk {
+			wg.Add(1)
+			go func(index int) {
+				data.Size, _ = clientMap[records[index].DownloadAccountID].client.Size(path.Join(clientMap[records[index].DownloadAccountID].backupPath, itemPath))
+				datas = append(datas, data)
+				wg.Done()
+			}(i)
+		} else {
+			datas = append(datas, data)
+		}
+	}
+	wg.Wait()
+
+	return datas, nil
 }
 
 func (u *SnapshotService) SnapshotImport(req dto.SnapshotImport) error {
@@ -173,44 +223,6 @@ func loadOs() string {
 	default:
 		return hostInfo.KernelArch
 	}
-}
-
-func loadSnapSize(records []model.Snapshot) ([]dto.SnapshotInfo, error) {
-	var datas []dto.SnapshotInfo
-	clientMap := make(map[uint]loadSizeHelper)
-	var wg sync.WaitGroup
-	for i := 0; i < len(records); i++ {
-		var item dto.SnapshotInfo
-		if err := copier.Copy(&item, &records[i]); err != nil {
-			return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
-		}
-		itemPath := fmt.Sprintf("system_snapshot/%s.tar.gz", item.Name)
-		if _, ok := clientMap[records[i].DownloadAccountID]; !ok {
-			backup, client, err := NewBackupClientWithID(records[i].DownloadAccountID)
-			if err != nil {
-				global.LOG.Errorf("load backup client from db failed, err: %v", err)
-				clientMap[records[i].DownloadAccountID] = loadSizeHelper{}
-				datas = append(datas, item)
-				continue
-			}
-			item.Size, _ = client.Size(path.Join(strings.TrimLeft(backup.BackupPath, "/"), itemPath))
-			datas = append(datas, item)
-			clientMap[records[i].DownloadAccountID] = loadSizeHelper{backupPath: strings.TrimLeft(backup.BackupPath, "/"), client: client, isOk: true}
-			continue
-		}
-		if clientMap[records[i].DownloadAccountID].isOk {
-			wg.Add(1)
-			go func(index int) {
-				item.Size, _ = clientMap[records[index].DownloadAccountID].client.Size(path.Join(clientMap[records[index].DownloadAccountID].backupPath, itemPath))
-				datas = append(datas, item)
-				wg.Done()
-			}(i)
-		} else {
-			datas = append(datas, item)
-		}
-	}
-	wg.Wait()
-	return datas, nil
 }
 
 func loadApps(fileOp fileUtils.FileOp) ([]dto.DataTree, error) {
