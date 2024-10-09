@@ -331,3 +331,11 @@ export const GetWebsiteDatabase = () => {
 export const ChangeDatabase = (req: Website.ChangeDatabase) => {
     return http.post(`/websites/databases`, req);
 };
+
+export const OperateCustomRewrite = (req: Website.CustomRewirte) => {
+    return http.post(`/websites/rewrite/custom`, req);
+};
+
+export const ListCustomRewrite = () => {
+    return http.get<string[]>(`/websites/rewrite/custom`);
+};

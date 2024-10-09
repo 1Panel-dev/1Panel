@@ -2089,6 +2089,7 @@ const message = {
         changeDatabase: '切换数据库',
         changeDatabaseHelper1: '数据库关联用于备份恢复网站',
         changeDatabaseHelper2: '切换其他数据库会导致以前的备份无法恢复',
+        saveCustom: '另存为模版',
     },
     php: {
         short_open_tag: '短标签支持',

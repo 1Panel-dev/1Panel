@@ -134,7 +134,7 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 		if err != nil {
 			return err
 		}
-		if err = fileOp.CopyFile(fmt.Sprintf("%s/%s.conf", tmpPath, website.Alias), GetSitePath(*website, SiteConfDir)); err != nil {
+		if err = fileOp.CopyFile(fmt.Sprintf("%s/%s.conf", tmpPath, website.Alias), GetOpenrestyDir(SiteConfDir)); err != nil {
 			return err
 		}
 

@@ -2244,6 +2244,7 @@ const message = {
         changeDatabase: 'Change Database',
         changeDatabaseHelper1: 'Database association is used for backing up and restoring the website.',
         changeDatabaseHelper2: 'Switching to another database will cause previous backups to be unrecoverable.',
+        saveCustom: 'Save as Template',
     },
     php: {
         short_open_tag: 'Short tag support',
