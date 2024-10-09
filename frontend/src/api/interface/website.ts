@@ -373,6 +373,8 @@ export namespace Website {
         content?: string;
         proxyAddress?: string;
         proxyProtocol?: string;
+        sni: boolean;
+        proxySSLName: string;
     }
 
     export interface ProxReplace {
