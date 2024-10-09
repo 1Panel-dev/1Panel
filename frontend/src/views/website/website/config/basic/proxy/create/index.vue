@@ -97,7 +97,6 @@
 </template>
 
 <script lang="ts" setup>
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { OperateProxyConfig } from '@/api/modules/website';
 import { checkNumberRange, Rules } from '@/global/form-rules';
 import i18n from '@/lang';

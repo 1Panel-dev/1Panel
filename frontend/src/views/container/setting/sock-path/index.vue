@@ -1,15 +1,6 @@
 <template>
     <div>
-        <el-drawer
-            v-model="drawerVisible"
-            :destroy-on-close="true"
-            :close-on-click-modal="false"
-            :close-on-press-escape="false"
-            size="30%"
-        >
-            <template #header>
-                <DrawerHeader :header="$t('container.sockPath')" :back="handleClose" />
-            </template>
+        <DrawerPro v-model="drawerVisible" :header="$t('container.sockPath')" :back="handleClose" size="small">
             <el-form
                 ref="formRef"
                 label-position="top"
@@ -18,29 +9,23 @@
                 @submit.prevent
                 v-loading="loading"
             >
-                <el-row type="flex" justify="center">
-                    <el-col :span="22">
-                        <el-form-item :label="$t('container.sockPath')" prop="dockerSockPath">
-                            <el-input v-model="form.dockerSockPath">
-                                <template #prepend>unix://</template>
-                                <template #append>
-                                    <FileList @choose="loadBuildDir"></FileList>
-                                </template>
-                            </el-input>
-                            <span class="input-help">{{ $t('container.sockPathHelper1') }}</span>
-                        </el-form-item>
-                    </el-col>
-                </el-row>
+                <el-form-item :label="$t('container.sockPath')" prop="dockerSockPath">
+                    <el-input v-model="form.dockerSockPath">
+                        <template #prepend>unix://</template>
+                        <template #append>
+                            <FileList @choose="loadBuildDir"></FileList>
+                        </template>
+                    </el-input>
+                    <span class="input-help">{{ $t('container.sockPathHelper1') }}</span>
+                </el-form-item>
             </el-form>
             <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
-                        {{ $t('commons.button.confirm') }}
-                    </el-button>
-                </span>
+                <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
+                    {{ $t('commons.button.confirm') }}
+                </el-button>
             </template>
-        </el-drawer>
+        </DrawerPro>
     </div>
 </template>
 <script lang="ts" setup>
@@ -48,7 +33,6 @@ import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { updateSetting } from '@/api/modules/setting';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { ElMessageBox, FormInstance } from 'element-plus';
 
 const emit = defineEmits<{ (e: 'search'): void }>();

@@ -40,6 +40,7 @@ export namespace Runtime {
         path?: string;
         exposedPorts?: ExposedPort[];
         environments?: Environment[];
+        volumes?: Volume[];
     }
 
     export interface RuntimeCreate {
@@ -58,6 +59,7 @@ export namespace Runtime {
         port?: number;
         exposedPorts?: ExposedPort[];
         environments?: Environment[];
+        volumes?: Volume[];
     }
 
     export interface ExposedPort {
@@ -68,6 +70,10 @@ export namespace Runtime {
     export interface Environment {
         key: string;
         value: string;
+    }
+    export interface Volume {
+        source: string;
+        target: string;
     }
 
     export interface RuntimeUpdate {

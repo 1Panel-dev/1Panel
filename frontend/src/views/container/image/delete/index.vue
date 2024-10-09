@@ -1,52 +1,37 @@
 <template>
     <div>
-        <el-drawer
-            v-model="deleteVisible"
-            :destroy-on-close="true"
-            :close-on-click-modal="false"
-            :close-on-press-escape="false"
-            size="30%"
-        >
-            <template #header>
-                <DrawerHeader :header="$t('container.imageDelete')" :back="handleClose" />
-            </template>
+        <DrawerPro v-model="deleteVisible" :header="$t('container.imageDelete')" :back="handleClose" size="small">
             <el-form @submit.prevent :model="form" label-position="top">
-                <el-row type="flex" justify="center">
-                    <el-col :span="22">
-                        <el-form-item :label="$t('container.tag')" prop="tagName">
-                            <div style="width: 100%">
-                                <el-checkbox
-                                    v-model="deleteAll"
-                                    :indeterminate="isIndeterminate"
-                                    @change="handleCheckAllChange"
-                                >
-                                    {{ $t('container.removeAll') }}
-                                </el-checkbox>
-                            </div>
-                            <el-checkbox-group v-model="form.deleteTags" @change="handleCheckedChange">
-                                <div>
-                                    <el-checkbox
-                                        style="width: 100%"
-                                        v-for="item in form.tags"
-                                        :key="item"
-                                        :value="item"
-                                        :label="item"
-                                    />
-                                </div>
-                            </el-checkbox-group>
-                        </el-form-item>
-                    </el-col>
-                </el-row>
+                <el-form-item :label="$t('container.tag')" prop="tagName">
+                    <div style="width: 100%">
+                        <el-checkbox
+                            v-model="deleteAll"
+                            :indeterminate="isIndeterminate"
+                            @change="handleCheckAllChange"
+                        >
+                            {{ $t('container.removeAll') }}
+                        </el-checkbox>
+                    </div>
+                    <el-checkbox-group v-model="form.deleteTags" @change="handleCheckedChange">
+                        <div>
+                            <el-checkbox
+                                style="width: 100%"
+                                v-for="item in form.tags"
+                                :key="item"
+                                :value="item"
+                                :label="item"
+                            />
+                        </div>
+                    </el-checkbox-group>
+                </el-form-item>
             </el-form>
             <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="deleteVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button type="primary" :disabled="form.deleteTags.length === 0" @click="batchDelete()">
-                        {{ $t('commons.button.delete') }}
-                    </el-button>
-                </span>
+                <el-button @click="deleteVisible = false">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button type="primary" :disabled="form.deleteTags.length === 0" @click="batchDelete()">
+                    {{ $t('commons.button.delete') }}
+                </el-button>
             </template>
-        </el-drawer>
+        </DrawerPro>
 
         <OpDialog ref="opRef" @search="onSearch" @cancel="handleClose" />
     </div>
@@ -55,7 +40,6 @@
 import { reactive, ref } from 'vue';
 import { ElForm } from 'element-plus';
 import { imageRemove } from '@/api/modules/container';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import i18n from '@/lang';
 
 const deleteVisible = ref(false);

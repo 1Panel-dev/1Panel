@@ -387,6 +387,32 @@ func (r *RuntimeService) Get(id uint) (*response.RuntimeDTO, error) {
 		if err != nil {
 			return nil, err
 		}
+		volumes, err := getDockerComposeVolumes(composeByte)
+		if err != nil {
+			return nil, err
+		}
+
+		defaultVolumes := make(map[string]string)
+		switch runtime.Type {
+		case constant.RuntimeNode:
+			defaultVolumes = constant.RuntimeDefaultVolumes
+		case constant.RuntimeJava:
+			defaultVolumes = constant.RuntimeDefaultVolumes
+		case constant.RuntimeGo:
+			defaultVolumes = constant.GoDefaultVolumes
+		}
+		for _, volume := range volumes {
+			exist := false
+			for key, value := range defaultVolumes {
+				if key == volume.Source && value == volume.Target {
+					exist = true
+					break
+				}
+			}
+			if !exist {
+				res.Volumes = append(res.Volumes, volume)
+			}
+		}
 	}
 
 	return &res, nil
@@ -461,6 +487,7 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 			Install:      true,
 			ExposedPorts: req.ExposedPorts,
 			Environments: req.Environments,
+			Volumes:      req.Volumes,
 		},
 	}
 	composeContent, envContent, _, err := handleParams(create, projectDir)

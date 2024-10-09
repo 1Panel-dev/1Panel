@@ -79,6 +79,7 @@
             </el-row>
             <PortConfig :params="runtime.params" :exposedPorts="runtime.exposedPorts" :rules="rules" />
             <Environment :environments="runtime.environments" />
+            <Volumes :volumes="runtime.volumes" />
             <el-form-item :label="$t('app.containerName')" prop="params.CONTAINER_NAME">
                 <el-input v-model.trim="runtime.params['CONTAINER_NAME']"></el-input>
             </el-form-item>
@@ -105,6 +106,7 @@ import { FormInstance } from 'element-plus';
 import { reactive, ref, watch } from 'vue';
 import PortConfig from '@/views/website/runtime/port/index.vue';
 import Environment from '@/views/website/runtime/environment/index.vue';
+import Volumes from '@/views/website/runtime/volume/index.vue';
 
 interface OperateRrops {
     id?: number;
@@ -139,6 +141,7 @@ const initData = (type: string) => ({
     port: 8080,
     exposedPorts: [],
     environments: [],
+    volumes: [],
 });
 let runtime = reactive<Runtime.RuntimeCreate>(initData('go'));
 const rules = ref<any>({
@@ -307,6 +310,7 @@ const getRuntime = async (id: number) => {
         });
         runtime.exposedPorts = data.exposedPorts || [];
         runtime.environments = data.environments || [];
+        runtime.volumes = data.volumes || [];
         editParams.value = data.appParams;
         searchApp(data.appID);
         open.value = true;

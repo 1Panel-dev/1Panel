@@ -1,16 +1,6 @@
 <template>
     <div>
-        <el-drawer
-            v-model="drawerVisible"
-            :destroy-on-close="true"
-            :close-on-click-modal="false"
-            :close-on-press-escape="false"
-            @close="handleClose"
-            size="30%"
-        >
-            <template #header>
-                <DrawerHeader :header="$t('container.cutLog')" :back="handleClose" />
-            </template>
+        <DrawerPro v-model="drawerVisible" :header="$t('container.cutLog')" :back="handleClose" size="small">
             <el-alert class="common-prompt" :closable="false" type="warning">
                 <template #default>
                     <ul style="margin-left: -20px">
@@ -21,36 +11,29 @@
                 </template>
             </el-alert>
             <el-form :model="form" ref="formRef" :rules="rules" v-loading="loading" label-position="top">
-                <el-row type="flex" justify="center">
-                    <el-col :span="22">
-                        <el-form-item prop="logMaxSize" :label="$t('container.maxSize')">
-                            <el-input v-model.number="form.logMaxSize">
-                                <template #append>
-                                    <el-select v-model="form.sizeUnit" style="width: 70px">
-                                        <el-option label="Byte" value="b"></el-option>
-                                        <el-option label="KB" value="k"></el-option>
-                                        <el-option label="MB" value="m"></el-option>
-                                        <el-option label="GB" value="g"></el-option>
-                                    </el-select>
-                                </template>
-                            </el-input>
-                        </el-form-item>
-                        <el-form-item prop="logMaxFile" :label="$t('container.maxFile')">
-                            <el-input v-model.number="form.logMaxFile" />
-                        </el-form-item>
-                    </el-col>
-                </el-row>
+                <el-form-item prop="logMaxSize" :label="$t('container.maxSize')">
+                    <el-input v-model.number="form.logMaxSize">
+                        <template #append>
+                            <el-select v-model="form.sizeUnit" style="width: 70px">
+                                <el-option label="Byte" value="b"></el-option>
+                                <el-option label="KB" value="k"></el-option>
+                                <el-option label="MB" value="m"></el-option>
+                                <el-option label="GB" value="g"></el-option>
+                            </el-select>
+                        </template>
+                    </el-input>
+                </el-form-item>
+                <el-form-item prop="logMaxFile" :label="$t('container.maxFile')">
+                    <el-input v-model.number="form.logMaxFile" />
+                </el-form-item>
             </el-form>
             <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button :disabled="loading" type="primary" @click="onSave(formRef)">
-                        {{ $t('commons.button.confirm') }}
-                    </el-button>
-                </span>
+                <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button :disabled="loading" type="primary" @click="onSave(formRef)">
+                    {{ $t('commons.button.confirm') }}
+                </el-button>
             </template>
-        </el-drawer>
-
+        </DrawerPro>
         <ConfirmDialog ref="confirmDialogRef" @confirm="onSubmitSave"></ConfirmDialog>
     </div>
 </template>
@@ -61,7 +44,6 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { updateLogOption } from '@/api/modules/container';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const loading = ref();
 const drawerVisible = ref();

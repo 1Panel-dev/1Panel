@@ -1,40 +1,31 @@
 <template>
     <div>
-        <el-drawer
+        <DrawerPro
             v-model="changeVisible"
-            :destroy-on-close="true"
-            :close-on-click-modal="false"
-            :close-on-press-escape="false"
-            width="30%"
+            :header="$t('database.permission')"
+            :resource="form.name"
+            :back="handleClose"
+            size="small"
         >
-            <template #header>
-                <DrawerHeader :header="$t('database.permission')" :resource="form.name" :back="handleClose" />
-            </template>
             <el-form v-loading="loading" :model="form" label-position="top">
-                <el-row type="flex" justify="center">
-                    <el-col :span="22">
-                        <el-form-item :label="$t('database.userBind')">
-                            <el-tag>
-                                {{ form.username }}
-                            </el-tag>
-                        </el-form-item>
-                        <el-form-item :label="$t('database.permission')" prop="superUser">
-                            <el-checkbox v-model="form.superUser">{{ $t('database.pgSuperUser') }}</el-checkbox>
-                        </el-form-item>
-                    </el-col>
-                </el-row>
+                <el-form-item :label="$t('database.userBind')">
+                    <el-tag>
+                        {{ form.username }}
+                    </el-tag>
+                </el-form-item>
+                <el-form-item :label="$t('database.permission')" prop="superUser">
+                    <el-checkbox v-model="form.superUser">{{ $t('database.pgSuperUser') }}</el-checkbox>
+                </el-form-item>
             </el-form>
             <template #footer>
-                <span class="dialog-footer">
-                    <el-button :disabled="loading" @click="changeVisible = false">
-                        {{ $t('commons.button.cancel') }}
-                    </el-button>
-                    <el-button :disabled="loading" type="primary" @click="onSubmit()">
-                        {{ $t('commons.button.confirm') }}
-                    </el-button>
-                </span>
+                <el-button :disabled="loading" @click="changeVisible = false">
+                    {{ $t('commons.button.cancel') }}
+                </el-button>
+                <el-button :disabled="loading" type="primary" @click="onSubmit()">
+                    {{ $t('commons.button.confirm') }}
+                </el-button>
             </template>
-        </el-drawer>
+        </DrawerPro>
     </div>
 </template>
 <script lang="ts" setup>
@@ -42,7 +33,6 @@ import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { changePrivileges } from '@/api/modules/database';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
 
 const loading = ref();
