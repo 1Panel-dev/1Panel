@@ -1667,6 +1667,9 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 	}
 	if req.SNI {
 		location.UpdateDirective("proxy_ssl_server_name", []string{"on"})
+		if req.ProxySSLName != "" {
+			location.UpdateDirective("proxy_ssl_name", []string{req.ProxySSLName})
+		}
 	} else {
 		location.UpdateDirective("proxy_ssl_server_name", []string{"off"})
 	}
@@ -1748,6 +1751,9 @@ func (w WebsiteService) GetProxies(id uint) (res []request.WebsiteProxyConfig, e
 		for _, directive := range location.Directives {
 			if directive.GetName() == "proxy_ssl_server_name" {
 				proxyConfig.SNI = directive.GetParameters()[0] == "on"
+			}
+			if directive.GetName() == "proxy_ssl_name" {
+				proxyConfig.ProxySSLName = directive.GetParameters()[0]
 			}
 		}
 		res = append(res, proxyConfig)
