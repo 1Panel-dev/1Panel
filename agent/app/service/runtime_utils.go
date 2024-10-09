@@ -474,9 +474,27 @@ func handleCompose(env gotenv.Env, composeContent []byte, create request.Runtime
 		for _, e := range create.Environments {
 			environments = append(environments, fmt.Sprintf("%s:%s", e.Key, e.Value))
 		}
+		delete(serviceValue, "environment")
 		if len(environments) > 0 {
 			serviceValue["environment"] = environments
 		}
+		var volumes []interface{}
+		defaultVolumes := make(map[string]string)
+		switch create.Type {
+		case constant.RuntimeNode:
+			defaultVolumes = constant.RuntimeDefaultVolumes
+		case constant.RuntimeJava:
+			defaultVolumes = constant.RuntimeDefaultVolumes
+		case constant.RuntimeGo:
+			defaultVolumes = constant.GoDefaultVolumes
+		}
+		for k, v := range defaultVolumes {
+			volumes = append(volumes, fmt.Sprintf("%s:%s", k, v))
+		}
+		for _, volume := range create.Volumes {
+			volumes = append(volumes, fmt.Sprintf("%s:%s", volume.Source, volume.Target))
+		}
+		serviceValue["volumes"] = volumes
 		break
 	}
 	for k := range env {
@@ -643,6 +661,33 @@ func getDockerComposeEnvironments(yml []byte) ([]request.Environment, error) {
 			res = append(res, request.Environment{
 				Key:   key,
 				Value: value,
+			})
+		}
+	}
+	return res, nil
+}
+
+func getDockerComposeVolumes(yml []byte) ([]request.Volume, error) {
+	var (
+		composeProject docker.ComposeProject
+		err            error
+	)
+	err = yaml.Unmarshal(yml, &composeProject)
+	if err != nil {
+		return nil, err
+	}
+	var res []request.Volume
+	for _, service := range composeProject.Services {
+		for _, volume := range service.Volumes {
+			envArray := strings.Split(volume, ":")
+			source := envArray[0]
+			target := ""
+			if len(envArray) > 1 {
+				target = envArray[1]
+			}
+			res = append(res, request.Volume{
+				Source: source,
+				Target: target,
 			})
 		}
 	}

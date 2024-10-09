@@ -30,11 +30,16 @@ type NodeConfig struct {
 	Port         int           `json:"port"`
 	ExposedPorts []ExposedPort `json:"exposedPorts"`
 	Environments []Environment `json:"environments"`
+	Volumes      []Volume      `json:"volumes"`
 }
 
 type Environment struct {
 	Key   string `json:"key"`
 	Value string `json:"value"`
+}
+type Volume struct {
+	Source string `json:"source"`
+	Target string `json:"target"`
 }
 
 type ExposedPort struct {

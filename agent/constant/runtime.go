@@ -34,3 +34,16 @@ const (
 	RuntimeNpm  = "npm"
 	RuntimeYarn = "yarn"
 )
+
+var GoDefaultVolumes = map[string]string{
+	"${CODE_DIR}": "/app",
+	"./run.sh":    "/run.sh",
+	"./.env":      "/.env",
+	"./mod":       "/go/pkg/mod",
+}
+
+var RuntimeDefaultVolumes = map[string]string{
+	"./run.sh": "/run.sh",
+	"./.env":   "/.env",
+	"./mod":    "/go/pkg/mod",
+}

@@ -1,16 +1,16 @@
 <template>
     <div class="mt-1.5">
-        <el-text>{{ $t('runtime.environment') }}</el-text>
+        <el-text>{{ $t('container.mount') }}</el-text>
         <div class="mt-1.5">
-            <el-row :gutter="20" v-for="(env, index) in environments" :key="index">
+            <el-row :gutter="20" v-for="(volume, index) in volumes" :key="index">
                 <el-col :span="7">
-                    <el-form-item :prop="`environments.${index}.key`" :rules="rules.value">
-                        <el-input v-model="env.key" :placeholder="$t('runtime.envKey')" />
+                    <el-form-item :prop="`volumes.${index}.source`" :rules="rules.value">
+                        <el-input v-model="volume.source" :placeholder="$t('container.hostOption')" />
                     </el-form-item>
                 </el-col>
                 <el-col :span="7">
-                    <el-form-item :prop="`environments.${index}.value`" :rules="rules.value">
-                        <el-input v-model="env.value" :placeholder="$t('runtime.envValue')" />
+                    <el-form-item :prop="`volumes.${index}.target`" :rules="rules.value">
+                        <el-input v-model="volume.target" :placeholder="$t('container.containerDir')" />
                     </el-form-item>
                 </el-col>
                 <el-col :span="4">
@@ -23,7 +23,7 @@
             </el-row>
             <el-row :gutter="20">
                 <el-col :span="4">
-                    <el-button @click="addEnv">{{ $t('commons.button.add') }}{{ $t('runtime.environment') }}</el-button>
+                    <el-button @click="addEnv">{{ $t('commons.button.add') }}{{ $t('container.mount') }}</el-button>
                 </el-col>
             </el-row>
         </div>
@@ -37,8 +37,8 @@ import { Rules } from '@/global/form-rules';
 import { Runtime } from '@/api/interface/runtime';
 
 const props = defineProps({
-    environments: {
-        type: Array<Runtime.Environment>,
+    volumes: {
+        type: Array<Runtime.Volume>,
         required: true,
     },
 });
@@ -48,13 +48,13 @@ const rules = reactive<FormRules>({
 });
 
 const addEnv = () => {
-    props.environments.push({
-        key: '',
-        value: '',
+    props.volumes.push({
+        source: '',
+        target: '',
     });
 };
 
 const removeEnv = (index: number) => {
-    props.environments.splice(index, 1);
+    props.volumes.splice(index, 1);
 };
 </script>
