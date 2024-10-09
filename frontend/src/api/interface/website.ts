@@ -350,6 +350,12 @@ export namespace Website {
         content: string;
     }
 
+    export interface CustomRewirte {
+        operate: string;
+        name: string;
+        content: string;
+    }
+
     export interface DirUpdate {
         id: number;
         siteDir: string;

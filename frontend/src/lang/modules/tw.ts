@@ -2091,6 +2091,7 @@ const message = {
         changeDatabase: '切換資料庫',
         changeDatabaseHelper1: '資料庫關聯用於備份恢復網站。',
         changeDatabaseHelper2: '切換其他資料庫會導致以前的備份無法恢復。',
+        saveCustom: '另存为模版',
     },
     php: {
         short_open_tag: '短標簽支持',

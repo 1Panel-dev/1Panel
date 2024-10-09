@@ -1047,3 +1047,39 @@ func (b *BaseApi) ChangeWebsiteDatabase(c *gin.Context) {
 	}
 	helper.SuccessWithOutData(c)
 }
+
+// @Tags Website
+// @Summary Operate custom rewrite
+// @Description 编辑自定义重写模版
+// @Accept json
+// @Param request body request.CustomRewriteOperate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/rewrite/custom [post]
+func (b *BaseApi) OperateCustomRewrite(c *gin.Context) {
+	var req request.CustomRewriteOperate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := websiteService.OperateCustomRewrite(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}
+
+// @Tags Website
+// @Summary List custom rewrite
+// @Description 获取自定义重写模版列表
+// @Accept json
+// @Success 200 {object} []string
+// @Security ApiKeyAuth
+// @Router /websites/rewrite/custom [get]
+func (b *BaseApi) ListCustomRewrite(c *gin.Context) {
+	res, err := websiteService.ListCustomRewrite()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}

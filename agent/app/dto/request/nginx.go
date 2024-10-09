@@ -24,6 +24,12 @@ type NginxRewriteReq struct {
 	Name      string `json:"name" validate:"required"`
 }
 
+type CustomRewriteOperate struct {
+	Operate string `json:"operate" validate:"required,oneof=create delete"`
+	Content string `json:"content"`
+	Name    string `json:"name"`
+}
+
 type NginxRewriteUpdate struct {
 	WebsiteID uint   `json:"websiteId" validate:"required"`
 	Name      string `json:"name" validate:"required"`

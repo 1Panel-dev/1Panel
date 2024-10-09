@@ -78,6 +78,9 @@ type IWebsiteService interface {
 
 	GetRewriteConfig(req request.NginxRewriteReq) (*response.NginxRewriteRes, error)
 	UpdateRewriteConfig(req request.NginxRewriteUpdate) error
+	OperateCustomRewrite(req request.CustomRewriteOperate) error
+	ListCustomRewrite() ([]string, error)
+
 	LoadWebsiteDirConfig(req request.WebsiteCommonReq) (*response.WebsiteDirConfig, error)
 	UpdateSiteDir(req request.WebsiteUpdateDir) error
 	UpdateSitePermission(req request.WebsiteUpdateDirPermission) error
@@ -1431,14 +1434,57 @@ func (w WebsiteService) GetRewriteConfig(req request.NginxRewriteReq) (*response
 		}
 	} else {
 		rewriteFile := fmt.Sprintf("rewrite/%s.conf", strings.ToLower(req.Name))
-		contentByte, err = nginx_conf.Rewrites.ReadFile(rewriteFile)
-		if err != nil {
-			return nil, err
+		contentByte, _ = nginx_conf.Rewrites.ReadFile(rewriteFile)
+		if contentByte == nil {
+			customRewriteDir := GetOpenrestyDir(DefaultRewriteDir)
+			customRewriteFile := path.Join(customRewriteDir, fmt.Sprintf("%s.conf", strings.ToLower(req.Name)))
+			contentByte, err = files.NewFileOp().GetContent(customRewriteFile)
 		}
 	}
 	return &response.NginxRewriteRes{
 		Content: string(contentByte),
 	}, err
+}
+
+func (w WebsiteService) OperateCustomRewrite(req request.CustomRewriteOperate) error {
+	rewriteDir := GetOpenrestyDir(DefaultRewriteDir)
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(rewriteDir) {
+		if err := fileOp.CreateDir(rewriteDir, 0755); err != nil {
+			return err
+		}
+	}
+	rewriteFile := path.Join(rewriteDir, fmt.Sprintf("%s.conf", req.Name))
+	switch req.Operate {
+	case "create":
+		if fileOp.Stat(rewriteFile) {
+			return buserr.New(constant.ErrNameIsExist)
+		}
+		return fileOp.WriteFile(rewriteFile, strings.NewReader(req.Content), 0755)
+	case "delete":
+		return fileOp.DeleteFile(rewriteFile)
+	}
+	return nil
+}
+
+func (w WebsiteService) ListCustomRewrite() ([]string, error) {
+	rewriteDir := GetOpenrestyDir(DefaultRewriteDir)
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(rewriteDir) {
+		return nil, nil
+	}
+	entries, err := os.ReadDir(rewriteDir)
+	if err != nil {
+		return nil, err
+	}
+	var res []string
+	for _, entry := range entries {
+		if entry.IsDir() {
+			continue
+		}
+		res = append(res, strings.TrimSuffix(entry.Name(), ".conf"))
+	}
+	return res, nil
 }
 
 func (w WebsiteService) UpdateSiteDir(req request.WebsiteUpdateDir) error {

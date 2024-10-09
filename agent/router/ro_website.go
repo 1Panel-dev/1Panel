@@ -41,6 +41,8 @@ func (a *WebsiteRouter) InitRouter(Router *gin.RouterGroup) {
 
 		websiteRouter.POST("/rewrite", baseApi.GetRewriteConfig)
 		websiteRouter.POST("/rewrite/update", baseApi.UpdateRewriteConfig)
+		websiteRouter.POST("/rewrite/custom", baseApi.OperateCustomRewrite)
+		websiteRouter.GET("/rewrite/custom", baseApi.ListCustomRewrite)
 
 		websiteRouter.POST("/dir/update", baseApi.UpdateSiteDir)
 		websiteRouter.POST("/dir/permission", baseApi.UpdateSiteDirPermission)

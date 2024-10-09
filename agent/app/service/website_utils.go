@@ -1194,19 +1194,21 @@ func GteSiteDir(alias string) string {
 }
 
 const (
-	SiteConf        = "SiteConf"
-	SiteAccessLog   = "access.log"
-	SiteErrorLog    = "error.log"
-	WebsiteRootDir  = "WebsiteRootDir"
-	SiteDir         = "SiteDir"
-	SiteIndexDir    = "SiteIndexDir"
-	SiteProxyDir    = "SiteProxyDir"
-	SiteSSLDir      = "SiteSSLDir"
-	SiteReWritePath = "SiteReWritePath"
-	SiteRedirectDir = "SiteRedirectDir"
-	SiteCacheDir    = "SiteCacheDir"
-	SiteConfDir     = "SiteConfDir"
-	SitesRootDir    = "SitesRootDir"
+	SiteConf          = "SiteConf"
+	SiteAccessLog     = "access.log"
+	SiteErrorLog      = "error.log"
+	WebsiteRootDir    = "WebsiteRootDir"
+	SiteDir           = "SiteDir"
+	SiteIndexDir      = "SiteIndexDir"
+	SiteProxyDir      = "SiteProxyDir"
+	SiteSSLDir        = "SiteSSLDir"
+	SiteReWritePath   = "SiteReWritePath"
+	SiteRedirectDir   = "SiteRedirectDir"
+	SiteCacheDir      = "SiteCacheDir"
+	SiteConfDir       = "SiteConfDir"
+	SitesRootDir      = "SitesRootDir"
+	DefaultDir        = "DefaultDir"
+	DefaultRewriteDir = "DefaultRewriteDir"
 )
 
 func GetSitePath(website model.Website, confType string) string {
@@ -1217,8 +1219,6 @@ func GetSitePath(website model.Website, confType string) string {
 		return path.Join(GteSiteDir(website.Alias), "log", "access.log")
 	case SiteErrorLog:
 		return path.Join(GteSiteDir(website.Alias), "log", "error.log")
-	case WebsiteRootDir:
-		return GetWebSiteRootDir()
 	case SiteDir:
 		return GteSiteDir(website.Alias)
 	case SiteIndexDir:
@@ -1233,10 +1233,22 @@ func GetSitePath(website model.Website, confType string) string {
 		return path.Join(GteSiteDir(website.Alias), "rewrite", website.Alias+".conf")
 	case SiteRedirectDir:
 		return path.Join(GteSiteDir(website.Alias), "redirect")
+	}
+	return ""
+}
+
+func GetOpenrestyDir(confType string) string {
+	switch confType {
+	case WebsiteRootDir:
+		return GetWebSiteRootDir()
 	case SiteConfDir:
 		return path.Join(GetWebSiteRootDir(), "conf.d")
 	case SitesRootDir:
 		return path.Join(GetWebSiteRootDir(), "sites")
+	case DefaultDir:
+		return path.Join(GetWebSiteRootDir(), "default")
+	case DefaultRewriteDir:
+		return path.Join(GetWebSiteRootDir(), "default", "rewrite")
 	}
 	return ""
 }
