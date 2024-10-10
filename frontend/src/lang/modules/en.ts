@@ -2534,6 +2534,8 @@ const message = {
         envKey: 'Name',
         envValue: 'Value',
         environment: 'Environment Variable',
+        pythonHelper:
+            'Please provide a complete start command, for example: pip install -r requirements.txt && python  manage.py runserver 0.0.0.0:5000',
     },
     process: {
         pid: 'Process ID',
