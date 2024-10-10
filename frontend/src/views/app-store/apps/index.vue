@@ -243,16 +243,11 @@ const search = async (req: App.AppReq) => {
 const openInstall = (app: App.App) => {
     switch (app.type) {
         case 'php':
-            router.push({ path: '/websites/runtimes/php' });
-            break;
         case 'node':
-            router.push({ path: '/websites/runtimes/node' });
-            break;
         case 'java':
-            router.push({ path: '/websites/runtimes/java' });
-            break;
         case 'go':
-            router.push({ path: '/websites/runtimes/go' });
+        case 'python':
+            router.push({ path: '/websites/runtimes/' + app.type });
             break;
         default:
             const params = {

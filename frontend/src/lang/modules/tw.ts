@@ -2351,6 +2351,8 @@ const message = {
         envKey: '名稱',
         envValue: '值',
         environment: '環境變數',
+        pythonHelper:
+            '請填寫完整啟動指令，例如：pip install -r requirements.txt && python  manage.py runserver 0.0.0.0:5000',
     },
     process: {
         pid: '進程ID',

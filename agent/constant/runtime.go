@@ -15,10 +15,11 @@ const (
 	RuntimeCreating   = "creating"
 	RuntimeStartErr   = "startErr"
 
-	RuntimePHP  = "php"
-	RuntimeNode = "node"
-	RuntimeJava = "java"
-	RuntimeGo   = "go"
+	RuntimePHP    = "php"
+	RuntimeNode   = "node"
+	RuntimeJava   = "java"
+	RuntimeGo     = "go"
+	RuntimePython = "python"
 
 	RuntimeProxyUnix = "unix"
 	RuntimeProxyTcp  = "tcp"
@@ -43,7 +44,7 @@ var GoDefaultVolumes = map[string]string{
 }
 
 var RuntimeDefaultVolumes = map[string]string{
-	"./run.sh": "/run.sh",
-	"./.env":   "/.env",
-	"./mod":    "/go/pkg/mod",
+	"${CODE_DIR}": "/app",
+	"./run.sh":    "/run.sh",
+	"./.env":      "/.env",
 }
