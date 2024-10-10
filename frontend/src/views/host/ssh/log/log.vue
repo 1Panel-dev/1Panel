@@ -12,8 +12,9 @@
                     <el-option :label="$t('commons.status.success')" value="Success"></el-option>
                     <el-option :label="$t('commons.status.failed')" value="Failed"></el-option>
                 </el-select>
-                <TableSetting @search="search()" class="mr-2.5" />
-                <TableSearch @search="search()" v-model:searchName="searchInfo" />
+                <TableSearch @search="search()" v-model:searchName="searchInfo" class="mr-2.5" />
+                <TableRefresh @search="search()" class="mr-2.5" />
+                <TableSetting title="ssh-log-refresh" @search="search()" />
             </template>
 
             <template #main>

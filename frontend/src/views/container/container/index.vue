@@ -106,6 +106,7 @@
                     {{ $t('container.includeAppstore') }}
                 </el-checkbox>
                 <TableSearch @search="search()" v-model:searchName="searchName" class="mr-2.5" />
+                <TableRefresh @search="search()" class="mr-2.5" />
                 <TableSetting title="container-refresh" @search="refresh()" class="mr-2.5" />
                 <fu-table-column-select
                     :columns="columns"

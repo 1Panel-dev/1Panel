@@ -17,7 +17,8 @@
             </template>
             <template #rightToolBar>
                 <TableSearch @search="search()" v-model:searchName="searchName" class="mr-2.5" />
-                <TableSetting ref="timerRef" @search="search()" />
+                <TableRefresh @search="search()" class="mr-2.5" />
+                <TableSetting title="snapshot-refresh" ref="timerRef" @search="search()" />
             </template>
             <template #main>
                 <ComplexTable

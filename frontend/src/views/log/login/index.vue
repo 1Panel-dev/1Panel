@@ -17,7 +17,8 @@
                     <el-option :label="$t('commons.status.failed')" value="Failed"></el-option>
                 </el-select>
                 <TableSearch @search="search()" v-model:searchName="searchIP" class="mr-2.5" />
-                <TableSetting @search="search()" />
+                <TableRefresh @search="search()" class="mr-2.5" />
+                <TableSetting title="login-log-refresh" @search="search()" />
             </template>
             <template #main>
                 <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search" :heightDiff="370">

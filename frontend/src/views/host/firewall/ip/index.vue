@@ -35,7 +35,8 @@
                             <el-option :label="$t('firewall.deny')" value="drop"></el-option>
                         </el-select>
                         <TableSearch @search="search()" v-model:searchName="searchName" class="mr-2.5" />
-                        <TableSetting @search="search()" />
+                        <TableRefresh @search="search()" class="mr-2.5" />
+                        <TableSetting title="firewall-ip-refresh" @search="search()" />
                     </template>
                     <template #main>
                         <ComplexTable
