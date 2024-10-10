@@ -338,6 +338,14 @@ func handleParams(create request.RuntimeCreate, projectDir string) (composeConte
 		if err != nil {
 			return
 		}
+	case constant.RuntimePython:
+		create.Params["CODE_DIR"] = create.CodeDir
+		create.Params["PYTHON_VERSION"] = create.Version
+		create.Params["PANEL_APP_PORT_HTTP"] = create.Port
+		composeContent, err = handleCompose(env, composeContent, create, projectDir)
+		if err != nil {
+			return
+		}
 	}
 
 	newMap := make(map[string]string)
@@ -384,7 +392,8 @@ func handleCompose(env gotenv.Env, composeContent []byte, create request.Runtime
 				ports = append(ports, "${HOST_IP}:${PANEL_APP_PORT_HTTP}:${JAVA_APP_PORT}")
 			case constant.RuntimeGo:
 				ports = append(ports, "${HOST_IP}:${PANEL_APP_PORT_HTTP}:${GO_APP_PORT}")
-
+			case constant.RuntimePython:
+				ports = append(ports, "${HOST_IP}:${PANEL_APP_PORT_HTTP}:${APP_PORT}")
 			}
 
 			for i, port := range create.ExposedPorts {

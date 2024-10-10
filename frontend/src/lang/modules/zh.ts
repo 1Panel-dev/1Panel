@@ -2217,6 +2217,8 @@ const message = {
         javaDirHelper: '目录中要包含 jar 包，子目录中包含也可',
         goHelper: '请填写完整启动命令，例如：go run main.go 或 ./main',
         goDirHelper: '目录中要包含 go 文件或者二进制文件，子目录中包含也可',
+        pythonHelper:
+            '请填写完整启动命令，例如：pip install -r requirements.txt && python manage.py runserver 0.0.0.0:5000',
     },
     process: {
         pid: '进程ID',

@@ -78,6 +78,16 @@ const webSiteRouter = {
                 requiresAuth: false,
             },
         },
+        {
+            path: '/websites/runtimes/python',
+            name: 'python',
+            hidden: true,
+            component: () => import('@/views/website/runtime/python/index.vue'),
+            meta: {
+                activeMenu: '/websites/runtimes/python',
+                requiresAuth: false,
+            },
+        },
     ],
 };
 
