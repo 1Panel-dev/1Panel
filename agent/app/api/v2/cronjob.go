@@ -33,6 +33,28 @@ func (b *BaseApi) CreateCronjob(c *gin.Context) {
 }
 
 // @Tags Cronjob
+// @Summary Load cronjob spec time
+// @Description 预览最近五次执行时间
+// @Accept json
+// @Param request body dto.CronjobSpec true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /cronjobs/next [post]
+func (b *BaseApi) LoadNextHandle(c *gin.Context) {
+	var req dto.CronjobSpec
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	list, err := cronjobService.LoadNextHandle(req.Spec)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, list)
+}
+
+// @Tags Cronjob
 // @Summary Page cronjobs
 // @Description 获取计划任务分页
 // @Accept json

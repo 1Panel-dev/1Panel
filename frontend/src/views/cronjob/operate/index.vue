@@ -68,67 +68,113 @@
                 <el-input :disabled="dialogData.title === 'edit'" clearable v-model.trim="dialogData.rowData!.name" />
             </el-form-item>
 
-            <el-form-item :label="$t('cronjob.cronSpec')" prop="spec">
-                <div v-for="(specObj, index) of dialogData.rowData.specObjs" :key="index" style="width: 100%">
-                    <el-select class="specTypeClass" v-model="specObj.specType" @change="changeSpecType(index)">
-                        <el-option
-                            v-for="item in specOptions"
-                            :key="item.label"
-                            :value="item.value"
-                            :label="item.label"
-                        />
-                    </el-select>
-                    <el-select v-if="specObj.specType === 'perWeek'" class="specClass" v-model="specObj.week">
-                        <el-option
-                            v-for="item in weekOptions"
-                            :key="item.label"
-                            :value="item.value"
-                            :label="item.label"
-                        />
-                    </el-select>
-                    <el-input v-if="hasDay(specObj)" class="specClass" v-model.number="specObj.day">
-                        <template #append>
-                            <div class="append">{{ $t('cronjob.day') }}</div>
-                        </template>
-                    </el-input>
-                    <el-input v-if="hasHour(specObj)" class="specClass" v-model.number="specObj.hour">
-                        <template #append>
-                            <div class="append">{{ $t('commons.units.hour') }}</div>
-                        </template>
-                    </el-input>
-                    <el-input
-                        v-if="specObj.specType !== 'perNSecond'"
-                        class="specClass"
-                        v-model.number="specObj.minute"
-                    >
-                        <template #append>
-                            <div class="append">{{ $t('commons.units.minute') }}</div>
-                        </template>
-                    </el-input>
-                    <el-input
-                        v-if="specObj.specType === 'perNSecond'"
-                        class="specClass"
-                        v-model.number="specObj.second"
-                    >
-                        <template #append>
-                            <div class="append">{{ $t('commons.units.second') }}</div>
-                        </template>
-                    </el-input>
-                    <el-button
-                        class="ml-2.5"
-                        link
-                        type="primary"
-                        @click="handleSpecDelete(index)"
-                        v-if="dialogData.rowData.specObjs.length > 1"
-                    >
-                        {{ $t('commons.button.delete') }}
-                    </el-button>
-                    <el-divider v-if="dialogData.rowData.specObjs.length > 1" class="divider" />
-                </div>
+            <el-form-item :label="$t('cronjob.cronSpec')" prop="specCustom">
+                <el-checkbox :label="$t('container.custom')" v-model="dialogData.rowData!.specCustom" />
             </el-form-item>
-            <el-button class="mb-3" @click="handleSpecAdd()">
-                {{ $t('commons.button.add') }}
-            </el-button>
+            <div v-if="!dialogData.rowData!.specCustom">
+                <el-form-item prop="spec">
+                    <div v-for="(specObj, index) of dialogData.rowData.specObjs" :key="index" style="width: 100%">
+                        <el-select class="specTypeClass" v-model="specObj.specType" @change="changeSpecType(index)">
+                            <el-option
+                                v-for="item in specOptions"
+                                :key="item.label"
+                                :value="item.value"
+                                :label="item.label"
+                            />
+                        </el-select>
+                        <el-select v-if="specObj.specType === 'perWeek'" class="specClass" v-model="specObj.week">
+                            <el-option
+                                v-for="item in weekOptions"
+                                :key="item.label"
+                                :value="item.value"
+                                :label="item.label"
+                            />
+                        </el-select>
+                        <el-input v-if="hasDay(specObj)" class="specClass" v-model.number="specObj.day">
+                            <template #append>
+                                <div class="append">{{ $t('cronjob.day') }}</div>
+                            </template>
+                        </el-input>
+                        <el-input v-if="hasHour(specObj)" class="specClass" v-model.number="specObj.hour">
+                            <template #append>
+                                <div class="append">{{ $t('commons.units.hour') }}</div>
+                            </template>
+                        </el-input>
+                        <el-input
+                            v-if="specObj.specType !== 'perNSecond'"
+                            class="specClass"
+                            v-model.number="specObj.minute"
+                        >
+                            <template #append>
+                                <div class="append">{{ $t('commons.units.minute') }}</div>
+                            </template>
+                        </el-input>
+                        <el-input
+                            v-if="specObj.specType === 'perNSecond'"
+                            class="specClass"
+                            v-model.number="specObj.second"
+                        >
+                            <template #append>
+                                <div class="append">{{ $t('commons.units.second') }}</div>
+                            </template>
+                        </el-input>
+                        <el-popover placement="top-start" :title="$t('cronjob.nextTime')" width="200" trigger="click">
+                            <div v-for="(time, index_t) of nextTimes" :key="index_t">
+                                <el-tag class="mt-2">{{ time }}</el-tag>
+                            </div>
+                            <template #reference>
+                                <el-button class="ml-2.5" @click="loadNext(specObj)" link type="primary">
+                                    {{ $t('commons.button.preview') }}
+                                </el-button>
+                            </template>
+                        </el-popover>
+                        <el-button
+                            class="ml-2.5"
+                            link
+                            type="primary"
+                            @click="handleSpecDelete(index)"
+                            v-if="dialogData.rowData.specObjs.length > 1"
+                        >
+                            {{ $t('commons.button.delete') }}
+                        </el-button>
+                        <el-divider v-if="dialogData.rowData.specObjs.length > 1" class="divider" />
+                    </div>
+                </el-form-item>
+                <el-button class="mb-3" @click="handleSpecAdd()">
+                    {{ $t('commons.button.add') }}
+                </el-button>
+            </div>
+
+            <div v-if="dialogData.rowData!.specCustom">
+                <el-form-item prop="spec">
+                    <div v-for="(spec, index) of dialogData.rowData.specs" :key="index" style="width: 100%">
+                        <el-input style="width: 80%" v-model="dialogData.rowData.specs[index]" />
+                        <el-popover placement="top-start" :title="$t('cronjob.nextTime')" width="200" trigger="click">
+                            <div v-for="(time, index_t) of nextTimes" :key="index_t">
+                                <el-tag class="mt-2">{{ time }}</el-tag>
+                            </div>
+                            <template #reference>
+                                <el-button class="ml-2.5" @click="loadNext(spec)" link type="primary">
+                                    {{ $t('commons.button.preview') }}
+                                </el-button>
+                            </template>
+                        </el-popover>
+                        <el-button
+                            class="ml-2.5"
+                            link
+                            type="primary"
+                            @click="handleSpecCustomDelete(index)"
+                            v-if="dialogData.rowData.specs.length > 1"
+                        >
+                            {{ $t('commons.button.delete') }}
+                        </el-button>
+                        <el-divider v-if="dialogData.rowData.specs.length > 1" class="divider" />
+                    </div>
+                </el-form-item>
+                <el-button class="mb-3" @click="handleSpecCustomAdd()">
+                    {{ $t('commons.button.add') }}
+                </el-button>
+            </div>
 
             <el-form-item v-if="hasScript()">
                 <el-checkbox v-model="dialogData.rowData!.inContainer">
@@ -336,7 +382,7 @@ import { getBackupList } from '@/api/modules/backup';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { Cronjob } from '@/api/interface/cronjob';
-import { addCronjob, editCronjob } from '@/api/modules/cronjob';
+import { addCronjob, editCronjob, loadNextHandle } from '@/api/modules/cronjob';
 import { listDbItems } from '@/api/modules/database';
 import { GetWebsiteOptions } from '@/api/modules/website';
 import { MsgError, MsgSuccess } from '@/utils/message';
@@ -344,7 +390,14 @@ import { useRouter } from 'vue-router';
 import { listContainer } from '@/api/modules/container';
 import { Database } from '@/api/interface/database';
 import { ListAppInstalled } from '@/api/modules/app';
-import { loadDefaultSpec, specOptions, transObjToSpec, transSpecToObj, weekOptions } from './../helper';
+import {
+    loadDefaultSpec,
+    loadDefaultSpecCustom,
+    specOptions,
+    transObjToSpec,
+    transSpecToObj,
+    weekOptions,
+} from './../helper';
 const router = useRouter();
 
 interface DialogProps {
@@ -357,16 +410,22 @@ const drawerVisible = ref(false);
 const dialogData = ref<DialogProps>({
     title: '',
 });
+const nextTimes = ref([]);
 
 const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
-    if (dialogData.value.rowData?.spec) {
+    if (!dialogData.value.rowData?.specCustom && dialogData.value.rowData?.spec) {
         let objs = [];
         for (const item of dialogData.value.rowData.spec.split(',')) {
             objs.push(transSpecToObj(item));
         }
         dialogData.value.rowData.specObjs = objs;
     }
+    dialogData.value.rowData.specObjs = dialogData.value.rowData.specObjs || [];
+    if (dialogData.value.rowData?.specCustom && dialogData.value.rowData?.spec) {
+        dialogData.value.rowData.specs = dialogData.value.rowData.spec.split(',');
+    }
+    dialogData.value.rowData.specs = dialogData.value.rowData.specs || [];
     if (dialogData.value.title === 'create') {
         changeType();
         dialogData.value.rowData.dbType = 'mysql';
@@ -548,6 +607,22 @@ const hasHour = (item: any) => {
     return item.specType !== 'perHour' && item.specType !== 'perNMinute' && item.specType !== 'perNSecond';
 };
 
+const loadNext = async (spec: any) => {
+    nextTimes.value = [];
+    let specItem = '';
+    if (!dialogData.value.rowData.specCustom) {
+        specItem = transObjToSpec(spec.specType, spec.week, spec.day, spec.hour, spec.minute, spec.second);
+    } else {
+        specItem = spec;
+    }
+    if (!specItem) {
+        MsgError(i18n.global.t('cronjob.cronSpecRule2'));
+        return;
+    }
+    const data = await loadNextHandle(specItem);
+    nextTimes.value = data.data || [];
+};
+
 const loadDatabases = async (dbType: string) => {
     const data = await listDbItems(dbType);
     dbInfo.dbs = data.data || [];
@@ -555,6 +630,7 @@ const loadDatabases = async (dbType: string) => {
 
 const changeType = () => {
     dialogData.value.rowData!.specObjs = [loadDefaultSpec(dialogData.value.rowData.type)];
+    dialogData.value.rowData!.specs = [loadDefaultSpecCustom(dialogData.value.rowData.type)];
 };
 
 const changeSpecType = (index: number) => {
@@ -598,8 +674,16 @@ const handleSpecAdd = () => {
     dialogData.value.rowData!.specObjs.push(item);
 };
 
+const handleSpecCustomAdd = () => {
+    dialogData.value.rowData!.specs.push('');
+};
+
 const handleSpecDelete = (index: number) => {
     dialogData.value.rowData!.specObjs.splice(index, 1);
+};
+
+const handleSpecCustomDelete = (index: number) => {
+    dialogData.value.rowData!.specs.splice(index, 1);
 };
 
 const loadBackups = async () => {
@@ -679,14 +763,18 @@ function hasScript() {
 }
 
 const onSubmit = async (formEl: FormInstance | undefined) => {
-    const specs = [];
-    for (const item of dialogData.value.rowData.specObjs) {
-        const itemSpec = transObjToSpec(item.specType, item.week, item.day, item.hour, item.minute, item.second);
-        if (itemSpec === '') {
-            MsgError(i18n.global.t('cronjob.cronSpecHelper'));
-            return;
+    let specs = [];
+    if (!dialogData.value.rowData.specCustom) {
+        for (const item of dialogData.value.rowData.specObjs) {
+            const itemSpec = transObjToSpec(item.specType, item.week, item.day, item.hour, item.minute, item.second);
+            if (itemSpec === '') {
+                MsgError(i18n.global.t('cronjob.cronSpecHelper'));
+                return;
+            }
+            specs.push(itemSpec);
         }
-        specs.push(itemSpec);
+    } else {
+        specs = dialogData.value.rowData.specs;
     }
     dialogData.value.rowData.sourceAccountIDs = dialogData.value.rowData.sourceAccounts.join(',');
     dialogData.value.rowData.spec = specs.join(',');
@@ -719,7 +807,7 @@ defineExpose({
 </script>
 <style scoped lang="scss">
 .specClass {
-    width: 20% !important;
+    width: 17% !important;
     margin-left: 20px;
     .append {
         width: 20px;

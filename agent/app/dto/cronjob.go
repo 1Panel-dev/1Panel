@@ -11,10 +11,15 @@ type PageCronjob struct {
 	Order   string `json:"order" validate:"required,oneof=null ascending descending"`
 }
 
-type CronjobCreate struct {
-	Name string `json:"name" validate:"required"`
-	Type string `json:"type" validate:"required"`
+type CronjobSpec struct {
 	Spec string `json:"spec" validate:"required"`
+}
+
+type CronjobCreate struct {
+	Name       string `json:"name" validate:"required"`
+	Type       string `json:"type" validate:"required"`
+	SpecCustom bool   `json:"specCustom"`
+	Spec       string `json:"spec" validate:"required"`
 
 	Script         string `json:"script"`
 	Command        string `json:"command"`
@@ -34,9 +39,10 @@ type CronjobCreate struct {
 }
 
 type CronjobUpdate struct {
-	ID   uint   `json:"id" validate:"required"`
-	Name string `json:"name" validate:"required"`
-	Spec string `json:"spec" validate:"required"`
+	ID         uint   `json:"id" validate:"required"`
+	Name       string `json:"name" validate:"required"`
+	SpecCustom bool   `json:"specCustom"`
+	Spec       string `json:"spec" validate:"required"`
 
 	Script         string `json:"script"`
 	Command        string `json:"command"`
@@ -77,10 +83,11 @@ type CronjobBatchDelete struct {
 }
 
 type CronjobInfo struct {
-	ID   uint   `json:"id"`
-	Name string `json:"name"`
-	Type string `json:"type"`
-	Spec string `json:"spec"`
+	ID         uint   `json:"id"`
+	Name       string `json:"name"`
+	Type       string `json:"type"`
+	SpecCustom bool   `json:"specCustom"`
+	Spec       string `json:"spec"`
 
 	Script            string `json:"script"`
 	Command           string `json:"command"`

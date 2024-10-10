@@ -79,7 +79,7 @@
                             <div v-for="(item, index) of row.spec.split(',')" :key="index">
                                 <div v-if="row.expand || (!row.expand && index < 3)">
                                     <span>
-                                        {{ transSpecToStr(item) }}
+                                        {{ row.specCustom ? item : transSpecToStr(item) }}
                                     </span>
                                 </div>
                             </div>
