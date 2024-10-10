@@ -75,10 +75,15 @@
                     </el-table-column>
                     <el-table-column :label="$t('file.size')" prop="size" min-width="60" show-overflow-tooltip>
                         <template #default="{ row }">
-                            <span v-if="row.size">
-                                {{ computeSize(row.size) }}
-                            </span>
-                            <span v-else>-</span>
+                            <div v-if="row.hasLoad">
+                                <span v-if="row.size">
+                                    {{ computeSize(row.size) }}
+                                </span>
+                                <span v-else>-</span>
+                            </div>
+                            <div v-if="!row.hasLoad">
+                                <el-button link loading></el-button>
+                            </div>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" min-width="80" prop="status">
@@ -197,7 +202,13 @@
 
 <script setup lang="ts">
 import DrawerHeader from '@/components/drawer-header/index.vue';
-import { snapshotCreate, searchSnapshotPage, snapshotDelete, updateSnapshotDescription } from '@/api/modules/setting';
+import {
+    snapshotCreate,
+    searchSnapshotPage,
+    snapshotDelete,
+    updateSnapshotDescription,
+    loadSnapshotSize,
+} from '@/api/modules/setting';
 import { onMounted, reactive, ref } from 'vue';
 import { computeSize, dateFormat } from '@/utils/util';
 import { ElForm } from 'element-plus';
@@ -418,9 +429,32 @@ const search = async (column?: any) => {
     await searchSnapshotPage(params)
         .then((res) => {
             loading.value = false;
+            loadSize(params);
             cleanData.value = false;
             data.value = res.data.items || [];
             paginationConfig.total = res.data.total;
+        })
+        .catch(() => {
+            loading.value = false;
+        });
+};
+
+const loadSize = async (params: any) => {
+    await loadSnapshotSize(params)
+        .then((res) => {
+            let stats = res.data || [];
+            if (stats.length === 0) {
+                return;
+            }
+            for (const snap of data.value) {
+                for (const item of stats) {
+                    if (snap.id === item.id) {
+                        snap.hasLoad = true;
+                        snap.size = item.size;
+                        break;
+                    }
+                }
+            }
         })
         .catch(() => {
             loading.value = false;

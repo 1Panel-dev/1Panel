@@ -37,6 +37,7 @@ func (s *SettingRouter) InitRouter(Router *gin.RouterGroup) {
 		settingRouter.POST("/snapshot", baseApi.CreateSnapshot)
 		settingRouter.POST("/snapshot/status", baseApi.LoadSnapShotStatus)
 		settingRouter.POST("/snapshot/search", baseApi.SearchSnapshot)
+		settingRouter.POST("/snapshot/size", baseApi.LoadSnapshotSize)
 		settingRouter.POST("/snapshot/import", baseApi.ImportSnapshot)
 		settingRouter.POST("/snapshot/del", baseApi.DeleteSnapshot)
 		settingRouter.POST("/snapshot/recover", baseApi.RecoverSnapshot)

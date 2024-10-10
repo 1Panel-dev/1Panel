@@ -28,6 +28,7 @@ type SnapshotService struct {
 
 type ISnapshotService interface {
 	SearchWithPage(req dto.PageSnapshot) (int64, interface{}, error)
+	LoadSize(req dto.PageSnapshot) ([]dto.SnapshotFile, error)
 	SnapshotCreate(req dto.SnapshotCreate) error
 	SnapshotRecover(req dto.SnapshotRecover) error
 	SnapshotRollback(req dto.SnapshotRecover) error
@@ -47,15 +48,31 @@ func NewISnapshotService() ISnapshotService {
 }
 
 func (u *SnapshotService) SearchWithPage(req dto.PageSnapshot) (int64, interface{}, error) {
-	total, systemBackups, err := snapshotRepo.Page(req.Page, req.PageSize, commonRepo.WithLikeName(req.Info), commonRepo.WithOrderRuleBy(req.OrderBy, req.Order))
+	total, records, err := snapshotRepo.Page(req.Page, req.PageSize, commonRepo.WithLikeName(req.Info), commonRepo.WithOrderRuleBy(req.OrderBy, req.Order))
 	if err != nil {
 		return 0, nil, err
 	}
-	dtoSnap, err := loadSnapSize(systemBackups)
-	if err != nil {
-		return 0, nil, err
+	var data []dto.SnapshotInfo
+	for _, record := range records {
+		var item dto.SnapshotInfo
+		if err := copier.Copy(&item, &record); err != nil {
+			return 0, nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+		}
+		data = append(data, item)
 	}
-	return total, dtoSnap, err
+	return total, data, err
+}
+
+func (u *SnapshotService) LoadSize(req dto.PageSnapshot) ([]dto.SnapshotFile, error) {
+	_, records, err := snapshotRepo.Page(req.Page, req.PageSize, commonRepo.WithLikeName(req.Info), commonRepo.WithOrderRuleBy(req.OrderBy, req.Order))
+	if err != nil {
+		return nil, err
+	}
+	data, err := loadSnapSize(records)
+	if err != nil {
+		return nil, err
+	}
+	return data, err
 }
 
 func (u *SnapshotService) SnapshotImport(req dto.SnapshotImport) error {
@@ -510,15 +527,12 @@ func loadOs() string {
 	}
 }
 
-func loadSnapSize(records []model.Snapshot) ([]dto.SnapshotInfo, error) {
-	var datas []dto.SnapshotInfo
+func loadSnapSize(records []model.Snapshot) ([]dto.SnapshotFile, error) {
+	var datas []dto.SnapshotFile
 	clientMap := make(map[string]loadSizeHelper)
 	var wg sync.WaitGroup
 	for i := 0; i < len(records); i++ {
-		var item dto.SnapshotInfo
-		if err := copier.Copy(&item, &records[i]); err != nil {
-			return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
-		}
+		item := dto.SnapshotFile{Name: records[i].Name, ID: records[i].ID}
 		itemPath := fmt.Sprintf("system_snapshot/%s.tar.gz", item.Name)
 		if _, ok := clientMap[records[i].DefaultDownload]; !ok {
 			backup, err := backupRepo.Get(commonRepo.WithByType(records[i].DefaultDownload))

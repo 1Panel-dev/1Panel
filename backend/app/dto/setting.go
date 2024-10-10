@@ -149,7 +149,6 @@ type SnapshotInfo struct {
 	Message         string    `json:"message"`
 	CreatedAt       time.Time `json:"createdAt"`
 	Version         string    `json:"version"`
-	Size            int64     `json:"size"`
 
 	InterruptStep    string `json:"interruptStep"`
 	RecoverStatus    string `json:"recoverStatus"`
@@ -158,6 +157,12 @@ type SnapshotInfo struct {
 	RollbackStatus   string `json:"rollbackStatus"`
 	RollbackMessage  string `json:"rollbackMessage"`
 	LastRollbackedAt string `json:"lastRollbackedAt"`
+}
+
+type SnapshotFile struct {
+	ID   uint   `json:"id"`
+	Name string `json:"name"`
+	Size int64  `json:"size"`
 }
 
 type UpgradeInfo struct {

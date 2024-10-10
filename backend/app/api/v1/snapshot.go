@@ -121,6 +121,28 @@ func (b *BaseApi) SearchSnapshot(c *gin.Context) {
 }
 
 // @Tags System Setting
+// @Summary Load system snapshot size
+// @Description 获取系统快照大小
+// @Accept json
+// @Param request body dto.PageSnapshot true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /settings/snapshot/size [post]
+func (b *BaseApi) LoadSnapshotSize(c *gin.Context) {
+	var req dto.PageSnapshot
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	data, err := snapshotService.LoadSize(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags System Setting
 // @Summary Recover system backup
 // @Description 从系统快照恢复
 // @Accept json
