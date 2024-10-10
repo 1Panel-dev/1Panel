@@ -2388,6 +2388,8 @@ const message = {
         javaDirHelper: 'The directory must contain jar files, subdirectories are also acceptable',
         goHelper: 'Please provide a complete start command, for example: go run main.go or ./main',
         goDirHelper: 'The directory must contain go files or binary files, subdirectories are also acceptable',
+        pythonHelper:
+            'Please fill in the complete startup command, for example: pip install -r requirements.txt && python manage.py runserver 0.0.0.0:5000',
     },
     process: {
         pid: 'Process ID',
