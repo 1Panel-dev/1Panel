@@ -3,16 +3,17 @@ package service
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/constant"
-	"github.com/shirou/gopsutil/v3/load"
-	"github.com/shirou/gopsutil/v3/mem"
-	"github.com/shirou/gopsutil/v3/net"
 	network "net"
 	"os"
 	"sort"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/shirou/gopsutil/v3/load"
+	"github.com/shirou/gopsutil/v3/mem"
+	"github.com/shirou/gopsutil/v3/net"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/global"
@@ -268,13 +269,13 @@ func loadDiskInfo() []dto.DiskInfo {
 		if strings.HasPrefix(fields[6], "/snap") || len(strings.Split(fields[6], "/")) > 10 {
 			continue
 		}
-		if strings.TrimSpace(fields[1]) == "tmpfs" {
+		if strings.TrimSpace(fields[1]) == "tmpfs" || strings.TrimSpace(fields[1]) == "overlay" {
 			continue
 		}
 		if strings.Contains(fields[2], "K") {
 			continue
 		}
-		if strings.Contains(fields[6], "docker") {
+		if strings.Contains(fields[6], "docker") || strings.Contains(fields[6], "podman") || strings.Contains(fields[6], "containerd") || strings.HasPrefix(fields[6], "/var/lib/containers") {
 			continue
 		}
 		isExclude := false
