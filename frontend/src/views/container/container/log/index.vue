@@ -122,17 +122,16 @@ const timeOptions = ref([
 ]);
 
 function toggleFullscreen() {
-    if (screenfull.isEnabled) {
-        screenfull.toggle();
-    }
+    globalStore.isFullScreen = !globalStore.isFullScreen;
 }
 
 const loadTooltip = () => {
-    return i18n.global.t('commons.button.' + (screenfull.isFullscreen ? 'quitFullscreen' : 'fullscreen'));
+    return i18n.global.t('commons.button.' + (globalStore.isFullScreen ? 'quitFullscreen' : 'fullscreen'));
 };
 const handleClose = async () => {
     terminalSocket.value?.send('close conn');
     logVisible.value = false;
+    globalStore.isFullScreen = false;
 };
 watch(logVisible, (val) => {
     if (screenfull.isEnabled && !val && !mobile.value) screenfull.exit();

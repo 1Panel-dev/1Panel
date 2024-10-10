@@ -97,12 +97,10 @@ const mobile = computed(() => {
 });
 
 function toggleFullscreen() {
-    if (screenfull.isEnabled) {
-        screenfull.toggle();
-    }
+    globalStore.isFullScreen = !globalStore.isFullScreen;
 }
 const loadTooltip = () => {
-    return i18n.global.t('commons.button.' + (screenfull.isFullscreen ? 'quitFullscreen' : 'fullscreen'));
+    return i18n.global.t('commons.button.' + (globalStore.isFullScreen ? 'quitFullscreen' : 'fullscreen'));
 };
 
 const getContent = () => {
@@ -134,6 +132,7 @@ const changeTail = () => {
 const handleClose = () => {
     content.value = '';
     open.value = false;
+    globalStore.isFullScreen = false;
 };
 
 const submit = () => {
