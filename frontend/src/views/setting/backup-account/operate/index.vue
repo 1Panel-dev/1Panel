@@ -55,7 +55,34 @@
                 <el-form-item :label="$t('commons.login.username')" prop="accessKey" :rules="[Rules.requiredInput]">
                     <el-input v-model.trim="dialogData.rowData!.accessKey" />
                 </el-form-item>
-                <el-form-item :label="$t('commons.login.password')" prop="credential" :rules="[Rules.requiredInput]">
+
+                <div v-if="dialogData.rowData!.type === 'SFTP'">
+                    <el-form-item :label="$t('terminal.authMode')" prop="varsJson.authMode">
+                        <el-radio-group v-model="dialogData.rowData!.varsJson['authMode']">
+                            <el-radio value="password">{{ $t('terminal.passwordMode') }}</el-radio>
+                            <el-radio value="key">{{ $t('terminal.keyMode') }}</el-radio>
+                        </el-radio-group>
+                    </el-form-item>
+                </div>
+                <div v-if="dialogData.rowData!.type === 'SFTP' && dialogData.rowData!.varsJson['authMode'] === 'key'">
+                    <el-form-item :label="$t('terminal.key')" prop="credential" :rules="[Rules.requiredInput]">
+                        <el-input type="textarea" v-model="dialogData.rowData!.credential" />
+                    </el-form-item>
+                    <el-form-item :label="$t('terminal.keyPassword')" prop="varsJson.passPhrase">
+                        <el-input
+                            type="password"
+                            show-password
+                            clearable
+                            v-model="dialogData.rowData!.varsJson['passPhrase']"
+                        />
+                    </el-form-item>
+                </div>
+                <el-form-item
+                    v-else
+                    :label="$t('commons.login.password')"
+                    prop="credential"
+                    :rules="[Rules.requiredInput]"
+                >
                     <el-input type="password" clearable show-password v-model.trim="dialogData.rowData!.credential" />
                 </el-form-item>
             </div>
@@ -437,6 +464,7 @@ const changeType = async () => {
             }
         case 'SFTP':
             dialogData.value.rowData.varsJson['port'] = 22;
+            dialogData.value.rowData.varsJson['authMode'] = 'password';
     }
 };
 const changeFrom = () => {

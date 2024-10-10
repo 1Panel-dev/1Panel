@@ -142,6 +142,15 @@ func (u *BackupService) SearchWithPage(req dto.SearchPageWithType) (int64, inter
 		if !item.RememberAuth {
 			item.AccessKey = ""
 			item.Credential = ""
+			if account.Type == constant.Sftp {
+				varMap := make(map[string]interface{})
+				if err := json.Unmarshal([]byte(item.Vars), &varMap); err != nil {
+					continue
+				}
+				delete(varMap, "passPhrase")
+				itemVars, _ := json.Marshal(varMap)
+				item.Vars = string(itemVars)
+			}
 		} else {
 			item.AccessKey = base64.StdEncoding.EncodeToString([]byte(item.AccessKey))
 			item.Credential = base64.StdEncoding.EncodeToString([]byte(item.Credential))

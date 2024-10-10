@@ -26,17 +26,23 @@ func NewSftpClient(vars map[string]interface{}) (*sftpClient, error) {
 		global.LOG.Errorf("load param port from vars failed, err: not exist!")
 	}
 	authMode := loadParamFromVars("authMode", vars)
-	privateKey := loadParamFromVars("privateKey", vars)
+	passPhrase := loadParamFromVars("passPhrase", vars)
 	password := loadParamFromVars("password", vars)
 	bucket := loadParamFromVars("bucket", vars)
 
 	var auth []ssh.AuthMethod
 	if authMode == "key" {
-		itemPrivateKey, err := ssh.ParsePrivateKey([]byte(privateKey))
+		var signer ssh.Signer
+		var err error
+		if len(passPhrase) != 0 {
+			signer, err = ssh.ParsePrivateKeyWithPassphrase([]byte(password), []byte(passPhrase))
+		} else {
+			signer, err = ssh.ParsePrivateKey([]byte(password))
+		}
 		if err != nil {
 			return nil, err
 		}
-		auth = []ssh.AuthMethod{ssh.PublicKeys(itemPrivateKey)}
+		auth = []ssh.AuthMethod{ssh.PublicKeys(signer)}
 	} else {
 		auth = []ssh.AuthMethod{ssh.Password(password)}
 	}
