@@ -423,6 +423,7 @@ const dialogRenameRef = ref();
 const dialogPruneRef = ref();
 
 const search = async (column?: any) => {
+    localStorage.setItem('includeAppStore', includeAppStore.value ? 'true' : 'false');
     let filterItem = props.filters ? props.filters : '';
     paginationConfig.orderBy = column?.order ? column.prop : paginationConfig.orderBy;
     paginationConfig.order = column?.order ? column.order : paginationConfig.order;
@@ -767,6 +768,8 @@ const buttons = [
 ];
 
 onMounted(() => {
+    let includeItem = localStorage.getItem('includeAppStore');
+    includeAppStore.value = !includeItem || includeItem === 'true';
     loadStatus();
 });
 </script>
