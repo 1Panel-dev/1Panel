@@ -2,7 +2,7 @@
     <div>
         <el-popover placement="bottom-start" :width="200" trigger="click">
             <template #reference>
-                <el-button class="timer-button" icon="Refresh"></el-button>
+                <el-button class="timer-button" icon="Clock"></el-button>
             </template>
             <el-select v-model="refreshRate" @change="changeRefresh">
                 <template #prefix>{{ $t('commons.table.refreshRate') }}</template>

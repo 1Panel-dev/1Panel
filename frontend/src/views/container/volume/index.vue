@@ -20,7 +20,8 @@
             </template>
             <template #rightToolBar>
                 <TableSearch @search="search()" v-model:searchName="searchName" class="mr-2.5" />
-                <TableSetting @search="search()" />
+                <TableRefresh @search="search()" class="mr-2.5" />
+                <TableSetting title="volume-refresh" @search="search()" />
             </template>
             <template #main>
                 <ComplexTable

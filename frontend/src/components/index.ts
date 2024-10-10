@@ -6,6 +6,7 @@ import ErrPrompt from './error-prompt/index.vue';
 import OpDialog from './del-dialog/index.vue';
 import TableSearch from './table-search/index.vue';
 import TableSetting from './table-setting/index.vue';
+import TableRefresh from './table-refresh/index.vue';
 import Tooltip from '@/components/tooltip/index.vue';
 import CopyButton from '@/components/copy-button/index.vue';
 import MsgInfo from '@/components/msg-info/index.vue';
@@ -22,6 +23,7 @@ export default {
         app.component(CopyButton.name, CopyButton);
         app.component(TableSearch.name, TableSearch);
         app.component(TableSetting.name, TableSetting);
+        app.component(TableRefresh.name, TableRefresh);
         app.component(MsgInfo.name, MsgInfo);
         app.component(MainDiv.name, MainDiv);
         app.component(DrawerPro.name, DrawerPro);

@@ -12,7 +12,8 @@
                     <el-option :label="$t('commons.status.failed')" value="Failed"></el-option>
                     <el-option :label="$t('logs.taskRunning')" value="Running"></el-option>
                 </el-select>
-                <TableSetting @search="search()" />
+                <TableRefresh @search="search()" class="mr-2.5" />
+                <TableSetting title="task-log-refresh" @search="search()" />
             </template>
             <template #main>
                 <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search" :heightDiff="370">
