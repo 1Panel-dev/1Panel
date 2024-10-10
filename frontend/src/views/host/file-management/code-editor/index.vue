@@ -19,6 +19,7 @@
                             v-if="!mobile"
                             class="!border-none !bg-transparent !text-base !font-semibold !py-2 !px-1"
                             icon="FullScreen"
+                            style="margin-right: 10px"
                         ></el-button>
                     </el-tooltip>
                     <el-button

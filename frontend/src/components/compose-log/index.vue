@@ -95,15 +95,14 @@ const logSearch = reactive({
 const handleClose = () => {
     terminalSocket.value?.send('close conn');
     open.value = false;
+    globalStore.isFullScreen = false;
 };
 
 function toggleFullscreen() {
-    if (screenfull.isEnabled) {
-        screenfull.toggle();
-    }
+    globalStore.isFullScreen = !globalStore.isFullScreen;
 }
 const loadTooltip = () => {
-    return i18n.global.t('commons.button.' + (screenfull.isFullscreen ? 'quitFullscreen' : 'fullscreen'));
+    return i18n.global.t('commons.button.' + (globalStore.isFullScreen ? 'quitFullscreen' : 'fullscreen'));
 };
 
 watch(logVisible, (val) => {
@@ -214,6 +213,9 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
+.fullScreen {
+    border: none;
+}
 .selectWidth {
     width: 200px;
 }
