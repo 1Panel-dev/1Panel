@@ -145,6 +145,11 @@ export namespace Setting {
         lastRollbackedAt: string;
         secret: string;
     }
+    export interface SnapshotFile {
+        id: number;
+        name: string;
+        size: number;
+    }
     export interface SnapshotStatus {
         panel: string;
         panelInfo: string;
