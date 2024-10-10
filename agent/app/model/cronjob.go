@@ -9,9 +9,10 @@ import (
 type Cronjob struct {
 	BaseModel
 
-	Name string `gorm:"not null" json:"name"`
-	Type string `gorm:"not null" json:"type"`
-	Spec string `gorm:"not null" json:"spec"`
+	Name       string `gorm:"not null" json:"name"`
+	Type       string `gorm:"not null" json:"type"`
+	SpecCustom bool   `json:"specCustom"`
+	Spec       string `gorm:"not null" json:"spec"`
 
 	Command        string `json:"command"`
 	ContainerName  string `json:"containerName"`

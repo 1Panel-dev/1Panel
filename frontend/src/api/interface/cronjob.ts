@@ -5,7 +5,9 @@ export namespace Cronjob {
         id: number;
         name: string;
         type: string;
+        specCustom: boolean;
         spec: string;
+        specs: Array<string>;
         specObjs: Array<SpecObj>;
 
         script: string;
@@ -31,6 +33,7 @@ export namespace Cronjob {
     export interface CronjobCreate {
         name: string;
         type: string;
+        specCustom: boolean;
         spec: string;
         specObjs: Array<SpecObj>;
 
@@ -57,6 +60,7 @@ export namespace Cronjob {
     }
     export interface CronjobUpdate {
         id: number;
+        specCustom: boolean;
         spec: string;
 
         script: string;

@@ -39,33 +39,20 @@ export function loadDefaultSpec(type: string) {
     item.second = 0;
     switch (type) {
         case 'shell':
+        case 'clean':
+        case 'website':
+        case 'log':
+        case 'snapshot':
+        case 'curl':
             item.specType = 'perWeek';
             item.week = 1;
             item.hour = 1;
             item.minute = 30;
             break;
         case 'app':
-            item.specType = 'perDay';
-            item.hour = 2;
-            item.minute = 30;
-            break;
         case 'database':
             item.specType = 'perDay';
             item.hour = 2;
-            item.minute = 30;
-            break;
-        case 'clean':
-        case 'website':
-            item.specType = 'perWeek';
-            item.week = 1;
-            item.hour = 1;
-            item.minute = 30;
-            break;
-        case 'log':
-        case 'snapshot':
-            item.specType = 'perWeek';
-            item.week = 1;
-            item.hour = 1;
             item.minute = 30;
             break;
         case 'directory':
@@ -75,14 +62,29 @@ export function loadDefaultSpec(type: string) {
             item.hour = 1;
             item.minute = 30;
             break;
-        case 'curl':
-            item.specType = 'perWeek';
-            item.week = 1;
-            item.hour = 1;
-            item.minute = 30;
-            break;
     }
     return item;
+}
+
+export function loadDefaultSpecCustom(type: string) {
+    switch (type) {
+        case 'shell':
+        case 'clean':
+        case 'website':
+        case 'log':
+        case 'snapshot':
+        case 'curl':
+            return '30 1 * * 1';
+        case 'app':
+        case 'database':
+            return '30 2 * * *';
+        case 'directory':
+        case 'cutWebsiteLog':
+        case 'ntp':
+            return '30 1 * * *';
+        default:
+            return '30 1 * * 1';
+    }
 }
 
 export function transObjToSpec(specType: string, week, day, hour, minute, second): string {

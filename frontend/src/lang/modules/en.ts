@@ -857,6 +857,7 @@ const message = {
         enableMsg:
             'Enabling the scheduled task will allow the task to automatically execute on a regular basis. Do you want to continue?',
         taskType: 'Type',
+        nextTime: 'Next 5 executions',
         record: 'Records',
         shell: 'Shell',
         log: 'Backup Logs',
@@ -902,6 +903,7 @@ const message = {
         retainCopiesHelper1: 'Number of copies to retain for backup files',
         retainCopiesUnit: ' copies (View)',
         cronSpecRule: 'The execution period format in line {0} is incorrect. Please check and try again!',
+        cronSpecRule2: 'Execution period format is incorrect, please check and try again!',
         perMonth: 'Every monthly',
         perWeek: 'Every week',
         perHour: 'Every hour',

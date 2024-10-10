@@ -24,6 +24,7 @@ type ICronjobService interface {
 	SearchWithPage(search dto.PageCronjob) (int64, interface{}, error)
 	SearchRecords(search dto.SearchRecord) (int64, interface{}, error)
 	Create(cronjobDto dto.CronjobCreate) error
+	LoadNextHandle(spec string) ([]string, error)
 	HandleOnce(id uint) error
 	Update(id uint, req dto.CronjobUpdate) error
 	UpdateStatus(id uint, status string) error
@@ -75,6 +76,23 @@ func (u *CronjobService) SearchRecords(search dto.SearchRecord) (int64, interfac
 		dtoCronjobs = append(dtoCronjobs, item)
 	}
 	return total, dtoCronjobs, err
+}
+
+func (u *CronjobService) LoadNextHandle(specStr string) ([]string, error) {
+	spec := cron.NewParser(cron.Minute | cron.Hour | cron.Dom | cron.Month | cron.Dow)
+	sched, err := spec.Parse(specStr)
+	if err != nil {
+		return nil, err
+	}
+	now := time.Now()
+	var nexts [5]string
+	for i := 0; i < 5; i++ {
+		nextTime := sched.Next(now)
+		nexts[i] = nextTime.Format("2006-01-02 15:04:05")
+		fmt.Println(nextTime)
+		now = nextTime
+	}
+	return nexts[:], nil
 }
 
 func (u *CronjobService) LoadRecordLog(req dto.OperateByID) string {
@@ -261,6 +279,7 @@ func (u *CronjobService) Update(id uint, req dto.CronjobUpdate) error {
 	}
 
 	upMap["name"] = req.Name
+	upMap["spec_custom"] = req.SpecCustom
 	upMap["spec"] = spec
 	upMap["script"] = req.Script
 	upMap["command"] = req.Command
