@@ -29,10 +29,17 @@ type FirewallClient interface {
 }
 
 func NewFirewallClient() (FirewallClient, error) {
-	if _, err := os.Stat("/usr/sbin/firewalld"); err == nil {
+	_, firewalldErr := os.Stat("/usr/sbin/firewalld")
+	_, ufwErr := os.Stat("/usr/sbin/ufw")
+
+	if firewalldErr == nil && ufwErr == nil {
+		return nil, buserr.New("firewalld and ufw both found, only one firewall should be active")
+	}
+
+	if firewalldErr == nil {
 		return client.NewFirewalld()
 	}
-	if _, err := os.Stat("/usr/sbin/ufw"); err == nil {
+	if ufwErr == nil {
 		return client.NewUfw()
 	}
 	return nil, buserr.New(constant.ErrFirewall)
