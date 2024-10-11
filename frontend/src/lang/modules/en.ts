@@ -2138,6 +2138,7 @@ const message = {
         sni: 'Origin SNI',
         sniHelper:
             "When the reverse proxy backend is HTTPS, you might need to set the origin SNI. Please refer to the CDN service provider's documentation for details.",
+        huaweicloud: 'Huawei Cloud',
     },
     php: {
         short_open_tag: 'Short tag support',
