@@ -14,7 +14,11 @@
                         <el-input v-model.trim="account.name"></el-input>
                     </el-form-item>
                     <el-form-item :label="$t('commons.table.type')" prop="type">
-                        <el-select v-model="account.type" :disabled="accountData.mode === 'edit'">
+                        <el-select
+                            v-model="account.type"
+                            :disabled="accountData.mode === 'edit'"
+                            @change="changeType(account.type)"
+                        >
                             <el-option
                                 v-for="(type, index) in DNSTypes"
                                 :key="index"
@@ -25,8 +29,11 @@
                         <span class="input-help text-red-500" v-if="account.type === 'DnsPod'">
                             {{ $t('ssl.deprecatedHelper') }}
                         </span>
+                        <span class="input-help text-red-500" v-if="account.type === 'CloudFlare'">
+                            {{ $t('ssl.cfHelper') }}
+                        </span>
                     </el-form-item>
-                    <div v-if="account.type === 'AliYun'">
+                    <div v-if="account.type === 'AliYun' || account.type === 'HuaweiCloud'">
                         <el-form-item label="Access Key" prop="authorization.accessKey">
                             <el-input v-model.trim="account.authorization['accessKey']"></el-input>
                         </el-form-item>
@@ -34,6 +41,9 @@
                             <el-input v-model.trim="account.authorization['secretKey']"></el-input>
                         </el-form-item>
                     </div>
+                    <el-form-item label="Region" prop="authorization.region" v-if="account.type === 'HuaweiCloud'">
+                        <el-input v-model.trim="account.authorization['region']" :placeholder="'cn-north-1'"></el-input>
+                    </el-form-item>
                     <div v-if="account.type === 'TencentCloud'">
                         <el-form-item label="Secret ID" prop="authorization.secretID">
                             <el-input v-model.trim="account.authorization['secretID']"></el-input>
@@ -57,9 +67,6 @@
                         </el-form-item>
                         <el-form-item label="API Token" prop="authorization.apiKey">
                             <el-input v-model.trim="account.authorization['apiKey']"></el-input>
-                            <span class="input-help text-red-500">
-                                {{ $t('ssl.cfHelper') }}
-                            </span>
                         </el-form-item>
                     </div>
                     <el-form-item
@@ -130,6 +137,7 @@ const rules = ref<any>({
         apiKey: [Rules.requiredInput],
         apiUser: [Rules.requiredInput],
         secretID: [Rules.requiredInput],
+        region: [Rules.requiredInput],
     },
 });
 const account = ref({
@@ -154,6 +162,14 @@ const resetForm = () => {
         authorization: {},
     };
     accountForm.value?.resetFields();
+};
+
+const changeType = (type: string) => {
+    account.value.type = type;
+    account.value.authorization = {};
+    if (account.value.type == 'HuaweiCloud') {
+        account.value.authorization['region'] = 'cn-north-1';
+    }
 };
 
 const acceptParams = async (props: AccountProps) => {
