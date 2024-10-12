@@ -71,6 +71,9 @@ MoveSiteToDir: "迁移网站目录到 {{ .name }}"
 ErrMoveSiteDir: "迁移网站目录失败"
 MoveSiteDirSuccess: "迁移网站目录成功"
 DeleteRuntimePHP: "删除 PHP 运行环境"
+CustomAppStoreNotConfig: "请在应用商店设置离线包地址"
+CustomAppStoreNotFound: "应用商店包获取失败，请检查是否存在"
+CustomAppStoreFileValid: "应用商店包需要 .tar.gz 格式"
 
 #file
 ErrFileCanNotRead: "此文件不支持预览"

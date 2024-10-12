@@ -45,6 +45,7 @@ type AppDto struct {
 	Github      string      `json:"github"`
 	Website     string      `json:"website"`
 	GpuSupport  bool        `json:"gpuSupport"`
+	Recommend   int         `json:"recommend"`
 }
 
 type TagDTO struct {

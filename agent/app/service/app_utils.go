@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx/parser"
+	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 	"log"
 	"math"
 	"net/http"
@@ -403,27 +404,6 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 		}
 
 		switch install.App.Key {
-		case constant.AppOpenresty:
-			//TODO 删除 Openresty 不再删除网站
-			//websites, _ := websiteRepo.List()
-			//for _, website := range websites {
-			//	if website.AppInstallID > 0 {
-			//		websiteAppInstall, _ := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
-			//		if websiteAppInstall.AppId > 0 {
-			//			websiteApp, _ := appRepo.GetFirst(commonRepo.WithByID(websiteAppInstall.AppId))
-			//			if websiteApp.Type == constant.RuntimePHP {
-			//				go func() {
-			//					_, _ = compose.Down(websiteAppInstall.GetComposePath())
-			//					_ = op.DeleteDir(websiteAppInstall.GetPath())
-			//				}()
-			//				_ = appInstallRepo.Delete(ctx, websiteAppInstall)
-			//			}
-			//		}
-			//	}
-			//}
-			//_ = websiteRepo.DeleteAll(ctx)
-			//_ = websiteDomainRepo.DeleteAll(ctx)
-			//xpack.RemoveTamper("")
 		case constant.AppMysql, constant.AppMariaDB:
 			_ = mysqlRepo.Delete(ctx, mysqlRepo.WithByMysqlName(install.Name))
 		case constant.AppPostgresql:
@@ -1045,7 +1025,15 @@ func upApp(task *task.Task, appInstall *model.AppInstall, pullImages bool) {
 			if err != nil {
 				return err
 			}
+			imagePrefix := xpack.GetImagePrefix()
 			for _, image := range images {
+				if imagePrefix != "" {
+					lastSlashIndex := strings.LastIndex(image, "/")
+					if lastSlashIndex != -1 {
+						image = image[lastSlashIndex+1:]
+					}
+					image = imagePrefix + "/" + image
+				}
 				task.Log(i18n.GetWithName("PullImageStart", image))
 				if out, err = cmd.ExecWithTimeOut("docker pull "+image, 20*time.Minute); err != nil {
 					if out != "" {
@@ -1555,6 +1543,22 @@ func addDockerComposeCommonParam(composeMap map[string]interface{}, serviceName 
 	if !serviceValid {
 		return buserr.New(constant.ErrFileParse)
 	}
+	imagePreFix := xpack.GetImagePrefix()
+	if imagePreFix != "" {
+		for _, service := range services {
+			serviceValue := service.(map[string]interface{})
+			if image, ok := serviceValue["image"]; ok {
+				imageStr := image.(string)
+				lastSlashIndex := strings.LastIndex(imageStr, "/")
+				if lastSlashIndex != -1 {
+					imageStr = imageStr[lastSlashIndex+1:]
+				}
+				imageStr = imagePreFix + "/" + imageStr
+				serviceValue["image"] = imageStr
+			}
+		}
+	}
+
 	service, serviceExist := services[serviceName]
 	if !serviceExist {
 		return buserr.New(constant.ErrFileParse)

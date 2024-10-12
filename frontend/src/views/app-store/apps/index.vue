@@ -175,7 +175,7 @@
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';
 import { onMounted, reactive, ref, computed } from 'vue';
-import { GetAppTags, SearchApp, SyncApp, SyncLocalApp } from '@/api/modules/app';
+import { GetAppTags, SearchApp, SyncApp, SyncCutomAppStore, SyncLocalApp } from '@/api/modules/app';
 import Install from '../detail/install/index.vue';
 import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
@@ -183,8 +183,11 @@ import { GlobalStore } from '@/store';
 import { getLanguage, newUUID } from '@/utils/util';
 import Detail from '../detail/index.vue';
 import TaskLog from '@/components/task-log/index.vue';
+import { storeToRefs } from 'pinia';
+import { GetCustomAppStoreConfig } from '@/xpack/api/modules/app';
 
 const globalStore = GlobalStore();
+const { isProductPro } = storeToRefs(globalStore);
 
 const mobile = computed(() => {
     return globalStore.isMobile();
@@ -221,6 +224,7 @@ const moreTag = ref('');
 const mainHeight = ref(0);
 const detailRef = ref();
 const taskLogRef = ref();
+const syncCustomAppstore = ref(false);
 
 const search = async (req: App.AppReq) => {
     loading.value = true;
@@ -265,25 +269,29 @@ const openTaskLog = (taskID: string) => {
     taskLogRef.value.openWithTaskID(taskID);
 };
 
-const sync = () => {
+const sync = async () => {
     syncing.value = true;
     const taskID = newUUID();
     const syncReq = {
         taskID: taskID,
     };
-    SyncApp(syncReq)
-        .then((res) => {
-            if (res.message != '') {
-                MsgSuccess(res.message);
-            } else {
-                openTaskLog(taskID);
-            }
-            canUpdate.value = false;
-            search(req);
-        })
-        .finally(() => {
-            syncing.value = false;
-        });
+    try {
+        let res;
+        if (isProductPro.value && syncCustomAppstore.value) {
+            res = await SyncCutomAppStore(syncReq);
+        } else {
+            res = await SyncApp(syncReq);
+        }
+        if (res.message != '') {
+            MsgSuccess(res.message);
+        } else {
+            openTaskLog(taskID);
+        }
+        canUpdate.value = false;
+        search(req);
+    } finally {
+        syncing.value = false;
+    }
 };
 
 const syncLocal = () => {
@@ -329,7 +337,7 @@ const searchByName = () => {
     search(req);
 };
 
-onMounted(() => {
+onMounted(async () => {
     if (router.currentRoute.value.query.install) {
         installKey.value = String(router.currentRoute.value.query.install);
         const params = {
@@ -340,6 +348,12 @@ onMounted(() => {
         installRef.value.acceptParams(params);
     }
     search(req);
+    if (isProductPro.value) {
+        const res = await GetCustomAppStoreConfig();
+        if (res && res.data) {
+            syncCustomAppstore.value = res.data.status === 'enable';
+        }
+    }
     mainHeight.value = window.innerHeight - 380;
     window.onresize = () => {
         return (() => {
