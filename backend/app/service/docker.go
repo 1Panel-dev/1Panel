@@ -213,8 +213,12 @@ func (u *DockerService) UpdateConf(req dto.SettingUpdate) error {
 	if err := os.WriteFile(constant.DaemonJsonPath, newJson, 0640); err != nil {
 		return err
 	}
+	stdout, err := cmd.Exec("dockerd --validate")
+	if err != nil || (string(stdout) != "" && strings.TrimSpace(stdout) != "configuration OK") {
+		return errors.New("Docker configuration validation failed: " + string(stdout))
+	}
 
-	stdout, err := cmd.Exec("systemctl restart docker")
+	stdout, err = cmd.Exec("systemctl restart docker")
 	if err != nil {
 		return errors.New(string(stdout))
 	}
@@ -260,7 +264,12 @@ func (u *DockerService) UpdateLogOption(req dto.LogOption) error {
 		return err
 	}
 
-	stdout, err := cmd.Exec("systemctl restart docker")
+	stdout, err := cmd.Exec("dockerd --validate")
+	if err != nil || (string(stdout) != "" && strings.TrimSpace(stdout) != "configuration OK") {
+		return errors.New("Docker configuration validation failed: " + string(stdout))
+	}
+
+	stdout, err = cmd.Exec("systemctl restart docker")
 	if err != nil {
 		return errors.New(string(stdout))
 	}
@@ -300,7 +309,12 @@ func (u *DockerService) UpdateIpv6Option(req dto.Ipv6Option) error {
 		return err
 	}
 
-	stdout, err := cmd.Exec("systemctl restart docker")
+	stdout, err := cmd.Exec("dockerd --validate")
+	if err != nil || (string(stdout) != "" && strings.TrimSpace(stdout) != "configuration OK") {
+		return errors.New("Docker configuration validation failed: " + string(stdout))
+	}
+
+	stdout, err = cmd.Exec("systemctl restart docker")
 	if err != nil {
 		return errors.New(string(stdout))
 	}
@@ -329,7 +343,12 @@ func (u *DockerService) UpdateConfByFile(req dto.DaemonJsonUpdateByFile) error {
 	_, _ = write.WriteString(req.File)
 	write.Flush()
 
-	stdout, err := cmd.Exec("systemctl restart docker")
+	stdout, err := cmd.Exec("dockerd --validate")
+	if err != nil || (string(stdout) != "" && strings.TrimSpace(stdout) != "configuration OK") {
+		return errors.New("Docker configuration validation failed: " + string(stdout))
+	}
+
+	stdout, err = cmd.Exec("systemctl restart docker")
 	if err != nil {
 		return errors.New(string(stdout))
 	}
@@ -348,6 +367,14 @@ func (u *DockerService) OperateDocker(req dto.DockerOperation) error {
 			}
 		}
 	}
+
+	if req.Operation == "restart" {
+		stdout, err := cmd.Exec("dockerd --validate")
+		if err != nil || (string(stdout) != "" && strings.TrimSpace(stdout) != "configuration OK") {
+			return errors.New("Docker configuration validation failed: " + string(stdout))
+		}
+	}
+
 	stdout, err := cmd.Execf("systemctl %s %s ", req.Operation, service)
 	if err != nil {
 		return errors.New(string(stdout))
