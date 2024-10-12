@@ -86,12 +86,11 @@ func (u *ImageRepoService) Create(req dto.ImageRepoCreate) error {
 	}
 	if req.Protocol == "http" {
 		_ = u.handleRegistries(req.DownloadUrl, "", "create")
-		stdout, err := cmd.Exec("dockerd --validate")
-		if err != nil || (string(stdout) != "" && strings.TrimSpace(stdout) != "configuration OK") {
-			return errors.New("Docker configuration validation failed: " + string(stdout))
+		if err := validateDockerConfig(); err != nil {
+			return err
 		}
 
-		stdout, err = cmd.Exec("systemctl restart docker")
+		stdout, err := cmd.Exec("systemctl restart docker")
 		if err != nil {
 			return errors.New(string(stdout))
 		}
@@ -164,12 +163,11 @@ func (u *ImageRepoService) Update(req dto.ImageRepoUpdate) error {
 		if repo.Auth {
 			_, _ = cmd.ExecWithCheck("docker", "logout", repo.DownloadUrl)
 		}
-		stdout, err := cmd.Exec("dockerd --validate")
-		if err != nil || (string(stdout) != "" && strings.TrimSpace(stdout) != "configuration OK") {
-			return errors.New("Docker configuration validation failed: " + string(stdout))
+		if err := validateDockerConfig(); err != nil {
+			return err
 		}
 
-		stdout, err = cmd.Exec("systemctl restart docker")
+		stdout, err := cmd.Exec("systemctl restart docker")
 		if err != nil {
 			return errors.New(string(stdout))
 		}

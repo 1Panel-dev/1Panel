@@ -146,12 +146,6 @@ func (u *SnapshotService) HandleSnapshotRecover(snap model.Snapshot, isRecover b
 		global.LOG.Debugf("remove the file %s after the operation is successful", path.Dir(snapFileDir))
 		_ = os.RemoveAll(path.Dir(snapFileDir))
 	}
-	stdout, err := cmd.Exec("dockerd --validate")
-	if err != nil || (string(stdout) != "" && strings.TrimSpace(stdout) != "configuration OK") {
-		global.LOG.Errorf("Docker configuration validation failed: " + string(stdout))
-		return
-	}
-
 	_, _ = cmd.Exec("systemctl daemon-reload && systemctl restart 1panel.service")
 }
 
@@ -236,12 +230,6 @@ func recoverDaemonJson(src string, fileOp files.FileOp) error {
 			return fmt.Errorf("recover docker daemon.json failed, err: %v", err)
 		}
 	}
-
-	stdout, err := cmd.Exec("dockerd --validate")
-	if err != nil || (string(stdout) != "" && strings.TrimSpace(stdout) != "configuration OK") {
-		return errors.New("Docker configuration validation failed: " + string(stdout))
-	}
-
 	_, _ = cmd.Exec("systemctl restart docker")
 	return nil
 }

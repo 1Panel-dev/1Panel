@@ -176,11 +176,6 @@ func (u *FirewallService) SearchWithPage(req dto.RuleSearch) (int64, interface{}
 
 func (u *FirewallService) OperateFirewall(operation string) error {
 
-	stdout, err := cmd.Exec("dockerd --validate")
-	if err != nil || (string(stdout) != "" && strings.TrimSpace(stdout) != "configuration OK") {
-		return errors.New("Docker configuration validation failed: " + string(stdout))
-	}
-
 	client, err := firewall.NewFirewallClient()
 	if err != nil {
 		return err
