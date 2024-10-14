@@ -890,6 +890,7 @@ const message = {
 
         requestExpirationTime: '上传请求过期时间（小时）',
         unitHours: '单位：小时',
+        alertTitle: '计划任务-{0}「 {1} 」任务失败告警',
     },
     monitor: {
         monitor: '监控',
@@ -1071,6 +1072,8 @@ const message = {
             clamLog: '扫描日志',
             freshClam: '病毒库刷新配置',
             freshClamLog: '病毒库刷新日志',
+            alertHelper: '专业版支持短信告警功能',
+            alertTitle: '病毒扫描「 {0} 」任务失败告警',
         },
     },
     logs: {
@@ -2287,6 +2290,14 @@ const message = {
             statusCode: '状态码',
             manage: '管理',
         },
+    },
+    alert: {
+        isAlert: '是否告警',
+        alertCount: '告警次数',
+        clamHelper: '扫描到感染文件时触发短信告警',
+        cronJobHelper: '定时执行计划任务失败时触发短信告警',
+        licenseHelper: '专业版支持短信告警功能',
+        alertCountHelper: '每日最大告警次数',
     },
 };
 export default {

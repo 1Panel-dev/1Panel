@@ -31,10 +31,13 @@ type CronjobCreate struct {
 	DefaultDownload string `json:"defaultDownload"`
 	RetainCopies    int    `json:"retainCopies" validate:"number,min=1"`
 	Secret          string `json:"secret"`
+	AlertCount      uint   `json:"alertCount"`
+	AlertTitle      string `json:"alertTitle"`
 }
 
 type CronjobUpdate struct {
 	ID   uint   `json:"id" validate:"required"`
+	Type string `json:"type" validate:"required"`
 	Name string `json:"name" validate:"required"`
 	Spec string `json:"spec" validate:"required"`
 
@@ -53,6 +56,8 @@ type CronjobUpdate struct {
 	DefaultDownload string `json:"defaultDownload"`
 	RetainCopies    int    `json:"retainCopies" validate:"number,min=1"`
 	Secret          string `json:"secret"`
+	AlertCount      uint   `json:"alertCount"`
+	AlertTitle      string `json:"alertTitle"`
 }
 
 type CronjobUpdateStatus struct {
@@ -99,6 +104,7 @@ type CronjobInfo struct {
 	LastRecordTime string `json:"lastRecordTime"`
 	Status         string `json:"status"`
 	Secret         string `json:"secret"`
+	AlertCount     uint   `json:"alertCount"`
 }
 
 type SearchRecord struct {

@@ -935,6 +935,7 @@ const message = {
 
         requestExpirationTime: 'Upload Request Expiration Time（Hours）',
         unitHours: 'Unit: Hours',
+        alertTitle: 'Planned Task - {0} 「{1}」 Task Failure Alert',
     },
     monitor: {
         monitor: 'Monitor',
@@ -1132,6 +1133,8 @@ const message = {
             clamLog: 'Scan Logs',
             freshClam: 'Update Virus Definitions',
             freshClamLog: 'Update Virus Definitions Logs',
+            alertHelper: 'Professional version supports SMS alert',
+            alertTitle: 'Virus scanning 「{0}」 task failed alert',
         },
     },
     logs: {
@@ -2460,6 +2463,14 @@ const message = {
             statusCode: 'Status code',
             manage: 'Management',
         },
+    },
+    alert: {
+        isAlert: 'Alert',
+        alertCount: 'Alert Count',
+        clamHelper: 'Trigger SMS alert when scanning infected files',
+        cronJobHelper: 'Trigger SMS alert when scheduled task execution fails',
+        licenseHelper: 'Professional version supports SMS alert',
+        alertCountHelper: 'Maximum daily alarm frequency',
     },
 };
 

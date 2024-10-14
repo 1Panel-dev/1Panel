@@ -8,6 +8,7 @@ import (
 	"path"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -20,6 +21,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/systemctl"
 	"github.com/1Panel-dev/1Panel/backend/utils/xpack"
+	"github.com/1Panel-dev/1Panel/backend/xpack/utils/alert"
 	"github.com/jinzhu/copier"
 	"github.com/robfig/cron/v3"
 
@@ -154,6 +156,16 @@ func (c *ClamService) SearchWithPage(req dto.SearchClamWithPage) (int64, interfa
 			}
 			datas[i].LastHandleDate = t1.Format(constant.DateTimeLayout)
 		}
+		alertBase := dto.AlertBase{
+			AlertType: "clams",
+			EntryID:   datas[i].ID,
+		}
+		alertCount := xpack.GetAlert(alertBase)
+		if alertCount != 0 {
+			datas[i].AlertCount = alertCount
+		} else {
+			datas[i].AlertCount = 0
+		}
 	}
 	return total, datas, err
 }
@@ -179,6 +191,19 @@ func (c *ClamService) Create(req dto.ClamCreate) error {
 	}
 	if err := clamRepo.Create(&clam); err != nil {
 		return err
+	}
+
+	if req.AlertCount != 0 {
+		createAlert := dto.CreateOrUpdateAlert{
+			AlertTitle: req.AlertTitle,
+			AlertCount: req.AlertCount,
+			AlertType:  "clams",
+			EntryID:    clam.ID,
+		}
+		err := xpack.CreateAlert(createAlert)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -225,6 +250,16 @@ func (c *ClamService) Update(req dto.ClamUpdate) error {
 	if err := clamRepo.Update(req.ID, upMap); err != nil {
 		return err
 	}
+	updateAlert := dto.CreateOrUpdateAlert{
+		AlertTitle: req.AlertTitle,
+		AlertType:  "clams",
+		AlertCount: req.AlertCount,
+		EntryID:    clam.ID,
+	}
+	err := xpack.UpdateAlert(updateAlert)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -263,6 +298,14 @@ func (c *ClamService) Delete(req dto.ClamDelete) error {
 			_ = os.RemoveAll(path.Join(clam.InfectedDir, "1panel-infected", clam.Name))
 		}
 		if err := clamRepo.Delete(commonRepo.WithByID(id)); err != nil {
+			return err
+		}
+		alertBase := dto.AlertBase{
+			AlertType: "clams",
+			EntryID:   clam.ID,
+		}
+		err := xpack.DeleteAlert(alertBase)
+		if err != nil {
 			return err
 		}
 	}
@@ -305,6 +348,7 @@ func (c *ClamService) HandleOnce(req dto.OperateByID) error {
 		}
 		global.LOG.Debugf("clamdscan --fdpass %s %s -l %s", strategy, clam.Path, logFile)
 		stdout, err := cmd.Execf("clamdscan --fdpass %s %s -l %s", strategy, clam.Path, logFile)
+		handleAlert(stdout, clam.Name, clam.ID)
 		if err != nil {
 			global.LOG.Errorf("clamdscan failed, stdout: %v, err: %v", stdout, err)
 		}
@@ -584,4 +628,29 @@ func (c *ClamService) loadLogPath(name string) string {
 	}
 
 	return ""
+}
+
+func handleAlert(stdout, clamName string, clamId uint) {
+	if strings.Contains(stdout, "- SCAN SUMMARY -") {
+		lines := strings.Split(stdout, "\n")
+		for _, line := range lines {
+			if strings.HasPrefix(line, "Infected files:") {
+				var infectedFiles = 0
+				infectedFiles, _ = strconv.Atoi(strings.TrimPrefix(line, "Infected files:"))
+				if infectedFiles > 0 {
+					pushAlert := dto.PushAlert{
+						TaskName:  clamName,
+						AlertType: "clams",
+						EntryID:   clamId,
+						Param:     strconv.Itoa(infectedFiles),
+					}
+					err := alert.PushAlert(pushAlert)
+					if err != nil {
+						global.LOG.Errorf("clamdscan push failed, err: %v", err)
+					}
+					break
+				}
+			}
+		}
+	}
 }

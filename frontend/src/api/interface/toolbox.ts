@@ -139,6 +139,9 @@ export namespace Toolbox {
         spec: string;
         specObj: Cronjob.SpecObj;
         description: string;
+        hasAlert: boolean;
+        alertCount: number;
+        alertTitle: string;
     }
     export interface ClamCreate {
         name: string;
