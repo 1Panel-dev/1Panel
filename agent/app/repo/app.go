@@ -30,6 +30,7 @@ type IAppRepo interface {
 	Create(ctx context.Context, app *model.App) error
 	Save(ctx context.Context, app *model.App) error
 	BatchDelete(ctx context.Context, apps []model.App) error
+	DeleteByIDs(ctx context.Context, ids []uint) error
 }
 
 func NewIAppRepo() IAppRepo {
@@ -91,7 +92,7 @@ func (a AppRepo) Page(page, size int, opts ...DBOption) (int64, []model.App, err
 	var apps []model.App
 	db := getDb(opts...).Model(&model.App{})
 	count := int64(0)
-	db = db.Count(&count)
+	db = db.Count(&count).Debug()
 	err := db.Limit(size).Offset(size * (page - 1)).Preload("AppTags").Find(&apps).Error
 	return count, apps, err
 }
@@ -136,4 +137,8 @@ func (a AppRepo) Save(ctx context.Context, app *model.App) error {
 
 func (a AppRepo) BatchDelete(ctx context.Context, apps []model.App) error {
 	return getTx(ctx).Omit(clause.Associations).Delete(&apps).Error
+}
+
+func (a AppRepo) DeleteByIDs(ctx context.Context, ids []uint) error {
+	return getTx(ctx).Where("id in (?)", ids).Delete(&model.App{}).Error
 }

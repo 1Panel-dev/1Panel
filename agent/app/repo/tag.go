@@ -16,6 +16,9 @@ type ITagRepo interface {
 	GetByIds(ids []uint) ([]model.Tag, error)
 	GetByKeys(keys []string) ([]model.Tag, error)
 	GetByAppId(appId uint) ([]model.Tag, error)
+	DeleteByID(ctx context.Context, id uint) error
+	Create(ctx context.Context, tag *model.Tag) error
+	Save(ctx context.Context, tag *model.Tag) error
 }
 
 func NewITagRepo() ITagRepo {
@@ -60,4 +63,16 @@ func (t TagRepo) GetByAppId(appId uint) ([]model.Tag, error) {
 		return nil, err
 	}
 	return tags, nil
+}
+
+func (t TagRepo) DeleteByID(ctx context.Context, id uint) error {
+	return getTx(ctx).Where("id = ?", id).Delete(&model.Tag{}).Error
+}
+
+func (t TagRepo) Create(ctx context.Context, tag *model.Tag) error {
+	return getTx(ctx).Create(tag).Error
+}
+
+func (t TagRepo) Save(ctx context.Context, tag *model.Tag) error {
+	return getTx(ctx).Save(tag).Error
 }

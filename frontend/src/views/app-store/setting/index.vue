@@ -4,7 +4,7 @@
             <el-form
                 :model="config"
                 label-position="left"
-                label-width="150px"
+                label-width="180px"
                 class="ml-2.5"
                 v-loading="loading"
                 :rules="rules"
@@ -15,32 +15,39 @@
                         <el-form-item :label="$t('app.defaultWebDomain')" prop="defaultDomain">
                             <el-input v-model="config.defaultDomain">
                                 <template #prepend>
-                                    <el-select v-model="protocol" placeholder="Select" class="p-w-100">
+                                    <el-select v-model="protocol" placeholder="Select" class="p-w-100" disabled>
                                         <el-option label="HTTP" value="http://" />
                                         <el-option label="HTTPS" value="https://" />
                                     </el-select>
                                 </template>
+                                <template #append>
+                                    <el-button @click="setDefaultDomain()" icon="Setting">
+                                        {{ $t('commons.button.set') }}
+                                    </el-button>
+                                </template>
                             </el-input>
                             <span class="input-help">{{ $t('app.defaultWebDomainHepler') }}</span>
                         </el-form-item>
-                        <el-form-item>
-                            <el-button type="primary" :disabled="loading" @click="submit()">
-                                {{ $t('commons.button.confirm') }}
-                            </el-button>
-                        </el-form-item>
+                        <CustomSetting v-if="isProductPro" />
                     </el-col>
                 </el-row>
             </el-form>
         </template>
     </LayoutContent>
+    <DefaultDomain ref="domainRef" @close="search" />
 </template>
 
 <script setup lang="ts">
-import { GetAppStoreConfig, UpdateAppStoreConfig } from '@/api/modules/app';
+import { GetAppStoreConfig } from '@/api/modules/app';
 import { Rules } from '@/global/form-rules';
-import i18n from '@/lang';
-import { MsgSuccess } from '@/utils/message';
 import { FormRules } from 'element-plus';
+import CustomSetting from '@/xpack/views/appstore/index.vue';
+import DefaultDomain from './default-domain/index.vue';
+import { GlobalStore } from '@/store';
+import { storeToRefs } from 'pinia';
+
+const globalStore = GlobalStore();
+const { isProductPro } = storeToRefs(globalStore);
 
 const rules = ref<FormRules>({
     defaultDomain: [Rules.domainOrIP],
@@ -51,12 +58,11 @@ const config = ref({
 const loading = ref(false);
 const configForm = ref();
 const protocol = ref('http://');
+const domainRef = ref();
 
 function getUrl(url: string) {
     const regex = /^(https?:\/\/)(.*)/;
-
     const match = url.match(regex);
-
     if (match) {
         const protocol = match[1];
         const remainder = match[2];
@@ -86,28 +92,10 @@ const search = async () => {
     }
 };
 
-const submit = async () => {
-    if (!configForm.value) return;
-    await configForm.value.validate(async (valid) => {
-        if (!valid) {
-            return;
-        }
-        loading.value = true;
-        try {
-            let defaultDomain = '';
-            if (config.value.defaultDomain) {
-                defaultDomain = protocol.value + config.value.defaultDomain;
-            }
-            const req = {
-                defaultDomain: defaultDomain,
-            };
-            await UpdateAppStoreConfig(req);
-            MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
-        } catch (error) {
-        } finally {
-            loading.value = false;
-            search();
-        }
+const setDefaultDomain = () => {
+    domainRef.value.acceptParams({
+        domain: config.value.defaultDomain,
+        protocol: protocol.value,
     });
 };
 

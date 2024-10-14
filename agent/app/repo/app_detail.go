@@ -19,6 +19,7 @@ type IAppDetailRepo interface {
 	Update(ctx context.Context, detail model.AppDetail) error
 	BatchCreate(ctx context.Context, details []model.AppDetail) error
 	DeleteByAppIds(ctx context.Context, appIds []uint) error
+	DeleteByIDs(ctx context.Context, appIds []uint) error
 	GetBy(opts ...DBOption) ([]model.AppDetail, error)
 	BatchUpdateBy(maps map[string]interface{}, opts ...DBOption) error
 	BatchDelete(ctx context.Context, appDetails []model.AppDetail) error
@@ -62,6 +63,10 @@ func (a AppDetailRepo) BatchCreate(ctx context.Context, details []model.AppDetai
 
 func (a AppDetailRepo) DeleteByAppIds(ctx context.Context, appIds []uint) error {
 	return getTx(ctx).Where("app_id in (?)", appIds).Delete(&model.AppDetail{}).Error
+}
+
+func (a AppDetailRepo) DeleteByIDs(ctx context.Context, appIds []uint) error {
+	return getTx(ctx).Where("id in (?)", appIds).Delete(&model.AppDetail{}).Error
 }
 
 func (a AppDetailRepo) GetBy(opts ...DBOption) ([]model.AppDetail, error) {

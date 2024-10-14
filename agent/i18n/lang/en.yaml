@@ -70,7 +70,11 @@ MoveSiteDir: "The current upgrade requires migrating the OpenResty website direc
 MoveSiteToDir: "Migrate the website directory to {{ .name }}"
 ErrMoveSiteDir: "Failed to migrate the website directory"
 MoveSiteDirSuccess: "Successfully migrated the website directory"
-DeleteRuntimePHP: "Delete PHP runtime environment"
+DeleteRuntimePHP: "Delete PHP runtime environment",
+CustomAppStoreNotConfig: "Please configure the offline package address in the app store settings",
+CustomAppStoreNotFound: "Failed to retrieve app store package, please check if it exists",
+CustomAppStoreFileValid: "App store package must be in .tar.gz format"
+
 
 #file
 ErrFileCanNotRead: "File can not read"

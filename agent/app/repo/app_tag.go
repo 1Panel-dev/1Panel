@@ -2,6 +2,7 @@ package repo
 
 import (
 	"context"
+	"gorm.io/gorm"
 
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 )
@@ -15,10 +16,19 @@ type IAppTagRepo interface {
 	DeleteAll(ctx context.Context) error
 	GetByAppId(appId uint) ([]model.AppTag, error)
 	GetByTagIds(tagIds []uint) ([]model.AppTag, error)
+	DeleteBy(ctx context.Context, opts ...DBOption) error
+
+	WithByTagID(tagID uint) DBOption
 }
 
 func NewIAppTagRepo() IAppTagRepo {
 	return &AppTagRepo{}
+}
+
+func (a AppTagRepo) WithByTagID(tagID uint) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("tag_id = ?", tagID)
+	}
 }
 
 func (a AppTagRepo) BatchCreate(ctx context.Context, tags []*model.AppTag) error {
@@ -47,4 +57,8 @@ func (a AppTagRepo) GetByTagIds(tagIds []uint) ([]model.AppTag, error) {
 		return nil, err
 	}
 	return appTags, nil
+}
+
+func (a AppTagRepo) DeleteBy(ctx context.Context, opts ...DBOption) error {
+	return getTx(ctx, opts...).Delete(&model.AppTag{}).Error
 }

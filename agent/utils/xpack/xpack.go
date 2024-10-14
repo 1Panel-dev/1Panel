@@ -43,3 +43,7 @@ func InitNodeData(tx *gorm.DB) (bool, string, error) { return true, "127.0.0.1",
 func RequestToMaster(reqUrl, reqMethod string, reqBody io.Reader) (interface{}, error) {
 	return nil, nil
 }
+
+func GetImagePrefix() string {
+	return ""
+}

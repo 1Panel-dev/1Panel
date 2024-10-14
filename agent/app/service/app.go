@@ -120,6 +120,7 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 			Website:     ap.Website,
 			Github:      ap.Github,
 			GpuSupport:  ap.GpuSupport,
+			Recommend:   ap.Recommend,
 		}
 		appDTOs = append(appDTOs, appDTO)
 		appTags, err := appTagRepo.GetByAppId(ap.ID)
