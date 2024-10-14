@@ -230,6 +230,7 @@ func recoverDaemonJson(src string, fileOp files.FileOp) error {
 			return fmt.Errorf("recover docker daemon.json failed, err: %v", err)
 		}
 	}
+
 	_, _ = cmd.Exec("systemctl restart docker")
 	return nil
 }

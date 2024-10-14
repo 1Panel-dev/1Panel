@@ -175,7 +175,6 @@ func (u *FirewallService) SearchWithPage(req dto.RuleSearch) (int64, interface{}
 }
 
 func (u *FirewallService) OperateFirewall(operation string) error {
-
 	client, err := firewall.NewFirewallClient()
 	if err != nil {
 		return err

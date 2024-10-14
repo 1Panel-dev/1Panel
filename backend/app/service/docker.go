@@ -429,7 +429,7 @@ func changeLogOption(daemonMap map[string]interface{}, logMaxFile, logMaxSize st
 
 func validateDockerConfig() error {
 	stdout, err := cmd.Exec("dockerd --validate")
-	if err != nil || (string(stdout) != "" && strings.TrimSpace(stdout) != "configuration OK") {
+	if err != nil || (stdout != "" && strings.TrimSpace(stdout) != "configuration OK") {
 		return fmt.Errorf("Docker configuration validation failed, err: %v", stdout)
 	}
 	return nil
