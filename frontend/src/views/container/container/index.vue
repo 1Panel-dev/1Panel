@@ -369,7 +369,7 @@ const dialogUpgradeRef = ref();
 const dialogCommitRef = ref();
 const dialogPortJumpRef = ref();
 const opRef = ref();
-const includeAppStore = ref(true);
+const includeAppStore = ref();
 const columns = ref([]);
 
 const dockerStatus = ref('Running');
