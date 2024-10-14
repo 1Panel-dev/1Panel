@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
@@ -38,4 +39,24 @@ func LoadXpuInfo() []interface{} {
 
 func StartClam(startClam model.Clam, isUpdate bool) (int, error) {
 	return 0, buserr.New(constant.ErrXpackNotFound)
+}
+
+func CreateAlert(createAlert dto.CreateOrUpdateAlert) error {
+	return nil
+}
+
+func UpdateAlert(updateAlert dto.CreateOrUpdateAlert) error {
+	return nil
+}
+
+func DeleteAlert(alertBase dto.AlertBase) error {
+	return nil
+}
+
+func GetAlert(alertBase dto.AlertBase) uint {
+	return 0
+}
+
+func PushAlert(pushAlert dto.PushAlert) error {
+	return nil
 }

@@ -13,6 +13,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/xpack"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
 	"github.com/robfig/cron/v3"
@@ -52,6 +53,16 @@ func (u *CronjobService) SearchWithPage(search dto.PageCronjob) (int64, interfac
 			item.LastRecordTime = record.StartTime.Format(constant.DateTimeLayout)
 		} else {
 			item.LastRecordTime = "-"
+		}
+		alertBase := dto.AlertBase{
+			AlertType: cronjob.Type,
+			EntryID:   cronjob.ID,
+		}
+		alertCount := xpack.GetAlert(alertBase)
+		if alertCount != 0 {
+			item.AlertCount = alertCount
+		} else {
+			item.AlertCount = 0
 		}
 		dtoCronjobs = append(dtoCronjobs, item)
 	}
@@ -190,6 +201,18 @@ func (u *CronjobService) Create(cronjobDto dto.CronjobCreate) error {
 	if err := cronjobRepo.Create(&cronjob); err != nil {
 		return err
 	}
+	if cronjobDto.AlertCount != 0 {
+		createAlert := dto.CreateOrUpdateAlert{
+			AlertTitle: cronjobDto.AlertTitle,
+			AlertCount: cronjobDto.AlertCount,
+			AlertType:  cronjob.Type,
+			EntryID:    cronjob.ID,
+		}
+		err := xpack.CreateAlert(createAlert)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
@@ -230,6 +253,14 @@ func (u *CronjobService) Delete(req dto.CronjobBatchDelete) error {
 			return err
 		}
 		if err := cronjobRepo.Delete(commonRepo.WithByID(id)); err != nil {
+			return err
+		}
+		alertBase := dto.AlertBase{
+			AlertType: cronjob.Type,
+			EntryID:   cronjob.ID,
+		}
+		err := xpack.DeleteAlert(alertBase)
+		if err != nil {
 			return err
 		}
 	}
@@ -281,7 +312,21 @@ func (u *CronjobService) Update(id uint, req dto.CronjobUpdate) error {
 	upMap["default_download"] = req.DefaultDownload
 	upMap["retain_copies"] = req.RetainCopies
 	upMap["secret"] = req.Secret
-	return cronjobRepo.Update(id, upMap)
+	err = cronjobRepo.Update(id, upMap)
+	if err != nil {
+		return err
+	}
+	updateAlert := dto.CreateOrUpdateAlert{
+		AlertTitle: req.AlertTitle,
+		AlertType:  cronModel.Type,
+		AlertCount: req.AlertCount,
+		EntryID:    cronModel.ID,
+	}
+	err = xpack.UpdateAlert(updateAlert)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (u *CronjobService) UpdateStatus(id uint, status string) error {
@@ -293,6 +338,7 @@ func (u *CronjobService) UpdateStatus(id uint, status string) error {
 		entryIDs string
 		err      error
 	)
+
 	if status == constant.StatusEnable {
 		entryIDs, err = u.StartJob(&cronjob, false)
 		if err != nil {

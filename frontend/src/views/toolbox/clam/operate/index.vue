@@ -121,6 +121,30 @@
                             </template>
                         </el-input>
                     </el-form-item>
+                    <el-form-item prop="hasAlert">
+                        <el-checkbox v-model="dialogData.rowData!.hasAlert" :label="$t('alert.isAlert')" />
+                        <span class="input-help">{{ $t('alert.clamHelper') }}</span>
+                    </el-form-item>
+                    <el-form-item v-if="dialogData.rowData!.hasAlert && !isProductPro">
+                        <span>{{ $t('toolbox.clam.alertHelper') }}</span>
+                        <el-button link type="primary" @click="toUpload">
+                            {{ $t('license.levelUpPro') }}
+                        </el-button>
+                    </el-form-item>
+                    <el-form-item
+                        prop="alertCount"
+                        v-if="dialogData.rowData!.hasAlert && isProductPro"
+                        :label="$t('alert.alertCount')"
+                    >
+                        <el-input-number
+                            style="width: 200px"
+                            :min="1"
+                            step-strictly
+                            :step="1"
+                            v-model.number="dialogData.rowData!.alertCount"
+                        ></el-input-number>
+                        <span class="input-help">{{ $t('alert.alertCountHelper') }}</span>
+                    </el-form-item>
                     <el-form-item :label="$t('commons.table.description')" prop="description">
                         <el-input type="textarea" :rows="3" clearable v-model="dialogData.rowData!.description" />
                     </el-form-item>
@@ -184,6 +208,8 @@ const acceptParams = (params: DialogProps): void => {
             second: 30,
         };
     }
+    dialogData.value.rowData.hasAlert = dialogData.value.rowData!.alertCount > 0;
+    dialogData.value.rowData!.alertCount = dialogData.value.rowData!.alertCount || 3;
     title.value = i18n.global.t('commons.button.' + dialogData.value.title);
     drawerVisible.value = true;
 };
@@ -277,6 +303,19 @@ const verifySpec = (rule: any, value: any, callback: any) => {
     }
     callback();
 };
+
+function checkSendCount(rule: any, value: any, callback: any) {
+    if (value === '') {
+        callback();
+    }
+    const regex = /^(?:[1-9]|[12][0-9]|30)$/;
+    if (!regex.test(value)) {
+        return callback(new Error(i18n.global.t('commons.rule.numberRange', [1, 30])));
+    }
+
+    callback();
+}
+
 const rules = reactive({
     name: [Rules.simpleName],
     path: [Rules.requiredInput, Rules.noSpace],
@@ -284,6 +323,7 @@ const rules = reactive({
         { validator: verifySpec, trigger: 'blur', required: true },
         { validator: verifySpec, trigger: 'change', required: true },
     ],
+    alertCount: [Rules.integerNumber, { validator: checkSendCount, trigger: 'blur' }],
 });
 
 type FormInstance = InstanceType<typeof ElForm>;
@@ -353,6 +393,16 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
                 MsgError(i18n.global.t('cronjob.cronSpecHelper'));
                 return;
             }
+            dialogData.value.rowData.alertCount = dialogData.value.rowData!.hasAlert
+                ? dialogData.value.rowData.alertCount
+                : 0;
+            dialogData.value.rowData.alertTitle = i18n.global.t('toolbox.clam.alertTitle', [
+                dialogData.value.rowData.name,
+            ]);
+        } else {
+            dialogData.value.rowData.alertTitle = '';
+            dialogData.value.rowData.alertCount = 0;
+            dialogData.value.rowData.hasAlert = false;
         }
         dialogData.value.rowData.spec = spec;
 
