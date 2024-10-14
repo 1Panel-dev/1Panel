@@ -23,3 +23,8 @@ body,
 .el-switch--small,.is-checked .el-switch__core::after {
     margin-left: 12px !important;
 }
+
+.el-alert__title {
+    display: flex;
+    align-items: center;
+}
