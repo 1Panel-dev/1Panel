@@ -86,6 +86,10 @@ func (u *ImageRepoService) Create(req dto.ImageRepoCreate) error {
 	}
 	if req.Protocol == "http" {
 		_ = u.handleRegistries(req.DownloadUrl, "", "create")
+		if err := validateDockerConfig(); err != nil {
+			return err
+		}
+
 		stdout, err := cmd.Exec("systemctl restart docker")
 		if err != nil {
 			return errors.New(string(stdout))
@@ -159,6 +163,10 @@ func (u *ImageRepoService) Update(req dto.ImageRepoUpdate) error {
 		if repo.Auth {
 			_, _ = cmd.ExecWithCheck("docker", "logout", repo.DownloadUrl)
 		}
+		if err := validateDockerConfig(); err != nil {
+			return err
+		}
+
 		stdout, err := cmd.Exec("systemctl restart docker")
 		if err != nil {
 			return errors.New(string(stdout))
