@@ -264,8 +264,6 @@ const search = async () => {
     form.complexityVerification = res.data.complexityVerification;
     form.defaultNetwork = res.data.defaultNetwork;
     form.defaultNetworkVal = res.data.defaultNetwork === 'all' ? i18n.t('commons.table.all') : res.data.defaultNetwork;
-    form.proHideMenus = res.data.xpackHideMenu;
-    form.hideMenuList = res.data.xpackHideMenu;
     form.developerMode = res.data.developerMode;
 
     form.proxyUrl = res.data.proxyUrl;
@@ -277,6 +275,15 @@ const search = async () => {
     form.proxyPasswdKeep = res.data.proxyPasswdKeep;
 
     const json: Node = JSON.parse(res.data.xpackHideMenu);
+    if (json.isCheck === false) {
+        json.children.forEach((child: any) => {
+            if (child.isCheck === true) {
+                child.isCheck = false;
+            }
+        });
+    }
+    form.proHideMenus = JSON.stringify(json);
+    form.hideMenuList = JSON.stringify(json);
     const checkedTitles = getCheckedTitles(json);
     form.proHideMenus = checkedTitles.toString();
 

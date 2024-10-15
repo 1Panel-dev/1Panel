@@ -130,6 +130,13 @@ function getCheckedLabels(json: Node): string[] {
 const search = async () => {
     const res = await getSettingInfo();
     const json: Node = JSON.parse(res.data.xpackHideMenu);
+    if (json.isCheck === false) {
+        json.children.forEach((child: any) => {
+            if (child.isCheck === true) {
+                child.isCheck = false;
+            }
+        });
+    }
     const checkedLabels = getCheckedLabels(json);
     let rstMenuList: RouteRecordRaw[] = [];
     menuStore.menuList.forEach((item) => {
