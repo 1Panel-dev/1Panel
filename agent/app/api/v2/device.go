@@ -87,6 +87,21 @@ func (b *BaseApi) UpdateDeviceByFile(c *gin.Context) {
 }
 
 // @Tags Device
+// @Summary Load user list
+// @Description 获取服务器用户列表
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /toolbox/device/users  [get]
+func (b *BaseApi) LoadUsers(c *gin.Context) {
+	users, err := deviceService.LoadUsers()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, users)
+}
+
+// @Tags Device
 // @Summary Update device
 // @Description 修改系统参数
 // @Accept json

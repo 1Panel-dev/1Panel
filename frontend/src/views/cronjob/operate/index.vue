@@ -67,148 +67,250 @@
             <el-form-item :label="$t('cronjob.taskName')" prop="name">
                 <el-input :disabled="dialogData.title === 'edit'" clearable v-model.trim="dialogData.rowData!.name" />
             </el-form-item>
-
-            <el-form-item :label="$t('cronjob.cronSpec')" prop="specCustom">
-                <el-checkbox :label="$t('container.custom')" v-model="dialogData.rowData!.specCustom" />
-            </el-form-item>
-            <div v-if="!dialogData.rowData!.specCustom">
-                <el-form-item prop="spec">
-                    <div v-for="(specObj, index) of dialogData.rowData.specObjs" :key="index" style="width: 100%">
-                        <el-select class="specTypeClass" v-model="specObj.specType" @change="changeSpecType(index)">
-                            <el-option
-                                v-for="item in specOptions"
-                                :key="item.label"
-                                :value="item.value"
-                                :label="item.label"
-                            />
-                        </el-select>
-                        <el-select v-if="specObj.specType === 'perWeek'" class="specClass" v-model="specObj.week">
-                            <el-option
-                                v-for="item in weekOptions"
-                                :key="item.label"
-                                :value="item.value"
-                                :label="item.label"
-                            />
-                        </el-select>
-                        <el-input v-if="hasDay(specObj)" class="specClass" v-model.number="specObj.day">
-                            <template #append>
-                                <div class="append">{{ $t('cronjob.day') }}</div>
-                            </template>
-                        </el-input>
-                        <el-input v-if="hasHour(specObj)" class="specClass" v-model.number="specObj.hour">
-                            <template #append>
-                                <div class="append">{{ $t('commons.units.hour') }}</div>
-                            </template>
-                        </el-input>
-                        <el-input
-                            v-if="specObj.specType !== 'perNSecond'"
-                            class="specClass"
-                            v-model.number="specObj.minute"
-                        >
-                            <template #append>
-                                <div class="append">{{ $t('commons.units.minute') }}</div>
-                            </template>
-                        </el-input>
-                        <el-input
-                            v-if="specObj.specType === 'perNSecond'"
-                            class="specClass"
-                            v-model.number="specObj.second"
-                        >
-                            <template #append>
-                                <div class="append">{{ $t('commons.units.second') }}</div>
-                            </template>
-                        </el-input>
-                        <el-popover placement="top-start" :title="$t('cronjob.nextTime')" width="200" trigger="click">
-                            <div v-for="(time, index_t) of nextTimes" :key="index_t">
-                                <el-tag class="mt-2">{{ time }}</el-tag>
-                            </div>
-                            <template #reference>
-                                <el-button class="ml-2.5" @click="loadNext(specObj)" link type="primary">
-                                    {{ $t('commons.button.preview') }}
-                                </el-button>
-                            </template>
-                        </el-popover>
-                        <el-button
-                            class="ml-2.5"
-                            link
-                            type="primary"
-                            @click="handleSpecDelete(index)"
-                            v-if="dialogData.rowData.specObjs.length > 1"
-                        >
-                            {{ $t('commons.button.delete') }}
-                        </el-button>
-                        <el-divider v-if="dialogData.rowData.specObjs.length > 1" class="divider" />
-                    </div>
+            <el-card>
+                <el-form-item :label="$t('cronjob.cronSpec')" prop="specCustom">
+                    <el-checkbox :label="$t('container.custom')" v-model="dialogData.rowData!.specCustom" />
                 </el-form-item>
-                <el-button class="mb-3" @click="handleSpecAdd()">
-                    {{ $t('commons.button.add') }}
-                </el-button>
-            </div>
+                <div v-if="!dialogData.rowData!.specCustom">
+                    <el-form-item prop="spec">
+                        <div v-for="(specObj, index) of dialogData.rowData.specObjs" :key="index" style="width: 100%">
+                            <el-select class="specTypeClass" v-model="specObj.specType" @change="changeSpecType(index)">
+                                <el-option
+                                    v-for="item in specOptions"
+                                    :key="item.label"
+                                    :value="item.value"
+                                    :label="item.label"
+                                />
+                            </el-select>
+                            <el-select v-if="specObj.specType === 'perWeek'" class="specClass" v-model="specObj.week">
+                                <el-option
+                                    v-for="item in weekOptions"
+                                    :key="item.label"
+                                    :value="item.value"
+                                    :label="item.label"
+                                />
+                            </el-select>
+                            <el-input v-if="hasDay(specObj)" class="specClass" v-model.number="specObj.day">
+                                <template #append>
+                                    <div class="append">{{ $t('cronjob.day') }}</div>
+                                </template>
+                            </el-input>
+                            <el-input v-if="hasHour(specObj)" class="specClass" v-model.number="specObj.hour">
+                                <template #append>
+                                    <div class="append">{{ $t('commons.units.hour') }}</div>
+                                </template>
+                            </el-input>
+                            <el-input
+                                v-if="specObj.specType !== 'perNSecond'"
+                                class="specClass"
+                                v-model.number="specObj.minute"
+                            >
+                                <template #append>
+                                    <div class="append">{{ $t('commons.units.minute') }}</div>
+                                </template>
+                            </el-input>
+                            <el-input
+                                v-if="specObj.specType === 'perNSecond'"
+                                class="specClass"
+                                v-model.number="specObj.second"
+                            >
+                                <template #append>
+                                    <div class="append">{{ $t('commons.units.second') }}</div>
+                                </template>
+                            </el-input>
+                            <el-popover
+                                placement="top-start"
+                                :title="$t('cronjob.nextTime')"
+                                width="200"
+                                trigger="click"
+                            >
+                                <div v-for="(time, index_t) of nextTimes" :key="index_t">
+                                    <el-tag class="mt-2">{{ time }}</el-tag>
+                                </div>
+                                <template #reference>
+                                    <el-button class="ml-2.5" @click="loadNext(specObj)" link type="primary">
+                                        {{ $t('commons.button.preview') }}
+                                    </el-button>
+                                </template>
+                            </el-popover>
+                            <el-button
+                                class="ml-2.5"
+                                link
+                                type="primary"
+                                @click="handleSpecDelete(index)"
+                                v-if="dialogData.rowData.specObjs.length > 1"
+                            >
+                                {{ $t('commons.button.delete') }}
+                            </el-button>
+                            <el-divider v-if="dialogData.rowData.specObjs.length > 1" class="divider" />
+                        </div>
+                    </el-form-item>
+                    <el-button class="mb-3" @click="handleSpecAdd()">
+                        {{ $t('commons.button.add') }}
+                    </el-button>
+                </div>
 
-            <div v-if="dialogData.rowData!.specCustom">
-                <el-form-item prop="spec">
-                    <div v-for="(spec, index) of dialogData.rowData.specs" :key="index" style="width: 100%">
-                        <el-input style="width: 80%" v-model="dialogData.rowData.specs[index]" />
-                        <el-popover placement="top-start" :title="$t('cronjob.nextTime')" width="200" trigger="click">
-                            <div v-for="(time, index_t) of nextTimes" :key="index_t">
-                                <el-tag class="mt-2">{{ time }}</el-tag>
-                            </div>
-                            <template #reference>
-                                <el-button class="ml-2.5" @click="loadNext(spec)" link type="primary">
-                                    {{ $t('commons.button.preview') }}
-                                </el-button>
-                            </template>
-                        </el-popover>
-                        <el-button
-                            class="ml-2.5"
-                            link
-                            type="primary"
-                            @click="handleSpecCustomDelete(index)"
-                            v-if="dialogData.rowData.specs.length > 1"
-                        >
-                            {{ $t('commons.button.delete') }}
-                        </el-button>
-                        <el-divider v-if="dialogData.rowData.specs.length > 1" class="divider" />
-                    </div>
+                <div v-if="dialogData.rowData!.specCustom">
+                    <el-form-item prop="spec">
+                        <div v-for="(spec, index) of dialogData.rowData.specs" :key="index">
+                            <el-input style="width: 80%" v-model="dialogData.rowData.specs[index]" />
+                            <el-popover
+                                placement="top-start"
+                                :title="$t('cronjob.nextTime')"
+                                width="200"
+                                trigger="click"
+                            >
+                                <div v-for="(time, index_t) of nextTimes" :key="index_t">
+                                    <el-tag class="mt-2">{{ time }}</el-tag>
+                                </div>
+                                <template #reference>
+                                    <el-button class="ml-2.5" @click="loadNext(spec)" link type="primary">
+                                        {{ $t('commons.button.preview') }}
+                                    </el-button>
+                                </template>
+                            </el-popover>
+                            <el-button
+                                class="ml-2.5"
+                                link
+                                type="primary"
+                                @click="handleSpecCustomDelete(index)"
+                                v-if="dialogData.rowData.specs.length > 1"
+                            >
+                                {{ $t('commons.button.delete') }}
+                            </el-button>
+                            <el-divider v-if="dialogData.rowData.specs.length > 1" class="divider" />
+                        </div>
+                    </el-form-item>
+                    <el-button class="mb-3" @click="handleSpecCustomAdd()">
+                        {{ $t('commons.button.add') }}
+                    </el-button>
+                </div>
+            </el-card>
+
+            <div v-if="hasScript()">
+                <el-form-item class="mt-5">
+                    <el-checkbox v-model="dialogData.rowData!.inContainer">
+                        {{ $t('cronjob.containerCheckBox') }}
+                    </el-checkbox>
                 </el-form-item>
-                <el-button class="mb-3" @click="handleSpecCustomAdd()">
-                    {{ $t('commons.button.add') }}
-                </el-button>
+                <el-card v-if="dialogData.rowData!.inContainer">
+                    <el-row :gutter="20">
+                        <el-col :span="12">
+                            <el-form-item :label="$t('cronjob.containerName')" prop="containerName">
+                                <el-select class="selectClass" v-model="dialogData.rowData!.containerName">
+                                    <el-option
+                                        v-for="item in containerOptions"
+                                        :key="item"
+                                        :value="item"
+                                        :label="item"
+                                    />
+                                </el-select>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item :label="$t('container.command')" prop="command" :rules="Rules.requiredInput">
+                                <el-checkbox border v-model="dialogData.rowData!.isCustom">
+                                    {{ $t('container.custom') }}
+                                </el-checkbox>
+                                <el-select
+                                    v-if="!dialogData.rowData!.isCustom"
+                                    style="width: calc(100% - 100px)"
+                                    filterable
+                                    clearable
+                                    v-model="dialogData.rowData!.command"
+                                >
+                                    <el-option value="ash" label="/bin/ash" />
+                                    <el-option value="bash" label="/bin/bash" />
+                                    <el-option value="sh" label="/bin/sh" />
+                                </el-select>
+                                <el-input
+                                    clearable
+                                    v-else
+                                    style="width: calc(100% - 100px)"
+                                    v-model="dialogData.rowData!.command"
+                                />
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                </el-card>
+                <div v-if="!dialogData.rowData!.inContainer">
+                    <el-card>
+                        <el-row :gutter="20">
+                            <el-col :span="12">
+                                <el-form-item
+                                    :label="$t('commons.table.user')"
+                                    prop="user"
+                                    :rules="Rules.requiredSelect"
+                                >
+                                    <el-select filterable v-model="dialogData.rowData!.user">
+                                        <div v-for="item in userOptions" :key="item">
+                                            <el-option :value="item" :label="item" />
+                                        </div>
+                                    </el-select>
+                                </el-form-item>
+                            </el-col>
+                            <el-col :span="12">
+                                <el-form-item
+                                    :label="$t('cronjob.executor')"
+                                    prop="executor"
+                                    :rules="Rules.requiredSelect"
+                                >
+                                    <el-checkbox border v-model="dialogData.rowData!.isExecutorCustom">
+                                        {{ $t('container.custom') }}
+                                    </el-checkbox>
+                                    <el-select
+                                        v-if="!dialogData.rowData!.isExecutorCustom"
+                                        style="width: calc(100% - 100px)"
+                                        v-model="dialogData.rowData!.executor"
+                                    >
+                                        <el-option value="bash" label="bash" />
+                                        <el-option value="python" label="python" />
+                                        <el-option value="sh" label="sh" />
+                                    </el-select>
+                                    <el-input
+                                        clearable
+                                        v-else
+                                        style="width: calc(100% - 100px)"
+                                        v-model="dialogData.rowData!.executor"
+                                    />
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                    </el-card>
+
+                    <el-form-item :label="$t('cronjob.shellContent')" prop="script" class="mt-5">
+                        <el-radio-group v-model="dialogData.rowData!.scriptMode">
+                            <el-radio value="input">{{ $t('commons.button.edit') }}</el-radio>
+                            <el-radio value="select">{{ $t('container.pathSelect') }}</el-radio>
+                        </el-radio-group>
+                        <CodemirrorPro
+                            v-if="dialogData.rowData!.scriptMode=== 'input'"
+                            v-model="dialogData.rowData!.script"
+                            placeholder="#Define or paste the content of your shell file here"
+                            mode="javascript"
+                            :heightDiff="400"
+                        />
+                        <el-input
+                            v-if="dialogData.rowData!.scriptMode=== 'select'"
+                            :placeholder="$t('commons.example') + '/tmp/test.sh'"
+                            v-model="dialogData.rowData!.script"
+                        >
+                            <template #prepend>
+                                <FileList @choose="loadScriptDir" :dir="false"></FileList>
+                            </template>
+                        </el-input>
+                    </el-form-item>
+                </div>
+                <el-form-item :label="$t('cronjob.shellContent')" v-else prop="script" class="mt-5">
+                    <CodemirrorPro
+                        v-if="dialogData.rowData!.scriptMode=== 'input'"
+                        v-model="dialogData.rowData!.script"
+                        placeholder="#Define or paste the content of your shell file here"
+                        mode="javascript"
+                        :heightDiff="400"
+                    />
+                </el-form-item>
             </div>
-
-            <el-form-item v-if="hasScript()">
-                <el-checkbox v-model="dialogData.rowData!.inContainer">
-                    {{ $t('cronjob.containerCheckBox') }}
-                </el-checkbox>
-            </el-form-item>
-            <el-form-item
-                v-if="hasScript() && dialogData.rowData!.inContainer"
-                :label="$t('cronjob.containerName')"
-                prop="containerName"
-            >
-                <el-select class="selectClass" v-model="dialogData.rowData!.containerName">
-                    <el-option v-for="item in containerOptions" :key="item" :value="item" :label="item" />
-                </el-select>
-            </el-form-item>
-            <el-form-item
-                v-if="hasScript() && dialogData.rowData!.inContainer"
-                :label="$t('container.command')"
-                prop="command"
-                :rules="Rules.requiredInput"
-            >
-                <el-checkbox class="w-full" border v-model="dialogData.rowData!.isCustom">
-                    {{ $t('container.custom') }}
-                </el-checkbox>
-                <el-select style="width: calc(100% - 100px)" filterable clearable v-model="dialogData.rowData!.command">
-                    <el-option value="ash" label="/bin/ash" />
-                    <el-option value="bash" label="/bin/bash" />
-                    <el-option value="sh" label="/bin/sh" />
-                </el-select>
-            </el-form-item>
-
-            <el-form-item v-if="hasScript()" :label="$t('cronjob.shellContent')" prop="script">
-                <el-input clearable type="textarea" :rows="5" v-model="dialogData.rowData!.script" />
-            </el-form-item>
 
             <el-form-item
                 v-if="dialogData.rowData!.type === 'website' || dialogData.rowData!.type === 'cutWebsiteLog'"
@@ -383,6 +485,7 @@ import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { Cronjob } from '@/api/interface/cronjob';
 import { addCronjob, editCronjob, loadNextHandle } from '@/api/modules/cronjob';
+import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import { listDbItems } from '@/api/modules/database';
 import { GetWebsiteOptions } from '@/api/modules/website';
 import { MsgError, MsgSuccess } from '@/utils/message';
@@ -398,6 +501,7 @@ import {
     transSpecToObj,
     weekOptions,
 } from './../helper';
+import { loadUsers } from '@/api/modules/toolbox';
 const router = useRouter();
 
 interface DialogProps {
@@ -428,6 +532,7 @@ const acceptParams = (params: DialogProps): void => {
     dialogData.value.rowData.specs = dialogData.value.rowData.specs || [];
     if (dialogData.value.title === 'create') {
         changeType();
+        dialogData.value.rowData.scriptMode = 'input';
         dialogData.value.rowData.dbType = 'mysql';
         dialogData.value.rowData.downloadAccountID = 1;
     }
@@ -442,7 +547,14 @@ const acceptParams = (params: DialogProps): void => {
     dialogData.value.rowData!.isCustom =
         dialogData.value.rowData!.command !== 'sh' &&
         dialogData.value.rowData!.command !== 'bash' &&
-        dialogData.value.rowData!.command === 'ash';
+        dialogData.value.rowData!.command !== 'ash';
+
+    dialogData.value.rowData!.executor = dialogData.value.rowData!.executor || 'bash';
+    dialogData.value.rowData!.isCustom =
+        dialogData.value.rowData!.executor !== 'sh' &&
+        dialogData.value.rowData!.executor !== 'bash' &&
+        dialogData.value.rowData!.executor !== 'python' &&
+        dialogData.value.rowData!.executor !== 'python3';
 
     title.value = i18n.global.t('cronjob.' + dialogData.value.title);
     if (dialogData.value?.rowData?.exclusionRules) {
@@ -454,6 +566,7 @@ const acceptParams = (params: DialogProps): void => {
     drawerVisible.value = true;
     loadBackups();
     loadAppInstalls();
+    loadShellUsers();
     loadWebsites();
     loadContainers();
     if (dialogData.value.rowData?.dbType) {
@@ -477,6 +590,7 @@ const websiteOptions = ref([]);
 const backupOptions = ref([]);
 const accountOptions = ref([]);
 const appOptions = ref([]);
+const userOptions = ref([]);
 
 const dbInfo = reactive({
     isExist: false,
@@ -484,6 +598,14 @@ const dbInfo = reactive({
     version: '',
     dbs: [] as Array<Database.DbItem>,
 });
+
+const verifyScript = (rule: any, value: any, callback: any) => {
+    if (!dialogData.value.rowData!.script || dialogData.value.rowData!.script.length === 0) {
+        callback(new Error(i18n.global.t('commons.rule.requiredInput')));
+        return;
+    }
+    callback();
+};
 
 const verifySpec = (rule: any, value: any, callback: any) => {
     if (dialogData.value.rowData!.specObjs.length === 0) {
@@ -583,7 +705,7 @@ const rules = reactive({
         { validator: verifySpec, trigger: 'change', required: true },
     ],
 
-    script: [Rules.requiredInput],
+    script: [{ validator: verifyScript, trigger: 'blur', required: true }],
     website: [Rules.requiredSelect],
     dbName: [Rules.requiredSelect],
     url: [Rules.requiredInput],
@@ -598,6 +720,10 @@ const formRef = ref<FormInstance>();
 
 const loadDir = async (path: string) => {
     dialogData.value.rowData!.sourceDir = path;
+};
+
+const loadScriptDir = async (path: string) => {
+    dialogData.value.rowData!.script = path;
 };
 
 const hasDay = (item: any) => {
@@ -722,6 +848,11 @@ const changeAccount = async () => {
     if (!isInAccounts) {
         dialogData.value.rowData.downloadAccountID = undefined;
     }
+};
+
+const loadShellUsers = async () => {
+    const res = await loadUsers();
+    userOptions.value = res.data || [];
 };
 
 const loadAppInstalls = async () => {

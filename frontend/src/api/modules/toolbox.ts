@@ -12,6 +12,9 @@ export const getDeviceBase = () => {
 export const loadTimeZoneOptions = () => {
     return http.get<Array<string>>(`/toolbox/device/zone/options`);
 };
+export const loadUsers = () => {
+    return http.get<Array<string>>(`/toolbox/device/users`);
+};
 export const updateDevice = (key: string, value: string) => {
     return http.post(`/toolbox/device/update/conf`, { key: key, value: value }, TimeoutEnum.T_60S);
 };

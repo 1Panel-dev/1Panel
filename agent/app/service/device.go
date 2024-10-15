@@ -37,6 +37,7 @@ type IDeviceService interface {
 	LoadTimeZone() ([]string, error)
 	CheckDNS(key, value string) (bool, error)
 	LoadConf(name string) (string, error)
+	LoadUsers() ([]string, error)
 
 	Scan() dto.CleanData
 	Clean(req []dto.Clean)
@@ -166,6 +167,21 @@ func (u *DeviceService) Update(key, value string) error {
 		return fmt.Errorf("not support such key %s", key)
 	}
 	return nil
+}
+
+func (u *DeviceService) LoadUsers() ([]string, error) {
+	file, err := os.ReadFile("/etc/passwd")
+	if err != nil {
+		return nil, err
+	}
+	var users []string
+	lines := strings.Split(string(file), "\n")
+	for _, line := range lines {
+		if strings.Contains(line, ":") {
+			users = append(users, strings.Split(line, ":")[0])
+		}
+	}
+	return users, nil
 }
 
 func (u *DeviceService) UpdateHosts(req []dto.HostHelper) error {

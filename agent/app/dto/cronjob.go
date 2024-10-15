@@ -21,9 +21,13 @@ type CronjobCreate struct {
 	SpecCustom bool   `json:"specCustom"`
 	Spec       string `json:"spec" validate:"required"`
 
-	Script         string `json:"script"`
-	Command        string `json:"command"`
-	ContainerName  string `json:"containerName"`
+	Executor      string `json:"executor"`
+	ScriptMode    string `json:"scriptMode"`
+	Script        string `json:"script"`
+	Command       string `json:"command"`
+	ContainerName string `json:"containerName"`
+	User          string `json:"user"`
+
 	AppID          string `json:"appID"`
 	Website        string `json:"website"`
 	ExclusionRules string `json:"exclusionRules"`
@@ -44,9 +48,13 @@ type CronjobUpdate struct {
 	SpecCustom bool   `json:"specCustom"`
 	Spec       string `json:"spec" validate:"required"`
 
-	Script         string `json:"script"`
-	Command        string `json:"command"`
-	ContainerName  string `json:"containerName"`
+	Executor      string `json:"executor"`
+	ScriptMode    string `json:"scriptMode"`
+	Script        string `json:"script"`
+	Command       string `json:"command"`
+	ContainerName string `json:"containerName"`
+	User          string `json:"user"`
+
 	AppID          string `json:"appID"`
 	Website        string `json:"website"`
 	ExclusionRules string `json:"exclusionRules"`
@@ -89,9 +97,13 @@ type CronjobInfo struct {
 	SpecCustom bool   `json:"specCustom"`
 	Spec       string `json:"spec"`
 
-	Script            string `json:"script"`
-	Command           string `json:"command"`
-	ContainerName     string `json:"containerName"`
+	Executor      string `json:"executor"`
+	ScriptMode    string `json:"scriptMode"`
+	Script        string `json:"script"`
+	Command       string `json:"command"`
+	ContainerName string `json:"containerName"`
+	User          string `json:"user"`
+
 	AppID             string `json:"appID"`
 	Website           string `json:"website"`
 	ExclusionRules    string `json:"exclusionRules"`

@@ -14,9 +14,13 @@ type Cronjob struct {
 	SpecCustom bool   `json:"specCustom"`
 	Spec       string `gorm:"not null" json:"spec"`
 
-	Command        string `json:"command"`
-	ContainerName  string `json:"containerName"`
-	Script         string `json:"script"`
+	Executor      string `json:"executor"`
+	Command       string `json:"command"`
+	ContainerName string `json:"containerName"`
+	ScriptMode    string `json:"scriptMode"`
+	Script        string `json:"script"`
+	User          string `json:"user"`
+
 	Website        string `json:"website"`
 	AppID          string `json:"appID"`
 	DBType         string `json:"dbType"`
@@ -39,6 +43,7 @@ type JobRecords struct {
 	BaseModel
 
 	CronjobID uint      `json:"cronjobID"`
+	TaskID    string    `json:"taskID"`
 	StartTime time.Time `json:"startTime"`
 	Interval  float64   `json:"interval"`
 	Records   string    `json:"records"`

@@ -58,6 +58,7 @@ const (
 	TaskBuild     = "TaskBuild"
 	TaskPull      = "TaskPull"
 	TaskPush      = "TaskPush"
+	TaskHandle    = "TaskHandle"
 )
 
 const (
@@ -65,6 +66,7 @@ const (
 	TaskScopeApp              = "App"
 	TaskScopeRuntime          = "Runtime"
 	TaskScopeDatabase         = "Database"
+	TaskScopeCronjob          = "Cronjob"
 	TaskScopeAppStore         = "AppStore"
 	TaskScopeSnapshot         = "Snapshot"
 	TaskScopeContainer        = "Container"
