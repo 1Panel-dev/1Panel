@@ -109,11 +109,11 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Ti
 		backupDir := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("database/%s/%s/%s", dbInfo.DBType, record.Name, dbInfo.Name))
 		record.FileName = fmt.Sprintf("db_%s_%s.sql.gz", dbInfo.Name, startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5))
 		if cronjob.DBType == "mysql" || cronjob.DBType == "mariadb" {
-			if err := handleMysqlBackup(dbInfo.Database, dbInfo.DBType, dbInfo.Name, backupDir, record.FileName); err != nil {
+			if err := handleMysqlBackup(dbInfo, nil, backupDir, record.FileName, ""); err != nil {
 				return err
 			}
 		} else {
-			if err := handlePostgresqlBackup(dbInfo.Database, dbInfo.Name, backupDir, record.FileName); err != nil {
+			if err := handlePostgresqlBackup(dbInfo, nil, backupDir, record.FileName, ""); err != nil {
 				return err
 			}
 		}
@@ -200,7 +200,7 @@ func (u *CronjobService) handleSnapshot(cronjob model.Cronjob, startTime time.Ti
 
 	var record model.BackupRecord
 	record.From = "cronjob"
-	record.Type = "directory"
+	record.Type = "snapshot"
 	record.CronjobID = cronjob.ID
 	record.Name = cronjob.Name
 	record.DownloadAccountID, record.SourceAccountIDs = cronjob.DownloadAccountID, cronjob.SourceAccountIDs
@@ -227,19 +227,21 @@ func (u *CronjobService) handleSnapshot(cronjob model.Cronjob, startTime time.Ti
 	return nil
 }
 
-type databaseHelper struct {
+type DatabaseHelper struct {
+	ID       uint
 	DBType   string
 	Database string
 	Name     string
 }
 
-func loadDbsForJob(cronjob model.Cronjob) []databaseHelper {
-	var dbs []databaseHelper
+func loadDbsForJob(cronjob model.Cronjob) []DatabaseHelper {
+	var dbs []DatabaseHelper
 	if cronjob.DBName == "all" {
 		if cronjob.DBType == "mysql" || cronjob.DBType == "mariadb" {
 			mysqlItems, _ := mysqlRepo.List()
 			for _, mysql := range mysqlItems {
-				dbs = append(dbs, databaseHelper{
+				dbs = append(dbs, DatabaseHelper{
+					ID:       mysql.ID,
 					DBType:   cronjob.DBType,
 					Database: mysql.MysqlName,
 					Name:     mysql.Name,
@@ -248,7 +250,8 @@ func loadDbsForJob(cronjob model.Cronjob) []databaseHelper {
 		} else {
 			pgItems, _ := postgresqlRepo.List()
 			for _, pg := range pgItems {
-				dbs = append(dbs, databaseHelper{
+				dbs = append(dbs, DatabaseHelper{
+					ID:       pg.ID,
 					DBType:   cronjob.DBType,
 					Database: pg.PostgresqlName,
 					Name:     pg.Name,
@@ -260,14 +263,16 @@ func loadDbsForJob(cronjob model.Cronjob) []databaseHelper {
 	itemID, _ := strconv.Atoi(cronjob.DBName)
 	if cronjob.DBType == "mysql" || cronjob.DBType == "mariadb" {
 		mysqlItem, _ := mysqlRepo.Get(commonRepo.WithByID(uint(itemID)))
-		dbs = append(dbs, databaseHelper{
+		dbs = append(dbs, DatabaseHelper{
+			ID:       mysqlItem.ID,
 			DBType:   cronjob.DBType,
 			Database: mysqlItem.MysqlName,
 			Name:     mysqlItem.Name,
 		})
 	} else {
 		pgItem, _ := postgresqlRepo.Get(commonRepo.WithByID(uint(itemID)))
-		dbs = append(dbs, databaseHelper{
+		dbs = append(dbs, DatabaseHelper{
+			ID:       pgItem.ID,
 			DBType:   cronjob.DBType,
 			Database: pgItem.PostgresqlName,
 			Name:     pgItem.Name,

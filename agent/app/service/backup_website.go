@@ -3,16 +3,17 @@ package service
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/task"
-	"github.com/1Panel-dev/1Panel/agent/i18n"
-	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
-	"github.com/1Panel-dev/1Panel/agent/utils/compose"
-	"github.com/pkg/errors"
 	"io/fs"
 	"os"
 	"path"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/app/task"
+	"github.com/1Panel-dev/1Panel/agent/i18n"
+	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	"github.com/1Panel-dev/1Panel/agent/utils/compose"
+	"github.com/pkg/errors"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -310,7 +311,7 @@ func recoverWebsiteDatabase(t *task.Task, dbID uint, dbType, tmpPath, websiteKey
 			Name:       db.PostgresqlName,
 			DetailName: db.Name,
 			File:       fmt.Sprintf("%s/%s.sql.gz", tmpPath, websiteKey),
-		}, true); err != nil {
+		}, t, true); err != nil {
 			t.LogFailedWithErr(taskName, err)
 			return err
 		}
@@ -326,7 +327,7 @@ func recoverWebsiteDatabase(t *task.Task, dbID uint, dbType, tmpPath, websiteKey
 			Name:       db.MysqlName,
 			DetailName: db.Name,
 			File:       fmt.Sprintf("%s/%s.sql.gz", tmpPath, websiteKey),
-		}, true); err != nil {
+		}, t, true, ""); err != nil {
 			t.LogFailedWithErr(taskName, err)
 			return err
 		}

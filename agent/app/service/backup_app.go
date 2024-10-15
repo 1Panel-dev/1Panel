@@ -4,13 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/task"
-	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"io/fs"
 	"os"
 	"path"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/app/task"
+	"github.com/1Panel-dev/1Panel/agent/i18n"
 
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 
@@ -103,7 +104,8 @@ func backupDatabaseWithTask(parentTask *task.Task, resourceKey, tmpDir, name str
 			return err
 		}
 		parentTask.LogStart(task.GetTaskName(db.Name, task.TaskBackup, task.TaskScopeDatabase))
-		if err := handleMysqlBackup(db.MysqlName, resourceKey, db.Name, tmpDir, fmt.Sprintf("%s.sql.gz", name)); err != nil {
+		databaseHelper := DatabaseHelper{Database: db.MysqlName, DBType: resourceKey, Name: db.Name}
+		if err := handleMysqlBackup(databaseHelper, parentTask, tmpDir, fmt.Sprintf("%s.sql.gz", name), ""); err != nil {
 			return err
 		}
 		parentTask.LogSuccess(task.GetTaskName(db.Name, task.TaskBackup, task.TaskScopeDatabase))
@@ -113,7 +115,8 @@ func backupDatabaseWithTask(parentTask *task.Task, resourceKey, tmpDir, name str
 			return err
 		}
 		parentTask.LogStart(task.GetTaskName(db.Name, task.TaskBackup, task.TaskScopeDatabase))
-		if err := handlePostgresqlBackup(db.PostgresqlName, db.Name, tmpDir, fmt.Sprintf("%s.sql.gz", name)); err != nil {
+		databaseHelper := DatabaseHelper{Database: db.PostgresqlName, DBType: resourceKey, Name: db.Name}
+		if err := handlePostgresqlBackup(databaseHelper, parentTask, tmpDir, fmt.Sprintf("%s.sql.gz", name), ""); err != nil {
 			return err
 		}
 		parentTask.LogSuccess(task.GetTaskName(db.Name, task.TaskBackup, task.TaskScopeDatabase))
@@ -257,7 +260,7 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 					Name:       database.Name,
 					DetailName: db.Name,
 					File:       fmt.Sprintf("%s/%s.sql.gz", tmpPath, install.Name),
-				}, true); err != nil {
+				}, parentTask, true); err != nil {
 					t.LogFailedWithErr(taskName, err)
 					return err
 				}
@@ -286,7 +289,7 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 					Name:       newDB.MysqlName,
 					DetailName: newDB.Name,
 					File:       fmt.Sprintf("%s/%s.sql.gz", tmpPath, install.Name),
-				}, true); err != nil {
+				}, parentTask, true, ""); err != nil {
 					t.LogFailedWithErr(taskName, err)
 					return err
 				}

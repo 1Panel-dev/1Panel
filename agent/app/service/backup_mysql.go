@@ -9,11 +9,13 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/i18n"
 
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
@@ -26,7 +28,8 @@ func (u *BackupService) MysqlBackup(req dto.CommonBackup) error {
 	targetDir := path.Join(global.CONF.System.Backup, itemDir)
 	fileName := fmt.Sprintf("%s_%s.sql.gz", req.DetailName, timeNow+common.RandStrAndNum(5))
 
-	if err := handleMysqlBackup(req.Name, req.Type, req.DetailName, targetDir, fileName); err != nil {
+	databaseHelper := DatabaseHelper{Database: req.Name, DBType: req.Type, Name: req.DetailName}
+	if err := handleMysqlBackup(databaseHelper, nil, targetDir, fileName, req.TaskID); err != nil {
 		return err
 	}
 
@@ -46,7 +49,7 @@ func (u *BackupService) MysqlBackup(req dto.CommonBackup) error {
 }
 
 func (u *BackupService) MysqlRecover(req dto.CommonRecover) error {
-	if err := handleMysqlRecover(req, false); err != nil {
+	if err := handleMysqlRecover(req, nil, false, req.TaskID); err != nil {
 		return err
 	}
 	return nil
@@ -90,100 +93,143 @@ func (u *BackupService) MysqlRecoverByUpload(req dto.CommonRecover) error {
 	}
 
 	req.File = path.Dir(file) + "/" + fileName
-	if err := handleMysqlRecover(req, false); err != nil {
+	if err := handleMysqlRecover(req, nil, false, req.TaskID); err != nil {
 		return err
 	}
 	global.LOG.Info("recover from uploads successful!")
 	return nil
 }
 
-func handleMysqlBackup(database, dbType, dbName, targetDir, fileName string) error {
-	dbInfo, err := mysqlRepo.Get(commonRepo.WithByName(dbName), mysqlRepo.WithByMysqlName(database))
+func handleMysqlBackup(db DatabaseHelper, parentTask *task.Task, targetDir, fileName, taskID string) error {
+	var (
+		err      error
+		itemTask *task.Task
+	)
+	itemTask = parentTask
+	dbInfo, err := mysqlRepo.Get(commonRepo.WithByName(db.Name), mysqlRepo.WithByMysqlName(db.Database))
 	if err != nil {
 		return err
 	}
-	cli, version, err := LoadMysqlClientByFrom(database)
-	if err != nil {
-		return err
+	itemName := fmt.Sprintf("%s[%s] - %s", db.Database, db.DBType, db.Name)
+	if parentTask == nil {
+		itemTask, err = task.NewTaskWithOps(itemName, task.TaskBackup, task.TaskScopeDatabase, taskID, dbInfo.ID)
+		if err != nil {
+			return err
+		}
 	}
 
-	backupInfo := client.BackupInfo{
-		Name:      dbName,
-		Type:      dbType,
-		Version:   version,
-		Format:    dbInfo.Format,
-		TargetDir: targetDir,
-		FileName:  fileName,
+	backupDatabase := func(t *task.Task) error {
+		cli, version, err := LoadMysqlClientByFrom(db.Database)
+		if err != nil {
+			return err
+		}
+		backupInfo := client.BackupInfo{
+			Name:      db.Name,
+			Type:      db.DBType,
+			Version:   version,
+			Format:    dbInfo.Format,
+			TargetDir: targetDir,
+			FileName:  fileName,
 
-		Timeout: 300,
+			Timeout: 300,
+		}
+		return cli.Backup(backupInfo)
 	}
-	if err := cli.Backup(backupInfo); err != nil {
-		return err
+
+	itemTask.AddSubTask(i18n.GetMsgByKey("TaskBackup"), backupDatabase, nil)
+	if parentTask != nil {
+		return backupDatabase(parentTask)
 	}
-	return nil
+
+	return itemTask.Execute()
 }
 
-func handleMysqlRecover(req dto.CommonRecover, isRollback bool) error {
-	isOk := false
-	fileOp := files.NewFileOp()
-	if !fileOp.Stat(req.File) {
-		return buserr.WithName("ErrFileNotFound", req.File)
-	}
+func handleMysqlRecover(req dto.CommonRecover, parentTask *task.Task, isRollback bool, taskID string) error {
+	var (
+		err      error
+		itemTask *task.Task
+	)
+	itemTask = parentTask
 	dbInfo, err := mysqlRepo.Get(commonRepo.WithByName(req.DetailName), mysqlRepo.WithByMysqlName(req.Name))
 	if err != nil {
 		return err
 	}
-	cli, version, err := LoadMysqlClientByFrom(req.Name)
-	if err != nil {
-		return err
+	itemName := fmt.Sprintf("%s[%s] - %s", req.Name, req.Type, req.DetailName)
+	if parentTask == nil {
+		itemTask, err = task.NewTaskWithOps(itemName, task.TaskRecover, task.TaskScopeDatabase, taskID, dbInfo.ID)
+		if err != nil {
+			return err
+		}
 	}
 
-	if !isRollback {
-		rollbackFile := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("database/%s/%s_%s.sql.gz", req.Type, req.DetailName, time.Now().Format(constant.DateTimeSlimLayout)))
-		if err := cli.Backup(client.BackupInfo{
-			Name:      req.DetailName,
-			Type:      req.Type,
-			Version:   version,
-			Format:    dbInfo.Format,
-			TargetDir: path.Dir(rollbackFile),
-			FileName:  path.Base(rollbackFile),
+	recoverDatabase := func(t *task.Task) error {
+		isOk := false
+		fileOp := files.NewFileOp()
+		if !fileOp.Stat(req.File) {
+			return buserr.WithName("ErrFileNotFound", req.File)
+		}
+		dbInfo, err := mysqlRepo.Get(commonRepo.WithByName(req.DetailName), mysqlRepo.WithByMysqlName(req.Name))
+		if err != nil {
+			return err
+		}
+		cli, version, err := LoadMysqlClientByFrom(req.Name)
+		if err != nil {
+			return err
+		}
+
+		if !isRollback {
+			rollbackFile := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("database/%s/%s_%s.sql.gz", req.Type, req.DetailName, time.Now().Format(constant.DateTimeSlimLayout)))
+			if err := cli.Backup(client.BackupInfo{
+				Name:      req.DetailName,
+				Type:      req.Type,
+				Version:   version,
+				Format:    dbInfo.Format,
+				TargetDir: path.Dir(rollbackFile),
+				FileName:  path.Base(rollbackFile),
+
+				Timeout: 300,
+			}); err != nil {
+				return fmt.Errorf("backup mysql db %s for rollback before recover failed, err: %v", req.DetailName, err)
+			}
+			defer func() {
+				if !isOk {
+					global.LOG.Info("recover failed, start to rollback now")
+					if err := cli.Recover(client.RecoverInfo{
+						Name:       req.DetailName,
+						Type:       req.Type,
+						Version:    version,
+						Format:     dbInfo.Format,
+						SourceFile: rollbackFile,
+
+						Timeout: 300,
+					}); err != nil {
+						global.LOG.Errorf("rollback mysql db %s from %s failed, err: %v", req.DetailName, rollbackFile, err)
+					}
+					global.LOG.Infof("rollback mysql db %s from %s successful", req.DetailName, rollbackFile)
+					_ = os.RemoveAll(rollbackFile)
+				} else {
+					_ = os.RemoveAll(rollbackFile)
+				}
+			}()
+		}
+		if err := cli.Recover(client.RecoverInfo{
+			Name:       req.DetailName,
+			Type:       req.Type,
+			Version:    version,
+			Format:     dbInfo.Format,
+			SourceFile: req.File,
 
 			Timeout: 300,
 		}); err != nil {
-			return fmt.Errorf("backup mysql db %s for rollback before recover failed, err: %v", req.DetailName, err)
+			return err
 		}
-		defer func() {
-			if !isOk {
-				global.LOG.Info("recover failed, start to rollback now")
-				if err := cli.Recover(client.RecoverInfo{
-					Name:       req.DetailName,
-					Type:       req.Type,
-					Version:    version,
-					Format:     dbInfo.Format,
-					SourceFile: rollbackFile,
-
-					Timeout: 300,
-				}); err != nil {
-					global.LOG.Errorf("rollback mysql db %s from %s failed, err: %v", req.DetailName, rollbackFile, err)
-				}
-				global.LOG.Infof("rollback mysql db %s from %s successful", req.DetailName, rollbackFile)
-				_ = os.RemoveAll(rollbackFile)
-			} else {
-				_ = os.RemoveAll(rollbackFile)
-			}
-		}()
+		isOk = true
+		return nil
 	}
-	if err := cli.Recover(client.RecoverInfo{
-		Name:       req.DetailName,
-		Type:       req.Type,
-		Version:    version,
-		Format:     dbInfo.Format,
-		SourceFile: req.File,
-
-		Timeout: 300,
-	}); err != nil {
-		return err
+	itemTask.AddSubTask(i18n.GetMsgByKey("TaskRecover"), recoverDatabase, nil)
+	if parentTask != nil {
+		return recoverDatabase(parentTask)
 	}
-	isOk = true
-	return nil
+
+	return itemTask.Execute()
 }
