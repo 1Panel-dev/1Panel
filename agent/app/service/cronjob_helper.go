@@ -8,13 +8,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/agent/buserr"
-	"github.com/1Panel-dev/1Panel/agent/i18n"
-
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/1Panel-dev/1Panel/agent/utils/ntp"
@@ -35,15 +34,7 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 			}
 			record.Records = u.generateLogsPath(*cronjob, record.StartTime)
 			_ = cronjobRepo.UpdateRecords(record.ID, map[string]interface{}{"records": record.Records})
-			script := cronjob.Script
-			if len(cronjob.ContainerName) != 0 {
-				command := "sh"
-				if len(cronjob.Command) != 0 {
-					command = cronjob.Command
-				}
-				script = fmt.Sprintf("docker exec %s %s -c \"%s\"", cronjob.ContainerName, command, strings.ReplaceAll(cronjob.Script, "\"", "\\\""))
-			}
-			err = u.handleShell(cronjob.Type, cronjob.Name, script, record.Records)
+			err = u.handleShell(*cronjob, record.Records)
 			u.removeExpiredLog(*cronjob)
 		case "curl":
 			if len(cronjob.URL) == 0 {
@@ -51,7 +42,7 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 			}
 			record.Records = u.generateLogsPath(*cronjob, record.StartTime)
 			_ = cronjobRepo.UpdateRecords(record.ID, map[string]interface{}{"records": record.Records})
-			err = u.handleShell(cronjob.Type, cronjob.Name, fmt.Sprintf("curl '%s'", cronjob.URL), record.Records)
+			err = cmd.ExecShell(record.Records, 24*time.Hour, "bash", "-c", "curl", cronjob.URL)
 			u.removeExpiredLog(*cronjob)
 		case "ntp":
 			err = u.handleNtpSync()
@@ -100,17 +91,29 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 	}()
 }
 
-func (u *CronjobService) handleShell(cronType, cornName, script, logPath string) error {
-	handleDir := fmt.Sprintf("%s/task/%s/%s", constant.DataDir, cronType, cornName)
-	if _, err := os.Stat(handleDir); err != nil && os.IsNotExist(err) {
-		if err = os.MkdirAll(handleDir, os.ModePerm); err != nil {
+func (u *CronjobService) handleShell(cronjob model.Cronjob, logPath string) error {
+	if len(cronjob.ContainerName) != 0 {
+		command := "sh"
+		if len(cronjob.Command) != 0 {
+			command = cronjob.Command
+		}
+		scriptFile, _ := os.ReadFile(cronjob.Script)
+		return cmd.ExecShell(logPath, 24*time.Hour, "docker", "exec", cronjob.ContainerName, command, "-c", strings.ReplaceAll(string(scriptFile), "\"", "\\\""))
+	}
+	if cronjob.ScriptMode == "input" {
+		fileItem := path.Join(global.CONF.System.BaseDir, "1panel", "task", "shell", cronjob.Name, cronjob.Name+".sh")
+		_ = os.MkdirAll(path.Dir(fileItem), os.ModePerm)
+		shellFile, err := os.OpenFile(fileItem, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
+		if err != nil {
 			return err
 		}
+		defer shellFile.Close()
+		if _, err := shellFile.WriteString(cronjob.Script); err != nil {
+			return err
+		}
+		return cmd.ExecShell(logPath, 24*time.Hour, "sudo", "-u", cronjob.User, cronjob.Executor, fileItem)
 	}
-	if err := cmd.ExecCronjobWithTimeOut(script, handleDir, logPath, 24*time.Hour); err != nil {
-		return err
-	}
-	return nil
+	return cmd.ExecShell(logPath, 24*time.Hour, "sudo", "-u", cronjob.User, cronjob.Executor, cronjob.Script)
 }
 
 func (u *CronjobService) handleNtpSync() error {

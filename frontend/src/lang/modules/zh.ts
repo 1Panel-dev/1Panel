@@ -879,6 +879,7 @@ const message = {
         saturday: '周六',
         sunday: '周日',
         shellContent: '脚本内容',
+        executor: '解释器',
         errRecord: '错误的日志记录',
         errHandle: '任务执行失败',
         noRecord: '当前计划任务暂未产生记录',

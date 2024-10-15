@@ -10,11 +10,15 @@ export namespace Cronjob {
         specs: Array<string>;
         specObjs: Array<SpecObj>;
 
+        executor: string;
+        isExecutorCustom: boolean;
         script: string;
+        scriptMode: string;
         isCustom: boolean;
         command: string;
         inContainer: boolean;
         containerName: string;
+        user: string;
         appID: string;
         website: string;
         exclusionRules: string;

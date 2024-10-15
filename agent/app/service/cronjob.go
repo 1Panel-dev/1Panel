@@ -182,13 +182,13 @@ func (u *CronjobService) HandleOnce(id uint) error {
 	return nil
 }
 
-func (u *CronjobService) Create(cronjobDto dto.CronjobCreate) error {
-	cronjob, _ := cronjobRepo.Get(commonRepo.WithByName(cronjobDto.Name))
+func (u *CronjobService) Create(req dto.CronjobCreate) error {
+	cronjob, _ := cronjobRepo.Get(commonRepo.WithByName(req.Name))
 	if cronjob.ID != 0 {
 		return constant.ErrRecordExist
 	}
-	cronjob.Secret = cronjobDto.Secret
-	if err := copier.Copy(&cronjob, &cronjobDto); err != nil {
+	cronjob.Secret = req.Secret
+	if err := copier.Copy(&cronjob, &req); err != nil {
 		return errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
 	cronjob.Status = constant.StatusEnable
@@ -282,8 +282,11 @@ func (u *CronjobService) Update(id uint, req dto.CronjobUpdate) error {
 	upMap["spec_custom"] = req.SpecCustom
 	upMap["spec"] = spec
 	upMap["script"] = req.Script
+	upMap["script_mode"] = req.ScriptMode
 	upMap["command"] = req.Command
 	upMap["container_name"] = req.ContainerName
+	upMap["executor"] = req.Executor
+	upMap["user"] = req.User
 	upMap["app_id"] = req.AppID
 	upMap["website"] = req.Website
 	upMap["exclusion_rules"] = req.ExclusionRules

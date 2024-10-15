@@ -107,15 +107,14 @@ func ExecContainerScript(containerName, cmdStr string, timeout time.Duration) er
 	return nil
 }
 
-func ExecCronjobWithTimeOut(cmdStr, workdir, outPath string, timeout time.Duration) error {
+func ExecShell(outPath string, timeout time.Duration, name string, arg ...string) error {
 	file, err := os.OpenFile(outPath, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
-	cmd := exec.Command("bash", "-c", cmdStr)
-	cmd.Dir = workdir
+	cmd := exec.Command(name, arg...)
 	cmd.Stdout = file
 	cmd.Stderr = file
 	if err := cmd.Start(); err != nil {

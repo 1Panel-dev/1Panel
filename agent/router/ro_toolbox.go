@@ -12,6 +12,7 @@ func (s *ToolboxRouter) InitRouter(Router *gin.RouterGroup) {
 	baseApi := v2.ApiGroupApp.BaseApi
 	{
 		toolboxRouter.POST("/device/base", baseApi.LoadDeviceBaseInfo)
+		toolboxRouter.GET("/device/users", baseApi.LoadUsers)
 		toolboxRouter.GET("/device/zone/options", baseApi.LoadTimeOption)
 		toolboxRouter.POST("/device/update/conf", baseApi.UpdateDeviceConf)
 		toolboxRouter.POST("/device/update/host", baseApi.UpdateDeviceHost)

@@ -923,6 +923,7 @@ const message = {
         saturday: 'Saturday',
         sunday: 'Sunday',
         shellContent: 'Script',
+        executor: 'Executor',
         errRecord: 'Incorrect logging',
         errHandle: 'Cronjob execution failure',
         noRecord: 'The execution did not generate any logs',

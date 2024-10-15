@@ -878,6 +878,7 @@ const message = {
         saturday: '周六',
         sunday: '周日',
         shellContent: '腳本內容',
+        executor: '解釋器',
         errRecord: '錯誤的日誌記錄',
         errHandle: '任務執行失敗',
         noRecord: '當前計劃任務暫未產生記錄',

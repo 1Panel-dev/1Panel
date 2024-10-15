@@ -13,6 +13,7 @@ import { oneDark } from '@codemirror/theme-one-dark';
 import { StreamLanguage } from '@codemirror/language';
 import { nginx } from './nginx';
 import { yaml } from '@codemirror/legacy-modes/mode/yaml';
+import { shell } from '@codemirror/legacy-modes/mode/shell';
 import { dockerFile } from '@codemirror/legacy-modes/mode/dockerfile';
 import { placeholder } from '@codemirror/view';
 import { json } from '@codemirror/lang-json';
@@ -92,6 +93,9 @@ const initCodeMirror = () => {
             break;
         case 'json':
             extensions.push(json());
+            break;
+        case 'shell':
+            extensions.push(StreamLanguage.define(shell));
             break;
     }
     let startState = EditorState.create({
