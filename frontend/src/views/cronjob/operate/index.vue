@@ -271,7 +271,11 @@
                     >
                         <el-input v-model="dialogData.rowData!.sourceDir">
                             <template #prepend>
-                                <FileList @choose="loadDir" :dir="true"></FileList>
+                                <FileList
+                                    @choose="loadDir"
+                                    :dir="true"
+                                    :path="dialogData.rowData!.sourceDir"
+                                ></FileList>
                             </template>
                         </el-input>
                     </el-form-item>
