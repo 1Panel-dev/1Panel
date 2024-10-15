@@ -873,7 +873,7 @@ const message = {
         website: 'Backup Website',
         rulesHelper:
             'When there are multiple compression exclusion rules, they need to be displayed with line breaks. For example: \n*.log \n*.sql',
-        lastRecordTime: 'Last Execution Time',
+        lastRecordTime: 'Last Execution',
         all: 'All',
         failedRecord: 'Failed Records',
         successRecord: 'Successful Records',
@@ -957,6 +957,8 @@ const message = {
         today: 'Today',
         yesterday: 'Yesterday',
         lastNDay: 'Last {0} day',
+        lastNMonth: 'Last {0} months',
+        lastHalfYear: 'Last half year',
         memory: 'Memory',
         cache: 'Cache',
         disk: 'Disk',

@@ -50,6 +50,7 @@ func (u *CronjobService) SearchWithPage(search dto.PageCronjob) (int64, interfac
 		}
 		record, _ := cronjobRepo.RecordFirst(cronjob.ID)
 		if record.ID != 0 {
+			item.LastRecordStatus = record.Status
 			item.LastRecordTime = record.StartTime.Format(constant.DateTimeLayout)
 		} else {
 			item.LastRecordTime = "-"

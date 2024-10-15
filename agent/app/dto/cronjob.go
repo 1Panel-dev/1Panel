@@ -115,9 +115,10 @@ type CronjobInfo struct {
 	DownloadAccountID uint   `json:"downloadAccountID"`
 	RetainCopies      int    `json:"retainCopies"`
 
-	LastRecordTime string `json:"lastRecordTime"`
-	Status         string `json:"status"`
-	Secret         string `json:"secret"`
+	LastRecordStatus string `json:"lastRecordStatus"`
+	LastRecordTime   string `json:"lastRecordTime"`
+	Status           string `json:"status"`
+	Secret           string `json:"secret"`
 }
 
 type SearchRecord struct {

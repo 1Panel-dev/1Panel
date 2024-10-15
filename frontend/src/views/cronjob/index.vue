@@ -105,6 +105,9 @@
                     </el-table-column>
                     <el-table-column :label="$t('cronjob.lastRecordTime')" :min-width="120" prop="lastRecordTime">
                         <template #default="{ row }">
+                            <el-button v-if="row.lastRecordStatus === 'Success'" icon="Select" link type="success" />
+                            <el-button v-if="row.lastRecordStatus === 'Failed'" icon="CloseBold" link type="danger" />
+                            <el-button v-if="row.lastRecordStatus === 'Waiting'" icon="SemiSelect" link type="info" />
                             {{ row.lastRecordTime }}
                         </template>
                     </el-table-column>

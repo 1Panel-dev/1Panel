@@ -42,4 +42,22 @@ export const shortcuts = [
             return [start, end];
         },
     },
+    {
+        text: i18n.global.t('monitor.lastNMonth', [3]),
+        value: () => {
+            const end = new Date();
+            const start = new Date(end);
+            start.setMonth(end.getMonth() - 3);
+            return [start, end];
+        },
+    },
+    {
+        text: i18n.global.t('monitor.lastHalfYear', [30]),
+        value: () => {
+            const end = new Date();
+            const start = new Date(end);
+            start.setMonth(end.getMonth() - 6);
+            return [start, end];
+        },
+    },
 ];
