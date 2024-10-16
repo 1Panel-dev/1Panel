@@ -644,6 +644,7 @@ const message = {
         imageLoadErr: '未检测到容器的镜像名称',
         appHelper: '该容器来源于应用商店，升级可能导致该服务不可用',
 
+        resource: '资源',
         input: '手动输入',
         forcePull: '强制拉取镜像',
         forcePullHelper: '忽略服务器已存在的镜像，重新拉取一次',

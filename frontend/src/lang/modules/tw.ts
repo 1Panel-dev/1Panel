@@ -643,6 +643,7 @@ const message = {
         imageLoadErr: '未檢測到容器的鏡像名稱',
         appHelper: '該容器來源於應用商店，升級可能導致該服務不可用',
 
+        resource: '資源',
         input: '手動輸入',
         forcePull: '強製拉取鏡像',
         forcePullHelper: '忽略服務器已存在的鏡像，重新拉取一次',

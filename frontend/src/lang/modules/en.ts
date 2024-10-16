@@ -669,6 +669,7 @@ const message = {
         imageLoadErr: 'No image name detected for the container',
         appHelper: 'This container is sourced from the app store; upgrading might render the service unavailable',
 
+        resource: 'Resource',
         input: 'Input',
         forcePull: 'forced image pull ',
         forcePullHelper: 'Ignore existing images on the server and pull again.',
