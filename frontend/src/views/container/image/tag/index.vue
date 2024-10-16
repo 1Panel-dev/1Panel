@@ -19,10 +19,12 @@
             </el-form-item>
 
             <el-form-item>
-                <el-checkbox v-model="form.deleteTag">
-                    {{ $t('container.imageTagDeleteHelper') }}
-                </el-checkbox>
-                <el-checkbox-group class="ml-5" v-if="form.deleteTag" v-model="form.deleteTags">
+                <div class="w-full">
+                    <el-checkbox v-model="form.deleteTag">
+                        {{ $t('container.imageTagDeleteHelper') }}
+                    </el-checkbox>
+                </div>
+                <el-checkbox-group v-if="form.deleteTag" v-model="form.deleteTags">
                     <el-checkbox v-for="item in tags" :key="item" :value="item" :label="item" />
                 </el-checkbox-group>
             </el-form-item>

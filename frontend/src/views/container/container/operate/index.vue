@@ -1,6 +1,9 @@
 <template>
     <div>
-        <LayoutContent :title="isCreate ? $t('container.create') : $t('commons.button.edit') + ' - ' + form.name">
+        <LayoutContent
+            back-name="Container"
+            :title="isCreate ? $t('container.create') : $t('commons.button.edit') + ' - ' + form.name"
+        >
             <template #prompt>
                 <el-alert
                     v-if="!isCreate && isFromApp(form)"
@@ -21,6 +24,9 @@
                     <el-row type="flex" justify="center" :gutter="20">
                         <el-col :span="20">
                             <el-card>
+                                <el-button v-if="isCreate" type="primary" icon="EditPen" plain @click="openDialog()">
+                                    {{ $t('container.commandInput') }}
+                                </el-button>
                                 <el-form-item class="mt-5" :label="$t('commons.table.name')" prop="name">
                                     <el-input
                                         :disabled="isFromApp(form)"
@@ -324,6 +330,7 @@
                 </el-form>
             </template>
         </LayoutContent>
+        <Command ref="commandRef" />
     </div>
 </template>
 
@@ -332,6 +339,7 @@ import { reactive, ref } from 'vue';
 import { Rules, checkFloatNumberRange, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, ElMessageBox } from 'element-plus';
+import Command from '@/views/container/container/command/index.vue';
 import {
     listImage,
     listVolume,
@@ -433,6 +441,7 @@ const search = async () => {
     loadNetworkOptions();
 };
 
+const commandRef = ref();
 const images = ref();
 const volumes = ref();
 const networks = ref();
@@ -454,6 +463,10 @@ const formRef = ref<FormInstance>();
 
 const goBack = () => {
     router.push({ name: 'Container' });
+};
+
+const openDialog = () => {
+    commandRef.value.acceptParams();
 };
 
 const handlePortsAdd = () => {

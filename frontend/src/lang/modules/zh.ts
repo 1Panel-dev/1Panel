@@ -562,6 +562,10 @@ const message = {
     },
     container: {
         create: '创建容器',
+        createByCommand: '命令创建',
+        commandInput: '命令输入',
+        commandRule: '请输入正确的 docker run 容器创建命令！',
+        commandHelper: '将在服务器上执行该条命令以创建容器，是否继续？',
         edit: '编辑容器',
         updateContainerHelper: '容器编辑需要重建容器，任何未持久化的数据将会丢失，是否继续？',
         containerList: '容器列表',

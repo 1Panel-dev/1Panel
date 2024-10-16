@@ -37,6 +37,10 @@ const props = defineProps({
         type: String,
         default: '',
     },
+    height: {
+        type: Number,
+        default: 0,
+    },
     heightDiff: {
         type: Number,
         default: 200,
@@ -44,6 +48,10 @@ const props = defineProps({
     minHeight: {
         type: Number,
         default: 400,
+    },
+    lineWrapping: {
+        type: Boolean,
+        default: false,
     },
 });
 
@@ -62,7 +70,7 @@ const initCodeMirror = () => {
     const defaultTheme = EditorView.theme({
         '&.cm-editor': {
             minHeight: props.minHeight + 'px',
-            height: 'calc(100vh - ' + props.heightDiff + 'px)',
+            height: props.height ? props.height + 'px' : 'calc(100vh - ' + props.heightDiff + 'px)',
         },
     });
 
@@ -78,6 +86,9 @@ const initCodeMirror = () => {
         placeholder(props.placeholder),
         EditorView.editable.of(!props.disabled),
     ];
+    if (props.lineWrapping) {
+        extensions.push(EditorView.lineWrapping);
+    }
     switch (props.mode) {
         case 'dockerfile':
             extensions.push(StreamLanguage.define(dockerFile));

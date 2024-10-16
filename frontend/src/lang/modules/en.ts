@@ -580,6 +580,10 @@ const message = {
     },
     container: {
         create: 'Create',
+        createByCommand: 'Create by command',
+        commandInput: 'Command input',
+        commandRule: 'Please enter the correct docker run container creation command!',
+        commandHelper: 'This command will be executed on the server to create the container. Do you want to continue?',
         edit: 'Edit container',
         updateContainerHelper:
             'Container editing requires rebuilding the container. Any data that has not been persisted will be lost. Do you want to continue?',
