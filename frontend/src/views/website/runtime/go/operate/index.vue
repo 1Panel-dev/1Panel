@@ -76,16 +76,12 @@
                             {{ $t('runtime.goDirHelper') }}
                         </span>
                     </el-form-item>
-                    <el-row :gutter="20">
-                        <el-col :span="18">
-                            <el-form-item :label="$t('runtime.runScript')" prop="params.EXEC_SCRIPT">
-                                <el-input v-model="runtime.params['EXEC_SCRIPT']"></el-input>
-                                <span class="input-help">
-                                    {{ $t('runtime.goHelper') }}
-                                </span>
-                            </el-form-item>
-                        </el-col>
-                    </el-row>
+                    <el-form-item :label="$t('runtime.runScript')" prop="params.EXEC_SCRIPT">
+                        <el-input v-model="runtime.params['EXEC_SCRIPT']"></el-input>
+                        <span class="input-help">
+                            {{ $t('runtime.goHelper') }}
+                        </span>
+                    </el-form-item>
                     <el-row :gutter="20">
                         <el-col :span="7">
                             <el-form-item :label="$t('runtime.appPort')" prop="params.GO_APP_PORT">
