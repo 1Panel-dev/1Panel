@@ -158,7 +158,7 @@ const resetForm = () => {
     account.value = {
         id: 0,
         name: '',
-        type: 'DnsPod',
+        type: 'AliYun',
         authorization: {},
     };
     accountForm.value?.resetFields();
