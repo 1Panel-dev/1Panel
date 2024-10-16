@@ -4,14 +4,12 @@
         :title="$t('app.composeDiff')"
         :destroy-on-close="true"
         :close-on-click-modal="false"
-        width="60%"
+        width="90%"
     >
-        <el-row :gutter="10">
-            <el-col :span="22" :offset="1">
-                <el-text type="warning">{{ $t('app.diffHelper') }}</el-text>
-                <div ref="container" class="compose-diff"></div>
-            </el-col>
-        </el-row>
+        <div>
+            <el-text type="warning">{{ $t('app.diffHelper') }}</el-text>
+            <div ref="container" class="compose-diff"></div>
+        </div>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
