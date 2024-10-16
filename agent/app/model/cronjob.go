@@ -26,6 +26,7 @@ type Cronjob struct {
 	DBType         string `json:"dbType"`
 	DBName         string `json:"dbName"`
 	URL            string `json:"url"`
+	IsDir          bool   `json:"isDir"`
 	SourceDir      string `json:"sourceDir"`
 	ExclusionRules string `json:"exclusionRules"`
 
