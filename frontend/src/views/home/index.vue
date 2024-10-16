@@ -7,17 +7,7 @@
                     path: '/',
                 },
             ]"
-        >
-            <template #route-button>
-                <div class="router-button">
-                    <template v-if="!isProductPro">
-                        <el-button link type="primary" @click="toUpload">
-                            {{ $t('license.levelUpPro') }}
-                        </el-button>
-                    </template>
-                </div>
-            </template>
-        </RouterButton>
+        />
 
         <el-alert
             v-if="!isSafety && globalStore.showEntranceWarn"
@@ -259,8 +249,6 @@
                 </CardWithHeader>
             </el-col>
         </el-row>
-
-        <LicenseImport ref="licenseRef" />
     </div>
 </template>
 
@@ -269,7 +257,6 @@ import { onMounted, onBeforeUnmount, ref, reactive } from 'vue';
 import Status from '@/views/home/status/index.vue';
 import App from '@/views/home/app/index.vue';
 import VCharts from '@/components/v-charts/index.vue';
-import LicenseImport from '@/components/license-import/index.vue';
 import CardWithHeader from '@/components/card-with-header/index.vue';
 import i18n from '@/lang';
 import { Dashboard } from '@/api/interface/dashboard';
@@ -302,9 +289,6 @@ const timeNetDatas = ref<Array<string>>([]);
 
 const ioOptions = ref();
 const netOptions = ref();
-
-const licenseRef = ref();
-const isProductPro = ref();
 
 const searchInfo = reactive({
     ioOption: 'all',
@@ -659,12 +643,7 @@ const onBlur = () => {
     isActive.value = false;
 };
 
-const toUpload = () => {
-    licenseRef.value.acceptParams();
-};
-
 onMounted(() => {
-    isProductPro.value = globalStore.isProductPro;
     window.addEventListener('focus', onFocus);
     window.addEventListener('blur', onBlur);
     loadSafeStatus();

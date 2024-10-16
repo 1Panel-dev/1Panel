@@ -12,7 +12,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/i18n"
 
-	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"github.com/1Panel-dev/1Panel/backend/constant"
@@ -21,11 +20,8 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/1Panel-dev/1Panel/backend/utils/ntp"
-	"github.com/1Panel-dev/1Panel/backend/utils/xpack"
 	"github.com/pkg/errors"
 )
-
-var alertTypes = map[string]bool{"app": true, "website": true, "database": true, "directory": true, "log": true, "snapshot": true}
 
 func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 	var (
@@ -94,7 +90,6 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 				record.Records, _ = mkdirAndWriteFile(cronjob, record.StartTime, message)
 			}
 			cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), record.Records)
-			handleCronJobAlert(cronjob)
 			return
 		}
 		if len(message) != 0 {
@@ -395,20 +390,4 @@ func (u *CronjobService) generateLogsPath(cronjob model.Cronjob, startTime time.
 
 func hasBackup(cronjobType string) bool {
 	return cronjobType == "app" || cronjobType == "database" || cronjobType == "website" || cronjobType == "directory" || cronjobType == "snapshot" || cronjobType == "log"
-}
-
-func handleCronJobAlert(cronjob *model.Cronjob) {
-	if alertTypes[cronjob.Type] {
-		pushAlert := dto.PushAlert{
-			TaskName:  cronjob.Name,
-			AlertType: cronjob.Type,
-			EntryID:   cronjob.ID,
-			Param:     cronjob.Type,
-		}
-		err := xpack.PushAlert(pushAlert)
-		if err != nil {
-			global.LOG.Errorf("cronjob alert push failed, err: %v", err)
-			return
-		}
-	}
 }

@@ -19,7 +19,6 @@
                                 <ul style="margin-left: -20px">
                                     <li v-if="isProductPro">{{ $t('setting.proxyHelper1') }}</li>
                                     <li v-if="isProductPro">{{ $t('setting.proxyHelper2') }}</li>
-                                    <li>{{ $t('setting.proxyHelper3') }}</li>
                                 </ul>
                             </template>
                         </el-alert>

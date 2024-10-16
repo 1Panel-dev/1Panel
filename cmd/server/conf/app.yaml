@@ -2,7 +2,7 @@ system:
   db_file: 1Panel.db
   base_dir: /opt
   mode: dev
-  repo_url: https://resource.fit2cloud.com/1panel/package
+  repo_url: https://resource.fit2cloud.com/1panel/package/aliyun
   app_repo: https://apps-assets.fit2cloud.com
   is_demo: false
   port: 9999

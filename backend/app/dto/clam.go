@@ -33,7 +33,6 @@ type ClamInfo struct {
 	LastHandleDate   string `json:"lastHandleDate"`
 	Spec             string `json:"spec"`
 	Description      string `json:"description"`
-	AlertCount       uint   `json:"alertCount"`
 }
 
 type ClamLogSearch struct {
@@ -72,8 +71,6 @@ type ClamCreate struct {
 	InfectedDir      string `json:"infectedDir"`
 	Spec             string `json:"spec"`
 	Description      string `json:"description"`
-	AlertCount       uint   `json:"alertCount"`
-	AlertTitle       string `json:"alertTitle"`
 }
 
 type ClamUpdate struct {

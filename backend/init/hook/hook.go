@@ -178,6 +178,8 @@ func handleUserInfo(tags string, settingRepo repo.ISettingRepo) {
 		if err := settingRepo.Update("SecurityEntrance", common.RandStrAndNum(10)); err != nil {
 			global.LOG.Fatalf("init entrance before start failed, err: %v", err)
 		}
+		sudo := cmd.SudoHandleCmd()
+		_, _ = cmd.Execf("%s sed -i '/CHANGE_USER_INFO=%v/d' /usr/local/bin/1pctl", sudo, global.CONF.System.ChangeUserInfo)
 		return
 	}
 	if strings.Contains(global.CONF.System.ChangeUserInfo, "username") {

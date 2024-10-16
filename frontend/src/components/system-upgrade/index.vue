@@ -16,11 +16,6 @@
                 <el-divider v-if="!mobile" direction="vertical" />
             </div>
             <div class="flex flex-wrap">
-                <el-button type="primary" link @click="toHalo">
-                    <span class="font-normal">
-                        {{ isProductPro ? $t('license.pro') : $t('license.community') }}
-                    </span>
-                </el-button>
                 <span class="version" @click="copyText(version)">{{ version }}</span>
                 <el-badge is-dot style="margin-top: -3px" v-if="version !== 'Waiting' && globalStore.hasNewVersion">
                     <el-button type="primary" link @click="onLoadUpgradeInfo">
@@ -124,10 +119,6 @@ const search = async () => {
 
 const handleClose = () => {
     drawerVisible.value = false;
-};
-
-const toHalo = () => {
-    window.open('https://www.lxware.cn/1panel' + '', '_blank', 'noopener,noreferrer');
 };
 
 const toDoc = () => {
