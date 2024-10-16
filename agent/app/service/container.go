@@ -126,7 +126,7 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 	if len(req.Name) != 0 {
 		length, count := len(list), 0
 		for count < length {
-			if !strings.Contains(list[count].Names[0][1:], req.Name) {
+			if !strings.Contains(list[count].Names[0][1:], req.Name) && !strings.Contains(list[count].Image, req.Name) {
 				list = append(list[:count], list[(count+1):]...)
 				length--
 			} else {
