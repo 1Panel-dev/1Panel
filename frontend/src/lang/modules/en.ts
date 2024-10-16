@@ -887,7 +887,8 @@ const message = {
         cronSpecHelper: 'Enter the correct execution period',
         cleanHelper:
             'This operation records all job execution records, backup files, and log files. Do you want to continue?',
-        directory: 'Backup Directory',
+        backupContent: 'Backup Content',
+        directory: 'Backup Directory / File',
         sourceDir: 'Backup Directory',
         snapshot: 'System Snapshot',
         allOptionHelper:

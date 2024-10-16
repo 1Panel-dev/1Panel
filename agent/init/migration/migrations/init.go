@@ -268,7 +268,7 @@ var UpdateSnapshot = &gormigrate.Migration{
 }
 
 var UpdateCronjob = &gormigrate.Migration{
-	ID: "20241011-update-cronjob",
+	ID: "20241017-update-cronjob",
 	Migrate: func(tx *gorm.DB) error {
 		return tx.AutoMigrate(&model.Cronjob{}, &model.JobRecords{})
 	},

@@ -67,7 +67,7 @@
             <el-form-item :label="$t('cronjob.taskName')" prop="name">
                 <el-input :disabled="dialogData.title === 'edit'" clearable v-model.trim="dialogData.rowData!.name" />
             </el-form-item>
-            <el-card>
+            <el-card class="mb-5">
                 <el-form-item :label="$t('cronjob.cronSpec')" prop="specCustom">
                     <el-checkbox :label="$t('container.custom')" v-model="dialogData.rowData!.specCustom" />
                 </el-form-item>
@@ -376,17 +376,45 @@
                 </el-form-item>
             </div>
 
-            <el-form-item
-                v-if="dialogData.rowData!.type === 'directory'"
-                :label="$t('cronjob.sourceDir')"
-                prop="sourceDir"
-            >
+            <el-form-item :label="$t('cronjob.backupContent')">
+                <el-radio-group v-model="dialogData.rowData!.isDir">
+                    <el-radio :value="true">{{ $t('file.dir') }}</el-radio>
+                    <el-radio :value="false">{{ $t('file.file') }}</el-radio>
+                </el-radio-group>
+            </el-form-item>
+
+            <el-form-item v-if="dialogData.rowData!.type === 'directory' && dialogData.rowData!.isDir" prop="sourceDir">
                 <el-input v-model="dialogData.rowData!.sourceDir">
                     <template #prepend>
                         <FileList @choose="loadDir" :dir="true"></FileList>
                     </template>
                 </el-input>
             </el-form-item>
+            <div v-if="dialogData.rowData!.type === 'directory' && !dialogData.rowData!.isDir" class="mb-5">
+                <el-input>
+                    <template #prepend>
+                        <FileList @choose="loadFile" :dir="false" />
+                    </template>
+                </el-input>
+                <el-form-item prop="files">
+                    <div style="width: 100%">
+                        <ComplexTable
+                            :show-header="false"
+                            :data="dialogData.rowData.files"
+                            v-if="dialogData.rowData.files"
+                        >
+                            <el-table-column prop="val" />
+                            <el-table-column width="60">
+                                <template #default="scope">
+                                    <el-button link type="primary" @click="handleFileDelete(scope.$index)">
+                                        {{ $t('commons.button.delete') }}
+                                    </el-button>
+                                </template>
+                            </el-table-column>
+                        </ComplexTable>
+                    </div>
+                </el-form-item>
+            </div>
 
             <div v-if="isBackup()">
                 <el-form-item :label="$t('setting.backupAccount')" prop="backupAccountList">
@@ -530,11 +558,19 @@ const acceptParams = (params: DialogProps): void => {
         dialogData.value.rowData.specs = dialogData.value.rowData.spec.split(',');
     }
     dialogData.value.rowData.specs = dialogData.value.rowData.specs || [];
+    dialogData.value.rowData.files = [];
+    if (!dialogData.value.rowData.isDir) {
+        let files = dialogData.value.rowData.sourceDir?.split(',') || [];
+        for (const item of files) {
+            dialogData.value.rowData.files.push({ val: item });
+        }
+    }
     if (dialogData.value.title === 'create') {
         changeType();
         dialogData.value.rowData.scriptMode = 'input';
         dialogData.value.rowData.dbType = 'mysql';
         dialogData.value.rowData.downloadAccountID = 1;
+        dialogData.value.rowData.isDir = true;
     }
     if (dialogData.value.rowData.sourceAccountIDs) {
         dialogData.value.rowData.sourceAccounts = [];
@@ -697,6 +733,14 @@ const verifySpec = (rule: any, value: any, callback: any) => {
     callback();
 };
 
+const verifyFiles = (rule: any, value: any, callback: any) => {
+    if (!dialogData.value.rowData!.files || dialogData.value.rowData!.files.length === 0) {
+        callback(new Error(i18n.global.t('commons.rule.requiredInput')));
+        return;
+    }
+    callback();
+};
+
 const rules = reactive({
     name: [Rules.requiredInput, Rules.noSpace],
     type: [Rules.requiredSelect],
@@ -709,6 +753,7 @@ const rules = reactive({
     website: [Rules.requiredSelect],
     dbName: [Rules.requiredSelect],
     url: [Rules.requiredInput],
+    files: [{ validator: verifyFiles, trigger: 'blur', required: true }],
     sourceDir: [Rules.requiredInput],
     backupAccounts: [Rules.requiredSelect],
     defaultDownload: [Rules.requiredSelect],
@@ -724,6 +769,15 @@ const loadDir = async (path: string) => {
 
 const loadScriptDir = async (path: string) => {
     dialogData.value.rowData!.script = path;
+};
+
+const loadFile = async (path: string) => {
+    for (const item of dialogData.value.rowData!.files) {
+        if (item.val === path) {
+            return;
+        }
+    }
+    dialogData.value.rowData!.files.push({ val: path });
 };
 
 const hasDay = (item: any) => {
@@ -812,6 +866,10 @@ const handleSpecCustomDelete = (index: number) => {
     dialogData.value.rowData!.specs.splice(index, 1);
 };
 
+const handleFileDelete = (index: number) => {
+    dialogData.value.rowData!.files.splice(index, 1);
+};
+
 const loadBackups = async () => {
     const res = await getBackupList();
     backupOptions.value = [];
@@ -885,7 +943,7 @@ function hasExclusionRules() {
     return (
         dialogData.value.rowData!.type === 'app' ||
         dialogData.value.rowData!.type === 'website' ||
-        dialogData.value.rowData!.type === 'directory'
+        (dialogData.value.rowData!.type === 'directory' && dialogData.value.rowData!.isDir)
     );
 }
 
@@ -906,6 +964,13 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         }
     } else {
         specs = dialogData.value.rowData.specs;
+    }
+    if (!dialogData.value.rowData.isDir) {
+        let files = [];
+        for (const item of dialogData.value.rowData.files) {
+            files.push(item.val);
+        }
+        dialogData.value.rowData.sourceDir = files.join(',');
     }
     dialogData.value.rowData.sourceAccountIDs = dialogData.value.rowData.sourceAccounts.join(',');
     dialogData.value.rowData.spec = specs.join(',');

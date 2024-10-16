@@ -13,6 +13,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
+	"github.com/1Panel-dev/1Panel/agent/utils/files"
 )
 
 func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time) error {
@@ -138,8 +139,17 @@ func (u *CronjobService) handleDirectory(cronjob model.Cronjob, startTime time.T
 	}
 	fileName := fmt.Sprintf("directory%s_%s.tar.gz", strings.ReplaceAll(cronjob.SourceDir, "/", "_"), startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5))
 	backupDir := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("%s/%s", cronjob.Type, cronjob.Name))
-	if err := handleTar(cronjob.SourceDir, backupDir, fileName, cronjob.ExclusionRules, cronjob.Secret); err != nil {
-		return err
+
+	fileOp := files.NewFileOp()
+	if cronjob.IsDir {
+		if err := fileOp.TarGzCompressPro(true, cronjob.SourceDir, path.Join(backupDir, fileName), cronjob.ExclusionRules, cronjob.Secret); err != nil {
+			return err
+		}
+	} else {
+		fileLists := strings.Split(cronjob.SourceDir, ",")
+		if err := fileOp.Compress(fileLists, backupDir, fileName, files.TarGz, cronjob.Secret); err != nil {
+			return err
+		}
 	}
 	var record model.BackupRecord
 	record.From = "cronjob"

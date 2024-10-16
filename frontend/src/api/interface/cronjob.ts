@@ -25,6 +25,8 @@ export namespace Cronjob {
         dbType: string;
         dbName: string;
         url: string;
+        isDir: boolean;
+        files: Array<Item>;
         sourceDir: string;
 
         sourceAccountIDs: string;
@@ -33,6 +35,9 @@ export namespace Cronjob {
         retainCopies: number;
         status: string;
         secret: string;
+    }
+    export interface Item {
+        val: string;
     }
     export interface CronjobCreate {
         name: string;

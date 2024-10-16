@@ -34,6 +34,7 @@ type CronjobCreate struct {
 	DBType         string `json:"dbType"`
 	DBName         string `json:"dbName"`
 	URL            string `json:"url"`
+	IsDir          bool   `json:"isDir"`
 	SourceDir      string `json:"sourceDir"`
 
 	SourceAccountIDs  string `json:"sourceAccountIDs"`
@@ -61,6 +62,7 @@ type CronjobUpdate struct {
 	DBType         string `json:"dbType"`
 	DBName         string `json:"dbName"`
 	URL            string `json:"url"`
+	IsDir          bool   `json:"isDir"`
 	SourceDir      string `json:"sourceDir"`
 
 	SourceAccountIDs  string `json:"sourceAccountIDs"`
@@ -110,6 +112,7 @@ type CronjobInfo struct {
 	DBType            string `json:"dbType"`
 	DBName            string `json:"dbName"`
 	URL               string `json:"url"`
+	IsDir             bool   `json:"isDir"`
 	SourceDir         string `json:"sourceDir"`
 	SourceAccountIDs  string `json:"sourceAccountIDs"`
 	DownloadAccountID uint   `json:"downloadAccountID"`
