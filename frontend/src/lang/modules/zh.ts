@@ -562,6 +562,10 @@ const message = {
     },
     container: {
         create: '创建容器',
+        createByCommand: '命令创建',
+        commandInput: '命令输入',
+        commandRule: '请输入正确的 docker run 容器创建命令！',
+        commandHelper: '将在服务器上执行该条命令以创建容器，是否继续？',
         edit: '编辑容器',
         updateContainerHelper: '容器编辑需要重建容器，任何未持久化的数据将会丢失，是否继续？',
         containerList: '容器列表',
@@ -644,6 +648,7 @@ const message = {
         imageLoadErr: '未检测到容器的镜像名称',
         appHelper: '该容器来源于应用商店，升级可能导致该服务不可用',
 
+        resource: '资源',
         input: '手动输入',
         forcePull: '强制拉取镜像',
         forcePullHelper: '忽略服务器已存在的镜像，重新拉取一次',

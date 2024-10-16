@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"sort"
 	"strconv"
@@ -63,6 +64,7 @@ type IContainerService interface {
 	CreateCompose(req dto.ComposeCreate) error
 	ComposeOperation(req dto.ComposeOperation) error
 	ContainerCreate(req dto.ContainerOperate) error
+	ContainerCreateByCommand(req dto.ContainerCreateByCommand) error
 	ContainerUpdate(req dto.ContainerOperate) error
 	ContainerUpgrade(req dto.ContainerUpgrade) error
 	ContainerInfo(req dto.OperationWithName) (*dto.ContainerOperate, error)
@@ -311,6 +313,25 @@ func (u *ContainerService) ContainerListStats() ([]dto.ContainerListStats, error
 	}
 	wg.Wait()
 	return datas, nil
+}
+
+func (u *ContainerService) ContainerCreateByCommand(req dto.ContainerCreateByCommand) error {
+	if cmd.CheckIllegal(req.Command) {
+		return buserr.New(constant.ErrCmdIllegal)
+	}
+	taskItem, err := task.NewTaskWithOps("-", task.TaskCreate, task.TaskScopeContainer, req.TaskID, 1)
+	if err != nil {
+		global.LOG.Errorf("new task for create container failed, err: %v", err)
+		return err
+	}
+	go func() {
+		taskItem.AddSubTask(i18n.GetWithName("ContainerCreate", "-"), func(t *task.Task) error {
+			logPath := path.Join(constant.LogDir, task.TaskScopeContainer, req.TaskID+".log")
+			return cmd.ExecShell(logPath, 5*time.Minute, "bash", "-c", req.Command)
+		}, nil)
+		_ = taskItem.Execute()
+	}()
+	return nil
 }
 
 func (u *ContainerService) Inspect(req dto.InspectReq) (string, error) {

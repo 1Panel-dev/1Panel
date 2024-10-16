@@ -90,6 +90,11 @@ type ContainerOperate struct {
 	RestartPolicy   string         `json:"restartPolicy"`
 }
 
+type ContainerCreateByCommand struct {
+	TaskID  string `json:"taskID"`
+	Command string `json:"command"`
+}
+
 type ContainerUpgrade struct {
 	Name      string `json:"name" validate:"required"`
 	Image     string `json:"image" validate:"required"`
