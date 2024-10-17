@@ -2,6 +2,7 @@ package service
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -218,7 +219,10 @@ func buildRuntime(runtime *model.Runtime, oldImageID string, rebuild bool) {
 		_ = logFile.Close()
 	}()
 
-	cmd := exec.Command("docker-compose", "-f", composePath, "build")
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Hour)
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx, "docker-compose", "-f", composePath, "build")
 	multiWriterStdout := io.MultiWriter(os.Stdout, logFile)
 	cmd.Stdout = multiWriterStdout
 	var stderrBuf bytes.Buffer
@@ -228,7 +232,11 @@ func buildRuntime(runtime *model.Runtime, oldImageID string, rebuild bool) {
 	err = cmd.Run()
 	if err != nil {
 		runtime.Status = constant.RuntimeError
-		runtime.Message = buserr.New(constant.ErrImageBuildErr).Error() + ":" + stderrBuf.String()
+		if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+			runtime.Message = buserr.New(constant.ErrImageBuildErr).Error() + ":" + buserr.New("ErrCmdTimeout").Error()
+		} else {
+			runtime.Message = buserr.New(constant.ErrImageBuildErr).Error() + ":" + stderrBuf.String()
+		}
 	} else {
 		runtime.Status = constant.RuntimeNormal
 		runtime.Message = ""
