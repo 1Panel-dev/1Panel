@@ -89,10 +89,8 @@ func (u *ImageRepoService) Create(req dto.ImageRepoCreate) error {
 		if err := validateDockerConfig(); err != nil {
 			return err
 		}
-
-		stdout, err := cmd.Exec("systemctl restart docker")
-		if err != nil {
-			return errors.New(string(stdout))
+		if err := restartDocker(); err != nil {
+			return err
 		}
 		ticker := time.NewTicker(3 * time.Second)
 		defer ticker.Stop()
@@ -166,13 +164,10 @@ func (u *ImageRepoService) Update(req dto.ImageRepoUpdate) error {
 		if err := validateDockerConfig(); err != nil {
 			return err
 		}
-
-		stdout, err := cmd.Exec("systemctl restart docker")
-		if err != nil {
-			return errors.New(string(stdout))
+		if err := restartDocker(); err != nil {
+			return err
 		}
 	}
-
 	upMap := make(map[string]interface{})
 	upMap["download_url"] = req.DownloadUrl
 	upMap["protocol"] = req.Protocol
