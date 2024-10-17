@@ -201,6 +201,7 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 		}
 		install, _ := appInstallRepo.GetFirst(appInstallRepo.WithContainerName(info.Name))
 		if install.ID > 0 {
+			info.Path = install.GetPath()
 			info.AppInstallName = install.Name
 			info.AppName = install.App.Name
 			websites, _ := websiteRepo.GetBy(websiteRepo.WithAppInstallId(install.ID))
