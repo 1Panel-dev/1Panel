@@ -204,6 +204,7 @@ func (u *DockerService) UpdateConf(req dto.SettingUpdate) error {
 		if err := restartDocker(); err != nil {
 			return err
 		}
+		return nil
 	}
 	newJson, err := json.MarshalIndent(daemonMap, "", "\t")
 	if err != nil {
@@ -320,6 +321,7 @@ func (u *DockerService) UpdateConfByFile(req dto.DaemonJsonUpdateByFile) error {
 		if err := restartDocker(); err != nil {
 			return err
 		}
+		return nil
 	}
 	err := createIfNotExistDaemonJsonFile()
 	if err != nil {
