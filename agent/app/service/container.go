@@ -319,13 +319,30 @@ func (u *ContainerService) ContainerCreateByCommand(req dto.ContainerCreateByCom
 	if cmd.CheckIllegal(req.Command) {
 		return buserr.New(constant.ErrCmdIllegal)
 	}
-	taskItem, err := task.NewTaskWithOps("-", task.TaskCreate, task.TaskScopeContainer, req.TaskID, 1)
+	if !strings.HasPrefix(strings.TrimSpace(req.Command), "docker run ") {
+		return errors.New("error command format")
+	}
+	containerName := ""
+	commands := strings.Split(req.Command, " ")
+	for index, val := range commands {
+		if val == "--name" && len(commands) > index+1 {
+			containerName = commands[index+1]
+		}
+	}
+	if !strings.Contains(req.Command, " -d ") {
+		req.Command = strings.ReplaceAll(req.Command, "docker run", "docker run -d")
+	}
+	if len(containerName) == 0 {
+		containerName = fmt.Sprintf("1Panel-%s-%s", common.RandStr(5), common.RandStrAndNum(4))
+		req.Command += fmt.Sprintf(" --name %s", containerName)
+	}
+	taskItem, err := task.NewTaskWithOps(containerName, task.TaskCreate, task.TaskScopeContainer, req.TaskID, 1)
 	if err != nil {
 		global.LOG.Errorf("new task for create container failed, err: %v", err)
 		return err
 	}
 	go func() {
-		taskItem.AddSubTask(i18n.GetWithName("ContainerCreate", "-"), func(t *task.Task) error {
+		taskItem.AddSubTask(i18n.GetWithName("ContainerCreate", containerName), func(t *task.Task) error {
 			logPath := path.Join(constant.LogDir, task.TaskScopeContainer, req.TaskID+".log")
 			return cmd.ExecShell(logPath, 5*time.Minute, "bash", "-c", req.Command)
 		}, nil)

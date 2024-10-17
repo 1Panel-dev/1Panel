@@ -150,12 +150,13 @@ func (b *BaseApi) ImageRemove(c *gin.Context) {
 		return
 	}
 
-	if err := imageService.ImageRemove(req); err != nil {
+	data, err := imageService.ImageRemove(req)
+	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
 
-	helper.SuccessWithData(c, nil)
+	helper.SuccessWithData(c, data)
 }
 
 // @Tags Container Image
