@@ -25,8 +25,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-var alertTypes = map[string]bool{"app": true, "website": true, "database": true, "directory": true, "log": true, "snapshot": true}
-
 func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 	var (
 		message []byte
@@ -398,17 +396,15 @@ func hasBackup(cronjobType string) bool {
 }
 
 func handleCronJobAlert(cronjob *model.Cronjob) {
-	if alertTypes[cronjob.Type] {
-		pushAlert := dto.PushAlert{
-			TaskName:  cronjob.Name,
-			AlertType: cronjob.Type,
-			EntryID:   cronjob.ID,
-			Param:     cronjob.Type,
-		}
-		err := xpack.PushAlert(pushAlert)
-		if err != nil {
-			global.LOG.Errorf("cronjob alert push failed, err: %v", err)
-			return
-		}
+	pushAlert := dto.PushAlert{
+		TaskName:  cronjob.Name,
+		AlertType: cronjob.Type,
+		EntryID:   cronjob.ID,
+		Param:     cronjob.Type,
+	}
+	err := xpack.PushAlert(pushAlert)
+	if err != nil {
+		global.LOG.Errorf("cronjob alert push failed, err: %v", err)
+		return
 	}
 }
