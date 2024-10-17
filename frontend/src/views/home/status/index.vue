@@ -158,6 +158,7 @@
                     </el-row>
                     <template #reference>
                         <v-charts
+                            @click="toFolder(item.path)"
                             height="160px"
                             :id="`disk${index}`"
                             type="pie"
@@ -247,6 +248,7 @@ import { computeSize } from '@/utils/util';
 import router from '@/routers';
 import i18n from '@/lang';
 import { nextTick, ref } from 'vue';
+import { toFolder } from '@/global/business';
 const showMore = ref(true);
 
 const baseInfo = ref<Dashboard.BaseInfo>({
