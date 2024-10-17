@@ -128,7 +128,7 @@ const onOpenDialog = async (
     rowData: Partial<Database.DatabaseInfo> = {
         name: '',
         type: 'postgresql',
-        version: '16.x',
+        version: '17.x',
         address: '',
         port: 5432,
         username: '',
