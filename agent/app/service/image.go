@@ -40,7 +40,7 @@ type IImageService interface {
 	ImageLoad(req dto.ImageLoad) error
 	ImageSave(req dto.ImageSave) error
 	ImagePush(req dto.ImagePush) error
-	ImageRemove(req dto.BatchDelete) error
+	ImageRemove(req dto.BatchDelete) (dto.ContainerPruneReport, error)
 	ImageTag(req dto.ImageTag) error
 }
 
@@ -399,24 +399,31 @@ func (u *ImageService) ImagePush(req dto.ImagePush) error {
 	return nil
 }
 
-func (u *ImageService) ImageRemove(req dto.BatchDelete) error {
+func (u *ImageService) ImageRemove(req dto.BatchDelete) (dto.ContainerPruneReport, error) {
+	report := dto.ContainerPruneReport{}
 	client, err := docker.NewDockerClient()
 	if err != nil {
-		return err
+		return report, err
 	}
 	defer client.Close()
 	for _, id := range req.Names {
+		imageItem, _, err := client.ImageInspectWithRaw(context.TODO(), id)
+		if err != nil {
+			return report, err
+		}
 		if _, err := client.ImageRemove(context.TODO(), id, image.RemoveOptions{Force: req.Force, PruneChildren: true}); err != nil {
 			if strings.Contains(err.Error(), "image is being used") || strings.Contains(err.Error(), "is using") {
 				if strings.Contains(id, "sha256:") {
-					return buserr.New(constant.ErrObjectInUsed)
+					return report, buserr.New(constant.ErrObjectInUsed)
 				}
-				return buserr.WithDetail(constant.ErrInUsed, id, nil)
+				return report, buserr.WithDetail(constant.ErrInUsed, id, nil)
 			}
-			return err
+			return report, err
 		}
+		report.DeletedNumber++
+		report.SpaceReclaimed += int(imageItem.Size)
 	}
-	return nil
+	return report, nil
 }
 
 func formatFileSize(fileSize int64) (size string) {

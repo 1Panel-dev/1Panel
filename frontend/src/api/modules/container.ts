@@ -94,7 +94,7 @@ export const imageTag = (params: Container.ImageTag) => {
     return http.post(`/containers/image/tag`, params);
 };
 export const imageRemove = (params: Container.BatchDelete) => {
-    return http.post(`/containers/image/remove`, params);
+    return http.post<Container.ContainerPruneReport>(`/containers/image/remove`, params);
 };
 
 // network
