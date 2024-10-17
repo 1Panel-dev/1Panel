@@ -37,6 +37,7 @@ type ContainerInfo struct {
 	AppName        string   `json:"appName"`
 	AppInstallName string   `json:"appInstallName"`
 	Websites       []string `json:"websites"`
+	Path           string   `json:"path"`
 }
 
 type ContainerStatus struct {

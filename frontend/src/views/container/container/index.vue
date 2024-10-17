@@ -327,6 +327,19 @@
                                     </el-button>
                                 </el-tooltip>
                             </div>
+                            <div>
+                                <el-tooltip
+                                    v-if="row.path != null"
+                                    :hide-after="20"
+                                    :content="row.path"
+                                    placement="top"
+                                    class="mt-1"
+                                >
+                                    <el-button icon="Setting" plain size="small" @click="toFolder(row.path)">
+                                        {{ $t('container.setting') }}
+                                    </el-button>
+                                </el-tooltip>
+                            </div>
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -481,6 +494,10 @@ const loadStatus = async () => {
             dockerStatus.value = 'Failed';
             loading.value = false;
         });
+};
+
+const toFolder = async (val: string) => {
+    router.push({ path: '/hosts/files', query: { path: val } });
 };
 
 const goDashboard = async (port: any) => {
