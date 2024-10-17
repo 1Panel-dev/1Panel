@@ -201,11 +201,9 @@ func (u *DockerService) UpdateConf(req dto.SettingUpdate) error {
 	}
 	if len(daemonMap) == 0 {
 		_ = os.Remove(constant.DaemonJsonPath)
-		stdout, err := cmd.Exec("systemctl restart docker")
-		if err != nil {
-			return errors.New(string(stdout))
+		if err := restartDocker(); err != nil {
+			return err
 		}
-		return nil
 	}
 	newJson, err := json.MarshalIndent(daemonMap, "", "\t")
 	if err != nil {
@@ -218,9 +216,8 @@ func (u *DockerService) UpdateConf(req dto.SettingUpdate) error {
 		return err
 	}
 
-	stdout, err := cmd.Exec("systemctl restart docker")
-	if err != nil {
-		return errors.New(string(stdout))
+	if err := restartDocker(); err != nil {
+		return err
 	}
 	return nil
 }
@@ -268,9 +265,8 @@ func (u *DockerService) UpdateLogOption(req dto.LogOption) error {
 		return err
 	}
 
-	stdout, err := cmd.Exec("systemctl restart docker")
-	if err != nil {
-		return errors.New(string(stdout))
+	if err := restartDocker(); err != nil {
+		return err
 	}
 	return nil
 }
@@ -312,9 +308,8 @@ func (u *DockerService) UpdateIpv6Option(req dto.Ipv6Option) error {
 		return err
 	}
 
-	stdout, err := cmd.Exec("systemctl restart docker")
-	if err != nil {
-		return errors.New(string(stdout))
+	if err := restartDocker(); err != nil {
+		return err
 	}
 	return nil
 }
@@ -322,11 +317,9 @@ func (u *DockerService) UpdateIpv6Option(req dto.Ipv6Option) error {
 func (u *DockerService) UpdateConfByFile(req dto.DaemonJsonUpdateByFile) error {
 	if len(req.File) == 0 {
 		_ = os.Remove(constant.DaemonJsonPath)
-		stdout, err := cmd.Exec("systemctl restart docker")
-		if err != nil {
-			return errors.New(string(stdout))
+		if err := restartDocker(); err != nil {
+			return err
 		}
-		return nil
 	}
 	err := createIfNotExistDaemonJsonFile()
 	if err != nil {
@@ -345,9 +338,8 @@ func (u *DockerService) UpdateConfByFile(req dto.DaemonJsonUpdateByFile) error {
 		return err
 	}
 
-	stdout, err := cmd.Exec("systemctl restart docker")
-	if err != nil {
-		return errors.New(string(stdout))
+	if err := restartDocker(); err != nil {
+		return err
 	}
 	return nil
 }
@@ -355,6 +347,10 @@ func (u *DockerService) UpdateConfByFile(req dto.DaemonJsonUpdateByFile) error {
 func (u *DockerService) OperateDocker(req dto.DockerOperation) error {
 	service := "docker"
 	sudo := cmd.SudoHandleCmd()
+	dockerCmd, err := getDockerRestartCommand()
+	if err != nil {
+		return err
+	}
 	if req.Operation == "stop" {
 		isSocketActive, _ := systemctl.IsActive("docker.socket")
 		if isSocketActive {
@@ -371,9 +367,9 @@ func (u *DockerService) OperateDocker(req dto.DockerOperation) error {
 		}
 	}
 
-	stdout, err := cmd.Execf("systemctl %s %s ", req.Operation, service)
+	stdout, err := cmd.Execf("%s %s %s", dockerCmd, req.Operation, service)
 	if err != nil {
-		return errors.New(string(stdout))
+		return errors.New(stdout)
 	}
 	return nil
 }
@@ -431,6 +427,30 @@ func validateDockerConfig() error {
 	stdout, err := cmd.Exec("dockerd --validate")
 	if err != nil || (stdout != "" && strings.TrimSpace(stdout) != "configuration OK") {
 		return fmt.Errorf("Docker configuration validation failed, err: %v", stdout)
+	}
+	return nil
+}
+
+func getDockerRestartCommand() (string, error) {
+	stdout, err := cmd.Exec("which docker")
+	if err != nil {
+		return "", fmt.Errorf("failed to find docker: %v", err)
+	}
+	dockerPath := stdout
+	if strings.Contains(dockerPath, "snap") {
+		return "snap", nil
+	}
+	return "systemctl", nil
+}
+
+func restartDocker() error {
+	restartCmd, err := getDockerRestartCommand()
+	if err != nil {
+		return err
+	}
+	stdout, err := cmd.Execf("%s restart docker", restartCmd)
+	if err != nil {
+		return fmt.Errorf("failed to restart Docker: %s", stdout)
 	}
 	return nil
 }

@@ -231,7 +231,9 @@ func recoverDaemonJson(src string, fileOp files.FileOp) error {
 		}
 	}
 
-	_, _ = cmd.Exec("systemctl restart docker")
+	if err := restartDocker(); err != nil {
+		return err
+	}
 	return nil
 }
 
