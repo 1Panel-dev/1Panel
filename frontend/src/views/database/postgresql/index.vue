@@ -19,6 +19,7 @@
                     v-model:mask-show="maskShow"
                     @setting="onSetting"
                     @is-exist="checkExist"
+                    ref="appStatusRef"
                 ></AppStatus>
             </template>
 
@@ -305,6 +306,7 @@ const postgresqlContainer = ref();
 const postgresqlStatus = ref();
 const postgresqlVersion = ref();
 
+const appStatusRef = ref();
 const dialogRef = ref();
 const onOpenDialog = async () => {
     let params = {
@@ -348,6 +350,7 @@ const onSetting = async () => {
 };
 
 const changeDatabase = async () => {
+    appStatusRef.value.onCheck();
     for (const item of dbOptionsLocal.value) {
         if (item.database == currentDBName.value) {
             currentDB.value = item;

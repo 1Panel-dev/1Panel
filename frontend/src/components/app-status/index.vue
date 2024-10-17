@@ -107,7 +107,7 @@
 <script lang="ts" setup>
 import { CheckAppInstalled, InstalledOp } from '@/api/modules/app';
 import router from '@/routers';
-import { onMounted, reactive, ref, watch } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import Status from '@/components/status/index.vue';
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
@@ -124,21 +124,6 @@ const props = defineProps({
         default: '',
     },
 });
-
-watch(
-    () => props.appKey,
-    (val) => {
-        key.value = val;
-        onCheck();
-    },
-);
-watch(
-    () => props.appName,
-    (val) => {
-        name.value = val;
-        onCheck();
-    },
-);
 
 let key = ref('');
 let name = ref('');
@@ -249,5 +234,9 @@ onMounted(() => {
     key.value = props.appKey;
     name.value = props.appName;
     onCheck();
+});
+
+defineExpose({
+    onCheck,
 });
 </script>

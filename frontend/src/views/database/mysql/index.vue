@@ -21,6 +21,7 @@
                     v-model:mask-show="maskShow"
                     @setting="onSetting"
                     @is-exist="checkExist"
+                    ref="appStatusRef"
                 ></AppStatus>
             </template>
 
@@ -327,6 +328,8 @@ const dashboardName = ref();
 const dashboardKey = ref();
 const dashboardVisible = ref(false);
 
+const appStatusRef = ref();
+
 const dialogPortJumpRef = ref();
 
 const data = ref();
@@ -384,6 +387,7 @@ const onSetting = async () => {
 };
 
 const changeDatabase = async () => {
+    appStatusRef.value.onCheck();
     for (const item of dbOptionsLocal.value) {
         if (item.database == currentDBName.value) {
             currentDB.value = item;
