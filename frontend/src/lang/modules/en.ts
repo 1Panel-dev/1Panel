@@ -1133,7 +1133,7 @@ const message = {
             clamLog: 'Scan Logs',
             freshClam: 'Update Virus Definitions',
             freshClamLog: 'Update Virus Definitions Logs',
-            alertHelper: 'Professional version supports SMS alert',
+            alertHelper: 'Professional version supports scheduled scan and SMS alert',
             alertTitle: 'Virus scanning 「{0}」 task failed alert',
         },
     },

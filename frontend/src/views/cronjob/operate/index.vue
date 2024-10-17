@@ -320,23 +320,7 @@
                         </el-form-item>
                     </div>
 
-                    <el-form-item :label="$t('cronjob.retainCopies')" prop="retainCopies">
-                        <el-input-number
-                            style="width: 200px"
-                            :min="1"
-                            step-strictly
-                            :step="1"
-                            v-model.number="dialogData.rowData!.retainCopies"
-                        ></el-input-number>
-                        <span v-if="isBackup()" class="input-help">{{ $t('cronjob.retainCopiesHelper1') }}</span>
-                        <span v-else class="input-help">{{ $t('cronjob.retainCopiesHelper') }}</span>
-                    </el-form-item>
-
-                    <el-form-item v-if="dialogData.rowData!.type === 'curl'" :label="$t('cronjob.url')" prop="url">
-                        <el-input clearable v-model.trim="dialogData.rowData!.url" />
-                    </el-form-item>
-
-                    <el-form-item prop="hasAlert" v-if="alertTypes.includes(dialogData.rowData!.type)">
+                    <el-form-item prop="hasAlert">
                         <el-checkbox v-model="dialogData.rowData!.hasAlert" :label="$t('alert.isAlert')" />
                         <span class="input-help">{{ $t('alert.cronJobHelper') }}</span>
                     </el-form-item>
@@ -359,6 +343,22 @@
                         <el-button link type="primary" @click="toUpload">
                             {{ $t('license.levelUpPro') }}
                         </el-button>
+                    </el-form-item>
+
+                    <el-form-item :label="$t('cronjob.retainCopies')" prop="retainCopies">
+                        <el-input-number
+                            style="width: 200px"
+                            :min="1"
+                            step-strictly
+                            :step="1"
+                            v-model.number="dialogData.rowData!.retainCopies"
+                        ></el-input-number>
+                        <span v-if="isBackup()" class="input-help">{{ $t('cronjob.retainCopiesHelper1') }}</span>
+                        <span v-else class="input-help">{{ $t('cronjob.retainCopiesHelper') }}</span>
+                    </el-form-item>
+
+                    <el-form-item v-if="dialogData.rowData!.type === 'curl'" :label="$t('cronjob.url')" prop="url">
+                        <el-input clearable v-model.trim="dialogData.rowData!.url" />
                     </el-form-item>
 
                     <el-form-item
@@ -429,7 +429,6 @@ const dialogData = ref<DialogProps>({
 const globalStore = GlobalStore();
 const licenseRef = ref();
 const { isProductPro } = storeToRefs(globalStore);
-const alertTypes = ['app', 'website', 'database', 'directory', 'log', 'snapshot'];
 
 const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
@@ -805,17 +804,15 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         if (dialogData.value?.rowData?.exclusionRules) {
             dialogData.value.rowData.exclusionRules = dialogData.value.rowData.exclusionRules.replaceAll('\n', ',');
         }
-        if (alertTypes.includes(dialogData.value.rowData.type)) {
-            dialogData.value.rowData.alertCount =
-                dialogData.value.rowData!.hasAlert && isProductPro.value ? dialogData.value.rowData.alertCount : 0;
-            dialogData.value.rowData.alertTitle =
-                dialogData.value.rowData!.hasAlert && isProductPro.value
-                    ? i18n.global.t('cronjob.alertTitle', [
-                          i18n.global.t('cronjob.' + dialogData.value.rowData.type),
-                          dialogData.value.rowData.name,
-                      ])
-                    : '';
-        }
+        dialogData.value.rowData.alertCount =
+            dialogData.value.rowData!.hasAlert && isProductPro.value ? dialogData.value.rowData.alertCount : 0;
+        dialogData.value.rowData.alertTitle =
+            dialogData.value.rowData!.hasAlert && isProductPro.value
+                ? i18n.global.t('cronjob.alertTitle', [
+                      i18n.global.t('cronjob.' + dialogData.value.rowData.type),
+                      dialogData.value.rowData.name,
+                  ])
+                : '';
         if (!dialogData.value.rowData) return;
         if (dialogData.value.title === 'create') {
             await addCronjob(dialogData.value.rowData);
