@@ -19,6 +19,7 @@
                     @before="onBefore"
                     @after="onAfter"
                     @setting="onSetting"
+                    ref="appStatusRef"
                 ></AppStatus>
             </template>
             <template #search v-if="!isOnSetting && currentDB">
@@ -164,6 +165,7 @@ const redisIsExist = ref(false);
 const redisStatus = ref();
 const terminalShow = ref(false);
 
+const appStatusRef = ref();
 const commandVisible = ref(false);
 
 const redisCliExist = ref();
@@ -220,6 +222,7 @@ const goRouter = async (target: string) => {
 };
 
 const changeDatabase = async () => {
+    appStatusRef.value.onCheck();
     for (const item of dbOptionsLocal.value) {
         if (item.database == currentDBName.value) {
             currentDB.value = item;
