@@ -53,12 +53,6 @@
                     <el-form-item prop="hasSpec">
                         <el-checkbox v-model="dialogData.rowData!.hasSpec" :label="$t('toolbox.clam.cron')" />
                     </el-form-item>
-                    <el-form-item v-if="dialogData.rowData!.hasSpec && !isProductPro">
-                        <span>{{ $t('toolbox.clam.cronHelper') }}</span>
-                        <el-button link type="primary" @click="toUpload">
-                            {{ $t('license.levelUpPro') }}
-                        </el-button>
-                    </el-form-item>
                     <el-form-item prop="spec" v-if="dialogData.rowData!.hasSpec && isProductPro">
                         <el-select
                             class="specTypeClass"
@@ -125,7 +119,7 @@
                         <el-checkbox v-model="dialogData.rowData!.hasAlert" :label="$t('alert.isAlert')" />
                         <span class="input-help">{{ $t('alert.clamHelper') }}</span>
                     </el-form-item>
-                    <el-form-item v-if="dialogData.rowData!.hasAlert && !isProductPro">
+                    <el-form-item v-if="(dialogData.rowData!.hasAlert || dialogData.rowData!.hasSpec) && !isProductPro">
                         <span>{{ $t('toolbox.clam.alertHelper') }}</span>
                         <el-button link type="primary" @click="toUpload">
                             {{ $t('license.levelUpPro') }}
