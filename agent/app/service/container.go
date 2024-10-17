@@ -177,9 +177,17 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 	backDatas := make([]dto.ContainerInfo, len(records))
 	for i := 0; i < len(records); i++ {
 		item := records[i]
+		pathItem := ""
 		IsFromCompose := false
 		if _, ok := item.Labels[composeProjectLabel]; ok {
 			IsFromCompose = true
+			config := item.Labels[composeConfigLabel]
+			workdir := item.Labels[composeWorkdirLabel]
+			if len(config) != 0 && len(workdir) != 0 && strings.Contains(config, workdir) {
+				pathItem = config
+			} else {
+				pathItem = workdir
+			}
 		}
 		IsFromApp := false
 		if created, ok := item.Labels[composeCreatedBy]; ok && created == "Apps" {
@@ -199,9 +207,11 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 			IsFromApp:     IsFromApp,
 			IsFromCompose: IsFromCompose,
 		}
+		if info.IsFromCompose {
+			info.Path = path.Dir(pathItem)
+		}
 		install, _ := appInstallRepo.GetFirst(appInstallRepo.WithContainerName(info.Name))
 		if install.ID > 0 {
-			info.Path = install.GetPath()
 			info.AppInstallName = install.Name
 			info.AppName = install.App.Name
 			websites, _ := websiteRepo.GetBy(websiteRepo.WithAppInstallId(install.ID))
