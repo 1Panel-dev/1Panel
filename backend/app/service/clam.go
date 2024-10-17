@@ -21,7 +21,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/systemctl"
 	"github.com/1Panel-dev/1Panel/backend/utils/xpack"
-	"github.com/1Panel-dev/1Panel/backend/xpack/utils/alert"
 	"github.com/jinzhu/copier"
 	"github.com/robfig/cron/v3"
 
@@ -644,7 +643,7 @@ func handleAlert(stdout, clamName string, clamId uint) {
 						EntryID:   clamId,
 						Param:     strconv.Itoa(infectedFiles),
 					}
-					err := alert.PushAlert(pushAlert)
+					err := xpack.PushAlert(pushAlert)
 					if err != nil {
 						global.LOG.Errorf("clamdscan push failed, err: %v", err)
 					}
