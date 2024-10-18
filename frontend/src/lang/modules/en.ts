@@ -1918,7 +1918,7 @@ const message = {
         applySSL: 'Certificate Application',
         SSLList: 'Certificate List',
         createDnsAccount: 'DNS Account',
-        aliyun: 'Aliyun DNS',
+        aliyun: 'Aliyun',
         manual: 'Manual parsing',
         key: 'Key',
         check: 'View',
