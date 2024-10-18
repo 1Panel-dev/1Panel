@@ -478,11 +478,10 @@ import {
     SearchFavorite,
 } from '@/api/modules/files';
 import { computeSize, copyText, dateFormat, downloadFile, getFileType, getIcon, getRandomStr } from '@/utils/util';
-import { StarFilled, Star, Top, Right, Close } from '@element-plus/icons-vue';
 import { File } from '@/api/interface/file';
 import { Mimetypes, Languages } from '@/global/mimetype';
 import { useRouter } from 'vue-router';
-import { Back, Refresh } from '@element-plus/icons-vue';
+import { Back, Refresh, StarFilled, Star, Top, Right, Close } from '@element-plus/icons-vue';
 import { MsgWarning } from '@/utils/message';
 import { useSearchable } from './hooks/searchable';
 import { ResultData } from '@/api/interface';
@@ -612,7 +611,7 @@ const handleFilePatch = (command: string) => {
             openBatchRole(selects.value);
             break;
         case 'batchDelFiles':
-            openDetail(selects.value);
+            batchDelFiles();
             break;
         default:
             break;
