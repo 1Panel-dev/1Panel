@@ -94,7 +94,6 @@ import ComposeDetail from '@/views/container/compose/detail/index.vue';
 import { loadContainerLog, loadDockerStatus, searchCompose } from '@/api/modules/container';
 import i18n from '@/lang';
 import { Container } from '@/api/interface/container';
-import { loadBaseDir } from '@/api/modules/setting';
 import router from '@/routers';
 
 const data = ref();
@@ -102,7 +101,6 @@ const selects = ref<any>([]);
 const loading = ref(false);
 
 const isOnDetail = ref(false);
-const baseDir = ref();
 
 const paginationConfig = reactive({
     cacheSizeKey: 'container-compose-page-size',
@@ -133,12 +131,7 @@ const goSetting = async () => {
 };
 
 const toComposeFolder = async (row: Container.ComposeInfo) => {
-    router.push({ path: '/hosts/files', query: { path: baseDir.value + '/docker/compose/' + row.name } });
-};
-
-const loadPath = async () => {
-    const pathRes = await loadBaseDir();
-    baseDir.value = pathRes.data;
+    router.push({ path: '/hosts/files', query: { path: row.workdir } });
 };
 
 const search = async () => {
@@ -230,7 +223,6 @@ const buttons = [
     },
 ];
 onMounted(() => {
-    loadPath();
     loadStatus();
 });
 </script>
