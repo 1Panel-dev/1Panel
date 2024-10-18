@@ -557,14 +557,20 @@ func (u *ContainerService) ContainerInfo(req dto.OperationWithName) (*dto.Contai
 	bridgeNetworkSettings := networkSettings.Networks[data.Network]
 	if bridgeNetworkSettings.IPAMConfig != nil {
 		ipv4Address := bridgeNetworkSettings.IPAMConfig.IPv4Address
+		data.MacAddr = bridgeNetworkSettings.MacAddress
 		data.Ipv4 = ipv4Address
 		ipv6Address := bridgeNetworkSettings.IPAMConfig.IPv6Address
 		data.Ipv6 = ipv6Address
 	} else {
 		data.Ipv4 = bridgeNetworkSettings.IPAddress
 	}
+	data.Hostname = oldContainer.Config.Hostname
+	data.DNS = oldContainer.HostConfig.DNS
+	data.DomainName = oldContainer.Config.Domainname
 
 	data.Cmd = oldContainer.Config.Cmd
+	data.WorkingDir = oldContainer.Config.WorkingDir
+	data.User = oldContainer.Config.User
 	data.OpenStdin = oldContainer.Config.OpenStdin
 	data.Tty = oldContainer.Config.Tty
 	data.Entrypoint = oldContainer.Config.Entrypoint
@@ -973,7 +979,7 @@ func (u *ContainerService) ContainerStats(id string) (*dto.ContainerStats, error
 		return nil, err
 	}
 	res.Body.Close()
-	var stats *types.StatsJSON
+	var stats *container.StatsResponse
 	if err := json.Unmarshal(body, &stats); err != nil {
 		return nil, err
 	}
@@ -1037,7 +1043,7 @@ func stringsToMap(list []string) map[string]string {
 	return labelMap
 }
 
-func calculateCPUPercentUnix(stats *types.StatsJSON) float64 {
+func calculateCPUPercentUnix(stats *container.StatsResponse) float64 {
 	cpuPercent := 0.0
 	cpuDelta := float64(stats.CPUStats.CPUUsage.TotalUsage) - float64(stats.PreCPUStats.CPUUsage.TotalUsage)
 	systemDelta := float64(stats.CPUStats.SystemUsage) - float64(stats.PreCPUStats.SystemUsage)
@@ -1050,7 +1056,7 @@ func calculateCPUPercentUnix(stats *types.StatsJSON) float64 {
 	}
 	return cpuPercent
 }
-func calculateMemPercentUnix(memStats types.MemoryStats) float64 {
+func calculateMemPercentUnix(memStats container.MemoryStats) float64 {
 	memPercent := 0.0
 	memUsage := float64(memStats.Usage)
 	memLimit := float64(memStats.Limit)
@@ -1059,7 +1065,7 @@ func calculateMemPercentUnix(memStats types.MemoryStats) float64 {
 	}
 	return memPercent
 }
-func calculateBlockIO(blkio types.BlkioStats) (blkRead float64, blkWrite float64) {
+func calculateBlockIO(blkio container.BlkioStats) (blkRead float64, blkWrite float64) {
 	for _, bioEntry := range blkio.IoServiceBytesRecursive {
 		switch strings.ToLower(bioEntry.Op) {
 		case "read":
@@ -1070,7 +1076,7 @@ func calculateBlockIO(blkio types.BlkioStats) (blkRead float64, blkWrite float64
 	}
 	return
 }
-func calculateNetwork(network map[string]types.NetworkStats) (float64, float64) {
+func calculateNetwork(network map[string]container.NetworkStats) (float64, float64) {
 	var rx, tx float64
 
 	for _, v := range network {
@@ -1132,11 +1138,11 @@ func pullImages(ctx context.Context, client *client.Client, imageName string) er
 	return nil
 }
 
-func loadCpuAndMem(client *client.Client, container string) dto.ContainerListStats {
+func loadCpuAndMem(client *client.Client, containerItem string) dto.ContainerListStats {
 	data := dto.ContainerListStats{
-		ContainerID: container,
+		ContainerID: containerItem,
 	}
-	res, err := client.ContainerStats(context.Background(), container, false)
+	res, err := client.ContainerStats(context.Background(), containerItem, false)
 	if err != nil {
 		return data
 	}
@@ -1146,7 +1152,7 @@ func loadCpuAndMem(client *client.Client, container string) dto.ContainerListSta
 	if err != nil {
 		return data
 	}
-	var stats *types.StatsJSON
+	var stats *container.StatsResponse
 	if err := json.Unmarshal(body, &stats); err != nil {
 		return data
 	}
@@ -1235,6 +1241,10 @@ func loadConfigInfo(isCreate bool, req dto.ContainerOperate, oldContainer *types
 	config.ExposedPorts = exposed
 	config.OpenStdin = req.OpenStdin
 	config.Tty = req.Tty
+	config.Hostname = req.Hostname
+	config.Domainname = req.DomainName
+	config.User = req.User
+	config.WorkingDir = req.WorkingDir
 
 	if len(req.Network) != 0 {
 		switch req.Network {
@@ -1242,13 +1252,11 @@ func loadConfigInfo(isCreate bool, req dto.ContainerOperate, oldContainer *types
 			hostConf.NetworkMode = container.NetworkMode(req.Network)
 		}
 		if req.Ipv4 != "" || req.Ipv6 != "" {
-			networkConf.EndpointsConfig = map[string]*network.EndpointSettings{
-				req.Network: {
-					IPAMConfig: &network.EndpointIPAMConfig{
-						IPv4Address: req.Ipv4,
-						IPv6Address: req.Ipv6,
-					},
-				}}
+			networkConf.EndpointsConfig = map[string]*network.EndpointSettings{req.Network: {
+				IPAMConfig: &network.EndpointIPAMConfig{
+					IPv4Address: req.Ipv4,
+					IPv6Address: req.Ipv6,
+				}, MacAddress: req.MacAddr}}
 		} else {
 			networkConf.EndpointsConfig = map[string]*network.EndpointSettings{req.Network: {}}
 		}
@@ -1273,6 +1281,7 @@ func loadConfigInfo(isCreate bool, req dto.ContainerOperate, oldContainer *types
 	hostConf.PortBindings = portMap
 	hostConf.Binds = []string{}
 	hostConf.Mounts = []mount.Mount{}
+	hostConf.DNS = req.DNS
 	config.Volumes = make(map[string]struct{})
 	for _, volume := range req.Volumes {
 		if volume.Type == "volume" {

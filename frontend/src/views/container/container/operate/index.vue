@@ -128,30 +128,69 @@
 
                             <el-tabs type="border-card" class="mt-5">
                                 <el-tab-pane :label="$t('container.network')">
-                                    <el-form-item :label="$t('container.network')" prop="network">
-                                        <el-select class="mini-form-item" v-model="form.network">
-                                            <el-option
-                                                v-for="(item, indexV) of networks"
-                                                :key="indexV"
-                                                :value="item.option"
-                                                :label="item.option"
-                                            />
-                                        </el-select>
-                                    </el-form-item>
-                                    <el-form-item label="ipv4" prop="ipv4">
-                                        <el-input
-                                            class="mini-form-item"
-                                            v-model="form.ipv4"
-                                            :placeholder="$t('container.inputIpv4')"
-                                        />
-                                    </el-form-item>
-                                    <el-form-item label="ipv6" prop="ipv6">
-                                        <el-input
-                                            class="mini-form-item"
-                                            v-model="form.ipv6"
-                                            :placeholder="$t('container.inputIpv6')"
-                                        />
-                                    </el-form-item>
+                                    <el-row :gutter="20">
+                                        <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10">
+                                            <el-form-item :label="$t('container.network')" prop="network">
+                                                <el-select v-model="form.network">
+                                                    <el-option
+                                                        v-for="(item, indexV) of networks"
+                                                        :key="indexV"
+                                                        :value="item.option"
+                                                        :label="item.option"
+                                                    />
+                                                </el-select>
+                                            </el-form-item>
+                                        </el-col>
+                                        <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10">
+                                            <el-form-item :label="$t('toolbox.device.hostname')" prop="hostname">
+                                                <el-input v-model="form.hostname" />
+                                            </el-form-item>
+                                        </el-col>
+                                        <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10">
+                                            <el-form-item label="Domain" prop="domainName">
+                                                <el-input v-model="form.domainName" />
+                                            </el-form-item>
+                                        </el-col>
+                                        <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10">
+                                            <el-form-item :label="$t('container.macAddr')" prop="macAddr">
+                                                <el-input v-model="form.macAddr" />
+                                            </el-form-item>
+                                        </el-col>
+                                        <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10">
+                                            <el-form-item label="IPv4" prop="ipv4">
+                                                <el-input
+                                                    v-model="form.ipv4"
+                                                    :placeholder="$t('container.inputIpv4')"
+                                                />
+                                            </el-form-item>
+                                        </el-col>
+                                        <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10">
+                                            <el-form-item label="IPv6" prop="ipv6">
+                                                <el-input
+                                                    v-model="form.ipv6"
+                                                    :placeholder="$t('container.inputIpv6')"
+                                                />
+                                            </el-form-item>
+                                        </el-col>
+                                        <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10">
+                                            <el-form-item label="DNS" prop="dns">
+                                                <div v-for="(_, index) of form.dns" :key="index" class="w-full">
+                                                    <el-input class="mt-2" v-model="form.dns[index]">
+                                                        <template #append>
+                                                            <el-button
+                                                                link
+                                                                icon="Delete"
+                                                                @click="form.dns.splice(index, 1)"
+                                                            />
+                                                        </template>
+                                                    </el-input>
+                                                </div>
+                                                <el-button @click="form.dns.push('')">
+                                                    {{ $t('commons.button.add') }}
+                                                </el-button>
+                                            </el-form-item>
+                                        </el-col>
+                                    </el-row>
                                 </el-tab-pane>
 
                                 <el-tab-pane :label="$t('container.mount')">
@@ -226,16 +265,40 @@
                                     </el-form-item>
                                 </el-tab-pane>
 
-                                <el-tab-pane label="Command">
-                                    <el-form-item label="Command" prop="cmdStr">
-                                        <el-input v-model="form.cmdStr" :placeholder="$t('container.cmdHelper')" />
-                                    </el-form-item>
-                                    <el-form-item label="Entrypoint" prop="entrypointStr">
-                                        <el-input
-                                            v-model="form.entrypointStr"
-                                            :placeholder="$t('container.entrypointHelper')"
-                                        />
-                                    </el-form-item>
+                                <el-tab-pane :label="$t('terminal.command')">
+                                    <el-row :gutter="20">
+                                        <el-col :xs="24" :sm="20" :md="20" :lg="20" :xl="20">
+                                            <el-form-item label="Command" prop="cmdStr">
+                                                <el-input
+                                                    v-model="form.cmdStr"
+                                                    :placeholder="$t('container.cmdHelper')"
+                                                />
+                                            </el-form-item>
+                                        </el-col>
+                                    </el-row>
+                                    <el-row :gutter="20">
+                                        <el-col :xs="24" :sm="20" :md="20" :lg="20" :xl="20">
+                                            <el-form-item label="Entrypoint" prop="entrypointStr">
+                                                <el-input
+                                                    v-model="form.entrypointStr"
+                                                    :placeholder="$t('container.entrypointHelper')"
+                                                />
+                                            </el-form-item>
+                                        </el-col>
+                                    </el-row>
+
+                                    <el-row :gutter="20">
+                                        <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10">
+                                            <el-form-item :label="$t('container.workingDir')" prop="workingDir">
+                                                <el-input v-model="form.workingDir" />
+                                            </el-form-item>
+                                        </el-col>
+                                        <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10">
+                                            <el-form-item :label="$t('commons.table.user')" prop="user">
+                                                <el-input v-model="form.user" />
+                                            </el-form-item>
+                                        </el-col>
+                                    </el-row>
                                     <el-form-item :label="$t('container.console')">
                                         <el-checkbox v-model="form.tty">{{ $t('container.tty') }}</el-checkbox>
                                         <el-checkbox v-model="form.openStdin">
@@ -285,22 +348,52 @@
                                 </el-tab-pane>
 
                                 <el-tab-pane :label="$t('container.tag') + ' & ' + $t('container.env')">
-                                    <el-form-item :label="$t('container.tag')" prop="labelsStr">
-                                        <el-input
-                                            type="textarea"
-                                            :placeholder="$t('container.tagHelper')"
-                                            :rows="3"
-                                            v-model="form.labelsStr"
-                                        />
-                                    </el-form-item>
-                                    <el-form-item :label="$t('container.env')" prop="envStr">
-                                        <el-input
-                                            type="textarea"
-                                            :placeholder="$t('container.tagHelper')"
-                                            :rows="3"
-                                            v-model="form.envStr"
-                                        />
-                                    </el-form-item>
+                                    <el-row :gutter="20">
+                                        <el-col :xs="24" :sm="20" :md="20" :lg="20" :xl="20">
+                                            <el-form-item :label="$t('container.tag')" prop="labels">
+                                                <div v-for="(_, index) of form.labels" :key="index" class="w-full">
+                                                    <el-input
+                                                        class="mt-2"
+                                                        placeholder="e.g. key=val"
+                                                        v-model="form.labels[index]"
+                                                    >
+                                                        <template #append>
+                                                            <el-button
+                                                                link
+                                                                icon="Delete"
+                                                                @click="form.labels.splice(index, 1)"
+                                                            />
+                                                        </template>
+                                                    </el-input>
+                                                </div>
+                                                <el-button @click="form.labels.push('')">
+                                                    {{ $t('commons.button.add') }}
+                                                </el-button>
+                                            </el-form-item>
+                                        </el-col>
+                                        <el-col :xs="24" :sm="20" :md="20" :lg="20" :xl="20">
+                                            <el-form-item :label="$t('container.env')" prop="envStr">
+                                                <div v-for="(_, index) of form.env" :key="index" class="w-full">
+                                                    <el-input
+                                                        class="mt-2"
+                                                        placeholder="e.g. key=val"
+                                                        v-model="form.env[index]"
+                                                    >
+                                                        <template #append>
+                                                            <el-button
+                                                                link
+                                                                icon="Delete"
+                                                                @click="form.env.splice(index, 1)"
+                                                            />
+                                                        </template>
+                                                    </el-input>
+                                                </div>
+                                                <el-button @click="form.env.push('')">
+                                                    {{ $t('commons.button.add') }}
+                                                </el-button>
+                                            </el-form-item>
+                                        </el-col>
+                                    </el-row>
                                 </el-tab-pane>
 
                                 <el-tab-pane :label="$t('container.restartPolicy')">
@@ -364,12 +457,18 @@ const form = reactive<Container.ContainerHelper>({
     imageInput: false,
     forcePull: false,
     network: '',
+    hostname: '',
+    domainName: '',
+    macAddr: '',
     ipv4: '',
     ipv6: '',
+    dns: [],
     cmdStr: '',
     entrypointStr: '',
     memoryItem: 0,
     cmd: [],
+    workingDir: '',
+    user: '',
     openStdin: false,
     tty: false,
     entrypoint: [],
@@ -382,58 +481,64 @@ const form = reactive<Container.ContainerHelper>({
     privileged: false,
     autoRemove: false,
     labels: [],
-    labelsStr: '',
     env: [],
-    envStr: '',
     restartPolicy: 'no',
 });
 const search = async () => {
     if (!isCreate.value) {
-        const res = await loadContainerInfo(form.containerID);
-        if (res.data) {
-            form.name = res.data.name;
-            form.image = res.data.image;
-            form.network = res.data.network;
-            form.ipv4 = res.data.ipv4;
-            form.ipv6 = res.data.ipv6;
-            form.openStdin = res.data.openStdin;
-            form.tty = res.data.tty;
-            form.publishAllPorts = res.data.publishAllPorts;
-            form.nanoCPUs = res.data.nanoCPUs;
-            form.cpuShares = res.data.cpuShares;
-            form.privileged = res.data.privileged;
-            form.autoRemove = res.data.autoRemove;
-            form.restartPolicy = res.data.restartPolicy;
-            form.memory = Number(res.data.memory.toFixed(2));
-            form.cmd = res.data.cmd || [];
-            let itemCmd = '';
-            for (const item of form.cmd) {
-                itemCmd += `'${item}' `;
-            }
-            form.cmdStr = itemCmd ? itemCmd.substring(0, itemCmd.length - 1) : '';
-
-            let itemEntrypoint = '';
-            if (res.data.entrypoint) {
-                for (const item of res.data.entrypoint) {
-                    itemEntrypoint += `'${item}' `;
+        loading.value = true;
+        await loadContainerInfo(form.containerID)
+            .then((res) => {
+                loading.value = false;
+                form.name = res.data.name;
+                form.image = res.data.image;
+                form.network = res.data.network;
+                form.hostname = res.data.hostname;
+                form.domainName = res.data.domainName;
+                form.dns = res.data.dns;
+                form.ipv4 = res.data.ipv4;
+                form.ipv6 = res.data.ipv6;
+                form.openStdin = res.data.openStdin;
+                form.tty = res.data.tty;
+                form.publishAllPorts = res.data.publishAllPorts;
+                form.nanoCPUs = res.data.nanoCPUs;
+                form.cpuShares = res.data.cpuShares;
+                form.privileged = res.data.privileged;
+                form.autoRemove = res.data.autoRemove;
+                form.restartPolicy = res.data.restartPolicy;
+                form.memory = Number(res.data.memory.toFixed(2));
+                form.cmd = res.data.cmd || [];
+                form.user = res.data.user;
+                form.workingDir = res.data.workingDir;
+                let itemCmd = '';
+                for (const item of form.cmd) {
+                    itemCmd += `'${item}' `;
                 }
-            }
+                form.cmdStr = itemCmd ? itemCmd.substring(0, itemCmd.length - 1) : '';
 
-            form.entrypointStr = itemEntrypoint ? itemEntrypoint.substring(0, itemEntrypoint.length - 1) : '';
-            form.labels = res.data.labels || [];
-            form.env = res.data.env || [];
-            form.labelsStr = res.data.labels.join('\n');
-            form.envStr = res.data.env.join('\n');
-            form.exposedPorts = res.data.exposedPorts || [];
-            for (const item of res.data.exposedPorts) {
-                if (item.hostIP) {
-                    item.host = item.hostIP + ':' + item.hostPort;
-                } else {
-                    item.host = item.hostPort;
+                let itemEntrypoint = '';
+                if (res.data.entrypoint) {
+                    for (const item of res.data.entrypoint) {
+                        itemEntrypoint += `'${item}' `;
+                    }
                 }
-            }
-            form.volumes = res.data.volumes || [];
-        }
+
+                form.entrypointStr = itemEntrypoint ? itemEntrypoint.substring(0, itemEntrypoint.length - 1) : '';
+                form.labels = res.data.labels || [];
+                form.env = res.data.env || [];
+                form.exposedPorts = res.data.exposedPorts || [];
+                for (const item of res.data.exposedPorts) {
+                    if (item.hostIP) {
+                        item.host = item.hostIP + ':' + item.hostPort;
+                    } else {
+                        item.host = item.hostPort;
+                    }
+                }
+                form.volumes = res.data.volumes || [];
+            })
+            .catch(() => {
+                loading.value = false;
+            });
     }
     loadLimit();
     loadImageOptions();
@@ -530,12 +635,6 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        if (form.envStr) {
-            form.env = form.envStr.split('\n');
-        }
-        if (form.labelsStr) {
-            form.labels = form.labelsStr.split('\n');
-        }
         form.cmd = [];
         if (form.cmdStr) {
             if (form.cmdStr.indexOf(`'`) !== -1) {

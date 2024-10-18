@@ -55,12 +55,18 @@ export namespace Container {
         imageInput: boolean;
         forcePull: boolean;
         network: string;
+        hostname: string;
+        domainName: string;
+        macAddr: string;
         ipv4: string;
         ipv6: string;
+        dns: Array<string>;
         cmdStr: string;
         entrypointStr: string;
         memoryItem: number;
         cmd: Array<string>;
+        workingDir: string;
+        user: string;
         openStdin: boolean;
         tty: boolean;
         entrypoint: Array<string>;
@@ -73,9 +79,7 @@ export namespace Container {
         privileged: boolean;
         autoRemove: boolean;
         labels: Array<string>;
-        labelsStr: string;
         env: Array<string>;
-        envStr: string;
         restartPolicy: string;
     }
     export interface Port {
