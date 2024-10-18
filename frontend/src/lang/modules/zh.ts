@@ -1783,7 +1783,7 @@ const message = {
         applySSL: '证书申请',
         SSLList: '证书列表',
         createDnsAccount: 'DNS账户',
-        aliyun: '阿里云DNS',
+        aliyun: '阿里云',
         manual: '手动解析',
         key: '密钥',
         check: '查看',

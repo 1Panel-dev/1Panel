@@ -1781,7 +1781,7 @@ const message = {
         applySSL: '證書申請',
         SSLList: '證書列表',
         createDnsAccount: 'DNS賬戶',
-        aliyun: '阿裏雲DNS',
+        aliyun: '阿裏雲',
         manual: '手動解析',
         key: '密鑰',
         check: '查看',

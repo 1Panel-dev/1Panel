@@ -290,7 +290,7 @@ defineExpose({ changeTail, onDownload, clearLog });
     overflow-y: auto;
     overflow-x: auto;
     position: relative;
-    background-color: #121212;
+    background-color: #1e1e1e;
     margin-top: 10px;
 }
 
@@ -306,5 +306,11 @@ defineExpose({ changeTail, onDownload, clearLog });
     color: #f5f5f5;
     box-sizing: border-box;
     white-space: nowrap;
+}
+
+.log-item span {
+    font-size: 14px;
+    font-weight: 300;
+    color: #cccccc;
 }
 </style>
