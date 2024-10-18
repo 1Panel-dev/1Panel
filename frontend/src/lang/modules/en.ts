@@ -636,6 +636,7 @@ const message = {
         cleanLogHelper:
             'Clearing logs requires restarting the container, and this operation cannot be rolled back. Do you want to continue?',
         newName: 'New name',
+        workingDir: 'Working Dir',
         source: 'Resource Rate',
         cpuUsage: 'CPU Usage',
         cpuTotal: 'CPU Total',
@@ -688,6 +689,7 @@ const message = {
         cpuQuota: 'NacosCPU',
         memoryLimit: 'Memory',
         limitHelper: 'If you limit it to 0, then the limitation is turned off, and the maximum available is {0}.',
+        macAddr: 'MAC Address',
         mount: 'Mount',
         volumeOption: 'Volume',
         hostOption: 'Host',
