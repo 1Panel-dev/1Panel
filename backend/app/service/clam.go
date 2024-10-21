@@ -633,9 +633,9 @@ func handleAlert(stdout, clamName string, clamId uint) {
 	if strings.Contains(stdout, "- SCAN SUMMARY -") {
 		lines := strings.Split(stdout, "\n")
 		for _, line := range lines {
-			if strings.HasPrefix(line, "Infected files:") {
+			if strings.HasPrefix(line, "Infected files: ") {
 				var infectedFiles = 0
-				infectedFiles, _ = strconv.Atoi(strings.TrimPrefix(line, "Infected files:"))
+				infectedFiles, _ = strconv.Atoi(strings.TrimPrefix(line, "Infected files: "))
 				if infectedFiles > 0 {
 					pushAlert := dto.PushAlert{
 						TaskName:  clamName,
