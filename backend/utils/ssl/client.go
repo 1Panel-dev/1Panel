@@ -3,7 +3,6 @@ package ssl
 import (
 	"crypto"
 	"encoding/json"
-	"github.com/1Panel-dev/1Panel/backend/utils/ssl/huaweicloud"
 	"os"
 	"strings"
 	"time"
@@ -19,6 +18,7 @@ import (
 	"github.com/go-acme/lego/v4/providers/dns/cloudflare"
 	"github.com/go-acme/lego/v4/providers/dns/dnspod"
 	"github.com/go-acme/lego/v4/providers/dns/godaddy"
+	"github.com/go-acme/lego/v4/providers/dns/huaweicloud"
 	"github.com/go-acme/lego/v4/providers/dns/namecheap"
 	"github.com/go-acme/lego/v4/providers/dns/namedotcom"
 	"github.com/go-acme/lego/v4/providers/dns/namesilo"
@@ -199,7 +199,7 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string, websiteSSL model.Web
 		dns01.CondOption(len(nameservers) > 0,
 			dns01.AddRecursiveNameservers(nameservers)),
 		dns01.CondOption(websiteSSL.SkipDNS,
-			dns01.DisableCompletePropagationRequirement()),
+			dns01.DisableAuthoritativeNssPropagationRequirement()),
 		dns01.AddDNSTimeout(10*time.Minute),
 	)
 }
