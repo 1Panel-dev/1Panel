@@ -92,6 +92,10 @@ let timer: NodeJS.Timer | null = null;
 
 const em = defineEmits(['search']);
 
+watch(open, (val) => {
+    if (screenfull.isEnabled && !val && !mobile.value) screenfull.exit();
+});
+
 const mobile = computed(() => {
     return globalStore.isMobile();
 });

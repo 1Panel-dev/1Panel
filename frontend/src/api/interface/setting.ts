@@ -29,6 +29,7 @@ export namespace Setting {
         bindAddress: string;
         ssl: string;
         sslType: string;
+        autoRestart: string;
         allowIPs: string;
         bindDomain: string;
         securityEntrance: string;

@@ -95,6 +95,8 @@ func Init() {
 		migrations.AddClamStatus,
 		migrations.AddAlertMenu,
 		migrations.AddComposeColumn,
+
+		migrations.AddAutoRestart,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

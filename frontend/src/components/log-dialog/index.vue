@@ -4,6 +4,7 @@
         :destroy-on-close="true"
         :close-on-click-modal="false"
         :close-on-press-escape="false"
+        :before-close="handleClose"
         :size="globalStore.isFullScreen ? '100%' : '50%'"
     >
         <template #header>
@@ -21,10 +22,10 @@
     </el-drawer>
 </template>
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import LogFile from '@/components/log-file/index.vue';
-import { GlobalStore } from '@/store';
 import screenfull from 'screenfull';
+import { GlobalStore } from '@/store';
 import i18n from '@/lang';
 
 const globalStore = GlobalStore();
@@ -45,19 +46,22 @@ const open = ref(false);
 const config = ref();
 const em = defineEmits(['close']);
 
-const handleClose = (search: boolean) => {
+const handleClose = () => {
     open.value = false;
-    em('close', search);
+    em('close', false);
+    globalStore.isFullScreen = false;
 };
 
+watch(open, (val) => {
+    if (screenfull.isEnabled && !val && !mobile.value) screenfull.exit();
+});
+
 function toggleFullscreen() {
-    if (screenfull.isEnabled) {
-        screenfull.toggle();
-    }
+    globalStore.isFullScreen = !globalStore.isFullScreen;
 }
 
 const loadTooltip = () => {
-    return i18n.global.t('commons.button.' + (screenfull.isFullscreen ? 'quitFullscreen' : 'fullscreen'));
+    return i18n.global.t('commons.button.' + (globalStore.isFullScreen ? 'quitFullscreen' : 'fullscreen'));
 };
 
 const acceptParams = (props: LogProps) => {
