@@ -56,7 +56,7 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, e
 		opts []repo.DBOption
 	)
 	if create.Name != "" {
-		opts = append(opts, commonRepo.WithLikeName(create.Name))
+		opts = append(opts, commonRepo.WithByName(create.Name))
 	}
 	if create.Type != "" {
 		opts = append(opts, commonRepo.WithByType(create.Type))
