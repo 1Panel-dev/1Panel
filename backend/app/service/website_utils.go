@@ -3,7 +3,6 @@ package service
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/utils/xpack"
 	"log"
 	"os"
 	"path"
@@ -12,6 +11,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/utils/xpack"
 
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/global"
@@ -1001,20 +1002,23 @@ func saveCertificateFile(websiteSSL *model.WebsiteSSL, logger *log.Logger) {
 	}
 }
 
-func GetSystemSSL() (bool, uint) {
+func GetSystemSSL() (bool, bool, uint) {
 	sslSetting, err := settingRepo.Get(settingRepo.WithByKey("SSL"))
 	if err != nil {
 		global.LOG.Errorf("load service ssl from setting failed, err: %v", err)
-		return false, 0
+		return false, false, 0
 	}
 	if sslSetting.Value == "enable" {
 		sslID, _ := settingRepo.Get(settingRepo.WithByKey("SSLID"))
 		idValue, _ := strconv.Atoi(sslID.Value)
-		if idValue > 0 {
-			return true, uint(idValue)
+		if idValue <= 0 {
+			return false, false, 0
 		}
+
+		auto, _ := settingRepo.Get(settingRepo.WithByKey("AutoRestart"))
+		return true, auto.Value == "enable", uint(idValue)
 	}
-	return false, 0
+	return false, false, 0
 }
 
 func UpdateSSLConfig(websiteSSL model.WebsiteSSL) error {
@@ -1033,7 +1037,7 @@ func UpdateSSLConfig(websiteSSL model.WebsiteSSL) error {
 			return buserr.WithErr(constant.ErrSSLApply, err)
 		}
 	}
-	enable, sslID := GetSystemSSL()
+	enable, auto, sslID := GetSystemSSL()
 	if enable && sslID == websiteSSL.ID {
 		fileOp := files.NewFileOp()
 		secretDir := path.Join(global.CONF.System.BaseDir, "1panel/secret")
@@ -1044,6 +1048,9 @@ func UpdateSSLConfig(websiteSSL model.WebsiteSSL) error {
 		if err := fileOp.WriteFile(path.Join(secretDir, "server.key"), strings.NewReader(websiteSSL.PrivateKey), 0600); err != nil {
 			global.LOG.Errorf("Failed to update the SSL certificate for 1Panel System domain [%s] , err:%s", websiteSSL.PrimaryDomain, err.Error())
 			return err
+		}
+		if auto {
+			_, _ = cmd.Exec("systemctl restart 1panel.service")
 		}
 	}
 	return nil
