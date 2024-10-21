@@ -324,3 +324,13 @@ var AddComposeColumn = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddAutoRestart = &gormigrate.Migration{
+	ID: "20241021-add-auto-restart",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Create(&model.Setting{Key: "AutoRestart", Value: "enable"}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}

@@ -30,6 +30,7 @@ type SettingInfo struct {
 	ServerPort             string `json:"serverPort"`
 	SSL                    string `json:"ssl"`
 	SSLType                string `json:"sslType"`
+	AutoRestart            string `json:"autoRestart"`
 	BindDomain             string `json:"bindDomain"`
 	AllowIPs               string `json:"allowIPs"`
 	SecurityEntrance       string `json:"securityEntrance"`
@@ -73,12 +74,13 @@ type SettingUpdate struct {
 }
 
 type SSLUpdate struct {
-	SSLType string `json:"sslType" validate:"required,oneof=self select import import-paste import-local"`
-	Domain  string `json:"domain"`
-	SSL     string `json:"ssl" validate:"required,oneof=enable disable"`
-	Cert    string `json:"cert"`
-	Key     string `json:"key"`
-	SSLID   uint   `json:"sslID"`
+	SSLType     string `json:"sslType" validate:"required,oneof=self select import import-paste import-local"`
+	Domain      string `json:"domain"`
+	SSL         string `json:"ssl" validate:"required,oneof=enable disable"`
+	Cert        string `json:"cert"`
+	Key         string `json:"key"`
+	SSLID       uint   `json:"sslID"`
+	AutoRestart string `json:"autoRestart"`
 }
 type SSLInfo struct {
 	Domain   string `json:"domain"`

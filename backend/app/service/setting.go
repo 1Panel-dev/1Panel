@@ -322,6 +322,9 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 	if err := settingRepo.Update("SSL", req.SSL); err != nil {
 		return err
 	}
+	if err := settingRepo.Update("AutoRestart", req.AutoRestart); err != nil {
+		return err
+	}
 
 	sID, _ := c.Cookie(constant.SessionName)
 	c.SetCookie(constant.SessionName, sID, 0, "", "", true, true)

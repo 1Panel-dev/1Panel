@@ -10,6 +10,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/service"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 )
@@ -22,7 +23,7 @@ func NewSSLJob() *ssl {
 }
 
 func (ssl *ssl) Run() {
-	systemSSLEnable, sslID := service.GetSystemSSL()
+	systemSSLEnable, auto, sslID := service.GetSystemSSL()
 	sslRepo := repo.NewISSLRepo()
 	sslService := service.NewIWebsiteSSLService()
 	sslList, _ := sslRepo.List()
@@ -69,6 +70,9 @@ func (ssl *ssl) Run() {
 				if err := fileOp.WriteFile(path.Join(secretDir, "server.key"), strings.NewReader(websiteSSL.PrivateKey), 0600); err != nil {
 					global.LOG.Errorf("Failed to update the SSL certificate for 1Panel System domain [%s] , err:%s", s.PrimaryDomain, err.Error())
 					continue
+				}
+				if auto {
+					_, _ = cmd.Exec("systemctl restart 1panel.service")
 				}
 			}
 			global.LOG.Infof("The SSL certificate for the [%s] domain has been successfully updated", s.PrimaryDomain)

@@ -11,13 +11,6 @@
             <template #header>
                 <DrawerHeader :header="$t('setting.panelSSL')" :back="handleClose" />
             </template>
-            <el-alert class="common-prompt" :closable="false" type="error">
-                <template #default>
-                    <span>
-                        <span>{{ $t('setting.panelSSLHelper') }}</span>
-                    </span>
-                </template>
-            </el-alert>
             <el-form ref="formRef" label-position="top" :model="form" :rules="rules" v-loading="loading">
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
@@ -40,7 +33,9 @@
 
                         <el-form-item v-if="form.timeout">
                             <el-tag>{{ $t('setting.domainOrIP') }} {{ form.domain }}</el-tag>
-                            <el-tag style="margin-left: 5px">{{ $t('setting.timeOut') }} {{ form.timeout }}</el-tag>
+                            <el-tag style="margin-left: 5px">
+                                {{ $t('setting.timeOut') }} {{ dateFormat('', '', form.timeout) }}
+                            </el-tag>
                             <el-button
                                 @click="onDownload"
                                 style="margin-left: 5px"
@@ -117,6 +112,14 @@
                                 </el-descriptions-item>
                             </el-descriptions>
                         </div>
+                        <el-form-item v-if="form.sslType !== 'import'">
+                            <el-checkbox true-value="enable" false-value="disable" v-model="form.autoRestart">
+                                {{ $t('setting.sslAutoRestart') }}
+                            </el-checkbox>
+                            <span v-if="form.autoRestart === 'disable'" class="input-help">
+                                {{ $t('setting.sslChangeHelper1') }}
+                            </span>
+                        </el-form-item>
                     </el-col>
                 </el-row>
             </el-form>
@@ -133,7 +136,7 @@
 </template>
 <script lang="ts" setup>
 import { Website } from '@/api/interface/website';
-import { dateFormatSimple, getProvider } from '@/utils/util';
+import { dateFormatSimple, dateFormat, getProvider } from '@/utils/util';
 import { ListSSL } from '@/api/modules/website';
 import { reactive, ref } from 'vue';
 import i18n from '@/lang';
@@ -159,6 +162,7 @@ const form = reactive({
     key: '',
     rootPath: '',
     timeout: '',
+    autoRestart: 'disable',
 });
 
 const rules = reactive({
@@ -175,6 +179,7 @@ const itemSSL = ref();
 interface DialogProps {
     sslType: string;
     sslInfo?: Setting.SSLInfo;
+    autoRestart: string;
 }
 const acceptParams = async (params: DialogProps): Promise<void> => {
     if (params.sslType.indexOf('-') !== -1) {
@@ -197,6 +202,7 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     } else {
         loadSSLs();
     }
+    form.autoRestart = params.autoRestart;
     drawerVisible.value = true;
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
@@ -237,7 +243,10 @@ const onSaveSSL = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        ElMessageBox.confirm(i18n.global.t('setting.sslChangeHelper'), 'https', {
+        let msg = !form.autoRestart
+            ? i18n.global.t('setting.sslChangeHelper1') + '\n\n\n' + 'qwdqwdqwd'
+            : i18n.global.t('setting.sslChangeHelper2');
+        ElMessageBox.confirm(msg, i18n.global.t('setting.panelSSL'), {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
             cancelButtonText: i18n.global.t('commons.button.cancel'),
             type: 'info',
@@ -253,6 +262,7 @@ const onSaveSSL = async (formEl: FormInstance | undefined) => {
                 sslID: form.sslID,
                 cert: form.cert,
                 key: form.key,
+                autoRestart: form.autoRestart,
             };
             let href = window.location.href;
             param.domain = href.split('//')[1].split(':')[0];
