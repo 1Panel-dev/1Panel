@@ -51,7 +51,8 @@ func (ssl *ssl) Run() {
 				}
 			} else {
 				if err := sslService.ObtainSSL(request.WebsiteSSLApply{
-					ID: s.ID,
+					ID:         s.ID,
+					DisableLog: true,
 				}); err != nil {
 					global.LOG.Errorf("Failed to update the SSL certificate for the [%s] domain , err:%s", s.PrimaryDomain, err.Error())
 					continue
