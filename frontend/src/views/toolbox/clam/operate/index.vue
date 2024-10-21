@@ -387,6 +387,10 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
                 MsgError(i18n.global.t('cronjob.cronSpecHelper'));
                 return;
             }
+        }
+        dialogData.value.rowData.spec = spec;
+
+        if (dialogData.value.rowData!.hasAlert) {
             dialogData.value.rowData.alertCount = dialogData.value.rowData!.hasAlert
                 ? dialogData.value.rowData.alertCount
                 : 0;
@@ -398,7 +402,6 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             dialogData.value.rowData.alertCount = 0;
             dialogData.value.rowData.hasAlert = false;
         }
-        dialogData.value.rowData.spec = spec;
 
         if (dialogData.value.title === 'edit') {
             await updateClam(dialogData.value.rowData)
