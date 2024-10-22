@@ -1743,6 +1743,7 @@ const message = {
         introduce: 'Feature Introduction',
         waf: 'Upgrading to the professional version can provide features such as interception map, logs, block records, geographical location blocking, custom rules, custom interception pages, etc.',
         tamper: 'Upgrading to the professional version can protect websites from unauthorized modifications or tampering.',
+        tamperHelper: 'Operation failed, the file or folder has tamper protection enabled. Please check and try again!',
         gpu: 'Upgrading to the professional version can help users visually monitor important parameters of GPU such as workload, temperature, memory usage in real time.',
         setting:
             'Upgrading to the professional version allows customization of panel logo, welcome message, and other information.',
