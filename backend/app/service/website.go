@@ -309,6 +309,10 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		if err != nil {
 			return err
 		}
+		if err = docker.CreateDefaultDockerNetwork(); err != nil {
+			err = buserr.WithDetail(constant.Err1PanelNetworkFailed, err.Error(), nil)
+			return
+		}
 		website.RuntimeID = runtime.ID
 		switch runtime.Type {
 		case constant.RuntimePHP:
