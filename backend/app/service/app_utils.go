@@ -1342,6 +1342,18 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool)
 			continue
 		}
 		lastVersion := versions[0]
+		if app.Key == constant.AppMysql {
+			for _, version := range versions {
+				majorVersion := getMajorVersion(installed.Version)
+				if !strings.HasPrefix(version, majorVersion) {
+					continue
+				} else {
+					lastVersion = version
+					break
+				}
+			}
+		}
+
 		if common.IsCrossVersion(installed.Version, lastVersion) {
 			installDTO.CanUpdate = app.CrossVersionUpdate
 		} else {
