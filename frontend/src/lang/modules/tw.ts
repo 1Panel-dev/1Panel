@@ -1071,7 +1071,7 @@ const message = {
             freshClam: '病毒庫刷新配置',
             freshClamLog: '病毒庫刷新日誌',
             alertHelper: '專業版支持定時掃描和短信告警功能',
-            alertTitle: '病毒掃描「{0}」任務失敗告警',
+            alertTitle: '病毒掃描「{0}」任務检测到感染文件告警',
         },
     },
     logs: {
