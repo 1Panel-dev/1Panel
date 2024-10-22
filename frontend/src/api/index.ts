@@ -6,6 +6,7 @@ import router from '@/routers';
 import { GlobalStore } from '@/store';
 import { MsgError } from '@/utils/message';
 import { Base64 } from 'js-base64';
+import i18n from '@/lang';
 
 const globalStore = GlobalStore();
 
@@ -90,6 +91,10 @@ class RequestHttp {
                     return data;
                 }
                 if (data.code && data.code !== ResultEnum.SUCCESS) {
+                    if (data.message.toLowerCase().indexOf('operation not permitted') !== -1) {
+                        MsgError(i18n.global.t('license.tamperHelper'));
+                        return data;
+                    }
                     MsgError(data.message);
                     return Promise.reject(data);
                 }
