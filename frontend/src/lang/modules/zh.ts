@@ -1073,7 +1073,7 @@ const message = {
             freshClam: '病毒库刷新配置',
             freshClamLog: '病毒库刷新日志',
             alertHelper: '专业版支持定时扫描和短信告警功能',
-            alertTitle: '病毒扫描「 {0} 」任务失败告警',
+            alertTitle: '病毒扫描「 {0} 」任务检测到感染文件告警',
         },
     },
     logs: {

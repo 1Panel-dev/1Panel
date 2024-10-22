@@ -1134,7 +1134,7 @@ const message = {
             freshClam: 'Update Virus Definitions',
             freshClamLog: 'Update Virus Definitions Logs',
             alertHelper: 'Professional version supports scheduled scan and SMS alert',
-            alertTitle: 'Virus scanning 「{0}」 task failed alert',
+            alertTitle: 'Virus scan task 「{0}」 detected infected file alert',
         },
     },
     logs: {
