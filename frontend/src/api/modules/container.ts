@@ -43,7 +43,7 @@ export const containerRename = (params: Container.ContainerRename) => {
     return http.post(`/containers/rename`, params);
 };
 export const containerOperator = (params: Container.ContainerOperate) => {
-    return http.post(`/containers/operate`, params);
+    return http.post(`/containers/operate`, params, TimeoutEnum.T_60S);
 };
 export const containerPrune = (params: Container.ContainerPrune) => {
     return http.post<Container.ContainerPruneReport>(`/containers/prune`, params);
