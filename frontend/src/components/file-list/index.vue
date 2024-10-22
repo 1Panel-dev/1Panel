@@ -188,7 +188,7 @@ const closePage = () => {
 
 const openPage = () => {
     popoverVisible.value = true;
-    selectRow.value.path = props.path || '/';
+    selectRow.value.path = props.dir ? props.path || '/' : '';
     rowName.value = '';
 };
 
@@ -216,7 +216,7 @@ const open = async (row: File.File) => {
         }
         await search(req);
     }
-    selectRow.value.path = req.path;
+    selectRow.value.path = props.dir ? req.path : '';
     rowName.value = '';
 };
 
@@ -230,7 +230,7 @@ const jump = async (index: number) => {
     }
     path = path || '/';
     req.path = path;
-    selectRow.value.path = req.path;
+    selectRow.value.path = props.dir ? req.path : '';
     rowName.value = '';
     await search(req);
     popoverVisible.value = true;
@@ -286,7 +286,7 @@ const cancelFolder = (row: any) => {
     data.value.shift();
     row.isCreate = false;
     disBtn.value = false;
-    selectRow.value.path = req.path;
+    selectRow.value.path = props.dir ? req.path : '';
     rowName.value = '';
     newFolder.value = '';
 };
