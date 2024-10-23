@@ -559,7 +559,10 @@ const message = {
     container: {
         create: '创建容器',
         edit: '编辑容器',
-        updateContainerHelper: '容器编辑需要重建容器，任何未持久化的数据将会丢失，是否继续？',
+        updateHelper1: '检测到该容器来源于应用商店，请注意以下两点：',
+        updateHelper2: '1. 当前修改内容不会同步到应用商店的已安装应用。',
+        updateHelper3: '2. 如果在已安装页面修改应用，当前编辑的部分内容将失效。',
+        updateHelper4: '编辑容器需要重建，任何未持久化的数据将丢失，是否继续操作？',
         containerList: '容器列表',
         operatorHelper: '将对以下容器进行 {0} 操作，是否继续？',
         operatorAppHelper:
@@ -622,7 +625,7 @@ const message = {
         inputIpv6: '请输入 ipv6 地址',
 
         containerFromAppHelper: '检测到该容器来源于应用商店，应用操作可能会导致当前编辑失效',
-        containerFromAppHelper1: '在已安装应用列表点击 `参数` 按钮，进入编辑页面即可修改容器名称。',
+        containerFromAppHelper1: '在应用商店的已安装页面，点击 [参数] 按钮，进入编辑页面修改容器名称。',
         command: '命令',
         console: '控制台交互',
         tty: '伪终端 ( -t )',
@@ -709,6 +712,7 @@ const message = {
         urlWarning: '路径前缀不需要添加 http:// 或 https://, 请修改',
 
         network: '网络',
+        networkHelper: '删除 1panel-network 容器网络将影响部分应用和运行环境的正常使用，是否继续？',
         createNetwork: '创建网络',
         networkName: '网络名',
         driver: '模式',
