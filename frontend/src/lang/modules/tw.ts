@@ -557,7 +557,10 @@ const message = {
     container: {
         create: '創建容器',
         edit: '編輯容器',
-        updateContainerHelper: '容器編輯需要重建容器，任何未持久化的數據將會丟失，是否繼續？',
+        updateHelper1: '檢測到該容器來源於應用商店，請注意以下兩點：',
+        updateHelper2: '1. 當前修改內容不會同步到應用商店的已安裝應用。',
+        updateHelper3: '2. 如果在已安裝頁面修改應用，當前編輯的部分內容將失效。',
+        updateHelper4: '編輯容器需要重建，任何未持久化的數據將丟失，是否繼續操作？',
         containerList: '容器列表',
         operatorHelper: '將對以下容器進行 {0} 操作，是否繼續？',
         operatorAppHelper:
@@ -619,7 +622,7 @@ const message = {
         inputIpv6: '請輸入 IPv6 地址',
 
         containerFromAppHelper: '檢測到該容器來源於應用商店，應用操作可能會導致當前編輯失效',
-        containerFromAppHelper1: '在已安裝應用程式列表點擊 `參數` 按鈕，進入編輯頁面即可修改容器名稱。',
+        containerFromAppHelper1: '在已安裝應用程式列表點擊 [參數] 按鈕，進入編輯頁面即可修改容器名稱。',
         command: '命令',
         console: '控製臺交互',
         tty: '偽終端 ( -t )',
@@ -707,6 +710,7 @@ const message = {
         urlWarning: '路徑前綴不需要添加 http:// 或 https://，請修改',
 
         network: '網絡',
+        networkHelper: '刪除 1panel-network 容器網絡將影響部分應用和運行環境的正常使用，是否繼續？',
         createNetwork: '創建網絡',
         networkName: '網絡名',
         driver: '模式',

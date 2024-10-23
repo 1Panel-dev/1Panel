@@ -25,12 +25,6 @@
         >
             <el-row type="flex" justify="center">
                 <el-col :span="22">
-                    <el-alert
-                        v-if="dialogData.title === 'edit' && isFromApp(dialogData.rowData!)"
-                        :title="$t('container.containerFromAppHelper')"
-                        :closable="false"
-                        type="error"
-                    />
                     <el-form-item class="mt-5" :label="$t('commons.table.name')" prop="name">
                         <el-input
                             :disabled="isFromApp(dialogData.rowData!)"
@@ -296,13 +290,39 @@
             </span>
         </template>
     </el-drawer>
+    <el-dialog v-model="dialogVisible" width="30%" :title="$t('commons.button.edit')">
+        <div v-if="dialogData.title === 'edit' && isFromApp(dialogData.rowData!)" class="leading-6">
+            <div>
+                <span>{{ $t('container.updateHelper1') }}</span>
+            </div>
+            <br />
+            <div>
+                <span>{{ $t('container.updateHelper2') }}</span>
+            </div>
+            <div>
+                <span>{{ $t('container.updateHelper3') }}</span>
+            </div>
+            <br />
+        </div>
+        <div>
+            <span>{{ $t('container.updateHelper4') }}</span>
+        </div>
+        <template #footer>
+            <el-button :disabled="loading" @click="dialogVisible = false">
+                {{ $t('commons.button.cancel') }}
+            </el-button>
+            <el-button :disabled="loading" type="primary" @click="submit()">
+                {{ $t('commons.button.confirm') }}
+            </el-button>
+        </template>
+    </el-dialog>
 </template>
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import { Rules, checkFloatNumberRange, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
-import { ElForm, ElMessageBox } from 'element-plus';
+import { ElForm } from 'element-plus';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import {
     listImage,
@@ -327,6 +347,7 @@ interface DialogProps {
 
 const title = ref<string>('');
 const drawerVisible = ref(false);
+const dialogVisible = ref(false);
 
 const dialogData = ref<DialogProps>({
     title: '',
@@ -386,6 +407,7 @@ const limits = ref<Container.ResourceLimit>({
 const handleClose = () => {
     emit('search');
     drawerVisible.value = false;
+    dialogVisible.value = false;
 };
 
 const rules = reactive({
@@ -448,6 +470,7 @@ const loadNetworkOptions = async () => {
     const res = await listNetwork();
     networks.value = res.data;
 };
+
 const onSubmit = async (formEl: FormInstance | undefined) => {
     if (dialogData.value.rowData!.volumes.length !== 0) {
         for (const item of dialogData.value.rowData!.volumes) {
@@ -460,93 +483,87 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        if (dialogData.value.rowData?.envStr) {
-            dialogData.value.rowData.env = dialogData.value.rowData!.envStr.split('\n');
-        }
-        if (dialogData.value.rowData?.labelsStr) {
-            dialogData.value.rowData!.labels = dialogData.value.rowData!.labelsStr.split('\n');
-        }
-        dialogData.value.rowData!.cmd = [];
-        if (dialogData.value.rowData?.cmdStr) {
-            if (dialogData.value.rowData?.cmdStr.indexOf(`'`) !== -1) {
-                let itemCmd = dialogData.value.rowData!.cmdStr.split(`'`);
-                for (const cmd of itemCmd) {
-                    if (cmd && cmd !== ' ') {
-                        dialogData.value.rowData!.cmd.push(cmd);
-                    }
-                }
-            } else {
-                let itemCmd = dialogData.value.rowData!.cmdStr.split(` `);
-                for (const cmd of itemCmd) {
+        dialogVisible.value = true;
+    });
+};
+
+const submit = async () => {
+    dialogVisible.value = false;
+    if (dialogData.value.rowData?.envStr) {
+        dialogData.value.rowData.env = dialogData.value.rowData!.envStr.split('\n');
+    }
+    if (dialogData.value.rowData?.labelsStr) {
+        dialogData.value.rowData!.labels = dialogData.value.rowData!.labelsStr.split('\n');
+    }
+    dialogData.value.rowData!.cmd = [];
+    if (dialogData.value.rowData?.cmdStr) {
+        if (dialogData.value.rowData?.cmdStr.indexOf(`'`) !== -1) {
+            let itemCmd = dialogData.value.rowData!.cmdStr.split(`'`);
+            for (const cmd of itemCmd) {
+                if (cmd && cmd !== ' ') {
                     dialogData.value.rowData!.cmd.push(cmd);
                 }
             }
+        } else {
+            let itemCmd = dialogData.value.rowData!.cmdStr.split(` `);
+            for (const cmd of itemCmd) {
+                dialogData.value.rowData!.cmd.push(cmd);
+            }
         }
-        dialogData.value.rowData!.entrypoint = [];
-        if (dialogData.value.rowData?.entrypointStr) {
-            if (dialogData.value.rowData?.entrypointStr.indexOf(`'`) !== -1) {
-                let itemEntrypoint = dialogData.value.rowData!.entrypointStr.split(`'`);
-                for (const entry of itemEntrypoint) {
-                    if (entry && entry !== ' ') {
-                        dialogData.value.rowData!.entrypoint.push(entry);
-                    }
-                }
-            } else {
-                let itemEntrypoint = dialogData.value.rowData!.entrypointStr.split(` `);
-                for (const entry of itemEntrypoint) {
+    }
+    dialogData.value.rowData!.entrypoint = [];
+    if (dialogData.value.rowData?.entrypointStr) {
+        if (dialogData.value.rowData?.entrypointStr.indexOf(`'`) !== -1) {
+            let itemEntrypoint = dialogData.value.rowData!.entrypointStr.split(`'`);
+            for (const entry of itemEntrypoint) {
+                if (entry && entry !== ' ') {
                     dialogData.value.rowData!.entrypoint.push(entry);
                 }
             }
-        }
-        if (dialogData.value.rowData!.publishAllPorts) {
-            dialogData.value.rowData!.exposedPorts = [];
         } else {
-            if (!checkPortValid()) {
-                return;
+            let itemEntrypoint = dialogData.value.rowData!.entrypointStr.split(` `);
+            for (const entry of itemEntrypoint) {
+                dialogData.value.rowData!.entrypoint.push(entry);
             }
         }
-        dialogData.value.rowData!.memory = Number(dialogData.value.rowData!.memory);
-        dialogData.value.rowData!.nanoCPUs = Number(dialogData.value.rowData!.nanoCPUs);
-
-        loading.value = true;
-        if (dialogData.value.title === 'create') {
-            await createContainer(dialogData.value.rowData!)
-                .then(() => {
-                    loading.value = false;
-                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                    emit('search');
-                    drawerVisible.value = false;
-                })
-                .catch(() => {
-                    loading.value = false;
-                });
-        } else {
-            ElMessageBox.confirm(
-                i18n.global.t('container.updateContainerHelper'),
-                i18n.global.t('commons.button.edit'),
-                {
-                    confirmButtonText: i18n.global.t('commons.button.confirm'),
-                    cancelButtonText: i18n.global.t('commons.button.cancel'),
-                },
-            )
-                .then(async () => {
-                    await updateContainer(dialogData.value.rowData!)
-                        .then(() => {
-                            loading.value = false;
-                            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                            emit('search');
-                            drawerVisible.value = false;
-                        })
-                        .catch(() => {
-                            updateContainerID();
-                            loading.value = false;
-                        });
-                })
-                .catch(() => {
-                    loading.value = false;
-                });
+    }
+    if (dialogData.value.rowData!.publishAllPorts) {
+        dialogData.value.rowData!.exposedPorts = [];
+    } else {
+        if (!checkPortValid()) {
+            return;
         }
-    });
+    }
+    dialogData.value.rowData!.memory = Number(dialogData.value.rowData!.memory);
+    dialogData.value.rowData!.nanoCPUs = Number(dialogData.value.rowData!.nanoCPUs);
+
+    loading.value = true;
+    if (dialogData.value.title === 'create') {
+        await createContainer(dialogData.value.rowData!)
+            .then(() => {
+                loading.value = false;
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                emit('search');
+                drawerVisible.value = false;
+                dialogVisible.value = false;
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+        return;
+    }
+    await updateContainer(dialogData.value.rowData!)
+        .then(() => {
+            loading.value = false;
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            emit('search');
+            drawerVisible.value = false;
+            dialogVisible.value = false;
+        })
+        .catch(() => {
+            updateContainerID();
+            loading.value = false;
+        });
 };
 
 const updateContainerID = async () => {
