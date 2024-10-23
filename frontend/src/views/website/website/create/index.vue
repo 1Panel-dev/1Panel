@@ -165,6 +165,7 @@
                                         <el-option label="Node.js" value="node"></el-option>
                                         <el-option label="Java" value="java"></el-option>
                                         <el-option label="Go" value="go"></el-option>
+                                        <el-option label="Python" value="python"></el-option>
                                     </el-select>
                                 </el-form-item>
                             </el-col>
