@@ -560,7 +560,7 @@ const message = {
         updateHelper1: '檢測到該容器來源於應用商店，請注意以下兩點：',
         updateHelper2: '1. 當前修改內容不會同步到應用商店的已安裝應用。',
         updateHelper3: '2. 如果在已安裝頁面修改應用，當前編輯的部分內容將失效。',
-        updateHelper4: '編輯容器需要重建，任何未持久化的數據將丟失，是否繼續操作？',
+        updateHelper4: '編輯容器需要重建，任何未持久化的數據將丟失，是否繼續？',
         containerList: '容器列表',
         operatorHelper: '將對以下容器進行 {0} 操作，是否繼續？',
         operatorAppHelper:
