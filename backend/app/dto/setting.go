@@ -149,7 +149,7 @@ type SnapshotInfo struct {
 	DefaultDownload string    `json:"defaultDownload"`
 	Status          string    `json:"status"`
 	Message         string    `json:"message"`
-	CreatedAt       time.Time `json:"createdAt"`
+	CreatedAt       time.Time `json:"created_at"`
 	Version         string    `json:"version"`
 
 	InterruptStep    string `json:"interruptStep"`

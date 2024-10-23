@@ -135,7 +135,7 @@ export namespace Setting {
         description: string;
         status: string;
         message: string;
-        createdAt: DateTimeFormats;
+        created_at: DateTimeFormats;
         version: string;
         interruptStep: string;
         recoverStatus: string;
