@@ -227,6 +227,9 @@ func initDir() {
 }
 
 func handleCronJobAlert(cronjob *model.Cronjob) {
+	if cronjob.Type == "snapshot" {
+		return
+	}
 	pushAlert := dto.PushAlert{
 		TaskName:  cronjob.Name,
 		AlertType: cronjob.Type,
