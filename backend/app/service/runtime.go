@@ -495,6 +495,9 @@ func (r *RuntimeService) OperateRuntime(req request.RuntimeOperate) error {
 			_ = runtimeRepo.Save(runtime)
 		}
 	}()
+	go func() {
+		_ = docker.CreateDefaultDockerNetwork()
+	}()
 	switch req.Operate {
 	case constant.RuntimeUp:
 		if err = runComposeCmdWithLog(req.Operate, runtime.GetComposePath(), runtime.GetLogPath()); err != nil {
