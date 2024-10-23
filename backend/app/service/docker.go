@@ -430,6 +430,9 @@ func validateDockerConfig() error {
 		return nil
 	}
 	stdout, err := cmd.Exec("dockerd --validate")
+	if strings.Contains(stdout, "unknown flag: --validate") {
+		return nil
+	}
 	if err != nil || (stdout != "" && strings.TrimSpace(stdout) != "configuration OK") {
 		return fmt.Errorf("Docker configuration validation failed, err: %v", stdout)
 	}
