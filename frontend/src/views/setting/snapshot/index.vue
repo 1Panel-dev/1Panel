@@ -110,7 +110,7 @@
                         </template>
                     </el-table-column>
                     <el-table-column
-                        prop="createdAt"
+                        prop="created_at"
                         sortable
                         :label="$t('commons.table.date')"
                         :formatter="dateFormat"

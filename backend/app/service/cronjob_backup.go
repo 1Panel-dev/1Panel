@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -29,6 +30,9 @@ func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time) e
 		appItems, err := appInstallRepo.ListBy(commonRepo.WithIdsIn(idItems))
 		if err != nil {
 			return err
+		}
+		if len(appItems) == 0 {
+			return errors.New("no such app in database!")
 		}
 		apps = appItems
 	}
@@ -65,6 +69,9 @@ func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time) e
 
 func (u *CronjobService) handleWebsite(cronjob model.Cronjob, startTime time.Time) error {
 	webs := loadWebsForJob(cronjob)
+	if len(webs) == 0 {
+		return errors.New("no such website in database!")
+	}
 	accountMap, err := loadClientMap(cronjob.BackupAccounts)
 	if err != nil {
 		return err
@@ -98,6 +105,9 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, startTime time.Tim
 
 func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Time) error {
 	dbs := loadDbsForJob(cronjob)
+	if len(dbs) == 0 {
+		return errors.New("no such db in database!")
+	}
 	accountMap, err := loadClientMap(cronjob.BackupAccounts)
 	if err != nil {
 		return err
