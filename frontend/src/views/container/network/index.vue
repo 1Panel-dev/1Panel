@@ -198,20 +198,29 @@ const search = async () => {
 
 const batchDelete = async (row: Container.NetworkInfo | null) => {
     let names: Array<string> = [];
+    let hasPanelNetwork;
     if (row === null) {
         selects.value.forEach((item: Container.NetworkInfo) => {
+            if (item.name === '1panel-network') {
+                hasPanelNetwork = true;
+            }
             names.push(item.name);
         });
     } else {
+        if (row.name === '1panel-network') {
+            hasPanelNetwork = true;
+        }
         names.push(row.name);
     }
     opRef.value.acceptParams({
         title: i18n.global.t('commons.button.delete'),
         names: names,
-        msg: i18n.global.t('commons.msg.operatorHelper', [
-            i18n.global.t('container.network'),
-            i18n.global.t('commons.button.delete'),
-        ]),
+        msg: hasPanelNetwork
+            ? i18n.global.t('container.networkHelper')
+            : i18n.global.t('commons.msg.operatorHelper', [
+                  i18n.global.t('container.network'),
+                  i18n.global.t('commons.button.delete'),
+              ]),
         api: deleteNetwork,
         params: { names: names },
     });

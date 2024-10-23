@@ -575,8 +575,13 @@ const message = {
     container: {
         create: 'Create',
         edit: 'Edit container',
-        updateContainerHelper:
-            'Container editing requires rebuilding the container. Any data that has not been persisted will be lost. Do you want to continue?',
+        updateHelper1: 'Detected that this container comes from the app store. Please note the following two points:',
+        updateHelper2:
+            '1. The current modifications will not be synchronized to the installed applications in the app store.',
+        updateHelper3:
+            '2. If you modify the application on the installed page, the currently edited content will become invalid.',
+        updateHelper4:
+            'Editing the container requires rebuilding, and any non-persistent data will be lost. Do you want to continue?',
         containerList: 'Container list',
         operatorHelper: '{0} will be performed on the following container, Do you want to continue?',
         operatorAppHelper:
@@ -643,7 +648,7 @@ const message = {
         containerFromAppHelper:
             'Detected that this container originates from the app store. App operations may cause current edits to be invalidated.',
         containerFromAppHelper1:
-            'Click the `Settings` button in the installed applications list to enter the editing page and modify the container name.',
+            'Click the [Param] button in the installed applications list to enter the editing page and modify the container name.',
         command: 'Command',
         console: 'Console Interaction',
         tty: 'TTY (-t)',
@@ -731,6 +736,8 @@ const message = {
         urlWarning: 'The URL prefix does not need to include http:// or https://. Please modify.',
 
         network: 'Network',
+        networkHelper:
+            'Deleting the 1panel-network container network will affect the normal use of some applications and runtime environments. Do you want to continue?',
         createNetwork: 'Create',
         networkName: 'Name',
         driver: 'Driver',
