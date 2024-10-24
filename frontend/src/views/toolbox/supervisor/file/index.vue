@@ -61,7 +61,7 @@
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
-import { computed, onUnmounted, reactive, ref, shallowRef } from 'vue';
+import { computed, onUnmounted, reactive, ref, shallowRef, watch } from 'vue';
 import { OperateSupervisorProcessFile } from '@/api/modules/host-tool';
 import i18n from '@/lang';
 import { TabsPaneContext } from 'element-plus';
