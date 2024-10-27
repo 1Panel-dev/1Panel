@@ -252,6 +252,10 @@ func (u *ContainerService) CreateCompose(req dto.ComposeCreate) (string, error) 
 }
 
 func (u *ContainerService) ComposeOperation(req dto.ComposeOperation) error {
+	if len(req.Path) == 0 && req.Operation == "delete" {
+		_ = composeRepo.DeleteRecord(commonRepo.WithByName(req.Name))
+		return nil
+	}
 	if cmd.CheckIllegal(req.Path, req.Operation) {
 		return buserr.New(constant.ErrCmdIllegal)
 	}
