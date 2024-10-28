@@ -1118,6 +1118,8 @@ const message = {
             runtimes: '運行環境',
             process: '進程管理',
             toolbox: '工具箱',
+            tampers: '防篡改',
+            xsetting: '界面設定',
             logs: '日誌審計',
             settings: '面板設置',
             cronjobs: '計劃任務',

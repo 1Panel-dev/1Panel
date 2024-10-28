@@ -1180,6 +1180,8 @@ const message = {
             runtimes: 'Runtime',
             process: 'Process',
             toolbox: 'Toolbox',
+            tampers: 'Tamper',
+            xsetting: 'Interface Settings',
             logs: 'Panel Logs',
             settings: 'Panel Setting',
             cronjobs: 'Cronjob',

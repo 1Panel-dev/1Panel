@@ -150,8 +150,14 @@ const loadDetail = (log: string) => {
     if (log.indexOf('[enable]') !== -1) {
         log = log.replace('[enable]', '[' + i18n.global.t('commons.button.enable') + ']');
     }
+    if (log.indexOf('[Enable]') !== -1) {
+        log = log.replace('[Enable]', '[' + i18n.global.t('commons.button.enable') + ']');
+    }
     if (log.indexOf('[disable]') !== -1) {
         log = log.replace('[disable]', '[' + i18n.global.t('commons.button.disable') + ']');
+    }
+    if (log.indexOf('[Disable]') !== -1) {
+        log = log.replace('[Disable]', '[' + i18n.global.t('commons.button.disable') + ']');
     }
     if (log.indexOf('[light]') !== -1) {
         log = log.replace('[light]', '[' + i18n.global.t('setting.light') + ']');

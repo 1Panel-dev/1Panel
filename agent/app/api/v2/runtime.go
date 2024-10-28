@@ -352,7 +352,7 @@ func (b *BaseApi) UpdatePHPConfig(c *gin.Context) {
 // @Summary Update php conf file
 // @Description 更新 php 配置文件
 // @Accept json
-// @Param request body request.WebsitePHPFileUpdate true "request"
+// @Param request body request.PHPFileUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /runtimes/php/update [post]
@@ -415,7 +415,7 @@ func (b *BaseApi) UpdateFPMConfig(c *gin.Context) {
 // @Description 获取 fpm 配置
 // @Accept json
 // @Param id path integer true "request"
-// @Success 200 {object} response.FPMConfig
+// @Success 200 {object} request.FPMConfig
 // @Security ApiKeyAuth
 // @Router /runtimes/php/fpm/config/:id [get]
 func (b *BaseApi) GetFPMConfig(c *gin.Context) {
@@ -437,7 +437,7 @@ func (b *BaseApi) GetFPMConfig(c *gin.Context) {
 // @Description 获取 supervisor 进程
 // @Accept json
 // @Param id path integer true "request"
-// @Success 200 {object} response.SupervisorProcess
+// @Success 200 {object} response.SupervisorProcessConfig
 // @Security ApiKeyAuth
 // @Router /runtimes/supervisor/process/:id [get]
 func (b *BaseApi) GetSupervisorProcess(c *gin.Context) {

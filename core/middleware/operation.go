@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"path"
 	"strings"
 	"time"
 
@@ -15,8 +16,9 @@ import (
 	"github.com/1Panel-dev/1Panel/core/app/service"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
-	"github.com/1Panel-dev/1Panel/core/utils/copier"
 	"github.com/gin-gonic/gin"
+	"github.com/glebarez/sqlite"
+	"gorm.io/gorm"
 )
 
 func OperationLog() gin.HandlerFunc {
@@ -36,40 +38,13 @@ func OperationLog() gin.HandlerFunc {
 			Path:      pathItem,
 			UserAgent: c.Request.UserAgent(),
 		}
-		var (
-			swagger      swaggerJson
-			operationDic operationJson
-		)
+		swagger := make(map[string]operationJson)
 		if err := json.Unmarshal(docs.XLogJson, &swagger); err != nil {
 			c.Next()
 			return
 		}
-		path, hasPath := swagger.Paths[record.Path]
+		operationDic, hasPath := swagger[record.Path]
 		if !hasPath {
-			c.Next()
-			return
-		}
-		methodMap, isMethodMap := path.(map[string]interface{})
-		if !isMethodMap {
-			c.Next()
-			return
-		}
-		dataMap, hasPost := methodMap["post"]
-		if !hasPost {
-			c.Next()
-			return
-		}
-		data, isDataMap := dataMap.(map[string]interface{})
-		if !isDataMap {
-			c.Next()
-			return
-		}
-		xlog, hasXlog := data["x-panel-log"]
-		if !hasXlog {
-			c.Next()
-			return
-		}
-		if err := copier.Copy(&operationDic, xlog); err != nil {
 			c.Next()
 			return
 		}
@@ -93,21 +68,27 @@ func OperationLog() gin.HandlerFunc {
 			}
 		}
 		if len(operationDic.BeforeFunctions) != 0 {
+			dbItem, err := newDB(record.Path)
+			if err != nil {
+				c.Next()
+				return
+			}
 			for _, funcs := range operationDic.BeforeFunctions {
 				for key, value := range formatMap {
 					if funcs.InputValue == key {
 						var names []string
 						if funcs.IsList {
 							sql := fmt.Sprintf("SELECT %s FROM %s where %s in (?);", funcs.OutputColumn, funcs.DB, funcs.InputColumn)
-							_ = global.DB.Raw(sql, value).Scan(&names)
+							_ = dbItem.Raw(sql, value).Scan(&names)
 						} else {
-							_ = global.DB.Raw(fmt.Sprintf("select %s from %s where %s = ?;", funcs.OutputColumn, funcs.DB, funcs.InputColumn), value).Scan(&names)
+							_ = dbItem.Raw(fmt.Sprintf("select %s from %s where %s = ?;", funcs.OutputColumn, funcs.DB, funcs.InputColumn), value).Scan(&names)
 						}
 						formatMap[funcs.OutputValue] = strings.Join(names, ",")
 						break
 					}
 				}
 			}
+			closeDB(dbItem)
 		}
 		for key, value := range formatMap {
 			if strings.Contains(operationDic.FormatEN, "["+key+"]") {
@@ -168,10 +149,6 @@ func OperationLog() gin.HandlerFunc {
 	}
 }
 
-type swaggerJson struct {
-	Paths map[string]interface{} `json:"paths"`
-}
-
 type operationJson struct {
 	API             string         `json:"api"`
 	Method          string         `json:"method"`
@@ -206,7 +183,7 @@ func (r responseBodyWriter) Write(b []byte) (int, error) {
 }
 
 func loadLogInfo(path string) string {
-	path = strings.ReplaceAll(path, "/api/v2", "")
+	path = replaceStr(path, "/api/v2", "/core", "/xpack")
 	if !strings.Contains(path, "/") {
 		return ""
 	}
@@ -215,4 +192,43 @@ func loadLogInfo(path string) string {
 		return ""
 	}
 	return pathArrays[1]
+}
+
+func newDB(pathItem string) (*gorm.DB, error) {
+	dbFile := ""
+	switch {
+	case strings.HasPrefix(pathItem, "/core"):
+		dbFile = path.Join(global.CONF.System.BaseDir, "1panel/db/core.db")
+	case strings.HasPrefix(pathItem, "/xpack"):
+		dbFile = path.Join(global.CONF.System.BaseDir, "1panel/db/xpack/xpack.db")
+	default:
+		dbFile = path.Join(global.CONF.System.BaseDir, "1panel/db/agent.db")
+	}
+
+	db, _ := gorm.Open(sqlite.Open(dbFile), &gorm.Config{
+		DisableForeignKeyConstraintWhenMigrating: true,
+	})
+	sqlDB, err := db.DB()
+	if err != nil {
+		return nil, err
+	}
+	sqlDB.SetConnMaxIdleTime(10)
+	sqlDB.SetMaxOpenConns(100)
+	sqlDB.SetConnMaxLifetime(time.Hour)
+	return db, nil
+}
+
+func closeDB(db *gorm.DB) {
+	sqlDB, err := db.DB()
+	if err != nil {
+		return
+	}
+	_ = sqlDB.Close()
+}
+
+func replaceStr(val string, rep ...string) string {
+	for _, item := range rep {
+		val = strings.ReplaceAll(val, item, "")
+	}
+	return val
 }

@@ -18,7 +18,7 @@ export const getSystemLogs = (name: string) => {
 };
 
 export const cleanLogs = (param: Log.CleanLog) => {
-    return http.post(`/logs/clean`, param);
+    return http.post(`/core/logs/clean`, param);
 };
 
 export const searchTasks = (req: Log.SearchTaskReq) => {

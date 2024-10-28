@@ -138,7 +138,7 @@ func (b *BaseApi) SearchHost(c *gin.Context) {
 // @Summary Delete host
 // @Description 删除主机
 // @Accept json
-// @Param request body dto.BatchDeleteReq true "request"
+// @Param request body dto.OperateByIDs true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /core/hosts/del [post]

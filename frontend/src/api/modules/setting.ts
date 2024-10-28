@@ -6,19 +6,19 @@ import { Setting } from '../interface/setting';
 
 // license
 export const UploadFileData = (params: FormData) => {
-    return http.upload('/licenses/upload', params);
+    return http.upload('/xpack/licenses/upload', params);
 };
 export const getLicense = () => {
-    return http.get<Setting.License>(`/licenses/get`);
+    return http.get<Setting.License>(`/xpack/licenses/get`);
 };
 export const getLicenseStatus = () => {
-    return http.get<Setting.LicenseStatus>(`/licenses/get/status`);
+    return http.get<Setting.LicenseStatus>(`/xpack/licenses/get/status`);
 };
 export const syncLicense = () => {
-    return http.post(`/licenses/sync`);
+    return http.post(`/xpack/licenses/sync`);
 };
 export const unbindLicense = () => {
-    return http.post(`/licenses/unbind`);
+    return http.post(`/xpack/licenses/unbind`);
 };
 
 // agent

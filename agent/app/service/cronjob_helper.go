@@ -100,6 +100,9 @@ func (u *CronjobService) handleShell(cronjob model.Cronjob, logPath string) erro
 		scriptFile, _ := os.ReadFile(cronjob.Script)
 		return cmd.ExecShell(logPath, 24*time.Hour, "docker", "exec", cronjob.ContainerName, command, "-c", strings.ReplaceAll(string(scriptFile), "\"", "\\\""))
 	}
+	if len(cronjob.Executor) == 0 {
+		cronjob.Executor = "bash"
+	}
 	if cronjob.ScriptMode == "input" {
 		fileItem := path.Join(global.CONF.System.BaseDir, "1panel", "task", "shell", cronjob.Name, cronjob.Name+".sh")
 		_ = os.MkdirAll(path.Dir(fileItem), os.ModePerm)
@@ -111,7 +114,13 @@ func (u *CronjobService) handleShell(cronjob model.Cronjob, logPath string) erro
 		if _, err := shellFile.WriteString(cronjob.Script); err != nil {
 			return err
 		}
+		if len(cronjob.User) == 0 {
+			return cmd.ExecShell(logPath, 24*time.Hour, cronjob.Executor, fileItem)
+		}
 		return cmd.ExecShell(logPath, 24*time.Hour, "sudo", "-u", cronjob.User, cronjob.Executor, fileItem)
+	}
+	if len(cronjob.User) == 0 {
+		return cmd.ExecShell(logPath, 24*time.Hour, cronjob.Executor, cronjob.Script)
 	}
 	return cmd.ExecShell(logPath, 24*time.Hour, "sudo", "-u", cronjob.User, cronjob.Executor, cronjob.Script)
 }

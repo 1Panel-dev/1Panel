@@ -995,7 +995,7 @@ func (b *BaseApi) GetRealIPConfig(c *gin.Context) {
 // @Description 获取网站资源
 // @Accept json
 // @Param id path int true "id"
-// @Success 200 {object} response.WebsiteResource
+// @Success 200 {object} response.Resource
 // @Security ApiKeyAuth
 // @Router /websites/resource/{id} [get]
 func (b *BaseApi) GetWebsiteResource(c *gin.Context) {
@@ -1016,7 +1016,7 @@ func (b *BaseApi) GetWebsiteResource(c *gin.Context) {
 // @Summary Get databases
 // @Description 获取数据库列表
 // @Accept json
-// @Success 200 {object} response.WebsiteDatabase
+// @Success 200 {object} response.Database
 // @Security ApiKeyAuth
 // @Router /websites/databases [get]
 func (b *BaseApi) GetWebsiteDatabase(c *gin.Context) {

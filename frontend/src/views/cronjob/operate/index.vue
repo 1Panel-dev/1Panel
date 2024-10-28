@@ -237,11 +237,7 @@
                     <el-card>
                         <el-row :gutter="20">
                             <el-col :span="12">
-                                <el-form-item
-                                    :label="$t('commons.table.user')"
-                                    prop="user"
-                                    :rules="Rules.requiredSelect"
-                                >
+                                <el-form-item :label="$t('commons.table.user')" prop="user">
                                     <el-select filterable v-model="dialogData.rowData!.user">
                                         <div v-for="item in userOptions" :key="item">
                                             <el-option :value="item" :label="item" />
@@ -250,11 +246,7 @@
                                 </el-form-item>
                             </el-col>
                             <el-col :span="12">
-                                <el-form-item
-                                    :label="$t('cronjob.executor')"
-                                    prop="executor"
-                                    :rules="Rules.requiredSelect"
-                                >
+                                <el-form-item :label="$t('cronjob.executor')" prop="executor">
                                     <el-checkbox border v-model="dialogData.rowData!.isExecutorCustom">
                                         {{ $t('container.custom') }}
                                     </el-checkbox>
