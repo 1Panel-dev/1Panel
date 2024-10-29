@@ -5,7 +5,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
@@ -28,7 +27,7 @@ func (b *BaseApi) SearchContainer(c *gin.Context) {
 
 	total, list, err := containerService.Page(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, dto.PageResult{
@@ -48,7 +47,7 @@ func (b *BaseApi) SearchContainer(c *gin.Context) {
 func (b *BaseApi) ListContainer(c *gin.Context) {
 	list, err := containerService.List()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, list)
@@ -65,7 +64,7 @@ func (b *BaseApi) ListContainer(c *gin.Context) {
 func (b *BaseApi) LoadContainerStatus(c *gin.Context) {
 	data, err := containerService.LoadStatus()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, data)
@@ -87,7 +86,7 @@ func (b *BaseApi) SearchCompose(c *gin.Context) {
 
 	total, list, err := containerService.PageCompose(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, dto.PageResult{
@@ -113,7 +112,7 @@ func (b *BaseApi) TestCompose(c *gin.Context) {
 
 	isOK, err := containerService.TestCompose(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, isOK)
@@ -135,7 +134,7 @@ func (b *BaseApi) CreateCompose(c *gin.Context) {
 	}
 
 	if err := containerService.CreateCompose(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -157,7 +156,7 @@ func (b *BaseApi) OperatorCompose(c *gin.Context) {
 	}
 
 	if err := containerService.ComposeOperation(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -179,7 +178,7 @@ func (b *BaseApi) ContainerUpdate(c *gin.Context) {
 	}
 
 	if err := containerService.ContainerUpdate(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -201,7 +200,7 @@ func (b *BaseApi) ContainerInfo(c *gin.Context) {
 
 	data, err := containerService.ContainerInfo(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, data)
@@ -215,7 +214,7 @@ func (b *BaseApi) ContainerInfo(c *gin.Context) {
 func (b *BaseApi) LoadResourceLimit(c *gin.Context) {
 	data, err := containerService.LoadResourceLimit()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, data)
@@ -229,7 +228,7 @@ func (b *BaseApi) LoadResourceLimit(c *gin.Context) {
 func (b *BaseApi) ContainerListStats(c *gin.Context) {
 	data, err := containerService.ContainerListStats()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, data)
@@ -251,7 +250,7 @@ func (b *BaseApi) ContainerCreate(c *gin.Context) {
 	}
 
 	if err := containerService.ContainerCreate(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -272,7 +271,7 @@ func (b *BaseApi) ContainerCreateByCommand(c *gin.Context) {
 	}
 
 	if err := containerService.ContainerCreateByCommand(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -294,7 +293,7 @@ func (b *BaseApi) ContainerUpgrade(c *gin.Context) {
 	}
 
 	if err := containerService.ContainerUpgrade(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -317,7 +316,7 @@ func (b *BaseApi) ContainerPrune(c *gin.Context) {
 
 	report, err := containerService.Prune(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, report)
@@ -339,7 +338,7 @@ func (b *BaseApi) CleanContainerLog(c *gin.Context) {
 	}
 
 	if err := containerService.ContainerLogClean(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -379,7 +378,7 @@ func (b *BaseApi) ContainerRename(c *gin.Context) {
 	}
 
 	if err := containerService.ContainerRename(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -399,7 +398,7 @@ func (b *BaseApi) ContainerCommit(c *gin.Context) {
 	}
 
 	if err := containerService.ContainerCommit(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -421,7 +420,7 @@ func (b *BaseApi) ContainerOperation(c *gin.Context) {
 	}
 
 	if err := containerService.ContainerOperation(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -437,13 +436,13 @@ func (b *BaseApi) ContainerOperation(c *gin.Context) {
 func (b *BaseApi) ContainerStats(c *gin.Context) {
 	containerID, ok := c.Params.Get("id")
 	if !ok {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error container id in path"))
+		helper.BadRequest(c, errors.New("error container id in path"))
 		return
 	}
 
 	result, err := containerService.ContainerStats(containerID)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, result)
@@ -465,7 +464,7 @@ func (b *BaseApi) Inspect(c *gin.Context) {
 
 	result, err := containerService.Inspect(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, result)
@@ -508,7 +507,7 @@ func (b *BaseApi) DownloadContainerLogs(c *gin.Context) {
 	}
 	err := containerService.DownloadContainerLogs(req.ContainerType, req.Container, req.Since, strconv.Itoa(int(req.Tail)), c)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 	}
 }
 
@@ -529,7 +528,7 @@ func (b *BaseApi) SearchNetwork(c *gin.Context) {
 
 	total, list, err := containerService.PageNetwork(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, dto.PageResult{
@@ -549,7 +548,7 @@ func (b *BaseApi) SearchNetwork(c *gin.Context) {
 func (b *BaseApi) ListNetwork(c *gin.Context) {
 	list, err := containerService.ListNetwork()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, list)
@@ -571,7 +570,7 @@ func (b *BaseApi) DeleteNetwork(c *gin.Context) {
 	}
 
 	if err := containerService.DeleteNetwork(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -593,7 +592,7 @@ func (b *BaseApi) CreateNetwork(c *gin.Context) {
 	}
 
 	if err := containerService.CreateNetwork(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -616,7 +615,7 @@ func (b *BaseApi) SearchVolume(c *gin.Context) {
 
 	total, list, err := containerService.PageVolume(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, dto.PageResult{
@@ -636,7 +635,7 @@ func (b *BaseApi) SearchVolume(c *gin.Context) {
 func (b *BaseApi) ListVolume(c *gin.Context) {
 	list, err := containerService.ListVolume()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, list)
@@ -658,7 +657,7 @@ func (b *BaseApi) DeleteVolume(c *gin.Context) {
 	}
 
 	if err := containerService.DeleteVolume(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -680,7 +679,7 @@ func (b *BaseApi) CreateVolume(c *gin.Context) {
 	}
 
 	if err := containerService.CreateVolume(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -702,7 +701,7 @@ func (b *BaseApi) ComposeUpdate(c *gin.Context) {
 	}
 
 	if err := containerService.ComposeUpdate(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)

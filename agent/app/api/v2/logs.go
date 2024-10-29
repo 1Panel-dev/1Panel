@@ -3,7 +3,6 @@ package v2
 import (
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,7 +15,7 @@ import (
 func (b *BaseApi) GetSystemFiles(c *gin.Context) {
 	data, err := logService.ListSystemLogFile()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -37,7 +36,7 @@ func (b *BaseApi) GetSystemLogs(c *gin.Context) {
 
 	data, err := logService.LoadSystemLog(req.Name)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 

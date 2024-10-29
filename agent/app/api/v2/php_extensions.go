@@ -4,7 +4,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,14 +23,14 @@ func (b *BaseApi) PagePHPExtensions(c *gin.Context) {
 	if req.All {
 		list, err := phpExtensionsService.List()
 		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			helper.InternalServer(c, err)
 			return
 		}
 		helper.SuccessWithData(c, list)
 	} else {
 		total, list, err := phpExtensionsService.Page(req)
 		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			helper.InternalServer(c, err)
 			return
 		}
 		helper.SuccessWithData(c, dto.PageResult{
@@ -56,7 +55,7 @@ func (b *BaseApi) CreatePHPExtensions(c *gin.Context) {
 		return
 	}
 	if err := phpExtensionsService.Create(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -76,7 +75,7 @@ func (b *BaseApi) UpdatePHPExtensions(c *gin.Context) {
 		return
 	}
 	if err := phpExtensionsService.Update(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -96,7 +95,7 @@ func (b *BaseApi) DeletePHPExtensions(c *gin.Context) {
 		return
 	}
 	if err := phpExtensionsService.Delete(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)

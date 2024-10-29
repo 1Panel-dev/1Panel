@@ -8,7 +8,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -27,7 +26,7 @@ func (b *BaseApi) PageWebsiteCA(c *gin.Context) {
 	}
 	total, cas, err := websiteCAService.Page(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, dto.PageResult{
@@ -52,7 +51,7 @@ func (b *BaseApi) CreateWebsiteCA(c *gin.Context) {
 	}
 	res, err := websiteCAService.Create(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, res)
@@ -73,7 +72,7 @@ func (b *BaseApi) GetWebsiteCA(c *gin.Context) {
 	}
 	res, err := websiteCAService.GetCA(id)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, res)
@@ -94,7 +93,7 @@ func (b *BaseApi) DeleteWebsiteCA(c *gin.Context) {
 		return
 	}
 	if err := websiteCAService.Delete(req.ID); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -115,7 +114,7 @@ func (b *BaseApi) ObtainWebsiteCA(c *gin.Context) {
 		return
 	}
 	if _, err := websiteCAService.ObtainSSL(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -141,7 +140,7 @@ func (b *BaseApi) RenewWebsiteCA(c *gin.Context) {
 		Unit:  "year",
 		Time:  1,
 	}); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -163,13 +162,13 @@ func (b *BaseApi) DownloadCAFile(c *gin.Context) {
 	}
 	file, err := websiteCAService.DownloadFile(req.ID)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	defer file.Close()
 	info, err := file.Stat()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	c.Header("Content-Length", strconv.FormatInt(info.Size(), 10))

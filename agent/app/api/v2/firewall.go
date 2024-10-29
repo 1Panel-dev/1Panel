@@ -3,7 +3,6 @@ package v2
 import (
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,7 +15,7 @@ import (
 func (b *BaseApi) LoadFirewallBaseInfo(c *gin.Context) {
 	data, err := firewallService.LoadBaseInfo()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -39,7 +38,7 @@ func (b *BaseApi) SearchFirewallRule(c *gin.Context) {
 
 	total, list, err := firewallService.SearchWithPage(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -65,7 +64,7 @@ func (b *BaseApi) OperateFirewall(c *gin.Context) {
 	}
 
 	if err := firewallService.OperateFirewall(req.Operation); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -88,7 +87,7 @@ func (b *BaseApi) OperatePortRule(c *gin.Context) {
 	}
 
 	if err := firewallService.OperatePortRule(req, true); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -111,7 +110,7 @@ func (b *BaseApi) OperateForwardRule(c *gin.Context) {
 	}
 
 	if err := firewallService.OperateForwardRule(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -133,7 +132,7 @@ func (b *BaseApi) OperateIPRule(c *gin.Context) {
 	}
 
 	if err := firewallService.OperateAddressRule(req, true); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -154,7 +153,7 @@ func (b *BaseApi) BatchOperateRule(c *gin.Context) {
 	}
 
 	if err := firewallService.BatchOperateRule(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -175,7 +174,7 @@ func (b *BaseApi) UpdateFirewallDescription(c *gin.Context) {
 	}
 
 	if err := firewallService.UpdateDescription(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -196,7 +195,7 @@ func (b *BaseApi) UpdatePortRule(c *gin.Context) {
 	}
 
 	if err := firewallService.UpdatePortRule(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -217,7 +216,7 @@ func (b *BaseApi) UpdateAddrRule(c *gin.Context) {
 	}
 
 	if err := firewallService.UpdateAddrRule(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)

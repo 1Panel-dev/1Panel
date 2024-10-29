@@ -41,8 +41,8 @@
                         </div>
                         <div class="flex justify-between" v-else>
                             <div>
-                                {{ title }}
-                                <el-divider direction="vertical" v-if="slots.leftToolBar || slots.buttons" />
+                                <!-- {{ title }} -->
+                                <!-- <el-divider direction="vertical" v-if="slots.leftToolBar || slots.buttons" /> -->
                                 <slot name="leftToolBar" v-if="slots.leftToolBar"></slot>
                                 <slot name="buttons" v-if="slots.buttons"></slot>
                             </div>

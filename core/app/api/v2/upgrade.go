@@ -38,7 +38,7 @@ func (b *BaseApi) GetNotesByVersion(c *gin.Context) {
 
 	notes, err := upgradeService.LoadNotes(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, notes)
@@ -60,7 +60,7 @@ func (b *BaseApi) Upgrade(c *gin.Context) {
 	}
 
 	if err := upgradeService.Upgrade(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)

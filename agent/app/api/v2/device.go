@@ -5,7 +5,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,7 +17,7 @@ import (
 func (b *BaseApi) LoadDeviceBaseInfo(c *gin.Context) {
 	data, err := deviceService.LoadBaseInfo()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -35,7 +34,7 @@ func (b *BaseApi) LoadDeviceBaseInfo(c *gin.Context) {
 func (b *BaseApi) LoadTimeOption(c *gin.Context) {
 	list, err := deviceService.LoadTimeZone()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -58,7 +57,7 @@ func (b *BaseApi) LoadDeviceConf(c *gin.Context) {
 
 	list, err := deviceService.LoadConf(req.Name)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -79,7 +78,7 @@ func (b *BaseApi) UpdateDeviceByFile(c *gin.Context) {
 		return
 	}
 	if err := deviceService.UpdateByConf(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -95,7 +94,7 @@ func (b *BaseApi) UpdateDeviceByFile(c *gin.Context) {
 func (b *BaseApi) LoadUsers(c *gin.Context) {
 	users, err := deviceService.LoadUsers()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, users)
@@ -117,7 +116,7 @@ func (b *BaseApi) UpdateDeviceConf(c *gin.Context) {
 	}
 
 	if err := deviceService.Update(req.Key, req.Value); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -138,7 +137,7 @@ func (b *BaseApi) UpdateDeviceHost(c *gin.Context) {
 	}
 
 	if err := deviceService.UpdateHosts(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -161,13 +160,13 @@ func (b *BaseApi) UpdateDevicePasswd(c *gin.Context) {
 	if len(req.Passwd) != 0 {
 		password, err := base64.StdEncoding.DecodeString(req.Passwd)
 		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			helper.BadRequest(c, err)
 			return
 		}
 		req.Passwd = string(password)
 	}
 	if err := deviceService.UpdatePasswd(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -189,7 +188,7 @@ func (b *BaseApi) UpdateDeviceSwap(c *gin.Context) {
 		return
 	}
 	if err := deviceService.UpdateSwap(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -212,7 +211,7 @@ func (b *BaseApi) CheckDNS(c *gin.Context) {
 
 	data, err := deviceService.CheckDNS(req.Key, req.Value)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 

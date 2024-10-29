@@ -45,7 +45,7 @@ func (b *BaseApi) DeleteGroup(c *gin.Context) {
 	}
 
 	if err := groupService.Delete(req.ID); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -67,7 +67,7 @@ func (b *BaseApi) UpdateGroup(c *gin.Context) {
 	}
 
 	if err := groupService.Update(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -89,7 +89,7 @@ func (b *BaseApi) ListGroup(c *gin.Context) {
 
 	list, err := groupService.List(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 

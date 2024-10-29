@@ -1673,10 +1673,12 @@ func (w WebsiteService) GetProxyCache(id uint) (res response.NginxProxyCache, er
 	if len(params) == 0 {
 		return
 	}
+	zoneRegexp := regexp.MustCompile(`keys_zone=proxy_cache_zone_of_[\w.]+:(\d+)([kmgt]?)`)
+	sizeRegexp := regexp.MustCompile(`max_size=([0-9.]+)([kmgt]?)`)
+	inactiveRegexp := regexp.MustCompile(`inactive=(\d+)([smhd])`)
 	for _, param := range params {
 		if match, _ := regexp.MatchString(`keys_zone=proxy_cache_zone_of_[\w.]+:\d+[kmgt]?`, param); match {
-			r := regexp.MustCompile(`keys_zone=proxy_cache_zone_of_[\w.]+:(\d+)([kmgt]?)`)
-			matches := r.FindStringSubmatch(param)
+			matches := zoneRegexp.FindStringSubmatch(param)
 			if len(matches) > 0 {
 				res.ShareCache, _ = strconv.Atoi(matches[1])
 				res.ShareCacheUnit = matches[2]
@@ -1684,16 +1686,14 @@ func (w WebsiteService) GetProxyCache(id uint) (res response.NginxProxyCache, er
 		}
 
 		if match, _ := regexp.MatchString(`max_size=\d+(\.\d+)?[kmgt]?`, param); match {
-			r := regexp.MustCompile(`max_size=([0-9.]+)([kmgt]?)`)
-			matches := r.FindStringSubmatch(param)
+			matches := sizeRegexp.FindStringSubmatch(param)
 			if len(matches) > 0 {
 				res.CacheLimit, _ = strconv.ParseFloat(matches[1], 64)
 				res.CacheLimitUnit = matches[2]
 			}
 		}
 		if match, _ := regexp.MatchString(`inactive=\d+[smhd]`, param); match {
-			r := regexp.MustCompile(`inactive=(\d+)([smhd])`)
-			matches := r.FindStringSubmatch(param)
+			matches := inactiveRegexp.FindStringSubmatch(param)
 			if len(matches) > 0 {
 				res.CacheExpire, _ = strconv.Atoi(matches[1])
 				res.CacheExpireUnit = matches[2]

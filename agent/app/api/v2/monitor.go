@@ -5,7 +5,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/gin-gonic/gin"
 	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/net"
@@ -26,7 +25,7 @@ func (b *BaseApi) LoadMonitor(c *gin.Context) {
 
 	data, err := monitorService.LoadMonitorData(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, data)
@@ -41,7 +40,7 @@ func (b *BaseApi) LoadMonitor(c *gin.Context) {
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"清空监控数据","formatEN":"clean monitor datas"}
 func (b *BaseApi) CleanMonitor(c *gin.Context) {
 	if err := monitorService.CleanData(); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -57,7 +56,7 @@ func (b *BaseApi) CleanMonitor(c *gin.Context) {
 func (b *BaseApi) LoadMonitorSetting(c *gin.Context) {
 	setting, err := monitorService.LoadSetting()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -78,7 +77,7 @@ func (b *BaseApi) UpdateMonitorSetting(c *gin.Context) {
 		return
 	}
 	if err := monitorService.UpdateSetting(req.Key, req.Value); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 

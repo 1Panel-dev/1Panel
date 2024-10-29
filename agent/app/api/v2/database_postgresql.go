@@ -6,7 +6,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -28,14 +27,14 @@ func (b *BaseApi) CreatePostgresql(c *gin.Context) {
 	if len(req.Password) != 0 {
 		password, err := base64.StdEncoding.DecodeString(req.Password)
 		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			helper.BadRequest(c, err)
 			return
 		}
 		req.Password = string(password)
 	}
 
 	if _, err := postgresqlService.Create(context.Background(), req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -57,7 +56,7 @@ func (b *BaseApi) BindPostgresqlUser(c *gin.Context) {
 	}
 
 	if err := postgresqlService.BindUser(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -79,7 +78,7 @@ func (b *BaseApi) UpdatePostgresqlDescription(c *gin.Context) {
 	}
 
 	if err := postgresqlService.UpdateDescription(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -101,7 +100,7 @@ func (b *BaseApi) ChangePostgresqlPrivileges(c *gin.Context) {
 	}
 
 	if err := postgresqlService.ChangePrivileges(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -125,14 +124,14 @@ func (b *BaseApi) ChangePostgresqlPassword(c *gin.Context) {
 	if len(req.Value) != 0 {
 		value, err := base64.StdEncoding.DecodeString(req.Value)
 		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			helper.BadRequest(c, err)
 			return
 		}
 		req.Value = string(value)
 	}
 
 	if err := postgresqlService.ChangePassword(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -154,7 +153,7 @@ func (b *BaseApi) SearchPostgresql(c *gin.Context) {
 
 	total, list, err := postgresqlService.SearchWithPage(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -174,12 +173,12 @@ func (b *BaseApi) SearchPostgresql(c *gin.Context) {
 func (b *BaseApi) LoadPostgresqlDBFromRemote(c *gin.Context) {
 	database, err := helper.GetStrParamByKey(c, "database")
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		helper.BadRequest(c, err)
 		return
 	}
 
 	if err := postgresqlService.LoadFromRemote(database); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -202,7 +201,7 @@ func (b *BaseApi) DeleteCheckPostgresql(c *gin.Context) {
 
 	apps, err := postgresqlService.DeleteCheck(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, apps)
@@ -224,7 +223,7 @@ func (b *BaseApi) DeletePostgresql(c *gin.Context) {
 	}
 	tx, ctx := helper.GetTxAndContext()
 	if err := postgresqlService.Delete(ctx, req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		tx.Rollback()
 		return
 	}

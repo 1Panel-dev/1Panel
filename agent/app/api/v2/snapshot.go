@@ -3,7 +3,6 @@ package v2
 import (
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,7 +15,7 @@ import (
 func (b *BaseApi) LoadSnapshotData(c *gin.Context) {
 	data, err := snapshotService.LoadSnapshotData()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, data)
@@ -38,7 +37,7 @@ func (b *BaseApi) CreateSnapshot(c *gin.Context) {
 	}
 
 	if err := snapshotService.SnapshotCreate(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -60,7 +59,7 @@ func (b *BaseApi) RecreateSnapshot(c *gin.Context) {
 	}
 
 	if err := snapshotService.SnapshotReCreate(req.ID); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -82,7 +81,7 @@ func (b *BaseApi) ImportSnapshot(c *gin.Context) {
 	}
 
 	if err := snapshotService.SnapshotImport(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -104,7 +103,7 @@ func (b *BaseApi) UpdateSnapDescription(c *gin.Context) {
 	}
 
 	if err := snapshotService.UpdateDescription(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -126,7 +125,7 @@ func (b *BaseApi) SearchSnapshot(c *gin.Context) {
 
 	total, accounts, err := snapshotService.SearchWithPage(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, dto.PageResult{
@@ -151,7 +150,7 @@ func (b *BaseApi) LoadSnapshotSize(c *gin.Context) {
 
 	accounts, err := snapshotService.LoadSize(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, accounts)
@@ -173,7 +172,7 @@ func (b *BaseApi) RecoverSnapshot(c *gin.Context) {
 	}
 
 	if err := snapshotService.SnapshotRecover(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -195,7 +194,7 @@ func (b *BaseApi) RollbackSnapshot(c *gin.Context) {
 	}
 
 	if err := snapshotService.SnapshotRollback(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -217,7 +216,7 @@ func (b *BaseApi) DeleteSnapshot(c *gin.Context) {
 	}
 
 	if err := snapshotService.Delete(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)

@@ -116,7 +116,7 @@ func (b *BaseApi) UpdateProxy(c *gin.Context) {
 	if len(req.ProxyPasswd) != 0 && len(req.ProxyType) != 0 {
 		pass, err := base64.StdEncoding.DecodeString(req.ProxyPasswd)
 		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			helper.BadRequest(c, err)
 			return
 		}
 		req.ProxyPasswd = string(pass)

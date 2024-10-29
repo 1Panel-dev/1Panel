@@ -4,7 +4,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/gin-gonic/gin"
 )
@@ -24,7 +23,7 @@ func (b *BaseApi) SearchApp(c *gin.Context) {
 	}
 	list, err := appService.PageApp(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, list)
@@ -44,7 +43,7 @@ func (b *BaseApi) SyncApp(c *gin.Context) {
 	}
 	res, err := appService.GetAppUpdate()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	if !res.CanUpdate {
@@ -56,7 +55,7 @@ func (b *BaseApi) SyncApp(c *gin.Context) {
 		return
 	}
 	if err = appService.SyncAppListFromRemote(req.TaskID); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -89,12 +88,12 @@ func (b *BaseApi) SyncLocalApp(c *gin.Context) {
 func (b *BaseApi) GetApp(c *gin.Context) {
 	appKey, err := helper.GetStrParamByKey(c, "key")
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		helper.BadRequest(c, err)
 		return
 	}
 	appDTO, err := appService.GetApp(appKey)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, appDTO)
@@ -113,14 +112,14 @@ func (b *BaseApi) GetApp(c *gin.Context) {
 func (b *BaseApi) GetAppDetail(c *gin.Context) {
 	appID, err := helper.GetIntParamByKey(c, "appId")
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		helper.BadRequest(c, err)
 		return
 	}
 	version := c.Param("version")
 	appType := c.Param("type")
 	appDetailDTO, err := appService.GetAppDetail(appID, version, appType)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, appDetailDTO)
@@ -137,12 +136,12 @@ func (b *BaseApi) GetAppDetail(c *gin.Context) {
 func (b *BaseApi) GetAppDetailByID(c *gin.Context) {
 	appDetailID, err := helper.GetIntParamByKey(c, "id")
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		helper.BadRequest(c, err)
 		return
 	}
 	appDetailDTO, err := appService.GetAppDetailByID(appDetailID)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, appDetailDTO)
@@ -158,7 +157,7 @@ func (b *BaseApi) GetAppDetailByID(c *gin.Context) {
 func (b *BaseApi) GetIgnoredApp(c *gin.Context) {
 	res, err := appService.GetIgnoredApp()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, res)
@@ -180,7 +179,7 @@ func (b *BaseApi) InstallApp(c *gin.Context) {
 	}
 	install, err := appService.Install(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, install)
@@ -189,7 +188,7 @@ func (b *BaseApi) InstallApp(c *gin.Context) {
 func (b *BaseApi) GetAppTags(c *gin.Context) {
 	tags, err := appService.GetAppTags()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, tags)
@@ -204,7 +203,7 @@ func (b *BaseApi) GetAppTags(c *gin.Context) {
 func (b *BaseApi) GetAppListUpdate(c *gin.Context) {
 	res, err := appService.GetAppUpdate()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, res)
@@ -225,7 +224,7 @@ func (b *BaseApi) UpdateAppstoreConfig(c *gin.Context) {
 	}
 	err := appService.UpdateAppstoreConfig(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -240,7 +239,7 @@ func (b *BaseApi) UpdateAppstoreConfig(c *gin.Context) {
 func (b *BaseApi) GetAppstoreConfig(c *gin.Context) {
 	res, err := appService.GetAppstoreConfig()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, res)

@@ -207,33 +207,6 @@ func getRuntimeEnv(envStr, key string) string {
 	return ""
 }
 
-func getRuntimeEnvironments(composeByte []byte) ([]request.Environment, error) {
-	var environments []request.Environment
-	var composeMap map[string]interface{}
-	if err := yaml.Unmarshal(composeByte, &composeMap); err != nil {
-		return nil, err
-	}
-	services, ok := composeMap["services"].(map[string]interface{})
-	if !ok {
-		return nil, buserr.New(constant.ErrFileParse)
-	}
-	for _, service := range services {
-		envs, ok := service.(map[string]interface{})["environment"].([]interface{})
-		if !ok {
-			continue
-		}
-		for _, env := range envs {
-			envStr := env.(string)
-			envArray := strings.Split(envStr, "=")
-			environments = append(environments, request.Environment{
-				Key:   envArray[0],
-				Value: envArray[1],
-			})
-		}
-	}
-	return environments, nil
-}
-
 func buildRuntime(runtime *model.Runtime, oldImageID string, oldEnv string, rebuild bool) {
 	runtimePath := runtime.GetPath()
 	composePath := runtime.GetComposePath()

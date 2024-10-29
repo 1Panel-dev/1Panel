@@ -3,7 +3,6 @@ package v2
 import (
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,7 +22,7 @@ func (b *BaseApi) CreateComposeTemplate(c *gin.Context) {
 	}
 
 	if err := composeTemplateService.Create(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -46,7 +45,7 @@ func (b *BaseApi) SearchComposeTemplate(c *gin.Context) {
 
 	total, list, err := composeTemplateService.SearchWithPage(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -66,7 +65,7 @@ func (b *BaseApi) SearchComposeTemplate(c *gin.Context) {
 func (b *BaseApi) ListComposeTemplate(c *gin.Context) {
 	list, err := composeTemplateService.List()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -89,7 +88,7 @@ func (b *BaseApi) DeleteComposeTemplate(c *gin.Context) {
 	}
 
 	if err := composeTemplateService.Delete(req.Ids); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -114,7 +113,7 @@ func (b *BaseApi) UpdateComposeTemplate(c *gin.Context) {
 	upMap["content"] = req.Content
 	upMap["description"] = req.Description
 	if err := composeTemplateService.Update(req.ID, upMap); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)

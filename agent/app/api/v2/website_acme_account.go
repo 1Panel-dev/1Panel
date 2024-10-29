@@ -4,7 +4,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,7 +22,7 @@ func (b *BaseApi) PageWebsiteAcmeAccount(c *gin.Context) {
 	}
 	total, accounts, err := websiteAcmeAccountService.Page(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, dto.PageResult{
@@ -48,7 +47,7 @@ func (b *BaseApi) CreateWebsiteAcmeAccount(c *gin.Context) {
 	}
 	res, err := websiteAcmeAccountService.Create(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, res)
@@ -69,7 +68,7 @@ func (b *BaseApi) DeleteWebsiteAcmeAccount(c *gin.Context) {
 		return
 	}
 	if err := websiteAcmeAccountService.Delete(req.ID); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)

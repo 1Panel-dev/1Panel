@@ -3,7 +3,6 @@ package v2
 import (
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,7 +22,7 @@ func (b *BaseApi) LoadDBBaseInfo(c *gin.Context) {
 
 	data, err := dbCommonService.LoadBaseInfo(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -45,7 +44,7 @@ func (b *BaseApi) LoadDBFile(c *gin.Context) {
 	}
 	content, err := dbCommonService.LoadDatabaseFile(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, content)
@@ -67,7 +66,7 @@ func (b *BaseApi) UpdateDBConfByFile(c *gin.Context) {
 	}
 
 	if err := dbCommonService.UpdateConfByFile(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 

@@ -32,7 +32,7 @@ func (b *BaseApi) Login(c *gin.Context) {
 
 	if req.AuthMethod != "jwt" && !req.IgnoreCaptcha {
 		if err := captcha.VerifyCode(req.CaptchaID, req.Captcha); err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			helper.InternalServer(c, err)
 			return
 		}
 	}
@@ -45,7 +45,7 @@ func (b *BaseApi) Login(c *gin.Context) {
 	user, err := authService.Login(c, req, string(entrance))
 	go saveLoginLogs(c, err)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, user)
@@ -73,7 +73,7 @@ func (b *BaseApi) MFALogin(c *gin.Context) {
 
 	user, err := authService.MFALogin(c, req, string(entrance))
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, user)
@@ -87,7 +87,7 @@ func (b *BaseApi) MFALogin(c *gin.Context) {
 // @Router /core/auth/logout [post]
 func (b *BaseApi) LogOut(c *gin.Context) {
 	if err := authService.LogOut(c); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -101,7 +101,7 @@ func (b *BaseApi) LogOut(c *gin.Context) {
 func (b *BaseApi) Captcha(c *gin.Context) {
 	captcha, err := captcha.CreateCaptcha()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, captcha)
@@ -116,7 +116,7 @@ func (b *BaseApi) CheckIsSafety(c *gin.Context) {
 	code := c.DefaultQuery("code", "")
 	status, err := authService.CheckIsSafety(code)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	if status == "disable" && len(code) != 0 {
@@ -137,7 +137,7 @@ func (b *BaseApi) CheckIsSafety(c *gin.Context) {
 func (b *BaseApi) GetResponsePage(c *gin.Context) {
 	pageCode, err := authService.GetResponsePage()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, pageCode)
@@ -160,7 +160,7 @@ func (b *BaseApi) CheckIsDemo(c *gin.Context) {
 func (b *BaseApi) GetLanguage(c *gin.Context) {
 	settingInfo, err := settingService.GetSettingInfo()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, settingInfo.Language)

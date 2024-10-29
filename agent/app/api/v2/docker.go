@@ -35,7 +35,7 @@ func (b *BaseApi) LoadDaemonJsonFile(c *gin.Context) {
 	}
 	content, err := os.ReadFile(constant.DaemonJsonPath)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, string(content))
@@ -69,7 +69,7 @@ func (b *BaseApi) UpdateDaemonJson(c *gin.Context) {
 	}
 
 	if err := dockerService.UpdateConf(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -92,7 +92,7 @@ func (b *BaseApi) UpdateLogOption(c *gin.Context) {
 	}
 
 	if err := dockerService.UpdateLogOption(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -115,7 +115,7 @@ func (b *BaseApi) UpdateIpv6Option(c *gin.Context) {
 	}
 
 	if err := dockerService.UpdateIpv6Option(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -138,7 +138,7 @@ func (b *BaseApi) UpdateDaemonJsonByFile(c *gin.Context) {
 	}
 
 	if err := dockerService.UpdateConfByFile(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -161,7 +161,7 @@ func (b *BaseApi) OperateDocker(c *gin.Context) {
 	}
 
 	if err := dockerService.OperateDocker(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 

@@ -4,7 +4,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,7 +22,7 @@ func (b *BaseApi) SearchRecycleBinFile(c *gin.Context) {
 	}
 	total, list, err := recycleBinService.Page(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, dto.PageResult{
@@ -47,7 +46,7 @@ func (b *BaseApi) ReduceRecycleBinFile(c *gin.Context) {
 		return
 	}
 	if err := recycleBinService.Reduce(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -63,7 +62,7 @@ func (b *BaseApi) ReduceRecycleBinFile(c *gin.Context) {
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"清空回收站","formatEN":"清空回收站"}
 func (b *BaseApi) ClearRecycleBinFile(c *gin.Context) {
 	if err := recycleBinService.Clear(); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -79,7 +78,7 @@ func (b *BaseApi) ClearRecycleBinFile(c *gin.Context) {
 func (b *BaseApi) GetRecycleStatus(c *gin.Context) {
 	settingInfo, err := settingService.GetSettingInfo()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, settingInfo.FileRecycleBin)

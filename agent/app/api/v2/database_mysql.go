@@ -6,7 +6,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -28,14 +27,14 @@ func (b *BaseApi) CreateMysql(c *gin.Context) {
 	if len(req.Password) != 0 {
 		password, err := base64.StdEncoding.DecodeString(req.Password)
 		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			helper.BadRequest(c, err)
 			return
 		}
 		req.Password = string(password)
 	}
 
 	if _, err := mysqlService.Create(context.Background(), req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -59,14 +58,14 @@ func (b *BaseApi) BindUser(c *gin.Context) {
 	if len(req.Password) != 0 {
 		password, err := base64.StdEncoding.DecodeString(req.Password)
 		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			helper.BadRequest(c, err)
 			return
 		}
 		req.Password = string(password)
 	}
 
 	if err := mysqlService.BindUser(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -88,7 +87,7 @@ func (b *BaseApi) UpdateMysqlDescription(c *gin.Context) {
 	}
 
 	if err := mysqlService.UpdateDescription(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -112,14 +111,14 @@ func (b *BaseApi) ChangeMysqlPassword(c *gin.Context) {
 	if len(req.Value) != 0 {
 		value, err := base64.StdEncoding.DecodeString(req.Value)
 		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			helper.BadRequest(c, err)
 			return
 		}
 		req.Value = string(value)
 	}
 
 	if err := mysqlService.ChangePassword(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -141,7 +140,7 @@ func (b *BaseApi) ChangeMysqlAccess(c *gin.Context) {
 	}
 
 	if err := mysqlService.ChangeAccess(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -163,7 +162,7 @@ func (b *BaseApi) UpdateMysqlVariables(c *gin.Context) {
 	}
 
 	if err := mysqlService.UpdateVariables(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -185,7 +184,7 @@ func (b *BaseApi) SearchMysql(c *gin.Context) {
 
 	total, list, err := mysqlService.SearchWithPage(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -206,7 +205,7 @@ func (b *BaseApi) SearchMysql(c *gin.Context) {
 func (b *BaseApi) ListDBName(c *gin.Context) {
 	list, err := mysqlService.ListDBOption()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -227,7 +226,7 @@ func (b *BaseApi) LoadDBFromRemote(c *gin.Context) {
 	}
 
 	if err := mysqlService.LoadFromRemote(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -250,7 +249,7 @@ func (b *BaseApi) DeleteCheckMysql(c *gin.Context) {
 
 	apps, err := mysqlService.DeleteCheck(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, apps)
@@ -273,7 +272,7 @@ func (b *BaseApi) DeleteMysql(c *gin.Context) {
 
 	tx, ctx := helper.GetTxAndContext()
 	if err := mysqlService.Delete(ctx, req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		tx.Rollback()
 		return
 	}
@@ -296,7 +295,7 @@ func (b *BaseApi) LoadRemoteAccess(c *gin.Context) {
 	}
 	isRemote, err := mysqlService.LoadRemoteAccess(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -319,7 +318,7 @@ func (b *BaseApi) LoadStatus(c *gin.Context) {
 
 	data, err := mysqlService.LoadStatus(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -342,7 +341,7 @@ func (b *BaseApi) LoadVariables(c *gin.Context) {
 
 	data, err := mysqlService.LoadVariables(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 

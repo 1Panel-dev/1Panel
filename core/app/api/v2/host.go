@@ -37,7 +37,7 @@ func (b *BaseApi) CreateHost(c *gin.Context) {
 
 	host, err := hostService.Create(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, host)
@@ -77,7 +77,7 @@ func (b *BaseApi) TestByID(c *gin.Context) {
 	}
 	intNum, err := strconv.Atoi(idParam)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		helper.BadRequest(c, err)
 		return
 	}
 
@@ -101,7 +101,7 @@ func (b *BaseApi) HostTree(c *gin.Context) {
 
 	data, err := hostService.SearchForTree(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -124,7 +124,7 @@ func (b *BaseApi) SearchHost(c *gin.Context) {
 
 	total, list, err := hostService.SearchWithPage(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -150,7 +150,7 @@ func (b *BaseApi) DeleteHost(c *gin.Context) {
 	}
 
 	if err := hostService.Delete(req.IDs); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -175,7 +175,7 @@ func (b *BaseApi) UpdateHost(c *gin.Context) {
 	if len(req.Password) != 0 && req.AuthMode == "password" {
 		req.Password, err = hostService.EncryptHost(req.Password)
 		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			helper.BadRequest(c, err)
 			return
 		}
 		req.PrivateKey = ""
@@ -184,13 +184,13 @@ func (b *BaseApi) UpdateHost(c *gin.Context) {
 	if len(req.PrivateKey) != 0 && req.AuthMode == "key" {
 		req.PrivateKey, err = hostService.EncryptHost(req.PrivateKey)
 		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			helper.BadRequest(c, err)
 			return
 		}
 		if len(req.PassPhrase) != 0 {
 			req.PassPhrase, err = encrypt.StringEncrypt(req.PassPhrase)
 			if err != nil {
-				helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+				helper.BadRequest(c, err)
 				return
 			}
 		}
@@ -216,7 +216,7 @@ func (b *BaseApi) UpdateHost(c *gin.Context) {
 	}
 	upMap["description"] = req.Description
 	if err := hostService.Update(req.ID, upMap); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -240,7 +240,7 @@ func (b *BaseApi) UpdateHostGroup(c *gin.Context) {
 	upMap := make(map[string]interface{})
 	upMap["group_id"] = req.GroupID
 	if err := hostService.Update(req.ID, upMap); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)

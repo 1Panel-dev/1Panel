@@ -3,7 +3,6 @@ package v2
 import (
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,7 +22,7 @@ func (b *BaseApi) GetToolStatus(c *gin.Context) {
 
 	config, err := hostToolService.GetToolStatus(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, config)
@@ -45,7 +44,7 @@ func (b *BaseApi) InitToolConfig(c *gin.Context) {
 	}
 
 	if err := hostToolService.CreateToolConfig(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -67,7 +66,7 @@ func (b *BaseApi) OperateTool(c *gin.Context) {
 	}
 	err := hostToolService.OperateTool(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -90,7 +89,7 @@ func (b *BaseApi) OperateToolConfig(c *gin.Context) {
 
 	config, err := hostToolService.OperateToolConfig(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, config)
@@ -112,7 +111,7 @@ func (b *BaseApi) GetToolLog(c *gin.Context) {
 
 	logContent, err := hostToolService.GetToolLog(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, logContent)
@@ -135,7 +134,7 @@ func (b *BaseApi) OperateProcess(c *gin.Context) {
 
 	err := hostToolService.OperateSupervisorProcess(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -151,7 +150,7 @@ func (b *BaseApi) OperateProcess(c *gin.Context) {
 func (b *BaseApi) GetProcess(c *gin.Context) {
 	configs, err := hostToolService.GetSupervisorProcessConfig()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, configs)
@@ -173,7 +172,7 @@ func (b *BaseApi) GetProcessFile(c *gin.Context) {
 	}
 	content, err := hostToolService.OperateSupervisorProcessFile(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, content)

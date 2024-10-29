@@ -3,7 +3,6 @@ package v2
 import (
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,7 +22,7 @@ func (b *BaseApi) CreateClam(c *gin.Context) {
 	}
 
 	if err := clamService.Create(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -45,7 +44,7 @@ func (b *BaseApi) UpdateClam(c *gin.Context) {
 	}
 
 	if err := clamService.Update(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -67,7 +66,7 @@ func (b *BaseApi) UpdateClamStatus(c *gin.Context) {
 	}
 
 	if err := clamService.UpdateStatus(req.ID, req.Status); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -89,7 +88,7 @@ func (b *BaseApi) SearchClam(c *gin.Context) {
 
 	total, list, err := clamService.SearchWithPage(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -109,7 +108,7 @@ func (b *BaseApi) SearchClam(c *gin.Context) {
 func (b *BaseApi) LoadClamBaseInfo(c *gin.Context) {
 	info, err := clamService.LoadBaseInfo()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -131,7 +130,7 @@ func (b *BaseApi) OperateClam(c *gin.Context) {
 	}
 
 	if err := clamService.Operate(req.Operation); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -152,7 +151,7 @@ func (b *BaseApi) CleanClamRecord(c *gin.Context) {
 		return
 	}
 	if err := clamService.CleanRecord(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -175,7 +174,7 @@ func (b *BaseApi) SearchClamRecord(c *gin.Context) {
 
 	total, list, err := clamService.LoadRecords(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -201,7 +200,7 @@ func (b *BaseApi) LoadClamRecordLog(c *gin.Context) {
 
 	content, err := clamService.LoadRecordLog(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -224,7 +223,7 @@ func (b *BaseApi) SearchClamFile(c *gin.Context) {
 
 	content, err := clamService.LoadFile(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -245,7 +244,7 @@ func (b *BaseApi) UpdateFile(c *gin.Context) {
 		return
 	}
 	if err := clamService.UpdateFile(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -267,7 +266,7 @@ func (b *BaseApi) DeleteClam(c *gin.Context) {
 	}
 
 	if err := clamService.Delete(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -289,7 +288,7 @@ func (b *BaseApi) HandleClamScan(c *gin.Context) {
 	}
 
 	if err := clamService.HandleOnce(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)

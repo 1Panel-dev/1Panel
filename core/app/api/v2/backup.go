@@ -3,7 +3,6 @@ package v2
 import (
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/app/dto"
-	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,7 +22,7 @@ func (b *BaseApi) CreateBackup(c *gin.Context) {
 	}
 
 	if err := backupService.Create(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -56,7 +55,7 @@ func (b *BaseApi) ListBuckets(c *gin.Context) {
 
 	buckets, err := backupService.GetBuckets(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, buckets)
@@ -72,7 +71,7 @@ func (b *BaseApi) ListBuckets(c *gin.Context) {
 func (b *BaseApi) LoadOneDriveInfo(c *gin.Context) {
 	data, err := backupService.LoadOneDriveInfo()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, data)
@@ -88,7 +87,7 @@ func (b *BaseApi) LoadOneDriveInfo(c *gin.Context) {
 func (b *BaseApi) LoadBackupOptions(c *gin.Context) {
 	list, err := backupService.LoadBackupOptions()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, list)
@@ -110,7 +109,7 @@ func (b *BaseApi) DeleteBackup(c *gin.Context) {
 	}
 
 	if err := backupService.Delete(req.ID); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -132,7 +131,7 @@ func (b *BaseApi) UpdateBackup(c *gin.Context) {
 	}
 
 	if err := backupService.Update(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -154,7 +153,7 @@ func (b *BaseApi) SearchBackup(c *gin.Context) {
 
 	total, list, err := backupService.SearchWithPage(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -173,7 +172,7 @@ func (b *BaseApi) SearchBackup(c *gin.Context) {
 func (b *BaseApi) GetLocalDir(c *gin.Context) {
 	dir, err := backupService.GetLocalDir()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 

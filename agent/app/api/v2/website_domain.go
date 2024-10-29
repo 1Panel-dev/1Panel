@@ -3,7 +3,6 @@ package v2
 import (
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,7 +21,7 @@ func (b *BaseApi) DeleteWebDomain(c *gin.Context) {
 		return
 	}
 	if err := websiteService.DeleteWebsiteDomain(req.ID); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -44,7 +43,7 @@ func (b *BaseApi) CreateWebDomain(c *gin.Context) {
 	}
 	domain, err := websiteService.CreateWebsiteDomain(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, domain)
@@ -61,12 +60,12 @@ func (b *BaseApi) CreateWebDomain(c *gin.Context) {
 func (b *BaseApi) GetWebDomains(c *gin.Context) {
 	websiteId, err := helper.GetIntParamByKey(c, "websiteId")
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		helper.BadRequest(c, err)
 		return
 	}
 	list, err := websiteService.GetWebsiteDomain(websiteId)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, list)
@@ -88,7 +87,7 @@ func (b *BaseApi) UpdateWebDomain(c *gin.Context) {
 		return
 	}
 	if err := websiteService.UpdateWebsiteDomain(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)

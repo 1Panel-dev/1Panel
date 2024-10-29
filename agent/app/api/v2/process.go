@@ -3,7 +3,6 @@ package v2
 import (
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	websocket2 "github.com/1Panel-dev/1Panel/agent/utils/websocket"
 	"github.com/gin-gonic/gin"
 )
@@ -32,7 +31,7 @@ func (b *BaseApi) StopProcess(c *gin.Context) {
 		return
 	}
 	if err := processService.StopProcess(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		helper.BadRequest(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)

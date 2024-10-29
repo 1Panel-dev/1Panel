@@ -5,7 +5,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/gin-gonic/gin"
 )
@@ -26,7 +25,7 @@ func (b *BaseApi) CreateCronjob(c *gin.Context) {
 	}
 
 	if err := cronjobService.Create(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -48,7 +47,7 @@ func (b *BaseApi) LoadNextHandle(c *gin.Context) {
 
 	list, err := cronjobService.LoadNextHandle(req.Spec)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, list)
@@ -70,7 +69,7 @@ func (b *BaseApi) SearchCronjob(c *gin.Context) {
 
 	total, list, err := cronjobService.SearchWithPage(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -100,7 +99,7 @@ func (b *BaseApi) SearchJobRecords(c *gin.Context) {
 
 	total, list, err := cronjobService.SearchRecords(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -143,7 +142,7 @@ func (b *BaseApi) CleanRecord(c *gin.Context) {
 	}
 
 	if err := cronjobService.CleanRecord(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -166,7 +165,7 @@ func (b *BaseApi) DeleteCronjob(c *gin.Context) {
 	}
 
 	if err := cronjobService.Delete(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -188,7 +187,7 @@ func (b *BaseApi) UpdateCronjob(c *gin.Context) {
 	}
 
 	if err := cronjobService.Update(req.ID, req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -210,7 +209,7 @@ func (b *BaseApi) UpdateCronjobStatus(c *gin.Context) {
 	}
 
 	if err := cronjobService.UpdateStatus(req.ID, req.Status); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -233,7 +232,7 @@ func (b *BaseApi) TargetDownload(c *gin.Context) {
 
 	filePath, err := cronjobService.Download(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -256,7 +255,7 @@ func (b *BaseApi) HandleOnce(c *gin.Context) {
 	}
 
 	if err := cronjobService.HandleOnce(req.ID); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)

@@ -9,7 +9,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -29,7 +28,7 @@ func (b *BaseApi) PageWebsiteSSL(c *gin.Context) {
 	if !reflect.DeepEqual(req.PageInfo, dto.PageInfo{}) {
 		total, accounts, err := websiteSSLService.Page(req)
 		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			helper.InternalServer(c, err)
 			return
 		}
 		helper.SuccessWithData(c, dto.PageResult{
@@ -39,7 +38,7 @@ func (b *BaseApi) PageWebsiteSSL(c *gin.Context) {
 	} else {
 		list, err := websiteSSLService.Search(req)
 		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			helper.InternalServer(c, err)
 			return
 		}
 		helper.SuccessWithData(c, list)
@@ -62,7 +61,7 @@ func (b *BaseApi) CreateWebsiteSSL(c *gin.Context) {
 	}
 	res, err := websiteSSLService.Create(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, res)
@@ -83,7 +82,7 @@ func (b *BaseApi) ApplyWebsiteSSL(c *gin.Context) {
 		return
 	}
 	if err := websiteSSLService.ObtainSSL(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -104,7 +103,7 @@ func (b *BaseApi) GetDNSResolve(c *gin.Context) {
 	}
 	res, err := websiteSSLService.GetDNSResolve(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, res)
@@ -125,7 +124,7 @@ func (b *BaseApi) DeleteWebsiteSSL(c *gin.Context) {
 		return
 	}
 	if err := websiteSSLService.Delete(req.IDs); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -142,12 +141,12 @@ func (b *BaseApi) DeleteWebsiteSSL(c *gin.Context) {
 func (b *BaseApi) GetWebsiteSSLByWebsiteId(c *gin.Context) {
 	websiteId, err := helper.GetIntParamByKey(c, "websiteId")
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		helper.BadRequest(c, err)
 		return
 	}
 	websiteSSL, err := websiteSSLService.GetWebsiteSSL(websiteId)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, websiteSSL)
@@ -164,12 +163,12 @@ func (b *BaseApi) GetWebsiteSSLByWebsiteId(c *gin.Context) {
 func (b *BaseApi) GetWebsiteSSLById(c *gin.Context) {
 	id, err := helper.GetParamID(c)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		helper.BadRequest(c, err)
 		return
 	}
 	websiteSSL, err := websiteSSLService.GetSSL(id)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, websiteSSL)
@@ -190,7 +189,7 @@ func (b *BaseApi) UpdateWebsiteSSL(c *gin.Context) {
 		return
 	}
 	if err := websiteSSLService.Update(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -211,7 +210,7 @@ func (b *BaseApi) UploadWebsiteSSL(c *gin.Context) {
 		return
 	}
 	if err := websiteSSLService.Upload(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -233,13 +232,13 @@ func (b *BaseApi) DownloadWebsiteSSL(c *gin.Context) {
 	}
 	file, err := websiteSSLService.DownloadFile(req.ID)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	defer file.Close()
 	info, err := file.Stat()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	c.Header("Content-Length", strconv.FormatInt(info.Size(), 10))

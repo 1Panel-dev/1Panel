@@ -3,7 +3,6 @@ package v2
 import (
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,7 +15,7 @@ import (
 func (b *BaseApi) GetNginx(c *gin.Context) {
 	fileInfo, err := nginxService.GetNginxConfig()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, fileInfo)
@@ -38,7 +37,7 @@ func (b *BaseApi) GetNginxConfigByScope(c *gin.Context) {
 
 	params, err := nginxService.GetConfigByScope(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, params)
@@ -59,7 +58,7 @@ func (b *BaseApi) UpdateNginxConfigByScope(c *gin.Context) {
 		return
 	}
 	if err := nginxService.UpdateConfigByScope(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -74,7 +73,7 @@ func (b *BaseApi) UpdateNginxConfigByScope(c *gin.Context) {
 func (b *BaseApi) GetNginxStatus(c *gin.Context) {
 	res, err := nginxService.GetStatus()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, res)
@@ -96,7 +95,7 @@ func (b *BaseApi) UpdateNginxFile(c *gin.Context) {
 	}
 
 	if err := nginxService.UpdateConfigFile(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -111,7 +110,7 @@ func (b *BaseApi) UpdateNginxFile(c *gin.Context) {
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"清理 Openresty 代理缓存","formatEN":"Clear nginx proxy cache"}
 func (b *BaseApi) ClearNginxProxyCache(c *gin.Context) {
 	if err := nginxService.ClearProxyCache(); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -132,7 +131,7 @@ func (b *BaseApi) BuildNginx(c *gin.Context) {
 		return
 	}
 	if err := nginxService.Build(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -153,7 +152,7 @@ func (b *BaseApi) UpdateNginxModule(c *gin.Context) {
 		return
 	}
 	if err := nginxService.UpdateModule(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -168,7 +167,7 @@ func (b *BaseApi) UpdateNginxModule(c *gin.Context) {
 func (b *BaseApi) GetNginxModules(c *gin.Context) {
 	modules, err := nginxService.GetModules()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, modules)

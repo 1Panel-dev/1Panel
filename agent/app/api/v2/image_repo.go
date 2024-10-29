@@ -3,7 +3,6 @@ package v2
 import (
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,7 +23,7 @@ func (b *BaseApi) SearchRepo(c *gin.Context) {
 
 	total, list, err := imageRepoService.Page(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -44,7 +43,7 @@ func (b *BaseApi) SearchRepo(c *gin.Context) {
 func (b *BaseApi) ListRepo(c *gin.Context) {
 	list, err := imageRepoService.List()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -67,7 +66,7 @@ func (b *BaseApi) CheckRepoStatus(c *gin.Context) {
 	}
 
 	if err := imageRepoService.Login(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -90,7 +89,7 @@ func (b *BaseApi) CreateRepo(c *gin.Context) {
 	}
 
 	if err := imageRepoService.Create(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -113,7 +112,7 @@ func (b *BaseApi) DeleteRepo(c *gin.Context) {
 	}
 
 	if err := imageRepoService.BatchDelete(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -136,7 +135,7 @@ func (b *BaseApi) UpdateRepo(c *gin.Context) {
 	}
 
 	if err := imageRepoService.Update(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)

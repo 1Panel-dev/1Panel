@@ -4,7 +4,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,7 +22,7 @@ func (b *BaseApi) PageWebsite(c *gin.Context) {
 	}
 	total, websites, err := websiteService.PageWebsite(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, dto.PageResult{
@@ -41,7 +40,7 @@ func (b *BaseApi) PageWebsite(c *gin.Context) {
 func (b *BaseApi) GetWebsites(c *gin.Context) {
 	websites, err := websiteService.GetWebsites()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, websites)
@@ -60,7 +59,7 @@ func (b *BaseApi) GetWebsiteOptions(c *gin.Context) {
 	}
 	websites, err := websiteService.GetWebsiteOptions(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, websites)
@@ -82,7 +81,7 @@ func (b *BaseApi) CreateWebsite(c *gin.Context) {
 	}
 	err := websiteService.CreateWebsite(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -104,7 +103,7 @@ func (b *BaseApi) OpWebsite(c *gin.Context) {
 	}
 	err := websiteService.OpWebsite(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -126,7 +125,7 @@ func (b *BaseApi) DeleteWebsite(c *gin.Context) {
 	}
 	err := websiteService.DeleteWebsite(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -147,7 +146,7 @@ func (b *BaseApi) UpdateWebsite(c *gin.Context) {
 		return
 	}
 	if err := websiteService.UpdateWebsite(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -164,12 +163,12 @@ func (b *BaseApi) UpdateWebsite(c *gin.Context) {
 func (b *BaseApi) GetWebsite(c *gin.Context) {
 	id, err := helper.GetParamID(c)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		helper.BadRequest(c, err)
 		return
 	}
 	website, err := websiteService.GetWebsite(id)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, website)
@@ -186,14 +185,14 @@ func (b *BaseApi) GetWebsite(c *gin.Context) {
 func (b *BaseApi) GetWebsiteNginx(c *gin.Context) {
 	id, err := helper.GetParamID(c)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		helper.BadRequest(c, err)
 		return
 	}
 	configType := c.Param("type")
 
 	fileInfo, err := websiteService.GetWebsiteNginxConfig(id, configType)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, fileInfo)
@@ -214,7 +213,7 @@ func (b *BaseApi) GetNginxConfig(c *gin.Context) {
 	}
 	config, err := websiteService.GetNginxConfigByScope(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, config)
@@ -235,7 +234,7 @@ func (b *BaseApi) UpdateNginxConfig(c *gin.Context) {
 		return
 	}
 	if err := websiteService.UpdateNginxConfigByScope(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -252,12 +251,12 @@ func (b *BaseApi) UpdateNginxConfig(c *gin.Context) {
 func (b *BaseApi) GetHTTPSConfig(c *gin.Context) {
 	id, err := helper.GetParamID(c)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		helper.BadRequest(c, err)
 		return
 	}
 	res, err := websiteService.GetWebsiteHTTPS(id)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, res)
@@ -281,7 +280,7 @@ func (b *BaseApi) UpdateHTTPSConfig(c *gin.Context) {
 	res, err := websiteService.OpWebsiteHTTPS(ctx, req)
 	if err != nil {
 		tx.Rollback()
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	tx.Commit()
@@ -303,7 +302,7 @@ func (b *BaseApi) CreateWebsiteCheck(c *gin.Context) {
 	}
 	data, err := websiteService.PreInstallCheck(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, data)
@@ -324,7 +323,7 @@ func (b *BaseApi) UpdateWebsiteNginxConfig(c *gin.Context) {
 		return
 	}
 	if err := websiteService.UpdateNginxConfigFile(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -346,7 +345,7 @@ func (b *BaseApi) OpWebsiteLog(c *gin.Context) {
 	}
 	res, err := websiteService.OpWebsiteLog(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, res)
@@ -367,7 +366,7 @@ func (b *BaseApi) ChangeDefaultServer(c *gin.Context) {
 		return
 	}
 	if err := websiteService.ChangeDefaultServer(req.ID); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -388,7 +387,7 @@ func (b *BaseApi) ChangePHPVersion(c *gin.Context) {
 		return
 	}
 	if err := websiteService.ChangePHPVersion(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -409,7 +408,7 @@ func (b *BaseApi) GetRewriteConfig(c *gin.Context) {
 	}
 	res, err := websiteService.GetRewriteConfig(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, res)
@@ -430,7 +429,7 @@ func (b *BaseApi) UpdateRewriteConfig(c *gin.Context) {
 		return
 	}
 	if err := websiteService.UpdateRewriteConfig(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -451,7 +450,7 @@ func (b *BaseApi) UpdateSiteDir(c *gin.Context) {
 		return
 	}
 	if err := websiteService.UpdateSiteDir(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -472,7 +471,7 @@ func (b *BaseApi) UpdateSiteDirPermission(c *gin.Context) {
 		return
 	}
 	if err := websiteService.UpdateSitePermission(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -493,7 +492,7 @@ func (b *BaseApi) GetProxyConfig(c *gin.Context) {
 	}
 	res, err := websiteService.GetProxies(req.ID)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, res)
@@ -515,7 +514,7 @@ func (b *BaseApi) UpdateProxyConfig(c *gin.Context) {
 	}
 	err := websiteService.OperateProxy(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -536,7 +535,7 @@ func (b *BaseApi) UpdateProxyConfigFile(c *gin.Context) {
 		return
 	}
 	if err := websiteService.UpdateProxyFile(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -557,7 +556,7 @@ func (b *BaseApi) GetAuthConfig(c *gin.Context) {
 	}
 	res, err := websiteService.GetAuthBasics(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, res)
@@ -577,7 +576,7 @@ func (b *BaseApi) UpdateAuthConfig(c *gin.Context) {
 		return
 	}
 	if err := websiteService.UpdateAuthBasic(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -598,7 +597,7 @@ func (b *BaseApi) GetPathAuthConfig(c *gin.Context) {
 	}
 	res, err := websiteService.GetPathAuthBasics(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, res)
@@ -618,7 +617,7 @@ func (b *BaseApi) UpdatePathAuthConfig(c *gin.Context) {
 		return
 	}
 	if err := websiteService.UpdatePathAuthBasic(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -639,7 +638,7 @@ func (b *BaseApi) GetAntiLeech(c *gin.Context) {
 	}
 	res, err := websiteService.GetAntiLeech(req.WebsiteID)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, res)
@@ -659,7 +658,7 @@ func (b *BaseApi) UpdateAntiLeech(c *gin.Context) {
 		return
 	}
 	if err := websiteService.UpdateAntiLeech(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -681,7 +680,7 @@ func (b *BaseApi) UpdateRedirectConfig(c *gin.Context) {
 	}
 	err := websiteService.OperateRedirect(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -702,7 +701,7 @@ func (b *BaseApi) GetRedirectConfig(c *gin.Context) {
 	}
 	res, err := websiteService.GetRedirect(req.WebsiteID)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, res)
@@ -723,7 +722,7 @@ func (b *BaseApi) UpdateRedirectConfigFile(c *gin.Context) {
 		return
 	}
 	if err := websiteService.UpdateRedirectFile(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -744,7 +743,7 @@ func (b *BaseApi) GetDirConfig(c *gin.Context) {
 	}
 	res, err := websiteService.LoadWebsiteDirConfig(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, res)
@@ -760,12 +759,12 @@ func (b *BaseApi) GetDirConfig(c *gin.Context) {
 func (b *BaseApi) GetDefaultHtml(c *gin.Context) {
 	resourceType, err := helper.GetStrParamByKey(c, "type")
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		helper.BadRequest(c, err)
 		return
 	}
 	fileInfo, err := websiteService.GetDefaultHtml(resourceType)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, fileInfo)
@@ -786,7 +785,7 @@ func (b *BaseApi) UpdateDefaultHtml(c *gin.Context) {
 		return
 	}
 	if err := websiteService.UpdateDefaultHtml(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -803,12 +802,12 @@ func (b *BaseApi) UpdateDefaultHtml(c *gin.Context) {
 func (b *BaseApi) GetLoadBalances(c *gin.Context) {
 	id, err := helper.GetParamID(c)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		helper.BadRequest(c, err)
 		return
 	}
 	res, err := websiteService.GetLoadBalances(id)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, res)
@@ -828,7 +827,7 @@ func (b *BaseApi) CreateLoadBalance(c *gin.Context) {
 		return
 	}
 	if err := websiteService.CreateLoadBalance(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -848,7 +847,7 @@ func (b *BaseApi) DeleteLoadBalance(c *gin.Context) {
 		return
 	}
 	if err := websiteService.DeleteLoadBalance(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -868,7 +867,7 @@ func (b *BaseApi) UpdateLoadBalance(c *gin.Context) {
 		return
 	}
 	if err := websiteService.UpdateLoadBalance(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -888,7 +887,7 @@ func (b *BaseApi) UpdateLoadBalanceFile(c *gin.Context) {
 		return
 	}
 	if err := websiteService.UpdateLoadBalanceFile(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -900,7 +899,7 @@ func (b *BaseApi) ChangeWebsiteGroup(c *gin.Context) {
 		return
 	}
 	if err := websiteService.ChangeGroup(req.Group, req.NewGroup); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -920,7 +919,7 @@ func (b *BaseApi) UpdateProxyCache(c *gin.Context) {
 		return
 	}
 	if err := websiteService.UpdateProxyCache(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -936,12 +935,12 @@ func (b *BaseApi) UpdateProxyCache(c *gin.Context) {
 func (b *BaseApi) GetProxyCache(c *gin.Context) {
 	id, err := helper.GetParamID(c)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		helper.BadRequest(c, err)
 		return
 	}
 	res, err := websiteService.GetProxyCache(id)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, res)
@@ -962,7 +961,7 @@ func (b *BaseApi) SetRealIPConfig(c *gin.Context) {
 		return
 	}
 	if err := websiteService.SetRealIPConfig(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -979,12 +978,12 @@ func (b *BaseApi) SetRealIPConfig(c *gin.Context) {
 func (b *BaseApi) GetRealIPConfig(c *gin.Context) {
 	id, err := helper.GetParamID(c)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		helper.BadRequest(c, err)
 		return
 	}
 	res, err := websiteService.GetRealIPConfig(id)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, res)
@@ -1001,12 +1000,12 @@ func (b *BaseApi) GetRealIPConfig(c *gin.Context) {
 func (b *BaseApi) GetWebsiteResource(c *gin.Context) {
 	id, err := helper.GetParamID(c)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		helper.BadRequest(c, err)
 		return
 	}
 	res, err := websiteService.GetWebsiteResource(id)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, res)
@@ -1022,7 +1021,7 @@ func (b *BaseApi) GetWebsiteResource(c *gin.Context) {
 func (b *BaseApi) GetWebsiteDatabase(c *gin.Context) {
 	res, err := websiteService.ListDatabases()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, res)
@@ -1042,7 +1041,7 @@ func (b *BaseApi) ChangeWebsiteDatabase(c *gin.Context) {
 		return
 	}
 	if err := websiteService.ChangeDatabase(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -1062,7 +1061,7 @@ func (b *BaseApi) OperateCustomRewrite(c *gin.Context) {
 		return
 	}
 	if err := websiteService.OperateCustomRewrite(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -1078,7 +1077,7 @@ func (b *BaseApi) OperateCustomRewrite(c *gin.Context) {
 func (b *BaseApi) ListCustomRewrite(c *gin.Context) {
 	res, err := websiteService.ListCustomRewrite()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, res)

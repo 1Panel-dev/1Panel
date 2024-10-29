@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,7 +17,7 @@ import (
 func (b *BaseApi) LoadDashboardOsInfo(c *gin.Context) {
 	data, err := dashboardService.LoadOsInfo()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, data)
@@ -36,17 +35,17 @@ func (b *BaseApi) LoadDashboardOsInfo(c *gin.Context) {
 func (b *BaseApi) LoadDashboardBaseInfo(c *gin.Context) {
 	ioOption, ok := c.Params.Get("ioOption")
 	if !ok {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error ioOption in path"))
+		helper.BadRequest(c, errors.New("error ioOption in path"))
 		return
 	}
 	netOption, ok := c.Params.Get("netOption")
 	if !ok {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error netOption in path"))
+		helper.BadRequest(c, errors.New("error ioOption in path"))
 		return
 	}
 	data, err := dashboardService.LoadBaseInfo(ioOption, netOption)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, data)
@@ -75,12 +74,12 @@ func (b *BaseApi) LoadCurrentInfoForNode(c *gin.Context) {
 func (b *BaseApi) LoadDashboardCurrentInfo(c *gin.Context) {
 	ioOption, ok := c.Params.Get("ioOption")
 	if !ok {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error ioOption in path"))
+		helper.BadRequest(c, errors.New("error ioOption in path"))
 		return
 	}
 	netOption, ok := c.Params.Get("netOption")
 	if !ok {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error netOption in path"))
+		helper.BadRequest(c, errors.New("error netOption in path"))
 		return
 	}
 
@@ -99,11 +98,11 @@ func (b *BaseApi) LoadDashboardCurrentInfo(c *gin.Context) {
 func (b *BaseApi) SystemRestart(c *gin.Context) {
 	operation, ok := c.Params.Get("operation")
 	if !ok {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error operation in path"))
+		helper.BadRequest(c, errors.New("error operation in path"))
 		return
 	}
 	if err := dashboardService.Restart(operation); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)

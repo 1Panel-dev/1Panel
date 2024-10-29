@@ -40,7 +40,7 @@ func (b *BaseApi) ListFiles(c *gin.Context) {
 	}
 	files, err := fileService.GetFileList(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, files)
@@ -61,7 +61,7 @@ func (b *BaseApi) SearchUploadWithPage(c *gin.Context) {
 	}
 	total, files, err := fileService.SearchUploadWithPage(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, dto.PageResult{
@@ -85,7 +85,7 @@ func (b *BaseApi) GetFileTree(c *gin.Context) {
 	}
 	tree, err := fileService.GetFileTree(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, tree)
@@ -107,7 +107,7 @@ func (b *BaseApi) CreateFile(c *gin.Context) {
 	}
 	err := fileService.Create(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -129,7 +129,7 @@ func (b *BaseApi) DeleteFile(c *gin.Context) {
 	}
 	err := fileService.Delete(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -151,7 +151,7 @@ func (b *BaseApi) BatchDeleteFile(c *gin.Context) {
 	}
 	err := fileService.BatchDelete(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -173,7 +173,7 @@ func (b *BaseApi) ChangeFileMode(c *gin.Context) {
 	}
 	err := fileService.ChangeMode(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -194,7 +194,7 @@ func (b *BaseApi) ChangeFileOwner(c *gin.Context) {
 		return
 	}
 	if err := fileService.ChangeOwner(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -216,7 +216,7 @@ func (b *BaseApi) CompressFile(c *gin.Context) {
 	}
 	err := fileService.Compress(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -238,7 +238,7 @@ func (b *BaseApi) DeCompressFile(c *gin.Context) {
 	}
 	err := fileService.DeCompress(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -260,7 +260,7 @@ func (b *BaseApi) GetContent(c *gin.Context) {
 	}
 	info, err := fileService.GetContent(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, info)
@@ -281,7 +281,7 @@ func (b *BaseApi) SaveContent(c *gin.Context) {
 		return
 	}
 	if err := fileService.SaveContent(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -298,7 +298,7 @@ func (b *BaseApi) SaveContent(c *gin.Context) {
 func (b *BaseApi) UploadFiles(c *gin.Context) {
 	form, err := c.MultipartForm()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		helper.BadRequest(c, err)
 		return
 	}
 	uploadFiles := form.File["file"]
@@ -322,7 +322,7 @@ func (b *BaseApi) UploadFiles(c *gin.Context) {
 	if err != nil && os.IsNotExist(err) {
 		mode, err := files.GetParentMode(dir)
 		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			helper.InternalServer(c, err)
 			return
 		}
 		if err = os.MkdirAll(dir, mode); err != nil {
@@ -332,7 +332,7 @@ func (b *BaseApi) UploadFiles(c *gin.Context) {
 	}
 	info, err := os.Stat(dir)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	mode := info.Mode()
@@ -422,7 +422,7 @@ func (b *BaseApi) ChangeFileName(c *gin.Context) {
 		return
 	}
 	if err := fileService.ChangeName(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -444,7 +444,7 @@ func (b *BaseApi) WgetFile(c *gin.Context) {
 	}
 	key, err := fileService.Wget(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, response.FileWgetRes{
@@ -467,7 +467,7 @@ func (b *BaseApi) MoveFile(c *gin.Context) {
 		return
 	}
 	if err := fileService.MvFile(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -484,7 +484,7 @@ func (b *BaseApi) Download(c *gin.Context) {
 	filePath := c.Query("path")
 	file, err := os.Open(filePath)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 	}
 	defer file.Close()
 	info, _ := file.Stat()
@@ -515,12 +515,12 @@ func (b *BaseApi) DownloadChunkFiles(c *gin.Context) {
 	filePath := req.Path
 	fstFile, err := fileOp.OpenFile(filePath)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	info, err := fstFile.Stat()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	if info.IsDir() {
@@ -553,7 +553,7 @@ func (b *BaseApi) DownloadChunkFiles(c *gin.Context) {
 		buffer := make([]byte, 1024*1024)
 		file, err := os.Open(filePath)
 		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			helper.InternalServer(c, err)
 			return
 		}
 		defer file.Close()
@@ -562,7 +562,7 @@ func (b *BaseApi) DownloadChunkFiles(c *gin.Context) {
 		reader := io.LimitReader(file, endPos-startPos+1)
 		_, err = io.CopyBuffer(c.Writer, reader, buffer)
 		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			helper.InternalServer(c, err)
 			return
 		}
 	} else {
@@ -586,7 +586,7 @@ func (b *BaseApi) Size(c *gin.Context) {
 	}
 	res, err := fileService.DirSize(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, res)
@@ -650,30 +650,30 @@ func (b *BaseApi) UploadChunkFiles(c *gin.Context) {
 	var err error
 	fileForm, err := c.FormFile("chunk")
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		helper.BadRequest(c, err)
 		return
 	}
 	uploadFile, err := fileForm.Open()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		helper.BadRequest(c, err)
 		return
 	}
 	defer uploadFile.Close()
 	chunkIndex, err := strconv.Atoi(c.PostForm("chunkIndex"))
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		helper.BadRequest(c, err)
 		return
 	}
 	chunkCount, err := strconv.Atoi(c.PostForm("chunkCount"))
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		helper.BadRequest(c, err)
 		return
 	}
 	fileOp := files.NewFileOp()
 	tmpDir := path.Join(global.CONF.System.TmpDir, "upload")
 	if !fileOp.Stat(tmpDir) {
 		if err := fileOp.CreateDir(tmpDir, 0755); err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			helper.BadRequest(c, err)
 			return
 		}
 	}
@@ -699,7 +699,7 @@ func (b *BaseApi) UploadChunkFiles(c *gin.Context) {
 
 	emptyFile, err = os.Create(filePath)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		helper.BadRequest(c, err)
 		return
 	}
 	defer emptyFile.Close()
@@ -753,7 +753,7 @@ func (b *BaseApi) Keys(c *gin.Context) {
 	res := &response.FileProcessKeys{}
 	keys, err := global.CACHE.PrefixScanKey("file-wget-")
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	res.Keys = keys
@@ -774,7 +774,7 @@ func (b *BaseApi) ReadFileByLine(c *gin.Context) {
 	}
 	res, err := fileService.ReadLogByLine(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, res)
@@ -795,7 +795,7 @@ func (b *BaseApi) BatchChangeModeAndOwner(c *gin.Context) {
 		return
 	}
 	if err := fileService.BatchChangeModeAndOwner(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 	}
 	helper.SuccessWithOutData(c)
 }

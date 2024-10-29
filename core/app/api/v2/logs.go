@@ -49,7 +49,7 @@ func (b *BaseApi) GetOperationLogs(c *gin.Context) {
 
 	total, list, err := logService.PageOperationLog(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -75,7 +75,7 @@ func (b *BaseApi) CleanLogs(c *gin.Context) {
 	}
 
 	if err := logService.CleanLogs(req.LogType); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 

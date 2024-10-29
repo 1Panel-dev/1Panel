@@ -18,7 +18,7 @@ import (
 func (b *BaseApi) LoadFtpBaseInfo(c *gin.Context) {
 	data, err := ftpService.LoadBaseInfo()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -117,7 +117,7 @@ func (b *BaseApi) CreateFtp(c *gin.Context) {
 	if len(req.Password) != 0 {
 		pass, err := base64.StdEncoding.DecodeString(req.Password)
 		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			helper.BadRequest(c, err)
 			return
 		}
 		req.Password = string(pass)
@@ -186,7 +186,7 @@ func (b *BaseApi) UpdateFtp(c *gin.Context) {
 	if len(req.Password) != 0 {
 		pass, err := base64.StdEncoding.DecodeString(req.Password)
 		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			helper.BadRequest(c, err)
 			return
 		}
 		req.Password = string(pass)

@@ -13,15 +13,13 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 
+	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx/components"
-	"gopkg.in/yaml.v3"
-
-	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -932,35 +930,6 @@ func chownRootDir(path string) error {
 		return err
 	}
 	return nil
-}
-
-func changeServiceName(newComposeContent, newServiceName string) (composeByte []byte, err error) {
-	composeMap := make(map[string]interface{})
-	if err = yaml.Unmarshal([]byte(newComposeContent), &composeMap); err != nil {
-		return
-	}
-	value, ok := composeMap["services"]
-	if !ok || value == nil {
-		err = buserr.New(constant.ErrFileParse)
-		return
-	}
-	servicesMap := value.(map[string]interface{})
-
-	index := 0
-	serviceName := ""
-	for k := range servicesMap {
-		serviceName = k
-		if index > 0 {
-			continue
-		}
-		index++
-	}
-	if newServiceName != serviceName {
-		servicesMap[newServiceName] = servicesMap[serviceName]
-		delete(servicesMap, serviceName)
-	}
-
-	return yaml.Marshal(composeMap)
 }
 
 func getWebsiteDomains(domains []request.WebsiteDomain, defaultPort int, websiteID uint) (domainModels []model.WebsiteDomain, addPorts []int, addDomains []string, err error) {

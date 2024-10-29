@@ -4,7 +4,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,7 +22,7 @@ func (b *BaseApi) SearchRuntimes(c *gin.Context) {
 	}
 	total, items, err := runtimeService.Page(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, dto.PageResult{
@@ -48,7 +47,7 @@ func (b *BaseApi) CreateRuntime(c *gin.Context) {
 	}
 	ssl, err := runtimeService.Create(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, ssl)
@@ -70,7 +69,7 @@ func (b *BaseApi) DeleteRuntime(c *gin.Context) {
 	}
 	err := runtimeService.Delete(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -86,12 +85,12 @@ func (b *BaseApi) DeleteRuntime(c *gin.Context) {
 func (b *BaseApi) DeleteRuntimeCheck(c *gin.Context) {
 	runTimeId, err := helper.GetIntParamByKey(c, "runTimeId")
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		helper.BadRequest(c, err)
 		return
 	}
 	checkData, err := runtimeService.DeleteCheck(runTimeId)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, checkData)
@@ -112,7 +111,7 @@ func (b *BaseApi) UpdateRuntime(c *gin.Context) {
 		return
 	}
 	if err := runtimeService.Update(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -129,12 +128,12 @@ func (b *BaseApi) UpdateRuntime(c *gin.Context) {
 func (b *BaseApi) GetRuntime(c *gin.Context) {
 	id, err := helper.GetIntParamByKey(c, "id")
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		helper.BadRequest(c, err)
 		return
 	}
 	res, err := runtimeService.Get(id)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, res)
@@ -155,7 +154,7 @@ func (b *BaseApi) GetNodePackageRunScript(c *gin.Context) {
 	}
 	res, err := runtimeService.GetNodePackageRunScript(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, res)
@@ -177,7 +176,7 @@ func (b *BaseApi) OperateRuntime(c *gin.Context) {
 	}
 	err := runtimeService.OperateRuntime(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -198,7 +197,7 @@ func (b *BaseApi) GetNodeModules(c *gin.Context) {
 	}
 	res, err := runtimeService.GetNodeModules(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, res)
@@ -219,7 +218,7 @@ func (b *BaseApi) OperateNodeModules(c *gin.Context) {
 	}
 	err := runtimeService.OperateNodeModules(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -235,7 +234,7 @@ func (b *BaseApi) OperateNodeModules(c *gin.Context) {
 func (b *BaseApi) SyncStatus(c *gin.Context) {
 	err := runtimeService.SyncRuntimeStatus()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -252,12 +251,12 @@ func (b *BaseApi) SyncStatus(c *gin.Context) {
 func (b *BaseApi) GetRuntimeExtension(c *gin.Context) {
 	id, err := helper.GetIntParamByKey(c, "id")
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		helper.BadRequest(c, err)
 		return
 	}
 	res, err := runtimeService.GetPHPExtensions(id)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, res)
@@ -278,7 +277,7 @@ func (b *BaseApi) InstallPHPExtension(c *gin.Context) {
 	}
 	err := runtimeService.InstallPHPExtension(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -299,7 +298,7 @@ func (b *BaseApi) UnInstallPHPExtension(c *gin.Context) {
 	}
 	err := runtimeService.UnInstallPHPExtension(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -316,12 +315,12 @@ func (b *BaseApi) UnInstallPHPExtension(c *gin.Context) {
 func (b *BaseApi) GetPHPConfig(c *gin.Context) {
 	id, err := helper.GetParamID(c)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		helper.BadRequest(c, err)
 		return
 	}
 	data, err := runtimeService.GetPHPConfig(id)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, data)
@@ -342,7 +341,7 @@ func (b *BaseApi) UpdatePHPConfig(c *gin.Context) {
 		return
 	}
 	if err := runtimeService.UpdatePHPConfig(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -363,7 +362,7 @@ func (b *BaseApi) UpdatePHPFile(c *gin.Context) {
 		return
 	}
 	if err := runtimeService.UpdatePHPConfigFile(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -384,7 +383,7 @@ func (b *BaseApi) GetPHPConfigFile(c *gin.Context) {
 	}
 	data, err := runtimeService.GetPHPConfigFile(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, data)
@@ -404,7 +403,7 @@ func (b *BaseApi) UpdateFPMConfig(c *gin.Context) {
 		return
 	}
 	if err := runtimeService.UpdateFPMConfig(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -421,12 +420,12 @@ func (b *BaseApi) UpdateFPMConfig(c *gin.Context) {
 func (b *BaseApi) GetFPMConfig(c *gin.Context) {
 	id, err := helper.GetParamID(c)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		helper.BadRequest(c, err)
 		return
 	}
 	data, err := runtimeService.GetFPMConfig(id)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, data)
@@ -443,12 +442,12 @@ func (b *BaseApi) GetFPMConfig(c *gin.Context) {
 func (b *BaseApi) GetSupervisorProcess(c *gin.Context) {
 	id, err := helper.GetParamID(c)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		helper.BadRequest(c, err)
 		return
 	}
 	data, err := runtimeService.GetSupervisorProcess(id)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, data)
@@ -469,7 +468,7 @@ func (b *BaseApi) OperateSupervisorProcess(c *gin.Context) {
 	}
 	err := runtimeService.OperateSupervisorProcess(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -490,7 +489,7 @@ func (b *BaseApi) OperateSupervisorProcessFile(c *gin.Context) {
 	}
 	res, err := runtimeService.OperateSupervisorProcessFile(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, res)

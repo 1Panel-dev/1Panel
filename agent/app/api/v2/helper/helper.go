@@ -44,6 +44,14 @@ func ErrorWithDetail(ctx *gin.Context, code int, msgKey string, err error) {
 	ctx.Abort()
 }
 
+func InternalServer(ctx *gin.Context, err error) {
+	ErrorWithDetail(ctx, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+}
+
+func BadRequest(ctx *gin.Context, err error) {
+	ErrorWithDetail(ctx, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+}
+
 func SuccessWithData(ctx *gin.Context, data interface{}) {
 	if data == nil {
 		data = gin.H{}

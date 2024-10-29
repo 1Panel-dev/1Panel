@@ -3,7 +3,6 @@ package v2
 import (
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,7 +15,7 @@ import (
 func (b *BaseApi) GetSSHInfo(c *gin.Context) {
 	info, err := sshService.GetSSHInfo()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, info)
@@ -37,7 +36,7 @@ func (b *BaseApi) OperateSSH(c *gin.Context) {
 	}
 
 	if err := sshService.OperateSSH(req.Operation); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -59,7 +58,7 @@ func (b *BaseApi) UpdateSSH(c *gin.Context) {
 	}
 
 	if err := sshService.Update(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -81,7 +80,7 @@ func (b *BaseApi) UpdateSSHByfile(c *gin.Context) {
 	}
 
 	if err := sshService.UpdateByFile(req.File); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -103,7 +102,7 @@ func (b *BaseApi) GenerateSSH(c *gin.Context) {
 	}
 
 	if err := sshService.GenerateSSH(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -125,7 +124,7 @@ func (b *BaseApi) LoadSSHSecret(c *gin.Context) {
 
 	data, err := sshService.LoadSSHSecret(req.EncryptionMode)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, data)
@@ -147,7 +146,7 @@ func (b *BaseApi) LoadSSHLogs(c *gin.Context) {
 
 	data, err := sshService.LoadLog(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, data)
@@ -162,7 +161,7 @@ func (b *BaseApi) LoadSSHLogs(c *gin.Context) {
 func (b *BaseApi) LoadSSHConf(c *gin.Context) {
 	data, err := sshService.LoadSSHConf()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, data)

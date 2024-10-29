@@ -5,7 +5,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,7 +17,7 @@ import (
 func (b *BaseApi) LoadFail2BanBaseInfo(c *gin.Context) {
 	data, err := fail2banService.LoadBaseInfo()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -41,7 +40,7 @@ func (b *BaseApi) SearchFail2Ban(c *gin.Context) {
 
 	list, err := fail2banService.Search(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -63,7 +62,7 @@ func (b *BaseApi) OperateFail2Ban(c *gin.Context) {
 	}
 
 	if err := fail2banService.Operate(req.Operation); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -84,7 +83,7 @@ func (b *BaseApi) OperateSSHD(c *gin.Context) {
 	}
 
 	if err := fail2banService.OperateSSHD(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -107,7 +106,7 @@ func (b *BaseApi) UpdateFail2BanConf(c *gin.Context) {
 	}
 
 	if err := fail2banService.UpdateConf(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -124,7 +123,7 @@ func (b *BaseApi) LoadFail2BanConf(c *gin.Context) {
 	path := "/etc/fail2ban/jail.local"
 	file, err := os.ReadFile(path)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -145,7 +144,7 @@ func (b *BaseApi) UpdateFail2BanConfByFile(c *gin.Context) {
 		return
 	}
 	if err := fail2banService.UpdateConfByFile(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 

@@ -103,8 +103,10 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, e
 			return nil, buserr.New(constant.ErrImageExist)
 		}
 		portValue, _ := create.Params["PANEL_APP_PORT_HTTP"]
-		if err := checkPortExist(int(portValue.(float64))); err != nil {
-			return nil, err
+		if portValue != nil {
+			if err := checkPortExist(int(portValue.(float64))); err != nil {
+				return nil, err
+			}
 		}
 	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo, constant.RuntimePython:
 		if !fileOp.Stat(create.CodeDir) {
@@ -747,6 +749,9 @@ func (r *RuntimeService) InstallPHPExtension(req request.PHPExtensionInstallReq)
 		defer client.Close()
 		if err == nil {
 			oldImageID, err := client.GetImageIDByName(runtime.Image)
+			if err != nil {
+				return err
+			}
 			commitCmd := fmt.Sprintf("docker commit %s %s", runtime.ContainerName, runtime.Image)
 			err = cmd2.ExecWithLogFile(commitCmd, 15*time.Minute, t.Task.LogFile)
 			if err != nil {

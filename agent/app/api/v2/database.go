@@ -5,7 +5,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -33,7 +32,7 @@ func (b *BaseApi) CreateDatabase(c *gin.Context) {
 	}
 
 	if err := databaseService.Create(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -81,7 +80,7 @@ func (b *BaseApi) SearchDatabase(c *gin.Context) {
 
 	total, list, err := databaseService.SearchWithPage(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -100,12 +99,12 @@ func (b *BaseApi) SearchDatabase(c *gin.Context) {
 func (b *BaseApi) ListDatabase(c *gin.Context) {
 	dbType, err := helper.GetStrParamByKey(c, "type")
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		helper.BadRequest(c, err)
 		return
 	}
 	list, err := databaseService.List(dbType)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -121,12 +120,12 @@ func (b *BaseApi) ListDatabase(c *gin.Context) {
 func (b *BaseApi) LoadDatabaseItems(c *gin.Context) {
 	dbType, err := helper.GetStrParamByKey(c, "type")
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		helper.BadRequest(c, err)
 		return
 	}
 	list, err := databaseService.LoadItems(dbType)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -142,12 +141,12 @@ func (b *BaseApi) LoadDatabaseItems(c *gin.Context) {
 func (b *BaseApi) GetDatabase(c *gin.Context) {
 	name, err := helper.GetStrParamByKey(c, "name")
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		helper.BadRequest(c, err)
 		return
 	}
 	data, err := databaseService.Get(name)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -170,7 +169,7 @@ func (b *BaseApi) DeleteCheckDatabase(c *gin.Context) {
 
 	apps, err := databaseService.DeleteCheck(req.ID)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, apps)
@@ -192,7 +191,7 @@ func (b *BaseApi) DeleteDatabase(c *gin.Context) {
 	}
 
 	if err := databaseService.Delete(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -222,7 +221,7 @@ func (b *BaseApi) UpdateDatabase(c *gin.Context) {
 	}
 
 	if err := databaseService.Update(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)

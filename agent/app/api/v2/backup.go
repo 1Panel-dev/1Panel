@@ -13,12 +13,12 @@ import (
 func (b *BaseApi) CheckBackupUsed(c *gin.Context) {
 	id, err := helper.GetIntParamByKey(c, "id")
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		helper.BadRequest(c, err)
 		return
 	}
 
 	if err := backupService.CheckUsed(id); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		helper.BadRequest(c, err)
 		return
 	}
 
@@ -41,7 +41,7 @@ func (b *BaseApi) SearchBackupRecords(c *gin.Context) {
 
 	total, list, err := backupService.SearchRecordsWithPage(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -67,7 +67,7 @@ func (b *BaseApi) SearchBackupRecordsByCronjob(c *gin.Context) {
 
 	total, list, err := backupService.SearchRecordsByCronjobWithPage(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -94,7 +94,7 @@ func (b *BaseApi) DownloadRecord(c *gin.Context) {
 
 	filePath, err := backupService.DownloadRecord(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, filePath)
@@ -116,7 +116,7 @@ func (b *BaseApi) DeleteBackupRecord(c *gin.Context) {
 	}
 
 	if err := backupService.BatchDeleteRecord(req.Ids); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -158,27 +158,27 @@ func (b *BaseApi) Backup(c *gin.Context) {
 	switch req.Type {
 	case "app":
 		if _, err := backupService.AppBackup(req); err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			helper.InternalServer(c, err)
 			return
 		}
 	case "mysql", "mariadb":
 		if err := backupService.MysqlBackup(req); err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			helper.InternalServer(c, err)
 			return
 		}
 	case constant.AppPostgresql:
 		if err := backupService.PostgresqlBackup(req); err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			helper.InternalServer(c, err)
 			return
 		}
 	case "website":
 		if err := backupService.WebsiteBackup(req); err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			helper.InternalServer(c, err)
 			return
 		}
 	case "redis":
 		if err := backupService.RedisBackup(req); err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			helper.InternalServer(c, err)
 			return
 		}
 	}
@@ -206,34 +206,34 @@ func (b *BaseApi) Recover(c *gin.Context) {
 		FileName:          path.Base(req.File),
 	})
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, fmt.Errorf("download file failed, err: %v", err))
+		helper.BadRequest(c, fmt.Errorf("download file failed, err: %v", err))
 		return
 	}
 	req.File = downloadPath
 	switch req.Type {
 	case "mysql", "mariadb":
 		if err := backupService.MysqlRecover(req); err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			helper.InternalServer(c, err)
 			return
 		}
 	case constant.AppPostgresql:
 		if err := backupService.PostgresqlRecover(req); err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			helper.InternalServer(c, err)
 			return
 		}
 	case "website":
 		if err := backupService.WebsiteRecover(req); err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			helper.InternalServer(c, err)
 			return
 		}
 	case "redis":
 		if err := backupService.RedisRecover(req); err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			helper.InternalServer(c, err)
 			return
 		}
 	case "app":
 		if err := backupService.AppRecover(req); err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			helper.InternalServer(c, err)
 			return
 		}
 	}
@@ -258,22 +258,22 @@ func (b *BaseApi) RecoverByUpload(c *gin.Context) {
 	switch req.Type {
 	case "mysql", "mariadb":
 		if err := backupService.MysqlRecoverByUpload(req); err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			helper.InternalServer(c, err)
 			return
 		}
 	case constant.AppPostgresql:
 		if err := backupService.PostgresqlRecoverByUpload(req); err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			helper.InternalServer(c, err)
 			return
 		}
 	case "app":
 		if err := backupService.AppRecover(req); err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			helper.InternalServer(c, err)
 			return
 		}
 	case "website":
 		if err := backupService.WebsiteRecover(req); err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			helper.InternalServer(c, err)
 			return
 		}
 	}

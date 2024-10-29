@@ -214,24 +214,35 @@ export const Fields = [
         label: 'Host',
         value: 'Host',
     },
+    {
+        label: i18n.global.t('xpack.waf.method'),
+        value: 'Method',
+    },
 ];
 
 export const Patterns = [
     {
         label: i18n.global.t('xpack.waf.contain'),
         value: 'contain',
+        hidden: ['Method'],
+    },
+    {
+        label: i18n.global.t('xpack.waf.notContain'),
+        value: 'notContain',
+        hidden: ['Method'],
     },
     {
         label: i18n.global.t('xpack.waf.equal'),
         value: 'eq',
     },
     {
-        label: i18n.global.t('xpack.waf.regex'),
-        value: 'regex',
-    },
-    {
         label: i18n.global.t('xpack.waf.notEqual'),
         value: 'notEq',
+    },
+    {
+        label: i18n.global.t('xpack.waf.regex'),
+        value: 'regex',
+        hidden: ['Method'],
     },
 ];
 
@@ -251,6 +262,41 @@ export const HttpCodes = [
     {
         label: i18n.global.t('xpack.waf.serverErr'),
         value: 500,
+    },
+];
+
+export const HttpMethods = [
+    {
+        label: 'GET',
+        value: 'GET',
+    },
+    {
+        label: 'POST',
+        value: 'POST',
+    },
+    {
+        label: 'PUT',
+        value: 'PUT',
+    },
+    {
+        label: 'DELETE',
+        value: 'DELETE',
+    },
+    {
+        label: 'HEAD',
+        value: 'HEAD',
+    },
+    {
+        label: 'OPTIONS',
+        value: 'OPTIONS',
+    },
+    {
+        label: 'PATCH',
+        value: 'PATCH',
+    },
+    {
+        label: 'TRACE',
+        value: 'TRACE',
     },
 ];
 

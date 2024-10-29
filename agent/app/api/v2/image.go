@@ -3,7 +3,6 @@ package v2
 import (
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,7 +23,7 @@ func (b *BaseApi) SearchImage(c *gin.Context) {
 
 	total, list, err := imageService.Page(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -44,7 +43,7 @@ func (b *BaseApi) SearchImage(c *gin.Context) {
 func (b *BaseApi) ListAllImage(c *gin.Context) {
 	list, err := imageService.ListAll()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, list)
@@ -60,7 +59,7 @@ func (b *BaseApi) ListAllImage(c *gin.Context) {
 func (b *BaseApi) ListImage(c *gin.Context) {
 	list, err := imageService.List()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, list)
@@ -82,7 +81,7 @@ func (b *BaseApi) ImageBuild(c *gin.Context) {
 	}
 
 	if err := imageService.ImageBuild(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -105,7 +104,7 @@ func (b *BaseApi) ImagePull(c *gin.Context) {
 	}
 
 	if err := imageService.ImagePull(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -128,7 +127,7 @@ func (b *BaseApi) ImagePush(c *gin.Context) {
 	}
 
 	if err := imageService.ImagePush(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -152,7 +151,7 @@ func (b *BaseApi) ImageRemove(c *gin.Context) {
 
 	data, err := imageService.ImageRemove(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -175,7 +174,7 @@ func (b *BaseApi) ImageSave(c *gin.Context) {
 	}
 
 	if err := imageService.ImageSave(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -198,7 +197,7 @@ func (b *BaseApi) ImageTag(c *gin.Context) {
 	}
 
 	if err := imageService.ImageTag(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -221,7 +220,7 @@ func (b *BaseApi) ImageLoad(c *gin.Context) {
 	}
 
 	if err := imageService.ImageLoad(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 

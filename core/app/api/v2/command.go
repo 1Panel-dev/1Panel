@@ -45,7 +45,7 @@ func (b *BaseApi) SearchCommand(c *gin.Context) {
 
 	total, list, err := commandService.SearchWithPage(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -71,7 +71,7 @@ func (b *BaseApi) SearchCommandTree(c *gin.Context) {
 
 	list, err := commandService.SearchForTree(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -94,7 +94,7 @@ func (b *BaseApi) ListCommand(c *gin.Context) {
 
 	list, err := commandService.List(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -117,7 +117,7 @@ func (b *BaseApi) DeleteCommand(c *gin.Context) {
 	}
 
 	if err := commandService.Delete(req.IDs); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -143,7 +143,7 @@ func (b *BaseApi) UpdateCommand(c *gin.Context) {
 	upMap["group_id"] = req.GroupID
 	upMap["command"] = req.Command
 	if err := commandService.Update(req.ID, upMap); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)

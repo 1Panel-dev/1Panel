@@ -5,7 +5,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,7 +23,7 @@ func (b *BaseApi) LoadRedisStatus(c *gin.Context) {
 	}
 	data, err := redisService.LoadStatus(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -46,7 +45,7 @@ func (b *BaseApi) LoadRedisConf(c *gin.Context) {
 	}
 	data, err := redisService.LoadConf(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -68,7 +67,7 @@ func (b *BaseApi) LoadPersistenceConf(c *gin.Context) {
 	}
 	data, err := redisService.LoadPersistenceConf(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -87,7 +86,7 @@ func (b *BaseApi) CheckHasCli(c *gin.Context) {
 // @Router /databases/redis/install/cli [post]
 func (b *BaseApi) InstallCli(c *gin.Context) {
 	if err := redisService.InstallCli(); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -110,7 +109,7 @@ func (b *BaseApi) UpdateRedisConf(c *gin.Context) {
 	}
 
 	if err := redisService.UpdateConf(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -134,14 +133,14 @@ func (b *BaseApi) ChangeRedisPassword(c *gin.Context) {
 	if len(req.Value) != 0 {
 		value, err := base64.StdEncoding.DecodeString(req.Value)
 		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			helper.BadRequest(c, err)
 			return
 		}
 		req.Value = string(value)
 	}
 
 	if err := redisService.ChangePassword(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
@@ -163,7 +162,7 @@ func (b *BaseApi) UpdateRedisPersistenceConf(c *gin.Context) {
 	}
 
 	if err := redisService.UpdatePersistenceConf(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
