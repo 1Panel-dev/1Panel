@@ -2,6 +2,7 @@ package v2
 
 import (
 	"encoding/base64"
+	"github.com/1Panel-dev/1Panel/core/utils/geo"
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/app/dto"
@@ -10,7 +11,6 @@ import (
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/middleware"
 	"github.com/1Panel-dev/1Panel/core/utils/captcha"
-	"github.com/1Panel-dev/1Panel/core/utils/qqwry"
 	"github.com/gin-gonic/gin"
 )
 
@@ -175,12 +175,15 @@ func saveLoginLogs(c *gin.Context, err error) {
 		logs.Status = constant.StatusSuccess
 	}
 	logs.IP = c.ClientIP()
-	qqWry, err := qqwry.NewQQwry()
-	if err != nil {
-		global.LOG.Errorf("load qqwry datas failed: %s", err)
+	lang := c.GetHeader("Accept-Language")
+	if lang == "" {
+		lang = "zh"
 	}
-	res := qqWry.Find(logs.IP)
+	address, err := geo.GetIPLocation(logs.IP, lang)
+	if err != nil {
+		global.LOG.Errorf("get ip location failed: %s", err)
+	}
 	logs.Agent = c.GetHeader("User-Agent")
-	logs.Address = res.Area
+	logs.Address = address
 	_ = logService.CreateLoginLog(logs)
 }
