@@ -387,7 +387,9 @@ const onSetting = async () => {
 };
 
 const changeDatabase = async () => {
-    appStatusRef.value.onCheck();
+    if (currentDB.value.from === 'local') {
+        appStatusRef.value.onCheck();
+    }
     for (const item of dbOptionsLocal.value) {
         if (item.database == currentDBName.value) {
             currentDB.value = item;
