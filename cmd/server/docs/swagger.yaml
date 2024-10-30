@@ -233,6 +233,10 @@ definitions:
     type: object
   dto.ClamCreate:
     properties:
+      alertCount:
+        type: integer
+      alertTitle:
+        type: string
       description:
         type: string
       infectedDir:
@@ -297,6 +301,10 @@ definitions:
     type: object
   dto.ClamUpdate:
     properties:
+      alertCount:
+        type: integer
+      alertTitle:
+        type: string
       description:
         type: string
       id:
@@ -371,6 +379,8 @@ definitions:
     properties:
       detailName:
         type: string
+      fileName:
+        type: string
       name:
         type: string
       secret:
@@ -424,6 +434,10 @@ definitions:
     type: object
   dto.ComposeCreate:
     properties:
+      env:
+        items:
+          type: string
+        type: array
       file:
         type: string
       from:
@@ -447,9 +461,11 @@ definitions:
         type: string
       operation:
         enum:
+        - up
         - start
         - stop
         - down
+        - delete
         type: string
       path:
         type: string
@@ -458,7 +474,6 @@ definitions:
     required:
     - name
     - operation
-    - path
     type: object
   dto.ComposeTemplateCreate:
     properties:
@@ -497,6 +512,10 @@ definitions:
     properties:
       content:
         type: string
+      env:
+        items:
+          type: string
+        type: array
       name:
         type: string
       path:
@@ -614,6 +633,7 @@ definitions:
         type: array
       operation:
         enum:
+        - up
         - start
         - stop
         - restart
@@ -713,6 +733,10 @@ definitions:
     type: object
   dto.CronjobCreate:
     properties:
+      alertCount:
+        type: integer
+      alertTitle:
+        type: string
       appID:
         type: string
       backupAccounts:
@@ -765,6 +789,10 @@ definitions:
     type: object
   dto.CronjobUpdate:
     properties:
+      alertCount:
+        type: integer
+      alertTitle:
+        type: string
       appID:
         type: string
       backupAccounts:
@@ -796,6 +824,8 @@ definitions:
         type: string
       spec:
         type: string
+      type:
+        type: string
       url:
         type: string
       website:
@@ -804,6 +834,7 @@ definitions:
     - id
     - name
     - spec
+    - type
     type: object
   dto.CronjobUpdateStatus:
     properties:
@@ -883,6 +914,8 @@ definitions:
     type: object
   dto.DashboardBase:
     properties:
+      SystemProxy:
+        type: string
       appInstalledNumber:
         type: integer
       cpuCores:
@@ -898,6 +931,8 @@ definitions:
       databaseNumber:
         type: integer
       hostname:
+        type: string
+      ipv4Addr:
         type: string
       kernelArch:
         type: string
@@ -982,6 +1017,19 @@ definitions:
         type: string
       uptime:
         type: integer
+      xpuData:
+        items:
+          $ref: '#/definitions/dto.XPUInfo'
+        type: array
+    type: object
+  dto.DashboardReq:
+    properties:
+      ioOption:
+        type: string
+      netOption:
+        type: string
+      scope:
+        type: string
     type: object
   dto.DatabaseCreate:
     properties:
@@ -2278,6 +2326,31 @@ definitions:
       total:
         type: integer
     type: object
+  dto.PageSnapshot:
+    properties:
+      info:
+        type: string
+      order:
+        enum:
+        - "null"
+        - ascending
+        - descending
+        type: string
+      orderBy:
+        enum:
+        - name
+        - created_at
+        type: string
+      page:
+        type: integer
+      pageSize:
+        type: integer
+    required:
+    - order
+    - orderBy
+    - page
+    - pageSize
+    type: object
   dto.PasswordUpdate:
     properties:
       newPassword:
@@ -2723,6 +2796,8 @@ definitions:
     type: object
   dto.SSLUpdate:
     properties:
+      autoRestart:
+        type: string
       cert:
         type: string
       domain:
@@ -2881,6 +2956,8 @@ definitions:
       appStoreSyncStatus:
         type: string
       appStoreVersion:
+        type: string
+      autoRestart:
         type: string
       bindAddress:
         type: string
@@ -3159,6 +3236,23 @@ definitions:
       sourceDir:
         type: string
       type:
+        type: string
+    type: object
+  dto.XPUInfo:
+    properties:
+      deviceID:
+        type: integer
+      deviceName:
+        type: string
+      memory:
+        type: string
+      memoryUsed:
+        type: string
+      memoryUtil:
+        type: string
+      power:
+        type: string
+      temperature:
         type: string
     type: object
   files.FileInfo:
@@ -4836,6 +4930,8 @@ definitions:
         type: string
       proxyPass:
         type: string
+      proxySSLName:
+        type: string
       replaces:
         additionalProperties:
           type: string
@@ -4868,6 +4964,8 @@ definitions:
     properties:
       ID:
         type: integer
+      disableLog:
+        type: boolean
       nameservers:
         items:
           type: string
@@ -7981,22 +8079,18 @@ paths:
       summary: Load os info
       tags:
       - Dashboard
-  /dashboard/current/:ioOption/:netOption:
-    get:
+  /dashboard/current:
+    post:
       consumes:
       - application/json
       description: 获取首页实时数据
       parameters:
       - description: request
-        in: path
-        name: ioOption
+        in: body
+        name: request
         required: true
-        type: string
-      - description: request
-        in: path
-        name: netOption
-        required: true
-        type: string
+        schema:
+          $ref: '#/definitions/dto.DashboardReq'
       responses:
         "200":
           description: OK
@@ -11310,8 +11404,8 @@ paths:
         BeforeFunctions: []
         bodyKeys:
         - id
-        formatEN: Delete website [name]
-        formatZH: 删除网站 [name]
+        formatEN: Delete runtime [name]
+        formatZH: 删除运行环境 [name]
         paramKeys: []
   /runtimes/node/modules:
     post:
@@ -12368,7 +12462,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.SearchWithPage'
+          $ref: '#/definitions/dto.PageSnapshot'
       responses:
         "200":
           description: OK
@@ -12377,6 +12471,26 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Page system snapshot
+      tags:
+      - System Setting
+  /settings/snapshot/size:
+    post:
+      consumes:
+      - application/json
+      description: 获取系统快照大小
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PageSnapshot'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Load system snapshot size
       tags:
       - System Setting
   /settings/snapshot/status:

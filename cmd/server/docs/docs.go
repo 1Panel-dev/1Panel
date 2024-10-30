@@ -3872,8 +3872,8 @@ const docTemplate = `{
                 }
             }
         },
-        "/dashboard/current/:ioOption/:netOption": {
-            "get": {
+        "/dashboard/current": {
+            "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -3889,18 +3889,13 @@ const docTemplate = `{
                 "summary": "Load dashboard current info",
                 "parameters": [
                     {
-                        "type": "string",
                         "description": "request",
-                        "name": "ioOption",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "request",
-                        "name": "netOption",
-                        "in": "path",
-                        "required": true
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.DashboardReq"
+                        }
                     }
                 ],
                 "responses": {
@@ -9130,8 +9125,8 @@ const docTemplate = `{
                     "bodyKeys": [
                         "id"
                     ],
-                    "formatEN": "Delete website [name]",
-                    "formatZH": "删除网站 [name]",
+                    "formatEN": "Delete runtime [name]",
+                    "formatZH": "删除运行环境 [name]",
                     "paramKeys": []
                 }
             }
@@ -10808,7 +10803,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.SearchWithPage"
+                            "$ref": "#/definitions/dto.PageSnapshot"
                         }
                     }
                 ],
@@ -10818,6 +10813,39 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/dto.PageResult"
                         }
+                    }
+                }
+            }
+        },
+        "/settings/snapshot/size": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取系统快照大小",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System Setting"
+                ],
+                "summary": "Load system snapshot size",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.PageSnapshot"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
                     }
                 }
             }
@@ -15591,6 +15619,12 @@ const docTemplate = `{
         "dto.ClamCreate": {
             "type": "object",
             "properties": {
+                "alertCount": {
+                    "type": "integer"
+                },
+                "alertTitle": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -15689,6 +15723,12 @@ const docTemplate = `{
         "dto.ClamUpdate": {
             "type": "object",
             "properties": {
+                "alertCount": {
+                    "type": "integer"
+                },
+                "alertTitle": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -15805,6 +15845,9 @@ const docTemplate = `{
                 "detailName": {
                     "type": "string"
                 },
+                "fileName": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -15876,6 +15919,12 @@ const docTemplate = `{
                 "from"
             ],
             "properties": {
+                "env": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "file": {
                     "type": "string"
                 },
@@ -15902,8 +15951,7 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "name",
-                "operation",
-                "path"
+                "operation"
             ],
             "properties": {
                 "name": {
@@ -15912,9 +15960,11 @@ const docTemplate = `{
                 "operation": {
                     "type": "string",
                     "enum": [
+                        "up",
                         "start",
                         "stop",
-                        "down"
+                        "down",
+                        "delete"
                     ]
                 },
                 "path": {
@@ -15986,6 +16036,12 @@ const docTemplate = `{
             "properties": {
                 "content": {
                     "type": "string"
+                },
+                "env": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "name": {
                     "type": "string"
@@ -16162,6 +16218,7 @@ const docTemplate = `{
                 "operation": {
                     "type": "string",
                     "enum": [
+                        "up",
                         "start",
                         "stop",
                         "restart",
@@ -16309,6 +16366,12 @@ const docTemplate = `{
                 "type"
             ],
             "properties": {
+                "alertCount": {
+                    "type": "integer"
+                },
+                "alertTitle": {
+                    "type": "string"
+                },
                 "appID": {
                     "type": "string"
                 },
@@ -16383,9 +16446,16 @@ const docTemplate = `{
             "required": [
                 "id",
                 "name",
-                "spec"
+                "spec",
+                "type"
             ],
             "properties": {
+                "alertCount": {
+                    "type": "integer"
+                },
+                "alertTitle": {
+                    "type": "string"
+                },
                 "appID": {
                     "type": "string"
                 },
@@ -16430,6 +16500,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "spec": {
+                    "type": "string"
+                },
+                "type": {
                     "type": "string"
                 },
                 "url": {
@@ -16557,6 +16630,9 @@ const docTemplate = `{
         "dto.DashboardBase": {
             "type": "object",
             "properties": {
+                "SystemProxy": {
+                    "type": "string"
+                },
                 "appInstalledNumber": {
                     "type": "integer"
                 },
@@ -16579,6 +16655,9 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "hostname": {
+                    "type": "string"
+                },
+                "ipv4Addr": {
                     "type": "string"
                 },
                 "kernelArch": {
@@ -16705,6 +16784,26 @@ const docTemplate = `{
                 },
                 "uptime": {
                     "type": "integer"
+                },
+                "xpuData": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.XPUInfo"
+                    }
+                }
+            }
+        },
+        "dto.DashboardReq": {
+            "type": "object",
+            "properties": {
+                "ioOption": {
+                    "type": "string"
+                },
+                "netOption": {
+                    "type": "string"
+                },
+                "scope": {
+                    "type": "string"
                 }
             }
         },
@@ -18608,6 +18707,41 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.PageSnapshot": {
+            "type": "object",
+            "required": [
+                "order",
+                "orderBy",
+                "page",
+                "pageSize"
+            ],
+            "properties": {
+                "info": {
+                    "type": "string"
+                },
+                "order": {
+                    "type": "string",
+                    "enum": [
+                        "null",
+                        "ascending",
+                        "descending"
+                    ]
+                },
+                "orderBy": {
+                    "type": "string",
+                    "enum": [
+                        "name",
+                        "created_at"
+                    ]
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.PasswordUpdate": {
             "type": "object",
             "required": [
@@ -19273,6 +19407,9 @@ const docTemplate = `{
                 "sslType"
             ],
             "properties": {
+                "autoRestart": {
+                    "type": "string"
+                },
                 "cert": {
                     "type": "string"
                 },
@@ -19499,6 +19636,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "appStoreVersion": {
+                    "type": "string"
+                },
+                "autoRestart": {
                     "type": "string"
                 },
                 "bindAddress": {
@@ -19921,6 +20061,32 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.XPUInfo": {
+            "type": "object",
+            "properties": {
+                "deviceID": {
+                    "type": "integer"
+                },
+                "deviceName": {
+                    "type": "string"
+                },
+                "memory": {
+                    "type": "string"
+                },
+                "memoryUsed": {
+                    "type": "string"
+                },
+                "memoryUtil": {
+                    "type": "string"
+                },
+                "power": {
+                    "type": "string"
+                },
+                "temperature": {
                     "type": "string"
                 }
             }
@@ -22434,6 +22600,9 @@ const docTemplate = `{
                 "proxyPass": {
                     "type": "string"
                 },
+                "proxySSLName": {
+                    "type": "string"
+                },
                 "replaces": {
                     "type": "object",
                     "additionalProperties": {
@@ -22475,6 +22644,9 @@ const docTemplate = `{
             "properties": {
                 "ID": {
                     "type": "integer"
+                },
+                "disableLog": {
+                    "type": "boolean"
                 },
                 "nameservers": {
                     "type": "array",

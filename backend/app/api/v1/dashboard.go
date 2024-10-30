@@ -2,6 +2,7 @@ package v1
 
 import (
 	"errors"
+
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
@@ -56,7 +57,7 @@ func (b *BaseApi) LoadDashboardBaseInfo(c *gin.Context) {
 // @Tags Dashboard
 // @Summary Load dashboard current info
 // @Description 获取首页实时数据
-// @Accept json、
+// @Accept json
 // @Param request body dto.DashboardReq true "request"
 // @Success 200 {object} dto.DashboardCurrent
 // @Security ApiKeyAuth

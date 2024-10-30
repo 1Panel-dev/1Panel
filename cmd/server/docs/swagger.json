@@ -3866,8 +3866,8 @@
                 }
             }
         },
-        "/dashboard/current/:ioOption/:netOption": {
-            "get": {
+        "/dashboard/current": {
+            "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -3883,18 +3883,13 @@
                 "summary": "Load dashboard current info",
                 "parameters": [
                     {
-                        "type": "string",
                         "description": "request",
-                        "name": "ioOption",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "request",
-                        "name": "netOption",
-                        "in": "path",
-                        "required": true
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.DashboardReq"
+                        }
                     }
                 ],
                 "responses": {
@@ -9124,8 +9119,8 @@
                     "bodyKeys": [
                         "id"
                     ],
-                    "formatEN": "Delete website [name]",
-                    "formatZH": "删除网站 [name]",
+                    "formatEN": "Delete runtime [name]",
+                    "formatZH": "删除运行环境 [name]",
                     "paramKeys": []
                 }
             }
@@ -10802,7 +10797,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.SearchWithPage"
+                            "$ref": "#/definitions/dto.PageSnapshot"
                         }
                     }
                 ],
@@ -10812,6 +10807,39 @@
                         "schema": {
                             "$ref": "#/definitions/dto.PageResult"
                         }
+                    }
+                }
+            }
+        },
+        "/settings/snapshot/size": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取系统快照大小",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System Setting"
+                ],
+                "summary": "Load system snapshot size",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.PageSnapshot"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
                     }
                 }
             }
@@ -15585,6 +15613,12 @@
         "dto.ClamCreate": {
             "type": "object",
             "properties": {
+                "alertCount": {
+                    "type": "integer"
+                },
+                "alertTitle": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -15683,6 +15717,12 @@
         "dto.ClamUpdate": {
             "type": "object",
             "properties": {
+                "alertCount": {
+                    "type": "integer"
+                },
+                "alertTitle": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -15799,6 +15839,9 @@
                 "detailName": {
                     "type": "string"
                 },
+                "fileName": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -15870,6 +15913,12 @@
                 "from"
             ],
             "properties": {
+                "env": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "file": {
                     "type": "string"
                 },
@@ -15896,8 +15945,7 @@
             "type": "object",
             "required": [
                 "name",
-                "operation",
-                "path"
+                "operation"
             ],
             "properties": {
                 "name": {
@@ -15906,9 +15954,11 @@
                 "operation": {
                     "type": "string",
                     "enum": [
+                        "up",
                         "start",
                         "stop",
-                        "down"
+                        "down",
+                        "delete"
                     ]
                 },
                 "path": {
@@ -15980,6 +16030,12 @@
             "properties": {
                 "content": {
                     "type": "string"
+                },
+                "env": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "name": {
                     "type": "string"
@@ -16156,6 +16212,7 @@
                 "operation": {
                     "type": "string",
                     "enum": [
+                        "up",
                         "start",
                         "stop",
                         "restart",
@@ -16303,6 +16360,12 @@
                 "type"
             ],
             "properties": {
+                "alertCount": {
+                    "type": "integer"
+                },
+                "alertTitle": {
+                    "type": "string"
+                },
                 "appID": {
                     "type": "string"
                 },
@@ -16377,9 +16440,16 @@
             "required": [
                 "id",
                 "name",
-                "spec"
+                "spec",
+                "type"
             ],
             "properties": {
+                "alertCount": {
+                    "type": "integer"
+                },
+                "alertTitle": {
+                    "type": "string"
+                },
                 "appID": {
                     "type": "string"
                 },
@@ -16424,6 +16494,9 @@
                     "type": "string"
                 },
                 "spec": {
+                    "type": "string"
+                },
+                "type": {
                     "type": "string"
                 },
                 "url": {
@@ -16551,6 +16624,9 @@
         "dto.DashboardBase": {
             "type": "object",
             "properties": {
+                "SystemProxy": {
+                    "type": "string"
+                },
                 "appInstalledNumber": {
                     "type": "integer"
                 },
@@ -16573,6 +16649,9 @@
                     "type": "integer"
                 },
                 "hostname": {
+                    "type": "string"
+                },
+                "ipv4Addr": {
                     "type": "string"
                 },
                 "kernelArch": {
@@ -16699,6 +16778,26 @@
                 },
                 "uptime": {
                     "type": "integer"
+                },
+                "xpuData": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.XPUInfo"
+                    }
+                }
+            }
+        },
+        "dto.DashboardReq": {
+            "type": "object",
+            "properties": {
+                "ioOption": {
+                    "type": "string"
+                },
+                "netOption": {
+                    "type": "string"
+                },
+                "scope": {
+                    "type": "string"
                 }
             }
         },
@@ -18602,6 +18701,41 @@
                 }
             }
         },
+        "dto.PageSnapshot": {
+            "type": "object",
+            "required": [
+                "order",
+                "orderBy",
+                "page",
+                "pageSize"
+            ],
+            "properties": {
+                "info": {
+                    "type": "string"
+                },
+                "order": {
+                    "type": "string",
+                    "enum": [
+                        "null",
+                        "ascending",
+                        "descending"
+                    ]
+                },
+                "orderBy": {
+                    "type": "string",
+                    "enum": [
+                        "name",
+                        "created_at"
+                    ]
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.PasswordUpdate": {
             "type": "object",
             "required": [
@@ -19267,6 +19401,9 @@
                 "sslType"
             ],
             "properties": {
+                "autoRestart": {
+                    "type": "string"
+                },
                 "cert": {
                     "type": "string"
                 },
@@ -19493,6 +19630,9 @@
                     "type": "string"
                 },
                 "appStoreVersion": {
+                    "type": "string"
+                },
+                "autoRestart": {
                     "type": "string"
                 },
                 "bindAddress": {
@@ -19915,6 +20055,32 @@
                     "type": "string"
                 },
                 "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.XPUInfo": {
+            "type": "object",
+            "properties": {
+                "deviceID": {
+                    "type": "integer"
+                },
+                "deviceName": {
+                    "type": "string"
+                },
+                "memory": {
+                    "type": "string"
+                },
+                "memoryUsed": {
+                    "type": "string"
+                },
+                "memoryUtil": {
+                    "type": "string"
+                },
+                "power": {
+                    "type": "string"
+                },
+                "temperature": {
                     "type": "string"
                 }
             }
@@ -22428,6 +22594,9 @@
                 "proxyPass": {
                     "type": "string"
                 },
+                "proxySSLName": {
+                    "type": "string"
+                },
                 "replaces": {
                     "type": "object",
                     "additionalProperties": {
@@ -22469,6 +22638,9 @@
             "properties": {
                 "ID": {
                     "type": "integer"
+                },
+                "disableLog": {
+                    "type": "boolean"
                 },
                 "nameservers": {
                     "type": "array",

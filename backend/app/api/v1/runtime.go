@@ -62,7 +62,7 @@ func (b *BaseApi) CreateRuntime(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /runtimes/del [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"删除网站 [name]","formatEN":"Delete website [name]"}
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"删除运行环境 [name]","formatEN":"Delete runtime [name]"}
 func (b *BaseApi) DeleteRuntime(c *gin.Context) {
 	var req request.RuntimeDelete
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
