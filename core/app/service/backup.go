@@ -173,7 +173,7 @@ func (u *BackupService) SearchWithPage(req dto.SearchPageWithType) (int64, inter
 func (u *BackupService) LoadOneDriveInfo() (dto.OneDriveInfo, error) {
 	var data dto.OneDriveInfo
 	data.RedirectUri = constant.OneDriveRedirectURI
-	clientID, err := settingRepo.Get(settingRepo.WithByKey("OneDriveID"))
+	clientID, err := settingRepo.Get(commonRepo.WithByKey("OneDriveID"))
 	if err != nil {
 		return data, err
 	}
@@ -182,7 +182,7 @@ func (u *BackupService) LoadOneDriveInfo() (dto.OneDriveInfo, error) {
 		return data, err
 	}
 	data.ClientID = string(idItem)
-	clientSecret, err := settingRepo.Get(settingRepo.WithByKey("OneDriveSc"))
+	clientSecret, err := settingRepo.Get(commonRepo.WithByKey("OneDriveSc"))
 	if err != nil {
 		return data, err
 	}

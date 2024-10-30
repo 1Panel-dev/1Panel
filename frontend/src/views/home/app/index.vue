@@ -1,67 +1,212 @@
 <template>
     <div>
-        <el-scrollbar height="525px" class="moz-height">
-            <div class="h-app-card" v-for="(app, index) in apps" :key="index">
-                <el-row :gutter="10">
-                    <el-col :span="5">
-                        <div>
-                            <el-avatar shape="square" :size="55" :src="'data:image/png;base64,' + app.icon" />
-                        </div>
-                    </el-col>
-                    <el-col :span="15">
-                        <div class="h-app-content">
-                            <div>
-                                <span class="h-app-title">{{ app.name }}</span>
-                            </div>
-                            <div class="h-app-desc">
-                                <span>
-                                    {{ language == 'zh' || language == 'tw' ? app.shortDescZh : app.shortDescEn }}
-                                </span>
-                            </div>
-                        </div>
-                    </el-col>
-                    <el-col :span="2">
-                        <el-button
-                            class="h-app-button"
-                            type="primary"
-                            plain
-                            round
-                            size="small"
-                            :disabled="app.limit == 1 && app.installed"
-                            @click="goInstall(app.key, app.type)"
-                        >
-                            {{ $t('app.install') }}
-                        </el-button>
-                    </el-col>
-                </el-row>
-                <div class="h-app-divider" />
-            </div>
-        </el-scrollbar>
+        <CardWithHeader :header="$t('home.app')" class="mt-5" :loading="loading">
+            <template #header-r>
+                <el-popover placement="left" :width="226" trigger="click">
+                    <el-input size="small" v-model="filter" clearable @input="loadOption()" />
+                    <el-table :show-header="false" :data="options" stripe max-height="500px">
+                        <el-table-column prop="key" width="120" show-overflow-tooltip />
+                        <el-table-column prop="name">
+                            <template #default="{ row }">
+                                <el-switch
+                                    @change="onChangeStatus(row)"
+                                    class="float-right"
+                                    size="small"
+                                    v-model="row.isShow"
+                                />
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                    <template #reference>
+                        <el-button class="h-button-setting" link icon="Setting"></el-button>
+                    </template>
+                </el-popover>
+            </template>
+            <template #body>
+                <el-scrollbar height="525px" class="moz-height">
+                    <div class="h-app-card" v-for="(app, index) in apps" :key="index">
+                        <el-row :gutter="5">
+                            <el-col :span="5">
+                                <div>
+                                    <el-badge
+                                        badge-style="background-color: transparent; color: #646a73; font-size: 12px; border: none"
+                                        :value="$t('home.recommend')"
+                                        v-if="app.isRecommend"
+                                        :offset="[-60, 0]"
+                                    >
+                                        <el-avatar
+                                            shape="square"
+                                            :size="55"
+                                            :src="'data:image/png;base64,' + app.icon"
+                                        />
+                                    </el-badge>
+                                    <el-avatar
+                                        v-else
+                                        shape="square"
+                                        :size="55"
+                                        :src="'data:image/png;base64,' + app.icon"
+                                    />
+                                </div>
+                            </el-col>
+                            <el-col :span="16">
+                                <div class="h-app-content" v-if="!app.currentRow">
+                                    <div>
+                                        <span class="h-app-title">{{ app.name }}</span>
+                                    </div>
+                                    <div class="h-app-desc">
+                                        <span>
+                                            {{
+                                                language == 'zh' || language == 'tw' ? app.shortDescZh : app.shortDescEn
+                                            }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="h-app-content" v-else>
+                                    <div>
+                                        <el-dropdown trigger="hover">
+                                            <el-button plain size="small" link class="h-app-dropdown">
+                                                {{ app.currentRow.name }}
+                                                <el-icon class="el-icon--right"><ArrowDown /></el-icon>
+                                            </el-button>
+                                            <template #dropdown>
+                                                <el-dropdown-menu
+                                                    v-for="(detailItem, index2) in app.detail"
+                                                    :key="index2"
+                                                >
+                                                    <el-dropdown-item @click="app.currentRow = detailItem">
+                                                        {{ detailItem.name + ' - ' + detailItem.version }}
+                                                    </el-dropdown-item>
+                                                </el-dropdown-menu>
+                                            </template>
+                                        </el-dropdown>
+                                    </div>
+                                    <div class="h-app-margin">
+                                        <el-button plain size="small" link class="h-app-desc">
+                                            {{ $t('app.version') + ': ' + app.currentRow.version }}
+                                        </el-button>
+                                    </div>
+                                    <div class="h-app-margin">
+                                        <el-button
+                                            size="small"
+                                            type="primary"
+                                            link
+                                            @click="onOperate('stop', app.currentRow)"
+                                        >
+                                            {{ $t('commons.operate.up') }}
+                                        </el-button>
+                                        <el-button
+                                            :style="mobile ? 'margin-left: -1px' : ''"
+                                            size="small"
+                                            type="primary"
+                                            link
+                                            @click="onOperate('stop', app.currentRow)"
+                                        >
+                                            {{ $t('commons.operate.down') }}
+                                        </el-button>
+                                        <el-button
+                                            :style="mobile ? 'margin-left: -1px' : ''"
+                                            size="small"
+                                            type="primary"
+                                            link
+                                            @click="toFolder(app.currentRow.path)"
+                                        >
+                                            {{ $t('home.dir') }}
+                                        </el-button>
+                                        <el-popover
+                                            placement="left"
+                                            trigger="hover"
+                                            v-if="app.currentRow.appType == 'website'"
+                                            :width="260"
+                                        >
+                                            <template #reference>
+                                                <el-button
+                                                    link
+                                                    size="small"
+                                                    type="primary"
+                                                    :style="mobile ? 'margin-left: -1px' : ''"
+                                                >
+                                                    {{ $t('app.toLink') }}
+                                                </el-button>
+                                            </template>
+                                            <span v-if="defaultLink == '' && app.currentRow.webUI == ''">
+                                                {{ $t('app.webUIConfig') }}
+                                            </span>
+                                            <div v-else>
+                                                <div>
+                                                    <el-button
+                                                        v-if="defaultLink != ''"
+                                                        type="primary"
+                                                        link
+                                                        @click="toLink(defaultLink + ':' + app.currentRow.httpPort)"
+                                                    >
+                                                        {{ defaultLink + ':' + app.currentRow.httpPort }}
+                                                    </el-button>
+                                                </div>
+                                                <div>
+                                                    <el-button
+                                                        v-if="app.currentRow.webUI != ''"
+                                                        type="primary"
+                                                        link
+                                                        @click="toLink(app.currentRow.webUI)"
+                                                    >
+                                                        {{ app.currentRow.webUI }}
+                                                    </el-button>
+                                                </div>
+                                            </div>
+                                        </el-popover>
+                                    </div>
+                                </div>
+                            </el-col>
+                            <el-col :span="1">
+                                <el-button
+                                    class="h-app-button"
+                                    type="primary"
+                                    plain
+                                    round
+                                    size="small"
+                                    :disabled="app.limit == 1 && app.detail && app.detail.length !== 0"
+                                    @click="goInstall(app.key, app.appType)"
+                                >
+                                    {{ $t('app.install') }}
+                                </el-button>
+                            </el-col>
+                        </el-row>
+                        <div class="h-app-divider" />
+                    </div>
+                </el-scrollbar>
+            </template>
+        </CardWithHeader>
     </div>
 </template>
 
 <script lang="ts" setup>
-import { App } from '@/api/interface/app';
-import { SearchApp } from '@/api/modules/app';
+import { GetAppStoreConfig, InstalledOp } from '@/api/modules/app';
+import { changeLauncherStatus, loadAppLauncher, loadAppLauncherOption } from '@/api/modules/dashboard';
+import i18n from '@/lang';
+import { GlobalStore } from '@/store';
+import { MsgSuccess } from '@/utils/message';
 import { getLanguage } from '@/utils/util';
-import { reactive, ref } from 'vue';
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { toFolder } from '@/global/business';
+
 const router = useRouter();
 const language = getLanguage();
-
-let req = reactive({
-    name: '',
-    tags: [],
-    page: 1,
-    pageSize: 50,
-    recommend: true,
-});
+const globalStore = GlobalStore();
 
 let loading = ref(false);
-let apps = ref<App.AppDTO[]>([]);
+let apps = ref([]);
+const options = ref([]);
+const filter = ref();
+const mobile = computed(() => {
+    return globalStore.isMobile();
+});
+const defaultLink = ref('');
 
 const acceptParams = (): void => {
-    search(req);
+    search();
+    loadOption();
+    getAppStoreConfig();
 };
 
 const goInstall = (key: string, type: string) => {
@@ -77,15 +222,80 @@ const goInstall = (key: string, type: string) => {
     }
 };
 
-const search = async (req: App.AppReq) => {
+const search = async () => {
     loading.value = true;
-    await SearchApp(req)
+    await loadAppLauncher()
         .then((res) => {
-            apps.value = res.data.items;
+            loading.value = false;
+            apps.value = res.data;
+            for (const item of apps.value) {
+                if (item.detail && item.detail.length !== 0) {
+                    item.currentRow = item.detail[0];
+                }
+            }
         })
         .finally(() => {
             loading.value = false;
         });
+};
+
+const onChangeStatus = async (row: any) => {
+    loading.value = true;
+    await changeLauncherStatus(row.key, row.isShow ? 'Enable' : 'Disable')
+        .then(() => {
+            loading.value = false;
+            search();
+        })
+        .catch(() => {
+            loading.value = false;
+        });
+};
+
+const toLink = (link: string) => {
+    window.open(link, '_blank');
+};
+
+const getAppStoreConfig = async () => {
+    try {
+        const res = await GetAppStoreConfig();
+        if (res.data.defaultDomain != '') {
+            defaultLink.value = res.data.defaultDomain;
+        }
+    } catch (error) {}
+};
+
+const onOperate = async (operation: string, row: any) => {
+    ElMessageBox.confirm(
+        i18n.global.t('app.operatorHelper', [i18n.global.t('app.' + operation)]),
+        i18n.global.t('app.' + operation),
+        {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+            type: 'info',
+        },
+    ).then(async () => {
+        loading.value = true;
+        let params = {
+            installId: row.installId,
+            operate: operation,
+            detailId: row.detailId,
+        };
+        await InstalledOp(params)
+            .then(() => {
+                loading.value = false;
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                search();
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+    });
+};
+
+const loadOption = async () => {
+    const res = await loadAppLauncherOption(filter.value || '');
+    options.value = res.data || [];
+    console.log(options.value);
 };
 
 defineExpose({
@@ -125,9 +335,37 @@ defineExpose({
 }
 
 .h-app-divider {
-    margin-top: 13px;
+    margin-top: 10px;
     border: 0;
     border-top: var(--panel-border);
+}
+
+.h-app-desc {
+    font-weight: 400;
+    font-size: 12px;
+    color: var(--el-text-color-regular);
+}
+
+.h-button-setting {
+    float: right;
+    margin-left: 5px;
+}
+
+.h-app-dropdown {
+    font-weight: 600;
+    font-size: 16px;
+    color: #1f2329;
+}
+
+.h-app-margin {
+    margin-top: 2px;
+}
+
+.h-app-option {
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--el-text-color-regular);
 }
 
 /* FOR MOZILLA */

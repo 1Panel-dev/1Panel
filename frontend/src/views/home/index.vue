@@ -230,11 +230,7 @@
                     </template>
                 </CardWithHeader>
 
-                <CardWithHeader :header="$t('home.app')" style="margin-top: 20px">
-                    <template #body>
-                        <App ref="appRef" />
-                    </template>
-                </CardWithHeader>
+                <AppLauncher ref="appRef" style="margin-top: 20px" />
             </el-col>
         </el-row>
 
@@ -245,7 +241,7 @@
 <script lang="ts" setup>
 import { onMounted, onBeforeUnmount, ref, reactive } from 'vue';
 import Status from '@/views/home/status/index.vue';
-import App from '@/views/home/app/index.vue';
+import AppLauncher from '@/views/home/app/index.vue';
 import VCharts from '@/components/v-charts/index.vue';
 import LicenseImport from '@/components/license-import/index.vue';
 import CardWithHeader from '@/components/card-with-header/index.vue';

@@ -330,6 +330,8 @@ const message = {
         tamper: '防篡改',
     },
     home: {
+        recommend: '推荐',
+        dir: '目录',
         restart_1panel: '重启面板',
         restart_system: '重启服务器',
         operationSuccess: '操作成功，正在重启，请稍后手动刷新浏览器！',

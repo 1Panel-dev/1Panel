@@ -330,6 +330,8 @@ const message = {
         tamper: '防篡改',
     },
     home: {
+        recommend: '推薦',
+        dir: '目錄',
         restart_1panel: '重啟面板',
         restart_system: '重啟服務器',
         operationSuccess: '操作成功，正在重啟，請稍後手動刷新瀏覽器！',

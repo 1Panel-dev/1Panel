@@ -3,7 +3,6 @@ package repo
 import (
 	"github.com/1Panel-dev/1Panel/core/app/model"
 	"github.com/1Panel-dev/1Panel/core/global"
-	"gorm.io/gorm"
 )
 
 type SettingRepo struct{}
@@ -13,7 +12,6 @@ type ISettingRepo interface {
 	Get(opts ...DBOption) (model.Setting, error)
 	Create(key, value string) error
 	Update(key, value string) error
-	WithByKey(key string) DBOption
 }
 
 func NewISettingRepo() ISettingRepo {
@@ -46,12 +44,6 @@ func (u *SettingRepo) Get(opts ...DBOption) (model.Setting, error) {
 	}
 	err := db.First(&settings).Error
 	return settings, err
-}
-
-func (c *SettingRepo) WithByKey(key string) DBOption {
-	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("key = ?", key)
-	}
 }
 
 func (u *SettingRepo) Update(key, value string) error {

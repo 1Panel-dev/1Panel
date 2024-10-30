@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"sort"
 	"strings"
 	"sync"
@@ -12,6 +13,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/copier"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 	"github.com/shirou/gopsutil/v3/cpu"
@@ -30,6 +32,8 @@ type IDashboardService interface {
 	LoadCurrentInfoForNode() *dto.NodeCurrent
 	LoadCurrentInfo(ioOption string, netOption string) *dto.DashboardCurrent
 
+	LoadAppLauncher() ([]dto.AppLauncher, error)
+	ListLauncherOption(filter string) ([]dto.LauncherOption, error)
 	Restart(operation string) error
 }
 
@@ -240,6 +244,109 @@ func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *d
 	return &currentInfo
 }
 
+func (u *DashboardService) LoadAppLauncher() ([]dto.AppLauncher, error) {
+	var (
+		data          []dto.AppLauncher
+		recommendList []dto.AppLauncher
+	)
+	appInstalls, err := appInstallRepo.ListBy()
+	if err != nil {
+		return data, err
+	}
+	apps, err := appRepo.GetBy()
+	if err != nil {
+		return data, err
+	}
+
+	showList := loadShowList()
+	defaultList := []string{"openresty", "mysql", "halo", "redis", "maxkb", "wordpress"}
+	allList := common.RemoveRepeatStr(append(defaultList, showList...))
+	for _, showItem := range allList {
+		var itemData dto.AppLauncher
+		for _, app := range apps {
+			if showItem == app.Key {
+				itemData.Key = app.Key
+				itemData.Type = app.Type
+				itemData.Name = app.Name
+				itemData.Icon = app.Icon
+				itemData.Limit = app.Limit
+				itemData.ShortDescEn = app.ShortDescEn
+				itemData.ShortDescZh = app.ShortDescZh
+				itemData.Recommend = app.Recommend
+				break
+			}
+		}
+		if len(itemData.Icon) == 0 {
+			continue
+		}
+		for _, install := range appInstalls {
+			if install.App.Key == showItem {
+				itemData.IsInstall = true
+				itemData.Detail = append(itemData.Detail, dto.InstallDetail{
+					InstallID: install.ID,
+					DetailID:  install.AppDetailId,
+					Name:      install.Name,
+					Version:   install.Version,
+					Status:    install.Status,
+					Path:      install.GetPath(),
+					WebUI:     install.WebUI,
+					HttpPort:  install.HttpPort,
+					HttpsPort: install.HttpsPort,
+				})
+			}
+		}
+		if ArryContains(defaultList, showItem) && len(itemData.Detail) == 0 {
+			itemData.IsRecommend = true
+			recommendList = append(recommendList, itemData)
+			continue
+		}
+		if !ArryContains(showList, showItem) && len(itemData.Detail) != 0 {
+			continue
+		}
+		data = append(data, itemData)
+	}
+
+	sort.Slice(recommendList, func(i, j int) bool {
+		return recommendList[i].Recommend < recommendList[j].Recommend
+	})
+	sort.Slice(data, func(i, j int) bool {
+		return data[i].Name < data[j].Name
+	})
+	data = append(data, recommendList...)
+	return data, nil
+}
+
+func (u *DashboardService) ListLauncherOption(filter string) ([]dto.LauncherOption, error) {
+	showList := loadShowList()
+	var data []dto.LauncherOption
+	optionMap := make(map[string]bool)
+	appInstalls, err := appInstallRepo.ListBy()
+	if err != nil {
+		return data, err
+	}
+
+	for _, install := range appInstalls {
+		isShow := false
+		for _, item := range showList {
+			if install.App.Key == item {
+				isShow = true
+				break
+			}
+		}
+		optionMap[install.App.Key] = isShow
+	}
+	for key, val := range optionMap {
+		if len(filter) != 0 && !strings.Contains(key, filter) {
+			continue
+		}
+		data = append(data, dto.LauncherOption{Key: key, IsShow: val})
+	}
+	sort.Slice(data, func(i, j int) bool {
+		return data[i].Key < data[j].Key
+	})
+	return data, nil
+}
+
 type diskInfo struct {
 	Type   string
 	Mount  string
@@ -354,4 +461,43 @@ func loadGPUInfo() []dto.GPUInfo {
 		data = append(data, dataItem)
 	}
 	return data
+}
+
+func loadShowList() []string {
+	var data []string
+	if global.IsMaster {
+		var list []AppLauncher
+		if err := global.CoreDB.Model(AppLauncher{}).Where("1 == 1").Find(&list).Error; err != nil {
+			return []string{}
+		}
+		for _, item := range list {
+			data = append(data, item.Key)
+		}
+		return data
+	}
+	res, err := xpack.RequestToMaster("/api/v2/core/launcher/search", http.MethodGet, nil)
+	if err != nil {
+		return data
+	}
+	item, err := json.Marshal(res)
+	if err != nil {
+		return data
+	}
+	if err := json.Unmarshal(item, &data); err != nil {
+		return data
+	}
+	return data
+}
+
+type AppLauncher struct {
+	Key string `json:"key"`
+}
+
+func ArryContains(arr []string, element string) bool {
+	for _, v := range arr {
+		if v == element {
+			return true
+		}
+	}
+	return false
 }

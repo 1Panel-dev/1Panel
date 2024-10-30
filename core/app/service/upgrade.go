@@ -33,11 +33,11 @@ func NewIUpgradeService() IUpgradeService {
 
 func (u *UpgradeService) SearchUpgrade() (*dto.UpgradeInfo, error) {
 	var upgrade dto.UpgradeInfo
-	currentVersion, err := settingRepo.Get(settingRepo.WithByKey("SystemVersion"))
+	currentVersion, err := settingRepo.Get(commonRepo.WithByKey("SystemVersion"))
 	if err != nil {
 		return nil, err
 	}
-	DeveloperMode, err := settingRepo.Get(settingRepo.WithByKey("DeveloperMode"))
+	DeveloperMode, err := settingRepo.Get(commonRepo.WithByKey("DeveloperMode"))
 	if err != nil {
 		return nil, err
 	}

@@ -27,6 +27,10 @@ type Operate struct {
 	Operation string `json:"operation" validate:"required"`
 }
 
+type SearchByFilter struct {
+	Filter string `json:"filter"`
+}
+
 type BatchDeleteReq struct {
 	Ids []uint `json:"ids" validate:"required"`
 }

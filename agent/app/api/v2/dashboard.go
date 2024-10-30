@@ -4,6 +4,8 @@ import (
 	"errors"
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
+	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,6 +20,43 @@ func (b *BaseApi) LoadDashboardOsInfo(c *gin.Context) {
 	data, err := dashboardService.LoadOsInfo()
 	if err != nil {
 		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags Dashboard
+// @Summary Load app launcher
+// @Description 获取应用展示列表
+// @Accept json
+// @Success 200 {Array} dto.dto.AppLauncher
+// @Security ApiKeyAuth
+// @Router /dashboard/app/launcher [get]
+func (b *BaseApi) LoadAppLauncher(c *gin.Context) {
+	data, err := dashboardService.LoadAppLauncher()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags Dashboard
+// @Summary Load app launcher options
+// @Description 获取应用展示选项
+// @Accept json
+// @Param request body dto.SearchByFilter true "request"
+// @Success 200 {Array} dto.LauncherOption
+// @Security ApiKeyAuth
+// @Router /dashboard/app/launcher/option [post]
+func (b *BaseApi) LoadAppLauncherOption(c *gin.Context) {
+	var req dto.SearchByFilter
+	if err := helper.CheckBind(&req, c); err != nil {
+		return
+	}
+	data, err := dashboardService.ListLauncherOption(req.Filter)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
 	helper.SuccessWithData(c, data)

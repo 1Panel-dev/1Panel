@@ -126,3 +126,33 @@ type GPUInfo struct {
 	MemTotal         string `json:"memTotal"`
 	FanSpeed         string `json:"fanSpeed"`
 }
+
+type AppLauncher struct {
+	Key         string `json:"key"`
+	Type        string `json:"type"`
+	Name        string `json:"name"`
+	Icon        string `json:"icon"`
+	Limit       int    `json:"limit"`
+	ShortDescZh string `json:"shortDescZh"`
+	ShortDescEn string `json:"shortDescEn"`
+	Recommend   int    `json:"recomend"`
+
+	IsInstall   bool            `json:"isInstall"`
+	IsRecommend bool            `json:"isRecommend"`
+	Detail      []InstallDetail `json:"detail"`
+}
+type InstallDetail struct {
+	InstallID uint   `json:"installID"`
+	DetailID  uint   `json:"detailID"`
+	Name      string `json:"name"`
+	Version   string `json:"version"`
+	Path      string `json:"path"`
+	Status    string `json:"status"`
+	WebUI     string `json:"webUI"`
+	HttpPort  int    `json:"httpPort"`
+	HttpsPort int    `json:"httpsPort"`
+}
+type LauncherOption struct {
+	Key    string `json:"key"`
+	IsShow bool   `json:"isShow"`
+}

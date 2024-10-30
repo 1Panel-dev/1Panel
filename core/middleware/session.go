@@ -32,7 +32,8 @@ func SessionAuth() gin.HandlerFunc {
 			return
 		}
 		settingRepo := repo.NewISettingRepo()
-		setting, err := settingRepo.Get(settingRepo.WithByKey("SessionTimeout"))
+		commonRepo := repo.NewICommonRepo()
+		setting, err := settingRepo.Get(commonRepo.WithByKey("SessionTimeout"))
 		if err != nil {
 			global.LOG.Errorf("create operation record failed, err: %v", err)
 		}

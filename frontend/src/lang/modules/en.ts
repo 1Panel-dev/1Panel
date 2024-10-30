@@ -336,6 +336,8 @@ const message = {
         name: 'Tamper Proof',
     },
     home: {
+        recommend: 'recommend',
+        dir: 'dir',
         restart_1panel: 'Restart Panel',
         restart_system: 'Restart Server',
         operationSuccess: 'Operation succeeded, rebooting, please refresh the browser manually later!',

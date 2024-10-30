@@ -233,3 +233,10 @@ var InitTerminalSetting = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var InitAppLauncher = &gormigrate.Migration{
+	ID: "20241029-init-app-launcher",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.AppLauncher{})
+	},
+}

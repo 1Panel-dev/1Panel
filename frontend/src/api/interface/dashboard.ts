@@ -8,6 +8,34 @@ export namespace Dashboard {
 
         diskSize: number;
     }
+    export interface AppLauncher {
+        key: string;
+        icon: string;
+        limit: number;
+        shortDescEn: string;
+        shortDescZh: string;
+        currentRow: InstallDetail;
+
+        isInstall: boolean;
+        isRecommend: boolean;
+        detail: Array<InstallDetail>;
+    }
+    export interface AppLauncherOption {
+        key: string;
+        isShow: boolean;
+    }
+    export interface InstallDetail {
+        installID: number;
+        detailID: string;
+        name: string;
+        version: string;
+        path: string;
+        status: string;
+        appType: string;
+        webUI: string;
+        httpPort: string;
+        httpsPort: string;
+    }
     export interface BaseInfo {
         websiteNumber: number;
         databaseNumber: number;

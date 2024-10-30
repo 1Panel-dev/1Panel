@@ -9,5 +9,6 @@ func commonGroups() []CommonRouter {
 		&CommandRouter{},
 		&HostRouter{},
 		&GroupRouter{},
+		&AppLauncherRouter{},
 	}
 }

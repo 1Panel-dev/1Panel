@@ -21,7 +21,8 @@ func PasswordExpired() gin.HandlerFunc {
 			return
 		}
 		settingRepo := repo.NewISettingRepo()
-		setting, err := settingRepo.Get(settingRepo.WithByKey("ExpirationDays"))
+		commonRepo := repo.NewICommonRepo()
+		setting, err := settingRepo.Get(commonRepo.WithByKey("ExpirationDays"))
 		if err != nil {
 			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypePasswordExpired, err)
 			return
@@ -32,7 +33,7 @@ func PasswordExpired() gin.HandlerFunc {
 			return
 		}
 
-		extime, err := settingRepo.Get(settingRepo.WithByKey("ExpirationTime"))
+		extime, err := settingRepo.Get(commonRepo.WithByKey("ExpirationTime"))
 		if err != nil {
 			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypePasswordExpired, err)
 			return

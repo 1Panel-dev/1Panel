@@ -229,6 +229,17 @@ func RemoveRepeatElement(a interface{}) (ret []interface{}) {
 	return ret
 }
 
+func RemoveRepeatStr(list []string) (ret []string) {
+	mapItem := make(map[string]struct{})
+	for _, item := range list {
+		mapItem[item] = struct{}{}
+	}
+	for key := range mapItem {
+		ret = append(ret, key)
+	}
+	return ret
+}
+
 func LoadSizeUnit(value float64) string {
 	val := int64(value)
 	if val%1024 != 0 {
