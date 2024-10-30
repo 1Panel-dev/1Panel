@@ -124,7 +124,6 @@ const onClean = async () => {
         submitInputInfo: i18n.global.t('logs.deleteLogs'),
     };
     confirmDialogRef.value!.acceptParams(params);
-    searchLog();
 };
 
 const onDownload = async () => {
