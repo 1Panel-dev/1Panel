@@ -5,6 +5,8 @@ import { AxiosCanceler } from '@/api/helper/axios-cancel';
 
 const axiosCanceler = new AxiosCanceler();
 
+let isRedirecting = false;
+
 router.beforeEach((to, from, next) => {
     NProgress.start();
     axiosCanceler.removeAllPending();
@@ -31,11 +33,32 @@ router.beforeEach((to, from, next) => {
         return;
     }
 
+    const activeMenuKey = 'cachedRoute' + (to.meta.activeMenu || '');
+    const cachedRoute = localStorage.getItem(activeMenuKey);
+
+    if (
+        to.meta.activeMenu &&
+        to.meta.activeMenu != from.meta.activeMenu &&
+        cachedRoute &&
+        cachedRoute !== to.path &&
+        !isRedirecting
+    ) {
+        isRedirecting = true;
+        next(cachedRoute);
+        NProgress.done();
+        return;
+    }
+
     if (!to.matched.some((record) => record.meta.requiresAuth)) return next();
+
     return next();
 });
 
-router.afterEach(() => {
+router.afterEach((to) => {
+    if (to.meta.activeMenu && !isRedirecting) {
+        localStorage.setItem('cachedRoute' + to.meta.activeMenu, to.path);
+    }
+    isRedirecting = false;
     NProgress.done();
 });
 
