@@ -401,6 +401,9 @@ func newClient(account *model.BackupAccount) (cloud_storage.CloudStorageClient, 
 	case constant.OSS, constant.S3, constant.MinIo, constant.Cos, constant.Kodo:
 		varMap["accessKey"] = account.AccessKey
 		varMap["secretKey"] = account.Credential
+	case constant.UPYUN:
+		varMap["operator"] = account.AccessKey
+		varMap["password"] = account.Credential
 	}
 
 	client, err := cloud_storage.NewCloudStorageClient(account.Type, varMap)

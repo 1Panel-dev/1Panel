@@ -16,6 +16,7 @@
                     <el-option :label="$t('setting.S3')" value="S3"></el-option>
                     <el-option :label="$t('setting.SFTP')" value="SFTP"></el-option>
                     <el-option :label="$t('setting.WebDAV')" value="WebDAV"></el-option>
+                    <el-option :label="$t('setting.UPYUN')" value="UPYUN"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item v-if="hasAccessKey()" label="Access Key ID" prop="accessKey" :rules="Rules.requiredInput">
@@ -24,6 +25,14 @@
             <el-form-item v-if="hasAccessKey()" label="Secret Key" prop="credential" :rules="Rules.requiredInput">
                 <el-input show-password clearable v-model.trim="dialogData.rowData!.credential" />
             </el-form-item>
+            <div v-if="isUPYUN()">
+                <el-form-item :label="$t('setting.operator')" prop="accessKey" :rules="Rules.requiredInput">
+                    <el-input clearable v-model.trim="dialogData.rowData!.accessKey" />
+                </el-form-item>
+                <el-form-item :label="$t('commons.login.password')" prop="credential" :rules="Rules.requiredInput">
+                    <el-input show-password clearable v-model.trim="dialogData.rowData!.credential" />
+                </el-form-item>
+            </div>
             <el-form-item
                 v-if="dialogData.rowData!.type === 'WebDAV'"
                 :label="$t('setting.address')"
@@ -142,6 +151,14 @@
                     {{ $t('setting.loadBucket') }}
                 </el-button>
                 <span v-if="errBuckets" class="input-error">{{ $t('commons.rule.requiredSelect') }}</span>
+            </el-form-item>
+            <el-form-item
+                v-if="isUPYUN()"
+                :label="$t('setting.serviceName')"
+                prop="bucket"
+                :rules="Rules.requiredInput"
+            >
+                <el-input v-model="dialogData.rowData!.bucket" />
             </el-form-item>
             <el-form-item
                 v-if="dialogData.rowData!.type === 'COS'"
@@ -420,6 +437,10 @@ function callback(error: any) {
     }
 }
 
+const isUPYUN = () => {
+    let itemType = dialogData.value.rowData!.type;
+    return itemType === 'UPYUN';
+};
 const hasAccessKey = () => {
     let itemType = dialogData.value.rowData!.type;
     return itemType === 'COS' || itemType === 'KODO' || itemType === 'MINIO' || itemType === 'OSS' || itemType === 'S3';

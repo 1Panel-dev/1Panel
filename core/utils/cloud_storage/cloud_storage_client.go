@@ -30,6 +30,8 @@ func NewCloudStorageClient(backupType string, vars map[string]interface{}) (Clou
 		return client.NewKodoClient(vars)
 	case constant.OneDrive:
 		return client.NewOneDriveClient(vars)
+	case constant.UPYUN:
+		return client.NewUpClient(vars)
 	default:
 		return nil, constant.ErrNotSupportType
 	}

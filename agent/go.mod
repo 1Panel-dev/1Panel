@@ -43,6 +43,7 @@ require (
 	github.com/studio-b12/gowebdav v0.9.0
 	github.com/subosito/gotenv v1.6.0
 	github.com/tencentyun/cos-go-sdk-v5 v0.7.54
+	github.com/upyun/go-sdk v2.1.0+incompatible
 	golang.org/x/crypto v0.25.0
 	golang.org/x/net v0.27.0
 	golang.org/x/oauth2 v0.21.0

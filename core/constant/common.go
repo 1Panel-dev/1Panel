@@ -28,5 +28,6 @@ const (
 	Kodo                = "KODO"
 	WebDAV              = "WebDAV"
 	Local               = "LOCAL"
+	UPYUN               = "UPYUN"
 	OneDriveRedirectURI = "http://localhost/login/authorized"
 )

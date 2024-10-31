@@ -21,6 +21,7 @@ require (
 	github.com/minio/minio-go/v7 v7.0.74
 	github.com/mojocn/base64Captcha v1.3.6
 	github.com/nicksnyder/go-i18n/v2 v2.4.0
+	github.com/oschwald/maxminddb-golang v1.13.1
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/sftp v1.13.6
 	github.com/qiniu/go-sdk/v7 v7.21.1
@@ -34,6 +35,7 @@ require (
 	github.com/swaggo/gin-swagger v1.6.0
 	github.com/swaggo/swag v1.16.3
 	github.com/tencentyun/cos-go-sdk-v5 v0.7.54
+	github.com/upyun/go-sdk v2.1.0+incompatible
 	github.com/xlzd/gotp v0.1.0
 	golang.org/x/crypto v0.24.0
 	golang.org/x/oauth2 v0.18.0
@@ -99,7 +101,6 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/mozillazg/go-httpheader v0.2.1 // indirect
-	github.com/oschwald/maxminddb-golang v1.13.1 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.2 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/rs/xid v1.5.0 // indirect
