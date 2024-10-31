@@ -12,6 +12,7 @@ type System struct {
 	BackupDir      string `mapstructure:"backup_dir"`
 	Mode           string `mapstructure:"mode"`
 	RepoUrl        string `mapstructure:"repo_url"`
+	ResourceUrl    string `mapstructure:"resource_url"`
 	Version        string `mapstructure:"version"`
 	Username       string `mapstructure:"username"`
 	Password       string `mapstructure:"password"`
