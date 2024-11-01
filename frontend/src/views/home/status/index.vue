@@ -287,7 +287,7 @@ import { computeSize } from '@/utils/util';
 import router from '@/routers';
 import i18n from '@/lang';
 import { nextTick, ref } from 'vue';
-const showMore = ref(true);
+const showMore = ref(false);
 
 const baseInfo = ref<Dashboard.BaseInfo>({
     websiteNumber: 0,
