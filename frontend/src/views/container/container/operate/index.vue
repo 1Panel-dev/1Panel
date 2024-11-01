@@ -483,7 +483,11 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        dialogVisible.value = true;
+        if (dialogData.value.title === 'create') {
+            submit();
+        } else {
+            dialogVisible.value = true;
+        }
     });
 };
 
