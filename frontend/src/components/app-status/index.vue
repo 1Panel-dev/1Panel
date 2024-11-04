@@ -90,10 +90,10 @@
                     <div class="app-warn">
                         <div class="flex flex-col gap-4 items-cetner justify-center w-full sm:flex-row">
                             <div>{{ $t('app.checkInstalledWarn', [data.app]) }}</div>
-                            <div @click="goRouter(key)" class="flex items-cetner justify-center text-[#74a4f3]">
+                            <span @click="goRouter(key)" class="flex items-cetner justify-center">
                                 <el-icon class="flex items-center justify-center"><Position /></el-icon>
                                 {{ $t('database.goInstall') }}
-                            </div>
+                            </span>
                         </div>
                         <div>
                             <img src="@/assets/images/no_app.svg" />
