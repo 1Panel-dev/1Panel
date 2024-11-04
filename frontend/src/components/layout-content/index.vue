@@ -19,7 +19,7 @@
         </div>
         <div class="content-container__main" v-if="slots.main">
             <el-card>
-                <div class="content-container__title" v-if="title">
+                <div class="content-container__title">
                     <slot name="title">
                         <div v-if="showBack">
                             <div class="flex justify-between">

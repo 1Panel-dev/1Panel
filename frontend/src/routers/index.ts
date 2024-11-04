@@ -56,8 +56,15 @@ router.beforeEach((to, from, next) => {
 
 router.afterEach((to) => {
     if (to.meta.activeMenu && !isRedirecting) {
-        localStorage.setItem('cachedRoute' + to.meta.activeMenu, to.path);
+        let notMathParam = true;
+        if (to.matched.some((record) => record.path.includes(':'))) {
+            notMathParam = false;
+        }
+        if (notMathParam) {
+            localStorage.setItem('cachedRoute' + to.meta.activeMenu, to.path);
+        }
     }
+
     isRedirecting = false;
     NProgress.done();
 });

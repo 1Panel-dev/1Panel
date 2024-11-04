@@ -53,6 +53,10 @@ const props = defineProps({
         type: Number,
         default: 0,
     },
+    height: {
+        type: Number,
+        default: 0,
+    },
 });
 const emit = defineEmits(['search', 'update:selects', 'update:paginationConfig']);
 const globalStore = GlobalStore();
@@ -105,11 +109,19 @@ onMounted(() => {
     if (props.heightDiff) {
         heightDiff = props.heightDiff;
     }
+    if (props.height) {
+        tableHeight.value = props.height;
+    } else {
+        tableHeight.value = window.innerHeight - heightDiff;
+    }
 
-    tableHeight.value = window.innerHeight - heightDiff;
     window.onresize = () => {
         return (() => {
-            tableHeight.value = window.innerHeight - heightDiff;
+            if (props.height) {
+                tableHeight.value = props.height;
+            } else {
+                tableHeight.value = window.innerHeight - heightDiff;
+            }
         })();
     };
 });

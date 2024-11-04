@@ -45,6 +45,7 @@ const webSiteRouter = {
             component: () => import('@/views/website/runtime/php/index.vue'),
             meta: {
                 title: 'menu.runtime',
+                activeMenu: '/websites/runtimes/php',
                 requiresAuth: false,
             },
         },
