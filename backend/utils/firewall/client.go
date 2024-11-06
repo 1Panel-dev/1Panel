@@ -1,10 +1,9 @@
 package firewall
 
 import (
-	"os"
-
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/firewall/client"
 )
 
@@ -29,18 +28,18 @@ type FirewallClient interface {
 }
 
 func NewFirewallClient() (FirewallClient, error) {
-	_, firewalldErr := os.Stat("/usr/sbin/firewalld")
-	_, ufwErr := os.Stat("/usr/sbin/ufw")
+	firewalld := cmd.Which("firewalld")
+	ufw := cmd.Which("ufw")
 
-	if firewalldErr == nil && ufwErr == nil {
-		return nil, buserr.New("firewalld and ufw both found, only one firewall should be active")
+	if firewalld && ufw {
+		return nil, buserr.New(constant.ErrFirewallBoth)
 	}
 
-	if firewalldErr == nil {
+	if firewalld {
 		return client.NewFirewalld()
 	}
-	if ufwErr == nil {
+	if ufw {
 		return client.NewUfw()
 	}
-	return nil, buserr.New(constant.ErrFirewall)
+	return nil, buserr.New(constant.ErrFirewallNone)
 }

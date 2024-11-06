@@ -165,7 +165,9 @@ ErrConfigAlreadyExist: "A configuration file with the same name already exists"
 ErrUserFindErr: "Failed to find user {{ .name }} {{ .err }}"
 
 #ssh
-ErrFirewall: "No firewalld or ufw service is detected. Please check and try again!"
+ErrFirewallNone: "No firewalld or ufw service detected on the system. Please check and try again!"
+ErrFirewallBoth: "Both firewalld and ufw services are detected on the system. To avoid conflicts, please uninstall one and try again!"
+ErrNFTables: "Port forwarding functionality relies on the iptables service and is currently not compatible with nftables operations!"
 
 #cronjob
 ErrBashExecute: "Script execution error, please check the specific information in the task output text area."

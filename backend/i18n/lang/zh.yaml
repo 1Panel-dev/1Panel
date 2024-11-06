@@ -168,7 +168,9 @@ ErrConfigAlreadyExist: "已存在同名配置文件"
 ErrUserFindErr: "用户 {{ .name }} 查找失败 {{ .err }}"
 
 #ssh
-ErrFirewall: "当前未检测到系统 firewalld 或 ufw 服务，请检查后重试！"
+ErrFirewallNone: "未检测到系统 firewalld 或 ufw 服务，请检查后重试！"
+ErrFirewallBoth: "检测到系统同时存在 firewalld 或 ufw 服务，为避免冲突，请卸载后重试！"
+ErrNFTables: "端口转发功能依赖于 iptables 服务，暂不兼容 nftables 操作！"
 
 #cronjob
 ErrBashExecute: "脚本执行错误，请在任务输出文本域中查看具体信息。"
