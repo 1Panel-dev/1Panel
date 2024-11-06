@@ -14,11 +14,10 @@ const GlobalStore = defineStore({
         language: '',
         themeConfig: {
             panelName: '',
-            primary: '#005EEB',
+            primary: '#005eeb',
             theme: 'auto',
-            isGold: false,
             footer: true,
-
+            themeColor: '',
             title: '',
             logo: '',
             logoWithText: '',
@@ -46,9 +45,8 @@ const GlobalStore = defineStore({
     getters: {
         isDarkTheme: (state) =>
             state.themeConfig.theme === 'dark' ||
-            state.themeConfig.isGold ||
             (state.themeConfig.theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches),
-        isDarkGoldTheme: (state) => state.themeConfig.isGold && state.isProductPro,
+        isDarkGoldTheme: (state) => state.themeConfig.primary === '#F0BE96' && state.isProductPro,
     },
     actions: {
         setOpenMenuTabs(openMenuTabs: boolean) {

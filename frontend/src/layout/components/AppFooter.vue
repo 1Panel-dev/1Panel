@@ -28,8 +28,8 @@ const mobile = computed(() => {
     align-items: center;
     justify-content: space-between;
     height: 48px;
-    background: #ffffff;
-    border-top: 1px solid #e4e7ed;
+    background: var(--panel-footer-bg);
+    border-top: 1px solid var(--panel-footer-border);
     box-sizing: border-box;
     padding: 10px 20px;
     a {

@@ -7,7 +7,7 @@ import * as echarts from 'echarts';
 import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';
 const globalStore = GlobalStore();
-const { isDarkGoldTheme, isDarkTheme } = storeToRefs(globalStore);
+const { isDarkTheme } = storeToRefs(globalStore);
 
 const props = defineProps({
     id: {
@@ -25,7 +25,7 @@ const props = defineProps({
     option: {
         type: Object,
         required: true,
-    }, // option: { title , data }
+    },
 });
 
 function initChart() {
@@ -34,6 +34,12 @@ function initChart() {
         myChart = echarts.init(document.getElementById(props.id) as HTMLElement);
     }
     let percentText = String(props.option.data).split('.');
+    const primaryLight2 = getComputedStyle(document.documentElement)
+        .getPropertyValue('--panel-color-primary-light-3')
+        .trim();
+    const primaryLight1 = getComputedStyle(document.documentElement).getPropertyValue('--panel-color-primary').trim();
+    const pieBgColor = getComputedStyle(document.documentElement).getPropertyValue('--panel-pie-bg-color').trim();
+
     const option = {
         title: [
             {
@@ -99,11 +105,11 @@ function initChart() {
                     new echarts.graphic.LinearGradient(0, 1, 0, 0, [
                         {
                             offset: 0,
-                            color: isDarkGoldTheme.value ? '#836c4c' : 'rgba(81, 192, 255, .1)',
+                            color: primaryLight2,
                         },
                         {
                             offset: 1,
-                            color: isDarkGoldTheme.value ? '#eaba63' : '#4261F6',
+                            color: primaryLight1,
                         },
                     ]),
                 ],
@@ -119,7 +125,7 @@ function initChart() {
                 label: {
                     show: false,
                 },
-                color: isDarkTheme.value ? '#16191D' : '#fff',
+                color: pieBgColor,
                 data: [
                     {
                         value: 0,

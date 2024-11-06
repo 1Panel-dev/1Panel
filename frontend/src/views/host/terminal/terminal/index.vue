@@ -3,7 +3,7 @@
         <el-tabs
             type="card"
             class="terminal-tabs"
-            style="background-color: #efefef; margin-top: 20px"
+            style="background-color: var(--panel-terminal-tag-bg-color); margin-top: 20px"
             v-model="terminalValue"
             :before-leave="beforeLeave"
             @tab-change="quickCmd = ''"

@@ -48,7 +48,7 @@ import { UploadFileData } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import { UploadFile, UploadFiles, UploadInstance, UploadProps, UploadRawFile, genFileId } from 'element-plus';
 import { useTheme } from '@/hooks/use-theme';
-import { getXpackSetting } from '@/utils/xpack';
+import { getXpackSetting, initFavicon } from '@/utils/xpack';
 const globalStore = GlobalStore();
 
 const { switchTheme } = useTheme();
@@ -90,10 +90,11 @@ const submit = async () => {
             globalStore.isProductPro = true;
             const xpackRes = await getXpackSetting();
             if (xpackRes) {
-                globalStore.themeConfig.isGold = xpackRes.data.theme === 'dark-gold';
+                globalStore.themeConfig.themeColor = xpackRes.data.themeColor;
             }
             loading.value = false;
             switchTheme();
+            initFavicon();
             uploadRef.value!.clearFiles();
             uploaderFiles.value = [];
             open.value = false;

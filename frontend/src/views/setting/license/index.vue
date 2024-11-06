@@ -2,7 +2,7 @@
     <div>
         <LayoutContent v-loading="loading" :title="$t('setting.license')" :divider="true">
             <template #main>
-                <el-row :gutter="20" class="mt-5; mb-10">
+                <el-row :gutter="20" class="mt-5; mb-10 license-card">
                     <el-col :xs="24" :sm="24" :md="15" :lg="15" :xl="15">
                         <div class="descriptions" v-if="hasLicense">
                             <el-descriptions :column="1" direction="horizontal" size="large" border>
@@ -123,6 +123,7 @@ import LicenseImport from '@/components/license-import/index.vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
+import { initFavicon } from '@/utils/xpack';
 const loading = ref();
 const licenseRef = ref();
 const globalStore = GlobalStore();
@@ -168,7 +169,7 @@ const onUnBind = async () => {
             .then(() => {
                 loading.value = false;
                 globalStore.isProductPro = false;
-                globalStore.themeConfig.isGold = false;
+                initFavicon();
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 window.location.reload();
             })
@@ -250,6 +251,9 @@ onMounted(() => {
     &:hover {
         background-color: rgba(0, 94, 235, 0.03);
     }
+}
+:deep(.license-card .el-card) {
+    border: var(--panel-border) !important;
 }
 :deep(.el-descriptions__content) {
     max-width: 300px;

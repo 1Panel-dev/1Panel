@@ -1,22 +1,29 @@
 import { GlobalStore } from '@/store';
+import { setPrimaryColor } from '@/utils/theme';
 
 export const useTheme = () => {
-    const globalStore = GlobalStore();
     const switchTheme = () => {
-        if (globalStore.themeConfig.isGold && globalStore.isProductPro) {
-            const body = document.documentElement as HTMLElement;
-            body.setAttribute('class', 'dark-gold');
-            return;
+        const globalStore = GlobalStore();
+        const themeConfig = globalStore.themeConfig;
+        let itemTheme = themeConfig.theme;
+        if (itemTheme === 'auto') {
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            itemTheme = prefersDark ? 'dark' : 'light';
         }
+        document.documentElement.className = itemTheme === 'dark' ? 'dark' : 'light';
+        if (globalStore.isProductPro && themeConfig.themeColor) {
+            try {
+                const themeColor = JSON.parse(themeConfig.themeColor);
+                const color = itemTheme === 'dark' ? themeColor.dark : themeColor.light;
 
-        let itemTheme = globalStore.themeConfig.theme;
-        if (globalStore.themeConfig.theme === 'auto') {
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
-            itemTheme = prefersDark.matches ? 'dark' : 'light';
+                if (color) {
+                    themeConfig.primary = color;
+                    setPrimaryColor(color);
+                }
+            } catch (e) {
+                console.error('Failed to parse themeColor', e);
+            }
         }
-        const body = document.documentElement as HTMLElement;
-        if (itemTheme === 'dark') body.setAttribute('class', 'dark');
-        else body.setAttribute('class', '');
     };
 
     return {

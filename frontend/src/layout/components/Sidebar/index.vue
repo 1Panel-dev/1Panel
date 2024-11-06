@@ -6,6 +6,9 @@
         element-loading-svg-view-box="-10, -10, 50, 50"
         element-loading-background="rgba(122, 122, 122, 0.01)"
     >
+        <div class="fixed">
+            <PrimaryMenu />
+        </div>
         <Logo :isCollapse="isCollapse" />
         <el-scrollbar>
             <el-menu
@@ -46,6 +49,7 @@ import { GlobalStore, MenuStore } from '@/store';
 import { MsgSuccess } from '@/utils/message';
 import { isString } from '@vueuse/core';
 import { getSettingInfo } from '@/api/modules/setting';
+import PrimaryMenu from '@/assets/images/menu-bg.svg?component';
 
 const route = useRoute();
 const menuStore = MenuStore();
@@ -183,7 +187,7 @@ onMounted(() => {
     display: flex;
     flex-direction: column;
     height: 100%;
-    background: url(@/assets/images/menu-bg.png) var(--el-menu-bg-color) no-repeat top;
+    background: var(--panel-menu-bg-color) no-repeat top;
 
     .el-scrollbar {
         flex: 1;

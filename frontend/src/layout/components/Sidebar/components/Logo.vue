@@ -37,6 +37,7 @@ const goHome = () => {
     align-items: center;
     justify-content: center;
     height: 55px;
+    z-index: 1;
     img {
         object-fit: contain;
         width: 95%;

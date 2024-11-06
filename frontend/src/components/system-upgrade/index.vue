@@ -1,7 +1,7 @@
 <template>
     <div>
-        <div class="flex w-full flex-col gap-2 md:flex-row">
-            <div class="flex flex-wrap" v-if="props.footer">
+        <div class="flex w-full flex-col gap-2 md:flex-row items-center">
+            <div class="flex flex-wrap items-center" v-if="props.footer">
                 <el-button type="primary" link @click="toForum">
                     <span class="font-normal">{{ $t('setting.forum') }}</span>
                 </el-button>
@@ -15,17 +15,17 @@
                 </el-button>
                 <el-divider v-if="!mobile" direction="vertical" />
             </div>
-            <div class="flex flex-wrap">
-                <el-button type="primary" link @click="toHalo">
-                    <span class="font-normal">
-                        {{ isProductPro ? $t('license.pro') : $t('license.community') }}
-                    </span>
-                </el-button>
-                <span class="version" @click="copyText(version)">{{ version }}</span>
-                <el-badge is-dot style="margin-top: -3px" v-if="version !== 'Waiting' && globalStore.hasNewVersion">
-                    <el-button type="primary" link @click="onLoadUpgradeInfo">
-                        <span class="font-normal">({{ $t('setting.hasNewVersion') }})</span>
-                    </el-button>
+            <div class="flex flex-wrap items-center">
+                <el-link :underline="false" type="primary" @click="toHalo">
+                    {{ isProductPro ? $t('license.pro') : $t('license.community') }}
+                </el-link>
+                <el-link :underline="false" class="version" type="primary" @click="copyText(version)">
+                    {{ version }}
+                </el-link>
+                <el-badge is-dot class="-mt-0.5" v-if="version !== 'Waiting' && globalStore.hasNewVersion">
+                    <el-link :underline="false" type="primary" @click="onLoadUpgradeInfo">
+                        （{{ $t('setting.hasNewVersion') }}）
+                    </el-link>
                 </el-badge>
                 <el-button
                     v-if="version !== 'Waiting' && !globalStore.hasNewVersion"
@@ -33,7 +33,7 @@
                     link
                     @click="onLoadUpgradeInfo"
                 >
-                    <span>({{ $t('setting.upgradeCheck') }})</span>
+                    （{{ $t('setting.upgradeCheck') }}）
                 </el-button>
                 <el-tag v-if="version === 'Waiting'" round style="margin-left: 10px">
                     {{ $t('setting.upgrading') }}
@@ -201,11 +201,10 @@ onMounted(() => {
 <style lang="scss" scoped>
 .version {
     font-size: 14px;
-    color: var(--dark-gold-base-color);
+    color: var(--panel-color-primary-light-4);
     text-decoration: none;
     letter-spacing: 0.5px;
     cursor: pointer;
-    margin-top: 2px;
 }
 .line-height {
     line-height: 25px;
@@ -221,10 +220,13 @@ onMounted(() => {
         font-size: 14px;
     }
     :deep(.default-theme h2) {
-        color: var(--dark-gold-base-color);
-        margin: 13px, 0;
+        color: var(--el-color-primary);
+        margin: 13px 0;
         padding: 0;
         font-size: 16px;
     }
+}
+:deep(.el-link__inner) {
+    font-weight: 400;
 }
 </style>

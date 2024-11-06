@@ -476,7 +476,11 @@ onMounted(() => {
         height: 45px;
         margin-top: 10px;
         background-color: #005eeb;
+        border-color: #005eeb;
         color: #ffffff;
+        &:hover {
+            --el-button-hover-border-color: #005eeb;
+        }
     }
 
     .demo {
@@ -503,6 +507,13 @@ onMounted(() => {
         color: #005eeb;
     }
 
+    :deep(a) {
+        color: #005eeb;
+        &:hover {
+            color: #005eeb95;
+        }
+    }
+
     :deep(.el-checkbox__input .el-checkbox__inner) {
         background-color: #fff !important;
         border-color: #fff !important;
@@ -522,5 +533,25 @@ onMounted(() => {
         margin-top: -20px;
         margin-left: 20px;
     }
+}
+.cursor-pointer {
+    outline: none;
+}
+
+.el-dropdown:focus-visible {
+    outline: none;
+}
+
+.el-tooltip__trigger:focus-visible {
+    outline: none;
+}
+
+:deep(.el-dropdown-menu__item:not(.is-disabled):hover) {
+    color: #005eeb !important;
+    background-color: #e5eefd !important;
+}
+:deep(.el-dropdown-menu__item:not(.is-disabled):focus) {
+    color: #005eeb !important;
+    background-color: #e5eefd !important;
 }
 </style>

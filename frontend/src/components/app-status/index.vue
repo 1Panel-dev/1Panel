@@ -88,9 +88,9 @@
             <LayoutContent :title="getTitle(key)" :divider="true">
                 <template #main>
                     <div class="app-warn">
-                        <div class="flex flex-col gap-4 items-cetner justify-center w-full sm:flex-row">
+                        <div class="flex flex-col gap-2 items-center justify-center w-full sm:flex-row">
                             <div>{{ $t('app.checkInstalledWarn', [data.app]) }}</div>
-                            <span @click="goRouter(key)" class="flex items-cetner justify-center">
+                            <span @click="goRouter(key)" class="flex items-center justify-center gap-0.5">
                                 <el-icon class="flex items-center justify-center"><Position /></el-icon>
                                 {{ $t('database.goInstall') }}
                             </span>

@@ -105,7 +105,7 @@ defineExpose({
         .h-app-title {
             font-weight: 500;
             font-size: 15px;
-            color: #1f2329;
+            color: var(--panel-text-color);
         }
 
         .h-app-desc {
