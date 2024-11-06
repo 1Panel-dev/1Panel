@@ -1452,6 +1452,14 @@ const message = {
         WebDAV: 'WebDAV',
         WebDAVAlist: 'WebDAV connect Alist can refer to the official documentation',
         UPYUN: 'UPYUN',
+        ALIYUN: 'Aliyun Drive',
+        ALIYUNHelper:
+            'The current maximum limit for non-client downloads on Aliyun Drive is 100 MB. Exceeding this limit requires downloading through the client.',
+        ALIYUNRecover:
+            'The current maximum limit for non-client downloads on Aliyun Drive is 100 MB. Exceeding this limit requires downloading through the client to the local device, then synchronizing the snapshot for recovery.',
+        analysis: 'Analysis',
+        analysisHelper:
+            'Paste the entire token content to automatically parse the required parts. For specific operations, please refer to the official documentation.',
         serviceName: 'Service Name',
         operator: 'Operator',
         OneDrive: 'Microsoft OneDrive',

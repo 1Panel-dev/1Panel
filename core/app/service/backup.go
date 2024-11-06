@@ -156,12 +156,13 @@ func (u *BackupService) SearchWithPage(req dto.SearchPageWithType) (int64, inter
 			item.Credential = base64.StdEncoding.EncodeToString([]byte(item.Credential))
 		}
 
-		if account.Type == constant.OneDrive {
+		if account.Type == constant.OneDrive || account.Type == constant.ALIYUN {
 			varMap := make(map[string]interface{})
 			if err := json.Unmarshal([]byte(item.Vars), &varMap); err != nil {
 				continue
 			}
 			delete(varMap, "refresh_token")
+			delete(varMap, "drive_id")
 			itemVars, _ := json.Marshal(varMap)
 			item.Vars = string(itemVars)
 		}
@@ -500,33 +501,75 @@ func StartRefreshOneDriveToken(backup *model.BackupAccount) error {
 }
 
 func (u *BackupService) Run() {
-	var backupItem model.BackupAccount
-	_ = global.DB.Where("`type` = ?", "OneDrive").First(&backupItem)
-	if backupItem.ID == 0 {
-		return
-	}
-	global.LOG.Info("start to refresh token of OneDrive ...")
-	varMap := make(map[string]interface{})
-	if err := json.Unmarshal([]byte(backupItem.Vars), &varMap); err != nil {
-		global.LOG.Errorf("Failed to refresh OneDrive token, please retry, err: %v", err)
-		return
-	}
-	refreshToken, err := client.RefreshToken("refresh_token", "refreshToken", varMap)
-	varMap["refresh_status"] = constant.StatusSuccess
-	varMap["refresh_time"] = time.Now().Format(constant.DateTimeLayout)
-	if err != nil {
-		varMap["refresh_status"] = constant.StatusFailed
-		varMap["refresh_msg"] = err.Error()
-		global.LOG.Errorf("Failed to refresh OneDrive token, please retry, err: %v", err)
-		return
-	}
-	varMap["refresh_token"] = refreshToken
+	refreshOneDrive()
+	refreshALIYUN()
+}
 
-	varsItem, _ := json.Marshal(varMap)
-	_ = global.DB.Model(&model.BackupAccount{}).
-		Where("id = ?", backupItem.ID).
-		Updates(map[string]interface{}{
-			"vars": varsItem,
-		}).Error
-	global.LOG.Info("Successfully refreshed OneDrive token.")
+func refreshOneDrive() {
+	var backups []model.BackupAccount
+	_ = global.DB.Where("`type` = ?", "OneDrive").Find(&backups)
+	for _, backupItem := range backups {
+		if backupItem.ID == 0 {
+			return
+		}
+		global.LOG.Infof("start to refresh token of OneDrive %s ...", backupItem.Name)
+		varMap := make(map[string]interface{})
+		if err := json.Unmarshal([]byte(backupItem.Vars), &varMap); err != nil {
+			global.LOG.Errorf("Failed to refresh OneDrive token, please retry, err: %v", err)
+			return
+		}
+		refreshToken, err := client.RefreshToken("refresh_token", "refreshToken", varMap)
+		varMap["refresh_status"] = constant.StatusSuccess
+		varMap["refresh_time"] = time.Now().Format(constant.DateTimeLayout)
+		if err != nil {
+			varMap["refresh_status"] = constant.StatusFailed
+			varMap["refresh_msg"] = err.Error()
+			global.LOG.Errorf("Failed to refresh OneDrive token, please retry, err: %v", err)
+			return
+		}
+		varMap["refresh_token"] = refreshToken
+
+		varsItem, _ := json.Marshal(varMap)
+		_ = global.DB.Model(&model.BackupAccount{}).
+			Where("id = ?", backupItem.ID).
+			Updates(map[string]interface{}{
+				"vars": varsItem,
+			}).Error
+		global.LOG.Info("Successfully refreshed OneDrive token.")
+	}
+}
+
+func refreshALIYUN() {
+	var backups []model.BackupAccount
+	_ = global.DB.Where("`type` = ?", "ALIYUN").Find(&backups)
+	for _, backupItem := range backups {
+		global.LOG.Infof("start to refresh token of ALIYUN %s ...", backupItem.Name)
+		varMap := make(map[string]interface{})
+		if err := json.Unmarshal([]byte(backupItem.Vars), &varMap); err != nil {
+			global.LOG.Errorf("Failed to refresh ALIYUN token, please retry, err: %v", err)
+			return
+		}
+		if _, ok := varMap["refresh_token"]; !ok {
+			global.LOG.Error("no such refresh token find in db")
+			return
+		}
+		refreshToken, err := client.RefreshALIToken(fmt.Sprintf("%v", varMap["refresh_token"]))
+		varMap["refresh_status"] = constant.StatusSuccess
+		varMap["refresh_time"] = time.Now().Format(constant.DateTimeLayout)
+		if err != nil {
+			varMap["refresh_status"] = constant.StatusFailed
+			varMap["refresh_msg"] = err.Error()
+			global.LOG.Errorf("Failed to refresh ALIYUN token, please retry, err: %v", err)
+			return
+		}
+		varMap["refresh_token"] = refreshToken
+
+		varsItem, _ := json.Marshal(varMap)
+		_ = global.DB.Model(&model.BackupAccount{}).
+			Where("id = ?", backupItem.ID).
+			Updates(map[string]interface{}{
+				"vars": varsItem,
+			}).Error
+		global.LOG.Info("Successfully refreshed ALIYUN token.")
+	}
 }

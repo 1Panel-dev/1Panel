@@ -29,5 +29,6 @@ const (
 	WebDAV              = "WebDAV"
 	Local               = "LOCAL"
 	UPYUN               = "UPYUN"
+	ALIYUN              = "ALIYUN"
 	OneDriveRedirectURI = "http://localhost/login/authorized"
 )

@@ -196,7 +196,7 @@ import RecoverStatus from '@/views/setting/snapshot/status/index.vue';
 import SnapshotImport from '@/views/setting/snapshot/import/index.vue';
 import SnapshotCreate from '@/views/setting/snapshot/create/index.vue';
 import SnapRecover from '@/views/setting/snapshot/recover/index.vue';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import { loadOsInfo } from '@/api/modules/dashboard';
 
 const loading = ref(false);
@@ -291,6 +291,10 @@ const onChange = async (info: any) => {
 };
 
 const onRecover = async (row: any) => {
+    if (row.defaultDownload.indexOf('ALIYUN') !== -1 && row.size > 100 * 1024 * 1024) {
+        MsgError(i18n.global.t('setting.ALIYUNRecover'));
+        return;
+    }
     loading.value = true;
     await loadOsInfo()
         .then((res) => {

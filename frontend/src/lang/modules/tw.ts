@@ -1365,6 +1365,12 @@ const message = {
         WebDAV: 'WebDAV',
         WebDAVAlist: 'WebDAV 連接 Alist 可參考官方文檔',
         UPYUN: '又拍雲',
+        ALIYUN: '阿里雲盤',
+        ALIYUNHelper: '當前阿里雲盤非客戶端下載最大限制為 100 MB，超過限制需要通過客戶端下載',
+        ALIYUNRecover:
+            '當前阿里雲盤非客戶端下載最大限制為 100 MB，超過限制需要通過客戶端下載到本地後，同步快照進行恢復',
+        analysis: '解析',
+        analysisHelper: '粘貼整個 token 內容，自動解析所需部分，具體操作可參考官方文檔',
         serviceName: '服務名稱',
         operator: '操作員',
         OneDrive: '微軟 OneDrive',

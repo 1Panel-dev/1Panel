@@ -17,7 +17,9 @@
                     <el-option :label="$t('setting.SFTP')" value="SFTP"></el-option>
                     <el-option :label="$t('setting.WebDAV')" value="WebDAV"></el-option>
                     <el-option :label="$t('setting.UPYUN')" value="UPYUN"></el-option>
+                    <el-option :label="$t('setting.ALIYUN')" value="ALIYUN"></el-option>
                 </el-select>
+                <span v-if="isALIYUNYUN()" class="input-help">{{ $t('setting.ALIYUNHelper') }}</span>
             </el-form-item>
             <el-form-item v-if="hasAccessKey()" label="Access Key ID" prop="accessKey" :rules="Rules.requiredInput">
                 <el-input v-model.trim="dialogData.rowData!.accessKey" />
@@ -95,10 +97,7 @@
                     <el-input type="password" clearable show-password v-model.trim="dialogData.rowData!.credential" />
                 </el-form-item>
             </div>
-            <el-form-item
-                v-if="dialogData.rowData!.type !== 'LOCAL' && dialogData.rowData!.type !== 'OneDrive'"
-                prop="rememberAuth"
-            >
+            <el-form-item v-if="hasRemember()" prop="rememberAuth">
                 <el-checkbox v-model="dialogData.rowData!.rememberAuth">
                     {{ $t('terminal.rememberPassword') }}
                 </el-checkbox>
@@ -233,6 +232,40 @@
                     v-model.number="dialogData.rowData!.varsJson['timeout']"
                 ></el-input-number>
             </el-form-item>
+            <div v-if="isALIYUNYUN()">
+                <el-form-item label="Token" prop="varsJson.token">
+                    <div class="!w-full">
+                        <el-input
+                            style="width: calc(100% - 80px)"
+                            :rows="3"
+                            type="textarea"
+                            clearable
+                            v-model.trim="dialogData.rowData!.varsJson['token']"
+                        />
+                        <el-button class="append-button" @click="loadFromToken()">
+                            {{ $t('setting.analysis') }}
+                        </el-button>
+                        <span class="input-help">
+                            {{ $t('setting.analysisHelper') }}
+                            <el-link
+                                style="font-size: 12px; margin-left: 5px"
+                                icon="Position"
+                                @click="toDoc(true)"
+                                type="primary"
+                            >
+                                {{ $t('firewall.quickJump') }}
+                            </el-link>
+                        </span>
+                    </div>
+                </el-form-item>
+                <el-form-item label="Drive ID" prop="varsJson.drive_id" :rules="Rules.requiredInput">
+                    <el-input v-model.trim="dialogData.rowData!.varsJson['drive_id']" />
+                </el-form-item>
+                <el-form-item label="Refresh Token" prop="varsJson.refresh_token" :rules="Rules.requiredInput">
+                    <el-input v-model.trim="dialogData.rowData!.varsJson['refresh_token']" />
+                </el-form-item>
+            </div>
+
             <div v-if="dialogData.rowData!.type === 'OneDrive'">
                 <el-form-item>
                     <el-radio-group v-model="dialogData.rowData!.varsJson['isCN']" @change="changeFrom">
@@ -437,9 +470,25 @@ function callback(error: any) {
     }
 }
 
+const loadFromToken = () => {
+    const obj = JSON.parse(dialogData.value.rowData!.varsJson['token']);
+    dialogData.value.rowData!.varsJson['drive_id'] = obj.default_drive_id;
+    dialogData.value.rowData!.varsJson['refresh_token'] = obj.refresh_token;
+};
+const hasRemember = () => {
+    return (
+        dialogData.value.rowData!.type !== 'LOCAL' &&
+        dialogData.value.rowData!.type !== 'OneDrive' &&
+        dialogData.value.rowData!.type !== 'ALIYUN'
+    );
+};
 const isUPYUN = () => {
     let itemType = dialogData.value.rowData!.type;
     return itemType === 'UPYUN';
+};
+const isALIYUNYUN = () => {
+    let itemType = dialogData.value.rowData!.type;
+    return itemType === 'ALIYUN';
 };
 const hasAccessKey = () => {
     let itemType = dialogData.value.rowData!.type;
@@ -557,6 +606,9 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
                 dialogData.value.rowData!.varsJson['endpoint'] = itemEndpoint;
             }
             dialogData.value.rowData!.varsJson['endpointItem'] = undefined;
+        }
+        if (isALIYUNYUN()) {
+            dialogData.value.rowData!.varsJson['token'] = undefined;
         }
         dialogData.value.rowData.vars = JSON.stringify(dialogData.value.rowData!.varsJson);
         loading.value = true;

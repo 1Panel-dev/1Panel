@@ -50,6 +50,7 @@ export namespace Backup {
         downloadAccountID: number;
         fileDir: string;
         fileName: string;
+        size: number;
     }
     export interface ForBucket {
         type: string;

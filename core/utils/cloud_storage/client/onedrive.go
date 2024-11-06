@@ -80,38 +80,6 @@ func (o oneDriveClient) Upload(src, target string) (bool, error) {
 	return isOk, err
 }
 
-func (o oneDriveClient) Download(src, target string) (bool, error) {
-	src = "/" + strings.TrimPrefix(src, "/")
-	req, err := o.client.NewRequest("GET", fmt.Sprintf("me/drive/root:%s", src), nil)
-	if err != nil {
-		return false, fmt.Errorf("new request for file id failed, err: %v", err)
-	}
-	var driveItem *odsdk.DriveItem
-	if err := o.client.Do(context.Background(), req, false, &driveItem); err != nil {
-		return false, fmt.Errorf("do request for file id failed, err: %v", err)
-	}
-
-	resp, err := http.Get(driveItem.DownloadURL)
-	if err != nil {
-		return false, err
-	}
-	defer resp.Body.Close()
-
-	out, err := os.Create(target)
-	if err != nil {
-		return false, err
-	}
-	defer out.Close()
-	buffer := make([]byte, 2*1024*1024)
-
-	_, err = io.CopyBuffer(out, resp.Body, buffer)
-	if err != nil {
-		return false, err
-	}
-
-	return true, nil
-}
-
 func (o *oneDriveClient) loadIDByPath(path string) (string, error) {
 	pathItem := "root:" + path
 	if path == "/" {

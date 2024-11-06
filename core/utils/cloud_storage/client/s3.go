@@ -4,7 +4,6 @@ import (
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -53,49 +52,6 @@ func (s s3Client) ListBuckets() ([]interface{}, error) {
 	return result, nil
 }
 
-func (s s3Client) Exist(path string) (bool, error) {
-	svc := s3.New(&s.Sess)
-	if _, err := svc.HeadObject(&s3.HeadObjectInput{
-		Bucket: &s.bucket,
-		Key:    &path,
-	}); err != nil {
-		if aerr, ok := err.(awserr.RequestFailure); ok {
-			if aerr.StatusCode() == 404 {
-				return false, nil
-			}
-		} else {
-			return false, aerr
-		}
-	}
-	return true, nil
-}
-
-func (s *s3Client) Size(path string) (int64, error) {
-	svc := s3.New(&s.Sess)
-	file, err := svc.GetObject(&s3.GetObjectInput{
-		Bucket: &s.bucket,
-		Key:    &path,
-	})
-	if err != nil {
-		return 0, err
-	}
-	return *file.ContentLength, nil
-}
-
-func (s s3Client) Delete(path string) (bool, error) {
-	svc := s3.New(&s.Sess)
-	if _, err := svc.DeleteObject(&s3.DeleteObjectInput{Bucket: aws.String(s.bucket), Key: aws.String(path)}); err != nil {
-		return false, err
-	}
-	if err := svc.WaitUntilObjectNotExists(&s3.HeadObjectInput{
-		Bucket: aws.String(s.bucket),
-		Key:    aws.String(path),
-	}); err != nil {
-		return false, err
-	}
-	return true, nil
-}
-
 func (s s3Client) Upload(src, target string) (bool, error) {
 	fileInfo, err := os.Stat(src)
 	if err != nil {
@@ -120,44 +76,4 @@ func (s s3Client) Upload(src, target string) (bool, error) {
 		return false, err
 	}
 	return true, nil
-}
-
-func (s s3Client) Download(src, target string) (bool, error) {
-	if _, err := os.Stat(target); err != nil {
-		if os.IsNotExist(err) {
-			os.Remove(target)
-		} else {
-			return false, err
-		}
-	}
-	file, err := os.Create(target)
-	if err != nil {
-		return false, err
-	}
-	defer file.Close()
-	downloader := s3manager.NewDownloader(&s.Sess)
-	if _, err = downloader.Download(file, &s3.GetObjectInput{
-		Bucket: aws.String(s.bucket),
-		Key:    aws.String(src),
-	}); err != nil {
-		os.Remove(target)
-		return false, err
-	}
-	return true, nil
-}
-
-func (s *s3Client) ListObjects(prefix string) ([]string, error) {
-	svc := s3.New(&s.Sess)
-	var result []string
-	outputs, err := svc.ListObjects(&s3.ListObjectsInput{
-		Bucket: &s.bucket,
-		Prefix: &prefix,
-	})
-	if err != nil {
-		return result, err
-	}
-	for _, item := range outputs.Contents {
-		result = append(result, *item.Key)
-	}
-	return result, nil
 }

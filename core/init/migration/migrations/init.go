@@ -240,3 +240,10 @@ var InitAppLauncher = &gormigrate.Migration{
 		return tx.AutoMigrate(&model.AppLauncher{})
 	},
 }
+
+var InitBackup = &gormigrate.Migration{
+	ID: "20241107-init-backup",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.BackupAccount{})
+	},
+}

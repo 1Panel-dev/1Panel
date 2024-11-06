@@ -108,21 +108,3 @@ func (s sftpClient) ListBuckets() ([]interface{}, error) {
 	var result []interface{}
 	return result, nil
 }
-
-func (s sftpClient) Delete(filePath string) error {
-	sshClient, err := ssh.Dial("tcp", s.connInfo, s.config)
-	if err != nil {
-		return err
-	}
-	client, err := sftp.NewClient(sshClient)
-	if err != nil {
-		return err
-	}
-	defer client.Close()
-	defer sshClient.Close()
-
-	if err := client.Remove(filePath); err != nil {
-		return err
-	}
-	return nil
-}

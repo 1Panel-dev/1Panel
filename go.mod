@@ -13,6 +13,7 @@ require (
 	github.com/glebarez/sqlite v1.11.0
 	github.com/go-gormigrate/gormigrate/v2 v2.1.2
 	github.com/go-playground/validator/v10 v10.22.0
+	github.com/go-resty/resty/v2 v2.15.3
 	github.com/goh-chunlin/go-onedrive v1.1.1
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/google/uuid v1.6.0
@@ -37,7 +38,7 @@ require (
 	github.com/tencentyun/cos-go-sdk-v5 v0.7.54
 	github.com/upyun/go-sdk v2.1.0+incompatible
 	github.com/xlzd/gotp v0.1.0
-	golang.org/x/crypto v0.24.0
+	golang.org/x/crypto v0.25.0
 	golang.org/x/oauth2 v0.18.0
 	golang.org/x/sys v0.22.0
 	golang.org/x/term v0.22.0
@@ -119,9 +120,9 @@ require (
 	golang.org/x/arch v0.8.0 // indirect
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9 // indirect
 	golang.org/x/image v0.13.0 // indirect
-	golang.org/x/net v0.26.0 // indirect
+	golang.org/x/net v0.27.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
-	golang.org/x/time v0.5.0 // indirect
+	golang.org/x/time v0.6.0 // indirect
 	golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/protobuf v1.34.1 // indirect

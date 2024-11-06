@@ -53,6 +53,7 @@ import { computeSize, dateFormat, downloadFile } from '@/utils/util';
 import i18n from '@/lang';
 import { downloadBackupRecord, searchBackupRecordsByCronjob } from '@/api/modules/backup';
 import { Backup } from '@/api/interface/backup';
+import { MsgError } from '@/utils/message';
 
 const selects = ref<any>([]);
 const loading = ref();
@@ -102,6 +103,10 @@ const search = async () => {
 };
 
 const onDownload = async (row: Backup.RecordInfo) => {
+    if (row.accountType === 'ALIYUN' && row.size < 100 * 1024 * 1024) {
+        MsgError(i18n.global.t('setting.ALIYUNHelper'));
+        return;
+    }
     let params = {
         downloadAccountID: row.downloadAccountID,
         fileDir: row.fileDir,

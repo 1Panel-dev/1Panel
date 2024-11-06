@@ -3,7 +3,6 @@ package client
 import (
 	"crypto/tls"
 	"fmt"
-	"io"
 	"net/http"
 	"os"
 	"path"
@@ -59,63 +58,5 @@ func (s webDAVClient) Upload(src, target string) (bool, error) {
 
 func (s webDAVClient) ListBuckets() ([]interface{}, error) {
 	var result []interface{}
-	return result, nil
-}
-
-func (s webDAVClient) Download(src, target string) (bool, error) {
-	srcPath := path.Join(s.Bucket, src)
-	info, err := s.client.Stat(srcPath)
-	if err != nil {
-		return false, err
-	}
-	targetStat, err := os.Stat(target)
-	if err == nil {
-		if info.Size() == targetStat.Size() {
-			return true, nil
-		}
-	}
-	file, err := os.Create(target)
-	if err != nil {
-		return false, err
-	}
-	defer file.Close()
-	reader, _ := s.client.ReadStream(srcPath)
-	if _, err := io.Copy(file, reader); err != nil {
-		return false, err
-	}
-	return true, err
-}
-
-func (s webDAVClient) Exist(pathItem string) (bool, error) {
-	if _, err := s.client.Stat(path.Join(s.Bucket, pathItem)); err != nil {
-		return false, err
-	}
-	return true, nil
-}
-
-func (s webDAVClient) Size(pathItem string) (int64, error) {
-	file, err := s.client.Stat(path.Join(s.Bucket, pathItem))
-	if err != nil {
-		return 0, err
-	}
-	return file.Size(), nil
-}
-
-func (s webDAVClient) Delete(pathItem string) (bool, error) {
-	if err := s.client.Remove(path.Join(s.Bucket, pathItem)); err != nil {
-		return false, err
-	}
-	return true, nil
-}
-
-func (s webDAVClient) ListObjects(prefix string) ([]string, error) {
-	files, err := s.client.ReadDir(path.Join(s.Bucket, prefix))
-	if err != nil {
-		return nil, err
-	}
-	var result []string
-	for _, file := range files {
-		result = append(result, file.Name())
-	}
 	return result, nil
 }
