@@ -589,3 +589,29 @@ export const getFileType = (extension: string) => {
     });
     return type;
 };
+
+export const escapeProxyURL = (url: string): string => {
+    const encodeMap: { [key: string]: string } = {
+        ':': '%%3A',
+        '/': '%%2F',
+        '?': '%%3F',
+        '#': '%%23',
+        '[': '%%5B',
+        ']': '%%5D',
+        '@': '%%40',
+        '!': '%%21',
+        $: '%%24',
+        '&': '%%26',
+        "'": '%%27',
+        '(': '%%28',
+        ')': '%%29',
+        '*': '%%2A',
+        '+': '%%2B',
+        ',': '%%2C',
+        ';': '%%3B',
+        '=': '%%3D',
+        '%': '%%25',
+    };
+
+    return url.replace(/[\/:?#[\]@!$&'()*+,;=%~]/g, (match) => encodeMap[match] || match);
+};

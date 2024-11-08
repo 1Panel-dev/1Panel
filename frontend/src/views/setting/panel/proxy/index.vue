@@ -19,6 +19,7 @@
                                 <ul style="margin-left: -20px">
                                     <li v-if="isProductPro">{{ $t('setting.proxyHelper1') }}</li>
                                     <li v-if="isProductPro">{{ $t('setting.proxyHelper2') }}</li>
+                                    <li v-if="isProductPro">{{ $t('setting.proxyHelper4') }}</li>
                                     <li>{{ $t('setting.proxyHelper3') }}</li>
                                 </ul>
                             </template>
@@ -59,6 +60,10 @@
                                     :label="$t('setting.proxyPasswdKeep')"
                                 />
                             </el-form-item>
+                            <el-form-item v-if="isProductPro">
+                                <el-checkbox v-model="form.proxyDocker" :label="$t('setting.proxyDocker')" />
+                                <span class="input-help">{{ $t('setting.proxyDockerHelper') }}</span>
+                            </el-form-item>
                         </div>
                     </el-col>
                 </el-row>
@@ -74,6 +79,8 @@
                 </span>
             </template>
         </el-drawer>
+
+        <ConfirmDialog ref="confirmDialogRef" @confirm="onSubmit" />
     </div>
 </template>
 
@@ -87,11 +94,16 @@ import DrawerHeader from '@/components/drawer-header/index.vue';
 import { updateProxy } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';
+import { updateXpackSettingByKey } from '@/utils/xpack';
+import { updateDaemonJson } from '@/api/modules/container';
+import ConfirmDialog from '@/components/confirm-dialog/index.vue';
+import { escapeProxyURL } from '@/utils/util';
 
 const globalStore = GlobalStore();
 const emit = defineEmits<{ (e: 'search'): void }>();
 const { isProductPro } = storeToRefs(globalStore);
 
+const confirmDialogRef = ref();
 const formRef = ref<FormInstance>();
 const rules = reactive({
     proxyType: [Rules.requiredSelect],
@@ -101,6 +113,7 @@ const rules = reactive({
 
 const loading = ref(false);
 const passwordVisible = ref<boolean>(false);
+const proxyDockerVisible = ref<boolean>(false);
 const form = reactive({
     proxyUrl: '',
     proxyType: '',
@@ -110,6 +123,7 @@ const form = reactive({
     proxyPasswd: '',
     proxyPasswdKeep: '',
     proxyPasswdKeepItem: false,
+    proxyDocker: false,
 });
 
 interface DialogProps {
@@ -119,6 +133,7 @@ interface DialogProps {
     user: string;
     passwd: string;
     passwdKeep: string;
+    proxyDocker: string;
 }
 const acceptParams = (params: DialogProps): void => {
     if (params.url) {
@@ -134,6 +149,8 @@ const acceptParams = (params: DialogProps): void => {
     form.proxyPortItem = params.port ? Number(params.port) : 7890;
     form.proxyUser = params.user;
     form.proxyPasswd = params.passwd;
+    form.proxyDocker = params.proxyDocker !== '';
+    proxyDockerVisible.value = params.proxyDocker !== '';
     passwordVisible.value = true;
     form.proxyPasswdKeepItem = params.passwdKeep === 'Enable';
 };
@@ -150,6 +167,7 @@ const submitChangePassword = async (formEl: FormInstance | undefined) => {
             proxyUser: isClose ? '' : form.proxyUser,
             proxyPasswd: isClose ? '' : form.proxyPasswd,
             proxyPasswdKeep: '',
+            proxyDocker: isClose ? false : form.proxyDocker,
         };
         if (!isClose) {
             params.proxyPasswdKeep = form.proxyPasswdKeepItem ? 'Enable' : 'Disable';
@@ -157,19 +175,78 @@ const submitChangePassword = async (formEl: FormInstance | undefined) => {
         if (form.proxyType === 'http' || form.proxyType === 'https') {
             params.proxyUrl = form.proxyType + '://' + form.proxyUrl;
         }
-        loading.value = true;
-        await updateProxy(params)
-            .then(async () => {
-                loading.value = false;
-                emit('search');
-                passwordVisible.value = false;
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            })
-            .catch(() => {
-                loading.value = false;
-            });
+        if (
+            isProductPro.value &&
+            (params.proxyDocker ||
+                (proxyDockerVisible.value && isClose) ||
+                (proxyDockerVisible.value && !isClose) ||
+                (proxyDockerVisible.value && !params.proxyDocker))
+        ) {
+            let confirmParams = {
+                header: i18n.global.t('database.confChange'),
+                operationInfo: i18n.global.t('database.restartNowHelper'),
+                submitInputInfo: i18n.global.t('database.restartNow'),
+            };
+            confirmDialogRef.value!.acceptParams(confirmParams);
+        } else {
+            loading.value = true;
+            await updateProxy(params)
+                .then(async () => {
+                    loading.value = false;
+                    emit('search');
+                    passwordVisible.value = false;
+                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                })
+                .catch(() => {
+                    loading.value = false;
+                });
+        }
     });
 };
+
+const onSubmit = async () => {
+    try {
+        loading.value = true;
+        let isClose = form.proxyType === '' || form.proxyType === 'close';
+        let params = {
+            proxyType: isClose ? '' : form.proxyType,
+            proxyUrl: isClose ? '' : form.proxyUrl,
+            proxyPort: isClose ? '' : form.proxyPortItem + '',
+            proxyUser: isClose ? '' : form.proxyUser,
+            proxyPasswd: isClose ? '' : form.proxyPasswd,
+            proxyPasswdKeep: '',
+            proxyDocker: isClose ? false : form.proxyDocker,
+        };
+        if (!isClose) {
+            params.proxyPasswdKeep = form.proxyPasswdKeepItem ? 'Enable' : 'Disable';
+        }
+        let proxyPort = params.proxyPort ? `:${params.proxyPort}` : '';
+        let proxyUser = params.proxyUser ? `${escapeProxyURL(params.proxyUser)}` : '';
+        let proxyPasswd = '';
+        if (params.proxyUser) {
+            proxyPasswd = params.proxyPasswd ? `:${escapeProxyURL(params.proxyPasswd)}@` : '@';
+        }
+
+        let proxyUrl = form.proxyType + '://' + proxyUser + proxyPasswd + form.proxyUrl + proxyPort;
+        if (form.proxyType === 'http' || form.proxyType === 'https') {
+            params.proxyUrl = form.proxyType + '://' + form.proxyUrl;
+        }
+        await updateProxy(params);
+        if (isClose || params.proxyDocker === false) {
+            params.proxyUrl = '';
+        }
+        await updateXpackSettingByKey('ProxyDocker', proxyUrl);
+        await updateDaemonJson(`${form.proxyType}-proxy`, proxyUrl);
+        emit('search');
+        handleClose();
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+    } catch (error) {
+        console.error(error);
+    } finally {
+        loading.value = false;
+    }
+};
+
 const handleClose = () => {
     passwordVisible.value = false;
 };

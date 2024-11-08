@@ -239,6 +239,7 @@ const form = reactive({
     proxyUser: '',
     proxyPasswd: '',
     proxyPasswdKeep: '',
+    proxyDocker: '',
 
     proHideMenus: ref(i18n.t('setting.unSetting')),
     hideMenuList: '',
@@ -302,6 +303,7 @@ const search = async () => {
             form.theme = xpackRes.data.theme || globalStore.themeConfig.theme;
             form.themeColor = JSON.parse(xpackRes.data.themeColor);
             globalStore.themeConfig.themeColor = xpackRes.data.themeColor;
+            form.proxyDocker = xpackRes.data.proxyDocker;
         }
     } else {
         form.theme = res.data.theme;
@@ -355,6 +357,7 @@ const onChangeProxy = () => {
         user: form.proxyUser,
         passwd: form.proxyPasswd,
         passwdKeep: form.proxyPasswdKeep,
+        proxyDocker: form.proxyDocker,
     });
 };
 const onChangeNetwork = () => {
