@@ -924,18 +924,34 @@ func upApp(appInstall *model.AppInstall, pullImages bool) {
 			errMsg string
 		)
 		if pullImages && appInstall.App.Type != "php" {
-			out, err = compose.Pull(appInstall.GetComposePath())
+			projectName := strings.ToLower(appInstall.Name)
+			envByte, err := files.NewFileOp().GetContent(appInstall.GetEnvPath())
 			if err != nil {
-				if out != "" {
-					if strings.Contains(out, "no such host") {
-						errMsg = i18n.GetMsgByKey("ErrNoSuchHost") + ":"
-					}
-					if strings.Contains(out, "timeout") {
-						errMsg = i18n.GetMsgByKey("ErrImagePullTimeOut") + ":"
+				return err
+			}
+			images, err := composeV2.GetDockerComposeImages(projectName, envByte, []byte(appInstall.DockerCompose))
+			if err != nil {
+				return err
+			}
+			for _, image := range images {
+				if out, err = cmd.ExecWithTimeOut("docker pull "+image, 60*time.Minute); err != nil {
+					if out != "" {
+						if strings.Contains(out, "no such host") {
+							errMsg = i18n.GetMsgByKey("ErrNoSuchHost") + ":"
+						}
+						if strings.Contains(out, "timeout") {
+							errMsg = i18n.GetMsgByKey("ErrImagePullTimeOut") + ":"
+						}
+					} else {
+						if err.Error() == buserr.New(constant.ErrCmdTimeout).Error() {
+							errMsg = i18n.GetMsgByKey("ErrImagePullTimeOut")
+						} else {
+							errMsg = i18n.GetMsgWithMap("ErrImagePull", map[string]interface{}{"err": err.Error()})
+						}
 					}
 					appInstall.Message = errMsg + out
+					return err
 				}
-				return err
 			}
 		}
 
