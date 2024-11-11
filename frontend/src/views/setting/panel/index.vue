@@ -303,6 +303,7 @@ const search = async () => {
             form.theme = xpackRes.data.theme || globalStore.themeConfig.theme;
             form.themeColor = JSON.parse(xpackRes.data.themeColor);
             globalStore.themeConfig.themeColor = xpackRes.data.themeColor;
+            globalStore.themeConfig.theme = form.theme;
             form.proxyDocker = xpackRes.data.proxyDocker;
         }
     } else {

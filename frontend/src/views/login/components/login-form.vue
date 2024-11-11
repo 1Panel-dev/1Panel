@@ -366,7 +366,8 @@ const loadDataFromDB = async () => {
     globalStore.setDefaultNetwork(res.data.defaultNetwork);
     globalStore.setOpenMenuTabs(res.data.menuTabs === 'enable');
     globalStore.updateLanguage(res.data.language);
-    globalStore.setThemeConfig({ ...themeConfig.value, theme: res.data.theme, panelName: res.data.panelName });
+    let theme = globalStore.themeConfig.theme === res.data.theme ? res.data.theme : globalStore.themeConfig.theme;
+    globalStore.setThemeConfig({ ...themeConfig.value, theme: theme, panelName: res.data.panelName });
 };
 
 onMounted(() => {

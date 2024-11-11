@@ -8,7 +8,7 @@
                 <div class="flex w-full flex-col gap-4 md:justify-between md:flex-row">
                     <div class="flex flex-wrap gap-4">
                         <el-button type="primary" @click="onCreate()">
-                            {{ $t('commons.button.create') }} {{ $t('terminal.quickCommand') }}
+                            {{ $t('commons.button.create') }}{{ $t('terminal.quickCommand') }}
                         </el-button>
                         <el-button type="primary" plain @click="onOpenGroupDialog()">
                             {{ $t('terminal.group') }}

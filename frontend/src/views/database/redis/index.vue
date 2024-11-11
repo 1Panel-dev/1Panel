@@ -123,11 +123,12 @@
             :close-on-click-modal="false"
             :destroy-on-close="true"
         >
-            <el-alert :closable="false" :title="$t('app.checkInstalledWarn', ['Redis-Commander'])" type="info">
+            <div class="flex justify-center items-center gap-2 flex-wrap">
+                {{ $t('app.checkInstalledWarn', ['Redis-Commander']) }}
                 <el-link icon="Position" @click="getAppDetail('redis-commander')" type="primary">
                     {{ $t('database.goInstall') }}
                 </el-link>
-            </el-alert>
+            </div>
             <template #footer>
                 <span class="dialog-footer">
                     <el-button @click="commandVisible = false">{{ $t('commons.button.cancel') }}</el-button>

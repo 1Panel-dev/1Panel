@@ -25,6 +25,9 @@
     --el-color-primary-light-9: var(--panel-color-primary-light-9);
 
     --el-text-color-regular: #646a73;
+    --el-color-success:#238636;
+    --el-color-success-light-8: #3fb950;
+    --el-color-success-light-9: #3fb95030;
 }
 
 html {
@@ -44,6 +47,9 @@ html {
     --panel-button-bg-color: #ffffff;
     --panel-footer-border: #e4e7ed;
     --panel-terminal-tag-bg-color: #efefef;
+    --panel-terminal-tag-active-bg-color: #575758;
+    --panel-terminal-bg-color: #1e1e1e;
+    --panel-logs-bg-color: #1e1e1e;
 
     --panel-alert-bg: #e2e4ec;
     --panel-path-bg: #ffffff;

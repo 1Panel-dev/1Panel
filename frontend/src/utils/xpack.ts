@@ -115,6 +115,7 @@ export async function getXpackSettingForTheme() {
             globalStore.themeConfig.logoWithText = res2.data?.logoWithText;
             globalStore.themeConfig.favicon = res2.data?.favicon;
             globalStore.themeConfig.themeColor = res2.data?.themeColor;
+            globalStore.themeConfig.theme = res2.data?.theme || 'auto';
         } else {
             resetXSetting();
         }

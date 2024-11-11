@@ -722,7 +722,7 @@ onBeforeUnmount(() => {
 .system-label {
     font-weight: 400 !important;
     font-size: 14px !important;
-    color: #1f2329;
+    color: var(--panel-text-color);
 }
 
 .system-content {

@@ -47,12 +47,13 @@ const acceptParams = (props: WsProps) => {
 };
 
 const newTerm = () => {
+    const background = getComputedStyle(document.documentElement).getPropertyValue('--panel-terminal-bg-color').trim();
     term.value = new Terminal({
         lineHeight: 1.2,
         fontSize: 12,
         fontFamily: "Monaco, Menlo, Consolas, 'Courier New', monospace",
         theme: {
-            background: '#000000',
+            background: background,
         },
         cursorBlink: true,
         cursorStyle: 'underline',
@@ -242,5 +243,8 @@ onBeforeUnmount(() => {
 #terminal {
     width: 100%;
     height: 100%;
+}
+:deep(.xterm) {
+    padding: 5px !important;
 }
 </style>

@@ -241,3 +241,11 @@ onMounted(() => {
     search();
 });
 </script>
+<style scoped lang="scss">
+.tag-button {
+    &.no-active {
+        background: none;
+        border: none;
+    }
+}
+</style>

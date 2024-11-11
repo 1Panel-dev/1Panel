@@ -107,9 +107,7 @@
                                 ></EditParams>
                                 <el-form-item>
                                     <el-alert :title="$t('runtime.buildHelper')" type="warning" :closable="false" />
-                                </el-form-item>
-                                <el-form-item>
-                                    <el-alert type="info" :closable="false">
+                                    <span class="input-help">
                                         <span>{{ $t('runtime.extendHelper') }}</span>
                                         <el-link
                                             target="_blank"
@@ -119,19 +117,14 @@
                                             {{ $t('php.toExtensionsList') }}
                                         </el-link>
                                         <br />
-                                    </el-alert>
+                                    </span>
                                 </el-form-item>
                                 <div v-if="mode == 'edit'">
                                     <el-form-item>
                                         <el-checkbox v-model="runtime.rebuild">
                                             {{ $t('runtime.rebuild') }}
                                         </el-checkbox>
-                                    </el-form-item>
-                                    <el-form-item>
-                                        <el-alert type="info" :closable="false">
-                                            <span>{{ $t('runtime.rebuildHelper') }}</span>
-                                            <br />
-                                        </el-alert>
+                                        <span class="input-help">{{ $t('runtime.rebuildHelper') }}</span>
                                     </el-form-item>
                                 </div>
                             </div>

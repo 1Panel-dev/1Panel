@@ -211,11 +211,12 @@
             :close-on-click-modal="false"
             :destroy-on-close="true"
         >
-            <el-alert :closable="false" :title="$t('app.checkInstalledWarn', [dashboardName])" type="info">
+            <div class="flex justify-center items-center gap-2 flex-wrap">
+                {{ $t('app.checkInstalledWarn', [dashboardName]) }}
                 <el-link icon="Position" @click="getAppDetail" type="primary">
                     {{ $t('database.goInstall') }}
                 </el-link>
-            </el-alert>
+            </div>
             <template #footer>
                 <span class="dialog-footer">
                     <el-button @click="dashboardVisible = false">{{ $t('commons.button.cancel') }}</el-button>

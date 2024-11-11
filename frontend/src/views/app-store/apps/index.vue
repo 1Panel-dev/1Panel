@@ -282,7 +282,7 @@ onMounted(() => {
 });
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
 .header {
     padding-bottom: 10px;
 }

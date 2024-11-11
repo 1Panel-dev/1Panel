@@ -27,11 +27,11 @@
                                     </el-tooltip>
                                     <el-tooltip :content="$t('xpack.theme.freshGreen')" placement="top">
                                         <el-button
-                                            color="#00CC00"
-                                            :class="form.light === '#00CC00' ? 'selected-white' : ''"
+                                            color="#238636"
+                                            :class="form.light === '#238636' ? 'selected-white' : ''"
                                             circle
                                             dark
-                                            @click="changeLightColor('#00CC00')"
+                                            @click="changeLightColor('#238636')"
                                         />
                                     </el-tooltip>
                                     <el-color-picker
@@ -68,11 +68,11 @@
                                         </el-tooltip>
                                         <el-tooltip :content="$t('xpack.theme.freshGreen')" placement="top">
                                             <el-button
-                                                color="#00CC00"
-                                                :class="form.dark === '#00CC00' ? 'selected-white' : ''"
+                                                color="#238636"
+                                                :class="form.dark === '#238636' ? 'selected-white' : ''"
                                                 circle
                                                 dark
-                                                @click="changeDarkColor('#00CC00')"
+                                                @click="changeDarkColor('#238636')"
                                             />
                                         </el-tooltip>
                                         <el-color-picker
@@ -136,7 +136,7 @@ const predefineColors = ref([
     '#005eeb',
     '#3D8EFF',
     '#F0BE96',
-    '#00CC00',
+    '#238636',
     '#00ced1',
     '#c71585',
     '#ff4500',

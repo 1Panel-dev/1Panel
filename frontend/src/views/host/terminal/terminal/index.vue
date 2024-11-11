@@ -44,7 +44,10 @@
                     </span>
                 </template>
                 <Terminal
-                    :style="{ height: `calc(100vh - ${loadHeight()})`, 'background-color': '#000' }"
+                    :style="{
+                        height: `calc(100vh - ${loadHeight()})`,
+                        'background-color': `var(--panel-logs-bg-color)`,
+                    }"
                     :ref="'t-' + item.index"
                     :key="item.Refresh"
                 ></Terminal>
@@ -427,12 +430,10 @@ onMounted(() => {
         z-index: calc(var(--el-index-normal) + 1);
     }
     :deep(.el-tabs__item) {
-        color: #575758;
-        padding: 0 0px;
+        padding: 0;
     }
     :deep(.el-tabs__item.is-active) {
-        color: #ebeef5;
-        background-color: #575758;
+        background-color: var(--panel-terminal-tag-active-bg-color);
     }
 }
 

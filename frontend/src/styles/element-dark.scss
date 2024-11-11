@@ -49,6 +49,12 @@ html.dark {
     --el-color-primary-light-7: var(--panel-color-primary-light-7);
     --el-color-primary-light-8: var(--panel-color-primary-light-8);
     --el-color-primary-light-9: var(--panel-color-primary-light-9);
+    --el-color-primary-dark-2: var(--panel-color-primary);
+    --el-scrollbar-bg-color: var(--panel-main-bg-color-8);
+    --el-border-color-darker: var(--panel-main-bg-color-6);
+    --el-color-success:#238636;
+    --el-color-success-light-8: #3fb950;
+    --el-color-success-light-9: #3fb95030;
 
 
     --panel-border: 2px solid var(--panel-main-bg-color-8);
@@ -59,7 +65,10 @@ html.dark {
     --panel-footer-border: var(--panel-main-bg-color-7);
     --panel-text-color: var(--panel-main-bg-color-1);
     --panel-menu-bg-color: var(--panel-main-bg-color-10);
-    --panel-terminal-tag-bg-color:  var(--panel-main-bg-color-10);
+    --panel-terminal-tag-bg-color: var(--panel-main-bg-color-10);
+    --panel-terminal-tag-active-bg-color: var(--panel-main-bg-color-10);
+    --panel-terminal-bg-color: var(--panel-main-bg-color-10);
+    --panel-logs-bg-color: var(--panel-main-bg-color-9);
 
     --el-menu-item-bg-color: var(--panel-main-bg-color-10);
     --el-menu-item-bg-color-active: var(--panel-main-bg-color-8);
@@ -160,14 +169,14 @@ html.dark {
         --el-button-hover-border-color: var(--panel-main-bg-color-8);
     }
 
-    .el-button:hover {
+    .el-button--primary:hover {
         --el-button-hover-text-color: var(--panel-text-color-white);
         --el-button-border-color: var(--el-color-primary-light-3);
         --el-button-hover-bg-color: var(--el-color-primary-light-3);
         --el-button-hover-border-color: var(--el-color-primary-light-3);
     }
 
-    .el-button:active {
+    .el-button--primary:active {
         --el-button-hover-text-color: var(--panel-text-color-white);
         --el-button-active-bg-color: var(--el-color-primary-light-3);
         --el-button-active-border-color: var(--el-color-primary-light-3);
@@ -197,7 +206,7 @@ html.dark {
     }
 
     .el-drawer .el-drawer__header span {
-        color: var(--el-menu-text-color);
+        color: var(--panel-text-color);
     }
 
     .el-dialog {
@@ -232,6 +241,67 @@ html.dark {
     .el-alert--info {
         --el-alert-bg-color: var(--panel-alert-info-bg-color);
         --el-color-info: var(--panel-alert-info-text-color);
+    }
+
+    .md-editor-dark {
+        --md-bk-color: var(--panel-main-bg-color-8);
+    }
+    .md-editor-dark .md-editor-preview {
+        --md-theme-color: var(--el-text-color-primary);
+    }
+    .md-editor-dark .default-theme a {
+        --md-theme-link-color: var(--el-color-primary);
+    }
+
+    .el-descriptions__title {
+        color: var(--el-text-color-primary);
+    }
+    .el-descriptions__content.el-descriptions__cell.is-bordered-content {
+        color: var(--el-text-color-primary);
+    }
+    .el-descriptions--large .el-descriptions__body .el-descriptions__table.is-bordered .el-descriptions__cell {
+        padding: 12px 15px;
+        background-color: transparent;
+    }
+    .el-descriptions__body {
+        background-color: transparent;
+    }
+    .el-descriptions__label {
+        color: var(--el-color-primary) !important;
+        margin-right: 16px;
+    }
+
+    .el-avatar {
+        --el-avatar-bg-color: var(--panel-main-bg-color-7) !important;
+        box-shadow: 0 0 4px rgba(0, 94, 235, 0.1);
+        border: 0.5px solid var(--panel-main-bg-color-7);
+    }
+
+    .cm-editor {
+        background-color: var(--panel-main-bg-color-9);
+    }
+    .cm-gutters {
+        background-color: var(--panel-main-bg-color-8);
+    }
+
+    // scroll-bar
+    ::-webkit-scrollbar {
+        background-color: var(--el-scrollbar-bg-color) !important;
+    }
+    ::-webkit-scrollbar-thumb {
+        background-color: var(--el-border-color-darker);
+    }
+
+    .app-warn {
+        span {
+            &:nth-child(2) {
+                color: var(--panel-color-primary);
+
+                &:hover {
+                    color: var(--panel-color-primary-light-3);
+                }
+            }
+        }
     }
 
 }
