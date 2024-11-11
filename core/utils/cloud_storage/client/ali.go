@@ -19,10 +19,9 @@ type aliClient struct {
 }
 
 func NewALIClient(vars map[string]interface{}) (*aliClient, error) {
-	refresh_token := loadParamFromVars("refresh_token", vars)
 	drive_id := loadParamFromVars("drive_id", vars)
 
-	token, err := RefreshALIToken(refresh_token)
+	token, err := RefreshALIToken(vars)
 	if err != nil {
 		return nil, err
 	}
@@ -278,7 +277,11 @@ type tokenResp struct {
 	AccessToken string `json:"access_token"`
 }
 
-func RefreshALIToken(refresh_token string) (string, error) {
+func RefreshALIToken(varMap map[string]interface{}) (string, error) {
+	refresh_token := loadParamFromVars("refresh_token", varMap)
+	if len(refresh_token) == 0 {
+		return "", errors.New("no such refresh token find in db")
+	}
 	client := resty.New()
 	data := map[string]interface{}{
 		"grant_type":    "refresh_token",

@@ -35,7 +35,7 @@ type BackupInfo struct {
 	RememberAuth bool `json:"rememberAuth"`
 }
 
-type OneDriveInfo struct {
+type BackupClientInfo struct {
 	ClientID     string `json:"client_id"`
 	ClientSecret string `json:"client_secret"`
 	RedirectUri  string `json:"redirect_uri"`

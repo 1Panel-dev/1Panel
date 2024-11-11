@@ -1,6 +1,8 @@
 package v2
 
 import (
+	"fmt"
+
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/gin-gonic/gin"
@@ -67,9 +69,14 @@ func (b *BaseApi) ListBuckets(c *gin.Context) {
 // @Accept json
 // @Success 200 {object} dto.OneDriveInfo
 // @Security ApiKeyAuth
-// @Router /core/backup/onedrive [get]
+// @Router /core/backup/client/:clientType [get]
 func (b *BaseApi) LoadOneDriveInfo(c *gin.Context) {
-	data, err := backupService.LoadOneDriveInfo()
+	clientType, ok := c.Params.Get("clientType")
+	if !ok {
+		helper.BadRequest(c, fmt.Errorf("error %s in path", "clientType"))
+		return
+	}
+	data, err := backupService.LoadBackupClientInfo(clientType)
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

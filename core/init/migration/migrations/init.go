@@ -247,3 +247,16 @@ var InitBackup = &gormigrate.Migration{
 		return tx.AutoMigrate(&model.BackupAccount{})
 	},
 }
+
+var InitGoogle = &gormigrate.Migration{
+	ID: "20241111-init-google",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Create(&model.Setting{Key: "GoogleID", Value: "NTU2NTQ3NDYwMTQtY2Q0bGR0dDk2aGNsNWcxYWtwdmJhZTFmcjJlZ2Y0MXAuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20K"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "GoogleSc", Value: "R09DU1BYLXRibXg0QVdVZ3d3Ykc2QW1XTHQ3YUdaZElVeE4K"}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}

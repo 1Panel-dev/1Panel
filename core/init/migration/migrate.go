@@ -17,6 +17,7 @@ func Init() {
 		migrations.InitTerminalSetting,
 		migrations.InitAppLauncher,
 		migrations.InitBackup,
+		migrations.InitGoogle,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

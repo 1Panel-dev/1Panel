@@ -1371,6 +1371,7 @@ const message = {
         ALIYUNHelper: '当前阿里云盘非客户端下载最大限制为 100 MB，超过限制需要通过客户端下载',
         ALIYUNRecover:
             '当前阿里云盘非客户端下载最大限制为 100 MB，超过限制需要通过客户端下载到本地后，同步快照进行恢复',
+        GoogleDrive: '谷歌云盘',
         analysis: '解析',
         analysisHelper: '粘贴整个 token 内容，自动解析所需部分，具体操作可参考官方文档',
         serviceName: '服务名称',
@@ -1389,7 +1390,7 @@ const message = {
         backupDir: '备份目录',
         code: '授权码',
         codeHelper:
-            '请点击获取按钮，然后登录 OneDrive 复制跳转链接中 code 后面的内容，粘贴到该输入框中，具体操作可参考官方文档。',
+            '请点击获取按钮，然后登录 {0} 复制跳转链接中 code 后面的内容，粘贴到该输入框中，具体操作可参考官方文档。',
         loadCode: '获取',
         COS: '腾讯云 COS',
         ap_beijing_1: '北京一区',

@@ -15,6 +15,7 @@ const (
 	Local        = "LOCAL"
 	UPYUN        = "UPYUN"
 	ALIYUN       = "ALIYUN"
+	GoogleDrive  = "GoogleDrive"
 
 	OneDriveRedirectURI = "http://localhost/login/authorized"
 )

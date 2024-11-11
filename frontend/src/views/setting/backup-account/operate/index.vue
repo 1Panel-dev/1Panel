@@ -18,6 +18,7 @@
                     <el-option :label="$t('setting.WebDAV')" value="WebDAV"></el-option>
                     <el-option :label="$t('setting.UPYUN')" value="UPYUN"></el-option>
                     <el-option :label="$t('setting.ALIYUN')" value="ALIYUN"></el-option>
+                    <el-option :label="$t('setting.GoogleDrive')" value="GoogleDrive"></el-option>
                 </el-select>
                 <span v-if="isALIYUNYUN()" class="input-help">{{ $t('setting.ALIYUNHelper') }}</span>
             </el-form-item>
@@ -242,7 +243,7 @@
                             clearable
                             v-model.trim="dialogData.rowData!.varsJson['token']"
                         />
-                        <el-button class="append-button" @click="loadFromToken()">
+                        <el-button class="append-button" @click="loadFromTokenForAliyun()">
                             {{ $t('setting.analysis') }}
                         </el-button>
                         <span class="input-help">
@@ -266,9 +267,9 @@
                 </el-form-item>
             </div>
 
-            <div v-if="dialogData.rowData!.type === 'OneDrive'">
-                <el-form-item>
-                    <el-radio-group v-model="dialogData.rowData!.varsJson['isCN']" @change="changeFrom">
+            <div v-if="hasClient()">
+                <el-form-item v-if="isOneDrive()">
+                    <el-radio-group v-model="dialogData.rowData!.varsJson['isCN']" @change="changeOnedriveFrom">
                         <el-radio-button :value="false">{{ $t('setting.isNotCN') }}</el-radio-button>
                         <el-radio-button :value="true">{{ $t('setting.isCN') }}</el-radio-button>
                     </el-radio-group>
@@ -310,12 +311,12 @@
                             clearable
                             v-model.trim="dialogData.rowData!.varsJson['code']"
                         />
-                        <el-button class="append-button" @click="jumpAzure(formRef)">
+                        <el-button class="append-button" @click="jumpForCode(formRef)">
                             {{ $t('setting.loadCode') }}
                         </el-button>
                     </div>
                     <span class="input-help">
-                        {{ $t('setting.codeHelper') }}
+                        {{ $t('setting.codeHelper', [$t('setting.' + dialogData.rowData?.type)]) }}
                         <el-link
                             style="font-size: 12px; margin-left: 5px"
                             icon="Position"
@@ -368,7 +369,7 @@ import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { Backup } from '@/api/interface/backup';
-import { addBackup, editBackup, getOneDriveInfo, listBucket } from '@/api/modules/backup';
+import { addBackup, editBackup, getClientInfo, listBucket } from '@/api/modules/backup';
 import { cities } from './../helper';
 import { deepCopy, spliceHttp, splitHttp } from '@/utils/util';
 import { MsgSuccess } from '@/utils/message';
@@ -392,7 +393,7 @@ function checkDriveCode(rule: any, value: any, callback: any) {
     if (!value) {
         return callback(new Error(i18n.global.t('setting.codeWarning')));
     }
-    const reg = /^[A-Za-z0-9_.-]+$/;
+    const reg = /^[A-Za-z0-9/_.-]+$/;
     if (!reg.test(value)) {
         return callback(new Error(i18n.global.t('setting.codeWarning')));
     }
@@ -443,7 +444,7 @@ const toDoc = (isConf: boolean) => {
 const toWebDAVDoc = () => {
     window.open('https://1panel.cn/docs/user_manual/settings/#webdav-alist', '_blank', 'noopener,noreferrer');
 };
-const jumpAzure = async (formEl: FormInstance | undefined) => {
+const jumpForCode = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     const result = await formEl.validateField('varsJson.client_id', callback);
     if (!result) {
@@ -455,12 +456,18 @@ const jumpAzure = async (formEl: FormInstance | undefined) => {
     }
     let client_id = dialogData.value.rowData.varsJson['client_id'];
     let redirect_uri = dialogData.value.rowData.varsJson['redirect_uri'];
-    let commonUrl = `response_type=code&client_id=${client_id}&redirect_uri=${redirect_uri}&scope=offline_access+Files.ReadWrite.All+User.Read`;
-    if (!dialogData.value.rowData!.varsJson['isCN']) {
-        window.open('https://login.microsoftonline.com/common/oauth2/v2.0/authorize?' + commonUrl, '_blank');
-    } else {
-        window.open('https://login.chinacloudapi.cn/common/oauth2/v2.0/authorize?' + commonUrl, '_blank');
+    if (isOneDrive()) {
+        let commonUrl = `response_type=code&client_id=${client_id}&redirect_uri=${redirect_uri}&scope=offline_access+Files.ReadWrite.All+User.Read`;
+        if (!dialogData.value.rowData!.varsJson['isCN']) {
+            window.open('https://login.microsoftonline.com/common/oauth2/v2.0/authorize?' + commonUrl, '_blank');
+        } else {
+            window.open('https://login.chinacloudapi.cn/common/oauth2/v2.0/authorize?' + commonUrl, '_blank');
+        }
+        return;
     }
+
+    let url = `https://accounts.google.com/o/oauth2/auth/oauthchooseaccount?client_id=${client_id}&response_type=code&redirect_uri=${redirect_uri}&scope=openid%20profile%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fphotoslibrary&access_type=offline&prompt=consent&service=lso&o2v=1&ddm=1&flowName=GeneralOAuthFlow`;
+    window.open(url, '_blank');
 };
 function callback(error: any) {
     if (error) {
@@ -470,7 +477,7 @@ function callback(error: any) {
     }
 }
 
-const loadFromToken = () => {
+const loadFromTokenForAliyun = () => {
     const obj = JSON.parse(dialogData.value.rowData!.varsJson['token']);
     dialogData.value.rowData!.varsJson['drive_id'] = obj.default_drive_id;
     dialogData.value.rowData!.varsJson['refresh_token'] = obj.refresh_token;
@@ -479,8 +486,17 @@ const hasRemember = () => {
     return (
         dialogData.value.rowData!.type !== 'LOCAL' &&
         dialogData.value.rowData!.type !== 'OneDrive' &&
-        dialogData.value.rowData!.type !== 'ALIYUN'
+        dialogData.value.rowData!.type !== 'ALIYUN' &&
+        dialogData.value.rowData!.type !== 'GoogleDrive'
     );
+};
+const hasClient = () => {
+    let itemType = dialogData.value.rowData!.type;
+    return itemType === 'OneDrive' || itemType === 'GoogleDrive';
+};
+const isOneDrive = () => {
+    let itemType = dialogData.value.rowData!.type;
+    return itemType === 'OneDrive';
 };
 const isUPYUN = () => {
     let itemType = dialogData.value.rowData!.type;
@@ -522,7 +538,7 @@ const changeType = async () => {
             break;
         case 'OneDrive':
             dialogData.value.rowData.varsJson['isCN'] = false;
-            const res = await getOneDriveInfo();
+            const res = await getClientInfo('Onedrive');
             oneDriveInfo.value = res.data;
             if (!dialogData.value.rowData.id) {
                 dialogData.value.rowData.varsJson = {
@@ -532,12 +548,22 @@ const changeType = async () => {
                     redirect_uri: res.data.redirect_uri,
                 };
             }
+        case 'GoogleDrive':
+            const res2 = await getClientInfo('GoogleDrive');
+            oneDriveInfo.value = res2.data;
+            if (!dialogData.value.rowData.id) {
+                dialogData.value.rowData.varsJson = {
+                    client_id: res2.data.client_id,
+                    client_secret: res2.data.client_secret,
+                    redirect_uri: res2.data.redirect_uri,
+                };
+            }
         case 'SFTP':
             dialogData.value.rowData.varsJson['port'] = 22;
             dialogData.value.rowData.varsJson['authMode'] = 'password';
     }
 };
-const changeFrom = () => {
+const changeOnedriveFrom = () => {
     if (dialogData.value.rowData.varsJson['isCN']) {
         dialogData.value.rowData.varsJson = {
             isCN: true,

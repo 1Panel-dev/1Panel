@@ -1457,6 +1457,7 @@ const message = {
             'The current maximum limit for non-client downloads on Aliyun Drive is 100 MB. Exceeding this limit requires downloading through the client.',
         ALIYUNRecover:
             'The current maximum limit for non-client downloads on Aliyun Drive is 100 MB. Exceeding this limit requires downloading through the client to the local device, then synchronizing the snapshot for recovery.',
+        GoogleDrive: 'Google Drive',
         analysis: 'Analysis',
         analysisHelper:
             'Paste the entire token content to automatically parse the required parts. For specific operations, please refer to the official documentation.',
@@ -1476,7 +1477,7 @@ const message = {
         codeWarning: 'The current authorization code format is incorrect, please confirm again!',
         code: 'Auth code',
         codeHelper:
-            'Please click on the "Acquire" button, then login to OneDrive and copy the content after "code" in the redirected link. Paste it into this input box. For specific instructions, please refer to the official documentation.',
+            'Please click on the "Acquire" button, then login to {0} and copy the content after "code" in the redirected link. Paste it into this input box. For specific instructions, please refer to the official documentation.',
         loadCode: 'Acquire',
         COS: 'Tencent COS',
         ap_beijing_1: 'Beijing Zone 1',

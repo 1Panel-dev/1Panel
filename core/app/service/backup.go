@@ -24,7 +24,6 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
-	"github.com/robfig/cron/v3"
 )
 
 type BackupService struct{}
@@ -36,7 +35,7 @@ type IBackupService interface {
 	GetLocalDir() (string, error)
 	LoadBackupOptions() ([]dto.BackupOption, error)
 	SearchWithPage(search dto.SearchPageWithType) (int64, interface{}, error)
-	LoadOneDriveInfo() (dto.OneDriveInfo, error)
+	LoadBackupClientInfo(clientType string) (dto.BackupClientInfo, error)
 	Create(backupDto dto.BackupOperate) error
 	GetBuckets(backupDto dto.ForBuckets) ([]interface{}, error)
 	Update(req dto.BackupOperate) error
@@ -156,7 +155,7 @@ func (u *BackupService) SearchWithPage(req dto.SearchPageWithType) (int64, inter
 			item.Credential = base64.StdEncoding.EncodeToString([]byte(item.Credential))
 		}
 
-		if account.Type == constant.OneDrive || account.Type == constant.ALIYUN {
+		if account.Type == constant.OneDrive || account.Type == constant.ALIYUN || account.Type == constant.GoogleDrive {
 			varMap := make(map[string]interface{})
 			if err := json.Unmarshal([]byte(item.Vars), &varMap); err != nil {
 				continue
@@ -171,10 +170,18 @@ func (u *BackupService) SearchWithPage(req dto.SearchPageWithType) (int64, inter
 	return count, data, nil
 }
 
-func (u *BackupService) LoadOneDriveInfo() (dto.OneDriveInfo, error) {
-	var data dto.OneDriveInfo
-	data.RedirectUri = constant.OneDriveRedirectURI
-	clientID, err := settingRepo.Get(commonRepo.WithByKey("OneDriveID"))
+func (u *BackupService) LoadBackupClientInfo(clientType string) (dto.BackupClientInfo, error) {
+	var data dto.BackupClientInfo
+	clientIDKey := "OneDriveID"
+	clientIDSc := "OneDriveSc"
+	if clientType == constant.GoogleDrive {
+		clientIDKey = "GoogleID"
+		clientIDSc = "GoogleSc"
+		data.RedirectUri = constant.GoogleRedirectURI
+	} else {
+		data.RedirectUri = constant.OneDriveRedirectURI
+	}
+	clientID, err := settingRepo.Get(commonRepo.WithByKey(clientIDKey))
 	if err != nil {
 		return data, err
 	}
@@ -183,7 +190,7 @@ func (u *BackupService) LoadOneDriveInfo() (dto.OneDriveInfo, error) {
 		return data, err
 	}
 	data.ClientID = string(idItem)
-	clientSecret, err := settingRepo.Get(commonRepo.WithByKey("OneDriveSc"))
+	clientSecret, err := settingRepo.Get(commonRepo.WithByKey(clientIDSc))
 	if err != nil {
 		return data, err
 	}
@@ -215,19 +222,14 @@ func (u *BackupService) Create(req dto.BackupOperate) error {
 	}
 	backup.Credential = string(itemCredential)
 
-	if req.Type == constant.OneDrive {
-		if err := u.loadAccessToken(&backup); err != nil {
+	if req.Type == constant.OneDrive || req.Type == constant.GoogleDrive {
+		if err := u.loadRefreshTokenByCode(&backup); err != nil {
 			return err
 		}
 	}
 	if req.Type != "LOCAL" {
 		if _, err := u.checkBackupConn(&backup); err != nil {
 			return buserr.WithMap("ErrBackupCheck", map[string]interface{}{"err": err.Error()}, err)
-		}
-	}
-	if backup.Type == constant.OneDrive {
-		if err := StartRefreshOneDriveToken(&backup); err != nil {
-			return err
 		}
 	}
 
@@ -284,9 +286,6 @@ func (u *BackupService) Delete(id uint) error {
 	if backup.Type == constant.Local {
 		return buserr.New(constant.ErrBackupLocalDelete)
 	}
-	if backup.Type == constant.OneDrive {
-		global.Cron.Remove(cron.EntryID(backup.EntryID))
-	}
 	if _, err := httpUtils.NewLocalClient(fmt.Sprintf("/api/v2/backups/check/%v", id), http.MethodGet, nil); err != nil {
 		global.LOG.Errorf("check used of local cronjob failed, err: %v", err)
 		return buserr.New(constant.ErrBackupInUsed)
@@ -338,9 +337,8 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 		}
 	}
 
-	if newBackup.Type == constant.OneDrive {
-		global.Cron.Remove(cron.EntryID(backup.EntryID))
-		if err := u.loadAccessToken(&backup); err != nil {
+	if newBackup.Type == constant.OneDrive || newBackup.Type == constant.GoogleDrive {
+		if err := u.loadRefreshTokenByCode(&backup); err != nil {
 			return err
 		}
 	}
@@ -392,14 +390,23 @@ func (u *BackupService) NewClient(backup *model.BackupAccount) (cloud_storage.Cl
 	return backClient, nil
 }
 
-func (u *BackupService) loadAccessToken(backup *model.BackupAccount) error {
+func (u *BackupService) loadRefreshTokenByCode(backup *model.BackupAccount) error {
 	varMap := make(map[string]interface{})
 	if err := json.Unmarshal([]byte(backup.Vars), &varMap); err != nil {
 		return fmt.Errorf("unmarshal backup vars failed, err: %v", err)
 	}
-	refreshToken, err := client.RefreshToken("authorization_code", "refreshToken", varMap)
-	if err != nil {
-		return err
+	refreshToken := ""
+	var err error
+	if backup.Type == constant.GoogleDrive {
+		refreshToken, err = client.RefreshGoogleToken("authorization_code", "refreshToken", varMap)
+		if err != nil {
+			return err
+		}
+	} else {
+		refreshToken, err = client.RefreshToken("authorization_code", "refreshToken", varMap)
+		if err != nil {
+			return err
+		}
 	}
 	delete(varMap, "code")
 	varMap["refresh_status"] = constant.StatusSuccess
@@ -489,87 +496,59 @@ func (u *BackupService) checkBackupConn(backup *model.BackupAccount) (bool, erro
 	return client.Upload(fileItem, targetPath)
 }
 
-func StartRefreshOneDriveToken(backup *model.BackupAccount) error {
+func StartRefreshForToken() error {
 	service := NewIBackupService()
-	oneDriveCronID, err := global.Cron.AddJob("0 3 */31 * *", service)
+	refreshID, err := global.Cron.AddJob("0 3 */31 * *", service)
 	if err != nil {
-		global.LOG.Errorf("can not add OneDrive corn job: %s", err.Error())
+		global.LOG.Errorf("add cron job of refresh backup account token failed, err: %s", err.Error())
 		return err
 	}
-	backup.EntryID = uint(oneDriveCronID)
+	global.BackupAccountTokenEntryID = refreshID
 	return nil
 }
 
 func (u *BackupService) Run() {
-	refreshOneDrive()
-	refreshALIYUN()
+	refreshToken()
 }
 
-func refreshOneDrive() {
+func refreshToken() {
 	var backups []model.BackupAccount
-	_ = global.DB.Where("`type` = ?", "OneDrive").Find(&backups)
+	_ = global.DB.Where("`type` in (?)", []string{constant.OneDrive, constant.ALIYUN, constant.GoogleDrive}).Find(&backups)
+	if len(backups) == 0 {
+		return
+	}
 	for _, backupItem := range backups {
 		if backupItem.ID == 0 {
-			return
+			continue
 		}
-		global.LOG.Infof("start to refresh token of OneDrive %s ...", backupItem.Name)
 		varMap := make(map[string]interface{})
 		if err := json.Unmarshal([]byte(backupItem.Vars), &varMap); err != nil {
-			global.LOG.Errorf("Failed to refresh OneDrive token, please retry, err: %v", err)
-			return
+			global.LOG.Errorf("Failed to refresh %s - %s token, please retry, err: %v", backupItem.Type, backupItem.Name, err)
+			continue
 		}
-		refreshToken, err := client.RefreshToken("refresh_token", "refreshToken", varMap)
-		varMap["refresh_status"] = constant.StatusSuccess
-		varMap["refresh_time"] = time.Now().Format(constant.DateTimeLayout)
+		var (
+			refreshToken string
+			err          error
+		)
+		switch backupItem.Type {
+		case constant.OneDrive:
+			refreshToken, err = client.RefreshToken("refresh_token", "refreshToken", varMap)
+		case constant.GoogleDrive:
+			refreshToken, err = client.RefreshGoogleToken("refresh_token", "refreshToken", varMap)
+		case constant.ALIYUN:
+			refreshToken, err = client.RefreshALIToken(varMap)
+		}
 		if err != nil {
 			varMap["refresh_status"] = constant.StatusFailed
 			varMap["refresh_msg"] = err.Error()
 			global.LOG.Errorf("Failed to refresh OneDrive token, please retry, err: %v", err)
-			return
+			continue
 		}
-		varMap["refresh_token"] = refreshToken
-
-		varsItem, _ := json.Marshal(varMap)
-		_ = global.DB.Model(&model.BackupAccount{}).
-			Where("id = ?", backupItem.ID).
-			Updates(map[string]interface{}{
-				"vars": varsItem,
-			}).Error
-		global.LOG.Info("Successfully refreshed OneDrive token.")
-	}
-}
-
-func refreshALIYUN() {
-	var backups []model.BackupAccount
-	_ = global.DB.Where("`type` = ?", "ALIYUN").Find(&backups)
-	for _, backupItem := range backups {
-		global.LOG.Infof("start to refresh token of ALIYUN %s ...", backupItem.Name)
-		varMap := make(map[string]interface{})
-		if err := json.Unmarshal([]byte(backupItem.Vars), &varMap); err != nil {
-			global.LOG.Errorf("Failed to refresh ALIYUN token, please retry, err: %v", err)
-			return
-		}
-		if _, ok := varMap["refresh_token"]; !ok {
-			global.LOG.Error("no such refresh token find in db")
-			return
-		}
-		refreshToken, err := client.RefreshALIToken(fmt.Sprintf("%v", varMap["refresh_token"]))
 		varMap["refresh_status"] = constant.StatusSuccess
 		varMap["refresh_time"] = time.Now().Format(constant.DateTimeLayout)
-		if err != nil {
-			varMap["refresh_status"] = constant.StatusFailed
-			varMap["refresh_msg"] = err.Error()
-			global.LOG.Errorf("Failed to refresh ALIYUN token, please retry, err: %v", err)
-			return
-		}
 		varMap["refresh_token"] = refreshToken
 
 		varsItem, _ := json.Marshal(varMap)
-		_ = global.DB.Model(&model.BackupAccount{}).
-			Where("id = ?", backupItem.ID).
-			Updates(map[string]interface{}{
-				"vars": varsItem,
-			}).Error
-		global.LOG.Info("Successfully refreshed ALIYUN token.")
+		_ = global.DB.Model(&model.BackupAccount{}).Where("id = ?", backupItem.ID).Updates(map[string]interface{}{"vars": varsItem}).Error
 	}
 }

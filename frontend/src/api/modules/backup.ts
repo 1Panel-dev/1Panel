@@ -44,8 +44,8 @@ export const getLocalBackupDir = () => {
 export const searchBackup = (params: Backup.SearchWithType) => {
     return http.post<ResPage<Backup.BackupInfo>>(`/core/backup/search`, params);
 };
-export const getOneDriveInfo = () => {
-    return http.get<Backup.OneDriveInfo>(`/core/backup/onedrive`);
+export const getClientInfo = (clientType: string) => {
+    return http.get<Backup.OneDriveInfo>(`/core/backup/client/${clientType}`);
 };
 export const addBackup = (params: Backup.BackupOperate) => {
     let request = deepCopy(params) as Backup.BackupOperate;

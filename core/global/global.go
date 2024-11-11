@@ -26,4 +26,6 @@ var (
 	I18n *i18n.Localizer
 
 	Cron *cron.Cron
+
+	BackupAccountTokenEntryID cron.EntryID
 )
