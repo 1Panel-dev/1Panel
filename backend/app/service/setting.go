@@ -383,7 +383,7 @@ func (u *SettingService) LoadFromCert() (*dto.SSLInfo, error) {
 		if err != nil {
 			return nil, err
 		}
-		data.Domain = ssl.Domains
+		data.Domain = ssl.PrimaryDomain
 		data.SSLID = uint(id)
 		data.Timeout = ssl.ExpireDate.Format(constant.DateTimeLayout)
 	}
