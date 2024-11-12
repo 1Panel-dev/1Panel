@@ -3,7 +3,7 @@
         <div v-if="showButton">
             <RouterButton :buttons="buttons">
                 <template #route-button>
-                    <div class="pr-5 mt-1">
+                    <div class="pr-5">
                         <el-badge is-dot :hidden="!canUpdate">
                             <el-button @click="sync" type="primary" plain :disabled="syncing">
                                 {{ $t('app.syncAppList') }}

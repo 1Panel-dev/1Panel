@@ -24,19 +24,44 @@ html.dark {
     --panel-main-bg-color-11: #60626F;
 
     --panel-alert-error-bg-color: #54293A;
-    --panel-alert-error-text-color: #B22F48;
-    --panel-alert-error-hover-bg-color: #672A3D;
+    --panel-alert-error-text-color: #E2324F;
+    --panel-alert-error-hover-bg-color: #E9657B;
 
     --panel-alert-success-bg-color: #1E5146;
-    --panel-alert-success-text-color: #169262;
-    --panel-alert-success-hover-bg-color: #1D5849;
+    --panel-alert-success-text-color: #11B671;
+    --panel-alert-success-hover-bg-color: #4DC894;
 
     --panel-alert-warning-bg-color: #59472A;
-    --panel-alert-warning-text-color: #BB8A2E;
-    --panel-alert-warning-hover-bg-color: #6A5531;
+    --panel-alert-warning-text-color: #EDAC2C;
+    --panel-alert-warning-hover-bg-color: #F1C161;
 
-    --panel-alert-info-bg-color: var(--panel-main-bg-color-6);
-    --panel-alert-info-text-color: var(--panel-main-bg-color-3);
+    --el-color-success: #3fb950;
+    --el-color-success-light-5: #4DC894;
+    --el-color-success-light-8: #3fb950;
+    --el-color-success-light-9: #1E5146;
+
+    --el-color-warning: #EDAC2C;
+    --el-color-warning-light-5: #F1C161;
+    --el-color-warning-light-8: #EDAC2C;
+    --el-color-warning-light-9: #59472A;
+
+    --el-color-danger: #E2324F;
+    --el-color-danger-light-5: #E9657B;
+    --el-color-danger-light-8: #E2324F;
+    --el-color-danger-light-9: #54293A;
+
+    --el-color-error: #E2324F;
+    --el-color-error-light-5: #E9657B;
+    --el-color-error-light-8: #E2324F;
+    --el-color-error-light-9: #54293A;
+
+    --el-color-info: var(--panel-text-color-white);
+    --el-color-info-light-5: var(--panel-main-bg-color-3);
+    --el-color-info-light-8: var(--panel-text-color-white);
+    --el-color-info-light-9: var(--panel-main-bg-color-8);
+
+    --panel-alert-info-bg-color: var(--panel-main-bg-color-8);
+    --panel-alert-info-text-color: var(--panel-text-color-white);
     --panel-alert-info-hover-bg-color: var(--panel-main-bg-color-4);
 
     --panel-pie-bg-color: #434552;
@@ -52,10 +77,6 @@ html.dark {
     --el-color-primary-dark-2: var(--panel-color-primary);
     --el-scrollbar-bg-color: var(--panel-main-bg-color-8);
     --el-border-color-darker: var(--panel-main-bg-color-6);
-    --el-color-success:#238636;
-    --el-color-success-light-8: #3fb950;
-    --el-color-success-light-9: #3fb95030;
-
 
     --panel-border: 2px solid var(--panel-main-bg-color-8);
     --panel-button-active: var(--panel-main-bg-color-10);
@@ -92,6 +113,32 @@ html.dark {
 
     --el-text-color-placeholder: var(--panel-main-bg-color-4);
 
+    .el-message {
+        --el-color-primary: #409eff;
+        --el-color-primary-light-5: #a0cfff;
+        --el-color-primary-light-8: #d9ecff;
+        --el-color-primary-light-9: #ecf5ff;
+        --el-color-success: #67c23a;
+        --el-color-success-light-5: #b3e19d;
+        --el-color-success-light-8: #e1f3d8;
+        --el-color-success-light-9: #f0f9eb;
+        --el-color-warning: #e6a23c;
+        --el-color-warning-light-5: #f3d19e;
+        --el-color-warning-light-8: #faecd8;
+        --el-color-warning-light-9: #fdf6ec;
+        --el-color-danger: #f56c6c;
+        --el-color-danger-light-5: #fab6b6;
+        --el-color-danger-light-8: #fde2e2;
+        --el-color-error: #f56c6c;
+        --el-color-error-light-5: #fab6b6;
+        --el-color-error-light-8: #fde2e2;
+        --el-color-error-light-9: #fef0f0;
+        --el-color-info: #909399;
+        --el-color-info-light-5: #c8c9cc;
+        --el-color-info-light-8: #e9e9eb;
+        --el-color-info-light-9: #f4f4f5;
+    }
+
     .el-descriptions__content:not(.is-bordered-label) {
         color: var(--panel-main-bg-color-3);
     }
@@ -114,7 +161,7 @@ html.dark {
 
     .el-tag.el-tag--primary {
         --el-tag-bg-color: var(--panel-main-bg-color-9);
-        --el-tag-border-color: var(--panel-main-bg-color-8);
+        --el-tag-border-color: var(--panel-main-bg-color-11);
         --el-tag-hover-color: var(--panel-color-primary);
     }
 
@@ -272,7 +319,7 @@ html.dark {
     }
 
     .el-avatar {
-        --el-avatar-bg-color: var(--panel-main-bg-color-7) !important;
+        --el-avatar-bg-color: var(--panel-text-color-white) !important;
         box-shadow: 0 0 4px rgba(0, 94, 235, 0.1);
         border: 0.5px solid var(--panel-main-bg-color-7);
     }
