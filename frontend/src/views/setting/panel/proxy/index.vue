@@ -17,9 +17,9 @@
                             <template #default>
                                 {{ $t('setting.proxyHelper') }}
                                 <ul style="margin-left: -20px">
-                                    <li v-if="isProductPro">{{ $t('setting.proxyHelper1') }}</li>
-                                    <li v-if="isProductPro">{{ $t('setting.proxyHelper2') }}</li>
-                                    <li v-if="isProductPro">{{ $t('setting.proxyHelper4') }}</li>
+                                    <li>{{ $t('setting.proxyHelper1') }}</li>
+                                    <li>{{ $t('setting.proxyHelper2') }}</li>
+                                    <li>{{ $t('setting.proxyHelper4') }}</li>
                                     <li>{{ $t('setting.proxyHelper3') }}</li>
                                 </ul>
                             </template>
@@ -183,9 +183,9 @@ const submitChangePassword = async (formEl: FormInstance | undefined) => {
                 (proxyDockerVisible.value && !params.proxyDocker))
         ) {
             let confirmParams = {
-                header: i18n.global.t('database.confChange'),
-                operationInfo: i18n.global.t('database.restartNowHelper'),
-                submitInputInfo: i18n.global.t('database.restartNow'),
+                header: i18n.global.t('setting.confDockerProxy'),
+                operationInfo: i18n.global.t('setting.restartNowHelper'),
+                submitInputInfo: i18n.global.t('setting.restartNow'),
             };
             confirmDialogRef.value!.acceptParams(confirmParams);
         } else {
@@ -233,7 +233,7 @@ const onSubmit = async () => {
         }
         await updateProxy(params);
         if (isClose || params.proxyDocker === false) {
-            params.proxyUrl = '';
+            proxyUrl = '';
         }
         await updateXpackSettingByKey('ProxyDocker', proxyUrl);
         await updateDaemonJson(`${form.proxyType}-proxy`, proxyUrl);
