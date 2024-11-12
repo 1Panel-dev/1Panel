@@ -28,3 +28,29 @@ body,
     display: flex;
     align-items: center;
 }
+
+.el-message {
+    --el-color-primary: #409eff;
+    --el-color-primary-light-5: #a0cfff;
+    --el-color-primary-light-8: #d9ecff;
+    --el-color-primary-light-9: #ecf5ff;
+    --el-color-success: #67c23a;
+    --el-color-success-light-5: #b3e19d;
+    --el-color-success-light-8: #e1f3d8;
+    --el-color-success-light-9: #f0f9eb;
+    --el-color-warning: #e6a23c;
+    --el-color-warning-light-5: #f3d19e;
+    --el-color-warning-light-8: #faecd8;
+    --el-color-warning-light-9: #fdf6ec;
+    --el-color-danger: #f56c6c;
+    --el-color-danger-light-5: #fab6b6;
+    --el-color-danger-light-8: #fde2e2;
+    --el-color-error: #f56c6c;
+    --el-color-error-light-5: #fab6b6;
+    --el-color-error-light-8: #fde2e2;
+    --el-color-error-light-9: #fef0f0;
+    --el-color-info: #909399;
+    --el-color-info-light-5: #c8c9cc;
+    --el-color-info-light-8: #e9e9eb;
+    --el-color-info-light-9: #f4f4f5;
+}
