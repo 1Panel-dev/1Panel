@@ -432,7 +432,7 @@ func (u *ImageService) ImageRemove(req dto.BatchDelete) error {
 	}
 	defer client.Close()
 	for _, id := range req.Names {
-		if _, err := client.ImageRemove(context.TODO(), id, types.ImageRemoveOptions{Force: req.Force, PruneChildren: true}); err != nil {
+		if _, err := client.ImageRemove(context.TODO(), id, image.RemoveOptions{Force: req.Force, PruneChildren: true}); err != nil {
 			if strings.Contains(err.Error(), "image is being used") || strings.Contains(err.Error(), "is using") {
 				if strings.Contains(id, "sha256:") {
 					return buserr.New(constant.ErrObjectInUsed)
