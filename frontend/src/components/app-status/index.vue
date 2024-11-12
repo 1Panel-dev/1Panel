@@ -72,13 +72,9 @@
                             :content="$t('website.openrestyHelper', [httpPort, httpsPort])"
                             placement="top-start"
                         >
-                            <el-alert
-                                :title="$t('app.checkTitle')"
-                                :closable="false"
-                                type="warning"
-                                show-icon
-                                class="h-8"
-                            />
+                            <el-button size="small" type="warning" :icon="Warning">
+                                {{ $t('app.checkTitle') }}
+                            </el-button>
                         </el-tooltip>
                     </div>
                 </div>
@@ -113,6 +109,7 @@ import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ClearNginxCache } from '@/api/modules/nginx';
+import { Warning } from '@element-plus/icons-vue';
 
 const props = defineProps({
     appKey: {

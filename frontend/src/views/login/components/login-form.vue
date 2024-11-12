@@ -534,6 +534,10 @@ onMounted(() => {
         margin-top: -20px;
         margin-left: 20px;
     }
+
+    :deep(.el-input__inner) {
+        color: #000 !important;
+    }
 }
 .cursor-pointer {
     outline: none;

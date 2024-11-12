@@ -100,10 +100,19 @@
                                 <el-col :xs="16" :sm="18" :md="18" :lg="18" :xl="19">
                                     <div class="app-content">
                                         <div class="app-header">
-                                            <span class="app-title">{{ app.name }}</span>
-                                            <el-text type="success" class="!ml-2" v-if="app.installed">
-                                                {{ $t('app.allReadyInstalled') }}
-                                            </el-text>
+                                            <el-space wrap :size="1">
+                                                <span class="app-title">{{ app.name }}</span>
+                                                <el-tag
+                                                    type="success"
+                                                    v-if="app.installed"
+                                                    round
+                                                    size="small"
+                                                    class="!ml-2"
+                                                >
+                                                    {{ $t('app.allReadyInstalled') }}
+                                                </el-tag>
+                                            </el-space>
+
                                             <el-button
                                                 class="app-button"
                                                 type="primary"
