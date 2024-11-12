@@ -2,6 +2,7 @@ package v1
 
 import (
 	"encoding/base64"
+	"net/http"
 
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -120,12 +121,13 @@ func (b *BaseApi) CheckIsSafety(c *gin.Context) {
 		return
 	}
 	if status == "disable" && len(code) != 0 {
-		helper.ErrorWithDetail(c, constant.CodeErrNotFound, constant.ErrTypeInternalServer, err)
+		helper.ErrResponse(c, http.StatusNotFound)
 		return
 	}
 	if status == "unpass" {
-		if middleware.LoadErrCode("err-entrance") != 200 {
-			helper.ErrResponse(c, middleware.LoadErrCode("err-entrance"))
+		code := middleware.LoadErrCode()
+		if code != 200 {
+			helper.ErrResponse(c, code)
 			return
 		}
 		helper.ErrorWithDetail(c, constant.CodeErrEntrance, constant.ErrTypeInternalServer, nil)

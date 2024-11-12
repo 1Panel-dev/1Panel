@@ -1,17 +1,19 @@
 <template>
     <div>
-        <div v-if="!loading">
-            <div class="login-background" v-if="errStatus === ''">
-                <div class="login-wrapper">
-                    <div :class="screenWidth > 1110 ? 'left inline-block' : ''">
-                        <div class="login-title">
-                            <span>{{ globalStore.themeConfig.title || $t('setting.description') }}</span>
+        <div v-if="init">
+            <div v-if="errStatus === ''">
+                <div class="login-background">
+                    <div class="login-wrapper">
+                        <div :class="screenWidth > 1110 ? 'left inline-block' : ''">
+                            <div class="login-title">
+                                <span>{{ globalStore.themeConfig.title || $t('setting.description') }}</span>
+                            </div>
+                            <img src="@/assets/images/1panel-login.png" alt="" v-if="screenWidth > 1110" />
                         </div>
-                        <img src="@/assets/images/1panel-login.png" alt="" v-if="screenWidth > 1110" />
-                    </div>
-                    <div :class="screenWidth > 1110 ? 'right inline-block' : ''">
-                        <div class="login-container">
-                            <LoginForm ref="loginRef"></LoginForm>
+                        <div :class="screenWidth > 1110 ? 'right inline-block' : ''">
+                            <div class="login-container">
+                                <LoginForm ref="loginRef"></LoginForm>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -46,14 +48,14 @@ import ErrIP from '@/components/error-message/err_ip.vue';
 import ErrCode from '@/components/error-message/error_code.vue';
 import ErrDomain from '@/components/error-message/err_domain.vue';
 import ErrFound from '@/components/error-message/404.vue';
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted } from 'vue';
 import { GlobalStore } from '@/store';
 import { getXpackSettingForTheme } from '@/utils/xpack';
 const globalStore = GlobalStore();
 
 const screenWidth = ref(null);
-const errStatus = ref('');
-const loading = ref();
+const errStatus = ref('x');
+const init = ref(false);
 
 const mySafetyCode = defineProps({
     code: {
@@ -61,30 +63,25 @@ const mySafetyCode = defineProps({
         default: '',
     },
 });
-watch(
-    () => globalStore.errStatus,
-    (newVal) => {
-        if (newVal?.startsWith('err-') || newVal?.startsWith('code-')) {
-            errStatus.value = newVal;
-        }
-    },
-);
+
 const getStatus = async () => {
-    let info = globalStore.errStatus;
-    if (info?.startsWith('err-') || info?.startsWith('code-')) {
-        errStatus.value = info;
-        return;
-    }
     let code = mySafetyCode.code;
     globalStore.entrance = code;
-    loading.value = true;
     await checkIsSafety(code)
         .then(() => {
-            loading.value = false;
+            let info = globalStore.errStatus;
+            if (info?.startsWith('err-') || info?.startsWith('code-')) {
+                errStatus.value = info;
+                init.value = true;
+                return;
+            }
+            errStatus.value = '';
+            init.value = true;
             getXpackSettingForTheme();
         })
-        .catch(() => {
-            loading.value = false;
+        .catch((err) => {
+            errStatus.value = 'code-' + err.status;
+            init.value = true;
         });
 };
 

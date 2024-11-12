@@ -132,12 +132,13 @@ class RequestHttp {
                             );
                             return;
                         default:
+                            globalStore.isLogin = false;
                             globalStore.errStatus = 'code-' + response.status;
                             router.push({
                                 name: 'entrance',
                                 params: { code: globalStore.entrance },
                             });
-                            return;
+                            return Promise.reject(error);
                     }
                 }
                 if (!window.navigator.onLine) router.replace({ path: '/500' });

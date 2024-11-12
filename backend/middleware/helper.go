@@ -6,7 +6,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/repo"
 )
 
-func LoadErrCode(errInfo string) int {
+func LoadErrCode() int {
 	settingRepo := repo.NewISettingRepo()
 	codeVal, err := settingRepo.Get(settingRepo.WithByKey("NoAuthSetting"))
 	if err != nil {

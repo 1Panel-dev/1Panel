@@ -33,9 +33,3 @@ const loadErrInfo = () => {
     }
 };
 </script>
-
-<style scoped lang="scss">
-.container {
-    margin-left: 40%;
-}
-</style>
