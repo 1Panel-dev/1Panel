@@ -164,51 +164,61 @@ const changeDarkColor = (color: string) => {
 
 const onSave = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
-    await formEl.validate(async (valid) => {
-        if (!valid) return;
-        form.themeColor = { light: form.light, dark: form.dark };
+    ElMessageBox.confirm(i18n.global.t('xpack.theme.setHelper'), i18n.global.t('commons.button.save'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'info',
+    }).then(async () => {
+        await formEl.validate(async (valid) => {
+            if (!valid) return;
+            form.themeColor = { light: form.light, dark: form.dark };
+            if (globalStore.isProductPro) {
+                await updateXpackSettingByKey('ThemeColor', JSON.stringify(form.themeColor));
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                globalStore.themeConfig.themeColor = JSON.stringify(form.themeColor);
+                loading.value = false;
+                let color: string;
+                if (form.theme === 'auto') {
+                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+                    color = prefersDark.matches ? form.dark : form.light;
+                } else {
+                    color = form.theme === 'dark' ? form.dark : form.light;
+                }
+                globalStore.themeConfig.primary = color;
+                setPrimaryColor(color);
+                initFavicon();
+                drawerVisible.value = false;
+                emit('search');
+            }
+        });
+    });
+};
+
+const onReSet = async () => {
+    ElMessageBox.confirm(i18n.global.t('xpack.theme.setDefaultHelper'), i18n.global.t('xpack.theme.setDefault'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'info',
+    }).then(async () => {
+        form.themeColor = { light: '#005eeb', dark: '#F0BE96' };
         if (globalStore.isProductPro) {
             await updateXpackSettingByKey('ThemeColor', JSON.stringify(form.themeColor));
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            globalStore.themeConfig.themeColor = JSON.stringify(form.themeColor);
             loading.value = false;
+            globalStore.themeConfig.themeColor = JSON.stringify(form.themeColor);
             let color: string;
             if (form.theme === 'auto') {
                 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
-                color = prefersDark.matches ? form.dark : form.light;
+                color = prefersDark.matches ? '#F0BE96' : '#005eeb';
             } else {
-                color = form.theme === 'dark' ? form.dark : form.light;
+                color = form.theme === 'dark' ? '#F0BE96' : '#005eeb';
             }
             globalStore.themeConfig.primary = color;
             setPrimaryColor(color);
             initFavicon();
             drawerVisible.value = false;
-            emit('search');
-            return;
         }
     });
-};
-
-const onReSet = async () => {
-    form.themeColor = { light: '#005eeb', dark: '#F0BE96' };
-    if (globalStore.isProductPro) {
-        await updateXpackSettingByKey('ThemeColor', JSON.stringify(form.themeColor));
-        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-        loading.value = false;
-        globalStore.themeConfig.themeColor = JSON.stringify(form.themeColor);
-        let color: string;
-        if (form.theme === 'auto') {
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
-            color = prefersDark.matches ? '#F0BE96' : '#005eeb';
-        } else {
-            color = form.theme === 'dark' ? '#F0BE96' : '#005eeb';
-        }
-        globalStore.themeConfig.primary = color;
-        setPrimaryColor(color);
-        initFavicon();
-        drawerVisible.value = false;
-        return;
-    }
 };
 
 const handleClose = () => {
