@@ -206,7 +206,7 @@ func (u *DockerService) UpdateConf(req dto.SettingUpdate) error {
 			}
 			daemonMap["proxies"] = proxies
 		}
-	case "socks5-proxy":
+	case "socks5-proxy", "close-proxy":
 		delete(daemonMap, "proxies")
 		if len(req.Value) > 0 {
 			proxies := map[string]interface{}{

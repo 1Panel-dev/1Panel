@@ -195,6 +195,9 @@ const submitChangePassword = async (formEl: FormInstance | undefined) => {
                     loading.value = false;
                     emit('search');
                     passwordVisible.value = false;
+                    if (isClose) {
+                        await updateDaemonJson(`${form.proxyType}-proxy`, '');
+                    }
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 })
                 .catch(() => {
