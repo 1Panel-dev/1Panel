@@ -211,6 +211,10 @@ func (f *FileService) Create(op request.FileCreate) error {
 }
 
 func (f *FileService) Delete(op request.FileDelete) error {
+	excludeDir := global.CONF.System.DataDir
+	if strings.Contains(op.Path, ".1panel_clash") || op.Path == excludeDir {
+		return buserr.New(constant.ErrPathNotDelete)
+	}
 	fo := files.NewFileOp()
 	recycleBinStatus, _ := settingRepo.Get(settingRepo.WithByKey("FileRecycleBin"))
 	if recycleBinStatus.Value == "disable" {

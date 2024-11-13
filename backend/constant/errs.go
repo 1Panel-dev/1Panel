@@ -100,6 +100,7 @@ var (
 	ErrFileDownloadDir  = "ErrFileDownloadDir"
 	ErrCmdNotFound      = "ErrCmdNotFound"
 	ErrFavoriteExist    = "ErrFavoriteExist"
+	ErrPathNotDelete    = "ErrPathNotDelete"
 )
 
 // mysql

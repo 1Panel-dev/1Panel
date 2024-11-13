@@ -1227,6 +1227,7 @@ const message = {
         noNameFile: '未命名檔案',
         minimap: '縮略圖',
         fileCanNotRead: '此文件不支持預覽',
+        panelInstallDir: '1Panel 安裝目錄不能删除',
     },
     ssh: {
         autoStart: '開機自啟',

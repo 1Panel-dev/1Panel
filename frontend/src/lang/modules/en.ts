@@ -1297,6 +1297,7 @@ const message = {
         noNameFile: 'Untitled File',
         minimap: 'Code Mini Map',
         fileCanNotRead: 'File can not read',
+        panelInstallDir: '1Panel installation directory cannot be deleted',
     },
     ssh: {
         autoStart: 'Auto Start',

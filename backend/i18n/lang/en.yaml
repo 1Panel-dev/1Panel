@@ -81,6 +81,8 @@ ErrCmdNotFound: "{{ .name}} command does not exist, please install this command 
 ErrSourcePathNotFound:  "Source directory does not exist"
 ErrFavoriteExist: "This path has been collected"
 ErrInvalidChar: "Illegal characters are prohibited"
+ErrPathNotDelete: "The selected directory cannot be deleted"
+
 
 #website
 ErrDomainIsExist: "Domain is already exist"
