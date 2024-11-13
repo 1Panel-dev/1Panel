@@ -213,7 +213,7 @@ func (f *FileService) Create(op request.FileCreate) error {
 func (f *FileService) Delete(op request.FileDelete) error {
 	if op.IsDir {
 		excludeDir := global.CONF.System.DataDir
-		if strings.Contains(op.Path, ".1panel_clash") || op.Path == excludeDir {
+		if filepath.Base(op.Path) == ".1panel_clash" || op.Path == excludeDir {
 			return buserr.New(constant.ErrPathNotDelete)
 		}
 	}
