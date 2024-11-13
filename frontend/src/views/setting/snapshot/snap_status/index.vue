@@ -14,69 +14,89 @@
         <div v-loading="loading">
             <el-alert :type="loadStatus(status.panelInfo)" :closable="false">
                 <template #title>
-                    <el-button :icon="loadIcon(status.panelInfo)" link>{{ $t('setting.panelInfo') }}</el-button>
-                    <div v-if="showErrorMsg(status.panelInfo)" class="top-margin">
-                        <span class="err-message">{{ status.panelInfo }}</span>
+                    <div class="flex flex-wrap items-center justify-start">
+                        <component :is="loadIcon(status.panelInfo)" class="w-4 pr-1" />
+                        {{ $t('setting.panelInfo') }}
+                        <div v-if="showErrorMsg(status.panelInfo)" class="top-margin">
+                            <span class="err-message">{{ status.panelInfo }}</span>
+                        </div>
                     </div>
                 </template>
             </el-alert>
             <el-alert :type="loadStatus(status.panel)" :closable="false">
                 <template #title>
-                    <el-button :icon="loadIcon(status.panel)" link>{{ $t('setting.panelBin') }}</el-button>
-                    <div v-if="showErrorMsg(status.panel)" class="top-margin">
-                        <span class="err-message">{{ status.panel }}</span>
+                    <div class="flex flex-wrap items-center justify-start">
+                        <component :is="loadIcon(status.panel)" class="w-4 pr-1" />
+                        {{ $t('setting.panelBin') }}
+                        <div v-if="showErrorMsg(status.panel)" class="top-margin">
+                            <span class="err-message">{{ status.panel }}</span>
+                        </div>
                     </div>
                 </template>
             </el-alert>
             <el-alert :type="loadStatus(status.daemonJson)" :closable="false">
                 <template #title>
-                    <el-button :icon="loadIcon(status.daemonJson)" link>{{ $t('setting.daemonJson') }}</el-button>
-                    <div v-if="showErrorMsg(status.daemonJson)" class="top-margin">
-                        <span class="err-message">{{ status.daemonJson }}</span>
+                    <div class="flex flex-wrap items-center justify-start">
+                        <component :is="loadIcon(status.daemonJson)" class="w-4 pr-1" />
+                        {{ $t('setting.daemonJson') }}
+                        <div v-if="showErrorMsg(status.daemonJson)" class="top-margin">
+                            <span class="err-message">{{ status.daemonJson }}</span>
+                        </div>
                     </div>
                 </template>
             </el-alert>
             <el-alert :type="loadStatus(status.appData)" :closable="false">
                 <template #title>
-                    <el-button :icon="loadIcon(status.appData)" link>{{ $t('setting.appData') }}</el-button>
-                    <div v-if="showErrorMsg(status.appData)" class="top-margin">
-                        <span class="err-message">{{ status.appData }}</span>
+                    <div class="flex flex-wrap items-center justify-start">
+                        <component :is="loadIcon(status.appData)" class="w-4 pr-1" />
+                        {{ $t('setting.appData') }}
+                        <div v-if="showErrorMsg(status.appData)" class="top-margin">
+                            <span class="err-message">{{ status.appData }}</span>
+                        </div>
                     </div>
                 </template>
             </el-alert>
             <el-alert :type="loadStatus(status.backupData)" :closable="false">
                 <template #title>
-                    <el-button :icon="loadIcon(status.backupData)" link>{{ $t('setting.backupData') }}</el-button>
-                    <div v-if="showErrorMsg(status.backupData)" class="top-margin">
-                        <span class="err-message">{{ status.backupData }}</span>
+                    <div class="flex flex-wrap items-center justify-start">
+                        <component :is="loadIcon(status.backupData)" class="w-4 pr-1" />
+                        {{ $t('setting.backupData') }}
+                        <div v-if="showErrorMsg(status.backupData)" class="top-margin">
+                            <span class="err-message">{{ status.backupData }}</span>
+                        </div>
                     </div>
                 </template>
             </el-alert>
             <el-alert :type="loadStatus(status.panelData)" :closable="false">
                 <template #title>
-                    <el-button :icon="loadIcon(status.panelData)" link>{{ $t('setting.panelData') }}</el-button>
-                    <div v-if="showErrorMsg(status.panelData)" class="top-margin">
-                        <span class="err-message">{{ status.panelData }}</span>
+                    <div class="flex flex-wrap items-center justify-start">
+                        <component :is="loadIcon(status.panelData)" class="w-4 pr-1" />
+                        {{ $t('setting.panelData') }}
+                        <div v-if="showErrorMsg(status.panelData)" class="top-margin">
+                            <span class="err-message">{{ status.panelData }}</span>
+                        </div>
                     </div>
                 </template>
             </el-alert>
             <el-alert :type="loadStatus(status.compress)" :closable="false">
                 <template #title>
-                    <el-button :icon="loadIcon(status.compress)" link>
-                        {{ $t('setting.compress') }} {{ status.size }}
-                    </el-button>
-                    <div v-if="showErrorMsg(status.compress)" class="top-margin">
-                        <span class="err-message">{{ status.compress }}</span>
+                    <div class="flex flex-wrap items-center justify-start">
+                        <component :is="loadIcon(status.compress)" class="w-4 pr-1" />
+                        {{ $t('setting.compress') }}
+                        <div v-if="showErrorMsg(status.compress)" class="top-margin">
+                            <span class="err-message">{{ status.compress }}</span>
+                        </div>
                     </div>
                 </template>
             </el-alert>
             <el-alert :type="loadStatus(status.upload)" :closable="false">
                 <template #title>
-                    <el-button :icon="loadIcon(status.upload)" link>
+                    <div class="flex flex-wrap items-center justify-start">
+                        <component :is="loadIcon(status.upload)" class="w-4 pr-1" />
                         {{ $t('setting.upload') }}
-                    </el-button>
-                    <div v-if="showErrorMsg(status.upload)" class="top-margin">
-                        <span class="err-message">{{ status.upload }}</span>
+                        <div v-if="showErrorMsg(status.upload)" class="top-margin">
+                            <span class="err-message">{{ status.upload }}</span>
+                        </div>
                     </div>
                 </template>
             </el-alert>
@@ -98,6 +118,7 @@
 import { Setting } from '@/api/interface/setting';
 import { loadSnapStatus, snapshotCreate } from '@/api/modules/setting';
 import { nextTick, onBeforeUnmount, reactive, ref } from 'vue';
+import { Loading, Check, Close } from '@element-plus/icons-vue';
 
 const status = reactive<Setting.SnapshotStatus>({
     panel: '',
@@ -285,11 +306,11 @@ const loadIcon = (status: string) => {
         case 'Running':
         case 'Waiting':
         case 'Uploading':
-            return 'Loading';
+            return Loading;
         case 'Done':
-            return 'Check';
+            return Check;
         default:
-            return 'Close';
+            return Close;
     }
 };
 

@@ -2,17 +2,17 @@
     <div>
         <div class="flex w-full flex-col gap-2 md:flex-row items-center">
             <div class="flex flex-wrap items-center" v-if="props.footer">
-                <el-button type="primary" link @click="toForum">
+                <el-link type="primary" :underline="false" @click="toForum">
                     <span class="font-normal">{{ $t('setting.forum') }}</span>
-                </el-button>
+                </el-link>
                 <el-divider direction="vertical" />
-                <el-button type="primary" link @click="toDoc">
+                <el-link type="primary" :underline="false" @click="toDoc">
                     <span class="font-normal">{{ $t('setting.doc2') }}</span>
-                </el-button>
+                </el-link>
                 <el-divider direction="vertical" />
-                <el-button type="primary" link @click="toGithub">
+                <el-link type="primary" :underline="false" @click="toGithub">
                     <span class="font-normal">{{ $t('setting.project') }}</span>
-                </el-button>
+                </el-link>
                 <el-divider v-if="!mobile" direction="vertical" />
             </div>
             <div class="flex flex-wrap items-center">
@@ -27,14 +27,14 @@
                         （{{ $t('setting.hasNewVersion') }}）
                     </el-link>
                 </el-badge>
-                <el-button
+                <el-link
                     v-if="version !== 'Waiting' && !globalStore.hasNewVersion"
                     type="primary"
-                    link
+                    :underline="false"
                     @click="onLoadUpgradeInfo"
                 >
                     （{{ $t('setting.upgradeCheck') }}）
-                </el-button>
+                </el-link>
                 <el-tag v-if="version === 'Waiting'" round style="margin-left: 10px">
                     {{ $t('setting.upgrading') }}
                 </el-tag>

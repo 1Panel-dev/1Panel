@@ -15,10 +15,12 @@
                     show-icon
                     :closable="false"
                 />
-                <el-descriptions :column="1" border>
-                    <el-descriptions-item label-class-name="label" class-name="content" min-width="60px">
+                <el-descriptions border :column="1">
+                    <el-descriptions-item label-class-name="check-label" class-name="check-content" min-width="60px">
                         <template #label>
-                            <a href="javascript:void(0);" class="content-a" @click="toApp()">{{ $t('app.app') }}</a>
+                            <a href="javascript:void(0);" class="check-label-a" @click="toApp()">
+                                {{ $t('app.app') }}
+                            </a>
                         </template>
                         <pre>{{ installData.join('\n') }}</pre>
                     </el-descriptions-item>
@@ -40,7 +42,6 @@ let open = ref(false);
 
 const acceptParams = (props: InstallProps) => {
     installData.value = props.items;
-    installData.value.push('sdsfhjdghjdgfhsdgfhjsgfkhjsdgfhjasgdfhjasgdfjhsagdfhjsagdfashdfgaskhjdfgaskjhdf');
     open.value = true;
 };
 
@@ -52,25 +53,3 @@ defineExpose({
     acceptParams,
 });
 </script>
-
-<style scoped>
-:deep(.label) {
-    background: var(--panel-main-bg-color-10) !important;
-}
-:deep(.content) {
-    background: var(--panel-main-bg-color-10);
-}
-:deep(.content-a) {
-    color: var(--panel-color-primary);
-}
-pre {
-    margin: 0;
-    width: 350px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-:deep(.el-descriptions) {
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-</style>

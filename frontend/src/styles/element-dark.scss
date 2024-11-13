@@ -22,18 +22,23 @@ html.dark {
     --panel-main-bg-color-9: #2E313D;
     --panel-main-bg-color-10: #242633;
     --panel-main-bg-color-11: #60626F;
+    --panel-main-bg-color-12: #000000;
 
-    --panel-alert-error-bg-color: #54293A;
-    --panel-alert-error-text-color: #E2324F;
+    --panel-alert-error-bg-color: #fef0f0;
+    --panel-alert-error-text-color: #f56c6c;
     --panel-alert-error-hover-bg-color: #E9657B;
 
-    --panel-alert-success-bg-color: #1E5146;
-    --panel-alert-success-text-color: #11B671;
+    --panel-alert-success-bg-color: #e1f3d8;
+    --panel-alert-success-text-color: #67c23a;
     --panel-alert-success-hover-bg-color: #4DC894;
 
     --panel-alert-warning-bg-color: #59472A;
     --panel-alert-warning-text-color: #EDAC2C;
     --panel-alert-warning-hover-bg-color: #F1C161;
+
+    --panel-alert-info-bg-color: var(--panel-main-bg-color-7);
+    --panel-alert-info-text-color: var(--panel-text-color-white);
+    --panel-alert-info-hover-bg-color: var(--panel-main-bg-color-4);
 
     --el-color-success: #3fb950;
     --el-color-success-light-5: #4DC894;
@@ -55,14 +60,11 @@ html.dark {
     --el-color-error-light-8: #E2324F;
     --el-color-error-light-9: #54293A;
 
-    --el-color-info: var(--panel-text-color-white);
+    --el-color-info: var(--panel-main-bg-color-2);
     --el-color-info-light-5: var(--panel-main-bg-color-3);
-    --el-color-info-light-8: var(--panel-text-color-white);
+    --el-color-info-light-8: var(--panel-color-primary);
     --el-color-info-light-9: var(--panel-main-bg-color-8);
 
-    --panel-alert-info-bg-color: var(--panel-main-bg-color-8);
-    --panel-alert-info-text-color: var(--panel-text-color-white);
-    --panel-alert-info-hover-bg-color: var(--panel-main-bg-color-4);
 
     --panel-pie-bg-color: #434552;
     --panel-text-color-white: #ffffff;
@@ -78,7 +80,8 @@ html.dark {
     --el-scrollbar-bg-color: var(--panel-main-bg-color-8);
     --el-border-color-darker: var(--panel-main-bg-color-6);
 
-    --panel-border: 2px solid var(--panel-main-bg-color-8);
+    --panel-border: 1px solid var(--panel-main-bg-color-8);
+    --panel-border-color: var(--panel-main-bg-color-8);
     --panel-button-active: var(--panel-main-bg-color-10);
     --panel-button-text-color: var(--panel-main-bg-color-10);
     --panel-button-bg-color:  var(--panel-color-primary);
@@ -113,6 +116,9 @@ html.dark {
 
     --el-text-color-placeholder: var(--panel-main-bg-color-4);
 
+    .el-radio-button {
+        --el-radio-button-checked-text-color: var(--panel-main-bg-color-10);
+    }
     .el-descriptions__content:not(.is-bordered-label) {
         color: var(--panel-main-bg-color-3);
     }
@@ -180,21 +186,52 @@ html.dark {
     }
 
     .el-button--primary {
+        --el-button-text-color: var(--panel-main-bg-color-10);
         --el-button-hover-link-text-color: var(--panel-color-primary-light-1);
+        &.tag-button,
+        &.brief-button {
+            --el-button-text-color: var(--panel-main-bg-color-10);
+            --el-button-hover-text-color: var(--el-color-white);
+            --el-button-hover-border-color:var(--el-color-primary);
+            --el-button-hover-bg-color: var(--el-color-primary);
+        }
+
+        &.app-button {
+            --el-button-text-color: var(--el-color-primary);
+        }
+
+        &.h-app-button {
+            --el-button-text-color: var(--panel-main-bg-color-10);
+            --el-button-hover-text-color: var(--el-color-white);
+            --el-button-hover-border-color: var(--el-color-primary);
+            --el-button-hover-bg-color: var(--el-color-primary);
+        }
     }
 
     .el-button--primary.is-plain, .el-button--primary.is-text, .el-button--primary.is-link {
+        --el-button-text-color: var(--panel-main-bg-color-2);
         --el-button-bg-color: var(--panel-main-bg-color-9);
         --el-button-border-color: var(--panel-main-bg-color-8);
         --el-button-hover-bg-color: var(--panel-main-bg-color-9);
         --el-button-hover-border-color: var(--panel-main-bg-color-8);
     }
 
+    .el-button--primary.is-text,.el-button--primary.is-link {
+        --el-button-text-color: var(--panel-color-primary);
+    }
+
     .el-button--primary:hover {
-        --el-button-hover-text-color: var(--panel-text-color-white);
-        --el-button-border-color: var(--el-color-primary-light-3);
-        --el-button-hover-bg-color: var(--el-color-primary-light-3);
-        --el-button-hover-border-color: var(--el-color-primary-light-3);
+        --el-button-hover-text-color: var(--panel-main-bg-color-2);
+        --el-button-border-color: var(--el-color-primary);
+        --el-button-hover-bg-color: var(--panel-main-bg-color-9);
+        --el-button-hover-border-color: var(--panel-main-bg-color-8);
+    }
+
+    .el-button--primary.is-plain:hover {
+        --el-button-hover-text-color: var(--panel-main-bg-color-10);
+        --el-button-border-color: var(--el-color-primary);
+        --el-button-hover-bg-color: var(--el-color-primary);
+        --el-button-hover-border-color: var(--el-color-primary);
     }
 
     .el-button--primary:active {
@@ -231,7 +268,7 @@ html.dark {
     }
 
     .el-dialog {
-        background-color: var(--panel-main-bg-color-8);
+        background-color: var(--panel-main-bg-color-9);
         border: 1px solid var(--panel-border-color);
 
         .el-dialog__header {
@@ -265,13 +302,22 @@ html.dark {
     }
 
     .md-editor-dark {
-        --md-bk-color: var(--panel-main-bg-color-8);
+        --md-bk-color: var(--panel-main-bg-color-9);
     }
+
     .md-editor-dark .md-editor-preview {
         --md-theme-color: var(--el-text-color-primary);
     }
+
     .md-editor-dark .default-theme a {
         --md-theme-link-color: var(--el-color-primary);
+    }
+
+    .md-editor-dark .default-theme pre code {
+        background-color: var(--panel-main-bg-color-8);
+    }
+    .md-editor-dark .default-theme pre:before {
+        background-color: var(--panel-main-bg-color-10);
     }
 
     .el-descriptions__title {
@@ -297,12 +343,20 @@ html.dark {
         box-shadow: 0 0 4px rgba(0, 94, 235, 0.1);
         border: 0.5px solid var(--panel-main-bg-color-7);
     }
+    .el-drawer {
+        .cm-editor {
+            background-color: var(--panel-main-bg-color-10);
+        }
+        .cm-gutters {
+            background-color: var(--panel-main-bg-color-10);
+        }
+    }
 
     .cm-editor {
         background-color: var(--panel-main-bg-color-9);
     }
     .cm-gutters {
-        background-color: var(--panel-main-bg-color-8);
+        background-color: var(--panel-main-bg-color-9);
     }
 
     // scroll-bar
@@ -311,6 +365,9 @@ html.dark {
     }
     ::-webkit-scrollbar-thumb {
         background-color: var(--el-border-color-darker);
+    }
+    ::-webkit-scrollbar-corner {
+        background-color: var(--el-scrollbar-bg-color);
     }
 
     .app-warn {
@@ -325,4 +382,61 @@ html.dark {
         }
     }
 
+    .el-table {
+        --el-table-bg-color: var(--el-bg-color);
+        --el-table-tr-bg-color: var(--el-bg-color);
+        --el-table-header-bg-color: var(--el-bg-color);
+        --el-table-border: 1px solid var(--panel-main-bg-color-8);
+        --el-table-border-color: var(--panel-main-bg-color-8);
+    }
+
+    .el-message-box {
+        --el-messagebox-title-color: var(--el-menu-text-color);
+        border: 1px solid var(--panel-border-color);
+    }
+
+    .el-popover {
+        --el-popover-title-text-color: var(--panel-main-bg-color-2);
+        border: 1px solid var(--panel-border-color);
+    }
+
+    .app-wrapper {
+        .main-container {
+            background-color: var(--panel-main-bg-color-9) !important;
+        }
+        .app-footer {
+            background-color: var(--panel-main-bg-color-9) !important;
+            border-top: var(--panel-border);
+        }
+        .mobile-header {
+            background-color: var(--panel-main-bg-color-9) !important;
+            border-bottom: var(--panel-border);
+            color: #ffffff;
+        }
+    }
+
+    .router_card_button {
+        .el-radio-button__inner {
+            background: none !important;
+        }
+        .el-radio-button__original-radio:checked + .el-radio-button__inner {
+            color: var(--panel-main-bg-color-10);
+            background-color: var(--panel-color-primary) !important;
+            box-shadow: none !important;
+            border: none !important;
+        }
+    }
+
+    .el-date-table td.in-range .el-date-table-cell {
+        background-color: var(--panel-main-bg-color-8);
+    }
+
+    .el-collapse-item__header {
+        color: #ffffff;
+        background-color: var(--panel-main-bg-color-10) !important;
+    }
+
+    .el-loading-mask {
+        background-color: rgba(36, 38, 51, 0.8);
+    }
 }
