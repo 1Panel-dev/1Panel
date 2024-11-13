@@ -10,6 +10,7 @@ const message = {
         true: '是',
         false: '否',
         example: '例：',
+        fit2cloud: '飞致云',
         button: {
             create: '创建',
             add: '添加',

@@ -11,6 +11,7 @@ const message = {
         true: 'true',
         false: 'false',
         example: 'e.g.:',
+        fit2cloud: 'FIT2CLOUD',
         button: {
             create: 'Create ',
             add: 'Add ',

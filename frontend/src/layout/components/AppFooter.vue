@@ -2,7 +2,7 @@
     <div class="footer" :style="{ height: mobile ? '108px' : '48px' }">
         <div class="flex w-full flex-col gap-4 md:justify-between md:flex-row">
             <div class="flex flex-wrap gap-4">
-                <a href="https://fit2cloud.com/" target="_blank">Copyright © 2014-2024 飞致云</a>
+                <a href="https://fit2cloud.com/" target="_blank">Copyright © 2014-2024 {{ $t('commons.fit2cloud') }}</a>
             </div>
             <div class="flex flex-row gap-2 md:flex-col lg:flex-row">
                 <SystemUpgrade :footer="true" />

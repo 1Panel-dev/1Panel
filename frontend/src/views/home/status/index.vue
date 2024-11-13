@@ -112,7 +112,7 @@
             <span class="input-help">{{ loadStatus(currentInfo.loadUsagePercent) }}</span>
         </el-col>
         <template v-for="(item, index) of currentInfo.diskData" :key="index">
-            <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center" v-if="showMore || index < 4">
+            <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center" v-if="isShow('disk', index)">
                 <el-popover placement="bottom" :width="300" trigger="hover" v-if="chartsOption[`disk${index}`]">
                     <el-row :gutter="5">
                         <el-tag style="font-weight: 500">{{ $t('home.baseInfo') }}:</el-tag>
@@ -165,15 +165,7 @@
             </el-col>
         </template>
         <template v-for="(item, index) of currentInfo.gpuData" :key="index">
-            <el-col
-                :xs="12"
-                :sm="12"
-                :md="6"
-                :lg="6"
-                :xl="6"
-                align="center"
-                v-if="showMore || index < 4 - currentInfo.diskData.length"
-            >
+            <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center" v-if="isShow('gpu', index)">
                 <el-popover placement="bottom" :width="250" trigger="hover" v-if="chartsOption[`gpu${index}`]">
                     <el-row :gutter="5">
                         <el-tag style="font-weight: 500">{{ $t('home.baseInfo') }}:</el-tag>
@@ -218,16 +210,8 @@
             </el-col>
         </template>
         <template v-for="(item, index) of currentInfo.xpuData" :key="index">
-            <el-col
-                :xs="12"
-                :sm="12"
-                :md="6"
-                :lg="6"
-                :xl="6"
-                align="center"
-                v-if="showMore || index < 4 - currentInfo.diskData.length"
-            >
-                <el-popover placement="bottom" :width="250" trigger="hover" v-if="chartsOption[`gpu${index}`]">
+            <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center" v-if="isShow('xpu', index)">
+                <el-popover placement="bottom" :width="250" trigger="hover" v-if="chartsOption[`xpu${index}`]">
                     <el-row :gutter="5">
                         <el-tag style="font-weight: 500">{{ $t('home.baseInfo') }}:</el-tag>
                     </el-row>
@@ -249,10 +233,10 @@
                         <v-charts
                             @click="goGPU()"
                             height="160px"
-                            :id="`gpu${index}`"
+                            :id="`xpu${index}`"
                             type="pie"
-                            :option="chartsOption[`gpu${index}`]"
-                            v-if="chartsOption[`gpu${index}`]"
+                            :option="chartsOption[`xpu${index}`]"
+                            v-if="chartsOption[`xpu${index}`]"
                         />
                     </template>
                 </el-popover>
@@ -262,18 +246,12 @@
                 <span class="input-help" v-else>{{ item.deviceName }}</span>
             </el-col>
         </template>
-        <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center">
-            <el-button v-if="!showMore" link type="primary" @click="showMore = true" class="buttonClass">
+        <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center" v-if="totalCount > 5">
+            <el-button v-if="!showMore" link type="primary" @click="changeShowMore(true)" class="buttonClass">
                 {{ $t('tabs.more') }}
                 <el-icon><Bottom /></el-icon>
             </el-button>
-            <el-button
-                v-if="showMore && currentInfo.diskData.length > 5"
-                type="primary"
-                link
-                @click="showMore = false"
-                class="buttonClass"
-            >
+            <el-button v-if="showMore" type="primary" link @click="changeShowMore(false)" class="buttonClass">
                 {{ $t('tabs.hide') }}
                 <el-icon><Top /></el-icon>
             </el-button>
@@ -288,6 +266,7 @@ import router from '@/routers';
 import i18n from '@/lang';
 import { nextTick, ref } from 'vue';
 const showMore = ref(false);
+const totalCount = ref();
 
 const baseInfo = ref<Dashboard.BaseInfo>({
     websiteNumber: 0,
@@ -355,7 +334,7 @@ const cpuShowAll = ref();
 
 const chartsOption = ref({ cpu: null, memory: null, load: null });
 
-const acceptParams = (current: Dashboard.CurrentInfo, base: Dashboard.BaseInfo, isInit: boolean): void => {
+const acceptParams = (current: Dashboard.CurrentInfo, base: Dashboard.BaseInfo): void => {
     currentInfo.value = current;
     baseInfo.value = base;
     chartsOption.value['cpu'] = {
@@ -389,14 +368,15 @@ const acceptParams = (current: Dashboard.CurrentInfo, base: Dashboard.BaseInfo, 
         }
         currentInfo.value.xpuData = currentInfo.value.xpuData || [];
         for (let i = 0; i < currentInfo.value.xpuData.length; i++) {
-            chartsOption.value['gpu' + i] = {
-                title: 'GPU-' + currentInfo.value.xpuData[i].deviceID,
+            chartsOption.value['xpu' + i] = {
+                title: 'XPU-' + currentInfo.value.xpuData[i].deviceID,
                 data: formatNumber(Number(currentInfo.value.xpuData[i].memoryUtil.replaceAll('%', ''))),
             };
         }
-        if (currentInfo.value.diskData.length + currentInfo.value.gpuData.length > 5) {
-            showMore.value = isInit ? false : showMore.value || false;
-        }
+
+        totalCount.value =
+            currentInfo.value.diskData.length + currentInfo.value.gpuData.length + currentInfo.value.xpuData.length;
+        showMore.value = localStorage.getItem('dashboard_show') === 'more';
     });
 };
 
@@ -413,8 +393,27 @@ function loadStatus(val: number) {
     return i18n.global.t('home.runJam');
 }
 
+const isShow = (val: string, index: number) => {
+    let showCount = totalCount.value < 6 ? 5 : 4;
+    switch (val) {
+        case 'disk':
+            return showMore.value || index < showCount;
+        case 'gpu':
+            let gpuCount = showCount - currentInfo.value.diskData.length;
+            return showMore.value || index < gpuCount;
+        case 'xpu':
+            let xpuCount = showCount - currentInfo.value.diskData.length - currentInfo.value.gpuData.length;
+            return showMore.value || index < xpuCount;
+    }
+};
+
 const goGPU = () => {
     router.push({ name: 'GPU' });
+};
+
+const changeShowMore = (show: boolean) => {
+    showMore.value = show;
+    localStorage.setItem('dashboard_show', show ? 'more' : 'hide');
 };
 
 const loadWidth = () => {

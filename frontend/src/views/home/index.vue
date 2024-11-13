@@ -290,7 +290,6 @@ const isSafety = ref();
 const chartOption = ref('network');
 let timer: NodeJS.Timer | null = null;
 let isInit = ref<boolean>(true);
-let isStatusInit = ref<boolean>(true);
 let isActive = ref(true);
 
 const ioReadBytes = ref<Array<number>>([]);
@@ -429,8 +428,7 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
     currentInfo.value.uptime = resData.uptime;
 
     loadAppCurrentInfo();
-    isStatusInit.value = false;
-    statusRef.value.acceptParams(currentInfo.value, baseInfo.value, isStatusInit.value);
+    statusRef.value.acceptParams(currentInfo.value, baseInfo.value);
     appRef.value.acceptParams();
     if (isInit) {
         timer = setInterval(async () => {
@@ -443,7 +441,7 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
 
 const loadAppCurrentInfo = async () => {
     await Promise.all([onLoadCurrentInfo('gpu'), onLoadCurrentInfo('basic'), onLoadCurrentInfo('ioNet')]);
-    statusRef.value.acceptParams(currentInfo.value, baseInfo.value, isStatusInit.value);
+    statusRef.value.acceptParams(currentInfo.value, baseInfo.value);
 };
 
 const onLoadCurrentInfo = async (scope: string) => {
