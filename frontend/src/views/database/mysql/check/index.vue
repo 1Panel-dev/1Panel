@@ -2,7 +2,7 @@
     <el-dialog
         v-model="open"
         :title="$t('app.checkTitle')"
-        width="50%"
+        width="40%"
         :close-on-click-modal="false"
         :destroy-on-close="true"
     >
@@ -10,18 +10,17 @@
             <el-col :span="20" :offset="2" v-if="open">
                 <el-alert
                     type="error"
-                    :description="$t('app.deleteHelper', [$t('app.database')])"
+                    :title="$t('app.deleteHelper', [$t('app.database')])"
                     center
                     show-icon
                     :closable="false"
                 />
-                <br />
-                <el-descriptions border :column="1">
-                    <el-descriptions-item>
+                <el-descriptions :column="1" border>
+                    <el-descriptions-item label-class-name="label" class-name="content" min-width="60px">
                         <template #label>
-                            <a href="javascript:void(0);" @click="toApp()">{{ $t('app.app') }}</a>
+                            <a href="javascript:void(0);" class="content-a" @click="toApp()">{{ $t('app.app') }}</a>
                         </template>
-                        {{ installData.join(',') }}
+                        <pre>{{ installData.join('\n') }}</pre>
                     </el-descriptions-item>
                 </el-descriptions>
             </el-col>
@@ -41,6 +40,7 @@ let open = ref(false);
 
 const acceptParams = (props: InstallProps) => {
     installData.value = props.items;
+    installData.value.push('sdsfhjdghjdgfhsdgfhjsgfkhjsdgfhjasgdfhjasgdfjhsagdfhjsagdfashdfgaskhjdfgaskjhdf');
     open.value = true;
 };
 
@@ -52,3 +52,25 @@ defineExpose({
     acceptParams,
 });
 </script>
+
+<style scoped>
+:deep(.label) {
+    background: var(--panel-main-bg-color-10) !important;
+}
+:deep(.content) {
+    background: var(--panel-main-bg-color-10);
+}
+:deep(.content-a) {
+    color: var(--panel-color-primary);
+}
+pre {
+    margin: 0;
+    width: 350px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+:deep(.el-descriptions) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+</style>

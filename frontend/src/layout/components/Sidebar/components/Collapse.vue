@@ -23,6 +23,7 @@ const isCollapse = computed(() => menuStore.isCollapse);
 }
 
 .collapse-icon {
+    color: var(--panel-main-bg-color-1);
     margin-left: 25px;
     &:hover {
         color: $primary-color;
