@@ -4,7 +4,11 @@
             <template #main>
                 <div style="text-align: center; margin-top: 20px">
                     <div style="justify-self: center" class="logo">
-                        <img v-if="globalStore.themeConfig.logo" style="width: 80px" :src="'/api/v1/images/logo'" />
+                        <img
+                            v-if="globalStore.themeConfig.logo"
+                            style="width: 80px"
+                            :src="`/api/v1/images/logo?t=${Date.now()}`"
+                        />
                         <PrimaryLogo v-else />
                     </div>
                     <h3 class="description">{{ globalStore.themeConfig.title || $t('setting.description') }}</h3>

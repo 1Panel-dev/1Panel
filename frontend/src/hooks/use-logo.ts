@@ -15,6 +15,6 @@ export const useLogo = async () => {
     const link = (document.querySelector("link[rel*='icon']") || document.createElement('link')) as HTMLLinkElement;
     link.type = 'image/x-icon';
     link.rel = 'shortcut icon';
-    link.href = globalStore.themeConfig.favicon ? '/api/v1/images/favicon' : '/public/favicon.png';
+    link.href = globalStore.themeConfig.favicon ? `/api/v1/images/favicon?t=${Date.now()}` : '/public/favicon.png';
     document.getElementsByTagName('head')[0].appendChild(link);
 };

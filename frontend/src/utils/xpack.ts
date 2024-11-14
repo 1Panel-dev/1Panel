@@ -32,9 +32,9 @@ export function initFavicon() {
           </svg>
         `;
         goldLink = `data:image/svg+xml,${encodeURIComponent(svg)}`;
-        link.href = favicon ? '/api/v1/images/favicon' : goldLink;
+        link.href = favicon ? `/api/v1/images/favicon?t=${Date.now()}` : goldLink;
     } else {
-        link.href = favicon ? '/api/v1/images/favicon' : '/public/favicon.png';
+        link.href = favicon ? `/api/v1/images/favicon?t=${Date.now()}` : '/public/favicon.png';
     }
     document.head.appendChild(link);
 }
