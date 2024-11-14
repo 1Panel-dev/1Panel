@@ -43,27 +43,27 @@ html.dark {
     --el-color-success: #3fb950;
     --el-color-success-light-5: #4DC894;
     --el-color-success-light-8: #3fb950;
-    --el-color-success-light-9: #1E5146;
+    --el-color-success-light-9: var(--panel-main-bg-color-9);
 
     --el-color-warning: #EDAC2C;
     --el-color-warning-light-5: #F1C161;
     --el-color-warning-light-8: #EDAC2C;
-    --el-color-warning-light-9: #59472A;
+    --el-color-warning-light-9: var(--panel-main-bg-color-9);
 
     --el-color-danger: #E2324F;
     --el-color-danger-light-5: #E9657B;
     --el-color-danger-light-8: #E2324F;
-    --el-color-danger-light-9: #54293A;
+    --el-color-danger-light-9: var(--panel-main-bg-color-9);
 
     --el-color-error: #E2324F;
     --el-color-error-light-5: #E9657B;
     --el-color-error-light-8: #E2324F;
-    --el-color-error-light-9: #54293A;
+    --el-color-error-light-9: var(--panel-main-bg-color-9);
 
-    --el-color-info: var(--panel-main-bg-color-2);
+    --el-color-info: var(--panel-main-bg-color-3);
     --el-color-info-light-5: var(--panel-main-bg-color-3);
-    --el-color-info-light-8: var(--panel-color-primary);
-    --el-color-info-light-9: var(--panel-main-bg-color-8);
+    --el-color-info-light-8: var(--panel-main-bg-color-3);
+    --el-color-info-light-9: var(--panel-main-bg-color-9);
 
 
     --panel-pie-bg-color: #434552;
@@ -71,8 +71,12 @@ html.dark {
 
 
     --el-color-primary: var(--panel-color-primary);
+    --el-color-primary-light-1: var(--panel-color-primary-light-1);
+    --el-color-primary-light-2: var(--panel-color-primary-light-2);
     --el-color-primary-light-3: var(--panel-color-primary-light-3);
+    --el-color-primary-light-4: var(--panel-color-primary-light-4);
     --el-color-primary-light-5: var(--panel-color-primary-light-5);
+    --el-color-primary-light-6: var(--panel-color-primary-light-6);
     --el-color-primary-light-7: var(--panel-color-primary-light-7);
     --el-color-primary-light-8: var(--panel-color-primary-light-8);
     --el-color-primary-light-9: var(--panel-color-primary-light-9);
@@ -185,6 +189,11 @@ html.dark {
         --el-card-bg-color: var(--panel-main-bg-color-10)
     }
 
+    .el-button:hover {
+        --el-button-hover-border-color:var(--panel-main-bg-color-11);
+        --el-button-hover-bg-color: var(--panel-main-bg-color-10);
+    }
+
     .el-button--primary {
         --el-button-text-color: var(--panel-main-bg-color-10);
         --el-button-hover-link-text-color: var(--panel-color-primary-light-1);
@@ -221,9 +230,9 @@ html.dark {
     }
 
     .el-button--primary:hover {
-        --el-button-hover-text-color: var(--panel-main-bg-color-2);
+        --el-button-hover-text-color: var(--panel-main-bg-color-7);
         --el-button-border-color: var(--el-color-primary);
-        --el-button-hover-bg-color: var(--panel-main-bg-color-9);
+        --el-button-hover-bg-color: var(--panel-color-primary-light-2);
         --el-button-hover-border-color: var(--panel-main-bg-color-8);
     }
 
@@ -272,7 +281,6 @@ html.dark {
         border: 1px solid var(--panel-border-color);
 
         .el-dialog__header {
-            border-bottom: var(--panel-border);
             color: var(--el-text-color-primary);
 
             .el-dialog__title {
@@ -288,7 +296,7 @@ html.dark {
 
     .el-alert--success {
         --el-alert-bg-color: var(--panel-alert-success-bg-color);
-        --el-color-success: var(--panel-alert-success-text-color);;
+        --el-color-success: var(--panel-alert-success-text-color);
     }
 
     .el-alert--warning {

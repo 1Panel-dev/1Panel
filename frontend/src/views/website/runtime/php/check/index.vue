@@ -9,7 +9,7 @@
                     show-icon
                     :closable="false"
                 />
-                <el-descriptions border :column="1">
+                <el-descriptions border :column="1" class="mt-5">
                     <el-descriptions-item
                         v-for="(item, key) in map"
                         :key="key"

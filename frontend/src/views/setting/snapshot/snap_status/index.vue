@@ -329,9 +329,6 @@ defineExpose({
 .el-alert:first-child {
     margin: 0;
 }
-.top-margin {
-    margin-top: 10px;
-}
 .err-message {
     margin-left: 23px;
     line-height: 20px;

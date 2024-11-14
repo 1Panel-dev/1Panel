@@ -15,7 +15,7 @@
                     show-icon
                     :closable="false"
                 />
-                <el-descriptions border :column="1">
+                <el-descriptions border :column="1" class="mt-5">
                     <el-descriptions-item label-class-name="check-label" class-name="check-content" min-width="60px">
                         <template #label>
                             <a href="javascript:void(0);" class="check-label-a" @click="toApp()">

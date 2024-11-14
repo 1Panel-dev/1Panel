@@ -74,7 +74,7 @@ export const WgetFile = (params: File.FileWget) => {
 };
 
 export const MoveFile = (params: File.FileMove) => {
-    return http.post<File.File>('files/move', params);
+    return http.post<File.File>('files/move', params, TimeoutEnum.T_5M);
 };
 
 export const DownloadFile = (params: File.FileDownload) => {
