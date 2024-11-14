@@ -24,7 +24,7 @@ type FileTree struct {
 }
 
 type DirSizeRes struct {
-	Size float64 `json:"size" validate:"required"`
+	Size int64 `json:"size" validate:"required"`
 }
 
 type FileProcessKeys struct {

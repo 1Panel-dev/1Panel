@@ -5,7 +5,6 @@ import (
 	"io"
 	"io/fs"
 	"os"
-	"os/exec"
 	"path"
 	"path/filepath"
 	"strings"
@@ -402,19 +401,6 @@ func (f *FileService) DirSize(req request.DirSizeReq) (response.DirSizeRes, erro
 	)
 	if req.Path == "/proc" {
 		return res, nil
-	}
-	cmd := exec.Command("du", "-s", req.Path)
-	output, err := cmd.Output()
-	if err == nil {
-		fields := strings.Fields(string(output))
-		if len(fields) == 2 {
-			var cmdSize int64
-			_, err = fmt.Sscanf(fields[0], "%d", &cmdSize)
-			if err == nil {
-				res.Size = float64(cmdSize * 1024)
-				return res, nil
-			}
-		}
 	}
 	fo := files.NewFileOp()
 	size, err := fo.GetDirSize(req.Path)

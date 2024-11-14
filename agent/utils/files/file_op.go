@@ -12,6 +12,7 @@ import (
 	"io/fs"
 	"net/http"
 	"os"
+	"os/exec"
 	"path"
 	"path/filepath"
 	"strconv"
@@ -502,9 +503,22 @@ func (f FileOp) CopyFile(src, dst string) error {
 	return cmd.ExecCmd(fmt.Sprintf(`cp -f '%s' '%s'`, src, dst+"/"))
 }
 
-func (f FileOp) GetDirSize(path string) (float64, error) {
+func (f FileOp) GetDirSize(path string) (int64, error) {
+	duCmd := exec.Command("du", "-s", path)
+	output, err := duCmd.Output()
+	if err == nil {
+		fields := strings.Fields(string(output))
+		if len(fields) == 2 {
+			var cmdSize int64
+			_, err = fmt.Sscanf(fields[0], "%d", &cmdSize)
+			if err == nil {
+				return cmdSize * 1024, nil
+			}
+		}
+	}
+
 	var size int64
-	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -516,7 +530,7 @@ func (f FileOp) GetDirSize(path string) (float64, error) {
 	if err != nil {
 		return 0, err
 	}
-	return float64(size), nil
+	return size, nil
 }
 
 func getFormat(cType CompressType) archiver.CompressedArchive {
