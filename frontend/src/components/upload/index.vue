@@ -17,7 +17,15 @@
                 <div class="mb-4" v-if="type === 'website'">
                     <el-alert :closable="false" type="warning" :title="$t('website.websiteBackupWarn')"></el-alert>
                 </div>
-                <el-upload ref="uploadRef" drag :on-change="fileOnChange" class="upload-demo" :auto-upload="false">
+                <el-upload
+                    :limit="1"
+                    ref="uploadRef"
+                    drag
+                    :on-exceed="handleExceed"
+                    :on-change="fileOnChange"
+                    class="upload-demo"
+                    :auto-upload="false"
+                >
                     <el-icon class="el-icon--upload"><upload-filled /></el-icon>
                     <div class="el-upload__text">
                         {{ $t('database.dropHelper') }}
@@ -48,7 +56,7 @@
                         </div>
                     </template>
                 </el-upload>
-                <el-button :disabled="isUpload" v-if="uploaderFiles.length === 1" icon="Upload" @click="onSubmit">
+                <el-button :disabled="isUpload || uploaderFiles.length !== 1" icon="Upload" @click="onSubmit">
                     {{ $t('commons.button.upload') }}
                 </el-button>
 
@@ -128,7 +136,7 @@
 import { reactive, ref } from 'vue';
 import { computeSize } from '@/utils/util';
 import i18n from '@/lang';
-import { UploadFile, UploadFiles, UploadInstance } from 'element-plus';
+import { UploadFile, UploadFiles, UploadInstance, genFileId } from 'element-plus';
 import { File } from '@/api/interface/file';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { BatchDeleteFile, CheckFile, ChunkUploadFileData, GetUploadList } from '@/api/modules/files';
@@ -278,6 +286,13 @@ const handleClose = () => {
     uploaderFiles.value = [];
     uploadRef.value!.clearFiles();
     upVisible.value = false;
+};
+
+const handleExceed: UploadProps['onExceed'] = (files) => {
+    uploadRef.value!.clearFiles();
+    const file = files[0] as UploadRawFile;
+    file.uid = genFileId();
+    uploadRef.value!.handleStart(file);
 };
 
 const onSubmit = async () => {
