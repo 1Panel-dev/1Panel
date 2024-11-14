@@ -316,17 +316,15 @@ func (u *CronjobService) Update(id uint, req dto.CronjobUpdate) error {
 	if err != nil {
 		return err
 	}
-	if req.AlertCount != 0 {
-		updateAlert := dto.CreateOrUpdateAlert{
-			AlertTitle: req.AlertTitle,
-			AlertType:  cronModel.Type,
-			AlertCount: req.AlertCount,
-			EntryID:    cronModel.ID,
-		}
-		err = xpack.UpdateAlert(updateAlert)
-		if err != nil {
-			return err
-		}
+	updateAlert := dto.CreateOrUpdateAlert{
+		AlertTitle: req.AlertTitle,
+		AlertType:  cronModel.Type,
+		AlertCount: req.AlertCount,
+		EntryID:    cronModel.ID,
+	}
+	err = xpack.UpdateAlert(updateAlert)
+	if err != nil {
+		return err
 	}
 	return nil
 }
