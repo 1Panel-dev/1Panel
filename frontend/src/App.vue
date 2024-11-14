@@ -8,6 +8,7 @@
 import { reactive, computed, ref, nextTick, provide } from 'vue';
 import { GlobalStore } from '@/store';
 import zhCn from 'element-plus/es/locale/lang/zh-cn';
+import zhTw from 'element-plus/es/locale/lang/zh-tw';
 import en from 'element-plus/es/locale/lang/en';
 import { useTheme } from '@/hooks/use-theme';
 useTheme();
@@ -19,6 +20,7 @@ const config = reactive({
 
 const i18nLocale = computed(() => {
     if (globalStore.language === 'zh') return zhCn;
+    if (globalStore.language === 'tw') return zhTw;
     if (globalStore.language === 'en') return en;
     return zhCn;
 });
