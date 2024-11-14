@@ -249,15 +249,17 @@ func (c *ClamService) Update(req dto.ClamUpdate) error {
 	if err := clamRepo.Update(req.ID, upMap); err != nil {
 		return err
 	}
-	updateAlert := dto.CreateOrUpdateAlert{
-		AlertTitle: req.AlertTitle,
-		AlertType:  "clams",
-		AlertCount: req.AlertCount,
-		EntryID:    clam.ID,
-	}
-	err := xpack.UpdateAlert(updateAlert)
-	if err != nil {
-		return err
+	if req.AlertCount != 0 {
+		updateAlert := dto.CreateOrUpdateAlert{
+			AlertTitle: req.AlertTitle,
+			AlertType:  "clams",
+			AlertCount: req.AlertCount,
+			EntryID:    clam.ID,
+		}
+		err := xpack.UpdateAlert(updateAlert)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
