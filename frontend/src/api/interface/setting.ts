@@ -178,6 +178,8 @@ export namespace Setting {
         offline: boolean;
         status: string;
         message: string;
+        smsUsed: number;
+        smsTotal: number;
     }
     export interface LicenseStatus {
         productPro: string;
