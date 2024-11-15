@@ -559,4 +559,8 @@ onMounted(() => {
     color: #005eeb !important;
     background-color: #e5eefd !important;
 }
+
+:deep(.el-loading-mask) {
+    background-color: rgba(229, 238, 253, 0.8) !important;
+}
 </style>

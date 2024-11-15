@@ -30,10 +30,24 @@ const props = defineProps({
     option: {
         type: Object,
         required: true,
-    }, // option: { title , xData, yData, formatStr, yAxis, grid, tooltip}
+    },
 });
 
 const seriesStyle = [
+    {
+        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            {
+                offset: 0,
+                color: getComputedStyle(document.documentElement).getPropertyValue('--panel-color-primary').trim(),
+            },
+            {
+                offset: 1,
+                color: getComputedStyle(document.documentElement)
+                    .getPropertyValue('--panel-color-primary-light-9')
+                    .trim(),
+            },
+        ]),
+    },
     {
         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
             {
@@ -98,6 +112,7 @@ function initChart() {
             series.push({
                 name: item?.name,
                 type: 'line',
+                itemStyle: seriesStyle[index + 2],
                 areaStyle: seriesStyle[index],
                 data: item?.data,
                 showSymbol: false,
