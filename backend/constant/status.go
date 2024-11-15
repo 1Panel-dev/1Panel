@@ -10,6 +10,8 @@ const (
 	StatusEnable    = "Enable"
 	StatusDisable   = "Disable"
 	StatusNone      = "None"
+	StatusOnRetry   = "OnRetry"
+	StatusLost      = "Lost"
 
 	OrderDesc = "descending"
 	OrderAsc  = "ascending"

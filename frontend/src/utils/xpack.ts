@@ -70,7 +70,7 @@ export async function loadProductProFromDB() {
         globalStore.isProductPro = false;
     } else {
         globalStore.isProductPro =
-            res.data.status === 'Enable' || res.data.status === 'Lost01' || res.data.status === 'Lost02';
+            res.data.status === 'Enable' || res.data.status === 'OnRetry' || res.data.status === 'Lost';
         if (globalStore.isProductPro) {
             globalStore.productProExpires = Number(res.data.productPro);
             globalStore.isTrial = res.data.trial;
@@ -91,7 +91,7 @@ export async function getXpackSettingForTheme() {
         return;
     }
     globalStore.isProductPro =
-        res.data.status === 'Enable' || res.data.status === 'Lost01' || res.data.status === 'Lost02';
+        res.data.status === 'Enable' || res.data.status === 'OnRetry' || res.data.status === 'Lost';
     if (globalStore.isProductPro) {
         globalStore.productProExpires = Number(res.data.productPro);
         globalStore.isTrial = res.data.trial;

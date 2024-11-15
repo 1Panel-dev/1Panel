@@ -202,7 +202,7 @@ const search = async () => {
             loading.value = false;
             license.status = res.data.status;
             globalStore.isProductPro =
-                res.data.status === 'Enable' || res.data.status === 'Lost01' || res.data.status === 'Lost02';
+                res.data.status === 'Enable' || res.data.status === 'OnRetry' || res.data.status === 'Lost';
             if (res.data.status === '') {
                 hasLicense.value = false;
                 return;
