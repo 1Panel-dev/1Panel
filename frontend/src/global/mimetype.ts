@@ -181,6 +181,10 @@ export const DNSTypes = [
         value: 'CloudFlare',
     },
     {
+        label: 'CloudDns',
+        value: 'CloudDns',
+    },
+    {
         label: 'NameSilo',
         value: 'NameSilo',
     },
