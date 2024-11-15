@@ -300,14 +300,14 @@ const search = async () => {
     if (isProductPro.value) {
         const xpackRes = await getXpackSetting();
         if (xpackRes) {
-            form.theme = xpackRes.data.theme || globalStore.themeConfig.theme;
+            form.theme = xpackRes.data.theme || globalStore.themeConfig.theme || 'light';
             form.themeColor = JSON.parse(xpackRes.data.themeColor);
             globalStore.themeConfig.themeColor = xpackRes.data.themeColor;
             globalStore.themeConfig.theme = form.theme;
             form.proxyDocker = xpackRes.data.proxyDocker;
         }
     } else {
-        form.theme = res.data.theme;
+        form.theme = globalStore.themeConfig.theme || res.data.theme || 'light';
     }
 };
 
@@ -395,10 +395,6 @@ const onSave = async (key: string, val: any) => {
             }
             globalStore.themeConfig.primary = color;
             setPrimaryColor(color);
-            MsgSuccess(i18n.t('commons.msg.operationSuccess'));
-            loading.value = false;
-            await search();
-            return;
         }
     }
     if (key === 'MenuTabs') {

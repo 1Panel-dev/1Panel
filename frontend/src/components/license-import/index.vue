@@ -90,6 +90,7 @@ const submit = async () => {
             globalStore.isProductPro = true;
             const xpackRes = await getXpackSetting();
             if (xpackRes) {
+                globalStore.themeConfig.theme = xpackRes.data.theme;
                 globalStore.themeConfig.themeColor = xpackRes.data.themeColor;
             }
             loading.value = false;
