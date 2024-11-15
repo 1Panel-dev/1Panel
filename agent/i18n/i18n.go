@@ -70,6 +70,16 @@ func GetMsgByKey(key string) string {
 	return content
 }
 
+func Get(key string) string {
+	content, _ := global.I18n.Localize(&i18n.LocalizeConfig{
+		MessageID: key,
+	})
+	if content != "" {
+		return content
+	}
+	return key
+}
+
 func GetWithName(key string, name string) string {
 	var (
 		dataMap = make(map[string]interface{})

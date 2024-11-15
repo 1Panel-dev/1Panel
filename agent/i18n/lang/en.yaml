@@ -197,6 +197,43 @@ ErrGroupInUse: "The IP group is used by the black/white list and cannot be delet
 ErrGroupExist: "IP group name already exists"
 ErrIPRange: "Wrong IP range"
 ErrIPExist: "IP is exit"
+urlDefense: 'URL Rules'
+urlHelper: 'Forbidden Access URLs'
+dirFilter: 'Directory Filtering'
+xss: 'XSS'
+phpExec: 'PHP Script Execution'
+oneWordTrojan: 'One-Liner Trojan'
+appFilter: 'Application Dangerous Directory Filtering'
+webshell: 'Webshell'
+args: 'Parameter Rules'
+protocolFilter: 'Protocol Filtering'
+javaFileter: 'Java Dangerous File Filtering'
+scannerFilter: 'Scanner Filtering'
+escapeFilter: 'Escape Filtering'
+customRule: 'Custom Rules'
+httpMethod: 'HTTP Method Filtering'
+fileExt: 'File Upload Restrictions'
+defaultIpBlack: 'Malicious IP Group'
+cookie: 'Cookie Rules'
+urlBlack: 'URL Blacklist'
+uaBlack: 'User-Agent Blacklist'
+attackCount: 'Attack Frequency Limit'
+fileExtCheck: 'File Upload Restrictions'
+geoRestrict: 'Geographical Access Restrictions'
+unknownWebsite: 'Unauthorized Domain Access'
+notFoundLimit: '404 Frequency Limit'
+headerDefense: 'Header Rules'
+defaultUaBlack: 'User-Agent Rules'
+methodWhite: 'HTTP Rules'
+captcha: 'Captcha'
+fiveSeconds: '5 Seconds Verification'
+vulnCheck: 'Supplementary Rules'
+acl: 'Custom Rules'
+sql: 'SQL Injection'
+cc: 'Access Frequency Limit'
+defaultUrlBlack: 'URL Rules'
+sqlInject: 'SQL Injection'
+
 
 #license
 ErrLicense: "License format error, please check and try again!"

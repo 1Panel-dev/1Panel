@@ -199,6 +199,43 @@ ErrGroupInUse: "IP 组被黑/白名单使用，无法删除"
 ErrGroupExist: "IP 组名称已存在"
 ErrIPRange: "IP 范围错误"
 ErrIPExist: "IP 已存在"
+urlDefense: 'URL 规则'
+urlHelper: '禁止访问的 URL'
+dirFilter: '目录过滤'
+xss: 'XSS'
+phpExec: 'PHP 脚本执行'
+oneWordTrojan: '一句话木马'
+appFilter: '应用危险目录过滤'
+webshell: 'Webshell'
+args: '参数规则'
+protocolFilter: '协议过滤'
+javaFileter: 'Java 危险文件过滤'
+scannerFilter: '扫描器过滤'
+escapeFilter: '转义过滤'
+customRule: '自定义规则'
+httpMethod: 'HTTP 方法过滤'
+fileExt: '文件上传限制'
+defaultIpBlack: '恶意 IP 组'
+cookie: 'Cookie 规则'
+urlBlack: 'URL 黑名单'
+uaBlack: 'User-Agent 黑名单'
+attackCount: '攻击频率限制'
+fileExtCheck: '文件上传限制'
+geoRestrict: '地区访问限制'
+unknownWebsite: '未授权域名访问'
+notFoundLimit: '404 频率限制'
+headerDefense: 'Header 规则'
+defaultUaBlack: 'User-Agent 规则'
+methodWhite: 'HTTP 规则'
+captcha: '人机验证'
+fiveSeconds: '5 秒验证'
+vulnCheck: '补充规则'
+acl: '自定义规则'
+sql: 'SQL 注入'
+cc: '访问频率限制'
+defaultUrlBlack: 'URL 规则'
+sqlInject: 'SQL 注入'
+
 
 #license
 ErrLicense: "许可证格式错误，请检查后重试！"
