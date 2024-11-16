@@ -45,7 +45,8 @@
                                     <div v-if="license.status">
                                         <el-tooltip
                                             v-if="license.status.indexOf('Lost') !== -1"
-                                            :content="$t('license.lostHelper')"
+                                            :content="license.message"
+                                            placement="top"
                                         >
                                             <el-tag type="info">
                                                 {{ $t('license.' + license.status) }}
@@ -56,7 +57,7 @@
                                     <span v-else>-</span>
                                 </el-descriptions-item>
                                 <el-descriptions-item class="descriptions" :label="$t('commons.table.message')">
-                                    {{ license.message }}
+                                    {{ showSync() ? $t('license.lostHelper') : '' }}
                                 </el-descriptions-item>
                             </el-descriptions>
                         </div>
@@ -200,7 +201,7 @@ const search = async () => {
     await getLicense()
         .then((res) => {
             loading.value = false;
-            license.status = res.data.status;
+            license.status = res.data.status === 'OnRetry' ? 'Enable' : res.data.status;
             globalStore.isProductPro =
                 res.data.status === 'Enable' || res.data.status === 'OnRetry' || res.data.status === 'Lost';
             if (res.data.status === '') {

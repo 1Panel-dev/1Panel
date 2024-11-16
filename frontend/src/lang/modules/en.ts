@@ -1690,7 +1690,7 @@ const message = {
         Enable: 'Enabled',
         Disable: 'Disabled',
         lostHelper:
-            'The License needs to be periodically synchronized for availability. Please ensure normal external network access.',
+            'The license has reached the maximum number of retry attempts. Please manually click the sync button to ensure the professional version features are functioning properly.',
         quickUpdate: 'Quick Update',
         import: 'Import',
         power: 'Authorize',

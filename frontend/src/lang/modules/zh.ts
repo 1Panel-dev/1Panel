@@ -1568,7 +1568,7 @@ const message = {
         Lost: '已失联',
         Enable: '已激活',
         Disable: '未激活',
-        lostHelper: '许可证需要定时同步是否可用，请保证正常外网访问。',
+        lostHelper: '许可证已达到最大重试次数，请手动点击同步按钮，以确保专业版功能正常使用。',
         quickUpdate: '快速更新',
         import: '导入',
         power: '授 权',

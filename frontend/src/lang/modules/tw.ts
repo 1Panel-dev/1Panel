@@ -1567,7 +1567,7 @@ const message = {
         Lost: '已失聯',
         Enable: '已啟用',
         Disable: '未啟用',
-        lostHelper: '許可證需要定時同步是否可用，請保證正常外網訪問。',
+        lostHelper: '許可證已達到最大重試次數，請手動點擊同步按鈕，以確保專業版功能正常使用。',
         quickUpdate: '快速更新',
         import: '導入',
         power: '授 權',
