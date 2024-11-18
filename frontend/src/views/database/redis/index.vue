@@ -223,14 +223,12 @@ const goRouter = async (target: string) => {
 };
 
 const changeDatabase = async () => {
-    if (currentDB.value.from === 'local') {
-        appStatusRef.value.onCheck();
-    }
     for (const item of dbOptionsLocal.value) {
         if (item.database == currentDBName.value) {
             currentDB.value = item;
             appKey.value = item.type;
             appName.value = item.database;
+            appStatusRef.value?.onCheck(appKey.value, appName.value);
             reOpenTerminal();
             return;
         }

@@ -159,8 +159,8 @@ const isDB = () => {
     return key.value === 'mysql' || key.value === 'mariadb' || key.value === 'postgresql';
 };
 
-const onCheck = async () => {
-    await CheckAppInstalled(key.value, name.value)
+const onCheck = async (key: any, name: any) => {
+    await CheckAppInstalled(key, name)
         .then((res) => {
             data.value = res.data;
             em('isExist', res.data);
@@ -206,7 +206,7 @@ const onOperate = async (operation: string) => {
                 .then(() => {
                     em('update:loading', false);
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                    onCheck();
+                    onCheck(key.value, name.value);
                     em('after');
                 })
                 .catch(() => {
@@ -234,7 +234,7 @@ const getTitle = (key: string) => {
 onMounted(() => {
     key.value = props.appKey;
     name.value = props.appName;
-    onCheck();
+    onCheck(key.value, name.value);
 });
 
 defineExpose({

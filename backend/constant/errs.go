@@ -47,6 +47,7 @@ var (
 	ErrXpackNotFound       = "ErrXpackNotFound"
 	ErrXpackNotActive      = "ErrXpackNotActive"
 	ErrXpackLost           = "ErrXpackLost"
+	ErrXpackTimeout        = "ErrXpackTimeout"
 	ErrXpackOutOfDate      = "ErrXpackOutOfDate"
 )
 
