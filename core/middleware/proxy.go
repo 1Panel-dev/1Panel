@@ -20,6 +20,10 @@ func Proxy() gin.HandlerFunc {
 			c.Next()
 			return
 		}
+		if !strings.HasPrefix(c.Request.URL.Path, "/api/v2") {
+			c.Next()
+			return
+		}
 		currentNode := c.Request.Header.Get("CurrentNode")
 		if len(currentNode) != 0 && currentNode != "127.0.0.1" {
 			if err := xpack.Proxy(c, currentNode); err != nil {
