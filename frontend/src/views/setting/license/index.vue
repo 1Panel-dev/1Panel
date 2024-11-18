@@ -250,7 +250,7 @@ onMounted(() => {
     margin-right: 10px;
     line-height: 18px;
     &:hover {
-        background-color: rgba(0, 94, 235, 0.03);
+        background-color: var(--panel-main-bg-color-8);
     }
 }
 :deep(.license-card .el-card) {

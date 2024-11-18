@@ -140,7 +140,7 @@ html.dark {
     }
 
     .el-overlay {
-        background-color: #2E313D90;
+        background-color: rgb(46 49 61 / 80%);
     }
 
     .el-tag.el-tag--primary {
@@ -159,7 +159,7 @@ html.dark {
     }
 
     .el-loading-mask {
-        background-color:var(--panel-main-bg-color-10);
+        background-color: #24263375;
     }
 
     .el-input {
@@ -244,9 +244,12 @@ html.dark {
     }
 
     .el-button--primary:active {
-        --el-button-hover-text-color: var(--panel-text-color-white);
+        --el-button-hover-text-color: var(--panel-main-bg-color-7);
         --el-button-active-bg-color: var(--el-color-primary-light-3);
         --el-button-active-border-color: var(--el-color-primary-light-3);
+    }
+    .el-button--primary.is-plain:active {
+        color: var(--panel-main-bg-color-10);
     }
 
     .el-button:focus-visible {
@@ -442,5 +445,13 @@ html.dark {
     .el-collapse-item__header {
         color: #ffffff;
         background-color: var(--panel-main-bg-color-10) !important;
+    }
+
+    .el-checkbox__input.is-checked .el-checkbox__inner::after {
+        border-color: var(--panel-main-bg-color-10);
+    }
+
+    .el-checkbox__input.is-indeterminate .el-checkbox__inner::before {
+        background-color: var(--panel-main-bg-color-10);
     }
 }
