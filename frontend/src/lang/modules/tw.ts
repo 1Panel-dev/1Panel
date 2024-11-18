@@ -1568,6 +1568,7 @@ const message = {
         Enable: '已啟用',
         Disable: '未啟用',
         lostHelper: '許可證已達到最大重試次數，請手動點擊同步按鈕，以確保專業版功能正常使用。',
+        disableHelper: '許可證同步驗證失敗，請手動點擊同步按鈕，以確保專業版功能正常使用。',
         quickUpdate: '快速更新',
         import: '導入',
         power: '授 權',

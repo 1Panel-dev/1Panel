@@ -43,11 +43,7 @@
                                 </el-descriptions-item>
                                 <el-descriptions-item :label="$t('license.productStatus')">
                                     <div v-if="license.status">
-                                        <el-tooltip
-                                            v-if="license.status.indexOf('Lost') !== -1"
-                                            :content="license.message"
-                                            placement="top"
-                                        >
+                                        <el-tooltip v-if="license.message" :content="license.message" placement="top">
                                             <el-tag type="info">
                                                 {{ $t('license.' + license.status) }}
                                             </el-tag>
@@ -57,7 +53,7 @@
                                     <span v-else>-</span>
                                 </el-descriptions-item>
                                 <el-descriptions-item class="descriptions" :label="$t('commons.table.message')">
-                                    {{ showSync() ? $t('license.lostHelper') : '' }}
+                                    {{ showSync() ? loadInfo() : '' }}
                                 </el-descriptions-item>
                             </el-descriptions>
                         </div>
@@ -144,6 +140,10 @@ const license = reactive({
 
 const toHalo = () => {
     window.open('https://www.lxware.cn/1panel' + '', '_blank', 'noopener,noreferrer');
+};
+
+const loadInfo = () => {
+    return license.status === 'Lost' ? i18n.global.t('license.lostHelper') : i18n.global.t('license.disableHelper');
 };
 
 const onSync = async () => {

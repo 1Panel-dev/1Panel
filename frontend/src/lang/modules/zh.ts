@@ -1569,6 +1569,7 @@ const message = {
         Enable: '已激活',
         Disable: '未激活',
         lostHelper: '许可证已达到最大重试次数，请手动点击同步按钮，以确保专业版功能正常使用。',
+        disableHelper: '许可证同步验证失败，请手动点击同步按钮，以确保专业版功能正常使用。',
         quickUpdate: '快速更新',
         import: '导入',
         power: '授 权',

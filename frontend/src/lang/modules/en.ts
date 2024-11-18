@@ -1691,6 +1691,8 @@ const message = {
         Disable: 'Disabled',
         lostHelper:
             'The license has reached the maximum number of retry attempts. Please manually click the sync button to ensure the professional version features are functioning properly.',
+        disableHelper:
+            'License synchronization verification failed. Please manually click the sync button to ensure that the professional version features are functioning properly.',
         quickUpdate: 'Quick Update',
         import: 'Import',
         power: 'Authorize',
