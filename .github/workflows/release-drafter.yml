@@ -12,6 +12,15 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            ~/.cache
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-1panel-build-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-1panel-build-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -29,7 +38,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
-          version: '~> v2'
+          version: 'v2.4.5'
           args: release --skip=publish --clean
       - name: Upload Assets
         uses: softprops/action-gh-release@v1
