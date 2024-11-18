@@ -34,6 +34,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.23'
+          cache: 'false'
       - name: Build Release
         uses: goreleaser/goreleaser-action@v6
         with:
