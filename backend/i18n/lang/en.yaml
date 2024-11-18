@@ -201,6 +201,7 @@ ErrLicenseSync: "Failed to sync license information, no license information dete
 ErrXpackNotFound: "This section is a professional edition feature, please import the license first in Panel Settings-License interface"
 ErrXpackNotActive: "This section is a professional edition feature, please synchronize the license status first in Panel Settings-License interface"
 ErrXpackOutOfDate: "The current license has expired, please re-import the license in Panel Settings-License interface"
+ErrXpackLost: "The license has reached the maximum number of retry attempts. Please go to the [Settings] [License] page and manually click the sync button to ensure that the professional version features are functioning properly."
 ErrXpackTimeout: "Request timed out, the network connection may be unstable, please try again later!"
 
 

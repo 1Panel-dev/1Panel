@@ -46,6 +46,7 @@ var (
 	ErrCmdIllegal          = "ErrCmdIllegal"
 	ErrXpackNotFound       = "ErrXpackNotFound"
 	ErrXpackNotActive      = "ErrXpackNotActive"
+	ErrXpackLost           = "ErrXpackLost"
 	ErrXpackOutOfDate      = "ErrXpackOutOfDate"
 )
 

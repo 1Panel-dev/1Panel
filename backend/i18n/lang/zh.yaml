@@ -204,6 +204,7 @@ ErrLicenseSync: "许可证信息同步失败，数据库中未检测到许可证
 ErrXpackNotFound: "该部分为专业版功能，请先在 面板设置-许可证 界面导入许可证"
 ErrXpackNotActive: "该部分为专业版功能，请先在 面板设置-许可证 界面同步许可证状态"
 ErrXpackOutOfDate: "当前许可证已过期，请重新在 面板设置-许可证 界面导入许可证"
+ErrXpackLost: "许可证已达到最大重试次数，请进入【面板设置】【许可证】页面手动点击同步按钮，以确保专业版功能正常使用"
 ErrXpackTimeout: "请求超时，网络连接可能不稳定，请稍后再试！"
 
 #license
