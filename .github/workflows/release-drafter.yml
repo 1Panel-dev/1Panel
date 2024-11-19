@@ -39,7 +39,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
-          version: 'v2.4.5'
+          version: '~> v2'
           args: release --skip=publish --clean
       - name: Upload Assets
         uses: softprops/action-gh-release@v1
