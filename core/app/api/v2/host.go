@@ -277,12 +277,12 @@ func (b *BaseApi) WsSsh(c *gin.Context) {
 		connInfo.PassPhrase = []byte(host.PassPhrase)
 	}
 
-	client, err := connInfo.NewClient()
+	client, err := ssh.NewClient(connInfo)
 	if wshandleError(wsConn, errors.WithMessage(err, "failed to set up the connection. Please check the host information")) {
 		return
 	}
 	defer client.Close()
-	sws, err := terminal.NewLogicSshWsSession(cols, rows, true, connInfo.Client, wsConn)
+	sws, err := terminal.NewLogicSshWsSession(cols, rows, true, client.Client, wsConn)
 	if wshandleError(wsConn, err) {
 		return
 	}

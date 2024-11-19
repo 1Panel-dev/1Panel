@@ -1,8 +1,8 @@
 package constant
 
 const (
-	StatusSuccess = "Success"
-	StatusFailed  = "Failed"
+	StatusSuccess = "success"
+	StatusFailed  = "failed"
 
 	// node
 	StatusWaiting     = "waiting"

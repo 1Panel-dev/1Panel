@@ -65,7 +65,7 @@ func (u *HostService) TestByInfo(req dto.HostConnTest) bool {
 	if len(req.PassPhrase) != 0 {
 		connInfo.PassPhrase = []byte(req.PassPhrase)
 	}
-	client, err := connInfo.NewClient()
+	client, err := ssh.NewClient(connInfo)
 	if err != nil {
 		return false
 	}
@@ -114,7 +114,7 @@ func (u *HostService) TestLocalConn(id uint) bool {
 		}
 		connInfo.PassPhrase = []byte(host.PassPhrase)
 	}
-	client, err := connInfo.NewClient()
+	client, err := ssh.NewClient(connInfo)
 	if err != nil {
 		return false
 	}

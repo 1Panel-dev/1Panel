@@ -20,13 +20,13 @@ type ConnInfo struct {
 	PrivateKey  []byte        `json:"privateKey"`
 	PassPhrase  []byte        `json:"passPhrase"`
 	DialTimeOut time.Duration `json:"dialTimeOut"`
-
-	Client     *gossh.Client  `json:"client"`
-	Session    *gossh.Session `json:"session"`
-	LastResult string         `json:"lastResult"`
 }
 
-func (c *ConnInfo) NewClient() (*ConnInfo, error) {
+type SSHClient struct {
+	Client *gossh.Client `json:"client"`
+}
+
+func NewClient(c ConnInfo) (*SSHClient, error) {
 	if strings.Contains(c.Addr, ":") {
 		c.Addr = fmt.Sprintf("[%s]", c.Addr)
 	}
@@ -55,18 +55,12 @@ func (c *ConnInfo) NewClient() (*ConnInfo, error) {
 	}
 	client, err := gossh.Dial(proto, addr, config)
 	if nil != err {
-		return c, err
+		return nil, err
 	}
-	c.Client = client
-	return c, nil
+	return &SSHClient{Client: client}, nil
 }
 
-func (c *ConnInfo) Run(shell string) (string, error) {
-	if c.Client == nil {
-		if _, err := c.NewClient(); err != nil {
-			return "", err
-		}
-	}
+func (c *SSHClient) Run(shell string) (string, error) {
 	session, err := c.Client.NewSession()
 	if err != nil {
 		return "", err
@@ -74,11 +68,10 @@ func (c *ConnInfo) Run(shell string) (string, error) {
 	defer session.Close()
 	buf, err := session.CombinedOutput(shell)
 
-	c.LastResult = string(buf)
-	return c.LastResult, err
+	return string(buf), err
 }
 
-func (c *ConnInfo) Close() {
+func (c *SSHClient) Close() {
 	_ = c.Client.Close()
 }
 
@@ -88,7 +81,7 @@ type SshConn struct {
 	Session     *gossh.Session
 }
 
-func (c *ConnInfo) NewSshConn(cols, rows int) (*SshConn, error) {
+func (c *SSHClient) NewSshConn(cols, rows int) (*SshConn, error) {
 	sshSession, err := c.Client.NewSession()
 	if err != nil {
 		return nil, err
