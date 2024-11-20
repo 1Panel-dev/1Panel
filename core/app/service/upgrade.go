@@ -83,8 +83,10 @@ func (u *UpgradeService) LoadNotes(req dto.Upgrade) (string, error) {
 func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 	global.LOG.Info("start to upgrade now...")
 	timeStr := time.Now().Format(constant.DateTimeSlimLayout)
-	rootDir := path.Join(global.CONF.System.BaseDir, fmt.Sprintf("1panel/tmp/upgrade/upgrade_%s/downloads", timeStr))
-	originalDir := path.Join(global.CONF.System.BaseDir, fmt.Sprintf("1panel/tmp/upgrade/upgrade_%s/original", timeStr))
+	baseDir := path.Join(global.CONF.System.BaseDir, fmt.Sprintf("1panel/tmp/upgrade/%s", req.Version))
+	rootDir := path.Join(baseDir, fmt.Sprintf("upgrade_%s/downloads", timeStr))
+	_ = os.RemoveAll(baseDir)
+	originalDir := path.Join(baseDir, fmt.Sprintf("upgrade_%s/original", timeStr))
 	if err := os.MkdirAll(rootDir, os.ModePerm); err != nil {
 		return err
 	}
@@ -127,13 +129,13 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 		}
 		global.LOG.Info("backup original data successful, now start to upgrade!")
 
-		if err := files.CopyFile(path.Join(tmpDir, "1panel"), "/usr/local/bin", false); err != nil {
+		if err := files.CopyItem(false, true, path.Join(tmpDir, "1panel*"), "/usr/local/bin"); err != nil {
 			global.LOG.Errorf("upgrade 1panel failed, err: %v", err)
 			u.handleRollback(originalDir, 1)
 			return
 		}
 
-		if err := files.CopyFile(path.Join(tmpDir, "1pctl"), "/usr/local/bin", false); err != nil {
+		if err := files.CopyItem(false, true, path.Join(tmpDir, "1pctl"), "/usr/local/bin"); err != nil {
 			global.LOG.Errorf("upgrade 1pctl failed, err: %v", err)
 			u.handleRollback(originalDir, 2)
 			return
@@ -144,7 +146,7 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 			return
 		}
 
-		if err := files.CopyFile(path.Join(tmpDir, "1panel.service"), "/etc/systemd/system", false); err != nil {
+		if err := files.CopyItem(false, true, path.Join(tmpDir, "1panel*.service"), "/etc/systemd/system"); err != nil {
 			global.LOG.Errorf("upgrade 1panel.service failed, err: %v", err)
 			u.handleRollback(originalDir, 3)
 			return
@@ -154,24 +156,22 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 		go writeLogs(req.Version)
 		_ = settingRepo.Update("SystemVersion", req.Version)
 		_ = settingRepo.Update("SystemStatus", "Free")
-		checkPointOfWal()
 		_, _ = cmd.ExecWithTimeOut("systemctl daemon-reload && systemctl restart 1panel.service", 1*time.Minute)
 	}()
 	return nil
 }
 
 func (u *UpgradeService) handleBackup(originalDir string) error {
-	if err := files.CopyFile("/usr/local/bin/1panel", originalDir, false); err != nil {
+	if err := files.CopyItem(false, true, "/usr/local/bin/1panel*", originalDir); err != nil {
 		return err
 	}
-	if err := files.CopyFile("/usr/local/bin/1pctl", originalDir, false); err != nil {
+	if err := files.CopyItem(false, true, "/usr/local/bin/1pctl", originalDir); err != nil {
 		return err
 	}
-	if err := files.CopyFile("/etc/systemd/system/1panel.service", originalDir, false); err != nil {
+	if err := files.CopyItem(false, true, "/etc/systemd/system/1panel*.service", originalDir); err != nil {
 		return err
 	}
-	checkPointOfWal()
-	if err := files.HandleTar(path.Join(global.CONF.System.BaseDir, "1panel/db"), originalDir, "db.tar.gz", "db/1Panel.db-*", ""); err != nil {
+	if err := files.CopyItem(true, true, path.Join(global.CONF.System.BaseDir, "1panel/db"), originalDir); err != nil {
 		return err
 	}
 	return nil
@@ -180,31 +180,25 @@ func (u *UpgradeService) handleBackup(originalDir string) error {
 func (u *UpgradeService) handleRollback(originalDir string, errStep int) {
 	_ = settingRepo.Update("SystemStatus", "Free")
 
-	checkPointOfWal()
 	dbPath := path.Join(global.CONF.System.BaseDir, "1panel/db")
-	if _, err := os.Stat(path.Join(originalDir, "1Panel.db")); err == nil {
-		if err := files.CopyFile(path.Join(originalDir, "1Panel.db"), dbPath, false); err != nil {
+	if _, err := os.Stat(path.Join(originalDir, "db")); err == nil {
+		if err := files.CopyItem(true, true, path.Join(originalDir, "db"), dbPath); err != nil {
 			global.LOG.Errorf("rollback 1panel db failed, err: %v", err)
 		}
 	}
-	if _, err := os.Stat(path.Join(originalDir, "db.tar.gz")); err == nil {
-		if err := files.HandleUnTar(path.Join(originalDir, "db.tar.gz"), dbPath, ""); err != nil {
-			global.LOG.Errorf("rollback 1panel db failed, err: %v", err)
-		}
-	}
-	if err := files.CopyFile(path.Join(originalDir, "1panel"), "/usr/local/bin", false); err != nil {
+	if err := files.CopyItem(false, true, path.Join(originalDir, "1panel*"), "/usr/local/bin"); err != nil {
 		global.LOG.Errorf("rollback 1pctl failed, err: %v", err)
 	}
 	if errStep == 1 {
 		return
 	}
-	if err := files.CopyFile(path.Join(originalDir, "1pctl"), "/usr/local/bin", false); err != nil {
+	if err := files.CopyItem(false, true, path.Join(originalDir, "1pctl"), "/usr/local/bin"); err != nil {
 		global.LOG.Errorf("rollback 1panel failed, err: %v", err)
 	}
 	if errStep == 2 {
 		return
 	}
-	if err := files.CopyFile(path.Join(originalDir, "1panel.service"), "/etc/systemd/system", false); err != nil {
+	if err := files.CopyItem(false, true, path.Join(originalDir, "1panel*.service"), "/etc/systemd/system"); err != nil {
 		global.LOG.Errorf("rollback 1panel failed, err: %v", err)
 	}
 }
@@ -344,10 +338,4 @@ func loadArch() (string, error) {
 		return "s390x", nil
 	}
 	return "", fmt.Errorf("unsupported such arch: %s", std)
-}
-
-func checkPointOfWal() {
-	if err := global.DB.Exec("PRAGMA wal_checkpoint(TRUNCATE);").Error; err != nil {
-		global.LOG.Errorf("handle check point failed, err: %v", err)
-	}
 }

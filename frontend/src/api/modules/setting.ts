@@ -130,11 +130,11 @@ export const loadSnapshotSize = (param: SearchWithPage) => {
 
 // upgrade
 export const loadUpgradeInfo = () => {
-    return http.get<Setting.UpgradeInfo>(`/settings/upgrade`);
+    return http.get<Setting.UpgradeInfo>(`/core/settings/upgrade`);
 };
 export const loadReleaseNotes = (version: string) => {
-    return http.post<string>(`/settings/upgrade/notes`, { version: version });
+    return http.post<string>(`/core/settings/upgrade/notes`, { version: version });
 };
 export const upgrade = (version: string) => {
-    return http.post(`/settings/upgrade`, { version: version });
+    return http.post(`/core/settings/upgrade`, { version: version });
 };
