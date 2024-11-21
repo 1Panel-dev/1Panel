@@ -58,6 +58,10 @@ export namespace Setting {
         proxyUser: string;
         proxyPasswd: string;
         proxyPasswdKeep: string;
+
+        apiInterfaceStatus: string;
+        apiKey: string;
+        ipWhiteList: string;
     }
     export interface SettingUpdate {
         key: string;
@@ -185,5 +189,10 @@ export namespace Setting {
         productPro: string;
         trial: boolean;
         status: string;
+    }
+    export interface ApiConfig {
+        apiInterfaceStatus: string;
+        apiKey: string;
+        ipWhiteList: string;
     }
 }

@@ -8,6 +8,10 @@ ErrStructTransform: "类型转换失败: {{ .detail }}"
 ErrNotLogin: "用户未登录: {{ .detail }}"
 ErrPasswordExpired: "当前密码已过期: {{ .detail }}"
 ErrNotSupportType: "系统暂不支持当前类型: {{ .detail }}"
+ErrApiConfigStatusInvalid: "API 接口禁止访问: {{ .detail }}"
+ErrApiConfigKeyInvalid: "API 接口密钥错误: {{ .detail }}"
+ErrApiConfigIPInvalid: "调用 API 接口 IP 不在白名单: {{ .detail }}"
+ErrApiConfigDisable: "此接口禁止使用 API 接口调用: {{ .detail }}"
 
 #common
 ErrNameIsExist: "名称已存在"

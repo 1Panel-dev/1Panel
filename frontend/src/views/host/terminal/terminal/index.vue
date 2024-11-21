@@ -433,6 +433,7 @@ onMounted(() => {
         padding: 0;
     }
     :deep(.el-tabs__item.is-active) {
+        color: var(--panel-terminal-tag-active-text-color);
         background-color: var(--panel-terminal-tag-active-bg-color);
     }
 }

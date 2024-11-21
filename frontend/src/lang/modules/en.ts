@@ -1401,11 +1401,28 @@ const message = {
         proxyPort: 'Proxy Port',
         proxyPasswdKeep: 'Remember Password',
         proxyDocker: 'Docker Proxy',
-        ProxyDockerHelper:
+        proxyDockerHelper:
             'Synchronize proxy server configuration to Docker, support offline server image pulling and other operations',
-        ConfDockerProxy: 'Configure Docker Proxy',
-        RestartNowHelper: 'Configuring Docker proxy requires restarting the Docker service.',
-        RestartNow: 'Restart immediately',
+        apiInterface: 'API Interface',
+        apiInterfaceClose: 'Once closed, API interfaces cannot be accessed. Do you want to continue?',
+        apiInterfaceHelper: 'Provide panel support for API interface access',
+        apiInterfaceAlert1:
+            'Please do not enable it in production environments as it may increase server security risks',
+        apiInterfaceAlert2:
+            'Please do not use third-party applications to call the panel API to prevent potential security threats.',
+        apiInterfaceAlert3: 'API Interface Document:',
+        apiInterfaceAlert4: 'Usage Document:',
+        apiKey: 'Interface Key',
+        apiKeyHelper: 'Interface key is used for external applications to access API interfaces',
+        ipWhiteList: 'IP Whitelist',
+        ipWhiteListEgs:
+            'When there are multiple IPs, line breaks are required for display, for example:  \n172.161.10.111  \n172.161.10.0/24 ',
+        ipWhiteListHelper: 'IPs must be in the IP whitelist list to access the panel API interface',
+        apiKeyReset: 'Interface key reset',
+        apiKeyResetHelper: 'the associated key service will become invalid. Please add a new key to the service',
+        confDockerProxy: 'Configure Docker Proxy',
+        restartNowHelper: 'Configuring Docker proxy requires restarting the Docker service.',
+        restartNow: 'Restart immediately',
         systemIPWarning: 'The server address is not currently set. Please set it in the control panel first!',
         systemIPWarning1: 'The current server address is set to {0}, and quick redirection is not possible!',
         defaultNetwork: 'Network Card',

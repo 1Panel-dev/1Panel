@@ -64,5 +64,7 @@ func (s *SettingRouter) InitRouter(Router *gin.RouterGroup) {
 		settingRouter.POST("/upgrade/notes", baseApi.GetNotesByVersion)
 		settingRouter.GET("/upgrade", baseApi.GetUpgradeInfo)
 		settingRouter.GET("/basedir", baseApi.LoadBaseDir)
+		settingRouter.POST("/api/config/generate/key", baseApi.GenerateApiKey)
+		settingRouter.POST("/api/config/update", baseApi.UpdateApiConfig)
 	}
 }

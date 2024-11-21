@@ -210,3 +210,11 @@ export const loadReleaseNotes = (version: string) => {
 export const upgrade = (version: string) => {
     return http.post(`/settings/upgrade`, { version: version });
 };
+
+// api config
+export const generateApiKey = () => {
+    return http.post<string>(`/settings/api/config/generate/key`);
+};
+export const updateApiConfig = (param: Setting.ApiConfig) => {
+    return http.post(`/settings/api/config/update`, param);
+};

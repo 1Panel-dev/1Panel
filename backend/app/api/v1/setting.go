@@ -342,3 +342,52 @@ func (b *BaseApi) MFABind(c *gin.Context) {
 
 	helper.SuccessWithData(c, nil)
 }
+
+// @Tags System Setting
+// @Summary generate api key
+// @Description 生成 API 接口密钥
+// @Accept json
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /settings/api/config/generate/key [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"生成 API 接口密钥","formatEN":"generate api key"}
+func (b *BaseApi) GenerateApiKey(c *gin.Context) {
+	panelToken := c.GetHeader("1Panel-Token")
+	if panelToken != "" {
+		helper.ErrorWithDetail(c, constant.CodeErrUnauthorized, constant.ErrApiConfigDisable, nil)
+		return
+	}
+	apiKey, err := settingService.GenerateApiKey()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, apiKey)
+}
+
+// @Tags System Setting
+// @Summary Update api config
+// @Description 更新 API 接口配置
+// @Accept json
+// @Param request body dto.ApiInterfaceConfig true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /settings/api/config/update [post]
+// @x-panel-log {"bodyKeys":["ipWhiteList"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新 API 接口配置 => IP 白名单: [ipWhiteList]","formatEN":"update api config => IP White List: [ipWhiteList]"}
+func (b *BaseApi) UpdateApiConfig(c *gin.Context) {
+	panelToken := c.GetHeader("1Panel-Token")
+	if panelToken != "" {
+		helper.ErrorWithDetail(c, constant.CodeErrUnauthorized, constant.ErrApiConfigDisable, nil)
+		return
+	}
+	var req dto.ApiInterfaceConfig
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := settingService.UpdateApiConfig(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}

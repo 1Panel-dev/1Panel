@@ -28,6 +28,15 @@ definitions:
       oldRule:
         $ref: '#/definitions/dto.AddrRuleOperate'
     type: object
+  dto.ApiInterfaceConfig:
+    properties:
+      apiInterfaceStatus:
+        type: string
+      apiKey:
+        type: string
+      ipWhiteList:
+        type: string
+    type: object
   dto.AppInstallInfo:
     properties:
       id:
@@ -2951,6 +2960,10 @@ definitions:
     properties:
       allowIPs:
         type: string
+      apiInterfaceStatus:
+        type: string
+      apiKey:
+        type: string
       appStoreLastModified:
         type: string
       appStoreSyncStatus:
@@ -2982,6 +2995,8 @@ definitions:
       expirationTime:
         type: string
       fileRecycleBin:
+        type: string
+      ipWhiteList:
         type: string
       ipv6:
         type: string
@@ -5624,7 +5639,6 @@ definitions:
       version:
         type: string
     type: object
-host: localhost
 info:
   contact: {}
   description: 开源Linux面板
@@ -6179,15 +6193,6 @@ paths:
         "200":
           description: OK
       summary: Check System isDemo
-      tags:
-      - Auth
-  /auth/issafety:
-    get:
-      description: 获取系统安全登录状态
-      responses:
-        "200":
-          description: OK
-      summary: Load safety status
       tags:
       - Auth
   /auth/language:
@@ -11638,6 +11643,52 @@ paths:
         formatEN: Update runtime [name]
         formatZH: 更新运行环境 [name]
         paramKeys: []
+  /settings/api/config/generate/key:
+    post:
+      consumes:
+      - application/json
+      description: 生成 API 接口密钥
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: generate api key
+      tags:
+      - System Setting
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys: []
+        formatEN: generate api key
+        formatZH: 生成 API 接口密钥
+        paramKeys: []
+  /settings/api/config/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新 API 接口配置
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ApiInterfaceConfig'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Update api config
+      tags:
+      - System Setting
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - ipWhiteList
+        formatEN: 'update api config => IP White List: [ipWhiteList]'
+        formatZH: '更新 API 接口配置 => IP 白名单: [ipWhiteList]'
+        paramKeys: []
   /settings/backup:
     post:
       consumes:
@@ -15292,4 +15343,26 @@ paths:
         formatEN: Update website [primaryDomain]
         formatZH: 更新网站 [primaryDomain]
         paramKeys: []
+schemes:
+- http
+- https
+securityDefinitions:
+  CustomToken:
+    description: |-
+      自定义 Token 格式，格式：md5('1panel' + 1Panel-Token + 1Panel-Timestamp)。
+      ```
+      示例请求头：
+      curl -X GET "http://localhost:4004/api/v1/resource" \
+      -H "1Panel-Token: <1panel_token>" \
+      -H "1Panel-Timestamp: <current_unix_timestamp>"
+      ```
+      - `1Panel-Token` 为面板 API 接口密钥。
+    in: Header
+    name: 1Panel-Token
+    type: apiKey
+  Timestamp:
+    description: '- `1Panel-Timestamp` 为当前时间的 Unix 时间戳（单位：秒）。'
+    in: header
+    name: 1Panel-Timestamp
+    type: apiKey
 swagger: "2.0"

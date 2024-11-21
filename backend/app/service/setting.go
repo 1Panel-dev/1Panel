@@ -40,6 +40,8 @@ type ISettingService interface {
 	UpdateSSL(c *gin.Context, req dto.SSLUpdate) error
 	LoadFromCert() (*dto.SSLInfo, error)
 	HandlePasswordExpired(c *gin.Context, old, new string) error
+	GenerateApiKey() (string, error)
+	UpdateApiConfig(req dto.ApiInterfaceConfig) error
 }
 
 func NewISettingService() ISettingService {
@@ -483,5 +485,30 @@ func checkCertValid() error {
 		return err
 	}
 
+	return nil
+}
+
+func (u *SettingService) GenerateApiKey() (string, error) {
+	apiKey := common.RandStr(32)
+	if err := settingRepo.Update("ApiKey", apiKey); err != nil {
+		return global.CONF.System.ApiKey, err
+	}
+	global.CONF.System.ApiKey = apiKey
+	return apiKey, nil
+}
+
+func (u *SettingService) UpdateApiConfig(req dto.ApiInterfaceConfig) error {
+	if err := settingRepo.Update("ApiInterfaceStatus", req.ApiInterfaceStatus); err != nil {
+		return err
+	}
+	global.CONF.System.ApiInterfaceStatus = req.ApiInterfaceStatus
+	if err := settingRepo.Update("ApiKey", req.ApiKey); err != nil {
+		return err
+	}
+	global.CONF.System.ApiKey = req.ApiKey
+	if err := settingRepo.Update("IpWhiteList", req.IpWhiteList); err != nil {
+		return err
+	}
+	global.CONF.System.IpWhiteList = req.IpWhiteList
 	return nil
 }

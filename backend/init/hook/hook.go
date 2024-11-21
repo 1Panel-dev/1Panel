@@ -61,6 +61,24 @@ func Init() {
 		global.LOG.Fatalf("init service before start failed, err: %v", err)
 	}
 
+	apiInterfaceStatusSetting, err := settingRepo.Get(settingRepo.WithByKey("ApiInterfaceStatus"))
+	if err != nil {
+		global.LOG.Errorf("load service api interface from setting failed, err: %v", err)
+	}
+	global.CONF.System.ApiInterfaceStatus = apiInterfaceStatusSetting.Value
+	if apiInterfaceStatusSetting.Value == "enable" {
+		apiKeySetting, err := settingRepo.Get(settingRepo.WithByKey("ApiKey"))
+		if err != nil {
+			global.LOG.Errorf("load service api key from setting failed, err: %v", err)
+		}
+		global.CONF.System.ApiKey = apiKeySetting.Value
+		ipWhiteListSetting, err := settingRepo.Get(settingRepo.WithByKey("IpWhiteList"))
+		if err != nil {
+			global.LOG.Errorf("load service ip white list from setting failed, err: %v", err)
+		}
+		global.CONF.System.IpWhiteList = ipWhiteListSetting.Value
+	}
+
 	handleUserInfo(global.CONF.System.ChangeUserInfo, settingRepo)
 
 	handleCronjobStatus()

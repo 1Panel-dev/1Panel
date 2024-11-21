@@ -160,3 +160,8 @@ defineExpose({
     acceptParams,
 });
 </script>
+<style scoped>
+:deep(.log-container) {
+    background-color: var(--panel-main-bg-color-10);
+}
+</style>

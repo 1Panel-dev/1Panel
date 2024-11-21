@@ -37,18 +37,22 @@ var (
 
 // api
 var (
-	ErrTypeInternalServer  = "ErrInternalServer"
-	ErrTypeInvalidParams   = "ErrInvalidParams"
-	ErrTypeNotLogin        = "ErrNotLogin"
-	ErrTypePasswordExpired = "ErrPasswordExpired"
-	ErrNameIsExist         = "ErrNameIsExist"
-	ErrDemoEnvironment     = "ErrDemoEnvironment"
-	ErrCmdIllegal          = "ErrCmdIllegal"
-	ErrXpackNotFound       = "ErrXpackNotFound"
-	ErrXpackNotActive      = "ErrXpackNotActive"
-	ErrXpackLost           = "ErrXpackLost"
-	ErrXpackTimeout        = "ErrXpackTimeout"
-	ErrXpackOutOfDate      = "ErrXpackOutOfDate"
+	ErrTypeInternalServer     = "ErrInternalServer"
+	ErrTypeInvalidParams      = "ErrInvalidParams"
+	ErrTypeNotLogin           = "ErrNotLogin"
+	ErrTypePasswordExpired    = "ErrPasswordExpired"
+	ErrNameIsExist            = "ErrNameIsExist"
+	ErrDemoEnvironment        = "ErrDemoEnvironment"
+	ErrCmdIllegal             = "ErrCmdIllegal"
+	ErrXpackNotFound          = "ErrXpackNotFound"
+	ErrXpackNotActive         = "ErrXpackNotActive"
+	ErrXpackLost              = "ErrXpackLost"
+	ErrXpackTimeout           = "ErrXpackTimeout"
+	ErrXpackOutOfDate         = "ErrXpackOutOfDate"
+	ErrApiConfigStatusInvalid = "ErrApiConfigStatusInvalid"
+	ErrApiConfigKeyInvalid    = "ErrApiConfigKeyInvalid"
+	ErrApiConfigIPInvalid     = "ErrApiConfigIPInvalid"
+	ErrApiConfigDisable       = "ErrApiConfigDisable"
 )
 
 // app

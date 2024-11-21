@@ -66,6 +66,10 @@ type SettingInfo struct {
 	ProxyUser       string `json:"proxyUser"`
 	ProxyPasswd     string `json:"proxyPasswd"`
 	ProxyPasswdKeep string `json:"proxyPasswdKeep"`
+
+	ApiInterfaceStatus string `json:"apiInterfaceStatus"`
+	ApiKey             string `json:"apiKey"`
+	IpWhiteList        string `json:"ipWhiteList"`
 }
 
 type SettingUpdate struct {
@@ -230,4 +234,10 @@ type XpackHideMenu struct {
 	Title    string          `json:"title"`
 	Path     string          `json:"path,omitempty"`
 	Children []XpackHideMenu `json:"children,omitempty"`
+}
+
+type ApiInterfaceConfig struct {
+	ApiInterfaceStatus string `json:"apiInterfaceStatus"`
+	ApiKey             string `json:"apiKey"`
+	IpWhiteList        string `json:"ipWhiteList"`
 }

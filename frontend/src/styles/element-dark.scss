@@ -88,7 +88,7 @@ html.dark {
     --panel-border-color: var(--panel-main-bg-color-8);
     --panel-button-active: var(--panel-main-bg-color-10);
     --panel-button-text-color: var(--panel-main-bg-color-10);
-    --panel-button-bg-color:  var(--panel-color-primary);
+    --panel-button-bg-color: var(--panel-color-primary);
     --panel-footer-bg: var(--panel-main-bg-color-9);
     --panel-footer-border: var(--panel-main-bg-color-7);
     --panel-text-color: var(--panel-main-bg-color-1);
@@ -96,6 +96,7 @@ html.dark {
     --panel-terminal-tag-bg-color: var(--panel-main-bg-color-10);
     --panel-terminal-tag-active-bg-color: var(--panel-main-bg-color-10);
     --panel-terminal-bg-color: var(--panel-main-bg-color-10);
+    --panel-terminal-tag-active-text-color: var(--panel-color-primary);
     --panel-logs-bg-color: var(--panel-main-bg-color-9);
 
     --el-menu-item-bg-color: var(--panel-main-bg-color-10);

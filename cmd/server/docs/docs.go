@@ -887,20 +887,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/issafety": {
-            "get": {
-                "description": "获取系统安全登录状态",
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Load safety status",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
-            }
-        },
         "/auth/language": {
             "get": {
                 "description": "获取系统语言设置",
@@ -9507,6 +9493,77 @@ const docTemplate = `{
                 }
             }
         },
+        "/settings/api/config/generate/key": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "生成 API 接口密钥",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System Setting"
+                ],
+                "summary": "generate api key",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [],
+                    "formatEN": "generate api key",
+                    "formatZH": "生成 API 接口密钥",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/settings/api/config/update": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "更新 API 接口配置",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System Setting"
+                ],
+                "summary": "Update api config",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ApiInterfaceConfig"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [
+                        "ipWhiteList"
+                    ],
+                    "formatEN": "update api config =\u003e IP White List: [ipWhiteList]",
+                    "formatZH": "更新 API 接口配置 =\u003e IP 白名单: [ipWhiteList]",
+                    "paramKeys": []
+                }
+            }
+        },
         "/settings/backup": {
             "post": {
                 "security": [
@@ -15310,6 +15367,20 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.ApiInterfaceConfig": {
+            "type": "object",
+            "properties": {
+                "apiInterfaceStatus": {
+                    "type": "string"
+                },
+                "apiKey": {
+                    "type": "string"
+                },
+                "ipWhiteList": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.AppInstallInfo": {
             "type": "object",
             "properties": {
@@ -19629,6 +19700,12 @@ const docTemplate = `{
                 "allowIPs": {
                     "type": "string"
                 },
+                "apiInterfaceStatus": {
+                    "type": "string"
+                },
+                "apiKey": {
+                    "type": "string"
+                },
                 "appStoreLastModified": {
                     "type": "string"
                 },
@@ -19675,6 +19752,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "fileRecycleBin": {
+                    "type": "string"
+                },
+                "ipWhiteList": {
                     "type": "string"
                 },
                 "ipv6": {
@@ -23635,15 +23715,29 @@ const docTemplate = `{
                 }
             }
         }
+    },
+    "securityDefinitions": {
+        "CustomToken": {
+            "description": "自定义 Token 格式，格式：md5('1panel' + 1Panel-Token + 1Panel-Timestamp)。\n` + "`" + `` + "`" + `` + "`" + `\n示例请求头：\ncurl -X GET \"http://localhost:4004/api/v1/resource\" \\\n-H \"1Panel-Token: \u003c1panel_token\u003e\" \\\n-H \"1Panel-Timestamp: \u003ccurrent_unix_timestamp\u003e\"\n` + "`" + `` + "`" + `` + "`" + `\n- ` + "`" + `1Panel-Token` + "`" + ` 为面板 API 接口密钥。",
+            "type": "apiKey",
+            "name": "1Panel-Token",
+            "in": "Header"
+        },
+        "Timestamp": {
+            "description": "- ` + "`" + `1Panel-Timestamp` + "`" + ` 为当前时间的 Unix 时间戳（单位：秒）。",
+            "type": "apiKey",
+            "name": "1Panel-Timestamp",
+            "in": "header"
+        }
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost",
+	Host:             "",
 	BasePath:         "/api/v1",
-	Schemes:          []string{},
+	Schemes:          []string{"http", "https"},
 	Title:            "1Panel",
 	Description:      "开源Linux面板",
 	InfoInstanceName: "swagger",

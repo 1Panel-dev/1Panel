@@ -133,6 +133,16 @@
                                 </el-input>
                             </el-form-item>
 
+                            <el-form-item :label="$t('setting.apiInterface')" prop="apiInterface">
+                                <el-switch
+                                    @change="onChangeApiInterfaceStatus"
+                                    v-model="form.apiInterfaceStatus"
+                                    active-value="enable"
+                                    inactive-value="disable"
+                                />
+                                <span class="input-help">{{ $t('setting.apiInterfaceHelper') }}</span>
+                            </el-form-item>
+
                             <el-form-item :label="$t('setting.developerMode')" prop="developerMode">
                                 <el-radio-group
                                     @change="onSave('DeveloperMode', form.developerMode)"
@@ -168,6 +178,7 @@
         <PanelName ref="panelNameRef" @search="search()" />
         <SystemIP ref="systemIPRef" @search="search()" />
         <Proxy ref="proxyRef" @search="search()" />
+        <ApiInterface ref="apiInterfaceRef" @search="search()" />
         <Timeout ref="timeoutRef" @search="search()" />
         <Network ref="networkRef" @search="search()" />
         <HideMenu ref="hideMenuRef" @search="search()" />
@@ -177,7 +188,7 @@
 
 <script lang="ts" setup>
 import { ref, reactive, onMounted, computed } from 'vue';
-import { ElForm } from 'element-plus';
+import { ElForm, ElMessageBox } from 'element-plus';
 import { getSettingInfo, updateSetting, getSystemAvailable } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import { useI18n } from 'vue-i18n';
@@ -192,6 +203,7 @@ import Proxy from '@/views/setting/panel/proxy/index.vue';
 import Network from '@/views/setting/panel/default-network/index.vue';
 import HideMenu from '@/views/setting/panel/hidemenu/index.vue';
 import ThemeColor from '@/views/setting/panel/theme-color/index.vue';
+import ApiInterface from '@/views/setting/panel/api-interface/index.vue';
 import { storeToRefs } from 'pinia';
 import { getXpackSetting, updateXpackSettingByKey } from '@/utils/xpack';
 import { setPrimaryColor } from '@/utils/theme';
@@ -241,6 +253,10 @@ const form = reactive({
     proxyPasswdKeep: '',
     proxyDocker: '',
 
+    apiInterfaceStatus: 'disable',
+    apiKey: '',
+    ipWhiteList: '',
+
     proHideMenus: ref(i18n.t('setting.unSetting')),
     hideMenuList: '',
 });
@@ -256,6 +272,7 @@ const timeoutRef = ref();
 const networkRef = ref();
 const hideMenuRef = ref();
 const themeColorRef = ref();
+const apiInterfaceRef = ref();
 const unset = ref(i18n.t('setting.unSetting'));
 
 interface Node {
@@ -293,6 +310,9 @@ const search = async () => {
     form.proxyUser = res.data.proxyUser;
     form.proxyPasswd = res.data.proxyPasswd;
     form.proxyPasswdKeep = res.data.proxyPasswdKeep;
+    form.apiInterfaceStatus = res.data.apiInterfaceStatus;
+    form.apiKey = res.data.apiKey;
+    form.ipWhiteList = res.data.ipWhiteList;
 
     const json: Node = JSON.parse(res.data.xpackHideMenu);
     const checkedTitles = getCheckedTitles(json);
@@ -360,6 +380,41 @@ const onChangeProxy = () => {
         passwdKeep: form.proxyPasswdKeep,
         proxyDocker: form.proxyDocker,
     });
+};
+
+const onChangeApiInterfaceStatus = () => {
+    if (form.apiInterfaceStatus === 'enable') {
+        apiInterfaceRef.value.acceptParams({
+            apiInterfaceStatus: form.apiInterfaceStatus,
+            apiKey: form.apiKey,
+            ipWhiteList: form.ipWhiteList,
+        });
+        return;
+    }
+    ElMessageBox.confirm(i18n.t('setting.apiInterfaceClose'), i18n.t('setting.apiInterface'), {
+        confirmButtonText: i18n.t('commons.button.confirm'),
+        cancelButtonText: i18n.t('commons.button.cancel'),
+    })
+        .then(async () => {
+            loading.value = true;
+            await updateSetting({ key: 'ApiInterfaceStatus', value: 'disable' })
+                .then(() => {
+                    loading.value = false;
+                    search();
+                    MsgSuccess(i18n.t('commons.msg.operationSuccess'));
+                })
+                .catch(() => {
+                    loading.value = false;
+                });
+        })
+        .catch(() => {
+            apiInterfaceRef.value.acceptParams({
+                apiInterfaceStatus: 'enable',
+                apiKey: form.apiKey,
+                ipWhiteList: form.ipWhiteList,
+            });
+            return;
+        });
 };
 const onChangeNetwork = () => {
     networkRef.value.acceptParams({ defaultNetwork: form.defaultNetwork });

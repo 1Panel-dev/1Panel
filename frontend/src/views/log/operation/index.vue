@@ -228,6 +228,9 @@ const loadDetail = (log: string) => {
     if (log.indexOf('[MonitorStoreDays]') !== -1) {
         return log.replace('[MonitorStoreDays]', '[' + i18n.global.t('setting.monitor') + ']');
     }
+    if (log.indexOf('[ApiInterfaceStatus]') !== -1) {
+        return log.replace('[ApiInterfaceStatus]', '[' + i18n.global.t('setting.apiInterface') + ']');
+    }
     return log;
 };
 

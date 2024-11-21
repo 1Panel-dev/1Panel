@@ -334,3 +334,19 @@ var AddAutoRestart = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddApiInterfaceConfig = &gormigrate.Migration{
+	ID: "202411-add-api-interface-config",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Create(&model.Setting{Key: "ApiInterfaceStatus", Value: "disable"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "ApiKey", Value: ""}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "IpWhiteList", Value: ""}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
