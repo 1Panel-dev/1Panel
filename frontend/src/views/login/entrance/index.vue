@@ -41,7 +41,6 @@
 </template>
 
 <script setup lang="ts" name="login">
-import { checkIsSafety } from '@/api/modules/auth';
 import LoginForm from '../components/login-form.vue';
 import UnSafe from '@/components/error-message/unsafe.vue';
 import ErrIP from '@/components/error-message/err_ip.vue';
@@ -66,23 +65,18 @@ const mySafetyCode = defineProps({
 
 const getStatus = async () => {
     let code = mySafetyCode.code;
-    globalStore.entrance = code;
-    await checkIsSafety(code)
-        .then(() => {
-            let info = globalStore.errStatus;
-            if (info?.startsWith('err-') || info?.startsWith('code-')) {
-                errStatus.value = info;
-                init.value = true;
-                return;
-            }
-            errStatus.value = '';
-            init.value = true;
-            getXpackSettingForTheme();
-        })
-        .catch((err) => {
-            errStatus.value = 'code-' + err.status;
-            init.value = true;
-        });
+    if (code != '') {
+        globalStore.entrance = code;
+    }
+    await getXpackSettingForTheme();
+    let info = globalStore.errStatus;
+    if (info?.startsWith('err-') || info?.startsWith('code-')) {
+        errStatus.value = info;
+        init.value = true;
+        return;
+    }
+    errStatus.value = '';
+    init.value = true;
 };
 
 onMounted(() => {

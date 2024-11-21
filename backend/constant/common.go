@@ -23,3 +23,87 @@ const (
 	DateTimeLayout     = "2006-01-02 15:04:05" // or use time.DateTime while go version >= 1.20
 	DateTimeSlimLayout = "20060102150405"
 )
+
+var WebUrlMap = map[string]struct{}{
+	"/apps":           {},
+	"/apps/all":       {},
+	"/apps/installed": {},
+	"/apps/upgrade":   {},
+
+	"/containers":           {},
+	"/containers/container": {},
+	"/containers/image":     {},
+	"/containers/network":   {},
+	"/containers/volume":    {},
+	"/containers/repo":      {},
+	"/containers/compose":   {},
+	"/containers/template":  {},
+	"/containers/setting":   {},
+
+	"/cronjobs": {},
+
+	"/databases":                   {},
+	"/databases/mysql":             {},
+	"/databases/mysql/remote":      {},
+	"/databases/postgresql":        {},
+	"/databases/postgresql/remote": {},
+	"/databases/redis":             {},
+	"/databases/redis/remote":      {},
+
+	"/hosts":                  {},
+	"/hosts/files":            {},
+	"/hosts/monitor/monitor":  {},
+	"/hosts/monitor/setting":  {},
+	"/hosts/terminal":         {},
+	"/hosts/firewall/port":    {},
+	"/hosts/firewall/forward": {},
+	"/hosts/firewall/ip":      {},
+	"/hosts/process/process":  {},
+	"/hosts/process/network":  {},
+	"/hosts/ssh/ssh":          {},
+	"/hosts/ssh/log":          {},
+	"/hosts/ssh/session":      {},
+
+	"/logs":           {},
+	"/logs/operation": {},
+	"/logs/login":     {},
+	"/logs/website":   {},
+	"/logs/system":    {},
+	"/logs/ssh":       {},
+
+	"/settings":               {},
+	"/settings/panel":         {},
+	"/settings/backupaccount": {},
+	"/settings/license":       {},
+	"/settings/about":         {},
+	"/settings/safe":          {},
+	"/settings/snapshot":      {},
+	"/settings/expired":       {},
+
+	"/toolbox":              {},
+	"/toolbox/device":       {},
+	"/toolbox/supervisor":   {},
+	"/toolbox/clam":         {},
+	"/toolbox/clam/setting": {},
+	"/toolbox/ftp":          {},
+	"/toolbox/fail2ban":     {},
+	"/toolbox/clean":        {},
+
+	"/websites":                 {},
+	"/websites/ssl":             {},
+	"/websites/runtimes/php":    {},
+	"/websites/runtimes/node":   {},
+	"/websites/runtimes/java":   {},
+	"/websites/runtimes/net":    {},
+	"/websites/runtimes/go":     {},
+	"/websites/runtimes/python": {},
+
+	"/login": {},
+}
+
+var DynamicRoutes = []string{
+	`^/containers/composeDetail/[^/]+$`,
+	`^/databases/mysql/setting/[^/]+/[^/]+$`,
+	`^/databases/postgresql/setting/[^/]+/[^/]+$`,
+	`^/websites/[^/]+/config/[^/]+$`,
+}

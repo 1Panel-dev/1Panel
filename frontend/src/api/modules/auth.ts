@@ -17,10 +17,6 @@ export const logOutApi = () => {
     return http.post<any>(`/auth/logout`);
 };
 
-export const checkIsSafety = (code: string) => {
-    return http.get<string>(`/auth/issafety?code=${code}`);
-};
-
 export const checkIsDemo = () => {
     return http.get<boolean>('/auth/demo');
 };

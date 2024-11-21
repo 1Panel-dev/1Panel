@@ -2,14 +2,11 @@ package v1
 
 import (
 	"encoding/base64"
-	"net/http"
-
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
-	"github.com/1Panel-dev/1Panel/backend/middleware"
 	"github.com/1Panel-dev/1Panel/backend/utils/captcha"
 	"github.com/1Panel-dev/1Panel/backend/utils/qqwry"
 	"github.com/gin-gonic/gin"
@@ -37,10 +34,17 @@ func (b *BaseApi) Login(c *gin.Context) {
 			return
 		}
 	}
+
 	entranceItem := c.Request.Header.Get("EntranceCode")
 	var entrance []byte
 	if len(entranceItem) != 0 {
 		entrance, _ = base64.StdEncoding.DecodeString(entranceItem)
+	}
+	if len(entrance) == 0 {
+		cookieValue, err := c.Cookie("SecurityEntrance")
+		if err == nil {
+			entrance, _ = base64.StdEncoding.DecodeString(cookieValue)
+		}
 	}
 
 	user, err := authService.Login(c, req, string(entrance))
@@ -106,34 +110,6 @@ func (b *BaseApi) Captcha(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithData(c, captcha)
-}
-
-// @Tags Auth
-// @Summary Load safety status
-// @Description 获取系统安全登录状态
-// @Success 200
-// @Router /auth/issafety [get]
-func (b *BaseApi) CheckIsSafety(c *gin.Context) {
-	code := c.DefaultQuery("code", "")
-	status, err := authService.CheckIsSafety(code)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-	if status == "disable" && len(code) != 0 {
-		helper.ErrResponse(c, http.StatusNotFound)
-		return
-	}
-	if status == "unpass" {
-		code := middleware.LoadErrCode()
-		if code != 200 {
-			helper.ErrResponse(c, code)
-			return
-		}
-		helper.ErrorWithDetail(c, constant.CodeErrEntrance, constant.ErrTypeInternalServer, nil)
-		return
-	}
-	helper.SuccessWithOutData(c)
 }
 
 func (b *BaseApi) GetResponsePage(c *gin.Context) {

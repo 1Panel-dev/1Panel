@@ -19,36 +19,16 @@
 </template>
 
 <script setup lang="ts" name="login">
-import { checkIsSafety } from '@/api/modules/auth';
 import LoginForm from './components/login-form.vue';
 import { ref, onMounted } from 'vue';
-import router from '@/routers';
 import { GlobalStore } from '@/store';
-import { getXpackSettingForTheme } from '@/utils/xpack';
 
 const gStore = GlobalStore();
 const loading = ref();
 
 const screenWidth = ref(null);
 
-const getStatus = async () => {
-    loading.value = true;
-    await checkIsSafety(gStore.entrance)
-        .then((res) => {
-            loading.value = false;
-            if (res.data === 'unpass') {
-                router.replace({ name: 'entrance', params: { code: gStore.entrance } });
-                return;
-            }
-            getXpackSettingForTheme();
-        })
-        .catch(() => {
-            loading.value = false;
-        });
-};
-
 onMounted(() => {
-    getStatus();
     screenWidth.value = document.body.clientWidth;
     window.onresize = () => {
         return (() => {
