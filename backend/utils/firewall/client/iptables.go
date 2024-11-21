@@ -52,7 +52,7 @@ func (iptables *Iptables) Check() error {
 }
 
 func (iptables *Iptables) NatNewChain() error {
-	return iptables.runf("-t nat -N %s", NatChain)
+	return iptables.runf("-N %s", NatChain)
 }
 
 func (iptables *Iptables) NatAppendChain() error {

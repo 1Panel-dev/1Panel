@@ -6,6 +6,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 )
 
@@ -107,6 +108,12 @@ func (f *Ufw) ListForward() ([]FireInfo, error) {
 	iptables, err := NewIptables()
 	if err != nil {
 		return nil, err
+	}
+	panelChian, _ := cmd.Execf("%s iptables -t nat -L -n | grep 'Chain 1PANEL'", iptables.CmdStr)
+	if len(strings.ReplaceAll(panelChian, "\n", "")) == 0 {
+		if err := f.EnableForward(); err != nil {
+			global.LOG.Errorf("init port forward failed, err: %v", err)
+		}
 	}
 	rules, err := iptables.NatList()
 	if err != nil {

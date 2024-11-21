@@ -8,6 +8,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 )
 
@@ -118,6 +119,9 @@ func (f *Firewall) ListPort() ([]FireInfo, error) {
 }
 
 func (f *Firewall) ListForward() ([]FireInfo, error) {
+	if err := f.EnableForward(); err != nil {
+		global.LOG.Errorf("init port forward failed, err: %v", err)
+	}
 	stdout, err := cmd.Exec("firewall-cmd --zone=public --list-forward-ports")
 	if err != nil {
 		return nil, err
