@@ -1520,6 +1520,8 @@ const message = {
         error404: '未找到',
         error408: '请求超时',
         error416: '无效请求',
+        error444: '关闭连接',
+        error500: '服务器错误',
 
         https: '为面板设置 https 协议访问，提升面板访问安全性',
         certType: '证书类型',

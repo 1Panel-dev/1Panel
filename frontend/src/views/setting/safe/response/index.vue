@@ -90,6 +90,14 @@ const options = [
         value: '416',
         label: '416 - ' + i18n.global.t('setting.error416'),
     },
+    {
+        value: '444',
+        label: '444 - ' + i18n.global.t('setting.error444'),
+    },
+    {
+        value: '500',
+        label: '500 - ' + i18n.global.t('setting.error500'),
+    },
 ];
 
 interface DialogProps {

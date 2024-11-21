@@ -90,6 +90,11 @@ func handleNoRoute(c *gin.Context) {
 		c.String(http.StatusInternalServerError, "Internal Server Error")
 		return
 	}
+	if resPage == "444" {
+		c.String(444, "")
+		return
+	}
+
 	file := fmt.Sprintf("html/%s.html", resPage)
 	if resPage == "200" && c.GetHeader("Accept-Language") == "en" {
 		file = "html/200_en.html"

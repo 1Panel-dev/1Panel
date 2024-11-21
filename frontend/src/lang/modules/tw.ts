@@ -1519,6 +1519,8 @@ const message = {
         error404: '未找到',
         error408: '請求超時',
         error416: '無效請求',
+        error444: '關閉連線',
+        error500: '伺服器錯誤',
 
         https: '為面板設置 https 協議訪問，提升面板訪問安全性',
         certType: '證書類型',

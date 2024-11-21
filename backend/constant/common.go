@@ -99,6 +99,22 @@ var WebUrlMap = map[string]struct{}{
 	"/websites/runtimes/python": {},
 
 	"/login": {},
+
+	"/xpack":                   {},
+	"/xpack/waf/dashboard":     {},
+	"/xpack/waf/global":        {},
+	"/xpack/waf/websites":      {},
+	"/xpack/waf/log":           {},
+	"/xpack/waf/block":         {},
+	"/xpack/monitor/dashboard": {},
+	"/xpack/monitor/setting":   {},
+	"/xpack/monitor/rank":      {},
+	"/xpack/monitor/log":       {},
+	"/xpack/tamper":            {},
+	"/xpack/gpu":               {},
+	"/xpack/alert/dashboard":   {},
+	"/xpack/alert/log":         {},
+	"/xpack/setting":           {},
 }
 
 var DynamicRoutes = []string{
