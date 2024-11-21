@@ -148,7 +148,6 @@ var (
 var (
 	ErrFirewallNone = "ErrFirewallNone"
 	ErrFirewallBoth = "ErrFirewallBoth"
-	ErrNFTables     = "ErrNFTables"
 )
 
 // cronjob

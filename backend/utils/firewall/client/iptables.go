@@ -2,11 +2,12 @@ package client
 
 import (
 	"fmt"
+	"regexp"
+	"strings"
+
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
-	"regexp"
-	"strings"
 )
 
 const NatChain = "1PANEL"
@@ -51,7 +52,7 @@ func (iptables *Iptables) Check() error {
 }
 
 func (iptables *Iptables) NatNewChain() error {
-	return iptables.runf("-N %s", NatChain)
+	return iptables.runf("-t nat -N %s", NatChain)
 }
 
 func (iptables *Iptables) NatAppendChain() error {

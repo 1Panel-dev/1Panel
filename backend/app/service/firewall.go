@@ -10,7 +10,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
-	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
@@ -87,11 +86,6 @@ func (u *FirewallService) SearchWithPage(req dto.RuleSearch) (int64, interface{}
 	case "port":
 		rules, err = client.ListPort()
 	case "forward":
-		isSupport, errSup := checkIsSupport()
-		if !isSupport {
-			return 0, nil, errSup
-		}
-
 		rules, err = client.ListForward()
 	case "address":
 		rules, err = client.ListAddress()
@@ -312,11 +306,6 @@ func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) 
 }
 
 func (u *FirewallService) OperateForwardRule(req dto.ForwardRuleOperate) error {
-	isSupport, errSup := checkIsSupport()
-	if !isSupport {
-		return errSup
-	}
-
 	client, err := firewall.NewFirewallClient()
 	if err != nil {
 		return err
@@ -736,15 +725,4 @@ func checkPortUsed(ports, proto string, apps []portOfApp) string {
 		return "inUsed"
 	}
 	return ""
-}
-
-func checkIsSupport() (bool, error) {
-	std, err := cmd.Exec("iptables --version")
-	if err != nil {
-		return false, fmt.Errorf("handle iptables --version failed, stdout: %s, err: %v", std, err)
-	}
-	if strings.Contains(std, "nf_tables") {
-		return false, buserr.New(constant.ErrNFTables)
-	}
-	return true, nil
 }

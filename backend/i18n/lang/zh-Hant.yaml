@@ -169,7 +169,6 @@ ErrUserFindErr: "用戶 {{ .name }} 查找失敗 {{ .err }}"
 #ssh
 ErrFirewallNone: "未檢測到系統 firewalld 或 ufw 服務，請檢查後重試！"
 ErrFirewallBoth: "檢測到系統同時存在 firewalld 或 ufw 服務，為避免衝突，請卸載後重試！"
-ErrNFTables: "端口轉發功能依賴於 iptables 服務，暫不兼容 nftables 操作！"
 
 #cronjob
 ErrBashExecute: "腳本執行錯誤，請在任務輸出文本域中查看具體信息。"
