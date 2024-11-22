@@ -1107,11 +1107,7 @@ func handleLocalAppDetail(versionDir string, appDetail *model.AppDetail) error {
 		return buserr.WithMap(constant.ErrFileParseApp, map[string]interface{}{"name": "data.yml", "err": err.Error()}, err)
 	}
 
-	additionalProperties, ok := dataMap["additionalProperties"].(map[string]interface{})
-	if !ok {
-		return buserr.WithName(constant.ErrAppParamKey, "additionalProperties")
-	}
-
+	additionalProperties, _ := dataMap["additionalProperties"].(map[string]interface{})
 	formFieldsInterface, ok := additionalProperties["formFields"]
 	if ok {
 		formFields, ok := formFieldsInterface.([]interface{})

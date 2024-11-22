@@ -88,6 +88,16 @@ const webSiteRouter = {
                 requiresAuth: false,
             },
         },
+        {
+            path: '/websites/runtimes/donet',
+            name: 'doNet',
+            hidden: true,
+            component: () => import('@/views/website/runtime/donet/index.vue'),
+            meta: {
+                activeMenu: '/websites/runtimes/php',
+                requiresAuth: false,
+            },
+        },
     ],
 };
 

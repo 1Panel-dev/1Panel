@@ -99,6 +99,7 @@ var WebUrlMap = map[string]struct{}{
 	"/websites/runtimes/net":    {},
 	"/websites/runtimes/go":     {},
 	"/websites/runtimes/python": {},
+	"/websites/runtimes/donet":  {},
 
 	"/login": {},
 

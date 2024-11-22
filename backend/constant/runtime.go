@@ -19,6 +19,7 @@ const (
 	RuntimeJava   = "java"
 	RuntimeGo     = "go"
 	RuntimePython = "python"
+	RuntimeDoNet  = "donet"
 
 	RuntimeProxyUnix = "unix"
 	RuntimeProxyTcp  = "tcp"

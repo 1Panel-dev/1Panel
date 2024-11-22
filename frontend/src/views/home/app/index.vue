@@ -67,10 +67,12 @@ const acceptParams = (): void => {
 const goInstall = (key: string, type: string) => {
     switch (type) {
         case 'php':
-            router.push({ path: '/websites/runtimes/php' });
-            break;
         case 'node':
-            router.push({ path: '/websites/runtimes/node' });
+        case 'java':
+        case 'go':
+        case 'python':
+        case 'donet':
+            router.push({ path: '/websites/runtimes/' + type });
             break;
         default:
             router.push({ name: 'AppAll', query: { install: key } });
