@@ -127,6 +127,8 @@ ErrDefaultCA: "The default organization cannot be deleted"
 ApplyWebSiteSSLLog: "Start updating {{ .name }} website certificate"
 ErrUpdateWebsiteSSL: "{{ .name }} website failed to update certificate: {{ .err }}"
 ApplyWebSiteSSLSuccess: "Update website certificate successfully"
+StartUpdateSystemSSL: "Start updating system certificate"
+UpdateSystemSSLSuccess: "Update system certificate successfully"
 
 #mysql
 ErrUserIsExist: "The current user already exists. Please enter a new user"

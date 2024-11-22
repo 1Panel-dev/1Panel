@@ -381,6 +381,9 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) (*model.Website
 			logger.Println(i18n.GetMsgByKey("ExecShellSuccess"))
 		}
 	}
+
+	reloadSystemSSL(websiteSSL, logger)
+
 	return websiteSSL, nil
 }
 

@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"crypto"
+	"crypto/tls"
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
@@ -188,6 +189,31 @@ func printSSLLog(logger *log.Logger, msgKey string, params map[string]interface{
 	logger.Println(i18n.GetMsgWithMap(msgKey, params))
 }
 
+func reloadSystemSSL(websiteSSL *model.WebsiteSSL, logger *log.Logger) {
+	systemSSLEnable, sslID := GetSystemSSL()
+	if systemSSLEnable && sslID == websiteSSL.ID {
+		fileOp := files.NewFileOp()
+		certPath := path.Join(global.CONF.System.BaseDir, "1panel/secret/server.crt")
+		keyPath := path.Join(global.CONF.System.BaseDir, "1panel/secret/server.key")
+		printSSLLog(logger, "StartUpdateSystemSSL", nil, logger == nil)
+		if err := fileOp.WriteFile(certPath, strings.NewReader(websiteSSL.Pem), 0600); err != nil {
+			logger.Printf("Failed to update the SSL certificate File for 1Panel System domain [%s] , err:%s", websiteSSL.PrimaryDomain, err.Error())
+			return
+		}
+		if err := fileOp.WriteFile(keyPath, strings.NewReader(websiteSSL.PrivateKey), 0600); err != nil {
+			logger.Printf("Failed to update the SSL certificate for 1Panel System domain [%s] , err:%s", websiteSSL.PrimaryDomain, err.Error())
+			return
+		}
+		newCert, err := tls.X509KeyPair([]byte(websiteSSL.Pem), []byte(websiteSSL.PrivateKey))
+		if err != nil {
+			logger.Printf("Failed to update the SSL certificate for 1Panel System domain [%s] , err:%s", websiteSSL.PrimaryDomain, err.Error())
+			return
+		}
+		printSSLLog(logger, "UpdateSystemSSLSuccess", nil, logger == nil)
+		constant.CertStore.Store(&newCert)
+	}
+}
+
 func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 	var (
 		err         error
@@ -344,6 +370,8 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 			}
 			printSSLLog(logger, "ApplyWebSiteSSLSuccess", nil, apply.DisableLog)
 		}
+
+		reloadSystemSSL(websiteSSL, logger)
 	}()
 
 	return nil

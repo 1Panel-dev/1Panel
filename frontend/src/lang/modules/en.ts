@@ -1551,11 +1551,6 @@ const message = {
         bindDomain: 'Bind Domain',
         unBindDomain: 'Unbind domain',
         panelSSL: 'Panel SSL',
-        sslAutoRestart: 'Restart 1Panel service after certificate auto-renewal',
-        sslChangeHelper1:
-            'Currently, automatic restart of 1Panel service is not selected. The certificate auto-renewal will not take effect immediately and will still require a manual restart of 1Panel.',
-        sslChangeHelper2:
-            'The 1Panel service will automatically restart after setting the panel SSL. Do you want to continue?',
         unBindDomainHelper:
             'The action of unbinding a domain name may cause system insecurity. Do you want to continue?',
         bindDomainHelper:

@@ -34,7 +34,7 @@ const settingRouter = {
                     hidden: true,
                     meta: {
                         requiresAuth: true,
-                        activeMenu: 'Setting',
+                        activeMenu: '/settings',
                     },
                 },
                 {
@@ -44,7 +44,7 @@ const settingRouter = {
                     hidden: true,
                     meta: {
                         requiresAuth: true,
-                        activeMenu: 'Setting',
+                        activeMenu: '/settings',
                     },
                 },
                 {
@@ -54,7 +54,7 @@ const settingRouter = {
                     hidden: true,
                     meta: {
                         requiresAuth: true,
-                        activeMenu: 'Setting',
+                        activeMenu: '/settings',
                     },
                 },
                 {
@@ -64,7 +64,7 @@ const settingRouter = {
                     hidden: true,
                     meta: {
                         requiresAuth: true,
-                        activeMenu: 'Setting',
+                        activeMenu: '/settings',
                     },
                 },
                 {
@@ -74,7 +74,7 @@ const settingRouter = {
                     component: () => import('@/views/setting/snapshot/index.vue'),
                     meta: {
                         requiresAuth: true,
-                        activeMenu: 'Setting',
+                        activeMenu: '/settings',
                     },
                 },
                 {
@@ -84,7 +84,7 @@ const settingRouter = {
                     component: () => import('@/views/setting/expired.vue'),
                     meta: {
                         requiresAuth: true,
-                        activeMenu: 'Expired',
+                        activeMenu: '/settings',
                     },
                 },
             ],

@@ -4,12 +4,12 @@ import (
 	"crypto/tls"
 	"encoding/gob"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/i18n"
 	"net"
 	"net/http"
 	"os"
 	"path"
-
-	"github.com/1Panel-dev/1Panel/backend/i18n"
 
 	"github.com/1Panel-dev/1Panel/backend/init/app"
 	"github.com/1Panel-dev/1Panel/backend/init/business"
@@ -81,12 +81,16 @@ func Start() {
 		if err != nil {
 			panic(err)
 		}
+		constant.CertStore.Store(&cert)
+
 		server.TLSConfig = &tls.Config{
-			Certificates: []tls.Certificate{cert},
+			GetCertificate: func(info *tls.ClientHelloInfo) (*tls.Certificate, error) {
+				return constant.CertStore.Load().(*tls.Certificate), nil
+			},
 		}
 		global.LOG.Infof("listen at https://%s:%s [%s]", global.CONF.System.BindAddress, global.CONF.System.Port, tcpItem)
 
-		if err := server.ServeTLS(tcpKeepAliveListener{ln.(*net.TCPListener)}, certPath, keyPath); err != nil {
+		if err := server.ServeTLS(tcpKeepAliveListener{ln.(*net.TCPListener)}, "", ""); err != nil {
 			panic(err)
 		}
 	} else {

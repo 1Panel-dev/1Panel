@@ -112,14 +112,6 @@
                                 </el-descriptions-item>
                             </el-descriptions>
                         </div>
-                        <el-form-item v-if="form.sslType !== 'import'">
-                            <el-checkbox true-value="enable" false-value="disable" v-model="form.autoRestart">
-                                {{ $t('setting.sslAutoRestart') }}
-                            </el-checkbox>
-                            <span v-if="form.autoRestart === 'disable'" class="input-help">
-                                {{ $t('setting.sslChangeHelper1') }}
-                            </span>
-                        </el-form-item>
                     </el-col>
                 </el-row>
             </el-form>
@@ -143,7 +135,7 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { downloadSSL, updateSSL } from '@/api/modules/setting';
 import { Rules } from '@/global/form-rules';
-import { ElMessageBox, FormInstance } from 'element-plus';
+import { FormInstance } from 'element-plus';
 import { Setting } from '@/api/interface/setting';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { GlobalStore } from '@/store';
@@ -162,7 +154,6 @@ const form = reactive({
     key: '',
     rootPath: '',
     timeout: '',
-    autoRestart: 'disable',
 });
 
 const rules = reactive({
@@ -179,7 +170,6 @@ const itemSSL = ref();
 interface DialogProps {
     sslType: string;
     sslInfo?: Setting.SSLInfo;
-    autoRestart: string;
 }
 const acceptParams = async (params: DialogProps): Promise<void> => {
     if (params.sslType.indexOf('-') !== -1) {
@@ -202,7 +192,6 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     } else {
         loadSSLs();
     }
-    form.autoRestart = params.autoRestart;
     drawerVisible.value = true;
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
@@ -243,41 +232,31 @@ const onSaveSSL = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        let msg = !form.autoRestart
-            ? i18n.global.t('setting.sslChangeHelper1') + '\n\n\n' + 'qwdqwdqwd'
-            : i18n.global.t('setting.sslChangeHelper2');
-        ElMessageBox.confirm(msg, i18n.global.t('setting.panelSSL'), {
-            confirmButtonText: i18n.global.t('commons.button.confirm'),
-            cancelButtonText: i18n.global.t('commons.button.cancel'),
-            type: 'info',
-        }).then(async () => {
-            let itemType = form.sslType;
-            if (form.sslType === 'import') {
-                itemType = form.itemSSLType === 'paste' ? 'import-paste' : 'import-local';
-            }
-            let param = {
-                ssl: 'enable',
-                sslType: itemType,
-                domain: '',
-                sslID: form.sslID,
-                cert: form.cert,
-                key: form.key,
-                autoRestart: form.autoRestart,
-            };
+        let itemType = form.sslType;
+        if (form.sslType === 'import') {
+            itemType = form.itemSSLType === 'paste' ? 'import-paste' : 'import-local';
+        }
+        let param = {
+            ssl: 'enable',
+            sslType: itemType,
+            domain: '',
+            sslID: form.sslID,
+            cert: form.cert,
+            key: form.key,
+        };
+        let href = window.location.href;
+        param.domain = href.split('//')[1].split(':')[0];
+        await updateSSL(param).then(() => {
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             let href = window.location.href;
-            param.domain = href.split('//')[1].split(':')[0];
-            await updateSSL(param).then(() => {
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                let href = window.location.href;
-                globalStore.isLogin = false;
-                let address = href.split('://')[1];
-                if (globalStore.entrance) {
-                    address = address.replaceAll('settings/safe', globalStore.entrance);
-                } else {
-                    address = address.replaceAll('settings/safe', 'login');
-                }
-                window.open(`https://${address}`, '_self');
-            });
+            globalStore.isLogin = false;
+            let address = href.split('://')[1];
+            if (globalStore.entrance) {
+                address = address.replaceAll('settings/safe', globalStore.entrance);
+            } else {
+                address = address.replaceAll('settings/safe', 'login');
+            }
+            window.open(`https://${address}`, '_self');
         });
     });
 };

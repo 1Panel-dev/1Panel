@@ -1,5 +1,7 @@
 package constant
 
+import "sync/atomic"
+
 type DBContext string
 
 const (
@@ -123,3 +125,5 @@ var DynamicRoutes = []string{
 	`^/databases/postgresql/setting/[^/]+/[^/]+$`,
 	`^/websites/[^/]+/config/[^/]+$`,
 }
+
+var CertStore atomic.Value

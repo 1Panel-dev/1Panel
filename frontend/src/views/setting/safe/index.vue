@@ -225,7 +225,6 @@ const form = reactive({
     bindAddress: '',
     ssl: 'disable',
     sslType: 'self',
-    autoRestart: 'disable',
     securityEntrance: '',
     expirationDays: 0,
     expirationTime: '',
@@ -250,7 +249,6 @@ const search = async () => {
     if (form.ssl === 'enable') {
         loadInfo();
     }
-    form.autoRestart = res.data.autoRestart;
     form.securityEntrance = res.data.securityEntrance;
     form.expirationDays = Number(res.data.expirationDays);
     form.expirationTime = res.data.expirationTime;
@@ -330,7 +328,6 @@ const handleSSL = async () => {
             ssl: form.ssl,
             sslType: form.sslType,
             sslInfo: sslInfo.value,
-            autoRestart: form.autoRestart,
         };
         sslRef.value!.acceptParams(params);
         return;
