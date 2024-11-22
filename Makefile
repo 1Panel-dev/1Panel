@@ -10,11 +10,11 @@ WEB_PATH=$(BASE_PAH)/frontend
 ASSERT_PATH= $(BASE_PAH)/core/cmd/server/web/assets
 
 CORE_MAIN= $(BASE_PAH)/cmd/server/main.go
-CORE_NAME=1panel_core
+CORE_NAME=1panel-core
 
 AGENT_PATH=$(BASE_PAH)/agent
 AGENT_MAIN= $(AGENT_PATH)/cmd/server/main.go
-AGENT_NAME=1panel_agent
+AGENT_NAME=1panel-agent
 
 
 clean_assets:

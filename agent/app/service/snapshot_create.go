@@ -148,7 +148,7 @@ func (u *SnapshotService) HandleSnapshot(req dto.SnapshotCreate) error {
 		taskItem.AddSubTask(
 			"SnapCloseDBConn",
 			func(t *task.Task) error {
-				taskItem.Log("######################## 6 / 8 ########################")
+				taskItem.Log("---------------------- 6 / 8 ----------------------")
 				closeDatabase(itemHelper.snapAgentDB)
 				closeDatabase(itemHelper.snapCoreDB)
 				return nil
@@ -194,7 +194,7 @@ type snapHelper struct {
 }
 
 func loadDbConn(snap *snapHelper, targetDir string, req dto.SnapshotCreate) error {
-	snap.Task.Log("######################## 1 / 8 ########################")
+	snap.Task.Log("---------------------- 1 / 8 ----------------------")
 	snap.Task.LogStart(i18n.GetMsgByKey("SnapDBInfo"))
 	pathDB := path.Join(global.CONF.System.BaseDir, "1panel/db")
 
@@ -246,17 +246,17 @@ func loadDbConn(snap *snapHelper, targetDir string, req dto.SnapshotCreate) erro
 }
 
 func snapBaseData(snap snapHelper, targetDir string) error {
-	snap.Task.Log("######################## 2 / 8 ########################")
+	snap.Task.Log("---------------------- 2 / 8 ----------------------")
 	snap.Task.LogStart(i18n.GetMsgByKey("SnapBaseInfo"))
 
-	err := common.CopyFile("/usr/local/bin/1panel", targetDir)
-	snap.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/usr/local/bin/1panel"), err)
+	err := common.CopyFile("/usr/local/bin/1panel-core", targetDir)
+	snap.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/usr/local/bin/1panel-core"), err)
 	if err != nil {
 		return err
 	}
 
-	err = common.CopyFile("/usr/local/bin/1panel_agent", targetDir)
-	snap.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/usr/local/bin/1panel_agent"), err)
+	err = common.CopyFile("/usr/local/bin/1panel-agent", targetDir)
+	snap.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/usr/local/bin/1panel-agent"), err)
 	if err != nil {
 		return err
 	}
@@ -273,8 +273,8 @@ func snapBaseData(snap snapHelper, targetDir string) error {
 		return err
 	}
 
-	err = common.CopyFile("/etc/systemd/system/1panel_agent.service", targetDir)
-	snap.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/etc/systemd/system/1panel_agent.service"), err)
+	err = common.CopyFile("/etc/systemd/system/1panel-agent.service", targetDir)
+	snap.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/etc/systemd/system/1panel-agent.service"), err)
 	if err != nil {
 		return err
 	}
@@ -301,7 +301,7 @@ func snapBaseData(snap snapHelper, targetDir string) error {
 }
 
 func snapAppImage(snap snapHelper, req dto.SnapshotCreate, targetDir string) error {
-	snap.Task.Log("######################## 3 / 8 ########################")
+	snap.Task.Log("---------------------- 3 / 8 ----------------------")
 	snap.Task.LogStart(i18n.GetMsgByKey("SnapInstallApp"))
 
 	var imageList []string
@@ -333,7 +333,7 @@ func snapAppImage(snap snapHelper, req dto.SnapshotCreate, targetDir string) err
 }
 
 func snapBackupData(snap snapHelper, req dto.SnapshotCreate, targetDir string) error {
-	snap.Task.Log("######################## 4 / 8 ########################")
+	snap.Task.Log("---------------------- 4 / 8 ----------------------")
 	snap.Task.LogStart(i18n.GetMsgByKey("SnapLocalBackup"))
 
 	excludes := loadBackupExcludes(snap, req.BackupData)
@@ -389,7 +389,7 @@ func loadAppBackupExcludes(req []dto.DataTree) []string {
 }
 
 func snapPanelData(snap snapHelper, req dto.SnapshotCreate, targetDir string) error {
-	snap.Task.Log("######################## 5 / 8 ########################")
+	snap.Task.Log("---------------------- 5 / 8 ----------------------")
 	snap.Task.LogStart(i18n.GetMsgByKey("SnapPanelData"))
 
 	excludes := loadPanelExcludes(req.PanelData)
@@ -447,7 +447,7 @@ func loadPanelExcludes(req []dto.DataTree) []string {
 }
 
 func snapCompress(snap snapHelper, rootDir string, secret string) error {
-	snap.Task.Log("######################## 7 / 8 ########################")
+	snap.Task.Log("---------------------- 7 / 8 ----------------------")
 	snap.Task.LogStart(i18n.GetMsgByKey("SnapCompress"))
 
 	tmpDir := path.Join(global.CONF.System.TmpDir, "system")
@@ -471,7 +471,7 @@ func snapCompress(snap snapHelper, rootDir string, secret string) error {
 }
 
 func snapUpload(snap snapHelper, accounts string, file string) error {
-	snap.Task.Log("######################## 8 / 8 ########################")
+	snap.Task.Log("---------------------- 8 / 8 ----------------------")
 	snap.Task.LogStart(i18n.GetMsgByKey("SnapUpload"))
 
 	source := path.Join(global.CONF.System.TmpDir, "system", path.Base(file))

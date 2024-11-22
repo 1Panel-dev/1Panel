@@ -42,16 +42,16 @@ func (u *SnapshotService) SnapshotRollback(req dto.SnapshotRecover) error {
 			nil,
 		)
 		taskItem.AddSubTask(
-			i18n.GetWithName("SnapCopy", "/usr/local/bin/1panel"),
+			i18n.GetWithName("SnapCopy", "/usr/local/bin/1panel-core"),
 			func(t *task.Task) error {
 				return FileOp.CopyFile(path.Join(baseDir, "1panel"), "/usr/local/bin")
 			},
 			nil,
 		)
 		taskItem.AddSubTask(
-			i18n.GetWithName("SnapCopy", "/usr/local/bin/1panel_agent"),
+			i18n.GetWithName("SnapCopy", "/usr/local/bin/1panel-agent"),
 			func(t *task.Task) error {
-				return FileOp.CopyFile(path.Join(baseDir, "1panel_agent"), "/usr/local/bin")
+				return FileOp.CopyFile(path.Join(baseDir, "1panel-agent"), "/usr/local/bin")
 			},
 			nil,
 		)
@@ -63,7 +63,7 @@ func (u *SnapshotService) SnapshotRollback(req dto.SnapshotRecover) error {
 			nil,
 		)
 		taskItem.AddSubTask(
-			i18n.GetWithName("SnapCopy", "/etc/systemd/system/1panel_agent.service"),
+			i18n.GetWithName("SnapCopy", "/etc/systemd/system/1panel-agent.service"),
 			func(t *task.Task) error {
 				return FileOp.CopyFile(path.Join(baseDir, "1panel.service"), "/etc/systemd/system")
 			},

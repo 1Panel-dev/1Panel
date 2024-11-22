@@ -26,6 +26,17 @@ func Init() {
 	if err != nil {
 		global.LOG.Fatalf("load current node before start failed, err: %v", err)
 	}
+	baseDir, err := settingRepo.Get(settingRepo.WithByKey("BaseDir"))
+	if err != nil {
+		global.LOG.Fatalf("load base dir before start failed, err: %v", err)
+	}
+	global.CONF.System.BaseDir = baseDir.Value
+	version, err := settingRepo.Get(settingRepo.WithByKey("Version"))
+	if err != nil {
+		global.LOG.Fatalf("load base dir before start failed, err: %v", err)
+	}
+	global.CONF.System.Version = version.Value
+
 	global.IsMaster = node.Value == "127.0.0.1" || len(node.Value) == 0
 	if global.IsMaster {
 		db.InitCoreDB()

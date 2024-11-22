@@ -6,11 +6,9 @@ import (
 	"path"
 	"sort"
 	"strings"
-	"time"
 
 	cmdUtils "github.com/1Panel-dev/1Panel/core/utils/cmd"
 	"github.com/1Panel-dev/1Panel/core/utils/files"
-	"github.com/pkg/errors"
 
 	"github.com/spf13/cobra"
 )
@@ -45,31 +43,20 @@ var restoreCmd = &cobra.Command{
 		tmpPath = path.Join(upgradeDir, tmpPath, "original")
 		fmt.Printf("(0/4) 开始从 %s 目录回滚 1Panel 服务及数据... \n", tmpPath)
 
-		if err := files.CopyFile(path.Join(tmpPath, "1panel"), "/usr/local/bin", false); err != nil {
+		if err := files.CopyItem(false, true, path.Join(tmpPath, "1panel*"), "/usr/local/bin"); err != nil {
 			return err
 		}
 		fmt.Println("(1/4) 1panel 二进制回滚成功")
-		if err := files.CopyFile(path.Join(tmpPath, "1pctl"), "/usr/local/bin", false); err != nil {
+		if err := files.CopyItem(false, true, path.Join(tmpPath, "1pctl"), "/usr/local/bin"); err != nil {
 			return err
 		}
 		fmt.Println("(2/4) 1panel 脚本回滚成功")
-		if err := files.CopyFile(path.Join(tmpPath, "1panel.service"), "/etc/systemd/system", false); err != nil {
+		if err := files.CopyItem(false, true, path.Join(tmpPath, "1panel*.service"), "/etc/systemd/system"); err != nil {
 			return err
 		}
 		fmt.Println("(3/4) 1panel 服务回滚成功")
-		checkPointOfWal()
 		if _, err := os.Stat(path.Join(tmpPath, "core.db")); err == nil {
-			if err := files.CopyFile(path.Join(tmpPath, "core.db"), path.Join(baseDir, "core/db"), false); err != nil {
-				return err
-			}
-		}
-		if _, err := os.Stat(path.Join(tmpPath, "agent.db")); err == nil {
-			if err := files.CopyFile(path.Join(tmpPath, "agent.db"), path.Join(baseDir, "1panel/db"), false); err != nil {
-				return err
-			}
-		}
-		if _, err := os.Stat(path.Join(tmpPath, "db.tar.gz")); err == nil {
-			if err := handleUnTar(path.Join(tmpPath, "db.tar.gz"), path.Join(baseDir, "1panel")); err != nil {
+			if err := files.CopyItem(true, true, path.Join(tmpPath, "db"), path.Join(baseDir, "1panel")); err != nil {
 				return err
 			}
 		}
@@ -78,14 +65,6 @@ var restoreCmd = &cobra.Command{
 		fmt.Println("回滚成功！正在重启服务，请稍候...")
 		return nil
 	},
-}
-
-func checkPointOfWal() {
-	db, err := loadDBConn()
-	if err != nil {
-		return
-	}
-	_ = db.Exec("PRAGMA wal_checkpoint(TRUNCATE);").Error
 }
 
 func loadRestorePath(upgradeDir string) (string, error) {
@@ -109,19 +88,4 @@ func loadRestorePath(upgradeDir string) (string, error) {
 		return folders[i] > folders[j]
 	})
 	return folders[0], nil
-}
-
-func handleUnTar(sourceFile, targetDir string) error {
-	if _, err := os.Stat(targetDir); err != nil && os.IsNotExist(err) {
-		if err = os.MkdirAll(targetDir, os.ModePerm); err != nil {
-			return err
-		}
-	}
-
-	commands := fmt.Sprintf("tar zxvfC %s %s", sourceFile, targetDir)
-	stdout, err := cmdUtils.ExecWithTimeOut(commands, 20*time.Second)
-	if err != nil {
-		return errors.New(stdout)
-	}
-	return nil
 }

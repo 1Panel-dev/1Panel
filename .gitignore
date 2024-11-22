@@ -4,8 +4,8 @@
 *.dll
 *.so
 *.dylib
-build/1panel_agent
-build/1panel_core
+build/1panel-agent
+build/1panel-core
 
 # Mac
 .DS_Store

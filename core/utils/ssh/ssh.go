@@ -71,6 +71,17 @@ func (c *SSHClient) Run(shell string) (string, error) {
 	return string(buf), err
 }
 
+func (c *SSHClient) Runf(shell string, args ...interface{}) (string, error) {
+	session, err := c.Client.NewSession()
+	if err != nil {
+		return "", err
+	}
+	defer session.Close()
+	buf, err := session.CombinedOutput(fmt.Sprintf(shell, args...))
+
+	return string(buf), err
+}
+
 func (c *SSHClient) Close() {
 	_ = c.Client.Close()
 }

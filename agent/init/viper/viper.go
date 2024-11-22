@@ -38,9 +38,6 @@ func Init() {
 			panic(fmt.Errorf("Fatal error config file: %s \n", err))
 		}
 	} else {
-		baseDir = loadParams("BASE_DIR")
-		version = loadParams("ORIGINAL_VERSION")
-
 		reader := bytes.NewReader(conf.AppYaml)
 		if err := v.ReadConfig(reader); err != nil {
 			panic(fmt.Errorf("Fatal error config file: %s \n", err))

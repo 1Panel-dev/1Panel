@@ -40,6 +40,11 @@ func Init() {
 		global.LOG.Errorf("load service ssl from setting failed, err: %v", err)
 	}
 	global.CONF.System.SSL = sslSetting.Value
+	versionSetting, err := settingRepo.Get(commonRepo.WithByKey("SystemVersion"))
+	if err != nil {
+		global.LOG.Errorf("load version from setting failed, err: %v", err)
+	}
+	global.CONF.System.Version = versionSetting.Value
 
 	if _, err := settingRepo.Get(commonRepo.WithByKey("SystemStatus")); err != nil {
 		_ = settingRepo.Create("SystemStatus", "Free")

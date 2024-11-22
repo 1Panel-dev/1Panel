@@ -78,6 +78,12 @@ var InitSetting = &gormigrate.Migration{
 			return err
 		}
 		global.IsMaster = isMaster
+		if err := tx.Create(&model.Setting{Key: "BaseDir", Value: global.CONF.System.BaseDir}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "CurrentNode", Value: currentNode}).Error; err != nil {
+			return err
+		}
 		if err := tx.Create(&model.Setting{Key: "CurrentNode", Value: currentNode}).Error; err != nil {
 			return err
 		}

@@ -47,6 +47,30 @@ func CopyFile(src, dst string, withName bool) error {
 	return nil
 }
 
+func CopyItem(isDir, withName bool, src, dst string) error {
+	if path.Base(src) != path.Base(dst) && !withName {
+		dst = path.Join(dst, path.Base(src))
+	}
+	srcInfo, err := os.Stat(path.Dir(src))
+	if err != nil {
+		return err
+	}
+	if _, err := os.Stat(path.Dir(dst)); err != nil {
+		if os.IsNotExist(err) {
+			_ = os.MkdirAll(path.Dir(dst), srcInfo.Mode())
+		}
+	}
+	cmdStr := fmt.Sprintf(`cp -rf %s %s`, src, dst+"/")
+	if !isDir {
+		cmdStr = fmt.Sprintf(`cp -f %s %s`, src, dst+"/")
+	}
+	stdout, err := cmd.Exec(cmdStr)
+	if err != nil {
+		return fmt.Errorf("handle %s failed, stdout: %s, err: %v", cmdStr, stdout, err)
+	}
+	return nil
+}
+
 func HandleTar(sourceDir, targetDir, name, exclusionRules string, secret string) error {
 	if _, err := os.Stat(targetDir); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(targetDir, os.ModePerm); err != nil {
