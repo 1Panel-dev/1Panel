@@ -13,6 +13,8 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/encrypt"
+	"github.com/1Panel-dev/1Panel/backend/utils/firewall"
+	fireClient "github.com/1Panel-dev/1Panel/backend/utils/firewall/client"
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
 )
@@ -187,6 +189,7 @@ func port() {
 		fmt.Printf("错误：初始化数据库连接失败，%v\n", err)
 		return
 	}
+	oldPortStr := getSettingByKey(db, "ServerPort")
 	if err := setSettingByKey(db, "ServerPort", newPortStr); err != nil {
 		fmt.Printf("错误：面板端口修改失败，%v\n", err)
 		return
@@ -194,6 +197,18 @@ func port() {
 
 	fmt.Printf("修改成功！\n\n")
 	fmt.Printf("面板端口：%s\n", newPortStr)
+
+	if client, err := firewall.NewFirewallClient(); err == nil {
+		if err := client.Port(fireClient.FireInfo{Port: newPortStr, Protocol: "tcp", Strategy: "accept"}, "add"); err != nil {
+			fmt.Printf("添加防火墙端口规则失败，%v，请您手动将 %s 端口添加至防火墙规则中。\n", newPortStr, err)
+		}
+		if err := client.Port(fireClient.FireInfo{Port: oldPortStr, Protocol: "tcp", Strategy: "accept"}, "remove"); err != nil {
+			fmt.Printf("错误：防火墙端口删除失败，%v\n", err)
+		}
+		if err := client.Reload(); err != nil {
+			fmt.Printf("防火墙重载失败，%v，请您手动重载防火墙。\n", err)
+		}
+	}
 
 	std, err := cmd.Exec("1pctl restart")
 	if err != nil {
