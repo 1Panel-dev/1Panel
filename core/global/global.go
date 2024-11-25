@@ -15,6 +15,7 @@ import (
 
 var (
 	DB      *gorm.DB
+	TaskDB  *gorm.DB
 	LOG     *logrus.Logger
 	CONF    configs.ServerConfig
 	VALID   *validator.Validate

@@ -61,4 +61,4 @@ build_xpack_all: build_frontend build_core_xpack_on_linux build_agent_xpack_on_l
 
 build_on_local: clean_assets build_frontend build_core_on_darwin build_agent_on_darwin upx_bin
 
-build_xpack_on_local: clean_assets build_frontend build_agent_xpack_on_darwin build_agent_xpack_on_darwin upx_bin
+build_xpack_on_local: clean_assets build_frontend build_core_xpack_on_darwin build_agent_xpack_on_darwin upx_bin

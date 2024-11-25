@@ -31,9 +31,9 @@ func Init() {
 		global.LOG.Fatalf("load base dir before start failed, err: %v", err)
 	}
 	global.CONF.System.BaseDir = baseDir.Value
-	version, err := settingRepo.Get(settingRepo.WithByKey("Version"))
+	version, err := settingRepo.Get(settingRepo.WithByKey("SystemVersion"))
 	if err != nil {
-		global.LOG.Fatalf("load base dir before start failed, err: %v", err)
+		global.LOG.Fatalf("load system version before start failed, err: %v", err)
 	}
 	global.CONF.System.Version = version.Value
 

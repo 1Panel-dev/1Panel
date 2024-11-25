@@ -64,6 +64,4 @@ var (
 
 	websiteCAService = service.NewIWebsiteCAService()
 	taskService      = service.NewITaskService()
-
-	upgradeService = service.NewIUpgradeService()
 )

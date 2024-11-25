@@ -21,6 +21,5 @@ func commonGroups() []CommonRouter {
 		&RuntimeRouter{},
 		&ProcessRouter{},
 		&WebsiteCARouter{},
-		&UpgradeRouter{},
 	}
 }

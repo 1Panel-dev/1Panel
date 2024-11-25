@@ -17,6 +17,7 @@ type ICommonRepo interface {
 	WithByType(ty string) DBOption
 	WithByKey(key string) DBOption
 	WithOrderBy(orderStr string) DBOption
+	WithByStatus(status string) DBOption
 
 	WithOrderRuleBy(orderBy, order string) DBOption
 }
@@ -64,6 +65,11 @@ func (c *CommonRepo) WithByType(ty string) DBOption {
 func (c *CommonRepo) WithByKey(key string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("key = ?", key)
+	}
+}
+func (c *CommonRepo) WithByStatus(status string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("status = ?", status)
 	}
 }
 func (c *CommonRepo) WithOrderBy(orderStr string) DBOption {

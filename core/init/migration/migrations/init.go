@@ -15,7 +15,7 @@ import (
 )
 
 var AddTable = &gormigrate.Migration{
-	ID: "20240819-add-table",
+	ID: "20241224-add-table",
 	Migrate: func(tx *gorm.DB) error {
 		return tx.AutoMigrate(
 			&model.OperationLog{},
@@ -25,6 +25,7 @@ var AddTable = &gormigrate.Migration{
 			&model.Group{},
 			&model.Host{},
 			&model.Command{},
+			&model.UpgradeLog{},
 		)
 	},
 }
@@ -258,5 +259,14 @@ var InitGoogle = &gormigrate.Migration{
 			return err
 		}
 		return nil
+	},
+}
+
+var AddTaskDB = &gormigrate.Migration{
+	ID: "20241125-add-task-table",
+	Migrate: func(tx *gorm.DB) error {
+		return global.TaskDB.AutoMigrate(
+			&model.Task{},
+		)
 	},
 }

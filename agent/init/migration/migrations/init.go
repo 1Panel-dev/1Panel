@@ -53,7 +53,6 @@ var AddTable = &gormigrate.Migration{
 			&model.WebsiteDnsAccount{},
 			&model.WebsiteDomain{},
 			&model.WebsiteSSL{},
-			&model.Task{},
 		)
 	},
 }
@@ -217,14 +216,6 @@ var InitPHPExtensions = &gormigrate.Migration{
 	},
 }
 
-var AddTask = &gormigrate.Migration{
-	ID: "20240802-add-task",
-	Migrate: func(tx *gorm.DB) error {
-		return tx.AutoMigrate(
-			&model.Task{})
-	},
-}
-
 var UpdateWebsite = &gormigrate.Migration{
 	ID: "20240812-update-website",
 	Migrate: func(tx *gorm.DB) error {
@@ -277,5 +268,15 @@ var UpdateCronjob = &gormigrate.Migration{
 	ID: "20241017-update-cronjob",
 	Migrate: func(tx *gorm.DB) error {
 		return tx.AutoMigrate(&model.Cronjob{}, &model.JobRecords{})
+	},
+}
+
+var InitBaseDir = &gormigrate.Migration{
+	ID: "20241122-init-setting",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Create(&model.Setting{Key: "BaseDir", Value: global.CONF.System.BaseDir}).Error; err != nil {
+			return err
+		}
+		return nil
 	},
 }

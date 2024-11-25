@@ -13,4 +13,5 @@ const (
 	StatusHealthy     = "healthy"
 	StatusUnhealthy   = "unhealthy"
 	StatusUpgrading   = "upgrading"
+	StatusRunning     = "running"
 )

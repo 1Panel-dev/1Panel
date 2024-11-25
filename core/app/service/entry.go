@@ -11,4 +11,6 @@ var (
 	logRepo      = repo.NewILogRepo()
 	groupRepo    = repo.NewIGroupRepo()
 	launcherRepo = repo.NewILauncherRepo()
+
+	taskRepo = repo.NewITaskRepo()
 )
