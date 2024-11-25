@@ -95,7 +95,7 @@
                 </ComplexTable>
             </template>
         </LayoutContent>
-        <OperateDonet ref="operateRef" @close="search" />
+        <OperateDotnet ref="operateRef" @close="search" />
         <Delete ref="deleteRef" @close="search" />
         <ComposeLogs ref="composeLogRef" />
         <PortJumpDialog ref="dialogPortJumpRef" />
@@ -108,7 +108,7 @@ import { onMounted, onUnmounted, reactive, ref, computed } from 'vue';
 import { Runtime } from '@/api/interface/runtime';
 import { OperateRuntime, RuntimeDeleteCheck, SearchRuntimes, SyncRuntime } from '@/api/modules/runtime';
 import { dateFormat } from '@/utils/util';
-import OperateDonet from '@/views/website/runtime/donet/operate/index.vue';
+import OperateDotnet from '@/views/website/runtime/dotnet/operate/index.vue';
 import Status from '@/components/status/index.vue';
 import Delete from '@/views/website/runtime/delete/index.vue';
 import i18n from '@/lang';
@@ -147,7 +147,7 @@ const req = reactive<Runtime.RuntimeReq>({
     name: '',
     page: 1,
     pageSize: 40,
-    type: 'donet',
+    type: 'dotnet',
 });
 const buttons = [
     {
@@ -213,7 +213,7 @@ const sync = () => {
 };
 
 const openCreate = () => {
-    operateRef.value.acceptParams({ type: 'donet', mode: 'create' });
+    operateRef.value.acceptParams({ type: 'dotnet', mode: 'create' });
 };
 
 const openDetail = (row: Runtime.Runtime) => {

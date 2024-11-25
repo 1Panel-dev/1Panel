@@ -31,7 +31,7 @@ const buttons = [
     },
     {
         label: '.NET',
-        path: '/websites/runtimes/donet',
+        path: '/websites/runtimes/dotnet',
     },
 ];
 </script>

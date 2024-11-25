@@ -96,10 +96,9 @@ var WebUrlMap = map[string]struct{}{
 	"/websites/runtimes/php":    {},
 	"/websites/runtimes/node":   {},
 	"/websites/runtimes/java":   {},
-	"/websites/runtimes/net":    {},
 	"/websites/runtimes/go":     {},
 	"/websites/runtimes/python": {},
-	"/websites/runtimes/donet":  {},
+	"/websites/runtimes/dotnet": {},
 
 	"/login": {},
 

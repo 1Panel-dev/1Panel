@@ -2249,7 +2249,7 @@ const message = {
         goDirHelper: '目录中要包含 go 文件或者二进制文件，子目录中包含也可',
         pythonHelper:
             '请填写完整启动命令，例如：pip install -r requirements.txt && python manage.py runserver 0.0.0.0:5000',
-        donetHelper: '请填写完整启动命令，例如 dotnet MyWebApp.dll',
+        dotnetHelper: '请填写完整启动命令，例如 dotnet MyWebApp.dll',
     },
     process: {
         pid: '进程ID',

@@ -354,9 +354,9 @@ func handleParams(create request.RuntimeCreate, projectDir string) (composeConte
 		if err != nil {
 			return
 		}
-	case constant.RuntimeDoNet:
+	case constant.RuntimeDotNet:
 		create.Params["CODE_DIR"] = create.CodeDir
-		create.Params["DONET_VERSION"] = create.Version
+		create.Params["DOTNET_VERSION"] = create.Version
 		create.Params["PANEL_APP_PORT_HTTP"] = create.Port
 		composeContent, err = handleCompose(env, composeContent, create, projectDir)
 		if err != nil {
@@ -408,7 +408,7 @@ func handleCompose(env gotenv.Env, composeContent []byte, create request.Runtime
 				ports = append(ports, "${HOST_IP}:${PANEL_APP_PORT_HTTP}:${JAVA_APP_PORT}")
 			case constant.RuntimeGo:
 				ports = append(ports, "${HOST_IP}:${PANEL_APP_PORT_HTTP}:${GO_APP_PORT}")
-			case constant.RuntimePython, constant.RuntimeDoNet:
+			case constant.RuntimePython, constant.RuntimeDotNet:
 				ports = append(ports, "${HOST_IP}:${PANEL_APP_PORT_HTTP}:${APP_PORT}")
 			}
 

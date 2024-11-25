@@ -76,7 +76,7 @@
                     <el-form-item :label="$t('runtime.runScript')" prop="params.EXEC_SCRIPT">
                         <el-input v-model="runtime.params['EXEC_SCRIPT']"></el-input>
                         <span class="input-help">
-                            {{ $t('runtime.donetHelper') }}
+                            {{ $t('runtime.dotnetHelper') }}
                         </span>
                     </el-form-item>
                     <el-row :gutter="20">
@@ -174,7 +174,7 @@ const mode = ref('create');
 const editParams = ref<App.InstallParams[]>();
 const appVersions = ref<string[]>([]);
 const appReq = reactive({
-    type: 'donet',
+    type: 'dotnet',
     page: 1,
     pageSize: 20,
     resource: 'remote',
@@ -193,7 +193,7 @@ const initData = (type: string) => ({
     port: 8080,
     exposedPorts: [],
 });
-let runtime = reactive<Runtime.RuntimeCreate>(initData('donet'));
+let runtime = reactive<Runtime.RuntimeCreate>(initData('dotnet'));
 const rules = ref<any>({
     name: [Rules.requiredInput, Rules.appName],
     appID: [Rules.requiredSelect],

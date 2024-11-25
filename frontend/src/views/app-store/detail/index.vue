@@ -146,7 +146,7 @@ const openInstall = () => {
         case 'java':
         case 'go':
         case 'python':
-        case 'donet':
+        case 'dotnet':
             router.push({ path: '/websites/runtimes/' + app.value.type });
             break;
         default:
