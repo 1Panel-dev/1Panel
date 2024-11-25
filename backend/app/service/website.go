@@ -1052,19 +1052,19 @@ func (w WebsiteService) OpWebsiteLog(req request.WebsiteLogReq) (*response.Websi
 		res.Content = strings.Join(lines, "\n")
 		return res, nil
 	case constant.DisableLog:
-		key := "access_log"
+		params := dto.NginxParam{}
 		switch req.LogType {
 		case constant.AccessLog:
+			params.Name = "access_log"
+			params.Params = []string{"off"}
 			website.AccessLog = false
 		case constant.ErrorLog:
-			key = "error_log"
+			params.Name = "error_log"
+			params.Params = []string{"/dev/null", "crit"}
 			website.ErrorLog = false
 		}
 		var nginxParams []dto.NginxParam
-		nginxParams = append(nginxParams, dto.NginxParam{
-			Name:   key,
-			Params: []string{"off"},
-		})
+		nginxParams = append(nginxParams, params)
 
 		if err := updateNginxConfig(constant.NginxScopeServer, nginxParams, &website); err != nil {
 			return nil, err
