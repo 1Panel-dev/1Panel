@@ -816,7 +816,10 @@ func (a AppService) SyncAppListFromRemote() (err error) {
 	}
 	settingService := NewISettingService()
 	_ = settingService.Update("AppStoreSyncStatus", constant.Syncing)
-
+	setting, err := settingService.GetSettingInfo()
+	if err != nil {
+		return err
+	}
 	var (
 		tags      []*model.Tag
 		appTags   []*model.AppTag
@@ -868,7 +871,13 @@ func (a AppService) SyncAppListFromRemote() (err error) {
 			version := v.Name
 			detail := detailsMap[version]
 			versionUrl := fmt.Sprintf("%s/%s/%s", baseRemoteUrl, app.Key, version)
-
+			paramByte, _ := json.Marshal(v.AppForm)
+			var appForm dto.AppForm
+			_ = json.Unmarshal(paramByte, &appForm)
+			if appForm.SupportVersion > 0 && common.CompareVersion(strconv.FormatFloat(appForm.SupportVersion, 'f', -1, 64), setting.SystemVersion) {
+				delete(detailsMap, version)
+				continue
+			}
 			if _, ok := InitTypes[app.Type]; ok {
 				dockerComposeUrl := fmt.Sprintf("%s/%s", versionUrl, "docker-compose.yml")
 				_, composeRes, err := httpUtil.HandleGetWithTransport(dockerComposeUrl, http.MethodGet, transport, constant.TimeOut20s)
@@ -880,7 +889,6 @@ func (a AppService) SyncAppListFromRemote() (err error) {
 				detail.DockerCompose = ""
 			}
 
-			paramByte, _ := json.Marshal(v.AppForm)
 			detail.Params = string(paramByte)
 			detail.DownloadUrl = fmt.Sprintf("%s/%s", versionUrl, app.Key+"-"+version+".tar.gz")
 			detail.DownloadCallBackUrl = v.DownloadCallBackUrl
