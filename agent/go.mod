@@ -7,7 +7,6 @@ require (
 	github.com/aws/aws-sdk-go v1.55.0
 	github.com/compose-spec/compose-go/v2 v2.1.4
 	github.com/creack/pty v1.1.21
-	github.com/dgraph-io/badger/v4 v4.2.0
 	github.com/docker/compose/v2 v2.29.0
 	github.com/docker/docker v27.1.0+incompatible
 	github.com/docker/go-connections v0.5.0
@@ -176,6 +175,7 @@ require (
 	github.com/nwaples/rardecode/v2 v2.0.0-beta.2 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opentracing/opentracing-go v1.2.1-0.20220228012449-10b1cf09e00b // indirect
+	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.2 // indirect
 	github.com/pierrec/lz4/v4 v4.1.15 // indirect

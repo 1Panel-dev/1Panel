@@ -2,8 +2,7 @@ package global
 
 import (
 	"github.com/1Panel-dev/1Panel/agent/configs"
-	"github.com/1Panel-dev/1Panel/agent/init/cache/badger_db"
-	"github.com/dgraph-io/badger/v4"
+	badger_db "github.com/1Panel-dev/1Panel/agent/init/cache/db"
 	"github.com/go-playground/validator/v10"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/robfig/cron/v3"
@@ -21,7 +20,6 @@ var (
 	CONF      configs.ServerConfig
 	VALID     *validator.Validate
 	CACHE     *badger_db.Cache
-	CacheDb   *badger.DB
 	Viper     *viper.Viper
 
 	Cron           *cron.Cron

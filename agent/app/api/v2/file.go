@@ -751,11 +751,7 @@ func (b *BaseApi) Ws(c *gin.Context) {
 
 func (b *BaseApi) Keys(c *gin.Context) {
 	res := &response.FileProcessKeys{}
-	keys, err := global.CACHE.PrefixScanKey("file-wget-")
-	if err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
+	keys := global.CACHE.PrefixScanKey("file-wget-")
 	res.Keys = keys
 	helper.SuccessWithData(c, res)
 }

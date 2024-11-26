@@ -248,13 +248,9 @@ func (w *WriteCounter) SaveProcess() {
 	}
 	by, _ := json.Marshal(process)
 	if percentValue < 100 {
-		if err := global.CACHE.Set(w.Key, string(by)); err != nil {
-			global.LOG.Errorf("save cache error, err %s", err.Error())
-		}
+		global.CACHE.Set(w.Key, string(by))
 	} else {
-		if err := global.CACHE.SetWithTTL(w.Key, string(by), time.Second*time.Duration(10)); err != nil {
-			global.LOG.Errorf("save cache error, err %s", err.Error())
-		}
+		global.CACHE.SetWithTTL(w.Key, string(by), time.Second*time.Duration(10))
 	}
 }
 
@@ -293,20 +289,14 @@ func (f FileOp) DownloadFileWithProcess(url, dst, key string, ignoreCertificate 
 		out.Close()
 		resp.Body.Close()
 
-		value, err := global.CACHE.Get(counter.Key)
-		if err != nil {
-			global.LOG.Errorf("get cache error,err %s", err.Error())
-			return
-		}
+		value := global.CACHE.Get(counter.Key)
 		process := &Process{}
-		_ = json.Unmarshal(value, process)
+		_ = json.Unmarshal([]byte(value), process)
 		process.Percent = 100
 		process.Name = counter.Name
 		process.Total = process.Written
 		by, _ := json.Marshal(process)
-		if err := global.CACHE.SetWithTTL(counter.Key, string(by), time.Second*time.Duration(10)); err != nil {
-			global.LOG.Errorf("save cache error, err %s", err.Error())
-		}
+		global.CACHE.Set(counter.Key, string(by))
 	}()
 	return nil
 }

@@ -8,7 +8,6 @@ require (
 	github.com/aliyun/aliyun-oss-go-sdk v3.0.2+incompatible
 	github.com/aws/aws-sdk-go v1.55.5
 	github.com/creack/pty v1.1.9
-	github.com/dgraph-io/badger/v4 v4.2.0
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/gin-contrib/gzip v1.0.1
 	github.com/gin-gonic/gin v1.10.0

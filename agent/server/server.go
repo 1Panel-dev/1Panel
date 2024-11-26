@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/agent/init/business"
+	"github.com/1Panel-dev/1Panel/agent/init/cache"
 	"net"
 	"net/http"
 	"os"
@@ -30,6 +31,7 @@ func Start() {
 	i18n.Init()
 	log.Init()
 	db.Init()
+	cache.Init()
 	migration.Init()
 	app.Init()
 	validator.Init()

@@ -134,13 +134,12 @@ func ProcessData(c *Client, inputMsg []byte) {
 func getDownloadProcess(progress DownloadProgress) (res []byte, err error) {
 	var result []files.Process
 	for _, k := range progress.Keys {
-		value, err := global.CACHE.Get(k)
-		if err != nil {
-			global.LOG.Errorf("get cache error,err %s", err.Error())
-			return nil, err
+		value := global.CACHE.Get(k)
+		if value == "" {
+			return nil, fmt.Errorf("get cache error,err value is nil")
 		}
 		downloadProcess := &files.Process{}
-		_ = json.Unmarshal(value, downloadProcess)
+		_ = json.Unmarshal([]byte(value), downloadProcess)
 		result = append(result, *downloadProcess)
 	}
 	res, err = json.Marshal(result)
