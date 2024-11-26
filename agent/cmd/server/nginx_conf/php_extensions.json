@@ -327,5 +327,11 @@
     "file": "sourceguardian.so",
     "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
     "installed": false
+  },{
+  "name": "mysqli",
+    "check": "mysqli",
+    "file": "mysqli.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "installed": false
   }
 ]

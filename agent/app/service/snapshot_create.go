@@ -358,12 +358,12 @@ func loadBackupExcludes(snap snapHelper, req []dto.DataTree) []string {
 			}
 			if strings.HasPrefix(item.Path, path.Join(global.CONF.System.Backup, "system_snapshot")) {
 				fmt.Println(strings.TrimSuffix(item.Name, ".tar.gz"))
-				if err := snap.snapAgentDB.Debug().Where("name = ? AND download_account_id = ?", strings.TrimSuffix(item.Name, ".tar.gz"), "1").Delete(&model.Snapshot{}).Error; err != nil {
+				if err := snap.snapAgentDB.Where("name = ? AND download_account_id = ?", strings.TrimSuffix(item.Name, ".tar.gz"), "1").Delete(&model.Snapshot{}).Error; err != nil {
 					snap.Task.LogWithStatus("delete snapshot from database", err)
 				}
 			} else {
 				fmt.Println(strings.TrimPrefix(path.Dir(item.Path), global.CONF.System.Backup+"/"), path.Base(item.Path))
-				if err := snap.snapAgentDB.Debug().Where("file_dir = ? AND file_name = ?", strings.TrimPrefix(path.Dir(item.Path), global.CONF.System.Backup+"/"), path.Base(item.Path)).Delete(&model.BackupRecord{}).Error; err != nil {
+				if err := snap.snapAgentDB.Where("file_dir = ? AND file_name = ?", strings.TrimPrefix(path.Dir(item.Path), global.CONF.System.Backup+"/"), path.Base(item.Path)).Delete(&model.BackupRecord{}).Error; err != nil {
 					snap.Task.LogWithStatus("delete backup file from database", err)
 				}
 			}

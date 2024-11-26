@@ -21,12 +21,7 @@ func SessionAuth() gin.HandlerFunc {
 			c.Next()
 			return
 		}
-		sId, err := c.Cookie(constant.SessionName)
-		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrUnauthorized, constant.ErrTypeNotLogin, nil)
-			return
-		}
-		psession, err := global.SESSION.Get(sId)
+		psession, err := global.SESSION.Get(c)
 		if err != nil {
 			helper.ErrorWithDetail(c, constant.CodeErrUnauthorized, constant.ErrTypeNotLogin, nil)
 			return
@@ -36,9 +31,15 @@ func SessionAuth() gin.HandlerFunc {
 		setting, err := settingRepo.Get(commonRepo.WithByKey("SessionTimeout"))
 		if err != nil {
 			global.LOG.Errorf("create operation record failed, err: %v", err)
+			return
 		}
 		lifeTime, _ := strconv.Atoi(setting.Value)
-		_ = global.SESSION.Set(sId, psession, lifeTime)
+		httpsSetting, err := settingRepo.Get(commonRepo.WithByKey("SSL"))
+		if err != nil {
+			global.LOG.Errorf("create operation record failed, err: %v", err)
+			return
+		}
+		_ = global.SESSION.Set(c, psession, httpsSetting.Value == "enable", lifeTime)
 		c.Next()
 	}
 }

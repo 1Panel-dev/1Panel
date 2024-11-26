@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"os"
 	"path"
 	"time"
 
@@ -11,6 +12,8 @@ import (
 
 func Init() {
 	c := path.Join(global.CONF.System.BaseDir, "1panel/cache")
+	_ = os.RemoveAll(c)
+	_ = os.Mkdir(c, 0755)
 
 	options := badger.Options{
 		Dir:                c,

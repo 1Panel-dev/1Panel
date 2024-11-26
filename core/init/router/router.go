@@ -42,6 +42,8 @@ func Routers() *gin.Engine {
 	Router = gin.Default()
 	Router.Use(i18n.UseI18n())
 
+	//Router.Use(sessions.Sessions("test", global.SESSION.Store))
+
 	swaggerRouter := Router.Group("1panel")
 	docs.SwaggerInfo.BasePath = "/api/v2"
 	swaggerRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth()).GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
@@ -62,6 +64,7 @@ func Routers() *gin.Engine {
 	Router.Use(middleware.SessionAuth())
 	Router.Use(middleware.PasswordExpired())
 	Router.Use(middleware.Proxy())
+
 	PrivateGroup := Router.Group("/api/v2/core")
 	PrivateGroup.Use(middleware.WhiteAllow())
 	PrivateGroup.Use(middleware.BindDomain())

@@ -60,5 +60,5 @@ func (w *WebsiteAcmeAccountRepo) Save(account model.WebsiteAcmeAccount) error {
 }
 
 func (w *WebsiteAcmeAccountRepo) DeleteBy(opts ...DBOption) error {
-	return getDb(opts...).Debug().Delete(&model.WebsiteAcmeAccount{}).Error
+	return getDb(opts...).Delete(&model.WebsiteAcmeAccount{}).Error
 }

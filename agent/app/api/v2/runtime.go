@@ -83,7 +83,7 @@ func (b *BaseApi) DeleteRuntime(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Router /installed/delete/check/:id [get]
 func (b *BaseApi) DeleteRuntimeCheck(c *gin.Context) {
-	runTimeId, err := helper.GetIntParamByKey(c, "runTimeId")
+	runTimeId, err := helper.GetIntParamByKey(c, "id")
 	if err != nil {
 		helper.BadRequest(c, err)
 		return

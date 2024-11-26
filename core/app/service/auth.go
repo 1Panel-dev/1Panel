@@ -12,7 +12,6 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/jwt"
 	"github.com/1Panel-dev/1Panel/core/utils/mfa"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/pkg/errors"
 )
 
@@ -132,18 +131,15 @@ func (u *AuthService) generateSession(c *gin.Context, name, authMethod string) (
 		}
 		return &dto.UserLoginInfo{Name: name, Token: token}, nil
 	}
-	sID, _ := c.Cookie(constant.SessionName)
-	sessionUser, err := global.SESSION.Get(sID)
+	sessionUser, err := global.SESSION.Get(c)
 	if err != nil {
-		sID = uuid.New().String()
-		c.SetCookie(constant.SessionName, sID, 0, "", "", httpsSetting.Value == "enable", true)
-		err := global.SESSION.Set(sID, sessionUser, lifeTime)
+		err := global.SESSION.Set(c, sessionUser, httpsSetting.Value == "enable", lifeTime)
 		if err != nil {
 			return nil, err
 		}
 		return &dto.UserLoginInfo{Name: name}, nil
 	}
-	if err := global.SESSION.Set(sID, sessionUser, lifeTime); err != nil {
+	if err := global.SESSION.Set(c, sessionUser, httpsSetting.Value == "enable", lifeTime); err != nil {
 		return nil, err
 	}
 
@@ -158,7 +154,7 @@ func (u *AuthService) LogOut(c *gin.Context) error {
 	sID, _ := c.Cookie(constant.SessionName)
 	if sID != "" {
 		c.SetCookie(constant.SessionName, sID, -1, "", "", httpsSetting.Value == "enable", true)
-		err := global.SESSION.Delete(sID)
+		err := global.SESSION.Delete(c)
 		if err != nil {
 			return err
 		}
