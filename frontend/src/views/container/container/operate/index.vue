@@ -357,23 +357,26 @@ const acceptParams = (params: DialogProps): void => {
     title.value = i18n.global.t('container.' + dialogData.value.title);
     if (params.title === 'edit') {
         dialogData.value.rowData.memory = Number(dialogData.value.rowData.memory.toFixed(2));
-        dialogData.value.rowData.cmd = dialogData.value.rowData.cmd || [];
+
         let itemCmd = '';
         for (const item of dialogData.value.rowData.cmd) {
-            itemCmd += `'${item}' `;
-        }
-        dialogData.value.rowData.cmdStr = itemCmd ? itemCmd.substring(0, itemCmd.length - 1) : '';
-
-        let itemEntrypoint = '';
-        if (dialogData.value.rowData?.entrypoint) {
-            for (const item of dialogData.value.rowData.entrypoint) {
-                itemEntrypoint += `'${item}' `;
+            if (item.indexOf(' ') !== -1) {
+                itemCmd += `"${item.replaceAll('"', '\\"')}" `;
+            } else {
+                itemCmd += item + ' ';
             }
         }
+        dialogData.value.rowData.cmdStr = itemCmd.trimEnd();
+        let itemEntrypoint = '';
+        for (const item of dialogData.value.rowData.entrypoint) {
+            if (item.indexOf(' ') !== -1) {
+                itemEntrypoint += `"${item.replaceAll('"', '\\"')}" `;
+            } else {
+                itemEntrypoint += item + ' ';
+            }
+        }
+        dialogData.value.rowData.entrypointStr = itemEntrypoint.trimEnd();
 
-        dialogData.value.rowData.entrypointStr = itemEntrypoint
-            ? itemEntrypoint.substring(0, itemEntrypoint.length - 1)
-            : '';
         dialogData.value.rowData.labels = dialogData.value.rowData.labels || [];
         dialogData.value.rowData.env = dialogData.value.rowData.env || [];
         dialogData.value.rowData.labelsStr = dialogData.value.rowData.labels.join('\n');
@@ -501,34 +504,16 @@ const submit = async () => {
     }
     dialogData.value.rowData!.cmd = [];
     if (dialogData.value.rowData?.cmdStr) {
-        if (dialogData.value.rowData?.cmdStr.indexOf(`'`) !== -1) {
-            let itemCmd = dialogData.value.rowData!.cmdStr.split(`'`);
-            for (const cmd of itemCmd) {
-                if (cmd && cmd !== ' ') {
-                    dialogData.value.rowData!.cmd.push(cmd);
-                }
-            }
-        } else {
-            let itemCmd = dialogData.value.rowData!.cmdStr.split(` `);
-            for (const cmd of itemCmd) {
-                dialogData.value.rowData!.cmd.push(cmd);
-            }
+        let itemCmd = splitWithQuotes(dialogData.value.rowData?.cmdStr);
+        for (const item of itemCmd) {
+            dialogData.value.rowData!.cmd.push(item.replace(/(?<!\\)"/g, '').replaceAll('\\"', '"'));
         }
     }
     dialogData.value.rowData!.entrypoint = [];
     if (dialogData.value.rowData?.entrypointStr) {
-        if (dialogData.value.rowData?.entrypointStr.indexOf(`'`) !== -1) {
-            let itemEntrypoint = dialogData.value.rowData!.entrypointStr.split(`'`);
-            for (const entry of itemEntrypoint) {
-                if (entry && entry !== ' ') {
-                    dialogData.value.rowData!.entrypoint.push(entry);
-                }
-            }
-        } else {
-            let itemEntrypoint = dialogData.value.rowData!.entrypointStr.split(` `);
-            for (const entry of itemEntrypoint) {
-                dialogData.value.rowData!.entrypoint.push(entry);
-            }
+        let itemEntrypoint = splitWithQuotes(dialogData.value.rowData?.entrypointStr);
+        for (const item of itemEntrypoint) {
+            dialogData.value.rowData!.entrypoint.push(item.replace(/(?<!\\)"/g, '').replaceAll('\\"', '"'));
         }
     }
     if (dialogData.value.rowData!.publishAllPorts) {
@@ -643,6 +628,17 @@ const isFromApp = (rowData: Container.ContainerHelper) => {
         return rowData.labels.indexOf('createdBy=Apps') > -1;
     }
     return false;
+};
+
+const splitWithQuotes = (str) => {
+    str = str.replace(/\\"/g, '<quota>');
+    const regex = /(?=(?:[^'"]|['"][^'"]*['"])*$)\s+/g;
+    let parts = str.split(regex).filter(Boolean);
+    let returnList = [];
+    for (const item of parts) {
+        returnList.push(item.replaceAll('<quota>', '\\"'));
+    }
+    return returnList;
 };
 defineExpose({
     acceptParams,
