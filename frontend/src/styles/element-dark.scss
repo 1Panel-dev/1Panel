@@ -97,6 +97,7 @@ html.dark {
     --panel-terminal-tag-active-bg-color: var(--panel-main-bg-color-10);
     --panel-terminal-bg-color: var(--panel-main-bg-color-10);
     --panel-terminal-tag-active-text-color: var(--panel-color-primary);
+    --panel-terminal-tag-hover-text-color: var(--panel-color-primary);
     --panel-logs-bg-color: var(--panel-main-bg-color-9);
 
     --el-menu-item-bg-color: var(--panel-main-bg-color-10);
@@ -360,6 +361,9 @@ html.dark {
             background-color: var(--panel-main-bg-color-10);
         }
         .cm-gutters {
+            background-color: var(--panel-main-bg-color-10);
+        }
+        .log-container {
             background-color: var(--panel-main-bg-color-10);
         }
     }

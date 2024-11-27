@@ -6,6 +6,34 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "4472516",
+      "name": "告警设置",
+      "font_class": "alert-3",
+      "unicode": "e728",
+      "unicode_decimal": 59176
+    },
+    {
+      "icon_id": "3977832",
+      "name": "统一检查",
+      "font_class": "tongyijiancha",
+      "unicode": "e619",
+      "unicode_decimal": 58905
+    },
+    {
+      "icon_id": "11052436",
+      "name": "命令行",
+      "font_class": "minglinghang",
+      "unicode": "e61e",
+      "unicode_decimal": 58910
+    },
+    {
+      "icon_id": "11124973",
+      "name": "表单",
+      "font_class": "17",
+      "unicode": "e618",
+      "unicode_decimal": 58904
+    },
+    {
       "icon_id": "29851742",
       "name": "短信告警",
       "font_class": "alert-1",

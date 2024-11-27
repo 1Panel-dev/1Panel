@@ -540,6 +540,19 @@ const checkHttpOrHttps = (rule, value, callback) => {
     }
 };
 
+const checkPhone = (rule: any, value: any, callback: any) => {
+    if (value === '' || typeof value === 'undefined' || value == null) {
+        callback();
+    } else {
+        const reg = /^(?:(?:\+|00)86)?1[3-9]\d{9}$/;
+        if (!reg.test(value) && value !== '') {
+            callback(new Error(i18n.global.t('commons.rule.phone')));
+        } else {
+            callback();
+        }
+    }
+};
+
 interface CommonRule {
     requiredInput: FormItemRule;
     requiredSelect: FormItemRule;
@@ -584,6 +597,7 @@ interface CommonRule {
     paramExtUrl: FormItemRule;
     paramSimple: FormItemRule;
     paramHttp: FormItemRule;
+    phone: FormItemRule;
 }
 
 export const Rules: CommonRule = {
@@ -804,6 +818,11 @@ export const Rules: CommonRule = {
     },
     ipv4: {
         validator: checkIpv4,
+        trigger: 'blur',
+    },
+    phone: {
+        validator: checkPhone,
+        required: true,
         trigger: 'blur',
     },
 };

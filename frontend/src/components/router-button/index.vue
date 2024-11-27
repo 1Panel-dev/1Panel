@@ -96,7 +96,7 @@ onMounted(() => {
     .el-radio-button__original-radio:checked + .el-radio-button__inner {
         color: var(--panel-button-text-color) !important;
         background-color: var(--panel-button-bg-color) !important;
-        border-color: var(--panel-button-active) !important;
+        border-color: var(--panel-color-primary) !important;
         border-radius: 4px;
     }
 }

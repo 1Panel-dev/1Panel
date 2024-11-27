@@ -226,8 +226,7 @@ const message = {
             formatErr: 'Format error, please check and retry',
             phpExtension: 'Only supports , _ lowercase English and numbers',
             paramHttp: 'Must start with http:// or https://',
-            diffHelper:
-                'The left side is the old version, the right side is the new version, after editing, click Save using custom version',
+            phone: 'The format of the phone number is incorrect',
         },
         res: {
             paramError: 'The request failed, please try again later!',

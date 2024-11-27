@@ -223,6 +223,7 @@ const message = {
             formatErr: '格式错误，检查后重试',
             phpExtension: '仅支持 , _ 小写英文和数字',
             paramHttp: '必须以 http:// 或 https:// 开头',
+            phone: '手机号码格式不正确',
         },
         res: {
             paramError: '请求失败,请稍后重试!',

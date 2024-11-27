@@ -436,6 +436,12 @@ onMounted(() => {
         color: var(--panel-terminal-tag-active-text-color);
         background-color: var(--panel-terminal-tag-active-bg-color);
     }
+    :deep(.el-tabs__item:hover) {
+        color: var(--panel-terminal-tag-hover-text-color);
+    }
+    :deep(.el-tabs__item.is-active:hover) {
+        color: var(--panel-terminal-tag-active-text-color);
+    }
 }
 
 .tagButton {
