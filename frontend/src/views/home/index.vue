@@ -9,12 +9,10 @@
             ]"
         >
             <template #route-button>
-                <div class="router-button">
-                    <template v-if="!isProductPro">
-                        <el-button link type="primary" @click="toUpload">
-                            {{ $t('license.levelUpPro') }}
-                        </el-button>
-                    </template>
+                <div class="router-button" v-if="!isProductPro && !globalStore.isIntl">
+                    <el-button link type="primary" @click="toUpload">
+                        {{ $t('license.levelUpPro') }}
+                    </el-button>
                 </div>
             </template>
         </RouterButton>

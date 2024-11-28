@@ -20,7 +20,9 @@ type System struct {
 	Username           string `mapstructure:"username"`
 	Password           string `mapstructure:"password"`
 	Entrance           string `mapstructure:"entrance"`
+	Language           string `mapstructure:"language"`
 	IsDemo             bool   `mapstructure:"is_demo"`
+	IsIntl             bool   `mapstructure:"is_intl"`
 	AppRepo            string `mapstructure:"app_repo"`
 	ChangeUserInfo     string `mapstructure:"change_user_info"`
 	OneDriveID         string `mapstructure:"one_drive_id"`

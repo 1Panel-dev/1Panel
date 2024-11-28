@@ -24,3 +24,7 @@ export const checkIsDemo = () => {
 export const getLanguage = () => {
     return http.get<string>(`/auth/language`);
 };
+
+export const checkIsIntl = () => {
+    return http.get<boolean>('/auth/intl');
+};

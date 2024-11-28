@@ -16,7 +16,7 @@
                         <SystemUpgrade />
                     </div>
                     <div class="flex w-full justify-center my-5 flex-wrap md:flex-row gap-4">
-                        <el-link @click="toDoc" class="system-link">
+                        <el-link @click="toDoc" class="system-link" v-if="!globalStore.isIntl">
                             <el-icon><Document /></el-icon>
                             <span>{{ $t('setting.doc2') }}</span>
                         </el-link>

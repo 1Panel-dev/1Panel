@@ -5,8 +5,8 @@
                 <el-link type="primary" :underline="false" @click="toForum">
                     <span class="font-normal">{{ $t('setting.forum') }}</span>
                 </el-link>
-                <el-divider direction="vertical" />
-                <el-link type="primary" :underline="false" @click="toDoc">
+                <el-divider direction="vertical" v-if="!globalStore.isIntl" />
+                <el-link type="primary" :underline="false" @click="toDoc" v-if="!globalStore.isIntl">
                     <span class="font-normal">{{ $t('setting.doc2') }}</span>
                 </el-link>
                 <el-divider direction="vertical" />
@@ -17,7 +17,7 @@
             </div>
             <div class="flex flex-wrap items-center">
                 <el-link :underline="false" type="primary" @click="toHalo">
-                    {{ isProductPro ? $t('license.pro') : $t('license.community') }}
+                    {{ isProductPro && globalStore.isIntl ? $t('license.pro') : $t('license.community') }}
                 </el-link>
                 <el-link :underline="false" class="version" type="primary" @click="copyText(version)">
                     {{ version }}
@@ -122,7 +122,9 @@ const handleClose = () => {
 };
 
 const toHalo = () => {
-    window.open('https://www.lxware.cn/1panel' + '', '_blank', 'noopener,noreferrer');
+    if (!globalStore.isIntl) {
+        window.open('https://www.lxware.cn/1panel' + '', '_blank', 'noopener,noreferrer');
+    }
 };
 
 const toDoc = () => {
@@ -130,7 +132,10 @@ const toDoc = () => {
 };
 
 const toForum = () => {
-    window.open('https://bbs.fit2cloud.com/c/1p/7', '_blank');
+    let url = globalStore.isIntl
+        ? 'https://github.com/1Panel-dev/1Panel/discussions'
+        : 'https://bbs.fit2cloud.com/c/1p/7';
+    window.open(url, '_blank');
 };
 
 const toGithub = () => {

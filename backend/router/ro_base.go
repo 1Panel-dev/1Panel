@@ -17,5 +17,6 @@ func (s *BaseRouter) InitRouter(Router *gin.RouterGroup) {
 		baseRouter.POST("/logout", baseApi.LogOut)
 		baseRouter.GET("/demo", baseApi.CheckIsDemo)
 		baseRouter.GET("/language", baseApi.GetLanguage)
+		baseRouter.GET("/intl", baseApi.CheckIsIntl)
 	}
 }

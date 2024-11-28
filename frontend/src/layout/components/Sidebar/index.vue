@@ -42,7 +42,7 @@ import Logo from './components/Logo.vue';
 import Collapse from './components/Collapse.vue';
 import SubItem from './components/SubItem.vue';
 import router, { menuList } from '@/routers/router';
-import { logOutApi } from '@/api/modules/auth';
+import { checkIsIntl, logOutApi } from '@/api/modules/auth';
 import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
 import { GlobalStore, MenuStore } from '@/store';
@@ -68,7 +68,7 @@ const activeMenu = computed(() => {
 const isCollapse = computed((): boolean => menuStore.isCollapse);
 
 let routerMenus = computed((): RouteRecordRaw[] => {
-    return menuStore.menuList.filter((route) => route.meta && !route.meta.hideInSidebar);
+    return menuStore.menuList.filter((route) => route.meta && !route.meta.hideInSidebar) as RouteRecordRaw[];
 });
 
 const screenWidth = ref(0);
@@ -132,9 +132,14 @@ function getCheckedLabels(json: Node): string[] {
 }
 
 const search = async () => {
-    const res = await getSettingInfo();
-    const json: Node = JSON.parse(res.data.xpackHideMenu);
-    const checkedLabels = getCheckedLabels(json);
+    await checkIsSystemIntl();
+    let checkedLabels: string | any[];
+    if (!globalStore.isIntl) {
+        const res = await getSettingInfo();
+        const json: Node = JSON.parse(res.data.xpackHideMenu);
+        checkedLabels = getCheckedLabels(json);
+    }
+
     let rstMenuList: RouteRecordRaw[] = [];
     menuStore.menuList.forEach((item) => {
         let menuItem = JSON.parse(JSON.stringify(item));
@@ -171,6 +176,11 @@ const search = async () => {
         }
     });
     menuStore.menuList = rstMenuList;
+};
+
+const checkIsSystemIntl = async () => {
+    const res = await checkIsIntl();
+    globalStore.isIntl = res.data;
 };
 
 onMounted(() => {

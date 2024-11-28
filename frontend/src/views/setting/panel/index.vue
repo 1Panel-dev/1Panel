@@ -123,7 +123,7 @@
                                 </el-input>
                             </el-form-item>
 
-                            <el-form-item :label="$t('setting.proxy')" prop="proxyShow">
+                            <el-form-item v-if="!globalStore.isIntl" :label="$t('setting.proxy')" prop="proxyShow">
                                 <el-input disabled v-model="form.proxyShow">
                                     <template #append>
                                         <el-button @click="onChangeProxy" icon="Setting">
@@ -158,7 +158,7 @@
                                 <span class="input-help">{{ $t('setting.developerModeHelper') }}</span>
                             </el-form-item>
 
-                            <el-form-item :label="$t('setting.advancedMenuHide')">
+                            <el-form-item v-if="!globalStore.isIntl" :label="$t('setting.advancedMenuHide')">
                                 <el-input disabled v-model="form.proHideMenus">
                                     <template #append>
                                         <el-button v-show="!show" @click="onChangeHideMenus" icon="Setting">

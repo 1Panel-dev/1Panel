@@ -131,6 +131,15 @@ func (b *BaseApi) CheckIsDemo(c *gin.Context) {
 }
 
 // @Tags Auth
+// @Summary Check System isDemo
+// @Description 判断是否为国际版
+// @Success 200
+// @Router /auth/intl [get]
+func (b *BaseApi) CheckIsIntl(c *gin.Context) {
+	helper.SuccessWithData(c, global.CONF.System.IsIntl)
+}
+
+// @Tags Auth
 // @Summary Load System Language
 // @Description 获取系统语言设置
 // @Success 200

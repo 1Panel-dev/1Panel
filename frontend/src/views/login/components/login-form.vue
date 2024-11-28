@@ -120,22 +120,24 @@
                             {{ $t('commons.button.login') }}
                         </el-button>
                     </el-form-item>
-                    <el-form-item prop="agreeLicense">
-                        <el-checkbox v-model="loginForm.agreeLicense">
-                            <template #default>
-                                <span class="agree" v-html="$t('commons.login.licenseHelper')"></span>
-                            </template>
-                        </el-checkbox>
-                    </el-form-item>
-                    <div class="agree-helper">
-                        <span
-                            v-if="!loginForm.agreeLicense && !_isMobile()"
-                            class="input-error"
-                            style="line-height: 14px"
-                        >
-                            {{ $t('commons.login.errorAgree') }}
-                        </span>
-                    </div>
+                    <template v-if="!isIntl">
+                        <el-form-item prop="agreeLicense">
+                            <el-checkbox v-model="loginForm.agreeLicense">
+                                <template #default>
+                                    <span class="agree" v-html="$t('commons.login.licenseHelper')"></span>
+                                </template>
+                            </el-checkbox>
+                        </el-form-item>
+                        <div class="agree-helper">
+                            <span
+                                v-if="!loginForm.agreeLicense && !_isMobile()"
+                                class="input-error"
+                                style="line-height: 14px"
+                            >
+                                {{ $t('commons.login.errorAgree') }}
+                            </span>
+                        </div>
+                    </template>
                 </el-form>
                 <div class="demo">
                     <span v-if="isDemo">
@@ -171,7 +173,7 @@
 import { ref, reactive, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import type { ElForm } from 'element-plus';
-import { loginApi, getCaptcha, mfaLoginApi, checkIsDemo, getLanguage } from '@/api/modules/auth';
+import { loginApi, getCaptcha, mfaLoginApi, checkIsDemo, getLanguage, checkIsIntl } from '@/api/modules/auth';
 import { GlobalStore, MenuStore, TabsStore } from '@/store';
 import { MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
@@ -188,6 +190,7 @@ const errAuthInfo = ref(false);
 const errCaptcha = ref(false);
 const errMfaInfo = ref(false);
 const isDemo = ref(false);
+const isIntl = ref(true);
 const agreeVisible = ref(false);
 
 type FormInstance = InstanceType<typeof ElForm>;
@@ -235,6 +238,12 @@ const mfaShow = ref<boolean>(false);
 const router = useRouter();
 const dropdownText = ref('中文(简体)');
 
+const checkIsSystemIntl = async () => {
+    const res = await checkIsIntl();
+    isIntl.value = res.data;
+    globalStore.isIntl = isIntl.value;
+};
+
 function handleCommand(command: string) {
     loginForm.language = command;
     usei18n.locale.value = command;
@@ -258,6 +267,9 @@ const login = (formEl: FormInstance | undefined) => {
     if (!formEl || isLoggingIn) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
+        if (isIntl.value) {
+            loginForm.agreeLicense = true;
+        }
         if (!loginForm.agreeLicense) {
             if (_isMobile()) {
                 agreeVisible.value = true;
@@ -372,6 +384,7 @@ const loadDataFromDB = async () => {
 
 onMounted(() => {
     globalStore.isOnRestart = false;
+    checkIsSystemIntl();
     loginVerify();
     loadLanguage();
     document.title = globalStore.themeConfig.panelName;

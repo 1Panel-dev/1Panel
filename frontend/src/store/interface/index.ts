@@ -34,6 +34,7 @@ export interface GlobalState {
     defaultNetwork: string;
 
     isProductPro: boolean;
+    isIntl: boolean;
     isTrial: boolean;
     productProExpires: number;
 

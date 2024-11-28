@@ -72,6 +72,11 @@ var AddTableSetting = &gormigrate.Migration{
 		}
 		global.CONF.System.EncryptKey = encryptKey
 		pass, _ := encrypt.StringEncrypt(global.CONF.System.Password)
+		language := "en"
+		if global.CONF.System.Language == "zh" {
+			language = "zh"
+		}
+
 		if err := tx.Create(&model.Setting{Key: "Password", Value: pass}).Error; err != nil {
 			return err
 		}
@@ -82,7 +87,7 @@ var AddTableSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "PanelName", Value: "1Panel"}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "Language", Value: "zh"}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "Language", Value: language}).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "Theme", Value: "light"}).Error; err != nil {
