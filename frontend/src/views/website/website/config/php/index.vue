@@ -10,7 +10,7 @@
             <Upload :id="id" v-if="index == '2'"></Upload>
         </el-tab-pane>
         <el-tab-pane :label="$t('runtime.version')" name="3">
-            <Version :id="id" :runtimeID="runtimeID" v-if="index == '3'"></Version>
+            <Version :id="id" v-if="index == '3'"></Version>
         </el-tab-pane>
     </el-tabs>
 </template>

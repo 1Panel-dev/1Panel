@@ -2,7 +2,6 @@
     <div v-loading="loading">
         <el-form :model="form" :rules="variablesRules" ref="phpFormRef" label-position="top">
             <el-row v-loading="loading">
-                <el-col :span="1"><br /></el-col>
                 <el-col :span="9">
                     <el-form-item label="short_open_tag" prop="short_open_tag">
                         <el-select v-model="form.short_open_tag">

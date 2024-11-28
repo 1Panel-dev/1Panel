@@ -1343,6 +1343,14 @@ func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) error
 	if runtime.Resource == constant.ResourceLocal || oldRuntime.Resource == constant.ResourceLocal {
 		return buserr.New("ErrPHPResource")
 	}
+	client, err := docker.NewDockerClient()
+	if err != nil {
+		return err
+	}
+	defer client.Close()
+	if !checkImageExist(client, runtime.Image) {
+		return buserr.WithName("ErrImageNotExist", runtime.Name)
+	}
 	appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
 	if err != nil {
 		return err

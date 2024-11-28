@@ -1,7 +1,7 @@
 <template>
     <div v-loading="loading">
         <el-row>
-            <el-col :xs="20" :sm="12" :md="10" :lg="10" :xl="8" :offset="1">
+            <el-col :xs="20" :sm="12" :md="10" :lg="10" :xl="8">
                 <el-form>
                     <el-form-item :label="$t('runtime.version')">
                         <el-select v-model="versionReq.runtimeID" style="width: 100%">
@@ -33,15 +33,11 @@ import { SearchRuntimes } from '@/api/modules/runtime';
 import { onMounted, reactive, ref } from 'vue';
 import { Runtime } from '@/api/interface/runtime';
 import { Website } from '@/api/interface/website';
-import { ChangePHPVersion } from '@/api/modules/website';
+import { ChangePHPVersion, GetWebsite } from '@/api/modules/website';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 const props = defineProps({
     id: {
-        type: Number,
-        default: 0,
-    },
-    runtimeID: {
         type: Number,
         default: 0,
     },
@@ -92,16 +88,23 @@ const submit = async () => {
             try {
                 await ChangePHPVersion(versionReq);
                 MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
+                getWebsiteDetail();
             } catch (error) {}
             loading.value = false;
         });
     } catch (error) {}
 };
 
+const getWebsiteDetail = async () => {
+    const res = await GetWebsite(props.id);
+    versionReq.runtimeID = res.data.runtimeID;
+    oldRuntimeID.value = res.data.runtimeID;
+};
+
 onMounted(() => {
-    versionReq.runtimeID = props.runtimeID;
     versionReq.websiteID = props.id;
-    oldRuntimeID.value = props.runtimeID;
+
+    getWebsiteDetail();
     getRuntimes();
 });
 </script>

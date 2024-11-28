@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-row>
-            <el-col :xs="20" :sm="12" :md="10" :lg="10" :xl="8" :offset="1">
+            <el-col :xs="20" :sm="12" :md="10" :lg="10" :xl="8">
                 <el-form :model="form" :rules="rules" ref="formRef">
                     <el-form-item prop="funcs">
                         <el-input
