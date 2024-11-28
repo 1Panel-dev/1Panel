@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"net/http"
 	"os"
 	"os/exec"
 	"path"
@@ -20,7 +19,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
-	httpUtil "github.com/1Panel-dev/1Panel/backend/utils/http"
 	"github.com/pkg/errors"
 	"github.com/subosito/gotenv"
 	"gopkg.in/yaml.v3"
@@ -56,10 +54,7 @@ func handleNodeAndJava(create request.RuntimeCreate, runtime *model.Runtime, fil
 	}
 
 	go func() {
-		if _, _, err := httpUtil.HandleGet(nodeDetail.DownloadCallBackUrl, http.MethodGet, constant.TimeOut5s); err != nil {
-			global.LOG.Errorf("http request failed(handleNode), err: %v", err)
-			return
-		}
+		RequestDownloadCallBack(nodeDetail.DownloadCallBackUrl)
 	}()
 	go startRuntime(runtime)
 

@@ -91,10 +91,6 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 	}
 	var appDTOs []*response.AppDto
 	for _, ap := range apps {
-		// ap.ReadMe = ""
-		// ap.Website = ""
-		// ap.Document = ""
-		// ap.Github = ""
 		appDTO := &response.AppDto{
 			ID:          ap.ID,
 			Name:        ap.Name,
@@ -816,6 +812,14 @@ func (a AppService) SyncAppListFromRemote() (err error) {
 	}
 	settingService := NewISettingService()
 	_ = settingService.Update("AppStoreSyncStatus", constant.Syncing)
+
+	defer func() {
+		if err != nil {
+			_ = settingService.Update("AppStoreSyncStatus", constant.SyncFailed)
+			global.LOG.Errorf("App Store synchronization failed %v", err)
+		}
+	}()
+
 	setting, err := settingService.GetSettingInfo()
 	if err != nil {
 		return err

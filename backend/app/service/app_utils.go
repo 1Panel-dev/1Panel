@@ -584,7 +584,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 				_ = appDetailRepo.Update(context.Background(), detail)
 			}
 			go func() {
-				_, _, _ = httpUtil.HandleGet(detail.DownloadCallBackUrl, http.MethodGet, constant.TimeOut5s)
+				RequestDownloadCallBack(detail.DownloadCallBackUrl)
 			}()
 		}
 
@@ -822,7 +822,7 @@ func copyData(app model.App, appDetail model.AppDetail, appInstall *model.AppIns
 			return
 		}
 		go func() {
-			_, _, _ = httpUtil.HandleGet(appDetail.DownloadCallBackUrl, http.MethodGet, constant.TimeOut5s)
+			RequestDownloadCallBack(appDetail.DownloadCallBackUrl)
 		}()
 	}
 	appKey := app.Key
@@ -1579,4 +1579,11 @@ func isHostModel(dockerCompose string) bool {
 		}
 	}
 	return false
+}
+
+func RequestDownloadCallBack(downloadCallBackUrl string) {
+	if downloadCallBackUrl == "" {
+		return
+	}
+	_, _, _ = httpUtil.HandleGet(downloadCallBackUrl, http.MethodGet, constant.TimeOut5s)
 }
