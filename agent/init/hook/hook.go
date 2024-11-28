@@ -1,8 +1,6 @@
 package hook
 
 import (
-	"encoding/json"
-	"os"
 	"path"
 
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -10,11 +8,20 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/service"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
-	"github.com/1Panel-dev/1Panel/agent/init/db"
+	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
+	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 )
 
 func Init() {
+	initWithNodeJson()
+	initGlobalData()
+	handleCronjobStatus()
+	handleSnapStatus()
+	loadLocalDir()
+}
+
+func initGlobalData() {
 	settingRepo := repo.NewISettingRepo()
 	if _, err := settingRepo.Get(settingRepo.WithByKey("SystemStatus")); err != nil {
 		_ = settingRepo.Create("SystemStatus", "Free")
@@ -22,37 +29,18 @@ func Init() {
 	if err := settingRepo.Update("SystemStatus", "Free"); err != nil {
 		global.LOG.Fatalf("init service before start failed, err: %v", err)
 	}
-	node, err := settingRepo.Get(settingRepo.WithByKey("CurrentNode"))
-	if err != nil {
-		global.LOG.Fatalf("load current node before start failed, err: %v", err)
-	}
-	baseDir, err := settingRepo.Get(settingRepo.WithByKey("BaseDir"))
-	if err != nil {
-		global.LOG.Fatalf("load base dir before start failed, err: %v", err)
-	}
-	global.CONF.System.BaseDir = baseDir.Value
-	version, err := settingRepo.Get(settingRepo.WithByKey("SystemVersion"))
-	if err != nil {
-		global.LOG.Fatalf("load system version before start failed, err: %v", err)
-	}
-	global.CONF.System.Version = version.Value
 
-	global.IsMaster = node.Value == "127.0.0.1" || len(node.Value) == 0
+	global.CONF.System.BaseDir, _ = settingRepo.GetValueByKey("BaseDir")
+	global.CONF.System.Version, _ = settingRepo.GetValueByKey("SystemVersion")
+	global.CONF.System.EncryptKey, _ = settingRepo.GetValueByKey("EncryptKey")
+	currentNode, _ := settingRepo.GetValueByKey("CurrentNode")
+
+	global.IsMaster = currentNode == "127.0.0.1" || len(currentNode) == 0
 	if global.IsMaster {
-		db.InitCoreDB()
+		global.CoreDB = common.LoadDBConnByPath(path.Join(global.CONF.System.DbPath, "core.db"), "core")
 	} else {
-		masterAddr, err := settingRepo.Get(settingRepo.WithByKey("MasterAddr"))
-		if err != nil {
-			global.LOG.Fatalf("load master addr before start failed, err: %v", err)
-		}
-		global.CONF.System.MasterAddr = masterAddr.Value
+		global.CONF.System.MasterAddr, _ = settingRepo.GetValueByKey("MasterAddr")
 	}
-
-	handleCronjobStatus()
-	handleSnapStatus()
-	loadLocalDir()
-	initDir()
-	_ = initSSL()
 }
 
 func handleSnapStatus() {
@@ -112,46 +100,44 @@ func loadLocalDir() {
 	global.CONF.System.Backup = localDir
 }
 
-func initDir() {
-	composePath := path.Join(global.CONF.System.BaseDir, "1panel/docker/compose/")
-	if _, err := os.Stat(composePath); err != nil && os.IsNotExist(err) {
-		if err = os.MkdirAll(composePath, os.ModePerm); err != nil {
-			global.LOG.Errorf("mkdir %s failed, err: %v", composePath, err)
-			return
-		}
+func initWithNodeJson() {
+	if global.IsMaster {
+		return
 	}
-}
-
-func initSSL() error {
-	settingRepo := repo.NewISettingRepo()
-	if _, err := os.Stat("/opt/1panel/nodeJson"); err != nil {
-		return nil
-	}
-	type nodeInfo struct {
-		ServerCrt   string `json:"serverCrt"`
-		ServerKey   string `json:"serverKey"`
-		CurrentNode string `json:"currentNode"`
-	}
-	nodeJson, err := os.ReadFile("/opt/1panel/nodeJson")
+	isLocal, nodeInfo, err := xpack.LoadNodeInfo()
 	if err != nil {
-		return err
+		global.LOG.Errorf("load new node info failed, err: %v", err)
+		return
 	}
-	var node nodeInfo
-	if err := json.Unmarshal(nodeJson, &node); err != nil {
-		return err
+	if isLocal {
+		return
 	}
-	itemKey, _ := encrypt.StringEncrypt(node.ServerKey)
+
+	settingRepo := repo.NewISettingRepo()
+	itemKey, _ := encrypt.StringEncrypt(nodeInfo.ServerKey)
 	if err := settingRepo.Update("ServerKey", itemKey); err != nil {
-		return err
+		global.LOG.Errorf("update server key failed, err: %v", err)
+		return
 	}
-	itemCrt, _ := encrypt.StringEncrypt(node.ServerCrt)
+	itemCrt, _ := encrypt.StringEncrypt(nodeInfo.ServerCrt)
 	if err := settingRepo.Update("ServerCrt", itemCrt); err != nil {
-		return err
+		global.LOG.Errorf("update server crt failed, err: %v", err)
+		return
 	}
-	if err := settingRepo.Update("CurrentNode", node.CurrentNode); err != nil {
-		return err
+	if err := settingRepo.Update("CurrentNode", nodeInfo.CurrentNode); err != nil {
+		global.LOG.Errorf("update current node failed, err: %v", err)
+		return
 	}
-	global.IsMaster = node.CurrentNode == "127.0.0.1" || len(node.CurrentNode) == 0
-	_ = os.Remove(("/opt/1panel/nodeJson"))
-	return nil
+	if err := settingRepo.Update("SystemVersion", nodeInfo.Version); err != nil {
+		global.LOG.Errorf("update system version failed, err: %v", err)
+		return
+	}
+	if err := settingRepo.Update("BaseDir", nodeInfo.BaseDir); err != nil {
+		global.LOG.Errorf("update base dir failed, err: %v", err)
+		return
+	}
+	if err := settingRepo.Update("MasterAddr", nodeInfo.MasterAddr); err != nil {
+		global.LOG.Errorf("update master addr failed, err: %v", err)
+		return
+	}
 }

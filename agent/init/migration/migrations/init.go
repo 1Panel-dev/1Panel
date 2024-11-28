@@ -1,14 +1,13 @@
 package migrations
 
 import (
-	"os"
-
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/service"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
+	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 
 	"github.com/go-gormigrate/gormigrate/v2"
@@ -72,21 +71,31 @@ var InitSetting = &gormigrate.Migration{
 	ID: "20240722-init-setting",
 	Migrate: func(tx *gorm.DB) error {
 		global.CONF.System.EncryptKey = common.RandStr(16)
-		isMaster, currentNode, err := xpack.InitNodeData(tx)
+		_, nodeInfo, err := xpack.LoadNodeInfo()
 		if err != nil {
 			return err
 		}
-		global.IsMaster = isMaster
-		if err := tx.Create(&model.Setting{Key: "BaseDir", Value: global.CONF.System.BaseDir}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "BaseDir", Value: nodeInfo.BaseDir}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "CurrentNode", Value: currentNode}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "CurrentNode", Value: nodeInfo.CurrentNode}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "CurrentNode", Value: currentNode}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "EncryptKey", Value: nodeInfo.EncryptKey}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "EncryptKey", Value: global.CONF.System.EncryptKey}).Error; err != nil {
+		itemKey, _ := encrypt.StringEncrypt(nodeInfo.ServerKey)
+		if err := tx.Create(&model.Setting{Key: "ServerKey", Value: itemKey}).Error; err != nil {
+			return err
+		}
+		itemCrt, _ := encrypt.StringEncrypt(nodeInfo.ServerCrt)
+		if err := tx.Create(&model.Setting{Key: "ServerCrt", Value: itemCrt}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "MasterAddr", Value: nodeInfo.MasterAddr}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "SystemVersion", Value: nodeInfo.Version}).Error; err != nil {
 			return err
 		}
 
@@ -94,9 +103,6 @@ var InitSetting = &gormigrate.Migration{
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "DockerSockPath", Value: "unix:///var/run/docker.sock"}).Error; err != nil {
-			return err
-		}
-		if err := tx.Create(&model.Setting{Key: "SystemVersion", Value: global.CONF.System.Version}).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "SystemStatus", Value: "Free"}).Error; err != nil {
@@ -153,7 +159,6 @@ var InitSetting = &gormigrate.Migration{
 			return err
 		}
 
-		_ = os.Remove(("/opt/1panel/nodeJson"))
 		return nil
 	},
 }

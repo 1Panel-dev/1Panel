@@ -1500,6 +1500,7 @@ const message = {
         rollbackHelper:
             '即將回滾本次恢復，回滾將替換所有本次恢復的檔案，過程中可能需要重新啟動 Docker 以及 1Panel 服務，是否繼續？',
 
+        upgradeRecord: '升級記錄',
         upgrading: '正在升級中，請稍候...',
         upgradeHelper: '升級操作需要重啟 1Panel 服務，是否繼續？',
         noUpgrade: '當前已經是最新版本',

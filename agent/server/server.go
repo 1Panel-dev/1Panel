@@ -3,8 +3,6 @@ package server
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/init/business"
-	"github.com/1Panel-dev/1Panel/agent/init/cache"
 	"net"
 	"net/http"
 	"os"
@@ -14,6 +12,8 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/init/app"
+	"github.com/1Panel-dev/1Panel/agent/init/business"
+	"github.com/1Panel-dev/1Panel/agent/init/cache"
 	"github.com/1Panel-dev/1Panel/agent/init/db"
 	"github.com/1Panel-dev/1Panel/agent/init/hook"
 	"github.com/1Panel-dev/1Panel/agent/init/log"

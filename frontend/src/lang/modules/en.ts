@@ -1689,6 +1689,8 @@ const message = {
         rollbackHelper:
             'Rolling back this recovery will replace all files from this recovery, and may require restarting Docker and 1Panel services. Do you want to continue?',
 
+        upgradeRecord: 'Upgrade record',
+        upgrading: ' Upgrading, please wait...',
         upgradeHelper: 'The upgrade requires restarting the 1Panel service. Do you want to continue?',
         noUpgrade: 'It is currently the latest version',
         versionHelper:

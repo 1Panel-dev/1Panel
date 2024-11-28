@@ -4,22 +4,20 @@ import (
 	"bytes"
 	"fmt"
 	"path"
-	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/cmd/server/conf"
 	"github.com/1Panel-dev/1Panel/agent/configs"
 	"github.com/1Panel-dev/1Panel/agent/global"
-	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
+	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v3"
 )
 
 func Init() {
-	baseDir := "/opt"
 	mode := ""
-	version := "v1.0.0"
 	fileOp := files.NewFileOp()
 	v := viper.NewWithOptions()
 	v.SetConfigType("yaml")
@@ -52,36 +50,25 @@ func Init() {
 	if err := v.Unmarshal(&serverConfig); err != nil {
 		panic(err)
 	}
-	if mode == "dev" && fileOp.Stat("/opt/1panel/conf/app.yaml") {
-		if serverConfig.System.BaseDir != "" {
-			baseDir = serverConfig.System.BaseDir
-		}
-		if serverConfig.System.Version != "" {
-			version = serverConfig.System.Version
-		}
-	}
 
 	global.CONF = serverConfig
-	global.CONF.System.BaseDir = baseDir
 	global.CONF.System.IsDemo = v.GetBool("system.is_demo")
-	global.CONF.System.DataDir = path.Join(global.CONF.System.BaseDir, "1panel")
-	global.CONF.System.Cache = path.Join(global.CONF.System.DataDir, "cache")
-	global.CONF.System.Backup = path.Join(global.CONF.System.DataDir, "backup")
-	global.CONF.System.DbPath = path.Join(global.CONF.System.DataDir, "db")
-	global.CONF.System.LogPath = path.Join(global.CONF.System.DataDir, "log")
-	global.CONF.System.TmpDir = path.Join(global.CONF.System.DataDir, "tmp")
-	global.CONF.System.Version = version
+
+	initDir()
 	global.Viper = v
 }
 
-func loadParams(param string) string {
-	stdout, err := cmd.Execf("grep '^%s=' /usr/local/bin/1pctl | cut -d'=' -f2", param)
+func initDir() {
+	_, nodeInfo, err := xpack.LoadNodeInfo()
 	if err != nil {
 		panic(err)
 	}
-	info := strings.ReplaceAll(stdout, "\n", "")
-	if len(info) == 0 || info == `""` {
-		panic(fmt.Sprintf("error `%s` find in /usr/local/bin/1pctl", param))
-	}
-	return info
+	global.CONF.System.BaseDir = nodeInfo.BaseDir
+
+	_, _ = common.CreateDirWhenNotExist(true, path.Join(global.CONF.System.BaseDir, "1panel/docker/compose/"))
+	global.CONF.System.DataDir, _ = common.CreateDirWhenNotExist(true, path.Join(global.CONF.System.BaseDir, "1panel"))
+	global.CONF.System.Cache, _ = common.CreateDirWhenNotExist(true, path.Join(global.CONF.System.DataDir, "cache"))
+	global.CONF.System.DbPath, _ = common.CreateDirWhenNotExist(true, path.Join(global.CONF.System.DataDir, "db"))
+	global.CONF.System.LogPath, _ = common.CreateDirWhenNotExist(true, path.Join(global.CONF.System.DataDir, "log"))
+	global.CONF.System.TmpDir, _ = common.CreateDirWhenNotExist(true, path.Join(global.CONF.System.DataDir, "tmp"))
 }

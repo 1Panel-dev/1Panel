@@ -20,7 +20,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/copier"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
-	"github.com/glebarez/sqlite"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
 )
@@ -149,8 +148,8 @@ func (u *SnapshotService) HandleSnapshot(req dto.SnapshotCreate) error {
 			"SnapCloseDBConn",
 			func(t *task.Task) error {
 				taskItem.Log("---------------------- 6 / 8 ----------------------")
-				closeDatabase(itemHelper.snapAgentDB)
-				closeDatabase(itemHelper.snapCoreDB)
+				common.CloseDB(itemHelper.snapAgentDB)
+				common.CloseDB(itemHelper.snapCoreDB)
 				return nil
 			},
 			nil,
@@ -204,13 +203,13 @@ func loadDbConn(snap *snapHelper, targetDir string, req dto.SnapshotCreate) erro
 		return err
 	}
 
-	agentDb, err := newSnapDB(path.Join(targetDir, "db"), "agent.db")
+	agentDb, err := common.LoadDBConnByPathWithErr(path.Join(targetDir, "db"), "agent.db")
 	snap.Task.LogWithStatus(i18n.GetWithName("SnapNewDB", "agent"), err)
 	if err != nil {
 		return err
 	}
 	snap.snapAgentDB = agentDb
-	coreDb, err := newSnapDB(path.Join(targetDir, "db"), "core.db")
+	coreDb, err := common.LoadDBConnByPathWithErr(path.Join(targetDir, "db"), "core.db")
 	snap.Task.LogWithStatus(i18n.GetWithName("SnapNewDB", "core"), err)
 	if err != nil {
 		return err
@@ -465,7 +464,7 @@ func snapCompress(snap snapHelper, rootDir string, secret string) error {
 	}
 
 	size := common.LoadSizeUnit2F(float64(stat.Size()))
-	snap.Task.Logf(i18n.GetWithName("SnapCompressSize", size))
+	snap.Task.Log(i18n.GetWithName("SnapCompressSize", size))
 	_ = os.RemoveAll(rootDir)
 	return nil
 }
@@ -492,26 +491,4 @@ func snapUpload(snap snapHelper, accounts string, file string) error {
 	}
 	_ = os.Remove(source)
 	return nil
-}
-
-func newSnapDB(dir, file string) (*gorm.DB, error) {
-	db, _ := gorm.Open(sqlite.Open(path.Join(dir, file)), &gorm.Config{
-		DisableForeignKeyConstraintWhenMigrating: true,
-	})
-	sqlDB, err := db.DB()
-	if err != nil {
-		return nil, err
-	}
-	sqlDB.SetConnMaxIdleTime(10)
-	sqlDB.SetMaxOpenConns(100)
-	sqlDB.SetConnMaxLifetime(time.Hour)
-	return db, nil
-}
-
-func closeDatabase(db *gorm.DB) {
-	sqlDB, err := db.DB()
-	if err != nil {
-		return
-	}
-	_ = sqlDB.Close()
 }

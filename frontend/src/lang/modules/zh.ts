@@ -1499,6 +1499,7 @@ const message = {
         rollbackHelper:
             '即将回滚本次恢复，回滚将替换所有本次恢复的文件，过程中可能需要重启 Docker 以及 1Panel 服务，是否继续？',
 
+        upgradeRecord: '升级记录',
         upgrading: '正在升级中，请稍候...',
         upgradeHelper: '升级操作需要重启 1Panel 服务，是否继续？',
         noUpgrade: '当前已经是最新版本',

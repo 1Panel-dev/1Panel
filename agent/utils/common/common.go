@@ -18,6 +18,7 @@ import (
 
 	"golang.org/x/net/idna"
 
+	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 )
 
@@ -335,4 +336,18 @@ func SplitStr(str string, spi ...string) []string {
 
 func IsValidIP(ip string) bool {
 	return net.ParseIP(ip) != nil
+}
+
+func CreateDirWhenNotExist(isDir bool, pathItem string) (string, error) {
+	checkPath := pathItem
+	if !isDir {
+		checkPath = path.Dir(pathItem)
+	}
+	if _, err := os.Stat(checkPath); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(checkPath, os.ModePerm); err != nil {
+			global.LOG.Errorf("mkdir %s failed, err: %v", checkPath, err)
+			return pathItem, err
+		}
+	}
+	return pathItem, nil
 }
