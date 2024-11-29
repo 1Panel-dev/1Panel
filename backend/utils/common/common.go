@@ -3,6 +3,7 @@ package common
 import (
 	"crypto/rand"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"io"
 	mathRand "math/rand"
 	"net"
@@ -341,4 +342,12 @@ func FormatBytes(bytes uint64) string {
 
 func FormatPercent(percent float64) string {
 	return fmt.Sprintf("%.2f%%", percent)
+}
+
+func GetLang(c *gin.Context) string {
+	lang := c.GetHeader("Accept-Language")
+	if lang == "" {
+		lang = "en"
+	}
+	return lang
 }

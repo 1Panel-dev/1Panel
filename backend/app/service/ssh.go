@@ -2,6 +2,8 @@ package service
 
 import (
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/utils/geo"
+	"github.com/gin-gonic/gin"
 	"os"
 	"os/user"
 	"path"
@@ -17,7 +19,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
-	"github.com/1Panel-dev/1Panel/backend/utils/qqwry"
 	"github.com/1Panel-dev/1Panel/backend/utils/systemctl"
 	"github.com/pkg/errors"
 )
@@ -33,7 +34,7 @@ type ISSHService interface {
 	Update(req dto.SSHUpdate) error
 	GenerateSSH(req dto.GenerateSSH) error
 	LoadSSHSecret(mode string) (string, error)
-	LoadLog(req dto.SearchSSHLog) (*dto.SSHLog, error)
+	LoadLog(c *gin.Context, req dto.SearchSSHLog) (*dto.SSHLog, error)
 
 	LoadSSHConf() (string, error)
 }
@@ -289,7 +290,7 @@ type sshFileItem struct {
 	Year int
 }
 
-func (u *SSHService) LoadLog(req dto.SearchSSHLog) (*dto.SSHLog, error) {
+func (u *SSHService) LoadLog(c *gin.Context, req dto.SearchSSHLog) (*dto.SSHLog, error) {
 	var fileList []sshFileItem
 	var data dto.SSHLog
 	baseDir := "/var/log"
@@ -323,10 +324,6 @@ func (u *SSHService) LoadLog(req dto.SearchSSHLog) (*dto.SSHLog, error) {
 	showCountFrom := (req.Page - 1) * req.PageSize
 	showCountTo := req.Page * req.PageSize
 	nyc, _ := time.LoadLocation(common.LoadTimeZoneByCmd())
-	qqWry, err := qqwry.NewQQwry()
-	if err != nil {
-		global.LOG.Errorf("load qqwry datas failed: %s", err)
-	}
 	for _, file := range fileList {
 		commandItem := ""
 		if strings.HasPrefix(path.Base(file.Name), "secure") {
@@ -349,7 +346,7 @@ func (u *SSHService) LoadLog(req dto.SearchSSHLog) (*dto.SSHLog, error) {
 				commandItem = fmt.Sprintf("cat %s | grep -aE \"(Failed password for|Connection closed by authenticating user|Accepted)\" %s", file.Name, command)
 			}
 		}
-		dataItem, successCount, failedCount := loadSSHData(commandItem, showCountFrom, showCountTo, file.Year, qqWry, nyc)
+		dataItem, successCount, failedCount := loadSSHData(c, commandItem, showCountFrom, showCountTo, file.Year, nyc)
 		data.FailedCount += failedCount
 		data.TotalCount += successCount + failedCount
 		showCountFrom = showCountFrom - (successCount + failedCount)
@@ -422,7 +419,7 @@ func updateSSHConf(oldFiles []string, param string, value string) []string {
 	return newFiles
 }
 
-func loadSSHData(command string, showCountFrom, showCountTo, currentYear int, qqWry *qqwry.QQwry, nyc *time.Location) ([]dto.SSHHistory, int, int) {
+func loadSSHData(c *gin.Context, command string, showCountFrom, showCountTo, currentYear int, nyc *time.Location) ([]dto.SSHHistory, int, int) {
 	var (
 		datas        []dto.SSHHistory
 		successCount int
@@ -440,7 +437,7 @@ func loadSSHData(command string, showCountFrom, showCountTo, currentYear int, qq
 			itemData = loadFailedSecureDatas(lines[i])
 			if len(itemData.Address) != 0 {
 				if successCount+failedCount >= showCountFrom && successCount+failedCount < showCountTo {
-					itemData.Area = qqWry.Find(itemData.Address).Area
+					itemData.Area, _ = geo.GetIPLocation(itemData.Address, common.GetLang(c))
 					itemData.Date = loadDate(currentYear, itemData.DateStr, nyc)
 					datas = append(datas, itemData)
 				}
@@ -450,7 +447,7 @@ func loadSSHData(command string, showCountFrom, showCountTo, currentYear int, qq
 			itemData = loadFailedAuthDatas(lines[i])
 			if len(itemData.Address) != 0 {
 				if successCount+failedCount >= showCountFrom && successCount+failedCount < showCountTo {
-					itemData.Area = qqWry.Find(itemData.Address).Area
+					itemData.Area, _ = geo.GetIPLocation(itemData.Address, common.GetLang(c))
 					itemData.Date = loadDate(currentYear, itemData.DateStr, nyc)
 					datas = append(datas, itemData)
 				}
@@ -460,7 +457,7 @@ func loadSSHData(command string, showCountFrom, showCountTo, currentYear int, qq
 			itemData = loadSuccessDatas(lines[i])
 			if len(itemData.Address) != 0 {
 				if successCount+failedCount >= showCountFrom && successCount+failedCount < showCountTo {
-					itemData.Area = qqWry.Find(itemData.Address).Area
+					itemData.Area, _ = geo.GetIPLocation(itemData.Address, common.GetLang(c))
 					itemData.Date = loadDate(currentYear, itemData.DateStr, nyc)
 					datas = append(datas, itemData)
 				}

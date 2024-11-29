@@ -8,7 +8,8 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/captcha"
-	"github.com/1Panel-dev/1Panel/backend/utils/qqwry"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
+	"github.com/1Panel-dev/1Panel/backend/utils/geo"
 	"github.com/gin-gonic/gin"
 )
 
@@ -162,12 +163,11 @@ func saveLoginLogs(c *gin.Context, err error) {
 		logs.Status = constant.StatusSuccess
 	}
 	logs.IP = c.ClientIP()
-	qqWry, err := qqwry.NewQQwry()
+	address, err := geo.GetIPLocation(logs.IP, common.GetLang(c))
 	if err != nil {
-		global.LOG.Errorf("load qqwry datas failed: %s", err)
+		global.LOG.Errorf("get ip location failed: %s", err)
 	}
-	res := qqWry.Find(logs.IP)
 	logs.Agent = c.GetHeader("User-Agent")
-	logs.Address = res.Area
+	logs.Address = address
 	_ = logService.CreateLoginLog(logs)
 }
