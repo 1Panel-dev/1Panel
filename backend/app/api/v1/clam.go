@@ -9,6 +9,7 @@ import (
 
 // @Tags Clam
 // @Summary Create clam
+// @Description 创建扫描规则
 // @Accept json
 // @Param request body dto.ClamCreate true "request"
 // @Success 200
@@ -30,6 +31,7 @@ func (b *BaseApi) CreateClam(c *gin.Context) {
 
 // @Tags Clam
 // @Summary Update clam
+// @Description 修改扫描规则
 // @Accept json
 // @Param request body dto.ClamUpdate true "request"
 // @Success 200
@@ -51,6 +53,7 @@ func (b *BaseApi) UpdateClam(c *gin.Context) {
 
 // @Tags Clam
 // @Summary Update clam status
+// @Description 修改扫描规则状态
 // @Accept json
 // @Param request body dto.ClamUpdateStatus true "request"
 // @Success 200
@@ -72,6 +75,7 @@ func (b *BaseApi) UpdateClamStatus(c *gin.Context) {
 
 // @Tags Clam
 // @Summary Page clam
+// @Description 获取扫描规则列表分页
 // @Accept json
 // @Param request body dto.SearchClamWithPage true "request"
 // @Success 200 {object} dto.PageResult
@@ -97,6 +101,7 @@ func (b *BaseApi) SearchClam(c *gin.Context) {
 
 // @Tags Clam
 // @Summary Load clam base info
+// @Description 获取 Clam 基础信息
 // @Accept json
 // @Success 200 {object} dto.ClamBaseInfo
 // @Security ApiKeyAuth
@@ -113,6 +118,7 @@ func (b *BaseApi) LoadClamBaseInfo(c *gin.Context) {
 
 // @Tags Clam
 // @Summary Operate Clam
+// @Description 修改 Clam 状态
 // @Accept json
 // @Param request body dto.Operate true "request"
 // @Security ApiKeyAuth
@@ -134,6 +140,7 @@ func (b *BaseApi) OperateClam(c *gin.Context) {
 
 // @Tags Clam
 // @Summary Clean clam record
+// @Description 清空扫描报告
 // @Accept json
 // @Param request body dto.OperateByID true "request"
 // @Security ApiKeyAuth
@@ -154,6 +161,7 @@ func (b *BaseApi) CleanClamRecord(c *gin.Context) {
 
 // @Tags Clam
 // @Summary Page clam record
+// @Description 获取扫描结果列表分页
 // @Accept json
 // @Param request body dto.ClamLogSearch true "request"
 // @Success 200 {object} dto.PageResult
@@ -179,6 +187,7 @@ func (b *BaseApi) SearchClamRecord(c *gin.Context) {
 
 // @Tags Clam
 // @Summary Load clam record detail
+// @Description 获取扫描结果详情
 // @Accept json
 // @Param request body dto.ClamLogReq true "request"
 // @Success 200
@@ -201,6 +210,7 @@ func (b *BaseApi) LoadClamRecordLog(c *gin.Context) {
 
 // @Tags Clam
 // @Summary Load clam file
+// @Description 获取扫描文件
 // @Accept json
 // @Param request body dto.ClamFileReq true "request"
 // @Success 200 {object} dto.PageResult
@@ -223,6 +233,7 @@ func (b *BaseApi) SearchClamFile(c *gin.Context) {
 
 // @Tags Clam
 // @Summary Update clam file
+// @Description 更新病毒扫描配置文件
 // @Accept json
 // @Param request body dto.UpdateByNameAndFile true "request"
 // @Success 200
@@ -242,6 +253,7 @@ func (b *BaseApi) UpdateFile(c *gin.Context) {
 
 // @Tags Clam
 // @Summary Delete clam
+// @Description 删除扫描规则
 // @Accept json
 // @Param request body dto.ClamDelete true "request"
 // @Success 200
@@ -263,6 +275,7 @@ func (b *BaseApi) DeleteClam(c *gin.Context) {
 
 // @Tags Clam
 // @Summary Handle clam scan
+// @Description 执行病毒扫描
 // @Accept json
 // @Param request body dto.OperateByID true "request"
 // @Success 200

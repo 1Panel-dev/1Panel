@@ -9,6 +9,7 @@ import (
 
 // @Tags Firewall
 // @Summary Load firewall base info
+// @Description 获取防火墙基础信息
 // @Success 200 {object} dto.FirewallBaseInfo
 // @Security ApiKeyAuth
 // @Router /hosts/firewall/base [get]
@@ -24,6 +25,7 @@ func (b *BaseApi) LoadFirewallBaseInfo(c *gin.Context) {
 
 // @Tags Firewall
 // @Summary Page firewall rules
+// @Description 获取防火墙规则列表分页
 // @Accept json
 // @Param request body dto.RuleSearch true "request"
 // @Success 200 {object} dto.PageResult
@@ -49,6 +51,7 @@ func (b *BaseApi) SearchFirewallRule(c *gin.Context) {
 
 // @Tags Firewall
 // @Summary Page firewall status
+// @Description 修改防火墙状态
 // @Accept json
 // @Param request body dto.FirewallOperation true "request"
 // @Success 200 {object} dto.PageResult
@@ -70,7 +73,8 @@ func (b *BaseApi) OperateFirewall(c *gin.Context) {
 }
 
 // @Tags Firewall
-// @Summary Create firewall port group
+// @Summary Create group
+// @Description 创建防火墙端口规则
 // @Accept json
 // @Param request body dto.PortRuleOperate true "request"
 // @Success 200
@@ -92,7 +96,8 @@ func (b *BaseApi) OperatePortRule(c *gin.Context) {
 
 // OperateForwardRule
 // @Tags Firewall
-// @Summary Update firewall port group
+// @Summary Create group
+// @Description 更新防火墙端口转发规则
 // @Accept json
 // @Param request body dto.ForwardRuleOperate true "request"
 // @Success 200
@@ -113,7 +118,8 @@ func (b *BaseApi) OperateForwardRule(c *gin.Context) {
 }
 
 // @Tags Firewall
-// @Summary Create firewall group
+// @Summary Create group
+// @Description 创建防火墙 IP 规则
 // @Accept json
 // @Param request body dto.AddrRuleOperate true "request"
 // @Success 200
@@ -134,7 +140,8 @@ func (b *BaseApi) OperateIPRule(c *gin.Context) {
 }
 
 // @Tags Firewall
-// @Summary Batch create group
+// @Summary Create group
+// @Description 批量删除防火墙规则
 // @Accept json
 // @Param request body dto.BatchRuleOperate true "request"
 // @Success 200
@@ -155,6 +162,7 @@ func (b *BaseApi) BatchOperateRule(c *gin.Context) {
 
 // @Tags Firewall
 // @Summary Update rule description
+// @Description 更新防火墙描述
 // @Accept json
 // @Param request body dto.UpdateFirewallDescription true "request"
 // @Success 200
@@ -174,7 +182,8 @@ func (b *BaseApi) UpdateFirewallDescription(c *gin.Context) {
 }
 
 // @Tags Firewall
-// @Summary Update firewall group
+// @Summary Create group
+// @Description 更新端口防火墙规则
 // @Accept json
 // @Param request body dto.PortRuleUpdate true "request"
 // @Success 200
@@ -194,7 +203,8 @@ func (b *BaseApi) UpdatePortRule(c *gin.Context) {
 }
 
 // @Tags Firewall
-// @Summary Uodate address group
+// @Summary Create group
+// @Description 更新 ip 防火墙规则
 // @Accept json
 // @Param request body dto.AddrRuleUpdate true "request"
 // @Success 200

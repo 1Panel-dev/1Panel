@@ -9,6 +9,7 @@ import (
 
 // @Tags SSH
 // @Summary Load host SSH setting info
+// @Description 加载 SSH 配置信息
 // @Success 200 {object} dto.SSHInfo
 // @Security ApiKeyAuth
 // @Router /host/ssh/search [post]
@@ -23,6 +24,7 @@ func (b *BaseApi) GetSSHInfo(c *gin.Context) {
 
 // @Tags SSH
 // @Summary Operate SSH
+// @Description 修改 SSH 服务状态
 // @Accept json
 // @Param request body dto.Operate true "request"
 // @Security ApiKeyAuth
@@ -43,6 +45,7 @@ func (b *BaseApi) OperateSSH(c *gin.Context) {
 
 // @Tags SSH
 // @Summary Update host SSH setting
+// @Description 更新 SSH 配置
 // @Accept json
 // @Param request body dto.SSHUpdate true "request"
 // @Success 200
@@ -64,6 +67,7 @@ func (b *BaseApi) UpdateSSH(c *gin.Context) {
 
 // @Tags SSH
 // @Summary Update host SSH setting by file
+// @Description 上传文件更新 SSH 配置
 // @Accept json
 // @Param request body dto.SSHConf true "request"
 // @Success 200
@@ -85,6 +89,7 @@ func (b *BaseApi) UpdateSSHByfile(c *gin.Context) {
 
 // @Tags SSH
 // @Summary Generate host SSH secret
+// @Description 生成 SSH 密钥
 // @Accept json
 // @Param request body dto.GenerateSSH true "request"
 // @Success 200
@@ -106,6 +111,7 @@ func (b *BaseApi) GenerateSSH(c *gin.Context) {
 
 // @Tags SSH
 // @Summary Load host SSH secret
+// @Description 获取 SSH 密钥
 // @Accept json
 // @Param request body dto.GenerateLoad true "request"
 // @Success 200
@@ -127,6 +133,7 @@ func (b *BaseApi) LoadSSHSecret(c *gin.Context) {
 
 // @Tags SSH
 // @Summary Load host SSH logs
+// @Description 获取 SSH 登录日志
 // @Accept json
 // @Param request body dto.SearchSSHLog true "request"
 // @Success 200 {object} dto.SSHLog
@@ -148,6 +155,7 @@ func (b *BaseApi) LoadSSHLogs(c *gin.Context) {
 
 // @Tags SSH
 // @Summary Load host SSH conf
+// @Description 获取 SSH 配置文件
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /host/ssh/conf [get]

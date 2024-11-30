@@ -13,6 +13,7 @@ import (
 
 // @Tags Website CA
 // @Summary Page website ca
+// @Description 获取网站 ca 列表分页
 // @Accept json
 // @Param request body request.WebsiteCASearch true "request"
 // @Success 200 {object} dto.PageResult
@@ -36,6 +37,7 @@ func (b *BaseApi) PageWebsiteCA(c *gin.Context) {
 
 // @Tags Website CA
 // @Summary Create website ca
+// @Description 创建网站 ca
 // @Accept json
 // @Param request body request.WebsiteCACreate true "request"
 // @Success 200 {object} request.WebsiteCACreate
@@ -57,6 +59,7 @@ func (b *BaseApi) CreateWebsiteCA(c *gin.Context) {
 
 // @Tags Website CA
 // @Summary Get website ca
+// @Description 获取网站 ca
 // @Accept json
 // @Param id path int true "id"
 // @Success 200 {object} response.WebsiteCADTO
@@ -77,6 +80,7 @@ func (b *BaseApi) GetWebsiteCA(c *gin.Context) {
 
 // @Tags Website CA
 // @Summary Delete website ca
+// @Description 删除网站 ca
 // @Accept json
 // @Param request body request.WebsiteCommonReq true "request"
 // @Success 200
@@ -97,6 +101,7 @@ func (b *BaseApi) DeleteWebsiteCA(c *gin.Context) {
 
 // @Tags Website CA
 // @Summary Obtain SSL
+// @Description 自签 SSL 证书
 // @Accept json
 // @Param request body request.WebsiteCAObtain true "request"
 // @Success 200
@@ -116,7 +121,8 @@ func (b *BaseApi) ObtainWebsiteCA(c *gin.Context) {
 }
 
 // @Tags Website CA
-// @Summary Renew Obtain SSL
+// @Summary Obtain SSL
+// @Description 续签 SSL 证书
 // @Accept json
 // @Param request body request.WebsiteCAObtain true "request"
 // @Success 200
@@ -142,6 +148,7 @@ func (b *BaseApi) RenewWebsiteCA(c *gin.Context) {
 
 // @Tags Website CA
 // @Summary Download CA file
+// @Description 下载 CA 证书文件
 // @Accept json
 // @Param request body request.WebsiteResourceReq true "request"
 // @Success 200

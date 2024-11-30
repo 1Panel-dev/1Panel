@@ -12,6 +12,7 @@ import (
 
 // @Tags Dashboard
 // @Summary Load os info
+// @Description 获取服务器基础数据
 // @Accept json
 // @Success 200 {object} dto.OsInfo
 // @Security ApiKeyAuth
@@ -27,6 +28,7 @@ func (b *BaseApi) LoadDashboardOsInfo(c *gin.Context) {
 
 // @Tags Dashboard
 // @Summary Load dashboard base info
+// @Description 获取首页基础数据
 // @Accept json
 // @Param ioOption path string true "request"
 // @Param netOption path string true "request"
@@ -54,6 +56,7 @@ func (b *BaseApi) LoadDashboardBaseInfo(c *gin.Context) {
 
 // @Tags Dashboard
 // @Summary Load dashboard current info
+// @Description 获取首页实时数据
 // @Accept json
 // @Param request body dto.DashboardReq true "request"
 // @Success 200 {object} dto.DashboardCurrent
@@ -69,7 +72,8 @@ func (b *BaseApi) LoadDashboardCurrentInfo(c *gin.Context) {
 }
 
 // @Tags Dashboard
-// @Summary System restart panel
+// @Summary System restart
+// @Description 重启服务器/面板
 // @Accept json
 // @Param operation path string true "request"
 // @Success 200

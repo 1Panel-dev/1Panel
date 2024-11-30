@@ -572,19 +572,6 @@ definitions:
       systemUsage:
         type: integer
     type: object
-  dto.ContainerLog:
-    properties:
-      container:
-        type: string
-      containerType:
-        type: string
-      since:
-        type: string
-      tail:
-        type: integer
-    required:
-    - container
-    type: object
   dto.ContainerOperate:
     properties:
       autoRemove:
@@ -5654,7 +5641,7 @@ definitions:
     type: object
 info:
   contact: {}
-  description: Open Source Linux Panel
+  description: 开源Linux面板
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -5666,6 +5653,7 @@ paths:
     get:
       consumes:
       - application/json
+      description: 通过 key 获取应用信息
       parameters:
       - description: app key
         in: path
@@ -5684,6 +5672,7 @@ paths:
       - App
   /apps/checkupdate:
     get:
+      description: 获取应用更新版本
       responses:
         "200":
           description: OK
@@ -5696,18 +5685,19 @@ paths:
     get:
       consumes:
       - application/json
+      description: 通过 appid 获取应用详情
       parameters:
       - description: app id
         in: path
         name: appId
         required: true
         type: integer
-      - description: app version
+      - description: app 版本
         in: path
         name: version
         required: true
         type: string
-      - description: app type
+      - description: app 类型
         in: path
         name: version
         required: true
@@ -5726,6 +5716,7 @@ paths:
     get:
       consumes:
       - application/json
+      description: 通过 id 获取应用详情
       parameters:
       - description: id
         in: path
@@ -5746,6 +5737,7 @@ paths:
     get:
       consumes:
       - application/json
+      description: 获取忽略的应用版本
       responses:
         "200":
           description: OK
@@ -5760,6 +5752,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 安装应用
       parameters:
       - description: request
         in: body
@@ -5788,6 +5781,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 检查应用安装情况
       parameters:
       - description: request
         in: body
@@ -5809,6 +5803,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 通过 key 获取应用默认配置
       parameters:
       - description: request
         in: body
@@ -5830,6 +5825,7 @@ paths:
     get:
       consumes:
       - application/json
+      description: 获取应用连接信息
       parameters:
       - description: request
         in: body
@@ -5851,6 +5847,7 @@ paths:
     get:
       consumes:
       - application/json
+      description: 删除前检查
       parameters:
       - description: App install id
         in: path
@@ -5873,6 +5870,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 忽略应用升级版本
       parameters:
       - description: request
         in: body
@@ -5899,6 +5897,7 @@ paths:
     get:
       consumes:
       - application/json
+      description: 获取已安装应用列表
       responses:
         "200":
           description: OK
@@ -5915,6 +5914,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取应用端口
       parameters:
       - description: request
         in: body
@@ -5936,6 +5936,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 操作已安装应用
       parameters:
       - description: request
         in: body
@@ -5981,6 +5982,7 @@ paths:
     get:
       consumes:
       - application/json
+      description: 通过 install id 获取应用参数
       parameters:
       - description: request
         in: path
@@ -6001,6 +6003,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 修改应用参数
       parameters:
       - description: request
         in: body
@@ -6027,6 +6030,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 修改应用端口
       parameters:
       - description: request
         in: body
@@ -6055,6 +6059,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 分页获取已安装应用列表
       parameters:
       - description: request
         in: body
@@ -6072,6 +6077,7 @@ paths:
       - App
   /apps/installed/sync:
     post:
+      description: 同步已安装应用列表
       responses:
         "200":
           description: OK
@@ -6090,6 +6096,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 通过 install id 获取应用更新版本
       parameters:
       - description: request
         in: path
@@ -6112,6 +6119,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取应用列表
       parameters:
       - description: request
         in: body
@@ -6131,6 +6139,7 @@ paths:
     get:
       consumes:
       - application/json
+      description: 通过 key 获取应用 service
       parameters:
       - description: request
         in: path
@@ -6151,6 +6160,7 @@ paths:
       - App
   /apps/sync:
     post:
+      description: 同步应用列表
       responses:
         "200":
           description: OK
@@ -6167,6 +6177,7 @@ paths:
         paramKeys: []
   /auth/captcha:
     get:
+      description: 加载验证码
       responses:
         "200":
           description: OK
@@ -6177,22 +6188,16 @@ paths:
       - Auth
   /auth/demo:
     get:
+      description: 判断是否为demo环境
       responses:
         "200":
           description: OK
       summary: Check System isDemo
       tags:
       - Auth
-  /auth/intl:
-    get:
-      responses:
-        "200":
-          description: OK
-      summary: Check System isIntl
-      tags:
-      - Auth
   /auth/language:
     get:
+      description: 获取系统语言设置
       responses:
         "200":
           description: OK
@@ -6203,8 +6208,9 @@ paths:
     post:
       consumes:
       - application/json
+      description: 用户登录
       parameters:
-      - description: Secure entrance base64 encrypted string
+      - description: 安全入口 base64 加密串
         in: header
         name: EntranceCode
         required: true
@@ -6225,6 +6231,7 @@ paths:
       - Auth
   /auth/logout:
     post:
+      description: 用户登出
       responses:
         "200":
           description: OK
@@ -6237,6 +6244,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 用户 mfa 登录
       parameters:
       - description: request
         in: body
@@ -6249,6 +6257,7 @@ paths:
           description: OK
           headers:
             EntranceCode:
+              description: 安全入口
               type: string
           schema:
             $ref: '#/definitions/dto.UserLoginInfo'
@@ -6259,6 +6268,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 创建容器
       parameters:
       - description: request
         in: body
@@ -6286,6 +6296,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 清理容器日志
       parameters:
       - description: request
         in: body
@@ -6312,6 +6323,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 容器提交生成新镜像
       parameters:
       - description: request
         in: body
@@ -6329,6 +6341,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 创建容器编排
       parameters:
       - description: request
         in: body
@@ -6355,6 +6368,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 容器编排操作
       parameters:
       - description: request
         in: body
@@ -6382,6 +6396,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取编排列表分页
       parameters:
       - description: request
         in: body
@@ -6401,20 +6416,21 @@ paths:
       - Container Compose
   /containers/compose/search/log:
     get:
+      description: docker-compose 日志
       parameters:
-      - description: compose file address
+      - description: compose 文件地址
         in: query
         name: compose
         type: string
-      - description: date
+      - description: 时间筛选
         in: query
         name: since
         type: string
-      - description: follow
+      - description: 是否追踪
         in: query
         name: follow
         type: string
-      - description: tail
+      - description: 显示行号
         in: query
         name: tail
         type: string
@@ -6428,6 +6444,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 测试 compose 是否可用
       parameters:
       - description: request
         in: body
@@ -6454,6 +6471,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新容器编排
       parameters:
       - description: request
         in: body
@@ -6466,7 +6484,7 @@ paths:
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Update Container Compose
+      summary: Update compose
       tags:
       - Container Compose
       x-panel-log:
@@ -6478,6 +6496,7 @@ paths:
         paramKeys: []
   /containers/daemonjson:
     get:
+      description: 获取 docker 配置信息
       produces:
       - application/json
       responses:
@@ -6492,6 +6511,7 @@ paths:
       - Container Docker
   /containers/daemonjson/file:
     get:
+      description: 获取 docker 配置信息(表单)
       produces:
       - application/json
       responses:
@@ -6508,6 +6528,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 修改 docker 配置信息
       parameters:
       - description: request
         in: body
@@ -6535,6 +6556,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 上传替换 docker 配置文件
       parameters:
       - description: request
         in: body
@@ -6560,6 +6582,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: Docker 操作
       parameters:
       - description: request
         in: body
@@ -6584,6 +6607,7 @@ paths:
         paramKeys: []
   /containers/docker/status:
     get:
+      description: 获取 docker 服务状态
       produces:
       - application/json
       responses:
@@ -6598,23 +6622,11 @@ paths:
       - Container Docker
   /containers/download/log:
     post:
-      consumes:
-      - application/json
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.ContainerLog'
+      description: 下载容器日志
       responses: {}
-      security:
-      - ApiKeyAuth: []
-      summary: Download Container logs
-      tags:
-      - Container
   /containers/image:
     get:
+      description: 获取镜像名称列表
       produces:
       - application/json
       responses:
@@ -6631,6 +6643,7 @@ paths:
       - Container Image
   /containers/image/all:
     get:
+      description: 获取所有镜像列表
       produces:
       - application/json
       responses:
@@ -6649,6 +6662,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 构建镜像
       parameters:
       - description: request
         in: body
@@ -6677,6 +6691,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 导入镜像
       parameters:
       - description: request
         in: body
@@ -6703,6 +6718,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 拉取镜像
       parameters:
       - description: request
         in: body
@@ -6738,6 +6754,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 推送镜像
       parameters:
       - description: request
         in: body
@@ -6774,6 +6791,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 删除镜像
       parameters:
       - description: request
         in: body
@@ -6800,6 +6818,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 导出镜像
       parameters:
       - description: request
         in: body
@@ -6828,6 +6847,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取镜像列表分页
       parameters:
       - description: request
         in: body
@@ -6851,6 +6871,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: Tag 镜像
       parameters:
       - description: request
         in: body
@@ -6884,6 +6905,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取容器表单信息
       parameters:
       - description: request
         in: body
@@ -6905,6 +6927,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 容器详情
       parameters:
       - description: request
         in: body
@@ -6926,6 +6949,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 修改 docker ipv6 配置
       parameters:
       - description: request
         in: body
@@ -6949,6 +6973,7 @@ paths:
         paramKeys: []
   /containers/limit:
     get:
+      description: 获取容器限制
       responses:
         "200":
           description: OK
@@ -6961,6 +6986,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取容器名称
       produces:
       - application/json
       responses:
@@ -6973,6 +6999,7 @@ paths:
       - Container
   /containers/list/stats:
     get:
+      description: 获取容器列表资源占用
       responses:
         "200":
           description: OK
@@ -6987,6 +7014,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取容器操作日志
       parameters:
       - description: request
         in: body
@@ -7006,6 +7034,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 修改 docker 日志配置
       parameters:
       - description: request
         in: body
@@ -7031,6 +7060,7 @@ paths:
     get:
       consumes:
       - application/json
+      description: 获取容器网络列表
       produces:
       - application/json
       responses:
@@ -7048,6 +7078,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 创建容器网络
       parameters:
       - description: request
         in: body
@@ -7074,6 +7105,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 删除容器网络
       parameters:
       - description: request
         in: body
@@ -7100,6 +7132,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取容器网络列表分页
       parameters:
       - description: request
         in: body
@@ -7123,6 +7156,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 容器操作
       parameters:
       - description: request
         in: body
@@ -7150,6 +7184,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 容器清理
       parameters:
       - description: request
         in: body
@@ -7178,6 +7213,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 容器重命名
       parameters:
       - description: request
         in: body
@@ -7203,6 +7239,7 @@ paths:
         paramKeys: []
   /containers/repo:
     get:
+      description: 获取镜像仓库列表
       produces:
       - application/json
       responses:
@@ -7220,6 +7257,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 创建镜像仓库
       parameters:
       - description: request
         in: body
@@ -7248,6 +7286,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 删除镜像仓库
       parameters:
       - description: request
         in: body
@@ -7282,6 +7321,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取镜像仓库列表分页
       parameters:
       - description: request
         in: body
@@ -7305,6 +7345,7 @@ paths:
     get:
       consumes:
       - application/json
+      description: 获取 docker 仓库状态
       parameters:
       - description: request
         in: body
@@ -7326,6 +7367,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新镜像仓库
       parameters:
       - description: request
         in: body
@@ -7360,6 +7402,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取容器列表分页
       parameters:
       - description: request
         in: body
@@ -7381,20 +7424,21 @@ paths:
       - Container
   /containers/search/log:
     post:
+      description: 容器日志
       parameters:
-      - description: container name
+      - description: 容器名称
         in: query
         name: container
         type: string
-      - description: since
+      - description: 时间筛选
         in: query
         name: since
         type: string
-      - description: follow
+      - description: 是否追踪
         in: query
         name: follow
         type: string
-      - description: tail
+      - description: 显示行号
         in: query
         name: tail
         type: string
@@ -7406,8 +7450,9 @@ paths:
       - Container
   /containers/stats/:id:
     get:
+      description: 容器监控信息
       parameters:
-      - description: container id
+      - description: 容器id
         in: path
         name: id
         required: true
@@ -7424,6 +7469,7 @@ paths:
       - Container
   /containers/template:
     get:
+      description: 获取容器编排模版列表
       produces:
       - application/json
       responses:
@@ -7441,6 +7487,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 创建容器编排模版
       parameters:
       - description: request
         in: body
@@ -7467,6 +7514,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 删除容器编排模版
       parameters:
       - description: request
         in: body
@@ -7499,6 +7547,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取容器编排模版列表分页
       parameters:
       - description: request
         in: body
@@ -7522,6 +7571,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新容器编排模版
       parameters:
       - description: request
         in: body
@@ -7554,6 +7604,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新容器
       parameters:
       - description: request
         in: body
@@ -7581,6 +7632,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新容器镜像
       parameters:
       - description: request
         in: body
@@ -7608,6 +7660,7 @@ paths:
     get:
       consumes:
       - application/json
+      description: 获取容器存储卷列表
       produces:
       - application/json
       responses:
@@ -7619,12 +7672,13 @@ paths:
             type: array
       security:
       - ApiKeyAuth: []
-      summary: List Container Volumes
+      summary: List volumes
       tags:
       - Container Volume
     post:
       consumes:
       - application/json
+      description: 创建容器存储卷
       parameters:
       - description: request
         in: body
@@ -7637,7 +7691,7 @@ paths:
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Create Container Volume
+      summary: Create volume
       tags:
       - Container Volume
       x-panel-log:
@@ -7651,6 +7705,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 删除容器存储卷
       parameters:
       - description: request
         in: body
@@ -7663,7 +7718,7 @@ paths:
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Delete Container Volume
+      summary: Delete volume
       tags:
       - Container Volume
       x-panel-log:
@@ -7677,6 +7732,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取容器存储卷分页
       parameters:
       - description: request
         in: body
@@ -7693,13 +7749,14 @@ paths:
             $ref: '#/definitions/dto.PageResult'
       security:
       - ApiKeyAuth: []
-      summary: Page Container Volumes
+      summary: Page volumes
       tags:
       - Container Volume
   /cronjobs:
     post:
       consumes:
       - application/json
+      description: 创建计划任务
       parameters:
       - description: request
         in: body
@@ -7727,6 +7784,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 删除计划任务
       parameters:
       - description: request
         in: body
@@ -7759,6 +7817,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 下载计划任务记录
       parameters:
       - description: request
         in: body
@@ -7791,6 +7850,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 手动执行计划任务
       parameters:
       - description: request
         in: body
@@ -7823,6 +7883,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 清空计划任务记录
       parameters:
       - description: request
         in: body
@@ -7855,6 +7916,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取计划任务记录日志
       parameters:
       - description: request
         in: body
@@ -7874,6 +7936,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取计划任务分页
       parameters:
       - description: request
         in: body
@@ -7895,6 +7958,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取计划任务记录
       parameters:
       - description: request
         in: body
@@ -7916,6 +7980,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新计划任务状态
       parameters:
       - description: request
         in: body
@@ -7949,6 +8014,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新计划任务
       parameters:
       - description: request
         in: body
@@ -7981,6 +8047,7 @@ paths:
     get:
       consumes:
       - application/json
+      description: 获取首页基础数据
       parameters:
       - description: request
         in: path
@@ -8006,6 +8073,7 @@ paths:
     get:
       consumes:
       - application/json
+      description: 获取服务器基础数据
       responses:
         "200":
           description: OK
@@ -8020,6 +8088,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取首页实时数据
       parameters:
       - description: request
         in: body
@@ -8041,6 +8110,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 重启服务器/面板
       parameters:
       - description: request
         in: path
@@ -8052,13 +8122,14 @@ paths:
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: System restart panel
+      summary: System restart
       tags:
       - Dashboard
   /databases:
     post:
       consumes:
       - application/json
+      description: 创建 mysql 数据库
       parameters:
       - description: request
         in: body
@@ -8085,6 +8156,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 绑定 mysql 数据库用户
       parameters:
       - description: request
         in: body
@@ -8112,6 +8184,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 修改 mysql 访问权限
       parameters:
       - description: request
         in: body
@@ -8144,6 +8217,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 修改 mysql 密码
       parameters:
       - description: request
         in: body
@@ -8176,6 +8250,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取数据库基础信息
       parameters:
       - description: request
         in: body
@@ -8197,6 +8272,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取数据库配置文件
       parameters:
       - description: request
         in: body
@@ -8216,6 +8292,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 上传替换配置文件
       parameters:
       - description: request
         in: body
@@ -8243,6 +8320,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 创建远程数据库
       parameters:
       - description: request
         in: body
@@ -8268,6 +8346,7 @@ paths:
         paramKeys: []
   /databases/db/:name:
     get:
+      description: 获取远程数据库
       responses:
         "200":
           description: OK
@@ -8282,6 +8361,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 检测远程数据库连接性
       parameters:
       - description: request
         in: body
@@ -8309,6 +8389,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 删除远程数据库
       parameters:
       - description: request
         in: body
@@ -8339,6 +8420,7 @@ paths:
         paramKeys: []
   /databases/db/item/:type:
     get:
+      description: 获取数据库列表
       responses:
         "200":
           description: OK
@@ -8348,11 +8430,12 @@ paths:
             type: array
       security:
       - ApiKeyAuth: []
-      summary: Retrieve database list based on type
+      summary: List databases
       tags:
       - Database
   /databases/db/list/:type:
     get:
+      description: 获取远程数据库列表
       responses:
         "200":
           description: OK
@@ -8369,6 +8452,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取远程数据库列表分页
       parameters:
       - description: request
         in: body
@@ -8390,6 +8474,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新远程数据库
       parameters:
       - description: request
         in: body
@@ -8416,6 +8501,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 删除 mysql 数据库
       parameters:
       - description: request
         in: body
@@ -8448,6 +8534,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: Mysql 数据库删除前检查
       parameters:
       - description: request
         in: body
@@ -8471,6 +8558,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新 mysql 数据库库描述信息
       parameters:
       - description: request
         in: body
@@ -8504,6 +8592,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 从服务器获取
       parameters:
       - description: request
         in: body
@@ -8521,6 +8610,7 @@ paths:
     get:
       consumes:
       - application/json
+      description: 获取 mysql 数据库列表
       parameters:
       - description: request
         in: body
@@ -8544,6 +8634,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 创建 postgresql 数据库
       parameters:
       - description: request
         in: body
@@ -8570,6 +8661,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 从服务器获取
       parameters:
       - description: request
         in: body
@@ -8587,6 +8679,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 绑定 postgresql 数据库用户
       parameters:
       - description: request
         in: body
@@ -8614,6 +8707,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 删除 postgresql 数据库
       parameters:
       - description: request
         in: body
@@ -8646,6 +8740,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: Postgresql 数据库删除前检查
       parameters:
       - description: request
         in: body
@@ -8669,6 +8764,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新 postgresql 数据库库描述信息
       parameters:
       - description: request
         in: body
@@ -8703,6 +8799,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 修改 postgresql 密码
       parameters:
       - description: request
         in: body
@@ -8735,6 +8832,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 修改 postgresql 用户权限
       parameters:
       - description: request
         in: body
@@ -8762,6 +8860,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取 postgresql 数据库列表分页
       parameters:
       - description: request
         in: body
@@ -8783,6 +8882,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取 redis 配置信息
       parameters:
       - description: request
         in: body
@@ -8804,6 +8904,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新 redis 配置信息
       parameters:
       - description: request
         in: body
@@ -8827,6 +8928,7 @@ paths:
         paramKeys: []
   /databases/redis/install/cli:
     post:
+      description: 安装 redis cli
       responses:
         "200":
           description: OK
@@ -8839,6 +8941,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新 redis 密码
       parameters:
       - description: request
         in: body
@@ -8864,6 +8967,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取 redis 持久化配置
       parameters:
       - description: request
         in: body
@@ -8885,6 +8989,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新 redis 持久化配置
       parameters:
       - description: request
         in: body
@@ -8910,6 +9015,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取 redis 状态信息
       parameters:
       - description: request
         in: body
@@ -8931,6 +9037,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取 mysql 远程访问权限
       parameters:
       - description: request
         in: body
@@ -8952,6 +9059,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取 mysql 数据库列表分页
       parameters:
       - description: request
         in: body
@@ -8973,6 +9081,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取 mysql 状态信息
       parameters:
       - description: request
         in: body
@@ -8994,6 +9103,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取 mysql 性能参数信息
       parameters:
       - description: request
         in: body
@@ -9015,6 +9125,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: mysql 性能调优
       parameters:
       - description: request
         in: body
@@ -9040,6 +9151,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: Mysql 远程数据库删除前检查
       parameters:
       - description: request
         in: body
@@ -9063,6 +9175,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 创建文件/文件夹
       parameters:
       - description: request
         in: body
@@ -9089,6 +9202,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 批量删除文件/文件夹
       parameters:
       - description: request
         in: body
@@ -9115,6 +9229,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 批量修改文件权限和用户/组
       parameters:
       - description: request
         in: body
@@ -9144,6 +9259,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 检测文件是否存在
       parameters:
       - description: request
         in: body
@@ -9163,6 +9279,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 分片下载下载文件
       parameters:
       - description: request
         in: body
@@ -9187,6 +9304,7 @@ paths:
         paramKeys: []
   /files/chunkupload:
     post:
+      description: 分片上传文件
       parameters:
       - description: request
         in: formData
@@ -9198,13 +9316,14 @@ paths:
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Chunk upload file
+      summary: ChunkUpload file
       tags:
       - File
   /files/compress:
     post:
       consumes:
       - application/json
+      description: 压缩文件
       parameters:
       - description: request
         in: body
@@ -9231,6 +9350,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取文件内容
       parameters:
       - description: request
         in: body
@@ -9259,6 +9379,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 解压文件
       parameters:
       - description: request
         in: body
@@ -9285,6 +9406,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 删除文件/文件夹
       parameters:
       - description: request
         in: body
@@ -9311,6 +9433,7 @@ paths:
     get:
       consumes:
       - application/json
+      description: 下载文件
       responses:
         "200":
           description: OK
@@ -9323,6 +9446,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 创建收藏
       parameters:
       - description: request
         in: body
@@ -9349,6 +9473,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 删除收藏
       parameters:
       - description: request
         in: body
@@ -9381,6 +9506,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取收藏列表
       parameters:
       - description: request
         in: body
@@ -9400,6 +9526,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 修改文件权限
       parameters:
       - description: request
         in: body
@@ -9427,6 +9554,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 移动文件
       parameters:
       - description: request
         in: body
@@ -9454,6 +9582,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 修改文件用户/组
       parameters:
       - description: request
         in: body
@@ -9480,6 +9609,7 @@ paths:
         paramKeys: []
   /files/read:
     post:
+      description: 按行读取日志文件
       parameters:
       - description: request
         in: body
@@ -9499,12 +9629,13 @@ paths:
     post:
       consumes:
       - application/json
+      description: 清空回收站文件
       responses:
         "200":
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Clear Recycle Bin files
+      summary: Clear RecycleBin files
       tags:
       - File
       x-panel-log:
@@ -9517,6 +9648,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 还原回收站文件
       parameters:
       - description: request
         in: body
@@ -9529,7 +9661,7 @@ paths:
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Reduce Recycle Bin files
+      summary: Reduce RecycleBin files
       tags:
       - File
       x-panel-log:
@@ -9543,6 +9675,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取回收站文件列表
       parameters:
       - description: request
         in: body
@@ -9555,25 +9688,27 @@ paths:
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: List Recycle Bin files
+      summary: List RecycleBin files
       tags:
       - File
   /files/recycle/status:
     get:
       consumes:
       - application/json
+      description: 获取回收站状态
       responses:
         "200":
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Get Recycle Bin status
+      summary: Get RecycleBin status
       tags:
       - File
   /files/rename:
     post:
       consumes:
       - application/json
+      description: 修改文件名称
       parameters:
       - description: request
         in: body
@@ -9601,6 +9736,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新文件内容
       parameters:
       - description: request
         in: body
@@ -9627,6 +9763,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取文件列表
       parameters:
       - description: request
         in: body
@@ -9648,6 +9785,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取文件夹大小
       parameters:
       - description: request
         in: body
@@ -9674,6 +9812,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 加载文件树
       parameters:
       - description: request
         in: body
@@ -9695,6 +9834,7 @@ paths:
       - File
   /files/upload:
     post:
+      description: 上传文件
       parameters:
       - description: request
         in: formData
@@ -9720,6 +9860,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 分页获取上传文件
       parameters:
       - description: request
         in: body
@@ -9743,6 +9884,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 下载远端文件
       parameters:
       - description: request
         in: body
@@ -9771,6 +9913,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 创建系统组
       parameters:
       - description: request
         in: body
@@ -9783,7 +9926,7 @@ paths:
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Create system group
+      summary: Create group
       tags:
       - System Group
       x-panel-log:
@@ -9798,6 +9941,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 删除系统组
       parameters:
       - description: request
         in: body
@@ -9810,7 +9954,7 @@ paths:
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Delete system group
+      summary: Delete group
       tags:
       - System Group
       x-panel-log:
@@ -9836,6 +9980,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 查询系统组
       parameters:
       - description: request
         in: body
@@ -9852,13 +9997,14 @@ paths:
             type: array
       security:
       - ApiKeyAuth: []
-      summary: List system groups
+      summary: List groups
       tags:
       - System Group
   /groups/update:
     post:
       consumes:
       - application/json
+      description: 更新系统组
       parameters:
       - description: request
         in: body
@@ -9871,7 +10017,7 @@ paths:
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Update system group
+      summary: Update group
       tags:
       - System Group
       x-panel-log:
@@ -9886,6 +10032,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 上传文件更新 SSH 配置
       parameters:
       - description: request
         in: body
@@ -9909,6 +10056,7 @@ paths:
         paramKeys: []
   /host/ssh/conf:
     get:
+      description: 获取 SSH 配置文件
       responses:
         "200":
           description: OK
@@ -9921,6 +10069,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 生成 SSH 密钥
       parameters:
       - description: request
         in: body
@@ -9946,6 +10095,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取 SSH 登录日志
       parameters:
       - description: request
         in: body
@@ -9967,6 +10117,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 修改 SSH 服务状态
       parameters:
       - description: request
         in: body
@@ -9989,6 +10140,7 @@ paths:
         paramKeys: []
   /host/ssh/search:
     post:
+      description: 加载 SSH 配置信息
       responses:
         "200":
           description: OK
@@ -10003,6 +10155,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取 SSH 密钥
       parameters:
       - description: request
         in: body
@@ -10022,6 +10175,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新 SSH 配置
       parameters:
       - description: request
         in: body
@@ -10049,6 +10203,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取主机工具状态
       parameters:
       - description: request
         in: body
@@ -10061,13 +10216,14 @@ paths:
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Get tool status
+      summary: Get tool
       tags:
       - Host tool
   /host/tool/config:
     post:
       consumes:
       - application/json
+      description: 操作主机工具配置文件
       parameters:
       - description: request
         in: body
@@ -10094,6 +10250,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 创建主机工具配置
       parameters:
       - description: request
         in: body
@@ -10120,6 +10277,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取主机工具日志
       parameters:
       - description: request
         in: body
@@ -10132,13 +10290,14 @@ paths:
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Get tool logs
+      summary: Get tool
       tags:
       - Host tool
   /host/tool/operate:
     post:
       consumes:
       - application/json
+      description: 操作主机工具
       parameters:
       - description: request
         in: body
@@ -10166,6 +10325,7 @@ paths:
     get:
       consumes:
       - application/json
+      description: 获取 Supervisor 进程配置
       responses:
         "200":
           description: OK
@@ -10177,6 +10337,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 操作守护进程
       parameters:
       - description: request
         in: body
@@ -10203,6 +10364,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 操作 Supervisor 进程文件
       parameters:
       - description: request
         in: body
@@ -10229,6 +10391,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 创建主机
       parameters:
       - description: request
         in: body
@@ -10254,6 +10417,7 @@ paths:
         paramKeys: []
   /hosts/command:
     get:
+      description: 获取快速命令列表
       responses:
         "200":
           description: OK
@@ -10267,6 +10431,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 创建快速命令
       parameters:
       - description: request
         in: body
@@ -10294,6 +10459,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 删除快速命令
       parameters:
       - description: request
         in: body
@@ -10324,6 +10490,7 @@ paths:
         paramKeys: []
   /hosts/command/redis:
     get:
+      description: 获取 redis 快速命令列表
       responses:
         "200":
           description: OK
@@ -10337,6 +10504,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 保存 Redis 快速命令
       parameters:
       - description: request
         in: body
@@ -10364,6 +10532,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 删除 redis 快速命令
       parameters:
       - description: request
         in: body
@@ -10396,6 +10565,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取 redis 快速命令列表分页
       parameters:
       - description: request
         in: body
@@ -10417,6 +10587,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取快速命令列表分页
       parameters:
       - description: request
         in: body
@@ -10438,6 +10609,7 @@ paths:
     get:
       consumes:
       - application/json
+      description: 获取快速命令树
       responses:
         "200":
           description: OK
@@ -10452,6 +10624,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新快速命令
       parameters:
       - description: request
         in: body
@@ -10478,6 +10651,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 删除主机
       parameters:
       - description: request
         in: body
@@ -10508,6 +10682,7 @@ paths:
         paramKeys: []
   /hosts/firewall/base:
     get:
+      description: 获取防火墙基础信息
       responses:
         "200":
           description: OK
@@ -10522,6 +10697,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 批量删除防火墙规则
       parameters:
       - description: request
         in: body
@@ -10534,13 +10710,14 @@ paths:
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Batch create group
+      summary: Create group
       tags:
       - Firewall
   /hosts/firewall/forward:
     post:
       consumes:
       - application/json
+      description: 更新防火墙端口转发规则
       parameters:
       - description: request
         in: body
@@ -10553,7 +10730,7 @@ paths:
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Update firewall port group
+      summary: Create group
       tags:
       - Firewall
       x-panel-log:
@@ -10567,6 +10744,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 创建防火墙 IP 规则
       parameters:
       - description: request
         in: body
@@ -10579,7 +10757,7 @@ paths:
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Create firewall group
+      summary: Create group
       tags:
       - Firewall
       x-panel-log:
@@ -10594,6 +10772,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 修改防火墙状态
       parameters:
       - description: request
         in: body
@@ -10622,6 +10801,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 创建防火墙端口规则
       parameters:
       - description: request
         in: body
@@ -10634,7 +10814,7 @@ paths:
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Create firewall port group
+      summary: Create group
       tags:
       - Firewall
       x-panel-log:
@@ -10649,6 +10829,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取防火墙规则列表分页
       parameters:
       - description: request
         in: body
@@ -10670,6 +10851,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新 ip 防火墙规则
       parameters:
       - description: request
         in: body
@@ -10682,13 +10864,14 @@ paths:
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Uodate address group
+      summary: Create group
       tags:
       - Firewall
   /hosts/firewall/update/description:
     post:
       consumes:
       - application/json
+      description: 更新防火墙描述
       parameters:
       - description: request
         in: body
@@ -10708,6 +10891,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新端口防火墙规则
       parameters:
       - description: request
         in: body
@@ -10720,11 +10904,12 @@ paths:
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Update firewall group
+      summary: Create group
       tags:
       - Firewall
   /hosts/monitor/clean:
     post:
+      description: 清空监控数据
       responses:
         "200":
           description: OK
@@ -10741,6 +10926,7 @@ paths:
         paramKeys: []
   /hosts/monitor/search:
     post:
+      description: 获取监控数据
       parameters:
       - description: request
         in: body
@@ -10760,6 +10946,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取主机列表分页
       parameters:
       - description: request
         in: body
@@ -10783,6 +10970,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 测试主机连接
       parameters:
       - description: request
         in: path
@@ -10803,6 +10991,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 测试主机连接
       parameters:
       - description: request
         in: body
@@ -10822,6 +11011,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 加载主机树
       parameters:
       - description: request
         in: body
@@ -10845,6 +11035,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新主机
       parameters:
       - description: request
         in: body
@@ -10872,6 +11063,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 切换分组
       parameters:
       - description: request
         in: body
@@ -10905,6 +11097,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 清空操作日志
       parameters:
       - description: request
         in: body
@@ -10933,6 +11126,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取系统登录日志列表分页
       parameters:
       - description: request
         in: body
@@ -10954,6 +11148,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取系统操作日志列表分页
       parameters:
       - description: request
         in: body
@@ -10973,6 +11168,7 @@ paths:
       - Logs
   /logs/system:
     post:
+      description: 获取系统日志
       responses:
         "200":
           description: OK
@@ -10983,6 +11179,7 @@ paths:
       - Logs
   /logs/system/files:
     get:
+      description: 获取系统日志文件列表
       responses:
         "200":
           description: OK
@@ -10993,6 +11190,7 @@ paths:
       - Logs
   /openresty:
     get:
+      description: 获取 OpenResty 配置信息
       responses:
         "200":
           description: OK
@@ -11005,6 +11203,7 @@ paths:
       - OpenResty
   /openresty/clear:
     post:
+      description: 清理 OpenResty 代理缓存
       responses:
         "200":
           description: OK
@@ -11023,6 +11222,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 上传更新 OpenResty 配置文件
       parameters:
       - description: request
         in: body
@@ -11048,6 +11248,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取部分 OpenResty 配置信息
       parameters:
       - description: request
         in: body
@@ -11069,6 +11270,7 @@ paths:
       - OpenResty
   /openresty/status:
     get:
+      description: 获取 OpenResty 状态信息
       responses:
         "200":
           description: OK
@@ -11083,6 +11285,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新 OpenResty 配置信息
       parameters:
       - description: request
         in: body
@@ -11113,6 +11316,7 @@ paths:
         paramKeys: []
   /process/stop:
     post:
+      description: 停止进程
       parameters:
       - description: request
         in: body
@@ -11139,6 +11343,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 创建运行环境
       parameters:
       - description: request
         in: body
@@ -11165,6 +11370,7 @@ paths:
     get:
       consumes:
       - application/json
+      description: 获取运行环境
       parameters:
       - description: request
         in: path
@@ -11183,6 +11389,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 删除运行环境
       parameters:
       - description: request
         in: body
@@ -11209,6 +11416,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取 Node 项目的 modules
       parameters:
       - description: request
         in: body
@@ -11228,6 +11436,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 操作 Node 项目 modules
       parameters:
       - description: request
         in: body
@@ -11247,6 +11456,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取 Node 项目的 scripts
       parameters:
       - description: request
         in: body
@@ -11266,6 +11476,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 操作运行环境
       parameters:
       - description: request
         in: body
@@ -11292,6 +11503,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: Create Extensions
       parameters:
       - description: request
         in: body
@@ -11311,6 +11523,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: Delete Extensions
       parameters:
       - description: request
         in: body
@@ -11330,6 +11543,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: Page Extensions
       parameters:
       - description: request
         in: body
@@ -11353,6 +11567,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: Update Extensions
       parameters:
       - description: request
         in: body
@@ -11372,6 +11587,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取运行环境列表
       parameters:
       - description: request
         in: body
@@ -11391,6 +11607,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 同步运行环境状态
       responses:
         "200":
           description: OK
@@ -11403,6 +11620,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新运行环境
       parameters:
       - description: request
         in: body
@@ -11429,12 +11647,13 @@ paths:
     post:
       consumes:
       - application/json
+      description: 生成 API 接口密钥
       responses:
         "200":
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Generate api key
+      summary: generate api key
       tags:
       - System Setting
       x-panel-log:
@@ -11447,6 +11666,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新 API 接口配置
       parameters:
       - description: request
         in: body
@@ -11473,6 +11693,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 创建备份账号
       parameters:
       - description: request
         in: body
@@ -11499,6 +11720,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 备份系统数据
       parameters:
       - description: request
         in: body
@@ -11527,6 +11749,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 删除备份账号
       parameters:
       - description: request
         in: body
@@ -11559,6 +11782,7 @@ paths:
     get:
       consumes:
       - application/json
+      description: 获取 OneDrive 信息
       responses:
         "200":
           description: OK
@@ -11573,6 +11797,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 删除备份记录
       parameters:
       - description: request
         in: body
@@ -11605,6 +11830,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 下载备份记录
       parameters:
       - description: request
         in: body
@@ -11632,6 +11858,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取备份记录列表分页
       parameters:
       - description: request
         in: body
@@ -11651,6 +11878,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 通过计划任务获取备份记录列表分页
       parameters:
       - description: request
         in: body
@@ -11670,6 +11898,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 恢复系统数据
       parameters:
       - description: request
         in: body
@@ -11699,6 +11928,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 从上传恢复系统数据
       parameters:
       - description: request
         in: body
@@ -11726,6 +11956,7 @@ paths:
         paramKeys: []
   /settings/backup/refresh/onedrive:
     post:
+      description: 刷新 OneDrive token
       responses:
         "200":
           description: OK
@@ -11736,6 +11967,7 @@ paths:
       - Backup Account
   /settings/backup/search:
     get:
+      description: 获取备份账号列表
       responses:
         "200":
           description: OK
@@ -11751,6 +11983,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取 bucket 列表
       parameters:
       - description: request
         in: body
@@ -11774,6 +12007,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取备份账号内文件列表
       parameters:
       - description: request
         in: body
@@ -11797,6 +12031,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新备份账号信息
       parameters:
       - description: request
         in: body
@@ -11821,6 +12056,7 @@ paths:
         paramKeys: []
   /settings/basedir:
     get:
+      description: 获取安装根目录
       responses:
         "200":
           description: OK
@@ -11828,13 +12064,14 @@ paths:
             type: string
       security:
       - ApiKeyAuth: []
-      summary: Load local base dir
+      summary: Load local backup dir
       tags:
       - System Setting
   /settings/bind/update:
     post:
       consumes:
       - application/json
+      description: 更新系统监听信息
       parameters:
       - description: request
         in: body
@@ -11862,6 +12099,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 重置过期系统登录密码
       parameters:
       - description: request
         in: body
@@ -11887,6 +12125,7 @@ paths:
     get:
       consumes:
       - application/json
+      description: 获取系统地址信息
       responses:
         "200":
           description: OK
@@ -11899,6 +12138,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 隐藏高级功能菜单
       parameters:
       - description: request
         in: body
@@ -11924,6 +12164,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取 mfa 信息
       parameters:
       - description: request
         in: body
@@ -11945,6 +12186,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: Mfa 绑定
       parameters:
       - description: request
         in: body
@@ -11970,6 +12212,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新系统登录密码
       parameters:
       - description: request
         in: body
@@ -11995,6 +12238,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新系统端口
       parameters:
       - description: request
         in: body
@@ -12021,6 +12265,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 服务器代理配置
       parameters:
       - description: request
         in: body
@@ -12046,6 +12291,7 @@ paths:
         paramKeys: []
   /settings/search:
     post:
+      description: 加载系统配置信息
       responses:
         "200":
           description: OK
@@ -12058,6 +12304,7 @@ paths:
       - System Setting
   /settings/search/available:
     get:
+      description: 获取系统可用状态
       responses:
         "200":
           description: OK
@@ -12070,6 +12317,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 创建系统快照
       parameters:
       - description: request
         in: body
@@ -12097,6 +12345,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 删除系统快照
       parameters:
       - description: request
         in: body
@@ -12129,6 +12378,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新快照描述信息
       parameters:
       - description: request
         in: body
@@ -12162,6 +12412,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 导入已有快照
       parameters:
       - description: request
         in: body
@@ -12189,6 +12440,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 从系统快照恢复
       parameters:
       - description: request
         in: body
@@ -12221,6 +12473,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 从系统快照回滚
       parameters:
       - description: request
         in: body
@@ -12253,6 +12506,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取系统快照列表分页
       parameters:
       - description: request
         in: body
@@ -12274,6 +12528,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取系统快照大小
       parameters:
       - description: request
         in: body
@@ -12293,6 +12548,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取快照状态
       parameters:
       - description: request
         in: body
@@ -12310,6 +12566,7 @@ paths:
       - System Setting
   /settings/ssl/download:
     post:
+      description: 下载证书
       responses:
         "200":
           description: OK
@@ -12320,6 +12577,7 @@ paths:
       - System Setting
   /settings/ssl/info:
     get:
+      description: 获取证书信息
       responses:
         "200":
           description: OK
@@ -12334,6 +12592,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 修改系统 ssl 登录
       parameters:
       - description: request
         in: body
@@ -12360,6 +12619,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新系统配置
       parameters:
       - description: request
         in: body
@@ -12387,6 +12647,7 @@ paths:
     get:
       consumes:
       - application/json
+      description: 获取版本 release notes
       parameters:
       - description: request
         in: body
@@ -12405,6 +12666,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 系统更新
       parameters:
       - description: request
         in: body
@@ -12431,6 +12693,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 创建扫描规则
       parameters:
       - description: request
         in: body
@@ -12458,6 +12721,7 @@ paths:
     get:
       consumes:
       - application/json
+      description: 获取 Clam 基础信息
       responses:
         "200":
           description: OK
@@ -12472,6 +12736,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 删除扫描规则
       parameters:
       - description: request
         in: body
@@ -12504,6 +12769,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取扫描文件
       parameters:
       - description: request
         in: body
@@ -12525,6 +12791,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新病毒扫描配置文件
       parameters:
       - description: request
         in: body
@@ -12544,6 +12811,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 执行病毒扫描
       parameters:
       - description: request
         in: body
@@ -12576,6 +12844,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 修改 Clam 状态
       parameters:
       - description: request
         in: body
@@ -12600,6 +12869,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 清空扫描报告
       parameters:
       - description: request
         in: body
@@ -12630,6 +12900,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取扫描结果详情
       parameters:
       - description: request
         in: body
@@ -12649,6 +12920,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取扫描结果列表分页
       parameters:
       - description: request
         in: body
@@ -12670,6 +12942,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取扫描规则列表分页
       parameters:
       - description: request
         in: body
@@ -12691,6 +12964,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 修改扫描规则状态
       parameters:
       - description: request
         in: body
@@ -12724,6 +12998,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 修改扫描规则
       parameters:
       - description: request
         in: body
@@ -12751,6 +13026,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 清理系统垃圾文件
       parameters:
       - description: request
         in: body
@@ -12776,6 +13052,7 @@ paths:
         paramKeys: []
   /toolbox/device/base:
     post:
+      description: 获取设备基础信息
       responses:
         "200":
           description: OK
@@ -12790,6 +13067,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 检查系统 DNS 配置可用性
       parameters:
       - description: request
         in: body
@@ -12809,6 +13087,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取系统配置文件
       parameters:
       - description: request
         in: body
@@ -12828,6 +13107,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 通过文件修改配置
       parameters:
       - description: request
         in: body
@@ -12847,6 +13127,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 修改系统参数
       parameters:
       - description: request
         in: body
@@ -12872,6 +13153,7 @@ paths:
         paramKeys: []
   /toolbox/device/update/host:
     post:
+      description: 修改系统 hosts
       responses:
         "200":
           description: OK
@@ -12892,6 +13174,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 修改系统密码
       parameters:
       - description: request
         in: body
@@ -12911,6 +13194,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 修改系统 Swap
       parameters:
       - description: request
         in: body
@@ -12938,6 +13222,7 @@ paths:
     get:
       consumes:
       - application/json
+      description: 获取系统可用时区选项
       responses:
         "200":
           description: OK
@@ -12950,6 +13235,7 @@ paths:
       - Device
   /toolbox/fail2ban/base:
     get:
+      description: 获取 Fail2ban 基础信息
       responses:
         "200":
           description: OK
@@ -12964,6 +13250,7 @@ paths:
     get:
       consumes:
       - application/json
+      description: 获取 fail2ban 配置文件
       responses:
         "200":
           description: OK
@@ -12976,6 +13263,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 修改 Fail2ban 状态
       parameters:
       - description: request
         in: body
@@ -13000,6 +13288,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 配置 sshd
       parameters:
       - description: request
         in: body
@@ -13017,6 +13306,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取 Fail2ban ip
       parameters:
       - description: request
         in: body
@@ -13038,6 +13328,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 修改 Fail2ban 配置
       parameters:
       - description: request
         in: body
@@ -13065,6 +13356,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 通过文件修改 fail2ban 配置
       parameters:
       - description: request
         in: body
@@ -13084,6 +13376,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 创建 FTP 账户
       parameters:
       - description: request
         in: body
@@ -13109,6 +13402,7 @@ paths:
         paramKeys: []
   /toolbox/ftp/base:
     get:
+      description: 获取 FTP 基础信息
       responses:
         "200":
           description: OK
@@ -13123,6 +13417,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 删除 FTP 账户
       parameters:
       - description: request
         in: body
@@ -13155,6 +13450,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取 FTP 操作日志
       parameters:
       - description: request
         in: body
@@ -13176,6 +13472,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 修改 FTP 状态
       parameters:
       - description: request
         in: body
@@ -13200,6 +13497,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取 FTP 账户列表分页
       parameters:
       - description: request
         in: body
@@ -13221,6 +13519,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 同步 FTP 账户
       parameters:
       - description: request
         in: body
@@ -13246,6 +13545,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 修改 FTP 账户
       parameters:
       - description: request
         in: body
@@ -13271,6 +13571,7 @@ paths:
         paramKeys: []
   /toolbox/scan:
     post:
+      description: 扫描系统垃圾文件
       responses:
         "200":
           description: OK
@@ -13289,6 +13590,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 创建网站
       parameters:
       - description: request
         in: body
@@ -13315,6 +13617,7 @@ paths:
     get:
       consumes:
       - application/json
+      description: 通过 id 查询网站
       parameters:
       - description: request
         in: path
@@ -13335,6 +13638,7 @@ paths:
     get:
       consumes:
       - application/json
+      description: 通过 id 查询网站 nginx
       parameters:
       - description: request
         in: path
@@ -13355,6 +13659,7 @@ paths:
     get:
       consumes:
       - application/json
+      description: 获取 https 配置
       parameters:
       - description: request
         in: path
@@ -13374,6 +13679,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新 https 配置
       parameters:
       - description: request
         in: body
@@ -13408,6 +13714,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 创建网站 acme
       parameters:
       - description: request
         in: body
@@ -13436,6 +13743,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 删除网站 acme
       parameters:
       - description: request
         in: body
@@ -13468,6 +13776,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取网站 acme 列表分页
       parameters:
       - description: request
         in: body
@@ -13489,6 +13798,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取密码访问配置
       parameters:
       - description: request
         in: body
@@ -13508,6 +13818,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新密码访问配置
       parameters:
       - description: request
         in: body
@@ -13527,6 +13838,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 创建网站 ca
       parameters:
       - description: request
         in: body
@@ -13555,6 +13867,7 @@ paths:
     get:
       consumes:
       - application/json
+      description: 获取网站 ca
       parameters:
       - description: id
         in: path
@@ -13575,6 +13888,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 删除网站 ca
       parameters:
       - description: request
         in: body
@@ -13607,6 +13921,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 下载 CA 证书文件
       parameters:
       - description: request
         in: body
@@ -13639,6 +13954,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 自签 SSL 证书
       parameters:
       - description: request
         in: body
@@ -13671,6 +13987,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 续签 SSL 证书
       parameters:
       - description: request
         in: body
@@ -13683,7 +14000,7 @@ paths:
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Renew Obtain SSL
+      summary: Obtain SSL
       tags:
       - Website CA
       x-panel-log:
@@ -13703,6 +14020,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取网站 ca 列表分页
       parameters:
       - description: request
         in: body
@@ -13724,6 +14042,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 网站创建前检查
       parameters:
       - description: request
         in: body
@@ -13747,6 +14066,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取 nginx 配置
       parameters:
       - description: request
         in: body
@@ -13768,6 +14088,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新 nginx 配置
       parameters:
       - description: request
         in: body
@@ -13800,6 +14121,7 @@ paths:
     get:
       consumes:
       - application/json
+      description: 获取默认 html
       responses:
         "200":
           description: OK
@@ -13814,6 +14136,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新默认 html
       parameters:
       - description: request
         in: body
@@ -13840,6 +14163,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 操作网站日志
       parameters:
       - description: request
         in: body
@@ -13873,6 +14197,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 删除网站
       parameters:
       - description: request
         in: body
@@ -13905,6 +14230,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取网站目录配置
       parameters:
       - description: request
         in: body
@@ -13924,6 +14250,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新网站目录权限
       parameters:
       - description: request
         in: body
@@ -13956,6 +14283,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新网站目录
       parameters:
       - description: request
         in: body
@@ -13988,6 +14316,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 创建网站 dns
       parameters:
       - description: request
         in: body
@@ -14014,6 +14343,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 删除网站 dns
       parameters:
       - description: request
         in: body
@@ -14046,6 +14376,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取网站 dns 列表分页
       parameters:
       - description: request
         in: body
@@ -14067,6 +14398,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新网站 dns
       parameters:
       - description: request
         in: body
@@ -14093,6 +14425,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 创建网站域名
       parameters:
       - description: request
         in: body
@@ -14121,6 +14454,7 @@ paths:
     get:
       consumes:
       - application/json
+      description: 通过网站 id 查询域名
       parameters:
       - description: request
         in: path
@@ -14143,6 +14477,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 删除网站域名
       parameters:
       - description: request
         in: body
@@ -14175,6 +14510,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取防盗链配置
       parameters:
       - description: request
         in: body
@@ -14194,6 +14530,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新防盗链配置
       parameters:
       - description: request
         in: body
@@ -14206,11 +14543,12 @@ paths:
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Update AntiLeech conf
+      summary: Update AntiLeech
       tags:
       - Website
   /websites/list:
     get:
+      description: 获取网站列表
       responses:
         "200":
           description: OK
@@ -14227,6 +14565,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 操作网站日志
       parameters:
       - description: request
         in: body
@@ -14262,6 +14601,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新 网站 nginx 配置
       parameters:
       - description: request
         in: body
@@ -14294,6 +14634,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 操作网站
       parameters:
       - description: request
         in: body
@@ -14325,6 +14666,7 @@ paths:
         paramKeys: []
   /websites/options:
     get:
+      description: 获取网站列表
       responses:
         "200":
           description: OK
@@ -14341,6 +14683,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新 网站 PHP 配置
       parameters:
       - description: request
         in: body
@@ -14373,6 +14716,7 @@ paths:
     get:
       consumes:
       - application/json
+      description: 获取网站 php 配置
       parameters:
       - description: request
         in: path
@@ -14393,6 +14737,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新 php 配置文件
       parameters:
       - description: request
         in: body
@@ -14425,6 +14770,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 变更 php 版本
       parameters:
       - description: request
         in: body
@@ -14457,6 +14803,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取反向代理配置
       parameters:
       - description: request
         in: body
@@ -14476,6 +14823,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 修改反向代理配置
       parameters:
       - description: request
         in: body
@@ -14508,6 +14856,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新反向代理文件
       parameters:
       - description: request
         in: body
@@ -14540,6 +14889,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取重定向配置
       parameters:
       - description: request
         in: body
@@ -14559,6 +14909,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新重定向文件
       parameters:
       - description: request
         in: body
@@ -14591,6 +14942,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 修改重定向配置
       parameters:
       - description: request
         in: body
@@ -14623,6 +14975,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取伪静态配置
       parameters:
       - description: request
         in: body
@@ -14642,6 +14995,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新伪静态配置
       parameters:
       - description: request
         in: body
@@ -14674,6 +15028,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取网站列表分页
       parameters:
       - description: request
         in: body
@@ -14695,6 +15050,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 创建网站 ssl
       parameters:
       - description: request
         in: body
@@ -14723,6 +15079,7 @@ paths:
     get:
       consumes:
       - application/json
+      description: 通过 id 查询 ssl
       parameters:
       - description: request
         in: path
@@ -14741,6 +15098,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 删除网站 ssl
       parameters:
       - description: request
         in: body
@@ -14773,6 +15131,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 下载证书文件
       parameters:
       - description: request
         in: body
@@ -14785,7 +15144,7 @@ paths:
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Download SSL file
+      summary: Download SSL  file
       tags:
       - Website SSL
       x-panel-log:
@@ -14805,6 +15164,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 申请证书
       parameters:
       - description: request
         in: body
@@ -14837,6 +15197,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 解析网站 ssl
       parameters:
       - description: request
         in: body
@@ -14860,6 +15221,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 获取网站 ssl 列表分页
       parameters:
       - description: request
         in: body
@@ -14879,6 +15241,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新 ssl
       parameters:
       - description: request
         in: body
@@ -14891,7 +15254,7 @@ paths:
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Update Website ssl
+      summary: Update ssl
       tags:
       - Website SSL
       x-panel-log:
@@ -14911,6 +15274,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 上传 ssl
       parameters:
       - description: request
         in: body
@@ -14923,7 +15287,7 @@ paths:
           description: OK
       security:
       - ApiKeyAuth: []
-      summary: Upload Website ssl
+      summary: Upload ssl
       tags:
       - Website SSL
       x-panel-log:
@@ -14937,6 +15301,7 @@ paths:
     get:
       consumes:
       - application/json
+      description: 通过网站 id 查询 ssl
       parameters:
       - description: request
         in: path
@@ -14955,6 +15320,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: 更新网站
       parameters:
       - description: request
         in: body
@@ -14983,20 +15349,19 @@ schemes:
 securityDefinitions:
   CustomToken:
     description: |-
-      Custom Token Format, Format: md5('1panel' + 1Panel-Token + 1Panel-Timestamp).
+      自定义 Token 格式，格式：md5('1panel' + 1Panel-Token + 1Panel-Timestamp)。
       ```
-      eg:
+      示例请求头：
       curl -X GET "http://localhost:4004/api/v1/resource" \
       -H "1Panel-Token: <1panel_token>" \
       -H "1Panel-Timestamp: <current_unix_timestamp>"
       ```
-      - `1Panel-Token` is the key for the panel API interface.
+      - `1Panel-Token` 为面板 API 接口密钥。
     in: Header
     name: 1Panel-Token
     type: apiKey
   Timestamp:
-    description: '- `1Panel-Timestamp` is the Unix timestamp of the current time in
-      seconds.'
+    description: '- `1Panel-Timestamp` 为当前时间的 Unix 时间戳（单位：秒）。'
     in: header
     name: 1Panel-Timestamp
     type: apiKey

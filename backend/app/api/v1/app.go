@@ -11,6 +11,7 @@ import (
 
 // @Tags App
 // @Summary List apps
+// @Description 获取应用列表
 // @Accept json
 // @Param request body request.AppSearch true "request"
 // @Success 200
@@ -31,6 +32,7 @@ func (b *BaseApi) SearchApp(c *gin.Context) {
 
 // @Tags App
 // @Summary Sync app list
+// @Description 同步应用列表
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /apps/sync [post]
@@ -61,6 +63,7 @@ func (b *BaseApi) SyncApp(c *gin.Context) {
 
 // @Tags App
 // @Summary Search app by key
+// @Description 通过 key 获取应用信息
 // @Accept json
 // @Param key path string true "app key"
 // @Success 200 {object} response.AppDTO
@@ -82,10 +85,11 @@ func (b *BaseApi) GetApp(c *gin.Context) {
 
 // @Tags App
 // @Summary Search app detail by appid
+// @Description 通过 appid 获取应用详情
 // @Accept json
 // @Param appId path integer true "app id"
-// @Param version path string true "app version"
-// @Param version path string true "app type"
+// @Param version path string true "app 版本"
+// @Param version path string true "app 类型"
 // @Success 200 {object} response.AppDetailDTO
 // @Security ApiKeyAuth
 // @Router /apps/detail/:appId/:version/:type [get]
@@ -107,6 +111,7 @@ func (b *BaseApi) GetAppDetail(c *gin.Context) {
 
 // @Tags App
 // @Summary Get app detail by id
+// @Description 通过 id 获取应用详情
 // @Accept json
 // @Param appId path integer true "id"
 // @Success 200 {object} response.AppDetailDTO
@@ -128,6 +133,7 @@ func (b *BaseApi) GetAppDetailByID(c *gin.Context) {
 
 // @Tags App
 // @Summary Get Ignore App
+// @Description 获取忽略的应用版本
 // @Accept json
 // @Success 200 {object} response.IgnoredApp
 // @Security ApiKeyAuth
@@ -143,6 +149,7 @@ func (b *BaseApi) GetIgnoredApp(c *gin.Context) {
 
 // @Tags App
 // @Summary Install app
+// @Description 安装应用
 // @Accept json
 // @Param request body request.AppInstallCreate true "request"
 // @Success 200 {object} model.AppInstall
@@ -176,6 +183,7 @@ func (b *BaseApi) GetAppTags(c *gin.Context) {
 
 // @Tags App
 // @Summary Get app list update
+// @Description 获取应用更新版本
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /apps/checkupdate [get]

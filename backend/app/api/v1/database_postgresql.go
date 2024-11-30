@@ -12,6 +12,7 @@ import (
 
 // @Tags Database Postgresql
 // @Summary Create postgresql database
+// @Description 创建 postgresql 数据库
 // @Accept json
 // @Param request body dto.PostgresqlDBCreate true "request"
 // @Success 200
@@ -42,6 +43,7 @@ func (b *BaseApi) CreatePostgresql(c *gin.Context) {
 
 // @Tags Database Postgresql
 // @Summary Bind postgresql user
+// @Description 绑定 postgresql 数据库用户
 // @Accept json
 // @Param request body dto.PostgresqlBindUser true "request"
 // @Success 200
@@ -63,6 +65,7 @@ func (b *BaseApi) BindPostgresqlUser(c *gin.Context) {
 
 // @Tags Database Postgresql
 // @Summary Update postgresql database description
+// @Description 更新 postgresql 数据库库描述信息
 // @Accept json
 // @Param request body dto.UpdateDescription true "request"
 // @Success 200
@@ -84,6 +87,7 @@ func (b *BaseApi) UpdatePostgresqlDescription(c *gin.Context) {
 
 // @Tags Database Postgresql
 // @Summary Change postgresql privileges
+// @Description 修改 postgresql 用户权限
 // @Accept json
 // @Param request body dto.ChangeDBInfo true "request"
 // @Success 200
@@ -105,6 +109,7 @@ func (b *BaseApi) ChangePostgresqlPrivileges(c *gin.Context) {
 
 // @Tags Database Postgresql
 // @Summary Change postgresql password
+// @Description 修改 postgresql 密码
 // @Accept json
 // @Param request body dto.ChangeDBInfo true "request"
 // @Success 200
@@ -135,6 +140,7 @@ func (b *BaseApi) ChangePostgresqlPassword(c *gin.Context) {
 
 // @Tags Database Postgresql
 // @Summary Page postgresql databases
+// @Description 获取 postgresql 数据库列表分页
 // @Accept json
 // @Param request body dto.PostgresqlDBSearch true "request"
 // @Success 200 {object} dto.PageResult
@@ -160,6 +166,7 @@ func (b *BaseApi) SearchPostgresql(c *gin.Context) {
 
 // @Tags Database Postgresql
 // @Summary Load postgresql database from remote
+// @Description 从服务器获取
 // @Accept json
 // @Param request body dto.PostgresqlLoadDB true "request"
 // @Security ApiKeyAuth
@@ -181,6 +188,7 @@ func (b *BaseApi) LoadPostgresqlDBFromRemote(c *gin.Context) {
 
 // @Tags Database Postgresql
 // @Summary Check before delete postgresql database
+// @Description Postgresql 数据库删除前检查
 // @Accept json
 // @Param request body dto.PostgresqlDBDeleteCheck true "request"
 // @Success 200 {array} string
@@ -202,6 +210,7 @@ func (b *BaseApi) DeleteCheckPostgresql(c *gin.Context) {
 
 // @Tags Database Postgresql
 // @Summary Delete postgresql database
+// @Description 删除 postgresql 数据库
 // @Accept json
 // @Param request body dto.PostgresqlDBDelete true "request"
 // @Success 200

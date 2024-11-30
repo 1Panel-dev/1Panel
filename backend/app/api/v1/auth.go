@@ -17,8 +17,9 @@ type BaseApi struct{}
 
 // @Tags Auth
 // @Summary User login
+// @Description 用户登录
 // @Accept json
-// @Param EntranceCode header string true "Secure entrance base64 encrypted string"
+// @Param EntranceCode header string true "安全入口 base64 加密串"
 // @Param request body dto.Login true "request"
 // @Success 200 {object} dto.UserLoginInfo
 // @Router /auth/login [post]
@@ -58,11 +59,12 @@ func (b *BaseApi) Login(c *gin.Context) {
 
 // @Tags Auth
 // @Summary User login with mfa
+// @Description 用户 mfa 登录
 // @Accept json
 // @Param request body dto.MFALogin true "request"
 // @Success 200 {object} dto.UserLoginInfo
 // @Router /auth/mfalogin [post]
-// @Header 200 {string} EntranceCode
+// @Header 200 {string} EntranceCode "安全入口"
 func (b *BaseApi) MFALogin(c *gin.Context) {
 	var req dto.MFALogin
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -85,6 +87,7 @@ func (b *BaseApi) MFALogin(c *gin.Context) {
 
 // @Tags Auth
 // @Summary User logout
+// @Description 用户登出
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /auth/logout [post]
@@ -98,6 +101,7 @@ func (b *BaseApi) LogOut(c *gin.Context) {
 
 // @Tags Auth
 // @Summary Load captcha
+// @Description 加载验证码
 // @Success 200 {object} dto.CaptchaResponse
 // @Router /auth/captcha [get]
 func (b *BaseApi) Captcha(c *gin.Context) {
@@ -120,6 +124,7 @@ func (b *BaseApi) GetResponsePage(c *gin.Context) {
 
 // @Tags Auth
 // @Summary Check System isDemo
+// @Description 判断是否为demo环境
 // @Success 200
 // @Router /auth/demo [get]
 func (b *BaseApi) CheckIsDemo(c *gin.Context) {
@@ -127,7 +132,8 @@ func (b *BaseApi) CheckIsDemo(c *gin.Context) {
 }
 
 // @Tags Auth
-// @Summary Check System isIntl
+// @Summary Check System isDemo
+// @Description 判断是否为国际版
 // @Success 200
 // @Router /auth/intl [get]
 func (b *BaseApi) CheckIsIntl(c *gin.Context) {
@@ -136,6 +142,7 @@ func (b *BaseApi) CheckIsIntl(c *gin.Context) {
 
 // @Tags Auth
 // @Summary Load System Language
+// @Description 获取系统语言设置
 // @Success 200
 // @Router /auth/language [get]
 func (b *BaseApi) GetLanguage(c *gin.Context) {

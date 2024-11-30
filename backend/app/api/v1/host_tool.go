@@ -8,7 +8,8 @@ import (
 )
 
 // @Tags Host tool
-// @Summary Get tool status
+// @Summary Get tool
+// @Description 获取主机工具状态
 // @Accept json
 // @Param request body request.HostToolReq true "request"
 // @Success 200
@@ -30,6 +31,7 @@ func (b *BaseApi) GetToolStatus(c *gin.Context) {
 
 // @Tags Host tool
 // @Summary Create Host tool Config
+// @Description 创建主机工具配置
 // @Accept json
 // @Param request body request.HostToolCreate true "request"
 // @Success 200
@@ -51,6 +53,7 @@ func (b *BaseApi) InitToolConfig(c *gin.Context) {
 
 // @Tags Host tool
 // @Summary Operate tool
+// @Description 操作主机工具
 // @Accept json
 // @Param request body request.HostToolReq true "request"
 // @Success 200
@@ -72,6 +75,7 @@ func (b *BaseApi) OperateTool(c *gin.Context) {
 
 // @Tags Host tool
 // @Summary Get tool config
+// @Description 操作主机工具配置文件
 // @Accept json
 // @Param request body request.HostToolConfig true "request"
 // @Success 200
@@ -93,7 +97,8 @@ func (b *BaseApi) OperateToolConfig(c *gin.Context) {
 }
 
 // @Tags Host tool
-// @Summary Get tool logs
+// @Summary Get tool
+// @Description 获取主机工具日志
 // @Accept json
 // @Param request body request.HostToolLogReq true "request"
 // @Success 200
@@ -115,6 +120,7 @@ func (b *BaseApi) GetToolLog(c *gin.Context) {
 
 // @Tags Host tool
 // @Summary Create Supervisor process
+// @Description 操作守护进程
 // @Accept json
 // @Param request body request.SupervisorProcessConfig true "request"
 // @Success 200
@@ -137,6 +143,7 @@ func (b *BaseApi) OperateProcess(c *gin.Context) {
 
 // @Tags Host tool
 // @Summary Get Supervisor process config
+// @Description 获取 Supervisor 进程配置
 // @Accept json
 // @Success 200
 // @Security ApiKeyAuth
@@ -152,6 +159,7 @@ func (b *BaseApi) GetProcess(c *gin.Context) {
 
 // @Tags Host tool
 // @Summary Get Supervisor process config
+// @Description 操作 Supervisor 进程文件
 // @Accept json
 // @Param request body request.SupervisorProcessFileReq true "request"
 // @Success 200

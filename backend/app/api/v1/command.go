@@ -9,6 +9,7 @@ import (
 
 // @Tags Command
 // @Summary Create command
+// @Description 创建快速命令
 // @Accept json
 // @Param request body dto.CommandOperate true "request"
 // @Success 200
@@ -30,6 +31,7 @@ func (b *BaseApi) CreateCommand(c *gin.Context) {
 
 // @Tags Redis Command
 // @Summary Save redis command
+// @Description 保存 Redis 快速命令
 // @Accept json
 // @Param request body dto.RedisCommand true "request"
 // @Success 200
@@ -51,6 +53,7 @@ func (b *BaseApi) SaveRedisCommand(c *gin.Context) {
 
 // @Tags Command
 // @Summary Page commands
+// @Description 获取快速命令列表分页
 // @Accept json
 // @Param request body dto.SearchWithPage true "request"
 // @Success 200 {object} dto.PageResult
@@ -76,6 +79,7 @@ func (b *BaseApi) SearchCommand(c *gin.Context) {
 
 // @Tags Redis Command
 // @Summary Page redis commands
+// @Description 获取 redis 快速命令列表分页
 // @Accept json
 // @Param request body dto.SearchWithPage true "request"
 // @Success 200 {object} dto.PageResult
@@ -101,6 +105,7 @@ func (b *BaseApi) SearchRedisCommand(c *gin.Context) {
 
 // @Tags Command
 // @Summary Tree commands
+// @Description 获取快速命令树
 // @Accept json
 // @Success 200 {Array} dto.CommandTree
 // @Security ApiKeyAuth
@@ -117,6 +122,7 @@ func (b *BaseApi) SearchCommandTree(c *gin.Context) {
 
 // @Tags Redis Command
 // @Summary List redis commands
+// @Description 获取 redis 快速命令列表
 // @Success 200 {Array} dto.RedisCommand
 // @Security ApiKeyAuth
 // @Router /hosts/command/redis [get]
@@ -132,6 +138,7 @@ func (b *BaseApi) ListRedisCommand(c *gin.Context) {
 
 // @Tags Command
 // @Summary List commands
+// @Description 获取快速命令列表
 // @Success 200 {object} dto.CommandInfo
 // @Security ApiKeyAuth
 // @Router /hosts/command [get]
@@ -147,6 +154,7 @@ func (b *BaseApi) ListCommand(c *gin.Context) {
 
 // @Tags Command
 // @Summary Delete command
+// @Description 删除快速命令
 // @Accept json
 // @Param request body dto.BatchDeleteReq true "request"
 // @Success 200
@@ -168,6 +176,7 @@ func (b *BaseApi) DeleteCommand(c *gin.Context) {
 
 // @Tags Redis Command
 // @Summary Delete redis command
+// @Description 删除 redis 快速命令
 // @Accept json
 // @Param request body dto.BatchDeleteReq true "request"
 // @Success 200
@@ -189,6 +198,7 @@ func (b *BaseApi) DeleteRedisCommand(c *gin.Context) {
 
 // @Tags Command
 // @Summary Update command
+// @Description 更新快速命令
 // @Accept json
 // @Param request body dto.CommandOperate true "request"
 // @Success 200

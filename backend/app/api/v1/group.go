@@ -8,7 +8,8 @@ import (
 )
 
 // @Tags System Group
-// @Summary Create system group
+// @Summary Create group
+// @Description 创建系统组
 // @Accept json
 // @Param request body dto.GroupCreate true "request"
 // @Success 200
@@ -29,7 +30,8 @@ func (b *BaseApi) CreateGroup(c *gin.Context) {
 }
 
 // @Tags System Group
-// @Summary Delete system group
+// @Summary Delete group
+// @Description 删除系统组
 // @Accept json
 // @Param request body dto.OperateByID true "request"
 // @Success 200
@@ -50,7 +52,8 @@ func (b *BaseApi) DeleteGroup(c *gin.Context) {
 }
 
 // @Tags System Group
-// @Summary Update system group
+// @Summary Update group
+// @Description 更新系统组
 // @Accept json
 // @Param request body dto.GroupUpdate true "request"
 // @Success 200
@@ -71,7 +74,8 @@ func (b *BaseApi) UpdateGroup(c *gin.Context) {
 }
 
 // @Tags System Group
-// @Summary List system groups
+// @Summary List groups
+// @Description 查询系统组
 // @Accept json
 // @Param request body dto.GroupSearch true "request"
 // @Success 200 {array} dto.GroupInfo

@@ -9,6 +9,7 @@ import (
 
 // @Tags Website Domain
 // @Summary Delete website domain
+// @Description 删除网站域名
 // @Accept json
 // @Param request body request.WebsiteDomainDelete true "request"
 // @Success 200
@@ -29,6 +30,7 @@ func (b *BaseApi) DeleteWebDomain(c *gin.Context) {
 
 // @Tags Website Domain
 // @Summary Create website domain
+// @Description 创建网站域名
 // @Accept json
 // @Param request body request.WebsiteDomainCreate true "request"
 // @Success 200 {object} model.WebsiteDomain
@@ -50,6 +52,7 @@ func (b *BaseApi) CreateWebDomain(c *gin.Context) {
 
 // @Tags Website Domain
 // @Summary Search website domains by websiteId
+// @Description 通过网站 id 查询域名
 // @Accept json
 // @Param websiteId path integer true "request"
 // @Success 200 {array} model.WebsiteDomain

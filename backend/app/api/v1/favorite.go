@@ -10,6 +10,7 @@ import (
 
 // @Tags File
 // @Summary List favorites
+// @Description 获取收藏列表
 // @Accept json
 // @Param request body dto.PageInfo true "request"
 // @Success 200
@@ -33,6 +34,7 @@ func (b *BaseApi) SearchFavorite(c *gin.Context) {
 
 // @Tags File
 // @Summary Create favorite
+// @Description 创建收藏
 // @Accept json
 // @Param request body request.FavoriteCreate true "request"
 // @Success 200
@@ -54,6 +56,7 @@ func (b *BaseApi) CreateFavorite(c *gin.Context) {
 
 // @Tags File
 // @Summary Delete favorite
+// @Description 删除收藏
 // @Accept json
 // @Param request body request.FavoriteDelete true "request"
 // @Success 200

@@ -9,6 +9,7 @@ import (
 
 // @Tags Container Image-repo
 // @Summary Page image repos
+// @Description 获取镜像仓库列表分页
 // @Accept json
 // @Param request body dto.SearchWithPage true "request"
 // @Produce json
@@ -35,6 +36,7 @@ func (b *BaseApi) SearchRepo(c *gin.Context) {
 
 // @Tags Container Image-repo
 // @Summary List image repos
+// @Description 获取镜像仓库列表
 // @Produce json
 // @Success 200 {array} dto.ImageRepoOption
 // @Security ApiKeyAuth
@@ -51,6 +53,7 @@ func (b *BaseApi) ListRepo(c *gin.Context) {
 
 // @Tags Container Image-repo
 // @Summary Load repo status
+// @Description 获取 docker 仓库状态
 // @Accept json
 // @Param request body dto.OperateByID true "request"
 // @Produce json
@@ -72,6 +75,7 @@ func (b *BaseApi) CheckRepoStatus(c *gin.Context) {
 
 // @Tags Container Image-repo
 // @Summary Create image repo
+// @Description 创建镜像仓库
 // @Accept json
 // @Param request body dto.ImageRepoDelete true "request"
 // @Produce json
@@ -94,6 +98,7 @@ func (b *BaseApi) CreateRepo(c *gin.Context) {
 
 // @Tags Container Image-repo
 // @Summary Delete image repo
+// @Description 删除镜像仓库
 // @Accept json
 // @Param request body dto.ImageRepoDelete true "request"
 // @Produce json
@@ -116,6 +121,7 @@ func (b *BaseApi) DeleteRepo(c *gin.Context) {
 
 // @Tags Container Image-repo
 // @Summary Update image repo
+// @Description 更新镜像仓库
 // @Accept json
 // @Param request body dto.ImageRepoUpdate true "request"
 // @Produce json

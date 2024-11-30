@@ -9,6 +9,7 @@ import (
 
 // @Tags System Setting
 // @Summary Create system snapshot
+// @Description 创建系统快照
 // @Accept json
 // @Param request body dto.SnapshotCreate true "request"
 // @Success 200
@@ -30,6 +31,7 @@ func (b *BaseApi) CreateSnapshot(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Import system snapshot
+// @Description 导入已有快照
 // @Accept json
 // @Param request body dto.SnapshotImport true "request"
 // @Success 200
@@ -51,6 +53,7 @@ func (b *BaseApi) ImportSnapshot(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Load Snapshot status
+// @Description 获取快照状态
 // @Accept json
 // @Param request body dto.OperateByID true "request"
 // @Success 200
@@ -72,6 +75,7 @@ func (b *BaseApi) LoadSnapShotStatus(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Update snapshot description
+// @Description 更新快照描述信息
 // @Accept json
 // @Param request body dto.UpdateDescription true "request"
 // @Success 200
@@ -93,6 +97,7 @@ func (b *BaseApi) UpdateSnapDescription(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Page system snapshot
+// @Description 获取系统快照列表分页
 // @Accept json
 // @Param request body dto.PageSnapshot true "request"
 // @Success 200 {object} dto.PageResult
@@ -117,6 +122,7 @@ func (b *BaseApi) SearchSnapshot(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Load system snapshot size
+// @Description 获取系统快照大小
 // @Accept json
 // @Param request body dto.PageSnapshot true "request"
 // @Success 200
@@ -138,6 +144,7 @@ func (b *BaseApi) LoadSnapshotSize(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Recover system backup
+// @Description 从系统快照恢复
 // @Accept json
 // @Param request body dto.SnapshotRecover true "request"
 // @Success 200
@@ -159,6 +166,7 @@ func (b *BaseApi) RecoverSnapshot(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Rollback system backup
+// @Description 从系统快照回滚
 // @Accept json
 // @Param request body dto.SnapshotRecover true "request"
 // @Success 200
@@ -180,6 +188,7 @@ func (b *BaseApi) RollbackSnapshot(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Delete system backup
+// @Description 删除系统快照
 // @Accept json
 // @Param request body dto.SnapshotBatchDelete true "request"
 // @Success 200

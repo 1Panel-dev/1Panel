@@ -11,6 +11,7 @@ import (
 
 // @Tags FTP
 // @Summary Load FTP base info
+// @Description 获取 FTP 基础信息
 // @Success 200 {object} dto.FtpBaseInfo
 // @Security ApiKeyAuth
 // @Router /toolbox/ftp/base [get]
@@ -26,6 +27,7 @@ func (b *BaseApi) LoadFtpBaseInfo(c *gin.Context) {
 
 // @Tags FTP
 // @Summary Load FTP operation log
+// @Description 获取 FTP 操作日志
 // @Accept json
 // @Param request body dto.FtpLogSearch true "request"
 // @Success 200 {object} dto.PageResult
@@ -51,6 +53,7 @@ func (b *BaseApi) LoadFtpLogInfo(c *gin.Context) {
 
 // @Tags FTP
 // @Summary Operate FTP
+// @Description 修改 FTP 状态
 // @Accept json
 // @Param request body dto.Operate true "request"
 // @Security ApiKeyAuth
@@ -72,6 +75,7 @@ func (b *BaseApi) OperateFtp(c *gin.Context) {
 
 // @Tags FTP
 // @Summary Page FTP user
+// @Description 获取 FTP 账户列表分页
 // @Accept json
 // @Param request body dto.SearchWithPage true "request"
 // @Success 200 {object} dto.PageResult
@@ -97,6 +101,7 @@ func (b *BaseApi) SearchFtp(c *gin.Context) {
 
 // @Tags FTP
 // @Summary Create FTP user
+// @Description 创建 FTP 账户
 // @Accept json
 // @Param request body dto.FtpCreate true "request"
 // @Success 200
@@ -126,6 +131,7 @@ func (b *BaseApi) CreateFtp(c *gin.Context) {
 
 // @Tags FTP
 // @Summary Delete FTP user
+// @Description 删除 FTP 账户
 // @Accept json
 // @Param request body dto.BatchDeleteReq true "request"
 // @Success 200
@@ -147,6 +153,7 @@ func (b *BaseApi) DeleteFtp(c *gin.Context) {
 
 // @Tags FTP
 // @Summary Sync FTP user
+// @Description 同步 FTP 账户
 // @Accept json
 // @Param request body dto.BatchDeleteReq true "request"
 // @Success 200
@@ -163,6 +170,7 @@ func (b *BaseApi) SyncFtp(c *gin.Context) {
 
 // @Tags FTP
 // @Summary Update FTP user
+// @Description 修改 FTP 账户
 // @Accept json
 // @Param request body dto.FtpUpdate true "request"
 // @Success 200

@@ -12,6 +12,7 @@ import (
 
 // @Tags Container
 // @Summary Page containers
+// @Description 获取容器列表分页
 // @Accept json
 // @Param request body dto.PageContainer true "request"
 // @Produce json
@@ -37,6 +38,7 @@ func (b *BaseApi) SearchContainer(c *gin.Context) {
 
 // @Tags Container
 // @Summary List containers
+// @Description 获取容器名称
 // @Accept json
 // @Produce json
 // @Success 200
@@ -53,6 +55,7 @@ func (b *BaseApi) ListContainer(c *gin.Context) {
 
 // @Tags Container Compose
 // @Summary Page composes
+// @Description 获取编排列表分页
 // @Accept json
 // @Param request body dto.SearchWithPage true "request"
 // @Success 200 {object} dto.PageResult
@@ -77,6 +80,7 @@ func (b *BaseApi) SearchCompose(c *gin.Context) {
 
 // @Tags Container Compose
 // @Summary Test compose
+// @Description 测试 compose 是否可用
 // @Accept json
 // @Param request body dto.ComposeCreate true "request"
 // @Success 200
@@ -99,6 +103,7 @@ func (b *BaseApi) TestCompose(c *gin.Context) {
 
 // @Tags Container Compose
 // @Summary Create compose
+// @Description 创建容器编排
 // @Accept json
 // @Param request body dto.ComposeCreate true "request"
 // @Success 200
@@ -121,6 +126,7 @@ func (b *BaseApi) CreateCompose(c *gin.Context) {
 
 // @Tags Container Compose
 // @Summary Operate compose
+// @Description 容器编排操作
 // @Accept json
 // @Param request body dto.ComposeOperation true "request"
 // @Success 200
@@ -142,6 +148,7 @@ func (b *BaseApi) OperatorCompose(c *gin.Context) {
 
 // @Tags Container
 // @Summary Update container
+// @Description 更新容器
 // @Accept json
 // @Param request body dto.ContainerOperate true "request"
 // @Success 200
@@ -163,6 +170,7 @@ func (b *BaseApi) ContainerUpdate(c *gin.Context) {
 
 // @Tags Container
 // @Summary Load container info
+// @Description 获取容器表单信息
 // @Accept json
 // @Param request body dto.OperationWithName true "request"
 // @Success 200 {object} dto.ContainerOperate
@@ -183,6 +191,7 @@ func (b *BaseApi) ContainerInfo(c *gin.Context) {
 }
 
 // @Summary Load container limits
+// @Description 获取容器限制
 // @Success 200 {object} dto.ResourceLimit
 // @Security ApiKeyAuth
 // @Router /containers/limit [get]
@@ -196,6 +205,7 @@ func (b *BaseApi) LoadResourceLimit(c *gin.Context) {
 }
 
 // @Summary Load container stats
+// @Description 获取容器列表资源占用
 // @Success 200 {array} dto.ContainerListStats
 // @Security ApiKeyAuth
 // @Router /containers/list/stats [get]
@@ -210,6 +220,7 @@ func (b *BaseApi) ContainerListStats(c *gin.Context) {
 
 // @Tags Container
 // @Summary Create container
+// @Description 创建容器
 // @Accept json
 // @Param request body dto.ContainerOperate true "request"
 // @Success 200
@@ -231,6 +242,7 @@ func (b *BaseApi) ContainerCreate(c *gin.Context) {
 
 // @Tags Container
 // @Summary Upgrade container
+// @Description 更新容器镜像
 // @Accept json
 // @Param request body dto.ContainerUpgrade true "request"
 // @Success 200
@@ -252,6 +264,7 @@ func (b *BaseApi) ContainerUpgrade(c *gin.Context) {
 
 // @Tags Container
 // @Summary Clean container
+// @Description 容器清理
 // @Accept json
 // @Param request body dto.ContainerPrune true "request"
 // @Success 200 {object} dto.ContainerPruneReport
@@ -274,6 +287,7 @@ func (b *BaseApi) ContainerPrune(c *gin.Context) {
 
 // @Tags Container
 // @Summary Clean container log
+// @Description 清理容器日志
 // @Accept json
 // @Param request body dto.OperationWithName true "request"
 // @Success 200
@@ -295,6 +309,7 @@ func (b *BaseApi) CleanContainerLog(c *gin.Context) {
 
 // @Tags Container
 // @Summary Load container log
+// @Description 获取容器操作日志
 // @Accept json
 // @Param request body dto.OperationWithNameAndType true "request"
 // @Success 200
@@ -312,6 +327,7 @@ func (b *BaseApi) LoadContainerLog(c *gin.Context) {
 
 // @Tags Container
 // @Summary Rename Container
+// @Description 容器重命名
 // @Accept json
 // @Param request body dto.ContainerRename true "request"
 // @Success 200
@@ -333,6 +349,7 @@ func (b *BaseApi) ContainerRename(c *gin.Context) {
 
 // @Tags Container
 // @Summary Commit Container
+// @Description 容器提交生成新镜像
 // @Accept json
 // @Param request body dto.ContainerCommit true "request"
 // @Success 200
@@ -352,6 +369,7 @@ func (b *BaseApi) ContainerCommit(c *gin.Context) {
 
 // @Tags Container
 // @Summary Operate Container
+// @Description 容器操作
 // @Accept json
 // @Param request body dto.ContainerOperation true "request"
 // @Success 200
@@ -373,7 +391,8 @@ func (b *BaseApi) ContainerOperation(c *gin.Context) {
 
 // @Tags Container
 // @Summary Container stats
-// @Param id path integer true "container id"
+// @Description 容器监控信息
+// @Param id path integer true "容器id"
 // @Success 200 {object} dto.ContainerStats
 // @Security ApiKeyAuth
 // @Router /containers/stats/:id [get]
@@ -394,6 +413,7 @@ func (b *BaseApi) ContainerStats(c *gin.Context) {
 
 // @Tags Container
 // @Summary Container inspect
+// @Description 容器详情
 // @Accept json
 // @Param request body dto.InspectReq true "request"
 // @Success 200 {string} result
@@ -415,10 +435,11 @@ func (b *BaseApi) Inspect(c *gin.Context) {
 
 // @Tags Container
 // @Summary Container logs
-// @Param container query string false "container name"
-// @Param since query string false "since"
-// @Param follow query string false "follow"
-// @Param tail query string false "tail"
+// @Description 容器日志
+// @Param container query string false "容器名称"
+// @Param since query string false "时间筛选"
+// @Param follow query string false "是否追踪"
+// @Param tail query string false "显示行号"
 // @Security ApiKeyAuth
 // @Router /containers/search/log [post]
 func (b *BaseApi) ContainerLogs(c *gin.Context) {
@@ -440,11 +461,7 @@ func (b *BaseApi) ContainerLogs(c *gin.Context) {
 	}
 }
 
-// @Tags Container
-// @Summary Download Container logs
-// @Accept json
-// @Param request body dto.ContainerLog true "request"
-// @Security ApiKeyAuth
+// @Description 下载容器日志
 // @Router /containers/download/log [post]
 func (b *BaseApi) DownloadContainerLogs(c *gin.Context) {
 	var req dto.ContainerLog
@@ -459,6 +476,7 @@ func (b *BaseApi) DownloadContainerLogs(c *gin.Context) {
 
 // @Tags Container Network
 // @Summary Page networks
+// @Description 获取容器网络列表分页
 // @Accept json
 // @Param request body dto.SearchWithPage true "request"
 // @Produce json
@@ -484,6 +502,7 @@ func (b *BaseApi) SearchNetwork(c *gin.Context) {
 
 // @Tags Container Network
 // @Summary List networks
+// @Description 获取容器网络列表
 // @Accept json
 // @Produce json
 // @Success 200 {array} dto.Options
@@ -500,6 +519,7 @@ func (b *BaseApi) ListNetwork(c *gin.Context) {
 
 // @Tags Container Network
 // @Summary Delete network
+// @Description 删除容器网络
 // @Accept json
 // @Param request body dto.BatchDelete true "request"
 // @Success 200
@@ -521,6 +541,7 @@ func (b *BaseApi) DeleteNetwork(c *gin.Context) {
 
 // @Tags Container Network
 // @Summary Create network
+// @Description 创建容器网络
 // @Accept json
 // @Param request body dto.NetworkCreate true "request"
 // @Success 200
@@ -541,7 +562,8 @@ func (b *BaseApi) CreateNetwork(c *gin.Context) {
 }
 
 // @Tags Container Volume
-// @Summary Page Container Volumes
+// @Summary Page volumes
+// @Description 获取容器存储卷分页
 // @Accept json
 // @Param request body dto.SearchWithPage true "request"
 // @Produce json
@@ -566,7 +588,8 @@ func (b *BaseApi) SearchVolume(c *gin.Context) {
 }
 
 // @Tags Container Volume
-// @Summary List Container Volumes
+// @Summary List volumes
+// @Description 获取容器存储卷列表
 // @Accept json
 // @Produce json
 // @Success 200 {array} dto.Options
@@ -582,7 +605,8 @@ func (b *BaseApi) ListVolume(c *gin.Context) {
 }
 
 // @Tags Container Volume
-// @Summary Delete Container Volume
+// @Summary Delete volume
+// @Description 删除容器存储卷
 // @Accept json
 // @Param request body dto.BatchDelete true "request"
 // @Success 200
@@ -603,7 +627,8 @@ func (b *BaseApi) DeleteVolume(c *gin.Context) {
 }
 
 // @Tags Container Volume
-// @Summary Create Container Volume
+// @Summary Create volume
+// @Description 创建容器存储卷
 // @Accept json
 // @Param request body dto.VolumeCreate true "request"
 // @Success 200
@@ -624,7 +649,8 @@ func (b *BaseApi) CreateVolume(c *gin.Context) {
 }
 
 // @Tags Container Compose
-// @Summary Update Container Compose
+// @Summary Update compose
+// @Description 更新容器编排
 // @Accept json
 // @Param request body dto.ComposeUpdate true "request"
 // @Success 200
@@ -646,10 +672,11 @@ func (b *BaseApi) ComposeUpdate(c *gin.Context) {
 
 // @Tags Container Compose
 // @Summary Container Compose logs
-// @Param compose query string false "compose file address"
-// @Param since query string false "date"
-// @Param follow query string false "follow"
-// @Param tail query string false "tail"
+// @Description docker-compose 日志
+// @Param compose query string false "compose 文件地址"
+// @Param since query string false "时间筛选"
+// @Param follow query string false "是否追踪"
+// @Param tail query string false "显示行号"
 // @Security ApiKeyAuth
 // @Router /containers/compose/search/log [get]
 func (b *BaseApi) ComposeLogs(c *gin.Context) {

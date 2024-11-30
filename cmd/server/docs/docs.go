@@ -27,6 +27,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "通过 key 获取应用信息",
                 "consumes": [
                     "application/json"
                 ],
@@ -60,6 +61,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取应用更新版本",
                 "tags": [
                     "App"
                 ],
@@ -78,6 +80,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "通过 appid 获取应用详情",
                 "consumes": [
                     "application/json"
                 ],
@@ -95,14 +98,14 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "app version",
+                        "description": "app 版本",
                         "name": "version",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "app type",
+                        "description": "app 类型",
                         "name": "version",
                         "in": "path",
                         "required": true
@@ -125,6 +128,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "通过 id 获取应用详情",
                 "consumes": [
                     "application/json"
                 ],
@@ -158,6 +162,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取忽略的应用版本",
                 "consumes": [
                     "application/json"
                 ],
@@ -182,6 +187,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "安装应用",
                 "consumes": [
                     "application/json"
                 ],
@@ -226,6 +232,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "检查应用安装情况",
                 "consumes": [
                     "application/json"
                 ],
@@ -261,6 +268,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "通过 key 获取应用默认配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -296,6 +304,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取应用连接信息",
                 "consumes": [
                     "application/json"
                 ],
@@ -331,6 +340,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "删除前检查",
                 "consumes": [
                     "application/json"
                 ],
@@ -367,6 +377,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "忽略应用升级版本",
                 "consumes": [
                     "application/json"
                 ],
@@ -408,6 +419,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取已安装应用列表",
                 "consumes": [
                     "application/json"
                 ],
@@ -435,6 +447,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取应用端口",
                 "consumes": [
                     "application/json"
                 ],
@@ -470,6 +483,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "操作已安装应用",
                 "consumes": [
                     "application/json"
                 ],
@@ -537,6 +551,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "通过 install id 获取应用参数",
                 "consumes": [
                     "application/json"
                 ],
@@ -570,6 +585,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "修改应用参数",
                 "consumes": [
                     "application/json"
                 ],
@@ -611,6 +627,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "修改应用端口",
                 "consumes": [
                     "application/json"
                 ],
@@ -654,6 +671,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "分页获取已安装应用列表",
                 "consumes": [
                     "application/json"
                 ],
@@ -686,6 +704,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "同步已安装应用列表",
                 "tags": [
                     "App"
                 ],
@@ -711,6 +730,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "通过 install id 获取应用更新版本",
                 "consumes": [
                     "application/json"
                 ],
@@ -747,6 +767,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取应用列表",
                 "consumes": [
                     "application/json"
                 ],
@@ -779,6 +800,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "通过 key 获取应用 service",
                 "consumes": [
                     "application/json"
                 ],
@@ -815,6 +837,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "同步应用列表",
                 "tags": [
                     "App"
                 ],
@@ -835,6 +858,7 @@ const docTemplate = `{
         },
         "/auth/captcha": {
             "get": {
+                "description": "加载验证码",
                 "tags": [
                     "Auth"
                 ],
@@ -851,6 +875,7 @@ const docTemplate = `{
         },
         "/auth/demo": {
             "get": {
+                "description": "判断是否为demo环境",
                 "tags": [
                     "Auth"
                 ],
@@ -862,21 +887,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/intl": {
-            "get": {
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Check System isIntl",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
-            }
-        },
         "/auth/language": {
             "get": {
+                "description": "获取系统语言设置",
                 "tags": [
                     "Auth"
                 ],
@@ -890,6 +903,7 @@ const docTemplate = `{
         },
         "/auth/login": {
             "post": {
+                "description": "用户登录",
                 "consumes": [
                     "application/json"
                 ],
@@ -900,7 +914,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Secure entrance base64 encrypted string",
+                        "description": "安全入口 base64 加密串",
                         "name": "EntranceCode",
                         "in": "header",
                         "required": true
@@ -932,6 +946,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "用户登出",
                 "tags": [
                     "Auth"
                 ],
@@ -945,6 +960,7 @@ const docTemplate = `{
         },
         "/auth/mfalogin": {
             "post": {
+                "description": "用户 mfa 登录",
                 "consumes": [
                     "application/json"
                 ],
@@ -971,7 +987,8 @@ const docTemplate = `{
                         },
                         "headers": {
                             "EntranceCode": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "安全入口"
                             }
                         }
                     }
@@ -985,6 +1002,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "创建容器",
                 "consumes": [
                     "application/json"
                 ],
@@ -1027,6 +1045,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "清理容器日志",
                 "consumes": [
                     "application/json"
                 ],
@@ -1063,6 +1082,7 @@ const docTemplate = `{
         },
         "/containers/commit": {
             "post": {
+                "description": "容器提交生成新镜像",
                 "consumes": [
                     "application/json"
                 ],
@@ -1095,6 +1115,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "创建容器编排",
                 "consumes": [
                     "application/json"
                 ],
@@ -1136,6 +1157,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "容器编排操作",
                 "consumes": [
                     "application/json"
                 ],
@@ -1178,6 +1200,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取编排列表分页",
                 "consumes": [
                     "application/json"
                 ],
@@ -1213,6 +1236,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "docker-compose 日志",
                 "tags": [
                     "Container Compose"
                 ],
@@ -1220,25 +1244,25 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "compose file address",
+                        "description": "compose 文件地址",
                         "name": "compose",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "date",
+                        "description": "时间筛选",
                         "name": "since",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "follow",
+                        "description": "是否追踪",
                         "name": "follow",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "tail",
+                        "description": "显示行号",
                         "name": "tail",
                         "in": "query"
                     }
@@ -1253,6 +1277,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "测试 compose 是否可用",
                 "consumes": [
                     "application/json"
                 ],
@@ -1294,13 +1319,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新容器编排",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "Container Compose"
                 ],
-                "summary": "Update Container Compose",
+                "summary": "Update compose",
                 "parameters": [
                     {
                         "description": "request",
@@ -1335,6 +1361,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取 docker 配置信息",
                 "produces": [
                     "application/json"
                 ],
@@ -1359,6 +1386,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取 docker 配置信息(表单)",
                 "produces": [
                     "application/json"
                 ],
@@ -1383,6 +1411,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "修改 docker 配置信息",
                 "consumes": [
                     "application/json"
                 ],
@@ -1425,6 +1454,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "上传替换 docker 配置文件",
                 "consumes": [
                     "application/json"
                 ],
@@ -1464,6 +1494,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "Docker 操作",
                 "consumes": [
                     "application/json"
                 ],
@@ -1505,6 +1536,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取 docker 服务状态",
                 "produces": [
                     "application/json"
                 ],
@@ -1524,29 +1556,7 @@ const docTemplate = `{
         },
         "/containers/download/log": {
             "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Container"
-                ],
-                "summary": "Download Container logs",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.ContainerLog"
-                        }
-                    }
-                ],
+                "description": "下载容器日志",
                 "responses": {}
             }
         },
@@ -1557,6 +1567,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取镜像名称列表",
                 "produces": [
                     "application/json"
                 ],
@@ -1584,6 +1595,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取所有镜像列表",
                 "produces": [
                     "application/json"
                 ],
@@ -1611,6 +1623,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "构建镜像",
                 "consumes": [
                     "application/json"
                 ],
@@ -1655,6 +1668,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "导入镜像",
                 "consumes": [
                     "application/json"
                 ],
@@ -1696,6 +1710,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "拉取镜像",
                 "consumes": [
                     "application/json"
                 ],
@@ -1750,6 +1765,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "推送镜像",
                 "consumes": [
                     "application/json"
                 ],
@@ -1805,6 +1821,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "删除镜像",
                 "consumes": [
                     "application/json"
                 ],
@@ -1846,6 +1863,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "导出镜像",
                 "consumes": [
                     "application/json"
                 ],
@@ -1889,6 +1907,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取镜像列表分页",
                 "consumes": [
                     "application/json"
                 ],
@@ -1927,6 +1946,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "Tag 镜像",
                 "consumes": [
                     "application/json"
                 ],
@@ -1978,6 +1998,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取容器表单信息",
                 "consumes": [
                     "application/json"
                 ],
@@ -2013,6 +2034,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "容器详情",
                 "consumes": [
                     "application/json"
                 ],
@@ -2048,6 +2070,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "修改 docker ipv6 配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -2087,6 +2110,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取容器限制",
                 "summary": "Load container limits",
                 "responses": {
                     "200": {
@@ -2105,6 +2129,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取容器名称",
                 "consumes": [
                     "application/json"
                 ],
@@ -2129,6 +2154,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取容器列表资源占用",
                 "summary": "Load container stats",
                 "responses": {
                     "200": {
@@ -2150,6 +2176,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取容器操作日志",
                 "consumes": [
                     "application/json"
                 ],
@@ -2182,6 +2209,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "修改 docker 日志配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -2221,6 +2249,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取容器网络列表",
                 "consumes": [
                     "application/json"
                 ],
@@ -2249,6 +2278,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "创建容器网络",
                 "consumes": [
                     "application/json"
                 ],
@@ -2290,6 +2320,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "删除容器网络",
                 "consumes": [
                     "application/json"
                 ],
@@ -2331,6 +2362,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取容器网络列表分页",
                 "consumes": [
                     "application/json"
                 ],
@@ -2369,6 +2401,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "容器操作",
                 "consumes": [
                     "application/json"
                 ],
@@ -2411,6 +2444,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "容器清理",
                 "consumes": [
                     "application/json"
                 ],
@@ -2455,6 +2489,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "容器重命名",
                 "consumes": [
                     "application/json"
                 ],
@@ -2497,6 +2532,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取镜像仓库列表",
                 "produces": [
                     "application/json"
                 ],
@@ -2522,6 +2558,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "创建镜像仓库",
                 "consumes": [
                     "application/json"
                 ],
@@ -2566,6 +2603,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "删除镜像仓库",
                 "consumes": [
                     "application/json"
                 ],
@@ -2619,6 +2657,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取镜像仓库列表分页",
                 "consumes": [
                     "application/json"
                 ],
@@ -2657,6 +2696,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取 docker 仓库状态",
                 "consumes": [
                     "application/json"
                 ],
@@ -2692,6 +2732,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新镜像仓库",
                 "consumes": [
                     "application/json"
                 ],
@@ -2745,6 +2786,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取容器列表分页",
                 "consumes": [
                     "application/json"
                 ],
@@ -2783,6 +2825,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "容器日志",
                 "tags": [
                     "Container"
                 ],
@@ -2790,25 +2833,25 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "container name",
+                        "description": "容器名称",
                         "name": "container",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "since",
+                        "description": "时间筛选",
                         "name": "since",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "follow",
+                        "description": "是否追踪",
                         "name": "follow",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "tail",
+                        "description": "显示行号",
                         "name": "tail",
                         "in": "query"
                     }
@@ -2823,6 +2866,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "容器监控信息",
                 "tags": [
                     "Container"
                 ],
@@ -2830,7 +2874,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "container id",
+                        "description": "容器id",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -2853,6 +2897,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取容器编排模版列表",
                 "produces": [
                     "application/json"
                 ],
@@ -2878,6 +2923,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "创建容器编排模版",
                 "consumes": [
                     "application/json"
                 ],
@@ -2919,6 +2965,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "删除容器编排模版",
                 "consumes": [
                     "application/json"
                 ],
@@ -2969,6 +3016,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取容器编排模版列表分页",
                 "consumes": [
                     "application/json"
                 ],
@@ -3007,6 +3055,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新容器编排模版",
                 "consumes": [
                     "application/json"
                 ],
@@ -3057,6 +3106,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新容器",
                 "consumes": [
                     "application/json"
                 ],
@@ -3099,6 +3149,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新容器镜像",
                 "consumes": [
                     "application/json"
                 ],
@@ -3141,6 +3192,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取容器存储卷列表",
                 "consumes": [
                     "application/json"
                 ],
@@ -3150,7 +3202,7 @@ const docTemplate = `{
                 "tags": [
                     "Container Volume"
                 ],
-                "summary": "List Container Volumes",
+                "summary": "List volumes",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -3169,13 +3221,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "创建容器存储卷",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "Container Volume"
                 ],
-                "summary": "Create Container Volume",
+                "summary": "Create volume",
                 "parameters": [
                     {
                         "description": "request",
@@ -3210,13 +3263,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "删除容器存储卷",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "Container Volume"
                 ],
-                "summary": "Delete Container Volume",
+                "summary": "Delete volume",
                 "parameters": [
                     {
                         "description": "request",
@@ -3251,6 +3305,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取容器存储卷分页",
                 "consumes": [
                     "application/json"
                 ],
@@ -3260,7 +3315,7 @@ const docTemplate = `{
                 "tags": [
                     "Container Volume"
                 ],
-                "summary": "Page Container Volumes",
+                "summary": "Page volumes",
                 "parameters": [
                     {
                         "description": "request",
@@ -3289,6 +3344,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "创建计划任务",
                 "consumes": [
                     "application/json"
                 ],
@@ -3331,6 +3387,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "删除计划任务",
                 "consumes": [
                     "application/json"
                 ],
@@ -3381,6 +3438,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "下载计划任务记录",
                 "consumes": [
                     "application/json"
                 ],
@@ -3431,6 +3489,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "手动执行计划任务",
                 "consumes": [
                     "application/json"
                 ],
@@ -3481,6 +3540,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "清空计划任务记录",
                 "consumes": [
                     "application/json"
                 ],
@@ -3531,6 +3591,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取计划任务记录日志",
                 "consumes": [
                     "application/json"
                 ],
@@ -3563,6 +3624,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取计划任务分页",
                 "consumes": [
                     "application/json"
                 ],
@@ -3598,6 +3660,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取计划任务记录",
                 "consumes": [
                     "application/json"
                 ],
@@ -3633,6 +3696,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新计划任务状态",
                 "consumes": [
                     "application/json"
                 ],
@@ -3684,6 +3748,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新计划任务",
                 "consumes": [
                     "application/json"
                 ],
@@ -3734,6 +3799,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取首页基础数据",
                 "consumes": [
                     "application/json"
                 ],
@@ -3774,6 +3840,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取服务器基础数据",
                 "consumes": [
                     "application/json"
                 ],
@@ -3798,6 +3865,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取首页实时数据",
                 "consumes": [
                     "application/json"
                 ],
@@ -3833,13 +3901,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "重启服务器/面板",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "Dashboard"
                 ],
-                "summary": "System restart panel",
+                "summary": "System restart",
                 "parameters": [
                     {
                         "type": "string",
@@ -3863,6 +3932,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "创建 mysql 数据库",
                 "consumes": [
                     "application/json"
                 ],
@@ -3904,6 +3974,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "绑定 mysql 数据库用户",
                 "consumes": [
                     "application/json"
                 ],
@@ -3946,6 +4017,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "修改 mysql 访问权限",
                 "consumes": [
                     "application/json"
                 ],
@@ -3996,6 +4068,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "修改 mysql 密码",
                 "consumes": [
                     "application/json"
                 ],
@@ -4046,6 +4119,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取数据库基础信息",
                 "consumes": [
                     "application/json"
                 ],
@@ -4081,6 +4155,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取数据库配置文件",
                 "consumes": [
                     "application/json"
                 ],
@@ -4113,6 +4188,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "上传替换配置文件",
                 "consumes": [
                     "application/json"
                 ],
@@ -4155,6 +4231,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "创建远程数据库",
                 "consumes": [
                     "application/json"
                 ],
@@ -4197,6 +4274,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取远程数据库",
                 "tags": [
                     "Database"
                 ],
@@ -4218,6 +4296,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "检测远程数据库连接性",
                 "consumes": [
                     "application/json"
                 ],
@@ -4260,6 +4339,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "删除远程数据库",
                 "consumes": [
                     "application/json"
                 ],
@@ -4310,10 +4390,11 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取数据库列表",
                 "tags": [
                     "Database"
                 ],
-                "summary": "Retrieve database list based on type",
+                "summary": "List databases",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -4334,6 +4415,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取远程数据库列表",
                 "tags": [
                     "Database"
                 ],
@@ -4358,6 +4440,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取远程数据库列表分页",
                 "consumes": [
                     "application/json"
                 ],
@@ -4393,6 +4476,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新远程数据库",
                 "consumes": [
                     "application/json"
                 ],
@@ -4434,6 +4518,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "删除 mysql 数据库",
                 "consumes": [
                     "application/json"
                 ],
@@ -4484,6 +4569,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "Mysql 数据库删除前检查",
                 "consumes": [
                     "application/json"
                 ],
@@ -4522,6 +4608,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新 mysql 数据库库描述信息",
                 "consumes": [
                     "application/json"
                 ],
@@ -4573,6 +4660,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "从服务器获取",
                 "consumes": [
                     "application/json"
                 ],
@@ -4601,6 +4689,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取 mysql 数据库列表",
                 "consumes": [
                     "application/json"
                 ],
@@ -4639,6 +4728,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "创建 postgresql 数据库",
                 "consumes": [
                     "application/json"
                 ],
@@ -4680,6 +4770,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "从服务器获取",
                 "consumes": [
                     "application/json"
                 ],
@@ -4708,6 +4799,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "绑定 postgresql 数据库用户",
                 "consumes": [
                     "application/json"
                 ],
@@ -4750,6 +4842,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "删除 postgresql 数据库",
                 "consumes": [
                     "application/json"
                 ],
@@ -4800,6 +4893,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "Postgresql 数据库删除前检查",
                 "consumes": [
                     "application/json"
                 ],
@@ -4838,6 +4932,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新 postgresql 数据库库描述信息",
                 "consumes": [
                     "application/json"
                 ],
@@ -4889,6 +4984,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "修改 postgresql 密码",
                 "consumes": [
                     "application/json"
                 ],
@@ -4939,6 +5035,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "修改 postgresql 用户权限",
                 "consumes": [
                     "application/json"
                 ],
@@ -4981,6 +5078,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取 postgresql 数据库列表分页",
                 "consumes": [
                     "application/json"
                 ],
@@ -5016,6 +5114,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取 redis 配置信息",
                 "consumes": [
                     "application/json"
                 ],
@@ -5051,6 +5150,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新 redis 配置信息",
                 "consumes": [
                     "application/json"
                 ],
@@ -5090,6 +5190,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "安装 redis cli",
                 "tags": [
                     "Database Redis"
                 ],
@@ -5108,6 +5209,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新 redis 密码",
                 "consumes": [
                     "application/json"
                 ],
@@ -5147,6 +5249,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取 redis 持久化配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -5182,6 +5285,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新 redis 持久化配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -5221,6 +5325,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取 redis 状态信息",
                 "consumes": [
                     "application/json"
                 ],
@@ -5256,6 +5361,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取 mysql 远程访问权限",
                 "consumes": [
                     "application/json"
                 ],
@@ -5291,6 +5397,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取 mysql 数据库列表分页",
                 "consumes": [
                     "application/json"
                 ],
@@ -5326,6 +5433,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取 mysql 状态信息",
                 "consumes": [
                     "application/json"
                 ],
@@ -5361,6 +5469,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取 mysql 性能参数信息",
                 "consumes": [
                     "application/json"
                 ],
@@ -5396,6 +5505,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "mysql 性能调优",
                 "consumes": [
                     "application/json"
                 ],
@@ -5435,6 +5545,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "Mysql 远程数据库删除前检查",
                 "consumes": [
                     "application/json"
                 ],
@@ -5473,6 +5584,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "创建文件/文件夹",
                 "consumes": [
                     "application/json"
                 ],
@@ -5514,6 +5626,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "批量删除文件/文件夹",
                 "consumes": [
                     "application/json"
                 ],
@@ -5555,6 +5668,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "批量修改文件权限和用户/组",
                 "consumes": [
                     "application/json"
                 ],
@@ -5599,6 +5713,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "检测文件是否存在",
                 "consumes": [
                     "application/json"
                 ],
@@ -5631,6 +5746,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "分片下载下载文件",
                 "consumes": [
                     "application/json"
                 ],
@@ -5672,10 +5788,11 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "分片上传文件",
                 "tags": [
                     "File"
                 ],
-                "summary": "Chunk upload file",
+                "summary": "ChunkUpload file",
                 "parameters": [
                     {
                         "type": "file",
@@ -5699,6 +5816,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "压缩文件",
                 "consumes": [
                     "application/json"
                 ],
@@ -5740,6 +5858,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取文件内容",
                 "consumes": [
                     "application/json"
                 ],
@@ -5784,6 +5903,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "解压文件",
                 "consumes": [
                     "application/json"
                 ],
@@ -5825,6 +5945,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "删除文件/文件夹",
                 "consumes": [
                     "application/json"
                 ],
@@ -5866,6 +5987,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "下载文件",
                 "consumes": [
                     "application/json"
                 ],
@@ -5887,6 +6009,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "创建收藏",
                 "consumes": [
                     "application/json"
                 ],
@@ -5928,6 +6051,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "删除收藏",
                 "consumes": [
                     "application/json"
                 ],
@@ -5978,6 +6102,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取收藏列表",
                 "consumes": [
                     "application/json"
                 ],
@@ -6010,6 +6135,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "修改文件权限",
                 "consumes": [
                     "application/json"
                 ],
@@ -6052,6 +6178,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "移动文件",
                 "consumes": [
                     "application/json"
                 ],
@@ -6094,6 +6221,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "修改文件用户/组",
                 "consumes": [
                     "application/json"
                 ],
@@ -6137,6 +6265,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "按行读取日志文件",
                 "tags": [
                     "File"
                 ],
@@ -6166,13 +6295,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "清空回收站文件",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "File"
                 ],
-                "summary": "Clear Recycle Bin files",
+                "summary": "Clear RecycleBin files",
                 "responses": {
                     "200": {
                         "description": "OK"
@@ -6194,13 +6324,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "还原回收站文件",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "File"
                 ],
-                "summary": "Reduce Recycle Bin files",
+                "summary": "Reduce RecycleBin files",
                 "parameters": [
                     {
                         "description": "request",
@@ -6235,13 +6366,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取回收站文件列表",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "File"
                 ],
-                "summary": "List Recycle Bin files",
+                "summary": "List RecycleBin files",
                 "parameters": [
                     {
                         "description": "request",
@@ -6267,13 +6399,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取回收站状态",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "File"
                 ],
-                "summary": "Get Recycle Bin status",
+                "summary": "Get RecycleBin status",
                 "responses": {
                     "200": {
                         "description": "OK"
@@ -6288,6 +6421,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "修改文件名称",
                 "consumes": [
                     "application/json"
                 ],
@@ -6330,6 +6464,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新文件内容",
                 "consumes": [
                     "application/json"
                 ],
@@ -6371,6 +6506,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取文件列表",
                 "consumes": [
                     "application/json"
                 ],
@@ -6406,6 +6542,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取文件夹大小",
                 "consumes": [
                     "application/json"
                 ],
@@ -6447,6 +6584,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "加载文件树",
                 "consumes": [
                     "application/json"
                 ],
@@ -6485,6 +6623,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "上传文件",
                 "tags": [
                     "File"
                 ],
@@ -6521,6 +6660,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "分页获取上传文件",
                 "consumes": [
                     "application/json"
                 ],
@@ -6559,6 +6699,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "下载远端文件",
                 "consumes": [
                     "application/json"
                 ],
@@ -6602,13 +6743,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "创建系统组",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "System Group"
                 ],
-                "summary": "Create system group",
+                "summary": "Create group",
                 "parameters": [
                     {
                         "description": "request",
@@ -6644,13 +6786,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "删除系统组",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "System Group"
                 ],
-                "summary": "Delete system group",
+                "summary": "Delete group",
                 "parameters": [
                     {
                         "description": "request",
@@ -6702,13 +6845,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "查询系统组",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "System Group"
                 ],
-                "summary": "List system groups",
+                "summary": "List groups",
                 "parameters": [
                     {
                         "description": "request",
@@ -6740,13 +6884,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新系统组",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "System Group"
                 ],
-                "summary": "Update system group",
+                "summary": "Update group",
                 "parameters": [
                     {
                         "description": "request",
@@ -6782,6 +6927,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "上传文件更新 SSH 配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -6821,6 +6967,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取 SSH 配置文件",
                 "tags": [
                     "SSH"
                 ],
@@ -6839,6 +6986,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "生成 SSH 密钥",
                 "consumes": [
                     "application/json"
                 ],
@@ -6878,6 +7026,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取 SSH 登录日志",
                 "consumes": [
                     "application/json"
                 ],
@@ -6913,6 +7062,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "修改 SSH 服务状态",
                 "consumes": [
                     "application/json"
                 ],
@@ -6950,6 +7100,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "加载 SSH 配置信息",
                 "tags": [
                     "SSH"
                 ],
@@ -6971,6 +7122,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取 SSH 密钥",
                 "consumes": [
                     "application/json"
                 ],
@@ -7003,6 +7155,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新 SSH 配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -7045,13 +7198,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取主机工具状态",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "Host tool"
                 ],
-                "summary": "Get tool status",
+                "summary": "Get tool",
                 "parameters": [
                     {
                         "description": "request",
@@ -7077,6 +7231,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "操作主机工具配置文件",
                 "consumes": [
                     "application/json"
                 ],
@@ -7118,6 +7273,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "创建主机工具配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -7159,13 +7315,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取主机工具日志",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "Host tool"
                 ],
-                "summary": "Get tool logs",
+                "summary": "Get tool",
                 "parameters": [
                     {
                         "description": "request",
@@ -7191,6 +7348,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "操作主机工具",
                 "consumes": [
                     "application/json"
                 ],
@@ -7233,6 +7391,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取 Supervisor 进程配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -7252,6 +7411,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "操作守护进程",
                 "consumes": [
                     "application/json"
                 ],
@@ -7293,6 +7453,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "操作 Supervisor 进程文件",
                 "consumes": [
                     "application/json"
                 ],
@@ -7334,6 +7495,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "创建主机",
                 "consumes": [
                     "application/json"
                 ],
@@ -7376,6 +7538,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取快速命令列表",
                 "tags": [
                     "Command"
                 ],
@@ -7395,6 +7558,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "创建快速命令",
                 "consumes": [
                     "application/json"
                 ],
@@ -7437,6 +7601,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "删除快速命令",
                 "consumes": [
                     "application/json"
                 ],
@@ -7487,6 +7652,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取 redis 快速命令列表",
                 "tags": [
                     "Redis Command"
                 ],
@@ -7506,6 +7672,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "保存 Redis 快速命令",
                 "consumes": [
                     "application/json"
                 ],
@@ -7548,6 +7715,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "删除 redis 快速命令",
                 "consumes": [
                     "application/json"
                 ],
@@ -7598,6 +7766,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取 redis 快速命令列表分页",
                 "consumes": [
                     "application/json"
                 ],
@@ -7633,6 +7802,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取快速命令列表分页",
                 "consumes": [
                     "application/json"
                 ],
@@ -7668,6 +7838,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取快速命令树",
                 "consumes": [
                     "application/json"
                 ],
@@ -7692,6 +7863,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新快速命令",
                 "consumes": [
                     "application/json"
                 ],
@@ -7733,6 +7905,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "删除主机",
                 "consumes": [
                     "application/json"
                 ],
@@ -7783,6 +7956,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取防火墙基础信息",
                 "tags": [
                     "Firewall"
                 ],
@@ -7804,13 +7978,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "批量删除防火墙规则",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "Firewall"
                 ],
-                "summary": "Batch create group",
+                "summary": "Create group",
                 "parameters": [
                     {
                         "description": "request",
@@ -7836,13 +8011,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新防火墙端口转发规则",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "Firewall"
                 ],
-                "summary": "Update firewall port group",
+                "summary": "Create group",
                 "parameters": [
                     {
                         "description": "request",
@@ -7877,13 +8053,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "创建防火墙 IP 规则",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "Firewall"
                 ],
-                "summary": "Create firewall group",
+                "summary": "Create group",
                 "parameters": [
                     {
                         "description": "request",
@@ -7919,6 +8096,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "修改防火墙状态",
                 "consumes": [
                     "application/json"
                 ],
@@ -7963,13 +8141,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "创建防火墙端口规则",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "Firewall"
                 ],
-                "summary": "Create firewall port group",
+                "summary": "Create group",
                 "parameters": [
                     {
                         "description": "request",
@@ -8005,6 +8184,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取防火墙规则列表分页",
                 "consumes": [
                     "application/json"
                 ],
@@ -8040,13 +8220,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新 ip 防火墙规则",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "Firewall"
                 ],
-                "summary": "Uodate address group",
+                "summary": "Create group",
                 "parameters": [
                     {
                         "description": "request",
@@ -8072,6 +8253,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新防火墙描述",
                 "consumes": [
                     "application/json"
                 ],
@@ -8104,13 +8286,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新端口防火墙规则",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "Firewall"
                 ],
-                "summary": "Update firewall group",
+                "summary": "Create group",
                 "parameters": [
                     {
                         "description": "request",
@@ -8136,6 +8319,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "清空监控数据",
                 "tags": [
                     "Monitor"
                 ],
@@ -8161,6 +8345,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取监控数据",
                 "tags": [
                     "Monitor"
                 ],
@@ -8190,6 +8375,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取主机列表分页",
                 "consumes": [
                     "application/json"
                 ],
@@ -8228,6 +8414,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "测试主机连接",
                 "consumes": [
                     "application/json"
                 ],
@@ -8261,6 +8448,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "测试主机连接",
                 "consumes": [
                     "application/json"
                 ],
@@ -8293,6 +8481,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "加载主机树",
                 "consumes": [
                     "application/json"
                 ],
@@ -8331,6 +8520,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新主机",
                 "consumes": [
                     "application/json"
                 ],
@@ -8373,6 +8563,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "切换分组",
                 "consumes": [
                     "application/json"
                 ],
@@ -8424,6 +8615,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "清空操作日志",
                 "consumes": [
                     "application/json"
                 ],
@@ -8468,6 +8660,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取系统登录日志列表分页",
                 "consumes": [
                     "application/json"
                 ],
@@ -8503,6 +8696,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取系统操作日志列表分页",
                 "consumes": [
                     "application/json"
                 ],
@@ -8538,6 +8732,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取系统日志",
                 "tags": [
                     "Logs"
                 ],
@@ -8556,6 +8751,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取系统日志文件列表",
                 "tags": [
                     "Logs"
                 ],
@@ -8574,6 +8770,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取 OpenResty 配置信息",
                 "tags": [
                     "OpenResty"
                 ],
@@ -8595,6 +8792,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "清理 OpenResty 代理缓存",
                 "tags": [
                     "OpenResty"
                 ],
@@ -8620,6 +8818,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "上传更新 OpenResty 配置文件",
                 "consumes": [
                     "application/json"
                 ],
@@ -8659,6 +8858,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取部分 OpenResty 配置信息",
                 "consumes": [
                     "application/json"
                 ],
@@ -8697,6 +8897,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取 OpenResty 状态信息",
                 "tags": [
                     "OpenResty"
                 ],
@@ -8718,6 +8919,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新 OpenResty 配置信息",
                 "consumes": [
                     "application/json"
                 ],
@@ -8768,6 +8970,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "停止进程",
                 "tags": [
                     "Process"
                 ],
@@ -8806,6 +9009,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "创建运行环境",
                 "consumes": [
                     "application/json"
                 ],
@@ -8847,6 +9051,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取运行环境",
                 "consumes": [
                     "application/json"
                 ],
@@ -8877,6 +9082,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "删除运行环境",
                 "consumes": [
                     "application/json"
                 ],
@@ -8918,6 +9124,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取 Node 项目的 modules",
                 "consumes": [
                     "application/json"
                 ],
@@ -8950,6 +9157,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "操作 Node 项目 modules",
                 "consumes": [
                     "application/json"
                 ],
@@ -8982,6 +9190,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取 Node 项目的 scripts",
                 "consumes": [
                     "application/json"
                 ],
@@ -9014,6 +9223,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "操作运行环境",
                 "consumes": [
                     "application/json"
                 ],
@@ -9055,6 +9265,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "Create Extensions",
                 "consumes": [
                     "application/json"
                 ],
@@ -9087,6 +9298,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "Delete Extensions",
                 "consumes": [
                     "application/json"
                 ],
@@ -9119,6 +9331,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "Page Extensions",
                 "consumes": [
                     "application/json"
                 ],
@@ -9157,6 +9370,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "Update Extensions",
                 "consumes": [
                     "application/json"
                 ],
@@ -9189,6 +9403,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取运行环境列表",
                 "consumes": [
                     "application/json"
                 ],
@@ -9221,6 +9436,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "同步运行环境状态",
                 "consumes": [
                     "application/json"
                 ],
@@ -9242,6 +9458,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新运行环境",
                 "consumes": [
                     "application/json"
                 ],
@@ -9283,13 +9500,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "生成 API 接口密钥",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "System Setting"
                 ],
-                "summary": "Generate api key",
+                "summary": "generate api key",
                 "responses": {
                     "200": {
                         "description": "OK"
@@ -9311,6 +9529,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新 API 接口配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -9352,6 +9571,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "创建备份账号",
                 "consumes": [
                     "application/json"
                 ],
@@ -9393,6 +9613,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "备份系统数据",
                 "consumes": [
                     "application/json"
                 ],
@@ -9436,6 +9657,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "删除备份账号",
                 "consumes": [
                     "application/json"
                 ],
@@ -9486,6 +9708,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取 OneDrive 信息",
                 "consumes": [
                     "application/json"
                 ],
@@ -9510,6 +9733,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "删除备份记录",
                 "consumes": [
                     "application/json"
                 ],
@@ -9560,6 +9784,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "下载备份记录",
                 "consumes": [
                     "application/json"
                 ],
@@ -9602,6 +9827,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取备份记录列表分页",
                 "consumes": [
                     "application/json"
                 ],
@@ -9634,6 +9860,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "通过计划任务获取备份记录列表分页",
                 "consumes": [
                     "application/json"
                 ],
@@ -9666,6 +9893,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "恢复系统数据",
                 "consumes": [
                     "application/json"
                 ],
@@ -9710,6 +9938,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "从上传恢复系统数据",
                 "consumes": [
                     "application/json"
                 ],
@@ -9754,6 +9983,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "刷新 OneDrive token",
                 "tags": [
                     "Backup Account"
                 ],
@@ -9772,6 +10002,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取备份账号列表",
                 "tags": [
                     "Backup Account"
                 ],
@@ -9794,6 +10025,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取 bucket 列表",
                 "consumes": [
                     "application/json"
                 ],
@@ -9832,6 +10064,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取备份账号内文件列表",
                 "consumes": [
                     "application/json"
                 ],
@@ -9870,6 +10103,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新备份账号信息",
                 "consumes": [
                     "application/json"
                 ],
@@ -9911,10 +10145,11 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取安装根目录",
                 "tags": [
                     "System Setting"
                 ],
-                "summary": "Load local base dir",
+                "summary": "Load local backup dir",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -9932,6 +10167,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新系统监听信息",
                 "consumes": [
                     "application/json"
                 ],
@@ -9974,6 +10210,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "重置过期系统登录密码",
                 "consumes": [
                     "application/json"
                 ],
@@ -10013,6 +10250,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取系统地址信息",
                 "consumes": [
                     "application/json"
                 ],
@@ -10034,6 +10272,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "隐藏高级功能菜单",
                 "consumes": [
                     "application/json"
                 ],
@@ -10073,6 +10312,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取 mfa 信息",
                 "consumes": [
                     "application/json"
                 ],
@@ -10108,6 +10348,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "Mfa 绑定",
                 "consumes": [
                     "application/json"
                 ],
@@ -10147,6 +10388,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新系统登录密码",
                 "consumes": [
                     "application/json"
                 ],
@@ -10186,6 +10428,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新系统端口",
                 "consumes": [
                     "application/json"
                 ],
@@ -10227,6 +10470,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "服务器代理配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -10269,6 +10513,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "加载系统配置信息",
                 "tags": [
                     "System Setting"
                 ],
@@ -10290,6 +10535,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取系统可用状态",
                 "tags": [
                     "System Setting"
                 ],
@@ -10308,6 +10554,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "创建系统快照",
                 "consumes": [
                     "application/json"
                 ],
@@ -10350,6 +10597,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "删除系统快照",
                 "consumes": [
                     "application/json"
                 ],
@@ -10400,6 +10648,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新快照描述信息",
                 "consumes": [
                     "application/json"
                 ],
@@ -10451,6 +10700,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "导入已有快照",
                 "consumes": [
                     "application/json"
                 ],
@@ -10493,6 +10743,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "从系统快照恢复",
                 "consumes": [
                     "application/json"
                 ],
@@ -10543,6 +10794,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "从系统快照回滚",
                 "consumes": [
                     "application/json"
                 ],
@@ -10593,6 +10845,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取系统快照列表分页",
                 "consumes": [
                     "application/json"
                 ],
@@ -10628,6 +10881,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取系统快照大小",
                 "consumes": [
                     "application/json"
                 ],
@@ -10660,6 +10914,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取快照状态",
                 "consumes": [
                     "application/json"
                 ],
@@ -10692,6 +10947,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "下载证书",
                 "tags": [
                     "System Setting"
                 ],
@@ -10710,6 +10966,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取证书信息",
                 "tags": [
                     "System Setting"
                 ],
@@ -10731,6 +10988,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "修改系统 ssl 登录",
                 "consumes": [
                     "application/json"
                 ],
@@ -10772,6 +11030,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新系统配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -10814,6 +11073,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取版本 release notes",
                 "consumes": [
                     "application/json"
                 ],
@@ -10844,6 +11104,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "系统更新",
                 "consumes": [
                     "application/json"
                 ],
@@ -10885,6 +11146,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "创建扫描规则",
                 "consumes": [
                     "application/json"
                 ],
@@ -10927,6 +11189,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取 Clam 基础信息",
                 "consumes": [
                     "application/json"
                 ],
@@ -10951,6 +11214,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "删除扫描规则",
                 "consumes": [
                     "application/json"
                 ],
@@ -11001,6 +11265,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取扫描文件",
                 "consumes": [
                     "application/json"
                 ],
@@ -11036,6 +11301,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新病毒扫描配置文件",
                 "consumes": [
                     "application/json"
                 ],
@@ -11068,6 +11334,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "执行病毒扫描",
                 "consumes": [
                     "application/json"
                 ],
@@ -11118,6 +11385,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "修改 Clam 状态",
                 "consumes": [
                     "application/json"
                 ],
@@ -11155,6 +11423,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "清空扫描报告",
                 "consumes": [
                     "application/json"
                 ],
@@ -11201,6 +11470,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取扫描结果详情",
                 "consumes": [
                     "application/json"
                 ],
@@ -11233,6 +11503,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取扫描结果列表分页",
                 "consumes": [
                     "application/json"
                 ],
@@ -11268,6 +11539,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取扫描规则列表分页",
                 "consumes": [
                     "application/json"
                 ],
@@ -11303,6 +11575,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "修改扫描规则状态",
                 "consumes": [
                     "application/json"
                 ],
@@ -11354,6 +11627,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "修改扫描规则",
                 "consumes": [
                     "application/json"
                 ],
@@ -11396,6 +11670,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "清理系统垃圾文件",
                 "consumes": [
                     "application/json"
                 ],
@@ -11438,6 +11713,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取设备基础信息",
                 "tags": [
                     "Device"
                 ],
@@ -11459,6 +11735,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "检查系统 DNS 配置可用性",
                 "consumes": [
                     "application/json"
                 ],
@@ -11491,6 +11768,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取系统配置文件",
                 "consumes": [
                     "application/json"
                 ],
@@ -11523,6 +11801,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "通过文件修改配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -11555,6 +11834,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "修改系统参数",
                 "consumes": [
                     "application/json"
                 ],
@@ -11597,6 +11877,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "修改系统 hosts",
                 "tags": [
                     "Device"
                 ],
@@ -11625,6 +11906,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "修改系统密码",
                 "consumes": [
                     "application/json"
                 ],
@@ -11657,6 +11939,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "修改系统 Swap",
                 "consumes": [
                     "application/json"
                 ],
@@ -11699,6 +11982,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取系统可用时区选项",
                 "consumes": [
                     "application/json"
                 ],
@@ -11723,6 +12007,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取 Fail2ban 基础信息",
                 "tags": [
                     "Fail2ban"
                 ],
@@ -11744,6 +12029,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取 fail2ban 配置文件",
                 "consumes": [
                     "application/json"
                 ],
@@ -11765,6 +12051,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "修改 Fail2ban 状态",
                 "consumes": [
                     "application/json"
                 ],
@@ -11802,6 +12089,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "配置 sshd",
                 "consumes": [
                     "application/json"
                 ],
@@ -11830,6 +12118,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取 Fail2ban ip",
                 "consumes": [
                     "application/json"
                 ],
@@ -11865,6 +12154,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "修改 Fail2ban 配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -11907,6 +12197,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "通过文件修改 fail2ban 配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -11939,6 +12230,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "创建 FTP 账户",
                 "consumes": [
                     "application/json"
                 ],
@@ -11981,6 +12273,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取 FTP 基础信息",
                 "tags": [
                     "FTP"
                 ],
@@ -12002,6 +12295,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "删除 FTP 账户",
                 "consumes": [
                     "application/json"
                 ],
@@ -12052,6 +12346,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取 FTP 操作日志",
                 "consumes": [
                     "application/json"
                 ],
@@ -12087,6 +12382,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "修改 FTP 状态",
                 "consumes": [
                     "application/json"
                 ],
@@ -12124,6 +12420,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取 FTP 账户列表分页",
                 "consumes": [
                     "application/json"
                 ],
@@ -12159,6 +12456,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "同步 FTP 账户",
                 "consumes": [
                     "application/json"
                 ],
@@ -12198,6 +12496,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "修改 FTP 账户",
                 "consumes": [
                     "application/json"
                 ],
@@ -12240,6 +12539,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "扫描系统垃圾文件",
                 "tags": [
                     "Device"
                 ],
@@ -12265,6 +12565,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "创建网站",
                 "consumes": [
                     "application/json"
                 ],
@@ -12306,6 +12607,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "通过 id 查询网站",
                 "consumes": [
                     "application/json"
                 ],
@@ -12339,6 +12641,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "通过 id 查询网站 nginx",
                 "consumes": [
                     "application/json"
                 ],
@@ -12372,6 +12675,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取 https 配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -12403,6 +12707,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新 https 配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -12456,6 +12761,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "创建网站 acme",
                 "consumes": [
                     "application/json"
                 ],
@@ -12500,6 +12806,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "删除网站 acme",
                 "consumes": [
                     "application/json"
                 ],
@@ -12550,6 +12857,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取网站 acme 列表分页",
                 "consumes": [
                     "application/json"
                 ],
@@ -12585,6 +12893,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取密码访问配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -12617,6 +12926,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新密码访问配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -12649,6 +12959,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "创建网站 ca",
                 "consumes": [
                     "application/json"
                 ],
@@ -12693,6 +13004,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "删除网站 ca",
                 "consumes": [
                     "application/json"
                 ],
@@ -12743,6 +13055,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "下载 CA 证书文件",
                 "consumes": [
                     "application/json"
                 ],
@@ -12793,6 +13106,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "自签 SSL 证书",
                 "consumes": [
                     "application/json"
                 ],
@@ -12843,13 +13157,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "续签 SSL 证书",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "Website CA"
                 ],
-                "summary": "Renew Obtain SSL",
+                "summary": "Obtain SSL",
                 "parameters": [
                     {
                         "description": "request",
@@ -12893,6 +13208,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取网站 ca 列表分页",
                 "consumes": [
                     "application/json"
                 ],
@@ -12928,6 +13244,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取网站 ca",
                 "consumes": [
                     "application/json"
                 ],
@@ -12961,6 +13278,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "网站创建前检查",
                 "consumes": [
                     "application/json"
                 ],
@@ -12999,6 +13317,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取 nginx 配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -13034,6 +13353,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新 nginx 配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -13084,6 +13404,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取默认 html",
                 "consumes": [
                     "application/json"
                 ],
@@ -13108,6 +13429,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新默认 html",
                 "consumes": [
                     "application/json"
                 ],
@@ -13149,6 +13471,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "操作网站日志",
                 "consumes": [
                     "application/json"
                 ],
@@ -13200,6 +13523,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "删除网站",
                 "consumes": [
                     "application/json"
                 ],
@@ -13250,6 +13574,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取网站目录配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -13282,6 +13607,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新网站目录权限",
                 "consumes": [
                     "application/json"
                 ],
@@ -13332,6 +13658,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新网站目录",
                 "consumes": [
                     "application/json"
                 ],
@@ -13382,6 +13709,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "创建网站 dns",
                 "consumes": [
                     "application/json"
                 ],
@@ -13423,6 +13751,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "删除网站 dns",
                 "consumes": [
                     "application/json"
                 ],
@@ -13473,6 +13802,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取网站 dns 列表分页",
                 "consumes": [
                     "application/json"
                 ],
@@ -13508,6 +13838,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新网站 dns",
                 "consumes": [
                     "application/json"
                 ],
@@ -13549,6 +13880,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "创建网站域名",
                 "consumes": [
                     "application/json"
                 ],
@@ -13593,6 +13925,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "通过网站 id 查询域名",
                 "consumes": [
                     "application/json"
                 ],
@@ -13629,6 +13962,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "删除网站域名",
                 "consumes": [
                     "application/json"
                 ],
@@ -13679,6 +14013,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取防盗链配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -13711,13 +14046,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新防盗链配置",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "Website"
                 ],
-                "summary": "Update AntiLeech conf",
+                "summary": "Update AntiLeech",
                 "parameters": [
                     {
                         "description": "request",
@@ -13743,6 +14079,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取网站列表",
                 "tags": [
                     "Website"
                 ],
@@ -13767,6 +14104,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "操作网站日志",
                 "consumes": [
                     "application/json"
                 ],
@@ -13821,6 +14159,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新 网站 nginx 配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -13871,6 +14210,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "操作网站",
                 "consumes": [
                     "application/json"
                 ],
@@ -13922,6 +14262,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取网站列表",
                 "tags": [
                     "Website"
                 ],
@@ -13946,6 +14287,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新 网站 PHP 配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -13996,6 +14338,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取网站 php 配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -14029,6 +14372,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新 php 配置文件",
                 "consumes": [
                     "application/json"
                 ],
@@ -14079,6 +14423,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "变更 php 版本",
                 "consumes": [
                     "application/json"
                 ],
@@ -14129,6 +14474,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取反向代理配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -14161,6 +14507,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "修改反向代理配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -14211,6 +14558,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新反向代理文件",
                 "consumes": [
                     "application/json"
                 ],
@@ -14261,6 +14609,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取重定向配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -14293,6 +14642,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新重定向文件",
                 "consumes": [
                     "application/json"
                 ],
@@ -14343,6 +14693,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "修改重定向配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -14393,6 +14744,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取伪静态配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -14425,6 +14777,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新伪静态配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -14475,6 +14828,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取网站列表分页",
                 "consumes": [
                     "application/json"
                 ],
@@ -14510,6 +14864,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "创建网站 ssl",
                 "consumes": [
                     "application/json"
                 ],
@@ -14554,6 +14909,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "通过 id 查询 ssl",
                 "consumes": [
                     "application/json"
                 ],
@@ -14584,6 +14940,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "删除网站 ssl",
                 "consumes": [
                     "application/json"
                 ],
@@ -14634,13 +14991,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "下载证书文件",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "Website SSL"
                 ],
-                "summary": "Download SSL file",
+                "summary": "Download SSL  file",
                 "parameters": [
                     {
                         "description": "request",
@@ -14684,6 +15042,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "申请证书",
                 "consumes": [
                     "application/json"
                 ],
@@ -14734,6 +15093,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "解析网站 ssl",
                 "consumes": [
                     "application/json"
                 ],
@@ -14772,6 +15132,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "获取网站 ssl 列表分页",
                 "consumes": [
                     "application/json"
                 ],
@@ -14804,13 +15165,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新 ssl",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "Website SSL"
                 ],
-                "summary": "Update Website ssl",
+                "summary": "Update ssl",
                 "parameters": [
                     {
                         "description": "request",
@@ -14854,13 +15216,14 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "上传 ssl",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "Website SSL"
                 ],
-                "summary": "Upload Website ssl",
+                "summary": "Upload ssl",
                 "parameters": [
                     {
                         "description": "request",
@@ -14895,6 +15258,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "通过网站 id 查询 ssl",
                 "consumes": [
                     "application/json"
                 ],
@@ -14925,6 +15289,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "更新网站",
                 "consumes": [
                     "application/json"
                 ],
@@ -15811,26 +16176,6 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "systemUsage": {
-                    "type": "integer"
-                }
-            }
-        },
-        "dto.ContainerLog": {
-            "type": "object",
-            "required": [
-                "container"
-            ],
-            "properties": {
-                "container": {
-                    "type": "string"
-                },
-                "containerType": {
-                    "type": "string"
-                },
-                "since": {
-                    "type": "string"
-                },
-                "tail": {
                     "type": "integer"
                 }
             }
@@ -23373,13 +23718,13 @@ const docTemplate = `{
     },
     "securityDefinitions": {
         "CustomToken": {
-            "description": "Custom Token Format, Format: md5('1panel' + 1Panel-Token + 1Panel-Timestamp).\n` + "`" + `` + "`" + `` + "`" + `\neg:\ncurl -X GET \"http://localhost:4004/api/v1/resource\" \\\n-H \"1Panel-Token: \u003c1panel_token\u003e\" \\\n-H \"1Panel-Timestamp: \u003ccurrent_unix_timestamp\u003e\"\n` + "`" + `` + "`" + `` + "`" + `\n- ` + "`" + `1Panel-Token` + "`" + ` is the key for the panel API interface.",
+            "description": "自定义 Token 格式，格式：md5('1panel' + 1Panel-Token + 1Panel-Timestamp)。\n` + "`" + `` + "`" + `` + "`" + `\n示例请求头：\ncurl -X GET \"http://localhost:4004/api/v1/resource\" \\\n-H \"1Panel-Token: \u003c1panel_token\u003e\" \\\n-H \"1Panel-Timestamp: \u003ccurrent_unix_timestamp\u003e\"\n` + "`" + `` + "`" + `` + "`" + `\n- ` + "`" + `1Panel-Token` + "`" + ` 为面板 API 接口密钥。",
             "type": "apiKey",
             "name": "1Panel-Token",
             "in": "Header"
         },
         "Timestamp": {
-            "description": "- ` + "`" + `1Panel-Timestamp` + "`" + ` is the Unix timestamp of the current time in seconds.",
+            "description": "- ` + "`" + `1Panel-Timestamp` + "`" + ` 为当前时间的 Unix 时间戳（单位：秒）。",
             "type": "apiKey",
             "name": "1Panel-Timestamp",
             "in": "header"
@@ -23394,7 +23739,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/api/v1",
 	Schemes:          []string{"http", "https"},
 	Title:            "1Panel",
-	Description:      "Open Source Linux Panel",
+	Description:      "开源Linux面板",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

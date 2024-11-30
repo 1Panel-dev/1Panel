@@ -11,6 +11,7 @@ import (
 
 // @Tags Database Redis
 // @Summary Load redis status info
+// @Description 获取 redis 状态信息
 // @Accept json
 // @Param request body dto.OperationWithName true "request"
 // @Success 200 {object} dto.RedisStatus
@@ -32,6 +33,7 @@ func (b *BaseApi) LoadRedisStatus(c *gin.Context) {
 
 // @Tags Database Redis
 // @Summary Load redis conf
+// @Description 获取 redis 配置信息
 // @Accept json
 // @Param request body dto.OperationWithName true "request"
 // @Success 200 {object} dto.RedisConf
@@ -53,6 +55,7 @@ func (b *BaseApi) LoadRedisConf(c *gin.Context) {
 
 // @Tags Database Redis
 // @Summary Load redis persistence conf
+// @Description 获取 redis 持久化配置
 // @Accept json
 // @Param request body dto.OperationWithName true "request"
 // @Success 200 {object} dto.RedisPersistence
@@ -78,6 +81,7 @@ func (b *BaseApi) CheckHasCli(c *gin.Context) {
 
 // @Tags Database Redis
 // @Summary Install redis-cli
+// @Description 安装 redis cli
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /databases/redis/install/cli [post]
@@ -92,6 +96,7 @@ func (b *BaseApi) InstallCli(c *gin.Context) {
 
 // @Tags Database Redis
 // @Summary Update redis conf
+// @Description 更新 redis 配置信息
 // @Accept json
 // @Param request body dto.RedisConfUpdate true "request"
 // @Success 200
@@ -113,6 +118,7 @@ func (b *BaseApi) UpdateRedisConf(c *gin.Context) {
 
 // @Tags Database Redis
 // @Summary Change redis password
+// @Description 更新 redis 密码
 // @Accept json
 // @Param request body dto.ChangeRedisPass true "request"
 // @Success 200
@@ -143,6 +149,7 @@ func (b *BaseApi) ChangeRedisPassword(c *gin.Context) {
 
 // @Tags Database Redis
 // @Summary Update redis persistence conf
+// @Description 更新 redis 持久化配置
 // @Accept json
 // @Param request body dto.RedisConfPersistenceUpdate true "request"
 // @Success 200

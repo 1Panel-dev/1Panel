@@ -10,6 +10,7 @@ import (
 
 // @Tags Runtime
 // @Summary List runtimes
+// @Description 获取运行环境列表
 // @Accept json
 // @Param request body request.RuntimeSearch true "request"
 // @Success 200
@@ -33,6 +34,7 @@ func (b *BaseApi) SearchRuntimes(c *gin.Context) {
 
 // @Tags Runtime
 // @Summary Create runtime
+// @Description 创建运行环境
 // @Accept json
 // @Param request body request.RuntimeCreate true "request"
 // @Success 200
@@ -54,6 +56,7 @@ func (b *BaseApi) CreateRuntime(c *gin.Context) {
 
 // @Tags Website
 // @Summary Delete runtime
+// @Description 删除运行环境
 // @Accept json
 // @Param request body request.RuntimeDelete true "request"
 // @Success 200
@@ -89,6 +92,7 @@ func (b *BaseApi) DeleteRuntimeCheck(c *gin.Context) {
 
 // @Tags Runtime
 // @Summary Update runtime
+// @Description 更新运行环境
 // @Accept json
 // @Param request body request.RuntimeUpdate true "request"
 // @Success 200
@@ -109,6 +113,7 @@ func (b *BaseApi) UpdateRuntime(c *gin.Context) {
 
 // @Tags Runtime
 // @Summary Get runtime
+// @Description 获取运行环境
 // @Accept json
 // @Param id path string true "request"
 // @Success 200
@@ -130,6 +135,7 @@ func (b *BaseApi) GetRuntime(c *gin.Context) {
 
 // @Tags Runtime
 // @Summary Get Node package scripts
+// @Description 获取 Node 项目的 scripts
 // @Accept json
 // @Param request body request.NodePackageReq true "request"
 // @Success 200
@@ -150,6 +156,7 @@ func (b *BaseApi) GetNodePackageRunScript(c *gin.Context) {
 
 // @Tags Runtime
 // @Summary Operate runtime
+// @Description 操作运行环境
 // @Accept json
 // @Param request body request.RuntimeOperate true "request"
 // @Success 200
@@ -171,6 +178,7 @@ func (b *BaseApi) OperateRuntime(c *gin.Context) {
 
 // @Tags Runtime
 // @Summary Get Node modules
+// @Description 获取 Node 项目的 modules
 // @Accept json
 // @Param request body request.NodeModuleReq true "request"
 // @Success 200
@@ -191,6 +199,7 @@ func (b *BaseApi) GetNodeModules(c *gin.Context) {
 
 // @Tags Runtime
 // @Summary Operate Node modules
+// @Description 操作 Node 项目 modules
 // @Accept json
 // @Param request body request.NodeModuleReq true "request"
 // @Success 200
@@ -211,6 +220,7 @@ func (b *BaseApi) OperateNodeModules(c *gin.Context) {
 
 // @Tags Runtime
 // @Summary Sync runtime status
+// @Description 同步运行环境状态
 // @Accept json
 // @Success 200
 // @Security ApiKeyAuth
