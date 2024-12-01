@@ -4,7 +4,7 @@ const message = {
     commons: {
         true: '是',
         false: '否',
-        example: '例：',
+        example: '例如：',
         fit2cloud: '飞致云',
         lingxia: '凌霞',
         colon: '： ',

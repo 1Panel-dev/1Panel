@@ -265,7 +265,7 @@
                         >
                             <template #append>{{ $t('app.cpuCore') }}</template>
                         </el-input>
-                        <span class="input-help">{{ $t('container.limitHelper') }}</span>
+                        <span class="input-help">{{ $t('container.limitHelper', [99999]) }}</span>
                     </el-form-item>
                     <el-form-item :label="$t('container.memoryLimit')" prop="appinstall.memoryLimit">
                         <el-input style="width: 40%" v-model.number="website.appinstall.memoryLimit" maxlength="10">
@@ -281,7 +281,7 @@
                                 </el-select>
                             </template>
                         </el-input>
-                        <span class="input-help">{{ $t('container.limitHelper') }}</span>
+                        <span class="input-help">{{ $t('container.limitHelper', ['9999999999']) }}</span>
                     </el-form-item>
                     <el-form-item prop="allowPort" v-if="website.type === 'deployment'">
                         <el-checkbox v-model="website.appinstall.allowPort" :label="$t('app.allowPort')" size="large" />
