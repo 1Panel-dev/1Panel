@@ -1791,7 +1791,7 @@ const message = {
         deleteApp: '删除应用',
         deleteBackup: '删除备份',
         domain: '域名',
-        domainHelper: '一行一个域名,支持*和IP地址,支持域名:端口',
+        domainHelper: '一行一个域名，支持*和IP地址，支持"域名:端口"',
         addDomain: '新增域名',
         domainConfig: '域名设置',
         defaultDoc: '默认文档',
@@ -1915,7 +1915,7 @@ const message = {
         websiteDeploymentHelper: '使用从 1Panel 部署的应用创建网站',
         websiteStatictHelper: '在主机上创建网站目录',
         websiteProxyHelper:
-            '代理已有服务,例如本机已安装使用 8080 端口的 halo 服务，那么代理地址为 http://127.0.0.1:8080',
+            '代理已有服务。例如本机已安装使用 8080 端口的 halo 服务，那么代理地址为 http://127.0.0.1:8080',
         restoreHelper: '确认使用此备份恢复？',
         wafValueHelper: '值',
         wafRemarkHelper: '描述',

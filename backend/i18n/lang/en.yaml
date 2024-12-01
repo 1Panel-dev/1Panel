@@ -16,7 +16,7 @@ ErrApiConfigDisable: "This interface prohibits the use of API Interface calls: {
 #common
 ErrNameIsExist: "Name is already exist"
 ErrDemoEnvironment: "Demo server, prohibit this operation!"
-ErrCmdTimeout: "Command execution timed out！"
+ErrCmdTimeout: "Command execution timed out!"
 ErrCmdIllegal: "The command contains illegal characters. Please modify and try again!"
 ErrPortExist: '{{ .port }} port is already occupied by {{ .type }} [{{ .name }}]'
 TYPE_APP: "Application"
@@ -34,13 +34,13 @@ ErrAppLimit: "App exceeds install limit"
 ErrAppRequired: "{{ .detail }} app is required"
 ErrNotInstall: "App not installed"
 ErrPortInOtherApp: "{{ .port }} port  already in use by app  {{ .apps }}"
-ErrDbUserNotValid: "Stock database, username and password do not match！"
+ErrDbUserNotValid: "Stock database, username and password do not match!"
 ErrDockerComposeNotValid: "docker-compose file format error!"
 ErrUpdateBuWebsite: 'The application was updated successfully, but the modification of the website configuration file failed, please check the configuration!'
 Err1PanelNetworkFailed: 'Default container network creation failed! {{ .detail }}'
 ErrFileParse: 'Application docker-compose file parsing failed!'
 ErrInstallDirNotFound: 'installation directory does not exist'
-AppStoreIsUpToDate: 'The app store is already up to date！'
+AppStoreIsUpToDate: 'Up to date'
 LocalAppVersionNull: 'The {{.name}} app is not synced to version! Could not add to application list'
 LocalAppVersionErr: '{{.name}} failed to sync version {{.version}}! {{.err}}'
 ErrFileNotFound: '{{.name}} file does not exist'
@@ -95,7 +95,7 @@ ErrAppDelete: 'Other Website use this App'
 ErrGroupIsUsed: 'The group is in use and cannot be deleted'
 ErrBackupMatch: 'the backup file does not match the current partial data of the website: {{ .detail}}'
 ErrBackupExist: 'the backup file corresponds to a portion of the original data that does not exist: {{ .detail}}'
-ErrPHPResource: 'The local runtime does not support switching！'
+ErrPHPResource: 'The local runtime does not support switching!'
 ErrPathPermission: 'A folder with non-1000:1000 permissions was detected in the index directory, which may cause an Access denied error when accessing the website. Please click the save button above'
 ErrDomainIsUsed: "Domain is already used by website {{ .name }}"
 ErrDomainFormat: "{{ .name }} domain format error"
@@ -105,7 +105,7 @@ ErrImageNotExist: "Running environment {{.name}} image does not exist, please re
 #ssl
 ErrSSLCannotDelete: "The certificate {{ .name }} is being used by the website and cannot be removed"
 ErrAccountCannotDelete: "The certificate associated with the account cannot be deleted"
-ErrSSLApply: "The certificate continues to be signed successfully, but openresty reload fails, please check the configuration！"
+ErrSSLApply: "The certificate continues to be signed successfully, but openresty reload fails, please check the configuration!"
 ErrEmailIsExist: 'Email is already exist'
 ErrSSLKeyNotFound: 'The private key file does not exist'
 ErrSSLCertificateNotFound: 'The certificate file does not exist'
@@ -147,10 +147,10 @@ ErrPortRules: "The number of ports does not match, please re-enter!"
 ErrPgImagePull: "Image pull timeout. Please configure image acceleration or manually pull the postgres:16.0-alpine image and try again"
 
 #runtime
-ErrDirNotFound: "The build folder does not exist! Please check file integrity！"
-ErrFileNotExist: "{{ .detail }} file does not exist! Please check source file integrity！"
+ErrDirNotFound: "The build folder does not exist! Please check file integrity!"
+ErrFileNotExist: "{{ .detail }} file does not exist! Please check source file integrity!"
 ErrImageBuildErr: "Image build failed"
-ErrImageExist: "Image is already exist！"
+ErrImageExist: "Image is already exist!"
 ErrDelWithWebsite: "The operating environment has been associated with a website and cannot be deleted"
 ErrRuntimeStart: "Failed to start"
 ErrPackageJsonNotFound: "package.json file does not exist"

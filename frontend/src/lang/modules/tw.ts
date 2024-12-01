@@ -9,8 +9,8 @@ const message = {
     commons: {
         true: '是',
         false: '否',
-        example: '例：',
-        fit2cloud: '飛致雲',
+        example: '例如：',
+        fit2cloud: '飞致云',
         button: {
             create: '創建',
             add: '添加',

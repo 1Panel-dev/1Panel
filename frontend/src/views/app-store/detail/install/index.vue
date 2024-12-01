@@ -16,7 +16,7 @@
                     :title="$t('app.appInstallWarn')"
                     class="common-prompt"
                     :closable="false"
-                    type="error"
+                    type="warning"
                     v-if="!isHostMode"
                 />
                 <el-alert

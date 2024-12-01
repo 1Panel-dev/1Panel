@@ -189,15 +189,11 @@ const clear = () => {
 const onOperate = async (operation: string) => {
     em('update:maskShow', false);
     operateReq.operate = operation;
-    ElMessageBox.confirm(
-        i18n.global.t('app.operatorHelper', [i18n.global.t('app.' + operation)]),
-        i18n.global.t('app.' + operation),
-        {
-            confirmButtonText: i18n.global.t('commons.button.confirm'),
-            cancelButtonText: i18n.global.t('commons.button.cancel'),
-            type: 'info',
-        },
-    )
+    ElMessageBox.confirm(i18n.global.t(`app.${operation}OperatorHelper`), i18n.global.t('app.' + operation), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'info',
+    })
         .then(() => {
             em('update:maskShow', true);
             em('update:loading', true);
