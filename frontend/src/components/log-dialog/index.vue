@@ -63,7 +63,6 @@ const loadTooltip = () => {
 
 const acceptParams = (props: LogProps) => {
     config.value = props;
-    console.log('config', config.value);
     open.value = true;
 
     if (!mobile.value) {

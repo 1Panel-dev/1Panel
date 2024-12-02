@@ -597,7 +597,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 				_ = appDetailRepo.Update(context.Background(), detail)
 			}
 			go func() {
-				_, _, _ = httpUtil.HandleGet(detail.DownloadCallBackUrl, http.MethodGet, constant.TimeOut5s)
+				RequestDownloadCallBack(detail.DownloadCallBackUrl)
 			}()
 		}
 		if install.App.Resource == constant.AppResourceLocal {
@@ -925,7 +925,7 @@ func copyData(task *task.Task, app model.App, appDetail model.AppDetail, appInst
 			return
 		}
 		go func() {
-			_, _, _ = httpUtil.HandleGet(appDetail.DownloadCallBackUrl, http.MethodGet, constant.TimeOut5s)
+			RequestDownloadCallBack(appDetail.DownloadCallBackUrl)
 		}()
 	}
 	appKey := app.Key
@@ -1232,11 +1232,7 @@ func handleLocalAppDetail(versionDir string, appDetail *model.AppDetail) error {
 		return buserr.WithMap(constant.ErrFileParseApp, map[string]interface{}{"name": "data.yml", "err": err.Error()}, err)
 	}
 
-	additionalProperties, ok := dataMap["additionalProperties"].(map[string]interface{})
-	if !ok {
-		return buserr.WithName(constant.ErrAppParamKey, "additionalProperties")
-	}
-
+	additionalProperties, _ := dataMap["additionalProperties"].(map[string]interface{})
 	formFieldsInterface, ok := additionalProperties["formFields"]
 	if ok {
 		formFields, ok := formFieldsInterface.([]interface{})
@@ -1463,6 +1459,17 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool)
 			continue
 		}
 		lastVersion := versions[0]
+		if app.Key == constant.AppMysql {
+			for _, version := range versions {
+				majorVersion := getMajorVersion(installed.Version)
+				if !strings.HasPrefix(version, majorVersion) {
+					continue
+				} else {
+					lastVersion = version
+					break
+				}
+			}
+		}
 		if common.IsCrossVersion(installed.Version, lastVersion) {
 			installDTO.CanUpdate = app.CrossVersionUpdate
 		} else {
@@ -1728,4 +1735,11 @@ func ignoreUpdate(installed model.AppInstall) bool {
 		return true
 	}
 	return false
+}
+
+func RequestDownloadCallBack(downloadCallBackUrl string) {
+	if downloadCallBackUrl == "" {
+		return
+	}
+	_, _, _ = httpUtil.HandleGet(downloadCallBackUrl, http.MethodGet, constant.TimeOut5s)
 }

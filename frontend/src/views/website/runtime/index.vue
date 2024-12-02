@@ -29,5 +29,9 @@ const buttons = [
         label: 'Python',
         path: '/websites/runtimes/python',
     },
+    {
+        label: '.NET',
+        path: '/websites/runtimes/dotnet',
+    },
 ];
 </script>

@@ -33,12 +33,13 @@ import { SearchRuntimes } from '@/api/modules/runtime';
 import { onMounted, reactive, ref } from 'vue';
 import { Runtime } from '@/api/interface/runtime';
 import { Website } from '@/api/interface/website';
-import { ChangePHPVersion } from '@/api/modules/website';
+import { ChangePHPVersion, GetWebsite } from '@/api/modules/website';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 const props = defineProps({
-    website: {
-        type: Object,
+    id: {
+        type: Number,
+        default: 0,
     },
 });
 
@@ -50,6 +51,7 @@ const versionReq = reactive<Website.PHPVersionChange>({
 const versions = ref([]);
 const loading = ref(false);
 const oldRuntimeID = ref(0);
+const website = ref();
 
 const getRuntimes = async () => {
     try {
@@ -76,16 +78,23 @@ const submit = async () => {
             try {
                 await ChangePHPVersion(versionReq);
                 MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
+                getWebsiteDetail();
             } catch (error) {}
             loading.value = false;
         });
     } catch (error) {}
 };
 
+const getWebsiteDetail = async () => {
+    const res = await GetWebsite(props.id);
+    versionReq.runtimeID = res.data.runtimeID;
+    oldRuntimeID.value = res.data.runtimeID;
+    website.value = res.data;
+};
+
 onMounted(() => {
-    versionReq.runtimeID = props.website.runtimeID;
-    versionReq.websiteID = props.website.id;
-    oldRuntimeID.value = props.website.runtimeID;
+    versionReq.websiteID = props.id;
+    getWebsiteDetail();
     getRuntimes();
 });
 </script>

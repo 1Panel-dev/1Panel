@@ -3,10 +3,6 @@ package server
 import (
 	"crypto/tls"
 	"fmt"
-	"net"
-	"net/http"
-	"os"
-
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/cron"
 	"github.com/1Panel-dev/1Panel/agent/global"
@@ -22,8 +18,12 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/init/validator"
 	"github.com/1Panel-dev/1Panel/agent/init/viper"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
+	"net"
+	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
+	_ "net/http/pprof"
 )
 
 func Start() {
@@ -45,6 +45,10 @@ func Start() {
 	server := &http.Server{
 		Handler: rootRouter,
 	}
+
+	go func() {
+		http.ListenAndServe("0.0.0.0:6060", nil)
+	}()
 
 	if global.IsMaster {
 		_ = os.Remove("/tmp/agent.sock")

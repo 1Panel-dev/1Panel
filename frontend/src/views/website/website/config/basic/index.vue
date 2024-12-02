@@ -42,7 +42,7 @@
             name="13"
             v-if="(website.type === 'runtime' && website.runtimeType === 'php') || website.type === 'static'"
         >
-            <PHP :website="website" v-if="tabIndex == '13'"></PHP>
+            <PHP :id="id" v-if="tabIndex == '13'"></PHP>
         </el-tab-pane>
         <el-tab-pane :label="$t('logs.resource')" name="14">
             <Resource :id="id" v-if="tabIndex == '14'"></Resource>

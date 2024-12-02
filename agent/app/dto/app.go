@@ -115,7 +115,8 @@ type Tag struct {
 }
 
 type AppForm struct {
-	FormFields []AppFormFields `json:"formFields"`
+	FormFields     []AppFormFields `json:"formFields"`
+	SupportVersion float64         `json:"supportVersion"`
 }
 
 type AppFormFields struct {

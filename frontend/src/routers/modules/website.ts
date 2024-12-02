@@ -89,6 +89,16 @@ const webSiteRouter = {
                 requiresAuth: false,
             },
         },
+        {
+            path: '/websites/runtimes/dotnet',
+            name: 'dotNet',
+            hidden: true,
+            component: () => import('@/views/website/runtime/dotnet/index.vue'),
+            meta: {
+                activeMenu: '/websites/runtimes/php',
+                requiresAuth: false,
+            },
+        },
     ],
 };
 

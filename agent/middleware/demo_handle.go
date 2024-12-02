@@ -19,6 +19,7 @@ var whiteUrlList = map[string]struct{}{
 	"/api/v2/logs/operation":      {},
 	"/api/v2/logs/login":          {},
 	"/api/v2/auth/logout":         {},
+	"/api/v1/dashboard/current":   {},
 
 	"/api/v2/apps/installed/loadport": {},
 	"/api/v2/apps/installed/check":    {},

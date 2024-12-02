@@ -2228,6 +2228,7 @@ const message = {
         sni: 'Origin SNI',
         sniHelper:
             "When the reverse proxy backend is HTTPS, you might need to set the origin SNI. Please refer to the CDN service provider's documentation for details.",
+        huaweicloud: 'Huawei Cloud',
         createDb: 'Create Database',
         enableSSLHelper: 'Failure to enable will not affect the creation of the website',
         batchAdd: 'Batch Add Domains',
@@ -2572,6 +2573,7 @@ const message = {
         environment: 'Environment Variable',
         pythonHelper:
             'Please provide a complete start command, for example: pip install -r requirements.txt && python  manage.py runserver 0.0.0.0:5000',
+        donetHelper: 'Please fill in the complete startup comman, for example: dotnet MyWebApp.dll',
     },
     process: {
         pid: 'Process ID',

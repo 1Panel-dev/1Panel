@@ -4,22 +4,23 @@
             <el-checkbox border v-model="tailLog" class="float-left" @change="changeTail(false)">
                 {{ $t('commons.button.watch') }}
             </el-checkbox>
-            <el-button class="ml-2.5" @click="onDownload" icon="Download" :disabled="data.content === ''">
+            <el-button class="ml-2.5" @click="onDownload" icon="Download" :disabled="logs.length === 0">
                 {{ $t('file.download') }}
             </el-button>
             <span v-if="$slots.button" class="ml-2.5">
                 <slot name="button"></slot>
             </span>
         </div>
-        <div class="mt-2.5">
-            <highlightjs
-                ref="editorRef"
-                class="editor-main"
-                language="JavaScript"
-                :autodetect="false"
-                :code="content"
-                :style="editorStyle"
-            ></highlightjs>
+        <div class="log-container" ref="logContainer" @scroll="onScroll">
+            <div class="log-spacer" :style="{ height: `${totalHeight}px` }"></div>
+            <div
+                v-for="(log, index) in visibleLogs"
+                :key="startIndex + index"
+                class="log-item"
+                :style="{ top: `${(startIndex + index) * logHeight}px` }"
+            >
+                <span>{{ log }}</span>
+            </div>
         </div>
     </div>
 </template>
@@ -27,9 +28,6 @@
 import { nextTick, onMounted, onUnmounted, reactive, ref } from 'vue';
 import { downloadFile } from '@/utils/util';
 import { ReadByLine } from '@/api/modules/files';
-import { watch } from 'vue';
-
-const editorRef = ref();
 
 interface LogProps {
     id?: number;
@@ -37,15 +35,6 @@ interface LogProps {
     name?: string;
     tail?: boolean;
 }
-
-const editorStyle = computed(() => {
-    const height = 'calc(100vh - ' + props.heightDiff + 'px)';
-    return {
-        height,
-        width: '100%',
-        overflow: 'auto',
-    };
-});
 
 const props = defineProps({
     config: {
@@ -74,46 +63,6 @@ const props = defineProps({
         default: 500,
     },
 });
-const data = ref({
-    enable: false,
-    content: '',
-    path: '',
-});
-
-let timer: NodeJS.Timer | null = null;
-const tailLog = ref(false);
-const content = ref('');
-const end = ref(false);
-const scrollerElement = ref<HTMLElement | null>(null);
-const minPage = ref(1);
-const maxPage = ref(1);
-const logs = ref([]);
-const isLoading = ref(false);
-
-const readReq = reactive({
-    id: 0,
-    type: '',
-    name: '',
-    page: 1,
-    pageSize: 500,
-    latest: false,
-});
-const emit = defineEmits(['update:loading', 'update:hasContent', 'update:isReading']);
-
-const loading = ref(props.loading);
-
-watch(
-    () => props.loading,
-    (newLoading) => {
-        loading.value = newLoading;
-    },
-);
-
-const changeLoading = () => {
-    loading.value = !loading.value;
-    emit('update:loading', loading.value);
-};
-
 const stopSignals = [
     'docker-compose up failed!',
     'docker-compose up successful!',
@@ -124,120 +73,63 @@ const stopSignals = [
     'image push failed!',
     'image push successful!',
 ];
-
+const emit = defineEmits(['update:loading', 'update:hasContent', 'update:isReading']);
+const tailLog = ref(false);
+const loading = ref(props.loading);
+const readReq = reactive({
+    id: 0,
+    type: '',
+    name: '',
+    page: 1,
+    pageSize: 500,
+    latest: false,
+});
+const isLoading = ref(false);
+const end = ref(false);
 const lastLogs = ref([]);
+const maxPage = ref(0);
+const minPage = ref(0);
+let timer: NodeJS.Timer | null = null;
+const logPath = ref('');
 
-const getContent = (pre: boolean) => {
-    if (isLoading.value) {
-        return;
-    }
-    emit('update:isReading', true);
-    readReq.id = props.config.id;
-    readReq.type = props.config.type;
-    readReq.name = props.config.name;
-    if (readReq.page < 1) {
-        readReq.page = 1;
-    }
-    isLoading.value = true;
-    ReadByLine(readReq).then((res) => {
-        if (!end.value && res.data.end) {
-            lastLogs.value = [...logs.value];
-        }
+const firstLoading = ref(false);
+const logs = ref<string[]>([]);
+const logContainer = ref<HTMLElement | null>(null);
+const logHeight = 20;
+const logCount = ref(0);
+const totalHeight = computed(() => logHeight * logCount.value);
+const containerHeight = ref(500);
+const visibleCount = computed(() => Math.ceil(containerHeight.value / logHeight)); // 计算可见日志条数（容器高度 / 日志高度）
+const startIndex = ref(0);
 
-        data.value = res.data;
-        if (res.data.lines && res.data.lines.length > 0) {
-            res.data.lines = res.data.lines.map((line) =>
-                line.replace(/\\u(\w{4})/g, function (match, grp) {
-                    return String.fromCharCode(parseInt(grp, 16));
-                }),
-            );
-            const newLogs = res.data.lines;
-            if (newLogs.length === readReq.pageSize && readReq.page < res.data.total) {
-                readReq.page++;
-            }
-            if (
-                readReq.type == 'php' &&
-                logs.value.length > 0 &&
-                newLogs.length > 0 &&
-                newLogs[newLogs.length - 1] === logs.value[logs.value.length - 1]
-            ) {
-                isLoading.value = false;
+const visibleLogs = computed(() => {
+    return logs.value.slice(startIndex.value, startIndex.value + visibleCount.value);
+});
+
+const onScroll = () => {
+    if (logContainer.value) {
+        const scrollTop = logContainer.value.scrollTop;
+        if (scrollTop == 0) {
+            readReq.page = minPage.value - 1;
+            if (readReq.page < 1) {
                 return;
             }
-
-            if (stopSignals.some((signal) => newLogs[newLogs.length - 1].endsWith(signal))) {
-                onCloseLog();
-            }
-            if (end.value) {
-                if ((logs.value.length = 0)) {
-                    logs.value = newLogs;
-                } else {
-                    logs.value = pre ? [...newLogs, ...lastLogs.value] : [...lastLogs.value, ...newLogs];
-                }
-            } else {
-                if ((logs.value.length = 0)) {
-                    logs.value = newLogs;
-                } else {
-                    logs.value = pre ? [...newLogs, ...logs.value] : [...logs.value, ...newLogs];
-                }
-            }
+            minPage.value = readReq.page;
+            getContent(true);
         }
-        end.value = res.data.end;
-        content.value = logs.value.join('\n');
-        emit('update:hasContent', content.value !== '');
-        nextTick(() => {
-            if (pre) {
-                if (scrollerElement.value.scrollHeight > 2000) {
-                    scrollerElement.value.scrollTop = 2000;
-                }
-            } else {
-                scrollerElement.value.scrollTop = scrollerElement.value.scrollHeight;
-            }
-        });
-
-        if (readReq.latest) {
-            readReq.page = res.data.total;
-            readReq.latest = false;
-            maxPage.value = res.data.total;
-            minPage.value = res.data.total;
-        }
-        if (logs.value && logs.value.length > 3000) {
-            logs.value.splice(0, readReq.pageSize);
-            if (minPage.value > 1) {
-                minPage.value--;
-            }
-        }
-
-        isLoading.value = false;
-    });
+        startIndex.value = Math.floor(scrollTop / logHeight);
+    }
 };
 
-function throttle<T extends (...args: any[]) => any>(func: T, limit: number): (...args: Parameters<T>) => void {
-    let inThrottle: boolean;
-    let lastFunc: ReturnType<typeof setTimeout>;
-    let lastRan: number;
-    return function (this: any, ...args: Parameters<T>) {
-        if (!inThrottle) {
-            func.apply(this, args);
-            lastRan = Date.now();
-            inThrottle = true;
-            setTimeout(() => (inThrottle = false), limit);
-        } else {
-            clearTimeout(lastFunc);
-            lastFunc = setTimeout(() => {
-                if (Date.now() - lastRan >= limit) {
-                    func.apply(this, args);
-                    lastRan = Date.now();
-                }
-            }, limit - (Date.now() - lastRan));
-        }
-    };
-}
+const changeLoading = () => {
+    loading.value = !loading.value;
+    emit('update:loading', loading.value);
+};
 
-const throttledGetContent = throttle(getContent, 3000);
-
-const search = () => {
-    throttledGetContent(false);
+const onDownload = async () => {
+    changeLoading();
+    downloadFile(logPath.value);
+    changeLoading();
 };
 
 const changeTail = (fromOutSide: boolean) => {
@@ -246,36 +138,127 @@ const changeTail = (fromOutSide: boolean) => {
     }
     if (tailLog.value) {
         timer = setInterval(() => {
-            search();
+            getContent(false);
         }, 1000 * 3);
     } else {
         onCloseLog();
     }
 };
 
-const onDownload = async () => {
-    changeLoading();
-    downloadFile(data.value.path);
-    changeLoading();
+const clearLog = (): void => {
+    logs.value = [];
+    readReq.page = 1;
+    lastLogs.value = [];
+};
+
+const getContent = async (pre: boolean) => {
+    if (isLoading.value) {
+        return;
+    }
+    readReq.id = props.config.id;
+    readReq.type = props.config.type;
+    readReq.name = props.config.name;
+    if (readReq.page < 1) {
+        readReq.page = 1;
+    }
+    isLoading.value = true;
+    emit('update:isReading', true);
+
+    const res = await ReadByLine(readReq);
+    logPath.value = res.data.path;
+    firstLoading.value = false;
+
+    if (!end.value && res.data.end) {
+        lastLogs.value = [...logs.value];
+    }
+    if (res.data.lines && res.data.lines.length > 0) {
+        res.data.lines = res.data.lines.map((line) =>
+            line.replace(/\\u(\w{4})/g, function (match, grp) {
+                return String.fromCharCode(parseInt(grp, 16));
+            }),
+        );
+        const newLogs = res.data.lines;
+        if (newLogs.length === readReq.pageSize && readReq.page < res.data.total) {
+            readReq.page++;
+        }
+        if (
+            readReq.type == 'php' &&
+            logs.value.length > 0 &&
+            newLogs.length > 0 &&
+            newLogs[newLogs.length - 1] === logs.value[logs.value.length - 1]
+        ) {
+            isLoading.value = false;
+            return;
+        }
+
+        if (stopSignals.some((signal) => newLogs[newLogs.length - 1].endsWith(signal))) {
+            onCloseLog();
+        }
+        if (end.value) {
+            if ((logs.value.length = 0)) {
+                logs.value = newLogs;
+            } else {
+                logs.value = pre ? [...newLogs, ...lastLogs.value] : [...lastLogs.value, ...newLogs];
+            }
+        } else {
+            if ((logs.value.length = 0)) {
+                logs.value = newLogs;
+            } else {
+                logs.value = pre ? [...newLogs, ...logs.value] : [...logs.value, ...newLogs];
+            }
+        }
+
+        nextTick(() => {
+            if (pre) {
+                logContainer.value.scrollTop = 2000;
+            } else {
+                logContainer.value.scrollTop = totalHeight.value;
+                containerHeight.value = logContainer.value.getBoundingClientRect().height;
+            }
+        });
+    }
+
+    logCount.value = logs.value.length;
+    end.value = res.data.end;
+    emit('update:hasContent', logs.value.length > 0);
+    if (readReq.latest) {
+        readReq.page = res.data.total;
+        readReq.latest = false;
+        maxPage.value = res.data.total;
+        minPage.value = res.data.total;
+    }
+    if (logs.value && logs.value.length > 3000) {
+        if (pre) {
+            logs.value.splice(logs.value.length - readReq.pageSize, readReq.pageSize);
+            if (maxPage.value > 1) {
+                maxPage.value--;
+            }
+        } else {
+            logs.value.splice(0, readReq.pageSize);
+            if (minPage.value > 1) {
+                minPage.value++;
+            }
+        }
+    }
+    isLoading.value = false;
 };
 
 const onCloseLog = async () => {
-    emit('update:isReading', false);
     tailLog.value = false;
     clearInterval(Number(timer));
     timer = null;
     isLoading.value = false;
+    emit('update:isReading', false);
 };
 
-function isScrolledToBottom(element: HTMLElement): boolean {
-    return element.scrollTop + element.clientHeight + 1 >= element.scrollHeight;
-}
+watch(
+    () => props.loading,
+    (newLoading) => {
+        loading.value = newLoading;
+    },
+);
 
-function isScrolledToTop(element: HTMLElement): boolean {
-    return element.scrollTop === 0;
-}
-
-const init = () => {
+const init = async () => {
     if (props.config.tail) {
         tailLog.value = props.config.tail;
     } else {
@@ -285,59 +268,58 @@ const init = () => {
         changeTail(false);
     }
     readReq.latest = true;
-    search();
-
-    nextTick(() => {});
+    await getContent(false);
 };
 
-const clearLog = (): void => {
-    content.value = '';
-};
-
-const initCodemirror = () => {
+onMounted(async () => {
+    firstLoading.value = true;
+    await init();
     nextTick(() => {
-        if (editorRef.value) {
-            scrollerElement.value = editorRef.value.$el as HTMLElement;
-            scrollerElement.value.addEventListener('scroll', function () {
-                if (tailLog.value) {
-                    return;
-                }
-                if (isScrolledToBottom(scrollerElement.value)) {
-                    if (maxPage.value > 1) {
-                        readReq.page = maxPage.value;
-                    }
-                    search();
-                }
-                if (isScrolledToTop(scrollerElement.value)) {
-                    readReq.page = minPage.value - 1;
-                    if (readReq.page < 1) {
-                        return;
-                    }
-                    minPage.value = readReq.page;
-                    throttledGetContent(true);
-                }
-            });
-            let hljsDom = scrollerElement.value.querySelector('.hljs') as HTMLElement;
-            hljsDom.style.minHeight = '95%';
+        if (logContainer.value) {
+            logContainer.value.scrollTop = totalHeight.value;
+            containerHeight.value = logContainer.value.getBoundingClientRect().height;
         }
     });
-};
+});
 
 onUnmounted(() => {
     onCloseLog();
 });
 
-onMounted(() => {
-    console.log(props.heightDiff);
-    initCodemirror();
-    init();
+onMounted(async () => {
+    firstLoading.value = true;
+    await init();
+    nextTick(() => {
+        if (logContainer.value) {
+            logContainer.value.scrollTop = totalHeight.value;
+            containerHeight.value = logContainer.value.getBoundingClientRect().height;
+        }
+    });
 });
 
 defineExpose({ changeTail, onDownload, clearLog });
 </script>
 <style lang="scss" scoped>
-.editor-main {
+.log-container {
+    height: calc(100vh - 405px);
+    overflow-y: auto;
+    overflow-x: auto;
+    position: relative;
+    background-color: #1e1e1e;
+    margin-top: 10px;
+}
+
+.log-spacer {
+    position: relative;
     width: 100%;
-    overflow: auto;
+}
+
+.log-item {
+    position: absolute;
+    width: 100%;
+    padding: 5px;
+    color: #f5f5f5;
+    box-sizing: border-box;
+    white-space: nowrap;
 }
 </style>

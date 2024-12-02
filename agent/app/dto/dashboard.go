@@ -93,6 +93,7 @@ type DashboardCurrent struct {
 	NetBytesRecv uint64 `json:"netBytesRecv"`
 
 	GPUData []GPUInfo `json:"gpuData"`
+	XPUData []XPUInfo `json:"xpuData"`
 
 	ShotTime time.Time `json:"shotTime"`
 }
@@ -141,6 +142,7 @@ type AppLauncher struct {
 	IsRecommend bool            `json:"isRecommend"`
 	Detail      []InstallDetail `json:"detail"`
 }
+
 type InstallDetail struct {
 	InstallID uint   `json:"installID"`
 	DetailID  uint   `json:"detailID"`
@@ -152,7 +154,18 @@ type InstallDetail struct {
 	HttpPort  int    `json:"httpPort"`
 	HttpsPort int    `json:"httpsPort"`
 }
+
 type LauncherOption struct {
 	Key    string `json:"key"`
 	IsShow bool   `json:"isShow"`
+}
+
+type XPUInfo struct {
+	DeviceID    int    `json:"deviceID"`
+	DeviceName  string `json:"deviceName"`
+	Memory      string `json:"memory"`
+	Temperature string `json:"temperature"`
+	MemoryUsed  string `json:"memoryUsed"`
+	Power       string `json:"power"`
+	MemoryUtil  string `json:"memoryUtil"`
 }

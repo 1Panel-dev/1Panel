@@ -126,6 +126,8 @@
                                 <span class="agree" v-html="$t('commons.login.licenseHelper')"></span>
                             </template>
                         </el-checkbox>
+                    </el-form-item>
+                    <div class="agree-helper">
                         <span
                             v-if="!loginForm.agreeLicense && !_isMobile()"
                             class="input-error"
@@ -133,7 +135,7 @@
                         >
                             {{ $t('commons.login.errorAgree') }}
                         </span>
-                    </el-form-item>
+                    </div>
                 </el-form>
                 <div class="demo">
                     <span v-if="isDemo">
@@ -511,6 +513,12 @@ onMounted(() => {
 
     :deep(.el-checkbox__input.is-checked .el-checkbox__inner::after) {
         border-color: #fff !important;
+    }
+
+    .agree-helper {
+        min-height: 20px;
+        margin-top: -20px;
+        margin-left: 20px;
     }
 }
 </style>

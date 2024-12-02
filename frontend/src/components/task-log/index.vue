@@ -115,7 +115,6 @@ const getContent = (pre: boolean) => {
         }
         end.value = res.data.end;
         nextTick(() => {
-            console.log('scrollerElement', scrollerElement.value);
             if (pre) {
                 if (scrollerElement.value.scrollHeight > 2000) {
                     scrollerElement.value.scrollTop = 2000;
@@ -123,8 +122,6 @@ const getContent = (pre: boolean) => {
             } else {
                 scrollerElement.value.scrollTop = scrollerElement.value.scrollHeight;
             }
-            console.log('scrollHeight', scrollerElement.value.scrollHeight);
-            console.log('scrollTop', scrollerElement.value.scrollTop);
         });
 
         if (readReq.latest) {
@@ -182,7 +179,6 @@ const initCodemirror = () => {
     nextTick(() => {
         if (editorRef.value) {
             scrollerElement.value = editorRef.value.$el as HTMLElement;
-            console.log('scrollerElement', scrollerElement.value);
             scrollerElement.value.addEventListener('scroll', function () {
                 if (isScrolledToBottom(scrollerElement.value)) {
                     readReq.page = maxPage.value;

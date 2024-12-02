@@ -131,6 +131,11 @@ ErrDefaultCA: "默認機構不能刪除"
 ApplyWebSiteSSLLog: "開始更新 {{ .name }} 網站憑證"
 ErrUpdateWebsiteSSL: "{{ .name }} 網站更新憑證失敗: {{ .err }}"
 ApplyWebSiteSSLSuccess: "更新網站憑證成功"
+StartUpdateSystemSSL: "開始更新系統證書"
+UpdateSystemSSLSuccess: "更新系統證書成功"
+ErrExecShell: "執行腳本失敗 {{.err}}"
+ExecShellStart: "開始執行腳本"
+ExecShellSuccess: "腳本執行成功"
 
 
 #mysql

@@ -10,6 +10,7 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"net"
 	"os"
 	"path"
@@ -1207,19 +1208,19 @@ func (w WebsiteService) OpWebsiteLog(req request.WebsiteLogReq) (*response.Websi
 		res.Content = strings.Join(lines, "\n")
 		return res, nil
 	case constant.DisableLog:
-		key := "access_log"
+		params := dto.NginxParam{}
 		switch req.LogType {
 		case constant.AccessLog:
+			params.Name = "access_log"
+			params.Params = []string{"off"}
 			website.AccessLog = false
 		case constant.ErrorLog:
-			key = "error_log"
+			params.Name = "error_log"
+			params.Params = []string{"/dev/null", "crit"}
 			website.ErrorLog = false
 		}
 		var nginxParams []dto.NginxParam
-		nginxParams = append(nginxParams, dto.NginxParam{
-			Name:   key,
-			Params: []string{"off"},
-		})
+		nginxParams = append(nginxParams, params)
 
 		if err := updateNginxConfig(constant.NginxScopeServer, nginxParams, &website); err != nil {
 			return nil, err
@@ -1333,6 +1334,14 @@ func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) error
 		}
 		if oldRuntime.Resource == constant.ResourceLocal {
 			return buserr.New("ErrPHPResource")
+		}
+		client, err := docker.NewDockerClient()
+		if err != nil {
+			return err
+		}
+		defer client.Close()
+		if !checkImageExist(client, oldRuntime.Image) {
+			return buserr.WithName("ErrImageNotExist", oldRuntime.Name)
 		}
 	}
 	configPath := GetSitePath(website, SiteConf)
@@ -1624,6 +1633,9 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 	}
 	if req.SNI {
 		location.UpdateDirective("proxy_ssl_server_name", []string{"on"})
+		if req.ProxySSLName != "" {
+			location.UpdateDirective("proxy_ssl_name", []string{req.ProxySSLName})
+		}
 	} else {
 		location.UpdateDirective("proxy_ssl_server_name", []string{"off"})
 	}

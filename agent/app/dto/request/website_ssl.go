@@ -41,6 +41,7 @@ type WebsiteSSLApply struct {
 	ID           uint     `json:"ID" validate:"required"`
 	SkipDNSCheck bool     `json:"skipDNSCheck"`
 	Nameservers  []string `json:"nameservers"`
+	DisableLog   bool     `json:"disableLog"`
 }
 
 type WebsiteAcmeAccountCreate struct {

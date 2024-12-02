@@ -64,16 +64,12 @@
                     </template>
                 </el-input>
             </el-form-item>
-            <el-row :gutter="20">
-                <el-col :span="18">
-                    <el-form-item :label="$t('runtime.runScript')" prop="params.EXEC_SCRIPT">
-                        <el-input v-model="runtime.params['EXEC_SCRIPT']"></el-input>
-                        <span class="input-help">
-                            {{ $t('runtime.pythonHelper') }}
-                        </span>
-                    </el-form-item>
-                </el-col>
-            </el-row>
+            <el-form-item :label="$t('runtime.runScript')" prop="params.EXEC_SCRIPT">
+                <el-input v-model="runtime.params['EXEC_SCRIPT']"></el-input>
+                <span class="input-help">
+                    {{ $t('runtime.pythonHelper') }}
+                </span>
+            </el-form-item>
             <PortConfig :params="runtime.params" :exposedPorts="runtime.exposedPorts" :rules="rules" />
             <Environment :environments="runtime.environments" />
             <Volumes :volumes="runtime.volumes" />

@@ -75,7 +75,7 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, e
 		opts []repo.DBOption
 	)
 	if create.Name != "" {
-		opts = append(opts, commonRepo.WithByLikeName(create.Name))
+		opts = append(opts, commonRepo.WithByName(create.Name))
 	}
 	if create.Type != "" {
 		opts = append(opts, commonRepo.WithByType(create.Type))
@@ -108,7 +108,7 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, e
 				return nil, err
 			}
 		}
-	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo, constant.RuntimePython:
+	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo, constant.RuntimePython, constant.RuntimeDotNet:
 		if !fileOp.Stat(create.CodeDir) {
 			return nil, buserr.New(constant.ErrPathNotFound)
 		}
@@ -140,7 +140,7 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, e
 	}
 
 	appVersionDir := filepath.Join(app.GetAppResourcePath(), appDetail.Version)
-	if !fileOp.Stat(appVersionDir) || appDetail.Update {
+	if !fileOp.Stat(appVersionDir) {
 		if err = downloadApp(app, appDetail, nil, nil); err != nil {
 			return nil, err
 		}
@@ -162,7 +162,7 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, e
 		if err = handlePHP(create, runtime, fileOp, appVersionDir); err != nil {
 			return nil, err
 		}
-	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo, constant.RuntimePython:
+	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo, constant.RuntimePython, constant.RuntimeDotNet:
 		runtime.Port = int(create.Params["port"].(float64))
 		if err = handleNodeAndJava(create, runtime, fileOp, appVersionDir); err != nil {
 			return nil, err
@@ -341,7 +341,7 @@ func (r *RuntimeService) Get(id uint) (*response.RuntimeDTO, error) {
 			}
 		}
 		res.AppParams = appParams
-	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo, constant.RuntimePython:
+	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo, constant.RuntimePython, constant.RuntimeDotNet:
 		res.Params = make(map[string]interface{})
 		envs, err := gotenv.Unmarshal(runtime.Env)
 		if err != nil {
@@ -440,7 +440,7 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 		if exist != nil {
 			return buserr.New(constant.ErrImageExist)
 		}
-	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo, constant.RuntimePython:
+	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo, constant.RuntimePython, constant.RuntimeDotNet:
 		if runtime.Port != req.Port {
 			if err = checkPortExist(req.Port); err != nil {
 				return err
@@ -516,7 +516,7 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 			return err
 		}
 		go buildRuntime(runtime, imageID, oldEnv, req.Rebuild)
-	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo, constant.RuntimePython:
+	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo, constant.RuntimePython, constant.RuntimeDotNet:
 		runtime.Version = req.Version
 		runtime.CodeDir = req.CodeDir
 		runtime.Port = req.Port
@@ -682,7 +682,7 @@ func (r *RuntimeService) SyncRuntimeStatus() error {
 		return err
 	}
 	for _, runtime := range runtimes {
-		if runtime.Type == constant.RuntimeNode || runtime.Type == constant.RuntimeJava || runtime.Type == constant.RuntimeGo || runtime.Type == constant.RuntimePython {
+		if runtime.Type == constant.RuntimeNode || runtime.Type == constant.RuntimeJava || runtime.Type == constant.RuntimeGo || runtime.Type == constant.RuntimePython || runtime.Type == constant.RuntimeDotNet {
 			_ = SyncRuntimeContainerStatus(&runtime)
 		}
 	}

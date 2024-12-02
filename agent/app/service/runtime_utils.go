@@ -3,6 +3,7 @@ package service
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -17,12 +18,10 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/compose"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
-	httpUtil "github.com/1Panel-dev/1Panel/agent/utils/http"
 	"github.com/pkg/errors"
 	"github.com/subosito/gotenv"
 	"gopkg.in/yaml.v3"
 	"io"
-	"net/http"
 	"os"
 	"os/exec"
 	"path"
@@ -61,10 +60,7 @@ func handleNodeAndJava(create request.RuntimeCreate, runtime *model.Runtime, fil
 	}
 
 	go func() {
-		if _, _, err := httpUtil.HandleGet(nodeDetail.DownloadCallBackUrl, http.MethodGet, constant.TimeOut5s); err != nil {
-			global.LOG.Errorf("http request failed(handleNode), err: %v", err)
-			return
-		}
+		RequestDownloadCallBack(nodeDetail.DownloadCallBackUrl)
 	}()
 	go startRuntime(runtime)
 
@@ -221,7 +217,10 @@ func buildRuntime(runtime *model.Runtime, oldImageID string, oldEnv string, rebu
 		_ = logFile.Close()
 	}()
 
-	cmd := exec.Command("docker", "compose", "-f", composePath, "build")
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Hour)
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx, "docker-compose", "-f", composePath, "build")
 	cmd.Stdout = logFile
 	var stderrBuf bytes.Buffer
 	multiWriterStderr := io.MultiWriter(&stderrBuf, logFile)
@@ -231,8 +230,10 @@ func buildRuntime(runtime *model.Runtime, oldImageID string, oldEnv string, rebu
 	if err != nil {
 		runtime.Status = constant.RuntimeError
 		runtime.Message = buserr.New(constant.ErrImageBuildErr).Error() + ":" + stderrBuf.String()
-		if stderrBuf.String() == "" {
-			runtime.Message = buserr.New(constant.ErrImageBuildErr).Error() + ":" + err.Error()
+		if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+			runtime.Message = buserr.New(constant.ErrImageBuildErr).Error() + ":" + buserr.New("ErrCmdTimeout").Error()
+		} else {
+			runtime.Message = buserr.New(constant.ErrImageBuildErr).Error() + ":" + stderrBuf.String()
 		}
 	} else {
 		if err = runComposeCmdWithLog(constant.RuntimeDown, runtime.GetComposePath(), runtime.GetLogPath()); err != nil {
@@ -393,6 +394,14 @@ func handleParams(create request.RuntimeCreate, projectDir string) (composeConte
 		if err != nil {
 			return
 		}
+	case constant.RuntimeDotNet:
+		create.Params["CODE_DIR"] = create.CodeDir
+		create.Params["DOTNET_VERSION"] = create.Version
+		create.Params["PANEL_APP_PORT_HTTP"] = create.Port
+		composeContent, err = handleCompose(env, composeContent, create, projectDir)
+		if err != nil {
+			return
+		}
 	}
 
 	newMap := make(map[string]string)
@@ -438,7 +447,7 @@ func handleCompose(env gotenv.Env, composeContent []byte, create request.Runtime
 				ports = append(ports, "${HOST_IP}:${PANEL_APP_PORT_HTTP}:${JAVA_APP_PORT}")
 			case constant.RuntimeGo:
 				ports = append(ports, "${HOST_IP}:${PANEL_APP_PORT_HTTP}:${GO_APP_PORT}")
-			case constant.RuntimePython:
+			case constant.RuntimePython, constant.RuntimeDotNet:
 				ports = append(ports, "${HOST_IP}:${PANEL_APP_PORT_HTTP}:${APP_PORT}")
 
 			}

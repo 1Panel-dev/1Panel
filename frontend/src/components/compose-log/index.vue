@@ -131,7 +131,6 @@ const searchLogs = async () => {
     logSocket.value.onmessage = (event) => {
         logInfo.value += event.data;
         nextTick(() => {
-            console.log(scrollerElement.value);
             scrollerElement.value.scrollTop = scrollerElement.value.scrollHeight;
         });
     };

@@ -1,5 +1,7 @@
 package constant
 
+import "sync/atomic"
+
 type DBContext string
 
 const (
@@ -35,3 +37,5 @@ const (
 	OneDriveRedirectURI = "http://localhost/login/authorized"
 	GoogleRedirectURI   = "http://localhost:8080"
 )
+
+var CertStore atomic.Value

@@ -172,6 +172,10 @@ export const DNSTypes = [
         value: 'TencentCloud',
     },
     {
+        label: i18n.global.t('website.huaweicloud'),
+        value: 'HuaweiCloud',
+    },
+    {
         label: 'DNSPod (' + i18n.global.t('ssl.deprecated') + ')',
         value: 'DnsPod',
     },

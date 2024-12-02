@@ -73,11 +73,13 @@ func Start() {
 			panic(err)
 		}
 		server.TLSConfig = &tls.Config{
-			Certificates: []tls.Certificate{cert},
+			GetCertificate: func(info *tls.ClientHelloInfo) (*tls.Certificate, error) {
+				return &cert, nil
+			},
 		}
 		global.LOG.Infof("listen at https://%s:%s [%s]", global.CONF.System.BindAddress, global.CONF.System.Port, tcpItem)
 
-		if err := server.ServeTLS(tcpKeepAliveListener{ln.(*net.TCPListener)}, certPath, keyPath); err != nil {
+		if err := server.ServeTLS(tcpKeepAliveListener{ln.(*net.TCPListener)}, "", ""); err != nil {
 			panic(err)
 		}
 	} else {

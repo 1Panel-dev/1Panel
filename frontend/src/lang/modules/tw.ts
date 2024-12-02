@@ -2075,6 +2075,7 @@ const message = {
         website404Helper: '網站 404 錯誤頁僅支援 PHP 運行環境網站和靜態網站',
         sni: '回源 SNI',
         sniHelper: '反代後端為 https 的時候可能需要設置回源 SNI，具體需要看 CDN 服務商文檔',
+        huaweicloud: '華為雲',
         createDb: '建立資料庫',
         enableSSLHelper: '開啟失敗不會影響網站創建',
         batchAdd: '批量添加域名',
@@ -2386,6 +2387,7 @@ const message = {
         environment: '環境變數',
         pythonHelper:
             '請填寫完整啟動指令，例如：pip install -r requirements.txt && python  manage.py runserver 0.0.0.0:5000',
+        donetHelper: '請填入完整啟動指令，例如 dotnet MyWebApp.dll',
     },
     process: {
         pid: '進程ID',
