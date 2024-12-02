@@ -16,10 +16,10 @@
                         <el-form-item :label="$t('commons.table.type')" prop="type" :rules="Rules.requiredSelect">
                             <el-tag>{{ $t('setting.' + ossData.rowData!.type) }}</el-tag>
                         </el-form-item>
-                        <el-form-item label="Access Key ID" prop="accessKey" :rules="Rules.requiredInput">
+                        <el-form-item label="Access key ID" prop="accessKey" :rules="Rules.requiredInput">
                             <el-input v-model.trim="ossData.rowData!.accessKey" />
                         </el-form-item>
-                        <el-form-item label="Secret Key" prop="credential" :rules="Rules.requiredInput">
+                        <el-form-item label="Secret key" prop="credential" :rules="Rules.requiredInput">
                             <el-input show-password clearable v-model.trim="ossData.rowData!.credential" />
                         </el-form-item>
                         <el-form-item label="Endpoint" prop="varsJson.endpointItem" :rules="Rules.requiredInput">

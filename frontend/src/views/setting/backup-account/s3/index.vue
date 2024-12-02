@@ -22,7 +22,7 @@
                                 <el-radio value="path">Path</el-radio>
                             </el-radio-group>
                         </el-form-item>
-                        <el-form-item label="Access Key ID" prop="accessKey" :rules="Rules.requiredInput">
+                        <el-form-item label="Access key ID" prop="accessKey" :rules="Rules.requiredInput">
                             <el-input v-model.trim="s3Data.rowData!.accessKey" />
                         </el-form-item>
                         <el-form-item label="Secret Key" prop="credential" :rules="Rules.requiredInput">

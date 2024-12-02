@@ -34,10 +34,10 @@
                         </span>
                     </el-form-item>
                     <div v-if="account.type === 'AliYun' || account.type === 'HuaweiCloud'">
-                        <el-form-item label="Access Key" prop="authorization.accessKey">
+                        <el-form-item label="Access key" prop="authorization.accessKey">
                             <el-input v-model.trim="account.authorization['accessKey']"></el-input>
                         </el-form-item>
-                        <el-form-item label="Secret Key" prop="authorization.secretKey">
+                        <el-form-item label="Secret key" prop="authorization.secretKey">
                             <el-input v-model.trim="account.authorization['secretKey']"></el-input>
                         </el-form-item>
                     </div>
@@ -45,10 +45,10 @@
                         <el-input v-model.trim="account.authorization['region']" :placeholder="'cn-north-1'"></el-input>
                     </el-form-item>
                     <div v-if="account.type === 'Volcengine'">
-                        <el-form-item label="Access Key" prop="authorization.accessKey">
+                        <el-form-item label="Access key" prop="authorization.accessKey">
                             <el-input v-model.trim="account.authorization['accessKey']"></el-input>
                         </el-form-item>
-                        <el-form-item label="Secret Key" prop="authorization.secretKey">
+                        <el-form-item label="Secret key" prop="authorization.secretKey">
                             <el-input v-model.trim="account.authorization['secretKey']"></el-input>
                         </el-form-item>
                     </div>
