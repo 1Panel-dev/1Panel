@@ -410,7 +410,7 @@ const message = {
         loadBackup: '导入备份',
         remoteAccess: '远程访问',
         remoteHelper: '多个 ip 以逗号分隔，例：172.16.10.111,172.16.10.112',
-        remoteConnHelper: 'root 帐号远程连接 mysql 有安全风险，开启需谨慎！',
+        remoteConnHelper: 'root 帐号远程连接 MySQL 有安全风险，开启需谨慎！',
         changePassword: '改密',
         changePasswordHelper: '当前数据库已经关联应用，修改密码将同步修改应用中数据库密码，修改后重启生效。',
 

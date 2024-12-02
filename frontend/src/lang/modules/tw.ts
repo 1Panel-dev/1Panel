@@ -408,7 +408,7 @@ const message = {
         loadBackup: '導入備份',
         remoteAccess: '遠程訪問',
         remoteHelper: '多個 ip 以逗號分隔，例：172.16.10.111,172.16.10.112',
-        remoteConnHelper: 'root 帳號遠程連接 mysql 有安全風險，開啟需謹慎！',
+        remoteConnHelper: 'root 帳號遠程連接 MySQL 有安全風險，開啟需謹慎！',
         changePassword: '改密',
         changePasswordHelper: '當前數據庫已經關聯應用，修改密碼將同步修改應用中數據庫密碼，修改後重啟生效。',
 
