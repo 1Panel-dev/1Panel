@@ -98,7 +98,7 @@
                                 </el-input>
                             </el-form-item>
 
-                            <el-form-item label="ipv6" prop="ipv6">
+                            <el-form-item label="IPv6" prop="ipv6">
                                 <el-switch v-model="form.ipv6" @change="handleIPv6"></el-switch>
                                 <span class="input-help"></span>
                                 <div v-if="ipv6OptionShow">
@@ -131,7 +131,7 @@
                                 <el-switch v-model="form.iptables" @change="handleIptables"></el-switch>
                                 <span class="input-help">{{ $t('container.iptablesHelper1') }}</span>
                             </el-form-item>
-                            <el-form-item label="live-restore" prop="liveRestore">
+                            <el-form-item label="Live restore" prop="liveRestore">
                                 <el-switch
                                     :disabled="form.isSwarm"
                                     v-model="form.liveRestore"
@@ -142,7 +142,7 @@
                                     {{ $t('container.liveWithSwarmHelper') }}
                                 </span>
                             </el-form-item>
-                            <el-form-item label="cgroup-driver" prop="cgroupDriver">
+                            <el-form-item label="cgroup driver" prop="cgroupDriver">
                                 <el-radio-group v-model="form.cgroupDriver" @change="handleCgroup">
                                     <el-radio value="cgroupfs">cgroupfs</el-radio>
                                     <el-radio value="systemd">systemd</el-radio>

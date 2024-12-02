@@ -623,8 +623,8 @@ const message = {
         ip: 'IP 地址',
         cpuShare: 'CPU 权重',
         cpuShareHelper: '容器默认份额为 1024 个 CPU，增大可使当前容器获得更多的 CPU 时间',
-        inputIpv4: '请输入 ipv4 地址',
-        inputIpv6: '请输入 ipv6 地址',
+        inputIpv4: '请输入 IPv4 地址',
+        inputIpv6: '请输入 IPv6 地址',
 
         containerFromAppHelper: '检测到该容器来源于应用商店，应用操作可能会导致当前编辑失效',
         containerFromAppHelper1: '在应用商店的已安装页面，点击 [参数] 按钮，进入编辑页面修改容器名称。',
@@ -2192,7 +2192,7 @@ const message = {
         targetPort: '目标端口',
         forwardHelper1: '如果是本机端口转发，目标IP为：127.0.0.1',
         forwardHelper2: '如果目标IP不填写，则默认为本机端口转发',
-        forwardHelper3: '当前仅支持 ipv4 的端口转发',
+        forwardHelper3: '当前仅支持 IPv4 的端口转发',
     },
     runtime: {
         runtime: '运行环境',

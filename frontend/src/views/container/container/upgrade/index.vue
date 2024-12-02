@@ -17,7 +17,7 @@
                     v-if="form.fromApp"
                     class="common-prompt"
                     :closable="false"
-                    type="error"
+                    type="warning"
                 />
                 <el-form @submit.prevent ref="formRef" :model="form" label-position="top">
                     <el-form-item :label="$t('container.oldImage')" prop="oldImage">

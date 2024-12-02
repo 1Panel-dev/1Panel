@@ -92,8 +92,8 @@ ErrPathNotDelete: "The selected directory cannot be deleted"
 ErrDomainIsExist: "Domain is already exist"
 ErrAliasIsExist: "Alias is already exist"
 ErrAppDelete: 'Other Website use this App'
-ErrGroupIsUsed: 'The group is in use and cannot be deleted'
-ErrBackupMatch: 'the backup file does not match the current partial data of the website: {{ .detail}}'
+ErrGroupIsUsed: "The group is in use and can't be deleted"
+ErrBackupMatch: "the backup file doesn't match the current partial data of the website: {{ .detail}}"
 ErrBackupExist: 'the backup file corresponds to a portion of the original data that does not exist: {{ .detail}}'
 ErrPHPResource: 'The local runtime does not support switching!'
 ErrPathPermission: 'A folder with non-1000:1000 permissions was detected in the index directory, which may cause an Access denied error when accessing the website. Please click the save button above'
@@ -141,8 +141,8 @@ ErrLocalExist: "The local database already exists with that name, please modify 
 ErrTypeOfRedis: "The recovery file type does not match the current persistence mode. Modify the file type and try again"
 
 #container
-ErrInUsed: "{{ .detail }} is in use and cannot be deleted"
-ErrObjectInUsed: "This object is in use and cannot be deleted"
+ErrInUsed: "{{ .detail }} is in use and can't be deleted"
+ErrObjectInUsed: "This object is in use and can't be deleted"
 ErrPortRules: "The number of ports does not match, please re-enter!"
 ErrPgImagePull: "Image pull timeout. Please configure image acceleration or manually pull the postgres:16.0-alpine image and try again"
 
