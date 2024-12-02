@@ -72,9 +72,9 @@ const clearLog = () => {
 const cleanLog = async () => {
     let log = logType.value === 'access.log' ? i18n.global.t('website.accessLog') : i18n.global.t('website.errLog');
     opRef.value.acceptParams({
-        title: i18n.global.t('commons.msg.clean'),
+        title: i18n.global.t('commons.button.clean'),
         names: [],
-        msg: i18n.global.t('commons.msg.operatorHelper', [log, i18n.global.t('commons.msg.clean')]),
+        msg: i18n.global.t('commons.msg.operatorHelper', [log, i18n.global.t('commons.button.clean')]),
         api: OpWebsiteLog,
         params: { id: id.value, operate: 'delete', logType: logType.value },
     });

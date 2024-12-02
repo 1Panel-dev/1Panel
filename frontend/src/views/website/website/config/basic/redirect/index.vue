@@ -149,7 +149,7 @@ const deleteProxy = async (redirectConfig: Website.RedirectConfig) => {
         names: [redirectConfig.name],
         msg: i18n.global.t('commons.msg.operatorHelper', [
             i18n.global.t('website.redirect'),
-            i18n.global.t('commons.msg.delete'),
+            i18n.global.t('commons.button.delete'),
         ]),
         api: OperateRedirectConfig,
         params: redirectConfig,

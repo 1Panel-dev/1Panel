@@ -93,7 +93,7 @@
                             </el-form-item>
                         </el-col>
                         <el-col :span="4">
-                            <el-form-item :label="$t('commons.button.add') + $t('commons.table.port')">
+                            <el-form-item :label="$t('commons.button.add')">
                                 <el-button @click="addPort">
                                     <el-icon><Plus /></el-icon>
                                 </el-button>

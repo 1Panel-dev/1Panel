@@ -92,7 +92,7 @@ const deleteDomain = async (row: Website.Domain) => {
         names: [row.domain],
         msg: i18n.global.t('commons.msg.operatorHelper', [
             i18n.global.t('website.domain'),
-            i18n.global.t('commons.msg.delete'),
+            i18n.global.t('commons.button.delete'),
         ]),
         api: DeleteDomain,
         params: { id: row.id },
