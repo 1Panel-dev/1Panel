@@ -826,6 +826,7 @@ const message = {
         enableMsg: '啟用計劃任務會讓該任務定期自動執行。是否繼續？',
         taskType: '任務類型',
         record: '報告',
+        viewRecords: '查看報告',
         shell: 'Shell 腳本',
         log: '備份日誌',
         logHelper: '備份系統日誌',

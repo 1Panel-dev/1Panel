@@ -64,7 +64,7 @@
                                 icon="VideoPlay"
                                 type="success"
                             >
-                                {{ $t('commons.button.enable') }}
+                                {{ $t('commons.status.enabled') }}
                             </el-button>
                             <el-button
                                 v-else
@@ -73,7 +73,7 @@
                                 type="danger"
                                 @click="onChangeStatus(row.id, 'enable')"
                             >
-                                {{ $t('commons.button.disable') }}
+                                {{ $t('commons.status.disabled') }}
                             </el-button>
                         </template>
                     </el-table-column>
@@ -390,7 +390,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('cronjob.record'),
+        label: i18n.global.t('cronjob.viewRecords'),
         click: (row: Cronjob.CronjobInfo) => {
             loadDetail(row);
         },

@@ -827,6 +827,7 @@ const message = {
         enableMsg: '启用计划任务会让该任务定期自动执行。是否继续？',
         taskType: '任务类型',
         record: '报告',
+        viewRecords: '查看报告',
         shell: 'Shell 脚本',
         log: '备份日志',
         logHelper: '备份系统日志',
