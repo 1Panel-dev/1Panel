@@ -1,5 +1,5 @@
 <p align="center"><a href="https://1panel.cn"><img src="http://1panel.oss-cn-hangzhou.aliyuncs.com/img/1panel-logo.png" alt="1Panel" width="300" /></a></p>
-<p align="center"><b>#1 Rated Web-based Linux Server Management Tool</b></p>
+<p align="center"><b>Top-Rated Web-based Linux Server Management Tool</b></p>
 <p align="center">
   <a href="https://www.gnu.org/licenses/gpl-3.0.html"><img src="https://shields.io/github/license/1Panel-dev/1Panel" alt="License: GPL v3"></a>
   <a href="https://app.codacy.com/gh/1Panel-dev/1Panel?utm_source=github.com&utm_medium=referral&utm_content=1Panel-dev/1Panel&utm_campaign=Badge_Grade_Dashboard"><img src="https://app.codacy.com/project/badge/Grade/da67574fd82b473992781d1386b937ef" alt="Codacy"></a>
@@ -9,14 +9,13 @@
 </p>
 
 ------------------------------
+1Panel is an open-source, modern web-based control panel for Linux server management.
 
-1Panel is an open-source, modern web-based Linux server management control panel.
-
-- **Efficient Management**: Users can easily manage Linux servers through a web graphical interface, achieving functions such as host monitoring, file management, database management, and container management.
-- **Rapid Website Building**: Deep integration of open-source website building software WordPress, with operations such as domain binding and SSL certificate configuration completed with one click.
-- **Application Store**: Curates a variety of high-quality open-source tools and application software, assisting users in easy installation and upgrades.
-- **Security and Reliability**: Based on container management and application deployment, minimizing vulnerability exposure, while providing features such as firewall and log auditing.
-- **One-Click Backup & Restore**: Supports one-click backup and restoration, allowing users to backup data to various cloud storage media, ensuring data is never lost.
+- **Efficient Management**: Through a user-friendly web graphical interface, 1Panel enables users to effortlessly manage their Linux servers. Key features include host monitoring, file management, database administration, and container orchestration.
+- **Rapid Website Deployment**: With deep integration of the popular open-source website building software WordPress, 1Panel streamlines the process of domain binding and SSL certificate configuration, all achievable with just one click.
+- **Application Store**: 1Panel curates a wide range of high-quality open-source tools and applications, facilitating easy installation and updates for its users.
+- **Security and Reliability**: By leveraging containerization and secure application deployment practices, 1Panel minimizes vulnerability exposure. It further enhances security through integrated firewall management and log auditing capabilities.
+- **One-Click Backup & Restore**: Data protection is made simple with 1Panel's one-click backup and restore functionality, supporting various cloud storage solutions to ensure data integrity and availability.
 
 ## Quick Start
 
@@ -26,7 +25,7 @@ Execute the following command to install 1Panel with one click:
 curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_start.sh && sudo bash quick_start.sh
 ```
 
-If you have any questions or suggestions, please submit a GitHub Issue.
+Have questions or suggestions? Please submit a GitHub Issue. We value your feedback!
 
 ## Screenshot
 
@@ -38,12 +37,9 @@ If you have any questions or suggestions, please submit a GitHub Issue.
 
 ## Security Information
 
-If you discover any security issues, please contact us through:
-- email: wanghe@fit2cloud.com
+If you discover any security issues, please contact us through: wanghe@fit2cloud.com.
 
-## Copyright & License
-
-Copyright (c) 2014-2024 [FIT2CLOUD](https://fit2cloud.com/), All rights reserved.
+## License
 
 Licensed under The GNU General Public License version 3 (GPLv3)  (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 
