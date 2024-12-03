@@ -51,7 +51,7 @@
                     <el-table-column
                         prop="status"
                         column-key="status"
-                        :label="$t('app.status')"
+                        :label="$t('process.state')"
                         :filters="[
                             { text: 'LISTEN', value: 'LISTEN' },
                             { text: 'ESTABLISHED', value: 'ESTABLISHED' },

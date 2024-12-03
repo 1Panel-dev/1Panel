@@ -9,12 +9,12 @@
             size="30%"
         >
             <template #header>
-                <DrawerHeader :header="$t('commons.table.port')" :back="handleClose" />
+                <DrawerHeader :header="$t('ssh.port')" :back="handleClose" />
             </template>
             <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
-                        <el-form-item :label="$t('commons.table.port')" prop="port" :rules="Rules.port">
+                        <el-form-item :label="$t('ssh.port')" prop="port" :rules="Rules.port">
                             <el-input clearable v-model.number="form.port" />
                         </el-form-item>
                     </el-col>
