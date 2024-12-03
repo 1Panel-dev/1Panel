@@ -243,14 +243,14 @@ var AddDefaultGroup = &gormigrate.Migration{
 	ID: "2023022-change-default-group",
 	Migrate: func(tx *gorm.DB) error {
 		defaultGroup := &model.Group{
-			Name:      "默认",
+			Name:      "Default",
 			IsDefault: true,
 			Type:      "website",
 		}
 		if err := tx.Create(defaultGroup).Error; err != nil {
 			return err
 		}
-		if err := tx.Model(&model.Group{}).Where("name = ? AND type = ?", "default", "host").Update("name", "默认").Error; err != nil {
+		if err := tx.Model(&model.Group{}).Where("name = ? AND type = ?", "default", "host").Update("name", "Default").Error; err != nil {
 			return err
 		}
 		if err := tx.Model(&model.Website{}).Where("1 = 1").Update("website_group_id", defaultGroup.ID).Error; err != nil {

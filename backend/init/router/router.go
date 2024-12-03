@@ -96,10 +96,6 @@ func handleNoRoute(c *gin.Context) {
 	}
 
 	file := fmt.Sprintf("html/%s.html", resPage)
-	if resPage == "200" && c.GetHeader("Accept-Language") == "en" {
-		file = "html/200_en.html"
-	}
-
 	data, err := res.ErrorMsg.ReadFile(file)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Internal Server Error")

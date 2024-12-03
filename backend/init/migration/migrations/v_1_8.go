@@ -35,7 +35,7 @@ var AddCommandGroup = &gormigrate.Migration{
 		if err := tx.AutoMigrate(&model.Command{}); err != nil {
 			return err
 		}
-		defaultCommand := &model.Group{IsDefault: true, Name: "默认", Type: "command"}
+		defaultCommand := &model.Group{IsDefault: true, Name: "Default", Type: "command"}
 		if err := tx.Create(defaultCommand).Error; err != nil {
 			return err
 		}
