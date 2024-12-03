@@ -80,7 +80,7 @@
                                 <div class="h-app-card">
                                     <el-row>
                                         <el-col :span="15">
-                                            <div class="h-app-content">{{ $t('license.importLicense') }}：</div>
+                                            <div class="h-app-content">{{ $t('license.importLicense') }}</div>
                                         </el-col>
                                         <el-col :span="5">
                                             <el-button type="primary" plain round size="small" @click="toUpload">
@@ -92,7 +92,7 @@
                                 <div class="h-app-card">
                                     <el-row>
                                         <el-col :span="15">
-                                            <div class="h-app-content">{{ $t('license.technicalAdvice') }}：</div>
+                                            <div class="h-app-content">{{ $t('license.technicalAdvice') }}</div>
                                         </el-col>
                                         <el-col :span="5">
                                             <el-button type="primary" plain round size="small" @click="toHalo()">
