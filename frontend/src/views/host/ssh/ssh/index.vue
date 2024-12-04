@@ -46,7 +46,7 @@
                 <el-row class="mt-10" v-if="confShowType === 'base'">
                     <el-col :xs="24" :sm="20" :md="20" :lg="10" :xl="10">
                         <el-form :model="form" label-position="right" ref="formRef" label-width="100px">
-                            <el-form-item :label="$t('commons.table.port')" prop="port">
+                            <el-form-item :label="$t('ssh.port')" prop="port">
                                 <el-input disabled v-model.number="form.port">
                                     <template #append>
                                         <el-button @click="onChangePort" icon="Setting">

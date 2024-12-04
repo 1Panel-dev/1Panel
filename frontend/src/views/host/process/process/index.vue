@@ -137,7 +137,7 @@ const opRef = ref();
 
 const buttons = [
     {
-        label: i18n.global.t('app.detail'),
+        label: i18n.global.t('process.viewDetails'),
         click: function (row: any) {
             openDetail(row);
         },
