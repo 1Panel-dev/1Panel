@@ -29,12 +29,12 @@ var versionCmd = &cobra.Command{
 		}
 		version := getSettingByKey(db, "SystemVersion")
 
-		fmt.Printf("1panel version: %s\n", version)
+		fmt.Println(i18n.GetMsgByKeyForCmd("SystemVersion") + version)
 		config := configs.ServerConfig{}
 		if err := yaml.Unmarshal(conf.AppYaml, &config); err != nil {
-			return fmt.Errorf("unmarshal conf.App.Yaml failed, errL %v", err)
+			return fmt.Errorf("unmarshal conf.App.Yaml failed, err: %v", err)
 		} else {
-			fmt.Printf("mode: %s\n", config.System.Mode)
+			fmt.Println(i18n.GetMsgByKeyForCmd("SystemMode") + config.System.Mode)
 		}
 		return nil
 	},

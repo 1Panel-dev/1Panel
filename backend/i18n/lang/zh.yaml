@@ -278,5 +278,6 @@ UpdatePortFirewallReload: "防火墙重载失败，{{ .err }}，请您手动重�
 UserInfo: "获取面板信息"
 UserInfoAddr: "面板地址："
 UserInfoPassHelp: "提示：修改密码可执行命令："
-SystemVersion: "获取系统版本信息"
 DBConnErr: "错误：初始化数据库连接失败，{{ .err }}"
+SystemVersion: "版本："
+SystemMode: "模式："

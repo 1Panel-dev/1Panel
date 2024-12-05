@@ -278,5 +278,6 @@ UpdatePortFirewallReload: "Failed to reload the firewall, {{ .err }}, please man
 UserInfo: "Get panel information"
 UserInfoAddr: "Panel address: "
 UserInfoPassHelp: "Tip: To change the password, you can execute the command: "
-SystemVersion: "Get system version information"
 DBConnErr: "Error: Failed to initialize database connection, {{ .err }}"
+SystemVersion: "version: "
+SystemMode: "mode: "

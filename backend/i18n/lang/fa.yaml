@@ -58,5 +58,6 @@ UpdatePortFirewallReload: "Reload firewall namovaffagh bud, {{ .err }}, lotfan f
 UserInfo: "Daryaft etela'at-e panel"
 UserInfoAddr: "Adres-e panel: "
 UserInfoPassHelp: "Nokte: baraye taghiri ramz, mitavanid dastur zir ra anjam dahid: "
-SystemVersion: "Daryaft etela'at-e version system"
 DBConnErr: "Khatta: etesal be database namovaffagh bud, {{ .err }}"
+SystemVersion: "noskhe: "
+SystemMode: "halat: "

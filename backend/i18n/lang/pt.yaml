@@ -58,5 +58,6 @@ UpdatePortFirewallReload: "Falha ao recarregar o firewall, {{ .err }}, recarregu
 UserInfo: "Obter informações do painel"
 UserInfoAddr: "Endereço do painel: "
 UserInfoPassHelp: "Dica: Para alterar a senha, execute o comando: "
-SystemVersion: "Obter informações da versão do sistema"
 DBConnErr: "Erro: Falha ao inicializar conexão com o banco de dados, {{ .err }}"
+SystemVersion: "versão: "
+SystemMode: "modo: "
