@@ -92,6 +92,7 @@ type AppProperty struct {
 	Website            string   `json:"website"`
 	Github             string   `json:"github"`
 	Document           string   `json:"document"`
+	Version            float64  `json:"version"`
 }
 
 type AppConfigVersion struct {
