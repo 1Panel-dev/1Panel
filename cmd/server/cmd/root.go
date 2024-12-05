@@ -16,7 +16,7 @@ import (
 var language string
 
 func init() {
-	RootCmd.PersistentFlags().StringVarP(&language, "language", "l", "zh", "Set the language (default is 'zh')")
+	RootCmd.PersistentFlags().StringVarP(&language, "language", "l", "en", "Set the language")
 }
 
 var RootCmd = &cobra.Command{
