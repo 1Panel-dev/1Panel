@@ -6,7 +6,7 @@
             :close-on-click-modal="false"
             :close-on-press-escape="false"
             @close="handleClose"
-            size="35%"
+            size="40%"
         >
             <template #header>
                 <DrawerHeader :header="$t('setting.apiInterface')" :back="handleClose" />
@@ -89,6 +89,7 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox, FormInstance } from 'element-plus';
 import DrawerHeader from '@/components/drawer-header/index.vue';
+import { checkCidr, checkIp } from '@/utils/util';
 
 const loading = ref();
 const drawerVisible = ref();
@@ -105,7 +106,7 @@ const form = reactive({
 });
 
 const rules = reactive({
-    ipWhiteList: [Rules.requiredInput],
+    ipWhiteList: [Rules.requiredInput, { validator: checkIPs, trigger: 'blur' }],
     apiKey: [Rules.requiredInput],
 });
 
@@ -114,7 +115,28 @@ interface DialogProps {
     apiKey: string;
     ipWhiteList: string;
 }
+
+function checkIPs(rule: any, value: any, callback: any) {
+    if (form.ipWhiteList !== '') {
+        let addr = form.ipWhiteList.split('\n');
+        for (const item of addr) {
+            if (item === '') {
+                continue;
+            }
+            if (item.indexOf('/') !== -1) {
+                if (checkCidr(item)) {
+                    return callback(new Error(i18n.global.t('firewall.addressFormatError')));
+                }
+            } else if (checkIp(item)) {
+                return callback(new Error(i18n.global.t('firewall.addressFormatError')));
+            }
+        }
+    }
+    callback();
+}
+
 const emit = defineEmits<{ (e: 'search'): void }>();
+
 const acceptParams = async (params: DialogProps): Promise<void> => {
     form.apiInterfaceStatus = params.apiInterfaceStatus;
     form.apiKey = params.apiKey;
@@ -128,12 +150,12 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
 };
 
 const resetApiKey = async () => {
-    loading.value = true;
     ElMessageBox.confirm(i18n.global.t('setting.apiKeyResetHelper'), i18n.global.t('setting.apiKeyReset'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
     })
         .then(async () => {
+            loading.value = true;
             await generateApiKey()
                 .then((res) => {
                     loading.value = false;

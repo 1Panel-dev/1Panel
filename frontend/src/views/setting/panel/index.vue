@@ -141,6 +141,13 @@
                                     inactive-value="disable"
                                 />
                                 <span class="input-help">{{ $t('setting.apiInterfaceHelper') }}</span>
+                                <div v-if="form.apiInterfaceStatus === 'enable'">
+                                    <div>
+                                        <el-button link type="primary" @click="onChangeApiInterfaceStatus">
+                                            {{ $t('commons.button.view') }}
+                                        </el-button>
+                                    </div>
+                                </div>
                             </el-form-item>
 
                             <el-form-item :label="$t('setting.developerMode')" prop="developerMode">
@@ -382,13 +389,21 @@ const onChangeProxy = () => {
     });
 };
 
-const onChangeApiInterfaceStatus = () => {
+const onChangeApiInterfaceStatus = async () => {
     if (form.apiInterfaceStatus === 'enable') {
-        apiInterfaceRef.value.acceptParams({
-            apiInterfaceStatus: form.apiInterfaceStatus,
-            apiKey: form.apiKey,
-            ipWhiteList: form.ipWhiteList,
-        });
+        loading.value = true;
+        await updateSetting({ key: 'ApiInterfaceStatus', value: form.apiInterfaceStatus })
+            .then(() => {
+                loading.value = false;
+                apiInterfaceRef.value.acceptParams({
+                    apiInterfaceStatus: form.apiInterfaceStatus,
+                    apiKey: form.apiKey,
+                    ipWhiteList: form.ipWhiteList,
+                });
+            })
+            .catch(() => {
+                loading.value = false;
+            });
         return;
     }
     ElMessageBox.confirm(i18n.t('setting.apiInterfaceClose'), i18n.t('setting.apiInterface'), {
@@ -397,6 +412,7 @@ const onChangeApiInterfaceStatus = () => {
     })
         .then(async () => {
             loading.value = true;
+            form.apiInterfaceStatus = 'disable';
             await updateSetting({ key: 'ApiInterfaceStatus', value: 'disable' })
                 .then(() => {
                     loading.value = false;
@@ -408,12 +424,7 @@ const onChangeApiInterfaceStatus = () => {
                 });
         })
         .catch(() => {
-            apiInterfaceRef.value.acceptParams({
-                apiInterfaceStatus: 'enable',
-                apiKey: form.apiKey,
-                ipWhiteList: form.ipWhiteList,
-            });
-            return;
+            form.apiInterfaceStatus = 'enable';
         });
 };
 const onChangeNetwork = () => {
