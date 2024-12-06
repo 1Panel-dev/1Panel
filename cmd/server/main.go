@@ -11,10 +11,10 @@ import (
 
 // @title 1Panel
 // @version 1.0
-// @description  Open Source Linux Panel
+// @description Top-Rated Web-based Linux Server Management Tool
 // @termsOfService http://swagger.io/terms/
-// @license.name Apache 2.0
-// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+// @license.name GPL-3.0
+// @license.url https://www.gnu.org/licenses/gpl-3.0.html
 // @BasePath /api/v1
 // @schemes http https
 
