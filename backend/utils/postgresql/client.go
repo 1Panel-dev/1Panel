@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"net/url"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/buserr"
@@ -33,8 +34,8 @@ func NewPostgresqlClient(conn client.DBInfo) (PostgresqlClient, error) {
 	}
 
 	// Escape username and password to handle special characters
-	escapedUsername := url.QueryEscape(username)
-	escapedPassword := url.QueryEscape(password)
+	escapedUsername := url.QueryEscape(conn.Username)
+	escapedPassword := url.QueryEscape(conn.Password)
 
 	connArgs := fmt.Sprintf("postgres://%s:%s@%s:%d/?sslmode=disable", escapedUsername, escapedPassword, conn.Address, conn.Port)
 	db, err := sql.Open("pgx", connArgs)
