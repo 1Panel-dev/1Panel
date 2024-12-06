@@ -11,5 +11,4 @@ jobs:
       - uses: usthe/issues-translate-action@v2.7
         with:
           IS_MODIFY_TITLE: true
-          BOT_GITHUB_TOKEN: ${{ secrets.GITHUBTOKEN }} 
-          BOT_LOGIN_NAME: 1Panel-bot
+          BOT_GITHUB_TOKEN: ${{ secrets.ISSUE_TRANSLATOR_TOKEN }} 
