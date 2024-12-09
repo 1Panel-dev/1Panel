@@ -18,6 +18,7 @@ import (
 // @Summary Load system setting info
 // @Success 200 {object} dto.SettingInfo
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /settings/search [post]
 func (b *BaseApi) GetSettingInfo(c *gin.Context) {
 	setting, err := settingService.GetSettingInfo()
@@ -32,6 +33,7 @@ func (b *BaseApi) GetSettingInfo(c *gin.Context) {
 // @Summary Load system available status
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /settings/search/available [get]
 func (b *BaseApi) GetSystemAvailable(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
@@ -43,6 +45,7 @@ func (b *BaseApi) GetSystemAvailable(c *gin.Context) {
 // @Param request body dto.SettingUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /settings/update [post]
 // @x-panel-log {"bodyKeys":["key","value"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"修改系统配置 [key] => [value]","formatEN":"update system setting [key] => [value]"}
 func (b *BaseApi) UpdateSetting(c *gin.Context) {
@@ -64,6 +67,7 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 // @Param request body dto.ProxyUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /settings/proxy/update [post]
 // @x-panel-log {"bodyKeys":["proxyUrl","proxyPort"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"服务器代理配置 [proxyPort]:[proxyPort]","formatEN":"set proxy [proxyPort]:[proxyPort]."}
 func (b *BaseApi) UpdateProxy(c *gin.Context) {
@@ -94,6 +98,7 @@ func (b *BaseApi) UpdateProxy(c *gin.Context) {
 // @Param request body dto.SettingUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /settings/menu/update [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"隐藏高级功能菜单","formatEN":"Hide advanced feature menu."}
 func (b *BaseApi) UpdateMenu(c *gin.Context) {
@@ -115,6 +120,7 @@ func (b *BaseApi) UpdateMenu(c *gin.Context) {
 // @Param request body dto.PasswordUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /settings/password/update [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"修改系统密码","formatEN":"update system password"}
 func (b *BaseApi) UpdatePassword(c *gin.Context) {
@@ -136,6 +142,7 @@ func (b *BaseApi) UpdatePassword(c *gin.Context) {
 // @Param request body dto.SSLUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /settings/ssl/update [post]
 // @x-panel-log {"bodyKeys":["ssl"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"修改系统 ssl => [ssl]","formatEN":"update system ssl => [ssl]"}
 func (b *BaseApi) UpdateSSL(c *gin.Context) {
@@ -155,6 +162,7 @@ func (b *BaseApi) UpdateSSL(c *gin.Context) {
 // @Summary Load system cert info
 // @Success 200 {object} dto.SettingInfo
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /settings/ssl/info [get]
 func (b *BaseApi) LoadFromCert(c *gin.Context) {
 	info, err := settingService.LoadFromCert()
@@ -169,6 +177,7 @@ func (b *BaseApi) LoadFromCert(c *gin.Context) {
 // @Summary Download system cert
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /settings/ssl/download [post]
 func (b *BaseApi) DownloadSSL(c *gin.Context) {
 	pathItem := path.Join(global.CONF.System.BaseDir, "1panel/secret/server.crt")
@@ -185,6 +194,7 @@ func (b *BaseApi) DownloadSSL(c *gin.Context) {
 // @Accept json
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /settings/interface [get]
 func (b *BaseApi) LoadInterfaceAddr(c *gin.Context) {
 	data, err := settingService.LoadInterfaceAddr()
@@ -201,6 +211,7 @@ func (b *BaseApi) LoadInterfaceAddr(c *gin.Context) {
 // @Param request body dto.BindInfo true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /settings/bind/update [post]
 // @x-panel-log {"bodyKeys":["ipv6", "bindAddress"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"修改系统监听信息 => ipv6: [ipv6], 监听 IP: [bindAddress]","formatEN":"update system bind info => ipv6: [ipv6], 监听 IP: [bindAddress]"}
 func (b *BaseApi) UpdateBindInfo(c *gin.Context) {
@@ -222,6 +233,7 @@ func (b *BaseApi) UpdateBindInfo(c *gin.Context) {
 // @Param request body dto.PortUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /settings/port/update [post]
 // @x-panel-log {"bodyKeys":["serverPort"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"修改系统端口 => [serverPort]","formatEN":"update system port => [serverPort]"}
 func (b *BaseApi) UpdatePort(c *gin.Context) {
@@ -243,6 +255,7 @@ func (b *BaseApi) UpdatePort(c *gin.Context) {
 // @Param request body dto.PasswordUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /settings/expired/handle [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"重置过期密码","formatEN":"reset an expired Password"}
 func (b *BaseApi) HandlePasswordExpired(c *gin.Context) {
@@ -262,6 +275,7 @@ func (b *BaseApi) HandlePasswordExpired(c *gin.Context) {
 // @Summary Load local base dir
 // @Success 200 {string} path
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /settings/basedir [get]
 func (b *BaseApi) LoadBaseDir(c *gin.Context) {
 	helper.SuccessWithData(c, global.CONF.System.DataDir)
@@ -273,6 +287,7 @@ func (b *BaseApi) LoadBaseDir(c *gin.Context) {
 // @Param request body dto.MfaCredential true "request"
 // @Success 200 {object} mfa.Otp
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /settings/mfa [post]
 func (b *BaseApi) LoadMFA(c *gin.Context) {
 	var req dto.MfaRequest
@@ -295,6 +310,7 @@ func (b *BaseApi) LoadMFA(c *gin.Context) {
 // @Param request body dto.MfaCredential true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /settings/mfa/bind [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"mfa 绑定","formatEN":"bind mfa"}
 func (b *BaseApi) MFABind(c *gin.Context) {
@@ -332,6 +348,7 @@ func (b *BaseApi) MFABind(c *gin.Context) {
 // @Accept json
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /settings/api/config/generate/key [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"生成 API 接口密钥","formatEN":"generate api key"}
 func (b *BaseApi) GenerateApiKey(c *gin.Context) {
@@ -354,6 +371,7 @@ func (b *BaseApi) GenerateApiKey(c *gin.Context) {
 // @Param request body dto.ApiInterfaceConfig true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /settings/api/config/update [post]
 // @x-panel-log {"bodyKeys":["ipWhiteList"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新 API 接口配置 => IP 白名单: [ipWhiteList]","formatEN":"update api config => IP White List: [ipWhiteList]"}
 func (b *BaseApi) UpdateApiConfig(c *gin.Context) {

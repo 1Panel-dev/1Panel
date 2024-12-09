@@ -15,6 +15,7 @@ import (
 // @Param request body request.AppSearch true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /apps/search [post]
 func (b *BaseApi) SearchApp(c *gin.Context) {
 	var req request.AppSearch
@@ -33,6 +34,7 @@ func (b *BaseApi) SearchApp(c *gin.Context) {
 // @Summary Sync app list
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /apps/sync [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"应用商店同步","formatEN":"App store synchronization"}
 func (b *BaseApi) SyncApp(c *gin.Context) {
@@ -65,6 +67,7 @@ func (b *BaseApi) SyncApp(c *gin.Context) {
 // @Param key path string true "app key"
 // @Success 200 {object} response.AppDTO
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /apps/:key [get]
 func (b *BaseApi) GetApp(c *gin.Context) {
 	appKey, err := helper.GetStrParamByKey(c, "key")
@@ -88,6 +91,7 @@ func (b *BaseApi) GetApp(c *gin.Context) {
 // @Param version path string true "app type"
 // @Success 200 {object} response.AppDetailDTO
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /apps/detail/:appId/:version/:type [get]
 func (b *BaseApi) GetAppDetail(c *gin.Context) {
 	appID, err := helper.GetIntParamByKey(c, "appId")
@@ -111,6 +115,7 @@ func (b *BaseApi) GetAppDetail(c *gin.Context) {
 // @Param appId path integer true "id"
 // @Success 200 {object} response.AppDetailDTO
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /apps/details/:id [get]
 func (b *BaseApi) GetAppDetailByID(c *gin.Context) {
 	appDetailID, err := helper.GetIntParamByKey(c, "id")
@@ -131,6 +136,7 @@ func (b *BaseApi) GetAppDetailByID(c *gin.Context) {
 // @Accept json
 // @Success 200 {object} response.IgnoredApp
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /apps/ignored [get]
 func (b *BaseApi) GetIgnoredApp(c *gin.Context) {
 	res, err := appService.GetIgnoredApp()
@@ -147,6 +153,7 @@ func (b *BaseApi) GetIgnoredApp(c *gin.Context) {
 // @Param request body request.AppInstallCreate true "request"
 // @Success 200 {object} model.AppInstall
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /apps/install [post]
 // @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"安装应用 [name]","formatEN":"Install app [name]"}
 func (b *BaseApi) InstallApp(c *gin.Context) {
@@ -178,6 +185,7 @@ func (b *BaseApi) GetAppTags(c *gin.Context) {
 // @Summary Get app list update
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /apps/checkupdate [get]
 func (b *BaseApi) GetAppListUpdate(c *gin.Context) {
 	res, err := appService.GetAppUpdate()

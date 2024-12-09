@@ -15,6 +15,7 @@ import (
 // @Param request body request.AppInstalledSearch true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /apps/installed/search [post]
 func (b *BaseApi) SearchAppInstalled(c *gin.Context) {
 	var req request.AppInstalledSearch
@@ -46,6 +47,7 @@ func (b *BaseApi) SearchAppInstalled(c *gin.Context) {
 // @Accept json
 // @Success 200 array dto.AppInstallInfo
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /apps/installed/list [get]
 func (b *BaseApi) ListAppInstalled(c *gin.Context) {
 	list, err := appInstallService.GetInstallList()
@@ -62,6 +64,7 @@ func (b *BaseApi) ListAppInstalled(c *gin.Context) {
 // @Param request body request.AppInstalledInfo true "request"
 // @Success 200 {object} response.AppInstalledCheck
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /apps/installed/check [post]
 func (b *BaseApi) CheckAppInstalled(c *gin.Context) {
 	var req request.AppInstalledInfo
@@ -82,6 +85,7 @@ func (b *BaseApi) CheckAppInstalled(c *gin.Context) {
 // @Param request body dto.OperationWithNameAndType true "request"
 // @Success 200 {integer} port
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /apps/installed/loadport [post]
 func (b *BaseApi) LoadPort(c *gin.Context) {
 	var req dto.OperationWithNameAndType
@@ -102,6 +106,7 @@ func (b *BaseApi) LoadPort(c *gin.Context) {
 // @Param request body dto.OperationWithNameAndType true "request"
 // @Success 200 {string} response.DatabaseConn
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /apps/installed/conninfo/:key [get]
 func (b *BaseApi) LoadConnInfo(c *gin.Context) {
 	var req dto.OperationWithNameAndType
@@ -122,6 +127,7 @@ func (b *BaseApi) LoadConnInfo(c *gin.Context) {
 // @Param appInstallId path integer true "App install id"
 // @Success 200 {array} dto.AppResource
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /apps/installed/delete/check/:appInstallId [get]
 func (b *BaseApi) DeleteCheck(c *gin.Context) {
 	appInstallId, err := helper.GetIntParamByKey(c, "appInstallId")
@@ -142,6 +148,7 @@ func (b *BaseApi) DeleteCheck(c *gin.Context) {
 // @Summary Sync app installed
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /apps/installed/sync [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"同步已安装应用列表","formatEN":"Sync the list of installed apps"}
 func (b *BaseApi) SyncInstalled(c *gin.Context) {
@@ -158,6 +165,7 @@ func (b *BaseApi) SyncInstalled(c *gin.Context) {
 // @Param request body request.AppInstalledOperate true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /apps/installed/op [post]
 // @x-panel-log {"bodyKeys":["installId","operate"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"installId","isList":false,"db":"app_installs","output_column":"app_id","output_value":"appId"},{"input_column":"id","input_value":"installId","isList":false,"db":"app_installs","output_column":"name","output_value":"appName"},{"input_column":"id","input_value":"appId","isList":false,"db":"apps","output_column":"key","output_value":"appKey"}],"formatZH":"[operate] 应用 [appKey][appName]","formatEN":"[operate] App [appKey][appName]"}
 func (b *BaseApi) OperateInstalled(c *gin.Context) {
@@ -178,6 +186,7 @@ func (b *BaseApi) OperateInstalled(c *gin.Context) {
 // @Param key path string true "request"
 // @Success 200 {array} response.AppService
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /apps/services/:key [get]
 func (b *BaseApi) GetServices(c *gin.Context) {
 	key := c.Param("key")
@@ -195,6 +204,7 @@ func (b *BaseApi) GetServices(c *gin.Context) {
 // @Param appInstallId path integer true "request"
 // @Success 200 {array} dto.AppVersion
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /apps/installed/update/versions [post]
 func (b *BaseApi) GetUpdateVersions(c *gin.Context) {
 	var req request.AppUpdateVersion
@@ -215,6 +225,7 @@ func (b *BaseApi) GetUpdateVersions(c *gin.Context) {
 // @Param request body request.PortUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /apps/installed/port/change [post]
 // @x-panel-log {"bodyKeys":["key","name","port"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"应用端口修改 [key]-[name] => [port]","formatEN":"Application port update [key]-[name] => [port]"}
 func (b *BaseApi) ChangeAppPort(c *gin.Context) {
@@ -235,6 +246,7 @@ func (b *BaseApi) ChangeAppPort(c *gin.Context) {
 // @Param request body dto.OperationWithNameAndType true "request"
 // @Success 200 {string} content
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /apps/installed/conf [post]
 func (b *BaseApi) GetDefaultConfig(c *gin.Context) {
 	var req dto.OperationWithNameAndType
@@ -256,6 +268,7 @@ func (b *BaseApi) GetDefaultConfig(c *gin.Context) {
 // @Param appInstallId path string true "request"
 // @Success 200 {object} response.AppParam
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /apps/installed/params/:appInstallId [get]
 func (b *BaseApi) GetParams(c *gin.Context) {
 	appInstallId, err := helper.GetIntParamByKey(c, "appInstallId")
@@ -277,6 +290,7 @@ func (b *BaseApi) GetParams(c *gin.Context) {
 // @Param request body request.AppInstalledUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /apps/installed/params/update [post]
 // @x-panel-log {"bodyKeys":["installId"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"应用参数修改 [installId]","formatEN":"Application param update [installId]"}
 func (b *BaseApi) UpdateInstalled(c *gin.Context) {
@@ -297,6 +311,7 @@ func (b *BaseApi) UpdateInstalled(c *gin.Context) {
 // @Param request body request.AppInstalledIgnoreUpgrade true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /apps/installed/ignore [post]
 // @x-panel-log {"bodyKeys":["installId"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"忽略应用 [installId] 版本升级","formatEN":"Application param update [installId]"}
 func (b *BaseApi) IgnoreUpgrade(c *gin.Context) {

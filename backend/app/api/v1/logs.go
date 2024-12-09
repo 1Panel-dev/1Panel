@@ -13,6 +13,7 @@ import (
 // @Param request body dto.SearchLgLogWithPage true "request"
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /logs/login [post]
 func (b *BaseApi) GetLoginLogs(c *gin.Context) {
 	var req dto.SearchLgLogWithPage
@@ -38,6 +39,7 @@ func (b *BaseApi) GetLoginLogs(c *gin.Context) {
 // @Param request body dto.SearchOpLogWithPage true "request"
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /logs/operation [post]
 func (b *BaseApi) GetOperationLogs(c *gin.Context) {
 	var req dto.SearchOpLogWithPage
@@ -63,6 +65,7 @@ func (b *BaseApi) GetOperationLogs(c *gin.Context) {
 // @Param request body dto.CleanLog true "request"
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /logs/clean [post]
 // @x-panel-log {"bodyKeys":["logType"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"清空 [logType] 日志信息","formatEN":"Clean the [logType] log information"}
 func (b *BaseApi) CleanLogs(c *gin.Context) {
@@ -83,6 +86,7 @@ func (b *BaseApi) CleanLogs(c *gin.Context) {
 // @Summary Load system log files
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /logs/system/files [get]
 func (b *BaseApi) GetSystemFiles(c *gin.Context) {
 	data, err := logService.ListSystemLogFile()
@@ -98,6 +102,7 @@ func (b *BaseApi) GetSystemFiles(c *gin.Context) {
 // @Summary Load system logs
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /logs/system [post]
 func (b *BaseApi) GetSystemLogs(c *gin.Context) {
 	var req dto.OperationWithName

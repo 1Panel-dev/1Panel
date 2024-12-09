@@ -16,6 +16,7 @@ import (
 // @Param request body dto.CronjobCreate true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /cronjobs [post]
 // @x-panel-log {"bodyKeys":["type","name"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建计划任务 [type][name]","formatEN":"create cronjob [type][name]"}
 func (b *BaseApi) CreateCronjob(c *gin.Context) {
@@ -37,6 +38,7 @@ func (b *BaseApi) CreateCronjob(c *gin.Context) {
 // @Param request body dto.PageCronjob true "request"
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /cronjobs/search [post]
 func (b *BaseApi) SearchCronjob(c *gin.Context) {
 	var req dto.PageCronjob
@@ -62,6 +64,7 @@ func (b *BaseApi) SearchCronjob(c *gin.Context) {
 // @Param request body dto.SearchRecord true "request"
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /cronjobs/search/records [post]
 func (b *BaseApi) SearchJobRecords(c *gin.Context) {
 	var req dto.SearchRecord
@@ -91,6 +94,7 @@ func (b *BaseApi) SearchJobRecords(c *gin.Context) {
 // @Param request body dto.OperateByID true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /cronjobs/records/log [post]
 func (b *BaseApi) LoadRecordLog(c *gin.Context) {
 	var req dto.OperateByID
@@ -107,6 +111,7 @@ func (b *BaseApi) LoadRecordLog(c *gin.Context) {
 // @Param request body dto.CronjobClean true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /cronjobs/records/clean [post]
 // @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"cronjobs","output_column":"name","output_value":"name"}],"formatZH":"清空计划任务记录 [name]","formatEN":"clean cronjob [name] records"}
 func (b *BaseApi) CleanRecord(c *gin.Context) {
@@ -129,6 +134,7 @@ func (b *BaseApi) CleanRecord(c *gin.Context) {
 // @Param request body dto.CronjobBatchDelete true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /cronjobs/del [post]
 // @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"ids","isList":true,"db":"cronjobs","output_column":"name","output_value":"names"}],"formatZH":"删除计划任务 [names]","formatEN":"delete cronjob [names]"}
 func (b *BaseApi) DeleteCronjob(c *gin.Context) {
@@ -150,6 +156,7 @@ func (b *BaseApi) DeleteCronjob(c *gin.Context) {
 // @Param request body dto.CronjobUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /cronjobs/update [post]
 // @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"cronjobs","output_column":"name","output_value":"name"}],"formatZH":"更新计划任务 [name]","formatEN":"update cronjob [name]"}
 func (b *BaseApi) UpdateCronjob(c *gin.Context) {
@@ -171,6 +178,7 @@ func (b *BaseApi) UpdateCronjob(c *gin.Context) {
 // @Param request body dto.CronjobUpdateStatus true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /cronjobs/status [post]
 // @x-panel-log {"bodyKeys":["id","status"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"cronjobs","output_column":"name","output_value":"name"}],"formatZH":"修改计划任务 [name] 状态为 [status]","formatEN":"change the status of cronjob [name] to [status]."}
 func (b *BaseApi) UpdateCronjobStatus(c *gin.Context) {
@@ -192,6 +200,7 @@ func (b *BaseApi) UpdateCronjobStatus(c *gin.Context) {
 // @Param request body dto.CronjobDownload true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /cronjobs/download [post]
 // @x-panel-log {"bodyKeys":["recordID"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"recordID","isList":false,"db":"job_records","output_column":"file","output_value":"file"}],"formatZH":"下载计划任务记录 [file]","formatEN":"download the cronjob record [file]"}
 func (b *BaseApi) TargetDownload(c *gin.Context) {
@@ -215,6 +224,7 @@ func (b *BaseApi) TargetDownload(c *gin.Context) {
 // @Param request body dto.OperateByID true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /cronjobs/handle [post]
 // @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"cronjobs","output_column":"name","output_value":"name"}],"formatZH":"手动执行计划任务 [name]","formatEN":"manually execute the cronjob [name]"}
 func (b *BaseApi) HandleOnce(c *gin.Context) {

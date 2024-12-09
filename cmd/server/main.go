@@ -18,7 +18,7 @@ import (
 // @BasePath /api/v1
 // @schemes http https
 
-// @securityDefinitions.apikey CustomToken
+// @securityDefinitions.apikey ApiKeyAuth
 // @description Custom Token Format, Format: md5('1panel' + 1Panel-Token + 1Panel-Timestamp).
 // @description ```
 // @description eg:
@@ -30,6 +30,7 @@ import (
 // @type apiKey
 // @in Header
 // @name 1Panel-Token
+
 // @securityDefinitions.apikey Timestamp
 // @type apiKey
 // @in header

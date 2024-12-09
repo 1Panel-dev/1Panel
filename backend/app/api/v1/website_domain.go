@@ -13,6 +13,7 @@ import (
 // @Param request body request.WebsiteDomainDelete true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/domains/del [post]
 // @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"website_domains","output_column":"domain","output_value":"domain"}],"formatZH":"删除域名 [domain]","formatEN":"Delete domain [domain]"}
 func (b *BaseApi) DeleteWebDomain(c *gin.Context) {
@@ -33,6 +34,7 @@ func (b *BaseApi) DeleteWebDomain(c *gin.Context) {
 // @Param request body request.WebsiteDomainCreate true "request"
 // @Success 200 {object} model.WebsiteDomain
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/domains [post]
 // @x-panel-log {"bodyKeys":["domain"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建域名 [domain]","formatEN":"Create domain [domain]"}
 func (b *BaseApi) CreateWebDomain(c *gin.Context) {
@@ -54,6 +56,7 @@ func (b *BaseApi) CreateWebDomain(c *gin.Context) {
 // @Param websiteId path integer true "request"
 // @Success 200 {array} model.WebsiteDomain
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/domains/:websiteId [get]
 func (b *BaseApi) GetWebDomains(c *gin.Context) {
 	websiteId, err := helper.GetIntParamByKey(c, "websiteId")

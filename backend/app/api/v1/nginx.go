@@ -11,6 +11,7 @@ import (
 // @Summary Load OpenResty conf
 // @Success 200 {object} response.FileInfo
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /openresty [get]
 func (b *BaseApi) GetNginx(c *gin.Context) {
 	fileInfo, err := nginxService.GetNginxConfig()
@@ -27,6 +28,7 @@ func (b *BaseApi) GetNginx(c *gin.Context) {
 // @Param request body request.NginxScopeReq true "request"
 // @Success 200 {array} response.NginxParam
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /openresty/scope [post]
 func (b *BaseApi) GetNginxConfigByScope(c *gin.Context) {
 	var req request.NginxScopeReq
@@ -48,6 +50,7 @@ func (b *BaseApi) GetNginxConfigByScope(c *gin.Context) {
 // @Param request body request.NginxConfigUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /openresty/update [post]
 // @x-panel-log {"bodyKeys":["websiteId"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"websiteId","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"更新 nginx 配置 [domain]","formatEN":"Update nginx conf [domain]"}
 func (b *BaseApi) UpdateNginxConfigByScope(c *gin.Context) {
@@ -66,6 +69,7 @@ func (b *BaseApi) UpdateNginxConfigByScope(c *gin.Context) {
 // @Summary Load OpenResty status info
 // @Success 200 {object} response.NginxStatus
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /openresty/status [get]
 func (b *BaseApi) GetNginxStatus(c *gin.Context) {
 	res, err := nginxService.GetStatus()
@@ -82,6 +86,7 @@ func (b *BaseApi) GetNginxStatus(c *gin.Context) {
 // @Param request body request.NginxConfigFileUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /openresty/file [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新 nginx 配置","formatEN":"Update nginx conf"}
 func (b *BaseApi) UpdateNginxFile(c *gin.Context) {
@@ -101,6 +106,7 @@ func (b *BaseApi) UpdateNginxFile(c *gin.Context) {
 // @Summary Clear OpenResty proxy cache
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /openresty/clear [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"清理 Openresty 代理缓存","formatEN":"Clear nginx proxy cache"}
 func (b *BaseApi) ClearNginxProxyCache(c *gin.Context) {

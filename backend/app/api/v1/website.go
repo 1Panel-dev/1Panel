@@ -16,6 +16,7 @@ import (
 // @Param request body request.WebsiteSearch true "request"
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/search [post]
 func (b *BaseApi) PageWebsite(c *gin.Context) {
 	var req request.WebsiteSearch
@@ -37,6 +38,7 @@ func (b *BaseApi) PageWebsite(c *gin.Context) {
 // @Summary List websites
 // @Success 200 {array} response.WebsiteDTO
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/list [get]
 func (b *BaseApi) GetWebsites(c *gin.Context) {
 	websites, err := websiteService.GetWebsites()
@@ -51,6 +53,7 @@ func (b *BaseApi) GetWebsites(c *gin.Context) {
 // @Summary List website names
 // @Success 200 {array} string
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/options [get]
 func (b *BaseApi) GetWebsiteOptions(c *gin.Context) {
 	websites, err := websiteService.GetWebsiteOptions()
@@ -67,6 +70,7 @@ func (b *BaseApi) GetWebsiteOptions(c *gin.Context) {
 // @Param request body request.WebsiteCreate true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites [post]
 // @x-panel-log {"bodyKeys":["primaryDomain"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建网站 [primaryDomain]","formatEN":"Create website [primaryDomain]"}
 func (b *BaseApi) CreateWebsite(c *gin.Context) {
@@ -96,6 +100,7 @@ func (b *BaseApi) CreateWebsite(c *gin.Context) {
 // @Param request body request.WebsiteOp true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/operate [post]
 // @x-panel-log {"bodyKeys":["id", "operate"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"[operate] 网站 [domain]","formatEN":"[operate] website [domain]"}
 func (b *BaseApi) OpWebsite(c *gin.Context) {
@@ -117,6 +122,7 @@ func (b *BaseApi) OpWebsite(c *gin.Context) {
 // @Param request body request.WebsiteDelete true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/del [post]
 // @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"删除网站 [domain]","formatEN":"Delete website [domain]"}
 func (b *BaseApi) DeleteWebsite(c *gin.Context) {
@@ -138,6 +144,7 @@ func (b *BaseApi) DeleteWebsite(c *gin.Context) {
 // @Param request body request.WebsiteUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/update [post]
 // @x-panel-log {"bodyKeys":["primaryDomain"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新网站 [primaryDomain]","formatEN":"Update website [primaryDomain]"}
 func (b *BaseApi) UpdateWebsite(c *gin.Context) {
@@ -158,6 +165,7 @@ func (b *BaseApi) UpdateWebsite(c *gin.Context) {
 // @Param id path integer true "request"
 // @Success 200 {object} response.WebsiteDTO
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/:id [get]
 func (b *BaseApi) GetWebsite(c *gin.Context) {
 	id, err := helper.GetParamID(c)
@@ -179,6 +187,7 @@ func (b *BaseApi) GetWebsite(c *gin.Context) {
 // @Param id path integer true "request"
 // @Success 200 {object} response.FileInfo
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/:id/config/:type [get]
 func (b *BaseApi) GetWebsiteNginx(c *gin.Context) {
 	id, err := helper.GetParamID(c)
@@ -202,6 +211,7 @@ func (b *BaseApi) GetWebsiteNginx(c *gin.Context) {
 // @Param request body request.NginxScopeReq true "request"
 // @Success 200 {object} response.WebsiteNginxConfig
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/config [post]
 func (b *BaseApi) GetNginxConfig(c *gin.Context) {
 	var req request.NginxScopeReq
@@ -222,6 +232,7 @@ func (b *BaseApi) GetNginxConfig(c *gin.Context) {
 // @Param request body request.NginxConfigUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/config/update [post]
 // @x-panel-log {"bodyKeys":["websiteId"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"websiteId","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"nginx 配置修改 [domain]","formatEN":"Nginx conf update [domain]"}
 func (b *BaseApi) UpdateNginxConfig(c *gin.Context) {
@@ -242,6 +253,7 @@ func (b *BaseApi) UpdateNginxConfig(c *gin.Context) {
 // @Param id path integer true "request"
 // @Success 200 {object} response.WebsiteHTTPS
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/:id/https [get]
 func (b *BaseApi) GetHTTPSConfig(c *gin.Context) {
 	id, err := helper.GetParamID(c)
@@ -263,6 +275,7 @@ func (b *BaseApi) GetHTTPSConfig(c *gin.Context) {
 // @Param request body request.WebsiteHTTPSOp true "request"
 // @Success 200 {object} response.WebsiteHTTPS
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/:id/https [post]
 // @x-panel-log {"bodyKeys":["websiteId"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"websiteId","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"更新网站 [domain] https 配置","formatEN":"Update website https [domain] conf"}
 func (b *BaseApi) UpdateHTTPSConfig(c *gin.Context) {
@@ -287,6 +300,7 @@ func (b *BaseApi) UpdateHTTPSConfig(c *gin.Context) {
 // @Param request body request.WebsiteInstallCheckReq true "request"
 // @Success 200 {array} response.WebsitePreInstallCheck
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/check [post]
 func (b *BaseApi) CreateWebsiteCheck(c *gin.Context) {
 	var req request.WebsiteInstallCheckReq
@@ -307,6 +321,7 @@ func (b *BaseApi) CreateWebsiteCheck(c *gin.Context) {
 // @Param request body request.WebsiteNginxUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/nginx/update [post]
 // @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"[domain] Nginx 配置修改","formatEN":"[domain] Nginx conf update"}
 func (b *BaseApi) UpdateWebsiteNginxConfig(c *gin.Context) {
@@ -327,6 +342,7 @@ func (b *BaseApi) UpdateWebsiteNginxConfig(c *gin.Context) {
 // @Param request body request.WebsiteLogReq true "request"
 // @Success 200 {object} response.WebsiteLog
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/log [post]
 // @x-panel-log {"bodyKeys":["id", "operate"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"[domain][operate] 日志","formatEN":"[domain][operate] logs"}
 func (b *BaseApi) OpWebsiteLog(c *gin.Context) {
@@ -348,6 +364,7 @@ func (b *BaseApi) OpWebsiteLog(c *gin.Context) {
 // @Param request body request.WebsiteDefaultUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/default/server [post]
 // @x-panel-log {"bodyKeys":["id", "operate"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"修改默认 server => [domain]","formatEN":"Change default server => [domain]"}
 func (b *BaseApi) ChangeDefaultServer(c *gin.Context) {
@@ -368,6 +385,7 @@ func (b *BaseApi) ChangeDefaultServer(c *gin.Context) {
 // @Param id path integer true "request"
 // @Success 200 {object} response.PHPConfig
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/php/config/:id [get]
 func (b *BaseApi) GetWebsitePHPConfig(c *gin.Context) {
 	id, err := helper.GetParamID(c)
@@ -389,6 +407,7 @@ func (b *BaseApi) GetWebsitePHPConfig(c *gin.Context) {
 // @Param request body request.WebsitePHPConfigUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/php/config [post]
 // @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"[domain] PHP 配置修改","formatEN":"[domain] PHP conf update"}
 func (b *BaseApi) UpdateWebsitePHPConfig(c *gin.Context) {
@@ -409,6 +428,7 @@ func (b *BaseApi) UpdateWebsitePHPConfig(c *gin.Context) {
 // @Param request body request.WebsitePHPFileUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/php/update [post]
 // @x-panel-log {"bodyKeys":["websiteId"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"websiteId","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"php 配置修改 [domain]","formatEN":"Nginx conf update [domain]"}
 func (b *BaseApi) UpdatePHPFile(c *gin.Context) {
@@ -429,6 +449,7 @@ func (b *BaseApi) UpdatePHPFile(c *gin.Context) {
 // @Param request body request.WebsitePHPVersionReq true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/php/version [post]
 // @x-panel-log {"bodyKeys":["websiteId"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"websiteId","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"php 版本变更 [domain]","formatEN":"php version update [domain]"}
 func (b *BaseApi) ChangePHPVersion(c *gin.Context) {
@@ -449,6 +470,7 @@ func (b *BaseApi) ChangePHPVersion(c *gin.Context) {
 // @Param request body request.NginxRewriteReq true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/rewrite [post]
 func (b *BaseApi) GetRewriteConfig(c *gin.Context) {
 	var req request.NginxRewriteReq
@@ -469,6 +491,7 @@ func (b *BaseApi) GetRewriteConfig(c *gin.Context) {
 // @Param request body request.NginxRewriteUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/rewrite/update [post]
 // @x-panel-log {"bodyKeys":["websiteID"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"websiteID","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"伪静态配置修改 [domain]","formatEN":"Nginx conf rewrite update [domain]"}
 func (b *BaseApi) UpdateRewriteConfig(c *gin.Context) {
@@ -489,6 +512,7 @@ func (b *BaseApi) UpdateRewriteConfig(c *gin.Context) {
 // @Param request body request.WebsiteUpdateDir true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/dir/update [post]
 // @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"更新网站 [domain] 目录","formatEN":"Update  domain [domain] dir"}
 func (b *BaseApi) UpdateSiteDir(c *gin.Context) {
@@ -509,6 +533,7 @@ func (b *BaseApi) UpdateSiteDir(c *gin.Context) {
 // @Param request body request.WebsiteUpdateDirPermission true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/dir/permission [post]
 // @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"更新网站 [domain] 目录权限","formatEN":"Update  domain [domain] dir permission"}
 func (b *BaseApi) UpdateSiteDirPermission(c *gin.Context) {
@@ -529,6 +554,7 @@ func (b *BaseApi) UpdateSiteDirPermission(c *gin.Context) {
 // @Param request body request.WebsiteProxyReq true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/proxies [post]
 func (b *BaseApi) GetProxyConfig(c *gin.Context) {
 	var req request.WebsiteProxyReq
@@ -549,6 +575,7 @@ func (b *BaseApi) GetProxyConfig(c *gin.Context) {
 // @Param request body request.WebsiteProxyConfig true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/proxies/update [post]
 // @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"修改网站 [domain] 反向代理配置 ","formatEN":"Update domain [domain] proxy config"}
 func (b *BaseApi) UpdateProxyConfig(c *gin.Context) {
@@ -570,6 +597,7 @@ func (b *BaseApi) UpdateProxyConfig(c *gin.Context) {
 // @Param request body request.NginxProxyUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/proxy/file [post]
 // @x-panel-log {"bodyKeys":["websiteID"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"websiteID","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"更新反向代理文件 [domain]","formatEN":"Nginx conf proxy file update [domain]"}
 func (b *BaseApi) UpdateProxyConfigFile(c *gin.Context) {
@@ -590,6 +618,7 @@ func (b *BaseApi) UpdateProxyConfigFile(c *gin.Context) {
 // @Param request body request.NginxAuthReq true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/auths [post]
 func (b *BaseApi) GetAuthConfig(c *gin.Context) {
 	var req request.NginxAuthReq
@@ -610,6 +639,7 @@ func (b *BaseApi) GetAuthConfig(c *gin.Context) {
 // @Param request body request.NginxAuthUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/auths/update [post]
 func (b *BaseApi) UpdateAuthConfig(c *gin.Context) {
 	var req request.NginxAuthUpdate
@@ -629,6 +659,7 @@ func (b *BaseApi) UpdateAuthConfig(c *gin.Context) {
 // @Param request body request.NginxCommonReq true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/leech [post]
 func (b *BaseApi) GetAntiLeech(c *gin.Context) {
 	var req request.NginxCommonReq
@@ -649,6 +680,7 @@ func (b *BaseApi) GetAntiLeech(c *gin.Context) {
 // @Param request body request.NginxAntiLeechUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/leech/update [post]
 func (b *BaseApi) UpdateAntiLeech(c *gin.Context) {
 	var req request.NginxAntiLeechUpdate
@@ -668,6 +700,7 @@ func (b *BaseApi) UpdateAntiLeech(c *gin.Context) {
 // @Param request body request.NginxRedirectReq true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/redirect/update [post]
 // @x-panel-log {"bodyKeys":["websiteID"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"websiteID","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"修改网站 [domain] 重定向理配置 ","formatEN":"Update domain [domain] redirect config"}
 func (b *BaseApi) UpdateRedirectConfig(c *gin.Context) {
@@ -689,6 +722,7 @@ func (b *BaseApi) UpdateRedirectConfig(c *gin.Context) {
 // @Param request body request.WebsiteProxyReq true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/redirect [post]
 func (b *BaseApi) GetRedirectConfig(c *gin.Context) {
 	var req request.WebsiteRedirectReq
@@ -709,6 +743,7 @@ func (b *BaseApi) GetRedirectConfig(c *gin.Context) {
 // @Param request body request.NginxRedirectUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/redirect/file [post]
 // @x-panel-log {"bodyKeys":["websiteID"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"websiteID","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"更新重定向文件 [domain]","formatEN":"Nginx conf redirect file update [domain]"}
 func (b *BaseApi) UpdateRedirectConfigFile(c *gin.Context) {
@@ -729,6 +764,7 @@ func (b *BaseApi) UpdateRedirectConfigFile(c *gin.Context) {
 // @Param request body request.WebsiteCommonReq true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/dir [post]
 func (b *BaseApi) GetDirConfig(c *gin.Context) {
 	var req request.WebsiteCommonReq
@@ -748,6 +784,7 @@ func (b *BaseApi) GetDirConfig(c *gin.Context) {
 // @Accept json
 // @Success 200 {object} response.FileInfo
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/default/html/:type [get]
 func (b *BaseApi) GetDefaultHtml(c *gin.Context) {
 	resourceType, err := helper.GetStrParamByKey(c, "type")
@@ -769,6 +806,7 @@ func (b *BaseApi) GetDefaultHtml(c *gin.Context) {
 // @Param request body request.WebsiteHtmlUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/default/html/update [post]
 // @x-panel-log {"bodyKeys":["type"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新默认 html","formatEN":"Update default html"}
 func (b *BaseApi) UpdateDefaultHtml(c *gin.Context) {

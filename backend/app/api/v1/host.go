@@ -14,6 +14,7 @@ import (
 // @Param request body dto.HostOperate true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /hosts [post]
 // @x-panel-log {"bodyKeys":["name","addr"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建主机 [name][addr]","formatEN":"create host [name][addr]"}
 func (b *BaseApi) CreateHost(c *gin.Context) {
@@ -36,6 +37,7 @@ func (b *BaseApi) CreateHost(c *gin.Context) {
 // @Param request body dto.HostConnTest true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /hosts/test/byinfo [post]
 func (b *BaseApi) TestByInfo(c *gin.Context) {
 	var req dto.HostConnTest
@@ -53,6 +55,7 @@ func (b *BaseApi) TestByInfo(c *gin.Context) {
 // @Param id path integer true "request"
 // @Success 200 {boolean} connStatus
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /hosts/test/byid/:id [post]
 func (b *BaseApi) TestByID(c *gin.Context) {
 	id, err := helper.GetParamID(c)
@@ -71,6 +74,7 @@ func (b *BaseApi) TestByID(c *gin.Context) {
 // @Param request body dto.SearchForTree true "request"
 // @Success 200 {array} dto.HostTree
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /hosts/tree [post]
 func (b *BaseApi) HostTree(c *gin.Context) {
 	var req dto.SearchForTree
@@ -93,6 +97,7 @@ func (b *BaseApi) HostTree(c *gin.Context) {
 // @Param request body dto.SearchHostWithPage true "request"
 // @Success 200 {array} dto.HostTree
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /hosts/search [post]
 func (b *BaseApi) SearchHost(c *gin.Context) {
 	var req dto.SearchHostWithPage
@@ -118,6 +123,7 @@ func (b *BaseApi) SearchHost(c *gin.Context) {
 // @Param request body dto.BatchDeleteReq true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /hosts/del [post]
 // @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"ids","isList":true,"db":"hosts","output_column":"addr","output_value":"addrs"}],"formatZH":"删除主机 [addrs]","formatEN":"delete host [addrs]"}
 func (b *BaseApi) DeleteHost(c *gin.Context) {
@@ -139,6 +145,7 @@ func (b *BaseApi) DeleteHost(c *gin.Context) {
 // @Param request body dto.HostOperate true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /hosts/update [post]
 // @x-panel-log {"bodyKeys":["name","addr"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新主机信息 [name][addr]","formatEN":"update host [name][addr]"}
 func (b *BaseApi) UpdateHost(c *gin.Context) {
@@ -204,6 +211,7 @@ func (b *BaseApi) UpdateHost(c *gin.Context) {
 // @Param request body dto.ChangeHostGroup true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /hosts/update/group [post]
 // @x-panel-log {"bodyKeys":["id","group"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"hosts","output_column":"addr","output_value":"addr"}],"formatZH":"切换主机[addr]分组 => [group]","formatEN":"change host [addr] group => [group]"}
 func (b *BaseApi) UpdateHostGroup(c *gin.Context) {

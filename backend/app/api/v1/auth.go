@@ -87,6 +87,7 @@ func (b *BaseApi) MFALogin(c *gin.Context) {
 // @Summary User logout
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /auth/logout [post]
 func (b *BaseApi) LogOut(c *gin.Context) {
 	if err := authService.LogOut(c); err != nil {

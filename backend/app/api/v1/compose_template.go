@@ -13,6 +13,7 @@ import (
 // @Param request body dto.ComposeTemplateCreate true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /containers/template [post]
 // @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建 compose 模版 [name]","formatEN":"create compose template [name]"}
 func (b *BaseApi) CreateComposeTemplate(c *gin.Context) {
@@ -35,6 +36,7 @@ func (b *BaseApi) CreateComposeTemplate(c *gin.Context) {
 // @Produce json
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /containers/template/search [post]
 func (b *BaseApi) SearchComposeTemplate(c *gin.Context) {
 	var req dto.SearchWithPage
@@ -59,6 +61,7 @@ func (b *BaseApi) SearchComposeTemplate(c *gin.Context) {
 // @Produce json
 // @Success 200 {array} dto.ComposeTemplateInfo
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /containers/template [get]
 func (b *BaseApi) ListComposeTemplate(c *gin.Context) {
 	list, err := composeTemplateService.List()
@@ -76,6 +79,7 @@ func (b *BaseApi) ListComposeTemplate(c *gin.Context) {
 // @Param request body dto.BatchDelete true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /containers/template/del [post]
 // @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"ids","isList":true,"db":"compose_templates","output_column":"name","output_value":"names"}],"formatZH":"删除 compose 模版 [names]","formatEN":"delete compose template [names]"}
 func (b *BaseApi) DeleteComposeTemplate(c *gin.Context) {
@@ -97,6 +101,7 @@ func (b *BaseApi) DeleteComposeTemplate(c *gin.Context) {
 // @Param request body dto.ComposeTemplateUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /containers/template/update [post]
 // @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"compose_templates","output_column":"name","output_value":"name"}],"formatZH":"更新 compose 模版 [name]","formatEN":"update compose template information [name]"}
 func (b *BaseApi) UpdateComposeTemplate(c *gin.Context) {
