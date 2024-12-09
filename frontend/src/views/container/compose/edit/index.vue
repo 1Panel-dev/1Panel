@@ -51,6 +51,7 @@
                                 :tabSize="4"
                                 :lineWrapping="true"
                                 :matchBrackets="true"
+                                :disabled="true"
                                 theme="cobalt"
                                 :styleActiveLine="true"
                                 :extensions="extensions"
@@ -93,7 +94,7 @@ const name = ref();
 const environmentStr = ref();
 const environmentEnv = ref();
 const createdBy = ref();
-const envFileContent = `env_file:\n  - 1panel.env`;
+const envFileContent = ref(`env_file:\n  - 1panel.env`);
 
 const onSubmitEdit = async () => {
     const param = {
