@@ -65,7 +65,7 @@ func SessionAuth() gin.HandlerFunc {
 
 func isValid1PanelToken(panelToken string, panelTimestamp string) bool {
 	system1PanelToken := global.CONF.System.ApiKey
-	if GenerateMD5("1panel"+panelToken+panelTimestamp) == GenerateMD5("1panel"+system1PanelToken+panelTimestamp) {
+	if panelToken == GenerateMD5("1panel"+system1PanelToken+panelTimestamp) {
 		return true
 	}
 	return false

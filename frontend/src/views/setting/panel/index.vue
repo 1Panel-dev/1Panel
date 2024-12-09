@@ -196,7 +196,7 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted, computed } from 'vue';
 import { ElForm, ElMessageBox } from 'element-plus';
-import { getSettingInfo, updateSetting, getSystemAvailable } from '@/api/modules/setting';
+import { getSettingInfo, updateSetting, getSystemAvailable, updateApiConfig } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { useTheme } from '@/hooks/use-theme';
@@ -391,19 +391,11 @@ const onChangeProxy = () => {
 
 const onChangeApiInterfaceStatus = async () => {
     if (form.apiInterfaceStatus === 'enable') {
-        loading.value = true;
-        await updateSetting({ key: 'ApiInterfaceStatus', value: form.apiInterfaceStatus })
-            .then(() => {
-                loading.value = false;
-                apiInterfaceRef.value.acceptParams({
-                    apiInterfaceStatus: form.apiInterfaceStatus,
-                    apiKey: form.apiKey,
-                    ipWhiteList: form.ipWhiteList,
-                });
-            })
-            .catch(() => {
-                loading.value = false;
-            });
+        apiInterfaceRef.value.acceptParams({
+            apiInterfaceStatus: form.apiInterfaceStatus,
+            apiKey: form.apiKey,
+            ipWhiteList: form.ipWhiteList,
+        });
         return;
     }
     ElMessageBox.confirm(i18n.t('setting.apiInterfaceClose'), i18n.t('setting.apiInterface'), {
@@ -413,7 +405,12 @@ const onChangeApiInterfaceStatus = async () => {
         .then(async () => {
             loading.value = true;
             form.apiInterfaceStatus = 'disable';
-            await updateSetting({ key: 'ApiInterfaceStatus', value: 'disable' })
+            let param = {
+                apiKey: form.apiKey,
+                ipWhiteList: form.ipWhiteList,
+                apiInterfaceStatus: form.apiInterfaceStatus,
+            };
+            await updateApiConfig(param)
                 .then(() => {
                     loading.value = false;
                     search();

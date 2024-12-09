@@ -21,15 +21,13 @@
                             <el-text type="danger">{{ $t('setting.apiInterfaceAlert2') }}</el-text>
                         </li>
                         <li>
-                            {{ $t('setting.apiInterfaceAlert3') }}
-                            <el-link :href="apiURL" type="success" target="_blank" class="mb-0.5 ml-0.5">
-                                {{ apiURL }}
+                            <el-link :href="apiURL" type="warning" target="_blank" class="mb-0.5 ml-0.5">
+                                {{ $t('setting.apiInterfaceAlert3') }}
                             </el-link>
                         </li>
                         <li>
-                            {{ $t('setting.apiInterfaceAlert4') }}
-                            <el-link :href="panelURL" type="success" target="_blank" class="mb-0.5 ml-0.5">
-                                {{ panelURL }}
+                            <el-link :href="panelURL" type="warning" target="_blank" class="mb-0.5 ml-0.5">
+                                {{ $t('setting.apiInterfaceAlert4') }}
                             </el-link>
                         </li>
                     </ul>
@@ -73,7 +71,7 @@
             <template #footer>
                 <span class="dialog-footer">
                     <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button :disabled="loading" type="primary" @click="onBind(formRef)">
+                    <el-button :disabled="loading" type="primary" @click="onSave(formRef)">
                         {{ $t('commons.button.confirm') }}
                     </el-button>
                 </span>
@@ -97,7 +95,7 @@ const formRef = ref();
 const apiURL = `${window.location.protocol}//${window.location.hostname}${
     window.location.port ? `:${window.location.port}` : ''
 }/1panel/swagger/index.html`;
-const panelURL = `https://1panel.cn/docs`;
+const panelURL = `https://1panel.cn/docs/dev_manual/api_manual/`;
 
 const form = reactive({
     apiKey: '',
@@ -171,7 +169,7 @@ const resetApiKey = async () => {
         });
 };
 
-const onBind = async (formEl: FormInstance | undefined) => {
+const onSave = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
