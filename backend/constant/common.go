@@ -116,6 +116,7 @@ var WebUrlMap = map[string]struct{}{
 	"/xpack/gpu":               {},
 	"/xpack/alert/dashboard":   {},
 	"/xpack/alert/log":         {},
+	"/xpack/alert/setting":     {},
 	"/xpack/setting":           {},
 }
 

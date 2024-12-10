@@ -822,7 +822,6 @@ export const Rules: CommonRule = {
     },
     phone: {
         validator: checkPhone,
-        required: true,
         trigger: 'blur',
     },
 };
