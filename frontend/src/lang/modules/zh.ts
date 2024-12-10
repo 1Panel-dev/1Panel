@@ -952,7 +952,7 @@ const message = {
         host: '主机',
         createConn: '新建连接',
         group: '分组',
-        manageGroup: '管理@.lower:terminal.group',
+        manageGroup: '管理@:terminal.group',
         noHost: '暂无主机',
         groupChange: '切换分组',
         expand: '全部展开',
