@@ -54,7 +54,7 @@
                     <el-table-column type="selection" fix />
                     <el-table-column
                         :label="$t('commons.table.name')"
-                        :min-width="60"
+                        :min-width="90"
                         prop="name"
                         sortable
                         show-overflow-tooltip
@@ -78,7 +78,7 @@
                     <el-table-column
                         v-if="isProductPro"
                         :label="$t('commons.table.status')"
-                        :min-width="70"
+                        :min-width="110"
                         prop="status"
                         sortable
                     >

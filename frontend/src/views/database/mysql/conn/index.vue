@@ -81,9 +81,11 @@
                             prop="password"
                         >
                             <el-input type="password" show-password clearable v-model="form.password">
+                                <template #suffix>
+                                    <CopyButton type="icon" :content="form.password" class="w-30" />
+                                </template>
                                 <template #append>
-                                    <CopyButton :content="form.password" />
-                                    <el-button @click="random" class="p-ml-5">
+                                    <el-button @click="random">
                                         {{ $t('commons.button.random') }}
                                     </el-button>
                                 </template>

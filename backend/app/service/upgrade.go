@@ -143,6 +143,7 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 			u.handleRollback(originalDir, 2)
 			return
 		}
+		_, _ = cmd.Execf("cp -r %s /usr/local/bin", path.Join(tmpDir, "lang"))
 		if _, err := cmd.Execf("sed -i -e 's#BASE_DIR=.*#BASE_DIR=%s#g' /usr/local/bin/1pctl", global.CONF.System.BaseDir); err != nil {
 			global.LOG.Errorf("upgrade basedir in 1pctl failed, err: %v", err)
 			u.handleRollback(originalDir, 2)
@@ -175,6 +176,7 @@ func (u *UpgradeService) handleBackup(fileOp files.FileOp, originalDir string) e
 	if err := fileOp.Copy("/etc/systemd/system/1panel.service", originalDir); err != nil {
 		return err
 	}
+	_, _ = cmd.Execf("cp -r /usr/local/bin/lang %s", originalDir)
 	checkPointOfWal()
 	if err := handleTar(path.Join(global.CONF.System.BaseDir, "1panel/db"), originalDir, "db.tar.gz", "db/1Panel.db-*", ""); err != nil {
 		return err
@@ -205,6 +207,8 @@ func (u *UpgradeService) handleRollback(originalDir string, errStep int) {
 	if err := common.CopyFile(path.Join(originalDir, "1pctl"), "/usr/local/bin"); err != nil {
 		global.LOG.Errorf("rollback 1panel failed, err: %v", err)
 	}
+	_, _ = cmd.Execf("cp -r %s /usr/local/bin", path.Join(originalDir, "lang"))
+
 	if errStep == 2 {
 		return
 	}

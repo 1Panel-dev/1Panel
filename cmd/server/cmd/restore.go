@@ -53,6 +53,7 @@ var restoreCmd = &cobra.Command{
 		if err := common.CopyFile(path.Join(tmpPath, "1pctl"), "/usr/local/bin"); err != nil {
 			return err
 		}
+		_, _ = cmdUtils.Execf("cp -r %s /usr/local/bin", path.Join(tmpPath, "lang"))
 		fmt.Println(i18n.GetMsgByKeyForCmd("RestoreStep3"))
 		if err := common.CopyFile(path.Join(tmpPath, "1panel.service"), "/etc/systemd/system"); err != nil {
 			return err

@@ -84,59 +84,86 @@
 
                     <el-form-item :label="$t('cronjob.cronSpec')" prop="spec">
                         <div v-for="(specObj, index) of dialogData.rowData.specObjs" :key="index" style="width: 100%">
-                            <el-select class="specTypeClass" v-model="specObj.specType" @change="changeSpecType(index)">
-                                <el-option
-                                    v-for="item in specOptions"
-                                    :key="item.label"
-                                    :value="item.value"
-                                    :label="item.label"
-                                />
-                            </el-select>
-                            <el-select v-if="specObj.specType === 'perWeek'" class="specClass" v-model="specObj.week">
-                                <el-option
-                                    v-for="item in weekOptions"
-                                    :key="item.label"
-                                    :value="item.value"
-                                    :label="item.label"
-                                />
-                            </el-select>
-                            <el-input v-if="hasDay(specObj)" class="specClass" v-model.number="specObj.day">
-                                <template #append>
-                                    <div class="append">{{ $t('cronjob.day') }}</div>
-                                </template>
-                            </el-input>
-                            <el-input v-if="hasHour(specObj)" class="specClass" v-model.number="specObj.hour">
-                                <template #append>
-                                    <div class="append">{{ $t('commons.units.hour') }}</div>
-                                </template>
-                            </el-input>
-                            <el-input
-                                v-if="specObj.specType !== 'perNSecond'"
-                                class="specClass"
-                                v-model.number="specObj.minute"
-                            >
-                                <template #append>
-                                    <div class="append">{{ $t('commons.units.minute') }}</div>
-                                </template>
-                            </el-input>
-                            <el-input
-                                v-if="specObj.specType === 'perNSecond'"
-                                class="specClass"
-                                v-model.number="specObj.second"
-                            >
-                                <template #append>
-                                    <div class="append">{{ $t('commons.units.second') }}</div>
-                                </template>
-                            </el-input>
-                            <el-button
-                                link
-                                type="primary"
-                                style="float: right; margin-top: 5px"
-                                @click="handleSpecDelete(index)"
-                                v-if="dialogData.rowData.specObjs.length > 1"
-                            >
-                                {{ $t('commons.button.delete') }}
-                            </el-button>
+                            <div class="grid sm:grid-cols-9 gap-4 grid-cols-1">
+                                <el-select
+                                    v-model="specObj.specType"
+                                    class="col-span-2"
+                                    @change="changeSpecType(index)"
+                                >
+                                    <el-option
+                                        v-for="item in specOptions"
+                                        :key="item.label"
+                                        :value="item.value"
+                                        :label="item.label"
+                                    />
+                                </el-select>
+                                <el-select
+                                    v-if="specObj.specType === 'perWeek'"
+                                    class="col-span-2"
+                                    v-model="specObj.week"
+                                >
+                                    <el-option
+                                        v-for="item in weekOptions"
+                                        :key="item.label"
+                                        :value="item.value"
+                                        :label="item.label"
+                                    />
+                                </el-select>
+                                <el-input v-if="hasDay(specObj)" class="col-span-2" v-model.number="specObj.day">
+                                    <template #append>
+                                        <div class="sm:min-w-8 min-w-14 text-center">
+                                            <el-tooltip :content="$t('cronjob.day')" placement="top">
+                                                {{ $t('cronjob.dayUnit') }}
+                                            </el-tooltip>
+                                        </div>
+                                    </template>
+                                </el-input>
+                                <el-input v-if="hasHour(specObj)" class="col-span-2" v-model.number="specObj.hour">
+                                    <template #append>
+                                        <div class="sm:min-w-8 min-w-14 text-center">
+                                            <el-tooltip :content="$t('commons.units.hour')" placement="top">
+                                                {{ $t('commons.units.hourUnit') }}
+                                            </el-tooltip>
+                                        </div>
+                                    </template>
+                                </el-input>
+                                <el-input
+                                    v-if="specObj.specType !== 'perNSecond'"
+                                    class="col-span-2"
+                                    v-model.number="specObj.minute"
+                                >
+                                    <template #append>
+                                        <div class="sm:min-w-8 min-w-14 text-center">
+                                            <el-tooltip :content="$t('commons.units.minute')" placement="top">
+                                                {{ $t('commons.units.minuteUnit') }}
+                                            </el-tooltip>
+                                        </div>
+                                    </template>
+                                </el-input>
+                                <el-input
+                                    v-if="specObj.specType === 'perNSecond'"
+                                    class="col-span-2"
+                                    v-model.number="specObj.second"
+                                >
+                                    <template #append>
+                                        <div class="sm:min-w-8 min-w-14 text-center">
+                                            <el-tooltip :content="$t('commons.units.second')" placement="top">
+                                                {{ $t('commons.units.secondUnit') }}
+                                            </el-tooltip>
+                                        </div>
+                                    </template>
+                                </el-input>
+                                <el-button
+                                    link
+                                    type="primary"
+                                    class="col-span-1"
+                                    style="float: right; margin-top: 5px"
+                                    @click="handleSpecDelete(index)"
+                                    v-if="dialogData.rowData.specObjs.length > 1"
+                                >
+                                    {{ $t('commons.button.delete') }}
+                                </el-button>
+                            </div>
                             <el-divider v-if="dialogData.rowData.specObjs.length > 1" class="divider" />
                         </div>
                     </el-form-item>
@@ -838,37 +865,9 @@ defineExpose({
 });
 </script>
 <style scoped lang="scss">
-.specClass {
-    width: 20% !important;
-    margin-left: 20px;
-
-    .append {
-        width: 20px;
-    }
+:deep(.el-input-group__append) {
+    padding: 0 10px;
 }
-
-@media only screen and (max-width: 1000px) {
-    .specClass {
-        width: 100% !important;
-        margin-top: 20px;
-        margin-left: 0;
-
-        .append {
-            width: 43px;
-        }
-    }
-}
-
-.specTypeClass {
-    width: 22% !important;
-}
-
-@media only screen and (max-width: 1000px) {
-    .specTypeClass {
-        width: 100% !important;
-    }
-}
-
 .selectClass {
     width: 100%;
 }

@@ -51,7 +51,7 @@
                                         v-model="form.mirrors"
                                         class="sm:calc(100% - 80px)"
                                     />
-                                    <el-button @click="onChangeMirrors" icon="Setting">
+                                    <el-button @click="onChangeMirrors" icon="Setting" class="custom-input-textarea">
                                         {{ $t('commons.button.set') }}
                                     </el-button>
                                 </div>

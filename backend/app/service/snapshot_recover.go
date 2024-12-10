@@ -104,6 +104,7 @@ func (u *SnapshotService) HandleSnapshotRecover(snap model.Snapshot, isRecover b
 			updateRecoverStatus(snap.ID, isRecover, "1PctlBinary", constant.StatusFailed, err.Error())
 			return
 		}
+		_, _ = cmd.Execf("cp -r %s %s", path.Join(snapFileDir, "1panel/lang"), "/usr/local/bin/")
 		global.LOG.Debug("recover 1pctl from snapshot file successful!")
 		req.IsNew = true
 	}

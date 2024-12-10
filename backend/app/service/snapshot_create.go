@@ -50,6 +50,7 @@ func snapPanel(snap snapHelper, targetDir string) {
 	if err := common.CopyFile("/usr/local/bin/1pctl", targetDir); err != nil {
 		status = err.Error()
 	}
+	_, _ = cmd.Execf("cp -r /usr/local/bin/lang %s", targetDir)
 
 	if err := common.CopyFile("/etc/systemd/system/1panel.service", targetDir); err != nil {
 		status = err.Error()

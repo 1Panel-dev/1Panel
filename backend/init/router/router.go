@@ -156,6 +156,9 @@ func Routers() *gin.Engine {
 		Router.Use(middleware.DemoHandle())
 	}
 
+	Router.Use(middleware.WhiteAllow())
+	Router.Use(middleware.BindDomain())
+
 	Router.NoRoute(func(c *gin.Context) {
 		if checkFrontendPath(c) {
 			toIndexHtml(c)
@@ -182,8 +185,7 @@ func Routers() *gin.Engine {
 		setWebStatic(PublicGroup)
 	}
 	PrivateGroup := Router.Group("/api/v1")
-	PrivateGroup.Use(middleware.WhiteAllow())
-	PrivateGroup.Use(middleware.BindDomain())
+
 	PrivateGroup.Use(middleware.GlobalLoading())
 	for _, router := range rou.RouterGroupApp {
 		router.InitRouter(PrivateGroup)

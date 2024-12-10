@@ -21,4 +21,10 @@ if [ ! -f "GeoIP.mmdb" ]; then
   wget https://resource.1panel.hk/geo/GeoIP.mmdb
 fi
 
+if [ ! -f "lang.tar.gz" ]; then 
+  wget https://resource.1panel.hk/language/lang.tar.gz
+  tar zxvf lang.tar.gz
+  rm -rf lang.tar.gz
+fi
+
 chmod 755 1pctl install.sh

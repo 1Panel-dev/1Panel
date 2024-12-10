@@ -33,7 +33,7 @@ func GetIPLocation(ip, lang string) (string, error) {
 		return "", err
 	}
 	if lang == "en" {
-		return geoLocation.Country.En + geoLocation.Province.En, nil
+		return geoLocation.Country.En + " " + geoLocation.Province.En, nil
 	}
-	return geoLocation.Country.Zh + geoLocation.Province.Zh, nil
+	return geoLocation.Country.Zh + " " + geoLocation.Province.Zh, nil
 }

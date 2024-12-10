@@ -101,6 +101,7 @@
                             :indent-with-tab="true"
                             :tabSize="4"
                             :lineWrapping="true"
+                            :disabled="true"
                             :matchBrackets="true"
                             theme="cobalt"
                             :styleActiveLine="true"
