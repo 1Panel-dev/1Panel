@@ -6,7 +6,7 @@
             <span>{{ $t('container.startIn') }}</span>
         </el-card>
 
-        <LayoutContent :title="$t('container.volume')" :class="{ mask: dockerStatus != 'Running' }">
+        <LayoutContent :title="$t('container.volume', 2)" :class="{ mask: dockerStatus != 'Running' }">
             <template #toolbar>
                 <div class="flex justify-between gap-2 flex-wrap sm:flex-row">
                     <div class="flex flex-wrap gap-3">

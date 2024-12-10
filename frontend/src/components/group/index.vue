@@ -7,7 +7,7 @@
         :before-close="handleClose"
     >
         <template #header>
-            <Header :header="$t('website.group')" :back="handleClose"></Header>
+            <Header :header="$t('website.manageGroup')" :back="handleClose"></Header>
         </template>
 
         <ComplexTable :data="data" @search="search()">

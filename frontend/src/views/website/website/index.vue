@@ -3,12 +3,12 @@
         <RouterButton
             :buttons="[
                 {
-                    label: i18n.global.t('website.website'),
+                    label: i18n.global.t('website.website', 2),
                     path: '/websites',
                 },
             ]"
         />
-        <LayoutContent :title="$t('website.website')" v-loading="loading">
+        <LayoutContent :title="$t('website.website', 2)" v-loading="loading">
             <template #app>
                 <AppStatus
                     :app-key="'openresty'"
@@ -28,7 +28,7 @@
                             {{ $t('website.create') }}
                         </el-button>
                         <el-button type="primary" plain @click="openGroup">
-                            {{ $t('website.group') }}
+                            {{ $t('website.manageGroup') }}
                         </el-button>
                         <el-button type="primary" plain @click="openDefault">
                             {{ $t('website.defaultServer') }}

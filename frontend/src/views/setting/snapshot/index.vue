@@ -1,6 +1,6 @@
 <template>
     <div>
-        <LayoutContent v-loading="loading" v-if="!isRecordShow" :title="$t('setting.snapshot')">
+        <LayoutContent v-loading="loading" v-if="!isRecordShow" :title="$t('setting.snapshot', 2)">
             <template #toolbar>
                 <div class="flex justify-between gap-2 flex-wrap sm:flex-row">
                     <div class="flex flex-wrap gap-3">
@@ -11,7 +11,7 @@
                             {{ $t('setting.importSnapshot') }}
                         </el-button>
                         <el-button type="primary" plain @click="onIgnore()">
-                            {{ $t('setting.ignoreRule') }}
+                            {{ $t('setting.editIgnoreRule') }}
                         </el-button>
                         <el-button type="primary" plain :disabled="selects.length === 0" @click="batchDelete(null)">
                             {{ $t('commons.button.delete') }}

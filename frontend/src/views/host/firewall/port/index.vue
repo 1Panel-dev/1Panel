@@ -55,7 +55,7 @@
                         <div class="flex justify-between gap-2 flex-wrap sm:flex-row">
                             <div class="flex flex-wrap gap-3">
                                 <el-button type="primary" @click="onOpenDialog('create')">
-                                    {{ $t('commons.button.create') }}{{ $t('firewall.portRule') }}
+                                    {{ $t('firewall.createPortRule') }}
                                 </el-button>
                                 <el-button @click="onDelete(null)" plain :disabled="selects.length === 0">
                                     {{ $t('commons.button.delete') }}

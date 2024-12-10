@@ -1,6 +1,6 @@
 <template>
     <div>
-        <LayoutContent v-loading="loading" :title="$t('terminal.quickCommand')">
+        <LayoutContent v-loading="loading" :title="$t('terminal.quickCommand', 2)">
             <template #prompt>
                 <el-alert type="info" :title="$t('terminal.quickCommandHelper')" :closable="false" />
             </template>
@@ -8,10 +8,10 @@
                 <div class="flex w-full flex-col gap-4 md:justify-between md:flex-row">
                     <div class="flex flex-wrap gap-4">
                         <el-button type="primary" @click="onCreate()">
-                            {{ $t('commons.button.create') }}{{ $t('terminal.quickCommand') }}
+                            {{ $t('commons.button.create') }}
                         </el-button>
                         <el-button type="primary" plain @click="onOpenGroupDialog()">
-                            {{ $t('terminal.group') }}
+                            {{ $t('terminal.manageGroup') }}
                         </el-button>
                         <el-button type="primary" plain :disabled="selects.length === 0" @click="batchDelete(null)">
                             {{ $t('commons.button.delete') }}

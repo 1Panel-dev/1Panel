@@ -8,7 +8,7 @@
             size="50%"
         >
             <template #header>
-                <DrawerHeader :header="title + $t('setting.backupAccount')" :back="handleClose" />
+                <DrawerHeader :header="title + $t('setting.backupAccount').toLowerCase()" :back="handleClose" />
             </template>
             <el-form @submit.prevent ref="formRef" v-loading="loading" label-position="top" :model="s3Data.rowData">
                 <el-row type="flex" justify="center">

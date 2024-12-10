@@ -1,7 +1,7 @@
 <template>
     <div>
         <RouterButton :buttons="routerButton" />
-        <LayoutContent :title="$t('website.ssl')">
+        <LayoutContent :title="$t('website.ssl', 2)">
             <template #toolbar>
                 <div class="flex flex-wrap gap-3">
                     <el-button type="primary" @click="openSSL()">
@@ -192,7 +192,7 @@ let selects = ref<any>([]);
 
 const routerButton = [
     {
-        label: i18n.global.t('website.ssl'),
+        label: i18n.global.t('website.ssl', 2),
         path: '/websites/ssl',
     },
 ];

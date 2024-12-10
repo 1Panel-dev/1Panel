@@ -3,17 +3,17 @@
         <RouterButton
             :buttons="[
                 {
-                    label: i18n.global.t('cronjob.cronTask'),
+                    label: i18n.global.t('cronjob.cronTask', 2),
                     path: '/cronjobs',
                 },
             ]"
         />
-        <LayoutContent v-loading="loading" v-if="!isRecordShow" :title="$t('cronjob.cronTask')">
+        <LayoutContent v-loading="loading" v-if="!isRecordShow" :title="$t('cronjob.cronTask', 2)">
             <template #toolbar>
                 <div class="flex justify-between gap-2 flex-wrap sm:flex-row">
                     <div class="flex flex-wrap gap-3">
                         <el-button type="primary" @click="onOpenDialog('create')">
-                            {{ $t('commons.button.create') }}{{ $t('cronjob.cronTask') }}
+                            {{ $t('cronjob.create') }}
                         </el-button>
                         <el-button-group class="ml-4">
                             <el-button plain :disabled="selects.length === 0" @click="onBatchChangeStatus('enable')">

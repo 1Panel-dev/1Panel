@@ -212,7 +212,7 @@
                                         </div>
                                         <div class="d-description">
                                             <el-button class="tagMargin" plain size="small">
-                                                {{ $t('app.version') }}：{{ installed.version }}
+                                                {{ $t('app.version') }}{{ $t('commons.colon') }}{{ installed.version }}
                                             </el-button>
 
                                             <el-button
@@ -223,7 +223,7 @@
                                                 plain
                                                 size="small"
                                             >
-                                                {{ $t('app.busPort') }}：{{ installed.httpPort }}
+                                                {{ $t('app.busPort') }}{{ $t('commons.colon') }}{{ installed.httpPort }}
                                             </el-button>
 
                                             <el-button
@@ -234,12 +234,14 @@
                                                 plain
                                                 size="small"
                                             >
-                                                {{ $t('app.busPort') }}：{{ installed.httpsPort }}
+                                                {{ $t('app.busPort') }}{{ $t('commons.colon')
+                                                }}{{ installed.httpsPort }}
                                             </el-button>
 
                                             <div class="description">
                                                 <span>
-                                                    {{ $t('app.alreadyRun') }}： {{ getAge(installed.createdAt) }}
+                                                    {{ $t('app.alreadyRun') }}{{ $t('commons.colon') }}
+                                                    {{ getAge(installed.createdAt) }}
                                                 </span>
                                             </div>
                                         </div>

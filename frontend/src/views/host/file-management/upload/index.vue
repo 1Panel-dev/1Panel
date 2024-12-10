@@ -13,9 +13,9 @@
         <div class="button-container">
             <div>
                 <el-button type="primary" @click="upload('file')">
-                    {{ $t('file.upload') }}{{ $t('file.file') }}
+                    {{ $t('file.uploadFile') }}
                 </el-button>
-                <el-button type="primary" @click="upload('dir')">{{ $t('file.upload') }}{{ $t('file.dir') }}</el-button>
+                <el-button type="primary" @click="upload('dir')">{{ $t('file.uploadDirectory') }}</el-button>
             </div>
             <el-button @click="clearFiles">{{ $t('file.clearList') }}</el-button>
         </div>

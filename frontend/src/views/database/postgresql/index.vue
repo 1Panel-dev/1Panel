@@ -77,7 +77,7 @@
                             {{ $t('database.loadFromRemote') }}
                         </el-button>
                         <el-button @click="goRemoteDB" type="primary" plain>
-                            {{ $t('database.remoteDB') }}
+                            {{ $t('database.manageRemoteDB') }}
                         </el-button>
                         <el-button @click="goDashboard()" type="primary" plain>PGAdmin4</el-button>
                     </div>

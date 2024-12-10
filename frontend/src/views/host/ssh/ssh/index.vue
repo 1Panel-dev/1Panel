@@ -52,7 +52,7 @@
             </el-card>
         </div>
 
-        <LayoutContent style="margin-top: 20px" :title="$t('menu.config')" :divider="true">
+        <LayoutContent style="margin-top: 20px" :title="$t('menu.settings', 2)" :divider="true">
             <template #main>
                 <el-radio-group v-model="confShowType" @change="changeMode">
                     <el-radio-button value="base">{{ $t('database.baseConf') }}</el-radio-button>

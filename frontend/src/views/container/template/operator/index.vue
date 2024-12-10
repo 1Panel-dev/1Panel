@@ -8,7 +8,7 @@
     >
         <template #header>
             <DrawerHeader
-                :header="title + $t('container.composeTemplate')"
+                :header="title + $t('container.composeTemplate').toLowerCase()"
                 :hideResource="dialogData.title === 'create'"
                 :resource="dialogData.rowData?.name"
                 :back="handleClose"

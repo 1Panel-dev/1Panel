@@ -45,19 +45,19 @@
                         <div class="h-overview">
                             <el-row>
                                 <el-col :span="6">
-                                    <span>{{ $t('menu.website') }}</span>
+                                    <span>{{ $t('menu.website', 2) }}</span>
                                     <div class="count">
                                         <span @click="goRouter('/websites')">{{ baseInfo?.websiteNumber }}</span>
                                     </div>
                                 </el-col>
                                 <el-col :span="6">
-                                    <span>{{ $t('menu.database') }} - {{ $t('database.all') }}</span>
+                                    <span>{{ $t('menu.database', 2) }} - {{ $t('database.all') }}</span>
                                     <div class="count">
                                         <span @click="goRouter('/databases')">{{ baseInfo?.databaseNumber }}</span>
                                     </div>
                                 </el-col>
                                 <el-col :span="6">
-                                    <span>{{ $t('menu.cronjob') }}</span>
+                                    <span>{{ $t('menu.cronjob', 2) }}</span>
                                     <div class="count">
                                         <span @click="goRouter('/cronjobs')">
                                             {{ baseInfo?.cronjobNumber }}
@@ -566,16 +566,16 @@ function loadUpTime(uptime: number) {
     if (days !== 0) {
         return (
             days +
-            i18n.global.t('commons.units.day') +
+            i18n.global.t('commons.units.day', days) +
             ' ' +
             hours +
-            i18n.global.t('commons.units.hour') +
+            i18n.global.t('commons.units.hour', hours) +
             ' ' +
             minutes +
-            i18n.global.t('commons.units.minute') +
+            i18n.global.t('commons.units.minute', minutes) +
             ' ' +
             seconds +
-            i18n.global.t('commons.units.second')
+            i18n.global.t('commons.units.second', seconds)
         );
     }
     if (hours !== 0) {

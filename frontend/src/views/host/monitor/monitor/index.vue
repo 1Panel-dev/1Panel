@@ -118,7 +118,7 @@
                 <el-card style="overflow: inherit">
                     <template #header>
                         <div :class="mobile ? 'flx-wrap' : 'flx-justify-between'">
-                            <span class="title">{{ $t('monitor.disk') }} IO</span>
+                            <span class="title">{{ $t('monitor.disk') }} I/O</span>
                             <el-date-picker
                                 @change="search('io')"
                                 v-model="timeRangeIO"
@@ -149,7 +149,7 @@
                     <template #header>
                         <div :class="mobile ? 'flx-wrap' : 'flx-justify-between'">
                             <div>
-                                <span class="title">{{ $t('monitor.network') }} IO:</span>
+                                <span class="title">{{ $t('monitor.network') }}{{ $t('commons.colon') }}</span>
                                 <el-popover placement="bottom" :width="200" trigger="click">
                                     <el-select @change="search('network')" v-model="networkChoose">
                                         <template #prefix>{{ $t('monitor.networkCard') }}</template>
@@ -398,15 +398,15 @@ function initLoadCharts(item: Host.MonitorData) {
         xData: loadDate,
         yData: [
             {
-                name: '1 ' + i18n.global.t('commons.units.minute'),
+                name: '1 ' + i18n.global.t('commons.units.minute', 1),
                 data: load1Data,
             },
             {
-                name: '5 ' + i18n.global.t('commons.units.minute'),
+                name: '5 ' + i18n.global.t('commons.units.minute', 5),
                 data: load5Data,
             },
             {
-                name: '15 ' + i18n.global.t('commons.units.minute'),
+                name: '15 ' + i18n.global.t('commons.units.minute', 15),
                 data: load15Data,
             },
             {
@@ -416,7 +416,7 @@ function initLoadCharts(item: Host.MonitorData) {
             },
         ],
         yAxis: [
-            { type: 'value', name: i18n.global.t('monitor.loadDetail') + ' ( % )' },
+            { type: 'value', name: i18n.global.t('monitor.loadDetail') },
             {
                 type: 'value',
                 name: i18n.global.t('monitor.resourceUsage') + ' ( % )',
@@ -425,7 +425,22 @@ function initLoadCharts(item: Host.MonitorData) {
             },
         ],
         grid: mobile.value ? { left: '15%', right: '15%', bottom: '20%' } : null,
-        formatStr: '%',
+        tooltip: {
+            trigger: 'axis',
+            formatter: function (datas: any) {
+                let res = datas[0].name + '<br/>';
+                for (const item of datas) {
+                    if (item.seriesName === i18n.global.t('monitor.resourceUsage')) {
+                        res +=
+                            item.marker + ' ' + item.seriesName + i18n.global.t('commons.colon') + item.data + '%<br/>';
+                    } else {
+                        res +=
+                            item.marker + ' ' + item.seriesName + i18n.global.t('commons.colon') + item.data + '<br/>';
+                    }
+                }
+                return res;
+            },
+        },
     };
 }
 
@@ -481,14 +496,20 @@ function initIOCharts(item: Host.MonitorData) {
                         item.seriesName === i18n.global.t('monitor.read') ||
                         item.seriesName === i18n.global.t('monitor.write')
                     ) {
-                        res += item.marker + ' ' + item.seriesName + '：' + computeSizeFromKBs(item.data) + '<br/>';
+                        res +=
+                            item.marker +
+                            ' ' +
+                            item.seriesName +
+                            i18n.global.t('commons.colon') +
+                            computeSizeFromKBs(item.data) +
+                            '<br/>';
                     }
                     if (item.seriesName === i18n.global.t('monitor.readWriteCount')) {
                         res +=
                             item.marker +
                             ' ' +
                             item.seriesName +
-                            '：' +
+                            i18n.global.t('commons.colon') +
                             item.data +
                             ' ' +
                             i18n.global.t('commons.units.time') +
@@ -496,7 +517,14 @@ function initIOCharts(item: Host.MonitorData) {
                             '<br/>';
                     }
                     if (item.seriesName === i18n.global.t('monitor.readWriteTime')) {
-                        res += item.marker + ' ' + item.seriesName + '：' + item.data + ' ms' + '<br/>';
+                        res +=
+                            item.marker +
+                            ' ' +
+                            item.seriesName +
+                            i18n.global.t('commons.colon') +
+                            item.data +
+                            ' ms' +
+                            '<br/>';
                     }
                 }
                 return res;

@@ -1,7 +1,7 @@
 <template>
     <div>
         <FireRouter />
-        <LayoutContent :title="$t('menu.network')" v-loading="loading">
+        <LayoutContent :title="$t('menu.network', 2)" v-loading="loading">
             <template #toolbar>
                 <div class="flex justify-between gap-2 flex-wrap sm:flex-row">
                     <div><!-- 占位 --></div>

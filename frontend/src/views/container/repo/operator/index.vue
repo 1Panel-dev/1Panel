@@ -8,7 +8,7 @@
     >
         <template #header>
             <DrawerHeader
-                :header="title + $t('container.repo')"
+                :header="title + $t('container.repo').toLowerCase()"
                 :resource="dialogData.rowData?.name"
                 :back="handleClose"
             />

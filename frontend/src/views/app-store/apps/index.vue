@@ -1,5 +1,5 @@
 <template>
-    <LayoutContent v-loading="loading" v-if="!showDetail" :title="$t('app.app')">
+    <LayoutContent v-loading="loading" v-if="!showDetail" :title="$t('app.app', 2)">
         <template #toolbar>
             <el-row :gutter="5">
                 <el-col :xs="24" :sm="20" :md="20" :lg="20" :xl="20">

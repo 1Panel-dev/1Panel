@@ -94,7 +94,7 @@
                                     {{ $t('file.compress') }}
                                 </el-button>
                                 <el-button plain @click="openBatchRole(selects)" :disabled="selects.length === 0">
-                                    {{ $t('file.role') }}
+                                    {{ $t('file.editPermissions') }}
                                 </el-button>
                                 <el-button plain @click="batchDelFiles" :disabled="selects.length === 0">
                                     {{ $t('commons.button.delete') }}
@@ -102,7 +102,7 @@
                             </el-button-group>
 
                             <el-button class="btn" @click="toTerminal">
-                                {{ $t('menu.terminal') }}
+                                {{ $t('file.terminal') }}
                             </el-button>
 
                             <el-button-group class="copy-button" v-if="moveOpen">
@@ -1088,7 +1088,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('file.mode'),
+        label: i18n.global.t('file.editPermissions'),
         click: (row: File.File) => {
             openBatchRole([row]);
         },

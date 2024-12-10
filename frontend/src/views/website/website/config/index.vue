@@ -25,7 +25,7 @@
                     {{ $t('website.log') }}
                 </el-button>
                 <el-button type="primary" :plain="index !== 'resource'" @click="changeTab('resource')">
-                    {{ $t('website.source') }}
+                    {{ $t('website.source', 2) }}
                 </el-button>
                 <el-button type="primary" v-if="configPHP" :plain="index !== 'php'" @click="changeTab('php')">
                     PHP

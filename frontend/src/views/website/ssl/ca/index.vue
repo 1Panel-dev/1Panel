@@ -7,7 +7,7 @@
         @close="handleClose"
     >
         <template #header>
-            <DrawerHeader :header="$t('ssl.ca')" :back="handleClose" />
+            <DrawerHeader :header="$t('ssl.selfSigned')" :back="handleClose" />
         </template>
         <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()" v-loading="loading">
             <template #toolbar>

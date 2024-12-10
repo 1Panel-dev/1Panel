@@ -7,7 +7,7 @@
         size="50%"
     >
         <template #header>
-            <DrawerHeader :header="$t('file.setRole')" :back="handleClose" />
+            <DrawerHeader :header="$t('file.editPermissions')" :back="handleClose" />
         </template>
 
         <el-row>

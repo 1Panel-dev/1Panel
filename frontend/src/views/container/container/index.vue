@@ -5,7 +5,7 @@
             <el-button type="primary" class="bt" link @click="goSetting">【 {{ $t('container.setting') }} 】</el-button>
             <span>{{ $t('container.startIn') }}</span>
         </el-card>
-        <LayoutContent :title="$t('container.container')" :class="{ mask: dockerStatus != 'Running' }">
+        <LayoutContent :title="$t('container.container', 2)" :class="{ mask: dockerStatus != 'Running' }">
             <template #rightButton>
                 <div class="flex justify-end">
                     <div class="mr-10">
@@ -649,7 +649,7 @@ const onOperate = async (op: string, row: Container.ContainerInfo | null) => {
 
 const buttons = [
     {
-        label: i18n.global.t('file.terminal'),
+        label: i18n.global.t('container.containerTerminal'),
         disabled: (row: Container.ContainerInfo) => {
             return row.state !== 'running';
         },

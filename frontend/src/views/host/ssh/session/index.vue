@@ -1,7 +1,7 @@
 <template>
     <div>
         <FireRouter />
-        <LayoutContent :title="$t('ssh.session')">
+        <LayoutContent :title="$t('ssh.session', 2)">
             <template #toolbar>
                 <div class="flex justify-between gap-2 flex-wrap sm:flex-row">
                     <div><!-- 占位 --></div>
