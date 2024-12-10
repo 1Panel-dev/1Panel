@@ -40,8 +40,7 @@ archives:
       - 1pctl
       - 1panel.service
       - install.sh
-      - README.md
-      - LICENSE
+      - GeoIP.mmdb
       - lang/*
 
 checksum:
