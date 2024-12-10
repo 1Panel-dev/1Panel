@@ -13,6 +13,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/model"
+	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
@@ -51,7 +52,7 @@ func NewIBackupService() IBackupService {
 
 func (u *BackupService) Get(req dto.OperateByID) (dto.BackupInfo, error) {
 	var data dto.BackupInfo
-	account, err := backupRepo.Get(commonRepo.WithByID(req.ID))
+	account, err := backupRepo.Get(repo.WithByID(req.ID))
 	if err != nil {
 		return data, err
 	}
@@ -70,7 +71,7 @@ func (u *BackupService) Get(req dto.OperateByID) (dto.BackupInfo, error) {
 }
 
 func (u *BackupService) List(req dto.OperateByIDs) ([]dto.BackupInfo, error) {
-	accounts, err := backupRepo.List(commonRepo.WithByIDs(req.IDs), commonRepo.WithOrderBy("created_at desc"))
+	accounts, err := backupRepo.List(repo.WithByIDs(req.IDs), repo.WithOrderBy("created_at desc"))
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +95,7 @@ func (u *BackupService) List(req dto.OperateByIDs) ([]dto.BackupInfo, error) {
 }
 
 func (u *BackupService) GetLocalDir() (string, error) {
-	account, err := backupRepo.Get(commonRepo.WithByType(constant.Local))
+	account, err := backupRepo.Get(repo.WithByType(constant.Local))
 	if err != nil {
 		return "", err
 	}
@@ -106,7 +107,7 @@ func (u *BackupService) GetLocalDir() (string, error) {
 }
 
 func (u *BackupService) LoadBackupOptions() ([]dto.BackupOption, error) {
-	accounts, err := backupRepo.List(commonRepo.WithOrderBy("created_at desc"))
+	accounts, err := backupRepo.List(repo.WithOrderBy("created_at desc"))
 	if err != nil {
 		return nil, err
 	}
@@ -125,9 +126,9 @@ func (u *BackupService) SearchWithPage(req dto.SearchPageWithType) (int64, inter
 	count, accounts, err := backupRepo.Page(
 		req.Page,
 		req.PageSize,
-		commonRepo.WithByType(req.Type),
-		commonRepo.WithByName(req.Info),
-		commonRepo.WithOrderBy("created_at desc"),
+		repo.WithByType(req.Type),
+		repo.WithByName(req.Info),
+		repo.WithOrderBy("created_at desc"),
 	)
 	if err != nil {
 		return 0, nil, err
@@ -181,7 +182,7 @@ func (u *BackupService) LoadBackupClientInfo(clientType string) (dto.BackupClien
 	} else {
 		data.RedirectUri = constant.OneDriveRedirectURI
 	}
-	clientID, err := settingRepo.Get(commonRepo.WithByKey(clientIDKey))
+	clientID, err := settingRepo.Get(repo.WithByKey(clientIDKey))
 	if err != nil {
 		return data, err
 	}
@@ -190,7 +191,7 @@ func (u *BackupService) LoadBackupClientInfo(clientType string) (dto.BackupClien
 		return data, err
 	}
 	data.ClientID = string(idItem)
-	clientSecret, err := settingRepo.Get(commonRepo.WithByKey(clientIDSc))
+	clientSecret, err := settingRepo.Get(repo.WithByKey(clientIDSc))
 	if err != nil {
 		return data, err
 	}
@@ -204,7 +205,7 @@ func (u *BackupService) LoadBackupClientInfo(clientType string) (dto.BackupClien
 }
 
 func (u *BackupService) Create(req dto.BackupOperate) error {
-	backup, _ := backupRepo.Get(commonRepo.WithByName(req.Name))
+	backup, _ := backupRepo.Get(repo.WithByName(req.Name))
 	if backup.ID != 0 {
 		return constant.ErrRecordExist
 	}
@@ -279,7 +280,7 @@ func (u *BackupService) GetBuckets(req dto.ForBuckets) ([]interface{}, error) {
 }
 
 func (u *BackupService) Delete(id uint) error {
-	backup, _ := backupRepo.Get(commonRepo.WithByID(id))
+	backup, _ := backupRepo.Get(repo.WithByID(id))
 	if backup.ID == 0 {
 		return constant.ErrRecordNotFound
 	}
@@ -295,11 +296,11 @@ func (u *BackupService) Delete(id uint) error {
 		return buserr.New(constant.ErrBackupInUsed)
 	}
 
-	return backupRepo.Delete(commonRepo.WithByID(id))
+	return backupRepo.Delete(repo.WithByID(id))
 }
 
 func (u *BackupService) Update(req dto.BackupOperate) error {
-	backup, _ := backupRepo.Get(commonRepo.WithByID(req.ID))
+	backup, _ := backupRepo.Get(repo.WithByID(req.ID))
 	if backup.ID == 0 {
 		return constant.ErrRecordNotFound
 	}

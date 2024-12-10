@@ -3,7 +3,7 @@ import { GlobalStore } from '@/store';
 export const useTheme = () => {
     const globalStore = GlobalStore();
     const switchTheme = () => {
-        if (globalStore.themeConfig.isGold && globalStore.isProductPro) {
+        if (globalStore.themeConfig.isGold && globalStore.isMasterProductPro) {
             const body = document.documentElement as HTMLElement;
             body.setAttribute('class', 'dark-gold');
             return;

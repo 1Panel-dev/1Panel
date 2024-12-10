@@ -1,24 +1,39 @@
 import http from '@/api';
 import { deepCopy } from '@/utils/util';
 import { Base64 } from 'js-base64';
-import { ResPage, SearchWithPage, DescriptionUpdate } from '../interface';
+import { ResPage, SearchWithPage, DescriptionUpdate, ReqPage } from '../interface';
 import { Setting } from '../interface/setting';
 
 // license
 export const UploadFileData = (params: FormData) => {
-    return http.upload('/xpack/licenses/upload', params);
+    return http.upload('/core/licenses/upload', params);
 };
-export const getLicense = () => {
-    return http.get<Setting.License>(`/xpack/licenses/get`);
+export const SearchLicense = (params: ReqPage) => {
+    return http.post<ResPage<Setting.License>>('/core/licenses/search', params);
+};
+export const DeleteLicense = (id: number, force: boolean) => {
+    return http.post('/core/licenses/del', { id: id, force: force });
 };
 export const getLicenseStatus = () => {
-    return http.get<Setting.LicenseStatus>(`/xpack/licenses/get/status`);
+    return http.get<Setting.LicenseStatus>(`/core/licenses/status`);
 };
-export const syncLicense = () => {
-    return http.post(`/xpack/licenses/sync`);
+export const getMasterLicenseStatus = () => {
+    return http.get<Setting.LicenseStatus>(`/core/licenses/master/status`);
 };
-export const unbindLicense = () => {
-    return http.post(`/xpack/licenses/unbind`);
+export const syncLicense = (id: number) => {
+    return http.post(`/core/licenses/sync`, { id: id });
+};
+export const bindLicense = (id: number, nodeID: number) => {
+    return http.post(`/core/licenses/bind`, { nodeID: nodeID, licenseID: id });
+};
+export const unbindLicense = (id: number) => {
+    return http.post(`/core/licenses/unbind`, { id: id });
+};
+export const loadLicenseOptions = () => {
+    return http.get(`/core/licenses/options`);
+};
+export const listNodeOptions = () => {
+    return http.get<Array<Setting.NodeItem>>(`/core/nodes/list`);
 };
 
 // agent

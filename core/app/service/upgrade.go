@@ -12,6 +12,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/model"
+	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/cmd"
@@ -35,11 +36,11 @@ func NewIUpgradeService() IUpgradeService {
 
 func (u *UpgradeService) SearchUpgrade() (*dto.UpgradeInfo, error) {
 	var upgrade dto.UpgradeInfo
-	currentVersion, err := settingRepo.Get(commonRepo.WithByKey("SystemVersion"))
+	currentVersion, err := settingRepo.Get(repo.WithByKey("SystemVersion"))
 	if err != nil {
 		return nil, err
 	}
-	DeveloperMode, err := settingRepo.Get(commonRepo.WithByKey("DeveloperMode"))
+	DeveloperMode, err := settingRepo.Get(repo.WithByKey("DeveloperMode"))
 	if err != nil {
 		return nil, err
 	}
@@ -167,7 +168,7 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 }
 
 func (u *UpgradeService) Rollback(req dto.OperateByID) error {
-	log, _ := upgradeLogRepo.Get(commonRepo.WithByID(req.ID))
+	log, _ := upgradeLogRepo.Get(repo.WithByID(req.ID))
 	if log.ID == 0 {
 		return constant.ErrRecordNotFound
 	}

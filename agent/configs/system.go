@@ -3,10 +3,11 @@ package configs
 type System struct {
 	Mode string `mapstructure:"mode"`
 
-	Version    string `mapstructure:"version"`
-	BaseDir    string `mapstructure:"base_dir"`
-	MasterAddr string `mapstructure:"master_addr"`
-	EncryptKey string `mapstructure:"encrypt_key"`
+	Version     string `mapstructure:"version"`
+	BaseDir     string `mapstructure:"base_dir"`
+	CurrentNode string `mapstructure:"base_dir"`
+	MasterAddr  string `mapstructure:"master_addr"`
+	EncryptKey  string `mapstructure:"encrypt_key"`
 
 	DbFile  string `mapstructure:"db_agent_file"`
 	DbPath  string `mapstructure:"db_path"`

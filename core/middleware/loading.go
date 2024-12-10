@@ -10,8 +10,7 @@ import (
 func GlobalLoading() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		settingRepo := repo.NewISettingRepo()
-		commonRepo := repo.NewICommonRepo()
-		status, err := settingRepo.Get(commonRepo.WithByKey("SystemStatus"))
+		status, err := settingRepo.Get(repo.WithByKey("SystemStatus"))
 		if err != nil {
 			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 			return

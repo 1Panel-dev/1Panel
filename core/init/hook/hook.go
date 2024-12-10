@@ -14,39 +14,38 @@ import (
 
 func Init() {
 	settingRepo := repo.NewISettingRepo()
-	commonRepo := repo.NewICommonRepo()
-	masterSetting, err := settingRepo.Get(commonRepo.WithByKey("MasterAddr"))
+	masterSetting, err := settingRepo.Get(repo.WithByKey("MasterAddr"))
 	if err != nil {
 		global.LOG.Errorf("load master addr from setting failed, err: %v", err)
 	}
 	global.CONF.System.MasterAddr = masterSetting.Value
-	portSetting, err := settingRepo.Get(commonRepo.WithByKey("ServerPort"))
+	portSetting, err := settingRepo.Get(repo.WithByKey("ServerPort"))
 	if err != nil {
 		global.LOG.Errorf("load service port from setting failed, err: %v", err)
 	}
 	global.CONF.System.Port = portSetting.Value
-	ipv6Setting, err := settingRepo.Get(commonRepo.WithByKey("Ipv6"))
+	ipv6Setting, err := settingRepo.Get(repo.WithByKey("Ipv6"))
 	if err != nil {
 		global.LOG.Errorf("load ipv6 status from setting failed, err: %v", err)
 	}
 	global.CONF.System.Ipv6 = ipv6Setting.Value
-	bindAddressSetting, err := settingRepo.Get(commonRepo.WithByKey("BindAddress"))
+	bindAddressSetting, err := settingRepo.Get(repo.WithByKey("BindAddress"))
 	if err != nil {
 		global.LOG.Errorf("load bind address from setting failed, err: %v", err)
 	}
 	global.CONF.System.BindAddress = bindAddressSetting.Value
-	sslSetting, err := settingRepo.Get(commonRepo.WithByKey("SSL"))
+	sslSetting, err := settingRepo.Get(repo.WithByKey("SSL"))
 	if err != nil {
 		global.LOG.Errorf("load service ssl from setting failed, err: %v", err)
 	}
 	global.CONF.System.SSL = sslSetting.Value
-	versionSetting, err := settingRepo.Get(commonRepo.WithByKey("SystemVersion"))
+	versionSetting, err := settingRepo.Get(repo.WithByKey("SystemVersion"))
 	if err != nil {
 		global.LOG.Errorf("load version from setting failed, err: %v", err)
 	}
 	global.CONF.System.Version = versionSetting.Value
 
-	if _, err := settingRepo.Get(commonRepo.WithByKey("SystemStatus")); err != nil {
+	if _, err := settingRepo.Get(repo.WithByKey("SystemStatus")); err != nil {
 		_ = settingRepo.Create("SystemStatus", "Free")
 	}
 	if err := settingRepo.Update("SystemStatus", "Free"); err != nil {

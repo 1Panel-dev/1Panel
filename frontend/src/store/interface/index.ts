@@ -35,6 +35,7 @@ export interface GlobalState {
 
     isProductPro: boolean;
     productProExpires: number;
+    isMasterProductPro: boolean;
 
     errStatus: string;
 

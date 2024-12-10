@@ -7,6 +7,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/model"
+	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
@@ -31,11 +32,11 @@ func NewIGroupService() IGroupService {
 
 func (u *GroupService) List(req dto.OperateByType) ([]dto.GroupInfo, error) {
 	options := []global.DBOption{
-		commonRepo.WithOrderBy("is_default desc"),
-		commonRepo.WithOrderBy("created_at desc"),
+		repo.WithOrderBy("is_default desc"),
+		repo.WithOrderBy("created_at desc"),
 	}
 	if len(req.Type) != 0 {
-		options = append(options, commonRepo.WithByType(req.Type))
+		options = append(options, repo.WithByType(req.Type))
 	}
 	var (
 		groups []model.Group
@@ -57,7 +58,7 @@ func (u *GroupService) List(req dto.OperateByType) ([]dto.GroupInfo, error) {
 }
 
 func (u *GroupService) Create(req dto.GroupCreate) error {
-	group, _ := groupRepo.Get(commonRepo.WithByName(req.Name), commonRepo.WithByType(req.Type))
+	group, _ := groupRepo.Get(repo.WithByName(req.Name), repo.WithByType(req.Type))
 	if group.ID != 0 {
 		return constant.ErrRecordExist
 	}
@@ -71,14 +72,14 @@ func (u *GroupService) Create(req dto.GroupCreate) error {
 }
 
 func (u *GroupService) Delete(id uint) error {
-	group, _ := groupRepo.Get(commonRepo.WithByID(id))
+	group, _ := groupRepo.Get(repo.WithByID(id))
 	if group.ID == 0 {
 		return constant.ErrRecordNotFound
 	}
 	if group.IsDefault {
 		return buserr.New(constant.ErrGroupIsDefault)
 	}
-	defaultGroup, err := groupRepo.Get(commonRepo.WithByType(group.Type), groupRepo.WithByDefault(true))
+	defaultGroup, err := groupRepo.Get(repo.WithByType(group.Type), groupRepo.WithByDefault(true))
 	if err != nil {
 		return err
 	}
@@ -103,7 +104,7 @@ func (u *GroupService) Delete(id uint) error {
 	if err != nil {
 		return err
 	}
-	return groupRepo.Delete(commonRepo.WithByID(id))
+	return groupRepo.Delete(repo.WithByID(id))
 }
 
 func (u *GroupService) Update(req dto.GroupUpdate) error {

@@ -38,6 +38,18 @@ func New(Key string) BusinessError {
 	}
 }
 
+func WithErr(Key string, err error) BusinessError {
+	paramMap := map[string]interface{}{}
+	if err != nil {
+		paramMap["err"] = err
+	}
+	return BusinessError{
+		Msg: Key,
+		Map: paramMap,
+		Err: err,
+	}
+}
+
 func WithDetail(Key string, detail interface{}, err error) BusinessError {
 	return BusinessError{
 		Msg:    Key,

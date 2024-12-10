@@ -33,9 +33,9 @@ func initGlobalData() {
 	global.CONF.System.BaseDir, _ = settingRepo.GetValueByKey("BaseDir")
 	global.CONF.System.Version, _ = settingRepo.GetValueByKey("SystemVersion")
 	global.CONF.System.EncryptKey, _ = settingRepo.GetValueByKey("EncryptKey")
-	currentNode, _ := settingRepo.GetValueByKey("CurrentNode")
+	global.CONF.System.CurrentNode, _ = settingRepo.GetValueByKey("CurrentNode")
 
-	global.IsMaster = currentNode == "127.0.0.1" || len(currentNode) == 0
+	global.IsMaster = global.CONF.System.CurrentNode == "127.0.0.1" || len(global.CONF.System.CurrentNode) == 0
 	if global.IsMaster {
 		global.CoreDB = common.LoadDBConnByPath(path.Join(global.CONF.System.DbPath, "core.db"), "core")
 	} else {

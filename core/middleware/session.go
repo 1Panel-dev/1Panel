@@ -27,14 +27,13 @@ func SessionAuth() gin.HandlerFunc {
 			return
 		}
 		settingRepo := repo.NewISettingRepo()
-		commonRepo := repo.NewICommonRepo()
-		setting, err := settingRepo.Get(commonRepo.WithByKey("SessionTimeout"))
+		setting, err := settingRepo.Get(repo.WithByKey("SessionTimeout"))
 		if err != nil {
 			global.LOG.Errorf("create operation record failed, err: %v", err)
 			return
 		}
 		lifeTime, _ := strconv.Atoi(setting.Value)
-		httpsSetting, err := settingRepo.Get(commonRepo.WithByKey("SSL"))
+		httpsSetting, err := settingRepo.Get(repo.WithByKey("SSL"))
 		if err != nil {
 			global.LOG.Errorf("create operation record failed, err: %v", err)
 			return

@@ -14,7 +14,7 @@ import (
 )
 
 func NewLocalClient(reqUrl, reqMethod string, body io.Reader) (interface{}, error) {
-	sockPath := "/tmp/agent.sock"
+	sockPath := "/etc/1panel/agent.sock"
 	if _, err := os.Stat(sockPath); err != nil {
 		return nil, fmt.Errorf("no such agent.sock find in localhost, err: %v", err)
 	}

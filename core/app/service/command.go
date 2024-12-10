@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/1Panel-dev/1Panel/core/app/dto"
+	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/jinzhu/copier"
@@ -24,7 +25,7 @@ func NewICommandService() ICommandService {
 }
 
 func (u *CommandService) List(req dto.OperateByType) ([]dto.CommandInfo, error) {
-	commands, err := commandRepo.List(commonRepo.WithOrderBy("name"), commonRepo.WithByType(req.Type))
+	commands, err := commandRepo.List(repo.WithOrderBy("name"), repo.WithByType(req.Type))
 	if err != nil {
 		return nil, constant.ErrRecordNotFound
 	}
@@ -40,11 +41,11 @@ func (u *CommandService) List(req dto.OperateByType) ([]dto.CommandInfo, error) 
 }
 
 func (u *CommandService) SearchForTree(req dto.OperateByType) ([]dto.CommandTree, error) {
-	cmdList, err := commandRepo.List(commonRepo.WithOrderBy("name"), commonRepo.WithByType(req.Type))
+	cmdList, err := commandRepo.List(repo.WithOrderBy("name"), repo.WithByType(req.Type))
 	if err != nil {
 		return nil, err
 	}
-	groups, err := groupRepo.GetList(commonRepo.WithByType(req.Type))
+	groups, err := groupRepo.GetList(repo.WithByType(req.Type))
 	if err != nil {
 		return nil, err
 	}
@@ -67,20 +68,20 @@ func (u *CommandService) SearchForTree(req dto.OperateByType) ([]dto.CommandTree
 
 func (u *CommandService) SearchWithPage(req dto.SearchCommandWithPage) (int64, interface{}, error) {
 	options := []global.DBOption{
-		commonRepo.WithOrderRuleBy(req.OrderBy, req.Order),
-		commonRepo.WithByType(req.Type),
+		repo.WithOrderRuleBy(req.OrderBy, req.Order),
+		repo.WithByType(req.Type),
 	}
 	if len(req.Info) != 0 {
 		options = append(options, commandRepo.WithByInfo(req.Info))
 	}
 	if req.GroupID != 0 {
-		options = append(options, commonRepo.WithByGroupID(req.GroupID))
+		options = append(options, repo.WithByGroupID(req.GroupID))
 	}
 	total, commands, err := commandRepo.Page(req.Page, req.PageSize, options...)
 	if err != nil {
 		return 0, nil, err
 	}
-	groups, _ := groupRepo.GetList(commonRepo.WithByType(req.Type))
+	groups, _ := groupRepo.GetList(repo.WithByType(req.Type))
 	var dtoCommands []dto.CommandInfo
 	for _, command := range commands {
 		var item dto.CommandInfo
@@ -99,7 +100,7 @@ func (u *CommandService) SearchWithPage(req dto.SearchCommandWithPage) (int64, i
 }
 
 func (u *CommandService) Create(commandDto dto.CommandOperate) error {
-	command, _ := commandRepo.Get(commonRepo.WithByName(commandDto.Name))
+	command, _ := commandRepo.Get(repo.WithByName(commandDto.Name))
 	if command.ID != 0 {
 		return constant.ErrRecordExist
 	}
@@ -114,13 +115,13 @@ func (u *CommandService) Create(commandDto dto.CommandOperate) error {
 
 func (u *CommandService) Delete(ids []uint) error {
 	if len(ids) == 1 {
-		command, _ := commandRepo.Get(commonRepo.WithByID(ids[0]))
+		command, _ := commandRepo.Get(repo.WithByID(ids[0]))
 		if command.ID == 0 {
 			return constant.ErrRecordNotFound
 		}
-		return commandRepo.Delete(commonRepo.WithByID(ids[0]))
+		return commandRepo.Delete(repo.WithByID(ids[0]))
 	}
-	return commandRepo.Delete(commonRepo.WithByIDs(ids))
+	return commandRepo.Delete(repo.WithByIDs(ids))
 }
 
 func (u *CommandService) Update(id uint, upMap map[string]interface{}) error {

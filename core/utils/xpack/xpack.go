@@ -6,8 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Proxy(c *gin.Context, currentNode string) error {
-	return nil
+func Proxy(c *gin.Context, currentNode string) {
+	return
 }
 
 func UpdateGroup(name string, group, newGroup uint) error {

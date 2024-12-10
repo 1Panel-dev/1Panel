@@ -15,7 +15,7 @@
             <el-divider direction="vertical" />
         </span>
         <el-button type="primary" link @click="toHalo">
-            <span class="font-normal">{{ isProductPro ? $t('license.pro') : $t('license.community') }}</span>
+            <span class="font-normal">{{ isMasterProductPro ? $t('license.pro') : $t('license.community') }}</span>
         </el-button>
         <span class="version">{{ version }}</span>
         <el-badge is-dot style="margin-top: -3px" v-if="version !== 'Waiting' && globalStore.hasNewVersion">
@@ -49,7 +49,7 @@ const globalStore = GlobalStore();
 const upgradeRef = ref();
 
 const version = ref<string>('');
-const isProductPro = ref();
+const isMasterProductPro = ref();
 const loading = ref(false);
 const upgradeInfo = ref();
 const upgradeVersion = ref();
@@ -112,7 +112,7 @@ const onLoadUpgradeInfo = async () => {
 };
 
 onMounted(() => {
-    isProductPro.value = globalStore.isProductPro;
+    isMasterProductPro.value = globalStore.isMasterProductPro;
     search();
 });
 </script>

@@ -30,6 +30,23 @@ ErrBackupInUsed: "該備份帳號已在計劃任務中使用，無法刪除"
 ErrBackupCheck: "備份帳號測試連接失敗 {{.err}}"
 ErrBackupLocalDelete: "暫不支持刪除本地伺服器備份帳號"
 
+#license
+ErrLicense: "許可證格式錯誤，請檢查後重試！"
+ErrLicenseCheck: "許可證校驗失敗，請檢查後重試！"
+ErrLicenseSave: "許可證信息保存失敗，錯誤 {{ .err }}, 請重試！"
+ErrLicenseSync: "許可證信息同步失敗，資料庫中未檢測到許可證信息！"
+ErrXpackNotFound: "該部分為專業版功能，請先在 面板設置-許可證 界面導入許可證"
+ErrXpackExceptional: "該部分為專業版功能，請先在 面板設置-許可證 界面同步許可證狀態"
+ErrXpackOutOfDate: "當前許可證已過期，請重新在 面板設置-許可證 界面導入許可證"
+ErrXpackLost: "許可證已達到最大重試次數，請進入【面板設定】【許可證】頁面手動點擊同步按鈕，以確保專業版功能正常使用"
+ErrXpackTimeout: "請求超時，網絡連接可能不穩定，請稍後再試！"
+ErrUnbindMaster: "檢測到節點管理內存在節點，無法解綁當前許可證，請先移除後重試！"
+ErrFreeNodeLimit: "社區版節點數量已達到免費上限，請前往 www.lxware.cn/1panel 購買後重試！"
+ErrNodeBound: "該許可證已綁定到其他節點，請檢查後重試！"
+ErrNoSuchNode: "未能找到該節點信息，請檢查後重試！"
+ErrNodeUnbind: "檢測到該節點未在許可證綁定範圍內，請檢查後重試！"
+ErrNodeBind: "檢測到該節點已綁定許可證，請檢查後重試！"
+
 #task
 TaskStart: "{{.name}} 任務開始 [START]"
 TaskEnd: "{{.name}} 任務結束 [COMPLETED]"

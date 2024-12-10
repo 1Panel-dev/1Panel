@@ -8,8 +8,7 @@ import (
 
 func LoadErrCode(errInfo string) int {
 	settingRepo := repo.NewISettingRepo()
-	commonRepo := repo.NewICommonRepo()
-	codeVal, err := settingRepo.Get(commonRepo.WithByKey("NoAuthSetting"))
+	codeVal, err := settingRepo.Get(repo.WithByKey("NoAuthSetting"))
 	if err != nil {
 		return 500
 	}

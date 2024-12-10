@@ -28,7 +28,7 @@
 
                             <el-form-item :label="$t('setting.theme')" prop="theme">
                                 <el-radio-group @change="onSave('Theme', form.theme)" v-model="form.theme">
-                                    <el-radio-button v-if="isProductPro" value="dark-gold">
+                                    <el-radio-button v-if="isMasterProductPro" value="dark-gold">
                                         <span>{{ $t('setting.darkGold') }}</span>
                                     </el-radio-button>
                                     <el-radio-button value="light">
@@ -159,7 +159,7 @@ const loading = ref(false);
 const i18n = useI18n();
 const globalStore = GlobalStore();
 
-const { isProductPro } = storeToRefs(globalStore);
+const { isMasterProductPro } = storeToRefs(globalStore);
 
 const { switchTheme } = useTheme();
 
@@ -230,7 +230,7 @@ const search = async () => {
     const checkedTitles = getCheckedTitles(json);
     form.proHideMenus = checkedTitles.toString();
 
-    if (isProductPro.value) {
+    if (isMasterProductPro.value) {
         const xpackRes = await getXpackSetting();
         if (xpackRes) {
             form.theme = xpackRes.data.theme === 'dark-gold' ? 'dark-gold' : res.data.theme;
@@ -305,7 +305,7 @@ const onSave = async (key: string, val: any) => {
             globalStore.themeConfig.theme = val;
         }
         switchTheme();
-        if (globalStore.isProductPro) {
+        if (globalStore.isMasterProductPro) {
             updateXpackSettingByKey('Theme', val === 'dark-gold' ? 'dark-gold' : '');
             if (val === 'dark-gold') {
                 MsgSuccess(i18n.t('commons.msg.operationSuccess'));

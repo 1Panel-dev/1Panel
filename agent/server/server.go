@@ -3,6 +3,10 @@ package server
 import (
 	"crypto/tls"
 	"fmt"
+	"net"
+	"net/http"
+	"os"
+
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/cron"
 	"github.com/1Panel-dev/1Panel/agent/global"
@@ -18,12 +22,10 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/init/validator"
 	"github.com/1Panel-dev/1Panel/agent/init/viper"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
-	"net"
-	"net/http"
-	"os"
+
+	_ "net/http/pprof"
 
 	"github.com/gin-gonic/gin"
-	_ "net/http/pprof"
 )
 
 func Start() {
@@ -47,12 +49,13 @@ func Start() {
 	}
 
 	go func() {
-		http.ListenAndServe("0.0.0.0:6060", nil)
+		_ = http.ListenAndServe("0.0.0.0:6060", nil)
 	}()
 
 	if global.IsMaster {
-		_ = os.Remove("/tmp/agent.sock")
-		listener, err := net.Listen("unix", "/tmp/agent.sock")
+		_ = os.Remove("/etc/1panel/agent.sock")
+		_ = os.Mkdir("/etc/1panel", 0755)
+		listener, err := net.Listen("unix", "/etc/1panel/agent.sock")
 		if err != nil {
 			panic(err)
 		}

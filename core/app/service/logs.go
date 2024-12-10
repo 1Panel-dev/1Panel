@@ -10,6 +10,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/model"
+	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/cmd"
@@ -75,13 +76,13 @@ func (u *LogService) ListSystemLogFile() ([]string, error) {
 
 func (u *LogService) PageLoginLog(req dto.SearchLgLogWithPage) (int64, interface{}, error) {
 	options := []global.DBOption{
-		commonRepo.WithOrderBy("created_at desc"),
+		repo.WithOrderBy("created_at desc"),
 	}
 	if len(req.IP) != 0 {
 		options = append(options, logRepo.WithByIP(req.IP))
 	}
 	if len(req.Status) != 0 {
-		options = append(options, commonRepo.WithByStatus(req.Status))
+		options = append(options, repo.WithByStatus(req.Status))
 	}
 	total, ops, err := logRepo.PageLoginLog(
 		req.Page,
@@ -105,14 +106,14 @@ func (u *LogService) CreateOperationLog(operation *model.OperationLog) error {
 
 func (u *LogService) PageOperationLog(req dto.SearchOpLogWithPage) (int64, interface{}, error) {
 	options := []global.DBOption{
-		commonRepo.WithOrderBy("created_at desc"),
+		repo.WithOrderBy("created_at desc"),
 		logRepo.WithByLikeOperation(req.Operation),
 	}
 	if len(req.Source) != 0 {
 		options = append(options, logRepo.WithBySource(req.Source))
 	}
 	if len(req.Status) != 0 {
-		options = append(options, commonRepo.WithByStatus(req.Status))
+		options = append(options, repo.WithByStatus(req.Status))
 	}
 
 	total, ops, err := logRepo.PageOperationLog(

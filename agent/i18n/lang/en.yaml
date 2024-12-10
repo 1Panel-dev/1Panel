@@ -240,16 +240,6 @@ cc: 'Access Frequency Limit'
 defaultUrlBlack: 'URL Rules'
 sqlInject: 'SQL Injection'
 
-
-#license
-ErrLicense: "License format error, please check and try again!"
-ErrLicenseCheck: "License verification failed, please check and try again!"
-ErrLicenseSave: "Failed to save license information, error {{ .err }}, please try again!"
-ErrLicenseSync: "Failed to sync license information, no license information detected in the database!"
-ErrXpackNotFound: "This section is a professional edition feature, please import the license first in Panel Settings-License interface"
-ErrXpackNotActive: "This section is a professional edition feature, please synchronize the license status first in Panel Settings-License interface"
-ErrXpackOutOfDate: "The current license has expired, please re-import the license in Panel Settings-License interface"
-
 #task
 TaskStart: "{{.name}} Start [START]"
 TaskEnd: "{{.name}} End [COMPLETED]"

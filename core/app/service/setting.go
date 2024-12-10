@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/core/app/dto"
+	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
@@ -74,7 +75,7 @@ func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {
 func (u *SettingService) Update(key, value string) error {
 	switch key {
 	case "AppStoreLastModified":
-		exist, _ := settingRepo.Get(commonRepo.WithByKey("AppStoreLastModified"))
+		exist, _ := settingRepo.Get(repo.WithByKey("AppStoreLastModified"))
 		if exist.ID == 0 {
 			_ = settingRepo.Create("AppStoreLastModified", value)
 			return nil
@@ -270,14 +271,14 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 }
 
 func (u *SettingService) LoadFromCert() (*dto.SSLInfo, error) {
-	ssl, err := settingRepo.Get(commonRepo.WithByKey("SSL"))
+	ssl, err := settingRepo.Get(repo.WithByKey("SSL"))
 	if err != nil {
 		return nil, err
 	}
 	if ssl.Value == "disable" {
 		return &dto.SSLInfo{}, nil
 	}
-	sslType, err := settingRepo.Get(commonRepo.WithByKey("SSLType"))
+	sslType, err := settingRepo.Get(repo.WithByKey("SSLType"))
 	if err != nil {
 		return nil, err
 	}
@@ -311,7 +312,7 @@ func (u *SettingService) LoadFromCert() (*dto.SSLInfo, error) {
 }
 
 func (u *SettingService) HandlePasswordExpired(c *gin.Context, old, new string) error {
-	setting, err := settingRepo.Get(commonRepo.WithByKey("Password"))
+	setting, err := settingRepo.Get(repo.WithByKey("Password"))
 	if err != nil {
 		return err
 	}
@@ -328,7 +329,7 @@ func (u *SettingService) HandlePasswordExpired(c *gin.Context, old, new string) 
 			return err
 		}
 
-		expiredSetting, err := settingRepo.Get(commonRepo.WithByKey("ExpirationDays"))
+		expiredSetting, err := settingRepo.Get(repo.WithByKey("ExpirationDays"))
 		if err != nil {
 			return err
 		}

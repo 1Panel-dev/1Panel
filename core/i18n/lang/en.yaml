@@ -30,6 +30,23 @@ ErrBackupInUsed: "The backup account is currently in use in a scheduled task and
 ErrBackupCheck: "Backup account test connection failed {{.err}}"
 ErrBackupLocalDelete: "Deleting local server backup accounts is not currently supported."
 
+#license
+ErrLicense: "License format error, please check and try again!"
+ErrLicenseCheck: "License verification failed, please check and try again!"
+ErrLicenseSave: "Failed to save license information, error {{ .err }}, please try again!"
+ErrLicenseSync: "Failed to sync license information, no license information detected in the database!"
+ErrXpackNotFound: "This section is a professional edition feature, please import the license first in Panel Settings-License interface"
+ErrXpackExceptional: "This section is a professional edition feature, please synchronize the license status first in Panel Settings-License interface"
+ErrXpackOutOfDate: "The current license has expired, please re-import the license in Panel Settings-License interface"
+ErrXpackLost: "The license has reached the maximum number of retry attempts. Please go to the [Settings] [License] page and manually click the sync button to ensure that the professional version features are functioning properly."
+ErrXpackTimeout: "Request timed out, the network connection may be unstable, please try again later!"
+ErrUnbindMaster: "Detected that there are nodes in the node management, unable to unbind the current license. Please remove them first and try again!"
+ErrFreeNodeLimit: "The number of nodes for the community edition has reached the free limit. Please visit www.lxware.cn/1panel to purchase and try again!"
+ErrNodeBound: "This license is already bound to another node. Please check and try again!"
+ErrNoSuchNode: "Failed to find the node information. Please check and try again!"
+ErrNodeUnbind: "Detected that this node is no longer within the license binding range. Please check and try again!"
+ErrNodeBind: "The node is already bound to a license. Please check and try again!"
+
 #task
 TaskStart: "{{.name}} Task Start [START]"
 TaskEnd: "{{.name}} Task End [COMPLETED]"

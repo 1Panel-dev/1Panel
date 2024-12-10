@@ -16,44 +16,43 @@ import (
 
 func Proxy() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if strings.HasPrefix(c.Request.URL.Path, "/api/v2/core") || strings.HasPrefix(c.Request.URL.Path, "/1panel/swagger") {
+		if strings.HasPrefix(c.Request.URL.Path, "/1panel/swagger") || !strings.HasPrefix(c.Request.URL.Path, "/api/v2") {
 			c.Next()
 			return
 		}
-		if !strings.HasPrefix(c.Request.URL.Path, "/api/v2") {
+		if strings.HasPrefix(c.Request.URL.Path, "/api/v2/core") && !strings.HasPrefix(c.Request.URL.Path, "/api/v2/core/xpack") {
 			c.Next()
 			return
 		}
+
 		currentNode := c.Request.Header.Get("CurrentNode")
-		if len(currentNode) != 0 && currentNode != "127.0.0.1" {
-			if err := xpack.Proxy(c, currentNode); err != nil {
+		if !strings.HasPrefix(c.Request.URL.Path, "/api/v2/core") && (currentNode == "local" || len(currentNode) == 0) {
+			sockPath := "/etc/1panel/agent.sock"
+			if _, err := os.Stat(sockPath); err != nil {
 				helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrProxy, err)
 				return
 			}
+			dialUnix := func() (conn net.Conn, err error) {
+				return net.Dial("unix", sockPath)
+			}
+			transport := &http.Transport{
+				DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+					return dialUnix()
+				},
+			}
+			proxy := &httputil.ReverseProxy{
+				Director: func(req *http.Request) {
+					req.URL.Scheme = "http"
+					req.URL.Host = "unix"
+				},
+				Transport: transport,
+			}
+			proxy.ServeHTTP(c.Writer, c.Request)
 			c.Abort()
 			return
 		}
-		sockPath := "/tmp/agent.sock"
-		if _, err := os.Stat(sockPath); err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrProxy, err)
-			return
-		}
-		dialUnix := func() (conn net.Conn, err error) {
-			return net.Dial("unix", sockPath)
-		}
-		transport := &http.Transport{
-			DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
-				return dialUnix()
-			},
-		}
-		proxy := &httputil.ReverseProxy{
-			Director: func(req *http.Request) {
-				req.URL.Scheme = "http"
-				req.URL.Host = "unix"
-			},
-			Transport: transport,
-		}
-		proxy.ServeHTTP(c.Writer, c.Request)
+		xpack.Proxy(c, currentNode)
 		c.Abort()
+		return
 	}
 }

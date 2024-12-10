@@ -32,7 +32,23 @@ ErrBackupInUsed: "该备份账号已在计划任务中使用，无法删除"
 ErrBackupCheck: "备份账号测试连接失败 {{ .err}}"
 ErrBackupLocalDelete: "暂不支持删除本地服务器备份账号"
 
-#task
+#license
+ErrLicense: "许可证格式错误，请检查后重试！"
+ErrLicenseCheck: "许可证校验失败，请检查后重试！"
+ErrLicenseSave: "许可证信息保存失败，错误 {{ .err }}，请重试！"
+ErrLicenseSync: "许可证信息同步失败，数据库中未检测到许可证信息！"
+ErrXpackNotFound: "该部分为专业版功能，请先在 面板设置-许可证 界面导入许可证"
+ErrXpackExceptional: "该部分为专业版功能，请先在 面板设置-许可证 界面同步许可证状态"
+ErrXpackOutOfDate: "当前许可证已过期，请重新在 面板设置-许可证 界面导入许可证"
+ErrXpackLost: "许可证已达到最大重试次数，请进入【面板设置】【许可证】页面手动点击同步按钮，以确保专业版功能正常使用"
+ErrXpackTimeout: "请求超时，网络连接可能不稳定，请稍后再试！"
+ErrUnbindMaster: "检测到节点管理内存在节点，无法解绑当前许可证，请先移除后重试！"
+ErrFreeNodeLimit: "社区版节点数量已达到免费上限，请前往 www.lxware.cn/1panel 购买后重试！"
+ErrNodeBound: "该许可证已绑定到其他节点，请检查后重试！"
+ErrNoSuchNode: "未能找到该节点信息，请检查后重试！"
+ErrNodeUnbind: "检测到该节点未在许可证绑定范围内，请检查后重试！"
+ErrNodeBind: "检测到该节点已绑定许可证，请检查后重试！"
+
 #task
 TaskStart: "{{.name}} 任务开始 [START]"
 TaskEnd: "{{.name}} 任务结束 [COMPLETED]"

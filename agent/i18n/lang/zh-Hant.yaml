@@ -241,16 +241,6 @@ cc: '訪問頻率限制'
 defaultUrlBlack: 'URL 規則'
 sqlInject: 'SQL 注入'
 
-
-#license
-ErrLicense: "許可證格式錯誤，請檢查後重試！"
-ErrLicenseCheck: "許可證校驗失敗，請檢查後重試！"
-ErrLicenseSave: "許可證信息保存失敗，錯誤 {{ .err }}, 請重試！"
-ErrLicenseSync: "許可證信息同步失敗，資料庫中未檢測到許可證信息！"
-ErrXpackNotFound: "該部分為專業版功能，請先在 面板設置-許可證 界面導入許可證"
-ErrXpackNotActive: "該部分為專業版功能，請先在 面板設置-許可證 界面同步許可證狀態"
-ErrXpackOutOfDate: "當前許可證已過期，請重新在 面板設置-許可證 界面導入許可證"
-
 #task
 TaskStart: "{{.name}} 開始 [START]"
 TaskEnd: "{{.name}} 結束 [COMPLETED]"

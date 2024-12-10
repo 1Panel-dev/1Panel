@@ -49,7 +49,6 @@ func LoadNodeInfo() (bool, model.NodeInfo, error) {
 	var info model.NodeInfo
 	info.BaseDir = loadParams("BASE_DIR")
 	info.Version = loadParams("ORIGINAL_VERSION")
-	info.CurrentNode = "127.0.0.1"
 	info.EncryptKey = common.RandStr(16)
 	return false, info, nil
 }

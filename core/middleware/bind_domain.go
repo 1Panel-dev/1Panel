@@ -13,8 +13,7 @@ import (
 func BindDomain() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		settingRepo := repo.NewISettingRepo()
-		commonRepo := repo.NewICommonRepo()
-		status, err := settingRepo.Get(commonRepo.WithByKey("BindDomain"))
+		status, err := settingRepo.Get(repo.WithByKey("BindDomain"))
 		if err != nil {
 			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 			return

@@ -1,144 +1,133 @@
 <template>
     <div>
-        <LayoutContent v-loading="loading" :title="$t('setting.license')" :divider="true">
+        <LayoutContent v-loading="loading" :title="$t('setting.license')">
+            <template #leftToolBar>
+                <el-button type="primary" @click="toUpload()">
+                    {{ $t('commons.button.add') }}
+                </el-button>
+            </template>
             <template #main>
-                <el-row :gutter="20" class="mt-5; mb-10">
-                    <el-col :xs="24" :sm="24" :md="15" :lg="15" :xl="15">
-                        <div class="descriptions" v-if="hasLicense">
-                            <el-descriptions :column="1" direction="horizontal" size="large" border>
-                                <el-descriptions-item :label="$t('license.authorizationId')">
-                                    {{ license.licenseName || '-' }}
-                                    <el-button
-                                        type="primary"
-                                        class="ml-3"
-                                        plain
-                                        @click="onSync"
-                                        size="small"
-                                        v-if="showSync()"
+                <ComplexTable :pagination-config="paginationConfig" @sort-change="search" @search="search" :data="data">
+                    <el-table-column
+                        :label="$t('license.authorizationId')"
+                        :min-width="80"
+                        prop="licenseName"
+                        show-overflow-tooltip
+                    />
+                    <el-table-column :label="$t('license.authorizedUser')" prop="assigneeName" show-overflow-tooltip>
+                        <template #default="{ row }">
+                            {{ row.assigneeName || '-' }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('license.expiresAt')" prop="expiresAt" show-overflow-tooltip>
+                        <template #default="{ row }">
+                            {{ row.expiresAt || '-' }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('commons.table.status')" prop="status" show-overflow-tooltip>
+                        <template #default="{ row }">
+                            <div v-if="row.status">
+                                <el-tooltip
+                                    v-if="row.status === 'exceptional'"
+                                    :content="$t('license.exceptionalHelper')"
+                                >
+                                    <el-tag type="danger">
+                                        {{ $t('license.' + row.status) }}
+                                    </el-tag>
+                                </el-tooltip>
+                                <el-tooltip v-if="row.status === 'lost'" :content="$t('license.lostHelper')">
+                                    <el-tag type="info">
+                                        {{ $t('license.' + row.status) }}
+                                    </el-tag>
+                                </el-tooltip>
+                                <el-tag v-if="row.status !== 'exceptional' && row.status !== 'lost'">
+                                    {{ $t('license.' + row.status) }}
+                                </el-tag>
+                            </div>
+                            <span v-else>-</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('setting.bindNode')">
+                        <template #default="{ row }">
+                            <span v-if="row.freeCount !== 0 && (row.status === 'free' || row.status === 'exceptional')">
+                                -
+                            </span>
+                            <div v-else>
+                                <span v-if="row.freeCount === 0">{{ row.bindNode || '-' }}</span>
+                                <div v-else>
+                                    <el-popover
+                                        placement="bottom"
+                                        :width="120"
+                                        trigger="hover"
+                                        v-if="row.freeNodes && row.freeNodes.length != 0"
                                     >
-                                        {{ $t('commons.button.sync') }}
-                                    </el-button>
-                                    <el-button type="primary" class="ml-3" plain @click="onUnBind()" size="small">
-                                        {{ $t('license.unbind') }}
-                                    </el-button>
-                                </el-descriptions-item>
-                                <el-descriptions-item :label="$t('license.authorizedUser')">
-                                    {{ license.assigneeName || '-' }}
-                                </el-descriptions-item>
-                                <el-descriptions-item :label="$t('license.productName')">
-                                    {{ license.productName || '-' }}
-                                </el-descriptions-item>
-                                <el-descriptions-item :label="$t('license.trialInfo')">
-                                    {{ license.trial ? $t('license.trial') : $t('license.office') }}
-                                </el-descriptions-item>
-                                <el-descriptions-item :label="$t('license.expiresAt')">
-                                    {{ license.expiresAt || '-' }}
-                                </el-descriptions-item>
-                                <el-descriptions-item :label="$t('license.productStatus')">
-                                    <div v-if="license.status">
-                                        <el-tooltip
-                                            v-if="license.status.indexOf('Lost') !== -1"
-                                            :content="$t('license.lostHelper')"
-                                        >
-                                            <el-tag type="info">
-                                                {{ $t('license.' + license.status) }}
-                                            </el-tag>
-                                        </el-tooltip>
-                                        <el-tag v-else>{{ $t('license.' + license.status) }}</el-tag>
-                                    </div>
-                                    <span v-else>-</span>
-                                </el-descriptions-item>
-                                <el-descriptions-item class="descriptions" :label="$t('commons.table.message')">
-                                    {{ license.message }}
-                                </el-descriptions-item>
-                            </el-descriptions>
-                        </div>
-
-                        <CardWithHeader :header="$t('home.overview')" height="160px" v-if="!hasLicense">
-                            <template #body>
-                                <div class="h-app-card">
-                                    <el-row>
-                                        <el-col :span="6">
-                                            <span>{{ $t('setting.license') }}</span>
-                                        </el-col>
-                                        <el-col :span="6">
-                                            <span>{{ $t('license.community2') }}</span>
-                                        </el-col>
-                                    </el-row>
-                                </div>
-                            </template>
-                        </CardWithHeader>
-                    </el-col>
-
-                    <el-col :xs="24" :sm="24" :md="9" :lg="9" :xl="9">
-                        <CardWithHeader :header="$t('license.quickUpdate')" height="160px">
-                            <template #body>
-                                <div class="h-app-card">
-                                    <el-row>
-                                        <el-col :span="15">
-                                            <div class="h-app-content">{{ $t('license.importLicense') }}：</div>
-                                        </el-col>
-                                        <el-col :span="5">
-                                            <el-button type="primary" plain round size="small" @click="toUpload">
-                                                {{ $t('license.import') }}
+                                        <div v-for="(item, index) of row.freeNodes" :key="index">
+                                            <el-tag>{{ item.name }}</el-tag>
+                                        </div>
+                                        <template #reference>
+                                            <el-button link type="primary">
+                                                ({{ row.bindCount }} / {{ row.freeCount }})
                                             </el-button>
-                                        </el-col>
-                                    </el-row>
+                                        </template>
+                                    </el-popover>
+                                    <span v-else link type="primary">({{ row.bindCount }} / {{ row.freeCount }})</span>
                                 </div>
-                                <div class="h-app-card">
-                                    <el-row>
-                                        <el-col :span="15">
-                                            <div class="h-app-content">{{ $t('license.technicalAdvice') }}：</div>
-                                        </el-col>
-                                        <el-col :span="5">
-                                            <el-button type="primary" plain round size="small" @click="toHalo()">
-                                                {{ $t('license.advice') }}
-                                            </el-button>
-                                        </el-col>
-                                    </el-row>
-                                </div>
-                            </template>
-                        </CardWithHeader>
-                    </el-col>
-                </el-row>
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                        prop="createdAt"
+                        :label="$t('commons.table.date')"
+                        :formatter="dateFormat"
+                        show-overflow-tooltip
+                    />
+                    <fu-table-operations
+                        width="300px"
+                        :buttons="buttons"
+                        :ellipsis="10"
+                        :label="$t('commons.table.operate')"
+                        fix
+                    />
+                </ComplexTable>
             </template>
         </LayoutContent>
 
         <LicenseImport ref="licenseRef" />
+        <LicenseBind ref="bindRef" />
+        <LicenseDelete ref="delRef" @search="search" />
     </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue';
-import { getLicense, syncLicense, unbindLicense } from '@/api/modules/setting';
-import CardWithHeader from '@/components/card-with-header/index.vue';
+import { SearchLicense, syncLicense, unbindLicense } from '@/api/modules/setting';
 import LicenseImport from '@/components/license-import/index.vue';
+import LicenseDelete from '@/views/setting/license/delete/index.vue';
+import LicenseBind from '@/views/setting/license/bind/index.vue';
+import { dateFormat } from '@/utils/util';
 import i18n from '@/lang';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
+
+const globalStore = GlobalStore();
 const loading = ref();
 const licenseRef = ref();
-const globalStore = GlobalStore();
-const hasLicense = ref();
+const delRef = ref();
+const bindRef = ref();
 
-const license = reactive({
-    licenseName: '',
-    trial: true,
-    expiresAt: '',
-    assigneeName: '',
-    productName: '',
-
-    status: '',
-    message: '',
+const data = ref();
+const paginationConfig = reactive({
+    cacheSizeKey: 'backup-page-size',
+    currentPage: 1,
+    pageSize: 10,
+    total: 0,
+    type: '',
+    name: '',
 });
 
-const toHalo = () => {
-    window.open('https://www.lxware.cn/1panel' + '', '_blank', 'noopener,noreferrer');
-};
-
-const onSync = async () => {
+const onSync = async (row: any) => {
     loading.value = true;
-    await syncLicense()
+    await syncLicense(row.id)
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
@@ -149,25 +138,52 @@ const onSync = async () => {
         });
 };
 
-const onUnBind = async () => {
+const onUnbind = async (row: any) => {
     ElMessageBox.confirm(i18n.global.t('license.unbindHelper'), i18n.global.t('license.unbind'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',
     }).then(async () => {
         loading.value = true;
-        await unbindLicense()
+        await unbindLicense(row.id)
             .then(() => {
                 loading.value = false;
-                globalStore.isProductPro = false;
-                globalStore.themeConfig.isGold = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                window.location.reload();
+                if (row.freeCount !== 0) {
+                    globalStore.isProductPro = false;
+                    globalStore.themeConfig.isGold = false;
+                    window.location.reload();
+                    return;
+                }
+                search();
             })
             .catch(() => {
                 loading.value = false;
             });
     });
+};
+
+const search = async () => {
+    loading.value = true;
+    let params = {
+        page: paginationConfig.currentPage,
+        pageSize: paginationConfig.pageSize,
+    };
+    await SearchLicense(params)
+        .then((res) => {
+            loading.value = false;
+            data.value = res.data.items || [];
+            for (const item of data.value) {
+                item.productName = 'product-1panel-pro';
+                item.expiresAt =
+                    item.productPro === '0'
+                        ? i18n.global.t('license.indefinitePeriod')
+                        : timestampToDate(Number(item.productPro));
+            }
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const timestampToDate = (timestamp: number) => {
@@ -186,46 +202,63 @@ const timestampToDate = (timestamp: number) => {
     return `${y}-${m}-${d} ${h}:${minute}:${second}`;
 };
 
-const search = async () => {
-    loading.value = true;
-    await getLicense()
-        .then((res) => {
-            loading.value = false;
-            license.status = res.data.status;
-            globalStore.isProductPro =
-                res.data.status === 'Enable' || res.data.status === 'Lost01' || res.data.status === 'Lost02';
-            if (res.data.status === '') {
-                hasLicense.value = false;
-                return;
-            }
-            hasLicense.value = true;
-            if (globalStore.isProductPro) {
-                globalStore.productProExpires = Number(res.data.productPro);
-            }
-            license.licenseName = res.data.licenseName;
-            license.message = res.data.message;
-            license.assigneeName = res.data.assigneeName;
-            license.trial = res.data.trial;
-            if (res.data.productPro) {
-                license.productName = 'product-1panel-pro';
-                license.expiresAt =
-                    res.data.productPro === '0'
-                        ? i18n.global.t('license.indefinitePeriod')
-                        : timestampToDate(Number(res.data.productPro));
-            }
-        })
-        .catch(() => {
-            loading.value = false;
-        });
-};
-
-const showSync = () => {
-    return license.status.indexOf('Lost') !== -1 || license.status === 'Disable';
-};
-
 const toUpload = () => {
     licenseRef.value.acceptParams();
 };
+
+const buttons = [
+    {
+        label: i18n.global.t('commons.button.bind'),
+        disabled: (row: any) => {
+            return row.status !== 'free';
+        },
+        click: (row: any) => {
+            bindRef.value.acceptParams({ licenseID: row.id, licenseName: row.licenseName });
+        },
+    },
+    {
+        label: i18n.global.t('commons.button.unbind'),
+        disabled: (row: any) => {
+            return row.status === 'free';
+        },
+        click: (row: any) => {
+            if (row.freeCount != 0) {
+                if (row.freeNodes) {
+                    MsgError(i18n.global.t('license.unbindMasterHelper', [i18n.global.t('commons.button.unbind')]));
+                    return;
+                }
+                for (const item of data.value) {
+                    if (item.bindNode && item.freeCount == 0) {
+                        MsgError(i18n.global.t('license.unbindMasterHelper', [i18n.global.t('commons.button.unbind')]));
+                        return;
+                    }
+                }
+            }
+            onUnbind(row);
+        },
+    },
+    {
+        label: i18n.global.t('commons.button.sync'),
+        disabled: (row: any) => {
+            return row.status.indexOf('Lost') !== -1 || row.status === 'Disable';
+        },
+        click: (row: any) => {
+            onSync(row);
+        },
+    },
+    {
+        label: i18n.global.t('commons.button.delete'),
+        click: (row: any) => {
+            for (const item of data.value) {
+                if (item.bindNode && row.freeCount != 0) {
+                    MsgError(i18n.global.t('license.unbindMasterHelper', [i18n.global.t('commons.button.delete')]));
+                    return;
+                }
+            }
+            delRef.value.acceptParams({ id: row.id, name: row.licenseName });
+        },
+    },
+];
 
 onMounted(() => {
     search();

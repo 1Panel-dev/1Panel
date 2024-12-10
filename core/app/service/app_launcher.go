@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/1Panel-dev/1Panel/core/app/dto"
+	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/constant"
 )
 
@@ -17,7 +18,7 @@ func NewIAppLauncher() IAppLauncher {
 }
 
 func (u *LauncherService) Search() ([]string, error) {
-	launchers, err := launcherRepo.List(commonRepo.WithOrderBy("created_at"))
+	launchers, err := launcherRepo.List(repo.WithOrderBy("created_at"))
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +30,7 @@ func (u *LauncherService) Search() ([]string, error) {
 }
 
 func (u *LauncherService) ChangeShow(req dto.SettingUpdate) error {
-	launcher, _ := launcherRepo.Get(commonRepo.WithByKey(req.Key))
+	launcher, _ := launcherRepo.Get(repo.WithByKey(req.Key))
 	if req.Value == constant.StatusEnable {
 		if launcher.ID != 0 {
 			return nil
@@ -41,5 +42,5 @@ func (u *LauncherService) ChangeShow(req dto.SettingUpdate) error {
 		return nil
 	}
 
-	return launcherRepo.Delete(commonRepo.WithByKey(req.Key))
+	return launcherRepo.Delete(repo.WithByKey(req.Key))
 }

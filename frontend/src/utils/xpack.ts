@@ -1,4 +1,4 @@
-import { getLicenseStatus, getSettingInfo } from '@/api/modules/setting';
+import { getLicenseStatus, getMasterLicenseStatus, getSettingInfo } from '@/api/modules/setting';
 import { useTheme } from '@/global/use-theme';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
@@ -53,36 +53,39 @@ const loadDataFromDB = async () => {
 export async function loadProductProFromDB() {
     const res = await getLicenseStatus();
     if (!res || !res.data) {
-        resetXSetting();
         globalStore.isProductPro = false;
     } else {
-        globalStore.isProductPro =
-            res.data.status === 'Enable' || res.data.status === 'Lost01' || res.data.status === 'Lost02';
+        globalStore.isProductPro = res.data.status === 'bound';
         if (globalStore.isProductPro) {
             globalStore.productProExpires = Number(res.data.productPro);
         }
     }
-    switchTheme();
-    initFavicon();
     loadDataFromDB();
 }
 
+export async function loadMasterProductProFromDB() {
+    const res = await getMasterLicenseStatus();
+    if (!res || !res.data) {
+        globalStore.isMasterProductPro = false;
+    } else {
+        globalStore.isMasterProductPro = res.data.status === 'bound';
+    }
+    switchTheme();
+    initFavicon();
+}
+
 export async function getXpackSettingForTheme() {
-    const res = await getLicenseStatus();
+    const res = await getMasterLicenseStatus();
     if (!res.data) {
-        globalStore.isProductPro = false;
+        globalStore.isMasterProductPro = false;
         resetXSetting();
         switchTheme();
         initFavicon();
         return;
     }
-    globalStore.isProductPro =
-        res.data.status === 'Enable' || res.data.status === 'Lost01' || res.data.status === 'Lost02';
-    if (globalStore.isProductPro) {
-        globalStore.productProExpires = Number(res.data.productPro);
-    }
-    if (!globalStore.isProductPro) {
-        globalStore.isProductPro = false;
+    globalStore.isMasterProductPro = res.data.status === 'bound';
+    if (!globalStore.isMasterProductPro) {
+        globalStore.isMasterProductPro = false;
         resetXSetting();
         switchTheme();
         initFavicon();

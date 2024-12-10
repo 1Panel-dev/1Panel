@@ -15,8 +15,7 @@ import (
 func WhiteAllow() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		settingRepo := repo.NewISettingRepo()
-		commonRepo := repo.NewICommonRepo()
-		status, err := settingRepo.Get(commonRepo.WithByKey("AllowIPs"))
+		status, err := settingRepo.Get(repo.WithByKey("AllowIPs"))
 		if err != nil {
 			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 			return

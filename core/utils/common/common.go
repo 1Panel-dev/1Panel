@@ -4,10 +4,13 @@ import (
 	"fmt"
 	mathRand "math/rand"
 	"net"
+	"os"
+	"path"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/cmd"
 )
 
@@ -119,4 +122,24 @@ func LoadArch() (string, error) {
 		return "s390x", nil
 	}
 	return "", fmt.Errorf("unsupported such arch: %s", std)
+}
+
+func Clean(str []byte) {
+	for i := 0; i < len(str); i++ {
+		str[i] = 0
+	}
+}
+
+func CreateDirWhenNotExist(isDir bool, pathItem string) (string, error) {
+	checkPath := pathItem
+	if !isDir {
+		checkPath = path.Dir(pathItem)
+	}
+	if _, err := os.Stat(checkPath); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(checkPath, os.ModePerm); err != nil {
+			global.LOG.Errorf("mkdir %s failed, err: %v", checkPath, err)
+			return pathItem, err
+		}
+	}
+	return pathItem, nil
 }

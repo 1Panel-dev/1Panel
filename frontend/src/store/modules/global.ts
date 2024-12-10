@@ -39,17 +39,18 @@ const GlobalStore = defineStore({
 
         isProductPro: false,
         productProExpires: 0,
+        isMasterProductPro: false,
 
         errStatus: '',
 
-        currentNode: '127.0.0.1',
+        currentNode: 'local',
     }),
     getters: {
         isDarkTheme: (state) =>
             state.themeConfig.theme === 'dark' ||
             state.themeConfig.isGold ||
             (state.themeConfig.theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches),
-        isDarkGoldTheme: (state) => state.themeConfig.isGold && state.isProductPro,
+        isDarkGoldTheme: (state) => state.themeConfig.isGold && state.isMasterProductPro,
     },
     actions: {
         setOpenMenuTabs(openMenuTabs: boolean) {

@@ -224,4 +224,9 @@ export namespace Setting {
         productPro: string;
         status: string;
     }
+    export interface NodeItem {
+        id: number;
+        addr: string;
+        status: string;
+    }
 }

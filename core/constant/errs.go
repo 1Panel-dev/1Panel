@@ -50,6 +50,14 @@ var (
 	ErrEntrance            = "ErrEntrance"
 	ErrProxy               = "ErrProxy"
 	ErrLocalDelete         = "ErrLocalDelete"
+
+	ErrXpackNotFound    = "ErrXpackNotFound"
+	ErrXpackExceptional = "ErrXpackExceptional"
+	ErrXpackLost        = "ErrXpackLost"
+	ErrXpackTimeout     = "ErrXpackTimeout"
+	ErrXpackOutOfDate   = "ErrXpackOutOfDate"
+	ErrNoSuchNode       = "ErrNoSuchNode"
+	ErrNodeUnbind       = "ErrNodeUnbind"
 )
 
 // backup
@@ -57,4 +65,15 @@ var (
 	ErrBackupInUsed      = "ErrBackupInUsed"
 	ErrBackupLocalDelete = "ErrBackupLocalDelete"
 	ErrMasterAddr        = "ErrMasterAddr"
+)
+
+var (
+	ErrLicense       = "ErrLicense"
+	ErrLicenseCheck  = "ErrLicenseCheck"
+	ErrLicenseSave   = "ErrLicenseSave"
+	ErrLicenseSync   = "ErrLicenseSync"
+	ErrUnbindMaster  = "ErrUnbindMaster"
+	ErrFreeNodeLimit = "ErrFreeNodeLimit"
+	ErrNodeBound     = "ErrNodeBound"
+	ErrNodeBind      = "ErrNodeBind"
 )

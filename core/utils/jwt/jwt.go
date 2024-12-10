@@ -27,8 +27,7 @@ type BaseClaims struct {
 
 func NewJWT() *JWT {
 	settingRepo := repo.NewISettingRepo()
-	commonRepo := repo.NewICommonRepo()
-	jwtSign, _ := settingRepo.Get(commonRepo.WithByKey("JWTSigningKey"))
+	jwtSign, _ := settingRepo.Get(repo.WithByKey("JWTSigningKey"))
 	return &JWT{
 		[]byte(jwtSign.Value),
 	}

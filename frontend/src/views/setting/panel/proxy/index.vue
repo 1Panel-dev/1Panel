@@ -5,8 +5,8 @@
                 <template #default>
                     {{ $t('setting.proxyHelper') }}
                     <ul class="-ml-5">
-                        <li v-if="isProductPro">{{ $t('setting.proxyHelper1') }}</li>
-                        <li v-if="isProductPro">{{ $t('setting.proxyHelper2') }}</li>
+                        <li v-if="isMasterProductPro">{{ $t('setting.proxyHelper1') }}</li>
+                        <li v-if="isMasterProductPro">{{ $t('setting.proxyHelper2') }}</li>
                         <li>{{ $t('setting.proxyHelper3') }}</li>
                     </ul>
                 </template>
@@ -69,7 +69,7 @@ import { storeToRefs } from 'pinia';
 
 const globalStore = GlobalStore();
 const emit = defineEmits<{ (e: 'search'): void }>();
-const { isProductPro } = storeToRefs(globalStore);
+const { isMasterProductPro } = storeToRefs(globalStore);
 
 const formRef = ref<FormInstance>();
 const rules = reactive({

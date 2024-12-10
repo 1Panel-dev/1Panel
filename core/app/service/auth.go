@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/1Panel-dev/1Panel/core/app/dto"
+	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
@@ -31,11 +32,11 @@ func NewIAuthService() IAuthService {
 }
 
 func (u *AuthService) Login(c *gin.Context, info dto.Login, entrance string) (*dto.UserLoginInfo, error) {
-	nameSetting, err := settingRepo.Get(commonRepo.WithByKey("UserName"))
+	nameSetting, err := settingRepo.Get(repo.WithByKey("UserName"))
 	if err != nil {
 		return nil, errors.WithMessage(constant.ErrRecordNotFound, err.Error())
 	}
-	passwordSetting, err := settingRepo.Get(commonRepo.WithByKey("Password"))
+	passwordSetting, err := settingRepo.Get(repo.WithByKey("Password"))
 	if err != nil {
 		return nil, errors.WithMessage(constant.ErrRecordNotFound, err.Error())
 	}
@@ -46,14 +47,14 @@ func (u *AuthService) Login(c *gin.Context, info dto.Login, entrance string) (*d
 	if !hmac.Equal([]byte(info.Password), []byte(pass)) || nameSetting.Value != info.Name {
 		return nil, constant.ErrAuth
 	}
-	entranceSetting, err := settingRepo.Get(commonRepo.WithByKey("SecurityEntrance"))
+	entranceSetting, err := settingRepo.Get(repo.WithByKey("SecurityEntrance"))
 	if err != nil {
 		return nil, err
 	}
 	if len(entranceSetting.Value) != 0 && entranceSetting.Value != entrance {
 		return nil, buserr.New(constant.ErrEntrance)
 	}
-	mfa, err := settingRepo.Get(commonRepo.WithByKey("MFAStatus"))
+	mfa, err := settingRepo.Get(repo.WithByKey("MFAStatus"))
 	if err != nil {
 		return nil, err
 	}
@@ -67,11 +68,11 @@ func (u *AuthService) Login(c *gin.Context, info dto.Login, entrance string) (*d
 }
 
 func (u *AuthService) MFALogin(c *gin.Context, info dto.MFALogin, entrance string) (*dto.UserLoginInfo, error) {
-	nameSetting, err := settingRepo.Get(commonRepo.WithByKey("UserName"))
+	nameSetting, err := settingRepo.Get(repo.WithByKey("UserName"))
 	if err != nil {
 		return nil, errors.WithMessage(constant.ErrRecordNotFound, err.Error())
 	}
-	passwordSetting, err := settingRepo.Get(commonRepo.WithByKey("Password"))
+	passwordSetting, err := settingRepo.Get(repo.WithByKey("Password"))
 	if err != nil {
 		return nil, errors.WithMessage(constant.ErrRecordNotFound, err.Error())
 	}
@@ -82,18 +83,18 @@ func (u *AuthService) MFALogin(c *gin.Context, info dto.MFALogin, entrance strin
 	if !hmac.Equal([]byte(info.Password), []byte(pass)) || nameSetting.Value != info.Name {
 		return nil, constant.ErrAuth
 	}
-	entranceSetting, err := settingRepo.Get(commonRepo.WithByKey("SecurityEntrance"))
+	entranceSetting, err := settingRepo.Get(repo.WithByKey("SecurityEntrance"))
 	if err != nil {
 		return nil, err
 	}
 	if len(entranceSetting.Value) != 0 && entranceSetting.Value != entrance {
 		return nil, buserr.New(constant.ErrEntrance)
 	}
-	mfaSecret, err := settingRepo.Get(commonRepo.WithByKey("MFASecret"))
+	mfaSecret, err := settingRepo.Get(repo.WithByKey("MFASecret"))
 	if err != nil {
 		return nil, err
 	}
-	mfaInterval, err := settingRepo.Get(commonRepo.WithByKey("MFAInterval"))
+	mfaInterval, err := settingRepo.Get(repo.WithByKey("MFAInterval"))
 	if err != nil {
 		return nil, err
 	}
@@ -106,11 +107,11 @@ func (u *AuthService) MFALogin(c *gin.Context, info dto.MFALogin, entrance strin
 }
 
 func (u *AuthService) generateSession(c *gin.Context, name, authMethod string) (*dto.UserLoginInfo, error) {
-	setting, err := settingRepo.Get(commonRepo.WithByKey("SessionTimeout"))
+	setting, err := settingRepo.Get(repo.WithByKey("SessionTimeout"))
 	if err != nil {
 		return nil, err
 	}
-	httpsSetting, err := settingRepo.Get(commonRepo.WithByKey("SSL"))
+	httpsSetting, err := settingRepo.Get(repo.WithByKey("SSL"))
 	if err != nil {
 		return nil, err
 	}
@@ -147,7 +148,7 @@ func (u *AuthService) generateSession(c *gin.Context, name, authMethod string) (
 }
 
 func (u *AuthService) LogOut(c *gin.Context) error {
-	httpsSetting, err := settingRepo.Get(commonRepo.WithByKey("SSL"))
+	httpsSetting, err := settingRepo.Get(repo.WithByKey("SSL"))
 	if err != nil {
 		return err
 	}
@@ -163,7 +164,7 @@ func (u *AuthService) LogOut(c *gin.Context) error {
 }
 
 func (u *AuthService) VerifyCode(code string) (bool, error) {
-	setting, err := settingRepo.Get(commonRepo.WithByKey("SecurityEntrance"))
+	setting, err := settingRepo.Get(repo.WithByKey("SecurityEntrance"))
 	if err != nil {
 		return false, err
 	}
@@ -171,7 +172,7 @@ func (u *AuthService) VerifyCode(code string) (bool, error) {
 }
 
 func (u *AuthService) CheckIsSafety(code string) (string, error) {
-	status, err := settingRepo.Get(commonRepo.WithByKey("SecurityEntrance"))
+	status, err := settingRepo.Get(repo.WithByKey("SecurityEntrance"))
 	if err != nil {
 		return "", err
 	}
@@ -185,7 +186,7 @@ func (u *AuthService) CheckIsSafety(code string) (string, error) {
 }
 
 func (u *AuthService) GetResponsePage() (string, error) {
-	pageCode, err := settingRepo.Get(commonRepo.WithByKey("NoAuthSetting"))
+	pageCode, err := settingRepo.Get(repo.WithByKey("NoAuthSetting"))
 	if err != nil {
 		return "", err
 	}

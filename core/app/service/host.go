@@ -6,6 +6,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/model"
+	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
@@ -84,7 +85,7 @@ func (u *HostService) TestLocalConn(id uint) bool {
 			return false
 		}
 	} else {
-		host, err = hostRepo.Get(commonRepo.WithByID(id))
+		host, err = hostRepo.Get(repo.WithByID(id))
 		if err != nil {
 			return false
 		}
@@ -124,7 +125,7 @@ func (u *HostService) TestLocalConn(id uint) bool {
 }
 
 func (u *HostService) GetHostInfo(id uint) (*model.Host, error) {
-	host, err := hostRepo.Get(commonRepo.WithByID(id))
+	host, err := hostRepo.Get(repo.WithByID(id))
 	if err != nil {
 		return nil, constant.ErrRecordNotFound
 	}
@@ -156,7 +157,7 @@ func (u *HostService) SearchWithPage(req dto.SearchHostWithPage) (int64, interfa
 		options = append(options, hostRepo.WithByInfo(req.Info))
 	}
 	if req.GroupID != 0 {
-		options = append(options, commonRepo.WithByGroupID(req.GroupID))
+		options = append(options, repo.WithByGroupID(req.GroupID))
 	}
 	total, hosts, err := hostRepo.Page(req.Page, req.PageSize, options...)
 	if err != nil {
@@ -168,7 +169,7 @@ func (u *HostService) SearchWithPage(req dto.SearchHostWithPage) (int64, interfa
 		if err := copier.Copy(&item, &host); err != nil {
 			return 0, nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
 		}
-		group, _ := groupRepo.Get(commonRepo.WithByID(host.GroupID))
+		group, _ := groupRepo.Get(repo.WithByID(host.GroupID))
 		item.GroupBelong = group.Name
 		if !item.RememberPassword {
 			item.Password = ""
@@ -204,7 +205,7 @@ func (u *HostService) SearchForTree(search dto.SearchForTree) ([]dto.HostTree, e
 	if err != nil {
 		return nil, err
 	}
-	groups, err := groupRepo.GetList(commonRepo.WithByType("host"))
+	groups, err := groupRepo.GetList(repo.WithByType("host"))
 	if err != nil {
 		return nil, err
 	}
@@ -257,7 +258,7 @@ func (u *HostService) Create(req dto.HostOperate) (*dto.HostInfo, error) {
 		return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
 	if req.GroupID == 0 {
-		group, err := groupRepo.Get(commonRepo.WithByType("host"), groupRepo.WithByDefault(true))
+		group, err := groupRepo.Get(repo.WithByType("host"), groupRepo.WithByDefault(true))
 		if err != nil {
 			return nil, errors.New("get default group failed")
 		}
@@ -307,7 +308,7 @@ func (u *HostService) Create(req dto.HostOperate) (*dto.HostInfo, error) {
 }
 
 func (u *HostService) Delete(ids []uint) error {
-	hosts, _ := hostRepo.GetList(commonRepo.WithByIDs(ids))
+	hosts, _ := hostRepo.GetList(repo.WithByIDs(ids))
 	for _, host := range hosts {
 		if host.ID == 0 {
 			return constant.ErrRecordNotFound
@@ -316,7 +317,7 @@ func (u *HostService) Delete(ids []uint) error {
 			return errors.New("the local connection information cannot be deleted!")
 		}
 	}
-	return hostRepo.Delete(commonRepo.WithByIDs(ids))
+	return hostRepo.Delete(repo.WithByIDs(ids))
 }
 
 func (u *HostService) Update(id uint, upMap map[string]interface{}) error {

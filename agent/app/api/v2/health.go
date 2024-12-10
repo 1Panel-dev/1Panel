@@ -9,7 +9,7 @@ import (
 )
 
 func (b *BaseApi) CheckHealth(c *gin.Context) {
-	_, err := xpack.RequestToMaster("/api/v2/agent/health", http.MethodGet, nil)
+	_, err := xpack.RequestToMaster("/api/v2/agent/xpack/health", http.MethodGet, nil)
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

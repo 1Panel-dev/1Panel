@@ -8,13 +8,16 @@
     >
         <Logo :isCollapse="isCollapse" />
 
-        <span v-if="nodes.length !== 1" class="el-dropdown-link">
-            {{ globalStore.currentNode || '127.0.0.1' }}
+        <span v-if="nodes.length !== 0" class="el-dropdown-link">
+            {{ loadCurrentName() }}
         </span>
-        <el-dropdown v-if="nodes.length !== 1" placement="right-start" @command="changeNode">
+        <el-dropdown v-if="nodes.length !== 0" placement="right-start" @command="changeNode">
             <el-icon class="ico"><Switch /></el-icon>
             <template #dropdown>
                 <el-dropdown-menu>
+                    <el-dropdown-item command="local">
+                        {{ $t('terminal.local') }}
+                    </el-dropdown-item>
                     <el-dropdown-item v-for="item in nodes" :key="item.name" :command="item.name">
                         {{ item.name }}
                     </el-dropdown-item>
@@ -60,7 +63,7 @@ import { ElMessageBox } from 'element-plus';
 import { GlobalStore, MenuStore } from '@/store';
 import { MsgSuccess } from '@/utils/message';
 import { isString } from '@vueuse/core';
-import { getSettingInfo } from '@/api/modules/setting';
+import { getSettingInfo, listNodeOptions } from '@/api/modules/setting';
 
 const route = useRoute();
 const menuStore = MenuStore();
@@ -82,6 +85,13 @@ const isCollapse = computed((): boolean => menuStore.isCollapse);
 let routerMenus = computed((): RouteRecordRaw[] => {
     return menuStore.menuList.filter((route) => route.meta && !route.meta.hideInSidebar);
 });
+
+const loadCurrentName = () => {
+    if (globalStore.currentNode) {
+        return globalStore.currentNode === 'local' ? i18n.global.t('terminal.local') : globalStore.currentNode;
+    }
+    return i18n.global.t('terminal.local');
+};
 
 const screenWidth = ref(0);
 
@@ -127,25 +137,23 @@ const systemLogOut = async () => {
 };
 
 const loadNodes = async () => {
-    let listXNodes;
-    const xpackModules = import.meta.glob('../../../xpack/api/modules/node.ts', { eager: true });
-    if (xpackModules['../../../xpack/api/modules/node.ts']) {
-        listXNodes = xpackModules['../../../xpack/api/modules/node.ts']['listNodes'] || {};
-        const res = await listXNodes();
-        if (!res) {
+    await listNodeOptions()
+        .then((res) => {
+            if (!res) {
+                nodes.value = [];
+                return;
+            }
+            nodes.value = res.data;
+            if (nodes.value.length === 0) {
+                globalStore.currentNode = 'local';
+            }
+        })
+        .catch(() => {
             nodes.value = [];
-            return;
-        }
-        nodes.value = res.data;
-        if (nodes.value.length === 1) {
-            globalStore.currentNode = nodes.value[0].name;
-        }
-        return;
-    }
-    nodes.value = [];
+        });
 };
 const changeNode = (command: string) => {
-    globalStore.currentNode = command || '127.0.0.1';
+    globalStore.currentNode = command || 'local';
     location.reload();
 };
 

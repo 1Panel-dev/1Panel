@@ -30,7 +30,7 @@ var (
 	ErrDemoEnvironment    = "ErrDemoEnvironment"
 	ErrCmdIllegal         = "ErrCmdIllegal"
 	ErrXpackNotFound      = "ErrXpackNotFound"
-	ErrXpackNotActive     = "ErrXpackNotActive"
+	ErrXpackExceptional   = "ErrXpackExceptional"
 	ErrXpackOutOfDate     = "ErrXpackOutOfDate"
 )
 
@@ -133,12 +133,4 @@ var (
 
 var (
 	ErrNotExistUser = "ErrNotExistUser"
-)
-
-// license
-var (
-	ErrLicense      = "ErrLicense"
-	ErrLicenseCheck = "ErrLicenseCheck"
-	ErrLicenseSave  = "ErrLicenseSave"
-	ErrLicenseSync  = "ErrLicenseSync"
 )
