@@ -3,8 +3,10 @@ package hook
 import (
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"os"
 	"path"
+	"sort"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -15,6 +17,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/encrypt"
+	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/1Panel-dev/1Panel/backend/utils/xpack"
 )
 
@@ -85,6 +88,8 @@ func Init() {
 	handleSnapStatus()
 	loadLocalDir()
 	initDir()
+
+	go initLang()
 }
 
 func handleSnapStatus() {
@@ -259,4 +264,73 @@ func handleCronJobAlert(cronjob *model.Cronjob) {
 		global.LOG.Errorf("cronjob alert push failed, err: %v", err)
 		return
 	}
+}
+
+func initLang() {
+	fileOp := files.NewFileOp()
+	upgradePath := path.Join(global.CONF.System.BaseDir, "1panel/tmp/upgrade")
+	if fileOp.Stat("/usr/local/bin/lang/zh.sh") {
+		return
+	}
+	tmpPath, err := loadRestorePath(upgradePath)
+	files, _ := os.ReadDir(path.Join(upgradePath, tmpPath, "downloads"))
+	if len(files) == 0 {
+		tmpPath = "no such file"
+	} else {
+		for _, item := range files {
+			if item.IsDir() && strings.HasPrefix(item.Name(), "1panel-") {
+				tmpPath = path.Join(upgradePath, tmpPath, "downloads", item.Name(), "lang")
+				break
+			}
+		}
+	}
+
+	if err != nil || tmpPath == "no such file" || !fileOp.Stat(tmpPath) {
+		path := fmt.Sprintf("%s/language/lang.tar.gz", global.CONF.System.RepoUrl)
+		if err := fileOp.DownloadFileWithProxy(path, "/usr/local/bin/lang.tar.gz"); err != nil {
+			global.LOG.Errorf("download lang.tar.gz failed, err: %v", err)
+			return
+		}
+		if !fileOp.Stat("/usr/local/bin/lang.tar.gz") {
+			global.LOG.Errorf("download lang.tar.gz failed, no such file, err: %v", err)
+			return
+		}
+		std, err := cmd.Execf("tar zxvfC %s %s", "/usr/local/bin/lang.tar.gz", "/usr/local/bin/")
+		if err != nil {
+			fmt.Printf("decompress lang.tar.gz failed, std: %s, err: %v", std, err)
+			return
+		}
+		_ = os.Remove("/usr/local/bin/lang.tar.gz")
+		global.LOG.Info("init lang for 1pctl successful")
+		return
+	}
+	std, err := cmd.Execf("cp -r %s %s", tmpPath, "/usr/local/bin/")
+	if err != nil {
+		fmt.Printf("load lang from package failed, std: %s, err: %v", std, err)
+		return
+	}
+	global.LOG.Info("init lang for 1pctl successful")
+}
+
+func loadRestorePath(upgradeDir string) (string, error) {
+	if _, err := os.Stat(upgradeDir); err != nil && os.IsNotExist(err) {
+		return "no such file", nil
+	}
+	files, err := os.ReadDir(upgradeDir)
+	if err != nil {
+		return "", err
+	}
+	var folders []string
+	for _, file := range files {
+		if file.IsDir() {
+			folders = append(folders, file.Name())
+		}
+	}
+	if len(folders) == 0 {
+		return "no such file", nil
+	}
+	sort.Slice(folders, func(i, j int) bool {
+		return folders[i] > folders[j]
+	})
+	return folders[0], nil
 }
