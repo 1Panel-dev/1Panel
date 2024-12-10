@@ -17,7 +17,7 @@
             </div>
             <div class="flex flex-wrap items-center">
                 <el-link :underline="false" type="primary" @click="toHalo">
-                    {{ isProductPro && globalStore.isIntl ? $t('license.pro') : $t('license.community') }}
+                    {{ $t(globalStore.isIntl || !isProductPro ? 'license.community' : 'license.pro') }}
                 </el-link>
                 <el-link :underline="false" class="version" type="primary" @click="copyText(version)">
                     {{ version }}
