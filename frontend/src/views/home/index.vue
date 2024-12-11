@@ -47,7 +47,7 @@
                         <div class="h-overview">
                             <el-row>
                                 <el-col :span="6">
-                                    <span>{{ $t('menu.website') }}</span>
+                                    <span>{{ $t('menu.website', 2) }}</span>
                                     <div class="count">
                                         <span @click="jumpToPath(router, '/websites')">
                                             {{ baseInfo?.websiteNumber }}
@@ -55,7 +55,7 @@
                                     </div>
                                 </el-col>
                                 <el-col :span="6">
-                                    <span>{{ $t('menu.database') }} - {{ $t('commons.table.all') }}</span>
+                                    <span>{{ $t('menu.database', 2) }} - {{ $t('commons.table.all') }}</span>
                                     <div class="count">
                                         <span @click="jumpToPath(router, '/databases')">
                                             {{ baseInfo?.databaseNumber }}
@@ -63,7 +63,7 @@
                                     </div>
                                 </el-col>
                                 <el-col :span="6">
-                                    <span>{{ $t('menu.cronjob') }}</span>
+                                    <span>{{ $t('menu.cronjob', 2) }}</span>
                                     <div class="count">
                                         <span @click="jumpToPath(router, '/cronjobs')">
                                             {{ baseInfo?.cronjobNumber }}

@@ -32,7 +32,7 @@
             </el-card>
         </div>
 
-        <LayoutContent v-if="isExist" class="card-interval" :title="$t('container.setting')">
+        <LayoutContent v-if="isExist" class="card-interval" :title="$t('container.setting', 2)">
             <template #main>
                 <el-radio-group v-model="confShowType" @change="changeMode">
                     <el-radio-button value="base">{{ $t('database.baseConf') }}</el-radio-button>
