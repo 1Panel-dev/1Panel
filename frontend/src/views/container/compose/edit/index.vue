@@ -75,7 +75,7 @@
 </template>
 <script lang="ts" setup>
 import { Codemirror } from 'vue-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
+import { yaml } from '@codemirror/lang-yaml';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { ref } from 'vue';
 import { composeUpdate } from '@/api/modules/container';
@@ -87,7 +87,7 @@ import { ElForm } from 'element-plus';
 const emit = defineEmits<{ (e: 'search'): void }>();
 const loading = ref(false);
 const composeVisible = ref(false);
-const extensions = [javascript(), oneDark];
+const extensions = [yaml(), oneDark];
 const path = ref();
 const content = ref();
 const name = ref();

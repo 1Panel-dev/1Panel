@@ -135,10 +135,10 @@ import DrawerHeader from '@/components/drawer-header/index.vue';
 import { listComposeTemplate, testCompose, upCompose } from '@/api/modules/container';
 import { loadBaseDir } from '@/api/modules/setting';
 import { MsgError } from '@/utils/message';
-import { javascript } from '@codemirror/lang-javascript';
+import { yaml } from '@codemirror/lang-yaml';
 import { oneDark } from '@codemirror/theme-one-dark';
 
-const extensions = [javascript(), oneDark];
+const extensions = [yaml(), oneDark];
 
 const showLog = ref(false);
 const loading = ref();

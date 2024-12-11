@@ -151,13 +151,13 @@ import { Rules, checkNumberRange } from '@/global/form-rules';
 import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 import { Codemirror } from 'vue-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
+import { yaml } from '@codemirror/lang-yaml';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { getLanguage } from '@/utils/util';
 import { Container } from '@/api/interface/container';
 import { loadResourceLimit } from '@/api/modules/container';
 
-const extensions = [javascript(), oneDark];
+const extensions = [yaml(), oneDark];
 
 interface ParamProps {
     id: Number;

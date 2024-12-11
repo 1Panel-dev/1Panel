@@ -153,14 +153,14 @@ import { useRouter } from 'vue-router';
 import Params from '../params/index.vue';
 import Header from '@/components/drawer-header/index.vue';
 import { Codemirror } from 'vue-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
+import { yaml } from '@codemirror/lang-yaml';
 import { oneDark } from '@codemirror/theme-one-dark';
 import i18n from '@/lang';
 import { MsgError } from '@/utils/message';
 import { Container } from '@/api/interface/container';
 import { loadResourceLimit } from '@/api/modules/container';
 
-const extensions = [javascript(), oneDark];
+const extensions = [yaml(), oneDark];
 const router = useRouter();
 
 interface InstallRrops {
