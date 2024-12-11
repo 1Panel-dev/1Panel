@@ -133,7 +133,7 @@ function getCheckedLabels(json: Node): string[] {
 
 const search = async () => {
     await checkIsSystemIntl();
-    let checkedLabels: string | any[];
+    let checkedLabels: any[] = [];
     if (!globalStore.isIntl) {
         const res = await getSettingInfo();
         const json: Node = JSON.parse(res.data.xpackHideMenu);

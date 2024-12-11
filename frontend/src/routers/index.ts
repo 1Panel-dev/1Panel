@@ -10,6 +10,12 @@ router.beforeEach((to, from, next) => {
     axiosCanceler.removeAllPending();
     const globalStore = GlobalStore();
 
+    if (globalStore.isIntl && to.path.includes('xpack')) {
+        next({ name: '404' });
+        NProgress.done();
+        return;
+    }
+
     if (to.name !== 'entrance' && !globalStore.isLogin) {
         next({
             name: 'entrance',
