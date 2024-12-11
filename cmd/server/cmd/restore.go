@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/i18n"
 	cmdUtils "github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
@@ -54,6 +55,7 @@ var restoreCmd = &cobra.Command{
 			return err
 		}
 		_, _ = cmdUtils.Execf("cp -r %s /usr/local/bin", path.Join(tmpPath, "lang"))
+		_, _ = cmdUtils.Execf("cp %s %s", path.Join(tmpPath, "GeoIP.mmdb"), path.Join(global.CONF.System.BaseDir, "1panel/geo/"))
 		fmt.Println(i18n.GetMsgByKeyForCmd("RestoreStep3"))
 		if err := common.CopyFile(path.Join(tmpPath, "1panel.service"), "/etc/systemd/system"); err != nil {
 			return err

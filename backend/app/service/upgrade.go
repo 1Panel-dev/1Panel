@@ -144,6 +144,9 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 			return
 		}
 		_, _ = cmd.Execf("cp -r %s /usr/local/bin", path.Join(tmpDir, "lang"))
+		geoPath := path.Join(global.CONF.System.BaseDir, "1panel/geo")
+		_, _ = cmd.Execf("mkdir %s && cp %s %s/", geoPath, path.Join(tmpDir, "GeoIP.mmdb"), geoPath)
+
 		if _, err := cmd.Execf("sed -i -e 's#BASE_DIR=.*#BASE_DIR=%s#g' /usr/local/bin/1pctl", global.CONF.System.BaseDir); err != nil {
 			global.LOG.Errorf("upgrade basedir in 1pctl failed, err: %v", err)
 			u.handleRollback(originalDir, 2)
@@ -177,6 +180,7 @@ func (u *UpgradeService) handleBackup(fileOp files.FileOp, originalDir string) e
 		return err
 	}
 	_, _ = cmd.Execf("cp -r /usr/local/bin/lang %s", originalDir)
+	_, _ = cmd.Execf("cp %s %s", path.Join(global.CONF.System.BaseDir, "1panel/geo/GeoIP.mmdb"), originalDir)
 	checkPointOfWal()
 	if err := handleTar(path.Join(global.CONF.System.BaseDir, "1panel/db"), originalDir, "db.tar.gz", "db/1Panel.db-*", ""); err != nil {
 		return err
@@ -208,6 +212,7 @@ func (u *UpgradeService) handleRollback(originalDir string, errStep int) {
 		global.LOG.Errorf("rollback 1panel failed, err: %v", err)
 	}
 	_, _ = cmd.Execf("cp -r %s /usr/local/bin", path.Join(originalDir, "lang"))
+	_, _ = cmd.Execf("cp %s %s", path.Join(originalDir, "GeoIP.mmdb"), path.Join(global.CONF.System.BaseDir, "1panel/geo/"))
 
 	if errStep == 2 {
 		return

@@ -4,15 +4,17 @@ import (
 	"crypto/tls"
 	"encoding/gob"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/constant"
-	"github.com/1Panel-dev/1Panel/backend/i18n"
 	"net"
 	"net/http"
 	"os"
 	"path"
 
+	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/i18n"
+
 	"github.com/1Panel-dev/1Panel/backend/init/app"
 	"github.com/1Panel-dev/1Panel/backend/init/business"
+	"github.com/1Panel-dev/1Panel/backend/init/lang"
 
 	"github.com/1Panel-dev/1Panel/backend/cron"
 	"github.com/1Panel-dev/1Panel/backend/init/cache"
@@ -38,6 +40,7 @@ func Start() {
 	db.Init()
 	migration.Init()
 	app.Init()
+	lang.Init()
 	validator.Init()
 	gob.Register(psession.SessionUser{})
 	cache.Init()
