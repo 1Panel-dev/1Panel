@@ -1834,7 +1834,7 @@ const message = {
         gotoInstalled: 'Go to install',
         search: 'Search',
         limitHelper: 'The application has already been installed.',
-        deleteHelper: `"{0}" has been associated with the following resource(s) and can't be deleted`,
+        deleteHelper: `"{0}" has been associated with the following resource(s). Please check and try again!`,
         checkTitle: 'Hint',
         website: 'website',
         database: 'database',

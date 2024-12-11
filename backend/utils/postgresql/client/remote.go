@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"sort"
 	"strings"
 	"time"
 
@@ -134,7 +135,7 @@ func (r *Remote) Backup(info BackupInfo) error {
 	}
 	fileNameItem := info.TargetDir + "/" + strings.TrimSuffix(info.FileName, ".gz")
 	backupCommand := exec.Command("bash", "-c",
-		fmt.Sprintf("docker run --rm --net=host -i %s -e PGPASSWORD='%s' /bin/bash -c 'pg_dump -h %s -p %d --no-owner -Fc -U %s %s' > %s",
+		fmt.Sprintf("docker run --rm --net=host -i %s /bin/bash -c 'PGPASSWORD=%s pg_dump -h %s -p %d --no-owner -Fc -U %s %s' > %s",
 			imageTag, r.Password, r.Address, r.Port, r.User, info.Name, fileNameItem))
 	_ = backupCommand.Run()
 	b := make([]byte, 5)
@@ -177,7 +178,7 @@ func (r *Remote) Recover(info RecoverInfo) error {
 		}()
 	}
 	recoverCommand := exec.Command("bash", "-c",
-		fmt.Sprintf("docker run --rm --net=host -i %s -e PGPASSWORD='%s' /bin/bash -c 'pg_restore -h %s -p %d --verbose --clean --no-privileges --no-owner -Fc -U %s -d %s --role=%s' < %s",
+		fmt.Sprintf("docker run --rm --net=host -i %s /bin/bash -c 'PGPASSWORD=%s pg_restore -h %s -p %d --verbose --clean --no-privileges --no-owner -Fc -U %s -d %s --role=%s' < %s",
 			imageTag, r.Password, r.Address, r.Port, r.User, info.Name, info.Username, fileName))
 	pipe, _ := recoverCommand.StdoutPipe()
 	stderrPipe, _ := recoverCommand.StderrPipe()
@@ -296,7 +297,11 @@ func loadImageTag() (string, error) {
 		return itemTag, nil
 	}
 
-	itemTag = "postgres:16.1-alpine"
+	sort.Strings(versions)
+	if len(versions) != 0 {
+		itemTag = versions[len(versions)-1]
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
 	defer cancel()
 	if _, err := client.ImagePull(ctx, itemTag, image.PullOptions{}); err != nil {

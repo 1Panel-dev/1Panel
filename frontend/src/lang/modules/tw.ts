@@ -1712,7 +1712,7 @@ const message = {
         gotoInstalled: '去安裝',
         search: '搜索',
         limitHelper: '該應用已安裝，不支持重復安裝',
-        deleteHelper: '{0}已經關聯以下資源，無法刪除',
+        deleteHelper: '{0}已經關聯以下資源，請檢查後重試！',
         checkTitle: '提示',
         website: '網站',
         database: '數據庫',
