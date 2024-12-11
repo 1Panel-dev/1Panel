@@ -247,7 +247,7 @@
                                         </div>
                                         <div class="app-divider" />
                                         <div
-                                            class="d-button"
+                                            class="d-button flex flex-wrap items-center justify-start gap-3"
                                             v-if="mode === 'installed' && installed.status != 'Installing'"
                                         >
                                             <el-button
@@ -641,5 +641,10 @@ onUnmounted(() => {
 .app-error {
     max-height: 500px;
     overflow-y: auto;
+}
+.d-button {
+    .el-button + .el-button {
+        margin-left: 0;
+    }
 }
 </style>
