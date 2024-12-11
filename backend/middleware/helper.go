@@ -26,6 +26,10 @@ func LoadErrCode() int {
 		return http.StatusRequestTimeout
 	case "416":
 		return http.StatusRequestedRangeNotSatisfiable
+	case "500":
+		return http.StatusInternalServerError
+	case "444":
+		return 444
 	default:
 		return http.StatusOK
 	}
