@@ -27,7 +27,7 @@
 
 <script lang="ts" setup>
 import { ReadByLine } from '@/api/modules/files';
-import { ref, computed, onMounted, watch, nextTick, reactive } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch, nextTick, reactive } from 'vue';
 import { downloadFile } from '@/utils/util';
 
 interface LogProps {
@@ -281,6 +281,11 @@ onMounted(async () => {
         }
     });
 });
+
+onUnmounted(() => {
+    onCloseLog();
+});
+
 defineExpose({ changeTail, onDownload, clearLog });
 </script>
 
