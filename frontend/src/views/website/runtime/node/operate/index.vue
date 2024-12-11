@@ -216,7 +216,7 @@ import { FormInstance } from 'element-plus';
 import { computed, reactive, ref, watch } from 'vue';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 
-interface OperateRrops {
+interface OperateProps {
     id?: number;
     mode: string;
     type: string;
@@ -482,7 +482,7 @@ const getRuntime = async (id: number) => {
     } catch (error) {}
 };
 
-const acceptParams = async (props: OperateRrops) => {
+const acceptParams = async (props: OperateProps) => {
     mode.value = props.mode;
     scripts.value = [];
     if (props.mode === 'create') {

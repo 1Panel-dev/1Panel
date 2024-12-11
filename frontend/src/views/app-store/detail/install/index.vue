@@ -163,12 +163,12 @@ import { loadResourceLimit } from '@/api/modules/container';
 const extensions = [yaml(), oneDark];
 const router = useRouter();
 
-interface InstallRrops {
+interface InstallProps {
     params?: App.AppParams;
     app: any;
 }
 
-const installData = ref<InstallRrops>({
+const installData = ref<InstallProps>({
     app: {},
 });
 const open = ref(false);
@@ -233,7 +233,7 @@ const resetForm = () => {
     Object.assign(req, initData());
 };
 
-const acceptParams = async (props: InstallRrops) => {
+const acceptParams = async (props: InstallProps) => {
     resetForm();
     if (props.app.versions != undefined) {
         installData.value = props;

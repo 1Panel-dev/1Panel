@@ -34,14 +34,14 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 const router = useRouter();
 
-interface InstallRrops {
+interface InstallProps {
     items: Website.CheckRes[];
 }
 
 let open = ref(false);
 let items = ref([]);
 
-const acceptParams = async (props: InstallRrops) => {
+const acceptParams = async (props: InstallProps) => {
     items.value = props.items;
     open.value = true;
 };

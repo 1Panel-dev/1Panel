@@ -166,7 +166,7 @@ import Params from '../param/index.vue';
 import EditParams from '../edit/index.vue';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 
-interface OperateRrops {
+interface OperateProps {
     id?: number;
     mode: string;
     type: string;
@@ -396,7 +396,7 @@ const changePHPExtension = () => {
     runtime.params['PHP_EXTENSIONS'] = extensions.value.split(',');
 };
 
-const acceptParams = async (props: OperateRrops) => {
+const acceptParams = async (props: OperateProps) => {
     mode.value = props.mode;
     initParam.value = false;
     if (props.mode === 'create') {

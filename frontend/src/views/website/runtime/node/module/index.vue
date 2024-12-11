@@ -49,7 +49,7 @@ import { MsgError, MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 import { Runtime } from '@/api/interface/runtime';
 
-interface NoodeRrops {
+interface NodeProps {
     packageManager: string;
     id: number;
 }
@@ -76,7 +76,7 @@ const buttons = [
     },
 ];
 
-const acceptParams = async (props: NoodeRrops) => {
+const acceptParams = async (props: NodeProps) => {
     id.value = props.id;
     packageManager.value = props.packageManager;
     module.value = '';

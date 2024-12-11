@@ -45,7 +45,7 @@ func Start() {
 	gob.Register(psession.SessionUser{})
 	cache.Init()
 	session.Init()
-	gin.SetMode("debug")
+	gin.SetMode(gin.DebugMode)
 	cron.Run()
 	InitOthers()
 	business.Init()

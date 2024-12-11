@@ -55,12 +55,12 @@ import { useRouter } from 'vue-router';
 import { DeleteRuntime } from '@/api/modules/runtime';
 const router = useRouter();
 
-interface CheckRrops {
+interface CheckProps {
     items: App.AppInstallResource[];
     installID: Number;
     key: string;
 }
-const installData = ref<CheckRrops>({
+const installData = ref<CheckProps>({
     items: [],
     installID: 0,
     key: '',
@@ -70,7 +70,7 @@ const map = new Map();
 const forceDelete = ref(false);
 const em = defineEmits(['close']);
 
-const acceptParams = (props: CheckRrops) => {
+const acceptParams = (props: CheckProps) => {
     map.clear();
     forceDelete.value = false;
     installData.value.installID = props.installID;
