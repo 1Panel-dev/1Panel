@@ -259,7 +259,7 @@ const get = async () => {
         }
         paramModel.value.memoryLimit = res.data.memoryLimit;
         paramModel.value.cpuQuota = res.data.cpuQuota;
-        paramModel.value.memoryUnit = res.data.memoryUnit !== '' ? res.data.memoryUnit : 'MB';
+        paramModel.value.memoryUnit = res.data.memoryUnit !== '' ? res.data.memoryUnit : 'M';
         paramModel.value.allowPort = res.data.allowPort;
         paramModel.value.containerName = res.data.containerName;
         paramModel.value.advanced = false;

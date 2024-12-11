@@ -35,7 +35,7 @@ func WhiteAllow() gin.HandlerFunc {
 			}
 		}
 		code := LoadErrCode()
-		helper.ErrWithHtml(c, code, "ip_limit")
+		helper.ErrWithHtml(c, code, "err_ip_limit")
 	}
 }
 
