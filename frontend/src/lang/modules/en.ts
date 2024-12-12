@@ -173,11 +173,11 @@ const message = {
             title: 'Linux Server Management Panel',
             licenseHelper:
                 'Agree &laquo; <a href="https://www.fit2cloud.com/legal/licenses.html" target="_blank">Community License Agreement</a> &raquo;',
-            errorAgree: 'Please click to agree to the Community Software License Agreement',
+            errorAgree: 'Click to agree to the Community Software License',
             logout: 'Logout',
             agreeTitle: 'Agreement',
             agreeContent:
-                'In order to better protect your legitimate rights and interests, please read and agree to the following agreement &laquo; <a href = "https://www.fit2cloud.com/legal/licenses.html" target = "_blank" > fly to cloud community software license agreement </a> &raquo;',
+                'In order to better protect your legitimate rights and interests, please read and agree to the following agreement &laquo; <a href = "https://www.fit2cloud.com/legal/licenses.html" target = "_blank" > Community License Agreement </a> &raquo;',
         },
         rule: {
             username: 'Enter a username',
