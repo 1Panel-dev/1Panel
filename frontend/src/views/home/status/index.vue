@@ -47,7 +47,8 @@
                 </template>
             </el-popover>
             <span class="input-help">
-                ( {{ formatNumber(currentInfo.cpuUsed) }} / {{ currentInfo.cpuTotal }} ) {{ $t('commons.units.core') }}
+                ( {{ formatNumber(currentInfo.cpuUsed) }} / {{ currentInfo.cpuTotal }} )
+                {{ $t('commons.units.core', currentInfo.cpuTotal) }}
             </span>
         </el-col>
         <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center">

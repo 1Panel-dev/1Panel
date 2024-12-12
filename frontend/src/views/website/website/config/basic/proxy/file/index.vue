@@ -7,7 +7,7 @@
         :before-close="handleClose"
     >
         <template #header>
-            <DrawerHeader :header="$t('website.proxyFile')" :back="handleClose" />
+            <DrawerHeader :header="$t('website.sourceFile')" :back="handleClose" />
         </template>
         <el-row v-loading="loading">
             <el-col :span="22" :offset="1">

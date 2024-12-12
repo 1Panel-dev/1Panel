@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-popover placement="bottom-start" :width="240" trigger="click">
+        <el-popover placement="bottom-start" :width="260" trigger="click">
             <template #reference>
                 <el-button round class="timer-button">{{ $t('commons.table.tableSetting') }}</el-button>
             </template>

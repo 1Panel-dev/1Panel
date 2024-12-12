@@ -581,17 +581,23 @@ function loadUpTime(uptime: number) {
     if (hours !== 0) {
         return (
             hours +
-            i18n.global.t('commons.units.hour') +
+            i18n.global.t('commons.units.hour', hours) +
             ' ' +
             minutes +
-            i18n.global.t('commons.units.minute') +
+            i18n.global.t('commons.units.minute', minutes) +
             ' ' +
             seconds +
-            i18n.global.t('commons.units.second')
+            i18n.global.t('commons.units.second', seconds)
         );
     }
     if (minutes !== 0) {
-        return minutes + i18n.global.t('commons.units.minute') + ' ' + seconds + i18n.global.t('commons.units.second');
+        return (
+            minutes +
+            i18n.global.t('commons.units.minute', minutes) +
+            ' ' +
+            seconds +
+            i18n.global.t('commons.units.second', seconds)
+        );
     }
     return seconds + i18n.global.t('commons.units.second');
 }

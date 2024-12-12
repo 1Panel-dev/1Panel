@@ -96,7 +96,7 @@
         </div>
 
         <div v-if="dbOptionsLocal.length === 0 && dbOptionsRemote.length === 0">
-            <LayoutContent :title="'Redis ' + $t('menu.database')" :divider="true">
+            <LayoutContent :title="'Redis ' + $t('menu.database').toLowerCase()" :divider="true">
                 <template #main>
                     <div class="app-warn">
                         <div>

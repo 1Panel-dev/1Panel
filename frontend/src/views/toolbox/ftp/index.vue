@@ -28,12 +28,12 @@
             </el-card>
         </div>
         <div v-if="form.isExist">
-            <LayoutContent v-loading="loading" title="FTP">
+            <LayoutContent v-loading="loading" :title="$t('toolbox.ftp.ftp', 2)">
                 <template #toolbar>
                     <div class="flex justify-between gap-2 flex-wrap sm:flex-row">
                         <div class="flex flex-wrap gap-3">
                             <el-button type="primary" :disabled="!form.isActive" @click="onOpenDialog('add')">
-                                {{ $t('commons.button.add') }} FTP
+                                {{ $t('commons.button.add') }} {{ $t('toolbox.ftp.ftp') }}
                             </el-button>
                             <el-button @click="onSync()" :disabled="!form.isActive">
                                 {{ $t('commons.button.sync') }}
@@ -327,7 +327,7 @@ const onDelete = async (row: Toolbox.FtpInfo | null) => {
         title: i18n.global.t('commons.button.delete'),
         names: names,
         msg: i18n.global.t('commons.msg.operatorHelper', [
-            i18n.global.t('cronjob.cronTask'),
+            i18n.global.t('toolbox.ftp.ftp'),
             i18n.global.t('commons.button.delete'),
         ]),
         api: null,

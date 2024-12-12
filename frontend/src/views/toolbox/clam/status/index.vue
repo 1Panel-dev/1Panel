@@ -11,7 +11,7 @@
                         <el-tag round v-if="!data.isActive" type="info">
                             {{ $t('commons.status.stopped') }}
                         </el-tag>
-                        <el-tag class="w-24">{{ $t('app.version') }}:{{ data.version }}</el-tag>
+                        <el-tag class="w-24">{{ $t('app.version') }}{{ $t('commons.colon') }}{{ data.version }}</el-tag>
                     </div>
                     <div class="mt-0.5">
                         <el-button type="primary" v-if="!data.isActive" link @click="onOperate('ClamAV', 'start')">

@@ -2,7 +2,7 @@
     <div v-loading="loading">
         <LayoutContent>
             <template #title>
-                <back-button name="PostgreSQL" :header="$t('database.remoteDB')" />
+                <back-button name="PostgreSQL" :header="$t('database.remoteDB', 2)" />
             </template>
             <template #toolbar>
                 <div class="flex justify-between gap-2 flex-wrap sm:flex-row">

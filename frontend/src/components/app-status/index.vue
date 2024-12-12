@@ -6,7 +6,7 @@
                     <div class="flex flex-wrap gap-4">
                         <el-tag effect="dark" type="success">{{ data.app }}</el-tag>
                         <Status :key="refresh" :status="data.status"></Status>
-                        <el-tag>{{ $t('app.version') }}:{{ data.version }}</el-tag>
+                        <el-tag>{{ $t('app.version') }}{{ $t('commons.colon') }}{{ data.version }}</el-tag>
                     </div>
 
                     <div class="mt-0.5">
@@ -217,13 +217,13 @@ const onOperate = async (operation: string) => {
 const getTitle = (key: string) => {
     switch (key) {
         case 'openresty':
-            return i18n.global.t('website.website');
+            return i18n.global.t('website.website', 2);
         case 'mysql':
-            return 'MySQL ' + i18n.global.t('menu.database');
+            return 'MySQL ' + i18n.global.t('menu.database').toLowerCase();
         case 'postgresql':
-            return 'PostgreSQL ' + i18n.global.t('menu.database');
+            return 'PostgreSQL ' + i18n.global.t('menu.database').toLowerCase();
         case 'redis':
-            return 'Redis ' + i18n.global.t('menu.database');
+            return 'Redis ' + i18n.global.t('menu.database').toLowerCase();
     }
 };
 

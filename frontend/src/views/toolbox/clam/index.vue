@@ -22,7 +22,7 @@
             <template #toolbar v-if="clamStatus.isExist">
                 <div class="flex w-full flex-col gap-4 md:justify-between md:flex-row">
                     <div class="flex flex-wrap gap-4">
-                        <el-button type="primary" :disabled="!clamStatus.isRunning" @click="onOpenDialog('add')">
+                        <el-button type="primary" :disabled="!clamStatus.isRunning" @click="onOpenDialog('create')">
                             {{ $t('toolbox.clam.clamCreate') }}
                         </el-button>
                         <el-button
@@ -366,7 +366,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('cronjob.record'),
+        label: i18n.global.t('cronjob.viewRecords'),
         click: (row: Toolbox.ClamInfo) => {
             onOpenRecord(row);
         },

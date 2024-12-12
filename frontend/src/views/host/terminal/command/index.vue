@@ -79,7 +79,7 @@
         >
             <template #header>
                 <DrawerHeader
-                    :header="$t('commons.button.' + operate) + $t('terminal.quickCommand')"
+                    :header="$t('commons.button.' + operate) + $t('terminal.quickCommand').toLowerCase()"
                     :back="handleClose"
                 />
             </template>
