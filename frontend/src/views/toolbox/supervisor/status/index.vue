@@ -44,7 +44,11 @@
                         <span v-if="!data.isExist">{{ $t('tool.supervisor.notSupport') }}</span>
                         <span v-else-if="!data.ctlExist">{{ $t('tool.supervisor.notSupportCrl') }}</span>
                         <span v-else-if="data.init">{{ $t('tool.supervisor.initHelper') }}</span>
-                        <span @click="toDoc()" v-if="!data.isExist || !data.ctlExist" class="flex items-center justify-center gap-0.5">
+                        <span
+                            @click="toDoc()"
+                            v-if="!data.isExist || !data.ctlExist"
+                            class="flex items-center justify-center gap-0.5"
+                        >
                             <el-icon><Position /></el-icon>
                             {{ $t('firewall.quickJump') }}
                         </span>

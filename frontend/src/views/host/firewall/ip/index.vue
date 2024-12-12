@@ -130,7 +130,7 @@ import { Host } from '@/api/interface/host';
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import {Position} from "@element-plus/icons-vue";
+import { Position } from '@element-plus/icons-vue';
 
 const loading = ref();
 const activeTag = ref('address');
