@@ -76,15 +76,15 @@
         <LayoutContent :title="$t('toolbox.clam.clam')" :divider="true" v-if="!data.isExist" v-loading="loading">
             <template #main>
                 <div class="app-warn">
-                    <div>
+                    <div class="flex flex-col gap-2 items-center justify-center w-full sm:flex-row">
                         <span v-if="!data.isExist">{{ $t('toolbox.clam.noClam') }}</span>
-                        <span @click="toDoc()" v-if="!data.isExist">
-                            <el-icon class="ml-2"><Position /></el-icon>
+                        <span @click="toDoc()" v-if="!data.isExist" class="flex items-center justify-center gap-0.5">
+                            <el-icon><Position /></el-icon>
                             {{ $t('firewall.quickJump') }}
                         </span>
-                        <div>
-                            <img alt="" src="@/assets/images/no_app.svg" />
-                        </div>
+                    </div>
+                    <div>
+                        <img alt="" src="@/assets/images/no_app.svg" />
                     </div>
                 </div>
             </template>

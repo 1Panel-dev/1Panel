@@ -229,15 +229,15 @@
             <LayoutContent :title="'MySQL ' + $t('menu.database')" :divider="true">
                 <template #main>
                     <div class="app-warn">
-                        <div>
+                        <div class="flex flex-col gap-2 items-center justify-center w-full sm:flex-row">
                             <span>{{ $t('app.checkInstalledWarn', [$t('database.noMysql')]) }}</span>
-                            <span @click="goRouter('app')">
-                                <el-icon class="ml-2"><Position /></el-icon>
+                            <span @click="goRouter('app')" class="flex items-center justify-center gap-0.5">
+                                <el-icon><Position /></el-icon>
                                 {{ $t('database.goInstall') }}
                             </span>
-                            <div>
-                                <img src="@/assets/images/no_app.svg" />
-                            </div>
+                        </div>
+                        <div>
+                            <img src="@/assets/images/no_app.svg" />
                         </div>
                     </div>
                 </template>

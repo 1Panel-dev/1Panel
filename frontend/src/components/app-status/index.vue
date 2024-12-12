@@ -92,7 +92,7 @@
                         <div class="flex flex-col gap-2 items-center justify-center w-full sm:flex-row">
                             <div>{{ $t('app.checkInstalledWarn', [data.app]) }}</div>
                             <span @click="goRouter(key)" class="flex items-center justify-center gap-0.5">
-                                <el-icon class="flex items-center justify-center"><Position /></el-icon>
+                                <el-icon><Position /></el-icon>
                                 {{ $t('database.goInstall') }}
                             </span>
                         </div>

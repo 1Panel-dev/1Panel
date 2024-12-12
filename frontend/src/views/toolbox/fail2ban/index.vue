@@ -149,15 +149,15 @@
             <LayoutContent title="Fail2ban" :divider="true">
                 <template #main>
                     <div class="app-warn">
-                        <div>
+                        <div class="flex flex-col gap-2 items-center justify-center w-full sm:flex-row">
                             <span>{{ $t('toolbox.fail2ban.noFail2ban') }}</span>
-                            <span @click="toDoc">
-                                <el-icon class="ml-2"><Position /></el-icon>
+                            <span @click="toDoc" class="flex items-center justify-center gap-0.5">
+                                <el-icon><Position /></el-icon>
                                 {{ $t('firewall.quickJump') }}
                             </span>
-                            <div>
-                                <img src="@/assets/images/no_app.svg" />
-                            </div>
+                        </div>
+                        <div>
+                            <img src="@/assets/images/no_app.svg" />
                         </div>
                     </div>
                 </template>
