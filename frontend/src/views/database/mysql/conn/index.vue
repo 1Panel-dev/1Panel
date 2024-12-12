@@ -80,16 +80,19 @@
                             :rules="Rules.paramComplexity"
                             prop="password"
                         >
-                            <el-input type="password" show-password clearable v-model="form.password">
-                                <template #suffix>
-                                    <CopyButton type="icon" :content="form.password" class="w-30" />
-                                </template>
-                                <template #append>
-                                    <el-button @click="random">
-                                        {{ $t('commons.button.random') }}
-                                    </el-button>
-                                </template>
-                            </el-input>
+                            <el-input
+                                style="width: calc(100% - 147px)"
+                                type="password"
+                                show-password
+                                clearable
+                                v-model="form.password"
+                            />
+                            <el-button-group>
+                                <CopyButton :content="form.password" />
+                                <el-button @click="random">
+                                    {{ $t('commons.button.random') }}
+                                </el-button>
+                            </el-button-group>
                         </el-form-item>
                     </div>
 
