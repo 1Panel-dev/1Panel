@@ -88,7 +88,7 @@
                                 v-model="form.password"
                             />
                             <el-button-group>
-                                <CopyButton :content="form.password" />
+                                <CopyButton class="copy_button" :content="form.password" />
                                 <el-button @click="random">
                                     {{ $t('commons.button.random') }}
                                 </el-button>
@@ -293,3 +293,14 @@ defineExpose({
     acceptParams,
 });
 </script>
+
+<style lang="scss" scoped>
+.copy_button {
+    border-radius: 0px;
+    border-left-width: 0px;
+}
+:deep(.el-input__wrapper) {
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+</style>

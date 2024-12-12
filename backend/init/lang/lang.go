@@ -74,7 +74,7 @@ func initLang() {
 			downloadGeoFromRemote(fileOp, geoPath)
 			return
 		}
-		std, err := cmd.Execf("cp %s %s", path.Join(tmpPath, "GeoIP.mmdb"), path.Dir(geoPath))
+		std, err := cmd.Execf("cp %s %s/", path.Join(tmpPath, "GeoIP.mmdb"), path.Dir(geoPath))
 		if err != nil {
 			global.LOG.Errorf("load geo ip from package failed, std: %s, err: %v", std, err)
 			return
