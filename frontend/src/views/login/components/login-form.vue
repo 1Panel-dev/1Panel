@@ -128,15 +128,6 @@
                                 </template>
                             </el-checkbox>
                         </el-form-item>
-                        <div class="agree-helper">
-                            <span
-                                v-if="!loginForm.agreeLicense && !_isMobile()"
-                                class="input-error"
-                                style="line-height: 14px"
-                            >
-                                {{ $t('commons.login.errorAgree') }}
-                            </span>
-                        </div>
                     </template>
                 </el-form>
                 <div class="demo">
@@ -156,7 +147,7 @@
                 <span v-html="$t('commons.login.agreeContent')"></span>
             </div>
             <template #footer>
-                <span class="dialog-footer">
+                <span class="dialog-footer login-footer-btn">
                     <el-button @click="agreeVisible = false">
                         {{ $t('commons.button.notAgree') }}
                     </el-button>
@@ -178,6 +169,7 @@ import { GlobalStore, MenuStore, TabsStore } from '@/store';
 import { MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
 import { getSettingInfo } from '@/api/modules/setting';
+import { Rules } from '@/global/form-rules';
 
 const i18n = useI18n();
 const themeConfig = computed(() => globalStore.themeConfig);
@@ -213,9 +205,17 @@ const loginForm = reactive({
 });
 
 const loginRules = reactive({
-    name: computed(() => [{ required: true, message: i18n.t('commons.rule.username'), trigger: 'blur' }]),
-    password: computed(() => [{ required: true, message: i18n.t('commons.rule.password'), trigger: 'blur' }]),
+    name: [{ required: true, message: i18n.t('commons.rule.username'), trigger: 'blur' }],
+    password: [{ required: true, message: i18n.t('commons.rule.password'), trigger: 'blur' }],
+    agreeLicense: [Rules.requiredSelect, { type: 'array', validator: checkAgreeLicense, trigger: 'blur' }],
 });
+
+function checkAgreeLicense(rule: any, value: any, callback: any) {
+    if (!value && !_isMobile()) {
+        return callback(new Error(i18n.t('commons.login.errorAgree')));
+    }
+    callback();
+}
 
 let isLoggingIn = false;
 const mfaButtonFocused = ref();
@@ -575,5 +575,12 @@ onMounted(() => {
 
 :deep(.el-loading-mask) {
     background-color: rgba(229, 238, 253, 0.8) !important;
+}
+
+.login-footer-btn {
+    .el-button--primary {
+        border-color: #005eeb !important;
+        background-color: #005eeb !important;
+    }
 }
 </style>
