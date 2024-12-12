@@ -212,7 +212,8 @@ func (u *UpgradeService) handleRollback(originalDir string, errStep int) {
 		global.LOG.Errorf("rollback 1panel failed, err: %v", err)
 	}
 	_, _ = cmd.Execf("cp -r %s /usr/local/bin", path.Join(originalDir, "lang"))
-	_, _ = cmd.Execf("cp %s %s", path.Join(originalDir, "GeoIP.mmdb"), path.Join(global.CONF.System.BaseDir, "1panel/geo/"))
+	geoPath := path.Join(global.CONF.System.BaseDir, "1panel/geo")
+	_, _ = cmd.Execf("mkdir %s && cp %s %s/", geoPath, path.Join(originalDir, "GeoIP.mmdb"), geoPath)
 
 	if errStep == 2 {
 		return
