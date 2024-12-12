@@ -1053,7 +1053,7 @@ const message = {
             hostname: 'Hostname',
             passwd: 'System password',
             passwdHelper: 'Input characters cannot include $ and &',
-            timeZone: 'System time zone',
+            timeZone: 'Time zone',
             localTime: 'Server time',
             timeZoneChangeHelper: 'Modifying the system time zone requires restarting the service. Continue?',
             timeZoneHelper: `If you don't install "timedatectl" command, you may not change the time zone. Because system uses that command to change time zone.`,
