@@ -168,10 +168,11 @@
                         show-overflow-tooltip
                     />
                     <fu-table-operations
-                        width="370px"
+                        :ellipsis="mobile ? 0 : 10"
+                        :min-width="mobile ? 'auto' : 300"
                         :buttons="buttons"
-                        :ellipsis="10"
                         :label="$t('commons.table.operate')"
+                        fixed="right"
                         fix
                     />
                 </ComplexTable>
@@ -252,7 +253,7 @@ import Backups from '@/components/backup/index.vue';
 import UploadDialog from '@/components/upload/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import { dateFormat } from '@/utils/util';
-import { onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref } from 'vue';
 import {
     deleteCheckPostgresqlDB,
     listDatabases,
@@ -330,6 +331,10 @@ const onChangeConn = async () => {
         database: currentDBName.value,
     });
 };
+
+const mobile = computed(() => {
+    return globalStore.isMobile();
+});
 
 const goRemoteDB = async () => {
     if (currentDB.value) {

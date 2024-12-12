@@ -124,7 +124,7 @@ html {
 .input-help {
     font-size: 12px;
     word-break: break-all;
-    color: #ADB0BC;
+    color: #adb0bc;
     width: 100%;
     display: inline-block;
 }
@@ -443,7 +443,7 @@ html {
     cursor: pointer;
 }
 
-.dialog-footer{
+.dialog-footer {
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -464,7 +464,7 @@ html {
 .monaco-editor-tree-dark .el-tree-node.is-current > .el-tree-node__content {
     background-color: #111417;
 }
-.check-label{
+.check-label {
     background: var(--panel-main-bg-color-10) !important;
     .check-label-a {
         color: var(--panel-color-primary);
@@ -479,7 +479,6 @@ html {
         text-overflow: ellipsis;
     }
 }
-
 
 .el-descriptions {
     overflow: hidden;

@@ -33,7 +33,7 @@
                     {{ $t('license.power') }}
                 </el-button>
                 <div class="mt-3 mb-5">
-                    <el-button text type="primary" @click="toHalo">{{ $t('license.knowMorePro') }}</el-button>
+                    <el-button text type="primary" @click="toLxware">{{ $t('license.knowMorePro') }}</el-button>
                 </div>
             </div>
         </el-dialog>
@@ -73,7 +73,7 @@ const handleExceed: UploadProps['onExceed'] = (files) => {
     uploadRef.value!.handleStart(file);
 };
 
-const toHalo = () => {
+const toLxware = () => {
     window.open('https://www.lxware.cn/1panel' + '', '_blank', 'noopener,noreferrer');
 };
 

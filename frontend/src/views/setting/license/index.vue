@@ -95,7 +95,7 @@
                                             <div class="h-app-content">{{ $t('license.technicalAdvice') }}</div>
                                         </el-col>
                                         <el-col :span="5">
-                                            <el-button type="primary" plain round size="small" @click="toHalo()">
+                                            <el-button type="primary" plain round size="small" @click="toLxware()">
                                                 {{ $t('license.advice') }}
                                             </el-button>
                                         </el-col>
@@ -138,7 +138,7 @@ const license = reactive({
     message: '',
 });
 
-const toHalo = () => {
+const toLxware = () => {
     window.open('https://www.lxware.cn/1panel' + '', '_blank', 'noopener,noreferrer');
 };
 

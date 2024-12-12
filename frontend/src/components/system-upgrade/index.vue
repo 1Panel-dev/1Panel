@@ -16,7 +16,7 @@
                 <el-divider v-if="!mobile" direction="vertical" />
             </div>
             <div class="flex flex-wrap items-center">
-                <el-link :underline="false" type="primary" @click="toHalo">
+                <el-link :underline="false" type="primary" @click="toLxware">
                     {{ $t(globalStore.isIntl || !isProductPro ? 'license.community' : 'license.pro') }}
                 </el-link>
                 <el-link :underline="false" class="version" type="primary" @click="copyText(version)">
@@ -121,7 +121,7 @@ const handleClose = () => {
     drawerVisible.value = false;
 };
 
-const toHalo = () => {
+const toLxware = () => {
     if (!globalStore.isIntl) {
         window.open('https://www.lxware.cn/1panel' + '', '_blank', 'noopener,noreferrer');
     }

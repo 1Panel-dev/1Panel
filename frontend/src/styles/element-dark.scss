@@ -1,63 +1,62 @@
 html.dark {
+    --panel-color-primary: #3d8eff;
+    --panel-color-primary-light-8: #3674cc;
+    --panel-color-primary-light-1: #6eaaff;
+    --panel-color-primary-light-2: #366fc2;
+    --panel-color-primary-light-3: #3364ad;
+    --panel-color-primary-light-4: #2f558f;
+    --panel-color-primary-light-5: #372e46;
+    --panel-color-primary-light-6: #2a4066;
+    --panel-color-primary-light-7: #2d4a7a;
+    --panel-color-primary-light-9: #2d4a7a;
 
-    --panel-color-primary: #3D8EFF;
-    --panel-color-primary-light-8: #3674CC;
-    --panel-color-primary-light-1: #6EAAFF;
-    --panel-color-primary-light-2: #366FC2;
-    --panel-color-primary-light-3: #3364AD;
-    --panel-color-primary-light-4: #2F558F;
-    --panel-color-primary-light-5: #372E46;
-    --panel-color-primary-light-6: #2A4066;
-    --panel-color-primary-light-7: #2D4A7A;
-    --panel-color-primary-light-9: #2D4A7A;
-
-    --panel-main-bg-color-1: #E3E6F3;
-    --panel-main-bg-color-2: #C0C2CF;
-    --panel-main-bg-color-3: #ADB0BC;
-    --panel-main-bg-color-4: #9597A4;
-    --panel-main-bg-color-5: #90929F;
-    --panel-main-bg-color-6: #787B88;
-    --panel-main-bg-color-7: #5B5E6A;
+    --panel-main-bg-color-1: #e3e6f3;
+    --panel-main-bg-color-2: #c0c2cf;
+    --panel-main-bg-color-3: #adb0bc;
+    --panel-main-bg-color-4: #9597a4;
+    --panel-main-bg-color-5: #90929f;
+    --panel-main-bg-color-6: #787b88;
+    --panel-main-bg-color-7: #5b5e6a;
     --panel-main-bg-color-8: #434552;
-    --panel-main-bg-color-9: #2E313D;
+    --panel-main-bg-color-9: #2e313d;
     --panel-main-bg-color-10: #242633;
-    --panel-main-bg-color-11: #60626F;
+    --panel-main-bg-color-11: #60626f;
     --panel-main-bg-color-12: #000000;
 
     --panel-alert-error-bg-color: #fef0f0;
     --panel-alert-error-text-color: #f56c6c;
-    --panel-alert-error-hover-bg-color: #E9657B;
+    --panel-alert-error-hover-bg-color: #e9657b;
 
     --panel-alert-success-bg-color: #e1f3d8;
     --panel-alert-success-text-color: #67c23a;
-    --panel-alert-success-hover-bg-color: #4DC894;
+    --panel-alert-success-hover-bg-color: #4dc894;
 
-    --panel-alert-warning-bg-color: #59472A;
-    --panel-alert-warning-text-color: #EDAC2C;
-    --panel-alert-warning-hover-bg-color: #F1C161;
+    --panel-alert-warning-bg-color: #59472a;
+    --panel-alert-warning-text-color: #edac2c;
+    --panel-alert-warning-hover-bg-color: #f1c161;
 
     --panel-alert-info-bg-color: var(--panel-main-bg-color-7);
     --panel-alert-info-text-color: var(--panel-text-color-white);
     --panel-alert-info-hover-bg-color: var(--panel-main-bg-color-4);
 
     --el-color-success: #3fb950;
-    --el-color-success-light-5: #4DC894;
+    --el-color-success-light-5: #4dc894;
     --el-color-success-light-8: #3fb950;
     --el-color-success-light-9: var(--panel-main-bg-color-9);
 
-    --el-color-warning: #EDAC2C;
-    --el-color-warning-light-5: #F1C161;
-    --el-color-warning-light-8: #EDAC2C;
+    --el-color-warning: #edac2c;
+    --el-color-warning-light-5: #f1c161;
+    --el-color-warning-light-8: #edac2c;
     --el-color-warning-light-9: var(--panel-main-bg-color-9);
 
-    --el-color-danger: #E2324F;
-    --el-color-danger-light-5: #E9657B;
-    --el-color-danger-light-8: #E2324F;
+    --el-color-danger: #e2324f;
+    --el-color-danger-light-5: #e9657b;
+    --el-color-danger-light-8: #e2324f;
     --el-color-danger-light-9: var(--panel-main-bg-color-9);
 
-    --el-color-error: #E2324F;
-    --el-color-error-light-5: #E9657B;
-    --el-color-error-light-8: #E2324F;
+    --el-color-error: #e2324f;
+    --el-color-error-light-5: #e9657b;
+    --el-color-error-light-8: #e2324f;
     --el-color-error-light-9: var(--panel-main-bg-color-9);
 
     --el-color-info: var(--panel-main-bg-color-3);
@@ -65,10 +64,8 @@ html.dark {
     --el-color-info-light-8: var(--panel-main-bg-color-3);
     --el-color-info-light-9: var(--panel-main-bg-color-9);
 
-
     --panel-pie-bg-color: #434552;
     --panel-text-color-white: #ffffff;
-
 
     --el-color-primary: var(--panel-color-primary);
     --el-color-primary-light-1: var(--panel-color-primary-light-1);
@@ -113,10 +110,10 @@ html.dark {
     --el-text-color-primary: var(--panel-main-bg-color-2);
     --el-text-color-regular: var(--panel-main-bg-color-2);
 
-    --el-box-shadow: 0px 12px 32px 4px rgba(36, 38, 51, .36), 0px 8px 20px rgba(36, 38, 51, .72);
-    --el-box-shadow-light: 0px 0px 12px rgba(36, 38, 51, .72);
-    --el-box-shadow-lighter: 0px 0px 6px rgba(36, 38, 51, .72);
-    --el-box-shadow-dark: 0px 16px 48px 16px rgba(36, 38, 51, .72), 0px 12px 32px #242633, 0px 8px 16px -8px #242633;
+    --el-box-shadow: 0px 12px 32px 4px rgba(36, 38, 51, 0.36), 0px 8px 20px rgba(36, 38, 51, 0.72);
+    --el-box-shadow-light: 0px 0px 12px rgba(36, 38, 51, 0.72);
+    --el-box-shadow-lighter: 0px 0px 6px rgba(36, 38, 51, 0.72);
+    --el-box-shadow-dark: 0px 16px 48px 16px rgba(36, 38, 51, 0.72), 0px 12px 32px #242633, 0px 8px 16px -8px #242633;
     --el-bg-color: var(--panel-main-bg-color-9);
     --el-bg-color-overlay: var(--panel-main-bg-color-9);
 
@@ -129,16 +126,17 @@ html.dark {
         color: var(--panel-main-bg-color-3);
     }
 
-    .el-menu-item:hover, .el-sub-menu__title:hover{
+    .el-menu-item:hover,
+    .el-sub-menu__title:hover {
         background: var(--panel-main-bg-color-8) !important;
     }
 
     .el-menu .el-menu-item {
-        box-shadow: 0 0 4px rgba(36, 38, 51, .72);
+        box-shadow: 0 0 4px rgba(36, 38, 51, 0.72);
     }
 
     .el-menu .el-sub-menu__title {
-        box-shadow: 0 0 4px rgba(36, 38, 51, .72);
+        box-shadow: 0 0 4px rgba(36, 38, 51, 0.72);
     }
 
     .el-overlay {
@@ -188,11 +186,11 @@ html.dark {
     }
 
     .el-card {
-        --el-card-bg-color: var(--panel-main-bg-color-10)
+        --el-card-bg-color: var(--panel-main-bg-color-10);
     }
 
     .el-button:hover {
-        --el-button-hover-border-color:var(--panel-main-bg-color-11);
+        --el-button-hover-border-color: var(--panel-main-bg-color-11);
         --el-button-hover-bg-color: var(--panel-main-bg-color-10);
     }
 
@@ -203,7 +201,7 @@ html.dark {
         &.brief-button {
             --el-button-text-color: var(--panel-main-bg-color-10);
             --el-button-hover-text-color: var(--el-color-white);
-            --el-button-hover-border-color:var(--el-color-primary);
+            --el-button-hover-border-color: var(--el-color-primary);
             --el-button-hover-bg-color: var(--el-color-primary);
         }
 
@@ -219,7 +217,9 @@ html.dark {
         }
     }
 
-    .el-button--primary.is-plain, .el-button--primary.is-text, .el-button--primary.is-link {
+    .el-button--primary.is-plain,
+    .el-button--primary.is-text,
+    .el-button--primary.is-link {
         --el-button-text-color: var(--panel-main-bg-color-2);
         --el-button-bg-color: var(--panel-main-bg-color-9);
         --el-button-border-color: var(--panel-main-bg-color-8);
@@ -227,7 +227,8 @@ html.dark {
         --el-button-hover-border-color: var(--panel-main-bg-color-8);
     }
 
-    .el-button--primary.is-text,.el-button--primary.is-link {
+    .el-button--primary.is-text,
+    .el-button--primary.is-link {
         --el-button-text-color: var(--panel-color-primary);
     }
 

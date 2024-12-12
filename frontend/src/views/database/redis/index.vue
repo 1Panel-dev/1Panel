@@ -213,6 +213,10 @@ const onLoadConn = async () => {
         database: currentDBName.value,
     });
 };
+//
+// const mobile = computed(() => {
+//     return globalStore.isMobile();
+// });
 
 const goRouter = async (target: string) => {
     if (target === 'app') {
