@@ -822,7 +822,7 @@ const message = {
         mirrors: 'Registry mirrors',
         mirrorsHelper: '',
         mirrorsHelper2: 'For details, see the official documents. ',
-        registries: 'Insecure registries',
+        registries: 'Private registries',
         ipv6Helper:
             'When enabling IPv6, you need to add an IPv6 container network. Refer to the official documentation for specific configuration steps.',
         ipv6CidrHelper: 'IPv6 address pool range for containers',
@@ -1246,7 +1246,7 @@ const message = {
         infoDetail: 'File properties',
         root: 'Root directory',
         list: 'File list',
-        sub: 'Include subdirectories',
+        sub: 'Subdirectories',
         downloadSuccess: 'Successfully downloaded',
         theme: 'Theme',
         language: 'Language',

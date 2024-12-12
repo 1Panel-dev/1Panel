@@ -386,7 +386,7 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('file.mode')" prop="mode" max-width="50">
+                    <el-table-column :label="$t('file.mode')" prop="mode" max-width="50" min-width="110px">
                         <template #default="{ row }">
                             <el-link :underline="false" @click="openMode(row)">{{ row.mode }}</el-link>
                         </template>

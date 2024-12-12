@@ -38,7 +38,7 @@
                 <el-row style="margin-top: 20px" v-if="confShowType === 'base'">
                     <el-col :span="1"><br /></el-col>
                     <el-col :xs="24" :sm="24" :md="15" :lg="12" :xl="10">
-                        <el-form :model="form" label-position="left" :rules="rules" ref="formRef" label-width="120px">
+                        <el-form :model="form" label-position="left" :rules="rules" ref="formRef" label-width="auto">
                             <el-form-item :label="$t('container.mirrors')" prop="mirrors">
                                 <div
                                     class="flex w-full justify-start flex-col sm:flex-row sm:items-end"

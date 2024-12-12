@@ -263,3 +263,10 @@ html {
     background-color: #f5f7fa !important;
     color: var(--el-color-info) !important;
 }
+
+.custom-input-textarea:hover {
+    color: var(--el-color-primary) !important;
+    background-color: var(--el-color-primary-light-9) !important;
+    border-color: var(--el-button-border-color) !important;
+}
+

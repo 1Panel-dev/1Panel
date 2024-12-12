@@ -460,4 +460,14 @@ html.dark {
     .el-checkbox__input.is-indeterminate .el-checkbox__inner::before {
         background-color: var(--panel-main-bg-color-10);
     }
+
+    .custom-input-textarea {
+        background-color: var(--panel-main-bg-color-10) !important;
+        color: var(--el-color-info) !important;
+    }
+    .custom-input-textarea:hover {
+        background-color: var(--panel-main-bg-color-9) !important;
+        color: var(--el-color-primary) !important;
+    }
+
 }
