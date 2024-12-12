@@ -1482,11 +1482,9 @@ const message = {
         upgrading: '正在升级中，请稍候...',
         upgradeHelper: '升级操作需要重启 1Panel 服务，是否继续？',
         noUpgrade: '当前已经是最新版本',
-        upgradeCheck: '检查更新',
         upgradeNotes: '更新内容',
         upgradeNow: '立即更新',
         source: '下载源',
-        hasNewVersion: '有新版本',
 
         safe: '安全',
         bindInfo: '监听地址',
@@ -1583,9 +1581,8 @@ const message = {
         backupRecoverMessage: '请输入压缩或解压缩密码（留空则不设置）',
     },
     license: {
-        community: '社区版：',
-        community2: '社区版',
-        pro: '专业版：',
+        community: '社区版',
+        pro: '专业版',
         trial: '试用版',
         office: '正式版',
         trialInfo: '版本',

@@ -16,24 +16,25 @@
                 <el-divider v-if="!mobile" direction="vertical" />
             </div>
             <div class="flex flex-wrap items-center">
-                <el-link :underline="false" type="primary" @click="toLxware">
+                <el-link :underline="false" class="-ml-2" type="primary" @click="toLxware">
                     {{ $t(globalStore.isIntl || !isProductPro ? 'license.community' : 'license.pro') }}
                 </el-link>
                 <el-link :underline="false" class="version" type="primary" @click="copyText(version)">
                     {{ version }}
                 </el-link>
                 <el-badge is-dot class="-mt-0.5" v-if="version !== 'Waiting' && globalStore.hasNewVersion">
-                    <el-link :underline="false" type="primary" @click="onLoadUpgradeInfo">
-                        （{{ $t('setting.hasNewVersion') }}）
+                    <el-link class="ml-2" :underline="false" type="primary" @click="onLoadUpgradeInfo">
+                        {{ $t('commons.operate.update') }}
                     </el-link>
                 </el-badge>
                 <el-link
                     v-if="version !== 'Waiting' && !globalStore.hasNewVersion"
                     type="primary"
                     :underline="false"
+                    class="ml-2"
                     @click="onLoadUpgradeInfo"
                 >
-                    （{{ $t('setting.upgradeCheck') }}）
+                    {{ $t('commons.operate.update') }}
                 </el-link>
                 <el-tag v-if="version === 'Waiting'" round style="margin-left: 10px">
                     {{ $t('setting.upgrading') }}
@@ -200,6 +201,7 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .version {
+    margin-left: 8px;
     font-size: 14px;
     color: var(--panel-color-primary-light-4);
     text-decoration: none;

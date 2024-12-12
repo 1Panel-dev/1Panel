@@ -66,7 +66,7 @@
                                             <span>{{ $t('setting.license') }}</span>
                                         </el-col>
                                         <el-col :span="6">
-                                            <span>{{ $t('license.community2') }}</span>
+                                            <span>{{ $t('license.community') }}</span>
                                         </el-col>
                                     </el-row>
                                 </div>

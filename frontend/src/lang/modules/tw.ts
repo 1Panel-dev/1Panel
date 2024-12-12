@@ -1481,11 +1481,9 @@ const message = {
         upgrading: '正在升級中，請稍候...',
         upgradeHelper: '升級操作需要重啟 1Panel 服務，是否繼續？',
         noUpgrade: '當前已經是最新版本',
-        upgradeCheck: '檢查更新',
         upgradeNotes: '更新內容',
         upgradeNow: '立即更新',
         source: '下載源',
-        hasNewVersion: '有新版本',
 
         safe: '安全',
         bindInfo: '監聽地址',
@@ -1583,9 +1581,8 @@ const message = {
         backupRecoverMessage: '請輸入壓縮或解壓縮密碼（留空則不設定）',
     },
     license: {
-        community: '社區版：',
-        community2: '社區版',
-        pro: '專業版：',
+        community: '社區版',
+        pro: '專業版',
         trial: '試用版',
         office: '正式版',
         trialInfo: '版本',
