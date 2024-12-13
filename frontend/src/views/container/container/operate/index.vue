@@ -359,6 +359,7 @@ const acceptParams = (params: DialogProps): void => {
         dialogData.value.rowData.memory = Number(dialogData.value.rowData.memory.toFixed(2));
 
         let itemCmd = '';
+        dialogData.value.rowData.cmd = dialogData.value.rowData?.cmd || [];
         for (const item of dialogData.value.rowData.cmd) {
             if (item.indexOf(' ') !== -1) {
                 itemCmd += `"${escapeQuotes(item)}" `;
@@ -368,6 +369,7 @@ const acceptParams = (params: DialogProps): void => {
         }
         dialogData.value.rowData.cmdStr = itemCmd.trimEnd();
         let itemEntrypoint = '';
+        dialogData.value.rowData.entrypoint = dialogData.value.rowData?.entrypoint || [];
         for (const item of dialogData.value.rowData.entrypoint) {
             if (item.indexOf(' ') !== -1) {
                 itemEntrypoint += `"${escapeQuotes(item)}" `;

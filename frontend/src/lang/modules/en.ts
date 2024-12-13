@@ -39,7 +39,7 @@ const message = {
             handle: 'Trigger',
             expand: 'Expand',
             collapse: 'Collapse',
-            log: 'View logs',
+            log: 'Logs',
             back: 'Back',
             backup: 'Backup',
             recover: 'Recover',
@@ -667,7 +667,7 @@ const message = {
         openStdin: 'Keep STDIN open even if not attached (-i)',
         custom: 'Custom',
         emptyUser: 'When empty, you will log in as  default',
-        containerTerminal: 'Open terminal',
+        containerTerminal: 'Terminal',
         privileged: 'Privileged',
         privilegedHelper:
             'Allow the container to perform certain privileged operations on the host, which may increase container risks. Use with caution!',
