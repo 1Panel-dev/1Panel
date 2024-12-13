@@ -93,7 +93,7 @@ import { ElMessageBox } from 'element-plus';
 import { storeToRefs } from 'pinia';
 
 const globalStore = GlobalStore();
-const { isDarkTheme } = storeToRefs(globalStore);
+const { isDarkTheme, docsUrl } = storeToRefs(globalStore);
 
 const mobile = computed(() => {
     return globalStore.isMobile();
@@ -129,7 +129,7 @@ const toLxware = () => {
 };
 
 const toDoc = () => {
-    window.open('https://1panel.cn/docs/', '_blank', 'noopener,noreferrer');
+    window.open(docsUrl.value, '_blank', 'noopener,noreferrer');
 };
 
 const toForum = () => {

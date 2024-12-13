@@ -13,36 +13,40 @@
         .d-name {
             height: 20%;
             .name {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 120px;
                 font-weight: 500;
                 font-size: 18px;
                 color: var(--panel-text-color);
             }
             .status {
-                margin-left: 10px;
+                margin-left: 5px;
             }
             .h-button {
                 float: right;
-                margin-right: 10px;
+                margin-right: 5px;
             }
             .msg {
-                margin-left: 10px;
+                margin-left: 5px;
+            }
+            .el-button + .el-button {
+                margin-left: 6px;
             }
         }
 
         .d-description {
             margin-top: 10px;
             overflow: hidden;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
             .el-tag {
                 margin-right: 5px;
             }
-            .description {
-                margin-top: 10px;
-                font-size: 14px;
-                color: var(--el-text-color-regular);
-            }
+        }
+        .description {
+            margin-top: 10px;
+            font-size: 14px;
+            color: var(--el-text-color-regular);
         }
         .d-button {
             margin-top: 10px;
