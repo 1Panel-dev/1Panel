@@ -207,7 +207,18 @@
                     </el-form-item>
 
                     <el-form-item v-if="hasScript()" :label="$t('cronjob.shellContent')" prop="script">
-                        <el-input clearable type="textarea" :rows="5" v-model="dialogData.rowData!.script" />
+                        <codemirror
+                            :autofocus="true"
+                            :indent-with-tab="true"
+                            :tabSize="4"
+                            :lineWrapping="true"
+                            style="width: 100%; margin-top: 5px"
+                            theme="cobalt"
+                            :styleActiveLine="true"
+                            :matchBrackets="true"
+                            :extensions="extensions"
+                            v-model="dialogData.rowData!.script"
+                        />
                     </el-form-item>
 
                     <el-form-item
@@ -440,6 +451,11 @@ import { loadDefaultSpec, specOptions, transObjToSpec, transSpecToObj, weekOptio
 import { storeToRefs } from 'pinia';
 import { GlobalStore } from '@/store';
 import LicenseImport from '@/components/license-import/index.vue';
+import { Codemirror } from 'vue-codemirror';
+import { javascript } from '@codemirror/lang-javascript';
+import { oneDark } from '@codemirror/theme-one-dark';
+
+const extensions = [javascript(), oneDark];
 
 const router = useRouter();
 
