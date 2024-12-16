@@ -181,6 +181,9 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
 import router from '@/routers';
+import { GlobalStore } from '@/store';
+
+const globalStore = GlobalStore();
 
 const loading = ref();
 const activeTag = ref('port');
@@ -254,7 +257,7 @@ const quickJump = () => {
     router.push({ name: 'AppInstalled' });
 };
 const toDoc = () => {
-    window.open('https://1panel.cn/docs/user_manual/hosts/firewall/', '_blank', 'noopener,noreferrer');
+    window.open(globalStore.docsUrl + '/user_manual/hosts/firewall/', '_blank', 'noopener,noreferrer');
 };
 
 const onChangeStatus = async (row: Host.RuleInfo, status: string) => {

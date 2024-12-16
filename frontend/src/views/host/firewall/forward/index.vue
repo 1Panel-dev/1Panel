@@ -90,6 +90,9 @@ import { onMounted, reactive, ref } from 'vue';
 import { operateForwardRule, searchFireRule } from '@/api/modules/host';
 import { Host } from '@/api/interface/host';
 import i18n from '@/lang';
+import { GlobalStore } from '@/store';
+
+const globalStore = GlobalStore();
 
 const loading = ref();
 const activeTag = ref('forward');
@@ -157,7 +160,7 @@ const onOpenDialog = async (
     dialogRef.value!.acceptParams(params);
 };
 const toDoc = () => {
-    window.open('https://1panel.cn/docs/user_manual/hosts/firewall/', '_blank', 'noopener,noreferrer');
+    window.open(globalStore.docsUrl + '/user_manual/hosts/firewall/', '_blank', 'noopener,noreferrer');
 };
 const onDelete = async (row: Host.RuleForward | null) => {
     let names = [];

@@ -109,11 +109,7 @@
                                     <el-alert :title="$t('runtime.buildHelper')" type="warning" :closable="false" />
                                     <span class="input-help">
                                         <span>{{ $t('runtime.extendHelper') }}</span>
-                                        <el-link
-                                            target="_blank"
-                                            type="primary"
-                                            href="https://1panel.cn/docs/user_manual/websites/php/#php_1"
-                                        >
+                                        <el-link target="_blank" type="primary" :href="globalStore.docsUrl + phpDocURL">
                                             {{ $t('php.toExtensionsList') }}
                                         </el-link>
                                         <br />
@@ -165,6 +161,10 @@ import { reactive, ref } from 'vue';
 import Params from '../param/index.vue';
 import EditParams from '../edit/index.vue';
 import DrawerHeader from '@/components/drawer-header/index.vue';
+import { GlobalStore } from '@/store';
+
+const globalStore = GlobalStore();
+const phpDocURL = globalStore.isIntl ? `/user_manual/websites/runtime_php/` : '/user_manual/websites/php/#php_1';
 
 interface OperateProps {
     id?: number;

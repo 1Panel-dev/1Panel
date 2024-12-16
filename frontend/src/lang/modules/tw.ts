@@ -12,6 +12,7 @@ const message = {
         colon: '：',
         example: '例如：',
         fit2cloud: '飞致云',
+        lingxia: '凌霞',
         button: {
             create: '創建',
             add: '添加',

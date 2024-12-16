@@ -195,7 +195,7 @@ const loading = ref();
 const selects = ref<any>([]);
 
 const globalStore = GlobalStore();
-const { isProductPro } = storeToRefs(globalStore);
+const { isProductPro, docsUrl } = storeToRefs(globalStore);
 const data = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'clam-page-size',
@@ -257,7 +257,7 @@ const toFolder = (folder: string) => {
     router.push({ path: '/hosts/files', query: { path: folder } });
 };
 const toDoc = async () => {
-    window.open('https://1panel.cn/docs/user_manual/toolbox/clam/', '_blank', 'noopener,noreferrer');
+    window.open(docsUrl + '/user_manual/toolbox/clam/', '_blank', 'noopener,noreferrer');
 };
 
 const onChange = async (row: any) => {

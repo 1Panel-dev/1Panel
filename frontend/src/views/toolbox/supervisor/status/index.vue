@@ -71,7 +71,9 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { HostTool } from '@/api/interface/host-tool';
 import InitPage from './init/index.vue';
+import { GlobalStore } from '@/store';
 
+const globalStore = GlobalStore();
 let operateReq = reactive({
     installId: 0,
     operate: '',
@@ -95,7 +97,7 @@ const setting = () => {
 };
 
 const toDoc = async () => {
-    window.open('https://1panel.cn/docs/user_manual/toolbox/supervisor/', '_blank', 'noopener,noreferrer');
+    window.open(globalStore.docsUrl + '/user_manual/toolbox/supervisor/', '_blank', 'noopener,noreferrer');
 };
 
 const init = async () => {

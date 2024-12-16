@@ -192,6 +192,9 @@ import { MsgSuccess } from '@/utils/message';
 import { getFail2banConf, getFail2banBase, operateFail2ban, updateFail2banByFile } from '@/api/modules/toolbox';
 import { ElMessageBox } from 'element-plus';
 import { transTimeUnit } from '@/utils/util';
+import { GlobalStore } from '@/store';
+
+const globalStore = GlobalStore();
 
 const loading = ref(false);
 const formRef = ref();
@@ -230,7 +233,7 @@ const onLoadList = async (type: string) => {
 };
 
 const toDoc = () => {
-    window.open('https://1panel.cn/docs/user_manual/toolbox/fail2ban/', '_blank', 'noopener,noreferrer');
+    window.open(globalStore.docsUrl + '/user_manual/toolbox/fail2ban/', '_blank', 'noopener,noreferrer');
 };
 
 const onSaveFile = async () => {

@@ -6,7 +6,7 @@
             :close-on-click-modal="false"
             :close-on-press-escape="false"
             @close="handleClose"
-            size="40%"
+            size="45%"
         >
             <template #header>
                 <DrawerHeader :header="$t('setting.apiInterface')" :back="handleClose" />
@@ -88,14 +88,16 @@ import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox, FormInstance } from 'element-plus';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { checkCidr, checkIp } from '@/utils/util';
+import { GlobalStore } from '@/store';
 
+const globalStore = GlobalStore();
 const loading = ref();
 const drawerVisible = ref();
 const formRef = ref();
 const apiURL = `${window.location.protocol}//${window.location.hostname}${
     window.location.port ? `:${window.location.port}` : ''
 }/1panel/swagger/index.html`;
-const panelURL = `https://1panel.cn/docs/dev_manual/api_manual/`;
+const panelURL = `${globalStore.docsUrl}/dev_manual/api_manual/`;
 
 const form = reactive({
     apiKey: '',

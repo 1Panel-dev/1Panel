@@ -13,6 +13,7 @@ const message = {
         colon: ': ',
         example: 'For example, ',
         fit2cloud: 'FIT2CLOUD',
+        lingxia: 'Lingxia',
         button: {
             create: 'Create ',
             add: 'Add ',

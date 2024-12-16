@@ -114,6 +114,9 @@ import { Backup } from '@/api/interface/backup';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { addBackup, editBackup, getOneDriveInfo } from '@/api/modules/setting';
 import { MsgSuccess } from '@/utils/message';
+import { GlobalStore } from '@/store';
+
+const globalStore = GlobalStore();
 
 const loading = ref(false);
 type FormInstance = InstanceType<typeof ElForm>;
@@ -214,7 +217,7 @@ function callback(error: any) {
 
 const toDoc = (isConf: boolean) => {
     let item = isConf ? '#onedrive' : '#onedrive_1';
-    window.open('https://1panel.cn/docs/user_manual/settings/' + item, '_blank', 'noopener,noreferrer');
+    window.open(globalStore.docsUrl + '/user_manual/settings/' + item, '_blank', 'noopener,noreferrer');
 };
 
 const onSubmit = async (formEl: FormInstance | undefined) => {

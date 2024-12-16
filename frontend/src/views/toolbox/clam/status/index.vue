@@ -97,6 +97,9 @@ import { onMounted, ref } from 'vue';
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
+import { GlobalStore } from '@/store';
+
+const globalStore = GlobalStore();
 
 const data = ref({
     isExist: false,
@@ -117,7 +120,7 @@ const setting = () => {
 };
 
 const toDoc = async () => {
-    window.open('https://1panel.cn/docs/user_manual/toolbox/clam/', '_blank', 'noopener,noreferrer');
+    window.open(globalStore.docsUrl + '/user_manual/toolbox/clam/', '_blank', 'noopener,noreferrer');
 };
 
 const changeShow = (val: boolean) => {

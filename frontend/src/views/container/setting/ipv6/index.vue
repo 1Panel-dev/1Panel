@@ -71,7 +71,9 @@ import { FormInstance } from 'element-plus';
 import { updateIpv6Option } from '@/api/modules/container';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { checkIpV6 } from '@/utils/util';
+import { GlobalStore } from '@/store';
 
+const globalStore = GlobalStore();
 const loading = ref();
 const drawerVisible = ref();
 const confirmDialogRef = ref();
@@ -108,7 +110,7 @@ function checkFixedCidrV6(rule: any, value: any, callback: any) {
 }
 
 const toDoc = () => {
-    window.open('https://1panel.cn/docs/user_manual/containers/setting/', '_blank', 'noopener,noreferrer');
+    window.open(globalStore.docsUrl + '/user_manual/containers/setting/', '_blank', 'noopener,noreferrer');
 };
 
 const emit = defineEmits<{ (e: 'search'): void }>();

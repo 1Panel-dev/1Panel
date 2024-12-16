@@ -131,6 +131,9 @@ import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { Position } from '@element-plus/icons-vue';
+import { GlobalStore } from '@/store';
+
+const globalStore = GlobalStore();
 
 const loading = ref();
 const activeTag = ref('address');
@@ -195,7 +198,7 @@ const onOpenDialog = async (
 };
 
 const toDoc = () => {
-    window.open('https://1panel.cn/docs/user_manual/hosts/firewall/', '_blank', 'noopener,noreferrer');
+    window.open(globalStore.docsUrl + '/user_manual/hosts/firewall/', '_blank', 'noopener,noreferrer');
 };
 
 const onChange = async (info: any) => {

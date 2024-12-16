@@ -20,11 +20,7 @@
                             v-model="extensions.extensions"
                         />
                     </el-form-item>
-                    <el-link
-                        target="_blank"
-                        type="primary"
-                        href="https://1panel.cn/docs/user_manual/websites/php/#php_1"
-                    >
+                    <el-link target="_blank" type="primary" :href="globalStore.docsUrl + phpDocURL">
                         {{ $t('php.toExtensionsList') }}
                     </el-link>
                 </el-form>
@@ -51,6 +47,10 @@ import { MsgSuccess } from '@/utils/message';
 import { CreatePHPExtensions, UpdatePHPExtensions } from '@/api/modules/runtime';
 import i18n from '@/lang';
 import { Runtime } from '@/api/interface/runtime';
+import { GlobalStore } from '@/store';
+
+const globalStore = GlobalStore();
+const phpDocURL = globalStore.isIntl ? `/user_manual/websites/runtime_php/` : '/user_manual/websites/php/#php_1';
 
 const open = ref(false);
 const operate = ref('create');
