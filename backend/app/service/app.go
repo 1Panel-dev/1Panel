@@ -126,11 +126,8 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 }
 
 func (a AppService) GetAppTags() ([]response.TagDTO, error) {
-	tags, err := tagRepo.All()
-	if err != nil {
-		return nil, err
-	}
-	var res []response.TagDTO
+	tags, _ := tagRepo.All()
+	res := make([]response.TagDTO, 0)
 	for _, tag := range tags {
 		res = append(res, response.TagDTO{
 			Tag: tag,
