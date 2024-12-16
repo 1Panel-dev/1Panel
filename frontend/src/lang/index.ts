@@ -5,7 +5,7 @@ import en from './modules/en';
 
 const i18n = createI18n({
     legacy: false,
-    locale: localStorage.getItem('lang') || 'zh',
+    locale: localStorage.getItem('lang') || 'en',
     fallbackLocale: 'en',
     globalInjection: true,
     messages: {
