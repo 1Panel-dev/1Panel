@@ -1425,7 +1425,7 @@ const message = {
         apiInterfaceAlert2: `Don't use third-party applications to call the API to prevent potential security threats.`,
         apiInterfaceAlert3: 'API Docs',
         apiInterfaceAlert4: 'Usage Docs',
-        apiKey: 'Interface key',
+        apiKey: 'API key',
         apiKeyHelper: 'API key is used for third-party applications to access the API.',
         ipWhiteList: 'IP allowlist',
         ipWhiteListEgs: 'One per line. For example,\n172.161.10.111\n172.161.10.0/24',

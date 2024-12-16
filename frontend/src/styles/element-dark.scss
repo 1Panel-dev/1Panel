@@ -157,9 +157,14 @@ html.dark {
         border-bottom-color: var(--panel-color-primary);
         --el-text-color-regular: var(--panel-color-primary);
     }
+    .main-container {
+        .el-loading-mask {
+            background-color: #24263375;
+        }
+    }
 
     .el-loading-mask {
-        background-color: #24263375;
+        background-color: #5b5e6a75;
     }
 
     .el-input {

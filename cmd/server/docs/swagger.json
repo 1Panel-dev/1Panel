@@ -24552,7 +24552,7 @@
     },
     "securityDefinitions": {
         "ApiKeyAuth": {
-            "description": "Custom Token Format, Format: md5('1panel' + 1Panel-Token + 1Panel-Timestamp).\n```\neg:\ncurl -X GET \"http://localhost:4004/api/v1/resource\" \\\n-H \"1Panel-Token: \u003c1panel_token\u003e\" \\\n-H \"1Panel-Timestamp: \u003ccurrent_unix_timestamp\u003e\"\n```\n- `1Panel-Token` is the key for the panel API interface.",
+            "description": "Custom Token Format, Format: md5('1panel' + API-Key + UnixTimestamp).\n```\neg:\ncurl -X GET \"http://localhost:4004/api/v1/resource\" \\\n-H \"1Panel-Token: \u003c1panel_token\u003e\" \\\n-H \"1Panel-Timestamp: \u003ccurrent_unix_timestamp\u003e\"\n```\n- `1Panel-Token` is the key for the panel API Key.",
             "type": "apiKey",
             "name": "1Panel-Token",
             "in": "Header"
