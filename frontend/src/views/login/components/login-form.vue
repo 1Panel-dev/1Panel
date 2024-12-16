@@ -161,7 +161,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from 'vue';
+import { ref, reactive, onMounted, computed, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import type { ElForm } from 'element-plus';
 import { loginApi, getCaptcha, mfaLoginApi, checkIsDemo, getLanguage, checkIsIntl } from '@/api/modules/auth';
@@ -176,7 +176,6 @@ const themeConfig = computed(() => globalStore.themeConfig);
 const globalStore = GlobalStore();
 const menuStore = MenuStore();
 const tabsStore = TabsStore();
-const usei18n = useI18n();
 
 const errAuthInfo = ref(false);
 const errCaptcha = ref(false);
@@ -250,7 +249,7 @@ const captcha = reactive({
 const loading = ref<boolean>(false);
 const mfaShow = ref<boolean>(false);
 const router = useRouter();
-const dropdownText = ref('中文(简体)');
+const dropdownText = ref('English');
 
 const checkIsSystemIntl = async () => {
     const res = await checkIsIntl();
@@ -260,7 +259,7 @@ const checkIsSystemIntl = async () => {
 
 function handleCommand(command: string) {
     loginForm.language = command;
-    usei18n.locale.value = command;
+    i18n.locale.value = command;
     globalStore.updateLanguage(command);
     if (command === 'zh') {
         dropdownText.value = '中文(简体)';
@@ -269,6 +268,9 @@ function handleCommand(command: string) {
     } else if (command === 'tw') {
         dropdownText.value = '中文(繁體)';
     }
+    nextTick(() => {
+        loginFormRef.value.clearValidate();
+    });
 }
 
 const agreeWithLogin = () => {
