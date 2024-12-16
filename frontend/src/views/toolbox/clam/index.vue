@@ -146,7 +146,7 @@
                         </template>
                     </el-table-column>
                     <fu-table-operations
-                        width="200px"
+                        width="300px"
                         :buttons="buttons"
                         :ellipsis="10"
                         :label="$t('commons.table.operate')"

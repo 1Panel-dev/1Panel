@@ -205,10 +205,24 @@ const loginForm = reactive({
 });
 
 const loginRules = reactive({
-    name: [{ required: true, message: i18n.t('commons.rule.username'), trigger: 'blur' }],
-    password: [{ required: true, message: i18n.t('commons.rule.password'), trigger: 'blur' }],
+    name: [{ required: true, validator: checkUsername, trigger: 'blur' }],
+    password: [{ required: true, validator: checkPassword, trigger: 'blur' }],
     agreeLicense: [Rules.requiredSelect, { type: 'array', validator: checkAgreeLicense, trigger: 'blur' }],
 });
+
+function checkUsername(rule: any, value: any, callback: any) {
+    if (value === '') {
+        return callback(new Error(i18n.t('commons.rule.username')));
+    }
+    callback();
+}
+
+function checkPassword(rule: any, value: any, callback: any) {
+    if (value === '') {
+        return callback(new Error(i18n.t('commons.rule.password')));
+    }
+    callback();
+}
 
 function checkAgreeLicense(rule: any, value: any, callback: any) {
     if (!value && !_isMobile()) {
