@@ -72,7 +72,7 @@
                             <el-form-item :label="$t('toolbox.device.localTime')" prop="localTime">
                                 <el-input disabled v-model="form.localTime">
                                     <template #append>
-                                        <el-button @click="onChangeLocalTime" icon="Refresh">
+                                        <el-button @click="onChangeLocalTime" icon="Refresh" width="150px">
                                             {{ $t('commons.button.sync') }}
                                         </el-button>
                                     </template>

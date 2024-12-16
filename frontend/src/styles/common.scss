@@ -123,10 +123,11 @@ html {
 
 .input-help {
     font-size: 12px;
-    word-break: break-all;
+    word-break:  keep-all;
     color: #adb0bc;
     width: 100%;
     display: inline-block;
+    white-space: normal;
 }
 
 .input-error {
