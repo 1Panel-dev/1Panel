@@ -1761,7 +1761,6 @@ const message = {
         upgradeHelper: '(Recommend keeping the latest upgrade backup for system rollback)',
         cache: 'System cache files',
         cacheHelper: '(Proceed with caution, cleaning requires a service restart)',
-        snapshot: 'System snapshot temporary files',
         snapshotTmp: 'System snapshot upload temporary files',
         snapshotLocal: 'System snapshot creation temporary files',
         rollback: 'Backup files before recover',
@@ -1784,9 +1783,7 @@ const message = {
             'System log information, container build or image pull log information, and log files generated in scheduled tasks',
         dockerLog: 'Container operation log files',
         taskLog: 'Scheduled task execution log files',
-        shell: 'Shell script scheduled tasks',
         containerShell: 'Container internal Shell script scheduled tasks',
-        curl: 'CURL scheduled tasks',
 
         containerTrash: 'Container Trash',
         images: 'Images',

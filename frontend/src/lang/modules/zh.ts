@@ -1644,7 +1644,6 @@ const message = {
         upgradeHelper: '( 建议保留最新的升级备份用于系统回滚 )',
         cache: '系统缓存文件',
         cacheHelper: '( 谨慎操作，清理需要重启服务 )',
-        snapshot: '系统快照临时文件',
         snapshotTmp: '系统快照上传临时文件',
         snapshotLocal: '系统快照制作临时文件',
         rollback: '恢复前备份目录',
@@ -1666,9 +1665,7 @@ const message = {
         systemLogHelper: '系统日志信息、容器构建或镜像拉取等日志信息以及计划任务中产生的日志文件',
         dockerLog: '容器操作日志文件',
         taskLog: '计划任务执行日志文件',
-        shell: 'Shell 脚本计划任务',
-        containerShell: '容器内执行 Shell 脚本计划任务',
-        curl: 'CURL 计划任务',
+        containerShell: '容器内 Shell 脚本',
 
         containerTrash: '容器垃圾',
         images: '镜像',

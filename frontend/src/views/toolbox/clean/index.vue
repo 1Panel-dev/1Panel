@@ -599,8 +599,6 @@ function load18n(label: string) {
             return i18n.global.t('clean.upgrade');
         case 'cache':
             return i18n.global.t('clean.cache');
-        case 'snapshot':
-            return i18n.global.t('clean.snapshot');
         case 'snapshot_tmp':
             return i18n.global.t('clean.snapshotTmp');
         case 'snapshot_local':
@@ -641,12 +639,20 @@ function load18n(label: string) {
             return i18n.global.t('clean.dockerLog');
         case 'task_log':
             return i18n.global.t('clean.taskLog');
-        case 'shell':
-            return i18n.global.t('clean.shell');
         case 'containerShell':
             return i18n.global.t('clean.containerShell');
         case 'curl':
-            return i18n.global.t('clean.curl');
+        case 'shell':
+        case 'app':
+        case 'website':
+        case 'database':
+        case 'directory':
+        case 'log':
+        case 'cutWebsiteLog':
+        case 'clean':
+        case 'snapshot':
+        case 'ntp':
+            return i18n.global.t('cronjob.' + label);
         case 'container_images':
             return i18n.global.t('clean.images');
         case 'container_containers':
