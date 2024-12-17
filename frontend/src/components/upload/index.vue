@@ -65,7 +65,7 @@
                         v-model:selects="selects"
                         :data="data"
                     >
-                        <template #toolbar>
+                        <template #leftToolBar>
                             <el-button
                                 class="ml-2.5"
                                 plain
@@ -138,9 +138,9 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
-import { computeSize } from '@/utils/util';
+import { computeSize, newUUID } from '@/utils/util';
 import i18n from '@/lang';
-import { UploadFile, UploadFiles, UploadInstance, genFileId } from 'element-plus';
+import { UploadFile, UploadFiles, UploadInstance, UploadProps, UploadRawFile, genFileId } from 'element-plus';
 import { File } from '@/api/interface/file';
 import { BatchDeleteFile, CheckFile, ChunkUploadFileData, GetUploadList } from '@/api/modules/files';
 import { loadBaseDir } from '@/api/modules/setting';
@@ -226,6 +226,7 @@ const onHandleRecover = async (row?: any) => {
         detailName: detailName.value,
         file: baseDir.value + row.name,
         secret: secret.value,
+        taskID: newUUID(),
     };
     loading.value = true;
     await handleRecoverByUpload(params)

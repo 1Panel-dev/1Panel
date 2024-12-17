@@ -11,7 +11,7 @@
         </template>
 
         <ComplexTable :data="data" @search="search()">
-            <template #toolbar>
+            <template #leftToolBar>
                 <el-button type="primary" @click="openCreate">{{ $t('website.createGroup') }}</el-button>
             </template>
             <el-table-column :label="$t('commons.table.name')" prop="name">

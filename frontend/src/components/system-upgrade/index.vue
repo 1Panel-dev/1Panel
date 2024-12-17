@@ -1,37 +1,45 @@
 <template>
-    <div class="flx-center">
-        <span v-if="props.footer">
-            <el-button type="primary" link @click="toForum">
-                <span class="font-normal">{{ $t('setting.forum') }}</span>
-            </el-button>
-            <el-divider direction="vertical" />
-            <el-button type="primary" link @click="toDoc">
-                <span class="font-normal">{{ $t('setting.doc2') }}</span>
-            </el-button>
-            <el-divider direction="vertical" />
-            <el-button type="primary" link @click="toGithub">
-                <span class="font-normal">{{ $t('setting.project') }}</span>
-            </el-button>
-            <el-divider direction="vertical" />
-        </span>
-        <el-button type="primary" link @click="toHalo">
-            <span class="font-normal">{{ isMasterProductPro ? $t('license.pro') : $t('license.community') }}</span>
-        </el-button>
-        <span class="version" @click="copyText(version)">{{ version }}</span>
-        <el-badge is-dot style="margin-top: -3px" v-if="version !== 'Waiting' && globalStore.hasNewVersion">
-            <el-button type="primary" link @click="onLoadUpgradeInfo">
-                <span class="font-normal">({{ $t('setting.hasNewVersion') }})</span>
-            </el-button>
-        </el-badge>
-        <el-button
-            v-if="version !== 'Waiting' && !globalStore.hasNewVersion"
-            type="primary"
-            link
-            @click="onLoadUpgradeInfo"
-        >
-            <span>({{ $t('setting.upgradeCheck') }})</span>
-        </el-button>
-        <el-tag v-if="version === 'Waiting'" round style="margin-left: 10px">{{ $t('setting.upgrading') }}</el-tag>
+    <div>
+        <div class="flex w-full flex-col gap-2 md:flex-row items-center">
+            <div class="flex flex-wrap items-center" v-if="props.footer">
+                <el-button type="primary" link @click="toForum">
+                    <span class="font-normal">{{ $t('setting.forum') }}</span>
+                </el-button>
+                <el-divider direction="vertical" />
+                <el-button type="primary" link @click="toDoc">
+                    <span class="font-normal">{{ $t('setting.doc2') }}</span>
+                </el-button>
+                <el-divider direction="vertical" />
+                <el-button type="primary" link @click="toGithub">
+                    <span class="font-normal">{{ $t('setting.project') }}</span>
+                </el-button>
+                <el-divider direction="vertical" />
+            </div>
+            <div class="flex flex-wrap items-center">
+                <el-button type="primary" link @click="toHalo">
+                    <span class="font-normal">
+                        {{ isMasterProductPro ? $t('license.pro') : $t('license.community') }}
+                    </span>
+                </el-button>
+                <span class="version" @click="copyText(version)">{{ version }}</span>
+                <el-badge is-dot style="margin-top: -3px" v-if="version !== 'Waiting' && globalStore.hasNewVersion">
+                    <el-button type="primary" link @click="onLoadUpgradeInfo">
+                        <span class="font-normal">({{ $t('setting.hasNewVersion') }})</span>
+                    </el-button>
+                </el-badge>
+                <el-button
+                    v-if="version !== 'Waiting' && !globalStore.hasNewVersion"
+                    type="primary"
+                    link
+                    @click="onLoadUpgradeInfo"
+                >
+                    <span>({{ $t('setting.upgradeCheck') }})</span>
+                </el-button>
+                <el-tag v-if="version === 'Waiting'" round style="margin-left: 10px">
+                    {{ $t('setting.upgrading') }}
+                </el-tag>
+            </div>
+        </div>
 
         <Upgrade ref="upgradeRef" @search="search" />
     </div>
@@ -124,25 +132,5 @@ onMounted(() => {
     color: var(--dark-gold-base-color);
     text-decoration: none;
     letter-spacing: 0.5px;
-}
-.line-height {
-    line-height: 25px;
-}
-.panel-MdEditor {
-    height: calc(100vh - 330px);
-    .tag {
-        margin-top: -6px;
-        margin-left: 20px;
-        vertical-align: middle;
-    }
-    :deep(.md-editor-preview) {
-        font-size: 14px;
-    }
-    :deep(.default-theme h2) {
-        color: var(--dark-gold-base-color);
-        margin: 13px, 0;
-        padding: 0;
-        font-size: 16px;
-    }
 }
 </style>

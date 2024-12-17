@@ -56,7 +56,7 @@
 
             <el-divider border-style="dashed" />
             <el-form-item :label="$t('commons.login.password')" v-if="form.from === 'local'" prop="password">
-                 <el-input
+                <el-input
                     style="width: calc(100% - 147px)"
                     type="password"
                     show-password

@@ -24,7 +24,7 @@
                 <el-button v-if="currentDB" type="primary" plain @click="onLoadConn">
                     {{ $t('database.databaseConnInfo') }}
                 </el-button>
-                <el-button @click="goRemoteDB" type="primary" plain>
+                <el-button @click="goRemoteDB()" type="primary" plain>
                     {{ $t('database.remoteDB') }}
                 </el-button>
             </template>

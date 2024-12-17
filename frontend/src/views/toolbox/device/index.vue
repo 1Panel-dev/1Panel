@@ -5,7 +5,12 @@
                 <el-row style="margin-top: 20px">
                     <el-col :span="1"><br /></el-col>
                     <el-col :xs="24" :sm="20" :md="20" :lg="10" :xl="10">
-                        <el-form :model="form" label-position="left" ref="formRef" label-width="120px">
+                        <el-form
+                            :model="form"
+                            :label-position="mobile ? 'top' : 'left'"
+                            ref="formRef"
+                            label-width="120px"
+                        >
                             <el-form-item label="DNS" prop="dnsItem">
                                 <el-input disabled v-model="form.dnsItem">
                                     <template #append>
@@ -95,7 +100,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref, computed } from 'vue';
 import Swap from '@/views/toolbox/device/swap/index.vue';
 import Passwd from '@/views/toolbox/device/passwd/index.vue';
 import TimeZone from '@/views/toolbox/device/time-zone/index.vue';
@@ -107,7 +112,11 @@ import { getDeviceBase, updateDevice } from '@/api/modules/toolbox';
 import i18n from '@/lang';
 import { computeSize } from '@/utils/util';
 import { MsgSuccess } from '@/utils/message';
-
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
+const mobile = computed(() => {
+    return globalStore.isMobile();
+});
 const loading = ref(false);
 
 const swapRef = ref();

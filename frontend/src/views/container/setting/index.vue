@@ -44,7 +44,13 @@
                 <el-row class="p-mt-20" v-if="confShowType === 'base'">
                     <el-col :span="1"><br /></el-col>
                     <el-col :xs="24" :sm="24" :md="15" :lg="12" :xl="10">
-                        <el-form :model="form" label-position="left" :rules="rules" ref="formRef" label-width="120px">
+                        <el-form
+                            :model="form"
+                            :label-position="mobile ? 'top' : 'left'"
+                            :rules="rules"
+                            ref="formRef"
+                            label-width="120px"
+                        >
                             <el-form-item :label="$t('container.mirrors')" prop="mirrors">
                                 <div class="w-full" v-if="form.mirrors">
                                     <el-input
@@ -230,7 +236,7 @@
 
 <script lang="ts" setup>
 import { ElMessageBox, FormInstance } from 'element-plus';
-import { onMounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref, computed } from 'vue';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import Mirror from '@/views/container/setting/mirror/index.vue';
 import Registry from '@/views/container/setting/registry/index.vue';
@@ -252,6 +258,9 @@ import { checkNumberRange } from '@/global/form-rules';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
 
+const mobile = computed(() => {
+    return globalStore.isMobile();
+});
 const unset = ref(i18n.global.t('setting.unSetting'));
 const submitInput = ref();
 

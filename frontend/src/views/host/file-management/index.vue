@@ -98,7 +98,7 @@
                     </el-button>
                 </el-button-group>
 
-                <el-button class="btn ml-2.5" @click="toTerminal">
+                <el-button class="btn" @click="toTerminal">
                     {{ $t('menu.terminal') }}
                 </el-button>
 
@@ -143,7 +143,7 @@
                 <el-button class="btn mr-2.5" @click="openRecycleBin">
                     {{ $t('file.recycleBin') }}
                 </el-button>
-                <div class="w-96">
+                <div class="w-76">
                     <el-input
                         v-model="req.search"
                         clearable

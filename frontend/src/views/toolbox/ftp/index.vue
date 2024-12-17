@@ -27,23 +27,19 @@
         </div>
         <div v-if="form.isExist">
             <LayoutContent v-loading="loading" title="FTP">
-                <template #toolbar>
-                    <el-row>
-                        <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16">
-                            <el-button type="primary" :disabled="!form.isActive" @click="onOpenDialog('add')">
-                                {{ $t('commons.button.add') }} FTP
-                            </el-button>
-                            <el-button @click="onSync()" :disabled="!form.isActive">
-                                {{ $t('commons.button.sync') }}
-                            </el-button>
-                            <el-button plain :disabled="selects.length === 0 || !form.isActive" @click="onDelete(null)">
-                                {{ $t('commons.button.delete') }}
-                            </el-button>
-                        </el-col>
-                        <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
-                            <TableSearch @search="search()" v-model:searchName="searchName" />
-                        </el-col>
-                    </el-row>
+                <template #leftToolBar>
+                    <el-button type="primary" :disabled="!form.isActive" @click="onOpenDialog('add')">
+                        {{ $t('commons.button.add') }} FTP
+                    </el-button>
+                    <el-button @click="onSync()" :disabled="!form.isActive">
+                        {{ $t('commons.button.sync') }}
+                    </el-button>
+                    <el-button plain :disabled="selects.length === 0 || !form.isActive" @click="onDelete(null)">
+                        {{ $t('commons.button.delete') }}
+                    </el-button>
+                </template>
+                <template #rightToolBar>
+                    <TableSearch @search="search()" v-model:searchName="searchName" />
                 </template>
                 <template #main>
                     <ComplexTable

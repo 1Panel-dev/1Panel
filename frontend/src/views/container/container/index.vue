@@ -77,7 +77,7 @@
                 <el-button type="primary" plain @click="onClean()">
                     {{ $t('container.containerPrune') }}
                 </el-button>
-                <el-button-group class="ml-4">
+                <el-button-group>
                     <el-button :disabled="checkStatus('start', null)" @click="onOperate('start', null)">
                         {{ $t('container.start') }}
                     </el-button>
@@ -102,12 +102,12 @@
                 </el-button-group>
             </template>
             <template #rightToolBar>
-                <el-checkbox v-model="includeAppStore" @change="search()" class="!mr-2.5">
+                <el-checkbox v-model="includeAppStore" @change="search()">
                     {{ $t('container.includeAppstore') }}
                 </el-checkbox>
-                <TableSearch @search="search()" v-model:searchName="searchName" class="mr-2.5" />
-                <TableRefresh @search="search()" class="mr-2.5" />
-                <TableSetting title="container-refresh" @search="refresh()" class="mr-2.5" />
+                <TableSearch @search="search()" v-model:searchName="searchName" />
+                <TableRefresh @search="search()" />
+                <TableSetting title="container-refresh" @search="refresh()" />
                 <fu-table-column-select
                     :columns="columns"
                     trigger="hover"

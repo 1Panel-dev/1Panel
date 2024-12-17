@@ -12,14 +12,14 @@
                     </el-tag>
                     <el-tag class="status-content w-24">{{ $t('app.version') }}:{{ data.version }}</el-tag>
                     <span class="buttons">
-                        <el-button type="primary" v-if="!data.isActive" link @click="onOperate('ClamAV','start')">
+                        <el-button type="primary" v-if="!data.isActive" link @click="onOperate('ClamAV', 'start')">
                             {{ $t('app.start') }}
                         </el-button>
-                        <el-button type="primary" v-if="data.isActive" link @click="onOperate('ClamAV','stop')">
+                        <el-button type="primary" v-if="data.isActive" link @click="onOperate('ClamAV', 'stop')">
                             {{ $t('app.stop') }}
                         </el-button>
                         <el-divider direction="vertical" />
-                        <el-button type="primary" link @click="onOperate('ClamAV','restart')">
+                        <el-button type="primary" link @click="onOperate('ClamAV', 'restart')">
                             {{ $t('app.restart') }}
                         </el-button>
                         <el-divider direction="vertical" />

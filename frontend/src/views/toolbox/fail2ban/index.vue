@@ -41,17 +41,13 @@
 
         <div v-if="form.isExist">
             <LayoutContent title="Fail2ban" :divider="true">
-                <template #toolbar>
-                    <el-row>
-                        <el-col :span="16">
-                            <el-button :disabled="!form.isActive" type="primary" plain @click="onLoadList('ignore')">
-                                {{ $t('toolbox.fail2ban.ignoreIP') }}
-                            </el-button>
-                            <el-button :disabled="!form.isActive" type="primary" plain @click="onLoadList('banned')">
-                                {{ $t('toolbox.fail2ban.bannedIP') }}
-                            </el-button>
-                        </el-col>
-                    </el-row>
+                <template #leftToolBar>
+                    <el-button :disabled="!form.isActive" type="primary" plain @click="onLoadList('ignore')">
+                        {{ $t('toolbox.fail2ban.ignoreIP') }}
+                    </el-button>
+                    <el-button :disabled="!form.isActive" type="primary" plain @click="onLoadList('banned')">
+                        {{ $t('toolbox.fail2ban.bannedIP') }}
+                    </el-button>
                 </template>
                 <template #main>
                     <el-radio-group v-model="confShowType" @change="changeMode">

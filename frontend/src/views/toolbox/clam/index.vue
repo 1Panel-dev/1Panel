@@ -19,24 +19,16 @@
                     v-model:mask-show="maskShow"
                 />
             </template>
-            <template #toolbar v-if="clamStatus.isExist">
-                <el-row>
-                    <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16">
-                        <el-button type="primary" :disabled="!clamStatus.isRunning" @click="onOpenDialog('add')">
-                            {{ $t('toolbox.clam.clamCreate') }}
-                        </el-button>
-                        <el-button
-                            plain
-                            :disabled="selects.length === 0 || !clamStatus.isRunning"
-                            @click="onDelete(null)"
-                        >
-                            {{ $t('commons.button.delete') }}
-                        </el-button>
-                    </el-col>
-                    <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
-                        <TableSearch @search="search()" v-model:searchName="searchName" />
-                    </el-col>
-                </el-row>
+            <template #leftToolBar v-if="clamStatus.isExist">
+                <el-button type="primary" :disabled="!clamStatus.isRunning" @click="onOpenDialog('add')">
+                    {{ $t('toolbox.clam.clamCreate') }}
+                </el-button>
+                <el-button plain :disabled="selects.length === 0 || !clamStatus.isRunning" @click="onDelete(null)">
+                    {{ $t('commons.button.delete') }}
+                </el-button>
+            </template>
+            <template #rightToolBar>
+                <TableSearch @search="search()" v-model:searchName="searchName" />
             </template>
             <el-card v-if="clamStatus.isExist && !clamStatus.isRunning && maskShow" class="mask-prompt">
                 <span>{{ $t('toolbox.clam.notStart') }}</span>

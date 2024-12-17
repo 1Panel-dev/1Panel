@@ -22,33 +22,37 @@
                 <div class="content-container__title">
                     <slot name="title">
                         <div v-if="showBack">
-                            <div class="flex justify-between">
-                                <back-button
-                                    :path="backPath"
-                                    :name="backName"
-                                    :to="backTo"
-                                    :header="title"
-                                    :reload="reload"
-                                >
-                                    <template v-if="slots.leftToolBar" #buttons>
-                                        <slot name="leftToolBar" v-if="slots.leftToolBar"></slot>
-                                    </template>
-                                </back-button>
-                                <div>
+                            <div class="flex flex-wrap gap-4 sm:justify-between">
+                                <div class="flex gap-2 flex-wrap items-center justify-start">
+                                    <back-button
+                                        :path="backPath"
+                                        :name="backName"
+                                        :to="backTo"
+                                        :header="title"
+                                        :reload="reload"
+                                    >
+                                        <template v-if="slots.leftToolBar" #buttons>
+                                            <slot name="leftToolBar" v-if="slots.leftToolBar"></slot>
+                                        </template>
+                                    </back-button>
+                                </div>
+                                <div class="flex flex-wrap gap-3">
                                     <slot name="rightToolBar" v-if="slots.rightToolBar"></slot>
                                 </div>
                             </div>
                         </div>
-                        <div class="flex justify-between" v-else>
-                            <div>
-                                <!-- {{ title }} -->
-                                <!-- <el-divider direction="vertical" v-if="slots.leftToolBar || slots.buttons" /> -->
-                                <slot name="leftToolBar" v-if="slots.leftToolBar"></slot>
-                                <slot name="buttons" v-if="slots.buttons"></slot>
-                            </div>
-                            <div class="flex justify-end" v-if="slots.rightToolBar || slots.rightButton">
-                                <slot name="rightToolBar"></slot>
-                                <slot name="rightButton"></slot>
+                        <div v-else>
+                            <div class="flex flex-wrap gap-4 sm:justify-between">
+                                <div class="flex gap-2 flex-wrap items-center justify-start">
+                                    {{ title }}
+                                    <el-divider direction="vertical" v-if="slots.leftToolBar || slots.buttons" />
+                                    <slot name="leftToolBar" v-if="slots.leftToolBar"></slot>
+                                    <slot name="buttons" v-if="slots.buttons"></slot>
+                                </div>
+                                <div class="flex flex-wrap gap-3" v-if="slots.rightToolBar || slots.rightButton">
+                                    <slot name="rightToolBar"></slot>
+                                    <slot name="rightButton"></slot>
+                                </div>
                             </div>
                         </div>
 
@@ -75,7 +79,7 @@
 
 <script setup lang="ts">
 import { computed, useSlots } from 'vue';
-import BackButton from '@/components/back-button/index.vue';
+// import BackButton from '@/components/back-button/index.vue';
 import FormButton from './form-button.vue';
 defineOptions({ name: 'LayoutContent' });
 const slots = useSlots();
@@ -111,6 +115,9 @@ const showBack = computed(() => {
 .content-container__title {
     font-weight: 400;
     font-size: 18px;
+    .el-button + .el-button {
+        margin: 0 !important;
+    }
 }
 
 .content-container_form {

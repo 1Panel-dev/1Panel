@@ -1,20 +1,24 @@
 <template>
     <el-card class="router_card">
-        <el-radio-group v-model="activeName" @change="handleChange">
-            <el-radio-button
-                class="router_card_button"
-                :label="button.label"
-                :value="button.label"
-                v-for="(button, index) in buttonArray"
-                size="large"
-                :key="index"
-            >
-                <el-badge :value="button.count" v-if="button.count" is-dot>
-                    <span>{{ button.label }}</span>
-                </el-badge>
-            </el-radio-button>
-        </el-radio-group>
-        <slot name="route-button"></slot>
+        <div class="flex w-full flex-col items-center md:justify-between md:flex-row">
+            <el-radio-group v-model="activeName" @change="handleChange">
+                <el-radio-button
+                    class="router_card_button"
+                    :label="button.label"
+                    :value="button.label"
+                    v-for="(button, index) in buttonArray"
+                    size="large"
+                    :key="index"
+                >
+                    <el-badge :value="button.count" v-if="button.count" is-dot>
+                        <span>{{ button.label }}</span>
+                    </el-badge>
+                </el-radio-button>
+            </el-radio-group>
+            <div class="flex flex-row gap-2 md:flex-col lg:flex-row">
+                <slot name="route-button"></slot>
+            </div>
+        </div>
     </el-card>
 </template>
 

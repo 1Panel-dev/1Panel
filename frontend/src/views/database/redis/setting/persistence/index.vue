@@ -80,7 +80,7 @@
         </el-row>
         <el-card style="margin-top: 20px">
             <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" @search="search" :data="data">
-                <template #toolbar>
+                <template #leftToolBar>
                     <el-button type="primary" @click="onBackup">{{ $t('commons.button.backup') }}</el-button>
                     <el-button type="primary" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
                         {{ $t('commons.button.delete') }}
@@ -118,7 +118,7 @@ import { Database } from '@/api/interface/database';
 import { redisPersistenceConf, updateRedisPersistenceConf } from '@/api/modules/database';
 import { deleteBackupRecord, handleBackup, handleRecover, searchBackupRecords } from '@/api/modules/backup';
 import { Rules } from '@/global/form-rules';
-import { dateFormat } from '@/utils/util';
+import { dateFormat, newUUID } from '@/utils/util';
 import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
 import { reactive, ref } from 'vue';
@@ -193,7 +193,7 @@ const search = async () => {
 };
 const onBackup = async () => {
     emit('loading', true);
-    await handleBackup({ name: database.value, detailName: '', type: 'redis', secret: '' })
+    await handleBackup({ name: database.value, detailName: '', type: 'redis', secret: '', taskID: '' })
         .then(() => {
             emit('loading', false);
             search();
@@ -211,6 +211,7 @@ const onRecover = async () => {
         detailName: '',
         file: currentRow.value.fileDir + '/' + currentRow.value.fileName,
         secret: '',
+        taskID: newUUID(),
     };
     emit('loading', true);
     await handleRecover(param)
