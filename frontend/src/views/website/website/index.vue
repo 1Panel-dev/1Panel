@@ -165,7 +165,7 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('website.sslExpireDate')" width="150px">
+                    <el-table-column :label="$t('website.sslExpireDate')" width="220px">
                         <template #default="{ row }">
                             <el-tag v-if="row.protocol == 'HTTPS'" :type="row.sslStatus">
                                 {{ dateFormatSimple(row.sslExpireDate) }}

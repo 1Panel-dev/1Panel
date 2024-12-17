@@ -118,7 +118,7 @@
                         :label="$t('container.source')"
                         show-overflow-tooltip
                         prop="resource"
-                        min-width="120"
+                        min-width="150"
                     >
                         <template #default="{ row }">
                             <div v-if="row.hasLoad">

@@ -54,11 +54,17 @@
                     <el-table-column
                         :label="$t('process.memory')"
                         fix
+                        min-width="120"
                         prop="rssValue"
                         :formatter="memFormatter"
                         sortable
                     ></el-table-column>
-                    <el-table-column :label="$t('process.numConnections')" fix prop="numConnections"></el-table-column>
+                    <el-table-column
+                        :label="$t('process.numConnections')"
+                        fix
+                        prop="numConnections"
+                        min-width="120"
+                    ></el-table-column>
                     <el-table-column
                         :label="$t('process.status')"
                         fix

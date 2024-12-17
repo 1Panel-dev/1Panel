@@ -48,14 +48,14 @@
                             </el-text>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('container.from')" prop="createdBy" min-width="80" fix>
+                    <el-table-column :label="$t('container.from')" prop="createdBy" min-width="120" fix>
                         <template #default="{ row }">
                             <span v-if="row.createdBy === ''">{{ $t('container.local') }}</span>
                             <span v-if="row.createdBy === 'Apps'">{{ $t('container.apps') }}</span>
                             <span v-if="row.createdBy === '1Panel'">1Panel</span>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('container.composeDirectory')" min-width="80" fix>
+                    <el-table-column :label="$t('container.composeDirectory')" min-width="100" fix>
                         <template #default="{ row }">
                             <el-button type="primary" link @click="toComposeFolder(row)">
                                 <el-icon>
@@ -64,19 +64,20 @@
                             </el-button>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('container.containerStatus')" min-width="80" fix>
+                    <el-table-column :label="$t('container.containerStatus')" min-width="200" fix>
                         <template #default="scope">
                             <div>
                                 {{ getContainerStatus(scope.row.containers) }}
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.createdAt')" prop="createdAt" min-width="80" fix />
+                    <el-table-column :label="$t('commons.table.createdAt')" prop="createdAt" min-width="180" fix />
                     <fu-table-operations
                         width="200px"
                         :ellipsis="10"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
+                        :fixed="mobile ? false : 'right'"
                         fix
                     />
                 </ComplexTable>
@@ -90,7 +91,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, onMounted, ref } from 'vue';
+import { reactive, onMounted, ref, computed } from 'vue';
 import EditDialog from '@/views/container/compose/edit/index.vue';
 import CreateDialog from '@/views/container/compose/create/index.vue';
 import DeleteDialog from '@/views/container/compose/delete/index.vue';
@@ -99,6 +100,12 @@ import { loadContainerLog, loadDockerStatus, searchCompose } from '@/api/modules
 import i18n from '@/lang';
 import { Container } from '@/api/interface/container';
 import router from '@/routers';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
+
+const mobile = computed(() => {
+    return globalStore.isMobile();
+});
 
 const data = ref();
 const selects = ref<any>([]);

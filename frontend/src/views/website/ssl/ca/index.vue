@@ -30,7 +30,7 @@
                 :buttons="buttons"
                 :label="$t('commons.table.operate')"
                 fix
-                width="250px"
+                width="400px"
             />
         </ComplexTable>
         <Create ref="createRef" @close="search()" />

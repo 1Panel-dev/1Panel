@@ -45,14 +45,14 @@
                         fix
                         show-overflow-tooltip
                         prop="domains"
-                        min-width="90px"
+                        min-width="150px"
                     ></el-table-column>
                     <el-table-column
                         :label="$t('ssl.applyType')"
                         fix
                         show-overflow-tooltip
                         prop="provider"
-                        min-width="110px"
+                        min-width="180px"
                     >
                         <template #default="{ row }">{{ getProvider(row.provider) }}</template>
                     </el-table-column>
@@ -61,7 +61,7 @@
                         fix
                         show-overflow-tooltip
                         prop="acmeAccount.email"
-                        min-width="110px"
+                        min-width="180px"
                     ></el-table-column>
                     <el-table-column
                         :label="$t('commons.table.status')"

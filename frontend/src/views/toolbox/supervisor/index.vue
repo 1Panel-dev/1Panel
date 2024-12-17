@@ -50,14 +50,14 @@
                         :label="$t('tool.supervisor.user')"
                         prop="user"
                         show-overflow-tooltip
-                        min-width="50px"
+                        min-width="120"
                     ></el-table-column>
                     <el-table-column
                         :label="$t('tool.supervisor.numprocs')"
                         prop="numprocs"
-                        min-width="60px"
+                        min-width="120"
                     ></el-table-column>
-                    <el-table-column :label="$t('tool.supervisor.manage')" min-width="80px">
+                    <el-table-column :label="$t('tool.supervisor.manage')" min-width="120">
                         <template #default="{ row }">
                             <div v-if="row.status && row.status.length > 0 && row.hasLoad">
                                 <el-button
@@ -142,7 +142,7 @@
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         :fixed="mobile ? false : 'right'"
-                        width="280px"
+                        min-width="300"
                         fix
                     />
                 </ComplexTable>
