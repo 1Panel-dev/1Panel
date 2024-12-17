@@ -17,7 +17,7 @@
                     <span>{{ $t('firewall.firewallNotStart') }}</span>
                 </el-card>
 
-                <LayoutContent :title="$t('firewall.portRule')" :class="{ mask: fireStatus != 'running' }">
+                <LayoutContent :title="$t('firewall.portRule', 2)" :class="{ mask: fireStatus != 'running' }">
                     <template #prompt>
                         <el-alert type="info" :closable="false">
                             <template #default>

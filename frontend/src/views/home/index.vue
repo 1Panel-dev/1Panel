@@ -170,20 +170,16 @@
                 <CardWithHeader :header="$t('home.systemInfo')">
                     <template #body>
                         <el-scrollbar>
-                            <el-descriptions :column="1" class="h-systemInfo">
-                                <el-descriptions-item class-name="system-content">
+                            <el-descriptions :column="1" class="h-systemInfo" border>
+                                <el-descriptions-item class-name="system-content" label-class-name="system-label">
                                     <template #label>
-                                        <span class="system-label">
-                                            {{ $t('home.hostname') }}
-                                        </span>
+                                        <span>{{ $t('home.hostname') }}</span>
                                     </template>
                                     {{ baseInfo.hostname }}
                                 </el-descriptions-item>
-                                <el-descriptions-item class-name="system-content">
+                                <el-descriptions-item class-name="system-content" label-class-name="system-label">
                                     <template #label>
-                                        <span class="system-label">
-                                            {{ $t('home.platformVersion') }}
-                                        </span>
+                                        <span>{{ $t('home.platformVersion') }}</span>
                                     </template>
                                     {{
                                         baseInfo.platformVersion
@@ -191,57 +187,47 @@
                                             : baseInfo.platform + '-' + baseInfo.platformVersion
                                     }}
                                 </el-descriptions-item>
-                                <el-descriptions-item class-name="system-content">
+                                <el-descriptions-item class-name="system-content" label-class-name="system-label">
                                     <template #label>
-                                        <span class="system-label">
-                                            {{ $t('home.kernelVersion') }}
-                                        </span>
+                                        <span>{{ $t('home.kernelVersion') }}</span>
                                     </template>
                                     {{ baseInfo.kernelVersion }}
                                 </el-descriptions-item>
-                                <el-descriptions-item class-name="system-content">
+                                <el-descriptions-item class-name="system-content" label-class-name="system-label">
                                     <template #label>
-                                        <span class="system-label">
-                                            {{ $t('home.kernelArch') }}
-                                        </span>
+                                        <span>{{ $t('home.kernelArch') }}</span>
                                     </template>
                                     {{ baseInfo.kernelArch }}
                                 </el-descriptions-item>
                                 <el-descriptions-item
                                     v-if="baseInfo.ipv4Addr && baseInfo.ipv4Addr !== 'IPNotFound'"
                                     class-name="system-content"
+                                    label-class-name="system-label"
                                 >
                                     <template #label>
-                                        <span class="system-label">
-                                            {{ $t('home.ip') }}
-                                        </span>
+                                        <span>{{ $t('home.ip') }}</span>
                                     </template>
                                     {{ baseInfo.ipv4Addr }}
                                 </el-descriptions-item>
                                 <el-descriptions-item
                                     v-if="baseInfo.systemProxy && baseInfo.systemProxy !== 'noProxy'"
                                     class-name="system-content"
+                                    label-class-name="system-label"
                                 >
                                     <template #label>
-                                        <span class="system-label">
-                                            {{ $t('home.proxy') }}
-                                        </span>
+                                        <span>{{ $t('home.proxy') }}</span>
                                     </template>
                                     {{ baseInfo.systemProxy }}
                                 </el-descriptions-item>
-                                <el-descriptions-item class-name="system-content">
+                                <el-descriptions-item class-name="system-content" label-class-name="system-label">
                                     <template #label>
-                                        <span class="system-label">
-                                            {{ $t('home.uptime') }}
-                                        </span>
+                                        <span>{{ $t('home.uptime') }}</span>
                                     </template>
                                     {{ currentInfo.timeSinceUptime }}
                                 </el-descriptions-item>
-                                <el-descriptions-item class-name="system-content">
+                                <el-descriptions-item class-name="system-content" label-class-name="system-label">
                                     <template #label>
-                                        <span class="system-label">
-                                            {{ $t('home.runningTime') }}
-                                        </span>
+                                        <span>{{ $t('home.runningTime') }}</span>
                                     </template>
                                     {{ loadUpTime(currentInfo.uptime) }}
                                 </el-descriptions-item>
@@ -563,43 +549,25 @@ function loadUpTime(uptime: number) {
     let hours = Math.floor((uptime % 86400) / 3600);
     let minutes = Math.floor((uptime % 3600) / 60);
     let seconds = uptime % 60;
+    let uptimeParts = [];
+    let lead = false;
     if (days !== 0) {
-        return (
-            days +
-            i18n.global.t('commons.units.day', days) +
-            ' ' +
-            hours +
-            i18n.global.t('commons.units.hour', hours) +
-            ' ' +
-            minutes +
-            i18n.global.t('commons.units.minute', minutes) +
-            ' ' +
-            seconds +
-            i18n.global.t('commons.units.second', seconds)
-        );
+        uptimeParts.push(days + i18n.global.t('commons.units.dayUnit', days));
+        lead = true;
     }
-    if (hours !== 0) {
-        return (
-            hours +
-            i18n.global.t('commons.units.hour', hours) +
-            ' ' +
-            minutes +
-            i18n.global.t('commons.units.minute', minutes) +
-            ' ' +
-            seconds +
-            i18n.global.t('commons.units.second', seconds)
-        );
+    if (lead || hours !== 0) {
+        uptimeParts.push(hours + i18n.global.t('commons.units.hourUnit', hours));
+        lead = true;
     }
-    if (minutes !== 0) {
-        return (
-            minutes +
-            i18n.global.t('commons.units.minute', minutes) +
-            ' ' +
-            seconds +
-            i18n.global.t('commons.units.second', seconds)
-        );
+    if (lead || minutes !== 0) {
+        uptimeParts.push(minutes + i18n.global.t('commons.units.minuteUnit', minutes));
+        lead = true;
     }
-    return seconds + i18n.global.t('commons.units.second');
+    if (lead || seconds !== 0) {
+        uptimeParts.push(seconds + i18n.global.t('commons.units.secondUnit', seconds));
+        lead = true;
+    }
+    return lead ? uptimeParts.join(' ') : '-';
 }
 
 const loadData = async () => {
@@ -725,10 +693,16 @@ onBeforeUnmount(() => {
     font-weight: 400 !important;
     font-size: 14px !important;
     color: var(--panel-text-color);
+    border: none !important;
+    background: none !important;
+    width: fit-content !important;
+    white-space: nowrap !important;
 }
 
 .system-content {
     font-size: 13px !important;
+    border: none !important;
+    width: 100% !important;
 }
 
 .monitor-tags {
