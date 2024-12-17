@@ -245,7 +245,7 @@
                                                 {{ getAge(installed.createdAt) }}
                                             </span>
                                         </div>
-                                        <div class="app-divider" />
+                                        <div class="app-divider" v-if="mode === 'installed'" />
                                         <div
                                             class="d-button flex flex-wrap items-center justify-start gap-1.5"
                                             v-if="mode === 'installed' && installed.status != 'Installing'"

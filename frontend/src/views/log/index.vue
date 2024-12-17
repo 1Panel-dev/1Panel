@@ -16,7 +16,7 @@ const buttons = [
         path: '/logs/operation',
     },
     {
-        label: i18n.global.t('ssh.loginLogs'),
+        label: 'SSH ' + i18n.global.t('ssh.loginLogs'),
         path: '/logs/ssh',
     },
     {
