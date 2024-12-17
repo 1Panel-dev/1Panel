@@ -2,7 +2,7 @@
     <div v-loading="loading">
         <LayoutContent :title="$t('setting.panel')" :divider="true">
             <template #main>
-                <el-form :model="form" :label-position="mobile ? 'top' : 'left'" label-width="150px">
+                <el-form :model="form" :label-position="mobile ? 'top' : 'left'" label-width="auto">
                     <el-row>
                         <el-col :span="1"><br /></el-col>
                         <el-col :xs="24" :sm="20" :md="15" :lg="12" :xl="12">
