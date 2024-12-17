@@ -34,10 +34,10 @@ __debug*
 # Dependency directories
 /pkg/
 backend/__debug_bin
-cmd/server/__debug_bin
-cmd/server/web/assets
-cmd/server/web/monacoeditorwork
-cmd/server/web/index.html
+core/cmd/server/__debug_bin
+core/cmd/server/web/assets
+core/cmd/server/web/monacoeditorwork
+core/cmd/server/web/index.html
 frontend/auto-imports.d.ts
 frontend/components.d.ts
 frontend/src/xpack

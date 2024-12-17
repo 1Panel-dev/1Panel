@@ -6,8 +6,8 @@ import (
 
 	_ "net/http/pprof"
 
-	"github.com/1Panel-dev/1Panel/cmd/server/cmd"
-	_ "github.com/1Panel-dev/1Panel/cmd/server/docs"
+	"github.com/1Panel-dev/1Panel/core/cmd/server/cmd"
+	_ "github.com/1Panel-dev/1Panel/core/cmd/server/docs"
 )
 
 // @title 1Panel

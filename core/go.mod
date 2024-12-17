@@ -1,4 +1,4 @@
-module github.com/1Panel-dev/1Panel
+module github.com/1Panel-dev/1Panel/core
 
 go 1.23
 

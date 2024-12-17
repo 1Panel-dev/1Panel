@@ -646,6 +646,7 @@ const runtimeReq = ref<Runtime.RuntimeReq>({
     page: 1,
     pageSize: 100,
     status: 'running',
+    type: 'php',
 });
 const runtimes = ref<Runtime.RuntimeDTO[]>([]);
 const versionExist = ref(true);
@@ -789,6 +790,7 @@ const changeRuntime = (runID: number) => {
 
 const getRuntimes = async () => {
     try {
+        console.log(runtimeReq.value);
         const res = await SearchRuntimes(runtimeReq.value);
         runtimes.value = res.data.items || [];
         if (runtimes.value.length > 0) {

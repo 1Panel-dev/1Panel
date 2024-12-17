@@ -7,7 +7,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/1Panel-dev/1Panel/cmd/server/conf"
+	"github.com/1Panel-dev/1Panel/core/cmd/server/conf"
 	"github.com/1Panel-dev/1Panel/core/configs"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/cmd"

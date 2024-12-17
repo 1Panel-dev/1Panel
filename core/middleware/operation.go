@@ -12,9 +12,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/cmd/server/docs"
 	"github.com/1Panel-dev/1Panel/core/app/model"
 	"github.com/1Panel-dev/1Panel/core/app/service"
+	"github.com/1Panel-dev/1Panel/core/cmd/server/docs"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/gin-gonic/gin"

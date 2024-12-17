@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/1Panel-dev/1Panel/cmd/server/docs"
-	"github.com/1Panel-dev/1Panel/cmd/server/web"
+	"github.com/1Panel-dev/1Panel/core/cmd/server/docs"
+	"github.com/1Panel-dev/1Panel/core/cmd/server/web"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/i18n"
 	"github.com/1Panel-dev/1Panel/core/middleware"

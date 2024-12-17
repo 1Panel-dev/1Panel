@@ -2,9 +2,9 @@ package cmd
 
 import (
 	"fmt"
-
-	"github.com/1Panel-dev/1Panel/cmd/server/conf"
 	"github.com/1Panel-dev/1Panel/core/configs"
+
+	"github.com/1Panel-dev/1Panel/core/cmd/server/conf"
 	"gopkg.in/yaml.v3"
 
 	"github.com/spf13/cobra"
