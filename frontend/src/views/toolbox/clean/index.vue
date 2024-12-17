@@ -643,15 +643,9 @@ function load18n(label: string) {
             return i18n.global.t('clean.containerShell');
         case 'curl':
         case 'shell':
-        case 'app':
-        case 'website':
-        case 'database':
-        case 'directory':
-        case 'log':
         case 'cutWebsiteLog':
         case 'clean':
         case 'snapshot':
-        case 'ntp':
             return i18n.global.t('cronjob.' + label);
         case 'container_images':
             return i18n.global.t('clean.images');

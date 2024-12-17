@@ -212,7 +212,7 @@
                             :indent-with-tab="true"
                             :tabSize="4"
                             :lineWrapping="true"
-                            style="width: 100%; margin-top: 5px"
+                            style="width: 100%; margin-top: 5px; height: 100px"
                             theme="cobalt"
                             :styleActiveLine="true"
                             :matchBrackets="true"
