@@ -31,7 +31,7 @@
                                         </el-text>
                                     </div>
                                 </div>
-                                <div else>
+                                <div v-else>
                                     <el-text class="clean_title">
                                         <el-icon>
                                             <MagicStick />
