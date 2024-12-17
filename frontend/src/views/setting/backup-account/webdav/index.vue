@@ -114,7 +114,8 @@ const handleClose = () => {
 };
 
 const toDoc = () => {
-    window.open(globalStore.docsUrl + '/user_manual/settings/#34-webdav-alist', '_blank', 'noopener,noreferrer');
+    const uri = globalStore.isIntl ? '#webdav-with-alist' : '#34-webdav-alist';
+    window.open(globalStore.docsUrl + '/user_manual/settings/' + uri, '_blank', 'noopener,noreferrer');
 };
 
 const onSubmit = async (formEl: FormInstance | undefined) => {

@@ -216,7 +216,10 @@ function callback(error: any) {
 }
 
 const toDoc = (isConf: boolean) => {
-    let item = isConf ? '#onedrive' : '#onedrive_1';
+    let item = isConf ? '#32-onedrive' : '#33-onedrive';
+    if (globalStore.isIntl) {
+        item = isConf ? '#using-your-own-client-info-for-onedrive' : '#auth-code-of-onedrive';
+    }
     window.open(globalStore.docsUrl + '/user_manual/settings/' + item, '_blank', 'noopener,noreferrer');
 };
 
