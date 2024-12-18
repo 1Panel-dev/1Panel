@@ -9,6 +9,7 @@
 </p>
 
 ------------------------------
+
 1Panel is an open-source, modern web-based control panel for Linux server management.
 
 - **Efficient Management**: Through a user-friendly web graphical interface, 1Panel enables users to effortlessly manage their Linux servers. Key features include host monitoring, file management, database administration, and container management.
@@ -25,7 +26,7 @@ Execute the following command to install 1Panel with one click:
 curl -sSL https://resource.1panel.hk/quick_start.sh -o quick_start.sh && bash quick_start.sh
 ```
 
-Have questions or suggestions? Please submit a GitHub Issue. We value your feedback!
+Please refer to our [Documentation](https://docs.1panel.hk/) if you encounter problems using 1Panel. 
 
 ## Screenshot
 
