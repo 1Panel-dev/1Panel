@@ -56,7 +56,7 @@ UpdatePortFirewallAdd: "Ezafe kardane ghanoun-e port firewall namovaffagh bud, {
 UpdatePortFirewallDel: "Khatta: hazf-e port firewall namovaffagh bud, {{ .err }}"
 UpdatePortFirewallReload: "Reload firewall namovaffagh bud, {{ .err }}, lotfan firewall ra be dast reload konid."
 UserInfo: "Daryaft etela'at-e panel"
-UserInfoAddr: "Adres-e panel: "
+UserInfoAddr: "Address-e panel: "
 UserInfoPassHelp: "Nokte: baraye taghiri ramz, mitavanid dastur zir ra anjam dahid: "
 DBConnErr: "Khatta: etesal be database namovaffagh bud, {{ .err }}"
 SystemVersion: "noskhe: "

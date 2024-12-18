@@ -1,11 +1,11 @@
-<p align="center"><a href="https://1panel.cn"><img src="http://1panel.oss-cn-hangzhou.aliyuncs.com/img/1panel-logo.png" alt="1Panel" width="300" /></a></p>
+<p align="center"><a href="https://1panel.hk"><img src="https://resource.1panel.hk/img/1panel-logo.png" alt="1Panel" width="300" /></a></p>
 <p align="center"><b>モダンでオープンソースの Linux サーバー運用管理パネル</b></p>
 <p align="center">
   <a href="https://www.gnu.org/licenses/gpl-3.0.html"><img src="https://shields.io/github/license/1Panel-dev/1Panel?color=%231890FF" alt="License: GPL v3"></a>
   <a href="https://app.codacy.com/gh/1Panel-dev/1Panel?utm_source=github.com&utm_medium=referral&utm_content=1Panel-dev/1Panel&utm_campaign=Badge_Grade_Dashboard"><img src="https://app.codacy.com/project/badge/Grade/da67574fd82b473992781d1386b937ef" alt="Codacy"></a>
   <a href="https://github.com/1Panel-dev/1Panel/releases"><img src="https://img.shields.io/github/v/release/1Panel-dev/1Panel" alt="GitHub release"></a>
   <a href="https://github.com/1Panel-dev/1Panel"><img src="https://img.shields.io/github/stars/1Panel-dev/1Panel?color=%231890FF&style=flat-square" alt="Stars"></a><br>
-  [<a href="../README.md">中文(简体)</a>] | [<a href="README_TW.md">中文(繁體)</a>] | [<a href="README_EN.md">English</a>]
+  [<a href="/README.md">English</a>] | [<a href="/docs/README.zh-Hans.md">中文(简体)</a>] | [<a href="/docs/README.zh-Hant.md">中文(繁體)</a>] | [<a href="/docs/README.ja.md">日本語</a>]
 </p>
 
 ------------------------------
@@ -18,19 +18,7 @@
 - **安全性と信頼性**：コンテナの管理とアプリケーションのデプロイに基づいて、最小限の脆弱性露出面を実現し、同時にファイアウォールやログ監査などの機能を提供します。
 - **ワンクリックバックアップ**：ワンクリックでバックアップと復元をサポートし、ユーザーはデータをさまざまなクラウドストレージメディアにバックアップし、永久に失うことはありません。
 
-## UI ディスプレイ
-
-![UI Display](https://resource.fit2cloud.com/1panel/img/overview_en.png)
-
 ## クイックスタート
-
-**オンラインでも**
-
-- アドレス: <https://demo.1panel.cn/>
-- ユーザネーム: demo
-- パスワード: 1panel
-
-**ワンクリックインストール**
 
 ワンクリックで 1Panel をインストールするには、次のコマンドを実行します:
 
@@ -38,32 +26,17 @@
 curl -sSL https://resource.1panel.hk/quick_start.sh -o quick_start.sh && bash quick_start.sh
 ```
 
-**学習教材**
+## UI ディスプレイ
 
-- [オンラインドキュメント](https://1panel.cn/docs/)
-- [ビデオ教材](https://space.bilibili.com/510493147/channel/collectiondetail?sid=1199760)
-
-## コミュニティ
-
-ご質問やご提案がございましたら、GitHub Issue にご投稿いただくか、WeChat グループにご参加ください。
-
-## セキュリティ情報
-
-セキュリティ上の問題を発見された場合は、下記までご連絡ください:
-
-- メール: wanghe@fit2cloud.com
-
-## その他の主要プロジェクト
-
-- [MaxKB](https://github.com/1Panel-dev/MaxKB/) - LLMベースのオープンソース知識ベースの質問応答システム
-- [JumpServer](https://github.com/jumpserver/jumpserver/) - 人気のあるオープンソースのバスチョンホスト管理ツール
-- [DataEase](https://github.com/dataease/dataease/) - 誰でも利用できるオープンソースのデータ可視化および分析ツール
-- [MeterSphere](https://github.com/metersphere/metersphere/) - オールインワンのオープンソース自動化テストプラットフォーム
-- [Halo](https://github.com/halo-dev/halo/) - 強力で使いやすいオープンソースのウェブサイト構築ツール
+![UI Display](https://resource.fit2cloud.com/1panel/img/overview_en.png)
 
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=1Panel-dev/1Panel&type=Date)](https://star-history.com/#1Panel-dev/1Panel&Date)
+
+## セキュリティ情報
+
+セキュリティの問題を発見した場合は、以下の方法でご連絡ください：wanghe@fit2cloud.com。
 
 ## License
 

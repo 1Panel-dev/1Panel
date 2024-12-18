@@ -206,7 +206,7 @@
                     </el-table-column>
                     <el-table-column :label="$t('container.related')" min-width="210" prop="appName">
                         <template #default="{ row }">
-                            <div>
+                            <div class="cell-button-class">
                                 <el-tooltip
                                     v-if="row.appName != ''"
                                     :hide-after="20"
@@ -223,7 +223,7 @@
                                     </el-button>
                                 </el-tooltip>
                             </div>
-                            <div>
+                            <div class="cell-button-class">
                                 <el-tooltip
                                     v-if="row.websites != null"
                                     :hide-after="20"
@@ -251,7 +251,7 @@
                         prop="ports"
                     >
                         <template #default="{ row }">
-                            <div v-if="row.ports">
+                            <div v-if="row.ports" class="cell-button-class">
                                 <div v-for="(item, index) in row.ports" :key="index">
                                     <div v-if="row.expand || (!row.expand && index < 3)">
                                         <el-tooltip :hide-after="20" :content="item" placement="top">
@@ -785,5 +785,12 @@ onMounted(() => {
     margin-top: -3px;
     font-size: 6px;
     cursor: pointer;
+}
+.cell-button-class {
+    button,
+    :deep(span) {
+        max-width: 100%;
+        overflow: hidden;
+    }
 }
 </style>

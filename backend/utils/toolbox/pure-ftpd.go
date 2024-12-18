@@ -226,7 +226,7 @@ func (f *Ftp) LoadList() ([]FtpList, error) {
 		}
 		std2, err := cmd.Execf("pure-pw  show %s | grep 'Allowed client IPs :'", parts[0])
 		if err != nil {
-			global.LOG.Errorf("handle pure-pw show %s faile, err: %v", parts[0], std2)
+			global.LOG.Errorf("handle pure-pw show %s failed, err: %v", parts[0], std2)
 			continue
 		}
 		status := constant.StatusDisable

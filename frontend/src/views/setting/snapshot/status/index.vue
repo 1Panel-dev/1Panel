@@ -230,7 +230,7 @@ defineExpose({
     border-top: 1px var(--el-border-color) var(--el-border-style);
 }
 .alert {
-    background-color: var(--panel-main-bg-color-10);
+    background-color: var(--panel-alert-bg-color);
 }
 
 .card-title {
