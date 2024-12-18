@@ -180,20 +180,16 @@
                 <CardWithHeader :header="$t('home.systemInfo')">
                     <template #body>
                         <el-scrollbar>
-                            <el-descriptions :column="1" class="h-systemInfo">
-                                <el-descriptions-item class-name="system-content">
+                            <el-descriptions :column="1" class="h-systemInfo" border>
+                                <el-descriptions-item class-name="system-content" label-class-name="system-label">
                                     <template #label>
-                                        <span class="system-label">
-                                            {{ $t('home.hostname') }}
-                                        </span>
+                                        <span>{{ $t('home.hostname') }}</span>
                                     </template>
                                     {{ baseInfo.hostname }}
                                 </el-descriptions-item>
-                                <el-descriptions-item class-name="system-content">
+                                <el-descriptions-item class-name="system-content" label-class-name="system-label">
                                     <template #label>
-                                        <span class="system-label">
-                                            {{ $t('home.platformVersion') }}
-                                        </span>
+                                        <span>{{ $t('home.platformVersion') }}</span>
                                     </template>
                                     {{
                                         baseInfo.platformVersion
@@ -201,54 +197,44 @@
                                             : baseInfo.platform + '-' + baseInfo.platformVersion
                                     }}
                                 </el-descriptions-item>
-                                <el-descriptions-item class-name="system-content">
+                                <el-descriptions-item class-name="system-content" label-class-name="system-label">
                                     <template #label>
-                                        <span class="system-label">
-                                            {{ $t('home.kernelVersion') }}
-                                        </span>
+                                        <span>{{ $t('home.kernelVersion') }}</span>
                                     </template>
                                     {{ baseInfo.kernelVersion }}
                                 </el-descriptions-item>
-                                <el-descriptions-item class-name="system-content">
+                                <el-descriptions-item class-name="system-content" label-class-name="system-label">
                                     <template #label>
-                                        <span class="system-label">
-                                            {{ $t('home.kernelArch') }}
-                                        </span>
+                                        <span>{{ $t('home.kernelArch') }}</span>
                                     </template>
                                     {{ baseInfo.kernelArch }}
                                 </el-descriptions-item>
-                                <el-descriptions-item class-name="system-content">
+                                <el-descriptions-item class-name="system-content"label-class-name="system-label"
+                                >
                                     <template #label>
-                                        <span class="system-label">
-                                            {{ $t('home.ip') }}
-                                        </span>
+                                        <span>{{ $t('home.ip') }}</span>
                                     </template>
                                     {{ baseInfo.ipV4Addr }}
                                 </el-descriptions-item>
                                 <el-descriptions-item
                                     v-if="baseInfo.httpProxy && baseInfo.httpProxy !== 'noProxy'"
                                     class-name="system-content"
+                                    label-class-name="system-label"
                                 >
                                     <template #label>
-                                        <span class="system-label">
-                                            {{ $t('home.proxy') }}
-                                        </span>
+                                        <span>{{ $t('home.proxy') }}</span>
                                         {{ baseInfo.httpProxy }}
                                     </template>
                                 </el-descriptions-item>
-                                <el-descriptions-item class-name="system-content">
+                                <el-descriptions-item class-name="system-content" label-class-name="system-label">
                                     <template #label>
-                                        <span class="system-label">
-                                            {{ $t('home.uptime') }}
-                                        </span>
+                                        <span>{{ $t('home.uptime') }}</span>
                                     </template>
                                     {{ currentInfo.timeSinceUptime }}
                                 </el-descriptions-item>
-                                <el-descriptions-item class-name="system-content">
+                                <el-descriptions-item class-name="system-content" label-class-name="system-label">
                                     <template #label>
-                                        <span class="system-label">
-                                            {{ $t('home.runningTime') }}
-                                        </span>
+                                        <span>{{ $t('home.runningTime') }}</span>
                                     </template>
                                     {{ loadUpTime(currentInfo.uptime) }}
                                 </el-descriptions-item>
@@ -611,10 +597,16 @@ onBeforeUnmount(() => {
     font-weight: 400 !important;
     font-size: 14px !important;
     color: var(--panel-text-color);
+    border: none !important;
+    background: none !important;
+    width: fit-content !important;
+    white-space: nowrap !important;
 }
 
 .system-content {
     font-size: 13px !important;
+    border: none !important;
+    width: 100% !important;
 }
 
 .monitor-tags {
