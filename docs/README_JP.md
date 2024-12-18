@@ -35,7 +35,7 @@
 ワンクリックで 1Panel をインストールするには、次のコマンドを実行します:
 
 ```sh
-curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_start.sh && sudo bash quick_start.sh
+curl -sSL https://resource.1panel.hk/quick_start.sh -o quick_start.sh && bash quick_start.sh
 ```
 
 **学習教材**
