@@ -44,8 +44,6 @@
                         <div v-else>
                             <div class="flex flex-wrap gap-4 sm:justify-between">
                                 <div class="flex gap-2 flex-wrap items-center justify-start">
-                                    {{ title }}
-                                    <el-divider direction="vertical" v-if="slots.leftToolBar || slots.buttons" />
                                     <slot name="leftToolBar" v-if="slots.leftToolBar"></slot>
                                     <slot name="buttons" v-if="slots.buttons"></slot>
                                 </div>
@@ -79,7 +77,6 @@
 
 <script setup lang="ts">
 import { computed, useSlots } from 'vue';
-// import BackButton from '@/components/back-button/index.vue';
 import FormButton from './form-button.vue';
 defineOptions({ name: 'LayoutContent' });
 const slots = useSlots();

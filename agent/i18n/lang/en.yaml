@@ -240,6 +240,7 @@ sql: 'SQL Injection'
 cc: 'Access Frequency Limit'
 defaultUrlBlack: 'URL Rules'
 sqlInject: 'SQL Injection'
+ErrDBNotExist: "Database does not exist"
 
 #task
 TaskStart: "{{.name}} Start [START]"

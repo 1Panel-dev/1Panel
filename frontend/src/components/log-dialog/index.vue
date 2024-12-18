@@ -62,7 +62,7 @@ function toggleFullscreen() {
 }
 
 const loadTooltip = () => {
-     return i18n.global.t('commons.button.' + (globalStore.isFullScreen ? 'quitFullscreen' : 'fullscreen'));
+    return i18n.global.t('commons.button.' + (globalStore.isFullScreen ? 'quitFullscreen' : 'fullscreen'));
 };
 
 const acceptParams = (props: LogProps) => {

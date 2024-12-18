@@ -52,6 +52,7 @@ var AddTable = &gormigrate.Migration{
 			&model.WebsiteDnsAccount{},
 			&model.WebsiteDomain{},
 			&model.WebsiteSSL{},
+			&model.Task{},
 		)
 	},
 }
@@ -202,7 +203,7 @@ var InitDefaultCA = &gormigrate.Migration{
 var InitPHPExtensions = &gormigrate.Migration{
 	ID: "20240722-add-php-extensions",
 	Migrate: func(tx *gorm.DB) error {
-		if err := tx.Create(&model.PHPExtensions{Name: "默认", Extensions: "bcmath,gd,gettext,intl,pcntl,shmop,soap,sockets,sysvsem,xmlrpc,zip"}).Error; err != nil {
+		if err := tx.Create(&model.PHPExtensions{Name: "Default", Extensions: "bcmath,gd,gettext,intl,pcntl,shmop,soap,sockets,sysvsem,xmlrpc,zip"}).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.PHPExtensions{Name: "WordPress", Extensions: "exif,igbinary,imagick,intl,zip,apcu,memcached,opcache,redis,bc,image,shmop,mysqli,pdo_mysql,gd"}).Error; err != nil {
@@ -211,68 +212,10 @@ var InitPHPExtensions = &gormigrate.Migration{
 		if err := tx.Create(&model.PHPExtensions{Name: "Flarum", Extensions: "curl,gd,pdo_mysql,mysqli,bz2,exif,yaf,imap"}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.PHPExtensions{Name: "苹果CMS-V10", Extensions: "mysqli,pdo_mysql,zip,gd,redis,memcache,memcached"}).Error; err != nil {
-			return err
-		}
 		if err := tx.Create(&model.PHPExtensions{Name: "SeaCMS", Extensions: "mysqli,pdo_mysql,gd,curl"}).Error; err != nil {
 			return err
 		}
 		return nil
-	},
-}
-
-var UpdateWebsite = &gormigrate.Migration{
-	ID: "20240812-update-website",
-	Migrate: func(tx *gorm.DB) error {
-		return tx.AutoMigrate(
-			&model.Website{})
-	},
-}
-
-var UpdateWebsiteDomain = &gormigrate.Migration{
-	ID: "20240808-update-website-domain",
-	Migrate: func(tx *gorm.DB) error {
-		return tx.AutoMigrate(
-			&model.WebsiteDomain{})
-	},
-}
-
-var AddTaskDB = &gormigrate.Migration{
-	ID: "20240822-add-task-table",
-	Migrate: func(tx *gorm.DB) error {
-		return global.TaskDB.AutoMigrate(
-			&model.Task{},
-		)
-	},
-}
-
-var UpdateApp = &gormigrate.Migration{
-	ID: "20240826-update-app",
-	Migrate: func(tx *gorm.DB) error {
-		return tx.AutoMigrate(
-			&model.App{})
-	},
-}
-
-var UpdateAppInstall = &gormigrate.Migration{
-	ID: "20240828-update-app-install",
-	Migrate: func(tx *gorm.DB) error {
-		return tx.AutoMigrate(
-			&model.AppInstall{})
-	},
-}
-
-var UpdateSnapshot = &gormigrate.Migration{
-	ID: "20240926-update-snapshot",
-	Migrate: func(tx *gorm.DB) error {
-		return tx.AutoMigrate(&model.Snapshot{})
-	},
-}
-
-var UpdateCronjob = &gormigrate.Migration{
-	ID: "20241017-update-cronjob",
-	Migrate: func(tx *gorm.DB) error {
-		return tx.AutoMigrate(&model.Cronjob{}, &model.JobRecords{})
 	},
 }
 

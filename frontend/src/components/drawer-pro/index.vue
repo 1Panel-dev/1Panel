@@ -1,11 +1,5 @@
 <template>
-    <el-drawer
-        v-model="localOpenPage"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        :size="size"
-    >
+    <el-drawer v-model="localOpenPage" :destroy-on-close="true" :close-on-click-modal="false" :size="size">
         <template #header>
             <el-page-header @back="handleBack">
                 <template #content>

@@ -239,6 +239,7 @@ sql: 'SQL 注入'
 cc: '访问频率限制'
 defaultUrlBlack: 'URL 规则'
 sqlInject: 'SQL 注入'
+ErrDBNotExist: "数据库不存在"
 
 #task
 TaskStart: "{{.name}} 任务开始 [START]"
