@@ -438,48 +438,50 @@ const onChangeThemeColor = () => {
     themeColorRef.value.acceptParams({ themeColor: themeColor, theme: globalStore.themeConfig.theme });
 };
 
+const handleThemeChange = async (val: string) => {
+    globalStore.themeConfig.theme = val;
+    switchTheme();
+    if (globalStore.isProductPro) {
+        await updateXpackSettingByKey('Theme', val);
+        let color: string;
+        const themeColor: ThemeColor = JSON.parse(globalStore.themeConfig.themeColor);
+        if (val === 'auto') {
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+            color = prefersDark.matches ? themeColor.dark : themeColor.light;
+        } else {
+            color = val === 'dark' ? themeColor.dark : themeColor.light;
+        }
+        globalStore.themeConfig.primary = color;
+        setPrimaryColor(color);
+    }
+};
+
 const onSave = async (key: string, val: any) => {
     loading.value = true;
     let param = {
         key: key,
         value: val + '',
     };
-    await updateSetting(param)
-        .then(async () => {
-            if (key === 'Language') {
-                i18n.locale.value = val;
-                globalStore.updateLanguage(val);
-            }
-            if (key === 'Theme') {
-                globalStore.themeConfig.theme = val;
-                switchTheme();
-                if (globalStore.isProductPro) {
-                    await updateXpackSettingByKey('Theme', val);
-                    let color: string;
-                    const themeColor: ThemeColor = JSON.parse(globalStore.themeConfig.themeColor);
-                    if (val === 'auto') {
-                        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
-                        color = prefersDark.matches ? themeColor.dark : themeColor.light;
-                    } else {
-                        color = val === 'dark' ? themeColor.dark : themeColor.light;
-                    }
-                    globalStore.themeConfig.primary = color;
-                    setPrimaryColor(color);
-                }
-            }
-            if (key === 'MenuTabs') {
-                globalStore.setOpenMenuTabs(val === 'enable');
-            }
-            if (param.key === 'Language') {
-                location.reload();
-            }
-            loading.value = false;
-            MsgSuccess(i18n.t('commons.msg.operationSuccess'));
-            await search();
-        })
-        .catch(() => {
-            loading.value = false;
-        });
+    try {
+        await updateSetting(param);
+        if (key === 'Language') {
+            i18n.locale.value = val;
+            globalStore.updateLanguage(val);
+            location.reload();
+        }
+
+        if (key === 'Theme') {
+            await handleThemeChange(val);
+        }
+        if (key === 'MenuTabs') {
+            globalStore.setOpenMenuTabs(val === 'enable');
+        }
+        MsgSuccess(i18n.t('commons.msg.operationSuccess'));
+        await search();
+    } catch (error) {
+    } finally {
+        loading.value = false;
+    }
 };
 
 onMounted(() => {
