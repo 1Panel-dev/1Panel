@@ -1,16 +1,18 @@
 <template>
     <div>
-        <div class="app-status" style="margin-top: 20px">
+        <div class="app-status mt-5">
             <el-card v-if="form.isExist">
-                <div>
-                    <el-tag effect="dark" type="success">FTP</el-tag>
-                    <el-tag round class="status-content" v-if="form.isActive" type="success">
-                        {{ $t('commons.status.running') }}
-                    </el-tag>
-                    <el-tag round class="status-content" v-if="!form.isActive" type="info">
-                        {{ $t('commons.status.stopped') }}
-                    </el-tag>
-                    <span class="buttons">
+                <div class="flex w-full flex-col gap-4 md:flex-row">
+                    <div class="flex flex-wrap gap-4">
+                        <el-tag effect="dark" type="success">FTP</el-tag>
+                        <el-tag round v-if="form.isActive" type="success">
+                            {{ $t('commons.status.running') }}
+                        </el-tag>
+                        <el-tag round v-if="!form.isActive" type="info">
+                            {{ $t('commons.status.stopped') }}
+                        </el-tag>
+                    </div>
+                    <div class="mt-0.5">
                         <el-button v-if="form.isActive" type="primary" @click="onOperate('stop')" link>
                             {{ $t('commons.button.stop') }}
                         </el-button>
@@ -21,7 +23,7 @@
                         <el-button type="primary" @click="onOperate('restart')" link>
                             {{ $t('container.restart') }}
                         </el-button>
-                    </span>
+                    </div>
                 </div>
             </el-card>
         </div>

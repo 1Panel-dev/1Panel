@@ -2,17 +2,18 @@
     <div v-loading="loading">
         <div class="app-status p-mt-20">
             <el-card>
-                <div>
-                    <el-tag class="float-left" effect="dark" type="success">Docker</el-tag>
-                    <el-tag round class="status-content" v-if="form.status === 'Running'" type="success">
-                        {{ $t('commons.status.running') }}
-                    </el-tag>
-                    <el-tag round class="status-content" v-if="form.status === 'Stopped'" type="info">
-                        {{ $t('commons.status.stopped') }}
-                    </el-tag>
-                    <el-tag class="status-content">{{ $t('app.version') }}: {{ form.version }}</el-tag>
-
-                    <span v-if="form.status === 'Running'" class="buttons">
+                <div class="flex w-full flex-col gap-4 md:flex-row">
+                    <div class="flex flex-wrap gap-4">
+                        <el-tag class="float-left" effect="dark" type="success">Docker</el-tag>
+                        <el-tag round v-if="form.status === 'Running'" type="success">
+                            {{ $t('commons.status.running') }}
+                        </el-tag>
+                        <el-tag round v-if="form.status === 'Stopped'" type="info">
+                            {{ $t('commons.status.stopped') }}
+                        </el-tag>
+                        <el-tag>{{ $t('app.version') }}: {{ form.version }}</el-tag>
+                    </div>
+                    <div class="mt-0.5" v-if="form.status === 'Running'">
                         <el-button type="primary" @click="onOperator('stop')" link>
                             {{ $t('container.stop') }}
                         </el-button>
@@ -20,9 +21,8 @@
                         <el-button type="primary" @click="onOperator('restart')" link>
                             {{ $t('container.restart') }}
                         </el-button>
-                    </span>
-
-                    <span v-if="form.status === 'Stopped'" class="buttons">
+                    </div>
+                    <div class="mt-0.5" v-if="form.status === 'Stopped'">
                         <el-button type="primary" @click="onOperator('start')" link>
                             {{ $t('container.start') }}
                         </el-button>
@@ -30,7 +30,7 @@
                         <el-button type="primary" @click="onOperator('restart')" link>
                             {{ $t('container.restart') }}
                         </el-button>
-                    </span>
+                    </div>
                 </div>
             </el-card>
         </div>

@@ -2,16 +2,18 @@
     <div>
         <div class="app-status tool-status" v-if="data.isExist">
             <el-card>
-                <div>
-                    <el-tag class="w-17" effect="dark" type="success">ClamAV</el-tag>
-                    <el-tag round class="status-content" v-if="data.isActive" type="success">
-                        {{ $t('commons.status.running') }}
-                    </el-tag>
-                    <el-tag round class="status-content" v-if="!data.isActive" type="info">
-                        {{ $t('commons.status.stopped') }}
-                    </el-tag>
-                    <el-tag class="status-content w-24">{{ $t('app.version') }}:{{ data.version }}</el-tag>
-                    <span class="buttons">
+                <div class="flex w-full flex-col gap-4 md:flex-row">
+                    <div class="flex flex-wrap gap-4">
+                        <el-tag class="w-17" effect="dark" type="success">ClamAV</el-tag>
+                        <el-tag round v-if="data.isActive" type="success">
+                            {{ $t('commons.status.running') }}
+                        </el-tag>
+                        <el-tag round v-if="!data.isActive" type="info">
+                            {{ $t('commons.status.stopped') }}
+                        </el-tag>
+                        <el-tag class="w-24">{{ $t('app.version') }}:{{ data.version }}</el-tag>
+                    </div>
+                    <div class="mt-0.5">
                         <el-button type="primary" v-if="!data.isActive" link @click="onOperate('ClamAV', 'start')">
                             {{ $t('app.start') }}
                         </el-button>
@@ -33,18 +35,20 @@
                         <el-button type="primary" v-if="!showFresh" link @click="changeShow(true)">
                             {{ $t('toolbox.clam.showFresh') }}
                         </el-button>
-                    </span>
+                    </div>
                 </div>
-                <div class="mt-4" v-if="showFresh">
-                    <el-tag class="w-16" effect="dark" type="success">FreshClam</el-tag>
-                    <el-tag round class="status-content" v-if="data.freshIsActive" type="success">
-                        {{ $t('commons.status.running') }}
-                    </el-tag>
-                    <el-tag round class="status-content" v-if="!data.freshIsActive" type="info">
-                        {{ $t('commons.status.stopped') }}
-                    </el-tag>
-                    <el-tag class="status-content w-24">{{ $t('app.version') }}:{{ data.freshVersion }}</el-tag>
-                    <span class="buttons">
+                <div class="flex w-full flex-col gap-4 md:flex-row mt-5" v-if="showFresh">
+                    <div class="flex flex-wrap gap-4">
+                        <el-tag class="w-16" effect="dark" type="success">FreshClam</el-tag>
+                        <el-tag round v-if="data.freshIsActive" type="success">
+                            {{ $t('commons.status.running') }}
+                        </el-tag>
+                        <el-tag round v-if="!data.freshIsActive" type="info">
+                            {{ $t('commons.status.stopped') }}
+                        </el-tag>
+                        <el-tag class="w-24">{{ $t('app.version') }}:{{ data.freshVersion }}</el-tag>
+                    </div>
+                    <div class="mt-0.5">
                         <el-button
                             type="primary"
                             v-if="!data.freshIsActive"
@@ -65,7 +69,7 @@
                         <el-button type="primary" link @click="onOperate('FreshClam', 'restart')">
                             {{ $t('app.restart') }}
                         </el-button>
-                    </span>
+                    </div>
                 </div>
             </el-card>
         </div>

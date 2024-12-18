@@ -2,32 +2,39 @@
     <div v-if="recordShow" v-loading="loading">
         <div class="app-status p-mt-20">
             <el-card>
-                <div>
-                    <el-popover
-                        v-if="dialogData.rowData.name.length >= 15"
-                        placement="top-start"
-                        trigger="hover"
-                        width="250"
-                        :content="$t('cronjob.' + dialogData.rowData.type) + ' - ' + dialogData.rowData.name"
-                    >
-                        <template #reference>
-                            <el-tag style="float: left" effect="dark" type="success">
-                                {{ $t('cronjob.' + dialogData.rowData.type) }} -
-                                {{ dialogData.rowData.name.substring(0, 12) }}...
-                            </el-tag>
-                        </template>
-                    </el-popover>
-                    <el-tag v-if="dialogData.rowData.name.length < 15" class="float-left" effect="dark" type="success">
-                        {{ $t('cronjob.' + dialogData.rowData.type) }} - {{ dialogData.rowData.name }}
-                    </el-tag>
+                <div class="flex w-full flex-col gap-4 md:flex-row">
+                    <div class="flex flex-wrap gap-4">
+                        <el-popover
+                            v-if="dialogData.rowData.name.length >= 15"
+                            placement="top-start"
+                            trigger="hover"
+                            width="250"
+                            :content="$t('cronjob.' + dialogData.rowData.type) + ' - ' + dialogData.rowData.name"
+                        >
+                            <template #reference>
+                                <el-tag style="float: left" effect="dark" type="success">
+                                    {{ $t('cronjob.' + dialogData.rowData.type) }} -
+                                    {{ dialogData.rowData.name.substring(0, 12) }}...
+                                </el-tag>
+                            </template>
+                        </el-popover>
+                        <el-tag
+                            v-if="dialogData.rowData.name.length < 15"
+                            class="float-left"
+                            effect="dark"
+                            type="success"
+                        >
+                            {{ $t('cronjob.' + dialogData.rowData.type) }} - {{ dialogData.rowData.name }}
+                        </el-tag>
 
-                    <el-tag v-if="dialogData.rowData.status === 'Enable'" round class="status-content" type="success">
-                        {{ $t('commons.status.running') }}
-                    </el-tag>
-                    <el-tag v-if="dialogData.rowData.status === 'Disable'" round class="status-content" type="info">
-                        {{ $t('commons.status.stopped') }}
-                    </el-tag>
-                    <span class="buttons">
+                        <el-tag v-if="dialogData.rowData.status === 'Enable'" round type="success">
+                            {{ $t('commons.status.running') }}
+                        </el-tag>
+                        <el-tag v-if="dialogData.rowData.status === 'Disable'" round type="info">
+                            {{ $t('commons.status.stopped') }}
+                        </el-tag>
+                    </div>
+                    <div class="mt-0.5">
                         <el-button type="primary" @click="onHandle(dialogData.rowData)" link>
                             {{ $t('commons.button.handle') }}
                         </el-button>
@@ -52,7 +59,7 @@
                         <el-button :disabled="!hasRecords" type="primary" @click="onClean" link>
                             {{ $t('commons.button.clean') }}
                         </el-button>
-                    </span>
+                    </div>
                 </div>
             </el-card>
         </div>

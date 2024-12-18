@@ -2,11 +2,13 @@
     <div v-loading="loading">
         <div class="app-status mt-5" v-if="currentDB?.from === 'remote'">
             <el-card>
-                <div>
-                    <el-tag class="float-left" effect="dark" type="success">
-                        {{ currentDB?.type === 'mysql' ? 'Mysql' : 'MariaDB' }}
-                    </el-tag>
-                    <el-tag class="status-content">{{ $t('app.version') }}: {{ currentDB?.version }}</el-tag>
+                <div class="flex w-full flex-col gap-4 md:flex-row">
+                    <div class="flex flex-wrap gap-4">
+                        <el-tag class="float-left" effect="dark" type="success">
+                            {{ currentDB?.type === 'mysql' ? 'Mysql' : 'MariaDB' }}
+                        </el-tag>
+                        <el-tag>{{ $t('app.version') }}: {{ currentDB?.version }}</el-tag>
+                    </div>
                 </div>
             </el-card>
         </div>

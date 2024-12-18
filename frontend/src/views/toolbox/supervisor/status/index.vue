@@ -1,12 +1,14 @@
 <template>
     <div>
-        <div class="app-status tool-status" v-if="data.isExist">
+        <div class="app-status" v-if="data.isExist">
             <el-card>
-                <div>
-                    <el-tag effect="dark" type="success">{{ 'Supervisor' }}</el-tag>
-                    <Status class="status-content" :key="data.status" :status="data.status"></Status>
-                    <el-tag class="status-content">{{ $t('app.version') }}:{{ data.version }}</el-tag>
-                    <span class="buttons" v-if="!data.init">
+                <div class="flex w-full flex-col gap-4 md:flex-row">
+                    <div class="flex flex-wrap gap-4">
+                        <el-tag effect="dark" type="success">{{ 'Supervisor' }}</el-tag>
+                        <Status :key="data.status" :status="data.status"></Status>
+                        <el-tag>{{ $t('app.version') }}:{{ data.version }}</el-tag>
+                    </div>
+                    <div class="mt-0.5" v-if="!data.init">
                         <el-button type="primary" v-if="data.status != 'running'" link @click="onOperate('start')">
                             {{ $t('app.start') }}
                         </el-button>
@@ -21,12 +23,12 @@
                         <el-button type="primary" link @click="setting">
                             {{ $t('commons.button.set') }}
                         </el-button>
-                    </span>
-                    <span class="buttons" v-else>
+                    </div>
+                    <div class="mt-0.5" v-else>
                         <el-button type="primary" link @click="init">
                             {{ $t('commons.button.init') }}
                         </el-button>
-                    </span>
+                    </div>
                 </div>
             </el-card>
         </div>
