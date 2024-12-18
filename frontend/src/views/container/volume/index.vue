@@ -1,12 +1,8 @@
 <template>
     <div v-loading="loading">
-        <el-card v-if="dockerStatus != 'Running'" class="mask-prompt">
-            <span>{{ $t('container.serviceUnavailable') }}</span>
-            <el-button type="primary" link class="bt" @click="goSetting">【 {{ $t('container.setting') }} 】</el-button>
-            <span>{{ $t('container.startIn') }}</span>
-        </el-card>
+        <docker-status v-model:isActive="isActive" v-model:loading="loading" @search="search" />
 
-        <LayoutContent :title="$t('container.volume')" :class="{ mask: dockerStatus != 'Running' }">
+        <LayoutContent :title="$t('container.volume')" :class="{ mask: !isActive }">
             <template #leftToolBar>
                 <el-button type="primary" @click="onCreate()">
                     {{ $t('container.createVolume') }}
@@ -88,9 +84,10 @@
 <script lang="ts" setup>
 import CreateDialog from '@/views/container/volume/create/index.vue';
 import CodemirrorDialog from '@/components/codemirror-dialog/index.vue';
-import { reactive, onMounted, ref, computed } from 'vue';
+import DockerStatus from '@/views/container/docker-status/index.vue';
+import { reactive, ref, computed } from 'vue';
 import { computeSize, dateFormat } from '@/utils/util';
-import { deleteVolume, searchVolume, inspect, loadDockerStatus, containerPrune } from '@/api/modules/container';
+import { deleteVolume, searchVolume, inspect, containerPrune } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import i18n from '@/lang';
 import router from '@/routers';
@@ -117,26 +114,8 @@ const paginationConfig = reactive({
     total: 0,
 });
 const searchName = ref();
+const isActive = ref(false);
 
-const dockerStatus = ref('Running');
-const loadStatus = async () => {
-    loading.value = true;
-    await loadDockerStatus()
-        .then((res) => {
-            loading.value = false;
-            dockerStatus.value = res.data;
-            if (dockerStatus.value === 'Running') {
-                search();
-            }
-        })
-        .catch(() => {
-            dockerStatus.value = 'Failed';
-            loading.value = false;
-        });
-};
-const goSetting = async () => {
-    router.push({ name: 'ContainerSetting' });
-};
 const toFolder = (folder: string) => {
     router.push({ path: '/hosts/files', query: { path: folder } });
 };
@@ -150,6 +129,9 @@ const onCreate = async () => {
 };
 
 const search = async () => {
+    if (!isActive.value) {
+        return;
+    }
     const params = {
         info: searchName.value,
         page: paginationConfig.currentPage,
@@ -234,8 +216,4 @@ const buttons = [
         },
     },
 ];
-
-onMounted(() => {
-    loadStatus();
-});
 </script>

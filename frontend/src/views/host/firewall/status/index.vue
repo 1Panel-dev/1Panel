@@ -5,19 +5,19 @@
                 <div class="flex w-full flex-col gap-4 md:flex-row">
                     <div class="flex flex-wrap gap-4">
                         <el-tag effect="dark" type="success">{{ baseInfo.name }}</el-tag>
-                        <el-tag round v-if="baseInfo.status === 'running'" type="success">
+                        <el-tag round v-if="baseInfo.isActive" type="success">
                             {{ $t('commons.status.running') }}
                         </el-tag>
-                        <el-tag round v-if="baseInfo.status === 'not running'" type="info">
+                        <el-tag round v-if="!baseInfo.isActive" type="info">
                             {{ $t('commons.status.stopped') }}
                         </el-tag>
                         <el-tag>{{ $t('app.version') }}: {{ baseInfo.version }}</el-tag>
                     </div>
                     <div class="mt-0.5">
-                        <el-button type="primary" v-if="baseInfo.status === 'running'" @click="onOperate('stop')" link>
+                        <el-button type="primary" v-if="baseInfo.isActive" @click="onOperate('stop')" link>
                             {{ $t('commons.button.stop') }}
                         </el-button>
-                        <el-button type="primary" v-if="baseInfo.status !== 'running'" @click="onOperate('start')" link>
+                        <el-button type="primary" v-if="!baseInfo.isActive" @click="onOperate('start')" link>
                             {{ $t('commons.button.start') }}
                         </el-button>
                         <el-divider direction="vertical" />
@@ -51,14 +51,14 @@ import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
 import { ref } from 'vue';
 
-const baseInfo = ref<Host.FirewallBase>({ status: '', name: '', version: '', pingStatus: '' });
+const baseInfo = ref<Host.FirewallBase>({ isActive: false, isExist: false, name: '', version: '', pingStatus: '' });
 const onPing = ref('Disable');
 const oldStatus = ref();
 
 const acceptParams = (): void => {
     loadBaseInfo(true);
 };
-const emit = defineEmits(['search', 'update:status', 'update:loading', 'update:maskShow', 'update:name']);
+const emit = defineEmits(['search', 'update:is-active', 'update:loading', 'update:maskShow', 'update:name']);
 
 const loadBaseInfo = async (search: boolean) => {
     await loadFireBaseInfo()
@@ -67,7 +67,7 @@ const loadBaseInfo = async (search: boolean) => {
             onPing.value = baseInfo.value.pingStatus;
             oldStatus.value = onPing.value;
             emit('update:name', baseInfo.value.name);
-            emit('update:status', baseInfo.value.status);
+            emit('update:is-active', baseInfo.value.status);
             if (search) {
                 emit('search');
             } else {
@@ -91,7 +91,6 @@ const onOperate = async (operation: string) => {
     })
         .then(async () => {
             emit('update:loading', true);
-            emit('update:status', 'running');
             emit('update:maskShow', true);
             await operateFire(operation)
                 .then(() => {
@@ -117,7 +116,6 @@ const onPingOperate = async (operation: string) => {
     })
         .then(async () => {
             emit('update:loading', true);
-            emit('update:status', 'running');
             operation = operation === 'Disable' ? 'disablePing' : 'enablePing';
             emit('update:maskShow', true);
             await operateFire(operation)

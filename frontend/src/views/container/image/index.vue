@@ -1,12 +1,8 @@
 <template>
     <div v-loading="loading">
-        <el-card v-if="dockerStatus != 'Running'" class="mask-prompt">
-            <span>{{ $t('container.serviceUnavailable') }}</span>
-            <el-button type="primary" link class="bt" @click="goSetting">【 {{ $t('container.setting') }} 】</el-button>
-            <span>{{ $t('container.startIn') }}</span>
-        </el-card>
+        <docker-status v-model:isActive="isActive" v-model:loading="loading" @search="search" @mounted="loadRepos" />
 
-        <LayoutContent :title="$t('container.image')" :class="{ mask: dockerStatus != 'Running' }">
+        <LayoutContent :title="$t('container.image')" :class="{ mask: !isActive }">
             <template #leftToolBar>
                 <el-button type="primary" plain @click="onOpenPull">
                     {{ $t('container.imagePull') }}
@@ -99,7 +95,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, onMounted, ref, computed } from 'vue';
+import { reactive, ref, computed } from 'vue';
 import { dateFormat } from '@/utils/util';
 import { Container } from '@/api/interface/container';
 import Pull from '@/views/container/image/pull/index.vue';
@@ -110,17 +106,10 @@ import Load from '@/views/container/image/load/index.vue';
 import Build from '@/views/container/image/build/index.vue';
 import Delete from '@/views/container/image/delete/index.vue';
 import Prune from '@/views/container/image/prune/index.vue';
+import DockerStatus from '@/views/container/docker-status/index.vue';
 import CodemirrorDialog from '@/components/codemirror-dialog/index.vue';
-import {
-    searchImage,
-    listImageRepo,
-    loadDockerStatus,
-    imageRemove,
-    inspect,
-    containerPrune,
-} from '@/api/modules/container';
+import { searchImage, listImageRepo, imageRemove, inspect, containerPrune } from '@/api/modules/container';
 import i18n from '@/lang';
-import router from '@/routers';
 import { GlobalStore } from '@/store';
 import { ElMessageBox } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
@@ -144,26 +133,7 @@ const paginationConfig = reactive({
 });
 const searchName = ref();
 
-const dockerStatus = ref('Running');
-const loadStatus = async () => {
-    loading.value = true;
-    await loadDockerStatus()
-        .then((res) => {
-            loading.value = false;
-            dockerStatus.value = res.data;
-            if (dockerStatus.value === 'Running') {
-                search();
-                loadRepos();
-            }
-        })
-        .catch(() => {
-            dockerStatus.value = 'Failed';
-            loading.value = false;
-        });
-};
-const goSetting = async () => {
-    router.push({ name: 'ContainerSetting' });
-};
+const isActive = ref(false);
 
 const mydetail = ref();
 const dialogPullRef = ref();
@@ -176,6 +146,9 @@ const dialogDeleteRef = ref();
 const dialogPruneRef = ref();
 
 const search = async () => {
+    if (!isActive.value) {
+        return;
+    }
     const repoSearch = {
         info: searchName.value,
         page: paginationConfig.currentPage,
@@ -305,8 +278,4 @@ const buttons = [
         },
     },
 ];
-
-onMounted(() => {
-    loadStatus();
-});
 </script>

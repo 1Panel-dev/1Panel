@@ -116,8 +116,8 @@ func (u *Fail2BanService) UpdateConf(req dto.Fail2BanUpdate) error {
 			if client.Name() != itemName {
 				return buserr.WithName("ErrBanAction", itemName)
 			}
-			status, _ := client.Status()
-			if status != "running" {
+			isActive, _ := client.Status()
+			if !isActive {
 				return buserr.WithName("ErrBanAction", itemName)
 			}
 		}

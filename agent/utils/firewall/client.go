@@ -13,7 +13,7 @@ type FirewallClient interface {
 	Stop() error
 	Restart() error
 	Reload() error
-	Status() (string, error) // running not running
+	Status() (bool, error) // running not running
 	Version() (string, error)
 
 	ListPort() ([]client.FireInfo, error)

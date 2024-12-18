@@ -10,7 +10,8 @@ type SSHUpdate struct {
 
 type SSHInfo struct {
 	AutoStart              bool   `json:"autoStart"`
-	Status                 string `json:"status"`
+	IsExist                bool   `json:"isExist"`
+	IsActive               bool   `json:"isActive"`
 	Message                string `json:"message"`
 	Port                   string `json:"port"`
 	ListenAddress          string `json:"listenAddress"`

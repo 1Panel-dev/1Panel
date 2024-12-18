@@ -1,12 +1,8 @@
 <template>
     <div v-loading="loading">
-        <el-card v-if="dockerStatus != 'Running'" class="mask-prompt">
-            <span>{{ $t('container.serviceUnavailable') }}</span>
-            <el-button type="primary" class="bt" link @click="goSetting">【 {{ $t('container.setting') }} 】</el-button>
-            <span>{{ $t('container.startIn') }}</span>
-        </el-card>
+        <docker-status v-model:isActive="isActive" @search="search" />
 
-        <div class="mt-5">
+        <div class="mt-5" v-if="isActive">
             <el-tag @click="searchWithStatus('all')" v-if="countItem.all" effect="plain" size="large">
                 {{ $t('commons.table.all') }} * {{ countItem.all }}
             </el-tag>
@@ -69,7 +65,7 @@
             </el-tag>
         </div>
 
-        <LayoutContent :title="$t('container.container')" :class="{ mask: dockerStatus != 'Running' }">
+        <LayoutContent :title="$t('container.container')" :class="{ mask: !isActive }">
             <template #leftToolBar>
                 <el-button type="primary" @click="onContainerOperate('')">
                     {{ $t('container.create') }}
@@ -414,6 +410,7 @@ import ContainerLogDialog from '@/views/container/container/log/index.vue';
 import TerminalDialog from '@/views/container/container/terminal/index.vue';
 import CodemirrorDialog from '@/components/codemirror-dialog/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
+import DockerStatus from '@/views/container/docker-status/index.vue';
 import Status from '@/components/status/index.vue';
 import { reactive, onMounted, ref, computed } from 'vue';
 import {
@@ -421,7 +418,6 @@ import {
     containerOperator,
     inspect,
     loadContainerStatus,
-    loadDockerStatus,
     searchContainer,
 } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
@@ -434,6 +430,7 @@ const globalStore = GlobalStore();
 const mobile = computed(() => {
     return globalStore.isMobile();
 });
+const isActive = ref(false);
 
 const loading = ref(false);
 const data = ref();
@@ -466,23 +463,6 @@ const countItem = reactive({
     dead: 0,
 });
 
-const dockerStatus = ref('Running');
-const loadStatus = async () => {
-    loading.value = true;
-    await loadDockerStatus()
-        .then((res) => {
-            loading.value = false;
-            dockerStatus.value = res.data;
-            if (dockerStatus.value === 'Running') {
-                search();
-            }
-        })
-        .catch(() => {
-            dockerStatus.value = 'Failed';
-            loading.value = false;
-        });
-};
-
 const goDashboard = async (port: any) => {
     if (port.indexOf('127.0.0.1') !== -1) {
         MsgWarning(i18n.global.t('container.unExposedPort'));
@@ -499,10 +479,6 @@ const goDashboard = async (port: any) => {
     dialogPortJumpRef.value.acceptParams({ port: portEx, ip: ip });
 };
 
-const goSetting = async () => {
-    router.push({ name: 'ContainerSetting' });
-};
-
 interface Filters {
     filters?: string;
 }
@@ -517,6 +493,9 @@ const dialogRenameRef = ref();
 const dialogPruneRef = ref();
 
 const search = async (column?: any) => {
+    if (!isActive.value) {
+        return;
+    }
     localStorage.setItem('includeAppStore', includeAppStore.value ? 'true' : 'false');
     let filterItem = props.filters ? props.filters : '';
     paginationConfig.orderBy = column?.order ? column.prop : paginationConfig.orderBy;
@@ -802,7 +781,6 @@ const buttons = [
 onMounted(() => {
     let includeItem = localStorage.getItem('includeAppStore');
     includeAppStore.value = !includeItem || includeItem === 'true';
-    loadStatus();
 });
 </script>
 

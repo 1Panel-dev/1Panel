@@ -27,8 +27,8 @@ func NewIptables() (*Iptables, error) {
 	return iptables, nil
 }
 
-func (iptables *Iptables) runf(rule string, a ...any) error {
-	stdout, err := cmd.Execf("%s iptables -t nat %s", iptables.CmdStr, fmt.Sprintf(rule, a...))
+func (iptables *Iptables) run(rule string) error {
+	stdout, err := cmd.Execf("%s iptables -t nat %s", iptables.CmdStr, rule)
 	if err != nil {
 		return fmt.Errorf("%s, %s", err, stdout)
 	}
@@ -37,6 +37,10 @@ func (iptables *Iptables) runf(rule string, a ...any) error {
 	}
 
 	return nil
+}
+
+func (iptables *Iptables) runf(rule string, a ...any) error {
+	return iptables.run(fmt.Sprintf(rule, a...))
 }
 
 func (iptables *Iptables) Check() error {
@@ -100,7 +104,7 @@ func (iptables *Iptables) NatAdd(protocol, src, destIp, destPort string, save bo
 	if destIp != "" && destIp != "127.0.0.1" && destIp != "localhost" {
 		rule = fmt.Sprintf("-A %s -p %s --dport %s -j DNAT --to-destination %s:%s", NatChain, protocol, src, destIp, destPort)
 	}
-	if err := iptables.runf(rule); err != nil {
+	if err := iptables.run(rule); err != nil {
 		return err
 	}
 

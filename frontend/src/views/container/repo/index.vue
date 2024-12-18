@@ -1,12 +1,8 @@
 <template>
     <div v-loading="loading">
-        <el-card v-if="dockerStatus != 'Running'" class="mask-prompt">
-            <span>{{ $t('container.serviceUnavailable') }}</span>
-            <el-button type="primary" link class="bt" @click="goSetting">【 {{ $t('container.setting') }} 】</el-button>
-            <span>{{ $t('container.startIn') }}</span>
-        </el-card>
+        <docker-status v-model:isActive="isActive" v-model:loading="loading" @search="search" />
 
-        <LayoutContent :title="$t('container.repo')" :class="{ mask: dockerStatus != 'Running' }">
+        <LayoutContent :title="$t('container.repo')" :class="{ mask: !isActive }">
             <template #leftToolBar>
                 <el-button type="primary" @click="onOpenDialog('add')">
                     {{ $t('container.createRepo') }}
@@ -66,12 +62,12 @@
 
 <script lang="ts" setup>
 import OperatorDialog from '@/views/container/repo/operator/index.vue';
-import { reactive, onMounted, ref } from 'vue';
+import { reactive, ref } from 'vue';
 import { dateFormat } from '@/utils/util';
 import { Container } from '@/api/interface/container';
-import { checkRepoStatus, deleteImageRepo, loadDockerStatus, searchImageRepo } from '@/api/modules/container';
+import { checkRepoStatus, deleteImageRepo, searchImageRepo } from '@/api/modules/container';
+import DockerStatus from '@/views/container/docker-status/index.vue';
 import i18n from '@/lang';
-import router from '@/routers';
 
 const loading = ref();
 const data = ref();
@@ -86,27 +82,12 @@ const searchName = ref();
 
 const opRef = ref();
 
-const dockerStatus = ref('Running');
-const loadStatus = async () => {
-    loading.value = true;
-    await loadDockerStatus()
-        .then((res) => {
-            loading.value = false;
-            dockerStatus.value = res.data;
-            if (dockerStatus.value === 'Running') {
-                search();
-            }
-        })
-        .catch(() => {
-            dockerStatus.value = 'Failed';
-            loading.value = false;
-        });
-};
-const goSetting = async () => {
-    router.push({ name: 'ContainerSetting' });
-};
+const isActive = ref();
 
 const search = async () => {
+    if (!isActive.value) {
+        return;
+    }
     let params = {
         info: searchName.value,
         page: paginationConfig.currentPage,
@@ -193,8 +174,4 @@ const buttons = [
         },
     },
 ];
-
-onMounted(() => {
-    loadStatus();
-});
 </script>

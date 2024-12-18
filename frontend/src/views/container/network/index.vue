@@ -1,12 +1,8 @@
 <template>
     <div v-loading="loading">
-        <el-card v-if="dockerStatus != 'Running'" class="mask-prompt">
-            <span>{{ $t('container.serviceUnavailable') }}</span>
-            <el-button type="primary" link class="bt" @click="goSetting">【 {{ $t('container.setting') }} 】</el-button>
-            <span>{{ $t('container.startIn') }}</span>
-        </el-card>
+        <docker-status v-model:isActive="isActive" v-model:loading="loading" @search="search" />
 
-        <LayoutContent :title="$t('container.network')" :class="{ mask: dockerStatus != 'Running' }">
+        <LayoutContent :title="$t('container.network')" :class="{ mask: !isActive }">
             <template #leftToolBar>
                 <el-button type="primary" @click="onCreate()">
                     {{ $t('container.createNetwork') }}
@@ -93,14 +89,14 @@
 <script lang="ts" setup>
 import CreateDialog from '@/views/container/network/create/index.vue';
 import CodemirrorDialog from '@/components/codemirror-dialog/index.vue';
-import { reactive, onMounted, ref } from 'vue';
+import { reactive, ref } from 'vue';
 import { dateFormat } from '@/utils/util';
-import { deleteNetwork, searchNetwork, inspect, loadDockerStatus, containerPrune } from '@/api/modules/container';
+import { deleteNetwork, searchNetwork, inspect, containerPrune } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import i18n from '@/lang';
-import router from '@/routers';
 import { ElMessageBox } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
+import DockerStatus from '@/views/container/docker-status/index.vue';
 
 const loading = ref();
 const codemirror = ref();
@@ -116,27 +112,7 @@ const paginationConfig = reactive({
 const searchName = ref();
 
 const opRef = ref();
-
-const dockerStatus = ref('Running');
-const loadStatus = async () => {
-    loading.value = true;
-    await loadDockerStatus()
-        .then((res) => {
-            loading.value = false;
-            dockerStatus.value = res.data;
-            if (dockerStatus.value === 'Running') {
-                search();
-            }
-        })
-        .catch(() => {
-            dockerStatus.value = 'Failed';
-            loading.value = false;
-        });
-};
-const goSetting = async () => {
-    router.push({ name: 'ContainerSetting' });
-};
-
+const isActive = ref(false);
 const dialogCreateRef = ref<DialogExpose>();
 
 interface DialogExpose {
@@ -174,6 +150,9 @@ function selectable(row) {
 }
 
 const search = async () => {
+    if (!isActive.value) {
+        return;
+    }
     const params = {
         info: searchName.value,
         page: paginationConfig.currentPage,
@@ -249,8 +228,4 @@ const buttons = [
         },
     },
 ];
-
-onMounted(() => {
-    loadStatus();
-});
 </script>

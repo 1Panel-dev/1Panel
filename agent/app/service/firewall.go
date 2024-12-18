@@ -43,13 +43,14 @@ func NewIFirewallService() IFirewallService {
 
 func (u *FirewallService) LoadBaseInfo() (dto.FirewallBaseInfo, error) {
 	var baseInfo dto.FirewallBaseInfo
-	baseInfo.Status = "not running"
 	baseInfo.Version = "-"
 	baseInfo.Name = "-"
 	client, err := firewall.NewFirewallClient()
 	if err != nil {
+		baseInfo.IsExist = false
 		return baseInfo, err
 	}
+	baseInfo.IsExist = true
 	baseInfo.Name = client.Name()
 
 	var wg sync.WaitGroup
@@ -60,7 +61,7 @@ func (u *FirewallService) LoadBaseInfo() (dto.FirewallBaseInfo, error) {
 	}()
 	go func() {
 		defer wg.Done()
-		baseInfo.Status, _ = client.Status()
+		baseInfo.IsActive, _ = client.Status()
 	}()
 	go func() {
 		defer wg.Done()

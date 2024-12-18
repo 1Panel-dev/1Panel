@@ -7,28 +7,28 @@
                 <div class="flex w-full flex-col gap-4 md:flex-row">
                     <div class="flex flex-wrap gap-4">
                         <el-tag class="float-left" effect="dark" type="success">SSH</el-tag>
-                        <el-tag round v-if="form.status === 'Enable'" type="success">
+                        <el-tag round v-if="form.isActive" type="success">
                             {{ $t('commons.status.running') }}
                         </el-tag>
                         <el-popover
-                            v-if="form.status === 'Disable'"
+                            v-if="!form.isActive"
                             placement="top-start"
                             trigger="hover"
                             width="450"
                             :content="form.message"
                         >
                             <template #reference>
-                                <el-tag round v-if="form.status === 'Disable'" type="info">
+                                <el-tag round v-if="!form.isActive" type="info">
                                     {{ $t('commons.status.stopped') }}
                                 </el-tag>
                             </template>
                         </el-popover>
                     </div>
                     <div class="mt-0.5">
-                        <el-button v-if="form.status === 'Enable'" type="primary" @click="onOperate('stop')" link>
+                        <el-button v-if="form.isActive" type="primary" @click="onOperate('stop')" link>
                             {{ $t('commons.button.stop') }}
                         </el-button>
-                        <el-button v-if="form.status === 'Disable'" type="primary" @click="onOperate('start')" link>
+                        <el-button v-if="!form.isActive" type="primary" @click="onOperate('start')" link>
                             {{ $t('commons.button.start') }}
                         </el-button>
                         <el-divider direction="vertical" />
@@ -174,7 +174,7 @@ const autoStart = ref('enable');
 
 const sshConf = ref();
 const form = reactive({
-    status: 'enable',
+    isActive: false,
     message: '',
     port: 22,
     listenAddress: '',
@@ -316,7 +316,7 @@ const changeMode = async () => {
 
 const search = async () => {
     const res = await getSSHInfo();
-    form.status = res.data.status;
+    form.isActive = res.data.isActive;
     form.port = Number(res.data.port);
     autoStart.value = res.data.autoStart ? 'enable' : 'disable';
     form.listenAddress = res.data.listenAddress;

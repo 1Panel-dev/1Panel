@@ -2,7 +2,8 @@ package dto
 
 type FirewallBaseInfo struct {
 	Name       string `json:"name"`
-	Status     string `json:"status"`
+	IsExist    bool   `json:"isExist"`
+	IsActive   bool   `json:"isActive"`
 	Version    string `json:"version"`
 	PingStatus string `json:"pingStatus"`
 }

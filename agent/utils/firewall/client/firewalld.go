@@ -24,12 +24,9 @@ func (f *Firewall) Name() string {
 	return "firewalld"
 }
 
-func (f *Firewall) Status() (string, error) {
+func (f *Firewall) Status() (bool, error) {
 	stdout, _ := cmd.Exec("firewall-cmd --state")
-	if stdout == "running\n" {
-		return "running", nil
-	}
-	return "not running", nil
+	return stdout == "running\n", nil
 }
 
 func (f *Firewall) Version() (string, error) {

@@ -45,7 +45,8 @@ func NewISSHService() ISSHService {
 func (u *SSHService) GetSSHInfo() (*dto.SSHInfo, error) {
 	data := dto.SSHInfo{
 		AutoStart:              true,
-		Status:                 constant.StatusEnable,
+		IsExist:                true,
+		IsActive:               true,
 		Message:                "",
 		Port:                   "22",
 		ListenAddress:          "",
@@ -56,17 +57,13 @@ func (u *SSHService) GetSSHInfo() (*dto.SSHInfo, error) {
 	}
 	serviceName, err := loadServiceName()
 	if err != nil {
-		data.Status = constant.StatusDisable
+		data.IsExist = false
 		data.Message = err.Error()
 	} else {
 		active, err := systemctl.IsActive(serviceName)
-		if !active {
-			data.Status = constant.StatusDisable
-			if err != nil {
-				data.Message = err.Error()
-			}
-		} else {
-			data.Status = constant.StatusEnable
+		data.IsActive = active
+		if !active && err != nil {
+			data.Message = err.Error()
 		}
 	}
 
@@ -84,7 +81,7 @@ func (u *SSHService) GetSSHInfo() (*dto.SSHInfo, error) {
 	sshConf, err := os.ReadFile(sshPath)
 	if err != nil {
 		data.Message = err.Error()
-		data.Status = constant.StatusDisable
+		data.IsActive = false
 	}
 	lines := strings.Split(string(sshConf), "\n")
 	for _, line := range lines {

@@ -9,15 +9,15 @@
                 @search="search"
                 v-model:loading="loading"
                 v-model:mask-show="maskShow"
-                v-model:status="fireStatus"
+                v-model:is-active="isActive"
                 v-model:name="fireName"
             />
             <div v-if="fireName !== '-'">
-                <el-card v-if="fireStatus != 'running' && maskShow" class="mask-prompt">
+                <el-card v-if="!isActive && maskShow" class="mask-prompt">
                     <span>{{ $t('firewall.firewallNotStart') }}</span>
                 </el-card>
 
-                <LayoutContent :title="$t('firewall.forwardRule')" :class="{ mask: fireStatus != 'running' }">
+                <LayoutContent :title="$t('firewall.forwardRule')" :class="{ mask: !isActive }">
                     <template #leftToolBar>
                         <el-button type="primary" @click="onOpenDialog('create')">
                             {{ $t('commons.button.create') }}{{ $t('firewall.forwardRule') }}
@@ -97,7 +97,7 @@ const searchStatus = ref('');
 const searchStrategy = ref('');
 
 const maskShow = ref(true);
-const fireStatus = ref('running');
+const isActive = ref(false);
 const fireName = ref();
 const fireStatusRef = ref();
 
@@ -112,7 +112,7 @@ const paginationConfig = reactive({
 });
 
 const search = async () => {
-    if (fireStatus.value !== 'running') {
+    if (!isActive.value) {
         loading.value = false;
         data.value = [];
         paginationConfig.total = 0;

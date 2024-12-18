@@ -28,16 +28,16 @@ func (f *Ufw) Name() string {
 	return "ufw"
 }
 
-func (f *Ufw) Status() (string, error) {
+func (f *Ufw) Status() (bool, error) {
 	stdout, _ := cmd.Execf("%s status | grep Status", f.CmdStr)
 	if stdout == "Status: active\n" {
-		return "running", nil
+		return true, nil
 	}
 	stdout1, _ := cmd.Execf("%s status | grep 状态", f.CmdStr)
 	if stdout1 == "状态： 激活\n" {
-		return "running", nil
+		return true, nil
 	}
-	return "not running", nil
+	return false, nil
 }
 
 func (f *Ufw) Version() (string, error) {
