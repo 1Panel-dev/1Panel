@@ -1,38 +1,11 @@
 <template>
-    <el-drawer
-        v-model="open"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        :before-close="handleClose"
-        :size="globalStore.isFullScreen ? '100%' : '50%'"
-    >
-        <template #header>
-            <DrawerHeader :header="$t('website.log')" :back="handleClose">
-                <template #extra v-if="!mobile">
-                    <el-tooltip :content="loadTooltip()" placement="top">
-                        <el-button @click="toggleFullscreen" class="fullScreen" icon="FullScreen" plain></el-button>
-                    </el-tooltip>
-                </template>
-            </DrawerHeader>
-        </template>
-        <div>
-            <LogFile :config="config" :height-diff="config.heightDiff"></LogFile>
-        </div>
-    </el-drawer>
+    <DrawerPro v-model="open" :header="$t('website.log')" size="large" :back="handleClose">
+        <LogFile :config="config" :height-diff="config.heightDiff"></LogFile>
+    </DrawerPro>
 </template>
 <script lang="ts" setup>
-import { computed, ref, watch } from 'vue';
+import { ref } from 'vue';
 import LogFile from '@/components/log-file/index.vue';
-import { GlobalStore } from '@/store';
-import screenfull from 'screenfull';
-import i18n from '@/lang';
-
-const globalStore = GlobalStore();
-
-const mobile = computed(() => {
-    return globalStore.isMobile();
-});
 
 interface LogProps {
     id: number;
@@ -50,30 +23,11 @@ const em = defineEmits(['close']);
 const handleClose = () => {
     open.value = false;
     em('close', false);
-    globalStore.isFullScreen = false;
-};
-
-watch(open, (val) => {
-    if (screenfull.isEnabled && !val && !mobile.value) screenfull.exit();
-});
-
-function toggleFullscreen() {
-    globalStore.isFullScreen = !globalStore.isFullScreen;
-}
-
-const loadTooltip = () => {
-    return i18n.global.t('commons.button.' + (globalStore.isFullScreen ? 'quitFullscreen' : 'fullscreen'));
 };
 
 const acceptParams = (props: LogProps) => {
     config.value = props;
     open.value = true;
-
-    if (!mobile.value) {
-        screenfull.on('change', () => {
-            globalStore.isFullScreen = screenfull.isFullscreen;
-        });
-    }
 };
 
 defineExpose({ acceptParams });

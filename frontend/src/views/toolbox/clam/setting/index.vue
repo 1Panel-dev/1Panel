@@ -6,7 +6,7 @@
             </template>
             <template #title>
                 <back-button name="Clam" header="ClamAV">
-                    <template #buttons>
+                    <template #leftToolBar>
                         <el-button type="primary" :plain="activeName !== 'clamd'" @click="search('clamd')">
                             {{ $t('toolbox.clam.clamConf') }}
                         </el-button>

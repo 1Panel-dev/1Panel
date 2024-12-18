@@ -42,11 +42,9 @@
                         <div v-else class="flex flex-wrap gap-4 sm:justify-between">
                             <div class="flex gap-2 flex-wrap items-center justify-start">
                                 <slot name="leftToolBar" v-if="slots.leftToolBar"></slot>
-                                <slot name="buttons" v-if="slots.buttons"></slot>
                             </div>
-                            <div class="flex flex-wrap gap-3" v-if="slots.rightToolBar || slots.rightButton">
+                            <div class="flex flex-wrap gap-3" v-if="slots.rightToolBar">
                                 <slot name="rightToolBar"></slot>
-                                <slot name="rightButton"></slot>
                             </div>
                         </div>
 

@@ -1,8 +1,5 @@
 <template>
-    <el-drawer v-model="open" width="30%" :close-on-click-modal="false" :close-on-press-escape="false">
-        <template #header>
-            <DrawerHeader :header="$t('file.info')" :back="handleClose" />
-        </template>
+    <DrawerPro v-model="open" :header="$t('file.info')" size="small" :back="handleClose">
         <el-descriptions :column="1" border>
             <el-descriptions-item label-class-name="detail-label" :label="$t('file.fileName')">
                 {{ data.name }}
@@ -41,7 +38,7 @@
                 {{ dateFormatSimple(data.modTime) }}
             </el-descriptions-item>
         </el-descriptions>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -49,7 +46,6 @@ import { ComputeDirSize, GetFileContent } from '@/api/modules/files';
 import { computeSize } from '@/utils/util';
 import { ref } from 'vue';
 import { dateFormatSimple } from '@/utils/util';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 
 interface InfoProps {
     path: string;

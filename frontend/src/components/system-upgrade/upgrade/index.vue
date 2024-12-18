@@ -1,15 +1,11 @@
 <template>
-    <el-drawer
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        :key="refresh"
+    <DrawerPro
         v-model="drawerVisible"
-        size="50%"
-        append-to-body
+        :header="$t('commons.button.upgrade')"
+        :back="handleClose"
+        size="large"
+        :key="refresh"
     >
-        <template #header>
-            <DrawerHeader :header="$t('commons.button.upgrade')" :back="handleClose" />
-        </template>
         <div class="panel-MdEditor">
             <el-alert :closable="false">
                 <span class="line-height">{{ $t('setting.versionHelper') }}</span>
@@ -38,11 +34,10 @@
                 <el-button type="primary" @click="onUpgrade">{{ $t('setting.upgradeNow') }}</el-button>
             </span>
         </template>
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script setup lang="ts">
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { loadReleaseNotes, upgrade } from '@/api/modules/setting';
 import MdEditor from 'md-editor-v3';
 import i18n from '@/lang';

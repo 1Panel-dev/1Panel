@@ -1,19 +1,11 @@
 <template>
-    <el-drawer
+    <DrawerPro
         v-model="drawerVisible"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        size="50%"
+        :header="title"
+        size="large"
+        :resource="dialogData.title === 'add' ? '' : dialogData.rowData?.name"
+        :back="handleClose"
     >
-        <template #header>
-            <DrawerHeader
-                :header="title"
-                :hideResource="dialogData.title === 'add'"
-                :resource="dialogData.rowData?.name"
-                :back="handleClose"
-            />
-        </template>
         <el-form ref="formRef" label-position="top" :model="dialogData.rowData" :rules="rules" v-loading="loading">
             <el-row type="flex" justify="center">
                 <el-col :span="22">
@@ -136,7 +128,7 @@
             </span>
         </template>
         <LicenseImport ref="licenseRef" />
-    </el-drawer>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -146,7 +138,6 @@ import FileList from '@/components/file-list/index.vue';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import LicenseImport from '@/components/license-import/index.vue';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { Toolbox } from '@/api/interface/toolbox';
 import { createClam, updateClam } from '@/api/modules/toolbox';
