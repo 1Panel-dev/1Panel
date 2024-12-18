@@ -21,36 +21,32 @@
             <el-card>
                 <div class="content-container__title">
                     <slot name="title">
-                        <div v-if="showBack">
-                            <div class="flex flex-wrap gap-4 sm:justify-between">
-                                <div class="flex gap-2 flex-wrap items-center justify-start">
-                                    <back-button
-                                        :path="backPath"
-                                        :name="backName"
-                                        :to="backTo"
-                                        :header="title"
-                                        :reload="reload"
-                                    >
-                                        <template v-if="slots.leftToolBar" #buttons>
-                                            <slot name="leftToolBar" v-if="slots.leftToolBar"></slot>
-                                        </template>
-                                    </back-button>
-                                </div>
-                                <div class="flex flex-wrap gap-3">
-                                    <slot name="rightToolBar" v-if="slots.rightToolBar"></slot>
-                                </div>
+                        <div v-if="showBack" class="flex flex-wrap gap-4 sm:justify-between">
+                            <back-button
+                                :path="backPath"
+                                :name="backName"
+                                :to="backTo"
+                                :header="title"
+                                :reload="reload"
+                            >
+                                <template v-if="slots.leftToolBar" #buttons>
+                                    <div class="flex flex-wrap gap-2 items-center justify-start">
+                                        <slot name="leftToolBar" v-if="slots.leftToolBar"></slot>
+                                    </div>
+                                </template>
+                            </back-button>
+                            <div class="flex flex-wrap gap-3">
+                                <slot name="rightToolBar" v-if="slots.rightToolBar"></slot>
                             </div>
                         </div>
-                        <div v-else>
-                            <div class="flex flex-wrap gap-4 sm:justify-between">
-                                <div class="flex gap-2 flex-wrap items-center justify-start">
-                                    <slot name="leftToolBar" v-if="slots.leftToolBar"></slot>
-                                    <slot name="buttons" v-if="slots.buttons"></slot>
-                                </div>
-                                <div class="flex flex-wrap gap-3" v-if="slots.rightToolBar || slots.rightButton">
-                                    <slot name="rightToolBar"></slot>
-                                    <slot name="rightButton"></slot>
-                                </div>
+                        <div v-else class="flex flex-wrap gap-4 sm:justify-between">
+                            <div class="flex gap-2 flex-wrap items-center justify-start">
+                                <slot name="leftToolBar" v-if="slots.leftToolBar"></slot>
+                                <slot name="buttons" v-if="slots.buttons"></slot>
+                            </div>
+                            <div class="flex flex-wrap gap-3" v-if="slots.rightToolBar || slots.rightButton">
+                                <slot name="rightToolBar"></slot>
+                                <slot name="rightButton"></slot>
                             </div>
                         </div>
 

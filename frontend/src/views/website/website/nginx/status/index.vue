@@ -1,53 +1,28 @@
 <template>
     <div>
-        <el-form label-position="top">
-            <el-row type="flex" style="margin-left: 50px" justify="center">
-                <el-form-item style="width: 25%">
-                    <template #label>
-                        <span class="status-label">{{ $t('nginx.connections') }}</span>
-                    </template>
-                    <span class="status-count">{{ data.active }}</span>
-                </el-form-item>
-                <el-form-item style="width: 25%">
-                    <template #label>
-                        <span class="status-label">{{ $t('nginx.accepts') }}</span>
-                    </template>
-                    <span class="status-count">{{ data.accepts }}</span>
-                </el-form-item>
-                <el-form-item style="width: 25%">
-                    <template #label>
-                        <span class="status-label">{{ $t('nginx.handled') }}</span>
-                    </template>
-                    <span class="status-count">{{ data.handled }}</span>
-                </el-form-item>
-                <el-form-item style="width: 25%">
-                    <template #label>
-                        <span class="status-label">{{ $t('nginx.requests') }}</span>
-                    </template>
-                    <span class="status-count">{{ data.requests }}</span>
-                </el-form-item>
-
-                <el-form-item style="width: 25%">
-                    <template #label>
-                        <span class="status-label">{{ $t('nginx.reading') }}</span>
-                    </template>
-                    <span class="status-count">{{ data.reading }}</span>
-                </el-form-item>
-                <el-form-item style="width: 25%">
-                    <template #label>
-                        <span class="status-label">{{ $t('nginx.writing') }}</span>
-                    </template>
-                    <span class="status-count">{{ data.writing }}</span>
-                </el-form-item>
-                <el-form-item style="width: 25%">
-                    <template #label>
-                        <span class="status-label">{{ $t('nginx.waiting') }}</span>
-                    </template>
-                    <span class="status-count">{{ data.waiting }}</span>
-                </el-form-item>
-                <el-form-item style="width: 25%" />
-            </el-row>
-        </el-form>
+        <el-row>
+            <el-col :xs="24" :sm="6" :md="6" :lg="6" :xl="6">
+                <el-statistic :title="$t('nginx.connections')" :value="data.active" />
+            </el-col>
+            <el-col :xs="24" :sm="6" :md="6" :lg="6" :xl="6">
+                <el-statistic :title="$t('nginx.accepts')" :value="data.accepts" />
+            </el-col>
+            <el-col :xs="24" :sm="6" :md="6" :lg="6" :xl="6">
+                <el-statistic :title="$t('nginx.handled')" :value="data.handled" />
+            </el-col>
+            <el-col :xs="24" :sm="6" :md="6" :lg="6" :xl="6">
+                <el-statistic :title="$t('nginx.requests')" :value="data.requests" />
+            </el-col>
+            <el-col :xs="24" :sm="6" :md="6" :lg="6" :xl="6">
+                <el-statistic :title="$t('nginx.reading')" :value="data.reading" />
+            </el-col>
+            <el-col :xs="24" :sm="6" :md="6" :lg="6" :xl="6">
+                <el-statistic :title="$t('nginx.writing')" :value="data.writing" />
+            </el-col>
+            <el-col :xs="24" :sm="6" :md="6" :lg="6" :xl="6">
+                <el-statistic :title="$t('nginx.waiting')" :value="data.waiting" />
+            </el-col>
+        </el-row>
     </div>
 </template>
 
@@ -64,13 +39,13 @@ const props = defineProps({
 });
 
 let data = ref<Nginx.NginxStatus>({
-    accepts: '',
-    handled: '',
-    requests: '',
-    reading: '',
-    waiting: '',
-    writing: '',
-    active: '',
+    accepts: 0,
+    handled: 0,
+    requests: 0,
+    reading: 0,
+    waiting: 0,
+    writing: 0,
+    active: 0,
 });
 
 const get = async () => {
@@ -85,3 +60,9 @@ onMounted(() => {
     get();
 });
 </script>
+
+<style scoped>
+.el-col {
+    text-align: center;
+}
+</style>

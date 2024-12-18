@@ -15,13 +15,13 @@ export namespace Nginx {
     }
 
     export interface NginxStatus {
-        accepts: string;
-        handled: string;
-        active: string;
-        requests: string;
-        reading: string;
-        writing: string;
-        waiting: string;
+        accepts: number;
+        handled: number;
+        active: number;
+        requests: number;
+        reading: number;
+        writing: number;
+        waiting: number;
     }
 
     export interface NginxFileUpdate {

@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"strconv"
 	"strings"
 	"time"
 
@@ -94,13 +95,34 @@ func (n NginxService) GetStatus() (response.NginxStatus, error) {
 	}
 	var status response.NginxStatus
 	resArray := strings.Split(string(content), " ")
-	status.Active = resArray[2]
-	status.Accepts = resArray[7]
-	status.Handled = resArray[8]
-	status.Requests = resArray[9]
-	status.Reading = resArray[11]
-	status.Writing = resArray[13]
-	status.Waiting = resArray[15]
+	active, err := strconv.Atoi(resArray[2])
+	if err == nil {
+		status.Active = active
+	}
+	accepts, err := strconv.Atoi(resArray[7])
+	if err == nil {
+		status.Accepts = accepts
+	}
+	handled, err := strconv.Atoi(resArray[8])
+	if err == nil {
+		status.Handled = handled
+	}
+	requests, err := strconv.Atoi(resArray[9])
+	if err == nil {
+		status.Requests = requests
+	}
+	reading, err := strconv.Atoi(resArray[11])
+	if err == nil {
+		status.Reading = reading
+	}
+	writing, err := strconv.Atoi(resArray[13])
+	if err == nil {
+		status.Writing = writing
+	}
+	waiting, err := strconv.Atoi(resArray[15])
+	if err == nil {
+		status.Waiting = waiting
+	}
 	return status, nil
 }
 

@@ -3,13 +3,13 @@ package response
 import "github.com/1Panel-dev/1Panel/agent/app/dto"
 
 type NginxStatus struct {
-	Active   string `json:"active"`
-	Accepts  string `json:"accepts"`
-	Handled  string `json:"handled"`
-	Requests string `json:"requests"`
-	Reading  string `json:"reading"`
-	Writing  string `json:"writing"`
-	Waiting  string `json:"waiting"`
+	Active   int `json:"active"`
+	Accepts  int `json:"accepts"`
+	Handled  int `json:"handled"`
+	Requests int `json:"requests"`
+	Reading  int `json:"reading"`
+	Writing  int `json:"writing"`
+	Waiting  int `json:"waiting"`
 }
 
 type NginxParam struct {
