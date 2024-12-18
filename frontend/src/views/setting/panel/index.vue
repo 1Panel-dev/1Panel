@@ -440,36 +440,36 @@ const onChangeThemeColor = () => {
 
 const onSave = async (key: string, val: any) => {
     loading.value = true;
-    if (key === 'Language') {
-        i18n.locale.value = val;
-        globalStore.updateLanguage(val);
-    }
-    if (key === 'Theme') {
-        globalStore.themeConfig.theme = val;
-        switchTheme();
-        if (globalStore.isProductPro) {
-            await updateXpackSettingByKey('Theme', val);
-            let color: string;
-            const themeColor: ThemeColor = JSON.parse(globalStore.themeConfig.themeColor);
-            if (val === 'auto') {
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
-                color = prefersDark.matches ? themeColor.dark : themeColor.light;
-            } else {
-                color = val === 'dark' ? themeColor.dark : themeColor.light;
-            }
-            globalStore.themeConfig.primary = color;
-            setPrimaryColor(color);
-        }
-    }
-    if (key === 'MenuTabs') {
-        globalStore.setOpenMenuTabs(val === 'enable');
-    }
     let param = {
         key: key,
         value: val + '',
     };
     await updateSetting(param)
         .then(async () => {
+            if (key === 'Language') {
+                i18n.locale.value = val;
+                globalStore.updateLanguage(val);
+            }
+            if (key === 'Theme') {
+                globalStore.themeConfig.theme = val;
+                switchTheme();
+                if (globalStore.isProductPro) {
+                    await updateXpackSettingByKey('Theme', val);
+                    let color: string;
+                    const themeColor: ThemeColor = JSON.parse(globalStore.themeConfig.themeColor);
+                    if (val === 'auto') {
+                        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+                        color = prefersDark.matches ? themeColor.dark : themeColor.light;
+                    } else {
+                        color = val === 'dark' ? themeColor.dark : themeColor.light;
+                    }
+                    globalStore.themeConfig.primary = color;
+                    setPrimaryColor(color);
+                }
+            }
+            if (key === 'MenuTabs') {
+                globalStore.setOpenMenuTabs(val === 'enable');
+            }
             if (param.key === 'Language') {
                 location.reload();
             }

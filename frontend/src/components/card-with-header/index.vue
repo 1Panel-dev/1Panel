@@ -31,13 +31,14 @@ defineProps({
             margin-left: 18px;
             &::before {
                 position: absolute;
-                top: 4px;
+                top: 50%;
                 left: -13px;
                 width: 4px;
                 height: 14px;
                 content: '';
                 background: $primary-color;
                 border-radius: 10px;
+                transform: translateY(-50%);
             }
         }
     }
