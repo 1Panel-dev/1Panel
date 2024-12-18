@@ -29,9 +29,11 @@ defineProps({
             font-size: 16px;
             font-weight: 500;
             margin-left: 18px;
+            display: flex;
             &::before {
                 position: absolute;
-                top: 4px;
+                top: 50%;
+                transform: translateY(-50%);
                 left: -13px;
                 width: 4px;
                 height: 14px;
