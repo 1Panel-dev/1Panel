@@ -25,7 +25,7 @@ Execute the following command to install 1Panel with one click:
 curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_start.sh && sudo bash quick_start.sh
 ```
 
-Have questions or suggestions? Please submit a GitHub Issue. We value your feedback!
+Please refer to our [Documentation](https://docs.1panel.hk/) if you encounter problems using 1Panel. 
 
 ## Screenshot
 
