@@ -20,13 +20,13 @@
 
 ## Quick Start
 
-Execute the following command to install 1Panel with one click:
+Execute the script below and follow the prompts to install 1Panel:
 
-```sh
+```bash
 curl -sSL https://resource.1panel.hk/quick_start.sh -o quick_start.sh && bash quick_start.sh
 ```
 
-Please refer to our [Documentation](https://docs.1panel.hk/) if you encounter problems using 1Panel. 
+Please refer to our [documentation](https://docs.1panel.hk/quick_start/) for more details.
 
 ## Screenshot
 
