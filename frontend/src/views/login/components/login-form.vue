@@ -41,8 +41,8 @@
             <div class="login-form">
                 <el-form ref="loginFormRef" :model="loginForm" size="default" :rules="loginRules">
                     <div class="login-form-header">
-                        <div class="title">{{ $t('commons.button.login') }}</div>
-                        <div>
+                        <div class="title cursor-pointer">{{ $t('commons.button.login') }}</div>
+                        <div class="cursor-pointer">
                             <el-dropdown @command="handleCommand">
                                 <span>
                                     {{ dropdownText }}

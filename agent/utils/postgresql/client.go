@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"net/url"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/buserr"
@@ -31,8 +32,9 @@ func NewPostgresqlClient(conn client.DBInfo) (PostgresqlClient, error) {
 		connArgs := []string{"exec", conn.Address, "psql", "-t", "-U", conn.Username, "-c"}
 		return client.NewLocal(connArgs, conn.Address, conn.Username, conn.Password, conn.Database), nil
 	}
-
-	connArgs := fmt.Sprintf("postgres://%s:%s@%s:%d/?sslmode=disable", conn.Username, conn.Password, conn.Address, conn.Port)
+	escapedUsername := url.QueryEscape(conn.Username)
+	escapedPassword := url.QueryEscape(conn.Password)
+	connArgs := fmt.Sprintf("postgres://%s:%s@%s:%d/?sslmode=disable", escapedUsername, escapedPassword, conn.Address, conn.Port)
 	db, err := sql.Open("pgx", connArgs)
 	if err != nil {
 		return nil, err

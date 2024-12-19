@@ -50,6 +50,8 @@ export namespace Dashboard {
         kernelArch: string;
         kernelVersion: string;
         virtualizationSystem: string;
+        ipV4Addr: string;
+        httpProxy: string;
 
         cpuCores: number;
         cpuLogicalCores: number;

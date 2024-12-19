@@ -308,21 +308,58 @@ func (u *FirewallService) OperateForwardRule(req dto.ForwardRuleOperate) error {
 	}
 
 	rules, _ := client.ListForward()
+	i := 0
+	for _, rule := range rules {
+		shouldKeep := true
+		for i := range req.Rules {
+			reqRule := &req.Rules[i]
+			if reqRule.TargetIP == "" {
+				reqRule.TargetIP = "127.0.0.1"
+			}
+
+			if reqRule.Operation == "remove" {
+				for _, proto := range strings.Split(reqRule.Protocol, "/") {
+					if reqRule.Port == rule.Port &&
+						reqRule.TargetPort == rule.TargetPort &&
+						reqRule.TargetIP == rule.TargetIP &&
+						proto == rule.Protocol {
+						shouldKeep = false
+						break
+					}
+				}
+			}
+		}
+		if shouldKeep {
+			rules[i] = rule
+			i++
+		}
+	}
+	rules = rules[:i]
+
 	for _, rule := range rules {
 		for _, reqRule := range req.Rules {
 			if reqRule.Operation == "remove" {
 				continue
 			}
-			if reqRule.TargetIP == "" {
-				reqRule.TargetIP = "127.0.0.1"
-			}
-			if reqRule.Port == rule.Port && reqRule.TargetPort == rule.TargetPort && reqRule.TargetIP == rule.TargetIP {
-				return constant.ErrRecordExist
+
+			for _, proto := range strings.Split(reqRule.Protocol, "/") {
+				if reqRule.Port == rule.Port &&
+					reqRule.TargetPort == rule.TargetPort &&
+					reqRule.TargetIP == rule.TargetIP &&
+					proto == rule.Protocol {
+					return constant.ErrRecordExist
+				}
 			}
 		}
 	}
 
 	sort.SliceStable(req.Rules, func(i, j int) bool {
+		if req.Rules[i].Operation == "remove" && req.Rules[j].Operation != "remove" {
+			return true
+		}
+		if req.Rules[i].Operation != "remove" && req.Rules[j].Operation == "remove" {
+			return false
+		}
 		n1, _ := strconv.Atoi(req.Rules[i].Num)
 		n2, _ := strconv.Atoi(req.Rules[j].Num)
 		return n1 > n2

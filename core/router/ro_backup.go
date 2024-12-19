@@ -2,13 +2,17 @@ package router
 
 import (
 	v2 "github.com/1Panel-dev/1Panel/core/app/api/v2"
+	"github.com/1Panel-dev/1Panel/core/middleware"
 	"github.com/gin-gonic/gin"
 )
 
 type BackupRouter struct{}
 
 func (s *BackupRouter) InitRouter(Router *gin.RouterGroup) {
-	backupRouter := Router.Group("backup")
+	backupRouter := Router.Group("backup").
+		Use(middleware.JwtAuth()).
+		Use(middleware.SessionAuth()).
+		Use(middleware.PasswordExpired())
 	baseApi := v2.ApiGroupApp.BaseApi
 	{
 		backupRouter.GET("/local", baseApi.GetLocalDir)

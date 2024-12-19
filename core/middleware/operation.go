@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/core/app/model"
-	"github.com/1Panel-dev/1Panel/core/app/service"
+	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/cmd/server/docs"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
@@ -124,6 +124,7 @@ func OperationLog() gin.HandlerFunc {
 		c.Next()
 
 		datas := writer.body.Bytes()
+		logRepo := repo.NewILogRepo()
 		if c.Request.Header.Get("Content-Encoding") == "gzip" {
 			buf := bytes.NewReader(writer.body.Bytes())
 			reader, err := gzip.NewReader(buf)
@@ -133,7 +134,7 @@ func OperationLog() gin.HandlerFunc {
 				latency := time.Since(now)
 				record.Latency = latency
 
-				if err := service.NewILogService().CreateOperationLog(record); err != nil {
+				if err := logRepo.CreateOperationLog(record); err != nil {
 					global.LOG.Errorf("create operation record failed, err: %v", err)
 				}
 				return
@@ -153,7 +154,7 @@ func OperationLog() gin.HandlerFunc {
 		latency := time.Since(now)
 		record.Latency = latency
 
-		if err := service.NewILogService().CreateOperationLog(record); err != nil {
+		if err := logRepo.CreateOperationLog(record); err != nil {
 			global.LOG.Errorf("create operation record failed, err: %v", err)
 		}
 	}

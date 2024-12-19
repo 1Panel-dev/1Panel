@@ -2,18 +2,25 @@ package router
 
 import (
 	v2 "github.com/1Panel-dev/1Panel/core/app/api/v2"
+	"github.com/1Panel-dev/1Panel/core/middleware"
 	"github.com/gin-gonic/gin"
 )
 
 type SettingRouter struct{}
 
 func (s *SettingRouter) InitRouter(Router *gin.RouterGroup) {
-	settingRouter := Router.Group("settings")
+	router := Router.Group("settings").
+		Use(middleware.JwtAuth()).
+		Use(middleware.SessionAuth())
+	settingRouter := Router.Group("settings").
+		Use(middleware.JwtAuth()).
+		Use(middleware.SessionAuth()).
+		Use(middleware.PasswordExpired())
 	baseApi := v2.ApiGroupApp.BaseApi
 	{
-		settingRouter.POST("/search", baseApi.GetSettingInfo)
+		router.POST("/search", baseApi.GetSettingInfo)
+		router.POST("/expired/handle", baseApi.HandlePasswordExpired)
 		settingRouter.POST("/terminal/search", baseApi.GetTerminalSettingInfo)
-		settingRouter.POST("/expired/handle", baseApi.HandlePasswordExpired)
 		settingRouter.GET("/search/available", baseApi.GetSystemAvailable)
 		settingRouter.POST("/update", baseApi.UpdateSetting)
 		settingRouter.POST("/terminal/update", baseApi.UpdateTerminalSetting)

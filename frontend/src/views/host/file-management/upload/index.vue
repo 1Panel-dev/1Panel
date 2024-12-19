@@ -187,7 +187,9 @@ const convertFileToUploadFile = (file: File, path: string): UploadFile => {
 
 const traverseFileTree = async (item: any, path = '') => {
     path = path || '';
-
+    if (!item) {
+        return;
+    }
     if (item.isFile) {
         if (tmpFiles.value.length > 1000) {
             breakFlag.value = true;

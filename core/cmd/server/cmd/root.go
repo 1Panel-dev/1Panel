@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os/user"
+	"path"
 	"strings"
 	"time"
 
@@ -42,11 +43,7 @@ func loadDBConn() (*gorm.DB, error) {
 	if len(baseDir) == 0 {
 		return nil, fmt.Errorf("error `BASE_DIR` find in /usr/local/bin/1pctl \n")
 	}
-	if strings.HasSuffix(baseDir, "/") {
-		baseDir = baseDir[:strings.LastIndex(baseDir, "/")]
-	}
-
-	db, err := gorm.Open(sqlite.Open(baseDir+"/1panel/db/core.db"), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open(path.Join(baseDir, "/1panel/db/core.db")), &gorm.Config{})
 	if err != nil {
 		return nil, fmt.Errorf("init my db conn failed, err: %v \n", err)
 	}

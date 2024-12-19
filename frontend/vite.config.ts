@@ -98,7 +98,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
             pure: viteEnv.VITE_DROP_CONSOLE ? ['console.log', 'debugger'] : [],
         },
         build: {
-            outDir: '../cmd/server/web',
+            outDir: '../core/cmd/server/web',
             minify: 'esbuild',
             target: 'esnext',
             rollupOptions: {

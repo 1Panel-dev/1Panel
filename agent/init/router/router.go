@@ -6,7 +6,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/middleware"
 	rou "github.com/1Panel-dev/1Panel/agent/router"
-	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,11 +17,6 @@ func Routers() *gin.Engine {
 	Router = gin.Default()
 	Router.Use(i18n.UseI18n())
 
-	PublicGroup := Router.Group("")
-	{
-		PublicGroup.Use(gzip.Gzip(gzip.DefaultCompression))
-		PublicGroup.Static("/api/v2/images", "./uploads")
-	}
 	PrivateGroup := Router.Group("/api/v2")
 	if !global.IsMaster {
 		PrivateGroup.Use(middleware.Certificate())

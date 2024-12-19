@@ -68,8 +68,8 @@ const acceptParams = (props: BatchRoleProps) => {
         addForm.paths.push(file.path);
     });
     addForm.mode = Number.parseInt(String(props.files[0].mode), 8);
-    addForm.group = props.files[0].group;
-    addForm.user = props.files[0].user;
+    addForm.group = props.files[0].group || props.files[0].gid + '';
+    addForm.user = props.files[0].user || props.files[0].uid + '';
     addForm.sub = true;
 
     mode.value = String(props.files[0].mode);

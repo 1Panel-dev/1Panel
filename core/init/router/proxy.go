@@ -1,4 +1,4 @@
-package middleware
+package router
 
 import (
 	"context"
@@ -26,7 +26,7 @@ func Proxy() gin.HandlerFunc {
 		}
 
 		currentNode := c.Request.Header.Get("CurrentNode")
-		if !strings.HasPrefix(c.Request.URL.Path, "/api/v2/core") && (currentNode == "local" || len(currentNode) == 0) {
+		if !strings.HasPrefix(c.Request.URL.Path, "/api/v2/core") && (currentNode == "local" || len(currentNode) == 0 || currentNode == "127.0.0.1") {
 			sockPath := "/etc/1panel/agent.sock"
 			if _, err := os.Stat(sockPath); err != nil {
 				helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrProxy, err)
@@ -53,6 +53,5 @@ func Proxy() gin.HandlerFunc {
 		}
 		xpack.Proxy(c, currentNode)
 		c.Abort()
-		return
 	}
 }

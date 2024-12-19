@@ -4,16 +4,16 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
 
 func LoadDBConnByPath(fullPath, dbName string) *gorm.DB {
-	if _, err := CreateDirWhenNotExist(true, global.CONF.System.DbPath); err != nil {
+	if _, err := CreateDirWhenNotExist(true, path.Dir(fullPath)); err != nil {
 		panic(fmt.Errorf("init db dir failed, err: %v", err))
 	}
 	if _, err := os.Stat(fullPath); err != nil {
@@ -32,7 +32,7 @@ func LoadDBConnByPath(fullPath, dbName string) *gorm.DB {
 }
 
 func LoadDBConnByPathWithErr(fullPath, dbName string) (*gorm.DB, error) {
-	if _, err := CreateDirWhenNotExist(true, global.CONF.System.DbPath); err != nil {
+	if _, err := CreateDirWhenNotExist(true, path.Dir(fullPath)); err != nil {
 		return nil, fmt.Errorf("init db dir failed, err: %v", err)
 	}
 	if _, err := os.Stat(fullPath); err != nil {

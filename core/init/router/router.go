@@ -58,10 +58,7 @@ func Routers() *gin.Engine {
 	if global.CONF.System.IsDemo {
 		Router.Use(middleware.DemoHandle())
 	}
-	Router.Use(middleware.JwtAuth())
-	Router.Use(middleware.SessionAuth())
-	Router.Use(middleware.PasswordExpired())
-	Router.Use(middleware.Proxy())
+	Router.Use(Proxy())
 
 	PrivateGroup := Router.Group("/api/v2/core")
 	PrivateGroup.Use(middleware.WhiteAllow())

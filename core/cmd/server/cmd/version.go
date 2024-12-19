@@ -2,12 +2,11 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/1Panel-dev/1Panel/core/configs"
 
 	"github.com/1Panel-dev/1Panel/core/cmd/server/conf"
-	"gopkg.in/yaml.v3"
-
+	"github.com/1Panel-dev/1Panel/core/configs"
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v3"
 )
 
 func init() {

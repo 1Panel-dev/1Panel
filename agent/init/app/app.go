@@ -33,11 +33,13 @@ func Init() {
 		createDir(fileOp, dir)
 	}
 
-	_ = docker.CreateDefaultDockerNetwork()
+	go func() {
+		_ = docker.CreateDefaultDockerNetwork()
 
-	if f, err := firewall.NewFirewallClient(); err == nil {
-		_ = f.EnableForward()
-	}
+		if f, err := firewall.NewFirewallClient(); err == nil {
+			_ = f.EnableForward()
+		}
+	}()
 }
 
 func createDir(fileOp files.FileOp, dirPath string) {

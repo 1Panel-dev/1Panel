@@ -2,13 +2,17 @@ package router
 
 import (
 	v2 "github.com/1Panel-dev/1Panel/core/app/api/v2"
+	"github.com/1Panel-dev/1Panel/core/middleware"
 	"github.com/gin-gonic/gin"
 )
 
 type HostRouter struct{}
 
 func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
-	hostRouter := Router.Group("hosts")
+	hostRouter := Router.Group("hosts").
+		Use(middleware.JwtAuth()).
+		Use(middleware.SessionAuth()).
+		Use(middleware.PasswordExpired())
 	baseApi := v2.ApiGroupApp.BaseApi
 	{
 		hostRouter.POST("", baseApi.CreateHost)

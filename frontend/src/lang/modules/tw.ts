@@ -359,6 +359,8 @@ const message = {
         kernelArch: '系統類型',
         network: '流量',
         io: '磁盤 IO',
+        ip: '主機地址',
+        proxy: '系統代理',
         baseInfo: '基本信息',
         totalSend: '總發送',
         totalRecv: '總接收',
