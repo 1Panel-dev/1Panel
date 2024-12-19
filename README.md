@@ -7,6 +7,9 @@
   <a href="https://github.com/1Panel-dev/1Panel"><img src="https://img.shields.io/github/stars/1Panel-dev/1Panel?color=%231890FF&style=flat-square" alt="Stars"></a><br>
   [<a href="/README.md">English</a>] | [<a href="/docs/README.zh-Hans.md">中文(简体)</a>] | [<a href="/docs/README.zh-Hant.md">中文(繁體)</a>] | [<a href="/docs/README.ja.md">日本語</a>] | [<a href="/docs/README.pt-br.md">Português (Brasil)</a>] | [<a href="/docs/README.ko.md">영어</a>]
 </p>
+<p align="center">
+  <a href="https://www.producthunt.com/posts/1panel?embed=true&utm_source=badge-featured&utm_medium=badge&utm_souce=badge-1panel" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=639696&theme=light" alt="1Panel - Top&#0045;Rated&#0032;web&#0045;based&#0032;Linux&#0032;server&#0032;management&#0032;tool | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
+</p>
 
 ------------------------------
 
