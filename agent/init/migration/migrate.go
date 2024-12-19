@@ -15,13 +15,6 @@ func Init() {
 		migrations.InitImageRepo,
 		migrations.InitDefaultCA,
 		migrations.InitPHPExtensions,
-		migrations.UpdateWebsite,
-		migrations.UpdateWebsiteDomain,
-		migrations.UpdateApp,
-		migrations.AddTaskDB,
-		migrations.UpdateAppInstall,
-		migrations.UpdateSnapshot,
-		migrations.UpdateCronjob,
 		migrations.InitBaseDir,
 	})
 	if err := m.Migrate(); err != nil {

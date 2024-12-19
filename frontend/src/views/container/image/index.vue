@@ -21,8 +21,8 @@
                 </el-button>
             </template>
             <template #rightToolBar>
-                <TableSearch @search="search()" v-model:searchName="searchName" class="mr-2.5" />
-                <TableRefresh @search="search()" class="mr-2.5" />
+                <TableSearch @search="search()" v-model:searchName="searchName" />
+                <TableRefresh @search="search()" />
                 <TableSetting title="image-refresh" @search="search()" />
             </template>
             <template #main>
@@ -36,12 +36,7 @@
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" prop="isUsed" width="100">
                         <template #default="{ row }">
-                            <el-tag icon="Select" v-if="row.isUsed" type="success">
-                                {{ $t('commons.status.used') }}
-                            </el-tag>
-                            <el-tag v-else type="info">
-                                {{ $t('commons.status.unUsed') }}
-                            </el-tag>
+                            <Status :status="row.isUsed ? 'used' : 'unused'" />
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -154,10 +149,16 @@ const search = async () => {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
     };
-    await searchImage(repoSearch).then((res) => {
-        data.value = res.data.items || [];
-        paginationConfig.total = res.data.total;
-    });
+    loading.value = true;
+    await searchImage(repoSearch)
+        .then((res) => {
+            loading.value = false;
+            data.value = res.data.items || [];
+            paginationConfig.total = res.data.total;
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 const loadRepos = async () => {
     const res = await listImageRepo();

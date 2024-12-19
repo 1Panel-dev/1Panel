@@ -45,7 +45,7 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "Theme", Value: "light"}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "MenuTabs", Value: "disable"}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "MenuTabs", Value: constant.StatusDisable}).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "PanelName", Value: "1Panel"}).Error; err != nil {
@@ -64,11 +64,11 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "SSLID", Value: "0"}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "SSL", Value: "disable"}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "SSL", Value: constant.StatusDisable}).Error; err != nil {
 			return err
 		}
 
-		if err := tx.Create(&model.Setting{Key: "DeveloperMode", Value: "disable"}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "DeveloperMode", Value: constant.StatusDisable}).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "ProxyType", Value: ""}).Error; err != nil {
@@ -111,10 +111,10 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "ExpirationDays", Value: "0"}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "ComplexityVerification", Value: "enable"}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "ComplexityVerification", Value: constant.StatusEnable}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "MFAStatus", Value: "disable"}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "MFAStatus", Value: constant.StatusDisable}).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "MFASecret", Value: ""}).Error; err != nil {
@@ -132,7 +132,7 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "BindAddress", Value: "0.0.0.0"}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "Ipv6", Value: "disable"}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "Ipv6", Value: constant.StatusDisable}).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "BindDomain", Value: ""}).Error; err != nil {
@@ -219,7 +219,7 @@ var InitTerminalSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "FontSize", Value: "12"}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "CursorBlink", Value: "enable"}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "CursorBlink", Value: constant.StatusEnable}).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "CursorStyle", Value: "block"}).Error; err != nil {
@@ -268,5 +268,18 @@ var AddTaskDB = &gormigrate.Migration{
 		return global.TaskDB.AutoMigrate(
 			&model.Task{},
 		)
+	},
+}
+
+var UpdateSettingStatus = &gormigrate.Migration{
+	ID: "20241218-update-setting-status",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Model(model.Setting{}).Where("value = ?", "enable").Update("value", constant.StatusEnable).Error; err != nil {
+			return err
+		}
+		if err := tx.Model(model.Setting{}).Where("value = ?", "disable").Update("value", constant.StatusDisable).Error; err != nil {
+			return err
+		}
+		return nil
 	},
 }

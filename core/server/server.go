@@ -9,6 +9,7 @@ import (
 	"os"
 	"path"
 
+	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/i18n"
 	"github.com/1Panel-dev/1Panel/core/init/cron"
@@ -42,7 +43,7 @@ func Start() {
 	rootRouter := router.Routers()
 
 	tcpItem := "tcp4"
-	if global.CONF.System.Ipv6 == "enable" {
+	if global.CONF.System.Ipv6 == constant.StatusEnable {
 		tcpItem = "tcp"
 		global.CONF.System.BindAddress = fmt.Sprintf("[%s]", global.CONF.System.BindAddress)
 	}
@@ -57,7 +58,7 @@ func Start() {
 	type tcpKeepAliveListener struct {
 		*net.TCPListener
 	}
-	if global.CONF.System.SSL == "enable" {
+	if global.CONF.System.SSL == constant.StatusEnable {
 		certPath := path.Join(global.CONF.System.BaseDir, "1panel/secret/server.crt")
 		keyPath := path.Join(global.CONF.System.BaseDir, "1panel/secret/server.key")
 		certificate, err := os.ReadFile(certPath)

@@ -5,12 +5,7 @@
                 <div class="flex w-full flex-col gap-4 md:flex-row">
                     <div class="flex flex-wrap gap-4">
                         <el-tag class="float-left" effect="dark" type="success">Docker</el-tag>
-                        <el-tag round v-if="form.status === 'Running'" type="success">
-                            {{ $t('commons.status.running') }}
-                        </el-tag>
-                        <el-tag round v-if="form.status === 'Stopped'" type="info">
-                            {{ $t('commons.status.stopped') }}
-                        </el-tag>
+                        <Status class="mt-0.5" :status="form.status" />
                         <el-tag>{{ $t('app.version') }}: {{ form.version }}</el-tag>
                     </div>
                     <div class="mt-0.5" v-if="form.status === 'Running'">

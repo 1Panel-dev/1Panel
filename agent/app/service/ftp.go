@@ -122,7 +122,7 @@ func (f *FtpService) Sync() error {
 	}
 	for _, item := range listsInDB {
 		if _, ok := sameData[item.User]; !ok {
-			_ = ftpRepo.Update(item.ID, map[string]interface{}{"status": "deleted"})
+			_ = ftpRepo.Update(item.ID, map[string]interface{}{"status": constant.StatusDeleted})
 		}
 	}
 	return nil

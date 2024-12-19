@@ -27,12 +27,7 @@
                             {{ $t('cronjob.' + dialogData.rowData.type) }} - {{ dialogData.rowData.name }}
                         </el-tag>
 
-                        <el-tag v-if="dialogData.rowData.status === 'Enable'" round type="success">
-                            {{ $t('commons.status.running') }}
-                        </el-tag>
-                        <el-tag v-if="dialogData.rowData.status === 'Disable'" round type="info">
-                            {{ $t('commons.status.stopped') }}
-                        </el-tag>
+                        <Status class="mt-0.5" :status="dialogData.rowData.status" />
                     </div>
                     <div class="mt-0.5">
                         <el-button type="primary" @click="onHandle(dialogData.rowData)" link>
@@ -99,15 +94,7 @@
                                     <el-table-column>
                                         <template #default="{ row }">
                                             <span v-if="row.id === currentRecord.id" class="select-sign"></span>
-                                            <el-tag v-if="row.status === 'Success'" type="success">
-                                                {{ $t('commons.status.success') }}
-                                            </el-tag>
-                                            <el-tag v-if="row.status === 'Waiting'" type="info">
-                                                {{ $t('commons.status.waiting') }}
-                                            </el-tag>
-                                            <el-tag v-if="row.status === 'Failed'" type="danger">
-                                                {{ $t('commons.status.failed') }}
-                                            </el-tag>
+                                            <Status :status="row.status" />
                                             <span>
                                                 {{ row.startTime }}
                                             </span>

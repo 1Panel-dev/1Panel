@@ -189,8 +189,8 @@ func (u *SettingService) UpdatePort(port uint) error {
 
 func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 	secretDir := path.Join(global.CONF.System.BaseDir, "1panel/secret")
-	if req.SSL == "disable" {
-		if err := settingRepo.Update("SSL", "disable"); err != nil {
+	if req.SSL == constant.StatusDisable {
+		if err := settingRepo.Update("SSL", constant.StatusDisable); err != nil {
 			return err
 		}
 		if err := settingRepo.Update("SSLType", "self"); err != nil {
@@ -275,7 +275,7 @@ func (u *SettingService) LoadFromCert() (*dto.SSLInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	if ssl.Value == "disable" {
+	if ssl.Value == constant.StatusDisable {
 		return &dto.SSLInfo{}, nil
 	}
 	sslType, err := settingRepo.Get(repo.WithByKey("SSLType"))

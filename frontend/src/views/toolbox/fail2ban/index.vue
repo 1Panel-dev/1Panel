@@ -5,12 +5,7 @@
                 <div class="flex w-full flex-col gap-4 md:flex-row">
                     <div class="flex flex-wrap gap-4">
                         <el-tag effect="dark" type="success">Fail2ban</el-tag>
-                        <el-tag round v-if="form.isActive" type="success">
-                            {{ $t('commons.status.running') }}
-                        </el-tag>
-                        <el-tag round v-if="!form.isActive" type="info">
-                            {{ $t('commons.status.stopped') }}
-                        </el-tag>
+                        <Status class="mt-0.5" :status="form.isActive ? 'enable' : 'disable'" />
                         <el-tag>{{ form.version }}</el-tag>
                     </div>
                     <div class="mt-0.5">

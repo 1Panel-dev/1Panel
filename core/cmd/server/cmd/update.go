@@ -9,6 +9,7 @@ import (
 	"strings"
 	"unicode"
 
+	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/cmd"
 	"github.com/1Panel-dev/1Panel/core/utils/common"
@@ -123,7 +124,7 @@ func password() {
 		return
 	}
 	complexSetting := getSettingByKey(db, "ComplexityVerification")
-	if complexSetting == "enable" {
+	if complexSetting == constant.StatusEnable {
 		if isValidPassword("newPassword") {
 			fmt.Println("\n错误：面板密码仅支持字母、数字、特殊字符（!@#$%*_,.?），长度 8-30 位！")
 			return

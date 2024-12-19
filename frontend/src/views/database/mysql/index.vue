@@ -64,7 +64,7 @@
                 </el-dropdown>
             </template>
             <template #rightToolBar>
-                <el-select v-model="currentDBName" @change="changeDatabase()" class="p-w-250" v-if="currentDB">
+                <el-select v-model="currentDBName" @change="changeDatabase()" class="p-w-200" v-if="currentDB">
                     <template #prefix>{{ $t('commons.table.type') }}</template>
                     <el-option-group :label="$t('database.local')">
                         <div v-for="(item, index) in dbOptionsLocal" :key="index">

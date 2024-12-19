@@ -16,8 +16,8 @@
                     <el-option :label="$t('commons.status.success')" value="Success"></el-option>
                     <el-option :label="$t('commons.status.failed')" value="Failed"></el-option>
                 </el-select>
-                <TableSearch @search="search()" v-model:searchName="searchIP" class="mr-2.5" />
-                <TableRefresh @search="search()" class="mr-2.5" />
+                <TableSearch @search="search()" v-model:searchName="searchIP" />
+                <TableRefresh @search="search()" />
                 <TableSetting title="login-log-refresh" @search="search()" />
             </template>
             <template #main>
@@ -27,14 +27,7 @@
                     <el-table-column :label="$t('logs.loginAgent')" show-overflow-tooltip prop="agent" />
                     <el-table-column :label="$t('logs.loginStatus')" prop="status">
                         <template #default="{ row }">
-                            <div v-if="row.status === 'Success'">
-                                <el-tag type="success">{{ $t('commons.status.success') }}</el-tag>
-                            </div>
-                            <div v-else>
-                                <el-tooltip class="box-item" effect="dark" :content="row.message" placement="top-start">
-                                    <el-tag type="danger">{{ $t('commons.status.failed') }}</el-tag>
-                                </el-tooltip>
-                            </div>
+                            <Status :status="row.status" :msg="row.message" />
                         </template>
                     </el-table-column>
                     <el-table-column

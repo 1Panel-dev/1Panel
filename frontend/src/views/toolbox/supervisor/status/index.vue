@@ -5,7 +5,7 @@
                 <div class="flex w-full flex-col gap-4 md:flex-row">
                     <div class="flex flex-wrap gap-4">
                         <el-tag effect="dark" type="success">{{ 'Supervisor' }}</el-tag>
-                        <Status :key="data.status" :status="data.status"></Status>
+                        <Status class="mt-0.5" :key="data.status" :status="data.status"></Status>
                         <el-tag>{{ $t('app.version') }}:{{ data.version }}</el-tag>
                     </div>
                     <div class="mt-0.5" v-if="!data.init">

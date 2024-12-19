@@ -5,12 +5,7 @@
                 <div class="flex w-full flex-col gap-4 md:flex-row">
                     <div class="flex flex-wrap gap-4">
                         <el-tag effect="dark" type="success">FTP</el-tag>
-                        <el-tag round v-if="form.isActive" type="success">
-                            {{ $t('commons.status.running') }}
-                        </el-tag>
-                        <el-tag round v-if="!form.isActive" type="info">
-                            {{ $t('commons.status.stopped') }}
-                        </el-tag>
+                        <Status class="mt-0.5" :status="form.isActive ? 'enable' : 'disable'" />
                     </div>
                     <div class="mt-0.5">
                         <el-button v-if="form.isActive" type="primary" @click="onOperate('stop')" link>
@@ -92,27 +87,17 @@
                         </el-table-column>
                         <el-table-column :label="$t('commons.table.status')" :min-width="60" prop="status">
                             <template #default="{ row }">
-                                <el-tag v-if="row.status === 'deleted'" type="info">
-                                    {{ $t('database.isDelete') }}
-                                </el-tag>
-                                <el-button
+                                <Status v-if="row.status === 'Deleted'" :status="row.status" />
+                                <Status
                                     v-if="row.status === 'Enable'"
+                                    :status="row.status"
                                     @click="onChangeStatus(row, 'disable')"
-                                    link
-                                    icon="VideoPlay"
-                                    type="success"
-                                >
-                                    {{ $t('commons.status.enabled') }}
-                                </el-button>
-                                <el-button
+                                />
+                                <Status
                                     v-if="row.status === 'Disable'"
-                                    icon="VideoPause"
+                                    :status="row.status"
                                     @click="onChangeStatus(row, 'enable')"
-                                    link
-                                    type="danger"
-                                >
-                                    {{ $t('commons.status.disabled') }}
-                                </el-button>
+                                />
                             </template>
                         </el-table-column>
                         <el-table-column :label="$t('file.root')" :min-width="120" prop="path" show-overflow-tooltip>

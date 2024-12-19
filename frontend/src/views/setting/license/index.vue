@@ -27,29 +27,14 @@
                     <el-table-column :label="$t('commons.table.status')" prop="status" show-overflow-tooltip>
                         <template #default="{ row }">
                             <div v-if="row.status">
-                                <el-tooltip
-                                    v-if="row.status === 'exceptional'"
-                                    :content="$t('license.exceptionalHelper')"
-                                >
-                                    <el-tag type="danger">
-                                        {{ $t('license.' + row.status) }}
-                                    </el-tag>
-                                </el-tooltip>
-                                <el-tooltip v-if="row.status === 'lost'" :content="$t('license.lostHelper')">
-                                    <el-tag type="info">
-                                        {{ $t('license.' + row.status) }}
-                                    </el-tag>
-                                </el-tooltip>
-                                <el-tag v-if="row.status !== 'exceptional' && row.status !== 'lost'">
-                                    {{ $t('license.' + row.status) }}
-                                </el-tag>
+                                <Status :status="row.status" :msg="loadMsg(row.status)"></Status>
                             </div>
                             <span v-else>-</span>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('setting.bindNode')">
                         <template #default="{ row }">
-                            <span v-if="row.freeCount !== 0 && (row.status === 'free' || row.status === 'exceptional')">
+                            <span v-if="row.freeCount !== 0 && (row.status === 'Free' || row.status === 'Exceptional')">
                                 -
                             </span>
                             <div v-else>
@@ -124,6 +109,16 @@ const paginationConfig = reactive({
     type: '',
     name: '',
 });
+
+const loadMsg = (status: string) => {
+    if (status === 'Exceptional') {
+        return i18n.global.t('license.exceptionalHelper');
+    }
+    if (status === 'Lost') {
+        return i18n.global.t('license.lostHelper');
+    }
+    return '';
+};
 
 const onSync = async (row: any) => {
     loading.value = true;
@@ -219,7 +214,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.unbind'),
         disabled: (row: any) => {
-            return row.status === 'free';
+            return row.status === 'Free';
         },
         click: (row: any) => {
             if (row.freeCount != 0) {

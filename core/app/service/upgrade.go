@@ -53,7 +53,7 @@ func (u *UpgradeService) SearchUpgrade() (*dto.UpgradeInfo, error) {
 	if len(upgrade.NewVersion) != 0 {
 		itemVersion = upgrade.NewVersion
 	}
-	if (global.CONF.System.Mode == "dev" || DeveloperMode.Value == "enable") && len(upgrade.TestVersion) != 0 {
+	if (global.CONF.System.Mode == "dev" || DeveloperMode.Value == constant.StatusEnable) && len(upgrade.TestVersion) != 0 {
 		itemVersion = upgrade.TestVersion
 	}
 	if len(itemVersion) == 0 {
@@ -232,7 +232,7 @@ func (u *UpgradeService) loadVersionByMode(developer, currentVersion string) (st
 	betaVersionLatest := ""
 	latest = u.loadVersion(true, currentVersion, "stable")
 	current = u.loadVersion(false, currentVersion, "stable")
-	if developer == "enable" {
+	if developer == constant.StatusEnable {
 		betaVersionLatest = u.loadVersion(true, currentVersion, "beta")
 	}
 	if current != latest {

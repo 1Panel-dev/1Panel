@@ -38,7 +38,7 @@ func SessionAuth() gin.HandlerFunc {
 			global.LOG.Errorf("create operation record failed, err: %v", err)
 			return
 		}
-		_ = global.SESSION.Set(c, psession, httpsSetting.Value == "enable", lifeTime)
+		_ = global.SESSION.Set(c, psession, httpsSetting.Value == constant.StatusEnable, lifeTime)
 		c.Next()
 	}
 }

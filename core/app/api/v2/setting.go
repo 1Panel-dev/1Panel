@@ -357,7 +357,7 @@ func (b *BaseApi) MFABind(c *gin.Context) {
 		return
 	}
 
-	if err := settingService.Update("MFAStatus", "enable"); err != nil {
+	if err := settingService.Update("MFAStatus", constant.StatusEnable); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

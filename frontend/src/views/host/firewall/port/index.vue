@@ -56,8 +56,8 @@
                             <el-option :label="$t('firewall.accept')" value="accept"></el-option>
                             <el-option :label="$t('firewall.drop')" value="drop"></el-option>
                         </el-select>
-                        <TableSearch @search="search()" v-model:searchName="searchName" class="mr-2.5" />
-                        <TableRefresh @search="search()" class="mr-2.5" />
+                        <TableSearch @search="search()" v-model:searchName="searchName" />
+                        <TableRefresh @search="search()" />
                         <TableSetting title="firewall-port-refresh" @search="search()" />
                     </template>
                     <template #main>

@@ -27,8 +27,8 @@
                         </el-button>
                     </template>
                     <template #rightToolBar>
-                        <TableSearch @search="search()" v-model:searchName="searchName" class="mr-2.5" />
-                        <TableRefresh @search="search()" class="mr-2.5" />
+                        <TableSearch @search="search()" v-model:searchName="searchName" />
+                        <TableRefresh @search="search()" />
                         <TableSetting title="firewall-forward-refresh" @search="search()" />
                     </template>
                     <template #main>

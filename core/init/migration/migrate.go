@@ -19,6 +19,7 @@ func Init() {
 		migrations.InitBackup,
 		migrations.InitGoogle,
 		migrations.AddTaskDB,
+		migrations.UpdateSettingStatus,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

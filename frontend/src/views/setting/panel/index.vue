@@ -45,10 +45,10 @@
 
                             <el-form-item :label="$t('setting.menuTabs')" prop="menuTabs">
                                 <el-radio-group @change="onSave('MenuTabs', form.menuTabs)" v-model="form.menuTabs">
-                                    <el-radio-button value="enable">
+                                    <el-radio-button value="Enable">
                                         <span>{{ $t('commons.button.enable') }}</span>
                                     </el-radio-button>
-                                    <el-radio-button value="disable">
+                                    <el-radio-button value="Disable">
                                         <span>{{ $t('commons.button.disable') }}</span>
                                     </el-radio-button>
                                 </el-radio-group>
@@ -104,10 +104,10 @@
                                     @change="onSave('DeveloperMode', form.developerMode)"
                                     v-model="form.developerMode"
                                 >
-                                    <el-radio-button value="enable">
+                                    <el-radio-button value="Enable">
                                         <span>{{ $t('commons.button.enable') }}</span>
                                     </el-radio-button>
-                                    <el-radio-button value="disable">
+                                    <el-radio-button value="Disable">
                                         <span>{{ $t('commons.button.disable') }}</span>
                                     </el-radio-button>
                                 </el-radio-group>
@@ -326,7 +326,7 @@ const onSave = async (key: string, val: any) => {
         }
     }
     if (key === 'MenuTabs') {
-        globalStore.setOpenMenuTabs(val === 'enable');
+        globalStore.setOpenMenuTabs(val === 'Enable');
     }
     let param = {
         key: key,

@@ -30,12 +30,7 @@
         </el-table-column>
         <el-table-column :label="$t('commons.table.status')" prop="enable" min-width="50px">
             <template #default="{ row }">
-                <el-button v-if="row.enable" link type="success" :icon="VideoPlay" @click="opProxy(row)">
-                    {{ $t('commons.status.running') }}
-                </el-button>
-                <el-button v-else link type="danger" :icon="VideoPause" @click="opProxy(row)">
-                    {{ $t('commons.status.stopped') }}
-                </el-button>
+                <Status :status="row.enable ? 'enable' : 'disable'" @click="opProxy(row)" />
             </template>
         </el-table-column>
         <fu-table-operations
@@ -59,7 +54,6 @@ import { OperateRedirectConfig, GetRedirectConfig } from '@/api/modules/website'
 import { computed, onMounted, ref } from 'vue';
 import Create from './create/index.vue';
 import File from './file/index.vue';
-import { VideoPlay, VideoPause } from '@element-plus/icons-vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';

@@ -136,18 +136,12 @@
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" prop="status" width="120px" sortable>
                         <template #default="{ row }">
-                            <el-button
+                            <Status
                                 v-if="row.status === 'Running'"
-                                link
-                                type="success"
-                                :icon="VideoPlay"
+                                :status="row.status"
                                 @click="opWebsite('stop', row.id)"
-                            >
-                                {{ $t('commons.status.running') }}
-                            </el-button>
-                            <el-button v-else link type="danger" :icon="VideoPause" @click="opWebsite('start', row.id)">
-                                {{ $t('commons.status.stopped') }}
-                            </el-button>
+                            />
+                            <Status v-else :status="row.status" @click="opWebsite('start', row.id)" />
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -255,7 +249,6 @@ import { ElMessageBox } from 'element-plus';
 import { dateFormatSimple } from '@/utils/util';
 import { MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
-import { VideoPlay, VideoPause } from '@element-plus/icons-vue';
 import { GetGroupList } from '@/api/modules/group';
 import { Group } from '@/api/interface/group';
 import { GlobalStore } from '@/store';

@@ -12,7 +12,7 @@
                     <el-option :label="$t('commons.status.failed')" value="Failed"></el-option>
                     <el-option :label="$t('logs.taskRunning')" value="Running"></el-option>
                 </el-select>
-                <TableRefresh @search="search()" class="mr-2.5" />
+                <TableRefresh @search="search()" />
                 <TableSetting title="task-log-refresh" @search="search()" />
             </template>
             <template #main>
@@ -21,22 +21,7 @@
                     <el-table-column :label="$t('commons.table.type')" prop="type" />
                     <el-table-column :label="$t('commons.table.status')" prop="status">
                         <template #default="{ row }">
-                            <div v-if="row.status === 'Success'">
-                                <el-tag type="success">{{ $t('commons.status.success') }}</el-tag>
-                            </div>
-                            <div v-else-if="row.status === 'Running'">
-                                <el-tag type="primary">{{ $t('process.running') }}</el-tag>
-                            </div>
-                            <div v-else>
-                                <el-tooltip
-                                    class="box-item"
-                                    effect="dark"
-                                    :content="row.errorMsg"
-                                    placement="top-start"
-                                >
-                                    <el-tag type="danger">{{ $t('commons.status.failed') }}</el-tag>
-                                </el-tooltip>
-                            </div>
+                            <Status :status="row.status" :msg="row.errorMsg" />
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('website.log')" prop="log">

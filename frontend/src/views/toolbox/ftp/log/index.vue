@@ -9,8 +9,7 @@
             <el-table-column label="ip" prop="ip" show-overflow-tooltip />
             <el-table-column :label="$t('commons.table.status')" min-width="50" show-overflow-tooltip prop="status">
                 <template #default="{ row }">
-                    <el-tag v-if="row.status === '200'">{{ $t('commons.status.success') }}</el-tag>
-                    <el-tag v-else type="danger">{{ $t('commons.status.failed') }}</el-tag>
+                    <Status :status="row.status === '200' ? 'success' : 'failed'" />
                 </template>
             </el-table-column>
             <el-table-column :label="$t('commons.table.operate')" min-width="40" show-overflow-tooltip>

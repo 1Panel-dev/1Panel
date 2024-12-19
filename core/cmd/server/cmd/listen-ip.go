@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/spf13/cobra"
 )
 
@@ -41,11 +42,11 @@ func updateBindInfo(protocol string) error {
 	if err != nil {
 		return err
 	}
-	ipv6 := "disable"
+	ipv6 := constant.StatusDisable
 	tcp := "tcp4"
 	address := "0.0.0.0"
 	if protocol == "ipv6" {
-		ipv6 = "enable"
+		ipv6 = constant.StatusEnable
 		tcp = "tcp6"
 		address = "::"
 	}

@@ -61,7 +61,7 @@ func (u *AuthService) Login(c *gin.Context, info dto.Login, entrance string) (*d
 	if err = settingRepo.Update("Language", info.Language); err != nil {
 		return nil, err
 	}
-	if mfa.Value == "enable" {
+	if mfa.Value == constant.StatusEnable {
 		return &dto.UserLoginInfo{Name: nameSetting.Value, MfaStatus: mfa.Value}, nil
 	}
 	return u.generateSession(c, info.Name, info.AuthMethod)
@@ -134,13 +134,13 @@ func (u *AuthService) generateSession(c *gin.Context, name, authMethod string) (
 	}
 	sessionUser, err := global.SESSION.Get(c)
 	if err != nil {
-		err := global.SESSION.Set(c, sessionUser, httpsSetting.Value == "enable", lifeTime)
+		err := global.SESSION.Set(c, sessionUser, httpsSetting.Value == constant.StatusEnable, lifeTime)
 		if err != nil {
 			return nil, err
 		}
 		return &dto.UserLoginInfo{Name: name}, nil
 	}
-	if err := global.SESSION.Set(c, sessionUser, httpsSetting.Value == "enable", lifeTime); err != nil {
+	if err := global.SESSION.Set(c, sessionUser, httpsSetting.Value == constant.StatusEnable, lifeTime); err != nil {
 		return nil, err
 	}
 
@@ -154,7 +154,7 @@ func (u *AuthService) LogOut(c *gin.Context) error {
 	}
 	sID, _ := c.Cookie(constant.SessionName)
 	if sID != "" {
-		c.SetCookie(constant.SessionName, sID, -1, "", "", httpsSetting.Value == "enable", true)
+		c.SetCookie(constant.SessionName, sID, -1, "", "", httpsSetting.Value == constant.StatusEnable, true)
 		err := global.SESSION.Delete(c)
 		if err != nil {
 			return err

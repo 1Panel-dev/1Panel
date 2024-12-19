@@ -9,8 +9,8 @@
                 </el-button>
             </template>
             <template #rightToolBar>
-                <TableSearch @search="search()" v-model:searchName="searchName" class="mr-2.5" />
-                <TableRefresh @search="search()" class="mr-2.5" />
+                <TableSearch @search="search()" v-model:searchName="searchName" />
+                <TableRefresh @search="search()" />
                 <TableSetting title="repo-refresh" @search="search()" />
             </template>
             <template #main>
@@ -32,15 +32,7 @@
                     <el-table-column :label="$t('commons.table.protocol')" prop="protocol" min-width="60" fix />
                     <el-table-column :label="$t('commons.table.status')" prop="status" min-width="60" fix>
                         <template #default="{ row }">
-                            <el-tag v-if="row.status === 'Success'" type="success">
-                                {{ $t('commons.status.success') }}
-                            </el-tag>
-                            <el-tooltip v-else effect="dark" placement="bottom">
-                                <template #content>
-                                    <div style="width: 300px; word-break: break-all">{{ row.message }}</div>
-                                </template>
-                                <el-tag type="danger">{{ $t('commons.status.failed') }}</el-tag>
-                            </el-tooltip>
+                            <Status :status="row.status" :msg="row.message" />
                         </template>
                     </el-table-column>
                     <el-table-column

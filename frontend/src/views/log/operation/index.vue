@@ -31,8 +31,8 @@
                     <el-option :label="$t('commons.status.success')" value="Success"></el-option>
                     <el-option :label="$t('commons.status.failed')" value="Failed"></el-option>
                 </el-select>
-                <TableSearch @search="search()" v-model:searchName="searchName" class="mr-2.5" />
-                <TableRefresh @search="search()" class="mr-2.5" />
+                <TableSearch @search="search()" v-model:searchName="searchName" />
+                <TableRefresh @search="search()" />
                 <TableSetting title="operation-log-refresh" @search="search()" />
             </template>
             <template #main>
@@ -55,22 +55,7 @@
 
                     <el-table-column :label="$t('commons.table.status')" prop="status">
                         <template #default="{ row }">
-                            <el-tag v-if="row.status === 'Success'" class="ml-2" type="success">
-                                {{ $t('commons.status.success') }}
-                            </el-tag>
-                            <div v-else>
-                                <el-popover
-                                    placement="top-start"
-                                    :title="$t('commons.table.message')"
-                                    :width="400"
-                                    trigger="hover"
-                                    :content="row.message"
-                                >
-                                    <template #reference>
-                                        <el-tag class="ml-2" type="danger">{{ $t('commons.status.failed') }}</el-tag>
-                                    </template>
-                                </el-popover>
-                            </div>
+                            <Status :status="row.status" :msg="row.message" />
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -147,76 +132,36 @@ const onClean = async () => {
 };
 
 const loadDetail = (log: string) => {
-    if (log.indexOf('[enable]') !== -1) {
-        log = log.replace('[enable]', '[' + i18n.global.t('commons.button.enable') + ']');
-    }
-    if (log.indexOf('[Enable]') !== -1) {
-        log = log.replace('[Enable]', '[' + i18n.global.t('commons.button.enable') + ']');
-    }
-    if (log.indexOf('[disable]') !== -1) {
-        log = log.replace('[disable]', '[' + i18n.global.t('commons.button.disable') + ']');
-    }
-    if (log.indexOf('[Disable]') !== -1) {
-        log = log.replace('[Disable]', '[' + i18n.global.t('commons.button.disable') + ']');
-    }
-    if (log.indexOf('[light]') !== -1) {
-        log = log.replace('[light]', '[' + i18n.global.t('setting.light') + ']');
-    }
-    if (log.indexOf('[dark]') !== -1) {
-        log = log.replace('[dark]', '[' + i18n.global.t('setting.dark') + ']');
-    }
-    if (log.indexOf('[delete]') !== -1) {
-        log = log.replace('[delete]', '[' + i18n.global.t('commons.button.delete') + ']');
-    }
-    if (log.indexOf('[get]') !== -1) {
-        log = log.replace('[get]', '[' + i18n.global.t('commons.button.get') + ']');
-    }
-    if (log.indexOf('[operate]') !== -1) {
-        log = log.replace('[operate]', '[' + i18n.global.t('commons.table.operate') + ']');
-    }
-    if (log.indexOf('[UserName]') !== -1) {
-        return log.replace('[UserName]', '[' + i18n.global.t('commons.login.username') + ']');
-    }
-    if (log.indexOf('[PanelName]') !== -1) {
-        return log.replace('[PanelName]', '[' + i18n.global.t('setting.title') + ']');
-    }
-    if (log.indexOf('[Language]') !== -1) {
-        return log.replace('[Language]', '[' + i18n.global.t('setting.language') + ']');
-    }
-    if (log.indexOf('[Theme]') !== -1) {
-        return log.replace('[Theme]', '[' + i18n.global.t('setting.theme') + ']');
-    }
-    if (log.indexOf('[MenuTabs]') !== -1) {
-        return log.replace('[MenuTabs]', '[' + i18n.global.t('setting.menuTabs') + ']');
-    }
-    if (log.indexOf('[SessionTimeout]') !== -1) {
-        return log.replace('[SessionTimeout]', '[' + i18n.global.t('setting.sessionTimeout') + ']');
-    }
-    if (log.indexOf('SecurityEntrance') !== -1) {
-        return log.replace('[SecurityEntrance]', '[' + i18n.global.t('setting.entrance') + ']');
-    }
-    if (log.indexOf('[ExpirationDays]') !== -1) {
-        return log.replace('[ExpirationDays]', '[' + i18n.global.t('setting.expirationTime') + ']');
-    }
-    if (log.indexOf('[ComplexityVerification]') !== -1) {
-        return log.replace('[ComplexityVerification]', '[' + i18n.global.t('setting.complexity') + ']');
-    }
-    if (log.indexOf('[MFAStatus]') !== -1) {
-        return log.replace('[MFAStatus]', '[' + i18n.global.t('setting.mfa') + ']');
-    }
-    if (log.indexOf('[MonitorStatus]') !== -1) {
-        return log.replace('[MonitorStatus]', '[' + i18n.global.t('monitor.enableMonitor') + ']');
-    }
-    if (log.indexOf('[MonitorStoreDays]') !== -1) {
-        return log.replace('[MonitorStoreDays]', '[' + i18n.global.t('setting.monitor') + ']');
-    }
-    if (log.indexOf('[MonitorStoreDays]') !== -1) {
-        return log.replace('[MonitorStoreDays]', '[' + i18n.global.t('setting.monitor') + ']');
-    }
-    if (log.indexOf('[MonitorStoreDays]') !== -1) {
-        return log.replace('[MonitorStoreDays]', '[' + i18n.global.t('setting.monitor') + ']');
+    for (const [key, value] of Object.entries(replacements)) {
+        if (log.indexOf(key) !== -1) {
+            log = log.replace(key, '[' + i18n.global.t(value) + ']');
+        }
     }
     return log;
+};
+
+const replacements = {
+    '[enable]': 'commons.button.enable',
+    '[Enable]': 'commons.button.enable',
+    '[disable]': 'commons.button.disable',
+    '[Disable]': 'commons.button.disable',
+    '[light]': 'setting.light',
+    '[dark]': 'setting.dark',
+    '[delete]': 'commons.button.delete',
+    '[get]': 'commons.button.get',
+    '[operate]': 'commons.table.operate',
+    '[UserName]': 'commons.button.username',
+    '[PanelName]': 'setting.title',
+    '[Language]': 'setting.language',
+    '[Theme]': 'setting.theme',
+    '[MenuTabs]': 'setting.menuTabs',
+    '[SessionTimeout]': 'setting.sessionTimeout',
+    '[SecurityEntrance]': 'setting.entrance',
+    '[ExpirationDays]': 'setting.expirationTime',
+    '[ComplexityVerification]': 'setting.complexity',
+    '[MFAStatus]': 'setting.mfa',
+    '[MonitorStatus]': 'setting.enableMonitor',
+    '[MonitorStoreDays]': 'setting.monitor',
 };
 
 const onSubmitClean = async () => {

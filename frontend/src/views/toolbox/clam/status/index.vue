@@ -5,12 +5,7 @@
                 <div class="flex w-full flex-col gap-4 md:flex-row">
                     <div class="flex flex-wrap gap-4">
                         <el-tag class="w-17" effect="dark" type="success">ClamAV</el-tag>
-                        <el-tag round v-if="data.isActive" type="success">
-                            {{ $t('commons.status.running') }}
-                        </el-tag>
-                        <el-tag round v-if="!data.isActive" type="info">
-                            {{ $t('commons.status.stopped') }}
-                        </el-tag>
+                        <Status class="mt-0.5" :status="data.isActive ? 'enable' : 'disable'" />
                         <el-tag class="w-24">{{ $t('app.version') }}:{{ data.version }}</el-tag>
                     </div>
                     <div class="mt-0.5">
@@ -40,12 +35,7 @@
                 <div class="flex w-full flex-col gap-4 md:flex-row mt-5" v-if="showFresh">
                     <div class="flex flex-wrap gap-4">
                         <el-tag class="w-16" effect="dark" type="success">FreshClam</el-tag>
-                        <el-tag round v-if="data.freshIsActive" type="success">
-                            {{ $t('commons.status.running') }}
-                        </el-tag>
-                        <el-tag round v-if="!data.freshIsActive" type="info">
-                            {{ $t('commons.status.stopped') }}
-                        </el-tag>
+                        <Status class="mt-0.5" :status="data.freshIsActive ? 'enable' : 'disable'" />
                         <el-tag class="w-24">{{ $t('app.version') }}:{{ data.freshVersion }}</el-tag>
                     </div>
                     <div class="mt-0.5">

@@ -61,7 +61,8 @@ export namespace Host {
 
     export interface FirewallBase {
         name: string;
-        status: string;
+        isExist: boolean;
+        isActive: boolean;
         version: string;
         pingStatus: string;
     }
@@ -148,7 +149,7 @@ export namespace Host {
 
     export interface SSHInfo {
         autoStart: boolean;
-        status: string;
+        isActive: boolean;
         message: string;
         port: string;
         listenAddress: string;

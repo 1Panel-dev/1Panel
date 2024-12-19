@@ -26,8 +26,8 @@
                 </el-button-group>
             </template>
             <template #rightToolBar>
-                <TableSearch @search="search()" v-model:searchName="searchName" class="mr-2.5" />
-                <TableRefresh @search="search()" class="mr-2.5" />
+                <TableSearch @search="search()" v-model:searchName="searchName" />
+                <TableRefresh @search="search()" />
                 <TableSetting title="cronjob-refresh" @search="search()" />
             </template>
             <template #main>
@@ -54,24 +54,12 @@
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" :min-width="80" prop="status" sortable>
                         <template #default="{ row }">
-                            <el-button
+                            <Status
                                 v-if="row.status === 'Enable'"
                                 @click="onChangeStatus(row.id, 'disable')"
-                                link
-                                icon="VideoPlay"
-                                type="success"
-                            >
-                                {{ $t('commons.button.enable') }}
-                            </el-button>
-                            <el-button
-                                v-else
-                                icon="VideoPause"
-                                link
-                                type="danger"
-                                @click="onChangeStatus(row.id, 'enable')"
-                            >
-                                {{ $t('commons.button.disable') }}
-                            </el-button>
+                                :status="row.status"
+                            />
+                            <Status v-else @click="onChangeStatus(row.id, 'enable')" :status="row.status" />
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('cronjob.cronSpec')" show-overflow-tooltip :min-width="120">

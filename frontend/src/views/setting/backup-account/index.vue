@@ -7,8 +7,8 @@
                 </el-button>
             </template>
             <template #rightToolBar>
-                <TableSearch @search="search()" v-model:searchName="paginationConfig.name" class="mr-2.5" />
-                <TableRefresh @search="search()" class="mr-2.5" />
+                <TableSearch @search="search()" v-model:searchName="paginationConfig.name" />
+                <TableRefresh @search="search()" />
                 <TableSetting title="backup-account-refresh" @search="search()" />
             </template>
             <template #main>

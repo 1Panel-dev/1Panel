@@ -17,9 +17,6 @@ const (
 	OrderDesc = "descending"
 	OrderAsc  = "ascending"
 
-	StatusEnable  = "Enable"
-	StatusDisable = "Disable"
-
 	// backup
 	S3          = "S3"
 	OSS         = "OSS"

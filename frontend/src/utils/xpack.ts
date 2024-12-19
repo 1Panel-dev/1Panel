@@ -55,7 +55,7 @@ export async function loadProductProFromDB() {
     if (!res || !res.data) {
         globalStore.isProductPro = false;
     } else {
-        globalStore.isProductPro = res.data.status === 'bound';
+        globalStore.isProductPro = res.data.status === 'Bound';
         if (globalStore.isProductPro) {
             globalStore.productProExpires = Number(res.data.productPro);
         }
@@ -68,7 +68,7 @@ export async function loadMasterProductProFromDB() {
     if (!res || !res.data) {
         globalStore.isMasterProductPro = false;
     } else {
-        globalStore.isMasterProductPro = res.data.status === 'bound';
+        globalStore.isMasterProductPro = res.data.status === 'Bound';
     }
     switchTheme();
     initFavicon();
@@ -83,7 +83,7 @@ export async function getXpackSettingForTheme() {
         initFavicon();
         return;
     }
-    globalStore.isMasterProductPro = res.data.status === 'bound';
+    globalStore.isMasterProductPro = res.data.status === 'Bound';
     if (!globalStore.isMasterProductPro) {
         globalStore.isMasterProductPro = false;
         resetXSetting();

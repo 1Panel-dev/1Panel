@@ -1,22 +1,24 @@
 package constant
 
 const (
-	StatusSuccess = "success"
-	StatusFailed  = "failed"
+	StatusSuccess = "Success"
+	StatusFailed  = "Failed"
 
 	// node
-	StatusWaiting     = "waiting"
-	StatusDownloading = "downloading"
-	StatusPacking     = "packing"
-	StatusSending     = "sending"
-	StatusStarting    = "starting"
-	StatusHealthy     = "healthy"
-	StatusUnhealthy   = "unhealthy"
-	StatusUpgrading   = "upgrading"
-	StatusRunning     = "running"
-	StatusFree        = "free"
-	StatusBound       = "bound"
-	StatusExceptional = "exceptional"
-	StatusRetrying    = "retrying"
-	StatusLost        = "lost"
+	StatusWaiting     = "Waiting"
+	StatusPacking     = "Packing"
+	StatusSending     = "Sending"
+	StatusStarting    = "Starting"
+	StatusHealthy     = "Healthy"
+	StatusUnhealthy   = "Unhealthy"
+	StatusUpgrading   = "Upgrading"
+	StatusRunning     = "Running"
+	StatusFree        = "Free"
+	StatusBound       = "Bound"
+	StatusExceptional = "Exceptional"
+	StatusRetrying    = "Retrying"
+	StatusLost        = "Lost"
+
+	StatusEnable  = "Enable"
+	StatusDisable = "Disable"
 )

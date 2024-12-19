@@ -60,33 +60,17 @@
                     <el-table-column :label="$t('tool.supervisor.manage')" min-width="80px">
                         <template #default="{ row }">
                             <div v-if="row.status && row.status.length > 0 && row.hasLoad">
-                                <el-button
+                                <Status
                                     v-if="checkStatus(row.status) === 'RUNNING'"
-                                    link
-                                    type="success"
-                                    :icon="VideoPlay"
+                                    status="running"
                                     @click="operate('stop', row.name)"
-                                >
-                                    {{ $t('commons.status.running') }}
-                                </el-button>
-                                <el-button
+                                />
+                                <Status
                                     v-else-if="checkStatus(row.status) === 'WARNING'"
-                                    link
-                                    type="warning"
-                                    :icon="RefreshRight"
+                                    status="unhealthy"
                                     @click="operate('restart', row.name)"
-                                >
-                                    {{ $t('commons.status.unhealthy') }}
-                                </el-button>
-                                <el-button
-                                    v-else
-                                    link
-                                    type="danger"
-                                    :icon="VideoPause"
-                                    @click="operate('start', row.name)"
-                                >
-                                    {{ $t('commons.status.stopped') }}
-                                </el-button>
+                                />
+                                <Status v-else status="stopped" @click="operate('start', row.name)" />
                             </div>
                             <div v-if="!row.hasLoad">
                                 <el-button link loading></el-button>
@@ -166,7 +150,6 @@ import { GlobalStore } from '@/store';
 import i18n from '@/lang';
 import { HostTool } from '@/api/interface/host-tool';
 import { MsgSuccess } from '@/utils/message';
-import { VideoPlay, VideoPause, RefreshRight } from '@element-plus/icons-vue';
 import router from '@/routers';
 const globalStore = GlobalStore();
 

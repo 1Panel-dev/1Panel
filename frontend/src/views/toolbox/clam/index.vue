@@ -75,24 +75,16 @@
                         sortable
                     >
                         <template #default="{ row }">
-                            <el-button
+                            <Status
                                 v-if="row.status === 'Enable'"
+                                :status="row.status"
                                 @click="onChangeStatus(row.id, 'disable')"
-                                link
-                                icon="VideoPlay"
-                                type="success"
-                            >
-                                {{ $t('commons.status.enabled') }}
-                            </el-button>
-                            <el-button
+                            />
+                            <Status
                                 v-if="row.status === 'Disable'"
-                                icon="VideoPause"
-                                link
-                                type="danger"
+                                :status="row.status"
                                 @click="onChangeStatus(row.id, 'enable')"
-                            >
-                                {{ $t('commons.status.disabled') }}
-                            </el-button>
+                            />
                             <span v-if="row.status === ''">-</span>
                         </template>
                     </el-table-column>

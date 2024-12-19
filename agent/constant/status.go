@@ -10,6 +10,7 @@ const (
 	StatusEnable    = "Enable"
 	StatusDisable   = "Disable"
 	StatusNone      = "None"
+	StatusDeleted   = "Deleted"
 
 	OrderDesc = "descending"
 	OrderAsc  = "ascending"
