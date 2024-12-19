@@ -12,7 +12,7 @@
   <a href="https://github.com/1Panel-dev/1Panel/releases"><img src="https://img.shields.io/github/v/release/1Panel-dev/1Panel" alt="GitHub release"></a>
   <a href="https://github.com/1Panel-dev/1Panel"><img src="https://img.shields.io/github/stars/1Panel-dev/1Panel?color=%231890FF&style=flat-square" alt="GitHub Stars"></a>
   <a href="https://gitee.com/fit2cloud-feizhiyun/1Panel"><img src="https://gitee.com/fit2cloud-feizhiyun/1Panel/badge/star.svg?theme=gvp" alt="Gitee Stars"></a><br>
-  [<a href="/README.md">English</a>] | [<a href="/docs/README.zh-Hans.md">中文(简体)</a>] | [<a href="/docs/README.zh-Hant.md">中文(繁體)</a>] | [<a href="/docs/README.ja.md">日本語</a>] | [<a href="/docs/README.pt-br.md">Português (Brasil)</a>] | [<a href="/docs/README.ko.md">영어</a>]
+  [<a href="/README.md">English</a>] | [<a href="/docs/README.zh-Hans.md">中文(简体)</a>] | [<a href="/docs/README.zh-Hant.md">中文(繁體)</a>] | [<a href="/docs/README.ja.md">日本語</a>] | [<a href="/docs/README.pt-br.md">Português (Brasil)</a>] | [<a href="/docs/README.ko.md">한국어</a>] | [<a href="/docs/README.id.md">Bahasa Indonesia</a>]
 </p>
 
 [![Watch the video](https://resource.fit2cloud.com/1panel/img/overview_video.png)](https://www.bilibili.com/video/BV1Mt421n7LZ/)
