@@ -1,8 +1,6 @@
 <template>
     <el-page-header :content="header" @back="jump">
         <template v-if="slots.buttons" #content>
-            <!-- <span>{{ header }}</span> -->
-            <!-- <el-divider direction="vertical" /> -->
             <slot name="buttons"></slot>
         </template>
     </el-page-header>

@@ -1052,6 +1052,9 @@ func calculateCPUPercentUnix(stats *container.StatsResponse) float64 {
 func calculateMemPercentUnix(memStats container.MemoryStats) float64 {
 	memPercent := 0.0
 	memUsage := float64(memStats.Usage)
+	if memStats.Stats["inactive_file"] > 0 {
+		memUsage = memUsage - float64(memStats.Stats["inactive_file"])
+	}
 	memLimit := float64(memStats.Limit)
 	if memUsage > 0.0 && memLimit > 0.0 {
 		memPercent = (memUsage / memLimit) * 100.0
@@ -1162,8 +1165,8 @@ func loadCpuAndMem(client *client.Client, containerItem string) dto.ContainerLis
 	data.CPUPercent = calculateCPUPercentUnix(stats)
 	data.PercpuUsage = len(stats.CPUStats.CPUUsage.PercpuUsage)
 
-	data.MemoryCache = stats.MemoryStats.Stats["cache"]
-	data.MemoryUsage = stats.MemoryStats.Usage
+	data.MemoryCache = stats.MemoryStats.Stats["inactive_file"]
+	data.MemoryUsage = stats.MemoryStats.Usage - data.MemoryCache
 	data.MemoryLimit = stats.MemoryStats.Limit
 
 	data.MemoryPercent = calculateMemPercentUnix(stats.MemoryStats)
