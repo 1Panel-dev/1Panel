@@ -52,12 +52,13 @@ require (
 	github.com/swaggo/swag v1.16.3
 	github.com/tencentyun/cos-go-sdk-v5 v0.7.46
 	github.com/xlzd/gotp v0.1.0
-	golang.org/x/crypto v0.31.0
-	golang.org/x/net v0.30.0
+	golang.org/x/crypto v0.28.0
+	golang.org/x/net v0.33.0
 	golang.org/x/oauth2 v0.23.0
-	golang.org/x/sys v0.28.0
-	golang.org/x/term v0.27.0
-	golang.org/x/text v0.21.0
+	golang.org/x/sys v0.26.0
+	golang.org/x/term v0.25.0
+	golang.org/x/text v0.19.0
+	google.golang.org/genproto v0.0.0-20241021214115-324edc3d5d38
 	gopkg.in/ini.v1 v1.67.0
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/gorm v1.25.7
@@ -254,10 +255,9 @@ require (
 	golang.org/x/exp v0.0.0-20240213143201-ec583247a57a // indirect
 	golang.org/x/image v0.18.0 // indirect
 	golang.org/x/mod v0.21.0 // indirect
-	golang.org/x/sync v0.10.0 // indirect
+	golang.org/x/sync v0.8.0 // indirect
 	golang.org/x/time v0.7.0 // indirect
 	golang.org/x/tools v0.25.0 // indirect
-	google.golang.org/genproto v0.0.0-20241021214115-324edc3d5d38 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20241015192408-796eee8c2d53 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20241021214115-324edc3d5d38 // indirect
 	google.golang.org/grpc v1.67.1 // indirect
