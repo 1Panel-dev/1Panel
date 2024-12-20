@@ -14,7 +14,7 @@ ErrApiConfigIPInvalid: "API Interface IP is not on the whitelist: {{ .detail }}"
 ErrApiConfigDisable: "This interface prohibits the use of API Interface calls: {{ .detail }}"
 
 #common
-ErrNameIsExist: "Name is already exist"
+ErrNameIsExist: "Name is already exists"
 ErrDemoEnvironment: "Demo server, prohibit this operation!"
 ErrCmdTimeout: "Command execution timed out!"
 ErrCmdIllegal: "The command contains illegal characters. Please modify and try again!"
