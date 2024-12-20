@@ -135,9 +135,9 @@ UpdateSystemSSLSuccess: "更新系統證書成功"
 #mysql
 ErrUserIsExist: "當前用戶已存在，請重新輸入"
 ErrDatabaseIsExist: "當前資料庫已存在，請重新輸入"
-ErrExecTimeOut: "SQL 執行超時，請檢查數據庫"
-ErrRemoteExist: "遠程數據庫已存在該名稱，請修改後重試"
-ErrLocalExist: "本地數據庫已存在該名稱，請修改後重試"
+ErrExecTimeOut: "SQL 執行超時，請檢查資料庫"
+ErrRemoteExist: "遠程資料庫已存在該名稱，請修改後重試"
+ErrLocalExist: "本地資料庫已存在該名稱，請修改後重試"
 
 #redis
 ErrTypeOfRedis: "恢復文件類型與當前持久化方式不匹配，請修改後重試"
