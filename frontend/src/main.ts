@@ -14,7 +14,6 @@ for (const path in styleModule) {
     styleModule[path]?.();
 }
 
-import directives from '@/directives/index';
 import router from '@/routers/index';
 import i18n from '@/lang/index';
 import pinia from '@/store/index';
@@ -39,6 +38,5 @@ Object.keys(Icons).forEach((key) => {
 app.use(router);
 app.use(i18n);
 app.use(pinia);
-app.use(directives);
 app.use(Components);
 app.mount('#app');
