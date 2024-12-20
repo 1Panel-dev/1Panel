@@ -103,23 +103,28 @@ func (f *FtpService) Sync() error {
 	if err != nil {
 		return err
 	}
+
+	currentData := make(map[string]model.Ftp)
+	for _, item := range listsInDB {
+		currentData[item.User] = item
+	}
+
 	sameData := make(map[string]struct{})
 	for _, item := range lists {
-		for _, itemInDB := range listsInDB {
-			if item.User == itemInDB.User {
-				sameData[item.User] = struct{}{}
-				if item.Path != itemInDB.Path || item.Status != itemInDB.Status {
-					_ = ftpRepo.Update(itemInDB.ID, map[string]interface{}{"path": item.Path, "status": item.Status})
+		if itemInDB, ok := currentData[item.User]; ok {
+			sameData[item.User] = struct{}{}
+			if item.Path != itemInDB.Path || item.Status != itemInDB.Status {
+				if err := ftpRepo.Update(itemInDB.ID, map[string]interface{}{"path": item.Path, "status": item.Status}); err != nil {
+					return err
 				}
-				break
+			}
+		} else {
+			if err := ftpRepo.Create(&model.Ftp{User: item.User, Path: item.Path, Status: item.Status}); err != nil {
+				return err
 			}
 		}
 	}
-	for _, item := range lists {
-		if _, ok := sameData[item.User]; !ok {
-			_ = ftpRepo.Create(&model.Ftp{User: item.User, Path: item.Path, Status: item.Status})
-		}
-	}
+
 	for _, item := range listsInDB {
 		if _, ok := sameData[item.User]; !ok {
 			_ = ftpRepo.Update(item.ID, map[string]interface{}{"status": "deleted"})
