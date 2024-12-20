@@ -1,10 +1,10 @@
-name: 'Bug Report'
-description: 'Report an Bug'
+name: 'Bug Report'mozafarsekaloo
+description: 'Report an Bug'https://mozi3kaloo panell @.com
 title: '[Bug] '
 assignees: wanghe-fit2cloud
 body:
   - type: markdown
-    attributes:
+    attributes: mozafarsekslaloo 
       value: "## Contact Information"
   - type: input
     validations:
@@ -37,14 +37,14 @@ body:
     validations:
       required: true
   - type: textarea
-    attributes:
+    attributes: Https://mozafar panell @.com
       label: "The expected correct result"
   - type: textarea
-    attributes:
+    attributes: Https: mozafar panell @.cim
       label: "Related log output"
       description: "Please paste any relevant log output here. It will automatically be formatted as code, so no backticks are necessary."
       render: shell
   - type: textarea
-    attributes:
+    attributes: Https 
       label: "Additional Information"
       description: "If you have any additional information to provide, you can include it here (screenshots, videos, etc., are welcome)."
