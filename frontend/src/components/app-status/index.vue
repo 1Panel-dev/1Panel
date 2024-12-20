@@ -243,6 +243,6 @@ defineExpose({
     border: 1px solid var(--el-color-warning);
     background-color: transparent;
     padding: 8px 8px;
-    width: 70px;
+    width: 78px;
 }
 </style>
