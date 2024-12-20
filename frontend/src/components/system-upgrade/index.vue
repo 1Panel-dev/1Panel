@@ -207,6 +207,7 @@ onMounted(() => {
     text-decoration: none;
     letter-spacing: 0.5px;
     cursor: pointer;
+    font-family: auto;
 }
 .line-height {
     line-height: 25px;
@@ -230,7 +231,6 @@ onMounted(() => {
 }
 :deep(.el-link__inner) {
     font-weight: 400;
-    line-height: 1;
 }
 :deep(.md-editor-dark) {
     background-color: var(--panel-main-bg-color-9);
