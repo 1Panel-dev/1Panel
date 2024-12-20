@@ -21,7 +21,7 @@ func (b *BaseApi) GetLoginLogs(c *gin.Context) {
 		return
 	}
 
-	total, list, err := logService.PageLoginLog(req)
+	total, list, err := logService.PageLoginLog(c, req)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

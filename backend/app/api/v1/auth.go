@@ -8,8 +8,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/captcha"
-	"github.com/1Panel-dev/1Panel/backend/utils/common"
-	"github.com/1Panel-dev/1Panel/backend/utils/geo"
 	"github.com/gin-gonic/gin"
 )
 
@@ -157,11 +155,6 @@ func saveLoginLogs(c *gin.Context, err error) {
 		logs.Status = constant.StatusSuccess
 	}
 	logs.IP = c.ClientIP()
-	address, err := geo.GetIPLocation(logs.IP, common.GetLang(c))
-	if err != nil {
-		global.LOG.Errorf("get ip location failed: %s", err)
-	}
 	logs.Agent = c.GetHeader("User-Agent")
-	logs.Address = address
 	_ = logService.CreateLoginLog(logs)
 }

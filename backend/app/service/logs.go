@@ -2,6 +2,9 @@ package service
 
 import (
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
+	"github.com/1Panel-dev/1Panel/backend/utils/geo"
+	"github.com/gin-gonic/gin"
 	"os"
 	"path"
 	"path/filepath"
@@ -26,7 +29,7 @@ const logs = "https://resource.fit2cloud.com/installation-log.sh"
 type ILogService interface {
 	ListSystemLogFile() ([]string, error)
 	CreateLoginLog(operation model.LoginLog) error
-	PageLoginLog(search dto.SearchLgLogWithPage) (int64, interface{}, error)
+	PageLoginLog(c *gin.Context, search dto.SearchLgLogWithPage) (int64, interface{}, error)
 
 	CreateOperationLog(operation model.OperationLog) error
 	PageOperationLog(search dto.SearchOpLogWithPage) (int64, interface{}, error)
@@ -77,7 +80,7 @@ func (u *LogService) ListSystemLogFile() ([]string, error) {
 	return files, nil
 }
 
-func (u *LogService) PageLoginLog(req dto.SearchLgLogWithPage) (int64, interface{}, error) {
+func (u *LogService) PageLoginLog(c *gin.Context, req dto.SearchLgLogWithPage) (int64, interface{}, error) {
 	total, ops, err := logRepo.PageLoginLog(
 		req.Page,
 		req.PageSize,
@@ -91,6 +94,7 @@ func (u *LogService) PageLoginLog(req dto.SearchLgLogWithPage) (int64, interface
 		if err := copier.Copy(&item, &op); err != nil {
 			return 0, nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
 		}
+		item.Address, _ = geo.GetIPLocation(item.IP, common.GetLang(c))
 		dtoOps = append(dtoOps, item)
 	}
 	return total, dtoOps, err
