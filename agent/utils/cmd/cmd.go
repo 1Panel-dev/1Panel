@@ -63,7 +63,7 @@ func ExecWithTimeOut(cmdStr string, timeout time.Duration) (string, error) {
 func ExecWithLogFile(cmdStr string, timeout time.Duration, outputFile string) error {
 	cmd := exec.Command("bash", "-c", cmdStr)
 
-	outFile, err := os.OpenFile(outputFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+	outFile, err := os.OpenFile(outputFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, constant.DirPerm)
 	if err != nil {
 		return err
 	}
@@ -108,7 +108,7 @@ func ExecContainerScript(containerName, cmdStr string, timeout time.Duration) er
 }
 
 func ExecShell(outPath string, timeout time.Duration, name string, arg ...string) error {
-	file, err := os.OpenFile(outPath, os.O_WRONLY|os.O_CREATE, 0666)
+	file, err := os.OpenFile(outPath, os.O_WRONLY|os.O_CREATE, constant.FilePerm)
 	if err != nil {
 		return err
 	}

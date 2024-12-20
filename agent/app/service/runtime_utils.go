@@ -132,7 +132,7 @@ func runComposeCmdWithLog(operate string, composePath string, logPath string) er
 	if operate == "up" {
 		cmd = exec.Command("docker", "compose", "-f", composePath, operate, "-d")
 	}
-	logFile, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	logFile, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, constant.FilePerm)
 	if err != nil {
 		global.LOG.Errorf("Failed to open log file: %v", err)
 		return err
@@ -208,7 +208,7 @@ func buildRuntime(runtime *model.Runtime, oldImageID string, oldEnv string, rebu
 	composePath := runtime.GetComposePath()
 	logPath := path.Join(runtimePath, "build.log")
 
-	logFile, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
+	logFile, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, constant.FilePerm)
 	if err != nil {
 		global.LOG.Errorf("failed to open log file: %v", err)
 		return
@@ -502,7 +502,7 @@ func handleCompose(env gotenv.Env, composeContent []byte, create request.Runtime
 		return
 	}
 	fileOp := files.NewFileOp()
-	_ = fileOp.SaveFile(path.Join(projectDir, "docker-compose.yml"), string(composeByte), 0644)
+	_ = fileOp.SaveFile(path.Join(projectDir, "docker-compose.yml"), string(composeByte), constant.DirPerm)
 	return
 }
 

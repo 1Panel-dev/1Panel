@@ -273,7 +273,7 @@ func confSet(redisName string, updateType string, changeConf []redisConfig) erro
 	}
 	newFiles = append(newFiles, "# End Redis configuration rewrite by 1Panel")
 
-	file, err := os.OpenFile(path, os.O_WRONLY|os.O_TRUNC, 0666)
+	file, err := os.OpenFile(path, os.O_WRONLY|os.O_TRUNC, constant.FilePerm)
 	if err != nil {
 		return err
 	}

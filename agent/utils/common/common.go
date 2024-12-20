@@ -3,6 +3,7 @@ package common
 import (
 	"crypto/rand"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/constant"
 	"io"
 	mathRand "math/rand"
 	"net"
@@ -137,7 +138,7 @@ func CopyFile(src, dst string) error {
 			_ = os.MkdirAll(path.Dir(dst), os.ModePerm)
 		}
 	}
-	target, err := os.OpenFile(dst+"_temp", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
+	target, err := os.OpenFile(dst+"_temp", os.O_RDWR|os.O_CREATE|os.O_TRUNC, constant.DirPerm)
 	if err != nil {
 		return err
 	}

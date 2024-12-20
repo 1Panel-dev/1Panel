@@ -44,6 +44,6 @@ func Init() {
 
 func createDir(fileOp files.FileOp, dirPath string) {
 	if !fileOp.Stat(dirPath) {
-		_ = fileOp.CreateDir(dirPath, 0755)
+		_ = fileOp.CreateDir(dirPath, constant.DirPerm)
 	}
 }

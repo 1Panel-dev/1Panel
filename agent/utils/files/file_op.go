@@ -558,7 +558,7 @@ func (f FileOp) Compress(srcRiles []string, dst string, name string, cType Compr
 	}
 
 	if !f.Stat(dst) {
-		_ = f.CreateDir(dst, 0755)
+		_ = f.CreateDir(dst, constant.DirPerm)
 	}
 
 	files, err := archiver.FilesFromDisk(nil, fileMaps)

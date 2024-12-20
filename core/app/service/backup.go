@@ -481,7 +481,7 @@ func (u *BackupService) checkBackupConn(backup *model.BackupAccount) (bool, erro
 			return false, err
 		}
 	}
-	file, err := os.OpenFile(fileItem, os.O_WRONLY|os.O_CREATE, 0666)
+	file, err := os.OpenFile(fileItem, os.O_WRONLY|os.O_CREATE, constant.FilePerm)
 	if err != nil {
 		return false, err
 	}

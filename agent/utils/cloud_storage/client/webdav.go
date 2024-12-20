@@ -3,6 +3,7 @@ package client
 import (
 	"crypto/tls"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/constant"
 	"io"
 	"net/http"
 	"os"
@@ -51,7 +52,7 @@ func (s webDAVClient) Upload(src, target string) (bool, error) {
 	}
 	defer srcFile.Close()
 
-	if err := s.client.WriteStream(targetFilePath, srcFile, 0644); err != nil {
+	if err := s.client.WriteStream(targetFilePath, srcFile, constant.DirPerm); err != nil {
 		return false, err
 	}
 	return true, nil

@@ -136,7 +136,7 @@ func (n NginxService) UpdateConfigFile(req request.NginxConfigFileUpdate) error 
 	if req.Backup {
 		backupPath := path.Join(path.Dir(filePath), "bak")
 		if !fileOp.Stat(backupPath) {
-			if err := fileOp.CreateDir(backupPath, 0755); err != nil {
+			if err := fileOp.CreateDir(backupPath, constant.DirPerm); err != nil {
 				return err
 			}
 		}
@@ -152,12 +152,12 @@ func (n NginxService) UpdateConfigFile(req request.NginxConfigFileUpdate) error 
 	if err != nil {
 		return err
 	}
-	if err = fileOp.WriteFile(filePath, strings.NewReader(req.Content), 0644); err != nil {
+	if err = fileOp.WriteFile(filePath, strings.NewReader(req.Content), constant.DirPerm); err != nil {
 		return err
 	}
 	if status, err := checkContainerStatus(nginxInstall.ContainerName); err == nil && status != "running" {
 		if out, err := compose.DownAndUp(nginxInstall.GetComposePath()); err != nil {
-			_ = fileOp.SaveFile(filePath, string(oldContent), 0644)
+			_ = fileOp.SaveFile(filePath, string(oldContent), constant.DirPerm)
 			return fmt.Errorf("nginx restart failed: %v", out)
 		} else {
 			return nginxCheckAndReload(string(oldContent), filePath, nginxInstall.ContainerName)
@@ -207,7 +207,7 @@ func (n NginxService) Build(req request.NginxBuildReq) error {
 	)
 	if len(moduleContent) > 0 {
 		_ = json.Unmarshal(moduleContent, &modules)
-		bashFile, err := os.OpenFile(path.Join(buildPath, "tmp", "pre.sh"), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0755)
+		bashFile, err := os.OpenFile(path.Join(buildPath, "tmp", "pre.sh"), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, constant.DirPerm)
 		if err != nil {
 			return err
 		}
@@ -358,5 +358,5 @@ func (n NginxService) UpdateModule(req request.NginxModuleUpdate) error {
 	if err != nil {
 		return err
 	}
-	return fileOp.SaveFileWithByte(moduleConfigPath, moduleByte, 0644)
+	return fileOp.SaveFileWithByte(moduleConfigPath, moduleByte, constant.DirPerm)
 }

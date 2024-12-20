@@ -3,6 +3,7 @@ package server
 import (
 	"crypto/tls"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/constant"
 	"net"
 	"net/http"
 	"os"
@@ -54,7 +55,7 @@ func Start() {
 
 	if global.IsMaster {
 		_ = os.Remove("/etc/1panel/agent.sock")
-		_ = os.Mkdir("/etc/1panel", 0755)
+		_ = os.Mkdir("/etc/1panel", constant.DirPerm)
 		listener, err := net.Listen("unix", "/etc/1panel/agent.sock")
 		if err != nil {
 			panic(err)

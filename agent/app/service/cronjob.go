@@ -351,7 +351,7 @@ func mkdirAndWriteFile(cronjob *model.Cronjob, startTime time.Time, msg []byte) 
 
 	path := fmt.Sprintf("%s/%s.log", dir, startTime.Format(constant.DateTimeSlimLayout))
 	global.LOG.Infof("cronjob %s has generated some logs %s", cronjob.Name, path)
-	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE, 0666)
+	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE, constant.FilePerm)
 	if err != nil {
 		return "", err
 	}

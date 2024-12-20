@@ -35,4 +35,9 @@ const (
 	GoogleRedirectURI   = "http://localhost:8080"
 )
 
+const (
+	DirPerm  = 0755
+	FilePerm = 0644
+)
+
 var CertStore atomic.Value

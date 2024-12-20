@@ -773,7 +773,7 @@ func (u *ContainerService) ContainerLogClean(req dto.OperationWithName) error {
 	if err := client.ContainerStop(ctx, containerItem.ID, container.StopOptions{}); err != nil {
 		return err
 	}
-	file, err := os.OpenFile(containerItem.LogPath, os.O_RDWR|os.O_CREATE, 0666)
+	file, err := os.OpenFile(containerItem.LogPath, os.O_RDWR|os.O_CREATE, constant.FilePerm)
 	if err != nil {
 		return err
 	}

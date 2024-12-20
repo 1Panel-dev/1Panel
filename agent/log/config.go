@@ -2,6 +2,7 @@ package log
 
 import (
 	"errors"
+	"github.com/1Panel-dev/1Panel/agent/constant"
 	"io"
 	"os"
 	"path"
@@ -9,7 +10,7 @@ import (
 
 var (
 	BufferSize         = 0x100000
-	DefaultFileMode    = os.FileMode(0644)
+	DefaultFileMode    = os.FileMode(constant.DirPerm)
 	DefaultFileFlag    = os.O_RDWR | os.O_CREATE | os.O_APPEND
 	ErrInvalidArgument = errors.New("error argument invalid")
 	QueueSize          = 1024

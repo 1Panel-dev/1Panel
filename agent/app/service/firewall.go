@@ -589,7 +589,7 @@ func (u *FirewallService) updatePingStatus(enable string) error {
 	if !hasLine {
 		newFiles = append(newFiles, "net/ipv4/icmp_echo_ignore_all="+enable)
 	}
-	file, err := os.OpenFile(confPath, os.O_WRONLY|os.O_TRUNC, 0666)
+	file, err := os.OpenFile(confPath, os.O_WRONLY|os.O_TRUNC, constant.FilePerm)
 	if err != nil {
 		return err
 	}

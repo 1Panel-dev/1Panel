@@ -62,7 +62,7 @@ func createIndexFile(website *model.Website, runtime *model.Runtime) error {
 
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(indexFolder) {
-		if err := fileOp.CreateDir(indexFolder, 0755); err != nil {
+		if err := fileOp.CreateDir(indexFolder, constant.DirPerm); err != nil {
 			return err
 		}
 	}
@@ -76,13 +76,13 @@ func createIndexFile(website *model.Website, runtime *model.Runtime) error {
 			return err
 		}
 	}
-	if err := fileOp.WriteFile(indexPath, strings.NewReader(indexContent), 0755); err != nil {
+	if err := fileOp.WriteFile(indexPath, strings.NewReader(indexContent), constant.DirPerm); err != nil {
 		return err
 	}
 
 	html404, _ := websiteService.GetDefaultHtml("404")
 	path404 := path.Join(indexFolder, "404.html")
-	if err := fileOp.WriteFile(path404, strings.NewReader(html404.Content), 0755); err != nil {
+	if err := fileOp.WriteFile(path404, strings.NewReader(html404.Content), constant.DirPerm); err != nil {
 		return err
 	}
 
@@ -98,7 +98,7 @@ func createProxyFile(website *model.Website) error {
 	filePath := path.Join(proxyFolder, "root.conf")
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(proxyFolder) {
-		if err := fileOp.CreateDir(proxyFolder, 0755); err != nil {
+		if err := fileOp.CreateDir(proxyFolder, constant.DirPerm); err != nil {
 			return err
 		}
 	}
@@ -130,10 +130,10 @@ func createWebsiteFolder(website *model.Website, runtime *model.Runtime) error {
 	siteFolder := GteSiteDir(website.Alias)
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(siteFolder) {
-		if err := fileOp.CreateDir(siteFolder, 0755); err != nil {
+		if err := fileOp.CreateDir(siteFolder, constant.DirPerm); err != nil {
 			return err
 		}
-		if err := fileOp.CreateDir(path.Join(siteFolder, "log"), 0755); err != nil {
+		if err := fileOp.CreateDir(path.Join(siteFolder, "log"), constant.DirPerm); err != nil {
 			return err
 		}
 		if err := fileOp.CreateFile(path.Join(siteFolder, "log", "access.log")); err != nil {
@@ -142,16 +142,16 @@ func createWebsiteFolder(website *model.Website, runtime *model.Runtime) error {
 		if err := fileOp.CreateFile(path.Join(siteFolder, "log", "error.log")); err != nil {
 			return err
 		}
-		if err := fileOp.CreateDir(path.Join(siteFolder, "index"), 0775); err != nil {
+		if err := fileOp.CreateDir(path.Join(siteFolder, "index"), constant.DirPerm); err != nil {
 			return err
 		}
-		if err := fileOp.CreateDir(path.Join(siteFolder, "ssl"), 0755); err != nil {
+		if err := fileOp.CreateDir(path.Join(siteFolder, "ssl"), constant.DirPerm); err != nil {
 			return err
 		}
 		if website.Type == constant.Runtime {
 			if runtime.Type == constant.RuntimePHP && runtime.Resource == constant.ResourceLocal {
 				phpPoolDir := path.Join(siteFolder, "php-pool")
-				if err := fileOp.CreateDir(phpPoolDir, 0755); err != nil {
+				if err := fileOp.CreateDir(phpPoolDir, constant.DirPerm); err != nil {
 					return err
 				}
 				if err := fileOp.CreateFile(path.Join(phpPoolDir, "php-fpm.sock")); err != nil {
@@ -314,7 +314,7 @@ func createWafConfig(website *model.Website, domains []model.WebsiteDomain) erro
 	if err != nil {
 		return err
 	}
-	if err := fileOp.SaveFileWithByte(websitesConfigPath, websitesContent, 0644); err != nil {
+	if err := fileOp.SaveFileWithByte(websitesConfigPath, websitesContent, constant.DirPerm); err != nil {
 		return err
 	}
 
@@ -331,7 +331,7 @@ func createWafConfig(website *model.Website, domains []model.WebsiteDomain) erro
 	}
 
 	if !fileOp.Stat(websiteDir) {
-		if err = fileOp.CreateDir(websiteDir, 0755); err != nil {
+		if err = fileOp.CreateDir(websiteDir, constant.DirPerm); err != nil {
 			return err
 		}
 	}
@@ -341,13 +341,13 @@ func createWafConfig(website *model.Website, domains []model.WebsiteDomain) erro
 		}
 	}()
 
-	if err = fileOp.SaveFileWithByte(path.Join(websiteDir, "config.json"), defaultConfigContent, 0644); err != nil {
+	if err = fileOp.SaveFileWithByte(path.Join(websiteDir, "config.json"), defaultConfigContent, constant.DirPerm); err != nil {
 		return err
 	}
 
 	websiteRuleDir := path.Join(websiteDir, "rules")
 	if !fileOp.Stat(websiteRuleDir) {
-		if err := fileOp.CreateDir(websiteRuleDir, 0755); err != nil {
+		if err := fileOp.CreateDir(websiteRuleDir, constant.DirPerm); err != nil {
 			return err
 		}
 	}
@@ -443,7 +443,7 @@ func delWafConfig(website model.Website, force bool) error {
 	if err != nil {
 		return err
 	}
-	if err := fileOp.SaveFileWithByte(websitesConfigPath, websitesContent, 0644); err != nil {
+	if err := fileOp.SaveFileWithByte(websitesConfigPath, websitesContent, constant.DirPerm); err != nil {
 		return err
 	}
 
@@ -557,7 +557,7 @@ func createPemFile(website model.Website, websiteSSL model.WebsiteSSL) error {
 	fileOp := files.NewFileOp()
 
 	if !fileOp.Stat(configDir) {
-		if err := fileOp.CreateDir(configDir, 0775); err != nil {
+		if err := fileOp.CreateDir(configDir, constant.DirPerm); err != nil {
 			return err
 		}
 	}
@@ -576,10 +576,10 @@ func createPemFile(website model.Website, websiteSSL model.WebsiteSSL) error {
 		}
 	}
 
-	if err := fileOp.WriteFile(fullChainFile, strings.NewReader(websiteSSL.Pem), 0644); err != nil {
+	if err := fileOp.WriteFile(fullChainFile, strings.NewReader(websiteSSL.Pem), constant.DirPerm); err != nil {
 		return err
 	}
-	if err := fileOp.WriteFile(privatePemFile, strings.NewReader(websiteSSL.PrivateKey), 0644); err != nil {
+	if err := fileOp.WriteFile(privatePemFile, strings.NewReader(websiteSSL.PrivateKey), constant.DirPerm); err != nil {
 		return err
 	}
 	return nil
@@ -1019,12 +1019,12 @@ func saveCertificateFile(websiteSSL *model.WebsiteSSL, logger *log.Logger) {
 			pushErr error
 			MsgMap  = map[string]interface{}{"path": websiteSSL.Dir, "status": i18n.GetMsgByKey("Success")}
 		)
-		if pushErr = fileOp.SaveFile(path.Join(websiteSSL.Dir, "privkey.pem"), websiteSSL.PrivateKey, 0666); pushErr != nil {
+		if pushErr = fileOp.SaveFile(path.Join(websiteSSL.Dir, "privkey.pem"), websiteSSL.PrivateKey, constant.FilePerm); pushErr != nil {
 			MsgMap["status"] = i18n.GetMsgByKey("Failed")
 			logger.Println(i18n.GetMsgWithMap("PushDirLog", MsgMap))
 			logger.Println("Push dir failed:" + pushErr.Error())
 		}
-		if pushErr = fileOp.SaveFile(path.Join(websiteSSL.Dir, "fullchain.pem"), websiteSSL.Pem, 0666); pushErr != nil {
+		if pushErr = fileOp.SaveFile(path.Join(websiteSSL.Dir, "fullchain.pem"), websiteSSL.Pem, constant.FilePerm); pushErr != nil {
 			MsgMap["status"] = i18n.GetMsgByKey("Failed")
 			logger.Println(i18n.GetMsgWithMap("PushDirLog", MsgMap))
 			logger.Println("Push dir failed:" + pushErr.Error())
@@ -1227,7 +1227,7 @@ func openProxyCache(website model.Website) error {
 	cacheDir := GetSitePath(website, SiteCacheDir)
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(cacheDir) {
-		_ = fileOp.CreateDir(cacheDir, 0755)
+		_ = fileOp.CreateDir(cacheDir, constant.DirPerm)
 	}
 	content, err := fileOp.GetContent(GetSitePath(website, SiteConf))
 	if err != nil {

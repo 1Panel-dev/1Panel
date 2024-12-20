@@ -32,7 +32,7 @@ func CopyFile(src, dst string, withName bool) error {
 			_ = os.MkdirAll(path.Dir(dst), os.ModePerm)
 		}
 	}
-	target, err := os.OpenFile(dst+"_temp", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
+	target, err := os.OpenFile(dst+"_temp", os.O_RDWR|os.O_CREATE|os.O_TRUNC, constant.FilePerm)
 	if err != nil {
 		return err
 	}

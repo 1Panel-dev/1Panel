@@ -175,7 +175,7 @@ func getClashDir(realPath string) (string, error) {
 func createClashDir(clashDir string) error {
 	op := files.NewFileOp()
 	if !op.Stat(clashDir) {
-		if err := op.CreateDir(clashDir, 0755); err != nil {
+		if err := op.CreateDir(clashDir, constant.DirPerm); err != nil {
 			return err
 		}
 	}

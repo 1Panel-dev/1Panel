@@ -404,10 +404,10 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 		return err
 	}
 	fileOp := files.NewFileOp()
-	_ = fileOp.WriteFile(installed.GetComposePath(), strings.NewReader(installed.DockerCompose), 0755)
+	_ = fileOp.WriteFile(installed.GetComposePath(), strings.NewReader(installed.DockerCompose), constant.DirPerm)
 	if err := rebuildApp(installed); err != nil {
 		_ = env.Write(backupEnvMaps, envPath)
-		_ = fileOp.WriteFile(installed.GetComposePath(), strings.NewReader(backupDockerCompose), 0755)
+		_ = fileOp.WriteFile(installed.GetComposePath(), strings.NewReader(backupDockerCompose), constant.DirPerm)
 		return err
 	}
 	installed.Status = constant.Running
@@ -856,7 +856,7 @@ func updateInstallInfoInDB(appKey, appName, param string, value interface{}) err
 			newFiles = append(newFiles, line)
 		}
 	}
-	file, err := os.OpenFile(envPath, os.O_WRONLY|os.O_TRUNC, 0666)
+	file, err := os.OpenFile(envPath, os.O_WRONLY|os.O_TRUNC, constant.FilePerm)
 	if err != nil {
 		return err
 	}

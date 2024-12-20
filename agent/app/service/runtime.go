@@ -928,13 +928,13 @@ func (r *RuntimeService) UpdatePHPConfig(req request.PHPConfigUpdate) (err error
 		}
 	}
 	updatedContent := strings.Join(lines, "\n")
-	if err := fileOp.WriteFile(phpConfigPath, strings.NewReader(updatedContent), 0755); err != nil {
+	if err := fileOp.WriteFile(phpConfigPath, strings.NewReader(updatedContent), constant.DirPerm); err != nil {
 		return err
 	}
 
 	err = restartRuntime(runtime)
 	if err != nil {
-		_ = fileOp.WriteFile(phpConfigPath, strings.NewReader(string(contentBytes)), 0755)
+		_ = fileOp.WriteFile(phpConfigPath, strings.NewReader(string(contentBytes)), constant.DirPerm)
 		return err
 	}
 	return
@@ -973,7 +973,7 @@ func (r *RuntimeService) UpdatePHPConfigFile(req request.PHPFileUpdate) error {
 	} else {
 		configPath = path.Join(runtime.GetPath(), "conf", "php.ini")
 	}
-	if err := files.NewFileOp().WriteFile(configPath, strings.NewReader(req.Content), 0755); err != nil {
+	if err := files.NewFileOp().WriteFile(configPath, strings.NewReader(req.Content), constant.DirPerm); err != nil {
 		return err
 	}
 	if _, err := compose.Restart(runtime.GetComposePath()); err != nil {

@@ -3,6 +3,7 @@ package nginx
 import (
 	"bytes"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/constant"
 	"os"
 	"strings"
 
@@ -111,5 +112,5 @@ func DumpConfig(c *components.Config, style *Style) string {
 }
 
 func WriteConfig(c *components.Config, style *Style) error {
-	return os.WriteFile(c.FilePath, []byte(DumpConfig(c, style)), 0644)
+	return os.WriteFile(c.FilePath, []byte(DumpConfig(c, style)), constant.DirPerm)
 }

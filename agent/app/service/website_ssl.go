@@ -137,7 +137,7 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 	if create.PushDir {
 		fileOP := files.NewFileOp()
 		if !fileOP.Stat(create.Dir) {
-			_ = fileOP.CreateDir(create.Dir, 0755)
+			_ = fileOP.CreateDir(create.Dir, constant.DirPerm)
 		}
 		websiteSSL.Dir = create.Dir
 	}
@@ -295,7 +295,7 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 	}
 
 	go func() {
-		logFile, _ := os.OpenFile(path.Join(constant.SSLLogDir, fmt.Sprintf("%s-ssl-%d.log", websiteSSL.PrimaryDomain, websiteSSL.ID)), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
+		logFile, _ := os.OpenFile(path.Join(constant.SSLLogDir, fmt.Sprintf("%s-ssl-%d.log", websiteSSL.PrimaryDomain, websiteSSL.ID)), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, constant.FilePerm)
 		defer logFile.Close()
 		logger := log.New(logFile, "", log.LstdFlags)
 		legoLogger.Logger = logger
@@ -492,7 +492,7 @@ func (w WebsiteSSLService) Update(update request.WebsiteSSLUpdate) error {
 	if update.PushDir {
 		fileOP := files.NewFileOp()
 		if !fileOP.Stat(update.Dir) {
-			_ = fileOP.CreateDir(update.Dir, 0755)
+			_ = fileOP.CreateDir(update.Dir, constant.DirPerm)
 		}
 		updateParams["dir"] = update.Dir
 	}
@@ -635,13 +635,13 @@ func (w WebsiteSSLService) DownloadFile(id uint) (*os.File, error) {
 			return nil, err
 		}
 	}
-	if err = fileOp.CreateDir(dir, 0666); err != nil {
+	if err = fileOp.CreateDir(dir, constant.DirPerm); err != nil {
 		return nil, err
 	}
-	if err = fileOp.WriteFile(path.Join(dir, "fullchain.pem"), strings.NewReader(websiteSSL.Pem), 0644); err != nil {
+	if err = fileOp.WriteFile(path.Join(dir, "fullchain.pem"), strings.NewReader(websiteSSL.Pem), constant.DirPerm); err != nil {
 		return nil, err
 	}
-	if err = fileOp.WriteFile(path.Join(dir, "privkey.pem"), strings.NewReader(websiteSSL.PrivateKey), 0644); err != nil {
+	if err = fileOp.WriteFile(path.Join(dir, "privkey.pem"), strings.NewReader(websiteSSL.PrivateKey), constant.DirPerm); err != nil {
 		return nil, err
 	}
 	fileName := websiteSSL.PrimaryDomain + ".zip"

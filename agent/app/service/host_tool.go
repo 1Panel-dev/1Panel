@@ -157,13 +157,13 @@ func (h *HostToolService) CreateToolConfig(req request.HostToolCreate) error {
 		supervisorDir := path.Join(global.CONF.System.BaseDir, "1panel", "tools", "supervisord")
 		includeDir := path.Join(supervisorDir, "supervisor.d")
 		if !fileOp.Stat(includeDir) {
-			if err = fileOp.CreateDir(includeDir, 0755); err != nil {
+			if err = fileOp.CreateDir(includeDir, constant.DirPerm); err != nil {
 				return err
 			}
 		}
 		logDir := path.Join(supervisorDir, "log")
 		if !fileOp.Stat(logDir) {
-			if err = fileOp.CreateDir(logDir, 0755); err != nil {
+			if err = fileOp.CreateDir(logDir, constant.DirPerm); err != nil {
 				return err
 			}
 		}
@@ -466,7 +466,7 @@ func handleSupervisorFile(req request.SupervisorProcessFileReq, includeDir, cont
 			}
 			return string(content), nil
 		case "clear":
-			if err = fileOp.WriteFile(logFile, strings.NewReader(""), 0755); err != nil {
+			if err = fileOp.WriteFile(logFile, strings.NewReader(""), constant.DirPerm); err != nil {
 				return "", err
 			}
 		}
@@ -486,7 +486,7 @@ func handleSupervisorFile(req request.SupervisorProcessFileReq, includeDir, cont
 			}
 			return string(content), nil
 		case "clear":
-			if err = fileOp.WriteFile(logFile, strings.NewReader(""), 0755); err != nil {
+			if err = fileOp.WriteFile(logFile, strings.NewReader(""), constant.DirPerm); err != nil {
 				return "", err
 			}
 		}
@@ -503,7 +503,7 @@ func handleSupervisorFile(req request.SupervisorProcessFileReq, includeDir, cont
 			if req.Content == "" {
 				return "", buserr.New("ErrConfigIsNull")
 			}
-			if err := fileOp.WriteFile(configPath, strings.NewReader(req.Content), 0755); err != nil {
+			if err := fileOp.WriteFile(configPath, strings.NewReader(req.Content), constant.DirPerm); err != nil {
 				return "", err
 			}
 			return "", operateSupervisorCtl("update", "", req.Name, includeDir, containerName)

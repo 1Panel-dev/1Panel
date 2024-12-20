@@ -192,7 +192,7 @@ func (f *FileService) Create(op request.FileCreate) error {
 		if err == nil {
 			mode = int64(fileInfo.Mode().Perm())
 		} else {
-			mode = 0755
+			mode = constant.DirPerm
 		}
 	}
 	if op.IsDir {

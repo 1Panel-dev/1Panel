@@ -98,7 +98,7 @@ func handleRuntimeRecover(runtime *model.Runtime, recoverFile string, isRollback
 	runtimeDir := runtime.GetPath()
 	backPath := fmt.Sprintf("%s_bak", runtimeDir)
 	_ = fileOp.Rename(runtimeDir, backPath)
-	_ = fileOp.CreateDir(runtimeDir, 0755)
+	_ = fileOp.CreateDir(runtimeDir, constant.DirPerm)
 
 	if err := handleUnTar(tmpPath+"/runtime.tar.gz", fmt.Sprintf("%s/%s", constant.RuntimeDir, runtime.Type), secret); err != nil {
 		global.LOG.Errorf("handle recover from runtime.tar.gz failed, err: %v", err)

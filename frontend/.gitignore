@@ -28,3 +28,4 @@ stats.html
 *.sln
 *.sw?
 .vscode
+folder-alias.json

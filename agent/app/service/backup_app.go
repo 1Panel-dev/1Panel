@@ -303,7 +303,7 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 		appDir := install.GetPath()
 		backPath := fmt.Sprintf("%s_bak", appDir)
 		_ = fileOp.Rename(appDir, backPath)
-		_ = fileOp.CreateDir(appDir, 0755)
+		_ = fileOp.CreateDir(appDir, constant.DirPerm)
 
 		deCompressName := i18n.GetWithName("DeCompressFile", "app.tar.gz")
 		t.LogStart(deCompressName)

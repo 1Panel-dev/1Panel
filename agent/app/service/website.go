@@ -719,7 +719,7 @@ func (w WebsiteService) CreateWebsiteDomain(create request.WebsiteDomainCreate) 
 		if err != nil {
 			return nil, err
 		}
-		if err := fileOp.SaveFileWithByte(websitesConfigPath, websitesContent, 0644); err != nil {
+		if err := fileOp.SaveFileWithByte(websitesConfigPath, websitesContent, constant.DirPerm); err != nil {
 			return nil, err
 		}
 	}
@@ -816,7 +816,7 @@ func (w WebsiteService) DeleteWebsiteDomain(domainId uint) error {
 		if err != nil {
 			return err
 		}
-		if err = fileOp.SaveFileWithByte(websitesConfigPath, websitesContent, 0644); err != nil {
+		if err = fileOp.SaveFileWithByte(websitesConfigPath, websitesContent, constant.DirPerm); err != nil {
 			return err
 		}
 	}
@@ -1169,7 +1169,7 @@ func (w WebsiteService) UpdateNginxConfigFile(req request.WebsiteNginxUpdate) er
 	}
 
 	filePath := nginxFull.SiteConfig.FilePath
-	if err = files.NewFileOp().WriteFile(filePath, strings.NewReader(req.Content), 0755); err != nil {
+	if err = files.NewFileOp().WriteFile(filePath, strings.NewReader(req.Content), constant.DirPerm); err != nil {
 		return err
 	}
 	return nginxCheckAndReload(nginxFull.SiteConfig.OldContent, filePath, nginxFull.Install.ContainerName)
@@ -1248,7 +1248,7 @@ func (w WebsiteService) OpWebsiteLog(req request.WebsiteLogReq) (*response.Websi
 		}
 	case constant.DeleteLog:
 		logPath := path.Join(sitePath, "log", req.LogType)
-		if err := files.NewFileOp().WriteFile(logPath, strings.NewReader(""), 0755); err != nil {
+		if err := files.NewFileOp().WriteFile(logPath, strings.NewReader(""), constant.DirPerm); err != nil {
 			return nil, err
 		}
 	}
@@ -1404,7 +1404,7 @@ func (w WebsiteService) UpdateRewriteConfig(req request.NginxRewriteUpdate) erro
 	fileOp := files.NewFileOp()
 	var oldRewriteContent []byte
 	if !fileOp.Stat(path.Dir(absolutePath)) {
-		if err := fileOp.CreateDir(path.Dir(absolutePath), 0755); err != nil {
+		if err := fileOp.CreateDir(path.Dir(absolutePath), constant.DirPerm); err != nil {
 			return err
 		}
 	}
@@ -1418,12 +1418,12 @@ func (w WebsiteService) UpdateRewriteConfig(req request.NginxRewriteUpdate) erro
 			return err
 		}
 	}
-	if err := fileOp.WriteFile(absolutePath, strings.NewReader(req.Content), 0755); err != nil {
+	if err := fileOp.WriteFile(absolutePath, strings.NewReader(req.Content), constant.DirPerm); err != nil {
 		return err
 	}
 
 	if err := updateNginxConfig(constant.NginxScopeServer, []dto.NginxParam{{Name: "include", Params: []string{includePath}}}, &website); err != nil {
-		_ = fileOp.WriteFile(absolutePath, bytes.NewReader(oldRewriteContent), 0755)
+		_ = fileOp.WriteFile(absolutePath, bytes.NewReader(oldRewriteContent), constant.DirPerm)
 		return err
 	}
 	website.Rewrite = req.Name
@@ -1463,7 +1463,7 @@ func (w WebsiteService) OperateCustomRewrite(req request.CustomRewriteOperate) e
 	rewriteDir := GetOpenrestyDir(DefaultRewriteDir)
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(rewriteDir) {
-		if err := fileOp.CreateDir(rewriteDir, 0755); err != nil {
+		if err := fileOp.CreateDir(rewriteDir, constant.DirPerm); err != nil {
 			return err
 		}
 	}
@@ -1473,7 +1473,7 @@ func (w WebsiteService) OperateCustomRewrite(req request.CustomRewriteOperate) e
 		if fileOp.Stat(rewriteFile) {
 			return buserr.New(constant.ErrNameIsExist)
 		}
-		return fileOp.WriteFile(rewriteFile, strings.NewReader(req.Content), 0755)
+		return fileOp.WriteFile(rewriteFile, strings.NewReader(req.Content), constant.DirPerm)
 	case "delete":
 		return fileOp.DeleteFile(rewriteFile)
 	}
@@ -1552,7 +1552,7 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 	fileOp := files.NewFileOp()
 	includeDir := GetSitePath(website, SiteProxyDir)
 	if !fileOp.Stat(includeDir) {
-		_ = fileOp.CreateDir(includeDir, 0755)
+		_ = fileOp.CreateDir(includeDir, constant.DirPerm)
 	}
 	fileName := fmt.Sprintf("%s.conf", req.Name)
 	includePath := path.Join(includeDir, fileName)
@@ -1570,7 +1570,7 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 			case "create":
 				_ = fileOp.DeleteFile(includePath)
 			case "edit":
-				_ = fileOp.WriteFile(includePath, bytes.NewReader(oldContent), 0755)
+				_ = fileOp.WriteFile(includePath, bytes.NewReader(oldContent), constant.DirPerm)
 			}
 		}
 	}()
@@ -1654,7 +1654,7 @@ func (w WebsiteService) UpdateProxyCache(req request.NginxProxyCacheUpdate) (err
 	cacheDir := GetSitePath(website, SiteCacheDir)
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(cacheDir) {
-		_ = fileOp.CreateDir(cacheDir, 0755)
+		_ = fileOp.CreateDir(cacheDir, constant.DirPerm)
 	}
 	if req.Open {
 		proxyCachePath := fmt.Sprintf("/www/sites/%s/cache levels=1:2 keys_zone=proxy_cache_zone_of_%s:%d%s max_size=%d%s inactive=%d%s", website.Alias, website.Alias, req.ShareCache, req.ShareCacheUnit, req.CacheLimit, req.CacheLimitUnit, req.CacheExpire, req.CacheExpireUnit)
@@ -1811,12 +1811,12 @@ func (w WebsiteService) UpdateProxyFile(req request.NginxProxyUpdate) (err error
 	if err != nil {
 		return err
 	}
-	if err = fileOp.WriteFile(absolutePath, strings.NewReader(req.Content), 0755); err != nil {
+	if err = fileOp.WriteFile(absolutePath, strings.NewReader(req.Content), constant.DirPerm); err != nil {
 		return err
 	}
 	defer func() {
 		if err != nil {
-			_ = fileOp.WriteFile(absolutePath, bytes.NewReader(oldRewriteContent), 0755)
+			_ = fileOp.WriteFile(absolutePath, bytes.NewReader(oldRewriteContent), constant.DirPerm)
 		}
 	}()
 	return updateNginxConfig(constant.NginxScopeServer, nil, &website)
@@ -1886,7 +1886,7 @@ func (w WebsiteService) UpdateAuthBasic(req request.NginxAuthUpdate) (err error)
 	absoluteAuthPath := path.Join(nginxInstall.GetPath(), authPath)
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(path.Dir(absoluteAuthPath)) {
-		_ = fileOp.CreateDir(path.Dir(absoluteAuthPath), 0755)
+		_ = fileOp.CreateDir(path.Dir(absoluteAuthPath), constant.DirPerm)
 	}
 	if !fileOp.Stat(absoluteAuthPath) {
 		_ = fileOp.CreateFile(absoluteAuthPath)
@@ -2076,11 +2076,11 @@ func (w WebsiteService) UpdatePathAuthBasic(req request.NginxPathAuthUpdate) err
 	fileOp := files.NewFileOp()
 	authDir := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "path_auth")
 	if !fileOp.Stat(authDir) {
-		_ = fileOp.CreateDir(authDir, 0755)
+		_ = fileOp.CreateDir(authDir, constant.DirPerm)
 	}
 	passDir := path.Join(authDir, "pass")
 	if !fileOp.Stat(passDir) {
-		_ = fileOp.CreateDir(passDir, 0755)
+		_ = fileOp.CreateDir(passDir, constant.DirPerm)
 	}
 	confPath := path.Join(authDir, fmt.Sprintf("%s.conf", req.Name))
 	passPath := path.Join(passDir, fmt.Sprintf("%s.pass", req.Name))
@@ -2122,7 +2122,7 @@ func (w WebsiteService) UpdatePathAuthBasic(req request.NginxPathAuthUpdate) err
 	if req.Remark != "" {
 		line = fmt.Sprintf("%s:%s:%s\n", req.Username, passwdHash, req.Remark)
 	}
-	_ = fileOp.SaveFile(passPath, line, 0644)
+	_ = fileOp.SaveFile(passPath, line, constant.DirPerm)
 	if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 		return buserr.WithErr(constant.ErrUpdateBuWebsite, err)
 	}
@@ -2214,7 +2214,7 @@ func (w WebsiteService) UpdateAntiLeech(req request.NginxAntiLeechUpdate) (err e
 		return
 	}
 	if err = updateNginxConfig(constant.NginxScopeServer, nil, &website); err != nil {
-		_ = fileOp.WriteFile(nginxFull.SiteConfig.Config.FilePath, bytes.NewReader(backupContent), 0755)
+		_ = fileOp.WriteFile(nginxFull.SiteConfig.Config.FilePath, bytes.NewReader(backupContent), constant.DirPerm)
 		return
 	}
 	return
@@ -2311,7 +2311,7 @@ func (w WebsiteService) OperateRedirect(req request.NginxRedirectReq) (err error
 	includeDir := GetSitePath(website, SiteRedirectDir)
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(includeDir) {
-		_ = fileOp.CreateDir(includeDir, 0755)
+		_ = fileOp.CreateDir(includeDir, constant.DirPerm)
 	}
 	fileName := fmt.Sprintf("%s.conf", req.Name)
 	includePath := path.Join(includeDir, fileName)
@@ -2329,7 +2329,7 @@ func (w WebsiteService) OperateRedirect(req request.NginxRedirectReq) (err error
 			case "create":
 				_ = fileOp.DeleteFile(includePath)
 			case "edit":
-				_ = fileOp.WriteFile(includePath, bytes.NewReader(oldContent), 0755)
+				_ = fileOp.WriteFile(includePath, bytes.NewReader(oldContent), constant.DirPerm)
 			}
 		}
 	}()
@@ -2597,12 +2597,12 @@ func (w WebsiteService) UpdateRedirectFile(req request.NginxRedirectUpdate) (err
 	if err != nil {
 		return err
 	}
-	if err = fileOp.WriteFile(absolutePath, strings.NewReader(req.Content), 0755); err != nil {
+	if err = fileOp.WriteFile(absolutePath, strings.NewReader(req.Content), constant.DirPerm); err != nil {
 		return err
 	}
 	defer func() {
 		if err != nil {
-			_ = fileOp.WriteFile(absolutePath, bytes.NewReader(oldRewriteContent), 0755)
+			_ = fileOp.WriteFile(absolutePath, bytes.NewReader(oldRewriteContent), constant.DirPerm)
 		}
 	}()
 	return updateNginxConfig(constant.NginxScopeServer, nil, &website)
@@ -2662,7 +2662,7 @@ func (w WebsiteService) GetDefaultHtml(resourceType string) (*response.WebsiteHt
 	fileOp := files.NewFileOp()
 	defaultPath := path.Join(rootPath, "default")
 	if !fileOp.Stat(defaultPath) {
-		_ = fileOp.CreateDir(defaultPath, 0755)
+		_ = fileOp.CreateDir(defaultPath, constant.DirPerm)
 	}
 
 	res := &response.WebsiteHtmlRes{}
@@ -2721,7 +2721,7 @@ func (w WebsiteService) UpdateDefaultHtml(req request.WebsiteHtmlUpdate) error {
 	fileOp := files.NewFileOp()
 	defaultPath := path.Join(rootPath, "default")
 	if !fileOp.Stat(defaultPath) {
-		_ = fileOp.CreateDir(defaultPath, 0755)
+		_ = fileOp.CreateDir(defaultPath, constant.DirPerm)
 	}
 	var resourcePath string
 	switch req.Type {
@@ -2738,7 +2738,7 @@ func (w WebsiteService) UpdateDefaultHtml(req request.WebsiteHtmlUpdate) error {
 	default:
 		return nil
 	}
-	return fileOp.SaveFile(resourcePath, req.Content, 0644)
+	return fileOp.SaveFile(resourcePath, req.Content, constant.DirPerm)
 }
 
 func (w WebsiteService) GetLoadBalances(id uint) ([]dto.NginxUpstream, error) {
@@ -2848,7 +2848,7 @@ func (w WebsiteService) CreateLoadBalance(req request.WebsiteLBCreate) error {
 	includeDir := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "upstream")
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(includeDir) {
-		_ = fileOp.CreateDir(includeDir, 0644)
+		_ = fileOp.CreateDir(includeDir, constant.DirPerm)
 	}
 	filePath := path.Join(includeDir, fmt.Sprintf("%s.conf", req.Name))
 	if fileOp.Stat(filePath) {
@@ -3020,12 +3020,12 @@ func (w WebsiteService) UpdateLoadBalanceFile(req request.WebsiteLBUpdateFile) e
 	if err != nil {
 		return err
 	}
-	if err = fileOp.WriteFile(filePath, strings.NewReader(req.Content), 0755); err != nil {
+	if err = fileOp.WriteFile(filePath, strings.NewReader(req.Content), constant.DirPerm); err != nil {
 		return err
 	}
 	defer func() {
 		if err != nil {
-			_ = fileOp.WriteFile(filePath, bytes.NewReader(oldContent), 0755)
+			_ = fileOp.WriteFile(filePath, bytes.NewReader(oldContent), constant.DirPerm)
 		}
 	}()
 	return opNginx(nginxInstall.ContainerName, constant.NginxReload)

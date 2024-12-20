@@ -365,7 +365,7 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) (*model.Website
 		}
 	}
 
-	logFile, _ := os.OpenFile(path.Join(constant.SSLLogDir, fmt.Sprintf("%s-ssl-%d.log", websiteSSL.PrimaryDomain, websiteSSL.ID)), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
+	logFile, _ := os.OpenFile(path.Join(constant.SSLLogDir, fmt.Sprintf("%s-ssl-%d.log", websiteSSL.PrimaryDomain, websiteSSL.ID)), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, constant.FilePerm)
 	defer logFile.Close()
 	logger := log.New(logFile, "", log.LstdFlags)
 	logger.Println(i18n.GetMsgWithMap("ApplySSLSuccess", map[string]interface{}{"domain": strings.Join(domains, ",")}))
@@ -430,13 +430,13 @@ func (w WebsiteCAService) DownloadFile(id uint) (*os.File, error) {
 			return nil, err
 		}
 	}
-	if err = fileOp.CreateDir(dir, 0666); err != nil {
+	if err = fileOp.CreateDir(dir, constant.DirPerm); err != nil {
 		return nil, err
 	}
-	if err = fileOp.WriteFile(path.Join(dir, "ca.csr"), strings.NewReader(ca.CSR), 0644); err != nil {
+	if err = fileOp.WriteFile(path.Join(dir, "ca.csr"), strings.NewReader(ca.CSR), constant.DirPerm); err != nil {
 		return nil, err
 	}
-	if err = fileOp.WriteFile(path.Join(dir, "private.key"), strings.NewReader(ca.PrivateKey), 0644); err != nil {
+	if err = fileOp.WriteFile(path.Join(dir, "private.key"), strings.NewReader(ca.PrivateKey), constant.DirPerm); err != nil {
 		return nil, err
 	}
 	fileName := ca.Name + ".zip"

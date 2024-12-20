@@ -170,7 +170,7 @@ func (u *ImageService) ImageBuild(req dto.ImageBuild) error {
 		}
 
 		pathItem := fmt.Sprintf("%s/Dockerfile", dir)
-		file, err := os.OpenFile(pathItem, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+		file, err := os.OpenFile(pathItem, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, constant.FilePerm)
 		if err != nil {
 			return err
 		}
@@ -317,7 +317,7 @@ func (u *ImageService) ImageSave(req dto.ImageSave) error {
 		return err
 	}
 	defer out.Close()
-	file, err := os.OpenFile(fmt.Sprintf("%s/%s.tar", req.Path, req.Name), os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0666)
+	file, err := os.OpenFile(fmt.Sprintf("%s/%s.tar", req.Path, req.Name), os.O_WRONLY|os.O_CREATE|os.O_EXCL, constant.FilePerm)
 	if err != nil {
 		return err
 	}

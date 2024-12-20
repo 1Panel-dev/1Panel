@@ -610,7 +610,7 @@ func mergeChunks(fileName string, fileDir string, dstDir string, chunkCount int,
 	dstDir = strings.TrimSpace(dstDir)
 	mode, _ := files.GetParentMode(dstDir)
 	if mode == 0 {
-		mode = 0755
+		mode = constant.DirPerm
 	}
 	if _, err := os.Stat(dstDir); err != nil && os.IsNotExist(err) {
 		if err = op.CreateDir(dstDir, mode); err != nil {
@@ -681,7 +681,7 @@ func (b *BaseApi) UploadChunkFiles(c *gin.Context) {
 	fileOp := files.NewFileOp()
 	tmpDir := path.Join(global.CONF.System.TmpDir, "upload")
 	if !fileOp.Stat(tmpDir) {
-		if err := fileOp.CreateDir(tmpDir, 0755); err != nil {
+		if err := fileOp.CreateDir(tmpDir, constant.DirPerm); err != nil {
 			helper.BadRequest(c, err)
 			return
 		}
@@ -692,7 +692,7 @@ func (b *BaseApi) UploadChunkFiles(c *gin.Context) {
 		if fileOp.Stat(fileDir) {
 			_ = fileOp.DeleteDir(fileDir)
 		}
-		_ = os.MkdirAll(fileDir, 0755)
+		_ = os.MkdirAll(fileDir, constant.DirPerm)
 	}
 	filePath := filepath.Join(fileDir, filename)
 
@@ -720,7 +720,7 @@ func (b *BaseApi) UploadChunkFiles(c *gin.Context) {
 	}
 
 	chunkPath := filepath.Join(fileDir, fmt.Sprintf("%s.%d", filename, chunkIndex))
-	err = os.WriteFile(chunkPath, chunkData, 0644)
+	err = os.WriteFile(chunkPath, chunkData, constant.DirPerm)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, buserr.WithMap(constant.ErrFileUpload, map[string]interface{}{"name": filename, "detail": err.Error()}, err))
 		return

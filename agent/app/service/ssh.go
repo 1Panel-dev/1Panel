@@ -156,7 +156,7 @@ func (u *SSHService) Update(req dto.SSHUpdate) error {
 	}
 	lines := strings.Split(string(sshConf), "\n")
 	newFiles := updateSSHConf(lines, req.Key, req.NewValue)
-	file, err := os.OpenFile(sshPath, os.O_WRONLY|os.O_TRUNC, 0666)
+	file, err := os.OpenFile(sshPath, os.O_WRONLY|os.O_TRUNC, constant.FilePerm)
 	if err != nil {
 		return err
 	}
@@ -200,7 +200,7 @@ func (u *SSHService) UpdateByFile(value string) error {
 		return err
 	}
 
-	file, err := os.OpenFile(sshPath, os.O_WRONLY|os.O_TRUNC, 0666)
+	file, err := os.OpenFile(sshPath, os.O_WRONLY|os.O_TRUNC, constant.FilePerm)
 	if err != nil {
 		return err
 	}

@@ -220,11 +220,11 @@ func opNginx(containerName, operate string) error {
 
 func nginxCheckAndReload(oldContent string, filePath string, containerName string) error {
 	if err := opNginx(containerName, constant.NginxCheck); err != nil {
-		_ = files.NewFileOp().WriteFile(filePath, strings.NewReader(oldContent), 0644)
+		_ = files.NewFileOp().WriteFile(filePath, strings.NewReader(oldContent), constant.DirPerm)
 		return err
 	}
 	if err := opNginx(containerName, constant.NginxReload); err != nil {
-		_ = files.NewFileOp().WriteFile(filePath, strings.NewReader(oldContent), 0644)
+		_ = files.NewFileOp().WriteFile(filePath, strings.NewReader(oldContent), constant.DirPerm)
 		return err
 	}
 	return nil

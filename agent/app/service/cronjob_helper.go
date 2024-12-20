@@ -106,7 +106,7 @@ func (u *CronjobService) handleShell(cronjob model.Cronjob, logPath string) erro
 	if cronjob.ScriptMode == "input" {
 		fileItem := pathUtils.Join(global.CONF.System.BaseDir, "1panel", "task", "shell", cronjob.Name, cronjob.Name+".sh")
 		_ = os.MkdirAll(pathUtils.Dir(fileItem), os.ModePerm)
-		shellFile, err := os.OpenFile(fileItem, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
+		shellFile, err := os.OpenFile(fileItem, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, constant.FilePerm)
 		if err != nil {
 			return err
 		}
@@ -234,7 +234,7 @@ func (u *CronjobService) handleCutWebsiteLog(cronjob *model.Cronjob, startTime t
 		srcErrorLogPath := pathUtils.Join(websiteLogDir, "error.log")
 		dstLogDir := pathUtils.Join(global.CONF.System.Backup, "log", "website", website.Alias)
 		if !fileOp.Stat(dstLogDir) {
-			_ = os.MkdirAll(dstLogDir, 0755)
+			_ = os.MkdirAll(dstLogDir, constant.DirPerm)
 		}
 
 		dstName := fmt.Sprintf("%s_log_%s.gz", website.PrimaryDomain, startTime.Format(constant.DateTimeSlimLayout))
@@ -248,8 +248,8 @@ func (u *CronjobService) handleCutWebsiteLog(cronjob *model.Cronjob, startTime t
 			global.LOG.Error(websiteErr.Error())
 			continue
 		} else {
-			_ = fileOp.WriteFile(srcAccessLogPath, strings.NewReader(""), 0755)
-			_ = fileOp.WriteFile(srcErrorLogPath, strings.NewReader(""), 0755)
+			_ = fileOp.WriteFile(srcAccessLogPath, strings.NewReader(""), constant.DirPerm)
+			_ = fileOp.WriteFile(srcErrorLogPath, strings.NewReader(""), constant.DirPerm)
 		}
 		msg := i18n.GetMsgWithMap("CutWebsiteLogSuccess", map[string]interface{}{"name": website.PrimaryDomain, "path": dstFilePath})
 		msgs = append(msgs, msg)

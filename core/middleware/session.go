@@ -23,7 +23,7 @@ func SessionAuth() gin.HandlerFunc {
 		}
 		psession, err := global.SESSION.Get(c)
 		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrUnauthorized, constant.ErrTypeNotLogin, nil)
+			helper.ErrorWithDetail(c, constant.CodeErrUnauthorized, constant.ErrTypeNotLogin, err)
 			return
 		}
 		settingRepo := repo.NewISettingRepo()

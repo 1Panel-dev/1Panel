@@ -1,6 +1,7 @@
 package log
 
 import (
+	"github.com/1Panel-dev/1Panel/core/constant"
 	"log"
 	"os"
 	"path"
@@ -84,7 +85,7 @@ func NewWriterFromConfig(c *Config) (RollingWriter, error) {
 		return nil, err
 	}
 	filepath := FilePath(c)
-	file, err := os.OpenFile(filepath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
+	file, err := os.OpenFile(filepath, os.O_RDWR|os.O_CREATE|os.O_APPEND, constant.DirPerm)
 	if err != nil {
 		return nil, err
 	}

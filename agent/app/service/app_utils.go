@@ -635,7 +635,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		if fileOp.Stat(sourceScripts) {
 			dstScripts := path.Join(install.GetPath(), "scripts")
 			_ = fileOp.DeleteDir(dstScripts)
-			_ = fileOp.CreateDir(dstScripts, 0755)
+			_ = fileOp.CreateDir(dstScripts, constant.DirPerm)
 			scriptCmd := exec.Command("cp", "-rf", sourceScripts+"/.", dstScripts+"/")
 			_, _ = scriptCmd.CombinedOutput()
 		}
@@ -678,7 +678,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 				return err
 			}
 			newConfDir := path.Join(constant.DataDir, "www", "conf.d")
-			_ = fileOp.CreateDir(newConfDir, 0644)
+			_ = fileOp.CreateDir(newConfDir, constant.DirPerm)
 			oldConfDir := path.Join(install.GetPath(), "conf/conf.d")
 			items, err := os.ReadDir(oldConfDir)
 			if err != nil {
@@ -732,7 +732,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 			return err
 		}
 
-		if err = fileOp.WriteFile(install.GetComposePath(), strings.NewReader(install.DockerCompose), 0775); err != nil {
+		if err = fileOp.WriteFile(install.GetComposePath(), strings.NewReader(install.DockerCompose), constant.FilePerm); err != nil {
 			return err
 		}
 
@@ -871,10 +871,10 @@ func downloadApp(app model.App, appDetail model.AppDetail, appInstall *model.App
 		return
 	}
 	if !fileOp.Stat(appDownloadDir) {
-		_ = fileOp.CreateDir(appDownloadDir, 0755)
+		_ = fileOp.CreateDir(appDownloadDir, constant.DirPerm)
 	}
 	if !fileOp.Stat(appVersionDir) {
-		_ = fileOp.CreateDir(appVersionDir, 0755)
+		_ = fileOp.CreateDir(appVersionDir, constant.DirPerm)
 	}
 	if logger == nil {
 		global.LOG.Infof("download app[%s] from %s", app.Name, appDetail.DownloadUrl)
@@ -938,7 +938,7 @@ func copyData(task *task.Task, app model.App, appDetail model.AppDetail, appInst
 	resourceDir := path.Join(appResourceDir, appKey, appDetail.Version)
 
 	if !fileOp.Stat(installAppDir) {
-		if err = fileOp.CreateDir(installAppDir, 0755); err != nil {
+		if err = fileOp.CreateDir(installAppDir, constant.DirPerm); err != nil {
 			return
 		}
 	}
@@ -962,7 +962,7 @@ func copyData(task *task.Task, app model.App, appDetail model.AppDetail, appInst
 	if err = env.Write(envParams, envPath); err != nil {
 		return
 	}
-	if err := fileOp.WriteFile(appInstall.GetComposePath(), strings.NewReader(appInstall.DockerCompose), 0755); err != nil {
+	if err := fileOp.WriteFile(appInstall.GetComposePath(), strings.NewReader(appInstall.DockerCompose), constant.DirPerm); err != nil {
 		return err
 	}
 	return

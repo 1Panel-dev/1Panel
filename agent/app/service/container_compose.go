@@ -298,7 +298,7 @@ func (u *ContainerService) loadPath(req *dto.ComposeCreate) error {
 		}
 
 		path := fmt.Sprintf("%s/docker-compose.yml", dir)
-		file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+		file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, constant.FilePerm)
 		if err != nil {
 			return err
 		}
@@ -350,7 +350,7 @@ func newComposeEnv(pathItem string, env []string) error {
 		return nil
 	}
 	envFilePath := path.Join(path.Dir(pathItem), "1panel.env")
-	file, err := os.OpenFile(envFilePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	file, err := os.OpenFile(envFilePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, constant.FilePerm)
 	if err != nil {
 		global.LOG.Errorf("failed to create env file: %v", err)
 		return err
