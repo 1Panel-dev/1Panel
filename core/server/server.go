@@ -73,9 +73,11 @@ func Start() {
 		if err != nil {
 			panic(err)
 		}
+		constant.CertStore.Store(&cert)
+
 		server.TLSConfig = &tls.Config{
 			GetCertificate: func(info *tls.ClientHelloInfo) (*tls.Certificate, error) {
-				return &cert, nil
+				return constant.CertStore.Load().(*tls.Certificate), nil
 			},
 		}
 		global.LOG.Infof("listen at https://%s:%s [%s]", global.CONF.System.BindAddress, global.CONF.System.Port, tcpItem)

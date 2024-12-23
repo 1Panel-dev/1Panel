@@ -7,8 +7,7 @@ import (
 )
 
 func Init() {
-	//TODO 国际化处理
-	//go syncApp()
+	go syncApp()
 	go syncInstalledApp()
 	go syncRuntime()
 	go syncSSL()

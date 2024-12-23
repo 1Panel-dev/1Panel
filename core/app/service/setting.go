@@ -40,6 +40,8 @@ type ISettingService interface {
 
 	GetTerminalInfo() (*dto.TerminalInfo, error)
 	UpdateTerminal(req dto.TerminalInfo) error
+
+	UpdateSystemSSL() error
 }
 
 func NewISettingService() ISettingService {
@@ -198,15 +200,6 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 		}
 		_ = os.Remove(path.Join(secretDir, "server.crt"))
 		_ = os.Remove(path.Join(secretDir, "server.key"))
-		sID, _ := c.Cookie(constant.SessionName)
-		c.SetCookie(constant.SessionName, sID, 0, "", "", false, true)
-
-		go func() {
-			_, err := cmd.Exec("systemctl restart 1panel.service")
-			if err != nil {
-				global.LOG.Errorf("restart system failed, err: %v", err)
-			}
-		}()
 		return nil
 	}
 	if _, err := os.Stat(secretDir); err != nil && os.IsNotExist(err) {
@@ -257,17 +250,7 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 	if err := settingRepo.Update("SSL", req.SSL); err != nil {
 		return err
 	}
-
-	sID, _ := c.Cookie(constant.SessionName)
-	c.SetCookie(constant.SessionName, sID, 0, "", "", true, true)
-	go func() {
-		time.Sleep(1 * time.Second)
-		_, err := cmd.Exec("systemctl restart 1panel.service")
-		if err != nil {
-			global.LOG.Errorf("restart system failed, err: %v", err)
-		}
-	}()
-	return nil
+	return u.UpdateSystemSSL()
 }
 
 func (u *SettingService) LoadFromCert() (*dto.SSLInfo, error) {
@@ -391,6 +374,25 @@ func (u *SettingService) UpdatePassword(c *gin.Context, old, new string) error {
 		return err
 	}
 	_ = global.SESSION.Clean()
+	return nil
+}
+
+func (u *SettingService) UpdateSystemSSL() error {
+	certPath := path.Join(global.CONF.System.BaseDir, "1panel/secret/server.crt")
+	keyPath := path.Join(global.CONF.System.BaseDir, "1panel/secret/server.key")
+	certificate, err := os.ReadFile(certPath)
+	if err != nil {
+		return err
+	}
+	key, err := os.ReadFile(keyPath)
+	if err != nil {
+		return err
+	}
+	cert, err := tls.X509KeyPair(certificate, key)
+	if err != nil {
+		return err
+	}
+	constant.CertStore.Store(&cert)
 	return nil
 }
 

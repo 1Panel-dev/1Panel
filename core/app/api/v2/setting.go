@@ -369,3 +369,16 @@ func (b *BaseApi) MFABind(c *gin.Context) {
 
 	helper.SuccessWithData(c, nil)
 }
+
+func (b *BaseApi) ReloadSSL(c *gin.Context) {
+	clientIP := c.ClientIP()
+	if clientIP != "127.0.0.1" {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, errors.New("only localhost can reload ssl"))
+		return
+	}
+	if err := settingService.UpdateSystemSSL(); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}

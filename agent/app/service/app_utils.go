@@ -1022,7 +1022,7 @@ func checkContainerNameIsExist(containerName, appDir string) (bool, error) {
 	return false, nil
 }
 
-func upApp(task *task.Task, appInstall *model.AppInstall, pullImages bool) {
+func upApp(task *task.Task, appInstall *model.AppInstall, pullImages bool) error {
 	upProject := func(appInstall *model.AppInstall) (err error) {
 		var (
 			out    string
@@ -1079,14 +1079,6 @@ func upApp(task *task.Task, appInstall *model.AppInstall, pullImages bool) {
 		task.LogSuccess(logStr)
 		return
 	}
-	if err := upProject(appInstall); err != nil {
-		if appInstall.Message == "" {
-			appInstall.Message = err.Error()
-		}
-		appInstall.Status = constant.UpErr
-	} else {
-		appInstall.Status = constant.Running
-	}
 	exist, _ := appInstallRepo.GetFirst(commonRepo.WithByID(appInstall.ID))
 	if exist.ID > 0 {
 		containerNames, err := getContainerNames(*appInstall)
@@ -1096,6 +1088,16 @@ func upApp(task *task.Task, appInstall *model.AppInstall, pullImages bool) {
 			}
 			_ = appInstallRepo.Save(context.Background(), appInstall)
 		}
+	}
+	if err := upProject(appInstall); err != nil {
+		if appInstall.Message == "" {
+			appInstall.Message = err.Error()
+		}
+		appInstall.Status = constant.UpErr
+		return err
+	} else {
+		appInstall.Status = constant.Running
+		return nil
 	}
 }
 

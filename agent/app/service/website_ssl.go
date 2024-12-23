@@ -6,6 +6,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	http2 "github.com/1Panel-dev/1Panel/agent/utils/http"
 	"log"
 	"os"
 	"path"
@@ -201,6 +202,10 @@ func reloadSystemSSL(websiteSSL *model.WebsiteSSL, logger *log.Logger) {
 			return
 		}
 		if err := fileOp.WriteFile(keyPath, strings.NewReader(websiteSSL.PrivateKey), 0600); err != nil {
+			logger.Printf("Failed to update the SSL certificate for 1Panel System domain [%s] , err:%s", websiteSSL.PrimaryDomain, err.Error())
+			return
+		}
+		if err := http2.PostLocalCore("/core/settings/ssl/reload"); err != nil {
 			logger.Printf("Failed to update the SSL certificate for 1Panel System domain [%s] , err:%s", websiteSSL.PrimaryDomain, err.Error())
 			return
 		}

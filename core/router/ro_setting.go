@@ -16,6 +16,8 @@ func (s *SettingRouter) InitRouter(Router *gin.RouterGroup) {
 		Use(middleware.JwtAuth()).
 		Use(middleware.SessionAuth()).
 		Use(middleware.PasswordExpired())
+
+	noAuthRouter := Router.Group("settings")
 	baseApi := v2.ApiGroupApp.BaseApi
 	{
 		router.POST("/search", baseApi.GetSettingInfo)
@@ -39,5 +41,7 @@ func (s *SettingRouter) InitRouter(Router *gin.RouterGroup) {
 		settingRouter.POST("/upgrade", baseApi.Upgrade)
 		settingRouter.POST("/upgrade/notes", baseApi.GetNotesByVersion)
 		settingRouter.GET("/upgrade", baseApi.GetUpgradeInfo)
+
+		noAuthRouter.POST("/ssl/reload", baseApi.ReloadSSL)
 	}
 }

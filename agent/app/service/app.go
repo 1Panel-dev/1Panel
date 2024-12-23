@@ -488,7 +488,9 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 		if err = runScript(t, appInstall, "init"); err != nil {
 			return err
 		}
-		upApp(t, appInstall, req.PullImage)
+		if err = upApp(t, appInstall, req.PullImage); err != nil {
+			return err
+		}
 		updateToolApp(appInstall)
 		return nil
 	}
