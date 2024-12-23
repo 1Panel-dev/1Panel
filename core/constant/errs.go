@@ -76,4 +76,5 @@ var (
 	ErrFreeNodeLimit = "ErrFreeNodeLimit"
 	ErrNodeBound     = "ErrNodeBound"
 	ErrNodeBind      = "ErrNodeBind"
+	ConnInfoNotMatch = "ConnInfoNotMatch"
 )

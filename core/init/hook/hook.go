@@ -14,11 +14,6 @@ import (
 
 func Init() {
 	settingRepo := repo.NewISettingRepo()
-	masterSetting, err := settingRepo.Get(repo.WithByKey("MasterAddr"))
-	if err != nil {
-		global.LOG.Errorf("load master addr from setting failed, err: %v", err)
-	}
-	global.CONF.System.MasterAddr = masterSetting.Value
 	portSetting, err := settingRepo.Get(repo.WithByKey("ServerPort"))
 	if err != nil {
 		global.LOG.Errorf("load service port from setting failed, err: %v", err)

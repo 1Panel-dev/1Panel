@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"os/exec"
+	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/core/buserr"
@@ -20,6 +21,14 @@ func SudoHandleCmd() string {
 		return "sudo "
 	}
 	return ""
+}
+
+func Which(name string) bool {
+	stdout, err := Execf("which %s", name)
+	if err != nil || (len(strings.ReplaceAll(stdout, "\n", "")) == 0) {
+		return false
+	}
+	return true
 }
 
 func Execf(cmdStr string, a ...interface{}) (string, error) {

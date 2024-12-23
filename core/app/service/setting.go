@@ -9,6 +9,7 @@ import (
 	"net"
 	"os"
 	"path"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -21,6 +22,8 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/cmd"
 	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
+	"github.com/1Panel-dev/1Panel/core/utils/firewall"
+	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/gin-gonic/gin"
 )
 
@@ -75,6 +78,13 @@ func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {
 }
 
 func (u *SettingService) Update(key, value string) error {
+	oldVal, err := settingRepo.Get(repo.WithByKey(key))
+	if err != nil {
+		return err
+	}
+	if oldVal.Value == value {
+		return nil
+	}
 	switch key {
 	case "AppStoreLastModified":
 		exist, _ := settingRepo.Get(repo.WithByKey("AppStoreLastModified"))
@@ -82,8 +92,6 @@ func (u *SettingService) Update(key, value string) error {
 			_ = settingRepo.Create("AppStoreLastModified", value)
 			return nil
 		}
-	case "MasterAddr":
-		global.CONF.System.MasterAddr = value
 	}
 
 	if err := settingRepo.Update(key, value); err != nil {
@@ -105,7 +113,12 @@ func (u *SettingService) Update(key, value string) error {
 		}
 	case "UserName", "Password":
 		_ = global.SESSION.Clean()
-
+	case "MasterAddr":
+		go func() {
+			if err := xpack.UpdateMasterAddr(value); err != nil {
+				global.LOG.Errorf("update master addr failed, err: %v", err)
+			}
+		}()
 	}
 
 	return nil
@@ -174,16 +187,40 @@ func (u *SettingService) UpdatePort(port uint) error {
 	if common.ScanPort(int(port)) {
 		return buserr.WithDetail(constant.ErrPortInUsed, port, nil)
 	}
-	// TODO 修改防火墙端口
+	oldPort, err := settingRepo.Get(repo.WithByKey("Port"))
+	if err != nil {
+		return err
+	}
+	if oldPort.Value == fmt.Sprintf("%v", port) {
+		return nil
+	}
+	if err := firewall.UpdatePort(oldPort.Value, fmt.Sprintf("%v", port)); err != nil {
+		return err
+	}
 
 	if err := settingRepo.Update("ServerPort", strconv.Itoa(int(port))); err != nil {
 		return err
 	}
 	go func() {
 		time.Sleep(1 * time.Second)
-		_, err := cmd.Exec("systemctl restart 1panel.service")
+		defer func() {
+			if _, err := cmd.Exec("systemctl restart 1panel.service"); err != nil {
+				global.LOG.Errorf("restart system port failed, err: %v", err)
+			}
+		}()
+		masterAddr, err := settingRepo.Get(repo.WithByKey("MasterAddr"))
 		if err != nil {
-			global.LOG.Errorf("restart system port failed, err: %v", err)
+			global.LOG.Errorf("load master addr from db failed, err: %v", err)
+			return
+		}
+		if len(masterAddr.Value) != 0 {
+			oldMasterPort := loadPort(masterAddr.Value)
+			if len(oldMasterPort) != 0 {
+				if err := xpack.UpdateMasterAddr(strings.ReplaceAll(masterAddr.Value, oldMasterPort, fmt.Sprintf("%v", port))); err != nil {
+					global.LOG.Errorf("update master addr from db failed, err: %v", err)
+					return
+				}
+			}
 		}
 	}()
 	return nil
@@ -250,7 +287,31 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 	if err := settingRepo.Update("SSL", req.SSL); err != nil {
 		return err
 	}
-	return u.UpdateSystemSSL()
+
+	if err := u.UpdateSystemSSL(); err != nil {
+		return err
+	}
+
+	go func() {
+		oldSSL, _ := settingRepo.Get(repo.WithByKey("SSL"))
+		if oldSSL.Value != req.SSL {
+			masterAddr, err := settingRepo.Get(repo.WithByKey("MasterAddr"))
+			if err != nil {
+				global.LOG.Errorf("load master addr from db failed, err: %v", err)
+				return
+			}
+			addrItem := masterAddr.Value
+			if req.SSL == constant.StatusDisable {
+				addrItem = strings.ReplaceAll(addrItem, "https://", "http://")
+			} else {
+				addrItem = strings.ReplaceAll(addrItem, "http://", "https://")
+			}
+			if err := xpack.UpdateMasterAddr(addrItem); err != nil {
+				global.LOG.Errorf("update master addr from db failed, err: %v", err)
+			}
+		}
+	}()
+	return nil
 }
 
 func (u *SettingService) LoadFromCert() (*dto.SSLInfo, error) {
@@ -451,4 +512,18 @@ func checkCertValid() error {
 	}
 
 	return nil
+}
+
+func loadPort(address string) string {
+	re := regexp.MustCompile(`(?:(?:\[([0-9a-fA-F:]+)\])|([^:/\s]+))(?::(\d+))?$`)
+	matches := re.FindStringSubmatch(address)
+	if len(matches) <= 0 {
+		return ""
+	}
+	var port string
+	port = matches[3]
+	if len(port) != 0 {
+		return port
+	}
+	return ""
 }
