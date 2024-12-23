@@ -75,7 +75,7 @@ export const routes: RouteRecordRaw[] = [
     {
         path: '/:code?',
         name: 'entrance',
-        component: () => import('@/views/login/entrance/index.vue'),
+        component: () => import('@/views/login/index.vue'),
         props: true,
     },
     ...routerArray,

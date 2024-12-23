@@ -86,6 +86,13 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, e
 	}
 	fileOp := files.NewFileOp()
 
+	runtimeDir := path.Join(constant.RuntimeDir, create.Type)
+	if !fileOp.Stat(runtimeDir) {
+		if err := fileOp.CreateDir(runtimeDir, constant.DirPerm); err != nil {
+			return nil, err
+		}
+	}
+
 	switch create.Type {
 	case constant.RuntimePHP:
 		if create.Resource == constant.ResourceLocal {

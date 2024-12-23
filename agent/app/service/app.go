@@ -70,10 +70,7 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 	if req.Resource != "" && req.Resource != "all" {
 		opts = append(opts, appRepo.WithResource(req.Resource))
 	}
-	if req.Type == "php" {
-		info, _ := NewISettingService().GetSettingInfo()
-		opts = append(opts, appRepo.WithPanelVersion(info.SystemVersion))
-	}
+
 	if req.ShowCurrentArch {
 		info, err := NewIDashboardService().LoadOsInfo()
 		if err != nil {
@@ -101,12 +98,22 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 		opts = append(opts, commonRepo.WithByIDs(appIds))
 	}
 	var res response.AppRes
+
 	total, apps, err := appRepo.Page(req.Page, req.PageSize, opts...)
 	if err != nil {
 		return nil, err
 	}
 	var appDTOs []*response.AppDto
+	info := &dto.SettingInfo{}
+	if req.Type == "php" {
+		info, _ = NewISettingService().GetSettingInfo()
+	}
 	for _, ap := range apps {
+		if req.Type == "php" {
+			if ap.RequiredPanelVersion == 0 || !common.CompareAppVersion(fmt.Sprintf("%f", ap.RequiredPanelVersion), info.SystemVersion) {
+				continue
+			}
+		}
 		appDTO := &response.AppDto{
 			ID:          ap.ID,
 			Name:        ap.Name,
@@ -789,7 +796,7 @@ func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
 		return res, err
 	}
 	if list.Extra.Version != "" && setting.SystemVersion != list.Extra.Version && !common.CompareVersion(setting.SystemVersion, list.Extra.Version) {
-		global.LOG.Errorf("The current version is too low to synchronize with the App Store. The minimum required version is %s", list.Extra.Version)
+		global.LOG.Errorf("The current version %s is too low to synchronize with the App Store. The minimum required version is %s", setting.SystemVersion, list.Extra.Version)
 		return nil, buserr.New("ErrVersionTooLow")
 	}
 	res.AppList = list

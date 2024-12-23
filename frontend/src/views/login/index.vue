@@ -29,9 +29,20 @@ import { getXpackSettingForTheme } from '@/utils/xpack';
 const gStore = GlobalStore();
 const loading = ref();
 
+const mySafetyCode = defineProps({
+    code: {
+        type: String,
+        default: '',
+    },
+});
+
 const screenWidth = ref(null);
 
 const getStatus = async () => {
+    let code = mySafetyCode.code;
+    if (code != '') {
+        gStore.entrance = code;
+    }
     loading.value = true;
     await checkIsSafety(gStore.entrance)
         .then((res) => {

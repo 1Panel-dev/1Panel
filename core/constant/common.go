@@ -132,6 +132,7 @@ var WebUrlMap = map[string]struct{}{
 	"/xpack/alert/log":         {},
 	"/xpack/alert/setting":     {},
 	"/xpack/setting":           {},
+	"xpack/node":               {},
 }
 
 var DynamicRoutes = []string{

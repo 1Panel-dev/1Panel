@@ -47,6 +47,33 @@ func CompareVersion(version1, version2 string) bool {
 	return false
 }
 
+func CompareAppVersion(version1, version2 string) bool {
+	v1s := extractNumbers(version1)
+	v2s := extractNumbers(version2)
+
+	maxLen := max(len(v1s), len(v2s))
+	v1s = append(v1s, make([]string, maxLen-len(v1s))...)
+	v2s = append(v2s, make([]string, maxLen-len(v2s))...)
+
+	for i := 0; i < maxLen; i++ {
+		v1, err1 := strconv.Atoi(v1s[i])
+		v2, err2 := strconv.Atoi(v2s[i])
+		if err1 != nil {
+			v1 = 0
+		}
+		if err2 != nil {
+			v2 = 0
+		}
+		if v1 > v2 {
+			return true
+		}
+		if v1 < v2 {
+			return false
+		}
+	}
+	return true
+}
+
 func ComparePanelVersion(version1, version2 string) bool {
 	if version1 == version2 {
 		return false
