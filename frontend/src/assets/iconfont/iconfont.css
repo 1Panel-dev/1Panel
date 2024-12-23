@@ -1,201 +1,144 @@
 @font-face {
-  font-family: "panel"; /* Project id 3575356 */
-  src: url('iconfont.woff2?t=1723798525783') format('woff2'),
-       url('iconfont.woff?t=1723798525783') format('woff'),
-       url('iconfont.ttf?t=1723798525783') format('truetype'),
-       url('iconfont.svg?t=1723798525783#panel') format('svg');
+  font-family: "iconfont"; /* Project id 4776196 */
+  src: url('iconfont.woff2?t=1734689625014') format('woff2'),
+       url('iconfont.woff?t=1734689625014') format('woff'),
+       url('iconfont.ttf?t=1734689625014') format('truetype');
 }
 
-.panel {
-  font-family: "panel" !important;
+.iconfont {
+  font-family: "iconfont" !important;
   font-size: 16px;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-.p-zhongduan:before {
-  content: "\e731";
+.p-node-1:before {
+  content: "\e61a";
 }
 
-.p-docker1:before {
-  content: "\e76a";
+.p-node-2:before {
+  content: "\e647";
 }
 
-.p-Firefox:before {
-  content: "\e87c";
+.p-tongyijiancha:before {
+  content: "\e619";
 }
 
-.p-m-ios:before {
-  content: "\e60e";
+.p-alert-3:before {
+  content: "\e728";
 }
 
-.p-m-pc:before {
-  content: "\e771";
+.p-file-zip:before {
+  content: "\e606";
 }
 
-.p-m-theworld:before {
-  content: "\e947";
+.p-file-normal:before {
+  content: "\e7ac";
 }
 
-.p-m-android:before {
-  content: "\e9e0";
+.p-txt:before {
+  content: "\e6e3";
 }
 
-.p-m-tencent:before {
-  content: "\e609";
+.p-file-folder:before {
+  content: "\e600";
 }
 
-.p-m-windows:before {
-  content: "\e6a0";
+.p-file-unknown:before {
+  content: "\e601";
 }
 
-.p-m-machine:before {
-  content: "\e862";
+.p-file-txt:before {
+  content: "\e602";
 }
 
-.p-m-mobile:before {
-  content: "\e620";
+.p-language:before {
+  content: "\e605";
 }
 
-.p-m-ucweb:before {
+.p-theme:before {
+  content: "\e638";
+}
+
+.p-arrow-right:before {
+  content: "\e665";
+}
+
+.p-docker:before {
+  content: "\e659";
+}
+
+.p-appstore:before {
+  content: "\eb65";
+}
+
+.p-website:before {
+  content: "\e781";
+}
+
+.p-config:before {
+  content: "\e78e";
+}
+
+.p-appstore1:before {
+  content: "\e792";
+}
+
+.p-log:before {
+  content: "\e793";
+}
+
+.p-host:before {
+  content: "\e7b1";
+}
+
+.p-home:before {
+  content: "\e7c6";
+}
+
+.p-plan:before {
+  content: "\e746";
+}
+
+.p-database:before {
+  content: "\e754";
+}
+
+.p-rejected-order:before {
+  content: "\e75e";
+}
+
+.p-toolbox:before {
+  content: "\e769";
+}
+
+.p-yingwen:before {
+  content: "\e6c3";
+}
+
+.p-zhongwen:before {
+  content: "\e6c8";
+}
+
+.p-logout:before {
+  content: "\e8fe";
+}
+
+.p-taolun:before {
   content: "\e603";
 }
 
-.p-m-edge:before {
-  content: "\e8e2";
+.p-bug:before {
+  content: "\e616";
 }
 
-.p-m-2345explorer:before {
-  content: "\e60a";
+.p-huaban88:before {
+  content: "\e67c";
 }
 
-.p-m-chrome:before {
-  content: "\ea09";
-}
-
-.p-m-opera:before {
-  content: "\ea0e";
-}
-
-.p-m-linux:before {
-  content: "\e80b";
-}
-
-.p-m-maxthon:before {
-  content: "\e676";
-}
-
-.p-m-mac:before {
-  content: "\ef2d";
-}
-
-.p-m-ie:before {
-  content: "\eaab";
-}
-
-.p-Chrome-OS:before {
-  content: "\e60b";
-}
-
-.p-m-safari:before {
-  content: "\e60c";
-}
-
-.p-m-360se:before {
-  content: "\e678";
-}
-
-.p-monitor-1:before {
-  content: "\e60d";
-}
-
-.p-xpack:before {
-  content: "\e604";
-}
-
-.p-gpu-2:before {
-  content: "\e6d8";
-}
-
-.p-gpu-1:before {
-  content: "\e623";
-}
-
-.p-monitor-4:before {
-  content: "\ec4e";
-}
-
-.p-waf-4:before {
-  content: "\e608";
-}
-
-.p-waf-1:before {
-  content: "\e62a";
-}
-
-.p-waf-2:before {
-  content: "\e682";
-}
-
-.p-waf-3:before {
-  content: "\e666";
-}
-
-.p-monitor-2:before {
-  content: "\ec4f";
-}
-
-.p-setting-1:before {
-  content: "\e626";
-}
-
-.p-setting-2:before {
-  content: "\e630";
-}
-
-.p-setting-3:before {
-  content: "\e617";
-}
-
-.p-tamper-4:before {
-  content: "\e7c3";
-}
-
-.p-tamper-2:before {
-  content: "\e610";
-}
-
-.p-tamper-3:before {
-  content: "\ec4d";
-}
-
-.p-tamper-1:before {
-  content: "\e687";
-}
-
-.p-monitor-3:before {
-  content: "\ec50";
-}
-
-.p-tongji:before {
-  content: "\e856";
-}
-
-.p-xiangqing:before {
-  content: "\e677";
-}
-
-.p-caidan:before {
-  content: "\e61d";
-}
-
-.p-yanzhengma1:before {
-  content: "\e744";
-}
-
-.p-file-png:before {
-  content: "\e7ae";
+.p-star:before {
+  content: "\e60f";
 }
 
 .p-file-ppt:before {
@@ -203,7 +146,7 @@
 }
 
 .p-file-html:before {
-  content: "\d123";
+  content: "\e608";
 }
 
 .p-file-word:before {
@@ -234,127 +177,207 @@
   content: "\e6eb";
 }
 
-.p-star:before {
-  content: "\e60f";
+.p-file-png:before {
+  content: "\e7ae";
 }
 
-.p-taolun:before {
-  content: "\e602";
+.p-yanzhengma1:before {
+  content: "\e744";
 }
 
-.p-bug:before {
-  content: "\e616";
+.p-caidan:before {
+  content: "\e61d";
 }
 
-.p-huaban88:before {
-  content: "\e67c";
+.p-xiangqing:before {
+  content: "\e677";
 }
 
-.p-logout:before {
-  content: "\e8fe";
+.p-webdav:before {
+  content: "\e622";
 }
 
-.p-terminal2:before {
-  content: "\e82a";
+.p-tongji:before {
+  content: "\e856";
 }
 
-.p-yingwen:before {
-  content: "\e6c3";
+.p-tamper-4:before {
+  content: "\e7c3";
 }
 
-.p-zhongwen:before {
-  content: "\e6c8";
+.p-tamper-2:before {
+  content: "\e610";
 }
 
-.p-plan:before {
-  content: "\e746";
+.p-tamper-3:before {
+  content: "\ec4d";
 }
 
-.p-database:before {
-  content: "\e754";
+.p-tamper-1:before {
+  content: "\e687";
 }
 
-.p-rejected-order:before {
-  content: "\e75e";
+.p-setting-1:before {
+  content: "\e626";
 }
 
-.p-toolbox:before {
-  content: "\e769";
+.p-setting-2:before {
+  content: "\e630";
 }
 
-.p-website:before {
-  content: "\e781";
+.p-setting-3:before {
+  content: "\e617";
 }
 
-.p-config:before {
-  content: "\e78e";
+.p-waf-4:before {
+  content: "\e60a";
 }
 
-.p-appstore1:before {
-  content: "\e792";
+.p-waf-1:before {
+  content: "\e62a";
 }
 
-.p-log:before {
-  content: "\e793";
+.p-waf-2:before {
+  content: "\e682";
 }
 
-.p-host:before {
-  content: "\e7b1";
+.p-waf-3:before {
+  content: "\e666";
 }
 
-.p-home:before {
-  content: "\e7c6";
+.p-gpu-1:before {
+  content: "\e623";
 }
 
-.p-appstore:before {
-  content: "\eb65";
+.p-gpu-2:before {
+  content: "\e6d8";
 }
 
-.p-docker:before {
-  content: "\e659";
+.p-xpack:before {
+  content: "\e60b";
 }
 
-.p-arrow-right:before {
-  content: "\e665";
+.p-monitor-4:before {
+  content: "\ec4e";
 }
 
-.p-terminal:before {
-  content: "\e864";
+.p-monitor-2:before {
+  content: "\ec4f";
 }
 
-.p-terminal1:before {
-  content: "\e663";
+.p-monitor-1:before {
+  content: "\e60d";
 }
 
-.p-language:before {
-  content: "\e605";
+.p-monitor-3:before {
+  content: "\ec50";
 }
 
-.p-theme:before {
-  content: "\e638";
+.p-m-ios:before {
+  content: "\e60e";
 }
 
-.p-file-folder:before {
-  content: "\66";
+.p-m-pc:before {
+  content: "\e771";
 }
 
-.p-file-unknown:before {
-  content: "\233";
+.p-m-theworld:before {
+  content: "\e947";
 }
 
-.p-file-txt:before {
-  content: "\74";
+.p-m-android:before {
+  content: "\e9e0";
 }
 
-.p-file-normal:before {
-  content: "\e7ac";
+.p-m-tencent:before {
+  content: "\e60c";
 }
 
-.p-txt:before {
-  content: "\e6e3";
+.p-m-windows:before {
+  content: "\e6a0";
 }
 
-.p-file-zip:before {
-  content: "\e606";
+.p-m-machine:before {
+  content: "\e862";
+}
+
+.p-m-mobile:before {
+  content: "\e620";
+}
+
+.p-m-ucweb:before {
+  content: "\e611";
+}
+
+.p-m-edge:before {
+  content: "\e8e2";
+}
+
+.p-m-2345explorer:before {
+  content: "\e612";
+}
+
+.p-m-chrome:before {
+  content: "\ea09";
+}
+
+.p-m-opera:before {
+  content: "\ea0e";
+}
+
+.p-m-linux:before {
+  content: "\e80b";
+}
+
+.p-m-maxthon:before {
+  content: "\e676";
+}
+
+.p-m-mac:before {
+  content: "\ef2d";
+}
+
+.p-m-ie:before {
+  content: "\eaab";
+}
+
+.p-Chrome-OS:before {
+  content: "\e613";
+}
+
+.p-m-safari:before {
+  content: "\e614";
+}
+
+.p-m-360se:before {
+  content: "\e678";
+}
+
+.p-Firefox:before {
+  content: "\e87c";
+}
+
+.p-docker1:before {
+  content: "\e76a";
+}
+
+.p-zhongduan:before {
+  content: "\e731";
+}
+
+.p-alert-1:before {
+  content: "\e615";
+}
+
+.p-alert-2:before {
+  content: "\e701";
+}
+
+.p-minglinghang:before {
+  content: "\e61e";
+}
+
+.p-17:before {
+  content: "\e618";
 }
 

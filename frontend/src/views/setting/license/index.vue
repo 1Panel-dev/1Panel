@@ -205,7 +205,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.bind'),
         disabled: (row: any) => {
-            return row.status !== 'free';
+            return row.status !== 'Free';
         },
         click: (row: any) => {
             bindRef.value.acceptParams({ licenseID: row.id, licenseName: row.licenseName });
