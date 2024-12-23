@@ -53,22 +53,6 @@ class RequestHttp {
                     });
                     return Promise.reject(data);
                 }
-                if (data.code == ResultEnum.NOTFOUND) {
-                    globalStore.errStatus = 'err-found';
-                    return;
-                }
-                if (data.code == ResultEnum.ERRIP) {
-                    globalStore.errStatus = 'err-ip';
-                    return;
-                }
-                if (data.code == ResultEnum.ERRDOMAIN) {
-                    globalStore.errStatus = 'err-domain';
-                    return;
-                }
-                if (data.code == ResultEnum.UNSAFETY) {
-                    globalStore.errStatus = 'err-unsafe';
-                    return;
-                }
                 if (data.code == ResultEnum.EXPIRED) {
                     router.push({ name: 'Expired' });
                     return;
@@ -106,27 +90,6 @@ class RequestHttp {
                 if (error.message.indexOf('timeout') !== -1) MsgError('请求超时！请您稍后重试');
                 if (response) {
                     switch (response.status) {
-                        case 310:
-                            globalStore.errStatus = 'err-ip';
-                            router.push({
-                                name: 'entrance',
-                                params: { code: globalStore.entrance },
-                            });
-                            return;
-                        case 311:
-                            globalStore.errStatus = 'err-domain';
-                            router.push({
-                                name: 'entrance',
-                                params: { code: globalStore.entrance },
-                            });
-                            return;
-                        case 312:
-                            globalStore.errStatus = 'err-entrance';
-                            router.push({
-                                name: 'entrance',
-                                params: { code: globalStore.entrance },
-                            });
-                            return;
                         case 313:
                             router.push({ name: 'Expired' });
                             return;

@@ -25,6 +25,8 @@ type IAuthService interface {
 	Login(c *gin.Context, info dto.Login, entrance string) (*dto.UserLoginInfo, error)
 	LogOut(c *gin.Context) error
 	MFALogin(c *gin.Context, info dto.MFALogin, entrance string) (*dto.UserLoginInfo, error)
+	GetSecurityEntrance() string
+	IsLogin(c *gin.Context) bool
 }
 
 func NewIAuthService() IAuthService {
@@ -191,4 +193,20 @@ func (u *AuthService) GetResponsePage() (string, error) {
 		return "", err
 	}
 	return pageCode.Value, nil
+}
+
+func (u *AuthService) GetSecurityEntrance() string {
+	status, err := settingRepo.Get(repo.WithByKey("SecurityEntrance"))
+	if err != nil {
+		return ""
+	}
+	if len(status.Value) == 0 {
+		return ""
+	}
+	return status.Value
+}
+
+func (u *AuthService) IsLogin(c *gin.Context) bool {
+	_, err := global.SESSION.Get(c)
+	return err == nil
 }

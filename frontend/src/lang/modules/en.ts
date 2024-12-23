@@ -1638,6 +1638,8 @@ const message = {
         error404: 'Not Found',
         error408: 'Request Timeout',
         error416: 'Range Not Satisfiable',
+        error444: 'Connection Closed',
+        error500: 'Internal Server Error',
 
         https: 'Setting up HTTPS protocol access for the panel can enhance the security of panel access.',
         certType: 'Certificate type',

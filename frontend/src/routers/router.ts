@@ -72,12 +72,6 @@ export const routes: RouteRecordRaw[] = [
             key: 'login',
         },
     },
-    {
-        path: '/:code?',
-        name: 'entrance',
-        component: () => import('@/views/login/entrance/index.vue'),
-        props: true,
-    },
     ...routerArray,
     {
         path: '/:pathMatch(.*)',
