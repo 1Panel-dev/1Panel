@@ -75,7 +75,6 @@ func GetMsgByKey(key string) string {
 	return content
 }
 
-//go:embed lang/*
 var fs embed.FS
 var bundle *i18n.Bundle
 
@@ -100,6 +99,7 @@ func Init() {
 	_, _ = bundle.LoadMessageFileFS(fs, "lang/zh-Hant.yaml")
 	_, _ = bundle.LoadMessageFileFS(fs, "lang/fa.yaml")
 	_, _ = bundle.LoadMessageFileFS(fs, "lang/pt.yaml")
+	_, _ = bundle.LoadMessageFileFS(fs, "lang/ru.yaml")
 }
 
 func UseI18nForCmd(lang string) {

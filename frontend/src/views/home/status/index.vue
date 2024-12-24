@@ -1,5 +1,5 @@
 <template>
-    <el-row :gutter="10">
+    <el-row :gutter="10" class="status-container">
         <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center">
             <el-popover placement="bottom" :width="loadWidth()" trigger="hover" v-if="chartsOption['cpu']">
                 <div>
@@ -52,7 +52,7 @@
             </span>
         </el-col>
         <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center">
-            <el-popover placement="bottom" :width="160" trigger="hover" v-if="chartsOption['memory']">
+            <el-popover placement="bottom" :width="200" trigger="hover" v-if="chartsOption['memory']">
                 <el-tag style="font-weight: 500">{{ $t('home.mem') }}:</el-tag>
                 <el-tag class="tagClass">{{ $t('home.total') }}: {{ computeSize(currentInfo.memoryTotal) }}</el-tag>
                 <el-tag class="tagClass">{{ $t('home.used') }}: {{ computeSize(currentInfo.memoryUsed) }}</el-tag>
@@ -431,6 +431,39 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
+.status-container {
+    :deep(.el-button) {
+        min-width: 180px;
+        padding: 8px 16px;
+        height: auto;
+        white-space: normal;
+        line-height: 1.5;
+        text-align: left;
+    }
+
+    :deep(.el-tag) {
+        min-width: 180px;
+        padding: 8px 12px;
+        height: auto;
+        white-space: normal;
+        line-height: 1.5;
+        margin: 4px;
+        text-align: left;
+    }
+
+    :deep(.el-button--primary) {
+        background-color: var(--el-color-primary);
+        &.is-plain {
+            background: var(--el-color-primary-light-9);
+            color: var(--el-color-primary);
+            &:hover {
+                background: var(--el-color-primary);
+                color: white;
+            }
+        }
+    }
+}
+
 .cpuModeTag {
     justify-content: flex-start !important;
     text-align: left !important;
@@ -445,6 +478,10 @@ defineExpose({
 }
 .tagClass {
     margin-top: 3px;
+    min-width: 140px;
+    white-space: normal;
+    height: auto;
+    line-height: 1.5;
 }
 
 .tagCPUClass {
@@ -459,6 +496,14 @@ defineExpose({
 .buttonClass {
     margin-top: 28%;
     font-size: 14px;
+}
+
+.input-help {
+    display: inline-block;
+    min-width: 120px;
+    white-space: normal;
+    line-height: 1.2;
+    padding: 2px 4px;
 }
 .nameTag {
     margin-top: 3px;

@@ -78,9 +78,11 @@
                                     v-model="form.language"
                                 >
                                     <el-radio v-if="globalStore.isIntl" value="en">English</el-radio>
+                                    <el-radio v-if="globalStore.isIntl" value="ru">Русский</el-radio>
                                     <el-radio value="zh">中文(简体)</el-radio>
                                     <el-radio value="tw">中文(繁體)</el-radio>
                                     <el-radio v-if="!globalStore.isIntl" value="en">English</el-radio>
+                                    <el-radio v-if="!globalStore.isIntl" value="ru">Русский</el-radio>
                                 </el-radio-group>
                             </el-form-item>
 
