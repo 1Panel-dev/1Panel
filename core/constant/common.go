@@ -45,6 +45,7 @@ var WebUrlMap = map[string]struct{}{
 	"/apps/all":       {},
 	"/apps/installed": {},
 	"/apps/upgrade":   {},
+	"apps/setting":    {},
 
 	"/containers":           {},
 	"/containers/container": {},
@@ -55,6 +56,7 @@ var WebUrlMap = map[string]struct{}{
 	"/containers/compose":   {},
 	"/containers/template":  {},
 	"/containers/setting":   {},
+	"containers/dashboard":  {},
 
 	"/cronjobs": {},
 
@@ -133,6 +135,7 @@ var WebUrlMap = map[string]struct{}{
 	"/xpack/alert/setting":     {},
 	"/xpack/setting":           {},
 	"xpack/node":               {},
+	"xpack/waf/stat":           {},
 }
 
 var DynamicRoutes = []string{

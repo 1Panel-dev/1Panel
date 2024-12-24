@@ -123,11 +123,11 @@ html {
 
 .input-help {
     font-size: 12px;
-    word-break: break-all;
-    color: #8f959e;
+    word-break: keep-all;
+    color: #adb0bc;
     width: 100%;
     display: inline-block;
-    height: 12px;
+    white-space: normal;
 }
 
 .input-error {
@@ -431,7 +431,7 @@ html {
     cursor: pointer;
 }
 
-.dialog-footer{
+.dialog-footer {
     display: flex;
     align-items: center;
     justify-content: flex-end;
