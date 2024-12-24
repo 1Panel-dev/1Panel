@@ -109,24 +109,21 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, e
 		if exist != nil {
 			return nil, buserr.New(constant.ErrImageExist)
 		}
-		portValue, _ := create.Params["PANEL_APP_PORT_HTTP"]
-		if portValue != nil {
-			if err := checkPortExist(int(portValue.(float64))); err != nil {
-				return nil, err
-			}
-		}
 	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo, constant.RuntimePython, constant.RuntimeDotNet:
 		if !fileOp.Stat(create.CodeDir) {
 			return nil, buserr.New(constant.ErrPathNotFound)
 		}
 		create.Install = true
-		if err := checkPortExist(create.Port); err != nil {
-			return nil, err
-		}
 		for _, export := range create.ExposedPorts {
 			if err := checkPortExist(export.HostPort); err != nil {
 				return nil, err
 			}
+		}
+	}
+	portValue, _ := create.Params["PANEL_APP_PORT_HTTP"]
+	if portValue != nil {
+		if err := checkPortExist(int(portValue.(float64))); err != nil {
+			return nil, err
 		}
 	}
 	containerName, ok := create.Params["CONTAINER_NAME"]
@@ -161,17 +158,16 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, e
 		Resource:      create.Resource,
 		Version:       create.Version,
 		ContainerName: containerName.(string),
+		Port:          int(portValue.(float64)),
 	}
 
 	switch create.Type {
 	case constant.RuntimePHP:
-		runtime.Port = int(create.Params["PANEL_APP_PORT_HTTP"].(float64))
 		if err = handlePHP(create, runtime, fileOp, appVersionDir); err != nil {
 			return nil, err
 		}
 	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo, constant.RuntimePython, constant.RuntimeDotNet:
-		runtime.Port = int(create.Params["port"].(float64))
-		if err = handleNodeAndJava(create, runtime, fileOp, appVersionDir); err != nil {
+		if err = handleRuntime(create, runtime, fileOp, appVersionDir); err != nil {
 			return nil, err
 		}
 	}
@@ -356,7 +352,7 @@ func (r *RuntimeService) Get(id uint) (*response.RuntimeDTO, error) {
 		}
 		for k, v := range envs {
 			switch k {
-			case "NODE_APP_PORT", "PANEL_APP_PORT_HTTP", "JAVA_APP_PORT", "GO_APP_PORT", "APP_PORT", "port":
+			case "APP_PORT", "PANEL_APP_PORT_HTTP":
 				port, err := strconv.Atoi(v)
 				if err != nil {
 					return nil, err
@@ -440,7 +436,7 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 	}
 	oldImage := runtime.Image
 	oldEnv := runtime.Env
-	req.Port = int(req.Params["port"].(float64))
+	port := int(req.Params["PANEL_APP_PORT_HTTP"].(float64))
 	switch runtime.Type {
 	case constant.RuntimePHP:
 		exist, _ := runtimeRepo.GetFirst(runtimeRepo.WithImage(req.Name), runtimeRepo.WithNotId(req.ID))
@@ -448,11 +444,11 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 			return buserr.New(constant.ErrImageExist)
 		}
 	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo, constant.RuntimePython, constant.RuntimeDotNet:
-		if runtime.Port != req.Port {
-			if err = checkPortExist(req.Port); err != nil {
+		if runtime.Port != port {
+			if err = checkPortExist(port); err != nil {
 				return err
 			}
-			runtime.Port = req.Port
+			runtime.Port = port
 		}
 		for _, export := range req.ExposedPorts {
 			if err = checkPortExist(export.HostPort); err != nil {
@@ -494,7 +490,6 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 		CodeDir: req.CodeDir,
 		Version: req.Version,
 		NodeConfig: request.NodeConfig{
-			Port:         req.Port,
 			Install:      true,
 			ExposedPorts: req.ExposedPorts,
 			Environments: req.Environments,
@@ -526,7 +521,7 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo, constant.RuntimePython, constant.RuntimeDotNet:
 		runtime.Version = req.Version
 		runtime.CodeDir = req.CodeDir
-		runtime.Port = req.Port
+		runtime.Port = port
 		runtime.Status = constant.RuntimeReCreating
 		_ = runtimeRepo.Save(runtime)
 		go reCreateRuntime(runtime)

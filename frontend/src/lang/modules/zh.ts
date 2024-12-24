@@ -2374,7 +2374,7 @@ const message = {
         appPort: '应用端口',
         externalPort: '外部映射端口',
         packageManager: '包管理器',
-        codeDir: '源码目录',
+        codeDir: '项目目录',
         appPortHelper: '应用端口是指容器内部的端口',
         externalPortHelper: '外部映射端口是指容器对外暴露的端口',
         runScript: '启动命令',

@@ -18,110 +18,14 @@
             <el-form-item :label="$t('commons.table.name')" prop="name">
                 <el-input :disabled="mode === 'edit'" v-model="runtime.name"></el-input>
             </el-form-item>
-            <el-form-item :label="$t('runtime.app')" prop="appID">
-                <el-row :gutter="20">
-                    <el-col :span="12">
-                        <el-select
-                            v-model="runtime.appID"
-                            :disabled="mode === 'edit'"
-                            @change="changeApp(runtime.appID)"
-                            class="p-w-200"
-                        >
-                            <el-option
-                                v-for="(app, index) in apps"
-                                :key="index"
-                                :label="app.name"
-                                :value="app.id"
-                            ></el-option>
-                        </el-select>
-                    </el-col>
-                    <el-col :span="12">
-                        <el-select
-                            v-model="runtime.version"
-                            :disabled="mode === 'edit'"
-                            @change="changeVersion()"
-                            class="p-w-200"
-                        >
-                            <el-option
-                                v-for="(version, index) in appVersions"
-                                :key="index"
-                                :label="version"
-                                :value="version"
-                            ></el-option>
-                        </el-select>
-                    </el-col>
-                </el-row>
-            </el-form-item>
-            <el-form-item :label="$t('tool.supervisor.dir')" prop="codeDir">
-                <el-input v-model.trim="runtime.codeDir" :disabled="mode === 'edit'">
-                    <template #prepend>
-                        <FileList
-                            :disabled="mode === 'edit'"
-                            :path="runtime.codeDir"
-                            @choose="getPath"
-                            :dir="true"
-                        ></FileList>
-                    </template>
-                </el-input>
-            </el-form-item>
-            <el-form-item :label="$t('runtime.runScript')" prop="params.EXEC_SCRIPT">
-                <el-input v-model="runtime.params['EXEC_SCRIPT']"></el-input>
-                <span class="input-help">
-                    {{ $t('runtime.donetHelper') }}
-                </span>
-            </el-form-item>
-            <el-row :gutter="20">
-                <el-col :span="7">
-                    <el-form-item :label="$t('runtime.appPort')" prop="params.APP_PORT">
-                        <el-input v-model.number="runtime.params['APP_PORT']" />
-                        <span class="input-help">{{ $t('runtime.appPortHelper') }}</span>
-                    </el-form-item>
-                </el-col>
-                <el-col :span="7">
-                    <el-form-item :label="$t('runtime.externalPort')" prop="port">
-                        <el-input v-model.number="runtime.port" />
-                        <span class="input-help">{{ $t('runtime.externalPortHelper') }}</span>
-                    </el-form-item>
-                </el-col>
-                <el-col :span="4">
-                    <el-form-item :label="$t('commons.button.add') + $t('commons.table.port')">
-                        <el-button @click="addPort">
-                            <el-icon><Plus /></el-icon>
-                        </el-button>
-                    </el-form-item>
-                </el-col>
-                <el-col :span="6">
-                    <el-form-item :label="$t('app.allowPort')" prop="params.HOST_IP">
-                        <el-switch
-                            v-model="runtime.params['HOST_IP']"
-                            :active-value="'0.0.0.0'"
-                            :inactive-value="'127.0.0.1'"
-                        />
-                    </el-form-item>
-                </el-col>
-            </el-row>
-            <el-row :gutter="20" v-for="(port, index) of runtime.exposedPorts" :key="index">
-                <el-col :span="7">
-                    <el-form-item :prop="'exposedPorts.' + index + '.containerPort'" :rules="rules.params.APP_PORT">
-                        <el-input v-model.number="port.containerPort" :placeholder="$t('runtime.appPort')" />
-                    </el-form-item>
-                </el-col>
-                <el-col :span="7">
-                    <el-form-item :prop="'exposedPorts.' + index + '.hostPort'" :rules="rules.params.APP_PORT">
-                        <el-input v-model.number="port.hostPort" :placeholder="$t('runtime.externalPort')" />
-                    </el-form-item>
-                </el-col>
-                <el-col :span="4">
-                    <el-form-item>
-                        <el-button type="primary" @click="removePort(index)" link>
-                            {{ $t('commons.button.delete') }}
-                        </el-button>
-                    </el-form-item>
-                </el-col>
-            </el-row>
+            <AppConfig v-model="runtime" :mode="mode" appKey="dotnet" />
+            <DirConfig v-model="runtime" :mode="mode" :scriptHelper="$t('runtime.donetHelper')" />
             <el-form-item :label="$t('app.containerName')" prop="params.CONTAINER_NAME">
                 <el-input v-model.trim="runtime.params['CONTAINER_NAME']"></el-input>
             </el-form-item>
+            <PortConfig v-model="runtime" :mode="mode" />
+            <Environment :environments="runtime.environments" />
+            <Volumes :volumes="runtime.volumes" />
         </el-form>
         <template #footer>
             <span>
@@ -137,13 +41,17 @@
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';
 import { Runtime } from '@/api/interface/runtime';
-import { GetApp, GetAppDetail, SearchApp } from '@/api/modules/app';
 import { CreateRuntime, GetRuntime, UpdateRuntime } from '@/api/modules/runtime';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { reactive, ref, watch } from 'vue';
+import AppConfig from '@/views/website/runtime/app/index.vue';
+import PortConfig from '@/views/website/runtime/port/index.vue';
+import Environment from '@/views/website/runtime/environment/index.vue';
+import Volumes from '@/views/website/runtime/volume/index.vue';
+import DirConfig from '@/views/website/runtime/dir/index.vue';
 
 interface OperateRrops {
     id?: number;
@@ -152,18 +60,10 @@ interface OperateRrops {
 }
 
 const open = ref(false);
-const apps = ref<App.App[]>([]);
 const runtimeForm = ref<FormInstance>();
 const loading = ref(false);
 const mode = ref('create');
 const editParams = ref<App.InstallParams[]>();
-const appVersions = ref<string[]>([]);
-const appReq = reactive({
-    type: 'donet',
-    page: 1,
-    pageSize: 20,
-    resource: 'remote',
-});
 const initData = (type: string) => ({
     name: '',
     appDetailID: undefined,
@@ -177,6 +77,8 @@ const initData = (type: string) => ({
     codeDir: '/',
     port: 8080,
     exposedPorts: [],
+    environments: [],
+    volumes: [],
 });
 let runtime = reactive<Runtime.RuntimeCreate>(initData('donet'));
 const rules = ref<any>({
@@ -196,16 +98,6 @@ const scripts = ref<Runtime.NodeScripts[]>([]);
 const em = defineEmits(['close']);
 
 watch(
-    () => runtime.params['APP_PORT'],
-    (newVal) => {
-        if (newVal && mode.value == 'create') {
-            runtime.port = newVal;
-        }
-    },
-    { deep: true },
-);
-
-watch(
     () => runtime.name,
     (newVal) => {
         if (newVal && mode.value == 'create') {
@@ -219,71 +111,6 @@ const handleClose = () => {
     open.value = false;
     em('close', false);
     runtimeForm.value?.resetFields();
-};
-
-const getPath = (codeDir: string) => {
-    runtime.codeDir = codeDir;
-};
-
-const addPort = () => {
-    runtime.exposedPorts.push({
-        hostPort: undefined,
-        containerPort: undefined,
-    });
-};
-
-const removePort = (index: number) => {
-    runtime.exposedPorts.splice(index, 1);
-};
-
-const searchApp = (appID: number) => {
-    SearchApp(appReq).then((res) => {
-        apps.value = res.data.items || [];
-        if (res.data && res.data.items && res.data.items.length > 0) {
-            if (appID == null) {
-                runtime.appID = res.data.items[0].id;
-                getApp(res.data.items[0].key, mode.value);
-            } else {
-                res.data.items.forEach((item) => {
-                    if (item.id === appID) {
-                        getApp(item.key, mode.value);
-                    }
-                });
-            }
-        }
-    });
-};
-
-const changeApp = (appID: number) => {
-    for (const app of apps.value) {
-        if (app.id === appID) {
-            getApp(app.key, mode.value);
-            break;
-        }
-    }
-};
-
-const changeVersion = () => {
-    loading.value = true;
-    GetAppDetail(runtime.appID, runtime.version, 'runtime')
-        .then((res) => {
-            runtime.appDetailID = res.data.id;
-        })
-        .finally(() => {
-            loading.value = false;
-        });
-};
-
-const getApp = (appkey: string, mode: string) => {
-    GetApp(appkey).then((res) => {
-        appVersions.value = res.data.versions || [];
-        if (res.data.versions.length > 0) {
-            if (mode === 'create') {
-                runtime.version = res.data.versions[0];
-                changeVersion();
-            }
-        }
-    });
 };
 
 const submit = async (formEl: FormInstance | undefined) => {
@@ -342,7 +169,7 @@ const getRuntime = async (id: number) => {
         Object.assign(runtime, {
             id: data.id,
             name: data.name,
-            appDetailId: data.appDetailID,
+            appDetailID: data.appDetailID,
             image: data.image,
             type: data.type,
             resource: data.resource,
@@ -356,7 +183,6 @@ const getRuntime = async (id: number) => {
         });
         runtime.exposedPorts = data.exposedPorts || [];
         editParams.value = data.appParams;
-        searchApp(data.appID);
         open.value = true;
     } catch (error) {}
 };
@@ -366,7 +192,6 @@ const acceptParams = async (props: OperateRrops) => {
     scripts.value = [];
     if (props.mode === 'create') {
         Object.assign(runtime, initData(props.type));
-        searchApp(null);
         open.value = true;
     } else {
         getRuntime(props.id);

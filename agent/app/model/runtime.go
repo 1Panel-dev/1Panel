@@ -9,7 +9,7 @@ import (
 type Runtime struct {
 	BaseModel
 	Name          string `gorm:"not null" json:"name"`
-	AppDetailID   uint   `json:"appDetailId"`
+	AppDetailID   uint   `json:"appDetailID"`
 	Image         string `json:"image"`
 	WorkDir       string `json:"workDir"`
 	DockerCompose string `json:"dockerCompose"`

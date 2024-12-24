@@ -17,66 +17,19 @@
             <el-form-item :label="$t('commons.table.name')" prop="name">
                 <el-input :disabled="mode === 'edit'" v-model="runtime.name"></el-input>
             </el-form-item>
-            <el-form-item :label="$t('runtime.app')" prop="appID">
-                <el-row :gutter="20">
-                    <el-col :span="12">
-                        <el-select
-                            v-model="runtime.appID"
-                            :disabled="mode === 'edit'"
-                            @change="changeApp(runtime.appID)"
-                            class="p-w-200"
-                        >
-                            <el-option
-                                v-for="(app, index) in apps"
-                                :key="index"
-                                :label="app.name"
-                                :value="app.id"
-                            ></el-option>
-                        </el-select>
-                    </el-col>
-                    <el-col :span="12">
-                        <el-select
-                            v-model="runtime.version"
-                            :disabled="mode === 'edit'"
-                            @change="changeVersion()"
-                            class="p-w-200"
-                        >
-                            <el-option
-                                v-for="(version, index) in appVersions"
-                                :key="index"
-                                :label="version"
-                                :value="version"
-                            ></el-option>
-                        </el-select>
-                    </el-col>
-                </el-row>
-            </el-form-item>
-            <el-form-item :label="$t('tool.supervisor.dir')" prop="codeDir">
-                <el-input v-model.trim="runtime.codeDir" :disabled="mode === 'edit'">
-                    <template #prepend>
-                        <FileList
-                            :disabled="mode === 'edit'"
-                            :path="runtime.codeDir"
-                            @choose="getPath"
-                            :dir="true"
-                        ></FileList>
-                    </template>
-                </el-input>
-                <span class="input-help">
-                    {{ $t('runtime.javaDirHelper') }}
-                </span>
-            </el-form-item>
-            <el-form-item :label="$t('runtime.runScript')" prop="params.EXEC_SCRIPT">
-                <el-input v-model="runtime.params['EXEC_SCRIPT']"></el-input>
-                <span class="input-help">
-                    {{ $t('runtime.javaScriptHelper') }}
-                </span>
-            </el-form-item>
-            <PortConfig :params="runtime.params" :exposedPorts="runtime.exposedPorts" :rules="rules" />
-            <Environment :environments="runtime.environments" />
+            <AppConfig v-model="runtime" :mode="mode" appKey="java" />
+            <DirConfig
+                v-model="runtime"
+                :mode="mode"
+                :dirHelper="$t('runtime.javaDirHelper')"
+                :scriptHelper="$t('runtime.javaScriptHelper')"
+            />
             <el-form-item :label="$t('app.containerName')" prop="params.CONTAINER_NAME">
                 <el-input v-model.trim="runtime.params['CONTAINER_NAME']"></el-input>
             </el-form-item>
+            <PortConfig v-model="runtime" :mode="mode" />
+            <Environment :environments="runtime.environments" />
+            <Volumes :volumes="runtime.volumes" />
         </el-form>
         <template #footer>
             <span>
@@ -92,7 +45,6 @@
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';
 import { Runtime } from '@/api/interface/runtime';
-import { GetApp, GetAppDetail, SearchApp } from '@/api/modules/app';
 import { CreateRuntime, GetRuntime, UpdateRuntime } from '@/api/modules/runtime';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
@@ -101,6 +53,9 @@ import { FormInstance } from 'element-plus';
 import { reactive, ref, watch } from 'vue';
 import PortConfig from '@/views/website/runtime/port/index.vue';
 import Environment from '@/views/website/runtime/environment/index.vue';
+import Volumes from '@/views/website/runtime/volume/index.vue';
+import AppConfig from '@/views/website/runtime/app/index.vue';
+import DirConfig from '@/views/website/runtime/dir/index.vue';
 
 interface OperateRrops {
     id?: number;
@@ -109,18 +64,10 @@ interface OperateRrops {
 }
 
 const open = ref(false);
-const apps = ref<App.App[]>([]);
 const runtimeForm = ref<FormInstance>();
 const loading = ref(false);
 const mode = ref('create');
 const editParams = ref<App.InstallParams[]>();
-const appVersions = ref<string[]>([]);
-const appReq = reactive({
-    type: 'java',
-    page: 1,
-    pageSize: 20,
-    resource: 'remote',
-});
 const initData = (type: string) => ({
     name: '',
     appDetailID: undefined,
@@ -135,6 +82,7 @@ const initData = (type: string) => ({
     port: 8080,
     exposedPorts: [],
     environments: [],
+    volumes: [],
 });
 let runtime = reactive<Runtime.RuntimeCreate>(initData('java'));
 const rules = ref<any>({
@@ -176,60 +124,6 @@ const handleClose = () => {
     open.value = false;
     em('close', false);
     runtimeForm.value?.resetFields();
-};
-
-const getPath = (codeDir: string) => {
-    runtime.codeDir = codeDir;
-};
-
-const searchApp = (appID: number) => {
-    SearchApp(appReq).then((res) => {
-        apps.value = res.data.items || [];
-        if (res.data && res.data.items && res.data.items.length > 0) {
-            if (appID == null) {
-                runtime.appID = res.data.items[0].id;
-                getApp(res.data.items[0].key, mode.value);
-            } else {
-                res.data.items.forEach((item) => {
-                    if (item.id === appID) {
-                        getApp(item.key, mode.value);
-                    }
-                });
-            }
-        }
-    });
-};
-
-const changeApp = (appID: number) => {
-    for (const app of apps.value) {
-        if (app.id === appID) {
-            getApp(app.key, mode.value);
-            break;
-        }
-    }
-};
-
-const changeVersion = () => {
-    loading.value = true;
-    GetAppDetail(runtime.appID, runtime.version, 'runtime')
-        .then((res) => {
-            runtime.appDetailID = res.data.id;
-        })
-        .finally(() => {
-            loading.value = false;
-        });
-};
-
-const getApp = (appkey: string, mode: string) => {
-    GetApp(appkey).then((res) => {
-        appVersions.value = res.data.versions || [];
-        if (res.data.versions.length > 0) {
-            if (mode === 'create') {
-                runtime.version = res.data.versions[0];
-                changeVersion();
-            }
-        }
-    });
 };
 
 const submit = async (formEl: FormInstance | undefined) => {
@@ -288,7 +182,7 @@ const getRuntime = async (id: number) => {
         Object.assign(runtime, {
             id: data.id,
             name: data.name,
-            appDetailId: data.appDetailID,
+            appDetailID: data.appDetailID,
             image: data.image,
             type: data.type,
             resource: data.resource,
@@ -303,7 +197,6 @@ const getRuntime = async (id: number) => {
         runtime.exposedPorts = data.exposedPorts || [];
         runtime.environments = data.environments || [];
         editParams.value = data.appParams;
-        searchApp(data.appID);
         open.value = true;
     } catch (error) {}
 };
@@ -313,7 +206,6 @@ const acceptParams = async (props: OperateRrops) => {
     scripts.value = [];
     if (props.mode === 'create') {
         Object.assign(runtime, initData(props.type));
-        searchApp(null);
         open.value = true;
     } else {
         getRuntime(props.id);

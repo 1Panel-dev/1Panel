@@ -1,7 +1,7 @@
 <template>
-    <div class="mt-1.5">
+    <div class="mt-2">
         <el-text>{{ $t('container.mount') }}</el-text>
-        <div class="mt-1.5">
+        <div class="mt-2">
             <el-row :gutter="20" v-for="(volume, index) in volumes" :key="index">
                 <el-col :span="7">
                     <el-form-item :prop="`volumes.${index}.source`" :rules="rules.value">

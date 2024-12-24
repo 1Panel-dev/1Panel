@@ -31,7 +31,7 @@
                             </el-text>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('website.runDir')" prop="codeDir">
+                    <el-table-column :label="$t('runtime.codeDir')" prop="codeDir">
                         <template #default="{ row }">
                             <el-button type="primary" link @click="toFolder(row.codeDir)">
                                 <el-icon>

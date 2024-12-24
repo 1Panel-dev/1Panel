@@ -18,93 +18,11 @@
             <el-form-item :label="$t('commons.table.name')" prop="name">
                 <el-input :disabled="mode === 'edit'" v-model="runtime.name"></el-input>
             </el-form-item>
-            <el-form-item :label="$t('runtime.app')" prop="appID">
-                <el-row :gutter="20">
-                    <el-col :span="12">
-                        <el-select
-                            v-model="runtime.appID"
-                            :disabled="mode === 'edit'"
-                            @change="changeApp(runtime.appID)"
-                            class="p-w-200"
-                        >
-                            <el-option
-                                v-for="(app, index) in apps"
-                                :key="index"
-                                :label="app.name"
-                                :value="app.id"
-                            ></el-option>
-                        </el-select>
-                    </el-col>
-                    <el-col :span="12">
-                        <el-select
-                            v-model="runtime.version"
-                            :disabled="mode === 'edit'"
-                            @change="changeVersion()"
-                            class="p-w-200"
-                        >
-                            <el-option
-                                v-for="(version, index) in appVersions"
-                                :key="index"
-                                :label="version"
-                                :value="version"
-                            ></el-option>
-                        </el-select>
-                    </el-col>
-                </el-row>
+            <AppConfig v-model="runtime" :mode="mode" appKey="node" />
+            <DirConfig v-model="runtime" :mode="mode" appKey="node" :scriptHelper="$t('runtime.customScriptHelper')" />
+            <el-form-item :label="$t('app.containerName')" prop="params.CONTAINER_NAME">
+                <el-input v-model.trim="runtime.params['CONTAINER_NAME']"></el-input>
             </el-form-item>
-            <el-form-item :label="$t('runtime.codeDir')" prop="codeDir">
-                <el-input v-model.trim="runtime.codeDir" :disabled="mode === 'edit'">
-                    <template #prepend>
-                        <FileList
-                            :disabled="mode === 'edit'"
-                            :path="runtime.codeDir"
-                            @choose="getPath"
-                            :dir="true"
-                        ></FileList>
-                    </template>
-                </el-input>
-            </el-form-item>
-            <el-row :gutter="20">
-                <el-col :span="18">
-                    <el-form-item :label="$t('runtime.runScript')" prop="params.EXEC_SCRIPT">
-                        <el-select
-                            v-model="runtime.params['EXEC_SCRIPT']"
-                            v-if="runtime.params['CUSTOM_SCRIPT'] == '0'"
-                        >
-                            <el-option
-                                v-for="(script, index) in scripts"
-                                :key="index"
-                                :label="script.name + ' 【 ' + script.script + ' 】'"
-                                :value="script.name"
-                            >
-                                <el-row :gutter="10">
-                                    <el-col :span="4">{{ script.name }}</el-col>
-                                    <el-col :span="10">{{ ' 【 ' + script.script + ' 】' }}</el-col>
-                                </el-row>
-                            </el-option>
-                        </el-select>
-                        <el-input v-else v-model="runtime.params['EXEC_SCRIPT']"></el-input>
-                        <span class="input-help" v-if="runtime.params['CUSTOM_SCRIPT'] == '0'">
-                            {{ $t('runtime.runScriptHelper') }}
-                        </span>
-                        <span class="input-help" v-else>
-                            {{ $t('runtime.customScriptHelper') }}
-                        </span>
-                    </el-form-item>
-                </el-col>
-                <el-col :span="6">
-                    <el-form-item :label="$t('runtime.customScript')" prop="params.CUSTOM_SCRIPT">
-                        <el-switch
-                            v-model="runtime.params['CUSTOM_SCRIPT']"
-                            :active-value="'1'"
-                            :inactive-value="'0'"
-                            @change="changeScriptType"
-                        />
-                    </el-form-item>
-                </el-col>
-            </el-row>
-            <PortConfig :params="runtime.params" :exposedPorts="runtime.exposedPorts" :rules="rules" />
-            <Environment :environments="runtime.environments" />
             <el-form-item :label="$t('runtime.packageManager')" prop="params.PACKAGE_MANAGER">
                 <el-select v-model="runtime.params['PACKAGE_MANAGER']">
                     <el-option label="npm" value="npm"></el-option>
@@ -125,9 +43,9 @@
                     {{ $t('runtime.phpsourceHelper') }}
                 </span>
             </el-form-item>
-            <el-form-item :label="$t('app.containerName')" prop="params.CONTAINER_NAME">
-                <el-input v-model.trim="runtime.params['CONTAINER_NAME']"></el-input>
-            </el-form-item>
+            <PortConfig v-model="runtime" :mode="mode" />
+            <Environment :environments="runtime.environments" />
+            <Volumes :volumes="runtime.volumes" />
         </el-form>
 
         <template #footer>
@@ -144,8 +62,7 @@
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';
 import { Runtime } from '@/api/interface/runtime';
-import { GetApp, GetAppDetail, SearchApp } from '@/api/modules/app';
-import { CreateRuntime, GetNodeScripts, GetRuntime, UpdateRuntime } from '@/api/modules/runtime';
+import { CreateRuntime, GetRuntime, UpdateRuntime } from '@/api/modules/runtime';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
@@ -153,6 +70,9 @@ import { FormInstance } from 'element-plus';
 import { computed, reactive, ref, watch } from 'vue';
 import PortConfig from '@/views/website/runtime/port/index.vue';
 import Environment from '@/views/website/runtime/environment/index.vue';
+import AppConfig from '@/views/website/runtime/app/index.vue';
+import Volumes from '@/views/website/runtime/volume/index.vue';
+import DirConfig from '@/views/website/runtime/dir/index.vue';
 
 interface OperateRrops {
     id?: number;
@@ -161,18 +81,10 @@ interface OperateRrops {
 }
 
 const open = ref(false);
-const apps = ref<App.App[]>([]);
 const runtimeForm = ref<FormInstance>();
 const loading = ref(false);
 const mode = ref('create');
 const editParams = ref<App.InstallParams[]>();
-const appVersions = ref<string[]>([]);
-const appReq = reactive({
-    type: 'node',
-    page: 1,
-    pageSize: 20,
-    resource: 'remote',
-});
 const initData = (type: string) => ({
     name: '',
     appDetailID: undefined,
@@ -186,10 +98,11 @@ const initData = (type: string) => ({
     resource: 'appstore',
     rebuild: false,
     codeDir: '/',
-    port: 3000,
+    port: 4004,
     source: 'https://registry.npmjs.org/',
     exposedPorts: [],
     environments: [],
+    volumes: [],
 });
 let runtime = reactive<Runtime.RuntimeCreate>(initData('node'));
 const rules = ref<any>({
@@ -205,7 +118,6 @@ const rules = ref<any>({
         CONTAINER_NAME: [Rules.requiredInput, Rules.containerName],
     },
 });
-const scripts = ref<Runtime.NodeScripts[]>([]);
 const em = defineEmits(['close']);
 
 const hasPnpm = computed(() => {
@@ -231,16 +143,6 @@ const imageSources = [
 ];
 
 watch(
-    () => runtime.params['APP_PORT'],
-    (newVal) => {
-        if (newVal && mode.value == 'create') {
-            runtime.port = newVal;
-        }
-    },
-    { deep: true },
-);
-
-watch(
     () => runtime.name,
     (newVal) => {
         if (newVal && mode.value == 'create') {
@@ -254,80 +156,6 @@ const handleClose = () => {
     open.value = false;
     em('close', false);
     runtimeForm.value?.resetFields();
-};
-
-const getPath = (codeDir: string) => {
-    runtime.codeDir = codeDir;
-    getScripts();
-};
-
-const changeScriptType = () => {
-    runtime.params['EXEC_SCRIPT'] = '';
-    if (runtime.params['CUSTOM_SCRIPT'] == '0') {
-        getScripts();
-    }
-};
-
-const getScripts = () => {
-    GetNodeScripts({ codeDir: runtime.codeDir }).then((res) => {
-        scripts.value = res.data;
-        if (mode.value == 'create' && scripts.value.length > 0) {
-            runtime.params['EXEC_SCRIPT'] = scripts.value[0].name;
-        }
-    });
-};
-
-const searchApp = (appID: number) => {
-    SearchApp(appReq).then((res) => {
-        apps.value = res.data.items || [];
-        if (res.data && res.data.items && res.data.items.length > 0) {
-            if (appID == null) {
-                runtime.appID = res.data.items[0].id;
-                getApp(res.data.items[0].key, mode.value);
-            } else {
-                res.data.items.forEach((item) => {
-                    if (item.id === appID) {
-                        getApp(item.key, mode.value);
-                    }
-                });
-            }
-        }
-    });
-};
-
-const changeApp = (appID: number) => {
-    for (const app of apps.value) {
-        if (app.id === appID) {
-            getApp(app.key, mode.value);
-            break;
-        }
-    }
-};
-
-const changeVersion = () => {
-    loading.value = true;
-    if (runtime.params['PACKAGE_MANAGER'] == 'pnpm' && !hasPnpm.value) {
-        runtime.params['PACKAGE_MANAGER'] = 'npm';
-    }
-    GetAppDetail(runtime.appID, runtime.version, 'runtime')
-        .then((res) => {
-            runtime.appDetailID = res.data.id;
-        })
-        .finally(() => {
-            loading.value = false;
-        });
-};
-
-const getApp = (appkey: string, mode: string) => {
-    GetApp(appkey).then((res) => {
-        appVersions.value = res.data.versions || [];
-        if (res.data.versions.length > 0) {
-            if (mode === 'create') {
-                runtime.version = res.data.versions[0];
-                changeVersion();
-            }
-        }
-    });
 };
 
 const submit = async (formEl: FormInstance | undefined) => {
@@ -386,7 +214,7 @@ const getRuntime = async (id: number) => {
         Object.assign(runtime, {
             id: data.id,
             name: data.name,
-            appDetailId: data.appDetailID,
+            appDetailID: data.appDetailID,
             image: data.image,
             type: data.type,
             resource: data.resource,
@@ -401,10 +229,8 @@ const getRuntime = async (id: number) => {
         runtime.exposedPorts = data.exposedPorts || [];
         runtime.environments = data.environments || [];
         editParams.value = data.appParams;
-        searchApp(data.appID);
         if (data.params['CUSTOM_SCRIPT'] == undefined || data.params['CUSTOM_SCRIPT'] == '0') {
             data.params['CUSTOM_SCRIPT'] = '0';
-            getScripts();
         }
         open.value = true;
     } catch (error) {}
@@ -412,10 +238,8 @@ const getRuntime = async (id: number) => {
 
 const acceptParams = async (props: OperateRrops) => {
     mode.value = props.mode;
-    scripts.value = [];
     if (props.mode === 'create') {
         Object.assign(runtime, initData(props.type));
-        searchApp(null);
         open.value = true;
     } else {
         getRuntime(props.id);
