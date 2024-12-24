@@ -8,7 +8,6 @@ const (
 	StatusWaiting     = "Waiting"
 	StatusPacking     = "Packing"
 	StatusSending     = "Sending"
-	StatusChecking    = "Checking"
 	StatusStarting    = "Starting"
 	StatusHealthy     = "Healthy"
 	StatusUnhealthy   = "Unhealthy"

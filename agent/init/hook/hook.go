@@ -14,7 +14,7 @@ import (
 )
 
 func Init() {
-	initWithNodeJson()
+	service.NewISettingService().ReloadConn()
 	initGlobalData()
 	handleCronjobStatus()
 	handleSnapStatus()
