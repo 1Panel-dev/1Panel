@@ -1,10 +1,9 @@
 <template>
-    <el-dialog
+    <DialogPro
         v-model="open"
-        :close-on-click-modal="false"
         :title="$t('commons.button.delete') + ' - ' + resourceName"
-        width="30%"
-        :before-close="handleClose"
+        size="small"
+        @close="handleClose"
     >
         <div :key="key" :loading="loading">
             <el-form ref="deleteForm" label-position="left">
@@ -24,7 +23,7 @@
                 </el-button>
             </span>
         </template>
-    </el-dialog>
+    </DialogPro>
 </template>
 
 <script lang="ts" setup>

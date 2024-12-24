@@ -1,11 +1,5 @@
 <template>
-    <el-dialog
-        v-model="open"
-        :title="$t('app.checkTitle')"
-        width="50%"
-        :close-on-click-modal="false"
-        :destroy-on-close="true"
-    >
+    <DialogPro v-model="open" :title="$t('app.checkTitle')" size="large" @close="handleClose">
         <el-row>
             <el-alert type="warning" :description="$t('website.deleteHelper')" center show-icon :closable="false" />
             <el-col :span="24">
@@ -26,7 +20,7 @@
                 </el-button>
             </span>
         </template>
-    </el-dialog>
+    </DialogPro>
 </template>
 <script lang="ts" setup>
 import { Website } from '@/api/interface/website';

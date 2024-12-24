@@ -1,10 +1,9 @@
 <template>
-    <el-dialog
+    <DialogPro
         v-model="open"
         :title="$t('commons.button.' + operate) + $t('php.extensions')"
-        :close-on-click-modal="false"
-        width="30%"
-        :before-close="handleClose"
+        size="small"
+        @close="handleClose"
     >
         <el-row v-loading="loading">
             <el-col :span="22" :offset="1">
@@ -40,7 +39,7 @@
                 </el-button>
             </span>
         </template>
-    </el-dialog>
+    </DialogPro>
 </template>
 
 <script lang="ts" setup>

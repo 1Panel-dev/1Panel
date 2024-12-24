@@ -173,15 +173,7 @@
             </template>
         </LayoutContent>
 
-        <el-dialog
-            v-model="iptablesVisible"
-            :title="$t('container.iptablesDisable')"
-            width="30%"
-            :destroy-on-close="true"
-            :close-on-click-modal="false"
-            :close-on-press-escape="false"
-            :show-close="false"
-        >
+        <DialogPro v-model="open" :title="$t('container.iptablesDisable')" size="small">
             <div class="mt-2.5">
                 <span class="text-rose-500">{{ $t('container.iptablesHelper2') }}</span>
                 <div class="mt-2.5">
@@ -197,7 +189,7 @@
                 <span class="dialog-footer">
                     <el-button
                         @click="
-                            iptablesVisible = false;
+                            open = false;
                             search();
                         "
                     >
@@ -212,7 +204,7 @@
                     </el-button>
                 </span>
             </template>
-        </el-dialog>
+        </DialogPro>
 
         <Mirror ref="mirrorRef" @search="search" />
         <Registry ref="registriesRef" @search="search" />
@@ -305,7 +297,7 @@ const formRef = ref<FormInstance>();
 const dockerConf = ref();
 const confirmDialogRefFile = ref();
 
-const iptablesVisible = ref();
+const open = ref();
 
 const onSaveFile = async () => {
     let params = {
@@ -377,12 +369,12 @@ const handleIptables = () => {
         confirmDialogRefIptable.value!.acceptParams(params);
         return;
     } else {
-        iptablesVisible.value = true;
+        open.value = true;
     }
 };
 const onSubmitCloseIPtable = () => {
     save('IPtables', 'disable');
-    iptablesVisible.value = false;
+    open.value = false;
 };
 const onSubmitOpenIPtable = () => {
     save('IPtables', 'enable');

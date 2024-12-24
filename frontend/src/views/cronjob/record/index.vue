@@ -187,12 +187,7 @@
             </template>
         </LayoutContent>
 
-        <el-dialog
-            v-model="deleteVisible"
-            :title="$t('commons.button.clean')"
-            width="30%"
-            :close-on-click-modal="false"
-        >
+        <DialogPro v-model="open" :title="$t('commons.button.clean')" size="small">
             <el-form ref="deleteForm" label-position="left" v-loading="delLoading">
                 <el-form-item>
                     <el-checkbox v-model="cleanData" :label="$t('cronjob.cleanData')" />
@@ -203,7 +198,7 @@
             </el-form>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="deleteVisible = false" :disabled="delLoading">
+                    <el-button @click="open = false" :disabled="delLoading">
                         {{ $t('commons.button.cancel') }}
                     </el-button>
                     <el-button type="primary" @click="cleanRecord">
@@ -211,7 +206,7 @@
                     </el-button>
                 </span>
             </template>
-        </el-dialog>
+        </DialogPro>
     </div>
 </template>
 
@@ -245,7 +240,7 @@ const records = ref<Array<Cronjob.Record>>([]);
 const currentRecord = ref<Cronjob.Record>();
 const currentRecordDetail = ref<string>('');
 
-const deleteVisible = ref();
+const open = ref();
 const delLoading = ref();
 const cleanData = ref();
 
@@ -418,7 +413,7 @@ const cleanRecord = async () => {
     await cleanRecords(dialogData.value.rowData.id, cleanData.value)
         .then(() => {
             delLoading.value = false;
-            deleteVisible.value = false;
+            open.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             search();
         })

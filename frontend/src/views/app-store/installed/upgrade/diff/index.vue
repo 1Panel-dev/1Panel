@@ -1,11 +1,5 @@
 <template>
-    <el-dialog
-        v-model="open"
-        :title="$t('app.composeDiff')"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        width="90%"
-    >
+    <DialogPro v-model="open" :title="$t('app.composeDiff')" @close="handleClose" size="w-90">
         <div>
             <el-text type="warning">{{ $t('app.diffHelper') }}</el-text>
             <div ref="container" class="compose-diff"></div>
@@ -21,7 +15,7 @@
                 </el-button>
             </span>
         </template>
-    </el-dialog>
+    </DialogPro>
 </template>
 
 <script setup lang="ts">

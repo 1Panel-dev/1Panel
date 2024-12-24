@@ -118,13 +118,8 @@
 
         <Setting ref="settingRef" style="margin-top: 30px" />
         <Conn ref="connRef" @check-exist="reOpenTerminal" @close-terminal="closeTerminal(true)" />
-        <el-dialog
-            v-model="commandVisible"
-            :title="$t('app.checkTitle')"
-            width="30%"
-            :close-on-click-modal="false"
-            :destroy-on-close="true"
-        >
+
+        <DialogPro v-model="open" :title="$t('app.checkTitle')" size="small">
             <el-alert :closable="false" :title="$t('app.checkInstalledWarn', ['Redis-Commander'])" type="info">
                 <el-link icon="Position" @click="getAppDetail('redis-commander')" type="primary">
                     {{ $t('database.goInstall') }}
@@ -132,10 +127,10 @@
             </el-alert>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="commandVisible = false">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button @click="open = false">{{ $t('commons.button.cancel') }}</el-button>
                 </span>
             </template>
-        </el-dialog>
+        </DialogPro>
 
         <QuickCmd ref="dialogQuickCmdRef" @reload="loadQuickCmd" />
     </div>
@@ -169,7 +164,7 @@ const terminalShow = ref(false);
 
 const appStatusRef = ref();
 
-const commandVisible = ref(false);
+const open = ref(false);
 
 const redisCliExist = ref();
 

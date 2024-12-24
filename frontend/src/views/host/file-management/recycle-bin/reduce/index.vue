@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="open" :title="$t('file.reduce')" width="30%" :close-on-click-modal="false">
+    <DialogPro v-model="open" :title="$t('file.reduce')" size="small">
         <el-row>
             <el-col :span="20" :offset="2">
                 <el-alert :title="$t('file.confirmReduce')" show-icon type="error" :closable="false"></el-alert>
@@ -23,7 +23,7 @@
                 </el-button>
             </span>
         </template>
-    </el-dialog>
+    </DialogPro>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue';

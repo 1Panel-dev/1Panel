@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-dialog v-model="drawerVisible" :title="$t('container.createByCommand')" :back="handleClose" width="70%">
+        <DialogPro v-model="open" :title="$t('container.createByCommand')" @close="handleClose" size="w-70">
             <el-form
                 @submit.prevent
                 ref="formRef"
@@ -22,7 +22,7 @@
             </el-form>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button :disabled="loading" @click="drawerVisible = false">
+                    <el-button :disabled="loading" @click="open = false">
                         {{ $t('commons.button.cancel') }}
                     </el-button>
                     <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
@@ -30,7 +30,7 @@
                     </el-button>
                 </span>
             </template>
-        </el-dialog>
+        </DialogPro>
         <TaskLog ref="taskLogRef" width="70%" />
     </div>
 </template>
@@ -44,7 +44,7 @@ import { createContainerByCommand } from '@/api/modules/container';
 import { MsgSuccess } from '@/utils/message';
 import { newUUID } from '@/utils/util';
 
-const drawerVisible = ref<boolean>(false);
+const open = ref<boolean>(false);
 const emit = defineEmits<{ (e: 'search'): void }>();
 const loading = ref(false);
 const form = reactive({
@@ -54,7 +54,7 @@ const taskLogRef = ref();
 
 const acceptParams = (): void => {
     form.command = '';
-    drawerVisible.value = true;
+    open.value = true;
 };
 
 const formRef = ref<FormInstance>();
@@ -86,7 +86,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
                     loading.value = false;
                     emit('search');
                     openTaskLog(taskID);
-                    drawerVisible.value = false;
+                    open.value = false;
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 })
                 .catch(() => {
@@ -100,7 +100,7 @@ const openTaskLog = (taskID: string) => {
 };
 
 const handleClose = async () => {
-    drawerVisible.value = false;
+    open.value = false;
     emit('search');
 };
 

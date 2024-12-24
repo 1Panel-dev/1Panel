@@ -1,10 +1,5 @@
 <template>
-    <el-dialog
-        v-model="dialogVisible"
-        :title="$t('commons.button.delete') + ' - ' + dbName"
-        width="30%"
-        :close-on-click-modal="false"
-    >
+    <DialogPro v-model="open" :title="$t('commons.button.delete') + ' - ' + dbName" size="small">
         <el-form ref="deleteForm" v-loading="loading" @submit.prevent>
             <el-form-item>
                 <el-checkbox v-model="deleteReq.forceDelete" :label="$t('app.forceDelete')" />
@@ -29,7 +24,7 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="dialogVisible = false" :disabled="loading">
+                <el-button @click="open = false" :disabled="loading">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
                 <el-button type="primary" @click="submit" :disabled="deleteInfo != dbName || loading">
@@ -37,7 +32,7 @@
                 </el-button>
             </span>
         </template>
-    </el-dialog>
+    </DialogPro>
 </template>
 <script lang="ts" setup>
 import { FormInstance } from 'element-plus';
@@ -53,7 +48,7 @@ let deleteReq = ref({
     deleteBackup: false,
     forceDelete: false,
 });
-let dialogVisible = ref(false);
+let open = ref(false);
 let loading = ref(false);
 let deleteInfo = ref('');
 let dbName = ref('');
@@ -78,7 +73,7 @@ const acceptParams = async (prop: DialogProps) => {
     };
     dbName.value = prop.name;
     deleteInfo.value = '';
-    dialogVisible.value = true;
+    open.value = true;
 };
 
 const submit = async () => {
@@ -88,7 +83,7 @@ const submit = async () => {
             loading.value = false;
             emit('search');
             MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
-            dialogVisible.value = false;
+            open.value = false;
         })
         .catch(() => {
             loading.value = false;

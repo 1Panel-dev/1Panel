@@ -50,13 +50,7 @@
             </template>
         </LayoutContent>
 
-        <el-dialog
-            v-model="upgradeVisible"
-            :title="$t('app.checkTitle')"
-            width="30%"
-            :close-on-click-modal="false"
-            :destroy-on-close="true"
-        >
+        <DialogPro v-model="open" :title="$t('app.checkTitle')" size="small">
             <el-alert :closable="false" :title="$t('database.confNotFound')" type="info">
                 <el-link icon="Position" @click="goUpgrade()" type="primary">
                     {{ $t('database.goUpgrade') }}
@@ -64,10 +58,10 @@
             </el-alert>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="upgradeVisible = false">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button @click="open = false">{{ $t('commons.button.cancel') }}</el-button>
                 </span>
             </template>
-        </el-dialog>
+        </DialogPro>
 
         <ConfirmDialog ref="confirmPortRef" @confirm="onSubmitChangePort"></ConfirmDialog>
         <ConfirmDialog ref="confirmConfRef" @confirm="onSubmitChangeConf"></ConfirmDialog>
@@ -100,7 +94,7 @@ const baseInfo = reactive({
 });
 const panelFormRef = ref<FormInstance>();
 const postgresqlConf = ref();
-const upgradeVisible = ref();
+const open = ref();
 
 const postgresqlName = ref();
 const postgresqlStatus = ref();
@@ -207,7 +201,7 @@ const loadPostgresqlConf = async () => {
             postgresqlConf.value = res.data;
         })
         .catch(() => {
-            upgradeVisible.value = true;
+            open.value = true;
             loading.value = false;
         });
 };

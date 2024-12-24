@@ -1,12 +1,5 @@
 <template>
-    <el-dialog
-        v-model="open"
-        :title="$t('ssl.apply')"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        width="50%"
-        :before-close="handleClose"
-    >
+    <DialogPro v-model="open" :title="$t('ssl.apply')" size="large" @close="handleClose">
         <div v-if="loading">
             <el-alert type="info" :closable="false" center>{{ $t('ssl.getDnsResolve') }}</el-alert>
         </div>
@@ -39,7 +32,7 @@
                 </el-button>
             </span>
         </template>
-    </el-dialog>
+    </DialogPro>
 </template>
 
 <script lang="ts" setup>

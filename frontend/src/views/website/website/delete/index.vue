@@ -1,11 +1,5 @@
 <template>
-    <el-dialog
-        v-model="open"
-        :close-on-click-modal="false"
-        :title="$t('website.delete') + ' - ' + websiteName"
-        width="30%"
-        :before-close="handleClose"
-    >
+    <DialogPro v-model="open" :title="$t('website.delete') + ' - ' + websiteName" size="small" @close="handleClose">
         <div :key="key" v-loading="loading">
             <el-form ref="deleteForm" label-position="left">
                 <el-form-item>
@@ -46,7 +40,7 @@
                 </el-button>
             </span>
         </template>
-    </el-dialog>
+    </DialogPro>
 </template>
 
 <script lang="ts" setup>

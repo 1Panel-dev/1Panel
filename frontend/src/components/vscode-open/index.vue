@@ -1,12 +1,6 @@
 <template>
     <div>
-        <el-dialog
-            v-model="dialogVisible"
-            :title="$t('app.checkTitle')"
-            width="30%"
-            :close-on-click-modal="false"
-            :destroy-on-close="true"
-        >
+        <DialogPro v-model="open" :title="$t('app.checkTitle')" size="small">
             <el-row>
                 <el-col :span="22" :offset="1">
                     <el-alert :closable="false" :title="$t('file.vscodeHelper')" type="info"></el-alert>
@@ -37,14 +31,14 @@
                     </el-button>
                 </span>
             </template>
-        </el-dialog>
+        </DialogPro>
     </div>
 </template>
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import { FormInstance } from 'element-plus';
 
-const dialogVisible = ref();
+const open = ref();
 
 interface DialogProps {
     path: string;
@@ -60,7 +54,7 @@ const addForm = reactive({
 
 const em = defineEmits(['close']);
 const handleClose = () => {
-    dialogVisible.value = false;
+    open.value = false;
     if (vscodeConnectInfoForm.value) {
         vscodeConnectInfoForm.value.resetFields();
     }
@@ -73,7 +67,7 @@ const submit = async (formEl: FormInstance | undefined) => {
             return;
         }
         localStorage.setItem('VscodeConnectInfo', JSON.stringify(addForm));
-        dialogVisible.value = false;
+        open.value = false;
         const vscodeUrl = `vscode://vscode-remote/ssh-remote+${addForm.username}@${addForm.host}:${addForm.port}${addForm.path}?windowId=_blank`;
         window.open(vscodeUrl);
     });
@@ -91,7 +85,7 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     }
 
     addForm.path = params.path;
-    dialogVisible.value = true;
+    open.value = true;
 };
 
 defineExpose({ acceptParams });

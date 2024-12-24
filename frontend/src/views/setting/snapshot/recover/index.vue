@@ -1,11 +1,5 @@
 <template>
-    <el-dialog
-        v-model="open"
-        :title="$t('commons.button.recover')"
-        width="40%"
-        :close-on-click-modal="false"
-        :before-close="handleClose"
-    >
+    <DialogPro v-model="open" :title="$t('commons.button.recover')" @close="handleClose">
         <el-form ref="recoverForm" label-position="top" v-loading="loading">
             <div style="margin-left: 20px; line-height: 32px" v-if="recoverReq.isNew">
                 {{ $t('setting.recoverHelper', [recoverReq.name]) }}
@@ -58,7 +52,7 @@
                 </el-button>
             </span>
         </template>
-    </el-dialog>
+    </DialogPro>
     <TaskLog ref="taskLogRef" width="70%" />
 </template>
 

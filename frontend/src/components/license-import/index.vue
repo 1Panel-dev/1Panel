@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-dialog class="level-up-pro" v-model="open" :close-on-click-modal="false" @close="handleClose">
+        <DialogPro v-model="open" class="level-up-pro" @close="handleClose">
             <div style="text-align: center" v-loading="loading">
                 <span class="text-3xl font-medium title">{{ $t('license.levelUpPro') }}</span>
                 <el-row type="flex" justify="center" class="mt-6">
@@ -36,7 +36,7 @@
                     <el-button text type="primary" @click="toHalo">{{ $t('license.knowMorePro') }}</el-button>
                 </div>
             </div>
-        </el-dialog>
+        </DialogPro>
     </div>
 </template>
 

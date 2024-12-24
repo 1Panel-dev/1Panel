@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="open" :title="$t('app.delete')" width="30%" :close-on-click-modal="false">
+    <DialogPro v-model="open" :title="$t('app.delete')" size="small">
         <el-row>
             <el-col :span="20" :offset="2">
                 <el-alert :title="$t('file.deleteRecycleHelper')" show-icon type="error" :closable="false"></el-alert>
@@ -23,7 +23,7 @@
                 </el-button>
             </span>
         </template>
-    </el-dialog>
+    </DialogPro>
 </template>
 <script lang="ts" setup>
 import i18n from '@/lang';

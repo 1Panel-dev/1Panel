@@ -144,7 +144,8 @@
                 </div>
             </div>
         </div>
-        <el-dialog v-model="agreeVisible" center :destroy-on-close="true" :close-on-click-modal="false" width="80%">
+
+        <DialogPro v-model="open" center size="w-90">
             <el-row type="flex" justify="center">
                 <span class="text-base mb-4">
                     {{ $t('commons.login.agreeTitle') }}
@@ -155,7 +156,7 @@
             </div>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="agreeVisible = false">
+                    <el-button @click="open = false">
                         {{ $t('commons.button.notAgree') }}
                     </el-button>
                     <el-button type="primary" @click="agreeWithLogin()">
@@ -163,7 +164,7 @@
                     </el-button>
                 </span>
             </template>
-        </el-dialog>
+        </DialogPro>
     </div>
 </template>
 
@@ -188,7 +189,7 @@ const errAuthInfo = ref(false);
 const errCaptcha = ref(false);
 const errMfaInfo = ref(false);
 const isDemo = ref(false);
-const agreeVisible = ref(false);
+const open = ref(false);
 
 type FormInstance = InstanceType<typeof ElForm>;
 const _isMobile = () => {
@@ -249,7 +250,7 @@ function handleCommand(command: string) {
 }
 
 const agreeWithLogin = () => {
-    agreeVisible.value = false;
+    open.value = false;
     loginForm.agreeLicense = true;
     login(loginFormRef.value);
 };
@@ -260,7 +261,7 @@ const login = (formEl: FormInstance | undefined) => {
         if (!valid) return;
         if (!loginForm.agreeLicense) {
             if (_isMobile()) {
-                agreeVisible.value = true;
+                open.value = true;
             }
             return;
         }

@@ -1,12 +1,5 @@
 <template>
-    <el-dialog
-        v-model="open"
-        :title="$t('ssl.selfSigned')"
-        :close-on-click-modal="false"
-        width="40%"
-        :before-close="handleClose"
-        :destroy-on-close="true"
-    >
+    <DialogPro v-model="open" :title="$t('ssl.selfSigned')" @close="handleClose">
         <el-row v-loading="loading">
             <el-col :span="22" :offset="1">
                 <el-form @submit.prevent ref="obtainForm" label-position="top" :model="obtain" :rules="rules">
@@ -77,7 +70,7 @@
                 </el-button>
             </span>
         </template>
-    </el-dialog>
+    </DialogPro>
 </template>
 
 <script lang="ts" setup>

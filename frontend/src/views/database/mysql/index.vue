@@ -235,13 +235,7 @@
             </LayoutContent>
         </div>
 
-        <el-dialog
-            v-model="dashboardVisible"
-            :title="$t('app.checkTitle')"
-            width="30%"
-            :close-on-click-modal="false"
-            :destroy-on-close="true"
-        >
+        <DialogPro v-model="open" :title="$t('app.checkTitle')" size="small">
             <el-alert :closable="false" :title="$t('app.checkInstalledWarn', [dashboardName])" type="info">
                 <el-link icon="Position" @click="getAppDetail" type="primary">
                     {{ $t('database.goInstall') }}
@@ -249,10 +243,10 @@
             </el-alert>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="dashboardVisible = false">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button @click="open = false">{{ $t('commons.button.cancel') }}</el-button>
                 </span>
             </template>
-        </el-dialog>
+        </DialogPro>
 
         <BindDialog ref="bindRef" @search="search" />
         <PasswordDialog ref="passwordRef" @search="search" />
@@ -315,7 +309,7 @@ const phpadminPort = ref();
 const adminerPort = ref();
 const dashboardName = ref();
 const dashboardKey = ref();
-const dashboardVisible = ref(false);
+const open = ref(false);
 
 const appStatusRef = ref();
 
@@ -453,7 +447,7 @@ const goDashboard = async (name: string) => {
         if (phpadminPort.value === 0) {
             dashboardName.value = 'phpMyAdmin';
             dashboardKey.value = 'phpmyadmin';
-            dashboardVisible.value = true;
+            open.value = true;
             return;
         }
         dialogPortJumpRef.value.acceptParams({ port: phpadminPort.value });
@@ -462,7 +456,7 @@ const goDashboard = async (name: string) => {
     if (adminerPort.value === 0) {
         dashboardName.value = 'Adminer';
         dashboardKey.value = 'adminer';
-        dashboardVisible.value = true;
+        open.value = true;
         return;
     }
     dialogPortJumpRef.value.acceptParams({ port: adminerPort.value });

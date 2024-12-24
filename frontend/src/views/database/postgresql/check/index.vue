@@ -1,11 +1,5 @@
 <template>
-    <el-dialog
-        v-model="open"
-        :title="$t('app.checkTitle')"
-        width="50%"
-        :close-on-click-modal="false"
-        :destroy-on-close="true"
-    >
+    <DialogPro v-model="open" :title="$t('app.checkTitle')" size="large">
         <el-row>
             <el-col :span="20" :offset="2" v-if="open">
                 <el-alert
@@ -26,7 +20,7 @@
                 </el-descriptions>
             </el-col>
         </el-row>
-    </el-dialog>
+    </DialogPro>
 </template>
 <script lang="ts" setup>
 import { ref } from 'vue';

@@ -1,12 +1,5 @@
 <template>
-    <el-dialog
-        v-model="open"
-        :title="$t('commons.button.create')"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        width="40%"
-        :before-close="handleClose"
-    >
+    <DialogPro v-model="open" :title="$t('commons.button.create')" @close="handleClose">
         <el-row>
             <el-col :span="22" :offset="1">
                 <el-form ref="accountForm" label-position="top" :model="account" :rules="rules">
@@ -95,7 +88,7 @@
                 </el-button>
             </span>
         </template>
-    </el-dialog>
+    </DialogPro>
 </template>
 
 <script lang="ts" setup>

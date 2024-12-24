@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="open" :title="$t('app.checkTitle')" width="50%" :close-on-click-modal="false">
+    <DialogPro v-model="open" :title="$t('app.checkTitle')" size="large">
         <el-row>
             <el-col :span="20" :offset="2" v-if="open">
                 <el-alert
@@ -37,7 +37,7 @@
                 </el-button>
             </span>
         </template>
-    </el-dialog>
+    </DialogPro>
 </template>
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';

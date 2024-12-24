@@ -1,14 +1,5 @@
 <template>
-    <el-dialog
-        v-model="open"
-        :show-close="false"
-        :before-close="handleClose"
-        destroy-on-close
-        width="70%"
-        @opened="onOpen"
-        :top="'5vh'"
-        :fullscreen="isFullscreen"
-    >
+    <DialogPro v-model="open" size="w-70" @opened="onOpen" :show-close="false" :top="'5vh'" :fullscreen="isFullscreen">
         <template #header>
             <div ref="dialogHeader" class="flex items-center justify-between">
                 <span>{{ $t('commons.button.edit') + ' - ' + form.path }}</span>
@@ -157,7 +148,7 @@
                 <el-button type="primary" @click="saveContent()">{{ $t('commons.button.confirm') }}</el-button>
             </div>
         </template>
-    </el-dialog>
+    </DialogPro>
 </template>
 
 <script lang="ts" setup>

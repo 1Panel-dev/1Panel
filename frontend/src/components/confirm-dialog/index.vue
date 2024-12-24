@@ -1,10 +1,5 @@
 <template>
-    <el-dialog v-model="submitVisible" :destroy-on-close="true" :close-on-click-modal="false" width="20%">
-        <template #header>
-            <div class="card-header">
-                <span>{{ header }}</span>
-            </div>
-        </template>
+    <DialogPro v-model="submitVisible" :title="header" size="mini">
         <div>
             <span v-if="operationInfo" style="font-size: 12px">{{ operationInfo }}</span>
             <div :style="{ 'margin-top': operationInfo ? '10px' : '0px' }">
@@ -23,7 +18,7 @@
                 </el-button>
             </span>
         </template>
-    </el-dialog>
+    </DialogPro>
 </template>
 
 <script lang="ts" setup>

@@ -104,13 +104,7 @@
             </template>
         </DrawerPro>
 
-        <el-dialog
-            v-model="open"
-            :title="$t('commons.button.recover') + ' - ' + name"
-            width="40%"
-            :close-on-click-modal="false"
-            :before-close="handleBackupClose"
-        >
+        <DialogPro v-model="open" :title="$t('commons.button.recover') + ' - ' + name" @close="handleBackupClose">
             <el-form ref="backupForm" label-position="left" v-loading="loading">
                 <el-form-item
                     :label="$t('setting.compressPassword')"
@@ -130,7 +124,7 @@
                     </el-button>
                 </span>
             </template>
-        </el-dialog>
+        </DialogPro>
 
         <OpDialog ref="opRef" @search="search" />
     </div>

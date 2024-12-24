@@ -1,11 +1,5 @@
 <template>
-    <el-dialog
-        v-model="open"
-        :title="$t('commons.button.create')"
-        :close-on-click-modal="false"
-        width="30%"
-        :before-close="handleClose"
-    >
+    <DialogPro v-model="open" :title="$t('commons.button.create')" size="small" @close="handleClose">
         <el-row v-loading="loading">
             <el-col :span="22" :offset="1">
                 <el-form @submit.prevent ref="accountForm" label-position="top" :model="account" :rules="rules">
@@ -65,7 +59,7 @@
                 </el-button>
             </span>
         </template>
-    </el-dialog>
+    </DialogPro>
 </template>
 <script lang="ts" setup>
 import { FormInstance } from 'element-plus';

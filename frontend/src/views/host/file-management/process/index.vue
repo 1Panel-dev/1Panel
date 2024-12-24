@@ -1,11 +1,5 @@
 <template>
-    <el-dialog
-        width="30%"
-        v-model="open"
-        @open="onOpen"
-        :before-close="handleClose"
-        :title="$t('file.downloadProcess')"
-    >
+    <DialogPro v-model="open" :title="$t('file.downloadProcess')" size="small" @open="onOpen" @close="handleClose">
         <div v-for="(value, index) in res" :key="index">
             <span>{{ value['percent'] === 100 ? $t('file.downloadSuccess') : $t('file.downloading') }}</span>
             <MsgInfo :info="value['name']" width="250" />
@@ -16,7 +10,7 @@
                 <span v-if="value['total'] > 0">{{ getFileSize(value['total']) }}</span>
             </span>
         </div>
-    </el-dialog>
+    </DialogPro>
 </template>
 
 <script lang="ts" setup>

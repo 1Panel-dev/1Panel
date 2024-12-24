@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="dialogVisible" width="30%" :title="$t('commons.button.edit')">
+    <DialogPro v-model="open" :title="$t('commons.button.edit')" size="small">
         <div v-if="isFromApp" class="leading-6">
             <div>
                 <span>{{ $t('container.updateHelper1') }}</span>
@@ -17,21 +17,21 @@
             <span>{{ $t('container.updateHelper4') }}</span>
         </div>
         <template #footer>
-            <el-button :disabled="loading" @click="dialogVisible = false">
+            <el-button :disabled="loading" @click="open = false">
                 {{ $t('commons.button.cancel') }}
             </el-button>
             <el-button :disabled="loading" type="primary" @click="onSubmit()">
                 {{ $t('commons.button.confirm') }}
             </el-button>
         </template>
-    </el-dialog>
+    </DialogPro>
 </template>
 
 <script lang="ts" setup>
 import { ref } from 'vue';
 
 const loading = ref();
-const dialogVisible = ref(false);
+const open = ref(false);
 const isFromApp = ref();
 
 interface DialogProps {
@@ -40,13 +40,13 @@ interface DialogProps {
 
 const acceptParams = (props: DialogProps): void => {
     isFromApp.value = props.isFromApp;
-    dialogVisible.value = true;
+    open.value = true;
 };
 const emit = defineEmits(['submit']);
 
 const onSubmit = async () => {
     emit('submit');
-    dialogVisible.value = false;
+    open.value = false;
 };
 
 defineExpose({

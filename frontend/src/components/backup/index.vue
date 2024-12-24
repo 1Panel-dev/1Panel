@@ -67,12 +67,11 @@
         </template>
     </DrawerPro>
 
-    <el-dialog
+    <DialogPro
         v-model="open"
         :title="isBackup ? $t('commons.button.backup') : $t('commons.button.recover') + ' - ' + name"
-        width="30%"
-        :close-on-click-modal="false"
-        :before-close="handleBackupClose"
+        size="small"
+        @close="handleBackupClose"
     >
         <el-form ref="backupForm" label-position="left" v-loading="loading">
             <el-form-item
@@ -93,7 +92,7 @@
                 </el-button>
             </span>
         </template>
-    </el-dialog>
+    </DialogPro>
 
     <OpDialog ref="opRef" @search="search" />
     <TaskLog ref="taskLogRef" @close="search" />

@@ -1,11 +1,5 @@
 <template>
-    <el-dialog
-        v-model="open"
-        :title="$t('commons.button.delete') + ' - ' + appInstallName"
-        width="40%"
-        :close-on-click-modal="false"
-        :before-close="handleClose"
-    >
+    <DialogPro v-model="open" :title="$t('commons.button.delete') + ' - ' + appInstallName" @close="handleClose">
         <el-form ref="deleteForm" label-position="left" v-loading="loading">
             <el-form-item>
                 <el-checkbox v-model="deleteReq.forceDelete" :label="$t('app.forceDelete')" />
@@ -46,7 +40,7 @@
                 </el-button>
             </span>
         </template>
-    </el-dialog>
+    </DialogPro>
     <TaskLog ref="taskLogRef" @close="handleClose" />
 </template>
 <script lang="ts" setup>

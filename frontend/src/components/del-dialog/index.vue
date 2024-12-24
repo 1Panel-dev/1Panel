@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-dialog v-model="open" :title="form.title" width="30%" :close-on-click-modal="false" @close="handleClose">
+        <DialogPro v-model="open" :title="form.title" size="small" @close="handleClose">
             <div v-loading="loading">
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
@@ -30,7 +30,7 @@
                     </el-button>
                 </span>
             </template>
-        </el-dialog>
+        </DialogPro>
     </div>
 </template>
 

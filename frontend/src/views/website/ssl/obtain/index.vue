@@ -1,12 +1,5 @@
 <template>
-    <el-dialog
-        v-model="open"
-        :title="$t('ssl.apply')"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        width="30%"
-        :before-close="handleClose"
-    >
+    <DialogPro v-model="open" :title="$t('ssl.apply')" size="small" @close="handleClose">
         <div class="text-center" v-loading="loading">
             <div v-if="ssl.websites && ssl.websites.length > 0">
                 <span>{{ $t('ssl.renewWebsite') }}</span>
@@ -30,7 +23,7 @@
                 </el-button>
             </span>
         </template>
-    </el-dialog>
+    </DialogPro>
 </template>
 
 <script lang="ts" setup>
