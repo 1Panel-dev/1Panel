@@ -190,6 +190,10 @@ export const UpdateProxyConfigFile = (req: Website.ProxyFileUpdate) => {
     return http.post<any>(`/websites/proxies/file`, req);
 };
 
+export const ClearProxtCache = (req: Website.WebsiteReq) => {
+    return http.post(`/websites/proxy/clear`, req);
+};
+
 export const GetAuthConfig = (req: Website.AuthReq) => {
     return http.post<Website.AuthConfig>(`/websites/auths`, req);
 };

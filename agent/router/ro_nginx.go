@@ -18,7 +18,6 @@ func (a *NginxRouter) InitRouter(Router *gin.RouterGroup) {
 		groupRouter.POST("/update", baseApi.UpdateNginxConfigByScope)
 		groupRouter.GET("/status", baseApi.GetNginxStatus)
 		groupRouter.POST("/file", baseApi.UpdateNginxFile)
-		groupRouter.POST("/clear", baseApi.ClearNginxProxyCache)
 		groupRouter.POST("/build", baseApi.BuildNginx)
 		groupRouter.POST("/modules/update", baseApi.UpdateNginxModule)
 		groupRouter.GET("/modules", baseApi.GetNginxModules)

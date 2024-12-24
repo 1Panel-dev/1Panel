@@ -2202,7 +2202,7 @@ const message = {
         configResource: '配置修改',
         saveAndReload: '保存並重載',
         clearProxyCache: '清除反代快取',
-        clearProxyCacheWarn: '清除反代快取會影響所有配置快取的網站，並且需要重新啟動 OpenResty， 是否繼續？ ',
+        clearProxyCacheWarn: '此操作將刪除緩存目錄下的所有文件，是否繼續？',
         create: '新增模組',
         update: '編輯模組',
         params: '參數',

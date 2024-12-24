@@ -3,6 +3,9 @@
         <template #toolbar>
             <el-button type="primary" plain @click="openCreate">{{ $t('commons.button.create') }}</el-button>
             <el-button @click="openCache">{{ $t('website.proxyCache') }}</el-button>
+            <el-button type="primary" @click="clear" link>
+                {{ $t('nginx.clearProxyCache') }}
+            </el-button>
         </template>
         <el-table-column :label="$t('commons.table.name')" prop="name"></el-table-column>
         <el-table-column :label="$t('website.proxyPath')" prop="match"></el-table-column>
@@ -35,7 +38,7 @@
 
 <script lang="ts" setup name="proxy">
 import { Website } from '@/api/interface/website';
-import { OperateProxyConfig, GetProxyConfig } from '@/api/modules/website';
+import { OperateProxyConfig, GetProxyConfig, ClearProxtCache } from '@/api/modules/website';
 import { computed, onMounted, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
@@ -196,6 +199,16 @@ const search = async () => {
     } finally {
         loading.value = false;
     }
+};
+
+const clear = () => {
+    ElMessageBox.confirm(i18n.global.t('nginx.clearProxyCacheWarn'), i18n.global.t('nginx.clearProxyCache'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+    }).then(async () => {
+        await ClearProxtCache({ websiteID: id.value });
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+    });
 };
 
 onMounted(() => {

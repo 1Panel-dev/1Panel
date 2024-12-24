@@ -22,10 +22,6 @@ export const UpdateNginxConfigFile = (req: Nginx.NginxFileUpdate) => {
     return http.post(`/openresty/file`, req);
 };
 
-export const ClearNginxCache = () => {
-    return http.post(`/openresty/clear`);
-};
-
 export const BuildNginx = (req: Nginx.NginxBuildReq) => {
     return http.post(`/openresty/build`, req);
 };

@@ -2201,7 +2201,7 @@ const message = {
         configResource: '配置修改',
         saveAndReload: '保存并重载',
         clearProxyCache: '清除反代缓存',
-        clearProxyCacheWarn: '清除反代缓存会影响所有配置缓存的网站，并且需要重启 OpenResty， 是否继续？',
+        clearProxyCacheWarn: '此操作将删除缓存目录下的所有文件, 是否继续？',
         create: '新增模块',
         update: '编辑模块',
         params: '参数',

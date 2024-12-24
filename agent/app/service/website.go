@@ -91,6 +91,7 @@ type IWebsiteService interface {
 	UpdateProxyFile(req request.NginxProxyUpdate) (err error)
 	UpdateProxyCache(req request.NginxProxyCacheUpdate) (err error)
 	GetProxyCache(id uint) (res response.NginxProxyCache, err error)
+	ClearProxyCache(req request.NginxCommonReq) error
 
 	GetAntiLeech(id uint) (*response.NginxAntiLeechRes, error)
 	UpdateAntiLeech(req request.NginxAntiLeechUpdate) (err error)
@@ -1820,6 +1821,28 @@ func (w WebsiteService) UpdateProxyFile(req request.NginxProxyUpdate) (err error
 		}
 	}()
 	return updateNginxConfig(constant.NginxScopeServer, nil, &website)
+}
+
+func (w WebsiteService) ClearProxyCache(req request.NginxCommonReq) error {
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	if err != nil {
+		return err
+	}
+	cacheDir := GetSitePath(website, SiteProxyDir)
+	fileOp := files.NewFileOp()
+	if fileOp.Stat(cacheDir) {
+		if err = fileOp.CleanDir(cacheDir); err != nil {
+			return err
+		}
+	}
+	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return err
+	}
+	if err = opNginx(nginxInstall.ContainerName, constant.NginxReload); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (w WebsiteService) GetAuthBasics(req request.NginxAuthReq) (res response.NginxAuthRes, err error) {

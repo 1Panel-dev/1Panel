@@ -1082,3 +1082,21 @@ func (b *BaseApi) ListCustomRewrite(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, res)
 }
+
+// @Tags Website
+// @Summary Clear Website proxy cache
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/proxy/clear [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"清理 Openresty 代理缓存","formatEN":"Clear nginx proxy cache"}
+func (b *BaseApi) ClearProxyCache(c *gin.Context) {
+	var req request.NginxCommonReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := websiteService.ClearProxyCache(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}

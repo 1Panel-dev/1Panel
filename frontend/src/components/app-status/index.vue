@@ -51,18 +51,6 @@
                     >
                         {{ $t('commons.button.set') }}
                     </el-button>
-                    <el-divider v-if="data.app === 'OpenResty'" direction="vertical" />
-                    <el-button
-                        v-if="data.app === 'OpenResty'"
-                        type="primary"
-                        @click="clear"
-                        link
-                        :disabled="
-                            data.status === 'Installing' || (data.status !== 'Running' && data.app === 'OpenResty')
-                        "
-                    >
-                        {{ $t('nginx.clearProxyCache') }}
-                    </el-button>
                 </div>
                 <div class="ml-5" v-if="key === 'openresty' && (httpPort != 80 || httpsPort != 443)">
                     <el-tooltip
@@ -91,7 +79,6 @@ import Status from '@/components/status/index.vue';
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { ClearNginxCache } from '@/api/modules/nginx';
 
 const props = defineProps({
     appKey: {
@@ -144,16 +131,6 @@ const onCheck = async (key: any, name: any) => {
             em('isExist', false);
             refresh.value++;
         });
-};
-
-const clear = () => {
-    ElMessageBox.confirm(i18n.global.t('nginx.clearProxyCacheWarn'), i18n.global.t('nginx.clearProxyCache'), {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-    }).then(async () => {
-        await ClearNginxCache();
-        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-    });
 };
 
 const onOperate = async (operation: string) => {
