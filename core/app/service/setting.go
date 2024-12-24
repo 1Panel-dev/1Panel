@@ -197,20 +197,6 @@ func (u *SettingService) UpdatePort(port uint) error {
 	if err := firewall.UpdatePort(oldPort.Value, fmt.Sprintf("%v", port)); err != nil {
 		return err
 	}
-	masterAddr, err := settingRepo.Get(repo.WithByKey("MasterAddr"))
-	if err != nil {
-		global.LOG.Errorf("load master addr from db failed, err: %v", err)
-		return err
-	}
-	if len(masterAddr.Value) != 0 {
-		oldMasterPort := loadPort(masterAddr.Value)
-		if len(oldMasterPort) != 0 {
-			if err := xpack.UpdateMasterAddr(strings.ReplaceAll(masterAddr.Value, oldMasterPort, fmt.Sprintf("%v", port))); err != nil {
-				global.LOG.Errorf("update master addr from db failed, err: %v", err)
-				return err
-			}
-		}
-	}
 
 	if err := settingRepo.Update("ServerPort", strconv.Itoa(int(port))); err != nil {
 		return err
@@ -222,6 +208,23 @@ func (u *SettingService) UpdatePort(port uint) error {
 				global.LOG.Errorf("restart system port failed, err: %v", err)
 			}
 		}()
+
+		masterAddr, err := settingRepo.Get(repo.WithByKey("MasterAddr"))
+		if err != nil {
+			global.LOG.Errorf("load master addr from db failed, err: %v", err)
+			return
+		}
+		if len(masterAddr.Value) != 0 {
+			oldMasterPort := loadPort(masterAddr.Value)
+			if len(oldMasterPort) != 0 {
+				newMasterAddr := strings.ReplaceAll(masterAddr.Value, oldMasterPort, fmt.Sprintf("%v", port))
+				_ = settingRepo.Update("MasterAddr", newMasterAddr)
+				if err := xpack.UpdateMasterAddr(newMasterAddr); err != nil {
+					global.LOG.Errorf("update master addr from db failed, err: %v", err)
+					return
+				}
+			}
+		}
 	}()
 	return nil
 }
@@ -306,6 +309,7 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 			} else {
 				addrItem = strings.ReplaceAll(addrItem, "http://", "https://")
 			}
+			_ = settingRepo.Update("MasterAddr", addrItem)
 			if err := xpack.UpdateMasterAddr(addrItem); err != nil {
 				global.LOG.Errorf("update master addr from db failed, err: %v", err)
 			}

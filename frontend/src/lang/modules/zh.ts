@@ -75,6 +75,7 @@ const message = {
             helpDoc: '帮助文档',
             bind: '绑定',
             unbind: '解绑',
+            fix: '修复',
         },
         search: {
             timeStart: '开始时间',

@@ -75,6 +75,7 @@ const message = {
             helpDoc: '幫助文档',
             bind: '綁定',
             unbind: '解除綁定',
+            fix: '修復',
         },
         search: {
             timeStart: '開始時間',

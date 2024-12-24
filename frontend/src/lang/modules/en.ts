@@ -76,6 +76,7 @@ const message = {
             helpDoc: 'Help Document',
             bind: 'Bind',
             unbind: 'Unbind',
+            fix: 'Fix',
         },
         search: {
             timeStart: 'Time start',
