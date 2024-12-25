@@ -18,6 +18,7 @@ const (
 	StatusExceptional = "Exceptional"
 	StatusRetrying    = "Retrying"
 	StatusLost        = "Lost"
+	StatusExecuting   = "Executing"
 
 	StatusEnable  = "Enable"
 	StatusDisable = "Disable"

@@ -11,6 +11,7 @@ const (
 	StatusDisable   = "Disable"
 	StatusNone      = "None"
 	StatusDeleted   = "Deleted"
+	StatusExecuting = "Executing"
 
 	OrderDesc = "descending"
 	OrderAsc  = "ascending"

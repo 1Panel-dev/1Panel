@@ -296,6 +296,7 @@ const message = {
             packing: '打包中',
             sending: '下发中',
             healthy: '正常',
+            executing: '执行中',
         },
         units: {
             second: '秒',
@@ -1165,7 +1166,7 @@ const message = {
         errLog: '错误日志',
         task: '任务日志',
         taskName: '任务名称',
-        taskRunning: '运行中',
+        taskRunning: '执行中',
     },
     file: {
         dir: '文件夹',

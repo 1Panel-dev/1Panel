@@ -291,6 +291,7 @@ TaskSync: "Sync"
 LocalApp: "Local App"
 SubTask: "Subtask"
 RuntimeExtension: "Runtime Extension"
+TaskIsExecuting: "Task is executing"
 
 # task - snapshot 
 Snapshot: "Snapshot"

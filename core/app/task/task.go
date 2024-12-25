@@ -88,7 +88,7 @@ func NewTask(name, operate, taskScope, taskID string, resourceID uint) (*Task, e
 		Name:       name,
 		Type:       taskScope,
 		LogFile:    logPath,
-		Status:     constant.StatusRunning,
+		Status:     constant.StatusExecuting,
 		ResourceID: resourceID,
 		Operate:    operate,
 	}
@@ -188,7 +188,7 @@ func (t *Task) Execute() error {
 			break
 		}
 	}
-	if t.Task.Status == constant.StatusRunning {
+	if t.Task.Status == constant.StatusExecuting {
 		t.Task.Status = constant.StatusSuccess
 		t.Log(i18n.GetWithName("TaskSuccess", t.Name))
 	} else {

@@ -296,6 +296,7 @@ const message = {
             packing: '打包中',
             sending: '下發中',
             healthy: '正常',
+            executing: '執行中',
         },
         units: {
             second: '秒',

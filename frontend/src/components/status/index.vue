@@ -47,6 +47,7 @@ const getType = (status: string) => {
         case 'done':
         case 'healthy':
         case 'used':
+        case 'executing':
             return 'success';
         case 'stopped':
         case 'exceptional':
@@ -80,6 +81,7 @@ const loadingStatus = [
     'packing',
     'sending',
     'waiting',
+    'executing',
 ];
 
 const loadingIcon = (status: string): boolean => {

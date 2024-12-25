@@ -292,7 +292,7 @@ TaskSync: "同步"
 LocalApp: "本地應用"
 SubTask: "子任務"
 RuntimeExtension: "運行環境擴展"
-
+TaskIsExecuting: "任務正在執行中"
 
 # task - snapshot 
 Snapshot: "快照"

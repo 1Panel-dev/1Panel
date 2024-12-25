@@ -3,6 +3,7 @@ package task
 import (
 	"context"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"log"
 	"os"
 	"path"
@@ -75,17 +76,22 @@ const (
 	TaskScopeRuntimeExtension = "RuntimeExtension"
 )
 
-const (
-	TaskSuccess = "Success"
-	TaskFailed  = "Failed"
-)
-
 func GetTaskName(resourceName, operate, scope string) string {
 	return fmt.Sprintf("%s%s [%s]", i18n.GetMsgByKey(operate), i18n.GetMsgByKey(scope), resourceName)
 }
 
 func NewTaskWithOps(resourceName, operate, scope, taskID string, resourceID uint) (*Task, error) {
 	return NewTask(GetTaskName(resourceName, operate, scope), operate, scope, taskID, resourceID)
+}
+
+func CheckTaskIsExecuting(name string) error {
+	taskRepo := repo.NewITaskRepo()
+	commonRepo := repo.NewCommonRepo()
+	task, _ := taskRepo.GetFirst(commonRepo.WithByStatus(constant.StatusExecuting), commonRepo.WithByName(name))
+	if task.ID != "" {
+		return buserr.New("TaskIsExecuting")
+	}
+	return nil
 }
 
 func NewTask(name, operate, taskScope, taskID string, resourceID uint) (*Task, error) {
@@ -109,7 +115,7 @@ func NewTask(name, operate, taskScope, taskID string, resourceID uint) (*Task, e
 		Name:       name,
 		Type:       taskScope,
 		LogFile:    logPath,
-		Status:     constant.StatusRunning,
+		Status:     constant.StatusExecuting,
 		ResourceID: resourceID,
 		Operate:    operate,
 	}
@@ -209,7 +215,7 @@ func (t *Task) Execute() error {
 			break
 		}
 	}
-	if t.Task.Status == constant.Running {
+	if t.Task.Status == constant.StatusExecuting {
 		t.Task.Status = constant.StatusSuccess
 		t.Log(i18n.GetWithName("TaskSuccess", t.Name))
 	} else {

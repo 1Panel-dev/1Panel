@@ -301,6 +301,7 @@ const message = {
             packing: 'Packing',
             sending: 'Sending',
             healthy: 'Normal',
+            executing: 'Executing',
         },
         units: {
             second: 'Second',

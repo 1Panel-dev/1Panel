@@ -34,6 +34,7 @@ interface LogProps {
     type: string;
     name?: string;
     tail?: boolean;
+    taskID?: string;
 }
 
 const props = defineProps({
@@ -72,6 +73,7 @@ const stopSignals = [
     'image pull successful!',
     'image push failed!',
     'image push successful!',
+    '[TASK-END]',
 ];
 const emit = defineEmits(['update:loading', 'update:hasContent', 'update:isReading']);
 const tailLog = ref(false);
@@ -83,6 +85,7 @@ const readReq = reactive({
     page: 1,
     pageSize: 500,
     latest: false,
+    taskID: '',
 });
 const isLoading = ref(false);
 const end = ref(false);
@@ -158,6 +161,7 @@ const getContent = async (pre: boolean) => {
     readReq.id = props.config.id;
     readReq.type = props.config.type;
     readReq.name = props.config.name;
+    readReq.taskID = props.config.taskID;
     if (readReq.page < 1) {
         readReq.page = 1;
     }

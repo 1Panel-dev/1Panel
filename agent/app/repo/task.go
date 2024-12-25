@@ -18,6 +18,7 @@ type ITaskRepo interface {
 	GetFirst(opts ...DBOption) (model.Task, error)
 	Page(page, size int, opts ...DBOption) (int64, []model.Task, error)
 	Update(ctx context.Context, task *model.Task) error
+	UpdateRunningTaskToFailed() error
 
 	WithByID(id string) DBOption
 	WithResourceID(id uint) DBOption
@@ -89,4 +90,8 @@ func (t TaskRepo) Page(page, size int, opts ...DBOption) (int64, []model.Task, e
 
 func (t TaskRepo) Update(ctx context.Context, task *model.Task) error {
 	return getTaskTx(ctx).Save(&task).Error
+}
+
+func (t TaskRepo) UpdateRunningTaskToFailed() error {
+	return getTaskDb(commonRepo.WithByStatus(constant.StatusExecuting)).Model(&model.Task{}).Updates(map[string]interface{}{"status": constant.StatusFailed, "error_msg": "1Panel restart causes failure"}).Error
 }

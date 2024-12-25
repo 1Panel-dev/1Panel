@@ -135,6 +135,7 @@ type TaskReq struct {
 	TaskID      string `json:"taskID"`
 	TaskType    string `json:"taskType"`
 	TaskOperate string `json:"taskOperate"`
+	ResourceID  uint   `json:"resourceID"`
 }
 
 type FileExistReq struct {

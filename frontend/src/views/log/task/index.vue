@@ -10,7 +10,7 @@
                     <el-option :label="$t('commons.table.all')" value=""></el-option>
                     <el-option :label="$t('commons.status.success')" value="Success"></el-option>
                     <el-option :label="$t('commons.status.failed')" value="Failed"></el-option>
-                    <el-option :label="$t('logs.taskRunning')" value="Running"></el-option>
+                    <el-option :label="$t('logs.taskRunning')" value="Executing"></el-option>
                 </el-select>
                 <TableRefresh @search="search()" />
                 <TableSetting title="task-log-refresh" @search="search()" />

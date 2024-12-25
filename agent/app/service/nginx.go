@@ -170,6 +170,10 @@ func (n NginxService) Build(req request.NginxBuildReq) error {
 	if err != nil {
 		return err
 	}
+	taskName := task.GetTaskName(nginxInstall.Name, task.TaskBuild, task.TaskScopeApp)
+	if err = task.CheckTaskIsExecuting(taskName); err != nil {
+		return err
+	}
 	fileOp := files.NewFileOp()
 	buildPath := path.Join(nginxInstall.GetPath(), "build")
 	if !fileOp.Stat(buildPath) {
