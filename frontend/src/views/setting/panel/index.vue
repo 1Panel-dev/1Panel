@@ -27,7 +27,7 @@
                             </el-form-item>
 
                             <el-form-item :label="$t('setting.theme')" prop="theme">
-                                <div class="flex justify-between items-center gap-6">
+                                <div class="flex justify-start items-center sm:gap-6 gap-2">
                                     <el-radio-group @change="onSave('Theme', form.theme)" v-model="form.theme">
                                         <el-radio-button value="light">
                                             <span>{{ $t('setting.light') }}</span>
@@ -72,17 +72,20 @@
                             </el-form-item>
 
                             <el-form-item :label="$t('setting.language')" prop="language">
-                                <el-radio-group
-                                    style="width: 100%"
+                                <el-select
+                                    class="sm:!w-1/2 !w-full"
                                     @change="onSave('Language', form.language)"
                                     v-model="form.language"
                                 >
-                                    <el-radio v-if="globalStore.isIntl" value="en">English</el-radio>
-                                    <el-radio value="zh">中文(简体)</el-radio>
-                                    <el-radio value="tw">中文(繁體)</el-radio>
-                                    <el-radio v-if="!globalStore.isIntl" value="en">English</el-radio>
-                                    <el-radio value="ru">Русский</el-radio>
-                                </el-radio-group>
+                                    <el-option
+                                        v-for="option in languageOptions"
+                                        :key="option.value"
+                                        :value="option.value"
+                                        :label="option.label"
+                                    >
+                                        {{ option.label }}
+                                    </el-option>
+                                </el-select>
                             </el-form-item>
 
                             <el-form-item :label="$t('setting.sessionTimeout')" prop="sessionTimeout">
@@ -291,6 +294,17 @@ interface Node {
     label: string;
     isCheck: boolean;
     children?: Node[];
+}
+
+const languageOptions = ref([
+    { value: 'zh', label: '中文(简体)' },
+    { value: 'tw', label: '中文(繁體)' },
+    ...(!globalStore.isIntl ? [{ value: 'en', label: 'English' }] : []),
+    { value: 'ru', label: 'Русский' },
+]);
+
+if (globalStore.isIntl) {
+    languageOptions.value.unshift({ value: 'en', label: 'English' });
 }
 
 const search = async () => {
