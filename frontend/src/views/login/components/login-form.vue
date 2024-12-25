@@ -55,16 +55,13 @@
                                         <el-dropdown-item v-if="globalStore.isIntl" command="en">
                                             English
                                         </el-dropdown-item>
-                                        <el-dropdown-item v-if="globalStore.isIntl" command="ru">
-                                            Русский
-                                        </el-dropdown-item>
                                         <el-dropdown-item command="zh">中文(简体)</el-dropdown-item>
                                         <el-dropdown-item command="tw">中文(繁體)</el-dropdown-item>
                                         <el-dropdown-item v-if="!globalStore.isIntl" command="en">
                                             English
                                         </el-dropdown-item>
                                     </el-dropdown-menu>
-                                    <el-dropdown-item v-if="!globalStore.isIntl" command="ru">Русский</el-dropdown-item>
+                                    <el-dropdown-item command="ru">Русский</el-dropdown-item>
                                 </template>
                             </el-dropdown>
                         </div>

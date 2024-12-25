@@ -5,7 +5,7 @@
                 <el-form :model="form" :label-position="mobile ? 'top' : 'left'" label-width="auto">
                     <el-row>
                         <el-col :span="1"><br /></el-col>
-                        <el-col :xs="24" :sm="20" :md="15" :lg="12" :xl="12">
+                        <el-col :xs="24" :sm="20" :md="15" :lg="13" :xl="12">
                             <el-form-item :label="$t('setting.user')" prop="userName">
                                 <el-input disabled v-model="form.userName">
                                     <template #append>
@@ -78,11 +78,10 @@
                                     v-model="form.language"
                                 >
                                     <el-radio v-if="globalStore.isIntl" value="en">English</el-radio>
-                                    <el-radio v-if="globalStore.isIntl" value="ru">Русский</el-radio>
                                     <el-radio value="zh">中文(简体)</el-radio>
                                     <el-radio value="tw">中文(繁體)</el-radio>
                                     <el-radio v-if="!globalStore.isIntl" value="en">English</el-radio>
-                                    <el-radio v-if="!globalStore.isIntl" value="ru">Русский</el-radio>
+                                    <el-radio value="ru">Русский</el-radio>
                                 </el-radio-group>
                             </el-form-item>
 

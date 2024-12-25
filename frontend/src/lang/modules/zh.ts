@@ -369,7 +369,7 @@ const message = {
 
         core: '物理核心',
         logicCore: '逻辑核心',
-        loadAverage: '最近 {0} 分钟平均负载',
+        loadAverage: '最近 1 分钟平均负载 | 最近 {n} 分钟平均负载',
         load: '负载',
         mount: '挂载点',
         fileSystem: '文件系统',
