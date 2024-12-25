@@ -1,7 +1,7 @@
 <template>
     <el-tooltip v-if="msg" effect="dark" placement="bottom">
         <template #content>
-            <div style="width: 300px; word-break: break-all">{{ msg }}</div>
+            <div class="content">{{ msg }}</div>
         </template>
         <el-tag size="small" :type="getType(statusItem)" round effect="light">
             <span class="flx-align-center">
@@ -19,6 +19,10 @@
             <el-icon v-if="loadingIcon(statusItem)" class="is-loading">
                 <Loading />
             </el-icon>
+            <el-icon size="15" v-if="operate">
+                <CaretRight v-if="statusItem == 'running'" />
+                <CaretBottom v-if="statusItem == 'stopped'" />
+            </el-icon>
         </span>
     </el-tag>
 </template>
@@ -29,6 +33,11 @@ import { computed } from 'vue';
 const props = defineProps({
     status: String,
     msg: String,
+    operate: {
+        type: Boolean,
+        default: false,
+        required: false,
+    },
 });
 
 const statusItem = computed(() => {
@@ -88,3 +97,10 @@ const loadingIcon = (status: string): boolean => {
     return loadingStatus.indexOf(status) > -1;
 };
 </script>
+
+<style lang="scss" scoped>
+.content {
+    width: 300px;
+    word-break: break-all;
+}
+</style>

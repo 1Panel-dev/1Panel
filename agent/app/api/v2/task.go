@@ -29,3 +29,17 @@ func (b *BaseApi) PageTasks(c *gin.Context) {
 		Total: total,
 	})
 }
+
+// @Tags TaskLog
+// @Summary Get the number of executing tasks
+// @Success 200 {object} int64
+// @Security ApiKeyAuth
+// @Router /logs/tasks/executing/count [get]
+func (b *BaseApi) CountExecutingTasks(c *gin.Context) {
+	count, err := taskService.CountExecutingTask()
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, count)
+}

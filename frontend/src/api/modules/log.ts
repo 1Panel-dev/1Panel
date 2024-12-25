@@ -24,3 +24,7 @@ export const cleanLogs = (param: Log.CleanLog) => {
 export const searchTasks = (req: Log.SearchTaskReq) => {
     return http.post<ResPage<Log.Task>>(`/logs/tasks/search`, req);
 };
+
+export const countExecutingTask = () => {
+    return http.get<number>(`/tasks/executing/count`);
+};

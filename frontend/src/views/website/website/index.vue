@@ -138,10 +138,11 @@
                         <template #default="{ row }">
                             <Status
                                 v-if="row.status === 'Running'"
+                                :operate="true"
                                 :status="row.status"
                                 @click="opWebsite('stop', row.id)"
                             />
-                            <Status v-else :status="row.status" @click="opWebsite('start', row.id)" />
+                            <Status v-else :status="row.status" :operate="true" @click="opWebsite('start', row.id)" />
                         </template>
                     </el-table-column>
                     <el-table-column

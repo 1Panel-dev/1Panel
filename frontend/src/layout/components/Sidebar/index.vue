@@ -7,24 +7,37 @@
         element-loading-background="rgba(122, 122, 122, 0.01)"
     >
         <Logo :isCollapse="isCollapse" />
-
-        <span v-if="nodes.length !== 0" class="el-dropdown-link">
-            {{ loadCurrentName() }}
-        </span>
-        <el-dropdown v-if="nodes.length !== 0" placement="right-start" @command="changeNode">
-            <el-icon class="ico"><Switch /></el-icon>
-            <template #dropdown>
-                <el-dropdown-menu>
-                    <el-dropdown-item command="local">
-                        {{ $t('terminal.local') }}
-                    </el-dropdown-item>
-                    <el-dropdown-item v-for="item in nodes" :key="item.name" :command="item.name">
-                        {{ item.name }}
-                    </el-dropdown-item>
-                </el-dropdown-menu>
-            </template>
-        </el-dropdown>
-
+        <div class="el-dropdown-link flex justify-between items-center">
+            <el-button type="text" @click="openChangeNode" @mouseenter="openChangeNode">
+                <span>
+                    {{ loadCurrentName() }}
+                </span>
+            </el-button>
+            <div>
+                <el-dropdown
+                    ref="nodeChangeRef"
+                    trigger="contextmenu"
+                    v-if="nodes.length > 0"
+                    placement="right-start"
+                    @command="changeNode"
+                >
+                    <span></span>
+                    <template #dropdown>
+                        <el-dropdown-menu>
+                            <el-dropdown-item command="local">
+                                <SvgIcon class="ico" iconName="p-host" />
+                                {{ $t('terminal.local') }}
+                            </el-dropdown-item>
+                            <el-dropdown-item v-for="item in nodes" :key="item.name" :command="item.name">
+                                <SvgIcon class="ico" iconName="p-host" />
+                                {{ item.name }}
+                            </el-dropdown-item>
+                        </el-dropdown-menu>
+                    </template>
+                </el-dropdown>
+            </div>
+            <el-tag type="danger" size="small" effect="light" class="mr-2">{{ taskCount }}</el-tag>
+        </div>
         <el-scrollbar>
             <el-menu
                 :default-active="activeMenu"
@@ -59,16 +72,18 @@ import SubItem from './components/SubItem.vue';
 import router, { menuList } from '@/routers/router';
 import { logOutApi } from '@/api/modules/auth';
 import i18n from '@/lang';
-import { ElMessageBox } from 'element-plus';
+import { DropdownInstance, ElMessageBox } from 'element-plus';
 import { GlobalStore, MenuStore } from '@/store';
 import { MsgSuccess } from '@/utils/message';
 import { isString } from '@vueuse/core';
 import { getSettingInfo, listNodeOptions } from '@/api/modules/setting';
+import { countExecutingTask } from '@/api/modules/log';
 
 const route = useRoute();
 const menuStore = MenuStore();
 const globalStore = GlobalStore();
 const nodes = ref([]);
+const nodeChangeRef = ref<DropdownInstance>();
 defineProps({
     menuRouter: {
         type: Boolean,
@@ -85,6 +100,10 @@ const isCollapse = computed((): boolean => menuStore.isCollapse);
 let routerMenus = computed((): RouteRecordRaw[] => {
     return menuStore.menuList.filter((route) => route.meta && !route.meta.hideInSidebar);
 });
+
+const openChangeNode = () => {
+    nodeChangeRef.value?.handleOpen();
+};
 
 const loadCurrentName = () => {
     if (globalStore.currentNode) {
@@ -223,15 +242,26 @@ const search = async () => {
     menuStore.menuList = rstMenuList;
 };
 
+const taskCount = ref(0);
+const checkTask = async () => {
+    try {
+        const res = await countExecutingTask();
+        taskCount.value = res.data;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
 onMounted(() => {
     menuStore.setMenuList(menuList);
     search();
     loadNodes();
+    checkTask();
 });
 </script>
 
 <style lang="scss">
-@import './index.scss';
+@use './index.scss';
 
 .sidebar-container {
     position: relative;
@@ -252,20 +282,13 @@ onMounted(() => {
 
 .el-dropdown-link {
     margin-top: -5px;
-    margin-left: 30px;
+    margin-left: 15px;
     font-size: 14px;
     font-weight: 500;
-    cursor: pointer;
     color: var(--el-color-primary);
-    display: flex;
-    align-items: center;
-    height: 28px;
+    height: 38px;
 }
 .ico {
-    margin-top: -20px;
-    display: flex;
-    float: left;
-    position: absolute;
-    right: 25px;
+    height: 20px !important;
 }
 </style>

@@ -19,6 +19,7 @@ type ITaskRepo interface {
 	Page(page, size int, opts ...DBOption) (int64, []model.Task, error)
 	Update(ctx context.Context, task *model.Task) error
 	UpdateRunningTaskToFailed() error
+	CountExecutingTask() (int64, error)
 
 	WithByID(id string) DBOption
 	WithResourceID(id uint) DBOption
@@ -94,4 +95,10 @@ func (t TaskRepo) Update(ctx context.Context, task *model.Task) error {
 
 func (t TaskRepo) UpdateRunningTaskToFailed() error {
 	return getTaskDb(commonRepo.WithByStatus(constant.StatusExecuting)).Model(&model.Task{}).Updates(map[string]interface{}{"status": constant.StatusFailed, "error_msg": "1Panel restart causes failure"}).Error
+}
+
+func (t TaskRepo) CountExecutingTask() (int64, error) {
+	var count int64
+	err := getTaskDb(commonRepo.WithByStatus(constant.StatusExecuting)).Model(&model.Task{}).Count(&count).Error
+	return count, err
 }

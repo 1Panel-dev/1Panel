@@ -10,6 +10,7 @@ type TaskLogService struct{}
 type ITaskLogService interface {
 	Page(req dto.SearchTaskLogReq) (int64, []dto.TaskDTO, error)
 	SyncForRestart() error
+	CountExecutingTask() (int64, error)
 }
 
 func NewITaskService() ITaskLogService {
@@ -44,4 +45,8 @@ func (u *TaskLogService) Page(req dto.SearchTaskLogReq) (int64, []dto.TaskDTO, e
 
 func (u *TaskLogService) SyncForRestart() error {
 	return taskRepo.UpdateRunningTaskToFailed()
+}
+
+func (u *TaskLogService) CountExecutingTask() (int64, error) {
+	return taskRepo.CountExecutingTask()
 }
