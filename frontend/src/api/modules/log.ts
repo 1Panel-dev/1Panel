@@ -26,5 +26,5 @@ export const searchTasks = (req: Log.SearchTaskReq) => {
 };
 
 export const countExecutingTask = () => {
-    return http.get<number>(`/tasks/executing/count`);
+    return http.get<number>(`/logs/tasks/executing/count`);
 };

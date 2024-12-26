@@ -25,6 +25,10 @@ defineProps({
         type: String,
         default: '30%',
     },
+    tail: {
+        type: Boolean,
+        default: true,
+    },
 });
 
 const config = reactive({
@@ -33,6 +37,7 @@ const config = reactive({
     taskOperate: '',
     resourceID: 0,
     taskType: '',
+    tail: true,
 });
 const open = ref(false);
 

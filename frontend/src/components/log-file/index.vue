@@ -1,5 +1,5 @@
 <template>
-    <div v-loading="isLoading">
+    <div v-loading="initLog && isLoading">
         <div v-if="defaultButton">
             <el-checkbox border v-model="tailLog" class="float-left" @change="changeTail(false)">
                 {{ $t('commons.button.watch') }}
@@ -94,6 +94,7 @@ const maxPage = ref(0);
 const minPage = ref(0);
 let timer: NodeJS.Timer | null = null;
 const logPath = ref('');
+const initLog = ref(false);
 
 const firstLoading = ref(false);
 const logs = ref<string[]>([]);
@@ -213,6 +214,7 @@ const getContent = async (pre: boolean) => {
         }
 
         nextTick(() => {
+            console.log('pre', pre);
             if (pre) {
                 logContainer.value.scrollTop = 2000;
             } else {
@@ -249,10 +251,14 @@ const getContent = async (pre: boolean) => {
 
 const onCloseLog = async () => {
     tailLog.value = false;
-    clearInterval(Number(timer));
+    if (timer) {
+        clearInterval(Number(timer));
+        timer = null;
+    }
     timer = null;
     isLoading.value = false;
     emit('update:isReading', false);
+    initLog.value = false;
 };
 
 watch(
@@ -263,6 +269,7 @@ watch(
 );
 
 const init = async () => {
+    initLog.value = true;
     if (props.config.tail) {
         tailLog.value = props.config.tail;
     } else {
@@ -287,18 +294,8 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
+    console.log('onUnmounted');
     onCloseLog();
-});
-
-onMounted(async () => {
-    firstLoading.value = true;
-    await init();
-    nextTick(() => {
-        if (logContainer.value) {
-            logContainer.value.scrollTop = totalHeight.value;
-            containerHeight.value = logContainer.value.getBoundingClientRect().height;
-        }
-    });
 });
 
 defineExpose({ changeTail, onDownload, clearLog });
