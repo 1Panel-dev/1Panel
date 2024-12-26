@@ -26,6 +26,8 @@ type IBackupRepo interface {
 	WithByFileName(fileName string) DBOption
 	WithByCronID(cronjobID uint) DBOption
 	WithFileNameStartWith(filePrefix string) DBOption
+
+	SyncAll(data []model.BackupAccount) error
 }
 
 func NewIBackupRepo() IBackupRepo {
@@ -152,4 +154,18 @@ func (u *BackupRepo) GetRecord(opts ...DBOption) (*model.BackupRecord, error) {
 	}
 	err := db.Find(record).Error
 	return record, err
+}
+
+func (u *BackupRepo) SyncAll(data []model.BackupAccount) error {
+	tx := global.DB.Begin()
+	if err := tx.Where("1 = 1").Delete(&model.BackupAccount{}).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	if err := tx.Model(model.BackupAccount{}).Save(&data).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	tx.Commit()
+	return nil
 }

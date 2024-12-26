@@ -81,9 +81,6 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "BaseDir", Value: nodeInfo.BaseDir}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "EncryptKey", Value: nodeInfo.EncryptKey}).Error; err != nil {
-			return err
-		}
 		itemKey, _ := encrypt.StringEncrypt(nodeInfo.ServerKey)
 		if err := tx.Create(&model.Setting{Key: "ServerKey", Value: itemKey}).Error; err != nil {
 			return err
@@ -99,6 +96,9 @@ var InitSetting = &gormigrate.Migration{
 			return err
 		}
 
+		if err := tx.Create(&model.Setting{Key: "EncryptKey", Value: common.RandStr(16)}).Error; err != nil {
+			return err
+		}
 		if err := tx.Create(&model.Setting{Key: "SystemIP", Value: ""}).Error; err != nil {
 			return err
 		}

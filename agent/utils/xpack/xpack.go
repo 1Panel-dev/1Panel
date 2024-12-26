@@ -14,7 +14,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
-	"github.com/1Panel-dev/1Panel/agent/utils/common"
 )
 
 func RemoveTamper(website string) {}
@@ -48,7 +47,6 @@ func LoadNodeInfo() (bool, model.NodeInfo, error) {
 	var info model.NodeInfo
 	info.BaseDir = loadParams("BASE_DIR")
 	info.Version = loadParams("ORIGINAL_VERSION")
-	info.EncryptKey = common.RandStr(16)
 	info.Scope = "master"
 	return false, info, nil
 }

@@ -8,10 +8,9 @@ type Setting struct {
 }
 
 type NodeInfo struct {
-	Scope      string `json:"scope"`
-	BaseDir    string `json:"baseDir"`
-	Version    string `json:"version"`
-	EncryptKey string `json:"encryptKey"`
-	ServerCrt  string `json:"serverCrt"`
-	ServerKey  string `json:"serverKey"`
+	Scope     string `json:"scope"`
+	BaseDir   string `json:"baseDir"`
+	Version   string `json:"version"`
+	ServerCrt string `json:"serverCrt"`
+	ServerKey string `json:"serverKey"`
 }

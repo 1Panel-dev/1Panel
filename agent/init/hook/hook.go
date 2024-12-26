@@ -26,7 +26,7 @@ func initGlobalData() {
 	if err := settingRepo.Update("SystemStatus", "Free"); err != nil {
 		global.LOG.Fatalf("init service before start failed, err: %v", err)
 	}
-
+	global.CONF.System.EncryptKey, _ = settingRepo.GetValueByKey("EncryptKey")
 	_ = service.NewISettingService().ReloadConn()
 	if global.IsMaster {
 		global.CoreDB = common.LoadDBConnByPath(path.Join(global.CONF.System.DbPath, "core.db"), "core")

@@ -106,7 +106,6 @@ func (u *SettingService) ReloadConn() error {
 
 	global.CONF.System.BaseDir = nodeInfo.BaseDir
 	global.CONF.System.Version = nodeInfo.Version
-	global.CONF.System.EncryptKey = nodeInfo.EncryptKey
 	global.IsMaster = nodeInfo.Scope == "master"
 	return nil
 }
