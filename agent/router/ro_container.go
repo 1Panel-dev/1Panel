@@ -23,7 +23,7 @@ func (s *ContainerRouter) InitRouter(Router *gin.RouterGroup) {
 		baRouter.POST("/list", baseApi.ListContainer)
 		baRouter.GET("/status", baseApi.LoadContainerStatus)
 		baRouter.GET("/list/stats", baseApi.ContainerListStats)
-		baRouter.GET("/search/log", baseApi.ContainerLogs)
+		baRouter.GET("/search/log", baseApi.ContainerStreamLogs)
 		baRouter.POST("/download/log", baseApi.DownloadContainerLogs)
 		baRouter.GET("/limit", baseApi.LoadResourceLimit)
 		baRouter.POST("/clean/log", baseApi.CleanContainerLog)
@@ -46,7 +46,6 @@ func (s *ContainerRouter) InitRouter(Router *gin.RouterGroup) {
 		baRouter.POST("/compose/test", baseApi.TestCompose)
 		baRouter.POST("/compose/operate", baseApi.OperatorCompose)
 		baRouter.POST("/compose/update", baseApi.ComposeUpdate)
-		baRouter.GET("/compose/search/log", baseApi.ComposeLogs)
 
 		baRouter.GET("/template", baseApi.ListComposeTemplate)
 		baRouter.POST("/template/search", baseApi.SearchComposeTemplate)

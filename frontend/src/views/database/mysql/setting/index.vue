@@ -86,7 +86,7 @@
                         </el-row>
                     </el-form>
                 </div>
-                <ContainerLog v-if="activeName === 'log'" ref="dialogContainerLogRef" />
+                <ContainerLog v-if="activeName === 'log'" :container="containerID" />
                 <SlowLog
                     @loading="changeLoading"
                     @refresh="loadBaseInfo"
@@ -155,6 +155,7 @@ const mysqlName = ref();
 const mysqlStatus = ref();
 const mysqlVersion = ref();
 const variables = ref();
+const containerID = ref('');
 
 interface DBProps {
     type: string;
@@ -165,7 +166,6 @@ const props = withDefaults(defineProps<DBProps>(), {
     database: '',
 });
 
-const dialogContainerLogRef = ref();
 const jumpToConf = async () => {
     activeName.value = 'conf';
     loadMysqlConf();
@@ -275,8 +275,8 @@ const onSaveConf = async () => {
     return;
 };
 
-const loadContainerLog = async (containerID: string) => {
-    dialogContainerLogRef.value!.acceptParams({ containerID: containerID, container: containerID });
+const loadContainerLog = async (conID: string) => {
+    containerID.value = conID;
 };
 
 const loadBaseInfo = async () => {

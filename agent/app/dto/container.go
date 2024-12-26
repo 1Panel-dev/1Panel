@@ -268,3 +268,12 @@ type ContainerLog struct {
 	Tail          uint   `json:"tail"`
 	ContainerType string `json:"containerType"`
 }
+
+type StreamLog struct {
+	Compose   string
+	Container string
+	Since     string
+	Follow    bool
+	Tail      string
+	Type      string
+}
