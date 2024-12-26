@@ -6,11 +6,11 @@ import { Backup } from '../interface/backup';
 import { TimeoutEnum } from '@/enums/http-enum';
 
 // backup-agent
-export const listBackupOptions = () => {
-    return http.get<Array<Backup.BackupOption>>(`/backups/options`);
-};
 export const handleBackup = (params: Backup.Backup) => {
     return http.post(`/backups/backup`, params, TimeoutEnum.T_1H);
+};
+export const listBackupOptions = () => {
+    return http.get<Array<Backup.BackupOption>>(`/backups/options`);
 };
 export const handleRecover = (params: Backup.Recover) => {
     return http.post(`/backups/recover`, params, TimeoutEnum.T_1D);

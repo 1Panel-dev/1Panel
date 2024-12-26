@@ -107,13 +107,14 @@ func (u *BackupService) GetLocalDir() (string, error) {
 }
 
 func (u *BackupService) SearchWithPage(req dto.SearchPageWithType) (int64, interface{}, error) {
-	count, accounts, err := backupRepo.Page(
-		req.Page,
-		req.PageSize,
-		repo.WithByType(req.Type),
-		repo.WithByName(req.Info),
-		repo.WithOrderBy("created_at desc"),
-	)
+	options := []global.DBOption{repo.WithOrderBy("created_at desc")}
+	if len(req.Type) != 0 {
+		options = append(options, repo.WithByType(req.Type))
+	}
+	if len(req.Info) != 0 {
+		options = append(options, repo.WithByType(req.Info))
+	}
+	count, accounts, err := backupRepo.Page(req.Page, req.PageSize, options...)
 	if err != nil {
 		return 0, nil, err
 	}
