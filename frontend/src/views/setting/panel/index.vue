@@ -30,7 +30,7 @@
 
                     <el-form-item :label="$t('setting.theme')" prop="theme">
                         <div class="flex justify-center items-center sm:gap-6 gap-2">
-                            <div class="sm:block hidden">
+                            <div class="sm:contents hidden">
                                 <el-radio-group @change="onSave('Theme', form.theme)" v-model="form.theme">
                                     <el-radio-button value="light">
                                         <span>{{ $t('setting.light') }}</span>
@@ -43,8 +43,8 @@
                                     </el-radio-button>
                                 </el-radio-group>
                             </div>
-                            <div class="sm:hidden block w-32 !h-[34px]">
-                                <el-select class="!h-[34px]" @change="onSave('Theme', form.theme)" v-model="form.theme">
+                            <div class="sm:hidden block w-32 !h-[33.5px]">
+                                <el-select @change="onSave('Theme', form.theme)" v-model="form.theme">
                                     <el-option key="light" value="light" :label="$t('setting.light')">
                                         {{ $t('setting.light') }}
                                     </el-option>
@@ -56,9 +56,16 @@
                                     </el-option>
                                 </el-select>
                             </div>
-                            <el-button v-if="isProductPro" @click="onChangeThemeColor" icon="Setting" class="!h-[34px]">
-                                <span>{{ $t('container.custom') }}</span>
-                            </el-button>
+                            <div>
+                                <el-button
+                                    v-if="isProductPro"
+                                    @click="onChangeThemeColor"
+                                    icon="Setting"
+                                    class="!h-[32px] sm:!h-[33.5px]"
+                                >
+                                    <span>{{ $t('container.custom') }}</span>
+                                </el-button>
+                            </div>
                         </div>
                     </el-form-item>
 
@@ -516,10 +523,6 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-:deep(.el-select__wrapper) {
-    min-height: 34px;
-}
-
 :deep(.el-radio-group) {
     min-width: max-content;
 }
