@@ -1,12 +1,10 @@
 package service
 
 import (
-	"bytes"
 	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"os"
 	"path"
 	"sort"
@@ -21,7 +19,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cloud_storage"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
-	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
 )
@@ -30,6 +27,9 @@ type BackupService struct{}
 
 type IBackupService interface {
 	CheckUsed(id uint) error
+	Sync(req dto.SyncFromMaster) error
+
+	LoadBackupOptions() ([]dto.BackupOption, error)
 
 	SearchRecordsWithPage(search dto.RecordSearch) (int64, []dto.BackupRecords, error)
 	SearchRecordsByCronjobWithPage(search dto.RecordSearchByCronjob) (int64, []dto.BackupRecords, error)
@@ -59,6 +59,53 @@ type IBackupService interface {
 
 func NewIBackupService() IBackupService {
 	return &BackupService{}
+}
+
+func (u *BackupService) Sync(req dto.SyncFromMaster) error {
+	var accountItem model.BackupAccount
+	if err := json.Unmarshal([]byte(req.Data), &accountItem); err != nil {
+		return err
+	}
+	accountItem.AccessKey, _ = encrypt.StringEncryptWithBase64(accountItem.AccessKey)
+	accountItem.Credential, _ = encrypt.StringEncryptWithBase64(accountItem.Credential)
+	account, _ := backupRepo.Get(commonRepo.WithByName(req.Name))
+	switch req.Operation {
+	case "create":
+		if account.ID != 0 {
+			accountItem.ID = account.ID
+			return backupRepo.Save(&accountItem)
+		}
+		return backupRepo.Create(&accountItem)
+	case "delete":
+		if account.ID == 0 {
+			return constant.ErrRecordNotFound
+		}
+		return backupRepo.Delete(commonRepo.WithByID(account.ID))
+	case "update":
+		if account.ID == 0 {
+			return constant.ErrRecordNotFound
+		}
+		accountItem.ID = account.ID
+		return backupRepo.Save(&accountItem)
+	default:
+		return fmt.Errorf("not support such operation %s", req.Operation)
+	}
+}
+
+func (u *BackupService) LoadBackupOptions() ([]dto.BackupOption, error) {
+	accounts, err := backupRepo.List(commonRepo.WithOrderBy("created_at desc"))
+	if err != nil {
+		return nil, err
+	}
+	var data []dto.BackupOption
+	for _, account := range accounts {
+		var item dto.BackupOption
+		if err := copier.Copy(&item, &account); err != nil {
+			global.LOG.Errorf("copy backup account to dto backup info failed, err: %v", err)
+		}
+		data = append(data, item)
+	}
+	return data, nil
 }
 
 func (u *BackupService) SearchRecordsWithPage(search dto.RecordSearch) (int64, []dto.BackupRecords, error) {
@@ -289,29 +336,7 @@ func NewBackupClientWithID(id uint) (*model.BackupAccount, cloud_storage.CloudSt
 		account.AccessKey, _ = encrypt.StringDecryptWithKey(account.AccessKey, setting.Value)
 		account.Credential, _ = encrypt.StringDecryptWithKey(account.Credential, setting.Value)
 	} else {
-		bodyItem, err := json.Marshal(dto.OperateByID{ID: id})
-		if err != nil {
-			return nil, nil, err
-		}
-		data, err := xpack.RequestToMaster("/api/v2/agent/xpack/backup", http.MethodPost, bytes.NewReader(bodyItem))
-		if err != nil {
-			return nil, nil, err
-		}
-		item, err := json.Marshal(data)
-		if err != nil {
-			return nil, nil, err
-		}
-		if err := json.Unmarshal(item, &account); err != nil {
-			return nil, nil, fmt.Errorf("err response from master: %v", data)
-		}
-
-		if account.Type == constant.Local {
-			localDir, err := LoadLocalDirByStr(account.Vars)
-			if err != nil {
-				return nil, nil, err
-			}
-			global.CONF.System.Backup = localDir
-		}
+		account, _ = backupRepo.Get(commonRepo.WithByID(id))
 	}
 	backClient, err := newClient(&account)
 	if err != nil {
@@ -351,24 +376,7 @@ func NewBackupClientMap(ids []string) (map[string]backupClientHelper, error) {
 			item, _ := strconv.Atoi(ids[i])
 			idItems = append(idItems, uint(item))
 		}
-		operateByIDs := struct {
-			IDs []uint `json:"ids"`
-		}{IDs: idItems}
-		bodyItem, err := json.Marshal(operateByIDs)
-		if err != nil {
-			return nil, err
-		}
-		data, err := xpack.RequestToMaster("/api/v2/agent/xpack/backup/list", http.MethodPost, bytes.NewReader(bodyItem))
-		if err != nil {
-			return nil, err
-		}
-		item, err := json.Marshal(data)
-		if err != nil {
-			return nil, err
-		}
-		if err := json.Unmarshal(item, &accounts); err != nil {
-			return nil, fmt.Errorf("err response from master: %v", data)
-		}
+		accounts, _ = backupRepo.List(commonRepo.WithByIDs(idItems))
 	}
 	clientMap := make(map[string]backupClientHelper)
 	for _, item := range accounts {

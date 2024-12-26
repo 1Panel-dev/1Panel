@@ -41,7 +41,7 @@ import { reactive, ref } from 'vue';
 import { FormInstance } from 'element-plus';
 import i18n from '@/lang';
 import { snapshotImport } from '@/api/modules/setting';
-import { getBackupList, getFilesFromBackup } from '@/api/modules/backup';
+import { listBackupOptions, getFilesFromBackup } from '@/api/modules/backup';
 import { Rules } from '@/global/form-rules';
 import { MsgSuccess } from '@/utils/message';
 import router from '@/routers';
@@ -115,7 +115,7 @@ const submitImport = async (formEl: FormInstance | undefined) => {
 
 const loadBackups = async () => {
     loading.value = true;
-    await getBackupList()
+    await listBackupOptions()
         .then((res) => {
             loading.value = false;
             backupOptions.value = [];

@@ -1,7 +1,5 @@
 package model
 
-import "time"
-
 type BackupAccount struct {
 	BaseModel
 	Name       string `gorm:"not null" json:"name"`
@@ -12,6 +10,5 @@ type BackupAccount struct {
 	BackupPath string `json:"backupPath"`
 	Vars       string `json:"vars"`
 
-	RememberAuth bool      `json:"rememberAuth"`
-	DeletedAt    time.Time `json:"deletedAt"`
+	RememberAuth bool `json:"rememberAuth"`
 }

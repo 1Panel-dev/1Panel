@@ -3,6 +3,8 @@
 package xpack
 
 import (
+	"io"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -12,6 +14,4 @@ func UpdateGroup(name string, group, newGroup uint) error { return nil }
 
 func CheckBackupUsed(id uint) error { return nil }
 
-func InitAgentRouter(Router *gin.RouterGroup) {}
-
-func UpdateMasterAddr(newAddr string) error { return nil }
+func RequestToAgent(reqUrl, reqMethod string, reqBody io.Reader) error { return nil }

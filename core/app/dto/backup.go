@@ -2,6 +2,12 @@ package dto
 
 import "time"
 
+type SyncToAgent struct {
+	Name      string `json:"name" validate:"required"`
+	Operation string `json:"operation" validate:"required,oneof=create delere update"`
+	Data      string `json:"data"`
+}
+
 type BackupOperate struct {
 	ID         uint   `json:"id"`
 	Name       string `json:"name"`
@@ -13,12 +19,6 @@ type BackupOperate struct {
 	Vars       string `json:"vars" validate:"required"`
 
 	RememberAuth bool `json:"rememberAuth"`
-}
-
-type BackupOption struct {
-	ID   uint   `json:"id"`
-	Name string `json:"name"`
-	Type string `json:"type"`
 }
 
 type BackupInfo struct {

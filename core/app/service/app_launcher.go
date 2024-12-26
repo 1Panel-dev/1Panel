@@ -1,9 +1,15 @@
 package service
 
 import (
+	"bytes"
+	"encoding/json"
+	"net/http"
+
 	"github.com/1Panel-dev/1Panel/core/app/dto"
+	"github.com/1Panel-dev/1Panel/core/app/model"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/constant"
+	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 )
 
 type LauncherService struct{}
@@ -36,11 +42,25 @@ func (u *LauncherService) ChangeShow(req dto.SettingUpdate) error {
 			return nil
 		}
 		launcher.Key = req.Key
-		return launcherRepo.Create(&launcher)
+		if err := launcherRepo.Create(&launcher); err != nil {
+			return err
+		}
+		go syncLauncherToAgent(launcher, "create")
+		return nil
 	}
 	if launcher.ID == 0 {
 		return nil
 	}
+	if err := launcherRepo.Delete(repo.WithByKey(req.Key)); err != nil {
+		return err
+	}
+	go syncLauncherToAgent(launcher, "delete")
+	return nil
+}
 
-	return launcherRepo.Delete(repo.WithByKey(req.Key))
+func syncLauncherToAgent(launcher model.AppLauncher, operation string) {
+	itemData, _ := json.Marshal(launcher)
+	itemJson := dto.SyncToAgent{Name: launcher.Key, Operation: operation, Data: string(itemData)}
+	bodyItem, _ := json.Marshal(itemJson)
+	_ = xpack.RequestToAgent("/api/v2/backups/sync", http.MethodPost, bytes.NewReader((bodyItem)))
 }

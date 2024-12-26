@@ -6,7 +6,6 @@ export namespace Setting {
         password: string;
         email: string;
         systemIP: string;
-        masterAddr: string;
         systemVersion: string;
         dockerSockPath: string;
         developerMode: string;

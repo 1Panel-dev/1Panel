@@ -283,7 +283,7 @@
 
             <div v-if="hasClient()">
                 <el-form-item v-if="isOneDrive()">
-                    <el-radio-group v-model="dialogData.rowData!.varsJson['isCN']" @change="changeOnedriveFrom">
+                    <el-radio-group v-model="dialogData.rowData!.varsJson['isCN']" @change="changeClientFrom">
                         <el-radio-button :value="false">{{ $t('setting.isNotCN') }}</el-radio-button>
                         <el-radio-button :value="true">{{ $t('setting.isCN') }}</el-radio-button>
                     </el-radio-group>
@@ -393,7 +393,7 @@ const loading = ref(false);
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 const buckets = ref();
-const oneDriveInfo = ref();
+const clientInfo = ref();
 
 const regionInput = ref();
 
@@ -553,7 +553,7 @@ const changeType = async () => {
         case 'OneDrive':
             dialogData.value.rowData.varsJson['isCN'] = false;
             const res = await getClientInfo('Onedrive');
-            oneDriveInfo.value = res.data;
+            clientInfo.value = res.data;
             if (!dialogData.value.rowData.id) {
                 dialogData.value.rowData.varsJson = {
                     isCN: false,
@@ -564,7 +564,7 @@ const changeType = async () => {
             }
         case 'GoogleDrive':
             const res2 = await getClientInfo('GoogleDrive');
-            oneDriveInfo.value = res2.data;
+            clientInfo.value = res2.data;
             if (!dialogData.value.rowData.id) {
                 dialogData.value.rowData.varsJson = {
                     client_id: res2.data.client_id,
@@ -577,7 +577,7 @@ const changeType = async () => {
             dialogData.value.rowData.varsJson['authMode'] = 'password';
     }
 };
-const changeOnedriveFrom = () => {
+const changeClientFrom = () => {
     if (dialogData.value.rowData.varsJson['isCN']) {
         dialogData.value.rowData.varsJson = {
             isCN: true,
@@ -588,9 +588,9 @@ const changeOnedriveFrom = () => {
     } else {
         dialogData.value.rowData.varsJson = {
             isCN: false,
-            client_id: oneDriveInfo.value.client_id,
-            client_secret: oneDriveInfo.value.client_secret,
-            redirect_uri: oneDriveInfo.value.redirect_uri,
+            client_id: clientInfo.value.client_id,
+            client_secret: clientInfo.value.client_secret,
+            redirect_uri: clientInfo.value.redirect_uri,
         };
     }
 };

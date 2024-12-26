@@ -5,7 +5,6 @@ package xpack
 import (
 	"crypto/tls"
 	"fmt"
-	"io"
 	"net"
 	"net/http"
 	"strings"
@@ -50,6 +49,7 @@ func LoadNodeInfo() (bool, model.NodeInfo, error) {
 	info.BaseDir = loadParams("BASE_DIR")
 	info.Version = loadParams("ORIGINAL_VERSION")
 	info.EncryptKey = common.RandStr(16)
+	info.Scope = "master"
 	return false, info, nil
 }
 
@@ -63,10 +63,6 @@ func loadParams(param string) string {
 		panic(fmt.Sprintf("error `%s` find in /usr/local/bin/1pctl", param))
 	}
 	return info
-}
-
-func RequestToMaster(reqUrl, reqMethod string, reqBody io.Reader) (interface{}, error) {
-	return nil, nil
 }
 
 func GetImagePrefix() string {

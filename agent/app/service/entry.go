@@ -10,6 +10,7 @@ var (
 	appDetailRepo          = repo.NewIAppDetailRepo()
 	tagRepo                = repo.NewITagRepo()
 	appInstallRepo         = repo.NewIAppInstallRepo()
+	launcherRepo           = repo.NewILauncherRepo()
 	appInstallResourceRepo = repo.NewIAppInstallResourceRpo()
 
 	mysqlRepo      = repo.NewIMysqlRepo()

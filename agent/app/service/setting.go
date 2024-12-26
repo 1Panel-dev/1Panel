@@ -76,6 +76,7 @@ func (u *SettingService) ReloadConn() error {
 		return nil
 	}
 	if isLocal {
+		global.IsMaster = true
 		return nil
 	}
 
@@ -90,7 +91,7 @@ func (u *SettingService) ReloadConn() error {
 		global.LOG.Errorf("update server crt failed, err: %v", err)
 		return nil
 	}
-	if err := settingRepo.Update("CurrentNode", nodeInfo.CurrentNode); err != nil {
+	if err := settingRepo.Update("NodeScope", nodeInfo.Scope); err != nil {
 		global.LOG.Errorf("update current node failed, err: %v", err)
 		return nil
 	}
@@ -102,15 +103,10 @@ func (u *SettingService) ReloadConn() error {
 		global.LOG.Errorf("update base dir failed, err: %v", err)
 		return nil
 	}
-	if err := settingRepo.Update("MasterAddr", nodeInfo.MasterAddr); err != nil {
-		global.LOG.Errorf("update master addr failed, err: %v", err)
-		return nil
-	}
 
-	global.CONF.System.BaseDir, _ = settingRepo.GetValueByKey("BaseDir")
-	global.CONF.System.Version, _ = settingRepo.GetValueByKey("SystemVersion")
-	global.CONF.System.EncryptKey, _ = settingRepo.GetValueByKey("EncryptKey")
-	global.CONF.System.CurrentNode, _ = settingRepo.GetValueByKey("CurrentNode")
-	global.CONF.System.MasterAddr, _ = settingRepo.GetValueByKey("MasterAddr")
+	global.CONF.System.BaseDir = nodeInfo.BaseDir
+	global.CONF.System.Version = nodeInfo.Version
+	global.CONF.System.EncryptKey = nodeInfo.EncryptKey
+	global.IsMaster = nodeInfo.Scope == "master"
 	return nil
 }

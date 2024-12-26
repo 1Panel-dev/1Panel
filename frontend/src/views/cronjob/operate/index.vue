@@ -500,7 +500,7 @@
 import { reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import FileList from '@/components/file-list/index.vue';
-import { getBackupList } from '@/api/modules/backup';
+import { listBackupOptions } from '@/api/modules/backup';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { Cronjob } from '@/api/interface/cronjob';
@@ -864,12 +864,13 @@ const handleFileDelete = (index: number) => {
 };
 
 const loadBackups = async () => {
-    const res = await getBackupList();
+    const res = await listBackupOptions();
+    let options = res.data || [];
     backupOptions.value = [];
     if (!dialogData.value.rowData!.sourceAccounts) {
         dialogData.value.rowData!.sourceAccounts = [1];
     }
-    for (const item of res.data) {
+    for (const item of options) {
         if (item.id === 0) {
             continue;
         }

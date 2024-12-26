@@ -4,6 +4,18 @@ import (
 	"time"
 )
 
+type SyncFromMaster struct {
+	Name      string `json:"name" validate:"required"`
+	Operation string `json:"operation" validate:"required,oneof=create delete update"`
+	Data      string `json:"data"`
+}
+
+type BackupOption struct {
+	ID   uint   `json:"id"`
+	Name string `json:"name"`
+	Type string `json:"type"`
+}
+
 type CommonBackup struct {
 	Type       string `json:"type" validate:"required,oneof=app mysql mariadb redis website postgresql"`
 	Name       string `json:"name"`

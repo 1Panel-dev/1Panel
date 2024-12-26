@@ -9,7 +9,6 @@ import (
 	"net"
 	"os"
 	"path"
-	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -23,7 +22,6 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/core/utils/firewall"
-	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/gin-gonic/gin"
 )
 
@@ -113,12 +111,6 @@ func (u *SettingService) Update(key, value string) error {
 		}
 	case "UserName", "Password":
 		_ = global.SESSION.Clean()
-	case "MasterAddr":
-		go func() {
-			if err := xpack.UpdateMasterAddr(value); err != nil {
-				global.LOG.Errorf("update master addr failed, err: %v", err)
-			}
-		}()
 	}
 
 	return nil
@@ -203,27 +195,8 @@ func (u *SettingService) UpdatePort(port uint) error {
 	}
 	go func() {
 		time.Sleep(1 * time.Second)
-		defer func() {
-			if _, err := cmd.Exec("systemctl restart 1panel.service"); err != nil {
-				global.LOG.Errorf("restart system port failed, err: %v", err)
-			}
-		}()
-
-		masterAddr, err := settingRepo.Get(repo.WithByKey("MasterAddr"))
-		if err != nil {
-			global.LOG.Errorf("load master addr from db failed, err: %v", err)
-			return
-		}
-		if len(masterAddr.Value) != 0 {
-			oldMasterPort := loadPort(masterAddr.Value)
-			if len(oldMasterPort) != 0 {
-				newMasterAddr := strings.ReplaceAll(masterAddr.Value, oldMasterPort, fmt.Sprintf("%v", port))
-				_ = settingRepo.Update("MasterAddr", newMasterAddr)
-				if err := xpack.UpdateMasterAddr(newMasterAddr); err != nil {
-					global.LOG.Errorf("update master addr from db failed, err: %v", err)
-					return
-				}
-			}
+		if _, err := cmd.Exec("systemctl restart 1panel.service"); err != nil {
+			global.LOG.Errorf("restart system port failed, err: %v", err)
 		}
 	}()
 	return nil
@@ -291,31 +264,7 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 		return err
 	}
 
-	if err := u.UpdateSystemSSL(); err != nil {
-		return err
-	}
-
-	go func() {
-		oldSSL, _ := settingRepo.Get(repo.WithByKey("SSL"))
-		if oldSSL.Value != req.SSL {
-			masterAddr, err := settingRepo.Get(repo.WithByKey("MasterAddr"))
-			if err != nil {
-				global.LOG.Errorf("load master addr from db failed, err: %v", err)
-				return
-			}
-			addrItem := masterAddr.Value
-			if req.SSL == constant.StatusDisable {
-				addrItem = strings.ReplaceAll(addrItem, "https://", "http://")
-			} else {
-				addrItem = strings.ReplaceAll(addrItem, "http://", "https://")
-			}
-			_ = settingRepo.Update("MasterAddr", addrItem)
-			if err := xpack.UpdateMasterAddr(addrItem); err != nil {
-				global.LOG.Errorf("update master addr from db failed, err: %v", err)
-			}
-		}
-	}()
-	return nil
+	return u.UpdateSystemSSL()
 }
 
 func (u *SettingService) LoadFromCert() (*dto.SSLInfo, error) {
@@ -516,18 +465,4 @@ func checkCertValid() error {
 	}
 
 	return nil
-}
-
-func loadPort(address string) string {
-	re := regexp.MustCompile(`(?:(?:\[([0-9a-fA-F:]+)\])|([^:/\s]+))(?::(\d+))?$`)
-	matches := re.FindStringSubmatch(address)
-	if len(matches) <= 0 {
-		return ""
-	}
-	var port string
-	port = matches[3]
-	if len(port) != 0 {
-		return port
-	}
-	return ""
 }

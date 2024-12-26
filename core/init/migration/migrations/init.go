@@ -197,16 +197,6 @@ var InitOneDrive = &gormigrate.Migration{
 	},
 }
 
-var InitMasterAddr = &gormigrate.Migration{
-	ID: "20240814-init-master-addr",
-	Migrate: func(tx *gorm.DB) error {
-		if err := tx.Create(&model.Setting{Key: "MasterAddr", Value: ""}).Error; err != nil {
-			return err
-		}
-		return nil
-	},
-}
-
 var InitTerminalSetting = &gormigrate.Migration{
 	ID: "20240814-init-terminal-setting",
 	Migrate: func(tx *gorm.DB) error {

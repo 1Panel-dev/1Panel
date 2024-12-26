@@ -9,12 +9,9 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
-	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
-	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 )
 
 func Init() {
-	service.NewISettingService().ReloadConn()
 	initGlobalData()
 	handleCronjobStatus()
 	handleSnapStatus()
@@ -30,16 +27,9 @@ func initGlobalData() {
 		global.LOG.Fatalf("init service before start failed, err: %v", err)
 	}
 
-	global.CONF.System.BaseDir, _ = settingRepo.GetValueByKey("BaseDir")
-	global.CONF.System.Version, _ = settingRepo.GetValueByKey("SystemVersion")
-	global.CONF.System.EncryptKey, _ = settingRepo.GetValueByKey("EncryptKey")
-	global.CONF.System.CurrentNode, _ = settingRepo.GetValueByKey("CurrentNode")
-
-	global.IsMaster = global.CONF.System.CurrentNode == "127.0.0.1" || len(global.CONF.System.CurrentNode) == 0
+	_ = service.NewISettingService().ReloadConn()
 	if global.IsMaster {
 		global.CoreDB = common.LoadDBConnByPath(path.Join(global.CONF.System.DbPath, "core.db"), "core")
-	} else {
-		global.CONF.System.MasterAddr, _ = settingRepo.GetValueByKey("MasterAddr")
 	}
 }
 
@@ -98,46 +88,4 @@ func loadLocalDir() {
 		return
 	}
 	global.CONF.System.Backup = localDir
-}
-
-func initWithNodeJson() {
-	if global.IsMaster {
-		return
-	}
-	isLocal, nodeInfo, err := xpack.LoadNodeInfo()
-	if err != nil {
-		global.LOG.Errorf("load new node info failed, err: %v", err)
-		return
-	}
-	if isLocal {
-		return
-	}
-
-	settingRepo := repo.NewISettingRepo()
-	itemKey, _ := encrypt.StringEncrypt(nodeInfo.ServerKey)
-	if err := settingRepo.Update("ServerKey", itemKey); err != nil {
-		global.LOG.Errorf("update server key failed, err: %v", err)
-		return
-	}
-	itemCrt, _ := encrypt.StringEncrypt(nodeInfo.ServerCrt)
-	if err := settingRepo.Update("ServerCrt", itemCrt); err != nil {
-		global.LOG.Errorf("update server crt failed, err: %v", err)
-		return
-	}
-	if err := settingRepo.Update("CurrentNode", nodeInfo.CurrentNode); err != nil {
-		global.LOG.Errorf("update current node failed, err: %v", err)
-		return
-	}
-	if err := settingRepo.Update("SystemVersion", nodeInfo.Version); err != nil {
-		global.LOG.Errorf("update system version failed, err: %v", err)
-		return
-	}
-	if err := settingRepo.Update("BaseDir", nodeInfo.BaseDir); err != nil {
-		global.LOG.Errorf("update base dir failed, err: %v", err)
-		return
-	}
-	if err := settingRepo.Update("MasterAddr", nodeInfo.MasterAddr); err != nil {
-		global.LOG.Errorf("update master addr failed, err: %v", err)
-		return
-	}
 }

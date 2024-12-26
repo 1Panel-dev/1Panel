@@ -6,6 +6,9 @@ import { Backup } from '../interface/backup';
 import { TimeoutEnum } from '@/enums/http-enum';
 
 // backup-agent
+export const listBackupOptions = () => {
+    return http.get<Array<Backup.BackupOption>>(`/backups/options`);
+};
 export const handleBackup = (params: Backup.Backup) => {
     return http.post(`/backups/backup`, params, TimeoutEnum.T_1H);
 };
@@ -32,20 +35,17 @@ export const getFilesFromBackup = (id: number) => {
 };
 
 // backup-core
-export const refreshOneDrive = () => {
-    return http.post(`/core/backup/refresh/onedrive`, {});
-};
-export const getBackupList = () => {
-    return http.get<Array<Backup.BackupOption>>(`/core/backup/options`);
+export const refreshToken = () => {
+    return http.post(`/core/backups/refresh/token`, {});
 };
 export const getLocalBackupDir = () => {
-    return http.get<string>(`/core/backup/local`);
+    return http.get<string>(`/core/backups/local`);
 };
 export const searchBackup = (params: Backup.SearchWithType) => {
-    return http.post<ResPage<Backup.BackupInfo>>(`/core/backup/search`, params);
+    return http.post<ResPage<Backup.BackupInfo>>(`/core/backups/search`, params);
 };
 export const getClientInfo = (clientType: string) => {
-    return http.get<Backup.OneDriveInfo>(`/core/backup/client/${clientType}`);
+    return http.get<Backup.ClientInfo>(`/core/backups/client/${clientType}`);
 };
 export const addBackup = (params: Backup.BackupOperate) => {
     let request = deepCopy(params) as Backup.BackupOperate;
@@ -55,7 +55,7 @@ export const addBackup = (params: Backup.BackupOperate) => {
     if (request.credential) {
         request.credential = Base64.encode(request.credential);
     }
-    return http.post<Backup.BackupOperate>(`/core/backup`, request, TimeoutEnum.T_60S);
+    return http.post<Backup.BackupOperate>(`/core/backups`, request, TimeoutEnum.T_60S);
 };
 export const editBackup = (params: Backup.BackupOperate) => {
     let request = deepCopy(params) as Backup.BackupOperate;
@@ -65,10 +65,10 @@ export const editBackup = (params: Backup.BackupOperate) => {
     if (request.credential) {
         request.credential = Base64.encode(request.credential);
     }
-    return http.post(`/core/backup/update`, request);
+    return http.post(`/core/backups/update`, request);
 };
 export const deleteBackup = (params: { id: number }) => {
-    return http.post(`/core/backup/del`, params);
+    return http.post(`/core/backups/del`, params);
 };
 export const listBucket = (params: Backup.ForBucket) => {
     let request = deepCopy(params) as Backup.BackupOperate;
@@ -78,5 +78,5 @@ export const listBucket = (params: Backup.ForBucket) => {
     if (request.credential) {
         request.credential = Base64.encode(request.credential);
     }
-    return http.post(`/core/backup/buckets`, request);
+    return http.post(`/core/backups/buckets`, request);
 };

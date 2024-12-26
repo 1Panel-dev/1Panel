@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	network "net"
-	"net/http"
 	"os"
 	"sort"
 	"strings"
@@ -12,6 +11,7 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
@@ -29,6 +29,8 @@ import (
 type DashboardService struct{}
 
 type IDashboardService interface {
+	Sync(req dto.SyncFromMaster) error
+
 	LoadOsInfo() (*dto.OsInfo, error)
 	LoadBaseInfo(ioOption string, netOption string) (*dto.DashboardBase, error)
 	LoadCurrentInfoForNode() *dto.NodeCurrent
@@ -41,6 +43,35 @@ type IDashboardService interface {
 
 func NewIDashboardService() IDashboardService {
 	return &DashboardService{}
+}
+
+func (u *DashboardService) Sync(req dto.SyncFromMaster) error {
+	var launcherItem model.AppLauncher
+	if err := json.Unmarshal([]byte(req.Data), &launcherItem); err != nil {
+		return err
+	}
+	launcher, _ := launcherRepo.Get(settingRepo.WithByKey(req.Name))
+	switch req.Operation {
+	case "create":
+		if launcher.ID != 0 {
+			launcherItem.ID = launcher.ID
+			return launcherRepo.Save(&launcherItem)
+		}
+		return launcherRepo.Create(&launcherItem)
+	case "delete":
+		if launcher.ID == 0 {
+			return constant.ErrRecordNotFound
+		}
+		return launcherRepo.Delete(commonRepo.WithByID(launcher.ID))
+	case "update":
+		if launcher.ID == 0 {
+			return constant.ErrRecordNotFound
+		}
+		launcherItem.ID = launcher.ID
+		return launcherRepo.Save(&launcherItem)
+	default:
+		return fmt.Errorf("not support such operation %s", req.Operation)
+	}
 }
 
 func (u *DashboardService) Restart(operation string) error {
@@ -487,16 +518,9 @@ func loadShowList() []string {
 		}
 		return data
 	}
-	res, err := xpack.RequestToMaster("/api/v2/core/launcher/search", http.MethodGet, nil)
-	if err != nil {
-		return data
-	}
-	item, err := json.Marshal(res)
-	if err != nil {
-		return data
-	}
-	if err := json.Unmarshal(item, &data); err != nil {
-		return data
+	list, _ := launcherRepo.List()
+	for _, item := range list {
+		data = append(data, item.Key)
 	}
 	return data
 }

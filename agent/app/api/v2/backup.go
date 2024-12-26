@@ -25,6 +25,36 @@ func (b *BaseApi) CheckBackupUsed(c *gin.Context) {
 	helper.SuccessWithOutData(c)
 }
 
+func (b *BaseApi) SyncBackupAccount(c *gin.Context) {
+	var req dto.SyncFromMaster
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := backupService.Sync(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+
+	helper.SuccessWithOutData(c)
+}
+
+// @Tags Backup Account
+// @Summary Load backup account options
+// @Description 获取备份账号选项
+// @Accept json
+// @Success 200 {array} dto.BackupOption
+// @Security ApiKeyAuth
+// @Router /backup/options [get]
+func (b *BaseApi) LoadBackupOptions(c *gin.Context) {
+	list, err := backupService.LoadBackupOptions()
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, list)
+}
+
 // @Tags Backup Account
 // @Summary Page backup records
 // @Description 获取备份记录列表分页

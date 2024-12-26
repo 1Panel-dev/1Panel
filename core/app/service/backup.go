@@ -2,6 +2,7 @@ package service
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -34,7 +35,6 @@ type IBackupService interface {
 	List(req dto.OperateByIDs) ([]dto.BackupInfo, error)
 
 	GetLocalDir() (string, error)
-	LoadBackupOptions() ([]dto.BackupOption, error)
 	SearchWithPage(search dto.SearchPageWithType) (int64, interface{}, error)
 	LoadBackupClientInfo(clientType string) (dto.BackupClientInfo, error)
 	Create(backupDto dto.BackupOperate) error
@@ -104,22 +104,6 @@ func (u *BackupService) GetLocalDir() (string, error) {
 		return "", err
 	}
 	return dir, nil
-}
-
-func (u *BackupService) LoadBackupOptions() ([]dto.BackupOption, error) {
-	accounts, err := backupRepo.List(repo.WithOrderBy("created_at desc"))
-	if err != nil {
-		return nil, err
-	}
-	var data []dto.BackupOption
-	for _, account := range accounts {
-		var item dto.BackupOption
-		if err := copier.Copy(&item, &account); err != nil {
-			global.LOG.Errorf("copy backup account to dto backup info failed, err: %v", err)
-		}
-		data = append(data, item)
-	}
-	return data, nil
 }
 
 func (u *BackupService) SearchWithPage(req dto.SearchPageWithType) (int64, interface{}, error) {
@@ -245,6 +229,7 @@ func (u *BackupService) Create(req dto.BackupOperate) error {
 	if err := backupRepo.Create(&backup); err != nil {
 		return err
 	}
+	go syncAccountToAgent(backup, "create")
 	return nil
 }
 
@@ -296,6 +281,7 @@ func (u *BackupService) Delete(id uint) error {
 		return buserr.New(constant.ErrBackupInUsed)
 	}
 
+	go syncAccountToAgent(backup, "delete")
 	return backupRepo.Delete(repo.WithByID(id))
 }
 
@@ -362,6 +348,7 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 	if err := backupRepo.Save(&newBackup); err != nil {
 		return err
 	}
+	go syncAccountToAgent(backup, "update")
 	return nil
 }
 
@@ -551,5 +538,16 @@ func refreshToken() {
 
 		varsItem, _ := json.Marshal(varMap)
 		_ = global.DB.Model(&model.BackupAccount{}).Where("id = ?", backupItem.ID).Updates(map[string]interface{}{"vars": varsItem}).Error
+
+		go syncAccountToAgent(backupItem, "update")
 	}
+}
+
+func syncAccountToAgent(backup model.BackupAccount, operation string) {
+	backup.AccessKey, _ = encrypt.StringDecryptWithBase64(backup.AccessKey)
+	backup.Credential, _ = encrypt.StringDecryptWithBase64(backup.Credential)
+	itemData, _ := json.Marshal(backup)
+	itemJson := dto.SyncToAgent{Name: backup.Name, Operation: operation, Data: string(itemData)}
+	bodyItem, _ := json.Marshal(itemJson)
+	_ = xpack.RequestToAgent("/api/v2/backups/sync", http.MethodPost, bytes.NewReader((bodyItem)))
 }

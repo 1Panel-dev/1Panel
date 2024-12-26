@@ -3,13 +3,14 @@ package router
 import (
 	"encoding/base64"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/core/app/service"
-	"github.com/1Panel-dev/1Panel/core/cmd/server/res"
-	"github.com/1Panel-dev/1Panel/core/constant"
 	"net/http"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/core/app/service"
+	"github.com/1Panel-dev/1Panel/core/cmd/server/res"
+	"github.com/1Panel-dev/1Panel/core/constant"
 
 	"github.com/1Panel-dev/1Panel/core/cmd/server/docs"
 	"github.com/1Panel-dev/1Panel/core/cmd/server/web"
@@ -17,7 +18,6 @@ import (
 	"github.com/1Panel-dev/1Panel/core/i18n"
 	"github.com/1Panel-dev/1Panel/core/middleware"
 	rou "github.com/1Panel-dev/1Panel/core/router"
-	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
@@ -156,9 +156,6 @@ func Routers() *gin.Engine {
 		PublicGroup.Use(gzip.Gzip(gzip.DefaultCompression))
 		setWebStatic(PublicGroup)
 	}
-
-	agentRouter := Router.Group("/api/v2/agent")
-	xpack.InitAgentRouter(agentRouter)
 
 	Router.Use(middleware.OperationLog())
 	if global.CONF.System.IsDemo {

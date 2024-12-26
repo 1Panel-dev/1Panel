@@ -153,7 +153,7 @@ import { loadSnapshotInfo, snapshotCreate } from '@/api/modules/setting';
 import { computeSize, newUUID } from '@/utils/util';
 import i18n from '@/lang';
 import TaskLog from '@/components/task-log/index.vue';
-import { getBackupList } from '@/api/modules/backup';
+import { listBackupOptions } from '@/api/modules/backup';
 import { Rules } from '@/global/form-rules';
 import { ElForm } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
@@ -273,7 +273,7 @@ const loadApp18n = (label: string) => {
 };
 
 const loadBackups = async () => {
-    const res = await getBackupList();
+    const res = await listBackupOptions();
     backupOptions.value = [];
     for (const item of res.data) {
         if (item.id !== 0) {

@@ -15,7 +15,6 @@ func Init() {
 		migrations.InitImageRepo,
 		migrations.InitDefaultCA,
 		migrations.InitPHPExtensions,
-		migrations.InitBaseDir,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

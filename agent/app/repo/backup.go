@@ -11,6 +11,12 @@ import (
 type BackupRepo struct{}
 
 type IBackupRepo interface {
+	Get(opts ...DBOption) (model.BackupAccount, error)
+	List(opts ...DBOption) ([]model.BackupAccount, error)
+	Create(backup *model.BackupAccount) error
+	Save(backup *model.BackupAccount) error
+	Delete(opts ...DBOption) error
+
 	ListRecord(opts ...DBOption) ([]model.BackupRecord, error)
 	PageRecord(page, size int, opts ...DBOption) (int64, []model.BackupRecord, error)
 	CreateRecord(record *model.BackupRecord) error
@@ -24,6 +30,54 @@ type IBackupRepo interface {
 
 func NewIBackupRepo() IBackupRepo {
 	return &BackupRepo{}
+}
+
+func (u *BackupRepo) Get(opts ...DBOption) (model.BackupAccount, error) {
+	var backup model.BackupAccount
+	db := global.DB
+	for _, opt := range opts {
+		db = opt(db)
+	}
+	err := db.First(&backup).Error
+	return backup, err
+}
+
+func (u *BackupRepo) Page(page, size int, opts ...DBOption) (int64, []model.BackupAccount, error) {
+	var ops []model.BackupAccount
+	db := global.DB.Model(&model.BackupAccount{})
+	for _, opt := range opts {
+		db = opt(db)
+	}
+	count := int64(0)
+	db = db.Count(&count)
+	err := db.Limit(size).Offset(size * (page - 1)).Find(&ops).Error
+	return count, ops, err
+}
+
+func (u *BackupRepo) List(opts ...DBOption) ([]model.BackupAccount, error) {
+	var ops []model.BackupAccount
+	db := global.DB.Model(&model.BackupAccount{})
+	for _, opt := range opts {
+		db = opt(db)
+	}
+	err := db.Find(&ops).Error
+	return ops, err
+}
+
+func (u *BackupRepo) Create(backup *model.BackupAccount) error {
+	return global.DB.Create(backup).Error
+}
+
+func (u *BackupRepo) Save(backup *model.BackupAccount) error {
+	return global.DB.Save(backup).Error
+}
+
+func (u *BackupRepo) Delete(opts ...DBOption) error {
+	db := global.DB
+	for _, opt := range opts {
+		db = opt(db)
+	}
+	return db.Delete(&model.BackupAccount{}).Error
 }
 
 func (u *BackupRepo) ListRecord(opts ...DBOption) ([]model.BackupRecord, error) {

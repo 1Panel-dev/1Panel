@@ -56,7 +56,7 @@
                                     <br />
                                     {{ $t('setting.refreshTime') + ':' + row.varsJson['refresh_time'] }}
                                 </template>
-                                <el-tag @click="refreshToken" v-if="row.type === 'OneDrive'" class="ml-1">
+                                <el-tag @click="refreshItemToken" v-if="row.type === 'OneDrive'" class="ml-1">
                                     {{ 'Token ' + $t('commons.button.refresh') }}
                                 </el-tag>
                             </el-tooltip>
@@ -97,7 +97,7 @@
 <script setup lang="ts">
 import { dateFormat } from '@/utils/util';
 import { onMounted, ref } from 'vue';
-import { searchBackup, deleteBackup, refreshOneDrive } from '@/api/modules/backup';
+import { searchBackup, deleteBackup, refreshToken } from '@/api/modules/backup';
 import Operate from '@/views/setting/backup-account/operate/index.vue';
 import { Backup } from '@/api/interface/backup';
 import i18n from '@/lang';
@@ -177,8 +177,8 @@ const onOpenDialog = async (
     dialogRef.value!.acceptParams(params);
 };
 
-const refreshToken = async () => {
-    await refreshOneDrive();
+const refreshItemToken = async () => {
+    await refreshToken();
     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     search();
 };

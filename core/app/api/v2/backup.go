@@ -31,12 +31,12 @@ func (b *BaseApi) CreateBackup(c *gin.Context) {
 }
 
 // @Tags Backup Account
-// @Summary Refresh OneDrive token
-// @Description 刷新 OneDrive token
+// @Summary Refresh token
+// @Description 刷新 token
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /core/backup/refresh/onedrive [post]
-func (b *BaseApi) RefreshOneDriveToken(c *gin.Context) {
+// @Router /core/backup/refresh/token [post]
+func (b *BaseApi) RefreshToken(c *gin.Context) {
 	backupService.Run()
 	helper.SuccessWithData(c, nil)
 }
@@ -64,13 +64,13 @@ func (b *BaseApi) ListBuckets(c *gin.Context) {
 }
 
 // @Tags Backup Account
-// @Summary Load OneDrive info
-// @Description 获取 OneDrive 信息
+// @Summary Load backup account base info
+// @Description 获取预定义备份账号信息
 // @Accept json
 // @Success 200 {object} dto.OneDriveInfo
 // @Security ApiKeyAuth
 // @Router /core/backup/client/:clientType [get]
-func (b *BaseApi) LoadOneDriveInfo(c *gin.Context) {
+func (b *BaseApi) LoadBackupClientInfo(c *gin.Context) {
 	clientType, ok := c.Params.Get("clientType")
 	if !ok {
 		helper.BadRequest(c, fmt.Errorf("error %s in path", "clientType"))
@@ -82,22 +82,6 @@ func (b *BaseApi) LoadOneDriveInfo(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithData(c, data)
-}
-
-// @Tags Backup Account
-// @Summary Load backup account options
-// @Description 获取备份账号选项
-// @Accept json
-// @Success 200 {array} dto.BackupOption
-// @Security ApiKeyAuth
-// @Router /core/backup/options [get]
-func (b *BaseApi) LoadBackupOptions(c *gin.Context) {
-	list, err := backupService.LoadBackupOptions()
-	if err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-	helper.SuccessWithData(c, list)
 }
 
 // @Tags Backup Account

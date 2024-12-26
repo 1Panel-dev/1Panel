@@ -6,7 +6,6 @@ type SettingInfo struct {
 	UserName      string `json:"userName"`
 	SystemVersion string `json:"systemVersion"`
 	DeveloperMode string `json:"developerMode"`
-	MasterAddr    string `json:"masterAddr"`
 
 	SessionTimeout string `json:"sessionTimeout"`
 	Port           string `json:"port"`

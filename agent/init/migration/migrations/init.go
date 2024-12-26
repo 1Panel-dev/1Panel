@@ -24,6 +24,8 @@ var AddTable = &gormigrate.Migration{
 			&model.AppTag{},
 			&model.Tag{},
 			&model.App{},
+			&model.AppLauncher{},
+			&model.BackupAccount{},
 			&model.BackupRecord{},
 			&model.Clam{},
 			&model.ComposeTemplate{},
@@ -79,9 +81,6 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "BaseDir", Value: nodeInfo.BaseDir}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "CurrentNode", Value: nodeInfo.CurrentNode}).Error; err != nil {
-			return err
-		}
 		if err := tx.Create(&model.Setting{Key: "EncryptKey", Value: nodeInfo.EncryptKey}).Error; err != nil {
 			return err
 		}
@@ -93,7 +92,7 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "ServerCrt", Value: itemCrt}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "MasterAddr", Value: nodeInfo.MasterAddr}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "NodeScope", Value: nodeInfo.Scope}).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "SystemVersion", Value: nodeInfo.Version}).Error; err != nil {
@@ -213,16 +212,6 @@ var InitPHPExtensions = &gormigrate.Migration{
 			return err
 		}
 		if err := tx.Create(&model.PHPExtensions{Name: "SeaCMS", Extensions: "mysqli,pdo_mysql,gd,curl"}).Error; err != nil {
-			return err
-		}
-		return nil
-	},
-}
-
-var InitBaseDir = &gormigrate.Migration{
-	ID: "20241122-init-setting",
-	Migrate: func(tx *gorm.DB) error {
-		if err := tx.Create(&model.Setting{Key: "BaseDir", Value: global.CONF.System.BaseDir}).Error; err != nil {
 			return err
 		}
 		return nil

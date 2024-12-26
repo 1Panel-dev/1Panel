@@ -12,6 +12,9 @@ func (s *BackupRouter) InitRouter(Router *gin.RouterGroup) {
 	baseApi := v2.ApiGroupApp.BaseApi
 	{
 		backupRouter.GET("/check/:id", baseApi.CheckBackupUsed)
+		backupRouter.POST("/sync", baseApi.SyncBackupAccount)
+		backupRouter.GET("/options", baseApi.LoadBackupOptions)
+
 		backupRouter.POST("/backup", baseApi.Backup)
 		backupRouter.POST("/recover", baseApi.Recover)
 		backupRouter.POST("/recover/byupload", baseApi.RecoverByUpload)

@@ -64,7 +64,6 @@ var (
 var (
 	ErrBackupInUsed      = "ErrBackupInUsed"
 	ErrBackupLocalDelete = "ErrBackupLocalDelete"
-	ErrMasterAddr        = "ErrMasterAddr"
 )
 
 var (

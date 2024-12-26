@@ -24,7 +24,7 @@ export namespace Backup {
         varsJson: object;
         createdAt: Date;
     }
-    export interface OneDriveInfo {
+    export interface ClientInfo {
         client_id: string;
         client_secret: string;
         redirect_uri: string;

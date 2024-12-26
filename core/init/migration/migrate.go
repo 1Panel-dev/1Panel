@@ -12,7 +12,6 @@ func Init() {
 		migrations.AddTable,
 		migrations.InitSetting,
 		migrations.InitOneDrive,
-		migrations.InitMasterAddr,
 		migrations.InitHost,
 		migrations.InitTerminalSetting,
 		migrations.InitAppLauncher,
