@@ -5,7 +5,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
-	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 )
@@ -470,34 +469,6 @@ func (b *BaseApi) Inspect(c *gin.Context) {
 	helper.SuccessWithData(c, result)
 }
 
-// @Tags Container
-// @Summary Container logs
-// @Description 容器日志
-// @Param container query string false "容器名称"
-// @Param since query string false "时间筛选"
-// @Param follow query string false "是否追踪"
-// @Param tail query string false "显示行号"
-// @Security ApiKeyAuth
-// @Router /containers/search/log [post]
-func (b *BaseApi) ContainerLogs(c *gin.Context) {
-	wsConn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
-	if err != nil {
-		global.LOG.Errorf("gin context http handler failed, err: %v", err)
-		return
-	}
-	defer wsConn.Close()
-
-	container := c.Query("container")
-	since := c.Query("since")
-	follow := c.Query("follow") == "true"
-	tail := c.Query("tail")
-
-	if err := containerService.ContainerLogs(wsConn, "container", container, since, tail, follow); err != nil {
-		_ = wsConn.WriteMessage(1, []byte(err.Error()))
-		return
-	}
-}
-
 // @Description 下载容器日志
 // @Router /containers/download/log [post]
 func (b *BaseApi) DownloadContainerLogs(c *gin.Context) {
@@ -707,30 +678,38 @@ func (b *BaseApi) ComposeUpdate(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// @Tags Container Compose
-// @Summary Container Compose logs
-// @Description docker-compose 日志
-// @Param compose query string false "compose 文件地址"
+// @Tags Container
+// @Summary Container logs
+// @Description 容器日志
+// @Param container query string false "容器名称"
 // @Param since query string false "时间筛选"
 // @Param follow query string false "是否追踪"
 // @Param tail query string false "显示行号"
 // @Security ApiKeyAuth
-// @Router /containers/compose/search/log [get]
-func (b *BaseApi) ComposeLogs(c *gin.Context) {
-	wsConn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
-	if err != nil {
-		global.LOG.Errorf("gin context http handler failed, err: %v", err)
-		return
-	}
-	defer wsConn.Close()
+// @Router /containers/search/log [post]
+func (b *BaseApi) ContainerStreamLogs(c *gin.Context) {
+	c.Header("Content-Type", "text/event-stream")
+	c.Header("Cache-Control", "no-cache")
+	c.Header("Connection", "keep-alive")
+	c.Header("Transfer-Encoding", "chunked")
 
-	compose := c.Query("compose")
 	since := c.Query("since")
 	follow := c.Query("follow") == "true"
 	tail := c.Query("tail")
 
-	if err := containerService.ContainerLogs(wsConn, "compose", compose, since, tail, follow); err != nil {
-		_ = wsConn.WriteMessage(1, []byte(err.Error()))
-		return
+	container := c.Query("container")
+	compose := c.Query("compose")
+	streamLog := dto.StreamLog{
+		Compose:   compose,
+		Container: container,
+		Since:     since,
+		Follow:    follow,
+		Tail:      tail,
+		Type:      "container",
 	}
+	if compose != "" {
+		streamLog.Type = "compose"
+	}
+
+	containerService.StreamLogs(c, streamLog)
 }

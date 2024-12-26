@@ -218,7 +218,6 @@ const getContent = async (pre: boolean) => {
         }
 
         nextTick(() => {
-            console.log('pre', pre);
             if (pre) {
                 logContainer.value.scrollTop = 2000;
             } else {

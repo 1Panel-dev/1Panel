@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
 	"net/url"
@@ -19,9 +20,6 @@ import (
 	"sync"
 	"syscall"
 	"time"
-	"unicode/utf8"
-
-	"github.com/gin-gonic/gin"
 
 	"github.com/pkg/errors"
 
@@ -44,7 +42,6 @@ import (
 	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
-	"github.com/gorilla/websocket"
 	v1 "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/mem"
@@ -74,7 +71,6 @@ type IContainerService interface {
 	ContainerCommit(req dto.ContainerCommit) error
 	ContainerLogClean(req dto.OperationWithName) error
 	ContainerOperation(req dto.ContainerOperation) error
-	ContainerLogs(wsConn *websocket.Conn, containerType, container, since, tail string, follow bool) error
 	DownloadContainerLogs(containerType, container, since, tail string, c *gin.Context) error
 	ContainerStats(id string) (*dto.ContainerStats, error)
 	Inspect(req dto.InspectReq) (string, error)
@@ -87,6 +83,8 @@ type IContainerService interface {
 	Prune(req dto.ContainerPrune) (dto.ContainerPruneReport, error)
 
 	LoadContainerLogs(req dto.OperationWithNameAndType) string
+
+	StreamLogs(ctx *gin.Context, params dto.StreamLog)
 }
 
 func NewIContainerService() IContainerService {
@@ -794,87 +792,87 @@ func (u *ContainerService) ContainerLogClean(req dto.OperationWithName) error {
 	return nil
 }
 
-func (u *ContainerService) ContainerLogs(wsConn *websocket.Conn, containerType, container, since, tail string, follow bool) error {
-	defer func() { wsConn.Close() }()
-	if cmd.CheckIllegal(container, since, tail) {
-		return buserr.New(constant.ErrCmdIllegal)
-	}
-	commandName := "docker"
-	commandArg := []string{"logs", container}
-	if containerType == "compose" {
-		commandArg = []string{"compose", "-f", container, "logs"}
-	}
-	if tail != "0" {
-		commandArg = append(commandArg, "--tail")
-		commandArg = append(commandArg, tail)
-	}
-	if since != "all" {
-		commandArg = append(commandArg, "--since")
-		commandArg = append(commandArg, since)
-	}
-	if follow {
-		commandArg = append(commandArg, "-f")
-	}
-	if !follow {
-		cmd := exec.Command(commandName, commandArg...)
-		cmd.Stderr = cmd.Stdout
-		stdout, _ := cmd.CombinedOutput()
-		if !utf8.Valid(stdout) {
-			return errors.New("invalid utf8")
-		}
-		if err := wsConn.WriteMessage(websocket.TextMessage, stdout); err != nil {
-			global.LOG.Errorf("send message with log to ws failed, err: %v", err)
-		}
-		return nil
-	}
+func (u *ContainerService) StreamLogs(ctx *gin.Context, params dto.StreamLog) {
+	messageChan := make(chan string, 1024)
+	errorChan := make(chan error, 1)
 
-	cmd := exec.Command(commandName, commandArg...)
+	go collectLogs(params, messageChan, errorChan)
+
+	ctx.Stream(func(w io.Writer) bool {
+		select {
+		case msg, ok := <-messageChan:
+			if !ok {
+				return false
+			}
+			_, err := fmt.Fprintf(w, "data: %v\n\n", msg)
+			if err != nil {
+				return false
+			}
+			return true
+		case err := <-errorChan:
+			_, err = fmt.Fprintf(w, "data: {\"event\": \"error\", \"data\": \"%s\"}\n\n", err.Error())
+			if err != nil {
+				return false
+			}
+			return false
+		case <-ctx.Request.Context().Done():
+			return false
+		}
+	})
+}
+
+func collectLogs(params dto.StreamLog, messageChan chan<- string, errorChan chan<- error) {
+	defer close(messageChan)
+	defer close(errorChan)
+
+	var cmdArgs []string
+	if params.Type == "compose" {
+		cmdArgs = []string{"compose", "-f", params.Compose}
+	}
+	cmdArgs = append(cmdArgs, "logs")
+	if params.Follow {
+		cmdArgs = append(cmdArgs, "-f")
+	}
+	if params.Tail != "all" {
+		cmdArgs = append(cmdArgs, "--tail", params.Tail)
+	}
+	if params.Since != "all" {
+		cmdArgs = append(cmdArgs, "--since", params.Since)
+	}
+	if params.Container != "" {
+		cmdArgs = append(cmdArgs, params.Container)
+	}
+	cmd := exec.Command("docker", cmdArgs...)
+
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		_ = cmd.Process.Signal(syscall.SIGTERM)
-		return err
+		errorChan <- fmt.Errorf("failed to get stdout pipe: %v", err)
+		return
 	}
-	cmd.Stderr = cmd.Stdout
 	if err := cmd.Start(); err != nil {
-		_ = cmd.Process.Signal(syscall.SIGTERM)
-		return err
+		errorChan <- fmt.Errorf("failed to start command: %v", err)
+		return
 	}
-	exitCh := make(chan struct{})
-	go func() {
-		_, wsData, _ := wsConn.ReadMessage()
-		if string(wsData) == "close conn" {
-			_ = cmd.Process.Signal(syscall.SIGTERM)
-			exitCh <- struct{}{}
-		}
-	}()
 
-	go func() {
-		buffer := make([]byte, 1024)
-		for {
-			select {
-			case <-exitCh:
-				return
-			default:
-				n, err := stdout.Read(buffer)
-				if err != nil {
-					if err == io.EOF {
-						return
-					}
-					global.LOG.Errorf("read bytes from log failed, err: %v", err)
-					return
-				}
-				if !utf8.Valid(buffer[:n]) {
-					continue
-				}
-				if err = wsConn.WriteMessage(websocket.TextMessage, buffer[:n]); err != nil {
-					global.LOG.Errorf("send message with log to ws failed, err: %v", err)
-					return
-				}
-			}
+	scanner := bufio.NewScanner(stdout)
+	lineNumber := 0
+
+	for scanner.Scan() {
+		lineNumber++
+		message := scanner.Text()
+		select {
+		case messageChan <- message:
+		case <-time.After(time.Second):
+			errorChan <- fmt.Errorf("message channel blocked")
+			return
 		}
-	}()
-	_ = cmd.Wait()
-	return nil
+	}
+
+	if err := scanner.Err(); err != nil {
+		errorChan <- fmt.Errorf("scanner error: %v", err)
+		return
+	}
+	cmd.Wait()
 }
 
 func (u *ContainerService) DownloadContainerLogs(containerType, container, since, tail string, c *gin.Context) error {

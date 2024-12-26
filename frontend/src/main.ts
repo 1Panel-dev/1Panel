@@ -25,6 +25,9 @@ import Fit2CloudPlus from 'fit2cloud-ui-plus';
 import * as Icons from '@element-plus/icons-vue';
 import hljsVuePlugin from '@highlightjs/vue-plugin';
 
+import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
+import VirtualScroller from 'vue-virtual-scroller';
+
 const app = createApp(App);
 app.use(hljsVuePlugin);
 app.component('SvgIcon', SvgIcon);
@@ -35,6 +38,7 @@ Object.keys(Icons).forEach((key) => {
     app.component(key, Icons[key as keyof typeof Icons]);
 });
 
+app.use(VirtualScroller);
 app.use(router);
 app.use(i18n);
 app.use(pinia);

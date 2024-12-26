@@ -43,9 +43,12 @@ const open = ref(false);
 const showTail = ref(true);
 
 const openWithTaskID = (id: string, tail: boolean) => {
+    console.log('openWithTaskID', id, tail);
     config.taskID = id;
     if (!tail) {
         config.tail = false;
+    } else {
+        config.tail = true;
     }
     open.value = true;
 };

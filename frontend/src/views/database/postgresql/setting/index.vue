@@ -46,7 +46,7 @@
                         </el-row>
                     </el-form>
                 </div>
-                <ContainerLog v-show="activeName === 'log'" ref="dialogContainerLogRef" />
+                <ContainerLog v-if="activeName === 'log'" :container="containerID" />
             </template>
         </LayoutContent>
 
@@ -109,7 +109,7 @@ const props = withDefaults(defineProps<DBProps>(), {
     database: '',
 });
 
-const dialogContainerLogRef = ref();
+const containerID = ref('');
 const jumpToConf = async () => {
     activeName.value = 'conf';
     loadPostgresqlConf();
@@ -181,8 +181,8 @@ const onSaveConf = async () => {
     return;
 };
 
-const loadContainerLog = async (containerID: string) => {
-    dialogContainerLogRef.value!.acceptParams({ containerID: containerID, container: containerID });
+const loadContainerLog = async (conID: string) => {
+    containerID.value = conID;
 };
 
 const loadBaseInfo = async () => {

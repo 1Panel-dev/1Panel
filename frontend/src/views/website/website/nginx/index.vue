@@ -31,7 +31,7 @@
             <Status v-if="activeName === '1'" :status="status" />
             <Source v-if="activeName === '2'" />
             <NginxPer v-if="activeName === '3'" />
-            <ContainerLog v-if="activeName === '4'" ref="dialogContainerLogRef" />
+            <ContainerLog v-if="activeName === '4'" :container="containerName" />
             <Module v-if="activeName === '5'" />
         </template>
     </LayoutContent>
@@ -39,14 +39,13 @@
 
 <script lang="ts" setup>
 import Source from './source/index.vue';
-import { nextTick, ref } from 'vue';
+import { ref } from 'vue';
 import ContainerLog from '@/components/container-log/index.vue';
 import NginxPer from './performance/index.vue';
 import Status from './status/index.vue';
 import Module from './module/index.vue';
 
 const activeName = ref('1');
-const dialogContainerLogRef = ref();
 
 const props = defineProps({
     containerName: {
@@ -60,15 +59,6 @@ const props = defineProps({
 });
 const changeTab = (index: string) => {
     activeName.value = index;
-
-    if (index === '4') {
-        nextTick(() => {
-            dialogContainerLogRef.value!.acceptParams({
-                containerID: props.containerName,
-                container: props.containerName,
-            });
-        });
-    }
 };
 
 onMounted(() => {
