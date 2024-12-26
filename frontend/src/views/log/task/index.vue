@@ -56,7 +56,7 @@ import TaskLog from '@/components/task-log/index.vue';
 const loading = ref();
 const data = ref();
 const paginationConfig = reactive({
-    cacheSizeKey: 'login-log-page-size',
+    cacheSizeKey: 'task-page-size',
     currentPage: 1,
     pageSize: 10,
     total: 0,
@@ -73,19 +73,19 @@ const search = async () => {
     req.page = paginationConfig.currentPage;
     req.pageSize = paginationConfig.pageSize;
     loading.value = true;
-    await searchTasks(req)
-        .then((res) => {
-            loading.value = false;
-            data.value = res.data.items;
-            paginationConfig.total = res.data.total;
-        })
-        .catch(() => {
-            loading.value = false;
-        });
+    try {
+        const res = await searchTasks(req);
+        loading.value = false;
+        data.value = res.data.items;
+        paginationConfig.total = res.data.total;
+    } catch (error) {
+    } finally {
+        loading.value = false;
+    }
 };
 
 const openTaskLog = (row: Log.Task) => {
-    taskLogRef.value.openWithTaskID(row.id);
+    taskLogRef.value.openWithTaskID(row.id, !(row.status == 'Executing'));
 };
 
 onMounted(() => {

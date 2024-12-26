@@ -62,6 +62,7 @@ const getType = (status: string) => {
         case 'exceptional':
         case 'disable':
         case 'unhealthy':
+        case 'failed':
             return 'danger';
         case 'paused':
         case 'exited':

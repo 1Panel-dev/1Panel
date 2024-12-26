@@ -9,7 +9,7 @@
         :width="width"
     >
         <div>
-            <LogFile :config="config"></LogFile>
+            <LogFile :config="config" :showTail="showTail"></LogFile>
         </div>
     </el-dialog>
 </template>
@@ -37,12 +37,16 @@ const config = reactive({
     taskOperate: '',
     resourceID: 0,
     taskType: '',
-    tail: true,
+    tail: false,
 });
 const open = ref(false);
+const showTail = ref(true);
 
-const openWithTaskID = (id: string) => {
+const openWithTaskID = (id: string, tail: boolean) => {
     config.taskID = id;
+    if (!tail) {
+        config.tail = false;
+    }
     open.value = true;
 };
 

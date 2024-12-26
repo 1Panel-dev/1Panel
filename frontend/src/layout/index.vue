@@ -2,7 +2,7 @@
     <div :class="classObj" class="app-wrapper" v-loading="loading" :element-loading-text="loadingText" fullscreen>
         <div v-if="classObj.mobile && classObj.openSidebar" class="drawer-bg" @click="handleClickOutside" />
         <div class="app-sidebar" v-if="!globalStore.isFullScreen">
-            <Sidebar @menu-click="handleMenuClick" :menu-router="!classObj.openMenuTabs" />
+            <Sidebar @menu-click="handleMenuClick" :menu-router="!classObj.openMenuTabs" @open-task="openTask" />
         </div>
 
         <div class="main-container">
@@ -10,6 +10,7 @@
             <Tabs v-if="classObj.openMenuTabs" />
             <app-main :keep-alive="classObj.openMenuTabs ? tabsStore.cachedTabs : null" class="app-main" />
             <Footer class="app-footer" v-if="!globalStore.isFullScreen" />
+            <TaskList ref="taskListRef" />
         </div>
     </div>
 </template>
@@ -25,8 +26,14 @@ import { useRoute, useRouter } from 'vue-router';
 import { loadMasterProductProFromDB, loadProductProFromDB } from '@/utils/xpack';
 import { useTheme } from '@/global/use-theme';
 const { switchTheme } = useTheme();
+import TaskList from '@/components/task-list/index.vue';
+
 useResize();
 
+const taskListRef = ref();
+const openTask = () => {
+    taskListRef.value.acceptParams();
+};
 const router = useRouter();
 const route = useRoute();
 const menuStore = MenuStore();

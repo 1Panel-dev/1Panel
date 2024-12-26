@@ -1,7 +1,7 @@
 <template>
     <div v-loading="initLog && isLoading">
         <div v-if="defaultButton">
-            <el-checkbox border v-model="tailLog" class="float-left" @change="changeTail(false)">
+            <el-checkbox border v-model="tailLog" class="float-left" @change="changeTail(false)" v-if="showTail">
                 {{ $t('commons.button.watch') }}
             </el-checkbox>
             <el-button class="ml-2.5" @click="onDownload" icon="Download" :disabled="logs.length === 0">
@@ -62,6 +62,10 @@ const props = defineProps({
     heightDiff: {
         type: Number,
         default: 500,
+    },
+    showTail: {
+        type: Boolean,
+        default: true,
     },
 });
 const stopSignals = [
@@ -294,7 +298,6 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
-    console.log('onUnmounted');
     onCloseLog();
 });
 

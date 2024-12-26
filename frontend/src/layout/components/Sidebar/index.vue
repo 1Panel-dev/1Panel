@@ -36,7 +36,7 @@
                     </template>
                 </el-dropdown>
             </div>
-            <el-tag type="danger" size="small" effect="light" class="mr-2">{{ taskCount }}</el-tag>
+            <el-tag type="danger" size="small" effect="light" class="mr-2" @click="openTask">{{ taskCount }}</el-tag>
         </div>
         <el-scrollbar>
             <el-menu
@@ -132,7 +132,7 @@ const listeningWindow = () => {
     };
 };
 listeningWindow();
-const emit = defineEmits(['menuClick']);
+const emit = defineEmits(['menuClick', 'openTask']);
 const handleMenuClick = (path) => {
     emit('menuClick', path);
 };
@@ -250,6 +250,10 @@ const checkTask = async () => {
     } catch (error) {
         console.error(error);
     }
+};
+
+const openTask = () => {
+    emit('openTask');
 };
 
 onMounted(() => {
