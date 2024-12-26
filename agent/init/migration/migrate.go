@@ -8,6 +8,12 @@ import (
 )
 
 func Init() {
+	InitAgentDB()
+	InitTaskDB()
+	global.LOG.Info("Migration run successfully")
+}
+
+func InitAgentDB() {
 	m := gormigrate.New(global.DB, gormigrate.DefaultOptions, []*gormigrate.Migration{
 		migrations.AddTable,
 		migrations.AddMonitorTable,
@@ -20,5 +26,14 @@ func Init() {
 		global.LOG.Error(err)
 		panic(err)
 	}
-	global.LOG.Info("Migration run successfully")
+}
+
+func InitTaskDB() {
+	m := gormigrate.New(global.TaskDB, gormigrate.DefaultOptions, []*gormigrate.Migration{
+		migrations.AddTaskTable,
+	})
+	if err := m.Migrate(); err != nil {
+		global.LOG.Error(err)
+		panic(err)
+	}
 }
