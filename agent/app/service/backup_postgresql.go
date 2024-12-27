@@ -61,12 +61,13 @@ func (u *BackupService) PostgresqlRecoverByUpload(req dto.CommonRecover) error {
 	if strings.HasSuffix(fileName, ".tar.gz") {
 		fileNameItem := time.Now().Format(constant.DateTimeSlimLayout)
 		dstDir := fmt.Sprintf("%s/%s", path.Dir(req.File), fileNameItem)
-		if _, err := os.Stat(dstDir); err != nil && os.IsNotExist(err) {
-			if err = os.MkdirAll(dstDir, os.ModePerm); err != nil {
+		fileOp := files.NewFileOp()
+		if !fileOp.Stat(dstDir) {
+			if err := fileOp.CreateDir(dstDir, os.ModePerm); err != nil {
 				return fmt.Errorf("mkdir %s failed, err: %v", dstDir, err)
 			}
 		}
-		if err := handleUnTar(req.File, dstDir, ""); err != nil {
+		if err := fileOp.TarGzExtractPro(req.File, dstDir, ""); err != nil {
 			_ = os.RemoveAll(dstDir)
 			return err
 		}

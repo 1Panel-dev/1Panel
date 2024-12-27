@@ -6,7 +6,7 @@ import (
 	"path"
 	"path/filepath"
 
-	"github.com/1Panel-dev/1Panel/agent/utils/common"
+	"github.com/1Panel-dev/1Panel/agent/utils/files"
 )
 
 type localClient struct {
@@ -43,6 +43,7 @@ func (c localClient) Delete(file string) (bool, error) {
 }
 
 func (c localClient) Upload(src, target string) (bool, error) {
+	fileOp := files.NewFileOp()
 	targetFilePath := path.Join(c.dir, target)
 	if _, err := os.Stat(path.Dir(targetFilePath)); err != nil {
 		if os.IsNotExist(err) {
@@ -54,13 +55,14 @@ func (c localClient) Upload(src, target string) (bool, error) {
 		}
 	}
 
-	if err := common.CopyFile(src, targetFilePath); err != nil {
+	if err := fileOp.CopyAndReName(src, targetFilePath, "", true); err != nil {
 		return false, fmt.Errorf("cp file failed, err: %v", err)
 	}
 	return true, nil
 }
 
 func (c localClient) Download(src, target string) (bool, error) {
+	fileOp := files.NewFileOp()
 	localPath := path.Join(c.dir, src)
 	if _, err := os.Stat(path.Dir(target)); err != nil {
 		if os.IsNotExist(err) {
@@ -72,7 +74,7 @@ func (c localClient) Download(src, target string) (bool, error) {
 		}
 	}
 
-	if err := common.CopyFile(localPath, target); err != nil {
+	if err := fileOp.CopyAndReName(localPath, target, "", true); err != nil {
 		return false, fmt.Errorf("cp file failed, err: %v", err)
 	}
 	return true, nil

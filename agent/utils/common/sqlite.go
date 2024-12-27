@@ -7,13 +7,14 @@ import (
 	"path"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
 
 func LoadDBConnByPath(fullPath, dbName string) *gorm.DB {
-	if _, err := CreateDirWhenNotExist(true, path.Dir(fullPath)); err != nil {
+	if _, err := createDirWhenNotExist(true, path.Dir(fullPath)); err != nil {
 		panic(fmt.Errorf("init db dir failed, err: %v", err))
 	}
 	if _, err := os.Stat(fullPath); err != nil {
@@ -32,7 +33,7 @@ func LoadDBConnByPath(fullPath, dbName string) *gorm.DB {
 }
 
 func LoadDBConnByPathWithErr(fullPath, dbName string) (*gorm.DB, error) {
-	if _, err := CreateDirWhenNotExist(true, path.Dir(fullPath)); err != nil {
+	if _, err := createDirWhenNotExist(true, path.Dir(fullPath)); err != nil {
 		return nil, fmt.Errorf("init db dir failed, err: %v", err)
 	}
 	if _, err := os.Stat(fullPath); err != nil {
@@ -83,4 +84,18 @@ func newLogger() logger.Interface {
 			Colorful:                  false,
 		},
 	)
+}
+
+func createDirWhenNotExist(isDir bool, pathItem string) (string, error) {
+	checkPath := pathItem
+	if !isDir {
+		checkPath = path.Dir(pathItem)
+	}
+	if _, err := os.Stat(checkPath); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(checkPath, os.ModePerm); err != nil {
+			global.LOG.Errorf("mkdir %s failed, err: %v", checkPath, err)
+			return pathItem, err
+		}
+	}
+	return pathItem, nil
 }

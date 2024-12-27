@@ -17,7 +17,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/1Panel-dev/1Panel/agent/utils/ntp"
-	"github.com/pkg/errors"
 )
 
 func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
@@ -136,81 +135,6 @@ func (u *CronjobService) handleNtpSync() error {
 	}
 	if err := ntp.UpdateSystemTime(ntime.Format(constant.DateTimeLayout)); err != nil {
 		return err
-	}
-	return nil
-}
-
-func handleTar(sourceDir, targetDir, name, exclusionRules string, secret string) error {
-	if _, err := os.Stat(targetDir); err != nil && os.IsNotExist(err) {
-		if err = os.MkdirAll(targetDir, os.ModePerm); err != nil {
-			return err
-		}
-	}
-
-	excludes := strings.Split(exclusionRules, ",")
-	excludeRules := ""
-	for _, exclude := range excludes {
-		if len(exclude) == 0 {
-			continue
-		}
-		excludeRules += " --exclude " + exclude
-	}
-	path := ""
-	if strings.Contains(sourceDir, "/") {
-		itemDir := strings.ReplaceAll(sourceDir[strings.LastIndex(sourceDir, "/"):], "/", "")
-		aheadDir := sourceDir[:strings.LastIndex(sourceDir, "/")]
-		if len(aheadDir) == 0 {
-			aheadDir = "/"
-		}
-		path += fmt.Sprintf("-C %s %s", aheadDir, itemDir)
-	} else {
-		path = sourceDir
-	}
-
-	commands := ""
-
-	if len(secret) != 0 {
-		extraCmd := "| openssl enc -aes-256-cbc -salt -k '" + secret + "' -out"
-		commands = fmt.Sprintf("tar --warning=no-file-changed --ignore-failed-read --exclude-from=<(find %s -type s -print) -zcf %s %s %s %s", sourceDir, " -"+excludeRules, path, extraCmd, targetDir+"/"+name)
-		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" %s ", secret), "******"))
-	} else {
-		itemPrefix := pathUtils.Base(sourceDir)
-		if itemPrefix == "/" {
-			itemPrefix = ""
-		}
-		commands = fmt.Sprintf("tar --warning=no-file-changed --ignore-failed-read --exclude-from=<(find %s -type s -printf '%s' | sed 's|^|%s/|') -zcf %s %s %s", sourceDir, "%P\n", itemPrefix, targetDir+"/"+name, excludeRules, path)
-		global.LOG.Debug(commands)
-	}
-	stdout, err := cmd.ExecWithTimeOut(commands, 24*time.Hour)
-	if err != nil {
-		if len(stdout) != 0 {
-			global.LOG.Errorf("do handle tar failed, stdout: %s, err: %v", stdout, err)
-			return fmt.Errorf("do handle tar failed, stdout: %s, err: %v", stdout, err)
-		}
-	}
-	return nil
-}
-
-func handleUnTar(sourceFile, targetDir string, secret string) error {
-	if _, err := os.Stat(targetDir); err != nil && os.IsNotExist(err) {
-		if err = os.MkdirAll(targetDir, os.ModePerm); err != nil {
-			return err
-		}
-	}
-	commands := ""
-	if len(secret) != 0 {
-		extraCmd := "openssl enc -d -aes-256-cbc -k '" + secret + "' -in " + sourceFile + " | "
-		commands = fmt.Sprintf("%s tar -zxvf - -C %s", extraCmd, targetDir+" > /dev/null 2>&1")
-		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" %s ", secret), "******"))
-	} else {
-		commands = fmt.Sprintf("tar zxvfC %s %s", sourceFile, targetDir)
-		global.LOG.Debug(commands)
-	}
-
-	stdout, err := cmd.ExecWithTimeOut(commands, 24*time.Hour)
-	if err != nil {
-		global.LOG.Errorf("do handle untar failed, stdout: %s, err: %v", stdout, err)
-		return errors.New(stdout)
 	}
 	return nil
 }

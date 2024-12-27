@@ -35,10 +35,10 @@ func handleRuntimeBackup(runtime *model.Runtime, backupDir, fileName string, exc
 	}
 
 	appPath := runtime.GetPath()
-	if err := handleTar(appPath, tmpDir, "runtime.tar.gz", excludes, secret); err != nil {
+	if err := fileOp.TarGzCompressPro(true, appPath, path.Join(tmpDir, "runtime.tar.gz"), secret, excludes); err != nil {
 		return err
 	}
-	if err := handleTar(tmpDir, backupDir, fileName, "", secret); err != nil {
+	if err := fileOp.TarGzCompressPro(true, tmpDir, path.Join(backupDir, fileName), secret, ""); err != nil {
 		return err
 	}
 	return nil
@@ -47,7 +47,7 @@ func handleRuntimeBackup(runtime *model.Runtime, backupDir, fileName string, exc
 func handleRuntimeRecover(runtime *model.Runtime, recoverFile string, isRollback bool, secret string) error {
 	isOk := false
 	fileOp := files.NewFileOp()
-	if err := handleUnTar(recoverFile, path.Dir(recoverFile), secret); err != nil {
+	if err := fileOp.TarGzExtractPro(recoverFile, path.Dir(recoverFile), secret); err != nil {
 		return err
 	}
 	tmpPath := strings.ReplaceAll(recoverFile, ".tar.gz", "")
@@ -100,7 +100,7 @@ func handleRuntimeRecover(runtime *model.Runtime, recoverFile string, isRollback
 	_ = fileOp.Rename(runtimeDir, backPath)
 	_ = fileOp.CreateDir(runtimeDir, constant.DirPerm)
 
-	if err := handleUnTar(tmpPath+"/runtime.tar.gz", fmt.Sprintf("%s/%s", constant.RuntimeDir, runtime.Type), secret); err != nil {
+	if err := fileOp.TarGzExtractPro(tmpPath+"/runtime.tar.gz", fmt.Sprintf("%s/%s", constant.RuntimeDir, runtime.Type), secret); err != nil {
 		global.LOG.Errorf("handle recover from runtime.tar.gz failed, err: %v", err)
 		_ = fileOp.DeleteDir(runtimeDir)
 		_ = fileOp.Rename(backPath, runtimeDir)

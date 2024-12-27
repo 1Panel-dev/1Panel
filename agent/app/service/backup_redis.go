@@ -102,7 +102,7 @@ func handleRedisBackup(redisInfo *repo.RootInfo, parentTask *task.Task, backupDi
 
 		if strings.HasSuffix(fileName, ".tar.gz") {
 			redisDataDir := fmt.Sprintf("%s/%s/%s/data/appendonlydir", constant.AppInstallDir, "redis", redisInfo.Name)
-			if err := handleTar(redisDataDir, backupDir, fileName, "", secret); err != nil {
+			if err := fileOp.TarGzCompressPro(true, redisDataDir, path.Join(backupDir, fileName), secret, ""); err != nil {
 				return err
 			}
 			return nil
@@ -201,7 +201,7 @@ func handleRedisRecover(redisInfo *repo.RootInfo, parentTask *task.Task, recover
 		}
 		if appendonly == "yes" && strings.HasPrefix(redisInfo.Version, "7.") {
 			redisDataDir := fmt.Sprintf("%s/%s/%s/data", constant.AppInstallDir, "redis", redisInfo.Name)
-			if err := handleUnTar(recoverFile, redisDataDir, secret); err != nil {
+			if err := fileOp.TarGzExtractPro(recoverFile, redisDataDir, secret); err != nil {
 				return err
 			}
 		} else {

@@ -65,6 +65,19 @@ func (f FileOp) CreateDirWithMode(dst string, mode fs.FileMode) error {
 	}
 	return f.ChmodRWithMode(dst, mode, true)
 }
+func (f FileOp) CreateDirWithPath(isDir bool, pathItem string) (string, error) {
+	checkPath := pathItem
+	if !isDir {
+		checkPath = path.Dir(pathItem)
+	}
+	if f.Stat(checkPath) {
+		if err := f.CreateDir(checkPath, os.ModePerm); err != nil {
+			global.LOG.Errorf("mkdir %s failed, err: %v", checkPath, err)
+			return pathItem, err
+		}
+	}
+	return pathItem, nil
+}
 
 func (f FileOp) CreateFile(dst string) error {
 	if _, err := f.Fs.Create(dst); err != nil {
@@ -728,8 +741,6 @@ func (f FileOp) TarGzCompressPro(withDir bool, src, dst, secret, exclusionRules 
 	exMap := make(map[string]struct{})
 	exStr := ""
 	excludes := strings.Split(exclusionRules, ";")
-	excludes = append(excludes, "*.sock")
-	excludes = append(excludes, "*.socket")
 	for _, exclude := range excludes {
 		if len(exclude) == 0 {
 			continue
@@ -742,11 +753,15 @@ func (f FileOp) TarGzCompressPro(withDir bool, src, dst, secret, exclusionRules 
 		exMap[exclude] = struct{}{}
 	}
 
+	itemPrefix := filepath.Base(src)
+	if itemPrefix == "/" {
+		itemPrefix = ""
+	}
 	if len(secret) != 0 {
-		commands = fmt.Sprintf("tar -zcf - %s | openssl enc -aes-256-cbc -salt -pbkdf2 -k '%s' -out %s", srcItem, secret, dst)
+		commands = fmt.Sprintf("tar  --warning=no-file-changed --ignore-failed-read --exclude-from=<(find %s -type s -print-printf '%s' | sed 's|^|%s/|') -zcf - %s | openssl enc -aes-256-cbc -salt -pbkdf2 -k '%s' -out %s", src, "%P\n", itemPrefix, srcItem, secret, dst)
 		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" %s ", secret), "******"))
 	} else {
-		commands = fmt.Sprintf("tar zcf %s %s %s", dst, exStr, srcItem)
+		commands = fmt.Sprintf("tar  --warning=no-file-changed --ignore-failed-read --exclude-from=<(find %s -type s -print-printf '%s' | sed 's|^|%s/|') -zcf %s %s %s", src, "%P\n", itemPrefix, dst, exStr, srcItem)
 		global.LOG.Debug(commands)
 	}
 	return cmd.ExecCmdWithDir(commands, workdir)

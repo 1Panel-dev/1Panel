@@ -79,7 +79,7 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 		fileOp := files.NewFileOp()
 		tmpPath := strings.ReplaceAll(recoverFile, ".tar.gz", "")
 		t.Log(i18n.GetWithName("DeCompressFile", recoverFile))
-		if err = handleUnTar(recoverFile, path.Dir(recoverFile), secret); err != nil {
+		if err = fileOp.TarGzExtractPro(recoverFile, path.Dir(recoverFile), secret); err != nil {
 			return err
 		}
 		defer func() {
@@ -182,7 +182,7 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 		}
 		taskName := i18n.GetMsgByKey("TaskRecover") + i18n.GetMsgByKey("websiteDir")
 		t.Log(taskName)
-		if err = handleUnTar(fmt.Sprintf("%s/%s.web.tar.gz", tmpPath, website.Alias), GetSitePath(*website, SiteDir), ""); err != nil {
+		if err = fileOp.TarGzExtractPro(fmt.Sprintf("%s/%s.web.tar.gz", tmpPath, website.Alias), GetSitePath(*website, SiteDir), ""); err != nil {
 			t.LogFailedWithErr(taskName, err)
 			return err
 		}
@@ -263,10 +263,10 @@ func handleWebsiteBackup(website *model.Website, backupDir, fileName, excludes, 
 
 		websiteDir := GetSitePath(*website, SiteDir)
 		t.LogStart(i18n.GetMsgByKey("CompressDir"))
-		if err = handleTar(websiteDir, tmpDir, fmt.Sprintf("%s.web.tar.gz", website.Alias), excludes, ""); err != nil {
+		if err = fileOp.TarGzCompressPro(true, websiteDir, path.Join(tmpDir, fmt.Sprintf("%s.web.tar.gz", website.Alias)), "", excludes); err != nil {
 			return err
 		}
-		if err = handleTar(tmpDir, backupDir, fileName, "", secret); err != nil {
+		if err = fileOp.TarGzCompressPro(true, tmpDir, path.Join(backupDir, fileName), secret, ""); err != nil {
 			return err
 		}
 		t.Log(i18n.GetWithName("CompressFileSuccess", fileName))

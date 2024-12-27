@@ -159,7 +159,7 @@ func handleAppBackup(install *model.AppInstall, parentTask *task.Task, backupDir
 		}
 
 		appPath := install.GetPath()
-		if err := handleTar(appPath, tmpDir, "app.tar.gz", excludes, ""); err != nil {
+		if err := fileOp.TarGzCompressPro(true, appPath, path.Join(tmpDir, "app.tar.gz"), "", excludes); err != nil {
 			return err
 		}
 
@@ -170,7 +170,7 @@ func handleAppBackup(install *model.AppInstall, parentTask *task.Task, backupDir
 			}
 		}
 		t.LogStart(i18n.GetMsgByKey("CompressDir"))
-		if err := handleTar(tmpDir, backupDir, fileName, "", secret); err != nil {
+		if err := fileOp.TarGzCompressPro(true, tmpDir, path.Join(backupDir, fileName), secret, ""); err != nil {
 			return err
 		}
 		t.Log(i18n.GetWithName("CompressFileSuccess", fileName))
@@ -200,7 +200,7 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 
 	recoverApp := func(t *task.Task) error {
 		fileOp := files.NewFileOp()
-		if err := handleUnTar(recoverFile, path.Dir(recoverFile), secret); err != nil {
+		if err := fileOp.TarGzExtractPro(recoverFile, path.Dir(recoverFile), secret); err != nil {
 			return err
 		}
 		tmpPath := strings.ReplaceAll(recoverFile, ".tar.gz", "")
@@ -307,7 +307,7 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 
 		deCompressName := i18n.GetWithName("DeCompressFile", "app.tar.gz")
 		t.LogStart(deCompressName)
-		if err := handleUnTar(tmpPath+"/app.tar.gz", install.GetAppPath(), ""); err != nil {
+		if err := fileOp.TarGzExtractPro(tmpPath+"/app.tar.gz", install.GetAppPath(), ""); err != nil {
 			t.LogFailedWithErr(deCompressName, err)
 			_ = fileOp.DeleteDir(appDir)
 			_ = fileOp.Rename(backPath, appDir)

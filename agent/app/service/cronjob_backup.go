@@ -316,6 +316,7 @@ func loadWebsForJob(cronjob model.Cronjob) []model.Website {
 }
 
 func handleBackupLogs(targetDir, fileName string, secret string) error {
+	fileOp := files.NewFileOp()
 	websites, err := websiteRepo.List()
 	if err != nil {
 		return err
@@ -338,7 +339,7 @@ func handleBackupLogs(targetDir, fileName string, secret string) error {
 			if len(logFiles) != 0 {
 				for i := 0; i < len(logFiles); i++ {
 					if !logFiles[i].IsDir() {
-						_ = common.CopyFile(path.Join(itemDir, logFiles[i].Name()), dirItem)
+						_ = fileOp.CopyFile(path.Join(itemDir, logFiles[i].Name()), dirItem)
 					}
 				}
 			}
@@ -347,7 +348,7 @@ func handleBackupLogs(targetDir, fileName string, secret string) error {
 			if len(logFiles2) != 0 {
 				for i := 0; i < len(logFiles2); i++ {
 					if !logFiles2[i].IsDir() {
-						_ = common.CopyFile(path.Join(itemDir2, logFiles2[i].Name()), dirItem)
+						_ = fileOp.CopyFile(path.Join(itemDir2, logFiles2[i].Name()), dirItem)
 					}
 				}
 			}
@@ -366,7 +367,7 @@ func handleBackupLogs(targetDir, fileName string, secret string) error {
 	if len(systemLogFiles) != 0 {
 		for i := 0; i < len(systemLogFiles); i++ {
 			if !systemLogFiles[i].IsDir() {
-				_ = common.CopyFile(path.Join(systemLogDir, systemLogFiles[i].Name()), systemDir)
+				_ = fileOp.CopyFile(path.Join(systemLogDir, systemLogFiles[i].Name()), systemDir)
 			}
 		}
 	}
@@ -382,13 +383,13 @@ func handleBackupLogs(targetDir, fileName string, secret string) error {
 	if len(loginLogFiles) != 0 {
 		for i := 0; i < len(loginLogFiles); i++ {
 			if !loginLogFiles[i].IsDir() && (strings.HasPrefix(loginLogFiles[i].Name(), "secure") || strings.HasPrefix(loginLogFiles[i].Name(), "auth.log")) {
-				_ = common.CopyFile(path.Join("/var/log", loginLogFiles[i].Name()), loginDir)
+				_ = fileOp.CopyFile(path.Join("/var/log", loginLogFiles[i].Name()), loginDir)
 			}
 		}
 	}
 	global.LOG.Debug("backup ssh log successful!")
 
-	if err := handleTar(targetDir, path.Dir(targetDir), fileName, "", secret); err != nil {
+	if err := fileOp.TarGzCompressPro(true, targetDir, path.Join(path.Dir(targetDir), fileName), secret, ""); err != nil {
 		return err
 	}
 	defer func() {
