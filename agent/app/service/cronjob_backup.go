@@ -17,7 +17,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time) error {
+func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time, taskID string) error {
 	var apps []model.AppInstall
 	if cronjob.AppID == "all" {
 		apps, _ = appInstallRepo.ListBy()
@@ -46,7 +46,7 @@ func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time) e
 		record.DownloadAccountID, record.SourceAccountIDs = cronjob.DownloadAccountID, cronjob.SourceAccountIDs
 		backupDir := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("app/%s/%s", app.App.Key, app.Name))
 		record.FileName = fmt.Sprintf("app_%s_%s.tar.gz", app.Name, startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5))
-		if err := handleAppBackup(&app, nil, backupDir, record.FileName, cronjob.ExclusionRules, cronjob.Secret, ""); err != nil {
+		if err := handleAppBackup(&app, nil, backupDir, record.FileName, cronjob.ExclusionRules, cronjob.Secret, taskID); err != nil {
 			return err
 		}
 		downloadPath, err := u.uploadCronjobBackFile(cronjob, accountMap, path.Join(backupDir, record.FileName))
@@ -63,7 +63,7 @@ func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time) e
 	return nil
 }
 
-func (u *CronjobService) handleWebsite(cronjob model.Cronjob, startTime time.Time) error {
+func (u *CronjobService) handleWebsite(cronjob model.Cronjob, startTime time.Time, taskID string) error {
 	webs := loadWebsForJob(cronjob)
 	if len(webs) == 0 {
 		return errors.New("no such website in database!")
@@ -82,7 +82,7 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, startTime time.Tim
 		record.DownloadAccountID, record.SourceAccountIDs = cronjob.DownloadAccountID, cronjob.SourceAccountIDs
 		backupDir := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("website/%s", web.PrimaryDomain))
 		record.FileName = fmt.Sprintf("website_%s_%s.tar.gz", web.PrimaryDomain, startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5))
-		if err := handleWebsiteBackup(&web, backupDir, record.FileName, cronjob.ExclusionRules, cronjob.Secret, ""); err != nil {
+		if err := handleWebsiteBackup(&web, backupDir, record.FileName, cronjob.ExclusionRules, cronjob.Secret, taskID); err != nil {
 			return err
 		}
 		downloadPath, err := u.uploadCronjobBackFile(cronjob, accountMap, path.Join(backupDir, record.FileName))
@@ -99,7 +99,7 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, startTime time.Tim
 	return nil
 }
 
-func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Time) error {
+func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Time, taskID string) error {
 	dbs := loadDbsForJob(cronjob)
 	if len(dbs) == 0 {
 		return errors.New("no such db in database!")
@@ -120,11 +120,11 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Ti
 		backupDir := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("database/%s/%s/%s", dbInfo.DBType, record.Name, dbInfo.Name))
 		record.FileName = fmt.Sprintf("db_%s_%s.sql.gz", dbInfo.Name, startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5))
 		if cronjob.DBType == "mysql" || cronjob.DBType == "mariadb" {
-			if err := handleMysqlBackup(dbInfo, nil, backupDir, record.FileName, ""); err != nil {
+			if err := handleMysqlBackup(dbInfo, nil, backupDir, record.FileName, taskID); err != nil {
 				return err
 			}
 		} else {
-			if err := handlePostgresqlBackup(dbInfo, nil, backupDir, record.FileName, ""); err != nil {
+			if err := handlePostgresqlBackup(dbInfo, nil, backupDir, record.FileName, taskID); err != nil {
 				return err
 			}
 		}
@@ -212,8 +212,12 @@ func (u *CronjobService) handleSystemLog(cronjob model.Cronjob, startTime time.T
 	return nil
 }
 
-func (u *CronjobService) handleSnapshot(cronjob model.Cronjob, startTime time.Time) error {
+func (u *CronjobService) handleSnapshot(cronjob model.Cronjob, startTime time.Time, taskID string) error {
 	accountMap, err := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
+	if err != nil {
+		return err
+	}
+	itemData, err := NewISnapshotService().LoadSnapshotData()
 	if err != nil {
 		return err
 	}
@@ -227,14 +231,28 @@ func (u *CronjobService) handleSnapshot(cronjob model.Cronjob, startTime time.Ti
 	record.FileDir = "system_snapshot"
 
 	versionItem, _ := settingRepo.Get(settingRepo.WithByKey("SystemVersion"))
+	scope := "core"
+	if !global.IsMaster {
+		scope = "agent"
+	}
 	req := dto.SnapshotCreate{
-		Name:   fmt.Sprintf("snapshot-1panel-%s-linux-%s-%s", versionItem.Value, loadOs(), startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5)),
+		Name:   fmt.Sprintf("snapshot-1panel-%s-%s-linux-%s-%s", scope, versionItem.Value, loadOs(), startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5)),
 		Secret: cronjob.Secret,
+		TaskID: taskID,
 
 		SourceAccountIDs:  record.SourceAccountIDs,
 		DownloadAccountID: cronjob.DownloadAccountID,
+		AppData:           itemData.AppData,
+		PanelData:         itemData.PanelData,
+		BackupData:        itemData.BackupData,
+		WithMonitorData:   true,
+		WithLoginLog:      true,
+		WithOperationLog:  true,
+		WithSystemLog:     true,
+		WithTaskLog:       true,
 	}
-	if err := NewISnapshotService().HandleSnapshot(req); err != nil {
+
+	if err := NewISnapshotService().SnapshotCreate(req, true); err != nil {
 		return err
 	}
 	record.FileName = req.Name + ".tar.gz"

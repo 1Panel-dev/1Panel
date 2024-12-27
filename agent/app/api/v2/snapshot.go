@@ -36,7 +36,7 @@ func (b *BaseApi) CreateSnapshot(c *gin.Context) {
 		return
 	}
 
-	if err := snapshotService.SnapshotCreate(req); err != nil {
+	if err := snapshotService.SnapshotCreate(req, false); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}

@@ -4,7 +4,13 @@
             <el-checkbox border v-model="tailLog" class="float-left" @change="changeTail(false)" v-if="showTail">
                 {{ $t('commons.button.watch') }}
             </el-checkbox>
-            <el-button class="ml-2.5" @click="onDownload" icon="Download" :disabled="logs.length === 0">
+            <el-button
+                class="ml-2.5"
+                v-if="showDownload"
+                @click="onDownload"
+                icon="Download"
+                :disabled="logs.length === 0"
+            >
                 {{ $t('file.download') }}
             </el-button>
             <span v-if="$slots.button" class="ml-2.5">
@@ -64,6 +70,10 @@ const props = defineProps({
         default: 500,
     },
     showTail: {
+        type: Boolean,
+        default: true,
+    },
+    showDownload: {
         type: Boolean,
         default: true,
     },

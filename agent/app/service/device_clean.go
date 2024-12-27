@@ -10,11 +10,13 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
@@ -290,64 +292,71 @@ func (u *DeviceService) Clean(req []dto.Clean) {
 	}
 }
 
-func (u *DeviceService) CleanForCronjob() (string, error) {
-	logs := ""
-	size := int64(0)
-	fileCount := 0
-	dropFileOrDirWithLog(path.Join(global.CONF.System.BaseDir, "1panel_original"), &logs, &size, &fileCount)
+func systemClean(taskItem *task.Task) error {
+	taskItem.AddSubTask(i18n.GetMsgByKey("HandleSystemClean"), func(t *task.Task) error {
+		size := int64(0)
+		fileCount := 0
+		dropWithTask(path.Join(global.CONF.System.BaseDir, "1panel_original"), taskItem, &size, &fileCount)
 
-	upgradePath := path.Join(global.CONF.System.BaseDir, upgradePath)
-	upgradeFiles, _ := os.ReadDir(upgradePath)
-	if len(upgradeFiles) != 0 {
-		sort.Slice(upgradeFiles, func(i, j int) bool {
-			return upgradeFiles[i].Name() > upgradeFiles[j].Name()
-		})
-		for i := 0; i < len(upgradeFiles); i++ {
-			if i != 0 {
-				dropFileOrDirWithLog(path.Join(upgradePath, upgradeFiles[i].Name()), &logs, &size, &fileCount)
+		upgradePath := path.Join(global.CONF.System.BaseDir, upgradePath)
+		upgradeFiles, _ := os.ReadDir(upgradePath)
+		if len(upgradeFiles) != 0 {
+			sort.Slice(upgradeFiles, func(i, j int) bool {
+				return upgradeFiles[i].Name() > upgradeFiles[j].Name()
+			})
+			for i := 0; i < len(upgradeFiles); i++ {
+				if i != 0 {
+					dropWithTask(path.Join(upgradePath, upgradeFiles[i].Name()), taskItem, &size, &fileCount)
+				}
 			}
 		}
-	}
 
-	dropFileOrDirWithLog(path.Join(global.CONF.System.BaseDir, snapshotTmpPath), &logs, &size, &fileCount)
-	dropFileOrDirWithLog(path.Join(global.CONF.System.Backup, "system"), &logs, &size, &fileCount)
+		dropWithTask(path.Join(global.CONF.System.BaseDir, snapshotTmpPath), taskItem, &size, &fileCount)
+		dropWithTask(path.Join(global.CONF.System.Backup, "system"), taskItem, &size, &fileCount)
 
-	dropFileOrDirWithLog(path.Join(global.CONF.System.BaseDir, rollbackPath, "app"), &logs, &size, &fileCount)
-	dropFileOrDirWithLog(path.Join(global.CONF.System.BaseDir, rollbackPath, "website"), &logs, &size, &fileCount)
-	dropFileOrDirWithLog(path.Join(global.CONF.System.BaseDir, rollbackPath, "database"), &logs, &size, &fileCount)
+		dropWithTask(path.Join(global.CONF.System.BaseDir, rollbackPath, "app"), taskItem, &size, &fileCount)
+		dropWithTask(path.Join(global.CONF.System.BaseDir, rollbackPath, "website"), taskItem, &size, &fileCount)
+		dropWithTask(path.Join(global.CONF.System.BaseDir, rollbackPath, "database"), taskItem, &size, &fileCount)
 
-	dropFileOrDirWithLog(path.Join(global.CONF.System.BaseDir, oldOriginalPath), &logs, &size, &fileCount)
-	dropFileOrDirWithLog(path.Join(global.CONF.System.BaseDir, oldAppBackupPath), &logs, &size, &fileCount)
-	dropFileOrDirWithLog(path.Join(global.CONF.System.BaseDir, oldDownloadPath), &logs, &size, &fileCount)
-	oldUpgradePath := path.Join(global.CONF.System.BaseDir, oldUpgradePath)
-	oldUpgradeFiles, _ := os.ReadDir(oldUpgradePath)
-	if len(oldUpgradeFiles) != 0 {
-		for i := 0; i < len(oldUpgradeFiles); i++ {
-			dropFileOrDirWithLog(path.Join(oldUpgradePath, oldUpgradeFiles[i].Name()), &logs, &size, &fileCount)
-		}
-	}
-
-	dropFileOrDirWithLog(path.Join(global.CONF.System.BaseDir, tmpUploadPath), &logs, &size, &fileCount)
-	dropFileOrDirWithLog(path.Join(global.CONF.System.BaseDir, uploadPath), &logs, &size, &fileCount)
-	dropFileOrDirWithLog(path.Join(global.CONF.System.BaseDir, downloadPath), &logs, &size, &fileCount)
-
-	logPath := path.Join(global.CONF.System.BaseDir, logPath)
-	logFiles, _ := os.ReadDir(logPath)
-	if len(logFiles) != 0 {
-		for i := 0; i < len(logFiles); i++ {
-			if logFiles[i].Name() != "1Panel.log" {
-				dropFileOrDirWithLog(path.Join(logPath, logFiles[i].Name()), &logs, &size, &fileCount)
+		dropWithTask(path.Join(global.CONF.System.BaseDir, oldOriginalPath), taskItem, &size, &fileCount)
+		dropWithTask(path.Join(global.CONF.System.BaseDir, oldAppBackupPath), taskItem, &size, &fileCount)
+		dropWithTask(path.Join(global.CONF.System.BaseDir, oldDownloadPath), taskItem, &size, &fileCount)
+		oldUpgradePath := path.Join(global.CONF.System.BaseDir, oldUpgradePath)
+		oldUpgradeFiles, _ := os.ReadDir(oldUpgradePath)
+		if len(oldUpgradeFiles) != 0 {
+			for i := 0; i < len(oldUpgradeFiles); i++ {
+				dropWithTask(path.Join(oldUpgradePath, oldUpgradeFiles[i].Name()), taskItem, &size, &fileCount)
 			}
 		}
-	}
-	timeNow := time.Now().Format(constant.DateTimeLayout)
-	logs += fmt.Sprintf("\n%s: total clean: %s, total count: %d", timeNow, common.LoadSizeUnit2F(float64(size)), fileCount)
 
-	_ = settingRepo.Update("LastCleanTime", timeNow)
-	_ = settingRepo.Update("LastCleanSize", fmt.Sprintf("%v", size))
-	_ = settingRepo.Update("LastCleanData", fmt.Sprintf("%v", fileCount))
+		dropWithTask(path.Join(global.CONF.System.BaseDir, tmpUploadPath), taskItem, &size, &fileCount)
+		dropWithTask(path.Join(global.CONF.System.BaseDir, uploadPath), taskItem, &size, &fileCount)
+		dropWithTask(path.Join(global.CONF.System.BaseDir, downloadPath), taskItem, &size, &fileCount)
 
-	return logs, nil
+		logPath := path.Join(global.CONF.System.BaseDir, logPath)
+		logFiles, _ := os.ReadDir(logPath)
+		if len(logFiles) != 0 {
+			for i := 0; i < len(logFiles); i++ {
+				if logFiles[i].IsDir() {
+					continue
+				}
+				if logFiles[i].Name() != "1Panel.log" {
+					dropWithTask(path.Join(logPath, logFiles[i].Name()), taskItem, &size, &fileCount)
+				}
+			}
+		}
+		timeNow := time.Now().Format(constant.DateTimeLayout)
+		if fileCount != 0 {
+			taskItem.LogSuccessF("%s: total clean: %s, total count: %d", timeNow, common.LoadSizeUnit2F(float64(size)), fileCount)
+		}
+
+		_ = settingRepo.Update("LastCleanTime", timeNow)
+		_ = settingRepo.Update("LastCleanSize", fmt.Sprintf("%v", size))
+		_ = settingRepo.Update("LastCleanData", fmt.Sprintf("%v", fileCount))
+
+		return nil
+	}, nil)
+	return taskItem.Execute()
 }
 
 func loadSnapshotTree(fileOp fileUtils.FileOp) []dto.CleanTree {
@@ -695,18 +704,19 @@ func dropVolumes() {
 	}
 }
 
-func dropFileOrDirWithLog(itemPath string, log *string, size *int64, count *int) {
+func dropWithTask(itemPath string, taskItem *task.Task, size *int64, count *int) {
 	itemSize := int64(0)
 	itemCount := 0
 	scanFile(itemPath, &itemSize, &itemCount)
 	*size += itemSize
 	*count += itemCount
 	if err := os.RemoveAll(itemPath); err != nil {
-		global.LOG.Errorf("drop file %s failed, err %v", itemPath, err)
-		*log += fmt.Sprintf("- drop file %s failed, err: %v \n\n", itemPath, err)
+		taskItem.LogFailed(fmt.Sprintf("drop file %s, err %v", itemPath, err))
 		return
 	}
-	*log += fmt.Sprintf("+ drop file %s successful!, size: %s, count: %d \n\n", itemPath, common.LoadSizeUnit2F(float64(itemSize)), itemCount)
+	if itemCount != 0 {
+		taskItem.LogSuccessF("drop file %s, size: %s, count: %d", itemPath, common.LoadSizeUnit2F(float64(itemSize)), itemCount)
+	}
 }
 
 func scanFile(pathItem string, size *int64, count *int) {

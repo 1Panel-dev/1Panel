@@ -105,6 +105,7 @@ export namespace Cronjob {
     }
     export interface Record {
         id: number;
+        taskID: string;
         file: string;
         startTime: string;
         records: string;

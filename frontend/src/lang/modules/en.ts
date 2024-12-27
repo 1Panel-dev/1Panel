@@ -1658,6 +1658,8 @@ const message = {
             'Backup files not in the current backup list, please try downloading from the file directory and importing for backup.',
 
         snapshot: 'Snapshot',
+        noAppData: 'No system applications available for selection',
+        noBackupData: 'No backup data available for selection',
         stepBaseData: 'Base Data',
         stepAppData: 'System Application',
         stepPanelData: 'System Data',

@@ -3,12 +3,13 @@ package task
 import (
 	"context"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"log"
 	"os"
 	"path"
 	"strconv"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
@@ -68,6 +69,7 @@ const (
 	TaskScopeRuntime          = "Runtime"
 	TaskScopeDatabase         = "Database"
 	TaskScopeCronjob          = "Cronjob"
+	TaskScopeSystem           = "System"
 	TaskScopeAppStore         = "AppStore"
 	TaskScopeSnapshot         = "Snapshot"
 	TaskScopeContainer        = "Container"
@@ -234,14 +236,14 @@ func (t *Task) DeleteLogFile() {
 
 func (t *Task) LogWithStatus(msg string, err error) {
 	if err != nil {
-		t.Logger.Printf(i18n.GetWithNameAndErr("FailedStatus", msg, err))
+		t.Logger.Print(i18n.GetWithNameAndErr("FailedStatus", msg, err))
 	} else {
-		t.Logger.Printf(i18n.GetWithName("SuccessStatus", msg))
+		t.Logger.Print(i18n.GetWithName("SuccessStatus", msg))
 	}
 }
 
 func (t *Task) Log(msg string) {
-	t.Logger.Printf(msg)
+	t.Logger.Print(msg)
 }
 
 func (t *Task) Logf(format string, v ...any) {

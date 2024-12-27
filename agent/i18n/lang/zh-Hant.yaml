@@ -188,6 +188,9 @@ ErrFirewallBoth: "檢測到系統同時存在 firewalld 或 ufw 服務，為避�
 #cronjob
 ErrCutWebsiteLog: "{{ .name }} 網站日誌切割失敗，錯誤 {{ .err }}"
 CutWebsiteLogSuccess: "{{ .name }} 網站日誌切割成功，備份路徑 {{ .path }}"
+HandleShell: "執行腳本 {{ .name }}"
+HandleNtpSync: "系統時間同步"
+HandleSystemClean: "系統快取清理"
 
 #toolbox
 ErrNotExistUser: "當前使用者不存在，請修改後重試！"

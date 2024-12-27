@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 )
@@ -117,6 +118,39 @@ func ExecShell(outPath string, timeout time.Duration, name string, arg ...string
 	cmd := exec.Command(name, arg...)
 	cmd.Stdout = file
 	cmd.Stderr = file
+	if err := cmd.Start(); err != nil {
+		return err
+	}
+	done := make(chan error, 1)
+	go func() {
+		done <- cmd.Wait()
+	}()
+	after := time.After(timeout)
+	select {
+	case <-after:
+		_ = cmd.Process.Kill()
+		return buserr.New(constant.ErrCmdTimeout)
+	case err := <-done:
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+type CustomWriter struct {
+	taskItem *task.Task
+}
+
+func (cw *CustomWriter) Write(p []byte) (n int, err error) {
+	cw.taskItem.Log(string(p))
+	return len(p), nil
+}
+func ExecShellWithTask(taskItem *task.Task, timeout time.Duration, name string, arg ...string) error {
+	customWriter := &CustomWriter{taskItem: taskItem}
+	cmd := exec.Command(name, arg...)
+	cmd.Stdout = customWriter
+	cmd.Stderr = customWriter
 	if err := cmd.Start(); err != nil {
 		return err
 	}

@@ -134,6 +134,7 @@ type SearchRecord struct {
 
 type Record struct {
 	ID         uint   `json:"id"`
+	TaskID     string `json:"taskID"`
 	StartTime  string `json:"startTime"`
 	Records    string `json:"records"`
 	Status     string `json:"status"`

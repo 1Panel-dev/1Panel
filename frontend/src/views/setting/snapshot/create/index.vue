@@ -53,31 +53,36 @@
                 </el-form>
             </fu-step>
             <fu-step id="appData" :title="$t('setting.stepAppData')">
-                <el-checkbox
-                    class="ml-6"
-                    v-model="form.backupAllImage"
-                    @change="selectAllImage"
-                    :label="$t('setting.selectAllImage')"
-                    size="large"
-                />
-                <el-tree
-                    style="max-width: 600px"
-                    ref="appRef"
-                    node-key="id"
-                    :data="form.appData"
-                    :props="defaultProps"
-                    @check-change="onChangeAppData"
-                    show-checkbox
-                >
-                    <template #default="{ data }">
-                        <div class="float-left">
-                            <span>{{ loadApp18n(data.label) }}</span>
-                        </div>
-                        <div class="ml-4 float-left">
-                            <span v-if="data.size">{{ computeSize(data.size) }}</span>
-                        </div>
-                    </template>
-                </el-tree>
+                <div class="mt-5 mb-5" v-if="!form.appData || form.appData.length === 0">
+                    <span class="input-help">{{ $t('setting.noAppData') }}</span>
+                </div>
+                <div v-else>
+                    <el-checkbox
+                        class="ml-6"
+                        v-model="form.backupAllImage"
+                        @change="selectAllImage"
+                        :label="$t('setting.selectAllImage')"
+                        size="large"
+                    />
+                    <el-tree
+                        style="max-width: 600px"
+                        ref="appRef"
+                        node-key="id"
+                        :data="form.appData"
+                        :props="defaultProps"
+                        @check-change="onChangeAppData"
+                        show-checkbox
+                    >
+                        <template #default="{ data }">
+                            <div class="float-left">
+                                <span>{{ loadApp18n(data.label) }}</span>
+                            </div>
+                            <div class="ml-4 float-left">
+                                <span v-if="data.size">{{ computeSize(data.size) }}</span>
+                            </div>
+                        </template>
+                    </el-tree>
+                </div>
             </fu-step>
             <fu-step id="panelData" :title="$t('setting.stepPanelData')">
                 <el-tree
@@ -99,23 +104,28 @@
                 </el-tree>
             </fu-step>
             <fu-step id="backupData" :title="$t('setting.stepBackupData')">
-                <el-tree
-                    style="max-width: 600px"
-                    ref="backupRef"
-                    node-key="id"
-                    :data="form.backupData"
-                    :props="defaultProps"
-                    show-checkbox
-                >
-                    <template #default="{ node, data }">
-                        <div class="float-left">
-                            <span>{{ load18n(node, data.label) }}</span>
-                        </div>
-                        <div class="ml-4 float-left">
-                            <span v-if="data.size">{{ computeSize(data.size) }}</span>
-                        </div>
-                    </template>
-                </el-tree>
+                <div class="mt-5 mb-5" v-if="!form.appData || form.appData.length === 0">
+                    <span class="input-help">{{ $t('setting.noBackupData') }}</span>
+                </div>
+                <div v-else>
+                    <el-tree
+                        style="max-width: 600px"
+                        ref="backupRef"
+                        node-key="id"
+                        :data="form.backupData"
+                        :props="defaultProps"
+                        show-checkbox
+                    >
+                        <template #default="{ node, data }">
+                            <div class="float-left">
+                                <span>{{ load18n(node, data.label) }}</span>
+                            </div>
+                            <div class="ml-4 float-left">
+                                <span v-if="data.size">{{ computeSize(data.size) }}</span>
+                            </div>
+                        </template>
+                    </el-tree>
+                </div>
             </fu-step>
             <fu-step id="otherData" :title="$t('setting.stepOtherData')">
                 <div class="ml-5">
@@ -239,16 +249,20 @@ const beforeLeave = async (stepItem: any) => {
                 return false;
             }
         case 'appData':
-            let appChecks = appRef.value.getCheckedNodes();
-            loadCheckForSubmit(appChecks, form.appData);
+            if (form.appData && form.appData.length !== 0) {
+                let appChecks = appRef.value.getCheckedNodes();
+                loadCheckForSubmit(appChecks, form.appData);
+            }
             return true;
         case 'panelData':
             let panelChecks = panelRef.value.getCheckedNodes();
             loadCheckForSubmit(panelChecks, form.panelData);
             return true;
         case 'backupData':
-            let backupChecks = backupRef.value.getCheckedNodes();
-            loadCheckForSubmit(backupChecks, form.backupData);
+            if (form.backupData && form.backupData.length !== 0) {
+                let backupChecks = backupRef.value.getCheckedNodes();
+                loadCheckForSubmit(backupChecks, form.backupData);
+            }
             return true;
     }
 };

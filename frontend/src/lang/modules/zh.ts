@@ -1470,6 +1470,8 @@ const message = {
         backupJump: '未在当前备份列表中的备份文件，请尝试从文件目录中下载后导入备份。',
 
         snapshot: '快照',
+        noAppData: '暂无可选择系统应用',
+        noBackupData: '暂无可选择备份数据',
         stepBaseData: '基础数据',
         stepAppData: '系统应用',
         stepPanelData: '系统数据',

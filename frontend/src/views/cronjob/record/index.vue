@@ -172,6 +172,14 @@
                                         ></highlightjs>
                                     </div>
                                 </el-row>
+                                <el-row v-if="currentRecord?.taskID">
+                                    <TaskLog
+                                        class="w-full"
+                                        :taskID="currentRecord?.taskID"
+                                        :key="currentRecord?.taskID"
+                                        :heightDiff="200"
+                                    />
+                                </el-row>
                             </el-form>
                         </el-col>
                     </el-row>
@@ -221,6 +229,7 @@ import { MsgSuccess } from '@/utils/message';
 import { listDbItems } from '@/api/modules/database';
 import { ListAppInstalled } from '@/api/modules/app';
 import { shortcuts } from '@/utils/shortcuts';
+import TaskLog from '@/components/task-log/log-without-dialog.vue';
 
 const loading = ref();
 const refresh = ref(false);

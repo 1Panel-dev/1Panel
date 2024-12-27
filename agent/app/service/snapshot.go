@@ -30,7 +30,7 @@ type ISnapshotService interface {
 	SearchWithPage(req dto.PageSnapshot) (int64, interface{}, error)
 	LoadSize(req dto.SearchWithPage) ([]dto.SnapshotFile, error)
 	LoadSnapshotData() (dto.SnapshotData, error)
-	SnapshotCreate(req dto.SnapshotCreate) error
+	SnapshotCreate(req dto.SnapshotCreate, isCron bool) error
 	SnapshotReCreate(id uint) error
 	SnapshotRecover(req dto.SnapshotRecover) error
 	SnapshotRollback(req dto.SnapshotRecover) error
@@ -38,8 +38,6 @@ type ISnapshotService interface {
 	Delete(req dto.SnapshotBatchDelete) error
 
 	UpdateDescription(req dto.UpdateDescription) error
-
-	HandleSnapshot(req dto.SnapshotCreate) error
 }
 
 func NewISnapshotService() ISnapshotService {
@@ -87,6 +85,8 @@ func (u *SnapshotService) LoadSize(req dto.SearchWithPage) ([]dto.SnapshotFile, 
 				backupName := fmt.Sprintf("%s - %s", backup.Type, backup.Name)
 				clientMap[uint(itemVal)] = loadSizeHelper{backupPath: strings.TrimLeft(backup.BackupPath, "/"), client: client, isOk: true, backupName: backupName}
 				accountNames = append(accountNames, backupName)
+			} else {
+				accountNames = append(accountNames, clientMap[uint(itemVal)].backupName)
 			}
 		}
 		data.DefaultDownload = clientMap[records[i].DownloadAccountID].backupName

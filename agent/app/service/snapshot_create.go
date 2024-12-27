@@ -24,10 +24,16 @@ import (
 	"gorm.io/gorm"
 )
 
-func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate) error {
+func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate, isCron bool) error {
 	versionItem, _ := settingRepo.Get(settingRepo.WithByKey("SystemVersion"))
 
-	req.Name = fmt.Sprintf("1panel-%s-linux-%s-%s", versionItem.Value, loadOs(), time.Now().Format(constant.DateTimeSlimLayout))
+	scope := "core"
+	if !global.IsMaster {
+		scope = "agent"
+	}
+	if !isCron {
+		req.Name = fmt.Sprintf("1panel-%s-%s-linux-%s-%s", versionItem.Value, scope, loadOs(), time.Now().Format(constant.DateTimeSlimLayout))
+	}
 	appItem, _ := json.Marshal(req.AppData)
 	panelItem, _ := json.Marshal(req.PanelData)
 	backupItem, _ := json.Marshal(req.BackupData)
@@ -57,9 +63,16 @@ func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate) error {
 	}
 
 	req.ID = snap.ID
-	if err := u.HandleSnapshot(req); err != nil {
+	taskItem, err := task.NewTaskWithOps(req.Name, task.TaskCreate, task.TaskScopeSnapshot, req.TaskID, req.ID)
+	if err != nil {
+		global.LOG.Errorf("new task for create snapshot failed, err: %v", err)
 		return err
 	}
+	if !isCron {
+		go handleSnapshot(req, taskItem)
+		return nil
+	}
+	handleSnapshot(req, taskItem)
 	return nil
 }
 
@@ -85,101 +98,95 @@ func (u *SnapshotService) SnapshotReCreate(id uint) error {
 		return err
 	}
 	req.TaskID = taskModel.ID
-	if err := u.HandleSnapshot(req); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (u *SnapshotService) HandleSnapshot(req dto.SnapshotCreate) error {
 	taskItem, err := task.NewTaskWithOps(req.Name, task.TaskCreate, task.TaskScopeSnapshot, req.TaskID, req.ID)
 	if err != nil {
 		global.LOG.Errorf("new task for create snapshot failed, err: %v", err)
 		return err
 	}
+	go handleSnapshot(req, taskItem)
 
+	return nil
+}
+
+func handleSnapshot(req dto.SnapshotCreate, taskItem *task.Task) {
 	rootDir := path.Join(global.CONF.System.BaseDir, "1panel/tmp/system", req.Name)
 	itemHelper := snapHelper{SnapID: req.ID, Task: *taskItem, FileOp: files.NewFileOp(), Ctx: context.Background()}
 	baseDir := path.Join(rootDir, "base")
 	_ = os.MkdirAll(baseDir, os.ModePerm)
 
-	go func() {
+	taskItem.AddSubTaskWithAlias(
+		"SnapDBInfo",
+		func(t *task.Task) error { return loadDbConn(&itemHelper, rootDir, req) },
+		nil,
+	)
+
+	if len(req.InterruptStep) == 0 || req.InterruptStep == "SnapBaseInfo" {
 		taskItem.AddSubTaskWithAlias(
-			"SnapDBInfo",
-			func(t *task.Task) error { return loadDbConn(&itemHelper, rootDir, req) },
+			"SnapBaseInfo",
+			func(t *task.Task) error { return snapBaseData(itemHelper, baseDir) },
 			nil,
 		)
+		req.InterruptStep = ""
+	}
+	if len(req.InterruptStep) == 0 || req.InterruptStep == "SnapInstallApp" {
+		taskItem.AddSubTaskWithAlias(
+			"SnapInstallApp",
+			func(t *task.Task) error { return snapAppImage(itemHelper, req, rootDir) },
+			nil,
+		)
+		req.InterruptStep = ""
+	}
+	if len(req.InterruptStep) == 0 || req.InterruptStep == "SnapLocalBackup" {
+		taskItem.AddSubTaskWithAlias(
+			"SnapLocalBackup",
+			func(t *task.Task) error { return snapBackupData(itemHelper, req, rootDir) },
+			nil,
+		)
+		req.InterruptStep = ""
+	}
+	if len(req.InterruptStep) == 0 || req.InterruptStep == "SnapPanelData" {
+		taskItem.AddSubTaskWithAlias(
+			"SnapPanelData",
+			func(t *task.Task) error { return snapPanelData(itemHelper, req, rootDir) },
+			nil,
+		)
+		req.InterruptStep = ""
+	}
 
-		if len(req.InterruptStep) == 0 || req.InterruptStep == "SnapBaseInfo" {
-			taskItem.AddSubTaskWithAlias(
-				"SnapBaseInfo",
-				func(t *task.Task) error { return snapBaseData(itemHelper, baseDir) },
-				nil,
-			)
-			req.InterruptStep = ""
-		}
-		if len(req.InterruptStep) == 0 || req.InterruptStep == "SnapInstallApp" {
-			taskItem.AddSubTaskWithAlias(
-				"SnapInstallApp",
-				func(t *task.Task) error { return snapAppImage(itemHelper, req, rootDir) },
-				nil,
-			)
-			req.InterruptStep = ""
-		}
-		if len(req.InterruptStep) == 0 || req.InterruptStep == "SnapLocalBackup" {
-			taskItem.AddSubTaskWithAlias(
-				"SnapLocalBackup",
-				func(t *task.Task) error { return snapBackupData(itemHelper, req, rootDir) },
-				nil,
-			)
-			req.InterruptStep = ""
-		}
-		if len(req.InterruptStep) == 0 || req.InterruptStep == "SnapPanelData" {
-			taskItem.AddSubTaskWithAlias(
-				"SnapPanelData",
-				func(t *task.Task) error { return snapPanelData(itemHelper, req, rootDir) },
-				nil,
-			)
-			req.InterruptStep = ""
-		}
-
-		taskItem.AddSubTask(
-			"SnapCloseDBConn",
+	taskItem.AddSubTask(
+		"SnapCloseDBConn",
+		func(t *task.Task) error {
+			taskItem.Log("---------------------- 6 / 8 ----------------------")
+			common.CloseDB(itemHelper.snapAgentDB)
+			common.CloseDB(itemHelper.snapCoreDB)
+			return nil
+		},
+		nil,
+	)
+	if len(req.InterruptStep) == 0 || req.InterruptStep == "SnapCompress" {
+		taskItem.AddSubTaskWithAlias(
+			"SnapCompress",
+			func(t *task.Task) error { return snapCompress(itemHelper, rootDir, req.Secret) },
+			nil,
+		)
+		req.InterruptStep = ""
+	}
+	if len(req.InterruptStep) == 0 || req.InterruptStep == "SnapUpload" {
+		taskItem.AddSubTaskWithAlias(
+			"SnapUpload",
 			func(t *task.Task) error {
-				taskItem.Log("---------------------- 6 / 8 ----------------------")
-				common.CloseDB(itemHelper.snapAgentDB)
-				common.CloseDB(itemHelper.snapCoreDB)
-				return nil
+				return snapUpload(itemHelper, req.SourceAccountIDs, fmt.Sprintf("%s.tar.gz", rootDir))
 			},
 			nil,
 		)
-		if len(req.InterruptStep) == 0 || req.InterruptStep == "SnapCompress" {
-			taskItem.AddSubTaskWithAlias(
-				"SnapCompress",
-				func(t *task.Task) error { return snapCompress(itemHelper, rootDir, req.Secret) },
-				nil,
-			)
-			req.InterruptStep = ""
-		}
-		if len(req.InterruptStep) == 0 || req.InterruptStep == "SnapUpload" {
-			taskItem.AddSubTaskWithAlias(
-				"SnapUpload",
-				func(t *task.Task) error {
-					return snapUpload(itemHelper, req.SourceAccountIDs, fmt.Sprintf("%s.tar.gz", rootDir))
-				},
-				nil,
-			)
-			req.InterruptStep = ""
-		}
-		if err := taskItem.Execute(); err != nil {
-			_ = snapshotRepo.Update(req.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error(), "interrupt_step": taskItem.Task.CurrentStep})
-			return
-		}
-		_ = snapshotRepo.Update(req.ID, map[string]interface{}{"status": constant.StatusSuccess, "interrupt_step": ""})
-		_ = os.RemoveAll(rootDir)
-	}()
-	return nil
+		req.InterruptStep = ""
+	}
+	if err := taskItem.Execute(); err != nil {
+		_ = snapshotRepo.Update(req.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error(), "interrupt_step": taskItem.Task.CurrentStep})
+		return
+	}
+	_ = snapshotRepo.Update(req.ID, map[string]interface{}{"status": constant.StatusSuccess, "interrupt_step": ""})
+	_ = os.RemoveAll(rootDir)
 }
 
 type snapHelper struct {

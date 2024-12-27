@@ -41,7 +41,6 @@ type IDeviceService interface {
 
 	Scan() dto.CleanData
 	Clean(req []dto.Clean)
-	CleanForCronjob() (string, error)
 }
 
 func NewIDeviceService() IDeviceService {

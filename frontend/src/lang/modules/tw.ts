@@ -1469,6 +1469,8 @@ const message = {
         backupJump: '未在當前備份列表中的備份檔案，請嘗試從檔案目錄中下載後導入備份。',
 
         snapshot: '快照',
+        noAppData: '暫無可選擇系統應用',
+        noBackupData: '暫無可選擇備份數據',
         stepBaseData: '基礎數據',
         stepAppData: '系統應用',
         stepPanelData: '系統數據',

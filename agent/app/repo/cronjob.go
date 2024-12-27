@@ -6,6 +6,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -146,6 +147,7 @@ func (u *CronjobRepo) StartRecords(cronjobID uint, targetPath string) model.JobR
 	var record model.JobRecords
 	record.StartTime = time.Now()
 	record.CronjobID = cronjobID
+	record.TaskID = uuid.New().String()
 	record.Status = constant.StatusWaiting
 	if err := global.DB.Create(&record).Error; err != nil {
 		global.LOG.Errorf("create record status failed, err: %v", err)

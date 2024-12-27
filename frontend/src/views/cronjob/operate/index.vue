@@ -368,7 +368,7 @@
                 </el-form-item>
             </div>
 
-            <el-form-item :label="$t('cronjob.backupContent')">
+            <el-form-item v-if="dialogData.rowData!.type === 'directory'" :label="$t('cronjob.backupContent')">
                 <el-radio-group v-model="dialogData.rowData!.isDir">
                     <el-radio :value="true">{{ $t('file.dir') }}</el-radio>
                     <el-radio :value="false">{{ $t('file.file') }}</el-radio>
