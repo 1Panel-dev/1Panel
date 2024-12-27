@@ -33,3 +33,12 @@ type IptablesNatInfo struct {
 	SrcPort     string `json:"srcPort"`
 	DestPort    string `json:"destPort"`
 }
+
+type IptablesFilterInfo struct {
+	Num         string `json:"num"`
+	Target      string `json:"target"`
+	Protocol    string `json:"protocol"`
+	Opt         string `json:"opt"`
+	Source      string `json:"source"`
+	Destination string `json:"destination"`
+}

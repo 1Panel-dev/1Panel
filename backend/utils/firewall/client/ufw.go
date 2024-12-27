@@ -309,21 +309,34 @@ func (f *Ufw) EnableForward() error {
 	if err != nil {
 		return err
 	}
-	_ = iptables.NatNewChain()
+	_ = iptables.NewChain(NatTab)
+	_ = iptables.NewChain(FilterTab)
 
+	if err = f.enableChain(iptables); err != nil {
+		return err
+	}
+	return iptables.Reload()
+}
+
+func (f *Ufw) enableChain(iptables *Iptables) error {
 	rules, err := iptables.NatList("PREROUTING")
 	if err != nil {
 		return err
 	}
 	for _, rule := range rules {
-		if rule.Target == NatChain {
-			goto reload
+		if rule.Target == Chain {
+			return nil
 		}
 	}
 
-	if err = iptables.NatAppendChain(); err != nil {
+	if err = iptables.AppendChain(NatTab, "PREROUTING"); err != nil {
 		return err
 	}
-reload:
-	return iptables.Reload()
+	if err = iptables.AppendChain(NatTab, "POSTROUTING"); err != nil {
+		return err
+	}
+	if err = iptables.AppendChain(FilterTab, "FORWARD"); err != nil {
+		return err
+	}
+	return nil
 }
