@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -103,9 +104,14 @@ func (u *SettingService) ReloadConn() error {
 		global.LOG.Errorf("update base dir failed, err: %v", err)
 		return nil
 	}
+	if err := settingRepo.Update("NodePort", fmt.Sprintf("%v", nodeInfo.NodePort)); err != nil {
+		global.LOG.Errorf("update node port failed, err: %v", err)
+		return nil
+	}
 
 	global.CONF.System.BaseDir = nodeInfo.BaseDir
 	global.CONF.System.Version = nodeInfo.Version
+	global.CONF.System.Port = fmt.Sprintf("%v", nodeInfo.NodePort)
 	global.IsMaster = nodeInfo.Scope == "master"
 	return nil
 }

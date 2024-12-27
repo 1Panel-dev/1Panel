@@ -21,6 +21,7 @@ func InitAgentDB() {
 		migrations.InitImageRepo,
 		migrations.InitDefaultCA,
 		migrations.InitPHPExtensions,
+		migrations.InitNodePort,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

@@ -1,6 +1,8 @@
 package migrations
 
 import (
+	"fmt"
+
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/service"
@@ -90,6 +92,9 @@ var InitSetting = &gormigrate.Migration{
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "NodeScope", Value: nodeInfo.Scope}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "NodePort", Value: fmt.Sprintf("%v", nodeInfo.NodePort)}).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "SystemVersion", Value: nodeInfo.Version}).Error; err != nil {
@@ -224,5 +229,19 @@ var AddTaskTable = &gormigrate.Migration{
 		return tx.AutoMigrate(
 			&model.Task{},
 		)
+	},
+}
+
+var InitNodePort = &gormigrate.Migration{
+	ID: "20241226-init-node-port",
+	Migrate: func(tx *gorm.DB) error {
+		var itemPort model.Setting
+		_ = tx.Where("key = ?", "NodePort").First(&itemPort).Error
+		if itemPort.ID == 0 {
+			if err := tx.Create(&model.Setting{Key: "NodePort", Value: "9999"}).Error; err != nil {
+				return err
+			}
+		}
+		return nil
 	},
 }

@@ -3,10 +3,11 @@ package server
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"net"
 	"net/http"
 	"os"
+
+	"github.com/1Panel-dev/1Panel/agent/constant"
 
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/cron"
@@ -64,7 +65,7 @@ func Start() {
 		_ = server.Serve(listener)
 		return
 	} else {
-		server.Addr = "0.0.0.0:9999"
+		server.Addr = fmt.Sprintf("0.0.0.0:%s", global.CONF.System.Port)
 		settingRepo := repo.NewISettingRepo()
 		certItem, err := settingRepo.Get(settingRepo.WithByKey("ServerCrt"))
 		if err != nil {
@@ -86,7 +87,7 @@ func Start() {
 			ClientAuth:   tls.RequireAnyClientCert,
 		}
 		business.Init()
-		global.LOG.Info("listen at https://0.0.0.0:9999")
+		global.LOG.Infof("listen at https://0.0.0.0:%s", global.CONF.System.Port)
 		if err := server.ListenAndServeTLS("", ""); err != nil {
 			panic(err)
 		}
