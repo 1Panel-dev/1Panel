@@ -181,7 +181,7 @@
                         :label="$t('cronjob.containerName')"
                         prop="containerName"
                     >
-                        <el-select class="selectClass" v-model="dialogData.rowData!.containerName">
+                        <el-select class="selectClass" filterable v-model="dialogData.rowData!.containerName">
                             <el-option v-for="item in containerOptions" :key="item" :value="item" :label="item" />
                         </el-select>
                     </el-form-item>

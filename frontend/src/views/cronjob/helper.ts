@@ -164,50 +164,26 @@ export function transSpecToObj(spec: string) {
 
 export function transSpecToStr(spec: string): string {
     const specObj = transSpecToObj(spec);
-    let str = '';
-    if (specObj.specType.indexOf('N') === -1 || specObj.specType === 'perWeek') {
-        str += i18n.global.t('cronjob.' + specObj.specType) + ' ';
-    } else {
-        str += i18n.global.t('cronjob.per') + ' ';
-    }
     switch (specObj.specType) {
         case 'perMonth':
-            str +=
-                specObj.day +
-                i18n.global.t('cronjob.day') +
-                ' ' +
-                loadZero(specObj.hour) +
-                ':' +
-                loadZero(specObj.minute);
-            break;
+            return i18n.global.t('cronjob.perMonthHelper', [specObj.day, specObj.hour, loadZero(specObj.minute)]);
         case 'perWeek':
-            str += loadWeek(specObj.week) + ' ' + loadZero(specObj.hour) + ':' + loadZero(specObj.minute);
-            break;
+            return i18n.global.t('cronjob.perWeekHelper', [
+                loadWeek(specObj.week),
+                specObj.hour,
+                loadZero(specObj.minute),
+            ]);
         case 'perDay':
-            str += loadZero(specObj.hour) + ':' + loadZero(specObj.minute);
-            break;
-        case 'perNDay':
-            str +=
-                specObj.day +
-                i18n.global.t('commons.units.day') +
-                ', ' +
-                loadZero(specObj.hour) +
-                ':' +
-                loadZero(specObj.minute);
-            break;
-        case 'perNHour':
-            str += specObj.hour + i18n.global.t('commons.units.hour') + ', ' + loadZero(specObj.minute);
-            break;
+            return i18n.global.t('cronjob.perDayHelper', [specObj.hour, loadZero(specObj.minute)]);
         case 'perHour':
-            str += loadZero(specObj.minute);
-            break;
+            return i18n.global.t('cronjob.perHourHelper', [loadZero(specObj.minute)]);
+        case 'perNDay':
+            return i18n.global.t('cronjob.perNDayHelper', [specObj.day, specObj.hour, loadZero(specObj.minute)]);
+        case 'perNHour':
+            return i18n.global.t('cronjob.perNHourHelper', [specObj.hour, loadZero(specObj.minute)]);
         case 'perNMinute':
-            str += loadZero(specObj.minute) + i18n.global.t('commons.units.minute');
-            break;
+            return i18n.global.t('cronjob.perNMinuteHelper', [loadZero(specObj.minute)]);
         case 'perNSecond':
-            str += loadZero(specObj.second) + i18n.global.t('commons.units.second');
-            break;
+            return i18n.global.t('cronjob.perNSecondHelper', [loadZero(specObj.second)]);
     }
-
-    return str + ' ' + i18n.global.t('cronjob.handle');
 }
