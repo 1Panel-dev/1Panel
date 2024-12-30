@@ -17,9 +17,9 @@ type Ufw struct {
 func NewUfw() (*Ufw, error) {
 	var ufw Ufw
 	if cmd.HasNoPasswordSudo() {
-		ufw.CmdStr = "sudo ufw"
+		ufw.CmdStr = "LANGUAGE=en_US:en sudo ufw"
 	} else {
-		ufw.CmdStr = "ufw"
+		ufw.CmdStr = "LANGUAGE=en_US:en ufw"
 	}
 	return &ufw, nil
 }
@@ -31,10 +31,6 @@ func (f *Ufw) Name() string {
 func (f *Ufw) Status() (string, error) {
 	stdout, _ := cmd.Execf("%s status | grep Status", f.CmdStr)
 	if stdout == "Status: active\n" {
-		return "running", nil
-	}
-	stdout1, _ := cmd.Execf("%s status | grep 状态", f.CmdStr)
-	if stdout1 == "状态： 激活\n" {
 		return "running", nil
 	}
 	return "not running", nil
