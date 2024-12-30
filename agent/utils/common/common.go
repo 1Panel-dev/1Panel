@@ -3,6 +3,7 @@ package common
 import (
 	"crypto/rand"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"io"
 	mathRand "math/rand"
 	"net"
@@ -322,4 +323,12 @@ func SplitStr(str string, spi ...string) []string {
 
 func IsValidIP(ip string) bool {
 	return net.ParseIP(ip) != nil
+}
+
+func GetLang(context *gin.Context) string {
+	lang := context.GetHeader("Accept-Language")
+	if strings.Contains(lang, "zh") {
+		return "zh"
+	}
+	return "en"
 }

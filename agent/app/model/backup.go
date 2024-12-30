@@ -2,8 +2,8 @@ package model
 
 type BackupAccount struct {
 	BaseModel
-	Name       string `gorm:"not null" json:"name"`
-	Type       string `gorm:"not null" json:"type"`
+	Name       string `gorm:"not null;default:''" json:"name"`
+	Type       string `gorm:"not null;default:''" json:"type"`
 	Bucket     string `json:"bucket"`
 	AccessKey  string `json:"accessKey"`
 	Credential string `json:"credential"`
@@ -22,8 +22,8 @@ type BackupRecord struct {
 	SourceAccountIDs  string `json:"sourceAccountIDs"`
 	DownloadAccountID uint   `json:"downloadAccountID"`
 
-	Type       string `gorm:"not null" json:"type"`
-	Name       string `gorm:"not null" json:"name"`
+	Type       string `gorm:"not null;default:''" json:"type"`
+	Name       string `gorm:"not null;default:''" json:"name"`
 	DetailName string `json:"detailName"`
 	FileDir    string `json:"fileDir"`
 	FileName   string `json:"fileName"`

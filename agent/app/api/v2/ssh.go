@@ -144,7 +144,7 @@ func (b *BaseApi) LoadSSHLogs(c *gin.Context) {
 		return
 	}
 
-	data, err := sshService.LoadLog(req)
+	data, err := sshService.LoadLog(c, req)
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
