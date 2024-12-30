@@ -126,10 +126,11 @@ var (
 
 // container
 var (
-	ErrInUsed       = "ErrInUsed"
-	ErrObjectInUsed = "ErrObjectInUsed"
-	ErrPortRules    = "ErrPortRules"
-	ErrPgImagePull  = "ErrPgImagePull"
+	ErrInUsed            = "ErrInUsed"
+	ErrObjectInUsed      = "ErrObjectInUsed"
+	ErrObjectBeDependent = "ErrObjectBeDependent"
+	ErrPortRules         = "ErrPortRules"
+	ErrPgImagePull       = "ErrPgImagePull"
 )
 
 // runtime

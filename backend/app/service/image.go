@@ -439,6 +439,9 @@ func (u *ImageService) ImageRemove(req dto.BatchDelete) error {
 				}
 				return buserr.WithDetail(constant.ErrInUsed, id, nil)
 			}
+			if strings.Contains(err.Error(), "image has dependent") {
+				return buserr.New(constant.ErrObjectBeDependent)
+			}
 			return err
 		}
 	}
