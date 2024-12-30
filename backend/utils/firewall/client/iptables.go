@@ -10,7 +10,11 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 )
 
-const Chain = "1PANEL"
+const (
+	PreRoutingChain  = "1PANEL_PREROUTING"
+	PostRoutingChain = "1PANEL_POSTROUTING"
+	ForwardChain     = "1PANEL_FORWARD"
+)
 
 const (
 	FilterTab = "filter"
@@ -34,8 +38,16 @@ func NewIptables() (*Iptables, error) {
 	return iptables, nil
 }
 
+func (iptables *Iptables) outf(tab, rule string, a ...any) (stdout string, err error) {
+	stdout, err = cmd.Execf("%s iptables -t %s %s", iptables.CmdStr, tab, fmt.Sprintf(rule, a...))
+	if err != nil && stdout != "" {
+		global.LOG.Errorf("iptables failed, err: %s", stdout)
+	}
+	return
+}
+
 func (iptables *Iptables) runf(tab, rule string, a ...any) error {
-	stdout, err := cmd.Execf("%s iptables -t %s %s", iptables.CmdStr, tab, fmt.Sprintf(rule, a...))
+	stdout, err := iptables.outf(tab, rule, a...)
 	if err != nil {
 		return fmt.Errorf("%s, %s", err, stdout)
 	}
@@ -52,26 +64,30 @@ func (iptables *Iptables) Check() error {
 		return fmt.Errorf("%s, %s", err, stdout)
 	}
 	if stdout == "0" {
-		return fmt.Errorf("disable")
+		return fmt.Errorf("ipv4 forward disable")
+	}
+
+	chain, _ := iptables.outf(NatTab, "-L -n | grep 'Chain %s'", PreRoutingChain)
+	if len(strings.ReplaceAll(chain, "\n", "")) != 0 {
+		return fmt.Errorf("chain enabled")
 	}
 
 	return nil
 }
 
-func (iptables *Iptables) NewChain(tab string) error {
-	return iptables.runf(tab, "-N %s", Chain)
+func (iptables *Iptables) NewChain(tab, chain string) error {
+	return iptables.runf(tab, "-N %s", chain)
 }
 
-func (iptables *Iptables) AppendChain(tab string, chain string) error {
-	return iptables.runf(tab, "-A %s -j %s", chain, Chain)
+func (iptables *Iptables) AppendChain(tab string, chain, chain1 string) error {
+	return iptables.runf(tab, "-A %s -j %s", chain, chain1)
 }
 
 func (iptables *Iptables) NatList(chain ...string) ([]IptablesNatInfo, error) {
-	rule := fmt.Sprintf("%s iptables -t %s -nL %s --line", iptables.CmdStr, Chain)
-	if len(chain) == 1 {
-		rule = fmt.Sprintf("%s iptables -t %s -nL %s --line", iptables.CmdStr, chain[0])
+	if len(chain) == 0 {
+		chain = append(chain, PreRoutingChain)
 	}
-	stdout, err := cmd.Exec(rule)
+	stdout, err := iptables.outf(NatTab, "-nL %s --line", chain[0])
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +122,7 @@ func (iptables *Iptables) NatAdd(protocol, srcPort, dest, destPort string, save 
 	if dest != "" && dest != "127.0.0.1" && dest != "localhost" {
 		if err := iptables.runf(NatTab, fmt.Sprintf(
 			"-A %s -p %s --dport %s -j DNAT --to-destination %s:%s",
-			Chain,
+			PreRoutingChain,
 			protocol,
 			srcPort,
 			dest,
@@ -118,7 +134,7 @@ func (iptables *Iptables) NatAdd(protocol, srcPort, dest, destPort string, save 
 		// 非本机转发, 按公网流程走
 		if err := iptables.runf(NatTab, fmt.Sprintf(
 			"-A %s -p %s -d %s --dport %s -j MASQUERADE",
-			Chain,
+			PostRoutingChain,
 			protocol,
 			dest,
 			destPort,
@@ -128,7 +144,7 @@ func (iptables *Iptables) NatAdd(protocol, srcPort, dest, destPort string, save 
 
 		if err := iptables.runf(FilterTab, fmt.Sprintf(
 			"-A %s -d %s -p %s --dport %s -j ACCEPT",
-			Chain,
+			ForwardChain,
 			dest,
 			protocol,
 			destPort,
@@ -138,7 +154,7 @@ func (iptables *Iptables) NatAdd(protocol, srcPort, dest, destPort string, save 
 
 		if err := iptables.runf(FilterTab, fmt.Sprintf(
 			"-A %s -s %s -p %s --sport %s -j ACCEPT",
-			Chain,
+			ForwardChain,
 			dest,
 			protocol,
 			destPort,
@@ -148,7 +164,7 @@ func (iptables *Iptables) NatAdd(protocol, srcPort, dest, destPort string, save 
 	} else {
 		if err := iptables.runf(NatTab, fmt.Sprintf(
 			"-A %s -p %s --dport %s -j REDIRECT --to-port %s",
-			Chain,
+			PreRoutingChain,
 			protocol,
 			srcPort,
 			destPort,
@@ -169,7 +185,7 @@ func (iptables *Iptables) NatAdd(protocol, srcPort, dest, destPort string, save 
 }
 
 func (iptables *Iptables) NatRemove(num string, protocol, srcPort, dest, destPort string) error {
-	if err := iptables.runf(NatTab, "-D %s %s", Chain, num); err != nil {
+	if err := iptables.runf(NatTab, "-D %s %s", PreRoutingChain, num); err != nil {
 		return err
 	}
 
@@ -177,7 +193,7 @@ func (iptables *Iptables) NatRemove(num string, protocol, srcPort, dest, destPor
 	if dest != "" && dest != "127.0.0.1" && dest != "localhost" {
 		if err := iptables.runf(NatTab, fmt.Sprintf(
 			"-D %s -p %s --dport %s -j DNAT MASQUERADE",
-			Chain,
+			PostRoutingChain,
 			protocol,
 			destPort,
 		)); err != nil {
@@ -186,7 +202,7 @@ func (iptables *Iptables) NatRemove(num string, protocol, srcPort, dest, destPor
 
 		if err := iptables.runf(FilterTab, fmt.Sprintf(
 			"-D %s -d %s -p %s --dport %s -j ACCEPT",
-			Chain,
+			ForwardChain,
 			dest,
 			protocol,
 			destPort,
@@ -196,7 +212,7 @@ func (iptables *Iptables) NatRemove(num string, protocol, srcPort, dest, destPor
 
 		if err := iptables.runf(FilterTab, fmt.Sprintf(
 			"-D %s -s %s -p %s --sport %s -j ACCEPT",
-			Chain,
+			ForwardChain,
 			dest,
 			protocol,
 			destPort,
@@ -216,10 +232,13 @@ func (iptables *Iptables) NatRemove(num string, protocol, srcPort, dest, destPor
 }
 
 func (iptables *Iptables) Reload() error {
-	if err := iptables.runf(NatTab, "-F %s", Chain); err != nil {
+	if err := iptables.runf(NatTab, "-F %s", PreRoutingChain); err != nil {
 		return err
 	}
-	if err := iptables.runf(FilterTab, "-F %s", Chain); err != nil {
+	if err := iptables.runf(NatTab, "-F %s", PostRoutingChain); err != nil {
+		return err
+	}
+	if err := iptables.runf(FilterTab, "-F %s", ForwardChain); err != nil {
 		return err
 	}
 

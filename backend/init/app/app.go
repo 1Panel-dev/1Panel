@@ -35,7 +35,9 @@ func Init() {
 		_ = docker.CreateDefaultDockerNetwork()
 
 		if f, err := firewall.NewFirewallClient(); err == nil {
-			_ = f.EnableForward()
+			if err = f.EnableForward(); err != nil {
+				global.LOG.Errorf("init port forward failed, err: %v", err)
+			}
 		}
 	}()
 }

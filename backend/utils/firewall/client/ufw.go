@@ -6,7 +6,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
-	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 )
 
@@ -105,16 +104,12 @@ func (f *Ufw) ListPort() ([]FireInfo, error) {
 }
 
 func (f *Ufw) ListForward() ([]FireInfo, error) {
+	_ = f.EnableForward()
 	iptables, err := NewIptables()
 	if err != nil {
 		return nil, err
 	}
-	panelChian, _ := cmd.Execf("%s iptables -t nat -L -n | grep 'Chain 1PANEL'", iptables.CmdStr)
-	if len(strings.ReplaceAll(panelChian, "\n", "")) == 0 {
-		if err := f.EnableForward(); err != nil {
-			global.LOG.Errorf("init port forward failed, err: %v", err)
-		}
-	}
+
 	rules, err := iptables.NatList()
 	if err != nil {
 		return nil, err
@@ -309,8 +304,14 @@ func (f *Ufw) EnableForward() error {
 	if err != nil {
 		return err
 	}
-	_ = iptables.NewChain(NatTab)
-	_ = iptables.NewChain(FilterTab)
+
+	if err = iptables.Check(); err != nil {
+		return err
+	}
+
+	_ = iptables.NewChain(NatTab, PreRoutingChain)
+	_ = iptables.NewChain(NatTab, PostRoutingChain)
+	_ = iptables.NewChain(FilterTab, ForwardChain)
 
 	if err = f.enableChain(iptables); err != nil {
 		return err
@@ -324,19 +325,13 @@ func (f *Ufw) enableChain(iptables *Iptables) error {
 		return err
 	}
 	for _, rule := range rules {
-		if rule.Target == Chain {
+		if rule.Target == PreRoutingChain {
 			return nil
 		}
 	}
 
-	if err = iptables.AppendChain(NatTab, "PREROUTING"); err != nil {
-		return err
-	}
-	if err = iptables.AppendChain(NatTab, "POSTROUTING"); err != nil {
-		return err
-	}
-	if err = iptables.AppendChain(FilterTab, "FORWARD"); err != nil {
-		return err
-	}
+	_ = iptables.AppendChain(NatTab, "PREROUTING", PreRoutingChain)
+	_ = iptables.AppendChain(NatTab, "POSTROUTING", PostRoutingChain)
+	_ = iptables.AppendChain(FilterTab, "FORWARD", ForwardChain)
 	return nil
 }
