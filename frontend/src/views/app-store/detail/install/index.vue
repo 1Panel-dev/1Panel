@@ -173,7 +173,7 @@ const installData = ref<InstallProps>({
 });
 const open = ref(false);
 const rules = ref<FormRules>({
-    name: [Rules.appName],
+    name: [Rules.paramSimple],
     params: [],
     version: [Rules.requiredSelect],
     containerName: [Rules.containerName],
