@@ -125,13 +125,9 @@ func (a *AppInstallService) Page(req request.AppInstalledSearch) (int64, []respo
 	}
 
 	installDTOs, err := handleInstalled(installs, req.Update, req.Sync)
-	if err != nil {
-		return 0, nil, err
-	}
 	if req.Update {
 		total = int64(len(installDTOs))
 	}
-
 	return total, installDTOs, nil
 }
 

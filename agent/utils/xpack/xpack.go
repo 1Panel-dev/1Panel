@@ -66,3 +66,7 @@ func loadParams(param string) string {
 func GetImagePrefix() string {
 	return ""
 }
+
+func IsUseCustomApp() bool {
+	return false
+}

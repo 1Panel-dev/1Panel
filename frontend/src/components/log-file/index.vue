@@ -90,7 +90,7 @@ const stopSignals = [
     '[TASK-END]',
 ];
 const emit = defineEmits(['update:loading', 'update:hasContent', 'update:isReading']);
-const tailLog = ref(false);
+const tailLog = ref(true);
 const loading = ref(props.loading);
 const readReq = reactive({
     id: 0,
@@ -117,7 +117,7 @@ const logHeight = 20;
 const logCount = ref(0);
 const totalHeight = computed(() => logHeight * logCount.value);
 const containerHeight = ref(500);
-const visibleCount = computed(() => Math.ceil(containerHeight.value / logHeight)); // 计算可见日志条数（容器高度 / 日志高度）
+const visibleCount = computed(() => Math.ceil(containerHeight.value / logHeight));
 const startIndex = ref(0);
 
 const visibleLogs = computed(() => {

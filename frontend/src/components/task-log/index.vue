@@ -37,7 +37,7 @@ const config = reactive({
     taskOperate: '',
     resourceID: 0,
     taskType: '',
-    tail: false,
+    tail: true,
 });
 const open = ref(false);
 const showTail = ref(true);
@@ -45,10 +45,10 @@ const showTail = ref(true);
 const openWithTaskID = (id: string, tail: boolean) => {
     console.log('openWithTaskID', id, tail);
     config.taskID = id;
-    if (!tail) {
-        config.tail = false;
-    } else {
+    if (tail === undefined) {
         config.tail = true;
+    } else {
+        config.tail = tail;
     }
     open.value = true;
 };

@@ -21,12 +21,17 @@ func Init() {
 	constant.LocalAppResourceDir = path.Join(constant.AppResourceDir, "local")
 	constant.LocalAppInstallDir = path.Join(constant.AppInstallDir, "local")
 	constant.RemoteAppResourceDir = path.Join(constant.AppResourceDir, "remote")
+	constant.CustomAppResourceDir = path.Join(constant.AppResourceDir, "custom")
 
 	constant.LogDir = path.Join(global.CONF.System.DataDir, "log")
 	constant.SSLLogDir = path.Join(constant.LogDir, "ssl")
 
-	dirs := []string{constant.DataDir, constant.ResourceDir, constant.AppResourceDir, constant.AppInstallDir,
-		global.CONF.System.Backup, constant.RuntimeDir, constant.LocalAppResourceDir, constant.RemoteAppResourceDir, constant.SSLLogDir}
+	dirs := []string{
+		constant.DataDir, constant.ResourceDir, constant.AppResourceDir, constant.AppInstallDir,
+		global.CONF.System.Backup, constant.RuntimeDir, constant.LocalAppResourceDir,
+		constant.RemoteAppResourceDir, constant.SSLLogDir,
+		constant.CustomAppResourceDir,
+	}
 
 	fileOp := files.NewFileOp()
 	for _, dir := range dirs {

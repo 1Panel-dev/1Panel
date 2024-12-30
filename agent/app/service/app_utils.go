@@ -935,6 +935,9 @@ func copyData(task *task.Task, app model.App, appDetail model.AppDetail, appInst
 		appKey = strings.TrimPrefix(app.Key, "local")
 		installAppDir = path.Join(constant.LocalAppInstallDir, appKey)
 	}
+	if app.Resource == constant.AppResourceCustom {
+		appResourceDir = path.Join(constant.AppResourceDir, "custom")
+	}
 	resourceDir := path.Join(appResourceDir, appKey, appDetail.Version)
 
 	if !fileOp.Stat(installAppDir) {
@@ -1094,9 +1097,11 @@ func upApp(task *task.Task, appInstall *model.AppInstall, pullImages bool) error
 			appInstall.Message = err.Error()
 		}
 		appInstall.Status = constant.UpErr
+		_ = appInstallRepo.Save(context.Background(), appInstall)
 		return err
 	} else {
 		appInstall.Status = constant.Running
+		_ = appInstallRepo.Save(context.Background(), appInstall)
 		return nil
 	}
 }

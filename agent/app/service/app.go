@@ -843,6 +843,9 @@ var InitTypes = map[string]struct{}{
 }
 
 func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
+	if xpack.IsUseCustomApp() {
+		return nil
+	}
 	syncTask, err := task.NewTaskWithOps(i18n.GetMsgByKey("App"), task.TaskSync, task.TaskScopeAppStore, taskID, 0)
 	if err != nil {
 		return err

@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
@@ -81,7 +80,6 @@ func (u *SettingService) ReloadConn() error {
 		return nil
 	}
 
-	settingRepo := repo.NewISettingRepo()
 	itemKey, _ := encrypt.StringEncrypt(nodeInfo.ServerKey)
 	if err := settingRepo.Update("ServerKey", itemKey); err != nil {
 		global.LOG.Errorf("update server key failed, err: %v", err)
@@ -112,6 +110,9 @@ func (u *SettingService) ReloadConn() error {
 	global.CONF.System.BaseDir = nodeInfo.BaseDir
 	global.CONF.System.Version = nodeInfo.Version
 	global.CONF.System.Port = fmt.Sprintf("%v", nodeInfo.NodePort)
+	if global.CONF.System.Port == "0" {
+		global.CONF.System.Port = "9999"
+	}
 	global.IsMaster = nodeInfo.Scope == "master"
 	return nil
 }

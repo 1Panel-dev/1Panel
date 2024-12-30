@@ -18,6 +18,7 @@ type IAppRepo interface {
 	OrderByRecommend() DBOption
 	GetRecommend() DBOption
 	WithResource(resource string) DBOption
+	WithNotLocal() DBOption
 	WithByLikeName(name string) DBOption
 	WithArch(arch string) DBOption
 	WithPanelVersion(panelVersion string) DBOption
@@ -73,6 +74,12 @@ func (a AppRepo) GetRecommend() DBOption {
 func (a AppRepo) WithResource(resource string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("resource = ?", resource)
+	}
+}
+
+func (a AppRepo) WithNotLocal() DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("resource != local")
 	}
 }
 

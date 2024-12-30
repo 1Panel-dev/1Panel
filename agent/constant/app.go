@@ -33,6 +33,7 @@ const (
 
 	AppResourceLocal  = "local"
 	AppResourceRemote = "remote"
+	AppResourceCustom = "custom"
 
 	CPUS          = "CPUS"
 	MemoryLimit   = "MEMORY_LIMIT"
