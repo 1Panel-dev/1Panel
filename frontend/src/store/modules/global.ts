@@ -51,6 +51,7 @@ const GlobalStore = defineStore({
             state.themeConfig.isGold ||
             (state.themeConfig.theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches),
         isDarkGoldTheme: (state) => state.themeConfig.isGold && state.isMasterProductPro,
+        isMaster: (state) => state.currentNode === 'local',
     },
     actions: {
         setOpenMenuTabs(openMenuTabs: boolean) {

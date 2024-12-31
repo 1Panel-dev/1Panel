@@ -311,7 +311,7 @@ import {
     RemoveFavorite,
     SearchFavorite,
 } from '@/api/modules/files';
-import { computeSize, copyText, dateFormat, downloadFile, getFileType, getIcon, getRandomStr } from '@/utils/util';
+import { computeSize, copyText, dateFormat, getFileType, getIcon, getRandomStr, downloadFile } from '@/utils/util';
 import { StarFilled, Star, Top, Right, Close } from '@element-plus/icons-vue';
 import { File } from '@/api/interface/file';
 import { Mimetypes, Languages } from '@/global/mimetype';
@@ -810,7 +810,7 @@ const openPaste = () => {
 };
 
 const openDownload = (file: File.File) => {
-    downloadFile(file.path);
+    downloadFile(file.path, globalStore.currentNode);
 };
 
 const openDetail = (row: File.File) => {

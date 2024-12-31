@@ -251,22 +251,22 @@ func (t *Task) Logf(format string, v ...any) {
 }
 
 func (t *Task) LogFailed(msg string) {
-	t.Logger.Printf(msg + i18n.GetMsgByKey("Failed"))
+	t.Logger.Println(msg + i18n.GetMsgByKey("Failed"))
 }
 
 func (t *Task) LogFailedWithErr(msg string, err error) {
-	t.Logger.Printf(fmt.Sprintf("%s %s : %s", msg, i18n.GetMsgByKey("Failed"), err.Error()))
+	t.Logger.Println(fmt.Sprintf("%s %s : %s", msg, i18n.GetMsgByKey("Failed"), err.Error()))
 }
 
 func (t *Task) LogSuccess(msg string) {
-	t.Logger.Printf(msg + i18n.GetMsgByKey("Success"))
+	t.Logger.Println(msg + i18n.GetMsgByKey("Success"))
 }
 func (t *Task) LogSuccessF(format string, v ...any) {
-	t.Logger.Printf(fmt.Sprintf(format, v...) + i18n.GetMsgByKey("Success"))
+	t.Logger.Println(fmt.Sprintf(format, v...) + i18n.GetMsgByKey("Success"))
 }
 
 func (t *Task) LogStart(msg string) {
-	t.Logger.Printf(fmt.Sprintf("%s%s", i18n.GetMsgByKey("Start"), msg))
+	t.Logger.Println(fmt.Sprintf("%s%s", i18n.GetMsgByKey("Start"), msg))
 }
 
 func (t *Task) LogWithOps(operate, msg string) {

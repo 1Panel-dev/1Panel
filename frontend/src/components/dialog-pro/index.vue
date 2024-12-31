@@ -28,7 +28,7 @@
 
 <script lang="ts" setup>
 import { computed, useSlots } from 'vue';
-defineOptions({ name: 'DrawerPro' });
+defineOptions({ name: 'DialogPro' });
 
 const props = defineProps({
     title: String,

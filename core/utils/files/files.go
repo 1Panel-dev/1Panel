@@ -161,3 +161,11 @@ func DownloadFileWithProxy(url, dst string) error {
 	}
 	return nil
 }
+
+func Stat(path string) bool {
+	_, err := os.Stat(path)
+	if err != nil && os.IsNotExist(err) {
+		return false
+	}
+	return true
+}

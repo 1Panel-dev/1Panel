@@ -114,6 +114,8 @@ import { Backup } from '@/api/interface/backup';
 import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
 import TaskLog from '@/components/task-log/index.vue';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const selects = ref<any>([]);
 const loading = ref();
@@ -306,7 +308,7 @@ const onDownload = async (row: Backup.RecordInfo) => {
         fileName: row.fileName,
     };
     await downloadBackupRecord(params).then(async (res) => {
-        downloadFile(res.data);
+        downloadFile(res.data, globalStore.currentNode);
     });
 };
 

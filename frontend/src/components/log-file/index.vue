@@ -34,6 +34,8 @@
 import { nextTick, onMounted, onUnmounted, reactive, ref } from 'vue';
 import { downloadFile } from '@/utils/util';
 import { ReadByLine } from '@/api/modules/files';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 interface LogProps {
     id?: number;
@@ -146,7 +148,7 @@ const changeLoading = () => {
 
 const onDownload = async () => {
     changeLoading();
-    downloadFile(logPath.value);
+    downloadFile(logPath.value, globalStore.currentNode);
     changeLoading();
 };
 

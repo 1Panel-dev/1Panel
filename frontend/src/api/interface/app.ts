@@ -268,4 +268,9 @@ export namespace App {
     export interface AppStoreConfig {
         defaultDomain: string;
     }
+
+    export interface CustomAppStoreConfig {
+        status: string;
+        imagePrefix: string;
+    }
 }

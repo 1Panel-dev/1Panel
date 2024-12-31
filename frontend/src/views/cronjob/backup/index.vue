@@ -54,6 +54,8 @@ import i18n from '@/lang';
 import { downloadBackupRecord, searchBackupRecordsByCronjob } from '@/api/modules/backup';
 import { Backup } from '@/api/interface/backup';
 import { MsgError } from '@/utils/message';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const selects = ref<any>([]);
 const loading = ref();
@@ -116,7 +118,7 @@ const onDownload = async (row: Backup.RecordInfo) => {
     await downloadBackupRecord(params)
         .then(async (res) => {
             loading.value = false;
-            downloadFile(res.data);
+            downloadFile(res.data, globalStore.currentNode);
         })
         .catch(() => {
             loading.value = false;

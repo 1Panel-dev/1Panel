@@ -175,7 +175,14 @@
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';
 import { onMounted, reactive, ref, computed } from 'vue';
-import { GetAppTags, SearchApp, SyncApp, SyncCutomAppStore, SyncLocalApp } from '@/api/modules/app';
+import {
+    GetAppTags,
+    SearchApp,
+    SyncApp,
+    SyncCutomAppStore,
+    SyncLocalApp,
+    getCurrentNodeCustomAppConfig,
+} from '@/api/modules/app';
 import Install from '../detail/install/index.vue';
 import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
@@ -184,7 +191,6 @@ import { getLanguage, newUUID } from '@/utils/util';
 import Detail from '../detail/index.vue';
 import TaskLog from '@/components/task-log/index.vue';
 import { storeToRefs } from 'pinia';
-import { GetCustomAppStoreConfig } from '@/xpack/api/modules/app';
 
 const globalStore = GlobalStore();
 const { isProductPro } = storeToRefs(globalStore);
@@ -350,7 +356,7 @@ onMounted(async () => {
     }
     search(req);
     if (isProductPro.value) {
-        const res = await GetCustomAppStoreConfig();
+        const res = await getCurrentNodeCustomAppConfig();
         if (res && res.data) {
             syncCustomAppstore.value = res.data.status === 'enable';
         }

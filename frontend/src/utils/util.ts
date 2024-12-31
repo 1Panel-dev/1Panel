@@ -519,10 +519,33 @@ export function toLowerCase(str: string) {
     return str.toLowerCase();
 }
 
-export function downloadFile(filePath: string) {
-    let url = `${import.meta.env.VITE_API_URL as string}/files/download?`;
-    let path = encodeURIComponent(filePath);
-    window.open(url + 'path=' + path, '_blank');
+export function downloadFile(filePath: string, currentNode: string) {
+    const url = `${import.meta.env.VITE_API_URL as string}/files/download`;
+    const path = encodeURIComponent(filePath);
+
+    fetch(`${url}?path=${path}`, {
+        method: 'GET',
+        headers: {
+            CurrentNode: currentNode,
+        },
+    })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.blob();
+        })
+        .then((blob) => {
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = downloadUrl;
+            a.download = filePath.split('/').pop() || 'downloaded-file';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(downloadUrl);
+        })
+        .catch(() => {});
 }
 
 export function downloadWithContent(content: string, fileName: string) {
