@@ -118,7 +118,7 @@ func (b *BaseApi) UpdateFail2BanConf(c *gin.Context) {
 // @Tags Fail2ban
 // @Summary Load fail2ban conf
 // @Accept json
-// @Success 200
+// @Success 200 {string} file
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /toolbox/fail2ban/load/conf [get]

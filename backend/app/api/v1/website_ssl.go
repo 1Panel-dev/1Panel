@@ -17,7 +17,7 @@ import (
 // @Summary Page website ssl
 // @Accept json
 // @Param request body request.WebsiteSSLSearch true "request"
-// @Success 200
+// @Success 200 {array} response.WebsiteSSLDTO
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /websites/ssl/search [post]
@@ -135,7 +135,7 @@ func (b *BaseApi) DeleteWebsiteSSL(c *gin.Context) {
 // @Summary Search website ssl by website id
 // @Accept json
 // @Param websiteId path integer true "request"
-// @Success 200
+// @Success 200 {object} response.WebsiteSSLDTO
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /websites/ssl/website/{websiteId} [get]
@@ -157,7 +157,7 @@ func (b *BaseApi) GetWebsiteSSLByWebsiteId(c *gin.Context) {
 // @Summary Search website ssl by id
 // @Accept json
 // @Param id path integer true "request"
-// @Success 200
+// @Success 200 {object} response.WebsiteSSLDTO
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /websites/ssl/{id} [get]

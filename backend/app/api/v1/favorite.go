@@ -12,7 +12,7 @@ import (
 // @Summary List favorites
 // @Accept json
 // @Param request body dto.PageInfo true "request"
-// @Success 200
+// @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /files/favorite/search [post]
@@ -36,7 +36,7 @@ func (b *BaseApi) SearchFavorite(c *gin.Context) {
 // @Summary Create favorite
 // @Accept json
 // @Param request body request.FavoriteCreate true "request"
-// @Success 200
+// @Success 200 {object} model.Favorite
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /files/favorite [post]

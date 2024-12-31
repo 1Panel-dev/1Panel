@@ -32,7 +32,7 @@ func (b *BaseApi) DeleteWebDomain(c *gin.Context) {
 // @Summary Create website domain
 // @Accept json
 // @Param request body request.WebsiteDomainCreate true "request"
-// @Success 200 {object} model.WebsiteDomain
+// @Success 200 {array} model.WebsiteDomain
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /websites/domains [post]

@@ -11,7 +11,7 @@ import (
 // @Summary Get tool status
 // @Accept json
 // @Param request body request.HostToolReq true "request"
-// @Success 200
+// @Success 200 {object} response.HostToolRes
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /host/tool [post]
@@ -77,7 +77,7 @@ func (b *BaseApi) OperateTool(c *gin.Context) {
 // @Summary Get tool config
 // @Accept json
 // @Param request body request.HostToolConfig true "request"
-// @Success 200
+// @Success 200 {object} response.HostToolConfig
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /host/tool/config [post]
@@ -100,7 +100,7 @@ func (b *BaseApi) OperateToolConfig(c *gin.Context) {
 // @Summary Get tool logs
 // @Accept json
 // @Param request body request.HostToolLogReq true "request"
-// @Success 200
+// @Success 200 {string} logContent
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /host/tool/log [post]
@@ -144,7 +144,7 @@ func (b *BaseApi) OperateProcess(c *gin.Context) {
 // @Tags Host tool
 // @Summary Get Supervisor process config
 // @Accept json
-// @Success 200
+// @Success 200 {object} response.SupervisorProcessConfig
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /host/tool/supervisor/process [get]
@@ -161,7 +161,7 @@ func (b *BaseApi) GetProcess(c *gin.Context) {
 // @Summary Get Supervisor process config
 // @Accept json
 // @Param request body request.SupervisorProcessFileReq true "request"
-// @Success 200
+// @Success 200 {string} content
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /host/tool/supervisor/process/file [post]

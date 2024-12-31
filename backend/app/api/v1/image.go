@@ -94,7 +94,7 @@ func (b *BaseApi) ImageBuild(c *gin.Context) {
 // @Summary Pull image
 // @Accept json
 // @Param request body dto.ImagePull true "request"
-// @Success 200 {string} log
+// @Success 200 {string} logPath
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /containers/image/pull [post]
@@ -118,7 +118,7 @@ func (b *BaseApi) ImagePull(c *gin.Context) {
 // @Summary Push image
 // @Accept json
 // @Param request body dto.ImagePush true "request"
-// @Success 200 {string} log
+// @Success 200 {string} logPath
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /containers/image/push [post]

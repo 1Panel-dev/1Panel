@@ -43,7 +43,7 @@ func (b *BaseApi) CreateDatabase(c *gin.Context) {
 // @Summary Check database
 // @Accept json
 // @Param request body dto.DatabaseCreate true "request"
-// @Success 200
+// @Success 200 {boolean} isOk
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /databases/db/check [post]

@@ -13,7 +13,7 @@ import (
 // @Summary List apps
 // @Accept json
 // @Param request body request.AppSearch true "request"
-// @Success 200
+// @Success 200 {object} response.AppRes
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /apps/search [post]
@@ -183,7 +183,7 @@ func (b *BaseApi) GetAppTags(c *gin.Context) {
 
 // @Tags App
 // @Summary Get app list update
-// @Success 200
+// @Success 200 {object} response.AppUpdateRes
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /apps/checkupdate [get]

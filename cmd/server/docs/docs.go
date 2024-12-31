@@ -36,7 +36,10 @@ const docTemplate = `{
                 "summary": "Get app list update",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.AppUpdateRes"
+                        }
                     }
                 }
             }
@@ -316,7 +319,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/response.DatabaseConn"
                         }
                     }
                 }
@@ -617,7 +620,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.AppParam"
+                            "$ref": "#/definitions/response.AppConfig"
                         }
                     }
                 }
@@ -699,7 +702,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.PageResult"
+                        }
                     }
                 }
             }
@@ -792,7 +798,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.AppRes"
+                        }
                     }
                 }
             }
@@ -924,7 +933,10 @@ const docTemplate = `{
                 "summary": "Check System isDemo",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
                     }
                 }
             }
@@ -937,7 +949,10 @@ const docTemplate = `{
                 "summary": "Check System isIntl",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
                     }
                 }
             }
@@ -950,7 +965,10 @@ const docTemplate = `{
                 "summary": "Load System Language",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
@@ -1194,7 +1212,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 },
                 "x-panel-log": {
@@ -1368,7 +1389,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
                     }
                 },
                 "x-panel-log": {
@@ -2285,7 +2309,13 @@ const docTemplate = `{
                 "summary": "List containers",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
                     }
                 }
             }
@@ -2344,7 +2374,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
@@ -3831,7 +3864,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
@@ -4423,7 +4459,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
@@ -4548,7 +4587,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
                     }
                 },
                 "x-panel-log": {
@@ -6103,7 +6145,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
                     }
                 }
             }
@@ -6418,7 +6463,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Favorite"
+                        }
                     }
                 },
                 "x-panel-log": {
@@ -6515,7 +6563,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.PageResult"
+                        }
                     }
                 }
             }
@@ -6683,7 +6734,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.FileLineContent"
+                        }
                     }
                 }
             }
@@ -6793,7 +6847,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.PageResult"
+                        }
                     }
                 }
             }
@@ -6817,7 +6874,10 @@ const docTemplate = `{
                 "summary": "Get Recycle Bin status",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
@@ -6979,7 +7039,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.DirSizeRes"
+                        }
                     }
                 },
                 "x-panel-log": {
@@ -7108,10 +7171,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/response.FileInfo"
-                            }
+                            "$ref": "#/definitions/dto.PageResult"
                         }
                     }
                 }
@@ -7147,7 +7207,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.FileWgetRes"
+                        }
                     }
                 },
                 "x-panel-log": {
@@ -7413,7 +7476,10 @@ const docTemplate = `{
                 "summary": "Load host SSH conf",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
@@ -7596,7 +7662,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
@@ -7676,7 +7745,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.HostToolRes"
+                        }
                     }
                 }
             }
@@ -7711,7 +7783,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.HostToolConfig"
+                        }
                     }
                 },
                 "x-panel-log": {
@@ -7799,7 +7874,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
@@ -7868,7 +7946,10 @@ const docTemplate = `{
                 "summary": "Get Supervisor process config",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.SupervisorProcessConfig"
+                        }
                     }
                 }
             },
@@ -7945,7 +8026,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 },
                 "x-panel-log": {
@@ -7989,7 +8073,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HostInfo"
+                        }
                     }
                 },
                 "x-panel-log": {
@@ -8628,10 +8715,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.PageResult"
-                        }
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -8888,7 +8972,13 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.MonitorData"
+                            }
+                        }
                     }
                 }
             }
@@ -8925,10 +9015,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/dto.HostTree"
-                            }
+                            "$ref": "#/definitions/dto.PageResult"
                         }
                     }
                 }
@@ -9000,7 +9087,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
                     }
                 }
             }
@@ -9175,10 +9265,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.PageResult"
-                        }
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -9284,7 +9371,10 @@ const docTemplate = `{
                 "summary": "Load system logs",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
@@ -9305,7 +9395,13 @@ const docTemplate = `{
                 "summary": "Load system log files",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
                     }
                 }
             }
@@ -9328,7 +9424,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.FileInfo"
+                            "$ref": "#/definitions/response.NginxFile"
                         }
                     }
                 }
@@ -9593,7 +9689,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Runtime"
+                        }
                     }
                 },
                 "x-panel-log": {
@@ -9681,7 +9780,13 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/response.NodeModule"
+                            }
+                        }
                     }
                 }
             }
@@ -9751,7 +9856,13 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/response.PackageScripts"
+                            }
+                        }
                     }
                 }
             }
@@ -9976,7 +10087,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.PageResult"
+                        }
                     }
                 }
             }
@@ -10077,7 +10191,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.RuntimeDTO"
+                        }
                     }
                 }
             }
@@ -10101,7 +10218,10 @@ const docTemplate = `{
                 "summary": "Generate api key",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 },
                 "x-panel-log": {
@@ -10410,7 +10530,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 },
                 "x-panel-log": {
@@ -10455,7 +10578,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.PageResult"
+                        }
                     }
                 }
             }
@@ -10490,7 +10616,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.PageResult"
+                        }
                     }
                 }
             }
@@ -10669,7 +10798,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "type": "string"
+                                "type": "object"
                             }
                         }
                     }
@@ -10891,7 +11020,13 @@ const docTemplate = `{
                 "summary": "Load system address",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
                     }
                 }
             }
@@ -11565,7 +11700,13 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.SnapshotFile"
+                            }
+                        }
                     }
                 }
             }
@@ -11600,7 +11741,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SnapshotStatus"
+                        }
                     }
                 }
             }
@@ -11644,7 +11788,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.SettingInfo"
+                            "$ref": "#/definitions/dto.SSLInfo"
                         }
                     }
                 }
@@ -11769,7 +11913,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             },
@@ -11973,7 +12120,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.PageResult"
+                            "type": "string"
                         }
                     }
                 }
@@ -12194,7 +12341,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
@@ -12473,7 +12623,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
                     }
                 }
             }
@@ -12508,7 +12661,13 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
                     }
                 }
             }
@@ -12777,7 +12936,10 @@ const docTemplate = `{
                 "summary": "Load fail2ban conf",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
@@ -13327,7 +13489,10 @@ const docTemplate = `{
                 "summary": "Scan system",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CleanData"
+                        }
                     }
                 },
                 "x-panel-log": {
@@ -13551,7 +13716,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.NginxAuthRes"
+                        }
                     }
                 }
             }
@@ -14130,7 +14298,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.FileInfo"
+                            "$ref": "#/definitions/response.WebsiteHtmlRes"
                         }
                     }
                 }
@@ -14273,7 +14441,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.WebsiteDirConfig"
+                        }
                     }
                 }
             }
@@ -14595,7 +14766,10 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.WebsiteDomain"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.WebsiteDomain"
+                            }
                         }
                     }
                 },
@@ -14732,7 +14906,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.NginxAntiLeechRes"
+                        }
                     }
                 }
             }
@@ -14983,7 +15160,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "type": "string"
+                                "$ref": "#/definitions/response.WebsiteOption"
                             }
                         }
                     }
@@ -15215,7 +15392,13 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/request.WebsiteProxyConfig"
+                            }
+                        }
                     }
                 }
             }
@@ -15356,7 +15539,13 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/response.NginxRedirectConfig"
+                            }
+                        }
                     }
                 }
             }
@@ -15497,7 +15686,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.NginxRewriteRes"
+                        }
                     }
                 }
             }
@@ -15870,7 +16062,13 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/response.WebsiteSSLDTO"
+                            }
+                        }
                     }
                 }
             }
@@ -16000,7 +16198,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.WebsiteSSLDTO"
+                        }
                     }
                 }
             }
@@ -16033,7 +16234,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.WebsiteSSLDTO"
+                        }
                     }
                 }
             }
@@ -16318,6 +16522,50 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.AppConfigVersion": {
+            "type": "object",
+            "properties": {
+                "additionalProperties": {},
+                "downloadCallBackUrl": {
+                    "type": "string"
+                },
+                "downloadUrl": {
+                    "type": "string"
+                },
+                "lastModified": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.AppDefine": {
+            "type": "object",
+            "properties": {
+                "additionalProperties": {
+                    "$ref": "#/definitions/dto.AppProperty"
+                },
+                "icon": {
+                    "type": "string"
+                },
+                "lastModified": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "readMe": {
+                    "type": "string"
+                },
+                "versions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.AppConfigVersion"
+                    }
+                }
+            }
+        },
         "dto.AppInstallInfo": {
             "type": "object",
             "properties": {
@@ -16328,6 +16576,85 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.AppList": {
+            "type": "object",
+            "properties": {
+                "additionalProperties": {
+                    "$ref": "#/definitions/dto.ExtraProperties"
+                },
+                "apps": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.AppDefine"
+                    }
+                },
+                "lastModified": {
+                    "type": "integer"
+                },
+                "valid": {
+                    "type": "boolean"
+                },
+                "violations": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "dto.AppProperty": {
+            "type": "object",
+            "properties": {
+                "Required": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "crossVersionUpdate": {
+                    "type": "boolean"
+                },
+                "document": {
+                    "type": "string"
+                },
+                "github": {
+                    "type": "string"
+                },
+                "key": {
+                    "type": "string"
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "recommend": {
+                    "type": "integer"
+                },
+                "shortDescEn": {
+                    "type": "string"
+                },
+                "shortDescZh": {
+                    "type": "string"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "type": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "number"
+                },
+                "website": {
                     "type": "string"
                 }
             }
@@ -16785,6 +17112,41 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.CleanData": {
+            "type": "object",
+            "properties": {
+                "containerClean": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.CleanTree"
+                    }
+                },
+                "downloadClean": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.CleanTree"
+                    }
+                },
+                "systemClean": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.CleanTree"
+                    }
+                },
+                "systemLogClean": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.CleanTree"
+                    }
+                },
+                "uploadClean": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.CleanTree"
+                    }
+                }
+            }
+        },
         "dto.CleanLog": {
             "type": "object",
             "required": [
@@ -16797,6 +17159,38 @@ const docTemplate = `{
                         "login",
                         "operation"
                     ]
+                }
+            }
+        },
+        "dto.CleanTree": {
+            "type": "object",
+            "properties": {
+                "children": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.CleanTree"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "isCheck": {
+                    "type": "boolean"
+                },
+                "isRecommend": {
+                    "type": "boolean"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "size": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string"
                 }
             }
         },
@@ -18243,6 +18637,20 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.ExtraProperties": {
+            "type": "object",
+            "properties": {
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.Tag"
+                    }
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.Fail2BanBaseInfo": {
             "type": "object",
             "properties": {
@@ -18688,6 +19096,53 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.HostInfo": {
+            "type": "object",
+            "properties": {
+                "addr": {
+                    "type": "string"
+                },
+                "authMode": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "groupBelong": {
+                    "type": "string"
+                },
+                "groupID": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "passPhrase": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "integer"
+                },
+                "privateKey": {
+                    "type": "string"
+                },
+                "rememberPassword": {
+                    "type": "boolean"
+                },
+                "user": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.HostOperate": {
             "type": "object",
             "required": [
@@ -19042,6 +19497,34 @@ const docTemplate = `{
                 },
                 "secret": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.MonitorData": {
+            "type": "object",
+            "required": [
+                "param"
+            ],
+            "properties": {
+                "date": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "param": {
+                    "type": "string",
+                    "enum": [
+                        "cpu",
+                        "memory",
+                        "load",
+                        "io",
+                        "network"
+                    ]
+                },
+                "value": {
+                    "type": "array",
+                    "items": {}
                 }
             }
         },
@@ -19521,6 +20004,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "subnetV6": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.NginxAuth": {
+            "type": "object",
+            "properties": {
+                "remark": {
+                    "type": "string"
+                },
+                "username": {
                     "type": "string"
                 }
             }
@@ -20445,6 +20939,29 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.SSLInfo": {
+            "type": "object",
+            "properties": {
+                "cert": {
+                    "type": "string"
+                },
+                "domain": {
+                    "type": "string"
+                },
+                "key": {
+                    "type": "string"
+                },
+                "rootPath": {
+                    "type": "string"
+                },
+                "sslID": {
+                    "type": "integer"
+                },
+                "timeout": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.SSLUpdate": {
             "type": "object",
             "required": [
@@ -20903,6 +21420,20 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.SnapshotFile": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "size": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.SnapshotImport": {
             "type": "object",
             "properties": {
@@ -20941,6 +21472,38 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.SnapshotStatus": {
+            "type": "object",
+            "properties": {
+                "appData": {
+                    "type": "string"
+                },
+                "backupData": {
+                    "type": "string"
+                },
+                "compress": {
+                    "type": "string"
+                },
+                "daemonJson": {
+                    "type": "string"
+                },
+                "panel": {
+                    "type": "string"
+                },
+                "panelData": {
+                    "type": "string"
+                },
+                "panelInfo": {
+                    "type": "string"
+                },
+                "size": {
+                    "type": "string"
+                },
+                "upload": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.SwapHelper": {
             "type": "object",
             "required": [
@@ -20958,6 +21521,20 @@ const docTemplate = `{
                 },
                 "used": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.Tag": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "sort": {
+                    "type": "integer"
                 }
             }
         },
@@ -21359,6 +21936,91 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Favorite": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "isDir": {
+                    "type": "boolean"
+                },
+                "isTxt": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Runtime": {
+            "type": "object",
+            "properties": {
+                "appDetailId": {
+                    "type": "integer"
+                },
+                "codeDir": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "dockerCompose": {
+                    "type": "string"
+                },
+                "env": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "params": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "integer"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                },
+                "workDir": {
                     "type": "string"
                 }
             }
@@ -23997,6 +24659,47 @@ const docTemplate = `{
                 }
             }
         },
+        "response.AppConfig": {
+            "type": "object",
+            "properties": {
+                "advanced": {
+                    "type": "boolean"
+                },
+                "allowPort": {
+                    "type": "boolean"
+                },
+                "containerName": {
+                    "type": "string"
+                },
+                "cpuQuota": {
+                    "type": "number"
+                },
+                "dockerCompose": {
+                    "type": "string"
+                },
+                "editCompose": {
+                    "type": "boolean"
+                },
+                "hostMode": {
+                    "type": "boolean"
+                },
+                "memoryLimit": {
+                    "type": "number"
+                },
+                "memoryUnit": {
+                    "type": "string"
+                },
+                "params": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.AppParam"
+                    }
+                },
+                "pullImage": {
+                    "type": "boolean"
+                }
+            }
+        },
         "response.AppDTO": {
             "type": "object",
             "properties": {
@@ -24131,6 +24834,56 @@ const docTemplate = `{
                 }
             }
         },
+        "response.AppDto": {
+            "type": "object",
+            "properties": {
+                "icon": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "installed": {
+                    "type": "boolean"
+                },
+                "key": {
+                    "type": "string"
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "shortDescEn": {
+                    "type": "string"
+                },
+                "shortDescZh": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Tag"
+                    }
+                },
+                "type": {
+                    "type": "string"
+                },
+                "versions": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
         "response.AppInstalledCheck": {
             "type": "object",
             "properties": {
@@ -24206,6 +24959,20 @@ const docTemplate = `{
                 "values": {}
             }
         },
+        "response.AppRes": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.AppDto"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
         "response.AppService": {
             "type": "object",
             "properties": {
@@ -24218,6 +24985,57 @@ const docTemplate = `{
                 },
                 "value": {
                     "type": "string"
+                }
+            }
+        },
+        "response.AppUpdateRes": {
+            "type": "object",
+            "properties": {
+                "appList": {
+                    "$ref": "#/definitions/dto.AppList"
+                },
+                "appStoreLastModified": {
+                    "type": "integer"
+                },
+                "canUpdate": {
+                    "type": "boolean"
+                },
+                "isSyncing": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "response.DatabaseConn": {
+            "type": "object",
+            "properties": {
+                "containerName": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "integer"
+                },
+                "serviceName": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.DirSizeRes": {
+            "type": "object",
+            "required": [
+                "size"
+            ],
+            "properties": {
+                "size": {
+                    "type": "number"
                 }
             }
         },
@@ -24295,6 +25113,29 @@ const docTemplate = `{
                 }
             }
         },
+        "response.FileLineContent": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "end": {
+                    "type": "boolean"
+                },
+                "lines": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "path": {
+                    "type": "string"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
         "response.FileTree": {
             "type": "object",
             "properties": {
@@ -24321,6 +25162,31 @@ const docTemplate = `{
                 }
             }
         },
+        "response.FileWgetRes": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.HostToolConfig": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.HostToolRes": {
+            "type": "object",
+            "properties": {
+                "config": {},
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
         "response.IgnoredApp": {
             "type": "object",
             "properties": {
@@ -24338,6 +25204,66 @@ const docTemplate = `{
                 }
             }
         },
+        "response.NginxAntiLeechRes": {
+            "type": "object",
+            "properties": {
+                "blocked": {
+                    "type": "boolean"
+                },
+                "cache": {
+                    "type": "boolean"
+                },
+                "cacheTime": {
+                    "type": "integer"
+                },
+                "cacheUint": {
+                    "type": "string"
+                },
+                "enable": {
+                    "type": "boolean"
+                },
+                "extends": {
+                    "type": "string"
+                },
+                "logEnable": {
+                    "type": "boolean"
+                },
+                "noneRef": {
+                    "type": "boolean"
+                },
+                "return": {
+                    "type": "string"
+                },
+                "serverNames": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "response.NginxAuthRes": {
+            "type": "object",
+            "properties": {
+                "enable": {
+                    "type": "boolean"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.NginxAuth"
+                    }
+                }
+            }
+        },
+        "response.NginxFile": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                }
+            }
+        },
         "response.NginxParam": {
             "type": "object",
             "properties": {
@@ -24349,6 +25275,58 @@ const docTemplate = `{
                     "items": {
                         "type": "string"
                     }
+                }
+            }
+        },
+        "response.NginxRedirectConfig": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "domains": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "enable": {
+                    "type": "boolean"
+                },
+                "filePath": {
+                    "type": "string"
+                },
+                "keepPath": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "redirect": {
+                    "type": "string"
+                },
+                "redirectRoot": {
+                    "type": "boolean"
+                },
+                "target": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "websiteID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "response.NginxRewriteRes": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
                 }
             }
         },
@@ -24374,6 +25352,23 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "writing": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.NodeModule": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "license": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "version": {
                     "type": "string"
                 }
             }
@@ -24414,6 +25409,132 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.PackageScripts": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "script": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.ProcessStatus": {
+            "type": "object",
+            "properties": {
+                "PID": {
+                    "type": "string"
+                },
+                "msg": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "uptime": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.RuntimeDTO": {
+            "type": "object",
+            "properties": {
+                "appDetailID": {
+                    "type": "integer"
+                },
+                "appID": {
+                    "type": "integer"
+                },
+                "appParams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.AppParam"
+                    }
+                },
+                "codeDir": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "exposedPorts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/request.ExposedPort"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "params": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "path": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "integer"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "source": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.SupervisorProcessConfig": {
+            "type": "object",
+            "properties": {
+                "command": {
+                    "type": "string"
+                },
+                "dir": {
+                    "type": "string"
+                },
+                "msg": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "numprocs": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.ProcessStatus"
+                    }
+                },
+                "user": {
                     "type": "string"
                 }
             }
@@ -24618,6 +25739,26 @@ const docTemplate = `{
                 }
             }
         },
+        "response.WebsiteDirConfig": {
+            "type": "object",
+            "properties": {
+                "dirs": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "msg": {
+                    "type": "string"
+                },
+                "user": {
+                    "type": "string"
+                },
+                "userGroup": {
+                    "type": "string"
+                }
+            }
+        },
         "response.WebsiteHTTPS": {
             "type": "object",
             "properties": {
@@ -24640,6 +25781,14 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "httpConfig": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.WebsiteHtmlRes": {
+            "type": "object",
+            "properties": {
+                "content": {
                     "type": "string"
                 }
             }
@@ -24675,6 +25824,20 @@ const docTemplate = `{
                 }
             }
         },
+        "response.WebsiteOption": {
+            "type": "object",
+            "properties": {
+                "alias": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "primaryDomain": {
+                    "type": "string"
+                }
+            }
+        },
         "response.WebsitePreInstallCheck": {
             "type": "object",
             "properties": {
@@ -24689,6 +25852,113 @@ const docTemplate = `{
                 },
                 "version": {
                     "type": "string"
+                }
+            }
+        },
+        "response.WebsiteSSLDTO": {
+            "type": "object",
+            "properties": {
+                "acmeAccount": {
+                    "$ref": "#/definitions/model.WebsiteAcmeAccount"
+                },
+                "acmeAccountId": {
+                    "type": "integer"
+                },
+                "autoRenew": {
+                    "type": "boolean"
+                },
+                "caId": {
+                    "type": "integer"
+                },
+                "certURL": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "dir": {
+                    "type": "string"
+                },
+                "disableCNAME": {
+                    "type": "boolean"
+                },
+                "dnsAccount": {
+                    "$ref": "#/definitions/model.WebsiteDnsAccount"
+                },
+                "dnsAccountId": {
+                    "type": "integer"
+                },
+                "domains": {
+                    "type": "string"
+                },
+                "execShell": {
+                    "type": "boolean"
+                },
+                "expireDate": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "keyType": {
+                    "type": "string"
+                },
+                "logPath": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "nameserver1": {
+                    "type": "string"
+                },
+                "nameserver2": {
+                    "type": "string"
+                },
+                "organization": {
+                    "type": "string"
+                },
+                "pem": {
+                    "type": "string"
+                },
+                "primaryDomain": {
+                    "type": "string"
+                },
+                "privateKey": {
+                    "type": "string"
+                },
+                "provider": {
+                    "type": "string"
+                },
+                "pushDir": {
+                    "type": "boolean"
+                },
+                "shell": {
+                    "type": "string"
+                },
+                "skipDNS": {
+                    "type": "boolean"
+                },
+                "startDate": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "websites": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Website"
+                    }
                 }
             }
         }

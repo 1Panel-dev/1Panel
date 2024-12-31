@@ -39,6 +39,35 @@ definitions:
       ipWhiteList:
         type: string
     type: object
+  dto.AppConfigVersion:
+    properties:
+      additionalProperties: {}
+      downloadCallBackUrl:
+        type: string
+      downloadUrl:
+        type: string
+      lastModified:
+        type: integer
+      name:
+        type: string
+    type: object
+  dto.AppDefine:
+    properties:
+      additionalProperties:
+        $ref: '#/definitions/dto.AppProperty'
+      icon:
+        type: string
+      lastModified:
+        type: integer
+      name:
+        type: string
+      readMe:
+        type: string
+      versions:
+        items:
+          $ref: '#/definitions/dto.AppConfigVersion'
+        type: array
+    type: object
   dto.AppInstallInfo:
     properties:
       id:
@@ -46,6 +75,58 @@ definitions:
       key:
         type: string
       name:
+        type: string
+    type: object
+  dto.AppList:
+    properties:
+      additionalProperties:
+        $ref: '#/definitions/dto.ExtraProperties'
+      apps:
+        items:
+          $ref: '#/definitions/dto.AppDefine'
+        type: array
+      lastModified:
+        type: integer
+      valid:
+        type: boolean
+      violations:
+        items:
+          type: string
+        type: array
+    type: object
+  dto.AppProperty:
+    properties:
+      Required:
+        items:
+          type: string
+        type: array
+      crossVersionUpdate:
+        type: boolean
+      document:
+        type: string
+      github:
+        type: string
+      key:
+        type: string
+      limit:
+        type: integer
+      name:
+        type: string
+      recommend:
+        type: integer
+      shortDescEn:
+        type: string
+      shortDescZh:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+      type:
+        type: string
+      version:
+        type: number
+      website:
         type: string
     type: object
   dto.AppResource:
@@ -347,6 +428,29 @@ definitions:
       treeType:
         type: string
     type: object
+  dto.CleanData:
+    properties:
+      containerClean:
+        items:
+          $ref: '#/definitions/dto.CleanTree'
+        type: array
+      downloadClean:
+        items:
+          $ref: '#/definitions/dto.CleanTree'
+        type: array
+      systemClean:
+        items:
+          $ref: '#/definitions/dto.CleanTree'
+        type: array
+      systemLogClean:
+        items:
+          $ref: '#/definitions/dto.CleanTree'
+        type: array
+      uploadClean:
+        items:
+          $ref: '#/definitions/dto.CleanTree'
+        type: array
+    type: object
   dto.CleanLog:
     properties:
       logType:
@@ -356,6 +460,27 @@ definitions:
         type: string
     required:
     - logType
+    type: object
+  dto.CleanTree:
+    properties:
+      children:
+        items:
+          $ref: '#/definitions/dto.CleanTree'
+        type: array
+      id:
+        type: string
+      isCheck:
+        type: boolean
+      isRecommend:
+        type: boolean
+      label:
+        type: string
+      name:
+        type: string
+      size:
+        type: integer
+      type:
+        type: string
     type: object
   dto.CommandInfo:
     properties:
@@ -1332,6 +1457,15 @@ definitions:
     - fileName
     - source
     type: object
+  dto.ExtraProperties:
+    properties:
+      tags:
+        items:
+          $ref: '#/definitions/dto.Tag'
+        type: array
+      version:
+        type: string
+    type: object
   dto.Fail2BanBaseInfo:
     properties:
       banAction:
@@ -1633,6 +1767,37 @@ definitions:
       ip:
         type: string
     type: object
+  dto.HostInfo:
+    properties:
+      addr:
+        type: string
+      authMode:
+        type: string
+      createdAt:
+        type: string
+      description:
+        type: string
+      groupBelong:
+        type: string
+      groupID:
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
+      passPhrase:
+        type: string
+      password:
+        type: string
+      port:
+        type: integer
+      privateKey:
+        type: string
+      rememberPassword:
+        type: boolean
+      user:
+        type: string
+    type: object
   dto.HostOperate:
     properties:
       addr:
@@ -1873,6 +2038,26 @@ definitions:
     - code
     - interval
     - secret
+    type: object
+  dto.MonitorData:
+    properties:
+      date:
+        items:
+          type: string
+        type: array
+      param:
+        enum:
+        - cpu
+        - memory
+        - load
+        - io
+        - network
+        type: string
+      value:
+        items: {}
+        type: array
+    required:
+    - param
     type: object
   dto.MonitorSearch:
     properties:
@@ -2201,6 +2386,13 @@ definitions:
     required:
     - driver
     - name
+    type: object
+  dto.NginxAuth:
+    properties:
+      remark:
+        type: string
+      username:
+        type: string
     type: object
   dto.NginxKey:
     enum:
@@ -2829,6 +3021,21 @@ definitions:
     required:
     - key
     type: object
+  dto.SSLInfo:
+    properties:
+      cert:
+        type: string
+      domain:
+        type: string
+      key:
+        type: string
+      rootPath:
+        type: string
+      sslID:
+        type: integer
+      timeout:
+        type: string
+    type: object
   dto.SSLUpdate:
     properties:
       autoRestart:
@@ -3138,6 +3345,15 @@ definitions:
     - defaultDownload
     - from
     type: object
+  dto.SnapshotFile:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      size:
+        type: integer
+    type: object
   dto.SnapshotImport:
     properties:
       description:
@@ -3163,6 +3379,27 @@ definitions:
     required:
     - id
     type: object
+  dto.SnapshotStatus:
+    properties:
+      appData:
+        type: string
+      backupData:
+        type: string
+      compress:
+        type: string
+      daemonJson:
+        type: string
+      panel:
+        type: string
+      panelData:
+        type: string
+      panelInfo:
+        type: string
+      size:
+        type: string
+      upload:
+        type: string
+    type: object
   dto.SwapHelper:
     properties:
       isNew:
@@ -3175,6 +3412,15 @@ definitions:
         type: string
     required:
     - path
+    type: object
+  dto.Tag:
+    properties:
+      key:
+        type: string
+      name:
+        type: string
+      sort:
+        type: integer
     type: object
   dto.TreeChild:
     properties:
@@ -3438,6 +3684,62 @@ definitions:
       updatedAt:
         type: string
       version:
+        type: string
+    type: object
+  model.Favorite:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: integer
+      isDir:
+        type: boolean
+      isTxt:
+        type: boolean
+      name:
+        type: string
+      path:
+        type: string
+      type:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  model.Runtime:
+    properties:
+      appDetailId:
+        type: integer
+      codeDir:
+        type: string
+      createdAt:
+        type: string
+      dockerCompose:
+        type: string
+      env:
+        type: string
+      id:
+        type: integer
+      image:
+        type: string
+      message:
+        type: string
+      name:
+        type: string
+      params:
+        type: string
+      port:
+        type: integer
+      resource:
+        type: string
+      status:
+        type: string
+      type:
+        type: string
+      updatedAt:
+        type: string
+      version:
+        type: string
+      workDir:
         type: string
     type: object
   model.Tag:
@@ -5209,6 +5511,33 @@ definitions:
     - id
     - user
     type: object
+  response.AppConfig:
+    properties:
+      advanced:
+        type: boolean
+      allowPort:
+        type: boolean
+      containerName:
+        type: string
+      cpuQuota:
+        type: number
+      dockerCompose:
+        type: string
+      editCompose:
+        type: boolean
+      hostMode:
+        type: boolean
+      memoryLimit:
+        type: number
+      memoryUnit:
+        type: string
+      params:
+        items:
+          $ref: '#/definitions/response.AppParam'
+        type: array
+      pullImage:
+        type: boolean
+    type: object
   response.AppDTO:
     properties:
       createdAt:
@@ -5298,6 +5627,39 @@ definitions:
       version:
         type: string
     type: object
+  response.AppDto:
+    properties:
+      icon:
+        type: string
+      id:
+        type: integer
+      installed:
+        type: boolean
+      key:
+        type: string
+      limit:
+        type: integer
+      name:
+        type: string
+      resource:
+        type: string
+      shortDescEn:
+        type: string
+      shortDescZh:
+        type: string
+      status:
+        type: string
+      tags:
+        items:
+          $ref: '#/definitions/model.Tag'
+        type: array
+      type:
+        type: string
+      versions:
+        items:
+          type: string
+        type: array
+    type: object
   response.AppInstalledCheck:
     properties:
       app:
@@ -5348,6 +5710,15 @@ definitions:
       value: {}
       values: {}
     type: object
+  response.AppRes:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/response.AppDto'
+        type: array
+      total:
+        type: integer
+    type: object
   response.AppService:
     properties:
       config: {}
@@ -5357,6 +5728,39 @@ definitions:
         type: string
       value:
         type: string
+    type: object
+  response.AppUpdateRes:
+    properties:
+      appList:
+        $ref: '#/definitions/dto.AppList'
+      appStoreLastModified:
+        type: integer
+      canUpdate:
+        type: boolean
+      isSyncing:
+        type: boolean
+    type: object
+  response.DatabaseConn:
+    properties:
+      containerName:
+        type: string
+      password:
+        type: string
+      port:
+        type: integer
+      serviceName:
+        type: string
+      status:
+        type: string
+      username:
+        type: string
+    type: object
+  response.DirSizeRes:
+    properties:
+      size:
+        type: number
+    required:
+    - size
     type: object
   response.FileInfo:
     properties:
@@ -5407,6 +5811,21 @@ definitions:
       user:
         type: string
     type: object
+  response.FileLineContent:
+    properties:
+      content:
+        type: string
+      end:
+        type: boolean
+      lines:
+        items:
+          type: string
+        type: array
+      path:
+        type: string
+      total:
+        type: integer
+    type: object
   response.FileTree:
     properties:
       children:
@@ -5424,6 +5843,22 @@ definitions:
       path:
         type: string
     type: object
+  response.FileWgetRes:
+    properties:
+      key:
+        type: string
+    type: object
+  response.HostToolConfig:
+    properties:
+      content:
+        type: string
+    type: object
+  response.HostToolRes:
+    properties:
+      config: {}
+      type:
+        type: string
+    type: object
   response.IgnoredApp:
     properties:
       detailID:
@@ -5435,6 +5870,45 @@ definitions:
       version:
         type: string
     type: object
+  response.NginxAntiLeechRes:
+    properties:
+      blocked:
+        type: boolean
+      cache:
+        type: boolean
+      cacheTime:
+        type: integer
+      cacheUint:
+        type: string
+      enable:
+        type: boolean
+      extends:
+        type: string
+      logEnable:
+        type: boolean
+      noneRef:
+        type: boolean
+      return:
+        type: string
+      serverNames:
+        items:
+          type: string
+        type: array
+    type: object
+  response.NginxAuthRes:
+    properties:
+      enable:
+        type: boolean
+      items:
+        items:
+          $ref: '#/definitions/dto.NginxAuth'
+        type: array
+    type: object
+  response.NginxFile:
+    properties:
+      content:
+        type: string
+    type: object
   response.NginxParam:
     properties:
       name:
@@ -5443,6 +5917,40 @@ definitions:
         items:
           type: string
         type: array
+    type: object
+  response.NginxRedirectConfig:
+    properties:
+      content:
+        type: string
+      domains:
+        items:
+          type: string
+        type: array
+      enable:
+        type: boolean
+      filePath:
+        type: string
+      keepPath:
+        type: boolean
+      name:
+        type: string
+      path:
+        type: string
+      redirect:
+        type: string
+      redirectRoot:
+        type: boolean
+      target:
+        type: string
+      type:
+        type: string
+      websiteID:
+        type: integer
+    type: object
+  response.NginxRewriteRes:
+    properties:
+      content:
+        type: string
     type: object
   response.NginxStatus:
     properties:
@@ -5459,6 +5967,17 @@ definitions:
       waiting:
         type: string
       writing:
+        type: string
+    type: object
+  response.NodeModule:
+    properties:
+      description:
+        type: string
+      license:
+        type: string
+      name:
+        type: string
+      version:
         type: string
     type: object
   response.PHPConfig:
@@ -5485,6 +6004,89 @@ definitions:
       name:
         type: string
       updatedAt:
+        type: string
+    type: object
+  response.PackageScripts:
+    properties:
+      name:
+        type: string
+      script:
+        type: string
+    type: object
+  response.ProcessStatus:
+    properties:
+      PID:
+        type: string
+      msg:
+        type: string
+      name:
+        type: string
+      status:
+        type: string
+      uptime:
+        type: string
+    type: object
+  response.RuntimeDTO:
+    properties:
+      appDetailID:
+        type: integer
+      appID:
+        type: integer
+      appParams:
+        items:
+          $ref: '#/definitions/response.AppParam'
+        type: array
+      codeDir:
+        type: string
+      createdAt:
+        type: string
+      exposedPorts:
+        items:
+          $ref: '#/definitions/request.ExposedPort'
+        type: array
+      id:
+        type: integer
+      image:
+        type: string
+      message:
+        type: string
+      name:
+        type: string
+      params:
+        additionalProperties: true
+        type: object
+      path:
+        type: string
+      port:
+        type: integer
+      resource:
+        type: string
+      source:
+        type: string
+      status:
+        type: string
+      type:
+        type: string
+      version:
+        type: string
+    type: object
+  response.SupervisorProcessConfig:
+    properties:
+      command:
+        type: string
+      dir:
+        type: string
+      msg:
+        type: string
+      name:
+        type: string
+      numprocs:
+        type: string
+      status:
+        items:
+          $ref: '#/definitions/response.ProcessStatus'
+        type: array
+      user:
         type: string
     type: object
   response.WebsiteAcmeAccountDTO:
@@ -5619,6 +6221,19 @@ definitions:
       webSiteSSLId:
         type: integer
     type: object
+  response.WebsiteDirConfig:
+    properties:
+      dirs:
+        items:
+          type: string
+        type: array
+      msg:
+        type: string
+      user:
+        type: string
+      userGroup:
+        type: string
+    type: object
   response.WebsiteHTTPS:
     properties:
       SSL:
@@ -5634,6 +6249,11 @@ definitions:
       hsts:
         type: boolean
       httpConfig:
+        type: string
+    type: object
+  response.WebsiteHtmlRes:
+    properties:
+      content:
         type: string
     type: object
   response.WebsiteLog:
@@ -5656,6 +6276,15 @@ definitions:
           $ref: '#/definitions/response.NginxParam'
         type: array
     type: object
+  response.WebsiteOption:
+    properties:
+      alias:
+        type: string
+      id:
+        type: integer
+      primaryDomain:
+        type: string
+    type: object
   response.WebsitePreInstallCheck:
     properties:
       appName:
@@ -5666,6 +6295,77 @@ definitions:
         type: string
       version:
         type: string
+    type: object
+  response.WebsiteSSLDTO:
+    properties:
+      acmeAccount:
+        $ref: '#/definitions/model.WebsiteAcmeAccount'
+      acmeAccountId:
+        type: integer
+      autoRenew:
+        type: boolean
+      caId:
+        type: integer
+      certURL:
+        type: string
+      createdAt:
+        type: string
+      description:
+        type: string
+      dir:
+        type: string
+      disableCNAME:
+        type: boolean
+      dnsAccount:
+        $ref: '#/definitions/model.WebsiteDnsAccount'
+      dnsAccountId:
+        type: integer
+      domains:
+        type: string
+      execShell:
+        type: boolean
+      expireDate:
+        type: string
+      id:
+        type: integer
+      keyType:
+        type: string
+      logPath:
+        type: string
+      message:
+        type: string
+      nameserver1:
+        type: string
+      nameserver2:
+        type: string
+      organization:
+        type: string
+      pem:
+        type: string
+      primaryDomain:
+        type: string
+      privateKey:
+        type: string
+      provider:
+        type: string
+      pushDir:
+        type: boolean
+      shell:
+        type: string
+      skipDNS:
+        type: boolean
+      startDate:
+        type: string
+      status:
+        type: string
+      type:
+        type: string
+      updatedAt:
+        type: string
+      websites:
+        items:
+          $ref: '#/definitions/model.Website'
+        type: array
     type: object
 info:
   contact: {}
@@ -5703,6 +6403,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/response.AppUpdateRes'
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -5869,7 +6571,7 @@ paths:
         "200":
           description: OK
           schema:
-            type: string
+            $ref: '#/definitions/response.DatabaseConn'
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -6025,7 +6727,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.AppParam'
+            $ref: '#/definitions/response.AppConfig'
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -6102,6 +6804,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/dto.PageResult'
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -6156,6 +6860,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/response.AppRes'
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -6217,6 +6923,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            type: boolean
       summary: Check System isDemo
       tags:
       - Auth
@@ -6225,6 +6933,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            type: boolean
       summary: Check System isIntl
       tags:
       - Auth
@@ -6233,6 +6943,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            type: string
       summary: Load System Language
       tags:
       - Auth
@@ -6379,6 +7091,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            type: string
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -6484,6 +7198,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            type: boolean
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -7037,6 +7753,10 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            items:
+              type: string
+            type: array
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -7070,6 +7790,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            type: string
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -7974,6 +8696,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            type: string
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -8330,6 +9054,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            type: string
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -8425,6 +9151,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            type: boolean
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -9344,6 +10072,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            type: boolean
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -9533,6 +10263,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/model.Favorite'
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -9593,6 +10325,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/dto.PageResult'
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -9696,6 +10430,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/response.FileLineContent'
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -9762,6 +10498,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/dto.PageResult'
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -9775,6 +10513,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            type: string
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -9872,6 +10612,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/response.DirSizeRes'
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -9950,9 +10692,7 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/response.FileInfo'
-            type: array
+            $ref: '#/definitions/dto.PageResult'
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -9973,6 +10713,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/response.FileWgetRes'
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -10138,6 +10880,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            type: string
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -10246,6 +10990,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            type: string
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -10294,6 +11040,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/response.HostToolRes'
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -10314,6 +11062,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/response.HostToolConfig'
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -10368,6 +11118,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            type: string
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -10409,6 +11161,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/response.SupervisorProcessConfig'
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -10455,6 +11209,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            type: string
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -10482,6 +11238,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/dto.HostInfo'
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -10867,8 +11625,6 @@ paths:
       responses:
         "200":
           description: OK
-          schema:
-            $ref: '#/definitions/dto.PageResult'
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -11021,6 +11777,10 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.MonitorData'
+            type: array
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -11042,9 +11802,7 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/dto.HostTree'
-            type: array
+            $ref: '#/definitions/dto.PageResult'
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -11086,6 +11844,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            type: boolean
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -11192,8 +11952,6 @@ paths:
       responses:
         "200":
           description: OK
-          schema:
-            $ref: '#/definitions/dto.PageResult'
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -11256,6 +12014,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            type: string
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -11267,6 +12027,10 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            items:
+              type: string
+            type: array
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -11279,7 +12043,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.FileInfo'
+            $ref: '#/definitions/response.NginxFile'
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -11438,6 +12202,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/model.Runtime'
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -11464,6 +12230,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/response.RuntimeDTO'
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -11511,6 +12279,10 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            items:
+              $ref: '#/definitions/response.NodeModule'
+            type: array
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -11551,6 +12323,10 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            items:
+              $ref: '#/definitions/response.PackageScripts'
+            type: array
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -11682,6 +12458,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/dto.PageResult'
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -11735,6 +12513,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            type: string
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -11925,6 +12705,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            type: string
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -11953,6 +12735,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/dto.PageResult'
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -11973,6 +12757,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/dto.PageResult'
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -12080,7 +12866,7 @@ paths:
           description: OK
           schema:
             items:
-              type: string
+              type: object
             type: array
       security:
       - ApiKeyAuth: []
@@ -12213,6 +12999,10 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            items:
+              type: string
+            type: array
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -12623,6 +13413,10 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.SnapshotFile'
+            type: array
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -12643,6 +13437,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/dto.SnapshotStatus'
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -12666,7 +13462,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.SettingInfo'
+            $ref: '#/definitions/dto.SSLInfo'
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -12742,6 +13538,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            type: string
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -12865,7 +13663,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.PageResult'
+            type: string
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -12999,6 +13797,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            type: string
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -13166,6 +13966,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            type: boolean
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -13186,6 +13988,10 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            items:
+              type: string
+            type: array
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -13344,6 +14150,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            type: string
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -13673,6 +14481,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/dto.CleanData'
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -13917,6 +14727,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/response.NginxAuthRes'
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -14240,7 +15052,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.FileInfo'
+            $ref: '#/definitions/response.WebsiteHtmlRes'
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -14355,6 +15167,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/response.WebsiteDirConfig'
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -14551,7 +15365,9 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.WebsiteDomain'
+            items:
+              $ref: '#/definitions/model.WebsiteDomain'
+            type: array
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -14635,6 +15451,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/response.NginxAntiLeechRes'
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -14786,7 +15604,7 @@ paths:
           description: OK
           schema:
             items:
-              type: string
+              $ref: '#/definitions/response.WebsiteOption'
             type: array
       security:
       - ApiKeyAuth: []
@@ -14928,6 +15746,10 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            items:
+              $ref: '#/definitions/request.WebsiteProxyConfig'
+            type: array
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -15014,6 +15836,10 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            items:
+              $ref: '#/definitions/response.NginxRedirectConfig'
+            type: array
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -15100,6 +15926,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/response.NginxRewriteRes'
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -15203,6 +16031,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/response.WebsiteSSLDTO'
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -15346,6 +16176,10 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            items:
+              $ref: '#/definitions/response.WebsiteSSLDTO'
+            type: array
       security:
       - ApiKeyAuth: []
       - Timestamp: []
@@ -15425,6 +16259,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/response.WebsiteSSLDTO'
       security:
       - ApiKeyAuth: []
       - Timestamp: []

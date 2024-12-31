@@ -51,7 +51,7 @@ func (b *BaseApi) GetWebsites(c *gin.Context) {
 
 // @Tags Website
 // @Summary List website names
-// @Success 200 {array} string
+// @Success 200 {array} response.WebsiteOption
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /websites/options [get]
@@ -470,7 +470,7 @@ func (b *BaseApi) ChangePHPVersion(c *gin.Context) {
 // @Summary Get rewrite conf
 // @Accept json
 // @Param request body request.NginxRewriteReq true "request"
-// @Success 200
+// @Success 200 {object} response.NginxRewriteRes
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /websites/rewrite [post]
@@ -554,7 +554,7 @@ func (b *BaseApi) UpdateSiteDirPermission(c *gin.Context) {
 // @Summary Get proxy conf
 // @Accept json
 // @Param request body request.WebsiteProxyReq true "request"
-// @Success 200
+// @Success 200 {array} request.WebsiteProxyConfig
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /websites/proxies [post]
@@ -618,7 +618,7 @@ func (b *BaseApi) UpdateProxyConfigFile(c *gin.Context) {
 // @Summary Get AuthBasic conf
 // @Accept json
 // @Param request body request.NginxAuthReq true "request"
-// @Success 200
+// @Success 200 {object} response.NginxAuthRes
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /websites/auths [post]
@@ -659,7 +659,7 @@ func (b *BaseApi) UpdateAuthConfig(c *gin.Context) {
 // @Summary Get AntiLeech conf
 // @Accept json
 // @Param request body request.NginxCommonReq true "request"
-// @Success 200
+// @Success 200 {object} response.NginxAntiLeechRes
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /websites/leech [post]
@@ -722,7 +722,7 @@ func (b *BaseApi) UpdateRedirectConfig(c *gin.Context) {
 // @Summary Get redirect conf
 // @Accept json
 // @Param request body request.WebsiteProxyReq true "request"
-// @Success 200
+// @Success 200 {array} response.NginxRedirectConfig
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /websites/redirect [post]
@@ -764,7 +764,7 @@ func (b *BaseApi) UpdateRedirectConfigFile(c *gin.Context) {
 // @Summary Get website dir
 // @Accept json
 // @Param request body request.WebsiteCommonReq true "request"
-// @Success 200
+// @Success 200 {object} response.WebsiteDirConfig
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /websites/dir [post]
@@ -785,7 +785,7 @@ func (b *BaseApi) GetDirConfig(c *gin.Context) {
 // @Summary Get default html
 // @Accept json
 // @Param type path string true "type"
-// @Success 200 {object} response.FileInfo
+// @Success 200 {object} response.WebsiteHtmlRes
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /websites/default/html/{type} [get]

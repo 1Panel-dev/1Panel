@@ -114,7 +114,7 @@ func (b *BaseApi) GenerateSSH(c *gin.Context) {
 // @Summary Load host SSH secret
 // @Accept json
 // @Param request body dto.GenerateLoad true "request"
-// @Success 200
+// @Success 200 {string} data
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /host/ssh/secret [post]
@@ -156,7 +156,7 @@ func (b *BaseApi) LoadSSHLogs(c *gin.Context) {
 
 // @Tags SSH
 // @Summary Load host SSH conf
-// @Success 200
+// @Success 200 {string} data
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /host/ssh/conf [get]

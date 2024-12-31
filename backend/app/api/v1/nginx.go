@@ -9,7 +9,7 @@ import (
 
 // @Tags OpenResty
 // @Summary Load OpenResty conf
-// @Success 200 {object} response.FileInfo
+// @Success 200 {object} response.NginxFile
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /openresty [get]

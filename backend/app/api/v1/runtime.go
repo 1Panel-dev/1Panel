@@ -12,7 +12,7 @@ import (
 // @Summary List runtimes
 // @Accept json
 // @Param request body request.RuntimeSearch true "request"
-// @Success 200
+// @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /runtimes/search [post]
@@ -36,7 +36,7 @@ func (b *BaseApi) SearchRuntimes(c *gin.Context) {
 // @Summary Create runtime
 // @Accept json
 // @Param request body request.RuntimeCreate true "request"
-// @Success 200
+// @Success 200 {object} model.Runtime
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /runtimes [post]
@@ -115,7 +115,7 @@ func (b *BaseApi) UpdateRuntime(c *gin.Context) {
 // @Summary Get runtime
 // @Accept json
 // @Param id path string true "request"
-// @Success 200
+// @Success 200 {object} response.RuntimeDTO
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /runtimes/{id} [get]
@@ -137,7 +137,7 @@ func (b *BaseApi) GetRuntime(c *gin.Context) {
 // @Summary Get Node package scripts
 // @Accept json
 // @Param request body request.NodePackageReq true "request"
-// @Success 200
+// @Success 200 {array} response.PackageScripts
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /runtimes/node/package [post]
@@ -180,7 +180,7 @@ func (b *BaseApi) OperateRuntime(c *gin.Context) {
 // @Summary Get Node modules
 // @Accept json
 // @Param request body request.NodeModuleReq true "request"
-// @Success 200
+// @Success 200 {array} response.NodeModule
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /runtimes/node/modules [post]

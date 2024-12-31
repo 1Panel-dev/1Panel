@@ -39,19 +39,19 @@ func (b *BaseApi) ListFiles(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	files, err := fileService.GetFileList(req)
+	fileList, err := fileService.GetFileList(req)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	helper.SuccessWithData(c, files)
+	helper.SuccessWithData(c, fileList)
 }
 
 // @Tags File
 // @Summary Page file
 // @Accept json
 // @Param request body request.SearchUploadWithPage true "request"
-// @Success 200 {array} response.FileInfo
+// @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /files/upload/search [post]
@@ -401,7 +401,7 @@ func (b *BaseApi) UploadFiles(c *gin.Context) {
 // @Summary Check file exist
 // @Accept json
 // @Param request body request.FilePathCheck true "request"
-// @Success 200
+// @Success 200 {boolean} isOk
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /files/check [post]
@@ -442,7 +442,7 @@ func (b *BaseApi) ChangeFileName(c *gin.Context) {
 // @Summary Wget file
 // @Accept json
 // @Param request body request.FileWget true "request"
-// @Success 200
+// @Success 200 {object} response.FileWgetRes
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /files/wget [post]
@@ -584,7 +584,7 @@ func (b *BaseApi) DownloadChunkFiles(c *gin.Context) {
 // @Summary Load file size
 // @Accept json
 // @Param request body request.DirSizeReq true "request"
-// @Success 200
+// @Success 200 {object} response.DirSizeRes
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /files/size [post]
@@ -786,7 +786,7 @@ func (b *BaseApi) Keys(c *gin.Context) {
 // @Tags File
 // @Summary Read file by Line
 // @Param request body request.FileReadByLineReq true "request"
-// @Success 200
+// @Success 200 {object} response.FileLineContent
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /files/read [post]

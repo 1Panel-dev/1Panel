@@ -41,7 +41,7 @@ func (b *BaseApi) SearchContainer(c *gin.Context) {
 // @Summary List containers
 // @Accept json
 // @Produce json
-// @Success 200
+// @Success 200 {array} string
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /containers/list [post]
@@ -83,7 +83,7 @@ func (b *BaseApi) SearchCompose(c *gin.Context) {
 // @Summary Test compose
 // @Accept json
 // @Param request body dto.ComposeCreate true "request"
-// @Success 200
+// @Success 200 {boolean} isOK
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /containers/compose/test [post]
@@ -106,7 +106,7 @@ func (b *BaseApi) TestCompose(c *gin.Context) {
 // @Summary Create compose
 // @Accept json
 // @Param request body dto.ComposeCreate true "request"
-// @Success 200
+// @Success 200 {string} log
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /containers/compose [post]
@@ -312,7 +312,7 @@ func (b *BaseApi) CleanContainerLog(c *gin.Context) {
 // @Summary Load container log
 // @Accept json
 // @Param request body dto.OperationWithNameAndType true "request"
-// @Success 200
+// @Success 200 {string} content
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /containers/load/log [post]

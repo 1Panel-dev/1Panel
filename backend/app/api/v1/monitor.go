@@ -18,7 +18,7 @@ import (
 // @Tags Monitor
 // @Summary Load monitor datas
 // @Param request body dto.MonitorSearch true "request"
-// @Success 200
+// @Success 200 {array} dto.MonitorData
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /hosts/monitor/search [post]

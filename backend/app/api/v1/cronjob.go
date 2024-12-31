@@ -92,7 +92,7 @@ func (b *BaseApi) SearchJobRecords(c *gin.Context) {
 // @Summary Load Cronjob record log
 // @Accept json
 // @Param request body dto.OperateByID true "request"
-// @Success 200
+// @Success 200 {string} content
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /cronjobs/records/log [post]

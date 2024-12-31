@@ -46,7 +46,7 @@ func (b *BaseApi) LoadTimeOption(c *gin.Context) {
 // @Summary load conf
 // @Accept json
 // @Param request body dto.OperationWithName true "request"
-// @Success 200
+// @Success 200 {array} string
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /toolbox/device/conf [post]
@@ -185,7 +185,7 @@ func (b *BaseApi) UpdateDeviceSwap(c *gin.Context) {
 // @Summary Check device DNS conf
 // @Accept json
 // @Param request body dto.SettingUpdate true "request"
-// @Success 200
+// @Success 200 {boolean} data
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /toolbox/device/check/dns [post]
@@ -206,7 +206,7 @@ func (b *BaseApi) CheckDNS(c *gin.Context) {
 
 // @Tags Device
 // @Summary Scan system
-// @Success 200
+// @Success 200 {object} dto.CleanData
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /toolbox/scan [post]

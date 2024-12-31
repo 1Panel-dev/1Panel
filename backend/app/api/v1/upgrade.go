@@ -26,7 +26,7 @@ func (b *BaseApi) GetUpgradeInfo(c *gin.Context) {
 // @Summary Load release notes by version
 // @Accept json
 // @Param request body dto.Upgrade true "request"
-// @Success 200
+// @Success 200 {string} notes
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /settings/upgrade [get]

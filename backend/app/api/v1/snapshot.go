@@ -55,7 +55,7 @@ func (b *BaseApi) ImportSnapshot(c *gin.Context) {
 // @Summary Load Snapshot status
 // @Accept json
 // @Param request body dto.OperateByID true "request"
-// @Success 200
+// @Success 200 {object} dto.SnapshotStatus
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /settings/snapshot/status [post]
@@ -124,7 +124,7 @@ func (b *BaseApi) SearchSnapshot(c *gin.Context) {
 // @Summary Load system snapshot size
 // @Accept json
 // @Param request body dto.PageSnapshot true "request"
-// @Success 200
+// @Success 200 {array} dto.SnapshotFile
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /settings/snapshot/size [post]

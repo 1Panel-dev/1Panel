@@ -191,7 +191,7 @@ func (b *BaseApi) SearchClamRecord(c *gin.Context) {
 // @Summary Load clam record detail
 // @Accept json
 // @Param request body dto.ClamLogReq true "request"
-// @Success 200
+// @Success 200 {string} content
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /toolbox/clam/record/log [post]
@@ -214,7 +214,7 @@ func (b *BaseApi) LoadClamRecordLog(c *gin.Context) {
 // @Summary Load clam file
 // @Accept json
 // @Param request body dto.ClamFileReq true "request"
-// @Success 200 {object} dto.PageResult
+// @Success 200 {string} content
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /toolbox/clam/file/search [post]

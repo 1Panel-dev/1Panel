@@ -13,7 +13,7 @@ import (
 // @Summary Page app installed
 // @Accept json
 // @Param request body request.AppInstalledSearch true "request"
-// @Success 200
+// @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /apps/installed/search [post]
@@ -45,7 +45,7 @@ func (b *BaseApi) SearchAppInstalled(c *gin.Context) {
 // @Tags App
 // @Summary List app installed
 // @Accept json
-// @Success 200 array dto.AppInstallInfo
+// @Success 200 {array} dto.AppInstallInfo
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /apps/installed/list [get]
@@ -105,7 +105,7 @@ func (b *BaseApi) LoadPort(c *gin.Context) {
 // @Accept json
 // @Param request body dto.OperationWithNameAndType true "request"
 // @Param key path string true "key"
-// @Success 200 {string} response.DatabaseConn
+// @Success 200 {object} response.DatabaseConn
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /apps/installed/conninfo/{key} [get]
@@ -266,7 +266,7 @@ func (b *BaseApi) GetDefaultConfig(c *gin.Context) {
 // @Summary Search params by appInstallId
 // @Accept json
 // @Param appInstallId path string true "request"
-// @Success 200 {object} response.AppParam
+// @Success 200 {object} response.AppConfig
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /apps/installed/params/{appInstallId} [get]

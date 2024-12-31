@@ -12,7 +12,7 @@ import (
 // @Summary List Recycle Bin files
 // @Accept json
 // @Param request body dto.PageInfo true "request"
-// @Success 200
+// @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /files/recycle/search [post]
@@ -72,7 +72,7 @@ func (b *BaseApi) ClearRecycleBinFile(c *gin.Context) {
 // @Tags File
 // @Summary Get Recycle Bin status
 // @Accept json
-// @Success 200
+// @Success 200 {string} content
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /files/recycle/status [get]

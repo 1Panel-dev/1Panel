@@ -53,7 +53,7 @@ func (b *BaseApi) SearchFirewallRule(c *gin.Context) {
 // @Summary Page firewall status
 // @Accept json
 // @Param request body dto.FirewallOperation true "request"
-// @Success 200 {object} dto.PageResult
+// @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /hosts/firewall/operate [post]
