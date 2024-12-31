@@ -200,6 +200,10 @@ export const DNSTypes = [
         label: 'GoDaddy',
         value: 'Godaddy',
     },
+    {
+        label: i18n.global.t('website.rainyun'),
+        value: 'RainYun',
+    },
 ];
 
 export const Fields = [

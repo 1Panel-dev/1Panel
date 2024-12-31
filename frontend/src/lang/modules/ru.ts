@@ -2205,6 +2205,7 @@ const message = {
         sniHelper:
             'Когда бэкенд обратного прокси использует HTTPS, может потребоваться установить origin SNI. Подробности см. в документации провайдера CDN.',
         huaweicloud: 'Huawei Cloud',
+        rainyun: 'Rain Yun',
     },
     php: {
         short_open_tag: 'Поддержка коротких тегов',

@@ -77,6 +77,11 @@
                             <el-input v-model.trim="account.authorization['apiKey']"></el-input>
                         </el-form-item>
                     </div>
+                    <div v-if="account.type === 'RainYun'">
+                        <el-form-item label="API Key" prop="authorization.apiKey">
+                            <el-input v-model.trim="account.authorization['apiKey']"></el-input>
+                        </el-form-item>
+                    </div>
                     <div v-if="account.type === 'CloudDns'">
                         <el-form-item label="Client ID" prop="authorization.clientID">
                             <el-input v-model.trim="account.authorization['clientID']"></el-input>

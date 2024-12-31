@@ -2046,6 +2046,7 @@ const message = {
         sni: '回源 SNI',
         sniHelper: '反代后端为 https 的时候可能需要设置回源 SNI，具体需要看 CDN 服务商文档',
         huaweicloud: '华为云',
+        rainyun: '雨云',
     },
     php: {
         short_open_tag: '短标签支持',

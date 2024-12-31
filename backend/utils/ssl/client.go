@@ -3,6 +3,7 @@ package ssl
 import (
 	"crypto"
 	"encoding/json"
+	"github.com/go-acme/lego/v4/providers/dns/rainyun"
 	"os"
 	"strings"
 	"time"
@@ -78,6 +79,7 @@ const (
 	Godaddy      DnsType = "Godaddy"
 	TencentCloud DnsType = "TencentCloud"
 	HuaweiCloud  DnsType = "HuaweiCloud"
+	RainYun      DnsType = "RainYun"
 )
 
 type DNSParam struct {
@@ -201,6 +203,13 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string, websiteSSL model.Web
 		huaweiCloudConfig.PollingInterval = pollingInterval
 		huaweiCloudConfig.TTL = int32(ttl)
 		p, err = huaweicloud.NewDNSProviderConfig(huaweiCloudConfig)
+	case RainYun:
+		rainyunConfig := rainyun.NewDefaultConfig()
+		rainyunConfig.APIKey = param.APIkey
+		rainyunConfig.PropagationTimeout = propagationTimeout
+		rainyunConfig.PollingInterval = pollingInterval
+		rainyunConfig.TTL = ttl
+		p, err = rainyun.NewDNSProviderConfig(rainyunConfig)
 	}
 	if err != nil {
 		return err
