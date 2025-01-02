@@ -205,6 +205,7 @@ ErrIPExist: "IP 已存在"
 #license
 ErrLicense: "許可證格式錯誤，請檢查後重試！"
 ErrLicenseCheck: "許可證校驗失敗，請檢查後重試！"
+ErrXpackVersion: "許可證校驗失敗，該許可證受版本限制，無法成功導入，請檢查後重試！";
 ErrLicenseSave: "許可證資訊保存失敗，錯誤 {{ .err }}, 請重試！"
 ErrLicenseSync: "許可證資訊同步失敗，資料庫中未檢測到許可證資訊！"
 ErrXpackNotFound: "該部分為專業版功能，請先在 面板設定-許可證 界面導入許可證"

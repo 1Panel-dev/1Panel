@@ -169,6 +169,7 @@ var (
 var (
 	ErrLicense      = "ErrLicense"
 	ErrLicenseCheck = "ErrLicenseCheck"
+	ErrXpackVersion = "ErrXpackVersion"
 	ErrLicenseSave  = "ErrLicenseSave"
 	ErrLicenseSync  = "ErrLicenseSync"
 )

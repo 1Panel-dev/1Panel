@@ -205,6 +205,7 @@ ErrIPExist: "IP is exit"
 #license
 ErrLicense: "License format error, please check and try again!"
 ErrLicenseCheck: "License verification failed, please check and try again!"
+ErrXpackVersion: "License verification failed, this license is version-restricted and cannot be successfully imported. Please check and try again!";
 ErrLicenseSave: "Failed to save license information, error {{ .err }}, please try again!"
 ErrLicenseSync: "Failed to sync license information, no license information detected in the database!"
 ErrXpackNotFound: "This section is a professional edition feature, please import the license first in Panel Settings-License interface"

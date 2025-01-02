@@ -205,6 +205,7 @@ ErrIPExist: "IP 已存在"
 #license
 ErrLicense: "许可证格式错误，请检查后重试！"
 ErrLicenseCheck: "许可证校验失败，请检查后重试！"
+ErrXpackVersion: "许可证校验失败，该许可证受版本限制，无法成功导入，请检查后重试！"
 ErrLicenseSave: "许可证信息保存失败，错误 {{ .err }}，请重试！"
 ErrLicenseSync: "许可证信息同步失败，数据库中未检测到许可证信息！"
 ErrXpackNotFound: "该部分为专业版功能，请先在 面板设置-许可证 界面导入许可证"
