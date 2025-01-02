@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"io/fs"
 	"os"
 	"path"
@@ -141,7 +142,7 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 
 		switch website.Type {
 		case constant.Deployment:
-			app, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
+			app, err := appInstallRepo.GetFirst(repo.WithByID(website.AppInstallID))
 			if err != nil {
 				return err
 			}
@@ -157,7 +158,7 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 				return err
 			}
 		case constant.Runtime:
-			runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(website.RuntimeID))
+			runtime, err := runtimeRepo.GetFirst(repo.WithByID(website.RuntimeID))
 			if err != nil {
 				return err
 			}
@@ -229,7 +230,7 @@ func handleWebsiteBackup(website *model.Website, backupDir, fileName, excludes, 
 
 		switch website.Type {
 		case constant.Deployment:
-			app, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
+			app, err := appInstallRepo.GetFirst(repo.WithByID(website.AppInstallID))
 			if err != nil {
 				return err
 			}
@@ -239,7 +240,7 @@ func handleWebsiteBackup(website *model.Website, backupDir, fileName, excludes, 
 			}
 			t.LogSuccess(task.GetTaskName(app.Name, task.TaskBackup, task.TaskScopeApp))
 		case constant.Runtime:
-			runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(website.RuntimeID))
+			runtime, err := runtimeRepo.GetFirst(repo.WithByID(website.RuntimeID))
 			if err != nil {
 				return err
 			}
@@ -280,18 +281,18 @@ func checkValidOfWebsite(oldWebsite, website *model.Website) error {
 		return buserr.WithDetail(constant.ErrBackupMatch, fmt.Sprintf("oldName: %s, oldType: %v", oldWebsite.Alias, oldWebsite.Type), nil)
 	}
 	if oldWebsite.AppInstallID != 0 {
-		_, err := appInstallRepo.GetFirst(commonRepo.WithByID(oldWebsite.AppInstallID))
+		_, err := appInstallRepo.GetFirst(repo.WithByID(oldWebsite.AppInstallID))
 		if err != nil {
 			return buserr.WithDetail(constant.ErrBackupMatch, "app", nil)
 		}
 	}
 	if oldWebsite.RuntimeID != 0 {
-		if _, err := runtimeRepo.GetFirst(commonRepo.WithByID(oldWebsite.RuntimeID)); err != nil {
+		if _, err := runtimeRepo.GetFirst(repo.WithByID(oldWebsite.RuntimeID)); err != nil {
 			return buserr.WithDetail(constant.ErrBackupMatch, "runtime", nil)
 		}
 	}
 	if oldWebsite.WebsiteSSLID != 0 {
-		if _, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(oldWebsite.WebsiteSSLID)); err != nil {
+		if _, err := websiteSSLRepo.GetFirst(repo.WithByID(oldWebsite.WebsiteSSLID)); err != nil {
 			return buserr.WithDetail(constant.ErrBackupMatch, "ssl", nil)
 		}
 	}
@@ -301,7 +302,7 @@ func checkValidOfWebsite(oldWebsite, website *model.Website) error {
 func recoverWebsiteDatabase(t *task.Task, dbID uint, dbType, tmpPath, websiteKey string) error {
 	switch dbType {
 	case constant.AppPostgresql:
-		db, err := postgresqlRepo.Get(commonRepo.WithByID(dbID))
+		db, err := postgresqlRepo.Get(repo.WithByID(dbID))
 		if err != nil {
 			return err
 		}
@@ -317,7 +318,7 @@ func recoverWebsiteDatabase(t *task.Task, dbID uint, dbType, tmpPath, websiteKey
 		}
 		t.LogSuccess(taskName)
 	case constant.AppMysql, constant.AppMariaDB:
-		db, err := mysqlRepo.Get(commonRepo.WithByID(dbID))
+		db, err := mysqlRepo.Get(repo.WithByID(dbID))
 		if err != nil {
 			return err
 		}

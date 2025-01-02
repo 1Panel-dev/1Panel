@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"os"
 	"os/exec"
 	"path"
@@ -162,7 +163,7 @@ func (u *ContainerService) TestCompose(req dto.ComposeCreate) (bool, error) {
 	if cmd.CheckIllegal(req.Path) {
 		return false, buserr.New(constant.ErrCmdIllegal)
 	}
-	composeItem, _ := composeRepo.GetRecord(commonRepo.WithByName(req.Name))
+	composeItem, _ := composeRepo.GetRecord(repo.WithByName(req.Name))
 	if composeItem.ID != 0 {
 		return false, constant.ErrRecordExist
 	}
@@ -217,7 +218,7 @@ func (u *ContainerService) CreateCompose(req dto.ComposeCreate) error {
 
 func (u *ContainerService) ComposeOperation(req dto.ComposeOperation) error {
 	if len(req.Path) == 0 && req.Operation == "delete" {
-		_ = composeRepo.DeleteRecord(commonRepo.WithByName(req.Name))
+		_ = composeRepo.DeleteRecord(repo.WithByName(req.Name))
 		return nil
 	}
 	if cmd.CheckIllegal(req.Path, req.Operation) {
@@ -231,10 +232,10 @@ func (u *ContainerService) ComposeOperation(req dto.ComposeOperation) error {
 			return errors.New(string(stdout))
 		}
 		if req.WithFile {
-			_ = composeRepo.DeleteRecord(commonRepo.WithByName(req.Name))
+			_ = composeRepo.DeleteRecord(repo.WithByName(req.Name))
 			_ = os.RemoveAll(path.Dir(req.Path))
 		} else {
-			composeItem, _ := composeRepo.GetRecord(commonRepo.WithByName(req.Name))
+			composeItem, _ := composeRepo.GetRecord(repo.WithByName(req.Name))
 			if composeItem.Path == "" {
 				upMap := make(map[string]interface{})
 				upMap["path"] = req.Path

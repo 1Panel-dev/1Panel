@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"os"
 	"path"
 	"strings"
@@ -77,11 +78,11 @@ func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate, isCron bool) er
 }
 
 func (u *SnapshotService) SnapshotReCreate(id uint) error {
-	snap, err := snapshotRepo.Get(commonRepo.WithByID(id))
+	snap, err := snapshotRepo.Get(repo.WithByID(id))
 	if err != nil {
 		return err
 	}
-	taskModel, err := taskRepo.GetFirst(taskRepo.WithResourceID(snap.ID), commonRepo.WithByType(task.TaskScopeSnapshot))
+	taskModel, err := taskRepo.GetFirst(taskRepo.WithResourceID(snap.ID), repo.WithByType(task.TaskScopeSnapshot))
 	if err != nil {
 		return err
 	}

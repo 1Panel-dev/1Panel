@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"os"
 	"path"
 	"path/filepath"
@@ -142,7 +143,7 @@ func handlePostgresqlRecover(req dto.CommonRecover, parentTask *task.Task, isRol
 		err      error
 		itemTask *task.Task
 	)
-	dbInfo, err := postgresqlRepo.Get(commonRepo.WithByName(req.DetailName), postgresqlRepo.WithByPostgresqlName(req.Name))
+	dbInfo, err := postgresqlRepo.Get(repo.WithByName(req.DetailName), postgresqlRepo.WithByPostgresqlName(req.Name))
 	if err != nil {
 		return err
 	}

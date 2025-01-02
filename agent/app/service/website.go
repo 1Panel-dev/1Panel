@@ -133,7 +133,7 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 		websiteDTOs []response.WebsiteRes
 		opts        []repo.DBOption
 	)
-	opts = append(opts, commonRepo.WithOrderRuleBy(req.OrderBy, req.Order))
+	opts = append(opts, repo.WithOrderRuleBy(req.OrderBy, req.Order))
 	if req.Name != "" {
 		domains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithDomainLike(req.Name))
 		if len(domains) > 0 {
@@ -141,7 +141,7 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 			for _, domain := range domains {
 				websiteIds = append(websiteIds, domain.WebsiteID)
 			}
-			opts = append(opts, commonRepo.WithByIDs(websiteIds))
+			opts = append(opts, repo.WithByIDs(websiteIds))
 		} else {
 			opts = append(opts, websiteRepo.WithDomainLike(req.Name))
 		}
@@ -162,14 +162,14 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 		)
 		switch web.Type {
 		case constant.Deployment:
-			appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(web.AppInstallID))
+			appInstall, err := appInstallRepo.GetFirst(repo.WithByID(web.AppInstallID))
 			if err != nil {
 				return 0, nil, err
 			}
 			appName = appInstall.Name
 			appInstallID = appInstall.ID
 		case constant.Runtime:
-			runtime, _ := runtimeRepo.GetFirst(commonRepo.WithByID(web.RuntimeID))
+			runtime, _ := runtimeRepo.GetFirst(repo.WithByID(web.RuntimeID))
 			if runtime != nil {
 				runtimeName = runtime.Name
 				runtimeType = runtime.Type
@@ -209,7 +209,7 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 
 func (w WebsiteService) GetWebsites() ([]response.WebsiteDTO, error) {
 	var websiteDTOs []response.WebsiteDTO
-	websites, _ := websiteRepo.List(commonRepo.WithOrderRuleBy("primary_domain", "ascending"))
+	websites, _ := websiteRepo.List(repo.WithOrderRuleBy("primary_domain", "ascending"))
 	for _, web := range websites {
 		res := response.WebsiteDTO{
 			Website: web,
@@ -287,14 +287,14 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 
 	if create.CreateDb {
 		createDataBase := func(t *task.Task) error {
-			database, _ := databaseRepo.Get(commonRepo.WithByName(create.DbHost))
+			database, _ := databaseRepo.Get(repo.WithByName(create.DbHost))
 			if database.ID == 0 {
 				return nil
 			}
 			dbConfig := create.DataBaseConfig
 			switch database.Type {
 			case constant.AppPostgresql, constant.AppPostgres:
-				oldPostgresqlDb, _ := postgresqlRepo.Get(commonRepo.WithByName(create.DbName), commonRepo.WithByFrom(constant.ResourceLocal))
+				oldPostgresqlDb, _ := postgresqlRepo.Get(repo.WithByName(create.DbName), repo.WithByFrom(constant.ResourceLocal))
 				if oldPostgresqlDb.ID > 0 {
 					return buserr.New(constant.ErrDbUserNotValid)
 				}
@@ -313,7 +313,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 				website.DbID = pgDB.ID
 				website.DbType = database.Type
 			case constant.AppMysql, constant.AppMariaDB:
-				oldMysqlDb, _ := mysqlRepo.Get(commonRepo.WithByName(dbConfig.DbName), commonRepo.WithByFrom(constant.ResourceLocal))
+				oldMysqlDb, _ := mysqlRepo.Get(repo.WithByName(dbConfig.DbName), repo.WithByFrom(constant.ResourceLocal))
 				if oldMysqlDb.ID > 0 {
 					return buserr.New(constant.ErrDbUserNotValid)
 				}
@@ -358,7 +358,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 			website.Proxy = fmt.Sprintf("127.0.0.1:%d", appInstall.HttpPort)
 		} else {
 			var install model.AppInstall
-			install, err = appInstallRepo.GetFirst(commonRepo.WithByID(create.AppInstallID))
+			install, err = appInstallRepo.GetFirst(repo.WithByID(create.AppInstallID))
 			if err != nil {
 				return err
 			}
@@ -371,7 +371,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 			createTask.AddSubTask(i18n.GetMsgByKey("ConfigApp"), configApp, nil)
 		}
 	case constant.Runtime:
-		runtime, err = runtimeRepo.GetFirst(commonRepo.WithByID(create.RuntimeID))
+		runtime, err = runtimeRepo.GetFirst(repo.WithByID(create.RuntimeID))
 		if err != nil {
 			return err
 		}
@@ -398,7 +398,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 			website.Proxy = fmt.Sprintf("127.0.0.1:%d", runtime.Port)
 		}
 	case constant.Subsite:
-		parentWebsite, err := websiteRepo.GetFirst(commonRepo.WithByID(create.ParentWebsiteID))
+		parentWebsite, err := websiteRepo.GetFirst(repo.WithByID(create.ParentWebsiteID))
 		if err != nil {
 			return err
 		}
@@ -456,7 +456,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 
 	if create.EnableSSL {
 		enableSSL := func(t *task.Task) error {
-			websiteModel, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(create.WebsiteSSLID))
+			websiteModel, err := websiteSSLRepo.GetFirst(repo.WithByID(create.WebsiteSSLID))
 			if err != nil {
 				return err
 			}
@@ -487,7 +487,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 }
 
 func (w WebsiteService) OpWebsite(req request.WebsiteOp) error {
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.ID))
+	website, err := websiteRepo.GetFirst(repo.WithByID(req.ID))
 	if err != nil {
 		return err
 	}
@@ -500,7 +500,7 @@ func (w WebsiteService) OpWebsite(req request.WebsiteOp) error {
 func (w WebsiteService) GetWebsiteOptions(req request.WebsiteOptionReq) ([]response.WebsiteOption, error) {
 	var options []repo.DBOption
 	if len(req.Types) > 0 {
-		options = append(options, commonRepo.WithTypes(req.Types))
+		options = append(options, repo.WithTypes(req.Types))
 	}
 	webs, _ := websiteRepo.List(options...)
 	var datas []response.WebsiteOption
@@ -515,7 +515,7 @@ func (w WebsiteService) GetWebsiteOptions(req request.WebsiteOptionReq) ([]respo
 }
 
 func (w WebsiteService) UpdateWebsite(req request.WebsiteUpdate) error {
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.ID))
+	website, err := websiteRepo.GetFirst(repo.WithByID(req.ID))
 	if err != nil {
 		return err
 	}
@@ -542,7 +542,7 @@ func (w WebsiteService) UpdateWebsite(req request.WebsiteUpdate) error {
 
 func (w WebsiteService) GetWebsite(id uint) (response.WebsiteDTO, error) {
 	var res response.WebsiteDTO
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(id))
+	website, err := websiteRepo.GetFirst(repo.WithByID(id))
 	if err != nil {
 		return res, err
 	}
@@ -552,7 +552,7 @@ func (w WebsiteService) GetWebsite(id uint) (response.WebsiteDTO, error) {
 	res.SitePath = GetSitePath(website, SiteDir)
 	res.SiteDir = website.SiteDir
 	if website.Type == constant.Runtime {
-		runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(website.RuntimeID))
+		runtime, err := runtimeRepo.GetFirst(repo.WithByID(website.RuntimeID))
 		if err != nil {
 			return res, err
 		}
@@ -563,7 +563,7 @@ func (w WebsiteService) GetWebsite(id uint) (response.WebsiteDTO, error) {
 }
 
 func (w WebsiteService) DeleteWebsite(req request.WebsiteDelete) error {
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.ID))
+	website, err := websiteRepo.GetFirst(repo.WithByID(req.ID))
 	if err != nil {
 		return err
 	}
@@ -586,7 +586,7 @@ func (w WebsiteService) DeleteWebsite(req request.WebsiteDelete) error {
 	}
 
 	if checkIsLinkApp(website) && req.DeleteApp {
-		appInstall, _ := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
+		appInstall, _ := appInstallRepo.GetFirst(repo.WithByID(website.AppInstallID))
 		if appInstall.ID > 0 {
 			deleteReq := request.AppInstallDelete{
 				Install:      appInstall,
@@ -607,7 +607,7 @@ func (w WebsiteService) DeleteWebsite(req request.WebsiteDelete) error {
 		_ = NewIBackupService().DeleteRecordByName("website", website.PrimaryDomain, website.Alias, req.DeleteBackup)
 	}()
 
-	if err := websiteRepo.DeleteBy(ctx, commonRepo.WithByID(req.ID)); err != nil {
+	if err := websiteRepo.DeleteBy(ctx, repo.WithByID(req.ID)); err != nil {
 		return err
 	}
 	if err := websiteDomainRepo.DeleteBy(ctx, websiteDomainRepo.WithWebsiteId(req.ID)); err != nil {
@@ -623,12 +623,12 @@ func (w WebsiteService) DeleteWebsite(req request.WebsiteDelete) error {
 }
 
 func (w WebsiteService) UpdateWebsiteDomain(req request.WebsiteDomainUpdate) error {
-	domain, err := websiteDomainRepo.GetFirst(commonRepo.WithByID(req.ID))
+	domain, err := websiteDomainRepo.GetFirst(repo.WithByID(req.ID))
 	if err != nil {
 		return err
 	}
 	domain.SSL = req.SSL
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(domain.WebsiteID))
+	website, err := websiteRepo.GetFirst(repo.WithByID(domain.WebsiteID))
 	if err != nil {
 		return err
 	}
@@ -663,7 +663,7 @@ func (w WebsiteService) CreateWebsiteDomain(create request.WebsiteDomainCreate) 
 	if err != nil {
 		return nil, err
 	}
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(create.WebsiteID))
+	website, err := websiteRepo.GetFirst(repo.WithByID(create.WebsiteID))
 	if err != nil {
 		return nil, err
 	}
@@ -733,7 +733,7 @@ func (w WebsiteService) GetWebsiteDomain(websiteId uint) ([]model.WebsiteDomain,
 }
 
 func (w WebsiteService) DeleteWebsiteDomain(domainId uint) error {
-	webSiteDomain, err := websiteDomainRepo.GetFirst(commonRepo.WithByID(domainId))
+	webSiteDomain, err := websiteDomainRepo.GetFirst(repo.WithByID(domainId))
 	if err != nil {
 		return err
 	}
@@ -741,7 +741,7 @@ func (w WebsiteService) DeleteWebsiteDomain(domainId uint) error {
 	if websiteDomains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithWebsiteId(webSiteDomain.WebsiteID)); len(websiteDomains) == 1 {
 		return fmt.Errorf("can not delete last domain")
 	}
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(webSiteDomain.WebsiteID))
+	website, err := websiteRepo.GetFirst(repo.WithByID(webSiteDomain.WebsiteID))
 	if err != nil {
 		return err
 	}
@@ -822,7 +822,7 @@ func (w WebsiteService) DeleteWebsiteDomain(domainId uint) error {
 		}
 	}
 
-	return websiteDomainRepo.DeleteBy(context.TODO(), commonRepo.WithByID(domainId))
+	return websiteDomainRepo.DeleteBy(context.TODO(), repo.WithByID(domainId))
 }
 
 func (w WebsiteService) GetNginxConfigByScope(req request.NginxScopeReq) (*response.WebsiteNginxConfig, error) {
@@ -831,7 +831,7 @@ func (w WebsiteService) GetNginxConfigByScope(req request.NginxScopeReq) (*respo
 		return nil, nil
 	}
 
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
 	if err != nil {
 		return nil, err
 	}
@@ -851,7 +851,7 @@ func (w WebsiteService) UpdateNginxConfigByScope(req request.NginxConfigUpdate) 
 	if !ok || len(keys) == 0 {
 		return nil
 	}
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
 	if err != nil {
 		return err
 	}
@@ -874,7 +874,7 @@ func (w WebsiteService) UpdateNginxConfigByScope(req request.NginxConfigUpdate) 
 }
 
 func (w WebsiteService) GetWebsiteNginxConfig(websiteID uint, configType string) (*response.FileInfo, error) {
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(websiteID))
+	website, err := websiteRepo.GetFirst(repo.WithByID(websiteID))
 	if err != nil {
 		return nil, err
 	}
@@ -894,7 +894,7 @@ func (w WebsiteService) GetWebsiteNginxConfig(websiteID uint, configType string)
 }
 
 func (w WebsiteService) GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, error) {
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(websiteId))
+	website, err := websiteRepo.GetFirst(repo.WithByID(websiteId))
 	if err != nil {
 		return response.WebsiteHTTPS{}, err
 	}
@@ -918,7 +918,7 @@ func (w WebsiteService) GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, 
 		res.Enable = false
 		return res, nil
 	}
-	websiteSSL, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(website.WebsiteSSLID))
+	websiteSSL, err := websiteSSLRepo.GetFirst(repo.WithByID(website.WebsiteSSLID))
 	if err != nil {
 		return response.WebsiteHTTPS{}, err
 	}
@@ -953,7 +953,7 @@ func (w WebsiteService) GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, 
 }
 
 func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteHTTPSOp) (*response.WebsiteHTTPS, error) {
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
 	if err != nil {
 		return nil, err
 	}
@@ -1025,7 +1025,7 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 	}
 
 	if req.Type == constant.SSLExisted {
-		websiteModel, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(req.WebsiteSSLID))
+		websiteModel, err := websiteSSLRepo.GetFirst(repo.WithByID(req.WebsiteSSLID))
 		if err != nil {
 			return nil, err
 		}
@@ -1137,7 +1137,7 @@ func (w WebsiteService) PreInstallCheck(req request.WebsiteInstallCheckReq) ([]r
 		checkIds = append(req.InstallIds, appInstall.ID)
 	}
 	if len(checkIds) > 0 {
-		installList, _ := appInstallRepo.ListBy(commonRepo.WithByIDs(checkIds))
+		installList, _ := appInstallRepo.ListBy(repo.WithByIDs(checkIds))
 		for _, install := range installList {
 			if err = syncAppInstallStatus(&install, false); err != nil {
 				return nil, err
@@ -1160,7 +1160,7 @@ func (w WebsiteService) PreInstallCheck(req request.WebsiteInstallCheckReq) ([]r
 }
 
 func (w WebsiteService) UpdateNginxConfigFile(req request.WebsiteNginxUpdate) error {
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.ID))
+	website, err := websiteRepo.GetFirst(repo.WithByID(req.ID))
 	if err != nil {
 		return err
 	}
@@ -1177,7 +1177,7 @@ func (w WebsiteService) UpdateNginxConfigFile(req request.WebsiteNginxUpdate) er
 }
 
 func (w WebsiteService) OpWebsiteLog(req request.WebsiteLogReq) (*response.WebsiteLog, error) {
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.ID))
+	website, err := websiteRepo.GetFirst(repo.WithByID(req.ID))
 	if err != nil {
 		return nil, err
 	}
@@ -1284,7 +1284,7 @@ func (w WebsiteService) ChangeDefaultServer(id uint) error {
 		}
 	}
 	if id > 0 {
-		website, err := websiteRepo.GetFirst(commonRepo.WithByID(id))
+		website, err := websiteRepo.GetFirst(repo.WithByID(id))
 		if err != nil {
 			return err
 		}
@@ -1324,12 +1324,12 @@ func (w WebsiteService) ChangeDefaultServer(id uint) error {
 }
 
 func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) error {
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
 	if err != nil {
 		return err
 	}
 	if website.Type == constant.Runtime {
-		oldRuntime, err := runtimeRepo.GetFirst(commonRepo.WithByID(website.RuntimeID))
+		oldRuntime, err := runtimeRepo.GetFirst(repo.WithByID(website.RuntimeID))
 		if err != nil {
 			return err
 		}
@@ -1362,7 +1362,7 @@ func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) error
 
 	if req.RuntimeID > 0 {
 		server.RemoveDirective("location", []string{"~", "[^/]\\.php(/|$)"})
-		runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(req.RuntimeID))
+		runtime, err := runtimeRepo.GetFirst(repo.WithByID(req.RuntimeID))
 		if err != nil {
 			return err
 		}
@@ -1396,7 +1396,7 @@ func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) error
 }
 
 func (w WebsiteService) UpdateRewriteConfig(req request.NginxRewriteUpdate) error {
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
 	if err != nil {
 		return err
 	}
@@ -1432,7 +1432,7 @@ func (w WebsiteService) UpdateRewriteConfig(req request.NginxRewriteUpdate) erro
 }
 
 func (w WebsiteService) GetRewriteConfig(req request.NginxRewriteReq) (*response.NginxRewriteRes, error) {
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
 	if err != nil {
 		return nil, err
 	}
@@ -1502,7 +1502,7 @@ func (w WebsiteService) ListCustomRewrite() ([]string, error) {
 }
 
 func (w WebsiteService) UpdateSiteDir(req request.WebsiteUpdateDir) error {
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.ID))
+	website, err := websiteRepo.GetFirst(repo.WithByID(req.ID))
 	if err != nil {
 		return err
 	}
@@ -1519,7 +1519,7 @@ func (w WebsiteService) UpdateSiteDir(req request.WebsiteUpdateDir) error {
 }
 
 func (w WebsiteService) UpdateSitePermission(req request.WebsiteUpdateDirPermission) error {
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.ID))
+	website, err := websiteRepo.GetFirst(repo.WithByID(req.ID))
 	if err != nil {
 		return err
 	}
@@ -1546,7 +1546,7 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 		oldContent []byte
 	)
 
-	website, err = websiteRepo.GetFirst(commonRepo.WithByID(req.ID))
+	website, err = websiteRepo.GetFirst(repo.WithByID(req.ID))
 	if err != nil {
 		return
 	}
@@ -1648,7 +1648,7 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 }
 
 func (w WebsiteService) UpdateProxyCache(req request.NginxProxyCacheUpdate) (err error) {
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
 	if err != nil {
 		return
 	}
@@ -1668,7 +1668,7 @@ func (w WebsiteService) GetProxyCache(id uint) (res response.NginxProxyCache, er
 	var (
 		website model.Website
 	)
-	website, err = websiteRepo.GetFirst(commonRepo.WithByID(id))
+	website, err = websiteRepo.GetFirst(repo.WithByID(id))
 	if err != nil {
 		return
 	}
@@ -1726,7 +1726,7 @@ func (w WebsiteService) GetProxies(id uint) (res []request.WebsiteProxyConfig, e
 		website  model.Website
 		fileList response.FileInfo
 	)
-	website, err = websiteRepo.GetFirst(commonRepo.WithByID(id))
+	website, err = websiteRepo.GetFirst(repo.WithByID(id))
 	if err != nil {
 		return
 	}
@@ -1797,7 +1797,7 @@ func (w WebsiteService) UpdateProxyFile(req request.NginxProxyUpdate) (err error
 		nginxFull         dto.NginxFull
 		oldRewriteContent []byte
 	)
-	website, err = websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	website, err = websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
 	if err != nil {
 		return err
 	}
@@ -1824,7 +1824,7 @@ func (w WebsiteService) UpdateProxyFile(req request.NginxProxyUpdate) (err error
 }
 
 func (w WebsiteService) ClearProxyCache(req request.NginxCommonReq) error {
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
 	if err != nil {
 		return err
 	}
@@ -1852,7 +1852,7 @@ func (w WebsiteService) GetAuthBasics(req request.NginxAuthReq) (res response.Ng
 		authContent  []byte
 		nginxParams  []response.NginxParam
 	)
-	website, err = websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	website, err = websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
 	if err != nil {
 		return
 	}
@@ -1897,7 +1897,7 @@ func (w WebsiteService) UpdateAuthBasic(req request.NginxAuthUpdate) (err error)
 		authContent  []byte
 		authArray    []string
 	)
-	website, err = websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	website, err = websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
 	if err != nil {
 		return err
 	}
@@ -2024,7 +2024,7 @@ func (w WebsiteService) GetPathAuthBasics(req request.NginxAuthReq) (res []respo
 		nginxInstall model.AppInstall
 		authContent  []byte
 	)
-	website, err = websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	website, err = websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
 	if err != nil {
 		return
 	}
@@ -2088,7 +2088,7 @@ func (w WebsiteService) GetPathAuthBasics(req request.NginxAuthReq) (res []respo
 }
 
 func (w WebsiteService) UpdatePathAuthBasic(req request.NginxPathAuthUpdate) error {
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
 	if err != nil {
 		return err
 	}
@@ -2157,7 +2157,7 @@ func (w WebsiteService) UpdatePathAuthBasic(req request.NginxPathAuthUpdate) err
 }
 
 func (w WebsiteService) UpdateAntiLeech(req request.NginxAntiLeechUpdate) (err error) {
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
 	if err != nil {
 		return
 	}
@@ -2244,7 +2244,7 @@ func (w WebsiteService) UpdateAntiLeech(req request.NginxAntiLeechUpdate) (err e
 }
 
 func (w WebsiteService) GetAntiLeech(id uint) (*response.NginxAntiLeechRes, error) {
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(id))
+	website, err := websiteRepo.GetFirst(repo.WithByID(id))
 	if err != nil {
 		return nil, err
 	}
@@ -2327,7 +2327,7 @@ func (w WebsiteService) OperateRedirect(req request.NginxRedirectReq) (err error
 		oldContent []byte
 	)
 
-	website, err = websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	website, err = websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
 	if err != nil {
 		return err
 	}
@@ -2475,7 +2475,7 @@ func (w WebsiteService) GetRedirect(id uint) (res []response.NginxRedirectConfig
 		website  model.Website
 		fileList response.FileInfo
 	)
-	website, err = websiteRepo.GetFirst(commonRepo.WithByID(id))
+	website, err = websiteRepo.GetFirst(repo.WithByID(id))
 	if err != nil {
 		return
 	}
@@ -2605,7 +2605,7 @@ func (w WebsiteService) UpdateRedirectFile(req request.NginxRedirectUpdate) (err
 		nginxFull         dto.NginxFull
 		oldRewriteContent []byte
 	)
-	website, err = websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	website, err = websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
 	if err != nil {
 		return err
 	}
@@ -2632,7 +2632,7 @@ func (w WebsiteService) UpdateRedirectFile(req request.NginxRedirectUpdate) (err
 }
 
 func (w WebsiteService) LoadWebsiteDirConfig(req request.WebsiteCommonReq) (*response.WebsiteDirConfig, error) {
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.ID))
+	website, err := websiteRepo.GetFirst(repo.WithByID(req.ID))
 	if err != nil {
 		return nil, err
 	}
@@ -2765,7 +2765,7 @@ func (w WebsiteService) UpdateDefaultHtml(req request.WebsiteHtmlUpdate) error {
 }
 
 func (w WebsiteService) GetLoadBalances(id uint) ([]dto.NginxUpstream, error) {
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(id))
+	website, err := websiteRepo.GetFirst(repo.WithByID(id))
 	if err != nil {
 		return nil, err
 	}
@@ -2860,7 +2860,7 @@ func (w WebsiteService) GetLoadBalances(id uint) ([]dto.NginxUpstream, error) {
 }
 
 func (w WebsiteService) CreateLoadBalance(req request.WebsiteLBCreate) error {
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
 	if err != nil {
 		return err
 	}
@@ -2935,7 +2935,7 @@ func (w WebsiteService) CreateLoadBalance(req request.WebsiteLBCreate) error {
 }
 
 func (w WebsiteService) UpdateLoadBalance(req request.WebsiteLBUpdate) error {
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
 	if err != nil {
 		return err
 	}
@@ -3007,7 +3007,7 @@ func (w WebsiteService) UpdateLoadBalance(req request.WebsiteLBUpdate) error {
 }
 
 func (w WebsiteService) DeleteLoadBalance(req request.WebsiteLBDelete) error {
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
 	if err != nil {
 		return err
 	}
@@ -3028,7 +3028,7 @@ func (w WebsiteService) DeleteLoadBalance(req request.WebsiteLBDelete) error {
 }
 
 func (w WebsiteService) UpdateLoadBalanceFile(req request.WebsiteLBUpdateFile) error {
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
 	if err != nil {
 		return err
 	}
@@ -3059,7 +3059,7 @@ func (w WebsiteService) ChangeGroup(group, newGroup uint) error {
 }
 
 func (w WebsiteService) SetRealIPConfig(req request.WebsiteRealIP) error {
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
 	if err != nil {
 		return err
 	}
@@ -3102,7 +3102,7 @@ func (w WebsiteService) SetRealIPConfig(req request.WebsiteRealIP) error {
 }
 
 func (w WebsiteService) GetRealIPConfig(websiteID uint) (*response.WebsiteRealIP, error) {
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(websiteID))
+	website, err := websiteRepo.GetFirst(repo.WithByID(websiteID))
 	if err != nil {
 		return nil, err
 	}
@@ -3139,7 +3139,7 @@ func (w WebsiteService) GetRealIPConfig(websiteID uint) (*response.WebsiteRealIP
 }
 
 func (w WebsiteService) GetWebsiteResource(websiteID uint) ([]response.Resource, error) {
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(websiteID))
+	website, err := websiteRepo.GetFirst(repo.WithByID(websiteID))
 	if err != nil {
 		return nil, err
 	}
@@ -3149,7 +3149,7 @@ func (w WebsiteService) GetWebsiteResource(websiteID uint) ([]response.Resource,
 		databaseType string
 	)
 	if website.Type == constant.Runtime {
-		runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(website.RuntimeID))
+		runtime, err := runtimeRepo.GetFirst(repo.WithByID(website.RuntimeID))
 		if err != nil {
 			return nil, err
 		}
@@ -3161,7 +3161,7 @@ func (w WebsiteService) GetWebsiteResource(websiteID uint) ([]response.Resource,
 		})
 	}
 	if website.Type == constant.Deployment {
-		install, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
+		install, err := appInstallRepo.GetFirst(repo.WithByID(website.AppInstallID))
 		if err != nil {
 			return nil, err
 		}
@@ -3186,7 +3186,7 @@ func (w WebsiteService) GetWebsiteResource(websiteID uint) ([]response.Resource,
 	if databaseID > 0 {
 		switch databaseType {
 		case constant.AppMysql, constant.AppMariaDB:
-			db, _ := mysqlRepo.Get(commonRepo.WithByID(databaseID))
+			db, _ := mysqlRepo.Get(repo.WithByID(databaseID))
 			if db.ID > 0 {
 				res = append(res, response.Resource{
 					Name:       db.Name,
@@ -3196,7 +3196,7 @@ func (w WebsiteService) GetWebsiteResource(websiteID uint) ([]response.Resource,
 				})
 			}
 		case constant.AppPostgresql, constant.AppPostgres:
-			db, _ := postgresqlRepo.Get(commonRepo.WithByID(databaseID))
+			db, _ := postgresqlRepo.Get(repo.WithByID(databaseID))
 			if db.ID > 0 {
 				res = append(res, response.Resource{
 					Name:       db.Name,
@@ -3215,7 +3215,7 @@ func (w WebsiteService) ListDatabases() ([]response.Database, error) {
 	var res []response.Database
 	mysqlDBs, _ := mysqlRepo.List()
 	for _, db := range mysqlDBs {
-		database, _ := databaseRepo.Get(commonRepo.WithByName(db.MysqlName))
+		database, _ := databaseRepo.Get(repo.WithByName(db.MysqlName))
 		if database.ID > 0 {
 			res = append(res, response.Database{
 				ID:   db.ID,
@@ -3226,7 +3226,7 @@ func (w WebsiteService) ListDatabases() ([]response.Database, error) {
 	}
 	pgSqls, _ := postgresqlRepo.List()
 	for _, db := range pgSqls {
-		database, _ := databaseRepo.Get(commonRepo.WithByName(db.PostgresqlName))
+		database, _ := databaseRepo.Get(repo.WithByName(db.PostgresqlName))
 		if database.ID > 0 {
 			res = append(res, response.Database{
 				ID:   db.ID,
@@ -3239,7 +3239,7 @@ func (w WebsiteService) ListDatabases() ([]response.Database, error) {
 }
 
 func (w WebsiteService) ChangeDatabase(req request.ChangeDatabase) error {
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
 	if err != nil {
 		return err
 	}

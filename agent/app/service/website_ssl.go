@@ -57,7 +57,7 @@ func (w WebsiteSSLService) Page(search request.WebsiteSSLSearch) (int64, []respo
 	var (
 		result []response.WebsiteSSLDTO
 	)
-	total, sslList, err := websiteSSLRepo.Page(search.Page, search.PageSize, commonRepo.WithOrderBy("created_at desc"))
+	total, sslList, err := websiteSSLRepo.Page(search.Page, search.PageSize, repo.WithOrderBy("created_at desc"))
 	if err != nil {
 		return 0, nil, err
 	}
@@ -72,7 +72,7 @@ func (w WebsiteSSLService) Page(search request.WebsiteSSLSearch) (int64, []respo
 
 func (w WebsiteSSLService) GetSSL(id uint) (*response.WebsiteSSLDTO, error) {
 	var res response.WebsiteSSLDTO
-	websiteSSL, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(id))
+	websiteSSL, err := websiteSSLRepo.GetFirst(repo.WithByID(id))
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +85,7 @@ func (w WebsiteSSLService) Search(search request.WebsiteSSLSearch) ([]response.W
 		opts   []repo.DBOption
 		result []response.WebsiteSSLDTO
 	)
-	opts = append(opts, commonRepo.WithOrderBy("created_at desc"))
+	opts = append(opts, repo.WithOrderBy("created_at desc"))
 	if search.AcmeAccountID != "" {
 		acmeAccountID, err := strconv.ParseUint(search.AcmeAccountID, 10, 64)
 		if err != nil {
@@ -113,7 +113,7 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 		return create, buserr.New("ErrParseIP")
 	}
 	var res request.WebsiteSSLCreate
-	acmeAccount, err := websiteAcmeRepo.GetFirst(commonRepo.WithByID(create.AcmeAccountID))
+	acmeAccount, err := websiteAcmeRepo.GetFirst(repo.WithByID(create.AcmeAccountID))
 	if err != nil {
 		return res, err
 	}
@@ -160,7 +160,7 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 		websiteSSL.AutoRenew = create.AutoRenew
 	}
 	if create.Provider == constant.DNSAccount {
-		dnsAccount, err := websiteDnsRepo.GetFirst(commonRepo.WithByID(create.DnsAccountID))
+		dnsAccount, err := websiteDnsRepo.GetFirst(repo.WithByID(create.DnsAccountID))
 		if err != nil {
 			return res, err
 		}
@@ -221,11 +221,11 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 		dnsAccount  *model.WebsiteDnsAccount
 	)
 
-	websiteSSL, err = websiteSSLRepo.GetFirst(commonRepo.WithByID(apply.ID))
+	websiteSSL, err = websiteSSLRepo.GetFirst(repo.WithByID(apply.ID))
 	if err != nil {
 		return err
 	}
-	acmeAccount, err = websiteAcmeRepo.GetFirst(commonRepo.WithByID(websiteSSL.AcmeAccountID))
+	acmeAccount, err = websiteAcmeRepo.GetFirst(repo.WithByID(websiteSSL.AcmeAccountID))
 	if err != nil {
 		return err
 	}
@@ -236,7 +236,7 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 
 	switch websiteSSL.Provider {
 	case constant.DNSAccount:
-		dnsAccount, err = websiteDnsRepo.GetFirst(commonRepo.WithByID(websiteSSL.DnsAccountID))
+		dnsAccount, err = websiteDnsRepo.GetFirst(repo.WithByID(websiteSSL.DnsAccountID))
 		if err != nil {
 			return err
 		}
@@ -387,7 +387,7 @@ func handleError(websiteSSL *model.WebsiteSSL, err error) {
 }
 
 func (w WebsiteSSLService) GetDNSResolve(req request.WebsiteDNSReq) ([]response.WebsiteDNSRes, error) {
-	acmeAccount, err := websiteAcmeRepo.GetFirst(commonRepo.WithByID(req.AcmeAccountID))
+	acmeAccount, err := websiteAcmeRepo.GetFirst(repo.WithByID(req.AcmeAccountID))
 	if err != nil {
 		return nil, err
 	}
@@ -414,11 +414,11 @@ func (w WebsiteSSLService) GetDNSResolve(req request.WebsiteDNSReq) ([]response.
 
 func (w WebsiteSSLService) GetWebsiteSSL(websiteId uint) (response.WebsiteSSLDTO, error) {
 	var res response.WebsiteSSLDTO
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(websiteId))
+	website, err := websiteRepo.GetFirst(repo.WithByID(websiteId))
 	if err != nil {
 		return res, err
 	}
-	websiteSSL, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(website.WebsiteSSLID))
+	websiteSSL, err := websiteSSLRepo.GetFirst(repo.WithByID(website.WebsiteSSLID))
 	if err != nil {
 		return res, err
 	}
@@ -430,7 +430,7 @@ func (w WebsiteSSLService) Delete(ids []uint) error {
 	var names []string
 	for _, id := range ids {
 		if websites, _ := websiteRepo.GetBy(websiteRepo.WithWebsiteSSLID(id)); len(websites) > 0 {
-			oldSSL, _ := websiteSSLRepo.GetFirst(commonRepo.WithByID(id))
+			oldSSL, _ := websiteSSLRepo.GetFirst(repo.WithByID(id))
 			if oldSSL.ID > 0 {
 				names = append(names, oldSSL.PrimaryDomain)
 			}
@@ -444,11 +444,11 @@ func (w WebsiteSSLService) Delete(ids []uint) error {
 				return buserr.New("ErrDeleteWithPanelSSL")
 			}
 		}
-		websiteSSL, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(id))
+		websiteSSL, err := websiteSSLRepo.GetFirst(repo.WithByID(id))
 		if err != nil {
 			return err
 		}
-		acmeAccount, err := websiteAcmeRepo.GetFirst(commonRepo.WithByID(websiteSSL.AcmeAccountID))
+		acmeAccount, err := websiteAcmeRepo.GetFirst(repo.WithByID(websiteSSL.AcmeAccountID))
 		if err != nil {
 			return err
 		}
@@ -457,7 +457,7 @@ func (w WebsiteSSLService) Delete(ids []uint) error {
 			return err
 		}
 		_ = client.RevokeSSL([]byte(websiteSSL.Pem))
-		_ = websiteSSLRepo.DeleteBy(commonRepo.WithByID(id))
+		_ = websiteSSLRepo.DeleteBy(repo.WithByID(id))
 	}
 	if len(names) > 0 {
 		return buserr.WithName("ErrSSLCannotDelete", strings.Join(names, ","))
@@ -466,7 +466,7 @@ func (w WebsiteSSLService) Delete(ids []uint) error {
 }
 
 func (w WebsiteSSLService) Update(update request.WebsiteSSLUpdate) error {
-	websiteSSL, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(update.ID))
+	websiteSSL, err := websiteSSLRepo.GetFirst(repo.WithByID(update.ID))
 	if err != nil {
 		return err
 	}
@@ -487,7 +487,7 @@ func (w WebsiteSSLService) Update(update request.WebsiteSSLUpdate) error {
 	}
 
 	if websiteSSL.Provider != constant.SelfSigned {
-		acmeAccount, err := websiteAcmeRepo.GetFirst(commonRepo.WithByID(update.AcmeAccountID))
+		acmeAccount, err := websiteAcmeRepo.GetFirst(repo.WithByID(update.AcmeAccountID))
 		if err != nil {
 			return err
 		}
@@ -518,7 +518,7 @@ func (w WebsiteSSLService) Update(update request.WebsiteSSLUpdate) error {
 		updateParams["auto_renew"] = false
 	}
 	if update.Provider == constant.DNSAccount {
-		dnsAccount, err := websiteDnsRepo.GetFirst(commonRepo.WithByID(update.DnsAccountID))
+		dnsAccount, err := websiteDnsRepo.GetFirst(repo.WithByID(update.DnsAccountID))
 		if err != nil {
 			return err
 		}
@@ -535,7 +535,7 @@ func (w WebsiteSSLService) Upload(req request.WebsiteSSLUpload) error {
 	}
 	var err error
 	if req.SSLID > 0 {
-		websiteSSL, err = websiteSSLRepo.GetFirst(commonRepo.WithByID(req.SSLID))
+		websiteSSL, err = websiteSSLRepo.GetFirst(repo.WithByID(req.SSLID))
 		if err != nil {
 			return err
 		}
@@ -629,7 +629,7 @@ func (w WebsiteSSLService) Upload(req request.WebsiteSSLUpload) error {
 }
 
 func (w WebsiteSSLService) DownloadFile(id uint) (*os.File, error) {
-	websiteSSL, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(id))
+	websiteSSL, err := websiteSSLRepo.GetFirst(repo.WithByID(id))
 	if err != nil {
 		return nil, err
 	}

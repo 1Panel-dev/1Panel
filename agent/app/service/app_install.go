@@ -88,7 +88,7 @@ func (a *AppInstallService) Page(req request.AppInstalledSearch) (int64, []respo
 	)
 
 	if req.Name != "" {
-		opts = append(opts, commonRepo.WithByLikeName(req.Name))
+		opts = append(opts, repo.WithByLikeName(req.Name))
 	}
 
 	if len(req.Tags) != 0 {
@@ -146,7 +146,7 @@ func (a *AppInstallService) CheckExist(req request.AppInstalledInfo) (*response.
 	if len(req.Name) == 0 {
 		appInstall, _ = appInstallRepo.GetFirst(appInstallRepo.WithAppId(app.ID))
 	} else {
-		appInstall, _ = appInstallRepo.GetFirst(appInstallRepo.WithAppId(app.ID), commonRepo.WithByName(req.Name))
+		appInstall, _ = appInstallRepo.GetFirst(appInstallRepo.WithAppId(app.ID), repo.WithByName(req.Name))
 	}
 
 	if reflect.DeepEqual(appInstall, model.AppInstall{}) {
@@ -240,7 +240,7 @@ func (a *AppInstallService) SearchForWebsite(req request.AppInstalledSearch) ([]
 }
 
 func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
-	install, err := appInstallRepo.GetFirstByCtx(context.Background(), commonRepo.WithByID(req.InstallId))
+	install, err := appInstallRepo.GetFirstByCtx(context.Background(), repo.WithByID(req.InstallId))
 	if err != nil {
 		return err
 	}
@@ -302,7 +302,7 @@ func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
 }
 
 func (a *AppInstallService) UpdateAppConfig(req request.AppConfigUpdate) error {
-	installed, err := appInstallRepo.GetFirst(commonRepo.WithByID(req.InstallID))
+	installed, err := appInstallRepo.GetFirst(repo.WithByID(req.InstallID))
 	if err != nil {
 		return err
 	}
@@ -314,7 +314,7 @@ func (a *AppInstallService) UpdateAppConfig(req request.AppConfigUpdate) error {
 }
 
 func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
-	installed, err := appInstallRepo.GetFirst(commonRepo.WithByID(req.InstallId))
+	installed, err := appInstallRepo.GetFirst(repo.WithByID(req.InstallId))
 	if err != nil {
 		return err
 	}
@@ -441,7 +441,7 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 }
 
 func (a *AppInstallService) IgnoreUpgrade(req request.AppInstalledIgnoreUpgrade) error {
-	appDetail, err := appDetailRepo.GetFirst(commonRepo.WithByID(req.DetailID))
+	appDetail, err := appDetailRepo.GetFirst(repo.WithByID(req.DetailID))
 	if err != nil {
 		return err
 	}
@@ -478,7 +478,7 @@ func (a *AppInstallService) GetServices(key string) ([]response.AppService, erro
 		if key == constant.AppPostgres {
 			key = constant.AppPostgresql
 		}
-		dbs, _ := databaseRepo.GetList(commonRepo.WithByType(key))
+		dbs, _ := databaseRepo.GetList(repo.WithByType(key))
 		if len(dbs) == 0 {
 			return res, nil
 		}
@@ -488,7 +488,7 @@ func (a *AppInstallService) GetServices(key string) ([]response.AppService, erro
 				Value: db.Name,
 			}
 			if db.AppInstallID > 0 {
-				install, err := appInstallRepo.GetFirst(commonRepo.WithByID(db.AppInstallID))
+				install, err := appInstallRepo.GetFirst(repo.WithByID(db.AppInstallID))
 				if err != nil {
 					return nil, err
 				}
@@ -528,12 +528,12 @@ func (a *AppInstallService) GetServices(key string) ([]response.AppService, erro
 }
 
 func (a *AppInstallService) GetUpdateVersions(req request.AppUpdateVersion) ([]dto.AppVersion, error) {
-	install, err := appInstallRepo.GetFirst(commonRepo.WithByID(req.AppInstallID))
+	install, err := appInstallRepo.GetFirst(repo.WithByID(req.AppInstallID))
 	var versions []dto.AppVersion
 	if err != nil {
 		return versions, err
 	}
-	app, err := appRepo.GetFirst(commonRepo.WithByID(install.AppId))
+	app, err := appRepo.GetFirst(repo.WithByID(install.AppId))
 	if err != nil {
 		return versions, err
 	}
@@ -602,7 +602,7 @@ func (a *AppInstallService) ChangeAppPort(req request.PortUpdate) error {
 
 	appRess, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithLinkId(appInstall.ID))
 	for _, appRes := range appRess {
-		appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(appRes.AppInstallId))
+		appInstall, err := appInstallRepo.GetFirst(repo.WithByID(appRes.AppInstallId))
 		if err != nil {
 			return err
 		}
@@ -616,7 +616,7 @@ func (a *AppInstallService) ChangeAppPort(req request.PortUpdate) error {
 
 func (a *AppInstallService) DeleteCheck(installID uint) ([]dto.AppResource, error) {
 	var res []dto.AppResource
-	appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(installID))
+	appInstall, err := appInstallRepo.GetFirst(repo.WithByID(installID))
 	if err != nil {
 		return nil, err
 	}
@@ -627,9 +627,9 @@ func (a *AppInstallService) DeleteCheck(installID uint) ([]dto.AppResource, erro
 			Name: website.PrimaryDomain,
 		})
 	}
-	resources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithLinkId(appInstall.ID), commonRepo.WithByFrom(constant.AppResourceLocal))
+	resources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithLinkId(appInstall.ID), repo.WithByFrom(constant.AppResourceLocal))
 	for _, resource := range resources {
-		linkInstall, _ := appInstallRepo.GetFirst(commonRepo.WithByID(resource.AppInstallId))
+		linkInstall, _ := appInstallRepo.GetFirst(repo.WithByID(resource.AppInstallId))
 		res = append(res, dto.AppResource{
 			Type: "app",
 			Name: linkInstall.Name,
@@ -676,11 +676,11 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 		envs    = make(map[string]interface{})
 		res     response.AppConfig
 	)
-	install, err := appInstallRepo.GetFirst(commonRepo.WithByID(id))
+	install, err := appInstallRepo.GetFirst(repo.WithByID(id))
 	if err != nil {
 		return nil, err
 	}
-	detail, err := appDetailRepo.GetFirst(commonRepo.WithByID(install.AppDetailId))
+	detail, err := appDetailRepo.GetFirst(repo.WithByID(install.AppDetailId))
 	if err != nil {
 		return nil, err
 	}
@@ -857,7 +857,7 @@ func updateInstallInfoInDB(appKey, appName, param string, value interface{}) err
 		_ = appInstallRepo.BatchUpdateBy(map[string]interface{}{
 			"param": strings.ReplaceAll(appInstall.Param, oldVal, newVal),
 			"env":   strings.ReplaceAll(appInstall.Env, oldVal, newVal),
-		}, commonRepo.WithByID(appInstall.ID))
+		}, repo.WithByID(appInstall.ID))
 	}
 	if param == "user-password" {
 		oldVal = fmt.Sprintf("\"PANEL_DB_USER_PASSWORD\":\"%v\"", appInstall.UserPassword)
@@ -865,7 +865,7 @@ func updateInstallInfoInDB(appKey, appName, param string, value interface{}) err
 		_ = appInstallRepo.BatchUpdateBy(map[string]interface{}{
 			"param": strings.ReplaceAll(appInstall.Param, oldVal, newVal),
 			"env":   strings.ReplaceAll(appInstall.Env, oldVal, newVal),
-		}, commonRepo.WithByID(appInstall.ID))
+		}, repo.WithByID(appInstall.ID))
 	}
 	if param == "port" {
 		oldVal = fmt.Sprintf("\"PANEL_APP_PORT_HTTP\":%v", appInstall.Port)
@@ -874,7 +874,7 @@ func updateInstallInfoInDB(appKey, appName, param string, value interface{}) err
 			"param":     strings.ReplaceAll(appInstall.Param, oldVal, newVal),
 			"env":       strings.ReplaceAll(appInstall.Env, oldVal, newVal),
 			"http_port": value,
-		}, commonRepo.WithByID(appInstall.ID))
+		}, repo.WithByID(appInstall.ID))
 	}
 
 	ComposeFile := fmt.Sprintf("%s/%s/%s/docker-compose.yml", constant.AppInstallDir, appKey, appInstall.Name)

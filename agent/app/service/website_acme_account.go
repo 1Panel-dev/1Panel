@@ -5,6 +5,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/ssl"
@@ -24,7 +25,7 @@ func NewIWebsiteAcmeAccountService() IWebsiteAcmeAccountService {
 }
 
 func (w WebsiteAcmeAccountService) Page(search dto.PageInfo) (int64, []response.WebsiteAcmeAccountDTO, error) {
-	total, accounts, err := websiteAcmeRepo.Page(search.Page, search.PageSize, commonRepo.WithOrderBy("created_at desc"))
+	total, accounts, err := websiteAcmeRepo.Page(search.Page, search.PageSize, repo.WithOrderBy("created_at desc"))
 	var accountDTOs []response.WebsiteAcmeAccountDTO
 	for _, account := range accounts {
 		accountDTOs = append(accountDTOs, response.WebsiteAcmeAccountDTO{
@@ -74,5 +75,5 @@ func (w WebsiteAcmeAccountService) Delete(id uint) error {
 	if ssls, _ := websiteSSLRepo.List(websiteSSLRepo.WithByAcmeAccountId(id)); len(ssls) > 0 {
 		return buserr.New(constant.ErrAccountCannotDelete)
 	}
-	return websiteAcmeRepo.DeleteBy(commonRepo.WithByID(id))
+	return websiteAcmeRepo.DeleteBy(repo.WithByID(id))
 }

@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"os"
 	"path"
 	"strings"
@@ -43,8 +44,8 @@ func NewIPostgresqlService() IPostgresqlService {
 func (u *PostgresqlService) SearchWithPage(search dto.PostgresqlDBSearch) (int64, interface{}, error) {
 	total, postgresqls, err := postgresqlRepo.Page(search.Page, search.PageSize,
 		postgresqlRepo.WithByPostgresqlName(search.Database),
-		commonRepo.WithByLikeName(search.Info),
-		commonRepo.WithOrderRuleBy(search.OrderBy, search.Order),
+		repo.WithByLikeName(search.Info),
+		repo.WithOrderRuleBy(search.OrderBy, search.Order),
 	)
 	var dtoPostgresqls []dto.PostgresqlDBInfo
 	for _, pg := range postgresqls {
@@ -88,7 +89,7 @@ func (u *PostgresqlService) BindUser(req dto.PostgresqlBindUser) error {
 	if cmd.CheckIllegal(req.Name, req.Username, req.Password) {
 		return buserr.New(constant.ErrCmdIllegal)
 	}
-	dbItem, err := postgresqlRepo.Get(postgresqlRepo.WithByPostgresqlName(req.Database), commonRepo.WithByName(req.Name))
+	dbItem, err := postgresqlRepo.Get(postgresqlRepo.WithByPostgresqlName(req.Database), repo.WithByName(req.Name))
 	if err != nil {
 		return err
 	}
@@ -125,7 +126,7 @@ func (u *PostgresqlService) Create(ctx context.Context, req dto.PostgresqlDBCrea
 		return nil, buserr.New(constant.ErrCmdIllegal)
 	}
 
-	pgsql, _ := postgresqlRepo.Get(commonRepo.WithByName(req.Name), postgresqlRepo.WithByPostgresqlName(req.Database), commonRepo.WithByFrom(req.From))
+	pgsql, _ := postgresqlRepo.Get(repo.WithByName(req.Name), postgresqlRepo.WithByPostgresqlName(req.Database), repo.WithByFrom(req.From))
 	if pgsql.ID != 0 {
 		return nil, constant.ErrRecordExist
 	}
@@ -171,7 +172,7 @@ func LoadPostgresqlClientByFrom(database string) (postgresql.PostgresqlClient, e
 	)
 
 	dbInfo.Timeout = 300
-	databaseItem, err := databaseRepo.Get(commonRepo.WithByName(database))
+	databaseItem, err := databaseRepo.Get(repo.WithByName(database))
 	if err != nil {
 		return nil, err
 	}
@@ -251,7 +252,7 @@ func (u *PostgresqlService) UpdateDescription(req dto.UpdateDescription) error {
 
 func (u *PostgresqlService) DeleteCheck(req dto.PostgresqlDBDeleteCheck) ([]string, error) {
 	var appInUsed []string
-	db, err := postgresqlRepo.Get(commonRepo.WithByID(req.ID))
+	db, err := postgresqlRepo.Get(repo.WithByID(req.ID))
 	if err != nil {
 		return appInUsed, err
 	}
@@ -263,7 +264,7 @@ func (u *PostgresqlService) DeleteCheck(req dto.PostgresqlDBDeleteCheck) ([]stri
 		}
 		apps, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithLinkId(app.ID), appInstallResourceRepo.WithResourceId(db.ID))
 		for _, app := range apps {
-			appInstall, _ := appInstallRepo.GetFirst(commonRepo.WithByID(app.AppInstallId))
+			appInstall, _ := appInstallRepo.GetFirst(repo.WithByID(app.AppInstallId))
 			if appInstall.ID != 0 {
 				appInUsed = append(appInUsed, appInstall.Name)
 			}
@@ -271,7 +272,7 @@ func (u *PostgresqlService) DeleteCheck(req dto.PostgresqlDBDeleteCheck) ([]stri
 	} else {
 		apps, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithResourceId(db.ID), appRepo.WithKey(req.Type))
 		for _, app := range apps {
-			appInstall, _ := appInstallRepo.GetFirst(commonRepo.WithByID(app.AppInstallId))
+			appInstall, _ := appInstallRepo.GetFirst(repo.WithByID(app.AppInstallId))
 			if appInstall.ID != 0 {
 				appInUsed = append(appInUsed, appInstall.Name)
 			}
@@ -282,7 +283,7 @@ func (u *PostgresqlService) DeleteCheck(req dto.PostgresqlDBDeleteCheck) ([]stri
 }
 
 func (u *PostgresqlService) Delete(ctx context.Context, req dto.PostgresqlDBDelete) error {
-	db, err := postgresqlRepo.Get(commonRepo.WithByID(req.ID))
+	db, err := postgresqlRepo.Get(repo.WithByID(req.ID))
 	if err != nil && !req.ForceDelete {
 		return err
 	}
@@ -309,11 +310,11 @@ func (u *PostgresqlService) Delete(ctx context.Context, req dto.PostgresqlDBDele
 		if _, err := os.Stat(backupDir); err == nil {
 			_ = os.RemoveAll(backupDir)
 		}
-		_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType(req.Type), commonRepo.WithByName(req.Database), commonRepo.WithByDetailName(db.Name))
+		_ = backupRepo.DeleteRecord(ctx, repo.WithByType(req.Type), repo.WithByName(req.Database), repo.WithByDetailName(db.Name))
 		global.LOG.Infof("delete database %s-%s backups successful", req.Database, db.Name)
 	}
 
-	_ = postgresqlRepo.Delete(ctx, commonRepo.WithByID(db.ID))
+	_ = postgresqlRepo.Delete(ctx, repo.WithByID(db.ID))
 	return nil
 }
 
@@ -321,7 +322,7 @@ func (u *PostgresqlService) ChangePrivileges(req dto.PostgresqlPrivileges) error
 	if cmd.CheckIllegal(req.Database, req.Username) {
 		return buserr.New(constant.ErrCmdIllegal)
 	}
-	dbItem, err := postgresqlRepo.Get(postgresqlRepo.WithByPostgresqlName(req.Database), commonRepo.WithByName(req.Name))
+	dbItem, err := postgresqlRepo.Get(postgresqlRepo.WithByPostgresqlName(req.Database), repo.WithByName(req.Name))
 	if err != nil {
 		return err
 	}
@@ -359,13 +360,13 @@ func (u *PostgresqlService) ChangePassword(req dto.ChangeDBInfo) error {
 	passwordInfo.Timeout = 300
 
 	if req.ID != 0 {
-		postgresqlData, err = postgresqlRepo.Get(commonRepo.WithByID(req.ID))
+		postgresqlData, err = postgresqlRepo.Get(repo.WithByID(req.ID))
 		if err != nil {
 			return err
 		}
 		passwordInfo.Username = postgresqlData.Username
 	} else {
-		dbItem, err := databaseRepo.Get(commonRepo.WithByType(req.Type), commonRepo.WithByFrom(req.From))
+		dbItem, err := databaseRepo.Get(repo.WithByType(req.Type), repo.WithByFrom(req.From))
 		if err != nil {
 			return err
 		}
@@ -387,11 +388,11 @@ func (u *PostgresqlService) ChangePassword(req dto.ChangeDBInfo) error {
 			appRess, _ = appInstallResourceRepo.GetBy(appInstallResourceRepo.WithResourceId(postgresqlData.ID))
 		}
 		for _, appRes := range appRess {
-			appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(appRes.AppInstallId))
+			appInstall, err := appInstallRepo.GetFirst(repo.WithByID(appRes.AppInstallId))
 			if err != nil {
 				return err
 			}
-			appModel, err := appRepo.GetFirst(commonRepo.WithByID(appInstall.AppId))
+			appModel, err := appRepo.GetFirst(repo.WithByID(appInstall.AppId))
 			if err != nil {
 				return err
 			}
@@ -414,7 +415,7 @@ func (u *PostgresqlService) ChangePassword(req dto.ChangeDBInfo) error {
 		return err
 	}
 	if req.From == "local" {
-		remote, err := databaseRepo.Get(commonRepo.WithByName(req.Database))
+		remote, err := databaseRepo.Get(repo.WithByName(req.Database))
 		if err != nil {
 			return err
 		}

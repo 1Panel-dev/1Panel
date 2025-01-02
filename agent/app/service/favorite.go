@@ -5,6 +5,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
@@ -76,7 +77,7 @@ func (f *FavoriteService) Create(req request.FavoriteCreate) (*model.Favorite, e
 }
 
 func (f *FavoriteService) Delete(id uint) error {
-	if err := favoriteRepo.Delete(commonRepo.WithByID(id)); err != nil {
+	if err := favoriteRepo.Delete(repo.WithByID(id)); err != nil {
 		return err
 	}
 	return nil

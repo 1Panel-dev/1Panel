@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"log"
 	"os"
 	"path"
@@ -232,7 +233,7 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 			server.UpdateRootProxy([]string{proxy})
 		}
 	case constant.Subsite:
-		parentWebsite, err := websiteRepo.GetFirst(commonRepo.WithByID(website.ParentWebsiteID))
+		parentWebsite, err := websiteRepo.GetFirst(repo.WithByID(website.ParentWebsiteID))
 		if err != nil {
 			return err
 		}
@@ -240,7 +241,7 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 		rootIndex = path.Join("/www/sites", parentWebsite.Alias, "index", website.SiteDir)
 		server.UpdateDirective("error_page", []string{"404", "/404.html"})
 		if parentWebsite.Type == constant.Runtime {
-			parentRuntime, err := runtimeRepo.GetFirst(commonRepo.WithByID(parentWebsite.RuntimeID))
+			parentRuntime, err := runtimeRepo.GetFirst(repo.WithByID(parentWebsite.RuntimeID))
 			if err != nil {
 				return err
 			}
@@ -801,7 +802,7 @@ func opWebsite(website *model.Website, operate string) error {
 		case constant.Deployment:
 			server.RemoveDirective("location", []string{"/"})
 		case constant.Runtime:
-			runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(website.RuntimeID))
+			runtime, err := runtimeRepo.GetFirst(repo.WithByID(website.RuntimeID))
 			if err != nil {
 				return err
 			}
@@ -833,7 +834,7 @@ func opWebsite(website *model.Website, operate string) error {
 		switch website.Type {
 		case constant.Deployment:
 			server.RemoveDirective("root", nil)
-			appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
+			appInstall, err := appInstallRepo.GetFirst(repo.WithByID(website.AppInstallID))
 			if err != nil {
 				return err
 			}
@@ -847,7 +848,7 @@ func opWebsite(website *model.Website, operate string) error {
 		case constant.Runtime:
 			server.UpdateRoot(rootIndex)
 			localPath := ""
-			runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(website.RuntimeID))
+			runtime, err := runtimeRepo.GetFirst(repo.WithByID(website.RuntimeID))
 			if err != nil {
 				return err
 			}
@@ -918,7 +919,7 @@ func checkIsLinkApp(website model.Website) bool {
 		return true
 	}
 	if website.Type == constant.Runtime {
-		runtime, _ := runtimeRepo.GetFirst(commonRepo.WithByID(website.RuntimeID))
+		runtime, _ := runtimeRepo.GetFirst(repo.WithByID(website.RuntimeID))
 		return runtime.Resource == constant.ResourceAppstore
 	}
 	return false
@@ -971,7 +972,7 @@ func getWebsiteDomains(domains []request.WebsiteDomain, defaultPort int, website
 	}
 	for _, domain := range domainModels {
 		if exist, _ := websiteDomainRepo.GetFirst(websiteDomainRepo.WithDomain(domain.Domain), websiteDomainRepo.WithPort(domain.Port)); exist.ID > 0 {
-			website, _ := websiteRepo.GetFirst(commonRepo.WithByID(exist.WebsiteID))
+			website, _ := websiteRepo.GetFirst(repo.WithByID(exist.WebsiteID))
 			err = buserr.WithName(constant.ErrDomainIsUsed, website.PrimaryDomain)
 			return
 		}

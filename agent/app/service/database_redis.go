@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"os"
 	"os/exec"
 	"strings"
@@ -88,7 +89,7 @@ func (u *RedisService) ChangePassword(req dto.ChangeRedisPass) error {
 	if err := updateInstallInfoInDB("redis", req.Database, "password", req.Value); err != nil {
 		return err
 	}
-	remote, err := databaseRepo.Get(commonRepo.WithByName(req.Database))
+	remote, err := databaseRepo.Get(repo.WithByName(req.Database))
 	if err != nil {
 		return err
 	}

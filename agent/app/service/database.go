@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"os"
 	"path"
 
@@ -42,8 +43,8 @@ func NewIDatabaseService() IDatabaseService {
 func (u *DatabaseService) SearchWithPage(search dto.DatabaseSearch) (int64, interface{}, error) {
 	total, dbs, err := databaseRepo.Page(search.Page, search.PageSize,
 		databaseRepo.WithTypeList(search.Type),
-		commonRepo.WithByLikeName(search.Info),
-		commonRepo.WithOrderRuleBy(search.OrderBy, search.Order),
+		repo.WithByLikeName(search.Info),
+		repo.WithOrderRuleBy(search.OrderBy, search.Order),
 		databaseRepo.WithoutByFrom("local"),
 	)
 	var datas []dto.DatabaseInfo
@@ -59,7 +60,7 @@ func (u *DatabaseService) SearchWithPage(search dto.DatabaseSearch) (int64, inte
 
 func (u *DatabaseService) Get(name string) (dto.DatabaseInfo, error) {
 	var data dto.DatabaseInfo
-	remote, err := databaseRepo.Get(commonRepo.WithByName(name))
+	remote, err := databaseRepo.Get(repo.WithByName(name))
 	if err != nil {
 		return data, err
 	}
@@ -156,7 +157,7 @@ func (u *DatabaseService) CheckDatabase(req dto.DatabaseCreate) bool {
 }
 
 func (u *DatabaseService) Create(req dto.DatabaseCreate) error {
-	db, _ := databaseRepo.Get(commonRepo.WithByName(req.Name))
+	db, _ := databaseRepo.Get(repo.WithByName(req.Name))
 	if db.ID != 0 {
 		if db.From == "local" {
 			return buserr.New(constant.ErrLocalExist)
@@ -215,9 +216,9 @@ func (u *DatabaseService) Create(req dto.DatabaseCreate) error {
 
 func (u *DatabaseService) DeleteCheck(id uint) ([]string, error) {
 	var appInUsed []string
-	apps, _ := appInstallResourceRepo.GetBy(commonRepo.WithByFrom("remote"), appInstallResourceRepo.WithLinkId(id))
+	apps, _ := appInstallResourceRepo.GetBy(repo.WithByFrom("remote"), appInstallResourceRepo.WithLinkId(id))
 	for _, app := range apps {
-		appInstall, _ := appInstallRepo.GetFirst(commonRepo.WithByID(app.AppInstallId))
+		appInstall, _ := appInstallRepo.GetFirst(repo.WithByID(app.AppInstallId))
 		if appInstall.ID != 0 {
 			appInUsed = append(appInUsed, appInstall.Name)
 		}
@@ -227,7 +228,7 @@ func (u *DatabaseService) DeleteCheck(id uint) ([]string, error) {
 }
 
 func (u *DatabaseService) Delete(req dto.DatabaseDelete) error {
-	db, _ := databaseRepo.Get(commonRepo.WithByID(req.ID))
+	db, _ := databaseRepo.Get(repo.WithByID(req.ID))
 	if db.ID == 0 {
 		return constant.ErrRecordNotFound
 	}
@@ -241,11 +242,11 @@ func (u *DatabaseService) Delete(req dto.DatabaseDelete) error {
 		if _, err := os.Stat(backupDir); err == nil {
 			_ = os.RemoveAll(backupDir)
 		}
-		_ = backupRepo.DeleteRecord(context.Background(), commonRepo.WithByType(db.Type), commonRepo.WithByName(db.Name))
+		_ = backupRepo.DeleteRecord(context.Background(), repo.WithByType(db.Type), repo.WithByName(db.Name))
 		global.LOG.Infof("delete database %s-%s backups successful", db.Type, db.Name)
 	}
 
-	if err := databaseRepo.Delete(context.Background(), commonRepo.WithByID(req.ID)); err != nil && !req.ForceDelete {
+	if err := databaseRepo.Delete(context.Background(), repo.WithByID(req.ID)); err != nil && !req.ForceDelete {
 		return err
 	}
 	if db.From != "local" {

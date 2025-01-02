@@ -88,8 +88,7 @@ func NewTaskWithOps(resourceName, operate, scope, taskID string, resourceID uint
 
 func CheckTaskIsExecuting(name string) error {
 	taskRepo := repo.NewITaskRepo()
-	commonRepo := repo.NewCommonRepo()
-	task, _ := taskRepo.GetFirst(commonRepo.WithByStatus(constant.StatusExecuting), commonRepo.WithByName(name))
+	task, _ := taskRepo.GetFirst(taskRepo.WithByStatus(constant.StatusExecuting), repo.WithByName(name))
 	if task.ID != "" {
 		return buserr.New("TaskIsExecuting")
 	}

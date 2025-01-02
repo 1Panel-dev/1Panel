@@ -10,6 +10,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/cmd/server/nginx_conf"
 	"github.com/1Panel-dev/1Panel/agent/constant"
@@ -54,7 +55,7 @@ func handleRuntime(create request.RuntimeCreate, runtime *model.Runtime, fileOp 
 	runtime.Status = constant.RuntimeCreating
 	runtime.CodeDir = create.CodeDir
 
-	nodeDetail, err := appDetailRepo.GetFirst(commonRepo.WithByID(runtime.AppDetailID))
+	nodeDetail, err := appDetailRepo.GetFirst(repo.WithByID(runtime.AppDetailID))
 	if err != nil {
 		return err
 	}

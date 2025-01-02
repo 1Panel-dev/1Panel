@@ -263,13 +263,13 @@ func (u *CronjobService) uploadCronjobBackFile(cronjob model.Cronjob, accountMap
 
 func (u *CronjobService) removeExpiredBackup(cronjob model.Cronjob, accountMap map[string]backupClientHelper, record model.BackupRecord) {
 	var opts []repo.DBOption
-	opts = append(opts, commonRepo.WithByFrom("cronjob"))
+	opts = append(opts, repo.WithByFrom("cronjob"))
 	opts = append(opts, backupRepo.WithByCronID(cronjob.ID))
-	opts = append(opts, commonRepo.WithOrderBy("created_at desc"))
+	opts = append(opts, repo.WithOrderBy("created_at desc"))
 	if record.ID != 0 {
-		opts = append(opts, commonRepo.WithByType(record.Type))
-		opts = append(opts, commonRepo.WithByName(record.Name))
-		opts = append(opts, commonRepo.WithByDetailName(record.DetailName))
+		opts = append(opts, repo.WithByType(record.Type))
+		opts = append(opts, repo.WithByName(record.Name))
+		opts = append(opts, repo.WithByDetailName(record.DetailName))
 	}
 	records, _ := backupRepo.ListRecord(opts...)
 	if len(records) <= int(cronjob.RetainCopies) {
@@ -283,7 +283,7 @@ func (u *CronjobService) removeExpiredBackup(cronjob model.Cronjob, accountMap m
 					_, _ = accountMap[account].client.Delete(pathUtils.Join(accountMap[account].backupPath, "system_snapshot", records[i].FileName))
 				}
 			}
-			_ = snapshotRepo.Delete(commonRepo.WithByName(strings.TrimSuffix(records[i].FileName, ".tar.gz")))
+			_ = snapshotRepo.Delete(repo.WithByName(strings.TrimSuffix(records[i].FileName, ".tar.gz")))
 		} else {
 			for _, account := range accounts {
 				if len(account) != 0 {
@@ -291,12 +291,12 @@ func (u *CronjobService) removeExpiredBackup(cronjob model.Cronjob, accountMap m
 				}
 			}
 		}
-		_ = backupRepo.DeleteRecord(context.Background(), commonRepo.WithByID(records[i].ID))
+		_ = backupRepo.DeleteRecord(context.Background(), repo.WithByID(records[i].ID))
 	}
 }
 
 func (u *CronjobService) removeExpiredLog(cronjob model.Cronjob) {
-	records, _ := cronjobRepo.ListRecord(cronjobRepo.WithByJobID(int(cronjob.ID)), commonRepo.WithOrderBy("created_at desc"))
+	records, _ := cronjobRepo.ListRecord(cronjobRepo.WithByJobID(int(cronjob.ID)), repo.WithOrderBy("created_at desc"))
 	if len(records) <= int(cronjob.RetainCopies) {
 		return
 	}
@@ -307,7 +307,7 @@ func (u *CronjobService) removeExpiredLog(cronjob model.Cronjob) {
 				_ = os.Remove(file)
 			}
 		}
-		_ = cronjobRepo.DeleteRecord(commonRepo.WithByID(uint(records[i].ID)))
+		_ = cronjobRepo.DeleteRecord(repo.WithByID(records[i].ID))
 		_ = os.Remove(records[i].Records)
 	}
 }

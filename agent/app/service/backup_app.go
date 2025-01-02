@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"io/fs"
 	"os"
 	"path"
@@ -30,7 +31,7 @@ func (u *BackupService) AppBackup(req dto.CommonBackup) (*model.BackupRecord, er
 	if err != nil {
 		return nil, err
 	}
-	install, err := appInstallRepo.GetFirst(commonRepo.WithByName(req.DetailName), appInstallRepo.WithAppId(app.ID))
+	install, err := appInstallRepo.GetFirst(repo.WithByName(req.DetailName), appInstallRepo.WithAppId(app.ID))
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +80,7 @@ func (u *BackupService) AppRecover(req dto.CommonRecover) error {
 	if err != nil {
 		return err
 	}
-	install, err := appInstallRepo.GetFirst(commonRepo.WithByName(req.DetailName), appInstallRepo.WithAppId(app.ID))
+	install, err := appInstallRepo.GetFirst(repo.WithByName(req.DetailName), appInstallRepo.WithAppId(app.ID))
 	if err != nil {
 		return err
 	}
@@ -102,7 +103,7 @@ func (u *BackupService) AppRecover(req dto.CommonRecover) error {
 func backupDatabaseWithTask(parentTask *task.Task, resourceKey, tmpDir, name string, databaseID uint) error {
 	switch resourceKey {
 	case constant.AppMysql, constant.AppMariaDB:
-		db, err := mysqlRepo.Get(commonRepo.WithByID(databaseID))
+		db, err := mysqlRepo.Get(repo.WithByID(databaseID))
 		if err != nil {
 			return err
 		}
@@ -113,7 +114,7 @@ func backupDatabaseWithTask(parentTask *task.Task, resourceKey, tmpDir, name str
 		}
 		parentTask.LogSuccess(task.GetTaskName(db.Name, task.TaskBackup, task.TaskScopeDatabase))
 	case constant.AppPostgresql:
-		db, err := postgresqlRepo.Get(commonRepo.WithByID(databaseID))
+		db, err := postgresqlRepo.Get(repo.WithByID(databaseID))
 		if err != nil {
 			return err
 		}
@@ -237,23 +238,23 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 			var database model.Database
 			switch resource.From {
 			case constant.AppResourceRemote:
-				database, err = databaseRepo.Get(commonRepo.WithByID(resource.LinkId))
+				database, err = databaseRepo.Get(repo.WithByID(resource.LinkId))
 				if err != nil {
 					return err
 				}
 			case constant.AppResourceLocal:
-				resourceApp, err := appInstallRepo.GetFirst(commonRepo.WithByID(resource.LinkId))
+				resourceApp, err := appInstallRepo.GetFirst(repo.WithByID(resource.LinkId))
 				if err != nil {
 					return err
 				}
-				database, err = databaseRepo.Get(databaseRepo.WithAppInstallID(resourceApp.ID), commonRepo.WithByType(resource.Key), commonRepo.WithByFrom(constant.AppResourceLocal), commonRepo.WithByName(resourceApp.Name))
+				database, err = databaseRepo.Get(databaseRepo.WithAppInstallID(resourceApp.ID), repo.WithByType(resource.Key), repo.WithByFrom(constant.AppResourceLocal), repo.WithByName(resourceApp.Name))
 				if err != nil {
 					return err
 				}
 			}
 			switch database.Type {
 			case constant.AppPostgresql:
-				db, err := postgresqlRepo.Get(commonRepo.WithByID(resource.ResourceId))
+				db, err := postgresqlRepo.Get(repo.WithByID(resource.ResourceId))
 				if err != nil {
 					return err
 				}
@@ -269,7 +270,7 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 				}
 				t.LogSuccess(taskName)
 			case constant.AppMysql, constant.AppMariaDB:
-				db, err := mysqlRepo.Get(commonRepo.WithByID(resource.ResourceId))
+				db, err := mysqlRepo.Get(repo.WithByID(resource.ResourceId))
 				if err != nil {
 					return err
 				}
@@ -285,7 +286,7 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 				if err != nil {
 					return err
 				}
-				_ = appInstallResourceRepo.BatchUpdateBy(map[string]interface{}{"resource_id": newDB.ID}, commonRepo.WithByID(resource.ID))
+				_ = appInstallResourceRepo.BatchUpdateBy(map[string]interface{}{"resource_id": newDB.ID}, repo.WithByID(resource.ID))
 				taskName := task.GetTaskName(db.Name, task.TaskRecover, task.TaskScopeDatabase)
 				t.LogStart(taskName)
 				if err := handleMysqlRecover(dto.CommonRecover{

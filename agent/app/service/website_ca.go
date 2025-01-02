@@ -10,6 +10,7 @@ import (
 	"crypto/x509/pkix"
 	"encoding/pem"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"log"
 	"math/big"
@@ -49,7 +50,7 @@ func NewIWebsiteCAService() IWebsiteCAService {
 }
 
 func (w WebsiteCAService) Page(search request.WebsiteCASearch) (int64, []response.WebsiteCADTO, error) {
-	total, cas, err := websiteCARepo.Page(search.Page, search.PageSize, commonRepo.WithOrderBy("created_at desc"))
+	total, cas, err := websiteCARepo.Page(search.Page, search.PageSize, repo.WithOrderBy("created_at desc"))
 	if err != nil {
 		return 0, nil, err
 	}
@@ -63,7 +64,7 @@ func (w WebsiteCAService) Page(search request.WebsiteCASearch) (int64, []respons
 }
 
 func (w WebsiteCAService) Create(create request.WebsiteCACreate) (*request.WebsiteCACreate, error) {
-	if exist, _ := websiteCARepo.GetFirst(commonRepo.WithByName(create.Name)); exist.ID > 0 {
+	if exist, _ := websiteCARepo.GetFirst(repo.WithByName(create.Name)); exist.ID > 0 {
 		return nil, buserr.New(constant.ErrNameIsExist)
 	}
 
@@ -126,7 +127,7 @@ func (w WebsiteCAService) Create(create request.WebsiteCACreate) (*request.Websi
 
 func (w WebsiteCAService) GetCA(id uint) (*response.WebsiteCADTO, error) {
 	res := &response.WebsiteCADTO{}
-	ca, err := websiteCARepo.GetFirst(commonRepo.WithByID(id))
+	ca, err := websiteCARepo.GetFirst(repo.WithByID(id))
 	if err != nil {
 		return nil, err
 	}
@@ -154,14 +155,14 @@ func (w WebsiteCAService) Delete(id uint) error {
 	if len(ssls) > 0 {
 		return buserr.New("ErrDeleteCAWithSSL")
 	}
-	exist, err := websiteCARepo.GetFirst(commonRepo.WithByID(id))
+	exist, err := websiteCARepo.GetFirst(repo.WithByID(id))
 	if err != nil {
 		return err
 	}
 	if exist.Name == "1Panel" {
 		return buserr.New("ErrDefaultCA")
 	}
-	return websiteCARepo.DeleteBy(commonRepo.WithByID(id))
+	return websiteCARepo.DeleteBy(repo.WithByID(id))
 }
 
 func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) (*model.WebsiteSSL, error) {
@@ -173,11 +174,11 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) (*model.Website
 		ca         model.WebsiteCA
 	)
 	if req.Renew {
-		websiteSSL, err = websiteSSLRepo.GetFirst(commonRepo.WithByID(req.SSLID))
+		websiteSSL, err = websiteSSLRepo.GetFirst(repo.WithByID(req.SSLID))
 		if err != nil {
 			return nil, err
 		}
-		ca, err = websiteCARepo.GetFirst(commonRepo.WithByID(websiteSSL.CaID))
+		ca, err = websiteCARepo.GetFirst(repo.WithByID(websiteSSL.CaID))
 		if err != nil {
 			return nil, err
 		}
@@ -193,7 +194,7 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) (*model.Website
 			}
 		}
 	} else {
-		ca, err = websiteCARepo.GetFirst(commonRepo.WithByID(req.ID))
+		ca, err = websiteCARepo.GetFirst(repo.WithByID(req.ID))
 		if err != nil {
 			return nil, err
 		}
@@ -419,7 +420,7 @@ func createPrivateKey(keyType string) (privateKey any, publicKey any, privateKey
 }
 
 func (w WebsiteCAService) DownloadFile(id uint) (*os.File, error) {
-	ca, err := websiteCARepo.GetFirst(commonRepo.WithByID(id))
+	ca, err := websiteCARepo.GetFirst(repo.WithByID(id))
 	if err != nil {
 		return nil, err
 	}

@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"os"
 	"path"
 	"strconv"
@@ -23,7 +24,7 @@ func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time, t
 		apps, _ = appInstallRepo.ListBy()
 	} else {
 		itemID, _ := strconv.Atoi(cronjob.AppID)
-		app, err := appInstallRepo.GetFirst(commonRepo.WithByID(uint(itemID)))
+		app, err := appInstallRepo.GetFirst(repo.WithByID(uint(itemID)))
 		if err != nil {
 			return err
 		}
@@ -300,7 +301,7 @@ func loadDbsForJob(cronjob model.Cronjob) []DatabaseHelper {
 	}
 	itemID, _ := strconv.Atoi(cronjob.DBName)
 	if cronjob.DBType == "mysql" || cronjob.DBType == "mariadb" {
-		mysqlItem, _ := mysqlRepo.Get(commonRepo.WithByID(uint(itemID)))
+		mysqlItem, _ := mysqlRepo.Get(repo.WithByID(uint(itemID)))
 		dbs = append(dbs, DatabaseHelper{
 			ID:       mysqlItem.ID,
 			DBType:   cronjob.DBType,
@@ -308,7 +309,7 @@ func loadDbsForJob(cronjob model.Cronjob) []DatabaseHelper {
 			Name:     mysqlItem.Name,
 		})
 	} else {
-		pgItem, _ := postgresqlRepo.Get(commonRepo.WithByID(uint(itemID)))
+		pgItem, _ := postgresqlRepo.Get(repo.WithByID(uint(itemID)))
 		dbs = append(dbs, DatabaseHelper{
 			ID:       pgItem.ID,
 			DBType:   cronjob.DBType,
@@ -326,7 +327,7 @@ func loadWebsForJob(cronjob model.Cronjob) []model.Website {
 		return weblist
 	}
 	itemID, _ := strconv.Atoi(cronjob.Website)
-	webItem, _ := websiteRepo.GetFirst(commonRepo.WithByID(uint(itemID)))
+	webItem, _ := websiteRepo.GetFirst(repo.WithByID(uint(itemID)))
 	if webItem.ID != 0 {
 		weblist = append(weblist, webItem)
 	}

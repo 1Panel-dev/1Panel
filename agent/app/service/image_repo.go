@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"os"
 	"strings"
 	"time"
@@ -34,7 +35,7 @@ func NewIImageRepoService() IImageRepoService {
 }
 
 func (u *ImageRepoService) Page(req dto.SearchWithPage) (int64, interface{}, error) {
-	total, ops, err := imageRepoRepo.Page(req.Page, req.PageSize, commonRepo.WithByLikeName(req.Info), commonRepo.WithOrderBy("created_at desc"))
+	total, ops, err := imageRepoRepo.Page(req.Page, req.PageSize, repo.WithByLikeName(req.Info), repo.WithOrderBy("created_at desc"))
 	var dtoOps []dto.ImageRepoInfo
 	for _, op := range ops {
 		var item dto.ImageRepoInfo
@@ -47,7 +48,7 @@ func (u *ImageRepoService) Page(req dto.SearchWithPage) (int64, interface{}, err
 }
 
 func (u *ImageRepoService) Login(req dto.OperateByID) error {
-	repo, err := imageRepoRepo.Get(commonRepo.WithByID(req.ID))
+	repo, err := imageRepoRepo.Get(repo.WithByID(req.ID))
 	if err != nil {
 		return err
 	}
@@ -62,7 +63,7 @@ func (u *ImageRepoService) Login(req dto.OperateByID) error {
 }
 
 func (u *ImageRepoService) List() ([]dto.ImageRepoOption, error) {
-	ops, err := imageRepoRepo.List(commonRepo.WithOrderBy("created_at desc"))
+	ops, err := imageRepoRepo.List(repo.WithOrderBy("created_at desc"))
 	var dtoOps []dto.ImageRepoOption
 	for _, op := range ops {
 		if op.Status == constant.StatusSuccess {
@@ -80,7 +81,7 @@ func (u *ImageRepoService) Create(req dto.ImageRepoCreate) error {
 	if cmd.CheckIllegal(req.Username, req.Password, req.DownloadUrl) {
 		return buserr.New(constant.ErrCmdIllegal)
 	}
-	imageRepo, _ := imageRepoRepo.Get(commonRepo.WithByName(req.Name))
+	imageRepo, _ := imageRepoRepo.Get(repo.WithByName(req.Name))
 	if imageRepo.ID != 0 {
 		return constant.ErrRecordExist
 	}
@@ -136,7 +137,7 @@ func (u *ImageRepoService) BatchDelete(req dto.ImageRepoDelete) error {
 			return errors.New("The default value cannot be edit !")
 		}
 	}
-	if err := imageRepoRepo.Delete(commonRepo.WithByIDs(req.Ids)); err != nil {
+	if err := imageRepoRepo.Delete(repo.WithByIDs(req.Ids)); err != nil {
 		return err
 	}
 	return nil
@@ -149,7 +150,7 @@ func (u *ImageRepoService) Update(req dto.ImageRepoUpdate) error {
 	if cmd.CheckIllegal(req.Username, req.Password, req.DownloadUrl) {
 		return buserr.New(constant.ErrCmdIllegal)
 	}
-	repo, err := imageRepoRepo.Get(commonRepo.WithByID(req.ID))
+	repo, err := imageRepoRepo.Get(repo.WithByID(req.ID))
 	if err != nil {
 		return err
 	}

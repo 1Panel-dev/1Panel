@@ -95,7 +95,7 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 		for _, t := range appTags {
 			appIds = append(appIds, t.AppId)
 		}
-		opts = append(opts, commonRepo.WithByIDs(appIds))
+		opts = append(opts, repo.WithByIDs(appIds))
 	}
 	var res response.AppRes
 
@@ -203,7 +203,7 @@ func (a AppService) GetAppDetail(appID uint, version, appType string) (response.
 	appDetailDTO.Enable = true
 
 	if appType == "runtime" {
-		app, err := appRepo.GetFirst(commonRepo.WithByID(appID))
+		app, err := appRepo.GetFirst(repo.WithByID(appID))
 		if err != nil {
 			return appDetailDTO, err
 		}
@@ -274,7 +274,7 @@ func (a AppService) GetAppDetail(appID uint, version, appType string) (response.
 
 	appDetailDTO.HostMode = isHostModel(appDetailDTO.DockerCompose)
 
-	app, err := appRepo.GetFirst(commonRepo.WithByID(detail.AppId))
+	app, err := appRepo.GetFirst(repo.WithByID(detail.AppId))
 	if err != nil {
 		return appDetailDTO, err
 	}
@@ -288,7 +288,7 @@ func (a AppService) GetAppDetail(appID uint, version, appType string) (response.
 }
 func (a AppService) GetAppDetailByID(id uint) (*response.AppDetailDTO, error) {
 	res := &response.AppDetailDTO{}
-	appDetail, err := appDetailRepo.GetFirst(commonRepo.WithByID(id))
+	appDetail, err := appDetailRepo.GetFirst(repo.WithByID(id))
 	if err != nil {
 		return nil, err
 	}
@@ -309,7 +309,7 @@ func (a AppService) GetIgnoredApp() ([]response.IgnoredApp, error) {
 		return res, nil
 	}
 	for _, detail := range details {
-		app, err := appRepo.GetFirst(commonRepo.WithByID(detail.AppId))
+		app, err := appRepo.GetFirst(repo.WithByID(detail.AppId))
 		if err != nil {
 			return nil, err
 		}
@@ -328,7 +328,7 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 		err = buserr.WithDetail(constant.Err1PanelNetworkFailed, err.Error(), nil)
 		return
 	}
-	if list, _ := appInstallRepo.ListBy(commonRepo.WithByName(req.Name)); len(list) > 0 {
+	if list, _ := appInstallRepo.ListBy(repo.WithByName(req.Name)); len(list) > 0 {
 		err = buserr.New(constant.ErrAppNameExist)
 		return
 	}
@@ -338,16 +338,16 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 		appDetail model.AppDetail
 		app       model.App
 	)
-	appDetail, err = appDetailRepo.GetFirst(commonRepo.WithByID(req.AppDetailId))
+	appDetail, err = appDetailRepo.GetFirst(repo.WithByID(req.AppDetailId))
 	if err != nil {
 		return
 	}
-	app, err = appRepo.GetFirst(commonRepo.WithByID(appDetail.AppId))
+	app, err = appRepo.GetFirst(repo.WithByID(appDetail.AppId))
 	if err != nil {
 		return
 	}
 	if DatabaseKeys[app.Key] > 0 {
-		if existDatabases, _ := databaseRepo.GetList(commonRepo.WithByName(req.Name)); len(existDatabases) > 0 {
+		if existDatabases, _ := databaseRepo.GetList(repo.WithByName(req.Name)); len(existDatabases) > 0 {
 			err = buserr.New(constant.ErrRemoteExist)
 			return
 		}
@@ -462,7 +462,7 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 	appInstall.DockerCompose = string(composeByte)
 
 	if hostName, ok := req.Params["PANEL_DB_HOST"]; ok {
-		database, _ := databaseRepo.Get(commonRepo.WithByName(hostName.(string)))
+		database, _ := databaseRepo.Get(repo.WithByName(hostName.(string)))
 		if !reflect.DeepEqual(database, model.Database{}) {
 			req.Params["PANEL_DB_HOST"] = database.Address
 			req.Params["PANEL_DB_PORT"] = database.Port

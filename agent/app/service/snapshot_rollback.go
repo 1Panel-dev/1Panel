@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"os"
 	"path"
 
@@ -15,7 +16,7 @@ import (
 
 func (u *SnapshotService) SnapshotRollback(req dto.SnapshotRecover) error {
 	global.LOG.Info("start to rollback now")
-	snap, err := snapshotRepo.Get(commonRepo.WithByID(req.ID))
+	snap, err := snapshotRepo.Get(repo.WithByID(req.ID))
 	if err != nil {
 		return err
 	}

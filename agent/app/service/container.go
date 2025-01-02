@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
@@ -1009,7 +1010,7 @@ func (u *ContainerService) LoadContainerLogs(req dto.OperationWithNameAndType) s
 			}
 		}
 		if len(containers) == 0 {
-			composeItem, _ := composeRepo.GetRecord(commonRepo.WithByName(req.Name))
+			composeItem, _ := composeRepo.GetRecord(repo.WithByName(req.Name))
 			filePath = composeItem.Path
 		}
 	}

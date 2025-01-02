@@ -415,19 +415,19 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 	logFilePath := ""
 	switch req.Type {
 	case constant.TypeWebsite:
-		website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.ID))
+		website, err := websiteRepo.GetFirst(repo.WithByID(req.ID))
 		if err != nil {
 			return nil, err
 		}
 		logFilePath = GetSitePath(website, req.Name)
 	case constant.TypePhp:
-		php, err := runtimeRepo.GetFirst(commonRepo.WithByID(req.ID))
+		php, err := runtimeRepo.GetFirst(repo.WithByID(req.ID))
 		if err != nil {
 			return nil, err
 		}
 		logFilePath = php.GetLogPath()
 	case constant.TypeSSL:
-		ssl, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(req.ID))
+		ssl, err := websiteSSLRepo.GetFirst(repo.WithByID(req.ID))
 		if err != nil {
 			return nil, err
 		}
@@ -454,7 +454,7 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 		if req.TaskID != "" {
 			opts = append(opts, taskRepo.WithByID(req.TaskID))
 		} else {
-			opts = append(opts, commonRepo.WithByType(req.TaskType), taskRepo.WithOperate(req.TaskOperate), taskRepo.WithResourceID(req.ID))
+			opts = append(opts, repo.WithByType(req.TaskType), taskRepo.WithOperate(req.TaskOperate), taskRepo.WithResourceID(req.ID))
 		}
 		taskModel, err := taskRepo.GetFirst(opts...)
 		if err != nil {

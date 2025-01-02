@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"os"
 	"path"
 	"path/filepath"
@@ -107,7 +108,7 @@ func handleMysqlBackup(db DatabaseHelper, parentTask *task.Task, targetDir, file
 		itemTask *task.Task
 	)
 	itemTask = parentTask
-	dbInfo, err := mysqlRepo.Get(commonRepo.WithByName(db.Name), mysqlRepo.WithByMysqlName(db.Database))
+	dbInfo, err := mysqlRepo.Get(repo.WithByName(db.Name), mysqlRepo.WithByMysqlName(db.Database))
 	if err != nil {
 		return err
 	}
@@ -151,7 +152,7 @@ func handleMysqlRecover(req dto.CommonRecover, parentTask *task.Task, isRollback
 		itemTask *task.Task
 	)
 	itemTask = parentTask
-	dbInfo, err := mysqlRepo.Get(commonRepo.WithByName(req.DetailName), mysqlRepo.WithByMysqlName(req.Name))
+	dbInfo, err := mysqlRepo.Get(repo.WithByName(req.DetailName), mysqlRepo.WithByMysqlName(req.Name))
 	if err != nil {
 		return err
 	}
@@ -169,7 +170,7 @@ func handleMysqlRecover(req dto.CommonRecover, parentTask *task.Task, isRollback
 		if !fileOp.Stat(req.File) {
 			return buserr.WithName("ErrFileNotFound", req.File)
 		}
-		dbInfo, err := mysqlRepo.Get(commonRepo.WithByName(req.DetailName), mysqlRepo.WithByMysqlName(req.Name))
+		dbInfo, err := mysqlRepo.Get(repo.WithByName(req.DetailName), mysqlRepo.WithByMysqlName(req.Name))
 		if err != nil {
 			return err
 		}

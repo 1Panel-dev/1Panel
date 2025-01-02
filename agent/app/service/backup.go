@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"os"
 	"path"
 	"sort"
@@ -68,7 +69,7 @@ func (u *BackupService) Sync(req dto.SyncFromMaster) error {
 	}
 	accountItem.AccessKey, _ = encrypt.StringEncryptWithBase64(accountItem.AccessKey)
 	accountItem.Credential, _ = encrypt.StringEncryptWithBase64(accountItem.Credential)
-	account, _ := backupRepo.Get(commonRepo.WithByName(req.Name))
+	account, _ := backupRepo.Get(repo.WithByName(req.Name))
 	switch req.Operation {
 	case "create":
 		if account.ID != 0 {
@@ -80,7 +81,7 @@ func (u *BackupService) Sync(req dto.SyncFromMaster) error {
 		if account.ID == 0 {
 			return constant.ErrRecordNotFound
 		}
-		return backupRepo.Delete(commonRepo.WithByID(account.ID))
+		return backupRepo.Delete(repo.WithByID(account.ID))
 	case "update":
 		if account.ID == 0 {
 			return constant.ErrRecordNotFound
@@ -93,7 +94,7 @@ func (u *BackupService) Sync(req dto.SyncFromMaster) error {
 }
 
 func (u *BackupService) LoadBackupOptions() ([]dto.BackupOption, error) {
-	accounts, err := backupRepo.List(commonRepo.WithOrderBy("created_at desc"))
+	accounts, err := backupRepo.List(repo.WithOrderBy("created_at desc"))
 	if err != nil {
 		return nil, err
 	}
@@ -111,10 +112,10 @@ func (u *BackupService) LoadBackupOptions() ([]dto.BackupOption, error) {
 func (u *BackupService) SearchRecordsWithPage(search dto.RecordSearch) (int64, []dto.BackupRecords, error) {
 	total, records, err := backupRepo.PageRecord(
 		search.Page, search.PageSize,
-		commonRepo.WithOrderBy("created_at desc"),
-		commonRepo.WithByName(search.Name),
-		commonRepo.WithByType(search.Type),
-		commonRepo.WithByDetailName(search.DetailName),
+		repo.WithOrderBy("created_at desc"),
+		repo.WithByName(search.Name),
+		repo.WithByType(search.Type),
+		repo.WithByDetailName(search.DetailName),
 	)
 	if err != nil {
 		return 0, nil, err
@@ -133,7 +134,7 @@ func (u *BackupService) SearchRecordsWithPage(search dto.RecordSearch) (int64, [
 func (u *BackupService) SearchRecordsByCronjobWithPage(search dto.RecordSearchByCronjob) (int64, []dto.BackupRecords, error) {
 	total, records, err := backupRepo.PageRecord(
 		search.Page, search.PageSize,
-		commonRepo.WithOrderBy("created_at desc"),
+		repo.WithOrderBy("created_at desc"),
 		backupRepo.WithByCronID(search.CronjobID),
 	)
 	if err != nil {
@@ -202,10 +203,10 @@ func (u *BackupService) DownloadRecord(info dto.DownloadRecord) (string, error) 
 
 func (u *BackupService) DeleteRecordByName(backupType, name, detailName string, withDeleteFile bool) error {
 	if !withDeleteFile {
-		return backupRepo.DeleteRecord(context.Background(), commonRepo.WithByType(backupType), commonRepo.WithByName(name), commonRepo.WithByDetailName(detailName))
+		return backupRepo.DeleteRecord(context.Background(), repo.WithByType(backupType), repo.WithByName(name), repo.WithByDetailName(detailName))
 	}
 
-	records, err := backupRepo.ListRecord(commonRepo.WithByType(backupType), commonRepo.WithByName(name), commonRepo.WithByDetailName(detailName))
+	records, err := backupRepo.ListRecord(repo.WithByType(backupType), repo.WithByName(name), repo.WithByDetailName(detailName))
 	if err != nil {
 		return err
 	}
@@ -219,13 +220,13 @@ func (u *BackupService) DeleteRecordByName(backupType, name, detailName string, 
 		if _, err = client.Delete(path.Join(record.FileDir, record.FileName)); err != nil {
 			global.LOG.Errorf("remove file %s failed, err: %v", path.Join(record.FileDir, record.FileName), err)
 		}
-		_ = backupRepo.DeleteRecord(context.Background(), commonRepo.WithByID(record.ID))
+		_ = backupRepo.DeleteRecord(context.Background(), repo.WithByID(record.ID))
 	}
 	return nil
 }
 
 func (u *BackupService) BatchDeleteRecord(ids []uint) error {
-	records, err := backupRepo.ListRecord(commonRepo.WithByIDs(ids))
+	records, err := backupRepo.ListRecord(repo.WithByIDs(ids))
 	if err != nil {
 		return err
 	}
@@ -239,14 +240,14 @@ func (u *BackupService) BatchDeleteRecord(ids []uint) error {
 			global.LOG.Errorf("remove file %s failed, err: %v", path.Join(record.FileDir, record.FileName), err)
 		}
 	}
-	return backupRepo.DeleteRecord(context.Background(), commonRepo.WithByIDs(ids))
+	return backupRepo.DeleteRecord(context.Background(), repo.WithByIDs(ids))
 }
 
 func (u *BackupService) ListAppRecords(name, detailName, fileName string) ([]model.BackupRecord, error) {
 	records, err := backupRepo.ListRecord(
-		commonRepo.WithOrderBy("created_at asc"),
-		commonRepo.WithByName(name),
-		commonRepo.WithByType("app"),
+		repo.WithOrderBy("created_at asc"),
+		repo.WithByName(name),
+		repo.WithByType("app"),
 		backupRepo.WithFileNameStartWith(fileName),
 		backupRepo.WithByDetailName(detailName),
 	)
@@ -336,7 +337,7 @@ func NewBackupClientWithID(id uint) (*model.BackupAccount, cloud_storage.CloudSt
 		account.AccessKey, _ = encrypt.StringDecryptWithKey(account.AccessKey, setting.Value)
 		account.Credential, _ = encrypt.StringDecryptWithKey(account.Credential, setting.Value)
 	} else {
-		account, _ = backupRepo.Get(commonRepo.WithByID(id))
+		account, _ = backupRepo.Get(repo.WithByID(id))
 	}
 	backClient, err := newClient(&account)
 	if err != nil {
@@ -376,7 +377,7 @@ func NewBackupClientMap(ids []string) (map[string]backupClientHelper, error) {
 			item, _ := strconv.Atoi(ids[i])
 			idItems = append(idItems, uint(item))
 		}
-		accounts, _ = backupRepo.List(commonRepo.WithByIDs(idItems))
+		accounts, _ = backupRepo.List(repo.WithByIDs(idItems))
 	}
 	clientMap := make(map[string]backupClientHelper)
 	for _, item := range accounts {

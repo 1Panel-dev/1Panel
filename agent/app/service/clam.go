@@ -3,6 +3,7 @@ package service
 import (
 	"bufio"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"os"
 	"os/exec"
 	"path"
@@ -128,7 +129,7 @@ func (c *ClamService) Operate(operate string) error {
 }
 
 func (c *ClamService) SearchWithPage(req dto.SearchClamWithPage) (int64, interface{}, error) {
-	total, commands, err := clamRepo.Page(req.Page, req.PageSize, commonRepo.WithByLikeName(req.Info), commonRepo.WithOrderRuleBy(req.OrderBy, req.Order))
+	total, commands, err := clamRepo.Page(req.Page, req.PageSize, repo.WithByLikeName(req.Info), repo.WithOrderRuleBy(req.OrderBy, req.Order))
 	if err != nil {
 		return 0, nil, err
 	}
@@ -159,7 +160,7 @@ func (c *ClamService) SearchWithPage(req dto.SearchClamWithPage) (int64, interfa
 }
 
 func (c *ClamService) Create(req dto.ClamCreate) error {
-	clam, _ := clamRepo.Get(commonRepo.WithByName(req.Name))
+	clam, _ := clamRepo.Get(repo.WithByName(req.Name))
 	if clam.ID != 0 {
 		return constant.ErrRecordExist
 	}
@@ -184,7 +185,7 @@ func (c *ClamService) Create(req dto.ClamCreate) error {
 }
 
 func (c *ClamService) Update(req dto.ClamUpdate) error {
-	clam, _ := clamRepo.Get(commonRepo.WithByName(req.Name))
+	clam, _ := clamRepo.Get(repo.WithByName(req.Name))
 	if clam.ID == 0 {
 		return constant.ErrRecordNotFound
 	}
@@ -229,7 +230,7 @@ func (c *ClamService) Update(req dto.ClamUpdate) error {
 }
 
 func (c *ClamService) UpdateStatus(id uint, status string) error {
-	clam, _ := clamRepo.Get(commonRepo.WithByID(id))
+	clam, _ := clamRepo.Get(repo.WithByID(id))
 	if clam.ID == 0 {
 		return constant.ErrRecordNotFound
 	}
@@ -252,7 +253,7 @@ func (c *ClamService) UpdateStatus(id uint, status string) error {
 
 func (c *ClamService) Delete(req dto.ClamDelete) error {
 	for _, id := range req.Ids {
-		clam, _ := clamRepo.Get(commonRepo.WithByID(id))
+		clam, _ := clamRepo.Get(repo.WithByID(id))
 		if clam.ID == 0 {
 			continue
 		}
@@ -262,7 +263,7 @@ func (c *ClamService) Delete(req dto.ClamDelete) error {
 		if req.RemoveInfected {
 			_ = os.RemoveAll(path.Join(clam.InfectedDir, "1panel-infected", clam.Name))
 		}
-		if err := clamRepo.Delete(commonRepo.WithByID(id)); err != nil {
+		if err := clamRepo.Delete(repo.WithByID(id)); err != nil {
 			return err
 		}
 	}
@@ -273,7 +274,7 @@ func (c *ClamService) HandleOnce(req dto.OperateByID) error {
 	if cleaned := StopAllCronJob(true); cleaned {
 		return buserr.New("ErrClamdscanNotFound")
 	}
-	clam, _ := clamRepo.Get(commonRepo.WithByID(req.ID))
+	clam, _ := clamRepo.Get(repo.WithByID(req.ID))
 	if clam.ID == 0 {
 		return constant.ErrRecordNotFound
 	}
@@ -313,7 +314,7 @@ func (c *ClamService) HandleOnce(req dto.OperateByID) error {
 }
 
 func (c *ClamService) LoadRecords(req dto.ClamLogSearch) (int64, interface{}, error) {
-	clam, _ := clamRepo.Get(commonRepo.WithByID(req.ClamID))
+	clam, _ := clamRepo.Get(repo.WithByID(req.ClamID))
 	if clam.ID == 0 {
 		return 0, nil, constant.ErrRecordNotFound
 	}
@@ -376,7 +377,7 @@ func (c *ClamService) LoadRecordLog(req dto.ClamLogReq) (string, error) {
 }
 
 func (c *ClamService) CleanRecord(req dto.OperateByID) error {
-	clam, _ := clamRepo.Get(commonRepo.WithByID(req.ID))
+	clam, _ := clamRepo.Get(repo.WithByID(req.ID))
 	if clam.ID == 0 {
 		return constant.ErrRecordNotFound
 	}
@@ -490,7 +491,7 @@ func StopAllCronJob(withCheck bool) bool {
 			return false
 		}
 	}
-	clams, _ := clamRepo.List(commonRepo.WithByStatus(constant.StatusEnable))
+	clams, _ := clamRepo.List(repo.WithByStatus(constant.StatusEnable))
 	for i := 0; i < len(clams); i++ {
 		global.Cron.Remove(cron.EntryID(clams[i].EntryID))
 		_ = clamRepo.Update(clams[i].ID, map[string]interface{}{"status": constant.StatusDisable, "entry_id": 0})

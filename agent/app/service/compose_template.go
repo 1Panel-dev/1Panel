@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
@@ -38,7 +39,7 @@ func (u *ComposeTemplateService) List() ([]dto.ComposeTemplateInfo, error) {
 }
 
 func (u *ComposeTemplateService) SearchWithPage(req dto.SearchWithPage) (int64, interface{}, error) {
-	total, composes, err := composeRepo.Page(req.Page, req.PageSize, commonRepo.WithByLikeName(req.Info))
+	total, composes, err := composeRepo.Page(req.Page, req.PageSize, repo.WithByLikeName(req.Info))
 	var dtoComposeTemplates []dto.ComposeTemplateInfo
 	for _, compose := range composes {
 		var item dto.ComposeTemplateInfo
@@ -51,7 +52,7 @@ func (u *ComposeTemplateService) SearchWithPage(req dto.SearchWithPage) (int64, 
 }
 
 func (u *ComposeTemplateService) Create(composeDto dto.ComposeTemplateCreate) error {
-	compose, _ := composeRepo.Get(commonRepo.WithByName(composeDto.Name))
+	compose, _ := composeRepo.Get(repo.WithByName(composeDto.Name))
 	if compose.ID != 0 {
 		return constant.ErrRecordExist
 	}
@@ -66,13 +67,13 @@ func (u *ComposeTemplateService) Create(composeDto dto.ComposeTemplateCreate) er
 
 func (u *ComposeTemplateService) Delete(ids []uint) error {
 	if len(ids) == 1 {
-		compose, _ := composeRepo.Get(commonRepo.WithByID(ids[0]))
+		compose, _ := composeRepo.Get(repo.WithByID(ids[0]))
 		if compose.ID == 0 {
 			return constant.ErrRecordNotFound
 		}
-		return composeRepo.Delete(commonRepo.WithByID(ids[0]))
+		return composeRepo.Delete(repo.WithByID(ids[0]))
 	}
-	return composeRepo.Delete(commonRepo.WithByIDs(ids))
+	return composeRepo.Delete(repo.WithByIDs(ids))
 }
 
 func (u *ComposeTemplateService) Update(id uint, upMap map[string]interface{}) error {

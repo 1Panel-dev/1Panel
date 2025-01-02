@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"os"
 	"os/exec"
 	"path"
@@ -55,8 +56,8 @@ func NewIMysqlService() IMysqlService {
 func (u *MysqlService) SearchWithPage(search dto.MysqlDBSearch) (int64, interface{}, error) {
 	total, mysqls, err := mysqlRepo.Page(search.Page, search.PageSize,
 		mysqlRepo.WithByMysqlName(search.Database),
-		commonRepo.WithByLikeName(search.Info),
-		commonRepo.WithOrderRuleBy(search.OrderBy, search.Order),
+		repo.WithByLikeName(search.Info),
+		repo.WithOrderRuleBy(search.OrderBy, search.Order),
 	)
 	var dtoMysqls []dto.MysqlDBInfo
 	for _, mysql := range mysqls {
@@ -101,7 +102,7 @@ func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*mode
 		return nil, buserr.New(constant.ErrCmdIllegal)
 	}
 
-	mysql, _ := mysqlRepo.Get(commonRepo.WithByName(req.Name), mysqlRepo.WithByMysqlName(req.Database), commonRepo.WithByFrom(req.From))
+	mysql, _ := mysqlRepo.Get(repo.WithByName(req.Name), mysqlRepo.WithByMysqlName(req.Database), repo.WithByFrom(req.From))
 	if mysql.ID != 0 {
 		return nil, constant.ErrRecordExist
 	}
@@ -145,7 +146,7 @@ func (u *MysqlService) BindUser(req dto.BindUser) error {
 		return buserr.New(constant.ErrCmdIllegal)
 	}
 
-	dbItem, err := mysqlRepo.Get(mysqlRepo.WithByMysqlName(req.Database), commonRepo.WithByName(req.DB))
+	dbItem, err := mysqlRepo.Get(mysqlRepo.WithByMysqlName(req.Database), repo.WithByName(req.DB))
 	if err != nil {
 		return err
 	}
@@ -229,7 +230,7 @@ func (u *MysqlService) UpdateDescription(req dto.UpdateDescription) error {
 
 func (u *MysqlService) DeleteCheck(req dto.MysqlDBDeleteCheck) ([]string, error) {
 	var appInUsed []string
-	db, err := mysqlRepo.Get(commonRepo.WithByID(req.ID))
+	db, err := mysqlRepo.Get(repo.WithByID(req.ID))
 	if err != nil {
 		return appInUsed, err
 	}
@@ -241,7 +242,7 @@ func (u *MysqlService) DeleteCheck(req dto.MysqlDBDeleteCheck) ([]string, error)
 		}
 		apps, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithLinkId(app.ID), appInstallResourceRepo.WithResourceId(db.ID))
 		for _, app := range apps {
-			appInstall, _ := appInstallRepo.GetFirst(commonRepo.WithByID(app.AppInstallId))
+			appInstall, _ := appInstallRepo.GetFirst(repo.WithByID(app.AppInstallId))
 			if appInstall.ID != 0 {
 				appInUsed = append(appInUsed, appInstall.Name)
 			}
@@ -249,7 +250,7 @@ func (u *MysqlService) DeleteCheck(req dto.MysqlDBDeleteCheck) ([]string, error)
 	} else {
 		apps, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithResourceId(db.ID), appRepo.WithKey(req.Type))
 		for _, app := range apps {
-			appInstall, _ := appInstallRepo.GetFirst(commonRepo.WithByID(app.AppInstallId))
+			appInstall, _ := appInstallRepo.GetFirst(repo.WithByID(app.AppInstallId))
 			if appInstall.ID != 0 {
 				appInUsed = append(appInUsed, appInstall.Name)
 			}
@@ -260,7 +261,7 @@ func (u *MysqlService) DeleteCheck(req dto.MysqlDBDeleteCheck) ([]string, error)
 }
 
 func (u *MysqlService) Delete(ctx context.Context, req dto.MysqlDBDelete) error {
-	db, err := mysqlRepo.Get(commonRepo.WithByID(req.ID))
+	db, err := mysqlRepo.Get(repo.WithByID(req.ID))
 	if err != nil && !req.ForceDelete {
 		return err
 	}
@@ -288,11 +289,11 @@ func (u *MysqlService) Delete(ctx context.Context, req dto.MysqlDBDelete) error 
 		if _, err := os.Stat(backupDir); err == nil {
 			_ = os.RemoveAll(backupDir)
 		}
-		_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType(req.Type), commonRepo.WithByName(req.Database), commonRepo.WithByDetailName(db.Name))
+		_ = backupRepo.DeleteRecord(ctx, repo.WithByType(req.Type), repo.WithByName(req.Database), repo.WithByDetailName(db.Name))
 		global.LOG.Infof("delete database %s-%s backups successful", req.Database, db.Name)
 	}
 
-	_ = mysqlRepo.Delete(ctx, commonRepo.WithByID(db.ID))
+	_ = mysqlRepo.Delete(ctx, repo.WithByID(db.ID))
 	return nil
 }
 
@@ -314,7 +315,7 @@ func (u *MysqlService) ChangePassword(req dto.ChangeDBInfo) error {
 	passwordInfo.Version = version
 
 	if req.ID != 0 {
-		mysqlData, err = mysqlRepo.Get(commonRepo.WithByID(req.ID))
+		mysqlData, err = mysqlRepo.Get(repo.WithByID(req.ID))
 		if err != nil {
 			return err
 		}
@@ -340,11 +341,11 @@ func (u *MysqlService) ChangePassword(req dto.ChangeDBInfo) error {
 			appRess, _ = appInstallResourceRepo.GetBy(appInstallResourceRepo.WithResourceId(mysqlData.ID))
 		}
 		for _, appRes := range appRess {
-			appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(appRes.AppInstallId))
+			appInstall, err := appInstallRepo.GetFirst(repo.WithByID(appRes.AppInstallId))
 			if err != nil {
 				return err
 			}
-			appModel, err := appRepo.GetFirst(commonRepo.WithByID(appInstall.AppId))
+			appModel, err := appRepo.GetFirst(repo.WithByID(appInstall.AppId))
 			if err != nil {
 				return err
 			}
@@ -367,7 +368,7 @@ func (u *MysqlService) ChangePassword(req dto.ChangeDBInfo) error {
 		return err
 	}
 	if req.From == "local" {
-		remote, err := databaseRepo.Get(commonRepo.WithByName(req.Database))
+		remote, err := databaseRepo.Get(repo.WithByName(req.Database))
 		if err != nil {
 			return err
 		}
@@ -398,7 +399,7 @@ func (u *MysqlService) ChangeAccess(req dto.ChangeDBInfo) error {
 	accessInfo.Version = version
 
 	if req.ID != 0 {
-		mysqlData, err = mysqlRepo.Get(commonRepo.WithByID(req.ID))
+		mysqlData, err = mysqlRepo.Get(repo.WithByID(req.ID))
 		if err != nil {
 			return err
 		}
@@ -624,7 +625,7 @@ func LoadMysqlClientByFrom(database string) (mysql.MysqlClient, string, error) {
 	)
 
 	dbInfo.Timeout = 300
-	databaseItem, err := databaseRepo.Get(commonRepo.WithByName(database))
+	databaseItem, err := databaseRepo.Get(repo.WithByName(database))
 	if err != nil {
 		return nil, "", err
 	}

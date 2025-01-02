@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"io"
 	"os"
 	"path"
@@ -244,7 +245,7 @@ func (u *ImageService) ImagePull(req dto.ImagePull) error {
 					options.RegistryAuth = authStr
 				}
 			} else {
-				repo, err := imageRepoRepo.Get(commonRepo.WithByID(req.RepoID))
+				repo, err := imageRepoRepo.Get(repo.WithByID(req.RepoID))
 				taskItem.LogWithStatus(i18n.GetMsgByKey("ImageRepoAuthFromDB"), err)
 				if err != nil {
 					return err
@@ -355,19 +356,19 @@ func (u *ImageService) ImagePush(req dto.ImagePush) error {
 
 	go func() {
 		options := image.PushOptions{All: true}
-		var repo model.ImageRepo
+		var imageRepo model.ImageRepo
 		newName := ""
 		taskItem.AddSubTask(i18n.GetMsgByKey("ImagePush"), func(t *task.Task) error {
-			repo, err = imageRepoRepo.Get(commonRepo.WithByID(req.RepoID))
-			newName = fmt.Sprintf("%s/%s", repo.DownloadUrl, req.Name)
+			imageRepo, err = imageRepoRepo.Get(repo.WithByID(req.RepoID))
+			newName = fmt.Sprintf("%s/%s", imageRepo.DownloadUrl, req.Name)
 			taskItem.LogWithStatus(i18n.GetMsgByKey("ImageRepoAuthFromDB"), err)
 			if err != nil {
 				return err
 			}
 			options = image.PushOptions{All: true}
 			authConfig := registry.AuthConfig{
-				Username: repo.Username,
-				Password: repo.Password,
+				Username: imageRepo.Username,
+				Password: imageRepo.Password,
 			}
 			encodedJSON, _ := json.Marshal(authConfig)
 			authStr := base64.URLEncoding.EncodeToString(encodedJSON)

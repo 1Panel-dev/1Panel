@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	network "net"
 	"os"
 	"sort"
@@ -62,7 +63,7 @@ func (u *DashboardService) Sync(req dto.SyncFromMaster) error {
 		if launcher.ID == 0 {
 			return constant.ErrRecordNotFound
 		}
-		return launcherRepo.Delete(commonRepo.WithByID(launcher.ID))
+		return launcherRepo.Delete(repo.WithByID(launcher.ID))
 	case "update":
 		if launcher.ID == 0 {
 			return constant.ErrRecordNotFound

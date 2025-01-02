@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"strconv"
 	"time"
 
@@ -52,7 +53,7 @@ func (m *MonitorService) LoadMonitorData(req dto.MonitorSearch) ([]dto.MonitorDa
 
 	var data []dto.MonitorData
 	if req.Param == "all" || req.Param == "cpu" || req.Param == "memory" || req.Param == "load" {
-		bases, err := monitorRepo.GetBase(commonRepo.WithByCreatedAt(req.StartTime, req.EndTime))
+		bases, err := monitorRepo.GetBase(repo.WithByCreatedAt(req.StartTime, req.EndTime))
 		if err != nil {
 			return nil, err
 		}
@@ -66,7 +67,7 @@ func (m *MonitorService) LoadMonitorData(req dto.MonitorSearch) ([]dto.MonitorDa
 		data = append(data, itemData)
 	}
 	if req.Param == "all" || req.Param == "io" {
-		bases, err := monitorRepo.GetIO(commonRepo.WithByCreatedAt(req.StartTime, req.EndTime))
+		bases, err := monitorRepo.GetIO(repo.WithByCreatedAt(req.StartTime, req.EndTime))
 		if err != nil {
 			return nil, err
 		}
@@ -80,7 +81,7 @@ func (m *MonitorService) LoadMonitorData(req dto.MonitorSearch) ([]dto.MonitorDa
 		data = append(data, itemData)
 	}
 	if req.Param == "all" || req.Param == "network" {
-		bases, err := monitorRepo.GetIO(commonRepo.WithByName(req.Info), commonRepo.WithByCreatedAt(req.StartTime, req.EndTime))
+		bases, err := monitorRepo.GetIO(repo.WithByName(req.Info), repo.WithByCreatedAt(req.StartTime, req.EndTime))
 		if err != nil {
 			return nil, err
 		}

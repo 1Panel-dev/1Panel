@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"os"
 	"sort"
 
@@ -74,7 +75,7 @@ func (u *FtpService) Operate(operation string) error {
 }
 
 func (f *FtpService) SearchWithPage(req dto.SearchWithPage) (int64, interface{}, error) {
-	total, lists, err := ftpRepo.Page(req.Page, req.PageSize, ftpRepo.WithLikeUser(req.Info), commonRepo.WithOrderBy("created_at desc"))
+	total, lists, err := ftpRepo.Page(req.Page, req.PageSize, ftpRepo.WithLikeUser(req.Info), repo.WithOrderBy("created_at desc"))
 	if err != nil {
 		return 0, nil, err
 	}
@@ -171,12 +172,12 @@ func (f *FtpService) Delete(req dto.BatchDeleteReq) error {
 		return err
 	}
 	for _, id := range req.Ids {
-		ftpItem, err := ftpRepo.Get(commonRepo.WithByID(id))
+		ftpItem, err := ftpRepo.Get(repo.WithByID(id))
 		if err != nil {
 			return err
 		}
 		_ = client.UserDel(ftpItem.User)
-		_ = ftpRepo.Delete(commonRepo.WithByID(id))
+		_ = ftpRepo.Delete(repo.WithByID(id))
 	}
 	return nil
 }
@@ -196,7 +197,7 @@ func (f *FtpService) Update(req dto.FtpUpdate) error {
 	if err != nil {
 		return err
 	}
-	ftpItem, _ := ftpRepo.Get(commonRepo.WithByID(req.ID))
+	ftpItem, _ := ftpRepo.Get(repo.WithByID(req.ID))
 	if ftpItem.ID == 0 {
 		return constant.ErrRecordNotFound
 	}

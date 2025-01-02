@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"os"
 	"path"
 	"strconv"
@@ -45,7 +46,7 @@ func NewISnapshotService() ISnapshotService {
 }
 
 func (u *SnapshotService) SearchWithPage(req dto.PageSnapshot) (int64, interface{}, error) {
-	total, records, err := snapshotRepo.Page(req.Page, req.PageSize, commonRepo.WithByLikeName(req.Info), commonRepo.WithOrderRuleBy(req.OrderBy, req.Order))
+	total, records, err := snapshotRepo.Page(req.Page, req.PageSize, repo.WithByLikeName(req.Info), repo.WithOrderRuleBy(req.OrderBy, req.Order))
 	if err != nil {
 		return 0, nil, err
 	}
@@ -61,7 +62,7 @@ func (u *SnapshotService) SearchWithPage(req dto.PageSnapshot) (int64, interface
 }
 
 func (u *SnapshotService) LoadSize(req dto.SearchWithPage) ([]dto.SnapshotFile, error) {
-	_, records, err := snapshotRepo.Page(req.Page, req.PageSize, commonRepo.WithByLikeName(req.Info))
+	_, records, err := snapshotRepo.Page(req.Page, req.PageSize, repo.WithByLikeName(req.Info))
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +113,7 @@ func (u *SnapshotService) SnapshotImport(req dto.SnapshotImport) error {
 		return fmt.Errorf("incorrect snapshot request body: %v", req.Names)
 	}
 	for _, snapName := range req.Names {
-		snap, _ := snapshotRepo.Get(commonRepo.WithByName(strings.ReplaceAll(snapName, ".tar.gz", "")))
+		snap, _ := snapshotRepo.Get(repo.WithByName(strings.ReplaceAll(snapName, ".tar.gz", "")))
 		if snap.ID != 0 {
 			return constant.ErrRecordExist
 		}
@@ -185,7 +186,7 @@ type SnapshotJson struct {
 }
 
 func (u *SnapshotService) Delete(req dto.SnapshotBatchDelete) error {
-	snaps, _ := snapshotRepo.GetList(commonRepo.WithByIDs(req.Ids))
+	snaps, _ := snapshotRepo.GetList(repo.WithByIDs(req.Ids))
 	for _, snap := range snaps {
 		if req.DeleteWithFile {
 			accounts, err := NewBackupClientMap(strings.Split(snap.SourceAccountIDs, ","))
@@ -198,7 +199,7 @@ func (u *SnapshotService) Delete(req dto.SnapshotBatchDelete) error {
 			}
 		}
 
-		if err := snapshotRepo.Delete(commonRepo.WithByID(snap.ID)); err != nil {
+		if err := snapshotRepo.Delete(repo.WithByID(snap.ID)); err != nil {
 			return err
 		}
 	}

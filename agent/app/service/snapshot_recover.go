@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"os"
 	"path"
 	"strings"
@@ -28,7 +29,7 @@ type snapRecoverHelper struct {
 
 func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 	global.LOG.Info("start to recover panel by snapshot now")
-	snap, err := snapshotRepo.Get(commonRepo.WithByID(req.ID))
+	snap, err := snapshotRepo.Get(repo.WithByID(req.ID))
 	if err != nil {
 		return err
 	}

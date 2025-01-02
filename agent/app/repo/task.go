@@ -2,7 +2,6 @@ package repo
 
 import (
 	"context"
-
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 
@@ -24,6 +23,7 @@ type ITaskRepo interface {
 	WithByID(id string) DBOption
 	WithResourceID(id uint) DBOption
 	WithOperate(taskOperate string) DBOption
+	WithByStatus(status string) DBOption
 }
 
 func NewITaskRepo() ITaskRepo {
@@ -67,6 +67,12 @@ func (t TaskRepo) WithResourceID(id uint) DBOption {
 	}
 }
 
+func (t TaskRepo) WithByStatus(status string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("status = ?", status)
+	}
+}
+
 func (t TaskRepo) Save(ctx context.Context, task *model.Task) error {
 	return getTaskTx(ctx).Save(&task).Error
 }
@@ -94,11 +100,11 @@ func (t TaskRepo) Update(ctx context.Context, task *model.Task) error {
 }
 
 func (t TaskRepo) UpdateRunningTaskToFailed() error {
-	return getTaskDb(commonRepo.WithByStatus(constant.StatusExecuting)).Model(&model.Task{}).Updates(map[string]interface{}{"status": constant.StatusFailed, "error_msg": "1Panel restart causes failure"}).Error
+	return getTaskDb(t.WithByStatus(constant.StatusExecuting)).Model(&model.Task{}).Updates(map[string]interface{}{"status": constant.StatusFailed, "error_msg": "1Panel restart causes failure"}).Error
 }
 
 func (t TaskRepo) CountExecutingTask() (int64, error) {
 	var count int64
-	err := getTaskDb(commonRepo.WithByStatus(constant.StatusExecuting)).Model(&model.Task{}).Count(&count).Error
+	err := getTaskDb(t.WithByStatus(constant.StatusExecuting)).Model(&model.Task{}).Count(&count).Error
 	return count, err
 }

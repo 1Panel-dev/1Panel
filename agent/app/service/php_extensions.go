@@ -4,6 +4,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 )
@@ -61,7 +62,7 @@ func (p PHPExtensionsService) List() ([]response.PHPExtensionsDTO, error) {
 }
 
 func (p PHPExtensionsService) Create(req request.PHPExtensionsCreate) error {
-	exist, _ := phpExtensionsRepo.GetFirst(commonRepo.WithByName(req.Name))
+	exist, _ := phpExtensionsRepo.GetFirst(repo.WithByName(req.Name))
 	if exist.ID > 0 {
 		return buserr.New(constant.ErrNameIsExist)
 	}
@@ -73,7 +74,7 @@ func (p PHPExtensionsService) Create(req request.PHPExtensionsCreate) error {
 }
 
 func (p PHPExtensionsService) Update(req request.PHPExtensionsUpdate) error {
-	exist, err := phpExtensionsRepo.GetFirst(commonRepo.WithByID(req.ID))
+	exist, err := phpExtensionsRepo.GetFirst(repo.WithByID(req.ID))
 	if err != nil {
 		return err
 	}
@@ -82,5 +83,5 @@ func (p PHPExtensionsService) Update(req request.PHPExtensionsUpdate) error {
 }
 
 func (p PHPExtensionsService) Delete(req request.PHPExtensionsDelete) error {
-	return phpExtensionsRepo.DeleteBy(commonRepo.WithByID(req.ID))
+	return phpExtensionsRepo.DeleteBy(repo.WithByID(req.ID))
 }

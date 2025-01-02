@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx/parser"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
@@ -155,7 +156,7 @@ func createLink(ctx context.Context, installTask *task.Task, app model.App, appI
 				Address:      appInstall.ServiceName,
 				Port:         DatabaseKeys[app.Key],
 			}
-			detail, err := appDetailRepo.GetFirst(commonRepo.WithByID(appInstall.AppDetailId))
+			detail, err := appDetailRepo.GetFirst(repo.WithByID(appInstall.AppDetailId))
 			if err != nil {
 				return err
 			}
@@ -250,7 +251,7 @@ func createLink(ctx context.Context, installTask *task.Task, app model.App, appI
 			if hostName == nil || hostName.(string) == "" {
 				return nil
 			}
-			database, _ := databaseRepo.Get(commonRepo.WithByName(hostName.(string)))
+			database, _ := databaseRepo.Get(repo.WithByName(hostName.(string)))
 			if database.ID == 0 {
 				return nil
 			}
@@ -258,7 +259,7 @@ func createLink(ctx context.Context, installTask *task.Task, app model.App, appI
 			if dbConfig.DbName != "" && dbConfig.DbUser != "" && dbConfig.Password != "" {
 				switch database.Type {
 				case constant.AppPostgresql, constant.AppPostgres:
-					oldPostgresqlDb, _ := postgresqlRepo.Get(commonRepo.WithByName(dbConfig.DbName), commonRepo.WithByFrom(constant.ResourceLocal))
+					oldPostgresqlDb, _ := postgresqlRepo.Get(repo.WithByName(dbConfig.DbName), repo.WithByFrom(constant.ResourceLocal))
 					resourceId = oldPostgresqlDb.ID
 					if oldPostgresqlDb.ID > 0 {
 						if oldPostgresqlDb.Username != dbConfig.DbUser || oldPostgresqlDb.Password != dbConfig.Password {
@@ -280,7 +281,7 @@ func createLink(ctx context.Context, installTask *task.Task, app model.App, appI
 						resourceId = pgdb.ID
 					}
 				case constant.AppMysql, constant.AppMariaDB:
-					oldMysqlDb, _ := mysqlRepo.Get(commonRepo.WithByName(dbConfig.DbName), commonRepo.WithByFrom(constant.ResourceLocal))
+					oldMysqlDb, _ := mysqlRepo.Get(repo.WithByName(dbConfig.DbName), repo.WithByFrom(constant.ResourceLocal))
 					resourceId = oldMysqlDb.ID
 					if oldMysqlDb.ID > 0 {
 						if oldMysqlDb.Username != dbConfig.DbUser || oldMysqlDb.Password != dbConfig.Password {
@@ -411,7 +412,7 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 			_ = postgresqlRepo.Delete(ctx, postgresqlRepo.WithByPostgresqlName(install.Name))
 		}
 
-		_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType("app"), commonRepo.WithByName(install.App.Key), commonRepo.WithByDetailName(install.Name))
+		_ = backupRepo.DeleteRecord(ctx, repo.WithByType("app"), repo.WithByName(install.App.Key), repo.WithByDetailName(install.Name))
 		uploadDir := path.Join(global.CONF.System.BaseDir, fmt.Sprintf("1panel/uploads/app/%s/%s", install.App.Key, install.Name))
 		if _, err := os.Stat(uploadDir); err == nil {
 			_ = os.RemoveAll(uploadDir)
@@ -448,7 +449,7 @@ func deleteLink(del dto.DelAppLink) error {
 		switch re.Key {
 		case constant.AppMysql, constant.AppMariaDB:
 			mysqlService := NewIMysqlService()
-			database, _ := mysqlRepo.Get(commonRepo.WithByID(re.ResourceId))
+			database, _ := mysqlRepo.Get(repo.WithByID(re.ResourceId))
 			if reflect.DeepEqual(database, model.DatabaseMysql{}) {
 				continue
 			}
@@ -463,7 +464,7 @@ func deleteLink(del dto.DelAppLink) error {
 			}
 		case constant.AppPostgresql:
 			pgsqlService := NewIPostgresqlService()
-			database, _ := postgresqlRepo.Get(commonRepo.WithByID(re.ResourceId))
+			database, _ := postgresqlRepo.Get(repo.WithByID(re.ResourceId))
 			if reflect.DeepEqual(database, model.DatabasePostgresql{}) {
 				continue
 			}
@@ -535,11 +536,11 @@ func getUpgradeCompose(install model.AppInstall, detail model.AppDetail) (string
 }
 
 func upgradeInstall(req request.AppInstallUpgrade) error {
-	install, err := appInstallRepo.GetFirst(commonRepo.WithByID(req.InstallID))
+	install, err := appInstallRepo.GetFirst(repo.WithByID(req.InstallID))
 	if err != nil {
 		return err
 	}
-	detail, err := appDetailRepo.GetFirst(commonRepo.WithByID(req.DetailID))
+	detail, err := appDetailRepo.GetFirst(repo.WithByID(req.DetailID))
 	if err != nil {
 		return err
 	}
@@ -711,16 +712,16 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 			}
 			t.Log(i18n.GetMsgByKey("DeleteRuntimePHP"))
 			_ = fileOp.DeleteDir(path.Join(constant.RuntimeDir, "php"))
-			websites, _ := websiteRepo.List(commonRepo.WithByType("runtime"))
+			websites, _ := websiteRepo.List(repo.WithByType("runtime"))
 			for _, website := range websites {
-				runtime, _ := runtimeRepo.GetFirst(commonRepo.WithByID(website.RuntimeID))
+				runtime, _ := runtimeRepo.GetFirst(repo.WithByID(website.RuntimeID))
 				if runtime != nil && runtime.Type == "php" {
 					website.Type = constant.Static
 					website.RuntimeID = 0
 					_ = websiteRepo.SaveWithoutCtx(&website)
 				}
 			}
-			_ = runtimeRepo.DeleteBy(commonRepo.WithByType("php"))
+			_ = runtimeRepo.DeleteBy(repo.WithByType("php"))
 			t.Log(i18n.GetMsgByKey("MoveSiteDirSuccess"))
 		}
 
@@ -766,7 +767,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 	go func() {
 		err = upgradeTask.Execute()
 		if err != nil {
-			existInstall, _ := appInstallRepo.GetFirst(commonRepo.WithByID(req.InstallID))
+			existInstall, _ := appInstallRepo.GetFirst(repo.WithByID(req.InstallID))
 			if existInstall.ID > 0 && existInstall.Status != constant.Running {
 				existInstall.Status = constant.UpgradeErr
 				existInstall.Message = err.Error()
@@ -1082,7 +1083,7 @@ func upApp(task *task.Task, appInstall *model.AppInstall, pullImages bool) error
 		task.LogSuccess(logStr)
 		return
 	}
-	exist, _ := appInstallRepo.GetFirst(commonRepo.WithByID(appInstall.ID))
+	exist, _ := appInstallRepo.GetFirst(repo.WithByID(appInstall.ID))
 	if exist.ID > 0 {
 		containerNames, err := getContainerNames(*appInstall)
 		if err == nil {
@@ -1439,7 +1440,7 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool)
 		if updated {
 			installDTO.DockerCompose = installed.DockerCompose
 		}
-		app, err := appRepo.GetFirst(commonRepo.WithByID(installed.AppId))
+		app, err := appRepo.GetFirst(repo.WithByID(installed.AppId))
 		if err != nil {
 			return nil, err
 		}

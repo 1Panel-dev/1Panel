@@ -3,6 +3,7 @@ package service
 import (
 	"bufio"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"os"
 	"path"
 	"strconv"
@@ -41,7 +42,7 @@ func NewICronjobService() ICronjobService {
 }
 
 func (u *CronjobService) SearchWithPage(search dto.PageCronjob) (int64, interface{}, error) {
-	total, cronjobs, err := cronjobRepo.Page(search.Page, search.PageSize, commonRepo.WithByLikeName(search.Info), commonRepo.WithOrderRuleBy(search.OrderBy, search.Order))
+	total, cronjobs, err := cronjobRepo.Page(search.Page, search.PageSize, repo.WithByLikeName(search.Info), repo.WithOrderRuleBy(search.OrderBy, search.Order))
 	var dtoCronjobs []dto.CronjobInfo
 	for _, cronjob := range cronjobs {
 		var item dto.CronjobInfo
@@ -64,9 +65,9 @@ func (u *CronjobService) SearchRecords(search dto.SearchRecord) (int64, interfac
 	total, records, err := cronjobRepo.PageRecords(
 		search.Page,
 		search.PageSize,
-		commonRepo.WithByStatus(search.Status),
+		repo.WithByStatus(search.Status),
 		cronjobRepo.WithByJobID(search.CronjobID),
-		commonRepo.WithByDate(search.StartTime, search.EndTime))
+		repo.WithByDate(search.StartTime, search.EndTime))
 	var dtoCronjobs []dto.Record
 	for _, record := range records {
 		var item dto.Record
@@ -97,7 +98,7 @@ func (u *CronjobService) LoadNextHandle(specStr string) ([]string, error) {
 }
 
 func (u *CronjobService) LoadRecordLog(req dto.OperateByID) string {
-	record, err := cronjobRepo.GetRecord(commonRepo.WithByID(req.ID))
+	record, err := cronjobRepo.GetRecord(repo.WithByID(req.ID))
 	if err != nil {
 		return ""
 	}
@@ -112,7 +113,7 @@ func (u *CronjobService) LoadRecordLog(req dto.OperateByID) string {
 }
 
 func (u *CronjobService) CleanRecord(req dto.CronjobClean) error {
-	cronjob, err := cronjobRepo.Get(commonRepo.WithByID(req.CronjobID))
+	cronjob, err := cronjobRepo.Get(repo.WithByID(req.CronjobID))
 	if err != nil {
 		return err
 	}
@@ -149,7 +150,7 @@ func (u *CronjobService) CleanRecord(req dto.CronjobClean) error {
 }
 
 func (u *CronjobService) Download(req dto.CronjobDownload) (string, error) {
-	record, _ := cronjobRepo.GetRecord(commonRepo.WithByID(req.RecordID))
+	record, _ := cronjobRepo.GetRecord(repo.WithByID(req.RecordID))
 	if record.ID == 0 {
 		return "", constant.ErrRecordNotFound
 	}
@@ -175,7 +176,7 @@ func (u *CronjobService) Download(req dto.CronjobDownload) (string, error) {
 }
 
 func (u *CronjobService) HandleOnce(id uint) error {
-	cronjob, _ := cronjobRepo.Get(commonRepo.WithByID(id))
+	cronjob, _ := cronjobRepo.Get(repo.WithByID(id))
 	if cronjob.ID == 0 {
 		return constant.ErrRecordNotFound
 	}
@@ -184,7 +185,7 @@ func (u *CronjobService) HandleOnce(id uint) error {
 }
 
 func (u *CronjobService) Create(req dto.CronjobCreate) error {
-	cronjob, _ := cronjobRepo.Get(commonRepo.WithByName(req.Name))
+	cronjob, _ := cronjobRepo.Get(repo.WithByName(req.Name))
 	if cronjob.ID != 0 {
 		return constant.ErrRecordExist
 	}
@@ -231,7 +232,7 @@ func (u *CronjobService) StartJob(cronjob *model.Cronjob, isUpdate bool) (string
 
 func (u *CronjobService) Delete(req dto.CronjobBatchDelete) error {
 	for _, id := range req.IDs {
-		cronjob, _ := cronjobRepo.Get(commonRepo.WithByID(id))
+		cronjob, _ := cronjobRepo.Get(repo.WithByID(id))
 		if cronjob.ID == 0 {
 			return errors.New("find cronjob in db failed")
 		}
@@ -244,7 +245,7 @@ func (u *CronjobService) Delete(req dto.CronjobBatchDelete) error {
 		if err := u.CleanRecord(dto.CronjobClean{CronjobID: id, CleanData: req.CleanData, IsDelete: true}); err != nil {
 			return err
 		}
-		if err := cronjobRepo.Delete(commonRepo.WithByID(id)); err != nil {
+		if err := cronjobRepo.Delete(repo.WithByID(id)); err != nil {
 			return err
 		}
 	}
@@ -257,7 +258,7 @@ func (u *CronjobService) Update(id uint, req dto.CronjobUpdate) error {
 	if err := copier.Copy(&cronjob, &req); err != nil {
 		return errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
-	cronModel, err := cronjobRepo.Get(commonRepo.WithByID(id))
+	cronModel, err := cronjobRepo.Get(repo.WithByID(id))
 	if err != nil {
 		return constant.ErrRecordNotFound
 	}
@@ -304,7 +305,7 @@ func (u *CronjobService) Update(id uint, req dto.CronjobUpdate) error {
 }
 
 func (u *CronjobService) UpdateStatus(id uint, status string) error {
-	cronjob, _ := cronjobRepo.Get(commonRepo.WithByID(id))
+	cronjob, _ := cronjobRepo.Get(repo.WithByID(id))
 	if cronjob.ID == 0 {
 		return errors.WithMessage(constant.ErrRecordNotFound, "record not found")
 	}
