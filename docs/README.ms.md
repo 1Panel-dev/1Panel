@@ -1,5 +1,5 @@
 <p align="center"><a href="https://1panel.hk"><img src="https://resource.1panel.hk/img/1panel-logo.png" alt="1Panel" width="300" /></a></p>
-<p align="center"><b>Herramienta de gestión de servidores Linux basada en la web mejor valorada</b></p>
+<p align="center"><b>Alat Pengurusan Pelayan Linux Berasaskan Web Terbaik</b></p>
 <p align="center">
   <a href="https://trendshift.io/repositories/2462" target="_blank"><img src="https://trendshift.io/api/badge/repositories/2462" alt="1Panel-dev%2F1Panel | Trendshift" style="width: 180px; height: auto;" /></a>
   <a href="https://www.producthunt.com/posts/1panel?embed=true&utm_source=badge-featured&utm_medium=badge&utm_souce=badge-1panel" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=639696&theme=light" alt="1Panel - Top&#0045;Rated&#0032;web&#0045;based&#0032;Linux&#0032;server&#0032;management&#0032;tool | Product Hunt" style="width: 180px; height: auto;" /></a>
@@ -9,7 +9,7 @@
   <a href="https://app.codacy.com/gh/1Panel-dev/1Panel?utm_source=github.com&utm_medium=referral&utm_content=1Panel-dev/1Panel&utm_campaign=Badge_Grade_Dashboard"><img src="https://app.codacy.com/project/badge/Grade/da67574fd82b473992781d1386b937ef" alt="Codacy"></a>
   <a href="https://discord.gg/bUpUqWqdRr" target="_blank">
         <img src="https://img.shields.io/discord/1318846410149335080?logo=discord&labelColor=%20%235462eb&logoColor=%20%23f5f5f5&color=%20%235462eb"
-            alt="chat on Discord"></a>  
+            alt="chat on Discord"></a>
   <a href="https://github.com/1Panel-dev/1Panel/releases"><img src="https://img.shields.io/github/v/release/1Panel-dev/1Panel" alt="GitHub release"></a>
   <a href="https://github.com/1Panel-dev/1Panel"><img src="https://img.shields.io/github/stars/1Panel-dev/1Panel?color=%231890FF&style=flat-square" alt="Stars"></a><br>
 </p>
@@ -32,40 +32,40 @@
 
 ------------------------------
 
-1Panel es un panel de control moderno y de código abierto basado en la web para la gestión de servidores Linux.
+1Panel ialah panel kawalan moden sumber terbuka berasaskan web untuk pengurusan pelayan Linux.
 
-- **Gestión eficiente**: los usuarios pueden gestionar fácilmente servidores Linux a través de una interfaz web, como monitoreo de hosts, gestión de archivos, gestión de bases de datos, gestión de contenedores, entre otros;  
-- **Creación rápida de sitios web**: integración profunda con el software de creación de sitios web de código abierto WordPress y Halo, operaciones como vinculación de dominios y configuración de certificados SSL se realizan con un solo clic;  
-- **Tienda de aplicaciones**: selección de diversas herramientas y software de código abierto de alta calidad, ayudando a los usuarios a instalar y actualizar fácilmente;  
-- **Seguro y confiable**: basado en la gestión de contenedores y el despliegue de aplicaciones, se logra la mínima exposición a vulnerabilidades, al tiempo que se ofrecen funciones como protección contra virus, cortafuegos y auditoría de registros;  
-- **Copia de seguridad con un clic**: soporta copias de seguridad y restauraciones con un clic, los usuarios pueden respaldar datos en diversos medios de almacenamiento en la nube, asegurando que nunca se pierdan.
+- **Pengurusan yang Cekap**: Melalui antara muka grafik web yang mesra pengguna, 1Panel membolehkan pengguna menguruskan pelayan Linux mereka dengan mudah. Ciri utama termasuk pemantauan hos, pengurusan fail, pentadbiran pangkalan data, dan pengurusan kontena.
+- **Penggunaan Laman Web yang Pantas**: Dengan integrasi mendalam perisian pembinaan laman web sumber terbuka popular seperti WordPress, 1Panel mempermudah proses pengikatan domain dan konfigurasi sijil SSL, semuanya boleh dicapai dengan hanya satu klik.
+- **Gedung Aplikasi**: 1Panel menyediakan pelbagai alat dan aplikasi sumber terbuka berkualiti tinggi, memudahkan pemasangan dan kemas kini untuk penggunanya.
+- **Keselamatan dan Kebolehpercayaan**: Dengan memanfaatkan penggunaan kontena dan amalan penyebaran aplikasi yang selamat, 1Panel meminimumkan pendedahan terhadap kerentanan. Ia turut meningkatkan keselamatan melalui pengurusan firewall yang terintegrasi dan keupayaan pengauditan log.
+- **Sandaran & Pemulihan Satu Klik**: Perlindungan data menjadi mudah dengan fungsi sandaran dan pemulihan satu klik 1Panel, yang menyokong pelbagai penyelesaian storan awan untuk memastikan integriti dan ketersediaan data.
 
-## Inicio Rápido
+## Permulaan Pantas
 
-Ejecute el script a continuación y siga las indicaciones para instalar 1Panel:
+Jalankan skrip di bawah dan ikuti arahan untuk memasang 1Panel:
 
 ```bash
 curl -sSL https://resource.1panel.hk/quick_start.sh -o quick_start.sh && bash quick_start.sh
 ```
 
-Por favor, consulte nuestra [dokumentasi](https://docs.1panel.hk/quick_start/) para más detalles.
+Sila rujuk [dokumentasi](https://docs.1panel.hk/quick_start/) untuk maklumat lanjut.
 
-## Captura de Pantalla
+## Tangkap Layar
 
 ![UI Display](https://resource.1panel.hk/img/1panel.png)
 
-## Historial de Estrellas
+## Sejarah Bintang
 
 [![Star History Chart](https://api.star-history.com/svg?repos=1Panel-dev/1Panel&type=Date)](https://star-history.com/#1Panel-dev/1Panel&Date)
 
-## Información de Seguridad
+## Maklumat Keselamatan
 
-Si descubre algún problema de seguridad, contáctenos a través de: wanghe@fit2cloud.com.
+Jika anda menemui sebarang isu keselamatan, sila hubungi kami melalui: wanghe@fit2cloud.com.
 
-## Licencia
+## Lesen
 
-Licenciado bajo la Licencia Pública General GNU versión 3 (GPLv3) (la "Licencia"); no puede usar este archivo excepto en cumplimiento con la Licencia. Puede obtener una copia de la Licencia en
+Dilesenkan di bawah Lesen Awam Am GNU versi 3 (GPLv3) (selepas ini disebut sebagai "Lesen"); anda tidak boleh menggunakan fail ini kecuali mematuhi terma-terma Lesen. Anda boleh mendapatkan salinan Lesen di:
 
 <https://www.gnu.org/licenses/gpl-3.0.html>
 
-A menos que lo exija la ley aplicable o se acuerde por escrito, el software distribuido bajo la Licencia se distribuye en una BASE "TAL CUAL", SIN GARANTÍAS O CONDICIONES DE NINGÚN TIPO, ya sean expresas o implícitas. Consulte la Licencia para el lenguaje específico que rige los permisos y limitaciones bajo la Licencia.
+Kecuali dikehendaki oleh undang-undang yang berkuat kuasa atau dipersetujui secara bertulis, perisian yang diedarkan di bawah Lesen ini diedarkan "SEBAGAIMANA ADANYA", TANPA SEBARANG JAMINAN ATAU SYARAT, sama ada tersurat atau tersirat. Sila rujuk Lesen untuk bahasa khusus yang mengawal hak dan batasan di bawah Lesen ini.
