@@ -137,17 +137,20 @@ const message = {
             operateConfirm: 'Jika anda pasti dengan operasi ini, sila masukkan secara manual:',
             inputOrSelect: 'Sila pilih atau masukkan',
             copyFailed: 'Gagal disalin',
-            operatorHelper: 'Operasi "{1}" akan dilakukan pada "{0}" dan tidak boleh diundur. Adakah anda mahu meneruskan?',
+            operatorHelper:
+                'Operasi "{1}" akan dilakukan pada "{0}" dan tidak boleh diundur. Adakah anda mahu meneruskan?',
             notFound: 'Maaf, halaman yang anda minta tidak wujud.',
             unSupportType: 'Jenis fail semasa tidak disokong.',
             unSupportSize: 'Fail yang dimuat naik melebihi {0}M, sila sahkan!',
             fileExist: 'Fail sudah wujud dalam folder semasa. Memuat naik semula tidak disokong.',
-            fileNameErr: 'Anda hanya boleh memuat naik fail dengan nama yang mengandungi 1 hingga 256 aksara, termasuk Bahasa Inggeris, Cina, nombor, atau titik (.-_)',
+            fileNameErr:
+                'Anda hanya boleh memuat naik fail dengan nama yang mengandungi 1 hingga 256 aksara, termasuk Bahasa Inggeris, Cina, nombor, atau titik (.-_)',
             confirmNoNull: 'Pastikan nilai {0} tidak kosong.',
             errPort: 'Maklumat port tidak betul, sila sahkan!',
             remove: 'Buang',
             backupHelper: 'Operasi semasa akan membuat sandaran {0}. Adakah anda mahu meneruskan?',
-            recoverHelper: 'Memulihkan daripada fail {0}. Operasi ini tidak boleh diundur. Adakah anda mahu meneruskan?',
+            recoverHelper:
+                'Memulihkan daripada fail {0}. Operasi ini tidak boleh diundur. Adakah anda mahu meneruskan?',
             refreshSuccess: 'Berjaya disegarkan',
             rootInfoErr: 'Ia sudah menjadi direktori akar',
             resetSuccess: 'Berjaya ditetapkan semula',
@@ -188,7 +191,8 @@ const message = {
             illegalInput: 'Ruangan ini tidak boleh mengandungi aksara tidak sah.',
             commonName:
                 'Ruangan ini mesti bermula dengan aksara bukan khas dan mesti terdiri daripada aksara rumi, Cina, nombor, ".", "-", dan "_" dengan panjang 1-128 aksara.',
-            userName: 'Ruangan ini mesti terdiri daripada aksara rumi, Cina, nombor, dan "_" dengan panjang 3-30 aksara.',
+            userName:
+                'Ruangan ini mesti terdiri daripada aksara rumi, Cina, nombor, dan "_" dengan panjang 3-30 aksara.',
             simpleName: `Ruangan ini tidak boleh bermula dengan aksara garis bawah ("_") dan mesti terdiri daripada aksara rumi, nombor, dan "_" dengan panjang 3-30 aksara.`,
             simplePassword: `Ruangan ini tidak boleh bermula dengan aksara garis bawah ("_") dan mesti terdiri daripada aksara rumi, nombor, dan "_" dengan panjang 1-30 aksara.`,
             dbName: `Ruangan ini tidak boleh bermula dengan aksara garis bawah ("_") dan mesti terdiri daripada aksara rumi, nombor, dan "_" dengan panjang 1-64 aksara.`,
@@ -213,16 +217,20 @@ const message = {
             port: 'Ruangan ini mesti mengandungi nombor port yang sah.',
             selectHelper: 'Sila pilih fail {0} yang betul',
             domain: 'Ruangan ini mesti dalam format: example.com atau example.com:8080.',
-            databaseName: 'Ruangan ini mesti terdiri daripada aksara Bahasa Inggeris, nombor, dan "_" dengan panjang 1-30 aksara.',
+            databaseName:
+                'Ruangan ini mesti terdiri daripada aksara Bahasa Inggeris, nombor, dan "_" dengan panjang 1-30 aksara.',
             ipErr: 'Ruangan ini mesti mengandungi alamat IP yang sah.',
             numberRange: 'Ruangan ini mesti mengandungi nombor antara {0} dan {1}.',
             paramName:
                 'Ruangan ini mesti terdiri daripada aksara rumi, nombor, ".", "-", dan "_" dengan panjang 2-30 aksara.',
-            paramComplexity: 'Ruangan ini tidak boleh bermula atau berakhir dengan aksara khas dan mesti terdiri daripada aksara rumi, nombor, "{0}" dengan panjang 6-128 aksara.',
+            paramComplexity:
+                'Ruangan ini tidak boleh bermula atau berakhir dengan aksara khas dan mesti terdiri daripada aksara rumi, nombor, "{0}" dengan panjang 6-128 aksara.',
             paramUrlAndPort: 'Ruangan ini mesti dalam format "http(s)://(nama domain/IP):(port)".',
             nginxDoc: 'Ruangan ini mesti terdiri daripada aksara rumi, nombor, dan ".".',
-            appName: 'Ruangan ini tidak boleh bermula atau berakhir dengan "-" dan "_" dan mesti terdiri daripada aksara rumi, nombor, "-", dan "_" dengan panjang 2-30 aksara.',
-            containerName: 'Menyokong huruf, nombor, -, _ dan .; tidak boleh bermula dengan -, _ atau .; panjang: 2-128 aksara.',
+            appName:
+                'Ruangan ini tidak boleh bermula atau berakhir dengan "-" dan "_" dan mesti terdiri daripada aksara rumi, nombor, "-", dan "_" dengan panjang 2-30 aksara.',
+            containerName:
+                'Menyokong huruf, nombor, -, _ dan .; tidak boleh bermula dengan -, _ atau .; panjang: 2-128 aksara.',
             mirror: 'Alamat pecutan cermin mesti bermula dengan http(s)://, menyokong huruf (huruf besar dan kecil), nombor, ., / dan -, serta tidak boleh mengandungi baris kosong.',
             disableFunction: 'Hanya menyokong huruf, garis bawah, dan ,',
             leechExts: 'Hanya menyokong huruf, nombor, dan ,',
@@ -312,7 +320,7 @@ const message = {
             restart: 'Mula Semula',
             install: 'Pasang',
             uninstall: 'Nyahpasang',
-            update: 'Kemas Kini'
+            update: 'Kemas Kini',
         },
     },
     menu: {
@@ -348,7 +356,8 @@ const message = {
         restart_system: 'Mulakan semula pelayan',
         operationSuccess: 'Operasi berjaya, sedang memulakan semula, sila segarkan pelayar secara manual nanti!',
         overview: 'Overview',
-        entranceHelper: 'Pintu masuk keselamatan tidak diaktifkan. Anda boleh mengaktifkannya di "Tetapan -> Keselamatan" untuk meningkatkan keselamatan sistem.',
+        entranceHelper:
+            'Pintu masuk keselamatan tidak diaktifkan. Anda boleh mengaktifkannya di "Tetapan -> Keselamatan" untuk meningkatkan keselamatan sistem.',
         appInstalled: 'Aplikasi yang dipasang',
         systemInfo: 'Maklumat sistem',
         hostname: 'Nama hos',
@@ -443,7 +452,8 @@ const message = {
 
         loadFromRemote: 'Selaras',
         userBind: 'Kaitkan pengguna',
-        pgBindHelper: 'Operasi ini digunakan untuk mencipta pengguna baharu dan mengaitkannya dengan pangkalan data sasaran. Pada masa ini, memilih pengguna yang sudah wujud dalam pangkalan data tidak disokong.',
+        pgBindHelper:
+            'Operasi ini digunakan untuk mencipta pengguna baharu dan mengaitkannya dengan pangkalan data sasaran. Pada masa ini, memilih pengguna yang sudah wujud dalam pangkalan data tidak disokong.',
         pgSuperUser: 'Pengguna Super',
         loadFromRemoteHelper:
             'Ini akan menyelaraskan maklumat pangkalan data di pelayan ke 1Panel. Adakah anda mahu meneruskan?',
@@ -462,7 +472,8 @@ const message = {
         localDB: 'Pangkalan data tempatan',
         address: 'Alamat pangkalan data',
         version: 'Versi pangkalan data',
-        userHelper: 'Pengguna root atau pengguna pangkalan data dengan keistimewaan root boleh mengakses pangkalan data jauh.',
+        userHelper:
+            'Pengguna root atau pengguna pangkalan data dengan keistimewaan root boleh mengakses pangkalan data jauh.',
         pgUserHelper: 'Pengguna pangkalan data dengan keistimewaan superuser.',
         ssl: 'Gunakan SSL',
         clientKey: 'Kunci peribadi klien',
@@ -509,7 +520,8 @@ const message = {
         sortMergePasses: 'Bilangan penggabungan terisih',
         sortMergePassesHelper: 'Jika nilai terlalu besar, tingkatkan "sort_buffer_size".',
         tableLocksWaited: 'Bilangan kunci jadual',
-        tableLocksWaitedHelper: 'Jika nilai terlalu besar, pertimbangkan untuk meningkatkan prestasi pangkalan data anda.',
+        tableLocksWaitedHelper:
+            'Jika nilai terlalu besar, pertimbangkan untuk meningkatkan prestasi pangkalan data anda.',
 
         performanceTuning: 'Penalaan prestasi',
         optimizationScheme: 'Skema pengoptimuman',
@@ -592,11 +604,14 @@ const message = {
         edit: 'Sunting kontena',
         updateHelper1: 'Dikesan bahawa kontena ini berasal dari gedung aplikasi. Sila perhatikan dua perkara berikut:',
         updateHelper2: '1. Pengubahsuaian semasa tidak akan diselaraskan ke aplikasi yang dipasang di gedung aplikasi.',
-        updateHelper3: '2. Jika anda mengubah aplikasi di halaman yang dipasang, kandungan yang sedang diedit akan menjadi tidak sah.',
-        updateHelper4: 'Mengedit kontena memerlukan pembinaan semula, dan sebarang data yang tidak berterusan akan hilang. Adakah anda mahu meneruskan?',
+        updateHelper3:
+            '2. Jika anda mengubah aplikasi di halaman yang dipasang, kandungan yang sedang diedit akan menjadi tidak sah.',
+        updateHelper4:
+            'Mengedit kontena memerlukan pembinaan semula, dan sebarang data yang tidak berterusan akan hilang. Adakah anda mahu meneruskan?',
         containerList: 'Senarai kontena',
         operatorHelper: '{0} akan dilakukan pada kontena berikut. Adakah anda mahu meneruskan?',
-        operatorAppHelper: 'Operasi "{0}" akan dilakukan pada kontena berikut dan mungkin mempengaruhi perkhidmatan yang sedang berjalan. Adakah anda mahu meneruskan?',
+        operatorAppHelper:
+            'Operasi "{0}" akan dilakukan pada kontena berikut dan mungkin mempengaruhi perkhidmatan yang sedang berjalan. Adakah anda mahu meneruskan?',
         start: 'Mulakan',
         stop: 'Hentikan',
         restart: 'Mulakan semula',
@@ -608,7 +623,8 @@ const message = {
         removeAll: 'Buang semua',
         containerPrune: 'Prune',
         containerPruneHelper1: 'Ini akan memadam semua kontena yang berada dalam keadaan dihentikan.',
-        containerPruneHelper2: 'Jika kontena berasal dari gedung aplikasi, anda perlu ke "Gedung Aplikasi -> Dipasang" dan klik butang "Bangun Semula" untuk memasangnya semula selepas pembersihan.',
+        containerPruneHelper2:
+            'Jika kontena berasal dari gedung aplikasi, anda perlu ke "Gedung Aplikasi -> Dipasang" dan klik butang "Bangun Semula" untuk memasangnya semula selepas pembersihan.',
         containerPruneHelper3: 'Operasi ini tidak boleh diundur. Adakah anda mahu meneruskan?',
         imagePrune: 'Prune',
         imagePruneSome: 'Bersihkan yang tidak berlabel',
@@ -622,7 +638,8 @@ const message = {
         volumePrune: 'Prune',
         volumePruneHelper: 'Ini akan membuang semua volum tempatan yang tidak digunakan. Adakah anda mahu meneruskan?',
         cleanSuccess: 'Operasi berjaya, bilangan yang dibersihkan kali ini: {0}!',
-        cleanSuccessWithSpace: 'Operasi berjaya. Bilangan cakera yang dibersihkan kali ini ialah {0}. Ruang cakera yang dibebaskan ialah {1}!',
+        cleanSuccessWithSpace:
+            'Operasi berjaya. Bilangan cakera yang dibersihkan kali ini ialah {0}. Ruang cakera yang dibebaskan ialah {1}!',
         container: 'Kontena | Kontena',
         unExposedPort: 'Alamat pemetaan port semasa ialah 127.0.0.1, yang tidak dapat mengaktifkan akses luaran.',
         upTime: 'Waktu hidup',
@@ -648,12 +665,15 @@ const message = {
         memCache: 'Cache memori',
         ip: 'Alamat IP',
         cpuShare: 'Bahagian CPU',
-        cpuShareHelper: 'Enjin kontena menggunakan nilai asas 1024 untuk bahagian CPU. Anda boleh meningkatkannya untuk memberikan lebih masa CPU kepada kontena.',
+        cpuShareHelper:
+            'Enjin kontena menggunakan nilai asas 1024 untuk bahagian CPU. Anda boleh meningkatkannya untuk memberikan lebih masa CPU kepada kontena.',
         inputIpv4: 'Contoh: 192.168.1.1',
         inputIpv6: 'Contoh: 2001:0db8:85a3:0000:0000:8a2e:0370:7334',
 
-        containerFromAppHelper: 'Dikesan bahawa kontena ini berasal dari gedung aplikasi. Operasi aplikasi boleh menyebabkan suntingan semasa menjadi tidak sah.',
-        containerFromAppHelper1: 'Klik butang [Param] dalam senarai aplikasi yang dipasang untuk memasuki halaman penyuntingan dan mengubah nama kontena.',
+        containerFromAppHelper:
+            'Dikesan bahawa kontena ini berasal dari gedung aplikasi. Operasi aplikasi boleh menyebabkan suntingan semasa menjadi tidak sah.',
+        containerFromAppHelper1:
+            'Klik butang [Param] dalam senarai aplikasi yang dipasang untuk memasuki halaman penyuntingan dan mengubah nama kontena.',
         command: 'Arahan',
         console: 'Interaksi kontena',
         tty: 'Peruntukkan TTY palsu (-t)',
@@ -662,15 +682,19 @@ const message = {
         emptyUser: 'Apabila kosong, anda akan log masuk sebagai lalai',
         containerTerminal: 'Terminal',
         privileged: 'Privileged',
-        privilegedHelper: 'Benarkan kontena menjalankan operasi teristimewa tertentu pada hos, yang boleh meningkatkan risiko kontena. Gunakan dengan berhati-hati!',
-        editComposeHelper: 'Nota: Pembolehubah persekitaran yang ditetapkan akan ditulis ke fail 1panel.env secara lalai. Jika anda mahu menggunakan parameter ini dalam kontena, anda juga perlu menambah rujukan env_file secara manual dalam fail compose.',
+        privilegedHelper:
+            'Benarkan kontena menjalankan operasi teristimewa tertentu pada hos, yang boleh meningkatkan risiko kontena. Gunakan dengan berhati-hati!',
+        editComposeHelper:
+            'Nota: Pembolehubah persekitaran yang ditetapkan akan ditulis ke fail 1panel.env secara lalai. Jika anda mahu menggunakan parameter ini dalam kontena, anda juga perlu menambah rujukan env_file secara manual dalam fail compose.',
 
         upgradeHelper: 'Nama Repository/Nama Imej: Versi Imej',
-        upgradeWarning2: 'Operasi peningkatan memerlukan pembinaan semula kontena, sebarang data yang tidak disimpan akan hilang. Adakah anda mahu meneruskan?',
+        upgradeWarning2:
+            'Operasi peningkatan memerlukan pembinaan semula kontena, sebarang data yang tidak disimpan akan hilang. Adakah anda mahu meneruskan?',
         oldImage: 'Imej semasa',
         targetImage: 'Imej sasaran',
         imageLoadErr: 'Tiada nama imej dikesan untuk kontena',
-        appHelper: 'Kontena berasal dari gedung aplikasi, dan peningkatan boleh menyebabkan perkhidmatan tidak tersedia.',
+        appHelper:
+            'Kontena berasal dari gedung aplikasi, dan peningkatan boleh menyebabkan perkhidmatan tidak tersedia.',
         input: 'Input manual',
         forcePull: 'Tarik imej sentiasa ',
         forcePullHelper: 'Ini akan mengabaikan imej sedia ada di pelayan dan menarik imej terkini dari pendaftaran.',
@@ -732,11 +756,13 @@ const message = {
         tagHelper: 'Satu setiap baris. Sebagai contoh,\nkey1=value1\nkey2=value2',
         imageNameHelper: 'Nama dan Tag imej, sebagai contoh: nginx:latest',
         cleanBuildCache: 'Bersihkan cache bina',
-        delBuildCacheHelper: 'Ini akan memadam semua artefak cache yang dijana semasa binaan dan tidak boleh diundur. Adakah anda mahu meneruskan?',
+        delBuildCacheHelper:
+            'Ini akan memadam semua artefak cache yang dijana semasa binaan dan tidak boleh diundur. Adakah anda mahu meneruskan?',
         urlWarning: 'Awalan URL tidak perlu termasuk http:// atau https://. Sila ubah.',
 
         network: 'Rangkaian | Rangkaian-rangkaian',
-        networkHelper: 'Ini boleh menyebabkan beberapa aplikasi dan persekitaran runtime tidak berfungsi dengan betul. Adakah anda mahu meneruskan?',
+        networkHelper:
+            'Ini boleh menyebabkan beberapa aplikasi dan persekitaran runtime tidak berfungsi dengan betul. Adakah anda mahu meneruskan?',
         createNetwork: 'Cipta',
         networkName: 'Nama',
         driver: 'Pemacu',
@@ -758,23 +784,29 @@ const message = {
 
         repo: 'Pendaftaran',
         createRepo: 'Tambah',
-        httpRepo: 'Memilih protokol HTTP memerlukan memulakan semula perkhidmatan Docker untuk menambahkannya ke pendaftaran tidak selamat.',
+        httpRepo:
+            'Memilih protokol HTTP memerlukan memulakan semula perkhidmatan Docker untuk menambahkannya ke pendaftaran tidak selamat.',
         delInsecure: 'Padamkan pendaftaran tidak selamat',
-        delInsecureHelper: 'Ini akan memulakan semula perkhidmatan Docker untuk mengeluarkannya dari pendaftaran tidak selamat. Adakah anda mahu meneruskan?',
+        delInsecureHelper:
+            'Ini akan memulakan semula perkhidmatan Docker untuk mengeluarkannya dari pendaftaran tidak selamat. Adakah anda mahu meneruskan?',
         downloadUrl: 'Pelayan',
         imageRepo: 'Repo imej',
         repoHelper: 'Adakah ia termasuk repositori cermin/organisasi/projek?',
         auth: 'Memerlukan pengesahan',
-        mirrorHelper: 'Jika terdapat banyak cermin, baris baru mesti dipaparkan, contohnya:\nhttp://xxxxxx.m.daocloud.io \nhttps://xxxxxx.mirror.aliyuncs.com',
-        registrieHelper: 'Jika terdapat banyak repositori persendirian, baris baru mesti dipaparkan, contohnya:\n172.16.10.111:8081 \n172.16.10.112:8081',
+        mirrorHelper:
+            'Jika terdapat banyak cermin, baris baru mesti dipaparkan, contohnya:\nhttp://xxxxxx.m.daocloud.io \nhttps://xxxxxx.mirror.aliyuncs.com',
+        registrieHelper:
+            'Jika terdapat banyak repositori persendirian, baris baru mesti dipaparkan, contohnya:\n172.16.10.111:8081 \n172.16.10.112:8081',
 
         compose: 'Compose | Compose-compose',
         fromChangeHelper: 'Menukar sumber akan membersihkan kandungan yang sedang diedit. Adakah anda mahu meneruskan?',
         composePathHelper: 'Laluan simpan fail konfigurasi: {0}',
-        composeHelper: 'Komposisi yang dicipta melalui editor atau templat 1Panel akan disimpan dalam direktori {0}/docker/compose.',
+        composeHelper:
+            'Komposisi yang dicipta melalui editor atau templat 1Panel akan disimpan dalam direktori {0}/docker/compose.',
         deleteFile: 'Padam fail',
         allDelete: 'Padam secara Kekal',
-        deleteComposeHelper: 'Padam semua fail berkaitan komposisi kontena, termasuk fail konfigurasi dan fail berterusan. Sila berhati-hati!',
+        deleteComposeHelper:
+            'Padam semua fail berkaitan komposisi kontena, termasuk fail konfigurasi dan fail berterusan. Sila berhati-hati!',
         deleteCompose: 'Padam komposisi ini.',
         apps: 'Gedung Aplikasi',
         local: 'Tempatan',
@@ -794,7 +826,8 @@ const message = {
         up: 'Naik',
         composeDetailHelper: 'Komposisi dibuat di luar 1Panel. Operasi mula dan berhenti tidak disokong.',
         composeOperatorHelper: 'Operasi {1} akan dilakukan pada {0}. Adakah anda mahu meneruskan?',
-        composeDownHelper: 'Ini akan menghentikan dan menghapuskan semua kontena dan rangkaian di bawah komposisi {0}. Adakah anda mahu meneruskan?',
+        composeDownHelper:
+            'Ini akan menghentikan dan menghapuskan semua kontena dan rangkaian di bawah komposisi {0}. Adakah anda mahu meneruskan?',
 
         setting: 'Tetapan | Tetapan',
         operatorStatusHelper: 'Ini akan "{0}" perkhidmatan Docker. Adakah anda mahu meneruskan?',
@@ -804,28 +837,34 @@ const message = {
         mirrorsHelper: '',
         mirrorsHelper2: 'Untuk maklumat lanjut, lihat dokumen rasmi.',
         registries: 'Pendaftaran tidak selamat',
-        ipv6Helper: 'Apabila IPv6 diaktifkan, anda perlu menambah rangkaian kontena IPv6. Rujuk dokumen rasmi untuk langkah konfigurasi tertentu.',
+        ipv6Helper:
+            'Apabila IPv6 diaktifkan, anda perlu menambah rangkaian kontena IPv6. Rujuk dokumen rasmi untuk langkah konfigurasi tertentu.',
         ipv6CidrHelper: 'Julat kolam alamat IPv6 untuk kontena',
         ipv6TablesHelper: 'Konfigurasi automatik Docker IPv6 untuk peraturan iptables.',
-        experimentalHelper: 'Mengaktifkan ip6tables memerlukan konfigurasi ini dihidupkan; jika tidak, ip6tables akan diabaikan.',
+        experimentalHelper:
+            'Mengaktifkan ip6tables memerlukan konfigurasi ini dihidupkan; jika tidak, ip6tables akan diabaikan.',
         cutLog: 'Pilihan log',
         cutLogHelper1: 'Konfigurasi semasa hanya akan mempengaruhi kontena yang baru dicipta.',
         cutLogHelper2: 'Kontena sedia ada perlu dicipta semula agar konfigurasi berkuat kuasa.',
-        cutLogHelper3: 'Harap maklum bahawa mencipta semula kontena boleh menyebabkan kehilangan data. Jika kontena anda mengandungi data penting, pastikan membuat sandaran sebelum melakukan operasi pembinaan semula.',
+        cutLogHelper3:
+            'Harap maklum bahawa mencipta semula kontena boleh menyebabkan kehilangan data. Jika kontena anda mengandungi data penting, pastikan membuat sandaran sebelum melakukan operasi pembinaan semula.',
         maxSize: 'Saiz maksimum',
         maxFile: 'Fail maksimum',
-        liveHelper: 'Secara lalai, apabila daemon Docker ditamatkan, ia mematikan kontena yang sedang berjalan. Anda boleh mengkonfigurasi daemon supaya kontena kekal berjalan jika daemon menjadi tidak tersedia. Fungsi ini dipanggil pemulihan langsung. Pilihan pemulihan langsung membantu mengurangkan waktu henti kontena akibat kerosakan daemon, pemadaman terancang, atau peningkatan.',
+        liveHelper:
+            'Secara lalai, apabila daemon Docker ditamatkan, ia mematikan kontena yang sedang berjalan. Anda boleh mengkonfigurasi daemon supaya kontena kekal berjalan jika daemon menjadi tidak tersedia. Fungsi ini dipanggil pemulihan langsung. Pilihan pemulihan langsung membantu mengurangkan waktu henti kontena akibat kerosakan daemon, pemadaman terancang, atau peningkatan.',
         liveWithSwarmHelper: 'Konfigurasi daemon live-restore tidak serasi dengan mod swarm.',
         iptablesDisable: 'Tutup iptables',
         iptablesHelper1: 'Konfigurasi automatik peraturan iptables untuk Docker.',
-        iptablesHelper2: 'Melumpuhkan iptables akan menyebabkan kontena tidak dapat berkomunikasi dengan rangkaian luaran.',
+        iptablesHelper2:
+            'Melumpuhkan iptables akan menyebabkan kontena tidak dapat berkomunikasi dengan rangkaian luaran.',
         daemonJsonPath: 'Laluan Konfigurasi',
         serviceUnavailable: 'Perkhidmatan Docker tidak dimulakan pada masa ini.',
         startIn: ' untuk dimulakan',
         sockPath: 'Socket domain Unix',
         sockPathHelper: 'Saluran komunikasi antara daemon Docker dan klien.',
         sockPathHelper1: 'Laluan lalai: /var/run/docker-x.sock',
-        sockPathMsg: 'Menyimpan tetapan Laluan Socket boleh menyebabkan perkhidmatan Docker tidak tersedia. Adakah anda mahu meneruskan?',
+        sockPathMsg:
+            'Menyimpan tetapan Laluan Socket boleh menyebabkan perkhidmatan Docker tidak tersedia. Adakah anda mahu meneruskan?',
         sockPathErr: 'Sila pilih atau masukkan laluan fail sock Docker yang betul',
         related: 'Berkaitan',
         includeAppstore: 'Tunjukkan kontena dari gedung aplikasi',
@@ -847,7 +886,8 @@ const message = {
         edit: 'Edit tugas cron',
         cronTask: 'Tugas Cron | Tugas Cron',
         changeStatus: 'Tukar status',
-        disableMsg: 'Ini akan menghentikan tugas berjadual daripada dilaksanakan secara automatik. Adakah anda mahu meneruskan?',
+        disableMsg:
+            'Ini akan menghentikan tugas berjadual daripada dilaksanakan secara automatik. Adakah anda mahu meneruskan?',
         enableMsg: 'Ini akan membenarkan tugas berjadual dilaksanakan secara automatik. Adakah anda mahu meneruskan?',
         taskType: 'Jenis',
         record: 'Rekod',
@@ -864,7 +904,8 @@ const message = {
         ntp_helper: 'Anda boleh mengkonfigurasi pelayan NTP di halaman Tetapan Pantas Alat.',
         app: 'Aplikasi sandaran',
         website: 'Laman web sandaran',
-        rulesHelper: 'Apabila terdapat pelbagai peraturan pengecualian mampatan, ia perlu dipaparkan dengan pemecahan baris. Sebagai contoh,\n*.log \n*.sql',
+        rulesHelper:
+            'Apabila terdapat pelbagai peraturan pengecualian mampatan, ia perlu dipaparkan dengan pemecahan baris. Sebagai contoh,\n*.log \n*.sql',
         lastRecordTime: 'Waktu pelaksanaan terakhir',
         all: 'Semua',
         failedRecord: 'Rekod kegagalan',
@@ -877,11 +918,13 @@ const message = {
         taskName: 'Nama',
         cronSpec: 'Kitaran pencetus',
         cronSpecHelper: 'Masukkan tempoh pelaksanaan yang betul',
-        cleanHelper: 'Operasi ini merekodkan semua rekod pelaksanaan tugas, fail sandaran, dan fail log. Adakah anda mahu meneruskan?',
+        cleanHelper:
+            'Operasi ini merekodkan semua rekod pelaksanaan tugas, fail sandaran, dan fail log. Adakah anda mahu meneruskan?',
         directory: 'Direktori sandaran',
         sourceDir: 'Direktori sumber',
         snapshot: 'Snapshot sistem',
-        allOptionHelper: 'Pelan tugas semasa adalah untuk menyandarkan semua [{0}]. Muat turun terus tidak disokong buat masa ini. Anda boleh menyemak senarai sandaran dalam menu [{0}].',
+        allOptionHelper:
+            'Pelan tugas semasa adalah untuk menyandarkan semua [{0}]. Muat turun terus tidak disokong buat masa ini. Anda boleh menyemak senarai sandaran dalam menu [{0}].',
         exclusionRules: 'Peraturan pengecualian',
         exclusionRulesHelper: 'Peraturan pengecualian akan terpakai pada semua operasi mampatan bagi sandaran ini.',
         default_download_path: 'Pautan muat turun lalai',
@@ -984,7 +1027,8 @@ const message = {
         batchInput: 'Pemprosesan kelompok',
         quickCommand: 'Arahan pantas | Arahan pantas',
         quickCommandHelper: 'Anda boleh menggunakan arahan pantas di bahagian bawah "Terminal -> Terminal".',
-        groupDeleteHelper: 'Selepas kumpulan dikeluarkan, semua sambungan dalam kumpulan akan dipindahkan ke kumpulan lalai. Adakah anda mahu meneruskan?',
+        groupDeleteHelper:
+            'Selepas kumpulan dikeluarkan, semua sambungan dalam kumpulan akan dipindahkan ke kumpulan lalai. Adakah anda mahu meneruskan?',
         command: 'Arahan',
         quickCmd: 'Arahan pantas',
         addHost: 'Tambah',
@@ -1001,21 +1045,29 @@ const message = {
     toolbox: {
         swap: {
             swap: 'Partition Swap',
-            swapHelper1: 'Saiz partition swap harus 1 hingga 2 kali ganda memori fizikal, boleh disesuaikan berdasarkan keperluan tertentu;',
-            swapHelper2: 'Sebelum mencipta fail swap, pastikan cakera sistem mempunyai ruang yang mencukupi, kerana saiz fail swap akan menggunakan ruang cakera yang bersamaan;',
-            swapHelper3: 'Swap boleh membantu mengurangkan tekanan memori, tetapi ia hanya alternatif. Kebergantungan berlebihan pada swap boleh menyebabkan penurunan prestasi sistem. Disarankan untuk mengutamakan peningkatan memori atau pengoptimuman penggunaan memori aplikasi;',
-            swapHelper4: 'Disarankan untuk memantau penggunaan swap secara berkala bagi memastikan operasi sistem berjalan dengan normal.',
-            swapDeleteHelper: 'Operasi ini akan membuang partition Swap {0}. Atas sebab keselamatan sistem, fail yang sepadan tidak akan dipadamkan secara automatik. Jika pemadaman diperlukan, sila lakukan secara manual!',
+            swapHelper1:
+                'Saiz partition swap harus 1 hingga 2 kali ganda memori fizikal, boleh disesuaikan berdasarkan keperluan tertentu;',
+            swapHelper2:
+                'Sebelum mencipta fail swap, pastikan cakera sistem mempunyai ruang yang mencukupi, kerana saiz fail swap akan menggunakan ruang cakera yang bersamaan;',
+            swapHelper3:
+                'Swap boleh membantu mengurangkan tekanan memori, tetapi ia hanya alternatif. Kebergantungan berlebihan pada swap boleh menyebabkan penurunan prestasi sistem. Disarankan untuk mengutamakan peningkatan memori atau pengoptimuman penggunaan memori aplikasi;',
+            swapHelper4:
+                'Disarankan untuk memantau penggunaan swap secara berkala bagi memastikan operasi sistem berjalan dengan normal.',
+            swapDeleteHelper:
+                'Operasi ini akan membuang partition Swap {0}. Atas sebab keselamatan sistem, fail yang sepadan tidak akan dipadamkan secara automatik. Jika pemadaman diperlukan, sila lakukan secara manual!',
             saveHelper: 'Sila simpan tetapan semasa terlebih dahulu!',
-            saveSwap: 'Menyimpan konfigurasi semasa akan menyesuaikan saiz partition Swap {0} kepada {1}. Adakah anda mahu meneruskan?',
+            saveSwap:
+                'Menyimpan konfigurasi semasa akan menyesuaikan saiz partition Swap {0} kepada {1}. Adakah anda mahu meneruskan?',
             swapMin: 'Saiz minimum partition adalah 40 KB. Sila ubah dan cuba lagi!',
             swapMax: 'Nilai maksimum untuk saiz partition adalah {0}. Sila ubah dan cuba lagi!',
             swapOff: 'Saiz minimum partition adalah 40 KB. Menetapkannya kepada 0 akan mematikan partition Swap.',
         },
         device: {
             dnsHelper: 'Pelayan DNS',
-            dnsAlert: 'Perhatian! Mengubah konfigurasi fail /etc/resolv.conf akan mengembalikan fail ke nilai lalai selepas sistem dimulakan semula.',
-            dnsHelper1: 'Apabila terdapat pelbagai entri DNS, ia perlu dipaparkan pada baris baru. Contoh:\n114.114.114.114\n8.8.8.8',
+            dnsAlert:
+                'Perhatian! Mengubah konfigurasi fail /etc/resolv.conf akan mengembalikan fail ke nilai lalai selepas sistem dimulakan semula.',
+            dnsHelper1:
+                'Apabila terdapat pelbagai entri DNS, ia perlu dipaparkan pada baris baru. Contoh:\n114.114.114.114\n8.8.8.8',
             hostsHelper: 'Resolusi nama hos',
             hosts: 'Domain',
             hostAlert: 'Rekod komen tersembunyi, sila klik butang Semua Konfigurasi untuk melihat atau menetapkan',
@@ -1026,17 +1078,22 @@ const message = {
             timeZone: 'Zon waktu',
             localTime: 'Waktu pelayan',
             timeZoneChangeHelper: 'Mengubah zon waktu sistem memerlukan memulakan semula perkhidmatan. Teruskan?',
-            timeZoneHelper: 'Jika anda tidak memasang arahan "timedatectl", anda mungkin tidak dapat mengubah zon waktu kerana sistem menggunakan arahan itu untuk mengubah zon waktu.',
+            timeZoneHelper:
+                'Jika anda tidak memasang arahan "timedatectl", anda mungkin tidak dapat mengubah zon waktu kerana sistem menggunakan arahan itu untuk mengubah zon waktu.',
             timeZoneCN: 'Beijing',
             timeZoneAM: 'Los Angeles',
             timeZoneNY: 'New York',
             ntpALi: 'Alibaba',
             ntpGoogle: 'Google',
             syncSite: 'Pelayan NTP',
-            hostnameHelper: 'Pengubahan nama hos bergantung pada arahan "hostnamectl". Jika arahan itu tidak dipasang, pengubahan mungkin gagal.',
-            userHelper: 'Nama pengguna bergantung pada arahan "whoami" untuk pengambilan. Jika arahan itu tidak dipasang, pengambilan mungkin gagal.',
-            passwordHelper: 'Pengubahan kata laluan bergantung pada arahan "chpasswd". Jika arahan itu tidak dipasang, pengubahan mungkin gagal.',
-            hostHelper: 'Terdapat nilai kosong dalam kandungan yang disediakan. Sila semak dan cuba lagi selepas pengubahsuaian!',
+            hostnameHelper:
+                'Pengubahan nama hos bergantung pada arahan "hostnamectl". Jika arahan itu tidak dipasang, pengubahan mungkin gagal.',
+            userHelper:
+                'Nama pengguna bergantung pada arahan "whoami" untuk pengambilan. Jika arahan itu tidak dipasang, pengambilan mungkin gagal.',
+            passwordHelper:
+                'Pengubahan kata laluan bergantung pada arahan "chpasswd". Jika arahan itu tidak dipasang, pengubahan mungkin gagal.',
+            hostHelper:
+                'Terdapat nilai kosong dalam kandungan yang disediakan. Sila semak dan cuba lagi selepas pengubahsuaian!',
             dnsCheck: 'Uji Ketersediaan',
             dnsOK: 'Maklumat konfigurasi DNS tersedia!',
             dnsTestFailed: 'Maklumat konfigurasi DNS tidak tersedia.',
@@ -1048,7 +1105,8 @@ const message = {
             unActive: 'Perkhidmatan Fail2ban tidak diaktifkan pada masa ini.',
             operation: 'Anda akan melaksanakan operasi "{0}" pada perkhidmatan Fail2ban. Adakah anda mahu meneruskan?',
             fail2banChange: 'Pengubahan Konfigurasi Fail2ban',
-            ignoreHelper: 'Senarai IP dalam senarai dibenarkan akan diabaikan untuk disekat. Adakah anda mahu meneruskan?',
+            ignoreHelper:
+                'Senarai IP dalam senarai dibenarkan akan diabaikan untuk disekat. Adakah anda mahu meneruskan?',
             bannedHelper: 'Senarai IP dalam senarai sekatan akan disekat oleh pelayan. Adakah anda mahu meneruskan?',
             maxRetry: 'Percubaan maksimum',
             banTime: 'Waktu sekatan',
@@ -1068,9 +1126,12 @@ const message = {
             ftp: 'Akaun FTP | Akaun FTP',
             noFtp: 'Perkhidmatan FTP (pure-ftpd) tidak dikesan. Rujuk dokumen rasmi untuk memasang.',
             operation: 'Ini akan melaksanakan operasi "{0}" pada perkhidmatan FTP. Adakah anda mahu meneruskan?',
-            noPasswdMsg: 'Tidak dapat mendapatkan kata laluan akaun FTP semasa, sila tetapkan kata laluan dan cuba lagi!',
-            enableHelper: 'Mengaktifkan akaun FTP yang dipilih akan memulihkan kebenaran aksesnya. Adakah anda mahu meneruskan?',
-            disableHelper: 'Melumpuhkan akaun FTP yang dipilih akan membatalkan kebenaran aksesnya. Adakah anda mahu meneruskan?',
+            noPasswdMsg:
+                'Tidak dapat mendapatkan kata laluan akaun FTP semasa, sila tetapkan kata laluan dan cuba lagi!',
+            enableHelper:
+                'Mengaktifkan akaun FTP yang dipilih akan memulihkan kebenaran aksesnya. Adakah anda mahu meneruskan?',
+            disableHelper:
+                'Melumpuhkan akaun FTP yang dipilih akan membatalkan kebenaran aksesnya. Adakah anda mahu meneruskan?',
             syncHelper: 'Selaraskan data akaun FTP antara pelayan dan pangkalan data. Adakah anda mahu meneruskan?',
         },
         clam: {
@@ -1078,18 +1139,23 @@ const message = {
             cron: 'Imbasan berjadual',
             cronHelper: 'Versi profesional menyokong ciri imbasan berjadual',
             specErr: 'Ralat format jadual pelaksanaan, sila semak dan cuba lagi!',
-            disableMsg: 'Menghentikan pelaksanaan berjadual akan menghalang tugas imbasan ini daripada berjalan secara automatik. Adakah anda mahu meneruskan?',
-            enableMsg: 'Mengaktifkan pelaksanaan berjadual akan membolehkan tugas imbasan ini berjalan secara automatik pada selang waktu yang tetap. Adakah anda mahu meneruskan?',
+            disableMsg:
+                'Menghentikan pelaksanaan berjadual akan menghalang tugas imbasan ini daripada berjalan secara automatik. Adakah anda mahu meneruskan?',
+            enableMsg:
+                'Mengaktifkan pelaksanaan berjadual akan membolehkan tugas imbasan ini berjalan secara automatik pada selang waktu yang tetap. Adakah anda mahu meneruskan?',
             showFresh: 'Tunjukkan perkhidmatan pengemas kini tanda tangan',
             hideFresh: 'Sembunyikan perkhidmatan pengemas kini tanda tangan',
-            clamHelper: 'Konfigurasi minimum yang disyorkan untuk ClamAV ialah: RAM 3 GiB atau lebih, CPU teras tunggal dengan 2.0 GHz atau lebih tinggi, dan sekurang-kurangnya 5 GiB ruang cakera keras yang tersedia.',
+            clamHelper:
+                'Konfigurasi minimum yang disyorkan untuk ClamAV ialah: RAM 3 GiB atau lebih, CPU teras tunggal dengan 2.0 GHz atau lebih tinggi, dan sekurang-kurangnya 5 GiB ruang cakera keras yang tersedia.',
             noClam: 'Perkhidmatan ClamAV tidak dikesan, sila rujuk dokumentasi rasmi untuk pemasangan!',
             notStart: 'Perkhidmatan ClamAV tidak berjalan pada masa ini, sila mulakan dahulu!',
             removeRecord: 'Padam fail laporan',
             noRecords: 'Klik butang "Picu" untuk memulakan imbasan dan anda akan melihat rekod di sini.',
-            removeResultHelper: 'Padam fail laporan yang dijana semasa pelaksanaan tugas untuk membebaskan ruang storan.',
+            removeResultHelper:
+                'Padam fail laporan yang dijana semasa pelaksanaan tugas untuk membebaskan ruang storan.',
             removeInfected: 'Padam fail virus',
-            removeInfectedHelper: 'Padam fail virus yang dikesan semasa tugas untuk memastikan keselamatan pelayan dan operasi normal.',
+            removeInfectedHelper:
+                'Padam fail virus yang dikesan semasa tugas untuk memastikan keselamatan pelayan dan operasi normal.',
             clamCreate: 'Cipta peraturan imbasan',
             infectedStrategy: 'Strategi fail dijangkiti',
             remove: 'Padam',
@@ -1141,7 +1207,7 @@ const message = {
             logs: 'Log Panel',
             settings: 'Tetapan Panel',
             cronjobs: 'Cronjob',
-            databases: 'Pangkalan Data'
+            databases: 'Pangkalan Data',
         },
         websiteLog: 'Log Laman Web',
         runLog: 'Log Jalankan',
@@ -1219,13 +1285,15 @@ const message = {
         cancel: 'Batal',
         changeOwner: 'Ubah suai pengguna dan kumpulan pengguna',
         containSub: 'Guna perubahan kebenaran secara rekursif',
-        ownerHelper: 'Pengguna lalai persekitaran operasi PHP: kumpulan pengguna adalah 1000:1000, adalah normal jika pengguna di dalam dan di luar kontena menunjukkan ketidakkonsistenan',
+        ownerHelper:
+            'Pengguna lalai persekitaran operasi PHP: kumpulan pengguna adalah 1000:1000, adalah normal jika pengguna di dalam dan di luar kontena menunjukkan ketidakkonsistenan',
         searchHelper: 'Sokong wildcard seperti *',
         uploadFailed: '[{0}] Gagal memuat naik fail',
         fileUploadStart: 'Memuat naik [{0}]....',
         currentSelect: 'Pilihan semasa: ',
         unsupportedType: 'Jenis fail tidak disokong',
-        deleteHelper: 'Adakah anda pasti mahu memadam fail berikut? Secara lalai, ia akan masuk ke tong kitar semula selepas dipadamkan',
+        deleteHelper:
+            'Adakah anda pasti mahu memadam fail berikut? Secara lalai, ia akan masuk ke tong kitar semula selepas dipadamkan',
         fileHeper: 'Nota:\n1. Keputusan carian tidak boleh diisih.\n2. Folder tidak boleh diisih mengikut saiz.',
         forceDeleteHelper: 'Padamkan fail secara kekal (tanpa masuk ke tong kitar semula, padam terus)',
         recycleBin: 'Tong kitar semula',
@@ -1234,7 +1302,8 @@ const message = {
         confirmReduce: 'Adakah anda pasti mahu memulihkan fail berikut?',
         reduceSuccess: 'Berjaya dipulihkan',
         reduce: 'Pulihkan',
-        reduceHelper: 'Jika fail atau direktori dengan nama yang sama wujud di laluan asal, ia akan ditimpa. Adakah anda mahu meneruskan?',
+        reduceHelper:
+            'Jika fail atau direktori dengan nama yang sama wujud di laluan asal, ia akan ditimpa. Adakah anda mahu meneruskan?',
         clearRecycleBin: 'Bersihkan',
         clearRecycleBinHelper: 'Adakah anda mahu membersihkan tong kitar semula?',
         favorite: 'Kegemaran',
@@ -1249,7 +1318,8 @@ const message = {
         wordWrap: 'Bungkus secara automatik',
         deleteHelper2: 'Adakah anda pasti mahu memadam fail yang dipilih? Operasi pemadaman tidak boleh dipulihkan',
         ignoreCertificate: 'Benarkan sambungan pelayan tidak selamat',
-        ignoreCertificateHelper: 'Membenarkan sambungan pelayan tidak selamat boleh menyebabkan kebocoran atau pengubahan data. Gunakan pilihan ini hanya jika mempercayai sumber muat turun.',
+        ignoreCertificateHelper:
+            'Membenarkan sambungan pelayan tidak selamat boleh menyebabkan kebocoran atau pengubahan data. Gunakan pilihan ini hanya jika mempercayai sumber muat turun.',
         uploadOverLimit: 'Bilangan fail melebihi 1000! Sila mampatkan dan muat naik',
         clashDitNotSupport: 'Nama fail dilarang mengandungi .1panel_clash',
         clashDeleteAlert: 'Folder "Tong Kitar Semula" tidak boleh dipadamkan',
@@ -1274,17 +1344,21 @@ const message = {
         autoStart: 'Mula automatik',
         enable: 'Aktifkan Mula Automatik',
         disable: 'Nyahaktif Mula Automatik',
-        sshAlert: 'Data senarai disusun berdasarkan tarikh log masuk. Menukar zon waktu atau melakukan operasi lain boleh menyebabkan penyimpangan dalam tarikh log log masuk.',
-        sshAlert2: 'Anda boleh menggunakan "Fail2ban" di "Kotak Alat" untuk menyekat alamat IP yang cuba menyerang secara kasar, dan ini akan meningkatkan keselamatan hos.',
+        sshAlert:
+            'Data senarai disusun berdasarkan tarikh log masuk. Menukar zon waktu atau melakukan operasi lain boleh menyebabkan penyimpangan dalam tarikh log log masuk.',
+        sshAlert2:
+            'Anda boleh menggunakan "Fail2ban" di "Kotak Alat" untuk menyekat alamat IP yang cuba menyerang secara kasar, dan ini akan meningkatkan keselamatan hos.',
         sshOperate: 'Operasi "{0}" pada perkhidmatan SSH akan dilaksanakan. Adakah anda mahu meneruskan?',
         sshChange: 'Tetapan SSH',
         sshChangeHelper: 'Tindakan ini mengubah "{0}" kepada "{1}". Adakah anda mahu meneruskan?',
-        sshFileChangeHelper: 'Mengubah fail konfigurasi boleh menyebabkan ketidaktersediaan perkhidmatan. Lakukan operasi ini dengan berhati-hati. Adakah anda mahu meneruskan?',
+        sshFileChangeHelper:
+            'Mengubah fail konfigurasi boleh menyebabkan ketidaktersediaan perkhidmatan. Lakukan operasi ini dengan berhati-hati. Adakah anda mahu meneruskan?',
         port: 'Port',
         portHelper: 'Tentukan port yang didengar oleh perkhidmatan SSH.',
         listenAddress: 'Alamat dengar',
         allV4V6: '0.0.0.0:{0}(IPv4) dan :::{0}(IPv6)',
-        listenHelper: 'Membiarkan tetapan IPv4 dan IPv6 kosong akan mendengar pada "0.0.0.0:{0}(IPv4)" dan ":::{0}(IPv6)".',
+        listenHelper:
+            'Membiarkan tetapan IPv4 dan IPv6 kosong akan mendengar pada "0.0.0.0:{0}(IPv4)" dan ":::{0}(IPv6)".',
         addressHelper: 'Tentukan alamat yang didengar oleh perkhidmatan SSH.',
         permitRootLogin: 'Benarkan log masuk pengguna root',
         rootSettingHelper: 'Kaedah log masuk lalai untuk pengguna root ialah "Benarkan log masuk SSH".',
@@ -1304,10 +1378,13 @@ const message = {
         reGenerate: 'Jana semula kunci',
         keyAuthHelper: 'Sama ada untuk mengaktifkan pengesahan kunci.',
         useDNS: 'Gunakan DNS',
-        dnsHelper: 'Kawal sama ada fungsi resolusi DNS diaktifkan pada pelayan SSH untuk mengesahkan identiti sambungan.',
+        dnsHelper:
+            'Kawal sama ada fungsi resolusi DNS diaktifkan pada pelayan SSH untuk mengesahkan identiti sambungan.',
         analysis: 'Maklumat statistik',
-        denyHelper: "Melaksanakan operasi 'tolak' pada alamat berikut. Selepas menetapkan, IP akan dilarang mengakses pelayan. Adakah anda mahu meneruskan?",
-        acceptHelper: "Melaksanakan operasi 'terima' pada alamat berikut. Selepas menetapkan, IP akan mendapatkan semula akses normal. Adakah anda mahu meneruskan?",
+        denyHelper:
+            "Melaksanakan operasi 'tolak' pada alamat berikut. Selepas menetapkan, IP akan dilarang mengakses pelayan. Adakah anda mahu meneruskan?",
+        acceptHelper:
+            "Melaksanakan operasi 'terima' pada alamat berikut. Selepas menetapkan, IP akan mendapatkan semula akses normal. Adakah anda mahu meneruskan?",
         noAddrWarning: 'Tiada alamat [{0}] yang dipilih pada masa ini. Sila periksa dan cuba lagi!',
         successful: 'Berjaya',
         failed: 'Gagal',
@@ -1334,8 +1411,10 @@ const message = {
         emailHelper: 'Untuk pemulihan kata laluan',
         title: 'Alias panel',
         panelPort: 'Port panel',
-        titleHelper: 'Menyokong permulaan bukan aksara khas, bahasa Inggeris, Cina, nombor, ruang, .- dan _, panjang 3-30',
-        portHelper: 'Julat port yang disarankan ialah 8888 hingga 65535. Nota: Jika pelayan mempunyai kumpulan keselamatan, benarkan port baru dari kumpulan keselamatan terlebih dahulu',
+        titleHelper:
+            'Menyokong permulaan bukan aksara khas, bahasa Inggeris, Cina, nombor, ruang, .- dan _, panjang 3-30',
+        portHelper:
+            'Julat port yang disarankan ialah 8888 hingga 65535. Nota: Jika pelayan mempunyai kumpulan keselamatan, benarkan port baru dari kumpulan keselamatan terlebih dahulu',
         portChange: 'Tukar port',
         portChangeHelper: 'Ubah port perkhidmatan dan mulakan semula perkhidmatan. Adakah anda mahu meneruskan?',
         theme: 'Tema',
@@ -1345,7 +1424,8 @@ const message = {
         light: 'Terang',
         auto: 'Ikut Sistem',
         language: 'Bahasa',
-        languageHelper: 'Secara lalai, ia mengikuti bahasa penyemak imbas. Parameter ini hanya berkuat kuasa pada penyemak imbas semasa',
+        languageHelper:
+            'Secara lalai, ia mengikuti bahasa penyemak imbas. Parameter ini hanya berkuat kuasa pada penyemak imbas semasa',
         sessionTimeout: 'Tempoh tamat sesi',
         sessionTimeoutError: 'Tempoh tamat sesi minimum ialah 300 saat',
         sessionTimeoutHelper: 'Panel akan log keluar secara automatik jika tiada operasi lebih daripada {0} saat.',
@@ -1361,12 +1441,15 @@ const message = {
         proxyPort: 'Port proksi',
         proxyPasswdKeep: 'Ingat Kata Laluan',
         proxyDocker: 'Proksi Docker',
-        proxyDockerHelper: 'Selaraskan konfigurasi pelayan proksi ke Docker, menyokong tarikan imej pelayan luar talian dan operasi lain',
+        proxyDockerHelper:
+            'Selaraskan konfigurasi pelayan proksi ke Docker, menyokong tarikan imej pelayan luar talian dan operasi lain',
         apiInterface: 'Aktifkan API',
         apiInterfaceClose: 'Setelah ditutup, antara muka API tidak boleh diakses. Adakah anda mahu meneruskan?',
         apiInterfaceHelper: 'Benarkan aplikasi pihak ketiga mengakses API.',
-        apiInterfaceAlert1: 'Jangan aktifkan dalam persekitaran pengeluaran kerana ia mungkin meningkatkan risiko keselamatan pelayan.',
-        apiInterfaceAlert2: 'Jangan gunakan aplikasi pihak ketiga untuk memanggil API bagi mengelakkan potensi ancaman keselamatan.',
+        apiInterfaceAlert1:
+            'Jangan aktifkan dalam persekitaran pengeluaran kerana ia mungkin meningkatkan risiko keselamatan pelayan.',
+        apiInterfaceAlert2:
+            'Jangan gunakan aplikasi pihak ketiga untuk memanggil API bagi mengelakkan potensi ancaman keselamatan.',
         apiInterfaceAlert3: 'Dokumen API',
         apiInterfaceAlert4: 'Dokumen Penggunaan',
         apiKey: 'Kunci API',
@@ -1376,9 +1459,11 @@ const message = {
         ipWhiteListHelper: 'IP dalam senarai putih boleh mengakses API.',
         apiKeyValidityTime: 'Tempoh sah kunci antara muka',
         apiKeyValidityTimeEgs: 'Tempoh sah kunci antara muka (dalam minit)',
-        apiKeyValidityTimeHelper: 'Cap waktu antara muka sah jika perbezaannya dengan cap waktu semasa (dalam minit) berada dalam julat yang dibenarkan. Nilai 0 melumpuhkan pengesahan.',
+        apiKeyValidityTimeHelper:
+            'Cap waktu antara muka sah jika perbezaannya dengan cap waktu semasa (dalam minit) berada dalam julat yang dibenarkan. Nilai 0 melumpuhkan pengesahan.',
         apiKeyReset: 'Tetapkan semula kunci antara muka',
-        apiKeyResetHelper: 'Perkhidmatan kunci yang berkaitan akan menjadi tidak sah. Sila tambah kunci baru pada perkhidmatan',
+        apiKeyResetHelper:
+            'Perkhidmatan kunci yang berkaitan akan menjadi tidak sah. Sila tambah kunci baru pada perkhidmatan',
         confDockerProxy: 'Konfigurasi proksi docker',
         restartNowHelper: 'Mengkonfigurasi proksi Docker memerlukan memulakan semula perkhidmatan Docker.',
         restartNow: 'Mulakan semula sekarang',
@@ -1387,8 +1472,10 @@ const message = {
         defaultNetwork: 'Kad rangkaian',
         syncTime: 'Waktu Pelayan',
         timeZone: 'Zon Waktu',
-        timeZoneChangeHelper: 'Menukar zon waktu memerlukan memulakan semula perkhidmatan. Adakah anda mahu meneruskan?',
-        timeZoneHelper: 'Pengubahan zon waktu bergantung pada perkhidmatan sistem timedatectl. Berkuat kuasa selepas mulakan semula perkhidmatan 1Panel.',
+        timeZoneChangeHelper:
+            'Menukar zon waktu memerlukan memulakan semula perkhidmatan. Adakah anda mahu meneruskan?',
+        timeZoneHelper:
+            'Pengubahan zon waktu bergantung pada perkhidmatan sistem timedatectl. Berkuat kuasa selepas mulakan semula perkhidmatan 1Panel.',
         timeZoneCN: 'Beijing',
         timeZoneAM: 'Los Angeles',
         timeZoneNY: 'New York',
@@ -1405,7 +1492,8 @@ const message = {
         duplicatePassword: 'Kata laluan baru tidak boleh sama dengan kata laluan asal, sila masukkan semula!',
         diskClean: 'Pembersihan Cache',
         developerMode: 'Program Pratonton',
-        developerModeHelper: 'Anda akan dapat mengalami ciri dan pembaikan baru sebelum ia dilancarkan secara meluas dan memberikan maklum balas awal.',
+        developerModeHelper:
+            'Anda akan dapat mengalami ciri dan pembaikan baru sebelum ia dilancarkan secara meluas dan memberikan maklum balas awal.',
         thirdParty: 'Akaun pihak ketiga',
         addBackupAccount: 'Tambah {0}',
         noTypeForCreate: 'Tiada jenis sandaran yang sedang dibuat',
@@ -1461,12 +1549,17 @@ const message = {
         typeStandard_IA: 'Standard_IA',
         typeArchive: 'Archive',
         typeDeep_Archive: 'Deep_Archive',
-        scStandard: 'Storan Standard sesuai untuk senario perniagaan dengan sejumlah besar fail panas yang memerlukan akses masa nyata, interaksi data yang kerap, dan sebagainya.',
-        scStandard_IA: 'Storan kekerapan rendah sesuai untuk senario perniagaan dengan kekerapan akses yang agak rendah dan menyimpan data sekurang-kurangnya 30 hari.',
+        scStandard:
+            'Storan Standard sesuai untuk senario perniagaan dengan sejumlah besar fail panas yang memerlukan akses masa nyata, interaksi data yang kerap, dan sebagainya.',
+        scStandard_IA:
+            'Storan kekerapan rendah sesuai untuk senario perniagaan dengan kekerapan akses yang agak rendah dan menyimpan data sekurang-kurangnya 30 hari.',
         scArchive: 'Storan arkib sesuai untuk senario perniagaan dengan kekerapan akses yang sangat rendah.',
-        scDeep_Archive: 'Storan sejuk tahan lama sesuai untuk senario perniagaan dengan kekerapan akses yang sangat rendah.',
-        archiveHelper: 'Fail storan arkib tidak boleh dimuat turun secara langsung dan mesti dipulihkan terlebih dahulu melalui laman web penyedia perkhidmatan awan yang berkaitan. Sila gunakan dengan berhati-hati!',
-        backupAlert: 'Jika penyedia awan serasi dengan protokol S3, anda boleh menggunakan Amazon S3 secara langsung untuk sandaran.',
+        scDeep_Archive:
+            'Storan sejuk tahan lama sesuai untuk senario perniagaan dengan kekerapan akses yang sangat rendah.',
+        archiveHelper:
+            'Fail storan arkib tidak boleh dimuat turun secara langsung dan mesti dipulihkan terlebih dahulu melalui laman web penyedia perkhidmatan awan yang berkaitan. Sila gunakan dengan berhati-hati!',
+        backupAlert:
+            'Jika penyedia awan serasi dengan protokol S3, anda boleh menggunakan Amazon S3 secara langsung untuk sandaran.',
         domain: 'Domain pemecutan',
         backupAccount: 'Akaun sandaran | Akaun sandaran',
         loadBucket: 'Dapatkan baldi',
@@ -1478,55 +1571,73 @@ const message = {
         safe: 'Keselamatan',
         bindInfo: 'Maklumat ikatan',
         bindAll: 'Dengar Semua',
-        bindInfoHelper: 'Mengubah alamat atau protokol perkhidmatan pendengaran boleh menyebabkan ketidaktersediaan perkhidmatan. Adakah anda mahu meneruskan?',
+        bindInfoHelper:
+            'Mengubah alamat atau protokol perkhidmatan pendengaran boleh menyebabkan ketidaktersediaan perkhidmatan. Adakah anda mahu meneruskan?',
         ipv6: 'Dengar IPv6',
         bindAddress: 'Alamat pendengaran',
         entrance: 'Pintu masuk',
         showEntrance: 'Tunjukkan amaran dilumpuhkan di halaman "Tinjauan"',
-        entranceHelper: 'Mengaktifkan pintu masuk keselamatan hanya akan membolehkan log masuk ke panel melalui pintu masuk keselamatan yang ditentukan.',
-        entranceError: 'Sila masukkan titik masuk log masuk yang selamat sepanjang 5-116 aksara, hanya nombor atau huruf yang disokong.',
+        entranceHelper:
+            'Mengaktifkan pintu masuk keselamatan hanya akan membolehkan log masuk ke panel melalui pintu masuk keselamatan yang ditentukan.',
+        entranceError:
+            'Sila masukkan titik masuk log masuk yang selamat sepanjang 5-116 aksara, hanya nombor atau huruf yang disokong.',
         entranceInputHelper: 'Biarkan kosong untuk melumpuhkan pintu masuk keselamatan.',
         randomGenerate: 'Rawak',
         expirationTime: 'Tarikh Tamat Tempoh',
         unSetting: 'Tidak ditetapkan',
-        noneSetting: 'Tetapkan masa tamat tempoh untuk kata laluan panel. Selepas tamat tempoh, anda perlu menetapkan semula kata laluan',
-        expirationHelper: 'Jika masa tamat tempoh kata laluan ialah [0] hari, fungsi tamat tempoh kata laluan dilumpuhkan',
+        noneSetting:
+            'Tetapkan masa tamat tempoh untuk kata laluan panel. Selepas tamat tempoh, anda perlu menetapkan semula kata laluan',
+        expirationHelper:
+            'Jika masa tamat tempoh kata laluan ialah [0] hari, fungsi tamat tempoh kata laluan dilumpuhkan',
         days: 'Hari Tamat Tempoh',
         expiredHelper: 'Kata laluan semasa telah tamat tempoh. Sila tukar kata laluan lagi.',
-        timeoutHelper: '[ {0} hari ] Kata laluan panel akan tamat tempoh. Selepas tamat tempoh, anda perlu menetapkan semula kata laluan',
+        timeoutHelper:
+            '[ {0} hari ] Kata laluan panel akan tamat tempoh. Selepas tamat tempoh, anda perlu menetapkan semula kata laluan',
         complexity: 'Pengesahan kerumitan',
-        complexityHelper: 'Selepas anda mengaktifkannya, peraturan pengesahan kata laluan akan menjadi: 8-30 aksara, termasuk bahasa Inggeris, nombor, dan sekurang-kurangnya dua aksara khas.',
+        complexityHelper:
+            'Selepas anda mengaktifkannya, peraturan pengesahan kata laluan akan menjadi: 8-30 aksara, termasuk bahasa Inggeris, nombor, dan sekurang-kurangnya dua aksara khas.',
         bindDomain: 'Ikatan domain',
         unBindDomain: 'Buka ikatan domain',
         panelSSL: 'Panel SSL',
-        unBindDomainHelper: 'Tindakan membuka ikatan nama domain boleh menyebabkan ketidakamanan sistem. Adakah anda mahu meneruskan?',
+        unBindDomainHelper:
+            'Tindakan membuka ikatan nama domain boleh menyebabkan ketidakamanan sistem. Adakah anda mahu meneruskan?',
         bindDomainHelper: 'Selepas anda mengikat domain, hanya domain itu yang boleh mengakses perkhidmatan 1Panel.',
         bindDomainHelper1: 'Biarkan kosong untuk melumpuhkan ikatan nama domain.',
-        bindDomainWarning: 'Selepas ikatan domain, anda akan log keluar dan hanya boleh mengakses perkhidmatan 1Panel melalui nama domain yang ditentukan dalam tetapan. Adakah anda mahu meneruskan?',
+        bindDomainWarning:
+            'Selepas ikatan domain, anda akan log keluar dan hanya boleh mengakses perkhidmatan 1Panel melalui nama domain yang ditentukan dalam tetapan. Adakah anda mahu meneruskan?',
         allowIPs: 'IP Dibenarkan',
         unAllowIPs: 'IP Tidak Dibenarkan',
-        unAllowIPsWarning: 'Membenarkan IP kosong akan membolehkan semua IP mengakses sistem, yang boleh menyebabkan ketidakamanan sistem. Adakah anda mahu meneruskan?',
-        allowIPsHelper: 'Selepas anda menetapkan senarai alamat IP yang dibenarkan, hanya alamat IP dalam senarai yang boleh mengakses perkhidmatan panel.',
-        allowIPsWarning: 'Selepas anda menetapkan senarai alamat IP yang dibenarkan, hanya alamat IP dalam senarai yang boleh mengakses perkhidmatan panel. Adakah anda mahu meneruskan?',
+        unAllowIPsWarning:
+            'Membenarkan IP kosong akan membolehkan semua IP mengakses sistem, yang boleh menyebabkan ketidakamanan sistem. Adakah anda mahu meneruskan?',
+        allowIPsHelper:
+            'Selepas anda menetapkan senarai alamat IP yang dibenarkan, hanya alamat IP dalam senarai yang boleh mengakses perkhidmatan panel.',
+        allowIPsWarning:
+            'Selepas anda menetapkan senarai alamat IP yang dibenarkan, hanya alamat IP dalam senarai yang boleh mengakses perkhidmatan panel. Adakah anda mahu meneruskan?',
         allowIPsHelper1: 'Biarkan kosong untuk melumpuhkan sekatan alamat IP.',
         allowIPEgs: 'Satu per baris. Contoh,\n172.16.10.111\n172.16.10.0/24',
         mfa: 'Pengesahan dua faktor (2FA)',
         mfaClose: 'Melumpuhkan MFA akan mengurangkan keselamatan perkhidmatan. Adakah anda mahu meneruskan?',
         secret: 'Rahsia',
         mfaInterval: 'Selang penyegaran (saat)',
-        mfaTitleHelper: 'Judul digunakan untuk membezakan hos 1Panel yang berbeza. Imbas lagi atau tambahkan kunci rahsia secara manual selepas anda mengubah judul.',
-        mfaIntervalHelper: 'Imbas lagi atau tambahkan kunci rahsia secara manual selepas anda mengubah masa penyegaran.',
-        mfaAlert: 'Token satu kali ialah nombor 6 digit yang dijana secara dinamik berdasarkan masa semasa. Pastikan masa pelayan disegerakkan.',
+        mfaTitleHelper:
+            'Judul digunakan untuk membezakan hos 1Panel yang berbeza. Imbas lagi atau tambahkan kunci rahsia secara manual selepas anda mengubah judul.',
+        mfaIntervalHelper:
+            'Imbas lagi atau tambahkan kunci rahsia secara manual selepas anda mengubah masa penyegaran.',
+        mfaAlert:
+            'Token satu kali ialah nombor 6 digit yang dijana secara dinamik berdasarkan masa semasa. Pastikan masa pelayan disegerakkan.',
         mfaHelper: 'Selepas anda mengaktifkannya, token satu kali perlu disahkan.',
         mfaHelper1: 'Muat turun aplikasi pengesahan, contohnya,',
-        mfaHelper2: 'Untuk mendapatkan token satu kali, imbas kod QR berikut menggunakan aplikasi pengesahan anda atau salin kunci rahsia ke dalam aplikasi pengesahan anda.',
+        mfaHelper2:
+            'Untuk mendapatkan token satu kali, imbas kod QR berikut menggunakan aplikasi pengesahan anda atau salin kunci rahsia ke dalam aplikasi pengesahan anda.',
         mfaHelper3: 'Masukkan enam digit dari aplikasi',
         mfaCode: 'Token satu kali',
         sslChangeHelper: 'Ubah tetapan https dan mulakan semula perkhidmatan. Adakah anda mahu meneruskan?',
         sslDisable: 'Lumpuhkan',
-        sslDisableHelper: 'Jika perkhidmatan https dilumpuhkan, anda perlu memulakan semula panel untuk ia berkuat kuasa. Adakah anda mahu meneruskan?',
+        sslDisableHelper:
+            'Jika perkhidmatan https dilumpuhkan, anda perlu memulakan semula panel untuk ia berkuat kuasa. Adakah anda mahu meneruskan?',
         noAuthSetting: 'Tetapan tidak dibenarkan',
-        noAuthSettingHelper: 'Apabila pengguna tidak log masuk dengan pintu masuk keselamatan yang ditentukan, atau tidak mengakses panel dari IP atau nama domain yang ditentukan, respons ini boleh menyembunyikan ciri panel.',
+        noAuthSettingHelper:
+            'Apabila pengguna tidak log masuk dengan pintu masuk keselamatan yang ditentukan, atau tidak mengakses panel dari IP atau nama domain yang ditentukan, respons ini boleh menyembunyikan ciri panel.',
         responseSetting: 'Tetapan respons',
         help200: 'Halaman Bantuan',
         error400: 'Permintaan Buruk',
@@ -1541,21 +1652,25 @@ const message = {
         https: 'Menetapkan protokol akses HTTPS untuk panel boleh meningkatkan keselamatan akses panel.',
         certType: 'Jenis sijil',
         selfSigned: 'Diterbitkan sendiri',
-        selfSignedHelper: 'Pelayar mungkin tidak mempercayai sijil diterbitkan sendiri dan mungkin memaparkan amaran keselamatan.',
+        selfSignedHelper:
+            'Pelayar mungkin tidak mempercayai sijil diterbitkan sendiri dan mungkin memaparkan amaran keselamatan.',
         select: 'Pilih',
         domainOrIP: 'Domain atau IP:',
         timeOut: 'Tamat Masa',
         rootCrtDownload: 'Muat turun sijil akar',
         primaryKey: 'Kunci utama',
         certificate: 'Sijil',
-        backupJump: 'Fail sandaran tidak berada dalam senarai sandaran semasa, sila cuba muat turun dari direktori fail dan import untuk sandaran.',
+        backupJump:
+            'Fail sandaran tidak berada dalam senarai sandaran semasa, sila cuba muat turun dari direktori fail dan import untuk sandaran.',
 
         snapshot: 'Snapshot | Snapshots',
-        deleteHelper: 'Semua fail snapshot termasuk yang ada dalam akaun sandaran pihak ketiga akan dipadamkan. Adakah anda mahu meneruskan?',
+        deleteHelper:
+            'Semua fail snapshot termasuk yang ada dalam akaun sandaran pihak ketiga akan dipadamkan. Adakah anda mahu meneruskan?',
         status: 'Status snapshot',
         ignoreRule: 'Aturan abaikan',
         editIgnoreRule: 'Sunting aturan abaikan',
-        ignoreHelper: 'Aturan ini akan digunakan untuk memampatkan dan menyandarkan direktori data 1Panel semasa membuat snapshot. Secara lalai, fail soket diabaikan.',
+        ignoreHelper:
+            'Aturan ini akan digunakan untuk memampatkan dan menyandarkan direktori data 1Panel semasa membuat snapshot. Secara lalai, fail soket diabaikan.',
         ignoreHelper1: 'Satu per baris. Contoh,\n*.log\n/opt/1panel/cache',
         panelInfo: 'Tulis maklumat asas 1Panel',
         panelBin: 'Sandarkan fail sistem 1Panel',
@@ -1579,10 +1694,13 @@ const message = {
         recoverErrSize: 'Kekurangan ruang cakera dikesan, sila periksa atau bersihkan dan cuba lagi!',
         recoverHelper: 'Memulakan pemulihan dari snapshot {0}, sila sahkan maklumat berikut sebelum meneruskan:',
         recoverHelper1: 'Pemulihan memerlukan mulakan semula perkhidmatan Docker dan 1Panel',
-        recoverHelper2: 'Pastikan terdapat ruang cakera yang mencukupi pada pelayan (Saiz fail snapshot: {0}, Ruang tersedia: {1})',
-        recoverHelper3: 'Pastikan seni bina pelayan sepadan dengan seni bina pelayan di mana snapshot dicipta (Seni bina pelayan semasa: {0})',
+        recoverHelper2:
+            'Pastikan terdapat ruang cakera yang mencukupi pada pelayan (Saiz fail snapshot: {0}, Ruang tersedia: {1})',
+        recoverHelper3:
+            'Pastikan seni bina pelayan sepadan dengan seni bina pelayan di mana snapshot dicipta (Seni bina pelayan semasa: {0})',
         rollback: 'Pulangkan semula',
-        rollbackHelper: 'Pulangkan semula pemulihan ini akan menggantikan semua fail dari pemulihan ini, dan mungkin memerlukan mulakan semula perkhidmatan Docker dan 1Panel. Adakah anda mahu meneruskan?',
+        rollbackHelper:
+            'Pulangkan semula pemulihan ini akan menggantikan semua fail dari pemulihan ini, dan mungkin memerlukan mulakan semula perkhidmatan Docker dan 1Panel. Adakah anda mahu meneruskan?',
 
         upgradeHelper: 'Kemas kini memerlukan mulakan semula perkhidmatan 1Panel. Adakah anda mahu meneruskan?',
         noUpgrade: 'Ia adalah versi terbaru pada masa ini',
@@ -1609,7 +1727,8 @@ const message = {
         menu: 'Menu',
         confirmMessage: 'Halaman akan disegarkan untuk mengemas kini senarai menu lanjutan. Teruskan?',
         compressPassword: 'Kata laluan mampatan',
-        backupRecoverMessage: 'Sila masukkan kata laluan mampatan atau nyahmampatan (biarkan kosong jika tidak menetapkan)',
+        backupRecoverMessage:
+            'Sila masukkan kata laluan mampatan atau nyahmampatan (biarkan kosong jika tidak menetapkan)',
     },
     license: {
         community: 'OSS',
@@ -1626,8 +1745,10 @@ const message = {
         Lost: 'Hilang',
         Enable: 'Diaktifkan',
         Disable: 'Dilumpuhkan',
-        lostHelper: 'Lesen telah mencapai jumlah percubaan semula maksimum. Sila klik butang penyegerakan secara manual untuk memastikan ciri versi profesional berfungsi dengan baik.',
-        disableHelper: 'Pengesahan penyegerakan lesen gagal. Sila klik butang penyegerakan secara manual untuk memastikan ciri versi profesional berfungsi dengan baik.',
+        lostHelper:
+            'Lesen telah mencapai jumlah percubaan semula maksimum. Sila klik butang penyegerakan secara manual untuk memastikan ciri versi profesional berfungsi dengan baik.',
+        disableHelper:
+            'Pengesahan penyegerakan lesen gagal. Sila klik butang penyegerakan secara manual untuk memastikan ciri versi profesional berfungsi dengan baik.',
         quickUpdate: 'Kemas Kini Pantas',
         import: 'Import',
         power: 'Kebenaran',
@@ -1646,8 +1767,10 @@ const message = {
         waf: 'Menaik taraf ke versi profesional boleh menyediakan ciri seperti peta pencegahan, log, rekod blok, sekatan lokasi geografi, peraturan tersuai, halaman pencegahan tersuai, dan sebagainya.',
         tamper: 'Menaik taraf ke versi profesional boleh melindungi laman web daripada pengubahsuaian atau manipulasi tanpa kebenaran.',
         gpu: 'Menaik taraf ke versi profesional boleh membantu pengguna memantau parameter penting GPU secara visual seperti beban kerja, suhu, penggunaan memori secara masa nyata.',
-        setting: 'Menaik taraf ke versi profesional membolehkan penyesuaian logo panel, mesej selamat datang, dan maklumat lain.',
-        monitor: 'Tingkatkan ke versi profesional untuk melihat status masa nyata laman web, tren pelawat, sumber pelawat, log permintaan dan maklumat lain.',
+        setting:
+            'Menaik taraf ke versi profesional membolehkan penyesuaian logo panel, mesej selamat datang, dan maklumat lain.',
+        monitor:
+            'Tingkatkan ke versi profesional untuk melihat status masa nyata laman web, tren pelawat, sumber pelawat, log permintaan dan maklumat lain.',
         alert: 'Tingkatkan ke versi profesional untuk menerima maklumat amaran melalui SMS dan melihat log amaran, mengawal sepenuhnya pelbagai acara utama, dan memastikan operasi sistem bebas kerisauan.',
     },
     clean: {
@@ -1655,7 +1778,8 @@ const message = {
         scanHelper: 'Bersihkan fail sampah dengan mudah yang dihasilkan semasa operasi 1Panel',
         clean: 'Bersihkan sekarang',
         reScan: 'Imbas semula',
-        cleanHelper: 'Ini akan membersihkan fail sampah sistem yang dipilih dan tidak boleh dipulihkan. Adakah anda mahu meneruskan?',
+        cleanHelper:
+            'Ini akan membersihkan fail sampah sistem yang dipilih dan tidak boleh dipulihkan. Adakah anda mahu meneruskan?',
         statusSuggest: '(Disyorkan untuk Pembersihan)',
         statusClean: '(Sangat bersih)',
         statusEmpty: 'Sangat bersih, tiada pembersihan diperlukan!',
@@ -1669,7 +1793,8 @@ const message = {
         selectScan: 'Jumlah fail sampah yang dipilih: ',
 
         system: 'Fail Sampah Sistem',
-        systemHelper: 'Fail sementara yang dihasilkan semasa snapshot, peningkatan, dan kandungan fail usang semasa iterasi versi',
+        systemHelper:
+            'Fail sementara yang dihasilkan semasa snapshot, peningkatan, dan kandungan fail usang semasa iterasi versi',
         panelOriginal: 'Fail sandaran pemulihan snapshot sistem',
         upgrade: 'Fail sandaran peningkatan sistem',
         upgradeHelper: '(Disarankan untuk mengekalkan sandaran peningkatan terbaru untuk pemulihan sistem)',
@@ -1693,7 +1818,8 @@ const message = {
         directory: 'Direktori',
 
         systemLog: 'Fail Log Sistem',
-        systemLogHelper: 'Maklumat log sistem, maklumat log pembinaan kontena atau muat turun imej, dan fail log yang dihasilkan dalam tugas berjadual',
+        systemLogHelper:
+            'Maklumat log sistem, maklumat log pembinaan kontena atau muat turun imej, dan fail log yang dihasilkan dalam tugas berjadual',
         dockerLog: 'Fail log operasi kontena',
         taskLog: 'Fail log pelaksanaan tugas berjadual',
         containerShell: 'Tugas berjadual skrip Shell dalam kontena',
@@ -1724,7 +1850,8 @@ const message = {
         stop: 'Henti',
         rebuild: 'Bina Semula',
         description: 'Deskripsi',
-        deleteWarn: 'Operasi memadam akan memadam semua data dan sandaran bersama. Operasi ini tidak boleh dipulihkan. Adakah anda mahu meneruskan?',
+        deleteWarn:
+            'Operasi memadam akan memadam semua data dan sandaran bersama. Operasi ini tidak boleh dipulihkan. Adakah anda mahu meneruskan?',
         syncSuccess: 'Disegerakkan dengan berjaya',
         canUpgrade: 'Kemaskini',
         backupName: 'Nama Fail',
@@ -1774,7 +1901,8 @@ const message = {
         containerNameHelper: 'Nama kontena akan dijana secara automatik jika tidak ditetapkan',
         allowPort: 'Akses luaran',
         allowPortHelper: 'Membenarkan akses port luaran akan membuka port firewall',
-        appInstallWarn: 'Aplikasi tidak membuka port akses luaran secara lalai. Klik "Tetapan lanjutan" untuk membukanya.',
+        appInstallWarn:
+            'Aplikasi tidak membuka port akses luaran secara lalai. Klik "Tetapan lanjutan" untuk membukanya.',
         upgradeStart: 'Mulakan peningkatan! Sila segar semula halaman kemudian',
         toFolder: 'Buka direktori pemasangan',
         editCompose: 'Edit fail compose',
@@ -1784,7 +1912,8 @@ const message = {
         allReadyInstalled: 'Telah Dipasang',
         installHelper: 'Jika terdapat isu tarikan imej, konfigurasikan pecutan imej.',
         upgradeHelper: 'Bawa aplikasi yang tidak normal kembali ke status normal sebelum meningkatkan.',
-        installWarn: 'Akses luaran tidak diaktifkan, yang menghalang aplikasi daripada diakses melalui rangkaian luaran. Adakah anda mahu meneruskan?',
+        installWarn:
+            'Akses luaran tidak diaktifkan, yang menghalang aplikasi daripada diakses melalui rangkaian luaran. Adakah anda mahu meneruskan?',
         showIgnore: 'Lihat aplikasi yang diabaikan',
         cancelIgnore: 'Batal abaikan',
         ignoreList: 'Aplikasi yang diabaikan',
@@ -1825,7 +1954,8 @@ const message = {
         enableFtp: 'FTP',
         ftpUser: 'Akaun FTP',
         ftpPassword: 'Kata Laluan FTP',
-        ftpHelper: 'Selepas membuat laman web, akaun FTP akan dibuat dan direktori FTP akan memautkan ke direktori laman web.',
+        ftpHelper:
+            'Selepas membuat laman web, akaun FTP akan dibuat dan direktori FTP akan memautkan ke direktori laman web.',
         remark: 'Catatan',
         group: 'Kumpulan',
         manageGroup: 'Urus kumpulan',
@@ -1894,7 +2024,8 @@ const message = {
         toApp: 'Pergi ke senarai dipasang',
         cycle: 'Kitaran',
         frequency: 'Kekerapan',
-        ccHelper: 'Permintaan akumulatif untuk URL yang sama lebih daripada {1} kali dalam {0} saat, mencetuskan pertahanan CC, menyekat IP ini',
+        ccHelper:
+            'Permintaan akumulatif untuk URL yang sama lebih daripada {1} kali dalam {0} saat, mencetuskan pertahanan CC, menyekat IP ini',
         mustSave: 'Pengubahsuaian perlu disimpan untuk berkuat kuasa',
         fileExt: 'Sambungan fail',
         fileExtBlock: 'Senarai blok sambungan fail',
@@ -1903,8 +2034,7 @@ const message = {
         proxyAddress: 'Alamat Proksi',
         proxyHelper: 'Contoh: 127.0.0.1:8080',
         forceDelete: 'Padam Paksa',
-        forceDeleteHelper:
-            'Padam paksa akan mengabaikan ralat semasa proses pemadaman dan akhirnya memadam metadata.',
+        forceDeleteHelper: 'Padam paksa akan mengabaikan ralat semasa proses pemadaman dan akhirnya memadam metadata.',
         deleteAppHelper: 'Padam aplikasi yang berkaitan dan sandaran aplikasi pada masa yang sama',
         deleteBackupHelper: 'Juga padamkan sandaran laman web.',
         deleteConfirmHelper: `Operasi pemadaman tidak boleh dibatalkan. Masukkan <span style="color:red"> "{0}" </span> untuk mengesahkan pemadaman.`,
@@ -1919,8 +2049,10 @@ const message = {
         videoSite: 'Video',
         errLog: 'Log Ralat',
         accessLog: 'Log Laman Web',
-        stopHelper: 'Selepas menghentikan laman web, ia tidak akan dapat diakses dengan normal, dan pengguna akan melihat halaman berhenti laman web semasa apabila mengunjunginya. Adakah anda mahu meneruskan?',
-        startHelper: 'Selepas mengaktifkan laman web, pengguna boleh mengakses kandungan laman web seperti biasa. Adakah anda mahu meneruskan?',
+        stopHelper:
+            'Selepas menghentikan laman web, ia tidak akan dapat diakses dengan normal, dan pengguna akan melihat halaman berhenti laman web semasa apabila mengunjunginya. Adakah anda mahu meneruskan?',
+        startHelper:
+            'Selepas mengaktifkan laman web, pengguna boleh mengakses kandungan laman web seperti biasa. Adakah anda mahu meneruskan?',
         sitePath: 'Direktori',
         siteAlias: 'Alias Laman',
         primaryPath: 'Direktori utama',
@@ -1943,13 +2075,15 @@ const message = {
         sslConfig: 'Pilihan SSL',
         disableHTTPS: 'Lumpuhkan HTTPS',
         disableHTTPSHelper: 'Melumpuhkan HTTPS akan memadam konfigurasi berkaitan sijil. Adakah anda mahu meneruskan?',
-        SSLHelper: 'Nota: Jangan gunakan sijil SSL untuk laman web tidak sah.\nJika akses HTTPS tidak dapat digunakan selepas diaktifkan, semak sama ada kumpulan keselamatan telah melepaskan port 443 dengan betul.',
+        SSLHelper:
+            'Nota: Jangan gunakan sijil SSL untuk laman web tidak sah.\nJika akses HTTPS tidak dapat digunakan selepas diaktifkan, semak sama ada kumpulan keselamatan telah melepaskan port 443 dengan betul.',
         SSLConfig: 'Tetapan sijil',
         SSLProConfig: 'Tetapan protokol',
         supportProtocol: 'Versi protokol',
         encryptionAlgorithm: 'Algoritma penyulitan',
         notSecurity: '(tidak selamat)',
-        encryptHelper: "Let's Encrypt mempunyai had kekerapan untuk mengeluarkan sijil, tetapi mencukupi untuk memenuhi keperluan biasa. Operasi terlalu kerap akan menyebabkan kegagalan pengeluaran. Untuk sekatan tertentu, sila lihat <a target='_blank' href='https://letsencrypt.org/docs/rate-limits/'>dokumen rasmi</a>",
+        encryptHelper:
+            "Let's Encrypt mempunyai had kekerapan untuk mengeluarkan sijil, tetapi mencukupi untuk memenuhi keperluan biasa. Operasi terlalu kerap akan menyebabkan kegagalan pengeluaran. Untuk sekatan tertentu, sila lihat <a target='_blank' href='https://letsencrypt.org/docs/rate-limits/'>dokumen rasmi</a>",
         ipValue: 'Nilai',
         ext: 'sambungan fail',
         wafInputHelper: 'Masukkan data secara berbaris, satu baris',
@@ -1968,8 +2102,7 @@ const message = {
             'Gunakan proksi terbalik untuk memproksi perkhidmatan sedia ada. Contohnya, jika perkhidmatan dipasang dan berjalan pada port 8080, alamat proksi akan menjadi "http://127.0.0.1:8080".',
         runtimeProxyHelper: 'Gunakan runtime laman web untuk mencipta laman web.',
         runtime: 'Runtime',
-        deleteRuntimeHelper:
-            'Aplikasi Runtime perlu dipadamkan bersama laman web, sila berhati-hati',
+        deleteRuntimeHelper: 'Aplikasi Runtime perlu dipadamkan bersama laman web, sila berhati-hati',
         proxyType: 'Jenis Rangkaian',
         unix: 'Rangkaian Unix',
         tcp: 'Rangkaian TCP/IP',
@@ -2061,7 +2194,8 @@ const message = {
             'Aplikasi seperti WordPress yang dipasang dari kedai aplikasi biasanya dilengkapi dengan konfigurasi pseudo-statik praset. Mengkonfigurasi semula mereka boleh menyebabkan ralat.',
         websiteBackupWarn:
             'Hanya menyokong pengimportan sandaran tempatan, pengimportan sandaran dari mesin lain boleh menyebabkan kegagalan pemulihan',
-        ipWebsiteWarn: 'Laman web dengan IP sebagai nama domain perlu disetkan sebagai laman web lalai untuk diakses secara normal.',
+        ipWebsiteWarn:
+            'Laman web dengan IP sebagai nama domain perlu disetkan sebagai laman web lalai untuk diakses secara normal.',
         hstsHelper: 'Mengaktifkan HSTS boleh meningkatkan keselamatan laman web',
         defaultHtml: 'Halaman lalai',
         website404: 'Halaman ralat 404 laman web',
@@ -2070,7 +2204,8 @@ const message = {
         stopHtml: 'Laman web dihentikan',
         indexPHP: 'Indeks untuk laman web PHP',
         sslExpireDate: 'Tarikh Tamat Tempoh Sijil',
-        website404Helper: 'Halaman ralat 404 laman web hanya menyokong laman web persekitaran runtime PHP dan laman web statik',
+        website404Helper:
+            'Halaman ralat 404 laman web hanya menyokong laman web persekitaran runtime PHP dan laman web statik',
         sni: 'Sumber SNI',
         sniHelper:
             'Apabila backend proksi terbalik adalah HTTPS, anda mungkin perlu menetapkan sumber SNI. Sila rujuk dokumentasi penyedia perkhidmatan CDN untuk butiran.',
@@ -2092,7 +2227,8 @@ const message = {
         cgi_fix_pathinfo: 'Sama ada untuk membuka pathinfo',
         date_timezone: 'Zon waktu',
         disableFunction: 'Lumpuhkan fungsi',
-        disableFunctionHelper: 'Masukkan fungsi yang ingin dilumpuhkan, seperti exec, gunakan pemisah untuk banyak fungsi',
+        disableFunctionHelper:
+            'Masukkan fungsi yang ingin dilumpuhkan, seperti exec, gunakan pemisah untuk banyak fungsi',
         uploadMaxSize: 'Had muat naik',
         indexHelper:
             'Untuk memastikan operasi laman web PHP berjalan lancar, sila letakkan kod dalam direktori indeks dan elakkan menamakan semula',
@@ -2167,8 +2303,7 @@ const message = {
         domainHelper: 'Satu nama domain setiap baris, menyokong * dan alamat IP',
         pushDir: 'Tolakkan sijil ke direktori tempatan',
         dir: 'Direktori',
-        pushDirHelper:
-            'Fail sijil "fullchain.pem" dan fail kunci "privkey.pem" akan dihasilkan dalam direktori ini.',
+        pushDirHelper: 'Fail sijil "fullchain.pem" dan fail kunci "privkey.pem" akan dihasilkan dalam direktori ini.',
         organizationDetail: 'Butiran organisasi',
         fromWebsite: 'Daripada laman web',
         dnsMauanlHelper:
@@ -2217,13 +2352,15 @@ const message = {
         firewallHelper: '{0} firewall sistem',
         firewallNotStart: `Firewall sistem belum diaktifkan. Aktifkannya dahulu.`,
         restartFirewallHelper: 'Operasi ini akan memulakan semula firewall semasa. Adakah anda mahu meneruskan?',
-        stopFirewallHelper: 'Ini akan menyebabkan pelayan kehilangan perlindungan keselamatan. Adakah anda mahu meneruskan?',
+        stopFirewallHelper:
+            'Ini akan menyebabkan pelayan kehilangan perlindungan keselamatan. Adakah anda mahu meneruskan?',
         startFirewallHelper:
             'Selepas firewall diaktifkan, keselamatan pelayan boleh dilindungi dengan lebih baik. Adakah anda mahu meneruskan?',
         noPing: 'Lumpuhkan ping',
         noPingTitle: 'Lumpuhkan ping',
         noPingHelper: `Ini akan melumpuhkan ping, dan pelayan tidak akan memberikan tindak balas ICMP. Adakah anda mahu meneruskan?`,
-        onPingHelper: 'Ini akan mengaktifkan ping, dan penggodam mungkin menemui pelayan anda. Adakah anda mahu meneruskan?',
+        onPingHelper:
+            'Ini akan mengaktifkan ping, dan penggodam mungkin menemui pelayan anda. Adakah anda mahu meneruskan?',
         changeStrategy: 'Tukar strategi {0}',
         changeStrategyIPHelper1:
             'Tukar strategi alamat IP kepada [deny]. Selepas alamat IP ditetapkan, akses kepada pelayan dilarang. Adakah anda mahu meneruskan?',
@@ -2279,11 +2416,13 @@ const message = {
         localHelper: 'Persekitaran operasi tempatan perlu dipasang sendiri',
         version: 'Versi',
         versionHelper: 'Versi PHP, contohnya v8.0',
-        buildHelper: 'Jika lebih banyak sambungan dipilih, penggunaan CPU akan lebih tinggi semasa proses penciptaan imej. Elakkan memilih semua sambungan.',
+        buildHelper:
+            'Jika lebih banyak sambungan dipilih, penggunaan CPU akan lebih tinggi semasa proses penciptaan imej. Elakkan memilih semua sambungan.',
         openrestyWarn: 'PHP perlu dinaik taraf kepada OpenResty versi 1.21.4.1 atau lebih tinggi untuk digunakan',
         toupgrade: 'Naik Taraf',
         edit: 'Edit runtime',
-        extendHelper: 'Jika sambungan yang anda perlukan tiada dalam senarai, anda boleh memasukkan nama sambungan secara manual. Contohnya, masukkan "sockets", kemudian pilih yang pertama.',
+        extendHelper:
+            'Jika sambungan yang anda perlukan tiada dalam senarai, anda boleh memasukkan nama sambungan secara manual. Contohnya, masukkan "sockets", kemudian pilih yang pertama.',
         rebuildHelper: 'Selepas mengedit sambungan, anda perlu membina semula aplikasi PHP untuk ia berkesan',
         rebuild: 'Bina Semula Aplikasi PHP',
         source: 'Sumber sambungan PHP',
@@ -2305,14 +2444,17 @@ const message = {
         runScriptHelper: 'Senarai arahan permulaan diuraikan dari fail package.json dalam direktori sumber.',
         open: 'Buka',
         close: 'Tutup',
-        operatorHelper: 'Operasi {0} akan dilakukan pada persekitaran operasi yang dipilih. Adakah anda mahu meneruskan?',
-        statusHelper: 'Huraian status: Memulakan - kontena telah dimulakan, tetapi aplikasi sedang dimulakan; tidak normal - kontena telah dimulakan, tetapi status aplikasi tidak normal',
+        operatorHelper:
+            'Operasi {0} akan dilakukan pada persekitaran operasi yang dipilih. Adakah anda mahu meneruskan?',
+        statusHelper:
+            'Huraian status: Memulakan - kontena telah dimulakan, tetapi aplikasi sedang dimulakan; tidak normal - kontena telah dimulakan, tetapi status aplikasi tidak normal',
         taobao: 'Taobao',
         tencent: 'Tencent',
         imageSource: 'Sumber imej',
         moduleManager: 'Pengurusan Modul',
         module: 'Modul',
-        nodeOperatorHelper: 'Adakah {0} {1} modul? Operasi ini mungkin menyebabkan ketidaknormalan dalam persekitaran operasi. Sila pastikan sebelum meneruskan',
+        nodeOperatorHelper:
+            'Adakah {0} {1} modul? Operasi ini mungkin menyebabkan ketidaknormalan dalam persekitaran operasi. Sila pastikan sebelum meneruskan',
         customScript: 'Arahan permulaan tersuai',
         customScriptHelper: 'Sediakan arahan permulaan penuh. Contohnya, "npm run start".',
         portError: 'Jangan ulangi port yang sama.',
@@ -2321,7 +2463,8 @@ const message = {
         javaDirHelper: 'Direktori mesti mengandungi fail jar, subdirektori juga diterima',
         goHelper: 'Sediakan arahan permulaan penuh. Contohnya, "go run main.go" atau "./main".',
         goDirHelper: 'Direktori atau subdirektori mesti mengandungi fail Go atau binari.',
-        pythonHelper: 'Sediakan arahan permulaan penuh. Contohnya, "pip install -r requirements.txt && python manage.py runserver 0.0.0.0:5000".',
+        pythonHelper:
+            'Sediakan arahan permulaan penuh. Contohnya, "pip install -r requirements.txt && python manage.py runserver 0.0.0.0:5000".',
         dotnetHelper: 'Sediakan arahan permulaan penuh. Contohnya, "dotnet MyWebApp.dll".',
     },
     process: {
@@ -2372,14 +2515,17 @@ const message = {
             command: 'Perintah',
             dir: 'Direktori',
             numprocs: 'Bil. proses',
-            initWarn: 'Ini akan mengubah nilai "files" dalam bahagian "[include]" dalam fail konfigurasi utama. Direktori fail konfigurasi lain akan menjadi: "{direktori pemasangan 1Panel}/1panel/tools/supervisord/supervisor.d/".',
+            initWarn:
+                'Ini akan mengubah nilai "files" dalam bahagian "[include]" dalam fail konfigurasi utama. Direktori fail konfigurasi lain akan menjadi: "{direktori pemasangan 1Panel}/1panel/tools/supervisord/supervisor.d/".',
             operatorHelper: 'Operasi {1} akan dilakukan pada {0}, teruskan?',
             uptime: 'Masa berjalan',
             notStartWarn: 'Supervisor belum dimulakan. Mulakan dahulu.',
             serviceName: 'Nama perkhidmatan',
             initHelper: 'Perkhidmatan Supervisor belum diinisialisasi. Klik "Inisialisasi" untuk memulakan.',
-            serviceNameHelper: 'Nama perkhidmatan Supervisor yang diuruskan oleh systemctl, biasanya supervisor atau supervisord',
-            restartHelper: 'Ini akan memulakan semula perkhidmatan selepas inisialisasi, menyebabkan semua proses daemon sedia ada berhenti.',
+            serviceNameHelper:
+                'Nama perkhidmatan Supervisor yang diuruskan oleh systemctl, biasanya supervisor atau supervisord',
+            restartHelper:
+                'Ini akan memulakan semula perkhidmatan selepas inisialisasi, menyebabkan semua proses daemon sedia ada berhenti.',
             msg: 'Mesej',
             RUNNING: 'Berjalan',
             STOPPED: 'Berhenti',

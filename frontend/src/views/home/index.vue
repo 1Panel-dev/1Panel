@@ -121,7 +121,7 @@
                         </el-select>
                     </template>
                     <template #body>
-                        <div style="position: relative; margin-top: 20px">
+                        <div style="position: relative; margin-top: 60px">
                             <div class="monitor-tags" v-if="chartOption === 'network'">
                                 <el-tag>
                                     {{ $t('monitor.up') }}: {{ computeSizeFromKBs(currentChartInfo.netBytesSent) }}

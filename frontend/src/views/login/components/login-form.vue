@@ -62,6 +62,7 @@
                                         </el-dropdown-item>
                                     </el-dropdown-menu>
                                     <el-dropdown-item command="ru">Русский</el-dropdown-item>
+                                    <el-dropdown-item command="ms">Bahasa Melayu</el-dropdown-item>
                                 </template>
                             </el-dropdown>
                         </div>
@@ -275,6 +276,8 @@ function handleCommand(command: string) {
         dropdownText.value = '中文(繁體)';
     } else if (command === 'ru') {
         dropdownText.value = 'Русский';
+    } else if (command === 'ms') {
+        dropdownText.value = 'Bahasa Melayu';
     }
     nextTick(() => {
         loginFormRef.value.clearValidate();

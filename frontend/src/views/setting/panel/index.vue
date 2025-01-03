@@ -319,6 +319,7 @@ const languageOptions = ref([
     { value: 'tw', label: '中文(繁體)' },
     ...(!globalStore.isIntl ? [{ value: 'en', label: 'English' }] : []),
     { value: 'ru', label: 'Русский' },
+    { value: 'ms', label: 'Bahasa Melayu' },
 ]);
 
 if (globalStore.isIntl) {

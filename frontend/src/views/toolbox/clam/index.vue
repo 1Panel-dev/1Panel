@@ -257,7 +257,7 @@ const toFolder = (folder: string) => {
     router.push({ path: '/hosts/files', query: { path: folder } });
 };
 const toDoc = async () => {
-    window.open(docsUrl + '/user_manual/toolbox/clam/', '_blank', 'noopener,noreferrer');
+    window.open(docsUrl.value + '/user_manual/toolbox/clam/', '_blank', 'noopener,noreferrer');
 };
 
 const onChange = async (row: any) => {
