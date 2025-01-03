@@ -842,6 +842,28 @@ var InitTypes = map[string]struct{}{
 	"node":    {},
 }
 
+func deleteCustomApp() {
+	var appIDS []uint
+	installs, _ := appInstallRepo.ListBy()
+	for _, install := range installs {
+		appIDS = append(appIDS, install.AppId)
+	}
+	var ops []repo.DBOption
+	ops = append(ops, repo.WithByIDNotIn(appIDS))
+	if len(appIDS) > 0 {
+		ops = append(ops, repo.WithByIDNotIn(appIDS))
+	}
+	apps, _ := appRepo.GetBy(ops...)
+	var deleteIDS []uint
+	for _, app := range apps {
+		if app.Resource == constant.AppResourceCustom {
+			deleteIDS = append(deleteIDS, app.ID)
+		}
+	}
+	_ = appRepo.DeleteByIDs(context.Background(), deleteIDS)
+	_ = appDetailRepo.DeleteByAppIds(context.Background(), deleteIDS)
+}
+
 func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 	if xpack.IsUseCustomApp() {
 		return nil
@@ -891,7 +913,8 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 				Sort: t.Sort,
 			})
 		}
-		oldApps, err := appRepo.GetBy(appRepo.WithResource(constant.AppResourceRemote))
+		deleteCustomApp()
+		oldApps, err := appRepo.GetBy(appRepo.WithNotLocal())
 		if err != nil {
 			return err
 		}
@@ -1104,6 +1127,7 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 
 	go func() {
 		if err = syncTask.Execute(); err != nil {
+			_ = NewISettingService().Update("AppStoreLastModified", "0")
 			_ = NewISettingService().Update("AppStoreSyncStatus", constant.Error)
 		}
 	}()

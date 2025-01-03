@@ -91,11 +91,13 @@ func createIndexFile(website *model.Website, runtime *model.Runtime) error {
 }
 
 func createProxyFile(website *model.Website) error {
-	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
-	if err != nil {
-		return err
-	}
-	proxyFolder := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "www", "sites", website.Alias, "proxy")
+	//nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	//if err != nil {
+	//	return err
+	//}
+	//
+	//proxyFolder := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "www", "sites", website.Alias, "proxy")
+	proxyFolder := GetSitePath(*website, SiteProxyDir)
 	filePath := path.Join(proxyFolder, "root.conf")
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(proxyFolder) {

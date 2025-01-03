@@ -24,6 +24,12 @@ func WithByIDs(ids []uint) DBOption {
 	}
 }
 
+func WithByIDNotIn(ids []uint) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("id not in (?)", ids)
+	}
+}
+
 func WithByName(name string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("name = ?", name)

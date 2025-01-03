@@ -32,6 +32,7 @@ type IAppRepo interface {
 	Save(ctx context.Context, app *model.App) error
 	BatchDelete(ctx context.Context, apps []model.App) error
 	DeleteByIDs(ctx context.Context, ids []uint) error
+	DeleteBy(opts ...DBOption) error
 }
 
 func NewIAppRepo() IAppRepo {
@@ -79,7 +80,7 @@ func (a AppRepo) WithResource(resource string) DBOption {
 
 func (a AppRepo) WithNotLocal() DBOption {
 	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("resource != local")
+		return g.Where("resource != 'local'")
 	}
 }
 
@@ -148,4 +149,8 @@ func (a AppRepo) BatchDelete(ctx context.Context, apps []model.App) error {
 
 func (a AppRepo) DeleteByIDs(ctx context.Context, ids []uint) error {
 	return getTx(ctx).Where("id in (?)", ids).Delete(&model.App{}).Error
+}
+
+func (a AppRepo) DeleteBy(opts ...DBOption) error {
+	return getDb().Delete(&model.App{}, opts).Error
 }

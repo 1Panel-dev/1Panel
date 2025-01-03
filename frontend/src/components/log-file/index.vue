@@ -1,5 +1,5 @@
 <template>
-    <div v-loading="initLog && isLoading">
+    <div v-loading="firstLoading">
         <div v-if="defaultButton">
             <el-checkbox border v-model="tailLog" class="float-left" @change="changeTail(false)" v-if="showTail">
                 {{ $t('commons.button.watch') }}
@@ -110,7 +110,6 @@ const maxPage = ref(0);
 const minPage = ref(0);
 let timer: NodeJS.Timer | null = null;
 const logPath = ref('');
-const initLog = ref(false);
 
 const firstLoading = ref(false);
 const logs = ref<string[]>([]);
@@ -273,7 +272,6 @@ const onCloseLog = async () => {
     timer = null;
     isLoading.value = false;
     emit('update:isReading', false);
-    initLog.value = false;
 };
 
 watch(
@@ -284,7 +282,6 @@ watch(
 );
 
 const init = async () => {
-    initLog.value = true;
     if (props.config.tail) {
         tailLog.value = props.config.tail;
     } else {
