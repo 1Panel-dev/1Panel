@@ -2,6 +2,8 @@ package files
 
 import (
 	"bytes"
+	"crypto/md5"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
@@ -168,4 +170,18 @@ func Stat(path string) bool {
 		return false
 	}
 	return true
+}
+
+func GetFileMD5(filePath string) (string, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+	hash := md5.New()
+
+	if _, err = io.Copy(hash, file); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(hash.Sum(nil)), nil
 }

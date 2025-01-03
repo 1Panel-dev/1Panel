@@ -414,13 +414,13 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 		go func() {
 			nginxInstall, err := getNginxFull(&website)
 			if err != nil {
-				global.LOG.Errorf(buserr.WithErr(constant.ErrUpdateBuWebsite, err).Error())
+				global.LOG.Error(buserr.WithErr(constant.ErrUpdateBuWebsite, err).Error())
 				return
 			}
 			config := nginxInstall.SiteConfig.Config
 			servers := config.FindServers()
 			if len(servers) == 0 {
-				global.LOG.Errorf(buserr.WithErr(constant.ErrUpdateBuWebsite, errors.New("nginx config is not valid")).Error())
+				global.LOG.Error(buserr.WithErr(constant.ErrUpdateBuWebsite, errors.New("nginx config is not valid")).Error())
 				return
 			}
 			server := servers[0]
@@ -428,11 +428,11 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 			server.UpdateRootProxy([]string{proxy})
 
 			if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
-				global.LOG.Errorf(buserr.WithErr(constant.ErrUpdateBuWebsite, err).Error())
+				global.LOG.Error(buserr.WithErr(constant.ErrUpdateBuWebsite, err).Error())
 				return
 			}
 			if err := nginxCheckAndReload(nginxInstall.SiteConfig.OldContent, config.FilePath, nginxInstall.Install.ContainerName); err != nil {
-				global.LOG.Errorf(buserr.WithErr(constant.ErrUpdateBuWebsite, err).Error())
+				global.LOG.Error(buserr.WithErr(constant.ErrUpdateBuWebsite, err).Error())
 				return
 			}
 		}()
