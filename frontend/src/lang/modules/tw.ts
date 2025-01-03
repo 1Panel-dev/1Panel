@@ -1548,6 +1548,8 @@ const message = {
         upgradeNow: '立即更新',
         source: '下載源',
         hasNewVersion: '有新版本',
+        versionHigher: '檢測到節點 {0} 版本高於主節點，暫不支持切換，請先升級主節點系統版本後重試！',
+        versionLower: '檢測到節點 {0} 版本低於主節點，暫不支持切換，請先升級該節點系統版本後重試！',
 
         safe: '安全',
         bindInfo: '監聽地址',

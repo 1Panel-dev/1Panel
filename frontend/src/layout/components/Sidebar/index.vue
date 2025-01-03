@@ -8,10 +8,8 @@
     >
         <Logo :isCollapse="isCollapse" />
         <div class="el-dropdown-link flex justify-between items-center">
-            <el-button type="text" @click="openChangeNode" @mouseenter="openChangeNode">
-                <span>
-                    {{ loadCurrentName() }}
-                </span>
+            <el-button link class="ml-4" @click="openChangeNode" @mouseenter="openChangeNode">
+                {{ loadCurrentName() }}
             </el-button>
             <div>
                 <el-dropdown
@@ -25,11 +23,12 @@
                     <template #dropdown>
                         <el-dropdown-menu>
                             <el-dropdown-item command="local">
-                                <SvgIcon class="ico" iconName="p-host" />
+                                <el-button link icon="CircleCheck" type="success" />
                                 {{ $t('terminal.local') }}
                             </el-dropdown-item>
                             <el-dropdown-item v-for="item in nodes" :key="item.name" :command="item.name">
-                                <SvgIcon class="ico" iconName="p-host" />
+                                <el-button v-if="item.status === 'Healthy'" link icon="CircleCheck" type="success" />
+                                <el-button v-else link icon="Warning" type="danger" />
                                 {{ item.name }}
                             </el-dropdown-item>
                         </el-dropdown-menu>
@@ -74,16 +73,18 @@ import { logOutApi } from '@/api/modules/auth';
 import i18n from '@/lang';
 import { DropdownInstance, ElMessageBox } from 'element-plus';
 import { GlobalStore, MenuStore } from '@/store';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import { isString } from '@vueuse/core';
 import { getSettingInfo, listNodeOptions } from '@/api/modules/setting';
 import { countExecutingTask } from '@/api/modules/log';
+import { compareVersion } from '@/utils/version';
 
 const route = useRoute();
 const menuStore = MenuStore();
 const globalStore = GlobalStore();
 const nodes = ref([]);
 const nodeChangeRef = ref<DropdownInstance>();
+const version = ref();
 defineProps({
     menuRouter: {
         type: Boolean,
@@ -172,8 +173,32 @@ const loadNodes = async () => {
         });
 };
 const changeNode = (command: string) => {
-    globalStore.currentNode = command || 'local';
-    location.reload();
+    if (globalStore.currentNode === command) {
+        return;
+    }
+    if (command == 'local') {
+        globalStore.currentNode = command || 'local';
+        location.reload();
+        return;
+    }
+    for (const item of nodes.value) {
+        if (item.name == command) {
+            if (version.value == item.version) {
+                globalStore.currentNode = command || 'local';
+                location.reload();
+                return;
+            }
+            let compareItem = compareVersion(item.version, version.value);
+            if (compareItem) {
+                MsgError(i18n.global.t('setting.versionHigher', [command]));
+                return;
+            }
+            if (!compareItem) {
+                MsgError(i18n.global.t('setting.versionLower', [command]));
+                return;
+            }
+        }
+    }
 };
 
 function extractLabels(node: Node, result: string[]): void {
@@ -195,6 +220,7 @@ function getCheckedLabels(json: Node): string[] {
 
 const search = async () => {
     const res = await getSettingInfo();
+    version.value = res.data.systemVersion;
     const json: Node = JSON.parse(res.data.xpackHideMenu);
     if (json.isCheck === false) {
         json.children.forEach((child: any) => {

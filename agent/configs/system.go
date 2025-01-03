@@ -3,7 +3,7 @@ package configs
 type System struct {
 	Mode string `mapstructure:"mode"`
 
-	Port       string `mapstructure:"version"`
+	Port       string `mapstructure:"port"`
 	Version    string `mapstructure:"version"`
 	BaseDir    string `mapstructure:"base_dir"`
 	EncryptKey string `mapstructure:"encrypt_key"`

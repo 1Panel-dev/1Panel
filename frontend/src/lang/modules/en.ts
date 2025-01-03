@@ -1743,6 +1743,10 @@ const message = {
         upgradeNow: 'Upgrade now',
         source: 'Download source',
         hasNewVersion: 'New version Available',
+        versionHigher:
+            'Detected that node {0} version is higher than the main node, switching is not supported at this time. Please upgrade the main node system version and try again!',
+        versionLower:
+            'Detected that node {0} version is lower than the main node, switching is not supported at this time. Please upgrade the system version of this node and try again!',
 
         about: 'About',
         project: 'Project Address',

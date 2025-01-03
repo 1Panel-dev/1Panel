@@ -227,5 +227,6 @@ export namespace Setting {
         id: number;
         addr: string;
         status: string;
+        version: string;
     }
 }

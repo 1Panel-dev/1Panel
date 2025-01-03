@@ -1546,6 +1546,8 @@ const message = {
         upgradeNow: '立即更新',
         source: '下载源',
         hasNewVersion: '有新版本',
+        versionHigher: '检测到节点 {0} 版本高于主节点，暂不支持切换，请先升级主节点系统版本后重试！',
+        versionLower: '检测到节点 {0} 版本低于主节点，暂不支持切换，请先升级该节点系统版本后重试！',
 
         safe: '安全',
         bindInfo: '监听地址',
