@@ -24,13 +24,14 @@ type ISettingRepo interface {
 	DelMonitorBase(timeForDelete time.Time) error
 	DelMonitorIO(timeForDelete time.Time) error
 	DelMonitorNet(timeForDelete time.Time) error
+	UpdateOrCreate(key, value string) error
 }
 
 func NewISettingRepo() ISettingRepo {
 	return &SettingRepo{}
 }
 
-func (u *SettingRepo) GetList(opts ...DBOption) ([]model.Setting, error) {
+func (s *SettingRepo) GetList(opts ...DBOption) ([]model.Setting, error) {
 	var settings []model.Setting
 	db := global.DB.Model(&model.Setting{})
 	for _, opt := range opts {
@@ -40,7 +41,7 @@ func (u *SettingRepo) GetList(opts ...DBOption) ([]model.Setting, error) {
 	return settings, err
 }
 
-func (u *SettingRepo) Create(key, value string) error {
+func (s *SettingRepo) Create(key, value string) error {
 	setting := &model.Setting{
 		Key:   key,
 		Value: value,
@@ -48,7 +49,7 @@ func (u *SettingRepo) Create(key, value string) error {
 	return global.DB.Create(setting).Error
 }
 
-func (u *SettingRepo) Get(opts ...DBOption) (model.Setting, error) {
+func (s *SettingRepo) Get(opts ...DBOption) (model.Setting, error) {
 	var settings model.Setting
 	db := global.DB.Model(&model.Setting{})
 	for _, opt := range opts {
@@ -58,7 +59,7 @@ func (u *SettingRepo) Get(opts ...DBOption) (model.Setting, error) {
 	return settings, err
 }
 
-func (u *SettingRepo) GetValueByKey(key string) (string, error) {
+func (s *SettingRepo) GetValueByKey(key string) (string, error) {
 	var setting model.Setting
 	if err := global.DB.Model(&model.Setting{}).Where("key = ?", key).First(&setting).Error; err != nil {
 		global.LOG.Errorf("load %s from db setting failed, err: %v", key, err)
@@ -67,31 +68,35 @@ func (u *SettingRepo) GetValueByKey(key string) (string, error) {
 	return setting.Value, nil
 }
 
-func (c *SettingRepo) WithByKey(key string) DBOption {
+func (s *SettingRepo) WithByKey(key string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("key = ?", key)
 	}
 }
 
-func (u *SettingRepo) Update(key, value string) error {
+func (s *SettingRepo) Update(key, value string) error {
 	return global.DB.Model(&model.Setting{}).Where("key = ?", key).Updates(map[string]interface{}{"value": value}).Error
 }
 
-func (u *SettingRepo) CreateMonitorBase(model model.MonitorBase) error {
+func (s *SettingRepo) CreateMonitorBase(model model.MonitorBase) error {
 	return global.MonitorDB.Create(&model).Error
 }
-func (u *SettingRepo) BatchCreateMonitorIO(ioList []model.MonitorIO) error {
+func (s *SettingRepo) BatchCreateMonitorIO(ioList []model.MonitorIO) error {
 	return global.MonitorDB.CreateInBatches(ioList, len(ioList)).Error
 }
-func (u *SettingRepo) BatchCreateMonitorNet(ioList []model.MonitorNetwork) error {
+func (s *SettingRepo) BatchCreateMonitorNet(ioList []model.MonitorNetwork) error {
 	return global.MonitorDB.CreateInBatches(ioList, len(ioList)).Error
 }
-func (u *SettingRepo) DelMonitorBase(timeForDelete time.Time) error {
+func (s *SettingRepo) DelMonitorBase(timeForDelete time.Time) error {
 	return global.MonitorDB.Where("created_at < ?", timeForDelete).Delete(&model.MonitorBase{}).Error
 }
-func (u *SettingRepo) DelMonitorIO(timeForDelete time.Time) error {
+func (s *SettingRepo) DelMonitorIO(timeForDelete time.Time) error {
 	return global.MonitorDB.Where("created_at < ?", timeForDelete).Delete(&model.MonitorIO{}).Error
 }
-func (u *SettingRepo) DelMonitorNet(timeForDelete time.Time) error {
+func (s *SettingRepo) DelMonitorNet(timeForDelete time.Time) error {
 	return global.MonitorDB.Where("created_at < ?", timeForDelete).Delete(&model.MonitorNetwork{}).Error
+}
+
+func (s *SettingRepo) UpdateOrCreate(key, value string) error {
+	return global.DB.Model(&model.Setting{}).Where("key = ?", key).Assign(model.Setting{Key: key, Value: value}).FirstOrCreate(&model.Setting{}).Error
 }

@@ -48,22 +48,7 @@ func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {
 }
 
 func (u *SettingService) Update(key, value string) error {
-	switch key {
-	case "AppStoreLastModified":
-		exist, _ := settingRepo.Get(settingRepo.WithByKey("AppStoreLastModified"))
-		if exist.ID == 0 {
-			return settingRepo.Create("AppStoreLastModified", value)
-		}
-	case "AppDefaultDomain":
-		exist, _ := settingRepo.Get(settingRepo.WithByKey("AppDefaultDomain"))
-		if exist.ID == 0 {
-			return settingRepo.Create("AppDefaultDomain", value)
-		}
-	}
-	if err := settingRepo.Update(key, value); err != nil {
-		return err
-	}
-	return nil
+	return settingRepo.UpdateOrCreate(key, value)
 }
 
 func (u *SettingService) ReloadConn() error {

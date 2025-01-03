@@ -65,8 +65,8 @@ import { dateFormat, computeSize } from '@/utils/util';
 import i18n from '@/lang';
 import Delete from './delete/index.vue';
 import Reduce from './reduce/index.vue';
-import { updateSetting } from '@/api/modules/setting';
 import { MsgSuccess } from '@/utils/message';
+import { updateAgentSetting } from '@/api/modules/setting';
 
 const open = ref(false);
 const req = reactive({
@@ -114,7 +114,7 @@ const getStatus = async () => {
 const changeStatus = async () => {
     try {
         loading.value = true;
-        await updateSetting({ key: 'FileRecycleBin', value: status.value });
+        await updateAgentSetting({ key: 'FileRecycleBin', value: status.value });
         MsgSuccess(i18n.global.t('file.fileRecycleBinMsg', [i18n.global.t('commons.button.' + status.value)]));
         loading.value = false;
     } catch (error) {}
