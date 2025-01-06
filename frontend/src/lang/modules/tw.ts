@@ -297,6 +297,7 @@ const message = {
             sending: '下發中',
             healthy: '正常',
             executing: '執行中',
+            installerr: '安裝失敗',
         },
         units: {
             second: '秒',
@@ -1863,6 +1864,8 @@ const message = {
             '默認訪問用於應用端口跳轉，例如應用端口為 8080 則跳轉地址為 http(s)://默認訪問地址:8080',
         webUIConfig: '請在應用參數或者應用商店設置處添加訪問地址',
         toLink: '連結',
+        customAppHelper: '當前使用的是主節點應用商店包，修改配置請在主節點操作',
+        forceUninstall: '強制卸載',
     },
     website: {
         website: '網站',

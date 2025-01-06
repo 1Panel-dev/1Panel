@@ -124,3 +124,7 @@ export const BatchChangeRole = (params: File.FileRole) => {
 export const GetRecycleStatus = () => {
     return http.get<string>('files/recycle/status');
 };
+
+export const GetPathByType = (pathType: string) => {
+    return http.get<string>(`files/path/${pathType}`);
+};

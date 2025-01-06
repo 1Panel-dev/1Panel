@@ -297,6 +297,7 @@ const message = {
             sending: '下发中',
             healthy: '正常',
             executing: '执行中',
+            installerr: '安装失败',
         },
         units: {
             second: '秒',
@@ -1862,6 +1863,7 @@ const message = {
         webUIConfig: '请在应用参数或者应用商店设置处添加访问地址',
         toLink: '跳转',
         customAppHelper: '当前使用的是主节点应用商店包，修改配置请在主节点操作',
+        forceUninstall: '强制卸载',
     },
     website: {
         website: '网站',

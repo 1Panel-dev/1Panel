@@ -114,6 +114,7 @@ import { GetAppService } from '@/api/modules/app';
 import { Rules } from '@/global/form-rules';
 import { App } from '@/api/interface/app';
 import { getDBName } from '@/utils/util';
+import { GetPathByType } from '@/api/modules/files';
 
 interface ParamObj extends App.FromField {
     services: App.AppService[];
@@ -185,6 +186,11 @@ const handleParams = () => {
                 }
             } else {
                 form[p.envKey] = p.default;
+            }
+            if (p.type == 'text' && p.envKey == 'WEBSITE_DIR') {
+                GetPathByType('websiteDir').then((res) => {
+                    form[p.envKey] = res.data;
+                });
             }
             if (p.required) {
                 if (p.type === 'service' || p.type === 'apps') {

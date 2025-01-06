@@ -51,6 +51,8 @@ type IFileService interface {
 	ChangeMode(op request.FileCreate) error
 	BatchChangeModeAndOwner(op request.FileRoleReq) error
 	ReadLogByLine(req request.FileReadByLineReq) (*response.FileLineContent, error)
+
+	GetPathByType(pathType string) string
 }
 
 var filteredPaths = []string{
@@ -482,4 +484,15 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 		Lines:   lines,
 	}
 	return res, nil
+}
+
+func (f *FileService) GetPathByType(pathType string) string {
+	if pathType == "websiteDir" {
+		value, _ := settingRepo.GetValueByKey("WEBSITE_DIR")
+		if value == "" {
+			return path.Join(global.CONF.System.BaseDir, "www")
+		}
+		return value
+	}
+	return ""
 }

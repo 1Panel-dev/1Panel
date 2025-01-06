@@ -87,7 +87,7 @@ const search = async () => {
 };
 
 const openTaskLog = (row: Log.Task) => {
-    taskLogRef.value.openWithTaskID(row.id, !(row.status == 'Executing'));
+    taskLogRef.value.openWithTaskID(row.id, row.status == 'Executing');
 };
 
 const acceptParams = () => {

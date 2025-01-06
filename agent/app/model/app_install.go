@@ -31,19 +31,6 @@ func (i *AppInstall) GetPath() string {
 	return path.Join(i.GetAppPath(), i.Name)
 }
 
-//func (i *AppInstall) GetSiteDir() string {
-//	var data map[string]interface{}
-//	err := json.Unmarshal([]byte(i.Env), &data)
-//	if err != nil {
-//		return path.Join(i.GetAppPath(), i.Name, "www")
-//	}
-//	websiteDir, ok := data["WEBSITE_DIR"].(string)
-//	if !ok || websiteDir == "" {
-//		return path.Join(i.GetAppPath(), i.Name, "www")
-//	}
-//	return websiteDir
-//}
-
 func (i *AppInstall) GetComposePath() string {
 	return path.Join(i.GetAppPath(), i.Name, "docker-compose.yml")
 }

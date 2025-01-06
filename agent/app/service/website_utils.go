@@ -91,12 +91,6 @@ func createIndexFile(website *model.Website, runtime *model.Runtime) error {
 }
 
 func createProxyFile(website *model.Website) error {
-	//nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
-	//if err != nil {
-	//	return err
-	//}
-	//
-	//proxyFolder := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "www", "sites", website.Alias, "proxy")
 	proxyFolder := GetSitePath(*website, SiteProxyDir)
 	filePath := path.Join(proxyFolder, "root.conf")
 	fileOp := files.NewFileOp()
@@ -281,10 +275,6 @@ func createWafConfig(website *model.Website, domains []model.WebsiteDomain) erro
 	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
 	if err != nil {
 		return err
-	}
-
-	if !common.CompareVersion(nginxInstall.Version, "1.21.4.3-2-0") {
-		return nil
 	}
 	wafDataPath := path.Join(nginxInstall.GetPath(), "1pwaf", "data")
 	fileOp := files.NewFileOp()

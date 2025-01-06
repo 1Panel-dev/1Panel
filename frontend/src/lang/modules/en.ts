@@ -302,6 +302,7 @@ const message = {
             sending: 'Sending',
             healthy: 'Normal',
             executing: 'Executing',
+            installerr: 'Install Error',
         },
         units: {
             second: 'Second',
@@ -2007,6 +2008,9 @@ const message = {
             'The default access is used for application port forwarding. For example, if the application port is 8080, the forwarding address would be http(s)://default-access-address:8080',
         webUIConfig: 'Please add the access address in the application parameters or the app store settings',
         toLink: 'Open',
+        customAppHelper:
+            'The current package is from the main node app store, please modify the configuration on the main node',
+        forceUninstall: 'Force Uninstall',
     },
     website: {
         website: 'Website',

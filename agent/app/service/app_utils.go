@@ -384,7 +384,8 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 			return err
 		}
 
-		if deleteReq.DeleteDB {
+		resources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithAppInstallId(install.ID))
+		if deleteReq.DeleteDB && len(resources) > 0 {
 			del := dto.DelAppLink{
 				Ctx:         ctx,
 				Install:     &install,
@@ -1062,8 +1063,9 @@ func upApp(task *task.Task, appInstall *model.AppInstall, pullImages bool) error
 						}
 					}
 					appInstall.Message = errMsg + out
-					task.LogFailedWithErr(i18n.GetMsgByKey("PullImage"), err)
-					return err
+					installErr := errors.New(appInstall.Message)
+					task.LogFailedWithErr(i18n.GetMsgByKey("PullImage"), installErr)
+					return installErr
 				} else {
 					task.Log(i18n.GetMsgByKey("PullImageSuccess"))
 				}
@@ -1316,7 +1318,7 @@ func handleErr(install model.AppInstall, err error, out string) error {
 
 func doNotNeedSync(installed model.AppInstall) bool {
 	return installed.Status == constant.Installing || installed.Status == constant.Rebuilding || installed.Status == constant.Upgrading ||
-		installed.Status == constant.Syncing || installed.Status == constant.Uninstalling
+		installed.Status == constant.Syncing || installed.Status == constant.Uninstalling || installed.Status == constant.InstallErr
 }
 
 func synAppInstall(containers map[string]types.Container, appInstall *model.AppInstall, force bool) {

@@ -359,7 +359,11 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 				siteDir = path.Join(constant.DataDir, dir.(string))
 			}
 			req.Params["WEBSITE_DIR"] = siteDir
-			_ = settingRepo.Create("WEBSITE_DIR", siteDir)
+			oldWebStePath, _ := settingRepo.GetValueByKey("WEBSITE_DIR")
+			if oldWebStePath != "" && oldWebStePath != siteDir {
+				_ = files.NewFileOp().Rename(oldWebStePath, siteDir)
+			}
+			_ = settingRepo.UpdateOrCreate("WEBSITE_DIR", siteDir)
 		}
 	}
 	for key := range req.Params {

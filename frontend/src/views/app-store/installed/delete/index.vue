@@ -1,8 +1,8 @@
 <template>
-    <DialogPro v-model="open" :title="$t('commons.button.delete') + ' - ' + appInstallName" @close="handleClose">
+    <DialogPro v-model="open" :title="$t('commons.button.uninstall') + ' - ' + appInstallName" @close="handleClose">
         <el-form ref="deleteForm" label-position="left" v-loading="loading">
             <el-form-item>
-                <el-checkbox v-model="deleteReq.forceDelete" :label="$t('app.forceDelete')" />
+                <el-checkbox v-model="deleteReq.forceDelete" :label="$t('app.forceUninstall')" />
                 <span class="input-help">
                     {{ $t('app.forceDeleteHelper') }}
                 </span>

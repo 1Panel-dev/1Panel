@@ -47,5 +47,6 @@ func (f *FileRouter) InitRouter(Router *gin.RouterGroup) {
 		fileRouter.POST("/favorite", baseApi.CreateFavorite)
 		fileRouter.POST("/favorite/del", baseApi.DeleteFavorite)
 
+		fileRouter.GET("/path/:type", baseApi.GetPathByType)
 	}
 }
