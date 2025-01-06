@@ -1,4 +1,4 @@
-import fit2cloudPtBrLocale from 'fit2cloud-ui-plus/src/locale/lang/pt-br';
+import fit2cloudPtBrLocale from 'fit2cloud-ui-plus/src/locale/lang/en';
 
 let xpackPtBrLocale = {};
 const xpackModules = import.meta.glob('../../xpack/lang/pt-br.ts', { eager: true });
@@ -80,7 +80,6 @@ const message = {
             timeRange: 'Até',
             dateStart: 'Data inicial',
             dateEnd: 'Data final',
-
         },
         table: {
             all: 'Todos',
@@ -110,14 +109,12 @@ const message = {
             refreshRate: 'Taxa de atualização',
             refreshRateUnit: 'Sem atualização | {n} segundo/atualização | {n} segundos/atualização',
             selectColumn: 'Selecionar coluna',
-
         },
         loadingText: {
             Upgrading: 'Atualizando o sistema, por favor, aguarde...',
             Restarting: 'Reiniciando o sistema, por favor, aguarde...',
             Recovering: 'Restaurando a partir de um snapshot, por favor, aguarde...',
             Rollbacking: 'Revertendo para um snapshot, por favor, aguarde...',
-
         },
         msg: {
             noneData: 'Nenhum dado disponível',
@@ -145,7 +142,8 @@ const message = {
             unSupportType: 'O tipo de arquivo atual não é suportado.',
             unSupportSize: 'O arquivo enviado excede {0}M, por favor confirme!',
             fileExist: 'O arquivo já existe na pasta atual. Não é possível enviar novamente.',
-            fileNameErr: 'Você pode enviar apenas arquivos cujo nome contenha de 1 a 256 caracteres, incluindo letras, números ou os caracteres (. - _)',
+            fileNameErr:
+                'Você pode enviar apenas arquivos cujo nome contenha de 1 a 256 caracteres, incluindo letras, números ou os caracteres (. - _)',
             confirmNoNull: 'Certifique-se de que o valor {0} não está vazio.',
             errPort: 'Informação de porta incorreta, por favor confirme!',
             remove: 'Remover',
@@ -155,7 +153,6 @@ const message = {
             rootInfoErr: 'Já está no diretório raiz',
             resetSuccess: 'Redefinido com sucesso',
             creatingInfo: 'Criando, não é necessário realizar esta operação',
-
         },
         login: {
             username: 'Usuário',
@@ -167,7 +164,8 @@ const message = {
             errorCaptcha: 'Erro no código Captcha!',
             notSafe: 'Acesso Negado',
             safeEntrance1: 'O login seguro foi habilitado no ambiente atual',
-            safeEntrance2: 'Digite o seguinte comando no terminal SSH para visualizar a entrada do painel: 1pctl user-info',
+            safeEntrance2:
+                'Digite o seguinte comando no terminal SSH para visualizar a entrada do painel: 1pctl user-info',
             errIP1: 'O acesso por endereço IP autorizado está habilitado no ambiente atual',
             errDomain1: 'O acesso por nome de domínio vinculado está habilitado no ambiente atual',
             errHelper: 'Para redefinir as informações de vinculação, execute o seguinte comando no terminal SSH:',
@@ -193,21 +191,23 @@ const message = {
             commonName:
                 'Este campo deve começar com caracteres não especiais e consistir em letras, números, ".", "-", e "_" com comprimento de 1-128.',
             userName: 'Este campo deve conter letras, números e "_" com comprimento de 3-30.',
-            simpleName: 'Este campo não deve começar com "_" e deve conter letras, números e "_" com comprimento de 3-30.',
-            simplePassword: 'Este campo não deve começar com "_" e deve conter letras, números e "_" com comprimento de 1-30.',
+            simpleName:
+                'Este campo não deve começar com "_" e deve conter letras, números e "_" com comprimento de 3-30.',
+            simplePassword:
+                'Este campo não deve começar com "_" e deve conter letras, números e "_" com comprimento de 1-30.',
             dbName: 'Este campo não deve começar com "_" e deve conter letras, números e "_" com comprimento de 1-64.',
             imageName:
                 'Este campo deve conter letras, números, ":", "@", "/", ".", "-", e "_" com comprimento de 1-256.',
             composeName:
                 'Deve começar com caracteres não especiais, conter letras minúsculas, números, "-" e "_" com comprimento de 1-256.',
-            volumeName:
-                'Este campo deve conter letras, números, ".", "-", e "_" com comprimento de 2-30.',
+            volumeName: 'Este campo deve conter letras, números, ".", "-", e "_" com comprimento de 2-30.',
             supervisorName:
                 'Este campo deve começar com caracteres não especiais e conter letras, números, "-" e "_" com comprimento de 1-128.',
             complexityPassword:
                 'Este campo deve conter letras, números com comprimento de 8-30 e pelo menos dois caracteres especiais.',
             commonPassword: 'O comprimento deste campo deve ser maior que 6.',
-            linuxName: 'O comprimento deste campo deve estar entre 1 e 128. Não pode conter os seguintes caracteres especiais: "{0}".',
+            linuxName:
+                'O comprimento deste campo deve estar entre 1 e 128. Não pode conter os seguintes caracteres especiais: "{0}".',
             email: 'Este campo deve ser um endereço de email válido.',
             number: 'Este campo deve ser um número.',
             integer: 'Este campo deve ser um número inteiro positivo.',
@@ -220,14 +220,15 @@ const message = {
             databaseName: 'Este campo deve conter letras, números e "_" com comprimento de 1-30.',
             ipErr: 'Este campo deve ser um endereço IP válido.',
             numberRange: 'Este campo deve ser um número entre {0} e {1}.',
-            paramName:
-                'Este campo deve conter letras, números, ".", "-", e "_" com comprimento de 2-30.',
+            paramName: 'Este campo deve conter letras, números, ".", "-", e "_" com comprimento de 2-30.',
             paramComplexity:
                 'Este campo não deve começar ou terminar com caracteres especiais e deve conter letras, números e "{0}" com comprimento de 6-128.',
             paramUrlAndPort: 'Este campo deve estar no formato "http(s)://(nome do domínio/IP):(porta)".',
             nginxDoc: 'Este campo deve conter letras, números e ".".',
-            appName: 'Este campo não deve começar ou terminar com "-" ou "_" e deve conter letras, números, "-", e "_" com comprimento de 2-30.',
-            containerName: 'Suporta letras, números, "-", "_" e "."; não pode começar com "-", "_" ou "."; comprimento: 2-128.',
+            appName:
+                'Este campo não deve começar ou terminar com "-" ou "_" e deve conter letras, números, "-", e "_" com comprimento de 2-30.',
+            containerName:
+                'Suporta letras, números, "-", "_" e "."; não pode começar com "-", "_" ou "."; comprimento: 2-128.',
             mirror: 'O endereço de aceleração do mirror deve começar com http(s)://, suportar letras (maiúsculas e minúsculas), números, ".", "/" e "-", e não deve conter linhas em branco.',
             disableFunction: 'Suporta apenas letras, underscores e,',
             leechExts: 'Suporta apenas letras, números e,',
@@ -353,7 +354,8 @@ const message = {
         restart_system: 'Reiniciar servidor',
         operationSuccess: 'Operação bem-sucedida, reiniciando, por favor, atualize o navegador manualmente mais tarde!',
         overview: 'Visão Geral',
-        entranceHelper: 'A entrada de segurança não está ativada. Você pode ativá-la em "Configurações -> Segurança" para melhorar a segurança do sistema.',
+        entranceHelper:
+            'A entrada de segurança não está ativada. Você pode ativá-la em "Configurações -> Segurança" para melhorar a segurança do sistema.',
         appInstalled: 'Aplicações',
         systemInfo: 'Informações do sistema',
         hostname: 'Nome do host',
@@ -404,7 +406,6 @@ const message = {
         closeCurrent: 'Fechar atual',
         closeOther: 'Fechar outros',
         closeAll: 'Fechar todos',
-
     },
     header: {
         logout: 'Logout',
@@ -461,14 +462,16 @@ const message = {
         createRemoteDB: 'Vincular @.lower:database.remoteDB',
         unBindRemoteDB: 'Desvincular @.lower:database.remoteDB',
         unBindForce: 'Forçar desvinculação',
-        unBindForceHelper: 'Ignorar todos os erros durante o processo de desvinculação para garantir que a operação final seja bem-sucedida',
+        unBindForceHelper:
+            'Ignorar todos os erros durante o processo de desvinculação para garantir que a operação final seja bem-sucedida',
         unBindRemoteHelper:
             'Desvincular o banco de dados remoto removerá apenas a relação de vinculação e não excluirá diretamente o banco de dados remoto',
         editRemoteDB: 'Editar servidor remoto',
         localDB: 'Banco de dados local',
         address: 'Endereço do banco de dados',
         version: 'Versão do banco de dados',
-        userHelper: 'O usuário root ou um usuário do banco de dados com privilégios de root pode acessar o banco de dados remoto.',
+        userHelper:
+            'O usuário root ou um usuário do banco de dados com privilégios de root pode acessar o banco de dados remoto.',
         pgUserHelper: 'Usuário do banco de dados com privilégios de superusuário.',
         ssl: 'Usar SSL',
         clientKey: 'Chave privada do cliente',
@@ -592,7 +595,6 @@ const message = {
         remoteConnHelper2:
             'Este endereço de conexão pode ser utilizado por aplicações que estão fora do contêiner ou por aplicações externas.',
         localIP: 'IP local',
-
     },
     container: {
         create: 'Criar contêiner',
@@ -602,7 +604,8 @@ const message = {
             '1. As modificações atuais não serão sincronizadas com os aplicativos instalados na loja de aplicativos.',
         updateHelper3:
             '2. Se você modificar o aplicativo na página de instalados, o conteúdo atualmente editado se tornará inválido.',
-        updateHelper4: 'Editar o contêiner requer reconstrução, e qualquer dado não persistente será perdido. Deseja continuar?',
+        updateHelper4:
+            'Editar o contêiner requer reconstrução, e qualquer dado não persistente será perdido. Deseja continuar?',
         containerList: 'Lista de contêineres',
         operatorHelper: '{0} será realizado no seguinte contêiner. Deseja continuar?',
         operatorAppHelper:
@@ -690,7 +693,8 @@ const message = {
         appHelper: 'O contêiner vem da loja de aplicativos, e o upgrade pode tornar o serviço indisponível.',
         input: 'Entrada manual',
         forcePull: 'Sempre puxar imagem',
-        forcePullHelper: 'Isso ignorará as imagens existentes no servidor e puxará a imagem mais recente do repositório.',
+        forcePullHelper:
+            'Isso ignorará as imagens existentes no servidor e puxará a imagem mais recente do repositório.',
         server: 'Host',
         serverExample: '80, 80-88, ip:80 ou ip:80-88',
         containerExample: '80 ou 80-88',
@@ -752,7 +756,8 @@ const message = {
         urlWarning: 'O prefixo da URL não precisa incluir http:// ou https://. Por favor, modifique.',
 
         network: 'Rede | Redes',
-        networkHelper: 'Isso pode fazer com que alguns aplicativos e ambientes de execução não funcionem corretamente. Deseja continuar?',
+        networkHelper:
+            'Isso pode fazer com que alguns aplicativos e ambientes de execução não funcionem corretamente. Deseja continuar?',
         createNetwork: 'Criar',
         networkName: 'Nome',
         driver: 'Driver',
@@ -774,23 +779,29 @@ const message = {
 
         repo: 'Registries',
         createRepo: 'Adicionar',
-        httpRepo: 'Escolher o protocolo HTTP requer reiniciar o serviço Docker para adicioná-lo a registries inseguros.',
+        httpRepo:
+            'Escolher o protocolo HTTP requer reiniciar o serviço Docker para adicioná-lo a registries inseguros.',
         delInsecure: 'Remover da lista de segurança',
-        delInsecureHelper: 'Isso reiniciará o serviço Docker para removê-lo dos registries inseguros. Deseja continuar?',
+        delInsecureHelper:
+            'Isso reiniciará o serviço Docker para removê-lo dos registries inseguros. Deseja continuar?',
         downloadUrl: 'Servidor',
         imageRepo: 'Repositório de imagens',
         repoHelper: 'Inclui repositório espelho/organização/projeto?',
         auth: 'Exigir autenticação',
-        mirrorHelper: 'Se houver múltiplos espelhos, devem ser exibidos em novas linhas, por exemplo:\nhttp://xxxxxx.m.daocloud.io \nhttps://xxxxxx.mirror.aliyuncs.com',
-        registrieHelper: 'Se houver múltiplos repositórios privados, eles devem ser exibidos em novas linhas, por exemplo:\n172.16.10.111:8081 \n172.16.10.112:8081',
+        mirrorHelper:
+            'Se houver múltiplos espelhos, devem ser exibidos em novas linhas, por exemplo:\nhttp://xxxxxx.m.daocloud.io \nhttps://xxxxxx.mirror.aliyuncs.com',
+        registrieHelper:
+            'Se houver múltiplos repositórios privados, eles devem ser exibidos em novas linhas, por exemplo:\n172.16.10.111:8081 \n172.16.10.112:8081',
 
         compose: 'Compose | Composições',
         fromChangeHelper: 'Trocar a origem limpará o conteúdo editado atual. Deseja continuar?',
         composePathHelper: 'Caminho de salvamento do arquivo de configuração: {0}',
-        composeHelper: 'A composição criada através do editor ou template do 1Panel será salva no diretório {0}/docker/compose.',
+        composeHelper:
+            'A composição criada através do editor ou template do 1Panel será salva no diretório {0}/docker/compose.',
         deleteFile: 'Excluir arquivo',
         allDelete: 'Excluir permanentemente',
-        deleteComposeHelper: 'Excluir todos os arquivos relacionados à composição do container, incluindo arquivos de configuração e arquivos persistentes. Prossiga com cautela!',
+        deleteComposeHelper:
+            'Excluir todos os arquivos relacionados à composição do container, incluindo arquivos de configuração e arquivos persistentes. Prossiga com cautela!',
         deleteCompose: 'Excluir esta composição.',
         apps: 'Loja de Aplicativos',
         local: 'Local',
@@ -808,40 +819,49 @@ const message = {
         running: 'Em execução',
         down: 'Parado',
         up: 'Ativo',
-        composeDetailHelper: 'A composição foi criada externamente ao 1Panel. As operações de iniciar e parar não são suportadas.',
+        composeDetailHelper:
+            'A composição foi criada externamente ao 1Panel. As operações de iniciar e parar não são suportadas.',
         composeOperatorHelper: 'A operação {1} será realizada no {0}. Deseja continuar?',
-        composeDownHelper: 'Isso irá parar e remover todos os containers e redes sob a composição {0}. Deseja continuar?',
+        composeDownHelper:
+            'Isso irá parar e remover todos os containers e redes sob a composição {0}. Deseja continuar?',
 
         setting: 'Configuração | Configurações',
         operatorStatusHelper: 'Isso irá "{0}" o serviço Docker. Deseja continuar?',
         dockerStatus: 'Serviço Docker',
-        daemonJsonPathHelper: 'Certifique-se de que o caminho de configuração seja o mesmo especificado no docker.service.',
+        daemonJsonPathHelper:
+            'Certifique-se de que o caminho de configuração seja o mesmo especificado no docker.service.',
         mirrors: 'Espelhos de registro',
         mirrorsHelper: '',
         mirrorsHelper2: 'Para mais detalhes, consulte a documentação oficial.',
         registries: 'Registries inseguros',
-        ipv6Helper: 'Ao habilitar o IPv6, é necessário adicionar uma rede de containers IPv6. Consulte a documentação oficial para etapas específicas de configuração.',
+        ipv6Helper:
+            'Ao habilitar o IPv6, é necessário adicionar uma rede de containers IPv6. Consulte a documentação oficial para etapas específicas de configuração.',
         ipv6CidrHelper: 'Faixa de endereços IPv6 para containers',
         ipv6TablesHelper: 'Configuração automática do Docker IPv6 para regras do iptables.',
-        experimentalHelper: 'Habilitar ip6tables requer que esta configuração esteja ativada; caso contrário, ip6tables será ignorado',
+        experimentalHelper:
+            'Habilitar ip6tables requer que esta configuração esteja ativada; caso contrário, ip6tables será ignorado',
         cutLog: 'Opção de log',
         cutLogHelper1: 'A configuração atual afetará apenas containers recém-criados.',
         cutLogHelper2: 'Containers existentes precisam ser recriados para que a configuração tenha efeito.',
-        cutLogHelper3: 'Observe que recriar containers pode resultar em perda de dados. Se seus containers contiverem dados importantes, faça backup antes de realizar a operação de reconstrução.',
+        cutLogHelper3:
+            'Observe que recriar containers pode resultar em perda de dados. Se seus containers contiverem dados importantes, faça backup antes de realizar a operação de reconstrução.',
         maxSize: 'Tamanho máximo',
         maxFile: 'Arquivo máximo',
-        liveHelper: 'Por padrão, quando o daemon Docker termina, ele desliga os containers em execução. Você pode configurar o daemon para que os containers permaneçam em execução se o daemon ficar indisponível. Essa funcionalidade é chamada de "restauração ao vivo". A opção de restauração ao vivo ajuda a reduzir o tempo de inatividade dos containers devido a falhas do daemon, interrupções planejadas ou atualizações.',
+        liveHelper:
+            'Por padrão, quando o daemon Docker termina, ele desliga os containers em execução. Você pode configurar o daemon para que os containers permaneçam em execução se o daemon ficar indisponível. Essa funcionalidade é chamada de "restauração ao vivo". A opção de restauração ao vivo ajuda a reduzir o tempo de inatividade dos containers devido a falhas do daemon, interrupções planejadas ou atualizações.',
         liveWithSwarmHelper: 'A configuração de restauração ao vivo é incompatível com o modo swarm.',
         iptablesDisable: 'Desabilitar iptables',
         iptablesHelper1: 'Configuração automática das regras do iptables para Docker.',
-        iptablesHelper2: 'Desabilitar iptables fará com que os containers não consigam se comunicar com redes externas.',
+        iptablesHelper2:
+            'Desabilitar iptables fará com que os containers não consigam se comunicar com redes externas.',
         daemonJsonPath: 'Caminho de configuração',
         serviceUnavailable: 'O serviço Docker não foi iniciado no momento.',
         startIn: 'para iniciar',
         sockPath: 'Caminho do socket Unix',
         sockPathHelper: 'Canal de comunicação entre o daemon Docker e o cliente.',
         sockPathHelper1: 'Caminho padrão: /var/run/docker-x.sock',
-        sockPathMsg: 'Salvar a configuração do Caminho do Socket pode tornar o serviço Docker indisponível. Deseja continuar?',
+        sockPathMsg:
+            'Salvar a configuração do Caminho do Socket pode tornar o serviço Docker indisponível. Deseja continuar?',
         sockPathErr: 'Por favor, selecione ou insira o caminho correto do arquivo do Docker sock',
         related: 'Relacionado',
         includeAppstore: 'Exibir containers da loja de aplicativos',
@@ -880,7 +900,8 @@ const message = {
         ntp_helper: 'Você pode configurar o servidor NTP na página de Configuração Rápida da Caixa de Ferramentas.',
         app: 'Backup de app',
         website: 'Backup de site',
-        rulesHelper: 'Quando houver múltiplas regras de exclusão de compressão, elas devem ser exibidas com quebras de linha. Por exemplo,\n*.log\n*.sql',
+        rulesHelper:
+            'Quando houver múltiplas regras de exclusão de compressão, elas devem ser exibidas com quebras de linha. Por exemplo,\n*.log\n*.sql',
         lastRecordTime: 'Última execução',
         all: 'Todos',
         failedRecord: 'Registros de falha',
@@ -893,11 +914,13 @@ const message = {
         taskName: 'Nome',
         cronSpec: 'Ciclo de execução',
         cronSpecHelper: 'Digite o período correto de execução',
-        cleanHelper: 'Esta operação registra todos os registros de execução de tarefas, arquivos de backup e logs. Você deseja continuar?',
+        cleanHelper:
+            'Esta operação registra todos os registros de execução de tarefas, arquivos de backup e logs. Você deseja continuar?',
         directory: 'Diretório de backup',
         sourceDir: 'Diretório de backup',
         snapshot: 'Snapshot do sistema',
-        allOptionHelper: 'O plano de tarefa atual é fazer backup de todos os [{0}]. O download direto não é suportado no momento. Você pode verificar a lista de backups no menu [{0}].',
+        allOptionHelper:
+            'O plano de tarefa atual é fazer backup de todos os [{0}]. O download direto não é suportado no momento. Você pode verificar a lista de backups no menu [{0}].',
         exclusionRules: 'Regras de exclusão',
         exclusionRulesHelper: 'As regras de exclusão se aplicam a todas as operações de compressão deste backup.',
         default_download_path: 'Link de download padrão',
@@ -978,7 +1001,8 @@ const message = {
     },
     terminal: {
         conn: 'Conexão',
-        connLocalErr: 'Não foi possível autenticar automaticamente, por favor, preencha as informações de login do servidor local.',
+        connLocalErr:
+            'Não foi possível autenticar automaticamente, por favor, preencha as informações de login do servidor local.',
         testConn: 'Testar conexão',
         saveAndConn: 'Salvar e conectar',
         connTestOk: 'Informações de conexão disponíveis',
@@ -1008,7 +1032,6 @@ const message = {
         key: 'Chave privada',
         keyPassword: 'Senha da chave privada',
         emptyTerminal: 'Nenhum terminal está conectado no momento.',
-
     },
     toolbox: {
         swap: {
@@ -1019,7 +1042,8 @@ const message = {
                 'Antes de criar um arquivo swap, verifique se o disco do sistema tem espaço disponível suficiente, pois o tamanho do arquivo swap ocupará o espaço correspondente no disco;',
             swapHelper3:
                 'Swap pode ajudar a aliviar a pressão de memória, mas é apenas uma alternativa. A dependência excessiva de swap pode levar a uma diminuição no desempenho do sistema. É recomendável priorizar o aumento de memória ou otimizar o uso de memória do aplicativo;',
-            swapHelper4: 'É aconselhável monitorar regularmente o uso de swap para garantir o funcionamento normal do sistema.',
+            swapHelper4:
+                'É aconselhável monitorar regularmente o uso de swap para garantir o funcionamento normal do sistema.',
             swapDeleteHelper:
                 'Esta operação removerá a partição Swap {0}. Por motivos de segurança do sistema, o arquivo correspondente não será excluído automaticamente. Se a exclusão for necessária, por favor, faça manualmente!',
             saveHelper: 'Por favor, salve as configurações atuais primeiro!',
@@ -1028,7 +1052,7 @@ const message = {
             swapMin: 'O tamanho mínimo da partição é 40 KB. Por favor, modifique e tente novamente!',
             swapMax: 'O valor máximo para o tamanho da partição é {0}. Por favor, modifique e tente novamente!',
             swapOff: 'O tamanho mínimo da partição é 40 KB. Definir como 0 desabilitará a partição Swap.',
-        }
+        },
     },
     device: {
         dnsHelper: 'Servidor DNS',
@@ -1038,14 +1062,16 @@ const message = {
             'Quando houver várias entradas DNS, elas devem ser exibidas em novas linhas. Exemplo:\n114.114.114.114\n8.8.8.8',
         hostsHelper: 'Resolução de hostname',
         hosts: 'Domínio',
-        hostAlert: 'Registros comentados ocultos, clique no botão "Todas as configurações" para visualizar ou configurar',
+        hostAlert:
+            'Registros comentados ocultos, clique no botão "Todas as configurações" para visualizar ou configurar',
         toolbox: 'Configurações rápidas',
         hostname: 'Nome do host',
         passwd: 'Senha do sistema',
         passwdHelper: 'Os caracteres de entrada não podem incluir $ e &',
         timeZone: 'Fuso horário',
         localTime: 'Hora do servidor',
-        timeZoneChangeHelper: 'Modificar o fuso horário do sistema requer a reinicialização do serviço. Deseja continuar?',
+        timeZoneChangeHelper:
+            'Modificar o fuso horário do sistema requer a reinicialização do serviço. Deseja continuar?',
         timeZoneHelper: `Se você não instalar o comando "timedatectl", poderá não conseguir alterar o fuso horário. O sistema usa esse comando para alterar o fuso horário.`,
         timeZoneCN: 'Pequim',
         timeZoneAM: 'Los Angeles',
@@ -1056,8 +1082,7 @@ const message = {
         hostnameHelper: `A modificação do nome do host depende do comando "hostnamectl". Se o comando não estiver instalado, a modificação pode falhar.`,
         userHelper: `O nome de usuário depende do comando "whoami" para recuperação. Se o comando não estiver instalado, a recuperação pode falhar.`,
         passwordHelper: `A modificação da senha depende do comando "chpasswd". Se o comando não estiver instalado, a modificação pode falhar.`,
-        hostHelper:
-            'Há um valor vazio no conteúdo fornecido. Verifique e tente novamente após a modificação!',
+        hostHelper: 'Há um valor vazio no conteúdo fornecido. Verifique e tente novamente após a modificação!',
         dnsCheck: 'Testar disponibilidade',
         dnsOK: 'As informações de configuração do DNS estão disponíveis!',
         dnsTestFailed: `As informações de configuração do DNS não estão disponíveis.`,
@@ -1099,18 +1124,23 @@ const message = {
         cron: 'Scan agendado',
         cronHelper: 'A versão profissional suporta a funcionalidade de scan agendado',
         specErr: 'Erro no formato do agendamento, por favor, verifique e tente novamente!',
-        disableMsg: 'Parar a execução agendada impedirá que esta tarefa de scan seja executada automaticamente. Deseja continuar?',
-        enableMsg: 'Ativar a execução agendada permitirá que esta tarefa de scan seja executada automaticamente em intervalos regulares. Deseja continuar?',
+        disableMsg:
+            'Parar a execução agendada impedirá que esta tarefa de scan seja executada automaticamente. Deseja continuar?',
+        enableMsg:
+            'Ativar a execução agendada permitirá que esta tarefa de scan seja executada automaticamente em intervalos regulares. Deseja continuar?',
         showFresh: 'Mostrar serviço de atualização de assinaturas',
         hideFresh: 'Ocultar serviço de atualização de assinaturas',
-        clamHelper: 'A configuração mínima recomendada para o ClamAV é: 3 GiB de RAM ou mais, CPU de 1 núcleo com 2.0 GHz ou superior, e pelo menos 5 GiB de espaço livre no disco rígido.',
+        clamHelper:
+            'A configuração mínima recomendada para o ClamAV é: 3 GiB de RAM ou mais, CPU de 1 núcleo com 2.0 GHz ou superior, e pelo menos 5 GiB de espaço livre no disco rígido.',
         noClam: 'Serviço ClamAV não detectado, consulte a documentação oficial para instalação!',
         notStart: 'O serviço ClamAV não está em execução, por favor, inicie-o primeiro!',
         removeRecord: 'Excluir arquivos de relatório',
         noRecords: 'Clique no botão "Acionar" para iniciar o scan e você verá registros aqui.',
-        removeResultHelper: 'Excluir arquivos de relatório gerados durante a execução da tarefa para liberar espaço de armazenamento.',
+        removeResultHelper:
+            'Excluir arquivos de relatório gerados durante a execução da tarefa para liberar espaço de armazenamento.',
         removeInfected: 'Excluir arquivos infectados',
-        removeInfectedHelper: 'Excluir arquivos de vírus detectados durante a tarefa para garantir a segurança e o funcionamento normal do servidor.',
+        removeInfectedHelper:
+            'Excluir arquivos de vírus detectados durante a tarefa para garantir a segurança e o funcionamento normal do servidor.',
         clamCreate: 'Criar regra de scan',
         infectedStrategy: 'Estratégia de arquivos infectados',
         remove: 'Excluir',
@@ -1162,8 +1192,7 @@ const message = {
             settings: 'Configurações do painel',
             cronjobs: 'Tarefas agendadas',
             databases: 'Banco de dados',
-        }
-        ,
+        },
         websiteLog: 'Logs do website',
         runLog: 'Logs de execução',
         errLog: 'Logs de erro',
@@ -1240,13 +1269,15 @@ const message = {
         cancel: 'Cancelar',
         changeOwner: 'Modificar usuário e grupo de usuários',
         containSub: 'Aplicar mudança de permissões recursivamente',
-        ownerHelper: 'O usuário padrão do ambiente PHP: o grupo de usuários é 1000:1000, é normal que os usuários dentro e fora do container mostrem inconsistências',
+        ownerHelper:
+            'O usuário padrão do ambiente PHP: o grupo de usuários é 1000:1000, é normal que os usuários dentro e fora do container mostrem inconsistências',
         searchHelper: 'Suporte a curingas como *',
         uploadFailed: '[{0}] Falha no upload do arquivo',
         fileUploadStart: 'Carregando [{0}]....',
         currentSelect: 'Selecionado atualmente: ',
         unsupportedType: 'Tipo de arquivo não suportado',
-        deleteHelper: 'Tem certeza de que deseja excluir os seguintes arquivos? Por padrão, eles irão para a lixeira após a exclusão',
+        deleteHelper:
+            'Tem certeza de que deseja excluir os seguintes arquivos? Por padrão, eles irão para a lixeira após a exclusão',
         fileHeper: `Nota:\n1. Os resultados da pesquisa não podem ser ordenados.\n2. Pastas não podem ser ordenadas por tamanho.`,
         forceDeleteHelper: 'Excluir permanentemente o arquivo (sem entrar na lixeira, excluí-lo diretamente)',
         recycleBin: 'Lixeira',
@@ -1255,7 +1286,8 @@ const message = {
         confirmReduce: 'Tem certeza de que deseja restaurar os seguintes arquivos?',
         reduceSuccess: 'Restaurado com sucesso',
         reduce: 'Restaurar',
-        reduceHelper: 'Se um arquivo ou diretório com o mesmo nome existir no caminho original, ele será substituído. Deseja continuar?',
+        reduceHelper:
+            'Se um arquivo ou diretório com o mesmo nome existir no caminho original, ele será substituído. Deseja continuar?',
         clearRecycleBin: 'Limpar',
         clearRecycleBinHelper: 'Você deseja limpar a lixeira?',
         favorite: 'Favoritos',
@@ -1268,9 +1300,11 @@ const message = {
         fileRecycleBin: 'Habilitar lixeira',
         fileRecycleBinMsg: '{0} lixeira',
         wordWrap: 'Quebra automática de linha',
-        deleteHelper2: 'Tem certeza de que deseja excluir o arquivo selecionado? A operação de exclusão não pode ser desfeita',
+        deleteHelper2:
+            'Tem certeza de que deseja excluir o arquivo selecionado? A operação de exclusão não pode ser desfeita',
         ignoreCertificate: 'Permitir conexões inseguras com o servidor',
-        ignoreCertificateHelper: 'Permitir conexões inseguras com o servidor pode levar a vazamento ou adulteração de dados. Use esta opção apenas quando confiar na fonte de download.',
+        ignoreCertificateHelper:
+            'Permitir conexões inseguras com o servidor pode levar a vazamento ou adulteração de dados. Use esta opção apenas quando confiar na fonte de download.',
         uploadOverLimit: 'O número de arquivos excede 1000! Por favor, compacte e envie novamente',
         clashDitNotSupport: 'Os nomes de arquivos são proibidos de conter .1panel_clash',
         clashDeleteAlert: 'A pasta "Lixeira" não pode ser excluída',
@@ -1281,7 +1315,8 @@ const message = {
         refresh: 'Atualizar',
         up: 'Voltar',
         openWithVscode: 'Abrir com VS Code',
-        vscodeHelper: 'Por favor, certifique-se de que o VS Code está instalado localmente e o plugin SSH Remote está configurado',
+        vscodeHelper:
+            'Por favor, certifique-se de que o VS Code está instalado localmente e o plugin SSH Remote está configurado',
         saveContentAndClose: 'O arquivo foi modificado, deseja salvar e fechar?',
         saveAndOpenNewFile: 'O arquivo foi modificado, deseja salvar e abrir o novo arquivo?',
         noEdit: 'O arquivo não foi modificado, não é necessário fazer isso!',
@@ -1290,23 +1325,26 @@ const message = {
         minimap: 'Mini mapa de código',
         fileCanNotRead: 'O arquivo não pode ser lido',
         panelInstallDir: 'O diretório de instalação do 1Panel não pode ser excluído',
-    }
-    ,
+    },
     ssh: {
         autoStart: 'Início automático',
         enable: 'Habilitar início automático',
         disable: 'Desabilitar início automático',
-        sshAlert: 'Os dados da lista são classificados com base na data de login. Alterar o fuso horário ou realizar outras operações pode causar desvios na data dos logs de login.',
-        sshAlert2: 'Você pode usar o "Fail2ban" na "Caixa de ferramentas" para bloquear endereços IP que tentam ataques de força bruta, o que aumentará a segurança do host.',
+        sshAlert:
+            'Os dados da lista são classificados com base na data de login. Alterar o fuso horário ou realizar outras operações pode causar desvios na data dos logs de login.',
+        sshAlert2:
+            'Você pode usar o "Fail2ban" na "Caixa de ferramentas" para bloquear endereços IP que tentam ataques de força bruta, o que aumentará a segurança do host.',
         sshOperate: 'A operação "{0}" no serviço SSH será realizada. Você deseja continuar?',
         sshChange: 'Configuração SSH',
         sshChangeHelper: 'Esta ação alterou "{0}" para "{1}". Você deseja continuar?',
-        sshFileChangeHelper: 'Modificar o arquivo de configuração pode afetar a disponibilidade do serviço. Tenha cautela ao realizar esta operação. Você deseja continuar?',
+        sshFileChangeHelper:
+            'Modificar o arquivo de configuração pode afetar a disponibilidade do serviço. Tenha cautela ao realizar esta operação. Você deseja continuar?',
         port: 'Porta',
         portHelper: 'Especifique a porta na qual o serviço SSH escutará.',
         listenAddress: 'Endereço de escuta',
         allV4V6: '0.0.0.0:{0}(IPv4) e :::{0}(IPv6)',
-        listenHelper: 'Deixar os campos de IPv4 e IPv6 em branco fará com que o serviço escute em "0.0.0.0:{0}(IPv4)" e ":::{0}(IPv6)"',
+        listenHelper:
+            'Deixar os campos de IPv4 e IPv6 em branco fará com que o serviço escute em "0.0.0.0:{0}(IPv4)" e ":::{0}(IPv6)"',
         addressHelper: 'Especifique o endereço em que o serviço SSH irá escutar.',
         permitRootLogin: 'Permitir login de usuário root',
         rootSettingHelper: 'O método de login padrão para o usuário root é "Permitir login SSH".',
@@ -1326,10 +1364,13 @@ const message = {
         reGenerate: 'Regenerar chave',
         keyAuthHelper: 'Se deve ou não habilitar a autenticação por chave.',
         useDNS: 'Usar DNS',
-        dnsHelper: 'Controla se a função de resolução DNS está habilitada no servidor SSH para verificar a identidade da conexão.',
+        dnsHelper:
+            'Controla se a função de resolução DNS está habilitada no servidor SSH para verificar a identidade da conexão.',
         analysis: 'Informações estatísticas',
-        denyHelper: "Realizando uma operação de 'negar' nos seguintes endereços. Após a configuração, o IP será proibido de acessar o servidor. Você deseja continuar?",
-        acceptHelper: "Realizando uma operação de 'aceitar' nos seguintes endereços. Após a configuração, o IP recuperará o acesso normal. Você deseja continuar?",
+        denyHelper:
+            "Realizando uma operação de 'negar' nos seguintes endereços. Após a configuração, o IP será proibido de acessar o servidor. Você deseja continuar?",
+        acceptHelper:
+            "Realizando uma operação de 'aceitar' nos seguintes endereços. Após a configuração, o IP recuperará o acesso normal. Você deseja continuar?",
         noAddrWarning: 'Nenhum endereço [{0}] foi selecionado atualmente. Por favor, verifique e tente novamente!',
         successful: 'Sucesso',
         failed: 'Falhou',
@@ -1345,7 +1386,6 @@ const message = {
         loginIP: 'IP de login',
         disconnect: 'Desconectar',
         stopSSHWarn: 'Deseja desconectar esta conexão SSH?',
-
     },
     setting: {
         all: 'Tudo',
@@ -1358,9 +1398,9 @@ const message = {
         title: 'Alias do painel',
         panelPort: 'Porta do painel',
         titleHelper:
-        'Suporta caracteres não especiais no início, inglês, chinês, números, espaços, .- e _, comprimento de 3 a 30',
+            'Suporta caracteres não especiais no início, inglês, chinês, números, espaços, .- e _, comprimento de 3 a 30',
         portHelper:
-        'O intervalo recomendado de portas é de 8888 a 65535. Nota: Se o servidor tiver um grupo de segurança, permita a nova porta do grupo de segurança antecipadamente',
+            'O intervalo recomendado de portas é de 8888 a 65535. Nota: Se o servidor tiver um grupo de segurança, permita a nova porta do grupo de segurança antecipadamente',
         portChange: 'Alteração de porta',
         portChangeHelper: 'Modificar a porta do serviço e reiniciar o serviço. Deseja continuar?',
         theme: 'Tema',
@@ -1370,17 +1410,15 @@ const message = {
         light: 'Claro',
         auto: 'Seguir o sistema',
         language: 'Idioma',
-        languageHelper:
-        'Por padrão, segue o idioma do navegador. Este parâmetro tem efeito apenas no navegador atual',
+        languageHelper: 'Por padrão, segue o idioma do navegador. Este parâmetro tem efeito apenas no navegador atual',
         sessionTimeout: 'Tempo limite de sessão',
         sessionTimeoutError: 'O tempo mínimo de sessão é de 300 segundos',
-        sessionTimeoutHelper:
-        'O painel será desconectado automaticamente após {0} segundo(s) de inatividade.',
+        sessionTimeoutHelper: 'O painel será desconectado automaticamente após {0} segundo(s) de inatividade.',
         systemIP: 'Endereço do sistema',
         proxy: 'Proxy do servidor',
         proxyHelper: 'Será eficaz nos seguintes cenários após configurar o servidor proxy:',
         proxyHelper1:
-        'Download de pacotes de instalação e sincronização da loja de aplicativos (apenas edição profissional)',
+            'Download de pacotes de instalação e sincronização da loja de aplicativos (apenas edição profissional)',
         proxyHelper2: 'Atualização do sistema e recuperação de informações de atualização (apenas edição profissional)',
         proxyHelper4: 'A rede Docker será acessada por meio de um servidor proxy (apenas edição profissional)',
         proxyHelper3: 'Verificação e sincronização da licença do sistema',
@@ -1390,12 +1428,14 @@ const message = {
         proxyPasswdKeep: 'Lembrar senha',
         proxyDocker: 'Proxy Docker',
         proxyDockerHelper:
-        'Sincronize a configuração do servidor proxy com o Docker, suportando operações de puxar imagens de servidor offline e outras',
+            'Sincronize a configuração do servidor proxy com o Docker, suportando operações de puxar imagens de servidor offline e outras',
         apiInterface: 'Habilitar API',
         apiInterfaceClose: 'Uma vez fechado, as interfaces da API não poderão ser acessadas. Deseja continuar?',
         apiInterfaceHelper: 'Permitir que aplicativos de terceiros acessem a API.',
-        apiInterfaceAlert1: 'Não habilite em ambientes de produção, pois pode aumentar os riscos de segurança do servidor.',
-        apiInterfaceAlert2: 'Não use aplicativos de terceiros para chamar a API, para evitar potenciais ameaças à segurança.',
+        apiInterfaceAlert1:
+            'Não habilite em ambientes de produção, pois pode aumentar os riscos de segurança do servidor.',
+        apiInterfaceAlert2:
+            'Não use aplicativos de terceiros para chamar a API, para evitar potenciais ameaças à segurança.',
         apiInterfaceAlert3: 'Documentação da API',
         apiInterfaceAlert4: 'Documentação de uso',
         apiKey: 'Chave API',
@@ -1404,18 +1444,21 @@ const message = {
         ipWhiteListEgs: 'Um por linha. Exemplo: \n172.161.10.111\n172.161.10.0/24',
         ipWhiteListHelper: 'IPs na lista de permitidos podem acessar a API.',
         apiKeyReset: 'Redefinir chave da interface',
-        apiKeyResetHelper: 'O serviço associado à chave se tornará inválido. Por favor, adicione uma nova chave ao serviço',
+        apiKeyResetHelper:
+            'O serviço associado à chave se tornará inválido. Por favor, adicione uma nova chave ao serviço',
         confDockerProxy: 'Configurar proxy do Docker',
         restartNowHelper: 'Configurar o proxy do Docker exige reiniciar o serviço Docker.',
         restartNow: 'Reiniciar imediatamente',
-        systemIPWarning: 'O endereço do servidor ainda não está configurado. Configure-o no painel de controle primeiro.',
-        systemIPWarning1: 'O endereço atual do servidor está configurado como {0}, e o redirecionamento rápido não é possível!',
+        systemIPWarning:
+            'O endereço do servidor ainda não está configurado. Configure-o no painel de controle primeiro.',
+        systemIPWarning1:
+            'O endereço atual do servidor está configurado como {0}, e o redirecionamento rápido não é possível!',
         defaultNetwork: 'Placa de rede',
         syncTime: 'Hora do servidor',
         timeZone: 'Fuso horário',
         timeZoneChangeHelper: 'Alterar o fuso horário exige reiniciar o serviço. Deseja continuar?',
         timeZoneHelper:
-        'A modificação de fuso horário depende do serviço timedatectl do sistema. Entrará em vigor após reiniciar o serviço 1Panel.',
+            'A modificação de fuso horário depende do serviço timedatectl do sistema. Entrará em vigor após reiniciar o serviço 1Panel.',
         timeZoneCN: 'Pequim',
         timeZoneAM: 'Los Angeles',
         timeZoneNY: 'Nova York',
@@ -1423,7 +1466,7 @@ const message = {
         ntpGoogle: 'Google',
         syncSite: 'Servidor NTP',
         syncSiteHelper:
-        'Esta operação usará {0} como fonte para a sincronização do horário do sistema. Deseja continuar?',
+            'Esta operação usará {0} como fonte para a sincronização do horário do sistema. Deseja continuar?',
         changePassword: 'Alterar senha',
         oldPassword: 'Senha original',
         newPassword: 'Nova senha',
@@ -1433,7 +1476,7 @@ const message = {
         diskClean: 'Limpeza de cache',
         developerMode: 'Modo de desenvolvimento',
         developerModeHelper:
-        'Você terá a oportunidade de testar novos recursos e correções antes de serem amplamente lançados e fornecer feedback precoce.',
+            'Você terá a oportunidade de testar novos recursos e correções antes de serem amplamente lançados e fornecer feedback precoce.',
         thirdParty: 'Contas de terceiros',
         addBackupAccount: 'Adicionar {0}',
         noTypeForCreate: 'Nenhum tipo de backup foi criado até o momento',
@@ -1458,7 +1501,7 @@ const message = {
         codeWarning: 'O formato atual do código de autorização está incorreto, por favor, verifique novamente!',
         code: 'Código de autorização',
         codeHelper:
-        'Clique no botão "Adquirir", faça login no OneDrive e copie o conteúdo após "code" no link redirecionado. Cole-o neste campo. Para instruções específicas, consulte a documentação oficial.',
+            'Clique no botão "Adquirir", faça login no OneDrive e copie o conteúdo após "code" no link redirecionado. Cole-o neste campo. Para instruções específicas, consulte a documentação oficial.',
         loadCode: 'Obter',
         COS: 'Tencent COS',
         ap_beijing_1: 'Beijing Zona 1',
@@ -1490,15 +1533,17 @@ const message = {
         typeArchive: 'Arquivo',
         typeDeep_Archive: 'Arquivo Profundo',
         scStandard:
-        'O armazenamento padrão é adequado para cenários de negócios com grande volume de arquivos quentes que exigem acesso em tempo real, interação frequente de dados, etc.',
+            'O armazenamento padrão é adequado para cenários de negócios com grande volume de arquivos quentes que exigem acesso em tempo real, interação frequente de dados, etc.',
         scStandard_IA:
-        'O armazenamento de baixa frequência é adequado para cenários de negócios com frequência de acesso relativamente baixa, e armazena dados por pelo menos 30 dias.',
-        scArchive: 'Armazenamento para arquivos é adequado para cenários de negócios com frequência de acesso extremamente baixa.',
-        scDeep_Archive: 'Armazenamento frio durável é adequado para cenários de negócios com frequência de acesso extremamente baixa.',
+            'O armazenamento de baixa frequência é adequado para cenários de negócios com frequência de acesso relativamente baixa, e armazena dados por pelo menos 30 dias.',
+        scArchive:
+            'Armazenamento para arquivos é adequado para cenários de negócios com frequência de acesso extremamente baixa.',
+        scDeep_Archive:
+            'Armazenamento frio durável é adequado para cenários de negócios com frequência de acesso extremamente baixa.',
         archiveHelper:
-        'Arquivos de armazenamento arquivado não podem ser baixados diretamente e devem ser restaurados primeiro através do site do provedor de serviços de nuvem correspondente. Use com cautela!',
+            'Arquivos de armazenamento arquivado não podem ser baixados diretamente e devem ser restaurados primeiro através do site do provedor de serviços de nuvem correspondente. Use com cautela!',
         backupAlert:
-        'Se um provedor de nuvem for compatível com o protocolo S3, você pode usar diretamente o Amazon S3 para backup.',
+            'Se um provedor de nuvem for compatível com o protocolo S3, você pode usar diretamente o Amazon S3 para backup.',
         domain: 'Domínio de aceleração',
         backupAccount: 'Conta de backup | Contas de backup',
         loadBucket: 'Obter bucket',
@@ -1507,59 +1552,76 @@ const message = {
         address: 'Endereço',
         path: 'Caminho',
 
-
         safe: 'Segurança',
         bindInfo: 'Informações de Vinculação',
         bindAll: 'Ouvir Todos',
-        bindInfoHelper: 'Alterar o endereço de escuta ou protocolo do serviço pode resultar em indisponibilidade do serviço. Você deseja continuar?',
+        bindInfoHelper:
+            'Alterar o endereço de escuta ou protocolo do serviço pode resultar em indisponibilidade do serviço. Você deseja continuar?',
         ipv6: 'Ouvir IPv6',
         bindAddress: 'Endereço de escuta',
         entrance: 'Entrada',
         showEntrance: 'Mostrar alerta desativado na página "Visão Geral"',
-        entranceHelper: 'Habilitar a entrada de segurança permitirá o login no painel apenas através do ponto de entrada de segurança especificado.',
-        entranceError: 'Por favor, insira um ponto de entrada seguro de 5-116 caracteres, somente números ou letras são suportados.',
+        entranceHelper:
+            'Habilitar a entrada de segurança permitirá o login no painel apenas através do ponto de entrada de segurança especificado.',
+        entranceError:
+            'Por favor, insira um ponto de entrada seguro de 5-116 caracteres, somente números ou letras são suportados.',
         entranceInputHelper: 'Deixe em branco para desativar a entrada de segurança.',
         randomGenerate: 'Aleatório',
         expirationTime: 'Data de Expiração',
         unSetting: 'Não definido',
-        noneSetting: 'Defina o tempo de expiração da senha do painel. Após a expiração, será necessário redefinir a senha.',
-        expirationHelper: 'Se o tempo de expiração da senha for [0] dias, a função de expiração da senha estará desativada.',
+        noneSetting:
+            'Defina o tempo de expiração da senha do painel. Após a expiração, será necessário redefinir a senha.',
+        expirationHelper:
+            'Se o tempo de expiração da senha for [0] dias, a função de expiração da senha estará desativada.',
         days: 'Dias de Expiração',
         expiredHelper: 'A senha atual expirou. Por favor, altere a senha novamente.',
-        timeoutHelper: '[ {0} dias ] A senha do painel está prestes a expirar. Após a expiração, será necessário redefinir a senha.',
+        timeoutHelper:
+            '[ {0} dias ] A senha do painel está prestes a expirar. Após a expiração, será necessário redefinir a senha.',
         complexity: 'Validação de Complexidade',
-        complexityHelper: 'Após ativar, a regra de validação de senha será: 8-30 caracteres, incluindo letras, números e pelo menos dois caracteres especiais.',
+        complexityHelper:
+            'Após ativar, a regra de validação de senha será: 8-30 caracteres, incluindo letras, números e pelo menos dois caracteres especiais.',
         bindDomain: 'Vincular domínio',
         unBindDomain: 'Desvincular domínio',
         panelSSL: 'SSL do Painel',
-        unBindDomainHelper: 'A ação de desvincular um domínio pode causar insegurança no sistema. Você deseja continuar?',
+        unBindDomainHelper:
+            'A ação de desvincular um domínio pode causar insegurança no sistema. Você deseja continuar?',
         bindDomainHelper: 'Após vincular o domínio, somente esse domínio poderá acessar o serviço 1Panel.',
         bindDomainHelper1: 'Deixe em branco para desabilitar o vínculo de domínio.',
-        bindDomainWarning: 'Após vincular o domínio, você será desconectado e poderá acessar o serviço 1Panel apenas através do domínio especificado nas configurações. Você deseja continuar?',
+        bindDomainWarning:
+            'Após vincular o domínio, você será desconectado e poderá acessar o serviço 1Panel apenas através do domínio especificado nas configurações. Você deseja continuar?',
         allowIPs: 'IP Autorizado',
         unAllowIPs: 'IP Não Autorizado',
-        unAllowIPsWarning: 'Autorizar um IP vazio permitirá que todos os IPs acessem o sistema, o que pode causar insegurança. Você deseja continuar?',
-        allowIPsHelper: 'Após definir a lista de IPs autorizados, apenas os IPs da lista poderão acessar o serviço do painel.',
-        allowIPsWarning: 'Após definir a lista de IPs autorizados, somente os IPs da lista poderão acessar o serviço do painel. Você deseja continuar?',
+        unAllowIPsWarning:
+            'Autorizar um IP vazio permitirá que todos os IPs acessem o sistema, o que pode causar insegurança. Você deseja continuar?',
+        allowIPsHelper:
+            'Após definir a lista de IPs autorizados, apenas os IPs da lista poderão acessar o serviço do painel.',
+        allowIPsWarning:
+            'Após definir a lista de IPs autorizados, somente os IPs da lista poderão acessar o serviço do painel. Você deseja continuar?',
         allowIPsHelper1: 'Deixe em branco para desabilitar a restrição de IP.',
         allowIPEgs: 'Um por linha. Por exemplo,\n172.16.10.111\n172.16.10.0/24',
         mfa: 'Autenticação de dois fatores (2FA)',
         mfaClose: 'Desabilitar MFA reduzirá a segurança do serviço. Você deseja continuar?',
         secret: 'Segredo',
         mfaInterval: 'Intervalo de atualização (s)',
-        mfaTitleHelper: 'O título é usado para distinguir diferentes hosts do 1Panel. Escaneie novamente ou adicione manualmente a chave secreta após modificar o título.',
-        mfaIntervalHelper: 'Escaneie novamente ou adicione manualmente a chave secreta após modificar o intervalo de atualização.',
-        mfaAlert: 'O token de uso único é um número dinâmico de 6 dígitos e baseado no tempo atual. Certifique-se de que o horário do servidor esteja sincronizado.',
+        mfaTitleHelper:
+            'O título é usado para distinguir diferentes hosts do 1Panel. Escaneie novamente ou adicione manualmente a chave secreta após modificar o título.',
+        mfaIntervalHelper:
+            'Escaneie novamente ou adicione manualmente a chave secreta após modificar o intervalo de atualização.',
+        mfaAlert:
+            'O token de uso único é um número dinâmico de 6 dígitos e baseado no tempo atual. Certifique-se de que o horário do servidor esteja sincronizado.',
         mfaHelper: 'Após ativá-lo, o token de uso único precisará ser verificado.',
         mfaHelper1: 'Baixe um aplicativo autenticador, por exemplo,',
-        mfaHelper2: 'Para obter o token de uso único, escaneie o código QR abaixo usando seu aplicativo autenticador ou copie a chave secreta para o aplicativo de autenticação.',
+        mfaHelper2:
+            'Para obter o token de uso único, escaneie o código QR abaixo usando seu aplicativo autenticador ou copie a chave secreta para o aplicativo de autenticação.',
         mfaHelper3: 'Digite os seis dígitos do aplicativo',
         mfaCode: 'Token de uso único',
         sslChangeHelper: 'Modificar a configuração de https e reiniciar o serviço. Você deseja continuar?',
         sslDisable: 'Desabilitar',
-        sslDisableHelper: 'Se o serviço https for desabilitado, será necessário reiniciar o painel para que a alteração tenha efeito. Você deseja continuar?',
+        sslDisableHelper:
+            'Se o serviço https for desabilitado, será necessário reiniciar o painel para que a alteração tenha efeito. Você deseja continuar?',
         noAuthSetting: 'Configuração não autorizada',
-        noAuthSettingHelper: 'Quando os usuários não fizerem login com a entrada de segurança especificada, ou não acessarem o painel a partir de IP ou domínio especificado, essa resposta pode ocultar características do painel.',
+        noAuthSettingHelper:
+            'Quando os usuários não fizerem login com a entrada de segurança especificada, ou não acessarem o painel a partir de IP ou domínio especificado, essa resposta pode ocultar características do painel.',
         responseSetting: 'Configuração de resposta',
         help200: 'Página de ajuda',
         error400: 'Requisição inválida',
@@ -1571,25 +1633,28 @@ const message = {
         error444: 'Conexão fechada',
         error500: 'Erro no servidor',
 
-
         https: 'Configurar o acesso via protocolo HTTPS para o painel pode melhorar a segurança do acesso ao painel.',
         certType: 'Tipo de certificado',
         selfSigned: 'Autoassinado',
-        selfSignedHelper: 'Os navegadores podem não confiar em certificados autoassinados e podem exibir avisos de segurança.',
+        selfSignedHelper:
+            'Os navegadores podem não confiar em certificados autoassinados e podem exibir avisos de segurança.',
         select: 'Selecionar',
         domainOrIP: 'Domínio ou IP:',
         timeOut: 'Tempo limite',
         rootCrtDownload: 'Download do certificado raiz',
         primaryKey: 'Chave primária',
         certificate: 'Certificado',
-        backupJump: 'Arquivos de backup não estão na lista de backup atual, tente fazer o download do diretório de arquivos e importar para o backup.',
+        backupJump:
+            'Arquivos de backup não estão na lista de backup atual, tente fazer o download do diretório de arquivos e importar para o backup.',
 
         snapshot: 'Snapshot | Snapshots',
-        deleteHelper: 'Todos os arquivos de snapshot, incluindo os da conta de backup de terceiros, serão excluídos. Você deseja continuar?',
+        deleteHelper:
+            'Todos os arquivos de snapshot, incluindo os da conta de backup de terceiros, serão excluídos. Você deseja continuar?',
         status: 'Status do snapshot',
         ignoreRule: 'Ignorar regra',
         editIgnoreRule: '@:commons.button.edit @.lower:setting.ignoreRule',
-        ignoreHelper: 'Esta regra será usada para comprimir e fazer backup do diretório de dados do 1Panel durante a criação do snapshot. Por padrão, arquivos de socket são ignorados.',
+        ignoreHelper:
+            'Esta regra será usada para comprimir e fazer backup do diretório de dados do 1Panel durante a criação do snapshot. Por padrão, arquivos de socket são ignorados.',
         ignoreHelper1: 'Um por linha. Exemplo,\n*.log\n/opt/1panel/cache',
         panelInfo: 'Escrever informações básicas do 1Panel',
         panelBin: 'Fazer backup dos arquivos do sistema 1Panel',
@@ -1610,13 +1675,18 @@ const message = {
         statusSuccess: 'Sucesso',
         statusFailed: 'Falhou',
         recoverErrArch: 'A recuperação de snapshot entre diferentes arquiteturas de servidor não é suportada!',
-        recoverErrSize: 'Espaço em disco insuficiente detectado, por favor, verifique ou libere espaço e tente novamente!',
-        recoverHelper: 'Iniciando a recuperação do snapshot {0}, por favor, confirme as seguintes informações antes de prosseguir:',
+        recoverErrSize:
+            'Espaço em disco insuficiente detectado, por favor, verifique ou libere espaço e tente novamente!',
+        recoverHelper:
+            'Iniciando a recuperação do snapshot {0}, por favor, confirme as seguintes informações antes de prosseguir:',
         recoverHelper1: 'A recuperação requer reiniciar os serviços Docker e 1Panel',
-        recoverHelper2: 'Por favor, assegure-se de que há espaço suficiente em disco no servidor (Tamanho do arquivo de snapshot: {0}, Espaço disponível: {1})',
-        recoverHelper3: 'Por favor, assegure-se de que a arquitetura do servidor corresponda à arquitetura do servidor onde o snapshot foi criado (Arquitetura do servidor atual: {0})',
+        recoverHelper2:
+            'Por favor, assegure-se de que há espaço suficiente em disco no servidor (Tamanho do arquivo de snapshot: {0}, Espaço disponível: {1})',
+        recoverHelper3:
+            'Por favor, assegure-se de que a arquitetura do servidor corresponda à arquitetura do servidor onde o snapshot foi criado (Arquitetura do servidor atual: {0})',
         rollback: 'Rollback',
-        rollbackHelper: 'Reverter essa recuperação substituirá todos os arquivos dessa recuperação e pode exigir reiniciar os serviços Docker e 1Panel. Você deseja continuar?',
+        rollbackHelper:
+            'Reverter essa recuperação substituirá todos os arquivos dessa recuperação e pode exigir reiniciar os serviços Docker e 1Panel. Você deseja continuar?',
 
         upgradeHelper: 'A atualização requer reiniciar o serviço 1Panel. Você deseja continuar?',
         noUpgrade: 'Esta é a versão mais recente',
@@ -1636,15 +1706,16 @@ const message = {
 
         license: 'Licença',
         advancedMenuHide: 'Ocultar menu avançado',
-        showMainAdvancedMenu: 'Se apenas um menu for mantido, somente o menu avançado principal será exibido na barra lateral',
+        showMainAdvancedMenu:
+            'Se apenas um menu for mantido, somente o menu avançado principal será exibido na barra lateral',
         showAll: 'Mostrar Tudo',
         hideALL: 'Ocultar Tudo',
         ifShow: 'Exibir?',
         menu: 'Menu',
         confirmMessage: 'A página será atualizada para atualizar a lista de menus avançados. Continuar?',
         compressPassword: 'Senha de compressão',
-        backupRecoverMessage: 'Por favor, insira a senha de compressão ou descompressão (deixe em branco para não definir)',
-
+        backupRecoverMessage:
+            'Por favor, insira a senha de compressão ou descompressão (deixe em branco para não definir)',
     },
     license: {
         community: 'Gratuito',
@@ -1660,13 +1731,16 @@ const message = {
         Lost: 'Perdido',
         Enable: 'Habilitado',
         Disable: 'Desabilitado',
-        lostHelper: 'A licença atingiu o número máximo de tentativas de reenvio. Por favor, clique manualmente no botão de sincronização para garantir que os recursos da versão profissional estão funcionando corretamente.',
-        disableHelper: 'A verificação de sincronização da licença falhou. Por favor, clique manualmente no botão de sincronização para garantir que os recursos da versão profissional estão funcionando corretamente.',
+        lostHelper:
+            'A licença atingiu o número máximo de tentativas de reenvio. Por favor, clique manualmente no botão de sincronização para garantir que os recursos da versão profissional estão funcionando corretamente.',
+        disableHelper:
+            'A verificação de sincronização da licença falhou. Por favor, clique manualmente no botão de sincronização para garantir que os recursos da versão profissional estão funcionando corretamente.',
         quickUpdate: 'Atualização rápida',
         import: 'Importar',
         power: 'Autorizar',
         unbind: 'Desvincular Licença',
-        unbindHelper: 'Todas as configurações relacionadas ao Pro serão limpas após a desvinculação. Você deseja continuar?',
+        unbindHelper:
+            'Todas as configurações relacionadas ao Pro serão limpas após a desvinculação. Você deseja continuar?',
         importLicense: 'Licença',
         importHelper: 'Clique ou arraste o arquivo de licença aqui',
         technicalAdvice: 'Consultoria técnica',
@@ -1680,10 +1754,11 @@ const message = {
         waf: 'O upgrade para a versão profissional pode fornecer recursos como mapa de intercepção, logs, registros de bloqueio, bloqueio por localização geográfica, regras personalizadas, páginas de intercepção personalizadas, etc.',
         tamper: 'O upgrade para a versão profissional pode proteger sites contra modificações ou adulterações não autorizadas.',
         gpu: 'O upgrade para a versão profissional pode ajudar os usuários a monitorar visualmente parâmetros importantes da GPU, como carga de trabalho, temperatura e uso de memória em tempo real.',
-        setting: 'O upgrade para a versão profissional permite a personalização do logo do painel, mensagem de boas-vindas e outras informações.',
-        monitor: 'Upgrade para a versão profissional para visualizar o status em tempo real do site, tendências de visitantes, fontes de visitantes, logs de solicitações e outras informações.',
+        setting:
+            'O upgrade para a versão profissional permite a personalização do logo do painel, mensagem de boas-vindas e outras informações.',
+        monitor:
+            'Upgrade para a versão profissional para visualizar o status em tempo real do site, tendências de visitantes, fontes de visitantes, logs de solicitações e outras informações.',
         alert: 'Upgrade para a versão profissional para receber informações de alarme via SMS e visualizar logs de alarmes, controlar completamente vários eventos chave e garantir a operação sem preocupações do sistema',
-
     },
     clean: {
         scan: 'Iniciar escaneamento',
@@ -1704,7 +1779,8 @@ const message = {
         selectScan: 'Total de arquivos inúteis selecionados: ',
 
         system: 'Arquivos inúteis do sistema',
-        systemHelper: 'Arquivos temporários gerados durante snapshots, atualizações e conteúdos obsoletos durante iterações de versão',
+        systemHelper:
+            'Arquivos temporários gerados durante snapshots, atualizações e conteúdos obsoletos durante iterações de versão',
         panelOriginal: 'Arquivos de backup de recuperação de snapshot do sistema',
         upgrade: 'Arquivos de backup de atualização do sistema',
         upgradeHelper: '(Recomenda-se manter o backup de atualização mais recente para rollback do sistema)',
@@ -1728,7 +1804,8 @@ const message = {
         directory: 'Diretório',
 
         systemLog: 'Arquivos de log do sistema',
-        systemLogHelper: 'Informações de log do sistema, logs de construção de container ou pull de imagem, e logs gerados em tarefas agendadas',
+        systemLogHelper:
+            'Informações de log do sistema, logs de construção de container ou pull de imagem, e logs gerados em tarefas agendadas',
         dockerLog: 'Arquivos de log de operação de container',
         taskLog: 'Arquivos de log de execução de tarefas agendadas',
         containerShell: 'Tarefas agendadas de script Shell interno do container',
@@ -1738,7 +1815,6 @@ const message = {
         containers: 'Containers',
         volumes: 'Volumes',
         buildCache: 'Cache de construção do container',
-
     },
     app: {
         app: 'Aplicativo | Aplicativos',
@@ -1760,7 +1836,8 @@ const message = {
         stop: 'Parar',
         rebuild: 'Reconstruir',
         description: 'Descrição',
-        deleteWarn: 'A operação de exclusão excluirá todos os dados e backups juntos. Esta operação não pode ser desfeita. Deseja continuar?',
+        deleteWarn:
+            'A operação de exclusão excluirá todos os dados e backups juntos. Esta operação não pode ser desfeita. Deseja continuar?',
         syncSuccess: 'Sincronizado com sucesso',
         canUpgrade: 'Atualizações',
         backupName: 'Nome do Arquivo',
@@ -1819,23 +1896,28 @@ const message = {
         takeDown: 'Retirar',
         allReadyInstalled: 'Instalado',
         installHelper: 'Se houver problemas ao puxar a imagem, configure a aceleração da imagem.',
-        upgradeHelper: 'Coloque aplicativos anormais de volta ao estado normal antes de atualizar. Se a atualização falhar, vá para "Logs > Logs do Sistema" para verificar a razão da falha.',
+        upgradeHelper:
+            'Coloque aplicativos anormais de volta ao estado normal antes de atualizar. Se a atualização falhar, vá para "Logs > Logs do Sistema" para verificar a razão da falha.',
         installWarn: `O acesso externo não foi habilitado, o que impede que o aplicativo seja acessado via redes externas. Deseja continuar?`,
         showIgnore: 'Exibir aplicativos ignorados',
         cancelIgnore: 'Cancelar ignorar',
         ignoreList: 'Aplicativos ignorados',
-        appHelper: 'Vá para a página de detalhes do aplicativo para aprender as instruções de instalação para alguns aplicativos especiais.',
+        appHelper:
+            'Vá para a página de detalhes do aplicativo para aprender as instruções de instalação para alguns aplicativos especiais.',
         backupApp: 'Fazer backup do aplicativo antes de atualizar',
-        backupAppHelper: 'Se a atualização falhar, o backup será automaticamente revertido. Verifique a razão da falha no log de auditoria-sistema. O backup manterá as últimas 3 cópias por padrão',
+        backupAppHelper:
+            'Se a atualização falhar, o backup será automaticamente revertido. Verifique a razão da falha no log de auditoria-sistema. O backup manterá as últimas 3 cópias por padrão',
         delete: 'Excluir',
         openrestyDeleteHelper: 'Excluir forçadamente o OpenResty excluirá todos os sites. Deseja continuar?',
         downloadLogHelper1: 'Todos os logs do aplicativo {0} estão prestes a ser baixados. Deseja continuar?',
         downloadLogHelper2: 'Os últimos {1} logs do aplicativo {0} estão prestes a ser baixados. Deseja continuar?',
         syncAllAppHelper: 'Todos os aplicativos serão sincronizados. Deseja continuar?',
-        hostModeHelper: 'O modo de rede atual do aplicativo é o modo host. Se precisar abrir a porta, abra-a manualmente na página do firewall.',
+        hostModeHelper:
+            'O modo de rede atual do aplicativo é o modo host. Se precisar abrir a porta, abra-a manualmente na página do firewall.',
         showLocal: 'Exibir aplicativos locais',
         reload: 'Recarregar',
-        upgradeWarn: 'Atualizar o aplicativo substituirá o arquivo docker-compose.yml. Se houver alterações, você pode clicar para visualizar a comparação do arquivo',
+        upgradeWarn:
+            'Atualizar o aplicativo substituirá o arquivo docker-compose.yml. Se houver alterações, você pode clicar para visualizar a comparação do arquivo',
         newVersion: 'Nova versão',
         oldVersion: 'Versão atual',
         composeDiff: 'Comparação de arquivo',
@@ -1843,11 +1925,12 @@ const message = {
         useNew: 'Usar versão personalizada',
         useDefault: 'Usar versão padrão',
         useCustom: 'Personalizar docker-compose.yml',
-        useCustomHelper: 'Usar um arquivo docker-compose.yml personalizado pode causar falha na atualização do aplicativo. Se não for necessário, não marque esta opção.',
-        diffHelper: 'O lado esquerdo é a versão antiga, o lado direito é a nova versão. Após editar, clique para salvar a versão personalizada',
+        useCustomHelper:
+            'Usar um arquivo docker-compose.yml personalizado pode causar falha na atualização do aplicativo. Se não for necessário, não marque esta opção.',
+        diffHelper:
+            'O lado esquerdo é a versão antiga, o lado direito é a nova versão. Após editar, clique para salvar a versão personalizada',
         pullImage: 'Puxar Imagem',
         pullImageHelper: 'Execute o comando docker pull para puxar a imagem antes de iniciar o aplicativo',
-
     },
     website: {
         website: 'Website | Websites',
@@ -1863,7 +1946,7 @@ const message = {
         ftpUser: 'Conta FTP',
         ftpPassword: 'Senha FTP',
         ftpHelper:
-        'Após criar um site, uma conta FTP correspondente será criada e o diretório FTP será vinculado ao diretório do site.',
+            'Após criar um site, uma conta FTP correspondente será criada e o diretório FTP será vinculado ao diretório do site.',
         remark: 'Observação',
         group: 'Grupo',
         manageGroup: 'Gerenciar grupos',
@@ -1933,7 +2016,7 @@ const message = {
         cycle: 'Ciclo',
         frequency: 'Frequência',
         ccHelper:
-        'Solicitar cumulativamente a mesma URL mais de {1} vezes em {0} segundos, aciona a defesa CC, bloqueia este IP',
+            'Solicitar cumulativamente a mesma URL mais de {1} vezes em {0} segundos, aciona a defesa CC, bloqueia este IP',
         mustSave: 'A modificação precisa ser salva para ter efeito',
         fileExt: 'Extensão de arquivo',
         fileExtBlock: 'Lista negra de extensões de arquivo',
@@ -1942,8 +2025,7 @@ const message = {
         proxyAddress: 'Endereço Proxy',
         proxyHelper: 'Exemplo: 127.0.0.1:8080',
         forceDelete: 'Excluir forçadamente',
-        forceDeleteHelper:
-        'A exclusão forçada ignorará erros durante o processo de exclusão e excluirá os metadados.',
+        forceDeleteHelper: 'A exclusão forçada ignorará erros durante o processo de exclusão e excluirá os metadados.',
         deleteAppHelper: 'Excluir aplicativos associados e backups de aplicativos ao mesmo tempo',
         deleteBackupHelper: 'Excluir também backups do site.',
         deleteConfirmHelper: `A operação de exclusão não pode ser desfeita. Digite <span style="color:red"> "{0}" </span> para confirmar a exclusão.`,
@@ -1959,9 +2041,8 @@ const message = {
         errLog: 'Erro de log',
         accessLog: 'Log do site',
         stopHelper:
-        'Após parar o site, ele não poderá ser acessado normalmente, e o usuário verá a página de parada do site atual ao visitar. Deseja continuar?',
-        startHelper:
-        'Após ativar o site, os usuários podem acessar o conteúdo do site normalmente, deseja continuar?',
+            'Após parar o site, ele não poderá ser acessado normalmente, e o usuário verá a página de parada do site atual ao visitar. Deseja continuar?',
+        startHelper: 'Após ativar o site, os usuários podem acessar o conteúdo do site normalmente, deseja continuar?',
         sitePath: 'Diretório',
         siteAlias: 'Alias do site',
         primaryPath: 'Diretório raiz',
@@ -1983,17 +2064,16 @@ const message = {
         HTTPAlso: 'Permitir requisições HTTP diretas',
         sslConfig: 'Opções SSL',
         disableHTTPS: 'Desabilitar HTTPS',
-        disableHTTPSHelper:
-        'Desabilitar HTTPS removerá a configuração do certificado relacionada, deseja continuar?',
+        disableHTTPSHelper: 'Desabilitar HTTPS removerá a configuração do certificado relacionada, deseja continuar?',
         SSLHelper:
-        "Nota: Não use certificados SSL para sites ilegais.\nSe o acesso HTTPS não funcionar após a ativação, verifique se o grupo de segurança liberou corretamente a porta 443.",
+            'Nota: Não use certificados SSL para sites ilegais.\nSe o acesso HTTPS não funcionar após a ativação, verifique se o grupo de segurança liberou corretamente a porta 443.',
         SSLConfig: 'Configurações do certificado',
         SSLProConfig: 'Configurações do protocolo',
         supportProtocol: 'Versão do protocolo',
         encryptionAlgorithm: 'Algoritmo de criptografia',
         notSecurity: '(não seguro)',
         encryptHelper:
-        "O Let's Encrypt tem um limite de frequência para a emissão de certificados, mas é suficiente para atender necessidades normais. Operações muito frequentes podem causar falha na emissão. Para restrições específicas, consulte <a target='_blank' href='https://letsencrypt.org/zh-cn/docs/rate-limits/'>documentação oficial</a>",
+            "O Let's Encrypt tem um limite de frequência para a emissão de certificados, mas é suficiente para atender necessidades normais. Operações muito frequentes podem causar falha na emissão. Para restrições específicas, consulte <a target='_blank' href='https://letsencrypt.org/zh-cn/docs/rate-limits/'>documentação oficial</a>",
         ipValue: 'Valor',
         ext: 'Extensão de arquivo',
         wafInputHelper: 'Digite os dados por linha, uma linha por vez',
@@ -2004,16 +2084,16 @@ const message = {
         defaultServer: 'Site padrão',
         noDefaultServer: 'Não definido',
         defaultServerHelper:
-        'Após definir o site padrão, todos os domínios e IPs não vinculados serão redirecionados para o site padrão\n o que pode prevenir efetivamente análises maliciosas',
+            'Após definir o site padrão, todos os domínios e IPs não vinculados serão redirecionados para o site padrão\n o que pode prevenir efetivamente análises maliciosas',
         restoreHelper: 'Tem certeza de que deseja restaurar com este backup?',
         websiteDeploymentHelper: 'Use um aplicativo instalado ou crie um novo aplicativo para criar um site.',
         websiteStatictHelper: 'Crie um diretório de site no host.',
         websiteProxyHelper:
-        'Use proxy reverso para redirecionar um serviço existente. Por exemplo, se um serviço estiver instalado e rodando na porta 8080, o endereço do proxy será "http://127.0.0.1:8080".',
+            'Use proxy reverso para redirecionar um serviço existente. Por exemplo, se um serviço estiver instalado e rodando na porta 8080, o endereço do proxy será "http://127.0.0.1:8080".',
         runtimeProxyHelper: 'Use o ambiente de execução do site para criar um site.',
         runtime: 'Ambiente de execução',
         deleteRuntimeHelper:
-        'O aplicativo de Runtime precisa ser excluído junto com o site, por favor, manuseie com cuidado',
+            'O aplicativo de Runtime precisa ser excluído junto com o site, por favor, manuseie com cuidado',
         proxyType: 'Tipo de rede',
         unix: 'Rede Unix',
         tcp: 'Rede TCP/IP',
@@ -2026,10 +2106,10 @@ const message = {
         rewriteMode: 'Plano',
         current: 'Atual',
         rewriteHelper:
-        'Se configurar pseudo-estático e o site se tornar inacessível, tente reverter para as configurações padrão.',
+            'Se configurar pseudo-estático e o site se tornar inacessível, tente reverter para as configurações padrão.',
         runDir: 'Diretório de execução',
         runUserHelper:
-        'Para sites implantados através do ambiente de execução PHP, você deve definir o proprietário e o grupo dos arquivos e pastas de índice e subdiretórios para 1000. Para o ambiente PHP local, consulte as configurações de usuário e grupo do PHP-FPM local',
+            'Para sites implantados através do ambiente de execução PHP, você deve definir o proprietário e o grupo dos arquivos e pastas de índice e subdiretórios para 1000. Para o ambiente PHP local, consulte as configurações de usuário e grupo do PHP-FPM local',
         userGroup: 'Usuário/Grupo',
         uGroup: 'Grupo',
         proxyPath: 'Caminho do proxy',
@@ -2045,10 +2125,11 @@ const message = {
         proxyHelper1: 'Ao acessar este diretório, o conteúdo da URL de destino será retornado e exibido.',
         proxyPassHelper: 'A URL de destino deve ser válida e acessível.',
         proxyHostHelper: 'Passe o nome de domínio no cabeçalho da requisição para o servidor proxy.',
-        replacementHelper: 'Até 5 substituições podem ser adicionadas, deixe em branco se não houver substituição necessária.',
+        replacementHelper:
+            'Até 5 substituições podem ser adicionadas, deixe em branco se não houver substituição necessária.',
         modifier: 'Regras de correspondência',
         modifierHelper:
-        'Exemplo: "=" é correspondência exata, "~" é correspondência regular, "^~" corresponde ao início do caminho, etc.',
+            'Exemplo: "=" é correspondência exata, "~" é correspondência regular, "^~" corresponde ao início do caminho, etc.',
         replace: 'Substituições de texto',
         addReplace: 'Adicionar',
         replaced: 'String de busca (não pode estar vazia)',
@@ -2056,7 +2137,8 @@ const message = {
         replacedErr: 'A string de busca não pode estar vazia',
         replacedErr2: 'A string de busca não pode ser repetida',
         basicAuth: 'Autenticação básica',
-        editBasicAuthHelper: 'A senha é criptografada de forma assimétrica e não pode ser exibida. A edição requer a redefinição da senha',
+        editBasicAuthHelper:
+            'A senha é criptografada de forma assimétrica e não pode ser exibida. A edição requer a redefinição da senha',
         antiLeech: 'Anti-leech',
         extends: 'Extensão',
         browserCache: 'Cache',
@@ -2076,7 +2158,8 @@ const message = {
         localSSL: 'Selecionar arquivo do servidor',
         privateKeyPath: 'Caminho do arquivo da chave privada',
         certificatePath: 'Caminho do arquivo do certificado',
-        ipWhiteListHelper: 'O papel da lista de permissões de IP: todas as regras são inválidas para a lista de permissões de IP',
+        ipWhiteListHelper:
+            'O papel da lista de permissões de IP: todas as regras são inválidas para a lista de permissões de IP',
         redirect: 'Redirecionar',
         sourceDomain: 'Domínio de origem',
         targetURL: 'Endereço da URL de destino',
@@ -2088,19 +2171,25 @@ const message = {
         notKeep: 'Não manter',
         redirectRoot: 'Redirecionar para a página inicial',
         redirectHelper: 'Redirecionamento permanente 301, redirecionamento temporário 302',
-        changePHPVersionWarn: 'Trocar a versão do PHP vai excluir o contêiner PHP original (o código do site montado não será perdido), continuar?',
+        changePHPVersionWarn:
+            'Trocar a versão do PHP vai excluir o contêiner PHP original (o código do site montado não será perdido), continuar?',
         changeVersion: 'Trocar versão',
         retainConfig: 'Deseja manter os arquivos php-fpm.conf e php.ini?',
-        runDirHelper2: 'Por favor, certifique-se de que o diretório de execução secundário esteja no diretório do índice',
-        openrestyHelper: 'Porta HTTP padrão do OpenResty: {0} Porta HTTPS: {1}, o que pode afetar o acesso ao domínio do site e o redirecionamento forçado para HTTPS',
+        runDirHelper2:
+            'Por favor, certifique-se de que o diretório de execução secundário esteja no diretório do índice',
+        openrestyHelper:
+            'Porta HTTP padrão do OpenResty: {0} Porta HTTPS: {1}, o que pode afetar o acesso ao domínio do site e o redirecionamento forçado para HTTPS',
         primaryDomainHelper: 'Exemplo: exemplo.com ou exemplo.com:8080',
         acmeAccountType: 'Tipo de conta',
         keyType: 'Algoritmo de chave',
         tencentCloud: 'Tencent Cloud',
         containWarn: 'O nome de domínio contém o domínio principal, por favor, reentre',
-        rewriteHelper2: 'Aplicações como o WordPress instaladas a partir da loja de aplicativos geralmente vêm com configuração de pseudo-estática predefinida. Reconfigurá-las pode causar erros.',
-        websiteBackupWarn: 'Somente suporta importar backups locais, importar backups de outras máquinas pode causar falha na recuperação',
-        ipWebsiteWarn: 'Sites com IP como nomes de domínio precisam ser configurados como site padrão para serem acessados normalmente',
+        rewriteHelper2:
+            'Aplicações como o WordPress instaladas a partir da loja de aplicativos geralmente vêm com configuração de pseudo-estática predefinida. Reconfigurá-las pode causar erros.',
+        websiteBackupWarn:
+            'Somente suporta importar backups locais, importar backups de outras máquinas pode causar falha na recuperação',
+        ipWebsiteWarn:
+            'Sites com IP como nomes de domínio precisam ser configurados como site padrão para serem acessados normalmente',
         hstsHelper: 'Ativar HSTS pode aumentar a segurança do site',
         defaultHtml: 'Página padrão',
         website404: 'Página de erro 404 do site',
@@ -2109,9 +2198,11 @@ const message = {
         stopHtml: 'Site parado',
         indexPHP: 'Índice para site PHP',
         sslExpireDate: 'Data de expiração do certificado',
-        website404Helper: 'A página de erro 404 do site suporta apenas sites com ambiente de execução PHP e sites estáticos',
+        website404Helper:
+            'A página de erro 404 do site suporta apenas sites com ambiente de execução PHP e sites estáticos',
         sni: 'SNI de origem',
-        sniHelper: 'Quando o proxy reverso de backend for HTTPS, você pode precisar configurar o SNI de origem. Consulte a documentação do provedor de serviços CDN para mais detalhes.',
+        sniHelper:
+            'Quando o proxy reverso de backend for HTTPS, você pode precisar configurar o SNI de origem. Consulte a documentação do provedor de serviços CDN para mais detalhes.',
         huaweicloud: 'Huawei Cloud',
     },
     php: {
@@ -2129,10 +2220,11 @@ const message = {
         cgi_fix_pathinfo: 'Ativar suporte a pathinfo',
         date_timezone: 'Fuso horário',
         disableFunction: 'Desabilitar função',
-        disableFunctionHelper: 'Informe a função a ser desabilitada, como exec. Para múltiplas funções, separe com vírgulas',
+        disableFunctionHelper:
+            'Informe a função a ser desabilitada, como exec. Para múltiplas funções, separe com vírgulas',
         uploadMaxSize: 'Limite de upload',
         indexHelper:
-        'Para garantir o funcionamento normal do site em PHP, coloque o código no diretório de índice e evite renomeações',
+            'Para garantir o funcionamento normal do site em PHP, coloque o código no diretório de índice e evite renomeações',
         extensions: 'Modelos de extensão',
         extension: 'Extensão',
         extensionHelper: 'Para múltiplas extensões, separe com vírgulas',
@@ -2159,7 +2251,7 @@ const message = {
         saveAndReload: 'Save and reload',
         clearProxyCache: 'Clean reverse proxy cache',
         clearProxyCacheWarn:
-        'All websites that have configured with cache will be affected and "OpenResty" will be restarted. Do you want to continue?',
+            'All websites that have configured with cache will be affected and "OpenResty" will be restarted. Do you want to continue?',
     },
     ssl: {
         create: 'Solicitar',
@@ -2180,8 +2272,7 @@ const message = {
         autoRenew: 'Renovação automática',
         autoRenewHelper: 'Renova automaticamente 30 dias antes da expiração',
         renewSuccess: 'Renovação bem-sucedida',
-        renewWebsite:
-        'Este certificado está associado aos seguintes sites e será aplicado a eles simultaneamente',
+        renewWebsite: 'Este certificado está associado aos seguintes sites e será aplicado a eles simultaneamente',
         createAcme: 'Criar conta',
         acmeHelper: 'A conta ACME é usada para solicitar certificados gratuitos',
         upload: 'Importar',
@@ -2205,22 +2296,23 @@ const message = {
         pushDir: 'Enviar o certificado para o diretório local',
         dir: 'Diretório',
         pushDirHelper:
-        'O arquivo do certificado "fullchain.pem" e o arquivo de chave "privkey.pem" serão gerados neste diretório.',
+            'O arquivo do certificado "fullchain.pem" e o arquivo de chave "privkey.pem" serão gerados neste diretório.',
         organizationDetail: 'Detalhes da organização',
         fromWebsite: 'Do site',
         dnsMauanlHelper:
-        'No modo de resolução manual, você precisa clicar no botão de solicitação após a criação para obter o valor de resolução DNS',
+            'No modo de resolução manual, você precisa clicar no botão de solicitação após a criação para obter o valor de resolução DNS',
         httpHelper: 'O modo HTTP requer a instalação do OpenResty',
         buypassHelper: 'O Buypass não está acessível na China continental',
         googleHelper: 'Como obter EAB HmacKey e EAB kid',
         googleCloudHelper: 'A API do Google Cloud não está acessível na maior parte da China continental',
         httpHelper2: 'Não é possível solicitar certificados para domínios genéricos no modo HTTP',
         skipDNSCheck: 'Pular verificação DNS',
-        skipDNSCheckHelper: 'Marque esta opção apenas se enfrentar problemas de timeout durante a solicitação de certificação.',
+        skipDNSCheckHelper:
+            'Marque esta opção apenas se enfrentar problemas de timeout durante a solicitação de certificação.',
         cfHelper: 'Não use a Global API Key',
         deprecated: 'será descontinuado',
         deprecatedHelper:
-        'A manutenção foi interrompida e pode ser abandonada em uma versão futura. Use o método Tencent Cloud para análise',
+            'A manutenção foi interrompida e pode ser abandonada em uma versão futura. Use o método Tencent Cloud para análise',
         disableCNAME: 'Desativar CNAME',
         disableCNAMEHelper: 'Marque esta opção se o domínio tiver um registro CNAME e a solicitação falhar.',
         nameserver: 'Servidor DNS',
@@ -2229,13 +2321,13 @@ const message = {
         execShell: 'Executar o script após a solicitação de certificação.',
         shell: 'Conteúdo do script',
         shellHelper:
-        'O diretório padrão de execução do script é o diretório de instalação do 1Panel. Se um certificado for enviado para o diretório local, o diretório de execução será o diretório de envio do certificado. O tempo limite padrão de execução é de 30 minutos.',
+            'O diretório padrão de execução do script é o diretório de instalação do 1Panel. Se um certificado for enviado para o diretório local, o diretório de execução será o diretório de envio do certificado. O tempo limite padrão de execução é de 30 minutos.',
     },
     firewall: {
         create: 'Criar regra',
         edit: 'Editar regra',
         notSupport:
-        'Nenhum firewall do sistema detectado (firewalld ou ufw). Consulte a documentação oficial para instalação.',
+            'Nenhum firewall do sistema detectado (firewalld ou ufw). Consulte a documentação oficial para instalação.',
         ccDeny: 'Proteção contra CC',
         ipWhiteList: 'Lista de IPs permitidos',
         ipBlockList: 'Lista de IPs bloqueados',
@@ -2248,41 +2340,36 @@ const message = {
 
         firewall: 'Firewall',
         dockerHelper:
-        'O firewall do Linux "{0}" não pode desativar o mapeamento de portas do Docker. O aplicativo pode editar os parâmetros na página "App Store -> Instalados" para controlar se a porta será liberada.',
+            'O firewall do Linux "{0}" não pode desativar o mapeamento de portas do Docker. O aplicativo pode editar os parâmetros na página "App Store -> Instalados" para controlar se a porta será liberada.',
         quickJump: 'Acesso rápido',
         used: 'Usado',
         unUsed: 'Não usado',
         firewallHelper: 'Firewall do sistema {0}',
-        firewallNotStart:
-        'O firewall do sistema não está habilitado atualmente. Habilite-o primeiro.',
+        firewallNotStart: 'O firewall do sistema não está habilitado atualmente. Habilite-o primeiro.',
         restartFirewallHelper: 'Esta operação reiniciará o firewall atual. Deseja continuar?',
-        stopFirewallHelper:
-        'Isso fará com que o servidor perca a proteção de segurança. Deseja continuar?',
+        stopFirewallHelper: 'Isso fará com que o servidor perca a proteção de segurança. Deseja continuar?',
         startFirewallHelper:
-        'Depois que o firewall for habilitado, a segurança do servidor será melhor protegida. Deseja continuar?',
+            'Depois que o firewall for habilitado, a segurança do servidor será melhor protegida. Deseja continuar?',
         noPing: 'Desativar ping',
         noPingTitle: 'Desativar ping',
-        noPingHelper:
-        'Isso desativará o ping, e o servidor não responderá ao ICMP. Deseja continuar?',
-        onPingHelper:
-        'Isso ativará o ping, permitindo que hackers descubram seu servidor. Deseja continuar?',
+        noPingHelper: 'Isso desativará o ping, e o servidor não responderá ao ICMP. Deseja continuar?',
+        onPingHelper: 'Isso ativará o ping, permitindo que hackers descubram seu servidor. Deseja continuar?',
         changeStrategy: 'Alterar a estratégia {0}',
         changeStrategyIPHelper1:
-        'Altere a estratégia de endereço IP para [negar]. Após definir o endereço IP, o acesso ao servidor será proibido. Deseja continuar?',
+            'Altere a estratégia de endereço IP para [negar]. Após definir o endereço IP, o acesso ao servidor será proibido. Deseja continuar?',
         changeStrategyIPHelper2:
-        'Altere a estratégia de endereço IP para [permitir]. Após definir o endereço IP, o acesso normal será restaurado. Deseja continuar?',
+            'Altere a estratégia de endereço IP para [permitir]. Após definir o endereço IP, o acesso normal será restaurado. Deseja continuar?',
         changeStrategyPortHelper1:
-        'Altere a política de porta para [bloquear]. Após definir a política de porta, o acesso externo será negado. Deseja continuar?',
+            'Altere a política de porta para [bloquear]. Após definir a política de porta, o acesso externo será negado. Deseja continuar?',
         changeStrategyPortHelper2:
-        'Altere a política de porta para [aceitar]. Após definir a política de porta, o acesso normal será restaurado. Deseja continuar?',
+            'Altere a política de porta para [aceitar]. Após definir a política de porta, o acesso normal será restaurado. Deseja continuar?',
         stop: 'Parar',
         portFormatError: 'Este campo deve ser uma porta válida.',
         portHelper1: 'Várias portas, ex.: 8080 e 8081',
         portHelper2: 'Faixa de portas, ex.: 8080-8089',
         changeStrategyHelper:
-        'Alterar a estratégia [{1}] {0} para [{2}]. Após a definição, {0} acessará {2} externamente. Deseja continuar?',
-        portHelper:
-        'Várias portas podem ser inseridas, ex.: 80,81, ou faixas de portas, ex.: 80-88',
+            'Alterar a estratégia [{1}] {0} para [{2}]. Após a definição, {0} acessará {2} externamente. Deseja continuar?',
+        portHelper: 'Várias portas podem ser inseridas, ex.: 80,81, ou faixas de portas, ex.: 80-88',
         strategy: 'Estratégia',
         accept: 'Aceitar',
         drop: 'Bloquear',
@@ -2293,10 +2380,8 @@ const message = {
         allow: 'Permitir',
         deny: 'Negar',
         addressFormatError: 'Este campo deve ser um endereço IP válido.',
-        addressHelper1:
-        'Suporta endereço IP ou intervalo de IP. Por exemplo, "172.16.10.11" ou "172.16.10.0/24".',
-        addressHelper2:
-        'Para vários endereços IP, separe por vírgula. Por exemplo, "172.16.10.11, 172.16.0.0/24".',
+        addressHelper1: 'Suporta endereço IP ou intervalo de IP. Por exemplo, "172.16.10.11" ou "172.16.10.0/24".',
+        addressHelper2: 'Para vários endereços IP, separe por vírgula. Por exemplo, "172.16.10.11, 172.16.0.0/24".',
         allIP: 'Todos os IPs',
         portRule: 'Regra | Regras',
         createPortRule: '@:commons.button.create @.lower:firewall.portRule',
@@ -2309,9 +2394,8 @@ const message = {
         targetIP: 'IP de destino',
         targetPort: 'Porta de destino',
         forwardHelper1:
-        'Se você deseja redirecionar para a porta local, o IP de destino deve ser definido como "127.0.0.1".',
-        forwardHelper2:
-        'Deixe o IP de destino em branco para redirecionar para a porta local.',
+            'Se você deseja redirecionar para a porta local, o IP de destino deve ser definido como "127.0.0.1".',
+        forwardHelper2: 'Deixe o IP de destino em branco para redirecionar para a porta local.',
         forwardHelper3: 'Somente suporta redirecionamento de porta IPv4.',
     },
     runtime: {
@@ -2349,32 +2433,33 @@ const message = {
         appPortHelper: 'A porta usada pela aplicação.',
         externalPortHelper: 'A porta exposta para o ambiente externo.',
         runScript: 'Executar script',
-        runScriptHelper: 'A lista de comandos de inicialização é gerada a partir do arquivo package.json no diretório de origem.',
+        runScriptHelper:
+            'A lista de comandos de inicialização é gerada a partir do arquivo package.json no diretório de origem.',
         open: 'Abrir',
         close: 'Fechar',
-        operatorHelper:
-        'A operação {0} será realizada no ambiente selecionado. Deseja continuar?',
+        operatorHelper: 'A operação {0} será realizada no ambiente selecionado. Deseja continuar?',
         statusHelper:
-        'Descrição do status: Iniciando - o contêiner foi iniciado, mas a aplicação está carregando; anormal - o contêiner foi iniciado, mas o status da aplicação está incorreto.',
+            'Descrição do status: Iniciando - o contêiner foi iniciado, mas a aplicação está carregando; anormal - o contêiner foi iniciado, mas o status da aplicação está incorreto.',
         taobao: 'Taobao',
         tencent: 'Tencent',
         imageSource: 'Fonte da imagem',
         moduleManager: 'Gerenciamento de Módulos',
         module: 'Módulo',
         nodeOperatorHelper:
-        'Deseja {0} o módulo {1}? Esta operação pode causar instabilidade no ambiente, confirme antes de prosseguir.',
+            'Deseja {0} o módulo {1}? Esta operação pode causar instabilidade no ambiente, confirme antes de prosseguir.',
         customScript: 'Comando de inicialização personalizado',
         customScriptHelper: 'Forneça um comando completo de inicialização. Por exemplo, "npm run start".',
         portError: `Evite repetir a mesma porta.`,
-        systemRestartHelper: 'Descrição do status: Interrupção - falha ao adquirir status devido à reinicialização do sistema.',
-        javaScriptHelper: 'Forneça um comando completo de inicialização. Por exemplo, "java -jar halo.jar -Xmx1024M -Xms256M".',
+        systemRestartHelper:
+            'Descrição do status: Interrupção - falha ao adquirir status devido à reinicialização do sistema.',
+        javaScriptHelper:
+            'Forneça um comando completo de inicialização. Por exemplo, "java -jar halo.jar -Xmx1024M -Xms256M".',
         javaDirHelper: 'O diretório deve conter arquivos jar, subdiretórios também são aceitos.',
         goHelper: 'Forneça um comando completo de inicialização. Por exemplo, "go run main.go" ou "./main".',
         goDirHelper: 'O diretório ou subdiretório deve conter arquivos Go ou binários.',
         pythonHelper:
-        'Forneça um comando completo de inicialização. Por exemplo, "pip install -r requirements.txt && python manage.py runserver 0.0.0.0:5000".',
+            'Forneça um comando completo de inicialização. Por exemplo, "pip install -r requirements.txt && python manage.py runserver 0.0.0.0:5000".',
         dotnetHelper: 'Forneça um comando completo de inicialização. Por exemplo, "dotnet MyWebApp.dll".',
-
     },
     process: {
         pid: 'ID do Processo',
@@ -2411,7 +2496,6 @@ const message = {
         viewDetails: 'Detalhes',
         stopProcessWarn: 'Tem certeza de que deseja encerrar este processo (PID:{0})?',
         processName: 'Nome do Processo',
-
     },
     tool: {
         supervisor: {
@@ -2426,15 +2510,16 @@ const message = {
             dir: 'Diretório',
             numprocs: 'Nº de processos',
             initWarn:
-            'Isso irá modificar o valor "files" na seção "[include"] do arquivo de configuração principal. O diretório de outros arquivos de configuração será: "{diretório de instalação do 1Panel}/1panel/tools/supervisord/supervisor.d/".',
+                'Isso irá modificar o valor "files" na seção "[include"] do arquivo de configuração principal. O diretório de outros arquivos de configuração será: "{diretório de instalação do 1Panel}/1panel/tools/supervisord/supervisor.d/".',
             operatorHelper: 'A operação {1} será realizada em {0}, deseja continuar? ',
             uptime: 'Tempo de execução',
             notStartWarn: `O Supervisor não foi iniciado. Inicie-o primeiro.`,
             serviceName: 'Nome do serviço',
             initHelper: `O serviço do Supervisor não foi inicializado. Clique em "Inicializar" para configurar.`,
-            serviceNameHelper: 'Nome do serviço do Supervisor gerenciado pelo systemctl, geralmente supervisor ou supervisord',
+            serviceNameHelper:
+                'Nome do serviço do Supervisor gerenciado pelo systemctl, geralmente supervisor ou supervisord',
             restartHelper:
-            'Isso reiniciará o serviço após a inicialização, o que fará com que todos os processos daemon existentes sejam interrompidos.',
+                'Isso reiniciará o serviço após a inicialização, o que fará com que todos os processos daemon existentes sejam interrompidos.',
             msg: 'Mensagem',
             RUNNING: 'Executando',
             STOPPED: 'Parado',

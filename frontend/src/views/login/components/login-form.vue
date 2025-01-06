@@ -61,7 +61,7 @@
                                             English
                                         </el-dropdown-item>
                                         <el-dropdown-item command="pt-BR">Portugês (Brasil)</el-dropdown-item>
-                                        <el-dropdown-item command="jp">日本語</el-dropdown-item>
+                                        <el-dropdown-item command="ja">日本語</el-dropdown-item>
                                         <el-dropdown-item command="ru">Русский</el-dropdown-item>
                                         <el-dropdown-item command="ms">Bahasa Melayu</el-dropdown-item>
                                     </el-dropdown-menu>
@@ -276,9 +276,9 @@ function handleCommand(command: string) {
         dropdownText.value = 'English';
     } else if (command === 'pt-BR') {
         dropdownText.value = 'Português (Brasil)';
-    }else if (command === 'tw') {
+    } else if (command === 'tw') {
         dropdownText.value = '中文(繁體)';
-    } else if (command === 'jp') {
+    } else if (command === 'ja') {
         dropdownText.value = '日本語';
     } else if (command === 'ru') {
         dropdownText.value = 'Русский';

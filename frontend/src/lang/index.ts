@@ -3,7 +3,7 @@ import zh from './modules/zh';
 import tw from './modules/tw';
 import en from './modules/en';
 import ptBr from './modules/pt-br';
-import jp from './modules/jp';
+import ja from './modules/ja';
 import ru from './modules/ru';
 import ms from './modules/ms';
 
@@ -16,8 +16,8 @@ const i18n = createI18n({
         zh,
         tw,
         en,
-        'pt-br': ptBr,
-        jp,
+        'pt-BR': ptBr,
+        ja,
         ru,
         ms,
     },

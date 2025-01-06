@@ -1,8 +1,8 @@
 import fit2cloudEnLocale from 'fit2cloud-ui-plus/src/locale/lang/en';
 let xpackJpLocale = {};
-const xpackModules = import.meta.glob('../../xpack/lang/jp.ts', { eager: true });
-if (xpackModules['../../xpack/lang/jp.ts']) {
-    xpackJpLocale = xpackModules['../../xpack/lang/jp.ts']['default'] || {};
+const xpackModules = import.meta.glob('../../xpack/lang/ja.ts', { eager: true });
+if (xpackModules['../../xpack/lang/ja.ts']) {
+    xpackJpLocale = xpackModules['../../xpack/lang/ja.ts']['default'] || {};
 }
 
 const message = {
@@ -106,7 +106,7 @@ const message = {
             protocol: 'プロトコル',
             tableSetting: 'テーブル設定',
             refreshRate: 'リフレッシュレート',
-            refreshRateUnit: '更新なし|{n} second/time |{n}秒/時間',
+            refreshRateUnit: '更新なし|{n}秒/時間 |{n}秒/時間',
             selectColumn: '列を選択します',
         },
         loadingText: {
@@ -296,15 +296,15 @@ const message = {
             year: '年|年|年',
             time: 'RPM',
             core: 'コア|コア|コア',
-            millisecond: 'Millisecond |ミリ秒',
+            millisecond: 'ミリ秒 |ミリ秒',
             secondUnit: 's',
-            minuteUnit: '分',
+            minuteUnit: 'min',
             hourUnit: 'h',
             dayUnit: 'd',
             weekUnit: 'w',
             monthUnit: 'm',
             yearUnit: 'y',
-            millisecondUnit: 'MS',
+            millisecondUnit: 'ms',
         },
         operate: {
             down: '停止',
@@ -317,7 +317,7 @@ const message = {
     },
     menu: {
         home: '概要',
-        apps: 'appStore',
+        apps: 'アプリストア',
         website: 'ウェブサイト|ウェブサイト',
         project: 'プロジェクト|プロジェクト',
         config: '構成|構成',
@@ -335,7 +335,7 @@ const message = {
         terminal: '端子|端子',
         settings: '設定|設定',
         toolbox: 'ツールボックス',
-        logs: 'log |ログ',
+        logs: 'ログ |ログ',
         runtime: 'ランタイム|ランタイム',
         processManage: 'プロセス|プロセス',
         process: 'プロセス|プロセス',
@@ -436,7 +436,7 @@ const message = {
 
         confChange: '構成',
         confNotFound:
-            '構成ファイルは見つかりませんでした。アプリケーションをApp Storeの最新バージョンにアップグレードして、再試行してください！',
+            '設定ファイルが見つかりませんでした。アプリストアでアプリケーションを最新バージョンにアップグレードして、再度お試しください！',
 
         portHelper:
             'このポートは、コンテナの露出したポートです。変更を個別に保存して、コンテナを再起動する必要があります！',
@@ -590,8 +590,8 @@ const message = {
     container: {
         create: 'コンテナを作成します',
         edit: 'コンテナを編集します',
-        updateHelper1: 'このコンテナはApp Storeから来ていることを検出しました。次の2つのポイントに注意してください。',
-        updateHelper2: '1.現在の変更は、App Storeにインストールされているアプリケーションと同期されません。',
+        updateHelper1: 'このコンテナがアプリストアから取得されたことを検出しました。以下の2点にご注意ください：',
+        updateHelper2: '1.現在の変更内容は、アプリストアにインストールされているアプリケーションには同期されません。',
         updateHelper3:
             '2.インストールされているページでアプリケーションを変更すると、現在編集されているコンテンツが無効になります。',
         updateHelper4: 'コンテナを編集するには再構築が必要であり、非存在データが失われます。続けたいですか？',
@@ -611,7 +611,7 @@ const message = {
         containerPrune: 'プルーン',
         containerPruneHelper1: 'これにより、停止状態にあるすべてのコンテナが削除されます。',
         containerPruneHelper2:
-            'コンテナがApp Storeの場合は、「App Store->インストール」に移動し、[再構築]ボタンをクリックして、クリーンアップを実行した後に再インストールする必要があります。',
+            'コンテナがアプリストアから取得された場合、クリーンアップを実行した後に、「アプリストア -> インストール済み」セクションに移動し、「再構築」ボタンをクリックして再インストールする必要があります。',
         containerPruneHelper3: 'この操作は元に戻すことはできません。続けたいですか？',
         imagePrune: 'プルーン',
         imagePruneSome: 'クリーンラベル付けされています',
@@ -658,7 +658,7 @@ const message = {
         inputIpv6: '例：2001：0DB8：85A3：0000：0000：8A2E：0370：7334',
 
         containerFromAppHelper:
-            'このコンテナはApp Storeから発生していることを検出しました。アプリの操作により、現在の編集が無効になる場合があります。',
+            'このコンテナがアプリストアから取得されたことが検出されました。アプリの操作により、現在の編集が無効になる可能性があります。',
         containerFromAppHelper1:
             'インストールされているアプリケーションリストの[PARAM]ボタンをクリックして、編集ページを入力し、コンテナ名を変更します。',
         command: '指示',
@@ -678,7 +678,8 @@ const message = {
         oldImage: '現在の画像',
         targetImage: 'ターゲット画像',
         imageLoadErr: 'コンテナの画像名は検出されません',
-        appHelper: 'コンテナはApp Storeから来ており、アップグレードするとサービスが利用できなくなる可能性があります。',
+        appHelper:
+            'このコンテナはアプリストアから取得されたものであり、アップグレードによってサービスが利用不可になる可能性があります。',
         input: '手動入力',
         forcePull: '常に画像を引っ張ってください',
         forcePullHelper: 'これにより、サーバー上の既存の画像が無視され、レジストリから最新の画像が引き出されます。',
@@ -846,7 +847,7 @@ const message = {
             'ソケットパスの設定を保存すると、Dockerサービスが利用できなくなる可能性があります。続けたいですか？',
         sockPathErr: '正しいDockerソックファイルパスを選択または入力してください',
         related: '関連している',
-        includeAppstore: 'App Storeのコンテナを表示します',
+        includeAppstore: 'アプリストアから取得したコンテナを表示',
 
         cleanDockerDiskZone: 'Dockerが使用するディスクスペースをクリーンアップします',
         cleanImagesHelper: '（コンテナで使用されていないすべての画像をクリーンアップ）',
@@ -1250,7 +1251,7 @@ const message = {
         currentSelect: '現在の選択：',
         unsupportedType: 'サポートされていないファイルタイプ',
         deleteHelper: '次のファイルを削除したいですか？デフォルトでは、削除後にリサイクルビンに入ります',
-        fileHeper: `note:\n1SearchResultsCan'tはソートされます。\N2。フォルダーはできます'tBeSortedBySize`,
+        fileHeper: `note:\n1.SearchResultsCan'tはソートされます。\n2.フォルダーはできます'tBeSortedBySize`,
         forceDeleteHelper: 'ファイルを永久に削除します（リサイクルビンを入力せずに、直接削除します）',
         recycleBin: 'ビンをリサイクルします',
         sourcePath: 'オリジナルパス',
@@ -1386,9 +1387,11 @@ const message = {
         systemIP: 'システムアドレス',
         proxy: 'サーバープロキシ',
         proxyHelper: 'プロキシサーバーを設定した後、次のシナリオで効果的になります。',
-        proxyHelper1: 'App Storeからのインストールパッケージのダウンロードと同期（Professional Editionのみ）',
+        proxyHelper1:
+            'アプリストアからのインストールパッケージのダウンロードと同期（プロフェッショナルエディションのみ）',
         proxyHelper2: 'システムの更新と更新情報検索（プロフェッショナルエディションのみ）',
-        proxyHelper4: 'Dockerネットワークはプロキシサーバー（Professional Editionのみ）を介してアクセスされます',
+        proxyHelper4:
+            'Dockerネットワークはプロキシサーバーを通じてアクセスされます（プロフェッショナルエディションのみ）',
         proxyHelper3: 'システムライセンスの確認と同期',
         proxyType: 'プロキシタイプ',
         proxyUrl: 'プロキシアドレス',
@@ -1801,7 +1804,7 @@ const message = {
         stopOperatorHelper: 'アプリケーションは停止します。続けたいですか？',
         restartOperatorHelper: 'アプリケーションが再起動されます。続けたいですか？',
         reloadOperatorHelper: 'アプリケーションはリロードされます。続けたいですか？',
-        checkInstalledWarn: `「{0}」は検出されません。「App Store」に移動してインストールします。`,
+        checkInstalledWarn: `「{0}」が検出されませんでした。「アプリストア」に移動してインストールしてください。`,
         gotoInstalled: 'インストールに移動します',
         search: '検索',
         limitHelper: 'アプリケーションはすでにインストールされています。',
@@ -2133,7 +2136,7 @@ const message = {
         tencentCloud: 'テンセントクラウド',
         containWarn: 'ドメイン名にはメインドメインが含まれています。再入力してください',
         rewriteHelper2:
-            'App StoreからインストールされたWordPressなどのアプリケーションには、通常、擬似静的構成プリセットが付属しています。それらを再構成すると、エラーが発生する可能性があります。',
+            'アプリストアからインストールされたWordPressなどのアプリケーションは、通常、擬似静的設定が事前に設定されています。それらを再設定すると、エラーが発生する可能性があります。',
         websiteBackupWarn:
             'ローカルバックアップのインポートをサポートするだけで、他のマシンからバックアップをインポートすることは回復の故障を引き起こす可能性があります',
         ipWebsiteWarn:
@@ -2284,7 +2287,7 @@ const message = {
         cookieBlockList: 'クッキーブロックリスト',
 
         firewall: 'ファイアウォール',
-        dockerHelper: `Linuxファイアウォール "{0}" Dockerポートマッピングは無効にできません。アプリケーションは、「App Store->インストールされた」ページのパラメーターを編集して、ポートがリリースされるかどうかを制御できます。`,
+        dockerHelper: `Linuxファイアウォール「{0}」ではDockerポートマッピングを無効にできません。アプリケーションは「アプリストア -> インストール済み」ページでパラメータを編集することにより、ポートの解放を制御できます。`,
         quickJump: 'クイックアクセス',
         used: '使用済み',
         unUsed: '未使用',
