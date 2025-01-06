@@ -15,6 +15,7 @@
 </template>
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
+import bus from '@/global/bus';
 
 defineProps({
     showClose: {
@@ -50,6 +51,7 @@ const openWithTaskID = (id: string, tail: boolean) => {
         config.tail = tail;
     }
     open.value = true;
+    bus.emit('refreshTask', true);
 };
 
 const openWithResourceID = (taskType: string, taskOperate: string, resourceID: number) => {

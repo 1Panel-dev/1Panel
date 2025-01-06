@@ -13,7 +13,7 @@
 import i18n from '@/lang';
 import { onMounted, ref } from 'vue';
 import { SearchAppInstalled } from '@/api/modules/app';
-import bus from './bus';
+import bus from '@/global/bus';
 let showButton = ref(false);
 
 const buttons = [

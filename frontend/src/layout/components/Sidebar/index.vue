@@ -78,6 +78,7 @@ import { isString } from '@vueuse/core';
 import { getSettingInfo, listNodeOptions } from '@/api/modules/setting';
 import { countExecutingTask } from '@/api/modules/log';
 import { compareVersion } from '@/utils/version';
+import bus from '@/global/bus';
 
 const route = useRoute();
 const menuStore = MenuStore();
@@ -85,6 +86,12 @@ const globalStore = GlobalStore();
 const nodes = ref([]);
 const nodeChangeRef = ref<DropdownInstance>();
 const version = ref();
+
+bus.on('refreshTask', () => {
+    console.log('on bus message');
+    checkTask();
+});
+
 defineProps({
     menuRouter: {
         type: Boolean,

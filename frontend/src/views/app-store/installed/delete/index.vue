@@ -49,7 +49,7 @@ import { onBeforeUnmount, ref } from 'vue';
 import { App } from '@/api/interface/app';
 import { InstalledOp } from '@/api/modules/app';
 import i18n from '@/lang';
-import bus from '../../bus';
+import bus from '@/global/bus';
 import TaskLog from '@/components/task-log/index.vue';
 import { v4 as uuidv4 } from 'uuid';
 

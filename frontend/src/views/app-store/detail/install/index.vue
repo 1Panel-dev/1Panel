@@ -136,16 +136,15 @@ import TaskLog from '@/components/task-log/index.vue';
 import { newUUID } from '@/utils/util';
 import { computeSizeFromMB } from '@/utils/util';
 
-const router = useRouter();
-
 interface InstallRrops {
     params?: App.AppParams;
     app: any;
 }
-
 const installData = ref<InstallRrops>({
     app: {},
 });
+
+const router = useRouter();
 const open = ref(false);
 const rules = ref<FormRules>({
     name: [Rules.appName],

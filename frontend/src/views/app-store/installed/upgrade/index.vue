@@ -87,7 +87,7 @@ import { reactive, ref, onBeforeUnmount } from 'vue';
 import { MsgSuccess } from '@/utils/message';
 import { Rules } from '@/global/form-rules';
 import Diff from './diff/index.vue';
-import bus from '../../bus';
+import bus from '@/global/bus';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import TaskLog from '@/components/task-log/index.vue';
 import { v4 as uuidv4 } from 'uuid';

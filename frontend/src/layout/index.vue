@@ -25,8 +25,8 @@ import { getSystemAvailable } from '@/api/modules/setting';
 import { useRoute, useRouter } from 'vue-router';
 import { loadMasterProductProFromDB, loadProductProFromDB } from '@/utils/xpack';
 import { useTheme } from '@/global/use-theme';
-const { switchTheme } = useTheme();
 import TaskList from '@/components/task-list/index.vue';
+const { switchTheme } = useTheme();
 
 useResize();
 
