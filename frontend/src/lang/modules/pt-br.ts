@@ -1,4 +1,4 @@
-import fit2cloudPtBrLocale from 'fit2cloud-ui-plus/src/locale/lang/en';
+import fit2cloudPtBrLocale from 'fit2cloud-ui-plus/src/locale/lang/pt-br';
 
 let xpackPtBrLocale = {};
 const xpackModules = import.meta.glob('../../xpack/lang/pt-br.ts', { eager: true });
@@ -1278,7 +1278,7 @@ const message = {
         unsupportedType: 'Tipo de arquivo não suportado',
         deleteHelper:
             'Tem certeza de que deseja excluir os seguintes arquivos? Por padrão, eles irão para a lixeira após a exclusão',
-        fileHeper: `Nota:\n1. Os resultados da pesquisa não podem ser ordenados.\n2. Pastas não podem ser ordenadas por tamanho.`,
+        fileHelper: `Nota:\n1. Os resultados da pesquisa não podem ser ordenados.\n2. Pastas não podem ser ordenadas por tamanho.`,
         forceDeleteHelper: 'Excluir permanentemente o arquivo (sem entrar na lixeira, excluí-lo diretamente)',
         recycleBin: 'Lixeira',
         sourcePath: 'Caminho original',
@@ -1398,7 +1398,7 @@ const message = {
         title: 'Alias do painel',
         panelPort: 'Porta do painel',
         titleHelper:
-            'Suporta caracteres não especiais no início, inglês, chinês, números, espaços, .- e _, comprimento de 3 a 30',
+            'Suporta nomes com comprimento de 3 a 30 caracteres, incluindo letras, caracteres chineses, números, espaços e caracteres especiais comuns',
         portHelper:
             'O intervalo recomendado de portas é de 8888 a 65535. Nota: Se o servidor tiver um grupo de segurança, permita a nova porta do grupo de segurança antecipadamente',
         portChange: 'Alteração de porta',

@@ -1273,7 +1273,7 @@ const message = {
         unsupportedType: 'Unsupported file type',
         deleteHelper:
             'Are you sure you want to delete the following files? By default, it will enter the recycle bin after deletion',
-        fileHeper: `Note:\n1. Search results can't be sorted.\n2. Folders can't be sorted by size.`,
+        fileHelper: `Note:\n1. Search results can't be sorted.\n2. Folders can't be sorted by size.`,
         forceDeleteHelper: 'Permanently delete the file (without entering the recycle bin, delete it directly)',
         recycleBin: 'Recycle bin',
         sourcePath: 'Original path',
@@ -1392,7 +1392,7 @@ const message = {
         title: 'Panel alias',
         panelPort: 'Panel port',
         titleHelper:
-            'Supports non-special character starting, English, Chinese, numbers, spaces, .- and _, length 3-30',
+            'Supports a length of 3 to 30 characters, including English letters, Chinese characters, numbers, spaces, and common special characters',
         portHelper:
             'The recommended port range is 8888 to 65535. Note: If the server has a security group, permit the new port from the security group in advance',
         portChange: 'Port change',

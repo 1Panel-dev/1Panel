@@ -319,7 +319,7 @@ const languageOptions = ref([
     { value: 'tw', label: '中文(繁體)' },
     ...(!globalStore.isIntl ? [{ value: 'en', label: 'English' }] : []),
     { value: 'pt-BR', label: 'Português (Brasil)' },
-    { value: 'jp', label: '日本語' },
+    { value: 'ja', label: '日本語' },
     { value: 'ru', label: 'Русский' },
     { value: 'ms', label: 'Bahasa Melayu' },
 ]);

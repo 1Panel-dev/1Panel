@@ -1,4 +1,4 @@
-import fit2cloudEnLocale from 'fit2cloud-ui-plus/src/locale/lang/en';
+import fit2cloudEnLocale from 'fit2cloud-ui-plus/src/locale/lang/ms';
 
 let xpackEnLocale = {};
 const xpackModules = import.meta.glob('../../xpack/lang/ms.ts', { eager: true });
@@ -1294,7 +1294,7 @@ const message = {
         unsupportedType: 'Jenis fail tidak disokong',
         deleteHelper:
             'Adakah anda pasti mahu memadam fail berikut? Secara lalai, ia akan masuk ke tong kitar semula selepas dipadamkan',
-        fileHeper: 'Nota:\n1. Keputusan carian tidak boleh diisih.\n2. Folder tidak boleh diisih mengikut saiz.',
+        fileHelper: 'Nota:\n1. Keputusan carian tidak boleh diisih.\n2. Folder tidak boleh diisih mengikut saiz.',
         forceDeleteHelper: 'Padamkan fail secara kekal (tanpa masuk ke tong kitar semula, padam terus)',
         recycleBin: 'Tong kitar semula',
         sourcePath: 'Laluan asal',
@@ -1412,7 +1412,7 @@ const message = {
         title: 'Alias panel',
         panelPort: 'Port panel',
         titleHelper:
-            'Menyokong permulaan bukan aksara khas, bahasa Inggeris, Cina, nombor, ruang, .- dan _, panjang 3-30',
+            'Menyokong panjang 3 hingga 30 aksara dengan huruf Inggeris, huruf Cina, nombor, ruang kosong dan aksara khas yang biasa',
         portHelper:
             'Julat port yang disarankan ialah 8888 hingga 65535. Nota: Jika pelayan mempunyai kumpulan keselamatan, benarkan port baru dari kumpulan keselamatan terlebih dahulu',
         portChange: 'Tukar port',

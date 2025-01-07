@@ -54,7 +54,7 @@
                 <el-alert type="info" :closable="false">
                     <template #title>
                         <span class="input-help whitespace-break-spaces">
-                            {{ $t('file.fileHeper') }}
+                            {{ $t('file.fileHelper') }}
                         </span>
                     </template>
                 </el-alert>
