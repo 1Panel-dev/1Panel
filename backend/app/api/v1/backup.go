@@ -163,6 +163,29 @@ func (b *BaseApi) SearchBackupRecords(c *gin.Context) {
 }
 
 // @Tags Backup Account
+// @Summary Load backup records size
+// @Accept json
+// @Param request body dto.RecordSearch true "request"
+// @Success 200 {array} dto.dto.BackupFile
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /settings/backup/record/size [post]
+func (b *BaseApi) LoadBackupSize(c *gin.Context) {
+	var req dto.RecordSearch
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	list, err := backupService.LoadSize(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, list)
+}
+
+// @Tags Backup Account
 // @Summary Page backup records by cronjob
 // @Accept json
 // @Param request body dto.RecordSearchByCronjob true "request"
@@ -186,6 +209,29 @@ func (b *BaseApi) SearchBackupRecordsByCronjob(c *gin.Context) {
 		Items: list,
 		Total: total,
 	})
+}
+
+// @Tags Backup Account
+// @Summary Load backup records size for cronjob
+// @Accept json
+// @Param request body dto.RecordSearchByCronjob true "request"
+// @Success 200 {array} dto.dto.BackupFile
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /settings/backup/record/size/bycronjob [post]
+func (b *BaseApi) LoadBackupSizeByCronjob(c *gin.Context) {
+	var req dto.RecordSearchByCronjob
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	list, err := backupService.LoadSizeByCronjob(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, list)
 }
 
 // @Tags Backup Account

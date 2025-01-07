@@ -21,6 +21,12 @@ type BackupInfo struct {
 	Vars       string    `json:"vars"`
 }
 
+type BackupFile struct {
+	ID   uint   `json:"id"`
+	Name string `json:"name"`
+	Size int64  `json:"size"`
+}
+
 type OneDriveInfo struct {
 	ClientID     string `json:"client_id"`
 	ClientSecret string `json:"client_secret"`
@@ -66,7 +72,6 @@ type BackupRecords struct {
 	BackupType string    `json:"backupType"`
 	FileDir    string    `json:"fileDir"`
 	FileName   string    `json:"fileName"`
-	Size       int64     `json:"size"`
 }
 
 type DownloadRecord struct {

@@ -48,10 +48,15 @@
                 <el-table-column :label="$t('commons.table.name')" prop="fileName" show-overflow-tooltip />
                 <el-table-column :label="$t('file.size')" prop="size" show-overflow-tooltip>
                     <template #default="{ row }">
-                        <span v-if="row.size">
-                            {{ computeSize(row.size) }}
-                        </span>
-                        <span v-else>-</span>
+                        <div v-if="row.hasLoad">
+                            <span v-if="row.size">
+                                {{ computeSize(row.size) }}
+                            </span>
+                            <span v-else>-</span>
+                        </div>
+                        <div v-if="!row.hasLoad">
+                            <el-button link loading></el-button>
+                        </div>
                     </template>
                 </el-table-column>
                 <el-table-column :label="$t('database.source')" prop="backupType">
@@ -110,7 +115,7 @@ import { computeSize, dateFormat, downloadFile } from '@/utils/util';
 import { getBackupList, handleBackup, handleRecover } from '@/api/modules/setting';
 import i18n from '@/lang';
 import DrawerHeader from '@/components/drawer-header/index.vue';
-import { deleteBackupRecord, downloadBackupRecord, searchBackupRecords } from '@/api/modules/setting';
+import { deleteBackupRecord, downloadBackupRecord, searchBackupRecords, loadBackupSize } from '@/api/modules/setting';
 import { Backup } from '@/api/interface/backup';
 import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
@@ -197,6 +202,31 @@ const search = async () => {
             loading.value = false;
             data.value = res.data.items || [];
             paginationConfig.total = res.data.total;
+            if (paginationConfig.total !== 0) {
+                loadSize(params);
+            }
+        })
+        .catch(() => {
+            loading.value = false;
+        });
+};
+
+const loadSize = async (params: any) => {
+    await loadBackupSize(params)
+        .then((res) => {
+            let stats = res.data || [];
+            if (stats.length === 0) {
+                return;
+            }
+            for (const backup of data.value) {
+                for (const item of stats) {
+                    if (backup.id === item.id) {
+                        backup.hasLoad = true;
+                        backup.size = item.size;
+                        break;
+                    }
+                }
+            }
         })
         .catch(() => {
             loading.value = false;

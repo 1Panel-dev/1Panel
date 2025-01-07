@@ -40,6 +40,11 @@ export namespace Backup {
         fileDir: string;
         fileName: string;
     }
+    export interface BackupFile {
+        id: number;
+        name: string;
+        size: number;
+    }
     export interface ForBucket {
         type: string;
         accessKey: string;

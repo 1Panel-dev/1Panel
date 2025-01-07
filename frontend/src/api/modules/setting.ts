@@ -124,8 +124,14 @@ export const deleteBackupRecord = (params: { ids: number[] }) => {
 export const searchBackupRecords = (params: Backup.SearchBackupRecord) => {
     return http.post<ResPage<Backup.RecordInfo>>(`/settings/backup/record/search`, params, TimeoutEnum.T_5M);
 };
+export const loadBackupSize = (param: Backup.SearchBackupRecord) => {
+    return http.post<Array<Backup.BackupFile>>(`/settings/backup/record/size`, param);
+};
 export const searchBackupRecordsByCronjob = (params: Backup.SearchBackupRecordByCronjob) => {
     return http.post<ResPage<Backup.RecordInfo>>(`/settings/backup/record/search/bycronjob`, params, TimeoutEnum.T_5M);
+};
+export const loadCronjobBackupSize = (param: Backup.SearchBackupRecordByCronjob) => {
+    return http.post<Array<Backup.BackupFile>>(`/settings/backup/record/size/bycronjob`, param);
 };
 
 export const getBackupList = () => {
