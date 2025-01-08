@@ -1,76 +1,76 @@
-ErrInvalidParams: "Erro nos parâmetros da solicitação: {{ .detail }}",
-ErrTokenParse: "Erro na geração do token: {{ .detail }}",
-ErrInitialPassword: "Erro na senha inicial",
-ErrInternalServer: "Erro interno do serviço: {{ .detail }}",
-ErrRecordExist: "Registro já existente",
-ErrRecordNotFound: "Registros não encontrados",
-ErrStructTransform: "Falha na conversão de tipo: {{ .detail }}",
-ErrNotLogin: "Usuário não está logado: {{ .detail }}",
-ErrPasswordExpired: "A senha atual expirou: {{ .detail }}",
-ErrNotSupportType: "O sistema não suporta o tipo atual: {{ .detail }}",
-ErrApiConfigStatusInvalid: "Acesso à interface da API proibido: {{ .detail }}",
-ErrApiConfigKeyInvalid: "Erro na chave da interface da API: {{ .detail }}",
-ErrApiConfigIPInvalid: "O IP da interface da API não está na lista de permissões: {{ .detail }}",
-ErrApiConfigDisable: "Esta interface proíbe o uso de chamadas de API: {{ .detail }}",
+ErrInvalidParams: "Erro nos parâmetros da solicitação: {{ .detail }}"
+ErrTokenParse: "Erro na geração do token: {{ .detail }}"
+ErrInitialPassword: "Erro na senha inicial"
+ErrInternalServer: "Erro interno do serviço: {{ .detail }}"
+ErrRecordExist: "Registro já existente"
+ErrRecordNotFound: "Registros não encontrados"
+ErrStructTransform: "Falha na conversão de tipo: {{ .detail }}"
+ErrNotLogin: "Usuário não está logado: {{ .detail }}"
+ErrPasswordExpired: "A senha atual expirou: {{ .detail }}"
+ErrNotSupportType: "O sistema não suporta o tipo atual: {{ .detail }}"
+ErrApiConfigStatusInvalid: "Acesso à interface da API proibido: {{ .detail }}"
+ErrApiConfigKeyInvalid: "Erro na chave da interface da API: {{ .detail }}"
+ErrApiConfigIPInvalid: "O IP da interface da API não está na lista de permissões: {{ .detail }}"
+ErrApiConfigDisable: "Esta interface proíbe o uso de chamadas de API: {{ .detail }}"
 
 #common
-ErrNameIsExist: "O nome já existe",
-ErrDemoEnvironment: "Servidor de demonstração, operação proibida!",
-ErrCmdTimeout: "Tempo limite de execução do comando excedido!",
-ErrCmdIllegal: "O comando contém caracteres ilegais. Por favor, modifique e tente novamente!",
-ErrPortExist: 'A porta {{ .port }} já está ocupada por {{ .type }} [{{ .name }}]',
-TYPE_APP: "Aplicação",
-TYPE_RUNTIME: "Ambiente de execução",
-TYPE_DOMAIN: "Nome de domínio",
-ErrTypePort: 'Erro no formato da porta {{ .name }}',
-ErrTypePortRange: 'O intervalo da porta deve estar entre 1-65535',
-Success: "Sucesso",
-Failed: "Falhou",
-SystemRestart: "A reinicialização do sistema causa interrupção da tarefa",
+ErrNameIsExist: "O nome já existe"
+ErrDemoEnvironment: "Servidor de demonstração, operação proibida!"
+ErrCmdTimeout: "Tempo limite de execução do comando excedido!"
+ErrCmdIllegal: "O comando contém caracteres ilegais. Por favor, modifique e tente novamente!"
+ErrPortExist: 'A porta {{ .port }} já está ocupada por {{ .type }} [{{ .name }}]'
+TYPE_APP: "Aplicação"
+TYPE_RUNTIME: "Ambiente de execução"
+TYPE_DOMAIN: "Nome de domínio"
+ErrTypePort: 'Erro no formato da porta {{ .name }}'
+ErrTypePortRange: 'O intervalo da porta deve estar entre 1-65535'
+Success: "Sucesso"
+Failed: "Falhou"
+SystemRestart: "A reinicialização do sistema causa interrupção da tarefa"
 
 #app
-ErrPortInUsed: "A porta {{ .detail }} já está em uso",
-ErrAppLimit: "O limite de instalação de aplicativos foi excedido",
-ErrAppRequired: "O aplicativo {{ .detail }} é necessário",
-ErrNotInstall: "Aplicativo não instalado",
-ErrPortInOtherApp: "A porta {{ .port }} já está em uso pelo aplicativo {{ .apps }}",
-ErrDbUserNotValid: "Banco de dados padrão, nome de usuário e senha não correspondem!",
-ErrDockerComposeNotValid: "Erro no formato do arquivo docker-compose!",
-ErrUpdateBuWebsite: "O aplicativo foi atualizado com sucesso, mas a modificação do arquivo de configuração do site falhou. Verifique a configuração!",
-Err1PanelNetworkFailed: "Falha ao criar a rede padrão do container! {{ .detail }}",
-ErrFileParse: "Falha ao analisar o arquivo docker-compose do aplicativo!",
-ErrInstallDirNotFound: "O diretório de instalação não existe",
-AppStoreIsUpToDate: "Atualizado",
-LocalAppVersionNull: "O aplicativo {{.name}} não está sincronizado com a versão! Não foi possível adicionar à lista de aplicativos",
-LocalAppVersionErr: "Falha ao sincronizar a versão {{.version}} do {{.name}}! {{.err}}",
-ErrFileNotFound: "O arquivo {{.name}} não existe",
-ErrFileParseApp: "Falha ao analisar o arquivo {{.name}} {{.err}}",
-ErrAppDirNull: "O diretório da versão não existe",
-LocalAppErr: "Falha ao sincronizar o aplicativo {{.name}}! {{.err}}",
-ErrContainerName: "O nome do container já existe",
-ErrAppSystemRestart: "A reinicialização do 1Panel causa a interrupção da tarefa",
-ErrCreateHttpClient: "Falha ao criar a solicitação HTTP {{.err}}",
-ErrHttpReqTimeOut: "Tempo limite da solicitação excedido {{.err}}",
-ErrHttpReqFailed: "Falha na solicitação {{.err}}",
-ErrHttpReqNotFound: "O arquivo não existe",
-ErrNoSuchHost: "Falha na conexão de rede",
-ErrImagePullTimeOut: "Tempo limite ao puxar a imagem",
-ErrContainerNotFound: "O container {{ .name }} não existe",
-ErrContainerMsg: "O container {{ .name }} está anormal, verifique o log na página do container para mais detalhes",
-ErrAppBackup: "Falha no backup do aplicativo {{ .name }} erro {{.err}}",
-ErrImagePull: "Falha ao puxar a imagem {{ .name }} erro {{.err}}",
-ErrVersionTooLow: "A versão atual do 1Panel é muito baixa para atualizar a loja de aplicativos, por favor atualize a versão",
-ErrAppNameExist: "O nome do aplicativo já existe",
-AppStoreIsSyncing: "A loja de aplicativos está sincronizando, tente novamente mais tarde",
-ErrGetCompose: "Falha ao obter o arquivo docker-compose.yml! {{ .detail }}",
-ErrAppWarn: "Status anormal, verifique o log",
-ErrAppParamKey: "Exceção no campo do parâmetro {{ .name }}",
-ErrAppUpgrade: "Falha ao atualizar o aplicativo {{ .name }} {{ .err }}",
-AppRecover: "Aplicativo {{ .name }} revertido",
-PullImageStart: "Iniciando o download da imagem {{ .name }}",
-PullImageSuccess: "Imagem baixada com sucesso",
-UpgradeAppStart: "Iniciando a atualização do aplicativo {{ .name }}",
-UpgradeAppSuccess: "Aplicativo {{ .name }} atualizado com sucesso",
+ErrPortInUsed: "A porta {{ .detail }} já está em uso"
+ErrAppLimit: "O limite de instalação de aplicativos foi excedido"
+ErrAppRequired: "O aplicativo {{ .detail }} é necessário"
+ErrNotInstall: "Aplicativo não instalado"
+ErrPortInOtherApp: "A porta {{ .port }} já está em uso pelo aplicativo {{ .apps }}"
+ErrDbUserNotValid: "Banco de dados padrão, nome de usuário e senha não correspondem!"
+ErrDockerComposeNotValid: "Erro no formato do arquivo docker-compose!"
+ErrUpdateBuWebsite: "O aplicativo foi atualizado com sucesso, mas a modificação do arquivo de configuração do site falhou. Verifique a configuração!"
+Err1PanelNetworkFailed: "Falha ao criar a rede padrão do container! {{ .detail }}"
+ErrFileParse: "Falha ao analisar o arquivo docker-compose do aplicativo!"
+ErrInstallDirNotFound: "O diretório de instalação não existe"
+AppStoreIsUpToDate: "Atualizado"
+LocalAppVersionNull: "O aplicativo {{.name}} não está sincronizado com a versão! Não foi possível adicionar à lista de aplicativos"
+LocalAppVersionErr: "Falha ao sincronizar a versão {{.version}} do {{.name}}! {{.err}}"
+ErrFileNotFound: "O arquivo {{.name}} não existe"
+ErrFileParseApp: "Falha ao analisar o arquivo {{.name}} {{.err}}"
+ErrAppDirNull: "O diretório da versão não existe"
+LocalAppErr: "Falha ao sincronizar o aplicativo {{.name}}! {{.err}}"
+ErrContainerName: "O nome do container já existe"
+ErrAppSystemRestart: "A reinicialização do 1Panel causa a interrupção da tarefa"
+ErrCreateHttpClient: "Falha ao criar a solicitação HTTP {{.err}}"
+ErrHttpReqTimeOut: "Tempo limite da solicitação excedido {{.err}}"
+ErrHttpReqFailed: "Falha na solicitação {{.err}}"
+ErrHttpReqNotFound: "O arquivo não existe"
+ErrNoSuchHost: "Falha na conexão de rede"
+ErrImagePullTimeOut: "Tempo limite ao puxar a imagem"
+ErrContainerNotFound: "O container {{ .name }} não existe"
+ErrContainerMsg: "O container {{ .name }} está anormal, verifique o log na página do container para mais detalhes"
+ErrAppBackup: "Falha no backup do aplicativo {{ .name }} erro {{.err}}"
+ErrImagePull: "Falha ao puxar a imagem {{ .name }} erro {{.err}}"
+ErrVersionTooLow: "A versão atual do 1Panel é muito baixa para atualizar a loja de aplicativos, por favor atualize a versão"
+ErrAppNameExist: "O nome do aplicativo já existe"
+AppStoreIsSyncing: "A loja de aplicativos está sincronizando, tente novamente mais tarde"
+ErrGetCompose: "Falha ao obter o arquivo docker-compose.yml! {{ .detail }}"
+ErrAppWarn: "Status anormal, verifique o log"
+ErrAppParamKey: "Exceção no campo do parâmetro {{ .name }}"
+ErrAppUpgrade: "Falha ao atualizar o aplicativo {{ .name }} {{ .err }}"
+AppRecover: "Aplicativo {{ .name }} revertido"
+PullImageStart: "Iniciando o download da imagem {{ .name }}"
+PullImageSuccess: "Imagem baixada com sucesso"
+UpgradeAppStart: "Iniciando a atualização do aplicativo {{ .name }}"
+UpgradeAppSuccess: "Aplicativo {{ .name }} atualizado com sucesso"
 
 #file
 ErrFileCanNotRead: "Não foi possível ler o arquivo"

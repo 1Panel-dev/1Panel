@@ -75,7 +75,7 @@ UpgradeAppSuccess: "应用  {{ .name }} 升级成功"
 
 #file
 ErrFileCanNotRead: "此文件不支持预览"
-ErrFileToLarge: "文件超过10M,无法打开"
+ErrFileToLarge: "文件超过10M，无法打开"
 ErrPathNotFound: "目录不存在"
 ErrMovePathFailed: "目标路径不能包含原路径！"
 ErrLinkPathNotFound: "目标路径不存在!"
@@ -91,7 +91,7 @@ ErrPathNotDelete: "所选目录不可删除"
 #website
 ErrDomainIsExist: "域名已存在"
 ErrAliasIsExist: "代号已存在"
-ErrAppDelete: '其他网站使用此应用,无法删除'
+ErrAppDelete: '其他网站使用此应用，无法删除'
 ErrGroupIsUsed: '分组正在使用中，无法删除'
 ErrBackupMatch: '该备份文件与当前网站部分数据不匹配 {{ .detail}}'
 ErrBackupExist: '该备份文件对应部分源数据不存在 {{ .detail}}'
@@ -113,11 +113,11 @@ ErrSSLKeyFormat: '私钥文件校验失败'
 ErrSSLCertificateFormat: '证书文件格式错误，请使用 pem 格式'
 ErrEabKidOrEabHmacKeyCannotBlank: 'EabKid 或 EabHmacKey 不能为空'
 ErrOpenrestyNotFound: 'Http 模式需要首先安装 Openresty'
-ApplySSLStart: '开始申请证书,域名 [{{ .domain }}] 申请方式 [{{ .type }}] '
+ApplySSLStart: '开始申请证书，域名 [{{ .domain }}] 申请方式 [{{ .type }}] '
 dnsAccount: "DNS 自动"
 dnsManual: "DNS 手动"
 http: "HTTP"
-ApplySSLFailed: '申请  [{{ .domain }}] 证书失败, {{.detail}} '
+ApplySSLFailed: '申请  [{{ .domain }}] 证书失败， {{.detail}} '
 ApplySSLSuccess: '申请 [{{ .domain }}] 证书成功！！'
 DNSAccountName: 'DNS 账号 [{{ .name }}] 厂商 [{{.type}}]'
 PushDirLog: '证书推送到目录 [{{ .path }}] {{ .status }}'
@@ -258,7 +258,7 @@ UpdatePassword: "修改面板密码"
 UpdatePort: "修改面板端口"
 UpdateUserNull: "错误：输入面板用户为空！"
 UpdateUserBlank: "错误：输入面板用户中包含空格字符！"
-UpdateUserFormat: "错误：输入面板用户错误！仅支持英文、中文、数字和_,长度3-30"
+UpdateUserFormat: "错误：输入面板用户错误！仅支持英文、中文、数字和_，长度3-30"
 UpdateUserErr: "错误：面板用户修改失败，{{ .err }}"
 UpdateSuccessful: "修改成功！"
 UpdateUserResult: "面板用户：{{ .name }}"

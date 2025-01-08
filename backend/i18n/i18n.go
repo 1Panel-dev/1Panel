@@ -75,6 +75,7 @@ func GetMsgByKey(key string) string {
 	return content
 }
 
+//go:embed lang/*
 var fs embed.FS
 var bundle *i18n.Bundle
 
@@ -83,10 +84,6 @@ func UseI18n() gin.HandlerFunc {
 		lang := context.GetHeader("Accept-Language")
 		if lang == "" {
 			lang = "zh"
-		}
-		//(dev: lucasplcorrea) - Ensuring support for pt-BR as a separate language
-		if lang == "pt-BR" {
-			lang = "pt-BR"
 		}
 		global.I18n = i18n.NewLocalizer(bundle, lang)
 	}
@@ -103,7 +100,6 @@ func Init() {
 	_, _ = bundle.LoadMessageFileFS(fs, "lang/zh-Hant.yaml")
 	_, _ = bundle.LoadMessageFileFS(fs, "lang/fa.yaml")
 	_, _ = bundle.LoadMessageFileFS(fs, "lang/pt.yaml")
-	// (dev: lucasplcorrea) - Add pt-BR.yaml
 	_, _ = bundle.LoadMessageFileFS(fs, "lang/pt-BR.yaml")
 	_, _ = bundle.LoadMessageFileFS(fs, "lang/ja.yaml")
 	_, _ = bundle.LoadMessageFileFS(fs, "lang/ru.yaml")
