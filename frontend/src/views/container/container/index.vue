@@ -7,7 +7,7 @@
         </el-card>
         <LayoutContent :title="$t('container.container', 2)" :class="{ mask: dockerStatus != 'Running' }">
             <template #rightButton>
-                <div class="flex justify-end">
+                <div class="flex justify-end flex-col sm:flex-row">
                     <div class="mr-10">
                         <el-checkbox v-model="includeAppStore" @change="search()">
                             {{ $t('container.includeAppstore') }}

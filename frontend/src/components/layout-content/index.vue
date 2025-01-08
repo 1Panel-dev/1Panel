@@ -36,7 +36,7 @@
                             </template>
                         </back-button>
 
-                        <span v-else>
+                        <span v-else class="flex justify-between items-start sm:items-center flex-col sm:flex-row">
                             {{ title }}
                             <span v-if="slots.buttons">
                                 <el-divider direction="vertical" />

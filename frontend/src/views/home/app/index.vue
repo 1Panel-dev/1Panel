@@ -2,25 +2,19 @@
     <div>
         <el-scrollbar height="525px" class="moz-height">
             <div class="h-app-card" v-for="(app, index) in apps" :key="index">
-                <el-row :gutter="10">
-                    <el-col :span="5">
-                        <div>
-                            <el-avatar shape="square" :size="55" :src="'data:image/png;base64,' + app.icon" />
+                <div class="flex justify-start items-center gap-2">
+                    <div class="w-14">
+                        <el-avatar shape="square" :size="55" :src="'data:image/png;base64,' + app.icon" />
+                    </div>
+                    <div class="flex-1 flex flex-col h-app-content">
+                        <span class="h-app-title">{{ app.name }}</span>
+                        <div class="h-app-desc">
+                            <span>
+                                {{ language == 'zh' || language == 'tw' ? app.shortDescZh : app.shortDescEn }}123123
+                            </span>
                         </div>
-                    </el-col>
-                    <el-col :span="15">
-                        <div class="h-app-content">
-                            <div>
-                                <span class="h-app-title">{{ app.name }}</span>
-                            </div>
-                            <div class="h-app-desc">
-                                <span>
-                                    {{ language == 'zh' || language == 'tw' ? app.shortDescZh : app.shortDescEn }}
-                                </span>
-                            </div>
-                        </div>
-                    </el-col>
-                    <el-col :span="2">
+                    </div>
+                    <div>
                         <el-button
                             class="h-app-button"
                             type="primary"
@@ -32,8 +26,8 @@
                         >
                             {{ $t('app.install') }}
                         </el-button>
-                    </el-col>
-                </el-row>
+                    </div>
+                </div>
                 <div class="h-app-divider" />
             </div>
         </el-scrollbar>

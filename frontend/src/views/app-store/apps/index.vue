@@ -55,7 +55,7 @@
             </el-row>
         </template>
         <template #rightButton>
-            <div class="flex justify-end">
+            <div class="flex justify-end flex-col sm:flex-row">
                 <fu-table-pagination
                     v-model:current-page="paginationConfig.currentPage"
                     v-model:page-size="paginationConfig.pageSize"
