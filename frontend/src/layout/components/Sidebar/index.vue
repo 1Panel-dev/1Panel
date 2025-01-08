@@ -18,6 +18,7 @@
                 :collapse-transition="false"
                 :unique-opened="true"
                 @select="handleMenuClick"
+                class="custom-menu"
             >
                 <SubItem :menuList="routerMenus" />
                 <el-menu-item :index="''">
@@ -168,7 +169,7 @@ const search = async () => {
             rstMenuList.push(menuItem);
         } else {
             menuItem.children.forEach((child: any) => {
-                if (child.hidden == undefined || child.hidden == false) {
+                if (!child.hidden) {
                     menuChildren.push(child);
                 }
             });
@@ -192,6 +193,13 @@ onMounted(() => {
 
 <style lang="scss">
 @import './index.scss';
+
+.custom-menu .el-menu-item {
+    white-space: normal !important;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    line-height: normal;
+}
 
 .sidebar-container {
     position: relative;
