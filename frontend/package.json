@@ -2,7 +2,7 @@
     "name": "1Panel-Frontend",
     "private": true,
     "version": "1.10",
-    "description": "1Panel 前端",
+    "description": "1Panel Frontend",
     "scripts": {
         "dev": "vite",
         "serve": "vite",
@@ -16,7 +16,7 @@
         "lint:lint-staged": "lint-staged",
         "release": "standard-version",
         "commit": "git pull && git add -A && git-cz && git push",
-        "prettier:comment": "自动格式化当前目录下的所有文件",
+        "prettier:comment": "automatically format all files in the current directory",
         "prettier": "prettier --write ."
     },
     "dependencies": {
