@@ -3,10 +3,10 @@
         <div class="flex w-full flex-col gap-4 md:justify-between md:flex-row">
             <div class="flex flex-wrap gap-4">
                 <a v-if="!globalStore.isIntl" href="https://fit2cloud.com/" target="_blank">
-                    Copyright © 2014-2025 {{ $t('commons.fit2cloud') }}
+                    Copyright © 2014-{{ year }} {{ $t('commons.fit2cloud') }}
                 </a>
                 <a v-if="globalStore.isIntl" href="https://1panel.hk/" target="_blank">
-                    Copyright © 2025 {{ $t('commons.lingxia') }}
+                    Copyright © {{ year }} {{ $t('commons.lingxia') }}
                 </a>
             </div>
             <div class="flex flex-row gap-2 md:flex-col lg:flex-row">
@@ -25,6 +25,7 @@ const globalStore = GlobalStore();
 const mobile = computed(() => {
     return globalStore.isMobile();
 });
+const year = new Date().getFullYear();
 </script>
 
 <style scoped lang="scss">
