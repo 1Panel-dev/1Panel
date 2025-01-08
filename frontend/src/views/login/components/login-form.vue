@@ -60,8 +60,8 @@
                                         <el-dropdown-item v-if="!globalStore.isIntl" command="en">
                                             English
                                         </el-dropdown-item>
-                                        <el-dropdown-item command="pt-BR">Português (Brasil)</el-dropdown-item>
                                         <el-dropdown-item command="ja">日本語</el-dropdown-item>
+                                        <el-dropdown-item command="pt-BR">Português (Brasil)</el-dropdown-item>
                                         <el-dropdown-item command="ru">Русский</el-dropdown-item>
                                         <el-dropdown-item command="ms">Bahasa Melayu</el-dropdown-item>
                                     </el-dropdown-menu>
