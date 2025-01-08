@@ -13,16 +13,16 @@
 
         &:hover {
             .el-icon {
-                color: $primary-color;
+                color: var(--el-color-primary);
             }
 
             span {
-                color: $primary-color;
+                color: var(--el-color-primary);
             }
         }
         &.is-active {
             background-color: var(--el-menu-item-bg-color-active);
-            border: 2px solid $primary-color;
+            border: 2px solid var(--el-color-primary);
 
             &::before {
                 position: absolute;
@@ -31,7 +31,7 @@
                 width: 4px;
                 height: 14px;
                 content: '';
-                background: $primary-color;
+                background: var(--el-color-primary);
             }
         }
     }
@@ -39,26 +39,26 @@
         &.is-active {
             .el-sub-menu__title {
                 span {
-                    color: $primary-color;
+                    color: var(--el-color-primary);
                 }
 
                 .el-icon {
-                    color: $primary-color;
+                    color: var(--el-color-primary);
                 }
             }
         }
         .el-sub-menu__title {
             background-color: var(--el-menu-item-bg-color);
-            box-shadow: 0px 0px 4px rgba(0, 94, 235, 0.1);
+            box-shadow: 0 0 4px rgba(0, 94, 235, 0.1);
             height: 46px;
             border-radius: 4px;
             &:hover {
                 .el-icon {
-                    color: $primary-color;
+                    color: var(--el-color-primary);
                 }
 
                 span {
-                    color: $primary-color;
+                    color: var(--el-color-primary);
                 }
             }
         }

@@ -32,6 +32,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
             preprocessorOptions: {
                 scss: {
                     additionalData: `@use "@/styles/var.scss" as *;`,
+                    api: 'modern',
                 },
             },
         },
@@ -84,6 +85,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         ],
         esbuild: {
             pure: viteEnv.VITE_DROP_CONSOLE ? ['console.log'] : [],
+            drop: viteEnv.VITE_DROP_CONSOLE ? ['debugger'] : [],
         },
         build: {
             outDir: '../cmd/server/web',

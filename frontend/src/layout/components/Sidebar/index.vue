@@ -36,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, defineEmits } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { RouteRecordRaw, useRoute } from 'vue-router';
 import { loadingSvg } from '@/utils/svg';
 import Logo from './components/Logo.vue';
@@ -192,7 +192,14 @@ onMounted(() => {
 </script>
 
 <style lang="scss">
-@import './index.scss';
+@use 'index';
+
+.custom-menu .el-menu-item {
+    white-space: normal !important;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    line-height: normal;
+}
 
 .custom-menu .el-menu-item {
     white-space: normal !important;
