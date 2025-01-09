@@ -136,7 +136,7 @@
 import { reactive, ref } from 'vue';
 import { computeSize } from '@/utils/util';
 import i18n from '@/lang';
-import { UploadFile, UploadFiles, UploadInstance, genFileId } from 'element-plus';
+import { UploadFile, UploadFiles, UploadInstance, UploadProps, UploadRawFile, genFileId } from 'element-plus';
 import { File } from '@/api/interface/file';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { BatchDeleteFile, CheckFile, ChunkUploadFileData, GetUploadList } from '@/api/modules/files';
@@ -156,7 +156,6 @@ const currentRow = ref();
 const data = ref();
 const title = ref();
 const paginationConfig = reactive({
-    cacheSizeKey: 'upload-page-size',
     currentPage: 1,
     pageSize: 10,
     total: 0,

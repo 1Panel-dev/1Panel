@@ -883,7 +883,7 @@ const message = {
         perDayHelper: '每日 {0}:{1} 執行',
         perHourHelper: '每小時 {0}分 執行',
         perNDayHelper: '每 {0} 日 {1}:{2} 執行',
-        perNHourHelper: '每 {0}小時 {1} 執行',
+        perNHourHelper: '每 {0}小時 {1}分 執行',
         perNMinuteHelper: '每 {0}分 執行',
         perNSecondHelper: '每 {0}秒 執行',
         perMonth: '每月',
