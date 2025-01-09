@@ -75,6 +75,7 @@ DeleteRuntimePHP: "刪除運行環境 PHP 版本",
 CustomAppStoreNotConfig: "請在應用商店設置離線包地址",
 CustomAppStoreNotFound: "應用商店包獲取失敗，請檢查是否存在",
 CustomAppStoreFileValid: "應用商店包需要 .tar.gz 格式"
+PullImageTimeout: "拉取鏡像超時，請嘗試增加鏡像加速或更換其他鏡像加速"
 
 
 #file

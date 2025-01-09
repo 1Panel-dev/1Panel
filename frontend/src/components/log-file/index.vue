@@ -35,6 +35,7 @@ import { nextTick, onMounted, onUnmounted, reactive, ref } from 'vue';
 import { downloadFile } from '@/utils/util';
 import { ReadByLine } from '@/api/modules/files';
 import { GlobalStore } from '@/store';
+import bus from '@/global/bus';
 const globalStore = GlobalStore();
 
 interface LogProps {
@@ -272,6 +273,7 @@ const onCloseLog = async () => {
     timer = null;
     isLoading.value = false;
     emit('update:isReading', false);
+    bus.emit('refreshTask', true);
 };
 
 watch(

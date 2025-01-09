@@ -303,6 +303,7 @@ const message = {
             healthy: 'Normal',
             executing: 'Executing',
             installerr: 'Install Error',
+            restating: 'Restarting',
         },
         units: {
             second: 'Second',

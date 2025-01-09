@@ -16,6 +16,7 @@ const (
 	UpErr        = "UpErr"
 	InstallErr   = "InstallErr"
 	Uninstalling = "Uninstalling"
+	Restating    = "Restarting"
 
 	ContainerPrefix = "1Panel-"
 

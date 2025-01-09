@@ -298,6 +298,7 @@ const message = {
             healthy: '正常',
             executing: '执行中',
             installerr: '安装失败',
+            restating: '重启中',
         },
         units: {
             second: '秒',

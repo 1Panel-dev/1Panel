@@ -518,6 +518,9 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 		if taskErr := installTask.Execute(); taskErr != nil {
 			appInstall.Status = constant.InstallErr
 			appInstall.Message = taskErr.Error()
+			if strings.Contains(taskErr.Error(), "Timeout") && strings.Contains(taskErr.Error(), "Pulling") {
+				appInstall.Message = buserr.New("PullImageTimeout").Error() + appInstall.Message
+			}
 			_ = appInstallRepo.Save(context.Background(), appInstall)
 		}
 	}()

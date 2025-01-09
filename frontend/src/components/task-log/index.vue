@@ -63,6 +63,7 @@ const openWithResourceID = (taskType: string, taskOperate: string, resourceID: n
 
 const handleClose = () => {
     open.value = false;
+    bus.emit('refreshTask', true);
 };
 
 defineExpose({ openWithResourceID, openWithTaskID });

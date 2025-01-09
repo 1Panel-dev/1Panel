@@ -1338,6 +1338,7 @@ func synAppInstall(containers map[string]types.Container, appInstall *model.AppI
 	exitedCount := 0
 	pausedCount := 0
 	runningCount := 0
+	restartingCount := 0
 	total := len(containerNames)
 	for _, name := range containerNames {
 		if con, ok := containers["/"+name]; ok {
@@ -1347,6 +1348,8 @@ func synAppInstall(containers map[string]types.Container, appInstall *model.AppI
 				exitNames = append(exitNames, name)
 			case "running":
 				runningCount++
+			case "restarting":
+				restartingCount++
 			case "paused":
 				pausedCount++
 			}
@@ -1362,6 +1365,8 @@ func synAppInstall(containers map[string]types.Container, appInstall *model.AppI
 		if oldStatus == constant.Running {
 			return
 		}
+	case restartingCount == total:
+		appInstall.Status = constant.Restating
 	case pausedCount == total:
 		appInstall.Status = constant.Paused
 	case len(notFoundNames) == total:
