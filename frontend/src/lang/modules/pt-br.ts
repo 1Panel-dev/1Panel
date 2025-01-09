@@ -1327,6 +1327,7 @@ const message = {
         panelInstallDir: 'O diretório de instalação do 1Panel não pode ser excluído',
     },
     ssh: {
+        setting: 'configuração',
         autoStart: 'Início automático',
         enable: 'Habilitar início automático',
         disable: 'Desabilitar início automático',

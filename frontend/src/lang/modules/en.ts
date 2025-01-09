@@ -1321,6 +1321,7 @@ const message = {
         panelInstallDir: `1Panel installation directory can't be deleted`,
     },
     ssh: {
+        setting: 'Setting',
         autoStart: 'Auto start',
         enable: 'Enable Autostart',
         disable: 'Disable Autostart',

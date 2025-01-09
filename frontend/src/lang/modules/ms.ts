@@ -1341,6 +1341,7 @@ const message = {
         panelInstallDir: 'Direktori pemasangan 1Panel tidak boleh dipadamkan',
     },
     ssh: {
+        setting: 'tetapan',
         autoStart: 'Mula automatik',
         enable: 'Aktifkan Mula Automatik',
         disable: 'Nyahaktif Mula Automatik',

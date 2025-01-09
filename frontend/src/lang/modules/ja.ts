@@ -1298,6 +1298,7 @@ const message = {
         panelInstallDir: `1Panelインストールディレクトリは削除できません`,
     },
     ssh: {
+        setting: '設定',
         autoStart: 'オートスタート',
         enable: 'AutoStartを有効にします',
         disable: 'AutoStartを無効にします',

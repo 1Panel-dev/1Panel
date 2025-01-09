@@ -1259,6 +1259,7 @@ const message = {
         panelInstallDir: '1Panel 安装目录不能删除',
     },
     ssh: {
+        setting: '配置',
         autoStart: '开机自启',
         enable: '设置开机自启',
         disable: '关闭开机自启',

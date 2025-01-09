@@ -1329,6 +1329,7 @@ const message = {
         panelInstallDir: 'Директорию установки 1Panel нельзя удалить',
     },
     ssh: {
+        setting: 'настройка',
         autoStart: 'Автозапуск',
         enable: 'Включить автозапуск',
         disable: 'Отключить автозапуск',
