@@ -2,7 +2,7 @@
     <div :class="classObj" class="app-wrapper" v-loading="loading" :element-loading-text="loadingText" fullscreen>
         <div v-if="classObj.mobile && classObj.openSidebar" class="drawer-bg" @click="handleClickOutside" />
         <div class="app-sidebar" v-if="!globalStore.isFullScreen">
-            <Sidebar @menu-click="handleMenuClick" :menu-router="!classObj.openMenuTabs" />
+            <Sidebar @menu-click="handleMenuClick" />
         </div>
 
         <div class="main-container">

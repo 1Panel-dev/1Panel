@@ -85,7 +85,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         ],
         esbuild: {
             pure: viteEnv.VITE_DROP_CONSOLE ? ['console.log'] : [],
-            drop: viteEnv.VITE_DROP_CONSOLE ? ['debugger'] : [],
+            drop: viteEnv.VITE_DROP_CONSOLE && process.env.NODE_ENV === 'production' ? ['debugger'] : [],
         },
         build: {
             outDir: '../cmd/server/web',

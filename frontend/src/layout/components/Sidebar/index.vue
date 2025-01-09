@@ -13,7 +13,7 @@
         <el-scrollbar>
             <el-menu
                 :default-active="activeMenu"
-                :router="menuRouter"
+                :router="true"
                 :collapse="isCollapse"
                 :collapse-transition="false"
                 :unique-opened="true"
@@ -21,12 +21,12 @@
                 class="custom-menu"
             >
                 <SubItem :menuList="routerMenus" />
-                <el-menu-item :index="''">
-                    <el-icon @click="logout">
+                <el-menu-item :index="''" @click="logout">
+                    <el-icon>
                         <SvgIcon :iconName="'p-logout'" />
                     </el-icon>
                     <template #title>
-                        <span @click="logout">{{ $t('commons.login.logout') }}</span>
+                        <span>{{ $t('commons.login.logout') }}</span>
                     </template>
                 </el-menu-item>
             </el-menu>
@@ -55,13 +55,7 @@ import PrimaryMenu from '@/assets/images/menu-bg.svg?component';
 const route = useRoute();
 const menuStore = MenuStore();
 const globalStore = GlobalStore();
-defineProps({
-    menuRouter: {
-        type: Boolean,
-        default: true,
-        required: false,
-    },
-});
+
 const activeMenu = computed(() => {
     const { meta, path } = route;
     return isString(meta.activeMenu) ? meta.activeMenu : path;
@@ -193,13 +187,6 @@ onMounted(() => {
 
 <style lang="scss">
 @use 'index';
-
-.custom-menu .el-menu-item {
-    white-space: normal !important;
-    word-break: break-word;
-    overflow-wrap: break-word;
-    line-height: normal;
-}
 
 .custom-menu .el-menu-item {
     white-space: normal !important;
