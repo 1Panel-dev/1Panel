@@ -10,8 +10,8 @@ import (
 )
 
 type AppRes struct {
-	Items []*AppDto `json:"items"`
-	Total int64     `json:"total"`
+	Items []*AppItem `json:"items"`
+	Total int64      `json:"total"`
 }
 
 type AppUpdateRes struct {
@@ -28,7 +28,7 @@ type AppDTO struct {
 	Tags      []model.Tag `json:"tags"`
 }
 
-type AppDto struct {
+type AppItem struct {
 	Name        string      `json:"name"`
 	Key         string      `json:"key"`
 	ID          uint        `json:"id"`

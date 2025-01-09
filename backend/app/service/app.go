@@ -89,9 +89,9 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	var appDTOs []*response.AppDto
+	var appDTOs []*response.AppItem
 	for _, ap := range apps {
-		appDTO := &response.AppDto{
+		appDTO := &response.AppItem{
 			ID:          ap.ID,
 			Name:        ap.Name,
 			Key:         ap.Key,
