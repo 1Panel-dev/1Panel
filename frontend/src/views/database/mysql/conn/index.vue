@@ -81,7 +81,7 @@
                             prop="password"
                         >
                             <el-input
-                                style="width: calc(100% - 147px)"
+                                style="width: calc(100% - 167px)"
                                 type="password"
                                 show-password
                                 clearable

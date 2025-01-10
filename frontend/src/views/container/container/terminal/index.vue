@@ -20,10 +20,10 @@
                 prop="command"
                 :rules="Rules.requiredInput"
             >
-                <el-checkbox style="width: 100px" border v-model="form.isCustom" @change="onChangeCommand">
+                <el-checkbox style="width: 180px" border v-model="form.isCustom" @change="onChangeCommand">
                     {{ $t('container.custom') }}
                 </el-checkbox>
-                <el-input style="width: calc(100% - 100px)" clearable v-model="form.command" />
+                <el-input style="width: calc(100% - 180px)" clearable v-model="form.command" />
             </el-form-item>
             <el-form-item
                 v-if="!form.isCustom"
@@ -31,10 +31,10 @@
                 prop="command"
                 :rules="Rules.requiredSelect"
             >
-                <el-checkbox style="width: 100px" border v-model="form.isCustom" @change="onChangeCommand">
+                <el-checkbox style="width: 180px" border v-model="form.isCustom" @change="onChangeCommand">
                     {{ $t('container.custom') }}
                 </el-checkbox>
-                <el-select style="width: calc(100% - 100px)" filterable clearable v-model="form.command">
+                <el-select style="width: calc(100% - 180px)" filterable clearable v-model="form.command">
                     <el-option value="/bin/ash" label="/bin/ash" />
                     <el-option value="/bin/bash" label="/bin/bash" />
                     <el-option value="/bin/sh" label="/bin/sh" />

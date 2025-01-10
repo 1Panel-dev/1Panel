@@ -169,13 +169,20 @@
             <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
                 <CardWithHeader :header="$t('home.systemInfo')">
                     <template #body>
-                        <el-scrollbar>
-                            <el-descriptions :column="1" class="h-systemInfo" border>
+                        <div class="h-systemInfo">
+                            <el-descriptions :column="1" border>
                                 <el-descriptions-item class-name="system-content" label-class-name="system-label">
                                     <template #label>
                                         <span>{{ $t('home.hostname') }}</span>
                                     </template>
-                                    {{ baseInfo.hostname }}
+                                    <el-tooltip
+                                        v-if="baseInfo.hostname.length > 30"
+                                        :content="baseInfo.hostname"
+                                        placement="bottom"
+                                    >
+                                        {{ baseInfo.hostname.substring(0, 27) + '...' }}
+                                    </el-tooltip>
+                                    <span v-else>{{ baseInfo.hostname }}</span>
                                 </el-descriptions-item>
                                 <el-descriptions-item class-name="system-content" label-class-name="system-label">
                                     <template #label>
@@ -191,7 +198,14 @@
                                     <template #label>
                                         <span>{{ $t('home.kernelVersion') }}</span>
                                     </template>
-                                    {{ baseInfo.kernelVersion }}
+                                    <el-tooltip
+                                        v-if="baseInfo.kernelVersion.length > 30"
+                                        :content="baseInfo.kernelVersion"
+                                        placement="bottom"
+                                    >
+                                        {{ baseInfo.kernelVersion.substring(0, 27) + '...' }}
+                                    </el-tooltip>
+                                    <span v-else>{{ baseInfo.kernelVersion }}</span>
                                 </el-descriptions-item>
                                 <el-descriptions-item class-name="system-content" label-class-name="system-label">
                                     <template #label>
@@ -232,7 +246,7 @@
                                     {{ loadUpTime(currentInfo.uptime) }}
                                 </el-descriptions-item>
                             </el-descriptions>
-                        </el-scrollbar>
+                        </div>
                     </template>
                 </CardWithHeader>
 
@@ -681,7 +695,8 @@ onBeforeUnmount(() => {
 
 .h-systemInfo {
     margin-left: 18px;
-    height: 276px;
+    height: 296px;
+    overflow: auto;
 }
 @-moz-document url-prefix() {
     .h-systemInfo {
@@ -695,8 +710,10 @@ onBeforeUnmount(() => {
     color: var(--panel-text-color);
     border: none !important;
     background: none !important;
-    width: fit-content !important;
-    white-space: nowrap !important;
+    max-width: 150px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .system-content {
