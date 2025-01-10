@@ -1,7 +1,7 @@
 <template>
     <el-card class="router_card p-1 sm:p-0">
         <div class="flex w-full flex-col justify-start sm:items-center items-start sm:justify-between sm:flex-row">
-            <el-radio-group v-model="activeName" @change="handleChange">
+            <el-radio-group v-model="activeName" @change="handleChange" class="flex-1">
                 <el-radio-button
                     class="router_card_button"
                     :label="button.label"

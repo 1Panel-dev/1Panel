@@ -6,166 +6,157 @@
                     :model="form"
                     v-loading="loading"
                     :label-position="mobile ? 'top' : 'left'"
-                    label-width="150px"
+                    label-width="auto"
+                    class="sm:w-full md:w-4/5 lg:w-3/5 2xl:w-1/2 max-w-max ml-8"
                 >
-                    <el-row>
-                        <el-col :span="1"><br /></el-col>
-                        <el-col :xs="24" :sm="20" :md="15" :lg="12" :xl="12">
-                            <el-form-item :label="$t('setting.panelPort')" prop="serverPort">
-                                <el-input disabled v-model.number="form.serverPort">
-                                    <template #append>
-                                        <el-button @click="onChangePort" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                            </el-form-item>
-                            <el-form-item :label="$t('setting.bindInfo')" prop="bindAddress">
-                                <el-input disabled v-model="form.bindAddress">
-                                    <template #append>
-                                        <el-button @click="onChangeBind" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                            </el-form-item>
-                            <el-form-item :label="$t('setting.entrance')">
-                                <el-input
-                                    type="password"
-                                    disabled
-                                    v-if="form.securityEntrance"
-                                    v-model="form.securityEntrance"
-                                >
-                                    <template #append>
-                                        <el-button @click="onChangeEntrance" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                                <el-input disabled v-if="!form.securityEntrance" v-model="unset">
-                                    <template #append>
-                                        <el-button @click="onChangeEntrance" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                                <span class="input-help">{{ $t('setting.entranceHelper') }}</span>
-                            </el-form-item>
+                    <el-form-item :label="$t('setting.panelPort')" prop="serverPort">
+                        <el-input disabled v-model.number="form.serverPort">
+                            <template #append>
+                                <el-button @click="onChangePort" icon="Setting">
+                                    {{ $t('commons.button.set') }}
+                                </el-button>
+                            </template>
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item :label="$t('setting.bindInfo')" prop="bindAddress">
+                        <el-input disabled v-model="form.bindAddress">
+                            <template #append>
+                                <el-button @click="onChangeBind" icon="Setting">
+                                    {{ $t('commons.button.set') }}
+                                </el-button>
+                            </template>
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item :label="$t('setting.entrance')">
+                        <el-input type="password" disabled v-if="form.securityEntrance" v-model="form.securityEntrance">
+                            <template #append>
+                                <el-button @click="onChangeEntrance" icon="Setting">
+                                    {{ $t('commons.button.set') }}
+                                </el-button>
+                            </template>
+                        </el-input>
+                        <el-input disabled v-if="!form.securityEntrance" v-model="unset">
+                            <template #append>
+                                <el-button @click="onChangeEntrance" icon="Setting">
+                                    {{ $t('commons.button.set') }}
+                                </el-button>
+                            </template>
+                        </el-input>
+                        <span class="input-help">{{ $t('setting.entranceHelper') }}</span>
+                    </el-form-item>
 
-                            <el-form-item :label="$t('setting.noAuthSetting')">
-                                <el-input disabled v-model="form.noAuthSetting">
-                                    <template #append>
-                                        <el-button @click="onChangeResponse" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                            </el-form-item>
+                    <el-form-item :label="$t('setting.noAuthSetting')">
+                        <el-input disabled v-model="form.noAuthSetting">
+                            <template #append>
+                                <el-button @click="onChangeResponse" icon="Setting">
+                                    {{ $t('commons.button.set') }}
+                                </el-button>
+                            </template>
+                        </el-input>
+                    </el-form-item>
 
-                            <el-form-item :label="$t('setting.allowIPs')">
-                                <div style="width: 100%" v-if="form.allowIPs">
-                                    <el-input
-                                        type="textarea"
-                                        :rows="3"
-                                        disabled
-                                        v-model="form.allowIPs"
-                                        style="width: calc(100% - 80px)"
-                                    />
-                                    <el-button class="append-button" @click="onChangeAllowIPs" icon="Setting">
-                                        {{ $t('commons.button.set') }}
-                                    </el-button>
-                                </div>
-                                <el-input disabled v-if="!form.allowIPs" v-model="unset">
-                                    <template #append>
-                                        <el-button @click="onChangeAllowIPs" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                                <span class="input-help">{{ $t('setting.allowIPsHelper') }}</span>
-                            </el-form-item>
+                    <el-form-item :label="$t('setting.allowIPs')">
+                        <div style="width: 100%" v-if="form.allowIPs">
+                            <el-input
+                                type="textarea"
+                                :rows="3"
+                                disabled
+                                v-model="form.allowIPs"
+                                style="width: calc(100% - 80px)"
+                            />
+                            <el-button class="append-button" @click="onChangeAllowIPs" icon="Setting">
+                                {{ $t('commons.button.set') }}
+                            </el-button>
+                        </div>
+                        <el-input disabled v-if="!form.allowIPs" v-model="unset">
+                            <template #append>
+                                <el-button @click="onChangeAllowIPs" icon="Setting">
+                                    {{ $t('commons.button.set') }}
+                                </el-button>
+                            </template>
+                        </el-input>
+                        <span class="input-help">{{ $t('setting.allowIPsHelper') }}</span>
+                    </el-form-item>
 
-                            <el-form-item :label="$t('setting.bindDomain')">
-                                <el-input disabled v-if="form.bindDomain" v-model="form.bindDomain">
-                                    <template #append>
-                                        <el-button @click="onChangeBindDomain" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                                <el-input disabled v-if="!form.bindDomain" v-model="unset">
-                                    <template #append>
-                                        <el-button @click="onChangeBindDomain" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                                <span class="input-help">{{ $t('setting.bindDomainHelper') }}</span>
-                            </el-form-item>
+                    <el-form-item :label="$t('setting.bindDomain')">
+                        <el-input disabled v-if="form.bindDomain" v-model="form.bindDomain">
+                            <template #append>
+                                <el-button @click="onChangeBindDomain" icon="Setting">
+                                    {{ $t('commons.button.set') }}
+                                </el-button>
+                            </template>
+                        </el-input>
+                        <el-input disabled v-if="!form.bindDomain" v-model="unset">
+                            <template #append>
+                                <el-button @click="onChangeBindDomain" icon="Setting">
+                                    {{ $t('commons.button.set') }}
+                                </el-button>
+                            </template>
+                        </el-input>
+                        <span class="input-help">{{ $t('setting.bindDomainHelper') }}</span>
+                    </el-form-item>
 
-                            <el-form-item :label="$t('setting.panelSSL')" prop="ssl">
-                                <el-switch
-                                    @change="handleSSL"
-                                    v-model="form.ssl"
-                                    active-value="enable"
-                                    inactive-value="disable"
-                                />
-                                <span class="input-help">{{ $t('setting.https') }}</span>
-                                <div v-if="form.ssl === 'enable' && sslInfo">
-                                    <el-tag>{{ $t('setting.domainOrIP') }} {{ sslInfo.domain }}</el-tag>
-                                    <el-tag style="margin-left: 5px">
-                                        {{ $t('setting.timeOut') }} {{ dateFormat('', '', sslInfo.timeout) }}
-                                    </el-tag>
-                                    <div>
-                                        <el-button link type="primary" @click="handleSSL">
-                                            {{ $t('commons.button.view') }}
-                                        </el-button>
-                                    </div>
-                                </div>
-                            </el-form-item>
+                    <el-form-item :label="$t('setting.panelSSL')" prop="ssl">
+                        <el-switch
+                            @change="handleSSL"
+                            v-model="form.ssl"
+                            active-value="enable"
+                            inactive-value="disable"
+                        />
+                        <span class="input-help">{{ $t('setting.https') }}</span>
+                        <div v-if="form.ssl === 'enable' && sslInfo">
+                            <el-tag>{{ $t('setting.domainOrIP') }} {{ sslInfo.domain }}</el-tag>
+                            <el-tag style="margin-left: 5px">
+                                {{ $t('setting.timeOut') }} {{ dateFormat('', '', sslInfo.timeout) }}
+                            </el-tag>
+                            <div>
+                                <el-button link type="primary" @click="handleSSL">
+                                    {{ $t('commons.button.view') }}
+                                </el-button>
+                            </div>
+                        </div>
+                    </el-form-item>
 
-                            <el-form-item :label="$t('setting.expirationTime')" prop="expirationTime">
-                                <el-input disabled v-model="form.expirationTime">
-                                    <template #append>
-                                        <el-button @click="onChangeExpirationTime" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                                <div>
-                                    <span class="input-help" v-if="form.expirationTime !== $t('setting.unSetting')">
-                                        {{ $t('setting.timeoutHelper', [loadTimeOut()]) }}
-                                    </span>
-                                    <span class="input-help" v-else>
-                                        {{ $t('setting.noneSetting') }}
-                                    </span>
-                                </div>
-                            </el-form-item>
-                            <el-form-item :label="$t('setting.complexity')" prop="complexityVerification">
-                                <el-switch
-                                    @change="onSaveComplexity"
-                                    v-model="form.complexityVerification"
-                                    active-value="enable"
-                                    inactive-value="disable"
-                                />
-                                <span class="input-help">
-                                    {{ $t('setting.complexityHelper') }}
-                                </span>
-                            </el-form-item>
+                    <el-form-item :label="$t('setting.expirationTime')" prop="expirationTime">
+                        <el-input disabled v-model="form.expirationTime">
+                            <template #append>
+                                <el-button @click="onChangeExpirationTime" icon="Setting">
+                                    {{ $t('commons.button.set') }}
+                                </el-button>
+                            </template>
+                        </el-input>
+                        <div>
+                            <span class="input-help" v-if="form.expirationTime !== $t('setting.unSetting')">
+                                {{ $t('setting.timeoutHelper', [loadTimeOut()]) }}
+                            </span>
+                            <span class="input-help" v-else>
+                                {{ $t('setting.noneSetting') }}
+                            </span>
+                        </div>
+                    </el-form-item>
+                    <el-form-item :label="$t('setting.complexity')" prop="complexityVerification">
+                        <el-switch
+                            @change="onSaveComplexity"
+                            v-model="form.complexityVerification"
+                            active-value="enable"
+                            inactive-value="disable"
+                        />
+                        <span class="input-help">
+                            {{ $t('setting.complexityHelper') }}
+                        </span>
+                    </el-form-item>
 
-                            <el-form-item :label="$t('setting.mfa')">
-                                <el-switch
-                                    @change="handleMFA"
-                                    v-model="form.mfaStatus"
-                                    active-value="enable"
-                                    inactive-value="disable"
-                                />
-                                <span class="input-help">
-                                    {{ $t('setting.mfaHelper') }}
-                                </span>
-                            </el-form-item>
-                        </el-col>
-                    </el-row>
+                    <el-form-item :label="$t('setting.mfa')">
+                        <el-switch
+                            @change="handleMFA"
+                            v-model="form.mfaStatus"
+                            active-value="enable"
+                            inactive-value="disable"
+                        />
+                        <span class="input-help">
+                            {{ $t('setting.mfaHelper') }}
+                        </span>
+                    </el-form-item>
                 </el-form>
             </template>
         </LayoutContent>

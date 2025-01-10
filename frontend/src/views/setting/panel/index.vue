@@ -6,7 +6,7 @@
                     :model="form"
                     :label-position="mobile ? 'top' : 'left'"
                     label-width="auto"
-                    class="sm:w-full md:w-4/5 lg:w-3/5 2xl:w-1/2 max-w-max"
+                    class="sm:w-full md:w-4/5 lg:w-3/5 2xl:w-1/2 max-w-max ml-8"
                 >
                     <el-form-item :label="$t('setting.user')" prop="userName">
                         <el-input disabled v-model="form.userName">

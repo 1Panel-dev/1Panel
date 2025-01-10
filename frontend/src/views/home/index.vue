@@ -720,6 +720,7 @@ onBeforeUnmount(() => {
     font-size: 13px !important;
     border: none !important;
     width: 100% !important;
+    line-height: normal !important;
 }
 
 .monitor-tags {
