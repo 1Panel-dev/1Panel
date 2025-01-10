@@ -26,7 +26,7 @@
                         </el-alert>
                         <el-form-item :label="$t('setting.proxyType')" prop="proxyType">
                             <el-select v-model="form.proxyType" clearable>
-                                <el-option value="close" :label="$t('commons.button.close')" />
+                                <el-option value="close" :label="$t('commons.button.off')" />
                                 <el-option value="socks5" label="SOCKS5" />
                                 <el-option value="http" label="HTTP" />
                                 <el-option value="https" label="HTTPS" />

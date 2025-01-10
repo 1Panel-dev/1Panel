@@ -33,6 +33,7 @@ const message = {
             clean: 'Limpar',
             login: 'Entrar',
             close: 'Fechar',
+            off: 'Fechar',
             stop: 'Parar',
             start: 'Iniciar',
             view: 'Visualizar',
@@ -1739,7 +1740,7 @@ const message = {
         quickUpdate: 'Atualização rápida',
         import: 'Importar',
         power: 'Autorizar',
-        unbind: 'Desvincular Licença',
+        unbind: 'Desvincular',
         unbindHelper:
             'Todas as configurações relacionadas ao Pro serão limpas após a desvinculação. Você deseja continuar?',
         importLicense: 'Licença',
