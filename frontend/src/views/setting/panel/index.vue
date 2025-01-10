@@ -252,6 +252,10 @@ const mobile = computed(() => {
 interface ThemeColor {
     light: string;
     dark: string;
+    themePredefineColors: {
+        light: string[];
+        dark: string[];
+    };
 }
 
 const form = reactive({
@@ -366,8 +370,10 @@ const search = async () => {
         const xpackRes = await getXpackSetting();
         if (xpackRes) {
             form.theme = xpackRes.data.theme || globalStore.themeConfig.theme || 'light';
-            form.themeColor = JSON.parse(xpackRes.data.themeColor);
-            globalStore.themeConfig.themeColor = xpackRes.data.themeColor;
+            form.themeColor = JSON.parse(xpackRes.data.themeColor || '{"light":"#005eeb","dark":"#F0BE96"}');
+            globalStore.themeConfig.themeColor = xpackRes.data.themeColor
+                ? xpackRes.data.themeColor
+                : '{"light":"#005eeb","dark":"#F0BE96"}';
             globalStore.themeConfig.theme = form.theme;
             form.proxyDocker = xpackRes.data.proxyDocker;
         }

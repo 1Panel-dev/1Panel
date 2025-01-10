@@ -94,13 +94,24 @@ const drawerVisible = ref();
 const loading = ref();
 
 interface DialogProps {
-    themeColor: { light: string; dark: string };
+    themeColor: {
+        light: string;
+        dark: string;
+        themePredefineColors: {
+            light: string[];
+            dark: string[];
+        };
+    };
     theme: '';
 }
 
 interface ThemeColor {
     light: string;
     dark: string;
+    themePredefineColors: {
+        light: string[];
+        dark: string[];
+    };
 }
 
 const form = reactive({
@@ -124,6 +135,7 @@ const lightPredefineColors = ref([
     '#ff4500',
     '#ff8c00',
     '#ffd700',
+    '#333539',
 ]);
 const darkPredefineColors = ref([
     '#238636',
@@ -135,6 +147,7 @@ const darkPredefineColors = ref([
     '#ff4500',
     '#ff8c00',
     '#ffd700',
+    '#333539',
 ]);
 
 const defaultDarkColors = [
@@ -191,9 +204,13 @@ const acceptParams = (params: DialogProps): void => {
     form.theme = params.theme;
     form.dark = form.themeColor.dark;
     form.light = form.themeColor.light;
+    if (form.themeColor.themePredefineColors) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(form.themeColor.themePredefineColors));
+    }
     initThemeColors();
     lightPredefineColors.value = themeColors.value['light'];
     darkPredefineColors.value = themeColors.value['dark'];
+    lightColors = defaultLightColors;
     lightPredefineColors.value.slice(0, 2).forEach((color) => {
         const exists = lightColors.some((item) => item.color === color);
         if (!exists) {
@@ -203,6 +220,7 @@ const acceptParams = (params: DialogProps): void => {
             });
         }
     });
+    darkColors = defaultDarkColors;
     darkPredefineColors.value.slice(0, 2).forEach((color) => {
         const exists = darkColors.some((item) => item.color === color);
         if (!exists) {
@@ -259,7 +277,7 @@ const onSave = async (formEl: FormInstance | undefined) => {
     }).then(async () => {
         await formEl.validate(async (valid) => {
             if (!valid) return;
-            form.themeColor = { light: form.light, dark: form.dark };
+            form.themeColor = { light: form.light, dark: form.dark, themePredefineColors: themeColors.value };
             if (globalStore.isProductPro) {
                 await updateXpackSettingByKey('ThemeColor', JSON.stringify(form.themeColor));
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
@@ -288,12 +306,8 @@ const onReSet = async () => {
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',
     }).then(async () => {
-        form.themeColor = { light: '#005eeb', dark: '#F0BE96' };
+        form.themeColor = { light: '#005eeb', dark: '#F0BE96', themePredefineColors: themeColors.value };
         if (globalStore.isProductPro) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultColors));
-            themeColors.value = { ...defaultColors };
-            darkColors = [...defaultDarkColors];
-            lightColors = [...defaultLightColors];
             await updateXpackSettingByKey('ThemeColor', JSON.stringify(form.themeColor));
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             loading.value = false;
