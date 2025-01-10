@@ -126,7 +126,7 @@ const toLxware = () => {
     if (!globalStore.isIntl) {
         window.open('https://www.lxware.cn/1panel' + '', '_blank', 'noopener,noreferrer');
     } else {
-        window.open('https://1panel.hk' + '', '_blank', 'noopener,noreferrer');
+        window.open('https://1panel.hk/pricing' + '', '_blank', 'noopener,noreferrer');
     }
 };
 
