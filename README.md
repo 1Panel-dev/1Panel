@@ -64,7 +64,7 @@ Compared to the OSS Edition, 1Panel Pro Edition provides users with a wealth of 
 
 ## Security Information
 
-If you discover any security issues, please contact us through: wanghe@fit2cloud.com.
+If you discover any security issues, please refer to [SECURITY.md](/SECURITY.md).
 
 ## License
 
