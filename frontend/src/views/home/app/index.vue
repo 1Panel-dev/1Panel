@@ -10,7 +10,7 @@
                         <span class="h-app-title">{{ app.name }}</span>
                         <div class="h-app-desc">
                             <span>
-                                {{ language == 'zh' || language == 'tw' ? app.shortDescZh : app.shortDescEn }}123123
+                                {{ language == 'zh' || language == 'tw' ? app.shortDescZh : app.shortDescEn }}
                             </span>
                         </div>
                     </div>
