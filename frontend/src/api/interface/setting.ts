@@ -146,8 +146,8 @@ export namespace Setting {
     export interface SnapshotInfo {
         id: number;
         name: string;
-        from: string;
-        defaultDownload: string;
+        sourceAccounts: Array<string>;
+        downloadAccount: string;
         description: string;
         status: string;
         message: string;

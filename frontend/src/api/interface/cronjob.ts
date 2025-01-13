@@ -29,9 +29,8 @@ export namespace Cronjob {
         files: Array<Item>;
         sourceDir: string;
 
-        sourceAccountIDs: string;
-        downloadAccountID: number;
-        sourceAccounts: Array<number>;
+        sourceAccounts: Array<string>;
+        downloadAccount: string;
         retainCopies: number;
         status: string;
         secret: string;

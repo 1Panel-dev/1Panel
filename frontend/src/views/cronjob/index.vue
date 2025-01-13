@@ -99,33 +99,34 @@
                             {{ row.lastRecordTime }}
                         </template>
                     </el-table-column>
-                    <el-table-column :min-width="80" :label="$t('setting.backupAccount')" prop="defaultDownload">
+                    <el-table-column :min-width="80" :label="$t('setting.backupAccount')">
                         <template #default="{ row }">
                             <span v-if="!hasBackup(row.type)">-</span>
                             <div v-else>
-                                <div v-for="(item, index) of row.backupAccounts?.split(',')" :key="index">
+                                <div v-for="(item, index) of row.sourceAccounts" :key="index">
                                     <div v-if="row.accountExpand || (!row.accountExpand && index < 3)">
-                                        <span v-if="row.backupAccounts">
-                                            <span>
-                                                {{ $t('setting.' + item) }}
+                                        <div v-if="row.expand || (!row.expand && index < 3)">
+                                            <span type="info">
+                                                <span>
+                                                    {{ loadName(item) }}
+                                                </span>
+                                                <el-icon
+                                                    v-if="item === row.downloadAccount"
+                                                    size="12"
+                                                    class="relative top-px left-1"
+                                                >
+                                                    <Star />
+                                                </el-icon>
                                             </span>
-                                            <el-icon
-                                                size="12"
-                                                v-if="item === row.defaultDownload"
-                                                class="relative top-px left-1"
-                                            >
-                                                <Star />
-                                            </el-icon>
-                                        </span>
-                                        <span v-else>-</span>
+                                        </div>
                                     </div>
                                 </div>
-                                <div v-if="!row.accountExpand && row.backupAccounts?.split(',').length > 3">
+                                <div v-if="!row.accountExpand && row.sourceAccounts?.length > 3">
                                     <el-button type="primary" link @click="row.accountExpand = true">
                                         {{ $t('commons.button.expand') }}...
                                     </el-button>
                                 </div>
-                                <div v-if="row.accountExpand && row.backupAccounts?.split(',').length > 3">
+                                <div v-if="row.accountExpand && row.sourceAccounts?.length > 3">
                                     <el-button type="primary" link @click="row.accountExpand = false">
                                         {{ $t('commons.button.collapse') }}
                                     </el-button>
@@ -209,18 +210,6 @@ const search = async (column?: any) => {
         .then((res) => {
             loading.value = false;
             data.value = res.data.items || [];
-            for (const item of data.value) {
-                let itemAccounts = item.backupAccounts.split(',') || [];
-                let accounts = [];
-                for (const account of itemAccounts) {
-                    if (account == item.defaultDownload) {
-                        accounts.unshift(account);
-                    } else {
-                        accounts.push(account);
-                    }
-                }
-                item.itemAccounts = accounts.join(',');
-            }
             paginationConfig.total = res.data.total;
         })
         .catch(() => {
@@ -362,6 +351,11 @@ const loadDetail = (row: any) => {
         rowData: { ...row },
     };
     dialogRecordRef.value!.acceptParams(params);
+};
+
+const loadName = (from: any) => {
+    let items = from.split(' - ');
+    return i18n.global.t('setting.' + items[0]) + ' ' + items[1];
 };
 
 const buttons = [

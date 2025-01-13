@@ -170,7 +170,7 @@ const loadNodes = async () => {
                 nodes.value = [];
                 return;
             }
-            nodes.value = res.data;
+            nodes.value = res.data || [];
             if (nodes.value.length === 0) {
                 globalStore.currentNode = 'local';
             }

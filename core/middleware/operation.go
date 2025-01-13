@@ -211,7 +211,7 @@ func newDB(pathItem string) (*gorm.DB, error) {
 	case strings.HasPrefix(pathItem, "/core"):
 		dbFile = path.Join(global.CONF.System.BaseDir, "1panel/db/core.db")
 	case strings.HasPrefix(pathItem, "/xpack"):
-		dbFile = path.Join(global.CONF.System.BaseDir, "1panel/db/xpack/xpack.db")
+		dbFile = path.Join(global.CONF.System.BaseDir, "1panel/db/xpack.db")
 	default:
 		dbFile = path.Join(global.CONF.System.BaseDir, "1panel/db/agent.db")
 	}

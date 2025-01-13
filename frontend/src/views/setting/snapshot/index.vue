@@ -41,30 +41,29 @@
                     <el-table-column prop="version" :label="$t('app.version')" />
                     <el-table-column :label="$t('setting.backupAccount')" min-width="80" prop="from">
                         <template #default="{ row }">
-                            <div v-if="row.hasLoad">
-                                <div v-for="(item, index) of row.from.split(',')" :key="index" class="mt-1">
+                            <div>
+                                <div v-for="(item, index) of row.sourceAccounts" :key="index" class="mt-1">
                                     <div v-if="row.expand || (!row.expand && index < 3)">
-                                        <span v-if="row.from" type="info">
+                                        <span type="info">
                                             <span>
                                                 {{ loadName(item) }}
                                             </span>
                                             <el-icon
-                                                v-if="item === row.defaultDownload"
+                                                v-if="item === row.downloadAccount"
                                                 size="12"
                                                 class="relative top-px left-1"
                                             >
                                                 <Star />
                                             </el-icon>
                                         </span>
-                                        <span v-else>-</span>
                                     </div>
                                 </div>
-                                <div v-if="!row.expand && row.from.split(',').length > 3">
+                                <div v-if="!row.expand && row.sourceAccounts.length > 3">
                                     <el-button type="primary" link @click="row.expand = true">
                                         {{ $t('commons.button.expand') }}...
                                     </el-button>
                                 </div>
-                                <div v-if="row.expand && row.from.split(',').length > 3">
+                                <div v-if="row.expand && row.sourceAccounts.length > 3">
                                     <el-button type="primary" link @click="row.expand = false">
                                         {{ $t('commons.button.collapse') }}
                                     </el-button>
@@ -296,7 +295,7 @@ const onChange = async (info: any) => {
 };
 
 const onRecover = async (row: any) => {
-    if (row.defaultDownload.indexOf('ALIYUN') !== -1 && row.size > 100 * 1024 * 1024) {
+    if (row.downloadAccount.indexOf('ALIYUN') !== -1 && row.size > 100 * 1024 * 1024) {
         MsgError(i18n.global.t('setting.ALIYUNRecover'));
         return;
     }
@@ -422,8 +421,6 @@ const loadSize = async () => {
                 for (const item of stats) {
                     if (snap.id === item.id) {
                         snap.hasLoad = true;
-                        snap.from = item.from;
-                        snap.defaultDownload = item.defaultDownload;
                         snap.size = item.size;
                         break;
                     }
