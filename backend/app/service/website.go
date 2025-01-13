@@ -87,9 +87,12 @@ type IWebsiteService interface {
 	LoadWebsiteDirConfig(req request.WebsiteCommonReq) (*response.WebsiteDirConfig, error)
 	UpdateSiteDir(req request.WebsiteUpdateDir) error
 	UpdateSitePermission(req request.WebsiteUpdateDirPermission) error
+
 	OperateProxy(req request.WebsiteProxyConfig) (err error)
 	GetProxies(id uint) (res []request.WebsiteProxyConfig, err error)
 	UpdateProxyFile(req request.NginxProxyUpdate) (err error)
+	DeleteProxy(req request.WebsiteProxyDel) (err error)
+
 	GetAuthBasics(req request.NginxAuthReq) (res response.NginxAuthRes, err error)
 	UpdateAuthBasic(req request.NginxAuthUpdate) (err error)
 	GetAntiLeech(id uint) (*response.NginxAntiLeechRes, error)
@@ -1551,6 +1554,29 @@ func (w WebsiteService) UpdateSitePermission(req request.WebsiteUpdateDirPermiss
 	website.User = req.User
 	website.Group = req.Group
 	return websiteRepo.Save(context.Background(), &website)
+}
+
+func (w WebsiteService) DeleteProxy(req request.WebsiteProxyDel) (err error) {
+	fileOp := files.NewFileOp()
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.ID))
+	if err != nil {
+		return
+	}
+	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return
+	}
+	includeDir := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "proxy")
+	if !fileOp.Stat(includeDir) {
+		_ = fileOp.CreateDir(includeDir, 0755)
+	}
+	fileName := fmt.Sprintf("%s.conf", req.Name)
+	includePath := path.Join(includeDir, fileName)
+	backName := fmt.Sprintf("%s.bak", req.Name)
+	backPath := path.Join(includeDir, backName)
+	_ = fileOp.DeleteFile(includePath)
+	_ = fileOp.DeleteFile(backPath)
+	return updateNginxConfig(constant.NginxScopeServer, nil, &website)
 }
 
 func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error) {

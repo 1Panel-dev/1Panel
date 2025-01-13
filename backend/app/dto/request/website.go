@@ -193,6 +193,11 @@ type WebsiteProxyConfig struct {
 	ProxySSLName string            `json:"proxySSLName"`
 }
 
+type WebsiteProxyDel struct {
+	ID   uint   `json:"id" validate:"required"`
+	Name string `json:"name" validate:"required"`
+}
+
 type WebsiteProxyReq struct {
 	ID uint `json:"id" validate:"required"`
 }

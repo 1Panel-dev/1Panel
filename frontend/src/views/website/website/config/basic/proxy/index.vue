@@ -38,7 +38,7 @@
 
 <script lang="ts" setup name="proxy">
 import { Website } from '@/api/interface/website';
-import { OperateProxyConfig, GetProxyConfig } from '@/api/modules/website';
+import { OperateProxyConfig, GetProxyConfig, DelProxy } from '@/api/modules/website';
 import { computed, onMounted, ref } from 'vue';
 import Create from './create/index.vue';
 import File from './file/index.vue';
@@ -108,6 +108,8 @@ const initData = (id: number): Website.ProxyConfig => ({
     proxyPass: 'http://',
     proxyHost: '$host',
     replaces: {},
+    sni: false,
+    proxySSLName: '',
 });
 
 const openCreate = () => {
@@ -128,7 +130,10 @@ const openEditFile = (proxyConfig: Website.ProxyConfig) => {
 };
 
 const deleteProxy = async (proxyConfig: Website.ProxyConfig) => {
-    proxyConfig.operate = 'delete';
+    const del = {
+        id: proxyConfig.id,
+        name: proxyConfig.name,
+    };
     opRef.value.acceptParams({
         title: i18n.global.t('commons.msg.deleteTitle'),
         names: [proxyConfig.name],
@@ -136,8 +141,8 @@ const deleteProxy = async (proxyConfig: Website.ProxyConfig) => {
             i18n.global.t('website.proxy'),
             i18n.global.t('commons.button.delete'),
         ]),
-        api: OperateProxyConfig,
-        params: proxyConfig,
+        api: DelProxy,
+        params: del,
     });
 };
 

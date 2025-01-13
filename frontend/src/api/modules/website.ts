@@ -198,6 +198,10 @@ export const UpdateProxyConfigFile = (req: Website.ProxyFileUpdate) => {
     return http.post<any>(`/websites/proxies/file`, req);
 };
 
+export const DelProxy = (req: Website.ProxyDel) => {
+    return http.post<any>(`/websites/proxies/del`, req);
+};
+
 export const GetAuthConfig = (req: Website.AuthReq) => {
     return http.post<Website.AuthConfig>(`/websites/auths`, req);
 };

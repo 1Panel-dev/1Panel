@@ -54,6 +54,7 @@ func (a *WebsiteRouter) InitRouter(Router *gin.RouterGroup) {
 		websiteRouter.POST("/proxies", baseApi.GetProxyConfig)
 		websiteRouter.POST("/proxies/update", baseApi.UpdateProxyConfig)
 		websiteRouter.POST("/proxies/file", baseApi.UpdateProxyConfigFile)
+		websiteRouter.POST("/proxies/del", baseApi.DeleteProxyConfig)
 
 		websiteRouter.POST("/auths", baseApi.GetAuthConfig)
 		websiteRouter.POST("/auths/update", baseApi.UpdateAuthConfig)

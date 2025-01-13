@@ -356,6 +356,11 @@ export namespace Website {
         id: number;
     }
 
+    export interface ProxyDel {
+        id: number;
+        name: string;
+    }
+
     export interface ProxyConfig {
         id: number;
         operate: string;

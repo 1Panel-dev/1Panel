@@ -572,6 +572,28 @@ func (b *BaseApi) GetProxyConfig(c *gin.Context) {
 }
 
 // @Tags Website
+// @Summary Delete proxy conf
+// @Accept json
+// @Param request body request.WebsiteProxyDel true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /websites/proxies/del [post]
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"websites","output_column":"primary_domain","output_value":"domain"}],"formatZH":"删除网站 [domain] 反向代理配置","formatEN":"Delete domain [domain] proxy config"}
+func (b *BaseApi) DeleteProxyConfig(c *gin.Context) {
+	var req request.WebsiteProxyDel
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	err := websiteService.DeleteProxy(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}
+
+// @Tags Website
 // @Summary Update proxy conf
 // @Accept json
 // @Param request body request.WebsiteProxyConfig true "request"
