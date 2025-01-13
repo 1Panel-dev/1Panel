@@ -39,6 +39,7 @@ const config = reactive({
     resourceID: 0,
     taskType: '',
     tail: true,
+    colorMode: 'task',
 });
 const open = ref(false);
 const showTail = ref(true);

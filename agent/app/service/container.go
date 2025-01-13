@@ -834,7 +834,7 @@ func collectLogs(params dto.StreamLog, messageChan chan<- string, errorChan chan
 	if params.Follow {
 		cmdArgs = append(cmdArgs, "-f")
 	}
-	if params.Tail != "all" {
+	if params.Tail != "0" {
 		cmdArgs = append(cmdArgs, "--tail", params.Tail)
 	}
 	if params.Since != "all" {

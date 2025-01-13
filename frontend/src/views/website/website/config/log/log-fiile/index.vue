@@ -5,7 +5,7 @@
                 <el-switch v-model="data.enable" @change="updateEnable"></el-switch>
             </el-form-item>
         </div>
-        <LogFile :config="{ id: id, type: 'website', name: logType }" ref="logRef">
+        <LogFile :config="{ id: id, type: 'website', name: logName, colorMode: 'nginx' }" ref="logRef">
             <template #button>
                 <el-button @click="cleanLog" icon="Delete">
                     {{ $t('commons.button.clean') }}
@@ -32,7 +32,7 @@ const props = defineProps({
         default: 0,
     },
 });
-const logType = computed(() => {
+const logName = computed(() => {
     return props.logType;
 });
 const id = computed(() => {
@@ -52,7 +52,7 @@ const updateEnable = () => {
     const req = {
         id: id.value,
         operate: operate,
-        logType: logType.value,
+        logType: props.logType,
     };
     loading.value = true;
     OpWebsiteLog(req)
@@ -69,13 +69,13 @@ const clearLog = () => {
 };
 
 const cleanLog = async () => {
-    let log = logType.value === 'access.log' ? i18n.global.t('website.accessLog') : i18n.global.t('website.errLog');
+    let log = props.logType === 'access.log' ? i18n.global.t('website.accessLog') : i18n.global.t('website.errLog');
     opRef.value.acceptParams({
         title: i18n.global.t('commons.msg.clean'),
         names: [],
         msg: i18n.global.t('commons.msg.operatorHelper', [log, i18n.global.t('commons.msg.clean')]),
         api: OpWebsiteLog,
-        params: { id: id.value, operate: 'delete', logType: logType.value },
+        params: { id: id.value, operate: 'delete', logType: props.logType },
     });
 };
 

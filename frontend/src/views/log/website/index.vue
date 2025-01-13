@@ -70,6 +70,7 @@ const logConfig = reactive({
     type: 'website',
     id: undefined,
     name: 'access.log',
+    colorMode: 'nginx',
 });
 const showLog = ref(false);
 const loading = ref(false);

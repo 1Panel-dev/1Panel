@@ -25,7 +25,7 @@
                 class="log-item"
                 :style="{ top: `${(startIndex + index) * logHeight}px` }"
             >
-                <span>{{ log }}</span>
+                <hightlight :log="log" :type="config.colorMode"></hightlight>
             </div>
         </div>
     </div>
@@ -36,6 +36,7 @@ import { downloadFile } from '@/utils/util';
 import { ReadByLine } from '@/api/modules/files';
 import { GlobalStore } from '@/store';
 import bus from '@/global/bus';
+import hightlight from '@/components/hightlight/index.vue';
 const globalStore = GlobalStore();
 
 interface LogProps {
@@ -44,6 +45,7 @@ interface LogProps {
     name?: string;
     tail?: boolean;
     taskID?: string;
+    colorMode?: string;
 }
 
 const props = defineProps({
@@ -54,6 +56,7 @@ const props = defineProps({
             type: '',
             name: '',
             tail: false,
+            colorMode: 'nginx',
         }),
     },
     defaultButton: {
@@ -315,7 +318,7 @@ defineExpose({ changeTail, onDownload, clearLog });
 </script>
 <style lang="scss" scoped>
 .log-container {
-    height: calc(100vh - 405px);
+    height: calc(100vh - 420px);
     overflow-y: auto;
     overflow-x: auto;
     position: relative;
@@ -335,5 +338,10 @@ defineExpose({ changeTail, onDownload, clearLog });
     color: #f5f5f5;
     box-sizing: border-box;
     white-space: nowrap;
+}
+
+.log-content {
+    font-size: 14px;
+    line-height: 20px;
 }
 </style>

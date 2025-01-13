@@ -45,6 +45,7 @@ const hasContent = ref(false);
 const logConfig = reactive({
     type: 'system',
     name: '',
+    colorMode: 'system',
 });
 const showLog = ref(false);
 

@@ -24,20 +24,26 @@
             {{ $t('commons.button.clean') }}
         </el-button>
     </div>
-    <div class="log-container" ref="logContainer">
+    <!-- <div class="log-container" ref="logContainer">
         <DynamicScroller :items="logs" :min-item-size="32" v-if="logs.length">
             <template #default="{ item, active }">
-                <DynamicScrollerItem
-                    :item="item"
-                    :active="active"
-                    class="msgBox"
-                    :size-dependencies="[item]"
-                    :data-index="item"
-                >
-                    <span class="log-item">{{ item }}</span>
+                <DynamicScrollerItem :item="item" :active="active" :size-dependencies="[item]" :data-index="item">
+                    <hightlight :log="item" type="container"></hightlight>
                 </DynamicScrollerItem>
             </template>
         </DynamicScroller>
+    </div> -->
+
+    <div class="log-container" ref="logContainer">
+        <div class="log-spacer" :style="{ height: `${totalHeight}px` }"></div>
+        <div
+            v-for="(log, index) in visibleLogs"
+            :key="startIndex + index"
+            class="log-item"
+            :style="{ top: `${(startIndex + index) * logHeight}px` }"
+        >
+            <hightlight :log="log" type="container"></hightlight>
+        </div>
     </div>
 </template>
 
@@ -48,6 +54,7 @@ import { dateFormatForName } from '@/utils/util';
 import { onUnmounted, reactive, ref } from 'vue';
 import { ElMessageBox } from 'element-plus';
 import { MsgError, MsgSuccess } from '@/utils/message';
+import hightlight from '@/components/hightlight/index.vue';
 
 const props = defineProps({
     container: {
@@ -70,6 +77,15 @@ const logSearch = reactive({
     mode: 'all',
     tail: 100,
     compose: '',
+});
+const logHeight = 20;
+const logCount = ref(0);
+const totalHeight = computed(() => logHeight * logCount.value);
+const startIndex = ref(0);
+const containerHeight = ref(500);
+const visibleCount = computed(() => Math.ceil(containerHeight.value / logHeight));
+const visibleLogs = computed(() => {
+    return logs.value.slice(startIndex.value, startIndex.value + visibleCount.value);
 });
 
 const timeOptions = ref([
@@ -177,6 +193,13 @@ onMounted(() => {
     logSearch.tail = 100;
     logSearch.mode = 'all';
     logSearch.isWatch = true;
+
+    nextTick(() => {
+        if (logContainer.value) {
+            logContainer.value.scrollTop = totalHeight.value;
+            containerHeight.value = logContainer.value.getBoundingClientRect().height;
+        }
+    });
 
     searchLogs();
 });
