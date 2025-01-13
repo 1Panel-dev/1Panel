@@ -227,7 +227,7 @@ const message = {
             paramUrlAndPort: 'Este campo deve estar no formato "http(s)://(nome do domínio/IP):(porta)".',
             nginxDoc: 'Este campo deve conter letras, números e ".".',
             appName:
-                'Este campo não deve começar ou terminar com "-" ou "_" e deve conter letras, números, "-", e "_" com comprimento de 2-30.',
+                'Suporta letras minúsculas, números, - e _, comprimento de 2 a 30, e não pode começar ou terminar com - ou _',
             containerName:
                 'Suporta letras, números, "-", "_" e "."; não pode começar com "-", "_" ou "."; comprimento: 2-128.',
             mirror: 'O endereço de aceleração do mirror deve começar com http(s)://, suportar letras (maiúsculas e minúsculas), números, ".", "/" e "-", e não deve conter linhas em branco.',

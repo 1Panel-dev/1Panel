@@ -229,7 +229,7 @@ const message = {
             paramUrlAndPort: 'Ruangan ini mesti dalam format "http(s)://(nama domain/IP):(port)".',
             nginxDoc: 'Ruangan ini mesti terdiri daripada aksara rumi, nombor, dan ".".',
             appName:
-                'Ruangan ini tidak boleh bermula atau berakhir dengan "-" dan "_" dan mesti terdiri daripada aksara rumi, nombor, "-", dan "_" dengan panjang 2-30 aksara.',
+                'Menyokong huruf kecil, nombor, -, dan _, panjang 2-30, dan tidak boleh bermula atau berakhir dengan - atau _',
             containerName:
                 'Menyokong huruf, nombor, -, _ dan .; tidak boleh bermula dengan -, _ atau .; panjang: 2-128 aksara.',
             mirror: 'Alamat pecutan cermin mesti bermula dengan http(s)://, menyokong huruf (huruf besar dan kecil), nombor, ., / dan -, serta tidak boleh mengandungi baris kosong.',
