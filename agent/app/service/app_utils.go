@@ -5,10 +5,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
-	"github.com/1Panel-dev/1Panel/agent/utils/nginx"
-	"github.com/1Panel-dev/1Panel/agent/utils/nginx/parser"
-	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 	"log"
 	"math"
 	"net/http"
@@ -20,6 +16,11 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/utils/nginx"
+	"github.com/1Panel-dev/1Panel/agent/utils/nginx/parser"
+	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 
 	"github.com/1Panel-dev/1Panel/agent/app/task"
 
@@ -562,17 +563,18 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 	backUpApp := func(t *task.Task) error {
 		if req.Backup {
 			backupService := NewIBackupService()
+			backupRecordService := NewIBackupRecordService()
 			fileName := fmt.Sprintf("upgrade_backup_%s_%s.tar.gz", install.Name, time.Now().Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5))
 			backupRecord, err := backupService.AppBackup(dto.CommonBackup{Name: install.App.Key, DetailName: install.Name, FileName: fileName})
 			if err == nil {
-				backups, _ := backupService.ListAppRecords(install.App.Key, install.Name, "upgrade_backup")
+				backups, _ := backupRecordService.ListAppRecords(install.App.Key, install.Name, "upgrade_backup")
 				if len(backups) > 3 {
 					backupsToDelete := backups[:len(backups)-3]
 					var deleteIDs []uint
 					for _, backup := range backupsToDelete {
 						deleteIDs = append(deleteIDs, backup.ID)
 					}
-					_ = backupService.BatchDeleteRecord(deleteIDs)
+					_ = backupRecordService.BatchDeleteRecord(deleteIDs)
 				}
 				backupFile = path.Join(global.CONF.System.Backup, backupRecord.FileDir, backupRecord.FileName)
 			} else {

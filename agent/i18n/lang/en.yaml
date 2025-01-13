@@ -19,6 +19,12 @@ Success: "Success"
 Failed: "Failed"
 SystemRestart: "System restart causes task interruption"
 
+#backup
+ErrBackupInUsed: "The backup account is currently in use in a scheduled task and cannot be deleted."
+ErrBackupCheck: "Backup account test connection failed {{.err}}"
+ErrBackupLocalDelete: "Deleting local server backup accounts is not currently supported."
+ErrBackupLocalCreate: "Creating local server backup accounts is not currently supported."
+
 #app
 ErrPortInUsed: "{{ .detail }} port already in use"
 ErrAppLimit: "App exceeds install limit"

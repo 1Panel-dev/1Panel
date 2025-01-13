@@ -66,26 +66,10 @@ func handleCronjobStatus() {
 }
 
 func loadLocalDir() {
-	var vars string
-	if global.IsMaster {
-		var account model.BackupAccount
-		if err := global.CoreDB.Where("id = 1").First(&account).Error; err != nil {
-			global.LOG.Errorf("load local backup account info failed, err: %v", err)
-			return
-		}
-		vars = account.Vars
-	} else {
-		account, _, err := service.NewBackupClientWithID(1)
-		if err != nil {
-			global.LOG.Errorf("load local backup account info failed, err: %v", err)
-			return
-		}
-		vars = account.Vars
-	}
-	localDir, err := service.LoadLocalDirByStr(vars)
-	if err != nil {
-		global.LOG.Errorf("load local backup dir failed, err: %v", err)
+	var account model.BackupAccount
+	if err := global.DB.Where("`type` = ?", constant.Local).First(&account).Error; err != nil {
+		global.LOG.Errorf("load local backup account info failed, err: %v", err)
 		return
 	}
-	global.CONF.System.Backup = localDir
+	global.CONF.System.Backup = account.BackupPath
 }

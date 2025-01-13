@@ -40,8 +40,9 @@ var (
 	ftpService      = service.NewIFtpService()
 	clamService     = service.NewIClamService()
 
-	settingService = service.NewISettingService()
-	backupService  = service.NewIBackupService()
+	settingService      = service.NewISettingService()
+	backupService       = service.NewIBackupService()
+	backupRecordService = service.NewIBackupRecordService()
 
 	websiteService            = service.NewIWebsiteService()
 	websiteDnsAccountService  = service.NewIWebsiteDnsAccountService()

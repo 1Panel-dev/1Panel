@@ -14,7 +14,6 @@ import (
 )
 
 type sftpClient struct {
-	bucket   string
 	connInfo string
 	config   *ssh.ClientConfig
 }
@@ -29,7 +28,6 @@ func NewSftpClient(vars map[string]interface{}) (*sftpClient, error) {
 	passPhrase := loadParamFromVars("passPhrase", vars)
 	username := loadParamFromVars("username", vars)
 	password := loadParamFromVars("password", vars)
-	bucket := loadParamFromVars("bucket", vars)
 
 	var auth []ssh.AuthMethod
 	if authMode == "key" {
@@ -59,7 +57,7 @@ func NewSftpClient(vars map[string]interface{}) (*sftpClient, error) {
 		return nil, err
 	}
 
-	return &sftpClient{bucket: bucket, connInfo: fmt.Sprintf("%s:%s", address, port), config: clientConfig}, nil
+	return &sftpClient{connInfo: fmt.Sprintf("%s:%s", address, port), config: clientConfig}, nil
 }
 
 func (s sftpClient) Upload(src, target string) (bool, error) {
@@ -80,8 +78,7 @@ func (s sftpClient) Upload(src, target string) (bool, error) {
 	}
 	defer srcFile.Close()
 
-	targetFilePath := path.Join(s.bucket, target)
-	targetDir, _ := path.Split(targetFilePath)
+	targetDir, _ := path.Split(target)
 	if _, err = client.Stat(targetDir); err != nil {
 		if os.IsNotExist(err) {
 			if err = client.MkdirAll(targetDir); err != nil {
@@ -91,7 +88,7 @@ func (s sftpClient) Upload(src, target string) (bool, error) {
 			return false, err
 		}
 	}
-	dstFile, err := client.Create(path.Join(s.bucket, target))
+	dstFile, err := client.Create(target)
 	if err != nil {
 		return false, err
 	}
@@ -120,7 +117,7 @@ func (s sftpClient) Download(src, target string) (bool, error) {
 	defer client.Close()
 	defer sshClient.Close()
 
-	srcFile, err := client.Open(s.bucket + "/" + src)
+	srcFile, err := client.Open(src)
 	if err != nil {
 		return false, err
 	}
@@ -150,7 +147,7 @@ func (s sftpClient) Exist(filePath string) (bool, error) {
 	defer client.Close()
 	defer sshClient.Close()
 
-	srcFile, err := client.Open(path.Join(s.bucket, filePath))
+	srcFile, err := client.Open(filePath)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return false, nil
@@ -174,7 +171,7 @@ func (s sftpClient) Size(filePath string) (int64, error) {
 	defer client.Close()
 	defer sshClient.Close()
 
-	files, err := client.Stat(path.Join(s.bucket, filePath))
+	files, err := client.Stat(filePath)
 	if err != nil {
 		return 0, err
 	}
@@ -193,7 +190,7 @@ func (s sftpClient) Delete(filePath string) (bool, error) {
 	defer client.Close()
 	defer sshClient.Close()
 
-	if err := client.Remove(path.Join(s.bucket, filePath)); err != nil {
+	if err := client.Remove(filePath); err != nil {
 		return false, err
 	}
 	return true, nil
@@ -211,7 +208,7 @@ func (s sftpClient) ListObjects(prefix string) ([]string, error) {
 	defer client.Close()
 	defer sshClient.Close()
 
-	files, err := client.ReadDir(path.Join(s.bucket, prefix))
+	files, err := client.ReadDir(prefix)
 	if err != nil {
 		return nil, err
 	}

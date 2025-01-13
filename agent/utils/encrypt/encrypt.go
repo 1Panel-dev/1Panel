@@ -46,6 +46,14 @@ func StringEncrypt(text string) (string, error) {
 	return "", err
 }
 
+func StringDecryptWithBase64(text string) (string, error) {
+	decryptItem, err := StringDecrypt(text)
+	if err != nil {
+		return "", err
+	}
+	return base64.StdEncoding.EncodeToString([]byte(decryptItem)), nil
+}
+
 func StringDecryptWithKey(text, key string) (string, error) {
 	if len(text) == 0 {
 		return "", nil

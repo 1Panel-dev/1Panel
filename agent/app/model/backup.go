@@ -4,6 +4,7 @@ type BackupAccount struct {
 	BaseModel
 	Name       string `gorm:"not null;default:''" json:"name"`
 	Type       string `gorm:"not null;default:''" json:"type"`
+	IsPublic   bool   `json:"isPublic"`
 	Bucket     string `json:"bucket"`
 	AccessKey  string `json:"accessKey"`
 	Credential string `json:"credential"`
@@ -13,8 +14,6 @@ type BackupAccount struct {
 	RememberAuth bool `json:"rememberAuth"`
 }
 
-// Source ---> SourceAccountIDs
-// BackupType ---> DownloadAccountID
 type BackupRecord struct {
 	BaseModel
 	From              string `json:"from"`

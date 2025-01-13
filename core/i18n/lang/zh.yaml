@@ -29,7 +29,8 @@ ErrNoSuchHost: "网络连接失败"
 #backup
 ErrBackupInUsed: "该备份账号已在计划任务中使用，无法删除"
 ErrBackupCheck: "备份账号测试连接失败 {{ .err}}"
-ErrBackupLocalDelete: "暂不支持删除本地服务器备份账号"
+ErrBackupLocal: "本地服务器备份账号暂不支持该操作！"
+ErrBackupPublic: "检测到该备份账号为非公用，请检查后重试！"
 
 #license
 ErrLicense: "许可证格式错误，请检查后重试！"

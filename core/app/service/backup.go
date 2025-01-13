@@ -21,7 +21,6 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/cloud_storage"
 	"github.com/1Panel-dev/1Panel/core/utils/cloud_storage/client"
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
-	fileUtils "github.com/1Panel-dev/1Panel/core/utils/files"
 	httpUtils "github.com/1Panel-dev/1Panel/core/utils/http"
 	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/jinzhu/copier"
@@ -31,129 +30,16 @@ import (
 type BackupService struct{}
 
 type IBackupService interface {
-	Get(req dto.OperateByID) (dto.BackupInfo, error)
-	List(req dto.OperateByIDs) ([]dto.BackupInfo, error)
-
-	GetLocalDir() (string, error)
-	SearchWithPage(search dto.SearchPageWithType) (int64, interface{}, error)
 	LoadBackupClientInfo(clientType string) (dto.BackupClientInfo, error)
 	Create(backupDto dto.BackupOperate) error
 	GetBuckets(backupDto dto.ForBuckets) ([]interface{}, error)
 	Update(req dto.BackupOperate) error
 	Delete(id uint) error
-	NewClient(backup *model.BackupAccount) (cloud_storage.CloudStorageClient, error)
-
-	Run()
+	RefreshToken(req dto.OperateByID) error
 }
 
 func NewIBackupService() IBackupService {
 	return &BackupService{}
-}
-
-func (u *BackupService) Get(req dto.OperateByID) (dto.BackupInfo, error) {
-	var data dto.BackupInfo
-	account, err := backupRepo.Get(repo.WithByID(req.ID))
-	if err != nil {
-		return data, err
-	}
-	if err := copier.Copy(&data, &account); err != nil {
-		global.LOG.Errorf("copy backup account to dto backup info failed, err: %v", err)
-	}
-	data.AccessKey, err = encrypt.StringDecryptWithBase64(data.AccessKey)
-	if err != nil {
-		return data, err
-	}
-	data.Credential, err = encrypt.StringDecryptWithBase64(data.Credential)
-	if err != nil {
-		return data, err
-	}
-	return data, nil
-}
-
-func (u *BackupService) List(req dto.OperateByIDs) ([]dto.BackupInfo, error) {
-	accounts, err := backupRepo.List(repo.WithByIDs(req.IDs), repo.WithOrderBy("created_at desc"))
-	if err != nil {
-		return nil, err
-	}
-	var data []dto.BackupInfo
-	for _, account := range accounts {
-		var item dto.BackupInfo
-		if err := copier.Copy(&item, &account); err != nil {
-			global.LOG.Errorf("copy backup account to dto backup info failed, err: %v", err)
-		}
-		item.AccessKey, err = encrypt.StringDecryptWithBase64(item.AccessKey)
-		if err != nil {
-			return nil, err
-		}
-		item.Credential, err = encrypt.StringDecryptWithBase64(item.Credential)
-		if err != nil {
-			return nil, err
-		}
-		data = append(data, item)
-	}
-	return data, nil
-}
-
-func (u *BackupService) GetLocalDir() (string, error) {
-	account, err := backupRepo.Get(repo.WithByType(constant.Local))
-	if err != nil {
-		return "", err
-	}
-	dir, err := LoadLocalDirByStr(account.Vars)
-	if err != nil {
-		return "", err
-	}
-	return dir, nil
-}
-
-func (u *BackupService) SearchWithPage(req dto.SearchPageWithType) (int64, interface{}, error) {
-	options := []global.DBOption{repo.WithOrderBy("created_at desc")}
-	if len(req.Type) != 0 {
-		options = append(options, repo.WithByType(req.Type))
-	}
-	if len(req.Info) != 0 {
-		options = append(options, repo.WithByType(req.Info))
-	}
-	count, accounts, err := backupRepo.Page(req.Page, req.PageSize, options...)
-	if err != nil {
-		return 0, nil, err
-	}
-	var data []dto.BackupInfo
-	for _, account := range accounts {
-		var item dto.BackupInfo
-		if err := copier.Copy(&item, &account); err != nil {
-			global.LOG.Errorf("copy backup account to dto backup info failed, err: %v", err)
-		}
-		if !item.RememberAuth {
-			item.AccessKey = ""
-			item.Credential = ""
-			if account.Type == constant.Sftp {
-				varMap := make(map[string]interface{})
-				if err := json.Unmarshal([]byte(item.Vars), &varMap); err != nil {
-					continue
-				}
-				delete(varMap, "passPhrase")
-				itemVars, _ := json.Marshal(varMap)
-				item.Vars = string(itemVars)
-			}
-		} else {
-			item.AccessKey = base64.StdEncoding.EncodeToString([]byte(item.AccessKey))
-			item.Credential = base64.StdEncoding.EncodeToString([]byte(item.Credential))
-		}
-
-		if account.Type == constant.OneDrive || account.Type == constant.ALIYUN || account.Type == constant.GoogleDrive {
-			varMap := make(map[string]interface{})
-			if err := json.Unmarshal([]byte(item.Vars), &varMap); err != nil {
-				continue
-			}
-			delete(varMap, "refresh_token")
-			delete(varMap, "drive_id")
-			itemVars, _ := json.Marshal(varMap)
-			item.Vars = string(itemVars)
-		}
-		data = append(data, item)
-	}
-	return count, data, nil
 }
 
 func (u *BackupService) LoadBackupClientInfo(clientType string) (dto.BackupClientInfo, error) {
@@ -190,6 +76,9 @@ func (u *BackupService) LoadBackupClientInfo(clientType string) (dto.BackupClien
 }
 
 func (u *BackupService) Create(req dto.BackupOperate) error {
+	if !req.IsPublic {
+		return buserr.New(constant.ErrBackupPublic)
+	}
 	backup, _ := backupRepo.Get(repo.WithByName(req.Name))
 	if backup.ID != 0 {
 		return constant.ErrRecordExist
@@ -270,8 +159,11 @@ func (u *BackupService) Delete(id uint) error {
 	if backup.ID == 0 {
 		return constant.ErrRecordNotFound
 	}
+	if !backup.IsPublic {
+		return buserr.New(constant.ErrBackupPublic)
+	}
 	if backup.Type == constant.Local {
-		return buserr.New(constant.ErrBackupLocalDelete)
+		return buserr.New(constant.ErrBackupLocal)
 	}
 	if _, err := httpUtils.NewLocalClient(fmt.Sprintf("/api/v2/backups/check/%v", id), http.MethodGet, nil); err != nil {
 		global.LOG.Errorf("check used of local cronjob failed, err: %v", err)
@@ -291,6 +183,12 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 	if backup.ID == 0 {
 		return constant.ErrRecordNotFound
 	}
+	if !backup.IsPublic {
+		return buserr.New(constant.ErrBackupPublic)
+	}
+	if backup.Type == constant.Local {
+		return buserr.New(constant.ErrBackupLocal)
+	}
 	var newBackup model.BackupAccount
 	if err := copier.Copy(&newBackup, &req); err != nil {
 		return errors.WithMessage(constant.ErrStructTransform, err.Error())
@@ -305,36 +203,15 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 		return err
 	}
 	newBackup.Credential = string(itemCredential)
-	if backup.Type == constant.Local {
-		if newBackup.Vars != backup.Vars {
-			oldPath, err := LoadLocalDirByStr(backup.Vars)
-			if err != nil {
-				return err
-			}
-			newPath, err := LoadLocalDirByStr(newBackup.Vars)
-			if err != nil {
-				return err
-			}
-			if strings.HasSuffix(newPath, "/") && newPath != "/" {
-				newPath = newPath[:strings.LastIndex(newPath, "/")]
-			}
-			if err := copyDir(oldPath, newPath); err != nil {
-				return err
-			}
-			global.CONF.System.BackupDir = newPath
-		}
-	}
 
 	if newBackup.Type == constant.OneDrive || newBackup.Type == constant.GoogleDrive {
 		if err := u.loadRefreshTokenByCode(&backup); err != nil {
 			return err
 		}
 	}
-	if backup.Type != "LOCAL" {
-		isOk, err := u.checkBackupConn(&newBackup)
-		if err != nil || !isOk {
-			return buserr.WithMap("ErrBackupCheck", map[string]interface{}{"err": err.Error()}, err)
-		}
+	isOk, err := u.checkBackupConn(&newBackup)
+	if err != nil || !isOk {
+		return buserr.WithMap("ErrBackupCheck", map[string]interface{}{"err": err.Error()}, err)
 	}
 
 	newBackup.AccessKey, err = encrypt.StringEncrypt(newBackup.AccessKey)
@@ -351,6 +228,44 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 	}
 	go syncAccountToAgent(backup, "update")
 	return nil
+}
+
+func (u *BackupService) RefreshToken(req dto.OperateByID) error {
+	backup, _ := backupRepo.Get(repo.WithByID(req.ID))
+	if backup.ID == 0 {
+		return constant.ErrRecordNotFound
+	}
+	if !backup.IsPublic {
+		return buserr.New(constant.ErrBackupPublic)
+	}
+	varMap := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(backup.Vars), &varMap); err != nil {
+		return fmt.Errorf("Failed to refresh %s - %s token, please retry, err: %v", backup.Type, backup.Name, err)
+	}
+	var (
+		refreshToken string
+		err          error
+	)
+	switch backup.Type {
+	case constant.OneDrive:
+		refreshToken, err = client.RefreshToken("refresh_token", "refreshToken", varMap)
+	case constant.GoogleDrive:
+		refreshToken, err = client.RefreshGoogleToken("refresh_token", "refreshToken", varMap)
+	case constant.ALIYUN:
+		refreshToken, err = client.RefreshALIToken(varMap)
+	}
+	if err != nil {
+		varMap["refresh_status"] = constant.StatusFailed
+		varMap["refresh_msg"] = err.Error()
+		return fmt.Errorf("Failed to refresh %s-%s token, please retry, err: %v", backup.Type, backup.Name, err)
+	}
+	varMap["refresh_status"] = constant.StatusSuccess
+	varMap["refresh_time"] = time.Now().Format(constant.DateTimeLayout)
+	varMap["refresh_token"] = refreshToken
+
+	varsItem, _ := json.Marshal(varMap)
+	backup.Vars = string(varsItem)
+	return backupRepo.Save(&backup)
 }
 
 func (u *BackupService) NewClient(backup *model.BackupAccount) (cloud_storage.CloudStorageClient, error) {
@@ -409,55 +324,6 @@ func (u *BackupService) loadRefreshTokenByCode(backup *model.BackupAccount) erro
 	return nil
 }
 
-func LoadLocalDirByStr(vars string) (string, error) {
-	varMap := make(map[string]interface{})
-	if err := json.Unmarshal([]byte(vars), &varMap); err != nil {
-		return "", err
-	}
-	if _, ok := varMap["dir"]; !ok {
-		return "", errors.New("load local backup dir failed")
-	}
-	baseDir, ok := varMap["dir"].(string)
-	if ok {
-		if _, err := os.Stat(baseDir); err != nil && os.IsNotExist(err) {
-			if err = os.MkdirAll(baseDir, os.ModePerm); err != nil {
-				return "", fmt.Errorf("mkdir %s failed, err: %v", baseDir, err)
-			}
-		}
-		return baseDir, nil
-	}
-	return "", fmt.Errorf("error type dir: %T", varMap["dir"])
-}
-
-func copyDir(src, dst string) error {
-	srcInfo, err := os.Stat(src)
-	if err != nil {
-		return err
-	}
-	if err = os.MkdirAll(dst, srcInfo.Mode()); err != nil {
-		return err
-	}
-	files, err := os.ReadDir(src)
-	if err != nil {
-		return err
-	}
-	for _, file := range files {
-		srcPath := fmt.Sprintf("%s/%s", src, file.Name())
-		dstPath := fmt.Sprintf("%s/%s", dst, file.Name())
-		if file.IsDir() {
-			if err = copyDir(srcPath, dstPath); err != nil {
-				global.LOG.Errorf("copy dir %s to %s failed, err: %v", srcPath, dstPath, err)
-			}
-		} else {
-			if err := fileUtils.CopyFile(srcPath, dst, false); err != nil {
-				global.LOG.Errorf("copy file %s to %s failed, err: %v", srcPath, dstPath, err)
-			}
-		}
-	}
-
-	return nil
-}
-
 func (u *BackupService) checkBackupConn(backup *model.BackupAccount) (bool, error) {
 	client, err := u.NewClient(backup)
 	if err != nil {
@@ -481,74 +347,22 @@ func (u *BackupService) checkBackupConn(backup *model.BackupAccount) (bool, erro
 	_, _ = write.WriteString("1Panelアカウントのテストファイルをバックアップします。\n")
 	write.Flush()
 
-	targetPath := strings.TrimPrefix(path.Join(backup.BackupPath, "test/1panel"), "/")
+	targetPath := path.Join(backup.BackupPath, "test/1panel")
+	if backup.Type != constant.Sftp && backup.Type != constant.Local && targetPath != "/" {
+		targetPath = strings.TrimPrefix(targetPath, "/")
+	}
 	return client.Upload(fileItem, targetPath)
 }
 
-func StartRefreshForToken() error {
-	service := NewIBackupService()
-	refreshID, err := global.Cron.AddJob("0 3 */31 * *", service)
-	if err != nil {
-		global.LOG.Errorf("add cron job of refresh backup account token failed, err: %s", err.Error())
-		return err
-	}
-	global.BackupAccountTokenEntryID = refreshID
-	return nil
-}
-
-func (u *BackupService) Run() {
-	refreshToken()
-}
-
-func refreshToken() {
-	var backups []model.BackupAccount
-	_ = global.DB.Where("`type` in (?)", []string{constant.OneDrive, constant.ALIYUN, constant.GoogleDrive}).Find(&backups)
-	if len(backups) == 0 {
+func syncAccountToAgent(backup model.BackupAccount, operation string) {
+	if !backup.IsPublic {
 		return
 	}
-	for _, backupItem := range backups {
-		if backupItem.ID == 0 {
-			continue
-		}
-		varMap := make(map[string]interface{})
-		if err := json.Unmarshal([]byte(backupItem.Vars), &varMap); err != nil {
-			global.LOG.Errorf("Failed to refresh %s - %s token, please retry, err: %v", backupItem.Type, backupItem.Name, err)
-			continue
-		}
-		var (
-			refreshToken string
-			err          error
-		)
-		switch backupItem.Type {
-		case constant.OneDrive:
-			refreshToken, err = client.RefreshToken("refresh_token", "refreshToken", varMap)
-		case constant.GoogleDrive:
-			refreshToken, err = client.RefreshGoogleToken("refresh_token", "refreshToken", varMap)
-		case constant.ALIYUN:
-			refreshToken, err = client.RefreshALIToken(varMap)
-		}
-		if err != nil {
-			varMap["refresh_status"] = constant.StatusFailed
-			varMap["refresh_msg"] = err.Error()
-			global.LOG.Errorf("Failed to refresh OneDrive token, please retry, err: %v", err)
-			continue
-		}
-		varMap["refresh_status"] = constant.StatusSuccess
-		varMap["refresh_time"] = time.Now().Format(constant.DateTimeLayout)
-		varMap["refresh_token"] = refreshToken
-
-		varsItem, _ := json.Marshal(varMap)
-		_ = global.DB.Model(&model.BackupAccount{}).Where("id = ?", backupItem.ID).Updates(map[string]interface{}{"vars": varsItem}).Error
-
-		go syncAccountToAgent(backupItem, "update")
-	}
-}
-
-func syncAccountToAgent(backup model.BackupAccount, operation string) {
 	backup.AccessKey, _ = encrypt.StringDecryptWithBase64(backup.AccessKey)
 	backup.Credential, _ = encrypt.StringDecryptWithBase64(backup.Credential)
 	itemData, _ := json.Marshal(backup)
 	itemJson := dto.SyncToAgent{Name: backup.Name, Operation: operation, Data: string(itemData)}
 	bodyItem, _ := json.Marshal(itemJson)
-	_ = xpack.RequestToAgent("/api/v2/backups/sync", http.MethodPost, bytes.NewReader((bodyItem)))
+	_ = xpack.RequestToAllAgent("/api/v2/backups/sync", http.MethodPost, bytes.NewReader((bodyItem)))
+	_, _ = httpUtils.NewLocalClient("/api/v2/backups/sync", http.MethodPost, bytes.NewReader((bodyItem)))
 }

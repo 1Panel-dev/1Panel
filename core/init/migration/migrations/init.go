@@ -15,7 +15,7 @@ import (
 )
 
 var AddTable = &gormigrate.Migration{
-	ID: "20241224-add-table",
+	ID: "20240109-add-table",
 	Migrate: func(tx *gorm.DB) error {
 		return tx.AutoMigrate(
 			&model.OperationLog{},
@@ -268,6 +268,16 @@ var UpdateSettingStatus = &gormigrate.Migration{
 			return err
 		}
 		if err := tx.Model(model.Setting{}).Where("value = ?", "disable").Update("value", constant.StatusDisable).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var RemoveLocalBackup = &gormigrate.Migration{
+	ID: "20250109-remove-local-backup",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Where("`type` = ?", constant.Local).Delete(&model.BackupAccount{}).Error; err != nil {
 			return err
 		}
 		return nil

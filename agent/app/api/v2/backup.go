@@ -40,12 +40,120 @@ func (b *BaseApi) SyncBackupAccount(c *gin.Context) {
 }
 
 // @Tags Backup Account
+// @Summary Create backup account
+// @Description 创建备份账号
+// @Accept json
+// @Param request body dto.BackupOperate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /backups [post]
+// @x-panel-log {"bodyKeys":["type"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建备份账号 [type]","formatEN":"create backup account [type]"}
+func (b *BaseApi) CreateBackup(c *gin.Context) {
+	var req dto.BackupOperate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := backupService.Create(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}
+
+// @Tags Backup Account
+// @Summary Refresh token
+// @Description 刷新 token
+// @Accept json
+// @Param request body dto.BackupOperate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /backups/refresh/token [post]
+func (b *BaseApi) RefreshToken(c *gin.Context) {
+	var req dto.OperateByID
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := backupService.RefreshToken(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}
+
+// @Tags Backup Account
+// @Summary List buckets
+// @Description 获取 bucket 列表
+// @Accept json
+// @Param request body dto.ForBuckets true "request"
+// @Success 200 {array} string
+// @Security ApiKeyAuth
+// @Router /buckets [post]
+func (b *BaseApi) ListBuckets(c *gin.Context) {
+	var req dto.ForBuckets
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	buckets, err := backupService.GetBuckets(req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, buckets)
+}
+
+// @Tags Backup Account
+// @Summary Delete backup account
+// @Description 删除备份账号
+// @Accept json
+// @Param request body dto.OperateByID true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /backups/del [post]
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"backup_accounts","output_column":"type","output_value":"types"}],"formatZH":"删除备份账号 [types]","formatEN":"delete backup account [types]"}
+func (b *BaseApi) DeleteBackup(c *gin.Context) {
+	var req dto.OperateByID
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := backupService.Delete(req.ID); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags Backup Account
+// @Summary Update backup account
+// @Description 更新备份账号信息
+// @Accept json
+// @Param request body dto.BackupOperate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /backups/update [post]
+// @x-panel-log {"bodyKeys":["type"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新备份账号 [types]","formatEN":"update backup account [types]"}
+func (b *BaseApi) UpdateBackup(c *gin.Context) {
+	var req dto.BackupOperate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := backupService.Update(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags Backup Account
 // @Summary Load backup account options
 // @Description 获取备份账号选项
 // @Accept json
 // @Success 200 {array} dto.BackupOption
 // @Security ApiKeyAuth
-// @Router /backup/options [get]
+// @Router /backups/options [get]
 func (b *BaseApi) LoadBackupOptions(c *gin.Context) {
 	list, err := backupService.LoadBackupOptions()
 	if err != nil {
@@ -56,20 +164,62 @@ func (b *BaseApi) LoadBackupOptions(c *gin.Context) {
 }
 
 // @Tags Backup Account
+// @Summary Search backup accounts with page
+// @Description 获取备份账号列表
+// @Accept json
+// @Param request body dto.SearchPageWithType true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /backups/search [post]
+func (b *BaseApi) SearchBackup(c *gin.Context) {
+	var req dto.SearchPageWithType
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	total, list, err := backupService.SearchWithPage(req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+
+	helper.SuccessWithData(c, dto.PageResult{
+		Items: list,
+		Total: total,
+	})
+}
+
+// @Tags Backup Account
+// @Summary get local backup dir
+// @Description 获取本地备份目录
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /backups/local [get]
+func (b *BaseApi) GetLocalDir(c *gin.Context) {
+	dir, err := backupService.GetLocalDir()
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+
+	helper.SuccessWithData(c, dir)
+}
+
+// @Tags Backup Account
 // @Summary Page backup records
 // @Description 获取备份记录列表分页
 // @Accept json
 // @Param request body dto.RecordSearch true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /backup/record/search [post]
+// @Router /backups/record/search [post]
 func (b *BaseApi) SearchBackupRecords(c *gin.Context) {
 	var req dto.RecordSearch
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 
-	total, list, err := backupService.SearchRecordsWithPage(req)
+	total, list, err := backupRecordService.SearchRecordsWithPage(req)
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -88,14 +238,14 @@ func (b *BaseApi) SearchBackupRecords(c *gin.Context) {
 // @Param request body dto.RecordSearchByCronjob true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /backup/record/search/bycronjob [post]
+// @Router /backups/record/search/bycronjob [post]
 func (b *BaseApi) SearchBackupRecordsByCronjob(c *gin.Context) {
 	var req dto.RecordSearchByCronjob
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 
-	total, list, err := backupService.SearchRecordsByCronjobWithPage(req)
+	total, list, err := backupRecordService.SearchRecordsByCronjobWithPage(req)
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -122,7 +272,7 @@ func (b *BaseApi) DownloadRecord(c *gin.Context) {
 		return
 	}
 
-	filePath, err := backupService.DownloadRecord(req)
+	filePath, err := backupRecordService.DownloadRecord(req)
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -145,7 +295,7 @@ func (b *BaseApi) DeleteBackupRecord(c *gin.Context) {
 		return
 	}
 
-	if err := backupService.BatchDeleteRecord(req.Ids); err != nil {
+	if err := backupRecordService.BatchDeleteRecord(req.Ids); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
@@ -159,14 +309,14 @@ func (b *BaseApi) DeleteBackupRecord(c *gin.Context) {
 // @Param request body dto.OperateByID true "request"
 // @Success 200 {array} string
 // @Security ApiKeyAuth
-// @Router /backup/search/files [post]
+// @Router /backups/search/files [post]
 func (b *BaseApi) LoadFilesFromBackup(c *gin.Context) {
 	var req dto.OperateByID
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 
-	data := backupService.ListFiles(req)
+	data := backupRecordService.ListFiles(req)
 	helper.SuccessWithData(c, data)
 }
 
@@ -177,7 +327,7 @@ func (b *BaseApi) LoadFilesFromBackup(c *gin.Context) {
 // @Param request body dto.CommonBackup true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /backup/backup [post]
+// @Router /backups/backup [post]
 // @x-panel-log {"bodyKeys":["type","name","detailName"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"备份 [type] 数据 [name][detailName]","formatEN":"backup [type] data [name][detailName]"}
 func (b *BaseApi) Backup(c *gin.Context) {
 	var req dto.CommonBackup
@@ -222,7 +372,7 @@ func (b *BaseApi) Backup(c *gin.Context) {
 // @Param request body dto.CommonRecover true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /backup/recover [post]
+// @Router /backups/recover [post]
 // @x-panel-log {"bodyKeys":["type","name","detailName","file"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"从 [file] 恢复 [type] 数据 [name][detailName]","formatEN":"recover [type] data [name][detailName] from [file]"}
 func (b *BaseApi) Recover(c *gin.Context) {
 	var req dto.CommonRecover
@@ -230,7 +380,7 @@ func (b *BaseApi) Recover(c *gin.Context) {
 		return
 	}
 
-	downloadPath, err := backupService.DownloadRecord(dto.DownloadRecord{
+	downloadPath, err := backupRecordService.DownloadRecord(dto.DownloadRecord{
 		DownloadAccountID: req.DownloadAccountID,
 		FileDir:           path.Dir(req.File),
 		FileName:          path.Base(req.File),
@@ -277,7 +427,7 @@ func (b *BaseApi) Recover(c *gin.Context) {
 // @Param request body dto.CommonRecover true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /backup/recover/byupload [post]
+// @Router /backups/recover/byupload [post]
 // @x-panel-log {"bodyKeys":["type","name","detailName","file"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"从 [file] 恢复 [type] 数据 [name][detailName]","formatEN":"recover [type] data [name][detailName] from [file]"}
 func (b *BaseApi) RecoverByUpload(c *gin.Context) {
 	var req dto.CommonRecover

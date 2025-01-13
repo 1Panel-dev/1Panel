@@ -15,7 +15,7 @@ import (
 // @Param request body dto.BackupOperate true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /core/backup [post]
+// @Router /core/backups [post]
 // @x-panel-log {"bodyKeys":["type"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建备份账号 [type]","formatEN":"create backup account [type]"}
 func (b *BaseApi) CreateBackup(c *gin.Context) {
 	var req dto.BackupOperate
@@ -27,18 +27,27 @@ func (b *BaseApi) CreateBackup(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithData(c, nil)
+	helper.SuccessWithOutData(c)
 }
 
 // @Tags Backup Account
 // @Summary Refresh token
 // @Description 刷新 token
+// @Accept json
+// @Param request body dto.BackupOperate true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /core/backup/refresh/token [post]
+// @Router /core/backups/refresh/token [post]
 func (b *BaseApi) RefreshToken(c *gin.Context) {
-	backupService.Run()
-	helper.SuccessWithData(c, nil)
+	var req dto.OperateByID
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := backupService.RefreshToken(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
 }
 
 // @Tags Backup Account
@@ -48,7 +57,7 @@ func (b *BaseApi) RefreshToken(c *gin.Context) {
 // @Param request body dto.ForBuckets true "request"
 // @Success 200 {array} string
 // @Security ApiKeyAuth
-// @Router /core/backup/search [post]
+// @Router /core/backups/buckets [post]
 func (b *BaseApi) ListBuckets(c *gin.Context) {
 	var req dto.ForBuckets
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -69,7 +78,7 @@ func (b *BaseApi) ListBuckets(c *gin.Context) {
 // @Accept json
 // @Success 200 {object} dto.OneDriveInfo
 // @Security ApiKeyAuth
-// @Router /core/backup/client/:clientType [get]
+// @Router /core/backups/client/:clientType [get]
 func (b *BaseApi) LoadBackupClientInfo(c *gin.Context) {
 	clientType, ok := c.Params.Get("clientType")
 	if !ok {
@@ -91,7 +100,7 @@ func (b *BaseApi) LoadBackupClientInfo(c *gin.Context) {
 // @Param request body dto.OperateByID true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /core/backup/del [post]
+// @Router /core/backups/del [post]
 // @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"backup_accounts","output_column":"type","output_value":"types"}],"formatZH":"删除备份账号 [types]","formatEN":"delete backup account [types]"}
 func (b *BaseApi) DeleteBackup(c *gin.Context) {
 	var req dto.OperateByID
@@ -113,7 +122,7 @@ func (b *BaseApi) DeleteBackup(c *gin.Context) {
 // @Param request body dto.BackupOperate true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /core/backup/update [post]
+// @Router /core/backups/update [post]
 // @x-panel-log {"bodyKeys":["type"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新备份账号 [types]","formatEN":"update backup account [types]"}
 func (b *BaseApi) UpdateBackup(c *gin.Context) {
 	var req dto.BackupOperate
@@ -126,46 +135,4 @@ func (b *BaseApi) UpdateBackup(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithData(c, nil)
-}
-
-// @Tags Backup Account
-// @Summary Search backup accounts with page
-// @Description 获取备份账号列表
-// @Accept json
-// @Param request body dto.SearchPageWithType true "request"
-// @Success 200
-// @Security ApiKeyAuth
-// @Router /core/backup/search [post]
-func (b *BaseApi) SearchBackup(c *gin.Context) {
-	var req dto.SearchPageWithType
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-
-	total, list, err := backupService.SearchWithPage(req)
-	if err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-
-	helper.SuccessWithData(c, dto.PageResult{
-		Items: list,
-		Total: total,
-	})
-}
-
-// @Tags Backup Account
-// @Summary get local backup dir
-// @Description 获取本地备份目录
-// @Success 200
-// @Security ApiKeyAuth
-// @Router /core/backup/local [get]
-func (b *BaseApi) GetLocalDir(c *gin.Context) {
-	dir, err := backupService.GetLocalDir()
-	if err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-
-	helper.SuccessWithData(c, dir)
 }

@@ -28,7 +28,8 @@ ErrNoSuchHost: "網路連接失敗"
 #backup
 ErrBackupInUsed: "該備份帳號已在計劃任務中使用，無法刪除"
 ErrBackupCheck: "備份帳號測試連接失敗 {{.err}}"
-ErrBackupLocalDelete: "暫不支持刪除本地伺服器備份帳號"
+ErrBackupLocal: "本地伺服器備份帳號暫不支持該操作！"
+ErrBackupPublic: "檢測到該備份帳號為非公用，請檢查後重試！"
 
 #license
 ErrLicense: "許可證格式錯誤，請檢查後重試！"

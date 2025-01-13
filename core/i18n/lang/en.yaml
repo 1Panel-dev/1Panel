@@ -28,7 +28,8 @@ ErrNoSuchHost: "Network connection failed"
 #backup
 ErrBackupInUsed: "The backup account is currently in use in a scheduled task and cannot be deleted."
 ErrBackupCheck: "Backup account test connection failed {{.err}}"
-ErrBackupLocalDelete: "Deleting local server backup accounts is not currently supported."
+ErrBackupLocal: "The local server backup account does not support this operation at the moment!"
+ErrBackupPublic: "Detected that the backup account is non-public, please check and try again!"
 
 #license
 ErrLicense: "License format error, please check and try again!"

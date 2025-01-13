@@ -15,9 +15,7 @@ func (s *BackupRouter) InitRouter(Router *gin.RouterGroup) {
 		Use(middleware.PasswordExpired())
 	baseApi := v2.ApiGroupApp.BaseApi
 	{
-		backupRouter.GET("/local", baseApi.GetLocalDir)
 		backupRouter.GET("/client/:clientType", baseApi.LoadBackupClientInfo)
-		backupRouter.POST("/search", baseApi.SearchBackup)
 		backupRouter.POST("/refresh/token", baseApi.RefreshToken)
 		backupRouter.POST("/buckets", baseApi.ListBuckets)
 		backupRouter.POST("", baseApi.CreateBackup)

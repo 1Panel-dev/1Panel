@@ -122,14 +122,21 @@ var (
 )
 
 var (
-	ErrBackupInUsed = "ErrBackupInUsed"
-	ErrOSSConn      = "ErrOSSConn"
-	ErrEntrance     = "ErrEntrance"
+	ErrOSSConn  = "ErrOSSConn"
+	ErrEntrance = "ErrEntrance"
 )
 
 var (
 	ErrFirewallNone = "ErrFirewallNone"
 	ErrFirewallBoth = "ErrFirewallBoth"
+)
+
+// backup
+var (
+	ErrBackupInUsed      = "ErrBackupInUsed"
+	ErrBackupCheck       = "ErrBackupCheck"
+	ErrBackupLocalDelete = "ErrBackupLocalDelete"
+	ErrBackupLocalCreate = "ErrBackupLocalCreate"
 )
 
 var (

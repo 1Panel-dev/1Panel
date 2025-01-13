@@ -1479,6 +1479,13 @@ const message = {
         developerModeHelper: 'Get a preview version of 1Panel to provide feedback on new features and updates',
 
         thirdParty: 'Third-party Account',
+        scope: 'Scope',
+        public: 'Public',
+        publicHelper:
+            'Public type backup accounts will be synchronized to each sub-node, and sub-nodes can use them together',
+        private: 'Private',
+        privateHelper:
+            'Private type backup accounts are only created on the current node and are for the use of the current node only',
         createBackupAccount: 'Add {0}',
         noTypeForCreate: 'No backup type is currently created',
         LOCAL: 'Server Disks',

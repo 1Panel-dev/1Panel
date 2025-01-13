@@ -5,6 +5,20 @@
                 <el-tag v-if="dialogData.title === 'edit'">{{ dialogData.rowData!.name }}</el-tag>
                 <el-input v-else v-model="dialogData.rowData!.name" />
             </el-form-item>
+            <el-form-item
+                v-if="globalStore.isProductPro"
+                :label="$t('setting.scope')"
+                prop="isPublic"
+                :rules="Rules.requiredSelect"
+            >
+                <el-radio-group v-model="dialogData.rowData!.isPublic">
+                    <el-radio :value="true" size="large">{{ $t('setting.public') }}</el-radio>
+                    <el-radio :value="false" size="large">{{ $t('setting.private') }}</el-radio>
+                    <span class="input-help">
+                        {{ dialogData.rowData!.isPublic ? $t('setting.publicHelper') : $t('setting.privateHelper') }}
+                    </span>
+                </el-radio-group>
+            </el-form-item>
             <el-form-item :label="$t('commons.table.type')" prop="type" :rules="Rules.requiredSelect">
                 <el-tag v-if="dialogData.title === 'edit'">{{ $t('setting.' + dialogData.rowData!.type) }}</el-tag>
                 <el-select v-else v-model="dialogData.rowData!.type" @change="changeType">
@@ -147,7 +161,7 @@
             >
                 <el-input v-model.trim="dialogData.rowData!.varsJson['endpointItem']">
                     <template #prepend>
-                        <el-select v-model.trim="domainProto" class="p-w-120">
+                        <el-select v-model.trim="domainProto" class="p-w-100">
                             <el-option label="http" value="http" />
                             <el-option label="https" value="https" />
                         </el-select>
@@ -348,18 +362,18 @@
             <el-form-item
                 v-if="dialogData.rowData!.type === 'SFTP'"
                 :label="$t('setting.backupDir')"
-                prop="bucket"
+                prop="backupPath"
                 :rules="[Rules.requiredInput]"
             >
-                <el-input v-model.trim="dialogData.rowData!.bucket" />
+                <el-input v-model.trim="dialogData.rowData!.backupPath" />
             </el-form-item>
             <el-form-item
                 v-if="dialogData.rowData!.type === 'LOCAL'"
                 :label="$t('setting.backupDir')"
-                prop="varsJson['dir']"
+                prop="backupPath"
                 :rules="Rules.requiredInput"
             >
-                <el-input v-model="dialogData.rowData!.varsJson['dir']">
+                <el-input v-model="dialogData.rowData!.backupPath">
                     <template #prepend>
                         <FileList @choose="loadDir" :dir="true"></FileList>
                     </template>
@@ -388,6 +402,8 @@ import { cities } from './../helper';
 import { deepCopy, spliceHttp, splitHttp } from '@/utils/util';
 import { MsgSuccess } from '@/utils/message';
 import { Base64 } from 'js-base64';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const loading = ref(false);
 type FormInstance = InstanceType<typeof ElForm>;
@@ -527,13 +543,14 @@ const hasPassword = () => {
     let itemType = dialogData.value.rowData!.type;
     return itemType === 'SFTP' || itemType === 'WebDAV';
 };
+
 const hasBackDir = () => {
     let itemType = dialogData.value.rowData!.type;
     return itemType !== 'LOCAL' && itemType !== 'SFTP';
 };
 
 const loadDir = async (path: string) => {
-    dialogData.value.rowData!.varsJson['dir'] = path;
+    dialogData.value.rowData!.backupPath = path;
 };
 
 const changeType = async () => {
@@ -610,6 +627,7 @@ const getBuckets = async () => {
     }
     item['endpointItem'] = undefined;
     listBucket({
+        isPublic: dialogData.value.rowData!.isPublic,
         type: dialogData.value.rowData!.type,
         vars: JSON.stringify(item),
         accessKey: dialogData.value.rowData!.accessKey,

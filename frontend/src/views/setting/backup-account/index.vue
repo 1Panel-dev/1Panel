@@ -34,10 +34,22 @@
                         prop="name"
                         show-overflow-tooltip
                     />
+                    <el-table-column
+                        v-if="globalStore.isProductPro"
+                        :label="$t('setting.scope')"
+                        :min-width="80"
+                        prop="isPublic"
+                    >
+                        <template #default="{ row }">
+                            <el-button plain size="small">
+                                {{ row.isPublic ? $t('setting.public') : $t('setting.private') }}
+                            </el-button>
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('commons.table.type')" :min-width="80" prop="type">
                         <template #default="{ row }">
                             <el-tag>{{ $t('setting.' + row.type) }}</el-tag>
-                            <el-tooltip>
+                            <el-tooltip v-if="row.type === 'OneDrive'">
                                 <template #content>
                                     {{ $t('setting.clickToRefresh') }}
                                     <br />
@@ -56,7 +68,7 @@
                                     <br />
                                     {{ $t('setting.refreshTime') + ':' + row.varsJson['refresh_time'] }}
                                 </template>
-                                <el-tag @click="refreshItemToken" v-if="row.type === 'OneDrive'" class="ml-1">
+                                <el-tag @click="refreshItemToken(row)" class="ml-1">
                                     {{ 'Token ' + $t('commons.button.refresh') }}
                                 </el-tag>
                             </el-tooltip>
@@ -102,6 +114,8 @@ import Operate from '@/views/setting/backup-account/operate/index.vue';
 import { Backup } from '@/api/interface/backup';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const loading = ref();
 const data = ref();
@@ -159,7 +173,7 @@ const onDelete = async (row: Backup.BackupInfo) => {
             i18n.global.t('commons.button.delete'),
         ]),
         api: deleteBackup,
-        params: { id: row.id },
+        params: { id: row.id, isPublic: row.isPublic },
     });
 };
 
@@ -167,6 +181,7 @@ const onOpenDialog = async (
     title: string,
     rowData: Partial<Backup.BackupInfo> = {
         id: 0,
+        isPublic: false,
         varsJson: {},
     },
 ) => {
@@ -177,8 +192,8 @@ const onOpenDialog = async (
     dialogRef.value!.acceptParams(params);
 };
 
-const refreshItemToken = async () => {
-    await refreshToken();
+const refreshItemToken = async (row: any) => {
+    await refreshToken({ id: row.id, isPublic: row.isPublic });
     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     search();
 };

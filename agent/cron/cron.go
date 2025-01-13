@@ -46,6 +46,9 @@ func Run() {
 	if _, err := global.Cron.AddJob(fmt.Sprintf("%v %v * * *", mathRand.Intn(60), mathRand.Intn(3)), job.NewAppStoreJob()); err != nil {
 		global.LOG.Errorf("can not add  appstore corn job: %s", err.Error())
 	}
+	if _, err := global.Cron.AddJob("0 3 */31 * *", job.NewBackupJob()); err != nil {
+		global.LOG.Errorf("can not add  backup token refresh corn job: %s", err.Error())
+	}
 
 	var cronJobs []model.Cronjob
 	if err := global.DB.Where("status = ?", constant.StatusEnable).Find(&cronJobs).Error; err != nil {

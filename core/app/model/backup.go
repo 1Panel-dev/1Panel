@@ -2,8 +2,9 @@ package model
 
 type BackupAccount struct {
 	BaseModel
-	Name       string `gorm:"not null" json:"name"`
-	Type       string `gorm:"not null" json:"type"`
+	Name       string `gorm:"not null;default:''" json:"name"`
+	Type       string `gorm:"not null;default:''" json:"type"`
+	IsPublic   bool   `json:"isPublic"`
 	Bucket     string `json:"bucket"`
 	AccessKey  string `json:"accessKey"`
 	Credential string `json:"credential"`

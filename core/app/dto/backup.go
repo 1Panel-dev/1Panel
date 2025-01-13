@@ -12,6 +12,7 @@ type BackupOperate struct {
 	ID         uint   `json:"id"`
 	Name       string `json:"name"`
 	Type       string `json:"type" validate:"required"`
+	IsPublic   bool   `json:"isPublic"`
 	Bucket     string `json:"bucket"`
 	AccessKey  string `json:"accessKey"`
 	Credential string `json:"credential"`
@@ -25,6 +26,7 @@ type BackupInfo struct {
 	ID         uint      `json:"id"`
 	Name       string    `json:"name"`
 	Type       string    `json:"type"`
+	IsPublic   bool      `json:"isPublic"`
 	Bucket     string    `json:"bucket"`
 	AccessKey  string    `json:"accessKey"`
 	Credential string    `json:"credential"`

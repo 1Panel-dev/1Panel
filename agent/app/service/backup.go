@@ -1,17 +1,17 @@
 package service
 
 import (
-	"context"
+	"bufio"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"os"
 	"path"
-	"sort"
 	"strconv"
 	"strings"
-	"sync"
+	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -19,7 +19,9 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cloud_storage"
+	"github.com/1Panel-dev/1Panel/agent/utils/cloud_storage/client"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
+	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
 )
@@ -31,15 +33,13 @@ type IBackupService interface {
 	Sync(req dto.SyncFromMaster) error
 
 	LoadBackupOptions() ([]dto.BackupOption, error)
-
-	SearchRecordsWithPage(search dto.RecordSearch) (int64, []dto.BackupRecords, error)
-	SearchRecordsByCronjobWithPage(search dto.RecordSearchByCronjob) (int64, []dto.BackupRecords, error)
-	DownloadRecord(info dto.DownloadRecord) (string, error)
-	DeleteRecordByName(backupType, name, detailName string, withDeleteFile bool) error
-	BatchDeleteRecord(ids []uint) error
-	ListAppRecords(name, detailName, fileName string) ([]model.BackupRecord, error)
-
-	ListFiles(req dto.OperateByID) []string
+	SearchWithPage(search dto.SearchPageWithType) (int64, interface{}, error)
+	Create(backupDto dto.BackupOperate) error
+	GetBuckets(backupDto dto.ForBuckets) ([]interface{}, error)
+	Update(req dto.BackupOperate) error
+	Delete(id uint) error
+	RefreshToken(req dto.OperateByID) error
+	GetLocalDir() (string, error)
 
 	MysqlBackup(db dto.CommonBackup) error
 	PostgresqlBackup(db dto.CommonBackup) error
@@ -60,6 +60,278 @@ type IBackupService interface {
 
 func NewIBackupService() IBackupService {
 	return &BackupService{}
+}
+
+func (u *BackupService) GetLocalDir() (string, error) {
+	account, err := backupRepo.Get(repo.WithByType(constant.Local))
+	if err != nil {
+		return "", err
+	}
+	return account.BackupPath, nil
+}
+
+func (u *BackupService) SearchWithPage(req dto.SearchPageWithType) (int64, interface{}, error) {
+	options := []repo.DBOption{repo.WithOrderBy("created_at desc")}
+	if len(req.Type) != 0 {
+		options = append(options, repo.WithByType(req.Type))
+	}
+	if len(req.Info) != 0 {
+		options = append(options, repo.WithByType(req.Info))
+	}
+	count, accounts, err := backupRepo.Page(req.Page, req.PageSize, options...)
+	if err != nil {
+		return 0, nil, err
+	}
+	var data []dto.BackupInfo
+	for _, account := range accounts {
+		var item dto.BackupInfo
+		if err := copier.Copy(&item, &account); err != nil {
+			global.LOG.Errorf("copy backup account to dto backup info failed, err: %v", err)
+		}
+		if !item.RememberAuth {
+			item.AccessKey = ""
+			item.Credential = ""
+			if account.Type == constant.Sftp {
+				varMap := make(map[string]interface{})
+				if err := json.Unmarshal([]byte(item.Vars), &varMap); err != nil {
+					continue
+				}
+				delete(varMap, "passPhrase")
+				itemVars, _ := json.Marshal(varMap)
+				item.Vars = string(itemVars)
+			}
+		} else {
+			item.AccessKey = base64.StdEncoding.EncodeToString([]byte(item.AccessKey))
+			item.Credential = base64.StdEncoding.EncodeToString([]byte(item.Credential))
+		}
+
+		if account.Type == constant.OneDrive || account.Type == constant.ALIYUN || account.Type == constant.GoogleDrive {
+			varMap := make(map[string]interface{})
+			if err := json.Unmarshal([]byte(item.Vars), &varMap); err != nil {
+				continue
+			}
+			delete(varMap, "refresh_token")
+			delete(varMap, "drive_id")
+			itemVars, _ := json.Marshal(varMap)
+			item.Vars = string(itemVars)
+		}
+		data = append(data, item)
+	}
+	return count, data, nil
+}
+
+func (u *BackupService) Create(req dto.BackupOperate) error {
+	if req.Type == constant.Local {
+		return buserr.New(constant.ErrBackupLocalCreate)
+	}
+	backup, _ := backupRepo.Get(repo.WithByName(req.Name))
+	if backup.ID != 0 {
+		return constant.ErrRecordExist
+	}
+	if err := copier.Copy(&backup, &req); err != nil {
+		return errors.WithMessage(constant.ErrStructTransform, err.Error())
+	}
+	itemAccessKey, err := base64.StdEncoding.DecodeString(backup.AccessKey)
+	if err != nil {
+		return err
+	}
+	backup.AccessKey = string(itemAccessKey)
+	itemCredential, err := base64.StdEncoding.DecodeString(backup.Credential)
+	if err != nil {
+		return err
+	}
+	backup.Credential = string(itemCredential)
+
+	if req.Type == constant.OneDrive || req.Type == constant.GoogleDrive {
+		if err := loadRefreshTokenByCode(&backup); err != nil {
+			return err
+		}
+	}
+	if req.Type != "LOCAL" {
+		isOk, err := u.checkBackupConn(&backup)
+		if err != nil || !isOk {
+			return buserr.WithMap(constant.ErrBackupCheck, map[string]interface{}{"err": err.Error()}, err)
+		}
+	}
+
+	backup.AccessKey, err = encrypt.StringEncrypt(backup.AccessKey)
+	if err != nil {
+		return err
+	}
+	backup.Credential, err = encrypt.StringEncrypt(backup.Credential)
+	if err != nil {
+		return err
+	}
+	if err := backupRepo.Create(&backup); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *BackupService) GetBuckets(req dto.ForBuckets) ([]interface{}, error) {
+	itemAccessKey, err := base64.StdEncoding.DecodeString(req.AccessKey)
+	if err != nil {
+		return nil, err
+	}
+	req.AccessKey = string(itemAccessKey)
+	itemCredential, err := base64.StdEncoding.DecodeString(req.Credential)
+	if err != nil {
+		return nil, err
+	}
+	req.Credential = string(itemCredential)
+
+	varMap := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(req.Vars), &varMap); err != nil {
+		return nil, err
+	}
+	switch req.Type {
+	case constant.Sftp, constant.WebDAV:
+		varMap["username"] = req.AccessKey
+		varMap["password"] = req.Credential
+	case constant.OSS, constant.S3, constant.MinIo, constant.Cos, constant.Kodo:
+		varMap["accessKey"] = req.AccessKey
+		varMap["secretKey"] = req.Credential
+	}
+	client, err := cloud_storage.NewCloudStorageClient(req.Type, varMap)
+	if err != nil {
+		return nil, err
+	}
+	return client.ListBuckets()
+}
+
+func (u *BackupService) Delete(id uint) error {
+	backup, _ := backupRepo.Get(repo.WithByID(id))
+	if backup.ID == 0 {
+		return constant.ErrRecordNotFound
+	}
+	if backup.Type == constant.Local {
+		return buserr.New(constant.ErrBackupLocalDelete)
+	}
+	return backupRepo.Delete(repo.WithByID(id))
+}
+
+func (u *BackupService) Update(req dto.BackupOperate) error {
+	backup, _ := backupRepo.Get(repo.WithByID(req.ID))
+	if backup.ID == 0 {
+		return constant.ErrRecordNotFound
+	}
+	var newBackup model.BackupAccount
+	if err := copier.Copy(&newBackup, &req); err != nil {
+		return errors.WithMessage(constant.ErrStructTransform, err.Error())
+	}
+	itemAccessKey, err := base64.StdEncoding.DecodeString(newBackup.AccessKey)
+	if err != nil {
+		return err
+	}
+	newBackup.AccessKey = string(itemAccessKey)
+	itemCredential, err := base64.StdEncoding.DecodeString(newBackup.Credential)
+	if err != nil {
+		return err
+	}
+	newBackup.Credential = string(itemCredential)
+	if backup.Type == constant.Local {
+		if newBackup.Vars != backup.Vars {
+			oldPath := backup.BackupPath
+			newPath := newBackup.BackupPath
+			if strings.HasSuffix(newPath, "/") && newPath != "/" {
+				newPath = newPath[:strings.LastIndex(newPath, "/")]
+			}
+			if err := files.NewFileOp().CopyDir(oldPath, newPath); err != nil {
+				return err
+			}
+		}
+	}
+
+	if newBackup.Type == constant.OneDrive || newBackup.Type == constant.GoogleDrive {
+		if err := loadRefreshTokenByCode(&backup); err != nil {
+			return err
+		}
+	}
+	if backup.Type != "LOCAL" {
+		isOk, err := u.checkBackupConn(&newBackup)
+		if err != nil || !isOk {
+			return buserr.WithMap("ErrBackupCheck", map[string]interface{}{"err": err.Error()}, err)
+		}
+	}
+
+	newBackup.AccessKey, err = encrypt.StringEncrypt(newBackup.AccessKey)
+	if err != nil {
+		return err
+	}
+	newBackup.Credential, err = encrypt.StringEncrypt(newBackup.Credential)
+	if err != nil {
+		return err
+	}
+	newBackup.ID = backup.ID
+	if err := backupRepo.Save(&newBackup); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *BackupService) RefreshToken(req dto.OperateByID) error {
+	backup, _ := backupRepo.Get(repo.WithByID(req.ID))
+	if backup.ID == 0 {
+		return constant.ErrRecordNotFound
+	}
+	varMap := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(backup.Vars), &varMap); err != nil {
+		return fmt.Errorf("Failed to refresh %s - %s token, please retry, err: %v", backup.Type, backup.Name, err)
+	}
+	var (
+		refreshToken string
+		err          error
+	)
+	switch backup.Type {
+	case constant.OneDrive:
+		refreshToken, err = client.RefreshToken("refresh_token", "refreshToken", varMap)
+	case constant.GoogleDrive:
+		refreshToken, err = client.RefreshGoogleToken("refresh_token", "refreshToken", varMap)
+	case constant.ALIYUN:
+		refreshToken, err = client.RefreshALIToken(varMap)
+	}
+	if err != nil {
+		varMap["refresh_status"] = constant.StatusFailed
+		varMap["refresh_msg"] = err.Error()
+		return fmt.Errorf("Failed to refresh %s-%s token, please retry, err: %v", backup.Type, backup.Name, err)
+	}
+	varMap["refresh_status"] = constant.StatusSuccess
+	varMap["refresh_time"] = time.Now().Format(constant.DateTimeLayout)
+	varMap["refresh_token"] = refreshToken
+
+	varsItem, _ := json.Marshal(varMap)
+	backup.Vars = string(varsItem)
+	return backupRepo.Save(&backup)
+}
+
+func (u *BackupService) checkBackupConn(backup *model.BackupAccount) (bool, error) {
+	client, err := newClient(backup)
+	if err != nil {
+		return false, err
+	}
+	fileItem := path.Join(global.CONF.System.BaseDir, "1panel/tmp/test/1panel")
+	if _, err := os.Stat(path.Dir(fileItem)); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(path.Dir(fileItem), os.ModePerm); err != nil {
+			return false, err
+		}
+	}
+	file, err := os.OpenFile(fileItem, os.O_WRONLY|os.O_CREATE, constant.FilePerm)
+	if err != nil {
+		return false, err
+	}
+	defer file.Close()
+	write := bufio.NewWriter(file)
+	_, _ = write.WriteString("1Panel 备份账号测试文件。\n")
+	_, _ = write.WriteString("1Panel 備份賬號測試文件。\n")
+	_, _ = write.WriteString("1Panel Backs up account test files.\n")
+	_, _ = write.WriteString("1Panelアカウントのテストファイルをバックアップします。\n")
+	write.Flush()
+
+	targetPath := path.Join(backup.BackupPath, "test/1panel")
+	if backup.Type != constant.Sftp && backup.Type != constant.Local && targetPath != "/" {
+		targetPath = strings.TrimPrefix(targetPath, "/")
+	}
+	return client.Upload(fileItem, targetPath)
 }
 
 func (u *BackupService) Sync(req dto.SyncFromMaster) error {
@@ -109,48 +381,6 @@ func (u *BackupService) LoadBackupOptions() ([]dto.BackupOption, error) {
 	return data, nil
 }
 
-func (u *BackupService) SearchRecordsWithPage(search dto.RecordSearch) (int64, []dto.BackupRecords, error) {
-	total, records, err := backupRepo.PageRecord(
-		search.Page, search.PageSize,
-		repo.WithOrderBy("created_at desc"),
-		repo.WithByName(search.Name),
-		repo.WithByType(search.Type),
-		repo.WithByDetailName(search.DetailName),
-	)
-	if err != nil {
-		return 0, nil, err
-	}
-
-	if total == 0 {
-		return 0, nil, nil
-	}
-	datas, err := u.loadRecordSize(records)
-	sort.Slice(datas, func(i, j int) bool {
-		return datas[i].CreatedAt.After(datas[j].CreatedAt)
-	})
-	return total, datas, err
-}
-
-func (u *BackupService) SearchRecordsByCronjobWithPage(search dto.RecordSearchByCronjob) (int64, []dto.BackupRecords, error) {
-	total, records, err := backupRepo.PageRecord(
-		search.Page, search.PageSize,
-		repo.WithOrderBy("created_at desc"),
-		backupRepo.WithByCronID(search.CronjobID),
-	)
-	if err != nil {
-		return 0, nil, err
-	}
-
-	if total == 0 {
-		return 0, nil, nil
-	}
-	datas, err := u.loadRecordSize(records)
-	sort.Slice(datas, func(i, j int) bool {
-		return datas[i].CreatedAt.After(datas[j].CreatedAt)
-	})
-	return total, datas, err
-}
-
 func (u *BackupService) CheckUsed(id uint) error {
 	cronjobs, _ := cronjobRepo.List()
 	for _, job := range cronjobs {
@@ -167,178 +397,8 @@ func (u *BackupService) CheckUsed(id uint) error {
 	return nil
 }
 
-type loadSizeHelper struct {
-	isOk       bool
-	backupName string
-	backupPath string
-	client     cloud_storage.CloudStorageClient
-}
-
-func (u *BackupService) DownloadRecord(info dto.DownloadRecord) (string, error) {
-	account, client, err := NewBackupClientWithID(info.DownloadAccountID)
-	if err != nil {
-		return "", fmt.Errorf("new cloud storage client failed, err: %v", err)
-	}
-	if account.Type == "LOCAL" {
-		return path.Join(global.CONF.System.Backup, info.FileDir, info.FileName), nil
-	}
-	targetPath := fmt.Sprintf("%s/download/%s/%s", constant.DataDir, info.FileDir, info.FileName)
-	if _, err := os.Stat(path.Dir(targetPath)); err != nil && os.IsNotExist(err) {
-		if err = os.MkdirAll(path.Dir(targetPath), os.ModePerm); err != nil {
-			global.LOG.Errorf("mkdir %s failed, err: %v", path.Dir(targetPath), err)
-		}
-	}
-	srcPath := fmt.Sprintf("%s/%s", info.FileDir, info.FileName)
-	if len(account.BackupPath) != 0 {
-		srcPath = path.Join(strings.TrimPrefix(account.BackupPath, "/"), srcPath)
-	}
-	if exist, _ := client.Exist(srcPath); exist {
-		isOK, err := client.Download(srcPath, targetPath)
-		if !isOK {
-			return "", fmt.Errorf("cloud storage download failed, err: %v", err)
-		}
-	}
-	return targetPath, nil
-}
-
-func (u *BackupService) DeleteRecordByName(backupType, name, detailName string, withDeleteFile bool) error {
-	if !withDeleteFile {
-		return backupRepo.DeleteRecord(context.Background(), repo.WithByType(backupType), repo.WithByName(name), repo.WithByDetailName(detailName))
-	}
-
-	records, err := backupRepo.ListRecord(repo.WithByType(backupType), repo.WithByName(name), repo.WithByDetailName(detailName))
-	if err != nil {
-		return err
-	}
-
-	for _, record := range records {
-		_, client, err := NewBackupClientWithID(record.DownloadAccountID)
-		if err != nil {
-			global.LOG.Errorf("new client for backup account failed, err: %v", err)
-			continue
-		}
-		if _, err = client.Delete(path.Join(record.FileDir, record.FileName)); err != nil {
-			global.LOG.Errorf("remove file %s failed, err: %v", path.Join(record.FileDir, record.FileName), err)
-		}
-		_ = backupRepo.DeleteRecord(context.Background(), repo.WithByID(record.ID))
-	}
-	return nil
-}
-
-func (u *BackupService) BatchDeleteRecord(ids []uint) error {
-	records, err := backupRepo.ListRecord(repo.WithByIDs(ids))
-	if err != nil {
-		return err
-	}
-	for _, record := range records {
-		_, client, err := NewBackupClientWithID(record.DownloadAccountID)
-		if err != nil {
-			global.LOG.Errorf("new client for backup account failed, err: %v", err)
-			continue
-		}
-		if _, err = client.Delete(path.Join(record.FileDir, record.FileName)); err != nil {
-			global.LOG.Errorf("remove file %s failed, err: %v", path.Join(record.FileDir, record.FileName), err)
-		}
-	}
-	return backupRepo.DeleteRecord(context.Background(), repo.WithByIDs(ids))
-}
-
-func (u *BackupService) ListAppRecords(name, detailName, fileName string) ([]model.BackupRecord, error) {
-	records, err := backupRepo.ListRecord(
-		repo.WithOrderBy("created_at asc"),
-		repo.WithByName(name),
-		repo.WithByType("app"),
-		backupRepo.WithFileNameStartWith(fileName),
-		backupRepo.WithByDetailName(detailName),
-	)
-	if err != nil {
-		return nil, err
-	}
-	return records, err
-}
-
-func (u *BackupService) ListFiles(req dto.OperateByID) []string {
-	var datas []string
-	account, client, err := NewBackupClientWithID(req.ID)
-	if err != nil {
-		return datas
-	}
-	prefix := "system_snapshot"
-	if len(account.BackupPath) != 0 {
-		prefix = path.Join(strings.TrimPrefix(account.BackupPath, "/"), prefix)
-	}
-	files, err := client.ListObjects(prefix)
-	if err != nil {
-		global.LOG.Debugf("load files failed, err: %v", err)
-		return datas
-	}
-	for _, file := range files {
-		if len(file) != 0 {
-			datas = append(datas, path.Base(file))
-		}
-	}
-	return datas
-}
-
-func (u *BackupService) loadRecordSize(records []model.BackupRecord) ([]dto.BackupRecords, error) {
-	recordMap := make(map[uint]struct{})
-	var recordIds []string
-	for _, record := range records {
-		if _, ok := recordMap[record.DownloadAccountID]; !ok {
-			recordMap[record.DownloadAccountID] = struct{}{}
-			recordIds = append(recordIds, fmt.Sprintf("%v", record.DownloadAccountID))
-		}
-	}
-	clientMap, err := NewBackupClientMap(recordIds)
-	if err != nil {
-		return nil, err
-	}
-
-	var datas []dto.BackupRecords
-	var wg sync.WaitGroup
-	for i := 0; i < len(records); i++ {
-		var item dto.BackupRecords
-		if err := copier.Copy(&item, &records[i]); err != nil {
-			return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
-		}
-
-		itemPath := path.Join(records[i].FileDir, records[i].FileName)
-		if val, ok := clientMap[fmt.Sprintf("%v", records[i].DownloadAccountID)]; ok {
-			item.AccountName = val.name
-			item.AccountType = val.accountType
-			item.DownloadAccountID = val.id
-			wg.Add(1)
-			go func(index int) {
-				item.Size, _ = val.client.Size(path.Join(strings.TrimLeft(val.backupPath, "/"), itemPath))
-				datas = append(datas, item)
-				wg.Done()
-			}(i)
-		} else {
-			datas = append(datas, item)
-		}
-	}
-	wg.Wait()
-	return datas, nil
-}
-
 func NewBackupClientWithID(id uint) (*model.BackupAccount, cloud_storage.CloudStorageClient, error) {
-	var account model.BackupAccount
-	if global.IsMaster {
-		var setting model.Setting
-		if err := global.CoreDB.Where("key = ?", "EncryptKey").First(&setting).Error; err != nil {
-			return nil, nil, err
-		}
-		if err := global.CoreDB.Where("id = ?", id).First(&account).Error; err != nil {
-			return nil, nil, err
-		}
-		if account.ID == 0 {
-			return nil, nil, constant.ErrRecordNotFound
-		}
-		account.AccessKey, _ = encrypt.StringDecryptWithKey(account.AccessKey, setting.Value)
-		account.Credential, _ = encrypt.StringDecryptWithKey(account.Credential, setting.Value)
-	} else {
-		account, _ = backupRepo.Get(repo.WithByID(id))
-	}
+	account, _ := backupRepo.Get(repo.WithByID(id))
 	backClient, err := newClient(&account)
 	if err != nil {
 		return nil, nil, err
@@ -356,55 +416,26 @@ type backupClientHelper struct {
 
 func NewBackupClientMap(ids []string) (map[string]backupClientHelper, error) {
 	var accounts []model.BackupAccount
-	if global.IsMaster {
-		var setting model.Setting
-		if err := global.CoreDB.Where("key = ?", "EncryptKey").First(&setting).Error; err != nil {
-			return nil, err
-		}
-		if err := global.CoreDB.Where("id in (?)", ids).Find(&accounts).Error; err != nil {
-			return nil, err
-		}
-		if len(accounts) == 0 {
-			return nil, constant.ErrRecordNotFound
-		}
-		for i := 0; i < len(accounts); i++ {
-			accounts[i].AccessKey, _ = encrypt.StringDecryptWithKey(accounts[i].AccessKey, setting.Value)
-			accounts[i].Credential, _ = encrypt.StringDecryptWithKey(accounts[i].Credential, setting.Value)
-		}
-	} else {
-		var idItems []uint
-		for i := 0; i < len(ids); i++ {
-			item, _ := strconv.Atoi(ids[i])
-			idItems = append(idItems, uint(item))
-		}
-		accounts, _ = backupRepo.List(repo.WithByIDs(idItems))
+	var idItems []uint
+	for i := 0; i < len(ids); i++ {
+		item, _ := strconv.Atoi(ids[i])
+		idItems = append(idItems, uint(item))
 	}
+	accounts, _ = backupRepo.List(repo.WithByIDs(idItems))
 	clientMap := make(map[string]backupClientHelper)
 	for _, item := range accounts {
-		if !global.IsMaster {
-			accessItem, err := base64.StdEncoding.DecodeString(item.AccessKey)
-			if err != nil {
-				return nil, err
-			}
-			item.AccessKey = string(accessItem)
-			secretItem, err := base64.StdEncoding.DecodeString(item.Credential)
-			if err != nil {
-				return nil, err
-			}
-			item.Credential = string(secretItem)
-		}
 		backClient, err := newClient(&item)
 		if err != nil {
 			return nil, err
 		}
 		pathItem := item.BackupPath
-		if item.BackupPath != "/" {
+		if item.Type != constant.Sftp && item.Type != constant.Local && pathItem != "/" {
 			pathItem = strings.TrimPrefix(item.BackupPath, "/")
 		}
 		clientMap[fmt.Sprintf("%v", item.ID)] = backupClientHelper{
 			client:      backClient,
-			backupPath:  pathItem,
 			name:        item.Name,
+			backupPath:  pathItem,
 			accountType: item.Type,
 			id:          item.ID,
 		}
@@ -414,10 +445,15 @@ func NewBackupClientMap(ids []string) (map[string]backupClientHelper, error) {
 
 func newClient(account *model.BackupAccount) (cloud_storage.CloudStorageClient, error) {
 	varMap := make(map[string]interface{})
-	if err := json.Unmarshal([]byte(account.Vars), &varMap); err != nil {
-		return nil, err
+	if len(account.Vars) != 0 {
+		if err := json.Unmarshal([]byte(account.Vars), &varMap); err != nil {
+			return nil, err
+		}
 	}
 	varMap["bucket"] = account.Bucket
+	varMap["backupPath"] = account.BackupPath
+	account.AccessKey, _ = encrypt.StringDecrypt(account.AccessKey)
+	account.Credential, _ = encrypt.StringDecrypt(account.Credential)
 	switch account.Type {
 	case constant.Sftp, constant.WebDAV:
 		varMap["username"] = account.AccessKey
@@ -437,23 +473,32 @@ func newClient(account *model.BackupAccount) (cloud_storage.CloudStorageClient, 
 	return client, nil
 }
 
-func LoadLocalDirByStr(vars string) (string, error) {
+func loadRefreshTokenByCode(backup *model.BackupAccount) error {
 	varMap := make(map[string]interface{})
-	if err := json.Unmarshal([]byte(vars), &varMap); err != nil {
-		return "", err
+	if err := json.Unmarshal([]byte(backup.Vars), &varMap); err != nil {
+		return fmt.Errorf("unmarshal backup vars failed, err: %v", err)
 	}
-	if _, ok := varMap["dir"]; !ok {
-		return "", errors.New("load local backup dir failed")
-	}
-	baseDir, ok := varMap["dir"].(string)
-	if ok {
-		if _, err := os.Stat(baseDir); err != nil && os.IsNotExist(err) {
-			if err = os.MkdirAll(baseDir, os.ModePerm); err != nil {
-				return "", fmt.Errorf("mkdir %s failed, err: %v", baseDir, err)
-			}
-			return baseDir, nil
+	refreshToken := ""
+	var err error
+	if backup.Type == constant.GoogleDrive {
+		refreshToken, err = client.RefreshGoogleToken("authorization_code", "refreshToken", varMap)
+		if err != nil {
+			return err
 		}
-		return baseDir, nil
+	} else {
+		refreshToken, err = client.RefreshToken("authorization_code", "refreshToken", varMap)
+		if err != nil {
+			return err
+		}
 	}
-	return "", fmt.Errorf("error type dir: %T", varMap["dir"])
+	delete(varMap, "code")
+	varMap["refresh_status"] = constant.StatusSuccess
+	varMap["refresh_time"] = time.Now().Format(constant.DateTimeLayout)
+	varMap["refresh_token"] = refreshToken
+	itemVars, err := json.Marshal(varMap)
+	if err != nil {
+		return fmt.Errorf("json marshal var map failed, err: %v", err)
+	}
+	backup.Vars = string(itemVars)
+	return nil
 }

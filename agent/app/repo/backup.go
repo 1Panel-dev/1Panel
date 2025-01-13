@@ -13,6 +13,7 @@ type BackupRepo struct{}
 type IBackupRepo interface {
 	Get(opts ...DBOption) (model.BackupAccount, error)
 	List(opts ...DBOption) ([]model.BackupAccount, error)
+	Page(limit, offset int, opts ...DBOption) (int64, []model.BackupAccount, error)
 	Create(backup *model.BackupAccount) error
 	Save(backup *model.BackupAccount) error
 	Delete(opts ...DBOption) error

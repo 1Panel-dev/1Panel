@@ -3,9 +3,7 @@ package hook
 import (
 	"strings"
 
-	"github.com/1Panel-dev/1Panel/core/app/model"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
-	"github.com/1Panel-dev/1Panel/core/app/service"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/cmd"
 	"github.com/1Panel-dev/1Panel/core/utils/common"
@@ -48,7 +46,6 @@ func Init() {
 	}
 
 	handleUserInfo(global.CONF.System.ChangeUserInfo, settingRepo)
-	loadLocalDir()
 }
 
 func handleUserInfo(tags string, settingRepo repo.ISettingRepo) {
@@ -87,19 +84,4 @@ func handleUserInfo(tags string, settingRepo repo.ISettingRepo) {
 
 	sudo := cmd.SudoHandleCmd()
 	_, _ = cmd.Execf("%s sed -i '/CHANGE_USER_INFO=%v/d' /usr/local/bin/1pctl", sudo, global.CONF.System.ChangeUserInfo)
-}
-
-func loadLocalDir() {
-	var backup model.BackupAccount
-	_ = global.DB.Where("type = ?", "LOCAL").First(&backup).Error
-	if backup.ID == 0 {
-		global.LOG.Errorf("no such backup account `%s` in db", "LOCAL")
-		return
-	}
-	dir, err := service.LoadLocalDirByStr(backup.Vars)
-	if err != nil {
-		global.LOG.Errorf("load local backup dir failed,err: %v", err)
-		return
-	}
-	global.CONF.System.BackupDir = dir
 }

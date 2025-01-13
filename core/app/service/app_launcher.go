@@ -62,5 +62,5 @@ func syncLauncherToAgent(launcher model.AppLauncher, operation string) {
 	itemData, _ := json.Marshal(launcher)
 	itemJson := dto.SyncToAgent{Name: launcher.Key, Operation: operation, Data: string(itemData)}
 	bodyItem, _ := json.Marshal(itemJson)
-	_ = xpack.RequestToAgent("/api/v2/backups/sync", http.MethodPost, bytes.NewReader((bodyItem)))
+	_ = xpack.RequestToAllAgent("/api/v2/backups/sync", http.MethodPost, bytes.NewReader((bodyItem)))
 }

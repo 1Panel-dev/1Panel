@@ -409,7 +409,7 @@
             </div>
 
             <div v-if="isBackup()">
-                <el-form-item :label="$t('setting.backupAccount')" prop="backupAccountList">
+                <el-form-item :label="$t('setting.backupAccount')" prop="sourceAccounts">
                     <el-select
                         multiple
                         class="selectClass"
@@ -561,7 +561,6 @@ const acceptParams = (params: DialogProps): void => {
         changeType();
         dialogData.value.rowData.scriptMode = 'input';
         dialogData.value.rowData.dbType = 'mysql';
-        dialogData.value.rowData.downloadAccountID = 1;
         dialogData.value.rowData.isDir = true;
     }
     if (dialogData.value.rowData.sourceAccountIDs) {
@@ -748,8 +747,8 @@ const rules = reactive({
     url: [Rules.requiredInput],
     files: [{ validator: verifyFiles, trigger: 'blur', required: true }],
     sourceDir: [Rules.requiredInput],
-    backupAccounts: [Rules.requiredSelect],
-    defaultDownload: [Rules.requiredSelect],
+    sourceAccounts: [Rules.requiredSelect],
+    downloadAccountID: [Rules.requiredSelect],
     retainCopies: [Rules.number],
 });
 
@@ -867,14 +866,18 @@ const loadBackups = async () => {
     const res = await listBackupOptions();
     let options = res.data || [];
     backupOptions.value = [];
-    if (!dialogData.value.rowData!.sourceAccounts) {
-        dialogData.value.rowData!.sourceAccounts = [1];
-    }
+    let local = 0;
     for (const item of options) {
         if (item.id === 0) {
             continue;
         }
+        if (item.type == 'LOCAL') {
+            local = item.id;
+        }
         backupOptions.value.push({ id: item.id, type: i18n.global.t('setting.' + item.type), name: item.name });
+    }
+    if (!dialogData.value.rowData!.sourceAccounts) {
+        dialogData.value.rowData!.sourceAccounts = local === 0 ? [local] : [];
     }
     changeAccount();
 };

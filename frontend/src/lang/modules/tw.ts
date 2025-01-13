@@ -1390,6 +1390,11 @@ const message = {
         developerModeHelper: '獲取 1Panel 的預覽版本，以分享有關新功能和更新的反饋',
 
         thirdParty: '第三方賬號',
+        scope: '使用範圍',
+        public: '公有',
+        publicHelper: '公有類型的備份帳號會同步到各個子節點，子節點可以一起使用',
+        private: '私有',
+        privateHelper: '私有類型的備份帳號只創建在當前節點上，僅供當前節點使用',
         createBackupAccount: '添加 {0}',
         noTypeForCreate: '當前無可創建備份類型',
         LOCAL: '服務器磁盤',

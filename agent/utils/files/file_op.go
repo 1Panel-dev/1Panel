@@ -730,6 +730,11 @@ func ZipFile(files []archiver.File, dst afero.File) error {
 }
 
 func (f FileOp) TarGzCompressPro(withDir bool, src, dst, secret, exclusionRules string) error {
+	if !f.Stat(path.Dir(dst)) {
+		if err := f.Fs.MkdirAll(path.Dir(dst), constant.FilePerm); err != nil {
+			return err
+		}
+	}
 	workdir := src
 	srcItem := "."
 	if withDir {
@@ -758,10 +763,10 @@ func (f FileOp) TarGzCompressPro(withDir bool, src, dst, secret, exclusionRules 
 		itemPrefix = ""
 	}
 	if len(secret) != 0 {
-		commands = fmt.Sprintf("tar  --warning=no-file-changed --ignore-failed-read --exclude-from=<(find %s -type s -print-printf '%s' | sed 's|^|%s/|') -zcf - %s | openssl enc -aes-256-cbc -salt -pbkdf2 -k '%s' -out %s", src, "%P\n", itemPrefix, srcItem, secret, dst)
+		commands = fmt.Sprintf("tar --warning=no-file-changed --ignore-failed-read --exclude-from=<(find %s -type s -print '%s' | sed 's|^|%s/|') -zcf - %s | openssl enc -aes-256-cbc -salt -pbkdf2 -k '%s' -out %s", src, "%P\n", itemPrefix, srcItem, secret, dst)
 		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" %s ", secret), "******"))
 	} else {
-		commands = fmt.Sprintf("tar  --warning=no-file-changed --ignore-failed-read --exclude-from=<(find %s -type s -print-printf '%s' | sed 's|^|%s/|') -zcf %s %s %s", src, "%P\n", itemPrefix, dst, exStr, srcItem)
+		commands = fmt.Sprintf("tar --warning=no-file-changed --ignore-failed-read --exclude-from=<(find %s -type s -printf '%s' | sed 's|^|%s/|') -zcf %s %s %s", src, "%P\n", itemPrefix, dst, exStr, srcItem)
 		global.LOG.Debug(commands)
 	}
 	return cmd.ExecCmdWithDir(commands, workdir)

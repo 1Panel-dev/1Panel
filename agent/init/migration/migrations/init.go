@@ -2,6 +2,7 @@ package migrations
 
 import (
 	"fmt"
+	"path"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -17,7 +18,7 @@ import (
 )
 
 var AddTable = &gormigrate.Migration{
-	ID: "20241231-add-table",
+	ID: "20240108-add-table",
 	Migrate: func(tx *gorm.DB) error {
 		return tx.AutoMigrate(
 			&model.AppDetail{},
@@ -240,6 +241,20 @@ var InitNodePort = &gormigrate.Migration{
 			if err := tx.Create(&model.Setting{Key: "NodePort", Value: "9999"}).Error; err != nil {
 				return err
 			}
+		}
+		return nil
+	},
+}
+
+var InitBackup = &gormigrate.Migration{
+	ID: "20241226-init-backup",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Create(&model.BackupAccount{
+			Name:       "localhost",
+			Type:       "LOCAL",
+			BackupPath: path.Join(global.CONF.System.BaseDir, "1panel/backup"),
+		}).Error; err != nil {
+			return err
 		}
 		return nil
 	},

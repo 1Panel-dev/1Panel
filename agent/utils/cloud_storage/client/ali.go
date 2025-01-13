@@ -502,3 +502,32 @@ func loadToken(refresh_token string) (string, error) {
 	}
 	return respItem.AccessToken, nil
 }
+
+func RefreshALIToken(varMap map[string]interface{}) (string, error) {
+	refresh_token := loadParamFromVars("refresh_token", varMap)
+	if len(refresh_token) == 0 {
+		return "", errors.New("no such refresh token find in db")
+	}
+	client := resty.New()
+	data := map[string]interface{}{
+		"grant_type":    "refresh_token",
+		"refresh_token": refresh_token,
+	}
+
+	url := "https://api.aliyundrive.com/token/refresh"
+	resp, err := client.R().
+		SetBody(data).
+		Post(url)
+
+	if err != nil {
+		return "", fmt.Errorf("load account token failed, err: %v", err)
+	}
+	if resp.StatusCode() != 200 {
+		return "", fmt.Errorf("load account token failed, code: %v", resp.StatusCode())
+	}
+	var respItem tokenResp
+	if err := json.Unmarshal(resp.Body(), &respItem); err != nil {
+		return "", err
+	}
+	return respItem.AccessToken, nil
+}

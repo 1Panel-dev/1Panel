@@ -10,7 +10,6 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"net"
 	"os"
 	"path"
@@ -20,6 +19,8 @@ import (
 	"strings"
 	"syscall"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 
 	"github.com/1Panel-dev/1Panel/agent/app/task"
 
@@ -604,7 +605,7 @@ func (w WebsiteService) DeleteWebsite(req request.WebsiteDelete) error {
 	defer tx.Rollback()
 
 	go func() {
-		_ = NewIBackupService().DeleteRecordByName("website", website.PrimaryDomain, website.Alias, req.DeleteBackup)
+		_ = NewIBackupRecordService().DeleteRecordByName("website", website.PrimaryDomain, website.Alias, req.DeleteBackup)
 	}()
 
 	if err := websiteRepo.DeleteBy(ctx, repo.WithByID(req.ID)); err != nil {

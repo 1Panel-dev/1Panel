@@ -25,7 +25,7 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 		message []byte
 		err     error
 	)
-	record := cronjobRepo.StartRecords(cronjob.ID, "")
+	record := cronjobRepo.StartRecords(cronjob.ID, "", cronjob.Type)
 	go func() {
 		switch cronjob.Type {
 		case "shell":

@@ -62,8 +62,9 @@ var (
 
 // backup
 var (
-	ErrBackupInUsed      = "ErrBackupInUsed"
-	ErrBackupLocalDelete = "ErrBackupLocalDelete"
+	ErrBackupInUsed = "ErrBackupInUsed"
+	ErrBackupLocal  = "ErrBackupLocal"
+	ErrBackupPublic = "ErrBackupPublic"
 )
 
 var (
