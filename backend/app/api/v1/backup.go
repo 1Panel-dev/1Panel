@@ -166,7 +166,7 @@ func (b *BaseApi) SearchBackupRecords(c *gin.Context) {
 // @Summary Load backup records size
 // @Accept json
 // @Param request body dto.RecordSearch true "request"
-// @Success 200 {array} dto.dto.BackupFile
+// @Success 200 {array} dto.BackupFile
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /settings/backup/record/size [post]
@@ -215,7 +215,7 @@ func (b *BaseApi) SearchBackupRecordsByCronjob(c *gin.Context) {
 // @Summary Load backup records size for cronjob
 // @Accept json
 // @Param request body dto.RecordSearchByCronjob true "request"
-// @Success 200 {array} dto.dto.BackupFile
+// @Success 200 {array} dto.BackupFile
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /settings/backup/record/size/bycronjob [post]

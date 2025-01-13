@@ -23,7 +23,7 @@ import (
 // @description Custom Token Format, Format: md5('1panel' + API-Key + UnixTimestamp).
 // @description ```
 // @description eg:
-// @description curl -X GET "http://localhost:4004/api/v1/resource" \
+// @description curl -X GET "http://localhost:4004/api/v1/dashboard/current" \
 // @description -H "1Panel-Token: <1panel_token>" \
 // @description -H "1Panel-Timestamp: <current_unix_timestamp>"
 // @description ```

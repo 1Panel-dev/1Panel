@@ -10624,6 +10624,88 @@ const docTemplate = `{
                 }
             }
         },
+        "/settings/backup/record/size": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "Timestamp": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Backup Account"
+                ],
+                "summary": "Load backup records size",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.RecordSearch"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.BackupFile"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/settings/backup/record/size/bycronjob": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "Timestamp": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Backup Account"
+                ],
+                "summary": "Load backup records size for cronjob",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.RecordSearchByCronjob"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.BackupFile"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/settings/backup/recover": {
             "post": {
                 "security": [
@@ -16684,6 +16766,20 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.BackupFile": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "size": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.BackupInfo": {
             "type": "object",
             "properties": {
@@ -19448,7 +19544,10 @@ const docTemplate = `{
                         "zh",
                         "en",
                         "tw",
-                        "ru"
+                        "ja",
+                        "ru",
+                        "ms",
+                        "pt-BR"
                     ]
                 },
                 "name": {
@@ -24834,7 +24933,48 @@ const docTemplate = `{
                 }
             }
         },
-        "response.AppDto": {
+        "response.AppInstalledCheck": {
+            "type": "object",
+            "properties": {
+                "app": {
+                    "type": "string"
+                },
+                "appInstallId": {
+                    "type": "integer"
+                },
+                "containerName": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "httpPort": {
+                    "type": "integer"
+                },
+                "httpsPort": {
+                    "type": "integer"
+                },
+                "installPath": {
+                    "type": "string"
+                },
+                "isExist": {
+                    "type": "boolean"
+                },
+                "lastBackupAt": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.AppItem": {
             "type": "object",
             "properties": {
                 "icon": {
@@ -24884,47 +25024,6 @@ const docTemplate = `{
                 }
             }
         },
-        "response.AppInstalledCheck": {
-            "type": "object",
-            "properties": {
-                "app": {
-                    "type": "string"
-                },
-                "appInstallId": {
-                    "type": "integer"
-                },
-                "containerName": {
-                    "type": "string"
-                },
-                "createdAt": {
-                    "type": "string"
-                },
-                "httpPort": {
-                    "type": "integer"
-                },
-                "httpsPort": {
-                    "type": "integer"
-                },
-                "installPath": {
-                    "type": "string"
-                },
-                "isExist": {
-                    "type": "boolean"
-                },
-                "lastBackupAt": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "version": {
-                    "type": "string"
-                }
-            }
-        },
         "response.AppParam": {
             "type": "object",
             "properties": {
@@ -24965,7 +25064,7 @@ const docTemplate = `{
                 "items": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/response.AppDto"
+                        "$ref": "#/definitions/response.AppItem"
                     }
                 },
                 "total": {
@@ -25965,7 +26064,7 @@ const docTemplate = `{
     },
     "securityDefinitions": {
         "ApiKeyAuth": {
-            "description": "Custom Token Format, Format: md5('1panel' + API-Key + UnixTimestamp).\n` + "`" + `` + "`" + `` + "`" + `\neg:\ncurl -X GET \"http://localhost:4004/api/v1/resource\" \\\n-H \"1Panel-Token: \u003c1panel_token\u003e\" \\\n-H \"1Panel-Timestamp: \u003ccurrent_unix_timestamp\u003e\"\n` + "`" + `` + "`" + `` + "`" + `\n- ` + "`" + `1Panel-Token` + "`" + ` is the key for the panel API Key.",
+            "description": "Custom Token Format, Format: md5('1panel' + API-Key + UnixTimestamp).\n` + "`" + `` + "`" + `` + "`" + `\neg:\ncurl -X GET \"http://localhost:4004/api/v1/dashboard/current\" \\\n-H \"1Panel-Token: \u003c1panel_token\u003e\" \\\n-H \"1Panel-Timestamp: \u003ccurrent_unix_timestamp\u003e\"\n` + "`" + `` + "`" + `` + "`" + `\n- ` + "`" + `1Panel-Token` + "`" + ` is the key for the panel API Key.",
             "type": "apiKey",
             "name": "1Panel-Token",
             "in": "header"

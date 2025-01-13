@@ -145,6 +145,15 @@ definitions:
       version:
         type: string
     type: object
+  dto.BackupFile:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      size:
+        type: integer
+    type: object
   dto.BackupInfo:
     properties:
       backupPath:
@@ -1999,7 +2008,10 @@ definitions:
         - zh
         - en
         - tw
+        - ja
         - ru
+        - ms
+        - pt-BR
         type: string
       name:
         type: string
@@ -5627,7 +5639,34 @@ definitions:
       version:
         type: string
     type: object
-  response.AppDto:
+  response.AppInstalledCheck:
+    properties:
+      app:
+        type: string
+      appInstallId:
+        type: integer
+      containerName:
+        type: string
+      createdAt:
+        type: string
+      httpPort:
+        type: integer
+      httpsPort:
+        type: integer
+      installPath:
+        type: string
+      isExist:
+        type: boolean
+      lastBackupAt:
+        type: string
+      name:
+        type: string
+      status:
+        type: string
+      version:
+        type: string
+    type: object
+  response.AppItem:
     properties:
       icon:
         type: string
@@ -5660,33 +5699,6 @@ definitions:
           type: string
         type: array
     type: object
-  response.AppInstalledCheck:
-    properties:
-      app:
-        type: string
-      appInstallId:
-        type: integer
-      containerName:
-        type: string
-      createdAt:
-        type: string
-      httpPort:
-        type: integer
-      httpsPort:
-        type: integer
-      installPath:
-        type: string
-      isExist:
-        type: boolean
-      lastBackupAt:
-        type: string
-      name:
-        type: string
-      status:
-        type: string
-      version:
-        type: string
-    type: object
   response.AppParam:
     properties:
       edit:
@@ -5714,7 +5726,7 @@ definitions:
     properties:
       items:
         items:
-          $ref: '#/definitions/response.AppDto'
+          $ref: '#/definitions/response.AppItem'
         type: array
       total:
         type: integer
@@ -12765,6 +12777,54 @@ paths:
       summary: Page backup records by cronjob
       tags:
       - Backup Account
+  /settings/backup/record/size:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RecordSearch'
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.BackupFile'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      - Timestamp: []
+      summary: Load backup records size
+      tags:
+      - Backup Account
+  /settings/backup/record/size/bycronjob:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RecordSearchByCronjob'
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.BackupFile'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      - Timestamp: []
+      summary: Load backup records size for cronjob
+      tags:
+      - Backup Account
   /settings/backup/recover:
     post:
       consumes:
@@ -16303,7 +16363,7 @@ securityDefinitions:
       Custom Token Format, Format: md5('1panel' + API-Key + UnixTimestamp).
       ```
       eg:
-      curl -X GET "http://localhost:4004/api/v1/resource" \
+      curl -X GET "http://localhost:4004/api/v1/dashboard/current" \
       -H "1Panel-Token: <1panel_token>" \
       -H "1Panel-Timestamp: <current_unix_timestamp>"
       ```
