@@ -811,10 +811,8 @@ func (u *ContainerService) StreamLogs(ctx *gin.Context, params dto.StreamLog) {
 			}
 			return true
 		case err := <-errorChan:
-			_, err = fmt.Fprintf(w, "data: {\"event\": \"error\", \"data\": \"%s\"}\n\n", err.Error())
-			if err != nil {
-				return false
-			}
+			errorMsg := fmt.Sprintf("event: error\ndata: %v\n\n", err.Error())
+			_, err = fmt.Fprintf(w, errorMsg)
 			return false
 		case <-ctx.Request.Context().Done():
 			return false
@@ -843,14 +841,19 @@ func collectLogs(params dto.StreamLog, messageChan chan<- string, errorChan chan
 	if params.Container != "" {
 		cmdArgs = append(cmdArgs, params.Container)
 	}
-	cmd := exec.Command("docker", cmdArgs...)
+	dockerCmd := exec.Command("docker", cmdArgs...)
 
-	stdout, err := cmd.StdoutPipe()
+	stdout, err := dockerCmd.StdoutPipe()
 	if err != nil {
 		errorChan <- fmt.Errorf("failed to get stdout pipe: %v", err)
 		return
 	}
-	if err := cmd.Start(); err != nil {
+	stderr, err := dockerCmd.StderrPipe()
+	if err != nil {
+		errorChan <- fmt.Errorf("failed to get stderr pipe: %v", err)
+		return
+	}
+	if err = dockerCmd.Start(); err != nil {
 		errorChan <- fmt.Errorf("failed to start command: %v", err)
 		return
 	}
@@ -869,11 +872,20 @@ func collectLogs(params dto.StreamLog, messageChan chan<- string, errorChan chan
 		}
 	}
 
-	if err := scanner.Err(); err != nil {
+	if err = scanner.Err(); err != nil {
 		errorChan <- fmt.Errorf("scanner error: %v", err)
 		return
 	}
-	cmd.Wait()
+
+	errScanner := bufio.NewScanner(stderr)
+	for errScanner.Scan() {
+		line := errScanner.Text()
+		errorChan <- fmt.Errorf("%v", line)
+	}
+	if err = dockerCmd.Wait(); err != nil {
+		errorChan <- fmt.Errorf("%v", err)
+		return
+	}
 }
 
 func (u *ContainerService) DownloadContainerLogs(containerType, container, since, tail string, c *gin.Context) error {

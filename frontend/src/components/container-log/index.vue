@@ -139,6 +139,10 @@ const searchLogs = async () => {
             }
         });
     };
+    eventSource.onerror = (event: MessageEvent) => {
+        stopListening();
+        MsgError(event.data);
+    };
 };
 
 const onDownload = async () => {

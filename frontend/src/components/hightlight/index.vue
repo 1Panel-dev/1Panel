@@ -30,13 +30,12 @@ const nginxRules: TokenRule[] = [
     },
     {
         type: 'path',
-        pattern:
-            /(?:(?<=GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS)\s+|(?<=open\(\s*")|(?<="\s*))(\/[^"\s]+(?:\.\w+)?(?:\?\w+=\w+)?)/g,
+        pattern: /(?<=[\s"])\/[^"\s]+(?:\.\w+)?(?:\?\w+=\w+)?/g,
         color: '#B87A2B',
     },
     {
         type: 'http-method',
-        pattern: /(?<=")(?:GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS)(?=\s)/g,
+        pattern: /(?<=)(?:GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS)(?=\s)/g,
         color: '#27AE60',
     },
     {
