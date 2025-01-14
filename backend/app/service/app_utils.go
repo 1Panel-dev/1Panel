@@ -1051,6 +1051,8 @@ func getApps(oldApps []model.App, items []dto.AppDefine) map[string]model.App {
 		app.Key = key
 		app.ShortDescZh = config.ShortDescZh
 		app.ShortDescEn = config.ShortDescEn
+		description, _ := json.Marshal(config.Description)
+		app.Description = string(description)
 		app.Website = config.Website
 		app.Document = config.Document
 		app.Github = config.Github
@@ -1150,14 +1152,32 @@ func handleLocalApp(appDir string) (app *model.App, err error) {
 		err = buserr.WithMap(constant.ErrFileParseApp, map[string]interface{}{"name": "data.yml", "err": err.Error()}, err)
 		return
 	}
-	app = &localAppDefine.AppProperty
+	appDefine := localAppDefine.AppProperty
+	app = &model.App{}
+	app.Name = appDefine.Name
+	app.TagsKey = append(appDefine.Tags, "Local")
+	app.Type = appDefine.Type
+	app.CrossVersionUpdate = appDefine.CrossVersionUpdate
+	app.Limit = appDefine.Limit
+	app.Recommend = appDefine.Recommend
+	app.Website = appDefine.Website
+	app.Github = appDefine.Github
+	app.Document = appDefine.Document
+
+	if appDefine.ShortDescZh != "" {
+		appDefine.Description.Zh = appDefine.ShortDescZh
+	}
+	if appDefine.ShortDescEn != "" {
+		appDefine.Description.En = appDefine.ShortDescEn
+	}
+	desc, _ := json.Marshal(appDefine.Description)
+	app.Description = string(desc)
+
+	app.Key = "local" + appDefine.Key
 	app.Resource = constant.AppResourceLocal
 	app.Status = constant.AppNormal
 	app.Recommend = 9999
-	app.TagsKey = append(app.TagsKey, "Local")
-	app.Key = "local" + app.Key
-	readMePath := path.Join(appDir, "README.md")
-	readMeByte, err := fileOp.GetContent(readMePath)
+	readMeByte, err := fileOp.GetContent(path.Join(appDir, "README.md"))
 	if err == nil {
 		app.ReadMe = string(readMeByte)
 	}

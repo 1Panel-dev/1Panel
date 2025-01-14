@@ -10,7 +10,7 @@
                         <span class="h-app-title">{{ app.name }}</span>
                         <div class="h-app-desc">
                             <span>
-                                {{ language == 'zh' || language == 'tw' ? app.shortDescZh : app.shortDescEn }}
+                                {{ app.description }}
                             </span>
                         </div>
                     </div>
@@ -37,11 +37,9 @@
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';
 import { SearchApp } from '@/api/modules/app';
-import { getLanguage } from '@/utils/util';
 import { reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 const router = useRouter();
-const language = getLanguage();
 
 let req = reactive({
     name: '',

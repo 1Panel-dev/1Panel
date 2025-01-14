@@ -1,9 +1,5 @@
 package dto
 
-import (
-	"github.com/1Panel-dev/1Panel/backend/app/model"
-)
-
 type AppDatabase struct {
 	ServiceName string `json:"PANEL_DB_HOST"`
 	DbName      string `json:"PANEL_DB_NAME"`
@@ -62,7 +58,7 @@ type AppDefine struct {
 }
 
 type LocalAppAppDefine struct {
-	AppProperty model.App `json:"additionalProperties" yaml:"additionalProperties"`
+	AppProperty AppProperty `json:"additionalProperties" yaml:"additionalProperties"`
 }
 
 type LocalAppParam struct {
@@ -84,6 +80,7 @@ type AppProperty struct {
 	Tags               []string `json:"tags"`
 	ShortDescZh        string   `json:"shortDescZh"`
 	ShortDescEn        string   `json:"shortDescEn"`
+	Description        Locale   `json:"description"`
 	Key                string   `json:"key"`
 	Required           []string `json:"Required"`
 	CrossVersionUpdate bool     `json:"crossVersionUpdate"`
@@ -114,9 +111,9 @@ type Locale struct {
 	En     string `json:"en"`
 	Ja     string `json:"ja"`
 	Ms     string `json:"ms"`
-	PtBr   string `json:"pt-br"`
+	PtBr   string `json:"pt-br" yaml:"pt-br"`
 	Ru     string `json:"ru"`
-	ZhHant string `json:"zh-hant"`
+	ZhHant string `json:"zh-hant" yaml:"zh-hant"`
 	Zh     string `json:"zh"`
 }
 
@@ -129,6 +126,7 @@ type AppFormFields struct {
 	Type     string         `json:"type"`
 	LabelZh  string         `json:"labelZh"`
 	LabelEn  string         `json:"labelEn"`
+	Label    Locale         `json:"label"`
 	Required bool           `json:"required"`
 	Default  interface{}    `json:"default"`
 	EnvKey   string         `json:"envKey"`

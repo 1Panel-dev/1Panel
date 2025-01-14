@@ -32,8 +32,7 @@ type AppItem struct {
 	Name        string   `json:"name"`
 	Key         string   `json:"key"`
 	ID          uint     `json:"id"`
-	ShortDescZh string   `json:"shortDescZh"`
-	ShortDescEn string   `json:"shortDescEn"`
+	Description string   `json:"description"`
 	Icon        string   `json:"icon"`
 	Type        string   `json:"type"`
 	Status      string   `json:"status"`

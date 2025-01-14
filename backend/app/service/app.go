@@ -37,7 +37,7 @@ type AppService struct {
 type IAppService interface {
 	PageApp(ctx *gin.Context, req request.AppSearch) (interface{}, error)
 	GetAppTags(ctx *gin.Context) ([]response.TagDTO, error)
-	GetApp(key string) (*response.AppDTO, error)
+	GetApp(ctx *gin.Context, key string) (*response.AppDTO, error)
 	GetAppDetail(appId uint, version, appType string) (response.AppDetailDTO, error)
 	Install(ctx context.Context, req request.AppInstallCreate) (*model.AppInstall, error)
 	SyncAppListFromRemote() error
@@ -94,16 +94,15 @@ func (a AppService) PageApp(ctx *gin.Context, req request.AppSearch) (interface{
 	lang := strings.ToLower(common.GetLang(ctx))
 	for _, ap := range apps {
 		appDTO := &response.AppItem{
-			ID:          ap.ID,
-			Name:        ap.Name,
-			Key:         ap.Key,
-			Type:        ap.Type,
-			Icon:        ap.Icon,
-			ShortDescZh: ap.ShortDescZh,
-			ShortDescEn: ap.ShortDescEn,
-			Resource:    ap.Resource,
-			Limit:       ap.Limit,
+			ID:       ap.ID,
+			Name:     ap.Name,
+			Key:      ap.Key,
+			Type:     ap.Type,
+			Icon:     ap.Icon,
+			Resource: ap.Resource,
+			Limit:    ap.Limit,
 		}
+		appDTO.Description = ap.GetDescription(ctx)
 		appDTOs = append(appDTOs, appDTO)
 		appTags, err := appTagRepo.GetByAppId(ap.ID)
 		if err != nil {
@@ -166,7 +165,7 @@ func (a AppService) GetAppTags(ctx *gin.Context) ([]response.TagDTO, error) {
 	return res, nil
 }
 
-func (a AppService) GetApp(key string) (*response.AppDTO, error) {
+func (a AppService) GetApp(ctx *gin.Context, key string) (*response.AppDTO, error) {
 	var appDTO response.AppDTO
 	if key == "postgres" {
 		key = "postgresql"
@@ -176,6 +175,7 @@ func (a AppService) GetApp(key string) (*response.AppDTO, error) {
 		return nil, err
 	}
 	appDTO.App = app
+	appDTO.App.Description = app.GetDescription(ctx)
 	details, err := appDetailRepo.GetBy(appDetailRepo.WithAppId(app.ID))
 	if err != nil {
 		return nil, err

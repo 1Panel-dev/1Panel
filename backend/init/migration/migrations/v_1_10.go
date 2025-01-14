@@ -362,9 +362,19 @@ var AddApiKeyValidityTime = &gormigrate.Migration{
 }
 
 var UpdateAppTag = &gormigrate.Migration{
-	ID: "20241226-update-app-tag",
+	ID: "20250114-update-app-tag",
 	Migrate: func(tx *gorm.DB) error {
 		if err := tx.AutoMigrate(&model.Tag{}); err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var UpdateApp = &gormigrate.Migration{
+	ID: "20250114-update-app",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.App{}); err != nil {
 			return err
 		}
 		return nil

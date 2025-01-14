@@ -1,7 +1,10 @@
 package model
 
 import (
+	"encoding/json"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
+	"github.com/gin-gonic/gin"
 	"path/filepath"
 	"strings"
 )
@@ -12,6 +15,7 @@ type App struct {
 	Key                string `json:"key" gorm:"type:varchar(64);not null;"`
 	ShortDescZh        string `json:"shortDescZh" yaml:"shortDescZh" gorm:"type:longtext;"`
 	ShortDescEn        string `json:"shortDescEn" yaml:"shortDescEn" gorm:"type:longtext;"`
+	Description        string `json:"description"`
 	Icon               string `json:"icon" gorm:"type:longtext;"`
 	Type               string `json:"type" gorm:"type:varchar(64);not null"`
 	Status             string `json:"status" gorm:"type:varchar(64);not null"`
@@ -36,8 +40,20 @@ func (i *App) IsLocalApp() bool {
 }
 func (i *App) GetAppResourcePath() string {
 	if i.IsLocalApp() {
-		//这里要去掉本地应用的local前缀
 		return filepath.Join(constant.LocalAppResourceDir, strings.TrimPrefix(i.Key, "local"))
 	}
 	return filepath.Join(constant.RemoteAppResourceDir, i.Key)
+}
+
+func (i *App) GetDescription(ctx *gin.Context) string {
+	var translations = make(map[string]string)
+	_ = json.Unmarshal([]byte(i.Description), &translations)
+	lang := strings.ToLower(common.GetLang(ctx))
+	if desc, ok := translations[lang]; ok {
+		return desc
+	}
+	if lang == "zh" {
+		return i.ShortDescZh
+	}
+	return i.ShortDescEn
 }

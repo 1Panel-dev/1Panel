@@ -129,11 +129,7 @@
                                         </div>
                                         <div class="app-desc">
                                             <span class="desc">
-                                                {{
-                                                    language == 'zh' || language == 'tw'
-                                                        ? app.shortDescZh
-                                                        : app.shortDescEn
-                                                }}
+                                                {{ app.description }}
                                             </span>
                                         </div>
                                         <div class="app-tag">
@@ -177,16 +173,11 @@ import Detail from '../detail/index.vue';
 import Install from '../detail/install/index.vue';
 import router from '@/routers';
 import { GlobalStore } from '@/store';
-import { getLanguage } from '@/utils/util';
-
 const globalStore = GlobalStore();
 
 const mobile = computed(() => {
     return globalStore.isMobile();
 });
-
-const language = getLanguage();
-
 const paginationConfig = reactive({
     cacheSizeKey: 'app-page-size',
     currentPage: 1,

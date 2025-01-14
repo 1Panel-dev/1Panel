@@ -75,7 +75,7 @@ func (b *BaseApi) GetApp(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	appDTO, err := appService.GetApp(appKey)
+	appDTO, err := appService.GetApp(c, appKey)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

@@ -8,6 +8,7 @@ export namespace App {
         tags: Tag[];
         shortDescZh: string;
         shortDescEn: string;
+        description: string;
         author: string;
         source: string;
         type: string;
@@ -58,10 +59,21 @@ export namespace App {
         formFields: FromField[];
     }
 
+    interface Locale {
+        zh: string;
+        en: string;
+        'zh-Hant': string;
+        ja: string;
+        ms: string;
+        'pt-br': string;
+        ru: string;
+    }
+
     export interface FromField {
         type: string;
         labelZh: string;
         labelEn: string;
+        label: Locale;
         required: boolean;
         default: any;
         envKey: string;
