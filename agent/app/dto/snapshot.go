@@ -88,8 +88,8 @@ type SnapshotInfo struct {
 	ID              uint      `json:"id"`
 	Name            string    `json:"name"`
 	Description     string    `json:"description" validate:"max=256"`
-	From            string    `json:"from"`
-	DefaultDownload string    `json:"defaultDownload"`
+	SourceAccounts  []string  `json:"sourceAccounts"`
+	DownloadAccount string    `json:"downloadAccount"`
 	Status          string    `json:"status"`
 	Message         string    `json:"message"`
 	CreatedAt       time.Time `json:"createdAt"`
@@ -107,12 +107,4 @@ type SnapshotInfo struct {
 	RollbackStatus   string `json:"rollbackStatus"`
 	RollbackMessage  string `json:"rollbackMessage"`
 	LastRollbackedAt string `json:"lastRollbackedAt"`
-}
-
-type SnapshotFile struct {
-	ID              uint   `json:"id"`
-	Name            string `json:"name"`
-	From            string `json:"from"`
-	DefaultDownload string `json:"defaultDownload"`
-	Size            int64  `json:"size"`
 }

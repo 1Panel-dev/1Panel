@@ -35,6 +35,9 @@ export const deleteBackupRecord = (params: { ids: number[] }) => {
 export const searchBackupRecords = (params: Backup.SearchBackupRecord) => {
     return http.post<ResPage<Backup.RecordInfo>>(`/backups/record/search`, params, TimeoutEnum.T_5M);
 };
+export const loadRecordSize = (param: Backup.SearchForSize) => {
+    return http.post<Array<Backup.RecordFileSize>>(`/backups/record/size`, param);
+};
 export const searchBackupRecordsByCronjob = (params: Backup.SearchBackupRecordByCronjob) => {
     return http.post<ResPage<Backup.RecordInfo>>(`/backups/record/search/bycronjob`, params, TimeoutEnum.T_5M);
 };

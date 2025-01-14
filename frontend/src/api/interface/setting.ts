@@ -165,13 +165,6 @@ export namespace Setting {
         rollbackStatus: string;
         rollbackMessage: string;
     }
-    export interface SnapshotFile {
-        id: number;
-        name: string;
-        from: string;
-        defaultDownload: string;
-        size: number;
-    }
     export interface SnapshotData {
         appData: Array<DataTree>;
         panelData: Array<DataTree>;

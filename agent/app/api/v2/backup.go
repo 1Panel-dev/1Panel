@@ -209,6 +209,29 @@ func (b *BaseApi) GetLocalDir(c *gin.Context) {
 // @Summary Page backup records
 // @Description 获取备份记录列表分页
 // @Accept json
+// @Param request body dto.SearchForSize true "request"
+// @Success 200 {object} dto.RecordFileSize
+// @Security ApiKeyAuth
+// @Router /backups/record/size [post]
+func (b *BaseApi) LoadBackupRecordSize(c *gin.Context) {
+	var req dto.SearchForSize
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	list, err := backupRecordService.LoadRecordSize(req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+
+	helper.SuccessWithData(c, list)
+}
+
+// @Tags Backup Account
+// @Summary Page backup records
+// @Description 获取备份记录列表分页
+// @Accept json
 // @Param request body dto.RecordSearch true "request"
 // @Success 200
 // @Security ApiKeyAuth

@@ -68,6 +68,17 @@ export namespace Backup {
         name: string;
         detailName: string;
     }
+    export interface SearchForSize extends ReqPage {
+        type: string;
+        name: string;
+        detailName: string;
+        info: string;
+        cronjobID: number;
+    }
+    export interface RecordFileSize extends ReqPage {
+        id: number;
+        size: number;
+    }
     export interface SearchBackupRecordByCronjob extends ReqPage {
         cronjobID: number;
     }

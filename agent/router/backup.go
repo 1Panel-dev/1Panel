@@ -28,6 +28,7 @@ func (s *BackupRouter) InitRouter(Router *gin.RouterGroup) {
 		backupRouter.POST("/recover/byupload", baseApi.RecoverByUpload)
 		backupRouter.POST("/search/files", baseApi.LoadFilesFromBackup)
 		backupRouter.POST("/record/search", baseApi.SearchBackupRecords)
+		backupRouter.POST("/record/size", baseApi.LoadBackupRecordSize)
 		backupRouter.POST("/record/search/bycronjob", baseApi.SearchBackupRecordsByCronjob)
 		backupRouter.POST("/record/download", baseApi.DownloadRecord)
 		backupRouter.POST("/record/del", baseApi.DeleteBackupRecord)

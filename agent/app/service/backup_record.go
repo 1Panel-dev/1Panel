@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path"
-	"sort"
-	"strings"
 	"sync"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -14,9 +12,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
-	"github.com/1Panel-dev/1Panel/agent/utils/cloud_storage"
 	"github.com/jinzhu/copier"
-	"github.com/pkg/errors"
 )
 
 type BackupRecordService struct{}
@@ -30,6 +26,7 @@ type IBackupRecordService interface {
 	ListAppRecords(name, detailName, fileName string) ([]model.BackupRecord, error)
 
 	ListFiles(req dto.OperateByID) []string
+	LoadRecordSize(req dto.SearchForSize) ([]dto.RecordFileSize, error)
 }
 
 func NewIBackupRecordService() IBackupRecordService {
@@ -47,15 +44,15 @@ func (u *BackupRecordService) SearchRecordsWithPage(search dto.RecordSearch) (in
 	if err != nil {
 		return 0, nil, err
 	}
-
-	if total == 0 {
-		return 0, nil, nil
+	var data []dto.BackupRecords
+	for _, account := range records {
+		var item dto.BackupRecords
+		if err := copier.Copy(&item, &account); err != nil {
+			global.LOG.Errorf("copy backup account to dto backup info failed, err: %v", err)
+		}
+		data = append(data, item)
 	}
-	datas, err := u.loadRecordSize(records)
-	sort.Slice(datas, func(i, j int) bool {
-		return datas[i].CreatedAt.After(datas[j].CreatedAt)
-	})
-	return total, datas, err
+	return total, data, err
 }
 
 func (u *BackupRecordService) SearchRecordsByCronjobWithPage(search dto.RecordSearchByCronjob) (int64, []dto.BackupRecords, error) {
@@ -67,15 +64,15 @@ func (u *BackupRecordService) SearchRecordsByCronjobWithPage(search dto.RecordSe
 	if err != nil {
 		return 0, nil, err
 	}
-
-	if total == 0 {
-		return 0, nil, nil
+	var data []dto.BackupRecords
+	for _, account := range records {
+		var item dto.BackupRecords
+		if err := copier.Copy(&item, &account); err != nil {
+			global.LOG.Errorf("copy backup account to dto backup info failed, err: %v", err)
+		}
+		data = append(data, item)
 	}
-	datas, err := u.loadRecordSize(records)
-	sort.Slice(datas, func(i, j int) bool {
-		return datas[i].CreatedAt.After(datas[j].CreatedAt)
-	})
-	return total, datas, err
+	return total, data, err
 }
 
 func (u *BackupRecordService) DownloadRecord(info dto.DownloadRecord) (string, error) {
@@ -94,7 +91,7 @@ func (u *BackupRecordService) DownloadRecord(info dto.DownloadRecord) (string, e
 	}
 	srcPath := fmt.Sprintf("%s/%s", info.FileDir, info.FileName)
 	if len(account.BackupPath) != 0 {
-		srcPath = path.Join(strings.TrimPrefix(account.BackupPath, "/"), srcPath)
+		srcPath = path.Join(account.BackupPath, srcPath)
 	}
 	if exist, _ := client.Exist(srcPath); exist {
 		isOK, err := client.Download(srcPath, targetPath)
@@ -181,13 +178,52 @@ func (u *BackupRecordService) ListFiles(req dto.OperateByID) []string {
 	return datas
 }
 
-func (u *BackupRecordService) loadRecordSize(records []model.BackupRecord) ([]dto.BackupRecords, error) {
+type backupSizeHelper struct {
+	ID         uint   `json:"id"`
+	DownloadID uint   `json:"downloadID"`
+	FilePath   string `json:"filePath"`
+	Size       uint   `json:"size"`
+}
+
+func (u *BackupRecordService) LoadRecordSize(req dto.SearchForSize) ([]dto.RecordFileSize, error) {
+	var list []backupSizeHelper
+	switch req.Type {
+	case "snapshot":
+		_, records, err := snapshotRepo.Page(req.Page, req.PageSize, repo.WithByLikeName(req.Info))
+		if err != nil {
+			return nil, err
+		}
+		for _, item := range records {
+			list = append(list, backupSizeHelper{ID: item.ID, DownloadID: item.DownloadAccountID, FilePath: fmt.Sprintf("system_snapshot/%s.tar.gz", item.Name)})
+		}
+	case "cronjob":
+		_, records, err := backupRepo.PageRecord(req.Page, req.PageSize, backupRepo.WithByCronID(req.CronjobID))
+		if err != nil {
+			return nil, err
+		}
+		for _, item := range records {
+			list = append(list, backupSizeHelper{ID: item.ID, DownloadID: item.DownloadAccountID, FilePath: path.Join(item.FileDir, item.FileName)})
+		}
+	default:
+		_, records, err := backupRepo.PageRecord(
+			req.Page, req.PageSize,
+			repo.WithByName(req.Name),
+			repo.WithByType(req.Type),
+			repo.WithByDetailName(req.DetailName),
+		)
+		if err != nil {
+			return nil, err
+		}
+		for _, item := range records {
+			list = append(list, backupSizeHelper{ID: item.ID, DownloadID: item.DownloadAccountID, FilePath: path.Join(item.FileDir, item.FileName)})
+		}
+	}
 	recordMap := make(map[uint]struct{})
 	var recordIds []string
-	for _, record := range records {
-		if _, ok := recordMap[record.DownloadAccountID]; !ok {
-			recordMap[record.DownloadAccountID] = struct{}{}
-			recordIds = append(recordIds, fmt.Sprintf("%v", record.DownloadAccountID))
+	for _, record := range list {
+		if _, ok := recordMap[record.DownloadID]; !ok {
+			recordMap[record.DownloadID] = struct{}{}
+			recordIds = append(recordIds, fmt.Sprintf("%v", record.DownloadID))
 		}
 	}
 	clientMap, err := NewBackupClientMap(recordIds)
@@ -195,22 +231,14 @@ func (u *BackupRecordService) loadRecordSize(records []model.BackupRecord) ([]dt
 		return nil, err
 	}
 
-	var datas []dto.BackupRecords
+	var datas []dto.RecordFileSize
 	var wg sync.WaitGroup
-	for i := 0; i < len(records); i++ {
-		var item dto.BackupRecords
-		if err := copier.Copy(&item, &records[i]); err != nil {
-			return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
-		}
-
-		itemPath := path.Join(records[i].FileDir, records[i].FileName)
-		if val, ok := clientMap[fmt.Sprintf("%v", records[i].DownloadAccountID)]; ok {
-			item.AccountName = val.name
-			item.AccountType = val.accountType
-			item.DownloadAccountID = val.id
+	for i := 0; i < len(list); i++ {
+		item := dto.RecordFileSize{ID: list[i].ID}
+		if val, ok := clientMap[fmt.Sprintf("%v", list[i].DownloadID)]; ok {
 			wg.Add(1)
 			go func(index int) {
-				item.Size, _ = val.client.Size(path.Join(strings.TrimLeft(val.backupPath, "/"), itemPath))
+				item.Size, _ = val.client.Size(path.Join(val.backupPath, list[i].FilePath))
 				datas = append(datas, item)
 				wg.Done()
 			}(i)
@@ -220,11 +248,4 @@ func (u *BackupRecordService) loadRecordSize(records []model.BackupRecord) ([]dt
 	}
 	wg.Wait()
 	return datas, nil
-}
-
-type loadSizeHelper struct {
-	isOk       bool
-	backupName string
-	backupPath string
-	client     cloud_storage.CloudStorageClient
 }

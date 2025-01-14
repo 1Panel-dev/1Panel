@@ -5,9 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path"
-	"strconv"
 	"strings"
-	"sync"
 
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 
@@ -30,7 +28,6 @@ type SnapshotService struct {
 
 type ISnapshotService interface {
 	SearchWithPage(req dto.PageSnapshot) (int64, interface{}, error)
-	LoadSize(req dto.SearchWithPage) ([]dto.SnapshotFile, error)
 	LoadSnapshotData() (dto.SnapshotData, error)
 	SnapshotCreate(req dto.SnapshotCreate, isCron bool) error
 	SnapshotReCreate(id uint) error
@@ -57,56 +54,10 @@ func (u *SnapshotService) SearchWithPage(req dto.PageSnapshot) (int64, interface
 		if err := copier.Copy(&item, &records[i]); err != nil {
 			return 0, nil, err
 		}
+		item.SourceAccounts, item.DownloadAccount, _ = loadBackupNamesByID(records[i].SourceAccountIDs, records[i].DownloadAccountID)
 		datas = append(datas, item)
 	}
 	return total, datas, err
-}
-
-func (u *SnapshotService) LoadSize(req dto.SearchWithPage) ([]dto.SnapshotFile, error) {
-	_, records, err := snapshotRepo.Page(req.Page, req.PageSize, repo.WithByLikeName(req.Info))
-	if err != nil {
-		return nil, err
-	}
-	var datas []dto.SnapshotFile
-	var wg sync.WaitGroup
-	clientMap := make(map[uint]loadSizeHelper)
-	for i := 0; i < len(records); i++ {
-		itemPath := fmt.Sprintf("system_snapshot/%s.tar.gz", records[i].Name)
-		data := dto.SnapshotFile{ID: records[i].ID, Name: records[i].Name}
-		accounts := strings.Split(records[i].SourceAccountIDs, ",")
-		var accountNames []string
-		for _, account := range accounts {
-			itemVal, _ := strconv.Atoi(account)
-			if _, ok := clientMap[uint(itemVal)]; !ok {
-				backup, client, err := NewBackupClientWithID(uint(itemVal))
-				if err != nil {
-					global.LOG.Errorf("load backup client from db failed, err: %v", err)
-					clientMap[records[i].DownloadAccountID] = loadSizeHelper{}
-					continue
-				}
-				backupName := fmt.Sprintf("%s - %s", backup.Type, backup.Name)
-				clientMap[uint(itemVal)] = loadSizeHelper{backupPath: strings.TrimLeft(backup.BackupPath, "/"), client: client, isOk: true, backupName: backupName}
-				accountNames = append(accountNames, backupName)
-			} else {
-				accountNames = append(accountNames, clientMap[uint(itemVal)].backupName)
-			}
-		}
-		data.DefaultDownload = clientMap[records[i].DownloadAccountID].backupName
-		data.From = strings.Join(accountNames, ",")
-		if clientMap[records[i].DownloadAccountID].isOk {
-			wg.Add(1)
-			go func(index int) {
-				data.Size, _ = clientMap[records[index].DownloadAccountID].client.Size(path.Join(clientMap[records[index].DownloadAccountID].backupPath, itemPath))
-				datas = append(datas, data)
-				wg.Done()
-			}(i)
-		} else {
-			datas = append(datas, data)
-		}
-	}
-	wg.Wait()
-
-	return datas, nil
 }
 
 func (u *SnapshotService) SnapshotImport(req dto.SnapshotImport) error {

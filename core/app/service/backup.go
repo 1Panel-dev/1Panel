@@ -83,6 +83,9 @@ func (u *BackupService) Create(req dto.BackupOperate) error {
 	if backup.ID != 0 {
 		return constant.ErrRecordExist
 	}
+	if req.Type != constant.Sftp && req.BackupPath != "/" {
+		req.BackupPath = strings.TrimPrefix(req.BackupPath, "/")
+	}
 	if err := copier.Copy(&backup, &req); err != nil {
 		return errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
@@ -188,6 +191,9 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 	}
 	if backup.Type == constant.Local {
 		return buserr.New(constant.ErrBackupLocal)
+	}
+	if req.Type != constant.Sftp && req.BackupPath != "/" {
+		req.BackupPath = strings.TrimPrefix(req.BackupPath, "/")
 	}
 	var newBackup model.BackupAccount
 	if err := copier.Copy(&newBackup, &req); err != nil {

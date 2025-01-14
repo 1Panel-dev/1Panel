@@ -88,6 +88,9 @@ func (u *BackupService) SearchWithPage(req dto.SearchPageWithType) (int64, inter
 		if err := copier.Copy(&item, &account); err != nil {
 			global.LOG.Errorf("copy backup account to dto backup info failed, err: %v", err)
 		}
+		if item.Type != constant.Sftp && item.Type != constant.Local {
+			item.BackupPath = path.Join("/", strings.TrimPrefix(item.BackupPath, "/"))
+		}
 		if !item.RememberAuth {
 			item.AccessKey = ""
 			item.Credential = ""
@@ -123,6 +126,9 @@ func (u *BackupService) SearchWithPage(req dto.SearchPageWithType) (int64, inter
 func (u *BackupService) Create(req dto.BackupOperate) error {
 	if req.Type == constant.Local {
 		return buserr.New(constant.ErrBackupLocalCreate)
+	}
+	if req.Type != constant.Sftp && req.BackupPath != "/" {
+		req.BackupPath = strings.TrimPrefix(req.BackupPath, "/")
 	}
 	backup, _ := backupRepo.Get(repo.WithByName(req.Name))
 	if backup.ID != 0 {
@@ -214,6 +220,9 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 	backup, _ := backupRepo.Get(repo.WithByID(req.ID))
 	if backup.ID == 0 {
 		return constant.ErrRecordNotFound
+	}
+	if req.Type != constant.Sftp && req.Type != constant.Local && req.BackupPath != "/" {
+		req.BackupPath = strings.TrimPrefix(req.BackupPath, "/")
 	}
 	var newBackup model.BackupAccount
 	if err := copier.Copy(&newBackup, &req); err != nil {
@@ -428,14 +437,10 @@ func NewBackupClientMap(ids []string) (map[string]backupClientHelper, error) {
 		if err != nil {
 			return nil, err
 		}
-		pathItem := item.BackupPath
-		if item.Type != constant.Sftp && item.Type != constant.Local && pathItem != "/" {
-			pathItem = strings.TrimPrefix(item.BackupPath, "/")
-		}
 		clientMap[fmt.Sprintf("%v", item.ID)] = backupClientHelper{
 			client:      backClient,
 			name:        item.Name,
-			backupPath:  pathItem,
+			backupPath:  item.BackupPath,
 			accountType: item.Type,
 			id:          item.ID,
 		}
@@ -501,4 +506,29 @@ func loadRefreshTokenByCode(backup *model.BackupAccount) error {
 	}
 	backup.Vars = string(itemVars)
 	return nil
+}
+
+func loadBackupNamesByID(accountIDs string, downloadID uint) ([]string, string, error) {
+	accountIDList := strings.Split(accountIDs, ",")
+	var ids []uint
+	for _, item := range accountIDList {
+		if len(item) != 0 {
+			itemID, _ := strconv.Atoi(item)
+			ids = append(ids, uint(itemID))
+		}
+	}
+	list, err := backupRepo.List(repo.WithByIDs(ids))
+	if err != nil {
+		return nil, "", err
+	}
+	var accounts []string
+	var downloadAccount string
+	for _, item := range list {
+		itemName := fmt.Sprintf("%s - %s", item.Type, item.Name)
+		accounts = append(accounts, itemName)
+		if item.ID == downloadID {
+			downloadAccount = itemName
+		}
+	}
+	return accounts, downloadAccount, nil
 }

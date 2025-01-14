@@ -106,17 +106,17 @@ type CronjobInfo struct {
 	ContainerName string `json:"containerName"`
 	User          string `json:"user"`
 
-	AppID             string `json:"appID"`
-	Website           string `json:"website"`
-	ExclusionRules    string `json:"exclusionRules"`
-	DBType            string `json:"dbType"`
-	DBName            string `json:"dbName"`
-	URL               string `json:"url"`
-	IsDir             bool   `json:"isDir"`
-	SourceDir         string `json:"sourceDir"`
-	SourceAccountIDs  string `json:"sourceAccountIDs"`
-	DownloadAccountID uint   `json:"downloadAccountID"`
-	RetainCopies      int    `json:"retainCopies"`
+	AppID           string   `json:"appID"`
+	Website         string   `json:"website"`
+	ExclusionRules  string   `json:"exclusionRules"`
+	DBType          string   `json:"dbType"`
+	DBName          string   `json:"dbName"`
+	URL             string   `json:"url"`
+	IsDir           bool     `json:"isDir"`
+	SourceDir       string   `json:"sourceDir"`
+	SourceAccounts  []string `json:"sourceAccounts"`
+	DownloadAccount string   `json:"downloadAccount"`
+	RetainCopies    int      `json:"retainCopies"`
 
 	LastRecordStatus string `json:"lastRecordStatus"`
 	LastRecordTime   string `json:"lastRecordTime"`

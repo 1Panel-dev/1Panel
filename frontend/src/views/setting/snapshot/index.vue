@@ -181,7 +181,6 @@
 <script setup lang="ts">
 import {
     searchSnapshotPage,
-    loadSnapshotSize,
     snapshotDelete,
     snapshotRecreate,
     snapshotRollback,
@@ -200,6 +199,7 @@ import SnapshotCreate from '@/views/setting/snapshot/create/index.vue';
 import SnapRecover from '@/views/setting/snapshot/recover/index.vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { loadOsInfo } from '@/api/modules/dashboard';
+import { loadRecordSize } from '@/api/modules/backup';
 
 const loading = ref(false);
 const data = ref();
@@ -395,7 +395,7 @@ const search = async (column?: any) => {
     await searchSnapshotPage(params)
         .then((res) => {
             loading.value = false;
-            loadSize();
+            loadSize(params);
             cleanData.value = false;
             data.value = res.data.items || [];
             paginationConfig.total = res.data.total;
@@ -405,13 +405,9 @@ const search = async (column?: any) => {
         });
 };
 
-const loadSize = async () => {
-    let params = {
-        info: searchName.value,
-        page: paginationConfig.currentPage,
-        pageSize: paginationConfig.pageSize,
-    };
-    await loadSnapshotSize(params)
+const loadSize = async (params: any) => {
+    params.type = 'snapshot';
+    await loadRecordSize(params)
         .then((res) => {
             let stats = res.data || [];
             if (stats.length === 0) {

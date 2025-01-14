@@ -92,11 +92,24 @@ type BackupRecords struct {
 	DownloadAccountID uint      `json:"downloadAccountID"`
 	FileDir           string    `json:"fileDir"`
 	FileName          string    `json:"fileName"`
-	Size              int64     `json:"size"`
 }
 
 type DownloadRecord struct {
 	DownloadAccountID uint   `json:"downloadAccountID" validate:"required"`
 	FileDir           string `json:"fileDir" validate:"required"`
 	FileName          string `json:"fileName" validate:"required"`
+}
+
+type SearchForSize struct {
+	PageInfo
+	Type       string `json:"type" validate:"required"`
+	Name       string `json:"name"`
+	DetailName string `json:"detailName"`
+	Info       string `json:"info"`
+	CronjobID  uint   `json:"cronjobID"`
+}
+type RecordFileSize struct {
+	ID   uint   `json:"id"`
+	Name string `json:"name"`
+	Size int64  `json:"size"`
 }

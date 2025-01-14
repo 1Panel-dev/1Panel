@@ -6,8 +6,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
-	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
 	"net/url"
@@ -21,6 +19,9 @@ import (
 	"sync"
 	"syscall"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/gin-gonic/gin"
 
 	"github.com/pkg/errors"
 

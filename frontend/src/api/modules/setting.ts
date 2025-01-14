@@ -139,9 +139,6 @@ export const snapshotRollback = (param: Setting.SnapshotRecover) => {
 export const searchSnapshotPage = (param: SearchWithPage) => {
     return http.post<ResPage<Setting.SnapshotInfo>>(`/settings/snapshot/search`, param);
 };
-export const loadSnapshotSize = (param: SearchWithPage) => {
-    return http.post<Array<Setting.SnapshotFile>>(`/settings/snapshot/size`, param);
-};
 
 // upgrade
 export const loadUpgradeInfo = () => {

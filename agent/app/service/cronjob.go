@@ -3,12 +3,13 @@ package service
 import (
 	"bufio"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"os"
 	"path"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -56,6 +57,7 @@ func (u *CronjobService) SearchWithPage(search dto.PageCronjob) (int64, interfac
 		} else {
 			item.LastRecordTime = "-"
 		}
+		item.SourceAccounts, item.DownloadAccount, _ = loadBackupNamesByID(cronjob.SourceAccountIDs, cronjob.DownloadAccountID)
 		dtoCronjobs = append(dtoCronjobs, item)
 	}
 	return total, dtoCronjobs, err
