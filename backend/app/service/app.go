@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -34,8 +35,8 @@ type AppService struct {
 }
 
 type IAppService interface {
-	PageApp(req request.AppSearch) (interface{}, error)
-	GetAppTags() ([]response.TagDTO, error)
+	PageApp(ctx *gin.Context, req request.AppSearch) (interface{}, error)
+	GetAppTags(ctx *gin.Context) ([]response.TagDTO, error)
 	GetApp(key string) (*response.AppDTO, error)
 	GetAppDetail(appId uint, version, appType string) (response.AppDetailDTO, error)
 	Install(ctx context.Context, req request.AppInstallCreate) (*model.AppInstall, error)
@@ -50,7 +51,7 @@ func NewIAppService() IAppService {
 	return &AppService{}
 }
 
-func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
+func (a AppService) PageApp(ctx *gin.Context, req request.AppSearch) (interface{}, error) {
 	var opts []repo.DBOption
 	opts = append(opts, appRepo.OrderByRecommend())
 	if req.Name != "" {
@@ -90,6 +91,7 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 		return nil, err
 	}
 	var appDTOs []*response.AppItem
+	lang := strings.ToLower(common.GetLang(ctx))
 	for _, ap := range apps {
 		appDTO := &response.AppItem{
 			ID:          ap.ID,
@@ -115,7 +117,27 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 		if err != nil {
 			continue
 		}
-		appDTO.Tags = tags
+		for _, t := range tags {
+			if t.Name != "" {
+				tagDTO := response.TagDTO{
+					ID:   t.ID,
+					Key:  t.Key,
+					Name: t.Name,
+				}
+				appDTO.Tags = append(appDTO.Tags, tagDTO)
+			} else {
+				var translations = make(map[string]string)
+				_ = json.Unmarshal([]byte(t.Translations), &translations)
+				if name, ok := translations[lang]; ok {
+					tagDTO := response.TagDTO{
+						ID:   t.ID,
+						Key:  t.Key,
+						Name: name,
+					}
+					appDTO.Tags = append(appDTO.Tags, tagDTO)
+				}
+			}
+		}
 		installs, _ := appInstallRepo.ListBy(appInstallRepo.WithAppId(ap.ID))
 		appDTO.Installed = len(installs) > 0
 	}
@@ -125,13 +147,21 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 	return res, nil
 }
 
-func (a AppService) GetAppTags() ([]response.TagDTO, error) {
+func (a AppService) GetAppTags(ctx *gin.Context) ([]response.TagDTO, error) {
 	tags, _ := tagRepo.All()
 	res := make([]response.TagDTO, 0)
+	lang := strings.ToLower(common.GetLang(ctx))
 	for _, tag := range tags {
-		res = append(res, response.TagDTO{
-			Tag: tag,
-		})
+		tagDTO := response.TagDTO{
+			ID:  tag.ID,
+			Key: tag.Key,
+		}
+		var translations = make(map[string]string)
+		_ = json.Unmarshal([]byte(tag.Translations), &translations)
+		if name, ok := translations[lang]; ok {
+			tagDTO.Name = name
+		}
+		res = append(res, tagDTO)
 	}
 	return res, nil
 }
@@ -827,10 +857,11 @@ func (a AppService) SyncAppListFromRemote() (err error) {
 		oldAppIds []uint
 	)
 	for _, t := range list.Extra.Tags {
+		translations, _ := json.Marshal(t.Locales)
 		tags = append(tags, &model.Tag{
-			Key:  t.Key,
-			Name: t.Name,
-			Sort: t.Sort,
+			Key:          t.Key,
+			Translations: string(translations),
+			Sort:         t.Sort,
 		})
 	}
 	oldApps, err := appRepo.GetBy(appRepo.WithResource(constant.AppResourceRemote))

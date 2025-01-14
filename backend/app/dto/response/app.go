@@ -29,23 +29,25 @@ type AppDTO struct {
 }
 
 type AppItem struct {
-	Name        string      `json:"name"`
-	Key         string      `json:"key"`
-	ID          uint        `json:"id"`
-	ShortDescZh string      `json:"shortDescZh"`
-	ShortDescEn string      `json:"shortDescEn"`
-	Icon        string      `json:"icon"`
-	Type        string      `json:"type"`
-	Status      string      `json:"status"`
-	Resource    string      `json:"resource"`
-	Installed   bool        `json:"installed"`
-	Versions    []string    `json:"versions"`
-	Limit       int         `json:"limit"`
-	Tags        []model.Tag `json:"tags"`
+	Name        string   `json:"name"`
+	Key         string   `json:"key"`
+	ID          uint     `json:"id"`
+	ShortDescZh string   `json:"shortDescZh"`
+	ShortDescEn string   `json:"shortDescEn"`
+	Icon        string   `json:"icon"`
+	Type        string   `json:"type"`
+	Status      string   `json:"status"`
+	Resource    string   `json:"resource"`
+	Installed   bool     `json:"installed"`
+	Versions    []string `json:"versions"`
+	Limit       int      `json:"limit"`
+	Tags        []TagDTO `json:"tags"`
 }
 
 type TagDTO struct {
-	model.Tag
+	ID   uint   `json:"id"`
+	Key  string `json:"key"`
+	Name string `json:"name"`
 }
 
 type AppInstalledCheck struct {

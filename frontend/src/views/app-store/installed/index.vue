@@ -21,7 +21,7 @@
                                 :type="activeTag === item.key ? 'primary' : ''"
                                 :plain="activeTag !== item.key"
                             >
-                                {{ language == 'zh' || language == 'tw' ? item.name : item.key }}
+                                {{ item.name }}
                             </el-button>
                         </div>
                         <div class="inline">

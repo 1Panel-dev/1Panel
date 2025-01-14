@@ -22,7 +22,7 @@ func (b *BaseApi) SearchApp(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	list, err := appService.PageApp(req)
+	list, err := appService.PageApp(c, req)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
@@ -173,7 +173,7 @@ func (b *BaseApi) InstallApp(c *gin.Context) {
 }
 
 func (b *BaseApi) GetAppTags(c *gin.Context) {
-	tags, err := appService.GetAppTags()
+	tags, err := appService.GetAppTags(c)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

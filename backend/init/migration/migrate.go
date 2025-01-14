@@ -99,6 +99,8 @@ func Init() {
 		migrations.AddAutoRestart,
 		migrations.AddApiInterfaceConfig,
 		migrations.AddApiKeyValidityTime,
+
+		migrations.UpdateAppTag,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

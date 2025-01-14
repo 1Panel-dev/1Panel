@@ -104,9 +104,20 @@ type AppConfigVersion struct {
 }
 
 type Tag struct {
-	Key  string `json:"key"`
-	Name string `json:"name"`
-	Sort int    `json:"sort"`
+	Key     string `json:"key"`
+	Name    string `json:"name"`
+	Sort    int    `json:"sort"`
+	Locales Locale `json:"locales"`
+}
+
+type Locale struct {
+	En     string `json:"en"`
+	Ja     string `json:"ja"`
+	Ms     string `json:"ms"`
+	PtBr   string `json:"pt-br"`
+	Ru     string `json:"ru"`
+	ZhHant string `json:"zh-hant"`
+	Zh     string `json:"zh"`
 }
 
 type AppForm struct {
