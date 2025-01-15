@@ -46,10 +46,11 @@ import FileList from '@/components/file-list/index.vue';
 import { reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
-import { ElForm, ElMessage } from 'element-plus';
+import { ElForm } from 'element-plus';
 import { imageBuild } from '@/api/modules/container';
 import TaskLog from '@/components/task-log/index.vue';
 import { newUUID } from '@/utils/util';
+import { MsgSuccess } from '@/utils/message';
 
 const drawerVisible = ref(false);
 const taskLogRef = ref();
@@ -95,7 +96,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         form.taskID = newUUID();
         await imageBuild(form);
         openTaskLog(form.taskID);
-        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     });
 };
 const openTaskLog = (taskID: string) => {

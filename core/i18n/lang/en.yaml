@@ -82,6 +82,7 @@ RestartAfterUpgrade: "Start Service After Upgrade"
 
 #add node
 TaskAddNode: "Add Node"
+SyncAgentBaseInfo: "Sync Node Base Data"
 GenerateSSLInfo: "Generate Node SSL Information"
 ConnInfoNotMatch: "Connection information does not match";
 MakeAgentPackage: "Generate Node Installation Package"

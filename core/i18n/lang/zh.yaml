@@ -83,6 +83,7 @@ RestartAfterUpgrade: "升级后启动服务"
 
 #add node
 TaskAddNode: "添加节点"
+SyncAgentBaseInfo: "同步节点基础数据"
 GenerateSSLInfo: "生成节点 SSL 信息"
 ConnInfoNotMatch: "连接信息不匹配"
 MakeAgentPackage: "生成节点安装包"

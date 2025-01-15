@@ -82,6 +82,7 @@ RestartAfterUpgrade: "升級後啟動服務"
 
 #node create
 TaskAddNode: "添加節點"
+SyncAgentBaseInfo: "同步節點基礎數據"
 GenerateSSLInfo: "生成節點 SSL 信息"
 ConnInfoNotMatch: "連接信息不匹配";
 MakeAgentPackage: "生成節點安裝包"
