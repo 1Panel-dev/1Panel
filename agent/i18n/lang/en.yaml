@@ -157,6 +157,7 @@ ErrTypeOfRedis: "The recovery file type does not match the current persistence m
 #container
 ErrInUsed: "{{ .detail }} is in use and cannot be deleted"
 ErrObjectInUsed: "This object is in use and cannot be deleted"
+ErrObjectBeDependent: "This image is dependent on other images and can't be deleted"
 ErrPortRules: "The number of ports does not match, please re-enter!"
 ErrPgImagePull: "Image pull timeout. Please configure image acceleration or manually pull the postgres:16.0-alpine image and try again"
 

@@ -17,9 +17,9 @@ type Ufw struct {
 func NewUfw() (*Ufw, error) {
 	var ufw Ufw
 	if cmd.HasNoPasswordSudo() {
-		ufw.CmdStr = "sudo ufw"
+		ufw.CmdStr = "LANGUAGE=en_US:en sudo ufw"
 	} else {
-		ufw.CmdStr = "ufw"
+		ufw.CmdStr = "LANGUAGE=en_US:en ufw"
 	}
 	return &ufw, nil
 }

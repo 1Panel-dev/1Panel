@@ -130,7 +130,6 @@ const taskLogRef = ref();
 
 const data = ref();
 const paginationConfig = reactive({
-    cacheSizeKey: 'backup-page-size',
     currentPage: 1,
     pageSize: 10,
     total: 0,

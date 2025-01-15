@@ -517,18 +517,17 @@ const search = async () => {
                 form.cmd = res.data.cmd || [];
                 for (const item of form.cmd) {
                     if (item.indexOf(' ') !== -1) {
-                        itemCmd += `"${item.replaceAll('"', '\\"')}" `;
+                        itemCmd += `"${escapeQuotes(item)}" `;
                     } else {
                         itemCmd += item + ' ';
                     }
                 }
                 form.cmdStr = itemCmd.trimEnd();
-
                 let itemEntrypoint = '';
                 form.entrypoint = res.data.entrypoint || [];
                 for (const item of form.entrypoint) {
                     if (item.indexOf(' ') !== -1) {
-                        itemEntrypoint += `"${item.replaceAll('"', '\\"')}" `;
+                        itemEntrypoint += `"${escapeQuotes(item)}" `;
                     } else {
                         itemEntrypoint += item + ' ';
                     }
@@ -656,14 +655,14 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
 const submit = async () => {
     form.cmd = [];
     if (form.cmdStr) {
-        let itemCmd = splitWithQuotes(form.cmdStr);
+        let itemCmd = splitStringIgnoringQuotes(form.cmdStr);
         for (const item of itemCmd) {
             form.cmd.push(item.replace(/(?<!\\)"/g, '').replaceAll('\\"', '"'));
         }
     }
     form.entrypoint = [];
     if (form.entrypointStr) {
-        let itemEntrypoint = splitWithQuotes(form.entrypointStr);
+        let itemEntrypoint = splitStringIgnoringQuotes(form.entrypointStr);
         for (const item of itemEntrypoint) {
             form.entrypoint.push(item.replace(/(?<!\\)"/g, '').replaceAll('\\"', '"'));
         }
@@ -778,15 +777,25 @@ const isFromApp = (rowData: Container.ContainerHelper) => {
     return false;
 };
 
-const splitWithQuotes = (str) => {
-    str = str.replace(/\\"/g, '<quota>');
-    const regex = /(?=(?:[^'"]|['"][^'"]*['"])*$)\s+/g;
-    let parts = str.split(regex).filter(Boolean);
-    let returnList = [];
-    for (const item of parts) {
-        returnList.push(item.replaceAll('<quota>', '\\"'));
+const escapeQuotes = (input) => {
+    return input.replace(/(?<!\\)"/g, '\\"');
+};
+
+const splitStringIgnoringQuotes = (input) => {
+    input = input.replace(/\\"/g, '<quota>');
+    const regex = /"([^"]*)"|(\S+)/g;
+    const result = [];
+    let match;
+
+    while ((match = regex.exec(input)) !== null) {
+        if (match[1]) {
+            result.push(match[1].replaceAll('<quota>', '\\"'));
+        } else if (match[2]) {
+            result.push(match[2].replaceAll('<quota>', '\\"'));
+        }
     }
-    return returnList;
+
+    return result;
 };
 
 onMounted(() => {

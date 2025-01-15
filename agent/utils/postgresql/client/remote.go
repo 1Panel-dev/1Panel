@@ -306,7 +306,7 @@ func loadImageTag() (string, error) {
 	defer cancel()
 	if _, err := client.ImagePull(ctx, itemTag, image.PullOptions{}); err != nil {
 		if errors.Is(ctx.Err(), context.DeadlineExceeded) {
-			return itemTag, buserr.New(constant.ErrPgImagePull)
+			return itemTag, buserr.WithName(constant.ErrPgImagePull, itemTag)
 		}
 		global.LOG.Errorf("image %s pull failed, err: %v", itemTag, err)
 		return itemTag, fmt.Errorf("image %s pull failed, err: %v", itemTag, err)

@@ -8,13 +8,13 @@
 import { CSSProperties } from 'vue';
 import { basicSetup, EditorView } from 'codemirror';
 import { EditorState } from '@codemirror/state';
-import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { StreamLanguage } from '@codemirror/language';
 import { nginx } from './nginx';
 import { yaml } from '@codemirror/legacy-modes/mode/yaml';
 import { shell } from '@codemirror/legacy-modes/mode/shell';
 import { dockerFile } from '@codemirror/legacy-modes/mode/dockerfile';
+import { javascript } from '@codemirror/legacy-modes/mode/javascript';
 import { placeholder } from '@codemirror/view';
 import { json } from '@codemirror/lang-json';
 
@@ -94,7 +94,7 @@ const initCodeMirror = () => {
             extensions.push(StreamLanguage.define(dockerFile));
             break;
         case 'javascript':
-            extensions.push(javascript());
+            extensions.push(StreamLanguage.define(javascript));
             break;
         case 'nginx':
             extensions.push(StreamLanguage.define(nginx));

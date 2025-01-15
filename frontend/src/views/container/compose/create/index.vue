@@ -98,7 +98,7 @@ const form = reactive({
     envFileContent: `env_file:\n  - 1panel.env`,
 });
 const rules = reactive({
-    name: [Rules.requiredInput, Rules.imageName],
+    name: [Rules.requiredInput, Rules.composeName],
     path: [Rules.requiredInput],
     template: [Rules.requiredSelect],
 });

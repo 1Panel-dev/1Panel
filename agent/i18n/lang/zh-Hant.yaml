@@ -158,6 +158,7 @@ ErrTypeOfRedis: "恢復文件類型與當前持久化方式不符，請修改後
 #container
 ErrInUsed: "{{ .detail }} 正被使用，無法刪除"
 ErrObjectInUsed: "該對象正被使用，無法刪除"
+ErrObjectBeDependent: "該鏡像依賴於其他鏡像，無法刪除"
 ErrPortRules: "端口數目不匹配，請重新輸入！"
 ErrPgImagePull: "鏡像拉取超時，請配置鏡像加速或手動拉取 postgres:16.0-alpine 鏡像後重試"
 

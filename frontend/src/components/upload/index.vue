@@ -153,7 +153,6 @@ const open = ref();
 const data = ref();
 const title = ref();
 const paginationConfig = reactive({
-    cacheSizeKey: 'upload-page-size',
     currentPage: 1,
     pageSize: 10,
     total: 0,

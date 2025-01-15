@@ -7,24 +7,23 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"io"
 	"os"
 	"path"
 	"strings"
 	"time"
 
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/image"
-
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/registry"
 	"github.com/docker/docker/pkg/archive"
 	"github.com/docker/docker/pkg/homedir"
@@ -418,6 +417,9 @@ func (u *ImageService) ImageRemove(req dto.BatchDelete) (dto.ContainerPruneRepor
 					return report, buserr.New(constant.ErrObjectInUsed)
 				}
 				return report, buserr.WithDetail(constant.ErrInUsed, id, nil)
+			}
+			if strings.Contains(err.Error(), "image has dependent") {
+				return report, buserr.New(constant.ErrObjectBeDependent)
 			}
 			return report, err
 		}

@@ -156,8 +156,9 @@ ErrTypeOfRedis: "恢复文件类型与当前持久化方式不符，请修改后
 #container
 ErrInUsed: "{{ .detail }} 正被使用，无法删除"
 ErrObjectInUsed: "该对象正被使用，无法删除"
+ErrObjectBeDependent: "该镜像依赖于其他镜像，无法删除"
 ErrPortRules: "端口数目不匹配，请重新输入！"
-ErrPgImagePull: "镜像拉取超时，请配置镜像加速或手动拉取 postgres:16.0-alpine 镜像后重试"
+ErrPgImagePull: "镜像拉取超时，请配置镜像加速或手动拉取 {{ .name }} 镜像后重试"
 
 #runtime
 ErrDirNotFound: "build 文件夹不存在！请检查文件完整性！"

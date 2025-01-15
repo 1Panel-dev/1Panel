@@ -224,6 +224,19 @@ const checkDBName = (rule: any, value: any, callback: any) => {
     }
 };
 
+const checkComposeName = (rule: any, value: any, callback: any) => {
+    if (value === '' || typeof value === 'undefined' || value == null) {
+        callback(new Error(i18n.global.t('commons.rule.composeName')));
+    } else {
+        const reg = /^[a-z0-9]{1}[a-z0-9_-]{0,256}$/;
+        if (!reg.test(value) && value !== '') {
+            callback(new Error(i18n.global.t('commons.rule.composeName')));
+        } else {
+            callback();
+        }
+    }
+};
+
 const checkImageName = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.imageName')));
@@ -568,6 +581,7 @@ interface CommonRule {
     simplePassword: FormItemRule;
     dbName: FormItemRule;
     imageName: FormItemRule;
+    composeName: FormItemRule;
     volumeName: FormItemRule;
     linuxName: FormItemRule;
     password: FormItemRule;
@@ -641,6 +655,11 @@ export const Rules: CommonRule = {
     dbName: {
         required: true,
         validator: checkDBName,
+        trigger: 'blur',
+    },
+    composeName: {
+        required: true,
+        validator: checkComposeName,
         trigger: 'blur',
     },
     imageName: {

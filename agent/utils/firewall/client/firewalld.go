@@ -25,12 +25,12 @@ func (f *Firewall) Name() string {
 }
 
 func (f *Firewall) Status() (bool, error) {
-	stdout, _ := cmd.Exec("firewall-cmd --state")
+	stdout, _ := cmd.Exec("LANGUAGE=en_US:en firewall-cmd --state")
 	return stdout == "running\n", nil
 }
 
 func (f *Firewall) Version() (string, error) {
-	stdout, err := cmd.Exec("firewall-cmd --version")
+	stdout, err := cmd.Exec("LANGUAGE=en_US:en firewall-cmd --version")
 	if err != nil {
 		return "", fmt.Errorf("load the firewall version failed, err: %s", stdout)
 	}
