@@ -2,6 +2,7 @@ package common
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
 	mathRand "math/rand"
 	"net"
 	"os"
@@ -153,4 +154,12 @@ func CreateDirWhenNotExist(isDir bool, pathItem string) (string, error) {
 		}
 	}
 	return pathItem, nil
+}
+
+func GetLang(c *gin.Context) string {
+	lang := c.GetHeader("Accept-Language")
+	if lang == "" {
+		lang = "en"
+	}
+	return lang
 }

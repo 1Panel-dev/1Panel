@@ -199,6 +199,14 @@ export const DNSTypes = [
         label: 'GoDaddy',
         value: 'Godaddy',
     },
+    {
+        label: 'CloudDNS',
+        value: 'CloudDns',
+    },
+    {
+        label: i18n.global.t('website.rainyun'),
+        value: 'RainYun',
+    },
 ];
 
 export const Fields = [

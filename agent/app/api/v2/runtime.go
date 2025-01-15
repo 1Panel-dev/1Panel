@@ -9,7 +9,6 @@ import (
 
 // @Tags Runtime
 // @Summary List runtimes
-// @Description 获取运行环境列表
 // @Accept json
 // @Param request body request.RuntimeSearch true "request"
 // @Success 200
@@ -33,7 +32,6 @@ func (b *BaseApi) SearchRuntimes(c *gin.Context) {
 
 // @Tags Runtime
 // @Summary Create runtime
-// @Description 创建运行环境
 // @Accept json
 // @Param request body request.RuntimeCreate true "request"
 // @Success 200
@@ -55,7 +53,6 @@ func (b *BaseApi) CreateRuntime(c *gin.Context) {
 
 // @Tags Website
 // @Summary Delete runtime
-// @Description 删除运行环境
 // @Accept json
 // @Param request body request.RuntimeDelete true "request"
 // @Success 200
@@ -77,7 +74,6 @@ func (b *BaseApi) DeleteRuntime(c *gin.Context) {
 
 // @Tags Website
 // @Summary Delete runtime
-// @Description 删除运行环境校验
 // @Accept json
 // @Success 200
 // @Security ApiKeyAuth
@@ -98,7 +94,6 @@ func (b *BaseApi) DeleteRuntimeCheck(c *gin.Context) {
 
 // @Tags Runtime
 // @Summary Update runtime
-// @Description 更新运行环境
 // @Accept json
 // @Param request body request.RuntimeUpdate true "request"
 // @Success 200
@@ -119,7 +114,6 @@ func (b *BaseApi) UpdateRuntime(c *gin.Context) {
 
 // @Tags Runtime
 // @Summary Get runtime
-// @Description 获取运行环境
 // @Accept json
 // @Param id path string true "request"
 // @Success 200
@@ -141,7 +135,6 @@ func (b *BaseApi) GetRuntime(c *gin.Context) {
 
 // @Tags Runtime
 // @Summary Get Node package scripts
-// @Description 获取 Node 项目的 scripts
 // @Accept json
 // @Param request body request.NodePackageReq true "request"
 // @Success 200
@@ -162,7 +155,6 @@ func (b *BaseApi) GetNodePackageRunScript(c *gin.Context) {
 
 // @Tags Runtime
 // @Summary Operate runtime
-// @Description 操作运行环境
 // @Accept json
 // @Param request body request.RuntimeOperate true "request"
 // @Success 200
@@ -184,7 +176,6 @@ func (b *BaseApi) OperateRuntime(c *gin.Context) {
 
 // @Tags Runtime
 // @Summary Get Node modules
-// @Description 获取 Node 项目的 modules
 // @Accept json
 // @Param request body request.NodeModuleReq true "request"
 // @Success 200
@@ -205,7 +196,6 @@ func (b *BaseApi) GetNodeModules(c *gin.Context) {
 
 // @Tags Runtime
 // @Summary Operate Node modules
-// @Description 操作 Node 项目 modules
 // @Accept json
 // @Param request body request.NodeModuleReq true "request"
 // @Success 200
@@ -226,7 +216,6 @@ func (b *BaseApi) OperateNodeModules(c *gin.Context) {
 
 // @Tags Runtime
 // @Summary Sync runtime status
-// @Description 同步运行环境状态
 // @Accept json
 // @Success 200
 // @Security ApiKeyAuth
@@ -242,7 +231,6 @@ func (b *BaseApi) SyncStatus(c *gin.Context) {
 
 // @Tags Runtime
 // @Summary Get php runtime extension
-// @Description 获取 PHP 运行环境扩展
 // @Accept json
 // @Param id path string true "request"
 // @Success 200
@@ -264,7 +252,6 @@ func (b *BaseApi) GetRuntimeExtension(c *gin.Context) {
 
 // @Tags Runtime
 // @Summary Install php extension
-// @Description 安装 PHP 扩展
 // @Accept json
 // @Param request body request.PHPExtensionInstallReq true "request"
 // @Success 200
@@ -285,7 +272,6 @@ func (b *BaseApi) InstallPHPExtension(c *gin.Context) {
 
 // @Tags Runtime
 // @Summary UnInstall php extension
-// @Description 卸载 PHP 扩展
 // @Accept json
 // @Param request body request.PHPExtensionInstallReq true "request"
 // @Success 200
@@ -306,7 +292,6 @@ func (b *BaseApi) UnInstallPHPExtension(c *gin.Context) {
 
 // @Tags Runtime
 // @Summary Load php runtime conf
-// @Description 获取 php 运行环境配置
 // @Accept json
 // @Param id path integer true "request"
 // @Success 200 {object} response.PHPConfig
@@ -328,7 +313,6 @@ func (b *BaseApi) GetPHPConfig(c *gin.Context) {
 
 // @Tags Runtime
 // @Summary Update runtime php conf
-// @Description 更新运行环境 PHP 配置
 // @Accept json
 // @Param request body request.PHPConfigUpdate true "request"
 // @Success 200
@@ -349,7 +333,6 @@ func (b *BaseApi) UpdatePHPConfig(c *gin.Context) {
 
 // @Tags Runtime
 // @Summary Update php conf file
-// @Description 更新 php 配置文件
 // @Accept json
 // @Param request body request.PHPFileUpdate true "request"
 // @Success 200
@@ -370,7 +353,6 @@ func (b *BaseApi) UpdatePHPFile(c *gin.Context) {
 
 // @Tags Runtime
 // @Summary Get php conf file
-// @Description 获取 php 配置文件
 // @Accept json
 // @Param request body request.PHPFileReq true "request"
 // @Success 200
@@ -391,7 +373,6 @@ func (b *BaseApi) GetPHPConfigFile(c *gin.Context) {
 
 // @Tags Runtime
 // @Summary Update fpm config
-// @Description 更新 fpm 配置
 // @Accept json
 // @Param request body request.FPMConfig true "request"
 // @Success 200
@@ -411,7 +392,6 @@ func (b *BaseApi) UpdateFPMConfig(c *gin.Context) {
 
 // @Tags Runtime
 // @Summary Get fpm config
-// @Description 获取 fpm 配置
 // @Accept json
 // @Param id path integer true "request"
 // @Success 200 {object} request.FPMConfig
@@ -433,7 +413,6 @@ func (b *BaseApi) GetFPMConfig(c *gin.Context) {
 
 // @Tags Runtime
 // @Summary Get supervisor process
-// @Description 获取 supervisor 进程
 // @Accept json
 // @Param id path integer true "request"
 // @Success 200 {object} response.SupervisorProcessConfig
@@ -455,7 +434,6 @@ func (b *BaseApi) GetSupervisorProcess(c *gin.Context) {
 
 // @Tags Runtime
 // @Summary Operate supervisor process
-// @Description 操作 supervisor 进程
 // @Accept json
 // @Param request body request.PHPSupervisorProcessConfig true "request"
 // @Success 200
@@ -476,7 +454,6 @@ func (b *BaseApi) OperateSupervisorProcess(c *gin.Context) {
 
 // @Tags Runtime
 // @Summary Operate supervisor process file
-// @Description 操作 supervisor 进程文件
 // @Accept json
 // @Param request body request.PHPSupervisorProcessFileReq true "request"
 // @Success 200

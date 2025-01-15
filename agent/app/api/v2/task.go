@@ -8,7 +8,6 @@ import (
 
 // @Tags TaskLog
 // @Summary Page task logs
-// @Description 获取任务日志列表
 // @Accept json
 // @Param request body dto.SearchTaskLogReq true "request"
 // @Success 200 {object} dto.PageResult

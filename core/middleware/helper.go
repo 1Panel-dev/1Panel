@@ -6,7 +6,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/app/repo"
 )
 
-func LoadErrCode(errInfo string) int {
+func LoadErrCode() int {
 	settingRepo := repo.NewISettingRepo()
 	codeVal, err := settingRepo.Get(repo.WithByKey("NoAuthSetting"))
 	if err != nil {
@@ -26,6 +26,10 @@ func LoadErrCode(errInfo string) int {
 		return http.StatusRequestTimeout
 	case "416":
 		return http.StatusRequestedRangeNotSatisfiable
+	case "500":
+		return http.StatusInternalServerError
+	case "444":
+		return 444
 	default:
 		return http.StatusOK
 	}

@@ -8,7 +8,6 @@ import (
 
 // @Tags OpenResty
 // @Summary Load OpenResty conf
-// @Description 获取 OpenResty 配置信息
 // @Success 200 {object} response.FileInfo
 // @Security ApiKeyAuth
 // @Router /openresty [get]
@@ -23,7 +22,6 @@ func (b *BaseApi) GetNginx(c *gin.Context) {
 
 // @Tags OpenResty
 // @Summary Load partial OpenResty conf
-// @Description 获取部分 OpenResty 配置信息
 // @Accept json
 // @Param request body request.NginxScopeReq true "request"
 // @Success 200 {array} response.NginxParam
@@ -45,7 +43,6 @@ func (b *BaseApi) GetNginxConfigByScope(c *gin.Context) {
 
 // @Tags OpenResty
 // @Summary Update OpenResty conf
-// @Description 更新 OpenResty 配置信息
 // @Accept json
 // @Param request body request.NginxConfigUpdate true "request"
 // @Success 200
@@ -66,7 +63,6 @@ func (b *BaseApi) UpdateNginxConfigByScope(c *gin.Context) {
 
 // @Tags OpenResty
 // @Summary Load OpenResty status info
-// @Description 获取 OpenResty 状态信息
 // @Success 200 {object} response.NginxStatus
 // @Security ApiKeyAuth
 // @Router /openresty/status [get]
@@ -81,7 +77,6 @@ func (b *BaseApi) GetNginxStatus(c *gin.Context) {
 
 // @Tags OpenResty
 // @Summary Update OpenResty conf by upload file
-// @Description 上传更新 OpenResty 配置文件
 // @Accept json
 // @Param request body request.NginxConfigFileUpdate true "request"
 // @Success 200
@@ -103,7 +98,6 @@ func (b *BaseApi) UpdateNginxFile(c *gin.Context) {
 
 // @Tags OpenResty
 // @Summary Build OpenResty
-// @Description 构建 OpenResty
 // @Accept json
 // @Param request body request.NginxBuildReq true "request"
 // @Success 200
@@ -124,7 +118,6 @@ func (b *BaseApi) BuildNginx(c *gin.Context) {
 
 // @Tags OpenResty
 // @Summary Update OpenResty module
-// @Description 更新 OpenResty 模块
 // @Accept json
 // @Param request body request.NginxModuleUpdate true "request"
 // @Success 200
@@ -145,7 +138,6 @@ func (b *BaseApi) UpdateNginxModule(c *gin.Context) {
 
 // @Tags OpenResty
 // @Summary Get OpenResty modules
-// @Description 获取 OpenResty 模块
 // @Success 200 {array} response.NginxModule
 // @Security ApiKeyAuth
 // @Router /openresty/modules [get]

@@ -20,20 +20,28 @@ type LocationRes struct {
 	Province  Location `maxminddb:"province"`
 }
 
-func GetIPLocation(ip, lang string) (string, error) {
+func NewGeo() (*maxminddb.Reader, error) {
 	geoPath := path.Join(global.CONF.System.BaseDir, "1panel", "geo", "GeoIP.mmdb")
-	reader, err := maxminddb.Open(geoPath)
-	if err != nil {
-		return "", err
-	}
+	return maxminddb.Open(geoPath)
+}
+
+func GetIPLocation(reader *maxminddb.Reader, ip, lang string) (string, error) {
+	var err error
 	var geoLocation LocationRes
+	if reader == nil {
+		geoPath := path.Join(global.CONF.System.BaseDir, "1panel", "geo", "GeoIP.mmdb")
+		reader, err = maxminddb.Open(geoPath)
+		if err != nil {
+			return "", err
+		}
+	}
 	ipNet := net.ParseIP(ip)
 	err = reader.Lookup(ipNet, &geoLocation)
 	if err != nil {
 		return "", err
 	}
-	if lang == "en" {
-		return geoLocation.Country.En + geoLocation.Province.En, nil
+	if lang == "zh" {
+		return geoLocation.Country.Zh + " " + geoLocation.Province.Zh, nil
 	}
-	return geoLocation.Country.Zh + geoLocation.Province.Zh, nil
+	return geoLocation.Country.En + " " + geoLocation.Province.En, nil
 }

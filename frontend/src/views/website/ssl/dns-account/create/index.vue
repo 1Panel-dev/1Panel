@@ -43,7 +43,22 @@
                             <el-input v-model.trim="account.authorization['token']"></el-input>
                         </el-form-item>
                     </div>
-
+                    <div v-if="account.type === 'RainYun'">
+                        <el-form-item label="API Key" prop="authorization.apiKey">
+                            <el-input v-model.trim="account.authorization['apiKey']"></el-input>
+                        </el-form-item>
+                    </div>
+                    <div v-if="account.type === 'CloudDns'">
+                        <el-form-item label="Client ID" prop="authorization.clientID">
+                            <el-input v-model.trim="account.authorization['clientID']"></el-input>
+                        </el-form-item>
+                        <el-form-item label="Email" prop="authorization.email">
+                            <el-input v-model.trim="account.authorization['email']"></el-input>
+                        </el-form-item>
+                        <el-form-item label="Password" prop="authorization.password">
+                            <el-input v-model.trim="account.authorization['password']"></el-input>
+                        </el-form-item>
+                    </div>
                     <div v-if="account.type === 'CloudFlare'">
                         <el-form-item label="EMAIL" prop="authorization.email">
                             <el-input v-model.trim="account.authorization['email']"></el-input>

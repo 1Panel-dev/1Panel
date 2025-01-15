@@ -19,7 +19,6 @@ func (b *BaseApi) ProcessWs(c *gin.Context) {
 
 // @Tags Process
 // @Summary Stop Process
-// @Description 停止进程
 // @Param request body request.ProcessReq true "request"
 // @Success 200
 // @Security ApiKeyAuth

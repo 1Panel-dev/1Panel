@@ -11,7 +11,6 @@ import (
 
 // @Tags Database Mysql
 // @Summary Create mysql database
-// @Description 创建 mysql 数据库
 // @Accept json
 // @Param request body dto.MysqlDBCreate true "request"
 // @Success 200
@@ -42,7 +41,6 @@ func (b *BaseApi) CreateMysql(c *gin.Context) {
 
 // @Tags Database Mysql
 // @Summary Bind user of mysql database
-// @Description 绑定 mysql 数据库用户
 // @Accept json
 // @Param request body dto.BindUser true "request"
 // @Success 200
@@ -73,7 +71,6 @@ func (b *BaseApi) BindUser(c *gin.Context) {
 
 // @Tags Database Mysql
 // @Summary Update mysql database description
-// @Description 更新 mysql 数据库库描述信息
 // @Accept json
 // @Param request body dto.UpdateDescription true "request"
 // @Success 200
@@ -95,7 +92,6 @@ func (b *BaseApi) UpdateMysqlDescription(c *gin.Context) {
 
 // @Tags Database Mysql
 // @Summary Change mysql password
-// @Description 修改 mysql 密码
 // @Accept json
 // @Param request body dto.ChangeDBInfo true "request"
 // @Success 200
@@ -126,7 +122,6 @@ func (b *BaseApi) ChangeMysqlPassword(c *gin.Context) {
 
 // @Tags Database Mysql
 // @Summary Change mysql access
-// @Description 修改 mysql 访问权限
 // @Accept json
 // @Param request body dto.ChangeDBInfo true "request"
 // @Success 200
@@ -148,7 +143,6 @@ func (b *BaseApi) ChangeMysqlAccess(c *gin.Context) {
 
 // @Tags Database Mysql
 // @Summary Update mysql variables
-// @Description mysql 性能调优
 // @Accept json
 // @Param request body dto.MysqlVariablesUpdate true "request"
 // @Success 200
@@ -170,7 +164,6 @@ func (b *BaseApi) UpdateMysqlVariables(c *gin.Context) {
 
 // @Tags Database Mysql
 // @Summary Page mysql databases
-// @Description 获取 mysql 数据库列表分页
 // @Accept json
 // @Param request body dto.MysqlDBSearch true "request"
 // @Success 200 {object} dto.PageResult
@@ -196,7 +189,6 @@ func (b *BaseApi) SearchMysql(c *gin.Context) {
 
 // @Tags Database Mysql
 // @Summary List mysql database names
-// @Description 获取 mysql 数据库列表
 // @Accept json
 // @Param request body dto.PageInfo true "request"
 // @Success 200 {array} dto.MysqlOption
@@ -214,7 +206,6 @@ func (b *BaseApi) ListDBName(c *gin.Context) {
 
 // @Tags Database Mysql
 // @Summary Load mysql database from remote
-// @Description 从服务器获取
 // @Accept json
 // @Param request body dto.MysqlLoadDB true "request"
 // @Security ApiKeyAuth
@@ -235,7 +226,6 @@ func (b *BaseApi) LoadDBFromRemote(c *gin.Context) {
 
 // @Tags Database Mysql
 // @Summary Check before delete mysql database
-// @Description Mysql 数据库删除前检查
 // @Accept json
 // @Param request body dto.MysqlDBDeleteCheck true "request"
 // @Success 200 {array} string
@@ -257,7 +247,6 @@ func (b *BaseApi) DeleteCheckMysql(c *gin.Context) {
 
 // @Tags Database Mysql
 // @Summary Delete mysql database
-// @Description 删除 mysql 数据库
 // @Accept json
 // @Param request body dto.MysqlDBDelete true "request"
 // @Success 200
@@ -282,7 +271,6 @@ func (b *BaseApi) DeleteMysql(c *gin.Context) {
 
 // @Tags Database Mysql
 // @Summary Load mysql remote access
-// @Description 获取 mysql 远程访问权限
 // @Accept json
 // @Param request body dto.OperationWithNameAndType true "request"
 // @Success 200 {boolean} isRemote
@@ -304,7 +292,6 @@ func (b *BaseApi) LoadRemoteAccess(c *gin.Context) {
 
 // @Tags Database Mysql
 // @Summary Load mysql status info
-// @Description 获取 mysql 状态信息
 // @Accept json
 // @Param request body dto.OperationWithNameAndType true "request"
 // @Success 200 {object} dto.MysqlStatus
@@ -327,7 +314,6 @@ func (b *BaseApi) LoadStatus(c *gin.Context) {
 
 // @Tags Database Mysql
 // @Summary Load mysql variables info
-// @Description 获取 mysql 性能参数信息
 // @Accept json
 // @Param request body dto.OperationWithNameAndType true "request"
 // @Success 200 {object} dto.MysqlVariables

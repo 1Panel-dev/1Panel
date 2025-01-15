@@ -10,7 +10,6 @@ import (
 
 // @Tags Backup Account
 // @Summary Create backup account
-// @Description 创建备份账号
 // @Accept json
 // @Param request body dto.BackupOperate true "request"
 // @Success 200
@@ -32,7 +31,6 @@ func (b *BaseApi) CreateBackup(c *gin.Context) {
 
 // @Tags Backup Account
 // @Summary Refresh token
-// @Description 刷新 token
 // @Accept json
 // @Param request body dto.BackupOperate true "request"
 // @Success 200
@@ -52,7 +50,6 @@ func (b *BaseApi) RefreshToken(c *gin.Context) {
 
 // @Tags Backup Account
 // @Summary List buckets
-// @Description 获取 bucket 列表
 // @Accept json
 // @Param request body dto.ForBuckets true "request"
 // @Success 200 {array} string
@@ -74,7 +71,6 @@ func (b *BaseApi) ListBuckets(c *gin.Context) {
 
 // @Tags Backup Account
 // @Summary Load backup account base info
-// @Description 获取预定义备份账号信息
 // @Accept json
 // @Success 200 {object} dto.OneDriveInfo
 // @Security ApiKeyAuth
@@ -95,7 +91,6 @@ func (b *BaseApi) LoadBackupClientInfo(c *gin.Context) {
 
 // @Tags Backup Account
 // @Summary Delete backup account
-// @Description 删除备份账号
 // @Accept json
 // @Param request body dto.OperateByID true "request"
 // @Success 200
@@ -117,7 +112,6 @@ func (b *BaseApi) DeleteBackup(c *gin.Context) {
 
 // @Tags Backup Account
 // @Summary Update backup account
-// @Description 更新备份账号信息
 // @Accept json
 // @Param request body dto.BackupOperate true "request"
 // @Success 200

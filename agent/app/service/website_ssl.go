@@ -523,6 +523,8 @@ func (w WebsiteSSLService) Update(update request.WebsiteSSLUpdate) error {
 			return err
 		}
 		updateParams["dns_account_id"] = dnsAccount.ID
+	} else {
+		updateParams["dns_account_id"] = 0
 	}
 	return websiteSSLRepo.SaveByMap(websiteSSL, updateParams)
 }

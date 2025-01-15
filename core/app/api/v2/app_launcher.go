@@ -18,7 +18,6 @@ func (b *BaseApi) SearchAppLauncher(c *gin.Context) {
 
 // @Tags App Launcher
 // @Summary Update app Launcher
-// @Description 更新首页显示应用
 // @Accept json
 // @Param request body dto.ChangeShow true "request"
 // @Success 200

@@ -9,7 +9,6 @@ import (
 
 // @Tags System Setting
 // @Summary Load upgrade info
-// @Description 系统更新信息
 // @Success 200 {object} dto.UpgradeInfo
 // @Security ApiKeyAuth
 // @Router /core/settings/upgrade [get]
@@ -24,7 +23,6 @@ func (b *BaseApi) GetUpgradeInfo(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Load release notes by version
-// @Description 获取版本 release notes
 // @Accept json
 // @Param request body dto.Upgrade true "request"
 // @Success 200
@@ -46,7 +44,6 @@ func (b *BaseApi) GetNotesByVersion(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Upgrade
-// @Description 系统更新
 // @Accept json
 // @Param request body dto.Upgrade true "request"
 // @Success 200
@@ -68,7 +65,6 @@ func (b *BaseApi) Upgrade(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Upgrade
-// @Description 系统回滚
 // @Accept json
 // @Param request body dto.OperateByID true "request"
 // @Success 200

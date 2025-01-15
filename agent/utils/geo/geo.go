@@ -41,7 +41,7 @@ func GetIPLocation(reader *maxminddb.Reader, ip, lang string) (string, error) {
 		return "", err
 	}
 	if lang == "zh" {
-		return geoLocation.Country.Zh + geoLocation.Province.Zh, nil
+		return geoLocation.Country.Zh + " " + geoLocation.Province.Zh, nil
 	}
-	return geoLocation.Country.En + geoLocation.Province.En, nil
+	return geoLocation.Country.En + " " + geoLocation.Province.En, nil
 }

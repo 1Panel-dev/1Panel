@@ -9,7 +9,6 @@ import (
 
 // @Tags System Setting
 // @Summary Load system setting info
-// @Description 加载系统配置信息
 // @Success 200 {object} dto.SettingInfo
 // @Security ApiKeyAuth
 // @Router /settings/search [post]
@@ -24,7 +23,6 @@ func (b *BaseApi) GetSettingInfo(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Load system available status
-// @Description 获取系统可用状态
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /settings/search/available [get]
@@ -34,7 +32,6 @@ func (b *BaseApi) GetSystemAvailable(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Update system setting
-// @Description 更新系统配置
 // @Accept json
 // @Param request body dto.SettingUpdate true "request"
 // @Success 200
@@ -56,7 +53,6 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Load local backup dir
-// @Description 获取安装根目录
 // @Success 200 {string} path
 // @Security ApiKeyAuth
 // @Router /settings/basedir [get]

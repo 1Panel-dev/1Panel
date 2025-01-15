@@ -9,7 +9,6 @@ import (
 
 // @Tags Website DNS
 // @Summary Page website dns accounts
-// @Description 获取网站 dns 列表分页
 // @Accept json
 // @Param request body dto.PageInfo true "request"
 // @Success 200 {object} dto.PageResult
@@ -33,7 +32,6 @@ func (b *BaseApi) PageWebsiteDnsAccount(c *gin.Context) {
 
 // @Tags Website DNS
 // @Summary Create website dns account
-// @Description 创建网站 dns
 // @Accept json
 // @Param request body request.WebsiteDnsAccountCreate true "request"
 // @Success 200
@@ -54,7 +52,6 @@ func (b *BaseApi) CreateWebsiteDnsAccount(c *gin.Context) {
 
 // @Tags Website DNS
 // @Summary Update website dns account
-// @Description 更新网站 dns
 // @Accept json
 // @Param request body request.WebsiteDnsAccountUpdate true "request"
 // @Success 200
@@ -75,7 +72,6 @@ func (b *BaseApi) UpdateWebsiteDnsAccount(c *gin.Context) {
 
 // @Tags Website DNS
 // @Summary Delete website dns account
-// @Description 删除网站 dns
 // @Accept json
 // @Param request body request.WebsiteResourceReq true "request"
 // @Success 200

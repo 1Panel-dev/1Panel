@@ -9,7 +9,6 @@ import (
 
 // @Tags Command
 // @Summary Create command
-// @Description 创建快速命令
 // @Accept json
 // @Param request body dto.CommandOperate true "request"
 // @Success 200
@@ -31,7 +30,6 @@ func (b *BaseApi) CreateCommand(c *gin.Context) {
 
 // @Tags Command
 // @Summary Page commands
-// @Description 获取快速命令列表分页
 // @Accept json
 // @Param request body dto.SearchWithPage true "request"
 // @Success 200 {object} dto.PageResult
@@ -57,7 +55,6 @@ func (b *BaseApi) SearchCommand(c *gin.Context) {
 
 // @Tags Command
 // @Summary Tree commands
-// @Description 获取快速命令树
 // @Accept json
 // @Param request body dto.OperateByType true "request"
 // @Success 200 {Array} dto.CommandTree
@@ -80,7 +77,6 @@ func (b *BaseApi) SearchCommandTree(c *gin.Context) {
 
 // @Tags Command
 // @Summary List commands
-// @Description 获取快速命令列表
 // @Accept json
 // @Param request body dto.OperateByType true "request"
 // @Success 200 {object} dto.CommandInfo
@@ -103,7 +99,6 @@ func (b *BaseApi) ListCommand(c *gin.Context) {
 
 // @Tags Command
 // @Summary Delete command
-// @Description 删除快速命令
 // @Accept json
 // @Param request body dto.OperateByIDs true "request"
 // @Success 200
@@ -125,7 +120,6 @@ func (b *BaseApi) DeleteCommand(c *gin.Context) {
 
 // @Tags Command
 // @Summary Update command
-// @Description 更新快速命令
 // @Accept json
 // @Param request body dto.CommandOperate true "request"
 // @Success 200

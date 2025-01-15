@@ -3,6 +3,8 @@ package ssl
 import (
 	"crypto"
 	"encoding/json"
+	"github.com/go-acme/lego/v4/providers/dns/clouddns"
+	"github.com/go-acme/lego/v4/providers/dns/rainyun"
 	"os"
 	"strings"
 	"time"
@@ -67,11 +69,13 @@ const (
 	DnsPod       DnsType = "DnsPod"
 	AliYun       DnsType = "AliYun"
 	CloudFlare   DnsType = "CloudFlare"
+	CloudDns     DnsType = "CloudDns"
 	NameSilo     DnsType = "NameSilo"
 	NameCheap    DnsType = "NameCheap"
 	NameCom      DnsType = "NameCom"
 	Godaddy      DnsType = "Godaddy"
 	TencentCloud DnsType = "TencentCloud"
+	RainYun      DnsType = "RainYun"
 )
 
 type DNSParam struct {
@@ -84,6 +88,8 @@ type DNSParam struct {
 	APIUser   string `json:"apiUser"`
 	APISecret string `json:"apiSecret"`
 	SecretID  string `json:"secretID"`
+	ClientID  string `json:"clientID"`
+	Password  string `json:"password"`
 }
 
 var (
@@ -127,6 +133,15 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string, websiteSSL model.Web
 		cloudflareConfig.PollingInterval = pollingInterval
 		cloudflareConfig.TTL = 3600
 		p, err = cloudflare.NewDNSProviderConfig(cloudflareConfig)
+	case CloudDns:
+		clouddnsConfig := clouddns.NewDefaultConfig()
+		clouddnsConfig.ClientID = param.ClientID
+		clouddnsConfig.Email = param.Email
+		clouddnsConfig.Password = param.Password
+		clouddnsConfig.PropagationTimeout = propagationTimeout
+		clouddnsConfig.PollingInterval = pollingInterval
+		clouddnsConfig.TTL = ttl
+		p, err = clouddns.NewDNSProviderConfig(clouddnsConfig)
 	case NameCheap:
 		namecheapConfig := namecheap.NewDefaultConfig()
 		namecheapConfig.APIKey = param.APIkey
@@ -166,6 +181,13 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string, websiteSSL model.Web
 		tencentCloudConfig.PollingInterval = pollingInterval
 		tencentCloudConfig.TTL = ttl
 		p, err = tencentcloud.NewDNSProviderConfig(tencentCloudConfig)
+	case RainYun:
+		rainyunConfig := rainyun.NewDefaultConfig()
+		rainyunConfig.APIKey = param.APIkey
+		rainyunConfig.PropagationTimeout = propagationTimeout
+		rainyunConfig.PollingInterval = pollingInterval
+		rainyunConfig.TTL = ttl
+		p, err = rainyun.NewDNSProviderConfig(rainyunConfig)
 	}
 	if err != nil {
 		return err

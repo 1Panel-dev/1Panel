@@ -9,7 +9,6 @@ import (
 
 // @Tags Logs
 // @Summary Page login logs
-// @Description 获取系统登录日志列表分页
 // @Accept json
 // @Param request body dto.SearchLgLogWithPage true "request"
 // @Success 200 {object} dto.PageResult
@@ -21,7 +20,7 @@ func (b *BaseApi) GetLoginLogs(c *gin.Context) {
 		return
 	}
 
-	total, list, err := logService.PageLoginLog(req)
+	total, list, err := logService.PageLoginLog(c, req)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
@@ -35,7 +34,6 @@ func (b *BaseApi) GetLoginLogs(c *gin.Context) {
 
 // @Tags Logs
 // @Summary Page operation logs
-// @Description 获取系统操作日志列表分页
 // @Accept json
 // @Param request body dto.SearchOpLogWithPage true "request"
 // @Success 200 {object} dto.PageResult
@@ -61,7 +59,6 @@ func (b *BaseApi) GetOperationLogs(c *gin.Context) {
 
 // @Tags Logs
 // @Summary Clean operation logs
-// @Description 清空操作日志
 // @Accept json
 // @Param request body dto.CleanLog true "request"
 // @Success 200 {object} dto.PageResult

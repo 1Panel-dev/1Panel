@@ -35,8 +35,8 @@ func WhiteAllow() gin.HandlerFunc {
 				return
 			}
 		}
-		if LoadErrCode("err-ip") != 200 {
-			helper.ErrResponse(c, LoadErrCode("err-ip"))
+		if LoadErrCode() != 200 {
+			helper.ErrResponse(c, LoadErrCode())
 			return
 		}
 		helper.ErrorWithDetail(c, constant.CodeErrIP, constant.ErrTypeInternalServer, errors.New("IP address not allowed"))

@@ -126,8 +126,8 @@ func setWebStatic(rootRouter *gin.RouterGroup) {
 	entrance := authService.GetSecurityEntrance()
 	if entrance != "" {
 		rootRouter.GET("/"+entrance, func(c *gin.Context) {
-			entrance = authService.GetSecurityEntrance()
-			if entrance == "" {
+			currentEntrance := authService.GetSecurityEntrance()
+			if currentEntrance != entrance {
 				handleNoRoute(c)
 				return
 			}

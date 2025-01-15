@@ -16,7 +16,6 @@ import (
 
 // @Tags System Setting
 // @Summary Load system setting info
-// @Description 加载系统配置信息
 // @Success 200 {object} dto.SettingInfo
 // @Security ApiKeyAuth
 // @Router /core/settings/search [post]
@@ -31,7 +30,6 @@ func (b *BaseApi) GetSettingInfo(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Load system terminal setting info
-// @Description 加载系统终端配置信息
 // @Success 200 {object} dto.TerminalInfo
 // @Security ApiKeyAuth
 // @Router /core/settings/terminal/search [post]
@@ -46,7 +44,6 @@ func (b *BaseApi) GetTerminalSettingInfo(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Load system available status
-// @Description 获取系统可用状态
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /core/settings/search/available [get]
@@ -56,7 +53,6 @@ func (b *BaseApi) GetSystemAvailable(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Update system setting
-// @Description 更新系统配置
 // @Accept json
 // @Param request body dto.SettingUpdate true "request"
 // @Success 200
@@ -78,7 +74,6 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Update system terminal setting
-// @Description 更新系统终端配置
 // @Accept json
 // @Param request body dto.TerminalInfo true "request"
 // @Success 200
@@ -100,7 +95,6 @@ func (b *BaseApi) UpdateTerminalSetting(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Update proxy setting
-// @Description 服务器代理配置
 // @Accept json
 // @Param request body dto.ProxyUpdate true "request"
 // @Success 200
@@ -131,7 +125,6 @@ func (b *BaseApi) UpdateProxy(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Update system setting
-// @Description 隐藏高级功能菜单
 // @Accept json
 // @Param request body dto.SettingUpdate true "request"
 // @Success 200
@@ -153,7 +146,6 @@ func (b *BaseApi) UpdateMenu(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Update system password
-// @Description 更新系统登录密码
 // @Accept json
 // @Param request body dto.PasswordUpdate true "request"
 // @Success 200
@@ -175,7 +167,6 @@ func (b *BaseApi) UpdatePassword(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Update system ssl
-// @Description 修改系统 ssl 登录
 // @Accept json
 // @Param request body dto.SSLUpdate true "request"
 // @Success 200
@@ -197,7 +188,6 @@ func (b *BaseApi) UpdateSSL(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Load system cert info
-// @Description 获取证书信息
 // @Success 200 {object} dto.SettingInfo
 // @Security ApiKeyAuth
 // @Router /core/settings/ssl/info [get]
@@ -212,7 +202,6 @@ func (b *BaseApi) LoadFromCert(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Download system cert
-// @Description 下载证书
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /core/settings/ssl/download [post]
@@ -228,7 +217,6 @@ func (b *BaseApi) DownloadSSL(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Load system address
-// @Description 获取系统地址信息
 // @Accept json
 // @Success 200
 // @Security ApiKeyAuth
@@ -244,7 +232,6 @@ func (b *BaseApi) LoadInterfaceAddr(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Update system bind info
-// @Description 更新系统监听信息
 // @Accept json
 // @Param request body dto.BindInfo true "request"
 // @Success 200
@@ -266,7 +253,6 @@ func (b *BaseApi) UpdateBindInfo(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Update system port
-// @Description 更新系统端口
 // @Accept json
 // @Param request body dto.PortUpdate true "request"
 // @Success 200
@@ -288,7 +274,6 @@ func (b *BaseApi) UpdatePort(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Reset system password expired
-// @Description 重置过期系统登录密码
 // @Accept json
 // @Param request body dto.PasswordUpdate true "request"
 // @Success 200
@@ -310,7 +295,6 @@ func (b *BaseApi) HandlePasswordExpired(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Load mfa info
-// @Description 获取 mfa 信息
 // @Accept json
 // @Param request body dto.MfaCredential true "request"
 // @Success 200 {object} mfa.Otp
@@ -333,7 +317,6 @@ func (b *BaseApi) LoadMFA(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Bind mfa
-// @Description Mfa 绑定
 // @Accept json
 // @Param request body dto.MfaCredential true "request"
 // @Success 200

@@ -149,7 +149,6 @@ func (b *BaseApi) UpdateBackup(c *gin.Context) {
 
 // @Tags Backup Account
 // @Summary Load backup account options
-// @Description 获取备份账号选项
 // @Accept json
 // @Success 200 {array} dto.BackupOption
 // @Security ApiKeyAuth
@@ -230,7 +229,6 @@ func (b *BaseApi) LoadBackupRecordSize(c *gin.Context) {
 
 // @Tags Backup Account
 // @Summary Page backup records
-// @Description 获取备份记录列表分页
 // @Accept json
 // @Param request body dto.RecordSearch true "request"
 // @Success 200
@@ -256,7 +254,6 @@ func (b *BaseApi) SearchBackupRecords(c *gin.Context) {
 
 // @Tags Backup Account
 // @Summary Page backup records by cronjob
-// @Description 通过计划任务获取备份记录列表分页
 // @Accept json
 // @Param request body dto.RecordSearchByCronjob true "request"
 // @Success 200
@@ -282,7 +279,6 @@ func (b *BaseApi) SearchBackupRecordsByCronjob(c *gin.Context) {
 
 // @Tags Backup Account
 // @Summary Download backup record
-// @Description 下载备份记录
 // @Accept json
 // @Param request body dto.DownloadRecord true "request"
 // @Success 200
@@ -305,7 +301,6 @@ func (b *BaseApi) DownloadRecord(c *gin.Context) {
 
 // @Tags Backup Account
 // @Summary Delete backup record
-// @Description 删除备份记录
 // @Accept json
 // @Param request body dto.BatchDeleteReq true "request"
 // @Success 200
@@ -327,7 +322,6 @@ func (b *BaseApi) DeleteBackupRecord(c *gin.Context) {
 
 // @Tags Backup Account
 // @Summary List files from backup accounts
-// @Description 获取备份账号内文件列表
 // @Accept json
 // @Param request body dto.OperateByID true "request"
 // @Success 200 {array} string
@@ -345,7 +339,6 @@ func (b *BaseApi) LoadFilesFromBackup(c *gin.Context) {
 
 // @Tags Backup Account
 // @Summary Backup system data
-// @Description 备份系统数据
 // @Accept json
 // @Param request body dto.CommonBackup true "request"
 // @Success 200
@@ -390,7 +383,6 @@ func (b *BaseApi) Backup(c *gin.Context) {
 
 // @Tags Backup Account
 // @Summary Recover system data
-// @Description 恢复系统数据
 // @Accept json
 // @Param request body dto.CommonRecover true "request"
 // @Success 200
@@ -445,7 +437,6 @@ func (b *BaseApi) Recover(c *gin.Context) {
 
 // @Tags Backup Account
 // @Summary Recover system data by upload
-// @Description 从上传恢复系统数据
 // @Accept json
 // @Param request body dto.CommonRecover true "request"
 // @Success 200

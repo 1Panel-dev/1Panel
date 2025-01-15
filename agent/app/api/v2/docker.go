@@ -11,7 +11,6 @@ import (
 
 // @Tags Container Docker
 // @Summary Load docker status
-// @Description 获取 docker 服务状态
 // @Produce json
 // @Success 200 {string} status
 // @Security ApiKeyAuth
@@ -23,7 +22,6 @@ func (b *BaseApi) LoadDockerStatus(c *gin.Context) {
 
 // @Tags Container Docker
 // @Summary Load docker daemon.json
-// @Description 获取 docker 配置信息(表单)
 // @Produce json
 // @Success 200 {object} string
 // @Security ApiKeyAuth
@@ -43,7 +41,6 @@ func (b *BaseApi) LoadDaemonJsonFile(c *gin.Context) {
 
 // @Tags Container Docker
 // @Summary Load docker daemon.json
-// @Description 获取 docker 配置信息
 // @Produce json
 // @Success 200 {object} dto.DaemonJsonConf
 // @Security ApiKeyAuth
@@ -55,7 +52,6 @@ func (b *BaseApi) LoadDaemonJson(c *gin.Context) {
 
 // @Tags Container Docker
 // @Summary Update docker daemon.json
-// @Description 修改 docker 配置信息
 // @Accept json
 // @Param request body dto.SettingUpdate true "request"
 // @Success 200
@@ -78,7 +74,6 @@ func (b *BaseApi) UpdateDaemonJson(c *gin.Context) {
 
 // @Tags Container Docker
 // @Summary Update docker daemon.json log option
-// @Description 修改 docker 日志配置
 // @Accept json
 // @Param request body dto.LogOption true "request"
 // @Success 200
@@ -101,7 +96,6 @@ func (b *BaseApi) UpdateLogOption(c *gin.Context) {
 
 // @Tags Container Docker
 // @Summary Update docker daemon.json ipv6 option
-// @Description 修改 docker ipv6 配置
 // @Accept json
 // @Param request body dto.LogOption true "request"
 // @Success 200
@@ -124,7 +118,6 @@ func (b *BaseApi) UpdateIpv6Option(c *gin.Context) {
 
 // @Tags Container Docker
 // @Summary Update docker daemon.json by upload file
-// @Description 上传替换 docker 配置文件
 // @Accept json
 // @Param request body dto.DaemonJsonUpdateByFile true "request"
 // @Success 200
@@ -147,7 +140,6 @@ func (b *BaseApi) UpdateDaemonJsonByFile(c *gin.Context) {
 
 // @Tags Container Docker
 // @Summary Operate docker
-// @Description Docker 操作
 // @Accept json
 // @Param request body dto.DockerOperation true "request"
 // @Success 200

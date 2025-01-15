@@ -29,8 +29,8 @@ func BindDomain() gin.HandlerFunc {
 		}
 
 		if domains != status.Value {
-			if LoadErrCode("err-domain") != 200 {
-				helper.ErrResponse(c, LoadErrCode("err-domain"))
+			if LoadErrCode() != 200 {
+				helper.ErrResponse(c, LoadErrCode())
 				return
 			}
 			helper.ErrorWithDetail(c, constant.CodeErrDomain, constant.ErrTypeInternalServer, errors.New("domain not allowed"))

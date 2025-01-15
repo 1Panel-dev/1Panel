@@ -306,7 +306,7 @@ const checkAppName = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.appName')));
     } else {
-        const reg = /^(?![_-])[a-zA-Z0-9_-]{1,29}[a-zA-Z0-9]$/;
+        const reg = /^(?![_-])[a-z0-9_-]{1,29}[a-z0-9]$/;
         if (!reg.test(value) && value !== '') {
             callback(new Error(i18n.global.t('commons.rule.appName')));
         } else {

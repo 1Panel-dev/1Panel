@@ -1,6 +1,9 @@
 package service
 
 import (
+	"github.com/1Panel-dev/1Panel/core/utils/common"
+	geo2 "github.com/1Panel-dev/1Panel/core/utils/geo"
+	"github.com/gin-gonic/gin"
 	"os"
 	"path"
 	"path/filepath"
@@ -25,7 +28,7 @@ const logs = "https://resource.fit2cloud.com/installation-log.sh"
 type ILogService interface {
 	ListSystemLogFile() ([]string, error)
 	CreateLoginLog(operation model.LoginLog) error
-	PageLoginLog(search dto.SearchLgLogWithPage) (int64, interface{}, error)
+	PageLoginLog(ctx *gin.Context, search dto.SearchLgLogWithPage) (int64, interface{}, error)
 
 	CreateOperationLog(operation *model.OperationLog) error
 	PageOperationLog(search dto.SearchOpLogWithPage) (int64, interface{}, error)
@@ -74,7 +77,7 @@ func (u *LogService) ListSystemLogFile() ([]string, error) {
 	return files, nil
 }
 
-func (u *LogService) PageLoginLog(req dto.SearchLgLogWithPage) (int64, interface{}, error) {
+func (u *LogService) PageLoginLog(ctx *gin.Context, req dto.SearchLgLogWithPage) (int64, interface{}, error) {
 	options := []global.DBOption{
 		repo.WithOrderBy("created_at desc"),
 	}
@@ -90,10 +93,14 @@ func (u *LogService) PageLoginLog(req dto.SearchLgLogWithPage) (int64, interface
 		options...,
 	)
 	var dtoOps []dto.LoginLog
+	geoDB, _ := geo2.NewGeo()
 	for _, op := range ops {
 		var item dto.LoginLog
 		if err := copier.Copy(&item, &op); err != nil {
 			return 0, nil, errors.WithMessage(constant.ErrTransform, err.Error())
+		}
+		if geoDB != nil {
+			item.Address, _ = geo2.GetIPLocation(geoDB, item.IP, common.GetLang(ctx))
 		}
 		dtoOps = append(dtoOps, item)
 	}

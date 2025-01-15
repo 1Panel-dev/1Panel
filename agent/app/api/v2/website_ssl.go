@@ -14,7 +14,6 @@ import (
 
 // @Tags Website SSL
 // @Summary Page website ssl
-// @Description 获取网站 ssl 列表分页
 // @Accept json
 // @Param request body request.WebsiteSSLSearch true "request"
 // @Success 200
@@ -47,7 +46,6 @@ func (b *BaseApi) PageWebsiteSSL(c *gin.Context) {
 
 // @Tags Website SSL
 // @Summary Create website ssl
-// @Description 创建网站 ssl
 // @Accept json
 // @Param request body request.WebsiteSSLCreate true "request"
 // @Success 200 {object} request.WebsiteSSLCreate
@@ -69,7 +67,6 @@ func (b *BaseApi) CreateWebsiteSSL(c *gin.Context) {
 
 // @Tags Website SSL
 // @Summary Apply  ssl
-// @Description 申请证书
 // @Accept json
 // @Param request body request.WebsiteSSLApply true "request"
 // @Success 200
@@ -90,7 +87,6 @@ func (b *BaseApi) ApplyWebsiteSSL(c *gin.Context) {
 
 // @Tags Website SSL
 // @Summary Resolve website ssl
-// @Description 解析网站 ssl
 // @Accept json
 // @Param request body request.WebsiteDNSReq true "request"
 // @Success 200 {array} response.WebsiteDNSRes
@@ -111,7 +107,6 @@ func (b *BaseApi) GetDNSResolve(c *gin.Context) {
 
 // @Tags Website SSL
 // @Summary Delete website ssl
-// @Description 删除网站 ssl
 // @Accept json
 // @Param request body request.WebsiteBatchDelReq true "request"
 // @Success 200
@@ -132,7 +127,6 @@ func (b *BaseApi) DeleteWebsiteSSL(c *gin.Context) {
 
 // @Tags Website SSL
 // @Summary Search website ssl by website id
-// @Description 通过网站 id 查询 ssl
 // @Accept json
 // @Param websiteId path integer true "request"
 // @Success 200
@@ -154,7 +148,6 @@ func (b *BaseApi) GetWebsiteSSLByWebsiteId(c *gin.Context) {
 
 // @Tags Website SSL
 // @Summary Search website ssl by id
-// @Description 通过 id 查询 ssl
 // @Accept json
 // @Param id path integer true "request"
 // @Success 200
@@ -176,7 +169,6 @@ func (b *BaseApi) GetWebsiteSSLById(c *gin.Context) {
 
 // @Tags Website SSL
 // @Summary Update ssl
-// @Description 更新 ssl
 // @Accept json
 // @Param request body request.WebsiteSSLUpdate true "request"
 // @Success 200
@@ -197,7 +189,6 @@ func (b *BaseApi) UpdateWebsiteSSL(c *gin.Context) {
 
 // @Tags Website SSL
 // @Summary Upload ssl
-// @Description 上传 ssl
 // @Accept json
 // @Param request body request.WebsiteSSLUpload true "request"
 // @Success 200
@@ -218,7 +209,6 @@ func (b *BaseApi) UploadWebsiteSSL(c *gin.Context) {
 
 // @Tags Website SSL
 // @Summary Download SSL  file
-// @Description 下载证书文件
 // @Accept json
 // @Param request body request.WebsiteResourceReq true "request"
 // @Success 200

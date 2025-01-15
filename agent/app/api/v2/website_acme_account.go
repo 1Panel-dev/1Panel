@@ -9,7 +9,6 @@ import (
 
 // @Tags Website Acme
 // @Summary Page website acme accounts
-// @Description 获取网站 acme 列表分页
 // @Accept json
 // @Param request body dto.PageInfo true "request"
 // @Success 200 {object} dto.PageResult
@@ -33,7 +32,6 @@ func (b *BaseApi) PageWebsiteAcmeAccount(c *gin.Context) {
 
 // @Tags Website Acme
 // @Summary Create website acme account
-// @Description 创建网站 acme
 // @Accept json
 // @Param request body request.WebsiteAcmeAccountCreate true "request"
 // @Success 200 {object} response.WebsiteAcmeAccountDTO
@@ -55,7 +53,6 @@ func (b *BaseApi) CreateWebsiteAcmeAccount(c *gin.Context) {
 
 // @Tags Website Acme
 // @Summary Delete website acme account
-// @Description 删除网站 acme
 // @Accept json
 // @Param request body request.WebsiteResourceReq true "request"
 // @Success 200

@@ -28,7 +28,6 @@ import (
 
 // @Tags File
 // @Summary List files
-// @Description 获取文件列表
 // @Accept json
 // @Param request body request.FileOption true "request"
 // @Success 200 {object} response.FileInfo
@@ -49,7 +48,6 @@ func (b *BaseApi) ListFiles(c *gin.Context) {
 
 // @Tags File
 // @Summary Page file
-// @Description 分页获取上传文件
 // @Accept json
 // @Param request body request.SearchUploadWithPage true "request"
 // @Success 200 {array} response.FileInfo
@@ -73,7 +71,6 @@ func (b *BaseApi) SearchUploadWithPage(c *gin.Context) {
 
 // @Tags File
 // @Summary Load files tree
-// @Description 加载文件树
 // @Accept json
 // @Param request body request.FileOption true "request"
 // @Success 200 {array} response.FileTree
@@ -94,7 +91,6 @@ func (b *BaseApi) GetFileTree(c *gin.Context) {
 
 // @Tags File
 // @Summary Create file
-// @Description 创建文件/文件夹
 // @Accept json
 // @Param request body request.FileCreate true "request"
 // @Success 200
@@ -116,7 +112,6 @@ func (b *BaseApi) CreateFile(c *gin.Context) {
 
 // @Tags File
 // @Summary Delete file
-// @Description 删除文件/文件夹
 // @Accept json
 // @Param request body request.FileDelete true "request"
 // @Success 200
@@ -138,7 +133,6 @@ func (b *BaseApi) DeleteFile(c *gin.Context) {
 
 // @Tags File
 // @Summary Batch delete file
-// @Description 批量删除文件/文件夹
 // @Accept json
 // @Param request body request.FileBatchDelete true "request"
 // @Success 200
@@ -160,7 +154,6 @@ func (b *BaseApi) BatchDeleteFile(c *gin.Context) {
 
 // @Tags File
 // @Summary Change file mode
-// @Description 修改文件权限
 // @Accept json
 // @Param request body request.FileCreate true "request"
 // @Success 200
@@ -182,7 +175,6 @@ func (b *BaseApi) ChangeFileMode(c *gin.Context) {
 
 // @Tags File
 // @Summary Change file owner
-// @Description 修改文件用户/组
 // @Accept json
 // @Param request body request.FileRoleUpdate true "request"
 // @Success 200
@@ -203,7 +195,6 @@ func (b *BaseApi) ChangeFileOwner(c *gin.Context) {
 
 // @Tags File
 // @Summary Compress file
-// @Description 压缩文件
 // @Accept json
 // @Param request body request.FileCompress true "request"
 // @Success 200
@@ -225,7 +216,6 @@ func (b *BaseApi) CompressFile(c *gin.Context) {
 
 // @Tags File
 // @Summary Decompress file
-// @Description 解压文件
 // @Accept json
 // @Param request body request.FileDeCompress true "request"
 // @Success 200
@@ -247,7 +237,6 @@ func (b *BaseApi) DeCompressFile(c *gin.Context) {
 
 // @Tags File
 // @Summary Load file content
-// @Description 获取文件内容
 // @Accept json
 // @Param request body request.FileContentReq true "request"
 // @Success 200 {object} response.FileInfo
@@ -269,7 +258,6 @@ func (b *BaseApi) GetContent(c *gin.Context) {
 
 // @Tags File
 // @Summary Update file content
-// @Description 更新文件内容
 // @Accept json
 // @Param request body request.FileEdit true "request"
 // @Success 200
@@ -290,7 +278,6 @@ func (b *BaseApi) SaveContent(c *gin.Context) {
 
 // @Tags File
 // @Summary Upload file
-// @Description 上传文件
 // @Param file formData file true "request"
 // @Success 200
 // @Security ApiKeyAuth
@@ -398,7 +385,6 @@ func (b *BaseApi) UploadFiles(c *gin.Context) {
 
 // @Tags File
 // @Summary Check file exist
-// @Description 检测文件是否存在
 // @Accept json
 // @Param request body request.FilePathCheck true "request"
 // @Success 200
@@ -418,7 +404,6 @@ func (b *BaseApi) CheckFile(c *gin.Context) {
 
 // @Tags File
 // @Summary Change file name
-// @Description 修改文件名称
 // @Accept json
 // @Param request body request.FileRename true "request"
 // @Success 200
@@ -439,7 +424,6 @@ func (b *BaseApi) ChangeFileName(c *gin.Context) {
 
 // @Tags File
 // @Summary Wget file
-// @Description 下载远端文件
 // @Accept json
 // @Param request body request.FileWget true "request"
 // @Success 200
@@ -463,7 +447,6 @@ func (b *BaseApi) WgetFile(c *gin.Context) {
 
 // @Tags File
 // @Summary Move file
-// @Description 移动文件
 // @Accept json
 // @Param request body request.FileMove true "request"
 // @Success 200
@@ -484,7 +467,6 @@ func (b *BaseApi) MoveFile(c *gin.Context) {
 
 // @Tags File
 // @Summary Download file
-// @Description 下载文件
 // @Accept json
 // @Success 200
 // @Security ApiKeyAuth
@@ -504,7 +486,6 @@ func (b *BaseApi) Download(c *gin.Context) {
 
 // @Tags File
 // @Summary Chunk Download file
-// @Description 分片下载下载文件
 // @Accept json
 // @Param request body request.FileDownload true "request"
 // @Success 200
@@ -581,7 +562,6 @@ func (b *BaseApi) DownloadChunkFiles(c *gin.Context) {
 
 // @Tags File
 // @Summary Load file size
-// @Description 获取文件夹大小
 // @Accept json
 // @Param request body request.DirSizeReq true "request"
 // @Success 200
@@ -650,7 +630,6 @@ func mergeChunks(fileName string, fileDir string, dstDir string, chunkCount int,
 
 // @Tags File
 // @Summary ChunkUpload file
-// @Description 分片上传文件
 // @Param file formData file true "request"
 // @Success 200
 // @Security ApiKeyAuth
@@ -767,7 +746,6 @@ func (b *BaseApi) Keys(c *gin.Context) {
 
 // @Tags File
 // @Summary Read file by Line
-// @Description 按行读取日志文件
 // @Param request body request.FileReadByLineReq true "request"
 // @Success 200
 // @Security ApiKeyAuth
@@ -787,7 +765,6 @@ func (b *BaseApi) ReadFileByLine(c *gin.Context) {
 
 // @Tags File
 // @Summary Batch change file mode and owner
-// @Description 批量修改文件权限和用户/组
 // @Accept json
 // @Param request body request.FileRoleReq true "request"
 // @Success 200

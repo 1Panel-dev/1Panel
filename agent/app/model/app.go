@@ -13,6 +13,7 @@ type App struct {
 	Key                  string  `json:"key" gorm:"not null;"`
 	ShortDescZh          string  `json:"shortDescZh" yaml:"shortDescZh"`
 	ShortDescEn          string  `json:"shortDescEn" yaml:"shortDescEn"`
+	Description          string  `json:"description"`
 	Icon                 string  `json:"icon"`
 	Type                 string  `json:"type" gorm:"not null"`
 	Status               string  `json:"status" gorm:"not null"`

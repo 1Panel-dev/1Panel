@@ -7,7 +7,7 @@ import (
 )
 
 // @title 1Panel
-// @version 1.0
+// @version 2.0
 // @description  开源Linux面板
 // @termsOfService http://swagger.io/terms/
 // @license.name Apache 2.0

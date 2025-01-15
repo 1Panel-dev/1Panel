@@ -11,7 +11,6 @@ import (
 
 // @Tags Cronjob
 // @Summary Create cronjob
-// @Description 创建计划任务
 // @Accept json
 // @Param request body dto.CronjobCreate true "request"
 // @Success 200
@@ -33,7 +32,6 @@ func (b *BaseApi) CreateCronjob(c *gin.Context) {
 
 // @Tags Cronjob
 // @Summary Load cronjob spec time
-// @Description 预览最近五次执行时间
 // @Accept json
 // @Param request body dto.CronjobSpec true "request"
 // @Success 200
@@ -55,7 +53,6 @@ func (b *BaseApi) LoadNextHandle(c *gin.Context) {
 
 // @Tags Cronjob
 // @Summary Page cronjobs
-// @Description 获取计划任务分页
 // @Accept json
 // @Param request body dto.PageCronjob true "request"
 // @Success 200 {object} dto.PageResult
@@ -81,7 +78,6 @@ func (b *BaseApi) SearchCronjob(c *gin.Context) {
 
 // @Tags Cronjob
 // @Summary Page job records
-// @Description 获取计划任务记录
 // @Accept json
 // @Param request body dto.SearchRecord true "request"
 // @Success 200 {object} dto.PageResult
@@ -111,7 +107,6 @@ func (b *BaseApi) SearchJobRecords(c *gin.Context) {
 
 // @Tags Cronjob
 // @Summary Load Cronjob record log
-// @Description 获取计划任务记录日志
 // @Accept json
 // @Param request body dto.OperateByID true "request"
 // @Success 200
@@ -128,7 +123,6 @@ func (b *BaseApi) LoadRecordLog(c *gin.Context) {
 
 // @Tags Cronjob
 // @Summary Clean job records
-// @Description 清空计划任务记录
 // @Accept json
 // @Param request body dto.CronjobClean true "request"
 // @Success 200
@@ -151,7 +145,6 @@ func (b *BaseApi) CleanRecord(c *gin.Context) {
 
 // @Tags Cronjob
 // @Summary Delete cronjob
-// @Description 删除计划任务
 // @Accept json
 // @Param request body dto.CronjobBatchDelete true "request"
 // @Success 200
@@ -173,7 +166,6 @@ func (b *BaseApi) DeleteCronjob(c *gin.Context) {
 
 // @Tags Cronjob
 // @Summary Update cronjob
-// @Description 更新计划任务
 // @Accept json
 // @Param request body dto.CronjobUpdate true "request"
 // @Success 200
@@ -195,7 +187,6 @@ func (b *BaseApi) UpdateCronjob(c *gin.Context) {
 
 // @Tags Cronjob
 // @Summary Update cronjob status
-// @Description 更新计划任务状态
 // @Accept json
 // @Param request body dto.CronjobUpdateStatus true "request"
 // @Success 200
@@ -217,7 +208,6 @@ func (b *BaseApi) UpdateCronjobStatus(c *gin.Context) {
 
 // @Tags Cronjob
 // @Summary Download cronjob records
-// @Description 下载计划任务记录
 // @Accept json
 // @Param request body dto.CronjobDownload true "request"
 // @Success 200
@@ -241,7 +231,6 @@ func (b *BaseApi) TargetDownload(c *gin.Context) {
 
 // @Tags Cronjob
 // @Summary Handle cronjob once
-// @Description 手动执行计划任务
 // @Accept json
 // @Param request body dto.OperateByID true "request"
 // @Success 200

@@ -8,7 +8,6 @@ import (
 
 // @Tags Container Compose-template
 // @Summary Create compose template
-// @Description 创建容器编排模版
 // @Accept json
 // @Param request body dto.ComposeTemplateCreate true "request"
 // @Success 200
@@ -30,7 +29,6 @@ func (b *BaseApi) CreateComposeTemplate(c *gin.Context) {
 
 // @Tags Container Compose-template
 // @Summary Page compose templates
-// @Description 获取容器编排模版列表分页
 // @Accept json
 // @Param request body dto.SearchWithPage true "request"
 // @Produce json
@@ -57,7 +55,6 @@ func (b *BaseApi) SearchComposeTemplate(c *gin.Context) {
 
 // @Tags Container Compose-template
 // @Summary List compose templates
-// @Description 获取容器编排模版列表
 // @Produce json
 // @Success 200 {array} dto.ComposeTemplateInfo
 // @Security ApiKeyAuth
@@ -74,7 +71,6 @@ func (b *BaseApi) ListComposeTemplate(c *gin.Context) {
 
 // @Tags Container Compose-template
 // @Summary Delete compose template
-// @Description 删除容器编排模版
 // @Accept json
 // @Param request body dto.BatchDelete true "request"
 // @Success 200
@@ -96,7 +92,6 @@ func (b *BaseApi) DeleteComposeTemplate(c *gin.Context) {
 
 // @Tags Container Compose-template
 // @Summary Update compose template
-// @Description 更新容器编排模版
 // @Accept json
 // @Param request body dto.ComposeTemplateUpdate true "request"
 // @Success 200

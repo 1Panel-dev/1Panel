@@ -9,7 +9,6 @@ import (
 
 // @Tags Website
 // @Summary Page websites
-// @Description 获取网站列表分页
 // @Accept json
 // @Param request body request.WebsiteSearch true "request"
 // @Success 200 {object} dto.PageResult
@@ -33,7 +32,6 @@ func (b *BaseApi) PageWebsite(c *gin.Context) {
 
 // @Tags Website
 // @Summary List websites
-// @Description 获取网站列表
 // @Success 200 {array} response.WebsiteDTO
 // @Security ApiKeyAuth
 // @Router /websites/list [get]
@@ -48,7 +46,6 @@ func (b *BaseApi) GetWebsites(c *gin.Context) {
 
 // @Tags Website
 // @Summary List website names
-// @Description 获取网站列表
 // @Success 200 {array} string
 // @Security ApiKeyAuth
 // @Router /websites/options [post]
@@ -67,7 +64,6 @@ func (b *BaseApi) GetWebsiteOptions(c *gin.Context) {
 
 // @Tags Website
 // @Summary Create website
-// @Description 创建网站
 // @Accept json
 // @Param request body request.WebsiteCreate true "request"
 // @Success 200
@@ -89,7 +85,6 @@ func (b *BaseApi) CreateWebsite(c *gin.Context) {
 
 // @Tags Website
 // @Summary Operate website
-// @Description 操作网站
 // @Accept json
 // @Param request body request.WebsiteOp true "request"
 // @Success 200
@@ -111,7 +106,6 @@ func (b *BaseApi) OpWebsite(c *gin.Context) {
 
 // @Tags Website
 // @Summary Delete website
-// @Description 删除网站
 // @Accept json
 // @Param request body request.WebsiteDelete true "request"
 // @Success 200
@@ -133,7 +127,6 @@ func (b *BaseApi) DeleteWebsite(c *gin.Context) {
 
 // @Tags Website
 // @Summary Update website
-// @Description 更新网站
 // @Accept json
 // @Param request body request.WebsiteUpdate true "request"
 // @Success 200
@@ -154,7 +147,6 @@ func (b *BaseApi) UpdateWebsite(c *gin.Context) {
 
 // @Tags Website
 // @Summary Search website by id
-// @Description 通过 id 查询网站
 // @Accept json
 // @Param id path integer true "request"
 // @Success 200 {object} response.WebsiteDTO
@@ -176,7 +168,6 @@ func (b *BaseApi) GetWebsite(c *gin.Context) {
 
 // @Tags Website Nginx
 // @Summary Search website nginx by id
-// @Description 通过 id 查询网站 nginx
 // @Accept json
 // @Param id path integer true "request"
 // @Success 200 {object} response.FileInfo
@@ -200,7 +191,6 @@ func (b *BaseApi) GetWebsiteNginx(c *gin.Context) {
 
 // @Tags Website Nginx
 // @Summary Load nginx conf
-// @Description 获取 nginx 配置
 // @Accept json
 // @Param request body request.NginxScopeReq true "request"
 // @Success 200 {object} response.WebsiteNginxConfig
@@ -221,7 +211,6 @@ func (b *BaseApi) GetNginxConfig(c *gin.Context) {
 
 // @Tags Website Nginx
 // @Summary Update nginx conf
-// @Description 更新 nginx 配置
 // @Accept json
 // @Param request body request.NginxConfigUpdate true "request"
 // @Success 200
@@ -242,7 +231,6 @@ func (b *BaseApi) UpdateNginxConfig(c *gin.Context) {
 
 // @Tags Website HTTPS
 // @Summary Load https conf
-// @Description 获取 https 配置
 // @Accept json
 // @Param id path integer true "request"
 // @Success 200 {object} response.WebsiteHTTPS
@@ -264,7 +252,6 @@ func (b *BaseApi) GetHTTPSConfig(c *gin.Context) {
 
 // @Tags Website HTTPS
 // @Summary Update https conf
-// @Description 更新 https 配置
 // @Accept json
 // @Param request body request.WebsiteHTTPSOp true "request"
 // @Success 200 {object} response.WebsiteHTTPS
@@ -289,7 +276,6 @@ func (b *BaseApi) UpdateHTTPSConfig(c *gin.Context) {
 
 // @Tags Website
 // @Summary Check before create website
-// @Description 网站创建前检查
 // @Accept json
 // @Param request body request.WebsiteInstallCheckReq true "request"
 // @Success 200 {array} response.WebsitePreInstallCheck
@@ -310,7 +296,6 @@ func (b *BaseApi) CreateWebsiteCheck(c *gin.Context) {
 
 // @Tags Website Nginx
 // @Summary Update website nginx conf
-// @Description 更新 网站 nginx 配置
 // @Accept json
 // @Param request body request.WebsiteNginxUpdate true "request"
 // @Success 200
@@ -331,7 +316,6 @@ func (b *BaseApi) UpdateWebsiteNginxConfig(c *gin.Context) {
 
 // @Tags Website
 // @Summary Operate website log
-// @Description 操作网站日志
 // @Accept json
 // @Param request body request.WebsiteLogReq true "request"
 // @Success 200 {object} response.WebsiteLog
@@ -353,7 +337,6 @@ func (b *BaseApi) OpWebsiteLog(c *gin.Context) {
 
 // @Tags Website
 // @Summary Change default server
-// @Description 操作网站日志
 // @Accept json
 // @Param request body request.WebsiteDefaultUpdate true "request"
 // @Success 200
@@ -374,7 +357,6 @@ func (b *BaseApi) ChangeDefaultServer(c *gin.Context) {
 
 // @Tags Website PHP
 // @Summary Update php version
-// @Description 变更 php 版本
 // @Accept json
 // @Param request body request.WebsitePHPVersionReq true "request"
 // @Success 200
@@ -395,7 +377,6 @@ func (b *BaseApi) ChangePHPVersion(c *gin.Context) {
 
 // @Tags Website
 // @Summary Get rewrite conf
-// @Description 获取伪静态配置
 // @Accept json
 // @Param request body request.NginxRewriteReq true "request"
 // @Success 200
@@ -416,7 +397,6 @@ func (b *BaseApi) GetRewriteConfig(c *gin.Context) {
 
 // @Tags Website
 // @Summary Update rewrite conf
-// @Description 更新伪静态配置
 // @Accept json
 // @Param request body request.NginxRewriteUpdate true "request"
 // @Success 200
@@ -437,7 +417,6 @@ func (b *BaseApi) UpdateRewriteConfig(c *gin.Context) {
 
 // @Tags Website
 // @Summary Update Site Dir
-// @Description 更新网站目录
 // @Accept json
 // @Param request body request.WebsiteUpdateDir true "request"
 // @Success 200
@@ -458,7 +437,6 @@ func (b *BaseApi) UpdateSiteDir(c *gin.Context) {
 
 // @Tags Website
 // @Summary Update Site Dir permission
-// @Description 更新网站目录权限
 // @Accept json
 // @Param request body request.WebsiteUpdateDirPermission true "request"
 // @Success 200
@@ -479,7 +457,6 @@ func (b *BaseApi) UpdateSiteDirPermission(c *gin.Context) {
 
 // @Tags Website
 // @Summary Get proxy conf
-// @Description 获取反向代理配置
 // @Accept json
 // @Param request body request.WebsiteProxyReq true "request"
 // @Success 200
@@ -500,7 +477,6 @@ func (b *BaseApi) GetProxyConfig(c *gin.Context) {
 
 // @Tags Website
 // @Summary Update proxy conf
-// @Description 修改反向代理配置
 // @Accept json
 // @Param request body request.WebsiteProxyConfig true "request"
 // @Success 200
@@ -522,7 +498,6 @@ func (b *BaseApi) UpdateProxyConfig(c *gin.Context) {
 
 // @Tags Website
 // @Summary Update proxy file
-// @Description 更新反向代理文件
 // @Accept json
 // @Param request body request.NginxProxyUpdate true "request"
 // @Success 200
@@ -543,7 +518,6 @@ func (b *BaseApi) UpdateProxyConfigFile(c *gin.Context) {
 
 // @Tags Website
 // @Summary Get AuthBasic conf
-// @Description 获取密码访问配置
 // @Accept json
 // @Param request body request.NginxAuthReq true "request"
 // @Success 200
@@ -564,7 +538,6 @@ func (b *BaseApi) GetAuthConfig(c *gin.Context) {
 
 // @Tags Website
 // @Summary Get AuthBasic conf
-// @Description 更新密码访问配置
 // @Accept json
 // @Param request body request.NginxAuthUpdate true "request"
 // @Success 200
@@ -584,7 +557,6 @@ func (b *BaseApi) UpdateAuthConfig(c *gin.Context) {
 
 // @Tags Website
 // @Summary Get AuthBasic conf
-// @Description 获取路由密码访问配置
 // @Accept json
 // @Param request body request.NginxAuthReq true "request"
 // @Success 200
@@ -605,7 +577,6 @@ func (b *BaseApi) GetPathAuthConfig(c *gin.Context) {
 
 // @Tags Website
 // @Summary Get AuthBasic conf
-// @Description 更新路由密码访问配置
 // @Accept json
 // @Param request body request.NginxPathAuthUpdate true "request"
 // @Success 200
@@ -625,7 +596,6 @@ func (b *BaseApi) UpdatePathAuthConfig(c *gin.Context) {
 
 // @Tags Website
 // @Summary Get AntiLeech conf
-// @Description 获取防盗链配置
 // @Accept json
 // @Param request body request.NginxCommonReq true "request"
 // @Success 200
@@ -646,7 +616,6 @@ func (b *BaseApi) GetAntiLeech(c *gin.Context) {
 
 // @Tags Website
 // @Summary Update AntiLeech
-// @Description 更新防盗链配置
 // @Accept json
 // @Param request body request.NginxAntiLeechUpdate true "request"
 // @Success 200
@@ -666,7 +635,6 @@ func (b *BaseApi) UpdateAntiLeech(c *gin.Context) {
 
 // @Tags Website
 // @Summary Update redirect conf
-// @Description 修改重定向配置
 // @Accept json
 // @Param request body request.NginxRedirectReq true "request"
 // @Success 200
@@ -688,7 +656,6 @@ func (b *BaseApi) UpdateRedirectConfig(c *gin.Context) {
 
 // @Tags Website
 // @Summary Get redirect conf
-// @Description 获取重定向配置
 // @Accept json
 // @Param request body request.WebsiteProxyReq true "request"
 // @Success 200
@@ -709,7 +676,6 @@ func (b *BaseApi) GetRedirectConfig(c *gin.Context) {
 
 // @Tags Website
 // @Summary Update redirect file
-// @Description 更新重定向文件
 // @Accept json
 // @Param request body request.NginxRedirectUpdate true "request"
 // @Success 200
@@ -730,7 +696,6 @@ func (b *BaseApi) UpdateRedirectConfigFile(c *gin.Context) {
 
 // @Tags Website
 // @Summary Get website dir
-// @Description 获取网站目录配置
 // @Accept json
 // @Param request body request.WebsiteCommonReq true "request"
 // @Success 200
@@ -751,7 +716,6 @@ func (b *BaseApi) GetDirConfig(c *gin.Context) {
 
 // @Tags Website
 // @Summary Get default html
-// @Description 获取默认 html
 // @Accept json
 // @Success 200 {object} response.FileInfo
 // @Security ApiKeyAuth
@@ -772,7 +736,6 @@ func (b *BaseApi) GetDefaultHtml(c *gin.Context) {
 
 // @Tags Website
 // @Summary Update default html
-// @Description 更新默认 html
 // @Accept json
 // @Param request body request.WebsiteHtmlUpdate true "request"
 // @Success 200
@@ -793,7 +756,6 @@ func (b *BaseApi) UpdateDefaultHtml(c *gin.Context) {
 
 // @Tags Website
 // @Summary Get website upstreams
-// @Description 获取网站 upstreams
 // @Accept json
 // @Param request body request.WebsiteCommonReq true "request"
 // @Success 200
@@ -815,7 +777,6 @@ func (b *BaseApi) GetLoadBalances(c *gin.Context) {
 
 // @Tags Website
 // @Summary Create website upstream
-// @Description 创建网站 upstream
 // @Accept json
 // @Param request body request.WebsiteLBCreate true "request"
 // @Success 200
@@ -835,7 +796,6 @@ func (b *BaseApi) CreateLoadBalance(c *gin.Context) {
 
 // @Tags Website
 // @Summary Delete website upstream
-// @Description 删除网站 upstream
 // @Accept json
 // @Param request body request.WebsiteLBDelete true "request"
 // @Success 200
@@ -855,7 +815,6 @@ func (b *BaseApi) DeleteLoadBalance(c *gin.Context) {
 
 // @Tags Website
 // @Summary Update website upstream
-// @Description 更新网站 upstream
 // @Accept json
 // @Param request body request.WebsiteLBUpdate true "request"
 // @Success 200
@@ -875,7 +834,6 @@ func (b *BaseApi) UpdateLoadBalance(c *gin.Context) {
 
 // @Tags Website
 // @Summary Update website upstream file
-// @Description 更新网站 upstream 文件
 // @Accept json
 // @Param request body request.WebsiteLBUpdateFile true "request"
 // @Success 200
@@ -907,7 +865,6 @@ func (b *BaseApi) ChangeWebsiteGroup(c *gin.Context) {
 
 // @Tags Website
 // @Summary update website proxy cache config
-// @Description 更新网站反代缓存配置
 // @Accept json
 // @Param request body request.NginxProxyCacheUpdate true "request"
 // @Success 200
@@ -926,7 +883,6 @@ func (b *BaseApi) UpdateProxyCache(c *gin.Context) {
 }
 
 // @Summary Get website proxy cache config
-// @Description 获取网站反代缓存配置
 // @Accept json
 // @Param id path int true "id"
 // @Success 200 {object} response.NginxProxyCache
@@ -948,7 +904,6 @@ func (b *BaseApi) GetProxyCache(c *gin.Context) {
 
 // @Tags Website
 // @Summary Set Real IP
-// @Description 设置真实IP
 // @Accept json
 // @Param request body request.WebsiteRealIP true "request"
 // @Success 200
@@ -969,7 +924,6 @@ func (b *BaseApi) SetRealIPConfig(c *gin.Context) {
 
 // @Tags Website
 // @Summary Get Real IP Config
-// @Description 获取真实 IP 配置
 // @Accept json
 // @Param id path int true "id"
 // @Success 200 {object} response.WebsiteRealIP
@@ -991,7 +945,6 @@ func (b *BaseApi) GetRealIPConfig(c *gin.Context) {
 
 // @Tags Website
 // @Summary Get website resource
-// @Description 获取网站资源
 // @Accept json
 // @Param id path int true "id"
 // @Success 200 {object} response.Resource
@@ -1013,7 +966,6 @@ func (b *BaseApi) GetWebsiteResource(c *gin.Context) {
 
 // @Tags Website
 // @Summary Get databases
-// @Description 获取数据库列表
 // @Accept json
 // @Success 200 {object} response.Database
 // @Security ApiKeyAuth
@@ -1029,7 +981,6 @@ func (b *BaseApi) GetWebsiteDatabase(c *gin.Context) {
 
 // @Tags Website
 // @Summary Change website database
-// @Description 切换网站数据库
 // @Accept json
 // @Param request body request.ChangeDatabase true "request"
 // @Success 200
@@ -1049,7 +1000,6 @@ func (b *BaseApi) ChangeWebsiteDatabase(c *gin.Context) {
 
 // @Tags Website
 // @Summary Operate custom rewrite
-// @Description 编辑自定义重写模版
 // @Accept json
 // @Param request body request.CustomRewriteOperate true "request"
 // @Success 200
@@ -1069,7 +1019,6 @@ func (b *BaseApi) OperateCustomRewrite(c *gin.Context) {
 
 // @Tags Website
 // @Summary List custom rewrite
-// @Description 获取自定义重写模版列表
 // @Accept json
 // @Success 200 {object} []string
 // @Security ApiKeyAuth

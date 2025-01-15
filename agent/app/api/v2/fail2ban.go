@@ -10,7 +10,6 @@ import (
 
 // @Tags Fail2ban
 // @Summary Load fail2ban base info
-// @Description 获取 Fail2ban 基础信息
 // @Success 200 {object} dto.Fail2BanBaseInfo
 // @Security ApiKeyAuth
 // @Router /toolbox/fail2ban/base [get]
@@ -26,7 +25,6 @@ func (b *BaseApi) LoadFail2BanBaseInfo(c *gin.Context) {
 
 // @Tags Fail2ban
 // @Summary Page fail2ban ip list
-// @Description 获取 Fail2ban ip
 // @Accept json
 // @Param request body dto.Fail2BanSearch true "request"
 // @Success 200 {Array} string
@@ -49,7 +47,6 @@ func (b *BaseApi) SearchFail2Ban(c *gin.Context) {
 
 // @Tags Fail2ban
 // @Summary Operate fail2ban
-// @Description 修改 Fail2ban 状态
 // @Accept json
 // @Param request body dto.Operate true "request"
 // @Security ApiKeyAuth
@@ -71,7 +68,6 @@ func (b *BaseApi) OperateFail2Ban(c *gin.Context) {
 
 // @Tags Fail2ban
 // @Summary Operate sshd of fail2ban
-// @Description 配置 sshd
 // @Accept json
 // @Param request body dto.Operate true "request"
 // @Security ApiKeyAuth
@@ -92,7 +88,6 @@ func (b *BaseApi) OperateSSHD(c *gin.Context) {
 
 // @Tags Fail2ban
 // @Summary Update fail2ban conf
-// @Description 修改 Fail2ban 配置
 // @Accept json
 // @Param request body dto.Fail2BanUpdate true "request"
 // @Success 200
@@ -114,7 +109,6 @@ func (b *BaseApi) UpdateFail2BanConf(c *gin.Context) {
 
 // @Tags Fail2ban
 // @Summary Load fail2ban conf
-// @Description 获取 fail2ban 配置文件
 // @Accept json
 // @Success 200
 // @Security ApiKeyAuth
@@ -132,7 +126,6 @@ func (b *BaseApi) LoadFail2BanConf(c *gin.Context) {
 
 // @Tags Fail2ban
 // @Summary Update fail2ban conf by file
-// @Description 通过文件修改 fail2ban 配置
 // @Accept json
 // @Param request body dto.UpdateByFile true "request"
 // @Success 200

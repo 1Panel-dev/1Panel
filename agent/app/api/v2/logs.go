@@ -8,7 +8,6 @@ import (
 
 // @Tags Logs
 // @Summary Load system log files
-// @Description 获取系统日志文件列表
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /logs/system/files [get]
@@ -24,7 +23,6 @@ func (b *BaseApi) GetSystemFiles(c *gin.Context) {
 
 // @Tags Logs
 // @Summary Load system logs
-// @Description 获取系统日志
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /logs/system [post]
