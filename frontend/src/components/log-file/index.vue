@@ -322,7 +322,7 @@ defineExpose({ changeTail, onDownload, clearLog });
     overflow-y: auto;
     overflow-x: auto;
     position: relative;
-    background-color: #1e1e1e;
+    background-color: var(--panel-logs-bg-color);
     margin-top: 10px;
 }
 

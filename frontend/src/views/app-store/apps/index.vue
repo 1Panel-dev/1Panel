@@ -103,12 +103,18 @@
                                         </div>
                                         <div class="app-content">
                                             <div class="content-top">
-                                                <div>
-                                                    <span class="app-name">{{ app.name }}</span>
-                                                    <el-text type="success" class="!ml-2" v-if="app.installed">
+                                                <el-space wrap :size="1">
+                                                    <span class="app-title">{{ app.name }}</span>
+                                                    <el-tag
+                                                        type="success"
+                                                        v-if="app.installed"
+                                                        round
+                                                        size="small"
+                                                        class="!ml-2"
+                                                    >
                                                         {{ $t('app.allReadyInstalled') }}
-                                                    </el-text>
-                                                </div>
+                                                    </el-tag>
+                                                </el-space>
                                             </div>
                                             <div class="content-middle">
                                                 <span class="app-description">

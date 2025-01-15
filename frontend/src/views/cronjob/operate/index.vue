@@ -378,7 +378,7 @@
             <el-form-item v-if="dialogData.rowData!.type === 'directory' && dialogData.rowData!.isDir" prop="sourceDir">
                 <el-input v-model="dialogData.rowData!.sourceDir">
                     <template #prepend>
-                        <FileList @choose="loadDir" :dir="true"></FileList>
+                        <FileList @choose="loadDir" :dir="true" :path="dialogData.rowData!.sourceDir" />
                     </template>
                 </el-input>
             </el-form-item>
@@ -458,6 +458,31 @@
                 </el-form-item>
             </div>
 
+            <el-form-item prop="hasAlert" v-if="alertTypes.includes(dialogData.rowData!.type)">
+                <el-checkbox v-model="dialogData.rowData!.hasAlert" :label="$t('alert.isAlert')" />
+                <span class="input-help">{{ $t('alert.cronJobHelper') }}</span>
+            </el-form-item>
+            <el-form-item
+                prop="alertCount"
+                v-if="dialogData.rowData!.hasAlert && isProductPro"
+                :label="$t('alert.alertCount')"
+            >
+                <el-input-number
+                    style="width: 200px"
+                    :min="1"
+                    step-strictly
+                    :step="1"
+                    v-model.number="dialogData.rowData!.alertCount"
+                ></el-input-number>
+                <span class="input-help">{{ $t('alert.alertCountHelper') }}</span>
+            </el-form-item>
+            <el-form-item v-if="dialogData.rowData!.hasAlert && !isProductPro">
+                <span>{{ $t('alert.licenseHelper') }}</span>
+                <el-button link type="primary" @click="toUpload">
+                    {{ $t('license.levelUpPro') }}
+                </el-button>
+            </el-form-item>
+
             <el-form-item :label="$t('cronjob.retainCopies')" prop="retainCopies">
                 <el-input-number
                     style="width: 200px"
@@ -493,6 +518,7 @@
                 </el-button>
             </span>
         </template>
+        <LicenseImport ref="licenseRef" />
     </DrawerPro>
 </template>
 
@@ -522,7 +548,15 @@ import {
     weekOptions,
 } from './../helper';
 import { loadUsers } from '@/api/modules/toolbox';
+import { storeToRefs } from 'pinia';
+import { GlobalStore } from '@/store';
+import LicenseImport from '@/components/license-import/index.vue';
 const router = useRouter();
+
+const globalStore = GlobalStore();
+const licenseRef = ref();
+const { isProductPro } = storeToRefs(globalStore);
+const alertTypes = ['app', 'website', 'database', 'directory', 'log', 'snapshot'];
 
 interface DialogProps {
     title: string;
@@ -562,13 +596,6 @@ const acceptParams = (params: DialogProps): void => {
         dialogData.value.rowData.scriptMode = 'input';
         dialogData.value.rowData.dbType = 'mysql';
         dialogData.value.rowData.isDir = true;
-    }
-    if (dialogData.value.rowData.sourceAccountIDs) {
-        dialogData.value.rowData.sourceAccounts = [];
-        let itemIDs = dialogData.value.rowData.sourceAccountIDs.split(',');
-        for (const item of itemIDs) {
-            dialogData.value.rowData.sourceAccounts.push(Number(item));
-        }
     }
     dialogData.value.rowData!.command = dialogData.value.rowData!.command || 'sh';
     dialogData.value.rowData!.isCustom =
@@ -732,6 +759,17 @@ const verifyFiles = (rule: any, value: any, callback: any) => {
     callback();
 };
 
+const checkSendCount = (rule: any, value: any, callback: any) => {
+    if (value === '') {
+        callback();
+    }
+    const regex = /^(?:[1-9]|[12][0-9]|30)$/;
+    if (!regex.test(value)) {
+        return callback(new Error(i18n.global.t('commons.rule.numberRange', [1, 30])));
+    }
+    callback();
+};
+
 const rules = reactive({
     name: [Rules.requiredInput, Rules.noSpace],
     type: [Rules.requiredSelect],
@@ -750,6 +788,7 @@ const rules = reactive({
     sourceAccounts: [Rules.requiredSelect],
     downloadAccountID: [Rules.requiredSelect],
     retainCopies: [Rules.number],
+    alertCount: [Rules.integerNumber, { validator: checkSendCount, trigger: 'blur' }],
 });
 
 type FormInstance = InstanceType<typeof ElForm>;
@@ -980,7 +1019,18 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         if (dialogData.value?.rowData?.exclusionRules) {
             dialogData.value.rowData.exclusionRules = dialogData.value.rowData.exclusionRules.replaceAll('\n', ',');
         }
+
+        dialogData.value.rowData.alertCount =
+            dialogData.value.rowData!.hasAlert && isProductPro.value ? dialogData.value.rowData.alertCount : 0;
+        dialogData.value.rowData.alertTitle =
+            dialogData.value.rowData!.hasAlert && isProductPro.value
+                ? i18n.global.t('cronjob.alertTitle', [
+                      i18n.global.t('cronjob.' + dialogData.value.rowData.type),
+                      dialogData.value.rowData.name,
+                  ])
+                : '';
         if (!dialogData.value.rowData) return;
+
         if (dialogData.value.title === 'create') {
             await addCronjob(dialogData.value.rowData);
         }
@@ -992,6 +1042,10 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         emit('search');
         drawerVisible.value = false;
     });
+};
+
+const toUpload = () => {
+    licenseRef.value.acceptParams();
 };
 
 defineExpose({

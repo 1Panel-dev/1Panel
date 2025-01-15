@@ -4,9 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"strconv"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -298,16 +299,20 @@ func StartMonitor(removeBefore bool, interval string) error {
 	service := NewIMonitorService()
 	ctx, cancel := context.WithCancel(context.Background())
 	monitorCancel = cancel
-	monitorID, err := global.Cron.AddJob(fmt.Sprintf("@every %sm", interval), service)
-	if err != nil {
-		return err
-	}
+	now := time.Now()
+	nextMinute := now.Truncate(time.Minute).Add(time.Minute)
+	time.AfterFunc(time.Until(nextMinute), func() {
+		monitorID, err := global.Cron.AddJob(fmt.Sprintf("@every %sm", interval), service)
+		if err != nil {
+			return
+		}
+		global.MonitorCronID = monitorID
+	})
 
 	service.Run()
 
 	go service.saveIODataToDB(ctx, float64(intervalItem))
 	go service.saveNetDataToDB(ctx, float64(intervalItem))
 
-	global.MonitorCronID = monitorID
 	return nil
 }

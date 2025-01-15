@@ -7,11 +7,6 @@
         :key="refresh"
     >
         <div class="panel-MdEditor">
-            <el-alert :closable="false">
-                <span class="line-height">{{ $t('setting.versionHelper') }}</span>
-                <li class="line-height">{{ $t('setting.versionHelper1') }}</li>
-                <li class="line-height">{{ $t('setting.versionHelper2') }}</li>
-            </el-alert>
             <div class="default-theme" style="margin-left: 20px">
                 <h2 class="inline-block">{{ $t('app.version') }}</h2>
             </div>
@@ -113,10 +108,16 @@ defineExpose({
         font-size: 14px;
     }
     :deep(.default-theme h2) {
-        color: var(--dark-gold-base-color);
-        margin: 13px, 0;
+        color: var(--el-color-primary);
+        margin: 13px 0;
         padding: 0;
         font-size: 16px;
     }
+}
+:deep(.el-link__inner) {
+    font-weight: 400;
+}
+:deep(.md-editor-dark) {
+    background-color: var(--panel-main-bg-color-9);
 }
 </style>

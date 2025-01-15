@@ -141,7 +141,7 @@ const data = ref([]);
 const loading = ref(false);
 const paths = ref<string[]>([]);
 const req = reactive({ path: '/', expand: true, page: 1, pageSize: 300, showHidden: true });
-const selectRow = ref();
+const selectRow = ref({ path: '', name: '' });
 const rowRefs = ref();
 const popoverVisible = ref(false);
 const newFolder = ref();
@@ -183,12 +183,12 @@ const selectFile = () => {
 
 const closePage = () => {
     popoverVisible.value = false;
-    selectRow.value = {};
+    selectRow.value = { path: '', name: '' };
 };
 
 const openPage = () => {
     popoverVisible.value = true;
-    selectRow.value = {};
+    selectRow.value.path = props.dir ? props.path || '/' : '';
     rowName.value = '';
 };
 
@@ -216,7 +216,7 @@ const open = async (row: File.File) => {
         }
         await search(req);
     }
-    selectRow.value = {};
+    selectRow.value.path = props.dir ? req.path : '';
     rowName.value = '';
 };
 
@@ -230,7 +230,7 @@ const jump = async (index: number) => {
     }
     path = path || '/';
     req.path = path;
-    selectRow.value = {};
+    selectRow.value.path = props.dir ? req.path : '';
     rowName.value = '';
     await search(req);
     popoverVisible.value = true;
@@ -286,7 +286,7 @@ const cancelFolder = (row: any) => {
     data.value.shift();
     row.isCreate = false;
     disBtn.value = false;
-    selectRow.value = {};
+    selectRow.value.path = props.dir ? req.path : '';
     rowName.value = '';
     newFolder.value = '';
 };

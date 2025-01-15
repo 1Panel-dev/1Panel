@@ -96,6 +96,7 @@ ErrCmdNotFound: "{{ .name}} command does not exist, please install this command 
 ErrSourcePathNotFound:  "Source directory does not exist"
 ErrFavoriteExist: "This path has been collected"
 ErrInvalidChar: "Illegal characters are prohibited"
+ErrPathNotDelete: "The selected directory cannot be deleted"
 
 #website
 ErrDomainIsExist: "Domain is already exist"
@@ -364,3 +365,10 @@ websiteDir: "Website directory"
 RecoverFailedStartRollBack: "Recovery failed, starting rollback"
 AppBackupFileIncomplete: "Backup file is incomplete; missing app.json or app.tar.gz file"
 AppAttributesNotMatch: "Application type or name does not match"
+
+#alert
+ErrAlert: "Alert information format error, please check and try again!"
+ErrAlertPush: "Alert push error, please check and try again!"
+ErrAlertSave: "Alert save error, please check and try again!"
+ErrAlertSync: "Alert sync error, please check and try again!"
+ErrAlertRemote: "Remote alert error, please check and try again!"

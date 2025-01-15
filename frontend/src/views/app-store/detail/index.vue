@@ -160,7 +160,7 @@ defineExpose({
 });
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
 .brief {
     .name {
         span {
@@ -181,6 +181,7 @@ defineExpose({
     .icon {
         width: 180px;
         height: 180px;
+        background-color: #ffffff;
     }
 
     .version {
@@ -190,5 +191,8 @@ defineExpose({
     .descriptions {
         margin-top: 20px;
     }
+}
+:deep(.md-editor-dark) {
+    background-color: var(--panel-main-bg-color-9);
 }
 </style>

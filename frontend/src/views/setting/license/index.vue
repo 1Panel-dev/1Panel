@@ -93,6 +93,7 @@ import { dateFormat } from '@/utils/util';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
+import { initFavicon } from '@/utils/xpack';
 
 const globalStore = GlobalStore();
 const loading = ref();
@@ -146,7 +147,7 @@ const onUnbind = async (row: any) => {
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 if (row.freeCount !== 0) {
                     globalStore.isProductPro = false;
-                    globalStore.themeConfig.isGold = false;
+                    initFavicon();
                     window.location.reload();
                     return;
                 }
@@ -259,21 +260,3 @@ onMounted(() => {
     search();
 });
 </script>
-
-<style scoped lang="scss">
-.h-app-card {
-    padding: 10px 15px;
-    margin-right: 10px;
-    line-height: 18px;
-    &:hover {
-        background-color: rgba(0, 94, 235, 0.03);
-    }
-}
-:deep(.el-descriptions__content) {
-    max-width: 300px;
-}
-.descriptions {
-    word-break: break-all;
-    word-wrap: break-word;
-}
-</style>

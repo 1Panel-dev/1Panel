@@ -65,8 +65,12 @@ func NewIFileService() IFileService {
 
 func (f *FileService) GetFileList(op request.FileOption) (response.FileInfo, error) {
 	var fileInfo response.FileInfo
-	if _, err := os.Stat(op.Path); err != nil && os.IsNotExist(err) {
+	data, err := os.Stat(op.Path)
+	if err != nil && os.IsNotExist(err) {
 		return fileInfo, nil
+	}
+	if !data.IsDir() {
+		op.FileOption.Path = filepath.Dir(op.FileOption.Path)
 	}
 	info, err := files.NewFileInfo(op.FileOption)
 	if err != nil {
@@ -210,6 +214,12 @@ func (f *FileService) Create(op request.FileCreate) error {
 }
 
 func (f *FileService) Delete(op request.FileDelete) error {
+	if op.IsDir {
+		excludeDir := global.CONF.System.DataDir
+		if filepath.Base(op.Path) == ".1panel_clash" || op.Path == excludeDir {
+			return buserr.New(constant.ErrPathNotDelete)
+		}
+	}
 	fo := files.NewFileOp()
 	recycleBinStatus, _ := settingRepo.Get(settingRepo.WithByKey("FileRecycleBin"))
 	if recycleBinStatus.Value == "disable" {

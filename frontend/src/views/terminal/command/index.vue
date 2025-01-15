@@ -6,7 +6,7 @@
             </template>
             <template #leftToolBar>
                 <el-button type="primary" @click="onCreate()">
-                    {{ $t('commons.button.create') }} {{ $t('terminal.quickCommand') }}
+                    {{ $t('commons.button.create') }}{{ $t('terminal.quickCommand') }}
                 </el-button>
                 <el-button type="primary" plain @click="onOpenGroupDialog()">
                     {{ $t('terminal.group') }}

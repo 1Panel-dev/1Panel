@@ -162,6 +162,7 @@ const replacements = {
     '[MFAStatus]': 'setting.mfa',
     '[MonitorStatus]': 'setting.enableMonitor',
     '[MonitorStoreDays]': 'setting.monitor',
+    '[ApiInterfaceStatus]': 'setting.apiInterface',
 };
 
 const onSubmitClean = async () => {
@@ -174,3 +175,12 @@ onMounted(() => {
     search();
 });
 </script>
+
+<style scoped lang="scss">
+.tag-button {
+    &.no-active {
+        background: none;
+        border: none;
+    }
+}
+</style>

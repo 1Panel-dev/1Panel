@@ -285,7 +285,7 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('container.related')" min-width="200" prop="appName">
+                    <el-table-column :label="$t('container.related')" min-width="210" prop="appName">
                         <template #default="{ row }">
                             <div>
                                 <el-tooltip

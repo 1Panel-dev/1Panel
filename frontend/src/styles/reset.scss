@@ -10,3 +10,21 @@ body,
 :-webkit-any(article, aside, nav, section) h1 {
     font-size: 2em;
 }
+
+.el-switch--small .el-switch__core {
+    width: 36px;
+}
+
+.el-switch--small .el-switch__core::after {
+    width: 12px;
+    height: 12px;
+}
+
+.el-switch--small.is-checked .el-switch__core::after {
+    margin-left: -13px;
+}
+
+.el-alert__title {
+    display: flex;
+    align-items: center;
+}

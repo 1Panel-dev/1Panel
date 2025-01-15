@@ -4,13 +4,13 @@ export interface ThemeConfigProp {
     panelName: string;
     primary: string;
     theme: string; // dark | bright ｜ auto
-    isGold: boolean;
     footer: boolean;
 
     title: string;
     logo: string;
     logoWithText: string;
     favicon: string;
+    themeColor: string;
 }
 
 export interface GlobalState {

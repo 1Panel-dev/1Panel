@@ -9,11 +9,18 @@
                     show-icon
                     :closable="false"
                 />
-                <br />
-                <el-descriptions border :column="1">
-                    <el-descriptions-item v-for="(item, key) in map" :key="key">
+                <el-descriptions border :column="1" class="mt-5">
+                    <el-descriptions-item
+                        v-for="(item, key) in map"
+                        :key="key"
+                        label-class-name="check-label"
+                        class-name="check-content"
+                        min-width="60px"
+                    >
                         <template #label>
-                            <a href="javascript:void(0);" @click="toPage(item[0])">{{ $t('app.' + item[0]) }}</a>
+                            <a href="javascript:void(0);" class="check-label-a" @click="toPage(item[0])">
+                                {{ $t('app.' + item[0]) }}
+                            </a>
                         </template>
                         <span class="resources">
                             {{ map.get(item[0]).toString() }}

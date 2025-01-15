@@ -3,13 +3,14 @@ package service
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	network "net"
 	"os"
 	"sort"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -122,7 +123,7 @@ func (u *DashboardService) LoadCurrentInfoForNode() *dto.NodeCurrent {
 	var currentInfo dto.NodeCurrent
 
 	currentInfo.CPUTotal, _ = cpu.Counts(true)
-	totalPercent, _ := cpu.Percent(0, false)
+	totalPercent, _ := cpu.Percent(100*time.Millisecond, false)
 	if len(totalPercent) == 1 {
 		currentInfo.CPUUsedPercent = totalPercent[0]
 		currentInfo.CPUUsed = currentInfo.CPUUsedPercent * 0.01 * float64(currentInfo.CPUTotal)

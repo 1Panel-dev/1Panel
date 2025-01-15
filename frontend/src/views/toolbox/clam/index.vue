@@ -245,7 +245,7 @@ const toDoc = async () => {
 };
 
 const onChange = async (row: any) => {
-    await await updateClam(row);
+    await updateClam(row);
     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
 };
 

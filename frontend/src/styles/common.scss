@@ -124,7 +124,7 @@ html {
 .input-help {
     font-size: 12px;
     word-break: keep-all;
-    color: #adb0bc;
+    color: #ADB0BC;
     width: 100%;
     display: inline-block;
     white-space: normal;
@@ -220,7 +220,6 @@ html {
         background: var(--el-button-bg-color, var(--el-fill-color-blank));
         border: 0;
         font-weight: 350;
-        border-left: 0;
         color: var(--el-button-text-color, var(--el-text-color-regular));
         text-align: center;
         box-sizing: border-box;
@@ -348,7 +347,7 @@ html {
 
 .el-input-group__append {
     border-left: 0;
-    background-color: #ffffff !important;
+    background-color: var(--el-fill-color-light) !important;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
     box-shadow: 0 1px 0 0 var(--el-input-border-color) inset, 0 -1px 0 0 var(--el-input-border-color) inset,
@@ -451,4 +450,26 @@ html {
 
 .monaco-editor-tree-dark .el-tree-node.is-current > .el-tree-node__content {
     background-color: #111417;
+}
+
+.check-label{
+    background: var(--panel-main-bg-color-10) !important;
+    .check-label-a {
+        color: var(--panel-color-primary);
+    }
+}
+.check-content {
+    background: var(--panel-main-bg-color-10);
+    pre {
+        margin: 0;
+        width: 350px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+
+.el-descriptions {
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

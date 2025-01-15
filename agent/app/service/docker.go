@@ -202,6 +202,23 @@ func (u *DockerService) UpdateConf(req dto.SettingUpdate) error {
 				daemonMap["exec-opts"] = []string{"native.cgroupdriver=systemd"}
 			}
 		}
+	case "http-proxy", "https-proxy":
+		delete(daemonMap, "proxies")
+		if len(req.Value) > 0 {
+			proxies := map[string]interface{}{
+				req.Key: req.Value,
+			}
+			daemonMap["proxies"] = proxies
+		}
+	case "socks5-proxy", "close-proxy":
+		delete(daemonMap, "proxies")
+		if len(req.Value) > 0 {
+			proxies := map[string]interface{}{
+				"http-proxy":  req.Value,
+				"https-proxy": req.Value,
+			}
+			daemonMap["proxies"] = proxies
+		}
 	}
 	if len(daemonMap) == 0 {
 		_ = os.Remove(constant.DaemonJsonPath)

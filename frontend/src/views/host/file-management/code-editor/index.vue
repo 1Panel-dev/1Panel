@@ -58,7 +58,7 @@
         </div>
         <div v-loading="loading">
             <div class="flex">
-                <div class="sm:w-48 w-1/3 monaco-editor-background tree-container" v-if="isShow">
+                <div class="monaco-editor sm:w-48 w-1/3 monaco-editor-background border-0 tree-container" v-if="isShow">
                     <div class="flex items-center justify-between pl-1 sm:pr-4 pr-1 pt-1">
                         <el-tooltip :content="$t('file.top')" placement="top">
                             <el-text size="small" @click="getUpData()" class="cursor-pointer">
@@ -700,6 +700,11 @@ defineExpose({ acceptParams });
 
 .monaco-editor-tree {
     color: var(--el-color-primary) !important;
+}
+
+.monaco-editor-background {
+    outline-style: none;
+    background-color: var(--vscode-editor-background) !important;
 }
 
 .tree-widget {

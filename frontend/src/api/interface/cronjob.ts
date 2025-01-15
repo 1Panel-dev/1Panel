@@ -34,6 +34,9 @@ export namespace Cronjob {
         retainCopies: number;
         status: string;
         secret: string;
+        hasAlert: boolean;
+        alertCount: number;
+        alertTitle: string;
     }
     export interface Item {
         val: string;

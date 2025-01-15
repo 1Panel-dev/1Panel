@@ -2,39 +2,39 @@
     <div>
         <div class="flex w-full flex-col gap-2 md:flex-row items-center">
             <div class="flex flex-wrap items-center" v-if="props.footer">
-                <el-button type="primary" link @click="toForum">
+                <el-link type="primary" :underline="false" @click="toForum">
                     <span class="font-normal">{{ $t('setting.forum') }}</span>
-                </el-button>
+                </el-link>
                 <el-divider direction="vertical" />
-                <el-button type="primary" link @click="toDoc">
+                <el-link type="primary" :underline="false" @click="toDoc">
                     <span class="font-normal">{{ $t('setting.doc2') }}</span>
-                </el-button>
+                </el-link>
                 <el-divider direction="vertical" />
-                <el-button type="primary" link @click="toGithub">
+                <el-link type="primary" :underline="false" @click="toGithub">
                     <span class="font-normal">{{ $t('setting.project') }}</span>
-                </el-button>
+                </el-link>
                 <el-divider direction="vertical" />
             </div>
             <div class="flex flex-wrap items-center">
-                <el-button type="primary" link @click="toHalo">
-                    <span class="font-normal">
-                        {{ isMasterProductPro ? $t('license.pro') : $t('license.community') }}
-                    </span>
-                </el-button>
-                <span class="version" @click="copyText(version)">{{ version }}</span>
-                <el-badge is-dot style="margin-top: -3px" v-if="version !== 'Waiting' && globalStore.hasNewVersion">
-                    <el-button type="primary" link @click="onLoadUpgradeInfo">
-                        <span class="font-normal">({{ $t('setting.hasNewVersion') }})</span>
-                    </el-button>
+                <el-link :underline="false" type="primary" @click="toHalo">
+                    {{ isMasterProductPro ? $t('license.pro') : $t('license.community') }}
+                </el-link>
+                <el-link :underline="false" class="version" type="primary" @click="copyText(version)">
+                    {{ version }}
+                </el-link>
+                <el-badge is-dot class="-mt-0.5" v-if="version !== 'Waiting' && globalStore.hasNewVersion">
+                    <el-link :underline="false" type="primary" @click="onLoadUpgradeInfo">
+                        （{{ $t('setting.hasNewVersion') }}）
+                    </el-link>
                 </el-badge>
-                <el-button
+                <el-link
                     v-if="version !== 'Waiting' && !globalStore.hasNewVersion"
                     type="primary"
-                    link
+                    :underline="false"
                     @click="onLoadUpgradeInfo"
                 >
-                    <span>({{ $t('setting.upgradeCheck') }})</span>
-                </el-button>
+                    （{{ $t('setting.upgradeCheck') }}）
+                </el-link>
                 <el-tag v-if="version === 'Waiting'" round style="margin-left: 10px">
                     {{ $t('setting.upgrading') }}
                 </el-tag>
@@ -129,7 +129,7 @@ onMounted(() => {
 <style lang="scss" scoped>
 .version {
     font-size: 14px;
-    color: var(--dark-gold-base-color);
+    color: var(--panel-color-primary-light-4);
     text-decoration: none;
     letter-spacing: 0.5px;
 }

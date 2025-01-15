@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/core/app/repo"
+	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/cmd"
 	"github.com/1Panel-dev/1Panel/core/utils/common"
@@ -22,6 +23,23 @@ func Init() {
 		global.LOG.Errorf("load ipv6 status from setting failed, err: %v", err)
 	}
 	global.CONF.System.Ipv6 = ipv6Setting.Value
+	apiInterfaceStatusSetting, err := settingRepo.Get(repo.WithByKey("ApiInterfaceStatus"))
+	if err != nil {
+		global.LOG.Errorf("load service api interface from setting failed, err: %v", err)
+	}
+	global.CONF.System.ApiInterfaceStatus = apiInterfaceStatusSetting.Value
+	if apiInterfaceStatusSetting.Value == constant.StatusEnable {
+		apiKeySetting, err := settingRepo.Get(repo.WithByKey("ApiKey"))
+		if err != nil {
+			global.LOG.Errorf("load service api key from setting failed, err: %v", err)
+		}
+		global.CONF.System.ApiKey = apiKeySetting.Value
+		ipWhiteListSetting, err := settingRepo.Get(repo.WithByKey("IpWhiteList"))
+		if err != nil {
+			global.LOG.Errorf("load service ip white list from setting failed, err: %v", err)
+		}
+		global.CONF.System.IpWhiteList = ipWhiteListSetting.Value
+	}
 	bindAddressSetting, err := settingRepo.Get(repo.WithByKey("BindAddress"))
 	if err != nil {
 		global.LOG.Errorf("load bind address from setting failed, err: %v", err)

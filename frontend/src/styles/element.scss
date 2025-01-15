@@ -1,34 +1,63 @@
 :root {
-    --el-color-primary: #005eeb;
-    --el-color-primary-dark-2: #0054d3;
+    --panel-gradient-end-color: var(--el-color-primary-light-7);
+
     --el-color-primary-light-1: #196eed;
     --el-color-primary-light-2: #337eef;
-    --el-color-primary-light-3: #4c8ef1;
     --el-color-primary-light-4: #669ef3;
-    --el-color-primary-light-5: #7faef5;
     --el-color-primary-light-6: #99bef7;
-    --el-color-primary-light-7: #b2cef9;
-    --el-color-primary-light-8: #ccdefb;
-    --el-color-primary-light-9: #e5eefd;
-    --el-font-weight-primary: 400;
+
+    --panel-color-primary: #005eeb;
+    --panel-color-primary-light-8: #196eed;
+    --panel-color-primary-light-1: #196eed;
+    --panel-color-primary-light-2: #337eef;
+    --panel-color-primary-light-3: #4c8ef1;
+    --panel-color-primary-light-4: #669ef3;
+    --panel-color-primary-light-5: #7faef5;
+    --panel-color-primary-light-6: #99bef7;
+    --panel-color-primary-light-7: #b2cef9;
+    --panel-color-primary-light-9: #e5eefd;
+
+    --el-color-primary: var(--panel-color-primary);
+    --el-color-primary-light-3: var(--panel-color-primary-light-1);
+    --el-color-primary-light-5: var(--panel-color-primary-light-5);
+    --el-color-primary-light-7: var(--panel-color-primary-light-7);
+    --el-color-primary-light-8: var(--panel-color-primary-light-8);
+    --el-color-primary-light-9: var(--panel-color-primary-light-9);
+
+    --el-text-color-regular: #646a73;
 }
 
 html {
     --el-box-shadow-light: 0px 0px 4px rgba(0, 94, 235, 0.1) !important;
 
-    --el-text-color-regular: #646a73 !important;
     // * menu
-    --el-menu-bg-color: rgba(0, 94, 235, 0.1) !important;
     --el-menu-item-bg-color: rgba(255, 255, 255, 0.3);
     --el-menu-item-bg-color-active: #ffffff;
+    --panel-main-bg-color-9: #f4f4f4;
+    --panel-menu-bg-color: rgba(0, 94, 235, 0.1);
     --panel-menu-width: 180px;
     --panel-menu-hide-width: 75px;
     --panel-text-color: #1f2329;
     --panel-border: 1px solid #f2f2f2;
     --panel-button-active: #ffffff;
+    --panel-button-text-color: var(--panel-color-primary);
+    --panel-button-bg-color: #ffffff;
+    --panel-footer-border: #e4e7ed;
+    --panel-terminal-tag-bg-color: #efefef;
+    --panel-terminal-tag-active-bg-color: #575758;
+    --panel-terminal-tag-active-text-color: #ebeef5;
+    --panel-terminal-tag-hover-text-color: #575758;
+    --panel-terminal-bg-color: #1e1e1e;
+    --panel-logs-bg-color: #1e1e1e;
+    --panel-alert-bg-color: rgba(0, 94, 235, 0.03);
 
     --panel-alert-bg: #e2e4ec;
     --panel-path-bg: #ffffff;
+    --panel-footer-bg: #ffffff;
+    --panel-pie-bg-color: #ffffff;
+
+    --el-fill-color-light: #ffffff;
+    --el-disabled-bg-color: var(--panel-main-bg-color-9) !important;
 }
 
 .el-notification {
@@ -214,6 +243,10 @@ html {
     }
 }
 
+.el-input.is-disabled .el-input__wrapper {
+    --el-disabled-bg-color: var(--panel-main-bg-color-9);
+}
+
 .el-radio-button__inner {
     [class*='el-icon'] + span {
         margin-left: 6px;
@@ -225,4 +258,15 @@ html {
 
 .logo {
     color: var(--el-color-primary);
+}
+
+.custom-input-textarea {
+    background-color: #f5f7fa !important;
+    color: var(--el-color-info) !important;
+}
+
+.custom-input-textarea:hover {
+    color: var(--el-color-primary) !important;
+    background-color: var(--el-color-primary-light-9) !important;
+    border-color: var(--el-button-border-color) !important;
 }

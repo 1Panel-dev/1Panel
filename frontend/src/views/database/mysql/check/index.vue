@@ -4,18 +4,20 @@
             <el-col :span="20" :offset="2" v-if="open">
                 <el-alert
                     type="error"
-                    :description="$t('app.deleteHelper', [$t('app.database')])"
+                    :title="$t('app.deleteHelper', [$t('app.database')])"
                     center
                     show-icon
                     :closable="false"
                 />
                 <br />
-                <el-descriptions border :column="1">
-                    <el-descriptions-item>
+                <el-descriptions :column="1" border>
+                    <el-descriptions-item label-class-name="check-label" class-name="check-content" min-width="60px">
                         <template #label>
-                            <a href="javascript:void(0);" @click="toApp()">{{ $t('app.app') }}</a>
+                            <a href="javascript:void(0);" class="check-label-a" @click="toApp()">
+                                {{ $t('app.app') }}
+                            </a>
                         </template>
-                        {{ installData.join(',') }}
+                        <pre>{{ installData.join('\n') }}</pre>
                     </el-descriptions-item>
                 </el-descriptions>
             </el-col>

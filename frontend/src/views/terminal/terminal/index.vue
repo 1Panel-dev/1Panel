@@ -3,7 +3,7 @@
         <el-tabs
             type="card"
             class="terminal-tabs"
-            style="background-color: #efefef; margin-top: 20px"
+            style="background-color: var(--panel-terminal-tag-bg-color); margin-top: 20px"
             v-model="terminalValue"
             :before-leave="beforeLeave"
             @tab-change="quickCmd = ''"
@@ -44,7 +44,10 @@
                     </span>
                 </template>
                 <Terminal
-                    :style="{ height: `calc(100vh - ${loadHeight()})`, 'background-color': '#000' }"
+                    :style="{
+                        height: `calc(100vh - ${loadHeight()})`,
+                        'background-color': `var(--panel-logs-bg-color)`,
+                    }"
                     :ref="'t-' + item.index"
                     :key="item.Refresh"
                 ></Terminal>
@@ -408,7 +411,7 @@ defineExpose({
 onMounted(() => {
     if (router.currentRoute.value.query.path) {
         const path = String(router.currentRoute.value.query.path);
-        initCmd.value = `cd ${path} \n`;
+        initCmd.value = `cd "${path}" \n`;
     }
 });
 </script>
@@ -428,12 +431,17 @@ onMounted(() => {
         z-index: calc(var(--el-index-normal) + 1);
     }
     :deep(.el-tabs__item) {
-        color: #575758;
-        padding: 0 0px;
+        padding: 0;
     }
     :deep(.el-tabs__item.is-active) {
-        color: #ebeef5;
-        background-color: #575758;
+        color: var(--panel-terminal-tag-active-text-color);
+        background-color: var(--panel-terminal-tag-active-bg-color);
+    }
+    :deep(.el-tabs__item:hover) {
+        color: var(--panel-terminal-tag-hover-text-color);
+    }
+    :deep(.el-tabs__item.is-active:hover) {
+        color: var(--panel-terminal-tag-active-text-color);
     }
 }
 

@@ -10,12 +10,14 @@
                     :closable="false"
                 />
                 <br />
-                <el-descriptions border :column="1">
-                    <el-descriptions-item>
+                <el-descriptions border :column="1" class="mt-5">
+                    <el-descriptions-item label-class-name="check-label" class-name="check-content" min-width="60px">
                         <template #label>
-                            <a href="javascript:void(0);" @click="toApp()">{{ $t('app.app') }}</a>
+                            <a href="javascript:void(0);" class="check-label-a" @click="toApp()">
+                                {{ $t('app.app') }}
+                            </a>
                         </template>
-                        {{ installData.join(',') }}
+                        <pre>{{ installData.join('\n') }}</pre>
                     </el-descriptions-item>
                 </el-descriptions>
             </el-col>

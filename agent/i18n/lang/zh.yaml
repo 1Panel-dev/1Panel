@@ -95,6 +95,7 @@ ErrCmdNotFound: "{{ .name}} 命令不存在，请先在宿主机安装此命令"
 ErrSourcePathNotFound:  "源目录不存在"
 ErrFavoriteExist: "已收藏此路径"
 ErrInvalidChar: "禁止使用非法字符"
+ErrPathNotDelete: "所选目录不可删除"
 
 #website
 ErrDomainIsExist: "域名已存在"
@@ -390,3 +391,10 @@ websiteDir: "网站目录"
 RecoverFailedStartRollBack: "恢复失败，开始回滚"
 AppBackupFileIncomplete: "备份文件不完整 缺少  app.json 或者 app.tar.gz  文件"
 AppAttributesNotMatch: "应用类型或者名称不一致"
+
+#alert
+ErrAlert: "告警信息格式错误，请检查后重试！"
+ErrAlertPush: "告警信息推送错误，请检查后重试！"
+ErrAlertSave: "告警信息保存错误，请检查后重试！"
+ErrAlertSync: "告警信息同步错误，请检查后重试！"
+ErrAlertRemote: "告警信息远端错误，请检查后重试！"

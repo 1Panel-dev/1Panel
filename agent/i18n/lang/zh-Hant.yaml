@@ -4,6 +4,10 @@ ErrRecordExist: "記錄已存在"
 ErrRecordNotFound: "記錄未找到"
 ErrStructTransform: "類型轉換失敗: {{ .detail }}"
 ErrNotSupportType: "系統暫不支持當前類型: {{ .detail }}"
+ErrApiConfigStatusInvalid: "API 接口禁止訪問: {{ .detail }}"
+ErrApiConfigKeyInvalid: "API 接口密钥錯誤: {{ .detail }}"
+ErrApiConfigIPInvalid: "调用 API 接口 IP 不在白名单: {{ .detail }}"
+ErrApiConfigDisable: "此接口禁止使用 API 接口調用: {{ .detail }}"
 
 #common
 ErrNameIsExist: "名稱已存在"
@@ -96,6 +100,7 @@ ErrFileDownloadDir: "不支持下載文件夾"
 ErrCmdNotFound: "{{ .name}} 命令不存在，請先在宿主機安裝此命令"
 ErrSourcePathNotFound:  "源目錄不存在"
 ErrFavoriteExist: "已收藏此路徑"
+ErrPathNotDelete: "所選目錄不可删除"
 
 #website
 ErrDomainIsExist: "域名已存在"
@@ -365,3 +370,10 @@ websiteDir: "網站目錄"
 RecoverFailedStartRollBack: "恢復失敗，開始回滾"
 AppBackupFileIncomplete: "備份文件不完整，缺少 app.json 或 app.tar.gz 文件"
 AppAttributesNotMatch: "應用類型或名稱不一致"
+
+# alert
+ErrAlert: "告警資訊格式錯誤，請檢查後重試！"
+ErrAlertPush: "告警資訊推送錯誤，請檢查後重試！"
+ErrAlertSave: "告警資訊保存錯誤，請檢查後重試！"
+ErrAlertSync: "告警資訊同步錯誤，請檢查後重試！"
+ErrAlertRemote: "告警資訊遠端錯誤，請檢查後重試！"

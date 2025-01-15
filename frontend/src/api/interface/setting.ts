@@ -57,6 +57,10 @@ export namespace Setting {
         proxyUser: string;
         proxyPasswd: string;
         proxyPasswdKeep: string;
+
+        apiInterfaceStatus: string;
+        apiKey: string;
+        ipWhiteList: string;
     }
     export interface TerminalInfo {
         lineHeight: string;
@@ -78,6 +82,11 @@ export namespace Setting {
         proxyUser: string;
         proxyPasswd: string;
         proxyPasswdKeep: string;
+    }
+    export interface ApiConfig {
+        apiInterfaceStatus: string;
+        apiKey: string;
+        ipWhiteList: string;
     }
     export interface SSLUpdate {
         ssl: string;
@@ -211,6 +220,8 @@ export namespace Setting {
         trial: boolean;
         status: string;
         message: string;
+        smsUsed: number;
+        smsTotal: number;
     }
     export interface LicenseStatus {
         productPro: string;

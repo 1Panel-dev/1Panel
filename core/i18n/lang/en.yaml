@@ -9,6 +9,10 @@ ErrNotLogin: "User is not Login: {{ .detail }}"
 ErrPasswordExpired: "The current password has expired: {{ .detail }}"
 ErrNotSupportType: "The system does not support the current type: {{ .detail }}"
 ErrProxy: "Request error, please check the node status: {{ .detail }}"
+ErrApiConfigStatusInvalid: "API Interface access prohibited: {{ .detail }}"
+ErrApiConfigKeyInvalid: "API Interface key error: {{ .detail }}"
+ErrApiConfigIPInvalid: "API Interface IP is not on the whitelist: {{ .detail }}"
+ErrApiConfigDisable: "This interface prohibits the use of API Interface calls: {{ .detail }}"
 
 #common
 ErrNameIsExist: "Name is already exist"

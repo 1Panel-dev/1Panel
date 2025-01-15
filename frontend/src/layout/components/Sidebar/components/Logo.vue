@@ -1,13 +1,18 @@
 <template>
     <div class="logo" style="cursor: pointer" @click="goHome">
         <template v-if="isCollapse">
-            <img v-if="globalStore.themeConfig.logo" :src="'/api/v2/images/logo'" style="cursor: pointer" alt="logo" />
+            <img
+                v-if="globalStore.themeConfig.logo"
+                :src="`/api/v2/images/logo?t=${Date.now()}`"
+                style="cursor: pointer"
+                alt="logo"
+            />
             <MenuLogo v-else />
         </template>
         <template v-else>
             <img
                 v-if="globalStore.themeConfig.logoWithText"
-                :src="'/api/v2/images/logoWithText'"
+                :src="`/api/v2/images/logoWithText?t=${Date.now()}`"
                 style="cursor: pointer"
                 alt="logo"
             />
@@ -37,6 +42,7 @@ const goHome = () => {
     align-items: center;
     justify-content: center;
     height: 55px;
+    z-index: 1;
     img {
         object-fit: contain;
         width: 95%;

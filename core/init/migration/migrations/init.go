@@ -89,7 +89,8 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "PrsoxyPasswdKeep", Value: ""}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "XpackHideMenu", Value: "{\"id\":\"1\",\"label\":\"/xpack\",\"isCheck\":true,\"title\":\"xpack.menu\",\"children\":[{\"id\":\"2\",\"title\":\"xpack.waf.name\",\"path\":\"/xpack/waf/dashboard\",\"label\":\"Dashboard\",\"isCheck\":true},{\"id\":\"3\",\"title\":\"xpack.tamper.tamper\",\"path\":\"/xpack/tamper\",\"label\":\"Tamper\",\"isCheck\":true},{\"id\":\"4\",\"title\":\"xpack.gpu.gpu\",\"path\":\"/xpack/gpu\",\"label\":\"GPU\",\"isCheck\":true},{\"id\":\"5\",\"title\":\"xpack.setting.setting\",\"path\":\"/xpack/setting\",\"label\":\"XSetting\",\"isCheck\":true},{\"id\":\"6\",\"title\":\"xpack.monitor.name\",\"path\":\"/xpack/monitor/dashboard\",\"label\":\"MonitorDashboard\",\"isCheck\":true},{\"id\":\"7\",\"title\":\"xpack.node.nodeManagement\",\"path\":\"/xpack/node\",\"label\":\"Node\",\"isCheck\":true}]}"}).Error; err != nil {
+		val := `{"id":"1","label":"/xpack","isCheck":true,"title":"xpack.menu","children":[{"id":"2","label":"Dashboard","isCheck":true,"title":"xpack.waf.name","path":"/xpack/waf/dashboard"},{"id":"3","label":"Tamper","isCheck":true,"title":"xpack.tamper.tamper","path":"/xpack/tamper"},{"id":"4","label":"GPU","isCheck":true,"title":"xpack.gpu.gpu","path":"/xpack/gpu"},{"id":"5","label":"XSetting","isCheck":true,"title":"xpack.setting.setting","path":"/xpack/setting"},{"id":"6","label":"MonitorDashboard","isCheck":true,"title":"xpack.monitor.name","path":"/xpack/monitor/dashboard"},{"id":"7","label":"XAlertDashboard","isCheck":true,"title":"xpack.alert.alert","path":"/xpack/alert/dashboard"},{"id":"8","label":"Node","isCheck":true,"title":"xpack.node.nodeManagement","path":"/xpack/node"}]}`
+		if err := tx.Create(&model.Setting{Key: "XpackHideMenu", Value: val}).Error; err != nil {
 			return err
 		}
 
@@ -142,6 +143,15 @@ var InitSetting = &gormigrate.Migration{
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "NoAuthSetting", Value: "200"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "ApiInterfaceStatus", Value: "disable"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "ApiKey", Value: ""}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "IpWhiteList", Value: ""}).Error; err != nil {
 			return err
 		}
 		return nil

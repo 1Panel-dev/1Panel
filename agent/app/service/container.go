@@ -812,8 +812,7 @@ func (u *ContainerService) StreamLogs(ctx *gin.Context, params dto.StreamLog) {
 			}
 			return true
 		case err := <-errorChan:
-			errorMsg := fmt.Sprintf("event: error\ndata: %v\n\n", err.Error())
-			_, err = fmt.Fprintf(w, errorMsg)
+			_, _ = fmt.Fprintf(w, "event: error\ndata: %v\n\n", err.Error())
 			return false
 		case <-ctx.Request.Context().Done():
 			return false

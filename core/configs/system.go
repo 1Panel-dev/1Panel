@@ -18,4 +18,8 @@ type System struct {
 	Entrance       string `mapstructure:"entrance"`
 	IsDemo         bool   `mapstructure:"is_demo"`
 	ChangeUserInfo string `mapstructure:"change_user_info"`
+
+	ApiInterfaceStatus string `mapstructure:"api_interface_status"`
+	ApiKey             string `mapstructure:"api_key"`
+	IpWhiteList        string `mapstructure:"ip_white_list"`
 }

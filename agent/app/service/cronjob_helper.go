@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/app/task"
@@ -18,6 +19,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/1Panel-dev/1Panel/agent/utils/ntp"
+	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 )
 
 func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
@@ -69,6 +71,7 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 				record.Records, _ = mkdirAndWriteFile(cronjob, record.StartTime, message)
 			}
 			cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), record.Records)
+			handleCronJobAlert(cronjob)
 			return
 		}
 		if len(message) != 0 {
@@ -314,4 +317,18 @@ func (u *CronjobService) removeExpiredLog(cronjob model.Cronjob) {
 
 func hasBackup(cronjobType string) bool {
 	return cronjobType == "app" || cronjobType == "database" || cronjobType == "website" || cronjobType == "directory" || cronjobType == "snapshot" || cronjobType == "log"
+}
+
+func handleCronJobAlert(cronjob *model.Cronjob) {
+	pushAlert := dto.PushAlert{
+		TaskName:  cronjob.Name,
+		AlertType: cronjob.Type,
+		EntryID:   cronjob.ID,
+		Param:     cronjob.Type,
+	}
+	err := xpack.PushAlert(pushAlert)
+	if err != nil {
+		global.LOG.Errorf("cronjob alert push failed, err: %v", err)
+		return
+	}
 }

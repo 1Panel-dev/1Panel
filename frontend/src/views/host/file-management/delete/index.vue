@@ -60,6 +60,7 @@ import { File } from '@/api/interface/file';
 import { getIcon } from '@/utils/util';
 import { DeleteFile, GetRecycleStatus } from '@/api/modules/files';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
+import { loadBaseDir } from '@/api/modules/setting';
 
 const open = ref(false);
 const files = ref();
@@ -85,12 +86,19 @@ const getStatus = async () => {
     } catch (error) {}
 };
 
-const onConfirm = () => {
+const onConfirm = async () => {
     const pros = [];
     for (const s of files.value) {
-        if (s['path'].indexOf('.1panel_clash') > -1) {
-            MsgWarning(i18n.global.t('file.clashDeleteAlert'));
-            return;
+        if (s['isDir']) {
+            if (s['path'].indexOf('.1panel_clash') > -1) {
+                MsgWarning(i18n.global.t('file.clashDeleteAlert'));
+                return;
+            }
+            const pathRes = await loadBaseDir();
+            if (s['path'] === pathRes.data) {
+                MsgWarning(i18n.global.t('file.panelInstallDir'));
+                return;
+            }
         }
         pros.push(DeleteFile({ path: s['path'], isDir: s['isDir'], forceDelete: forceDelete.value }));
     }

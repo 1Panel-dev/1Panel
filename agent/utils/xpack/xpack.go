@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
@@ -69,4 +70,21 @@ func GetImagePrefix() string {
 
 func IsUseCustomApp() bool {
 	return false
+}
+
+// alert
+func CreateAlert(createAlert dto.CreateOrUpdateAlert) error {
+	return nil
+}
+func UpdateAlert(updateAlert dto.CreateOrUpdateAlert) error {
+	return nil
+}
+func DeleteAlert(alertBase dto.AlertBase) error {
+	return nil
+}
+func GetAlert(alertBase dto.AlertBase) uint {
+	return 0
+}
+func PushAlert(pushAlert dto.PushAlert) error {
+	return nil
 }

@@ -146,7 +146,7 @@ onMounted(() => {
     height: 100vh;
     transition: margin-left 0.3s;
     margin-left: var(--panel-menu-width);
-    background-color: #f4f4f4;
+    background-color: var(--panel-main-bg-color-9);
     overflow-x: hidden;
 }
 .app-main {
