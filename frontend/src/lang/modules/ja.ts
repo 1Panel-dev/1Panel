@@ -1,8 +1,8 @@
-import fit2cloudEnLocale from 'fit2cloud-ui-plus/src/locale/lang/ja';
-let xpackJpLocale = {};
+import fit2cloudJaLocale from 'fit2cloud-ui-plus/src/locale/lang/ja';
+let xpackJaLocale = {};
 const xpackModules = import.meta.glob('../../xpack/lang/ja.ts', { eager: true });
 if (xpackModules['../../xpack/lang/ja.ts']) {
-    xpackJpLocale = xpackModules['../../xpack/lang/ja.ts']['default'] || {};
+    xpackJaLocale = xpackModules['../../xpack/lang/ja.ts']['default'] || {};
 }
 
 const message = {
@@ -59,8 +59,8 @@ const message = {
             copy: 'コピー',
             random: 'ランダム',
             uninstall: 'アンインストール',
-            fullscreen: 'フルスクリーンを入力します',
-            quitFullscreen: 'フルスクリーンを終了します',
+            fullscreen: 'フルスクリーン',
+            quitFullscreen: 'フルスクリーンを終了',
             update: '編集',
             showAll: 'すべてを表示します',
             hideSome: 'いくつかを隠します',
@@ -1915,7 +1915,7 @@ const message = {
         app: '応用',
         appNew: '新しいアプリケーション',
         appInstalled: 'インストールされたアプリケーション',
-        create: 'Webサイトを作成します',
+        create: '作成する',
         delete: 'Webサイトを削除します',
         deleteApp: 'アプリケーションを削除します',
         deleteBackup: 'バックアップを削除します',
@@ -2490,7 +2490,7 @@ const message = {
     },
 };
 export default {
-    ...fit2cloudEnLocale,
+    ...fit2cloudJaLocale,
     ...message,
-    ...xpackJpLocale,
+    ...xpackJaLocale,
 };

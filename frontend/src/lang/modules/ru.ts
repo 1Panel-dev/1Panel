@@ -1,9 +1,9 @@
-import fit2cloudEnLocale from 'fit2cloud-ui-plus/src/locale/lang/ru';
+import fit2cloudRuLocale from 'fit2cloud-ui-plus/src/locale/lang/ru';
 
-let xpackEnLocale = {};
+let xpackRuLocale = {};
 const xpackModules = import.meta.glob('../../xpack/lang/ru.ts', { eager: true });
 if (xpackModules['../../xpack/lang/ru.ts']) {
-    xpackEnLocale = xpackModules['../../xpack/lang/ru.ts']['default'] || {};
+    xpackRuLocale = xpackModules['../../xpack/lang/ru.ts']['default'] || {};
 }
 
 const message = {
@@ -1957,7 +1957,7 @@ const message = {
         app: 'Приложение',
         appNew: 'Новое приложение',
         appInstalled: 'Установленное приложение',
-        create: 'Создать веб-сайт',
+        create: 'Создать',
         delete: 'Удалить веб-сайт',
         deleteApp: 'Удалить приложение',
         deleteBackup: 'Удалить резервную копию',
@@ -2542,7 +2542,7 @@ const message = {
 };
 
 export default {
-    ...fit2cloudEnLocale,
+    ...fit2cloudRuLocale,
     ...message,
-    ...xpackEnLocale,
+    ...xpackRuLocale,
 };

@@ -1,9 +1,9 @@
-import fit2cloudEnLocale from 'fit2cloud-ui-plus/src/locale/lang/ms';
+import fit2cloudMsLocale from 'fit2cloud-ui-plus/src/locale/lang/ms';
 
-let xpackEnLocale = {};
+let xpackMsLocale = {};
 const xpackModules = import.meta.glob('../../xpack/lang/ms.ts', { eager: true });
 if (xpackModules['../../xpack/lang/ms.ts']) {
-    xpackEnLocale = xpackModules['../../xpack/lang/ms.ts']['default'] || {};
+    xpackMsLocale = xpackModules['../../xpack/lang/ms.ts']['default'] || {};
 }
 
 const message = {
@@ -60,8 +60,8 @@ const message = {
             copy: 'Salin',
             random: 'Rawak',
             uninstall: 'Nyahpasang',
-            fullscreen: 'Masuk ke skrin penuh',
-            quitFullscreen: 'Keluar dari skrin penuh',
+            fullscreen: 'Skrin Penuh',
+            quitFullscreen: 'Keluar Skrin Penuh',
             update: 'Kemas kini',
             showAll: 'Tunjukkan Semua',
             hideSome: 'Sembunyikan Sebahagian',
@@ -1966,7 +1966,7 @@ const message = {
         app: 'Aplikasi',
         appNew: 'Aplikasi Baru',
         appInstalled: 'Aplikasi yang Dipasang',
-        create: 'Cipta laman web',
+        create: 'Cipta',
         delete: 'Padam Laman Web',
         deleteApp: 'Padam Aplikasi',
         deleteBackup: 'Padam Sandaran',
@@ -2551,7 +2551,7 @@ const message = {
 };
 
 export default {
-    ...fit2cloudEnLocale,
+    ...fit2cloudMsLocale,
     ...message,
-    ...xpackEnLocale,
+    ...xpackMsLocale,
 };

@@ -6,6 +6,7 @@ import ptBr from './modules/pt-br';
 import ja from './modules/ja';
 import ru from './modules/ru';
 import ms from './modules/ms';
+import ko from './modules/ko';
 
 const i18n = createI18n({
     legacy: false,
@@ -20,6 +21,7 @@ const i18n = createI18n({
         ja,
         ru,
         ms,
+        ko,
     },
     warnHtmlMessage: false,
 });

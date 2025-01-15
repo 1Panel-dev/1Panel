@@ -14,6 +14,7 @@ import ja from 'element-plus/es/locale/lang/ja';
 import ms from 'element-plus/es/locale/lang/ms';
 import ptBR from 'element-plus/es/locale/lang/pt-br';
 import ru from 'element-plus/es/locale/lang/ru';
+import ko from 'element-plus/es/locale/lang/ko';
 import { useTheme } from '@/hooks/use-theme';
 useTheme();
 
@@ -30,6 +31,7 @@ const i18nLocale = computed(() => {
     if (globalStore.language === 'ms') return ms;
     if (globalStore.language === 'ru') return ru;
     if (globalStore.language === 'pt-br') return ptBR;
+    if (globalStore.language === 'ko') return ko;
     return zhCn;
 });
 
@@ -43,5 +45,3 @@ const reload = () => {
 };
 provide('reload', reload);
 </script>
-
-<style scoped lang="scss"></style>

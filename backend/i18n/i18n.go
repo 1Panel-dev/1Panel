@@ -104,6 +104,7 @@ func Init() {
 	_, _ = bundle.LoadMessageFileFS(fs, "lang/ja.yaml")
 	_, _ = bundle.LoadMessageFileFS(fs, "lang/ru.yaml")
 	_, _ = bundle.LoadMessageFileFS(fs, "lang/ms.yaml")
+	_, _ = bundle.LoadMessageFileFS(fs, "lang/ko.yaml")
 }
 
 func UseI18nForCmd(lang string) {
