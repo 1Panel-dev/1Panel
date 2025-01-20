@@ -39,6 +39,10 @@ var InitSetting = &gormigrate.Migration{
 		}
 		global.CONF.System.EncryptKey = encryptKey
 		pass, _ := encrypt.StringEncrypt(global.CONF.System.Password)
+		language := "en"
+		if global.CONF.System.Language == "zh" {
+			language = "zh"
+		}
 		if err := tx.Create(&model.Setting{Key: "Password", Value: pass}).Error; err != nil {
 			return err
 		}
@@ -51,7 +55,7 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "PanelName", Value: "1Panel"}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "Language", Value: "zh"}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "Language", Value: language}).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "SessionTimeout", Value: "86400"}).Error; err != nil {
@@ -152,6 +156,9 @@ var InitSetting = &gormigrate.Migration{
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "IpWhiteList", Value: ""}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "ApiKeyValidityTime", Value: "120"}).Error; err != nil {
 			return err
 		}
 		return nil

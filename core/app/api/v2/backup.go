@@ -14,6 +14,7 @@ import (
 // @Param request body dto.BackupOperate true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /core/backups [post]
 // @x-panel-log {"bodyKeys":["type"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建备份账号 [type]","formatEN":"create backup account [type]"}
 func (b *BaseApi) CreateBackup(c *gin.Context) {
@@ -35,6 +36,7 @@ func (b *BaseApi) CreateBackup(c *gin.Context) {
 // @Param request body dto.BackupOperate true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /core/backups/refresh/token [post]
 func (b *BaseApi) RefreshToken(c *gin.Context) {
 	var req dto.OperateByID
@@ -54,6 +56,7 @@ func (b *BaseApi) RefreshToken(c *gin.Context) {
 // @Param request body dto.ForBuckets true "request"
 // @Success 200 {array} string
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /core/backups/buckets [post]
 func (b *BaseApi) ListBuckets(c *gin.Context) {
 	var req dto.ForBuckets
@@ -74,6 +77,7 @@ func (b *BaseApi) ListBuckets(c *gin.Context) {
 // @Accept json
 // @Success 200 {object} dto.OneDriveInfo
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /core/backups/client/:clientType [get]
 func (b *BaseApi) LoadBackupClientInfo(c *gin.Context) {
 	clientType, ok := c.Params.Get("clientType")
@@ -95,6 +99,7 @@ func (b *BaseApi) LoadBackupClientInfo(c *gin.Context) {
 // @Param request body dto.OperateByID true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /core/backups/del [post]
 // @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"backup_accounts","output_column":"type","output_value":"types"}],"formatZH":"删除备份账号 [types]","formatEN":"delete backup account [types]"}
 func (b *BaseApi) DeleteBackup(c *gin.Context) {
@@ -107,7 +112,7 @@ func (b *BaseApi) DeleteBackup(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithData(c, nil)
+	helper.SuccessWithOutData(c)
 }
 
 // @Tags Backup Account
@@ -116,6 +121,7 @@ func (b *BaseApi) DeleteBackup(c *gin.Context) {
 // @Param request body dto.BackupOperate true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /core/backups/update [post]
 // @x-panel-log {"bodyKeys":["type"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新备份账号 [types]","formatEN":"update backup account [types]"}
 func (b *BaseApi) UpdateBackup(c *gin.Context) {
@@ -128,5 +134,5 @@ func (b *BaseApi) UpdateBackup(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithData(c, nil)
+	helper.SuccessWithOutData(c)
 }

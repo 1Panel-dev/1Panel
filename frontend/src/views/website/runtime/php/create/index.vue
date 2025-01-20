@@ -128,7 +128,7 @@
                                     <el-link
                                         target="_blank"
                                         type="primary"
-                                        href="https://1panel.cn/docs/user_manual/websites/php/#php_1"
+                                        :href="globalStore.docsUrl + '/user_manual/websites/php/#php_1'"
                                     >
                                         {{ $t('php.toExtensionsList') }}
                                     </el-link>
@@ -188,6 +188,8 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { reactive, ref } from 'vue';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 interface OperateRrops {
     id?: number;

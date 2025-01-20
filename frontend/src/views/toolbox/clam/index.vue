@@ -130,7 +130,7 @@
                         </template>
                     </el-table-column>
                     <fu-table-operations
-                        width="200px"
+                        width="300px"
                         :buttons="buttons"
                         :ellipsis="10"
                         :label="$t('commons.table.operate')"
@@ -241,7 +241,7 @@ const toFolder = (folder: string) => {
     router.push({ path: '/hosts/files', query: { path: folder } });
 };
 const toDoc = async () => {
-    window.open('https://1panel.cn/docs/user_manual/toolbox/clam/', '_blank', 'noopener,noreferrer');
+    window.open(globalStore.docsUrl + '/user_manual/toolbox/clam/', '_blank', 'noopener,noreferrer');
 };
 
 const onChange = async (row: any) => {

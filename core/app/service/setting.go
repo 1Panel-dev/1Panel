@@ -434,6 +434,10 @@ func (u *SettingService) UpdateApiConfig(req dto.ApiInterfaceConfig) error {
 		return err
 	}
 	global.CONF.System.IpWhiteList = req.IpWhiteList
+	if err := settingRepo.Update("ApiKeyValidityTime", req.ApiKeyValidityTime); err != nil {
+		return err
+	}
+	global.CONF.System.ApiKeyValidityTime = req.ApiKeyValidityTime
 	return nil
 }
 

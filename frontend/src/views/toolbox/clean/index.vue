@@ -26,7 +26,7 @@
                                         </el-text>
                                     </div>
                                 </div>
-                                <div else>
+                                <div v-else>
                                     <el-text class="clean_title">
                                         <el-icon>
                                             <MagicStick />
@@ -132,14 +132,16 @@
                             </div>
                         </div>
                         <div v-if="scanStatus === 'scanned'">
-                            <div>
-                                <el-text class="clean_title">
-                                    {{ $t('clean.totalScan') }} {{ computeSize(totalSize) }}
-                                </el-text>
-                                <div class="mt-4">
-                                    <el-text type="info">
-                                        {{ $t('clean.selectScan') }} {{ computeSize(selectSize) }}
+                            <div class="flex flex-row justify-between items-center gap-2">
+                                <div>
+                                    <el-text class="clean_title">
+                                        {{ $t('clean.totalScan') }} {{ computeSize(totalSize) }}
                                     </el-text>
+                                    <div class="mt-4">
+                                        <el-text type="info">
+                                            {{ $t('clean.selectScan') }} {{ computeSize(selectSize) }}
+                                        </el-text>
+                                    </div>
                                 </div>
                                 <div class="large_button">
                                     <el-button type="primary" size="large" @click="onSubmitClean">
@@ -147,124 +149,191 @@
                                     </el-button>
                                 </div>
                             </div>
-                            <el-collapse v-model="activeNames" class="mt-5">
-                                <el-collapse-item :title="$t('clean.system')" name="system">
-                                    <el-tree
-                                        ref="systemRef"
-                                        :data="cleanData.systemClean"
-                                        node-key="id"
-                                        :default-checked-keys="systemDefaultCheck"
-                                        show-checkbox
-                                        :props="defaultProps"
-                                        @check-change="onChange"
-                                    >
-                                        <template #default="{ node, data }">
-                                            <div class="float-left">
-                                                <span>{{ load18n(data.label) }}</span>
-                                            </div>
-                                            <div class="ml-4 float-left">
-                                                <span v-if="data.size">{{ computeSize(data.size) }}</span>
-                                            </div>
-                                            <div class="ml-4 float-left">
-                                                <span>{{ loadTag(node, data) }}</span>
-                                            </div>
-                                        </template>
-                                    </el-tree>
-                                </el-collapse-item>
+                            <div class="tree-container">
+                                <el-collapse v-model="activeNames" class="tree-collapse">
+                                    <el-collapse-item :title="$t('clean.system')" name="system">
+                                        <el-tree
+                                            ref="systemRef"
+                                            :data="cleanData.systemClean"
+                                            node-key="id"
+                                            :default-checked-keys="systemDefaultCheck"
+                                            show-checkbox
+                                            :props="defaultProps"
+                                            @check-change="onChange"
+                                            class="responsive-tree"
+                                        >
+                                            <template #default="{ node, data }">
+                                                <div class="tree-node">
+                                                    <el-tooltip
+                                                        effect="dark"
+                                                        :content="load18n(data.label)"
+                                                        placement="top"
+                                                    >
+                                                        <span class="tree-node-label">{{ load18n(data.label) }}</span>
+                                                    </el-tooltip>
+                                                    <span class="tree-node-size" v-if="data.size">
+                                                        {{ computeSize(data.size) }}
+                                                    </span>
+                                                    <el-tooltip
+                                                        effect="dark"
+                                                        :content="loadTag(node, data)"
+                                                        placement="top"
+                                                    >
+                                                        <span class="tree-node-tooltip">
+                                                            {{ loadTag(node, data) }}
+                                                        </span>
+                                                    </el-tooltip>
+                                                </div>
+                                            </template>
+                                        </el-tree>
+                                    </el-collapse-item>
 
-                                <el-collapse-item :title="$t('clean.containerTrash')" name="container_trash">
-                                    <el-tree
-                                        ref="containerRef"
-                                        :data="cleanData.containerClean"
-                                        node-key="id"
-                                        :default-checked-keys="containerDefaultCheck"
-                                        show-checkbox
-                                        :props="defaultProps"
-                                        @check-change="onChange"
-                                    >
-                                        <template #default="{ node, data }">
-                                            <div class="float-left">
-                                                <span>{{ load18n(data.label) }}</span>
-                                            </div>
-                                            <div class="ml-4 float-left">
-                                                <span v-if="data.size">{{ computeSize(data.size) }}</span>
-                                            </div>
-                                            <div class="ml-4 float-left">
-                                                <span>{{ loadTag(node, data) }}</span>
-                                            </div>
-                                        </template>
-                                    </el-tree>
-                                </el-collapse-item>
-                                <el-collapse-item :title="$t('clean.upload')" name="upload">
-                                    <el-tree
-                                        ref="uploadRef"
-                                        :data="cleanData.uploadClean"
-                                        node-key="id"
-                                        :default-checked-keys="uploadDefaultCheck"
-                                        show-checkbox
-                                        :props="defaultProps"
-                                        @check-change="onChange"
-                                    >
-                                        <template #default="{ node, data }">
-                                            <div class="float-left">
-                                                <span>{{ load18n(data.label) }}</span>
-                                            </div>
-                                            <div class="ml-4 float-left">
-                                                <span v-if="data.size">{{ computeSize(data.size) }}</span>
-                                            </div>
-                                            <div class="ml-4 float-left">
-                                                <span>{{ loadTag(node, data) }}</span>
-                                            </div>
-                                        </template>
-                                    </el-tree>
-                                </el-collapse-item>
-                                <el-collapse-item :title="$t('clean.download')" name="download">
-                                    <el-tree
-                                        ref="downloadRef"
-                                        :data="cleanData.downloadClean"
-                                        node-key="id"
-                                        :default-checked-keys="downloadDefaultCheck"
-                                        show-checkbox
-                                        :props="defaultProps"
-                                        @check-change="onChange"
-                                    >
-                                        <template #default="{ node, data }">
-                                            <div class="float-left">
-                                                <span>{{ load18n(data.label) }}</span>
-                                            </div>
-                                            <div class="ml-4 float-left">
-                                                <span v-if="data.size">{{ computeSize(data.size) }}</span>
-                                            </div>
-                                            <div class="ml-4 float-left">
-                                                <span>{{ loadTag(node, data) }}</span>
-                                            </div>
-                                        </template>
-                                    </el-tree>
-                                </el-collapse-item>
-                                <el-collapse-item :title="$t('clean.systemLog')" name="system_log">
-                                    <el-tree
-                                        ref="systemLogRef"
-                                        :data="cleanData.systemLogClean"
-                                        node-key="id"
-                                        :default-checked-keys="systemLogDefaultCheck"
-                                        show-checkbox
-                                        :props="defaultProps"
-                                        @check-change="onChange"
-                                    >
-                                        <template #default="{ node, data }">
-                                            <div class="float-left">
-                                                <span>{{ load18n(data.label) }}</span>
-                                            </div>
-                                            <div class="ml-4 float-left">
-                                                <span v-if="data.size">{{ computeSize(data.size) }}</span>
-                                            </div>
-                                            <div class="ml-4 float-left">
-                                                <span>{{ loadTag(node, data) }}</span>
-                                            </div>
-                                        </template>
-                                    </el-tree>
-                                </el-collapse-item>
-                            </el-collapse>
+                                    <el-collapse-item :title="$t('clean.containerTrash')" name="container_trash">
+                                        <el-tree
+                                            ref="containerRef"
+                                            :data="cleanData.containerClean"
+                                            node-key="id"
+                                            :default-checked-keys="containerDefaultCheck"
+                                            show-checkbox
+                                            :props="defaultProps"
+                                            @check-change="onChange"
+                                            class="responsive-tree"
+                                        >
+                                            <template #default="{ node, data }">
+                                                <div class="tree-node">
+                                                    <el-tooltip
+                                                        effect="dark"
+                                                        :content="load18n(data.label)"
+                                                        placement="top"
+                                                    >
+                                                        <span class="tree-node-label">{{ load18n(data.label) }}</span>
+                                                    </el-tooltip>
+                                                    <span class="tree-node-size" v-if="data.size">
+                                                        {{ computeSize(data.size) }}
+                                                    </span>
+                                                    <el-tooltip
+                                                        effect="dark"
+                                                        :content="loadTag(node, data)"
+                                                        placement="top"
+                                                    >
+                                                        <span class="tree-node-tooltip">
+                                                            {{ loadTag(node, data) }}
+                                                        </span>
+                                                    </el-tooltip>
+                                                </div>
+                                            </template>
+                                        </el-tree>
+                                    </el-collapse-item>
+                                    <el-collapse-item :title="$t('clean.upload')" name="upload">
+                                        <el-tree
+                                            ref="uploadRef"
+                                            :data="cleanData.uploadClean"
+                                            node-key="id"
+                                            :default-checked-keys="uploadDefaultCheck"
+                                            show-checkbox
+                                            :props="defaultProps"
+                                            @check-change="onChange"
+                                            class="responsive-tree"
+                                        >
+                                            <template #default="{ node, data }">
+                                                <div class="tree-node">
+                                                    <el-tooltip
+                                                        effect="dark"
+                                                        :content="load18n(data.label)"
+                                                        placement="top"
+                                                    >
+                                                        <span class="tree-node-label">{{ load18n(data.label) }}</span>
+                                                    </el-tooltip>
+                                                    <span class="tree-node-size" v-if="data.size">
+                                                        {{ computeSize(data.size) }}
+                                                    </span>
+                                                    <el-tooltip
+                                                        effect="dark"
+                                                        :content="loadTag(node, data)"
+                                                        placement="top"
+                                                    >
+                                                        <span class="tree-node-tooltip">
+                                                            {{ loadTag(node, data) }}
+                                                        </span>
+                                                    </el-tooltip>
+                                                </div>
+                                            </template>
+                                        </el-tree>
+                                    </el-collapse-item>
+                                    <el-collapse-item :title="$t('clean.download')" name="download">
+                                        <el-tree
+                                            ref="downloadRef"
+                                            :data="cleanData.downloadClean"
+                                            node-key="id"
+                                            :default-checked-keys="downloadDefaultCheck"
+                                            show-checkbox
+                                            :props="defaultProps"
+                                            @check-change="onChange"
+                                            class="responsive-tree"
+                                        >
+                                            <template #default="{ node, data }">
+                                                <div class="tree-node">
+                                                    <el-tooltip
+                                                        effect="dark"
+                                                        :content="load18n(data.label)"
+                                                        placement="top"
+                                                    >
+                                                        <span class="tree-node-label">{{ load18n(data.label) }}</span>
+                                                    </el-tooltip>
+                                                    <span class="tree-node-size" v-if="data.size">
+                                                        {{ computeSize(data.size) }}
+                                                    </span>
+                                                    <el-tooltip
+                                                        effect="dark"
+                                                        :content="loadTag(node, data)"
+                                                        placement="top"
+                                                    >
+                                                        <span class="tree-node-tooltip">
+                                                            {{ loadTag(node, data) }}
+                                                        </span>
+                                                    </el-tooltip>
+                                                </div>
+                                            </template>
+                                        </el-tree>
+                                    </el-collapse-item>
+                                    <el-collapse-item :title="$t('clean.systemLog')" name="system_log">
+                                        <el-tree
+                                            ref="systemLogRef"
+                                            :data="cleanData.systemLogClean"
+                                            node-key="id"
+                                            :default-checked-keys="systemLogDefaultCheck"
+                                            show-checkbox
+                                            :props="defaultProps"
+                                            @check-change="onChange"
+                                            class="responsive-tree"
+                                        >
+                                            <template #default="{ node, data }">
+                                                <div class="tree-node">
+                                                    <el-tooltip
+                                                        effect="dark"
+                                                        :content="load18n(data.label)"
+                                                        placement="top"
+                                                    >
+                                                        <span class="tree-node-label">{{ load18n(data.label) }}</span>
+                                                    </el-tooltip>
+                                                    <span class="tree-node-size" v-if="data.size">
+                                                        {{ computeSize(data.size) }}
+                                                    </span>
+                                                    <el-tooltip
+                                                        effect="dark"
+                                                        :content="loadTag(node, data)"
+                                                        placement="top"
+                                                    >
+                                                        <span class="tree-node-tooltip">
+                                                            {{ loadTag(node, data) }}
+                                                        </span>
+                                                    </el-tooltip>
+                                                </div>
+                                            </template>
+                                        </el-tree>
+                                    </el-collapse-item>
+                                </el-collapse>
+                            </div>
                         </div>
                     </el-col>
                 </el-row>
@@ -636,5 +705,48 @@ onMounted(() => {
     font-size: 14px;
     float: right;
     margin-right: 15px;
+}
+
+.tree-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: auto;
+}
+.tree-collapse {
+    flex: 1;
+    overflow: hidden;
+}
+.responsive-tree {
+    width: 100%;
+    max-height: 100%;
+    overflow: auto;
+}
+.tree-node {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    gap: 1rem;
+    width: 100%;
+    overflow: hidden;
+}
+.tree-node-label {
+    flex-shrink: 0;
+    max-width: 60%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.tree-node-size {
+    flex-shrink: 0;
+    max-width: 25%;
+    white-space: nowrap;
+}
+.tree-node-tooltip {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
 }
 </style>

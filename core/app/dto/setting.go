@@ -46,6 +46,7 @@ type SettingInfo struct {
 	ApiInterfaceStatus string `json:"apiInterfaceStatus"`
 	ApiKey             string `json:"apiKey"`
 	IpWhiteList        string `json:"ipWhiteList"`
+	ApiKeyValidityTime string `json:"apiKeyValidityTime"`
 }
 
 type SettingUpdate struct {
@@ -204,6 +205,7 @@ type ApiInterfaceConfig struct {
 	ApiInterfaceStatus string `json:"apiInterfaceStatus"`
 	ApiKey             string `json:"apiKey"`
 	IpWhiteList        string `json:"ipWhiteList"`
+	ApiKeyValidityTime string `json:"apiKeyValidityTime"`
 }
 
 type TerminalInfo struct {

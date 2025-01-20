@@ -125,7 +125,7 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('website.sitePath')" prop="sitePath">
+                    <el-table-column :label="$t('website.sitePath')" prop="sitePath" width="90px">
                         <template #default="{ row }">
                             <el-button type="primary" link @click="toFolder(row.sitePath + '/index')">
                                 <el-icon>
@@ -160,7 +160,7 @@
                         :label="$t('website.expireDate')"
                         prop="expireDate"
                         :sortable="'custom'"
-                        min-width="120px"
+                        min-width="150px"
                     >
                         <template #default="{ row }">
                             <div v-if="row.showdate">

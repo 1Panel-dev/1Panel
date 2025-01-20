@@ -2,6 +2,7 @@ package v2
 
 import (
 	"encoding/base64"
+
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/model"
@@ -78,13 +79,14 @@ func (b *BaseApi) MFALogin(c *gin.Context) {
 // @Summary User logout
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /core/auth/logout [post]
 func (b *BaseApi) LogOut(c *gin.Context) {
 	if err := authService.LogOut(c); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithData(c, nil)
+	helper.SuccessWithOutData(c)
 }
 
 // @Tags Auth
@@ -150,4 +152,12 @@ func saveLoginLogs(c *gin.Context, err error) {
 	logs.Agent = c.GetHeader("User-Agent")
 	//logs.Address = address
 	_ = logService.CreateLoginLog(logs)
+}
+
+// @Tags Auth
+// @Summary Check System isDemo
+// @Success 200
+// @Router /auth/intl [get]
+func (b *BaseApi) CheckIsIntl(c *gin.Context) {
+	helper.SuccessWithData(c, global.CONF.System.IsIntl)
 }

@@ -44,7 +44,7 @@
                             :label-position="mobile ? 'top' : 'left'"
                             :rules="rules"
                             ref="formRef"
-                            label-width="120px"
+                            label-width="auto"
                         >
                             <el-form-item :label="$t('container.mirrors')" prop="mirrors">
                                 <div class="w-full" v-if="form.mirrors">
@@ -55,7 +55,7 @@
                                         v-model="form.mirrors"
                                         style="width: calc(100% - 80px)"
                                     />
-                                    <el-button @click="onChangeMirrors" icon="Setting">
+                                    <el-button @click="onChangeMirrors" icon="Setting" class="custom-input-textarea">
                                         {{ $t('commons.button.set') }}
                                     </el-button>
                                 </div>
@@ -418,7 +418,7 @@ const save = async (key: string, value: string) => {
 };
 
 const toDoc = () => {
-    window.open('https://1panel.cn/docs/user_manual/containers/setting/', '_blank', 'noopener,noreferrer');
+    window.open(globalStore.docsUrl + '/user_manual/containers/setting/', '_blank', 'noopener,noreferrer');
 };
 
 const onOperator = async (operation: string) => {

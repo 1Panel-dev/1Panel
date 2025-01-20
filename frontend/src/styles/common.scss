@@ -124,7 +124,7 @@ html {
 .input-help {
     font-size: 12px;
     word-break: keep-all;
-    color: #ADB0BC;
+    color: #adb0bc;
     width: 100%;
     display: inline-block;
     white-space: normal;
@@ -132,12 +132,13 @@ html {
 
 .input-error {
     font-size: 12px;
-    word-break: break-all;
+    word-break: keep-all;
     color: red;
     transform: scale(0.9);
     transform-origin: left;
     width: 110%;
     display: inline-block;
+    white-space: normal;
 }
 
 .myTable {
@@ -452,7 +453,7 @@ html {
     background-color: #111417;
 }
 
-.check-label{
+.check-label {
     background: var(--panel-main-bg-color-10) !important;
     .check-label-a {
         color: var(--panel-color-primary);

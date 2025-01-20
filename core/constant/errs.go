@@ -23,18 +23,19 @@ const (
 
 // internal
 var (
-	ErrCaptchaCode            = errors.New("ErrCaptchaCode")
-	ErrAuth                   = errors.New("ErrAuth")
-	ErrRecordExist            = errors.New("ErrRecordExist")
-	ErrRecordNotFound         = errors.New("ErrRecordNotFound")
-	ErrTransform              = errors.New("ErrTransform")
-	ErrInitialPassword        = errors.New("ErrInitialPassword")
-	ErrInvalidParams          = errors.New("ErrInvalidParams")
-	ErrNotSupportType         = errors.New("ErrNotSupportType")
-	ErrApiConfigStatusInvalid = "ErrApiConfigStatusInvalid"
-	ErrApiConfigKeyInvalid    = "ErrApiConfigKeyInvalid"
-	ErrApiConfigIPInvalid     = "ErrApiConfigIPInvalid"
-	ErrApiConfigDisable       = "ErrApiConfigDisable"
+	ErrCaptchaCode             = errors.New("ErrCaptchaCode")
+	ErrAuth                    = errors.New("ErrAuth")
+	ErrRecordExist             = errors.New("ErrRecordExist")
+	ErrRecordNotFound          = errors.New("ErrRecordNotFound")
+	ErrTransform               = errors.New("ErrTransform")
+	ErrInitialPassword         = errors.New("ErrInitialPassword")
+	ErrInvalidParams           = errors.New("ErrInvalidParams")
+	ErrNotSupportType          = errors.New("ErrNotSupportType")
+	ErrApiConfigStatusInvalid  = "ErrApiConfigStatusInvalid"
+	ErrApiConfigKeyInvalid     = "ErrApiConfigKeyInvalid"
+	ErrApiConfigIPInvalid      = "ErrApiConfigIPInvalid"
+	ErrApiConfigDisable        = "ErrApiConfigDisable"
+	ErrApiConfigKeyTimeInvalid = "ErrApiConfigKeyTimeInvalid"
 
 	ErrTokenParse      = errors.New("ErrTokenParse")
 	ErrStructTransform = errors.New("ErrStructTransform")

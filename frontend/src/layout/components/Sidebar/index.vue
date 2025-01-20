@@ -72,7 +72,7 @@ import Logo from './components/Logo.vue';
 import Collapse from './components/Collapse.vue';
 import SubItem from './components/SubItem.vue';
 import router, { menuList } from '@/routers/router';
-import { logOutApi } from '@/api/modules/auth';
+import { checkIsIntl, logOutApi } from '@/api/modules/auth';
 import i18n from '@/lang';
 import { DropdownInstance, ElMessageBox } from 'element-plus';
 import { GlobalStore, MenuStore } from '@/store';
@@ -110,7 +110,7 @@ const activeMenu = computed(() => {
 const isCollapse = computed((): boolean => menuStore.isCollapse);
 
 let routerMenus = computed((): RouteRecordRaw[] => {
-    return menuStore.menuList.filter((route) => route.meta && !route.meta.hideInSidebar);
+    return menuStore.menuList.filter((route) => route.meta && !route.meta.hideInSidebar) as RouteRecordRaw[];
 });
 
 const openChangeNode = () => {
@@ -230,23 +230,21 @@ function getCheckedLabels(json: Node): string[] {
 }
 
 const search = async () => {
+    await checkIsSystemIntl();
+    let checkedLabels: any[] = [];
     const res = await getSettingInfo();
-    version.value = res.data.systemVersion;
     const json: Node = JSON.parse(res.data.xpackHideMenu);
-    if (json.isCheck === false) {
-        json.children.forEach((child: any) => {
-            if (child.isCheck === true) {
-                child.isCheck = false;
-            }
-        });
-    }
-    const checkedLabels = getCheckedLabels(json);
+    checkedLabels = getCheckedLabels(json);
+
     let rstMenuList: RouteRecordRaw[] = [];
     menuStore.menuList.forEach((item) => {
         let menuItem = JSON.parse(JSON.stringify(item));
         let menuChildren: RouteRecordRaw[] = [];
         if (menuItem.path === '/xpack') {
             if (checkedLabels.length) {
+                menuItem.children = menuItem.children.filter((child: any) => {
+                    return !(globalStore.isIntl && child.path.includes('/xpack/alert'));
+                });
                 menuItem.children.forEach((child: any) => {
                     for (const str of checkedLabels) {
                         if (child.name === str) {
@@ -291,6 +289,11 @@ const checkTask = async () => {
 
 const openTask = () => {
     emit('openTask');
+};
+
+const checkIsSystemIntl = async () => {
+    const res = await checkIsIntl();
+    globalStore.isIntl = res.data;
 };
 
 onMounted(() => {

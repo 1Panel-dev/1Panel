@@ -96,11 +96,11 @@
                             :md="24"
                             :lg="12"
                             :xl="12"
-                            class="install-card-col-12"
+                            :class="mode === 'upgrade' ? 'upgrade-card-col-12' : 'install-card-col-12'"
                         >
                             <div class="install-card">
                                 <el-card class="e-card">
-                                    <el-row :gutter="20">
+                                    <el-row :gutter="10">
                                         <el-col :xs="3" :sm="3" :md="3" :lg="4" :xl="4">
                                             <div class="icon">
                                                 <el-avatar
@@ -114,7 +114,9 @@
                                             <div class="a-detail">
                                                 <div class="d-name">
                                                     <el-button link type="info">
-                                                        <span class="name">{{ installed.name }}</span>
+                                                        <el-tooltip :content="installed.name" placement="top">
+                                                            <span class="name">{{ installed.name }}</span>
+                                                        </el-tooltip>
                                                     </el-button>
                                                     <span class="status">
                                                         <Status
@@ -228,7 +230,9 @@
                                                         {{ $t('commons.button.upgrade') }}
                                                     </el-button>
                                                 </div>
-                                                <div class="d-description">
+                                                <div
+                                                    class="d-description flex flex-wrap items-center justify-start gap-1.5"
+                                                >
                                                     <el-button class="tagMargin" plain size="small">
                                                         {{ $t('app.version') }}：{{ installed.version }}
                                                     </el-button>
@@ -301,14 +305,14 @@
 
                                                     <div class="description">
                                                         <span>
-                                                            {{ $t('app.alreadyRun') }}：
+                                                            {{ $t('app.alreadyRun') }}{{ $t('commons.colon') }}
                                                             {{ getAge(installed.createdAt) }}
                                                         </span>
                                                     </div>
                                                 </div>
                                                 <div class="app-divider" />
                                                 <div
-                                                    class="d-button"
+                                                    class="d-button flex flex-wrap items-center justify-start gap-1.5"
                                                     v-if="mode === 'installed' && installed.status != 'Installing'"
                                                 >
                                                     <el-button
@@ -733,15 +737,46 @@ onUnmounted(() => {
 
 <style scoped lang="scss">
 @use '../index.scss';
-@media only screen and (max-width: 1300px) {
+@media only screen and (max-width: 1400px) {
     .install-card-col-12 {
         max-width: 100%;
         flex: 0 0 100%;
+        .a-detail {
+            .d-name {
+                .name {
+                    max-width: 300px;
+                }
+            }
+        }
+    }
+}
+
+@media only screen and (max-width: 1499px) {
+    .upgrade-card-col-12 {
+        max-width: 100%;
+        flex: 0 0 100%;
+        .a-detail {
+            .d-name {
+                .name {
+                    max-width: 300px;
+                }
+            }
+        }
     }
 }
 
 .app-error {
     max-height: 500px;
     overflow-y: auto;
+}
+.d-button {
+    .el-button + .el-button {
+        margin-left: 0;
+    }
+}
+.d-description {
+    .el-button + .el-button {
+        margin-left: 0;
+    }
 }
 </style>

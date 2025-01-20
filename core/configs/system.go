@@ -16,10 +16,13 @@ type System struct {
 	Username       string `mapstructure:"username"`
 	Password       string `mapstructure:"password"`
 	Entrance       string `mapstructure:"entrance"`
+	Language       string `mapstructure:"language"`
 	IsDemo         bool   `mapstructure:"is_demo"`
+	IsIntl         bool   `mapstructure:"is_intl"`
 	ChangeUserInfo string `mapstructure:"change_user_info"`
 
 	ApiInterfaceStatus string `mapstructure:"api_interface_status"`
 	ApiKey             string `mapstructure:"api_key"`
 	IpWhiteList        string `mapstructure:"ip_white_list"`
+	ApiKeyValidityTime string `mapstructure:"api_key_validity_time"`
 }

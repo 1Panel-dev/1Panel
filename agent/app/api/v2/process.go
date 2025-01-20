@@ -22,6 +22,7 @@ func (b *BaseApi) ProcessWs(c *gin.Context) {
 // @Param request body request.ProcessReq true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /process/stop [post]
 // @x-panel-log {"bodyKeys":["PID"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"结束进程 [PID]","formatEN":"结束进程 [PID]"}
 func (b *BaseApi) StopProcess(c *gin.Context) {

@@ -458,30 +458,32 @@
                 </el-form-item>
             </div>
 
-            <el-form-item prop="hasAlert" v-if="alertTypes.includes(dialogData.rowData!.type)">
-                <el-checkbox v-model="dialogData.rowData!.hasAlert" :label="$t('alert.isAlert')" />
-                <span class="input-help">{{ $t('alert.cronJobHelper') }}</span>
-            </el-form-item>
-            <el-form-item
-                prop="alertCount"
-                v-if="dialogData.rowData!.hasAlert && isProductPro"
-                :label="$t('alert.alertCount')"
-            >
-                <el-input-number
-                    style="width: 200px"
-                    :min="1"
-                    step-strictly
-                    :step="1"
-                    v-model.number="dialogData.rowData!.alertCount"
-                ></el-input-number>
-                <span class="input-help">{{ $t('alert.alertCountHelper') }}</span>
-            </el-form-item>
-            <el-form-item v-if="dialogData.rowData!.hasAlert && !isProductPro">
-                <span>{{ $t('alert.licenseHelper') }}</span>
-                <el-button link type="primary" @click="toUpload">
-                    {{ $t('license.levelUpPro') }}
-                </el-button>
-            </el-form-item>
+            <div v-if="!globalStore.isIntl">
+                <el-form-item prop="hasAlert" v-if="alertTypes.includes(dialogData.rowData!.type)">
+                    <el-checkbox v-model="dialogData.rowData!.hasAlert" :label="$t('alert.isAlert')" />
+                    <span class="input-help">{{ $t('alert.cronJobHelper') }}</span>
+                </el-form-item>
+                <el-form-item
+                    prop="alertCount"
+                    v-if="dialogData.rowData!.hasAlert && isProductPro"
+                    :label="$t('alert.alertCount')"
+                >
+                    <el-input-number
+                        style="width: 200px"
+                        :min="1"
+                        step-strictly
+                        :step="1"
+                        v-model.number="dialogData.rowData!.alertCount"
+                    ></el-input-number>
+                    <span class="input-help">{{ $t('alert.alertCountHelper') }}</span>
+                </el-form-item>
+                <el-form-item v-if="dialogData.rowData!.hasAlert && !isProductPro">
+                    <span>{{ $t('alert.licenseHelper') }}</span>
+                    <el-button link type="primary" @click="toUpload">
+                        {{ $t('license.levelUpPro') }}
+                    </el-button>
+                </el-form-item>
+            </div>
 
             <el-form-item :label="$t('cronjob.retainCopies')" prop="retainCopies">
                 <el-input-number
@@ -1053,30 +1055,8 @@ defineExpose({
 });
 </script>
 <style scoped lang="scss">
-.specClass {
-    width: 17% !important;
-    margin-left: 20px;
-    .append {
-        width: 20px;
-    }
-}
-@media only screen and (max-width: 1000px) {
-    .specClass {
-        width: 100% !important;
-        margin-top: 20px;
-        margin-left: 0;
-        .append {
-            width: 43px;
-        }
-    }
-}
-.specTypeClass {
-    width: 22% !important;
-}
-@media only screen and (max-width: 1000px) {
-    .specTypeClass {
-        width: 100% !important;
-    }
+:deep(.el-input-group__append) {
+    padding: 0 10px;
 }
 .selectClass {
     width: 100%;

@@ -31,7 +31,7 @@
                             </el-text>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('website.runDir')" prop="codeDir">
+                    <el-table-column :label="$t('website.runDir')" prop="codeDir" min-width="120px">
                         <template #default="{ row }">
                             <el-button type="primary" link @click="toFolder(row.codeDir)">
                                 <el-icon>
@@ -41,7 +41,7 @@
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('runtime.version')" prop="version"></el-table-column>
-                    <el-table-column :label="$t('runtime.externalPort')" prop="port">
+                    <el-table-column :label="$t('runtime.externalPort')" prop="port" min-width="110px">
                         <template #default="{ row }">
                             {{ row.port }}
                             <el-button link :icon="Promotion" @click="goDashboard(row.port, 'http')"></el-button>
@@ -65,7 +65,7 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.button.log')" prop="path">
+                    <el-table-column :label="$t('commons.button.log')" prop="path" min-width="90px">
                         <template #default="{ row }">
                             <el-button @click="openLog(row)" link type="primary">{{ $t('website.check') }}</el-button>
                         </template>

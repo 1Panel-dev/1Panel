@@ -52,9 +52,15 @@
                                 </span>
                                 <template #dropdown>
                                     <el-dropdown-menu>
+                                        <el-dropdown-item v-if="globalStore.isIntl" command="en">
+                                            English
+                                        </el-dropdown-item>
                                         <el-dropdown-item command="zh">中文(简体)</el-dropdown-item>
                                         <el-dropdown-item command="tw">中文(繁體)</el-dropdown-item>
-                                        <el-dropdown-item command="en">English</el-dropdown-item>
+                                        <el-dropdown-item v-if="!globalStore.isIntl" command="en">
+                                            English
+                                        </el-dropdown-item>
+                                        <el-dropdown-item command="ru">Русский</el-dropdown-item>
                                     </el-dropdown-menu>
                                 </template>
                             </el-dropdown>
@@ -120,22 +126,15 @@
                             {{ $t('commons.button.login') }}
                         </el-button>
                     </el-form-item>
-                    <el-form-item prop="agreeLicense">
-                        <el-checkbox v-model="loginForm.agreeLicense">
-                            <template #default>
-                                <span class="agree" v-html="$t('commons.login.licenseHelper')"></span>
-                            </template>
-                        </el-checkbox>
-                    </el-form-item>
-                    <div class="agree-helper">
-                        <span
-                            v-if="!loginForm.agreeLicense && !_isMobile()"
-                            class="input-error"
-                            style="line-height: 14px"
-                        >
-                            {{ $t('commons.login.errorAgree') }}
-                        </span>
-                    </div>
+                    <template v-if="!isIntl">
+                        <el-form-item prop="agreeLicense">
+                            <el-checkbox v-model="loginForm.agreeLicense">
+                                <template #default>
+                                    <span class="agree" v-html="$t('commons.login.licenseHelper')"></span>
+                                </template>
+                            </el-checkbox>
+                        </el-form-item>
+                    </template>
                 </el-form>
                 <div class="demo">
                     <span v-if="isDemo">
@@ -155,7 +154,7 @@
                 <span v-html="$t('commons.login.agreeContent')"></span>
             </div>
             <template #footer>
-                <span class="dialog-footer">
+                <span class="dialog-footer login-footer-btn">
                     <el-button @click="open = false">
                         {{ $t('commons.button.notAgree') }}
                     </el-button>
@@ -172,7 +171,7 @@
 import { ref, reactive, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import type { ElForm } from 'element-plus';
-import { loginApi, getCaptcha, mfaLoginApi, checkIsDemo, getLanguage } from '@/api/modules/auth';
+import { loginApi, getCaptcha, mfaLoginApi, checkIsDemo, getLanguage, checkIsIntl } from '@/api/modules/auth';
 import { GlobalStore, MenuStore, TabsStore } from '@/store';
 import { MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
@@ -189,6 +188,7 @@ const errAuthInfo = ref(false);
 const errCaptcha = ref(false);
 const errMfaInfo = ref(false);
 const isDemo = ref(false);
+const isIntl = ref(true);
 const open = ref(false);
 
 type FormInstance = InstanceType<typeof ElForm>;
@@ -211,9 +211,29 @@ const loginForm = reactive({
 });
 
 const loginRules = reactive({
-    name: computed(() => [{ required: true, message: i18n.t('commons.rule.username'), trigger: 'blur' }]),
-    password: computed(() => [{ required: true, message: i18n.t('commons.rule.password'), trigger: 'blur' }]),
+    name: [{ required: true, validator: checkUsername, trigger: 'blur' }],
+    password: [{ required: true, validator: checkPassword, trigger: 'blur' }],
+    agreeLicense: [{ required: true, validator: checkAgreeLicense, trigger: 'blur' }],
 });
+
+function checkUsername(rule: any, value: any, callback: any) {
+    if (value === '') {
+        return callback(new Error(i18n.t('commons.rule.username')));
+    }
+    callback();
+}
+function checkPassword(rule: any, value: any, callback: any) {
+    if (value === '') {
+        return callback(new Error(i18n.t('commons.rule.password')));
+    }
+    callback();
+}
+function checkAgreeLicense(rule: any, value: any, callback: any) {
+    if (!value && !_isMobile()) {
+        return callback(new Error(i18n.t('commons.login.errorAgree')));
+    }
+    callback();
+}
 
 let isLoggingIn = false;
 const mfaButtonFocused = ref();
@@ -235,6 +255,12 @@ const loading = ref<boolean>(false);
 const mfaShow = ref<boolean>(false);
 const router = useRouter();
 const dropdownText = ref('中文(简体)');
+
+const checkIsSystemIntl = async () => {
+    const res = await checkIsIntl();
+    isIntl.value = res.data;
+    globalStore.isIntl = isIntl.value;
+};
 
 function handleCommand(command: string) {
     loginForm.language = command;
@@ -259,6 +285,9 @@ const login = (formEl: FormInstance | undefined) => {
     if (!formEl || isLoggingIn) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
+        if (isIntl.value) {
+            loginForm.agreeLicense = true;
+        }
         if (!loginForm.agreeLicense) {
             if (_isMobile()) {
                 open.value = true;
@@ -372,6 +401,7 @@ const loadDataFromDB = async () => {
 
 onMounted(() => {
     globalStore.isOnRestart = false;
+    checkIsSystemIntl();
     loginVerify();
     loadLanguage();
     document.title = globalStore.themeConfig.panelName;
@@ -554,5 +584,12 @@ onMounted(() => {
 :deep(.el-dropdown-menu__item:not(.is-disabled):focus) {
     color: #005eeb !important;
     background-color: #e5eefd !important;
+}
+
+.login-footer-btn {
+    .el-button--primary {
+        border-color: #005eeb !important;
+        background-color: #005eeb !important;
+    }
 }
 </style>

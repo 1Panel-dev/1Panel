@@ -39,6 +39,11 @@ func Init() {
 			global.LOG.Errorf("load service ip white list from setting failed, err: %v", err)
 		}
 		global.CONF.System.IpWhiteList = ipWhiteListSetting.Value
+		apiKeyValidityTimeSetting, err := settingRepo.Get(repo.WithByKey("ApiKeyValidityTime"))
+		if err != nil {
+			global.LOG.Errorf("load service api key validity time from setting failed, err: %v", err)
+		}
+		global.CONF.System.ApiKeyValidityTime = apiKeyValidityTimeSetting.Value
 	}
 	bindAddressSetting, err := settingRepo.Get(repo.WithByKey("BindAddress"))
 	if err != nil {

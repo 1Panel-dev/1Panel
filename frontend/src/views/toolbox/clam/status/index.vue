@@ -66,15 +66,15 @@
         <LayoutContent :title="$t('toolbox.clam.clam')" :divider="true" v-if="!data.isExist" v-loading="loading">
             <template #main>
                 <div class="app-warn">
-                    <div>
+                    <div class="flex flex-col gap-2 items-center justify-center w-full sm:flex-row">
                         <span v-if="!data.isExist">{{ $t('toolbox.clam.noClam') }}</span>
-                        <span @click="toDoc()" v-if="!data.isExist">
-                            <el-icon class="ml-2"><Position /></el-icon>
+                        <span @click="toDoc()" v-if="!data.isExist" class="flex items-center justify-center gap-0.5">
+                            <el-icon><Position /></el-icon>
                             {{ $t('firewall.quickJump') }}
                         </span>
-                        <div>
-                            <img alt="" src="@/assets/images/no_app.svg" />
-                        </div>
+                    </div>
+                    <div>
+                        <img alt="" src="@/assets/images/no_app.svg" />
                     </div>
                 </div>
             </template>
@@ -87,6 +87,8 @@ import { onMounted, ref } from 'vue';
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const data = ref({
     isExist: false,
@@ -107,7 +109,7 @@ const setting = () => {
 };
 
 const toDoc = async () => {
-    window.open('https://1panel.cn/docs/user_manual/toolbox/clam/', '_blank', 'noopener,noreferrer');
+    window.open(globalStore.docsUrl + '/user_manual/toolbox/clam/', '_blank', 'noopener,noreferrer');
 };
 
 const changeShow = (val: boolean) => {

@@ -42,8 +42,15 @@
                         fix
                         show-overflow-tooltip
                         prop="domains"
+                        min-width="90px"
                     ></el-table-column>
-                    <el-table-column :label="$t('ssl.applyType')" fix show-overflow-tooltip prop="provider">
+                    <el-table-column
+                        :label="$t('ssl.applyType')"
+                        fix
+                        show-overflow-tooltip
+                        prop="provider"
+                        min-width="110px"
+                    >
                         <template #default="{ row }">{{ getProvider(row.provider) }}</template>
                     </el-table-column>
                     <el-table-column
@@ -51,6 +58,7 @@
                         fix
                         show-overflow-tooltip
                         prop="acmeAccount.email"
+                        min-width="110px"
                     ></el-table-column>
                     <el-table-column
                         :label="$t('commons.table.status')"
@@ -95,7 +103,7 @@
                         show-overflow-tooltip
                         prop="organization"
                     ></el-table-column>
-                    <el-table-column :label="$t('website.remark')" fix prop="description">
+                    <el-table-column :label="$t('website.remark')" fix prop="description" min-width="100px">
                         <template #default="{ row }">
                             <fu-read-write-switch>
                                 <template #read>
@@ -107,7 +115,7 @@
                             </fu-read-write-switch>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('ssl.autoRenew')" fix>
+                    <el-table-column :label="$t('ssl.autoRenew')" fix min-width="100px">
                         <template #default="{ row }">
                             <el-switch
                                 :disabled="row.provider === 'dnsManual' || row.provider === 'manual'"

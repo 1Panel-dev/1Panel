@@ -3,145 +3,169 @@
         <LayoutContent :title="$t('setting.panel')" :divider="true">
             <template #main>
                 <el-form :model="form" :label-position="mobile ? 'top' : 'left'" label-width="150px">
-                    <el-row>
-                        <el-col :span="1"><br /></el-col>
-                        <el-col :xs="24" :sm="20" :md="15" :lg="12" :xl="12">
-                            <el-form-item :label="$t('setting.user')" prop="userName">
-                                <el-input disabled v-model="form.userName">
-                                    <template #append>
-                                        <el-button @click="onChangeUserName()" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                            </el-form-item>
+                    <el-form-item :label="$t('setting.user')" prop="userName">
+                        <el-input disabled v-model="form.userName">
+                            <template #append>
+                                <el-button @click="onChangeUserName()" icon="Setting">
+                                    {{ $t('commons.button.set') }}
+                                </el-button>
+                            </template>
+                        </el-input>
+                    </el-form-item>
 
-                            <el-form-item :label="$t('setting.passwd')" prop="password">
-                                <el-input type="password" disabled v-model="form.password">
-                                    <template #append>
-                                        <el-button icon="Setting" @click="onChangePassword">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                            </el-form-item>
+                    <el-form-item :label="$t('setting.passwd')" prop="password">
+                        <el-input type="password" disabled v-model="form.password">
+                            <template #append>
+                                <el-button icon="Setting" @click="onChangePassword">
+                                    {{ $t('commons.button.set') }}
+                                </el-button>
+                            </template>
+                        </el-input>
+                    </el-form-item>
 
-                            <el-form-item :label="$t('setting.theme')" prop="theme">
-                                <div class="flex justify-between items-center gap-6">
-                                    <el-radio-group @change="onSave('Theme', form.theme)" v-model="form.theme">
-                                        <el-radio-button value="light">
-                                            <span>{{ $t('setting.light') }}</span>
-                                        </el-radio-button>
-                                        <el-radio-button value="dark">
-                                            <span>{{ $t('setting.dark') }}</span>
-                                        </el-radio-button>
-                                        <el-radio-button value="auto">
-                                            <span>{{ $t('setting.auto') }}</span>
-                                        </el-radio-button>
-                                    </el-radio-group>
-                                    <el-button
-                                        v-if="isMasterProductPro"
-                                        @click="onChangeThemeColor"
-                                        icon="Setting"
-                                        class="!h-[34px]"
-                                    >
-                                        <span>{{ $t('container.custom') }}</span>
-                                    </el-button>
-                                </div>
-                            </el-form-item>
-
-                            <el-form-item :label="$t('setting.menuTabs')" prop="menuTabs">
-                                <el-radio-group @change="onSave('MenuTabs', form.menuTabs)" v-model="form.menuTabs">
-                                    <el-radio-button value="Enable">
-                                        <span>{{ $t('commons.button.enable') }}</span>
+                    <el-form-item :label="$t('setting.theme')" prop="theme">
+                        <div class="flex justify-center items-center sm:gap-6 gap-2">
+                            <div class="sm:contents hidden">
+                                <el-radio-group @change="onSave('Theme', form.theme)" v-model="form.theme">
+                                    <el-radio-button value="light">
+                                        <span>{{ $t('setting.light') }}</span>
                                     </el-radio-button>
-                                    <el-radio-button value="Disable">
-                                        <span>{{ $t('commons.button.disable') }}</span>
+                                    <el-radio-button value="dark">
+                                        <span>{{ $t('setting.dark') }}</span>
+                                    </el-radio-button>
+                                    <el-radio-button value="auto">
+                                        <span>{{ $t('setting.auto') }}</span>
                                     </el-radio-button>
                                 </el-radio-group>
-                            </el-form-item>
-
-                            <el-form-item :label="$t('setting.title')" prop="panelName">
-                                <el-input disabled v-model="form.panelName">
-                                    <template #append>
-                                        <el-button icon="Setting" @click="onChangeTitle">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                            </el-form-item>
-
-                            <el-form-item :label="$t('setting.language')" prop="language">
-                                <el-radio-group
-                                    style="width: 100%"
-                                    @change="onSave('Language', form.language)"
-                                    v-model="form.language"
+                            </div>
+                            <div class="sm:hidden block w-32 !h-[33.5px]">
+                                <el-select @change="onSave('Theme', form.theme)" v-model="form.theme">
+                                    <el-option key="light" value="light" :label="$t('setting.light')">
+                                        {{ $t('setting.light') }}
+                                    </el-option>
+                                    <el-option key="dark" value="dark" :label="$t('setting.dark')">
+                                        {{ $t('setting.dark') }}
+                                    </el-option>
+                                    <el-option key="auto" value="auto" :label="$t('setting.auto')">
+                                        {{ $t('setting.auto') }}
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <div>
+                                <el-button
+                                    v-if="isMasterProductPro"
+                                    @click="onChangeThemeColor"
+                                    icon="Setting"
+                                    class="!h-[32px] sm:!h-[33.5px]"
                                 >
-                                    <el-radio value="zh">中文(简体)</el-radio>
-                                    <el-radio value="tw">中文(繁體)</el-radio>
-                                    <el-radio value="en">English</el-radio>
-                                </el-radio-group>
-                            </el-form-item>
+                                    <span>{{ $t('container.custom') }}</span>
+                                </el-button>
+                            </div>
+                        </div>
+                    </el-form-item>
 
-                            <el-form-item :label="$t('setting.sessionTimeout')" prop="sessionTimeout">
-                                <el-input disabled v-model.number="form.sessionTimeout">
-                                    <template #append>
-                                        <el-button @click="onChangeTimeout" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                                <span class="input-help">
-                                    {{ $t('setting.sessionTimeoutHelper', [form.sessionTimeout]) }}
-                                </span>
-                            </el-form-item>
+                    <el-form-item :label="$t('setting.menuTabs')" prop="menuTabs">
+                        <el-radio-group @change="onSave('MenuTabs', form.menuTabs)" v-model="form.menuTabs">
+                            <el-radio-button value="enable">
+                                <span>{{ $t('commons.button.enable') }}</span>
+                            </el-radio-button>
+                            <el-radio-button value="disable">
+                                <span>{{ $t('commons.button.disable') }}</span>
+                            </el-radio-button>
+                        </el-radio-group>
+                    </el-form-item>
 
-                            <el-form-item :label="$t('setting.proxy')" prop="proxyShow">
-                                <el-input disabled v-model="form.proxyShow">
-                                    <template #append>
-                                        <el-button @click="onChangeProxy" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                            </el-form-item>
+                    <el-form-item :label="$t('setting.title')" prop="panelName">
+                        <el-input disabled v-model="form.panelName">
+                            <template #append>
+                                <el-button icon="Setting" @click="onChangeTitle">
+                                    {{ $t('commons.button.set') }}
+                                </el-button>
+                            </template>
+                        </el-input>
+                    </el-form-item>
 
-                            <el-form-item :label="$t('setting.apiInterface')" prop="apiInterface">
-                                <el-switch
-                                    @change="onChangeApiInterfaceStatus"
-                                    v-model="form.apiInterfaceStatus"
-                                    active-value="enable"
-                                    inactive-value="disable"
-                                />
-                                <span class="input-help">{{ $t('setting.apiInterfaceHelper') }}</span>
-                            </el-form-item>
+                    <el-form-item :label="$t('setting.language')" prop="language">
+                        <el-select
+                            class="sm:!w-1/2 !w-full"
+                            @change="onSave('Language', form.language)"
+                            v-model="form.language"
+                        >
+                            <el-option
+                                v-for="option in languageOptions"
+                                :key="option.value"
+                                :value="option.value"
+                                :label="option.label"
+                            >
+                                {{ option.label }}
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
 
-                            <el-form-item :label="$t('setting.developerMode')" prop="developerMode">
-                                <el-radio-group
-                                    @change="onSave('DeveloperMode', form.developerMode)"
-                                    v-model="form.developerMode"
-                                >
-                                    <el-radio-button value="Enable">
-                                        <span>{{ $t('commons.button.enable') }}</span>
-                                    </el-radio-button>
-                                    <el-radio-button value="Disable">
-                                        <span>{{ $t('commons.button.disable') }}</span>
-                                    </el-radio-button>
-                                </el-radio-group>
-                                <span class="input-help">{{ $t('setting.developerModeHelper') }}</span>
-                            </el-form-item>
+                    <el-form-item :label="$t('setting.sessionTimeout')" prop="sessionTimeout">
+                        <el-input disabled v-model.number="form.sessionTimeout">
+                            <template #append>
+                                <el-button @click="onChangeTimeout" icon="Setting">
+                                    {{ $t('commons.button.set') }}
+                                </el-button>
+                            </template>
+                        </el-input>
+                        <span class="input-help">
+                            {{ $t('setting.sessionTimeoutHelper', [form.sessionTimeout]) }}
+                        </span>
+                    </el-form-item>
 
-                            <el-form-item :label="$t('setting.advancedMenuHide')">
-                                <el-input disabled v-model="form.proHideMenus">
-                                    <template #append>
-                                        <el-button v-show="!show" @click="onChangeHideMenus" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                            </el-form-item>
-                        </el-col>
-                    </el-row>
+                    <el-form-item :label="$t('setting.proxy')" prop="proxyShow">
+                        <el-input disabled v-model="form.proxyShow">
+                            <template #append>
+                                <el-button @click="onChangeProxy" icon="Setting">
+                                    {{ $t('commons.button.set') }}
+                                </el-button>
+                            </template>
+                        </el-input>
+                    </el-form-item>
+
+                    <el-form-item :label="$t('setting.apiInterface')" prop="apiInterface">
+                        <el-switch
+                            @change="onChangeApiInterfaceStatus"
+                            v-model="form.apiInterfaceStatus"
+                            active-value="enable"
+                            inactive-value="disable"
+                        />
+                        <span class="input-help">{{ $t('setting.apiInterfaceHelper') }}</span>
+                        <div v-if="form.apiInterfaceStatus === 'enable'">
+                            <div>
+                                <el-button link type="primary" @click="onChangeApiInterfaceStatus">
+                                    {{ $t('commons.button.view') }}
+                                </el-button>
+                            </div>
+                        </div>
+                    </el-form-item>
+
+                    <el-form-item :label="$t('setting.developerMode')" prop="developerMode">
+                        <el-radio-group
+                            @change="onSave('DeveloperMode', form.developerMode)"
+                            v-model="form.developerMode"
+                        >
+                            <el-radio-button value="enable">
+                                <span>{{ $t('commons.button.enable') }}</span>
+                            </el-radio-button>
+                            <el-radio-button value="disable">
+                                <span>{{ $t('commons.button.disable') }}</span>
+                            </el-radio-button>
+                        </el-radio-group>
+                        <span class="input-help">{{ $t('setting.developerModeHelper') }}</span>
+                    </el-form-item>
+
+                    <el-form-item :label="$t('setting.advancedMenuHide')">
+                        <el-input disabled v-model="form.proHideMenus">
+                            <template #append>
+                                <el-button v-show="!show" @click="onChangeHideMenus" icon="Setting">
+                                    {{ $t('commons.button.set') }}
+                                </el-button>
+                            </template>
+                        </el-input>
+                    </el-form-item>
                 </el-form>
             </template>
         </LayoutContent>
@@ -160,7 +184,7 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted, computed } from 'vue';
 import { ElForm, ElMessageBox } from 'element-plus';
-import { getSettingInfo, updateSetting, getSystemAvailable } from '@/api/modules/setting';
+import { getSettingInfo, updateSetting, getSystemAvailable, updateApiConfig } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { useTheme } from '@/global/use-theme';
@@ -214,9 +238,10 @@ const form = reactive({
     proxyPasswdKeep: '',
     proxyDocker: '',
 
-    apiInterfaceStatus: 'disable',
+    apiInterfaceStatus: 'Disable',
     apiKey: '',
     ipWhiteList: '',
+    apiKeyValidityTime: 120,
 
     proHideMenus: ref(i18n.t('setting.unSetting')),
     hideMenuList: '',
@@ -243,6 +268,16 @@ interface Node {
     children?: Node[];
 }
 
+const languageOptions = ref([
+    { value: 'zh', label: '中文(简体)' },
+    { value: 'tw', label: '中文(繁體)' },
+    ...(!globalStore.isIntl ? [{ value: 'en', label: 'English' }] : []),
+    { value: 'ru', label: 'Русский' },
+]);
+if (globalStore.isIntl) {
+    languageOptions.value.unshift({ value: 'en', label: 'English' });
+}
+
 const search = async () => {
     const res = await getSettingInfo();
     form.userName = res.data.userName;
@@ -264,6 +299,7 @@ const search = async () => {
     form.apiInterfaceStatus = res.data.apiInterfaceStatus;
     form.apiKey = res.data.apiKey;
     form.ipWhiteList = res.data.ipWhiteList;
+    form.apiKeyValidityTime = res.data.apiKeyValidityTime;
 
     const json: Node = JSON.parse(res.data.xpackHideMenu);
     if (json.isCheck === false) {
@@ -349,12 +385,13 @@ const onChangeThemeColor = () => {
     themeColorRef.value.acceptParams({ themeColor: themeColor, theme: globalStore.themeConfig.theme });
 };
 
-const onChangeApiInterfaceStatus = () => {
-    if (form.apiInterfaceStatus === 'enable') {
+const onChangeApiInterfaceStatus = async () => {
+    if (form.apiInterfaceStatus === 'Enable') {
         apiInterfaceRef.value.acceptParams({
             apiInterfaceStatus: form.apiInterfaceStatus,
             apiKey: form.apiKey,
             ipWhiteList: form.ipWhiteList,
+            apiKeyValidityTime: form.apiKeyValidityTime,
         });
         return;
     }
@@ -364,7 +401,14 @@ const onChangeApiInterfaceStatus = () => {
     })
         .then(async () => {
             loading.value = true;
-            await updateSetting({ key: 'ApiInterfaceStatus', value: 'disable' })
+            form.apiInterfaceStatus = 'Disable';
+            let param = {
+                apiKey: form.apiKey,
+                ipWhiteList: form.ipWhiteList,
+                apiInterfaceStatus: form.apiInterfaceStatus,
+                apiKeyValidityTime: form.apiKeyValidityTime,
+            };
+            await updateApiConfig(param)
                 .then(() => {
                     loading.value = false;
                     search();
@@ -375,51 +419,46 @@ const onChangeApiInterfaceStatus = () => {
                 });
         })
         .catch(() => {
-            apiInterfaceRef.value.acceptParams({
-                apiInterfaceStatus: 'enable',
-                apiKey: form.apiKey,
-                ipWhiteList: form.ipWhiteList,
-            });
-            return;
+            form.apiInterfaceStatus = 'Enable';
         });
 };
 
+const handleThemeChange = async (val: string) => {
+    globalStore.themeConfig.theme = val;
+    switchTheme();
+    if (globalStore.isProductPro) {
+        await updateXpackSettingByKey('Theme', val);
+        let color: string;
+        const themeColor: ThemeColor = JSON.parse(globalStore.themeConfig.themeColor);
+        if (val === 'auto') {
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+            color = prefersDark.matches ? themeColor.dark : themeColor.light;
+        } else {
+            color = val === 'dark' ? themeColor.dark : themeColor.light;
+        }
+        globalStore.themeConfig.primary = color;
+        setPrimaryColor(color);
+    }
+};
 const onSave = async (key: string, val: any) => {
     loading.value = true;
-    if (key === 'Language') {
-        i18n.locale.value = val;
-        globalStore.updateLanguage(val);
-    }
-    if (key === 'Theme') {
-        globalStore.themeConfig.theme = val;
-        switchTheme();
-        if (globalStore.isMasterProductPro) {
-            await updateXpackSettingByKey('Theme', val);
-            let color: string;
-            const themeColor: ThemeColor = JSON.parse(globalStore.themeConfig.themeColor);
-            if (val === 'auto') {
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
-                color = prefersDark.matches ? themeColor.dark : themeColor.light;
-            } else {
-                color = val === 'dark' ? themeColor.dark : themeColor.light;
-            }
-            globalStore.themeConfig.primary = color;
-            setPrimaryColor(color);
-        }
-    }
-    if (key === 'MenuTabs') {
-        globalStore.setOpenMenuTabs(val === 'Enable');
-    }
     let param = {
         key: key,
         value: val + '',
     };
     await updateSetting(param)
-        .then(async () => {
-            if (param.key === 'Language') {
+        .then(() => {
+            if (key === 'Language') {
+                i18n.locale.value = val;
+                globalStore.updateLanguage(val);
                 location.reload();
             }
-            loading.value = false;
+            if (key === 'Theme') {
+                handleThemeChange(val);
+            }
+            if (key === 'MenuTabs') {
+                globalStore.setOpenMenuTabs(val === 'enable');
+            }
             MsgSuccess(i18n.t('commons.msg.operationSuccess'));
             search();
         })
@@ -433,3 +472,9 @@ onMounted(() => {
     getSystemAvailable();
 });
 </script>
+
+<style scoped lang="scss">
+:deep(.el-radio-group) {
+    min-width: max-content;
+}
+</style>

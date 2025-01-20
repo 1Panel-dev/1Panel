@@ -16,8 +16,9 @@ import (
 // @Summary Page website ssl
 // @Accept json
 // @Param request body request.WebsiteSSLSearch true "request"
-// @Success 200
+// @Success 200 {array} response.WebsiteSSLDTO
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/ssl/search [post]
 func (b *BaseApi) PageWebsiteSSL(c *gin.Context) {
 	var req request.WebsiteSSLSearch
@@ -50,6 +51,7 @@ func (b *BaseApi) PageWebsiteSSL(c *gin.Context) {
 // @Param request body request.WebsiteSSLCreate true "request"
 // @Success 200 {object} request.WebsiteSSLCreate
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/ssl [post]
 // @x-panel-log {"bodyKeys":["primaryDomain"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建网站 ssl [primaryDomain]","formatEN":"Create website ssl [primaryDomain]"}
 func (b *BaseApi) CreateWebsiteSSL(c *gin.Context) {
@@ -71,6 +73,7 @@ func (b *BaseApi) CreateWebsiteSSL(c *gin.Context) {
 // @Param request body request.WebsiteSSLApply true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/ssl/obtain [post]
 // @x-panel-log {"bodyKeys":["ID"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"ID","isList":false,"db":"website_ssls","output_column":"primary_domain","output_value":"domain"}],"formatZH":"申请证书  [domain]","formatEN":"apply ssl [domain]"}
 func (b *BaseApi) ApplyWebsiteSSL(c *gin.Context) {
@@ -91,6 +94,7 @@ func (b *BaseApi) ApplyWebsiteSSL(c *gin.Context) {
 // @Param request body request.WebsiteDNSReq true "request"
 // @Success 200 {array} response.WebsiteDNSRes
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/ssl/resolve [post]
 func (b *BaseApi) GetDNSResolve(c *gin.Context) {
 	var req request.WebsiteDNSReq
@@ -111,6 +115,7 @@ func (b *BaseApi) GetDNSResolve(c *gin.Context) {
 // @Param request body request.WebsiteBatchDelReq true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/ssl/del [post]
 // @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"ids","isList":true,"db":"website_ssls","output_column":"primary_domain","output_value":"domain"}],"formatZH":"删除 ssl [domain]","formatEN":"Delete ssl [domain]"}
 func (b *BaseApi) DeleteWebsiteSSL(c *gin.Context) {
@@ -122,15 +127,16 @@ func (b *BaseApi) DeleteWebsiteSSL(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithData(c, nil)
+	helper.SuccessWithOutData(c)
 }
 
 // @Tags Website SSL
 // @Summary Search website ssl by website id
 // @Accept json
 // @Param websiteId path integer true "request"
-// @Success 200
+// @Success 200 {object} response.WebsiteSSLDTO
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/ssl/website/:websiteId [get]
 func (b *BaseApi) GetWebsiteSSLByWebsiteId(c *gin.Context) {
 	websiteId, err := helper.GetIntParamByKey(c, "websiteId")
@@ -150,8 +156,9 @@ func (b *BaseApi) GetWebsiteSSLByWebsiteId(c *gin.Context) {
 // @Summary Search website ssl by id
 // @Accept json
 // @Param id path integer true "request"
-// @Success 200
+// @Success 200 {object} response.WebsiteSSLDTO
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/ssl/:id [get]
 func (b *BaseApi) GetWebsiteSSLById(c *gin.Context) {
 	id, err := helper.GetParamID(c)
@@ -173,6 +180,7 @@ func (b *BaseApi) GetWebsiteSSLById(c *gin.Context) {
 // @Param request body request.WebsiteSSLUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/ssl/update [post]
 // @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"website_ssls","output_column":"primary_domain","output_value":"domain"}],"formatZH":"更新证书设置 [domain]","formatEN":"Update ssl config [domain]"}
 func (b *BaseApi) UpdateWebsiteSSL(c *gin.Context) {
@@ -184,7 +192,7 @@ func (b *BaseApi) UpdateWebsiteSSL(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithData(c, nil)
+	helper.SuccessWithOutData(c)
 }
 
 // @Tags Website SSL
@@ -193,6 +201,7 @@ func (b *BaseApi) UpdateWebsiteSSL(c *gin.Context) {
 // @Param request body request.WebsiteSSLUpload true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /websites/ssl/upload [post]
 // @x-panel-log {"bodyKeys":["type"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"上传 ssl [type]","formatEN":"Upload ssl [type]"}
 func (b *BaseApi) UploadWebsiteSSL(c *gin.Context) {
@@ -204,7 +213,7 @@ func (b *BaseApi) UploadWebsiteSSL(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithData(c, nil)
+	helper.SuccessWithOutData(c)
 }
 
 // @Tags Website SSL
@@ -213,6 +222,7 @@ func (b *BaseApi) UploadWebsiteSSL(c *gin.Context) {
 // @Param request body request.WebsiteResourceReq true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router  /websites/ssl/download [post]
 // @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"website_ssls","output_column":"primary_domain","output_value":"domain"}],"formatZH":"下载证书文件 [domain]","formatEN":"download ssl file [domain]"}
 func (b *BaseApi) DownloadWebsiteSSL(c *gin.Context) {

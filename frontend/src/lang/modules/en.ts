@@ -12,6 +12,7 @@ const message = {
         false: 'false',
         example: 'e.g.:',
         fit2cloud: 'FIT2CLOUD',
+        lingxia: 'Lingxia',
         colon: ': ',
         button: {
             prev: 'Previous',
@@ -182,11 +183,11 @@ const message = {
             title: 'Linux Server Management Panel',
             licenseHelper:
                 'Agree &laquo; <a href="https://www.fit2cloud.com/legal/licenses.html" target="_blank">Community License Agreement</a> &raquo;',
-            errorAgree: 'Please click to agree to the Community Software License Agreement',
+            errorAgree: 'Click to agree to the Community Software License',
             logout: 'Logout',
             agreeTitle: 'Agreement',
             agreeContent:
-                'In order to better protect your legitimate rights and interests, please read and agree to the following agreement &laquo; <a href = "https://www.fit2cloud.com/legal/licenses.html" target = "_blank" > fly to cloud community software license agreement </a> &raquo;',
+                'In order to better protect your legitimate rights and interests, please read and agree to the following agreement &laquo; <a href = "https://www.fit2cloud.com/legal/licenses.html" target = "_blank" > Community License Agreement </a> &raquo;',
         },
         rule: {
             username: 'Please enter a username',
@@ -317,6 +318,14 @@ const message = {
             time: 'Time',
             core: 'Core',
             millisecond: 'Millisecond',
+            secondUnit: 's',
+            minuteUnit: 'min',
+            hourUnit: 'h',
+            dayUnit: 'd',
+            weekUnit: 'w',
+            monthUnit: 'm',
+            yearUnit: 'y',
+            millisecondUnit: 'ms',
         },
         operate: {
             down: 'Stop',
@@ -1104,7 +1113,7 @@ const message = {
             hostname: 'Hostname',
             passwd: 'System Password',
             passwdHelper: 'Input characters cannot include $ and &',
-            timeZone: 'System Time Zone',
+            timeZone: 'Time Zone',
             localTime: 'Server Time',
             timeZoneChangeHelper: 'Modifying the system time zone requires restarting the service. Continue?',
             timeZoneHelper:
@@ -1484,14 +1493,18 @@ const message = {
             'Please do not enable it in production environments as it may increase server security risks',
         apiInterfaceAlert2:
             'Please do not use third-party applications to call the panel API to prevent potential security threats.',
-        apiInterfaceAlert3: 'API Interface Document:',
-        apiInterfaceAlert4: 'Usage Document:',
-        apiKey: 'Interface Key',
+        apiInterfaceAlert3: 'API Docs',
+        apiInterfaceAlert4: 'Usage Docs',
+        apiKey: 'API Key',
         apiKeyHelper: 'Interface key is used for external applications to access API interfaces',
         ipWhiteList: 'IP Whitelist',
         ipWhiteListEgs:
             'When there are multiple IPs, line breaks are required for display, for example:  \n172.161.10.111  \n172.161.10.0/24 ',
         ipWhiteListHelper: 'IPs must be in the IP whitelist list to access the panel API interface',
+        apiKeyValidityTime: 'Validity period of interface key',
+        apiKeyValidityTimeEgs: 'Validity period of interface key (in minutes)',
+        apiKeyValidityTimeHelper:
+            'The interface timestamp is valid if its difference from the current timestamp (in minutes) is within the allowed range. A value of 0 disables verification.',
         apiKeyReset: 'Interface key reset',
         apiKeyResetHelper: 'the associated key service will become invalid. Please add a new key to the service',
         confDockerProxy: 'Configure Docker Proxy',
@@ -1988,7 +2001,7 @@ const message = {
         installPrompt: 'No apps installed yet',
         updateHelper: 'Updating parameters may cause the application to fail to start, please operate with caution',
         updateWarn: 'Update parameters need to rebuild the application, Do you want to continue? ',
-        busPort: 'Service Port',
+        busPort: 'Port',
         syncStart: 'Start syncing! Please refresh the app store later',
         advanced: 'Advanced Settings',
         cpuCore: 'Number of cores',

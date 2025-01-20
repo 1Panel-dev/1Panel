@@ -282,6 +282,8 @@ const baseInfo = ref<Dashboard.BaseInfo>({
     kernelArch: '',
     kernelVersion: '',
     virtualizationSystem: '',
+    ipV4Addr: '',
+    httpProxy: '',
 
     cpuCores: 0,
     cpuLogicalCores: 0,

@@ -16,8 +16,8 @@
                 <el-divider direction="vertical" />
             </div>
             <div class="flex flex-wrap items-center">
-                <el-link :underline="false" type="primary" @click="toHalo">
-                    {{ isMasterProductPro ? $t('license.pro') : $t('license.community') }}
+                <el-link :underline="false" type="primary" @click="toLxware">
+                    {{ $t(!isMasterProductPro ? 'license.community' : 'license.pro') }}
                 </el-link>
                 <el-link :underline="false" class="version" type="primary" @click="copyText(version)">
                     {{ version }}
@@ -53,8 +53,10 @@ import { MsgSuccess } from '@/utils/message';
 import { copyText } from '@/utils/util';
 import { onMounted, ref } from 'vue';
 import { GlobalStore } from '@/store';
+import { storeToRefs } from 'pinia';
 
 const globalStore = GlobalStore();
+const { docsUrl } = storeToRefs(globalStore);
 const upgradeRef = ref();
 
 const version = ref<string>('');
@@ -74,16 +76,23 @@ const search = async () => {
     version.value = res.data.systemVersion;
 };
 
-const toHalo = () => {
-    window.open('https://www.lxware.cn/1panel' + '', '_blank', 'noopener,noreferrer');
+const toLxware = () => {
+    if (!globalStore.isIntl) {
+        window.open('https://www.lxware.cn/1panel' + '', '_blank', 'noopener,noreferrer');
+    } else {
+        window.open('https://1panel.hk' + '', '_blank', 'noopener,noreferrer');
+    }
 };
 
 const toDoc = () => {
-    window.open('https://1panel.cn/docs/', '_blank', 'noopener,noreferrer');
+    window.open(docsUrl.value, '_blank', 'noopener,noreferrer');
 };
 
 const toForum = () => {
-    window.open('https://bbs.fit2cloud.com/c/1p/7', '_blank');
+    let url = globalStore.isIntl
+        ? 'https://github.com/1Panel-dev/1Panel/discussions'
+        : 'https://bbs.fit2cloud.com/c/1p/7';
+    window.open(url, '_blank');
 };
 
 const toGithub = () => {

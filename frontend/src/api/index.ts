@@ -99,7 +99,7 @@ class RequestHttp {
                                 response.status,
                                 response.data && response.data['message'] ? response.data['message'] : '',
                             );
-                            return;
+                            return Promise.reject(error);
                         default:
                             globalStore.errStatus = 'code-' + response.status;
                             router.push({

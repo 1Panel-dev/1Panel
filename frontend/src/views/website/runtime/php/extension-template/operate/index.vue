@@ -22,7 +22,7 @@
                     <el-link
                         target="_blank"
                         type="primary"
-                        href="https://1panel.cn/docs/user_manual/websites/php/#php_1"
+                        :href="globalStore.docsUrl + '/user_manual/websites/php/#php_1'"
                     >
                         {{ $t('php.toExtensionsList') }}
                     </el-link>
@@ -50,6 +50,8 @@ import { MsgSuccess } from '@/utils/message';
 import { CreatePHPExtensions, UpdatePHPExtensions } from '@/api/modules/runtime';
 import i18n from '@/lang';
 import { Runtime } from '@/api/interface/runtime';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const open = ref(false);
 const operate = ref('create');

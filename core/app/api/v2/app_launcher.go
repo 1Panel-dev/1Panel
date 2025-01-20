@@ -22,6 +22,7 @@ func (b *BaseApi) SearchAppLauncher(c *gin.Context) {
 // @Param request body dto.ChangeShow true "request"
 // @Success 200
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /core/app/launcher/show [post]
 // @x-panel-log {"bodyKeys":["key", "value"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"首页应用 [key] => 显示：[value]","formatEN":"app launcher [key] => show: [value]"}
 func (b *BaseApi) UpdateAppLauncher(c *gin.Context) {
@@ -34,5 +35,5 @@ func (b *BaseApi) UpdateAppLauncher(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	helper.SuccessWithData(c, nil)
+	helper.SuccessWithOutData(c)
 }

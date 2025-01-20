@@ -40,17 +40,21 @@
         >
             <template #main>
                 <div class="app-warn">
-                    <div>
+                    <div class="flex flex-col gap-2 items-center justify-center w-full sm:flex-row">
                         <span v-if="!data.isExist">{{ $t('tool.supervisor.notSupport') }}</span>
                         <span v-else-if="!data.ctlExist">{{ $t('tool.supervisor.notSupportCrl') }}</span>
                         <span v-else-if="data.init">{{ $t('tool.supervisor.initHelper') }}</span>
-                        <span @click="toDoc()" v-if="!data.isExist || !data.ctlExist">
-                            <el-icon class="ml-2"><Position /></el-icon>
+                        <span
+                            @click="toDoc()"
+                            v-if="!data.isExist || !data.ctlExist"
+                            class="flex items-center justify-center gap-0.5"
+                        >
+                            <el-icon><Position /></el-icon>
                             {{ $t('firewall.quickJump') }}
                         </span>
-                        <div>
-                            <img alt="" src="@/assets/images/no_app.svg" />
-                        </div>
+                    </div>
+                    <div>
+                        <img alt="" src="@/assets/images/no_app.svg" />
                     </div>
                 </div>
             </template>
@@ -67,6 +71,8 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { HostTool } from '@/api/interface/host-tool';
 import InitPage from './init/index.vue';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 let operateReq = reactive({
     installId: 0,
@@ -91,7 +97,7 @@ const setting = () => {
 };
 
 const toDoc = async () => {
-    window.open('https://1panel.cn/docs/user_manual/toolbox/supervisor/', '_blank', 'noopener,noreferrer');
+    window.open(globalStore.docsUrl + '/user_manual/toolbox/supervisor/', '_blank', 'noopener,noreferrer');
 };
 
 const init = async () => {

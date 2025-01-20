@@ -13,6 +13,7 @@ ErrApiConfigStatusInvalid: "API Interface access prohibited: {{ .detail }}"
 ErrApiConfigKeyInvalid: "API Interface key error: {{ .detail }}"
 ErrApiConfigIPInvalid: "API Interface IP is not on the whitelist: {{ .detail }}"
 ErrApiConfigDisable: "This interface prohibits the use of API Interface calls: {{ .detail }}"
+ErrApiConfigKeyTimeInvalid: "API Interface timestamp error: {{ .detail }}"
 
 #common
 ErrNameIsExist: "Name is already exist"

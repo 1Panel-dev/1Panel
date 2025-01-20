@@ -13,6 +13,7 @@ import (
 // @Param request body dto.SearchLgLogWithPage true "request"
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /core/logs/login [post]
 func (b *BaseApi) GetLoginLogs(c *gin.Context) {
 	var req dto.SearchLgLogWithPage
@@ -38,6 +39,7 @@ func (b *BaseApi) GetLoginLogs(c *gin.Context) {
 // @Param request body dto.SearchOpLogWithPage true "request"
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /core/logs/operation [post]
 func (b *BaseApi) GetOperationLogs(c *gin.Context) {
 	var req dto.SearchOpLogWithPage
@@ -63,6 +65,7 @@ func (b *BaseApi) GetOperationLogs(c *gin.Context) {
 // @Param request body dto.CleanLog true "request"
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /core/logs/clean [post]
 // @x-panel-log {"bodyKeys":["logType"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"清空 [logType] 日志信息","formatEN":"Clean the [logType] log information"}
 func (b *BaseApi) CleanLogs(c *gin.Context) {
@@ -76,5 +79,5 @@ func (b *BaseApi) CleanLogs(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithData(c, nil)
+	helper.SuccessWithOutData(c)
 }

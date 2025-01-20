@@ -83,7 +83,7 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('cronjob.retainCopies')" :min-width="90" prop="retainCopies">
+                    <el-table-column :label="$t('cronjob.retainCopies')" :min-width="120" prop="retainCopies">
                         <template #default="{ row }">
                             <el-button v-if="hasBackup(row.type)" @click="loadBackups(row)" plain size="small">
                                 {{ row.retainCopies }}{{ $t('cronjob.retainCopiesUnit') }}
@@ -99,7 +99,7 @@
                             {{ row.lastRecordTime }}
                         </template>
                     </el-table-column>
-                    <el-table-column :min-width="80" :label="$t('setting.backupAccount')">
+                    <el-table-column :min-width="120" :label="$t('setting.backupAccount')">
                         <template #default="{ row }">
                             <span v-if="!hasBackup(row.type)">-</span>
                             <div v-else>
@@ -139,6 +139,8 @@
                         :buttons="buttons"
                         :ellipsis="10"
                         :label="$t('commons.table.operate')"
+                        min-width="mobile ? 'auto' : 200"
+                        :fixed="mobile ? false : 'right'"
                         fix
                     />
                 </ComplexTable>
@@ -167,13 +169,19 @@
 import OperateDialog from '@/views/cronjob/operate/index.vue';
 import Records from '@/views/cronjob/record/index.vue';
 import Backups from '@/views/cronjob/backup/index.vue';
-import { onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref } from 'vue';
 import { deleteCronjob, getCronjobPage, handleOnce, updateStatus } from '@/api/modules/cronjob';
 import i18n from '@/lang';
 import { Cronjob } from '@/api/interface/cronjob';
 import { ElMessageBox } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
 import { transSpecToStr } from './helper';
+import { GlobalStore } from '@/store';
+
+const globalStore = GlobalStore();
+const mobile = computed(() => {
+    return globalStore.isMobile();
+});
 
 const loading = ref();
 const selects = ref<any>([]);

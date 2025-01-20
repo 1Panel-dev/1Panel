@@ -21,7 +21,7 @@ func Init() {
 	port := "9999"
 	mode := ""
 	version := "v2.0.0"
-	username, password, entrance := "", "", ""
+	username, password, entrance, language := "", "", "", "zh"
 	v := viper.NewWithOptions()
 	v.SetConfigType("yaml")
 
@@ -46,6 +46,7 @@ func Init() {
 		username = loadParams("ORIGINAL_USERNAME")
 		password = loadParams("ORIGINAL_PASSWORD")
 		entrance = loadParams("ORIGINAL_ENTRANCE")
+		language = loadParams("LANGUAGE")
 
 		reader := bytes.NewReader(conf.AppYaml)
 		if err := v.ReadConfig(reader); err != nil {
@@ -81,16 +82,21 @@ func Init() {
 		if serverConfig.System.Entrance != "" {
 			entrance = serverConfig.System.Entrance
 		}
+		if serverConfig.System.IsIntl {
+			language = "en"
+		}
 	}
 
 	global.CONF = serverConfig
 	global.CONF.System.BaseDir = baseDir
 	global.CONF.System.IsDemo = v.GetBool("system.is_demo")
+	global.CONF.System.IsIntl = v.GetBool("system.is_intl")
 	global.CONF.System.Port = port
 	global.CONF.System.Version = version
 	global.CONF.System.Username = username
 	global.CONF.System.Password = password
 	global.CONF.System.Entrance = entrance
+	global.CONF.System.Language = language
 	global.CONF.System.ChangeUserInfo = loadChangeInfo()
 	global.Viper = v
 }

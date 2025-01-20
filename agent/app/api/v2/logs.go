@@ -8,8 +8,9 @@ import (
 
 // @Tags Logs
 // @Summary Load system log files
-// @Success 200
+// @Success 200 {array} string
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /logs/system/files [get]
 func (b *BaseApi) GetSystemFiles(c *gin.Context) {
 	data, err := logService.ListSystemLogFile()
@@ -23,8 +24,9 @@ func (b *BaseApi) GetSystemFiles(c *gin.Context) {
 
 // @Tags Logs
 // @Summary Load system logs
-// @Success 200
+// @Success 200 {string} data
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /logs/system [post]
 func (b *BaseApi) GetSystemLogs(c *gin.Context) {
 	var req dto.OperationWithName

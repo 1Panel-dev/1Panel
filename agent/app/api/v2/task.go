@@ -12,6 +12,7 @@ import (
 // @Param request body dto.SearchTaskLogReq true "request"
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /logs/tasks/search [post]
 func (b *BaseApi) PageTasks(c *gin.Context) {
 	var req dto.SearchTaskLogReq
@@ -33,6 +34,7 @@ func (b *BaseApi) PageTasks(c *gin.Context) {
 // @Summary Get the number of executing tasks
 // @Success 200 {object} int64
 // @Security ApiKeyAuth
+// @Security Timestamp
 // @Router /logs/tasks/executing/count [get]
 func (b *BaseApi) CountExecutingTasks(c *gin.Context) {
 	count, err := taskService.CountExecutingTask()

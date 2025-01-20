@@ -467,11 +467,15 @@ const acceptParams = (params: DialogProps): void => {
     drawerVisible.value = true;
 };
 const toDoc = (isConf: boolean) => {
-    let item = isConf ? '#onedrive' : '#onedrive_1';
-    window.open('https://1panel.cn/docs/user_manual/settings/' + item, '_blank', 'noopener,noreferrer');
+    let item = isConf ? '#32-onedrive' : '#33-onedrive';
+    if (globalStore.isIntl) {
+        item = isConf ? '#using-your-own-client-info-for-onedrive' : '#auth-code-of-onedrive';
+    }
+    window.open(globalStore.docsUrl + '/user_manual/settings/' + item, '_blank', 'noopener,noreferrer');
 };
 const toWebDAVDoc = () => {
-    window.open('https://1panel.cn/docs/user_manual/settings/#webdav-alist', '_blank', 'noopener,noreferrer');
+    const uri = globalStore.isIntl ? '#webdav-with-alist' : '#34-webdav-alist';
+    window.open(globalStore.docsUrl + '/user_manual/settings/' + uri, '_blank', 'noopener,noreferrer');
 };
 const jumpForCode = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
