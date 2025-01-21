@@ -1,222 +1,96 @@
-ErrInvalidParams: "リクエストパラメーターエラー：{{.Detail}}"
-ErrTokenParse: "トークン生成エラー：{{.Detail}}"
-ErrInitialPassword: "初期パスワードエラー"
-ErrInternalServer: "サービス内部エラー：{{.Detail}}"
+ErrInvalidParams: "リクエストパラメーターエラー: {{ .detail }}"
+ErrTokenParse: "トークン生成エラー: {{ .detail }}"
+ErrInitialPassword: "元のパスワードが間違っています"
+ErrInternalServer: "サーバ内部エラー: {{ .detail }}"
 ErrRecordExist: "レコードはすでに存在します"
-ErrRecordNotFound: "記録が見つかりません"
-ErrStructTransform: "タイプ変換障害：{{.Detail}}"
-ErrNotLogin: "ユーザーはログインしません：{{.Detail}}"
-ErrPasswordExpired: "現在のパスワードが期限切れになっています：{{.Detail}}"
-ErrNotSupportType: "システムは現在のタイプをサポートしていません：{{.Detail}}"
-ErrApiConfigStatusInvalid: "APIインターフェイスアクセス禁止：{{.Detail}}"
-ErrApiConfigKeyInvalid: "APIインターフェイスキーエラー：{{.Detail}}"
-ErrApiConfigIPInvalid: "APIインターフェイスIPはホワイトリストにありません：{{.Detail}}"
-ErrApiConfigDisable: "このインターフェイスは、APIインターフェイスコールの使用を禁止しています：{{.Detail}}"
+ErrRecordNotFound: "レコードが見つかりません"
+ErrStructTransform: "型変換エラー: {{ .detail }}"
+ErrNotLogin: "ユーザーはログインしていません: {{ .detail }}"
+ErrPasswordExpired: "現在のパスワードは期限切れです: {{ .detail }}"
+ErrNotSupportType: "システムは現在のタイプをサポートしていません: {{ .detail }}"
+ErrProxy: "リクエストエラー、ノードの状態を確認してください: {{ .detail }}"
+ErrApiConfigStatusInvalid: "APIインターフェースへのアクセスが禁止されています: {{ .detail }}"
+ErrApiConfigKeyInvalid: "APIインターフェースのキーエラー: {{ .detail }}"
+ErrApiConfigIPInvalid: "APIインターフェースのIPがホワイトリストにありません: {{ .detail }}"
+ErrApiConfigDisable: "このインターフェースはAPI呼び出しが無効です: {{ .detail }}"
+ErrApiConfigKeyTimeInvalid: "APIインターフェースのタイムスタンプエラー: {{ .detail }}"
 
 #common
-ErrNameIsExist: "名前はすでに存在しています"
-ErrDemoEnvironment: "デモサーバー、この操作を禁止します！"
-ErrCmdTimeout: "コマンド実行がタイムアウトしました！"
-ErrCmdIllegal: "コマンドには違法な文字が含まれています。変更してもう一度やり直してください！"
-ErrPortExist: '{{.port}}ポートはすでに{{.type}} [{{.name}}]によって占有されています。'
-TYPE_APP: "応用"
-TYPE_RUNTIME: "ランタイム環境"
-TYPE_DOMAIN: "ドメイン名"
-ErrTypePort: 'port {{.name}}フォーマットエラー'
-ErrTypePortRange: 'ポートレンジは1-65535の間である必要があります'
-Success: "成功"
-Failed: "失敗した"
-SystemRestart: "システムの再起動により、タスクが中断されます"
+ErrDemoEnvironment: "デモサーバーで、この操作は許可されていません!"
+ErrCmdTimeout: "コマンド実行のタイムアウト!"
+ErrEntrance: "セキュアエントランス情報エラー、確認して再試行してください!"
+ErrGroupIsDefault: 'デフォルトグループは削除できません'
+ErrLocalDelete: "ローカルノードは削除できません!"
 
-#app
-ErrPortInUsed: "{{.Detail}}ポートはすでに使用されています"
-ErrAppLimit: "アプリはインストール制限を超えています"
-ErrAppRequired: "{{.Detail}}アプリが必要です"
-ErrNotInstall: "アプリがインストールされていません"
-ErrPortInOtherApp: "{{.port}}ポートは既にapp {{.apps}}で使用されています"
-ErrDbUserNotValid: "ストックデータベース、ユーザー名、パスワードが一致しません！"
-ErrDockerComposeNotValid: "Docker-Composeファイル形式のエラー！"
-ErrUpdateBuWebsite: 'アプリケーションは正常に更新されましたが、Webサイト構成ファイルの変更に失敗しました。構成を確認してください！'
-Err1PanelNetworkFailed: 'デフォルトのコンテナネットワークの作成に失敗しました！{{ 。詳細 }}'
-ErrFileParse: 'アプリケーションDocker-Composeファイルの解析は失敗しました！'
-ErrInstallDirNotFound: 'インストールディレクトリは存在しません'
-AppStoreIsUpToDate: '最新の'
-LocalAppVersionNull: '{{.name}}アプリはバージョンに同期されません！アプリケーションリストに追加できませんでした'
-LocalAppVersionErr: '{{.name}}}バージョン{{.version}}の同期に失敗しました！{{.err}}'
-ErrFileNotFound: '{{.name}}ファイルは存在しません'
-ErrFileParseApp: '{{.name}} file {{.err}}を解析できなかった'
-ErrAppDirNull: 'バージョンフォルダーは存在しません'
-LocalAppErr: "app {{.name}}同期が失敗しました！{{.err}}"
-ErrContainerName: "cantablernameはすでに存在しています"
-ErrAppSystemRestart: "1パネルの再起動により、タスクが終了します"
-ErrCreateHttpClient: "http request {{.err}}の作成に失敗しました"
-ErrHttpReqTimeOut: "リクエスト{{.err}}"
-ErrHttpReqFailed: "リクエストが失敗しました{{.err}}"
-ErrHttpReqNotFound: "ファイルは存在しません"
-ErrNoSuchHost: "ネットワーク接続に失敗しました"
-ErrImagePullTimeOut: '画像プルタイムアウト'
-ErrContainerNotFound: '{{.name}}コンテナは存在しません'
-ErrContainerMsg: '{{.name}}コンテナは異常です。詳細については、コンテナページのログを確認してください'
-ErrAppBackup: '{{.name}}アプリケーションバックアップが失敗したerr {{.err}}'
-ErrImagePull: '{{.name}}画像プルFailed err {{.err}}'
-ErrVersionTooLow: '現在の1パネルバージョンが低すぎてApp Storeを更新できないので、バージョンをアップグレードしてください'
-ErrAppNameExist: 'アプリ名はすでに存在しています'
-AppStoreIsSyncing: 'App Storeが同期しています。後でもう一度やり直してください'
-ErrGetCompose: "docker-compose.ymlファイルを取得できませんでした！{{ 。詳細 }}"
-ErrAppWarn: "異常なステータス、ログを確認してください"
-ErrAppParamKey: "parameter {{.name}}フィールド例外"
-ErrAppUpgrade: "アプリケーションのアップグレードに失敗しました{{.name}} {{.err}}"
-AppRecover: "app {{.name}}ロールバック"
-PullImageStart: "画像の引っ張りを開始{{.name}}"
-PullImageSuccess: "画像が正常に引っ張られました"
-UpgradeAppStart: "アプリケーションのアップグレードを起動{{.name}}"
-UpgradeAppSuccess: "App {{.Name}}アップグレードされました"
-
-#file
-ErrFileCanNotRead: "ファイルは読み取れません"
-ErrFileToLarge: "ファイルが大きすぎます"
-ErrPathNotFound: "パスは見つかりません"
-ErrMovePathFailed: "ターゲットパスには元のパスが含まれていません！"
-ErrLinkPathNotFound: "ターゲットパスは存在しません！"
-ErrFileIsExist: "ファイルまたはディレクトリはすでに存在します！"
-ErrFileUpload: "file {{.name}} {{.detail}}}のアップロードに失敗しました"
-ErrFileDownloadDir: "サポートされていないフォルダーをダウンロードします"
-ErrCmdNotFound: "{{.name}}コマンドは存在しません。最初にホストにこのコマンドをインストールしてください"
-ErrSourcePathNotFound:  "ソースディレクトリは存在しません"
-ErrFavoriteExist: "このパスが収集されました"
-ErrInvalidChar: "違法なキャラクターは禁止されています"
-ErrPathNotDelete: "選択したディレクトリを削除することはできません"
-
-#website
-ErrDomainIsExist: "ドメインはすでに存在しています"
-ErrAliasIsExist: "エイリアスはすでに存在しています"
-ErrAppDelete: '他のウェブサイトはこのアプリを使用します'
-ErrGroupIsUsed: "グループは使用されており、削除することはできません"
-ErrBackupMatch: "バックアップファイルは、ウェブサイトの現在の部分的なデータと一致しません：{{.Detail}}"
-ErrBackupExist: 'バックアップファイルは、存在しない元のデータの一部に対応しています。{{.Detail}}'
-ErrPHPResource: 'ローカルランタイムはスイッチングをサポートしません！'
-ErrPathPermission: 'インデックスディレクトリで1000：1000以外のアクセス許可を持つフォルダーが検出されたため、Webサイトにアクセスするとアクセスが拒否された場合があります。上の[保存]ボタンをクリックしてください'
-ErrDomainIsUsed: "ドメインはすでにWebサイトで使用されています{{.Name}}"
-ErrDomainFormat: "{{.name}}ドメイン形式エラー"
-ErrDefaultAlias: "デフォルトは予約済みのコード名です。別のコード名を使用してください"
-ErrImageNotExist: "実行中の環境{{.name}}画像は存在しません。実行中の環境を再編集してください"
-
-#ssl
-ErrSSLCannotDelete: "証明書{{.Name}}はWebサイトで使用されており、削除できません"
-ErrAccountCannotDelete: "アカウントに関連付けられた証明書を削除することはできません"
-ErrSSLApply: "証明書は引き続き正常に署名されていますが、OpenRestyリロードが失敗します。構成を確認してください！"
-ErrEmailIsExist: 'メールはすでに存在しています'
-ErrSSLKeyNotFound: '秘密キーファイルは存在しません'
-ErrSSLCertificateNotFound: '証明書ファイルは存在しません'
-ErrSSLKeyFormat: '秘密キーファイル検証エラー'
-ErrSSLCertificateFormat: '証明書ファイル形式エラー、PEM形式を使用してください'
-ErrEabKidOrEabHmacKeyCannotBlank: 'eabkidまたはeabhmackeyは空にすることはできません'
-ErrOpenrestyNotFound: 'HTTPモードでは、最初にOpenRestyをインストールする必要があります'
-ApplySSLStart: '証明書、ドメイン名[{{.domain}}]アプリケーションメソッド[{{.type}}]の申請を開始します'
-dnsAccount: "DNSオートマチック"
-dnsManual: "DNSマニュアル"
-http: "http"
-ApplySSLFailed: '[{{.domain}}]証明書のアプリケーションが失敗しました、{{.detail}}'
-ApplySSLSuccess: '[{{{.domain}}]証明書のアプリケーションが成功しました！！'
-DNSAccountName: 'dnsアカウント[{{.name}}]メーカー[{{.type}}]'
-PushDirLog: 'ディレクトリにプッシュされた証明書[{{.Path}}] {{.Status}}'
-ErrDeleteCAWithSSL: "現在の組織の下に発行された証明書があり、削除できません"
-ErrDeleteWithPanelSSL: "パネルSSL構成はこの証明書を使用しており、削除できません"
-ErrDefaultCA: "デフォルトの証明書当局は削除できません"
-ApplyWebSiteSSLLog: "{{.name}} Webサイト証明書の更新を開始します"
-ErrUpdateWebsiteSSL: "{{.name}}ウェブサイトは証明書の更新に失敗しました：{{.err}}"
-ApplyWebSiteSSLSuccess: "ウェブサイトの証明書を正常に更新します"
-ErrExecShell: "スクリプトの実行に失敗した{{.err}}"
-ExecShellStart: "スクリプトの実行を開始します"
-ExecShellSuccess: "スクリプトは正常に実行されました"
-StartUpdateSystemSSL: "システム証明書の更新を開始します"
-UpdateSystemSSLSuccess: "システム証明書を正常に更新します"
-
-#mysql
-ErrUserIsExist: "現在のユーザーはすでに存在しています。新しいユーザーを入力してください"
-ErrDatabaseIsExist: "現在のデータベースはすでに存在しています。新しいデータベースを入力してください"
-ErrExecTimeOut: "SQL実行のタイミングを出して、データベースを確認してください"
-ErrRemoteExist: "リモートデータベースはすでにその名前に存在しています。それを変更して、再試行してください"
-ErrLocalExist: "ローカルデータベースはすでにその名前に存在しています。それを変更して、もう一度試してください"
-
-#redis
-ErrTypeOfRedis: "回復ファイルのタイプは、現在の永続性モードと一致しません。ファイルタイプを変更して、再試行してください"
-
-#container
-ErrInUsed: "{{.Detail}}が使用されており、削除できません"
-ErrObjectInUsed: "このオブジェクトは使用されており、削除することはできません"
-ErrPortRules: "ポートの数が一致しません。再入力してください！"
-ErrPgImagePull: "画像プルタイムアウト。画像の加速を構成するか、Postgres：16.0-Alpine画像を手動で引いて、再試行してください"
-
-#runtime
-ErrDirNotFound: "ビルドフォルダーは存在しません！ファイルの整合性を確認してください！"
-ErrFileNotExist: "{{.Detail}}ファイルは存在しません！ソースファイルの完全性を確認してください！"
-ErrImageBuildErr: "画像ビルドが失敗しました"
-ErrImageExist: "画像はすでに存在しています！"
-ErrDelWithWebsite: "運用環境はウェブサイトに関連付けられており、削除することはできません"
-ErrRuntimeStart: "開始に失敗しました"
-ErrPackageJsonNotFound: "package.jsonファイルは存在しません"
-ErrScriptsNotFound: "Package.jsonにスクリプト構成アイテムは見つかりませんでした"
-ErrContainerNameNotFound: "コンテナ名を取得できない場合は、.envファイルを確認してください"
-ErrNodeModulesNotFound: "node_modulesフォルダーは存在しません！実行中の環境を編集するか、実行中の環境が正常に開始するのを待ちます"
-
-#setting
-ErrBackupInUsed: "バックアップアカウントは既にCronjobで使用されており、削除することはできません。"
-ErrBackupCheck: "バックアップアカウントテスト接続に失敗した{{.err}}"
-ErrOSSConn: "最新バージョンを取得できない場合は、サーバーが外部ネットワークに接続できるかどうかを確認してください。"
-ErrEntrance: "セキュリティ入り口情報エラー。チェックしてもう一度やり直してください！"
-
-#tool
-ErrConfigNotFound: "構成ファイルは存在しません"
-ErrConfigParse: "構成ファイル形式エラー"
-ErrConfigIsNull: "構成ファイルは空にすることは許可されていません"
-ErrConfigDirNotFound: "実行中のディレクトリは存在しません"
-ErrConfigAlreadyExist: "同じ名前の構成ファイルが既に存在しています"
-ErrUserFindErr: "ユーザー{{.name}} {{.err}}を見つけられなかった"
-
-#ssh
-ErrFirewallNone: "システムでFirewalldまたはUFWサービスは検出されませんでした。チェックしてもう一度やり直してください！"
-ErrFirewallBoth: "FirewalldサービスとUFWサービスの両方がシステムで検出されます。競合を避けるために、1つをアンインストールして再試行してください！"
-
-#cronjob
-ErrBashExecute: "スクリプト実行エラー、タスク出力テキスト領域の特定の情報を確認してください。"
-ErrCutWebsiteLog: "{{.Name}} Webサイトログの切断が失敗した、エラー{{.err}}"
-CutWebsiteLogSuccess: "{{.Name}} Webサイトログカットに正常にカット、バックアップパス{{.Path}}"
-
-#toolbox
-ErrNotExistUser: "現在のユーザーは存在しません。変更して再試行してください！"
-ErrBanAction: "失敗した設定では、現在の{{.name}}サービスが利用できません。チェックして再試行してください！"
-ErrClamdscanNotFound: "Clamdscanコマンドは検出されませんでした。インストールするためにドキュメントを参照してください！"
-
-#waf
-ErrScope: "この構成の変更はサポートされていません"
-ErrStateChange: "状態の変更に失敗しました"
-ErrRuleExist: "ルールが存在します"
-ErrRuleNotExist: "ルールは存在しません"
-ErrParseIP: "IP形式エラー"
-ErrDefaultIP: "デフォルトは予約済みの名前です。別の名前に変更してください"
-ErrGroupInUse: "IPグループはブラック/ホワイトリストで使用され、削除できません"
-ErrGroupExist: "IPグループ名はすでに存在しています"
-ErrIPRange: "間違ったIP範囲"
-ErrIPExist: "IPは終了します"
+#backup
+ErrBackupInUsed: "バックアップアカウントは計画タスクで使用中のため削除できません"
+ErrBackupCheck: "バックアップアカウントの接続テストに失敗しました {{ .err}}"
+ErrBackupLocal: "ローカルサーバーのバックアップアカウントはこの操作をサポートしていません!"
+ErrBackupPublic: "バックアップアカウントが公開ではないことが検出されました、確認して再試行してください!"
+ErrOSSConn: "最新バージョンを取得できませんでした、サーバーが外部ネットワークに接続できるか確認してください。"
+ErrEntrance: "セキュアエントランス情報エラー、確認して再試行してください!"
 
 #license
-ErrLicense: "ライセンス形式のエラー、チェックして再試行してください！"
-ErrLicenseCheck: "ライセンスの確認が失敗しました。チェックしてもう一度やり直してください！"
-ErrLicenseSave: "ライセンス情報の保存に失敗しました、{{.err}}、もう一度やり直してください！"
-ErrLicenseSync: "ライセンス情報の同期に失敗し、データベースでライセンス情報は検出されませんでした！"
-ErrXpackNotFound: "このセクションはプロフェッショナルエディション機能です。最初にパネルsettings-licenseインターフェイスにライセンスをインポートしてください"
-ErrXpackNotActive: "このセクションはプロフェッショナルエディション機能です。最初にパネル設定リセンスインターフェイスでライセンスステータスを同期してください"
-ErrXpackOutOfDate: "現在のライセンスの有効期限が切れています。パネル設定リセンスインターフェイスにライセンスを再輸入してください"
-ErrXpackLost: "ライセンスは、再試行の最大数に達しました。[設定] [ライセンス]ページに移動し、[同期]ボタンを手動でクリックして、プロフェッショナルバージョンの機能が適切に機能していることを確認してください。"
-ErrXpackTimeout: "リクエストタイムアウト、ネットワーク接続が不安定な場合があります。後でもう一度やり直してください！"
+ErrLicense: "ライセンスフォーマットエラー、確認して再試行してください!"
+ErrLicenseCheck: "ライセンスの確認に失敗しました、確認して再試行してください!"
+ErrXpackVersion: "ライセンスの確認に失敗しました、このライセンスはバージョン制限があり、正常にインポートできません、確認して再試行してください!"
+ErrLicenseSave: "ライセンス情報の保存に失敗しました、エラー {{ .err }}、再試行してください!"
+ErrLicenseSync: "ライセンス情報の同期に失敗しました、データベースにライセンス情報が検出されませんでした!"
+ErrXpackNotFound: "この部分はプロフェッショナル版機能です、まず「パネル設定-ライセンス」画面でライセンスをインポートしてください"
+ErrXpackExceptional: "この部分はプロフェッショナル版機能です、まず「パネル設定-ライセンス」画面でライセンス状態を同期してください"
+ErrXpackOutOfDate: "現在のライセンスは期限切れです、再度「パネル設定-ライセンス」画面でライセンスをインポートしてください"
+ErrXpackLost: "ライセンスの最大試行回数に達しました、「パネル設定」「ライセンス」ページに移動し、手動で同期ボタンをクリックして、プロフェッショナル版機能が正常に使用できることを確認してください"
+ErrXpackTimeout: "リクエストタイムアウト、ネットワーク接続が不安定な可能性があります。後で再試行してください!"
+ErrUnbindMaster: "ノード管理にノードが存在するため、現在のライセンスを解除できません。ノードを削除してから再試行してください!"
+ErrFreeNodeLimit: "コミュニティ版のノード数が無料上限に達しました、www.lxware.cn/1panel で購入して再試行してください!"
+ErrNodeBound: "このライセンスは他のノードにバインドされています、確認して再試行してください!"
+ErrNoSuchNode: "そのノード情報が見つかりませんでした、確認して再試行してください!"
+ErrNodeUnbind: "そのノードはライセンスのバインド範囲内ではありません、確認して再試行してください!"
+ErrNodeBind: "そのノードはライセンスにバインドされています、確認して再試行してください!"
 
-#license
-ErrAlert: "情報形式のエラーをアラートしてください。チェックして再試行してください！"
-ErrAlertPush: "アラートプッシュエラー、チェックして再試行してください！"
-ErrAlertSave: "エラーを保存してください、チェックして再試行してください！"
-ErrAlertSync: "アラート同期エラー、チェックして再試行してください！"
-ErrAlertRemote: "リモートアラートエラー、チェックして再試行してください！"
+# alert
+ErrAlertSync: "アラート情報の同期エラー、確認して再試行してください!"
+
+#task
+TaskStart: "{{.name}} タスク開始 [START]"
+TaskEnd: "{{.name}} タスク終了 [COMPLETED]"
+TaskFailed: "{{.name}} タスク失敗"
+TaskTimeout: "{{.name}} タイムアウト"
+TaskSuccess: "{{.name}} タスク成功"
+TaskRetry: "{{.name}} 番目の再試行を開始"
+SubTaskSuccess: "{{ .name }} 成功"
+SubTaskFailed: "{{ .name }} 失敗: {{ .err }}"
+TaskInstall: "インストール"
+TaskUninstall: "アンインストール"
+TaskCreate: "作成"
+TaskDelete: "削除"
+TaskUpgrade: "アップグレード"
+TaskUpdate: "更新"
+TaskRestart: "再起動"
+TaskRollback: "ロールバック"
+SuccessStatus: "{{ .name }} 成功" 
+FailedStatus: "{{ .name }} 失敗 {{.err}}"
+PullImage: "イメージを取得"
+Start: "開始"
+Run: "実行"
+Stop: "停止"
+SubTask: "サブタスク"
+
+#upgrade node
+NodeUpgrade: "ノードのアップグレード {name}"
+NewSSHClient: "SSH接続を初期化"
+BackupBeforeUpgrade: "アップグレード前のデータバックアップ"
+UploadUpgradeFile: "アップグレードに必要なファイルを送信"
+RestartAfterUpgrade: "アップグレード後にサービスを再起動"
+
+#add node
+TaskAddNode: "ノードを追加"
+SyncAgentBaseInfo: "ノードの基本情報を同期"
+GenerateSSLInfo: "ノードのSSL情報を生成"
+ConnInfoNotMatch: "接続情報が一致しません"
+MakeAgentPackage: "ノードインストールパッケージを生成"
+SendAgent: "ノードインストールパッケージを送信"
+StartService: "サービスを開始"
 
 #cmd
 AppVersion: "アプリバージョン"

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/1Panel-dev/1Panel/core/global"
+	"github.com/1Panel-dev/1Panel/core/i18n"
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
 	"github.com/spf13/cobra"
 )
@@ -13,11 +14,11 @@ func init() {
 }
 
 var userinfoCmd = &cobra.Command{
-	Use:   "user-info",
-	Short: "获取面板信息",
+	Use: "user-info",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		i18n.UseI18nForCmd(language)
 		if !isRoot() {
-			fmt.Println("请使用 sudo 1pctl user-info 或者切换到 root 用户")
+			fmt.Println(i18n.GetMsgWithMapForCmd("SudoHelper", map[string]interface{}{"cmd": "sudo 1pctl user-info"}))
 			return nil
 		}
 		db, err := loadDBConn()
@@ -47,10 +48,10 @@ var userinfoCmd = &cobra.Command{
 			address = "$LOCAL_IP"
 		}
 
-		fmt.Printf("面板地址: %s://%s:%s/%s \n", protocol, address, port, entrance)
-		fmt.Println("面板用户: ", user)
-		fmt.Println("面板密码: ", pass)
-		fmt.Println("提示：修改密码可执行命令：1pctl update password")
+		fmt.Println(i18n.GetMsgByKeyForCmd("UserInfoAddr") + fmt.Sprintf("%s://%s:%s/%s ", protocol, address, port, entrance))
+		fmt.Println(i18n.GetMsgWithMapForCmd("UpdateUserResult", map[string]interface{}{"name": user}))
+		fmt.Println(i18n.GetMsgWithMapForCmd("UpdatePasswordResult", map[string]interface{}{"name": pass}))
+		fmt.Println(i18n.GetMsgByKeyForCmd("UserInfoPassHelp") + "1pctl update password")
 		return nil
 	},
 }

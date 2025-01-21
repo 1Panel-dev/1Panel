@@ -30,5 +30,5 @@ export const getLanguage = () => {
 };
 
 export const checkIsIntl = () => {
-    return http.get<boolean>('/auth/intl');
+    return http.get<boolean>('/core/auth/intl');
 };

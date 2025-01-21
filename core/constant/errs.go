@@ -82,4 +82,6 @@ var (
 	ErrNodeBound     = "ErrNodeBound"
 	ErrNodeBind      = "ErrNodeBind"
 	ConnInfoNotMatch = "ConnInfoNotMatch"
+
+	ErrAlertSync = "ErrAlertSync"
 )

@@ -3,11 +3,16 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/1Panel-dev/1Panel/core/constant"
+	"github.com/1Panel-dev/1Panel/core/i18n"
 	"github.com/spf13/cobra"
 )
 
 func init() {
+	resetCmd.SetHelpFunc(func(c *cobra.Command, s []string) {
+		i18n.UseI18nForCmd(language)
+		loadResetHelper()
+	})
+
 	RootCmd.AddCommand(resetCmd)
 	resetCmd.AddCommand(resetMFACmd)
 	resetCmd.AddCommand(resetSSLCmd)
@@ -17,16 +22,20 @@ func init() {
 }
 
 var resetCmd = &cobra.Command{
-	Use:   "reset",
-	Short: "重置系统信息",
+	Use: "reset",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		i18n.UseI18nForCmd(language)
+		loadResetHelper()
+		return nil
+	},
 }
 
 var resetMFACmd = &cobra.Command{
-	Use:   "mfa",
-	Short: "取消 1Panel 两步验证",
+	Use: "mfa",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		i18n.UseI18nForCmd(language)
 		if !isRoot() {
-			fmt.Println("请使用 sudo 1pctl reset mfa 或者切换到 root 用户")
+			fmt.Println(i18n.GetMsgWithMapForCmd("SudoHelper", map[string]interface{}{"cmd": "sudo 1pctl reset mfa"}))
 			return nil
 		}
 		db, err := loadDBConn()
@@ -34,15 +43,15 @@ var resetMFACmd = &cobra.Command{
 			return err
 		}
 
-		return setSettingByKey(db, "MFAStatus", constant.StatusDisable)
+		return setSettingByKey(db, "MFAStatus", "disable")
 	},
 }
 var resetSSLCmd = &cobra.Command{
-	Use:   "https",
-	Short: "取消 1Panel https 方式登录",
+	Use: "https",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		i18n.UseI18nForCmd(language)
 		if !isRoot() {
-			fmt.Println("请使用 sudo 1pctl reset https 或者切换到 root 用户")
+			fmt.Println(i18n.GetMsgWithMapForCmd("SudoHelper", map[string]interface{}{"cmd": "sudo 1pctl reset https"}))
 			return nil
 		}
 		db, err := loadDBConn()
@@ -50,15 +59,15 @@ var resetSSLCmd = &cobra.Command{
 			return err
 		}
 
-		return setSettingByKey(db, "SSL", constant.StatusDisable)
+		return setSettingByKey(db, "SSL", "disable")
 	},
 }
 var resetEntranceCmd = &cobra.Command{
-	Use:   "entrance",
-	Short: "取消 1Panel 安全入口",
+	Use: "entrance",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		i18n.UseI18nForCmd(language)
 		if !isRoot() {
-			fmt.Println("请使用 sudo 1pctl reset entrance 或者切换到 root 用户")
+			fmt.Println(i18n.GetMsgWithMapForCmd("SudoHelper", map[string]interface{}{"cmd": "sudo 1pctl reset entrance"}))
 			return nil
 		}
 		db, err := loadDBConn()
@@ -70,11 +79,11 @@ var resetEntranceCmd = &cobra.Command{
 	},
 }
 var resetBindIpsCmd = &cobra.Command{
-	Use:   "ips",
-	Short: "取消 1Panel 授权 IP 限制",
+	Use: "ips",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		i18n.UseI18nForCmd(language)
 		if !isRoot() {
-			fmt.Println("请使用 sudo 1pctl reset ips 或者切换到 root 用户")
+			fmt.Println(i18n.GetMsgWithMapForCmd("SudoHelper", map[string]interface{}{"cmd": "sudo 1pctl reset ips"}))
 			return nil
 		}
 		db, err := loadDBConn()
@@ -86,11 +95,11 @@ var resetBindIpsCmd = &cobra.Command{
 	},
 }
 var resetDomainCmd = &cobra.Command{
-	Use:   "domain",
-	Short: "取消 1Panel 访问域名绑定",
+	Use: "domain",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		i18n.UseI18nForCmd(language)
 		if !isRoot() {
-			fmt.Println("请使用 sudo 1pctl reset domain 或者切换到 root 用户")
+			fmt.Println(i18n.GetMsgWithMapForCmd("SudoHelper", map[string]interface{}{"cmd": "sudo 1pctl reset domain"}))
 			return nil
 		}
 		db, err := loadDBConn()
@@ -100,4 +109,16 @@ var resetDomainCmd = &cobra.Command{
 
 		return setSettingByKey(db, "BindDomain", "")
 	},
+}
+
+func loadResetHelper() {
+	fmt.Println(i18n.GetMsgByKeyForCmd("ResetCommands"))
+	fmt.Println("\nUsage:\n  1panel reset [command]\n\nAvailable Commands:")
+	fmt.Println("\n  domain      " + i18n.GetMsgByKeyForCmd("ResetDomain"))
+	fmt.Println("  entrance    " + i18n.GetMsgByKeyForCmd("ResetEntrance"))
+	fmt.Println("  https       " + i18n.GetMsgByKeyForCmd("ResetHttps"))
+	fmt.Println("  ips         " + i18n.GetMsgByKeyForCmd("ResetIPs"))
+	fmt.Println("  mfa         " + i18n.GetMsgByKeyForCmd("ResetMFA"))
+	fmt.Println("\nFlags:\n  -h, --help   help for reset")
+	fmt.Println("\nUse \"1panel reset [command] --help\" for more information about a command.")
 }

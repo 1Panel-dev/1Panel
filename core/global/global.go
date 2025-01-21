@@ -20,7 +20,8 @@ var (
 	SESSION *psession.PSession
 	Viper   *viper.Viper
 
-	I18n *i18n.Localizer
+	I18n       *i18n.Localizer
+	I18nForCmd *i18n.Localizer
 
 	Cron *cron.Cron
 )

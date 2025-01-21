@@ -145,6 +145,25 @@ func HandleUnTar(sourceFile, targetDir string, secret string) error {
 	return nil
 }
 
+func DownloadFile(url, dst string) error {
+	resp, err := httpUtil.GetHttpRes(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	out, err := os.Create(dst)
+	if err != nil {
+		return fmt.Errorf("create download file [%s] error, err %s", dst, err.Error())
+	}
+	defer out.Close()
+
+	if _, err = io.Copy(out, resp.Body); err != nil {
+		return fmt.Errorf("save download file [%s] error, err %s", dst, err.Error())
+	}
+	return nil
+}
+
 func DownloadFileWithProxy(url, dst string) error {
 	_, resp, err := httpUtil.HandleGet(url, http.MethodGet, constant.TimeOut5m)
 	if err != nil {

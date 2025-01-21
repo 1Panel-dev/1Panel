@@ -9,8 +9,8 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
+	"github.com/1Panel-dev/1Panel/core/i18n"
 	"github.com/1Panel-dev/1Panel/core/utils/cmd"
 	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
@@ -19,6 +19,11 @@ import (
 )
 
 func init() {
+	updateCmd.SetHelpFunc(func(c *cobra.Command, s []string) {
+		i18n.UseI18nForCmd(language)
+		loadUpdateHelper()
+	})
+
 	RootCmd.AddCommand(updateCmd)
 	updateCmd.AddCommand(updateUserName)
 	updateCmd.AddCommand(updatePassword)
@@ -26,16 +31,21 @@ func init() {
 }
 
 var updateCmd = &cobra.Command{
-	Use:   "update",
-	Short: "修改面板信息",
+	Use: "update",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		i18n.UseI18nForCmd(language)
+		loadUpdateHelper()
+		return nil
+	},
 }
 
 var updateUserName = &cobra.Command{
 	Use:   "username",
-	Short: "修改面板用户",
+	Short: i18n.GetMsgByKeyForCmd("UpdateUser"),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		i18n.UseI18nForCmd(language)
 		if !isRoot() {
-			fmt.Println("请使用 sudo 1pctl update username 或者切换到 root 用户")
+			fmt.Println(i18n.GetMsgWithMapForCmd("SudoHelper", map[string]interface{}{"cmd": "sudo 1pctl update username"}))
 			return nil
 		}
 		username()
@@ -44,10 +54,11 @@ var updateUserName = &cobra.Command{
 }
 var updatePassword = &cobra.Command{
 	Use:   "password",
-	Short: "修改面板密码",
+	Short: i18n.GetMsgByKeyForCmd("UpdatePassword"),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		i18n.UseI18nForCmd(language)
 		if !isRoot() {
-			fmt.Println("请使用 sudo 1pctl update password 或者切换到 root 用户")
+			fmt.Println(i18n.GetMsgWithMapForCmd("SudoHelper", map[string]interface{}{"cmd": "sudo 1pctl update password"}))
 			return nil
 		}
 		password()
@@ -56,10 +67,11 @@ var updatePassword = &cobra.Command{
 }
 var updatePort = &cobra.Command{
 	Use:   "port",
-	Short: "修改面板端口",
+	Short: i18n.GetMsgByKeyForCmd("UpdatePort"),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		i18n.UseI18nForCmd(language)
 		if !isRoot() {
-			fmt.Println("请使用 sudo 1pctl update port 或者切换到 root 用户")
+			fmt.Println(i18n.GetMsgWithMapForCmd("SudoHelper", map[string]interface{}{"cmd": "sudo 1pctl update port"}))
 			return nil
 		}
 		port()
@@ -69,83 +81,83 @@ var updatePort = &cobra.Command{
 
 func username() {
 	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("修改面板用户: ")
+	fmt.Print(i18n.GetMsgByKeyForCmd("UpdateUser") + ": ")
 	newUsername, _ := reader.ReadString('\n')
 	newUsername = strings.Trim(newUsername, "\n")
 	if len(newUsername) == 0 {
-		fmt.Println("错误：输入面板用户为空！")
+		fmt.Println(i18n.GetMsgByKeyForCmd("UpdateUserNull"))
 		return
 	}
 	if strings.Contains(newUsername, " ") {
-		fmt.Println("错误：输入面板用户中包含空格字符！")
+		fmt.Println(i18n.GetMsgByKeyForCmd("UpdateUserBlank"))
 		return
 	}
 	result, err := regexp.MatchString("^[a-zA-Z0-9_\u4e00-\u9fa5]{3,30}$", newUsername)
 	if !result || err != nil {
-		fmt.Println("错误：输入面板用户错误！仅支持英文、中文、数字和_,长度3-30")
+		fmt.Println(i18n.GetMsgByKeyForCmd("UpdateUserFormat"))
 		return
 	}
 
 	db, err := loadDBConn()
 	if err != nil {
-		fmt.Printf("错误：初始化数据库连接失败，%v\n", err)
+		fmt.Println(i18n.GetMsgWithMapForCmd("DBConnErr", map[string]interface{}{"err": err.Error()}))
 		return
 	}
 	if err := setSettingByKey(db, "UserName", newUsername); err != nil {
-		fmt.Printf("错误：面板用户修改失败，%v\n", err)
+		fmt.Println(i18n.GetMsgWithMapForCmd("UpdateUserErr", map[string]interface{}{"err": err.Error()}))
 		return
 	}
 
-	fmt.Printf("修改成功！\n\n")
-	fmt.Printf("面板用户：%s\n", newUsername)
+	fmt.Println("\n" + i18n.GetMsgByKeyForCmd("UpdateSuccessful"))
+	fmt.Println(i18n.GetMsgWithMapForCmd("UpdateUserResult", map[string]interface{}{"name": newUsername}))
 }
 
 func password() {
-	fmt.Print("修改面板密码：")
+	fmt.Print(i18n.GetMsgByKeyForCmd("UpdatePassword") + ": ")
 	bytePassword, err := term.ReadPassword(int(os.Stdin.Fd()))
 	if err != nil {
-		fmt.Printf("\n错误：面板密码信息读取错误，%v\n", err)
+		fmt.Println("\n" + i18n.GetMsgWithMapForCmd("UpdatePasswordRead", map[string]interface{}{"err": err.Error()}))
 		return
 	}
 	newPassword := string(bytePassword)
 	newPassword = strings.Trim(newPassword, "\n")
 
 	if len(newPassword) == 0 {
-		fmt.Println("\n错误：输入面板密码为空！")
+		fmt.Println("\n", i18n.GetMsgByKeyForCmd("UpdatePasswordNull"))
 		return
 	}
 	if strings.Contains(newPassword, " ") {
-		fmt.Println("\n错误：输入面板密码中包含空格字符！")
+		fmt.Println("\n" + i18n.GetMsgByKeyForCmd("UpdateUPasswordBlank"))
 		return
 	}
 	db, err := loadDBConn()
 	if err != nil {
-		fmt.Printf("\n错误：初始化数据库连接失败，%v\n", err)
+		fmt.Println("\n" + i18n.GetMsgWithMapForCmd("DBConnErr", map[string]interface{}{"err": err.Error()}))
 		return
 	}
 	complexSetting := getSettingByKey(db, "ComplexityVerification")
-	if complexSetting == constant.StatusEnable {
+	if complexSetting == "enable" {
 		if isValidPassword("newPassword") {
-			fmt.Println("\n错误：面板密码仅支持字母、数字、特殊字符（!@#$%*_,.?），长度 8-30 位！")
+			fmt.Println("\n" + i18n.GetMsgByKeyForCmd("UpdatePasswordFormat"))
 			return
 		}
 	}
 	if len(newPassword) < 6 {
-		fmt.Println("错误：请输入 6 位以上密码！")
+		fmt.Println(i18n.GetMsgByKeyForCmd("UpdatePasswordLen"))
 		return
 	}
 
-	fmt.Print("\n确认密码：")
+	fmt.Print("\n" + i18n.GetMsgByKeyForCmd("UpdatePasswordRe"))
 	byteConfirmPassword, err := term.ReadPassword(int(os.Stdin.Fd()))
 	if err != nil {
-		fmt.Printf("\n错误：面板密码信息读取错误，%v\n", err)
+		fmt.Println("\n" + i18n.GetMsgWithMapForCmd("UpdatePasswordRead", map[string]interface{}{"err": err.Error()}))
 		return
 	}
 	confirmPassword := string(byteConfirmPassword)
 	confirmPassword = strings.Trim(confirmPassword, "\n")
 
 	if newPassword != confirmPassword {
-		fmt.Printf("\n错误：两次密码不匹配，请检查后重试！，%v\n", err)
+		fmt.Println("\n", i18n.GetMsgByKeyForCmd("UpdatePasswordSame"))
 		return
 	}
 
@@ -158,43 +170,43 @@ func password() {
 		p = newPassword
 	}
 	if err := setSettingByKey(db, "Password", p); err != nil {
-		fmt.Printf("\n错误：面板密码修改失败，%v\n", err)
+		fmt.Println("\n", i18n.GetMsgWithMapForCmd("UpdatePortErr", map[string]interface{}{"err": err.Error()}))
 		return
 	}
 	username := getSettingByKey(db, "UserName")
 
-	fmt.Printf("\n修改成功！\n\n")
-	fmt.Printf("面板用户：%s\n", username)
-	fmt.Printf("面板密码：%s\n", string(newPassword))
+	fmt.Println("\n" + i18n.GetMsgByKeyForCmd("UpdateSuccessful"))
+	fmt.Println(i18n.GetMsgWithMapForCmd("UpdateUserResult", map[string]interface{}{"name": username}))
+	fmt.Println(i18n.GetMsgWithMapForCmd("UpdatePasswordResult", map[string]interface{}{"name": string(newPassword)}))
 }
 
 func port() {
 	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("修改面板端口：")
+	fmt.Print(i18n.GetMsgByKeyForCmd("UpdatePort") + ": ")
 
 	newPortStr, _ := reader.ReadString('\n')
 	newPortStr = strings.Trim(newPortStr, "\n")
 	newPort, err := strconv.Atoi(strings.TrimSpace(newPortStr))
 	if err != nil || newPort < 1 || newPort > 65535 {
-		fmt.Println("错误：输入的端口号必须在 1 到 65535 之间！")
+		fmt.Println(i18n.GetMsgByKeyForCmd("UpdatePortFormat"))
 		return
 	}
 	if common.ScanPort(newPort) {
-		fmt.Println("错误：该端口号正被占用，请检查后重试！")
+		fmt.Println(i18n.GetMsgByKeyForCmd("UpdatePortUsed"))
 		return
 	}
 	db, err := loadDBConn()
 	if err != nil {
-		fmt.Printf("错误：初始化数据库连接失败，%v\n", err)
+		fmt.Println(i18n.GetMsgWithMapForCmd("DBConnErr", map[string]interface{}{"err": err.Error()}))
 		return
 	}
 	if err := setSettingByKey(db, "ServerPort", newPortStr); err != nil {
-		fmt.Printf("错误：面板端口修改失败，%v\n", err)
+		fmt.Println(i18n.GetMsgWithMapForCmd("UpdatePortErr", map[string]interface{}{"err": err.Error()}))
 		return
 	}
 
-	fmt.Printf("修改成功！\n\n")
-	fmt.Printf("面板端口：%s\n", newPortStr)
+	fmt.Println("\n" + i18n.GetMsgByKeyForCmd("UpdateSuccessful"))
+	fmt.Println(i18n.GetMsgWithMapForCmd("UpdatePortResult", map[string]interface{}{"name": newPortStr}))
 
 	std, err := cmd.Exec("1pctl restart")
 	if err != nil {
@@ -238,4 +250,14 @@ func contains(specialChars string, char rune) bool {
 		}
 	}
 	return false
+}
+
+func loadUpdateHelper() {
+	fmt.Println(i18n.GetMsgByKeyForCmd("UpdateCommands"))
+	fmt.Println("\nUsage:\n  1panel update [command]\n\nAvailable Commands:")
+	fmt.Println("\n  password    " + i18n.GetMsgByKeyForCmd("UpdatePassword"))
+	fmt.Println("  port        " + i18n.GetMsgByKeyForCmd("UpdatePort"))
+	fmt.Println("  username    " + i18n.GetMsgByKeyForCmd("UpdateUser"))
+	fmt.Println("\nFlags:\n  -h, --help   help for update")
+	fmt.Println("\nUse \"1panel update [command] --help\" for more information about a command.")
 }

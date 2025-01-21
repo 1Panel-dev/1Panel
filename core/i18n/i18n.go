@@ -133,3 +133,45 @@ func Init() {
 	_, _ = bundle.LoadMessageFileFS(fs, "lang/ms.yaml")
 	_, _ = bundle.LoadMessageFileFS(fs, "lang/ko.yaml")
 }
+
+func UseI18nForCmd(lang string) {
+	if lang == "" {
+		lang = "en"
+	}
+
+	if bundle == nil {
+		Init()
+	}
+	global.I18nForCmd = i18n.NewLocalizer(bundle, lang)
+}
+func GetMsgByKeyForCmd(key string) string {
+	if global.I18nForCmd == nil {
+		UseI18nForCmd("")
+	}
+	content, _ := global.I18nForCmd.Localize(&i18n.LocalizeConfig{
+		MessageID: key,
+	})
+	return content
+}
+func GetMsgWithMapForCmd(key string, maps map[string]interface{}) string {
+	if global.I18nForCmd == nil {
+		UseI18nForCmd("")
+	}
+	var content string
+	if maps == nil {
+		content, _ = global.I18nForCmd.Localize(&i18n.LocalizeConfig{
+			MessageID: key,
+		})
+	} else {
+		content, _ = global.I18nForCmd.Localize(&i18n.LocalizeConfig{
+			MessageID:    key,
+			TemplateData: maps,
+		})
+	}
+	content = strings.ReplaceAll(content, ": <no value>", "")
+	if content == "" {
+		return key
+	} else {
+		return content
+	}
+}

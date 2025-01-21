@@ -1,89 +1,77 @@
 <template>
-    <div>
-        <el-drawer
-            v-model="drawerVisible"
-            :destroy-on-close="true"
-            :close-on-click-modal="false"
-            :close-on-press-escape="false"
-            size="30%"
-        >
-            <template #header>
-                <DrawerHeader :header="$t('xpack.theme.customColor')" :back="handleClose" />
-            </template>
-            <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
-                <el-row type="flex" justify="center">
-                    <el-col :span="22">
-                        <el-form-item :label="$t('setting.light')" prop="light">
-                            <div class="flex flex-wrap justify-between items-center sm:items-start">
+    <DrawerPro v-model="drawerVisible" :header="$t('xpack.theme.customColor')" :back="handleClose" size="small">
+        <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
+            <el-row type="flex" justify="center">
+                <el-col :span="22">
+                    <el-form-item :label="$t('setting.light')" prop="light">
+                        <div class="flex flex-wrap justify-between items-center sm:items-start">
+                            <div class="flex gap-1">
+                                <template v-for="colorConfig in lightColors" :key="colorConfig.color">
+                                    <el-tooltip :content="$t(colorConfig.label)" placement="top">
+                                        <el-button
+                                            :color="colorConfig.color"
+                                            :class="form.light === colorConfig.color ? 'selected-white' : ''"
+                                            circle
+                                            dark
+                                            @click="changeLightColor(colorConfig.color)"
+                                        />
+                                    </el-tooltip>
+                                </template>
+                                <el-color-picker
+                                    v-model="form.light"
+                                    class="ml-4"
+                                    :predefine="lightPredefineColors"
+                                    show-alpha
+                                    @change="changeThemeColor('light', form.light)"
+                                />
+                            </div>
+                        </div>
+                    </el-form-item>
+
+                    <el-form-item :label="$t('setting.dark')" prop="dark">
+                        <div class="flex flex-wrap justify-between items-center sm:items-start">
+                            <div class="flex flex-wrap justify-between items-center mt-4 sm:mt-0">
                                 <div class="flex gap-1">
-                                    <template v-for="colorConfig in lightColors" :key="colorConfig.color">
+                                    <template v-for="colorConfig in darkColors" :key="colorConfig.color">
                                         <el-tooltip :content="$t(colorConfig.label)" placement="top">
                                             <el-button
                                                 :color="colorConfig.color"
-                                                :class="form.light === colorConfig.color ? 'selected-white' : ''"
+                                                :class="form.dark === colorConfig.color ? 'selected-white' : ''"
                                                 circle
                                                 dark
-                                                @click="changeLightColor(colorConfig.color)"
+                                                @click="changeDarkColor(colorConfig.color)"
                                             />
                                         </el-tooltip>
                                     </template>
                                     <el-color-picker
-                                        v-model="form.light"
+                                        v-model="form.dark"
                                         class="ml-4"
-                                        :predefine="lightPredefineColors"
+                                        :predefine="darkPredefineColors"
                                         show-alpha
-                                        @change="changeThemeColor('light', form.light)"
+                                        @change="changeThemeColor('dark', form.dark)"
                                     />
                                 </div>
                             </div>
-                        </el-form-item>
-
-                        <el-form-item :label="$t('setting.dark')" prop="dark">
-                            <div class="flex flex-wrap justify-between items-center sm:items-start">
-                                <div class="flex flex-wrap justify-between items-center mt-4 sm:mt-0">
-                                    <div class="flex gap-1">
-                                        <template v-for="colorConfig in darkColors" :key="colorConfig.color">
-                                            <el-tooltip :content="$t(colorConfig.label)" placement="top">
-                                                <el-button
-                                                    :color="colorConfig.color"
-                                                    :class="form.dark === colorConfig.color ? 'selected-white' : ''"
-                                                    circle
-                                                    dark
-                                                    @click="changeDarkColor(colorConfig.color)"
-                                                />
-                                            </el-tooltip>
-                                        </template>
-                                        <el-color-picker
-                                            v-model="form.dark"
-                                            class="ml-4"
-                                            :predefine="darkPredefineColors"
-                                            show-alpha
-                                            @change="changeThemeColor('dark', form.dark)"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </el-form-item>
-                    </el-col>
-                </el-row>
-            </el-form>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="onReSet">{{ $t('xpack.theme.setDefault') }}</el-button>
-                    <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button :disabled="loading" type="primary" @click="onSave(formRef)">
-                        {{ $t('commons.button.confirm') }}
-                    </el-button>
-                </span>
-            </template>
-        </el-drawer>
-    </div>
+                        </div>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+        </el-form>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="onReSet">{{ $t('xpack.theme.setDefault') }}</el-button>
+                <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button :disabled="loading" type="primary" @click="onSave(formRef)">
+                    {{ $t('commons.button.confirm') }}
+                </el-button>
+            </span>
+        </template>
+    </DrawerPro>
 </template>
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import DrawerHeader from '@/components/drawer-header/index.vue';
 import { FormInstance } from 'element-plus';
 import { initFavicon, updateXpackSettingByKey } from '@/utils/xpack';
 import { setPrimaryColor } from '@/utils/theme';

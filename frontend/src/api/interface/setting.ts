@@ -228,6 +228,8 @@ export namespace Setting {
     export interface LicenseStatus {
         productPro: string;
         status: string;
+        smsTotal: number;
+        smsUsed: number;
     }
     export interface NodeItem {
         id: number;

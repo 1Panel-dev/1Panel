@@ -15,6 +15,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/init/cron"
 	"github.com/1Panel-dev/1Panel/core/init/db"
 	"github.com/1Panel-dev/1Panel/core/init/hook"
+	"github.com/1Panel-dev/1Panel/core/init/lang"
 	"github.com/1Panel-dev/1Panel/core/init/log"
 	"github.com/1Panel-dev/1Panel/core/init/migration"
 	"github.com/1Panel-dev/1Panel/core/init/router"
@@ -33,6 +34,7 @@ func Start() {
 	db.Init()
 	migration.Init()
 	validator.Init()
+	lang.Init()
 	gob.Register(psession.SessionUser{})
 	cron.Init()
 	session.Init()

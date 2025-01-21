@@ -3,50 +3,59 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/1Panel-dev/1Panel/core/constant"
+	"github.com/1Panel-dev/1Panel/core/i18n"
 	"github.com/spf13/cobra"
 )
 
 func init() {
+	listenCmd.SetHelpFunc(func(c *cobra.Command, s []string) {
+		i18n.UseI18nForCmd(language)
+		loadListenIPHelper()
+	})
+
 	RootCmd.AddCommand(listenCmd)
 	listenCmd.AddCommand(listenIpv4Cmd)
 	listenCmd.AddCommand(listenIpv6Cmd)
 }
 
 var listenCmd = &cobra.Command{
-	Use:   "listen-ip",
-	Short: "切换监听 IP",
+	Use: "listen-ip",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		i18n.UseI18nForCmd(language)
+		loadListenIPHelper()
+		return nil
+	},
 }
 
 var listenIpv4Cmd = &cobra.Command{
-	Use:   "ipv4",
-	Short: "监听 IPv4",
+	Use: "ipv4",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		i18n.UseI18nForCmd(language)
 		return updateBindInfo("ipv4")
 	},
 }
 var listenIpv6Cmd = &cobra.Command{
-	Use:   "ipv6",
-	Short: "监听 IPv6",
+	Use: "ipv6",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		i18n.UseI18nForCmd(language)
 		return updateBindInfo("ipv6")
 	},
 }
 
 func updateBindInfo(protocol string) error {
 	if !isRoot() {
-		fmt.Println("请使用 sudo 1pctl listen-ip ipv6 或者切换到 root 用户")
+		fmt.Println(i18n.GetMsgWithMapForCmd("SudoHelper", map[string]interface{}{"cmd": "sudo 1pctl listen-ip ipv6"}))
 		return nil
 	}
 	db, err := loadDBConn()
 	if err != nil {
 		return err
 	}
-	ipv6 := constant.StatusDisable
+	ipv6 := "disable"
 	tcp := "tcp4"
 	address := "0.0.0.0"
 	if protocol == "ipv6" {
-		ipv6 = constant.StatusEnable
+		ipv6 = "enable"
 		tcp = "tcp6"
 		address = "::"
 	}
@@ -56,6 +65,15 @@ func updateBindInfo(protocol string) error {
 	if err := setSettingByKey(db, "BindAddress", address); err != nil {
 		return err
 	}
-	fmt.Printf("切换成功！已切换至监听 %s [%s]", tcp, address)
+	fmt.Println(i18n.GetMsgWithMapForCmd("ListenChangeSuccessful", map[string]interface{}{"value": fmt.Sprintf(" %s [%s]", tcp, address)}))
 	return nil
+}
+
+func loadListenIPHelper() {
+	fmt.Println(i18n.GetMsgByKeyForCmd("UpdateCommands"))
+	fmt.Println("\nUsage:\n  1panel listen-ip [command]\n\nAvailable Commands:")
+	fmt.Println("\n  ipv4        " + i18n.GetMsgByKeyForCmd("ListenIPv4"))
+	fmt.Println("  ipv6        " + i18n.GetMsgByKeyForCmd("ListenIPv6"))
+	fmt.Println("\nFlags:\n  -h, --help   help for listen-ip")
+	fmt.Println("\nUse \"1panel listen-ip [command] --help\" for more information about a command.")
 }
