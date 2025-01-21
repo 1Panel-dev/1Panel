@@ -43,19 +43,19 @@
         <el-scrollbar>
             <el-menu
                 :default-active="activeMenu"
-                :router="menuRouter"
+                :router="true"
                 :collapse="isCollapse"
                 :collapse-transition="false"
                 :unique-opened="true"
                 @select="handleMenuClick"
             >
                 <SubItem :menuList="routerMenus" />
-                <el-menu-item :index="''">
-                    <el-icon @click="logout">
+                <el-menu-item :index="''" @click="logout">
+                    <el-icon>
                         <SvgIcon :iconName="'p-logout'" />
                     </el-icon>
                     <template #title>
-                        <span @click="logout">{{ $t('commons.login.logout') }}</span>
+                        <span>{{ $t('commons.login.logout') }}</span>
                     </template>
                 </el-menu-item>
             </el-menu>
@@ -65,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, defineEmits } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { RouteRecordRaw, useRoute } from 'vue-router';
 import { loadingSvg } from '@/utils/svg';
 import Logo from './components/Logo.vue';
@@ -96,13 +96,6 @@ bus.on('refreshTask', () => {
     checkTask();
 });
 
-defineProps({
-    menuRouter: {
-        type: Boolean,
-        default: true,
-        required: false,
-    },
-});
 const activeMenu = computed(() => {
     const { meta, path } = route;
     return isString(meta.activeMenu) ? meta.activeMenu : path;
@@ -266,7 +259,7 @@ const search = async () => {
             rstMenuList.push(menuItem);
         } else {
             menuItem.children.forEach((child: any) => {
-                if (child.hidden == undefined || child.hidden == false) {
+                if (!child.hidden) {
                     menuChildren.push(child);
                 }
             });
@@ -305,7 +298,14 @@ onMounted(() => {
 </script>
 
 <style lang="scss">
-@use './index.scss';
+@use 'index';
+
+.custom-menu .el-menu-item {
+    white-space: normal !important;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    line-height: normal;
+}
 
 .sidebar-container {
     position: relative;

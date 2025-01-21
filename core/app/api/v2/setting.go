@@ -197,7 +197,7 @@ func (b *BaseApi) UpdateSSL(c *gin.Context) {
 
 // @Tags System Setting
 // @Summary Load system cert info
-// @Success 200 {object} dto.SettingInfo
+// @Success 200 {object} dto.SSLInfo
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /core/settings/ssl/info [get]
@@ -229,7 +229,7 @@ func (b *BaseApi) DownloadSSL(c *gin.Context) {
 // @Tags System Setting
 // @Summary Load system address
 // @Accept json
-// @Success 200
+// @Success 200 {array} string
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /core/settings/interface [get]
@@ -386,7 +386,7 @@ func (b *BaseApi) ReloadSSL(c *gin.Context) {
 // @Tags System Setting
 // @Summary generate api key
 // @Accept json
-// @Success 200
+// @Success 200 {string} key
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /settings/api/config/generate/key [post]

@@ -24,7 +24,7 @@ import (
 // @Summary Create host
 // @Accept json
 // @Param request body dto.HostOperate true "request"
-// @Success 200
+// @Success 200 {object} dto.HostInfo
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /core/hosts [post]
@@ -47,7 +47,7 @@ func (b *BaseApi) CreateHost(c *gin.Context) {
 // @Summary Test host conn by info
 // @Accept json
 // @Param request body dto.HostConnTest true "request"
-// @Success 200
+// @Success 200 {boolean} status
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /core/hosts/test/byinfo [post]
@@ -112,7 +112,7 @@ func (b *BaseApi) HostTree(c *gin.Context) {
 // @Summary Page host
 // @Accept json
 // @Param request body dto.SearchHostWithPage true "request"
-// @Success 200 {array} dto.HostTree
+// @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /core/hosts/search [post]

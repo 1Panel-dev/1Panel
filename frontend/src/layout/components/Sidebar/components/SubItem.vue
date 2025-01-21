@@ -39,5 +39,5 @@ defineProps<{ menuList: RouteRecordRaw[] }>();
 </script>
 
 <style scoped lang="scss">
-@use '../index.scss';
+@use '../index';
 </style>

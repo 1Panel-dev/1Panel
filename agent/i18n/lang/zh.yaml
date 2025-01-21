@@ -1,20 +1,31 @@
 ErrInvalidParams: "请求参数错误: {{ .detail }}"
+ErrTokenParse: "Token 生成错误: {{ .detail }}"
+ErrInitialPassword: "原密码错误"
 ErrInternalServer: "服务内部错误: {{ .detail }}"
 ErrRecordExist: "记录已存在"
 ErrRecordNotFound: "记录未能找到"
 ErrStructTransform: "类型转换失败: {{ .detail }}"
+ErrNotLogin: "用户未登录: {{ .detail }}"
+ErrPasswordExpired: "当前密码已过期: {{ .detail }}"
 ErrNotSupportType: "系统暂不支持当前类型: {{ .detail }}"
+ErrProxy: "请求错误，请检查该节点状态: {{ .detail }}"
+ErrApiConfigStatusInvalid: "API 接口禁止访问: {{ .detail }}"
+ErrApiConfigKeyInvalid: "API 接口密钥错误: {{ .detail }}"
+ErrApiConfigIPInvalid: "调用 API 接口 IP 不在白名单: {{ .detail }}"
+ErrApiConfigDisable: "此接口禁止使用 API 接口调用: {{ .detail }}"
+ErrApiConfigKeyTimeInvalid: "API 接口时间戳错误: {{ .detail }}"
 
 #common
 ErrNameIsExist: "名称已存在"
 ErrDemoEnvironment: "演示服务器，禁止此操作!"
 ErrCmdTimeout: "命令执行超时！"
 ErrCmdIllegal: "执行命令中存在不合法字符，请修改后重试！"
-ErrPortExist: "{{ .port }} 端口已被 {{ .type }} [{{ .name }}] 占用"
+ErrPortExist: '{{ .port }} 端口已被 {{ .type }} [{{ .name }}] 占用'
 TYPE_APP: "应用"
 TYPE_RUNTIME: "运行环境"
 TYPE_DOMAIN: "域名"
-ErrTypePort: "端口 {{ .name }} 格式错误"
+ErrTypePort: '端口 {{ .name }} 格式错误'
+ErrTypePortRange: '端口范围需要在 1-65535 之间'
 Success: "成功"
 Failed: "失败"
 SystemRestart: "系统重启导致任务中断"
@@ -33,16 +44,16 @@ ErrNotInstall: "应用未安装"
 ErrPortInOtherApp: "{{ .port }} 端口已被应用 {{ .apps }} 占用！"
 ErrDbUserNotValid: "存量数据库，用户名密码不匹配！"
 ErrDockerComposeNotValid: "docker-compose 文件格式错误"
-ErrUpdateBuWebsite: "应用更新成功，但是网站配置文件修改失败，请检查配置！"
-Err1PanelNetworkFailed: "默认容器网络创建失败！{{ .detail }}"
-ErrFileParse: "应用 docker-compose 文件解析失败!"
-ErrInstallDirNotFound: "安装目录不存在，如需卸载，请选择强制卸载"
-AppStoreIsUpToDate: "应用商店已经是最新版本"
-LocalAppVersionNull: "{{.name}} 应用未同步到版本！无法添加到应用列表"
-LocalAppVersionErr: "{{.name}} 同步版本 {{.version}} 失败！{{.err}}"
-ErrFileNotFound: "{{.name}} 文件不存在"
-ErrFileParseApp: "{{.name}} 文件解析失败 {{.err}}"
-ErrAppDirNull: "版本文件夹不存在"
+ErrUpdateBuWebsite: '应用更新成功，但是网站配置文件修改失败，请检查配置！'
+Err1PanelNetworkFailed: '默认容器网络创建失败！{{ .detail }}'
+ErrFileParse: '应用 docker-compose 文件解析失败!'
+ErrInstallDirNotFound: '安装目录不存在，如需卸载，请选择强制卸载'
+AppStoreIsUpToDate: '应用商店已经是最新版本'
+LocalAppVersionNull: '{{.name}} 应用未同步到版本！无法添加到应用列表'
+LocalAppVersionErr: '{{.name}} 同步版本 {{.version}} 失败！{{.err}}'
+ErrFileNotFound: '{{.name}} 文件不存在'
+ErrFileParseApp: '{{.name}} 文件解析失败 {{.err}}'
+ErrAppDirNull: '版本文件夹不存在'
 LocalAppErr: "应用 {{.name}} 同步失败！{{.err}}"
 ErrContainerName: "容器名称已存在"
 ErrAppSystemRestart: "1Panel 重启导致任务终止"
@@ -51,14 +62,14 @@ ErrHttpReqTimeOut: "请求超时 {{.err}}"
 ErrHttpReqFailed: "请求失败 {{.err}}"
 ErrHttpReqNotFound: "文件不存在"
 ErrNoSuchHost: "网络连接失败"
-ErrImagePullTimeOut: "镜像拉取超时"
-ErrContainerNotFound: "{{ .name }} 容器不存在"
-ErrContainerMsg: "{{ .name }} 容器异常，具体请在容器页面查看日志"
-ErrAppBackup: "{{ .name }} 应用备份失败 err {{.err}}"
-ErrImagePull: "镜像拉取失败 {{.err}}"
-ErrVersionTooLow: "当前 1Panel 版本过低，无法更新应用商店，请升级版本之后操作"
-ErrAppNameExist: "应用名称已存在"
-AppStoreIsSyncing: "应用商店正在同步中，请稍后再试"
+ErrImagePullTimeOut: '镜像拉取超时'
+ErrContainerNotFound: '{{ .name }} 容器不存在'
+ErrContainerMsg: '{{ .name }} 容器异常，具体请在容器页面查看日志'
+ErrAppBackup: '{{ .name }} 应用备份失败 err {{.err}}'
+ErrImagePull: '镜像拉取失败 {{.err}}'
+ErrVersionTooLow: '当前 1Panel 版本过低，无法更新应用商店，请升级版本之后操作'
+ErrAppNameExist: '应用名称已存在'
+AppStoreIsSyncing: '应用商店正在同步中，请稍后再试'
 ErrGetCompose: "docker-compose.yml 文件获取失败！{{ .detail }}"
 ErrAppWarn: "状态异常，请查看日志"
 ErrAppParamKey: "参数 {{ .name }} 字段异常"
@@ -84,7 +95,7 @@ PullImageTimeout: "拉取镜像超时,请尝试增加镜像加速或者更换其
 
 #file
 ErrFileCanNotRead: "此文件不支持预览"
-ErrFileToLarge: "文件超过10M,无法打开"
+ErrFileToLarge: "文件超过10M，无法打开"
 ErrPathNotFound: "目录不存在"
 ErrMovePathFailed: "目标路径不能包含原路径！"
 ErrLinkPathNotFound: "目标路径不存在!"
@@ -100,12 +111,12 @@ ErrPathNotDelete: "所选目录不可删除"
 #website
 ErrDomainIsExist: "域名已存在"
 ErrAliasIsExist: "代号已存在"
-ErrAppDelete: "其他网站使用此应用,无法删除"
-ErrGroupIsUsed: "分组正在使用中，无法删除"
-ErrBackupMatch: "该备份文件与当前网站部分数据不匹配 {{ .detail}}"
-ErrBackupExist: "该备份文件对应部分源数据不存在 {{ .detail}}"
-ErrPHPResource: "本地运行环境不支持切换！"
-ErrPathPermission: "index 目录下检测到非 1000:1000 权限文件夹，可能导致网站访问 Access denied 错误，请点击上方保存按钮"
+ErrAppDelete: '其他网站使用此应用，无法删除'
+ErrGroupIsUsed: '分组正在使用中，无法删除'
+ErrBackupMatch: '该备份文件与当前网站部分数据不匹配 {{ .detail}}'
+ErrBackupExist: '该备份文件对应部分源数据不存在 {{ .detail}}'
+ErrPHPResource: '本地运行环境不支持切换！'
+ErrPathPermission: 'index 目录下检测到非 1000:1000 权限文件夹，可能导致网站访问 Access denied 错误，请点击上方保存按钮'
 ErrDomainIsUsed: "域名已被网站【{{ .name }}】使用"
 ErrDomainFormat: "{{ .name }} 域名格式不正确"
 ErrDefaultAlias: "default 为保留代号，请使用其他代号"
@@ -117,32 +128,32 @@ ErrImageNotExist: "运行环境 {{.name}} 镜像不存在，请重新编辑运�
 ErrSSLCannotDelete: "{{ .name }} 证书正在被网站使用，无法删除"
 ErrAccountCannotDelete: "账号关联证书，无法删除"
 ErrSSLApply: "证书续签成功，openresty reload失败，请检查配置！"
-ErrEmailIsExist: "邮箱已存在"
-ErrSSLKeyNotFound: "私钥文件不存在"
-ErrSSLCertificateNotFound: "证书文件不存在"
-ErrSSLKeyFormat: "私钥文件校验失败"
-ErrSSLCertificateFormat: "证书文件格式错误，请使用 pem 格式"
-ErrEabKidOrEabHmacKeyCannotBlank: "EabKid 或 EabHmacKey 不能为空"
-ErrOpenrestyNotFound: "Http 模式需要首先安装 Openresty"
-ApplySSLStart: "开始申请证书,域名 [{{ .domain }}] 申请方式 [{{ .type }}] "
+ErrEmailIsExist: '邮箱已存在'
+ErrSSLKeyNotFound: '私钥文件不存在'
+ErrSSLCertificateNotFound: '证书文件不存在'
+ErrSSLKeyFormat: '私钥文件校验失败'
+ErrSSLCertificateFormat: '证书文件格式错误，请使用 pem 格式'
+ErrEabKidOrEabHmacKeyCannotBlank: 'EabKid 或 EabHmacKey 不能为空'
+ErrOpenrestyNotFound: 'Http 模式需要首先安装 Openresty'
+ApplySSLStart: '开始申请证书，域名 [{{ .domain }}] 申请方式 [{{ .type }}] '
 dnsAccount: "DNS 自动"
 dnsManual: "DNS 手动"
 http: "HTTP"
-ApplySSLFailed: "申请  [{{ .domain }}] 证书失败, {{.detail}} "
-ApplySSLSuccess: "申请 [{{ .domain }}] 证书成功！！"
-DNSAccountName: "DNS 账号 [{{ .name }}] 厂商 [{{.type}}]"
-PushDirLog: "证书推送到目录 [{{ .path }}] {{ .status }}"
+ApplySSLFailed: '申请  [{{ .domain }}] 证书失败， {{.detail}} '
+ApplySSLSuccess: '申请 [{{ .domain }}] 证书成功！！'
+DNSAccountName: 'DNS 账号 [{{ .name }}] 厂商 [{{.type}}]'
+PushDirLog: '证书推送到目录 [{{ .path }}] {{ .status }}'
 ErrDeleteCAWithSSL: "当前机构下存在已签发证书，无法删除"
 ErrDeleteWithPanelSSL: "面板 SSL 配置使用此证书，无法删除"
 ErrDefaultCA: "默认机构不能删除"
 ApplyWebSiteSSLLog: "开始更新 {{ .name }} 网站证书"
 ErrUpdateWebsiteSSL: "{{ .name }} 网站更新证书失败: {{ .err }}"
 ApplyWebSiteSSLSuccess: "更新网站证书成功"
-StartUpdateSystemSSL: "开始更新系统证书"
-UpdateSystemSSLSuccess: "更新系统证书成功"
 ErrExecShell: "执行脚本失败 {{ .err }}"
 ExecShellStart: "开始执行脚本"
 ExecShellSuccess: "脚本执行成功"
+StartUpdateSystemSSL: "开始更新系统证书"
+UpdateSystemSSLSuccess: "更新系统证书成功"
 
 #mysql
 ErrUserIsExist: "当前用户已存在，请重新输入"
@@ -173,12 +184,6 @@ ErrScriptsNotFound: "没有在 package.json 中找到 scripts 配置项"
 ErrContainerNameNotFound: "无法获取容器名称，请检查 .env 文件"
 ErrNodeModulesNotFound: "node_modules 文件夹不存在！请编辑运行环境或者等待运行环境启动成功"
 ErrContainerNameIsNull: "容器名称不存在"
-
-#setting
-ErrBackupInUsed: "该备份账号已在计划任务中使用，无法删除"
-ErrBackupCheck: "备份账号测试连接失败 {{ .err}}"
-ErrOSSConn: "无法获取最新版本，请确认服务器是否能够连接外部网络。"
-ErrEntrance: "安全入口信息错误，请检查后重试！"
 
 #tool
 ErrConfigNotFound: "配置文件不存在"

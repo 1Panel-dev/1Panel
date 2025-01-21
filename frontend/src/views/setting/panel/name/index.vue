@@ -42,7 +42,7 @@ function checkPanelName(rule: any, value: any, callback: any) {
     if (value === '') {
         return callback(new Error(i18n.global.t('setting.titleHelper')));
     }
-    const reg = /^[a-zA-Z0-9\u4e00-\u9fa5]{1}[a-zA-Z0-9_ .\u4e00-\u9fa5-]{2,29}$/;
+    const reg = /^[a-zA-Z0-9\u4e00-\u9fa5 .,:!@#%&^*_+[\]{}~\-=?，。！｜？：；「」『』【】（）《》·]{3,30}$/;
     if (!reg.test(value)) {
         return callback(new Error(i18n.global.t('setting.titleHelper')));
     }

@@ -28,7 +28,7 @@ func (b *BaseApi) LoadDashboardOsInfo(c *gin.Context) {
 // @Tags Dashboard
 // @Summary Load app launcher
 // @Accept json
-// @Success 200 {Array} dto.dto.AppLauncher
+// @Success 200 {Array} dto.AppLauncher
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /dashboard/app/launcher [get]

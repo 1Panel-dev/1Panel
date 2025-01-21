@@ -113,7 +113,7 @@ func (b *BaseApi) GetResponsePage(c *gin.Context) {
 
 // @Tags Auth
 // @Summary Check System isDemo
-// @Success 200
+// @Success 200 {boolean} demo
 // @Router /core/auth/demo [get]
 func (b *BaseApi) CheckIsDemo(c *gin.Context) {
 	helper.SuccessWithData(c, global.CONF.System.IsDemo)
@@ -121,7 +121,7 @@ func (b *BaseApi) CheckIsDemo(c *gin.Context) {
 
 // @Tags Auth
 // @Summary Load System Language
-// @Success 200
+// @Success 200 {string} language
 // @Router /core/auth/language [get]
 func (b *BaseApi) GetLanguage(c *gin.Context) {
 	settingInfo, err := settingService.GetSettingInfo()
@@ -155,8 +155,8 @@ func saveLoginLogs(c *gin.Context, err error) {
 }
 
 // @Tags Auth
-// @Summary Check System isDemo
-// @Success 200
+// @Summary Check System IsIntl
+// @Success 200 {string} intl
 // @Router /auth/intl [get]
 func (b *BaseApi) CheckIsIntl(c *gin.Context) {
 	helper.SuccessWithData(c, global.CONF.System.IsIntl)

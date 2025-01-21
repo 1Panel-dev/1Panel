@@ -736,7 +736,7 @@ onUnmounted(() => {
 </script>
 
 <style scoped lang="scss">
-@use '../index.scss';
+@use '../index';
 @media only screen and (max-width: 1400px) {
     .install-card-col-12 {
         max-width: 100%;

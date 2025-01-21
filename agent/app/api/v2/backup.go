@@ -206,7 +206,7 @@ func (b *BaseApi) GetLocalDir(c *gin.Context) {
 }
 
 // @Tags Backup Account
-// @Summary Page backup records
+// @Summary Load backup record size
 // @Accept json
 // @Param request body dto.SearchForSize true "request"
 // @Success 200 {array} dto.RecordFileSize

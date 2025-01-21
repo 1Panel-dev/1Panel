@@ -60,7 +60,11 @@
                                         <el-dropdown-item v-if="!globalStore.isIntl" command="en">
                                             English
                                         </el-dropdown-item>
+                                        <el-dropdown-item command="ja">日本語</el-dropdown-item>
+                                        <el-dropdown-item command="pt-BR">Português (Brasil)</el-dropdown-item>
+                                        <el-dropdown-item command="ko">한국어</el-dropdown-item>
                                         <el-dropdown-item command="ru">Русский</el-dropdown-item>
+                                        <el-dropdown-item command="ms">Bahasa Melayu</el-dropdown-item>
                                     </el-dropdown-menu>
                                 </template>
                             </el-dropdown>
@@ -272,6 +276,10 @@ function handleCommand(command: string) {
         dropdownText.value = 'English';
     } else if (command === 'tw') {
         dropdownText.value = '中文(繁體)';
+    } else if (command === 'ru') {
+        dropdownText.value = 'Русский';
+    } else if (command === 'ms') {
+        dropdownText.value = 'Bahasa Melayu';
     }
 }
 

@@ -215,6 +215,10 @@ const mobile = computed(() => {
 interface ThemeColor {
     light: string;
     dark: string;
+    themePredefineColors: {
+        light: string[];
+        dark: string[];
+    };
 }
 
 const form = reactive({
@@ -272,7 +276,10 @@ const languageOptions = ref([
     { value: 'zh', label: '中文(简体)' },
     { value: 'tw', label: '中文(繁體)' },
     ...(!globalStore.isIntl ? [{ value: 'en', label: 'English' }] : []),
+    { value: 'ja', label: '日本語' },
+    { value: 'pt-BR', label: 'Português (Brasil)' },
     { value: 'ru', label: 'Русский' },
+    { value: 'ms', label: 'Bahasa Melayu' },
 ]);
 if (globalStore.isIntl) {
     languageOptions.value.unshift({ value: 'en', label: 'English' });
@@ -318,8 +325,10 @@ const search = async () => {
         const xpackRes = await getXpackSetting();
         if (xpackRes) {
             form.theme = xpackRes.data.theme || globalStore.themeConfig.theme || 'light';
-            form.themeColor = JSON.parse(xpackRes.data.themeColor);
-            globalStore.themeConfig.themeColor = xpackRes.data.themeColor;
+            form.themeColor = JSON.parse(xpackRes.data.themeColor || '{"light":"#005eeb","dark":"#F0BE96"}');
+            globalStore.themeConfig.themeColor = xpackRes.data.themeColor
+                ? xpackRes.data.themeColor
+                : '{"light":"#005eeb","dark":"#F0BE96"}';
             globalStore.themeConfig.theme = form.theme;
             form.proxyDocker = xpackRes.data.proxyDocker;
         }

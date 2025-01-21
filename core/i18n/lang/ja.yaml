@@ -1,0 +1,283 @@
+ErrInvalidParams: "リクエストパラメーターエラー：{{.Detail}}"
+ErrTokenParse: "トークン生成エラー：{{.Detail}}"
+ErrInitialPassword: "初期パスワードエラー"
+ErrInternalServer: "サービス内部エラー：{{.Detail}}"
+ErrRecordExist: "レコードはすでに存在します"
+ErrRecordNotFound: "記録が見つかりません"
+ErrStructTransform: "タイプ変換障害：{{.Detail}}"
+ErrNotLogin: "ユーザーはログインしません：{{.Detail}}"
+ErrPasswordExpired: "現在のパスワードが期限切れになっています：{{.Detail}}"
+ErrNotSupportType: "システムは現在のタイプをサポートしていません：{{.Detail}}"
+ErrApiConfigStatusInvalid: "APIインターフェイスアクセス禁止：{{.Detail}}"
+ErrApiConfigKeyInvalid: "APIインターフェイスキーエラー：{{.Detail}}"
+ErrApiConfigIPInvalid: "APIインターフェイスIPはホワイトリストにありません：{{.Detail}}"
+ErrApiConfigDisable: "このインターフェイスは、APIインターフェイスコールの使用を禁止しています：{{.Detail}}"
+
+#common
+ErrNameIsExist: "名前はすでに存在しています"
+ErrDemoEnvironment: "デモサーバー、この操作を禁止します！"
+ErrCmdTimeout: "コマンド実行がタイムアウトしました！"
+ErrCmdIllegal: "コマンドには違法な文字が含まれています。変更してもう一度やり直してください！"
+ErrPortExist: '{{.port}}ポートはすでに{{.type}} [{{.name}}]によって占有されています。'
+TYPE_APP: "応用"
+TYPE_RUNTIME: "ランタイム環境"
+TYPE_DOMAIN: "ドメイン名"
+ErrTypePort: 'port {{.name}}フォーマットエラー'
+ErrTypePortRange: 'ポートレンジは1-65535の間である必要があります'
+Success: "成功"
+Failed: "失敗した"
+SystemRestart: "システムの再起動により、タスクが中断されます"
+
+#app
+ErrPortInUsed: "{{.Detail}}ポートはすでに使用されています"
+ErrAppLimit: "アプリはインストール制限を超えています"
+ErrAppRequired: "{{.Detail}}アプリが必要です"
+ErrNotInstall: "アプリがインストールされていません"
+ErrPortInOtherApp: "{{.port}}ポートは既にapp {{.apps}}で使用されています"
+ErrDbUserNotValid: "ストックデータベース、ユーザー名、パスワードが一致しません！"
+ErrDockerComposeNotValid: "Docker-Composeファイル形式のエラー！"
+ErrUpdateBuWebsite: 'アプリケーションは正常に更新されましたが、Webサイト構成ファイルの変更に失敗しました。構成を確認してください！'
+Err1PanelNetworkFailed: 'デフォルトのコンテナネットワークの作成に失敗しました！{{ 。詳細 }}'
+ErrFileParse: 'アプリケーションDocker-Composeファイルの解析は失敗しました！'
+ErrInstallDirNotFound: 'インストールディレクトリは存在しません'
+AppStoreIsUpToDate: '最新の'
+LocalAppVersionNull: '{{.name}}アプリはバージョンに同期されません！アプリケーションリストに追加できませんでした'
+LocalAppVersionErr: '{{.name}}}バージョン{{.version}}の同期に失敗しました！{{.err}}'
+ErrFileNotFound: '{{.name}}ファイルは存在しません'
+ErrFileParseApp: '{{.name}} file {{.err}}を解析できなかった'
+ErrAppDirNull: 'バージョンフォルダーは存在しません'
+LocalAppErr: "app {{.name}}同期が失敗しました！{{.err}}"
+ErrContainerName: "cantablernameはすでに存在しています"
+ErrAppSystemRestart: "1パネルの再起動により、タスクが終了します"
+ErrCreateHttpClient: "http request {{.err}}の作成に失敗しました"
+ErrHttpReqTimeOut: "リクエスト{{.err}}"
+ErrHttpReqFailed: "リクエストが失敗しました{{.err}}"
+ErrHttpReqNotFound: "ファイルは存在しません"
+ErrNoSuchHost: "ネットワーク接続に失敗しました"
+ErrImagePullTimeOut: '画像プルタイムアウト'
+ErrContainerNotFound: '{{.name}}コンテナは存在しません'
+ErrContainerMsg: '{{.name}}コンテナは異常です。詳細については、コンテナページのログを確認してください'
+ErrAppBackup: '{{.name}}アプリケーションバックアップが失敗したerr {{.err}}'
+ErrImagePull: '{{.name}}画像プルFailed err {{.err}}'
+ErrVersionTooLow: '現在の1パネルバージョンが低すぎてApp Storeを更新できないので、バージョンをアップグレードしてください'
+ErrAppNameExist: 'アプリ名はすでに存在しています'
+AppStoreIsSyncing: 'App Storeが同期しています。後でもう一度やり直してください'
+ErrGetCompose: "docker-compose.ymlファイルを取得できませんでした！{{ 。詳細 }}"
+ErrAppWarn: "異常なステータス、ログを確認してください"
+ErrAppParamKey: "parameter {{.name}}フィールド例外"
+ErrAppUpgrade: "アプリケーションのアップグレードに失敗しました{{.name}} {{.err}}"
+AppRecover: "app {{.name}}ロールバック"
+PullImageStart: "画像の引っ張りを開始{{.name}}"
+PullImageSuccess: "画像が正常に引っ張られました"
+UpgradeAppStart: "アプリケーションのアップグレードを起動{{.name}}"
+UpgradeAppSuccess: "App {{.Name}}アップグレードされました"
+
+#file
+ErrFileCanNotRead: "ファイルは読み取れません"
+ErrFileToLarge: "ファイルが大きすぎます"
+ErrPathNotFound: "パスは見つかりません"
+ErrMovePathFailed: "ターゲットパスには元のパスが含まれていません！"
+ErrLinkPathNotFound: "ターゲットパスは存在しません！"
+ErrFileIsExist: "ファイルまたはディレクトリはすでに存在します！"
+ErrFileUpload: "file {{.name}} {{.detail}}}のアップロードに失敗しました"
+ErrFileDownloadDir: "サポートされていないフォルダーをダウンロードします"
+ErrCmdNotFound: "{{.name}}コマンドは存在しません。最初にホストにこのコマンドをインストールしてください"
+ErrSourcePathNotFound:  "ソースディレクトリは存在しません"
+ErrFavoriteExist: "このパスが収集されました"
+ErrInvalidChar: "違法なキャラクターは禁止されています"
+ErrPathNotDelete: "選択したディレクトリを削除することはできません"
+
+#website
+ErrDomainIsExist: "ドメインはすでに存在しています"
+ErrAliasIsExist: "エイリアスはすでに存在しています"
+ErrAppDelete: '他のウェブサイトはこのアプリを使用します'
+ErrGroupIsUsed: "グループは使用されており、削除することはできません"
+ErrBackupMatch: "バックアップファイルは、ウェブサイトの現在の部分的なデータと一致しません：{{.Detail}}"
+ErrBackupExist: 'バックアップファイルは、存在しない元のデータの一部に対応しています。{{.Detail}}'
+ErrPHPResource: 'ローカルランタイムはスイッチングをサポートしません！'
+ErrPathPermission: 'インデックスディレクトリで1000：1000以外のアクセス許可を持つフォルダーが検出されたため、Webサイトにアクセスするとアクセスが拒否された場合があります。上の[保存]ボタンをクリックしてください'
+ErrDomainIsUsed: "ドメインはすでにWebサイトで使用されています{{.Name}}"
+ErrDomainFormat: "{{.name}}ドメイン形式エラー"
+ErrDefaultAlias: "デフォルトは予約済みのコード名です。別のコード名を使用してください"
+ErrImageNotExist: "実行中の環境{{.name}}画像は存在しません。実行中の環境を再編集してください"
+
+#ssl
+ErrSSLCannotDelete: "証明書{{.Name}}はWebサイトで使用されており、削除できません"
+ErrAccountCannotDelete: "アカウントに関連付けられた証明書を削除することはできません"
+ErrSSLApply: "証明書は引き続き正常に署名されていますが、OpenRestyリロードが失敗します。構成を確認してください！"
+ErrEmailIsExist: 'メールはすでに存在しています'
+ErrSSLKeyNotFound: '秘密キーファイルは存在しません'
+ErrSSLCertificateNotFound: '証明書ファイルは存在しません'
+ErrSSLKeyFormat: '秘密キーファイル検証エラー'
+ErrSSLCertificateFormat: '証明書ファイル形式エラー、PEM形式を使用してください'
+ErrEabKidOrEabHmacKeyCannotBlank: 'eabkidまたはeabhmackeyは空にすることはできません'
+ErrOpenrestyNotFound: 'HTTPモードでは、最初にOpenRestyをインストールする必要があります'
+ApplySSLStart: '証明書、ドメイン名[{{.domain}}]アプリケーションメソッド[{{.type}}]の申請を開始します'
+dnsAccount: "DNSオートマチック"
+dnsManual: "DNSマニュアル"
+http: "http"
+ApplySSLFailed: '[{{.domain}}]証明書のアプリケーションが失敗しました、{{.detail}}'
+ApplySSLSuccess: '[{{{.domain}}]証明書のアプリケーションが成功しました！！'
+DNSAccountName: 'dnsアカウント[{{.name}}]メーカー[{{.type}}]'
+PushDirLog: 'ディレクトリにプッシュされた証明書[{{.Path}}] {{.Status}}'
+ErrDeleteCAWithSSL: "現在の組織の下に発行された証明書があり、削除できません"
+ErrDeleteWithPanelSSL: "パネルSSL構成はこの証明書を使用しており、削除できません"
+ErrDefaultCA: "デフォルトの証明書当局は削除できません"
+ApplyWebSiteSSLLog: "{{.name}} Webサイト証明書の更新を開始します"
+ErrUpdateWebsiteSSL: "{{.name}}ウェブサイトは証明書の更新に失敗しました：{{.err}}"
+ApplyWebSiteSSLSuccess: "ウェブサイトの証明書を正常に更新します"
+ErrExecShell: "スクリプトの実行に失敗した{{.err}}"
+ExecShellStart: "スクリプトの実行を開始します"
+ExecShellSuccess: "スクリプトは正常に実行されました"
+StartUpdateSystemSSL: "システム証明書の更新を開始します"
+UpdateSystemSSLSuccess: "システム証明書を正常に更新します"
+
+#mysql
+ErrUserIsExist: "現在のユーザーはすでに存在しています。新しいユーザーを入力してください"
+ErrDatabaseIsExist: "現在のデータベースはすでに存在しています。新しいデータベースを入力してください"
+ErrExecTimeOut: "SQL実行のタイミングを出して、データベースを確認してください"
+ErrRemoteExist: "リモートデータベースはすでにその名前に存在しています。それを変更して、再試行してください"
+ErrLocalExist: "ローカルデータベースはすでにその名前に存在しています。それを変更して、もう一度試してください"
+
+#redis
+ErrTypeOfRedis: "回復ファイルのタイプは、現在の永続性モードと一致しません。ファイルタイプを変更して、再試行してください"
+
+#container
+ErrInUsed: "{{.Detail}}が使用されており、削除できません"
+ErrObjectInUsed: "このオブジェクトは使用されており、削除することはできません"
+ErrPortRules: "ポートの数が一致しません。再入力してください！"
+ErrPgImagePull: "画像プルタイムアウト。画像の加速を構成するか、Postgres：16.0-Alpine画像を手動で引いて、再試行してください"
+
+#runtime
+ErrDirNotFound: "ビルドフォルダーは存在しません！ファイルの整合性を確認してください！"
+ErrFileNotExist: "{{.Detail}}ファイルは存在しません！ソースファイルの完全性を確認してください！"
+ErrImageBuildErr: "画像ビルドが失敗しました"
+ErrImageExist: "画像はすでに存在しています！"
+ErrDelWithWebsite: "運用環境はウェブサイトに関連付けられており、削除することはできません"
+ErrRuntimeStart: "開始に失敗しました"
+ErrPackageJsonNotFound: "package.jsonファイルは存在しません"
+ErrScriptsNotFound: "Package.jsonにスクリプト構成アイテムは見つかりませんでした"
+ErrContainerNameNotFound: "コンテナ名を取得できない場合は、.envファイルを確認してください"
+ErrNodeModulesNotFound: "node_modulesフォルダーは存在しません！実行中の環境を編集するか、実行中の環境が正常に開始するのを待ちます"
+
+#setting
+ErrBackupInUsed: "バックアップアカウントは既にCronjobで使用されており、削除することはできません。"
+ErrBackupCheck: "バックアップアカウントテスト接続に失敗した{{.err}}"
+ErrOSSConn: "最新バージョンを取得できない場合は、サーバーが外部ネットワークに接続できるかどうかを確認してください。"
+ErrEntrance: "セキュリティ入り口情報エラー。チェックしてもう一度やり直してください！"
+
+#tool
+ErrConfigNotFound: "構成ファイルは存在しません"
+ErrConfigParse: "構成ファイル形式エラー"
+ErrConfigIsNull: "構成ファイルは空にすることは許可されていません"
+ErrConfigDirNotFound: "実行中のディレクトリは存在しません"
+ErrConfigAlreadyExist: "同じ名前の構成ファイルが既に存在しています"
+ErrUserFindErr: "ユーザー{{.name}} {{.err}}を見つけられなかった"
+
+#ssh
+ErrFirewallNone: "システムでFirewalldまたはUFWサービスは検出されませんでした。チェックしてもう一度やり直してください！"
+ErrFirewallBoth: "FirewalldサービスとUFWサービスの両方がシステムで検出されます。競合を避けるために、1つをアンインストールして再試行してください！"
+
+#cronjob
+ErrBashExecute: "スクリプト実行エラー、タスク出力テキスト領域の特定の情報を確認してください。"
+ErrCutWebsiteLog: "{{.Name}} Webサイトログの切断が失敗した、エラー{{.err}}"
+CutWebsiteLogSuccess: "{{.Name}} Webサイトログカットに正常にカット、バックアップパス{{.Path}}"
+
+#toolbox
+ErrNotExistUser: "現在のユーザーは存在しません。変更して再試行してください！"
+ErrBanAction: "失敗した設定では、現在の{{.name}}サービスが利用できません。チェックして再試行してください！"
+ErrClamdscanNotFound: "Clamdscanコマンドは検出されませんでした。インストールするためにドキュメントを参照してください！"
+
+#waf
+ErrScope: "この構成の変更はサポートされていません"
+ErrStateChange: "状態の変更に失敗しました"
+ErrRuleExist: "ルールが存在します"
+ErrRuleNotExist: "ルールは存在しません"
+ErrParseIP: "IP形式エラー"
+ErrDefaultIP: "デフォルトは予約済みの名前です。別の名前に変更してください"
+ErrGroupInUse: "IPグループはブラック/ホワイトリストで使用され、削除できません"
+ErrGroupExist: "IPグループ名はすでに存在しています"
+ErrIPRange: "間違ったIP範囲"
+ErrIPExist: "IPは終了します"
+
+#license
+ErrLicense: "ライセンス形式のエラー、チェックして再試行してください！"
+ErrLicenseCheck: "ライセンスの確認が失敗しました。チェックしてもう一度やり直してください！"
+ErrLicenseSave: "ライセンス情報の保存に失敗しました、{{.err}}、もう一度やり直してください！"
+ErrLicenseSync: "ライセンス情報の同期に失敗し、データベースでライセンス情報は検出されませんでした！"
+ErrXpackNotFound: "このセクションはプロフェッショナルエディション機能です。最初にパネルsettings-licenseインターフェイスにライセンスをインポートしてください"
+ErrXpackNotActive: "このセクションはプロフェッショナルエディション機能です。最初にパネル設定リセンスインターフェイスでライセンスステータスを同期してください"
+ErrXpackOutOfDate: "現在のライセンスの有効期限が切れています。パネル設定リセンスインターフェイスにライセンスを再輸入してください"
+ErrXpackLost: "ライセンスは、再試行の最大数に達しました。[設定] [ライセンス]ページに移動し、[同期]ボタンを手動でクリックして、プロフェッショナルバージョンの機能が適切に機能していることを確認してください。"
+ErrXpackTimeout: "リクエストタイムアウト、ネットワーク接続が不安定な場合があります。後でもう一度やり直してください！"
+
+#license
+ErrAlert: "情報形式のエラーをアラートしてください。チェックして再試行してください！"
+ErrAlertPush: "アラートプッシュエラー、チェックして再試行してください！"
+ErrAlertSave: "エラーを保存してください、チェックして再試行してください！"
+ErrAlertSync: "アラート同期エラー、チェックして再試行してください！"
+ErrAlertRemote: "リモートアラートエラー、チェックして再試行してください！"
+
+#cmd
+AppVersion: "アプリバージョン"
+AppCommands: "アプリ関連のコマンド"
+AppInit: "アプリを初期化します"
+AppKeyVal: "アプリキー（英語のみをサポートする）"
+AppCreateFileErr: "file {{.name}}作成に失敗した{{.err}}"
+AppCreateDirErr: "Folder {{.name}}作成に失敗した{{.err}}"
+AppMissKey: "アプリキーがありません、-kを使用して指定します"
+AppMissVersion: "アプリバージョンがありません、-vを使用して指定します"
+AppVersionExist: "バージョンはすでに存在します！"
+AppCreateSuccessful: "創造は成功しました！"
+AppWriteErr: "file {{.name}} write failed {{.err}}"
+SudoHelper: "{{.cmd}}を使用するか、ルートユーザーに切り替えてください"
+ListenIPCommands: "リスニングIPを切り替えます"
+ListenIPv4: "IPv4で聞いてください"
+ListenIPv6: "IPv6で聞く"
+ListenChangeSuccessful: "切り替え成功！{{.Value}}で聞いています"
+ResetCommands: "システム情報をリセットします"
+ResetMFA: "1パネルの2要素認証をキャンセルします"
+ResetHttps: "1Panel HTTPSログインをキャンセルします"
+ResetEntrance: "1パネルの安全な入り口をキャンセルします"
+ResetIPs: "1パネル認定IP制限をキャンセルします"
+ResetDomain: "1パネルドメインバインディングをキャンセルします"
+RestoreCommands: "ロールバック1パネルサービスとデータ"
+RestoreNoSuchFile: "ロールバックに使用できるファイルはありません"
+RestoreStep1: "（1/5）{{.name}}ディレクトリからの1パネルサービスとデータの開始ロールバック..."
+RestoreStep2: "（2/5）1パネルバイナリロールバックが成功しました"
+RestoreStep3: "（3/5）1パネルスクリプトロールバック成功"
+RestoreStep4: "（4/5）1パネルサービスロールバックが成功しました"
+RestoreStep5: "（5/5）1パネルデータロールバックが成功しました"
+RestoreSuccessful: "ロールバックが成功しました！サービスを再起動します、待ってください..."
+UpdateCommands: "パネル情報を更新します"
+UpdateUser: "パネルユーザーを更新します"
+UpdatePassword: "パスワードを更新します"
+UpdatePort: "パネルポートを更新します"
+UpdateUserNull: "エラー：パネルユーザーは空です！"
+UpdateUserBlank: "エラー：パネルユーザーにはスペースが含まれています！"
+UpdateUserFormat: "エラー：無効なパネルユーザー形式！英語、中国語、数字、_、長さ3〜30のみをサポートしています"
+UpdateUserErr: "エラー：パネルユーザーの更新に失敗しました{{.err}}"
+UpdateSuccessful: "更新成功！"
+UpdateUserResult: "パネルユーザー：{{.name}}"
+UpdatePasswordRead: "エラー：パネルパスワード情報の読み取りに失敗しました、{{.err}}"
+UpdatePasswordNull: "エラー：パネルパスワードは空です！"
+UpdateUPasswordBlank: "エラー：パスワードにはスペースが含まれています！"
+UpdatePasswordFormat: "エラー：パネルパスワードは、文字、数字、特殊文字のみをサポートします！@＃$％*_、。、、長さ8-30！"
+UpdatePasswordLen: "エラー：6文字より長くパスワードを入力してください！"
+UpdatePasswordRe: "パスワードを認証する："
+UpdatePasswordErr: "エラー：{{.err}}のパスワードの更新に失敗しました"
+UpdatePasswordSame: "エラー：2つのパスワードが一致しません。チェックして再試行してください！"
+UpdatePasswordResult: "パネルパスワード：{{.name}}"
+UpdatePortFormat: "エラー：入力ポート番号は1〜65535でなければなりません！"
+UpdatePortUsed: "エラー：ポート番号はすでに使用されています。チェックして再試行してください！"
+UpdatePortErr: "エラー：パネルポートの更新に失敗しました{{.err}}"
+UpdatePortResult: "パネルポート：{{.name}}"
+UpdatePortFirewallAdd: "ファイアウォールポートルールの追加に失敗した{{.err}}、ファイアウォールルールに{{.name}}ポートを手動で追加してください。"
+UpdatePortFirewallDel: "エラー：ファイアウォールポートの削除に失敗しました、{{.err}}"
+UpdatePortFirewallReload: "ファイアウォールのリロードに失敗しました{{.err}}、ファイアウォールを手動でリロードしてください。"
+UserInfo: "パネル情報を取得します"
+UserInfoAddr: "パネルアドレス："
+UserInfoPassHelp: "ヒント：パスワードを変更するには、コマンドを実行できます。"
+DBConnErr: "エラー：データベース接続の初期化に失敗しました、{{.err}}"
+SystemVersion: "バージョン："
+SystemMode: "モード："

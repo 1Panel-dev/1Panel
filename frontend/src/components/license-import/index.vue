@@ -74,7 +74,11 @@ const handleExceed: UploadProps['onExceed'] = (files) => {
 };
 
 const toLxware = () => {
-    window.open('https://www.lxware.cn/1panel' + '', '_blank', 'noopener,noreferrer');
+    if (!globalStore.isIntl) {
+        window.open('https://www.lxware.cn/1panel' + '', '_blank', 'noopener,noreferrer');
+    } else {
+        window.open('https://1panel.hk/pricing' + '', '_blank', 'noopener,noreferrer');
+    }
 };
 
 const submit = async () => {
