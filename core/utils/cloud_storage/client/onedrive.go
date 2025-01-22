@@ -80,6 +80,19 @@ func (o oneDriveClient) Upload(src, target string) (bool, error) {
 	return isOk, err
 }
 
+func (o oneDriveClient) Delete(path string) (bool, error) {
+	path = "/" + strings.TrimPrefix(path, "/")
+	req, err := o.client.NewRequest("DELETE", fmt.Sprintf("me/drive/root:%s", path), nil)
+	if err != nil {
+		return false, fmt.Errorf("new request for delete file failed, err: %v \n", err)
+	}
+	if err := o.client.Do(context.Background(), req, false, nil); err != nil {
+		return false, fmt.Errorf("do request for delete file failed, err: %v \n", err)
+	}
+
+	return true, nil
+}
+
 func (o *oneDriveClient) loadIDByPath(path string) (string, error) {
 	pathItem := "root:" + path
 	if path == "/" {

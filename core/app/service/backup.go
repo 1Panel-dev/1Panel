@@ -357,7 +357,11 @@ func (u *BackupService) checkBackupConn(backup *model.BackupAccount) (bool, erro
 	if backup.Type != constant.Sftp && backup.Type != constant.Local && targetPath != "/" {
 		targetPath = strings.TrimPrefix(targetPath, "/")
 	}
-	return client.Upload(fileItem, targetPath)
+	if _, err := client.Upload(fileItem, targetPath); err != nil {
+		return false, err
+	}
+	_, _ = client.Delete(path.Join(backup.BackupPath, "test"))
+	return true, nil
 }
 
 func syncAccountToAgent(backup model.BackupAccount, operation string) {

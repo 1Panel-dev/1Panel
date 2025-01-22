@@ -64,3 +64,10 @@ func (k kodoClient) Upload(src, target string) (bool, error) {
 	}
 	return true, nil
 }
+
+func (k kodoClient) Delete(path string) (bool, error) {
+	if err := k.client.Delete(k.bucket, path); err != nil {
+		return false, err
+	}
+	return true, nil
+}

@@ -38,3 +38,10 @@ func (c localClient) Upload(src, target string) (bool, error) {
 	}
 	return true, nil
 }
+
+func (c localClient) Delete(file string) (bool, error) {
+	if err := os.RemoveAll(file); err != nil {
+		return false, err
+	}
+	return true, nil
+}

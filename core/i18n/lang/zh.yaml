@@ -19,7 +19,7 @@ ErrApiConfigKeyTimeInvalid: "API 接口时间戳错误: {{ .detail }}"
 ErrDemoEnvironment: "演示服务器，禁止此操作!"
 ErrCmdTimeout: "命令执行超时！"
 ErrEntrance: "安全入口信息错误，请检查后重试！"
-ErrGroupIsDefault: '默认分组，无法删除'
+ErrGroupIsDefault: "默认分组，无法删除"
 ErrLocalDelete: "无法删除本地节点！"
 
 #backup
@@ -28,7 +28,6 @@ ErrBackupCheck: "备份账号测试连接失败 {{ .err}}"
 ErrBackupLocal: "本地服务器备份账号暂不支持该操作！"
 ErrBackupPublic: "检测到该备份账号为非公用，请检查后重试！"
 ErrOSSConn: "无法获取最新版本，请确认服务器是否能够连接外部网络。"
-ErrEntrance: "安全入口信息错误，请检查后重试！"
 
 #license
 ErrLicense: "许可证格式错误，请检查后重试！"

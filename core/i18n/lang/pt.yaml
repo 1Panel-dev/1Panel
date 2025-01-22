@@ -28,7 +28,6 @@ ErrBackupCheck: "Falha na conexão de teste da conta de backup {{ .err}}"
 ErrBackupLocal: "A conta de backup do servidor local não suporta essa operação!"
 ErrBackupPublic: "Detectamos que a conta de backup não é pública, verifique e tente novamente!"
 ErrOSSConn: "Não foi possível obter a versão mais recente, verifique se o servidor pode se conectar à rede externa."
-ErrEntrance: "Erro nas informações de entrada de segurança, verifique e tente novamente!"
 
 #license
 ErrLicense: "Erro no formato da licença, verifique e tente novamente!"

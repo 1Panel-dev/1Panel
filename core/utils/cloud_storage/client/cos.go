@@ -94,3 +94,10 @@ func (c cosClient) Upload(src, target string) (bool, error) {
 	}
 	return true, nil
 }
+
+func (c cosClient) Delete(path string) (bool, error) {
+	if _, err := c.clientWithBucket.Object.Delete(context.Background(), path); err != nil {
+		return false, err
+	}
+	return true, nil
+}

@@ -2,6 +2,7 @@ package i18n
 
 import (
 	"embed"
+	"fmt"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/core/global"
@@ -64,9 +65,10 @@ func GetErrMsg(key string, maps map[string]interface{}) string {
 }
 
 func GetMsgByKey(key string) string {
-	content, _ := global.I18n.Localize(&i18n.LocalizeConfig{
+	content, err := global.I18n.Localize(&i18n.LocalizeConfig{
 		MessageID: key,
 	})
+	fmt.Println(err)
 	return content
 }
 
@@ -132,6 +134,7 @@ func Init() {
 	_, _ = bundle.LoadMessageFileFS(fs, "lang/ru.yaml")
 	_, _ = bundle.LoadMessageFileFS(fs, "lang/ms.yaml")
 	_, _ = bundle.LoadMessageFileFS(fs, "lang/ko.yaml")
+	global.I18n = i18n.NewLocalizer(bundle, "en")
 }
 
 func UseI18nForCmd(lang string) {

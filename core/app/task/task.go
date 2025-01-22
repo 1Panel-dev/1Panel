@@ -207,14 +207,14 @@ func (t *Task) DeleteLogFile() {
 
 func (t *Task) LogWithStatus(msg string, err error) {
 	if err != nil {
-		t.Logger.Printf(i18n.GetWithNameAndErr("FailedStatus", msg, err))
+		t.Logger.Print(i18n.GetWithNameAndErr("FailedStatus", msg, err))
 	} else {
-		t.Logger.Printf(i18n.GetWithName("SuccessStatus", msg))
+		t.Logger.Print(i18n.GetWithName("SuccessStatus", msg))
 	}
 }
 
 func (t *Task) Log(msg string) {
-	t.Logger.Printf(msg)
+	t.Logger.Print(msg)
 }
 
 func (t *Task) Logf(format string, v ...any) {
@@ -222,22 +222,22 @@ func (t *Task) Logf(format string, v ...any) {
 }
 
 func (t *Task) LogFailed(msg string) {
-	t.Logger.Printf(msg + i18n.GetMsgByKey("Failed"))
+	t.Logger.Print(msg + i18n.GetMsgByKey("Failed"))
 }
 
 func (t *Task) LogFailedWithErr(msg string, err error) {
-	t.Logger.Printf(fmt.Sprintf("%s %s : %s", msg, i18n.GetMsgByKey("Failed"), err.Error()))
+	t.Logger.Printf("%s %s : %s", msg, i18n.GetMsgByKey("Failed"), err.Error())
 }
 
 func (t *Task) LogSuccess(msg string) {
-	t.Logger.Printf(msg + i18n.GetMsgByKey("Success"))
+	t.Logger.Print(msg + i18n.GetMsgByKey("Success"))
 }
 func (t *Task) LogSuccessF(format string, v ...any) {
-	t.Logger.Printf(fmt.Sprintf(format, v...) + i18n.GetMsgByKey("Success"))
+	t.Logger.Print(fmt.Sprintf(format, v...) + i18n.GetMsgByKey("Success"))
 }
 
 func (t *Task) LogStart(msg string) {
-	t.Logger.Printf(fmt.Sprintf("%s%s", i18n.GetMsgByKey("Start"), msg))
+	t.Logger.Printf("%s%s", i18n.GetMsgByKey("Start"), msg)
 }
 
 func (t *Task) LogWithOps(operate, msg string) {

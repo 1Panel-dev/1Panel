@@ -3,11 +3,12 @@ package client
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/core/constant"
 	"net/http"
 	"os"
 	"path"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/core/constant"
 
 	"github.com/studio-b12/gowebdav"
 )
@@ -60,4 +61,11 @@ func (s webDAVClient) Upload(src, target string) (bool, error) {
 func (s webDAVClient) ListBuckets() ([]interface{}, error) {
 	var result []interface{}
 	return result, nil
+}
+
+func (s webDAVClient) Delete(pathItem string) (bool, error) {
+	if err := s.client.Remove(path.Join(s.Bucket, pathItem)); err != nil {
+		return false, err
+	}
+	return true, nil
 }

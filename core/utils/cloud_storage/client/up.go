@@ -45,3 +45,12 @@ func (s upClient) Upload(src, target string) (bool, error) {
 	}
 	return true, nil
 }
+
+func (s upClient) Delete(path string) (bool, error) {
+	if err := s.client.Delete(&upyun.DeleteObjectConfig{
+		Path: path,
+	}); err != nil {
+		return false, err
+	}
+	return true, nil
+}

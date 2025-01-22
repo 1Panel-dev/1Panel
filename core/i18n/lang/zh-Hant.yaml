@@ -28,7 +28,6 @@ ErrBackupCheck: "備份帳號測試連接失敗 {{ .err}}"
 ErrBackupLocal: "本地伺服器備份帳號暫不支持該操作！"
 ErrBackupPublic: "檢測到該備份帳號為非公用，請檢查後重試！"
 ErrOSSConn: "無法獲取最新版本，請確認伺服器是否能夠連接外部網絡。"
-ErrEntrance: "安全入口信息錯誤，請檢查後重試！"
 
 #license
 ErrLicense: "許可證格式錯誤，請檢查後重試！"

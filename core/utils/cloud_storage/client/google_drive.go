@@ -72,6 +72,23 @@ func (g *googleDriveClient) Upload(src, target string) (bool, error) {
 	return true, nil
 }
 
+func (g *googleDriveClient) Delete(pathItem string) (bool, error) {
+	pathItem = path.Join("root", pathItem)
+	fileInfo, err := g.loadFileWithName(pathItem)
+	if err != nil {
+		return false, err
+	}
+	if len(fileInfo.ID) == 0 {
+		return false, fmt.Errorf("no such file %s", pathItem)
+	}
+	res, err := g.googleRequest("https://www.googleapis.com/drive/v3/files/"+fileInfo.ID, http.MethodDelete, nil, nil)
+	if err != nil {
+		return false, err
+	}
+	fmt.Println(string(res))
+	return true, nil
+}
+
 type googleFileResp struct {
 	Files []googleFile `json:"files"`
 }
@@ -145,6 +162,44 @@ func (g *googleDriveClient) mkdir(parentID, name string) (string, error) {
 		return "", err
 	}
 	return mkdirResp.ID, nil
+}
+
+func (g *googleDriveClient) loadFileWithName(pathItem string) (googleFile, error) {
+	pathItems := strings.Split(pathItem, "/")
+	var (
+		fileInfos []googleFile
+		err       error
+	)
+	parentID := "root"
+	for i := 0; i < len(pathItems); i++ {
+		if len(pathItems[i]) == 0 {
+			continue
+		}
+		fileInfos, err = g.loadFileWithParentID(parentID)
+		if err != nil {
+			return googleFile{}, err
+		}
+		isEnd := false
+		if i == len(pathItems)-2 {
+			isEnd = true
+		}
+		exist := false
+		for _, item := range fileInfos {
+			if item.Name == pathItems[i+1] {
+				if isEnd {
+					return item, nil
+				} else {
+					parentID = item.ID
+					exist = true
+				}
+			}
+		}
+		if !exist {
+			return googleFile{}, errors.New("no such file or dir")
+		}
+
+	}
+	return googleFile{}, errors.New("no such file or dir")
 }
 
 func (g *googleDriveClient) loadFileWithParentID(parentID string) ([]googleFile, error) {

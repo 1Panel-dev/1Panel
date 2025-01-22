@@ -28,7 +28,6 @@ ErrBackupCheck: "Cubaan sambungan akaun sandaran gagal {{ .err}}"
 ErrBackupLocal: "Akaun sandaran pelayan tempatan tidak menyokong operasi ini!"
 ErrBackupPublic: "Akaun sandaran ini didapati bukan awam, sila semak dan cuba lagi!"
 ErrOSSConn: "Tidak dapat mendapatkan versi terkini, sila pastikan pelayan boleh disambung ke rangkaian luar."
-ErrEntrance: "Maklumat pintu masuk selamat salah, sila semak dan cuba lagi!"
 
 #license
 ErrLicense: "Format lesen salah, sila semak dan cuba lagi!"

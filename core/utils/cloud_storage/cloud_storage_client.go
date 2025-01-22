@@ -8,6 +8,7 @@ import (
 type CloudStorageClient interface {
 	ListBuckets() ([]interface{}, error)
 	Upload(src, target string) (bool, error)
+	Delete(path string) (bool, error)
 }
 
 func NewCloudStorageClient(backupType string, vars map[string]interface{}) (CloudStorageClient, error) {

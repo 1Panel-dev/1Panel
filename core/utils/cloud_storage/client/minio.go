@@ -76,3 +76,21 @@ func (m minIoClient) Upload(src, target string) (bool, error) {
 	}
 	return true, nil
 }
+
+func (m minIoClient) Delete(path string) (bool, error) {
+	object, err := m.client.GetObject(context.Background(), m.bucket, path, minio.GetObjectOptions{})
+	if err != nil {
+		return false, err
+	}
+	info, err := object.Stat()
+	if err != nil {
+		return false, err
+	}
+	if err = m.client.RemoveObject(context.Background(), m.bucket, path, minio.RemoveObjectOptions{
+		GovernanceBypass: true,
+		VersionID:        info.VersionID,
+	}); err != nil {
+		return false, err
+	}
+	return true, nil
+}

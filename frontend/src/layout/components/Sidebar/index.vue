@@ -92,7 +92,6 @@ const nodeChangeRef = ref<DropdownInstance>();
 const version = ref();
 
 bus.on('refreshTask', () => {
-    console.log('on bus message');
     checkTask();
 });
 

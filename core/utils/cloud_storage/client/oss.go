@@ -53,3 +53,14 @@ func (o ossClient) Upload(src, target string) (bool, error) {
 	}
 	return true, nil
 }
+
+func (o ossClient) Delete(path string) (bool, error) {
+	bucket, err := o.client.Bucket(o.bucketStr)
+	if err != nil {
+		return false, err
+	}
+	if err := bucket.DeleteObject(path); err != nil {
+		return false, err
+	}
+	return true, nil
+}

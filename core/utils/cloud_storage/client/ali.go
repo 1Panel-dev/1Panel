@@ -88,6 +88,69 @@ func (a aliClient) Upload(src, target string) (bool, error) {
 	return true, nil
 }
 
+func (a aliClient) Delete(pathItem string) (bool, error) {
+	pathItem = path.Join("root", pathItem)
+	fileInfo, err := a.loadFileWithName(pathItem)
+	if err != nil {
+		return false, err
+	}
+	client := resty.New()
+	data := map[string]interface{}{
+		"drive_id": a.driveID,
+		"file_id":  fileInfo.FileID,
+	}
+	url := "https://api.alipan.com/v2/file/delete"
+	resp, err := client.R().
+		SetHeader("Authorization", a.token).
+		SetBody(data).
+		Post(url)
+	if err != nil {
+		return false, err
+	}
+	if resp.StatusCode() != 204 {
+		return false, fmt.Errorf("delete file %s failed, err: %v", pathItem, string(resp.Body()))
+	}
+	return true, nil
+}
+
+func (a aliClient) loadFileWithName(pathItem string) (fileInfo, error) {
+	pathItems := strings.Split(pathItem, "/")
+	var (
+		fileInfos []fileInfo
+		err       error
+	)
+	parentID := "root"
+	for i := 0; i < len(pathItems); i++ {
+		if len(pathItems[i]) == 0 {
+			continue
+		}
+		fileInfos, err = a.loadFileWithParentID(parentID)
+		if err != nil {
+			return fileInfo{}, err
+		}
+		isEnd := false
+		if i == len(pathItems)-2 {
+			isEnd = true
+		}
+		exist := false
+		for _, item := range fileInfos {
+			if item.Name == pathItems[i+1] {
+				if isEnd {
+					return item, nil
+				} else {
+					parentID = item.FileID
+					exist = true
+				}
+			}
+		}
+		if !exist {
+			return fileInfo{}, errors.New("no such file or dir")
+		}
+
+	}
+	return fileInfo{}, errors.New("no such file or dir")
+}
+
 func (a aliClient) loadFileWithParentID(parentID string) ([]fileInfo, error) {
 	client := resty.New()
 	data := map[string]interface{}{

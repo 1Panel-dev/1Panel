@@ -409,11 +409,11 @@
             </div>
 
             <div v-if="isBackup()">
-                <el-form-item :label="$t('setting.backupAccount')" prop="sourceAccounts">
+                <el-form-item :label="$t('setting.backupAccount')" prop="sourceAccountItems">
                     <el-select
                         multiple
                         class="selectClass"
-                        v-model="dialogData.rowData!.sourceAccounts"
+                        v-model="dialogData.rowData!.sourceAccountItems"
                         @change="changeAccount"
                     >
                         <div v-for="item in backupOptions" :key="item.id">
@@ -584,6 +584,16 @@ const acceptParams = (params: DialogProps): void => {
     dialogData.value.rowData.specObjs = dialogData.value.rowData.specObjs || [];
     if (dialogData.value.rowData?.specCustom && dialogData.value.rowData?.spec) {
         dialogData.value.rowData.specs = dialogData.value.rowData.spec.split(',');
+    }
+    if (dialogData.value.rowData.sourceAccountIDs) {
+        let list = [];
+        dialogData.value.rowData.sourceAccountItems = [];
+        list = dialogData.value.rowData.sourceAccountIDs.split(',');
+        for (const item of list) {
+            if (item) {
+                dialogData.value.rowData.sourceAccountItems.push(item);
+            }
+        }
     }
     dialogData.value.rowData.specs = dialogData.value.rowData.specs || [];
     dialogData.value.rowData.files = [];
@@ -787,7 +797,7 @@ const rules = reactive({
     url: [Rules.requiredInput],
     files: [{ validator: verifyFiles, trigger: 'blur', required: true }],
     sourceDir: [Rules.requiredInput],
-    sourceAccounts: [Rules.requiredSelect],
+    sourceAccountItems: [Rules.requiredSelect],
     downloadAccountID: [Rules.requiredSelect],
     retainCopies: [Rules.number],
     alertCount: [Rules.integerNumber, { validator: checkSendCount, trigger: 'blur' }],
@@ -917,8 +927,8 @@ const loadBackups = async () => {
         }
         backupOptions.value.push({ id: item.id, type: i18n.global.t('setting.' + item.type), name: item.name });
     }
-    if (!dialogData.value.rowData!.sourceAccounts) {
-        dialogData.value.rowData!.sourceAccounts = local === 0 ? [local] : [];
+    if (!dialogData.value.rowData!.sourceAccountItems) {
+        dialogData.value.rowData!.sourceAccountItems = local === 0 ? [local] : [];
     }
     changeAccount();
 };
@@ -928,7 +938,7 @@ const changeAccount = async () => {
     let isInAccounts = false;
     for (const item of backupOptions.value) {
         let exist = false;
-        for (const ac of dialogData.value.rowData.sourceAccounts) {
+        for (const ac of dialogData.value.rowData.sourceAccountItems) {
             if (item.id == ac) {
                 exist = true;
                 break;
@@ -1010,7 +1020,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         }
         dialogData.value.rowData.sourceDir = files.join(',');
     }
-    dialogData.value.rowData.sourceAccountIDs = dialogData.value.rowData.sourceAccounts.join(',');
+    dialogData.value.rowData.sourceAccountIDs = dialogData.value.rowData.sourceAccountItems.join(',');
     dialogData.value.rowData.spec = specs.join(',');
     if (!formEl) return;
     formEl.validate(async (valid) => {
@@ -1055,8 +1065,30 @@ defineExpose({
 });
 </script>
 <style scoped lang="scss">
-:deep(.el-input-group__append) {
-    padding: 0 10px;
+.specClass {
+    width: 17% !important;
+    margin-left: 20px;
+    .append {
+        width: 20px;
+    }
+}
+@media only screen and (max-width: 1000px) {
+    .specClass {
+        width: 100% !important;
+        margin-top: 20px;
+        margin-left: 0;
+        .append {
+            width: 43px;
+        }
+    }
+}
+.specTypeClass {
+    width: 22% !important;
+}
+@media only screen and (max-width: 1000px) {
+    .specTypeClass {
+        width: 100% !important;
+    }
 }
 .selectClass {
     width: 100%;

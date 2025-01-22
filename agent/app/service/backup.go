@@ -314,7 +314,7 @@ func (u *BackupService) RefreshToken(req dto.OperateByID) error {
 }
 
 func (u *BackupService) checkBackupConn(backup *model.BackupAccount) (bool, error) {
-	client, err := newClient(backup)
+	client, err := newClient(backup, false)
 	if err != nil {
 		return false, err
 	}
@@ -340,7 +340,12 @@ func (u *BackupService) checkBackupConn(backup *model.BackupAccount) (bool, erro
 	if backup.Type != constant.Sftp && backup.Type != constant.Local && targetPath != "/" {
 		targetPath = strings.TrimPrefix(targetPath, "/")
 	}
-	return client.Upload(fileItem, targetPath)
+
+	if _, err := client.Upload(fileItem, targetPath); err != nil {
+		return false, err
+	}
+	_, _ = client.Delete(path.Join(backup.BackupPath, "test"))
+	return true, nil
 }
 
 func (u *BackupService) Sync(req dto.SyncFromMaster) error {
@@ -408,7 +413,7 @@ func (u *BackupService) CheckUsed(id uint) error {
 
 func NewBackupClientWithID(id uint) (*model.BackupAccount, cloud_storage.CloudStorageClient, error) {
 	account, _ := backupRepo.Get(repo.WithByID(id))
-	backClient, err := newClient(&account)
+	backClient, err := newClient(&account, true)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -433,7 +438,7 @@ func NewBackupClientMap(ids []string) (map[string]backupClientHelper, error) {
 	accounts, _ = backupRepo.List(repo.WithByIDs(idItems))
 	clientMap := make(map[string]backupClientHelper)
 	for _, item := range accounts {
-		backClient, err := newClient(&item)
+		backClient, err := newClient(&item, true)
 		if err != nil {
 			return nil, err
 		}
@@ -448,7 +453,7 @@ func NewBackupClientMap(ids []string) (map[string]backupClientHelper, error) {
 	return clientMap, nil
 }
 
-func newClient(account *model.BackupAccount) (cloud_storage.CloudStorageClient, error) {
+func newClient(account *model.BackupAccount, isEncrypt bool) (cloud_storage.CloudStorageClient, error) {
 	varMap := make(map[string]interface{})
 	if len(account.Vars) != 0 {
 		if err := json.Unmarshal([]byte(account.Vars), &varMap); err != nil {
@@ -457,8 +462,10 @@ func newClient(account *model.BackupAccount) (cloud_storage.CloudStorageClient, 
 	}
 	varMap["bucket"] = account.Bucket
 	varMap["backupPath"] = account.BackupPath
-	account.AccessKey, _ = encrypt.StringDecrypt(account.AccessKey)
-	account.Credential, _ = encrypt.StringDecrypt(account.Credential)
+	if isEncrypt {
+		account.AccessKey, _ = encrypt.StringDecrypt(account.AccessKey)
+		account.Credential, _ = encrypt.StringDecrypt(account.Credential)
+	}
 	switch account.Type {
 	case constant.Sftp, constant.WebDAV:
 		varMap["username"] = account.AccessKey

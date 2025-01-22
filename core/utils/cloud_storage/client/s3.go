@@ -81,3 +81,17 @@ func (s s3Client) Upload(src, target string) (bool, error) {
 	}
 	return true, nil
 }
+
+func (s s3Client) Delete(path string) (bool, error) {
+	svc := s3.New(&s.Sess)
+	if _, err := svc.DeleteObject(&s3.DeleteObjectInput{Bucket: aws.String(s.bucket), Key: aws.String(path)}); err != nil {
+		return false, err
+	}
+	if err := svc.WaitUntilObjectNotExists(&s3.HeadObjectInput{
+		Bucket: aws.String(s.bucket),
+		Key:    aws.String(path),
+	}); err != nil {
+		return false, err
+	}
+	return true, nil
+}
