@@ -360,10 +360,17 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 			}
 			req.Params["WEBSITE_DIR"] = siteDir
 			oldWebStePath, _ := settingRepo.GetValueByKey("WEBSITE_DIR")
-			if oldWebStePath != "" && oldWebStePath != siteDir {
-				_ = files.NewFileOp().Rename(oldWebStePath, siteDir)
+			fileOp := files.NewFileOp()
+			if oldWebStePath != "" && oldWebStePath != siteDir && fileOp.Stat(oldWebStePath) {
+				_ = fileOp.Rename(oldWebStePath, siteDir)
 			}
-			_ = settingRepo.UpdateOrCreate("WEBSITE_DIR", siteDir)
+			if !fileOp.Stat(siteDir) {
+				_ = fileOp.CreateDir(siteDir, constant.DirPerm)
+			}
+			err = settingRepo.UpdateOrCreate("WEBSITE_DIR", siteDir)
+			if err != nil {
+				return
+			}
 		}
 	}
 	for key := range req.Params {
