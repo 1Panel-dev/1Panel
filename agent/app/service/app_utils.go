@@ -897,7 +897,7 @@ func downloadApp(app model.App, appDetail model.AppDetail, appInstall *model.App
 		}
 	}()
 
-	if err = fileOp.DownloadFileWithProxy(appDetail.DownloadUrl, filePath); err != nil {
+	if err = fileOp.DownloadFile(appDetail.DownloadUrl, filePath); err != nil {
 		if logger == nil {
 			global.LOG.Errorf("download app[%s] error %v", app.Name, err)
 		} else {
