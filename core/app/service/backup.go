@@ -21,7 +21,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/cloud_storage"
 	"github.com/1Panel-dev/1Panel/core/utils/cloud_storage/client"
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
-	httpUtils "github.com/1Panel-dev/1Panel/core/utils/http"
+	"github.com/1Panel-dev/1Panel/core/utils/req_helper"
 	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
@@ -168,7 +168,7 @@ func (u *BackupService) Delete(id uint) error {
 	if backup.Type == constant.Local {
 		return buserr.New(constant.ErrBackupLocal)
 	}
-	if _, err := httpUtils.NewLocalClient(fmt.Sprintf("/api/v2/backups/check/%v", id), http.MethodGet, nil); err != nil {
+	if _, err := req_helper.NewLocalClient(fmt.Sprintf("/api/v2/backups/check/%v", id), http.MethodGet, nil); err != nil {
 		global.LOG.Errorf("check used of local cronjob failed, err: %v", err)
 		return buserr.New(constant.ErrBackupInUsed)
 	}
@@ -370,5 +370,5 @@ func syncAccountToAgent(backup model.BackupAccount, operation string) {
 	itemJson := dto.SyncToAgent{Name: backup.Name, Operation: operation, Data: string(itemData)}
 	bodyItem, _ := json.Marshal(itemJson)
 	_ = xpack.RequestToAllAgent("/api/v2/backups/sync", http.MethodPost, bytes.NewReader((bodyItem)))
-	_, _ = httpUtils.NewLocalClient("/api/v2/backups/sync", http.MethodPost, bytes.NewReader((bodyItem)))
+	_, _ = req_helper.NewLocalClient("/api/v2/backups/sync", http.MethodPost, bytes.NewReader((bodyItem)))
 }

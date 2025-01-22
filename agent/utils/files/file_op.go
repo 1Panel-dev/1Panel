@@ -21,7 +21,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
-	http2 "github.com/1Panel-dev/1Panel/agent/utils/http"
+	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
 	cZip "github.com/klauspost/compress/zip"
 	"golang.org/x/text/encoding/simplifiedchinese"
 	"golang.org/x/text/transform"
@@ -315,7 +315,7 @@ func (f FileOp) DownloadFileWithProcess(url, dst, key string, ignoreCertificate 
 }
 
 func (f FileOp) DownloadFile(url, dst string) error {
-	resp, err := http2.GetHttpRes(url)
+	resp, err := req_helper.HandleGet(url)
 	if err != nil {
 		return err
 	}
@@ -334,7 +334,7 @@ func (f FileOp) DownloadFile(url, dst string) error {
 }
 
 func (f FileOp) DownloadFileWithProxy(url, dst string) error {
-	_, resp, err := http2.HandleGet(url, http.MethodGet, constant.TimeOut5m)
+	_, resp, err := req_helper.HandleRequest(url, http.MethodGet, constant.TimeOut5m)
 	if err != nil {
 		return err
 	}

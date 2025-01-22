@@ -1,4 +1,4 @@
-package http
+package req_helper
 
 import (
 	"context"
@@ -12,9 +12,10 @@ import (
 
 	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/global"
+	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 )
 
-func HandleGet(url, method string, timeout int) (int, []byte, error) {
+func HandleRequest(url, method string, timeout int) (int, []byte, error) {
 	transport := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		DialContext: (&net.Dialer{
@@ -25,10 +26,15 @@ func HandleGet(url, method string, timeout int) (int, []byte, error) {
 		ResponseHeaderTimeout: 10 * time.Second,
 		IdleConnTimeout:       15 * time.Second,
 	}
-	return HandleGetWithTransport(url, method, transport, timeout)
+	return handleRequestWithTransport(url, method, transport, timeout)
 }
 
-func HandleGetWithTransport(url, method string, transport *http.Transport, timeout int) (int, []byte, error) {
+func HandleRequestWithProxy(url, method string, timeout int) (int, []byte, error) {
+	transport := xpack.LoadRequestTransport()
+	return handleRequestWithTransport(url, method, transport, timeout)
+}
+
+func handleRequestWithTransport(url, method string, transport *http.Transport, timeout int) (int, []byte, error) {
 	defer func() {
 		if r := recover(); r != nil {
 			global.LOG.Errorf("handle request failed, error message: %v", r)
@@ -57,10 +63,7 @@ func HandleGetWithTransport(url, method string, transport *http.Transport, timeo
 	return resp.StatusCode, body, nil
 }
 
-func GetHttpRes(url string) (*http.Response, error) {
-	client := &http.Client{
-		Timeout: time.Second * 300,
-	}
+func HandleGet(url string) (*http.Response, error) {
 	transport := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		DialContext: (&net.Dialer{
@@ -70,6 +73,18 @@ func GetHttpRes(url string) (*http.Response, error) {
 		TLSHandshakeTimeout:   5 * time.Second,
 		ResponseHeaderTimeout: 10 * time.Second,
 		IdleConnTimeout:       15 * time.Second,
+	}
+	return handleGetWithTransport(url, transport)
+}
+
+func HandleGetWithProxy(url string) (*http.Response, error) {
+	transport := xpack.LoadRequestTransport()
+	return handleGetWithTransport(url, transport)
+}
+
+func handleGetWithTransport(url string, transport *http.Transport) (*http.Response, error) {
+	client := &http.Client{
+		Timeout: time.Second * 300,
 	}
 	client.Transport = transport
 

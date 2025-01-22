@@ -26,7 +26,7 @@ import (
 
 	"github.com/docker/docker/api/types"
 
-	httpUtil "github.com/1Panel-dev/1Panel/agent/utils/http"
+	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
 	"github.com/docker/docker/api/types/container"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
@@ -1758,5 +1758,5 @@ func RequestDownloadCallBack(downloadCallBackUrl string) {
 	if downloadCallBackUrl == "" {
 		return
 	}
-	_, _, _ = httpUtil.HandleGet(downloadCallBackUrl, http.MethodGet, constant.TimeOut5s)
+	_, _, _ = req_helper.HandleRequest(downloadCallBackUrl, http.MethodGet, constant.TimeOut5s)
 }

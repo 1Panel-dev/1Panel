@@ -10,7 +10,7 @@
             <PrimaryMenu />
         </div>
         <Logo :isCollapse="isCollapse" />
-        <div class="el-dropdown-link flex justify-between items-center">
+        <div class="el-dropdown-link flex justify-between items-center background">
             <el-button link class="ml-4" @click="openChangeNode" @mouseenter="openChangeNode">
                 {{ loadCurrentName() }}
             </el-button>
@@ -226,6 +226,7 @@ const search = async () => {
     await checkIsSystemIntl();
     let checkedLabels: any[] = [];
     const res = await getSettingInfo();
+    version.value = res.data.systemVersion;
     const json: Node = JSON.parse(res.data.xpackHideMenu);
     checkedLabels = getCheckedLabels(json);
 
@@ -299,6 +300,10 @@ onMounted(() => {
 
 <style lang="scss">
 @use 'index';
+
+.background {
+    z-index: 20;
+}
 
 .custom-menu .el-menu-item {
     white-space: normal !important;

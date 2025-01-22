@@ -1,4 +1,4 @@
-package http
+package req_helper
 
 import (
 	"context"

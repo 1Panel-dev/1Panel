@@ -1,10 +1,11 @@
-package http
+package req_helper
 
 import (
 	"bytes"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"net/http"
+
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 )
 
 func PostLocalCore(url string) error {

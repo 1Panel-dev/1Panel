@@ -217,7 +217,6 @@ const onSubmit = async () => {
             proxyUrl = '';
         }
         await updateXpackSettingByKey('ProxyDocker', proxyUrl);
-        await updateDaemonJson(`${form.proxyType}-proxy`, proxyUrl);
         emit('search');
         handleClose();
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));

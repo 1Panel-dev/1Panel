@@ -26,8 +26,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
-	http2 "github.com/1Panel-dev/1Panel/agent/utils/http"
-	httpUtil "github.com/1Panel-dev/1Panel/agent/utils/http"
+	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 	"gopkg.in/yaml.v3"
 )
@@ -260,7 +259,7 @@ func (a AppService) GetAppDetail(appID uint, version, appType string) (response.
 	if appDetailDTO.DockerCompose == "" {
 		filename := filepath.Base(appDetailDTO.DownloadUrl)
 		dockerComposeUrl := fmt.Sprintf("%s%s", strings.TrimSuffix(appDetailDTO.DownloadUrl, filename), "docker-compose.yml")
-		statusCode, composeRes, err := httpUtil.HandleGet(dockerComposeUrl, http.MethodGet, constant.TimeOut20s)
+		statusCode, composeRes, err := req_helper.HandleRequest(dockerComposeUrl, http.MethodGet, constant.TimeOut20s)
 		if err != nil {
 			return appDetailDTO, buserr.WithDetail("ErrGetCompose", err.Error(), err)
 		}
@@ -766,7 +765,7 @@ func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
 	}
 
 	versionUrl := fmt.Sprintf("%s/%s/1panel.json.version.txt", global.CONF.System.AppRepo, global.CONF.System.Mode)
-	_, versionRes, err := http2.HandleGet(versionUrl, http.MethodGet, constant.TimeOut20s)
+	_, versionRes, err := req_helper.HandleRequest(versionUrl, http.MethodGet, constant.TimeOut20s)
 	if err != nil {
 		return nil, err
 	}
@@ -929,7 +928,6 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 			oldAppIds = append(oldAppIds, old.ID)
 		}
 
-		transport := xpack.LoadRequestTransport()
 		baseRemoteUrl := fmt.Sprintf("%s/%s/1panel", global.CONF.System.AppRepo, global.CONF.System.Mode)
 
 		appsMap := getApps(oldApps, list.Apps, setting.SystemVersion, t)
@@ -937,7 +935,7 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 		t.LogStart(i18n.GetMsgByKey("SyncAppDetail"))
 		for _, l := range list.Apps {
 			app := appsMap[l.AppProperty.Key]
-			_, iconRes, err := httpUtil.HandleGetWithTransport(l.Icon, http.MethodGet, transport, constant.TimeOut20s)
+			_, iconRes, err := req_helper.HandleRequest(l.Icon, http.MethodGet, constant.TimeOut20s)
 			if err != nil {
 				return err
 			}
@@ -970,7 +968,7 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 				}
 				if _, ok := InitTypes[app.Type]; ok {
 					dockerComposeUrl := fmt.Sprintf("%s/%s", versionUrl, "docker-compose.yml")
-					_, composeRes, err := httpUtil.HandleGetWithTransport(dockerComposeUrl, http.MethodGet, transport, constant.TimeOut20s)
+					_, composeRes, err := req_helper.HandleRequest(dockerComposeUrl, http.MethodGet, constant.TimeOut20s)
 					if err != nil {
 						return err
 					}

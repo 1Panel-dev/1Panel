@@ -475,6 +475,7 @@ const onSave = async (key: string, val: any) => {
             }
             MsgSuccess(i18n.t('commons.msg.operationSuccess'));
             search();
+            loading.value = false;
         })
         .catch(() => {
             loading.value = false;

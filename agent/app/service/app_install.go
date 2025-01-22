@@ -15,7 +15,7 @@ import (
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
-	httpUtil "github.com/1Panel-dev/1Panel/agent/utils/http"
+	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
 	"github.com/docker/docker/api/types"
 	"gopkg.in/yaml.v3"
 
@@ -553,7 +553,7 @@ func (a *AppInstallService) GetUpdateVersions(req request.AppUpdateVersion) ([]d
 			if req.UpdateVersion != "" && req.UpdateVersion == detail.Version && detail.DockerCompose == "" && !app.IsLocalApp() {
 				filename := filepath.Base(detail.DownloadUrl)
 				dockerComposeUrl := fmt.Sprintf("%s%s", strings.TrimSuffix(detail.DownloadUrl, filename), "docker-compose.yml")
-				statusCode, composeRes, err := httpUtil.HandleGet(dockerComposeUrl, http.MethodGet, constant.TimeOut20s)
+				statusCode, composeRes, err := req_helper.HandleRequest(dockerComposeUrl, http.MethodGet, constant.TimeOut20s)
 				if err != nil {
 					return versions, err
 				}

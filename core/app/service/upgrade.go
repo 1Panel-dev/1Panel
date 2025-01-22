@@ -18,7 +18,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/cmd"
 	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/1Panel-dev/1Panel/core/utils/files"
-	httpUtil "github.com/1Panel-dev/1Panel/core/utils/http"
+	"github.com/1Panel-dev/1Panel/core/utils/req_helper"
 )
 
 type UpgradeService struct{}
@@ -264,7 +264,7 @@ func (u *UpgradeService) loadVersion(isLatest bool, currentVersion, mode string)
 	if !isLatest {
 		path = fmt.Sprintf("%s/%s/latest.current", global.CONF.System.RepoUrl, mode)
 	}
-	_, latestVersionRes, err := httpUtil.HandleGet(path, http.MethodGet, constant.TimeOut20s)
+	_, latestVersionRes, err := req_helper.HandleRequestWithProxy(path, http.MethodGet, constant.TimeOut20s)
 	if err != nil {
 		global.LOG.Errorf("load latest version from oss failed, err: %v", err)
 		return ""
@@ -325,7 +325,7 @@ func (u *UpgradeService) checkVersion(v2, v1 string) string {
 }
 
 func (u *UpgradeService) loadReleaseNotes(path string) (string, error) {
-	_, releaseNotes, err := httpUtil.HandleGet(path, http.MethodGet, constant.TimeOut20s)
+	_, releaseNotes, err := req_helper.HandleRequestWithProxy(path, http.MethodGet, constant.TimeOut20s)
 	if err != nil {
 		return "", err
 	}

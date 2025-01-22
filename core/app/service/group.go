@@ -11,7 +11,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
-	httpUtils "github.com/1Panel-dev/1Panel/core/utils/http"
+	"github.com/1Panel-dev/1Panel/core/utils/req_helper"
 	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
@@ -92,7 +92,7 @@ func (u *GroupService) Delete(id uint) error {
 		err = xpack.UpdateGroup("node", id, defaultGroup.ID)
 	case "website":
 		bodyItem := []byte(fmt.Sprintf(`{"Group":%v, "NewGroup":%v}`, id, defaultGroup.ID))
-		if _, err := httpUtils.NewLocalClient("/api/v2/websites/group/change", http.MethodPost, bytes.NewReader(bodyItem)); err != nil {
+		if _, err := req_helper.NewLocalClient("/api/v2/websites/group/change", http.MethodPost, bytes.NewReader(bodyItem)); err != nil {
 			return err
 		}
 		if err := xpack.UpdateGroup("node", id, defaultGroup.ID); err != nil {

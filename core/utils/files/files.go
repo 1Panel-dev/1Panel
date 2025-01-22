@@ -16,7 +16,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/cmd"
-	httpUtil "github.com/1Panel-dev/1Panel/core/utils/http"
+	"github.com/1Panel-dev/1Panel/core/utils/req_helper"
 )
 
 func CopyFile(src, dst string, withName bool) error {
@@ -146,7 +146,7 @@ func HandleUnTar(sourceFile, targetDir string, secret string) error {
 }
 
 func DownloadFile(url, dst string) error {
-	resp, err := httpUtil.GetHttpRes(url)
+	resp, err := req_helper.HandleGet(url)
 	if err != nil {
 		return err
 	}
@@ -165,7 +165,7 @@ func DownloadFile(url, dst string) error {
 }
 
 func DownloadFileWithProxy(url, dst string) error {
-	_, resp, err := httpUtil.HandleGet(url, http.MethodGet, constant.TimeOut5m)
+	_, resp, err := req_helper.HandleRequestWithProxy(url, http.MethodGet, constant.TimeOut5m)
 	if err != nil {
 		return err
 	}

@@ -6,7 +6,6 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	http2 "github.com/1Panel-dev/1Panel/agent/utils/http"
 	"log"
 	"os"
 	"path"
@@ -25,6 +24,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
+	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
 	"github.com/1Panel-dev/1Panel/agent/utils/ssl"
 	"github.com/go-acme/lego/v4/certcrypto"
 	legoLogger "github.com/go-acme/lego/v4/log"
@@ -205,7 +205,7 @@ func reloadSystemSSL(websiteSSL *model.WebsiteSSL, logger *log.Logger) {
 			logger.Printf("Failed to update the SSL certificate for 1Panel System domain [%s] , err:%s", websiteSSL.PrimaryDomain, err.Error())
 			return
 		}
-		if err := http2.PostLocalCore("/core/settings/ssl/reload"); err != nil {
+		if err := req_helper.PostLocalCore("/core/settings/ssl/reload"); err != nil {
 			logger.Printf("Failed to update the SSL certificate for 1Panel System domain [%s] , err:%s", websiteSSL.PrimaryDomain, err.Error())
 			return
 		}
