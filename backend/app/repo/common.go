@@ -15,6 +15,7 @@ type DBOption func(*gorm.DB) *gorm.DB
 type ICommonRepo interface {
 	WithByID(id uint) DBOption
 	WithByName(name string) DBOption
+	WithByLowerName(name string) DBOption
 	WithByType(tp string) DBOption
 	WithOrderBy(orderStr string) DBOption
 	WithOrderRuleBy(orderBy, order string) DBOption
@@ -42,6 +43,12 @@ func (c *CommonRepo) WithByID(id uint) DBOption {
 func (c *CommonRepo) WithByName(name string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("name = ?", name)
+	}
+}
+
+func (c *CommonRepo) WithByLowerName(name string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("LOWER(name) = LOWER(?)", name)
 	}
 }
 

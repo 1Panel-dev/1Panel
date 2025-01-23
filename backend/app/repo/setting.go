@@ -16,6 +16,7 @@ type ISettingRepo interface {
 	Create(key, value string) error
 	Update(key, value string) error
 	WithByKey(key string) DBOption
+	UpdateOrCreate(key, value string) error
 
 	CreateMonitorBase(model model.MonitorBase) error
 	BatchCreateMonitorIO(ioList []model.MonitorIO) error
@@ -84,4 +85,8 @@ func (u *SettingRepo) DelMonitorIO(timeForDelete time.Time) error {
 }
 func (u *SettingRepo) DelMonitorNet(timeForDelete time.Time) error {
 	return global.MonitorDB.Where("created_at < ?", timeForDelete).Delete(&model.MonitorNetwork{}).Error
+}
+
+func (u *SettingRepo) UpdateOrCreate(key, value string) error {
+	return global.DB.Model(&model.Setting{}).Where("key = ?", key).Assign(model.Setting{Key: key, Value: value}).FirstOrCreate(&model.Setting{}).Error
 }

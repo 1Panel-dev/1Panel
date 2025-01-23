@@ -11,6 +11,7 @@ func Init() {
 	go syncInstalledApp()
 	go syncRuntime()
 	go syncSSL()
+	generateKey()
 }
 
 func syncApp() {
@@ -36,5 +37,11 @@ func syncRuntime() {
 func syncSSL() {
 	if err := service.NewIWebsiteSSLService().SyncForRestart(); err != nil {
 		global.LOG.Errorf("sync ssl status error : %s", err.Error())
+	}
+}
+
+func generateKey() {
+	if err := service.NewISettingService().GenerateRSAKey(); err != nil {
+		global.LOG.Errorf("generate rsa key error : %s", err.Error())
 	}
 }

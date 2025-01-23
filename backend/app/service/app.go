@@ -326,7 +326,8 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 		err = buserr.WithDetail(constant.Err1PanelNetworkFailed, err.Error(), nil)
 		return
 	}
-	if list, _ := appInstallRepo.ListBy(commonRepo.WithByName(req.Name)); len(list) > 0 {
+
+	if list, _ := appInstallRepo.ListBy(commonRepo.WithByLowerName(req.Name)); len(list) > 0 {
 		err = buserr.New(constant.ErrAppNameExist)
 		return
 	}

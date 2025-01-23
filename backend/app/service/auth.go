@@ -3,8 +3,6 @@ package service
 import (
 	"crypto/hmac"
 	"encoding/base64"
-	"strconv"
-
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
@@ -15,6 +13,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
+	"strconv"
 )
 
 type AuthService struct{}
@@ -38,16 +37,11 @@ func (u *AuthService) Login(c *gin.Context, info dto.Login, entrance string) (*d
 	if err != nil {
 		return nil, errors.WithMessage(constant.ErrRecordNotFound, err.Error())
 	}
-	passwordSetting, err := settingRepo.Get(settingRepo.WithByKey("Password"))
-	if err != nil {
-		return nil, errors.WithMessage(constant.ErrRecordNotFound, err.Error())
-	}
-	pass, err := encrypt.StringDecrypt(passwordSetting.Value)
-	if err != nil {
+	if nameSetting.Value != info.Name {
 		return nil, constant.ErrAuth
 	}
-	if !hmac.Equal([]byte(info.Password), []byte(pass)) || nameSetting.Value != info.Name {
-		return nil, constant.ErrAuth
+	if err = checkPassword(info.Password); err != nil {
+		return nil, err
 	}
 	entranceSetting, err := settingRepo.Get(settingRepo.WithByKey("SecurityEntrance"))
 	if err != nil {
@@ -83,16 +77,11 @@ func (u *AuthService) MFALogin(c *gin.Context, info dto.MFALogin, entrance strin
 	if err != nil {
 		return nil, errors.WithMessage(constant.ErrRecordNotFound, err.Error())
 	}
-	passwordSetting, err := settingRepo.Get(settingRepo.WithByKey("Password"))
-	if err != nil {
-		return nil, errors.WithMessage(constant.ErrRecordNotFound, err.Error())
-	}
-	pass, err := encrypt.StringDecrypt(passwordSetting.Value)
-	if err != nil {
-		return nil, err
-	}
-	if !hmac.Equal([]byte(info.Password), []byte(pass)) || nameSetting.Value != info.Name {
+	if nameSetting.Value != info.Name {
 		return nil, constant.ErrAuth
+	}
+	if err = checkPassword(info.Password); err != nil {
+		return nil, err
 	}
 	entranceSetting, err := settingRepo.Get(settingRepo.WithByKey("SecurityEntrance"))
 	if err != nil {
@@ -218,4 +207,29 @@ func (u *AuthService) IsLogin(c *gin.Context) bool {
 		return false
 	}
 	return true
+}
+
+func checkPassword(password string) error {
+	priKey, _ := settingRepo.Get(settingRepo.WithByKey("PASSWORD_PRIVATE_KEY"))
+
+	privateKey, err := encrypt.ParseRSAPrivateKey(priKey.Value)
+	if err != nil {
+		return err
+	}
+	loginPassword, err := encrypt.DecryptPassword(password, privateKey)
+	if err != nil {
+		return err
+	}
+	passwordSetting, err := settingRepo.Get(settingRepo.WithByKey("Password"))
+	if err != nil {
+		return errors.WithMessage(constant.ErrRecordNotFound, err.Error())
+	}
+	existPassword, err := encrypt.StringDecrypt(passwordSetting.Value)
+	if err != nil {
+		return err
+	}
+	if !hmac.Equal([]byte(loginPassword), []byte(existPassword)) {
+		return constant.ErrAuth
+	}
+	return nil
 }

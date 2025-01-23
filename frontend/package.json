@@ -21,9 +21,9 @@
     },
     "dependencies": {
         "@codemirror/lang-html": "^6.4.9",
-        "@codemirror/lang-yaml": "^6.1.2",
         "@codemirror/lang-javascript": "^6.2.2",
         "@codemirror/lang-php": "^6.0.1",
+        "@codemirror/lang-yaml": "^6.1.2",
         "@codemirror/language": "^6.10.2",
         "@codemirror/legacy-modes": "^6.4.0",
         "@codemirror/state": "^6.4.1",
@@ -37,11 +37,13 @@
         "@xterm/xterm": "^5.5.0",
         "axios": "^1.7.2",
         "codemirror": "^6.0.1",
+        "crypto-js": "^4.2.0",
         "echarts": "^5.5.0",
         "element-plus": "^2.7.5",
         "fit2cloud-ui-plus": "^1.2.0",
         "highlight.js": "^11.9.0",
         "js-base64": "^3.7.7",
+        "jsencrypt": "^3.3.2",
         "md-editor-v3": "^2.11.3",
         "monaco-editor": "^0.50.0",
         "nprogress": "^0.2.0",
@@ -54,11 +56,12 @@
         "vue-clipboard3": "^2.0.0",
         "vue-codemirror": "^6.1.1",
         "vue-demi": "^0.14.6",
-        "vue-i18n": "^10.0.5",
-        "vue-router": "^4.3.3"
+        "vue-i18n": "^9.13.1",
+        "vue-router": "^4.3.3",
+        "vue-virtual-scroller": "^2.0.0-beta.8"
     },
     "devDependencies": {
-        "@types/node": "^20.14.2",
+        "@types/node": "^20.15.0",
         "@typescript-eslint/eslint-plugin": "^5.22.0",
         "@typescript-eslint/parser": "^5.22.0",
         "@vitejs/plugin-vue": "^5.0.5",
@@ -73,7 +76,7 @@
         "postcss": "^8.4.31",
         "postcss-html": "^1.4.1",
         "prettier": "^2.6.2",
-        "rollup-plugin-visualizer": "^5.5.4",
+        "rollup-plugin-visualizer": "^5.14.0",
         "sass": "^1.77.8",
         "standard-version": "^9.5.0",
         "stylelint": "^15.10.1",
@@ -81,7 +84,7 @@
         "typescript": "^4.5.4",
         "unplugin-auto-import": "^0.16.4",
         "unplugin-vue-components": "^0.25.0",
-        "vite": "^5.2.13",
+        "vite": "^6.0.7",
         "vite-plugin-compression": "^0.5.1",
         "vite-plugin-eslint": "^1.8.1",
         "vite-plugin-html": "^3.2.2",
@@ -90,7 +93,7 @@
         "vue-tsc": "^0.29.8"
     },
     "overrides": {
-        "esbuild": "npm:esbuild-wasm@latest"
+        "esbuild": "npm:esbuild-wasm@0.24.2"
     },
     "config": {
         "commitizen": {

@@ -113,9 +113,7 @@ func setWebStatic(rootRouter *gin.RouterGroup) {
 	rootRouter.StaticFS("/public", http.FS(web.Favicon))
 	rootRouter.StaticFS("/favicon.ico", http.FS(web.Favicon))
 	rootRouter.Static("/api/v1/images", "./uploads")
-	rootRouter.Use(func(c *gin.Context) {
-		c.Next()
-	})
+
 	rootRouter.GET("/assets/*filepath", func(c *gin.Context) {
 		c.Writer.Header().Set("Cache-Control", fmt.Sprintf("private, max-age=%d", 3600))
 		staticServer := http.FileServer(http.FS(web.Assets))
@@ -158,6 +156,7 @@ func Routers() *gin.Engine {
 
 	Router.Use(middleware.WhiteAllow())
 	Router.Use(middleware.BindDomain())
+	Router.Use(middleware.SetPasswordPublicKey())
 
 	Router.NoRoute(func(c *gin.Context) {
 		if checkFrontendPath(c) {

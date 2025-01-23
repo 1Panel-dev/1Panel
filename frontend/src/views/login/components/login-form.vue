@@ -180,6 +180,7 @@ import { MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
 import { getSettingInfo } from '@/api/modules/setting';
 import { Rules } from '@/global/form-rules';
+import { encryptPassword } from '@/utils/util';
 
 const i18n = useI18n();
 const themeConfig = computed(() => globalStore.themeConfig);
@@ -314,7 +315,7 @@ const login = (formEl: FormInstance | undefined) => {
         }
         let requestLoginForm = {
             name: loginForm.name,
-            password: loginForm.password,
+            password: encryptPassword(loginForm.password),
             ignoreCaptcha: globalStore.ignoreCaptcha,
             captcha: loginForm.captcha,
             captchaID: captcha.captchaID,
@@ -370,7 +371,7 @@ const mfaLogin = async (auto: boolean) => {
     if ((!auto && mfaLoginForm.code) || (auto && mfaLoginForm.code.length === 6)) {
         isLoggingIn = true;
         mfaLoginForm.name = loginForm.name;
-        mfaLoginForm.password = loginForm.password;
+        mfaLoginForm.password = encryptPassword(loginForm.password);
         const res = await mfaLoginApi(mfaLoginForm);
         if (res.code === 406) {
             errMfaInfo.value = true;
