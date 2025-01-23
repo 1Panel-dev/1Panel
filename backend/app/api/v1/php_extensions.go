@@ -12,7 +12,7 @@ import (
 // @Summary Page Extensions
 // @Accept json
 // @Param request body request.PHPExtensionsSearch true "request"
-// @Success 200 {array} response.PHPExtensionsDTO
+// @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /runtimes/php/extensions/search [post]
@@ -27,7 +27,10 @@ func (b *BaseApi) PagePHPExtensions(c *gin.Context) {
 			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 			return
 		}
-		helper.SuccessWithData(c, list)
+		helper.SuccessWithData(c, dto.PageResult{
+			Total: int64(len(list)),
+			Items: list,
+		})
 	} else {
 		total, list, err := phpExtensionsService.Page(req)
 		if err != nil {
