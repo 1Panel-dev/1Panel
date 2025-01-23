@@ -232,20 +232,6 @@ var AddTaskTable = &gormigrate.Migration{
 	},
 }
 
-var InitNodePort = &gormigrate.Migration{
-	ID: "20241226-init-node-port",
-	Migrate: func(tx *gorm.DB) error {
-		var itemPort model.Setting
-		_ = tx.Where("key = ?", "NodePort").First(&itemPort).Error
-		if itemPort.ID == 0 {
-			if err := tx.Create(&model.Setting{Key: "NodePort", Value: "9999"}).Error; err != nil {
-				return err
-			}
-		}
-		return nil
-	},
-}
-
 var InitBackup = &gormigrate.Migration{
 	ID: "20241226-init-backup",
 	Migrate: func(tx *gorm.DB) error {

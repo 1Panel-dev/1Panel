@@ -159,7 +159,7 @@ func (u *BackupRepo) GetRecord(opts ...DBOption) (*model.BackupRecord, error) {
 
 func (u *BackupRepo) SyncAll(data []model.BackupAccount) error {
 	tx := global.DB.Begin()
-	if err := tx.Where("1 = 1").Delete(&model.BackupAccount{}).Error; err != nil {
+	if err := tx.Where("is_public = ?", 1).Delete(&model.BackupAccount{}).Error; err != nil {
 		tx.Rollback()
 		return err
 	}

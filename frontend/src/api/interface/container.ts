@@ -330,7 +330,8 @@ export namespace Container {
     }
     export interface DaemonJsonConf {
         isSwarm: boolean;
-        status: string;
+        isExist: boolean;
+        isActive: boolean;
         version: string;
         registryMirrors: Array<string>;
         insecureRegistries: Array<string>;

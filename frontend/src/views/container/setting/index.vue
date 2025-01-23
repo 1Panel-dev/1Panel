@@ -5,20 +5,14 @@
                 <div class="flex w-full flex-col gap-4 md:flex-row">
                     <div class="flex flex-wrap gap-4">
                         <el-tag class="float-left" effect="dark" type="success">Docker</el-tag>
-                        <Status class="mt-0.5" :status="form.status" />
+                        <Status class="mt-0.5" :status="form.isActive ? 'enable' : 'disable'" />
                         <el-tag>{{ $t('app.version') }}: {{ form.version }}</el-tag>
                     </div>
-                    <div class="mt-0.5" v-if="form.status === 'Running'">
-                        <el-button type="primary" @click="onOperator('stop')" link>
+                    <div class="mt-0.5">
+                        <el-button v-if="form.isActive" type="primary" @click="onOperator('stop')" link>
                             {{ $t('container.stop') }}
                         </el-button>
-                        <el-divider direction="vertical" />
-                        <el-button type="primary" @click="onOperator('restart')" link>
-                            {{ $t('container.restart') }}
-                        </el-button>
-                    </div>
-                    <div class="mt-0.5" v-if="form.status === 'Stopped'">
-                        <el-button type="primary" @click="onOperator('start')" link>
+                        <el-button v-if="!form.isActive" type="primary" @click="onOperator('start')" link>
                             {{ $t('container.start') }}
                         </el-button>
                         <el-divider direction="vertical" />
@@ -270,7 +264,8 @@ const sockPathRef = ref();
 
 const form = reactive({
     isSwarm: false,
-    status: '',
+    isActive: false,
+    isExist: false,
     version: '',
     mirrors: '',
     registries: '',
@@ -480,7 +475,8 @@ const changeMode = async () => {
 const search = async () => {
     const res = await loadDaemonJson();
     form.isSwarm = res.data.isSwarm;
-    form.status = res.data.status;
+    form.isActive = res.data.isActive;
+    form.isExist = res.data.isExist;
     form.version = res.data.version;
     form.cgroupDriver = res.data.cgroupDriver || 'cgroupfs';
     form.liveRestore = res.data.liveRestore;

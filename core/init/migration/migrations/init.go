@@ -131,9 +131,6 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "SystemStatus", Value: "Free"}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "MasterRequestAddr", Value: ""}).Error; err != nil {
-			return err
-		}
 		if err := tx.Create(&model.Setting{Key: "BindAddress", Value: "0.0.0.0"}).Error; err != nil {
 			return err
 		}

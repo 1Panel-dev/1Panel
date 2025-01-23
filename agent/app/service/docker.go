@@ -70,11 +70,12 @@ func (u *DockerService) LoadDockerConf() *dto.DaemonJsonConf {
 	var data dto.DaemonJsonConf
 	data.IPTables = true
 	data.Version = "-"
-	if cmd.Which("docker") {
+	if !cmd.Which("docker") {
 		data.IsExist = false
 		return &data
 	}
 	data.IsExist = true
+	data.IsActive = true
 	client, err := docker.NewDockerClient()
 	if err != nil {
 		data.IsActive = false

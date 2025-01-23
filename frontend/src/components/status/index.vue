@@ -41,7 +41,7 @@ const props = defineProps({
 });
 
 const statusItem = computed(() => {
-    return props.status.toLowerCase() || '';
+    return props.status?.toLowerCase() || '';
 });
 
 const getType = (status: string) => {
