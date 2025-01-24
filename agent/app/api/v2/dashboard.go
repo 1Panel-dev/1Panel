@@ -5,7 +5,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -35,7 +34,7 @@ func (b *BaseApi) LoadDashboardOsInfo(c *gin.Context) {
 func (b *BaseApi) LoadAppLauncher(c *gin.Context) {
 	data, err := dashboardService.LoadAppLauncher()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, data)
@@ -56,7 +55,7 @@ func (b *BaseApi) LoadAppLauncherOption(c *gin.Context) {
 	}
 	data, err := dashboardService.ListLauncherOption(req.Filter)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, data)

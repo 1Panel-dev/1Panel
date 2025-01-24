@@ -3,9 +3,8 @@ package service
 import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
-	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/jinzhu/copier"
-	"github.com/pkg/errors"
 )
 
 type ComposeTemplateService struct{}
@@ -25,13 +24,13 @@ func NewIComposeTemplateService() IComposeTemplateService {
 func (u *ComposeTemplateService) List() ([]dto.ComposeTemplateInfo, error) {
 	composes, err := composeRepo.List()
 	if err != nil {
-		return nil, constant.ErrRecordNotFound
+		return nil, buserr.New("ErrRecordNotFound")
 	}
 	var dtoLists []dto.ComposeTemplateInfo
 	for _, compose := range composes {
 		var item dto.ComposeTemplateInfo
 		if err := copier.Copy(&item, &compose); err != nil {
-			return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+			return nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 		}
 		dtoLists = append(dtoLists, item)
 	}
@@ -44,7 +43,7 @@ func (u *ComposeTemplateService) SearchWithPage(req dto.SearchWithPage) (int64, 
 	for _, compose := range composes {
 		var item dto.ComposeTemplateInfo
 		if err := copier.Copy(&item, &compose); err != nil {
-			return 0, nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+			return 0, nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 		}
 		dtoComposeTemplates = append(dtoComposeTemplates, item)
 	}
@@ -54,10 +53,10 @@ func (u *ComposeTemplateService) SearchWithPage(req dto.SearchWithPage) (int64, 
 func (u *ComposeTemplateService) Create(composeDto dto.ComposeTemplateCreate) error {
 	compose, _ := composeRepo.Get(repo.WithByName(composeDto.Name))
 	if compose.ID != 0 {
-		return constant.ErrRecordExist
+		return buserr.New("ErrRecordExist")
 	}
 	if err := copier.Copy(&compose, &composeDto); err != nil {
-		return errors.WithMessage(constant.ErrStructTransform, err.Error())
+		return buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 	}
 	if err := composeRepo.Create(&compose); err != nil {
 		return err
@@ -69,7 +68,7 @@ func (u *ComposeTemplateService) Delete(ids []uint) error {
 	if len(ids) == 1 {
 		compose, _ := composeRepo.Get(repo.WithByID(ids[0]))
 		if compose.ID == 0 {
-			return constant.ErrRecordNotFound
+			return buserr.New("ErrRecordNotFound")
 		}
 		return composeRepo.Delete(repo.WithByID(ids[0]))
 	}

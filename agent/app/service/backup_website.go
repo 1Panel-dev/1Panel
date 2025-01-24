@@ -3,12 +3,13 @@ package service
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"io/fs"
 	"os"
 	"path"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 
 	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
@@ -33,7 +34,7 @@ func (u *BackupService) WebsiteBackup(req dto.CommonBackup) error {
 
 	timeNow := time.Now().Format(constant.DateTimeSlimLayout)
 	itemDir := fmt.Sprintf("website/%s", req.Name)
-	backupDir := path.Join(global.CONF.System.Backup, itemDir)
+	backupDir := path.Join(global.Dir.LocalBackupDir, itemDir)
 	fileName := fmt.Sprintf("%s_%s.tar.gz", website.Alias, timeNow+common.RandStrAndNum(5))
 
 	go func() {
@@ -103,17 +104,17 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 
 		temPathWithName := tmpPath + "/" + website.Alias
 		if !fileOp.Stat(tmpPath+"/website.json") || !fileOp.Stat(temPathWithName+".conf") || !fileOp.Stat(temPathWithName+".web.tar.gz") {
-			return buserr.WithDetail(constant.ErrBackupExist, ".conf or .web.tar.gz", nil)
+			return buserr.WithDetail("ErrBackupExist", ".conf or .web.tar.gz", nil)
 		}
 		if website.Type == constant.Deployment {
 			if !fileOp.Stat(temPathWithName + ".app.tar.gz") {
-				return buserr.WithDetail(constant.ErrBackupExist, ".app.tar.gz", nil)
+				return buserr.WithDetail("ErrBackupExist", ".app.tar.gz", nil)
 			}
 		}
 
 		isOk := false
 		if !isRollback {
-			rollbackFile := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("website/%s_%s.tar.gz", website.Alias, time.Now().Format(constant.DateTimeSlimLayout)))
+			rollbackFile := path.Join(global.Dir.TmpDir, fmt.Sprintf("website/%s_%s.tar.gz", website.Alias, time.Now().Format(constant.DateTimeSlimLayout)))
 			if err := handleWebsiteBackup(website, path.Dir(rollbackFile), path.Base(rollbackFile), "", "", ""); err != nil {
 				return fmt.Errorf("backup website %s for rollback before recover failed, err: %v", website.Alias, err)
 			}
@@ -153,7 +154,7 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 				return err
 			}
 			t.LogSuccess(taskName)
-			if _, err = compose.DownAndUp(fmt.Sprintf("%s/%s/%s/docker-compose.yml", constant.AppInstallDir, app.App.Key, app.Name)); err != nil {
+			if _, err = compose.DownAndUp(fmt.Sprintf("%s/%s/%s/docker-compose.yml", global.Dir.AppInstallDir, app.App.Key, app.Name)); err != nil {
 				t.LogFailedWithErr("Run", err)
 				return err
 			}
@@ -278,22 +279,22 @@ func handleWebsiteBackup(website *model.Website, backupDir, fileName, excludes, 
 
 func checkValidOfWebsite(oldWebsite, website *model.Website) error {
 	if oldWebsite.Alias != website.Alias || oldWebsite.Type != website.Type {
-		return buserr.WithDetail(constant.ErrBackupMatch, fmt.Sprintf("oldName: %s, oldType: %v", oldWebsite.Alias, oldWebsite.Type), nil)
+		return buserr.WithDetail("ErrBackupMatch", fmt.Sprintf("oldName: %s, oldType: %v", oldWebsite.Alias, oldWebsite.Type), nil)
 	}
 	if oldWebsite.AppInstallID != 0 {
 		_, err := appInstallRepo.GetFirst(repo.WithByID(oldWebsite.AppInstallID))
 		if err != nil {
-			return buserr.WithDetail(constant.ErrBackupMatch, "app", nil)
+			return buserr.WithDetail("ErrBackupMatch", "app", nil)
 		}
 	}
 	if oldWebsite.RuntimeID != 0 {
 		if _, err := runtimeRepo.GetFirst(repo.WithByID(oldWebsite.RuntimeID)); err != nil {
-			return buserr.WithDetail(constant.ErrBackupMatch, "runtime", nil)
+			return buserr.WithDetail("ErrBackupMatch", "runtime", nil)
 		}
 	}
 	if oldWebsite.WebsiteSSLID != 0 {
 		if _, err := websiteSSLRepo.GetFirst(repo.WithByID(oldWebsite.WebsiteSSLID)); err != nil {
-			return buserr.WithDetail(constant.ErrBackupMatch, "ssl", nil)
+			return buserr.WithDetail("ErrBackupMatch", "ssl", nil)
 		}
 	}
 	return nil

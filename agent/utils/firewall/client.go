@@ -2,7 +2,6 @@ package firewall
 
 import (
 	"github.com/1Panel-dev/1Panel/agent/buserr"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/client"
 )
@@ -32,7 +31,7 @@ func NewFirewallClient() (FirewallClient, error) {
 	ufw := cmd.Which("ufw")
 
 	if firewalld && ufw {
-		return nil, buserr.New(constant.ErrFirewallBoth)
+		return nil, buserr.New("ErrFirewallBoth")
 	}
 
 	if firewalld {
@@ -41,5 +40,5 @@ func NewFirewallClient() (FirewallClient, error) {
 	if ufw {
 		return client.NewUfw()
 	}
-	return nil, buserr.New(constant.ErrFirewallNone)
+	return nil, buserr.New("ErrFirewallNone")
 }

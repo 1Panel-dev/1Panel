@@ -43,7 +43,7 @@ func (u *BackupService) RedisBackup(req dto.CommonBackup) error {
 		}
 	}
 	itemDir := fmt.Sprintf("database/redis/%s", redisInfo.Name)
-	backupDir := path.Join(global.CONF.System.Backup, itemDir)
+	backupDir := path.Join(global.Dir.LocalBackupDir, itemDir)
 	if err := handleRedisBackup(redisInfo, nil, backupDir, fileName, req.Secret, req.TaskID); err != nil {
 		return err
 	}
@@ -101,7 +101,7 @@ func handleRedisBackup(redisInfo *repo.RootInfo, parentTask *task.Task, backupDi
 		}
 
 		if strings.HasSuffix(fileName, ".tar.gz") {
-			redisDataDir := fmt.Sprintf("%s/%s/%s/data/appendonlydir", constant.AppInstallDir, "redis", redisInfo.Name)
+			redisDataDir := fmt.Sprintf("%s/%s/%s/data/appendonlydir", global.Dir.AppInstallDir, "redis", redisInfo.Name)
 			if err := fileOp.TarGzCompressPro(true, redisDataDir, path.Join(backupDir, fileName), secret, ""); err != nil {
 				return err
 			}
@@ -155,14 +155,14 @@ func handleRedisRecover(redisInfo *repo.RootInfo, parentTask *task.Task, recover
 
 		if appendonly == "yes" {
 			if strings.HasPrefix(redisInfo.Version, "6.") && !strings.HasSuffix(recoverFile, ".aof") {
-				return buserr.New(constant.ErrTypeOfRedis)
+				return buserr.New("ErrTypeOfRedis")
 			}
 			if strings.HasPrefix(redisInfo.Version, "7.") && !strings.HasSuffix(recoverFile, ".tar.gz") {
-				return buserr.New(constant.ErrTypeOfRedis)
+				return buserr.New("ErrTypeOfRedis")
 			}
 		} else {
 			if !strings.HasSuffix(recoverFile, ".rdb") {
-				return buserr.New(constant.ErrTypeOfRedis)
+				return buserr.New("ErrTypeOfRedis")
 			}
 		}
 
@@ -177,7 +177,7 @@ func handleRedisRecover(redisInfo *repo.RootInfo, parentTask *task.Task, recover
 					suffix = "tar.gz"
 				}
 			}
-			rollbackFile := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("database/redis/%s_%s.%s", redisInfo.Name, time.Now().Format(constant.DateTimeSlimLayout), suffix))
+			rollbackFile := path.Join(global.Dir.TmpDir, fmt.Sprintf("database/redis/%s_%s.%s", redisInfo.Name, time.Now().Format(constant.DateTimeSlimLayout), suffix))
 			if err := handleRedisBackup(redisInfo, nil, path.Dir(rollbackFile), path.Base(rollbackFile), secret, ""); err != nil {
 				return fmt.Errorf("backup database %s for rollback before recover failed, err: %v", redisInfo.Name, err)
 			}
@@ -195,12 +195,12 @@ func handleRedisRecover(redisInfo *repo.RootInfo, parentTask *task.Task, recover
 				}
 			}()
 		}
-		composeDir := fmt.Sprintf("%s/redis/%s", constant.AppInstallDir, redisInfo.Name)
+		composeDir := fmt.Sprintf("%s/redis/%s", global.Dir.AppInstallDir, redisInfo.Name)
 		if _, err := compose.Down(composeDir + "/docker-compose.yml"); err != nil {
 			return err
 		}
 		if appendonly == "yes" && strings.HasPrefix(redisInfo.Version, "7.") {
-			redisDataDir := fmt.Sprintf("%s/%s/%s/data", constant.AppInstallDir, "redis", redisInfo.Name)
+			redisDataDir := fmt.Sprintf("%s/%s/%s/data", global.Dir.AppInstallDir, "redis", redisInfo.Name)
 			if err := fileOp.TarGzExtractPro(recoverFile, redisDataDir, secret); err != nil {
 				return err
 			}

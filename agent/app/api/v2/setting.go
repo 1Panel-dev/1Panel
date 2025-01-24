@@ -61,7 +61,7 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 // @Security Timestamp
 // @Router /settings/basedir [get]
 func (b *BaseApi) LoadBaseDir(c *gin.Context) {
-	helper.SuccessWithData(c, global.CONF.System.DataDir)
+	helper.SuccessWithData(c, global.Dir.DataDir)
 }
 
 func (b *BaseApi) ReloadConn(c *gin.Context) {

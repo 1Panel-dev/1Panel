@@ -3,7 +3,6 @@ package middleware
 import (
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
-	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -12,11 +11,11 @@ func GlobalLoading() gin.HandlerFunc {
 		settingRepo := repo.NewISettingRepo()
 		status, err := settingRepo.Get(repo.WithByKey("SystemStatus"))
 		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			helper.InternalServer(c, err)
 			return
 		}
 		if status.Value != "Free" {
-			helper.ErrorWithDetail(c, constant.CodeGlobalLoading, status.Value, err)
+			helper.ErrorWithDetail(c, 407, status.Value, err)
 			return
 		}
 		c.Next()

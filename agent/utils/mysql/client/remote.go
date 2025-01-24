@@ -45,7 +45,7 @@ func (r *Remote) Create(info CreateInfo) error {
 	createSql := fmt.Sprintf("create database `%s` default character set %s collate %s", info.Name, info.Format, formatMap[info.Format])
 	if err := r.ExecSQL(createSql, info.Timeout); err != nil {
 		if strings.Contains(strings.ToLower(err.Error()), "error 1007") {
-			return buserr.New(constant.ErrDatabaseIsExist)
+			return buserr.New("ErrDatabaseIsExist")
 		}
 		return err
 	}
@@ -74,7 +74,7 @@ func (r *Remote) CreateUser(info CreateInfo, withDeleteDB bool) error {
 	for _, user := range userlist {
 		if err := r.ExecSQL(fmt.Sprintf("create user %s identified by '%s';", user, info.Password), info.Timeout); err != nil {
 			if strings.Contains(strings.ToLower(err.Error()), "error 1396") {
-				return buserr.New(constant.ErrUserIsExist)
+				return buserr.New("ErrUserIsExist")
 			}
 			if withDeleteDB {
 				_ = r.Delete(DeleteInfo{
@@ -391,7 +391,7 @@ func (r *Remote) ExecSQL(command string, timeout uint) error {
 		return err
 	}
 	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
-		return buserr.New(constant.ErrExecTimeOut)
+		return buserr.New("ErrExecTimeOut")
 	}
 
 	return nil
@@ -406,7 +406,7 @@ func (r *Remote) ExecSQLForHosts(timeout uint) ([]string, error) {
 		return nil, err
 	}
 	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
-		return nil, buserr.New(constant.ErrExecTimeOut)
+		return nil, buserr.New("ErrExecTimeOut")
 	}
 	var rows []string
 	for results.Next() {

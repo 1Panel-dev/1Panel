@@ -3,7 +3,6 @@ package service
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"log"
 	"os"
 	"path"
@@ -11,6 +10,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 
@@ -118,7 +119,7 @@ func createProxyFile(website *model.Website) error {
 	location.UpdateDirective("proxy_pass", []string{website.Proxy})
 	location.UpdateDirective("proxy_set_header", []string{"Host", "$host"})
 	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
-		return buserr.WithErr(constant.ErrUpdateBuWebsite, err)
+		return buserr.WithErr("ErrUpdateBuWebsite", err)
 	}
 	return nil
 }
@@ -760,7 +761,7 @@ func toMapStr(m map[string]interface{}) map[string]string {
 }
 
 func deleteWebsiteFolder(nginxInstall model.AppInstall, website *model.Website) error {
-	nginxFolder := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name)
+	nginxFolder := path.Join(global.Dir.AppInstallDir, constant.AppOpenresty, nginxInstall.Name)
 	siteFolder := path.Join(nginxFolder, "www", "sites", website.Alias)
 	fileOp := files.NewFileOp()
 	if fileOp.Stat(siteFolder) {
@@ -965,7 +966,7 @@ func getWebsiteDomains(domains []request.WebsiteDomain, defaultPort int, website
 	for _, domain := range domainModels {
 		if exist, _ := websiteDomainRepo.GetFirst(websiteDomainRepo.WithDomain(domain.Domain), websiteDomainRepo.WithPort(domain.Port)); exist.ID > 0 {
 			website, _ := websiteRepo.GetFirst(repo.WithByID(exist.WebsiteID))
-			err = buserr.WithName(constant.ErrDomainIsUsed, website.PrimaryDomain)
+			err = buserr.WithName("ErrDomainIsUsed", website.PrimaryDomain)
 			return
 		}
 	}
@@ -993,7 +994,7 @@ func getWebsiteDomains(domains []request.WebsiteDomain, defaultPort int, website
 				return
 			}
 			if common.ScanPort(port) {
-				err = buserr.WithDetail(constant.ErrPortInUsed, port, nil)
+				err = buserr.WithDetail("ErrPortInUsed", port, nil)
 				return
 			}
 		}
@@ -1057,13 +1058,13 @@ func UpdateSSLConfig(websiteSSL model.WebsiteSSL) error {
 			return err
 		}
 		if err := opNginx(nginxInstall.ContainerName, constant.NginxReload); err != nil {
-			return buserr.WithErr(constant.ErrSSLApply, err)
+			return buserr.WithErr("ErrSSLApply", err)
 		}
 	}
 	enable, sslID := GetSystemSSL()
 	if enable && sslID == websiteSSL.ID {
 		fileOp := files.NewFileOp()
-		secretDir := path.Join(global.CONF.System.BaseDir, "1panel/secret")
+		secretDir := path.Join(global.Dir.DataDir, "secret")
 		if err := fileOp.WriteFile(path.Join(secretDir, "server.crt"), strings.NewReader(websiteSSL.Pem), 0600); err != nil {
 			global.LOG.Errorf("Failed to update the SSL certificate File for 1Panel System domain [%s] , err:%s", websiteSSL.PrimaryDomain, err.Error())
 			return err
@@ -1108,7 +1109,7 @@ func ChangeHSTSConfig(enable bool, nginxInstall model.AppInstall, website model.
 					location.RemoveDirective("add_header", []string{"Strict-Transport-Security", "\"max-age=31536000\""})
 				}
 				if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
-					return buserr.WithErr(constant.ErrUpdateBuWebsite, err)
+					return buserr.WithErr("ErrUpdateBuWebsite", err)
 				}
 			}
 		}
@@ -1147,7 +1148,7 @@ func GetWebSiteRootDir() string {
 	siteSetting, _ := settingRepo.Get(settingRepo.WithByKey("WEBSITE_DIR"))
 	dir := siteSetting.Value
 	if dir == "" {
-		dir = path.Join(constant.DataDir, "www")
+		dir = path.Join(global.Dir.DataDir, "www")
 	}
 	return dir
 }

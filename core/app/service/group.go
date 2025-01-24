@@ -9,12 +9,10 @@ import (
 	"github.com/1Panel-dev/1Panel/core/app/model"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/buserr"
-	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/req_helper"
 	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/jinzhu/copier"
-	"github.com/pkg/errors"
 )
 
 type GroupService struct{}
@@ -44,13 +42,13 @@ func (u *GroupService) List(req dto.OperateByType) ([]dto.GroupInfo, error) {
 	)
 	groups, err = groupRepo.GetList(options...)
 	if err != nil {
-		return nil, constant.ErrRecordNotFound
+		return nil, buserr.New("ErrRecordNotFound")
 	}
 	var dtoUsers []dto.GroupInfo
 	for _, group := range groups {
 		var item dto.GroupInfo
 		if err := copier.Copy(&item, &group); err != nil {
-			return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+			return nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 		}
 		dtoUsers = append(dtoUsers, item)
 	}
@@ -60,10 +58,10 @@ func (u *GroupService) List(req dto.OperateByType) ([]dto.GroupInfo, error) {
 func (u *GroupService) Create(req dto.GroupCreate) error {
 	group, _ := groupRepo.Get(repo.WithByName(req.Name), repo.WithByType(req.Type))
 	if group.ID != 0 {
-		return constant.ErrRecordExist
+		return buserr.New("ErrRecordExist")
 	}
 	if err := copier.Copy(&group, &req); err != nil {
-		return errors.WithMessage(constant.ErrStructTransform, err.Error())
+		return buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 	}
 	if err := groupRepo.Create(&group); err != nil {
 		return err
@@ -74,10 +72,10 @@ func (u *GroupService) Create(req dto.GroupCreate) error {
 func (u *GroupService) Delete(id uint) error {
 	group, _ := groupRepo.Get(repo.WithByID(id))
 	if group.ID == 0 {
-		return constant.ErrRecordNotFound
+		return buserr.New("ErrRecordNotFound")
 	}
 	if group.IsDefault {
-		return buserr.New(constant.ErrGroupIsDefault)
+		return buserr.New("ErrGroupIsDefault")
 	}
 	defaultGroup, err := groupRepo.Get(repo.WithByType(group.Type), groupRepo.WithByDefault(true))
 	if err != nil {
@@ -99,7 +97,7 @@ func (u *GroupService) Delete(id uint) error {
 			return err
 		}
 	default:
-		return constant.ErrNotSupportType
+		return buserr.New("ErrNotSupportType")
 	}
 	if err != nil {
 		return err

@@ -29,32 +29,32 @@ func SessionAuth() gin.HandlerFunc {
 		panelToken := c.GetHeader("1Panel-Token")
 		panelTimestamp := c.GetHeader("1Panel-Timestamp")
 		if panelToken != "" || panelTimestamp != "" {
-			if global.CONF.System.ApiInterfaceStatus == constant.StatusEnable {
+			if global.Api.ApiInterfaceStatus == constant.StatusEnable {
 				clientIP := c.ClientIP()
 				if !isValid1PanelTimestamp(panelTimestamp) {
-					helper.ErrorWithDetail(c, constant.CodeErrUnauthorized, constant.ErrApiConfigKeyTimeInvalid, nil)
+					helper.BadAuth(c, "ErrApiConfigKeyTimeInvalid", nil)
 					return
 				}
 				if !isValid1PanelToken(panelToken, panelTimestamp) {
-					helper.ErrorWithDetail(c, constant.CodeErrUnauthorized, constant.ErrApiConfigKeyInvalid, nil)
+					helper.BadAuth(c, "ErrApiConfigKeyInvalid", nil)
 					return
 				}
 
 				if !isIPInWhiteList(clientIP) {
-					helper.ErrorWithDetail(c, constant.CodeErrUnauthorized, constant.ErrApiConfigIPInvalid, nil)
+					helper.BadAuth(c, "ErrApiConfigIPInvalid", nil)
 					return
 				}
 				c.Next()
 				return
 			} else {
-				helper.ErrorWithDetail(c, constant.CodeErrUnauthorized, constant.ErrApiConfigStatusInvalid, nil)
+				helper.BadAuth(c, "ErrApiConfigStatusInvalid", nil)
 				return
 			}
 		}
 
 		psession, err := global.SESSION.Get(c)
 		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrUnauthorized, constant.ErrTypeNotLogin, err)
+			helper.BadAuth(c, "ErrNotLogin", err)
 			return
 		}
 		settingRepo := repo.NewISettingRepo()
@@ -75,7 +75,7 @@ func SessionAuth() gin.HandlerFunc {
 }
 
 func isValid1PanelTimestamp(panelTimestamp string) bool {
-	apiKeyValidityTime := global.CONF.System.ApiKeyValidityTime
+	apiKeyValidityTime := global.Api.ApiKeyValidityTime
 	apiTime, err := strconv.Atoi(apiKeyValidityTime)
 	if err != nil {
 		return false
@@ -92,12 +92,12 @@ func isValid1PanelTimestamp(panelTimestamp string) bool {
 }
 
 func isValid1PanelToken(panelToken string, panelTimestamp string) bool {
-	system1PanelToken := global.CONF.System.ApiKey
+	system1PanelToken := global.Api.ApiKey
 	return panelToken == GenerateMD5("1panel"+system1PanelToken+panelTimestamp)
 }
 
 func isIPInWhiteList(clientIP string) bool {
-	ipWhiteString := global.CONF.System.IpWhiteList
+	ipWhiteString := global.Api.IpWhiteList
 	ipWhiteList := strings.Split(ipWhiteString, "\n")
 	for _, cidr := range ipWhiteList {
 		if cidr == "0.0.0.0" {

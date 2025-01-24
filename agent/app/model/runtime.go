@@ -3,7 +3,7 @@ package model
 import (
 	"path"
 
-	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/global"
 )
 
 type Runtime struct {
@@ -34,15 +34,15 @@ func (r *Runtime) GetEnvPath() string {
 }
 
 func (r *Runtime) GetPath() string {
-	return path.Join(constant.RuntimeDir, r.Type, r.Name)
+	return path.Join(global.Dir.RuntimeDir, r.Type, r.Name)
 }
 
 func (r *Runtime) GetFPMPath() string {
-	return path.Join(constant.RuntimeDir, r.Type, r.Name, "conf", "php-fpm.conf")
+	return path.Join(global.Dir.RuntimeDir, r.Type, r.Name, "conf", "php-fpm.conf")
 }
 
 func (r *Runtime) GetPHPPath() string {
-	return path.Join(constant.RuntimeDir, r.Type, r.Name, "conf", "php.ini")
+	return path.Join(global.Dir.RuntimeDir, r.Type, r.Name, "conf", "php.ini")
 }
 
 func (r *Runtime) GetLogPath() string {

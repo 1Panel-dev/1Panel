@@ -190,7 +190,7 @@ func (f *FileService) Create(op request.FileCreate) error {
 	}
 	fo := files.NewFileOp()
 	if fo.Stat(op.Path) {
-		return buserr.New(constant.ErrFileIsExist)
+		return buserr.New("ErrFileIsExist")
 	}
 	mode := op.Mode
 	if mode == 0 {
@@ -206,7 +206,7 @@ func (f *FileService) Create(op request.FileCreate) error {
 	}
 	if op.IsLink {
 		if !fo.Stat(op.LinkPath) {
-			return buserr.New(constant.ErrLinkPathNotFound)
+			return buserr.New("ErrLinkPathNotFound")
 		}
 		return fo.LinkFile(op.LinkPath, op.Path, op.IsSymlink)
 	}
@@ -215,9 +215,9 @@ func (f *FileService) Create(op request.FileCreate) error {
 
 func (f *FileService) Delete(op request.FileDelete) error {
 	if op.IsDir {
-		excludeDir := global.CONF.System.DataDir
+		excludeDir := global.Dir.DataDir
 		if filepath.Base(op.Path) == ".1panel_clash" || op.Path == excludeDir {
-			return buserr.New(constant.ErrPathNotDelete)
+			return buserr.New("ErrPathNotDelete")
 		}
 	}
 	fo := files.NewFileOp()
@@ -265,7 +265,7 @@ func (f *FileService) BatchChangeModeAndOwner(op request.FileRoleReq) error {
 	fo := files.NewFileOp()
 	for _, path := range op.Paths {
 		if !fo.Stat(path) {
-			return buserr.New(constant.ErrPathNotFound)
+			return buserr.New("ErrPathNotFound")
 		}
 		if err := fo.ChownR(path, op.User, op.Group, op.Sub); err != nil {
 			return err
@@ -286,7 +286,7 @@ func (f *FileService) ChangeOwner(req request.FileRoleUpdate) error {
 func (f *FileService) Compress(c request.FileCompress) error {
 	fo := files.NewFileOp()
 	if !c.Replace && fo.Stat(filepath.Join(c.Dst, c.Name)) {
-		return buserr.New(constant.ErrFileIsExist)
+		return buserr.New("ErrFileIsExist")
 	}
 	return fo.Compress(c.Files, c.Dst, c.Name, files.CompressType(c.Type), c.Secret)
 }
@@ -358,14 +358,14 @@ func (f *FileService) Wget(w request.FileWget) (string, error) {
 func (f *FileService) MvFile(m request.FileMove) error {
 	fo := files.NewFileOp()
 	if !fo.Stat(m.NewPath) {
-		return buserr.New(constant.ErrPathNotFound)
+		return buserr.New("ErrPathNotFound")
 	}
 	for _, oldPath := range m.OldPaths {
 		if !fo.Stat(oldPath) {
-			return buserr.WithName(constant.ErrFileNotFound, oldPath)
+			return buserr.WithName("ErrFileNotFound", oldPath)
 		}
 		if oldPath == m.NewPath || strings.Contains(m.NewPath, filepath.Clean(oldPath)+"/") {
-			return buserr.New(constant.ErrMovePathFailed)
+			return buserr.New("ErrMovePathFailed")
 		}
 	}
 	if m.Type == "cut" {
@@ -451,9 +451,9 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 		} else {
 			fileName = "1Panel-" + req.Name + ".log"
 		}
-		logFilePath = path.Join(global.CONF.System.DataDir, "log", fileName)
+		logFilePath = path.Join(global.Dir.DataDir, "log", fileName)
 		if _, err := os.Stat(logFilePath); err != nil {
-			fileGzPath := path.Join(global.CONF.System.DataDir, "log", fileName+".gz")
+			fileGzPath := path.Join(global.Dir.DataDir, "log", fileName+".gz")
 			if _, err := os.Stat(fileGzPath); err != nil {
 				return nil, buserr.New("ErrHttpReqNotFound")
 			}
@@ -500,7 +500,7 @@ func (f *FileService) GetPathByType(pathType string) string {
 	if pathType == "websiteDir" {
 		value, _ := settingRepo.GetValueByKey("WEBSITE_DIR")
 		if value == "" {
-			return path.Join(global.CONF.System.BaseDir, "www")
+			return path.Join(global.Dir.BaseDir, "www")
 		}
 		return value
 	}

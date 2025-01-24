@@ -232,7 +232,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		}
 	}
 	if exist, _ := websiteRepo.GetBy(websiteRepo.WithAlias(alias)); len(exist) > 0 {
-		return buserr.New(constant.ErrAliasIsExist)
+		return buserr.New("ErrAliasIsExist")
 	}
 	if len(create.FtpPassword) != 0 {
 		pass, err := base64.StdEncoding.DecodeString(create.FtpPassword)
@@ -297,7 +297,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 			case constant.AppPostgresql, constant.AppPostgres:
 				oldPostgresqlDb, _ := postgresqlRepo.Get(repo.WithByName(create.DbName), repo.WithByFrom(constant.ResourceLocal))
 				if oldPostgresqlDb.ID > 0 {
-					return buserr.New(constant.ErrDbUserNotValid)
+					return buserr.New("ErrDbUserNotValid")
 				}
 				var createPostgresql dto.PostgresqlDBCreate
 				createPostgresql.Name = dbConfig.DbName
@@ -316,7 +316,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 			case constant.AppMysql, constant.AppMariaDB:
 				oldMysqlDb, _ := mysqlRepo.Get(repo.WithByName(dbConfig.DbName), repo.WithByFrom(constant.ResourceLocal))
 				if oldMysqlDb.ID > 0 {
-					return buserr.New(constant.ErrDbUserNotValid)
+					return buserr.New("ErrDbUserNotValid")
 				}
 				var createMysql dto.MysqlDBCreate
 				createMysql.Name = dbConfig.DbName
@@ -616,7 +616,7 @@ func (w WebsiteService) DeleteWebsite(req request.WebsiteDelete) error {
 	}
 	tx.Commit()
 
-	uploadDir := path.Join(global.CONF.System.BaseDir, fmt.Sprintf("1panel/uploads/website/%s", website.Alias))
+	uploadDir := path.Join(global.Dir.DataDir, "uploads/website", website.Alias)
 	if _, err := os.Stat(uploadDir); err == nil {
 		_ = os.RemoveAll(uploadDir)
 	}
@@ -1130,7 +1130,7 @@ func (w WebsiteService) PreInstallCheck(req request.WebsiteInstallCheckReq) ([]r
 		res = append(res, response.WebsitePreInstallCheck{
 			Name:    appInstall.Name,
 			AppName: app.Name,
-			Status:  buserr.WithDetail(constant.ErrNotInstall, app.Name, nil).Error(),
+			Status:  buserr.WithDetail("ErrNotInstall", app.Name, nil).Error(),
 			Version: appInstall.Version,
 		})
 		showErr = true
@@ -1473,7 +1473,7 @@ func (w WebsiteService) OperateCustomRewrite(req request.CustomRewriteOperate) e
 	switch req.Operate {
 	case "create":
 		if fileOp.Stat(rewriteFile) {
-			return buserr.New(constant.ErrNameIsExist)
+			return buserr.New("ErrNameIsExist")
 		}
 		return fileOp.WriteFile(rewriteFile, strings.NewReader(req.Content), constant.DirPerm)
 	case "delete":
@@ -1562,7 +1562,7 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 	backPath := path.Join(includeDir, backName)
 
 	if req.Operate == "create" && (fileOp.Stat(includePath) || fileOp.Stat(backPath)) {
-		err = buserr.New(constant.ErrNameIsExist)
+		err = buserr.New("ErrNameIsExist")
 		return
 	}
 
@@ -1642,7 +1642,7 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 		location.UpdateDirective("proxy_ssl_server_name", []string{"off"})
 	}
 	if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
-		return buserr.WithErr(constant.ErrUpdateBuWebsite, err)
+		return buserr.WithErr("ErrUpdateBuWebsite", err)
 	}
 	nginxInclude := fmt.Sprintf("/www/sites/%s/proxy/*.conf", website.Alias)
 	return updateNginxConfig(constant.NginxScopeServer, []dto.NginxParam{{Name: "include", Params: []string{nginxInclude}}}, &website)
@@ -1935,7 +1935,7 @@ func (w WebsiteService) UpdateAuthBasic(req request.NginxAuthUpdate) (err error)
 			authParams := strings.Split(line, ":")
 			username := authParams[0]
 			if username == req.Username {
-				err = buserr.New(constant.ErrUsernameIsExist)
+				err = buserr.New("ErrUsernameIsExist")
 				return
 			}
 		}
@@ -1969,7 +1969,7 @@ func (w WebsiteService) UpdateAuthBasic(req request.NginxAuthUpdate) (err error)
 			}
 		}
 		if !userExist {
-			err = buserr.New(constant.ErrUsernameIsNotExist)
+			err = buserr.New("ErrUsernameIsNotExist")
 			return
 		}
 	case "delete":
@@ -2120,7 +2120,7 @@ func (w WebsiteService) UpdatePathAuthBasic(req request.NginxPathAuthUpdate) err
 			return err
 		}
 		if fileOp.Stat(confPath) || fileOp.Stat(passPath) {
-			return buserr.New(constant.ErrNameIsExist)
+			return buserr.New("ErrNameIsExist")
 		}
 	case "edit":
 		par, err := parser.NewParser(confPath)
@@ -2148,7 +2148,7 @@ func (w WebsiteService) UpdatePathAuthBasic(req request.NginxPathAuthUpdate) err
 	}
 	_ = fileOp.SaveFile(passPath, line, constant.DirPerm)
 	if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
-		return buserr.WithErr(constant.ErrUpdateBuWebsite, err)
+		return buserr.WithErr("ErrUpdateBuWebsite", err)
 	}
 	nginxInclude := fmt.Sprintf("/www/sites/%s/path_auth/*.conf", website.Alias)
 	if err = updateNginxConfig(constant.NginxScopeServer, []dto.NginxParam{{Name: "include", Params: []string{nginxInclude}}}, &website); err != nil {
@@ -2343,7 +2343,7 @@ func (w WebsiteService) OperateRedirect(req request.NginxRedirectReq) (err error
 	backPath := path.Join(includeDir, backName)
 
 	if req.Operate == "create" && (fileOp.Stat(includePath) || fileOp.Stat(backPath)) {
-		err = buserr.New(constant.ErrNameIsExist)
+		err = buserr.New("ErrNameIsExist")
 		return
 	}
 
@@ -2461,7 +2461,7 @@ func (w WebsiteService) OperateRedirect(req request.NginxRedirectReq) (err error
 	config.Block = block
 
 	if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
-		return buserr.WithErr(constant.ErrUpdateBuWebsite, err)
+		return buserr.WithErr("ErrUpdateBuWebsite", err)
 	}
 
 	nginxInclude := fmt.Sprintf("/www/sites/%s/redirect/*.conf", website.Alias)
@@ -2876,7 +2876,7 @@ func (w WebsiteService) CreateLoadBalance(req request.WebsiteLBCreate) error {
 	}
 	filePath := path.Join(includeDir, fmt.Sprintf("%s.conf", req.Name))
 	if fileOp.Stat(filePath) {
-		return buserr.New(constant.ErrNameIsExist)
+		return buserr.New("ErrNameIsExist")
 	}
 	config, err := parser.NewStringParser(string(nginx_conf.Upstream)).Parse()
 	if err != nil {
@@ -2926,7 +2926,7 @@ func (w WebsiteService) CreateLoadBalance(req request.WebsiteLBCreate) error {
 	}()
 
 	if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
-		return buserr.WithErr(constant.ErrUpdateBuWebsite, err)
+		return buserr.WithErr("ErrUpdateBuWebsite", err)
 	}
 	nginxInclude := fmt.Sprintf("/www/sites/%s/upstream/*.conf", website.Alias)
 	if err = updateNginxConfig("", []dto.NginxParam{{Name: "include", Params: []string{nginxInclude}}}, &website); err != nil {
@@ -2999,7 +2999,7 @@ func (w WebsiteService) UpdateLoadBalance(req request.WebsiteLBUpdate) error {
 		}
 	}
 	if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
-		return buserr.WithErr(constant.ErrUpdateBuWebsite, err)
+		return buserr.WithErr("ErrUpdateBuWebsite", err)
 	}
 	if err = opNginx(nginxInstall.ContainerName, constant.NginxReload); err != nil {
 		return err

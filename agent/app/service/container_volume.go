@@ -8,7 +8,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/docker/docker/api/types/filters"
@@ -107,7 +106,7 @@ func (u *ContainerService) DeleteVolume(req dto.BatchDelete) error {
 	for _, id := range req.Names {
 		if err := client.VolumeRemove(context.TODO(), id, true); err != nil {
 			if strings.Contains(err.Error(), "volume is in use") {
-				return buserr.WithDetail(constant.ErrInUsed, id, nil)
+				return buserr.WithDetail("ErrInUsed", id, nil)
 			}
 			return err
 		}
@@ -126,7 +125,7 @@ func (u *ContainerService) CreateVolume(req dto.VolumeCreate) error {
 	if len(vos.Volumes) != 0 {
 		for _, v := range vos.Volumes {
 			if v.Name == req.Name {
-				return constant.ErrRecordExist
+				return buserr.New("ErrRecordExist")
 			}
 		}
 	}

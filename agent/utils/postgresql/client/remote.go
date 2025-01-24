@@ -18,7 +18,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/1Panel-dev/1Panel/agent/buserr"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -41,7 +40,7 @@ func (r *Remote) Create(info CreateInfo) error {
 	createSql := fmt.Sprintf("CREATE DATABASE \"%s\"", info.Name)
 	if err := r.ExecSQL(createSql, info.Timeout); err != nil {
 		if strings.Contains(strings.ToLower(err.Error()), "already exists") {
-			return buserr.New(constant.ErrDatabaseIsExist)
+			return buserr.New("ErrDatabaseIsExist")
 		}
 		return err
 	}
@@ -55,7 +54,7 @@ func (r *Remote) CreateUser(info CreateInfo, withDeleteDB bool) error {
 	createSql := fmt.Sprintf("CREATE USER \"%s\" WITH PASSWORD '%s'", info.Username, info.Password)
 	if err := r.ExecSQL(createSql, info.Timeout); err != nil {
 		if strings.Contains(strings.ToLower(err.Error()), "already exists") {
-			return buserr.New(constant.ErrUserIsExist)
+			return buserr.New("ErrUserIsExist")
 		}
 		if withDeleteDB {
 			_ = r.Delete(DeleteInfo{
@@ -103,7 +102,7 @@ func (r *Remote) Delete(info DeleteInfo) error {
 	dropSql := fmt.Sprintf("DROP USER \"%s\"", info.Username)
 	if err := r.ExecSQL(dropSql, info.Timeout); err != nil && !info.ForceDelete {
 		if strings.Contains(strings.ToLower(err.Error()), "depend on it") {
-			return buserr.WithDetail(constant.ErrInUsed, info.Username, nil)
+			return buserr.WithDetail("ErrInUsed", info.Username, nil)
 		}
 		return err
 	}
@@ -225,7 +224,7 @@ func (r *Remote) SyncDB() ([]SyncDBInfo, error) {
 		datas = append(datas, SyncDBInfo{Name: dbName, From: r.From, PostgresqlName: r.Database})
 	}
 	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
-		return nil, buserr.New(constant.ErrExecTimeOut)
+		return nil, buserr.New("ErrExecTimeOut")
 	}
 	return datas, nil
 }
@@ -242,7 +241,7 @@ func (r *Remote) ExecSQL(command string, timeout uint) error {
 		return err
 	}
 	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
-		return buserr.New(constant.ErrExecTimeOut)
+		return buserr.New("ErrExecTimeOut")
 	}
 
 	return nil
@@ -306,7 +305,7 @@ func loadImageTag() (string, error) {
 	defer cancel()
 	if _, err := client.ImagePull(ctx, itemTag, image.PullOptions{}); err != nil {
 		if errors.Is(ctx.Err(), context.DeadlineExceeded) {
-			return itemTag, buserr.WithName(constant.ErrPgImagePull, itemTag)
+			return itemTag, buserr.WithName("ErrPgImagePull", itemTag)
 		}
 		global.LOG.Errorf("image %s pull failed, err: %v", itemTag, err)
 		return itemTag, fmt.Errorf("image %s pull failed, err: %v", itemTag, err)

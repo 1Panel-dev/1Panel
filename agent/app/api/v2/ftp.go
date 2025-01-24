@@ -5,7 +5,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -41,7 +40,7 @@ func (b *BaseApi) LoadFtpLogInfo(c *gin.Context) {
 
 	total, list, err := ftpService.LoadLog(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -66,7 +65,7 @@ func (b *BaseApi) OperateFtp(c *gin.Context) {
 	}
 
 	if err := ftpService.Operate(req.Operation); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -89,7 +88,7 @@ func (b *BaseApi) SearchFtp(c *gin.Context) {
 
 	total, list, err := ftpService.SearchWithPage(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -123,7 +122,7 @@ func (b *BaseApi) CreateFtp(c *gin.Context) {
 		req.Password = string(pass)
 	}
 	if _, err := ftpService.Create(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -145,7 +144,7 @@ func (b *BaseApi) DeleteFtp(c *gin.Context) {
 	}
 
 	if err := ftpService.Delete(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -162,7 +161,7 @@ func (b *BaseApi) DeleteFtp(c *gin.Context) {
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"同步 FTP 账户","formatEN":"sync FTP users"}
 func (b *BaseApi) SyncFtp(c *gin.Context) {
 	if err := ftpService.Sync(); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -192,7 +191,7 @@ func (b *BaseApi) UpdateFtp(c *gin.Context) {
 		req.Password = string(pass)
 	}
 	if err := ftpService.Update(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)

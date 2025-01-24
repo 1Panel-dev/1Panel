@@ -55,7 +55,7 @@ var restoreCmd = &cobra.Command{
 			return err
 		}
 		_, _ = cmdUtils.Execf("cp -r %s /usr/local/bin", path.Join(tmpPath, "lang"))
-		geoPath := path.Join(global.CONF.System.BaseDir, "1panel/geo")
+		geoPath := path.Join(global.CONF.Base.InstallDir, "1panel/geo")
 		_, _ = cmdUtils.Execf("mkdir %s && cp %s %s/", geoPath, path.Join(tmpPath, "GeoIP.mmdb"), geoPath)
 		fmt.Println(i18n.GetMsgByKeyForCmd("RestoreStep3"))
 		if err := files.CopyFile(path.Join(tmpPath, "1panel.service"), "/etc/systemd/system", true); err != nil {

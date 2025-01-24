@@ -158,7 +158,7 @@ func Routers() *gin.Engine {
 	}
 
 	Router.Use(middleware.OperationLog())
-	if global.CONF.System.IsDemo {
+	if global.CONF.Base.IsDemo {
 		Router.Use(middleware.DemoHandle())
 	}
 	Router.Use(Proxy())

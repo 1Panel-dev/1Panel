@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/core/configs"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/log"
 
@@ -28,9 +27,9 @@ func Init() {
 	global.LOG.Info("init logger successfully")
 }
 
-func setOutput(logger *logrus.Logger, config configs.LogConfig) {
+func setOutput(logger *logrus.Logger, config global.LogConfig) {
 	writer, err := log.NewWriterFromConfig(&log.Config{
-		LogPath:            path.Join(global.CONF.System.BaseDir, "1panel/log"),
+		LogPath:            path.Join(global.CONF.Base.InstallDir, "1panel/log"),
 		FileName:           config.LogName,
 		TimeTagFormat:      FileTImeFormat,
 		MaxRemain:          config.MaxBackup,

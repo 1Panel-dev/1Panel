@@ -51,7 +51,7 @@ func ExecWithTimeOut(cmdStr string, timeout time.Duration) (string, error) {
 	select {
 	case <-after:
 		_ = cmd.Process.Kill()
-		return "", buserr.New(constant.ErrCmdTimeout)
+		return "", buserr.New("ErrCmdTimeout")
 	case err := <-done:
 		if err != nil {
 			return handleErr(stdout, stderr, err)
@@ -86,7 +86,7 @@ func ExecWithLogFile(cmdStr string, timeout time.Duration, outputFile string) er
 	select {
 	case <-after:
 		_ = cmd.Process.Kill()
-		return buserr.New(constant.ErrCmdTimeout)
+		return buserr.New("ErrCmdTimeout")
 	case err := <-done:
 		if err != nil {
 			return err
@@ -129,7 +129,7 @@ func ExecShell(outPath string, timeout time.Duration, name string, arg ...string
 	select {
 	case <-after:
 		_ = cmd.Process.Kill()
-		return buserr.New(constant.ErrCmdTimeout)
+		return buserr.New("ErrCmdTimeout")
 	case err := <-done:
 		if err != nil {
 			return err
@@ -162,7 +162,7 @@ func ExecShellWithTask(taskItem *task.Task, timeout time.Duration, name string, 
 	select {
 	case <-after:
 		_ = cmd.Process.Kill()
-		return buserr.New(constant.ErrCmdTimeout)
+		return buserr.New("ErrCmdTimeout")
 	case err := <-done:
 		if err != nil {
 			return err
@@ -212,7 +212,7 @@ func ExecScript(scriptPath, workDir string) (string, error) {
 	select {
 	case <-after:
 		_ = cmd.Process.Kill()
-		return "", buserr.New(constant.ErrCmdTimeout)
+		return "", buserr.New("ErrCmdTimeout")
 	case err := <-done:
 		if err != nil {
 			return handleErr(stdout, stderr, err)
@@ -291,7 +291,7 @@ func ExecShellWithTimeOut(cmdStr, workdir string, logger *log.Logger, timeout ti
 	}
 	err := cmd.Wait()
 	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
-		return buserr.New(constant.ErrCmdTimeout)
+		return buserr.New("ErrCmdTimeout")
 	}
 	return err
 }

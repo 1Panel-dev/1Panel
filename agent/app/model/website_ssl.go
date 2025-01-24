@@ -5,7 +5,7 @@ import (
 	"path"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/global"
 )
 
 type WebsiteSSL struct {
@@ -47,5 +47,5 @@ func (w WebsiteSSL) TableName() string {
 }
 
 func (w WebsiteSSL) GetLogPath() string {
-	return path.Join(constant.SSLLogDir, fmt.Sprintf("%s-ssl-%d.log", w.PrimaryDomain, w.ID))
+	return path.Join(global.Dir.SSLLogDir, fmt.Sprintf("%s-ssl-%d.log", w.PrimaryDomain, w.ID))
 }

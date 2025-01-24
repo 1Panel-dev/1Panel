@@ -7,7 +7,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/ssl"
 )
 
@@ -38,7 +37,7 @@ func (w WebsiteAcmeAccountService) Page(search dto.PageInfo) (int64, []response.
 func (w WebsiteAcmeAccountService) Create(create request.WebsiteAcmeAccountCreate) (*response.WebsiteAcmeAccountDTO, error) {
 	exist, _ := websiteAcmeRepo.GetFirst(websiteAcmeRepo.WithEmail(create.Email), websiteAcmeRepo.WithType(create.Type))
 	if exist != nil {
-		return nil, buserr.New(constant.ErrEmailIsExist)
+		return nil, buserr.New("ErrEmailIsExist")
 	}
 	acmeAccount := &model.WebsiteAcmeAccount{
 		Email:   create.Email,
@@ -48,7 +47,7 @@ func (w WebsiteAcmeAccountService) Create(create request.WebsiteAcmeAccountCreat
 
 	if create.Type == "google" {
 		if create.EabKid == "" || create.EabHmacKey == "" {
-			return nil, buserr.New(constant.ErrEabKidOrEabHmacKeyCannotBlank)
+			return nil, buserr.New("ErrEabKidOrEabHmacKeyCannotBlank")
 		}
 		acmeAccount.EabKid = create.EabKid
 		acmeAccount.EabHmacKey = create.EabHmacKey
@@ -73,7 +72,7 @@ func (w WebsiteAcmeAccountService) Create(create request.WebsiteAcmeAccountCreat
 
 func (w WebsiteAcmeAccountService) Delete(id uint) error {
 	if ssls, _ := websiteSSLRepo.List(websiteSSLRepo.WithByAcmeAccountId(id)); len(ssls) > 0 {
-		return buserr.New(constant.ErrAccountCannotDelete)
+		return buserr.New("ErrAccountCannotDelete")
 	}
 	return websiteAcmeRepo.DeleteBy(repo.WithByID(id))
 }

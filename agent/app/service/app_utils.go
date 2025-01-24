@@ -84,10 +84,10 @@ func checkPort(key string, params map[string]interface{}) (int, error) {
 			for _, install := range oldInstalled {
 				apps = append(apps, install.App.Name)
 			}
-			return portN, buserr.WithMap(constant.ErrPortInOtherApp, map[string]interface{}{"port": portN, "apps": apps}, nil)
+			return portN, buserr.WithMap("ErrPortInOtherApp", map[string]interface{}{"port": portN, "apps": apps}, nil)
 		}
 		if common.ScanPort(portN) {
-			return portN, buserr.WithDetail(constant.ErrPortInUsed, portN, nil)
+			return portN, buserr.WithDetail("ErrPortInUsed", portN, nil)
 		} else {
 			return portN, nil
 		}
@@ -117,7 +117,7 @@ func checkPortExist(port int) error {
 		return buserr.WithMap("ErrPortExist", errMap, nil)
 	}
 	if common.ScanPort(port) {
-		return buserr.WithDetail(constant.ErrPortInUsed, port, nil)
+		return buserr.WithDetail("ErrPortInUsed", port, nil)
 	}
 	return nil
 }
@@ -264,7 +264,7 @@ func createLink(ctx context.Context, installTask *task.Task, app model.App, appI
 					resourceId = oldPostgresqlDb.ID
 					if oldPostgresqlDb.ID > 0 {
 						if oldPostgresqlDb.Username != dbConfig.DbUser || oldPostgresqlDb.Password != dbConfig.Password {
-							return buserr.New(constant.ErrDbUserNotValid)
+							return buserr.New("ErrDbUserNotValid")
 						}
 					} else {
 						var createPostgresql dto.PostgresqlDBCreate
@@ -286,7 +286,7 @@ func createLink(ctx context.Context, installTask *task.Task, app model.App, appI
 					resourceId = oldMysqlDb.ID
 					if oldMysqlDb.ID > 0 {
 						if oldMysqlDb.Username != dbConfig.DbUser || oldMysqlDb.Password != dbConfig.Password {
-							return buserr.New(constant.ErrDbUserNotValid)
+							return buserr.New("ErrDbUserNotValid")
 						}
 					} else {
 						var createMysql dto.MysqlDBCreate
@@ -415,12 +415,12 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 		}
 
 		_ = backupRepo.DeleteRecord(ctx, repo.WithByType("app"), repo.WithByName(install.App.Key), repo.WithByDetailName(install.Name))
-		uploadDir := path.Join(global.CONF.System.BaseDir, fmt.Sprintf("1panel/uploads/app/%s/%s", install.App.Key, install.Name))
+		uploadDir := path.Join(global.Dir.BaseDir, fmt.Sprintf("1panel/uploads/app/%s/%s", install.App.Key, install.Name))
 		if _, err := os.Stat(uploadDir); err == nil {
 			_ = os.RemoveAll(uploadDir)
 		}
 		if deleteReq.DeleteBackup {
-			backupDir := path.Join(global.CONF.System.Backup, fmt.Sprintf("app/%s/%s", install.App.Key, install.Name))
+			backupDir := path.Join(global.Dir.LocalBackupDir, fmt.Sprintf("app/%s/%s", install.App.Key, install.Name))
 			if _, err = os.Stat(backupDir); err == nil {
 				t.LogWithOps(task.TaskDelete, i18n.GetMsgByKey("TaskBackup"))
 				_ = os.RemoveAll(backupDir)
@@ -494,7 +494,7 @@ func getUpgradeCompose(install model.AppInstall, detail model.AppDetail) (string
 	}
 	value, ok := composeMap["services"]
 	if !ok || value == nil {
-		return "", buserr.New(constant.ErrFileParse)
+		return "", buserr.New("ErrFileParse")
 	}
 	servicesMap := value.(map[string]interface{})
 	if len(servicesMap) == 1 {
@@ -576,7 +576,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 					}
 					_ = backupRecordService.BatchDeleteRecord(deleteIDs)
 				}
-				backupFile = path.Join(global.CONF.System.Backup, backupRecord.FileDir, backupRecord.FileName)
+				backupFile = path.Join(global.Dir.LocalBackupDir, backupRecord.FileDir, backupRecord.FileName)
 			} else {
 				return buserr.WithNameAndErr("ErrAppBackup", install.Name, err)
 			}
@@ -587,7 +587,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 
 	upgradeApp := func(t *task.Task) error {
 		fileOp := files.NewFileOp()
-		detailDir := path.Join(constant.ResourceDir, "apps", install.App.Resource, install.App.Key, detail.Version)
+		detailDir := path.Join(global.Dir.ResourceDir, "apps", install.App.Resource, install.App.Key, detail.Version)
 		if install.App.Resource == constant.AppResourceRemote {
 			if err = downloadApp(install.App, detail, &install, t.Logger); err != nil {
 				return err
@@ -605,7 +605,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 			}()
 		}
 		if install.App.Resource == constant.AppResourceLocal {
-			detailDir = path.Join(constant.ResourceDir, "apps", "local", strings.TrimPrefix(install.App.Key, "local"), detail.Version)
+			detailDir = path.Join(global.Dir.ResourceDir, "apps", "local", strings.TrimPrefix(install.App.Key, "local"), detail.Version)
 		}
 
 		content, err := fileOp.GetContent(install.GetEnvPath())
@@ -673,15 +673,15 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		handleMap(envs, envParams)
 		if install.App.Key == "openresty" && install.App.Resource == "remote" && !common.CompareVersion(install.Version, "1.25.3.2-0-1") {
 			t.Log(i18n.GetMsgByKey("MoveSiteDir"))
-			siteDir := path.Join(constant.DataDir, "www")
+			siteDir := path.Join(global.Dir.DataDir, "www")
 			envParams["WEBSITE_DIR"] = siteDir
 			oldSiteDir := path.Join(install.GetPath(), "www")
 			t.Log(i18n.GetWithName("MoveSiteToDir", siteDir))
-			if err := fileOp.CopyDir(oldSiteDir, constant.DataDir); err != nil {
+			if err := fileOp.CopyDir(oldSiteDir, global.Dir.DataDir); err != nil {
 				t.Log(i18n.GetMsgByKey("ErrMoveSiteDir"))
 				return err
 			}
-			newConfDir := path.Join(constant.DataDir, "www", "conf.d")
+			newConfDir := path.Join(global.Dir.DataDir, "www", "conf.d")
 			_ = fileOp.CreateDir(newConfDir, constant.DirPerm)
 			oldConfDir := path.Join(install.GetPath(), "conf/conf.d")
 			items, err := os.ReadDir(oldConfDir)
@@ -711,10 +711,10 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 			httpDirective.UpdateDirective("include", []string{"/usr/local/openresty/nginx/conf/default/*.conf"})
 
 			if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
-				return buserr.WithErr(constant.ErrUpdateBuWebsite, err)
+				return buserr.WithErr("ErrUpdateBuWebsite", err)
 			}
 			t.Log(i18n.GetMsgByKey("DeleteRuntimePHP"))
-			_ = fileOp.DeleteDir(path.Join(constant.RuntimeDir, "php"))
+			_ = fileOp.DeleteDir(path.Join(global.Dir.RuntimeDir, "php"))
 			websites, _ := websiteRepo.List(repo.WithByType("runtime"))
 			for _, website := range websites {
 				runtime, _ := runtimeRepo.GetFirst(repo.WithByID(website.RuntimeID))
@@ -827,7 +827,7 @@ func checkLimit(app model.App) error {
 			return err
 		}
 		if len(installs) >= app.Limit {
-			return buserr.New(constant.ErrAppLimit)
+			return buserr.New("ErrAppLimit")
 		}
 	}
 	return nil
@@ -867,7 +867,7 @@ func downloadApp(app model.App, appDetail model.AppDetail, appInstall *model.App
 	if app.IsLocalApp() {
 		return nil
 	}
-	appResourceDir := path.Join(constant.AppResourceDir, app.Resource)
+	appResourceDir := path.Join(global.Dir.AppResourceDir, app.Resource)
 	appDownloadDir := app.GetAppResourcePath()
 	appVersionDir := path.Join(appDownloadDir, appDetail.Version)
 	fileOp := files.NewFileOp()
@@ -921,7 +921,7 @@ func downloadApp(app model.App, appDetail model.AppDetail, appInstall *model.App
 
 func copyData(task *task.Task, app model.App, appDetail model.AppDetail, appInstall *model.AppInstall, req request.AppInstallCreate) (err error) {
 	fileOp := files.NewFileOp()
-	appResourceDir := path.Join(constant.AppResourceDir, app.Resource)
+	appResourceDir := path.Join(global.Dir.AppResourceDir, app.Resource)
 
 	if app.Resource == constant.AppResourceRemote {
 		err = downloadApp(app, appDetail, appInstall, task.Logger)
@@ -933,14 +933,14 @@ func copyData(task *task.Task, app model.App, appDetail model.AppDetail, appInst
 		}()
 	}
 	appKey := app.Key
-	installAppDir := path.Join(constant.AppInstallDir, app.Key)
+	installAppDir := path.Join(global.Dir.AppInstallDir, app.Key)
 	if app.Resource == constant.AppResourceLocal {
-		appResourceDir = constant.LocalAppResourceDir
+		appResourceDir = global.Dir.LocalAppResourceDir
 		appKey = strings.TrimPrefix(app.Key, "local")
-		installAppDir = path.Join(constant.LocalAppInstallDir, appKey)
+		installAppDir = path.Join(global.Dir.LocalAppInstallDir, appKey)
 	}
 	if app.Resource == constant.AppResourceCustom {
-		appResourceDir = path.Join(constant.AppResourceDir, "custom")
+		appResourceDir = path.Join(global.Dir.AppResourceDir, "custom")
 	}
 	resourceDir := path.Join(appResourceDir, appKey, appDetail.Version)
 
@@ -1205,43 +1205,43 @@ func handleLocalAppDetail(versionDir string, appDetail *model.AppDetail) error {
 	fileOp := files.NewFileOp()
 	dockerComposePath := path.Join(versionDir, "docker-compose.yml")
 	if !fileOp.Stat(dockerComposePath) {
-		return buserr.WithName(constant.ErrFileNotFound, "docker-compose.yml")
+		return buserr.WithName("ErrFileNotFound", "docker-compose.yml")
 	}
 	dockerComposeByte, _ := fileOp.GetContent(dockerComposePath)
 	if dockerComposeByte == nil {
-		return buserr.WithName(constant.ErrFileParseApp, "docker-compose.yml")
+		return buserr.WithName("ErrFileParseApp", "docker-compose.yml")
 	}
 	appDetail.DockerCompose = string(dockerComposeByte)
 	paramPath := path.Join(versionDir, "data.yml")
 	if !fileOp.Stat(paramPath) {
-		return buserr.WithName(constant.ErrFileNotFound, "data.yml")
+		return buserr.WithName("ErrFileNotFound", "data.yml")
 	}
 	paramByte, _ := fileOp.GetContent(paramPath)
 	if paramByte == nil {
-		return buserr.WithName(constant.ErrFileNotFound, "data.yml")
+		return buserr.WithName("ErrFileNotFound", "data.yml")
 	}
 	appParamConfig := dto.LocalAppParam{}
 	if err := yaml.Unmarshal(paramByte, &appParamConfig); err != nil {
-		return buserr.WithMap(constant.ErrFileParseApp, map[string]interface{}{"name": "data.yml", "err": err.Error()}, err)
+		return buserr.WithMap("ErrFileParseApp", map[string]interface{}{"name": "data.yml", "err": err.Error()}, err)
 	}
 	dataJson, err := json.Marshal(appParamConfig.AppParams)
 	if err != nil {
-		return buserr.WithMap(constant.ErrFileParseApp, map[string]interface{}{"name": "data.yml", "err": err.Error()}, err)
+		return buserr.WithMap("ErrFileParseApp", map[string]interface{}{"name": "data.yml", "err": err.Error()}, err)
 	}
 	var appParam dto.AppForm
 	if err = json.Unmarshal(dataJson, &appParam); err != nil {
-		return buserr.WithMap(constant.ErrFileParseApp, map[string]interface{}{"name": "data.yml", "err": err.Error()}, err)
+		return buserr.WithMap("ErrFileParseApp", map[string]interface{}{"name": "data.yml", "err": err.Error()}, err)
 	}
 	for _, formField := range appParam.FormFields {
 		if strings.Contains(formField.EnvKey, " ") {
-			return buserr.WithName(constant.ErrAppParamKey, formField.EnvKey)
+			return buserr.WithName("ErrAppParamKey", formField.EnvKey)
 		}
 	}
 
 	var dataMap map[string]interface{}
 	err = yaml.Unmarshal(paramByte, &dataMap)
 	if err != nil {
-		return buserr.WithMap(constant.ErrFileParseApp, map[string]interface{}{"name": "data.yml", "err": err.Error()}, err)
+		return buserr.WithMap("ErrFileParseApp", map[string]interface{}{"name": "data.yml", "err": err.Error()}, err)
 	}
 
 	additionalProperties, _ := dataMap["additionalProperties"].(map[string]interface{})
@@ -1249,13 +1249,13 @@ func handleLocalAppDetail(versionDir string, appDetail *model.AppDetail) error {
 	if ok {
 		formFields, ok := formFieldsInterface.([]interface{})
 		if !ok {
-			return buserr.WithName(constant.ErrAppParamKey, "formFields")
+			return buserr.WithName("ErrAppParamKey", "formFields")
 		}
 		for _, item := range formFields {
 			field := item.(map[string]interface{})
 			for key, value := range field {
 				if value == nil {
-					return buserr.WithName(constant.ErrAppParamKey, key)
+					return buserr.WithName("ErrAppParamKey", key)
 				}
 			}
 		}
@@ -1269,22 +1269,22 @@ func handleLocalApp(appDir string) (app *model.App, err error) {
 	fileOp := files.NewFileOp()
 	configYamlPath := path.Join(appDir, "data.yml")
 	if !fileOp.Stat(configYamlPath) {
-		err = buserr.WithName(constant.ErrFileNotFound, "data.yml")
+		err = buserr.WithName("ErrFileNotFound", "data.yml")
 		return
 	}
 	iconPath := path.Join(appDir, "logo.png")
 	if !fileOp.Stat(iconPath) {
-		err = buserr.WithName(constant.ErrFileNotFound, "logo.png")
+		err = buserr.WithName("ErrFileNotFound", "logo.png")
 		return
 	}
 	configYamlByte, err := fileOp.GetContent(configYamlPath)
 	if err != nil {
-		err = buserr.WithMap(constant.ErrFileParseApp, map[string]interface{}{"name": "data.yml", "err": err.Error()}, err)
+		err = buserr.WithMap("ErrFileParseApp", map[string]interface{}{"name": "data.yml", "err": err.Error()}, err)
 		return
 	}
 	localAppDefine := dto.LocalAppAppDefine{}
 	if err = yaml.Unmarshal(configYamlByte, &localAppDefine); err != nil {
-		err = buserr.WithMap(constant.ErrFileParseApp, map[string]interface{}{"name": "data.yml", "err": err.Error()}, err)
+		err = buserr.WithMap("ErrFileParseApp", map[string]interface{}{"name": "data.yml", "err": err.Error()}, err)
 		return
 	}
 	app = &localAppDefine.AppProperty
@@ -1578,7 +1578,7 @@ func updateToolApp(installed *model.AppInstall) {
 func addDockerComposeCommonParam(composeMap map[string]interface{}, serviceName string, req request.AppContainerConfig, params map[string]interface{}) error {
 	services, serviceValid := composeMap["services"].(map[string]interface{})
 	if !serviceValid {
-		return buserr.New(constant.ErrFileParse)
+		return buserr.New("ErrFileParse")
 	}
 	imagePreFix := xpack.GetImagePrefix()
 	if imagePreFix != "" {
@@ -1598,7 +1598,7 @@ func addDockerComposeCommonParam(composeMap map[string]interface{}, serviceName 
 
 	service, serviceExist := services[serviceName]
 	if !serviceExist {
-		return buserr.New(constant.ErrFileParse)
+		return buserr.New("ErrFileParse")
 	}
 	serviceValue := service.(map[string]interface{})
 

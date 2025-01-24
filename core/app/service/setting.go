@@ -54,7 +54,7 @@ func NewISettingService() ISettingService {
 func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {
 	setting, err := settingRepo.List()
 	if err != nil {
-		return nil, constant.ErrRecordNotFound
+		return nil, buserr.New("ErrRecordNotFound")
 	}
 	settingMap := make(map[string]string)
 	for _, set := range setting {
@@ -179,7 +179,7 @@ func (u *SettingService) UpdateProxy(req dto.ProxyUpdate) error {
 
 func (u *SettingService) UpdatePort(port uint) error {
 	if common.ScanPort(int(port)) {
-		return buserr.WithDetail(constant.ErrPortInUsed, port, nil)
+		return buserr.WithDetail("ErrPortInUsed", port, nil)
 	}
 	oldPort, err := settingRepo.Get(repo.WithByKey("ServerPort"))
 	if err != nil {
@@ -205,7 +205,7 @@ func (u *SettingService) UpdatePort(port uint) error {
 }
 
 func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
-	secretDir := path.Join(global.CONF.System.BaseDir, "1panel/secret")
+	secretDir := path.Join(global.CONF.Base.InstallDir, "1panel/secret")
 	if req.SSL == constant.StatusDisable {
 		if err := settingRepo.Update("SSL", constant.StatusDisable); err != nil {
 			return err
@@ -293,16 +293,16 @@ func (u *SettingService) LoadFromCert() (*dto.SSLInfo, error) {
 		if err != nil {
 			return nil, err
 		}
-		if _, err := os.Stat(path.Join(global.CONF.System.BaseDir, "1panel/secret/server.crt")); err != nil {
+		if _, err := os.Stat(path.Join(global.CONF.Base.InstallDir, "1panel/secret/server.crt")); err != nil {
 			return nil, fmt.Errorf("load server.crt file failed, err: %v", err)
 		}
-		certFile, _ := os.ReadFile(path.Join(global.CONF.System.BaseDir, "1panel/secret/server.crt"))
+		certFile, _ := os.ReadFile(path.Join(global.CONF.Base.InstallDir, "1panel/secret/server.crt"))
 		data.Cert = string(certFile)
 
-		if _, err := os.Stat(path.Join(global.CONF.System.BaseDir, "1panel/secret/server.key")); err != nil {
+		if _, err := os.Stat(path.Join(global.CONF.Base.InstallDir, "1panel/secret/server.key")); err != nil {
 			return nil, fmt.Errorf("load server.key file failed, err: %v", err)
 		}
-		keyFile, _ := os.ReadFile(path.Join(global.CONF.System.BaseDir, "1panel/secret/server.key"))
+		keyFile, _ := os.ReadFile(path.Join(global.CONF.Base.InstallDir, "1panel/secret/server.key"))
 		data.Key = string(keyFile)
 	case "select":
 		// TODO select ssl from website
@@ -338,13 +338,13 @@ func (u *SettingService) HandlePasswordExpired(c *gin.Context, old, new string) 
 		}
 		return nil
 	}
-	return constant.ErrInitialPassword
+	return buserr.New("ErrInitialPassword")
 }
 
 func (u *SettingService) GetTerminalInfo() (*dto.TerminalInfo, error) {
 	setting, err := settingRepo.List()
 	if err != nil {
-		return nil, constant.ErrRecordNotFound
+		return nil, buserr.New("ErrRecordNotFound")
 	}
 	settingMap := make(map[string]string)
 	for _, set := range setting {
@@ -394,8 +394,8 @@ func (u *SettingService) UpdatePassword(c *gin.Context, old, new string) error {
 }
 
 func (u *SettingService) UpdateSystemSSL() error {
-	certPath := path.Join(global.CONF.System.BaseDir, "1panel/secret/server.crt")
-	keyPath := path.Join(global.CONF.System.BaseDir, "1panel/secret/server.key")
+	certPath := path.Join(global.CONF.Base.InstallDir, "1panel/secret/server.crt")
+	keyPath := path.Join(global.CONF.Base.InstallDir, "1panel/secret/server.key")
 	certificate, err := os.ReadFile(certPath)
 	if err != nil {
 		return err
@@ -415,9 +415,9 @@ func (u *SettingService) UpdateSystemSSL() error {
 func (u *SettingService) GenerateApiKey() (string, error) {
 	apiKey := common.RandStr(32)
 	if err := settingRepo.Update("ApiKey", apiKey); err != nil {
-		return global.CONF.System.ApiKey, err
+		return global.Api.ApiKey, err
 	}
-	global.CONF.System.ApiKey = apiKey
+	global.Api.ApiKey = apiKey
 	return apiKey, nil
 }
 
@@ -425,25 +425,25 @@ func (u *SettingService) UpdateApiConfig(req dto.ApiInterfaceConfig) error {
 	if err := settingRepo.Update("ApiInterfaceStatus", req.ApiInterfaceStatus); err != nil {
 		return err
 	}
-	global.CONF.System.ApiInterfaceStatus = req.ApiInterfaceStatus
+	global.Api.ApiInterfaceStatus = req.ApiInterfaceStatus
 	if err := settingRepo.Update("ApiKey", req.ApiKey); err != nil {
 		return err
 	}
-	global.CONF.System.ApiKey = req.ApiKey
+	global.Api.ApiKey = req.ApiKey
 	if err := settingRepo.Update("IpWhiteList", req.IpWhiteList); err != nil {
 		return err
 	}
-	global.CONF.System.IpWhiteList = req.IpWhiteList
+	global.Api.IpWhiteList = req.IpWhiteList
 	if err := settingRepo.Update("ApiKeyValidityTime", req.ApiKeyValidityTime); err != nil {
 		return err
 	}
-	global.CONF.System.ApiKeyValidityTime = req.ApiKeyValidityTime
+	global.Api.ApiKeyValidityTime = req.ApiKeyValidityTime
 	return nil
 }
 
 func loadInfoFromCert() (dto.SSLInfo, error) {
 	var info dto.SSLInfo
-	certFile := path.Join(global.CONF.System.BaseDir, "1panel/secret/server.crt")
+	certFile := path.Join(global.CONF.Base.InstallDir, "1panel/secret/server.crt")
 	if _, err := os.Stat(certFile); err != nil {
 		return info, err
 	}
@@ -471,16 +471,16 @@ func loadInfoFromCert() (dto.SSLInfo, error) {
 	return dto.SSLInfo{
 		Domain:   strings.Join(domains, ","),
 		Timeout:  certObj.NotAfter.Format(constant.DateTimeLayout),
-		RootPath: path.Join(global.CONF.System.BaseDir, "1panel/secret/server.crt"),
+		RootPath: path.Join(global.CONF.Base.InstallDir, "1panel/secret/server.crt"),
 	}, nil
 }
 
 func checkCertValid() error {
-	certificate, err := os.ReadFile(path.Join(global.CONF.System.BaseDir, "1panel/secret/server.crt.tmp"))
+	certificate, err := os.ReadFile(path.Join(global.CONF.Base.InstallDir, "1panel/secret/server.crt.tmp"))
 	if err != nil {
 		return err
 	}
-	key, err := os.ReadFile(path.Join(global.CONF.System.BaseDir, "1panel/secret/server.key.tmp"))
+	key, err := os.ReadFile(path.Join(global.CONF.Base.InstallDir, "1panel/secret/server.key.tmp"))
 	if err != nil {
 		return err
 	}

@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"io/fs"
 	"os"
 	"path"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 
 	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
@@ -37,7 +38,7 @@ func (u *BackupService) AppBackup(req dto.CommonBackup) (*model.BackupRecord, er
 	}
 	timeNow := time.Now().Format(constant.DateTimeSlimLayout)
 	itemDir := fmt.Sprintf("app/%s/%s", req.Name, req.DetailName)
-	backupDir := path.Join(global.CONF.System.Backup, itemDir)
+	backupDir := path.Join(global.Dir.LocalBackupDir, itemDir)
 
 	fileName := req.FileName
 	if req.FileName == "" {
@@ -226,7 +227,7 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 		}
 
 		if !isRollback {
-			rollbackFile = path.Join(global.CONF.System.TmpDir, fmt.Sprintf("app/%s_%s.tar.gz", install.Name, time.Now().Format(constant.DateTimeSlimLayout)))
+			rollbackFile = path.Join(global.Dir.TmpDir, fmt.Sprintf("app/%s_%s.tar.gz", install.Name, time.Now().Format(constant.DateTimeSlimLayout)))
 			if err := handleAppBackup(install, nil, path.Dir(rollbackFile), path.Base(rollbackFile), "", "", ""); err != nil {
 				t.Log(fmt.Sprintf("backup app %s for rollback before recover failed, err: %v", install.Name, err))
 			}

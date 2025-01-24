@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/buserr"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/postgresql/client"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
@@ -46,7 +45,7 @@ func NewPostgresqlClient(conn client.DBInfo) (PostgresqlClient, error) {
 		return nil, err
 	}
 	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
-		return nil, buserr.New(constant.ErrExecTimeOut)
+		return nil, buserr.New("ErrExecTimeOut")
 	}
 
 	return client.NewRemote(client.Remote{

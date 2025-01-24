@@ -1,6 +1,8 @@
-system:
-  base_dir: /opt
+base:
+  install_dir: /opt
   mode: dev
+
+remote_rul:
   repo_url: https://resource.fit2cloud.com/1panel/package
   resource_url: https://resource.fit2cloud.com/1panel/resource
   app_repo: https://apps-assets.fit2cloud.com

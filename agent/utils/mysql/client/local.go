@@ -34,7 +34,7 @@ func (r *Local) Create(info CreateInfo) error {
 	createSql := fmt.Sprintf("create database `%s` default character set %s collate %s", info.Name, info.Format, formatMap[info.Format])
 	if err := r.ExecSQL(createSql, info.Timeout); err != nil {
 		if strings.Contains(strings.ToLower(err.Error()), "error 1007") {
-			return buserr.New(constant.ErrDatabaseIsExist)
+			return buserr.New("ErrDatabaseIsExist")
 		}
 		return err
 	}
@@ -63,7 +63,7 @@ func (r *Local) CreateUser(info CreateInfo, withDeleteDB bool) error {
 	for _, user := range userlist {
 		if err := r.ExecSQL(fmt.Sprintf("create user %s identified by '%s';", user, info.Password), info.Timeout); err != nil {
 			if strings.Contains(strings.ToLower(err.Error()), "error 1396") {
-				return buserr.New(constant.ErrUserIsExist)
+				return buserr.New("ErrUserIsExist")
 			}
 			if withDeleteDB {
 				_ = r.Delete(DeleteInfo{
@@ -354,7 +354,7 @@ func (r *Local) ExecSQL(command string, timeout uint) error {
 	cmd := exec.CommandContext(ctx, "docker", itemCommand...)
 	stdout, err := cmd.CombinedOutput()
 	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
-		return buserr.New(constant.ErrExecTimeOut)
+		return buserr.New("ErrExecTimeOut")
 	}
 	stdStr := strings.ReplaceAll(string(stdout), "mysql: [Warning] Using a password on the command line interface can be insecure.\n", "")
 	if err != nil || strings.HasPrefix(string(stdStr), "ERROR ") {
@@ -371,7 +371,7 @@ func (r *Local) ExecSQLForRows(command string, timeout uint) ([]string, error) {
 	cmd := exec.CommandContext(ctx, "docker", itemCommand...)
 	stdout, err := cmd.CombinedOutput()
 	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
-		return nil, buserr.New(constant.ErrExecTimeOut)
+		return nil, buserr.New("ErrExecTimeOut")
 	}
 	stdStr := strings.ReplaceAll(string(stdout), "mysql: [Warning] Using a password on the command line interface can be insecure.\n", "")
 	if err != nil || strings.HasPrefix(string(stdStr), "ERROR ") {

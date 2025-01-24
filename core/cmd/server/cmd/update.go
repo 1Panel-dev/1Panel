@@ -164,7 +164,7 @@ func password() {
 	p := ""
 	encryptSetting := getSettingByKey(db, "EncryptKey")
 	if len(encryptSetting) == 16 {
-		global.CONF.System.EncryptKey = encryptSetting
+		global.CONF.Base.EncryptKey = encryptSetting
 		p, _ = encrypt.StringEncrypt(newPassword)
 	} else {
 		p = newPassword

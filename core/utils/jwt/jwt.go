@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/core/app/repo"
+	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -55,10 +56,10 @@ func (j *JWT) ParseToken(tokenStr string) (*CustomClaims, error) {
 		return j.SigningKey, nil
 	})
 	if err != nil || token == nil {
-		return nil, constant.ErrTokenParse
+		return nil, buserr.WithDetail("ErrTokenParse", "", err)
 	}
 	if claims, ok := token.Claims.(*CustomClaims); ok && token.Valid {
 		return claims, nil
 	}
-	return nil, constant.ErrTokenParse
+	return nil, buserr.New("ErrTokenParse")
 }

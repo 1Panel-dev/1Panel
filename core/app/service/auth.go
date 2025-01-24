@@ -13,7 +13,6 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/jwt"
 	"github.com/1Panel-dev/1Panel/core/utils/mfa"
 	"github.com/gin-gonic/gin"
-	"github.com/pkg/errors"
 )
 
 type AuthService struct{}
@@ -36,25 +35,25 @@ func NewIAuthService() IAuthService {
 func (u *AuthService) Login(c *gin.Context, info dto.Login, entrance string) (*dto.UserLoginInfo, error) {
 	nameSetting, err := settingRepo.Get(repo.WithByKey("UserName"))
 	if err != nil {
-		return nil, errors.WithMessage(constant.ErrRecordNotFound, err.Error())
+		return nil, buserr.New("ErrRecordNotFound")
 	}
 	passwordSetting, err := settingRepo.Get(repo.WithByKey("Password"))
 	if err != nil {
-		return nil, errors.WithMessage(constant.ErrRecordNotFound, err.Error())
+		return nil, buserr.New("ErrRecordNotFound")
 	}
 	pass, err := encrypt.StringDecrypt(passwordSetting.Value)
 	if err != nil {
-		return nil, constant.ErrAuth
+		return nil, buserr.New("ErrAuth")
 	}
 	if !hmac.Equal([]byte(info.Password), []byte(pass)) || nameSetting.Value != info.Name {
-		return nil, constant.ErrAuth
+		return nil, buserr.New("ErrAuth")
 	}
 	entranceSetting, err := settingRepo.Get(repo.WithByKey("SecurityEntrance"))
 	if err != nil {
 		return nil, err
 	}
 	if len(entranceSetting.Value) != 0 && entranceSetting.Value != entrance {
-		return nil, buserr.New(constant.ErrEntrance)
+		return nil, buserr.New("ErrEntrance")
 	}
 	mfa, err := settingRepo.Get(repo.WithByKey("MFAStatus"))
 	if err != nil {
@@ -72,25 +71,25 @@ func (u *AuthService) Login(c *gin.Context, info dto.Login, entrance string) (*d
 func (u *AuthService) MFALogin(c *gin.Context, info dto.MFALogin, entrance string) (*dto.UserLoginInfo, error) {
 	nameSetting, err := settingRepo.Get(repo.WithByKey("UserName"))
 	if err != nil {
-		return nil, errors.WithMessage(constant.ErrRecordNotFound, err.Error())
+		return nil, buserr.New("ErrRecordNotFound")
 	}
 	passwordSetting, err := settingRepo.Get(repo.WithByKey("Password"))
 	if err != nil {
-		return nil, errors.WithMessage(constant.ErrRecordNotFound, err.Error())
+		return nil, buserr.New("ErrRecordNotFound")
 	}
 	pass, err := encrypt.StringDecrypt(passwordSetting.Value)
 	if err != nil {
 		return nil, err
 	}
 	if !hmac.Equal([]byte(info.Password), []byte(pass)) || nameSetting.Value != info.Name {
-		return nil, constant.ErrAuth
+		return nil, buserr.New("ErrAuth")
 	}
 	entranceSetting, err := settingRepo.Get(repo.WithByKey("SecurityEntrance"))
 	if err != nil {
 		return nil, err
 	}
 	if len(entranceSetting.Value) != 0 && entranceSetting.Value != entrance {
-		return nil, buserr.New(constant.ErrEntrance)
+		return nil, buserr.New("ErrEntrance")
 	}
 	mfaSecret, err := settingRepo.Get(repo.WithByKey("MFASecret"))
 	if err != nil {
@@ -102,7 +101,7 @@ func (u *AuthService) MFALogin(c *gin.Context, info dto.MFALogin, entrance strin
 	}
 	success := mfa.ValidCode(info.Code, mfaInterval.Value, mfaSecret.Value)
 	if !success {
-		return nil, constant.ErrAuth
+		return nil, buserr.New("ErrAuth")
 	}
 
 	return u.generateSession(c, info.Name, info.AuthMethod)

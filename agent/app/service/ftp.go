@@ -1,9 +1,11 @@
 package service
 
 import (
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"os"
 	"sort"
+
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -11,7 +13,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/agent/utils/toolbox"
 	"github.com/jinzhu/copier"
-	"github.com/pkg/errors"
 )
 
 type FtpService struct{}
@@ -83,7 +84,7 @@ func (f *FtpService) SearchWithPage(req dto.SearchWithPage) (int64, interface{},
 	for _, user := range lists {
 		var item dto.FtpInfo
 		if err := copier.Copy(&item, &user); err != nil {
-			return 0, nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+			return 0, nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 		}
 		item.Password, _ = encrypt.StringDecrypt(item.Password)
 		users = append(users, item)
@@ -145,7 +146,7 @@ func (f *FtpService) Create(req dto.FtpCreate) (uint, error) {
 	}
 	userInDB, _ := ftpRepo.Get(ftpRepo.WithByUser(req.User))
 	if userInDB.ID != 0 {
-		return 0, constant.ErrRecordExist
+		return 0, buserr.New("ErrRecordExist")
 	}
 	client, err := toolbox.NewFtpClient()
 	if err != nil {
@@ -156,7 +157,7 @@ func (f *FtpService) Create(req dto.FtpCreate) (uint, error) {
 	}
 	var ftp model.Ftp
 	if err := copier.Copy(&ftp, &req); err != nil {
-		return 0, errors.WithMessage(constant.ErrStructTransform, err.Error())
+		return 0, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 	}
 	ftp.Status = constant.StatusEnable
 	ftp.Password = pass
@@ -199,7 +200,7 @@ func (f *FtpService) Update(req dto.FtpUpdate) error {
 	}
 	ftpItem, _ := ftpRepo.Get(repo.WithByID(req.ID))
 	if ftpItem.ID == 0 {
-		return constant.ErrRecordNotFound
+		return buserr.New("ErrRecordNotFound")
 	}
 	passItem, err := encrypt.StringDecrypt(ftpItem.Password)
 	if err != nil {

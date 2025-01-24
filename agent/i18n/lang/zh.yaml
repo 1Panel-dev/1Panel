@@ -4,10 +4,10 @@ ErrInitialPassword: "原密码错误"
 ErrInternalServer: "服务内部错误: {{ .detail }}"
 ErrRecordExist: "记录已存在"
 ErrRecordNotFound: "记录未能找到"
-ErrStructTransform: "类型转换失败: {{ .detail }}"
+ErrStructTransform: "类型转换失败: {{ .err }}"
 ErrNotLogin: "用户未登录: {{ .detail }}"
 ErrPasswordExpired: "当前密码已过期: {{ .detail }}"
-ErrNotSupportType: "系统暂不支持当前类型: {{ .detail }}"
+ErrNotSupportType: "系统暂不支持当前类型: {{ .name }}"
 ErrProxy: "请求错误，请检查该节点状态: {{ .detail }}"
 ErrApiConfigStatusInvalid: "API 接口禁止访问: {{ .detail }}"
 ErrApiConfigKeyInvalid: "API 接口密钥错误: {{ .detail }}"
@@ -112,7 +112,6 @@ ErrPathNotDelete: "所选目录不可删除"
 ErrDomainIsExist: "域名已存在"
 ErrAliasIsExist: "代号已存在"
 ErrAppDelete: '其他网站使用此应用，无法删除'
-ErrGroupIsUsed: '分组正在使用中，无法删除'
 ErrBackupMatch: '该备份文件与当前网站部分数据不匹配 {{ .detail}}'
 ErrBackupExist: '该备份文件对应部分源数据不存在 {{ .detail}}'
 ErrPHPResource: '本地运行环境不支持切换！'

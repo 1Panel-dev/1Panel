@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
-	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/gin-gonic/gin"
 )
@@ -29,7 +28,7 @@ func Proxy() gin.HandlerFunc {
 		if !strings.HasPrefix(c.Request.URL.Path, "/api/v2/core") && (currentNode == "local" || len(currentNode) == 0 || currentNode == "127.0.0.1") {
 			sockPath := "/etc/1panel/agent.sock"
 			if _, err := os.Stat(sockPath); err != nil {
-				helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrProxy, err)
+				helper.ErrorWithDetail(c, http.StatusBadRequest, "ErrProxy", err)
 				return
 			}
 			dialUnix := func() (conn net.Conn, err error) {

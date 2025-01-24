@@ -116,7 +116,7 @@ func (b *BaseApi) GetResponsePage(c *gin.Context) {
 // @Success 200 {boolean} demo
 // @Router /core/auth/demo [get]
 func (b *BaseApi) CheckIsDemo(c *gin.Context) {
-	helper.SuccessWithData(c, global.CONF.System.IsDemo)
+	helper.SuccessWithData(c, global.CONF.Base.IsDemo)
 }
 
 // @Tags Auth
@@ -159,5 +159,5 @@ func saveLoginLogs(c *gin.Context, err error) {
 // @Success 200 {string} intl
 // @Router /auth/intl [get]
 func (b *BaseApi) CheckIsIntl(c *gin.Context) {
-	helper.SuccessWithData(c, global.CONF.System.IsIntl)
+	helper.SuccessWithData(c, global.CONF.Base.IsIntl)
 }

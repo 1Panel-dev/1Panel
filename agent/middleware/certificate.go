@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/gin-gonic/gin"
 )
@@ -17,12 +16,12 @@ func Certificate() gin.HandlerFunc {
 			return
 		}
 		if !c.Request.TLS.HandshakeComplete || len(c.Request.TLS.PeerCertificates) == 0 {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, errors.New("no such tls peer certificates"))
+			helper.InternalServer(c, errors.New("no such tls peer certificates"))
 			return
 		}
 		cert := c.Request.TLS.PeerCertificates[0]
 		if cert.Subject.CommonName != "panel_client" {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, fmt.Errorf("err certificate"))
+			helper.InternalServer(c, fmt.Errorf("err certificate"))
 			return
 		}
 		c.Next()

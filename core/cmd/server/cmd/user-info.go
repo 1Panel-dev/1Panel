@@ -31,7 +31,7 @@ var userinfoCmd = &cobra.Command{
 			encryptSetting := getSettingByKey(db, "EncryptKey")
 			pass = getSettingByKey(db, "Password")
 			if len(encryptSetting) == 16 {
-				global.CONF.System.EncryptKey = encryptSetting
+				global.CONF.Base.EncryptKey = encryptSetting
 				pass, _ = encrypt.StringDecrypt(pass)
 			}
 		}

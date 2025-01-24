@@ -10,6 +10,7 @@ type SettingRepo struct{}
 type ISettingRepo interface {
 	List(opts ...global.DBOption) ([]model.Setting, error)
 	Get(opts ...global.DBOption) (model.Setting, error)
+	GetValueByKey(key string) (string, error)
 	Create(key, value string) error
 	Update(key, value string) error
 }
@@ -44,6 +45,14 @@ func (u *SettingRepo) Get(opts ...global.DBOption) (model.Setting, error) {
 	}
 	err := db.First(&settings).Error
 	return settings, err
+}
+
+func (u *SettingRepo) GetValueByKey(key string) (string, error) {
+	var setting model.Setting
+	if err := global.DB.Model(&model.Setting{}).Where("key = ?", key).First(&setting).Error; err != nil {
+		return "", err
+	}
+	return setting.Value, nil
 }
 
 func (u *SettingRepo) Update(key, value string) error {

@@ -7,7 +7,6 @@ import (
 	"sync"
 
 	"github.com/1Panel-dev/1Panel/agent/buserr"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 )
@@ -168,7 +167,7 @@ func (f *Firewall) ListAddress() ([]FireInfo, error) {
 
 func (f *Firewall) Port(port FireInfo, operation string) error {
 	if cmd.CheckIllegal(operation, port.Protocol, port.Port) {
-		return buserr.New(constant.ErrCmdIllegal)
+		return buserr.New("ErrCmdIllegal")
 	}
 
 	stdout, err := cmd.Execf("firewall-cmd --zone=public --%s-port=%s/%s --permanent", operation, port.Port, port.Protocol)
@@ -180,7 +179,7 @@ func (f *Firewall) Port(port FireInfo, operation string) error {
 
 func (f *Firewall) RichRules(rule FireInfo, operation string) error {
 	if cmd.CheckIllegal(operation, rule.Address, rule.Protocol, rule.Port, rule.Strategy) {
-		return buserr.New(constant.ErrCmdIllegal)
+		return buserr.New("ErrCmdIllegal")
 	}
 	ruleStr := "rule family=ipv4 "
 	if strings.Contains(rule.Address, ":") {

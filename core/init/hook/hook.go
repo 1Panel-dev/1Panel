@@ -13,62 +13,22 @@ import (
 
 func Init() {
 	settingRepo := repo.NewISettingRepo()
-	portSetting, err := settingRepo.Get(repo.WithByKey("ServerPort"))
-	if err != nil {
-		global.LOG.Errorf("load service port from setting failed, err: %v", err)
+	global.CONF.Conn.Port, _ = settingRepo.GetValueByKey("ServerPort")
+	global.CONF.Conn.Ipv6, _ = settingRepo.GetValueByKey("Ipv6")
+	global.Api.ApiInterfaceStatus, _ = settingRepo.GetValueByKey("ApiInterfaceStatus")
+	if global.Api.ApiInterfaceStatus == constant.StatusEnable {
+		global.Api.ApiKey, _ = settingRepo.GetValueByKey("ApiKey")
+		global.Api.IpWhiteList, _ = settingRepo.GetValueByKey("IpWhiteList")
+		global.Api.ApiKeyValidityTime, _ = settingRepo.GetValueByKey("ApiKeyValidityTime")
 	}
-	global.CONF.System.Port = portSetting.Value
-	ipv6Setting, err := settingRepo.Get(repo.WithByKey("Ipv6"))
-	if err != nil {
-		global.LOG.Errorf("load ipv6 status from setting failed, err: %v", err)
-	}
-	global.CONF.System.Ipv6 = ipv6Setting.Value
-	apiInterfaceStatusSetting, err := settingRepo.Get(repo.WithByKey("ApiInterfaceStatus"))
-	if err != nil {
-		global.LOG.Errorf("load service api interface from setting failed, err: %v", err)
-	}
-	global.CONF.System.ApiInterfaceStatus = apiInterfaceStatusSetting.Value
-	if apiInterfaceStatusSetting.Value == constant.StatusEnable {
-		apiKeySetting, err := settingRepo.Get(repo.WithByKey("ApiKey"))
-		if err != nil {
-			global.LOG.Errorf("load service api key from setting failed, err: %v", err)
-		}
-		global.CONF.System.ApiKey = apiKeySetting.Value
-		ipWhiteListSetting, err := settingRepo.Get(repo.WithByKey("IpWhiteList"))
-		if err != nil {
-			global.LOG.Errorf("load service ip white list from setting failed, err: %v", err)
-		}
-		global.CONF.System.IpWhiteList = ipWhiteListSetting.Value
-		apiKeyValidityTimeSetting, err := settingRepo.Get(repo.WithByKey("ApiKeyValidityTime"))
-		if err != nil {
-			global.LOG.Errorf("load service api key validity time from setting failed, err: %v", err)
-		}
-		global.CONF.System.ApiKeyValidityTime = apiKeyValidityTimeSetting.Value
-	}
-	bindAddressSetting, err := settingRepo.Get(repo.WithByKey("BindAddress"))
-	if err != nil {
-		global.LOG.Errorf("load bind address from setting failed, err: %v", err)
-	}
-	global.CONF.System.BindAddress = bindAddressSetting.Value
-	sslSetting, err := settingRepo.Get(repo.WithByKey("SSL"))
-	if err != nil {
-		global.LOG.Errorf("load service ssl from setting failed, err: %v", err)
-	}
-	global.CONF.System.SSL = sslSetting.Value
-	versionSetting, err := settingRepo.Get(repo.WithByKey("SystemVersion"))
-	if err != nil {
-		global.LOG.Errorf("load version from setting failed, err: %v", err)
-	}
-	global.CONF.System.Version = versionSetting.Value
-
-	if _, err := settingRepo.Get(repo.WithByKey("SystemStatus")); err != nil {
-		_ = settingRepo.Create("SystemStatus", "Free")
-	}
+	global.CONF.Conn.BindAddress, _ = settingRepo.GetValueByKey("BindAddress")
+	global.CONF.Conn.SSL, _ = settingRepo.GetValueByKey("SSL")
+	global.CONF.Base.Version, _ = settingRepo.GetValueByKey("SystemVersion")
 	if err := settingRepo.Update("SystemStatus", "Free"); err != nil {
 		global.LOG.Fatalf("init service before start failed, err: %v", err)
 	}
 
-	handleUserInfo(global.CONF.System.ChangeUserInfo, settingRepo)
+	handleUserInfo(global.CONF.Base.ChangeUserInfo, settingRepo)
 }
 
 func handleUserInfo(tags string, settingRepo repo.ISettingRepo) {
@@ -88,23 +48,23 @@ func handleUserInfo(tags string, settingRepo repo.ISettingRepo) {
 		}
 		return
 	}
-	if strings.Contains(global.CONF.System.ChangeUserInfo, "username") {
+	if strings.Contains(global.CONF.Base.ChangeUserInfo, "username") {
 		if err := settingRepo.Update("UserName", common.RandStrAndNum(10)); err != nil {
 			global.LOG.Fatalf("init username before start failed, err: %v", err)
 		}
 	}
-	if strings.Contains(global.CONF.System.ChangeUserInfo, "password") {
+	if strings.Contains(global.CONF.Base.ChangeUserInfo, "password") {
 		pass, _ := encrypt.StringEncrypt(common.RandStrAndNum(10))
 		if err := settingRepo.Update("Password", pass); err != nil {
 			global.LOG.Fatalf("init password before start failed, err: %v", err)
 		}
 	}
-	if strings.Contains(global.CONF.System.ChangeUserInfo, "entrance") {
+	if strings.Contains(global.CONF.Base.ChangeUserInfo, "entrance") {
 		if err := settingRepo.Update("SecurityEntrance", common.RandStrAndNum(10)); err != nil {
 			global.LOG.Fatalf("init entrance before start failed, err: %v", err)
 		}
 	}
 
 	sudo := cmd.SudoHandleCmd()
-	_, _ = cmd.Execf("%s sed -i '/CHANGE_USER_INFO=%v/d' /usr/local/bin/1pctl", sudo, global.CONF.System.ChangeUserInfo)
+	_, _ = cmd.Execf("%s sed -i '/CHANGE_USER_INFO=%v/d' /usr/local/bin/1pctl", sudo, global.CONF.Base.ChangeUserInfo)
 }

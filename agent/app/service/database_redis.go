@@ -5,10 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/global"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/constant"
@@ -51,7 +53,7 @@ func (u *RedisService) UpdateConf(req dto.RedisConfUpdate) error {
 	if err := confSet(redisInfo.Name, "", confs); err != nil {
 		return err
 	}
-	if _, err := compose.Restart(fmt.Sprintf("%s/redis/%s/docker-compose.yml", constant.AppInstallDir, redisInfo.Name)); err != nil {
+	if _, err := compose.Restart(fmt.Sprintf("%s/redis/%s/docker-compose.yml", global.Dir.AppInstallDir, redisInfo.Name)); err != nil {
 		return err
 	}
 
@@ -120,7 +122,7 @@ func (u *RedisService) UpdatePersistenceConf(req dto.RedisConfPersistenceUpdate)
 	if err := confSet(redisInfo.Name, req.Type, confs); err != nil {
 		return err
 	}
-	if _, err := compose.Restart(fmt.Sprintf("%s/redis/%s/docker-compose.yml", constant.AppInstallDir, redisInfo.Name)); err != nil {
+	if _, err := compose.Restart(fmt.Sprintf("%s/redis/%s/docker-compose.yml", global.Dir.AppInstallDir, redisInfo.Name)); err != nil {
 		return err
 	}
 
@@ -213,7 +215,7 @@ type redisConfig struct {
 }
 
 func confSet(redisName string, updateType string, changeConf []redisConfig) error {
-	path := fmt.Sprintf("%s/redis/%s/conf/redis.conf", constant.AppInstallDir, redisName)
+	path := fmt.Sprintf("%s/redis/%s/conf/redis.conf", global.Dir.AppInstallDir, redisName)
 	lineBytes, err := os.ReadFile(path)
 	if err != nil {
 		return err

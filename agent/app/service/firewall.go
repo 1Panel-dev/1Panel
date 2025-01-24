@@ -10,6 +10,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
@@ -17,7 +18,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	fireClient "github.com/1Panel-dev/1Panel/agent/utils/firewall/client"
 	"github.com/jinzhu/copier"
-	"github.com/pkg/errors"
 )
 
 const confPath = "/etc/sysctl.conf"
@@ -347,7 +347,7 @@ func (u *FirewallService) OperateForwardRule(req dto.ForwardRuleOperate) error {
 					reqRule.TargetPort == rule.TargetPort &&
 					reqRule.TargetIP == rule.TargetIP &&
 					proto == rule.Protocol {
-					return constant.ErrRecordExist
+					return buserr.New("ErrRecordExist")
 				}
 			}
 		}
@@ -446,7 +446,7 @@ func (u *FirewallService) UpdateAddrRule(req dto.AddrRuleUpdate) error {
 func (u *FirewallService) UpdateDescription(req dto.UpdateFirewallDescription) error {
 	var firewall model.Firewall
 	if err := copier.Copy(&firewall, &req); err != nil {
-		return errors.WithMessage(constant.ErrStructTransform, err.Error())
+		return buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 	}
 	return hostRepo.SaveFirewallRecord(&firewall)
 }

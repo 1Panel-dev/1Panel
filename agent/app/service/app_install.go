@@ -163,7 +163,7 @@ func (a *AppInstallService) CheckExist(req request.AppInstalledInfo) (*response.
 	res.Status = appInstall.Status
 	res.AppInstallID = appInstall.ID
 	res.IsExist = true
-	res.InstallPath = path.Join(constant.AppInstallDir, appInstall.App.Key, appInstall.Name)
+	res.InstallPath = path.Join(global.Dir.AppInstallDir, appInstall.App.Key, appInstall.Name)
 	res.HttpPort = appInstall.HttpPort
 	res.HttpsPort = appInstall.HttpsPort
 
@@ -245,7 +245,7 @@ func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
 		return err
 	}
 	if !req.ForceDelete && !files.NewFileOp().Stat(install.GetPath()) {
-		return buserr.New(constant.ErrInstallDirNotFound)
+		return buserr.New("ErrInstallDirNotFound")
 	}
 	dockerComposePath := install.GetComposePath()
 	switch req.Operate {
@@ -370,14 +370,14 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 			if installed.ContainerName != req.ContainerName {
 				exist, _ := appInstallRepo.GetFirst(appInstallRepo.WithContainerName(req.ContainerName), appInstallRepo.WithIDNotIs(installed.ID))
 				if exist.ID > 0 {
-					return buserr.New(constant.ErrContainerName)
+					return buserr.New("ErrContainerName")
 				}
 				containerExist, err := checkContainerNameIsExist(req.ContainerName, installed.GetPath())
 				if err != nil {
 					return err
 				}
 				if containerExist {
-					return buserr.New(constant.ErrContainerName)
+					return buserr.New("ErrContainerName")
 				}
 				installed.ContainerName = req.ContainerName
 			}
@@ -414,13 +414,13 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 		go func() {
 			nginxInstall, err := getNginxFull(&website)
 			if err != nil {
-				global.LOG.Error(buserr.WithErr(constant.ErrUpdateBuWebsite, err).Error())
+				global.LOG.Error(buserr.WithErr("ErrUpdateBuWebsite", err).Error())
 				return
 			}
 			config := nginxInstall.SiteConfig.Config
 			servers := config.FindServers()
 			if len(servers) == 0 {
-				global.LOG.Error(buserr.WithErr(constant.ErrUpdateBuWebsite, errors.New("nginx config is not valid")).Error())
+				global.LOG.Error(buserr.WithErr("ErrUpdateBuWebsite", errors.New("nginx config is not valid")).Error())
 				return
 			}
 			server := servers[0]
@@ -428,11 +428,11 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 			server.UpdateRootProxy([]string{proxy})
 
 			if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
-				global.LOG.Error(buserr.WithErr(constant.ErrUpdateBuWebsite, err).Error())
+				global.LOG.Error(buserr.WithErr("ErrUpdateBuWebsite", err).Error())
 				return
 			}
 			if err := nginxCheckAndReload(nginxInstall.SiteConfig.OldContent, config.FilePath, nginxInstall.Install.ContainerName); err != nil {
-				global.LOG.Error(buserr.WithErr(constant.ErrUpdateBuWebsite, err).Error())
+				global.LOG.Error(buserr.WithErr("ErrUpdateBuWebsite", err).Error())
 				return
 			}
 		}()
@@ -588,7 +588,7 @@ func (a *AppInstallService) GetUpdateVersions(req request.AppUpdateVersion) ([]d
 
 func (a *AppInstallService) ChangeAppPort(req request.PortUpdate) error {
 	if common.ScanPort(int(req.Port)) {
-		return buserr.WithDetail(constant.ErrPortInUsed, req.Port, nil)
+		return buserr.WithDetail("ErrPortInUsed", req.Port, nil)
 	}
 
 	appInstall, err := appInstallRepo.LoadBaseInfo(req.Key, req.Name)
@@ -606,7 +606,7 @@ func (a *AppInstallService) ChangeAppPort(req request.PortUpdate) error {
 		if err != nil {
 			return err
 		}
-		if _, err := compose.Restart(fmt.Sprintf("%s/%s/%s/docker-compose.yml", constant.AppInstallDir, appInstall.App.Key, appInstall.Name)); err != nil {
+		if _, err := compose.Restart(fmt.Sprintf("%s/%s/%s/docker-compose.yml", global.Dir.AppInstallDir, appInstall.App.Key, appInstall.Name)); err != nil {
 			global.LOG.Errorf("docker-compose restart %s[%s] failed, err: %v", appInstall.App.Key, appInstall.Name, err)
 		}
 	}
@@ -645,12 +645,12 @@ func (a *AppInstallService) GetDefaultConfigByKey(key, name string) (string, err
 	}
 
 	fileOp := files.NewFileOp()
-	filePath := path.Join(constant.AppResourceDir, "remote", baseInfo.Key, baseInfo.Version, "conf")
+	filePath := path.Join(global.Dir.AppResourceDir, "remote", baseInfo.Key, baseInfo.Version, "conf")
 	if !fileOp.Stat(filePath) {
-		filePath = path.Join(constant.AppResourceDir, baseInfo.Key, "versions", baseInfo.Version, "conf")
+		filePath = path.Join(global.Dir.AppResourceDir, baseInfo.Key, "versions", baseInfo.Version, "conf")
 	}
 	if !fileOp.Stat(filePath) {
-		return "", buserr.New(constant.ErrPathNotFound)
+		return "", buserr.New("ErrPathNotFound")
 	}
 
 	if key == constant.AppMysql || key == constant.AppMariaDB {
@@ -877,7 +877,7 @@ func updateInstallInfoInDB(appKey, appName, param string, value interface{}) err
 		}, repo.WithByID(appInstall.ID))
 	}
 
-	ComposeFile := fmt.Sprintf("%s/%s/%s/docker-compose.yml", constant.AppInstallDir, appKey, appInstall.Name)
+	ComposeFile := fmt.Sprintf("%s/%s/%s/docker-compose.yml", global.Dir.AppInstallDir, appKey, appInstall.Name)
 	stdout, err := compose.Down(ComposeFile)
 	if err != nil {
 		return errors.New(stdout)

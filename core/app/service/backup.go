@@ -24,7 +24,6 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/req_helper"
 	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/jinzhu/copier"
-	"github.com/pkg/errors"
 )
 
 type BackupService struct{}
@@ -77,17 +76,17 @@ func (u *BackupService) LoadBackupClientInfo(clientType string) (dto.BackupClien
 
 func (u *BackupService) Create(req dto.BackupOperate) error {
 	if !req.IsPublic {
-		return buserr.New(constant.ErrBackupPublic)
+		return buserr.New("ErrBackupPublic")
 	}
 	backup, _ := backupRepo.Get(repo.WithByName(req.Name))
 	if backup.ID != 0 {
-		return constant.ErrRecordExist
+		return buserr.New("ErrRecordExist")
 	}
 	if req.Type != constant.Sftp && req.BackupPath != "/" {
 		req.BackupPath = strings.TrimPrefix(req.BackupPath, "/")
 	}
 	if err := copier.Copy(&backup, &req); err != nil {
-		return errors.WithMessage(constant.ErrStructTransform, err.Error())
+		return buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 	}
 	itemAccessKey, err := base64.StdEncoding.DecodeString(backup.AccessKey)
 	if err != nil {
@@ -160,21 +159,21 @@ func (u *BackupService) GetBuckets(req dto.ForBuckets) ([]interface{}, error) {
 func (u *BackupService) Delete(id uint) error {
 	backup, _ := backupRepo.Get(repo.WithByID(id))
 	if backup.ID == 0 {
-		return constant.ErrRecordNotFound
+		return buserr.New("ErrRecordNotFound")
 	}
 	if !backup.IsPublic {
-		return buserr.New(constant.ErrBackupPublic)
+		return buserr.New("ErrBackupPublic")
 	}
 	if backup.Type == constant.Local {
-		return buserr.New(constant.ErrBackupLocal)
+		return buserr.New("ErrBackupLocal")
 	}
 	if _, err := req_helper.NewLocalClient(fmt.Sprintf("/api/v2/backups/check/%v", id), http.MethodGet, nil); err != nil {
 		global.LOG.Errorf("check used of local cronjob failed, err: %v", err)
-		return buserr.New(constant.ErrBackupInUsed)
+		return buserr.New("ErrBackupInUsed")
 	}
 	if err := xpack.CheckBackupUsed(id); err != nil {
 		global.LOG.Errorf("check used of node cronjob failed, err: %v", err)
-		return buserr.New(constant.ErrBackupInUsed)
+		return buserr.New("ErrBackupInUsed")
 	}
 
 	go syncAccountToAgent(backup, "delete")
@@ -184,20 +183,20 @@ func (u *BackupService) Delete(id uint) error {
 func (u *BackupService) Update(req dto.BackupOperate) error {
 	backup, _ := backupRepo.Get(repo.WithByID(req.ID))
 	if backup.ID == 0 {
-		return constant.ErrRecordNotFound
+		return buserr.New("ErrRecordNotFound")
 	}
 	if !backup.IsPublic {
-		return buserr.New(constant.ErrBackupPublic)
+		return buserr.New("ErrBackupPublic")
 	}
 	if backup.Type == constant.Local {
-		return buserr.New(constant.ErrBackupLocal)
+		return buserr.New("ErrBackupLocal")
 	}
 	if req.Type != constant.Sftp && req.BackupPath != "/" {
 		req.BackupPath = strings.TrimPrefix(req.BackupPath, "/")
 	}
 	var newBackup model.BackupAccount
 	if err := copier.Copy(&newBackup, &req); err != nil {
-		return errors.WithMessage(constant.ErrStructTransform, err.Error())
+		return buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 	}
 	itemAccessKey, err := base64.StdEncoding.DecodeString(newBackup.AccessKey)
 	if err != nil {
@@ -239,10 +238,10 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 func (u *BackupService) RefreshToken(req dto.OperateByID) error {
 	backup, _ := backupRepo.Get(repo.WithByID(req.ID))
 	if backup.ID == 0 {
-		return constant.ErrRecordNotFound
+		return buserr.New("ErrRecordNotFound")
 	}
 	if !backup.IsPublic {
-		return buserr.New(constant.ErrBackupPublic)
+		return buserr.New("ErrBackupPublic")
 	}
 	varMap := make(map[string]interface{})
 	if err := json.Unmarshal([]byte(backup.Vars), &varMap); err != nil {
@@ -335,7 +334,7 @@ func (u *BackupService) checkBackupConn(backup *model.BackupAccount) (bool, erro
 	if err != nil {
 		return false, err
 	}
-	fileItem := path.Join(global.CONF.System.BaseDir, "1panel/tmp/test/1panel")
+	fileItem := path.Join(global.CONF.Base.InstallDir, "1panel/tmp/test/1panel")
 	if _, err := os.Stat(path.Dir(fileItem)); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(path.Dir(fileItem), os.ModePerm); err != nil {
 			return false, err

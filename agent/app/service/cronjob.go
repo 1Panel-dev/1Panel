@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -49,7 +50,7 @@ func (u *CronjobService) SearchWithPage(search dto.PageCronjob) (int64, interfac
 	for _, cronjob := range cronjobs {
 		var item dto.CronjobInfo
 		if err := copier.Copy(&item, &cronjob); err != nil {
-			return 0, nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+			return 0, nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 		}
 		record, _ := cronjobRepo.RecordFirst(cronjob.ID)
 		if record.ID != 0 {
@@ -85,7 +86,7 @@ func (u *CronjobService) SearchRecords(search dto.SearchRecord) (int64, interfac
 	for _, record := range records {
 		var item dto.Record
 		if err := copier.Copy(&item, &record); err != nil {
-			return 0, nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+			return 0, nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 		}
 		item.StartTime = record.StartTime.Format(constant.DateTimeLayout)
 		dtoCronjobs = append(dtoCronjobs, item)
@@ -165,7 +166,7 @@ func (u *CronjobService) CleanRecord(req dto.CronjobClean) error {
 func (u *CronjobService) Download(req dto.CronjobDownload) (string, error) {
 	record, _ := cronjobRepo.GetRecord(repo.WithByID(req.RecordID))
 	if record.ID == 0 {
-		return "", constant.ErrRecordNotFound
+		return "", buserr.New("ErrRecordNotFound")
 	}
 	account, client, err := NewBackupClientWithID(req.BackupAccountID)
 	if err != nil {
@@ -177,7 +178,7 @@ func (u *CronjobService) Download(req dto.CronjobDownload) (string, error) {
 		}
 		return record.File, nil
 	}
-	tempPath := fmt.Sprintf("%s/download/%s", constant.DataDir, record.File)
+	tempPath := fmt.Sprintf("%s/download/%s", global.Dir.DataDir, record.File)
 	if _, err := os.Stat(tempPath); err != nil && os.IsNotExist(err) {
 		_ = os.MkdirAll(path.Dir(tempPath), os.ModePerm)
 		isOK, err := client.Download(record.File, tempPath)
@@ -191,7 +192,7 @@ func (u *CronjobService) Download(req dto.CronjobDownload) (string, error) {
 func (u *CronjobService) HandleOnce(id uint) error {
 	cronjob, _ := cronjobRepo.Get(repo.WithByID(id))
 	if cronjob.ID == 0 {
-		return constant.ErrRecordNotFound
+		return buserr.New("ErrRecordNotFound")
 	}
 	u.HandleJob(&cronjob)
 	return nil
@@ -200,11 +201,11 @@ func (u *CronjobService) HandleOnce(id uint) error {
 func (u *CronjobService) Create(req dto.CronjobCreate) error {
 	cronjob, _ := cronjobRepo.Get(repo.WithByName(req.Name))
 	if cronjob.ID != 0 {
-		return constant.ErrRecordExist
+		return buserr.New("ErrRecordExist")
 	}
 	cronjob.Secret = req.Secret
 	if err := copier.Copy(&cronjob, &req); err != nil {
-		return errors.WithMessage(constant.ErrStructTransform, err.Error())
+		return buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 	}
 	cronjob.Status = constant.StatusEnable
 
@@ -289,11 +290,11 @@ func (u *CronjobService) Delete(req dto.CronjobBatchDelete) error {
 func (u *CronjobService) Update(id uint, req dto.CronjobUpdate) error {
 	var cronjob model.Cronjob
 	if err := copier.Copy(&cronjob, &req); err != nil {
-		return errors.WithMessage(constant.ErrStructTransform, err.Error())
+		return buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 	}
 	cronModel, err := cronjobRepo.Get(repo.WithByID(id))
 	if err != nil {
-		return constant.ErrRecordNotFound
+		return buserr.New("ErrRecordNotFound")
 	}
 	upMap := make(map[string]interface{})
 	cronjob.EntryIDs = cronModel.EntryIDs
@@ -354,7 +355,7 @@ func (u *CronjobService) Update(id uint, req dto.CronjobUpdate) error {
 func (u *CronjobService) UpdateStatus(id uint, status string) error {
 	cronjob, _ := cronjobRepo.Get(repo.WithByID(id))
 	if cronjob.ID == 0 {
-		return errors.WithMessage(constant.ErrRecordNotFound, "record not found")
+		return errors.WithMessage(buserr.New("ErrRecordNotFound"), "record not found")
 	}
 	var (
 		entryIDs string
@@ -391,7 +392,7 @@ func (u *CronjobService) AddCronJob(cronjob *model.Cronjob) (int, error) {
 }
 
 func mkdirAndWriteFile(cronjob *model.Cronjob, startTime time.Time, msg []byte) (string, error) {
-	dir := fmt.Sprintf("%s/task/%s/%s", constant.DataDir, cronjob.Type, cronjob.Name)
+	dir := fmt.Sprintf("%s/task/%s/%s", global.Dir.DataDir, cronjob.Type, cronjob.Name)
 	if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(dir, os.ModePerm); err != nil {
 			return "", err

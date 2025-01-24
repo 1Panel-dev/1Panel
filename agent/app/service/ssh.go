@@ -2,8 +2,6 @@ package service
 
 import (
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/utils/geo"
-	"github.com/gin-gonic/gin"
 	"os"
 	"os/user"
 	"path"
@@ -11,6 +9,9 @@ import (
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/utils/geo"
+	"github.com/gin-gonic/gin"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
@@ -216,7 +217,7 @@ func (u *SSHService) UpdateByFile(value string) error {
 
 func (u *SSHService) GenerateSSH(req dto.GenerateSSH) error {
 	if cmd.CheckIllegal(req.EncryptionMode, req.Password) {
-		return buserr.New(constant.ErrCmdIllegal)
+		return buserr.New("ErrCmdIllegal")
 	}
 	currentUser, err := user.Current()
 	if err != nil {

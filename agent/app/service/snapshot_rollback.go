@@ -2,9 +2,10 @@ package service
 
 import (
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"os"
 	"path"
+
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/task"
@@ -31,7 +32,7 @@ func (u *SnapshotService) SnapshotRollback(req dto.SnapshotRecover) error {
 		return err
 	}
 	go func() {
-		rootDir := fmt.Sprintf("%s/1panel_original/original_%s", global.CONF.System.BaseDir, snap.Name)
+		rootDir := fmt.Sprintf("%s/1panel_original/original_%s", global.Dir.BaseDir, snap.Name)
 		baseDir := path.Join(rootDir, "base")
 
 		FileOp := files.NewFileOp()
@@ -78,16 +79,16 @@ func (u *SnapshotService) SnapshotRollback(req dto.SnapshotRecover) error {
 			nil,
 		)
 		taskItem.AddSubTask(
-			i18n.GetWithName("SnapCopy", global.CONF.System.Backup),
+			i18n.GetWithName("SnapCopy", global.Dir.LocalBackupDir),
 			func(t *task.Task) error {
-				return FileOp.CopyDir(path.Join(rootDir, "backup"), global.CONF.System.Backup)
+				return FileOp.CopyDir(path.Join(rootDir, "backup"), global.Dir.LocalBackupDir)
 			},
 			nil,
 		)
 		taskItem.AddSubTask(
-			i18n.GetWithName("SnapCopy", global.CONF.System.BaseDir),
+			i18n.GetWithName("SnapCopy", global.Dir.BaseDir),
 			func(t *task.Task) error {
-				return FileOp.CopyDir(path.Join(rootDir, "1panel"), global.CONF.System.BaseDir)
+				return FileOp.CopyDir(path.Join(rootDir, "1panel"), global.Dir.BaseDir)
 			},
 			nil,
 		)

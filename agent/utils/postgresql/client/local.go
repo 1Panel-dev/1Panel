@@ -34,7 +34,7 @@ func (r *Local) Create(info CreateInfo) error {
 	createSql := fmt.Sprintf("CREATE DATABASE \"%s\"", info.Name)
 	if err := r.ExecSQL(createSql, info.Timeout); err != nil {
 		if strings.Contains(strings.ToLower(err.Error()), "already exists") {
-			return buserr.New(constant.ErrDatabaseIsExist)
+			return buserr.New("ErrDatabaseIsExist")
 		}
 		return err
 	}
@@ -60,7 +60,7 @@ func (r *Local) CreateUser(info CreateInfo, withDeleteDB bool) error {
 	createSql := fmt.Sprintf("CREATE USER \"%s\" WITH PASSWORD '%s'", info.Username, info.Password)
 	if err := r.ExecSQL(createSql, info.Timeout); err != nil {
 		if strings.Contains(strings.ToLower(err.Error()), "already exists") {
-			return buserr.New(constant.ErrUserIsExist)
+			return buserr.New("ErrUserIsExist")
 		}
 		if withDeleteDB {
 			_ = r.Delete(DeleteInfo{
@@ -107,7 +107,7 @@ func (r *Local) Delete(info DeleteInfo) error {
 	dropSql := fmt.Sprintf("DROP USER \"%s\"", info.Username)
 	if err := r.ExecSQL(dropSql, info.Timeout); err != nil && !info.ForceDelete {
 		if strings.Contains(strings.ToLower(err.Error()), "depend on it") {
-			return buserr.WithDetail(constant.ErrInUsed, info.Username, nil)
+			return buserr.WithDetail("ErrInUsed", info.Username, nil)
 		}
 		return err
 	}
@@ -205,7 +205,7 @@ func (r *Local) ExecSQL(command string, timeout uint) error {
 	cmd := exec.CommandContext(ctx, "docker", itemCommand...)
 	stdout, err := cmd.CombinedOutput()
 	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
-		return buserr.New(constant.ErrExecTimeOut)
+		return buserr.New("ErrExecTimeOut")
 	}
 	if err != nil || strings.HasPrefix(string(stdout), "ERROR ") {
 		return errors.New(string(stdout))
@@ -221,7 +221,7 @@ func (r *Local) ExecSQLForRows(command string, timeout uint) ([]string, error) {
 	cmd := exec.CommandContext(ctx, "docker", itemCommand...)
 	stdout, err := cmd.CombinedOutput()
 	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
-		return nil, buserr.New(constant.ErrExecTimeOut)
+		return nil, buserr.New("ErrExecTimeOut")
 	}
 	if err != nil || strings.HasPrefix(string(stdout), "ERROR ") {
 		return nil, errors.New(string(stdout))

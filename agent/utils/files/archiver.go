@@ -2,7 +2,6 @@ package files
 
 import (
 	"github.com/1Panel-dev/1Panel/agent/buserr"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 )
 
@@ -34,5 +33,5 @@ func checkCmdAvailability(cmdStr string) error {
 	if cmd.Which(cmdStr) {
 		return nil
 	}
-	return buserr.WithName(constant.ErrCmdNotFound, cmdStr)
+	return buserr.WithName("ErrCmdNotFound", cmdStr)
 }

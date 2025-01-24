@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -9,7 +10,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 )
 
 type WebsiteDnsAccountService struct {
@@ -43,7 +43,7 @@ func (w WebsiteDnsAccountService) Page(search dto.PageInfo) (int64, []response.W
 func (w WebsiteDnsAccountService) Create(create request.WebsiteDnsAccountCreate) (request.WebsiteDnsAccountCreate, error) {
 	exist, _ := websiteDnsRepo.GetFirst(repo.WithByName(create.Name))
 	if exist != nil {
-		return request.WebsiteDnsAccountCreate{}, buserr.New(constant.ErrNameIsExist)
+		return request.WebsiteDnsAccountCreate{}, buserr.New("ErrNameIsExist")
 	}
 
 	authorization, err := json.Marshal(create.Authorization)
@@ -70,7 +70,7 @@ func (w WebsiteDnsAccountService) Update(update request.WebsiteDnsAccountUpdate)
 	exists, _ := websiteDnsRepo.List(repo.WithByName(update.Name))
 	for _, exist := range exists {
 		if exist.ID != update.ID {
-			return request.WebsiteDnsAccountUpdate{}, buserr.New(constant.ErrNameIsExist)
+			return request.WebsiteDnsAccountUpdate{}, buserr.New("ErrNameIsExist")
 		}
 	}
 	if err := websiteDnsRepo.Save(model.WebsiteDnsAccount{
@@ -89,7 +89,7 @@ func (w WebsiteDnsAccountService) Update(update request.WebsiteDnsAccountUpdate)
 
 func (w WebsiteDnsAccountService) Delete(id uint) error {
 	if ssls, _ := websiteSSLRepo.List(websiteSSLRepo.WithByDnsAccountId(id)); len(ssls) > 0 {
-		return buserr.New(constant.ErrAccountCannotDelete)
+		return buserr.New("ErrAccountCannotDelete")
 	}
 	return websiteDnsRepo.DeleteBy(repo.WithByID(id))
 }

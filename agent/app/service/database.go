@@ -3,9 +3,10 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"os"
 	"path"
+
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/postgresql"
 	pgclient "github.com/1Panel-dev/1Panel/agent/utils/postgresql/client"
@@ -51,7 +52,7 @@ func (u *DatabaseService) SearchWithPage(search dto.DatabaseSearch) (int64, inte
 	for _, db := range dbs {
 		var item dto.DatabaseInfo
 		if err := copier.Copy(&item, &db); err != nil {
-			return 0, nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+			return 0, nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 		}
 		datas = append(datas, item)
 	}
@@ -65,7 +66,7 @@ func (u *DatabaseService) Get(name string) (dto.DatabaseInfo, error) {
 		return data, err
 	}
 	if err := copier.Copy(&data, &remote); err != nil {
-		return data, errors.WithMessage(constant.ErrStructTransform, err.Error())
+		return data, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 	}
 	return data, nil
 }
@@ -79,7 +80,7 @@ func (u *DatabaseService) List(dbType string) ([]dto.DatabaseOption, error) {
 	for _, db := range dbs {
 		var item dto.DatabaseOption
 		if err := copier.Copy(&item, &db); err != nil {
-			return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+			return nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 		}
 		item.Database = db.Name
 		datas = append(datas, item)
@@ -160,9 +161,9 @@ func (u *DatabaseService) Create(req dto.DatabaseCreate) error {
 	db, _ := databaseRepo.Get(repo.WithByName(req.Name))
 	if db.ID != 0 {
 		if db.From == "local" {
-			return buserr.New(constant.ErrLocalExist)
+			return buserr.New("ErrLocalExist")
 		}
-		return constant.ErrRecordExist
+		return buserr.New("ErrRecordExist")
 	}
 	switch req.Type {
 	case constant.AppPostgresql:
@@ -206,7 +207,7 @@ func (u *DatabaseService) Create(req dto.DatabaseCreate) error {
 	}
 
 	if err := copier.Copy(&db, &req); err != nil {
-		return errors.WithMessage(constant.ErrStructTransform, err.Error())
+		return buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 	}
 	if err := databaseRepo.Create(context.Background(), &db); err != nil {
 		return err
@@ -230,15 +231,15 @@ func (u *DatabaseService) DeleteCheck(id uint) ([]string, error) {
 func (u *DatabaseService) Delete(req dto.DatabaseDelete) error {
 	db, _ := databaseRepo.Get(repo.WithByID(req.ID))
 	if db.ID == 0 {
-		return constant.ErrRecordNotFound
+		return buserr.New("ErrRecordNotFound")
 	}
 
 	if req.DeleteBackup {
-		uploadDir := path.Join(global.CONF.System.BaseDir, fmt.Sprintf("1panel/uploads/database/%s/%s", db.Type, db.Name))
+		uploadDir := path.Join(global.Dir.DataDir, fmt.Sprintf("uploads/database/%s/%s", db.Type, db.Name))
 		if _, err := os.Stat(uploadDir); err == nil {
 			_ = os.RemoveAll(uploadDir)
 		}
-		backupDir := path.Join(global.CONF.System.Backup, fmt.Sprintf("database/%s/%s", db.Type, db.Name))
+		backupDir := path.Join(global.Dir.LocalBackupDir, fmt.Sprintf("database/%s/%s", db.Type, db.Name))
 		if _, err := os.Stat(backupDir); err == nil {
 			_ = os.RemoveAll(backupDir)
 		}

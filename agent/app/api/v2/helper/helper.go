@@ -10,7 +10,6 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
-	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/gin-gonic/gin"
@@ -22,34 +21,17 @@ func ErrorWithDetail(ctx *gin.Context, code int, msgKey string, err error) {
 		Code:    code,
 		Message: "",
 	}
-	if msgKey == constant.ErrTypeInternalServer {
-		switch {
-		case errors.Is(err, constant.ErrRecordExist):
-			res.Message = i18n.GetMsgWithMap("ErrRecordExist", nil)
-		case errors.Is(constant.ErrRecordNotFound, err):
-			res.Message = i18n.GetMsgWithMap("ErrRecordNotFound", nil)
-		case errors.Is(constant.ErrInvalidParams, err):
-			res.Message = i18n.GetMsgWithMap("ErrInvalidParams", nil)
-		case errors.Is(constant.ErrStructTransform, err):
-			res.Message = i18n.GetMsgWithMap("ErrStructTransform", map[string]interface{}{"detail": err})
-		case errors.As(err, &buserr.BusinessError{}):
-			res.Message = err.Error()
-		default:
-			res.Message = i18n.GetMsgWithDetail(msgKey, err.Error())
-		}
-	} else {
-		res.Message = i18n.GetMsgWithDetail(msgKey, err.Error())
-	}
+	res.Message = i18n.GetMsgWithDetail(msgKey, err.Error())
 	ctx.JSON(http.StatusOK, res)
 	ctx.Abort()
 }
 
 func InternalServer(ctx *gin.Context, err error) {
-	ErrorWithDetail(ctx, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+	ErrorWithDetail(ctx, http.StatusInternalServerError, "ErrInternalServer", err)
 }
 
 func BadRequest(ctx *gin.Context, err error) {
-	ErrorWithDetail(ctx, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	ErrorWithDetail(ctx, http.StatusBadRequest, "ErrInvalidParams", err)
 }
 
 func SuccessWithData(ctx *gin.Context, data interface{}) {
@@ -57,7 +39,7 @@ func SuccessWithData(ctx *gin.Context, data interface{}) {
 		data = gin.H{}
 	}
 	res := dto.Response{
-		Code: constant.CodeSuccess,
+		Code: http.StatusOK,
 		Data: data,
 	}
 	ctx.JSON(http.StatusOK, res)
@@ -66,7 +48,7 @@ func SuccessWithData(ctx *gin.Context, data interface{}) {
 
 func SuccessWithOutData(ctx *gin.Context) {
 	res := dto.Response{
-		Code:    constant.CodeSuccess,
+		Code:    http.StatusOK,
 		Message: "success",
 	}
 	ctx.JSON(http.StatusOK, res)
@@ -75,7 +57,7 @@ func SuccessWithOutData(ctx *gin.Context) {
 
 func SuccessWithMsg(ctx *gin.Context, msg string) {
 	res := dto.Response{
-		Code:    constant.CodeSuccess,
+		Code:    http.StatusOK,
 		Message: msg,
 	}
 	ctx.JSON(http.StatusOK, res)
@@ -116,11 +98,11 @@ func GetTxAndContext() (tx *gorm.DB, ctx context.Context) {
 
 func CheckBindAndValidate(req interface{}, c *gin.Context) error {
 	if err := c.ShouldBindJSON(req); err != nil {
-		ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		ErrorWithDetail(c, http.StatusBadRequest, "ErrInvalidParams", err)
 		return err
 	}
 	if err := global.VALID.Struct(req); err != nil {
-		ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		ErrorWithDetail(c, http.StatusBadRequest, "ErrInvalidParams", err)
 		return err
 	}
 	return nil
@@ -128,7 +110,7 @@ func CheckBindAndValidate(req interface{}, c *gin.Context) error {
 
 func CheckBind(req interface{}, c *gin.Context) error {
 	if err := c.ShouldBindJSON(&req); err != nil {
-		ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		ErrorWithDetail(c, http.StatusBadRequest, "ErrInvalidParams", err)
 		return err
 	}
 	return nil

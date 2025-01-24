@@ -25,8 +25,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 	"github.com/jinzhu/copier"
 	"github.com/robfig/cron/v3"
-
-	"github.com/pkg/errors"
 )
 
 const (
@@ -139,7 +137,7 @@ func (c *ClamService) SearchWithPage(req dto.SearchClamWithPage) (int64, interfa
 	for _, command := range commands {
 		var item dto.ClamInfo
 		if err := copier.Copy(&item, &command); err != nil {
-			return 0, nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+			return 0, nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 		}
 		item.LastHandleDate = "-"
 		datas = append(datas, item)
@@ -174,10 +172,10 @@ func (c *ClamService) SearchWithPage(req dto.SearchClamWithPage) (int64, interfa
 func (c *ClamService) Create(req dto.ClamCreate) error {
 	clam, _ := clamRepo.Get(repo.WithByName(req.Name))
 	if clam.ID != 0 {
-		return constant.ErrRecordExist
+		return buserr.New("ErrRecordExist")
 	}
 	if err := copier.Copy(&clam, &req); err != nil {
-		return errors.WithMessage(constant.ErrStructTransform, err.Error())
+		return buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 	}
 	if clam.InfectedStrategy == "none" || clam.InfectedStrategy == "remove" {
 		clam.InfectedDir = ""
@@ -211,14 +209,14 @@ func (c *ClamService) Create(req dto.ClamCreate) error {
 func (c *ClamService) Update(req dto.ClamUpdate) error {
 	clam, _ := clamRepo.Get(repo.WithByName(req.Name))
 	if clam.ID == 0 {
-		return constant.ErrRecordNotFound
+		return buserr.New("ErrRecordNotFound")
 	}
 	if req.InfectedStrategy == "none" || req.InfectedStrategy == "remove" {
 		req.InfectedDir = ""
 	}
 	var clamItem model.Clam
 	if err := copier.Copy(&clamItem, &req); err != nil {
-		return errors.WithMessage(constant.ErrStructTransform, err.Error())
+		return buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 	}
 	clamItem.EntryID = clam.EntryID
 	upMap := map[string]interface{}{}
@@ -266,7 +264,7 @@ func (c *ClamService) Update(req dto.ClamUpdate) error {
 func (c *ClamService) UpdateStatus(id uint, status string) error {
 	clam, _ := clamRepo.Get(repo.WithByID(id))
 	if clam.ID == 0 {
-		return constant.ErrRecordNotFound
+		return buserr.New("ErrRecordNotFound")
 	}
 	var (
 		entryID int
@@ -292,7 +290,7 @@ func (c *ClamService) Delete(req dto.ClamDelete) error {
 			continue
 		}
 		if req.RemoveRecord {
-			_ = os.RemoveAll(path.Join(global.CONF.System.DataDir, resultDir, clam.Name))
+			_ = os.RemoveAll(path.Join(global.Dir.DataDir, resultDir, clam.Name))
 		}
 		if req.RemoveInfected {
 			_ = os.RemoveAll(path.Join(clam.InfectedDir, "1panel-infected", clam.Name))
@@ -318,13 +316,13 @@ func (c *ClamService) HandleOnce(req dto.OperateByID) error {
 	}
 	clam, _ := clamRepo.Get(repo.WithByID(req.ID))
 	if clam.ID == 0 {
-		return constant.ErrRecordNotFound
+		return buserr.New("ErrRecordNotFound")
 	}
 	if cmd.CheckIllegal(clam.Path) {
-		return buserr.New(constant.ErrCmdIllegal)
+		return buserr.New("ErrCmdIllegal")
 	}
 	timeNow := time.Now().Format(constant.DateTimeSlimLayout)
-	logFile := path.Join(global.CONF.System.DataDir, resultDir, clam.Name, timeNow)
+	logFile := path.Join(global.Dir.DataDir, resultDir, clam.Name, timeNow)
 	if _, err := os.Stat(path.Dir(logFile)); err != nil {
 		_ = os.MkdirAll(path.Dir(logFile), os.ModePerm)
 	}
@@ -359,7 +357,7 @@ func (c *ClamService) HandleOnce(req dto.OperateByID) error {
 func (c *ClamService) LoadRecords(req dto.ClamLogSearch) (int64, interface{}, error) {
 	clam, _ := clamRepo.Get(repo.WithByID(req.ClamID))
 	if clam.ID == 0 {
-		return 0, nil, constant.ErrRecordNotFound
+		return 0, nil, buserr.New("ErrRecordNotFound")
 	}
 	logPaths := loadFileByName(clam.Name)
 	if len(logPaths) == 0 {
@@ -398,13 +396,13 @@ func (c *ClamService) LoadRecords(req dto.ClamLogSearch) (int64, interface{}, er
 
 	var datas []dto.ClamLog
 	for i := 0; i < len(records); i++ {
-		item := loadResultFromLog(path.Join(global.CONF.System.DataDir, resultDir, clam.Name, records[i]))
+		item := loadResultFromLog(path.Join(global.Dir.DataDir, resultDir, clam.Name, records[i]))
 		datas = append(datas, item)
 	}
 	return int64(total), datas, nil
 }
 func (c *ClamService) LoadRecordLog(req dto.ClamLogReq) (string, error) {
-	logPath := path.Join(global.CONF.System.DataDir, resultDir, req.ClamName, req.RecordName)
+	logPath := path.Join(global.Dir.DataDir, resultDir, req.ClamName, req.RecordName)
 	var tail string
 	if req.Tail != "0" {
 		tail = req.Tail
@@ -422,9 +420,9 @@ func (c *ClamService) LoadRecordLog(req dto.ClamLogReq) (string, error) {
 func (c *ClamService) CleanRecord(req dto.OperateByID) error {
 	clam, _ := clamRepo.Get(repo.WithByID(req.ID))
 	if clam.ID == 0 {
-		return constant.ErrRecordNotFound
+		return buserr.New("ErrRecordNotFound")
 	}
-	pathItem := path.Join(global.CONF.System.DataDir, resultDir, clam.Name)
+	pathItem := path.Join(global.Dir.DataDir, resultDir, clam.Name)
 	_ = os.RemoveAll(pathItem)
 	return nil
 }
@@ -544,7 +542,7 @@ func StopAllCronJob(withCheck bool) bool {
 
 func loadFileByName(name string) []string {
 	var logPaths []string
-	pathItem := path.Join(global.CONF.System.DataDir, resultDir, name)
+	pathItem := path.Join(global.Dir.DataDir, resultDir, name)
 	_ = filepath.Walk(pathItem, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return nil

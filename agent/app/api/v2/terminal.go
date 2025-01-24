@@ -26,7 +26,7 @@ func (b *BaseApi) RedisWsSsh(c *gin.Context) {
 	}
 	defer wsConn.Close()
 
-	if global.CONF.System.IsDemo {
+	if global.CONF.Base.IsDemo {
 		if wshandleError(wsConn, errors.New("   demo server, prohibit this operation!")) {
 			return
 		}
@@ -99,7 +99,7 @@ func (b *BaseApi) ContainerWsSsh(c *gin.Context) {
 	}
 	defer wsConn.Close()
 
-	if global.CONF.System.IsDemo {
+	if global.CONF.Base.IsDemo {
 		if wshandleError(wsConn, errors.New("   demo server, prohibit this operation!")) {
 			return
 		}

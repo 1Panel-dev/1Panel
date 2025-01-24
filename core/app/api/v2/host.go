@@ -9,7 +9,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/app/dto"
-	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/copier"
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
@@ -72,7 +71,7 @@ func (b *BaseApi) TestByInfo(c *gin.Context) {
 func (b *BaseApi) TestByID(c *gin.Context) {
 	idParam, ok := c.Params.Get("id")
 	if !ok {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("no such params find in request"))
+		helper.BadRequest(c, errors.New("no such params find in request"))
 		return
 	}
 	intNum, err := strconv.Atoi(idParam)

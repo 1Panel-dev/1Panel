@@ -6,7 +6,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 )
 
 type PHPExtensionsService struct {
@@ -64,7 +63,7 @@ func (p PHPExtensionsService) List() ([]response.PHPExtensionsDTO, error) {
 func (p PHPExtensionsService) Create(req request.PHPExtensionsCreate) error {
 	exist, _ := phpExtensionsRepo.GetFirst(repo.WithByName(req.Name))
 	if exist.ID > 0 {
-		return buserr.New(constant.ErrNameIsExist)
+		return buserr.New("ErrNameIsExist")
 	}
 	extension := model.PHPExtensions{
 		Name:       req.Name,

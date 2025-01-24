@@ -6,7 +6,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -51,7 +50,7 @@ func DemoHandle() gin.HandlerFunc {
 
 		c.JSON(http.StatusInternalServerError, dto.Response{
 			Code:    http.StatusInternalServerError,
-			Message: buserr.New(constant.ErrDemoEnvironment).Error(),
+			Message: buserr.New("ErrDemoEnvironment").Error(),
 		})
 		c.Abort()
 	}

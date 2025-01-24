@@ -1,10 +1,11 @@
 package geo
 
 import (
-	"github.com/1Panel-dev/1Panel/agent/global"
-	"github.com/oschwald/maxminddb-golang"
 	"net"
 	"path"
+
+	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/oschwald/maxminddb-golang"
 )
 
 type Location struct {
@@ -21,7 +22,7 @@ type LocationRes struct {
 }
 
 func NewGeo() (*maxminddb.Reader, error) {
-	geoPath := path.Join(global.CONF.System.BaseDir, "1panel", "geo", "GeoIP.mmdb")
+	geoPath := path.Join(global.Dir.DataDir, "geo", "GeoIP.mmdb")
 	return maxminddb.Open(geoPath)
 }
 
@@ -29,7 +30,7 @@ func GetIPLocation(reader *maxminddb.Reader, ip, lang string) (string, error) {
 	var err error
 	var geoLocation LocationRes
 	if reader == nil {
-		geoPath := path.Join(global.CONF.System.BaseDir, "1panel", "geo", "GeoIP.mmdb")
+		geoPath := path.Join(global.Dir.DataDir, "geo", "GeoIP.mmdb")
 		reader, err = maxminddb.Open(geoPath)
 		if err != nil {
 			return "", err

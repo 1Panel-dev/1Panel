@@ -218,7 +218,7 @@ func (a AppService) GetAppDetail(appID uint, version, appType string) (response.
 		case constant.RuntimePHP:
 			paramsPath := filepath.Join(versionPath, "data.yml")
 			if !fileOp.Stat(paramsPath) {
-				return appDetailDTO, buserr.WithDetail(constant.ErrFileNotExist, paramsPath, nil)
+				return appDetailDTO, buserr.WithDetail("ErrFileNotExist", paramsPath, nil)
 			}
 			param, err := fileOp.GetContent(paramsPath)
 			if err != nil {
@@ -231,7 +231,7 @@ func (a AppService) GetAppDetail(appID uint, version, appType string) (response.
 			appDetailDTO.Params = paramMap["additionalProperties"]
 			composePath := filepath.Join(versionPath, "docker-compose.yml")
 			if !fileOp.Stat(composePath) {
-				return appDetailDTO, buserr.WithDetail(constant.ErrFileNotExist, composePath, nil)
+				return appDetailDTO, buserr.WithDetail("ErrFileNotExist", composePath, nil)
 			}
 			compose, err := fileOp.GetContent(composePath)
 			if err != nil {
@@ -324,11 +324,11 @@ func (a AppService) GetIgnoredApp() ([]response.IgnoredApp, error) {
 
 func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.AppInstall, err error) {
 	if err = docker.CreateDefaultDockerNetwork(); err != nil {
-		err = buserr.WithDetail(constant.Err1PanelNetworkFailed, err.Error(), nil)
+		err = buserr.WithDetail("Err1PanelNetworkFailed", err.Error(), nil)
 		return
 	}
 	if list, _ := appInstallRepo.ListBy(repo.WithByName(req.Name)); len(list) > 0 {
-		err = buserr.New(constant.ErrAppNameExist)
+		err = buserr.New("ErrAppNameExist")
 		return
 	}
 	var (
@@ -347,7 +347,7 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 	}
 	if DatabaseKeys[app.Key] > 0 {
 		if existDatabases, _ := databaseRepo.GetList(repo.WithByName(req.Name)); len(existDatabases) > 0 {
-			err = buserr.New(constant.ErrRemoteExist)
+			err = buserr.New("ErrRemoteExist")
 			return
 		}
 	}
@@ -355,7 +355,7 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 		if dir, ok := req.Params["WEBSITE_DIR"]; ok {
 			siteDir := dir.(string)
 			if siteDir == "" || !strings.HasPrefix(siteDir, "/") {
-				siteDir = path.Join(constant.DataDir, dir.(string))
+				siteDir = path.Join(global.Dir.DataDir, dir.(string))
 			}
 			req.Params["WEBSITE_DIR"] = siteDir
 			oldWebStePath, _ := settingRepo.GetValueByKey("WEBSITE_DIR")
@@ -416,7 +416,7 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 
 	value, ok := composeMap["services"]
 	if !ok || value == nil {
-		err = buserr.New(constant.ErrFileParse)
+		err = buserr.New("ErrFileParse")
 		return
 	}
 	servicesMap := value.(map[string]interface{})
@@ -425,7 +425,7 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 		containerName = req.ContainerName
 		appInstalls, _ := appInstallRepo.ListBy(appInstallRepo.WithContainerName(containerName))
 		if len(appInstalls) > 0 {
-			err = buserr.New(constant.ErrContainerName)
+			err = buserr.New("ErrContainerName")
 			return
 		}
 		containerExist := false
@@ -434,7 +434,7 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 			return
 		}
 		if containerExist {
-			err = buserr.New(constant.ErrContainerName)
+			err = buserr.New("ErrContainerName")
 			return
 		}
 	}
@@ -549,7 +549,7 @@ func (a AppService) SyncAppListFromLocal(TaskID string) {
 
 	syncTask.AddSubTask(task.GetTaskName(i18n.GetMsgByKey("LocalApp"), task.TaskSync, task.TaskScopeAppStore), func(t *task.Task) (err error) {
 		fileOp := files.NewFileOp()
-		localAppDir := constant.LocalAppResourceDir
+		localAppDir := global.Dir.LocalAppResourceDir
 		if !fileOp.Stat(localAppDir) {
 			return nil
 		}
@@ -771,7 +771,7 @@ func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
 		CanUpdate: false,
 	}
 
-	versionUrl := fmt.Sprintf("%s/%s/1panel.json.version.txt", global.CONF.System.AppRepo, global.CONF.System.Mode)
+	versionUrl := fmt.Sprintf("%s/%s/1panel.json.version.txt", global.CONF.RemoteURL.AppRepo, global.CONF.Base.Mode)
 	_, versionRes, err := req_helper.HandleRequest(versionUrl, http.MethodGet, constant.TimeOut20s)
 	if err != nil {
 		return nil, err
@@ -820,11 +820,11 @@ func getAppFromRepo(downloadPath string) error {
 	downloadUrl := downloadPath
 	global.LOG.Infof("[AppStore] download file from %s", downloadUrl)
 	fileOp := files.NewFileOp()
-	packagePath := filepath.Join(constant.ResourceDir, filepath.Base(downloadUrl))
+	packagePath := filepath.Join(global.Dir.ResourceDir, filepath.Base(downloadUrl))
 	if err := fileOp.DownloadFile(downloadUrl, packagePath); err != nil {
 		return err
 	}
-	if err := fileOp.Decompress(packagePath, constant.ResourceDir, files.SdkZip, ""); err != nil {
+	if err := fileOp.Decompress(packagePath, global.Dir.ResourceDir, files.SdkZip, ""); err != nil {
 		return err
 	}
 	defer func() {
@@ -835,10 +835,10 @@ func getAppFromRepo(downloadPath string) error {
 
 func getAppList() (*dto.AppList, error) {
 	list := &dto.AppList{}
-	if err := getAppFromRepo(fmt.Sprintf("%s/%s/1panel.json.zip", global.CONF.System.AppRepo, global.CONF.System.Mode)); err != nil {
+	if err := getAppFromRepo(fmt.Sprintf("%s/%s/1panel.json.zip", global.CONF.RemoteURL.AppRepo, global.CONF.Base.Mode)); err != nil {
 		return nil, err
 	}
-	listFile := filepath.Join(constant.ResourceDir, "1panel.json")
+	listFile := filepath.Join(global.Dir.ResourceDir, "1panel.json")
 	content, err := os.ReadFile(listFile)
 	if err != nil {
 		return nil, err
@@ -935,7 +935,7 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 			oldAppIds = append(oldAppIds, old.ID)
 		}
 
-		baseRemoteUrl := fmt.Sprintf("%s/%s/1panel", global.CONF.System.AppRepo, global.CONF.System.Mode)
+		baseRemoteUrl := fmt.Sprintf("%s/%s/1panel", global.CONF.RemoteURL.AppRepo, global.CONF.Base.Mode)
 
 		appsMap := getApps(oldApps, list.Apps, setting.SystemVersion, t)
 

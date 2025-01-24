@@ -17,7 +17,6 @@ func Init() {
 	initGlobalData()
 	handleCronjobStatus()
 	handleSnapStatus()
-	loadLocalDir()
 }
 
 func initGlobalData() {
@@ -28,10 +27,10 @@ func initGlobalData() {
 	if err := settingRepo.Update("SystemStatus", "Free"); err != nil {
 		global.LOG.Fatalf("init service before start failed, err: %v", err)
 	}
-	global.CONF.System.EncryptKey, _ = settingRepo.GetValueByKey("EncryptKey")
+	global.CONF.Base.EncryptKey, _ = settingRepo.GetValueByKey("EncryptKey")
 	_ = service.NewISettingService().ReloadConn()
 	if global.IsMaster {
-		global.CoreDB = common.LoadDBConnByPath(path.Join(global.CONF.System.DbPath, "core.db"), "core")
+		global.CoreDB = common.LoadDBConnByPath(path.Join(global.Dir.DbDir, "core.db"), "core")
 	}
 }
 
@@ -78,15 +77,6 @@ func handleCronjobStatus() {
 		_ = global.DB.Where("id = ?", record.CronjobID).First(&cronjob).Error
 		handleCronJobAlert(cronjob)
 	}
-}
-
-func loadLocalDir() {
-	var account model.BackupAccount
-	if err := global.DB.Where("`type` = ?", constant.Local).First(&account).Error; err != nil {
-		global.LOG.Errorf("load local backup account info failed, err: %v", err)
-		return
-	}
-	global.CONF.System.Backup = account.BackupPath
 }
 
 func handleCronJobAlert(cronjob *model.Cronjob) {

@@ -7,7 +7,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
-	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/gin-gonic/gin"
 )
@@ -17,7 +16,7 @@ func WhiteAllow() gin.HandlerFunc {
 		settingRepo := repo.NewISettingRepo()
 		status, err := settingRepo.Get(repo.WithByKey("AllowIPs"))
 		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			helper.InternalServer(c, err)
 			return
 		}
 
@@ -39,7 +38,7 @@ func WhiteAllow() gin.HandlerFunc {
 			helper.ErrResponse(c, LoadErrCode())
 			return
 		}
-		helper.ErrorWithDetail(c, constant.CodeErrIP, constant.ErrTypeInternalServer, errors.New("IP address not allowed"))
+		helper.ErrorWithDetail(c, 310, "ErrInternalServer", errors.New("IP address not allowed"))
 	}
 }
 

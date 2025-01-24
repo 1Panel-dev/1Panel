@@ -3,15 +3,15 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"os"
 	"path"
 	"strings"
 
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
+
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
@@ -51,7 +51,7 @@ func (u *PostgresqlService) SearchWithPage(search dto.PostgresqlDBSearch) (int64
 	for _, pg := range postgresqls {
 		var item dto.PostgresqlDBInfo
 		if err := copier.Copy(&item, &pg); err != nil {
-			return 0, nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+			return 0, nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 		}
 		dtoPostgresqls = append(dtoPostgresqls, item)
 	}
@@ -72,7 +72,7 @@ func (u *PostgresqlService) ListDBOption() ([]dto.PostgresqlOption, error) {
 	for _, pg := range postgresqls {
 		var item dto.PostgresqlOption
 		if err := copier.Copy(&item, &pg); err != nil {
-			return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+			return nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 		}
 		item.Database = pg.PostgresqlName
 		for _, database := range databases {
@@ -87,7 +87,7 @@ func (u *PostgresqlService) ListDBOption() ([]dto.PostgresqlOption, error) {
 
 func (u *PostgresqlService) BindUser(req dto.PostgresqlBindUser) error {
 	if cmd.CheckIllegal(req.Name, req.Username, req.Password) {
-		return buserr.New(constant.ErrCmdIllegal)
+		return buserr.New("ErrCmdIllegal")
 	}
 	dbItem, err := postgresqlRepo.Get(postgresqlRepo.WithByPostgresqlName(req.Database), repo.WithByName(req.Name))
 	if err != nil {
@@ -123,17 +123,17 @@ func (u *PostgresqlService) BindUser(req dto.PostgresqlBindUser) error {
 
 func (u *PostgresqlService) Create(ctx context.Context, req dto.PostgresqlDBCreate) (*model.DatabasePostgresql, error) {
 	if cmd.CheckIllegal(req.Name, req.Username, req.Password, req.Format) {
-		return nil, buserr.New(constant.ErrCmdIllegal)
+		return nil, buserr.New("ErrCmdIllegal")
 	}
 
 	pgsql, _ := postgresqlRepo.Get(repo.WithByName(req.Name), postgresqlRepo.WithByPostgresqlName(req.Database), repo.WithByFrom(req.From))
 	if pgsql.ID != 0 {
-		return nil, constant.ErrRecordExist
+		return nil, buserr.New("ErrRecordExist")
 	}
 
 	var createItem model.DatabasePostgresql
 	if err := copier.Copy(&createItem, &req); err != nil {
-		return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+		return nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 	}
 
 	if req.From == "local" && req.Username == "root" {
@@ -233,7 +233,7 @@ func (u *PostgresqlService) LoadFromRemote(database string) error {
 		if !hasOld {
 			var createItem model.DatabasePostgresql
 			if err := copier.Copy(&createItem, &data); err != nil {
-				return errors.WithMessage(constant.ErrStructTransform, err.Error())
+				return buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 			}
 			if err := postgresqlRepo.Create(context.Background(), &createItem); err != nil {
 				return err
@@ -302,11 +302,11 @@ func (u *PostgresqlService) Delete(ctx context.Context, req dto.PostgresqlDBDele
 	}
 
 	if req.DeleteBackup {
-		uploadDir := path.Join(global.CONF.System.BaseDir, fmt.Sprintf("1panel/uploads/database/%s/%s/%s", req.Type, req.Database, db.Name))
+		uploadDir := path.Join(global.Dir.DataDir, fmt.Sprintf("uploads/database/%s/%s/%s", req.Type, req.Database, db.Name))
 		if _, err := os.Stat(uploadDir); err == nil {
 			_ = os.RemoveAll(uploadDir)
 		}
-		backupDir := path.Join(global.CONF.System.Backup, fmt.Sprintf("database/%s/%s/%s", req.Type, db.PostgresqlName, db.Name))
+		backupDir := path.Join(global.Dir.LocalBackupDir, fmt.Sprintf("database/%s/%s/%s", req.Type, db.PostgresqlName, db.Name))
 		if _, err := os.Stat(backupDir); err == nil {
 			_ = os.RemoveAll(backupDir)
 		}
@@ -320,7 +320,7 @@ func (u *PostgresqlService) Delete(ctx context.Context, req dto.PostgresqlDBDele
 
 func (u *PostgresqlService) ChangePrivileges(req dto.PostgresqlPrivileges) error {
 	if cmd.CheckIllegal(req.Database, req.Username) {
-		return buserr.New(constant.ErrCmdIllegal)
+		return buserr.New("ErrCmdIllegal")
 	}
 	dbItem, err := postgresqlRepo.Get(postgresqlRepo.WithByPostgresqlName(req.Database), repo.WithByName(req.Name))
 	if err != nil {
@@ -345,7 +345,7 @@ func (u *PostgresqlService) ChangePrivileges(req dto.PostgresqlPrivileges) error
 
 func (u *PostgresqlService) ChangePassword(req dto.ChangeDBInfo) error {
 	if cmd.CheckIllegal(req.Value) {
-		return buserr.New(constant.ErrCmdIllegal)
+		return buserr.New("ErrCmdIllegal")
 	}
 	cli, err := LoadPostgresqlClientByFrom(req.Database)
 	if err != nil {

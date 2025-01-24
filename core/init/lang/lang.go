@@ -17,13 +17,13 @@ func Init() {
 }
 
 func initLang() {
-	geoPath := path.Join(global.CONF.System.BaseDir, "1panel/geo/GeoIP.mmdb")
+	geoPath := path.Join(global.CONF.Base.InstallDir, "1panel/geo/GeoIP.mmdb")
 	isLangExist := fileUtils.Stat("/usr/local/bin/lang/zh.sh")
 	isGeoExist := fileUtils.Stat(geoPath)
 	if isLangExist && isGeoExist {
 		return
 	}
-	upgradePath := path.Join(global.CONF.System.BaseDir, "1panel/tmp/upgrade")
+	upgradePath := path.Join(global.CONF.Base.InstallDir, "1panel/tmp/upgrade")
 	tmpPath, err := loadRestorePath(upgradePath)
 	upgradeDir := path.Join(upgradePath, tmpPath, "downloads")
 	if err != nil || len(tmpPath) == 0 || !fileUtils.Stat(upgradeDir) {
@@ -106,7 +106,7 @@ func loadRestorePath(upgradeDir string) (string, error) {
 }
 
 func downloadLangFromRemote() {
-	path := fmt.Sprintf("%s/language/lang.tar.gz", global.CONF.System.RepoUrl)
+	path := fmt.Sprintf("%s/language/lang.tar.gz", global.CONF.RemoteURL.RepoUrl)
 	if err := fileUtils.DownloadFile(path, "/usr/local/bin/lang.tar.gz"); err != nil {
 		global.LOG.Errorf("download lang.tar.gz failed, err: %v", err)
 		return
@@ -125,7 +125,7 @@ func downloadLangFromRemote() {
 }
 func downloadGeoFromRemote(targetPath string) {
 	_ = os.MkdirAll(path.Dir(targetPath), os.ModePerm)
-	pathItem := fmt.Sprintf("%s/geo/GeoIP.mmdb", global.CONF.System.RepoUrl)
+	pathItem := fmt.Sprintf("%s/geo/GeoIP.mmdb", global.CONF.RemoteURL.RepoUrl)
 	if err := fileUtils.DownloadFile(pathItem, targetPath); err != nil {
 		global.LOG.Errorf("download geo ip failed, err: %v", err)
 		return

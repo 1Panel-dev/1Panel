@@ -3,14 +3,13 @@ package v2
 import (
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/app/dto"
-	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/gin-gonic/gin"
 )
 
 func (b *BaseApi) SearchAppLauncher(c *gin.Context) {
 	data, err := appLauncherService.Search()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, data)
@@ -32,7 +31,7 @@ func (b *BaseApi) UpdateAppLauncher(c *gin.Context) {
 	}
 
 	if err := appLauncherService.ChangeShow(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)

@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/core/app/dto"
-	"github.com/1Panel-dev/1Panel/core/constant"
+	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/mojocn/base64Captcha"
 )
 
@@ -12,7 +12,7 @@ var store = base64Captcha.DefaultMemStore
 
 func VerifyCode(codeID string, code string) error {
 	if codeID == "" {
-		return constant.ErrCaptchaCode
+		return buserr.New("ErrCaptchaCode")
 	}
 	vv := store.Get(codeID, true)
 	vv = strings.TrimSpace(vv)
@@ -21,7 +21,7 @@ func VerifyCode(codeID string, code string) error {
 	if strings.EqualFold(vv, code) {
 		return nil
 	}
-	return constant.ErrCaptchaCode
+	return buserr.New("ErrCaptchaCode")
 }
 
 func CreateCaptcha() (*dto.CaptchaResponse, error) {

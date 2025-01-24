@@ -29,14 +29,14 @@ func StringEncrypt(text string) (string, error) {
 	if len(text) == 0 {
 		return "", nil
 	}
-	if len(global.CONF.System.EncryptKey) == 0 {
+	if len(global.CONF.Base.EncryptKey) == 0 {
 		var encryptSetting model.Setting
 		if err := global.DB.Where("key = ?", "EncryptKey").First(&encryptSetting).Error; err != nil {
 			return "", err
 		}
-		global.CONF.System.EncryptKey = encryptSetting.Value
+		global.CONF.Base.EncryptKey = encryptSetting.Value
 	}
-	key := global.CONF.System.EncryptKey
+	key := global.CONF.Base.EncryptKey
 	pass := []byte(text)
 	xpass, err := aesEncryptWithSalt([]byte(key), pass)
 	if err == nil {
@@ -75,14 +75,14 @@ func StringDecrypt(text string) (string, error) {
 	if len(text) == 0 {
 		return "", nil
 	}
-	if len(global.CONF.System.EncryptKey) == 0 {
+	if len(global.CONF.Base.EncryptKey) == 0 {
 		var encryptSetting model.Setting
 		if err := global.DB.Where("key = ?", "EncryptKey").First(&encryptSetting).Error; err != nil {
 			return "", err
 		}
-		global.CONF.System.EncryptKey = encryptSetting.Value
+		global.CONF.Base.EncryptKey = encryptSetting.Value
 	}
-	key := global.CONF.System.EncryptKey
+	key := global.CONF.Base.EncryptKey
 	return StringDecryptWithKey(text, key)
 }
 

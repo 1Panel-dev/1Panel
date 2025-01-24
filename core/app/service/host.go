@@ -7,7 +7,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/model"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
-	"github.com/1Panel-dev/1Panel/core/constant"
+	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/core/utils/ssh"
@@ -127,7 +127,7 @@ func (u *HostService) TestLocalConn(id uint) bool {
 func (u *HostService) GetHostInfo(id uint) (*model.Host, error) {
 	host, err := hostRepo.Get(repo.WithByID(id))
 	if err != nil {
-		return nil, constant.ErrRecordNotFound
+		return nil, buserr.New("ErrRecordNotFound")
 	}
 	if len(host.Password) != 0 {
 		host.Password, err = encrypt.StringDecrypt(host.Password)
@@ -167,7 +167,7 @@ func (u *HostService) SearchWithPage(req dto.SearchHostWithPage) (int64, interfa
 	for _, host := range hosts {
 		var item dto.HostInfo
 		if err := copier.Copy(&item, &host); err != nil {
-			return 0, nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+			return 0, nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 		}
 		group, _ := groupRepo.Get(repo.WithByID(host.GroupID))
 		item.GroupBelong = group.Name
@@ -255,7 +255,7 @@ func (u *HostService) Create(req dto.HostOperate) (*dto.HostInfo, error) {
 	}
 	var host model.Host
 	if err := copier.Copy(&host, &req); err != nil {
-		return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+		return nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 	}
 	if req.GroupID == 0 {
 		group, err := groupRepo.Get(repo.WithByType("host"), groupRepo.WithByDefault(true))
@@ -292,7 +292,7 @@ func (u *HostService) Create(req dto.HostOperate) (*dto.HostInfo, error) {
 		}
 		var hostinfo dto.HostInfo
 		if err := copier.Copy(&hostinfo, &host); err != nil {
-			return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+			return nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 		}
 		return &hostinfo, nil
 	}
@@ -302,7 +302,7 @@ func (u *HostService) Create(req dto.HostOperate) (*dto.HostInfo, error) {
 	}
 	var hostinfo dto.HostInfo
 	if err := copier.Copy(&hostinfo, &host); err != nil {
-		return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+		return nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 	}
 	return &hostinfo, nil
 }
@@ -311,7 +311,7 @@ func (u *HostService) Delete(ids []uint) error {
 	hosts, _ := hostRepo.GetList(repo.WithByIDs(ids))
 	for _, host := range hosts {
 		if host.ID == 0 {
-			return constant.ErrRecordNotFound
+			return buserr.New("ErrRecordNotFound")
 		}
 		if host.Addr == "127.0.0.1" {
 			return errors.New("the local connection information cannot be deleted!")

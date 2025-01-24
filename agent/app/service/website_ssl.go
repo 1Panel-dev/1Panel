@@ -64,7 +64,7 @@ func (w WebsiteSSLService) Page(search request.WebsiteSSLSearch) (int64, []respo
 	for _, model := range sslList {
 		result = append(result, response.WebsiteSSLDTO{
 			WebsiteSSL: model,
-			LogPath:    path.Join(constant.SSLLogDir, fmt.Sprintf("%s-ssl-%d.log", model.PrimaryDomain, model.ID)),
+			LogPath:    path.Join(global.Dir.SSLLogDir, fmt.Sprintf("%s-ssl-%d.log", model.PrimaryDomain, model.ID)),
 		})
 	}
 	return total, result, err
@@ -194,8 +194,8 @@ func reloadSystemSSL(websiteSSL *model.WebsiteSSL, logger *log.Logger) {
 	systemSSLEnable, sslID := GetSystemSSL()
 	if systemSSLEnable && sslID == websiteSSL.ID {
 		fileOp := files.NewFileOp()
-		certPath := path.Join(global.CONF.System.BaseDir, "1panel/secret/server.crt")
-		keyPath := path.Join(global.CONF.System.BaseDir, "1panel/secret/server.key")
+		certPath := path.Join(global.Dir.DataDir, "secret/server.crt")
+		keyPath := path.Join(global.Dir.DataDir, "secret/server.key")
 		printSSLLog(logger, "StartUpdateSystemSSL", nil, logger == nil)
 		if err := fileOp.WriteFile(certPath, strings.NewReader(websiteSSL.Pem), 0600); err != nil {
 			logger.Printf("Failed to update the SSL certificate File for 1Panel System domain [%s] , err:%s", websiteSSL.PrimaryDomain, err.Error())
@@ -300,7 +300,7 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 	}
 
 	go func() {
-		logFile, _ := os.OpenFile(path.Join(constant.SSLLogDir, fmt.Sprintf("%s-ssl-%d.log", websiteSSL.PrimaryDomain, websiteSSL.ID)), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, constant.FilePerm)
+		logFile, _ := os.OpenFile(path.Join(global.Dir.SSLLogDir, fmt.Sprintf("%s-ssl-%d.log", websiteSSL.PrimaryDomain, websiteSSL.ID)), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, constant.FilePerm)
 		defer logFile.Close()
 		logger := log.New(logFile, "", log.LstdFlags)
 		legoLogger.Logger = logger
@@ -334,7 +334,7 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 		saveCertificateFile(websiteSSL, logger)
 
 		if websiteSSL.ExecShell {
-			workDir := constant.DataDir
+			workDir := global.Dir.DataDir
 			if websiteSSL.PushDir {
 				workDir = websiteSSL.Dir
 			}
@@ -364,7 +364,7 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 				return
 			}
 			if err := opNginx(nginxInstall.ContainerName, constant.NginxReload); err != nil {
-				printSSLLog(logger, constant.ErrSSLApply, nil, apply.DisableLog)
+				printSSLLog(logger, "ErrSSLApply", nil, apply.DisableLog)
 				return
 			}
 			printSSLLog(logger, "ApplyWebSiteSSLSuccess", nil, apply.DisableLog)
@@ -636,7 +636,7 @@ func (w WebsiteSSLService) DownloadFile(id uint) (*os.File, error) {
 		return nil, err
 	}
 	fileOp := files.NewFileOp()
-	dir := path.Join(global.CONF.System.BaseDir, "1panel/tmp/ssl", websiteSSL.PrimaryDomain)
+	dir := path.Join(global.Dir.DataDir, "tmp/ssl", websiteSSL.PrimaryDomain)
 	if fileOp.Stat(dir) {
 		if err = fileOp.DeleteDir(dir); err != nil {
 			return nil, err

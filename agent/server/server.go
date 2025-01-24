@@ -17,6 +17,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/init/business"
 	"github.com/1Panel-dev/1Panel/agent/init/cache"
 	"github.com/1Panel-dev/1Panel/agent/init/db"
+	"github.com/1Panel-dev/1Panel/agent/init/dir"
 	"github.com/1Panel-dev/1Panel/agent/init/hook"
 	"github.com/1Panel-dev/1Panel/agent/init/log"
 	"github.com/1Panel-dev/1Panel/agent/init/migration"
@@ -32,6 +33,7 @@ import (
 
 func Start() {
 	viper.Init()
+	dir.Init()
 	i18n.Init()
 	log.Init()
 	db.Init()
@@ -65,7 +67,7 @@ func Start() {
 		_ = server.Serve(listener)
 		return
 	} else {
-		server.Addr = fmt.Sprintf("0.0.0.0:%s", global.CONF.System.Port)
+		server.Addr = fmt.Sprintf("0.0.0.0:%s", global.CONF.Base.Port)
 		settingRepo := repo.NewISettingRepo()
 		certItem, err := settingRepo.Get(settingRepo.WithByKey("ServerCrt"))
 		if err != nil {
@@ -87,7 +89,7 @@ func Start() {
 			ClientAuth:   tls.RequireAnyClientCert,
 		}
 		business.Init()
-		global.LOG.Infof("listen at https://0.0.0.0:%s", global.CONF.System.Port)
+		global.LOG.Infof("listen at https://0.0.0.0:%s", global.CONF.Base.Port)
 		if err := server.ListenAndServeTLS("", ""); err != nil {
 			panic(err)
 		}

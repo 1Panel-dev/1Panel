@@ -19,6 +19,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/docker/docker/api/types"
@@ -162,7 +163,7 @@ func (u *ImageService) ImageBuild(req dto.ImageBuild) error {
 	defer client.Close()
 	fileName := "Dockerfile"
 	if req.From == "edit" {
-		dir := fmt.Sprintf("%s/docker/build/%s", constant.DataDir, strings.ReplaceAll(req.Name, ":", "_"))
+		dir := fmt.Sprintf("%s/docker/build/%s", global.Dir.DataDir, strings.ReplaceAll(req.Name, ":", "_"))
 		if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
 			if err = os.MkdirAll(dir, os.ModePerm); err != nil {
 				return err
@@ -414,12 +415,12 @@ func (u *ImageService) ImageRemove(req dto.BatchDelete) (dto.ContainerPruneRepor
 		if _, err := client.ImageRemove(context.TODO(), id, image.RemoveOptions{Force: req.Force, PruneChildren: true}); err != nil {
 			if strings.Contains(err.Error(), "image is being used") || strings.Contains(err.Error(), "is using") {
 				if strings.Contains(id, "sha256:") {
-					return report, buserr.New(constant.ErrObjectInUsed)
+					return report, buserr.New("ErrObjectInUsed")
 				}
-				return report, buserr.WithDetail(constant.ErrInUsed, id, nil)
+				return report, buserr.WithDetail("ErrInUsed", id, nil)
 			}
 			if strings.Contains(err.Error(), "image has dependent") {
-				return report, buserr.New(constant.ErrObjectBeDependent)
+				return report, buserr.New("ErrObjectBeDependent")
 			}
 			return report, err
 		}

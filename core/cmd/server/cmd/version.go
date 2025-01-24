@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/1Panel-dev/1Panel/core/cmd/server/conf"
-	"github.com/1Panel-dev/1Panel/core/configs"
+	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/i18n"
 	"gopkg.in/yaml.v3"
 
@@ -30,11 +30,11 @@ var versionCmd = &cobra.Command{
 		version := getSettingByKey(db, "SystemVersion")
 
 		fmt.Println(i18n.GetMsgByKeyForCmd("SystemVersion") + version)
-		config := configs.ServerConfig{}
+		config := global.ServerConfig{}
 		if err := yaml.Unmarshal(conf.AppYaml, &config); err != nil {
 			return fmt.Errorf("unmarshal conf.App.Yaml failed, err: %v", err)
 		} else {
-			fmt.Println(i18n.GetMsgByKeyForCmd("SystemMode") + config.System.Mode)
+			fmt.Println(i18n.GetMsgByKeyForCmd("SystemMode") + config.Base.Mode)
 		}
 		return nil
 	},

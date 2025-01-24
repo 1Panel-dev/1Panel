@@ -15,6 +15,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/shirou/gopsutil/v3/disk"
 )
@@ -77,7 +78,7 @@ func (r RecycleBinService) Page(search dto.PageInfo) (int64, []response.RecycleB
 func (r RecycleBinService) Create(create request.RecycleBinCreate) error {
 	op := files.NewFileOp()
 	if !op.Stat(create.SourcePath) {
-		return buserr.New(constant.ErrLinkPathNotFound)
+		return buserr.New("ErrLinkPathNotFound")
 	}
 	clashDir, err := getClashDir(create.SourcePath)
 	if err != nil {
@@ -113,7 +114,7 @@ func (r RecycleBinService) Reduce(reduce request.RecycleBinReduce) error {
 	filePath := path.Join(reduce.From, reduce.RName)
 	op := files.NewFileOp()
 	if !op.Stat(filePath) {
-		return buserr.New(constant.ErrLinkPathNotFound)
+		return buserr.New("ErrLinkPathNotFound")
 	}
 	recycleBinDTO, err := getRecycleBinDTOFromName(reduce.RName)
 	if err != nil {
@@ -169,7 +170,7 @@ func getClashDir(realPath string) (string, error) {
 			return clashDir, nil
 		}
 	}
-	return constant.RecycleBinDir, createClashDir(constant.RecycleBinDir)
+	return global.Dir.RecycleBinDir, createClashDir(global.Dir.RecycleBinDir)
 }
 
 func createClashDir(clashDir string) error {

@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/global"
 )
 
 type App struct {
@@ -43,7 +44,7 @@ func (i *App) IsLocalApp() bool {
 func (i *App) GetAppResourcePath() string {
 	if i.IsLocalApp() {
 		//这里要去掉本地应用的local前缀
-		return filepath.Join(constant.LocalAppResourceDir, strings.TrimPrefix(i.Key, "local"))
+		return filepath.Join(global.Dir.LocalAppResourceDir, strings.TrimPrefix(i.Key, "local"))
 	}
-	return filepath.Join(constant.RemoteAppResourceDir, i.Key)
+	return filepath.Join(global.Dir.RemoteAppResourceDir, i.Key)
 }

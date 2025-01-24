@@ -2,12 +2,13 @@ package service
 
 import (
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"os"
 	"path"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -45,7 +46,7 @@ func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time, t
 		record.Name = app.App.Key
 		record.DetailName = app.Name
 		record.DownloadAccountID, record.SourceAccountIDs = cronjob.DownloadAccountID, cronjob.SourceAccountIDs
-		backupDir := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("app/%s/%s", app.App.Key, app.Name))
+		backupDir := path.Join(global.Dir.TmpDir, fmt.Sprintf("app/%s/%s", app.App.Key, app.Name))
 		record.FileName = fmt.Sprintf("app_%s_%s.tar.gz", app.Name, startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5))
 		if err := handleAppBackup(&app, nil, backupDir, record.FileName, cronjob.ExclusionRules, cronjob.Secret, taskID); err != nil {
 			return err
@@ -81,7 +82,7 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, startTime time.Tim
 		record.Name = web.PrimaryDomain
 		record.DetailName = web.Alias
 		record.DownloadAccountID, record.SourceAccountIDs = cronjob.DownloadAccountID, cronjob.SourceAccountIDs
-		backupDir := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("website/%s", web.PrimaryDomain))
+		backupDir := path.Join(global.Dir.TmpDir, fmt.Sprintf("website/%s", web.PrimaryDomain))
 		record.FileName = fmt.Sprintf("website_%s_%s.tar.gz", web.PrimaryDomain, startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5))
 		if err := handleWebsiteBackup(&web, backupDir, record.FileName, cronjob.ExclusionRules, cronjob.Secret, taskID); err != nil {
 			return err
@@ -118,7 +119,7 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Ti
 		record.DetailName = dbInfo.Name
 		record.DownloadAccountID, record.SourceAccountIDs = cronjob.DownloadAccountID, cronjob.SourceAccountIDs
 
-		backupDir := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("database/%s/%s/%s", dbInfo.DBType, record.Name, dbInfo.Name))
+		backupDir := path.Join(global.Dir.TmpDir, fmt.Sprintf("database/%s/%s/%s", dbInfo.DBType, record.Name, dbInfo.Name))
 		record.FileName = fmt.Sprintf("db_%s_%s.sql.gz", dbInfo.Name, startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5))
 		if cronjob.DBType == "mysql" || cronjob.DBType == "mariadb" {
 			if err := handleMysqlBackup(dbInfo, nil, backupDir, record.FileName, taskID); err != nil {
@@ -149,7 +150,7 @@ func (u *CronjobService) handleDirectory(cronjob model.Cronjob, startTime time.T
 		return err
 	}
 	fileName := fmt.Sprintf("directory%s_%s.tar.gz", strings.ReplaceAll(cronjob.SourceDir, "/", "_"), startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5))
-	backupDir := path.Join(global.CONF.System.TmpDir, fmt.Sprintf("%s/%s", cronjob.Type, cronjob.Name))
+	backupDir := path.Join(global.Dir.TmpDir, fmt.Sprintf("%s/%s", cronjob.Type, cronjob.Name))
 
 	fileOp := files.NewFileOp()
 	if cronjob.IsDir {
@@ -189,7 +190,7 @@ func (u *CronjobService) handleSystemLog(cronjob model.Cronjob, startTime time.T
 	}
 	nameItem := startTime.Format(constant.DateTimeSlimLayout) + common.RandStrAndNum(5)
 	fileName := fmt.Sprintf("system_log_%s.tar.gz", nameItem)
-	backupDir := path.Join(global.CONF.System.TmpDir, "log", nameItem)
+	backupDir := path.Join(global.Dir.TmpDir, "log", nameItem)
 	if err := handleBackupLogs(backupDir, fileName, cronjob.Secret); err != nil {
 		return err
 	}
@@ -362,7 +363,7 @@ func handleBackupLogs(targetDir, fileName string, secret string) error {
 					}
 				}
 			}
-			itemDir2 := path.Join(global.CONF.System.Backup, "log/website", website.Alias)
+			itemDir2 := path.Join(global.Dir.LocalBackupDir, "log/website", website.Alias)
 			logFiles2, _ := os.ReadDir(itemDir2)
 			if len(logFiles2) != 0 {
 				for i := 0; i < len(logFiles2); i++ {
@@ -375,18 +376,17 @@ func handleBackupLogs(targetDir, fileName string, secret string) error {
 		global.LOG.Debug("backup website log successful!")
 	}
 
-	systemLogDir := path.Join(global.CONF.System.BaseDir, "1panel/log")
 	systemDir := path.Join(targetDir, "system")
 	if _, err := os.Stat(systemDir); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(systemDir, os.ModePerm); err != nil {
 			return err
 		}
 	}
-	systemLogFiles, _ := os.ReadDir(systemLogDir)
+	systemLogFiles, _ := os.ReadDir(global.Dir.LogDir)
 	if len(systemLogFiles) != 0 {
 		for i := 0; i < len(systemLogFiles); i++ {
 			if !systemLogFiles[i].IsDir() {
-				_ = fileOp.CopyFile(path.Join(systemLogDir, systemLogFiles[i].Name()), systemDir)
+				_ = fileOp.CopyFile(path.Join(global.Dir.LogDir, systemLogFiles[i].Name()), systemDir)
 			}
 		}
 	}

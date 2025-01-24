@@ -9,7 +9,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 )
 
@@ -24,7 +23,7 @@ func LoadXpuInfo() []interface{} {
 }
 
 func StartClam(startClam model.Clam, isUpdate bool) (int, error) {
-	return 0, buserr.New(constant.ErrXpackNotFound)
+	return 0, buserr.New("ErrXpackNotFound")
 }
 
 func LoadNodeInfo() (bool, model.NodeInfo, error) {

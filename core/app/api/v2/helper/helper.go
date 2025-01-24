@@ -4,12 +4,9 @@ import (
 	"net/http"
 
 	"github.com/1Panel-dev/1Panel/core/app/dto"
-	"github.com/1Panel-dev/1Panel/core/buserr"
-	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/i18n"
 	"github.com/gin-gonic/gin"
-	"github.com/pkg/errors"
 )
 
 func ErrorWithDetail(ctx *gin.Context, code int, msgKey string, err error) {
@@ -17,42 +14,21 @@ func ErrorWithDetail(ctx *gin.Context, code int, msgKey string, err error) {
 		Code:    code,
 		Message: "",
 	}
-	if msgKey == constant.ErrTypeInternalServer {
-		switch {
-		case errors.Is(err, constant.ErrRecordExist):
-			res.Message = i18n.GetMsgWithMap("ErrRecordExist", nil)
-		case errors.Is(constant.ErrRecordNotFound, err):
-			res.Message = i18n.GetMsgWithMap("ErrRecordNotFound", nil)
-		case errors.Is(constant.ErrInvalidParams, err):
-			res.Message = i18n.GetMsgWithMap("ErrInvalidParams", nil)
-		case errors.Is(constant.ErrTransform, err):
-			res.Message = i18n.GetMsgWithMap("ErrTransform", map[string]interface{}{"detail": err})
-		case errors.Is(constant.ErrCaptchaCode, err):
-			res.Code = constant.CodeAuth
-			res.Message = "ErrCaptchaCode"
-		case errors.Is(constant.ErrAuth, err):
-			res.Code = constant.CodeAuth
-			res.Message = "ErrAuth"
-		case errors.Is(constant.ErrInitialPassword, err):
-			res.Message = i18n.GetMsgWithMap("ErrInitialPassword", map[string]interface{}{"detail": err})
-		case errors.As(err, &buserr.BusinessError{}):
-			res.Message = err.Error()
-		default:
-			res.Message = i18n.GetMsgWithMap(msgKey, map[string]interface{}{"detail": err})
-		}
-	} else {
-		res.Message = i18n.GetMsgWithMap(msgKey, map[string]interface{}{"detail": err})
-	}
+	res.Message = i18n.GetMsgWithMap(msgKey, map[string]interface{}{"detail": err})
 	ctx.JSON(http.StatusOK, res)
 	ctx.Abort()
 }
 
 func InternalServer(ctx *gin.Context, err error) {
-	ErrorWithDetail(ctx, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+	ErrorWithDetail(ctx, http.StatusInternalServerError, "ErrInternalServer", err)
 }
 
 func BadRequest(ctx *gin.Context, err error) {
-	ErrorWithDetail(ctx, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	ErrorWithDetail(ctx, http.StatusBadRequest, "ErrInvalidParams", err)
+}
+
+func BadAuth(ctx *gin.Context, msgKey string, err error) {
+	ErrorWithDetail(ctx, http.StatusUnauthorized, msgKey, err)
 }
 
 func SuccessWithData(ctx *gin.Context, data interface{}) {
@@ -60,7 +36,7 @@ func SuccessWithData(ctx *gin.Context, data interface{}) {
 		data = gin.H{}
 	}
 	res := dto.Response{
-		Code: constant.CodeSuccess,
+		Code: http.StatusOK,
 		Data: data,
 	}
 	ctx.JSON(http.StatusOK, res)
@@ -69,7 +45,7 @@ func SuccessWithData(ctx *gin.Context, data interface{}) {
 
 func SuccessWithOutData(ctx *gin.Context) {
 	res := dto.Response{
-		Code:    constant.CodeSuccess,
+		Code:    http.StatusOK,
 		Message: "success",
 	}
 	ctx.JSON(http.StatusOK, res)
@@ -78,11 +54,11 @@ func SuccessWithOutData(ctx *gin.Context) {
 
 func CheckBindAndValidate(req interface{}, c *gin.Context) error {
 	if err := c.ShouldBindJSON(req); err != nil {
-		ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		ErrorWithDetail(c, http.StatusBadRequest, "ErrInvalidParams", err)
 		return err
 	}
 	if err := global.VALID.Struct(req); err != nil {
-		ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		ErrorWithDetail(c, http.StatusBadRequest, "ErrInvalidParams", err)
 		return err
 	}
 	return nil

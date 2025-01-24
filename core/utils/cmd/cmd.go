@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/core/buserr"
-	"github.com/1Panel-dev/1Panel/core/constant"
 )
 
 func Exec(cmdStr string) (string, error) {
@@ -59,7 +58,7 @@ func ExecWithTimeOut(cmdStr string, timeout time.Duration) (string, error) {
 	select {
 	case <-after:
 		_ = cmd.Process.Kill()
-		return "", buserr.New(constant.ErrCmdTimeout)
+		return "", buserr.New("ErrCmdTimeout")
 	case err := <-done:
 		if err != nil {
 			return handleErr(stdout, stderr, err)

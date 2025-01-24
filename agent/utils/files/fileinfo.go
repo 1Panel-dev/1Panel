@@ -17,7 +17,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 
 	"github.com/spf13/afero"
 )
@@ -74,7 +73,7 @@ func NewFileInfo(op FileOption) (*FileInfo, error) {
 	info, err := appFs.Stat(op.Path)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return nil, buserr.New(constant.ErrLinkPathNotFound)
+			return nil, buserr.New("ErrLinkPathNotFound")
 		}
 		return nil, err
 	}
@@ -411,7 +410,7 @@ func (f *FileInfo) checkSymlink(df FileSearchInfo) (bool, bool) {
 
 func (f *FileInfo) getContent() error {
 	if IsBlockDevice(f.FileMode) {
-		return buserr.New(constant.ErrFileCanNotRead)
+		return buserr.New("ErrFileCanNotRead")
 	}
 	if f.Size > 10*1024*1024 {
 		return buserr.New("ErrFileToLarge")
@@ -422,7 +421,7 @@ func (f *FileInfo) getContent() error {
 		return nil
 	}
 	if len(cByte) > 0 && DetectBinary(cByte) {
-		return buserr.New(constant.ErrFileCanNotRead)
+		return buserr.New("ErrFileCanNotRead")
 	}
 	f.Content = string(cByte)
 	return nil

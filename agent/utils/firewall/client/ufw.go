@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/buserr"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 )
@@ -181,7 +180,7 @@ func (f *Ufw) Port(port FireInfo, operation string) error {
 		return fmt.Errorf("unsupported strategy %s", port.Strategy)
 	}
 	if cmd.CheckIllegal(port.Protocol, port.Port) {
-		return buserr.New(constant.ErrCmdIllegal)
+		return buserr.New("ErrCmdIllegal")
 	}
 
 	command := fmt.Sprintf("%s %s %s", f.CmdStr, port.Strategy, port.Port)
@@ -209,7 +208,7 @@ func (f *Ufw) RichRules(rule FireInfo, operation string) error {
 	}
 
 	if cmd.CheckIllegal(operation, rule.Protocol, rule.Address, rule.Port) {
-		return buserr.New(constant.ErrCmdIllegal)
+		return buserr.New("ErrCmdIllegal")
 	}
 
 	ruleStr := fmt.Sprintf("%s insert 1 %s ", f.CmdStr, rule.Strategy)

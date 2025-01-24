@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/buserr"
+	"github.com/1Panel-dev/1Panel/agent/global"
 
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
@@ -99,13 +100,13 @@ func NewTask(name, operate, taskScope, taskID string, resourceID uint) (*Task, e
 	if taskID == "" {
 		taskID = uuid.New().String()
 	}
-	logDir := path.Join(constant.LogDir, taskScope)
+	logDir := path.Join(global.Dir.LogDir, taskScope)
 	if _, err := os.Stat(logDir); os.IsNotExist(err) {
 		if err = os.MkdirAll(logDir, constant.DirPerm); err != nil {
 			return nil, fmt.Errorf("failed to create log directory: %w", err)
 		}
 	}
-	logPath := path.Join(constant.LogDir, taskScope, taskID+".log")
+	logPath := path.Join(global.Dir.LogDir, taskScope, taskID+".log")
 	file, err := os.OpenFile(logPath, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, constant.FilePerm)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open log file: %w", err)

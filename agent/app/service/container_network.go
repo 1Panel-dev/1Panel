@@ -8,7 +8,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/docker/docker/api/types/network"
 )
@@ -105,7 +104,7 @@ func (u *ContainerService) DeleteNetwork(req dto.BatchDelete) error {
 	for _, id := range req.Names {
 		if err := client.NetworkRemove(context.TODO(), id); err != nil {
 			if strings.Contains(err.Error(), "has active endpoints") {
-				return buserr.WithDetail(constant.ErrInUsed, id, nil)
+				return buserr.WithDetail("ErrInUsed", id, nil)
 			}
 			return err
 		}

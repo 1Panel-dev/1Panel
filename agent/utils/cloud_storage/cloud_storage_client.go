@@ -1,6 +1,7 @@
 package cloud_storage
 
 import (
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/cloud_storage/client"
 )
@@ -41,6 +42,6 @@ func NewCloudStorageClient(backupType string, vars map[string]interface{}) (Clou
 	case constant.ALIYUN:
 		return client.NewALIClient(vars)
 	default:
-		return nil, constant.ErrNotSupportType
+		return nil, buserr.WithName("ErrNotSupportType", backupType)
 	}
 }

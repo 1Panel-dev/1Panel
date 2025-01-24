@@ -111,7 +111,7 @@ func (u *SnapshotService) SnapshotReCreate(id uint) error {
 }
 
 func handleSnapshot(req dto.SnapshotCreate, taskItem *task.Task) {
-	rootDir := path.Join(global.CONF.System.BaseDir, "1panel/tmp/system", req.Name)
+	rootDir := path.Join(global.Dir.TmpDir, "system", req.Name)
 	itemHelper := snapHelper{SnapID: req.ID, Task: *taskItem, FileOp: files.NewFileOp(), Ctx: context.Background()}
 	baseDir := path.Join(rootDir, "base")
 	_ = os.MkdirAll(baseDir, os.ModePerm)
@@ -204,7 +204,7 @@ type snapHelper struct {
 func loadDbConn(snap *snapHelper, targetDir string, req dto.SnapshotCreate) error {
 	snap.Task.Log("---------------------- 1 / 8 ----------------------")
 	snap.Task.LogStart(i18n.GetMsgByKey("SnapDBInfo"))
-	pathDB := path.Join(global.CONF.System.BaseDir, "1panel/db")
+	pathDB := path.Join(global.Dir.DataDir, "db")
 
 	err := snap.FileOp.CopyDir(pathDB, targetDir)
 	snap.Task.LogWithStatus(i18n.GetWithName("SnapCopy", pathDB), err)
@@ -296,8 +296,8 @@ func snapBaseData(snap snapHelper, targetDir string) error {
 	}
 
 	remarkInfo, _ := json.MarshalIndent(SnapshotJson{
-		BaseDir:       global.CONF.System.BaseDir,
-		BackupDataDir: global.CONF.System.Backup,
+		BaseDir:       global.Dir.BaseDir,
+		BackupDataDir: global.Dir.LocalBackupDir,
 	}, "", "\t")
 	err = os.WriteFile(path.Join(targetDir, "snapshot.json"), remarkInfo, 0640)
 	snap.Task.LogWithStatus(i18n.GetWithName("SnapCopy", path.Join(targetDir, "snapshot.json")), err)
@@ -352,7 +352,7 @@ func snapBackupData(snap snapHelper, req dto.SnapshotCreate, targetDir string) e
 			}
 		}
 	}
-	err := snap.FileOp.TarGzCompressPro(false, global.CONF.System.Backup, path.Join(targetDir, "1panel_backup.tar.gz"), "", strings.Join(excludes, ";"))
+	err := snap.FileOp.TarGzCompressPro(false, global.Dir.LocalBackupDir, path.Join(targetDir, "1panel_backup.tar.gz"), "", strings.Join(excludes, ";"))
 	snap.Task.LogWithStatus(i18n.GetMsgByKey("SnapCompressBackup"), err)
 
 	return err
@@ -364,18 +364,18 @@ func loadBackupExcludes(snap snapHelper, req []dto.DataTree) []string {
 			if item.IsCheck {
 				continue
 			}
-			if strings.HasPrefix(item.Path, path.Join(global.CONF.System.Backup, "system_snapshot")) {
+			if strings.HasPrefix(item.Path, path.Join(global.Dir.LocalBackupDir, "system_snapshot")) {
 				fmt.Println(strings.TrimSuffix(item.Name, ".tar.gz"))
 				if err := snap.snapAgentDB.Where("name = ? AND download_account_id = ?", strings.TrimSuffix(item.Name, ".tar.gz"), "1").Delete(&model.Snapshot{}).Error; err != nil {
 					snap.Task.LogWithStatus("delete snapshot from database", err)
 				}
 			} else {
-				fmt.Println(strings.TrimPrefix(path.Dir(item.Path), global.CONF.System.Backup+"/"), path.Base(item.Path))
-				if err := snap.snapAgentDB.Where("file_dir = ? AND file_name = ?", strings.TrimPrefix(path.Dir(item.Path), global.CONF.System.Backup+"/"), path.Base(item.Path)).Delete(&model.BackupRecord{}).Error; err != nil {
+				fmt.Println(strings.TrimPrefix(path.Dir(item.Path), global.Dir.LocalBackupDir+"/"), path.Base(item.Path))
+				if err := snap.snapAgentDB.Where("file_dir = ? AND file_name = ?", strings.TrimPrefix(path.Dir(item.Path), global.Dir.LocalBackupDir+"/"), path.Base(item.Path)).Delete(&model.BackupRecord{}).Error; err != nil {
 					snap.Task.LogWithStatus("delete backup file from database", err)
 				}
 			}
-			excludes = append(excludes, "."+strings.TrimPrefix(item.Path, global.CONF.System.Backup))
+			excludes = append(excludes, "."+strings.TrimPrefix(item.Path, global.Dir.LocalBackupDir))
 		} else {
 			excludes = append(excludes, loadBackupExcludes(snap, item.Children)...)
 		}
@@ -387,7 +387,7 @@ func loadAppBackupExcludes(req []dto.DataTree) []string {
 	for _, item := range req {
 		if len(item.Children) == 0 {
 			if !item.IsCheck {
-				excludes = append(excludes, "."+strings.TrimPrefix(item.Path, path.Join(global.CONF.System.Backup)))
+				excludes = append(excludes, "."+strings.TrimPrefix(item.Path, path.Join(global.Dir.LocalBackupDir)))
 			}
 		} else {
 			excludes = append(excludes, loadAppBackupExcludes(item.Children)...)
@@ -423,9 +423,9 @@ func snapPanelData(snap snapHelper, req dto.SnapshotCreate, targetDir string) er
 		excludes = append(excludes, "./log/Website")
 	}
 
-	rootDir := path.Join(global.CONF.System.BaseDir, "1panel")
-	if strings.Contains(global.CONF.System.Backup, rootDir) {
-		excludes = append(excludes, "."+strings.ReplaceAll(global.CONF.System.Backup, rootDir, ""))
+	rootDir := global.Dir.DataDir
+	if strings.Contains(global.Dir.LocalBackupDir, rootDir) {
+		excludes = append(excludes, "."+strings.ReplaceAll(global.Dir.LocalBackupDir, rootDir, ""))
 	}
 	ignoreVal, _ := settingRepo.Get(settingRepo.WithByKey("SnapshotIgnore"))
 	rules := strings.Split(ignoreVal.Value, ",")
@@ -445,7 +445,7 @@ func loadPanelExcludes(req []dto.DataTree) []string {
 	for _, item := range req {
 		if len(item.Children) == 0 {
 			if !item.IsCheck {
-				excludes = append(excludes, "."+strings.TrimPrefix(item.Path, path.Join(global.CONF.System.BaseDir, "1panel")))
+				excludes = append(excludes, "."+strings.TrimPrefix(item.Path, path.Join(global.Dir.BaseDir, "1panel")))
 			}
 		} else {
 			excludes = append(excludes, loadPanelExcludes(item.Children)...)
@@ -458,7 +458,7 @@ func snapCompress(snap snapHelper, rootDir string, secret string) error {
 	snap.Task.Log("---------------------- 7 / 8 ----------------------")
 	snap.Task.LogStart(i18n.GetMsgByKey("SnapCompress"))
 
-	tmpDir := path.Join(global.CONF.System.TmpDir, "system")
+	tmpDir := path.Join(global.Dir.TmpDir, "system")
 	fileName := fmt.Sprintf("%s.tar.gz", path.Base(rootDir))
 	err := snap.FileOp.TarGzCompressPro(true, rootDir, path.Join(tmpDir, fileName), secret, "")
 	snap.Task.LogWithStatus(i18n.GetMsgByKey("SnapCompressFile"), err)
@@ -482,7 +482,7 @@ func snapUpload(snap snapHelper, accounts string, file string) error {
 	snap.Task.Log("---------------------- 8 / 8 ----------------------")
 	snap.Task.LogStart(i18n.GetMsgByKey("SnapUpload"))
 
-	source := path.Join(global.CONF.System.TmpDir, "system", path.Base(file))
+	source := path.Join(global.Dir.TmpDir, "system", path.Base(file))
 	accountMap, err := NewBackupClientMap(strings.Split(accounts, ","))
 	snap.Task.LogWithStatus(i18n.GetMsgByKey("SnapLoadBackup"), err)
 	if err != nil {

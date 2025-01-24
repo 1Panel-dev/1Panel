@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -67,7 +68,7 @@ func (u *SnapshotService) SnapshotImport(req dto.SnapshotImport) error {
 	for _, snapName := range req.Names {
 		snap, _ := snapshotRepo.Get(repo.WithByName(strings.ReplaceAll(snapName, ".tar.gz", "")))
 		if snap.ID != 0 {
-			return constant.ErrRecordExist
+			return buserr.New("ErrRecordExist")
 		}
 	}
 	for _, snap := range req.Names {
@@ -108,7 +109,7 @@ func (u *SnapshotService) LoadSnapshotData() (dto.SnapshotData, error) {
 	if err != nil {
 		return data, err
 	}
-	itemBackups, err := loadFile(global.CONF.System.Backup, 8, fileOp)
+	itemBackups, err := loadFile(global.Dir.LocalBackupDir, 8, fileOp)
 	if err != nil {
 		return data, err
 	}
@@ -220,7 +221,7 @@ func loadApps(fileOp fileUtils.FileOp) ([]dto.DataTree, error) {
 			Key:   app.App.Key,
 			Name:  app.Name,
 		}
-		appPath := path.Join(global.CONF.System.BaseDir, "1panel/apps", app.App.Key, app.Name)
+		appPath := path.Join(global.Dir.DataDir, "apps", app.App.Key, app.Name)
 		itemAppData := dto.DataTree{ID: uuid.NewString(), Label: "appData", Key: app.App.Key, Name: app.Name, IsCheck: true, Path: appPath}
 		if app.App.Key == constant.AppOpenresty && len(websites) != 0 {
 			itemAppData.IsDisable = true
@@ -257,7 +258,7 @@ func loadApps(fileOp fileUtils.FileOp) ([]dto.DataTree, error) {
 }
 func loadAppBackup(list []dto.DataTree, fileOp fileUtils.FileOp) []dto.DataTree {
 	for i := 0; i < len(list); i++ {
-		appBackupPath := path.Join(global.CONF.System.BaseDir, "1panel/backup/app", list[i].Key, list[i].Name)
+		appBackupPath := path.Join(global.Dir.LocalBackupDir, "app", list[i].Key, list[i].Name)
 		itemAppBackupTree, err := loadFile(appBackupPath, 8, fileOp)
 		itemAppBackup := dto.DataTree{ID: uuid.NewString(), Label: "appBackup", IsCheck: true, Children: itemAppBackupTree, Path: appBackupPath}
 		if err == nil {
@@ -286,7 +287,7 @@ func loadAppImage(list []dto.DataTree) []dto.DataTree {
 
 	for i := 0; i < len(list); i++ {
 		itemAppImage := dto.DataTree{ID: uuid.NewString(), Label: "appImage"}
-		stdout, err := cmd.Execf("cat %s | grep image: ", path.Join(global.CONF.System.BaseDir, "1panel/apps", list[i].Key, list[i].Name, "docker-compose.yml"))
+		stdout, err := cmd.Execf("cat %s | grep image: ", path.Join(global.Dir.AppDir, list[i].Key, list[i].Name, "docker-compose.yml"))
 		if err != nil {
 			list[i].Children = append(list[i].Children, itemAppImage)
 			continue
@@ -307,7 +308,7 @@ func loadAppImage(list []dto.DataTree) []dto.DataTree {
 
 func loadPanelFile(fileOp fileUtils.FileOp) ([]dto.DataTree, error) {
 	var data []dto.DataTree
-	snapFiles, err := os.ReadDir(path.Join(global.CONF.System.BaseDir, "1panel"))
+	snapFiles, err := os.ReadDir(global.Dir.DataDir)
 	if err != nil {
 		return data, err
 	}
@@ -316,19 +317,19 @@ func loadPanelFile(fileOp fileUtils.FileOp) ([]dto.DataTree, error) {
 			ID:      uuid.NewString(),
 			Label:   fileItem.Name(),
 			IsCheck: true,
-			Path:    path.Join(global.CONF.System.BaseDir, "1panel", fileItem.Name()),
+			Path:    path.Join(global.Dir.DataDir, fileItem.Name()),
 		}
 		switch itemData.Label {
 		case "agent", "conf", "runtime", "docker", "secret", "task":
 			itemData.IsDisable = true
 		case "clamav":
-			panelPath := path.Join(global.CONF.System.BaseDir, "1panel", itemData.Label)
+			panelPath := path.Join(global.Dir.DataDir, itemData.Label)
 			itemData.Children, _ = loadFile(panelPath, 5, fileOp)
 		default:
 			continue
 		}
 		if fileItem.IsDir() {
-			sizeItem, err := fileOp.GetDirSize(path.Join(global.CONF.System.BaseDir, "1panel", itemData.Label))
+			sizeItem, err := fileOp.GetDirSize(path.Join(global.Dir.DataDir, itemData.Label))
 			if err != nil {
 				continue
 			}

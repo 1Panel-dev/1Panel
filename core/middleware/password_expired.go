@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -23,7 +24,7 @@ func PasswordExpired() gin.HandlerFunc {
 		settingRepo := repo.NewISettingRepo()
 		setting, err := settingRepo.Get(repo.WithByKey("ExpirationDays"))
 		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypePasswordExpired, err)
+			helper.ErrorWithDetail(c, http.StatusInternalServerError, "ErrPasswordExpired", err)
 			return
 		}
 		expiredDays, _ := strconv.Atoi(setting.Value)
@@ -34,17 +35,17 @@ func PasswordExpired() gin.HandlerFunc {
 
 		extime, err := settingRepo.Get(repo.WithByKey("ExpirationTime"))
 		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypePasswordExpired, err)
+			helper.ErrorWithDetail(c, http.StatusInternalServerError, "ErrPasswordExpired", err)
 			return
 		}
 		loc, _ := time.LoadLocation(common.LoadTimeZoneByCmd())
 		expiredTime, err := time.ParseInLocation(constant.DateTimeLayout, extime.Value, loc)
 		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodePasswordExpired, constant.ErrTypePasswordExpired, err)
+			helper.ErrorWithDetail(c, 313, "ErrPasswordExpired", err)
 			return
 		}
 		if time.Now().After(expiredTime) {
-			helper.ErrorWithDetail(c, constant.CodePasswordExpired, constant.ErrTypePasswordExpired, err)
+			helper.ErrorWithDetail(c, 313, "ErrPasswordExpired", err)
 			return
 		}
 		c.Next()

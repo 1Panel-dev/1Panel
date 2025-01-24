@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"os"
 	"os/exec"
 	"path"
@@ -12,6 +11,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -63,7 +64,7 @@ func (u *MysqlService) SearchWithPage(search dto.MysqlDBSearch) (int64, interfac
 	for _, mysql := range mysqls {
 		var item dto.MysqlDBInfo
 		if err := copier.Copy(&item, &mysql); err != nil {
-			return 0, nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+			return 0, nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 		}
 		dtoMysqls = append(dtoMysqls, item)
 	}
@@ -84,7 +85,7 @@ func (u *MysqlService) ListDBOption() ([]dto.MysqlOption, error) {
 	for _, mysql := range mysqls {
 		var item dto.MysqlOption
 		if err := copier.Copy(&item, &mysql); err != nil {
-			return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+			return nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 		}
 		item.Database = mysql.MysqlName
 		for _, database := range databases {
@@ -99,17 +100,17 @@ func (u *MysqlService) ListDBOption() ([]dto.MysqlOption, error) {
 
 func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*model.DatabaseMysql, error) {
 	if cmd.CheckIllegal(req.Name, req.Username, req.Password, req.Format, req.Permission) {
-		return nil, buserr.New(constant.ErrCmdIllegal)
+		return nil, buserr.New("ErrCmdIllegal")
 	}
 
 	mysql, _ := mysqlRepo.Get(repo.WithByName(req.Name), mysqlRepo.WithByMysqlName(req.Database), repo.WithByFrom(req.From))
 	if mysql.ID != 0 {
-		return nil, constant.ErrRecordExist
+		return nil, buserr.New("ErrRecordExist")
 	}
 
 	var createItem model.DatabaseMysql
 	if err := copier.Copy(&createItem, &req); err != nil {
-		return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+		return nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 	}
 
 	if req.From == "local" && req.Username == "root" {
@@ -143,7 +144,7 @@ func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*mode
 
 func (u *MysqlService) BindUser(req dto.BindUser) error {
 	if cmd.CheckIllegal(req.Username, req.Password, req.Permission) {
-		return buserr.New(constant.ErrCmdIllegal)
+		return buserr.New("ErrCmdIllegal")
 	}
 
 	dbItem, err := mysqlRepo.Get(mysqlRepo.WithByMysqlName(req.Database), repo.WithByName(req.DB))
@@ -211,7 +212,7 @@ func (u *MysqlService) LoadFromRemote(req dto.MysqlLoadDB) error {
 		if !hasOld {
 			var createItem model.DatabaseMysql
 			if err := copier.Copy(&createItem, &data); err != nil {
-				return errors.WithMessage(constant.ErrStructTransform, err.Error())
+				return buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 			}
 			if err := mysqlRepo.Create(context.Background(), &createItem); err != nil {
 				return err
@@ -281,11 +282,11 @@ func (u *MysqlService) Delete(ctx context.Context, req dto.MysqlDBDelete) error 
 	}
 
 	if req.DeleteBackup {
-		uploadDir := path.Join(global.CONF.System.BaseDir, fmt.Sprintf("1panel/uploads/database/%s/%s/%s", req.Type, req.Database, db.Name))
+		uploadDir := path.Join(global.Dir.DataDir, fmt.Sprintf("uploads/database/%s/%s/%s", req.Type, req.Database, db.Name))
 		if _, err := os.Stat(uploadDir); err == nil {
 			_ = os.RemoveAll(uploadDir)
 		}
-		backupDir := path.Join(global.CONF.System.Backup, fmt.Sprintf("database/%s/%s/%s", req.Type, db.MysqlName, db.Name))
+		backupDir := path.Join(global.Dir.LocalBackupDir, fmt.Sprintf("database/%s/%s/%s", req.Type, db.MysqlName, db.Name))
 		if _, err := os.Stat(backupDir); err == nil {
 			_ = os.RemoveAll(backupDir)
 		}
@@ -299,7 +300,7 @@ func (u *MysqlService) Delete(ctx context.Context, req dto.MysqlDBDelete) error 
 
 func (u *MysqlService) ChangePassword(req dto.ChangeDBInfo) error {
 	if cmd.CheckIllegal(req.Value) {
-		return buserr.New(constant.ErrCmdIllegal)
+		return buserr.New("ErrCmdIllegal")
 	}
 	cli, version, err := LoadMysqlClientByFrom(req.Database)
 	if err != nil {
@@ -383,7 +384,7 @@ func (u *MysqlService) ChangePassword(req dto.ChangeDBInfo) error {
 
 func (u *MysqlService) ChangeAccess(req dto.ChangeDBInfo) error {
 	if cmd.CheckIllegal(req.Value) {
-		return buserr.New(constant.ErrCmdIllegal)
+		return buserr.New("ErrCmdIllegal")
 	}
 	cli, version, err := LoadMysqlClientByFrom(req.Database)
 	if err != nil {
@@ -428,7 +429,7 @@ func (u *MysqlService) UpdateVariables(req dto.MysqlVariablesUpdate) error {
 	}
 	var files []string
 
-	path := fmt.Sprintf("%s/%s/%s/conf/my.cnf", constant.AppInstallDir, req.Type, app.Name)
+	path := fmt.Sprintf("%s/%s/%s/conf/my.cnf", global.Dir.AppInstallDir, req.Type, app.Name)
 	lineBytes, err := os.ReadFile(path)
 	if err != nil {
 		return err
@@ -459,7 +460,7 @@ func (u *MysqlService) UpdateVariables(req dto.MysqlVariablesUpdate) error {
 		return err
 	}
 
-	if _, err := compose.Restart(fmt.Sprintf("%s/%s/%s/docker-compose.yml", constant.AppInstallDir, req.Type, app.Name)); err != nil {
+	if _, err := compose.Restart(fmt.Sprintf("%s/%s/%s/docker-compose.yml", global.Dir.AppInstallDir, req.Type, app.Name)); err != nil {
 		return err
 	}
 

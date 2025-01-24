@@ -4,13 +4,14 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"os"
 	"os/exec"
 	"path"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 
 	"github.com/docker/docker/api/types/container"
 
@@ -161,11 +162,11 @@ func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface
 
 func (u *ContainerService) TestCompose(req dto.ComposeCreate) (bool, error) {
 	if cmd.CheckIllegal(req.Path) {
-		return false, buserr.New(constant.ErrCmdIllegal)
+		return false, buserr.New("ErrCmdIllegal")
 	}
 	composeItem, _ := composeRepo.GetRecord(repo.WithByName(req.Name))
 	if composeItem.ID != 0 {
-		return false, constant.ErrRecordExist
+		return false, buserr.New("ErrRecordExist")
 	}
 	if err := u.loadPath(&req); err != nil {
 		return false, err
@@ -183,7 +184,7 @@ func (u *ContainerService) TestCompose(req dto.ComposeCreate) (bool, error) {
 
 func (u *ContainerService) CreateCompose(req dto.ComposeCreate) error {
 	if cmd.CheckIllegal(req.Name, req.Path) {
-		return buserr.New(constant.ErrCmdIllegal)
+		return buserr.New("ErrCmdIllegal")
 	}
 	if err := u.loadPath(&req); err != nil {
 		return err
@@ -222,7 +223,7 @@ func (u *ContainerService) ComposeOperation(req dto.ComposeOperation) error {
 		return nil
 	}
 	if cmd.CheckIllegal(req.Path, req.Operation) {
-		return buserr.New(constant.ErrCmdIllegal)
+		return buserr.New("ErrCmdIllegal")
 	}
 	if _, err := os.Stat(req.Path); err != nil {
 		return fmt.Errorf("load file with path %s failed, %v", req.Path, err)
@@ -259,7 +260,7 @@ func (u *ContainerService) ComposeOperation(req dto.ComposeOperation) error {
 
 func (u *ContainerService) ComposeUpdate(req dto.ComposeUpdate) error {
 	if cmd.CheckIllegal(req.Name, req.Path) {
-		return buserr.New(constant.ErrCmdIllegal)
+		return buserr.New("ErrCmdIllegal")
 	}
 	oldFile, err := os.ReadFile(req.Path)
 	if err != nil {
@@ -291,7 +292,7 @@ func (u *ContainerService) ComposeUpdate(req dto.ComposeUpdate) error {
 
 func (u *ContainerService) loadPath(req *dto.ComposeCreate) error {
 	if req.From == "template" || req.From == "edit" {
-		dir := fmt.Sprintf("%s/docker/compose/%s", constant.DataDir, req.Name)
+		dir := fmt.Sprintf("%s/docker/compose/%s", global.Dir.DataDir, req.Name)
 		if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
 			if err = os.MkdirAll(dir, os.ModePerm); err != nil {
 				return err

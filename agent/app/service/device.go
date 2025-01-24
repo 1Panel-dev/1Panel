@@ -115,7 +115,7 @@ func (u *DeviceService) Update(key, value string) error {
 	switch key {
 	case "TimeZone":
 		if cmd.CheckIllegal(value) {
-			return buserr.New(constant.ErrCmdIllegal)
+			return buserr.New("ErrCmdIllegal")
 		}
 		if err := ntp.UpdateSystemTimeZone(value); err != nil {
 			return err
@@ -132,7 +132,7 @@ func (u *DeviceService) Update(key, value string) error {
 		}
 	case "Hostname":
 		if cmd.CheckIllegal(value) {
-			return buserr.New(constant.ErrCmdIllegal)
+			return buserr.New("ErrCmdIllegal")
 		}
 		std, err := cmd.Execf("%s hostnamectl set-hostname %s", cmd.SudoHandleCmd(), value)
 		if err != nil {
@@ -140,7 +140,7 @@ func (u *DeviceService) Update(key, value string) error {
 		}
 	case "Ntp", "LocalTime":
 		if cmd.CheckIllegal(value) {
-			return buserr.New(constant.ErrCmdIllegal)
+			return buserr.New("ErrCmdIllegal")
 		}
 		ntpValue := value
 		if key == "LocalTime" {
@@ -223,12 +223,12 @@ func (u *DeviceService) UpdateHosts(req []dto.HostHelper) error {
 
 func (u *DeviceService) UpdatePasswd(req dto.ChangePasswd) error {
 	if cmd.CheckIllegal(req.User, req.Passwd) {
-		return buserr.New(constant.ErrCmdIllegal)
+		return buserr.New("ErrCmdIllegal")
 	}
 	std, err := cmd.Execf("%s echo '%s:%s' | %s chpasswd", cmd.SudoHandleCmd(), req.User, req.Passwd, cmd.SudoHandleCmd())
 	if err != nil {
 		if strings.Contains(err.Error(), "does not exist") {
-			return buserr.New(constant.ErrNotExistUser)
+			return buserr.New("ErrNotExistUser")
 		}
 		return errors.New(std)
 	}
@@ -237,7 +237,7 @@ func (u *DeviceService) UpdatePasswd(req dto.ChangePasswd) error {
 
 func (u *DeviceService) UpdateSwap(req dto.SwapHelper) error {
 	if cmd.CheckIllegal(req.Path) {
-		return buserr.New(constant.ErrCmdIllegal)
+		return buserr.New("ErrCmdIllegal")
 	}
 	if !req.IsNew {
 		std, err := cmd.Execf("%s swapoff %s", cmd.SudoHandleCmd(), req.Path)
@@ -246,8 +246,8 @@ func (u *DeviceService) UpdateSwap(req dto.SwapHelper) error {
 		}
 	}
 	if req.Size == 0 {
-		if req.Path == path.Join(global.CONF.System.BaseDir, ".1panel_swap") {
-			_ = os.Remove(path.Join(global.CONF.System.BaseDir, ".1panel_swap"))
+		if req.Path == path.Join(global.Dir.BaseDir, ".1panel_swap") {
+			_ = os.Remove(path.Join(global.Dir.BaseDir, ".1panel_swap"))
 		}
 		return operateSwapWithFile(true, req)
 	}

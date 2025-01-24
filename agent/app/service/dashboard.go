@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -62,12 +63,12 @@ func (u *DashboardService) Sync(req dto.SyncFromMaster) error {
 		return launcherRepo.Create(&launcherItem)
 	case "delete":
 		if launcher.ID == 0 {
-			return constant.ErrRecordNotFound
+			return buserr.New("ErrRecordNotFound")
 		}
 		return launcherRepo.Delete(repo.WithByID(launcher.ID))
 	case "update":
 		if launcher.ID == 0 {
-			return constant.ErrRecordNotFound
+			return buserr.New("ErrRecordNotFound")
 		}
 		launcherItem.ID = launcher.ID
 		return launcherRepo.Save(&launcherItem)
@@ -105,7 +106,7 @@ func (u *DashboardService) LoadOsInfo() (*dto.OsInfo, error) {
 	baseInfo.KernelArch = hostInfo.KernelArch
 	baseInfo.KernelVersion = hostInfo.KernelVersion
 
-	diskInfo, err := disk.Usage(global.CONF.System.BaseDir)
+	diskInfo, err := disk.Usage(global.Dir.BaseDir)
 	if err == nil {
 		baseInfo.DiskSize = int64(diskInfo.Free)
 	}

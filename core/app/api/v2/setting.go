@@ -23,7 +23,7 @@ import (
 func (b *BaseApi) GetSettingInfo(c *gin.Context) {
 	setting, err := settingService.GetSettingInfo()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, setting)
@@ -38,7 +38,7 @@ func (b *BaseApi) GetSettingInfo(c *gin.Context) {
 func (b *BaseApi) GetTerminalSettingInfo(c *gin.Context) {
 	setting, err := settingService.GetTerminalInfo()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, setting)
@@ -70,7 +70,7 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 	}
 
 	if err := settingService.Update(req.Key, req.Value); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -92,7 +92,7 @@ func (b *BaseApi) UpdateTerminalSetting(c *gin.Context) {
 	}
 
 	if err := settingService.UpdateTerminal(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -123,7 +123,7 @@ func (b *BaseApi) UpdateProxy(c *gin.Context) {
 	}
 
 	if err := settingService.UpdateProxy(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -145,7 +145,7 @@ func (b *BaseApi) UpdateMenu(c *gin.Context) {
 	}
 
 	if err := settingService.Update(req.Key, req.Value); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -167,7 +167,7 @@ func (b *BaseApi) UpdatePassword(c *gin.Context) {
 	}
 
 	if err := settingService.UpdatePassword(c, req.OldPassword, req.NewPassword); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -189,7 +189,7 @@ func (b *BaseApi) UpdateSSL(c *gin.Context) {
 	}
 
 	if err := settingService.UpdateSSL(c, req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -204,7 +204,7 @@ func (b *BaseApi) UpdateSSL(c *gin.Context) {
 func (b *BaseApi) LoadFromCert(c *gin.Context) {
 	info, err := settingService.LoadFromCert()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, info)
@@ -217,9 +217,9 @@ func (b *BaseApi) LoadFromCert(c *gin.Context) {
 // @Security Timestamp
 // @Router /core/settings/ssl/download [post]
 func (b *BaseApi) DownloadSSL(c *gin.Context) {
-	pathItem := path.Join(global.CONF.System.BaseDir, "1panel/secret/server.crt")
+	pathItem := path.Join(global.CONF.Base.InstallDir, "1panel/secret/server.crt")
 	if _, err := os.Stat(pathItem); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -236,7 +236,7 @@ func (b *BaseApi) DownloadSSL(c *gin.Context) {
 func (b *BaseApi) LoadInterfaceAddr(c *gin.Context) {
 	data, err := settingService.LoadInterfaceAddr()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, data)
@@ -258,7 +258,7 @@ func (b *BaseApi) UpdateBindInfo(c *gin.Context) {
 	}
 
 	if err := settingService.UpdateBindInfo(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -280,7 +280,7 @@ func (b *BaseApi) UpdatePort(c *gin.Context) {
 	}
 
 	if err := settingService.UpdatePort(req.ServerPort); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -302,7 +302,7 @@ func (b *BaseApi) HandlePasswordExpired(c *gin.Context) {
 	}
 
 	if err := settingService.HandlePasswordExpired(c, req.OldPassword, req.NewPassword); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -324,7 +324,7 @@ func (b *BaseApi) LoadMFA(c *gin.Context) {
 
 	otp, err := mfa.GetOtp("admin", req.Title, req.Interval)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -348,22 +348,22 @@ func (b *BaseApi) MFABind(c *gin.Context) {
 
 	success := mfa.ValidCode(req.Code, req.Interval, req.Secret)
 	if !success {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, errors.New("code is not valid"))
+		helper.InternalServer(c, errors.New("code is not valid"))
 		return
 	}
 
 	if err := settingService.Update("MFAInterval", req.Interval); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
 	if err := settingService.Update("MFAStatus", constant.StatusEnable); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
 	if err := settingService.Update("MFASecret", req.Secret); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 
@@ -373,11 +373,11 @@ func (b *BaseApi) MFABind(c *gin.Context) {
 func (b *BaseApi) ReloadSSL(c *gin.Context) {
 	clientIP := c.ClientIP()
 	if clientIP != "127.0.0.1" {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, errors.New("only localhost can reload ssl"))
+		helper.InternalServer(c, errors.New("only localhost can reload ssl"))
 		return
 	}
 	if err := settingService.UpdateSystemSSL(); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
@@ -394,12 +394,12 @@ func (b *BaseApi) ReloadSSL(c *gin.Context) {
 func (b *BaseApi) GenerateApiKey(c *gin.Context) {
 	panelToken := c.GetHeader("1Panel-Token")
 	if panelToken != "" {
-		helper.ErrorWithDetail(c, constant.CodeErrUnauthorized, constant.ErrApiConfigDisable, nil)
+		helper.BadAuth(c, "ErrApiConfigDisable", nil)
 		return
 	}
 	apiKey, err := settingService.GenerateApiKey()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, apiKey)
@@ -417,7 +417,7 @@ func (b *BaseApi) GenerateApiKey(c *gin.Context) {
 func (b *BaseApi) UpdateApiConfig(c *gin.Context) {
 	panelToken := c.GetHeader("1Panel-Token")
 	if panelToken != "" {
-		helper.ErrorWithDetail(c, constant.CodeErrUnauthorized, constant.ErrApiConfigDisable, nil)
+		helper.BadAuth(c, "ErrApiConfigDisable", nil)
 		return
 	}
 	var req dto.ApiInterfaceConfig
@@ -426,7 +426,7 @@ func (b *BaseApi) UpdateApiConfig(c *gin.Context) {
 	}
 
 	if err := settingService.UpdateApiConfig(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)

@@ -45,12 +45,12 @@ func Start() {
 	rootRouter := router.Routers()
 
 	tcpItem := "tcp4"
-	if global.CONF.System.Ipv6 == constant.StatusEnable {
+	if global.CONF.Conn.Ipv6 == constant.StatusEnable {
 		tcpItem = "tcp"
-		global.CONF.System.BindAddress = fmt.Sprintf("[%s]", global.CONF.System.BindAddress)
+		global.CONF.Conn.BindAddress = fmt.Sprintf("[%s]", global.CONF.Conn.BindAddress)
 	}
 	server := &http.Server{
-		Addr:    global.CONF.System.BindAddress + ":" + global.CONF.System.Port,
+		Addr:    global.CONF.Conn.BindAddress + ":" + global.CONF.Conn.Port,
 		Handler: rootRouter,
 	}
 	ln, err := net.Listen(tcpItem, server.Addr)
@@ -60,9 +60,9 @@ func Start() {
 	type tcpKeepAliveListener struct {
 		*net.TCPListener
 	}
-	if global.CONF.System.SSL == constant.StatusEnable {
-		certPath := path.Join(global.CONF.System.BaseDir, "1panel/secret/server.crt")
-		keyPath := path.Join(global.CONF.System.BaseDir, "1panel/secret/server.key")
+	if global.CONF.Conn.SSL == constant.StatusEnable {
+		certPath := path.Join(global.CONF.Base.InstallDir, "1panel/secret/server.crt")
+		keyPath := path.Join(global.CONF.Base.InstallDir, "1panel/secret/server.key")
 		certificate, err := os.ReadFile(certPath)
 		if err != nil {
 			panic(err)
@@ -82,13 +82,13 @@ func Start() {
 				return constant.CertStore.Load().(*tls.Certificate), nil
 			},
 		}
-		global.LOG.Infof("listen at https://%s:%s [%s]", global.CONF.System.BindAddress, global.CONF.System.Port, tcpItem)
+		global.LOG.Infof("listen at https://%s:%s [%s]", global.CONF.Conn.BindAddress, global.CONF.Conn.Port, tcpItem)
 
 		if err := server.ServeTLS(tcpKeepAliveListener{ln.(*net.TCPListener)}, "", ""); err != nil {
 			panic(err)
 		}
 	} else {
-		global.LOG.Infof("listen at http://%s:%s [%s]", global.CONF.System.BindAddress, global.CONF.System.Port, tcpItem)
+		global.LOG.Infof("listen at http://%s:%s [%s]", global.CONF.Conn.BindAddress, global.CONF.Conn.Port, tcpItem)
 		if err := server.Serve(tcpKeepAliveListener{ln.(*net.TCPListener)}); err != nil {
 			panic(err)
 		}

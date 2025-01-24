@@ -6,6 +6,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"os"
+	"os/exec"
+	"path"
+	"path/filepath"
+	"strings"
+	"time"
+
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
@@ -22,17 +30,10 @@ import (
 	"github.com/pkg/errors"
 	"github.com/subosito/gotenv"
 	"gopkg.in/yaml.v3"
-	"io"
-	"os"
-	"os/exec"
-	"path"
-	"path/filepath"
-	"strings"
-	"time"
 )
 
 func handleRuntime(create request.RuntimeCreate, runtime *model.Runtime, fileOp files.FileOp, appVersionDir string) (err error) {
-	runtimeDir := path.Join(constant.RuntimeDir, create.Type)
+	runtimeDir := path.Join(global.Dir.RuntimeDir, create.Type)
 	if err = fileOp.CopyDir(appVersionDir, runtimeDir); err != nil {
 		return
 	}
@@ -69,7 +70,7 @@ func handleRuntime(create request.RuntimeCreate, runtime *model.Runtime, fileOp 
 }
 
 func handlePHP(create request.RuntimeCreate, runtime *model.Runtime, fileOp files.FileOp, appVersionDir string) (err error) {
-	runtimeDir := path.Join(constant.RuntimeDir, create.Type)
+	runtimeDir := path.Join(global.Dir.RuntimeDir, create.Type)
 	if err = fileOp.CopyDirWithNewName(appVersionDir, runtimeDir, create.Name); err != nil {
 		return
 	}
@@ -147,7 +148,7 @@ func runComposeCmdWithLog(operate string, composePath string, logPath string) er
 
 	err = cmd.Run()
 	if err != nil {
-		return errors.New(buserr.New(constant.ErrRuntimeStart).Error() + ":" + err.Error())
+		return errors.New(buserr.New("ErrRuntimeStart").Error() + ":" + err.Error())
 	}
 	return nil
 }
@@ -230,11 +231,11 @@ func buildRuntime(runtime *model.Runtime, oldImageID string, oldEnv string, rebu
 	err = cmd.Run()
 	if err != nil {
 		runtime.Status = constant.RuntimeError
-		runtime.Message = buserr.New(constant.ErrImageBuildErr).Error() + ":" + stderrBuf.String()
+		runtime.Message = buserr.New("ErrImageBuildErr").Error() + ":" + stderrBuf.String()
 		if errors.Is(ctx.Err(), context.DeadlineExceeded) {
-			runtime.Message = buserr.New(constant.ErrImageBuildErr).Error() + ":" + buserr.New("ErrCmdTimeout").Error()
+			runtime.Message = buserr.New("ErrImageBuildErr").Error() + ":" + buserr.New("ErrCmdTimeout").Error()
 		} else {
-			runtime.Message = buserr.New(constant.ErrImageBuildErr).Error() + ":" + stderrBuf.String()
+			runtime.Message = buserr.New("ErrImageBuildErr").Error() + ":" + stderrBuf.String()
 		}
 	} else {
 		if err = runComposeCmdWithLog(constant.RuntimeDown, runtime.GetComposePath(), runtime.GetLogPath()); err != nil {
@@ -292,7 +293,7 @@ func buildRuntime(runtime *model.Runtime, oldImageID string, oldEnv string, rebu
 				err = cmd2.ExecWithLogFile(installCmd, 60*time.Minute, logPath)
 				if err != nil {
 					runtime.Status = constant.RuntimeError
-					runtime.Message = buserr.New(constant.ErrImageBuildErr).Error() + ":" + err.Error()
+					runtime.Message = buserr.New("ErrImageBuildErr").Error() + ":" + err.Error()
 					_ = runtimeRepo.Save(runtime)
 					return
 				}
@@ -422,7 +423,7 @@ func handleCompose(env gotenv.Env, composeContent []byte, create request.Runtime
 	}
 	services, serviceValid := composeMap["services"].(map[string]interface{})
 	if !serviceValid {
-		err = buserr.New(constant.ErrFileParse)
+		err = buserr.New("ErrFileParse")
 		return
 	}
 	serviceName := ""
@@ -500,7 +501,7 @@ func checkContainerName(name string) error {
 		return err
 	}
 	if len(names) > 0 {
-		return buserr.New(constant.ErrContainerName)
+		return buserr.New("ErrContainerName")
 	}
 	return nil
 }

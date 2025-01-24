@@ -8,10 +8,10 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/robfig/cron/v3"
@@ -101,7 +101,7 @@ func (m *MonitorService) LoadMonitorData(req dto.MonitorSearch) ([]dto.MonitorDa
 func (m *MonitorService) LoadSetting() (*dto.MonitorSetting, error) {
 	setting, err := settingRepo.GetList()
 	if err != nil {
-		return nil, constant.ErrRecordNotFound
+		return nil, buserr.New("ErrRecordNotFound")
 	}
 	settingMap := make(map[string]string)
 	for _, set := range setting {

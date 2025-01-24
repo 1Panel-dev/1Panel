@@ -10,7 +10,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/jinzhu/copier"
 )
@@ -81,9 +80,9 @@ func (u *BackupRecordService) DownloadRecord(info dto.DownloadRecord) (string, e
 		return "", fmt.Errorf("new cloud storage client failed, err: %v", err)
 	}
 	if account.Type == "LOCAL" {
-		return path.Join(global.CONF.System.Backup, info.FileDir, info.FileName), nil
+		return path.Join(global.Dir.LocalBackupDir, info.FileDir, info.FileName), nil
 	}
-	targetPath := fmt.Sprintf("%s/download/%s/%s", constant.DataDir, info.FileDir, info.FileName)
+	targetPath := fmt.Sprintf("%s/download/%s/%s", global.Dir.DataDir, info.FileDir, info.FileName)
 	if _, err := os.Stat(path.Dir(targetPath)); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(path.Dir(targetPath), os.ModePerm); err != nil {
 			global.LOG.Errorf("mkdir %s failed, err: %v", path.Dir(targetPath), err)

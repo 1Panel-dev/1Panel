@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/global"
 )
 
 type AppInstall struct {
@@ -41,8 +42,8 @@ func (i *AppInstall) GetEnvPath() string {
 
 func (i *AppInstall) GetAppPath() string {
 	if i.App.Resource == constant.AppResourceLocal {
-		return path.Join(constant.LocalAppInstallDir, strings.TrimPrefix(i.App.Key, constant.AppResourceLocal))
+		return path.Join(global.Dir.LocalAppInstallDir, strings.TrimPrefix(i.App.Key, constant.AppResourceLocal))
 	} else {
-		return path.Join(constant.AppInstallDir, i.App.Key)
+		return path.Join(global.Dir.AppInstallDir, i.App.Key)
 	}
 }

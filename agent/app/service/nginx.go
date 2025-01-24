@@ -4,10 +4,6 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/task"
-	"github.com/1Panel-dev/1Panel/agent/buserr"
-	cmd2 "github.com/1Panel-dev/1Panel/agent/utils/cmd"
-	"github.com/subosito/gotenv"
 	"io"
 	"net/http"
 	"os"
@@ -15,6 +11,12 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/app/task"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
+	"github.com/1Panel-dev/1Panel/agent/global"
+	cmd2 "github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	"github.com/subosito/gotenv"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/compose"
 
@@ -50,7 +52,7 @@ func (n NginxService) GetNginxConfig() (*response.NginxFile, error) {
 	if err != nil {
 		return nil, err
 	}
-	configPath := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "conf", "nginx.conf")
+	configPath := path.Join(global.Dir.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "conf", "nginx.conf")
 	byteContent, err := files.NewFileOp().GetContent(configPath)
 	if err != nil {
 		return nil, err
@@ -131,7 +133,7 @@ func (n NginxService) UpdateConfigFile(req request.NginxConfigFileUpdate) error 
 	if err != nil {
 		return err
 	}
-	filePath := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "conf", "nginx.conf")
+	filePath := path.Join(global.Dir.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "conf", "nginx.conf")
 	if req.Backup {
 		backupPath := path.Join(path.Dir(filePath), "bak")
 		if !fileOp.Stat(backupPath) {

@@ -104,7 +104,7 @@ func (u *CronjobService) handleShell(cronjob model.Cronjob, taskID string) error
 			cronjob.Executor = "bash"
 		}
 		if cronjob.ScriptMode == "input" {
-			fileItem := pathUtils.Join(global.CONF.System.BaseDir, "1panel", "task", "shell", cronjob.Name, cronjob.Name+".sh")
+			fileItem := pathUtils.Join(global.Dir.DataDir, "task", "shell", cronjob.Name, cronjob.Name+".sh")
 			_ = os.MkdirAll(pathUtils.Dir(fileItem), os.ModePerm)
 			shellFile, err := os.OpenFile(fileItem, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, constant.FilePerm)
 			if err != nil {
@@ -192,7 +192,7 @@ func (u *CronjobService) handleCutWebsiteLog(cronjob *model.Cronjob, startTime t
 		websiteLogDir := pathUtils.Join(baseDir, website.Alias, "log")
 		srcAccessLogPath := pathUtils.Join(websiteLogDir, "access.log")
 		srcErrorLogPath := pathUtils.Join(websiteLogDir, "error.log")
-		dstLogDir := pathUtils.Join(global.CONF.System.Backup, "log", "website", website.Alias)
+		dstLogDir := pathUtils.Join(global.Dir.LocalBackupDir, "log", "website", website.Alias)
 		if !fileOp.Stat(dstLogDir) {
 			_ = os.MkdirAll(dstLogDir, constant.DirPerm)
 		}
@@ -251,7 +251,7 @@ func (u *CronjobService) uploadCronjobBackFile(cronjob model.Cronjob, accountMap
 		_ = os.Remove(file)
 	}()
 	accounts := strings.Split(cronjob.SourceAccountIDs, ",")
-	cloudSrc := strings.TrimPrefix(file, global.CONF.System.TmpDir+"/")
+	cloudSrc := strings.TrimPrefix(file, global.Dir.TmpDir+"/")
 	for _, account := range accounts {
 		if len(account) != 0 {
 			global.LOG.Debugf("start upload file to %s, dir: %s", accountMap[account].name, pathUtils.Join(accountMap[account].backupPath, cloudSrc))

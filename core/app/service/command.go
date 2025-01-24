@@ -3,10 +3,9 @@ package service
 import (
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
-	"github.com/1Panel-dev/1Panel/core/constant"
+	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/jinzhu/copier"
-	"github.com/pkg/errors"
 )
 
 type CommandService struct{}
@@ -27,13 +26,13 @@ func NewICommandService() ICommandService {
 func (u *CommandService) List(req dto.OperateByType) ([]dto.CommandInfo, error) {
 	commands, err := commandRepo.List(repo.WithOrderBy("name"), repo.WithByType(req.Type))
 	if err != nil {
-		return nil, constant.ErrRecordNotFound
+		return nil, buserr.New("ErrRecordNotFound")
 	}
 	var dtoCommands []dto.CommandInfo
 	for _, command := range commands {
 		var item dto.CommandInfo
 		if err := copier.Copy(&item, &command); err != nil {
-			return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+			return nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 		}
 		dtoCommands = append(dtoCommands, item)
 	}
@@ -86,7 +85,7 @@ func (u *CommandService) SearchWithPage(req dto.SearchCommandWithPage) (int64, i
 	for _, command := range commands {
 		var item dto.CommandInfo
 		if err := copier.Copy(&item, &command); err != nil {
-			return 0, nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+			return 0, nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 		}
 		for _, group := range groups {
 			if command.GroupID == group.ID {
@@ -102,10 +101,10 @@ func (u *CommandService) SearchWithPage(req dto.SearchCommandWithPage) (int64, i
 func (u *CommandService) Create(commandDto dto.CommandOperate) error {
 	command, _ := commandRepo.Get(repo.WithByName(commandDto.Name))
 	if command.ID != 0 {
-		return constant.ErrRecordExist
+		return buserr.New("ErrRecordExist")
 	}
 	if err := copier.Copy(&command, &commandDto); err != nil {
-		return errors.WithMessage(constant.ErrStructTransform, err.Error())
+		return buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 	}
 	if err := commandRepo.Create(&command); err != nil {
 		return err
@@ -117,7 +116,7 @@ func (u *CommandService) Delete(ids []uint) error {
 	if len(ids) == 1 {
 		command, _ := commandRepo.Get(repo.WithByID(ids[0]))
 		if command.ID == 0 {
-			return constant.ErrRecordNotFound
+			return buserr.New("ErrRecordNotFound")
 		}
 		return commandRepo.Delete(repo.WithByID(ids[0]))
 	}

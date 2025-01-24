@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/core/cmd/server/conf"
-	"github.com/1Panel-dev/1Panel/core/configs"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/cmd"
 	"github.com/fsnotify/fsnotify"
@@ -25,12 +24,12 @@ func Init() {
 	v := viper.NewWithOptions()
 	v.SetConfigType("yaml")
 
-	config := configs.ServerConfig{}
+	config := global.ServerConfig{}
 	if err := yaml.Unmarshal(conf.AppYaml, &config); err != nil {
 		panic(err)
 	}
-	if config.System.Mode != "" {
-		mode = config.System.Mode
+	if config.Base.Mode != "" {
+		mode = config.Base.Mode
 	}
 	_, err := os.Stat("/opt/1panel/conf/app.yaml")
 	if mode == "dev" && err == nil {
@@ -58,46 +57,46 @@ func Init() {
 			panic(err)
 		}
 	})
-	serverConfig := configs.ServerConfig{}
+	serverConfig := global.ServerConfig{}
 	if err := v.Unmarshal(&serverConfig); err != nil {
 		panic(err)
 	}
 	_, err = os.Stat("/opt/1panel/conf/app.yaml")
 	if mode == "dev" && err == nil {
-		if serverConfig.System.BaseDir != "" {
-			baseDir = serverConfig.System.BaseDir
+		if serverConfig.Base.InstallDir != "" {
+			baseDir = serverConfig.Base.InstallDir
 		}
-		if serverConfig.System.Port != "" {
-			port = serverConfig.System.Port
+		if serverConfig.Conn.Port != "" {
+			port = serverConfig.Conn.Port
 		}
-		if serverConfig.System.Version != "" {
-			version = serverConfig.System.Version
+		if serverConfig.Base.Version != "" {
+			version = serverConfig.Base.Version
 		}
-		if serverConfig.System.Username != "" {
-			username = serverConfig.System.Username
+		if serverConfig.Base.Username != "" {
+			username = serverConfig.Base.Username
 		}
-		if serverConfig.System.Password != "" {
-			password = serverConfig.System.Password
+		if serverConfig.Base.Password != "" {
+			password = serverConfig.Base.Password
 		}
-		if serverConfig.System.Entrance != "" {
-			entrance = serverConfig.System.Entrance
+		if serverConfig.Conn.Entrance != "" {
+			entrance = serverConfig.Conn.Entrance
 		}
-		if serverConfig.System.IsIntl {
+		if serverConfig.Base.IsIntl {
 			language = "en"
 		}
 	}
 
 	global.CONF = serverConfig
-	global.CONF.System.BaseDir = baseDir
-	global.CONF.System.IsDemo = v.GetBool("system.is_demo")
-	global.CONF.System.IsIntl = v.GetBool("system.is_intl")
-	global.CONF.System.Port = port
-	global.CONF.System.Version = version
-	global.CONF.System.Username = username
-	global.CONF.System.Password = password
-	global.CONF.System.Entrance = entrance
-	global.CONF.System.Language = language
-	global.CONF.System.ChangeUserInfo = loadChangeInfo()
+	global.CONF.Base.InstallDir = baseDir
+	global.CONF.Base.IsDemo = v.GetBool("system.is_demo")
+	global.CONF.Base.IsIntl = v.GetBool("system.is_intl")
+	global.CONF.Base.Version = version
+	global.CONF.Base.Username = username
+	global.CONF.Base.Password = password
+	global.CONF.Base.Language = language
+	global.CONF.Base.ChangeUserInfo = loadChangeInfo()
+	global.CONF.Conn.Entrance = entrance
+	global.CONF.Conn.Port = port
 	global.Viper = v
 }
 

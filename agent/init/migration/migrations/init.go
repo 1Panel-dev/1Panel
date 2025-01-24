@@ -75,7 +75,7 @@ var AddMonitorTable = &gormigrate.Migration{
 var InitSetting = &gormigrate.Migration{
 	ID: "20240722-init-setting",
 	Migrate: func(tx *gorm.DB) error {
-		global.CONF.System.EncryptKey = common.RandStr(16)
+		global.CONF.Base.EncryptKey = common.RandStr(16)
 		_, nodeInfo, err := xpack.LoadNodeInfo()
 		if err != nil {
 			return err
@@ -238,7 +238,7 @@ var InitBackup = &gormigrate.Migration{
 		if err := tx.Create(&model.BackupAccount{
 			Name:       "localhost",
 			Type:       "LOCAL",
-			BackupPath: path.Join(global.CONF.System.BaseDir, "1panel/backup"),
+			BackupPath: path.Join(global.Dir.DataDir, "backup"),
 		}).Error; err != nil {
 			return err
 		}

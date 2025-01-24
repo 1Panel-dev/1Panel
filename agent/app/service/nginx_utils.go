@@ -13,6 +13,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/cmd/server/nginx_conf"
 	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx"
@@ -27,7 +28,7 @@ func getNginxFull(website *model.Website) (dto.NginxFull, error) {
 		return nginxFull, err
 	}
 	nginxFull.Install = nginxInstall
-	nginxFull.Dir = path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name)
+	nginxFull.Dir = path.Join(global.Dir.AppInstallDir, constant.AppOpenresty, nginxInstall.Name)
 	nginxFull.ConfigDir = path.Join(nginxFull.Dir, "conf")
 	nginxFull.ConfigFile = "nginx.conf"
 	nginxFull.SiteDir = path.Join(nginxFull.Dir, "www")

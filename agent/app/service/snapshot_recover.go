@@ -4,11 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"os"
 	"path"
 	"strings"
 	"sync"
+
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -60,7 +61,7 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 		global.LOG.Errorf("new task for create snapshot failed, err: %v", err)
 		return err
 	}
-	rootDir := path.Join(global.CONF.System.TmpDir, "system", snap.Name)
+	rootDir := path.Join(global.Dir.TmpDir, "system", snap.Name)
 	if _, err := os.Stat(rootDir); err != nil && os.IsNotExist(err) {
 		_ = os.MkdirAll(rootDir, os.ModePerm)
 	}
@@ -204,19 +205,19 @@ func backupBeforeRecover(name string, itemHelper *snapRecoverHelper) error {
 	itemHelper.Task.Log("---------------------- 3 / 10 ----------------------")
 	itemHelper.Task.LogStart(i18n.GetMsgByKey("BackupBeforeRecover"))
 
-	rootDir := fmt.Sprintf("%s/1panel_original/original_%s", global.CONF.System.BaseDir, name)
+	rootDir := fmt.Sprintf("%s/1panel_original/original_%s", global.Dir.BaseDir, name)
 	baseDir := path.Join(rootDir, "base")
 	if _, err := os.Stat(baseDir); err != nil {
 		_ = os.MkdirAll(baseDir, os.ModePerm)
 	}
 
-	err := itemHelper.FileOp.CopyDirWithExclude(path.Join(global.CONF.System.BaseDir, "1panel"), rootDir, []string{"cache", "tmp"})
-	itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", path.Join(global.CONF.System.BaseDir, "1panel")), err)
+	err := itemHelper.FileOp.CopyDirWithExclude(global.Dir.DataDir, rootDir, []string{"cache", "tmp"})
+	itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", global.Dir.DataDir), err)
 	if err != nil {
 		return err
 	}
-	err = itemHelper.FileOp.CopyDirWithExclude(global.CONF.System.Backup, rootDir, []string{"system_snapshot"})
-	itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", global.CONF.System.Backup), err)
+	err = itemHelper.FileOp.CopyDirWithExclude(global.Dir.LocalBackupDir, rootDir, []string{"system_snapshot"})
+	itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", global.Dir.LocalBackupDir), err)
 	if err != nil {
 		return err
 	}
@@ -369,7 +370,7 @@ func recoverBaseData(src string, itemHelper *snapRecoverHelper) error {
 func recoverDBData(src string, itemHelper *snapRecoverHelper) error {
 	itemHelper.Task.Log("---------------------- 7 / 10 ----------------------")
 	itemHelper.Task.LogStart(i18n.GetMsgByKey("RecoverDBData"))
-	err := itemHelper.FileOp.CopyDirWithExclude(src, path.Join(global.CONF.System.BaseDir, "1panel"), nil)
+	err := itemHelper.FileOp.CopyDirWithExclude(src, global.Dir.DataDir, nil)
 
 	itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("RecoverDBData"), err)
 	return err

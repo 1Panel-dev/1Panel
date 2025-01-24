@@ -9,7 +9,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/log"
 
-	"github.com/1Panel-dev/1Panel/agent/configs"
 	"github.com/1Panel-dev/1Panel/agent/global"
 
 	"github.com/sirupsen/logrus"
@@ -23,14 +22,14 @@ const (
 
 func Init() {
 	l := logrus.New()
-	setOutput(l, global.CONF.LogConfig)
+	setOutput(l, (global.CONF.Log))
 	global.LOG = l
 	global.LOG.Info("init logger successfully")
 }
 
-func setOutput(logger *logrus.Logger, config configs.LogConfig) {
+func setOutput(logger *logrus.Logger, config global.LogConfig) {
 	writer, err := log.NewWriterFromConfig(&log.Config{
-		LogPath:            global.CONF.System.LogPath,
+		LogPath:            global.Dir.LogDir,
 		FileName:           config.LogName,
 		TimeTagFormat:      FileTImeFormat,
 		MaxRemain:          config.MaxBackup,

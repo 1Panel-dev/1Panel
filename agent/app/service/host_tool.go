@@ -154,7 +154,7 @@ func (h *HostToolService) CreateToolConfig(req request.HostToolCreate) error {
 				return err
 			}
 		}
-		supervisorDir := path.Join(global.CONF.System.BaseDir, "1panel", "tools", "supervisord")
+		supervisorDir := path.Join(global.Dir.DataDir, "tools", "supervisord")
 		includeDir := path.Join(supervisorDir, "supervisor.d")
 		if !fileOp.Stat(includeDir) {
 			if err = fileOp.CreateDir(includeDir, constant.DirPerm); err != nil {
@@ -282,7 +282,7 @@ func (h *HostToolService) GetToolLog(req request.HostToolLogReq) (string, error)
 
 func (h *HostToolService) OperateSupervisorProcess(req request.SupervisorProcessConfig) error {
 	var (
-		supervisordDir = path.Join(global.CONF.System.BaseDir, "1panel", "tools", "supervisord")
+		supervisordDir = path.Join(global.Dir.DataDir, "tools", "supervisord")
 		fileOp         = files.NewFileOp()
 	)
 	if req.Operate == "update" || req.Operate == "create" {
@@ -432,13 +432,13 @@ func handleProcessConfig(configDir, containerName string) ([]response.Supervisor
 }
 
 func (h *HostToolService) GetSupervisorProcessConfig() ([]response.SupervisorProcessConfig, error) {
-	configDir := path.Join(global.CONF.System.BaseDir, "1panel", "tools", "supervisord", "supervisor.d")
+	configDir := path.Join(global.Dir.DataDir, "tools", "supervisord", "supervisor.d")
 	return handleProcessConfig(configDir, "")
 }
 
 func (h *HostToolService) OperateSupervisorProcessFile(req request.SupervisorProcessFileReq) (string, error) {
 	var (
-		includeDir = path.Join(global.CONF.System.BaseDir, "1panel", "tools", "supervisord", "supervisor.d")
+		includeDir = path.Join(global.Dir.DataDir, "tools", "supervisord", "supervisor.d")
 	)
 	return handleSupervisorFile(req, includeDir, "", "")
 }

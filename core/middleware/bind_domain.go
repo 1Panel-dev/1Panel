@@ -6,7 +6,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
-	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,7 +14,7 @@ func BindDomain() gin.HandlerFunc {
 		settingRepo := repo.NewISettingRepo()
 		status, err := settingRepo.Get(repo.WithByKey("BindDomain"))
 		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			helper.InternalServer(c, err)
 			return
 		}
 		if len(status.Value) == 0 {
@@ -33,7 +32,7 @@ func BindDomain() gin.HandlerFunc {
 				helper.ErrResponse(c, LoadErrCode())
 				return
 			}
-			helper.ErrorWithDetail(c, constant.CodeErrDomain, constant.ErrTypeInternalServer, errors.New("domain not allowed"))
+			helper.ErrorWithDetail(c, 311, "ErrInternalServer", errors.New("domain not allowed"))
 			return
 		}
 		c.Next()

@@ -23,7 +23,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/jinzhu/copier"
-	"github.com/pkg/errors"
 )
 
 type BackupService struct{}
@@ -125,17 +124,17 @@ func (u *BackupService) SearchWithPage(req dto.SearchPageWithType) (int64, inter
 
 func (u *BackupService) Create(req dto.BackupOperate) error {
 	if req.Type == constant.Local {
-		return buserr.New(constant.ErrBackupLocalCreate)
+		return buserr.New("ErrBackupLocalCreate")
 	}
 	if req.Type != constant.Sftp && req.BackupPath != "/" {
 		req.BackupPath = strings.TrimPrefix(req.BackupPath, "/")
 	}
 	backup, _ := backupRepo.Get(repo.WithByName(req.Name))
 	if backup.ID != 0 {
-		return constant.ErrRecordExist
+		return buserr.New("ErrRecordExist")
 	}
 	if err := copier.Copy(&backup, &req); err != nil {
-		return errors.WithMessage(constant.ErrStructTransform, err.Error())
+		return buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 	}
 	itemAccessKey, err := base64.StdEncoding.DecodeString(backup.AccessKey)
 	if err != nil {
@@ -156,7 +155,7 @@ func (u *BackupService) Create(req dto.BackupOperate) error {
 	if req.Type != "LOCAL" {
 		isOk, err := u.checkBackupConn(&backup)
 		if err != nil || !isOk {
-			return buserr.WithMap(constant.ErrBackupCheck, map[string]interface{}{"err": err.Error()}, err)
+			return buserr.WithMap("ErrBackupCheck", map[string]interface{}{"err": err.Error()}, err)
 		}
 	}
 
@@ -208,10 +207,10 @@ func (u *BackupService) GetBuckets(req dto.ForBuckets) ([]interface{}, error) {
 func (u *BackupService) Delete(id uint) error {
 	backup, _ := backupRepo.Get(repo.WithByID(id))
 	if backup.ID == 0 {
-		return constant.ErrRecordNotFound
+		return buserr.New("ErrRecordNotFound")
 	}
 	if backup.Type == constant.Local {
-		return buserr.New(constant.ErrBackupLocalDelete)
+		return buserr.New("ErrBackupLocalDelete")
 	}
 	return backupRepo.Delete(repo.WithByID(id))
 }
@@ -219,14 +218,14 @@ func (u *BackupService) Delete(id uint) error {
 func (u *BackupService) Update(req dto.BackupOperate) error {
 	backup, _ := backupRepo.Get(repo.WithByID(req.ID))
 	if backup.ID == 0 {
-		return constant.ErrRecordNotFound
+		return buserr.New("ErrRecordNotFound")
 	}
 	if req.Type != constant.Sftp && req.Type != constant.Local && req.BackupPath != "/" {
 		req.BackupPath = strings.TrimPrefix(req.BackupPath, "/")
 	}
 	var newBackup model.BackupAccount
 	if err := copier.Copy(&newBackup, &req); err != nil {
-		return errors.WithMessage(constant.ErrStructTransform, err.Error())
+		return buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 	}
 	itemAccessKey, err := base64.StdEncoding.DecodeString(newBackup.AccessKey)
 	if err != nil {
@@ -281,7 +280,7 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 func (u *BackupService) RefreshToken(req dto.OperateByID) error {
 	backup, _ := backupRepo.Get(repo.WithByID(req.ID))
 	if backup.ID == 0 {
-		return constant.ErrRecordNotFound
+		return buserr.New("ErrRecordNotFound")
 	}
 	varMap := make(map[string]interface{})
 	if err := json.Unmarshal([]byte(backup.Vars), &varMap); err != nil {
@@ -318,7 +317,7 @@ func (u *BackupService) checkBackupConn(backup *model.BackupAccount) (bool, erro
 	if err != nil {
 		return false, err
 	}
-	fileItem := path.Join(global.CONF.System.BaseDir, "1panel/tmp/test/1panel")
+	fileItem := path.Join(global.Dir.BaseDir, "1panel/tmp/test/1panel")
 	if _, err := os.Stat(path.Dir(fileItem)); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(path.Dir(fileItem), os.ModePerm); err != nil {
 			return false, err
@@ -365,12 +364,12 @@ func (u *BackupService) Sync(req dto.SyncFromMaster) error {
 		return backupRepo.Create(&accountItem)
 	case "delete":
 		if account.ID == 0 {
-			return constant.ErrRecordNotFound
+			return buserr.New("ErrRecordNotFound")
 		}
 		return backupRepo.Delete(repo.WithByID(account.ID))
 	case "update":
 		if account.ID == 0 {
-			return constant.ErrRecordNotFound
+			return buserr.New("ErrRecordNotFound")
 		}
 		accountItem.ID = account.ID
 		return backupRepo.Save(&accountItem)
@@ -399,12 +398,12 @@ func (u *BackupService) CheckUsed(id uint) error {
 	cronjobs, _ := cronjobRepo.List()
 	for _, job := range cronjobs {
 		if job.DownloadAccountID == id {
-			return buserr.New(constant.ErrBackupInUsed)
+			return buserr.New("ErrBackupInUsed")
 		}
 		ids := strings.Split(job.SourceAccountIDs, ",")
 		for _, idItem := range ids {
 			if idItem == fmt.Sprintf("%v", id) {
-				return buserr.New(constant.ErrBackupInUsed)
+				return buserr.New("ErrBackupInUsed")
 			}
 		}
 	}

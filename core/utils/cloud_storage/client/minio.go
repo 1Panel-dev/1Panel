@@ -3,11 +3,12 @@ package client
 import (
 	"context"
 	"crypto/tls"
+	"fmt"
 	"net/http"
 	"os"
 	"strings"
 
-	"github.com/1Panel-dev/1Panel/core/constant"
+	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
@@ -24,7 +25,7 @@ func NewMinIoClient(vars map[string]interface{}) (*minIoClient, error) {
 	bucket := loadParamFromVars("bucket", vars)
 	ssl := strings.Split(endpoint, ":")[0]
 	if len(ssl) == 0 || (ssl != "https" && ssl != "http") {
-		return nil, constant.ErrInvalidParams
+		return nil, buserr.WithErr("ErrInvalidParams", fmt.Errorf("no such proto in ssl: %s", ssl))
 	}
 
 	secure := false

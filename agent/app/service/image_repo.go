@@ -4,10 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
@@ -40,7 +41,7 @@ func (u *ImageRepoService) Page(req dto.SearchWithPage) (int64, interface{}, err
 	for _, op := range ops {
 		var item dto.ImageRepoInfo
 		if err := copier.Copy(&item, &op); err != nil {
-			return 0, nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+			return 0, nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 		}
 		dtoOps = append(dtoOps, item)
 	}
@@ -69,7 +70,7 @@ func (u *ImageRepoService) List() ([]dto.ImageRepoOption, error) {
 		if op.Status == constant.StatusSuccess {
 			var item dto.ImageRepoOption
 			if err := copier.Copy(&item, &op); err != nil {
-				return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+				return nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 			}
 			dtoOps = append(dtoOps, item)
 		}
@@ -79,11 +80,11 @@ func (u *ImageRepoService) List() ([]dto.ImageRepoOption, error) {
 
 func (u *ImageRepoService) Create(req dto.ImageRepoCreate) error {
 	if cmd.CheckIllegal(req.Username, req.Password, req.DownloadUrl) {
-		return buserr.New(constant.ErrCmdIllegal)
+		return buserr.New("ErrCmdIllegal")
 	}
 	imageRepo, _ := imageRepoRepo.Get(repo.WithByName(req.Name))
 	if imageRepo.ID != 0 {
-		return constant.ErrRecordExist
+		return buserr.New("ErrRecordExist")
 	}
 
 	if req.Protocol == "http" {
@@ -124,7 +125,7 @@ func (u *ImageRepoService) Create(req dto.ImageRepoCreate) error {
 	}
 
 	if err := copier.Copy(&imageRepo, &req); err != nil {
-		return errors.WithMessage(constant.ErrStructTransform, err.Error())
+		return buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 	}
 
 	imageRepo.Status = constant.StatusSuccess
@@ -148,7 +149,7 @@ func (u *ImageRepoService) Update(req dto.ImageRepoUpdate) error {
 		return errors.New("The default value cannot be deleted !")
 	}
 	if cmd.CheckIllegal(req.Username, req.Password, req.DownloadUrl) {
-		return buserr.New(constant.ErrCmdIllegal)
+		return buserr.New("ErrCmdIllegal")
 	}
 	repo, err := imageRepoRepo.Get(repo.WithByID(req.ID))
 	if err != nil {

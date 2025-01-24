@@ -1,6 +1,7 @@
 package cloud_storage
 
 import (
+	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/utils/cloud_storage/client"
 )
@@ -38,6 +39,6 @@ func NewCloudStorageClient(backupType string, vars map[string]interface{}) (Clou
 	case constant.GoogleDrive:
 		return client.NewGoogleDriveClient(vars)
 	default:
-		return nil, constant.ErrNotSupportType
+		return nil, buserr.New("ErrNotSupportType")
 	}
 }

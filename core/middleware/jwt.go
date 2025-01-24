@@ -25,7 +25,7 @@ func JwtAuth() gin.HandlerFunc {
 		j := jwtUtils.NewJWT()
 		claims, err := j.ParseToken(token)
 		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrUnauthorized, constant.ErrTypeInternalServer, err)
+			helper.BadAuth(c, "ErrInternalServer", err)
 			return
 		}
 		if claims.BaseClaims.IsAgent {
@@ -35,12 +35,12 @@ func JwtAuth() gin.HandlerFunc {
 				c.Next()
 				return
 			} else {
-				helper.ErrorWithDetail(c, constant.CodeErrUnauthorized, constant.ErrTypeInternalServer, fmt.Errorf("err token from request"))
+				helper.BadAuth(c, "ErrInternalServer", fmt.Errorf("err token from request"))
 				return
 			}
 		}
 		if strings.HasPrefix(c.Request.URL.Path, "/api/v2/agent/") {
-			helper.ErrorWithDetail(c, constant.CodeErrUnauthorized, constant.ErrTypeInternalServer, fmt.Errorf("err token from request"))
+			helper.BadAuth(c, "ErrInternalServer", fmt.Errorf("err token from request"))
 			return
 		}
 		c.Set("claims", claims)

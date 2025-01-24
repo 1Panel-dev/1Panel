@@ -25,9 +25,8 @@ func NewILogService() ILogService {
 }
 
 func (u *LogService) ListSystemLogFile() ([]string, error) {
-	logDir := path.Join(global.CONF.System.BaseDir, "1panel/log")
 	var files []string
-	if err := filepath.Walk(logDir, func(pathItem string, info os.FileInfo, err error) error {
+	if err := filepath.Walk(global.Dir.LogDir, func(pathItem string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -63,9 +62,9 @@ func (u *LogService) LoadSystemLog(name string) (string, error) {
 	} else {
 		name = "1Panel-" + name + ".log"
 	}
-	filePath := path.Join(global.CONF.System.DataDir, "log", name)
+	filePath := path.Join(global.Dir.LogDir, name)
 	if _, err := os.Stat(filePath); err != nil {
-		fileGzPath := path.Join(global.CONF.System.DataDir, "log", name+".gz")
+		fileGzPath := path.Join(global.Dir.LogDir, name+".gz")
 		if _, err := os.Stat(fileGzPath); err != nil {
 			return "", buserr.New("ErrHttpReqNotFound")
 		}

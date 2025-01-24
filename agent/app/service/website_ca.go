@@ -10,8 +10,6 @@ import (
 	"crypto/x509/pkix"
 	"encoding/pem"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
-	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"log"
 	"math/big"
 	"net"
@@ -19,6 +17,9 @@ import (
 	"path"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/utils/common"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
@@ -65,7 +66,7 @@ func (w WebsiteCAService) Page(search request.WebsiteCASearch) (int64, []respons
 
 func (w WebsiteCAService) Create(create request.WebsiteCACreate) (*request.WebsiteCACreate, error) {
 	if exist, _ := websiteCARepo.GetFirst(repo.WithByName(create.Name)); exist.ID > 0 {
-		return nil, buserr.New(constant.ErrNameIsExist)
+		return nil, buserr.New("ErrNameIsExist")
 	}
 
 	ca := &model.WebsiteCA{
@@ -212,7 +213,7 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) (*model.Website
 		}
 		if req.PushDir {
 			if !files.NewFileOp().Stat(req.Dir) {
-				return nil, buserr.New(constant.ErrLinkPathNotFound)
+				return nil, buserr.New("ErrLinkPathNotFound")
 			}
 			websiteSSL.Dir = req.Dir
 		}
@@ -366,13 +367,13 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) (*model.Website
 		}
 	}
 
-	logFile, _ := os.OpenFile(path.Join(constant.SSLLogDir, fmt.Sprintf("%s-ssl-%d.log", websiteSSL.PrimaryDomain, websiteSSL.ID)), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, constant.FilePerm)
+	logFile, _ := os.OpenFile(path.Join(global.Dir.SSLLogDir, fmt.Sprintf("%s-ssl-%d.log", websiteSSL.PrimaryDomain, websiteSSL.ID)), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, constant.FilePerm)
 	defer logFile.Close()
 	logger := log.New(logFile, "", log.LstdFlags)
 	logger.Println(i18n.GetMsgWithMap("ApplySSLSuccess", map[string]interface{}{"domain": strings.Join(domains, ",")}))
 	saveCertificateFile(websiteSSL, logger)
 	if websiteSSL.ExecShell {
-		workDir := constant.DataDir
+		workDir := global.Dir.DataDir
 		if websiteSSL.PushDir {
 			workDir = websiteSSL.Dir
 		}
@@ -425,7 +426,7 @@ func (w WebsiteCAService) DownloadFile(id uint) (*os.File, error) {
 		return nil, err
 	}
 	fileOp := files.NewFileOp()
-	dir := path.Join(global.CONF.System.BaseDir, "1panel/tmp/ssl", ca.Name)
+	dir := path.Join(global.Dir.DataDir, "tmp/ssl", ca.Name)
 	if fileOp.Stat(dir) {
 		if err = fileOp.DeleteDir(dir); err != nil {
 			return nil, err

@@ -8,7 +8,7 @@ import (
 )
 
 func Init() {
-	global.DB = common.LoadDBConnByPath(path.Join(global.CONF.System.DbPath, "agent.db"), "agent")
-	global.TaskDB = common.LoadDBConnByPath(path.Join(global.CONF.System.DbPath, "task.db"), "task")
-	global.MonitorDB = common.LoadDBConnByPath(path.Join(global.CONF.System.DbPath, "monitor.db"), "monitor")
+	global.DB = common.LoadDBConnByPath(path.Join(global.Dir.DbDir, "agent.db"), "agent")
+	global.TaskDB = common.LoadDBConnByPath(path.Join(global.Dir.DbDir, "task.db"), "task")
+	global.MonitorDB = common.LoadDBConnByPath(path.Join(global.Dir.DbDir, "monitor.db"), "monitor")
 }

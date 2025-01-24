@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
-	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
@@ -28,7 +28,7 @@ func NewISettingService() ISettingService {
 func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {
 	setting, err := settingRepo.GetList()
 	if err != nil {
-		return nil, constant.ErrRecordNotFound
+		return nil, buserr.New("ErrRecordNotFound")
 	}
 	settingMap := make(map[string]string)
 	for _, set := range setting {
@@ -92,11 +92,12 @@ func (u *SettingService) ReloadConn() error {
 		return nil
 	}
 
-	global.CONF.System.BaseDir = nodeInfo.BaseDir
-	global.CONF.System.Version = nodeInfo.Version
-	global.CONF.System.Port = fmt.Sprintf("%v", nodeInfo.NodePort)
-	if global.CONF.System.Port == "0" {
-		global.CONF.System.Port = "9999"
+	global.Dir.BaseDir = nodeInfo.BaseDir
+	global.CONF.Base.Version = nodeInfo.Version
+	global.CONF.Base.Port = fmt.Sprintf("%v", nodeInfo.NodePort)
+	global.CONF.Base.InstallDir = nodeInfo.BaseDir
+	if global.CONF.Base.Port == "0" {
+		global.CONF.Base.Port = "9999"
 	}
 	global.IsMaster = nodeInfo.Scope == "master"
 	return nil

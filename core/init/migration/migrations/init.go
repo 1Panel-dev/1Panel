@@ -34,13 +34,13 @@ var InitSetting = &gormigrate.Migration{
 	ID: "20200908-add-table-setting",
 	Migrate: func(tx *gorm.DB) error {
 		encryptKey := common.RandStr(16)
-		if err := tx.Create(&model.Setting{Key: "UserName", Value: global.CONF.System.Username}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "UserName", Value: global.CONF.Base.Username}).Error; err != nil {
 			return err
 		}
-		global.CONF.System.EncryptKey = encryptKey
-		pass, _ := encrypt.StringEncrypt(global.CONF.System.Password)
+		global.CONF.Base.EncryptKey = encryptKey
+		pass, _ := encrypt.StringEncrypt(global.CONF.Base.Password)
 		language := "en"
-		if global.CONF.System.Language == "zh" {
+		if global.CONF.Base.Language == "zh" {
 			language = "zh"
 		}
 		if err := tx.Create(&model.Setting{Key: "Password", Value: pass}).Error; err != nil {
@@ -98,10 +98,10 @@ var InitSetting = &gormigrate.Migration{
 			return err
 		}
 
-		if err := tx.Create(&model.Setting{Key: "ServerPort", Value: global.CONF.System.Port}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "ServerPort", Value: global.CONF.Conn.Port}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "SecurityEntrance", Value: global.CONF.System.Entrance}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "SecurityEntrance", Value: global.CONF.Conn.Entrance}).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "JWTSigningKey", Value: common.RandStr(16)}).Error; err != nil {
@@ -125,7 +125,7 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "MFASecret", Value: ""}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "SystemVersion", Value: global.CONF.System.Version}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "SystemVersion", Value: global.CONF.Base.Version}).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "SystemStatus", Value: "Free"}).Error; err != nil {
@@ -203,7 +203,7 @@ var InitOneDrive = &gormigrate.Migration{
 		if err := tx.Create(&model.BackupAccount{
 			Name: "localhost",
 			Type: "LOCAL",
-			Vars: fmt.Sprintf("{\"dir\":\"%s\"}", path.Join(global.CONF.System.BaseDir, "1panel/backup")),
+			Vars: fmt.Sprintf("{\"dir\":\"%s\"}", path.Join(global.CONF.Base.InstallDir, "1panel/backup")),
 		}).Error; err != nil {
 			return err
 		}

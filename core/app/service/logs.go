@@ -1,9 +1,6 @@
 package service
 
 import (
-	"github.com/1Panel-dev/1Panel/core/utils/common"
-	geo2 "github.com/1Panel-dev/1Panel/core/utils/geo"
-	"github.com/gin-gonic/gin"
 	"os"
 	"path"
 	"path/filepath"
@@ -11,14 +8,17 @@ import (
 	"strings"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/core/buserr"
+	"github.com/1Panel-dev/1Panel/core/utils/common"
+	geo2 "github.com/1Panel-dev/1Panel/core/utils/geo"
+	"github.com/gin-gonic/gin"
+
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/model"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
-	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/cmd"
 	"github.com/jinzhu/copier"
-	"github.com/pkg/errors"
 )
 
 type LogService struct{}
@@ -45,7 +45,7 @@ func (u *LogService) CreateLoginLog(operation model.LoginLog) error {
 }
 
 func (u *LogService) ListSystemLogFile() ([]string, error) {
-	logDir := path.Join(global.CONF.System.BaseDir, "1panel/log")
+	logDir := path.Join(global.CONF.Base.InstallDir, "1panel/log")
 	var files []string
 	if err := filepath.Walk(logDir, func(pathItem string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -97,7 +97,7 @@ func (u *LogService) PageLoginLog(ctx *gin.Context, req dto.SearchLgLogWithPage)
 	for _, op := range ops {
 		var item dto.LoginLog
 		if err := copier.Copy(&item, &op); err != nil {
-			return 0, nil, errors.WithMessage(constant.ErrTransform, err.Error())
+			return 0, nil, buserr.WithErr("ErrTransform", err)
 		}
 		if geoDB != nil {
 			item.Address, _ = geo2.GetIPLocation(geoDB, item.IP, common.GetLang(ctx))
@@ -132,7 +132,7 @@ func (u *LogService) PageOperationLog(req dto.SearchOpLogWithPage) (int64, inter
 	for _, op := range ops {
 		var item dto.OperationLog
 		if err := copier.Copy(&item, &op); err != nil {
-			return 0, nil, errors.WithMessage(constant.ErrTransform, err.Error())
+			return 0, nil, buserr.WithErr("ErrTransform", err)
 		}
 		dtoOps = append(dtoOps, item)
 	}

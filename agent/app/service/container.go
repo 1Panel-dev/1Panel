@@ -317,7 +317,7 @@ func (u *ContainerService) ContainerListStats() ([]dto.ContainerListStats, error
 
 func (u *ContainerService) ContainerCreateByCommand(req dto.ContainerCreateByCommand) error {
 	if cmd.CheckIllegal(req.Command) {
-		return buserr.New(constant.ErrCmdIllegal)
+		return buserr.New("ErrCmdIllegal")
 	}
 	if !strings.HasPrefix(strings.TrimSpace(req.Command), "docker run ") {
 		return errors.New("error command format")
@@ -343,7 +343,7 @@ func (u *ContainerService) ContainerCreateByCommand(req dto.ContainerCreateByCom
 	}
 	go func() {
 		taskItem.AddSubTask(i18n.GetWithName("ContainerCreate", containerName), func(t *task.Task) error {
-			logPath := path.Join(constant.LogDir, task.TaskScopeContainer, req.TaskID+".log")
+			logPath := path.Join(global.Dir.LogDir, task.TaskScopeContainer, req.TaskID+".log")
 			return cmd.ExecShell(logPath, 5*time.Minute, "bash", "-c", req.Command)
 		}, nil)
 		_ = taskItem.Execute()
@@ -466,7 +466,7 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerOperate) error {
 	ctx := context.Background()
 	newContainer, _ := client.ContainerInspect(ctx, req.Name)
 	if newContainer.ContainerJSONBase != nil {
-		return buserr.New(constant.ErrContainerName)
+		return buserr.New("ErrContainerName")
 	}
 
 	taskItem, err := task.NewTaskWithOps(req.Name, task.TaskCreate, task.TaskScopeContainer, req.TaskID, 1)
@@ -605,7 +605,7 @@ func (u *ContainerService) ContainerUpdate(req dto.ContainerOperate) error {
 	ctx := context.Background()
 	newContainer, _ := client.ContainerInspect(ctx, req.Name)
 	if newContainer.ContainerJSONBase != nil && newContainer.ID != req.ContainerID {
-		return buserr.New(constant.ErrContainerName)
+		return buserr.New("ErrContainerName")
 	}
 
 	oldContainer, err := client.ContainerInspect(ctx, req.ContainerID)
@@ -702,7 +702,7 @@ func (u *ContainerService) ContainerRename(req dto.ContainerRename) error {
 
 	newContainer, _ := client.ContainerInspect(ctx, req.NewName)
 	if newContainer.ContainerJSONBase != nil {
-		return buserr.New(constant.ErrContainerName)
+		return buserr.New("ErrContainerName")
 	}
 	return client.ContainerRename(ctx, req.Name, req.NewName)
 }
@@ -890,7 +890,7 @@ func collectLogs(params dto.StreamLog, messageChan chan<- string, errorChan chan
 
 func (u *ContainerService) DownloadContainerLogs(containerType, container, since, tail string, c *gin.Context) error {
 	if cmd.CheckIllegal(container, since, tail) {
-		return buserr.New(constant.ErrCmdIllegal)
+		return buserr.New("ErrCmdIllegal")
 	}
 	commandName := "docker"
 	commandArg := []string{"logs", container}
@@ -1192,17 +1192,17 @@ func checkPortStats(ports []dto.PortHelper) (nat.PortMap, error) {
 	for _, port := range ports {
 		if strings.Contains(port.ContainerPort, "-") {
 			if !strings.Contains(port.HostPort, "-") {
-				return portMap, buserr.New(constant.ErrPortRules)
+				return portMap, buserr.New("ErrPortRules")
 			}
 			hostStart, _ := strconv.Atoi(strings.Split(port.HostPort, "-")[0])
 			hostEnd, _ := strconv.Atoi(strings.Split(port.HostPort, "-")[1])
 			containerStart, _ := strconv.Atoi(strings.Split(port.ContainerPort, "-")[0])
 			containerEnd, _ := strconv.Atoi(strings.Split(port.ContainerPort, "-")[1])
 			if (hostEnd-hostStart) <= 0 || (containerEnd-containerStart) <= 0 {
-				return portMap, buserr.New(constant.ErrPortRules)
+				return portMap, buserr.New("ErrPortRules")
 			}
 			if (containerEnd - containerStart) != (hostEnd - hostStart) {
-				return portMap, buserr.New(constant.ErrPortRules)
+				return portMap, buserr.New("ErrPortRules")
 			}
 			for i := 0; i <= hostEnd-hostStart; i++ {
 				bindItem := nat.PortBinding{HostPort: strconv.Itoa(hostStart + i), HostIP: port.HostIP}
@@ -1210,7 +1210,7 @@ func checkPortStats(ports []dto.PortHelper) (nat.PortMap, error) {
 			}
 			for i := hostStart; i <= hostEnd; i++ {
 				if common.ScanPort(i) {
-					return portMap, buserr.WithDetail(constant.ErrPortInUsed, i, nil)
+					return portMap, buserr.WithDetail("ErrPortInUsed", i, nil)
 				}
 			}
 		} else {
@@ -1221,7 +1221,7 @@ func checkPortStats(ports []dto.PortHelper) (nat.PortMap, error) {
 				portItem, _ = strconv.Atoi(port.HostPort)
 			}
 			if common.ScanPort(portItem) {
-				return portMap, buserr.WithDetail(constant.ErrPortInUsed, portItem, nil)
+				return portMap, buserr.WithDetail("ErrPortInUsed", portItem, nil)
 			}
 			bindItem := nat.PortBinding{HostPort: strconv.Itoa(portItem), HostIP: port.HostIP}
 			portMap[nat.Port(fmt.Sprintf("%s/%s", port.ContainerPort, port.Protocol))] = []nat.PortBinding{bindItem}

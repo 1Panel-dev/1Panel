@@ -314,7 +314,7 @@ func (b *BaseApi) UploadFiles(c *gin.Context) {
 	}
 
 	if len(paths) == 0 || !strings.Contains(paths[0], "/") {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error paths in request"))
+		helper.BadRequest(c, errors.New("error paths in request"))
 		return
 	}
 	dir := path.Dir(paths[0])
@@ -327,7 +327,7 @@ func (b *BaseApi) UploadFiles(c *gin.Context) {
 			return
 		}
 		if err = os.MkdirAll(dir, mode); err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, fmt.Errorf("mkdir %s failed, err: %v", dir, err))
+			helper.BadRequest(c, fmt.Errorf("mkdir %s failed, err: %v", dir, err))
 			return
 		}
 	}
@@ -390,7 +390,7 @@ func (b *BaseApi) UploadFiles(c *gin.Context) {
 		success++
 	}
 	if success == 0 {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, failures)
+		helper.InternalServer(c, failures)
 	} else {
 		helper.SuccessWithMsg(c, fmt.Sprintf("%d files upload success", success))
 	}
@@ -518,7 +518,7 @@ func (b *BaseApi) DownloadChunkFiles(c *gin.Context) {
 	}
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(req.Path) {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrPathNotFound, nil)
+		helper.ErrorWithDetail(c, http.StatusInternalServerError, "ErrPathNotFound", nil)
 		return
 	}
 	filePath := req.Path
@@ -533,7 +533,7 @@ func (b *BaseApi) DownloadChunkFiles(c *gin.Context) {
 		return
 	}
 	if info.IsDir() {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrFileDownloadDir, err)
+		helper.ErrorWithDetail(c, http.StatusInternalServerError, "ErrFileDownloadDir", err)
 		return
 	}
 
@@ -679,7 +679,7 @@ func (b *BaseApi) UploadChunkFiles(c *gin.Context) {
 		return
 	}
 	fileOp := files.NewFileOp()
-	tmpDir := path.Join(global.CONF.System.TmpDir, "upload")
+	tmpDir := path.Join(global.Dir.TmpDir, "upload")
 	if !fileOp.Stat(tmpDir) {
 		if err := fileOp.CreateDir(tmpDir, constant.DirPerm); err != nil {
 			helper.BadRequest(c, err)
@@ -715,14 +715,14 @@ func (b *BaseApi) UploadChunkFiles(c *gin.Context) {
 
 	chunkData, err = io.ReadAll(uploadFile)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, buserr.WithMap(constant.ErrFileUpload, map[string]interface{}{"name": filename, "detail": err.Error()}, err))
+		helper.InternalServer(c, buserr.WithMap("ErrFileUpload", map[string]interface{}{"name": filename, "detail": err.Error()}, err))
 		return
 	}
 
 	chunkPath := filepath.Join(fileDir, fmt.Sprintf("%s.%d", filename, chunkIndex))
 	err = os.WriteFile(chunkPath, chunkData, constant.DirPerm)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, buserr.WithMap(constant.ErrFileUpload, map[string]interface{}{"name": filename, "detail": err.Error()}, err))
+		helper.InternalServer(c, buserr.WithMap("ErrFileUpload", map[string]interface{}{"name": filename, "detail": err.Error()}, err))
 		return
 	}
 
@@ -733,7 +733,7 @@ func (b *BaseApi) UploadChunkFiles(c *gin.Context) {
 		}
 		err = mergeChunks(filename, fileDir, c.PostForm("path"), chunkCount, overwrite)
 		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, buserr.WithMap(constant.ErrFileUpload, map[string]interface{}{"name": filename, "detail": err.Error()}, err))
+			helper.InternalServer(c, buserr.WithMap("ErrFileUpload", map[string]interface{}{"name": filename, "detail": err.Error()}, err))
 			return
 		}
 		helper.SuccessWithData(c, true)

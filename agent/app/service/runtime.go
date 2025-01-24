@@ -5,9 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/task"
-	"github.com/1Panel-dev/1Panel/agent/cmd/server/nginx_conf"
-	"gopkg.in/ini.v1"
 	"os"
 	"path"
 	"path/filepath"
@@ -16,6 +13,10 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/app/task"
+	"github.com/1Panel-dev/1Panel/agent/cmd/server/nginx_conf"
+	"gopkg.in/ini.v1"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
@@ -82,11 +83,11 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, e
 	}
 	exist, _ := runtimeRepo.GetFirst(opts...)
 	if exist != nil {
-		return nil, buserr.New(constant.ErrNameIsExist)
+		return nil, buserr.New("ErrNameIsExist")
 	}
 	fileOp := files.NewFileOp()
 
-	runtimeDir := path.Join(constant.RuntimeDir, create.Type)
+	runtimeDir := path.Join(global.Dir.RuntimeDir, create.Type)
 	if !fileOp.Stat(runtimeDir) {
 		if err := fileOp.CreateDir(runtimeDir, constant.DirPerm); err != nil {
 			return nil, err
@@ -107,11 +108,11 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, e
 		}
 		exist, _ = runtimeRepo.GetFirst(runtimeRepo.WithImage(create.Image))
 		if exist != nil {
-			return nil, buserr.New(constant.ErrImageExist)
+			return nil, buserr.New("ErrImageExist")
 		}
 	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo, constant.RuntimePython, constant.RuntimeDotNet:
 		if !fileOp.Stat(create.CodeDir) {
-			return nil, buserr.New(constant.ErrPathNotFound)
+			return nil, buserr.New("ErrPathNotFound")
 		}
 		create.Install = true
 		for _, export := range create.ExposedPorts {
@@ -229,7 +230,7 @@ func (r *RuntimeService) Delete(runtimeDelete request.RuntimeDelete) error {
 	}
 	website, _ := websiteRepo.GetFirst(websiteRepo.WithRuntimeID(runtimeDelete.ID))
 	if website.ID > 0 {
-		return buserr.New(constant.ErrDelWithWebsite)
+		return buserr.New("ErrDelWithWebsite")
 	}
 	if runtime.Resource != constant.ResourceAppstore {
 		return runtimeRepo.DeleteBy(repo.WithByID(runtimeDelete.ID))
@@ -441,7 +442,7 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 	case constant.RuntimePHP:
 		exist, _ := runtimeRepo.GetFirst(runtimeRepo.WithImage(req.Name), runtimeRepo.WithNotId(req.ID))
 		if exist != nil {
-			return buserr.New(constant.ErrImageExist)
+			return buserr.New("ErrImageExist")
 		}
 	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo, constant.RuntimePython, constant.RuntimeDotNet:
 		if runtime.Port != port {
@@ -465,7 +466,7 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 			return err
 		}
 		fileOp := files.NewFileOp()
-		appVersionDir := path.Join(constant.AppResourceDir, app.Resource, app.Key, appDetail.Version)
+		appVersionDir := path.Join(global.Dir.AppResourceDir, app.Resource, app.Key, appDetail.Version)
 		if !fileOp.Stat(appVersionDir) || appDetail.Update {
 			if err := downloadApp(app, appDetail, nil, nil); err != nil {
 				return err
@@ -481,7 +482,7 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 		}
 	}
 
-	projectDir := path.Join(constant.RuntimeDir, runtime.Type, runtime.Name)
+	projectDir := path.Join(global.Dir.RuntimeDir, runtime.Type, runtime.Name)
 	create := request.RuntimeCreate{
 		Image:   req.Image,
 		Type:    runtime.Type,
@@ -532,10 +533,10 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 func (r *RuntimeService) GetNodePackageRunScript(req request.NodePackageReq) ([]response.PackageScripts, error) {
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(req.CodeDir) {
-		return nil, buserr.New(constant.ErrPathNotFound)
+		return nil, buserr.New("ErrPathNotFound")
 	}
 	if !fileOp.Stat(path.Join(req.CodeDir, "package.json")) {
-		return nil, buserr.New(constant.ErrPackageJsonNotFound)
+		return nil, buserr.New("ErrPackageJsonNotFound")
 	}
 	content, err := fileOp.GetContent(path.Join(req.CodeDir, "package.json"))
 	if err != nil {
@@ -548,7 +549,7 @@ func (r *RuntimeService) GetNodePackageRunScript(req request.NodePackageReq) ([]
 	}
 	scripts, ok := packageMap["scripts"]
 	if !ok {
-		return nil, buserr.New(constant.ErrScriptsNotFound)
+		return nil, buserr.New("ErrScriptsNotFound")
 	}
 	var packageScripts []response.PackageScripts
 	for k, v := range scripts.(map[string]interface{}) {
@@ -1050,7 +1051,7 @@ func (r *RuntimeService) GetSupervisorProcess(id uint) ([]response.SupervisorPro
 	if err != nil {
 		return nil, err
 	}
-	configDir := path.Join(constant.RuntimeDir, "php", runtime.Name, "supervisor", "supervisor.d")
+	configDir := path.Join(global.Dir.RuntimeDir, "php", runtime.Name, "supervisor", "supervisor.d")
 	return handleProcessConfig(configDir, runtime.ContainerName)
 }
 
@@ -1059,7 +1060,7 @@ func (r *RuntimeService) OperateSupervisorProcess(req request.PHPSupervisorProce
 	if err != nil {
 		return err
 	}
-	configDir := path.Join(constant.RuntimeDir, "php", runtime.Name, "supervisor")
+	configDir := path.Join(global.Dir.RuntimeDir, "php", runtime.Name, "supervisor")
 	return handleProcess(configDir, req.SupervisorProcessConfig, runtime.ContainerName)
 }
 
@@ -1068,7 +1069,7 @@ func (r *RuntimeService) OperateSupervisorProcessFile(req request.PHPSupervisorP
 	if err != nil {
 		return "", err
 	}
-	supervisorDir := path.Join(constant.RuntimeDir, "php", runtime.Name, "supervisor")
+	supervisorDir := path.Join(global.Dir.RuntimeDir, "php", runtime.Name, "supervisor")
 	configDir := path.Join(supervisorDir, "supervisor.d")
 	logFile := path.Join(supervisorDir, "log", fmt.Sprintf("%s.out.log", req.SupervisorProcessFileReq.Name))
 	return handleSupervisorFile(req.SupervisorProcessFileReq, configDir, runtime.ContainerName, logFile)

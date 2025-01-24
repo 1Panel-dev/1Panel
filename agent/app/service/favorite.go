@@ -7,7 +7,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/spf13/afero"
 )
@@ -42,11 +41,11 @@ func (f *FavoriteService) Page(req dto.PageInfo) (int64, []response.FavoriteDTO,
 func (f *FavoriteService) Create(req request.FavoriteCreate) (*model.Favorite, error) {
 	exist, _ := favoriteRepo.GetFirst(favoriteRepo.WithByPath(req.Path))
 	if exist.ID > 0 {
-		return nil, buserr.New(constant.ErrFavoriteExist)
+		return nil, buserr.New("ErrFavoriteExist")
 	}
 	op := files.NewFileOp()
 	if !op.Stat(req.Path) {
-		return nil, buserr.New(constant.ErrLinkPathNotFound)
+		return nil, buserr.New("ErrLinkPathNotFound")
 	}
 	openFile, err := op.OpenFile(req.Path)
 	if err != nil {
