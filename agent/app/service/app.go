@@ -351,7 +351,7 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 			return
 		}
 	}
-	if app.Key == "openresty" && app.Resource == "remote" && common.CompareVersion(appDetail.Version, "1.21.4.3-3-3") {
+	if app.Key == "openresty" && app.Resource == "remote" && common.CompareVersion(appDetail.Version, "1.27") {
 		if dir, ok := req.Params["WEBSITE_DIR"]; ok {
 			siteDir := dir.(string)
 			if siteDir == "" || !strings.HasPrefix(siteDir, "/") {
@@ -365,6 +365,7 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 			}
 			if !fileOp.Stat(siteDir) {
 				_ = fileOp.CreateDir(siteDir, constant.DirPerm)
+				_ = fileOp.CreateDir(path.Join(siteDir, "conf.d"), constant.DirPerm)
 			}
 			err = settingRepo.UpdateOrCreate("WEBSITE_DIR", siteDir)
 			if err != nil {
@@ -377,15 +378,15 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 			continue
 		}
 		var port int
-		if port, err = checkPort(key, req.Params); err == nil {
-			if key == "PANEL_APP_PORT_HTTP" {
-				httpPort = port
-			}
-			if key == "PANEL_APP_PORT_HTTPS" {
-				httpsPort = port
-			}
-		} else {
+		port, err = checkPort(key, req.Params)
+		if err != nil {
 			return
+		}
+		if key == "PANEL_APP_PORT_HTTP" {
+			httpPort = port
+		}
+		if key == "PANEL_APP_PORT_HTTPS" {
+			httpsPort = port
 		}
 	}
 
@@ -919,11 +920,11 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 			appTags   []*model.AppTag
 			oldAppIds []uint
 		)
-		for _, t := range list.Extra.Tags {
+		for _, tag := range list.Extra.Tags {
 			tags = append(tags, &model.Tag{
-				Key:  t.Key,
-				Name: t.Name,
-				Sort: t.Sort,
+				Key:  tag.Key,
+				Name: tag.Name,
+				Sort: tag.Sort,
 			})
 		}
 		deleteCustomApp()

@@ -97,10 +97,10 @@
                     >
                         <el-select v-model="runtime.source" filterable default-first-option>
                             <el-option
-                                v-for="service in formFields['CONTAINER_PACKAGE_URL'].values"
-                                :key="service.label"
-                                :value="service.value"
-                                :label="service.label"
+                                v-for="source in phpSources"
+                                :key="source.label"
+                                :value="source.value"
+                                :label="source.label + ' [' + source.value + ']'"
                             ></el-option>
                         </el-select>
                     </el-form-item>
@@ -216,41 +216,41 @@ const phpSources = globalStore.isIntl
     ? [
           {
               label: i18n.global.t('runtime.default'),
-              value: 'dl-cdn.alpinelinux.org',
+              value: 'https://dl-cdn.alpinelinux.org',
           },
           {
               label: i18n.global.t('runtime.xtom'),
-              value: 'mirrors.xtom.com',
+              value: 'https://mirrors.xtom.com',
           },
       ]
     : [
           {
               label: i18n.global.t('runtime.ustc'),
-              value: 'mirrors.ustc.edu.cn',
+              value: 'https://mirrors.ustc.edu.cn',
           },
           {
               label: i18n.global.t('runtime.netease'),
-              value: 'mirrors.163.com',
+              value: 'https://mirrors.163.com',
           },
           {
               label: i18n.global.t('runtime.aliyun'),
-              value: 'mirrors.aliyun.com',
+              value: 'https://mirrors.aliyun.com',
           },
           {
               label: i18n.global.t('runtime.tsinghua'),
-              value: 'mirrors.tuna.tsinghua.edu.cn',
+              value: 'https://mirrors.tuna.tsinghua.edu.cn',
           },
           {
               label: i18n.global.t('runtime.xtomhk'),
-              value: 'mirrors.xtom.com.hk',
+              value: 'https://mirrors.xtom.com.hk',
           },
           {
               label: i18n.global.t('runtime.xtom'),
-              value: 'mirrors.xtom.com',
+              value: 'https://mirrors.xtom.com',
           },
           {
-              label: i18n.global.t('runtime.default'),
-              value: 'dl-cdn.alpinelinux.org',
+              label: i18n.global.t('commons.table.default'),
+              value: 'https://dl-cdn.alpinelinux.org',
           },
       ];
 
@@ -476,8 +476,8 @@ const acceptParams = async (props: OperateRrops) => {
         getRuntime(props.id);
     }
     extensions.value = '';
-    listPHPExtensions();
     open.value = true;
+    listPHPExtensions();
 };
 
 defineExpose({

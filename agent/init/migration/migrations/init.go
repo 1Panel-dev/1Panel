@@ -207,7 +207,7 @@ var InitDefaultCA = &gormigrate.Migration{
 var InitPHPExtensions = &gormigrate.Migration{
 	ID: "20240722-add-php-extensions",
 	Migrate: func(tx *gorm.DB) error {
-		if err := tx.Create(&model.PHPExtensions{Name: "Default", Extensions: "bcmath,gd,gettext,intl,pcntl,shmop,soap,sockets,sysvsem,xmlrpc,zip"}).Error; err != nil {
+		if err := tx.Create(&model.PHPExtensions{Name: "Default", Extensions: "bcmath,ftp,gd,gettext,intl,mysqli,pcntl,pdo_mysql,shmop,soap,sockets,sysvsem,xmlrpc,zip"}).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.PHPExtensions{Name: "WordPress", Extensions: "exif,igbinary,imagick,intl,zip,apcu,memcached,opcache,redis,bc,image,shmop,mysqli,pdo_mysql,gd"}).Error; err != nil {

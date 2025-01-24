@@ -72,7 +72,6 @@ var WebUrlMap = map[string]struct{}{
 	"/hosts/files":            {},
 	"/hosts/monitor/monitor":  {},
 	"/hosts/monitor/setting":  {},
-	"/hosts/terminal":         {},
 	"/hosts/firewall/port":    {},
 	"/hosts/firewall/forward": {},
 	"/hosts/firewall/ip":      {},
@@ -81,6 +80,8 @@ var WebUrlMap = map[string]struct{}{
 	"/hosts/ssh/ssh":          {},
 	"/hosts/ssh/log":          {},
 	"/hosts/ssh/session":      {},
+
+	"/terminal": {},
 
 	"/logs":           {},
 	"/logs/operation": {},
