@@ -99,13 +99,13 @@ func handleGetWithTransport(url string, transport *http.Transport) (*http.Respon
 			return nil, buserr.WithMap("ErrHttpReqTimeOut", map[string]interface{}{"err": err.Error()}, err)
 		} else {
 			if strings.Contains(err.Error(), "no such host") {
-				return nil, buserr.New("ErrNoSuchHost")
+				return nil, buserr.WithErr("ErrNoSuchHost", errors.New("no such host"))
 			}
 			return nil, buserr.WithMap("ErrHttpReqFailed", map[string]interface{}{"err": err.Error()}, err)
 		}
 	}
 	if resp.StatusCode == 404 {
-		return nil, buserr.New("ErrHttpReqNotFound")
+		return nil, buserr.WithErr("ErrHttpReqNotFound", errors.New("no such resource"))
 	}
 
 	return resp, nil

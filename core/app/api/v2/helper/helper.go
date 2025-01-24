@@ -14,6 +14,10 @@ func ErrorWithDetail(ctx *gin.Context, code int, msgKey string, err error) {
 		Code:    code,
 		Message: "",
 	}
+	if msgKey == "ErrCaptchaCode" || msgKey == "ErrAuth" {
+		res.Code = 406
+		res.Message = msgKey
+	}
 	res.Message = i18n.GetMsgWithMap(msgKey, map[string]interface{}{"detail": err})
 	ctx.JSON(http.StatusOK, res)
 	ctx.Abort()

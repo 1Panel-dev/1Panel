@@ -15,6 +15,13 @@ ErrApiConfigIPInvalid: "调用 API 接口 IP 不在白名单: {{ .detail }}"
 ErrApiConfigDisable: "此接口禁止使用 API 接口调用: {{ .detail }}"
 ErrApiConfigKeyTimeInvalid: "API 接口时间戳错误: {{ .detail }}"
 
+#request
+ErrNoSuchHost: "无法找到请求的服务器 {{ .err }}"
+ErrHttpReqNotFound: "无法找到请求的资源 {{ .err }}"
+ErrHttpReqFailed: "请求失败 {{ .err }}"
+ErrHttpReqTimeOut: "请求超时 {{ .err }}"
+ErrCreateHttpClient: "创建请求失败 {{ .err }}"
+
 #common
 ErrDemoEnvironment: "演示服务器，禁止此操作!"
 ErrCmdTimeout: "命令执行超时！"
@@ -22,6 +29,9 @@ ErrEntrance: "安全入口信息错误，请检查后重试！"
 ErrGroupIsDefault: "默认分组，无法删除"
 ErrLocalDelete: "无法删除本地节点！"
 ErrPortInUsed: "{{ .name }} 端口已被占用！"
+
+#app 
+CustomAppStoreFileValid: "应用商店包需要 .tar.gz 格式"
 
 #backup
 ErrBackupInUsed: "该备份账号已在计划任务中使用，无法删除"
@@ -61,19 +71,10 @@ TaskRetry: "开始第 {{ .name }} 次重试"
 SubTaskSuccess: "{{ .name }} 成功"
 SubTaskFailed: "{{ .name }} 失败: {{ .err }}"
 TaskInstall: "安装"
-TaskUninstall: "卸载"
-TaskCreate: "创建"
-TaskDelete: "删除"
 TaskUpgrade: "升级"
-TaskUpdate: "更新"
-TaskRestart: "重启"
-TaskRollback: "回滚"
 SuccessStatus: "{{ .name }} 成功" 
 FailedStatus: "{{ .name }} 失败 {{.err}}"
-PullImage: "拉取镜像"
 Start: "开始"
-Run: "启动"
-Stop: "停止"
 SubTask: "子任务"
 
 #upgrade node

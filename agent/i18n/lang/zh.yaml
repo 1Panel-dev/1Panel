@@ -32,7 +32,7 @@ SystemRestart: "系统重启导致任务中断"
 
 #backup
 ErrBackupInUsed: "该备份账号已在计划任务中使用，无法删除"
-ErrBackupCheck: "备份账号测试连接失败 {{ .err}}"
+ErrBackupCheck: "备份账号测试连接失败 {{ .err }}"
 ErrBackupLocalDelete: "暂不支持删除本地服务器备份账号"
 ErrBackupLocalCreate: "暂不支持创建本地服务器备份账号"
 
@@ -50,23 +50,23 @@ ErrFileParse: '应用 docker-compose 文件解析失败!'
 ErrInstallDirNotFound: '安装目录不存在，如需卸载，请选择强制卸载'
 AppStoreIsUpToDate: '应用商店已经是最新版本'
 LocalAppVersionNull: '{{.name}} 应用未同步到版本！无法添加到应用列表'
-LocalAppVersionErr: '{{.name}} 同步版本 {{.version}} 失败！{{.err}}'
+LocalAppVersionErr: '{{.name}} 同步版本 {{.version}} 失败！{{ .err }}'
 ErrFileNotFound: '{{.name}} 文件不存在'
-ErrFileParseApp: '{{.name}} 文件解析失败 {{.err}}'
+ErrFileParseApp: '{{.name}} 文件解析失败 {{ .err }}'
 ErrAppDirNull: '版本文件夹不存在'
-LocalAppErr: "应用 {{.name}} 同步失败！{{.err}}"
+LocalAppErr: "应用 {{.name}} 同步失败！{{ .err }}"
 ErrContainerName: "容器名称已存在"
 ErrAppSystemRestart: "1Panel 重启导致任务终止"
-ErrCreateHttpClient: "创建HTTP请求失败 {{.err}}"
-ErrHttpReqTimeOut: "请求超时 {{.err}}"
-ErrHttpReqFailed: "请求失败 {{.err}}"
-ErrHttpReqNotFound: "文件不存在"
-ErrNoSuchHost: "网络连接失败"
+ErrCreateHttpClient: "创建请求失败 {{ .err }}"
+ErrHttpReqTimeOut: "请求超时 {{ .err }}"
+ErrHttpReqFailed: "请求失败 {{ .err }}"
+ErrNoSuchHost: "无法找到请求的服务器 {{ .err }}"
+ErrHttpReqNotFound: "无法找到请求的资源 {{ .err }}"
 ErrImagePullTimeOut: '镜像拉取超时'
 ErrContainerNotFound: '{{ .name }} 容器不存在'
 ErrContainerMsg: '{{ .name }} 容器异常，具体请在容器页面查看日志'
-ErrAppBackup: '{{ .name }} 应用备份失败 err {{.err}}'
-ErrImagePull: '镜像拉取失败 {{.err}}'
+ErrAppBackup: '{{ .name }} 应用备份失败 err {{ .err }}'
+ErrImagePull: '镜像拉取失败 {{ .err }}'
 ErrVersionTooLow: '当前 1Panel 版本过低，无法更新应用商店，请升级版本之后操作'
 ErrAppNameExist: '应用名称已存在'
 AppStoreIsSyncing: '应用商店正在同步中，请稍后再试'
@@ -100,7 +100,7 @@ ErrPathNotFound: "目录不存在"
 ErrMovePathFailed: "目标路径不能包含原路径！"
 ErrLinkPathNotFound: "目标路径不存在!"
 ErrFileIsExist: "文件或文件夹已存在！"
-ErrFileUpload: "{{ .name }} 上传文件失败 {{ .detail}}"
+ErrFileUpload: "{{ .name }} 上传文件失败 {{ .detail }}"
 ErrFileDownloadDir: "不支持下载文件夹"
 ErrCmdNotFound: "{{ .name}} 命令不存在，请先在宿主机安装此命令"
 ErrSourcePathNotFound:  "源目录不存在"
@@ -112,8 +112,8 @@ ErrPathNotDelete: "所选目录不可删除"
 ErrDomainIsExist: "域名已存在"
 ErrAliasIsExist: "代号已存在"
 ErrAppDelete: '其他网站使用此应用，无法删除'
-ErrBackupMatch: '该备份文件与当前网站部分数据不匹配 {{ .detail}}'
-ErrBackupExist: '该备份文件对应部分源数据不存在 {{ .detail}}'
+ErrBackupMatch: '该备份文件与当前网站部分数据不匹配 {{ .detail }}'
+ErrBackupExist: '该备份文件对应部分源数据不存在 {{ .detail }}'
 ErrPHPResource: '本地运行环境不支持切换！'
 ErrPathPermission: 'index 目录下检测到非 1000:1000 权限文件夹，可能导致网站访问 Access denied 错误，请点击上方保存按钮'
 ErrDomainIsUsed: "域名已被网站【{{ .name }}】使用"
@@ -290,7 +290,7 @@ InstallAppSuccess: "应用 {{ .name }} 安装成功"
 ConfigRuntime: "配置运行环境"
 ConfigApp: "配置应用"
 SuccessStatus: "{{ .name }} 成功" 
-FailedStatus: "{{ .name }} 失败 {{.err}}"
+FailedStatus: "{{ .name }} 失败 {{ .err }}"
 HandleLink: "处理应用关联"
 HandleDatabaseApp: "处理应用参数"
 ExecShell: "执行 {{ .name }} 脚本"
