@@ -42,7 +42,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ComputeDirSize, GetFileContent } from '@/api/modules/files';
+import { computeDirSize, getFileContent } from '@/api/modules/files';
 import { computeSize } from '@/utils/util';
 import { ref } from 'vue';
 import { dateFormatSimple } from '@/utils/util';
@@ -64,7 +64,7 @@ const handleClose = () => {
 
 const acceptParams = async (params: InfoProps): Promise<void> => {
     props.value = params;
-    GetFileContent({ path: params.path, expand: false, page: 1, pageSize: 1, isDetail: true }).then((res) => {
+    getFileContent({ path: params.path, expand: false, page: 1, pageSize: 1, isDetail: true }).then((res) => {
         data.value = res.data;
         open.value = true;
     });
@@ -75,7 +75,7 @@ const getDirSize = async (row: any) => {
         path: row.path,
     };
     loading.value = true;
-    await ComputeDirSize(req)
+    await computeDirSize(req)
         .then(async (res) => {
             data.value.dirSize = res.data.size;
         })

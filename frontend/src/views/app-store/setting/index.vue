@@ -28,7 +28,7 @@
                             </el-input>
                             <span class="input-help">{{ $t('app.defaultWebDomainHepler') }}</span>
                         </el-form-item>
-                        <CustomSetting v-if="isProductPro && globalStore.isMaster" />
+                        <CustomSetting v-if="globalStore.isMasterProductPro" />
                         <el-form-item v-if="!globalStore.isMaster && useCustomApp">
                             <el-text type="warning">{{ $t('app.customAppHelper') }}</el-text>
                         </el-form-item>
@@ -41,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import { GetAppStoreConfig, getCurrentNodeCustomAppConfig } from '@/api/modules/app';
+import { getAppStoreConfig, getCurrentNodeCustomAppConfig } from '@/api/modules/app';
 import { Rules } from '@/global/form-rules';
 import { FormRules } from 'element-plus';
 import CustomSetting from '@/xpack/views/appstore/index.vue';
@@ -82,7 +82,7 @@ function getUrl(url: string) {
 const search = async () => {
     loading.value = true;
     try {
-        const res = await GetAppStoreConfig();
+        const res = await getAppStoreConfig();
         if (res.data.defaultDomain != '') {
             const url = getUrl(res.data.defaultDomain);
             if (url) {
@@ -104,7 +104,7 @@ const setDefaultDomain = () => {
 };
 
 const getNodeConfig = async () => {
-    if (globalStore.isMaster) {
+    if (globalStore.isMasterProductPro) {
         return;
     }
     const res = await getCurrentNodeCustomAppConfig();

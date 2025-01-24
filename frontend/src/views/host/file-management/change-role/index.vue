@@ -16,7 +16,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { File } from '@/api/interface/file';
-import { ChangeFileMode } from '@/api/modules/files';
+import { changeFileMode } from '@/api/modules/files';
 import i18n from '@/lang';
 import FileRole from '@/components/file-role/index.vue';
 import { MsgSuccess } from '@/utils/message';
@@ -50,7 +50,7 @@ const getMode = (val: number) => {
 
 const submit = async () => {
     loading.value = true;
-    ChangeFileMode(form.value)
+    changeFileMode(form.value)
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
             handleClose();

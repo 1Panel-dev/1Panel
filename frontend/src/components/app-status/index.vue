@@ -73,7 +73,7 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { CheckAppInstalled, InstalledOp } from '@/api/modules/app';
+import { checkAppInstalled, installedOp } from '@/api/modules/app';
 import { onMounted, reactive, ref } from 'vue';
 import Status from '@/components/status/index.vue';
 import { ElMessageBox } from 'element-plus';
@@ -117,7 +117,7 @@ const setting = () => {
 };
 
 const onCheck = async (key: any, name: any) => {
-    await CheckAppInstalled(key, name)
+    await checkAppInstalled(key, name)
         .then((res) => {
             data.value = res.data;
             em('isExist', res.data);
@@ -147,7 +147,7 @@ const onOperate = async (operation: string) => {
         em('update:maskShow', true);
         em('update:loading', true);
         em('before');
-        InstalledOp(operateReq)
+        installedOp(operateReq)
             .then(() => {
                 em('update:loading', false);
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));

@@ -46,7 +46,7 @@
 import { ref, reactive, computed } from 'vue';
 import { File } from '@/api/interface/file';
 import { FormInstance, FormRules } from 'element-plus';
-import { CreateFile } from '@/api/modules/files';
+import { createFile } from '@/api/modules/files';
 import i18n from '@/lang';
 import FileRole from '@/components/file-role/index.vue';
 import { Rules } from '@/global/form-rules';
@@ -117,7 +117,7 @@ const submit = async (formEl: FormInstance | undefined) => {
             addItem['mode'] = undefined;
         }
         addItem['name'] = addForm.name.trim();
-        CreateFile(addItem as File.FileCreate)
+        createFile(addItem as File.FileCreate)
             .then(() => {
                 MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
                 handleClose();

@@ -136,7 +136,7 @@ import { computeSize, newUUID } from '@/utils/util';
 import i18n from '@/lang';
 import { UploadFile, UploadFiles, UploadInstance, UploadProps, UploadRawFile, genFileId } from 'element-plus';
 import { File } from '@/api/interface/file';
-import { BatchDeleteFile, CheckFile, ChunkUploadFileData, GetUploadList } from '@/api/modules/files';
+import { batchDeleteFile, checkFile, chunkUploadFileData, getUploadList } from '@/api/modules/files';
 import { loadBaseDir } from '@/api/modules/setting';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { handleRecoverByUpload } from '@/api/modules/backup';
@@ -206,7 +206,7 @@ const search = async () => {
         pageSize: paginationConfig.pageSize,
         path: baseDir.value,
     };
-    const res = await GetUploadList(params);
+    const res = await getUploadList(params);
     data.value = res.data.items || [];
     paginationConfig.total = res.data.total;
 };
@@ -304,7 +304,7 @@ const onSubmit = async () => {
         MsgError(i18n.global.t('commons.msg.fileNameErr'));
         return;
     }
-    const res = await CheckFile(baseDir.value + file.raw.name);
+    const res = await checkFile(baseDir.value + file.raw.name);
     if (res.data) {
         MsgError(i18n.global.t('commons.msg.fileExist'));
         return;
@@ -337,7 +337,7 @@ const submitUpload = async (file: any) => {
         formData.append('chunkCount', chunkCount.toString());
 
         try {
-            await ChunkUploadFileData(formData, {
+            await chunkUploadFileData(formData, {
                 onUploadProgress: (progressEvent) => {
                     const progress = Math.round(
                         ((uploadedChunkCount + progressEvent.loaded / progressEvent.total) * 100) / chunkCount,
@@ -379,7 +379,7 @@ const onBatchDelete = async (row: File.File | null) => {
             i18n.global.t('commons.button.import'),
             i18n.global.t('commons.button.delete'),
         ]),
-        api: BatchDeleteFile,
+        api: batchDeleteFile,
         params: { paths: files, isDir: false },
     });
 };

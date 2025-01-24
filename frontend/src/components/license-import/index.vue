@@ -44,7 +44,7 @@
 import i18n from '@/lang';
 import { ref } from 'vue';
 import { MsgSuccess } from '@/utils/message';
-import { UploadFileData } from '@/api/modules/setting';
+import { uploadFileData } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import { UploadFile, UploadFiles, UploadInstance, UploadProps, UploadRawFile, genFileId } from 'element-plus';
 import { useTheme } from '@/global/use-theme';
@@ -89,7 +89,7 @@ const submit = async () => {
     const formData = new FormData();
     formData.append('file', file.raw);
     loading.value = true;
-    await UploadFileData(formData)
+    await uploadFileData(formData)
         .then(async () => {
             globalStore.isProductPro = true;
             const xpackRes = await getXpackSetting();

@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts" setup>
-import { InitSupervisor } from '@/api/modules/host-tool';
+import { initSupervisor } from '@/api/modules/host-tool';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
@@ -90,7 +90,7 @@ const submit = async (formEl: FormInstance | undefined) => {
             return;
         }
         loading.value = true;
-        InitSupervisor({
+        initSupervisor({
             type: 'supervisord',
             configPath: initModel.value.primaryConfig,
             serviceName: initModel.value.serviceName,

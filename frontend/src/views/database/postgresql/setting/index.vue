@@ -74,7 +74,7 @@ import ContainerLog from '@/components/container-log/index.vue';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { onMounted, reactive, ref } from 'vue';
 import { loadDBFile, loadDBBaseInfo, updateDBFile } from '@/api/modules/database';
-import { ChangePort, CheckAppInstalled } from '@/api/modules/app';
+import { changePort, checkAppInstalled } from '@/api/modules/app';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
@@ -122,7 +122,7 @@ const onSubmitChangePort = async () => {
         port: baseInfo.port,
     };
     loading.value = true;
-    await ChangePort(params)
+    await changePort(params)
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
@@ -211,7 +211,7 @@ const goUpgrade = () => {
 };
 
 const onLoadInfo = async () => {
-    await CheckAppInstalled(props.type, props.database).then((res) => {
+    await checkAppInstalled(props.type, props.database).then((res) => {
         postgresqlName.value = res.data.name;
         postgresqlStatus.value = res.data.status;
         postgresqlVersion.value = res.data.version;

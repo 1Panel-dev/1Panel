@@ -61,7 +61,7 @@
 </template>
 
 <script setup lang="ts">
-import { GetAntiLeech, ListDomains, UpdateAntiLeech } from '@/api/modules/website';
+import { getAntiLeech, listDomains, updateAntiLeech } from '@/api/modules/website';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import { FormInstance } from 'element-plus';
 import { computed, onMounted, reactive } from 'vue';
@@ -108,7 +108,7 @@ const rules = ref({
 
 const changeEnable = (enable: boolean) => {
     if (enable) {
-        ListDomains(id.value)
+        listDomains(id.value)
             .then((res) => {
                 const domains = res.data || [];
                 let serverNameStr = '';
@@ -141,7 +141,7 @@ const changeEnable = (enable: boolean) => {
 
 const search = async () => {
     loading.value = true;
-    const res = await GetAntiLeech({ websiteID: id.value });
+    const res = await getAntiLeech({ websiteID: id.value });
     loading.value = false;
     if (!res.data.enable) {
         return;
@@ -187,7 +187,7 @@ const update = async (enable: boolean) => {
     form.enable = enable;
     loading.value = true;
     form.websiteID = id.value;
-    await UpdateAntiLeech(form)
+    await updateAntiLeech(form)
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
             search();

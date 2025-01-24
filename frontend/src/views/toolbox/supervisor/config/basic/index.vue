@@ -21,7 +21,7 @@
 
 <script lang="ts" setup>
 import { HostTool } from '@/api/interface/host-tool';
-import { GetSupervisorStatus, InitSupervisor } from '@/api/modules/host-tool';
+import { getSupervisorStatus, initSupervisor } from '@/api/modules/host-tool';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
@@ -47,7 +47,7 @@ const data = ref({
 const getStatus = async () => {
     try {
         loading.value = true;
-        const res = await GetSupervisorStatus();
+        const res = await getSupervisorStatus();
         data.value = res.data.config as HostTool.Supersivor;
     } catch (error) {}
     loading.value = false;
@@ -60,7 +60,7 @@ const submit = async (formEl: FormInstance | undefined) => {
             return;
         }
         loading.value = true;
-        InitSupervisor({
+        initSupervisor({
             type: 'supervisord',
             configPath: data.value.configPath,
             serviceName: data.value.serviceName,

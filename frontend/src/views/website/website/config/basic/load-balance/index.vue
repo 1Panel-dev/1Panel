@@ -55,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { DeleteLoadBalance, GetLoadBalances } from '@/api/modules/website';
+import { deleteLoadBalance, getLoadBalances } from '@/api/modules/website';
 import { defineProps, onMounted, ref } from 'vue';
 import Operate from './operate/index.vue';
 import i18n from '@/lang';
@@ -98,7 +98,7 @@ const buttons = [
 ];
 
 const search = () => {
-    GetLoadBalances(props.id).then((res) => {
+    getLoadBalances(props.id).then((res) => {
         data.value = res.data;
     });
 };
@@ -124,7 +124,7 @@ const deleteLb = async (row: Website.NginxUpstream) => {
             i18n.global.t('website.loadBalance'),
             i18n.global.t('commons.button.delete'),
         ]),
-        api: DeleteLoadBalance,
+        api: deleteLoadBalance,
         params: { websiteID: props.id, name: row.name },
     });
 };

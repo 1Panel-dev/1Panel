@@ -74,7 +74,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ObtainSSLByCA } from '@/api/modules/website';
+import { obtainSSLByCA } from '@/api/modules/website';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
@@ -138,7 +138,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         }
         loading.value = true;
 
-        ObtainSSLByCA(obtain.value)
+        obtainSSLByCA(obtain.value)
             .then(() => {
                 MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
                 handleClose();

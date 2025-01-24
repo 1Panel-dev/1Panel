@@ -123,7 +123,7 @@ import SlowLog from '@/views/database/mysql/setting/slow-log/index.vue';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { onMounted, reactive, ref } from 'vue';
 import { loadDBFile, loadDBBaseInfo, loadMysqlVariables, updateDBFile } from '@/api/modules/database';
-import { ChangePort, CheckAppInstalled, GetAppDefaultConfig } from '@/api/modules/app';
+import { changePort, checkAppInstalled, getAppDefaultConfig } from '@/api/modules/app';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
@@ -203,7 +203,7 @@ const onSubmitChangePort = async () => {
         port: baseInfo.port,
     };
     loading.value = true;
-    await ChangePort(params)
+    await changePort(params)
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
@@ -236,7 +236,7 @@ function callback(error: any) {
 
 const getDefaultConfig = async () => {
     loading.value = true;
-    await GetAppDefaultConfig(props.type, props.database)
+    await getAppDefaultConfig(props.type, props.database)
         .then((res) => {
             mysqlConf.value = res.data;
             useOld.value = true;
@@ -332,7 +332,7 @@ const goUpgrade = () => {
 };
 
 const onLoadInfo = async () => {
-    await CheckAppInstalled(props.type, props.database).then((res) => {
+    await checkAppInstalled(props.type, props.database).then((res) => {
         mysqlName.value = res.data.name;
         mysqlStatus.value = res.data.status;
         mysqlVersion.value = res.data.version;

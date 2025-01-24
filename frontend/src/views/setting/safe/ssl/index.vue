@@ -116,7 +116,7 @@
 <script lang="ts" setup>
 import { Website } from '@/api/interface/website';
 import { dateFormatSimple, getProvider } from '@/utils/util';
-import { ListSSL } from '@/api/modules/website';
+import { listSSL } from '@/api/modules/website';
 import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
@@ -172,7 +172,7 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
 
     if (params.sslInfo?.sslID) {
         form.sslID = params.sslInfo.sslID;
-        const ssls = await ListSSL({});
+        const ssls = await listSSL({});
         sslList.value = ssls.data || [];
         changeSSl(params.sslInfo?.sslID);
     } else {
@@ -183,7 +183,7 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 const loadSSLs = async () => {
-    const res = await ListSSL({});
+    const res = await listSSL({});
     sslList.value = res.data || [];
 };
 

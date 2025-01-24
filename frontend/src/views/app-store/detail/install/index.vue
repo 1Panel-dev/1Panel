@@ -121,7 +121,7 @@
 
 <script lang="ts" setup name="appInstall">
 import { App } from '@/api/interface/app';
-import { GetApp, GetAppDetail, InstallApp } from '@/api/modules/app';
+import { getAppByKey, getAppDetail, installApp } from '@/api/modules/app';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import { FormInstance, FormRules } from 'element-plus';
 import { onMounted, reactive, ref } from 'vue';
@@ -217,7 +217,7 @@ const acceptParams = async (props: InstallRrops) => {
     if (props.app.versions != undefined) {
         installData.value = props;
     } else {
-        const res = await GetApp(props.app.key);
+        const res = await getAppByKey(props.app.key);
         installData.value.app = res.data;
     }
 
@@ -225,17 +225,17 @@ const acceptParams = async (props: InstallRrops) => {
     appVersions.value = app.versions;
     if (appVersions.value.length > 0) {
         req.version = appVersions.value[0];
-        getAppDetail(appVersions.value[0]);
+        getDetail(appVersions.value[0]);
     }
 
     req.name = props.app.key;
     open.value = true;
 };
 
-const getAppDetail = async (version: string) => {
+const getDetail = async (version: string) => {
     loading.value = true;
     try {
-        const res = await GetAppDetail(installData.value.app.id, version, 'app');
+        const res = await getAppDetail(installData.value.app.id, version, 'app');
         req.appDetailId = res.data.id;
         req.dockerCompose = res.data.dockerCompose;
         isHostMode.value = res.data.hostMode;
@@ -286,7 +286,7 @@ const install = () => {
     loading.value = true;
     const taskID = newUUID();
     req.taskID = taskID;
-    InstallApp(req)
+    installApp(req)
         .then(() => {
             handleClose();
             openTaskLog(taskID);

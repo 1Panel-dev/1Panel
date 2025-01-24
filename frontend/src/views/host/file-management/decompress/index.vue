@@ -37,7 +37,7 @@ import { reactive, ref } from 'vue';
 import { File } from '@/api/interface/file';
 import { FormInstance, FormRules } from 'element-plus';
 import { Rules } from '@/global/form-rules';
-import { DeCompressFile } from '@/api/modules/files';
+import { deCompressFile } from '@/api/modules/files';
 import { Mimetypes } from '@/global/mimetype';
 import FileList from '@/components/file-list/index.vue';
 import { MsgSuccess } from '@/utils/message';
@@ -89,7 +89,7 @@ const submit = async (formEl: FormInstance | undefined) => {
             return;
         }
         loading.value = true;
-        DeCompressFile(form.value)
+        deCompressFile(form.value)
             .then(() => {
                 MsgSuccess(i18n.global.t('file.deCompressSuccess'));
                 handleClose();

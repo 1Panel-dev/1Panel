@@ -50,7 +50,7 @@
 
 <script lang="ts" setup name="proxy">
 import { Website } from '@/api/interface/website';
-import { OperateRedirectConfig, GetRedirectConfig } from '@/api/modules/website';
+import { operateRedirectConfig, getRedirectConfig } from '@/api/modules/website';
 import { computed, onMounted, ref } from 'vue';
 import Create from './create/index.vue';
 import File from './file/index.vue';
@@ -145,14 +145,14 @@ const deleteProxy = async (redirectConfig: Website.RedirectConfig) => {
             i18n.global.t('website.redirect'),
             i18n.global.t('commons.msg.delete'),
         ]),
-        api: OperateRedirectConfig,
+        api: operateRedirectConfig,
         params: redirectConfig,
     });
 };
 
 const submit = async (redirectConfig: Website.RedirectConfig) => {
     loading.value = true;
-    await OperateRedirectConfig(redirectConfig)
+    await operateRedirectConfig(redirectConfig)
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
             search();
@@ -186,7 +186,7 @@ const opProxy = (redirectConfig: Website.RedirectConfig) => {
 const search = async () => {
     try {
         loading.value = true;
-        const res = await GetRedirectConfig({ websiteID: id.value });
+        const res = await getRedirectConfig({ websiteID: id.value });
         data.value = res.data || [];
     } catch (error) {
     } finally {

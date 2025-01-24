@@ -71,7 +71,7 @@ import { ref } from 'vue';
 import { Units, sizeUnits } from '@/global/mimetype';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import { FormInstance } from 'element-plus';
-import { GetCacheConfig, UpdateCacheConfig } from '@/api/modules/website';
+import { getCacheConfig, updateCacheConfig } from '@/api/modules/website';
 import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 
@@ -108,7 +108,7 @@ const acceptParams = (websiteID: number) => {
 
 const get = async () => {
     try {
-        const res = await GetCacheConfig(req.websiteID);
+        const res = await getCacheConfig(req.websiteID);
         req.open = res.data.open;
         if (req.open) {
             req.cacheLimit = res.data.cacheLimit;
@@ -128,7 +128,7 @@ const submit = async (formEl: FormInstance | undefined) => {
             return;
         }
         try {
-            await UpdateCacheConfig(req);
+            await updateCacheConfig(req);
             MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
             handleClose();
         } catch (error) {}

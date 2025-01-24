@@ -35,7 +35,7 @@
 <script lang="ts" setup>
 import Create from './create/index.vue';
 import { Website } from '@/api/interface/website';
-import { DeleteDnsAccount, SearchDnsAccount } from '@/api/modules/website';
+import { deleteDnsAccount, searchDnsAccount } from '@/api/modules/website';
 import { onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { getDNSName } from '@/utils/util';
@@ -80,7 +80,7 @@ const search = () => {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
     };
-    SearchDnsAccount(req).then((res) => {
+    searchDnsAccount(req).then((res) => {
         data.value = res.data.items;
         paginationConfig.total = res.data.total;
     });
@@ -102,7 +102,7 @@ const deleteAccount = async (row: any) => {
             i18n.global.t('website.dnsAccountManage'),
             i18n.global.t('commons.button.delete'),
         ]),
-        api: DeleteDnsAccount,
+        api: deleteDnsAccount,
         params: { id: row.id },
     });
 };

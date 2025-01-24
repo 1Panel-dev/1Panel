@@ -18,7 +18,7 @@
                 <el-button type="primary" plain @click="openDnsAccount()">
                     {{ $t('website.dnsAccountManage') }}
                 </el-button>
-                <el-button plain @click="deleteSSL(null)" :disabled="selects.length === 0">
+                <el-button plain @click="deletessl(null)" :disabled="selects.length === 0">
                     {{ $t('commons.button.delete') }}
                 </el-button>
             </template>
@@ -157,7 +157,7 @@
 
 <script lang="ts" setup>
 import { onMounted, reactive, ref, computed } from 'vue';
-import { DeleteSSL, DownloadFile, SearchSSL, UpdateSSL } from '@/api/modules/website';
+import { deleteSSL, downloadFile, searchSSL, updateSSL } from '@/api/modules/website';
 import DnsAccount from './dns-account/index.vue';
 import AcmeAccount from './acme-account/index.vue';
 import CA from './ca/index.vue';
@@ -255,14 +255,14 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
         click: function (row: Website.SSLDTO) {
-            deleteSSL(row);
+            deletessl(row);
         },
     },
 ];
 
 const onDownload = (ssl: Website.SSLDTO) => {
     loading.value = true;
-    DownloadFile({ id: ssl.id })
+    downloadFile({ id: ssl.id })
         .then((res) => {
             const downloadUrl = window.URL.createObjectURL(new Blob([res]));
             const a = document.createElement('a');
@@ -287,7 +287,7 @@ const search = () => {
         pageSize: paginationConfig.pageSize,
     };
     loading.value = true;
-    SearchSSL(req)
+    searchSSL(req)
         .then((res) => {
             data.value = res.data.items || [];
             paginationConfig.total = res.data.total;
@@ -304,7 +304,7 @@ const updateDesc = (row: Website.SSLDTO, bulr: Function) => {
 
 const updateConfig = (row: Website.SSLDTO) => {
     loading.value = true;
-    UpdateSSL(row)
+    updateSSL(row)
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
         })
@@ -347,7 +347,7 @@ const applySSL = (row: Website.SSLDTO) => {
     obtainRef.value.acceptParams({ ssl: row });
 };
 
-const deleteSSL = async (row: any) => {
+const deletessl = async (row: any) => {
     let names = [];
     let params = {};
     if (row == null) {
@@ -365,7 +365,7 @@ const deleteSSL = async (row: any) => {
             i18n.global.t('website.ssl'),
             i18n.global.t('commons.button.delete'),
         ]),
-        api: DeleteSSL,
+        api: deleteSSL,
         params: params,
     });
     search();

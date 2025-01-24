@@ -26,7 +26,7 @@ import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
 import { Rules } from '@/global/form-rules';
-import { UpdateAppStoreConfig } from '@/api/modules/app';
+import { updateAppStoreConfig } from '@/api/modules/app';
 import { MsgSuccess } from '@/utils/message';
 
 const emit = defineEmits<{ (e: 'close'): void }>();
@@ -71,7 +71,7 @@ const submit = async () => {
             const req = {
                 defaultDomain: defaultDomain,
             };
-            await UpdateAppStoreConfig(req);
+            await updateAppStoreConfig(req);
             MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
         } catch (error) {
         } finally {

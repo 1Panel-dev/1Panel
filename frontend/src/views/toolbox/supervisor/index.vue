@@ -145,7 +145,7 @@ import ConfigSuperVisor from './config/index.vue';
 import { computed, onMounted } from 'vue';
 import Create from './create/index.vue';
 import File from './file/index.vue';
-import { GetSupervisorProcess, OperateSupervisorProcess } from '@/api/modules/host-tool';
+import { getSupervisorProcess, operateSupervisorProcess } from '@/api/modules/host-tool';
 import { GlobalStore } from '@/store';
 import i18n from '@/lang';
 import { HostTool } from '@/api/interface/host-tool';
@@ -212,7 +212,7 @@ const search = async () => {
     let needLoadStatus = false;
     dataLoading.value = true;
     try {
-        const res = await GetSupervisorProcess();
+        const res = await getSupervisorProcess();
         data.value = res.data;
         for (const process of data.value) {
             if (process.status && process.status.length > 0) {
@@ -234,7 +234,7 @@ const search = async () => {
 const loadStatus = async () => {
     let needLoadStatus = false;
     try {
-        const res = await GetSupervisorProcess();
+        const res = await getSupervisorProcess();
         const stats = res.data || [];
         for (const process of data.value) {
             for (const item of stats) {
@@ -285,7 +285,7 @@ const operate = async (operation: string, name: string) => {
         )
             .then(() => {
                 loading.value = true;
-                OperateSupervisorProcess({ operate: operation, name: name })
+                operateSupervisorProcess({ operate: operation, name: name })
                     .then(() => {
                         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                         search();

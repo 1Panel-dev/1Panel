@@ -46,7 +46,7 @@ import Resource from './resource/index.vue';
 import Log from './log/index.vue';
 import router from '@/routers';
 import WebsiteStatus from '@/views/website/website/status/index.vue';
-import { GetWebsite } from '@/api/modules/website';
+import { getWebsite } from '@/api/modules/website';
 import { GetRuntime } from '@/api/modules/runtime';
 
 const props = defineProps({
@@ -80,7 +80,7 @@ onMounted(() => {
     index.value = props.tab;
     id.value = Number(props.id);
     loading.value = true;
-    GetWebsite(id.value)
+    getWebsite(id.value)
         .then(async (res) => {
             website.value = res.data;
             if (res.data.type === 'runtime') {

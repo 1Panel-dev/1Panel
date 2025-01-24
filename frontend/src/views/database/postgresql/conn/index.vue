@@ -111,7 +111,7 @@ import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { getDatabase, updatePostgresqlPassword } from '@/api/modules/database';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
-import { GetAppConnInfo } from '@/api/modules/app';
+import { getAppConnInfo } from '@/api/modules/app';
 import { MsgSuccess } from '@/utils/message';
 import { getRandomStr } from '@/utils/util';
 import { getSettingInfo } from '@/api/modules/setting';
@@ -185,7 +185,7 @@ const loadSystemIP = async () => {
 
 const loadPassword = async () => {
     if (form.from === 'local') {
-        const res = await GetAppConnInfo(form.type, form.database);
+        const res = await getAppConnInfo(form.type, form.database);
         form.status = res.data.status;
         form.username = res.data.username || '';
         form.password = res.data.password || '';

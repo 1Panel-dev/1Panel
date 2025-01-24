@@ -7,7 +7,7 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { GetWebsiteConfig, UpdateNginxFile } from '@/api/modules/website';
+import { getWebsiteConfig, updateNginxFile } from '@/api/modules/website';
 import { computed, onMounted, ref } from 'vue';
 import { File } from '@/api/interface/file';
 import i18n from '@/lang';
@@ -31,7 +31,7 @@ let content = ref('');
 
 const get = () => {
     loading.value = true;
-    GetWebsiteConfig(id.value, 'openresty')
+    getWebsiteConfig(id.value, 'openresty')
         .then((res) => {
             data.value = res.data;
             content.value = data.value.content;
@@ -43,7 +43,7 @@ const get = () => {
 
 const submit = () => {
     loading.value = true;
-    UpdateNginxFile({
+    updateNginxFile({
         id: id.value,
         content: content.value,
     })

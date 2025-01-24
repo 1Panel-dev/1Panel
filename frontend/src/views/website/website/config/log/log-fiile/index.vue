@@ -17,7 +17,7 @@
 </template>
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue';
-import { GetWebsite, OpWebsiteLog } from '@/api/modules/website';
+import { getWebsite, opWebsiteLog } from '@/api/modules/website';
 import i18n from '@/lang';
 import LogFile from '@/components/log-file/index.vue';
 import { MsgSuccess } from '@/utils/message';
@@ -55,7 +55,7 @@ const updateEnable = () => {
         logType: props.logType,
     };
     loading.value = true;
-    OpWebsiteLog(req)
+    opWebsiteLog(req)
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
@@ -74,14 +74,14 @@ const cleanLog = async () => {
         title: i18n.global.t('commons.msg.clean'),
         names: [],
         msg: i18n.global.t('commons.msg.operatorHelper', [log, i18n.global.t('commons.msg.clean')]),
-        api: OpWebsiteLog,
+        api: opWebsiteLog,
         params: { id: id.value, operate: 'delete', logType: props.logType },
     });
 };
 
-const getWebsite = async () => {
+const get = async () => {
     try {
-        const res = await GetWebsite(props.id);
+        const res = await getWebsite(props.id);
         if (props.logType === 'access.log') {
             data.value.enable = res.data.accessLog;
         }
@@ -92,6 +92,6 @@ const getWebsite = async () => {
 };
 
 onMounted(() => {
-    getWebsite();
+    get();
 });
 </script>

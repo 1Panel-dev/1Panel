@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import { SearchFavorite, RemoveFavorite } from '@/api/modules/files';
+import { searchFavorite, removeFavorite } from '@/api/modules/files';
 import i18n from '@/lang';
 import { reactive, ref } from 'vue';
 
@@ -41,7 +41,7 @@ const search = async () => {
     try {
         req.page = paginationConfig.currentPage;
         req.pageSize = paginationConfig.pageSize;
-        const res = await SearchFavorite(req);
+        const res = await searchFavorite(req);
         data.value = res.data.items;
         paginationConfig.total = res.data.total;
         open.value = true;
@@ -54,7 +54,7 @@ const singleDel = async (id: number) => {
         cancelButtonText: i18n.global.t('commons.button.cancel'),
     }).then(async () => {
         try {
-            await RemoveFavorite(id);
+            await removeFavorite(id);
             search();
         } catch (error) {}
     });

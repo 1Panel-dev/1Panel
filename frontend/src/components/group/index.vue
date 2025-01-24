@@ -43,7 +43,7 @@
                                 v-if="!row.edit"
                                 :disabled="row.isDefault"
                                 type="primary"
-                                @click="deleteGroup($index)"
+                                @click="removeGroup($index)"
                             >
                                 {{ $t('commons.button.delete') }}
                             </el-button>
@@ -68,7 +68,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import i18n from '@/lang';
-import { CreateGroup, DeleteGroup, GetGroupList, UpdateGroup } from '@/api/modules/group';
+import { createGroup, deleteGroup, getGroupList, updateGroup } from '@/api/modules/group';
 import { MsgSuccess } from '@/utils/message';
 import { Group } from '@/api/interface/group';
 import { Rules } from '@/global/form-rules';
@@ -95,7 +95,7 @@ const acceptParams = (params: DialogProps): void => {
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 const search = () => {
-    GetGroupList(type.value).then((res) => {
+    getGroupList(type.value).then((res) => {
         data.value = res.data || [];
     });
 };
@@ -108,12 +108,12 @@ const saveGroup = async (formEl: FormInstance, group: Group.GroupInfo) => {
         }
         group.type = type.value;
         if (group.id == 0) {
-            CreateGroup(group).then(() => {
+            createGroup(group).then(() => {
                 MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
                 search();
             });
         } else {
-            UpdateGroup(group).then(() => {
+            updateGroup(group).then(() => {
                 MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
                 search();
             });
@@ -124,7 +124,7 @@ const saveGroup = async (formEl: FormInstance, group: Group.GroupInfo) => {
 const setDefault = (group: Group.GroupInfo) => {
     group.isDefault = true;
     group.type = type.value;
-    UpdateGroup(group).then(() => {
+    updateGroup(group).then(() => {
         MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
         search();
     });
@@ -149,11 +149,11 @@ const openCreate = () => {
     data.value.unshift(g);
 };
 
-const deleteGroup = (index: number) => {
+const removeGroup = (index: number) => {
     const group = data.value[index];
 
     if (group.id > 0) {
-        DeleteGroup(group.id).then(() => {
+        deleteGroup(group.id).then(() => {
             data.value.splice(index, 1);
             MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
         });

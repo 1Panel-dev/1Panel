@@ -67,7 +67,7 @@
     </DrawerPro>
 </template>
 <script lang="ts" setup>
-import { GetSSL } from '@/api/modules/website';
+import { getSSL } from '@/api/modules/website';
 import { ref } from 'vue';
 import { dateFormatSimple, getProvider, getDNSName } from '@/utils/util';
 
@@ -90,7 +90,7 @@ const acceptParams = (sslId: number) => {
 };
 
 const get = async () => {
-    const res = await GetSSL(id.value);
+    const res = await getSSL(id.value);
     ssl.value = res.data;
 };
 

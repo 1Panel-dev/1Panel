@@ -6,15 +6,15 @@ import { TimeoutEnum } from '@/enums/http-enum';
 import { deepCopy } from '@/utils/util';
 import { Base64 } from 'js-base64';
 
-export const SearchWebsites = (req: Website.WebSiteSearch) => {
+export const searchWebsites = (req: Website.WebSiteSearch) => {
     return http.post<ResPage<Website.WebsiteRes>>(`/websites/search`, req);
 };
 
-export const ListWebsites = () => {
+export const listWebsites = () => {
     return http.get<Website.WebsiteDTO>(`/websites/list`);
 };
 
-export const CreateWebsite = (req: Website.WebSiteCreateReq) => {
+export const createWebsite = (req: Website.WebSiteCreateReq) => {
     let request = deepCopy(req) as Website.WebSiteCreateReq;
     if (request.ftpPassword) {
         request.ftpPassword = Base64.encode(request.ftpPassword);
@@ -22,324 +22,316 @@ export const CreateWebsite = (req: Website.WebSiteCreateReq) => {
     return http.post<any>(`/websites`, request, TimeoutEnum.T_10M);
 };
 
-export const OpWebsite = (req: Website.WebSiteOp) => {
+export const opWebsite = (req: Website.WebSiteOp) => {
     return http.post<any>(`/websites/operate`, req);
 };
 
-export const OpWebsiteLog = (req: Website.WebSiteOpLog) => {
+export const opWebsiteLog = (req: Website.WebSiteOpLog) => {
     return http.post<Website.WebSiteLog>(`/websites/log`, req);
 };
 
-export const UpdateWebsite = (req: Website.WebSiteUpdateReq) => {
+export const updateWebsite = (req: Website.WebSiteUpdateReq) => {
     return http.post<any>(`/websites/update`, req);
 };
 
-export const GetWebsite = (id: number) => {
+export const getWebsite = (id: number) => {
     return http.get<Website.WebsiteDTO>(`/websites/${id}`);
 };
 
-export const GetWebsiteOptions = (req: Website.OptionReq) => {
+export const getWebsiteOptions = (req: Website.OptionReq) => {
     return http.post<any>(`/websites/options`, req);
 };
 
-export const GetWebsiteConfig = (id: number, type: string) => {
+export const getWebsiteConfig = (id: number, type: string) => {
     return http.get<File.File>(`/websites/${id}/config/${type}`);
 };
 
-export const DeleteWebsite = (req: Website.WebSiteDel) => {
+export const deleteWebsite = (req: Website.WebSiteDel) => {
     return http.post<any>(`/websites/del`, req);
 };
 
-export const ListDomains = (id: number) => {
+export const listDomains = (id: number) => {
     return http.get<Website.Domain[]>(`/websites/domains/${id}`);
 };
 
-export const DeleteDomain = (req: Website.DomainDelete) => {
+export const deleteDomain = (req: Website.DomainDelete) => {
     return http.post<any>(`/websites/domains/del/`, req);
 };
 
-export const CreateDomain = (req: Website.DomainCreate) => {
+export const createDomain = (req: Website.DomainCreate) => {
     return http.post<any>(`/websites/domains`, req);
 };
 
-export const UpdateDomain = (req: Website.DomainUpdate) => {
+export const updateDomain = (req: Website.DomainUpdate) => {
     return http.post<any>(`/websites/domains/update`, req);
 };
 
-export const GetNginxConfig = (req: Website.NginxScopeReq) => {
+export const getNginxConfig = (req: Website.NginxScopeReq) => {
     return http.post<Website.NginxScopeConfig>(`/websites/config`, req);
 };
 
-export const UpdateNginxConfig = (req: Website.NginxConfigReq) => {
+export const updateNginxConfig = (req: Website.NginxConfigReq) => {
     return http.post<any>(`/websites/config/update`, req);
 };
 
-export const SearchDnsAccount = (req: ReqPage) => {
+export const searchDnsAccount = (req: ReqPage) => {
     return http.post<ResPage<Website.DnsAccount>>(`/websites/dns/search`, req);
 };
 
-export const CreateDnsAccount = (req: Website.DnsAccountCreate) => {
+export const createDnsAccount = (req: Website.DnsAccountCreate) => {
     return http.post<any>(`/websites/dns`, req);
 };
 
-export const UpdateDnsAccount = (req: Website.DnsAccountUpdate) => {
+export const updateDnsAccount = (req: Website.DnsAccountUpdate) => {
     return http.post<any>(`/websites/dns/update`, req);
 };
 
-export const DeleteDnsAccount = (req: Website.DelReq) => {
+export const deleteDnsAccount = (req: Website.DelReq) => {
     return http.post<any>(`/websites/dns/del`, req);
 };
 
-export const SearchAcmeAccount = (req: ReqPage) => {
+export const searchAcmeAccount = (req: ReqPage) => {
     return http.post<ResPage<Website.AcmeAccount>>(`/websites/acme/search`, req);
 };
 
-export const CreateAcmeAccount = (req: Website.AcmeAccountCreate) => {
+export const createAcmeAccount = (req: Website.AcmeAccountCreate) => {
     return http.post<Website.AcmeAccount>(`/websites/acme`, req, TimeoutEnum.T_10M);
 };
 
-export const DeleteAcmeAccount = (req: Website.DelReq) => {
+export const deleteAcmeAccount = (req: Website.DelReq) => {
     return http.post<any>(`/websites/acme/del`, req);
 };
 
-export const SearchSSL = (req: ReqPage) => {
+export const searchSSL = (req: ReqPage) => {
     return http.post<ResPage<Website.SSLDTO>>(`/websites/ssl/search`, req);
 };
 
-export const ListSSL = (req: Website.SSLReq) => {
+export const listSSL = (req: Website.SSLReq) => {
     return http.post<Website.SSLDTO[]>(`/websites/ssl/search`, req);
 };
 
-export const CreateSSL = (req: Website.SSLCreate) => {
+export const createSSL = (req: Website.SSLCreate) => {
     return http.post<Website.SSLCreate>(`/websites/ssl`, req, TimeoutEnum.T_10M);
 };
 
-export const DeleteSSL = (req: Website.DelReq) => {
+export const deleteSSL = (req: Website.DelReq) => {
     return http.post<any>(`/websites/ssl/del`, req);
 };
 
-export const GetWebsiteSSL = (websiteId: number) => {
-    return http.get<Website.SSL>(`/websites/ssl/website/${websiteId}`);
-};
-
-export const GetSSL = (id: number) => {
+export const getSSL = (id: number) => {
     return http.get<Website.SSL>(`/websites/ssl/${id}`);
 };
 
-export const ApplySSL = (req: Website.SSLApply) => {
-    return http.post<Website.SSLApply>(`/websites/ssl/apply`, req);
-};
-
-export const ObtainSSL = (req: Website.SSLObtain) => {
+export const obtainSSL = (req: Website.SSLObtain) => {
     return http.post<any>(`/websites/ssl/obtain`, req);
 };
 
-export const UpdateSSL = (req: Website.SSLUpdate) => {
+export const updateSSL = (req: Website.SSLUpdate) => {
     return http.post<any>(`/websites/ssl/update`, req);
 };
 
-export const GetDnsResolve = (req: Website.DNSResolveReq) => {
+export const getDnsResolve = (req: Website.DNSResolveReq) => {
     return http.post<Website.DNSResolve[]>(`/websites/ssl/resolve`, req, TimeoutEnum.T_5M);
 };
 
-export const GetHTTPSConfig = (id: number) => {
+export const getHTTPSConfig = (id: number) => {
     return http.get<Website.HTTPSConfig>(`/websites/${id}/https`);
 };
 
-export const UpdateHTTPSConfig = (req: Website.HTTPSReq) => {
+export const updateHTTPSConfig = (req: Website.HTTPSReq) => {
     return http.post<Website.HTTPSConfig>(`/websites/${req.websiteId}/https`, req);
 };
 
-export const PreCheck = (req: Website.CheckReq) => {
+export const preCheck = (req: Website.CheckReq) => {
     return http.post<Website.CheckRes[]>(`/websites/check`, req);
 };
 
-export const UpdateNginxFile = (req: Website.NginxUpdate) => {
+export const updateNginxFile = (req: Website.NginxUpdate) => {
     return http.post<any>(`/websites/nginx/update`, req);
 };
 
-export const ChangeDefaultServer = (req: Website.DefaultServerUpdate) => {
+export const changeDefaultServer = (req: Website.DefaultServerUpdate) => {
     return http.post<any>(`/websites/default/server`, req);
 };
 
-export const GetRewriteConfig = (req: Website.RewriteReq) => {
+export const getRewriteConfig = (req: Website.RewriteReq) => {
     return http.post<Website.RewriteRes>(`/websites/rewrite`, req);
 };
 
-export const UpdateRewriteConfig = (req: Website.RewriteUpdate) => {
+export const updateRewriteConfig = (req: Website.RewriteUpdate) => {
     return http.post<any>(`/websites/rewrite/update`, req);
 };
 
-export const UpdateWebsiteDir = (req: Website.DirUpdate) => {
+export const updateWebsiteDir = (req: Website.DirUpdate) => {
     return http.post<any>(`/websites/dir/update`, req);
 };
 
-export const UpdateWebsiteDirPermission = (req: Website.DirPermissionUpdate) => {
+export const updateWebsiteDirPermission = (req: Website.DirPermissionUpdate) => {
     return http.post<any>(`/websites/dir/permission`, req);
 };
 
-export const GetProxyConfig = (req: Website.ProxyReq) => {
+export const getProxyConfig = (req: Website.ProxyReq) => {
     return http.post<Website.ProxyConfig[]>(`/websites/proxies`, req);
 };
 
-export const OperateProxyConfig = (req: Website.ProxyReq) => {
+export const operateProxyConfig = (req: Website.ProxyReq) => {
     return http.post<any>(`/websites/proxies/update`, req);
 };
 
-export const UpdateProxyConfigFile = (req: Website.ProxyFileUpdate) => {
+export const updateProxyConfigFile = (req: Website.ProxyFileUpdate) => {
     return http.post<any>(`/websites/proxies/file`, req);
 };
 
-export const ClearProxtCache = (req: Website.WebsiteReq) => {
+export const clearProxyCache = (req: Website.WebsiteReq) => {
     return http.post(`/websites/proxy/clear`, req);
 };
 
-export const GetAuthConfig = (req: Website.AuthReq) => {
+export const getAuthConfig = (req: Website.AuthReq) => {
     return http.post<Website.AuthConfig>(`/websites/auths`, req);
 };
 
-export const OperateAuthConfig = (req: Website.NginxAuthConfig) => {
+export const operateAuthConfig = (req: Website.NginxAuthConfig) => {
     return http.post<any>(`/websites/auths/update`, req);
 };
 
-export const GetPathAuthConfig = (req: Website.AuthReq) => {
+export const getPathAuthConfig = (req: Website.AuthReq) => {
     return http.post<Website.NginxPathAuthConfig[]>(`/websites/auths/path`, req);
 };
 
-export const OperatePathAuthConfig = (req: Website.NginxPathAuthConfig) => {
+export const operatePathAuthConfig = (req: Website.NginxPathAuthConfig) => {
     return http.post(`/websites/auths/path/update`, req);
 };
 
-export const GetAntiLeech = (req: Website.LeechReq) => {
+export const getAntiLeech = (req: Website.LeechReq) => {
     return http.post<Website.LeechConfig>(`/websites/leech`, req);
 };
 
-export const UpdateAntiLeech = (req: Website.LeechConfig) => {
+export const updateAntiLeech = (req: Website.LeechConfig) => {
     return http.post<any>(`/websites/leech/update`, req);
 };
 
-export const GetRedirectConfig = (req: Website.WebsiteReq) => {
+export const getRedirectConfig = (req: Website.WebsiteReq) => {
     return http.post<Website.RedirectConfig[]>(`/websites/redirect`, req);
 };
 
-export const OperateRedirectConfig = (req: Website.WebsiteReq) => {
+export const operateRedirectConfig = (req: Website.WebsiteReq) => {
     return http.post<any>(`/websites/redirect/update`, req);
 };
 
-export const UpdateRedirectConfigFile = (req: Website.RedirectFileUpdate) => {
+export const updateRedirectConfigFile = (req: Website.RedirectFileUpdate) => {
     return http.post<any>(`/websites/redirect/file`, req);
 };
 
-export const ChangePHPVersion = (req: Website.PHPVersionChange) => {
+export const changePHPVersion = (req: Website.PHPVersionChange) => {
     return http.post<any>(`/websites/php/version`, req);
 };
 
-export const GetDirConfig = (req: Website.ProxyReq) => {
+export const getDirConfig = (req: Website.ProxyReq) => {
     return http.post<Website.DirConfig>(`/websites/dir`, req);
 };
 
-export const UploadSSL = (req: Website.SSLUpload) => {
+export const uploadSSL = (req: Website.SSLUpload) => {
     return http.post<any>(`/websites/ssl/upload`, req);
 };
 
-export const SearchCAs = (req: ReqPage) => {
+export const searchCAs = (req: ReqPage) => {
     return http.post<ResPage<Website.CA>>(`/websites/ca/search`, req);
 };
 
-export const CreateCA = (req: Website.CACreate) => {
+export const createCA = (req: Website.CACreate) => {
     return http.post<Website.CA>(`/websites/ca`, req);
 };
 
-export const ObtainSSLByCA = (req: Website.SSLObtainByCA) => {
+export const obtainSSLByCA = (req: Website.SSLObtainByCA) => {
     return http.post<any>(`/websites/ca/obtain`, req);
 };
 
-export const DeleteCA = (req: Website.DelReq) => {
+export const deleteCA = (req: Website.DelReq) => {
     return http.post<any>(`/websites/ca/del`, req);
 };
 
-export const RenewSSLByCA = (req: Website.RenewSSLByCA) => {
+export const renewSSLByCA = (req: Website.RenewSSLByCA) => {
     return http.post<any>(`/websites/ca/renew`, req);
 };
 
-export const DownloadFile = (params: Website.SSLDownload) => {
+export const downloadFile = (params: Website.SSLDownload) => {
     return http.download<BlobPart>(`/websites/ssl/download`, params, {
         responseType: 'blob',
         timeout: TimeoutEnum.T_40S,
     });
 };
 
-export const GetCA = (id: number) => {
+export const getCA = (id: number) => {
     return http.get<Website.CADTO>(`/websites/ca/${id}`);
 };
 
-export const GetDefaultHtml = (type: string) => {
+export const getDefaultHtml = (type: string) => {
     return http.get<Website.WebsiteHtml>(`/websites/default/html/${type}`);
 };
 
-export const UpdateDefaultHtml = (req: Website.WebsiteHtmlUpdate) => {
+export const updateDefaultHtml = (req: Website.WebsiteHtmlUpdate) => {
     return http.post(`/websites/default/html/update`, req);
 };
 
-export const DownloadCAFile = (params: Website.SSLDownload) => {
+export const downloadCAFile = (params: Website.SSLDownload) => {
     return http.download<BlobPart>(`/websites/ca/download`, params, {
         responseType: 'blob',
         timeout: TimeoutEnum.T_40S,
     });
 };
 
-export const GetLoadBalances = (id: number) => {
+export const getLoadBalances = (id: number) => {
     return http.get<Website.NginxUpstream[]>(`/websites/${id}/lbs`);
 };
 
-export const CreateLoadBalance = (req: Website.LoadBalanceReq) => {
+export const createLoadBalance = (req: Website.LoadBalanceReq) => {
     return http.post(`/websites/lbs/create`, req);
 };
 
-export const DeleteLoadBalance = (req: Website.LoadBalanceDel) => {
+export const deleteLoadBalance = (req: Website.LoadBalanceDel) => {
     return http.post(`/websites/lbs/del`, req);
 };
 
-export const UpdateLoadBalance = (req: Website.LoadBalanceReq) => {
+export const updateLoadBalance = (req: Website.LoadBalanceReq) => {
     return http.post(`/websites/lbs/update`, req);
 };
 
-export const UpdateLoadBalanceFile = (req: Website.WebsiteLBUpdateFile) => {
+export const updateLoadBalanceFile = (req: Website.WebsiteLBUpdateFile) => {
     return http.post(`/websites/lbs/file`, req);
 };
 
-export const UpdateCacheConfig = (req: Website.WebsiteCacheConfig) => {
+export const updateCacheConfig = (req: Website.WebsiteCacheConfig) => {
     return http.post(`/websites/proxy/config`, req);
 };
 
-export const GetCacheConfig = (id: number) => {
+export const getCacheConfig = (id: number) => {
     return http.get<Website.WebsiteCacheConfig>(`/websites/proxy/config/${id}`);
 };
 
-export const UpdateRealIPConfig = (req: Website.WebsiteRealIPConfig) => {
+export const updateRealIPConfig = (req: Website.WebsiteRealIPConfig) => {
     return http.post(`/websites/realip/config`, req);
 };
 
-export const GetRealIPConfig = (id: number) => {
+export const getRealIPConfig = (id: number) => {
     return http.get<Website.WebsiteRealIPConfig>(`/websites/realip/config/${id}`);
 };
 
-export const GetWebsiteResource = (id: number) => {
+export const getWebsiteResource = (id: number) => {
     return http.get<Website.WebsiteResource[]>(`/websites/resource/${id}`);
 };
 
-export const GetWebsiteDatabase = () => {
+export const getWebsiteDatabase = () => {
     return http.get<Website.WebsiteDatabase[]>(`/websites/databases`);
 };
 
-export const ChangeDatabase = (req: Website.ChangeDatabase) => {
+export const changeDatabase = (req: Website.ChangeDatabase) => {
     return http.post(`/websites/databases`, req);
 };
 
-export const OperateCustomRewrite = (req: Website.CustomRewirte) => {
+export const operateCustomRewrite = (req: Website.CustomRewirte) => {
     return http.post(`/websites/rewrite/custom`, req);
 };
 
-export const ListCustomRewrite = () => {
+export const listCustomRewrite = () => {
     return http.get<string[]>(`/websites/rewrite/custom`);
 };

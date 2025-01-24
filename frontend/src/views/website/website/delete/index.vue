@@ -44,7 +44,7 @@
 </template>
 
 <script lang="ts" setup>
-import { DeleteWebsite } from '@/api/modules/website';
+import { deleteWebsite } from '@/api/modules/website';
 import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
 import { ref } from 'vue';
@@ -95,7 +95,7 @@ const acceptParams = async (website: Website.WebsiteDTO) => {
 
 const submit = () => {
     loading.value = true;
-    DeleteWebsite(deleteReq.value)
+    deleteWebsite(deleteReq.value)
         .then(() => {
             handleClose();
             MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));

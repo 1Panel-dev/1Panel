@@ -42,7 +42,7 @@
 <script lang="ts" setup>
 import { checkNumberRange, Rules } from '@/global/form-rules';
 import { Website } from '@/api/interface/website';
-import { GetNginxConfig, UpdateNginxConfig } from '@/api/modules/website';
+import { getNginxConfig, updateNginxConfig } from '@/api/modules/website';
 import { FormInstance } from 'element-plus';
 import { computed, onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
@@ -95,7 +95,7 @@ let ruleKey = ref('');
 
 const search = (scopeReq: Website.NginxScopeReq) => {
     loading.value = true;
-    GetNginxConfig(scopeReq)
+    getNginxConfig(scopeReq)
         .then((res) => {
             ruleKey.value = 'current';
             if (res.data) {
@@ -145,7 +145,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         if (req.operate === 'add') {
             enable.value = true;
         }
-        UpdateNginxConfig(req)
+        updateNginxConfig(req)
             .then(() => {
                 MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
                 search(req);

@@ -14,7 +14,7 @@
             v-if="website.type === 'static' || website.type === 'runtime'"
         >
             <el-form-item :label="$t('website.changeDatabase')" prop="db">
-                <el-select v-model="req.db" class="w-full" @change="changeDatabase">
+                <el-select v-model="req.db" class="w-full" @change="changeDB">
                     <el-option
                         v-for="(item, index) in databases"
                         :key="index"
@@ -39,7 +39,7 @@
     </div>
 </template>
 <script setup lang="ts">
-import { ChangeDatabase, GetWebsite, GetWebsiteDatabase, GetWebsiteResource } from '@/api/modules/website';
+import { changeDatabase, getWebsite, getWebsiteDatabase, getWebsiteResource } from '@/api/modules/website';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 
@@ -65,14 +65,14 @@ const website = ref({
 
 const search = async () => {
     try {
-        const res = await GetWebsiteResource(props.id);
+        const res = await getWebsiteResource(props.id);
         data.value = res.data;
     } catch (error) {}
 };
 
 const listDatabases = async () => {
     try {
-        const res = await GetWebsiteDatabase();
+        const res = await getWebsiteDatabase();
         databases.value = res.data;
         if (databases.value.length > 0) {
             if (website.value.dbID > 0) {
@@ -92,7 +92,7 @@ const listDatabases = async () => {
     } catch (error) {}
 };
 
-const changeDatabase = () => {
+const changeDB = () => {
     for (let i = 0; i < databases.value.length; i++) {
         if (databases.value[i].id + databases.value[i].type === req.db) {
             req.databaseID = databases.value[i].id;
@@ -104,15 +104,15 @@ const changeDatabase = () => {
 
 const submit = async () => {
     try {
-        await ChangeDatabase(req);
+        await changeDatabase(req);
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         search();
     } catch (error) {}
 };
 
-const getwebsite = async () => {
+const get = async () => {
     try {
-        const res = await GetWebsite(props.id);
+        const res = await getWebsite(props.id);
         website.value = res.data;
         req.db = '';
         search();
@@ -121,6 +121,6 @@ const getwebsite = async () => {
 };
 
 onMounted(() => {
-    getwebsite();
+    get();
 });
 </script>

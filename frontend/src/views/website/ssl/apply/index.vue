@@ -37,7 +37,7 @@
 
 <script lang="ts" setup>
 import { Website } from '@/api/interface/website';
-import { GetDnsResolve, ObtainSSL } from '@/api/modules/website';
+import { getDnsResolve, obtainSSL } from '@/api/modules/website';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ref } from 'vue';
@@ -60,10 +60,10 @@ const acceptParams = async (props: RenewProps) => {
     open.value = true;
     dnsResolve.value = [];
     sslID.value = props.ssl.id;
-    getDnsResolve(props.ssl);
+    getDnsResolveRes(props.ssl);
 };
 
-const getDnsResolve = async (row: Website.SSL) => {
+const getDnsResolveRes = async (row: Website.SSL) => {
     loading.value = true;
 
     let domains = [row.primaryDomain];
@@ -72,7 +72,7 @@ const getDnsResolve = async (row: Website.SSL) => {
         domains = domains.concat(otherDomains);
     }
     try {
-        const res = await GetDnsResolve({ acmeAccountId: row.acmeAccountId, domains: domains });
+        const res = await getDnsResolve({ acmeAccountId: row.acmeAccountId, domains: domains });
         if (res.data) {
             dnsResolve.value = res.data;
         }
@@ -82,7 +82,7 @@ const getDnsResolve = async (row: Website.SSL) => {
 };
 
 const submit = () => {
-    ObtainSSL({ ID: sslID.value })
+    obtainSSL({ ID: sslID.value })
         .then(() => {
             MsgSuccess(i18n.global.t('ssl.applyStart'));
             handleClose();

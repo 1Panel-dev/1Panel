@@ -32,7 +32,7 @@
 </template>
 <script lang="ts" setup>
 import { onUnmounted, reactive, ref } from 'vue';
-import { OperateSupervisorProcessFile } from '@/api/modules/runtime';
+import { operateSupervisorProcessFile } from '@/api/modules/runtime';
 import i18n from '@/lang';
 import { TabsPaneContext } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
@@ -55,7 +55,7 @@ const em = defineEmits(['search']);
 
 const getContent = () => {
     loading.value = true;
-    OperateSupervisorProcessFile(req)
+    operateSupervisorProcessFile(req)
         .then((res) => {
             content.value = res.data;
         })
@@ -93,7 +93,7 @@ const submit = () => {
         id: req.id,
     };
     loading.value = true;
-    OperateSupervisorProcessFile(updateReq)
+    operateSupervisorProcessFile(updateReq)
         .then(() => {
             em('search');
             open.value = false;
@@ -121,7 +121,7 @@ const cleanLog = async () => {
         title: i18n.global.t('commons.msg.clean'),
         names: [req.name],
         msg: i18n.global.t('commons.msg.operatorHelper', [log, i18n.global.t('commons.msg.clean')]),
-        api: OperateSupervisorProcessFile,
+        api: operateSupervisorProcessFile,
         params: { name: req.name, operate: 'clear', file: req.file },
     });
 };

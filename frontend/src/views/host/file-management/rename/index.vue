@@ -25,7 +25,7 @@
 </template>
 
 <script lang="ts" setup>
-import { RenameRile } from '@/api/modules/files';
+import { renameRile } from '@/api/modules/files';
 import { Rules } from '@/global/form-rules';
 import { FormInstance, FormRules } from 'element-plus';
 import { reactive, ref } from 'vue';
@@ -76,7 +76,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         addItem['oldName'] = getPath(addForm.path, oldName.value);
         addItem['newName'] = getPath(addForm.path, addForm.newName);
         loading.value = true;
-        RenameRile(addItem as File.FileRename)
+        renameRile(addItem as File.FileRename)
             .then(() => {
                 MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
                 handleClose();

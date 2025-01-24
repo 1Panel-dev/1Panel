@@ -35,13 +35,13 @@
 </template>
 
 <script lang="ts" setup>
-import { GetWebsite, UpdateWebsite } from '@/api/modules/website';
+import { getWebsite, updateWebsite } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import { computed, onMounted, reactive, ref } from 'vue';
 import { FormInstance } from 'element-plus';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { GetGroupList } from '@/api/modules/group';
+import { getGroupList } from '@/api/modules/group';
 import { Group } from '@/api/interface/group';
 
 const websiteForm = ref<FormInstance>();
@@ -76,7 +76,7 @@ const submit = async (formEl: FormInstance | undefined) => {
             return;
         }
         loading.value = true;
-        UpdateWebsite(form)
+        updateWebsite(form)
             .then(() => {
                 MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
                 search();
@@ -87,10 +87,10 @@ const submit = async (formEl: FormInstance | undefined) => {
     });
 };
 const search = async () => {
-    const res = await GetGroupList('website');
+    const res = await getGroupList('website');
     groups.value = res.data;
 
-    GetWebsite(websiteId.value).then((res) => {
+    getWebsite(websiteId.value).then((res) => {
         form.primaryDomain = res.data.primaryDomain;
         form.remark = res.data.remark;
         form.webSiteGroupId = res.data.webSiteGroupId;

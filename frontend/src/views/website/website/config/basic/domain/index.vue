@@ -31,12 +31,12 @@
 <script lang="ts" setup>
 import Domain from './create/index.vue';
 import { Website } from '@/api/interface/website';
-import { DeleteDomain, GetWebsite, ListDomains, UpdateDomain } from '@/api/modules/website';
+import { deleteDomain, getWebsite, listDomains, updateDomain } from '@/api/modules/website';
 import { computed, onMounted, ref } from 'vue';
 import i18n from '@/lang';
 import { Promotion } from '@element-plus/icons-vue';
 import { GlobalStore } from '@/store';
-import { CheckAppInstalled } from '@/api/modules/app';
+import { checkAppInstalled } from '@/api/modules/app';
 import { MsgSuccess } from '@/utils/message';
 const globalStore = GlobalStore();
 
@@ -64,7 +64,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
         click: function (row: Website.Domain) {
-            deleteDomain(row);
+            deleteWebsiteDomain(row);
         },
         disabled: () => {
             return data.value.length == 1;
@@ -93,7 +93,7 @@ const openUrl = (domain: Website.Domain) => {
     window.open(url);
 };
 
-const deleteDomain = async (row: Website.Domain) => {
+const deleteWebsiteDomain = async (row: Website.Domain) => {
     opRef.value.acceptParams({
         title: i18n.global.t('commons.msg.deleteTitle'),
         names: [row.domain],
@@ -101,14 +101,14 @@ const deleteDomain = async (row: Website.Domain) => {
             i18n.global.t('website.domain'),
             i18n.global.t('commons.button.delete'),
         ]),
-        api: DeleteDomain,
+        api: deleteDomain,
         params: { id: row.id },
     });
 };
 
 const search = (id: number) => {
     loading.value = true;
-    ListDomains(id)
+    listDomains(id)
         .then((res) => {
             data.value = res.data;
         })
@@ -118,14 +118,14 @@ const search = (id: number) => {
     onCheck();
 };
 
-const getWebsite = (id: number) => {
-    GetWebsite(id).then((res) => {
+const get = (id: number) => {
+    getWebsite(id).then((res) => {
         website.value = res.data;
     });
 };
 
 const onCheck = async () => {
-    await CheckAppInstalled('openresty', '')
+    await checkAppInstalled('openresty', '')
         .then((res) => {
             httpPort.value = res.data.httpPort;
             httpsPort.value = res.data.httpsPort;
@@ -135,7 +135,7 @@ const onCheck = async () => {
 
 const update = async (row: Website.Domain) => {
     try {
-        await UpdateDomain({
+        await updateDomain({
             id: row.id,
             ssl: row.ssl,
         });
@@ -145,6 +145,6 @@ const update = async (row: Website.Domain) => {
 
 onMounted(() => {
     search(id.value);
-    getWebsite(id.value);
+    get(id.value);
 });
 </script>

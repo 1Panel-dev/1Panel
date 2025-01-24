@@ -3,16 +3,16 @@
         <div class="flex items-center">
             <div class="flex-shrink-0 flex items-center mr-4">
                 <el-tooltip :content="$t('file.back')" placement="top">
-                    <el-button :icon="Back" @click="back" circle />
+                    <el-button icon="Back" @click="back" circle />
                 </el-tooltip>
                 <el-tooltip :content="$t('file.right')" placement="top">
-                    <el-button :icon="Right" @click="right" circle />
+                    <el-button icon="Right" @click="right" circle />
                 </el-tooltip>
                 <el-tooltip :content="$t('file.top')" placement="top">
-                    <el-button :icon="Top" @click="top" circle :disabled="paths.length == 0" />
+                    <el-button icon="Top" @click="top" circle :disabled="paths.length == 0" />
                 </el-tooltip>
                 <el-tooltip :content="$t('file.refresh')" placement="top">
-                    <el-button :icon="Refresh" circle @click="search" />
+                    <el-button icon="Refresh" circle @click="search" />
                 </el-tooltip>
             </div>
             <div
@@ -107,9 +107,7 @@
                         <el-button plain @click="openPaste">{{ $t('file.paste') }}({{ fileMove.count }})</el-button>
                     </el-tooltip>
                     <el-tooltip class="box-item" effect="dark" :content="$t('file.cancel')" placement="bottom">
-                        <el-button plain class="close" @click="closeMove">
-                            <el-icon class="close-icon"><Close /></el-icon>
-                        </el-button>
+                        <el-button plain class="close" icon="Close" @click="closeMove"></el-button>
                     </el-tooltip>
                 </el-button-group>
             </template>
@@ -205,15 +203,15 @@
                                         link
                                         type="warning"
                                         size="large"
-                                        :icon="StarFilled"
-                                        @click="removeFavorite(row.favoriteID)"
+                                        icon="StarFilled"
+                                        @click="remove(row.favoriteID)"
                                     ></el-button>
                                     <div v-else>
                                         <el-button
                                             v-if="hoveredRowIndex === $index"
                                             link
-                                            :icon="Star"
-                                            @click="addFavorite(row)"
+                                            icon="Star"
+                                            @click="addToFavorite(row)"
                                         ></el-button>
                                     </div>
                                 </div>
@@ -304,15 +302,14 @@
 <script setup lang="ts">
 import { nextTick, onMounted, reactive, ref, computed } from '@vue/runtime-core';
 import {
-    GetFilesList,
-    GetFileContent,
-    ComputeDirSize,
-    AddFavorite,
-    RemoveFavorite,
-    SearchFavorite,
+    getFilesList,
+    getFileContent,
+    computeDirSize,
+    addFavorite,
+    removeFavorite,
+    searchFavorite,
 } from '@/api/modules/files';
 import { computeSize, copyText, dateFormat, getFileType, getIcon, getRandomStr, downloadFile } from '@/utils/util';
-import { StarFilled, Star, Top, Right, Close } from '@element-plus/icons-vue';
 import { File } from '@/api/interface/file';
 import { Mimetypes, Languages } from '@/global/mimetype';
 import { useRouter } from 'vue-router';
@@ -434,7 +431,7 @@ const search = async () => {
 
     req.page = paginationConfig.currentPage;
     req.pageSize = paginationConfig.pageSize;
-    await GetFilesList(req)
+    await getFilesList(req)
         .then((res) => {
             handleSearchResult(res);
         })
@@ -447,7 +444,7 @@ const search = async () => {
 const searchFile = async () => {
     loading.value = true;
     try {
-        return await GetFilesList(req);
+        return await getFilesList(req);
     } finally {
         loading.value = false;
     }
@@ -615,7 +612,7 @@ const getDirSize = async (row: any, index: number) => {
         path: row.path,
     };
     btnLoading.value = index;
-    await ComputeDirSize(req)
+    await computeDirSize(req)
         .then(async (res) => {
             let newData = [...data.value];
             newData[index].dirSize = res.data.size;
@@ -711,7 +708,7 @@ const openCodeEditor = (path: string, extension: string) => {
         });
     }
 
-    GetFileContent(codeReq)
+    getFileContent(codeReq)
         .then((res) => {
             fileEdit.content = res.data.content;
             fileEdit.path = res.data.path;
@@ -828,20 +825,20 @@ const hideFavorite = () => {
     hoveredRowIndex.value = -1;
 };
 
-const addFavorite = async (row: File.File) => {
+const addToFavorite = async (row: File.File) => {
     try {
-        await AddFavorite(row.path);
+        await addFavorite(row.path);
         search();
     } catch (error) {}
 };
 
-const removeFavorite = async (id: number) => {
+const remove = async (id: number) => {
     ElMessageBox.confirm(i18n.global.t('file.removeFavorite'), i18n.global.t('commons.msg.remove'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
     }).then(async () => {
         try {
-            await RemoveFavorite(id);
+            await removeFavorite(id);
             search();
         } catch (error) {}
     });
@@ -849,7 +846,7 @@ const removeFavorite = async (id: number) => {
 
 const getFavoriates = async () => {
     try {
-        const res = await SearchFavorite(req);
+        const res = await searchFavorite(req);
         favorites.value = res.data.items;
     } catch (error) {}
 };

@@ -66,7 +66,7 @@
 </template>
 
 <script lang="ts" setup>
-import { GetApp, GetAppDetail } from '@/api/modules/app';
+import { getAppByKey, getAppDetail } from '@/api/modules/app';
 import MdEditor from 'md-editor-v3';
 import { ref } from 'vue';
 import Install from './install/index.vue';
@@ -105,7 +105,7 @@ const handleClose = () => {
 const getApp = async () => {
     loadingApp.value = true;
     try {
-        const res = await GetApp(appKey.value);
+        const res = await getAppByKey(appKey.value);
         app.value = res.data;
         app.value.icon = 'data:image/png;base64,' + res.data.icon;
         version.value = app.value.versions[0];
@@ -118,7 +118,7 @@ const getApp = async () => {
 const getDetail = async (id: number, version: string) => {
     loadingDetail.value = true;
     try {
-        const res = await GetAppDetail(id, version, 'app');
+        const res = await getAppDetail(id, version, 'app');
         appDetail.value = res.data;
         if (appDetail.value.architectures != '') {
             architectures.value = appDetail.value.architectures.split(',');

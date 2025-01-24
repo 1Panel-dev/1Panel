@@ -49,7 +49,7 @@
     </DrawerPro>
 </template>
 <script lang="ts" setup>
-import { GetCA } from '@/api/modules/website';
+import { getCA } from '@/api/modules/website';
 import { ref } from 'vue';
 
 const open = ref(false);
@@ -71,7 +71,7 @@ const acceptParams = (caID: number) => {
 };
 
 const get = async () => {
-    const res = await GetCA(id.value);
+    const res = await getCA(id.value);
     ca.value = res.data;
 };
 

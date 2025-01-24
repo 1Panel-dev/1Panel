@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts" setup>
-import { WgetFile } from '@/api/modules/files';
+import { wgetFile } from '@/api/modules/files';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { FormInstance, FormRules } from 'element-plus';
@@ -89,7 +89,7 @@ const submit = async (formEl: FormInstance | undefined) => {
             return;
         }
         loading.value = true;
-        WgetFile(addForm)
+        wgetFile(addForm)
             .then(() => {
                 MsgSuccess(i18n.global.t('file.downloadStart'));
                 submitData.value = true;

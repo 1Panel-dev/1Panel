@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts" setup>
-import { CreateDomain } from '@/api/modules/website';
+import { createDomain } from '@/api/modules/website';
 import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
 import { ref } from 'vue';
@@ -59,7 +59,7 @@ const submit = async (formEl: FormInstance | undefined) => {
             return;
         }
         loading.value = true;
-        CreateDomain(create.value)
+        createDomain(create.value)
             .then(() => {
                 MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
                 handleClose();

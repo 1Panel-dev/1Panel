@@ -36,7 +36,7 @@
 
 <script lang="ts" setup>
 import { Nginx } from '@/api/interface/nginx';
-import { UpdateNginxModule } from '@/api/modules/nginx';
+import { updateNginxModule } from '@/api/modules/nginx';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
@@ -88,7 +88,7 @@ const submit = async (form: FormInstance) => {
             ...module.value,
             operate: mode.value,
         };
-        UpdateNginxModule(data)
+        updateNginxModule(data)
             .then(() => {
                 if (mode.value === 'update') {
                     MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));

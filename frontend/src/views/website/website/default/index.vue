@@ -30,7 +30,7 @@
 </template>
 <script lang="ts" setup>
 import { Website } from '@/api/interface/website';
-import { ChangeDefaultServer, ListWebsites } from '@/api/modules/website';
+import { changeDefaultServer, listWebsites } from '@/api/modules/website';
 import i18n from '@/lang';
 import { ref } from 'vue';
 import { MsgSuccess } from '@/utils/message';
@@ -51,7 +51,7 @@ const handleClose = () => {
 };
 
 const get = async () => {
-    const res = await ListWebsites();
+    const res = await listWebsites();
     websites.value = res.data;
     websites.value.forEach((website: Website.WebsiteDTO) => {
         if (website.defaultServer) {
@@ -62,7 +62,7 @@ const get = async () => {
 
 const submit = () => {
     loading.value = true;
-    ChangeDefaultServer({ id: defaultId.value })
+    changeDefaultServer({ id: defaultId.value })
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
             handleClose();

@@ -28,7 +28,7 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { GetNginxModules, UpdateNginxModule } from '@/api/modules/nginx';
+import { getNginxModules, updateNginxModule } from '@/api/modules/nginx';
 import i18n from '@/lang';
 import { Nginx } from '@/api/interface/nginx';
 import { MsgSuccess } from '@/utils/message';
@@ -61,7 +61,7 @@ const buildNginx = async () => {
 
 const search = () => {
     loading.value = true;
-    GetNginxModules()
+    getNginxModules()
         .then((res) => {
             data.value = res.data.modules;
         })
@@ -84,7 +84,7 @@ const updateModule = (row: Nginx.NginxModule) => {
         ...row,
         operate: 'update',
     };
-    UpdateNginxModule(data)
+    updateNginxModule(data)
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
         })
@@ -105,7 +105,7 @@ const deleteModule = async (row: Nginx.NginxModule) => {
             i18n.global.t('nginx.module'),
             i18n.global.t('commons.button.delete'),
         ]),
-        api: UpdateNginxModule,
+        api: updateNginxModule,
         params: data,
     });
 };

@@ -123,7 +123,7 @@ import { ref } from '@vue/runtime-core';
 import { computed } from 'vue';
 import Create from './create/index.vue';
 import File from './file/index.vue';
-import { GetSupervisorProcess, OperateSupervisorProcess } from '@/api/modules/runtime';
+import { GetSupervisorProcess, operateSupervisorProcess } from '@/api/modules/runtime';
 import { GlobalStore } from '@/store';
 import i18n from '@/lang';
 import { HostTool } from '@/api/interface/host-tool';
@@ -229,7 +229,7 @@ const operate = async (operation: string, name: string) => {
         )
             .then(() => {
                 loading.value = true;
-                OperateSupervisorProcess({ operate: operation, name: name, id: runtimeID.value })
+                operateSupervisorProcess({ operate: operation, name: name, id: runtimeID.value })
                     .then(() => {
                         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                         search();

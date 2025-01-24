@@ -137,7 +137,7 @@
                                 <el-col :span="12">
                                     <el-select
                                         v-model="website.appinstall.version"
-                                        @change="getAppDetail(website.appinstall.version)"
+                                        @change="getDetail(website.appinstall.version)"
                                         class="p-w-200"
                                     >
                                         <el-option
@@ -430,7 +430,7 @@
                         <el-select
                             v-model="website.acmeAccountID"
                             :placeholder="$t('website.selectAcme')"
-                            @change="listSSL"
+                            @change="listSSLs"
                         >
                             <el-option :key="0" :label="$t('website.imported')" :value="0"></el-option>
                             <el-option
@@ -514,13 +514,13 @@
 
 <script lang="ts" setup name="CreateWebSite">
 import { App } from '@/api/interface/app';
-import { GetApp, GetAppDetail, SearchApp, GetAppInstalled, GetAppDetailByID } from '@/api/modules/app';
+import { getAppByKey, getAppDetail, searchApp, getAppInstalled, getAppDetailByID } from '@/api/modules/app';
 import {
-    CreateWebsite,
-    GetWebsiteOptions,
-    ListSSL,
-    PreCheck,
-    SearchAcmeAccount,
+    createWebsite,
+    getWebsiteOptions,
+    listSSL,
+    preCheck,
+    searchAcmeAccount,
     GetDirConfig,
 } from '@/api/modules/website';
 import { Rules, checkNumberRange } from '@/global/form-rules';
@@ -530,13 +530,13 @@ import { reactive, ref } from 'vue';
 import Params from '@/views/app-store/detail/params/index.vue';
 import Check from '../check/index.vue';
 import { MsgSuccess } from '@/utils/message';
-import { GetGroupList } from '@/api/modules/group';
+import { getGroupList } from '@/api/modules/group';
 import { Group } from '@/api/interface/group';
 import { SearchRuntimes } from '@/api/modules/runtime';
 import { Runtime } from '@/api/interface/runtime';
 import { getRandomStr } from '@/utils/util';
 import TaskLog from '@/components/task-log/index.vue';
-import { GetAppService } from '@/api/modules/app';
+import { getAppService } from '@/api/modules/app';
 import { v4 as uuidv4 } from 'uuid';
 import { dateFormatSimple, getProvider, getAccountName } from '@/utils/util';
 import { Website } from '@/api/interface/website';
@@ -701,7 +701,7 @@ const changeType = (type: string) => {
 };
 
 const searchAppInstalled = (appType: string) => {
-    GetAppInstalled({ type: appType, unused: true, all: true, page: 1, pageSize: 100 }).then((res) => {
+    getAppInstalled({ type: appType, unused: true, all: true, page: 1, pageSize: 100 }).then((res) => {
         appInstalls.value = res.data;
         website.value.appInstallId = undefined;
         if (appType == 'website' && res.data && res.data.length > 0) {
@@ -711,7 +711,7 @@ const searchAppInstalled = (appType: string) => {
 };
 
 const getAppByService = async (key: string) => {
-    const res = await GetAppService(key);
+    const res = await getAppService(key);
     dbServices.value = res.data;
 };
 
@@ -724,8 +724,8 @@ const changeInstall = () => {
     });
 };
 
-const searchApp = () => {
-    SearchApp(appReq).then((res) => {
+const searchAppList = () => {
+    searchApp(appReq).then((res) => {
         apps.value = res.data.items;
         if (res.data.items.length > 0) {
             website.value.appinstall.appId = res.data.items[0].id;
@@ -745,17 +745,17 @@ const changeApp = () => {
 };
 
 const getApp = () => {
-    GetApp(website.value.appinstall.appkey).then((res) => {
+    getAppByKey(website.value.appinstall.appkey).then((res) => {
         appVersions.value = res.data.versions;
         if (res.data.versions.length > 0) {
             website.value.appinstall.version = res.data.versions[0];
-            getAppDetail(res.data.versions[0]);
+            getDetail(res.data.versions[0]);
         }
     });
 };
 
-const getAppDetail = (version: string) => {
-    GetAppDetail(website.value.appinstall.appId, version, 'app').then((res) => {
+const getDetail = (version: string) => {
+    getAppDetail(website.value.appinstall.appId, version, 'app').then((res) => {
         website.value.appinstall.appDetailId = res.data.id;
         appDetail.value = res.data;
         appParams.value = res.data.params;
@@ -763,8 +763,8 @@ const getAppDetail = (version: string) => {
     });
 };
 
-const getAppDetailByID = (id: number) => {
-    GetAppDetailByID(id).then((res) => {
+const getDetailByID = (id: number) => {
+    getAppDetailByID(id).then((res) => {
         website.value.appinstall.appDetailId = res.data.id;
         appDetail.value = res.data;
         appParams.value = res.data.params;
@@ -784,7 +784,7 @@ const changeRuntime = (runID: number) => {
         if (item.id === runID) {
             runtimeResource.value = item.resource;
             if (item.resource === 'appstore') {
-                getAppDetailByID(item.appDetailID);
+                getDetailByID(item.appDetailID);
             }
         }
     });
@@ -800,7 +800,7 @@ const getRuntimes = async () => {
             website.value.runtimeID = first.id;
             runtimeResource.value = first.resource;
             if (first.resource === 'appstore') {
-                getAppDetailByID(first.appDetailID);
+                getDetailByID(first.appDetailID);
             }
         }
     } catch (error) {}
@@ -813,7 +813,7 @@ const acceptParams = async (installPath: string) => {
     }
     staticPath.value = installPath + '/www/sites/';
 
-    const res = await GetGroupList('website');
+    const res = await getGroupList('website');
     groups.value = res.data;
     website.value.webSiteGroupId = res.data[0].id;
     website.value.type = 'deployment';
@@ -829,7 +829,7 @@ const changeAppType = (type: string) => {
     if (type === 'installed') {
         searchAppInstalled('website');
     } else {
-        searchApp();
+        searchAppList();
     }
 };
 
@@ -838,13 +838,13 @@ const openTaskLog = (taskID: string) => {
 };
 
 const listAcmeAccount = () => {
-    SearchAcmeAccount({ page: 1, pageSize: 100 }).then((res) => {
+    searchAcmeAccount({ page: 1, pageSize: 100 }).then((res) => {
         acmeAccounts.value = res.data.items || [];
     });
 };
 
-const listSSL = () => {
-    ListSSL({
+const listSSLs = () => {
+    listSSL({
         acmeAccountID: String(website.value.acmeAccountID),
     }).then((res) => {
         ssls.value = res.data || [];
@@ -869,7 +869,7 @@ const submit = async (formEl: FormInstance | undefined) => {
             return;
         }
         loading.value = true;
-        PreCheck({})
+        preCheck({})
             .then((res) => {
                 if (res.data) {
                     loading.value = false;
@@ -884,7 +884,7 @@ const submit = async (formEl: FormInstance | undefined) => {
                     }
                     const taskID = uuidv4();
                     website.value.taskID = taskID;
-                    CreateWebsite(website.value)
+                    createWebsite(website.value)
                         .then(() => {
                             MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
                             handleClose();
@@ -919,7 +919,7 @@ const changeAlias = (value: string) => {
 
 const listWebsites = async () => {
     try {
-        const res = await GetWebsiteOptions({ types: ['static', 'runtime'] });
+        const res = await getWebsiteOptions({ types: ['static', 'runtime'] });
         parentWebsites.value = res.data;
         if (res.data.length > 0) {
             website.value.parentWebsiteID = res.data[0].id;

@@ -63,7 +63,7 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { GetSupervisorStatus, OperateSupervisor } from '@/api/modules/host-tool';
+import { getSupervisorStatus, operateSupervisor } from '@/api/modules/host-tool';
 import { onMounted, reactive, ref } from 'vue';
 import Status from '@/components/status/index.vue';
 import { ElMessageBox } from 'element-plus';
@@ -118,7 +118,7 @@ const onOperate = async (operation: string) => {
     )
         .then(() => {
             em('update:loading', true);
-            OperateSupervisor(operation)
+            operateSupervisor(operation)
                 .then(() => {
                     em('update:maskShow', true);
                     getStatus();
@@ -138,7 +138,7 @@ const getStatus = async () => {
     try {
         loading.value = true;
         em('update:loading', true);
-        const res = await GetSupervisorStatus();
+        const res = await getSupervisorStatus();
         if (res.data.config) {
             data.value = res.data.config as HostTool.Supersivor;
         }

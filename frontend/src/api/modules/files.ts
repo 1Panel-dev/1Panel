@@ -5,87 +5,87 @@ import { ResPage } from '../interface';
 import { TimeoutEnum } from '@/enums/http-enum';
 import { ReqPage } from '@/api/interface';
 
-export const GetFilesList = (params: File.ReqFile) => {
+export const getFilesList = (params: File.ReqFile) => {
     return http.post<File.File>('files/search', params, TimeoutEnum.T_5M);
 };
 
-export const GetUploadList = (params: File.SearchUploadInfo) => {
+export const getUploadList = (params: File.SearchUploadInfo) => {
     return http.post<ResPage<File.UploadInfo>>('files/upload/search', params);
 };
 
-export const GetFilesTree = (params: File.ReqFile) => {
+export const getFilesTree = (params: File.ReqFile) => {
     return http.post<File.FileTree[]>('files/tree', params);
 };
 
-export const CreateFile = (form: File.FileCreate) => {
+export const createFile = (form: File.FileCreate) => {
     return http.post<File.File>('files', form);
 };
 
-export const DeleteFile = (form: File.FileDelete) => {
+export const deleteFile = (form: File.FileDelete) => {
     return http.post<File.File>('files/del', form);
 };
 
-export const BatchDeleteFile = (form: File.FileBatchDelete) => {
+export const batchDeleteFile = (form: File.FileBatchDelete) => {
     return http.post('files/batch/del', form);
 };
 
-export const ChangeFileMode = (form: File.FileCreate) => {
+export const changeFileMode = (form: File.FileCreate) => {
     return http.post<File.File>('files/mode', form);
 };
 
-export const CompressFile = (form: File.FileCompress) => {
+export const compressFile = (form: File.FileCompress) => {
     return http.post<File.File>('files/compress', form, TimeoutEnum.T_10M);
 };
 
-export const DeCompressFile = (form: File.FileDeCompress) => {
+export const deCompressFile = (form: File.FileDeCompress) => {
     return http.post<File.File>('files/decompress', form, TimeoutEnum.T_10M);
 };
 
-export const GetFileContent = (params: File.ReqFile) => {
+export const getFileContent = (params: File.ReqFile) => {
     return http.post<File.File>('files/content', params);
 };
 
-export const SaveFileContent = (params: File.FileEdit) => {
+export const saveFileContent = (params: File.FileEdit) => {
     return http.post<File.File>('files/save', params);
 };
 
-export const CheckFile = (path: string) => {
+export const checkFile = (path: string) => {
     return http.post<boolean>('files/check', { path: path });
 };
 
-export const UploadFileData = (params: FormData, config: AxiosRequestConfig) => {
+export const uploadFileData = (params: FormData, config: AxiosRequestConfig) => {
     return http.upload<File.File>('files/upload', params, config);
 };
 
-export const ChunkUploadFileData = (params: FormData, config: AxiosRequestConfig) => {
+export const chunkUploadFileData = (params: FormData, config: AxiosRequestConfig) => {
     return http.upload<File.File>('files/chunkupload', params, config);
 };
 
-export const RenameRile = (params: File.FileRename) => {
+export const renameRile = (params: File.FileRename) => {
     return http.post<File.File>('files/rename', params);
 };
 
-export const ChangeOwner = (params: File.FileOwner) => {
+export const changeOwner = (params: File.FileOwner) => {
     return http.post<File.File>('files/owner', params);
 };
 
-export const WgetFile = (params: File.FileWget) => {
+export const wgetFile = (params: File.FileWget) => {
     return http.post<File.FileWgetRes>('files/wget', params);
 };
 
-export const MoveFile = (params: File.FileMove) => {
+export const moveFile = (params: File.FileMove) => {
     return http.post<File.File>('files/move', params, TimeoutEnum.T_5M);
 };
 
-export const DownloadFile = (params: File.FileDownload) => {
+export const downloadFile = (params: File.FileDownload) => {
     return http.download<BlobPart>('files/download', params, { responseType: 'blob', timeout: TimeoutEnum.T_40S });
 };
 
-export const ComputeDirSize = (params: File.DirSizeReq) => {
+export const computeDirSize = (params: File.DirSizeReq) => {
     return http.post<File.DirSizeRes>('files/size', params, TimeoutEnum.T_5M);
 };
 
-export const FileKeys = () => {
+export const fileKeys = () => {
     return http.get<File.FileKeys>('files/keys');
 };
 
@@ -101,30 +101,30 @@ export const clearRecycle = () => {
     return http.post<any>('files/recycle/clear');
 };
 
-export const SearchFavorite = (params: ReqPage) => {
+export const searchFavorite = (params: ReqPage) => {
     return http.post<ResPage<File.Favorite>>('files/favorite/search', params);
 };
 
-export const AddFavorite = (path: string) => {
+export const addFavorite = (path: string) => {
     return http.post<any>('files/favorite', { path: path });
 };
 
-export const ReadByLine = (req: File.FileReadByLine) => {
+export const readByLine = (req: File.FileReadByLine) => {
     return http.post<any>('files/read', req);
 };
 
-export const RemoveFavorite = (id: number) => {
+export const removeFavorite = (id: number) => {
     return http.post<any>('files/favorite/del', { id: id });
 };
 
-export const BatchChangeRole = (params: File.FileRole) => {
+export const batchChangeRole = (params: File.FileRole) => {
     return http.post<any>('files/batch/role', params);
 };
 
-export const GetRecycleStatus = () => {
+export const getRecycleStatus = () => {
     return http.get<string>('files/recycle/status');
 };
 
-export const GetPathByType = (pathType: string) => {
+export const getPathByType = (pathType: string) => {
     return http.get<string>(`files/path/${pathType}`);
 };

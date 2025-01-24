@@ -96,7 +96,7 @@
 <script setup lang="ts">
 import { nextTick, reactive, ref } from 'vue';
 import { UploadFile, UploadFiles, UploadInstance, UploadProps, UploadRawFile } from 'element-plus';
-import { ChunkUploadFileData, UploadFileData } from '@/api/modules/files';
+import { chunkUploadFileData, uploadFileData } from '@/api/modules/files';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess, MsgWarning } from '@/utils/message';
 import { Close, Document, UploadFilled } from '@element-plus/icons-vue';
@@ -280,7 +280,7 @@ const submit = async () => {
             }
             formData.append('overwrite', 'True');
             uploadPercent.value = 0;
-            await UploadFileData(formData, {
+            await uploadFileData(formData, {
                 onUploadProgress: (progressEvent) => {
                     const progress = Math.round((progressEvent.loaded / progressEvent.total) * 100);
                     uploadPercent.value = progress;
@@ -310,7 +310,7 @@ const submit = async () => {
                 formData.append('chunkCount', chunkCount.toString());
 
                 try {
-                    await ChunkUploadFileData(formData, {
+                    await chunkUploadFileData(formData, {
                         onUploadProgress: (progressEvent) => {
                             const progress = Math.round(
                                 ((uploadedChunkCount + progressEvent.loaded / progressEvent.total) * 100) / chunkCount,

@@ -58,7 +58,7 @@
 </template>
 <script lang="ts" setup>
 import { Nginx } from '@/api/interface/nginx';
-import { GetNginxConfigByScope, UpdateNginxConfigByScope } from '@/api/modules/nginx';
+import { getNginxConfigByScope, updateNginxConfigByScope } from '@/api/modules/nginx';
 import { checkNumberRange, Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
@@ -97,7 +97,7 @@ const variablesRules = reactive({
 });
 
 const getParams = async () => {
-    const res = await GetNginxConfigByScope(req.value);
+    const res = await getNginxConfigByScope(req.value);
     data.value = res.data;
     for (const param of res.data) {
         if (param.params.length === 0) {
@@ -128,7 +128,7 @@ const submit = async (formEl: FormInstance | undefined) => {
             gzip_comp_level: String(form.value.gzip_comp_level),
         };
         updateReq.value.params = params;
-        UpdateNginxConfigByScope(updateReq.value)
+        updateNginxConfigByScope(updateReq.value)
             .then(() => {
                 MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
                 getParams();

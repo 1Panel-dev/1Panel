@@ -26,7 +26,7 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
 import { File } from '@/api/interface/file';
-import { BatchChangeRole } from '@/api/modules/files';
+import { batchChangeRole } from '@/api/modules/files';
 import i18n from '@/lang';
 import FileRole from '@/components/file-role/index.vue';
 import { MsgSuccess } from '@/utils/message';
@@ -87,7 +87,7 @@ const submit = async () => {
     }
     loading.value = true;
 
-    BatchChangeRole(addForm)
+    batchChangeRole(addForm)
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
             handleClose();

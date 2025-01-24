@@ -47,7 +47,7 @@
 import { FormInstance } from 'element-plus';
 import { onBeforeUnmount, ref } from 'vue';
 import { App } from '@/api/interface/app';
-import { InstalledOp } from '@/api/modules/app';
+import { installedOp } from '@/api/modules/app';
 import i18n from '@/lang';
 import bus from '@/global/bus';
 import TaskLog from '@/components/task-log/index.vue';
@@ -97,7 +97,7 @@ const acceptParams = async (app: App.AppInstallDto) => {
 };
 
 const submit = async () => {
-    InstalledOp(deleteReq.value).then(() => {
+    installedOp(deleteReq.value).then(() => {
         handleClose();
         taskLogRef.value.openWithTaskID(deleteReq.value.taskID);
         bus.emit('update', true);

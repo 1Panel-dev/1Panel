@@ -24,7 +24,7 @@
 import { ref, reactive } from 'vue';
 import type { ElForm } from 'element-plus';
 import { Rules } from '@/global/form-rules';
-import { GetGroupList } from '@/api/modules/group';
+import { getGroupList } from '@/api/modules/group';
 
 const loading = ref();
 interface DialogProps {
@@ -56,7 +56,7 @@ const rules = reactive({
 });
 
 const loadGroups = async (groupName: string) => {
-    const res = await GetGroupList(dialogData.value.groupType);
+    const res = await getGroupList(dialogData.value.groupType);
     groupList.value = res.data;
     for (const group of groupList.value) {
         if (group.name === groupName) {

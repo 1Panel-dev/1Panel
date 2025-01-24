@@ -33,7 +33,7 @@
 <script lang="ts" setup>
 import { nextTick, onMounted, onUnmounted, reactive, ref } from 'vue';
 import { downloadFile } from '@/utils/util';
-import { ReadByLine } from '@/api/modules/files';
+import { readByLine } from '@/api/modules/files';
 import { GlobalStore } from '@/store';
 import bus from '@/global/bus';
 import hightlight from '@/components/hightlight/index.vue';
@@ -188,7 +188,7 @@ const getContent = async (pre: boolean) => {
     isLoading.value = true;
     emit('update:isReading', true);
 
-    const res = await ReadByLine(readReq);
+    const res = await readByLine(readReq);
     logPath.value = res.data.path;
     firstLoading.value = false;
 

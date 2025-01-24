@@ -107,7 +107,7 @@
 </template>
 
 <script lang="ts" setup>
-import { CreateDnsAccount, UpdateDnsAccount } from '@/api/modules/website';
+import { createDnsAccount, updateDnsAccount } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
@@ -181,7 +181,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         loading.value = true;
 
         if (accountData.value.mode === 'edit') {
-            UpdateDnsAccount(account.value)
+            updateDnsAccount(account.value)
                 .then(() => {
                     MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
                     handleClose();
@@ -190,7 +190,7 @@ const submit = async (formEl: FormInstance | undefined) => {
                     loading.value = false;
                 });
         } else {
-            CreateDnsAccount(account.value)
+            createDnsAccount(account.value)
                 .then(() => {
                     MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
                     handleClose();

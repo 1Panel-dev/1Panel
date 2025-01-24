@@ -66,7 +66,7 @@
 </template>
 
 <script setup lang="ts">
-import { GetRealIPConfig, UpdateRealIPConfig } from '@/api/modules/website';
+import { getRealIPConfig, updateRealIPConfig } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
@@ -95,7 +95,7 @@ const rules = {
 };
 
 const get = () => {
-    GetRealIPConfig(props.id).then((res) => {
+    getRealIPConfig(props.id).then((res) => {
         req.open = res.data.open;
         if (res.data.open) {
             req.ipFrom = res.data.ipFrom;
@@ -113,7 +113,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         }
         req.websiteID = props.id;
         try {
-            await UpdateRealIPConfig(req);
+            await updateRealIPConfig(req);
             MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
         } catch (error) {}
     });

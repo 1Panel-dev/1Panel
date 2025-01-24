@@ -58,7 +58,7 @@ import i18n from '@/lang';
 import { ref } from 'vue';
 import { File } from '@/api/interface/file';
 import { getIcon } from '@/utils/util';
-import { DeleteFile, GetRecycleStatus } from '@/api/modules/files';
+import { deleteFile, getRecycleStatus } from '@/api/modules/files';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { loadBaseDir } from '@/api/modules/setting';
 
@@ -78,7 +78,7 @@ const acceptParams = (props: File.File[]) => {
 
 const getStatus = async () => {
     try {
-        const res = await GetRecycleStatus();
+        const res = await getRecycleStatus();
         recycleStatus.value = res.data;
         if (recycleStatus.value === 'disable') {
             forceDelete.value = true;
@@ -100,7 +100,7 @@ const onConfirm = async () => {
                 return;
             }
         }
-        pros.push(DeleteFile({ path: s['path'], isDir: s['isDir'], forceDelete: forceDelete.value }));
+        pros.push(deleteFile({ path: s['path'], isDir: s['isDir'], forceDelete: forceDelete.value }));
     }
     loading.value = true;
     Promise.all(pros)

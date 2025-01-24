@@ -38,7 +38,7 @@
 
 <script lang="ts" setup name="proxy">
 import { Website } from '@/api/interface/website';
-import { OperateProxyConfig, GetProxyConfig, ClearProxtCache } from '@/api/modules/website';
+import { operateProxyConfig, getProxyConfig, clearProxyCache } from '@/api/modules/website';
 import { computed, onMounted, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
@@ -142,7 +142,7 @@ const deleteProxy = async (proxyConfig: Website.ProxyConfig) => {
             i18n.global.t('website.proxy'),
             i18n.global.t('commons.msg.delete'),
         ]),
-        api: OperateProxyConfig,
+        api: operateProxyConfig,
         params: proxyConfig,
     });
 };
@@ -158,7 +158,7 @@ const changeCache = (proxyConfig: Website.ProxyConfig) => {
 
 const submit = async (proxyConfig: Website.ProxyConfig) => {
     loading.value = true;
-    OperateProxyConfig(proxyConfig)
+    operateProxyConfig(proxyConfig)
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
             search();
@@ -193,7 +193,7 @@ const opProxy = (proxyConfig: Website.ProxyConfig) => {
 const search = async () => {
     try {
         loading.value = true;
-        const res = await GetProxyConfig({ id: id.value });
+        const res = await getProxyConfig({ id: id.value });
         data.value = res.data || [];
     } catch (error) {
     } finally {
@@ -206,7 +206,7 @@ const clear = () => {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
     }).then(async () => {
-        await ClearProxtCache({ websiteID: id.value });
+        await clearProxyCache({ websiteID: id.value });
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     });
 };

@@ -34,7 +34,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { FormInstance } from 'element-plus';
-import { GetNginxModules, BuildNginx } from '@/api/modules/nginx';
+import { getNginxModules, buildNginx } from '@/api/modules/nginx';
 import i18n from '@/lang';
 import { newUUID } from '@/utils/util';
 import TaskLog from '@/components/task-log/index.vue';
@@ -58,7 +58,7 @@ const acceptParams = async () => {
 
 const getModules = async () => {
     try {
-        const res = await GetNginxModules();
+        const res = await getNginxModules();
         build.value.mirror = res.data.mirror;
     } catch (error) {}
 };
@@ -72,7 +72,7 @@ const submit = async (form: FormInstance) => {
         }).then(async () => {
             const taskID = newUUID();
             try {
-                await BuildNginx({
+                await buildNginx({
                     taskID: taskID,
                     mirror: build.value.mirror,
                 });

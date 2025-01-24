@@ -15,7 +15,7 @@
 
 <script lang="ts" setup>
 import { Website } from '@/api/interface/website';
-import { GetNginxConfig, UpdateNginxConfig } from '@/api/modules/website';
+import { getNginxConfig, updateNginxConfig } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import { FormInstance } from 'element-plus';
 import { computed, onMounted, ref } from 'vue';
@@ -55,7 +55,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         }
         req.value.params = defaultModel.value;
         loading.value = true;
-        UpdateNginxConfig(req.value)
+        updateNginxConfig(req.value)
             .then(() => {
                 MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
                 search(req.value);
@@ -68,7 +68,7 @@ const submit = async (formEl: FormInstance | undefined) => {
 
 const search = (req: Website.NginxConfigReq) => {
     loading.value = true;
-    GetNginxConfig(req)
+    getNginxConfig(req)
         .then((res) => {
             if (res.data && res.data.params.length > 0) {
                 const params = res.data.params[0].params;

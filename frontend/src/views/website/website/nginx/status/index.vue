@@ -52,7 +52,7 @@
 
 <script lang="ts" setup>
 import { Nginx } from '@/api/interface/nginx';
-import { GetNginxStatus } from '@/api/modules/nginx';
+import { getNginxStatus } from '@/api/modules/nginx';
 import { onMounted, ref } from 'vue';
 
 const props = defineProps({
@@ -76,7 +76,7 @@ const get = async () => {
     if (props.status != 'Running') {
         return;
     }
-    const res = await GetNginxStatus();
+    const res = await getNginxStatus();
     data.value = res.data;
 };
 

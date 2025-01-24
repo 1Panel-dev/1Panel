@@ -227,7 +227,7 @@ import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
 import { listDbItems } from '@/api/modules/database';
-import { ListAppInstalled } from '@/api/modules/app';
+import { listAppInstalled } from '@/api/modules/app';
 import { shortcuts } from '@/utils/shortcuts';
 import TaskLog from '@/components/task-log/log-without-dialog.vue';
 
@@ -272,7 +272,7 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
         }
     }
     if (dialogData.value.rowData.type === 'app') {
-        const res = await ListAppInstalled();
+        const res = await listAppInstalled();
         let itemApps = res.data || [];
         for (const item of itemApps) {
             if (item.id == dialogData.value.rowData.appID) {

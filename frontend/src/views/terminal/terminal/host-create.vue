@@ -80,7 +80,7 @@ import { addHost, testByInfo } from '@/api/modules/terminal';
 import i18n from '@/lang';
 import { reactive, ref } from 'vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
-import { GetGroupList } from '@/api/modules/group';
+import { getGroupList } from '@/api/modules/group';
 
 const dialogVisible = ref();
 const isOK = ref(false);
@@ -176,7 +176,7 @@ const submitAddHost = (formEl: FormInstance | undefined, ops: string) => {
 };
 
 const loadGroups = async () => {
-    const res = await GetGroupList('host');
+    const res = await getGroupList('host');
     groupList.value = res.data;
     for (const item of groupList.value) {
         if (item.isDefault) {

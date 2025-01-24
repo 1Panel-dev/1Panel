@@ -17,7 +17,7 @@ import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
 import { reactive, ref } from 'vue';
 import { MsgSuccess } from '@/utils/message';
-import { UpdateRedirectConfigFile } from '@/api/modules/website';
+import { updateRedirectConfigFile } from '@/api/modules/website';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 
 const proxyForm = ref<FormInstance>();
@@ -44,7 +44,7 @@ const acceptParams = async (proxyreq: any) => {
 
 const submit = async () => {
     loading.value = true;
-    UpdateRedirectConfigFile(req)
+    updateRedirectConfigFile(req)
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
             handleClose();

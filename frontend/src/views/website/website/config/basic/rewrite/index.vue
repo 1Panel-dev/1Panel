@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-form-item :label="$t('website.rewriteMode')">
-            <el-select v-model="req.name" filterable @change="getRewriteConfig(req.name)" class="p-w-200">
+            <el-select v-model="req.name" filterable @change="getRewrite(req.name)" class="p-w-200">
                 <el-option :label="$t('website.current')" :value="'current'"></el-option>
                 <el-option
                     v-for="(rewrite, index) in rewrites"
@@ -29,7 +29,7 @@
             <el-button type="primary" @click="submit()">
                 {{ $t('nginx.saveAndReload') }}
             </el-button>
-            <el-button type="primary" @click="operateCustomRewrite()" :disabled="content == ''">
+            <el-button type="primary" @click="opCustomRewrite()" :disabled="content == ''">
                 {{ $t('website.saveCustom') }}
             </el-button>
         </div>
@@ -41,11 +41,11 @@
 <script lang="ts" setup>
 import { computed, nextTick, onMounted, reactive, ref } from 'vue';
 import {
-    GetWebsite,
-    GetRewriteConfig,
-    UpdateRewriteConfig,
-    ListCustomRewrite,
-    OperateCustomRewrite,
+    getWebsite,
+    getRewriteConfig,
+    updateRewriteConfig,
+    listCustomRewrite,
+    operateCustomRewrite,
 } from '@/api/modules/website';
 import { Rewrites } from '@/global/mimetype';
 import { MsgSuccess } from '@/utils/message';
@@ -78,12 +78,12 @@ const update = reactive({
 const rewrites = ref([]);
 const deleteRef = ref();
 
-const getRewriteConfig = async (rewrite: string) => {
+const getRewrite = async (rewrite: string) => {
     loading.value = true;
     req.name = rewrite;
     req.websiteID = id.value;
     try {
-        const res = await GetRewriteConfig(req);
+        const res = await getRewriteConfig(req);
         content.value = res.data.content;
         if (res.data.content == '') {
             content.value = ' ';
@@ -108,7 +108,7 @@ const submit = async () => {
     update.content = content.value;
     loading.value = true;
     try {
-        await UpdateRewriteConfig(update);
+        await updateRewriteConfig(update);
         MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
     } catch (error) {
     } finally {
@@ -116,7 +116,7 @@ const submit = async () => {
     }
 };
 
-const operateCustomRewrite = async () => {
+const opCustomRewrite = async () => {
     customRef.value.acceptParams(content.value);
 };
 
@@ -128,13 +128,13 @@ const deleteCustomRewrite = (name: string) => {
             i18n.global.t('container.template'),
             i18n.global.t('commons.button.delete'),
         ]),
-        api: OperateCustomRewrite,
+        api: operateCustomRewrite,
         params: { name: name, operate: 'delete' },
     });
 };
 
 const init = () => {
-    ListCustomRewrite().then((res) => {
+    listCustomRewrite().then((res) => {
         rewrites.value = [];
         if (res && res.data) {
             for (const d of res.data) {
@@ -151,12 +151,12 @@ const init = () => {
             });
         }
     });
-    GetWebsite(id.value).then((res) => {
+    getWebsite(id.value).then((res) => {
         const name = res.data.rewrite == '' ? 'default' : 'current';
         if (name === 'current') {
             req.name = 'current';
         }
-        getRewriteConfig(name);
+        getRewrite(name);
     });
 };
 

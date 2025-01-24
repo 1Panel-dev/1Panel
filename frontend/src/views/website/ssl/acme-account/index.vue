@@ -42,7 +42,7 @@
 
 <script lang="ts" setup>
 import { Website } from '@/api/interface/website';
-import { DeleteAcmeAccount, SearchAcmeAccount } from '@/api/modules/website';
+import { deleteAcmeAccount, searchAcmeAccount } from '@/api/modules/website';
 import i18n from '@/lang';
 import { reactive, ref } from 'vue';
 import Create from './create/index.vue';
@@ -79,7 +79,7 @@ const search = async () => {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
     };
-    await SearchAcmeAccount(req).then((res) => {
+    await searchAcmeAccount(req).then((res) => {
         data.value = res.data.items;
         paginationConfig.total = res.data.total;
     });
@@ -101,7 +101,7 @@ const deleteAccount = async (row: any) => {
             i18n.global.t('website.acmeAccountManage'),
             i18n.global.t('commons.button.delete'),
         ]),
-        api: DeleteAcmeAccount,
+        api: deleteAcmeAccount,
         params: { id: row.id },
     });
 };

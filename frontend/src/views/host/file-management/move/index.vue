@@ -35,7 +35,7 @@
 </template>
 
 <script lang="ts" setup>
-import { CheckFile, MoveFile } from '@/api/modules/files';
+import { checkFile, moveFile } from '@/api/modules/files';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { FormInstance, FormRules } from 'element-plus';
@@ -102,7 +102,7 @@ const changeType = () => {
 };
 
 const mvFile = () => {
-    MoveFile(addForm)
+    moveFile(addForm)
         .then(() => {
             if (type.value === 'cut') {
                 MsgSuccess(i18n.global.t('file.moveSuccess'));
@@ -136,7 +136,7 @@ const acceptParams = async (props: MoveProps) => {
     type.value = props.type;
     if (props.name && props.name != '') {
         oldName.value = props.name;
-        const res = await CheckFile(props.path + '/' + props.name);
+        const res = await checkFile(props.path + '/' + props.name);
         if (res.data) {
             changeName.value = true;
             addForm.cover = false;

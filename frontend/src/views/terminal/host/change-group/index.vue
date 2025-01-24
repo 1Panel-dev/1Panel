@@ -32,7 +32,7 @@ import { ref, reactive } from 'vue';
 import type { ElForm } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import { editHostGroup } from '@/api/modules/terminal';
-import { GetGroupList } from '@/api/modules/group';
+import { getGroupList } from '@/api/modules/group';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 
@@ -66,7 +66,7 @@ const rules = reactive({
 });
 
 const loadGroups = async (groupName: string) => {
-    const res = await GetGroupList('host');
+    const res = await getGroupList('host');
     groupList.value = res.data;
     for (const group of groupList.value) {
         if (group.name === groupName) {

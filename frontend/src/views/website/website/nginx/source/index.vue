@@ -23,10 +23,10 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { GetNginx, UpdateNginxConfigFile } from '@/api/modules/nginx';
+import { getNginx, updateNginxConfigFile } from '@/api/modules/nginx';
 import { onMounted, ref } from 'vue';
 import i18n from '@/lang';
-import { GetAppDefaultConfig } from '@/api/modules/app';
+import { getAppDefaultConfig } from '@/api/modules/app';
 import { MsgSuccess } from '@/utils/message';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 
@@ -36,22 +36,22 @@ let useOld = ref(false);
 
 const submit = () => {
     loading.value = true;
-    UpdateNginxConfigFile({
+    updateNginxConfigFile({
         content: content.value,
         backup: useOld.value,
     })
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
-            getNginx();
+            getNginxConfig();
         })
         .finally(() => {
             loading.value = false;
         });
 };
 
-const getNginx = async () => {
+const getNginxConfig = async () => {
     try {
-        const res = await GetNginx();
+        const res = await getNginx();
         content.value = res.data.content;
         useOld.value = false;
     } catch (error) {}
@@ -60,7 +60,7 @@ const getNginx = async () => {
 const getDefaultConfig = async () => {
     loading.value = true;
     try {
-        const res = await GetAppDefaultConfig('openresty', '');
+        const res = await getAppDefaultConfig('openresty', '');
         content.value = res.data;
         useOld.value = true;
     } catch (error) {}
@@ -68,6 +68,6 @@ const getDefaultConfig = async () => {
 };
 
 onMounted(() => {
-    getNginx();
+    getNginxConfig();
 });
 </script>

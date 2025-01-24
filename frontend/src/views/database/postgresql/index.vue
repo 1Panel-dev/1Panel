@@ -253,7 +253,7 @@ import {
 import i18n from '@/lang';
 import { Database } from '@/api/interface/database';
 import { App } from '@/api/interface/app';
-import { GetAppPort } from '@/api/modules/app';
+import { getAppPort } from '@/api/modules/app';
 import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
@@ -437,7 +437,7 @@ const getAppDetail = () => {
 };
 
 const loadPGAdminPort = async () => {
-    const res = await GetAppPort('pgadmin4', '');
+    const res = await getAppPort('pgadmin4', '');
     pgadminPort.value = res.data;
 };
 

@@ -110,14 +110,14 @@ export const GetSupervisorProcess = (id: number) => {
     return http.get<HostTool.ProcessStatus[]>(`/runtimes/supervisor/process/${id}`);
 };
 
-export const OperateSupervisorProcess = (req: Runtime.ProcessReq) => {
+export const operateSupervisorProcess = (req: Runtime.ProcessReq) => {
     return http.post(`/runtimes/supervisor/process`, req, TimeoutEnum.T_60S);
 };
 
-export const OperateSupervisorProcessFile = (req: Runtime.ProcessFileReq) => {
+export const operateSupervisorProcessFile = (req: Runtime.ProcessFileReq) => {
     return http.post<string>(`/runtimes/supervisor/process/file`, req, TimeoutEnum.T_60S);
 };
 
-export const CreateSupervisorProcess = (req: Runtime.SupersivorProcess) => {
+export const createSupervisorProcess = (req: Runtime.SupersivorProcess) => {
     return http.post(`/runtimes/supervisor/process`, req);
 };

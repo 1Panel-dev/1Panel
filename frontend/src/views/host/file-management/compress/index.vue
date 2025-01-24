@@ -48,7 +48,7 @@ import { File } from '@/api/interface/file';
 import { FormInstance, FormRules } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import { CompressExtension, CompressType } from '@/enums/files';
-import { CompressFile } from '@/api/modules/files';
+import { compressFile } from '@/api/modules/files';
 import FileList from '@/components/file-list/index.vue';
 import { MsgSuccess } from '@/utils/message';
 
@@ -101,7 +101,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         Object.assign(addItem, form.value);
         addItem['name'] = form.value.name + extension.value;
         loading.value = true;
-        CompressFile(addItem as File.FileCompress)
+        compressFile(addItem as File.FileCompress)
             .then(() => {
                 MsgSuccess(i18n.global.t('file.compressSuccess'));
                 handleClose();

@@ -27,7 +27,7 @@
 import FireRouter from '@/views/host/ssh/index.vue';
 import { ref, onMounted, onUnmounted, reactive } from 'vue';
 import i18n from '@/lang';
-import { StopProcess } from '@/api/modules/process';
+import { stopProcess } from '@/api/modules/process';
 import { MsgError, MsgSuccess } from '@/utils/message';
 
 const sshSearch = reactive({
@@ -39,7 +39,7 @@ const buttons = [
     {
         label: i18n.global.t('ssh.disconnect'),
         click: function (row: any) {
-            stopProcess(row.PID);
+            stop(row.PID);
         },
     },
 ];
@@ -97,7 +97,7 @@ const search = () => {
     }
 };
 
-const stopProcess = async (PID: number) => {
+const stop = async (PID: number) => {
     ElMessageBox.confirm(i18n.global.t('ssh.stopSSHWarn'), i18n.global.t('ssh.disconnect'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
@@ -105,7 +105,7 @@ const stopProcess = async (PID: number) => {
     })
         .then(async () => {
             try {
-                await StopProcess({ PID: PID });
+                await stopProcess({ PID: PID });
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             } catch (error) {
                 MsgError(error);

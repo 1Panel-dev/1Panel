@@ -286,7 +286,7 @@ import {
 import i18n from '@/lang';
 import { Database } from '@/api/interface/database';
 import { App } from '@/api/interface/app';
-import { GetAppPort } from '@/api/modules/app';
+import { getAppPort } from '@/api/modules/app';
 import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
@@ -473,12 +473,12 @@ const getAppDetail = () => {
 };
 
 const loadPhpMyAdminPort = async () => {
-    const res = await GetAppPort('phpmyadmin', '');
+    const res = await getAppPort('phpmyadmin', '');
     phpadminPort.value = res.data;
 };
 
 const loadAdminerPort = async () => {
-    const res = await GetAppPort('adminer', '');
+    const res = await getAppPort('adminer', '');
     adminerPort.value = res.data;
 };
 

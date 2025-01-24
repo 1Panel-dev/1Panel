@@ -2,34 +2,34 @@ import http from '@/api';
 import { File } from '../interface/file';
 import { Nginx } from '../interface/nginx';
 
-export const GetNginx = () => {
+export const getNginx = () => {
     return http.get<File.File>(`/openresty`);
 };
 
-export const GetNginxConfigByScope = (req: Nginx.NginxScopeReq) => {
+export const getNginxConfigByScope = (req: Nginx.NginxScopeReq) => {
     return http.post<Nginx.NginxParam[]>(`/openresty/scope`, req);
 };
 
-export const UpdateNginxConfigByScope = (req: Nginx.NginxConfigReq) => {
+export const updateNginxConfigByScope = (req: Nginx.NginxConfigReq) => {
     return http.post(`/openresty/update`, req);
 };
 
-export const GetNginxStatus = () => {
+export const getNginxStatus = () => {
     return http.get<Nginx.NginxStatus>(`/openresty/status`);
 };
 
-export const UpdateNginxConfigFile = (req: Nginx.NginxFileUpdate) => {
+export const updateNginxConfigFile = (req: Nginx.NginxFileUpdate) => {
     return http.post(`/openresty/file`, req);
 };
 
-export const BuildNginx = (req: Nginx.NginxBuildReq) => {
+export const buildNginx = (req: Nginx.NginxBuildReq) => {
     return http.post(`/openresty/build`, req);
 };
 
-export const GetNginxModules = () => {
+export const getNginxModules = () => {
     return http.get<Nginx.NginxBuildConfig>(`/openresty/modules`);
 };
 
-export const UpdateNginxModule = (req: Nginx.NginxModuleUpdate) => {
+export const updateNginxModule = (req: Nginx.NginxModuleUpdate) => {
     return http.post(`/openresty/modules/update`, req);
 };

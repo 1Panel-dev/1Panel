@@ -65,7 +65,7 @@
 import { FormInstance } from 'element-plus';
 import { ref } from 'vue';
 import { Rules } from '@/global/form-rules';
-import { CreateAcmeAccount } from '@/api/modules/website';
+import { createAcmeAccount } from '@/api/modules/website';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { AcmeAccountTypes, KeyTypes } from '@/global/mimetype';
@@ -115,7 +115,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         }
         loading.value = true;
 
-        CreateAcmeAccount(account.value)
+        createAcmeAccount(account.value)
             .then(() => {
                 MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
                 handleClose();

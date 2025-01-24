@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts" setup>
-import { OperateCustomRewrite } from '@/api/modules/website';
+import { operateCustomRewrite } from '@/api/modules/website';
 import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
 import { ref } from 'vue';
@@ -55,7 +55,7 @@ const submit = async (formEl: FormInstance | undefined) => {
             return;
         }
         loading.value = true;
-        OperateCustomRewrite(req.value)
+        operateCustomRewrite(req.value)
             .then(() => {
                 MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
                 handleClose();

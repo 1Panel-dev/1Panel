@@ -144,7 +144,7 @@ import Terminal from '@/components/terminal/index.vue';
 import AppStatus from '@/components/app-status/index.vue';
 import QuickCmd from '@/views/database/redis/command/index.vue';
 import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
-import { CheckAppInstalled } from '@/api/modules/app';
+import { checkAppInstalled } from '@/api/modules/app';
 import router from '@/routers';
 import { GlobalStore } from '@/store';
 import { listDatabases, checkRedisCli, installRedisCli } from '@/api/modules/database';
@@ -312,7 +312,7 @@ const initTerminal = async () => {
         isRefresh.value = !isRefresh.value;
         return;
     }
-    await CheckAppInstalled('redis', currentDBName.value)
+    await checkAppInstalled('redis', currentDBName.value)
         .then((res) => {
             redisIsExist.value = res.data.isExist;
             redisStatus.value = res.data.status;

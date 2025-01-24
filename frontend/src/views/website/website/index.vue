@@ -140,9 +140,14 @@
                                 v-if="row.status === 'Running'"
                                 :operate="true"
                                 :status="row.status"
-                                @click="opWebsite('stop', row.id)"
+                                @click="operateWebsite('stop', row.id)"
                             />
-                            <Status v-else :status="row.status" :operate="true" @click="opWebsite('start', row.id)" />
+                            <Status
+                                v-else
+                                :status="row.status"
+                                :operate="true"
+                                @click="operateWebsite('start', row.id)"
+                            />
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -243,14 +248,14 @@ import AppStatus from '@/components/app-status/index.vue';
 import i18n from '@/lang';
 import router from '@/routers';
 import { onMounted, reactive, ref, computed } from 'vue';
-import { ListDomains, OpWebsite, SearchWebsites, UpdateWebsite } from '@/api/modules/website';
+import { listDomains, opWebsite, searchWebsites, updateWebsite } from '@/api/modules/website';
 import { Website } from '@/api/interface/website';
 import { App } from '@/api/interface/app';
 import { ElMessageBox } from 'element-plus';
 import { dateFormatSimple } from '@/utils/util';
 import { MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
-import { GetGroupList } from '@/api/modules/group';
+import { getGroupList } from '@/api/modules/group';
 import { Group } from '@/api/interface/group';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
@@ -341,7 +346,7 @@ const search = async () => {
 
     loading.value = true;
     data.value = [];
-    await SearchWebsites(req)
+    await searchWebsites(req)
         .then((res) => {
             data.value = res.data.items;
             paginationConfig.total = res.data.total;
@@ -352,7 +357,7 @@ const search = async () => {
 };
 
 const listGroup = async () => {
-    const res = await GetGroupList('website');
+    const res = await getGroupList('website');
     groups.value = res.data;
 };
 
@@ -431,7 +436,7 @@ const submitDate = (row: any) => {
         IPV6: row.IPV6,
     };
 
-    UpdateWebsite(req).then(() => {
+    updateWebsite(req).then(() => {
         MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
         search();
     });
@@ -506,12 +511,12 @@ const checkDate = (date: Date) => {
     return date.getTime() < now.getTime();
 };
 
-const opWebsite = (op: string, id: number) => {
+const operateWebsite = (op: string, id: number) => {
     ElMessageBox.confirm(i18n.global.t('website.' + op + 'Helper'), i18n.global.t('cronjob.changeStatus'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
     }).then(async () => {
-        await OpWebsite({ id: id, operate: op });
+        await opWebsite({ id: id, operate: op });
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         search();
     });
@@ -522,7 +527,7 @@ const toFolder = (folder: string) => {
 };
 
 const searchDomains = (id: number) => {
-    ListDomains(id).then((res) => {
+    listDomains(id).then((res) => {
         domains.value = res.data;
     });
 };

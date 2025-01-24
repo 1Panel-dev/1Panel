@@ -80,7 +80,7 @@
 </template>
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';
-import { GetAppUpdateVersions, IgnoreUpgrade, InstalledOp } from '@/api/modules/app';
+import { getAppUpdateVersions, ignoreUpgrade, installedOp } from '@/api/modules/app';
 import i18n from '@/lang';
 import { ElMessageBox, FormInstance } from 'element-plus';
 import { reactive, ref, onBeforeUnmount } from 'vue';
@@ -174,7 +174,7 @@ const getVersions = async (version: string) => {
         req['updateVersion'] = version;
     }
     try {
-        const res = await GetAppUpdateVersions(req);
+        const res = await getAppUpdateVersions(req);
         versions.value = res.data || [];
         if (res.data != null && res.data.length > 0) {
             let item = res.data[0];
@@ -202,7 +202,7 @@ const operate = async () => {
         }
         const taskID = uuidv4();
         operateReq.taskID = taskID;
-        await InstalledOp(operateReq)
+        await installedOp(operateReq)
             .then(() => {
                 bus.emit('upgrade', true);
                 handleClose();
@@ -212,7 +212,7 @@ const operate = async () => {
                 loading.value = false;
             });
     } else {
-        await IgnoreUpgrade(operateReq)
+        await ignoreUpgrade(operateReq)
             .then(() => {
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 bus.emit('upgrade', true);

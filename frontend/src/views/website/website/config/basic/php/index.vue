@@ -33,7 +33,7 @@ import { SearchRuntimes } from '@/api/modules/runtime';
 import { onMounted, reactive, ref } from 'vue';
 import { Runtime } from '@/api/interface/runtime';
 import { Website } from '@/api/interface/website';
-import { ChangePHPVersion, GetWebsite } from '@/api/modules/website';
+import { changePHPVersion, getWebsite } from '@/api/modules/website';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 const props = defineProps({
@@ -76,7 +76,7 @@ const submit = async () => {
         }).then(async () => {
             loading.value = true;
             try {
-                await ChangePHPVersion(versionReq);
+                await changePHPVersion(versionReq);
                 MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
                 getWebsiteDetail();
             } catch (error) {}
@@ -86,7 +86,7 @@ const submit = async () => {
 };
 
 const getWebsiteDetail = async () => {
-    const res = await GetWebsite(props.id);
+    const res = await getWebsite(props.id);
     versionReq.runtimeID = res.data.runtimeID;
     oldRuntimeID.value = res.data.runtimeID;
     website.value = res.data;

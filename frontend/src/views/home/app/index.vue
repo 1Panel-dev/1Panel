@@ -180,7 +180,7 @@
 </template>
 
 <script lang="ts" setup>
-import { GetAppStoreConfig, InstalledOp } from '@/api/modules/app';
+import { getAppStoreConfig, installedOp } from '@/api/modules/app';
 import { changeLauncherStatus, loadAppLauncher, loadAppLauncherOption } from '@/api/modules/dashboard';
 import i18n from '@/lang';
 import { GlobalStore } from '@/store';
@@ -206,7 +206,7 @@ const defaultLink = ref('');
 const acceptParams = (): void => {
     search();
     loadOption();
-    getAppStoreConfig();
+    getConfig();
 };
 
 const goInstall = (key: string, type: string) => {
@@ -257,9 +257,9 @@ const toLink = (link: string) => {
     window.open(link, '_blank');
 };
 
-const getAppStoreConfig = async () => {
+const getConfig = async () => {
     try {
-        const res = await GetAppStoreConfig();
+        const res = await getAppStoreConfig();
         if (res.data.defaultDomain != '') {
             defaultLink.value = res.data.defaultDomain;
         }
@@ -282,7 +282,7 @@ const onOperate = async (operation: string, row: any) => {
             operate: operation,
             detailId: row.detailId,
         };
-        await InstalledOp(params)
+        await installedOp(params)
             .then(() => {
                 loading.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));

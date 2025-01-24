@@ -43,7 +43,7 @@
 </template>
 
 <script lang="ts" setup>
-import { CreateSupervisorProcess } from '@/api/modules/host-tool';
+import { createSupervisorProcess } from '@/api/modules/host-tool';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import FileList from '@/components/file-list/index.vue';
 import i18n from '@/lang';
@@ -114,7 +114,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         }
         loading.value = true;
         process.value.numprocs = String(process.value.numprocsNum);
-        CreateSupervisorProcess(process.value)
+        createSupervisorProcess(process.value)
             .then(() => {
                 open.value = false;
                 em('close', open);

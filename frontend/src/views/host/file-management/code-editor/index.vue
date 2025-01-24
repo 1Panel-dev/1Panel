@@ -152,7 +152,7 @@
 </template>
 
 <script lang="ts" setup>
-import { GetFileContent, GetFilesTree, SaveFileContent } from '@/api/modules/files';
+import { getFileContent, getFilesTree, saveFileContent } from '@/api/modules/files';
 import i18n from '@/lang';
 import { MsgError, MsgInfo, MsgSuccess } from '@/utils/message';
 import * as monaco from 'monaco-editor';
@@ -456,7 +456,7 @@ const quickSave = () => {
 const saveContent = () => {
     if (isEdit.value) {
         loading.value = true;
-        SaveFileContent(form.value)
+        saveFileContent(form.value)
             .then(() => {
                 loading.value = false;
                 isEdit.value = false;
@@ -561,7 +561,7 @@ const getContent = (path: string, extension: string) => {
             });
         }
 
-        GetFileContent(codeReq)
+        getFileContent(codeReq)
             .then((res) => {
                 form.value.content = res.data.content;
                 oldFileContent.value = res.data.content;
@@ -612,7 +612,7 @@ const search = async (path: string) => {
         req.sortBy = 'name';
         req.sortOrder = 'ascending';
     }
-    return await GetFilesTree(req);
+    return await getFilesTree(req);
 };
 
 const getUpData = async () => {

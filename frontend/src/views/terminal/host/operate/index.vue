@@ -86,7 +86,7 @@ import { ref, reactive } from 'vue';
 import type { ElForm } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import { addHost, editHost, testByInfo } from '@/api/modules/terminal';
-import { GetGroupList } from '@/api/modules/group';
+import { getGroupList } from '@/api/modules/group';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
 
@@ -134,7 +134,7 @@ function checkName(rule: any, value: any, callback: any) {
 }
 
 const loadGroups = async () => {
-    const res = await GetGroupList('host');
+    const res = await getGroupList('host');
     groupList.value = res.data;
     if (dialogData.value.title === 'create') {
         for (const item of groupList.value) {

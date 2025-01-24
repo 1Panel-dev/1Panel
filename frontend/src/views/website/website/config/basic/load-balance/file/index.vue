@@ -17,7 +17,7 @@ import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
 import { computed, reactive, ref } from 'vue';
 import { MsgSuccess } from '@/utils/message';
-import { UpdateLoadBalanceFile } from '@/api/modules/website';
+import { updateLoadBalanceFile } from '@/api/modules/website';
 import { GlobalStore } from '@/store';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import { Website } from '@/api/interface/website';
@@ -51,7 +51,7 @@ const acceptParams = async (ups: Website.NginxUpstreamFile) => {
 
 const submit = async () => {
     loading.value = true;
-    UpdateLoadBalanceFile(req)
+    updateLoadBalanceFile(req)
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
             handleClose();

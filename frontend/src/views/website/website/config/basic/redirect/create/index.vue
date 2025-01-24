@@ -60,7 +60,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ListDomains, OperateRedirectConfig, GetRedirectConfig } from '@/api/modules/website';
+import { listDomains, operateRedirectConfig, getRedirectConfig } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
@@ -130,7 +130,7 @@ const submit = async (formEl: FormInstance | undefined) => {
             return;
         }
         loading.value = true;
-        OperateRedirectConfig(redirect.value)
+        operateRedirectConfig(redirect.value)
             .then(() => {
                 if (redirect.value.operate == 'create') {
                     MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
@@ -148,7 +148,7 @@ const submit = async (formEl: FormInstance | undefined) => {
 const getDomains = async () => {
     try {
         loading.value = true;
-        const res = await GetRedirectConfig({ websiteID: redirect.value.websiteID });
+        const res = await getRedirectConfig({ websiteID: redirect.value.websiteID });
         let oldDomains = [];
         if (res.data) {
             for (const old of res.data) {
@@ -157,7 +157,7 @@ const getDomains = async () => {
                 }
             }
         }
-        ListDomains(redirect.value.websiteID)
+        listDomains(redirect.value.websiteID)
             .then((domainRes) => {
                 if (domainRes.data) {
                     if (oldDomains.length > 0) {

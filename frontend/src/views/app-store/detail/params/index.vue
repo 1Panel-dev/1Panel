@@ -110,11 +110,11 @@
 <script lang="ts" setup>
 import { computed, onMounted, reactive, ref } from 'vue';
 import { getRandomStr } from '@/utils/util';
-import { GetAppService } from '@/api/modules/app';
+import { getAppService } from '@/api/modules/app';
 import { Rules } from '@/global/form-rules';
 import { App } from '@/api/interface/app';
 import { getDBName } from '@/utils/util';
-import { GetPathByType } from '@/api/modules/files';
+import { getPathByType } from '@/api/modules/files';
 
 interface ParamObj extends App.FromField {
     services: App.AppService[];
@@ -188,7 +188,7 @@ const handleParams = () => {
                 form[p.envKey] = p.default;
             }
             if (p.type == 'text' && p.envKey == 'WEBSITE_DIR') {
-                GetPathByType('websiteDir').then((res) => {
+                getPathByType('websiteDir').then((res) => {
                     form[p.envKey] = res.data;
                 });
             }
@@ -228,7 +228,7 @@ const handleParams = () => {
 
 const getServices = async (childKey: string, key: string | undefined, pObj: ParamObj | undefined) => {
     pObj.services = [];
-    await GetAppService(key).then((res) => {
+    await getAppService(key).then((res) => {
         pObj.services = res.data || [];
         form[childKey] = '';
         if (res.data && res.data.length > 0) {

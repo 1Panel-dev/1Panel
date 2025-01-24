@@ -35,7 +35,7 @@
 
 <script lang="ts" setup>
 import { Website } from '@/api/interface/website';
-import { DeleteCA, SearchCAs, DownloadCAFile } from '@/api/modules/website';
+import { deleteCA, searchCAs, downloadCAFile } from '@/api/modules/website';
 import i18n from '@/lang';
 import { reactive, ref } from 'vue';
 import Create from './create/index.vue';
@@ -80,7 +80,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
         click: function (row: Website.CA) {
-            deleteCA(row);
+            deleteca(row);
         },
     },
 ];
@@ -99,7 +99,7 @@ const search = async () => {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
     };
-    await SearchCAs(req).then((res) => {
+    await searchCAs(req).then((res) => {
         data.value = res.data.items;
         paginationConfig.total = res.data.total;
     });
@@ -114,7 +114,7 @@ const handleClose = () => {
     open.value = false;
 };
 
-const deleteCA = async (row: any) => {
+const deleteca = async (row: any) => {
     opRef.value.acceptParams({
         title: i18n.global.t('commons.button.delete'),
         names: [row.name],
@@ -122,14 +122,14 @@ const deleteCA = async (row: any) => {
             i18n.global.t('website.ca'),
             i18n.global.t('commons.button.delete'),
         ]),
-        api: DeleteCA,
+        api: deleteCA,
         params: { id: row.id },
     });
 };
 
 const onDownload = (row: Website.CA) => {
     loading.value = true;
-    DownloadCAFile({ id: row.id })
+    downloadCAFile({ id: row.id })
         .then((res) => {
             const downloadUrl = window.URL.createObjectURL(new Blob([res]));
             const a = document.createElement('a');

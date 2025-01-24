@@ -48,7 +48,7 @@
 </template>
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';
-import { InstalledOp } from '@/api/modules/app';
+import { installedOp } from '@/api/modules/app';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ref } from 'vue';
@@ -118,7 +118,7 @@ const onConfirm = () => {
             forceDelete: true,
             deleteDB: true,
         };
-        InstalledOp(deleteReq).then(() => {
+        installedOp(deleteReq).then(() => {
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             open.value = false;
             em('close', open);

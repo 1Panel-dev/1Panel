@@ -151,7 +151,7 @@
 
 <script lang="ts" setup>
 import { Website } from '@/api/interface/website';
-import { CreateSSL, ListWebsites, SearchAcmeAccount, SearchDnsAccount, UpdateSSL } from '@/api/modules/website';
+import { createSSL, listWebsites, searchAcmeAccount, searchDnsAccount, updateSSL } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
@@ -265,7 +265,7 @@ const acceptParams = (op: string, websiteSSL: Website.SSLDTO) => {
     ssl.value.websiteId = Number(id.value);
     getAcmeAccounts();
     getDnsAccounts();
-    listwebsites();
+    getwebsites();
     open.value = true;
 };
 
@@ -274,7 +274,7 @@ const getPath = (dir: string) => {
 };
 
 const getAcmeAccounts = async () => {
-    const res = await SearchAcmeAccount(acmeReq);
+    const res = await searchAcmeAccount(acmeReq);
     acmeAccounts.value = res.data.items || [];
     if (acmeAccounts.value.length > 0 && ssl.value.acmeAccountId == undefined) {
         ssl.value.acmeAccountId = res.data.items[0].id;
@@ -282,7 +282,7 @@ const getAcmeAccounts = async () => {
 };
 
 const getDnsAccounts = async () => {
-    const res = await SearchDnsAccount(dnsReq);
+    const res = await searchDnsAccount(dnsReq);
     dnsAccounts.value = res.data.items || [];
     if (dnsAccounts.value.length > 0 && ssl.value.dnsAccountId == undefined) {
         ssl.value.dnsAccountId = res.data.items[0].id;
@@ -293,8 +293,8 @@ const changeProvider = () => {
     dnsResolve.value = [];
 };
 
-const listwebsites = async () => {
-    const res = await ListWebsites();
+const getwebsites = async () => {
+    const res = await listWebsites();
     websites.value = res.data;
 };
 
@@ -323,7 +323,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         }
         loading.value = true;
         if (operate.value == 'create') {
-            CreateSSL(ssl.value)
+            createSSL(ssl.value)
                 .then((res: any) => {
                     if (ssl.value.provider != 'dnsManual') {
                         em('submit', res.data.id);
@@ -355,7 +355,7 @@ const submit = async (formEl: FormInstance | undefined) => {
                 execShell: ssl.value.execShell,
                 shell: ssl.value.shell,
             };
-            UpdateSSL(sslUpdate)
+            updateSSL(sslUpdate)
                 .then(() => {
                     handleClose();
                     MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));

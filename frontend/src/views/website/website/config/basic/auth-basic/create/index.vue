@@ -44,7 +44,7 @@
 </template>
 
 <script lang="ts" setup>
-import { OperateAuthConfig, OperatePathAuthConfig } from '@/api/modules/website';
+import { operateAuthConfig, operatePathAuthConfig } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
@@ -99,7 +99,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         loading.value = true;
         try {
             if (authBasic.value.scope == 'root') {
-                await OperateAuthConfig(authBasic.value);
+                await operateAuthConfig(authBasic.value);
             } else {
                 const req = {
                     websiteID: authBasic.value.websiteID,
@@ -110,7 +110,7 @@ const submit = async (formEl: FormInstance | undefined) => {
                     operate: authBasic.value.operate,
                     remark: authBasic.value.remark,
                 };
-                await OperatePathAuthConfig(req);
+                await operatePathAuthConfig(req);
             }
             if (authBasic.value.operate == 'create') {
                 MsgSuccess(i18n.global.t('commons.msg.createSuccess'));

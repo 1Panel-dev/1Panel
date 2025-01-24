@@ -24,7 +24,7 @@
     </DrawerPro>
 </template>
 <script lang="ts" setup>
-import { UpdateDefaultHtml, GetDefaultHtml } from '@/api/modules/website';
+import { updateDefaultHtml, getDefaultHtml } from '@/api/modules/website';
 import i18n from '@/lang';
 import { ref } from 'vue';
 import { MsgSuccess } from '@/utils/message';
@@ -52,7 +52,7 @@ const handleClose = () => {
 };
 
 const get = async () => {
-    const res = await GetDefaultHtml(type.value);
+    const res = await getDefaultHtml(type.value);
     content.value = res.data.content;
     initEditor();
 };
@@ -83,7 +83,7 @@ const submit = async () => {
     loading.value = true;
     try {
         const content = view.value.state.doc.toString();
-        await UpdateDefaultHtml({ type: type.value, content: content });
+        await updateDefaultHtml({ type: type.value, content: content });
         MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
     } catch (error) {
     } finally {

@@ -64,7 +64,7 @@
 </template>
 <script lang="ts" setup>
 import { Website } from '@/api/interface/website';
-import { GetDirConfig, GetWebsite, UpdateWebsiteDir, UpdateWebsiteDirPermission } from '@/api/modules/website';
+import { getDirConfig, getWebsite, updateWebsiteDir, updateWebsiteDirPermission } from '@/api/modules/website';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
@@ -104,7 +104,7 @@ const dirConfig = ref<Website.DirConfig>({
 
 const search = () => {
     loading.value = true;
-    GetWebsite(websiteId.value)
+    getWebsite(websiteId.value)
         .then((res) => {
             website.value = res.data;
             update.id = website.value.id;
@@ -116,7 +116,7 @@ const search = () => {
             updatePermission.user = website.value.user === '' ? '1000' : website.value.user;
             if (website.value.type === 'static' || website.value.runtimeID > 0) {
                 configDir.value = true;
-                getDirConfig();
+                getConfig();
             }
         })
         .finally(() => {
@@ -131,7 +131,7 @@ const submit = async (formEl: FormInstance | undefined) => {
             return;
         }
         loading.value = true;
-        UpdateWebsiteDir(update)
+        updateWebsiteDir(update)
             .then(() => {
                 MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
                 search();
@@ -147,7 +147,7 @@ const submitPermission = async () => {
         return;
     }
     loading.value = true;
-    UpdateWebsiteDirPermission(updatePermission)
+    updateWebsiteDirPermission(updatePermission)
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
             search();
@@ -161,9 +161,9 @@ const initData = () => {
     dirs.value = [];
 };
 
-const getDirConfig = async () => {
+const getConfig = async () => {
     try {
-        const res = await GetDirConfig({ id: props.id });
+        const res = await getDirConfig({ id: props.id });
         dirs.value = res.data.dirs;
         dirConfig.value = res.data;
     } catch (error) {}

@@ -32,7 +32,7 @@
 </template>
 <script lang="ts" setup>
 import { onUnmounted, reactive, ref, watch } from 'vue';
-import { OperateSupervisorProcessFile } from '@/api/modules/host-tool';
+import { operateSupervisorProcessFile } from '@/api/modules/host-tool';
 import i18n from '@/lang';
 import { TabsPaneContext } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
@@ -54,13 +54,9 @@ let timer: NodeJS.Timer | null = null;
 
 const em = defineEmits(['search']);
 
-watch(open, (val) => {
-    if (screenfull.isEnabled && !val && !mobile.value) screenfull.exit();
-});
-
 const getContent = () => {
     loading.value = true;
-    OperateSupervisorProcessFile(req)
+    operateSupervisorProcessFile(req)
         .then((res) => {
             content.value = res.data;
         })
@@ -97,7 +93,7 @@ const submit = () => {
         content: content.value,
     };
     loading.value = true;
-    OperateSupervisorProcessFile(updateReq)
+    operateSupervisorProcessFile(updateReq)
         .then(() => {
             em('search');
             open.value = false;
@@ -124,7 +120,7 @@ const cleanLog = async () => {
         title: i18n.global.t('commons.msg.clean'),
         names: [req.name],
         msg: i18n.global.t('commons.msg.operatorHelper', [log, i18n.global.t('commons.msg.clean')]),
-        api: OperateSupervisorProcessFile,
+        api: operateSupervisorProcessFile,
         params: { name: req.name, operate: 'clear', file: req.file },
     });
 };

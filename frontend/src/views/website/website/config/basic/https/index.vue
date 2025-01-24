@@ -44,7 +44,7 @@
                             <el-select
                                 v-model="form.acmeAccountID"
                                 :placeholder="$t('website.selectAcme')"
-                                @change="listSSL"
+                                @change="listSSLs"
                                 class="p-w-400"
                             >
                                 <el-option :key="0" :label="$t('website.imported')" :value="0"></el-option>
@@ -175,7 +175,7 @@
 </template>
 <script lang="ts" setup>
 import { Website } from '@/api/interface/website';
-import { GetHTTPSConfig, ListSSL, SearchAcmeAccount, UpdateHTTPSConfig } from '@/api/modules/website';
+import { getHTTPSConfig, listSSL, searchAcmeAccount, updateHTTPSConfig } from '@/api/modules/website';
 import { ElMessageBox, FormInstance } from 'element-plus';
 import { computed, onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
@@ -242,9 +242,9 @@ const getPrivateKeyPath = (path: string) => {
 const getCertificatePath = (path: string) => {
     form.certificatePath = path;
 };
-const listSSL = () => {
+const listSSLs = () => {
     sslReq.acmeAccountID = String(form.acmeAccountID);
-    ListSSL(sslReq).then((res) => {
+    listSSL(sslReq).then((res) => {
         ssls.value = res.data || [];
         if (ssls.value.length > 0) {
             let exist = false;
@@ -266,7 +266,7 @@ const listSSL = () => {
 };
 
 const listAcmeAccount = () => {
-    SearchAcmeAccount({ page: 1, pageSize: 100 }).then((res) => {
+    searchAcmeAccount({ page: 1, pageSize: 100 }).then((res) => {
         acmeAccounts.value = res.data.items || [];
     });
 };
@@ -286,7 +286,7 @@ const changeType = (type: string) => {
 };
 
 const get = () => {
-    GetHTTPSConfig(id.value).then((res) => {
+    getHTTPSConfig(id.value).then((res) => {
         if (res.data) {
             form.type = 'existed';
             const data = res.data;
@@ -310,7 +310,7 @@ const get = () => {
             form.http3 = data.http3;
             form.httpsPort = data.httpsPort;
         }
-        listSSL();
+        listSSLs();
         listAcmeAccount();
     });
 };
@@ -322,7 +322,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         }
         loading.value = true;
         form.websiteId = id.value;
-        UpdateHTTPSConfig(form)
+        updateHTTPSConfig(form)
             .then(() => {
                 MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
                 get();
@@ -335,7 +335,7 @@ const submit = async (formEl: FormInstance | undefined) => {
 
 const changeEnable = (enable: boolean) => {
     if (enable) {
-        listSSL();
+        listSSLs();
         form.hsts = true;
     }
     if (resData.value.enable && !enable) {
@@ -352,7 +352,7 @@ const changeEnable = (enable: boolean) => {
                     instance.confirmButtonLoading = true;
                     form.enable = false;
                     form.websiteId = id.value;
-                    UpdateHTTPSConfig(form).then(() => {
+                    updateHTTPSConfig(form).then(() => {
                         done();
                         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                         get();

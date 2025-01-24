@@ -32,7 +32,7 @@
     </DrawerPro>
 </template>
 <script lang="ts" setup>
-import { GetIgnoredApp, IgnoreUpgrade } from '@/api/modules/app';
+import { getIgnoredApp, ignoreUpgrade } from '@/api/modules/app';
 import { ref } from 'vue';
 import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
@@ -54,14 +54,14 @@ const acceptParams = () => {
 
 const getApps = async () => {
     try {
-        const res = await GetIgnoredApp();
+        const res = await getIgnoredApp();
         apps.value = res.data;
     } catch (error) {}
 };
 
 const cancelIgnore = async (id: number) => {
     loading.value = true;
-    await IgnoreUpgrade({ detailID: id, operate: 'cancel' })
+    await ignoreUpgrade({ detailID: id, operate: 'cancel' })
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })

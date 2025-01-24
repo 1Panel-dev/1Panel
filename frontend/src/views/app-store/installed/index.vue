@@ -365,12 +365,12 @@
 
 <script lang="ts" setup>
 import {
-    SearchAppInstalled,
-    InstalledOp,
-    SyncInstalledApp,
-    AppInstalledDeleteCheck,
-    GetAppTags,
-    GetAppStoreConfig,
+    searchAppInstalled,
+    installedOp,
+    syncInstalledApp,
+    appInstalledDeleteCheck,
+    getAppTags,
+    getAppStoreConfig,
 } from '@/api/modules/app';
 import { onMounted, onUnmounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
@@ -456,7 +456,7 @@ const sync = () => {
         .then(async () => {
             syncLoading.value = true;
             try {
-                await SyncInstalledApp();
+                await syncInstalledApp();
                 MsgSuccess(i18n.global.t('app.syncSuccess'));
                 search();
             } finally {
@@ -491,10 +491,10 @@ const getTagValue = (key: string) => {
 const search = async () => {
     searchReq.page = paginationConfig.currentPage;
     searchReq.pageSize = paginationConfig.pageSize;
-    const res = await SearchAppInstalled(searchReq);
+    const res = await searchAppInstalled(searchReq);
     data.value = res.data.items;
     paginationConfig.total = res.data.total;
-    GetAppTags().then((res) => {
+    getAppTags().then((res) => {
         tags.value = res.data;
     });
 };
@@ -505,7 +505,7 @@ const openOperate = (row: any, op: string) => {
     if (op == 'upgrade' || op == 'ignore') {
         upgradeRef.value.acceptParams(row.id, row.name, row.dockerCompose, op, row.app);
     } else if (op == 'delete') {
-        AppInstalledDeleteCheck(row.id).then(async (res) => {
+        appInstalledDeleteCheck(row.id).then(async (res) => {
             const items = res.data;
             if (res.data && res.data.length > 0) {
                 checkRef.value.acceptParams({ items: items, key: row.appKey, installID: row.id });
@@ -525,7 +525,7 @@ const openIgnore = () => {
 const operate = async () => {
     open.value = false;
     loading.value = true;
-    await InstalledOp(operateReq)
+    await installedOp(operateReq)
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             searchReq.sync = true;
@@ -700,9 +700,9 @@ const toLink = (link: string) => {
     window.open(link, '_blank');
 };
 
-const getAppstoreConfig = async () => {
+const getConfig = async () => {
     try {
-        const res = await GetAppStoreConfig();
+        const res = await getAppStoreConfig();
         if (res.data.defaultDomain != '') {
             defaultLink.value = res.data.defaultDomain;
         }
@@ -710,7 +710,7 @@ const getAppstoreConfig = async () => {
 };
 
 onMounted(() => {
-    getAppstoreConfig();
+    getConfig();
     const path = router.currentRoute.value.path;
     if (path == '/apps/upgrade') {
         activeName.value = i18n.global.t('app.canUpgrade');

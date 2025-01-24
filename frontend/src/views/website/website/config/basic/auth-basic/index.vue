@@ -54,7 +54,7 @@
 
 <script lang="ts" setup name="proxy">
 import { Website } from '@/api/interface/website';
-import { OperateAuthConfig, GetAuthConfig, GetPathAuthConfig, OperatePathAuthConfig } from '@/api/modules/website';
+import { operateAuthConfig, getAuthConfig, getPathAuthConfig, operatePathAuthConfig } from '@/api/modules/website';
 import { computed, onMounted, ref } from 'vue';
 import i18n from '@/lang';
 import Create from './create/index.vue';
@@ -143,7 +143,7 @@ const deleteAuth = async (authConfig: Website.NginxAuthConfig) => {
             i18n.global.t('website.basicAuth'),
             i18n.global.t('commons.button.delete'),
         ]),
-        api: OperateAuthConfig,
+        api: operateAuthConfig,
         params: authConfig,
     });
 };
@@ -158,7 +158,7 @@ const deletePathAuth = async (authConfig: Website.NginxPathAuthConfig) => {
             i18n.global.t('website.basicAuth'),
             i18n.global.t('commons.button.delete'),
         ]),
-        api: OperatePathAuthConfig,
+        api: operatePathAuthConfig,
         params: authConfig,
     });
 };
@@ -167,7 +167,7 @@ const changeEnable = () => {
     const req = initData(id.value);
     req.operate = enable.value ? 'enable' : 'disable';
     loading.value = true;
-    OperateAuthConfig(req)
+    operateAuthConfig(req)
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
             search();
@@ -180,7 +180,7 @@ const changeEnable = () => {
 const search = async () => {
     try {
         loading.value = true;
-        const res = await GetAuthConfig({ websiteID: id.value });
+        const res = await getAuthConfig({ websiteID: id.value });
         data.value = res.data.items || [];
         enable.value = res.data.enable;
     } catch (error) {
@@ -192,7 +192,7 @@ const search = async () => {
 const searchPath = async () => {
     try {
         loading.value = true;
-        const res = await GetPathAuthConfig({ websiteID: id.value });
+        const res = await getPathAuthConfig({ websiteID: id.value });
         pathData.value = res.data || [];
     } catch (error) {
     } finally {

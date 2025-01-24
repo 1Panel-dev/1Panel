@@ -181,7 +181,7 @@
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';
 import { Runtime } from '@/api/interface/runtime';
-import { GetApp, GetAppDetail, SearchApp } from '@/api/modules/app';
+import { getAppByKey, getAppDetail, searchApp } from '@/api/modules/app';
 import { CreateRuntime, GetRuntime, ListPHPExtensions, UpdateRuntime } from '@/api/modules/runtime';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
@@ -308,12 +308,12 @@ const changeResource = (resource: string) => {
         runtime.image = '';
     } else {
         runtime.version = '';
-        searchApp(null);
+        searchAppList(null);
     }
 };
 
-const searchApp = (appId: number) => {
-    SearchApp(appReq).then((res) => {
+const searchAppList = (appId: number) => {
+    searchApp(appReq).then((res) => {
         apps.value = res.data.items || [];
         if (res.data && res.data.items && res.data.items.length > 0) {
             if (appId == null) {
@@ -349,7 +349,7 @@ const changeVersion = () => {
     loading.value = true;
     initParam.value = false;
     extensions.value = undefined;
-    GetAppDetail(runtime.appID, runtime.version, 'runtime')
+    getAppDetail(runtime.appID, runtime.version, 'runtime')
         .then((res) => {
             runtime.appDetailID = res.data.id;
             runtime.image = res.data.image + ':' + runtime.version;
@@ -371,7 +371,7 @@ const changeVersion = () => {
 };
 
 const getApp = (appkey: string, mode: string) => {
-    GetApp(appkey).then((res) => {
+    getAppByKey(appkey).then((res) => {
         appVersions.value = res.data.versions || [];
         if (res.data.versions.length > 0) {
             runtime.version = res.data.versions[0];
@@ -470,15 +470,25 @@ const acceptParams = async (props: OperateRrops) => {
     initParam.value = false;
     if (props.mode === 'create') {
         Object.assign(runtime, initData(props.type));
-        searchApp(null);
+        searchAppList(null);
     } else {
-        searchApp(props.appID);
+        searchAppList(props.appID);
         getRuntime(props.id);
     }
     extensions.value = '';
     open.value = true;
     listPHPExtensions();
 };
+
+watch(
+    () => runtime.name,
+    (newVal) => {
+        if (newVal && mode.value == 'create') {
+            runtime.params['CONTAINER_NAME'] = newVal;
+        }
+    },
+    { deep: true },
+);
 
 defineExpose({
     acceptParams,

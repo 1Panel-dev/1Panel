@@ -100,7 +100,7 @@ import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { changeRedisPassword, getDatabase } from '@/api/modules/database';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
-import { GetAppConnInfo } from '@/api/modules/app';
+import { getAppConnInfo } from '@/api/modules/app';
 import { MsgSuccess } from '@/utils/message';
 import { getRandomStr } from '@/utils/util';
 import { getSettingInfo } from '@/api/modules/setting';
@@ -164,7 +164,7 @@ const random = async () => {
 
 const loadPassword = async () => {
     if (form.from === 'local') {
-        const res = await GetAppConnInfo('redis', form.database);
+        const res = await getAppConnInfo('redis', form.database);
         form.status = res.data.status;
         form.password = res.data.password || '';
         form.port = res.data.port || 3306;

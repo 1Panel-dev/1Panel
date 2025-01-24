@@ -58,7 +58,7 @@
     </div>
 </template>
 <script setup lang="ts">
-import { ListWebsites, OpWebsiteLog } from '@/api/modules/website';
+import { listWebsites, opWebsiteLog } from '@/api/modules/website';
 import { reactive } from 'vue';
 import { onMounted } from 'vue';
 import { ref, nextTick } from 'vue';
@@ -89,7 +89,7 @@ const searchLog = () => {
 
 const getWebsites = async () => {
     loading.value = true;
-    await ListWebsites()
+    await listWebsites()
         .then((res) => {
             websites.value = res.data || [];
             if (websites.value.length > 0) {
@@ -130,12 +130,6 @@ const changeTail = () => {
     logRef.value.changeTail(true);
 };
 
-// const onCloseLog = async () => {
-//     tailLog.value = false;
-//     clearInterval(Number(timer));
-//     timer = null;
-// };
-
 const onSubmitClean = async () => {
     const req = {
         id: logConfig.id,
@@ -143,7 +137,7 @@ const onSubmitClean = async () => {
         logType: logConfig.name,
     };
     loading.value = true;
-    OpWebsiteLog(req)
+    opWebsiteLog(req)
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             searchLog();

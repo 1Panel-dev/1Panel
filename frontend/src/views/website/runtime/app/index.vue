@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 import { App } from '@/api/interface/app';
-import { GetApp, GetAppDetail, SearchApp } from '@/api/modules/app';
+import { getAppByKey, getAppDetail, searchApp } from '@/api/modules/app';
 import { useVModel } from '@vueuse/core';
 import { defineProps } from 'vue';
 
@@ -72,14 +72,14 @@ const changeApp = (appID: number) => {
 
 const changeVersion = async () => {
     try {
-        const res = await GetAppDetail(runtime.value.appID, runtime.value.version, 'runtime');
+        const res = await getAppDetail(runtime.value.appID, runtime.value.version, 'runtime');
         runtime.value.appDetailID = res.data.id;
     } catch (error) {}
 };
 
 const getApp = async (appkey: string, mode: string) => {
     try {
-        const res = await GetApp(appkey);
+        const res = await getAppByKey(appkey);
         appVersions.value = res.data.versions || [];
         if (res.data.versions.length > 0) {
             if (mode === 'create') {
@@ -90,9 +90,9 @@ const getApp = async (appkey: string, mode: string) => {
     } catch (error) {}
 };
 
-const searchApp = async (appID: number) => {
+const searchAppList = async (appID: number) => {
     try {
-        const res = await SearchApp(appReq);
+        const res = await searchApp(appReq);
         apps.value = res.data.items || [];
         if (res.data && res.data.items && res.data.items.length > 0) {
             if (appID == null) {
@@ -111,9 +111,9 @@ const searchApp = async (appID: number) => {
 
 onMounted(() => {
     if (props.mode === 'create') {
-        searchApp(null);
+        searchAppList(null);
     } else {
-        searchApp(runtime.value.appID);
+        searchAppList(runtime.value.appID);
     }
 });
 </script>

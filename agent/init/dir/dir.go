@@ -31,7 +31,7 @@ func Init() {
 	global.Dir.RecycleBinDir, _ = fileOp.CreateDirWithPath(true, "/.1panel_clash")
 	global.Dir.SSLLogDir, _ = fileOp.CreateDirWithPath(true, path.Join(baseDir, "1panel/log/ssl"))
 
-	loadLocalDir()
+	//loadLocalDir()
 }
 
 func loadLocalDir() {

@@ -25,7 +25,7 @@
 import { FormInstance, FormRules } from 'element-plus';
 import { CompressExtension, CompressType } from '@/enums/files';
 import { computed, reactive, ref } from 'vue';
-import { DownloadFile } from '@/api/modules/files';
+import { downloadFile } from '@/api/modules/files';
 import { File } from '@/api/interface/file';
 import { Rules } from '@/global/form-rules';
 
@@ -74,7 +74,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         Object.assign(addItem, addForm.value);
         addItem['name'] = addForm.value.name + extension.value;
         loading.value = true;
-        DownloadFile(addItem as File.FileDownload)
+        downloadFile(addItem as File.FileDownload)
             .then((res) => {
                 const downloadUrl = window.URL.createObjectURL(new Blob([res]));
                 const a = document.createElement('a');

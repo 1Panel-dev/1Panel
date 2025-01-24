@@ -112,7 +112,7 @@ import FireRouter from '@/views/host/process/index.vue';
 import { ref, onMounted, onUnmounted, nextTick, reactive } from 'vue';
 import ProcessDetail from './detail/index.vue';
 import i18n from '@/lang';
-import { StopProcess } from '@/api/modules/process';
+import { stopProcess } from '@/api/modules/process';
 
 interface SortStatus {
     prop: '';
@@ -143,7 +143,7 @@ const buttons = [
     {
         label: i18n.global.t('process.stopProcess'),
         click: function (row: any) {
-            stopProcess(row);
+            stop(row);
         },
     },
 ];
@@ -262,7 +262,7 @@ const search = () => {
     }
 };
 
-const stopProcess = async (row: any) => {
+const stop = async (row: any) => {
     opRef.value.acceptParams({
         title: i18n.global.t('process.stopProcess'),
         names: [row.name],
@@ -270,7 +270,7 @@ const stopProcess = async (row: any) => {
             i18n.global.t('menu.process'),
             i18n.global.t('process.stopProcess'),
         ]),
-        api: StopProcess,
+        api: stopProcess,
         params: { PID: row.PID },
         successMsg: i18n.global.t('commons.msg.operationSuccess'),
     });

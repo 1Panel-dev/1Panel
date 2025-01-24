@@ -115,7 +115,7 @@ import type { ElForm } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { GetGroupList } from '@/api/modules/group';
+import { getGroupList } from '@/api/modules/group';
 
 const loading = ref();
 const data = ref();
@@ -160,7 +160,7 @@ let commandInfo = reactive<Command.CommandOperate>({
 const cmdVisible = ref<boolean>(false);
 
 const loadGroups = async () => {
-    const res = await GetGroupList('command');
+    const res = await getGroupList('command');
     groupList.value = res.data;
     for (const group of groupList.value) {
         if (group.isDefault) {

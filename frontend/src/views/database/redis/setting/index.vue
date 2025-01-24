@@ -122,7 +122,7 @@ import Persistence from '@/views/database/redis/setting/persistence/index.vue';
 import { loadDBFile, loadRedisConf, updateRedisConf, updateDBFile } from '@/api/modules/database';
 import i18n from '@/lang';
 import { checkNumberRange, Rules } from '@/global/form-rules';
-import { ChangePort, GetAppDefaultConfig } from '@/api/modules/app';
+import { changePort, getAppDefaultConfig } from '@/api/modules/app';
 import { MsgSuccess } from '@/utils/message';
 
 const loading = ref(false);
@@ -226,7 +226,7 @@ const onChangePort = async (formEl: FormInstance | undefined) => {
         port: form.port,
     };
     loading.value = true;
-    await ChangePort(params)
+    await changePort(params)
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
@@ -270,7 +270,7 @@ const submitForm = async () => {
 
 const getDefaultConfig = async () => {
     loading.value = true;
-    await GetAppDefaultConfig('redis', '')
+    await getAppDefaultConfig('redis', '')
         .then((res) => {
             redisConf.value = res.data;
             useOld.value = true;

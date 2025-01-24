@@ -106,7 +106,7 @@
 </template>
 
 <script lang="ts" setup>
-import { CreateLoadBalance, UpdateLoadBalance } from '@/api/modules/website';
+import { createLoadBalance, updateLoadBalance } from '@/api/modules/website';
 import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
 import { ref } from 'vue';
@@ -211,10 +211,10 @@ const submit = async (formEl: FormInstance | undefined) => {
         loading.value = true;
         try {
             if (item.value.operate === 'edit') {
-                await UpdateLoadBalance(item.value);
+                await updateLoadBalance(item.value);
                 MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
             } else {
-                await CreateLoadBalance(item.value);
+                await createLoadBalance(item.value);
                 MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
             }
             handleClose();

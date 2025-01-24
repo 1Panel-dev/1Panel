@@ -535,12 +535,12 @@ import { Cronjob } from '@/api/interface/cronjob';
 import { addCronjob, editCronjob, loadNextHandle } from '@/api/modules/cronjob';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import { listDbItems } from '@/api/modules/database';
-import { GetWebsiteOptions } from '@/api/modules/website';
+import { getWebsiteOptions } from '@/api/modules/website';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { useRouter } from 'vue-router';
 import { listContainer } from '@/api/modules/container';
 import { Database } from '@/api/interface/database';
-import { ListAppInstalled } from '@/api/modules/app';
+import { listAppInstalled } from '@/api/modules/app';
 import {
     loadDefaultSpec,
     loadDefaultSpecCustom,
@@ -962,12 +962,12 @@ const loadShellUsers = async () => {
 };
 
 const loadAppInstalls = async () => {
-    const res = await ListAppInstalled();
+    const res = await listAppInstalled();
     appOptions.value = res.data || [];
 };
 
 const loadWebsites = async () => {
-    const res = await GetWebsiteOptions({});
+    const res = await getWebsiteOptions({});
     websiteOptions.value = res.data || [];
 };
 

@@ -14,7 +14,7 @@
 </template>
 
 <script lang="ts" setup>
-import { FileKeys } from '@/api/modules/files';
+import { fileKeys } from '@/api/modules/files';
 import { computeSize } from '@/utils/util';
 import { onBeforeUnmount, ref, toRefs } from 'vue';
 import MsgInfo from '@/components/msg-info/index.vue';
@@ -69,7 +69,7 @@ const initProcess = () => {
 const getKeys = () => {
     keys.value = [];
     res.value = [];
-    FileKeys().then((res) => {
+    fileKeys().then((res) => {
         if (res.data.keys.length > 0) {
             keys.value = res.data.keys;
             initProcess();

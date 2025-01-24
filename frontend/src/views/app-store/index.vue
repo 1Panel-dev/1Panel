@@ -12,7 +12,7 @@
 <script lang="ts" setup>
 import i18n from '@/lang';
 import { onMounted, ref } from 'vue';
-import { SearchAppInstalled } from '@/api/modules/app';
+import { searchAppInstalled } from '@/api/modules/app';
 import bus from '@/global/bus';
 let showButton = ref(false);
 
@@ -37,7 +37,7 @@ const buttons = [
 ];
 
 const search = () => {
-    SearchAppInstalled({ update: true, page: 1, pageSize: 100 })
+    searchAppInstalled({ update: true, page: 1, pageSize: 100 })
         .then((res) => {
             if (res.data.items) {
                 buttons[2].count = res.data.items.length;

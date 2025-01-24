@@ -59,7 +59,7 @@
 </template>
 
 <script lang="ts" setup>
-import { GetRecycleStatus, clearRecycle, getRecycleList, reduceFile } from '@/api/modules/files';
+import { getRecycleStatus, clearRecycle, getRecycleList, reduceFile } from '@/api/modules/files';
 import { reactive, ref } from 'vue';
 import { dateFormat, computeSize } from '@/utils/util';
 import i18n from '@/lang';
@@ -106,7 +106,7 @@ const acceptParams = () => {
 
 const getStatus = async () => {
     try {
-        const res = await GetRecycleStatus();
+        const res = await getRecycleStatus();
         status.value = res.data;
     } catch (error) {}
 };

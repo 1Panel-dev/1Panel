@@ -182,11 +182,11 @@
 import { App } from '@/api/interface/app';
 import { onMounted, reactive, ref, computed } from 'vue';
 import {
-    GetAppTags,
-    SearchApp,
-    SyncApp,
-    SyncCutomAppStore,
-    SyncLocalApp,
+    getAppTags,
+    searchApp,
+    syncApp,
+    syncCutomAppStore,
+    syncLocalApp,
     getCurrentNodeCustomAppConfig,
 } from '@/api/modules/app';
 import Install from '../detail/install/index.vue';
@@ -243,7 +243,7 @@ const search = async (req: App.AppReq) => {
     req.pageSize = paginationConfig.pageSize;
     req.page = paginationConfig.currentPage;
     localStorage.setItem('app-page-size', req.pageSize + '');
-    await SearchApp(req)
+    await searchApp(req)
         .then((res) => {
             apps.value = res.data.items;
             paginationConfig.total = res.data.total;
@@ -251,7 +251,7 @@ const search = async (req: App.AppReq) => {
         .finally(() => {
             loading.value = false;
         });
-    GetAppTags().then((res) => {
+    getAppTags().then((res) => {
         tags.value = res.data;
     });
 };
@@ -291,9 +291,9 @@ const sync = async () => {
     try {
         let res;
         if (isProductPro.value && syncCustomAppstore.value) {
-            res = await SyncCutomAppStore(syncReq);
+            res = await syncCutomAppStore(syncReq);
         } else {
-            res = await SyncApp(syncReq);
+            res = await syncApp(syncReq);
         }
         if (res.message != '') {
             MsgSuccess(res.message);
@@ -313,7 +313,7 @@ const syncLocal = () => {
         taskID: taskID,
     };
     syncing.value = true;
-    SyncLocalApp(syncReq)
+    syncLocalApp(syncReq)
         .then(() => {
             openTaskLog(taskID);
             canUpdate.value = false;

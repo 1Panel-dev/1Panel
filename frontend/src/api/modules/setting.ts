@@ -5,7 +5,7 @@ import { ResPage, SearchWithPage, DescriptionUpdate, ReqPage } from '../interfac
 import { Setting } from '../interface/setting';
 
 // license
-export const UploadFileData = (params: FormData) => {
+export const uploadFileData = (params: FormData) => {
     return http.upload('/core/licenses/upload', params);
 };
 export const SearchLicense = (params: ReqPage) => {

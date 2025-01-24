@@ -47,7 +47,7 @@
 </template>
 
 <script lang="ts" setup>
-import { UploadSSL } from '@/api/modules/website';
+import { uploadSSL } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
@@ -112,7 +112,7 @@ const submit = async (formEl: FormInstance | undefined) => {
             return;
         }
         loading.value = true;
-        UploadSSL(ssl.value)
+        uploadSSL(ssl.value)
             .then(() => {
                 handleClose();
                 MsgSuccess(i18n.global.t('commons.msg.createSuccess'));

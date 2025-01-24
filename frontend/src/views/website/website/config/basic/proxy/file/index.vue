@@ -17,7 +17,7 @@ import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
 import { computed, reactive, ref } from 'vue';
 import { MsgSuccess } from '@/utils/message';
-import { UpdateProxyConfigFile } from '@/api/modules/website';
+import { updateProxyConfigFile } from '@/api/modules/website';
 import { GlobalStore } from '@/store';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 const globalStore = GlobalStore();
@@ -55,7 +55,7 @@ const acceptParams = async (proxyreq: any) => {
 
 const submit = async () => {
     loading.value = true;
-    UpdateProxyConfigFile(req)
+    updateProxyConfigFile(req)
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
             handleClose();

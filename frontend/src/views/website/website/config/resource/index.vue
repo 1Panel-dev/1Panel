@@ -8,7 +8,7 @@
 
 <script lang="ts" setup>
 import { GetRuntime } from '@/api/modules/runtime';
-import { GetWebsite } from '@/api/modules/website';
+import { getWebsite } from '@/api/modules/website';
 import { computed, onMounted, ref } from 'vue';
 import Nginx from './nginx/index.vue';
 
@@ -28,7 +28,7 @@ let configPHP = ref(false);
 let installId = ref(0);
 
 const getWebsiteDetail = async () => {
-    const res = await GetWebsite(props.id);
+    const res = await getWebsite(props.id);
     if (res.data.type === 'runtime') {
         installId.value = res.data.appInstallId;
         const runRes = await GetRuntime(res.data.runtimeID);

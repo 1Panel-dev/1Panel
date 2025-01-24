@@ -128,7 +128,7 @@
 
 <script lang="ts" setup>
 import { File } from '@/api/interface/file';
-import { CreateFile, GetFilesList } from '@/api/modules/files';
+import { createFile, getFilesList } from '@/api/modules/files';
 import { Folder, HomeFilled, Close } from '@element-plus/icons-vue';
 import BreadCrumbs from '@/components/bread-crumbs/index.vue';
 import BreadCrumbItem from '@/components/bread-crumbs/bread-crumbs-item.vue';
@@ -239,7 +239,7 @@ const jump = async (index: number) => {
 const search = async (req: File.ReqFile) => {
     req.dir = props.dir;
     loading.value = true;
-    await GetFilesList(req)
+    await getFilesList(req)
         .then((res) => {
             data.value = res.data.items || [];
             req.path = res.data.path;
@@ -313,7 +313,7 @@ const createFolder = async (row: any) => {
     let addItem = {};
     Object.assign(addItem, addForm);
     loading.value = true;
-    CreateFile(addItem as File.FileCreate)
+    createFile(addItem as File.FileCreate)
         .then(() => {
             row.isCreate = false;
             disBtn.value = false;

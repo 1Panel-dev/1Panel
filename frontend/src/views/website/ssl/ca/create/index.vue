@@ -53,7 +53,7 @@ import { ref } from 'vue';
 import { FormInstance } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import { KeyTypes } from '@/global/mimetype';
-import { CreateCA } from '@/api/modules/website';
+import { createCA } from '@/api/modules/website';
 import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 
@@ -106,7 +106,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         }
         loading.value = true;
 
-        CreateCA(ca.value)
+        createCA(ca.value)
             .then(() => {
                 MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
                 handleClose();

@@ -116,7 +116,7 @@
 </template>
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';
-import { GetAppInstallParams, UpdateAppInstallParams, UpdateInstallConfig } from '@/api/modules/app';
+import { getAppInstallParams, updateAppInstallParams, updateInstallConfig } from '@/api/modules/app';
 import { reactive, ref } from 'vue';
 import { FormInstance } from 'element-plus';
 import { Rules, checkNumberRange } from '@/global/form-rules';
@@ -185,7 +185,7 @@ const editParam = () => {
 const get = async () => {
     try {
         loading.value = true;
-        const res = await GetAppInstallParams(Number(paramData.value.id));
+        const res = await getAppInstallParams(Number(paramData.value.id));
         const configParams = res.data.params || [];
         if (configParams && configParams.length > 0) {
             configParams.forEach((d) => {
@@ -263,7 +263,7 @@ const submit = async (formEl: FormInstance) => {
             }
             try {
                 loading.value = true;
-                await UpdateAppInstallParams(submitModel.value);
+                await updateAppInstallParams(submitModel.value);
                 loading.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
                 handleClose();
@@ -276,7 +276,7 @@ const submit = async (formEl: FormInstance) => {
 
 const updateAppConfig = async () => {
     try {
-        await UpdateInstallConfig({
+        await updateInstallConfig({
             installID: Number(paramData.value.id),
             webUI: appConfigUpdate.value.webUI,
         });
