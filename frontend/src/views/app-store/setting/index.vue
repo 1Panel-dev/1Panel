@@ -47,11 +47,8 @@ import { FormRules } from 'element-plus';
 import CustomSetting from '@/xpack/views/appstore/index.vue';
 import DefaultDomain from './default-domain/index.vue';
 import { GlobalStore } from '@/store';
-import { storeToRefs } from 'pinia';
 
 const globalStore = GlobalStore();
-const { isProductPro } = storeToRefs(globalStore);
-
 const rules = ref<FormRules>({
     defaultDomain: [Rules.domainOrIP],
 });

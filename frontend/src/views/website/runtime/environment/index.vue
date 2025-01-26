@@ -15,7 +15,7 @@
                 </el-col>
                 <el-col :span="4">
                     <el-form-item>
-                        <el-button type="primary" @click="removeEnv(index)" link>
+                        <el-button type="primary" @click="removeEnv(index)" link class="mt-1">
                             {{ $t('commons.button.delete') }}
                         </el-button>
                     </el-form-item>
@@ -23,7 +23,7 @@
             </el-row>
             <el-row :gutter="20">
                 <el-col :span="4">
-                    <el-button @click="addEnv">{{ $t('commons.button.add') }}{{ $t('runtime.environment') }}</el-button>
+                    <el-button @click="addEnv">{{ $t('commons.button.add') }}</el-button>
                 </el-col>
             </el-row>
         </div>

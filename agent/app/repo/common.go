@@ -18,6 +18,12 @@ func WithByID(id uint) DBOption {
 	}
 }
 
+func WithByNOTID(id uint) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("id != ?", id)
+	}
+}
+
 func WithByIDs(ids []uint) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("id in (?)", ids)

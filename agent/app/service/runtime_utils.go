@@ -6,6 +6,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/i18n"
+	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"io"
 	"os"
 	"os/exec"
@@ -319,7 +321,7 @@ func handleParams(create request.RuntimeCreate, projectDir string) (composeConte
 		return
 	}
 	for k := range env {
-		if strings.HasPrefix(k, "CONTAINER_PORT_") || strings.HasPrefix(k, "HOST_PORT_") {
+		if strings.HasPrefix(k, "CONTAINER_PORT_") || strings.HasPrefix(k, "HOST_PORT_") || strings.HasPrefix(k, "HOST_IP_") || strings.Contains(k, "APP_PORT") {
 			delete(env, k)
 		}
 	}
@@ -431,18 +433,19 @@ func handleCompose(env gotenv.Env, composeContent []byte, create request.Runtime
 	for name, service := range services {
 		serviceName = name
 		serviceValue = service.(map[string]interface{})
-		_, ok := serviceValue["ports"].([]interface{})
-		if ok {
+		delete(serviceValue, "ports")
+		if create.ExposedPorts != nil && len(create.ExposedPorts) > 0 {
 			var ports []interface{}
-			ports = append(ports, "${HOST_IP}:${PANEL_APP_PORT_HTTP}:${APP_PORT}")
 			for i, port := range create.ExposedPorts {
 				containerPortStr := fmt.Sprintf("CONTAINER_PORT_%d", i)
 				hostPortStr := fmt.Sprintf("HOST_PORT_%d", i)
 				existMap[containerPortStr] = struct{}{}
 				existMap[hostPortStr] = struct{}{}
-				ports = append(ports, fmt.Sprintf("${HOST_IP}:${%s}:${%s}", hostPortStr, containerPortStr))
+				hostIPStr := fmt.Sprintf("HOST_IP_%d", i)
+				ports = append(ports, fmt.Sprintf("${%s}:${%s}:${%s}", hostIPStr, hostPortStr, containerPortStr))
 				create.Params[containerPortStr] = port.ContainerPort
 				create.Params[hostPortStr] = port.HostPort
+				create.Params[hostIPStr] = port.HostIP
 			}
 			serviceValue["ports"] = ports
 		}
@@ -666,4 +669,35 @@ func getDockerComposeVolumes(yml []byte) ([]request.Volume, error) {
 		}
 	}
 	return res, nil
+}
+
+func checkRuntimePortExist(port int, scanPort bool, runtimeID uint) error {
+	errMap := make(map[string]interface{})
+	errMap["port"] = port
+	appInstall, _ := appInstallRepo.GetFirst(appInstallRepo.WithPort(port))
+	if appInstall.ID > 0 {
+		errMap["type"] = i18n.GetMsgByKey("TYPE_APP")
+		errMap["name"] = appInstall.Name
+		return buserr.WithMap("ErrPortExist", errMap, nil)
+	}
+	opts := []repo.DBOption{runtimeRepo.WithPort(port)}
+	if runtimeID > 0 {
+		opts = append(opts, repo.WithByNOTID(runtimeID))
+	}
+	runtime, _ := runtimeRepo.GetFirst(opts...)
+	if runtime != nil {
+		errMap["type"] = i18n.GetMsgByKey("TYPE_RUNTIME")
+		errMap["name"] = runtime.Name
+		return buserr.WithMap("ErrPortExist", errMap, nil)
+	}
+	domain, _ := websiteDomainRepo.GetFirst(websiteDomainRepo.WithPort(port))
+	if domain.ID > 0 {
+		errMap["type"] = i18n.GetMsgByKey("TYPE_DOMAIN")
+		errMap["name"] = domain.Domain
+		return buserr.WithMap("ErrPortExist", errMap, nil)
+	}
+	if scanPort && common.ScanPort(port) {
+		return buserr.WithDetail("ErrPortInUsed", port, nil)
+	}
+	return nil
 }

@@ -548,8 +548,11 @@ const getUrl = (domain: Website.Domain, website: Website.Website): string => {
     return url;
 };
 
-onMounted(() => {
-    search();
-    listGroup();
-});
+onBeforeMount(() => {
+    console.log('1111');
+}),
+    onMounted(() => {
+        search();
+        listGroup();
+    });
 </script>

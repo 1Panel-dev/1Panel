@@ -65,6 +65,7 @@ export namespace Runtime {
     export interface ExposedPort {
         hostPort: number;
         containerPort: number;
+        hostIP: string;
     }
 
     export interface Environment {

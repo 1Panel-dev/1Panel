@@ -122,8 +122,6 @@ const submit = async (formEl: FormInstance | undefined) => {
         if (runtime.exposedPorts && runtime.exposedPorts.length > 0) {
             const containerPortMap = new Map();
             const hostPortMap = new Map();
-            containerPortMap[runtime.params['APP_PORT']] = true;
-            hostPortMap[runtime.port] = true;
             for (const port of runtime.exposedPorts) {
                 if (containerPortMap[port.containerPort]) {
                     MsgError(i18n.global.t('runtime.portError'));

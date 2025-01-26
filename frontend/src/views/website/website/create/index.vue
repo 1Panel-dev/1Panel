@@ -164,7 +164,7 @@
                 </div>
                 <div v-if="website.type === 'subsite'">
                     <el-form-item :label="$t('website.parentWbeiste')" prop="parentWebsiteID">
-                        <el-select v-model="website.parentWebsiteID" @change="getDirConfig(website.parentWebsiteID)">
+                        <el-select v-model="website.parentWebsiteID" @change="getDir(website.parentWebsiteID)">
                             <el-option
                                 v-for="(site, index) in parentWebsites"
                                 :key="index"
@@ -521,7 +521,7 @@ import {
     listSSL,
     preCheck,
     searchAcmeAccount,
-    GetDirConfig,
+    getDirConfig,
 } from '@/api/modules/website';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
@@ -923,14 +923,14 @@ const listWebsites = async () => {
         parentWebsites.value = res.data;
         if (res.data.length > 0) {
             website.value.parentWebsiteID = res.data[0].id;
-            getDirConfig(res.data[0].id);
+            getDir(res.data[0].id);
         }
     } catch (error) {}
 };
 
-const getDirConfig = async (websiteID: number) => {
+const getDir = async (websiteID: number) => {
     try {
-        const res = await GetDirConfig({ id: websiteID });
+        const res = await getDirConfig({ id: websiteID });
         dirs.value = res.data.dirs;
         if (res.data.dirs.length > 0) {
             website.value.siteDir = res.data.dirs[0];

@@ -93,7 +93,7 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, e
 			return nil, err
 		}
 	}
-
+	var hostPorts []string
 	switch create.Type {
 	case constant.RuntimePHP:
 		if create.Resource == constant.ResourceLocal {
@@ -116,15 +116,10 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, e
 		}
 		create.Install = true
 		for _, export := range create.ExposedPorts {
+			hostPorts = append(hostPorts, strconv.Itoa(export.HostPort))
 			if err := checkPortExist(export.HostPort); err != nil {
 				return nil, err
 			}
-		}
-	}
-	portValue, _ := create.Params["PANEL_APP_PORT_HTTP"]
-	if portValue != nil {
-		if err := checkPortExist(int(portValue.(float64))); err != nil {
-			return nil, err
 		}
 	}
 	containerName, ok := create.Params["CONTAINER_NAME"]
@@ -159,7 +154,7 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, e
 		Resource:      create.Resource,
 		Version:       create.Version,
 		ContainerName: containerName.(string),
-		Port:          int(portValue.(float64)),
+		Port:          strings.Join(hostPorts, ","),
 	}
 
 	switch create.Type {
@@ -352,34 +347,30 @@ func (r *RuntimeService) Get(id uint) (*response.RuntimeDTO, error) {
 			return nil, err
 		}
 		for k, v := range envs {
-			switch k {
-			case "APP_PORT", "PANEL_APP_PORT_HTTP":
-				port, err := strconv.Atoi(v)
-				if err != nil {
-					return nil, err
-				}
-				res.Params[k] = port
-			default:
-				if strings.Contains(k, "CONTAINER_PORT") || strings.Contains(k, "HOST_PORT") {
-					if strings.Contains(k, "CONTAINER_PORT") {
-						r := regexp.MustCompile(`_(\d+)$`)
-						matches := r.FindStringSubmatch(k)
-						containerPort, err := strconv.Atoi(v)
-						if err != nil {
-							return nil, err
-						}
-						hostPort, err := strconv.Atoi(envs[fmt.Sprintf("HOST_PORT_%s", matches[1])])
-						if err != nil {
-							return nil, err
-						}
-						res.ExposedPorts = append(res.ExposedPorts, request.ExposedPort{
-							ContainerPort: containerPort,
-							HostPort:      hostPort,
-						})
+			if strings.Contains(k, "CONTAINER_PORT") || strings.Contains(k, "HOST_PORT") {
+				if strings.Contains(k, "CONTAINER_PORT") {
+					r := regexp.MustCompile(`_(\d+)$`)
+					matches := r.FindStringSubmatch(k)
+					containerPort, err := strconv.Atoi(v)
+					if err != nil {
+						return nil, err
 					}
-				} else {
-					res.Params[k] = v
+					hostPort, err := strconv.Atoi(envs[fmt.Sprintf("HOST_PORT_%s", matches[1])])
+					if err != nil {
+						return nil, err
+					}
+					hostIP := envs[fmt.Sprintf("HOST_IP_%s", matches[1])]
+					if hostIP == "" {
+						hostIP = "0.0.0.0"
+					}
+					res.ExposedPorts = append(res.ExposedPorts, request.ExposedPort{
+						ContainerPort: containerPort,
+						HostPort:      hostPort,
+						HostIP:        hostIP,
+					})
 				}
+			} else {
+				res.Params[k] = v
 			}
 		}
 		if v, ok := envs["CONTAINER_PACKAGE_URL"]; ok {
@@ -437,7 +428,7 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 	}
 	oldImage := runtime.Image
 	oldEnv := runtime.Env
-	port := int(req.Params["PANEL_APP_PORT_HTTP"].(float64))
+	var hostPorts []string
 	switch runtime.Type {
 	case constant.RuntimePHP:
 		exist, _ := runtimeRepo.GetFirst(runtimeRepo.WithImage(req.Name), runtimeRepo.WithNotId(req.ID))
@@ -445,14 +436,9 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 			return buserr.New("ErrImageExist")
 		}
 	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo, constant.RuntimePython, constant.RuntimeDotNet:
-		if runtime.Port != port {
-			if err = checkPortExist(port); err != nil {
-				return err
-			}
-			runtime.Port = port
-		}
 		for _, export := range req.ExposedPorts {
-			if err = checkPortExist(export.HostPort); err != nil {
+			hostPorts = append(hostPorts, strconv.Itoa(export.HostPort))
+			if err = checkRuntimePortExist(export.HostPort, false, runtime.ID); err != nil {
 				return err
 			}
 		}
@@ -522,7 +508,7 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo, constant.RuntimePython, constant.RuntimeDotNet:
 		runtime.Version = req.Version
 		runtime.CodeDir = req.CodeDir
-		runtime.Port = port
+		runtime.Port = strings.Join(hostPorts, ",")
 		runtime.Status = constant.RuntimeReCreating
 		_ = runtimeRepo.Save(runtime)
 		go reCreateRuntime(runtime)

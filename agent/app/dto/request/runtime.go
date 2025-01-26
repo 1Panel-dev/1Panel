@@ -42,8 +42,9 @@ type Volume struct {
 }
 
 type ExposedPort struct {
-	HostPort      int `json:"hostPort"`
-	ContainerPort int `json:"containerPort"`
+	HostPort      int    `json:"hostPort"`
+	ContainerPort int    `json:"containerPort"`
+	HostIP        string `json:"hostIP"`
 }
 
 type RuntimeDelete struct {

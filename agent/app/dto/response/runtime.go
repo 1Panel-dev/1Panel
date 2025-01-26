@@ -23,7 +23,7 @@ type RuntimeDTO struct {
 	CreatedAt    time.Time              `json:"createdAt"`
 	CodeDir      string                 `json:"codeDir"`
 	AppParams    []AppParam             `json:"appParams"`
-	Port         int                    `json:"port"`
+	Port         string                 `json:"port"`
 	Path         string                 `json:"path"`
 	ExposedPorts []request.ExposedPort  `json:"exposedPorts"`
 	Environments []request.Environment  `json:"environments"`

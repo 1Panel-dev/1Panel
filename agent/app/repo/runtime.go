@@ -2,6 +2,7 @@ package repo
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/global"
@@ -55,7 +56,9 @@ func (r *RuntimeRepo) WithNotId(id uint) DBOption {
 
 func (r *RuntimeRepo) WithPort(port int) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("port = ?", port)
+		portStr := fmt.Sprintf("%d", port)
+		regexPattern := fmt.Sprintf("(^|,)%s(,|$)", portStr)
+		return g.Where("port REGEXP ?", regexPattern)
 	}
 }
 

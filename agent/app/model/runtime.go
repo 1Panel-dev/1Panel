@@ -19,7 +19,7 @@ type Runtime struct {
 	Type          string `gorm:"not null" json:"type"`
 	Status        string `gorm:"not null" json:"status"`
 	Resource      string `gorm:"not null" json:"resource"`
-	Port          int    `json:"port"`
+	Port          string `json:"port"`
 	Message       string `json:"message"`
 	CodeDir       string `json:"codeDir"`
 	ContainerName string `json:"containerName"`
