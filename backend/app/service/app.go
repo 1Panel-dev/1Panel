@@ -104,39 +104,11 @@ func (a AppService) PageApp(ctx *gin.Context, req request.AppSearch) (interface{
 		}
 		appDTO.Description = ap.GetDescription(ctx)
 		appDTOs = append(appDTOs, appDTO)
-		appTags, err := appTagRepo.GetByAppId(ap.ID)
+		tags, err := getAppTags(ap.ID, lang)
 		if err != nil {
-			continue
+			return nil, err
 		}
-		var tagIds []uint
-		for _, at := range appTags {
-			tagIds = append(tagIds, at.TagId)
-		}
-		tags, err := tagRepo.GetByIds(tagIds)
-		if err != nil {
-			continue
-		}
-		for _, t := range tags {
-			if t.Name != "" {
-				tagDTO := response.TagDTO{
-					ID:   t.ID,
-					Key:  t.Key,
-					Name: t.Name,
-				}
-				appDTO.Tags = append(appDTO.Tags, tagDTO)
-			} else {
-				var translations = make(map[string]string)
-				_ = json.Unmarshal([]byte(t.Translations), &translations)
-				if name, ok := translations[lang]; ok {
-					tagDTO := response.TagDTO{
-						ID:   t.ID,
-						Key:  t.Key,
-						Name: name,
-					}
-					appDTO.Tags = append(appDTO.Tags, tagDTO)
-				}
-			}
-		}
+		appDTO.Tags = tags
 		installs, _ := appInstallRepo.ListBy(appInstallRepo.WithAppId(ap.ID))
 		appDTO.Installed = len(installs) > 0
 	}
@@ -185,7 +157,11 @@ func (a AppService) GetApp(ctx *gin.Context, key string) (*response.AppDTO, erro
 		versionsRaw = append(versionsRaw, detail.Version)
 	}
 	appDTO.Versions = common.GetSortedVersions(versionsRaw)
-
+	tags, err := getAppTags(app.ID, strings.ToLower(common.GetLang(ctx)))
+	if err != nil {
+		return nil, err
+	}
+	appDTO.Tags = tags
 	return &appDTO, nil
 }
 

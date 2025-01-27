@@ -49,7 +49,7 @@ func (i *App) GetDescription(ctx *gin.Context) string {
 	var translations = make(map[string]string)
 	_ = json.Unmarshal([]byte(i.Description), &translations)
 	lang := strings.ToLower(common.GetLang(ctx))
-	if desc, ok := translations[lang]; ok {
+	if desc, ok := translations[lang]; ok && desc != "" {
 		return desc
 	}
 	if lang == "zh" {

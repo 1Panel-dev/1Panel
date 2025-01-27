@@ -1607,3 +1607,41 @@ func RequestDownloadCallBack(downloadCallBackUrl string) {
 	}
 	_, _, _ = httpUtil.HandleGet(downloadCallBackUrl, http.MethodGet, constant.TimeOut5s)
 }
+
+func getAppTags(appID uint, lang string) ([]response.TagDTO, error) {
+	appTags, err := appTagRepo.GetByAppId(appID)
+	if err != nil {
+		return nil, err
+	}
+	var tagIds []uint
+	for _, at := range appTags {
+		tagIds = append(tagIds, at.TagId)
+	}
+	tags, err := tagRepo.GetByIds(tagIds)
+	if err != nil {
+		return nil, err
+	}
+	var res []response.TagDTO
+	for _, t := range tags {
+		if t.Name != "" {
+			tagDTO := response.TagDTO{
+				ID:   t.ID,
+				Key:  t.Key,
+				Name: t.Name,
+			}
+			res = append(res, tagDTO)
+		} else {
+			var translations = make(map[string]string)
+			_ = json.Unmarshal([]byte(t.Translations), &translations)
+			if name, ok := translations[lang]; ok {
+				tagDTO := response.TagDTO{
+					ID:   t.ID,
+					Key:  t.Key,
+					Name: name,
+				}
+				res = append(res, tagDTO)
+			}
+		}
+	}
+	return res, nil
+}
