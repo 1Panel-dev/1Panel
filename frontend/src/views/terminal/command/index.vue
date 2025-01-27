@@ -9,7 +9,7 @@
                     {{ $t('commons.button.create') }}{{ $t('terminal.quickCommand') }}
                 </el-button>
                 <el-button type="primary" plain @click="onOpenGroupDialog()">
-                    {{ $t('terminal.group') }}
+                    {{ $t('commons.table.group') }}
                 </el-button>
                 <el-button type="primary" plain :disabled="selects.length === 0" @click="batchDelete(null)">
                     {{ $t('commons.button.delete') }}
@@ -17,7 +17,7 @@
             </template>
             <template #rightToolBar>
                 <el-select v-model="group" @change="search()" clearable class="p-w-200 mr-2.5">
-                    <template #prefix>{{ $t('terminal.group') }}</template>
+                    <template #prefix>{{ $t('commons.table.group') }}</template>
                     <el-option :label="$t('commons.table.all')" value=""></el-option>
                     <div v-for="item in groupList" :key="item.name">
                         <el-option :value="item.id" :label="item.name" />

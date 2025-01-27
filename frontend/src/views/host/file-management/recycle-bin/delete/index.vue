@@ -1,5 +1,5 @@
 <template>
-    <DialogPro v-model="open" :title="$t('app.delete')" size="small">
+    <DialogPro v-model="open" :title="$t('commons.button.delete')" size="small">
         <el-row>
             <el-col :span="20" :offset="2">
                 <el-alert :title="$t('file.deleteRecycleHelper')" show-icon type="error" :closable="false"></el-alert>

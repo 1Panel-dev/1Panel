@@ -62,7 +62,7 @@
                     <el-table-column
                         prop="status"
                         column-key="status"
-                        :label="$t('app.status')"
+                        :label="$t(commons.table.status)"
                         :filters="[
                             { text: 'LISTEN', value: 'LISTEN' },
                             { text: 'ESTABLISHED', value: 'ESTABLISHED' },

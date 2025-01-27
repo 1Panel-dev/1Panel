@@ -91,7 +91,7 @@
                                     />
                                     <el-table-column
                                         property="msg"
-                                        :label="$t('tool.supervisor.msg')"
+                                        :label="$t('commons.table.message')"
                                         fix
                                         show-overflow-tooltip
                                     />
@@ -271,7 +271,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('website.log'),
+        label: i18n.global.t('commons.button.log'),
         click: function (row: HostTool.SupersivorProcess) {
             getFile(row.name, 'out.log', runtimeID.value);
         },

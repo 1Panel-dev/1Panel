@@ -377,7 +377,7 @@ const load18n = (node: any, label: string) => {
             case 'App':
                 return i18n.global.t('setting.appLabel');
             case 'AppStore':
-                return i18n.global.t('setting.appStoreLabel');
+                return i18n.global.t('menu.apps');
             case 'shell':
                 return i18n.global.t('setting.shellLabel');
             default:

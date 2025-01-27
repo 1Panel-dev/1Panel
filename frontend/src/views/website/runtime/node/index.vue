@@ -40,7 +40,7 @@
                             </el-button>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('runtime.version')" prop="version"></el-table-column>
+                    <el-table-column :label="$t('app.version')" prop="version"></el-table-column>
                     <el-table-column :label="$t('runtime.externalPort')" prop="port" min-width="110px">
                         <template #default="{ row }">
                             <span v-for="(port, index) in row.port.split(',')" :key="index">
@@ -153,7 +153,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('container.stop'),
+        label: i18n.global.t('app.stop'),
         click: function (row: Runtime.Runtime) {
             operateRuntime('down', row.id);
         },
@@ -162,7 +162,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('container.start'),
+        label: i18n.global.t('app.start'),
         click: function (row: Runtime.Runtime) {
             operateRuntime('up', row.id);
         },
@@ -171,7 +171,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('container.restart'),
+        label: i18n.global.t('commons.button.restart'),
         click: function (row: Runtime.Runtime) {
             operateRuntime('restart', row.id);
         },

@@ -122,7 +122,7 @@ const opCustomRewrite = async () => {
 
 const deleteCustomRewrite = (name: string) => {
     deleteRef.value.acceptParams({
-        title: i18n.global.t('commons.msg.deleteTitle'),
+        title: i18n.global.t('commons.button.delete'),
         names: [name],
         msg: i18n.global.t('commons.msg.operatorHelper', [
             i18n.global.t('container.template'),

@@ -81,7 +81,7 @@ const search = async () => {
 
 const openDelete = async (row: Runtime.PHPExtensions) => {
     opRef.value.acceptParams({
-        title: i18n.global.t('commons.msg.deleteTitle'),
+        title: i18n.global.t('commons.button.delete'),
         names: [row.name],
         msg: i18n.global.t('commons.msg.operatorHelper', [
             i18n.global.t('php.extensions'),

@@ -10,14 +10,14 @@
                     </div>
                     <div class="mt-0.5">
                         <el-button v-if="form.isActive" type="primary" @click="onOperator('stop')" link>
-                            {{ $t('container.stop') }}
+                            {{ $t('app.stop') }}
                         </el-button>
                         <el-button v-if="!form.isActive" type="primary" @click="onOperator('start')" link>
-                            {{ $t('container.start') }}
+                            {{ $t('app.start') }}
                         </el-button>
                         <el-divider direction="vertical" />
                         <el-button type="primary" @click="onOperator('restart')" link>
-                            {{ $t('container.restart') }}
+                            {{ $t('commons.button.restart') }}
                         </el-button>
                     </div>
                 </div>

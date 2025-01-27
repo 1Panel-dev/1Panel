@@ -3,8 +3,6 @@ package dir
 import (
 	"path"
 
-	"github.com/1Panel-dev/1Panel/agent/app/model"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 )
@@ -30,15 +28,4 @@ func Init() {
 	global.Dir.RuntimeDir, _ = fileOp.CreateDirWithPath(true, path.Join(baseDir, "1panel/runtime"))
 	global.Dir.RecycleBinDir, _ = fileOp.CreateDirWithPath(true, "/.1panel_clash")
 	global.Dir.SSLLogDir, _ = fileOp.CreateDirWithPath(true, path.Join(baseDir, "1panel/log/ssl"))
-
-	//loadLocalDir()
-}
-
-func loadLocalDir() {
-	var account model.BackupAccount
-	if err := global.DB.Where("`type` = ?", constant.Local).First(&account).Error; err != nil {
-		global.LOG.Errorf("load local backup account info failed, err: %v", err)
-		return
-	}
-	global.Dir.LocalBackupDir = account.BackupPath
 }

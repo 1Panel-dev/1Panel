@@ -2,8 +2,8 @@
     <DrawerPro v-model="drawerVisible" header="FTP" :resource="paginationConfig.user" :back="handleClose" size="large">
         <el-select @change="search" class="p-w-200" clearable v-model="paginationConfig.operation">
             <template #prefix>{{ $t('commons.table.operate') }}</template>
-            <el-option value="PUT" :label="$t('file.upload')" />
-            <el-option value="GET" :label="$t('file.download')" />
+            <el-option value="PUT" :label="$t('commons.button.upload')" />
+            <el-option value="GET" :label="$t('commons.button.download')" />
         </el-select>
         <ComplexTable class="mt-2" :pagination-config="paginationConfig" :data="data" @search="search">
             <el-table-column label="ip" prop="ip" show-overflow-tooltip />
@@ -17,7 +17,7 @@
                     {{ loadOperation(row.operation) }}
                 </template>
             </el-table-column>
-            <el-table-column :label="$t('file.file')" show-overflow-tooltip>
+            <el-table-column :label="$t('menu.file')" show-overflow-tooltip>
                 <template #default="{ row }">
                     {{ loadFileName(row.operation) }}
                 </template>
@@ -94,10 +94,10 @@ const search = async () => {
 
 const loadOperation = (operation: string) => {
     if (operation.startsWith('"PUT')) {
-        return i18n.global.t('file.upload');
+        return i18n.global.t('commons.button.upload');
     }
     if (operation.startsWith('"GET')) {
-        return i18n.global.t('file.download');
+        return i18n.global.t('commons.button.download');
     }
 };
 const loadFileName = (operation: string) => {

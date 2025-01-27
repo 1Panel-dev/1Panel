@@ -90,7 +90,7 @@
                 </LayoutContent>
             </div>
             <div v-else>
-                <LayoutContent :title="$t('firewall.firewall')" :divider="true">
+                <LayoutContent :title="$t('menu.firewall')" :divider="true">
                     <template #main>
                         <div class="app-warn">
                             <div class="flex flex-col gap-2 items-center justify-center w-full sm:flex-row">

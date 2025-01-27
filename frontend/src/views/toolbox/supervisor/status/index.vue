@@ -17,7 +17,7 @@
                         </el-button>
                         <el-divider direction="vertical" />
                         <el-button type="primary" link @click="onOperate('restart')">
-                            {{ $t('app.restart') }}
+                            {{ $t('commons.button.restart') }}
                         </el-button>
                         <el-divider direction="vertical" />
                         <el-button type="primary" link @click="setting">

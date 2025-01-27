@@ -59,7 +59,7 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="onReSet">{{ $t('xpack.theme.setDefault') }}</el-button>
+                <el-button @click="onReSet">{{ $t('commons.button.setDefault') }}</el-button>
                 <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
                 <el-button :disabled="loading" type="primary" @click="onSave(formRef)">
                     {{ $t('commons.button.confirm') }}
@@ -269,7 +269,7 @@ const onSave = async (formEl: FormInstance | undefined) => {
     });
 };
 const onReSet = async () => {
-    ElMessageBox.confirm(i18n.global.t('xpack.theme.setDefaultHelper'), i18n.global.t('xpack.theme.setDefault'), {
+    ElMessageBox.confirm(i18n.global.t('xpack.theme.setDefaultHelper'), i18n.global.t('commons.button.setDefault'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',

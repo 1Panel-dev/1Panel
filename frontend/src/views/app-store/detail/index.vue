@@ -31,7 +31,7 @@
                         type="primary"
                         class="brief-button"
                     >
-                        {{ $t('app.install') }}
+                        {{ $t('commons.button.install') }}
                     </el-button>
                 </div>
             </div>

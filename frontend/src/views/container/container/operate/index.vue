@@ -95,7 +95,7 @@
                                                 />
                                             </template>
                                         </el-table-column>
-                                        <el-table-column :label="$t('container.container')" min-width="120">
+                                        <el-table-column :label="$t('menu.container')" min-width="120">
                                             <template #default="{ row }">
                                                 <el-input
                                                     :placeholder="$t('container.containerExample')"

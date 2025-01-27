@@ -1,6 +1,6 @@
 <template>
     <div v-loading="loading">
-        <CardWithHeader :header="$t('container.container')" class="mt-5">
+        <CardWithHeader :header="$t('menu.container')" class="mt-5">
             <template #body>
                 <span class="count" @click="goRouter('Container')">{{ countItem.containerCount }}</span>
                 <div class="float-right">

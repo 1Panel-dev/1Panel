@@ -306,7 +306,7 @@
 
             <el-form-item
                 v-if="dialogData.rowData!.type === 'website' || dialogData.rowData!.type === 'cutWebsiteLog'"
-                :label="dialogData.rowData!.type === 'website' ? $t('cronjob.website'):$t('website.website')"
+                :label="dialogData.rowData!.type === 'website' ? $t('cronjob.website'):$t('menu.website')"
                 prop="website"
             >
                 <el-select class="selectClass" v-model="dialogData.rowData!.website">
@@ -358,7 +358,7 @@
                         <el-option v-for="item in dbInfo.dbs" :key="item.id" :value="item.id + ''" :label="item.name">
                             <span>{{ item.name }}</span>
                             <el-tag class="tagClass">
-                                {{ item.from === 'local' ? $t('database.local') : $t('database.remote') }}
+                                {{ item.from === 'local' ? $t('commons.table.local') : $t('database.remote') }}
                             </el-tag>
                             <el-tag class="tagClass">
                                 {{ item.database }}
@@ -371,7 +371,7 @@
             <el-form-item v-if="dialogData.rowData!.type === 'directory'" :label="$t('cronjob.backupContent')">
                 <el-radio-group v-model="dialogData.rowData!.isDir">
                     <el-radio :value="true">{{ $t('file.dir') }}</el-radio>
-                    <el-radio :value="false">{{ $t('file.file') }}</el-radio>
+                    <el-radio :value="false">{{ $t('menu.file') }}</el-radio>
                 </el-radio-group>
             </el-form-item>
 

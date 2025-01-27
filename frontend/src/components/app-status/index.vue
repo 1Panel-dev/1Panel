@@ -28,7 +28,7 @@
                         :disabled="data.status === 'Installing'"
                         @click="onOperate('restart')"
                     >
-                        {{ $t('app.restart') }}
+                        {{ $t('commons.button.restart') }}
                     </el-button>
                     <el-divider direction="vertical" />
                     <el-button

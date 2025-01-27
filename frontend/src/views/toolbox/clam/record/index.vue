@@ -50,7 +50,7 @@
                             @change="search()"
                             v-model="timeRangeLoad"
                             type="datetimerange"
-                            :range-separator="$t('commons.search.timeRange')"
+                            range-separator="-"
                             :start-placeholder="$t('commons.search.timeStart')"
                             :end-placeholder="$t('commons.search.timeEnd')"
                             :shortcuts="shortcuts"
@@ -100,7 +100,7 @@
                                 <el-row>
                                     <el-form-item class="descriptionWide">
                                         <template #label>
-                                            <span class="status-label">{{ $t('toolbox.clam.scanTime') }}</span>
+                                            <span class="status-label">{{ $t('commons.table.interval') }}</span>
                                         </template>
                                         <span class="status-count">
                                             {{ currentRecord?.status === 'Done' ? currentRecord?.scanTime : '-' }}
@@ -291,7 +291,7 @@ const loadRecordLog = async () => {
 };
 
 const onClean = async () => {
-    ElMessageBox.confirm(i18n.global.t('commons.msg.clean'), i18n.global.t('commons.msg.deleteTitle'), {
+    ElMessageBox.confirm(i18n.global.t('commons.msg.clean'), i18n.global.t('commons.button.delete'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'warning',

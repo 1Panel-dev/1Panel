@@ -13,7 +13,7 @@
                             </span>
                             <CopyButton :content="loadPgInfo(true)" type="icon" />
                         </el-descriptions-item>
-                        <el-descriptions-item :label="$t('database.connPort')">
+                        <el-descriptions-item :label="$t('commons.table.port')">
                             5432
                             <CopyButton content="5432" type="icon" />
                         </el-descriptions-item>
@@ -39,7 +39,7 @@
                             </span>
                             <CopyButton :content="loadPgInfo(false)" type="icon" />
                         </el-descriptions-item>
-                        <el-descriptions-item :label="$t('database.connPort')">
+                        <el-descriptions-item :label="$t('commons.table.port')">
                             {{ form.port }}
                             <CopyButton :content="form.port + ''" type="icon" />
                         </el-descriptions-item>

@@ -62,7 +62,7 @@ const title = computed(() => {
     if (type.value === 'cut') {
         return i18n.global.t('file.move');
     } else {
-        return i18n.global.t('file.copy');
+        return i18n.global.t('commons.button.copy');
     }
 });
 

@@ -65,7 +65,7 @@
             </el-tag>
         </div>
 
-        <LayoutContent :title="$t('container.container')" :class="{ mask: !isActive }">
+        <LayoutContent :title="$t('menu.container')" :class="{ mask: !isActive }">
             <template #leftToolBar>
                 <el-button type="primary" @click="onContainerOperate('')">
                     {{ $t('container.create') }}
@@ -75,13 +75,13 @@
                 </el-button>
                 <el-button-group>
                     <el-button :disabled="checkStatus('start', null)" @click="onOperate('start', null)">
-                        {{ $t('container.start') }}
+                        {{ $t('app.start') }}
                     </el-button>
                     <el-button :disabled="checkStatus('stop', null)" @click="onOperate('stop', null)">
-                        {{ $t('container.stop') }}
+                        {{ $t('app.stop') }}
                     </el-button>
                     <el-button :disabled="checkStatus('restart', null)" @click="onOperate('restart', null)">
-                        {{ $t('container.restart') }}
+                        {{ $t('commons.button.restart') }}
                     </el-button>
                     <el-button :disabled="checkStatus('kill', null)" @click="onOperate('kill', null)">
                         {{ $t('container.kill') }}
@@ -93,7 +93,7 @@
                         {{ $t('container.unpause') }}
                     </el-button>
                     <el-button :disabled="checkStatus('remove', null)" @click="onOperate('remove', null)">
-                        {{ $t('container.remove') }}
+                        {{ $t('commons.button.delete') }}
                     </el-button>
                 </el-button-group>
             </template>
@@ -158,19 +158,19 @@
                                             :disabled="checkStatus('start', row)"
                                             @click="onOperate('start', row)"
                                         >
-                                            {{ $t('container.start') }}
+                                            {{ $t('app.start') }}
                                         </el-dropdown-item>
                                         <el-dropdown-item
                                             :disabled="checkStatus('stop', row)"
                                             @click="onOperate('stop', row)"
                                         >
-                                            {{ $t('container.stop') }}
+                                            {{ $t('app.stop') }}
                                         </el-dropdown-item>
                                         <el-dropdown-item
                                             :disabled="checkStatus('restart', row)"
                                             @click="onOperate('restart', row)"
                                         >
-                                            {{ $t('container.restart') }}
+                                            {{ $t('commons.button.restart') }}
                                         </el-dropdown-item>
                                         <el-dropdown-item
                                             :disabled="checkStatus('kill', row)"
@@ -318,7 +318,7 @@
                                         size="small"
                                         @click="router.push({ name: 'Website' })"
                                     >
-                                        {{ $t('website.website') }}:
+                                        {{ $t('menu.website') }}:
                                         {{ row.websites.join(',') }}
                                     </el-button>
                                 </el-tooltip>
@@ -741,7 +741,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('container.monitor'),
+        label: i18n.global.t('menu.monitor'),
         disabled: (row: Container.ContainerInfo) => {
             return row.state !== 'running';
         },
@@ -768,7 +768,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('container.remove'),
+        label: i18n.global.t('commons.button.delete'),
         click: (row: Container.ContainerInfo) => {
             onOperate('remove', row);
         },

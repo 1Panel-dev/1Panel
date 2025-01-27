@@ -69,12 +69,12 @@
                             </el-text>
                         </el-tooltip>
 
-                        <el-tooltip :content="$t('file.refresh')" placement="top">
+                        <el-tooltip :content="$t('commons.button.refresh')" placement="top">
                             <el-text size="small" @click="getRefresh(directoryPath)" class="cursor-pointer">
                                 <el-icon>
                                     <Refresh />
                                 </el-icon>
-                                <span class="sm:inline hidden pl-1">{{ $t('file.refresh') }}</span>
+                                <span class="sm:inline hidden pl-1">{{ $t('commons.button.refresh') }}</span>
                             </el-text>
                         </el-tooltip>
                     </div>

@@ -103,8 +103,8 @@ const toPage = (key: string) => {
 
 const onConfirm = () => {
     ElMessageBox.confirm(
-        i18n.global.t('app.operatorHelper', [i18n.global.t('app.delete')]),
-        i18n.global.t('app.delete'),
+        i18n.global.t('app.operatorHelper', [i18n.global.t('commons.button.delete')]),
+        i18n.global.t('commons.button.delete'),
         {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
             cancelButtonText: i18n.global.t('commons.button.cancel'),

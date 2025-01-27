@@ -22,7 +22,7 @@
                     </el-checkbox>
                 </div>
                 <el-button :disabled="!currentStatus" class="ml-20" @click="onDownload" icon="Download">
-                    {{ $t('file.download') }}
+                    {{ $t('commons.button.download') }}
                 </el-button>
             </el-form-item>
         </el-form>

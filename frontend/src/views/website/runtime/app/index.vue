@@ -1,5 +1,5 @@
 <template>
-    <el-form-item :label="$t('runtime.app')" prop="appID">
+    <el-form-item :label="$t('app.app')" prop="appID">
         <el-row :gutter="20">
             <el-col :span="12">
                 <el-select

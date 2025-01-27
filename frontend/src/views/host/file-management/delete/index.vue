@@ -1,5 +1,5 @@
 <template>
-    <DialogPro v-model="open" :title="$t('app.delete')" size="small">
+    <DialogPro v-model="open" :title="$t('commons.button.delete')" size="small">
         <div>
             <el-row>
                 <el-col :span="22" :offset="1">

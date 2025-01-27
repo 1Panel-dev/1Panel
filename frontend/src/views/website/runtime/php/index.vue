@@ -50,10 +50,10 @@
                             <span>{{ $t('runtime.' + toLowerCase(row.resource)) }}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('runtime.version')" prop="version">
+                    <el-table-column :label="$t('app.version')" prop="version">
                         <template #default="{ row }">{{ row.params['PHP_VERSION'] }}</template>
                     </el-table-column>
-                    <el-table-column :label="$t('runtime.image')" prop="image" show-overflow-tooltip></el-table-column>
+                    <el-table-column :label="$t('container.image')" prop="image" show-overflow-tooltip></el-table-column>
                     <el-table-column :label="$t('commons.table.port')" prop="port">
                         <template #default="{ row }">
                             {{ row.port }}
@@ -77,7 +77,7 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('website.log')" prop="">
+                    <el-table-column :label="$t('commons.button.log')" prop="">
                         <template #default="{ row }">
                             <el-button @click="openLog(row)" link type="primary" :disabled="row.resource == 'local'">
                                 {{ $t('website.check') }}
@@ -172,7 +172,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('container.stop'),
+        label: i18n.global.t('app.stop'),
         click: function (row: Runtime.Runtime) {
             operateRuntime('down', row.id);
         },
@@ -181,7 +181,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('container.start'),
+        label: i18n.global.t('app.start'),
         click: function (row: Runtime.Runtime) {
             operateRuntime('up', row.id);
         },
@@ -195,7 +195,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('container.restart'),
+        label: i18n.global.t('commons.button.restart'),
         click: function (row: Runtime.Runtime) {
             operateRuntime('restart', row.id);
         },
@@ -298,7 +298,7 @@ const openDelete = async (row: Runtime.Runtime) => {
             checkRef.value.acceptParams({ items: items, key: 'website', installID: row.id });
         } else {
             opRef.value.acceptParams({
-                title: i18n.global.t('commons.msg.deleteTitle'),
+                title: i18n.global.t('commons.button.delete'),
                 names: [row.name],
                 msg: i18n.global.t('commons.msg.operatorHelper', [
                     i18n.global.t('website.runtime'),

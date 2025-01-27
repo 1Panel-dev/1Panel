@@ -16,7 +16,7 @@
                         </el-button>
                         <el-divider direction="vertical" />
                         <el-button type="primary" @click="onOperate('restart')" link>
-                            {{ $t('container.restart') }}
+                            {{ $t('commons.button.restart') }}
                         </el-button>
                     </div>
                 </div>
@@ -310,7 +310,7 @@ const onDelete = async (row: Toolbox.FtpInfo | null) => {
         title: i18n.global.t('commons.button.delete'),
         names: names,
         msg: i18n.global.t('commons.msg.operatorHelper', [
-            i18n.global.t('cronjob.cronTask'),
+            i18n.global.t('menu.cronjob'),
             i18n.global.t('commons.button.delete'),
         ]),
         api: null,

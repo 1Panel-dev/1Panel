@@ -50,7 +50,7 @@ const handleClose = () => {
 
 const buttons = [
     {
-        label: i18n.global.t('commons.operate.install'),
+        label: i18n.global.t('commons.button.install'),
         click: function (row: Runtime.SupportExtension) {
             installExtension(row);
         },
@@ -59,7 +59,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('commons.operate.uninstall'),
+        label: i18n.global.t('commons.commons.button.uninstall'),
         click: function (row: Runtime.SupportExtension) {
             unInstallPHPExtension(row);
         },

@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('app.install')" :back="handleClose" size="large">
+    <DrawerPro v-model="open" :header="$t('commons.button.install')" :back="handleClose" size="large">
         <el-alert
             :title="$t('app.hostModeHelper')"
             class="common-prompt"

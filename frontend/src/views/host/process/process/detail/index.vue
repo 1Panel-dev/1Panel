@@ -7,7 +7,9 @@
                         <el-descriptions-item :label="$t('commons.table.name')" min-width="100px">
                             {{ data.name }}
                         </el-descriptions-item>
-                        <el-descriptions-item :label="$t('process.status')">{{ data.status }}</el-descriptions-item>
+                        <el-descriptions-item :label="$t('commons.table.status')">
+                            {{ data.status }}
+                        </el-descriptions-item>
                         <el-descriptions-item :label="$t('process.pid')">{{ data.PID }}</el-descriptions-item>
                         <el-descriptions-item :label="$t('process.ppid')">{{ data.PPID }}</el-descriptions-item>
                         <el-descriptions-item :label="$t('process.numThreads')">
@@ -46,7 +48,7 @@
                 </el-tab-pane>
                 <el-tab-pane :label="$t('process.openFiles')" name="openFiles">
                     <el-table :data="data.openFiles" border style="width: 100%">
-                        <el-table-column prop="path" :label="$t('process.file')" />
+                        <el-table-column prop="path" :label="$t('menu.file')" />
                         <el-table-column prop="fd" label="fd" width="100px" />
                     </el-table>
                 </el-tab-pane>
@@ -72,7 +74,7 @@
                                 <span v-if="row.remoteaddr.port > 0">:{{ row.remoteaddr.port }}</span>
                             </template>
                         </el-table-column>
-                        <el-table-column prop="status" :label="$t('app.status')" />
+                        <el-table-column prop="status" :label="$t(commons.table.status)" />
                     </el-table>
                 </el-tab-pane>
             </el-tabs>

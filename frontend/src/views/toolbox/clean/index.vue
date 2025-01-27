@@ -618,15 +618,15 @@ function load18n(label: string) {
         case 'upload_website':
         case 'rollback_website':
         case 'download_website':
-            return i18n.global.t('clean.website');
+            return i18n.global.t('menu.website');
         case 'upload_app':
         case 'rollback_app':
         case 'download_app':
-            return i18n.global.t('clean.app');
+            return i18n.global.t('app.app');
         case 'upload_database':
         case 'rollback_database':
         case 'download_database':
-            return i18n.global.t('clean.database');
+            return i18n.global.t('menu.database');
         case 'upload_directory':
         case 'download_directory':
             return i18n.global.t('clean.directory');
@@ -643,9 +643,9 @@ function load18n(label: string) {
         case 'curl':
             return i18n.global.t('clean.curl');
         case 'container_images':
-            return i18n.global.t('clean.images');
+            return i18n.global.t('container.image');
         case 'container_containers':
-            return i18n.global.t('clean.containers');
+            return i18n.global.t('menu.container');
         case 'container_volumes':
             return i18n.global.t('clean.volumes');
         case 'build_cache':

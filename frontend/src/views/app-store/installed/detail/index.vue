@@ -243,7 +243,7 @@ const submit = async (formEl: FormInstance) => {
         if (!valid) {
             return;
         }
-        ElMessageBox.confirm(i18n.global.t('app.updateWarn'), i18n.global.t('app.update'), {
+        ElMessageBox.confirm(i18n.global.t('app.updateWarn'), i18n.global.t('commons.button.update'), {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
             cancelButtonText: i18n.global.t('commons.button.cancel'),
             type: 'info',

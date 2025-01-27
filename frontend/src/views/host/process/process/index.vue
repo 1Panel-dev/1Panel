@@ -71,7 +71,7 @@
                     ></el-table-column>
                     <el-table-column :label="$t('process.numConnections')" fix prop="numConnections"></el-table-column>
                     <el-table-column
-                        :label="$t('process.status')"
+                        :label="$t('commons.table.status')"
                         fix
                         prop="status"
                         column-key="status"

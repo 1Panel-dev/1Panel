@@ -118,7 +118,7 @@ const getAlgorithm = (key: string) => {
 
 const deleteLb = async (row: Website.NginxUpstream) => {
     delRef.value.acceptParams({
-        title: i18n.global.t('commons.msg.deleteTitle'),
+        title: i18n.global.t('commons.button.delete'),
         names: [row.name],
         msg: i18n.global.t('commons.msg.operatorHelper', [
             i18n.global.t('website.loadBalance'),

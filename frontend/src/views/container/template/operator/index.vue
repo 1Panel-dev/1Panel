@@ -17,7 +17,7 @@
             <el-form-item :label="$t('commons.table.name')" prop="name">
                 <el-input :disabled="dialogData.title === 'edit'" v-model.trim="dialogData.rowData!.name"></el-input>
             </el-form-item>
-            <el-form-item :label="$t('container.description')">
+            <el-form-item :label="$t('commons.table.description')">
                 <el-input v-model="dialogData.rowData!.description"></el-input>
             </el-form-item>
             <el-form-item>

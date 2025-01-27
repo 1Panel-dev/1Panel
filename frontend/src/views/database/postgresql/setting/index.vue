@@ -14,7 +14,7 @@
                     :plain="activeName !== 'log'"
                     @click="activeName = 'log'"
                 >
-                    {{ $t('database.log') }}
+                    {{ $t('commons.button.log') }}
                 </el-button>
             </template>
 

@@ -90,7 +90,7 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('website.log')" width="100px">
+                    <el-table-column :label="$t('commons.button.log')" width="100px">
                         <template #default="{ row }">
                             <el-button @click="openSSLLog(row)" link type="primary" v-if="row.provider != 'manual'">
                                 {{ $t('website.check') }}
@@ -229,7 +229,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('commons.operate.update'),
+        label: i18n.global.t('commons.button.update'),
         click: function (row: Website.SSLDTO) {
             sslUploadRef.value.acceptParams(row);
         },
@@ -247,7 +247,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('file.download'),
+        label: i18n.global.t('commons.button.download'),
         click: function (row: Website.SSLDTO) {
             onDownload(row);
         },

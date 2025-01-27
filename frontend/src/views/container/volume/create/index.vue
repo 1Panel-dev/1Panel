@@ -22,7 +22,7 @@
                 <el-form-item :label="$t('container.nfsAddress')" prop="nfsAddress">
                     <el-input clearable v-model.trim="form.nfsAddress" :placeholder="$t('commons.rule.hostHelper')" />
                 </el-form-item>
-                <el-form-item :label="$t('container.version')" prop="nfsVersion">
+                <el-form-item :label="$t('app.version')" prop="nfsVersion">
                     <el-radio-group v-model="form.nfsVersion">
                         <el-radio value="v3">NFS</el-radio>
                         <el-radio value="v4">NFS4</el-radio>

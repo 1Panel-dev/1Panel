@@ -23,7 +23,7 @@
                             @click="$emit('closeTab', tabItem.path)"
                         >
                             <el-icon><Close /></el-icon>
-                            {{ $t('tabs.close') }}
+                            {{ $t('commons.button.close') }}
                         </el-dropdown-item>
                         <el-dropdown-item
                             v-if="tabsStore.hasCloseDropdown(tabItem.path, 'left')"

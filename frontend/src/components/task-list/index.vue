@@ -22,7 +22,7 @@
                                 <Status :status="row.status" :msg="row.errorMsg" />
                             </template>
                         </el-table-column>
-                        <el-table-column :label="$t('website.log')" prop="log">
+                        <el-table-column :label="$t('commons.button.log')" prop="log">
                             <template #default="{ row }">
                                 <el-button @click="openTaskLog(row)" link type="primary">
                                     {{ $t('website.check') }}

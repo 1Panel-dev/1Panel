@@ -11,7 +11,7 @@
                 <el-tooltip :content="$t('file.top')" placement="top">
                     <el-button icon="Top" @click="top" circle :disabled="paths.length == 0" />
                 </el-tooltip>
-                <el-tooltip :content="$t('file.refresh')" placement="top">
+                <el-tooltip :content="$t('commons.button.refresh')" placement="top">
                     <el-button icon="Refresh" circle @click="search" />
                 </el-tooltip>
             </div>
@@ -49,7 +49,7 @@
                 "
             />
         </div>
-        <LayoutContent :title="$t('file.file')" v-loading="loading">
+        <LayoutContent :title="$t('menu.file')" v-loading="loading">
             <template #prompt>
                 <el-alert type="info" :closable="false">
                     <template #title>
@@ -73,16 +73,16 @@
                             </el-dropdown-item>
                             <el-dropdown-item command="file">
                                 <svg-icon iconName="p-file-normal"></svg-icon>
-                                {{ $t('file.file') }}
+                                {{ $t('menu.file') }}
                             </el-dropdown-item>
                         </el-dropdown-menu>
                     </template>
                 </el-dropdown>
                 <el-button-group>
-                    <el-button plain @click="openUpload">{{ $t('file.upload') }}</el-button>
+                    <el-button plain @click="openUpload">{{ $t('commons.button.upload') }}</el-button>
                     <el-button plain @click="openWget">{{ $t('file.remoteFile') }}</el-button>
                     <el-button plain @click="openMove('copy')" :disabled="selects.length === 0">
-                        {{ $t('file.copy') }}
+                        {{ $t('commons.button.copy') }}
                     </el-button>
                     <el-button plain @click="openMove('cut')" :disabled="selects.length === 0">
                         {{ $t('file.move') }}
@@ -106,7 +106,12 @@
                     <el-tooltip class="box-item" effect="dark" :content="$t('file.paste')" placement="bottom">
                         <el-button plain @click="openPaste">{{ $t('file.paste') }}({{ fileMove.count }})</el-button>
                     </el-tooltip>
-                    <el-tooltip class="box-item" effect="dark" :content="$t('file.cancel')" placement="bottom">
+                    <el-tooltip
+                        class="box-item"
+                        effect="dark"
+                        :content="$t('commons.button.cancel')"
+                        placement="bottom"
+                    >
                         <el-button plain class="close" icon="Close" @click="closeMove"></el-button>
                     </el-tooltip>
                 </el-button-group>
@@ -872,11 +877,11 @@ const openWithVSCode = (row: File.File) => {
 
 const buttons = [
     {
-        label: i18n.global.t('file.open'),
+        label: i18n.global.t('commons.button.opem'),
         click: open,
     },
     {
-        label: i18n.global.t('file.download'),
+        label: i18n.global.t('commons.button.download'),
         click: (row: File.File) => {
             openDownload(row);
         },

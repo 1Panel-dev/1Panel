@@ -5,7 +5,7 @@
                 {{ $t('nginx.configResource') }}
             </el-button>
             <el-button type="primary" :plain="activeName !== '2'" @click="changeTab('2')">
-                {{ $t('website.log') }}
+                {{ $t('commons.button.log') }}
             </el-button>
             <el-button type="primary" :plain="activeName !== '3'" @click="changeTab('3')">
                 {{ $t('commons.button.init') }}

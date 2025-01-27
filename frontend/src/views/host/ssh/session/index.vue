@@ -37,7 +37,7 @@ const sshSearch = reactive({
 
 const buttons = [
     {
-        label: i18n.global.t('ssh.disconnect'),
+        label: i18n.global.t('commons.button.disConn'),
         click: function (row: any) {
             stop(row.PID);
         },
@@ -98,7 +98,7 @@ const search = () => {
 };
 
 const stop = async (PID: number) => {
-    ElMessageBox.confirm(i18n.global.t('ssh.stopSSHWarn'), i18n.global.t('ssh.disconnect'), {
+    ElMessageBox.confirm(i18n.global.t('ssh.stopSSHWarn'), i18n.global.t('commons.button.disConn'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',

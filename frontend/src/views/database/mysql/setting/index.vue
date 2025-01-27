@@ -30,7 +30,7 @@
                     :plain="activeName !== 'log'"
                     @click="changeTab('log')"
                 >
-                    {{ $t('database.log') }}
+                    {{ $t('commons.button.log') }}
                 </el-button>
                 <el-button
                     type="primary"

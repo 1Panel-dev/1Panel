@@ -39,10 +39,10 @@
                             </el-text>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('container.from')" prop="createdBy" min-width="80" fix>
+                    <el-table-column :label="$t('app.source')" prop="createdBy" min-width="80" fix>
                         <template #default="{ row }">
-                            <span v-if="row.createdBy === ''">{{ $t('container.local') }}</span>
-                            <span v-if="row.createdBy === 'Apps'">{{ $t('container.apps') }}</span>
+                            <span v-if="row.createdBy === ''">{{ $t('commons.table.local') }}</span>
+                            <span v-if="row.createdBy === 'Apps'">{{ $t('menu.apps') }}</span>
                             <span v-if="row.createdBy === '1Panel'">1Panel</span>
                         </template>
                     </el-table-column>

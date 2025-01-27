@@ -25,15 +25,15 @@
                     @change="changeResource(runtime.resource)"
                 >
                     <el-radio :value="'appstore'">
-                        {{ $t('runtime.appstore') }}
+                        {{ $t('menu.apps') }}
                     </el-radio>
                     <el-radio :value="'local'">
-                        {{ $t('runtime.local') }}
+                        {{ $t('commons.table.local') }}
                     </el-radio>
                 </el-radio-group>
             </el-form-item>
             <div v-if="runtime.resource === 'appstore'">
-                <el-form-item :label="$t('runtime.app')" prop="appID">
+                <el-form-item :label="$t('app.app')" prop="appID">
                     <el-row :gutter="20">
                         <el-col :span="12">
                             <el-select
@@ -87,7 +87,7 @@
                             ></el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item :label="$t('runtime.image')" prop="image">
+                    <el-form-item :label="$t('container.image')" prop="image">
                         <el-input v-model="runtime.image"></el-input>
                     </el-form-item>
                     <el-form-item
@@ -162,7 +162,7 @@
                 <el-form-item>
                     <el-alert :title="$t('runtime.localHelper')" type="info" :closable="false" />
                 </el-form-item>
-                <el-form-item :label="$t('runtime.version')" prop="version">
+                <el-form-item :label="$t('app.version')" prop="version">
                     <el-input v-model="runtime.version" :placeholder="$t('runtime.versionHelper')"></el-input>
                 </el-form-item>
             </div>

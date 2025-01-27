@@ -3,15 +3,15 @@
         <RouterButton
             :buttons="[
                 {
-                    label: i18n.global.t('cronjob.cronTask'),
+                    label: i18n.global.t('menu.cronjob'),
                     path: '/cronjobs',
                 },
             ]"
         />
-        <LayoutContent v-loading="loading" v-if="!isRecordShow" :title="$t('cronjob.cronTask')">
+        <LayoutContent v-loading="loading" v-if="!isRecordShow" :title="$t('menu.cronjob')">
             <template #leftToolBar>
                 <el-button type="primary" @click="onOpenDialog('create')">
-                    {{ $t('commons.button.create') }}{{ $t('cronjob.cronTask') }}
+                    {{ $t('commons.button.create') }}{{ $t('menu.cronjob') }}
                 </el-button>
                 <el-button-group class="ml-4">
                     <el-button plain :disabled="selects.length === 0" @click="onBatchChangeStatus('enable')">
@@ -278,7 +278,7 @@ const onDelete = async (row: Cronjob.CronjobInfo | null) => {
         title: i18n.global.t('commons.button.delete'),
         names: names,
         msg: i18n.global.t('commons.msg.operatorHelper', [
-            i18n.global.t('cronjob.cronTask'),
+            i18n.global.t('menu.cronjob'),
             i18n.global.t('commons.button.delete'),
         ]),
         api: null,

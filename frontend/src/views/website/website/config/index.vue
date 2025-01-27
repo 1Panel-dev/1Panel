@@ -3,7 +3,7 @@
         <RouterButton
             :buttons="[
                 {
-                    label: $t('website.website'),
+                    label: $t('menu.website'),
                     path: '/websites',
                 },
             ]"
@@ -22,7 +22,7 @@
                     {{ $t('website.basic') }}
                 </el-button>
                 <el-button type="primary" :plain="index !== 'log'" @click="changeTab('log')">
-                    {{ $t('website.log') }}
+                    {{ $t('commons.button.log') }}
                 </el-button>
                 <el-button type="primary" :plain="index !== 'resource'" @click="changeTab('resource')">
                     {{ $t('website.source') }}

@@ -1,7 +1,7 @@
 <template>
     <DrawerPro v-model="drawerVisible" :header="$t('container.compose')" :back="handleClose" size="large">
         <el-form ref="formRef" @submit.prevent label-position="top" :model="form" :rules="rules" v-loading="loading">
-            <el-form-item :label="$t('container.from')">
+            <el-form-item :label="$t('app.source')">
                 <el-radio-group v-model="form.from" @change="onEdit('form')">
                     <el-radio value="edit">{{ $t('commons.button.edit') }}</el-radio>
                     <el-radio value="path">{{ $t('container.pathSelect') }}</el-radio>
@@ -133,7 +133,7 @@ const changeTemplate = () => {
 
 const changeFrom = () => {
     if ((oldFrom.value === 'edit' || oldFrom.value === 'template') && form.file) {
-        ElMessageBox.confirm(i18n.global.t('container.fromChangeHelper'), i18n.global.t('container.from'), {
+        ElMessageBox.confirm(i18n.global.t('container.fromChangeHelper'), i18n.global.t('app.source'), {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
             cancelButtonText: i18n.global.t('commons.button.cancel'),
             type: 'info',

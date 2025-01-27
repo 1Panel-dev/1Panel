@@ -17,6 +17,8 @@ func Init() {
 	initGlobalData()
 	handleCronjobStatus()
 	handleSnapStatus()
+
+	loadLocalDir()
 }
 
 func initGlobalData() {
@@ -91,4 +93,13 @@ func handleCronJobAlert(cronjob *model.Cronjob) {
 		global.LOG.Errorf("cronjob alert push failed, err: %v", err)
 		return
 	}
+}
+
+func loadLocalDir() {
+	var account model.BackupAccount
+	if err := global.DB.Where("`type` = ?", constant.Local).First(&account).Error; err != nil {
+		global.LOG.Errorf("load local backup account info failed, err: %v", err)
+		return
+	}
+	global.Dir.LocalBackupDir = account.BackupPath
 }

@@ -88,7 +88,7 @@
                 </template>
                 <el-table-column type="selection" fix />
                 <el-table-column :label="$t('commons.table.name')" show-overflow-tooltip prop="fileName" />
-                <el-table-column :label="$t('database.source')" prop="backupType">
+                <el-table-column :label="$t('app.source')" prop="backupType">
                     <template #default="{ row }">
                         <span v-if="row.source">
                             {{ $t('setting.' + row.source) }}

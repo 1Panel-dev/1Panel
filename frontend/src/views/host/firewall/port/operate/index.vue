@@ -15,7 +15,7 @@
                 <span class="input-help">{{ $t('firewall.portHelper2') }}</span>
             </el-form-item>
 
-            <el-form-item :label="$t('firewall.source')" prop="source">
+            <el-form-item :label="$t('app.source')" prop="source">
                 <el-radio-group v-model="dialogData.rowData!.source">
                     <el-radio value="anyWhere">{{ $t('firewall.anyWhere') }}</el-radio>
                     <el-radio value="address">{{ $t('firewall.address') }}</el-radio>

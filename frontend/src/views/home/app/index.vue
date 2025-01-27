@@ -92,7 +92,7 @@
                                             link
                                             @click="onOperate('stop', app.currentRow)"
                                         >
-                                            {{ $t('commons.operate.up') }}
+                                            {{ $t('commons.button.start') }}
                                         </el-button>
                                         <el-button
                                             :style="mobile ? 'margin-left: -1px' : ''"
@@ -101,7 +101,7 @@
                                             link
                                             @click="onOperate('stop', app.currentRow)"
                                         >
-                                            {{ $t('commons.operate.down') }}
+                                            {{ $t('commons.button.stop') }}
                                         </el-button>
                                         <el-button
                                             :style="mobile ? 'margin-left: -1px' : ''"
@@ -167,7 +167,7 @@
                                     :disabled="app.limit == 1 && app.detail && app.detail.length !== 0"
                                     @click="goInstall(app.key, app.appType)"
                                 >
-                                    {{ $t('app.install') }}
+                                    {{ $t('commons.button.install') }}
                                 </el-button>
                             </el-col>
                         </el-row>

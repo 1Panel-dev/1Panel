@@ -51,7 +51,7 @@
         </template>
         <template #leftToolBar>
             <el-button @click="sync" type="primary" plain v-if="mode === 'installed' && data != null">
-                {{ $t('app.sync') }}
+                {{ $t('commons.button.sync') }}
             </el-button>
             <el-button @click="openIgnore" type="primary" plain v-if="mode === 'upgrade'">
                 {{ $t('app.showIgnore') }}
@@ -448,7 +448,7 @@ const options = {
 };
 
 const sync = () => {
-    ElMessageBox.confirm(i18n.global.t('app.syncAllAppHelper'), i18n.global.t('app.sync'), {
+    ElMessageBox.confirm(i18n.global.t('app.syncAllAppHelper'), i18n.global.t('commons.button.sync'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',
@@ -561,7 +561,7 @@ const onOperate = async (operation: string) => {
 
 const buttons = [
     {
-        label: i18n.global.t('app.sync'),
+        label: i18n.global.t('commons.button.sync'),
         click: (row: any) => {
             openOperate(row, 'sync');
         },
@@ -589,7 +589,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('app.restart'),
+        label: i18n.global.t('commons.button.restart'),
         click: (row: any) => {
             openOperate(row, 'restart');
         },

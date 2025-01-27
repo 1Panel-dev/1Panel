@@ -39,7 +39,7 @@
                             </el-text>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('container.description')" prop="description" min-width="200" fix />
+                    <el-table-column :label="$t('commons.table.description')" prop="description" min-width="200" fix />
                     <el-table-column :label="$t('commons.table.createdAt')" min-width="80" fix>
                         <template #default="{ row }">
                             {{ dateFormat(0, 0, row.createdAt) }}

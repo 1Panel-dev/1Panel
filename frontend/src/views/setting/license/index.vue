@@ -135,7 +135,7 @@ const onSync = async (row: any) => {
 };
 
 const onUnbind = async (row: any) => {
-    ElMessageBox.confirm(i18n.global.t('license.unbindHelper'), i18n.global.t('license.unbind'), {
+    ElMessageBox.confirm(i18n.global.t('license.unbindHelper'), i18n.global.t('commons.button.unbind'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',

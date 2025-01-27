@@ -299,7 +299,7 @@
                     <el-checkbox
                         @change="random"
                         v-model="website.enableFtp"
-                        :label="$t('website.enableFtp')"
+                        :label="$t('commons.button.create') + ' FTP'"
                         size="large"
                     />
                     <span class="input-help">{{ $t('website.ftpHelper') }}</span>
@@ -364,7 +364,7 @@
                 </el-form-item>
                 <el-row :gutter="20" v-if="website.type === 'runtime' && website.createDb">
                     <el-col :span="24">
-                        <el-form-item :label="$t('database.database')" prop="dbHost">
+                        <el-form-item :label="$t('menu.database')" prop="dbHost">
                             <el-row :gutter="20">
                                 <el-col :span="12">
                                     <el-select

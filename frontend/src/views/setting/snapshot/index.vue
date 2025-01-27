@@ -91,7 +91,7 @@
                         <template #default="{ row }">
                             <div>
                                 <el-button link v-if="row.status === 'Waiting'" type="primary">
-                                    {{ $t('setting.snapshot') }}{{ $t('commons.table.statusWaiting') }}
+                                    {{ $t('setting.snapshot') }}{{ $t('commons.status.waiting') }}
                                 </el-button>
                                 <el-button link v-if="row.status === 'Failed'" @click="reCreate(row)" type="danger">
                                     {{ $t('setting.snapshot') }}{{ $t('commons.status.error') }}
@@ -102,7 +102,7 @@
                             </div>
                             <div v-if="row.recoverStatus">
                                 <el-button link v-if="row.recoverStatus === 'Waiting'" type="primary">
-                                    {{ $t('commons.button.recover') }}{{ $t('commons.table.statusWaiting') }}
+                                    {{ $t('commons.button.recover') }}{{ $t('commons.status.waiting') }}
                                 </el-button>
                                 <el-button
                                     v-if="row.recoverStatus === 'Failed'"
@@ -118,7 +118,7 @@
                             </div>
                             <div v-if="row.rollbackStatus">
                                 <el-button link v-if="row.rollbackStatus === 'Waiting'" type="primary">
-                                    {{ $t('setting.rollback') }}{{ $t('commons.table.statusWaiting') }}
+                                    {{ $t('setting.rollback') }}{{ $t('commons.status.waiting') }}
                                 </el-button>
                                 <el-button
                                     link

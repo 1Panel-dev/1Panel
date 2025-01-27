@@ -1,13 +1,13 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('file.upload')" :back="handleClose" size="normal">
+    <DrawerPro v-model="open" :header="$t('commons.button.upload')" :back="handleClose" size="normal">
         <template #content>
             <div class="button-container">
                 <div>
                     <el-button type="primary" @click="upload('file')">
-                        {{ $t('file.upload') }}{{ $t('file.file') }}
+                        {{ $t('commons.button.upload') }}{{ $t('menu.file') }}
                     </el-button>
                     <el-button type="primary" @click="upload('dir')">
-                        {{ $t('file.upload') }}{{ $t('file.dir') }}
+                        {{ $t('commons.button.upload') }}{{ $t('file.dir') }}
                     </el-button>
                 </div>
                 <el-button @click="clearFiles">{{ $t('file.clearList') }}</el-button>

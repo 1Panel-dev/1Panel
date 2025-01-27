@@ -1,7 +1,7 @@
 <template>
     <DrawerPro v-model="drawerVisible" :header="$t('container.imageTag')" :back="handleClose" size="large">
         <el-form v-loading="loading" label-position="top" ref="formRef" :model="form" label-width="80px">
-            <el-form-item :label="$t('container.from')">
+            <el-form-item :label="$t('app.source')">
                 <el-checkbox v-model="form.fromRepo">{{ $t('container.imageRepo') }}</el-checkbox>
             </el-form-item>
             <el-form-item

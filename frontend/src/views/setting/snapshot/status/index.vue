@@ -1,12 +1,12 @@
 <template>
     <DrawerPro v-model="drawerVisible" :header="$t('setting.recoverDetail')" :back="handleClose" size="small">
         <el-form label-position="top" v-loading="loading">
-            <span class="card-title">{{ $t('setting.recover') }}</span>
+            <span class="card-title">{{ $t('commons.button.recover') }}</span>
             <el-divider class="divider" />
             <div v-if="!snapInfo.recoverStatus && !snapInfo.lastRecoveredAt">
                 <el-alert center class="alert" style="height: 257px" :closable="false">
                     <el-button size="large" round plain type="primary" @click="recoverSnapshot(true)">
-                        {{ $t('setting.recover') }}
+                        {{ $t('commons.button.recover') }}
                     </el-button>
                 </el-alert>
             </div>
@@ -15,10 +15,10 @@
                     <div v-if="snapInfo.lastRecoveredAt">
                         <el-form-item :label="$t('commons.table.status')">
                             <el-tag type="success">
-                                {{ $t('commons.table.statusSuccess') }}
+                                {{ $t('commons.status.success') }}
                             </el-tag>
                             <el-button @click="recoverSnapshot(true)" style="margin-left: 10px" type="primary">
-                                {{ $t('setting.recover') }}
+                                {{ $t('commons.button.recover') }}
                             </el-button>
                         </el-form-item>
                         <el-form-item :label="$t('setting.lastRecoverAt')">
@@ -29,13 +29,13 @@
                 <div v-else>
                     <el-form-item :label="$t('commons.table.status')">
                         <el-tag type="danger" v-if="snapInfo.recoverStatus === 'Failed'">
-                            {{ $t('commons.table.statusFailed') }}
+                            {{ $t('commons.status.failed') }}
                         </el-tag>
                         <el-tag type="success" v-if="snapInfo.recoverStatus === 'Success'">
-                            {{ $t('commons.table.statusSuccess') }}
+                            {{ $t('commons.status.success') }}
                         </el-tag>
                         <el-tag type="info" v-if="snapInfo.recoverStatus === 'Waiting'">
-                            {{ $t('commons.table.statusWaiting') }}
+                            {{ $t('commons.status.waiting') }}
                         </el-tag>
                     </el-form-item>
                     <el-form-item :label="$t('setting.lastRecoverAt')" v-if="snapInfo.recoverStatus !== 'Waiting'">
@@ -70,7 +70,7 @@
                     <div v-if="snapInfo.lastRollbackedAt">
                         <el-form-item :label="$t('commons.table.status')">
                             <el-tag type="success">
-                                {{ $t('commons.table.statusSuccess') }}
+                                {{ $t('commons.status.success') }}
                             </el-tag>
                             <el-button @click="rollbackSnapshot" style="margin-left: 10px" type="primary">
                                 {{ $t('setting.rollback') }}
@@ -84,13 +84,13 @@
                 <div v-else>
                     <el-form-item :label="$t('commons.table.status')">
                         <el-tag type="success" v-if="snapInfo.rollbackStatus === 'Success'">
-                            {{ $t('commons.table.statusSuccess') }}
+                            {{ $t('commons.status.success') }}
                         </el-tag>
                         <el-tag type="danger" v-if="snapInfo.rollbackStatus === 'Failed'">
-                            {{ $t('commons.table.statusFailed') }}
+                            {{ $t('commons.status.failed') }}
                         </el-tag>
                         <el-tag type="info" v-if="snapInfo.rollbackStatus === 'Waiting'">
-                            {{ $t('commons.table.statusWaiting') }}
+                            {{ $t('commons.status.waiting') }}
                         </el-tag>
                         <el-button
                             style="margin-left: 15px"

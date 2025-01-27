@@ -150,7 +150,7 @@
                                                     "
                                                     @click.stop="openInstall(app)"
                                                 >
-                                                    {{ $t('app.install') }}
+                                                    {{ $t('commons.button.install') }}
                                                 </el-button>
                                             </div>
                                         </div>

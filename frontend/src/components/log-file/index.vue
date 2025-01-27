@@ -11,7 +11,7 @@
                 icon="Download"
                 :disabled="logs.length === 0"
             >
-                {{ $t('file.download') }}
+                {{ $t('commons.button.download') }}
             </el-button>
             <span v-if="$slots.button" class="ml-2.5">
                 <slot name="button"></slot>

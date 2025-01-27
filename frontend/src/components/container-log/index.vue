@@ -18,7 +18,7 @@
             </el-checkbox>
         </div>
         <el-button class="margin-button" @click="onDownload" icon="Download">
-            {{ $t('file.download') }}
+            {{ $t('commons.button.download') }}
         </el-button>
         <el-button class="margin-button" @click="onClean" icon="Delete">
             {{ $t('commons.button.clean') }}
@@ -89,7 +89,7 @@ const visibleLogs = computed(() => {
 });
 
 const timeOptions = ref([
-    { label: i18n.global.t('container.all'), value: 'all' },
+    { label: i18n.global.t('commons.table.all'), value: 'all' },
     {
         label: i18n.global.t('container.lastDay'),
         value: '24h',
@@ -148,7 +148,7 @@ const searchLogs = async () => {
 const onDownload = async () => {
     logSearch.tail = 0;
     let msg = i18n.global.t('container.downLogHelper1', [logSearch.container]);
-    ElMessageBox.confirm(msg, i18n.global.t('file.download'), {
+    ElMessageBox.confirm(msg, i18n.global.t('commons.button.download'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',

@@ -3,12 +3,12 @@
         <RouterButton
             :buttons="[
                 {
-                    label: i18n.global.t('website.website'),
+                    label: i18n.global.t('menu.website'),
                     path: '/websites',
                 },
             ]"
         />
-        <LayoutContent :title="$t('website.website')" v-loading="loading">
+        <LayoutContent :title="$t('menu.website')" v-loading="loading">
             <template #app>
                 <AppStatus
                     :app-key="'openresty'"
@@ -444,7 +444,7 @@ const submitDate = (row: any) => {
 
 const buttons = [
     {
-        label: i18n.global.t('website.config'),
+        label: i18n.global.t('menu.config'),
         click: function (row: Website.Website) {
             openConfig(row.id);
         },

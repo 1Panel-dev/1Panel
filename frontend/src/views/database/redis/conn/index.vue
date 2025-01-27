@@ -17,7 +17,7 @@
                             </span>
                             <CopyButton :content="loadRedisInfo(true)" type="icon" />
                         </el-descriptions-item>
-                        <el-descriptions-item :label="$t('database.connPort')">
+                        <el-descriptions-item :label="$t('commons.table.port')">
                             6379
                             <CopyButton content="6379" type="icon" />
                         </el-descriptions-item>
@@ -43,7 +43,7 @@
                             </span>
                             <CopyButton :content="loadRedisInfo(false)" type="icon" />
                         </el-descriptions-item>
-                        <el-descriptions-item :label="$t('database.connPort')">
+                        <el-descriptions-item :label="$t('commons.table.port')">
                             {{ form.port }}
                             <CopyButton :content="form.port + ''" type="icon" />
                         </el-descriptions-item>

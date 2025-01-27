@@ -8,15 +8,15 @@
                     </div>
                     <div v-if="createdBy === '1Panel'" style="margin-left: 50px">
                         <el-button link type="primary" @click="onComposeOperate('up')">
-                            {{ $t('container.start') }}
+                            {{ $t('app.start') }}
                         </el-button>
                         <el-divider direction="vertical" />
                         <el-button link type="primary" @click="onComposeOperate('stop')">
-                            {{ $t('container.stop') }}
+                            {{ $t('app.stop') }}
                         </el-button>
                         <el-divider direction="vertical" />
                         <el-button link type="primary" @click="onComposeOperate('down')">
-                            {{ $t('container.remove') }}
+                            {{ $t('commons.button.delete') }}
                         </el-button>
                     </div>
                     <div v-else>
@@ -40,13 +40,13 @@
             <template #main>
                 <el-button-group>
                     <el-button :disabled="checkStatus('start')" @click="onOperate('start')">
-                        {{ $t('container.start') }}
+                        {{ $t('app.start') }}
                     </el-button>
                     <el-button :disabled="checkStatus('stop')" @click="onOperate('stop')">
-                        {{ $t('container.stop') }}
+                        {{ $t('app.stop') }}
                     </el-button>
                     <el-button :disabled="checkStatus('restart')" @click="onOperate('restart')">
-                        {{ $t('container.restart') }}
+                        {{ $t('commons.button.restart') }}
                     </el-button>
                     <el-button :disabled="checkStatus('kill')" @click="onOperate('kill')">
                         {{ $t('container.kill') }}
@@ -58,7 +58,7 @@
                         {{ $t('container.unpause') }}
                     </el-button>
                     <el-button :disabled="checkStatus('remove')" @click="onOperate('remove')">
-                        {{ $t('container.remove') }}
+                        {{ $t('commons.button.delete') }}
                     </el-button>
                 </el-button-group>
                 <ComplexTable
@@ -311,7 +311,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('container.monitor'),
+        label: i18n.global.t('menu.monitor'),
         disabled: (row: Container.ContainerInfo) => {
             return row.state !== 'running';
         },

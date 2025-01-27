@@ -12,7 +12,7 @@ import i18n from '@/lang';
 
 const buttons = [
     {
-        label: i18n.global.t('monitor.monitor'),
+        label: i18n.global.t('menu.monitor'),
         path: '/hosts/monitor/monitor',
     },
     {

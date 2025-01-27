@@ -21,7 +21,7 @@
             </template>
             <template #leftToolBar>
                 <el-select v-model="logConfig.id" @change="changeWebsite()" class="p-w-200 mr-2.5">
-                    <template #prefix>{{ $t('website.website') }}</template>
+                    <template #prefix>{{ $t('menu.website') }}</template>
                     <el-option
                         v-for="(website, index) in websites"
                         :key="index"
@@ -35,7 +35,7 @@
                     </el-checkbox>
                 </el-button>
                 <el-button @click="onDownload" icon="Download" :disabled="!hasContent">
-                    {{ $t('file.download') }}
+                    {{ $t('commons.button.download') }}
                 </el-button>
                 <el-button type="primary" plain @click="onClean()" :disabled="!hasContent">
                     {{ $t('logs.deleteLogs') }}

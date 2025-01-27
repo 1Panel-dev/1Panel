@@ -17,7 +17,7 @@
                             </span>
                             <CopyButton :content="loadMysqlInfo(true)" type="icon" />
                         </el-descriptions-item>
-                        <el-descriptions-item :label="$t('database.connPort')">
+                        <el-descriptions-item :label="$t('commons.table.port')">
                             3306
                             <CopyButton content="3306" type="icon" />
                         </el-descriptions-item>
@@ -43,7 +43,7 @@
                             </span>
                             <CopyButton :content="loadMysqlInfo(false)" type="icon" />
                         </el-descriptions-item>
-                        <el-descriptions-item :label="$t('database.connPort')">
+                        <el-descriptions-item :label="$t('commons.table.port')">
                             {{ form.port }}
                             <CopyButton :content="form.port + ''" type="icon" />
                         </el-descriptions-item>

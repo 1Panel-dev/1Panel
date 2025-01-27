@@ -89,7 +89,7 @@
                             >
                                 <span>{{ service.label }}</span>
                                 <span class="float-right" v-if="service.from != ''">
-                                    <el-tag v-if="service.from === 'local'">{{ $t('database.local') }}</el-tag>
+                                    <el-tag v-if="service.from === 'local'">{{ $t('commons.table.local') }}</el-tag>
                                     <el-tag v-else type="success">{{ $t('database.remote') }}</el-tag>
                                 </span>
                             </el-option>

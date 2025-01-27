@@ -27,7 +27,7 @@
                 <el-input v-model="form.primaryKey" :rows="5" type="textarea" />
                 <div v-if="form.primaryKey">
                     <el-button icon="CopyDocument" class="marginTop" @click="onCopy(form.primaryKey)">
-                        {{ $t('file.copy') }}
+                        {{ $t('commons.button.copy') }}
                     </el-button>
                     <el-button icon="Download" class="marginTop" @click="onDownload">
                         {{ $t('commons.button.download') }}

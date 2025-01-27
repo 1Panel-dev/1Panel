@@ -95,7 +95,7 @@ const openUrl = (domain: Website.Domain) => {
 
 const deleteWebsiteDomain = async (row: Website.Domain) => {
     opRef.value.acceptParams({
-        title: i18n.global.t('commons.msg.deleteTitle'),
+        title: i18n.global.t('commons.button.delete'),
         names: [row.domain],
         msg: i18n.global.t('commons.msg.operatorHelper', [
             i18n.global.t('website.domain'),

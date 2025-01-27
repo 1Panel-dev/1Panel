@@ -1,5 +1,5 @@
 <template>
-    <LayoutContent :title="$t('nginx.nginxConfig')" :reload="true">
+    <LayoutContent :title="$t('commons.button.set')" :reload="true">
         <template #leftToolBar>
             <el-button
                 type="primary"
@@ -21,7 +21,7 @@
                 @click="changeTab('4')"
                 :disabled="status != 'Running'"
             >
-                {{ $t('website.log') }}
+                {{ $t('commons.button.log') }}
             </el-button>
             <el-button type="primary" :plain="activeName !== '5'" @click="changeTab('5')">
                 {{ $t('runtime.module') }}

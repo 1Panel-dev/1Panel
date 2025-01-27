@@ -4,7 +4,7 @@
             <el-col :span="20" :offset="2" v-if="open">
                 <el-alert
                     type="error"
-                    :title="$t('app.deleteHelper', [$t('app.database')])"
+                    :title="$t('app.deleteHelper', [$t('menu.database')])"
                     center
                     show-icon
                     :closable="false"

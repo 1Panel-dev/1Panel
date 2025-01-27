@@ -61,7 +61,7 @@ const getRuntimes = async () => {
         for (const item of items) {
             versions.value.push({
                 value: item.id,
-                label: item.name + ' [' + i18n.global.t('runtime.version') + ':' + item.params['PHP_VERSION'] + ']',
+                label: item.name + ' [' + i18n.global.t('app.version') + ':' + item.params['PHP_VERSION'] + ']',
             });
         }
     } catch (error) {}

@@ -27,9 +27,9 @@
                     <el-form-item :label="$t('toolbox.clam.infectedStrategy')" prop="infectedStrategy">
                         <el-radio-group v-model="dialogData.rowData!.infectedStrategy">
                             <el-radio value="none">{{ $t('toolbox.clam.none') }}</el-radio>
-                            <el-radio value="remove">{{ $t('toolbox.clam.remove') }}</el-radio>
+                            <el-radio value="remove">{{ $t('commons.button.delete') }}</el-radio>
                             <el-radio value="move">{{ $t('toolbox.clam.move') }}</el-radio>
-                            <el-radio value="copy">{{ $t('toolbox.clam.copy') }}</el-radio>
+                            <el-radio value="copy">{{ $t('commons.button.copy') }}</el-radio>
                         </el-radio-group>
                         <span class="input-help">
                             {{ $t('toolbox.clam.' + dialogData.rowData!.infectedStrategy + 'Helper') }}

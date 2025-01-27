@@ -12,11 +12,11 @@ import i18n from '@/lang';
 
 const buttons = [
     {
-        label: i18n.global.t('home.overview'),
+        label: i18n.global.t('menu.home'),
         path: '/containers/dashboard',
     },
     {
-        label: i18n.global.t('container.container'),
+        label: i18n.global.t('menu.container'),
         path: '/containers/container',
     },
     {

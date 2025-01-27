@@ -42,7 +42,7 @@
 
         <el-row :gutter="20" style="margin-top: 20px">
             <el-col :xs="24" :sm="24" :md="16" :lg="16" :xl="16">
-                <CardWithHeader :header="$t('home.overview')" height="166px">
+                <CardWithHeader :header="$t('menu.home')" height="166px">
                     <template #body>
                         <div class="h-overview">
                             <el-row>
@@ -53,7 +53,7 @@
                                     </div>
                                 </el-col>
                                 <el-col :span="6">
-                                    <span>{{ $t('menu.database') }} - {{ $t('database.all') }}</span>
+                                    <span>{{ $t('menu.database') }} - {{ $t('commons.table.all') }}</span>
                                     <div class="count">
                                         <span @click="goRouter('/databases')">{{ baseInfo?.databaseNumber }}</span>
                                     </div>

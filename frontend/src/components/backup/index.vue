@@ -49,7 +49,7 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column :label="$t('database.source')" prop="backupType">
+                <el-table-column :label="$t('app.source')" prop="backupType">
                     <template #default="{ row }">
                         <span v-if="row.accountType === 'LOCAL'">
                             {{ $t('setting.LOCAL') }}

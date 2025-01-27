@@ -66,7 +66,7 @@
                     @change="search()"
                     v-model="timeRangeLoad"
                     type="datetimerange"
-                    :range-separator="$t('commons.search.timeRange')"
+                    range-separator="-"
                     :start-placeholder="$t('commons.search.timeStart')"
                     :end-placeholder="$t('commons.search.timeEnd')"
                     :shortcuts="shortcuts"
@@ -143,13 +143,13 @@
                                             <span class="status-label">{{ $t('commons.table.status') }}</span>
                                         </template>
                                         <el-tag type="danger" v-if="currentRecord?.status === 'Failed'">
-                                            {{ $t('commons.table.statusFailed') }}
+                                            {{ $t('commons.status.failed') }}
                                         </el-tag>
                                         <el-tag type="success" v-if="currentRecord?.status === 'Success'">
-                                            {{ $t('commons.table.statusSuccess') }}
+                                            {{ $t('commons.status.success') }}
                                         </el-tag>
                                         <el-tag type="info" v-if="currentRecord?.status === 'Waiting'">
-                                            {{ $t('commons.table.statusWaiting') }}
+                                            {{ $t('commons.status.waiting') }}
                                         </el-tag>
                                     </el-form-item>
                                 </el-row>
@@ -400,7 +400,7 @@ const loadRecord = async (row: Cronjob.Record) => {
 };
 
 const onClean = async () => {
-    ElMessageBox.confirm(i18n.global.t('commons.msg.clean'), i18n.global.t('commons.msg.deleteTitle'), {
+    ElMessageBox.confirm(i18n.global.t('commons.msg.clean'), i18n.global.t('commons.button.delete'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'warning',

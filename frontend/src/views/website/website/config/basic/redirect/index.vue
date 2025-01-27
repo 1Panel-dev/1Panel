@@ -139,7 +139,7 @@ const openEditFile = (proxyConfig: Website.RedirectConfig) => {
 const deleteProxy = async (redirectConfig: Website.RedirectConfig) => {
     redirectConfig.operate = 'delete';
     opRef.value.acceptParams({
-        title: i18n.global.t('commons.msg.deleteTitle'),
+        title: i18n.global.t('commons.button.delete'),
         names: [redirectConfig.name],
         msg: i18n.global.t('commons.msg.operatorHelper', [
             i18n.global.t('website.redirect'),

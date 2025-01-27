@@ -28,7 +28,7 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column :label="$t('database.source')" prop="accountType" show-overflow-tooltip>
+                <el-table-column :label="$t('app.source')" prop="accountType" show-overflow-tooltip>
                     <template #default="{ row }">
                         <span v-if="row.accountType === 'LOCAL'">
                             {{ $t('setting.LOCAL') }}
