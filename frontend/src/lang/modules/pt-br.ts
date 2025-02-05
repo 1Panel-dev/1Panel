@@ -1856,6 +1856,28 @@ const message = {
             'O lado esquerdo é a versão antiga, o lado direito é a nova versão. Após editar, clique para salvar a versão personalizada',
         pullImage: 'Puxar Imagem',
         pullImageHelper: 'Execute o comando docker pull para puxar a imagem antes de iniciar o aplicativo',
+        deleteImage: 'Excluir Imagem',
+        deleteImageHelper:
+            'Exclua a imagem relacionada ao aplicativo. A tarefa não será encerrada se a exclusão falhar.',
+        requireMemory: 'Requisito de Memória',
+        supportedArchitectures: 'Arquiteturas Suportadas',
+        link: 'Link',
+        showCurrentArch: 'Aplicações da arquitetura atual do servidor',
+        syncLocalApp: 'Sincronizar Aplicativo Local',
+        memoryRequiredHelper: 'O aplicativo atual requer {0} de memória',
+        gpuConfig: 'Ativar Suporte a GPU',
+        gpuConfigHelper:
+            'Certifique-se de que a máquina possui uma GPU NVIDIA e tenha os drivers NVIDIA e NVIDIA Docker Container Toolkit instalados',
+        webUI: 'Endereço de Acesso Web',
+        webUIPlaceholder: 'Exemplo: http://example.com:8080/login',
+        defaultWebDomain: 'Endereço de Acesso Padrão',
+        defaultWebDomainHepler: 'Se a porta do aplicativo for 8080, o endereço será http(s)://endereço padrão:8080',
+        webUIConfig:
+            'Adicione o endereço de acesso nos parâmetros do aplicativo ou nas configurações da loja de aplicativos',
+        toLink: 'Ir para',
+        customAppHelper:
+            'O aplicativo atual usa o pacote da loja do nó principal. Modifique a configuração no nó principal.',
+        forceUninstall: 'Desinstalação Forçada',
     },
     website: {
         primaryDomain: 'Domínio principal',
@@ -2374,11 +2396,13 @@ const message = {
         create: 'Criar runtime',
         localHelper: 'O ambiente local precisa ser instalado manualmente',
         versionHelper: 'Versão do PHP, por exemplo, v8.0',
-        buildHelper: `Se mais extensões forem selecionadas, o uso da CPU será maior durante o processo de criação da imagem. Evite selecionar todas as extensões.`,
+        buildHelper:
+            'Quanto mais extensões, maior será o uso de CPU durante a criação da imagem. As extensões podem ser instaladas após a criação do ambiente.',
         openrestyWarn: 'É necessário atualizar o PHP para OpenResty versão 1.21.4.1 ou superior para usar',
         toupgrade: 'Atualizar',
         edit: 'Editar runtime',
-        extendHelper: `Caso as extensões necessárias não estejam na lista, você pode inserir manualmente o nome da extensão. Por exemplo, insira "sockets" e selecione a primeira opção.`,
+        extendHelper:
+            'Extensões não listadas podem ser inseridas e selecionadas manualmente. Por exemplo, digite "sockets" e escolha a primeira opção da lista suspensa para visualizar a lista de extensões.',
         rebuildHelper: 'Após editar as extensões, é necessário recriar a aplicação PHP para aplicar as alterações',
         rebuild: 'Recriar Aplicação PHP',
         source: 'Fonte de extensões PHP',

@@ -1971,7 +1971,7 @@ const message = {
         webUIPlaceholder: 'For example: http://example.com:8080/login',
         defaultWebDomain: 'Default Access Address',
         defaultWebDomainHepler:
-            'The default access is used for application port forwarding. For example, if the application port is 8080, the forwarding address would be http(s)://default-access-address:8080',
+            'If the application port is 8080, the redirect address will be http(s)://default access address:8080',
         webUIConfig: 'Please add the access address in the application parameters or the app store settings',
         toLink: 'Open',
         customAppHelper:
@@ -2504,7 +2504,7 @@ const message = {
         toupgrade: 'To Upgrade',
         edit: 'Edit runtime',
         extendHelper:
-            'Extensions that do not exist in the list can be selected after manual input, for example: input sockets, and then select the first one in the drop-down list,',
+            'Unlisted extensions can be manually entered and selected. For example, enter "sockets" and choose the first option from the dropdown list to view the extension list.',
         rebuildHelper: 'After editing the extension, you need to rebuild the PHP application to take effect',
         rebuild: 'Rebuild PHP App',
         source: 'PHP extension source',

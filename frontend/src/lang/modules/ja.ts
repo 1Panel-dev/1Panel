@@ -1813,6 +1813,27 @@ const message = {
             '左側は古いバージョンで、右側は新しいバージョンです。編集後、クリックしてカスタムバージョンを保存します',
         pullImage: '画像を引っ張ります',
         pullImageHelper: 'アプリケーションが開始する前に、Docker Pullを実行して画像をプルします',
+        deleteImage: 'イメージを削除',
+        deleteImageHelper: 'アプリ関連のイメージを削除します。削除に失敗してもタスクは終了しません。',
+        requireMemory: 'メモリ要件',
+        supportedArchitectures: '対応アーキテクチャ',
+        link: 'リンク',
+        showCurrentArch: '現在のサーバーアーキテクチャのアプリケーション',
+        syncLocalApp: 'ローカルアプリの同期',
+        memoryRequiredHelper: '現在のアプリケーションは {0} メモリが必要です',
+        gpuConfig: 'GPUサポートを有効化',
+        gpuConfigHelper:
+            'マシンにNVIDIA GPUが搭載され、NVIDIAドライバーとNVIDIA Docker Container Toolkitがインストールされていることを確認してください',
+        webUI: 'Webアクセスアドレス',
+        webUIPlaceholder: '例：http://example.com:8080/login',
+        defaultWebDomain: 'デフォルトアクセスアドレス',
+        defaultWebDomainHepler:
+            'アプリケーションポートが8080の場合、アドレスはhttp(s)://デフォルトアクセスアドレス:8080にジャンプします',
+        webUIConfig: 'アプリパラメータまたはアプリストア設定でアクセスアドレスを追加してください',
+        toLink: 'ジャンプ',
+        customAppHelper:
+            '現在のアプリはメインノードストアパッケージを使用しています。設定を変更するにはメインノードで操作してください。',
+        forceUninstall: '強制アンインストール',
     },
     website: {
         primaryDomain: 'プライマリドメイン',
@@ -2322,11 +2343,13 @@ const message = {
         create: 'ランタイムを作成します',
         localHelper: 'ローカルオペレーティング環境は単独でインストールする必要があります',
         versionHelper: 'PHPバージョン、例えばv8.0',
-        buildHelper: `より多くの拡張機能が選択されている場合、画像作成プロセス中にCPUの使用が高くなります。すべての拡張機能を選択しないでください。`,
+        buildHelper:
+            '拡張機能が多いほど、イメージ作成時にCPUの負荷が高くなります。環境作成後に拡張機能をインストールすることもできます。',
         openrestyWarn: 'PHPは、使用するためにバージョン1.21.4.1以降にOpenRestyにアップグレードする必要があります',
         toupgrade: 'アップグレードします',
         edit: 'ランタイムを編集します',
-        extendHelper: `必要な拡張機能がリストにない場合、拡張子名を手動で入力できます。たとえば、「ソケット」を入力し、最初のものを選択します。`,
+        extendHelper:
+            'リストにない拡張機能は手動で入力して選択できます。例えば、「sockets」と入力し、ドロップダウンリストの最初の項目を選択して拡張機能リストを表示します。',
         rebuildHelper: '拡張機能を編集した後、有効にするためにPHPアプリケーションを再構築する必要があります',
         rebuild: 'PHPアプリを再構築します',
         source: 'PHP拡張ソース',
