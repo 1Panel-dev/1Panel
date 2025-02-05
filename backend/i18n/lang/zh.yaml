@@ -42,24 +42,24 @@ Err1PanelNetworkFailed: '默认容器网络创建失败！{{ .detail }}'
 ErrFileParse: '应用 docker-compose 文件解析失败!'
 ErrInstallDirNotFound: '安装目录不存在'
 AppStoreIsUpToDate: '应用商店已经是最新版本'
-LocalAppVersionNull: '{{.name}} 应用未同步到版本！无法添加到应用列表'
-LocalAppVersionErr: '{{.name}} 同步版本 {{.version}} 失败！{{.err}}'
-ErrFileNotFound: '{{.name}} 文件不存在'
-ErrFileParseApp: '{{.name}} 文件解析失败 {{.err}}'
+LocalAppVersionNull: '{{ .name }} 应用未同步到版本！无法添加到应用列表'
+LocalAppVersionErr: '{{ .name }} 同步版本 {{ .version }} 失败！{{ .err }}'
+ErrFileNotFound: '{{ .name }} 文件不存在'
+ErrFileParseApp: '{{ .name }} 文件解析失败 {{ .err }}'
 ErrAppDirNull: '版本文件夹不存在'
-LocalAppErr: "应用 {{.name}} 同步失败！{{.err}}"
+LocalAppErr: "应用 {{ .name }} 同步失败！{{ .err }}"
 ErrContainerName: "容器名称已存在"
 ErrAppSystemRestart: "1Panel 重启导致任务终止"
-ErrCreateHttpClient: "创建HTTP请求失败 {{.err}}"
-ErrHttpReqTimeOut: "请求超时 {{.err}}"
-ErrHttpReqFailed: "请求失败 {{.err}}"
+ErrCreateHttpClient: "创建HTTP请求失败 {{ .err }}"
+ErrHttpReqTimeOut: "请求超时 {{ .err }}"
+ErrHttpReqFailed: "请求失败 {{ .err }}"
 ErrHttpReqNotFound: "文件不存在"
 ErrNoSuchHost: "网络连接失败"
 ErrImagePullTimeOut: '镜像拉取超时'
 ErrContainerNotFound: '{{ .name }} 容器不存在'
 ErrContainerMsg: '{{ .name }} 容器异常，具体请在容器页面查看日志'
-ErrAppBackup: '{{ .name }} 应用备份失败 err {{.err}}'
-ErrImagePull: '镜像拉取失败 {{.err}}'
+ErrAppBackup: '{{ .name }} 应用备份失败 err {{ .err }}'
+ErrImagePull: '镜像拉取失败 {{ .err }}'
 ErrVersionTooLow: '当前 1Panel 版本过低，无法更新应用商店，请升级版本之后操作'
 ErrAppNameExist: '应用名称已存在'
 AppStoreIsSyncing: '应用商店正在同步中，请稍后再试'
@@ -80,7 +80,7 @@ ErrPathNotFound: "目录不存在"
 ErrMovePathFailed: "目标路径不能包含原路径！"
 ErrLinkPathNotFound: "目标路径不存在!"
 ErrFileIsExist: "文件或文件夹已存在！"
-ErrFileUpload: "{{ .name }} 上传文件失败 {{ .detail}}"
+ErrFileUpload: "{{ .name }} 上传文件失败 {{ .detail }}"
 ErrFileDownloadDir: "不支持下载文件夹"
 ErrCmdNotFound: "{{ .name}} 命令不存在，请先在宿主机安装此命令"
 ErrSourcePathNotFound:  "源目录不存在"
@@ -93,14 +93,14 @@ ErrDomainIsExist: "域名已存在"
 ErrAliasIsExist: "代号已存在"
 ErrAppDelete: '其他网站使用此应用，无法删除'
 ErrGroupIsUsed: '分组正在使用中，无法删除'
-ErrBackupMatch: '该备份文件与当前网站部分数据不匹配 {{ .detail}}'
-ErrBackupExist: '该备份文件对应部分源数据不存在 {{ .detail}}'
+ErrBackupMatch: '该备份文件与当前网站部分数据不匹配 {{ .detail }}'
+ErrBackupExist: '该备份文件对应部分源数据不存在 {{ .detail }}'
 ErrPHPResource: '本地运行环境不支持切换！'
 ErrPathPermission: 'index 目录下检测到非 1000:1000 权限文件夹，可能导致网站访问 Access denied 错误，请点击上方保存按钮'
 ErrDomainIsUsed: "域名已被网站【{{ .name }}】使用"
 ErrDomainFormat: "{{ .name }} 域名格式不正确"
 ErrDefaultAlias: "default 为保留代号，请使用其他代号"
-ErrImageNotExist: "运行环境 {{.name}} 镜像不存在，请重新编辑运行环境"
+ErrImageNotExist: "运行环境 {{ .name }} 镜像不存在，请重新编辑运行环境"
 
 #ssl
 ErrSSLCannotDelete: "{{ .name }} 证书正在被网站使用，无法删除"
@@ -117,9 +117,9 @@ ApplySSLStart: '开始申请证书，域名 [{{ .domain }}] 申请方式 [{{ .ty
 dnsAccount: "DNS 自动"
 dnsManual: "DNS 手动"
 http: "HTTP"
-ApplySSLFailed: '申请  [{{ .domain }}] 证书失败， {{.detail}} '
+ApplySSLFailed: '申请  [{{ .domain }}] 证书失败， {{ .detail }} '
 ApplySSLSuccess: '申请 [{{ .domain }}] 证书成功！！'
-DNSAccountName: 'DNS 账号 [{{ .name }}] 厂商 [{{.type}}]'
+DNSAccountName: 'DNS 账号 [{{ .name }}] 厂商 [{{ .type }}]'
 PushDirLog: '证书推送到目录 [{{ .path }}] {{ .status }}'
 ErrDeleteCAWithSSL: "当前机构下存在已签发证书，无法删除"
 ErrDeleteWithPanelSSL: "面板 SSL 配置使用此证书，无法删除"
@@ -164,7 +164,7 @@ ErrNodeModulesNotFound: "node_modules 文件夹不存在！请编辑运行环境
 
 #setting
 ErrBackupInUsed: "该备份账号已在计划任务中使用，无法删除"
-ErrBackupCheck: "备份账号测试连接失败 {{ .err}}"
+ErrBackupCheck: "备份账号测试连接失败 {{ .err }}"
 ErrOSSConn: "无法获取最新版本，请确认服务器是否能够连接外部网络。"
 ErrEntrance: "安全入口信息错误，请检查后重试！"
 
