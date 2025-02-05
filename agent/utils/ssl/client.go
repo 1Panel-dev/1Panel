@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"github.com/go-acme/lego/v4/providers/dns/clouddns"
 	"github.com/go-acme/lego/v4/providers/dns/rainyun"
+	"github.com/go-acme/lego/v4/providers/dns/volcengine"
 	"os"
 	"strings"
 	"time"
@@ -76,6 +77,7 @@ const (
 	Godaddy      DnsType = "Godaddy"
 	TencentCloud DnsType = "TencentCloud"
 	RainYun      DnsType = "RainYun"
+	Volcengine   DnsType = "Volcengine"
 )
 
 type DNSParam struct {
@@ -188,6 +190,14 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string, websiteSSL model.Web
 		rainyunConfig.PollingInterval = pollingInterval
 		rainyunConfig.TTL = ttl
 		p, err = rainyun.NewDNSProviderConfig(rainyunConfig)
+	case Volcengine:
+		volcConfig := volcengine.NewDefaultConfig()
+		volcConfig.SecretKey = param.SecretKey
+		volcConfig.AccessKey = param.AccessKey
+		volcConfig.PropagationTimeout = propagationTimeout
+		volcConfig.PollingInterval = pollingInterval
+		volcConfig.TTL = ttl
+		p, err = volcengine.NewDNSProviderConfig(volcConfig)
 	}
 	if err != nil {
 		return err

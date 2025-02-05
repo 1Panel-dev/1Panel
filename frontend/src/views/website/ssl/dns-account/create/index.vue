@@ -43,6 +43,14 @@
                             <el-input v-model.trim="account.authorization['token']"></el-input>
                         </el-form-item>
                     </div>
+                    <div v-if="account.type === 'Volcengine'">
+                        <el-form-item label="Access key" prop="authorization.accessKey">
+                            <el-input v-model.trim="account.authorization['accessKey']"></el-input>
+                        </el-form-item>
+                        <el-form-item label="Secret key" prop="authorization.secretKey">
+                            <el-input v-model.trim="account.authorization['secretKey']"></el-input>
+                        </el-form-item>
+                    </div>
                     <div v-if="account.type === 'RainYun'">
                         <el-form-item label="API Key" prop="authorization.apiKey">
                             <el-input v-model.trim="account.authorization['apiKey']"></el-input>

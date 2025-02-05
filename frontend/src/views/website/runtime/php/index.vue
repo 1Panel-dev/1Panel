@@ -45,15 +45,20 @@
                             </el-text>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('runtime.resource')" prop="resource">
+                    <el-table-column :label="$t('app.source')" prop="resource">
                         <template #default="{ row }">
-                            <span>{{ $t('runtime.' + toLowerCase(row.resource)) }}</span>
+                            <span v-if="row.resource == 'appstore'">{{ $t('menu.apps') }}</span>
+                            <span v-if="row.resource == 'local'">{{ $t('commons.table.local') }}</span>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('app.version')" prop="version">
                         <template #default="{ row }">{{ row.params['PHP_VERSION'] }}</template>
                     </el-table-column>
-                    <el-table-column :label="$t('container.image')" prop="image" show-overflow-tooltip></el-table-column>
+                    <el-table-column
+                        :label="$t('container.image')"
+                        prop="image"
+                        show-overflow-tooltip
+                    ></el-table-column>
                     <el-table-column :label="$t('commons.table.port')" prop="port">
                         <template #default="{ row }">
                             {{ row.port }}
@@ -120,7 +125,7 @@
 import { onMounted, onUnmounted, reactive, ref } from 'vue';
 import { Runtime } from '@/api/interface/runtime';
 import { DeleteRuntime, OperateRuntime, RuntimeDeleteCheck, SearchRuntimes } from '@/api/modules/runtime';
-import { dateFormat, toLowerCase } from '@/utils/util';
+import { dateFormat } from '@/utils/util';
 import { ElMessageBox } from 'element-plus';
 import { containerPrune } from '@/api/modules/container';
 import { MsgSuccess } from '@/utils/message';
@@ -314,8 +319,8 @@ const openDelete = async (row: Runtime.Runtime) => {
 const operateRuntime = async (operate: string, ID: number) => {
     try {
         const action = await ElMessageBox.confirm(
-            i18n.global.t('runtime.operatorHelper', [i18n.global.t('commons.operate.' + operate)]),
-            i18n.global.t('commons.operate.' + operate),
+            i18n.global.t('runtime.operatorHelper', [i18n.global.t('commons.button.' + operate)]),
+            i18n.global.t('commons.button.' + operate),
             {
                 confirmButtonText: i18n.global.t('commons.button.confirm'),
                 cancelButtonText: i18n.global.t('commons.button.cancel'),

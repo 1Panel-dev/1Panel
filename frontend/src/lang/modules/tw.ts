@@ -73,6 +73,8 @@ const message = {
             bind: '綁定',
             unbind: '解綁',
             fix: '修復',
+            down: '停止',
+            up: '啟動',
         },
         search: {
             timeStart: '開始時間',
@@ -285,6 +287,7 @@ const message = {
             sending: '下發中',
             healthy: '正常',
             executing: '執行中',
+            installerr: '安裝失敗',
         },
         units: {
             second: '秒',
@@ -300,6 +303,7 @@ const message = {
             minuteUnit: '分鐘',
             hourUnit: '小時',
             dayUnit: '天',
+            millisecond: '毫秒',
         },
     },
     menu: {

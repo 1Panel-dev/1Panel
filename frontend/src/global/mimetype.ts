@@ -176,12 +176,20 @@ export const DNSTypes = [
         value: 'HuaweiCloud',
     },
     {
+        label: i18n.global.t('website.volcengine'),
+        value: 'Volcengine',
+    },
+    {
         label: 'DNSPod (' + i18n.global.t('ssl.deprecated') + ')',
         value: 'DnsPod',
     },
     {
         label: 'Cloudflare',
         value: 'CloudFlare',
+    },
+    {
+        label: 'CloudDNS',
+        value: 'CloudDns',
     },
     {
         label: 'NameSilo',
@@ -198,10 +206,6 @@ export const DNSTypes = [
     {
         label: 'GoDaddy',
         value: 'Godaddy',
-    },
-    {
-        label: 'CloudDNS',
-        value: 'CloudDns',
     },
     {
         label: i18n.global.t('website.rainyun'),

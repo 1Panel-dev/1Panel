@@ -99,8 +99,8 @@ const search = async () => {
 
 const operateModule = (operate: string, moduleName: string) => {
     ElMessageBox.confirm(
-        i18n.global.t('runtime.nodeOperatorHelper', [i18n.global.t('commons.operate.' + operate), moduleName]),
-        i18n.global.t('commons.operate.' + operate),
+        i18n.global.t('runtime.nodeOperatorHelper', [i18n.global.t('commons.button.' + operate), moduleName]),
+        i18n.global.t('commons.button.' + operate),
         {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
             cancelButtonText: i18n.global.t('commons.button.cancel'),
@@ -116,12 +116,12 @@ const operateModule = (operate: string, moduleName: string) => {
                 PkgManager: packageManager.value,
             });
             loading.value = false;
-            MsgSuccess(i18n.global.t('commons.operate.' + operate) + i18n.global.t('commons.status.success'));
+            MsgSuccess(i18n.global.t('commons.button.' + operate) + i18n.global.t('commons.status.success'));
             await search();
             module.value = '';
         } catch (error) {
             MsgError(
-                i18n.global.t('commons.operate.' + operate) +
+                i18n.global.t('commons.button.' + operate) +
                     i18n.global.t('commons.status.failed') +
                     '  ' +
                     error.message,

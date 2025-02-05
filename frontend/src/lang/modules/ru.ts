@@ -69,6 +69,9 @@ const message = {
             createNewFile: 'Создать новый файл',
             helpDoc: 'Справка',
             unbind: 'Отвязать',
+            fix: 'Исправить',
+            down: 'Остановить',
+            up: 'Запустить',
         },
         search: {
             timeStart: 'Время начала',
@@ -285,6 +288,7 @@ const message = {
             sending: 'Отправка',
             healthy: 'Нормально',
             executing: 'Выполнение',
+            installerr: 'Ошибка установки',
         },
         units: {
             second: ' секунда | секунда | секунд',
@@ -300,6 +304,7 @@ const message = {
             minuteUnit: 'мин',
             hourUnit: 'ч',
             dayUnit: 'д',
+            millisecond: 'Миллисекунда',
         },
     },
     menu: {

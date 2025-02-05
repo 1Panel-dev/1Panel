@@ -81,7 +81,7 @@
                 :rules="rules"
                 :validate-on-rule-change="false"
             >
-                <el-form-item :label="$t('website.group')" prop="webSiteGroupId">
+                <el-form-item :label="$t('commons.table.group')" prop="webSiteGroupId">
                     <el-select v-model="website.webSiteGroupId">
                         <el-option
                             v-for="(group, index) in groups"

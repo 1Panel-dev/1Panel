@@ -73,6 +73,8 @@ const message = {
             bind: 'Bind',
             unbind: 'Unbind',
             fix: 'Fix',
+            down: 'Stop',
+            up: 'Start',
         },
         search: {
             timeStart: 'Time start',
@@ -291,6 +293,7 @@ const message = {
             sending: 'Sending',
             healthy: 'Normal',
             executing: 'Executing',
+            installerr: 'Installation failed',
         },
         units: {
             second: 'Second',
@@ -306,6 +309,7 @@ const message = {
             minuteUnit: 'min',
             hourUnit: 'h',
             dayUnit: 'd',
+            millisecond: 'ms',
         },
     },
     menu: {

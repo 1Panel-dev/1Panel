@@ -110,6 +110,11 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, e
 		if exist != nil {
 			return nil, buserr.New("ErrImageExist")
 		}
+		fpmPort, ok := create.Params["PANEL_APP_PORT_HTTP"]
+		if !ok {
+			return nil, buserr.New("ErrPortNotFound")
+		}
+		hostPorts = append(hostPorts, fmt.Sprintf("%.0f", fpmPort.(float64)))
 	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo, constant.RuntimePython, constant.RuntimeDotNet:
 		if !fileOp.Stat(create.CodeDir) {
 			return nil, buserr.New("ErrPathNotFound")

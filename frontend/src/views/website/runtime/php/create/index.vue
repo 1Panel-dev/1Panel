@@ -18,7 +18,7 @@
             <el-form-item :label="$t('commons.table.name')" prop="name">
                 <el-input :disabled="mode === 'edit'" v-model="runtime.name"></el-input>
             </el-form-item>
-            <el-form-item :label="$t('runtime.resource')" prop="resource">
+            <el-form-item :label="$t('app.source')" prop="resource">
                 <el-radio-group
                     :disabled="mode === 'edit'"
                     v-model="runtime.resource"

@@ -69,6 +69,9 @@ const message = {
             createNewFile: '새 파일 생성',
             helpDoc: '도움말 문서',
             unbind: '연결 해제',
+            fix: '수정',
+            down: '중지',
+            up: '시작',
         },
         search: {
             timeStart: '시작 시간',
@@ -285,6 +288,7 @@ const message = {
             sending: '전송 중',
             healthy: '정상',
             executing: '실행 중',
+            installerr: '설치 실패',
         },
         units: {
             second: '초 | 초 | 초',
@@ -300,6 +304,7 @@ const message = {
             minuteUnit: '분',
             hourUnit: '시간',
             dayUnit: '일',
+            millisecond: '밀리초',
         },
     },
     menu: {

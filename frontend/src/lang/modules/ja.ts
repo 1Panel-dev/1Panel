@@ -69,6 +69,9 @@ const message = {
             createNewFile: '新しいファイルを作成します',
             helpDoc: '文書をヘルプします',
             unbind: 'バインド',
+            fix: '修正',
+            down: '停止',
+            up: '起動',
         },
         search: {
             timeStart: '時間開始',
@@ -284,6 +287,7 @@ const message = {
             sending: '送信中',
             healthy: '正常',
             executing: '実行中',
+            installerr: 'インストールに失敗しました',
         },
         units: {
             second: '2番目|2番目|秒',
@@ -299,6 +303,7 @@ const message = {
             minuteUnit: 'min',
             hourUnit: 'h',
             dayUnit: 'd',
+            millisecond: 'ミリ秒',
         },
     },
     menu: {

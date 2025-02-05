@@ -295,7 +295,7 @@ const sync = async () => {
         } else {
             res = await syncApp(syncReq);
         }
-        if (res.message != '') {
+        if (res.message != '' && res.message != 'success') {
             MsgSuccess(res.message);
         } else {
             openTaskLog(taskID);

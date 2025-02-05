@@ -73,6 +73,8 @@ const message = {
             bind: '绑定',
             unbind: '解绑',
             fix: '修复',
+            down: '停止',
+            up: '启动',
         },
         search: {
             timeStart: '开始时间',
@@ -283,6 +285,7 @@ const message = {
             sending: '下发中',
             healthy: '正常',
             executing: '执行中',
+            installerr: '安装失败',
         },
         units: {
             second: '秒',
@@ -298,6 +301,7 @@ const message = {
             minuteUnit: '分钟',
             hourUnit: '小时',
             dayUnit: '天',
+            millisecond: '毫秒',
         },
     },
     menu: {
@@ -2109,6 +2113,7 @@ const message = {
         changeDatabaseHelper2: '切换其他数据库会导致以前的备份无法恢复',
         saveCustom: '另存为模版',
         rainyun: '雨云',
+        volcengine: '火山引擎',
     },
     php: {
         short_open_tag: '短标签支持',

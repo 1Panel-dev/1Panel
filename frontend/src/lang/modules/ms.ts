@@ -69,6 +69,9 @@ const message = {
             createNewFile: 'Cipta fail baru',
             helpDoc: 'Dokumen Bantuan',
             unbind: 'Nyahkaitkan',
+            fix: 'Betulkan',
+            down: 'Hentikan',
+            up: 'Mulakan',
         },
         search: {
             timeStart: 'Masa mula',
@@ -291,6 +294,7 @@ const message = {
             sending: 'Menghantar',
             healthy: 'Sihat',
             executing: 'Melaksanakan',
+            installerr: 'Pemasangan gagal',
         },
         units: {
             second: 'saat | saat | saat',
@@ -306,6 +310,7 @@ const message = {
             minuteUnit: 'min',
             hourUnit: 'h',
             dayUnit: 'd',
+            millisecond: 'Milisaat',
         },
     },
     menu: {

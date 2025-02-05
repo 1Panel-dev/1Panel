@@ -180,11 +180,18 @@ func (a AppService) GetApp(key string) (*response.AppDTO, error) {
 		return nil, err
 	}
 	var versionsRaw []string
+	hasLatest := false
 	for _, detail := range details {
+		if strings.Contains(detail.Version, "latest") {
+			hasLatest = true
+			continue
+		}
 		versionsRaw = append(versionsRaw, detail.Version)
 	}
 	appDTO.Versions = common.GetSortedVersions(versionsRaw)
-
+	if hasLatest {
+		appDTO.Versions = append([]string{"latest"}, appDTO.Versions...)
+	}
 	return &appDTO, nil
 }
 

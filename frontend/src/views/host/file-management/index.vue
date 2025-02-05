@@ -877,7 +877,7 @@ const openWithVSCode = (row: File.File) => {
 
 const buttons = [
     {
-        label: i18n.global.t('commons.button.opem'),
+        label: i18n.global.t('commons.button.open'),
         click: open,
     },
     {

@@ -69,6 +69,9 @@ const message = {
             createNewFile: 'Criar novo arquivo',
             helpDoc: 'Documento de ajuda',
             unbind: 'Desvincular',
+            fix: 'Corrigir',
+            down: 'Parar',
+            up: 'Iniciar',
         },
         search: {
             timeStart: 'Hora inicial',
@@ -289,6 +292,7 @@ const message = {
             sending: 'Enviando',
             healthy: 'Saudável',
             executing: 'Executando',
+            installerr: 'Falha na instalação',
         },
         units: {
             second: 'segundo | segundos | segundos',
@@ -304,6 +308,7 @@ const message = {
             minuteUnit: 'min',
             hourUnit: 'h',
             dayUnit: 'd',
+            millisecond: 'Milissegundo',
         },
     },
     menu: {

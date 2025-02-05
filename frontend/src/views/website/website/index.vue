@@ -23,7 +23,7 @@
                     {{ $t('website.create') }}
                 </el-button>
                 <el-button type="primary" plain @click="openGroup" :disabled="nginxStatus != 'Running'">
-                    {{ $t('website.group') }}
+                    {{ $t('commons.table.group') }}
                 </el-button>
                 <el-button type="primary" plain @click="openDefault" :disabled="nginxStatus != 'Running'">
                     {{ $t('website.defaultServer') }}
@@ -39,7 +39,7 @@
                     class="p-w-200 mr-2.5"
                     :disabled="nginxStatus != 'Running'"
                 >
-                    <template #prefix>{{ $t('website.group') }}</template>
+                    <template #prefix>{{ $t('commons.table.group') }}</template>
                     <el-option :label="$t('commons.table.all')" :value="0"></el-option>
                     <el-option
                         v-for="(group, index) in groups"

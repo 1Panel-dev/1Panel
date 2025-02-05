@@ -384,7 +384,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 				if !checkImageExist(nil, runtime.Image) {
 					return buserr.WithName("ErrImageNotExist", runtime.Name)
 				}
-				website.Proxy = fmt.Sprintf("127.0.0.1:%d", runtime.Port)
+				website.Proxy = fmt.Sprintf("127.0.0.1:%s", runtime.Port)
 			} else {
 				website.ProxyType = create.ProxyType
 				if website.ProxyType == constant.RuntimeProxyUnix {
@@ -396,7 +396,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 				website.Proxy = proxy
 			}
 		case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo:
-			website.Proxy = fmt.Sprintf("127.0.0.1:%d", runtime.Port)
+			website.Proxy = fmt.Sprintf("127.0.0.1:%s", runtime.Port)
 		}
 	case constant.Subsite:
 		parentWebsite, err := websiteRepo.GetFirst(repo.WithByID(create.ParentWebsiteID))

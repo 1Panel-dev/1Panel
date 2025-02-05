@@ -8,7 +8,7 @@
                 <el-form-item :label="$t('website.alias')" prop="primaryDomain">
                     <el-input v-model="form.alias" disabled></el-input>
                 </el-form-item>
-                <el-form-item :label="$t('website.group')" prop="webSiteGroupID">
+                <el-form-item :label="$t('commons.table.group')" prop="webSiteGroupID">
                     <el-select v-model="form.webSiteGroupId">
                         <el-option
                             v-for="(group, index) in groups"
