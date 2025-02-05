@@ -95,8 +95,10 @@ type IWebsiteService interface {
 
 	GetAuthBasics(req request.NginxAuthReq) (res response.NginxAuthRes, err error)
 	UpdateAuthBasic(req request.NginxAuthUpdate) (err error)
+
 	GetAntiLeech(id uint) (*response.NginxAntiLeechRes, error)
 	UpdateAntiLeech(req request.NginxAntiLeechUpdate) (err error)
+
 	OperateRedirect(req request.NginxRedirectReq) (err error)
 	GetRedirect(id uint) (res []response.NginxRedirectConfig, err error)
 	UpdateRedirectFile(req request.NginxRedirectUpdate) (err error)
@@ -2069,7 +2071,19 @@ func (w WebsiteService) UpdateAntiLeech(req request.NginxAntiLeechUpdate) (err e
 		}
 		newBlock.Directives = append(newBlock.Directives, ifDir)
 		newDirective.Block = newBlock
-		block.Directives = append(block.Directives, &newDirective)
+
+		index := -1
+		for i, directive := range block.Directives {
+			if directive.GetName() == "include" {
+				index = i
+				break
+			}
+		}
+		if index != -1 {
+			block.Directives = append(block.Directives[:index], append([]components.IDirective{&newDirective}, block.Directives[index:]...)...)
+		} else {
+			block.Directives = append(block.Directives, &newDirective)
+		}
 	}
 
 	if err = nginx.WriteConfig(nginxFull.SiteConfig.Config, nginx.IndentedStyle); err != nil {
