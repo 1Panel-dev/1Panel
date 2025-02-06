@@ -225,9 +225,8 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 				server.UpdateRoot(rootIndex)
 				server.UpdatePHPProxy([]string{website.Proxy}, "")
 			}
-		case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo:
-			proxy := fmt.Sprintf("http://127.0.0.1:%d", runtime.Port)
-			server.UpdateRootProxy([]string{proxy})
+		case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo, constant.RuntimePython, constant.RuntimeDotNet:
+			server.UpdateRootProxy([]string{fmt.Sprintf("http://%s", website.Proxy)})
 		}
 	case constant.Subsite:
 		parentWebsite, err := websiteRepo.GetFirst(repo.WithByID(website.ParentWebsiteID))
@@ -760,14 +759,13 @@ func toMapStr(m map[string]interface{}) map[string]string {
 	return ret
 }
 
-func deleteWebsiteFolder(nginxInstall model.AppInstall, website *model.Website) error {
-	nginxFolder := path.Join(global.Dir.AppInstallDir, constant.AppOpenresty, nginxInstall.Name)
-	siteFolder := path.Join(nginxFolder, "www", "sites", website.Alias)
+func deleteWebsiteFolder(website *model.Website) error {
+	siteFolder := GetSitePath(*website, SiteDir)
 	fileOp := files.NewFileOp()
 	if fileOp.Stat(siteFolder) {
 		_ = fileOp.DeleteDir(siteFolder)
 	}
-	nginxFilePath := path.Join(nginxFolder, "conf", "conf.d", website.PrimaryDomain+".conf")
+	nginxFilePath := GetSitePath(*website, SiteConf)
 	if fileOp.Stat(nginxFilePath) {
 		_ = fileOp.DeleteFile(nginxFilePath)
 	}

@@ -1850,7 +1850,6 @@ const message = {
         SSLList: '인증서 목록',
         createDnsAccount: 'DNS 계정 생성',
         aliyun: '알리윤',
-        volcengine: '볼크엔진',
         manual: '수동 설정',
         key: '키',
         check: '보기',
@@ -2119,6 +2118,8 @@ const message = {
         changeDatabaseHelper2: '다른 데이터베이스로 전환하면 이전 백업을 복원할 수 없게 될 수 있습니다.',
         saveCustom: '템플릿으로 저장',
         rainyun: 'Rainyun',
+        volcengine: 'volcengine',
+        runtimePortHelper: '현재 실행 환경에 여러 포트가 있습니다. 프록시 포트를 선택하세요.',
     },
     php: {
         short_open_tag: '짧은 태그 지원',

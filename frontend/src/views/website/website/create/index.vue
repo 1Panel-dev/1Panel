@@ -208,7 +208,7 @@
                                     <el-option
                                         v-for="run in runtimes"
                                         :key="run.name"
-                                        :label="run.name + ' [' + $t('runtime.' + run.resource) + ']'"
+                                        :label="run.name + ' [' + getRuntimeLabel(run.resource) + ']'"
                                         :value="run.id"
                                     >
                                         <el-row>
@@ -218,7 +218,7 @@
                                                 </span>
                                             </el-col>
                                             <el-col :span="10">
-                                                {{ ' [' + $t('runtime.' + run.resource) + ']' }}
+                                                {{ ' [' + getRuntimeLabel(run.resource) + ']' }}
                                             </el-col>
                                         </el-row>
                                     </el-option>
@@ -237,6 +237,21 @@
                             <el-input v-model.number="website.port"></el-input>
                         </el-form-item>
                     </div>
+                    <el-form-item
+                        :label="$t('setting.proxyPort')"
+                        prop="port"
+                        v-if="website.runtimeType !== 'php' && runtimePorts.length > 0"
+                    >
+                        <el-select v-model="website.port">
+                            <el-option
+                                v-for="(port, index) in runtimePorts"
+                                :key="index"
+                                :label="port"
+                                :value="port"
+                            ></el-option>
+                        </el-select>
+                        <span class="input-help">{{ $t('website.runtimePortHelper') }}</span>
+                    </el-form-item>
                 </div>
                 <el-form-item prop="advanced" v-if="website.type === 'deployment' && website.appType === 'new'">
                     <el-checkbox v-model="website.appinstall.advanced" :label="$t('app.advanced')" size="large" />
@@ -495,12 +510,10 @@
             </el-form>
         </div>
         <template #footer>
-            <span>
-                <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="submit(websiteForm)" :disabled="loading">
-                    {{ $t('commons.button.confirm') }}
-                </el-button>
-            </span>
+            <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
+            <el-button type="primary" @click="submit(websiteForm)" :disabled="loading">
+                {{ $t('commons.button.confirm') }}
+            </el-button>
         </template>
         <Check ref="preCheckRef"></Check>
         <el-card width="30%" v-if="!versionExist" class="mask-prompt">
@@ -514,7 +527,7 @@
 
 <script lang="ts" setup name="CreateWebSite">
 import { App } from '@/api/interface/app';
-import { getAppByKey, getAppDetail, searchApp, getAppInstalled, getAppDetailByID } from '@/api/modules/app';
+import { getAppByKey, getAppDetail, searchApp, getAppInstalled } from '@/api/modules/app';
 import {
     createWebsite,
     getWebsiteOptions,
@@ -534,7 +547,7 @@ import { getGroupList } from '@/api/modules/group';
 import { Group } from '@/api/interface/group';
 import { SearchRuntimes } from '@/api/modules/runtime';
 import { Runtime } from '@/api/interface/runtime';
-import { getRandomStr } from '@/utils/util';
+import { getRandomStr, getRuntimeLabel } from '@/utils/util';
 import TaskLog from '@/components/task-log/index.vue';
 import { getAppService } from '@/api/modules/app';
 import { v4 as uuidv4 } from 'uuid';
@@ -575,7 +588,7 @@ const initData = () => ({
     ftpUser: '',
     ftpPassword: '',
     proxyType: 'tcp',
-    port: 9000,
+    port: 0,
     proxyProtocol: 'http://',
     proxyAddress: '',
     runtimeType: 'php',
@@ -644,12 +657,13 @@ const paramKey = ref(1);
 const preCheckRef = ref();
 const staticPath = ref('');
 const runtimeResource = ref('appstore');
-const runtimeReq = ref<Runtime.RuntimeReq>({
+const initRuntimeReq = () => ({
     page: 1,
     pageSize: 100,
     status: 'running',
     type: 'php',
 });
+const runtimeReq = ref<Runtime.RuntimeReq>(initRuntimeReq());
 const runtimes = ref<Runtime.RuntimeDTO[]>([]);
 const versionExist = ref(true);
 const em = defineEmits(['close']);
@@ -659,6 +673,7 @@ const ssls = ref();
 const websiteSSL = ref();
 const parentWebsites = ref();
 const dirs = ref([]);
+const runtimePorts = ref([]);
 
 const handleClose = () => {
     open.value = false;
@@ -763,15 +778,6 @@ const getDetail = (version: string) => {
     });
 };
 
-const getDetailByID = (id: number) => {
-    getAppDetailByID(id).then((res) => {
-        website.value.appinstall.appDetailId = res.data.id;
-        appDetail.value = res.data;
-        appParams.value = res.data.params;
-        paramKey.value++;
-    });
-};
-
 const changeRuntimeType = () => {
     runtimeReq.value.type = website.value.runtimeType;
     website.value.appinstall.advanced = false;
@@ -783,8 +789,11 @@ const changeRuntime = (runID: number) => {
     runtimes.value.forEach((item) => {
         if (item.id === runID) {
             runtimeResource.value = item.resource;
-            if (item.resource === 'appstore') {
-                getDetailByID(item.appDetailID);
+            runtimePorts.value = item.port.split(',').map((port: string) => parseInt(port.trim(), 10));
+            if (runtimePorts.value.length > 1) {
+                website.value.port = runtimePorts.value[0];
+            } else {
+                website.value.port = 0;
             }
         }
     });
@@ -792,15 +801,18 @@ const changeRuntime = (runID: number) => {
 
 const getRuntimes = async () => {
     try {
-        console.log(runtimeReq.value);
         const res = await SearchRuntimes(runtimeReq.value);
         runtimes.value = res.data.items || [];
         if (runtimes.value.length > 0) {
             const first = runtimes.value[0];
             website.value.runtimeID = first.id;
+            console.log('runtimeID', first.id);
             runtimeResource.value = first.resource;
-            if (first.resource === 'appstore') {
-                getDetailByID(first.appDetailID);
+            runtimePorts.value = first.port.split(',').map((port: string) => parseInt(port.trim(), 10));
+            if (runtimePorts.value.length > 1) {
+                website.value.port = runtimePorts.value[0];
+            } else {
+                website.value.port = 0;
             }
         }
     } catch (error) {}
@@ -818,11 +830,14 @@ const acceptParams = async (installPath: string) => {
     website.value.webSiteGroupId = res.data[0].id;
     website.value.type = 'deployment';
     runtimeResource.value = 'appstore';
+    runtimeReq.value = initRuntimeReq();
 
     searchAppInstalled('website');
     listAcmeAccount();
 
     open.value = true;
+
+    console.log('runtimeID', website.value.runtimeID);
 };
 
 const changeAppType = (type: string) => {

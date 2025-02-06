@@ -685,3 +685,13 @@ export const escapeProxyURL = (url: string): string => {
 
     return url.replace(/[\/:?#[\]@!$&'()*+,;=%~]/g, (match) => encodeMap[match] || match);
 };
+
+export function getRuntimeLabel(type: string) {
+    if (type == 'appstore') {
+        return i18n.global.t('menu.apps');
+    }
+    if (type == 'local') {
+        return i18n.global.t('commons.table.local');
+    }
+    return '';
+}

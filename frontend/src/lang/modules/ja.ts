@@ -1883,7 +1883,6 @@ const message = {
         SSLList: '証明書リスト',
         createDnsAccount: 'DNSアカウント',
         aliyun: 'エイリアン',
-        volcengine: 'volcengine',
         manual: '手動解析',
         key: '鍵',
         check: 'ビュー',
@@ -2156,6 +2155,8 @@ const message = {
         changeDatabaseHelper2: '別のデータベースに切り替えると、以前のバックアップが復元できなくなる可能性があります。',
         saveCustom: 'テンプレートとして保存',
         rainyun: '雨雲',
+        volcengine: 'volcengine',
+        runtimePortHelper: '現在の実行環境には複数のポートがあります。プロキシポートを選択してください。',
     },
     php: {
         short_open_tag: '短いタグサポート',

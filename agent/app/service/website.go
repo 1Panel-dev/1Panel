@@ -395,8 +395,12 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 				}
 				website.Proxy = proxy
 			}
-		case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo:
-			website.Proxy = fmt.Sprintf("127.0.0.1:%s", runtime.Port)
+		case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo, constant.RuntimePython, constant.RuntimeDotNet:
+			proxyPort := runtime.Port
+			if create.Port > 0 {
+				proxyPort = strconv.Itoa(create.Port)
+			}
+			website.Proxy = fmt.Sprintf("127.0.0.1:%s", proxyPort)
 		}
 	case constant.Subsite:
 		parentWebsite, err := websiteRepo.GetFirst(repo.WithByID(create.ParentWebsiteID))
@@ -450,7 +454,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 	}
 
 	deleteWebsite := func(t *task.Task) {
-		_ = deleteWebsiteFolder(nginxInstall, website)
+		_ = deleteWebsiteFolder(website)
 	}
 
 	createTask.AddSubTask(i18n.GetMsgByKey("ConfigOpenresty"), configNginx, deleteWebsite)

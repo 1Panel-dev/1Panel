@@ -14,7 +14,7 @@ export namespace Runtime {
         version: string;
         status: string;
         codeDir: string;
-        port: number;
+        port: string;
         appID: number;
     }
 

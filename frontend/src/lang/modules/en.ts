@@ -2294,6 +2294,8 @@ const message = {
         changeDatabaseHelper2: 'Switching to another database will cause previous backups to be unrecoverable.',
         saveCustom: 'Save as Template',
         rainyun: 'Rain Yun',
+        volcengine: 'Volcengine',
+        runtimePortHelper: 'The current runtime environment has multiple ports. Please select a proxy port.',
     },
     php: {
         short_open_tag: 'Short tag support',

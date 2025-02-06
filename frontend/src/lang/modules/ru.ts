@@ -1925,7 +1925,6 @@ const message = {
         SSLList: 'Список сертификатов',
         createDnsAccount: 'DNS аккаунт',
         aliyun: 'Aliyun',
-        volcengine: 'Volcengine',
         manual: 'Ручная настройка',
         key: 'Ключ',
         check: 'Просмотр',
@@ -2204,6 +2203,8 @@ const message = {
             'Переключение на другую базу данных может сделать предыдущие резервные копии невосстановимыми.',
         saveCustom: 'Сохранить как Шаблон',
         rainyun: 'Rainyun',
+        volcengine: 'Volcengine',
+        runtimePortHelper: 'O ambiente de runtime atual possui várias portas. Por favor, selecione uma porta de proxy.',
     },
     php: {
         short_open_tag: 'Поддержка коротких тегов',

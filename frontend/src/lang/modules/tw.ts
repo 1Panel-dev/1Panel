@@ -2132,6 +2132,8 @@ const message = {
         changeDatabaseHelper2: '切換其他資料庫會導致以前的備份無法恢復。',
         saveCustom: '另存为模版',
         rainyun: '雨雲',
+        volcengine: 'Volcengine',
+        runtimePortHelper: '當前運行環境存在多個端口，請選擇一個代理端口。',
     },
     php: {
         short_open_tag: '短標簽支持',

@@ -84,7 +84,7 @@
                                 {{ row.primaryDomain }}
                             </el-text>
                             <el-popover
-                                placement="left"
+                                placement="right"
                                 trigger="hover"
                                 :width="300"
                                 @before-enter="searchDomains(row.id)"
@@ -548,11 +548,8 @@ const getUrl = (domain: Website.Domain, website: Website.Website): string => {
     return url;
 };
 
-onBeforeMount(() => {
-    console.log('1111');
-}),
-    onMounted(() => {
-        search();
-        listGroup();
-    });
+onMounted(() => {
+    search();
+    listGroup();
+});
 </script>

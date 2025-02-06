@@ -1933,7 +1933,6 @@ const message = {
         SSLList: 'Senarai Sijil',
         createDnsAccount: 'Akaun DNS',
         aliyun: 'Aliyun',
-        volcengine: 'Volcengine',
         manual: 'Penyelesaian Manual',
         key: 'Kunci',
         check: 'Lihat',
@@ -2208,6 +2207,8 @@ const message = {
             'Menukar ke pangkalan data lain mungkin menyebabkan sandaran sebelumnya tidak dapat dipulihkan.',
         saveCustom: 'Simpan sebagai Templat',
         rainyun: 'Rainyun',
+        volcengine: 'Volcengine',
+        runtimePortHelper: 'Persekitaran runtime semasa mempunyai beberapa port. Sila pilih port proksi.',
     },
     php: {
         short_open_tag: 'Sokongan tag pendek',

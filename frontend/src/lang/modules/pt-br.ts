@@ -1926,7 +1926,6 @@ const message = {
         SSLList: 'Lista de certificados',
         createDnsAccount: 'Conta DNS',
         aliyun: 'Aliyun',
-        volcengine: 'Volcengine',
         manual: 'Análise manual',
         key: 'Chave',
         check: 'Ver',
@@ -2204,6 +2203,8 @@ const message = {
         changeDatabaseHelper2: 'Alternar para outro banco de dados pode tornar backups anteriores irrecuperáveis.',
         saveCustom: 'Salvar como Modelo',
         rainyun: 'Rainyun',
+        volcengine: 'Volcengine',
+        runtimePortHelper: 'O ambiente de runtime atual possui várias portas. Por favor, selecione uma porta de proxy.',
     },
     php: {
         short_open_tag: 'Suporte para short tags',
