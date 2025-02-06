@@ -122,7 +122,6 @@ import { FormInstance } from 'element-plus';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
-import { getLanguage } from '@/utils/util';
 
 interface ParamProps {
     id: Number;
@@ -205,6 +204,7 @@ const get = async () => {
                     values: d.values,
                     showValue: d.showValue,
                     multiple: d.multiple,
+                    label: d.label,
                 });
                 rules.params[d.key] = [Rules.requiredInput];
                 if (d.rule) {
@@ -229,7 +229,11 @@ const get = async () => {
 };
 
 const getLabel = (row: EditForm): string => {
-    const language = getLanguage();
+    const language = localStorage.getItem('lang') || 'zh';
+    let lang = language == 'tw' ? 'zh-Hant' : language;
+    if (row.label && row.label[lang] != '') {
+        return row.label[lang];
+    }
     if (language == 'zh' || language == 'tw') {
         return row.labelZh;
     } else {

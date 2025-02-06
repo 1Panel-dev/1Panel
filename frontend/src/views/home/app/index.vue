@@ -55,9 +55,7 @@
                                     </div>
                                     <div class="h-app-desc">
                                         <span>
-                                            {{
-                                                language == 'zh' || language == 'tw' ? app.shortDescZh : app.shortDescEn
-                                            }}
+                                            {{ app.description }}
                                         </span>
                                     </div>
                                 </div>

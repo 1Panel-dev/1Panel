@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"net/http"
 	"os"
 	"path"
@@ -35,9 +36,9 @@ type AppService struct {
 }
 
 type IAppService interface {
-	PageApp(req request.AppSearch) (interface{}, error)
-	GetAppTags() ([]response.TagDTO, error)
-	GetApp(key string) (*response.AppDTO, error)
+	PageApp(ctx *gin.Context, req request.AppSearch) (interface{}, error)
+	GetAppTags(ctx *gin.Context) ([]response.TagDTO, error)
+	GetApp(ctx *gin.Context, key string) (*response.AppDTO, error)
 	GetAppDetail(appId uint, version, appType string) (response.AppDetailDTO, error)
 	Install(req request.AppInstallCreate) (*model.AppInstall, error)
 	SyncAppListFromRemote(taskID string) error
@@ -54,7 +55,7 @@ func NewIAppService() IAppService {
 	return &AppService{}
 }
 
-func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
+func (a AppService) PageApp(ctx *gin.Context, req request.AppSearch) (interface{}, error) {
 	var opts []repo.DBOption
 	opts = append(opts, appRepo.OrderByRecommend())
 	if req.Name != "" {
@@ -102,31 +103,31 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	var appDTOs []*response.AppDto
+	var appDTOs []*response.AppItem
 	info := &dto.SettingInfo{}
 	if req.Type == "php" {
 		info, _ = NewISettingService().GetSettingInfo()
 	}
+	lang := strings.ToLower(common.GetLang(ctx))
 	for _, ap := range apps {
 		if req.Type == "php" {
 			if ap.RequiredPanelVersion == 0 || !common.CompareAppVersion(fmt.Sprintf("%f", ap.RequiredPanelVersion), info.SystemVersion) {
 				continue
 			}
 		}
-		appDTO := &response.AppDto{
+		appDTO := &response.AppItem{
 			ID:          ap.ID,
 			Name:        ap.Name,
 			Key:         ap.Key,
 			Type:        ap.Type,
 			Icon:        ap.Icon,
-			ShortDescZh: ap.ShortDescZh,
-			ShortDescEn: ap.ShortDescEn,
 			Resource:    ap.Resource,
 			Limit:       ap.Limit,
 			Website:     ap.Website,
 			Github:      ap.Github,
 			GpuSupport:  ap.GpuSupport,
 			Recommend:   ap.Recommend,
+			Description: ap.GetDescription(ctx),
 		}
 		appDTOs = append(appDTOs, appDTO)
 		appTags, err := appTagRepo.GetByAppId(ap.ID)
@@ -137,7 +138,7 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 		for _, at := range appTags {
 			tagIds = append(tagIds, at.TagId)
 		}
-		tags, err := tagRepo.GetByIds(tagIds)
+		tags, err := getAppTags(ap.ID, lang)
 		if err != nil {
 			continue
 		}
@@ -151,21 +152,29 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 	return res, nil
 }
 
-func (a AppService) GetAppTags() ([]response.TagDTO, error) {
+func (a AppService) GetAppTags(ctx *gin.Context) ([]response.TagDTO, error) {
 	tags, err := tagRepo.All()
 	if err != nil {
 		return nil, err
 	}
 	var res []response.TagDTO
+	lang := strings.ToLower(common.GetLang(ctx))
 	for _, tag := range tags {
-		res = append(res, response.TagDTO{
-			Tag: tag,
-		})
+		tagDTO := response.TagDTO{
+			ID:  tag.ID,
+			Key: tag.Key,
+		}
+		var translations = make(map[string]string)
+		_ = json.Unmarshal([]byte(tag.Translations), &translations)
+		if name, ok := translations[lang]; ok {
+			tagDTO.Name = name
+		}
+		res = append(res, tagDTO)
 	}
 	return res, nil
 }
 
-func (a AppService) GetApp(key string) (*response.AppDTO, error) {
+func (a AppService) GetApp(ctx *gin.Context, key string) (*response.AppDTO, error) {
 	var appDTO response.AppDTO
 	if key == "postgres" {
 		key = "postgresql"
@@ -175,6 +184,7 @@ func (a AppService) GetApp(key string) (*response.AppDTO, error) {
 		return nil, err
 	}
 	appDTO.App = app
+	appDTO.App.Description = app.GetDescription(ctx)
 	details, err := appDetailRepo.GetBy(appDetailRepo.WithAppId(app.ID))
 	if err != nil {
 		return nil, err
@@ -192,6 +202,11 @@ func (a AppService) GetApp(key string) (*response.AppDTO, error) {
 	if hasLatest {
 		appDTO.Versions = append([]string{"latest"}, appDTO.Versions...)
 	}
+	tags, err := getAppTags(app.ID, strings.ToLower(common.GetLang(ctx)))
+	if err != nil {
+		return nil, err
+	}
+	appDTO.Tags = tags
 	return &appDTO, nil
 }
 
@@ -334,7 +349,7 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 		err = buserr.WithDetail("Err1PanelNetworkFailed", err.Error(), nil)
 		return
 	}
-	if list, _ := appInstallRepo.ListBy(repo.WithByName(req.Name)); len(list) > 0 {
+	if list, _ := appInstallRepo.ListBy(repo.WithByLowerName(req.Name)); len(list) > 0 {
 		err = buserr.New("ErrAppNameExist")
 		return
 	}
@@ -928,10 +943,12 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 			oldAppIds []uint
 		)
 		for _, tag := range list.Extra.Tags {
+			translations, _ := json.Marshal(tag.Locales)
 			tags = append(tags, &model.Tag{
-				Key:  tag.Key,
-				Name: tag.Name,
-				Sort: tag.Sort,
+				Name:         tag.Name,
+				Translations: string(translations),
+				Sort:         tag.Sort,
+				Key:          tag.Key,
 			})
 		}
 		deleteCustomApp()

@@ -1,6 +1,8 @@
 package model
 
 import (
+	"encoding/json"
+	"github.com/gin-gonic/gin"
 	"path/filepath"
 	"strings"
 
@@ -47,4 +49,25 @@ func (i *App) GetAppResourcePath() string {
 		return filepath.Join(global.Dir.LocalAppResourceDir, strings.TrimPrefix(i.Key, "local"))
 	}
 	return filepath.Join(global.Dir.RemoteAppResourceDir, i.Key)
+}
+
+func getLang(c *gin.Context) string {
+	lang := c.GetHeader("Accept-Language")
+	if lang == "" {
+		lang = "en"
+	}
+	return lang
+}
+
+func (i *App) GetDescription(ctx *gin.Context) string {
+	var translations = make(map[string]string)
+	_ = json.Unmarshal([]byte(i.Description), &translations)
+	lang := strings.ToLower(getLang(ctx))
+	if desc, ok := translations[lang]; ok && desc != "" {
+		return desc
+	}
+	if lang == "zh" {
+		return i.ShortDescZh
+	}
+	return i.ShortDescEn
 }

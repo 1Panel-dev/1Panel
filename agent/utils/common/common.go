@@ -350,10 +350,10 @@ func FormatPercent(percent float64) string {
 	return fmt.Sprintf("%.2f%%", percent)
 }
 
-func GetLang(context *gin.Context) string {
-	lang := context.GetHeader("Accept-Language")
-	if strings.Contains(lang, "zh") {
-		return "zh"
+func GetLang(c *gin.Context) string {
+	lang := c.GetHeader("Accept-Language")
+	if lang == "" {
+		lang = "en"
 	}
-	return "en"
+	return lang
 }

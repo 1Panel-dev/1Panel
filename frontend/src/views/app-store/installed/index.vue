@@ -19,7 +19,7 @@
                         :type="activeTag === item.key ? 'primary' : ''"
                         :plain="activeTag !== item.key"
                     >
-                        {{ language == 'zh' || language == 'tw' ? item.name : item.key }}
+                        {{ item.name }}
                     </el-button>
                 </div>
                 <div class="inline">
@@ -41,7 +41,7 @@
                                     @click="changeTag(item.key)"
                                     :key="item.key"
                                 >
-                                    {{ language == 'zh' || language == 'tw' ? item.name : item.key }}
+                                    {{ item.name }}
                                 </el-dropdown-item>
                             </el-dropdown-menu>
                         </template>
@@ -484,7 +484,7 @@ const changeTag = (key: string) => {
 const getTagValue = (key: string) => {
     const tag = tags.value.find((tag) => tag.key === key);
     if (tag) {
-        return language == 'zh' || language == 'tw' ? tag.name : tag.key;
+        return tag.name;
     }
 };
 

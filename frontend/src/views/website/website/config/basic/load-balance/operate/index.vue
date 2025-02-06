@@ -68,7 +68,7 @@
                         :prop="`servers.${index}.flag`"
                         :rules="rules.flag"
                     >
-                        <el-select v-model="item.servers[index].flag">
+                        <el-select v-model="item.servers[index].flag" clearable>
                             <el-option
                                 v-for="flag in StatusStrategy"
                                 :label="flag.label"

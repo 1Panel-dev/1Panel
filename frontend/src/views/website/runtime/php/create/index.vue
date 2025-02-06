@@ -286,6 +286,10 @@ const rules = ref<any>({
 
 const getLabel = (row: App.FromField): string => {
     const language = localStorage.getItem('lang') || 'zh';
+    let lang = language == 'tw' ? 'zh-Hant' : language;
+    if (row.label && row.label[lang] != '') {
+        return row.label[lang];
+    }
     if (language == 'zh' || language == 'tw') {
         return row.labelZh;
     } else {

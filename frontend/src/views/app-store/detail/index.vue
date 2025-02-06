@@ -11,7 +11,7 @@
                     </div>
                     <div class="description mb-4">
                         <span>
-                            {{ language == 'zh' || language == 'tw' ? app.shortDescZh : app.shortDescEn }}
+                            {{ app.description }}
                         </span>
                     </div>
                     <br />
@@ -72,13 +72,11 @@ import { ref } from 'vue';
 import Install from './install/index.vue';
 import router from '@/routers';
 import { GlobalStore } from '@/store';
-import { getLanguage, computeSizeFromMB } from '@/utils/util';
+import { computeSizeFromMB } from '@/utils/util';
 import { storeToRefs } from 'pinia';
 
 const globalStore = GlobalStore();
 const { isDarkTheme } = storeToRefs(globalStore);
-
-const language = getLanguage();
 
 const app = ref<any>({});
 const appDetail = ref<any>({});

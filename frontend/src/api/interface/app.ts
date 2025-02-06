@@ -8,6 +8,7 @@ export namespace App {
         tags: Tag[];
         shortDescZh: string;
         shortDescEn: string;
+        description: string;
         author: string;
         source: string;
         type: string;
@@ -16,6 +17,16 @@ export namespace App {
         website: string;
         github: string;
         readme: string;
+    }
+
+    interface Locale {
+        zh: string;
+        en: string;
+        'zh-Hant': string;
+        ja: string;
+        ms: string;
+        'pt-br': string;
+        ru: string;
     }
 
     export interface AppDTO extends App {
@@ -78,6 +89,7 @@ export namespace App {
         params?: FromParam[];
         multiple?: boolean;
         allowCreate?: boolean;
+        label: Locale;
     }
 
     export interface FromFieldChild extends FromField {
@@ -229,6 +241,7 @@ export namespace App {
         showValue?: string;
         required?: boolean;
         multiple?: boolean;
+        label: Locale;
     }
 
     export interface AppConfig {

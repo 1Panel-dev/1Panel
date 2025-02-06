@@ -4,6 +4,7 @@ import (
 	"crypto"
 	"encoding/json"
 	"github.com/go-acme/lego/v4/providers/dns/clouddns"
+	"github.com/go-acme/lego/v4/providers/dns/huaweicloud"
 	"github.com/go-acme/lego/v4/providers/dns/rainyun"
 	"github.com/go-acme/lego/v4/providers/dns/volcengine"
 	"os"
@@ -78,6 +79,7 @@ const (
 	TencentCloud DnsType = "TencentCloud"
 	RainYun      DnsType = "RainYun"
 	Volcengine   DnsType = "Volcengine"
+	HuaweiCloud  DnsType = "HuaweiCloud"
 )
 
 type DNSParam struct {
@@ -92,6 +94,7 @@ type DNSParam struct {
 	SecretID  string `json:"secretID"`
 	ClientID  string `json:"clientID"`
 	Password  string `json:"password"`
+	Region    string `json:"region"`
 }
 
 var (
@@ -198,6 +201,15 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string, websiteSSL model.Web
 		volcConfig.PollingInterval = pollingInterval
 		volcConfig.TTL = ttl
 		p, err = volcengine.NewDNSProviderConfig(volcConfig)
+	case HuaweiCloud:
+		huaweiCloudConfig := huaweicloud.NewDefaultConfig()
+		huaweiCloudConfig.AccessKeyID = param.AccessKey
+		huaweiCloudConfig.SecretAccessKey = param.SecretKey
+		huaweiCloudConfig.Region = param.Region
+		huaweiCloudConfig.PropagationTimeout = propagationTimeout
+		huaweiCloudConfig.PollingInterval = pollingInterval
+		huaweiCloudConfig.TTL = int32(ttl)
+		p, err = huaweicloud.NewDNSProviderConfig(huaweiCloudConfig)
 	}
 	if err != nil {
 		return err

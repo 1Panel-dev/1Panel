@@ -2235,7 +2235,18 @@ func (w WebsiteService) UpdateAntiLeech(req request.NginxAntiLeechUpdate) (err e
 		}
 		newBlock.Directives = append(newBlock.Directives, ifDir)
 		newDirective.Block = newBlock
-		block.Directives = append(block.Directives, &newDirective)
+		index := -1
+		for i, directive := range block.Directives {
+			if directive.GetName() == "include" {
+				index = i
+				break
+			}
+		}
+		if index != -1 {
+			block.Directives = append(block.Directives[:index], append([]components.IDirective{&newDirective}, block.Directives[index:]...)...)
+		} else {
+			block.Directives = append(block.Directives, &newDirective)
+		}
 	}
 
 	if err = nginx.WriteConfig(nginxFull.SiteConfig.Config, nginx.IndentedStyle); err != nil {

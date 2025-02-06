@@ -42,6 +42,12 @@ func WithByName(name string) DBOption {
 	}
 }
 
+func WithByLowerName(name string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("LOWER(name) = LOWER(?)", name)
+	}
+}
+
 func WithByLikeName(name string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		if len(name) == 0 {

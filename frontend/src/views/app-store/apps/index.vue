@@ -20,7 +20,7 @@
                             :type="activeTag === item.key ? 'primary' : ''"
                             :plain="activeTag !== item.key"
                         >
-                            {{ language == 'zh' || language == 'tw' ? item.name : item.key }}
+                            {{ item.name }}
                         </el-button>
                     </div>
                     <div class="inline">
@@ -42,7 +42,7 @@
                                         @click="changeTag(item.key)"
                                         :key="item.key"
                                     >
-                                        {{ language == 'zh' || language == 'tw' ? item.name : item.key }}
+                                        {{ item.name }}
                                     </el-dropdown-item>
                                 </el-dropdown-menu>
                             </template>
@@ -118,22 +118,14 @@
                                             </div>
                                             <div class="content-middle">
                                                 <span class="app-description">
-                                                    {{
-                                                        language == 'zh' || language == 'tw'
-                                                            ? app.shortDescZh
-                                                            : app.shortDescEn
-                                                    }}
+                                                    {{ app.description }}
                                                 </span>
                                             </div>
                                             <div class="content-bottom">
                                                 <div class="app-tags">
                                                     <el-tag v-for="(tag, ind) in app.tags" :key="ind" type="info">
                                                         <span>
-                                                            {{
-                                                                language == 'zh' || language == 'tw'
-                                                                    ? tag.name
-                                                                    : tag.key
-                                                            }}
+                                                            {{ tag.name }}
                                                         </span>
                                                     </el-tag>
                                                     <el-tag v-if="app.status === 'TakeDown'" class="p-mr-5">
@@ -193,7 +185,7 @@ import Install from '../detail/install/index.vue';
 import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
-import { getLanguage, newUUID } from '@/utils/util';
+import { newUUID } from '@/utils/util';
 import Detail from '../detail/index.vue';
 import TaskLog from '@/components/task-log/index.vue';
 import { storeToRefs } from 'pinia';
@@ -204,8 +196,6 @@ const { isProductPro } = storeToRefs(globalStore);
 const mobile = computed(() => {
     return globalStore.isMobile();
 });
-
-const language = getLanguage();
 
 const paginationConfig = reactive({
     cacheSizeKey: 'app-page-size',
@@ -342,7 +332,7 @@ const changeTag = (key: string) => {
 const getTagValue = (key: string) => {
     const tag = tags.value.find((tag) => tag.key === key);
     if (tag) {
-        return language == 'zh' || language == 'tw' ? tag.name : tag.key;
+        return tag.name;
     }
 };
 
