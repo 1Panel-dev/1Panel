@@ -178,6 +178,7 @@ export namespace Setting {
         licenseName: string;
         assigneeName: string;
         productPro: string;
+        versionConstraint: string;
         trial: boolean;
         offline: boolean;
         status: string;
