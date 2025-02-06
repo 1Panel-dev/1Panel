@@ -382,7 +382,6 @@ const message = {
         used: 'Digunakan',
         free: 'Percuma',
         percent: 'Penggunaan',
-        app: 'Aplikasi Disyorkan',
         goInstall: 'Pergi pasang',
 
         networkCard: 'Kad rangkaian',

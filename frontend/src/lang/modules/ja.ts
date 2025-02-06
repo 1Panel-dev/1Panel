@@ -374,7 +374,6 @@ const message = {
         used: '使用済み',
         free: '無料',
         percent: '利用',
-        app: '推奨アプリケーション',
         goInstall: 'インストールします',
 
         networkCard: 'ネットワークカード',

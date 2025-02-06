@@ -374,7 +374,6 @@ const message = {
         used: '已用',
         free: '可用',
         percent: '使用率',
-        app: '推薦應用',
         goInstall: '去安裝',
 
         networkCard: '網卡',

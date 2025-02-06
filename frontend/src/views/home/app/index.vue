@@ -1,6 +1,6 @@
 <template>
     <div>
-        <CardWithHeader :header="$t('home.app')" class="mt-5" :loading="loading">
+        <CardWithHeader :header="$t('app.app')" class="mt-5" :loading="loading">
             <template #header-r>
                 <el-popover placement="left" :width="226" trigger="click">
                     <el-input size="small" v-model="filter" clearable @input="loadOption()" />
@@ -29,11 +29,13 @@
                             <el-col :span="5">
                                 <div>
                                     <el-badge
-                                        badge-style="background-color: transparent; color: #646a73; font-size: 12px; border: none"
-                                        :value="$t('home.recommend')"
+                                        badge-style="background-color: transparent; font-size: 10px; border: none"
                                         v-if="app.isRecommend"
                                         :offset="[-60, 0]"
                                     >
+                                        <template #content>
+                                            <svg-icon iconName="p-tuijian"></svg-icon>
+                                        </template>
                                         <el-avatar
                                             shape="square"
                                             :size="55"

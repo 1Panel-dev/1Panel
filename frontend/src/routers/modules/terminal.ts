@@ -1,13 +1,13 @@
 import { Layout } from '@/routers/constant';
 
 const terminalRouter = {
-    sort: 8,
+    sort: 7,
     path: '/terminal',
     component: Layout,
     redirect: '/terminal',
     meta: {
-        icon: 'p-zhongduan',
         title: 'menu.terminal',
+        icon: 'p-terminal3',
     },
     children: [
         {

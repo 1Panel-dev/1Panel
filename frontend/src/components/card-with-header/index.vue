@@ -2,7 +2,8 @@
     <div>
         <el-card :style="{ height: height }" class="home-card">
             <div class="header">
-                <span>{{ header }}</span>
+                <span class="header-span">{{ header }}</span>
+                <slot name="header-l" />
                 <slot name="header-r" />
             </div>
 
@@ -24,7 +25,7 @@ defineProps({
 <style scoped lang="scss">
 .home-card {
     .header {
-        span {
+        .header-span {
             position: relative;
             font-size: 16px;
             font-weight: 500;

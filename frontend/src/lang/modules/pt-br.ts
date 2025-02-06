@@ -380,7 +380,6 @@ const message = {
         used: 'Usado',
         free: 'Livre',
         percent: 'Utilização',
-        app: 'Aplicações recomendadas',
         goInstall: 'Ir para instalação',
 
         networkCard: 'Placa de rede',

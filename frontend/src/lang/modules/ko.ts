@@ -376,7 +376,6 @@ const message = {
         used: '사용 중',
         free: '여유',
         percent: '사용률',
-        app: '추천 애플리케이션',
         goInstall: 'Go 설치',
 
         networkCard: '네트워크 카드',

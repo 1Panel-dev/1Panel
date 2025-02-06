@@ -382,7 +382,6 @@ const message = {
         used: 'Used',
         free: 'Free',
         percent: 'Percent',
-        app: 'Recommended Apps',
         goInstall: 'Go install',
 
         networkCard: 'NetworkCard',

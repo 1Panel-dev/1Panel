@@ -3,32 +3,32 @@
         <CardWithHeader :header="$t('menu.container')" class="mt-5">
             <template #body>
                 <span class="count" @click="goRouter('Container')">{{ countItem.containerCount }}</span>
-                <div class="float-right">
-                    <el-tag v-if="countItem.all" effect="plain">
-                        {{ $t('commons.table.all') }} * {{ countItem.all }}
-                    </el-tag>
-                    <el-tag v-if="countItem.running" effect="plain" class="ml-2">
-                        {{ $t('commons.status.running') }} * {{ countItem.running }}
-                    </el-tag>
-                    <el-tag v-if="countItem.created" effect="plain" class="ml-2">
-                        {{ $t('commons.status.created') }} * {{ countItem.created }}
-                    </el-tag>
-                    <el-tag v-if="countItem.paused" effect="plain" class="ml-2">
-                        {{ $t('commons.status.paused') }} * {{ countItem.paused }}
-                    </el-tag>
-                    <el-tag v-if="countItem.restarting" effect="plain" class="ml-2">
-                        {{ $t('commons.status.restarting') }} * {{ countItem.restarting }}
-                    </el-tag>
-                    <el-tag v-if="countItem.removing" effect="plain" class="ml-2">
-                        {{ $t('commons.status.removing') }} * {{ countItem.removing }}
-                    </el-tag>
-                    <el-tag v-if="countItem.exited" effect="plain" class="ml-2">
-                        {{ $t('commons.status.exited') }} * {{ countItem.exited }}
-                    </el-tag>
-                    <el-tag v-if="countItem.dead" effect="plain" class="ml-2">
-                        {{ $t('commons.status.dead') }} * {{ countItem.dead }}
-                    </el-tag>
-                </div>
+            </template>
+            <template #header-l>
+                <el-tag size="small" class="ml-5" v-if="countItem.all" effect="plain">
+                    {{ $t('commons.table.all') }} * {{ countItem.all }}
+                </el-tag>
+                <el-tag size="small" v-if="countItem.running" effect="plain" class="ml-2">
+                    {{ $t('commons.status.running') }} * {{ countItem.running }}
+                </el-tag>
+                <el-tag size="small" v-if="countItem.created" effect="plain" class="ml-2">
+                    {{ $t('commons.status.created') }} * {{ countItem.created }}
+                </el-tag>
+                <el-tag size="small" v-if="countItem.paused" effect="plain" class="ml-2">
+                    {{ $t('commons.status.paused') }} * {{ countItem.paused }}
+                </el-tag>
+                <el-tag size="small" v-if="countItem.restarting" effect="plain" class="ml-2">
+                    {{ $t('commons.status.restarting') }} * {{ countItem.restarting }}
+                </el-tag>
+                <el-tag size="small" v-if="countItem.removing" effect="plain" class="ml-2">
+                    {{ $t('commons.status.removing') }} * {{ countItem.removing }}
+                </el-tag>
+                <el-tag size="small" v-if="countItem.exited" effect="plain" class="ml-2">
+                    {{ $t('commons.status.exited') }} * {{ countItem.exited }}
+                </el-tag>
+                <el-tag size="small" v-if="countItem.dead" effect="plain" class="ml-2">
+                    {{ $t('commons.status.dead') }} * {{ countItem.dead }}
+                </el-tag>
             </template>
         </CardWithHeader>
         <el-row :gutter="20" class="mt-5">
@@ -52,11 +52,11 @@
                 <CardWithHeader :header="$t('container.image')">
                     <template #body>
                         <span class="count" @click="goRouter('Image')">{{ countItem.imageCount }}</span>
-                        <div class="float-right">
-                            <el-tag v-if="countItem.imageSize" effect="plain" class="ml-2">
-                                {{ $t('commons.status.used') }}: {{ computeSize(countItem.imageSize) }}
-                            </el-tag>
-                        </div>
+                    </template>
+                    <template #header-l>
+                        <span v-if="countItem.imageSize" effect="plain" class="ml-2 text-xs">
+                            {{ $t('commons.status.used') }}: {{ computeSize(countItem.imageSize) }}
+                        </span>
                     </template>
                 </CardWithHeader>
             </el-col>

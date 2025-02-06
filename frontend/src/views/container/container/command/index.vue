@@ -75,9 +75,10 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        ElMessageBox.confirm(i18n.global.t('container.commandHelper'), {
+        ElMessageBox.confirm(i18n.global.t('container.commandHelper'), i18n.global.t('container.createByCommand'), {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
             cancelButtonText: i18n.global.t('commons.button.cancel'),
+            type: 'info',
         }).then(async () => {
             loading.value = true;
             let taskID = newUUID();

@@ -376,7 +376,6 @@ const message = {
         used: 'Использовано',
         free: 'Свободно',
         percent: 'Утилизация',
-        app: 'Рекомендуемые приложения',
         goInstall: 'Установить',
 
         networkCard: 'Интерфейс',

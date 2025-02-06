@@ -1,8 +1,9 @@
 @font-face {
   font-family: "iconfont"; /* Project id 4776196 */
-  src: url('iconfont.woff2?t=1734689625014') format('woff2'),
-       url('iconfont.woff?t=1734689625014') format('woff'),
-       url('iconfont.ttf?t=1734689625014') format('truetype');
+  src: url('iconfont.woff2?t=1738832240410') format('woff2'),
+       url('iconfont.woff?t=1738832240410') format('woff'),
+       url('iconfont.ttf?t=1738832240410') format('truetype'),
+       url('iconfont.svg?t=1738832240410#iconfont') format('svg');
 }
 
 .iconfont {
@@ -11,6 +12,14 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.p-terminal3:before {
+  content: "\eace";
+}
+
+.p-tuijian:before {
+  content: "\e627";
 }
 
 .p-node-1:before {
@@ -59,6 +68,14 @@
 
 .p-theme:before {
   content: "\e638";
+}
+
+.p-terminal:before {
+  content: "\e864";
+}
+
+.p-terminal1:before {
+  content: "\e663";
 }
 
 .p-arrow-right:before {
@@ -361,10 +378,6 @@
   content: "\e76a";
 }
 
-.p-zhongduan:before {
-  content: "\e731";
-}
-
 .p-alert-1:before {
   content: "\e615";
 }
@@ -373,7 +386,7 @@
   content: "\e701";
 }
 
-.p-minglinghang:before {
+.p-zhongduan:before {
   content: "\e61e";
 }
 

@@ -31,7 +31,7 @@
     <OpDialog ref="opRef" @search="getContent" />
 </template>
 <script lang="ts" setup>
-import { onUnmounted, reactive, ref, watch } from 'vue';
+import { onUnmounted, reactive, ref } from 'vue';
 import { operateSupervisorProcessFile } from '@/api/modules/host-tool';
 import i18n from '@/lang';
 import { TabsPaneContext } from 'element-plus';

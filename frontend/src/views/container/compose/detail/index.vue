@@ -302,7 +302,7 @@ const onTerminal = (row: any) => {
 
 const buttons = [
     {
-        label: i18n.global.t('file.terminal'),
+        label: i18n.global.t('menu.terminal'),
         disabled: (row: Container.ContainerInfo) => {
             return row.state !== 'running';
         },

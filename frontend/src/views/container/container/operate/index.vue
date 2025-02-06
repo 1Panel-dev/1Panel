@@ -120,7 +120,7 @@
                                         </el-table-column>
                                     </el-table>
 
-                                    <el-button class="ml-3" @click="handlePortsAdd()">
+                                    <el-button class="ml-3 mt-2" @click="handlePortsAdd()">
                                         {{ $t('commons.button.add') }}
                                     </el-button>
                                 </el-form-item>
@@ -185,7 +185,7 @@
                                                         </template>
                                                     </el-input>
                                                 </div>
-                                                <el-button @click="form.dns.push('')">
+                                                <el-button class="mt-2" @click="form.dns.push('')">
                                                     {{ $t('commons.button.add') }}
                                                 </el-button>
                                             </el-form-item>
@@ -259,7 +259,7 @@
                                                 </template>
                                             </el-table-column>
                                         </el-table>
-                                        <el-button @click="handleVolumesAdd()">
+                                        <el-button class="ml-3 mt-2" @click="handleVolumesAdd()">
                                             {{ $t('commons.button.add') }}
                                         </el-button>
                                     </el-form-item>
@@ -366,7 +366,7 @@
                                                         </template>
                                                     </el-input>
                                                 </div>
-                                                <el-button @click="form.labels.push('')">
+                                                <el-button class="mt-2" @click="form.labels.push('')">
                                                     {{ $t('commons.button.add') }}
                                                 </el-button>
                                             </el-form-item>
@@ -388,7 +388,7 @@
                                                         </template>
                                                     </el-input>
                                                 </div>
-                                                <el-button @click="form.env.push('')">
+                                                <el-button class="mt-2" @click="form.env.push('')">
                                                     {{ $t('commons.button.add') }}
                                                 </el-button>
                                             </el-form-item>
