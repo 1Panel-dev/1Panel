@@ -3,8 +3,10 @@ package v1
 import (
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"os"
 	"path"
+	"regexp"
 
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -52,6 +54,12 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 	var req dto.SettingUpdate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
+	}
+	if req.Key == "SecurityEntrance" {
+		if checkEntrancePattern(req.Value) {
+			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, fmt.Errorf("regexp match string with %s failed", req.Value))
+			return
+		}
 	}
 
 	if err := settingService.Update(req.Key, req.Value); err != nil {
@@ -390,4 +398,12 @@ func (b *BaseApi) UpdateApiConfig(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithData(c, nil)
+}
+
+func checkEntrancePattern(val string) bool {
+	if len(val) == 0 {
+		return true
+	}
+	result, _ := regexp.MatchString("^[a-zA-Z0-9]{5,116}$", val)
+	return result
 }
