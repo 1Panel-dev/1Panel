@@ -2,7 +2,6 @@ package v2
 
 import (
 	"encoding/base64"
-
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/model"
@@ -28,8 +27,8 @@ func (b *BaseApi) Login(c *gin.Context) {
 	}
 
 	if req.AuthMethod != "jwt" && !req.IgnoreCaptcha {
-		if err := captcha.VerifyCode(req.CaptchaID, req.Captcha); err != nil {
-			helper.InternalServer(c, err)
+		if errMsg := captcha.VerifyCode(req.CaptchaID, req.Captcha); errMsg != "" {
+			helper.BadAuth(c, errMsg, nil)
 			return
 		}
 	}
@@ -39,8 +38,12 @@ func (b *BaseApi) Login(c *gin.Context) {
 		entrance, _ = base64.StdEncoding.DecodeString(entranceItem)
 	}
 
-	user, err := authService.Login(c, req, string(entrance))
+	user, msgKey, err := authService.Login(c, req, string(entrance))
 	go saveLoginLogs(c, err)
+	if msgKey == "ErrAuth" {
+		helper.BadAuth(c, msgKey, err)
+		return
+	}
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -67,7 +70,11 @@ func (b *BaseApi) MFALogin(c *gin.Context) {
 		entrance, _ = base64.StdEncoding.DecodeString(entranceItem)
 	}
 
-	user, err := authService.MFALogin(c, req, string(entrance))
+	user, msgKey, err := authService.MFALogin(c, req, string(entrance))
+	if msgKey == "ErrAuth" {
+		helper.BadAuth(c, msgKey, err)
+		return
+	}
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -141,16 +148,7 @@ func saveLoginLogs(c *gin.Context, err error) {
 		logs.Status = constant.StatusSuccess
 	}
 	logs.IP = c.ClientIP()
-	//lang := c.GetHeader("Accept-Language")
-	//if lang == "" {
-	//	lang = "zh"
-	//}
-	//address, err := geo.GetIPLocation(logs.IP, lang)
-	//if err != nil {
-	//	global.LOG.Errorf("get ip location failed: %s", err)
-	//}
 	logs.Agent = c.GetHeader("User-Agent")
-	//logs.Address = address
 	_ = logService.CreateLoginLog(logs)
 }
 

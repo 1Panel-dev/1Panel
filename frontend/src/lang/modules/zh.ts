@@ -175,8 +175,7 @@ const message = {
             mfaTitle: 'MFA 认证',
             mfaCode: 'MFA 验证码',
             title: 'Linux 服务器运维管理面板',
-            licenseHelper:
-                '同意 &laquo; <a href="https://www.fit2cloud.com/legal/licenses.html" target="_blank"> 飞致云社区软件许可协议</a> &raquo;',
+            licenseHelper: '《飞致云社区软件许可协议》',
             errorAgree: '请点击同意社区软件许可协议',
             agreeTitle: '服务协议及隐私保护',
             agreeContent:

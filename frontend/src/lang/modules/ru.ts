@@ -167,8 +167,7 @@ const message = {
             mfaTitle: 'MFA Сертификация',
             mfaCode: 'MFA код подтверждения',
             title: 'Панель управления Linux сервером',
-            licenseHelper:
-                'Согласен &laquo; <a href="https://www.fit2cloud.com/legal/licenses.html" target="_blank">Лицензионное соглашение сообщества</a> &raquo;',
+            licenseHelper: '<Лицензионное соглашение сообщества>',
             errorAgree: 'Нажмите, чтобы согласиться с Лицензией программного обеспечения сообщества',
             logout: 'Выход',
             agreeTitle: 'Соглашение',

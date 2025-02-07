@@ -1,50 +1,49 @@
 <template>
-    <div v-loading="loading">
-        <div v-if="mfaShow">
-            <div class="login-form">
+    <div class="w-full h-full flex items-center justify-center px-8 py-6">
+        <div v-loading="loading" class="w-full flex-grow flex flex-col">
+            <div v-if="mfaShow">
                 <el-form @submit.prevent>
-                    <div class="login-title">{{ $t('commons.login.mfaTitle') }}</div>
-                    <el-form-item class="no-border">
-                        <el-input
-                            size="default"
-                            :placeholder="$t('commons.login.mfaCode')"
-                            v-model.trim="mfaLoginForm.code"
-                            @input="mfaLogin(true)"
-                        >
-                            <template #prefix>
-                                <el-icon class="el-input__icon">
-                                    <Finished />
-                                </el-icon>
-                            </template>
-                        </el-input>
-                        <span v-if="errMfaInfo" class="input-error" style="line-height: 14px">
-                            {{ $t('commons.login.errorMfaInfo') }}
-                        </span>
-                    </el-form-item>
-                    <el-form-item>
-                        <el-button
-                            @focus="mfaButtonFocused = true"
-                            @blur="mfaButtonFocused = false"
-                            class="login-button"
-                            type="primary"
-                            size="default"
-                            round
-                            @click="mfaLogin(false)"
-                        >
-                            {{ $t('commons.button.verify') }}
-                        </el-button>
-                    </el-form-item>
+                    <div class="flex flex-col justify-center items-center mb-6">
+                        <div class="text-2xl font-medium text-gray-900 text-center">
+                            {{ $t('commons.login.mfaTitle') }}
+                        </div>
+                    </div>
+
+                    <div class="space-y-6 flex-grow">
+                        <el-form-item>
+                            <el-input
+                                size="large"
+                                :placeholder="$t('commons.login.mfaCode')"
+                                v-model.trim="mfaLoginForm.code"
+                                @input="mfaLogin(true)"
+                            ></el-input>
+                            <div class="h-1">
+                                <span v-if="errMfaInfo" class="input-error">
+                                    {{ $t('commons.login.errorMfaInfo') }}
+                                </span>
+                            </div>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button
+                                @focus="mfaButtonFocused = true"
+                                @blur="mfaButtonFocused = false"
+                                class="w-full"
+                                type="primary"
+                                @click="mfaLogin(false)"
+                            >
+                                {{ $t('commons.button.verify') }}
+                            </el-button>
+                        </el-form-item>
+                    </div>
                 </el-form>
             </div>
-        </div>
-        <div v-else>
-            <div class="login-form">
+            <div v-else>
                 <el-form ref="loginFormRef" :model="loginForm" size="default" :rules="loginRules">
-                    <div class="login-form-header">
-                        <div class="title cursor-pointer">{{ $t('commons.button.login') }}</div>
+                    <div class="flex justify-between items-center mb-6">
+                        <div class="text-2xl font-medium text-gray-900">{{ $t('commons.button.login') }}</div>
                         <div class="cursor-pointer">
                             <el-dropdown @command="handleCommand">
-                                <span>
+                                <span class="flex items-center space-x-1">
                                     {{ dropdownText }}
                                     <el-icon>
                                         <arrow-down />
@@ -70,75 +69,85 @@
                             </el-dropdown>
                         </div>
                     </div>
-                    <el-form-item prop="name" class="no-border">
-                        <el-input
-                            v-model.trim="loginForm.name"
-                            :placeholder="$t('commons.login.username')"
-                            class="form-input"
-                        >
-                            <template #prefix>
-                                <el-icon class="el-input__icon">
-                                    <user />
-                                </el-icon>
-                            </template>
-                        </el-input>
-                    </el-form-item>
-                    <el-form-item prop="password" class="no-border">
-                        <el-input
-                            type="password"
-                            clearable
-                            v-model.trim="loginForm.password"
-                            show-password
-                            :placeholder="$t('commons.login.password')"
-                        >
-                            <template #prefix>
-                                <el-icon class="el-input__icon">
-                                    <lock />
-                                </el-icon>
-                            </template>
-                        </el-input>
-                        <span v-if="errAuthInfo" class="input-error" style="line-height: 14px">
-                            {{ $t('commons.login.errorAuthInfo') }}
-                        </span>
-                    </el-form-item>
-                    <el-form-item v-if="!globalStore.ignoreCaptcha" prop="captcha" class="login-captcha">
-                        <el-input v-model.trim="loginForm.captcha" :placeholder="$t('commons.login.captchaHelper')">
-                            <template #prefix>
-                                <svg-icon style="font-size: 7px" iconName="p-yanzhengma1"></svg-icon>
-                            </template>
-                        </el-input>
-                        <img
-                            v-if="captcha.imagePath"
-                            :src="captcha.imagePath"
-                            :alt="$t('commons.login.captchaHelper')"
-                            @click="loginVerify()"
-                        />
-                        <span v-if="errCaptcha" class="input-error" style="line-height: 14px">
-                            {{ $t('commons.login.errorCaptcha') }}
-                        </span>
-                    </el-form-item>
-                    <el-form-item>
-                        <el-button
-                            @click="login(loginFormRef)"
-                            @focus="loginButtonFocused = true"
-                            @blur="loginButtonFocused = false"
-                            class="login-button"
-                            type="primary"
-                            size="default"
-                            round
-                        >
-                            {{ $t('commons.button.login') }}
-                        </el-button>
-                    </el-form-item>
-                    <template v-if="!isIntl">
-                        <el-form-item prop="agreeLicense">
-                            <el-checkbox v-model="loginForm.agreeLicense">
-                                <template #default>
-                                    <span class="agree" v-html="$t('commons.login.licenseHelper')"></span>
-                                </template>
-                            </el-checkbox>
+                    <div class="space-y-6 flex-grow">
+                        <el-form-item prop="name" class="w-full">
+                            <el-input
+                                v-model.trim="loginForm.name"
+                                :placeholder="$t('commons.login.username')"
+                                class="w-full"
+                                size="large"
+                            ></el-input>
                         </el-form-item>
-                    </template>
+                        <el-form-item prop="password" class="w-full">
+                            <el-input
+                                type="password"
+                                v-model.trim="loginForm.password"
+                                class="w-full"
+                                size="large"
+                                :placeholder="$t('commons.login.password')"
+                            ></el-input>
+                        </el-form-item>
+                        <el-row :gutter="10">
+                            <el-col :span="12" v-if="!globalStore.ignoreCaptcha">
+                                <el-form-item prop="captcha">
+                                    <el-input
+                                        v-model.trim="loginForm.captcha"
+                                        size="large"
+                                        :placeholder="$t('commons.login.captchaHelper')"
+                                    ></el-input>
+                                </el-form-item>
+                            </el-col>
+                            <el-col :span="12" v-if="!globalStore.ignoreCaptcha">
+                                <img
+                                    class="w-full h-10"
+                                    v-if="captcha.imagePath"
+                                    :src="captcha.imagePath"
+                                    :alt="$t('commons.login.captchaHelper')"
+                                    @click="loginVerify()"
+                                />
+                            </el-col>
+                            <el-col :span="24" class="h-1">
+                                <span v-show="errCaptcha" class="input-error">
+                                    {{ $t('commons.login.errorCaptcha') }}
+                                </span>
+                                <span v-show="errAuthInfo" class="input-error">
+                                    {{ $t('commons.login.errorAuthInfo') }}
+                                </span>
+                            </el-col>
+                        </el-row>
+
+                        <el-form-item>
+                            <el-button
+                                @click="login(loginFormRef)"
+                                @focus="loginButtonFocused = true"
+                                @blur="loginButtonFocused = false"
+                                class="w-full"
+                                type="primary"
+                                size="default"
+                            >
+                                {{ $t('commons.button.login') }}
+                            </el-button>
+                        </el-form-item>
+
+                        <template v-if="!isIntl">
+                            <el-form-item prop="agreeLicense">
+                                <el-checkbox v-model="loginForm.agreeLicense">
+                                    <template #default>
+                                        <span>
+                                            {{ $t('commons.button.agree') }}
+                                            <a
+                                                class="agree"
+                                                href="https://www.fit2cloud.com/legal/licenses.html"
+                                                target="_blank"
+                                            >
+                                                {{ $t('commons.login.licenseHelper') }}
+                                            </a>
+                                        </span>
+                                    </template>
+                                </el-checkbox>
+                            </el-form-item>
+                        </template>
+                    </div>
                 </el-form>
                 <div class="demo">
                     <span v-if="isDemo">
@@ -146,28 +155,28 @@
                     </span>
                 </div>
             </div>
-        </div>
 
-        <DialogPro v-model="open" center size="w-90">
-            <el-row type="flex" justify="center">
-                <span class="text-base mb-4">
-                    {{ $t('commons.login.agreeTitle') }}
-                </span>
-            </el-row>
-            <div>
-                <span v-html="$t('commons.login.agreeContent')"></span>
-            </div>
-            <template #footer>
-                <span class="dialog-footer login-footer-btn">
-                    <el-button @click="open = false">
-                        {{ $t('commons.button.notAgree') }}
-                    </el-button>
-                    <el-button type="primary" @click="agreeWithLogin()">
-                        {{ $t('commons.button.agree') }}
-                    </el-button>
-                </span>
-            </template>
-        </DialogPro>
+            <DialogPro v-model="open" center size="w-90">
+                <el-row type="flex" justify="center">
+                    <span class="text-base mb-4">
+                        {{ $t('commons.login.agreeTitle') }}
+                    </span>
+                </el-row>
+                <div>
+                    <span v-html="$t('commons.login.agreeContent')"></span>
+                </div>
+                <template #footer>
+                    <span class="dialog-footer login-footer-btn">
+                        <el-button @click="open = false">
+                            {{ $t('commons.button.notAgree') }}
+                        </el-button>
+                        <el-button type="primary" @click="agreeWithLogin()">
+                            {{ $t('commons.button.agree') }}
+                        </el-button>
+                    </span>
+                </template>
+            </DialogPro>
+        </div>
     </div>
 </template>
 
@@ -319,22 +328,8 @@ const login = (formEl: FormInstance | undefined) => {
             isLoggingIn = true;
             loading.value = true;
             const res = await loginApi(requestLoginForm);
-            if (res.code === 406) {
-                if (res.message === 'ErrCaptchaCode') {
-                    loginForm.captcha = '';
-                    errCaptcha.value = true;
-                    errAuthInfo.value = false;
-                }
-                if (res.message === 'ErrAuth') {
-                    globalStore.ignoreCaptcha = false;
-                    errCaptcha.value = false;
-                    errAuthInfo.value = true;
-                }
-                loginVerify();
-                return;
-            }
             globalStore.ignoreCaptcha = true;
-            if (res.data.mfaStatus === 'enable') {
+            if (res.data.mfaStatus === 'Enable') {
                 mfaShow.value = true;
                 errMfaInfo.value = false;
                 return;
@@ -346,7 +341,20 @@ const login = (formEl: FormInstance | undefined) => {
             MsgSuccess(i18n.t('commons.msg.loginSuccess'));
             loadDataFromDB();
             router.push({ name: 'home' });
-        } catch (error) {
+        } catch (res) {
+            if (res.code === 401) {
+                if (res.message === 'ErrCaptchaCode') {
+                    loginForm.captcha = '';
+                    errCaptcha.value = true;
+                    errAuthInfo.value = false;
+                }
+                if (res.message === 'ErrAuth') {
+                    globalStore.ignoreCaptcha = false;
+                    errCaptcha.value = false;
+                    errAuthInfo.value = true;
+                    console.log('11111');
+                }
+            }
             loginVerify();
         } finally {
             isLoggingIn = false;
@@ -361,18 +369,23 @@ const mfaLogin = async (auto: boolean) => {
         isLoggingIn = true;
         mfaLoginForm.name = loginForm.name;
         mfaLoginForm.password = loginForm.password;
-        const res = await mfaLoginApi(mfaLoginForm);
-        if (res.code === 406) {
-            errMfaInfo.value = true;
+        try {
+            await mfaLoginApi(mfaLoginForm);
+            globalStore.setLogStatus(true);
+            menuStore.setMenuList([]);
+            tabsStore.removeAllTabs();
+            MsgSuccess(i18n.t('commons.msg.loginSuccess'));
+            loadDataFromDB();
+            router.push({ name: 'home' });
+        } catch (res) {
+            if (res.code === 401) {
+                errMfaInfo.value = true;
+                isLoggingIn = false;
+                return;
+            }
+        } finally {
             isLoggingIn = false;
-            return;
         }
-        globalStore.setLogStatus(true);
-        menuStore.setMenuList([]);
-        tabsStore.removeAllTabs();
-        MsgSuccess(i18n.t('commons.msg.loginSuccess'));
-        loadDataFromDB();
-        router.push({ name: 'home' });
     }
 };
 const loginVerify = async () => {
@@ -430,9 +443,28 @@ onMounted(() => {
     };
 });
 </script>
-
 <style scoped lang="scss">
-.login-form {
+.agree {
+    text-decoration: none;
+}
+.agree:hover {
+    text-decoration: underline;
+}
+
+:deep(.el-button) {
+    height: 2.5rem;
+}
+
+:deep(.el-input__inner) {
+    -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
+    transition: background-color 50000s ease-in-out 0s;
+}
+
+:deep(.el-row) {
+    padding: 0 !important;
+}
+</style>
+<!-- <style scoped lang='scss' > .login-form {
     padding: 0 40px;
     .hide {
         width: 0;
@@ -601,3 +633,4 @@ onMounted(() => {
     }
 }
 </style>
+-->

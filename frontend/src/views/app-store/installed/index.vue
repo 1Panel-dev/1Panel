@@ -386,7 +386,7 @@ import AppIgnore from './ignore/index.vue';
 import ComposeLogs from '@/components/compose-log/index.vue';
 import { App } from '@/api/interface/app';
 import Status from '@/components/status/index.vue';
-import { getAge, getLanguage } from '@/utils/util';
+import { getAge } from '@/utils/util';
 import { useRouter } from 'vue-router';
 import { MsgSuccess } from '@/utils/message';
 import { toFolder } from '@/global/business';
@@ -432,7 +432,6 @@ const router = useRouter();
 const activeName = ref(i18n.global.t('app.installed'));
 const mode = ref('installed');
 const moreTag = ref('');
-const language = getLanguage();
 const defaultLink = ref('');
 
 const options = {

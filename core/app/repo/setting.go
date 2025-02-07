@@ -13,6 +13,7 @@ type ISettingRepo interface {
 	GetValueByKey(key string) (string, error)
 	Create(key, value string) error
 	Update(key, value string) error
+	UpdateOrCreate(key, value string) error
 }
 
 func NewISettingRepo() ISettingRepo {
@@ -57,4 +58,8 @@ func (u *SettingRepo) GetValueByKey(key string) (string, error) {
 
 func (u *SettingRepo) Update(key, value string) error {
 	return global.DB.Model(&model.Setting{}).Where("key = ?", key).Updates(map[string]interface{}{"value": value}).Error
+}
+
+func (u *SettingRepo) UpdateOrCreate(key, value string) error {
+	return global.DB.Model(&model.Setting{}).Where("key = ?", key).Assign(model.Setting{Key: key, Value: value}).FirstOrCreate(&model.Setting{}).Error
 }

@@ -168,8 +168,7 @@ const message = {
             mfaTitle: 'Autenticação MFA',
             mfaCode: 'Código de verificação MFA',
             title: 'Painel de Gerenciamento de Servidores Linux',
-            licenseHelper:
-                'Concordar com &laquo; <a href="https://www.fit2cloud.com/legal/licenses.html" target="_blank">Acordo de Licença Comunitária</a> &raquo;',
+            licenseHelper: '<Acordo de Licença Comunitária>',
             errorAgree: 'Clique para concordar com o Acordo de Licença de Software Comunitário',
             logout: 'Sair',
             agreeTitle: 'Termo de Aceite',

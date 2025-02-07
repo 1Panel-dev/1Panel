@@ -167,8 +167,7 @@ const message = {
             mfaTitle: 'MFA認定',
             mfaCode: 'MFA検証コード',
             title: 'Linuxサーバー管理パネル',
-            licenseHelper:
-                '同意＆laquo;<a href = "https://www.fit2cloud.com/legal/licenses.html" target="_blank">コミュニティライセンス契約</a>＆raquo;',
+            licenseHelper: '<コミュニティライセンス契約>',
             errorAgree: 'クリックして、コミュニティソフトウェアライセンスに同意します',
             logout: 'ログアウト',
             agreeTitle: '合意',

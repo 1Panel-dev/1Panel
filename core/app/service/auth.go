@@ -21,9 +21,9 @@ type IAuthService interface {
 	CheckIsSafety(code string) (string, error)
 	GetResponsePage() (string, error)
 	VerifyCode(code string) (bool, error)
-	Login(c *gin.Context, info dto.Login, entrance string) (*dto.UserLoginInfo, error)
+	Login(c *gin.Context, info dto.Login, entrance string) (*dto.UserLoginInfo, string, error)
 	LogOut(c *gin.Context) error
-	MFALogin(c *gin.Context, info dto.MFALogin, entrance string) (*dto.UserLoginInfo, error)
+	MFALogin(c *gin.Context, info dto.MFALogin, entrance string) (*dto.UserLoginInfo, string, error)
 	GetSecurityEntrance() string
 	IsLogin(c *gin.Context) bool
 }
@@ -32,79 +32,86 @@ func NewIAuthService() IAuthService {
 	return &AuthService{}
 }
 
-func (u *AuthService) Login(c *gin.Context, info dto.Login, entrance string) (*dto.UserLoginInfo, error) {
+func (u *AuthService) Login(c *gin.Context, info dto.Login, entrance string) (*dto.UserLoginInfo, string, error) {
 	nameSetting, err := settingRepo.Get(repo.WithByKey("UserName"))
 	if err != nil {
-		return nil, buserr.New("ErrRecordNotFound")
+		return nil, "", buserr.New("ErrRecordNotFound")
 	}
 	passwordSetting, err := settingRepo.Get(repo.WithByKey("Password"))
 	if err != nil {
-		return nil, buserr.New("ErrRecordNotFound")
+		return nil, "", buserr.New("ErrRecordNotFound")
 	}
 	pass, err := encrypt.StringDecrypt(passwordSetting.Value)
 	if err != nil {
-		return nil, buserr.New("ErrAuth")
+		return nil, "ErrAuth", nil
 	}
 	if !hmac.Equal([]byte(info.Password), []byte(pass)) || nameSetting.Value != info.Name {
-		return nil, buserr.New("ErrAuth")
+		return nil, "ErrAuth", nil
 	}
 	entranceSetting, err := settingRepo.Get(repo.WithByKey("SecurityEntrance"))
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	if len(entranceSetting.Value) != 0 && entranceSetting.Value != entrance {
-		return nil, buserr.New("ErrEntrance")
+		return nil, "ErrEntrance", nil
 	}
 	mfa, err := settingRepo.Get(repo.WithByKey("MFAStatus"))
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	if err = settingRepo.Update("Language", info.Language); err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	if mfa.Value == constant.StatusEnable {
-		return &dto.UserLoginInfo{Name: nameSetting.Value, MfaStatus: mfa.Value}, nil
+		return &dto.UserLoginInfo{Name: nameSetting.Value, MfaStatus: mfa.Value}, "", nil
 	}
-	return u.generateSession(c, info.Name, info.AuthMethod)
+	res, err := u.generateSession(c, info.Name, info.AuthMethod)
+	if err != nil {
+		return nil, "", err
+	}
+	return res, "", nil
 }
 
-func (u *AuthService) MFALogin(c *gin.Context, info dto.MFALogin, entrance string) (*dto.UserLoginInfo, error) {
+func (u *AuthService) MFALogin(c *gin.Context, info dto.MFALogin, entrance string) (*dto.UserLoginInfo, string, error) {
 	nameSetting, err := settingRepo.Get(repo.WithByKey("UserName"))
 	if err != nil {
-		return nil, buserr.New("ErrRecordNotFound")
+		return nil, "", buserr.New("ErrRecordNotFound")
 	}
 	passwordSetting, err := settingRepo.Get(repo.WithByKey("Password"))
 	if err != nil {
-		return nil, buserr.New("ErrRecordNotFound")
+		return nil, "", buserr.New("ErrRecordNotFound")
 	}
 	pass, err := encrypt.StringDecrypt(passwordSetting.Value)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	if !hmac.Equal([]byte(info.Password), []byte(pass)) || nameSetting.Value != info.Name {
-		return nil, buserr.New("ErrAuth")
+		return nil, "ErrAuth", nil
 	}
 	entranceSetting, err := settingRepo.Get(repo.WithByKey("SecurityEntrance"))
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	if len(entranceSetting.Value) != 0 && entranceSetting.Value != entrance {
-		return nil, buserr.New("ErrEntrance")
+		return nil, "", buserr.New("ErrEntrance")
 	}
 	mfaSecret, err := settingRepo.Get(repo.WithByKey("MFASecret"))
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	mfaInterval, err := settingRepo.Get(repo.WithByKey("MFAInterval"))
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	success := mfa.ValidCode(info.Code, mfaInterval.Value, mfaSecret.Value)
 	if !success {
-		return nil, buserr.New("ErrAuth")
+		return nil, "ErrAuth", nil
 	}
-
-	return u.generateSession(c, info.Name, info.AuthMethod)
+	res, err := u.generateSession(c, info.Name, info.AuthMethod)
+	if err != nil {
+		return nil, "", err
+	}
+	return res, "", nil
 }
 
 func (u *AuthService) generateSession(c *gin.Context, name, authMethod string) (*dto.UserLoginInfo, error) {

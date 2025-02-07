@@ -88,6 +88,9 @@ interface DialogProps {
 const emit = defineEmits<{ (e: 'search'): void }>();
 const acceptParams = (params: DialogProps): void => {
     form.interval = params.interval;
+    if (params.interval == 0) {
+        form.interval = 30;
+    }
     loadMfaCode();
     drawerVisible.value = true;
 };

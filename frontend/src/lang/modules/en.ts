@@ -177,8 +177,7 @@ const message = {
             mfaTitle: 'MFA Certification',
             mfaCode: 'MFA verification code',
             title: 'Linux Server Management Panel',
-            licenseHelper:
-                'Agree &laquo; <a href="https://www.fit2cloud.com/legal/licenses.html" target="_blank">Community License Agreement</a> &raquo;',
+            licenseHelper: '<Community License Agreement>',
             errorAgree: 'Click to agree to the Community Software License',
             logout: 'Logout',
             agreeTitle: 'Agreement',

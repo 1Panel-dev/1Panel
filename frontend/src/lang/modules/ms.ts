@@ -169,8 +169,7 @@ const message = {
             mfaTitle: 'Pengesahan MFA',
             mfaCode: 'Kod pengesahan MFA',
             title: 'Panel Pengurusan Pelayan Linux',
-            licenseHelper:
-                'Setuju &laquo; <a href="https://www.fit2cloud.com/legal/licenses.html" target="_blank">Perjanjian Lesen Komuniti</a> &raquo;',
+            licenseHelper: '<Perjanjian Lesen Komuniti>',
             errorAgree: 'Klik untuk bersetuju dengan Lesen Perisian Komuniti',
             logout: 'Log keluar',
             agreeTitle: 'Agreement',

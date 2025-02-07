@@ -1,5 +1,25 @@
 <template>
-    <div>
+    <div class="flex items-center justify-center min-h-screen relative bg-gray-100">
+        <div
+            class="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            :style="{ backgroundImage: `url(${backgroundImage})` }"
+        ></div>
+        <div
+            :style="{ opacity: backgroundOpacity }"
+            class="w-[45%] min-h-[480px] bg-white rounded-lg shadow-lg relative z-10 border border-gray-200 flex overflow-hidden"
+        >
+            <div class="grid md:grid-cols-2 gap-4 items-stretch w-full">
+                <div class="flex flex-col justify-center items-center w-full p-4">
+                    <img :src="logoImage" class="max-w-full max-h-full object-contain" />
+                </div>
+                <div class="hidden md:block w-px bg-gray-200 absolute left-1/2 top-4 bottom-4"></div>
+                <div class="hidden md:flex items-center justify-center p-4">
+                    <LoginForm ref="loginRef"></LoginForm>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- <div>
         <div class="login-background" v-loading="loading">
             <div class="login-wrapper">
                 <div :class="screenWidth > 1110 ? 'left inline-block' : ''">
@@ -15,7 +35,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 </template>
 
 <script setup lang="ts" name="login">
@@ -28,6 +48,9 @@ import { getXpackSettingForTheme } from '@/utils/xpack';
 
 const gStore = GlobalStore();
 const loading = ref();
+const backgroundOpacity = ref(1);
+const backgroundImage = ref(new URL('', import.meta.url).href);
+const logoImage = ref(new URL('@/assets/images/1panel-login.png', import.meta.url).href);
 
 const mySafetyCode = defineProps({
     code: {
@@ -69,7 +92,7 @@ onMounted(() => {
 });
 </script>
 
-<style scoped lang="scss">
+<!-- <style scoped lang="scss">
 @mixin login-center {
     display: flex;
     justify-content: center;
@@ -153,4 +176,4 @@ onMounted(() => {
         }
     }
 }
-</style>
+</style> -->
