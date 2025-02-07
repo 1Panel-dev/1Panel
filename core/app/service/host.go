@@ -266,8 +266,8 @@ func (u *HostService) Create(req dto.HostOperate) (*dto.HostInfo, error) {
 		req.GroupID = group.ID
 	}
 	var sameHostID uint
-	if req.Addr == "127.0.0.1" {
-		hostSame, _ := hostRepo.Get(hostRepo.WithByAddr(req.Addr))
+	if req.Name == "local" {
+		hostSame, _ := hostRepo.Get(repo.WithByName("local"))
 		sameHostID = hostSame.ID
 	} else {
 		hostSame, _ := hostRepo.Get(hostRepo.WithByAddr(req.Addr), hostRepo.WithByUser(req.User), hostRepo.WithByPort(req.Port))

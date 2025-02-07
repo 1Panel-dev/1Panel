@@ -41,12 +41,14 @@
                 >
                     <template #prefix>{{ $t('commons.table.group') }}</template>
                     <el-option :label="$t('commons.table.all')" :value="0"></el-option>
-                    <el-option
-                        v-for="(group, index) in groups"
-                        :key="index"
-                        :label="group.name"
-                        :value="group.id"
-                    ></el-option>
+                    <div v-for="item in groups" :key="item.id">
+                        <el-option
+                            v-if="item.name === 'default'"
+                            :label="$t('commons.table.default')"
+                            :value="item.id"
+                        />
+                        <el-option v-else :label="item.name" :value="item.id" />
+                    </div>
                 </el-select>
                 <TableSearch @search="search()" v-model:searchName="req.name" />
                 <div class="!ml-2.5">

@@ -591,10 +591,14 @@ const message = {
         operatorHelper: '{0} será realizado no seguinte contêiner. Deseja continuar?',
         operatorAppHelper:
             'A operação "{0}" será realizada no(s) seguinte(s) contêiner(es) e pode afetar os serviços em execução. Deseja continuar?',
+        start: 'Iniciar',
+        stop: 'Parar',
+        restart: 'Reiniciar',
         kill: 'Finalizar',
         pause: 'Pausar',
         unpause: 'Retomar',
         rename: 'Renomear',
+        remove: 'Remover',
         removeAll: 'Remover todos',
         containerPrune: 'Limpar',
         containerPruneHelper1: 'Isso excluirá todos os contêineres que estão no estado parado.',
@@ -1075,6 +1079,7 @@ const message = {
     },
     ftp: {
         ftp: 'Conta FTP | Contas FTP',
+        notStart: 'O serviço FTP não está em execução, por favor, inicie-o primeiro!',
         noFtp: `O serviço FTP (pure-ftpd) não foi detectado. Consulte a documentação oficial para instalá-lo.`,
         operation: 'Isso realizará a operação "{0}" no serviço FTP. Deseja continuar?',
         noPasswdMsg: 'Não foi possível obter a senha atual da conta FTP, por favor, defina a senha e tente novamente!',

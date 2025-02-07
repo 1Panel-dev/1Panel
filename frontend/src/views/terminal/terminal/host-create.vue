@@ -119,7 +119,7 @@ interface DialogProps {
 }
 const acceptParams = (props: DialogProps) => {
     hostInfo.addr = '';
-    hostInfo.name = '';
+    hostInfo.name = 'local';
     hostInfo.groupID = 0;
     hostInfo.addr = '';
     hostInfo.port = 22;

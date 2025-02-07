@@ -571,10 +571,14 @@ const message = {
         operatorHelper: '将对以下容器进行 {0} 操作，是否继续？',
         operatorAppHelper:
             '将对以下容器进行 {0} 操作，\n其中部分来源于应用商店，该操作可能会影响到该服务的正常使用。\n是否继续？',
+        start: '启动',
+        stop: '停止',
+        restart: '重启',
         kill: '强制停止',
         pause: '暂停',
         unpause: '恢复',
         rename: '重命名',
+        remove: '删除',
         removeAll: '删除所有',
         containerPrune: '清理容器',
         containerPruneHelper1: '清理容器 将删除所有处于停止状态的容器。',
@@ -1045,6 +1049,7 @@ const message = {
         },
         ftp: {
             ftp: 'FTP 账户',
+            notStart: '当前未开启 FTP 服务，请先开启！',
             noFtp: '未检测到 FTP (pure-ftpd) 服务，请参考官方文档进行安装！',
             operation: '对 FTP 服务进行 [{0}] 操作，是否继续？',
             noPasswdMsg: '无法获取当前 FTP 账号密码，请先设置密码后重试！',

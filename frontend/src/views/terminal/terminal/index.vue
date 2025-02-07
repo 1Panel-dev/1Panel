@@ -215,7 +215,7 @@ const acceptParams = async () => {
             continue;
         }
         for (let i = 0; i < hostTree.value[gIndex].children.length; i++) {
-            if (hostTree.value[gIndex].children[i].label.indexOf('@127.0.0.1:') !== -1) {
+            if (hostTree.value[gIndex].children[i].label.startsWith('local - ')) {
                 localHostID.value = hostTree.value[gIndex].children[i].id;
                 hostTree.value[gIndex].children.splice(i, 1);
                 if (hostTree.value[gIndex].children.length === 0) {

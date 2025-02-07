@@ -595,10 +595,14 @@ const message = {
         operatorHelper: '{0} will be performed on the following container, Do you want to continue?',
         operatorAppHelper:
             'The {0} operation will be performed on the following containers,\n some of which are from the App Store. This operation may affect the normal use of the service. \nDo you want to continue?',
+        start: 'Start',
+        stop: 'Stop',
+        restart: 'Restart',
         kill: 'Kill',
         pause: 'Pause',
         unpause: 'Unpause',
         rename: 'Rename',
+        remove: 'Remove',
         removeAll: 'Remove All',
         containerPrune: 'Prune',
         containerPruneHelper1: 'Cleaning containers will delete all containers that are in a stopped state.',
@@ -1109,6 +1113,7 @@ const message = {
         },
         ftp: {
             ftp: 'FTP Account',
+            notStart: 'FTP service is currently not running, please start it first!',
             noFtp: 'FTP (pure-ftpd) service not detected, please refer to the official documentation for installation!',
             operation: 'Perform [{0}] operation on FTP service, continue?',
             noPasswdMsg: 'Can not get the current FTP account password, please set the password and try again! ',

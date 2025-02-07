@@ -185,13 +185,11 @@ import { changeLauncherStatus, loadAppLauncher, loadAppLauncherOption } from '@/
 import i18n from '@/lang';
 import { GlobalStore } from '@/store';
 import { MsgSuccess } from '@/utils/message';
-import { getLanguage } from '@/utils/util';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { toFolder } from '@/global/business';
 
 const router = useRouter();
-const language = getLanguage();
 const globalStore = GlobalStore();
 
 let loading = ref(false);

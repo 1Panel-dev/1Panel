@@ -61,7 +61,8 @@
                 </el-select>
             </el-form-item>
             <el-form-item :label="$t('commons.table.name')" prop="name">
-                <el-input :disabled="itemName === 'local'" clearable v-model="dialogData.rowData!.name" />
+                <el-tag v-if="itemName === 'local'">local</el-tag>
+                <el-input v-else clearable v-model="dialogData.rowData!.name" />
             </el-form-item>
             <el-form-item :label="$t('commons.table.description')" prop="description">
                 <el-input clearable type="textarea" v-model="dialogData.rowData!.description" />
@@ -107,6 +108,7 @@ const itemName = ref();
 const groupList = ref();
 const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
+    itemName.value = params.rowData.name;
     title.value = i18n.global.t('commons.button.' + dialogData.value.title);
     drawerVisible.value = true;
     loadGroups();

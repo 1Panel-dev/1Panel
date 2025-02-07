@@ -19,8 +19,13 @@
                 <el-select v-model="group" @change="search()" clearable class="p-w-200 mr-2.5">
                     <template #prefix>{{ $t('commons.table.group') }}</template>
                     <el-option :label="$t('commons.table.all')" value=""></el-option>
-                    <div v-for="item in groupList" :key="item.name">
-                        <el-option :value="item.id" :label="item.name" />
+                    <div v-for="item in groupList" :key="item.id">
+                        <el-option
+                            v-if="item.name === 'default'"
+                            :label="$t('commons.table.default')"
+                            :value="item.id"
+                        />
+                        <el-option v-else :label="item.name" :value="item.id" />
                     </div>
                 </el-select>
                 <TableSearch @search="search()" v-model:searchName="info" />
@@ -56,7 +61,23 @@
                         min-width="100"
                         prop="groupBelong"
                         fix
-                    />
+                    >
+                        <template #default="{ row }">
+                            <fu-select-rw-switch v-model="row.groupID" @change="updateGroup(row)">
+                                <template #read>
+                                    {{ row.groupBelong === 'default' ? $t('commons.table.default') : row.groupBelong }}
+                                </template>
+                                <div v-for="item in groupList" :key="item.id">
+                                    <el-option
+                                        v-if="item.name === 'default'"
+                                        :label="$t('commons.table.default')"
+                                        :value="item.id"
+                                    />
+                                    <el-option v-else :label="item.name" :value="item.id" />
+                                </div>
+                            </fu-select-rw-switch>
+                        </template>
+                    </el-table-column>
                     <fu-table-operations width="200px" :buttons="buttons" :label="$t('commons.table.operate')" fix />
                 </ComplexTable>
             </template>
@@ -81,7 +102,12 @@
                 <el-form-item :label="$t('commons.table.group')" prop="name">
                     <el-select filterable v-model="commandInfo.groupID" clearable style="width: 100%">
                         <div v-for="item in groupList" :key="item.id">
-                            <el-option :label="item.name" :value="item.id" />
+                            <el-option
+                                v-if="item.name === 'default'"
+                                :label="$t('commons.table.default')"
+                                :value="item.id"
+                            />
+                            <el-option v-else :label="item.name" :value="item.id" />
                         </div>
                     </el-select>
                 </el-form-item>
@@ -101,14 +127,12 @@
 
         <OpDialog ref="opRef" @search="search" />
         <GroupDialog @search="loadGroups" ref="dialogGroupRef" />
-        <GroupChangeDialog @search="search" @change="onChangeGroup" ref="dialogGroupChangeRef" />
     </div>
 </template>
 
 <script setup lang="ts">
 import { Command } from '@/api/interface/command';
 import GroupDialog from '@/components/group/index.vue';
-import GroupChangeDialog from '@/components/group/change.vue';
 import { addCommand, editCommand, deleteCommand, getCommandPage } from '@/api/modules/command';
 import { reactive, ref } from 'vue';
 import type { ElForm } from 'element-plus';
@@ -131,7 +155,6 @@ const paginationConfig = reactive({
 });
 const info = ref();
 const group = ref<string>('');
-const dialogGroupChangeRef = ref();
 
 const opRef = ref();
 
@@ -203,9 +226,8 @@ const submitAddCommand = (formEl: FormInstance | undefined) => {
     });
 };
 
-const onChangeGroup = async (groupID: number) => {
-    commandInfo.groupID = groupID;
-    await editCommand(commandInfo);
+const updateGroup = async (row: any) => {
+    await editCommand(row);
     search();
     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
 };
@@ -235,16 +257,6 @@ const batchDelete = async (row: Command.CommandInfo | null) => {
 };
 
 const buttons = [
-    {
-        label: i18n.global.t('terminal.groupChange'),
-        click: (row: any) => {
-            commandInfo = row;
-            dialogGroupChangeRef.value!.acceptParams({
-                group: row.groupBelong,
-                groupType: 'command',
-            });
-        },
-    },
     {
         label: i18n.global.t('commons.button.edit'),
         icon: 'Edit',

@@ -2,7 +2,7 @@
     <DrawerPro v-model="open" :header="$t('commons.table.group')" size="large" :back="handleClose">
         <template #content>
             <ComplexTable :data="data" @search="search()">
-                <template #leftToolBar>
+                <template #toolbar>
                     <el-button type="primary" @click="openCreate">{{ $t('website.createGroup') }}</el-button>
                 </template>
                 <el-table-column :label="$t('commons.table.name')" prop="name">

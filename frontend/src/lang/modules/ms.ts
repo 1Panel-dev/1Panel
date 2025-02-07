@@ -593,10 +593,14 @@ const message = {
         operatorHelper: '{0} akan dilakukan pada kontena berikut. Adakah anda mahu meneruskan?',
         operatorAppHelper:
             'Operasi "{0}" akan dilakukan pada kontena berikut dan mungkin mempengaruhi perkhidmatan yang sedang berjalan. Adakah anda mahu meneruskan?',
+        start: 'Mulakan',
+        stop: 'Hentikan',
+        restart: 'Mulakan semula',
         kill: 'Hentikan paksa',
         pause: 'Jeda',
         unpause: 'Sambung semula',
         rename: 'Tukar nama',
+        remove: 'Buang',
         removeAll: 'Buang semua',
         containerPrune: 'Prune',
         containerPruneHelper1: 'Ini akan memadam semua kontena yang berada dalam keadaan dihentikan.',
@@ -1087,6 +1091,7 @@ const message = {
         },
         ftp: {
             ftp: 'Akaun FTP | Akaun FTP',
+            notStart: 'Perkhidmatan FTP tidak berjalan pada masa ini, sila mulakan dahulu!',
             noFtp: 'Perkhidmatan FTP (pure-ftpd) tidak dikesan. Rujuk dokumen rasmi untuk memasang.',
             operation: 'Ini akan melaksanakan operasi "{0}" pada perkhidmatan FTP. Adakah anda mahu meneruskan?',
             noPasswdMsg:

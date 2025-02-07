@@ -576,10 +576,14 @@ const message = {
         operatorHelper: '{0} 작업이 다음 컨테이너에서 수행됩니다. 계속하시겠습니까?',
         operatorAppHelper:
             '"{0}" 작업이 다음 컨테이너에서 수행되며, 실행 중인 서비스에 영향을 미칠 수 있습니다. 계속하시겠습니까?',
+        start: '시작',
+        stop: '중지',
+        restart: '재시작',
         kill: '강제 종료',
         pause: '일시 정지',
         unpause: '재개',
         rename: '이름 변경',
+        remove: '제거',
         removeAll: '모두 제거',
         containerPrune: '정리',
         containerPruneHelper1: '이 작업은 중지된 모든 컨테이너를 삭제합니다.',
@@ -1041,6 +1045,7 @@ const message = {
         },
         ftp: {
             ftp: 'FTP 계정 | FTP 계정들',
+            notStart: 'FTP 서비스가 현재 실행 중이 아닙니다. 먼저 시작하세요!',
             noFtp: `FTP (pure-ftpd) 서비스가 감지되지 않았습니다. 공식 문서를 참조하여 설치하세요.`,
             operation: 'FTP 서비스에서 "{0}" 작업을 수행합니다. 계속하시겠습니까?',
             noPasswdMsg: '현재 FTP 계정의 비밀번호를 가져올 수 없습니다. 비밀번호를 설정한 후 다시 시도하세요!',

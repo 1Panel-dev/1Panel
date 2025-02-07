@@ -16,8 +16,13 @@
                 <el-select v-model="group" @change="search()" clearable class="p-w-200 mr-5">
                     <template #prefix>{{ $t('commons.table.group') }}</template>
                     <el-option :label="$t('commons.table.all')" value=""></el-option>
-                    <div v-for="item in groupList" :key="item.name">
-                        <el-option :value="item.id" :label="item.name" />
+                    <div v-for="item in groupList" :key="item.id">
+                        <el-option
+                            v-if="item.name === 'default'"
+                            :label="$t('commons.table.default')"
+                            :value="item.id"
+                        />
+                        <el-option v-else :label="item.name" :value="item.id" />
                     </div>
                 </el-select>
                 <TableSearch @search="search()" v-model:searchName="info" />
@@ -33,10 +38,26 @@
                     <el-table-column :label="$t('terminal.ip')" prop="addr" fix />
                     <el-table-column :label="$t('commons.login.username')" show-overflow-tooltip prop="user" />
                     <el-table-column :label="$t('commons.table.port')" prop="port" />
-                    <el-table-column :label="$t('commons.table.group')" show-overflow-tooltip prop="groupBelong">
+                    <el-table-column
+                        :label="$t('commons.table.group')"
+                        prop="description"
+                        min-width="80"
+                        show-overflow-tooltip
+                    >
                         <template #default="{ row }">
-                            <span v-if="row.groupBelong === 'default'">{{ $t('commons.table.default') }}</span>
-                            <span v-else>{{ row.groupBelong }}</span>
+                            <fu-select-rw-switch v-model="row.groupID" @change="updateGroup(row)">
+                                <template #read>
+                                    {{ row.groupBelong === 'default' ? $t('commons.table.default') : row.groupBelong }}
+                                </template>
+                                <div v-for="item in groupList" :key="item.id">
+                                    <el-option
+                                        v-if="item.name === 'default'"
+                                        :label="$t('commons.table.default')"
+                                        :value="item.id"
+                                    />
+                                    <el-option v-else :label="item.name" :value="item.id" />
+                                </div>
+                            </fu-select-rw-switch>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.title')" show-overflow-tooltip prop="name" />
@@ -53,13 +74,11 @@
         <OpDialog ref="opRef" @search="search" />
         <OperateDialog @search="search" ref="dialogRef" />
         <GroupDialog @search="search" ref="dialogGroupRef" />
-        <GroupChangeDialog @search="search" @change="onChangeGroup" ref="dialogGroupChangeRef" />
     </div>
 </template>
 
 <script setup lang="ts">
 import GroupDialog from '@/components/group/index.vue';
-import GroupChangeDialog from '@/components/group/change.vue';
 import OperateDialog from '@/views/terminal/host/operate/index.vue';
 import { deleteHost, editHostGroup, searchHosts } from '@/api/modules/terminal';
 import { getGroupList } from '@/api/modules/group';
@@ -80,8 +99,6 @@ const paginationConfig = reactive({
 });
 const info = ref();
 const group = ref<string>('');
-const dialogGroupChangeRef = ref();
-const currentID = ref();
 
 const opRef = ref();
 
@@ -142,24 +159,13 @@ const loadGroups = async () => {
     groupList.value = res.data;
 };
 
-const onChangeGroup = async (groupID: number) => {
-    let param = {
-        id: currentID.value,
-        groupID: groupID,
-    };
-    await editHostGroup(param);
+const updateGroup = async (row: any) => {
+    await editHostGroup({ id: row.id, groupID: row.groupID });
     search();
     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
 };
 
 const buttons = [
-    {
-        label: i18n.global.t('terminal.groupChange'),
-        click: (row: any) => {
-            currentID.value = row.id;
-            dialogGroupChangeRef.value!.acceptParams({ group: row.groupBelong, groupType: 'host' });
-        },
-    },
     {
         label: i18n.global.t('commons.button.edit'),
         click: (row: any) => {

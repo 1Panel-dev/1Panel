@@ -297,3 +297,13 @@ var RemoveLocalBackup = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddMFAInterval = &gormigrate.Migration{
+	ID: "20250207-add-mfa-interval",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Create(&model.Setting{Key: "MFAInterval", Value: "30"}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}

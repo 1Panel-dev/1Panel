@@ -36,8 +36,7 @@ type ApiInterface struct {
 }
 
 type RemoteURL struct {
-	RepoUrl     string `mapstructure:"repo_url"`
-	ResourceUrl string `mapstructure:"resource_url"`
+	RepoUrl string `mapstructure:"repo_url"`
 }
 
 type LogConfig struct {

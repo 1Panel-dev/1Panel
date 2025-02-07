@@ -8,7 +8,7 @@
             </template>
             <template #main>
                 <el-row class="mt-5 mb-5">
-                    <el-col :xs="24" :sm="20" :md="20" :lg="10" :xl="10">
+                    <el-col :xs="22" :sm="20" :md="20" :lg="10" :xl="10" :offset="1">
                         <div v-if="scanStatus !== 'scanned'">
                             <div v-if="scanStatus === 'beforeScan'">
                                 <div v-if="form.lastCleanTime">

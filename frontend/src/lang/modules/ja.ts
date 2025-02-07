@@ -581,10 +581,14 @@ const message = {
         operatorHelper: '{0}は次のコンテナで実行されます、続行しますか？',
         operatorAppHelper:
             '「{0}」操作は次のコンテナで実行され、実行中のサービスに影響を与える可能性があります。続けたいですか？',
+        start: '始める',
+        stop: '停止',
+        restart: '再起動',
         kill: '殺す',
         pause: '一時停止',
         unpause: '再開する',
         rename: '名前を変更します',
+        remove: '取り除く',
         removeAll: 'すべてを削除します',
         containerPrune: 'プルーン',
         containerPruneHelper1: 'これにより、停止状態にあるすべてのコンテナが削除されます。',
@@ -1050,6 +1054,7 @@ const message = {
         },
         ftp: {
             ftp: 'FTPアカウント|FTPアカウント',
+            notStart: 'FTP Serviceは現在実行されていません。最初に開始してください！',
             noFtp: `FTP（Pure-FTPD）サービスは検出されません。インストールする公式ドキュメントを参照してください。`,
             operation: 'これにより、FTPサービスで「{0}」操作が実行されます。続けたいですか？',
             noPasswdMsg: '現在のFTPアカウントパスワードを取得できません。パスワードを設定して再試行してください！',

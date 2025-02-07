@@ -23,15 +23,15 @@
             </el-card>
         </div>
         <div v-if="form.isExist">
-            <LayoutContent v-loading="loading" title="FTP">
+            <LayoutContent v-loading="loading" title="FTP" :class="{ mask: !form.isActive }">
                 <template #leftToolBar>
-                    <el-button type="primary" :disabled="!form.isActive" @click="onOpenDialog('add')">
+                    <el-button type="primary" @click="onOpenDialog('add')">
                         {{ $t('commons.button.add') }} FTP
                     </el-button>
-                    <el-button @click="onSync()" :disabled="!form.isActive">
+                    <el-button @click="onSync()">
                         {{ $t('commons.button.sync') }}
                     </el-button>
-                    <el-button plain :disabled="selects.length === 0 || !form.isActive" @click="onDelete(null)">
+                    <el-button plain :disabled="selects.length === 0" @click="onDelete(null)">
                         {{ $t('commons.button.delete') }}
                     </el-button>
                 </template>
@@ -124,6 +124,10 @@
                     </ComplexTable>
                 </template>
             </LayoutContent>
+
+            <el-card v-if="form.isExist && !form.isActive" class="mask-prompt">
+                <span>{{ $t('toolbox.ftp.notStart') }}</span>
+            </el-card>
         </div>
         <div v-else>
             <LayoutContent title="FTP" :divider="true">
