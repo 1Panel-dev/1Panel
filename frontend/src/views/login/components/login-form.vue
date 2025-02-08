@@ -189,6 +189,7 @@ import { GlobalStore, MenuStore, TabsStore } from '@/store';
 import { MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
 import { getSettingInfo } from '@/api/modules/setting';
+import { encryptPassword } from '@/utils/util';
 
 const i18n = useI18n();
 const themeConfig = computed(() => globalStore.themeConfig);
@@ -313,7 +314,7 @@ const login = (formEl: FormInstance | undefined) => {
         }
         let requestLoginForm = {
             name: loginForm.name,
-            password: loginForm.password,
+            password: encryptPassword(loginForm.password),
             ignoreCaptcha: globalStore.ignoreCaptcha,
             captcha: loginForm.captcha,
             captchaID: captcha.captchaID,
@@ -352,7 +353,6 @@ const login = (formEl: FormInstance | undefined) => {
                     globalStore.ignoreCaptcha = false;
                     errCaptcha.value = false;
                     errAuthInfo.value = true;
-                    console.log('11111');
                 }
             }
             loginVerify();
@@ -368,7 +368,7 @@ const mfaLogin = async (auto: boolean) => {
     if ((!auto && mfaLoginForm.code) || (auto && mfaLoginForm.code.length === 6)) {
         isLoggingIn = true;
         mfaLoginForm.name = loginForm.name;
-        mfaLoginForm.password = loginForm.password;
+        mfaLoginForm.password = encryptPassword(loginForm.password);
         try {
             await mfaLoginApi(mfaLoginForm);
             globalStore.setLogStatus(true);
@@ -464,173 +464,3 @@ onMounted(() => {
     padding: 0 !important;
 }
 </style>
-<!-- <style scoped lang='scss' > .login-form {
-    padding: 0 40px;
-    .hide {
-        width: 0;
-        border: 0;
-        position: absolute;
-        visibility: hidden;
-    }
-
-    .login-title {
-        font-size: 30px;
-        letter-spacing: 0;
-        text-align: center;
-        color: #646a73;
-        margin-bottom: 30px;
-    }
-    .no-border {
-        :deep(.el-input__wrapper) {
-            background: none !important;
-            box-shadow: none !important;
-            border-radius: 0 !important;
-            border-bottom: 1px solid #dcdfe6;
-        }
-    }
-
-    .el-input {
-        height: 44px;
-    }
-
-    .login-captcha {
-        margin-top: 10px;
-
-        :deep(.el-input__wrapper) {
-            background: none !important;
-            box-shadow: none !important;
-            border-radius: 0 !important;
-            border-bottom: 1px solid #dcdfe6;
-        }
-        .el-input {
-            width: 50%;
-            height: 44px;
-        }
-        img {
-            width: 45%;
-            height: 44px;
-            margin-left: 5%;
-        }
-    }
-
-    .login-msg {
-        margin-top: 10px;
-        padding: 0 40px;
-        text-align: center;
-    }
-
-    .login-image {
-        width: 480px;
-        height: 480px;
-        @media only screen and (max-width: 1280px) {
-            height: 380px;
-        }
-    }
-
-    .submit {
-        width: 100%;
-        border-radius: 0;
-    }
-
-    .forget-password {
-        margin-top: 40px;
-        padding: 0 40px;
-        float: right;
-        @media only screen and (max-width: 1280px) {
-            margin-top: 20px;
-        }
-    }
-
-    .login-button {
-        width: 100%;
-        height: 45px;
-        margin-top: 10px;
-        background-color: #005eeb;
-        border-color: #005eeb;
-        color: #ffffff;
-        &:hover {
-            --el-button-hover-border-color: #005eeb;
-        }
-    }
-
-    .demo {
-        text-align: center;
-        span {
-            color: red;
-        }
-    }
-
-    .login-form-header {
-        display: flex;
-        margin-bottom: 30px;
-        justify-content: space-between;
-        align-items: center;
-        .title {
-            color: #646a73;
-            font-size: 25px;
-        }
-    }
-
-    .agree {
-        white-space: pre-wrap;
-        line-height: 14px;
-        color: #005eeb;
-    }
-
-    :deep(a) {
-        color: #005eeb;
-        &:hover {
-            color: #005eeb95;
-        }
-    }
-
-    :deep(.el-checkbox__input .el-checkbox__inner) {
-        background-color: #fff !important;
-        border-color: #fff !important;
-    }
-
-    :deep(.el-checkbox__input.is-checked .el-checkbox__inner) {
-        background-color: #005eeb !important;
-        border-color: #005eeb !important;
-    }
-
-    :deep(.el-checkbox__input.is-checked .el-checkbox__inner::after) {
-        border-color: #fff !important;
-    }
-
-    .agree-helper {
-        min-height: 20px;
-        margin-top: -20px;
-        margin-left: 20px;
-    }
-    :deep(.el-input__inner) {
-        color: #000 !important;
-    }
-}
-
-.cursor-pointer {
-    outline: none;
-}
-.el-dropdown:focus-visible {
-    outline: none;
-}
-.el-tooltip__trigger:focus-visible {
-    outline: none;
-}
-:deep(.el-dropdown-menu__item:not(.is-disabled):hover) {
-    color: #005eeb !important;
-    background-color: #e5eefd !important;
-}
-:deep(.el-dropdown-menu__item:not(.is-disabled):focus) {
-    color: #005eeb !important;
-    background-color: #e5eefd !important;
-}
-
-.login-footer-btn {
-    .el-button--primary {
-        border-color: #005eeb !important;
-        background-color: #005eeb !important;
-    }
-}
-</style>
--->

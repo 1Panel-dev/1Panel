@@ -167,6 +167,7 @@ func Routers() *gin.Engine {
 	PrivateGroup.Use(middleware.WhiteAllow())
 	PrivateGroup.Use(middleware.BindDomain())
 	PrivateGroup.Use(middleware.GlobalLoading())
+	PrivateGroup.Use(middleware.SetPasswordPublicKey())
 	for _, router := range rou.RouterGroupApp {
 		router.InitRouter(PrivateGroup)
 	}

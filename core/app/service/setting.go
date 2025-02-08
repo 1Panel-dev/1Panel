@@ -1,6 +1,8 @@
 package service
 
 import (
+	"crypto/rand"
+	"crypto/rsa"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
@@ -45,6 +47,8 @@ type ISettingService interface {
 	UpdateTerminal(req dto.TerminalInfo) error
 
 	UpdateSystemSSL() error
+
+	GenerateRSAKey() error
 }
 
 func NewISettingService() ISettingService {
@@ -495,5 +499,31 @@ func checkCertValid() error {
 		return err
 	}
 
+	return nil
+}
+
+func (u *SettingService) GenerateRSAKey() error {
+	priKey, _ := settingRepo.Get(repo.WithByKey("PASSWORD_PRIVATE_KEY"))
+	pubKey, _ := settingRepo.Get(repo.WithByKey("PASSWORD_PUBLIC_KEY"))
+	if priKey.Value != "" && pubKey.Value != "" {
+		return nil
+	}
+	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
+	if err != nil {
+		return err
+	}
+	privateKeyPEM := encrypt.ExportPrivateKeyToPEM(privateKey)
+	publicKeyPEM, err := encrypt.ExportPublicKeyToPEM(&privateKey.PublicKey)
+	if err != nil {
+		return err
+	}
+	err = settingRepo.UpdateOrCreate("PASSWORD_PRIVATE_KEY", privateKeyPEM)
+	if err != nil {
+		return err
+	}
+	err = settingRepo.UpdateOrCreate("PASSWORD_PUBLIC_KEY", publicKeyPEM)
+	if err != nil {
+		return err
+	}
 	return nil
 }

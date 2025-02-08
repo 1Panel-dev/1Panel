@@ -20,8 +20,8 @@
         "prettier": "prettier --write ."
     },
     "dependencies": {
-        "@codemirror/lang-json": "^6.0.1",
         "@codemirror/lang-html": "^6.4.9",
+        "@codemirror/lang-json": "^6.0.1",
         "@codemirror/lang-php": "^6.0.1",
         "@codemirror/language": "^6.10.2",
         "@codemirror/legacy-modes": "^6.4.0",
@@ -35,11 +35,13 @@
         "@xterm/xterm": "^5.5.0",
         "axios": "^1.7.2",
         "codemirror": "^6.0.1",
+        "crypto-js": "^4.2.0",
         "echarts": "^5.5.0",
         "element-plus": "^2.7.5",
         "fit2cloud-ui-plus": "^1.2.0",
         "highlight.js": "^11.9.0",
         "js-base64": "^3.7.7",
+        "jsencrypt": "^3.3.2",
         "md-editor-v3": "^2.11.3",
         "monaco-editor": "^0.50.0",
         "nprogress": "^0.2.0",

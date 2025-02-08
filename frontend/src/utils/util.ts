@@ -4,6 +4,8 @@ import useClipboard from 'vue-clipboard3';
 const { toClipboard } = useClipboard();
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { v4 as uuidv4 } from 'uuid';
+import JSEncrypt from 'jsencrypt';
+import CryptoJS from 'crypto-js';
 
 export function deepCopy<T>(obj: any): T {
     let newObj: any;
@@ -695,3 +697,61 @@ export function getRuntimeLabel(type: string) {
     }
     return '';
 }
+
+function getCookie(name: string) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+}
+
+function rsaEncrypt(data: string, publicKey: string) {
+    if (!data) {
+        return data;
+    }
+    const jsEncrypt = new JSEncrypt();
+    jsEncrypt.setPublicKey(publicKey);
+    return jsEncrypt.encrypt(data);
+}
+
+function aesEncrypt(data: string, key: string) {
+    const keyBytes = CryptoJS.enc.Utf8.parse(key);
+    const iv = CryptoJS.lib.WordArray.random(16);
+    const encrypted = CryptoJS.AES.encrypt(data, keyBytes, {
+        iv: iv,
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7,
+    });
+    return iv.toString(CryptoJS.enc.Base64) + ':' + encrypted.toString();
+}
+
+function urlDecode(value: string): string {
+    return decodeURIComponent(value.replace(/\+/g, ' '));
+}
+
+function generateAESKey(): string {
+    const keyLength = 16;
+    const randomBytes = new Uint8Array(keyLength);
+    crypto.getRandomValues(randomBytes);
+    return Array.from(randomBytes)
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join('');
+}
+
+export const encryptPassword = (password: string) => {
+    if (!password) {
+        return '';
+    }
+    let rsaPublicKeyText = getCookie('panel_public_key');
+    if (!rsaPublicKeyText) {
+        console.log('RSA public key not found');
+        return password;
+    }
+    rsaPublicKeyText = urlDecode(rsaPublicKeyText);
+
+    const aesKey = generateAESKey();
+    rsaPublicKeyText = rsaPublicKeyText.replaceAll('"', '');
+    const rsaPublicKey = atob(rsaPublicKeyText);
+    const keyCipher = rsaEncrypt(aesKey, rsaPublicKey);
+    const passwordCipher = aesEncrypt(password, aesKey);
+    return `${keyCipher}:${passwordCipher}`;
+};

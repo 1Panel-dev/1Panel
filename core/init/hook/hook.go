@@ -1,6 +1,7 @@
 package hook
 
 import (
+	"github.com/1Panel-dev/1Panel/core/app/service"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/core/app/repo"
@@ -29,6 +30,8 @@ func Init() {
 	}
 
 	handleUserInfo(global.CONF.Base.ChangeUserInfo, settingRepo)
+
+	generateKey()
 }
 
 func handleUserInfo(tags string, settingRepo repo.ISettingRepo) {
@@ -67,4 +70,10 @@ func handleUserInfo(tags string, settingRepo repo.ISettingRepo) {
 
 	sudo := cmd.SudoHandleCmd()
 	_, _ = cmd.Execf("%s sed -i '/CHANGE_USER_INFO=%v/d' /usr/local/bin/1pctl", sudo, global.CONF.Base.ChangeUserInfo)
+}
+
+func generateKey() {
+	if err := service.NewISettingService().GenerateRSAKey(); err != nil {
+		global.LOG.Errorf("generate rsa key error : %s", err.Error())
+	}
 }
