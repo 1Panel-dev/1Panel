@@ -2526,6 +2526,21 @@ const message = {
             manage: 'Pengurusan',
         },
     },
+    customApp: {
+        name: 'Repositori Aplikasi Khusus',
+        appStoreType: 'Sumber Pakej App Store',
+        appStoreUrl: 'URL Repositori',
+        local: 'Laluan Tempatan',
+        remote: 'Pautan Jauh',
+        imagePrefix: 'Awalan Imej',
+        imagePrefixHelper:
+            'Fungsi: Sesuaikan awalan imej dan ubah medan imej dalam fail compose. Contohnya, apabila awalan imej ditetapkan kepada 1panel/custom, medan imej untuk MaxKB akan bertukar kepada 1panel/custom/maxkb:v1.10.0',
+        closeHelper: 'Batalkan penggunaan repositori aplikasi khusus',
+        appStoreUrlHelper: 'Hanya format .tar.gz disokong',
+        postNode: 'Segerakkan ke sub-node',
+        postNodeHelper: 'Sub-node akan mewarisi dan menggunakan konfigurasi di atas secara lalai',
+        nodes: 'Pilih Node',
+    },
     alert: {
         isAlert: 'Amaran',
         alertCount: 'Bilangan Amaran',

@@ -2468,6 +2468,21 @@ const message = {
             manage: '管理',
         },
     },
+    customApp: {
+        name: 'カスタムアプリリポジトリ',
+        appStoreType: 'アプリストアパッケージソース',
+        appStoreUrl: 'リポジトリURL',
+        local: 'ローカルパス',
+        remote: 'リモートリンク',
+        imagePrefix: 'イメージプレフィックス',
+        imagePrefixHelper:
+            '機能: イメージプレフィックスをカスタマイズし、composeファイル内のイメージフィールドを変更します。例えば、イメージプレフィックスを1panel/customに設定した場合、MaxKBのイメージフィールドは1panel/custom/maxkb:v1.10.0に変更されます',
+        closeHelper: 'カスタムアプリリポジトリの使用をキャンセルしますか',
+        appStoreUrlHelper: '.tar.gz形式のみサポートされます',
+        postNode: 'サブノードへ同期',
+        postNodeHelper: 'サブノードはデフォルトで上記の設定を継承して使用します',
+        nodes: 'ノードを選択',
+    },
     alert: {
         isAlert: 'アラート',
         alertCount: 'アラート数',

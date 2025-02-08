@@ -2427,6 +2427,21 @@ const message = {
             manage: '관리',
         },
     },
+    customApp: {
+        name: '사용자 정의 앱 저장소',
+        appStoreType: '앱 스토어 패키지 소스',
+        appStoreUrl: '저장소 URL',
+        local: '로컬 경로',
+        remote: '원격 링크',
+        imagePrefix: '이미지 접두사',
+        imagePrefixHelper:
+            '기능: 이미지 접두사를 사용자 정의하고 compose 파일의 이미지 필드를 수정합니다. 예를 들어 이미지 접두사를 1panel/custom으로 설정하면 MaxKB의 이미지 필드는 1panel/custom/maxkb:v1.10.0으로 변경됩니다',
+        closeHelper: '사용자 정의 앱 저장소 사용 취소',
+        appStoreUrlHelper: '.tar.gz 형식만 지원합니다',
+        postNode: '서브 노드로 동기화',
+        postNodeHelper: '서브 노드는 기본적으로 위 설정을 상속하고 사용합니다',
+        nodes: '노드 선택',
+    },
     alert: {
         isAlert: '알림',
         alertCount: '알림 횟수',

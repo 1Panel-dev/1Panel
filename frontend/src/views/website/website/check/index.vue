@@ -8,7 +8,7 @@
                     <el-table-column prop="name" :label="$t('app.installName')" />
                     <el-table-column prop="appName" :label="$t('app.appName')" />
                     <el-table-column prop="version" :label="$t('app.version')" />
-                    <el-table-column prop="status" :label="$t(commons.table.status)" />
+                    <el-table-column prop="status" :label="$t('commons.table.status')" />
                 </el-table>
             </el-col>
         </el-row>

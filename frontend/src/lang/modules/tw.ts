@@ -1134,6 +1134,21 @@ const message = {
         taskName: '任務名稱',
         taskRunning: '運行中',
     },
+    customApp: {
+        name: '自訂應用倉庫',
+        appStoreType: '應用商店包來源',
+        appStoreUrl: '倉庫地址',
+        local: '本機路徑',
+        remote: '遠端連結',
+        imagePrefix: '映像前綴',
+        imagePrefixHelper:
+            '作用：自訂映像前綴，修改 compose 檔案中的映像欄位，例如：當映像前綴設定為 1panel/custom 時，MaxKB 的映像欄位將變更為 1panel/custom/maxkb:v1.10.0',
+        closeHelper: '是否取消使用自訂應用倉庫',
+        appStoreUrlHelper: '僅支援 .tar.gz 格式',
+        postNode: '同步至子節點',
+        postNodeHelper: '子節點預設繼承並使用上述配置',
+        nodes: '節點',
+    },
     alert: {
         isAlert: '是否告警',
         alertCount: '告警次數',

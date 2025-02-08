@@ -74,7 +74,7 @@
                                 <span v-if="row.remoteaddr.port > 0">:{{ row.remoteaddr.port }}</span>
                             </template>
                         </el-table-column>
-                        <el-table-column prop="status" :label="$t(commons.table.status)" />
+                        <el-table-column prop="status" :label="$t('commons.table.status')" />
                     </el-table>
                 </el-tab-pane>
             </el-tabs>

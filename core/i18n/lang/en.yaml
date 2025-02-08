@@ -1,33 +1,45 @@
-ErrInvalidParams: "Request parameter error: {{ .detail }}"
+ErrInvalidParams: "Invalid request parameters: {{ .detail }}"
 ErrTokenParse: "Token generation error: {{ .detail }}"
-ErrInitialPassword: "Original password is incorrect"
+ErrInitialPassword: "Incorrect initial password"
 ErrInternalServer: "Internal server error: {{ .detail }}"
 ErrRecordExist: "Record already exists"
 ErrRecordNotFound: "Record not found"
 ErrStructTransform: "Type conversion failed: {{ .detail }}"
 ErrNotLogin: "User not logged in: {{ .detail }}"
 ErrPasswordExpired: "Current password has expired: {{ .detail }}"
-ErrNotSupportType: "System does not support current type: {{ .detail }}"
-ErrProxy: "Request error, please check node status: {{ .detail }}"
-ErrApiConfigStatusInvalid: "API access forbidden: {{ .detail }}"
+ErrNotSupportType: "The current type is not supported: {{ .detail }}"
+ErrProxy: "Request error, please check the status of this node: {{ .detail }}"
+ErrApiConfigStatusInvalid: "API access is prohibited: {{ .detail }}"
 ErrApiConfigKeyInvalid: "API key error: {{ .detail }}"
-ErrApiConfigIPInvalid: "API IP not in whitelist: {{ .detail }}"
-ErrApiConfigDisable: "API call is disabled for this endpoint: {{ .detail }}"
+ErrApiConfigIPInvalid: "The API request IP is not on the whitelist: {{ .detail }}"
+ErrApiConfigDisable: "This interface prohibits API calls: {{ .detail }}"
 ErrApiConfigKeyTimeInvalid: "API timestamp error: {{ .detail }}"
 
-#common
-ErrDemoEnvironment: "Demo server, operation forbidden!"
-ErrCmdTimeout: "Command execution timeout!"
-ErrEntrance: "Security entrance error, please check and retry!"
-ErrGroupIsDefault: 'Default group, cannot be deleted'
-ErrLocalDelete: "Cannot delete local node!"
+# request
+ErrNoSuchHost: "Unable to find the requested server {{ .err }}"
+ErrHttpReqNotFound: "Unable to find the requested resource {{ .err }}"
+ErrHttpReqFailed: "Request failed {{ .err }}"
+ErrHttpReqTimeOut: "Request timed out {{ .err }}"
+ErrCreateHttpClient: "Failed to create request {{ .err }}"
 
-#backup
-ErrBackupInUsed: "Backup account is in use by a scheduled task, cannot delete"
-ErrBackupCheck: "Backup account connection test failed {{ .err}}"
-ErrBackupLocal: "Local backup account does not support this operation!"
-ErrBackupPublic: "Non-public backup account detected, please check and retry!"
-ErrOSSConn: "Cannot retrieve latest version, please check if the server can connect to external network."
+# common
+ErrDemoEnvironment: "Demo server, this operation is prohibited!"
+ErrCmdTimeout: "Command execution timeout!"
+ErrEntrance: "Security entrance information error, please check and try again!"
+ErrGroupIsDefault: "Default group, unable to delete"
+ErrLocalDelete: "Cannot delete the local node!"
+ErrPortInUsed: "The {{ .name }} port is already in use!"
+
+# app
+CustomAppStoreFileValid: "Application store package requires .tar.gz format"
+ErrFileNotFound: "{{ .name }} file does not exist"
+
+# backup
+ErrBackupInUsed: "This backup account is used in scheduled tasks and cannot be deleted"
+ErrBackupCheck: "Backup account connection test failed {{ .err }}"
+ErrBackupLocal: "Local server backup account does not support this operation!"
+ErrBackupPublic: "Detected that this backup account is not public, please check and try again!"
+ErrOSSConn: "Unable to get the latest version, please check the server's external network connectivity."
 
 #license
 ErrLicense: "License format error, please check and retry!"
@@ -47,37 +59,31 @@ ErrNoSuchNode: "Node information not found, please check and retry!"
 ErrNodeUnbind: "This node is not within the license binding range, please check and retry!"
 ErrNodeBind: "This node is already bound to a license, please check and retry!"
 
-#task
-TaskStart: "{{.name}} task started [START]"
-TaskEnd: "{{.name}} task completed [COMPLETED]"
-TaskFailed: "{{.name}} task failed"
-TaskTimeout: "{{.name}} timeout"
-TaskSuccess: "{{.name}} task successful"
-TaskRetry: "Starting retry {{.name}}"
-SubTaskSuccess: "{{ .name }} successful"
+# alert
+ErrAlertSync: "Alert information sync error, please check and retry!"
+
+# task
+TaskStart: "{{ .name }} task started [START]"
+TaskEnd: "{{ .name }} task ended [COMPLETED]"
+TaskFailed: "{{ .name }} task failed"
+TaskTimeout: "{{ .name }} timed out"
+TaskSuccess: "{{ .name }} task succeeded"
+TaskRetry: "Starting retry {{ .name }}"
+SubTaskSuccess: "{{ .name }} succeeded"
 SubTaskFailed: "{{ .name }} failed: {{ .err }}"
 TaskInstall: "Install"
-TaskUninstall: "Uninstall"
-TaskCreate: "Create"
-TaskDelete: "Delete"
 TaskUpgrade: "Upgrade"
-TaskUpdate: "Update"
-TaskRestart: "Restart"
-TaskRollback: "Rollback"
-SuccessStatus: "{{ .name }} successful"
+SuccessStatus: "{{ .name }} succeeded"
 FailedStatus: "{{ .name }} failed {{.err}}"
-PullImage: "Pull image"
 Start: "Start"
-Run: "Run"
-Stop: "Stop"
 SubTask: "Subtask"
 
 #upgrade node
-NodeUpgrade: "Upgrade node {name}"
-NewSSHClient: "Initialize SSH connection"
+NodeUpgrade: "Upgrade node {{ .name }}"
+NewSSHClient: "Initializing SSH connection"
 BackupBeforeUpgrade: "Backup data before upgrade"
 UploadUpgradeFile: "Distribute upgrade files"
-RestartAfterUpgrade: "Start services after upgrade"
+RestartAfterUpgrade: "Start service after upgrade"
 
 #add node
 TaskAddNode: "Add node"

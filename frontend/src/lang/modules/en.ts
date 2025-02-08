@@ -2647,6 +2647,21 @@ const message = {
             manage: 'Management',
         },
     },
+    customApp: {
+        name: 'Custom App Repository',
+        appStoreType: 'App Store Package Source',
+        appStoreUrl: 'Repository URL',
+        local: 'Local Path',
+        remote: 'Remote Link',
+        imagePrefix: 'Image Prefix',
+        imagePrefixHelper:
+            'Function: Customize the image prefix and modify the image field in the compose file. For example, when the image prefix is set to 1panel/custom, the image field for MaxKB will change to 1panel/custom/maxkb:v1.10.0',
+        closeHelper: 'Cancel using custom app repository',
+        appStoreUrlHelper: 'Only .tar.gz format is supported',
+        postNode: 'Sync to sub-node',
+        postNodeHelper: 'Sub-nodes will inherit and use the above configuration by default',
+        nodes: 'Nodes',
+    },
     alert: {
         isAlert: 'Alert',
         alertCount: 'Alert Count',

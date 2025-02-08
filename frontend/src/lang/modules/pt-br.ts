@@ -2525,6 +2525,21 @@ const message = {
             manage: 'Gerenciamento',
         },
     },
+    customApp: {
+        name: 'Repositório de Aplicativos Personalizados',
+        appStoreType: 'Fonte do Pacote da App Store',
+        appStoreUrl: 'URL do Repositório',
+        local: 'Caminho Local',
+        remote: 'Link Remoto',
+        imagePrefix: 'Prefixo de Imagem',
+        imagePrefixHelper:
+            'Função: Personalize o prefixo da imagem e modifique o campo de imagem no arquivo compose. Por exemplo, quando o prefixo da imagem é configurado como 1panel/custom, o campo de imagem do MaxKB mudará para 1panel/custom/maxkb:v1.10.0',
+        closeHelper: 'Cancelar o uso do repositório de aplicativos personalizados',
+        appStoreUrlHelper: 'Apenas formato .tar.gz é suportado',
+        postNode: 'Sincronizar para subnó',
+        postNodeHelper: 'Subnós herdarão e usarão a configuração acima por padrão',
+        nodes: 'Selecionar Nós',
+    },
     alert: {
         isAlert: 'Alerta',
         alertCount: 'Contagem de Alertas',

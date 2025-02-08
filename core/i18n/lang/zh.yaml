@@ -32,6 +32,7 @@ ErrPortInUsed: "{{ .name }} 端口已被占用！"
 
 #app 
 CustomAppStoreFileValid: "应用商店包需要 .tar.gz 格式"
+ErrFileNotFound: '{{.name}} 文件不存在'
 
 #backup
 ErrBackupInUsed: "该备份账号已在计划任务中使用，无法删除"
