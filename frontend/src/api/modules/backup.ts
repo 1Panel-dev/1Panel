@@ -46,12 +46,11 @@ export const getFilesFromBackup = (id: number) => {
 };
 
 // backup-core
-export const refreshToken = (params: { id: number; isPublic: boolean }) => {
-    let urlItem = '/core/backups/refresh/token';
-    if (!params.isPublic || !globalStore.isProductPro) {
-        urlItem = '/backups/refresh/token';
+export const refreshToken = (params: { id: number; name: string; isPublic: boolean }) => {
+    if (!params.isPublic) {
+        return http.post('/backups/refresh/token', { id: params.id });
     }
-    return http.post(urlItem, { id: params.id });
+    return http.post('/core/backups/refresh/token', { name: params.name });
 };
 export const getClientInfo = (clientType: string) => {
     return http.get<Backup.ClientInfo>(`/core/backups/client/${clientType}`);
@@ -65,7 +64,7 @@ export const addBackup = (params: Backup.BackupOperate) => {
         request.credential = Base64.encode(request.credential);
     }
     let urlItem = '/core/backups';
-    if (!params.isPublic || !globalStore.isProductPro) {
+    if (!params.isPublic) {
         urlItem = '/backups';
     }
     return http.post<Backup.BackupOperate>(urlItem, request, TimeoutEnum.T_60S);
@@ -79,17 +78,16 @@ export const editBackup = (params: Backup.BackupOperate) => {
         request.credential = Base64.encode(request.credential);
     }
     let urlItem = '/core/backups/update';
-    if (!params.isPublic || !globalStore.isProductPro) {
+    if (!params.isPublic) {
         urlItem = '/backups/update';
     }
     return http.post(urlItem, request);
 };
-export const deleteBackup = (params: { id: number; isPublic: boolean }) => {
-    let urlItem = '/core/backups/del';
-    if (!params.isPublic || !globalStore.isProductPro) {
-        urlItem = '/backups/del';
+export const deleteBackup = (params: { id: number; name: string; isPublic: boolean }) => {
+    if (!params.isPublic) {
+        return http.post('/backups/del', { id: params.id });
     }
-    return http.post(urlItem, { id: params.id });
+    return http.post('/core/backups/del', { name: params.name });
 };
 export const listBucket = (params: Backup.ForBucket) => {
     let request = deepCopy(params) as Backup.BackupOperate;

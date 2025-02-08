@@ -11,13 +11,13 @@ import (
 )
 
 func (b *BaseApi) CheckBackupUsed(c *gin.Context) {
-	id, err := helper.GetIntParamByKey(c, "id")
+	name, err := helper.GetStrParamByKey(c, "name")
 	if err != nil {
 		helper.BadRequest(c, err)
 		return
 	}
 
-	if err := backupService.CheckUsed(id); err != nil {
+	if err := backupService.CheckUsed(name); err != nil {
 		helper.BadRequest(c, err)
 		return
 	}

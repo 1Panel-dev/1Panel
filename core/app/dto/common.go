@@ -35,6 +35,10 @@ type OperateByType struct {
 	Type string `json:"type"`
 }
 
+type OperateByName struct {
+	Name string `json:"name"`
+}
+
 type OperateByID struct {
 	ID uint `json:"id"`
 }

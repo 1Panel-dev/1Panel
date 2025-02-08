@@ -17,6 +17,7 @@ type IBackupRepo interface {
 	Create(backup *model.BackupAccount) error
 	Save(backup *model.BackupAccount) error
 	Delete(opts ...DBOption) error
+	WithByPublic(isPublic bool) DBOption
 
 	ListRecord(opts ...DBOption) ([]model.BackupRecord, error)
 	PageRecord(page, size int, opts ...DBOption) (int64, []model.BackupRecord, error)
@@ -33,6 +34,12 @@ type IBackupRepo interface {
 
 func NewIBackupRepo() IBackupRepo {
 	return &BackupRepo{}
+}
+
+func (u *BackupRepo) WithByPublic(isPublic bool) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("is_public = ?", isPublic)
+	}
 }
 
 func (u *BackupRepo) Get(opts ...DBOption) (model.BackupAccount, error) {

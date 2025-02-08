@@ -167,13 +167,13 @@ const loadEndpoint = (row: any) => {
 const onDelete = async (row: Backup.BackupInfo) => {
     opRef.value.acceptParams({
         title: i18n.global.t('commons.button.delete'),
-        names: [row.type],
+        names: ['[ ' + row.type + ' ] ' + row.name],
         msg: i18n.global.t('commons.msg.operatorHelper', [
             i18n.global.t('setting.backupAccount'),
             i18n.global.t('commons.button.delete'),
         ]),
         api: deleteBackup,
-        params: { id: row.id, isPublic: row.isPublic },
+        params: { id: row.id, name: row.name, isPublic: row.isPublic },
     });
 };
 
@@ -193,7 +193,7 @@ const onOpenDialog = async (
 };
 
 const refreshItemToken = async (row: any) => {
-    await refreshToken({ id: row.id, isPublic: row.isPublic });
+    await refreshToken({ id: row.id, name: row.name, isPublic: row.isPublic });
     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     search();
 };

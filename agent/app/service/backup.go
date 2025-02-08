@@ -28,7 +28,7 @@ import (
 type BackupService struct{}
 
 type IBackupService interface {
-	CheckUsed(id uint) error
+	CheckUsed(name string) error
 	Sync(req dto.SyncFromMaster) error
 
 	LoadBackupOptions() ([]dto.BackupOption, error)
@@ -103,8 +103,8 @@ func (u *BackupService) SearchWithPage(req dto.SearchPageWithType) (int64, inter
 				item.Vars = string(itemVars)
 			}
 		} else {
-			item.AccessKey = base64.StdEncoding.EncodeToString([]byte(item.AccessKey))
-			item.Credential = base64.StdEncoding.EncodeToString([]byte(item.Credential))
+			item.AccessKey, _ = encrypt.StringDecryptWithBase64(item.AccessKey)
+			item.Credential, _ = encrypt.StringDecryptWithBase64(item.Credential)
 		}
 
 		if account.Type == constant.OneDrive || account.Type == constant.ALIYUN || account.Type == constant.GoogleDrive {
@@ -394,15 +394,19 @@ func (u *BackupService) LoadBackupOptions() ([]dto.BackupOption, error) {
 	return data, nil
 }
 
-func (u *BackupService) CheckUsed(id uint) error {
+func (u *BackupService) CheckUsed(name string) error {
+	account, _ := backupRepo.Get(repo.WithByName(name), backupRepo.WithByPublic(true))
+	if account.ID == 0 {
+		return nil
+	}
 	cronjobs, _ := cronjobRepo.List()
 	for _, job := range cronjobs {
-		if job.DownloadAccountID == id {
+		if job.DownloadAccountID == account.ID {
 			return buserr.New("ErrBackupInUsed")
 		}
 		ids := strings.Split(job.SourceAccountIDs, ",")
 		for _, idItem := range ids {
-			if idItem == fmt.Sprintf("%v", id) {
+			if idItem == fmt.Sprintf("%v", account.ID) {
 				return buserr.New("ErrBackupInUsed")
 			}
 		}

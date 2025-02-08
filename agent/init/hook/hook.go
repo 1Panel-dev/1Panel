@@ -1,6 +1,7 @@
 package hook
 
 import (
+	"os"
 	"path"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -102,4 +103,10 @@ func loadLocalDir() {
 		return
 	}
 	global.Dir.LocalBackupDir = account.BackupPath
+
+	if _, err := os.Stat(account.BackupPath); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(account.BackupPath, os.ModePerm); err != nil {
+			global.LOG.Errorf("mkdir %s failed, err: %v", account.BackupPath, err)
+		}
+	}
 }

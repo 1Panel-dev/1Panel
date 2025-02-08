@@ -33,13 +33,13 @@ func (b *BaseApi) CreateBackup(c *gin.Context) {
 // @Tags Backup Account
 // @Summary Refresh token
 // @Accept json
-// @Param request body dto.BackupOperate true "request"
+// @Param request body dto.OperateByName true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /core/backups/refresh/token [post]
 func (b *BaseApi) RefreshToken(c *gin.Context) {
-	var req dto.OperateByID
+	var req dto.OperateByName
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
@@ -96,19 +96,19 @@ func (b *BaseApi) LoadBackupClientInfo(c *gin.Context) {
 // @Tags Backup Account
 // @Summary Delete backup account
 // @Accept json
-// @Param request body dto.OperateByID true "request"
+// @Param request body dto.OperateByName true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /core/backups/del [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"backup_accounts","output_column":"type","output_value":"types"}],"formatZH":"删除备份账号 [types]","formatEN":"delete backup account [types]"}
+// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"删除备份账号 [name]","formatEN":"delete backup account [name]"}
 func (b *BaseApi) DeleteBackup(c *gin.Context) {
-	var req dto.OperateByID
+	var req dto.OperateByName
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 
-	if err := backupService.Delete(req.ID); err != nil {
+	if err := backupService.Delete(req.Name); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}

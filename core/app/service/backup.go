@@ -33,8 +33,8 @@ type IBackupService interface {
 	Create(backupDto dto.BackupOperate) error
 	GetBuckets(backupDto dto.ForBuckets) ([]interface{}, error)
 	Update(req dto.BackupOperate) error
-	Delete(id uint) error
-	RefreshToken(req dto.OperateByID) error
+	Delete(name string) error
+	RefreshToken(req dto.OperateByName) error
 }
 
 func NewIBackupService() IBackupService {
@@ -156,8 +156,8 @@ func (u *BackupService) GetBuckets(req dto.ForBuckets) ([]interface{}, error) {
 	return client.ListBuckets()
 }
 
-func (u *BackupService) Delete(id uint) error {
-	backup, _ := backupRepo.Get(repo.WithByID(id))
+func (u *BackupService) Delete(name string) error {
+	backup, _ := backupRepo.Get(repo.WithByName(name))
 	if backup.ID == 0 {
 		return buserr.New("ErrRecordNotFound")
 	}
@@ -167,21 +167,21 @@ func (u *BackupService) Delete(id uint) error {
 	if backup.Type == constant.Local {
 		return buserr.New("ErrBackupLocal")
 	}
-	if _, err := req_helper.NewLocalClient(fmt.Sprintf("/api/v2/backups/check/%v", id), http.MethodGet, nil); err != nil {
+	if _, err := req_helper.NewLocalClient(fmt.Sprintf("/api/v2/backups/check/%s", name), http.MethodGet, nil); err != nil {
 		global.LOG.Errorf("check used of local cronjob failed, err: %v", err)
 		return buserr.New("ErrBackupInUsed")
 	}
-	if err := xpack.CheckBackupUsed(id); err != nil {
+	if err := xpack.CheckBackupUsed(name); err != nil {
 		global.LOG.Errorf("check used of node cronjob failed, err: %v", err)
 		return buserr.New("ErrBackupInUsed")
 	}
 
 	go syncAccountToAgent(backup, "delete")
-	return backupRepo.Delete(repo.WithByID(id))
+	return backupRepo.Delete(repo.WithByName(name))
 }
 
 func (u *BackupService) Update(req dto.BackupOperate) error {
-	backup, _ := backupRepo.Get(repo.WithByID(req.ID))
+	backup, _ := backupRepo.Get(repo.WithByName(req.Name))
 	if backup.ID == 0 {
 		return buserr.New("ErrRecordNotFound")
 	}
@@ -198,6 +198,7 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 	if err := copier.Copy(&newBackup, &req); err != nil {
 		return buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 	}
+	newBackup.ID = backup.ID
 	itemAccessKey, err := base64.StdEncoding.DecodeString(newBackup.AccessKey)
 	if err != nil {
 		return err
@@ -235,8 +236,8 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 	return nil
 }
 
-func (u *BackupService) RefreshToken(req dto.OperateByID) error {
-	backup, _ := backupRepo.Get(repo.WithByID(req.ID))
+func (u *BackupService) RefreshToken(req dto.OperateByName) error {
+	backup, _ := backupRepo.Get(repo.WithByName(req.Name))
 	if backup.ID == 0 {
 		return buserr.New("ErrRecordNotFound")
 	}

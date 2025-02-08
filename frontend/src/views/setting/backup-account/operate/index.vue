@@ -11,13 +11,16 @@
                 prop="isPublic"
                 :rules="Rules.requiredSelect"
             >
-                <el-radio-group v-model="dialogData.rowData!.isPublic">
+                <el-tag v-if="dialogData.title === 'edit'">
+                    {{ dialogData.rowData!.isPublic ? $t('setting.public') : $t('setting.private') }}
+                </el-tag>
+                <el-radio-group v-else v-model="dialogData.rowData!.isPublic">
                     <el-radio :value="true" size="large">{{ $t('setting.public') }}</el-radio>
                     <el-radio :value="false" size="large">{{ $t('setting.private') }}</el-radio>
-                    <span class="input-help">
-                        {{ dialogData.rowData!.isPublic ? $t('setting.publicHelper') : $t('setting.privateHelper') }}
-                    </span>
                 </el-radio-group>
+                <span class="input-help">
+                    {{ dialogData.rowData!.isPublic ? $t('setting.publicHelper') : $t('setting.privateHelper') }}
+                </span>
             </el-form-item>
             <el-form-item :label="$t('commons.table.type')" prop="type" :rules="Rules.requiredSelect">
                 <el-tag v-if="dialogData.title === 'edit'">{{ $t('setting.' + dialogData.rowData!.type) }}</el-tag>
@@ -440,6 +443,9 @@ const dialogData = ref<DialogProps>({
 });
 const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
+    dialogData.value.rowData.varsJson = dialogData.value.rowData!.vars
+        ? JSON.parse(dialogData.value.rowData!.vars)
+        : {};
     title.value = i18n.global.t('commons.button.' + dialogData.value.title);
     if (dialogData.value.title === 'create') {
         dialogData.value.rowData!.type = 'OSS';
