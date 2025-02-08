@@ -28,7 +28,7 @@ func TestGenerateSwaggerDoc(t *testing.T) {
 		fmt.Printf("generate swagger doc of agent failed, std1: %v, err: %v", string(std1), err)
 		return
 	}
-	cmd2 := exec.Command(swagBin, "init", "-o", workDir+"/cmd/server/docs/docs_core", "-d", workDir+"/core", "-g", "../cmd/server/main.go")
+	cmd2 := exec.Command(swagBin, "init", "-o", workDir+"/cmd/server/docs/docs_core", "-d", workDir+"/core", "-g", "./cmd/server/main.go")
 	cmd2.Dir = workDir
 	std2, err := cmd2.CombinedOutput()
 	if err != nil {
@@ -106,7 +106,7 @@ func TestGenerateSwaggerDoc(t *testing.T) {
 		return
 	}
 	docTemplate := strings.ReplaceAll(loadDefaultDocs(), "const docTemplate = \"aa\"", fmt.Sprintf("const docTemplate = `%s`", string(newJson)))
-	if err := os.WriteFile(workDir+"/cmd/server/docs/docs.go", []byte(docTemplate), 0640); err != nil {
+	if err := os.WriteFile(workDir+"/core/cmd/server/docs/docs.go", []byte(docTemplate), 0640); err != nil {
 		fmt.Printf("write new docs.go failed, err: %v", err)
 		return
 	}

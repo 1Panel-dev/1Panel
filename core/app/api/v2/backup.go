@@ -75,7 +75,7 @@ func (b *BaseApi) ListBuckets(c *gin.Context) {
 // @Tags Backup Account
 // @Summary Load backup account base info
 // @Accept json
-// @Success 200 {object} dto.OneDriveInfo
+// @Success 200 {object} dto.BackupClientInfo
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /core/backups/client/:clientType [get]

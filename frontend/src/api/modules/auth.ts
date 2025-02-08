@@ -17,18 +17,6 @@ export const logOutApi = () => {
     return http.post<any>(`/core/auth/logout`);
 };
 
-export const checkIsSafety = (code: string) => {
-    return http.get<string>(`/core/auth/issafety?code=${code}`);
-};
-
-export const checkIsDemo = () => {
-    return http.get<boolean>('/core/auth/demo');
-};
-
-export const getLanguage = () => {
-    return http.get<string>(`/core/auth/language`);
-};
-
-export const checkIsIntl = () => {
-    return http.get<boolean>('/core/auth/intl');
+export const getLoginSetting = () => {
+    return http.get<Login.LoginSetting>('/core/auth/setting');
 };

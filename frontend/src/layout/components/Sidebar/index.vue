@@ -72,7 +72,7 @@ import Logo from './components/Logo.vue';
 import Collapse from './components/Collapse.vue';
 import SubItem from './components/SubItem.vue';
 import router, { menuList } from '@/routers/router';
-import { checkIsIntl, logOutApi } from '@/api/modules/auth';
+import { logOutApi } from '@/api/modules/auth';
 import i18n from '@/lang';
 import { DropdownInstance, ElMessageBox } from 'element-plus';
 import { GlobalStore, MenuStore } from '@/store';
@@ -222,7 +222,6 @@ function getCheckedLabels(json: Node): string[] {
 }
 
 const search = async () => {
-    await checkIsSystemIntl();
     let checkedLabels: any[] = [];
     const res = await getSettingInfo();
     version.value = res.data.systemVersion;
@@ -282,11 +281,6 @@ const checkTask = async () => {
 
 const openTask = () => {
     emit('openTask');
-};
-
-const checkIsSystemIntl = async () => {
-    const res = await checkIsIntl();
-    globalStore.isIntl = res.data;
 };
 
 onMounted(() => {

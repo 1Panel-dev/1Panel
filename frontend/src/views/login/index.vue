@@ -22,15 +22,11 @@
 </template>
 
 <script setup lang="ts" name="login">
-import { checkIsSafety } from '@/api/modules/auth';
 import LoginForm from './components/login-form.vue';
 import { ref, onMounted } from 'vue';
-import router from '@/routers';
 import { GlobalStore } from '@/store';
-import { getXpackSettingForTheme } from '@/utils/xpack';
 
 const gStore = GlobalStore();
-const loading = ref();
 const backgroundOpacity = ref(0.8);
 const backgroundImage = ref(new URL('', import.meta.url).href);
 const logoImage = ref(new URL('@/assets/images/1panel-login.png', import.meta.url).href);
@@ -49,19 +45,6 @@ const getStatus = async () => {
     if (code != '') {
         gStore.entrance = code;
     }
-    loading.value = true;
-    await checkIsSafety(gStore.entrance)
-        .then((res) => {
-            loading.value = false;
-            if (res.data === 'unpass') {
-                router.replace({ name: 'entrance', params: { code: gStore.entrance } });
-                return;
-            }
-            getXpackSettingForTheme();
-        })
-        .catch(() => {
-            loading.value = false;
-        });
 };
 
 onMounted(() => {

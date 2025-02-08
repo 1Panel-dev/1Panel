@@ -47,8 +47,9 @@ type ISettingService interface {
 	UpdateTerminal(req dto.TerminalInfo) error
 
 	UpdateSystemSSL() error
-
 	GenerateRSAKey() error
+
+	GetLoginSetting() (*dto.SystemSetting, error)
 }
 
 func NewISettingService() ISettingService {
@@ -526,4 +527,17 @@ func (u *SettingService) GenerateRSAKey() error {
 		return err
 	}
 	return nil
+}
+
+func (u *SettingService) GetLoginSetting() (*dto.SystemSetting, error) {
+	settingInfo, err := u.GetSettingInfo()
+	if err != nil {
+		return nil, err
+	}
+	res := &dto.SystemSetting{
+		Language: settingInfo.Language,
+		IsDemo:   global.CONF.Base.IsDemo,
+		IsIntl:   global.CONF.Base.IsIntl,
+	}
+	return res, nil
 }

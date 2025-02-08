@@ -18,7 +18,7 @@ func (b *BaseApi) SearchAppLauncher(c *gin.Context) {
 // @Tags App Launcher
 // @Summary Update app Launcher
 // @Accept json
-// @Param request body dto.ChangeShow true "request"
+// @Param request body dto.SettingUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp

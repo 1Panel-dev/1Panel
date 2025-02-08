@@ -106,7 +106,7 @@
                                     @click="loginVerify()"
                                 />
                             </el-col>
-                            <el-col :span="24" class="h-1">
+                            <el-col :span="24" class="h-0.5">
                                 <span v-show="errCaptcha" class="input-error">
                                     {{ $t('commons.login.errorCaptcha') }}
                                 </span>
@@ -115,7 +115,6 @@
                                 </span>
                             </el-col>
                         </el-row>
-
                         <el-form-item>
                             <el-button
                                 @click="login(loginFormRef)"
@@ -128,32 +127,27 @@
                                 {{ $t('commons.button.login') }}
                             </el-button>
                         </el-form-item>
-
-                        <template v-if="!isIntl">
-                            <el-form-item prop="agreeLicense">
-                                <el-checkbox v-model="loginForm.agreeLicense">
-                                    <template #default>
-                                        <span>
-                                            {{ $t('commons.button.agree') }}
-                                            <a
-                                                class="agree"
-                                                href="https://www.fit2cloud.com/legal/licenses.html"
-                                                target="_blank"
-                                            >
-                                                {{ $t('commons.login.licenseHelper') }}
-                                            </a>
-                                        </span>
-                                    </template>
-                                </el-checkbox>
-                            </el-form-item>
-                        </template>
+                        <el-text v-if="isDemo" type="danger">
+                            {{ $t('commons.login.username') }}:demo {{ $t('commons.login.password') }}:1panel
+                        </el-text>
+                        <el-form-item prop="agreeLicense" v-if="!isIntl">
+                            <el-checkbox v-model="loginForm.agreeLicense">
+                                <template #default>
+                                    <span>
+                                        {{ $t('commons.button.agree') }}
+                                        <a
+                                            class="agree"
+                                            href="https://www.fit2cloud.com/legal/licenses.html"
+                                            target="_blank"
+                                        >
+                                            {{ $t('commons.login.licenseHelper') }}
+                                        </a>
+                                    </span>
+                                </template>
+                            </el-checkbox>
+                        </el-form-item>
                     </div>
                 </el-form>
-                <div class="demo">
-                    <span v-if="isDemo">
-                        {{ $t('commons.login.username') }}:demo {{ $t('commons.login.password') }}:1panel
-                    </span>
-                </div>
             </div>
 
             <DialogPro v-model="open" center size="w-90">
@@ -184,7 +178,7 @@
 import { ref, reactive, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import type { ElForm } from 'element-plus';
-import { loginApi, getCaptcha, mfaLoginApi, checkIsDemo, getLanguage, checkIsIntl } from '@/api/modules/auth';
+import { loginApi, getCaptcha, mfaLoginApi, getLoginSetting } from '@/api/modules/auth';
 import { GlobalStore, MenuStore, TabsStore } from '@/store';
 import { MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
@@ -270,12 +264,6 @@ const mfaShow = ref<boolean>(false);
 const router = useRouter();
 const dropdownText = ref('中文(简体)');
 
-const checkIsSystemIntl = async () => {
-    const res = await checkIsIntl();
-    isIntl.value = res.data;
-    globalStore.isIntl = isIntl.value;
-};
-
 function handleCommand(command: string) {
     loginForm.language = command;
     usei18n.locale.value = command;
@@ -284,8 +272,14 @@ function handleCommand(command: string) {
         dropdownText.value = '中文(简体)';
     } else if (command === 'en') {
         dropdownText.value = 'English';
+    } else if (command === 'pt-BR') {
+        dropdownText.value = 'Português (Brasil)';
     } else if (command === 'tw') {
         dropdownText.value = '中文(繁體)';
+    } else if (command === 'ko') {
+        dropdownText.value = '한국어';
+    } else if (command === 'ja') {
+        dropdownText.value = '日本語';
     } else if (command === 'ru') {
         dropdownText.value = 'Русский';
     } else if (command === 'ms') {
@@ -395,19 +389,6 @@ const loginVerify = async () => {
     captcha.captchaLength = res.data.captchaLength ? res.data.captchaLength : 0;
 };
 
-const checkIsSystemDemo = async () => {
-    const res = await checkIsDemo();
-    isDemo.value = res.data;
-};
-
-const loadLanguage = async () => {
-    try {
-        const res = await getLanguage();
-        loginForm.language = res.data;
-        handleCommand(res.data);
-    } catch (error) {}
-};
-
 const loadDataFromDB = async () => {
     const res = await getSettingInfo();
     document.title = res.data.panelName;
@@ -420,14 +401,25 @@ const loadDataFromDB = async () => {
     globalStore.setThemeConfig({ ...themeConfig.value, theme: theme, panelName: res.data.panelName });
 };
 
+const getSetting = async () => {
+    try {
+        const res = await getLoginSetting();
+        isDemo.value = res.data.isDemo;
+        loginForm.language = res.data.language;
+        handleCommand(loginForm.language);
+        isIntl.value = res.data.isIntl;
+        globalStore.isIntl = isIntl.value;
+    } catch (error) {}
+};
+
 onMounted(() => {
     globalStore.isOnRestart = false;
-    checkIsSystemIntl();
-    loginVerify();
-    loadLanguage();
+    getSetting();
+    if (!globalStore.ignoreCaptcha) {
+        loginVerify();
+    }
     document.title = globalStore.themeConfig.panelName;
     loginForm.agreeLicense = globalStore.agreeLicense;
-    checkIsSystemDemo();
     document.onkeydown = (e: any) => {
         e = window.event || e;
         if (e.keyCode === 13) {

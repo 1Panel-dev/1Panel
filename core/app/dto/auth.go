@@ -38,3 +38,9 @@ type MFALogin struct {
 	Code       string `json:"code" validate:"required"`
 	AuthMethod string `json:"authMethod"`
 }
+
+type SystemSetting struct {
+	IsDemo   bool   `json:"isDemo"`
+	Language string `json:"language"`
+	IsIntl   bool   `json:"isIntl"`
+}
