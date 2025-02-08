@@ -492,7 +492,7 @@ func snapUpload(snap snapHelper, accounts string, file string) error {
 	targetAccounts := strings.Split(accounts, ",")
 	for _, item := range targetAccounts {
 		snap.Task.LogStart(i18n.GetWithName("SnapUploadTo", fmt.Sprintf("[%s] %s", accountMap[item].name, path.Join("system_snapshot", path.Base(file)))))
-		_, err := accountMap[item].client.Upload(source, path.Join("system_snapshot", path.Base(file)))
+		_, err := accountMap[item].client.Upload(source, path.Join(accountMap[item].backupPath, "system_snapshot", path.Base(file)))
 		snap.Task.LogWithStatus(i18n.GetWithName("SnapUploadRes", accountMap[item].name), err)
 		if err != nil {
 			return err

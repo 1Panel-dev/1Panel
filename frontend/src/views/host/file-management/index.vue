@@ -49,7 +49,7 @@
                 "
             />
         </div>
-        <LayoutContent :title="$t('menu.file')" v-loading="loading">
+        <LayoutContent :title="$t('menu.files')" v-loading="loading">
             <template #prompt>
                 <el-alert type="info" :closable="false">
                     <template #title>
@@ -73,7 +73,7 @@
                             </el-dropdown-item>
                             <el-dropdown-item command="file">
                                 <svg-icon iconName="p-file-normal"></svg-icon>
-                                {{ $t('menu.file') }}
+                                {{ $t('menu.files') }}
                             </el-dropdown-item>
                         </el-dropdown-menu>
                     </template>

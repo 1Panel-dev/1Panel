@@ -14,8 +14,6 @@ type CloudStorageClient interface {
 
 func NewCloudStorageClient(backupType string, vars map[string]interface{}) (CloudStorageClient, error) {
 	switch backupType {
-	case constant.Local:
-		return client.NewLocalClient(vars)
 	case constant.S3:
 		return client.NewS3Client(vars)
 	case constant.OSS:

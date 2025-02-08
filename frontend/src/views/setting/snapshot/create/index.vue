@@ -259,6 +259,9 @@ const beforeLeave = async (stepItem: any) => {
             loadCheckForSubmit(panelChecks, form.panelData);
             return true;
         case 'backupData':
+            if (!form.appData || form.appData.length === 0) {
+                return true;
+            }
             if (form.backupData && form.backupData.length !== 0) {
                 let backupChecks = backupRef.value.getCheckedNodes();
                 loadCheckForSubmit(backupChecks, form.backupData);
@@ -497,6 +500,9 @@ const setPanelDefaultCheck = async (list: any) => {
     }
 };
 const setBackupDefaultCheck = async (list: any) => {
+    if (!form.appData || form.appData.length === 0) {
+        return;
+    }
     for (const item of list) {
         if (item.isCheck) {
             backupRef.value.setChecked(item.id, true, true);
