@@ -285,6 +285,7 @@ const message = {
             healthy: '正常',
             executing: '执行中',
             installerr: '安装失败',
+            applyerror: '申请失败',
         },
         units: {
             second: '秒',

@@ -288,6 +288,7 @@ const message = {
             healthy: '정상',
             executing: '실행 중',
             installerr: '설치 실패',
+            applyerror: '적용 실패',
         },
         units: {
             second: '초 | 초 | 초',

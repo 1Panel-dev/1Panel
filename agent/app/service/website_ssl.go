@@ -255,7 +255,7 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 			return err
 		}
 	case constant.DnsManual:
-		if err := client.UseManualDns(); err != nil {
+		if err := client.UseManualDns(*websiteSSL); err != nil {
 			return err
 		}
 	}

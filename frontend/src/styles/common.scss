@@ -6,45 +6,16 @@ html {
     align-items: center;
     justify-content: center;
 }
-.flx-justify-between {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
+
 .flx-align-center {
     display: flex;
     align-items: center;
-}
-
-.flx-wrap {
-    display: flex;
-    flex-wrap: wrap;
-}
-
-.clearfix::after {
-    display: block;
-    height: 0;
-    overflow: hidden;
-    clear: both;
-    content: '';
 }
 
 .sle {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-}
-
-.mle {
-    display: -webkit-box;
-    overflow: hidden;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-}
-
-.break-word {
-    word-break: break-all;
-    word-wrap: break-word;
 }
 
 .fade-transform-leave-active,
@@ -87,18 +58,6 @@ html {
     border-radius: 20px;
     box-shadow: inset 0 0 0 white;
 }
-.content-box {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    height: 100%;
-    .text {
-        margin: 30px 0;
-        font-size: 23px;
-        font-weight: bold;
-        color: rgb(88 88 88);
-    }
-}
 
 #nprogress {
     .bar {
@@ -111,10 +70,6 @@ html {
     .peg {
         box-shadow: 0 0 10px $primary-color, 0 0 5px $primary-color !important;
     }
-}
-
-.inline-block {
-    display: inline-block;
 }
 
 .form-button {
@@ -141,37 +96,6 @@ html {
     white-space: normal;
 }
 
-.myTable {
-    border-collapse: collapse;
-    font-size: 12px;
-    table-layout: fixed;
-    td {
-        width: 35%;
-        padding: 8px;
-        height: 23px;
-        border: 1px solid #383c42;
-        word-wrap: break-word;
-        div {
-            margin-top: 2px;
-        }
-        th {
-            border: 0;
-            height: 30px;
-        }
-        tr {
-            &:hover {
-                background-color: #d9dde2;
-            }
-            &:first-child:hover {
-                background-color: transparent !important;
-            }
-            td:nth-child(even) {
-                color: #85888e;
-            }
-        }
-    }
-}
-
 .mask {
     width: 100%;
     height: 100%;
@@ -195,48 +119,6 @@ html {
     }
 }
 
-.table-button {
-    display: inline;
-    margin-right: 5px;
-}
-
-.button-left {
-    float: left;
-}
-
-.topRouterCard {
-    .el-card__body {
-        --el-card-border-color: var(--el-border-color-light);
-        --el-card-border-radius: 4px;
-        --el-card-padding: 0px;
-        --el-card-bg-color: var(--el-fill-color-blank);
-    }
-}
-.topRouterButton {
-    .el-radio-button__inner {
-        display: inline-block;
-        line-height: 1;
-        white-space: nowrap;
-        vertical-align: middle;
-        background: var(--el-button-bg-color, var(--el-fill-color-blank));
-        border: 0;
-        font-weight: 350;
-        color: var(--el-button-text-color, var(--el-text-color-regular));
-        text-align: center;
-        box-sizing: border-box;
-        outline: 0;
-        margin: 0;
-        position: relative;
-        cursor: pointer;
-        transition: var(--el-transition-all);
-        -webkit-user-select: none;
-        user-select: none;
-        padding: 8px 15px;
-        font-size: var(--el-font-size-base);
-        border-radius: 0;
-    }
-}
-
 .sidebar-container-popper {
     .el-menu--popup-right-start {
         background-color: rgba(0, 94, 235, 0.1);
@@ -247,7 +129,6 @@ html {
     width: 250px;
 }
 
-// drawer头部增加按钮
 .drawer-header-button {
     span {
         color: currentColor !important;
@@ -288,9 +169,6 @@ html {
     background-color: #000000;
 }
 
-.middle-center {
-    vertical-align: middle;
-}
 .status-count {
     font-size: 24px;
 }
@@ -338,10 +216,6 @@ html {
     width: 40% !important;
 }
 
-.left-button {
-    margin-left: 10px;
-}
-
 .pre-select {
     width: 85px !important;
 }
@@ -377,12 +251,6 @@ html {
     margin-right: 20px;
 }
 
-.text-parent {
-    display: flex;
-    width: 100%;
-    margin-left: 2px;
-}
-
 .text-ellipsis {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -397,10 +265,6 @@ html {
 
 .p-ml-5 {
     margin-left: 5px !important;
-}
-
-.p-mb-5 {
-    margin-bottom: 5px !important;
 }
 
 .p-w-200 {
@@ -468,7 +332,6 @@ html {
         text-overflow: ellipsis;
     }
 }
-
 
 .el-descriptions {
     overflow: hidden;

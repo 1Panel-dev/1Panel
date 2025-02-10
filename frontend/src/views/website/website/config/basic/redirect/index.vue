@@ -14,7 +14,7 @@
         </el-table-column>
         <el-table-column :label="$t('commons.table.type')" prop="type" min-width="60px">
             <template #default="{ row }">
-                <span v-if="row.type != 404">{{ $t('website.' + row.type) }}</span>
+                <span v-if="row.type && row.type != 404">{{ $t('website.' + row.type) }}</span>
                 <span v-else>{{ 404 }}</span>
             </template>
         </el-table-column>

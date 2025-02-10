@@ -293,6 +293,7 @@ const message = {
             healthy: 'Normal',
             executing: 'Executing',
             installerr: 'Installation failed',
+            applyerror: 'Apply failed',
         },
         units: {
             second: 'Second',

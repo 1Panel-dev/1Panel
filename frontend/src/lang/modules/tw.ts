@@ -287,6 +287,7 @@ const message = {
             healthy: '正常',
             executing: '執行中',
             installerr: '安裝失敗',
+            applyerror: '申請失敗',
         },
         units: {
             second: '秒',

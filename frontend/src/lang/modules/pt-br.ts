@@ -292,6 +292,7 @@ const message = {
             healthy: 'Saudável',
             executing: 'Executando',
             installerr: 'Falha na instalação',
+            applyerror: 'Falha na aplicação',
         },
         units: {
             second: 'segundo | segundos | segundos',

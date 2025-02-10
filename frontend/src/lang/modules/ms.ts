@@ -294,6 +294,7 @@ const message = {
             healthy: 'Sihat',
             executing: 'Melaksanakan',
             installerr: 'Pemasangan gagal',
+            applyerror: 'Permohonan gagal',
         },
         units: {
             second: 'saat | saat | saat',

@@ -288,6 +288,7 @@ const message = {
             healthy: 'Нормально',
             executing: 'Выполнение',
             installerr: 'Ошибка установки',
+            applyerror: 'Ошибка применения',
         },
         units: {
             second: ' секунда | секунда | секунд',

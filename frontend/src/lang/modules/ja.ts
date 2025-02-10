@@ -287,6 +287,7 @@ const message = {
             healthy: '正常',
             executing: '実行中',
             installerr: 'インストールに失敗しました',
+            applyerror: '適用に失敗しました',
         },
         units: {
             second: '2番目|2番目|秒',
