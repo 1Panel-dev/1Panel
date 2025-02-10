@@ -28,7 +28,7 @@ import { FormInstance } from 'element-plus';
 import { ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { DeleteLicense } from '@/api/modules/setting';
+import { deleteLicense } from '@/api/modules/setting';
 
 let form = reactive({
     id: 0,
@@ -56,7 +56,7 @@ const acceptParams = async (prop: DialogProps) => {
 
 const submit = async () => {
     loading.value = true;
-    DeleteLicense(form.id, form.forceDelete)
+    deleteLicense(form.id, form.forceDelete)
         .then(() => {
             loading.value = false;
             emit('search');

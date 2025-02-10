@@ -44,7 +44,7 @@
 import i18n from '@/lang';
 import { ref } from 'vue';
 import { MsgSuccess } from '@/utils/message';
-import { uploadFileData } from '@/api/modules/setting';
+import { uploadLicense } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import { UploadFile, UploadFiles, UploadInstance, UploadProps, UploadRawFile, genFileId } from 'element-plus';
 import { useTheme } from '@/global/use-theme';
@@ -56,6 +56,18 @@ const loading = ref(false);
 const open = ref(false);
 const uploadRef = ref<UploadInstance>();
 const uploaderFiles = ref<UploadFiles>([]);
+
+const oldLicense = ref();
+interface DialogProps {
+    oldLicense: string;
+}
+
+const acceptParams = (params: DialogProps) => {
+    oldLicense.value = params?.oldLicense || '';
+    uploaderFiles.value = [];
+    uploadRef.value?.clearFiles();
+    open.value = true;
+};
 
 const handleClose = () => {
     open.value = false;
@@ -88,8 +100,9 @@ const submit = async () => {
     const file = uploaderFiles.value[0];
     const formData = new FormData();
     formData.append('file', file.raw);
+    formData.append('title', oldLicense.value);
     loading.value = true;
-    await uploadFileData(formData)
+    await uploadLicense(oldLicense.value, formData)
         .then(async () => {
             globalStore.isProductPro = true;
             const xpackRes = await getXpackSetting();
@@ -111,12 +124,6 @@ const submit = async () => {
             uploadRef.value!.clearFiles();
             uploaderFiles.value = [];
         });
-};
-
-const acceptParams = () => {
-    uploaderFiles.value = [];
-    uploadRef.value?.clearFiles();
-    open.value = true;
 };
 
 defineExpose({

@@ -5,13 +5,16 @@ import { ResPage, SearchWithPage, DescriptionUpdate, ReqPage } from '../interfac
 import { Setting } from '../interface/setting';
 
 // license
-export const uploadFileData = (params: FormData) => {
-    return http.upload('/core/licenses/upload', params);
+export const uploadLicense = (oldLicense: string, params: FormData) => {
+    if (oldLicense === '') {
+        return http.upload('/core/licenses/upload', params);
+    }
+    return http.upload('/core/licenses/update', params);
 };
-export const SearchLicense = (params: ReqPage) => {
+export const searchLicense = (params: ReqPage) => {
     return http.post<ResPage<Setting.License>>('/core/licenses/search', params);
 };
-export const DeleteLicense = (id: number, force: boolean) => {
+export const deleteLicense = (id: number, force: boolean) => {
     return http.post('/core/licenses/del', { id: id, force: force });
 };
 export const getLicenseStatus = () => {

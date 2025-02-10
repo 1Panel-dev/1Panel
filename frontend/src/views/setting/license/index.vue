@@ -85,7 +85,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue';
-import { SearchLicense, syncLicense, unbindLicense } from '@/api/modules/setting';
+import { searchLicense, syncLicense, unbindLicense } from '@/api/modules/setting';
 import LicenseImport from '@/components/license-import/index.vue';
 import LicenseDelete from '@/views/setting/license/delete/index.vue';
 import LicenseBind from '@/views/setting/license/bind/index.vue';
@@ -165,7 +165,7 @@ const search = async () => {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
     };
-    await SearchLicense(params)
+    await searchLicense(params)
         .then((res) => {
             loading.value = false;
             data.value = res.data.items || [];
@@ -176,6 +176,7 @@ const search = async () => {
                         ? i18n.global.t('license.indefinitePeriod')
                         : timestampToDate(Number(item.productPro));
             }
+            paginationConfig.total = res.data.total;
         })
         .catch(() => {
             loading.value = false;
@@ -231,6 +232,15 @@ const buttons = [
                 }
             }
             onUnbind(row);
+        },
+    },
+    {
+        label: i18n.global.t('commons.button.edit'),
+        disabled: (row: any) => {
+            return row.status === 'Free';
+        },
+        click: (row: any) => {
+            licenseRef.value.acceptParams({ oldLicense: row.licenseName });
         },
     },
     {

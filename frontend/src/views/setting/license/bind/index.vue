@@ -64,7 +64,6 @@ const onBind = async (formEl: FormInstance | undefined) => {
                 loading.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 globalStore.isProductPro = false;
-                globalStore.themeConfig.isGold = false;
                 window.location.reload();
             })
             .catch(() => {
