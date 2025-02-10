@@ -129,8 +129,14 @@ func (a AppService) GetAppTags(ctx *gin.Context) ([]response.TagDTO, error) {
 		}
 		var translations = make(map[string]string)
 		_ = json.Unmarshal([]byte(tag.Translations), &translations)
-		if name, ok := translations[lang]; ok {
+		if name, ok := translations[lang]; ok && name != "" {
 			tagDTO.Name = name
+		} else {
+			if lang == "zh" || lang == "zh-Hant" {
+				tagDTO.Name = tag.Name
+			} else {
+				tagDTO.Name = tag.Key
+			}
 		}
 		res = append(res, tagDTO)
 	}
