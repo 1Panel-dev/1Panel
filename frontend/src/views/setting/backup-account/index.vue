@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-loading="loading">
         <LayoutContent :title="$t('setting.backupAccount')">
             <template #leftToolBar>
                 <el-button type="primary" @click="onOpenDialog('create')">

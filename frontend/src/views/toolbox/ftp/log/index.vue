@@ -17,7 +17,7 @@
                     {{ loadOperation(row.operation) }}
                 </template>
             </el-table-column>
-            <el-table-column :label="$t('menu.file')" show-overflow-tooltip>
+            <el-table-column :label="$t('menu.files')" show-overflow-tooltip>
                 <template #default="{ row }">
                     {{ loadFileName(row.operation) }}
                 </template>

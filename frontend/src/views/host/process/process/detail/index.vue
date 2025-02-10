@@ -48,7 +48,7 @@
                 </el-tab-pane>
                 <el-tab-pane :label="$t('process.openFiles')" name="openFiles">
                     <el-table :data="data.openFiles" border style="width: 100%">
-                        <el-table-column prop="path" :label="$t('menu.file')" />
+                        <el-table-column prop="path" :label="$t('menu.files')" />
                         <el-table-column prop="fd" label="fd" width="100px" />
                     </el-table>
                 </el-tab-pane>

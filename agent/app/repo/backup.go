@@ -166,13 +166,29 @@ func (u *BackupRepo) GetRecord(opts ...DBOption) (*model.BackupRecord, error) {
 
 func (u *BackupRepo) SyncAll(data []model.BackupAccount) error {
 	tx := global.DB.Begin()
-	if err := tx.Where("is_public = ?", 1).Delete(&model.BackupAccount{}).Error; err != nil {
-		tx.Rollback()
-		return err
+	var oldAccounts []model.BackupAccount
+	_ = tx.Where("is_public = ?", 1).Find(&oldAccounts).Error
+	oldAccountMap := make(map[string]uint)
+	for _, item := range oldAccounts {
+		oldAccountMap[item.Name] = item.ID
 	}
-	if err := tx.Model(model.BackupAccount{}).Save(&data).Error; err != nil {
-		tx.Rollback()
-		return err
+	for _, item := range data {
+		if val, ok := oldAccountMap[item.Name]; ok {
+			item.ID = val
+			delete(oldAccountMap, item.Name)
+		} else {
+			item.ID = 0
+		}
+		if err := tx.Model(model.BackupAccount{}).Where("id = ?", item.ID).Save(&item).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+	for _, val := range oldAccountMap {
+		if err := tx.Where("id = ?", val).Delete(&model.BackupAccount{}).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
 	}
 	tx.Commit()
 	return nil

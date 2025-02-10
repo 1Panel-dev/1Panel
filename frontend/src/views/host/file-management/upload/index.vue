@@ -4,7 +4,7 @@
             <div class="button-container">
                 <div>
                     <el-button type="primary" @click="upload('file')">
-                        {{ $t('commons.button.upload') }}{{ $t('menu.file') }}
+                        {{ $t('commons.button.upload') }}{{ $t('menu.files') }}
                     </el-button>
                     <el-button type="primary" @click="upload('dir')">
                         {{ $t('commons.button.upload') }}{{ $t('file.dir') }}

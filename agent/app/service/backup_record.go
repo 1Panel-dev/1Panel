@@ -43,11 +43,20 @@ func (u *BackupRecordService) SearchRecordsWithPage(search dto.RecordSearch) (in
 	if err != nil {
 		return 0, nil, err
 	}
+	accounts, _ := backupRepo.List()
 	var data []dto.BackupRecords
-	for _, account := range records {
+	for _, record := range records {
 		var item dto.BackupRecords
-		if err := copier.Copy(&item, &account); err != nil {
+		if err := copier.Copy(&item, &record); err != nil {
 			global.LOG.Errorf("copy backup account to dto backup info failed, err: %v", err)
+		}
+		for _, account := range accounts {
+			if account.ID == record.DownloadAccountID {
+				item.DownloadAccountID = account.ID
+				item.AccountName = account.Name
+				item.AccountType = account.Type
+				break
+			}
 		}
 		data = append(data, item)
 	}
@@ -63,11 +72,20 @@ func (u *BackupRecordService) SearchRecordsByCronjobWithPage(search dto.RecordSe
 	if err != nil {
 		return 0, nil, err
 	}
+	accounts, _ := backupRepo.List()
 	var data []dto.BackupRecords
-	for _, account := range records {
+	for _, record := range records {
 		var item dto.BackupRecords
-		if err := copier.Copy(&item, &account); err != nil {
+		if err := copier.Copy(&item, &record); err != nil {
 			global.LOG.Errorf("copy backup account to dto backup info failed, err: %v", err)
+		}
+		for _, account := range accounts {
+			if account.ID == record.DownloadAccountID {
+				item.DownloadAccountID = account.ID
+				item.AccountName = account.Name
+				item.AccountType = account.Type
+				break
+			}
 		}
 		data = append(data, item)
 	}
