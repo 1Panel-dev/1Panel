@@ -56,8 +56,8 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 		return
 	}
 	if req.Key == "SecurityEntrance" {
-		if checkEntrancePattern(req.Value) {
-			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, fmt.Errorf("regexp match string with %s failed", req.Value))
+		if !checkEntrancePattern(req.Value) {
+			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, fmt.Errorf("the format of the security entrance %s is incorrect.", req.Value))
 			return
 		}
 	}
