@@ -50,6 +50,7 @@ type IFileService interface {
 	ChangeMode(op request.FileCreate) error
 	BatchChangeModeAndOwner(op request.FileRoleReq) error
 	ReadLogByLine(req request.FileReadByLineReq) (*response.FileLineContent, error)
+	BatchCheckFiles(req request.FilePathsCheck) []response.ExistFileInfo
 }
 
 var filteredPaths = []string{
@@ -500,4 +501,19 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 		Lines:   lines,
 	}
 	return res, nil
+}
+
+func (f *FileService) BatchCheckFiles(req request.FilePathsCheck) []response.ExistFileInfo {
+	fileList := make([]response.ExistFileInfo, 0, len(req.Paths))
+	for _, filePath := range req.Paths {
+		if info, err := os.Stat(filePath); err == nil {
+			fileList = append(fileList, response.ExistFileInfo{
+				Size:    float64(info.Size()),
+				Name:    info.Name(),
+				Path:    filePath,
+				ModTime: info.ModTime(),
+			})
+		}
+	}
+	return fileList
 }

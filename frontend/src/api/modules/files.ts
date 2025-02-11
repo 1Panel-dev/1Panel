@@ -53,6 +53,10 @@ export const CheckFile = (path: string) => {
     return http.post<boolean>('files/check', { path: path });
 };
 
+export const BatchCheckFiles = (paths: string[]) => {
+    return http.post<File.ExistFileInfo[]>('files/batch/check', { paths: paths }, TimeoutEnum.T_5M);
+};
+
 export const UploadFileData = (params: FormData, config: AxiosRequestConfig) => {
     return http.upload<File.File>('files/upload', params, config);
 };

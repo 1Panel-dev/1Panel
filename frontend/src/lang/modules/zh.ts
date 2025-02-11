@@ -73,6 +73,8 @@ const message = {
             createNewFile: '新建文件',
             helpDoc: '帮助文档',
             unbind: '解绑',
+            cover: '覆盖',
+            skip: '跳过',
         },
         search: {
             timeStart: '开始时间',
@@ -109,6 +111,7 @@ const message = {
             refreshRate: '刷新频率',
             refreshRateUnit: '不刷新 | {n} 秒/次 | {n} 秒/次',
             selectColumn: '选择列',
+            serialNumber: '序号',
         },
         loadingText: {
             Upgrading: '系统升级中，请稍候...',
@@ -1258,6 +1261,9 @@ const message = {
         minimap: '缩略图',
         fileCanNotRead: '此文件不支持预览',
         panelInstallDir: '1Panel 安装目录不能删除',
+        existFileTitle: '同名文件提示',
+        existFileHelper: '上传的文件存在同名文件，是否覆盖？',
+        existFileSize: '文件大小 (新 -> 旧)',
     },
     ssh: {
         setting: '配置',

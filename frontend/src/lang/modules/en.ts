@@ -74,6 +74,8 @@ const message = {
             createNewFile: 'Create new file',
             helpDoc: 'Help Document',
             unbind: 'Unbind',
+            cover: 'cover',
+            skip: 'skip',
         },
         search: {
             timeStart: 'Time start',
@@ -110,6 +112,7 @@ const message = {
             refreshRate: 'Refresh rate',
             refreshRateUnit: 'No refresh | {n} second/time | {n} seconds/time',
             selectColumn: 'Select column',
+            serialNumber: 'Serial number',
         },
         loadingText: {
             Upgrading: 'System upgrade, please wait...',
@@ -1320,6 +1323,9 @@ const message = {
         minimap: 'Code mini map',
         fileCanNotRead: 'File can not read',
         panelInstallDir: `1Panel installation directory can't be deleted`,
+        existFileTitle: 'Same name file prompt',
+        existFileHelper: 'The uploaded file contains a file with the same name, do you want to overwrite it?',
+        existFileSize: 'File size (new -> old)',
     },
     ssh: {
         setting: 'Setting',

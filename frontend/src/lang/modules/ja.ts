@@ -73,6 +73,8 @@ const message = {
             createNewFile: '新しいファイルを作成します',
             helpDoc: '文書をヘルプします',
             unbind: 'バインド',
+            cover: '上書き',
+            skip: 'スキップ',
         },
         search: {
             timeStart: '時間開始',
@@ -109,6 +111,7 @@ const message = {
             refreshRate: 'リフレッシュレート',
             refreshRateUnit: '更新なし|{n}秒/時間 |{n}秒/時間',
             selectColumn: '列を選択します',
+            serialNumber: 'シリアル番号',
         },
         loadingText: {
             Upgrading: 'システムのアップグレード、待ってください...',
@@ -1298,6 +1301,9 @@ const message = {
         minimap: 'コードミニマップ',
         fileCanNotRead: 'ファイルは読み取れません',
         panelInstallDir: `1Panelインストールディレクトリは削除できません`,
+        existFileTitle: '同名ファイルの警告',
+        existFileHelper: 'アップロードしたファイルに同じ名前のファイルが含まれています。上書きしますか？',
+        existFileSize: 'ファイルサイズ（新しい -> 古い）',
     },
     ssh: {
         setting: '設定',

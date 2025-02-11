@@ -74,6 +74,8 @@ const message = {
             createNewFile: 'Создать новый файл',
             helpDoc: 'Справка',
             unbind: 'Отвязать',
+            cover: 'Заменить',
+            skip: 'Пропустить',
         },
         search: {
             timeStart: 'Время начала',
@@ -110,6 +112,8 @@ const message = {
             refreshRate: 'Частота обновления',
             refreshRateUnit: 'Без обновления | {n} секунда/раз | {n} секунд/раз',
             selectColumn: 'Выбрать столбец',
+            cover: 'Заменить',
+            skip: 'Пропустить',
         },
         loadingText: {
             Upgrading: 'Обновление системы, пожалуйста, подождите...',
@@ -1328,6 +1332,9 @@ const message = {
         minimap: 'Мини-карта кода',
         fileCanNotRead: 'Файл не может быть прочитан',
         panelInstallDir: 'Директорию установки 1Panel нельзя удалить',
+        existFileTitle: 'Предупреждение о файле с тем же именем',
+        existFileHelper: 'Загруженный файл содержит файл с таким же именем. Заменить его?',
+        existFileSize: 'Размер файла (новый -> старый)',
     },
     ssh: {
         setting: 'настройка',

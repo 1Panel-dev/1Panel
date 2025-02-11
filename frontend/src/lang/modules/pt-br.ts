@@ -74,6 +74,8 @@ const message = {
             createNewFile: 'Criar novo arquivo',
             helpDoc: 'Documento de ajuda',
             unbind: 'Desvincular',
+            cover: 'Substituir',
+            skip: 'Pular',
         },
         search: {
             timeStart: 'Hora inicial',
@@ -110,6 +112,7 @@ const message = {
             refreshRate: 'Taxa de atualização',
             refreshRateUnit: 'Sem atualização | {n} segundo/atualização | {n} segundos/atualização',
             selectColumn: 'Selecionar coluna',
+            serialNumber: 'Número de série',
         },
         loadingText: {
             Upgrading: 'Atualizando o sistema, por favor, aguarde...',
@@ -1326,6 +1329,9 @@ const message = {
         minimap: 'Mini mapa de código',
         fileCanNotRead: 'O arquivo não pode ser lido',
         panelInstallDir: 'O diretório de instalação do 1Panel não pode ser excluído',
+        existFileTitle: 'Aviso de arquivo com o mesmo nome',
+        existFileHelper: 'O arquivo enviado contém um arquivo com o mesmo nome. Deseja substituí-lo?',
+        existFileSize: 'Tamanho do arquivo (novo -> antigo)',
     },
     ssh: {
         setting: 'configuração',

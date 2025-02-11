@@ -73,6 +73,8 @@ const message = {
             createNewFile: '新增檔案',
             helpDoc: '說明文件',
             unbind: '解綁',
+            cover: '覆蓋',
+            skip: '跳過',
         },
         search: {
             timeStart: '開始時間',
@@ -110,6 +112,7 @@ const message = {
             noRefresh: '不更新',
             refreshRateUnit: '不更新 | {0} 秒/次 | {0} 秒/次',
             selectColumn: '選擇列',
+            serialNumber: '序號',
         },
         loadingText: {
             Upgrading: '系統升級中，請稍候...',
@@ -1257,6 +1260,9 @@ const message = {
         minimap: '縮圖',
         fileCanNotRead: '此檔案不支援預覽',
         panelInstallDir: '1Panel 安裝目錄不能刪除',
+        existFileTitle: '同名檔案提示',
+        existFileHelper: '上傳的檔案存在同名檔案，是否覆蓋？',
+        existFileSize: '文件大小（新->舊）',
     },
     ssh: {
         setting: '設定',

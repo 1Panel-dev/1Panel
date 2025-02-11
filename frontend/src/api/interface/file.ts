@@ -152,6 +152,14 @@ export namespace File {
         path: string;
     }
 
+    export interface ExistFileInfo {
+        name: string;
+        path: string;
+        size: number;
+        uploadSize: number;
+        modTime: string;
+    }
+
     export interface RecycleBin {
         sourcePath: string;
         name: string;
