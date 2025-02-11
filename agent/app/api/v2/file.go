@@ -418,6 +418,23 @@ func (b *BaseApi) CheckFile(c *gin.Context) {
 }
 
 // @Tags File
+// @Summary Batch check file exist
+// @Accept json
+// @Param request body request.FilePathsCheck true "request"
+// @Success 200 {array} response.ExistFileInfo
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /files/batch/check [post]
+func (b *BaseApi) BatchCheckFiles(c *gin.Context) {
+	var req request.FilePathsCheck
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	fileList := fileService.BatchCheckFiles(req)
+	helper.SuccessWithData(c, fileList)
+}
+
+// @Tags File
 // @Summary Change file name
 // @Accept json
 // @Param request body request.FileRename true "request"

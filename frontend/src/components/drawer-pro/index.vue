@@ -87,6 +87,8 @@ const size = computed(() => {
             return '100%';
         case '60%':
             return '60%';
+        case props.size:
+            return props.size;
         default:
             return '50%';
     }

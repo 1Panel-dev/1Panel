@@ -29,7 +29,7 @@ type Login struct {
 	Captcha       string `json:"captcha"`
 	CaptchaID     string `json:"captchaID"`
 	AuthMethod    string `json:"authMethod" validate:"required,oneof=jwt session"`
-	Language      string `json:"language" validate:"required,oneof=zh en tw ja ru ms 'pt-BR'"`
+	Language      string `json:"language" validate:"required,oneof=zh en 'zh-Hant' ko ja ru ms 'pt-BR'"`
 }
 
 type MFALogin struct {

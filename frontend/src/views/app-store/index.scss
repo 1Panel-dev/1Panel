@@ -7,11 +7,7 @@
     }
 
     .a-detail {
-        height: 100%;
-        width: 100%;
-
         .d-name {
-            height: 20%;
             .name {
                 white-space: nowrap;
                 overflow: hidden;
@@ -26,22 +22,15 @@
             }
             .h-button {
                 float: right;
-                margin-left: 5px;
             }
             .msg {
                 margin-left: 5px;
-            }
-            .el-button + .el-button {
-                margin-left: 6px;
             }
         }
 
         .d-description {
             margin-top: 10px;
             overflow: hidden;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
             .el-tag {
                 margin-right: 5px;
             }
@@ -53,7 +42,7 @@
         }
         .d-button {
             margin-top: 10px;
-            min-width: 440px;
+            min-width: 330px;
         }
     }
 
@@ -64,6 +53,11 @@
             border: 1px solid var(--el-color-primary) !important;
         }
     }
+}
+
+.table-button {
+    display: inline;
+    margin-right: 5px;
 }
 
 .app-divider {
@@ -87,7 +81,6 @@
 }
 
 .tag-button {
-    margin-right: 10px;
     &.no-active {
         background: none;
         border: none;

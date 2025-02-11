@@ -70,6 +70,8 @@ const message = {
             createNewFile: 'Criar novo arquivo',
             helpDoc: 'Documento de ajuda',
             unbind: 'Desvincular',
+            cover: 'Substituir',
+            skip: 'Pular',
             fix: 'Corrigir',
             down: 'Parar',
             up: 'Iniciar',
@@ -118,6 +120,7 @@ const message = {
             refreshRateUnit: 'Sem atualização | {n} segundo/atualização | {n} segundos/atualização',
             selectColumn: 'Selecionar coluna',
             local: 'Local',
+            serialNumber: 'Número de série',
         },
         loadingText: {
             Upgrading: 'Atualizando o sistema, por favor, aguarde...',
@@ -1379,6 +1382,10 @@ const message = {
         fileCanNotRead: 'O arquivo não pode ser lido',
         panelInstallDir: 'O diretório de instalação do 1Panel não pode ser excluído',
         wgetTask: 'Tarefa de Download',
+        existFileTitle: 'Aviso de arquivo com o mesmo nome',
+        existFileHelper: 'O arquivo enviado contém um arquivo com o mesmo nome. Deseja substituí-lo?',
+        existFileSize: 'Tamanho do arquivo (novo -> antigo)',
+        existFileDirHelper: 'O arquivo/pasta selecionado tem um nome duplicado. Por favor, prossiga com cautela!',
     },
     ssh: {
         setting: 'configuração',

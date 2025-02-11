@@ -57,6 +57,10 @@ export const uploadFileData = (params: FormData, config: AxiosRequestConfig) => 
     return http.upload<File.File>('files/upload', params, config);
 };
 
+export const batchCheckFiles = (paths: string[]) => {
+    return http.post<File.ExistFileInfo[]>('files/batch/check', { paths: paths }, TimeoutEnum.T_5M);
+};
+
 export const chunkUploadFileData = (params: FormData, config: AxiosRequestConfig) => {
     return http.upload<File.File>('files/chunkupload', params, config);
 };

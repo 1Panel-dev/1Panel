@@ -73,6 +73,8 @@ const message = {
             helpDoc: 'Help Document',
             bind: 'Bind',
             unbind: 'Unbind',
+            cover: 'cover',
+            skip: 'skip',
             fix: 'Fix',
             down: 'Stop',
             up: 'Start',
@@ -126,6 +128,7 @@ const message = {
             refreshRateUnit: '{0} Seconds/Time',
             selectColumn: 'Select column',
             local: 'local',
+            serialNumber: 'Serial number',
         },
         loadingText: {
             Upgrading: 'System upgrade, please wait...',
@@ -1411,6 +1414,10 @@ const message = {
         fileCanNotRead: 'File can not read',
         panelInstallDir: '1Panel installation directory cannot be deleted',
         wgetTask: 'Download Task',
+        existFileTitle: 'Same name file prompt',
+        existFileHelper: 'The uploaded file contains a file with the same name, do you want to overwrite it?',
+        existFileSize: 'File size (new -> old)',
+        existFileDirHelper: 'The selected file/folder has a duplicate name. Please proceed with caution!',
     },
     ssh: {
         autoStart: 'Auto Start',

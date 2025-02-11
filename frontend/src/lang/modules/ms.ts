@@ -70,6 +70,8 @@ const message = {
             createNewFile: 'Cipta fail baru',
             helpDoc: 'Dokumen Bantuan',
             unbind: 'Nyahkaitkan',
+            cover: 'Tindih',
+            skip: 'Langkau',
             fix: 'Betulkan',
             down: 'Hentikan',
             up: 'Mulakan',
@@ -118,6 +120,7 @@ const message = {
             refreshRateUnit: 'Tiada penyegaran | {n} saat/masa | {n} saat/masa',
             selectColumn: 'Pilih lajur',
             local: 'Tempatan',
+            serialNumber: 'Nombor siri',
         },
         loadingText: {
             Upgrading: 'Peningkatan sistem, sila tunggu...',
@@ -1394,6 +1397,10 @@ const message = {
         fileCanNotRead: 'Fail tidak dapat dibaca',
         panelInstallDir: 'Direktori pemasangan 1Panel tidak boleh dipadamkan',
         wgetTask: 'Tugas Muat Turun',
+        existFileTitle: 'Amaran fail dengan nama yang sama',
+        existFileHelper: 'Fail yang dimuat naik mengandungi fail dengan nama yang sama. Adakah anda mahu menimpanya?',
+        existFileSize: 'Saiz fail (baru -> lama)',
+        existFileDirHelper: 'Fail/folder yang dipilih mempunyai nama yang sama. Sila berhati-hati!',
     },
     ssh: {
         setting: 'tetapan',

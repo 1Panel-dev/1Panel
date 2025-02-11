@@ -294,9 +294,11 @@ const languageOptions = ref([
     ...(!globalStore.isIntl ? [{ value: 'en', label: 'English' }] : []),
     { value: 'ja', label: '日本語' },
     { value: 'pt-BR', label: 'Português (Brasil)' },
+    { value: 'ko', label: '한국어' },
     { value: 'ru', label: 'Русский' },
     { value: 'ms', label: 'Bahasa Melayu' },
 ]);
+
 if (globalStore.isIntl) {
     languageOptions.value.unshift({ value: 'en', label: 'English' });
 }

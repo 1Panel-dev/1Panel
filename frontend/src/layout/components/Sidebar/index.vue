@@ -55,6 +55,7 @@
                 :collapse-transition="false"
                 :unique-opened="true"
                 @select="handleMenuClick"
+                class="custom-menu"
             >
                 <SubItem :menuList="routerMenus" />
                 <el-menu-item :index="''" @click="logout">

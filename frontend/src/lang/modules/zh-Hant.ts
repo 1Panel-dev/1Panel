@@ -73,6 +73,8 @@ const message = {
             helpDoc: '幫助文档',
             bind: '綁定',
             unbind: '解綁',
+            cover: '覆蓋',
+            skip: '跳過',
             fix: '修復',
             down: '停止',
             up: '啟動',
@@ -123,6 +125,7 @@ const message = {
             refreshRateUnit: '{0} 秒/次',
             selectColumn: '選擇列',
             local: '本地',
+            serialNumber: '序號',
         },
         loadingText: {
             Upgrading: '系統升級中，請稍候...',
@@ -1338,6 +1341,10 @@ const message = {
         fileCanNotRead: '此文件不支持預覽',
         panelInstallDir: '1Panel 安裝目錄不能删除',
         wgetTask: '下載任務',
+        existFileTitle: '同名檔案提示',
+        existFileHelper: '上傳的檔案存在同名檔案，是否覆蓋？',
+        existFileSize: '文件大小（新->舊）',
+        existFileDirHelper: '選擇的檔案/資料夾存在同名，請謹慎操作！',
     },
     ssh: {
         autoStart: '開機自啟',

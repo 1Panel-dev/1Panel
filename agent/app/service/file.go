@@ -54,6 +54,7 @@ type IFileService interface {
 	ReadLogByLine(req request.FileReadByLineReq) (*response.FileLineContent, error)
 
 	GetPathByType(pathType string) string
+	BatchCheckFiles(req request.FilePathsCheck) []response.ExistFileInfo
 }
 
 var filteredPaths = []string{
@@ -517,4 +518,19 @@ func (f *FileService) GetPathByType(pathType string) string {
 		return value
 	}
 	return ""
+}
+
+func (f *FileService) BatchCheckFiles(req request.FilePathsCheck) []response.ExistFileInfo {
+	fileList := make([]response.ExistFileInfo, 0, len(req.Paths))
+	for _, filePath := range req.Paths {
+		if info, err := os.Stat(filePath); err == nil {
+			fileList = append(fileList, response.ExistFileInfo{
+				Size:    info.Size(),
+				Name:    info.Name(),
+				Path:    filePath,
+				ModTime: info.ModTime(),
+			})
+		}
+	}
+	return fileList
 }

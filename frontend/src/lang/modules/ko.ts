@@ -70,6 +70,8 @@ const message = {
             createNewFile: '새 파일 생성',
             helpDoc: '도움말 문서',
             unbind: '연결 해제',
+            cover: '덮어쓰기',
+            skip: '건너뛰기',
             fix: '수정',
             down: '중지',
             up: '시작',
@@ -118,6 +120,7 @@ const message = {
             refreshRateUnit: '새로 고침 안 함 | {n} 초/회 | {n} 초/회',
             selectColumn: '열 선택',
             local: '로컬',
+            serialNumber: '일련 번호',
         },
         loadingText: {
             Upgrading: '시스템 업그레이드 중입니다. 잠시만 기다려 주십시오...',
@@ -1337,6 +1340,10 @@ const message = {
         fileCanNotRead: '파일을 읽을 수 없습니다.',
         panelInstallDir: `1Panel 설치 디렉터리는 삭제할 수 없습니다.`,
         wgetTask: '다운로드 작업',
+        existFileTitle: '동일한 이름의 파일 경고',
+        existFileHelper: '업로드한 파일에 동일한 이름의 파일이 포함되어 있습니다. 덮어쓰시겠습니까?',
+        existFileSize: '파일 크기 (새로운 -> 오래된)',
+        existFileDirHelper: '선택한 파일/폴더에 동일한 이름이 이미 존재합니다. 신중하게 작업하세요!',
     },
     ssh: {
         setting: '설정',
