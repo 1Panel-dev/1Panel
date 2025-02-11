@@ -5,15 +5,14 @@
             :style="{ backgroundImage: `url(${backgroundImage})` }"
         ></div>
         <div
-            :style="{ opacity: backgroundOpacity }"
-            class="w-[45%] min-h-[480px] bg-white rounded-lg shadow-lg relative z-10 border border-gray-200 flex overflow-hidden"
+            :style="{ opacity: backgroundOpacity, width: containerWidth, height: containerHeight }"
+            class="bg-white shadow-lg relative z-10 border border-gray-200 flex overflow-hidden"
         >
-            <div class="grid md:grid-cols-2 gap-4 items-stretch w-full">
-                <div class="flex flex-col justify-center items-center w-full p-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 items-stretch w-full h-full">
+                <div v-if="showLogo" class="flex flex-col justify-center items-center w-full">
                     <img :src="logoImage" class="max-w-full max-h-full object-contain" />
                 </div>
-                <div class="hidden md:block w-px bg-gray-200 absolute left-1/2 top-4 bottom-4"></div>
-                <div class="hidden md:flex items-center justify-center p-4">
+                <div :class="loginFormClass">
                     <LoginForm ref="loginRef"></LoginForm>
                 </div>
             </div>
@@ -28,8 +27,8 @@ import { GlobalStore } from '@/store';
 
 const gStore = GlobalStore();
 const backgroundOpacity = ref(0.8);
-const backgroundImage = ref(new URL('', import.meta.url).href);
-const logoImage = ref(new URL('@/assets/images/1panel-login.png', import.meta.url).href);
+const backgroundImage = ref(new URL('@/assets/images/1panel-login-bg.jpg', import.meta.url).href);
+const logoImage = ref(new URL('@/assets/images/1panel-login.jpg', import.meta.url).href);
 
 const mySafetyCode = defineProps({
     code: {
@@ -37,8 +36,6 @@ const mySafetyCode = defineProps({
         default: '',
     },
 });
-
-const screenWidth = ref(null);
 
 const getStatus = async () => {
     let code = mySafetyCode.code;
@@ -49,11 +46,31 @@ const getStatus = async () => {
 
 onMounted(() => {
     getStatus();
-    screenWidth.value = document.body.clientWidth;
-    window.onresize = () => {
-        return (() => {
-            screenWidth.value = document.body.clientWidth;
-        })();
+});
+
+const FIXED_WIDTH = 1000;
+const FIXED_HEIGHT = 415;
+const useWindowSize = () => {
+    const width = ref(window.innerWidth);
+    const height = ref(window.innerHeight);
+
+    const updateSize = () => {
+        width.value = window.innerWidth;
+        height.value = window.innerHeight;
     };
+
+    onMounted(() => window.addEventListener('resize', updateSize));
+    onUnmounted(() => window.removeEventListener('resize', updateSize));
+
+    return { width, height };
+};
+const { width } = useWindowSize();
+const showLogo = computed(() => width.value >= FIXED_WIDTH);
+const containerWidth = computed(() => `${FIXED_WIDTH}px`);
+const containerHeight = computed(() => `${FIXED_HEIGHT}px`);
+const loginFormClass = computed(() => {
+    return showLogo.value
+        ? 'hidden md:flex items-center justify-center p-4'
+        : 'flex items-center justify-center p-4 w-full';
 });
 </script>

@@ -11,6 +11,7 @@ base:
 remote_url:
   repo_url: https://resource.fit2cloud.com/1panel/package
   app_repo: https://apps-assets.fit2cloud.com
+  resource_url: https://resource.fit2cloud.com/1panel/resource
 
 log:
   level: debug
