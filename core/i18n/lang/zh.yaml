@@ -51,6 +51,7 @@ ErrXpackNotFound: "该部分为专业版功能，请先在 面板设置-许可�
 ErrXpackExceptional: "该部分为专业版功能，请先在 面板设置-许可证 界面同步许可证状态"
 ErrXpackOutOfDate: "当前许可证已过期，请重新在 面板设置-许可证 界面导入许可证"
 ErrXpackLost: "许可证已达到最大重试次数，请进入【面板设置】【许可证】页面手动点击同步按钮，以确保专业版功能正常使用"
+ErrDeviceLost: "许可证校验必要文件丢失，请检查后重试！"
 ErrXpackTimeout: "请求超时，网络连接可能不稳定，请稍后再试！"
 ErrUnbindMaster: "检测到节点管理内存在节点，无法解绑当前许可证，请先移除后重试！"
 ErrFreeNodeLimit: "社区版节点数量已达到免费上限，请前往 www.lxware.cn/1panel 购买后重试！"

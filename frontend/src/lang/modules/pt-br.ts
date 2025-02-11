@@ -1684,9 +1684,9 @@ const message = {
         Enable: 'Habilitado',
         Disable: 'Desabilitado',
         lostHelper:
-            'A licença atingiu o número máximo de tentativas de reenvio. Por favor, clique manualmente no botão de sincronização para garantir que os recursos da versão profissional estão funcionando corretamente.',
+            'A licença atingiu o número máximo de tentativas de reenvio. Por favor, clique manualmente no botão de sincronização para garantir que os recursos da versão profissional estão funcionando corretamente. detalhes: ',
         disableHelper:
-            'A verificação de sincronização da licença falhou. Por favor, clique manualmente no botão de sincronização para garantir que os recursos da versão profissional estão funcionando corretamente.',
+            'A verificação de sincronização da licença falhou. Por favor, clique manualmente no botão de sincronização para garantir que os recursos da versão profissional estão funcionando corretamente. detalhes: ',
         quickUpdate: 'Atualização rápida',
         power: 'Autorizar',
         unbindHelper:

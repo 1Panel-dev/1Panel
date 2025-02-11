@@ -27,7 +27,7 @@
                     <el-table-column :label="$t('commons.table.status')" prop="status" show-overflow-tooltip>
                         <template #default="{ row }">
                             <div v-if="row.status">
-                                <Status :status="row.status" :msg="loadMsg(row.status)"></Status>
+                                <Status :status="row.status" :msg="loadMsg(row)"></Status>
                             </div>
                             <span v-else>-</span>
                         </template>
@@ -111,12 +111,12 @@ const paginationConfig = reactive({
     name: '',
 });
 
-const loadMsg = (status: string) => {
-    if (status === 'Exceptional') {
-        return i18n.global.t('license.exceptionalHelper');
+const loadMsg = (row: any) => {
+    if (row.status === 'Exceptional') {
+        return i18n.global.t('license.exceptionalHelper') + (row.message || '-');
     }
-    if (status === 'Lost') {
-        return i18n.global.t('license.lostHelper');
+    if (row.status === 'Lost') {
+        return i18n.global.t('license.lostHelper') + (row.message || '-');
     }
     return '';
 };

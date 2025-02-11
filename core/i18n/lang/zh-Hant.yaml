@@ -51,6 +51,7 @@ ErrXpackNotFound: "該部分為專業版功能，請先在 面板設置-許可�
 ErrXpackExceptional: "該部分為專業版功能，請先在 面板設置-許可證 界面同步許可證狀態"
 ErrXpackOutOfDate: "當前許可證已過期，請重新在 面板設置-許可證 界面導入許可證"
 ErrXpackLost: "許可證已達到最大重試次數，請進入【面板設置】【許可證】頁面手動點擊同步按鈕，以確保專業版功能正常使用"
+ErrDeviceLost: "許可證校驗必要文件遺失，請檢查後重試！"
 ErrXpackTimeout: "請求超時，網絡連接可能不穩定，請稍後再試！"
 ErrUnbindMaster: "檢測到節點管理內存在節點，無法解綁當前許可證，請先移除後重試！"
 ErrFreeNodeLimit: "社區版節點數量已達免費上限，請前往 www.lxware.cn/1panel 購買後重試！"

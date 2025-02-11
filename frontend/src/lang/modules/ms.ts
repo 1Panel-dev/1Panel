@@ -1698,9 +1698,9 @@ const message = {
         Enable: 'Diaktifkan',
         Disable: 'Dilumpuhkan',
         lostHelper:
-            'Lesen telah mencapai jumlah percubaan semula maksimum. Sila klik butang penyegerakan secara manual untuk memastikan ciri versi profesional berfungsi dengan baik.',
+            'Lesen telah mencapai jumlah percubaan semula maksimum. Sila klik butang penyegerakan secara manual untuk memastikan ciri versi profesional berfungsi dengan baik. butiran: ',
         disableHelper:
-            'Pengesahan penyegerakan lesen gagal. Sila klik butang penyegerakan secara manual untuk memastikan ciri versi profesional berfungsi dengan baik.',
+            'Pengesahan penyegerakan lesen gagal. Sila klik butang penyegerakan secara manual untuk memastikan ciri versi profesional berfungsi dengan baik. butiran: ',
         quickUpdate: 'Kemas Kini Pantas',
         power: 'Kebenaran',
         unbindHelper: 'Semua Tetapan berkaitan Pro akan dibersihkan selepas nyahikat. Adakah anda mahu meneruskan?',

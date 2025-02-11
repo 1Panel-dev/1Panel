@@ -1778,9 +1778,9 @@ const message = {
         productName: 'Product Name',
         productStatus: 'Product Status',
         lostHelper:
-            'The license has reached the maximum number of retry attempts. Please manually click the sync button to ensure the professional version functions properly.',
+            'The license has reached the maximum number of retry attempts. Please manually click the sync button to ensure the professional version functions properly. detail: ',
         exceptionalHelper:
-            'License synchronization verification is abnormal. Please manually click the sync button to ensure the professional version functions properly.',
+            'License synchronization verification is abnormal. Please manually click the sync button to ensure the professional version functions properly. detail: ',
         quickUpdate: 'Quick Update',
         power: 'Authorization',
         unbindHelper: 'Unbinding will clear all professional edition settings for this node. Do you wish to continue?',

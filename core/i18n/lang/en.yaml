@@ -51,6 +51,7 @@ ErrXpackNotFound: "This section is for professional edition, please import the l
 ErrXpackExceptional: "This section is for professional edition, please sync license status in Panel Settings - License"
 ErrXpackOutOfDate: "Current license has expired, please import the license again in Panel Settings - License"
 ErrXpackLost: "License has reached the maximum retry count, please go to the [Panel Settings] [License] page and click the sync button manually to ensure the professional features work correctly"
+ErrDeviceLost: "Required files for license verification are missing, please check and try again!"
 ErrXpackTimeout: "Request timeout, network connection might be unstable, please try again later!"
 ErrUnbindMaster: "Detected nodes in node management, unable to unbind the current license, please remove nodes first and retry!"
 ErrFreeNodeLimit: "Community version node limit reached, please go to www.lxware.cn/1panel to purchase and retry!"

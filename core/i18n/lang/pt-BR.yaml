@@ -51,6 +51,7 @@ ErrXpackNotFound: "Esta parte é uma funcionalidade profissional, por favor impo
 ErrXpackExceptional: "Esta parte é uma funcionalidade profissional, por favor sincronize a licença em Configurações do Painel - Licença."
 ErrXpackOutOfDate: "A licença atual expirou, por favor importe uma nova em Configurações do Painel - Licença."
 ErrXpackLost: "A licença atingiu o número máximo de tentativas, acesse [Configurações do Painel][Licença] e clique no botão de sincronização manual."
+ErrDeviceLost: "Arquivos necessários para a verificação da licença estão faltando, por favor verifique e tente novamente!"
 ErrXpackTimeout: "Requisição expirou, a conexão de rede pode estar instável, por favor tente novamente mais tarde!"
 ErrUnbindMaster: "Foram encontrados nós na gestão de nós, remova-os primeiro e tente novamente!"
 ErrFreeNodeLimit: "O número de nós da versão comunitária atingiu o limite gratuito, por favor acesse www.lxware.cn/1panel para comprar!"

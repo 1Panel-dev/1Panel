@@ -51,6 +51,7 @@ ErrXpackNotFound: "Bahagian ini adalah fungsi profesional, sila muatkan lesen di
 ErrXpackExceptional: "Bahagian ini adalah fungsi profesional, sila selaraskan lesen di Tetapan Papan Pemuka terlebih dahulu."
 ErrXpackOutOfDate: "Lesen semasa telah tamat tempoh, sila muatkan lesen baru di Tetapan Papan Pemuka."
 ErrXpackLost: "Lesen telah mencapai bilangan percubaan maksimum, sila ke [Tetapan Papan Pemuka][Lesen] dan klik butang penyelarasan secara manual."
+ErrDeviceLost: "Fail yang diperlukan untuk pengesahan lesen hilang, sila semak dan cuba lagi!"
 ErrXpackTimeout: "Permintaan tamat masa, sambungan rangkaian mungkin tidak stabil, sila cuba lagi kemudian!"
 ErrUnbindMaster: "Terdapat nod dalam pengurusan nod, sila keluarkan dahulu dan cuba lagi!"
 ErrFreeNodeLimit: "Jumlah nod versi komuniti telah mencapai had percuma, sila lawati www.lxware.cn/1panel untuk pembelian!"
