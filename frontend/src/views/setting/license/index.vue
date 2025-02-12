@@ -6,6 +6,10 @@
                     {{ $t('commons.button.add') }}
                 </el-button>
             </template>
+            <template #rightToolBar>
+                <TableRefresh @search="search()" />
+                <TableSetting title="backup-account-refresh" @search="search()" />
+            </template>
             <template #main>
                 <ComplexTable :pagination-config="paginationConfig" @sort-change="search" @search="search" :data="data">
                     <el-table-column
@@ -19,9 +23,9 @@
                             {{ row.assigneeName || '-' }}
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('license.expiresAt')" prop="expiresAt" show-overflow-tooltip>
+                    <el-table-column :label="$t('license.trialInfo')" show-overflow-tooltip :min-width="120">
                         <template #default="{ row }">
-                            {{ row.expiresAt || '-' }}
+                            {{ loadVersion(row) }}
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" prop="status" show-overflow-tooltip>
@@ -171,10 +175,7 @@ const search = async () => {
             data.value = res.data.items || [];
             for (const item of data.value) {
                 item.productName = 'product-1panel-pro';
-                item.expiresAt =
-                    item.productPro === '0'
-                        ? i18n.global.t('license.indefinitePeriod')
-                        : timestampToDate(Number(item.productPro));
+                item.expiresAt = item.productPro === '0' ? '' : timestampToDate(Number(item.productPro));
             }
             paginationConfig.total = res.data.total;
         })
@@ -201,6 +202,19 @@ const timestampToDate = (timestamp: number) => {
 
 const toUpload = () => {
     licenseRef.value.acceptParams();
+};
+
+const loadVersion = (row: any) => {
+    if (row.trial === 'yes') {
+        return i18n.global.t('license.trial');
+    }
+    if (row.productPro && row.productPro !== '0') {
+        return i18n.global.t('license.subscription') + ' [ ' + row.expiresAt + ' ] ';
+    }
+    if (row.versionConstraint !== 'all') {
+        return i18n.global.t('license.versionConstraint', ['v' + row.versionConstraint.replace('.x', '')]);
+    }
+    return i18n.global.t('license.perpetual');
 };
 
 const buttons = [
@@ -255,11 +269,9 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
         click: (row: any) => {
-            for (const item of data.value) {
-                if (item.bindNode && row.freeCount != 0) {
-                    MsgError(i18n.global.t('license.unbindMasterHelper', [i18n.global.t('commons.button.delete')]));
-                    return;
-                }
+            if (row.freeNodes && row.freeCount != 0) {
+                MsgError(i18n.global.t('license.unbindMasterHelper', [i18n.global.t('commons.button.delete')]));
+                return;
             }
             delRef.value.acceptParams({ id: row.id, name: row.licenseName });
         },

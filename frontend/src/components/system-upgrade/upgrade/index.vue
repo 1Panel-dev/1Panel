@@ -114,9 +114,6 @@ defineExpose({
         font-size: 16px;
     }
 }
-:deep(.el-link__inner) {
-    font-weight: 400;
-}
 :deep(.md-editor-dark) {
     background-color: var(--panel-main-bg-color-9);
 }

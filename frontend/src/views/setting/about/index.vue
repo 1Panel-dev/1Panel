@@ -40,7 +40,7 @@
 </template>
 
 <script lang="ts" setup>
-import { getSettingInfo, getSystemAvailable } from '@/api/modules/setting';
+import { getSystemAvailable } from '@/api/modules/setting';
 import { onMounted, ref } from 'vue';
 import SystemUpgrade from '@/components/system-upgrade/index.vue';
 import { GlobalStore } from '@/store';
@@ -48,13 +48,7 @@ import PrimaryLogo from '@/assets/images/1panel-logo.svg?component';
 import { storeToRefs } from 'pinia';
 const globalStore = GlobalStore();
 const { docsUrl } = storeToRefs(globalStore);
-
-const version = ref();
 const loading = ref();
-const search = async () => {
-    const res = await getSettingInfo();
-    version.value = res.data.systemVersion;
-};
 
 const toDoc = () => {
     window.open(docsUrl.value, '_blank', 'noopener,noreferrer');
@@ -70,7 +64,6 @@ const toGithubStar = () => {
 };
 
 onMounted(() => {
-    search();
     getSystemAvailable();
 });
 </script>

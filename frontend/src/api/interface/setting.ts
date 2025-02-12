@@ -219,6 +219,7 @@ export namespace Setting {
         licenseName: string;
         assigneeName: string;
         productPro: string;
+        versionConstraint: string;
         trial: boolean;
         status: string;
         message: string;
