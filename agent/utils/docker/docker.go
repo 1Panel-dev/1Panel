@@ -2,6 +2,7 @@ package docker
 
 import (
 	"context"
+	"github.com/docker/docker/api/types/network"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/image"
@@ -13,6 +14,19 @@ import (
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
 )
+
+func NewDockerClient() (*client.Client, error) {
+	var settingItem model.Setting
+	_ = global.DB.Where("key = ?", "DockerSockPath").First(&settingItem).Error
+	if len(settingItem.Value) == 0 {
+		settingItem.Value = "unix:///var/run/docker.sock"
+	}
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithHost(settingItem.Value), client.WithAPIVersionNegotiation())
+	if err != nil {
+		return nil, err
+	}
+	return cli, nil
+}
 
 type Client struct {
 	cli *client.Client
@@ -34,21 +48,14 @@ func NewClient() (Client, error) {
 	}, nil
 }
 
-func (c Client) Close() {
-	_ = c.cli.Close()
+func NewClientWithCli(cli *client.Client) (Client, error) {
+	return Client{
+		cli: cli,
+	}, nil
 }
 
-func NewDockerClient() (*client.Client, error) {
-	var settingItem model.Setting
-	_ = global.DB.Where("key = ?", "DockerSockPath").First(&settingItem).Error
-	if len(settingItem.Value) == 0 {
-		settingItem.Value = "unix:///var/run/docker.sock"
-	}
-	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithHost(settingItem.Value), client.WithAPIVersionNegotiation())
-	if err != nil {
-		return nil, err
-	}
-	return cli, nil
+func (c Client) Close() {
+	_ = c.cli.Close()
 }
 
 func (c Client) ListContainersByName(names []string) ([]types.Container, error) {
@@ -90,34 +97,15 @@ func (c Client) ListAllContainers() ([]types.Container, error) {
 }
 
 func (c Client) CreateNetwork(name string) error {
-	_, err := c.cli.NetworkCreate(context.Background(), name, types.NetworkCreate{
-		Driver: "bridge",
+	_, err := c.cli.NetworkCreate(context.Background(), name, network.CreateOptions{
+		Driver:     "bridge",
+		EnableIPv6: new(bool),
 	})
 	return err
 }
 
 func (c Client) DeleteImage(imageID string) error {
 	if _, err := c.cli.ImageRemove(context.Background(), imageID, image.RemoveOptions{Force: true}); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (c Client) InspectContainer(containerID string) (types.ContainerJSON, error) {
-	return c.cli.ContainerInspect(context.Background(), containerID)
-}
-
-func (c Client) PullImage(imageName string, force bool) error {
-	if !force {
-		exist, err := c.CheckImageExist(imageName)
-		if err != nil {
-			return err
-		}
-		if exist {
-			return nil
-		}
-	}
-	if _, err := c.cli.ImagePull(context.Background(), imageName, image.PullOptions{}); err != nil {
 		return err
 	}
 	return nil
@@ -138,20 +126,8 @@ func (c Client) GetImageIDByName(imageName string) (string, error) {
 	return "", nil
 }
 
-func (c Client) CheckImageExist(imageName string) (bool, error) {
-	filter := filters.NewArgs()
-	filter.Add("reference", imageName)
-	list, err := c.cli.ImageList(context.Background(), image.ListOptions{
-		Filters: filter,
-	})
-	if err != nil {
-		return false, err
-	}
-	return len(list) > 0, nil
-}
-
 func (c Client) NetworkExist(name string) bool {
-	var options types.NetworkListOptions
+	var options network.ListOptions
 	options.Filters = filters.NewArgs(filters.Arg("name", name))
 	networks, err := c.cli.NetworkList(context.Background(), options)
 	if err != nil {

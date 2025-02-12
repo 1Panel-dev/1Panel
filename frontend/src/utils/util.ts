@@ -743,7 +743,6 @@ export const encryptPassword = (password: string) => {
     }
     let rsaPublicKeyText = getCookie('panel_public_key');
     if (!rsaPublicKeyText) {
-        console.log('RSA public key not found');
         return password;
     }
     rsaPublicKeyText = urlDecode(rsaPublicKeyText);
