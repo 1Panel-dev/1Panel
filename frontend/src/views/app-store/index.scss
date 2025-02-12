@@ -7,11 +7,7 @@
     }
 
     .a-detail {
-        height: 100%;
-        width: 100%;
-
         .d-name {
-            height: 20%;
             .name {
                 white-space: nowrap;
                 overflow: hidden;
@@ -21,18 +17,8 @@
                 font-size: 18px;
                 color: var(--panel-text-color);
             }
-            .status {
-                margin-left: 5px;
-            }
             .h-button {
                 float: right;
-                margin-right: 5px;
-            }
-            .msg {
-                margin-left: 5px;
-            }
-            .el-button + .el-button {
-                margin-left: 6px;
             }
         }
 
@@ -50,7 +36,7 @@
         }
         .d-button {
             margin-top: 10px;
-            min-width: 440px;
+            min-width: 330px;
         }
     }
 

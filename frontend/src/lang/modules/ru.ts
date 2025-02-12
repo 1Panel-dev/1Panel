@@ -43,7 +43,7 @@ const message = {
             collapse: 'Свернуть',
             log: 'Логи',
             back: 'Назад',
-            backup: 'Резервное копирование',
+            backup: 'Бэкап',
             recover: 'Восстановить',
             retry: 'Повторить',
             upload: 'Загрузить',
