@@ -10,19 +10,19 @@ import (
 	"sync"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/backend/constant"
-	"github.com/shirou/gopsutil/v3/load"
-	"github.com/shirou/gopsutil/v3/mem"
-	"github.com/shirou/gopsutil/v3/net"
-
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/ai_tools/gpu"
+	"github.com/1Panel-dev/1Panel/backend/utils/ai_tools/xpu"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/copier"
-	"github.com/1Panel-dev/1Panel/backend/utils/xpack"
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/host"
+	"github.com/shirou/gopsutil/v3/load"
+	"github.com/shirou/gopsutil/v3/mem"
+	"github.com/shirou/gopsutil/v3/net"
 )
 
 type DashboardService struct{}
@@ -341,7 +341,17 @@ func loadDiskInfo() []dto.DiskInfo {
 }
 
 func loadGPUInfo() []dto.GPUInfo {
-	list := xpack.LoadGpuInfo()
+	ok, client := gpu.New()
+	var list []interface{}
+	if ok {
+		info, err := client.LoadGpuInfo()
+		if err != nil || len(info.GPUs) == 0 {
+			return nil
+		}
+		for _, item := range info.GPUs {
+			list = append(list, item)
+		}
+	}
 	if len(list) == 0 {
 		return nil
 	}
@@ -359,7 +369,17 @@ func loadGPUInfo() []dto.GPUInfo {
 }
 
 func loadXpuInfo() []dto.XPUInfo {
-	list := xpack.LoadXpuInfo()
+	var list []interface{}
+	ok, xpuClient := xpu.New()
+	if ok {
+		xpus, err := xpuClient.LoadDashData()
+		if err != nil || len(xpus) == 0 {
+			return nil
+		}
+		for _, item := range xpus {
+			list = append(list, item)
+		}
+	}
 	if len(list) == 0 {
 		return nil
 	}

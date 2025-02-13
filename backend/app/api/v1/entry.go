@@ -15,6 +15,8 @@ var (
 	appService        = service.NewIAppService()
 	appInstallService = service.NewIAppInstalledService()
 
+	AIToolService = service.NewIAIToolService()
+
 	containerService       = service.NewIContainerService()
 	composeTemplateService = service.NewIComposeTemplateService()
 	imageRepoService       = service.NewIImageRepoService()
