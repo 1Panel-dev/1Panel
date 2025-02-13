@@ -17,6 +17,7 @@ func (a *AIToolsRouter) InitRouter(Router *gin.RouterGroup) {
 	{
 		aiToolsRouter.POST("/ollama/model", baseApi.CreateOllamaModel)
 		aiToolsRouter.POST("/ollama/model/search", baseApi.SearchOllamaModel)
+		aiToolsRouter.POST("/ollama/model/load", baseApi.LoadOllamaModelDetail)
 		aiToolsRouter.POST("/ollama/model/del", baseApi.DeleteOllamaModel)
 		aiToolsRouter.GET("/gpu/load", baseApi.LoadGpuInfo)
 	}

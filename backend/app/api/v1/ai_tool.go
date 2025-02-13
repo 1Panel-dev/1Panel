@@ -59,6 +59,29 @@ func (b *BaseApi) SearchOllamaModel(c *gin.Context) {
 }
 
 // @Tags AITools
+// @Summary Page Ollama models
+// @Accept json
+// @Param request body dto.OllamaModelName true "request"
+// @Success 200 {string} details
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /aitools/ollama/model/load [post]
+func (b *BaseApi) LoadOllamaModelDetail(c *gin.Context) {
+	var req dto.OllamaModelName
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	detail, err := AIToolService.LoadDetail(req.Name)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, detail)
+}
+
+// @Tags AITools
 // @Summary Delete Ollama model
 // @Accept json
 // @Param request body dto.OllamaModelName true "request"
@@ -66,6 +89,7 @@ func (b *BaseApi) SearchOllamaModel(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /aitool/ollama/model/del [post]
+// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"删除模型 [name]","formatEN":"remove Ollama model [name]"}
 func (b *BaseApi) DeleteOllamaModel(c *gin.Context) {
 	var req dto.OllamaModelName
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {

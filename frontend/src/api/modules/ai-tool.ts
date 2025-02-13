@@ -11,6 +11,9 @@ export const deleteOllamaModel = (name: string) => {
 export const searchOllamaModel = (params: AITool.OllamaModelSearch) => {
     return http.post<ResPage<AITool.OllamaModelInfo>>(`/aitools/ollama/model/search`, params);
 };
+export const loadOllamaModel = (name: string) => {
+    return http.post<string>(`/aitools/ollama/model/load`, { name: name });
+};
 
 export const loadGPUInfo = () => {
     return http.get<any>(`/aitools/gpu/load`);

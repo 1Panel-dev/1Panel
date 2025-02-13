@@ -6,7 +6,7 @@ const databaseRouter = {
     component: Layout,
     redirect: '/ai-tools/model',
     meta: {
-        icon: 'p-database',
+        icon: 'p-jiqiren2',
         title: 'menu.ai_tools',
     },
     children: [

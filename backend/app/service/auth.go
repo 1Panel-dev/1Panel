@@ -3,6 +3,8 @@ package service
 import (
 	"crypto/hmac"
 	"encoding/base64"
+	"strconv"
+
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
@@ -13,7 +15,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
-	"strconv"
 )
 
 type AuthService struct{}
@@ -203,10 +204,7 @@ func (u *AuthService) GetSecurityEntrance() string {
 func (u *AuthService) IsLogin(c *gin.Context) bool {
 	sID, _ := c.Cookie(constant.SessionName)
 	_, err := global.SESSION.Get(sID)
-	if err != nil {
-		return false
-	}
-	return true
+	return err == nil
 }
 
 func checkPassword(password string) error {

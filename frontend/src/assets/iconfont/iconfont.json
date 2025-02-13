@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "10505865",
+      "name": "机器人",
+      "font_class": "jiqiren2",
+      "unicode": "e613",
+      "unicode_decimal": 58899
+    },
+    {
       "icon_id": "4472516",
       "name": "告警设置",
       "font_class": "alert-3",
@@ -277,20 +284,6 @@
       "font_class": "xpack",
       "unicode": "e604",
       "unicode_decimal": 58884
-    },
-    {
-      "icon_id": "640495",
-      "name": "详细信息",
-      "font_class": "gpu-2",
-      "unicode": "e6d8",
-      "unicode_decimal": 59096
-    },
-    {
-      "icon_id": "6176565",
-      "name": "监控",
-      "font_class": "gpu-1",
-      "unicode": "e623",
-      "unicode_decimal": 58915
     },
     {
       "icon_id": "40398413",

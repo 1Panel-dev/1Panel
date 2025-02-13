@@ -19,23 +19,31 @@
                     ref="appStatusRef"
                 ></AppStatus>
             </template>
-            <template #toolbar>
+            <template #toolbar v-if="modelInfo.isExist">
                 <div class="flex justify-between gap-2 flex-wrap sm:flex-row">
                     <div class="flex flex-wrap gap-3">
-                        <el-button v-if="modelInfo.status === 'Running'" type="primary" @click="onCreate()">
+                        <el-button :disabled="modelInfo.status !== 'Running'" type="primary" @click="onCreate()">
                             {{ $t('ai_tools.model.create') }}
                         </el-button>
-                        <!-- <el-button @click="onLoadConn" type="primary" plain>
+                        <el-button :disabled="modelInfo.status !== 'Running'" @click="onLoadConn" type="primary" plain>
                             {{ $t('database.databaseConnInfo') }}
-                        </el-button> -->
-                        <el-button icon="Position" @click="goDashboard()" type="primary" plain>OpenWebUI</el-button>
+                        </el-button>
+                        <el-button
+                            :disabled="modelInfo.status !== 'Running'"
+                            icon="Position"
+                            @click="goDashboard()"
+                            type="primary"
+                            plain
+                        >
+                            OpenWebUI
+                        </el-button>
                     </div>
                     <div>
                         <TableSearch @search="search()" v-model:searchName="searchName" />
                     </div>
                 </div>
             </template>
-            <template #main>
+            <template #main v-if="modelInfo.isExist">
                 <ComplexTable
                     :pagination-config="paginationConfig"
                     :class="{ mask: maskShow }"
@@ -43,7 +51,13 @@
                     @search="search"
                     :data="data"
                 >
-                    <el-table-column :label="$t('commons.table.name')" prop="name" min-width="90" />
+                    <el-table-column :label="$t('commons.table.name')" prop="name" min-width="90">
+                        <template #default="{ row }">
+                            <el-text type="primary" class="cursor-pointer" @click="onLoad(row.name)">
+                                {{ row.name }}
+                            </el-text>
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('file.size')" prop="size" />
                     <el-table-column :label="$t('commons.button.log')">
                         <template #default="{ row }">
@@ -65,28 +79,11 @@
             </template>
         </LayoutContent>
 
-        <el-card v-if="modelInfo.status != 'Running' && !loading && maskShow" class="mask-prompt">
+        <el-card v-if="modelInfo.isExist && modelInfo.status != 'Running' && !loading && maskShow" class="mask-prompt">
             <span>
                 {{ $t('commons.service.serviceNotStarted', ['Ollama']) }}
             </span>
         </el-card>
-
-        <LayoutContent v-if="!modelInfo.isExist && !loading" title="Ollama" :divider="true">
-            <template #main>
-                <div class="app-warn">
-                    <div class="flex flex-col gap-2 items-center justify-center w-full sm:flex-row">
-                        <span>{{ $t('app.checkInstalledWarn', [$t('database.noMysql')]) }}</span>
-                        <span @click="goInstall('ollama')" class="flex items-center justify-center gap-0.5">
-                            <el-icon><Position /></el-icon>
-                            {{ $t('database.goInstall') }}
-                        </span>
-                    </div>
-                    <div>
-                        <img src="@/assets/images/no_app.svg" />
-                    </div>
-                </div>
-            </template>
-        </LayoutContent>
 
         <el-dialog
             v-model="dashboardVisible"
@@ -110,6 +107,8 @@
 
         <AddDialog ref="addRef" @search="search" @log="onLoadLog" />
         <Log ref="logRef" @close="search" />
+        <Conn ref="connRef" />
+        <CodemirrorDialog ref="detailRef" />
         <PortJumpDialog ref="dialogPortJumpRef" />
     </div>
 </template>
@@ -117,13 +116,15 @@
 <script lang="ts" setup>
 import AppStatus from '@/components/app-status/index.vue';
 import AddDialog from '@/views/ai-tools/model/add/index.vue';
+import Conn from '@/views/ai-tools/model/conn/index.vue';
 import Log from '@/components/log-dialog/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
+import CodemirrorDialog from '@/components/codemirror-dialog/index.vue';
 import { computed, onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { App } from '@/api/interface/app';
 import { GlobalStore } from '@/store';
-import { deleteOllamaModel, searchOllamaModel } from '@/api/modules/ai-tool';
+import { deleteOllamaModel, loadOllamaModel, searchOllamaModel } from '@/api/modules/ai-tool';
 import { AITool } from '@/api/interface/ai-tool';
 import { GetAppPort } from '@/api/modules/app';
 import router from '@/routers';
@@ -135,6 +136,8 @@ const maskShow = ref(true);
 
 const addRef = ref();
 const logRef = ref();
+const detailRef = ref();
+const connRef = ref();
 const openWebUIPort = ref();
 const dashboardVisible = ref(false);
 const dialogPortJumpRef = ref();
@@ -155,6 +158,7 @@ const modelInfo = reactive({
     container: '',
     isExist: null,
     version: '',
+    port: 11434,
 });
 
 const mobile = computed(() => {
@@ -183,6 +187,20 @@ const onCreate = async () => {
     addRef.value.acceptParams();
 };
 
+const onLoadConn = async () => {
+    connRef.value.acceptParams({ port: modelInfo.port, containerName: modelInfo.container });
+};
+
+const onLoad = async (name: string) => {
+    const res = await loadOllamaModel(name);
+    let detailInfo = res.data;
+    let param = {
+        header: i18n.global.t('commons.button.view'),
+        detailInfo: detailInfo,
+    };
+    detailRef.value!.acceptParams(param);
+};
+
 const goDashboard = async () => {
     if (openWebUIPort.value === 0) {
         dashboardVisible.value = true;
@@ -205,6 +223,11 @@ const checkExist = (data: App.CheckInstalled) => {
     modelInfo.status = data.status;
     modelInfo.version = data.version;
     modelInfo.container = data.containerName;
+    modelInfo.port = data.httpPort;
+
+    if (modelInfo.isExist && modelInfo.status === 'Running') {
+        search();
+    }
 };
 
 const onDelete = async (row: AITool.OllamaModelInfo) => {
@@ -240,7 +263,6 @@ const buttons = [
 ];
 
 onMounted(() => {
-    search();
     loadWebUIPort();
 });
 </script>

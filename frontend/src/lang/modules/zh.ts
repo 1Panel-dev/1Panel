@@ -579,7 +579,9 @@ const message = {
         model: {
             model: '模型',
             create: '添加模型',
-            create_helper: '查找需要添加的模型',
+            create_helper: '从 Ollama.com 拉取 "{0}"',
+            ollama_doc: '您可以访问 Ollama 官网，搜索并查找更多模型。',
+            container_conn_helper: '容器间访问或连接使用此地址',
         },
         gpu: {
             gpu: 'GPU 监控',
@@ -1681,7 +1683,6 @@ const message = {
         introduce: '功能介绍',
         waf: '升级专业版可以获得拦截地图、日志、封锁记录、地理位置封禁、自定义规则、自定义拦截页面等功能。',
         tamper: '升级专业版可以保护网站免受未经授权的修改或篡改。',
-        gpu: '升级专业版可以帮助用户实时直观查看到 GPU 的工作负载、温度、显存等重要参数。',
         setting: '升级专业版可以自定义面板 Logo、欢迎简介等信息。',
         monitor: '升级专业版可以查看网站的实时状态、访客趋势、访客来源、请求日志等信息。',
         alert: '升级专业版可通过短信接收告警信息，并查看告警日志，全面掌控各类关键事件，确保系统运行无忧。',

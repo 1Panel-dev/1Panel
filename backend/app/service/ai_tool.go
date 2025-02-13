@@ -21,6 +21,7 @@ type IAIToolService interface {
 	Search(search dto.SearchWithPage) (int64, []dto.OllamaModelInfo, error)
 	Create(name string) error
 	Delete(name string) error
+	LoadDetail(name string) (string, error)
 }
 
 func NewIAIToolService() IAIToolService {
@@ -31,6 +32,9 @@ func (u *AIToolService) Search(req dto.SearchWithPage) (int64, []dto.OllamaModel
 	ollamaBaseInfo, err := appInstallRepo.LoadBaseInfo("ollama", "")
 	if err != nil {
 		return 0, nil, err
+	}
+	if ollamaBaseInfo.Status != constant.Running {
+		return 0, nil, nil
 	}
 	stdout, err := cmd.Execf("docker exec %s ollama list", ollamaBaseInfo.ContainerName)
 	if err != nil {
@@ -85,6 +89,24 @@ func (u *AIToolService) Search(req dto.SearchWithPage) (int64, []dto.OllamaModel
 	return int64(total), records, err
 }
 
+func (u *AIToolService) LoadDetail(name string) (string, error) {
+	if cmd.CheckIllegal(name) {
+		return "", buserr.New(constant.ErrCmdIllegal)
+	}
+	ollamaBaseInfo, err := appInstallRepo.LoadBaseInfo("ollama", "")
+	if err != nil {
+		return "", err
+	}
+	if ollamaBaseInfo.Status != constant.Running {
+		return "", nil
+	}
+	stdout, err := cmd.Execf("docker exec %s ollama show %s", ollamaBaseInfo.ContainerName, name)
+	if err != nil {
+		return "", err
+	}
+	return stdout, err
+}
+
 func (u *AIToolService) Create(name string) error {
 	if cmd.CheckIllegal(name) {
 		return buserr.New(constant.ErrCmdIllegal)
@@ -92,6 +114,9 @@ func (u *AIToolService) Create(name string) error {
 	ollamaBaseInfo, err := appInstallRepo.LoadBaseInfo("ollama", "")
 	if err != nil {
 		return err
+	}
+	if ollamaBaseInfo.Status != constant.Running {
+		return nil
 	}
 	fileName := strings.ReplaceAll(name, ":", "-")
 	logItem := path.Join(global.CONF.System.DataDir, "log", "AITools", fileName)
@@ -129,6 +154,9 @@ func (u *AIToolService) Delete(name string) error {
 	ollamaBaseInfo, err := appInstallRepo.LoadBaseInfo("ollama", "")
 	if err != nil {
 		return err
+	}
+	if ollamaBaseInfo.Status != constant.Running {
+		return nil
 	}
 	stdout, err := cmd.Execf("docker exec %s ollama list", ollamaBaseInfo.ContainerName)
 	if err != nil {

@@ -4,7 +4,7 @@
         :destroy-on-close="true"
         :close-on-click-modal="false"
         :close-on-press-escape="false"
-        size="30%"
+        size="40%"
     >
         <template #header>
             <DrawerHeader :header="$t('ai_tools.model.create')" :back="handleClose" />
@@ -14,18 +14,22 @@
                 <el-alert type="info" :closable="false">
                     <template #title>
                         <span class="flx-align-center">
-                            {{ $t('ai_tools.model.create_helper') }}
+                            {{ $t('ai_tools.model.ollama_doc') }}
                             <el-link class="ml-5" icon="Position" @click="goSearch()" type="primary">
                                 {{ $t('firewall.quickJump') }}
                             </el-link>
                         </span>
                     </template>
                 </el-alert>
-                <el-form ref="formRef" label-position="top" :model="form">
+                <el-form ref="formRef" label-position="top" class="mt-5" :model="form">
                     <el-form-item :label="$t('commons.table.name')" :rules="Rules.requiredInput" prop="name">
                         <el-input v-model.trim="form.name" />
                         <span class="input-help" v-if="form.name">
-                            ollama pull {{ form.name.replaceAll('ollama run ', '').replaceAll('ollama pull ', '') }}
+                            {{
+                                $t('ai_tools.model.create_helper', [
+                                    form.name.replaceAll('ollama run ', '').replaceAll('ollama pull ', ''),
+                                ])
+                            }}
                         </span>
                     </el-form-item>
                 </el-form>
