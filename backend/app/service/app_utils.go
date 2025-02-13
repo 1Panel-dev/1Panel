@@ -1500,6 +1500,18 @@ func addDockerComposeCommonParam(composeMap map[string]interface{}, serviceName 
 	deploy["resources"] = resource
 	serviceValue["deploy"] = deploy
 
+	if req.GpuConfig {
+		resource["reservations"] = map[string]interface{}{
+			"devices": []map[string]interface{}{
+				{
+					"driver":       "nvidia",
+					"count":        "all",
+					"capabilities": []string{"gpu"},
+				},
+			},
+		}
+	}
+
 	ports, ok := serviceValue["ports"].([]interface{})
 	if ok {
 		for i, port := range ports {

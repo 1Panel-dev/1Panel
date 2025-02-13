@@ -1900,6 +1900,9 @@ const message = {
             '左側は古いバージョンで、右側は新しいバージョンです。編集後、クリックしてカスタムバージョンを保存します',
         pullImage: '画像を引っ張ります',
         pullImageHelper: 'アプリケーションが開始する前に、Docker Pullを実行して画像をプルします',
+        gpuConfig: 'GPU アクセラレーション',
+        gpuConfigHelper:
+            'マシンにNVIDIA GPUが搭載されていることを確認し、NVIDIAドライバーとNVIDIA Docker Container Toolkitをインストールしてください。',
     },
     website: {
         website: 'ウェブサイト|ウェブサイト',

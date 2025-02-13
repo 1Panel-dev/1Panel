@@ -1943,6 +1943,9 @@ const message = {
             'Слева старая версия, справа новая версия. После редактирования нажмите для сохранения пользовательской версии',
         pullImage: 'Загрузить образ',
         pullImageHelper: 'Выполнить docker pull для загрузки образа перед запуском приложения',
+        gpuConfig: 'GPU Hızlandırma',
+        gpuConfigHelper:
+            'Пожалуйста, убедитесь, что на машине есть NVIDIA GPU и установлены драйвера NVIDIA и NVIDIA Docker Container Toolkit',
     },
     website: {
         website: 'Веб-сайт | Веб-сайты',

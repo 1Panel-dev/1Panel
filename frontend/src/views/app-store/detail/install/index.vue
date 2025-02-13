@@ -108,6 +108,10 @@
                             <el-checkbox v-model="req.editCompose" :label="$t('app.editCompose')" size="large" />
                             <span class="input-help">{{ $t('app.editComposeHelper') }}</span>
                         </el-form-item>
+                        <el-form-item pro="gpuConfig" v-if="gpuSupport">
+                            <el-checkbox v-model="req.gpuConfig" :label="$t('app.gpuConfig')" size="large" />
+                            <span class="input-help">{{ $t('app.gpuConfigHelper') }}</span>
+                        </el-form-item>
                         <el-form-item pro="pullImage">
                             <el-checkbox v-model="req.pullImage" :label="$t('app.pullImage')" size="large" />
                             <span class="input-help">{{ $t('app.pullImageHelper') }}</span>
@@ -198,6 +202,7 @@ const initData = () => ({
     version: '',
     appID: '',
     pullImage: true,
+    gpuConfig: false,
 });
 const req = reactive(initData());
 const limits = ref<Container.ResourceLimit>({
@@ -215,6 +220,7 @@ const handleClose = () => {
 };
 const paramKey = ref(1);
 const isHostMode = ref(false);
+const gpuSupport = ref(false);
 
 const changeUnit = () => {
     if (req.memoryUnit == 'M') {
@@ -262,6 +268,7 @@ const getAppDetail = async (version: string) => {
         isHostMode.value = res.data.hostMode;
         installData.value.params = res.data.params;
         paramKey.value++;
+        gpuSupport.value = res.data.gpuSupport;
     } catch (error) {
     } finally {
         loading.value = false;

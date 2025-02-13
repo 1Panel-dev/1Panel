@@ -1801,6 +1801,8 @@ const message = {
         diffHelper: '左侧为旧版本，右侧为新版，编辑之后点击使用自定义版本保存',
         pullImage: '拉取镜像',
         pullImageHelper: '在应用启动之前执行 docker pull 来拉取镜像',
+        gpuConfig: 'GPU 加速',
+        gpuConfigHelper: '请确保机器有 NVIDIA GPU 并且安装 NVIDIA 驱动 和 NVIDIA docker Container Toolkit',
     },
     website: {
         website: '网站',

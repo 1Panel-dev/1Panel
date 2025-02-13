@@ -1869,6 +1869,9 @@ const message = {
         diffHelper: '왼쪽은 이전 버전, 오른쪽은 새 버전입니다. 편집 후 사용자 정의 버전을 저장하려면 클릭하세요.',
         pullImage: '이미지 풀',
         pullImageHelper: '애플리케이션 시작 전에 docker pull 을 실행하여 이미지를 다운로드하세요.',
+        gpuConfig: 'GPU 가속',
+        gpuConfigHelper:
+            '기계에 NVIDIA GPU가 설치되어 있고 NVIDIA 드라이버와 NVIDIA Docker Container Toolkit이 설치되어 있는지 확인하십시오.',
     },
     website: {
         website: '웹사이트 | 웹사이트들',

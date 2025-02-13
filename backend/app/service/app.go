@@ -94,13 +94,14 @@ func (a AppService) PageApp(ctx *gin.Context, req request.AppSearch) (interface{
 	lang := strings.ToLower(common.GetLang(ctx))
 	for _, ap := range apps {
 		appDTO := &response.AppItem{
-			ID:       ap.ID,
-			Name:     ap.Name,
-			Key:      ap.Key,
-			Type:     ap.Type,
-			Icon:     ap.Icon,
-			Resource: ap.Resource,
-			Limit:    ap.Limit,
+			ID:         ap.ID,
+			Name:       ap.Name,
+			Key:        ap.Key,
+			Type:       ap.Type,
+			Icon:       ap.Icon,
+			Resource:   ap.Resource,
+			Limit:      ap.Limit,
+			GpuSupport: ap.GpuSupport,
 		}
 		appDTO.Description = ap.GetDescription(ctx)
 		appDTOs = append(appDTOs, appDTO)
@@ -167,6 +168,7 @@ func (a AppService) GetApp(ctx *gin.Context, key string) (*response.AppDTO, erro
 	if err != nil {
 		return nil, err
 	}
+	appDTO.GpuSupport = app.GpuSupport
 	appDTO.Tags = tags
 	return &appDTO, nil
 }
@@ -264,6 +266,7 @@ func (a AppService) GetAppDetail(appID uint, version, appType string) (response.
 	if err := checkLimit(app); err != nil {
 		appDetailDTO.Enable = false
 	}
+	appDetailDTO.GpuSupport = app.GpuSupport
 	return appDetailDTO, nil
 }
 func (a AppService) GetAppDetailByID(id uint) (*response.AppDetailDTO, error) {
@@ -862,6 +865,7 @@ func (a AppService) SyncAppListFromRemote() (err error) {
 	global.LOG.Infof("Starting synchronization of application details...")
 	for _, l := range list.Apps {
 		app := appsMap[l.AppProperty.Key]
+		app.GpuSupport = l.AppProperty.GpuSupport
 
 		if l.AppProperty.Version > 0 && common.CompareVersion(strconv.FormatFloat(l.AppProperty.Version, 'f', -1, 64), setting.SystemVersion) {
 			delete(appsMap, l.AppProperty.Key)

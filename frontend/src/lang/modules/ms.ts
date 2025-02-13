@@ -1951,6 +1951,9 @@ const message = {
         diffHelper: 'Bahagian kiri ialah versi lama, kanan ialah versi baru.',
         pullImage: 'Tarik Imej',
         pullImageHelper: 'Laksanakan docker pull untuk menarik imej sebelum aplikasi dimulakan.',
+        gpuConfig: 'Pecutan GPU',
+        gpuConfigHelper:
+            'Pastikan mesin mempunyai GPU NVIDIA dan pasang pemacu NVIDIA serta NVIDIA Docker Container Toolkit.',
     },
     website: {
         website: 'Laman Web | Laman Web',

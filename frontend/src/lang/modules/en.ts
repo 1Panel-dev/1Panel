@@ -1927,6 +1927,9 @@ const message = {
             'The left side is the old version, the right side is the new version. After editing, click to save the custom version',
         pullImage: 'Pull Image',
         pullImageHelper: 'Execute docker pull to pull the image before the application starts',
+        gpuConfig: 'GPU Acceleration',
+        gpuConfigHelper:
+            'Please ensure the machine has an NVIDIA GPU and that NVIDIA drivers and the NVIDIA Docker Container Toolkit are installed',
     },
     website: {
         website: 'Website | Websites',

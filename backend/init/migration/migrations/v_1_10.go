@@ -372,7 +372,7 @@ var UpdateAppTag = &gormigrate.Migration{
 }
 
 var UpdateApp = &gormigrate.Migration{
-	ID: "20250114-update-app",
+	ID: "20250213-update-app",
 	Migrate: func(tx *gorm.DB) error {
 		if err := tx.AutoMigrate(&model.App{}); err != nil {
 			return err

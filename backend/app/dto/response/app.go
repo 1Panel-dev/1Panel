@@ -41,6 +41,7 @@ type AppItem struct {
 	Versions    []string `json:"versions"`
 	Limit       int      `json:"limit"`
 	Tags        []TagDTO `json:"tags"`
+	GpuSupport  bool     `json:"gpuSupport"`
 }
 
 type TagDTO struct {
@@ -66,10 +67,11 @@ type AppInstalledCheck struct {
 
 type AppDetailDTO struct {
 	model.AppDetail
-	Enable   bool        `json:"enable"`
-	Params   interface{} `json:"params"`
-	Image    string      `json:"image"`
-	HostMode bool        `json:"hostMode"`
+	Enable     bool        `json:"enable"`
+	Params     interface{} `json:"params"`
+	Image      string      `json:"image"`
+	HostMode   bool        `json:"hostMode"`
+	GpuSupport bool        `json:"gpuSupport"`
 }
 
 type IgnoredApp struct {

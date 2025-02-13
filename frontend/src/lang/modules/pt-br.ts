@@ -1941,6 +1941,9 @@ const message = {
             'O lado esquerdo é a versão antiga, o lado direito é a nova versão. Após editar, clique para salvar a versão personalizada',
         pullImage: 'Puxar Imagem',
         pullImageHelper: 'Execute o comando docker pull para puxar a imagem antes de iniciar o aplicativo',
+        gpuConfig: 'Aceleração de GPU',
+        gpuConfigHelper:
+            'Certifique-se de que a máquina possui uma GPU NVIDIA e instale os drivers NVIDIA e o NVIDIA Docker Container Toolkit.',
     },
     website: {
         website: 'Website | Websites',

@@ -90,6 +90,7 @@ type AppProperty struct {
 	Github             string   `json:"github"`
 	Document           string   `json:"document"`
 	Version            float64  `json:"version"`
+	GpuSupport         bool     `json:"gpuSupport"`
 }
 
 type AppConfigVersion struct {
