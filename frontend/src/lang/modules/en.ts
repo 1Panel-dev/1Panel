@@ -2579,6 +2579,13 @@ const message = {
         licenseHelper: 'Professional version supports SMS alert',
         alertCountHelper: 'Maximum daily alarm frequency',
     },
+    aitool: {
+        proxy: 'AI Proxy Enhancement',
+        proxyHelper1: 'Bind domain and enable HTTPS for enhanced transmission security',
+        proxyHelper2: 'Limit IP access to prevent exposure on the public internet',
+        proxyHelper3: 'Enable streaming',
+        proxyHelper4: 'Once created, you can view and manage it in the website list',
+    },
 };
 
 export default {

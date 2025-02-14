@@ -2601,6 +2601,13 @@ const message = {
         licenseHelper: 'A versão profissional suporta alertas via SMS',
         alertCountHelper: 'Frequência máxima diária de alertas',
     },
+    aitool: {
+        proxy: 'Melhoria de Proxy AI',
+        proxyHelper1: 'Vincule o domínio e habilite o HTTPS para aumentar a segurança na transmissão',
+        proxyHelper2: 'Limite o acesso por IP para evitar exposição na internet pública',
+        proxyHelper3: 'Habilite a transmissão em fluxo',
+        proxyHelper4: 'Após a criação, você pode visualizar e gerenciar no lista de sites',
+    },
 };
 
 export default {

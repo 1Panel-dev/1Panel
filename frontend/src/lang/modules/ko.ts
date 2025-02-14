@@ -2509,6 +2509,13 @@ const message = {
         licenseHelper: '전문 버전에서는 SMS 알림을 지원합니다.',
         alertCountHelper: '최대 일일 알림 빈도',
     },
+    aitool: {
+        proxy: 'AI 프록시 강화',
+        proxyHelper1: '도메인을 바인딩하고 HTTPS를 활성화하여 전송 보안을 강화',
+        proxyHelper2: 'IP 접근을 제한하여 공용 인터넷에서의 노출을 방지',
+        proxyHelper3: '스트리밍을 활성화',
+        proxyHelper4: '생성 후, 웹사이트 목록에서 이를 보고 관리할 수 있습니다',
+    },
 };
 
 export default {

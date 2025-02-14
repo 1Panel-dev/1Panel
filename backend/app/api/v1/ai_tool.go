@@ -134,3 +134,64 @@ func (b *BaseApi) LoadGpuInfo(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, &common.GpuInfo{})
 }
+
+// @Tags AITools
+// @Summary Bind domain
+// @Accept json
+// @Param request body dto.WebsiteConfig true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /aitool/domain/bind [post]
+func (b *BaseApi) BindDomain(c *gin.Context) {
+	var req dto.OllamaBindDomain
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := AIToolService.BindDomain(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}
+
+// @Tags AITools
+// @Summary Get bind domain
+// @Accept json
+// @Param request body dto.OllamaBindDomainReq true "request"
+// @Success 200 {object} dto.OllamaBindDomainRes
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /aitool/domain/get [post]
+func (b *BaseApi) GetBindDomain(c *gin.Context) {
+	var req dto.OllamaBindDomainReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	res, err := AIToolService.GetBindDomain(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}
+
+// Tags AITools
+// Summary Update bind domain
+// Accept json
+// Param request body dto.OllamaBindDomain true "request"
+// Success 200
+// Security ApiKeyAuth
+// Security Timestamp
+// Router /aitool/domain/update [post]
+func (b *BaseApi) UpdateBindDomain(c *gin.Context) {
+	var req dto.OllamaBindDomain
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := AIToolService.UpdateBindDomain(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}

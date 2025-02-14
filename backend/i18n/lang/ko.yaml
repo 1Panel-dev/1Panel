@@ -284,3 +284,6 @@ UserInfoPassHelp: "팁: 비밀번호를 변경하려면 다음 명령어를 실�
 DBConnErr: "오류: 데이터베이스 연결 초기화 실패 {{ .err }}"
 SystemVersion: "버전: "
 SystemMode: "모드: "
+
+#ai-tool
+ErrOpenrestyInstall: '먼저 Openresty를 설치하세요'

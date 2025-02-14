@@ -642,9 +642,15 @@ func applySSL(website model.Website, websiteSSL model.WebsiteSSL, req request.We
 		}
 		if param.Name == "ssl_protocols" {
 			nginxParams[i].Params = req.SSLProtocol
+			if len(req.SSLProtocol) == 0 {
+				nginxParams[i].Params = []string{"TLSv1.3", "TLSv1.2", "TLSv1.1", "TLSv1"}
+			}
 		}
 		if param.Name == "ssl_ciphers" {
 			nginxParams[i].Params = []string{req.Algorithm}
+			if len(req.Algorithm) == 0 {
+				nginxParams[i].Params = []string{"ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:!aNULL:!eNULL:!EXPORT:!DSS:!DES:!RC4:!3DES:!MD5:!PSK:!KRB5:!SRP:!CAMELLIA:!SEED"}
+			}
 		}
 	}
 	if req.Hsts {
@@ -1105,4 +1111,56 @@ func getResourceContent(fileOp files.FileOp, resourcePath string) (string, error
 		return string(content), nil
 	}
 	return "", nil
+}
+
+func ConfigAllowIPs(ips []string, website model.Website) error {
+	nginxFull, err := getNginxFull(&website)
+	if err != nil {
+		return err
+	}
+	nginxConfig := nginxFull.SiteConfig
+	config := nginxFull.SiteConfig.Config
+	server := config.FindServers()[0]
+	server.RemoveDirective("allow", nil)
+	server.RemoveDirective("deny", nil)
+	if len(ips) > 0 {
+		server.UpdateAllowIPs(ips)
+	}
+	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
+		return err
+	}
+	return nginxCheckAndReload(nginxConfig.OldContent, config.FilePath, nginxFull.Install.ContainerName)
+}
+
+func GetAllowIps(website model.Website) []string {
+	nginxFull, err := getNginxFull(&website)
+	if err != nil {
+		return nil
+	}
+	config := nginxFull.SiteConfig.Config
+	server := config.FindServers()[0]
+	dirs := server.GetDirectives()
+	var ips []string
+	for _, dir := range dirs {
+		if dir.GetName() == "allow" {
+			ips = append(ips, dir.GetParameters()...)
+		}
+	}
+	return ips
+}
+
+func ConfigAIProxy(website model.Website) error {
+	nginxFull, err := getNginxFull(&website)
+	if err != nil {
+		return nil
+	}
+	config := nginxFull.SiteConfig.Config
+	server := config.FindServers()[0]
+	dirs := server.GetDirectives()
+	for _, dir := range dirs {
+		if dir.GetName() == "location" && dir.GetParameters()[0] == "/" {
+			server.UpdateRootProxy()
+		}
+	}
+	return nil
 }

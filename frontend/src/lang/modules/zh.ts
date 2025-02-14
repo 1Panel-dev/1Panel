@@ -2418,6 +2418,13 @@ const message = {
         licenseHelper: '专业版支持短信告警功能',
         alertCountHelper: '每日最大告警次数',
     },
+    aitool: {
+        proxy: 'AI 代理增强',
+        proxyHelper1: '绑定域名，并开启 HTTPS，增强传输安全性',
+        proxyHelper2: '限制 IP 访问，防止在公网暴露',
+        proxyHelper3: '开启流式传输',
+        proxyHelper4: '创建完成之后可以在网站列表中查看并管理',
+    },
 };
 export default {
     ...fit2cloudZhLocale,

@@ -281,3 +281,6 @@ UserInfoPassHelp: "ヒント：パスワードを変更するには、コマン�
 DBConnErr: "エラー：データベース接続の初期化に失敗しました、{{.err}}"
 SystemVersion: "バージョン："
 SystemMode: "モード："
+
+#ai-tool
+ErrOpenrestyInstall: 'まず Openresty をインストールしてください'

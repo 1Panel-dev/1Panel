@@ -18,3 +18,15 @@ export const loadOllamaModel = (name: string) => {
 export const loadGPUInfo = () => {
     return http.get<any>(`/aitools/gpu/load`);
 };
+
+export const bindDomain = (req: AITool.BindDomain) => {
+    return http.post(`/aitools/domain/bind`, req);
+};
+
+export const getBindDomain = (req: AITool.BindDomainReq) => {
+    return http.post<AITool.BindDomainRes>(`/aitools/domain/get`, req);
+};
+
+export const updateBindDomain = (req: AITool.BindDomain) => {
+    return http.post(`/aitools/domain/update`, req);
+};

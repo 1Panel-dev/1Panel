@@ -284,3 +284,6 @@ UserInfoPassHelp: "Tip: To change the password, you can execute the command: "
 DBConnErr: "Error: Failed to initialize database connection, {{ .err }}"
 SystemVersion: "version: "
 SystemMode: "mode: "
+
+#ai-tool
+ErrOpenrestyInstall: 'Please install Openresty first'

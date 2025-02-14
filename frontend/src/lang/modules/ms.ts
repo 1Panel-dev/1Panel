@@ -2607,6 +2607,13 @@ const message = {
         licenseHelper: 'Versi profesional menyokong amaran SMS',
         alertCountHelper: 'Kekerapan maksimum amaran harian',
     },
+    aitool: {
+        proxy: 'Peningkatan Proksi AI',
+        proxyHelper1: 'Ikatkan domain dan aktifkan HTTPS untuk meningkatkan keselamatan penghantaran',
+        proxyHelper2: 'Hadkan akses IP untuk mengelakkan pendedahan di internet awam',
+        proxyHelper3: 'Aktifkan penstriman',
+        proxyHelper4: 'Setelah selesai, anda boleh melihat dan mengurusnya dalam senarai laman web',
+    },
 };
 
 export default {

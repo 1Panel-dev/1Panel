@@ -1,7 +1,9 @@
 package service
 
 import (
+	"context"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"io"
 	"os"
 	"os/exec"
@@ -22,6 +24,9 @@ type IAIToolService interface {
 	Create(name string) error
 	Delete(name string) error
 	LoadDetail(name string) (string, error)
+	BindDomain(req dto.OllamaBindDomain) error
+	GetBindDomain(req dto.OllamaBindDomainReq) (*dto.OllamaBindDomainRes, error)
+	UpdateBindDomain(req dto.OllamaBindDomain) error
 }
 
 func NewIAIToolService() IAIToolService {
@@ -189,6 +194,101 @@ func (u *AIToolService) Delete(name string) error {
 	logItem2 := path.Join(global.CONF.System.DataDir, "log", "AITools", strings.TrimSuffix(name, ":latest"))
 	if logItem2 != logItem {
 		_ = os.Remove(logItem2)
+	}
+	return nil
+}
+
+func (u *AIToolService) BindDomain(req dto.OllamaBindDomain) error {
+	nginxInstall, _ := getAppInstallByKey(constant.AppOpenresty)
+	if nginxInstall.ID == 0 {
+		return buserr.New("ErrOpenrestyInstall")
+	}
+	createWebsiteReq := request.WebsiteCreate{
+		PrimaryDomain: req.Domain,
+		Alias:         strings.ToLower(req.Domain),
+		Type:          constant.Deployment,
+		AppType:       constant.InstalledApp,
+		AppInstallID:  req.AppInstallID,
+	}
+	websiteService := NewIWebsiteService()
+	if err := websiteService.CreateWebsite(createWebsiteReq); err != nil {
+		return err
+	}
+	website, err := websiteRepo.GetFirst(websiteRepo.WithAlias(strings.ToLower(req.Domain)))
+	if err != nil {
+		return err
+	}
+	if err = ConfigAllowIPs(req.AllowIPs, website); err != nil {
+		return err
+	}
+	if req.SSLID > 0 {
+		sslReq := request.WebsiteHTTPSOp{
+			WebsiteID:    website.ID,
+			Enable:       true,
+			Type:         "existed",
+			WebsiteSSLID: req.SSLID,
+			HttpConfig:   "HTTPSOnly",
+		}
+		if _, err = websiteService.OpWebsiteHTTPS(context.Background(), sslReq); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (u *AIToolService) GetBindDomain(req dto.OllamaBindDomainReq) (*dto.OllamaBindDomainRes, error) {
+	install, err := appInstallRepo.GetFirst(commonRepo.WithByID(req.AppInstallID))
+	if err != nil {
+		return nil, err
+	}
+	res := &dto.OllamaBindDomainRes{}
+	website, _ := websiteRepo.GetFirst(websiteRepo.WithAppInstallId(install.ID))
+	if website.ID == 0 {
+		return res, nil
+	}
+	res.WebsiteID = website.ID
+	res.Domain = website.PrimaryDomain
+	if website.WebsiteSSLID > 0 {
+		res.SSLID = website.WebsiteSSLID
+	}
+	res.AllowIPs = GetAllowIps(website)
+	return res, nil
+}
+
+func (u *AIToolService) UpdateBindDomain(req dto.OllamaBindDomain) error {
+	nginxInstall, _ := getAppInstallByKey(constant.AppOpenresty)
+	if nginxInstall.ID == 0 {
+		return buserr.New("ErrOpenrestyInstall")
+	}
+	websiteService := NewIWebsiteService()
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	if err != nil {
+		return err
+	}
+	if err = ConfigAllowIPs(req.AllowIPs, website); err != nil {
+		return err
+	}
+	if req.SSLID > 0 {
+		sslReq := request.WebsiteHTTPSOp{
+			WebsiteID:    website.ID,
+			Enable:       true,
+			Type:         "existed",
+			WebsiteSSLID: req.SSLID,
+			HttpConfig:   "HTTPSOnly",
+		}
+		if _, err = websiteService.OpWebsiteHTTPS(context.Background(), sslReq); err != nil {
+			return err
+		}
+		return nil
+	}
+	if website.WebsiteSSLID > 0 && req.SSLID == 0 {
+		sslReq := request.WebsiteHTTPSOp{
+			WebsiteID: website.ID,
+			Enable:    false,
+		}
+		if _, err = websiteService.OpWebsiteHTTPS(context.Background(), sslReq); err != nil {
+			return err
+		}
 	}
 	return nil
 }

@@ -2416,6 +2416,13 @@ const message = {
         licenseHelper: '專業版支援簡訊告警功能',
         alertCountHelper: '每日最大告警次數',
     },
+    aitool: {
+        proxy: 'AI 代理增強',
+        proxyHelper1: '綁定域名並啟用 HTTPS，提高傳輸安全性',
+        proxyHelper2: '限制 IP 訪問，防止在公共網絡上暴露',
+        proxyHelper3: '啟用流式傳輸',
+        proxyHelper4: '創建後，您可以在網站列表中查看並管理',
+    },
 };
 export default {
     ...fit2cloudTwLocale,

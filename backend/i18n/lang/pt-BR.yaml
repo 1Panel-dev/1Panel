@@ -281,3 +281,6 @@ UserInfoPassHelp: "Dica: Para alterar a senha, você pode executar o comando: "
 DBConnErr: "Erro: Falha ao inicializar a conexão com o banco de dados, {{ .err }}"
 SystemVersion: "versão: "
 SystemMode: "modo: "
+
+#ai-tool
+ErrOpenrestyInstall: 'Por favor, instale o Openresty primeiro'

@@ -284,3 +284,6 @@ UserInfoPassHelp: "提示：修改密码可执行命令："
 DBConnErr: "错误：初始化数据库连接失败，{{ .err }}"
 SystemVersion: "版本："
 SystemMode: "模式："
+
+#ai-tool
+ErrOpenrestyInstall: '请先安装 Openresty'

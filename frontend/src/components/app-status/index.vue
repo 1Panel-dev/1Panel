@@ -65,6 +65,11 @@
                         >
                             {{ $t('nginx.clearProxyCache') }}
                         </el-button>
+
+                        <el-divider direction="vertical" v-if="slots.extra" />
+                        <span v-if="slots.extra">
+                            <slot name="extra"></slot>
+                        </span>
                     </div>
 
                     <div class="ml-5" v-if="key === 'openresty' && (httpPort != 80 || httpsPort != 443)">
@@ -109,12 +114,13 @@
 <script lang="ts" setup>
 import { CheckAppInstalled, InstalledOp } from '@/api/modules/app';
 import router from '@/routers';
-import { onMounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref, useSlots } from 'vue';
 import Status from '@/components/status/index.vue';
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ClearNginxCache } from '@/api/modules/nginx';
+const slots = useSlots();
 
 const props = defineProps({
     appKey: {
@@ -151,7 +157,15 @@ let refresh = ref(1);
 const httpPort = ref(0);
 const httpsPort = ref(0);
 
-const em = defineEmits(['setting', 'isExist', 'before', 'after', 'update:loading', 'update:maskShow']);
+const em = defineEmits([
+    'setting',
+    'isExist',
+    'before',
+    'after',
+    'update:loading',
+    'update:maskShow',
+    'update:appInstallID',
+]);
 const setting = () => {
     em('setting', false);
 };
@@ -171,6 +185,7 @@ const onCheck = async (key: any, name: any) => {
             em('isExist', res.data);
             em('update:maskShow', res.data.status !== 'Running');
             operateReq.installId = res.data.appInstallId;
+            em('update:appInstallID', res.data.appInstallId);
             httpPort.value = res.data.httpPort;
             httpsPort.value = res.data.httpsPort;
             refresh.value++;

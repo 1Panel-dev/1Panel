@@ -108,6 +108,8 @@ definitions:
         type: string
       github:
         type: string
+      gpuSupport:
+        type: boolean
       key:
         type: string
       limit:
@@ -260,6 +262,29 @@ definitions:
     - password
     - permission
     - username
+    type: object
+  dto.CCConfig:
+    properties:
+      action:
+        type: string
+      code:
+        type: integer
+      duration:
+        type: integer
+      ipBlock:
+        type: string
+      ipBlockTime:
+        type: integer
+      mode:
+        type: string
+      res:
+        type: string
+      state:
+        type: string
+      threshold:
+        type: integer
+      type:
+        type: string
     type: object
   dto.CaptchaResponse:
     properties:
@@ -554,6 +579,19 @@ definitions:
         type: string
     required:
     - type
+    type: object
+  dto.CommonConfig:
+    properties:
+      action:
+        type: string
+      code:
+        type: integer
+      res:
+        type: string
+      state:
+        type: string
+      type:
+        type: string
     type: object
   dto.CommonRecover:
     properties:
@@ -1702,6 +1740,21 @@ definitions:
     required:
     - encryptionMode
     type: object
+  dto.GeoRestrict:
+    properties:
+      action:
+        type: string
+      res:
+        type: string
+      rules:
+        items:
+          type: string
+        type: array
+      state:
+        type: string
+      type:
+        type: string
+    type: object
   dto.GroupCreate:
     properties:
       id:
@@ -1990,6 +2043,8 @@ definitions:
       en:
         type: string
       ja:
+        type: string
+      ko:
         type: string
       ms:
         type: string
@@ -2442,6 +2497,31 @@ definitions:
     - CACHE
     - HttpPer
     - ProxyCache
+  dto.OllamaBindDomainReq:
+    properties:
+      appInstallID:
+        type: integer
+    required:
+    - appInstallID
+    type: object
+  dto.OllamaBindDomainRes:
+    properties:
+      allowIPs:
+        items:
+          type: string
+        type: array
+      domain:
+        type: string
+      sslID:
+        type: integer
+      websiteID:
+        type: integer
+    type: object
+  dto.OllamaModelName:
+    properties:
+      name:
+        type: string
+    type: object
   dto.OneDriveInfo:
     properties:
       client_id:
@@ -3432,6 +3512,11 @@ definitions:
       upload:
         type: string
     type: object
+  dto.StateConfig:
+    properties:
+      state:
+        type: string
+    type: object
   dto.SwapHelper:
     properties:
       isNew:
@@ -3561,6 +3646,50 @@ definitions:
       type:
         type: string
     type: object
+  dto.WafConfig:
+    properties:
+      mode:
+        type: string
+      secret:
+        type: string
+      state:
+        type: string
+      token:
+        type: string
+    required:
+    - mode
+    - secret
+    - state
+    type: object
+  dto.WebsiteConfig:
+    properties:
+      args:
+        $ref: '#/definitions/dto.CommonConfig'
+      cc:
+        $ref: '#/definitions/dto.CCConfig'
+      cdn:
+        $ref: '#/definitions/dto.StateConfig'
+      cookie:
+        $ref: '#/definitions/dto.CommonConfig'
+      defaultUaBlack:
+        $ref: '#/definitions/dto.CommonConfig'
+      defaultUrlBlack:
+        $ref: '#/definitions/dto.CommonConfig'
+      fileExt:
+        $ref: '#/definitions/dto.CommonConfig'
+      geoRestrict:
+        $ref: '#/definitions/dto.GeoRestrict'
+      header:
+        $ref: '#/definitions/dto.CommonConfig'
+      methodWhite:
+        $ref: '#/definitions/dto.CommonConfig'
+      sql:
+        $ref: '#/definitions/dto.CommonConfig'
+      waf:
+        $ref: '#/definitions/dto.WafConfig'
+      xss:
+        $ref: '#/definitions/dto.CommonConfig'
+    type: object
   dto.XPUInfo:
     properties:
       deviceID:
@@ -3646,6 +3775,8 @@ definitions:
         type: string
       github:
         type: string
+      gpuSupport:
+        type: boolean
       icon:
         type: string
       id:
@@ -3776,23 +3907,6 @@ definitions:
       version:
         type: string
       workDir:
-        type: string
-    type: object
-  model.Tag:
-    properties:
-      createdAt:
-        type: string
-      id:
-        type: integer
-      key:
-        type: string
-      name:
-        type: string
-      sort:
-        type: integer
-      translations:
-        type: string
-      updatedAt:
         type: string
     type: object
   model.Website:
@@ -3990,6 +4104,8 @@ definitions:
         type: string
       editCompose:
         type: boolean
+      gpuConfig:
+        type: boolean
       hostMode:
         type: boolean
       memoryLimit:
@@ -4098,6 +4214,8 @@ definitions:
       dockerCompose:
         type: string
       editCompose:
+        type: boolean
+      gpuConfig:
         type: boolean
       hostMode:
         type: boolean
@@ -4332,6 +4450,15 @@ definitions:
     required:
     - path
     type: object
+  request.FilePathsCheck:
+    properties:
+      paths:
+        items:
+          type: string
+        type: array
+    required:
+    - paths
+    type: object
   request.FileReadByLineReq:
     properties:
       ID:
@@ -4478,6 +4605,8 @@ definitions:
       dockerCompose:
         type: string
       editCompose:
+        type: boolean
+      gpuConfig:
         type: boolean
       hostMode:
         type: boolean
@@ -5573,6 +5702,8 @@ definitions:
         type: string
       editCompose:
         type: boolean
+      gpuConfig:
+        type: boolean
       hostMode:
         type: boolean
       memoryLimit:
@@ -5598,6 +5729,8 @@ definitions:
         type: string
       github:
         type: string
+      gpuSupport:
+        type: boolean
       icon:
         type: string
       id:
@@ -5628,7 +5761,7 @@ definitions:
         type: string
       tags:
         items:
-          $ref: '#/definitions/model.Tag'
+          $ref: '#/definitions/response.TagDTO'
         type: array
       type:
         type: string
@@ -5654,6 +5787,8 @@ definitions:
       downloadUrl:
         type: string
       enable:
+        type: boolean
+      gpuSupport:
         type: boolean
       hostMode:
         type: boolean
@@ -5708,6 +5843,8 @@ definitions:
     properties:
       description:
         type: string
+      gpuSupport:
+        type: boolean
       icon:
         type: string
       id:
@@ -5809,6 +5946,17 @@ definitions:
         type: number
     required:
     - size
+    type: object
+  response.ExistFileInfo:
+    properties:
+      modTime:
+        type: string
+      name:
+        type: string
+      path:
+        type: string
+      size:
+        type: number
     type: object
   response.FileInfo:
     properties:
@@ -6421,6 +6569,159 @@ info:
   title: 1Panel
   version: "1.0"
 paths:
+  /aitool/domain/bind:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.WebsiteConfig'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      - Timestamp: []
+      summary: Bind domain
+      tags:
+      - AITools
+  /aitool/domain/get:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OllamaBindDomainReq'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.OllamaBindDomainRes'
+      security:
+      - ApiKeyAuth: []
+      - Timestamp: []
+      summary: Get bind domain
+      tags:
+      - AITools
+  /aitool/gpu/load:
+    get:
+      consumes:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      - Timestamp: []
+      summary: Load gpu / xpu info
+      tags:
+      - AITools
+  /aitool/ollama/model/del:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OllamaModelName'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      - Timestamp: []
+      summary: Delete Ollama model
+      tags:
+      - AITools
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - name
+        formatEN: remove Ollama model [name]
+        formatZH: 删除模型 [name]
+        paramKeys: []
+  /aitools/ollama/model:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OllamaModelName'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      - Timestamp: []
+      summary: Create Ollama model
+      tags:
+      - AITools
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - name
+        formatEN: add Ollama model [name]
+        formatZH: 添加模型 [name]
+        paramKeys: []
+  /aitools/ollama/model/load:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OllamaModelName'
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      - Timestamp: []
+      summary: Page Ollama models
+      tags:
+      - AITools
+  /aitools/ollama/model/search:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SearchWithPage'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PageResult'
+      security:
+      - ApiKeyAuth: []
+      - Timestamp: []
+      summary: Page Ollama models
+      tags:
+      - AITools
   /apps/{key}:
     get:
       consumes:
@@ -10045,6 +10346,30 @@ paths:
         formatEN: Create dir or file [path]
         formatZH: 创建文件/文件夹 [path]
         paramKeys: []
+  /files/batch/check:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.FilePathsCheck'
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/response.ExistFileInfo'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      - Timestamp: []
+      summary: Batch check file exist
+      tags:
+      - File
   /files/batch/del:
     post:
       consumes:
@@ -16422,15 +16747,7 @@ schemes:
 - https
 securityDefinitions:
   ApiKeyAuth:
-    description: |-
-      Custom Token Format, Format: md5('1panel' + API-Key + UnixTimestamp).
-      ```
-      eg:
-      curl -X GET "http://localhost:4004/api/v1/dashboard/current" \
-      -H "1Panel-Token: <1panel_token>" \
-      -H "1Panel-Timestamp: <current_unix_timestamp>"
-      ```
-      - `1Panel-Token` is the key for the panel API Key.
+    description: '- `1Panel-Token` is the key for the panel API Key.'
     in: header
     name: 1Panel-Token
     type: apiKey

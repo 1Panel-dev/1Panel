@@ -15,9 +15,14 @@
                     v-model:loading="loading"
                     :hide-setting="true"
                     v-model:mask-show="maskShow"
+                    v-model:appInstallID="appInstallID"
                     @is-exist="checkExist"
                     ref="appStatusRef"
-                ></AppStatus>
+                >
+                    <template #extra>
+                        <el-button link type="primary" @click="bindDomain">{{ $t('aitool.proxy') }}</el-button>
+                    </template>
+                </AppStatus>
             </template>
             <template #toolbar v-if="modelInfo.isExist">
                 <div class="flex justify-between gap-2 flex-wrap sm:flex-row">
@@ -110,6 +115,7 @@
         <Conn ref="connRef" />
         <CodemirrorDialog ref="detailRef" />
         <PortJumpDialog ref="dialogPortJumpRef" />
+        <BindDomain ref="bindDomainRef" />
     </div>
 </template>
 
@@ -129,11 +135,11 @@ import { AITool } from '@/api/interface/ai-tool';
 import { GetAppPort } from '@/api/modules/app';
 import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
+import BindDomain from '@/views/ai-tools/model/domain/index.vue';
 const globalStore = GlobalStore();
 
 const loading = ref(false);
 const maskShow = ref(true);
-
 const addRef = ref();
 const logRef = ref();
 const detailRef = ref();
@@ -141,9 +147,8 @@ const connRef = ref();
 const openWebUIPort = ref();
 const dashboardVisible = ref(false);
 const dialogPortJumpRef = ref();
-
 const appStatusRef = ref();
-
+const bindDomainRef = ref();
 const data = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'model-page-size',
@@ -152,6 +157,7 @@ const paginationConfig = reactive({
     total: 0,
 });
 const searchName = ref();
+const appInstallID = ref(0);
 
 const modelInfo = reactive({
     status: '',
@@ -207,6 +213,10 @@ const goDashboard = async () => {
         return;
     }
     dialogPortJumpRef.value.acceptParams({ port: openWebUIPort.value });
+};
+
+const bindDomain = () => {
+    bindDomainRef.value.acceptParams(appInstallID.value);
 };
 
 const goInstall = (name: string) => {

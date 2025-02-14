@@ -2547,6 +2547,13 @@ const message = {
         licenseHelper: 'プロのバージョンはSMSアラートをサポートします',
         alertCountHelper: '最大毎日のアラーム周波数',
     },
+    aitool: {
+        proxy: 'AI プロキシ強化',
+        proxyHelper1: 'ドメインをバインドし、HTTPS を有効にして通信のセキュリティを強化',
+        proxyHelper2: 'IP アクセスを制限し、パブリックインターネットでの露出を防止',
+        proxyHelper3: 'ストリーミングを有効にする',
+        proxyHelper4: '作成後、ウェブサイトリストで確認および管理できます',
+    },
 };
 export default {
     ...fit2cloudJaLocale,

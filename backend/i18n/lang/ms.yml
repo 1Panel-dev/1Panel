@@ -283,3 +283,6 @@ UserInfoPassHelp: "Petua: Untuk menukar kata laluan, anda boleh menjalankan arah
 DBConnErr: "Ralat: Gagal memulakan sambungan pangkalan data, {{ .err }}"
 SystemVersion: "Versi: "
 SystemMode: "Mod: "
+
+#ai-tool
+ErrOpenrestyInstall: 'Sila pasang Openresty terlebih dahulu'

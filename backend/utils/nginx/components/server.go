@@ -265,6 +265,41 @@ func (s *Server) UpdateRootProxy(proxy []string) {
 	s.UpdateDirectiveBySecondKey("location", "/", newDir)
 }
 
+func (s *Server) UpdateRootProxyForAi(proxy []string) {
+	newDir := Directive{
+		Name:       "location",
+		Parameters: []string{"/"},
+		Block:      &Block{},
+	}
+	block := &Block{}
+	block.Directives = []IDirective{
+		&Directive{
+			Name: "proxy_buffering",
+			Parameters: []string{
+				"off",
+			},
+		},
+		&Directive{
+			Name: "proxy_cache",
+			Parameters: []string{
+				"off",
+			},
+		},
+		&Directive{
+			Name: "proxy_http_version",
+			Parameters: []string{
+				"1.1",
+			},
+		},
+	}
+	block.Directives = append(block.Directives, &Directive{
+		Name:       "proxy_pass",
+		Parameters: proxy,
+	})
+	newDir.Block = block
+	s.UpdateDirectiveBySecondKey("location", "/", newDir)
+}
+
 func (s *Server) UpdatePHPProxy(proxy []string, localPath string) {
 	newDir := Directive{
 		Name:       "location",
@@ -368,4 +403,31 @@ func (s *Server) AddHTTP2HTTPS() {
 	})
 	newDir.Block = block
 	s.UpdateDirectiveBySecondKey("if", "($scheme", newDir)
+}
+
+func (s *Server) UpdateAllowIPs(ips []string) {
+	index := -1
+	for i, directive := range s.Directives {
+		if directive.GetName() == "location" && directive.GetParameters()[0] == "/" {
+			index = i
+			break
+		}
+	}
+	ipDirectives := make([]IDirective, 0)
+	for _, ip := range ips {
+		ipDirectives = append(ipDirectives, &Directive{
+			Name:       "allow",
+			Parameters: []string{ip},
+		})
+	}
+	ipDirectives = append(ipDirectives, &Directive{
+		Name:       "deny",
+		Parameters: []string{"all"},
+	})
+	if index != -1 {
+		newDirectives := append(ipDirectives, s.Directives[index:]...)
+		s.Directives = append(s.Directives[:index], newDirectives...)
+	} else {
+		s.Directives = append(s.Directives, ipDirectives...)
+	}
 }

@@ -79,4 +79,23 @@ export namespace AITool {
         shr: string;
         memory: string;
     }
+
+    export interface BindDomain {
+        domain: string;
+        sslID: number;
+        allowIPs: string[];
+        appInstallID: number;
+        websiteID?: number;
+    }
+
+    export interface BindDomainReq {
+        appInstallID: number;
+    }
+
+    export interface BindDomainRes {
+        domain: string;
+        sslID: number;
+        allowIPs: string[];
+        websiteID?: number;
+    }
 }

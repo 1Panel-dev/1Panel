@@ -284,3 +284,6 @@ UserInfoPassHelp: "Подсказка: чтобы изменить пароль,
 DBConnErr: "Ошибка: не удалось инициализировать подключение к базе данных, {{ .err }}"
 SystemVersion: "версия: "
 SystemMode: "режим: "
+
+#ai-tool  
+"ErrOpenrestyInstall": "Пожалуйста, установите Openresty сначала"
