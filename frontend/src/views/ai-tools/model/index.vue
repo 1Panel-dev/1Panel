@@ -58,9 +58,15 @@
                 >
                     <el-table-column :label="$t('commons.table.name')" prop="name" min-width="90">
                         <template #default="{ row }">
-                            <el-text type="primary" class="cursor-pointer" @click="onLoad(row.name)">
+                            <el-text
+                                v-if="row.size !== '-'"
+                                type="primary"
+                                class="cursor-pointer"
+                                @click="onLoad(row.name)"
+                            >
                                 {{ row.name }}
                             </el-text>
+                            <span v-else>{{ row.name }}</span>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('file.size')" prop="size" />

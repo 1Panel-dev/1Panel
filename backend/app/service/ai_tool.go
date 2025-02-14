@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"io"
 	"os"
 	"os/exec"
@@ -11,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
@@ -56,7 +56,7 @@ func (u *AIToolService) Search(req dto.SearchWithPage) (int64, []dto.OllamaModel
 		if parts[0] == "NAME" {
 			continue
 		}
-		modelMaps[parts[0]] = struct{}{}
+		modelMaps[strings.ReplaceAll(parts[0], ":", "-")] = struct{}{}
 		list = append(list, dto.OllamaModelInfo{Name: parts[0], Size: parts[2] + " " + parts[3], Modified: strings.Join(parts[4:], " ")})
 	}
 	entries, _ := os.ReadDir(path.Join(global.CONF.System.DataDir, "log", "AITools"))

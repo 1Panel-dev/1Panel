@@ -54,7 +54,7 @@
                             :placeholder="'172.16.10.10:8081'"
                         ></el-input>
                         <span v-if="dialogData.rowData!.downloadUrl" class="input-help">
-                            Pull example: docker pull {{ dialogData.rowData!.downloadUrl }}/nginx
+                            docker pull {{ dialogData.rowData!.downloadUrl }}/nginx
                         </span>
                     </el-form-item>
                     <el-form-item :label="$t('commons.table.protocol')" prop="protocol">
