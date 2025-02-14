@@ -1309,6 +1309,7 @@ const message = {
         existFileTitle: '同名檔案提示',
         existFileHelper: '上傳的檔案存在同名檔案，是否覆蓋？',
         existFileSize: '文件大小（新->舊）',
+        existFileDirHelper: '選擇的檔案/資料夾存在同名，請謹慎操作！',
     },
     ssh: {
         setting: '設定',

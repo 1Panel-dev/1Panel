@@ -1338,6 +1338,7 @@ const message = {
         existFileTitle: '동일한 이름의 파일 경고',
         existFileHelper: '업로드한 파일에 동일한 이름의 파일이 포함되어 있습니다. 덮어쓰시겠습니까?',
         existFileSize: '파일 크기 (새로운 -> 오래된)',
+        existFileDirHelper: '선택한 파일/폴더에 동일한 이름이 이미 존재합니다. 신중하게 작업하세요!',
     },
     ssh: {
         setting: '설정',

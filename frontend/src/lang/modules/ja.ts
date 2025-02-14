@@ -1352,6 +1352,7 @@ const message = {
         existFileTitle: '同名ファイルの警告',
         existFileHelper: 'アップロードしたファイルに同じ名前のファイルが含まれています。上書きしますか？',
         existFileSize: 'ファイルサイズ（新しい -> 古い）',
+        existFileDirHelper: '選択したファイル/フォルダーには同じ名前のものが既に存在します。慎重に操作してください！',
     },
     ssh: {
         setting: '設定',

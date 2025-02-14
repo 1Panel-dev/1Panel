@@ -1381,6 +1381,7 @@ const message = {
         existFileTitle: 'Aviso de arquivo com o mesmo nome',
         existFileHelper: 'O arquivo enviado contém um arquivo com o mesmo nome. Deseja substituí-lo?',
         existFileSize: 'Tamanho do arquivo (novo -> antigo)',
+        existFileDirHelper: 'O arquivo/pasta selecionado tem um nome duplicado. Por favor, prossiga com cautela!',
     },
     ssh: {
         setting: 'configuração',

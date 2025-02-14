@@ -1374,6 +1374,7 @@ const message = {
         existFileTitle: 'Same name file prompt',
         existFileHelper: 'The uploaded file contains a file with the same name, do you want to overwrite it?',
         existFileSize: 'File size (new -> old)',
+        existFileDirHelper: 'The selected file/folder has a duplicate name. Please proceed with caution!',
     },
     ssh: {
         setting: 'Setting',
