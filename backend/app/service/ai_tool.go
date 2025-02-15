@@ -233,6 +233,9 @@ func (u *AIToolService) BindDomain(req dto.OllamaBindDomain) error {
 			return err
 		}
 	}
+	if err = ConfigAIProxy(website); err != nil {
+		return err
+	}
 	return nil
 }
 

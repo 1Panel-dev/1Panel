@@ -291,6 +291,18 @@ func (s *Server) UpdateRootProxyForAi(proxy []string) {
 				"1.1",
 			},
 		},
+		&Directive{
+			Name: "proxy_set_header",
+			Parameters: []string{
+				"Connection", "''",
+			},
+		},
+		&Directive{
+			Name: "chunked_transfer_encoding",
+			Parameters: []string{
+				"off",
+			},
+		},
 	}
 	block.Directives = append(block.Directives, &Directive{
 		Name:       "proxy_pass",
