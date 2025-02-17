@@ -127,8 +127,8 @@
 
 <script lang="ts" setup>
 import AppStatus from '@/components/app-status/index.vue';
-import AddDialog from '@/views/ai-tools/model/add/index.vue';
-import Conn from '@/views/ai-tools/model/conn/index.vue';
+import AddDialog from '@/views/ai/model/add/index.vue';
+import Conn from '@/views/ai/model/conn/index.vue';
 import Log from '@/components/log-dialog/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import CodemirrorDialog from '@/components/codemirror-dialog/index.vue';
@@ -136,12 +136,12 @@ import { computed, onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { App } from '@/api/interface/app';
 import { GlobalStore } from '@/store';
-import { deleteOllamaModel, loadOllamaModel, searchOllamaModel } from '@/api/modules/ai-tool';
-import { AITool } from '@/api/interface/ai-tool';
+import { deleteOllamaModel, loadOllamaModel, searchOllamaModel } from '@/api/modules/ai';
+import { AI } from '@/api/interface/ai';
 import { GetAppPort } from '@/api/modules/app';
 import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
-import BindDomain from '@/views/ai-tools/model/domain/index.vue';
+import BindDomain from '@/views/ai/model/domain/index.vue';
 const globalStore = GlobalStore();
 
 const loading = ref(false);
@@ -246,7 +246,7 @@ const checkExist = (data: App.CheckInstalled) => {
     }
 };
 
-const onDelete = async (row: AITool.OllamaModelInfo) => {
+const onDelete = async (row: AI.OllamaModelInfo) => {
     ElMessageBox.confirm(i18n.global.t('commons.msg.delete'), i18n.global.t('commons.button.delete'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
@@ -272,7 +272,7 @@ const onLoadLog = (name: string) => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
-        click: (row: AITool.OllamaModelInfo) => {
+        click: (row: AI.OllamaModelInfo) => {
             onDelete(row);
         },
     },

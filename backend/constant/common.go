@@ -32,6 +32,10 @@ var WebUrlMap = map[string]struct{}{
 	"/apps/installed": {},
 	"/apps/upgrade":   {},
 
+	"/ai":       {},
+	"/ai/model": {},
+	"/ai/gpu":   {},
+
 	"/containers":           {},
 	"/containers/container": {},
 	"/containers/image":     {},

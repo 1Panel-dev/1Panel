@@ -261,19 +261,19 @@
 
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue';
-import { loadGPUInfo } from '@/api/modules/ai-tool';
-import { AITool } from '@/api/interface/ai-tool';
+import { loadGPUInfo } from '@/api/modules/ai';
+import { AI } from '@/api/interface/ai';
 import i18n from '@/lang';
 
 const loading = ref();
 const activeNames = ref(0);
-const gpuInfo = ref<AITool.Info>({
+const gpuInfo = ref<AI.Info>({
     cudaVersion: '',
     driverVersion: '',
     type: 'nvidia',
     gpu: [],
 });
-const xpuInfo = ref<AITool.XpuInfo>({
+const xpuInfo = ref<AI.XpuInfo>({
     driverVersion: '',
     type: 'xpu',
     xpu: [],

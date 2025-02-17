@@ -1,6 +1,6 @@
 import { ReqPage } from '.';
 
-export namespace AITool {
+export namespace AI {
     export interface OllamaModelInfo {
         name: string;
         size: string;

@@ -17,7 +17,7 @@
     },
     "basePath": "/api/v1",
     "paths": {
-        "/aitool/domain/bind": {
+        "/ai/domain/bind": {
             "post": {
                 "security": [
                     {
@@ -31,7 +31,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "AITools"
+                    "AI"
                 ],
                 "summary": "Bind domain",
                 "parameters": [
@@ -41,7 +41,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.WebsiteConfig"
+                            "$ref": "#/definitions/dto.OllamaBindDomain"
                         }
                     }
                 ],
@@ -52,7 +52,7 @@
                 }
             }
         },
-        "/aitool/domain/get": {
+        "/ai/domain/get": {
             "post": {
                 "security": [
                     {
@@ -66,7 +66,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "AITools"
+                    "AI"
                 ],
                 "summary": "Get bind domain",
                 "parameters": [
@@ -90,7 +90,7 @@
                 }
             }
         },
-        "/aitool/gpu/load": {
+        "/ai/gpu/load": {
             "get": {
                 "security": [
                     {
@@ -104,7 +104,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "AITools"
+                    "AI"
                 ],
                 "summary": "Load gpu / xpu info",
                 "responses": {
@@ -114,7 +114,7 @@
                 }
             }
         },
-        "/aitool/ollama/model/del": {
+        "/ai/ollama/model": {
             "post": {
                 "security": [
                     {
@@ -128,51 +128,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "AITools"
-                ],
-                "summary": "Delete Ollama model",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.OllamaModelName"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFunctions": [],
-                    "bodyKeys": [
-                        "name"
-                    ],
-                    "formatEN": "remove Ollama model [name]",
-                    "formatZH": "删除模型 [name]",
-                    "paramKeys": []
-                }
-            }
-        },
-        "/aitools/ollama/model": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    },
-                    {
-                        "Timestamp": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "AITools"
+                    "AI"
                 ],
                 "summary": "Create Ollama model",
                 "parameters": [
@@ -202,7 +158,7 @@
                 }
             }
         },
-        "/aitools/ollama/model/load": {
+        "/ai/ollama/model/del": {
             "post": {
                 "security": [
                     {
@@ -216,7 +172,51 @@
                     "application/json"
                 ],
                 "tags": [
-                    "AITools"
+                    "AI"
+                ],
+                "summary": "Delete Ollama model",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.OllamaModelName"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [
+                        "name"
+                    ],
+                    "formatEN": "remove Ollama model [name]",
+                    "formatZH": "删除模型 [name]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/ai/ollama/model/load": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "Timestamp": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AI"
                 ],
                 "summary": "Page Ollama models",
                 "parameters": [
@@ -240,7 +240,7 @@
                 }
             }
         },
-        "/aitools/ollama/model/search": {
+        "/ai/ollama/model/search": {
             "post": {
                 "security": [
                     {
@@ -254,7 +254,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "AITools"
+                    "AI"
                 ],
                 "summary": "Page Ollama models",
                 "parameters": [
@@ -17293,41 +17293,6 @@
                 }
             }
         },
-        "dto.CCConfig": {
-            "type": "object",
-            "properties": {
-                "action": {
-                    "type": "string"
-                },
-                "code": {
-                    "type": "integer"
-                },
-                "duration": {
-                    "type": "integer"
-                },
-                "ipBlock": {
-                    "type": "string"
-                },
-                "ipBlockTime": {
-                    "type": "integer"
-                },
-                "mode": {
-                    "type": "string"
-                },
-                "res": {
-                    "type": "string"
-                },
-                "state": {
-                    "type": "string"
-                },
-                "threshold": {
-                    "type": "integer"
-                },
-                "type": {
-                    "type": "string"
-                }
-            }
-        },
         "dto.CaptchaResponse": {
             "type": "object",
             "properties": {
@@ -17769,26 +17734,6 @@
                         "website",
                         "postgresql"
                     ]
-                }
-            }
-        },
-        "dto.CommonConfig": {
-            "type": "object",
-            "properties": {
-                "action": {
-                    "type": "string"
-                },
-                "code": {
-                    "type": "integer"
-                },
-                "res": {
-                    "type": "string"
-                },
-                "state": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
                 }
             }
         },
@@ -19488,29 +19433,6 @@
                 }
             }
         },
-        "dto.GeoRestrict": {
-            "type": "object",
-            "properties": {
-                "action": {
-                    "type": "string"
-                },
-                "res": {
-                    "type": "string"
-                },
-                "rules": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "state": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
-                }
-            }
-        },
         "dto.GroupCreate": {
             "type": "object",
             "required": [
@@ -20599,6 +20521,33 @@
                 "HttpPer",
                 "ProxyCache"
             ]
+        },
+        "dto.OllamaBindDomain": {
+            "type": "object",
+            "required": [
+                "appInstallID",
+                "domain"
+            ],
+            "properties": {
+                "allowIPs": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "appInstallID": {
+                    "type": "integer"
+                },
+                "domain": {
+                    "type": "string"
+                },
+                "sslID": {
+                    "type": "integer"
+                },
+                "websiteID": {
+                    "type": "integer"
+                }
+            }
         },
         "dto.OllamaBindDomainReq": {
             "type": "object",
@@ -22105,14 +22054,6 @@
                 }
             }
         },
-        "dto.StateConfig": {
-            "type": "object",
-            "properties": {
-                "state": {
-                    "type": "string"
-                }
-            }
-        },
         "dto.SwapHelper": {
             "type": "object",
             "required": [
@@ -22308,72 +22249,6 @@
                 },
                 "type": {
                     "type": "string"
-                }
-            }
-        },
-        "dto.WafConfig": {
-            "type": "object",
-            "required": [
-                "mode",
-                "secret",
-                "state"
-            ],
-            "properties": {
-                "mode": {
-                    "type": "string"
-                },
-                "secret": {
-                    "type": "string"
-                },
-                "state": {
-                    "type": "string"
-                },
-                "token": {
-                    "type": "string"
-                }
-            }
-        },
-        "dto.WebsiteConfig": {
-            "type": "object",
-            "properties": {
-                "args": {
-                    "$ref": "#/definitions/dto.CommonConfig"
-                },
-                "cc": {
-                    "$ref": "#/definitions/dto.CCConfig"
-                },
-                "cdn": {
-                    "$ref": "#/definitions/dto.StateConfig"
-                },
-                "cookie": {
-                    "$ref": "#/definitions/dto.CommonConfig"
-                },
-                "defaultUaBlack": {
-                    "$ref": "#/definitions/dto.CommonConfig"
-                },
-                "defaultUrlBlack": {
-                    "$ref": "#/definitions/dto.CommonConfig"
-                },
-                "fileExt": {
-                    "$ref": "#/definitions/dto.CommonConfig"
-                },
-                "geoRestrict": {
-                    "$ref": "#/definitions/dto.GeoRestrict"
-                },
-                "header": {
-                    "$ref": "#/definitions/dto.CommonConfig"
-                },
-                "methodWhite": {
-                    "$ref": "#/definitions/dto.CommonConfig"
-                },
-                "sql": {
-                    "$ref": "#/definitions/dto.CommonConfig"
-                },
-                "waf": {
-                    "$ref": "#/definitions/dto.WafConfig"
-                },
-                "xss": {
-                    "$ref": "#/definitions/dto.CommonConfig"
                 }
             }
         },

@@ -2,27 +2,27 @@ import { Layout } from '@/routers/constant';
 
 const databaseRouter = {
     sort: 4,
-    path: '/ai-tools',
+    path: '/ai',
     component: Layout,
-    redirect: '/ai-tools/model',
+    redirect: '/ai/model',
     meta: {
         icon: 'p-jiqiren2',
         title: 'menu.ai_tools',
     },
     children: [
         {
-            path: '/ai-tools/model',
+            path: '/ai/model',
             name: 'OllamaModel',
-            component: () => import('@/views/ai-tools/model/index.vue'),
+            component: () => import('@/views/ai/model/index.vue'),
             meta: {
                 title: 'ai_tools.model.model',
                 requiresAuth: true,
             },
         },
         {
-            path: '/ai-tools/gpu',
+            path: '/ai/gpu',
             name: 'GPU',
-            component: () => import('@/views/ai-tools/gpu/index.vue'),
+            component: () => import('@/views/ai/gpu/index.vue'),
             meta: {
                 title: 'ai_tools.gpu.gpu',
                 requiresAuth: true,

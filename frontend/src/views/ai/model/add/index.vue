@@ -55,7 +55,7 @@ import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
-import { createOllamaModel } from '@/api/modules/ai-tool';
+import { createOllamaModel } from '@/api/modules/ai';
 
 const drawerVisible = ref(false);
 const form = reactive({

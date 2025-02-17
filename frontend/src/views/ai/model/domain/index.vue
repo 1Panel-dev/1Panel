@@ -106,7 +106,7 @@ import { Rules } from '@/global/form-rules';
 import { FormInstance, FormRules } from 'element-plus';
 import { reactive, ref } from 'vue';
 import { getAccountName } from '@/utils/util';
-import { bindDomain, getBindDomain, updateBindDomain } from '@/api/modules/ai-tool';
+import { bindDomain, getBindDomain, updateBindDomain } from '@/api/modules/ai';
 import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 

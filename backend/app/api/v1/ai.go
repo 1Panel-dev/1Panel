@@ -10,14 +10,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// @Tags AITools
+// @Tags AI
 // @Summary Create Ollama model
 // @Accept json
 // @Param request body dto.OllamaModelName true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /aitools/ollama/model [post]
+// @Router /ai/ollama/model [post]
 // @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"添加模型 [name]","formatEN":"add Ollama model [name]"}
 func (b *BaseApi) CreateOllamaModel(c *gin.Context) {
 	var req dto.OllamaModelName
@@ -32,14 +32,14 @@ func (b *BaseApi) CreateOllamaModel(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// @Tags AITools
+// @Tags AI
 // @Summary Page Ollama models
 // @Accept json
 // @Param request body dto.SearchWithPage true "request"
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /aitools/ollama/model/search [post]
+// @Router /ai/ollama/model/search [post]
 func (b *BaseApi) SearchOllamaModel(c *gin.Context) {
 	var req dto.SearchWithPage
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -58,14 +58,14 @@ func (b *BaseApi) SearchOllamaModel(c *gin.Context) {
 	})
 }
 
-// @Tags AITools
+// @Tags AI
 // @Summary Page Ollama models
 // @Accept json
 // @Param request body dto.OllamaModelName true "request"
 // @Success 200 {string} details
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /aitools/ollama/model/load [post]
+// @Router /ai/ollama/model/load [post]
 func (b *BaseApi) LoadOllamaModelDetail(c *gin.Context) {
 	var req dto.OllamaModelName
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -81,14 +81,14 @@ func (b *BaseApi) LoadOllamaModelDetail(c *gin.Context) {
 	helper.SuccessWithData(c, detail)
 }
 
-// @Tags AITools
+// @Tags AI
 // @Summary Delete Ollama model
 // @Accept json
 // @Param request body dto.OllamaModelName true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /aitool/ollama/model/del [post]
+// @Router /ai/ollama/model/del [post]
 // @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"删除模型 [name]","formatEN":"remove Ollama model [name]"}
 func (b *BaseApi) DeleteOllamaModel(c *gin.Context) {
 	var req dto.OllamaModelName
@@ -104,13 +104,13 @@ func (b *BaseApi) DeleteOllamaModel(c *gin.Context) {
 	helper.SuccessWithOutData(c)
 }
 
-// @Tags AITools
+// @Tags AI
 // @Summary Load gpu / xpu info
 // @Accept json
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /aitool/gpu/load [get]
+// @Router /ai/gpu/load [get]
 func (b *BaseApi) LoadGpuInfo(c *gin.Context) {
 	ok, client := gpu.New()
 	if ok {
@@ -135,14 +135,14 @@ func (b *BaseApi) LoadGpuInfo(c *gin.Context) {
 	helper.SuccessWithData(c, &common.GpuInfo{})
 }
 
-// @Tags AITools
+// @Tags AI
 // @Summary Bind domain
 // @Accept json
-// @Param request body dto.WebsiteConfig true "request"
+// @Param request body dto.OllamaBindDomain true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /aitool/domain/bind [post]
+// @Router /ai/domain/bind [post]
 func (b *BaseApi) BindDomain(c *gin.Context) {
 	var req dto.OllamaBindDomain
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -155,14 +155,14 @@ func (b *BaseApi) BindDomain(c *gin.Context) {
 	helper.SuccessWithOutData(c)
 }
 
-// @Tags AITools
+// @Tags AI
 // @Summary Get bind domain
 // @Accept json
 // @Param request body dto.OllamaBindDomainReq true "request"
 // @Success 200 {object} dto.OllamaBindDomainRes
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /aitool/domain/get [post]
+// @Router /ai/domain/get [post]
 func (b *BaseApi) GetBindDomain(c *gin.Context) {
 	var req dto.OllamaBindDomainReq
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -176,14 +176,14 @@ func (b *BaseApi) GetBindDomain(c *gin.Context) {
 	helper.SuccessWithData(c, res)
 }
 
-// Tags AITools
+// Tags AI
 // Summary Update bind domain
 // Accept json
 // Param request body dto.OllamaBindDomain true "request"
 // Success 200
 // Security ApiKeyAuth
 // Security Timestamp
-// Router /aitool/domain/update [post]
+// Router /ai/domain/update [post]
 func (b *BaseApi) UpdateBindDomain(c *gin.Context) {
 	var req dto.OllamaBindDomain
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {

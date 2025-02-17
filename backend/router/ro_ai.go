@@ -10,7 +10,7 @@ type AIToolsRouter struct {
 }
 
 func (a *AIToolsRouter) InitRouter(Router *gin.RouterGroup) {
-	aiToolsRouter := Router.Group("aitools")
+	aiToolsRouter := Router.Group("ai")
 	aiToolsRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth()).Use(middleware.PasswordExpired())
 
 	baseApi := v1.ApiGroupApp.BaseApi

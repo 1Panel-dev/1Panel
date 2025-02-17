@@ -263,29 +263,6 @@ definitions:
     - permission
     - username
     type: object
-  dto.CCConfig:
-    properties:
-      action:
-        type: string
-      code:
-        type: integer
-      duration:
-        type: integer
-      ipBlock:
-        type: string
-      ipBlockTime:
-        type: integer
-      mode:
-        type: string
-      res:
-        type: string
-      state:
-        type: string
-      threshold:
-        type: integer
-      type:
-        type: string
-    type: object
   dto.CaptchaResponse:
     properties:
       captchaID:
@@ -579,19 +556,6 @@ definitions:
         type: string
     required:
     - type
-    type: object
-  dto.CommonConfig:
-    properties:
-      action:
-        type: string
-      code:
-        type: integer
-      res:
-        type: string
-      state:
-        type: string
-      type:
-        type: string
     type: object
   dto.CommonRecover:
     properties:
@@ -1740,21 +1704,6 @@ definitions:
     required:
     - encryptionMode
     type: object
-  dto.GeoRestrict:
-    properties:
-      action:
-        type: string
-      res:
-        type: string
-      rules:
-        items:
-          type: string
-        type: array
-      state:
-        type: string
-      type:
-        type: string
-    type: object
   dto.GroupCreate:
     properties:
       id:
@@ -2497,6 +2446,24 @@ definitions:
     - CACHE
     - HttpPer
     - ProxyCache
+  dto.OllamaBindDomain:
+    properties:
+      allowIPs:
+        items:
+          type: string
+        type: array
+      appInstallID:
+        type: integer
+      domain:
+        type: string
+      sslID:
+        type: integer
+      websiteID:
+        type: integer
+    required:
+    - appInstallID
+    - domain
+    type: object
   dto.OllamaBindDomainReq:
     properties:
       appInstallID:
@@ -3512,11 +3479,6 @@ definitions:
       upload:
         type: string
     type: object
-  dto.StateConfig:
-    properties:
-      state:
-        type: string
-    type: object
   dto.SwapHelper:
     properties:
       isNew:
@@ -3645,50 +3607,6 @@ definitions:
         type: string
       type:
         type: string
-    type: object
-  dto.WafConfig:
-    properties:
-      mode:
-        type: string
-      secret:
-        type: string
-      state:
-        type: string
-      token:
-        type: string
-    required:
-    - mode
-    - secret
-    - state
-    type: object
-  dto.WebsiteConfig:
-    properties:
-      args:
-        $ref: '#/definitions/dto.CommonConfig'
-      cc:
-        $ref: '#/definitions/dto.CCConfig'
-      cdn:
-        $ref: '#/definitions/dto.StateConfig'
-      cookie:
-        $ref: '#/definitions/dto.CommonConfig'
-      defaultUaBlack:
-        $ref: '#/definitions/dto.CommonConfig'
-      defaultUrlBlack:
-        $ref: '#/definitions/dto.CommonConfig'
-      fileExt:
-        $ref: '#/definitions/dto.CommonConfig'
-      geoRestrict:
-        $ref: '#/definitions/dto.GeoRestrict'
-      header:
-        $ref: '#/definitions/dto.CommonConfig'
-      methodWhite:
-        $ref: '#/definitions/dto.CommonConfig'
-      sql:
-        $ref: '#/definitions/dto.CommonConfig'
-      waf:
-        $ref: '#/definitions/dto.WafConfig'
-      xss:
-        $ref: '#/definitions/dto.CommonConfig'
     type: object
   dto.XPUInfo:
     properties:
@@ -6569,7 +6487,7 @@ info:
   title: 1Panel
   version: "1.0"
 paths:
-  /aitool/domain/bind:
+  /ai/domain/bind:
     post:
       consumes:
       - application/json
@@ -6579,7 +6497,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.WebsiteConfig'
+          $ref: '#/definitions/dto.OllamaBindDomain'
       responses:
         "200":
           description: OK
@@ -6588,8 +6506,8 @@ paths:
       - Timestamp: []
       summary: Bind domain
       tags:
-      - AITools
-  /aitool/domain/get:
+      - AI
+  /ai/domain/get:
     post:
       consumes:
       - application/json
@@ -6610,8 +6528,8 @@ paths:
       - Timestamp: []
       summary: Get bind domain
       tags:
-      - AITools
-  /aitool/gpu/load:
+      - AI
+  /ai/gpu/load:
     get:
       consumes:
       - application/json
@@ -6623,35 +6541,8 @@ paths:
       - Timestamp: []
       summary: Load gpu / xpu info
       tags:
-      - AITools
-  /aitool/ollama/model/del:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.OllamaModelName'
-      responses:
-        "200":
-          description: OK
-      security:
-      - ApiKeyAuth: []
-      - Timestamp: []
-      summary: Delete Ollama model
-      tags:
-      - AITools
-      x-panel-log:
-        BeforeFunctions: []
-        bodyKeys:
-        - name
-        formatEN: remove Ollama model [name]
-        formatZH: 删除模型 [name]
-        paramKeys: []
-  /aitools/ollama/model:
+      - AI
+  /ai/ollama/model:
     post:
       consumes:
       - application/json
@@ -6670,7 +6561,7 @@ paths:
       - Timestamp: []
       summary: Create Ollama model
       tags:
-      - AITools
+      - AI
       x-panel-log:
         BeforeFunctions: []
         bodyKeys:
@@ -6678,7 +6569,34 @@ paths:
         formatEN: add Ollama model [name]
         formatZH: 添加模型 [name]
         paramKeys: []
-  /aitools/ollama/model/load:
+  /ai/ollama/model/del:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OllamaModelName'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      - Timestamp: []
+      summary: Delete Ollama model
+      tags:
+      - AI
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - name
+        formatEN: remove Ollama model [name]
+        formatZH: 删除模型 [name]
+        paramKeys: []
+  /ai/ollama/model/load:
     post:
       consumes:
       - application/json
@@ -6699,8 +6617,8 @@ paths:
       - Timestamp: []
       summary: Page Ollama models
       tags:
-      - AITools
-  /aitools/ollama/model/search:
+      - AI
+  /ai/ollama/model/search:
     post:
       consumes:
       - application/json
@@ -6721,7 +6639,7 @@ paths:
       - Timestamp: []
       summary: Page Ollama models
       tags:
-      - AITools
+      - AI
   /apps/{key}:
     get:
       consumes:
