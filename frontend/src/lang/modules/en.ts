@@ -1979,8 +1979,7 @@ const message = {
         pullImage: 'Pull Image',
         pullImageHelper: 'Execute docker pull to pull the image before the application starts',
         gpuConfig: 'GPU Acceleration',
-        gpuConfigHelper:
-            'Please ensure that the server has NVIDIA drivers and NVIDIA Container Toolkit installed',
+        gpuConfigHelper: 'Please ensure that the server has NVIDIA drivers and NVIDIA Container Toolkit installed',
     },
     website: {
         website: 'Website | Websites',
@@ -2591,6 +2590,7 @@ const message = {
         proxyHelper4: 'Once created, you can view and manage it in the website list',
         proxyHelper5:
             'After enabling, you can disable external access to the port in the App Store - Installed - Ollama - Parameters to improve security.',
+        proxyHelper6: 'To disable proxy configuration, you can delete it from the website list.',
     },
 };
 

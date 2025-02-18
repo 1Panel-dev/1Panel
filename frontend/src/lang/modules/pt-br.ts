@@ -2614,6 +2614,7 @@ const message = {
         proxyHelper2: 'Limite o acesso por IP para evitar exposição na internet pública',
         proxyHelper3: 'Habilite a transmissão em fluxo',
         proxyHelper4: 'Após a criação, você pode visualizar e gerenciar no lista de sites',
+        proxyHelper6: 'Para desativar a configuração de proxy, você pode excluí-la da lista de sites.',
     },
 };
 

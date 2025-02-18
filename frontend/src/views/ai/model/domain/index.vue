@@ -25,7 +25,18 @@
                         <el-form-item :label="$t('website.domain')" prop="domain">
                             <el-input v-model.trim="req.domain" :disabled="operate === 'update'" />
                             <span class="input-help">
-                                {{ $t('aitool.proxyHelper4') }}
+                                {{ $t('aitool.proxyHelper4') + '   ' }}
+                                <el-link
+                                    class="pageRoute"
+                                    icon="Position"
+                                    @click="toWebsite(req.websiteID)"
+                                    type="primary"
+                                >
+                                    {{ $t('firewall.quickJump') }}
+                                </el-link>
+                            </span>
+                            <span class="input-help">
+                                {{ $t('aitool.proxyHelper6') }}
                             </span>
                         </el-form-item>
                         <el-form-item :label="$t('firewall.address')" prop="ipList">
@@ -52,6 +63,7 @@
                                 :placeholder="$t('website.selectAcme')"
                                 @change="listSSL"
                             >
+                                <el-option :key="0" :label="$t('website.imported')" :value="0"></el-option>
                                 <el-option
                                     v-for="(acme, index) in acmeAccounts"
                                     :key="index"
@@ -190,8 +202,8 @@ const listAcmeAccount = () => {
         acmeAccounts.value = res.data.items || [];
         if (acmeAccounts.value.length > 0) {
             req.value.acmeAccountID = acmeAccounts.value[0].id;
-            listSSL();
         }
+        listSSL();
     });
 };
 
@@ -230,7 +242,22 @@ const search = async (appInstallID: number) => {
     } catch (e) {}
 };
 
+const toWebsite = (websiteID: number) => {
+    if (websiteID != undefined && websiteID > 0) {
+        window.location.href = `/websites/${websiteID}/config/basic`;
+    } else {
+        window.location.href = '/websites';
+    }
+};
+
 defineExpose({
     acceptParams,
 });
 </script>
+
+<style lang="scss" scoped>
+.pageRoute {
+    font-size: 12px;
+    margin-left: 5px;
+}
+</style>

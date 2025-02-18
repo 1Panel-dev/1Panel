@@ -1338,9 +1338,10 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool)
 			Path:        installed.GetPath(),
 			CreatedAt:   installed.CreatedAt,
 			App: response.AppDetail{
-				Github:   installed.App.Github,
-				Website:  installed.App.Website,
-				Document: installed.App.Document,
+				Github:     installed.App.Github,
+				Website:    installed.App.Website,
+				Document:   installed.App.Document,
+				GpuSupport: installed.App.GpuSupport,
 			},
 		}
 		if updated {
@@ -1509,6 +1510,8 @@ func addDockerComposeCommonParam(composeMap map[string]interface{}, serviceName 
 				},
 			},
 		}
+	} else {
+		delete(resource, "reservations")
 	}
 
 	ports, ok := serviceValue["ports"].([]interface{})
@@ -1607,6 +1610,33 @@ func isHostModel(dockerCompose string) bool {
 		serviceValue := service.(map[string]interface{})
 		if value, ok := serviceValue["network_mode"]; ok && value == "host" {
 			return true
+		}
+	}
+	return false
+}
+
+func isGpuConfig(dockerCompose string) bool {
+	composeMap := make(map[string]interface{})
+	_ = yaml.Unmarshal([]byte(dockerCompose), &composeMap)
+	services, serviceValid := composeMap["services"].(map[string]interface{})
+	if !serviceValid {
+		return false
+	}
+	for _, service := range services {
+		serviceValue := service.(map[string]interface{})
+		deploy := map[string]interface{}{}
+		if de, ok := serviceValue["deploy"]; ok {
+			deploy = de.(map[string]interface{})
+		}
+		resource := map[string]interface{}{}
+		if res, ok := deploy["resources"]; ok {
+			resource = res.(map[string]interface{})
+		}
+		if reservations, ok := resource["reservations"]; ok {
+			reservationsMap := reservations.(map[string]interface{})
+			if _, dOk := reservationsMap["devices"]; dOk {
+				return true
+			}
 		}
 	}
 	return false

@@ -2427,6 +2427,7 @@ const message = {
         proxyHelper3: '啟用流式傳輸',
         proxyHelper4: '創建後，您可以在網站列表中查看並管理',
         proxyHelper5: '啟用後，您可以在應用商店 - 已安裝 - Ollama - 參數中取消端口外部訪問以提高安全性。',
+        proxyHelper6: '如需關閉代理配置，可以在網站列表中刪除',
     },
 };
 export default {

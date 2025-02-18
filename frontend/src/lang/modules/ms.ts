@@ -2004,8 +2004,7 @@ const message = {
         pullImage: 'Tarik Imej',
         pullImageHelper: 'Laksanakan docker pull untuk menarik imej sebelum aplikasi dimulakan.',
         gpuConfig: 'Pecutan GPU',
-        gpuConfigHelper:
-            'Sila pastikan bahawa pelayan telah dipasang pemacu NVIDIA dan NVIDIA Container Toolkit',
+        gpuConfigHelper: 'Sila pastikan bahawa pelayan telah dipasang pemacu NVIDIA dan NVIDIA Container Toolkit',
     },
     website: {
         website: 'Laman Web | Laman Web',
@@ -2620,6 +2619,7 @@ const message = {
         proxyHelper4: 'Setelah selesai, anda boleh melihat dan mengurusnya dalam senarai laman web',
         proxyHelper5:
             'Selepas diaktifkan, anda boleh melumpuhkan akses luaran ke port dalam App Store - Dipasang - Ollama - Parameter untuk meningkatkan keselamatan.',
+        proxyHelper6: 'Untuk melumpuhkan konfigurasi proksi, anda boleh memadamnya dari senarai laman web.',
     },
 };
 

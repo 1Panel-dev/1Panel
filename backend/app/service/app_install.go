@@ -750,6 +750,7 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 	}
 	res.AppContainerConfig = config
 	res.HostMode = isHostModel(install.DockerCompose)
+	res.GpuConfig = isGpuConfig(install.DockerCompose)
 	return &res, nil
 }
 

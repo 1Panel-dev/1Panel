@@ -2066,7 +2066,7 @@ const message = {
         ipv6: '监听 IPV6',
         leechReturnError: '请填写 HTTP 状态码',
         selectAcme: '选择 acme 账号',
-        imported: '手动创建',
+        imported: '存量/自签证书',
         importType: '导入方式',
         pasteSSL: '粘贴代码',
         localSSL: '选择服务器文件',
@@ -2424,11 +2424,12 @@ const message = {
     },
     aitool: {
         proxy: 'AI 代理增强',
-        proxyHelper1: '绑定域名，并开启 HTTPS，增强传输安全性',
+        proxyHelper1: '绑定域名并开启 HTTPS，增强传输安全性',
         proxyHelper2: '限制 IP 访问，防止在公网暴露',
         proxyHelper3: '开启流式传输',
         proxyHelper4: '创建完成之后可以在网站列表中查看并管理',
-        proxyHelper5: '开启之后可以在应用商店 - 已安装 - ollama - 参数中取消端口外部访问以提高安全性',
+        proxyHelper5: '创建完成之后可以在应用商店 - 已安装 - ollama - 参数中取消端口外部访问以提高安全性',
+        proxyHelper6: '如需关闭代理配置，可以在网站列表中删除',
     },
 };
 export default {

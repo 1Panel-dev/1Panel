@@ -92,9 +92,10 @@ type AppInstalledDTO struct {
 }
 
 type AppDetail struct {
-	Website  string `json:"website"`
-	Document string `json:"document"`
-	Github   string `json:"github"`
+	Website    string `json:"website"`
+	Document   string `json:"document"`
+	Github     string `json:"github"`
+	GpuSupport bool   `json:"gpuSupport"`
 }
 
 type AppInstallDTO struct {

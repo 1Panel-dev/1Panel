@@ -33,6 +33,9 @@
                         <el-button :disabled="modelInfo.status !== 'Running'" type="primary" @click="onCreate()">
                             {{ $t('ai_tools.model.create') }}
                         </el-button>
+                        <el-button plain type="primary" :disabled="modelInfo.status !== 'Running'" @click="bindDomain">
+                            {{ $t('aitool.proxy') }}
+                        </el-button>
                         <el-button :disabled="modelInfo.status !== 'Running'" @click="onLoadConn" type="primary" plain>
                             {{ $t('database.databaseConnInfo') }}
                         </el-button>
@@ -48,9 +51,7 @@
                         >
                             OpenWebUI
                         </el-button>
-                        <el-button plain type="primary" :disabled="modelInfo.status !== 'Running'" @click="bindDomain">
-                            {{ $t('aitool.proxy') }}
-                        </el-button>
+
                         <el-button plain :disabled="selects.length === 0" type="primary" @click="onDelete(null)">
                             {{ $t('commons.button.delete') }}
                         </el-button>

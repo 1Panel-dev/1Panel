@@ -107,7 +107,10 @@
                                 {{ $t('container.limitHelper', [limits.memory]) }} {{ paramModel.memoryUnit }}B
                             </span>
                         </el-form-item>
-
+                        <el-form-item pro="gpuConfig" v-if="gpuSupport">
+                            <el-checkbox v-model="paramModel.gpuConfig" :label="$t('app.gpuConfig')" size="large" />
+                            <span class="input-help">{{ $t('app.gpuConfigHelper') }}</span>
+                        </el-form-item>
                         <el-form-item prop="editCompose">
                             <el-checkbox v-model="paramModel.editCompose" :label="$t('app.editCompose')" size="large" />
                             <span class="input-help">{{ $t('app.editComposeHelper') }}</span>
@@ -162,10 +165,12 @@ const extensions = [yaml(), oneDark];
 interface ParamProps {
     id: Number;
     app: any;
+    gpuSupport?: boolean;
 }
 const paramData = ref<ParamProps>({
     id: 0,
     app: {},
+    gpuSupport: false,
 });
 
 interface EditForm extends App.InstallParams {
@@ -190,6 +195,8 @@ const limits = ref<Container.ResourceLimit>({
     cpu: null as number,
     memory: null as number,
 });
+const gpuSupport = ref(false);
+const em = defineEmits(['close']);
 
 const changeUnit = () => {
     if (paramModel.value.memoryUnit == 'M') {
@@ -212,6 +219,7 @@ const acceptParams = async (props: ParamProps) => {
     params.value = [];
     paramData.value.id = props.id;
     paramModel.value.params = {};
+    gpuSupport.value = props.gpuSupport;
     edit.value = false;
     await get();
     open.value = true;
@@ -219,6 +227,7 @@ const acceptParams = async (props: ParamProps) => {
 
 const handleClose = () => {
     open.value = false;
+    em('close', open);
 };
 const editParam = () => {
     params.value.forEach((param: EditForm) => {
@@ -265,6 +274,7 @@ const get = async () => {
         paramModel.value.advanced = false;
         paramModel.value.dockerCompose = res.data.dockerCompose;
         paramModel.value.isHostMode = res.data.hostMode;
+        paramModel.value.gpuConfig = res.data.gpuConfig;
     } catch (error) {
     } finally {
         loading.value = false;
@@ -303,6 +313,7 @@ const submit = async (formEl: FormInstance) => {
                     submitModel.value.editCompose = paramModel.value.editCompose;
                     submitModel.value.dockerCompose = paramModel.value.dockerCompose;
                 }
+                submitModel.value.gpuConfig = paramModel.value.gpuConfig;
             }
             try {
                 loading.value = true;

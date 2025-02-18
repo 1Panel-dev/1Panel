@@ -242,6 +242,7 @@ export namespace App {
         allowPort: boolean;
         dockerCompose: string;
         hostMode?: boolean;
+        gpuConfig?: boolean;
     }
 
     export interface IgnoredApp {

@@ -1920,8 +1920,7 @@ const message = {
         pullImage: '이미지 풀',
         pullImageHelper: '애플리케이션 시작 전에 docker pull 을 실행하여 이미지를 다운로드하세요.',
         gpuConfig: 'GPU 가속',
-        gpuConfigHelper:
-            '서버에 NVIDIA 드라이버와 NVIDIA Container Toolkit이 설치되어 있는지 확인하십시오',
+        gpuConfigHelper: '서버에 NVIDIA 드라이버와 NVIDIA Container Toolkit이 설치되어 있는지 확인하십시오',
     },
     website: {
         website: '웹사이트 | 웹사이트들',
@@ -2521,6 +2520,7 @@ const message = {
         proxyHelper4: '생성 후, 웹사이트 목록에서 이를 보고 관리할 수 있습니다',
         proxyHelper5:
             '활성화한 후, 앱 스토어 - 설치됨 - Ollama - 매개변수에서 포트 외부 접근을 비활성화하여 보안을 강화할 수 있습니다.',
+        proxyHelper6: '프록시 구성을 비활성화하려면 웹사이트 목록에서 삭제할 수 있습니다.',
     },
 };
 

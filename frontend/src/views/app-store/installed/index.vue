@@ -302,7 +302,7 @@
     <Uploads ref="uploadRef" />
     <AppResources ref="checkRef" @close="search" />
     <AppDelete ref="deleteRef" @close="search" />
-    <AppParams ref="appParamRef" />
+    <AppParams ref="appParamRef" @close="search" />
     <AppUpgrade ref="upgradeRef" @close="search" />
     <PortJumpDialog ref="dialogPortJumpRef" />
     <AppIgnore ref="ignoreRef" @close="search" />
@@ -605,7 +605,7 @@ const openUploads = (key: string, name: string) => {
 };
 
 const openParam = (row: any) => {
-    appParamRef.value.acceptParams({ id: row.id });
+    appParamRef.value.acceptParams({ id: row.id, gpuSupport: row.app.gpuSupport });
 };
 
 const isAppErr = (row: any) => {
