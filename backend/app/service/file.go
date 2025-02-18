@@ -480,13 +480,7 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 	case "image-pull", "image-push", "image-build", "compose-create":
 		logFilePath = path.Join(global.CONF.System.TmpDir, fmt.Sprintf("docker_logs/%s", req.Name))
 	case "ollama-model":
-		fileName := strings.ReplaceAll(req.Name, ":", "-")
-		if _, err := os.Stat(fileName); err != nil {
-			if strings.HasSuffix(req.Name, ":latest") {
-				fileName = strings.TrimSuffix(req.Name, ":latest")
-			}
-		}
-		logFilePath = path.Join(global.CONF.System.DataDir, "log", "AITools", fileName)
+		logFilePath = path.Join(global.CONF.System.DataDir, "log", "AITools", req.Name)
 	}
 
 	lines, isEndOfFile, total, err := files.ReadFileByLine(logFilePath, req.Page, req.PageSize, req.Latest)

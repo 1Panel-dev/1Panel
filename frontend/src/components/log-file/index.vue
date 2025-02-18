@@ -72,8 +72,7 @@ const stopSignals = [
     'image pull successful!',
     'image push failed!',
     'image push successful!',
-    'ollama pull failed!',
-    'ollama pull successful!',
+    'ollama pull completed!',
 ];
 const emit = defineEmits(['update:loading', 'update:hasContent', 'update:isReading']);
 const tailLog = ref(false);

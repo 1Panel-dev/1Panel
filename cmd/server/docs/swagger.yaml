@@ -1567,6 +1567,15 @@ definitions:
     - type
     - vars
     type: object
+  dto.ForceDelete:
+    properties:
+      forceDelete:
+        type: boolean
+      ids:
+        items:
+          type: integer
+        type: array
+    type: object
   dto.ForwardRuleOperate:
     properties:
       rules:
@@ -2483,6 +2492,13 @@ definitions:
         type: integer
       websiteID:
         type: integer
+    type: object
+  dto.OllamaModelDropList:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
     type: object
   dto.OllamaModelName:
     properties:
@@ -6579,7 +6595,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.OllamaModelName'
+          $ref: '#/definitions/dto.ForceDelete'
       responses:
         "200":
           description: OK
@@ -6590,11 +6606,17 @@ paths:
       tags:
       - AI
       x-panel-log:
-        BeforeFunctions: []
+        BeforeFunctions:
+        - db: ollama_models
+          input_column: id
+          input_value: id
+          isList: false
+          output_column: name
+          output_value: name
         bodyKeys:
-        - name
-        formatEN: remove Ollama model [name]
-        formatZH: 删除模型 [name]
+        - id
+        formatEN: remove ollama model [name]
+        formatZH: 删除 ollama 模型 [name]
         paramKeys: []
   /ai/ollama/model/load:
     post:
@@ -6618,6 +6640,33 @@ paths:
       summary: Page Ollama models
       tags:
       - AI
+  /ai/ollama/model/recreate:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OllamaModelName'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      - Timestamp: []
+      summary: Rereate Ollama model
+      tags:
+      - AI
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - name
+        formatEN: re-add Ollama model [name]
+        formatZH: 添加模型重试 [name]
+        paramKeys: []
   /ai/ollama/model/search:
     post:
       consumes:
@@ -6640,6 +6689,27 @@ paths:
       summary: Page Ollama models
       tags:
       - AI
+  /ai/ollama/model/sync:
+    post:
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.OllamaModelDropList'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      - Timestamp: []
+      summary: Sync Ollama model list
+      tags:
+      - AI
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys: []
+        formatEN: sync Ollama model list
+        formatZH: 同步 Ollama 模型列表
+        paramKeys: []
   /apps/{key}:
     get:
       consumes:

@@ -33,6 +33,44 @@ func (b *BaseApi) CreateOllamaModel(c *gin.Context) {
 }
 
 // @Tags AI
+// @Summary Rereate Ollama model
+// @Accept json
+// @Param request body dto.OllamaModelName true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/ollama/model/recreate [post]
+// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"添加模型重试 [name]","formatEN":"re-add Ollama model [name]"}
+func (b *BaseApi) RecreateOllamaModel(c *gin.Context) {
+	var req dto.OllamaModelName
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := AIToolService.Recreate(req.Name); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags AI
+// @Summary Sync Ollama model list
+// @Success 200 {array} dto.OllamaModelDropList
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/ollama/model/sync [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"同步 Ollama 模型列表","formatEN":"sync Ollama model list"}
+func (b *BaseApi) SyncOllamaModel(c *gin.Context) {
+	list, err := AIToolService.Sync()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, list)
+}
+
+// @Tags AI
 // @Summary Page Ollama models
 // @Accept json
 // @Param request body dto.SearchWithPage true "request"
@@ -84,19 +122,19 @@ func (b *BaseApi) LoadOllamaModelDetail(c *gin.Context) {
 // @Tags AI
 // @Summary Delete Ollama model
 // @Accept json
-// @Param request body dto.OllamaModelName true "request"
+// @Param request body dto.ForceDelete true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /ai/ollama/model/del [post]
-// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"删除模型 [name]","formatEN":"remove Ollama model [name]"}
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"ollama_models","output_column":"name","output_value":"name"}],"formatZH":"删除 ollama 模型 [name]","formatEN":"remove ollama model [name]"}
 func (b *BaseApi) DeleteOllamaModel(c *gin.Context) {
-	var req dto.OllamaModelName
+	var req dto.ForceDelete
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 
-	if err := AIToolService.Delete(req.Name); err != nil {
+	if err := AIToolService.Delete(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

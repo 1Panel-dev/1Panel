@@ -611,6 +611,10 @@ const message = {
             create_helper: 'Tarik "{0}" dari Ollama.com',
             ollama_doc: 'Anda boleh melawat laman web rasmi Ollama untuk mencari dan menemui lebih banyak model.',
             container_conn_helper: 'Gunakan alamat ini untuk akses atau sambungan antara kontena',
+            ollama_sync:
+                'Sincronizando o modelo Ollama, encontrou que os seguintes modelos não existem, deseja excluí-los?',
+            from_remote: 'Este modelo não foi baixado via 1Panel, sem logs de pull relacionados.',
+            no_logs: 'Os logs de pull deste modelo foram excluídos e não podem ser visualizados.',
         },
         gpu: {
             gpu: 'Monitor GPU',

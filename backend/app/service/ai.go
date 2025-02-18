@@ -11,10 +11,14 @@ import (
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
+	"github.com/1Panel-dev/1Panel/backend/app/model"
+	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
+	"github.com/jinzhu/copier"
+	"github.com/pkg/errors"
 )
 
 type AIToolService struct{}
@@ -22,7 +26,9 @@ type AIToolService struct{}
 type IAIToolService interface {
 	Search(search dto.SearchWithPage) (int64, []dto.OllamaModelInfo, error)
 	Create(name string) error
-	Delete(name string) error
+	Recreate(name string) error
+	Delete(req dto.ForceDelete) error
+	Sync() ([]dto.OllamaModelDropList, error)
 	LoadDetail(name string) (string, error)
 	BindDomain(req dto.OllamaBindDomain) error
 	GetBindDomain(req dto.OllamaBindDomainReq) (*dto.OllamaBindDomainRes, error)
@@ -34,78 +40,38 @@ func NewIAIToolService() IAIToolService {
 }
 
 func (u *AIToolService) Search(req dto.SearchWithPage) (int64, []dto.OllamaModelInfo, error) {
-	ollamaBaseInfo, err := appInstallRepo.LoadBaseInfo("ollama", "")
-	if err != nil {
-		return 0, nil, err
-	}
-	if ollamaBaseInfo.Status != constant.Running {
-		return 0, nil, nil
-	}
-	stdout, err := cmd.Execf("docker exec %s ollama list", ollamaBaseInfo.ContainerName)
-	if err != nil {
-		return 0, nil, err
-	}
-	var list []dto.OllamaModelInfo
-	modelMaps := make(map[string]struct{})
-	lines := strings.Split(stdout, "\n")
-	for _, line := range lines {
-		parts := strings.Fields(line)
-		if len(parts) < 5 {
-			continue
-		}
-		if parts[0] == "NAME" {
-			continue
-		}
-		modelMaps[strings.ReplaceAll(parts[0], ":", "-")] = struct{}{}
-		list = append(list, dto.OllamaModelInfo{Name: parts[0], Size: parts[2] + " " + parts[3], Modified: strings.Join(parts[4:], " ")})
-	}
-	entries, _ := os.ReadDir(path.Join(global.CONF.System.DataDir, "log", "AITools"))
-	for _, item := range entries {
-		if _, ok := modelMaps[item.Name()]; ok {
-			continue
-		}
-		if _, ok := modelMaps[item.Name()+":latest"]; ok {
-			continue
-		}
-		list = append(list, dto.OllamaModelInfo{Name: item.Name(), Size: "-", Modified: "-"})
-	}
+	var options []repo.DBOption
 	if len(req.Info) != 0 {
-		length, count := len(list), 0
-		for count < length {
-			if !strings.Contains(list[count].Name, req.Info) {
-				list = append(list[:count], list[(count+1):]...)
-				length--
-			} else {
-				count++
-			}
-		}
+		options = append(options, commonRepo.WithLikeName(req.Info))
 	}
-
-	var records []dto.OllamaModelInfo
-	total, start, end := len(list), (req.Page-1)*req.PageSize, req.Page*req.PageSize
-	if start > total {
-		records = make([]dto.OllamaModelInfo, 0)
-	} else {
-		if end >= total {
-			end = total
-		}
-		records = list[start:end]
+	total, list, err := aiRepo.Page(req.Page, req.PageSize, options...)
+	if err != nil {
+		return 0, nil, err
 	}
-	return int64(total), records, err
+	var dtoLists []dto.OllamaModelInfo
+	for _, itemModel := range list {
+		var item dto.OllamaModelInfo
+		if err := copier.Copy(&item, &itemModel); err != nil {
+			return 0, nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+		}
+		logPath := path.Join(global.CONF.System.DataDir, "log", "AITools", itemModel.Name)
+		if _, err := os.Stat(logPath); err == nil {
+			item.LogFileExist = true
+		}
+		dtoLists = append(dtoLists, item)
+	}
+	return int64(total), dtoLists, err
 }
 
 func (u *AIToolService) LoadDetail(name string) (string, error) {
 	if cmd.CheckIllegal(name) {
 		return "", buserr.New(constant.ErrCmdIllegal)
 	}
-	ollamaBaseInfo, err := appInstallRepo.LoadBaseInfo("ollama", "")
+	containerName, err := loadContainerName()
 	if err != nil {
 		return "", err
 	}
-	if ollamaBaseInfo.Status != constant.Running {
-		return "", nil
-	}
-	stdout, err := cmd.Execf("docker exec %s ollama show %s", ollamaBaseInfo.ContainerName, name)
+	stdout, err := cmd.Execf("docker exec %s ollama show %s", containerName, name)
 	if err != nil {
 		return "", err
 	}
@@ -116,15 +82,52 @@ func (u *AIToolService) Create(name string) error {
 	if cmd.CheckIllegal(name) {
 		return buserr.New(constant.ErrCmdIllegal)
 	}
-	ollamaBaseInfo, err := appInstallRepo.LoadBaseInfo("ollama", "")
+	modelInfo, _ := aiRepo.Get(commonRepo.WithByName(name))
+	if modelInfo.ID != 0 {
+		return constant.ErrRecordExist
+	}
+	containerName, err := loadContainerName()
 	if err != nil {
 		return err
 	}
-	if ollamaBaseInfo.Status != constant.Running {
-		return nil
+	logItem := path.Join(global.CONF.System.DataDir, "log", "AITools", name)
+	if _, err := os.Stat(path.Dir(logItem)); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(path.Dir(logItem), os.ModePerm); err != nil {
+			return err
+		}
 	}
-	fileName := strings.ReplaceAll(name, ":", "-")
-	logItem := path.Join(global.CONF.System.DataDir, "log", "AITools", fileName)
+	info := model.OllamaModel{
+		Name:   name,
+		From:   "local",
+		Status: constant.StatusWaiting,
+	}
+	if err := aiRepo.Create(&info); err != nil {
+		return err
+	}
+	file, err := os.OpenFile(logItem, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	if err != nil {
+		return err
+	}
+	go pullOllamaModel(file, containerName, info)
+	return nil
+}
+
+func (u *AIToolService) Recreate(name string) error {
+	if cmd.CheckIllegal(name) {
+		return buserr.New(constant.ErrCmdIllegal)
+	}
+	modelInfo, _ := aiRepo.Get(commonRepo.WithByName(name))
+	if modelInfo.ID == 0 {
+		return constant.ErrRecordNotFound
+	}
+	containerName, err := loadContainerName()
+	if err != nil {
+		return err
+	}
+	if err := aiRepo.Update(modelInfo.ID, map[string]interface{}{"status": constant.StatusWaiting, "from": "local"}); err != nil {
+		return err
+	}
+	logItem := path.Join(global.CONF.System.DataDir, "log", "AITools", name)
 	if _, err := os.Stat(path.Dir(logItem)); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(path.Dir(logItem), os.ModePerm); err != nil {
 			return err
@@ -134,40 +137,41 @@ func (u *AIToolService) Create(name string) error {
 	if err != nil {
 		return err
 	}
-	go func() {
-		defer file.Close()
-		cmd := exec.Command("docker", "exec", ollamaBaseInfo.ContainerName, "ollama", "run", name)
-		multiWriter := io.MultiWriter(os.Stdout, file)
-		cmd.Stdout = multiWriter
-		cmd.Stderr = multiWriter
-		if err := cmd.Run(); err != nil {
-			global.LOG.Errorf("ollama pull %s failed, err: %v", name, err)
-			_, _ = file.WriteString("ollama pull failed!")
-			return
-		}
-		global.LOG.Infof("ollama pull %s successful!", name)
-		_, _ = file.WriteString("ollama pull successful!")
-	}()
-
+	go pullOllamaModel(file, containerName, modelInfo)
 	return nil
 }
 
-func (u *AIToolService) Delete(name string) error {
-	if cmd.CheckIllegal(name) {
-		return buserr.New(constant.ErrCmdIllegal)
+func (u *AIToolService) Delete(req dto.ForceDelete) error {
+	ollamaList, _ := aiRepo.List(commonRepo.WithIdsIn(req.IDs))
+	if len(ollamaList) == 0 {
+		return constant.ErrRecordNotFound
 	}
-	ollamaBaseInfo, err := appInstallRepo.LoadBaseInfo("ollama", "")
-	if err != nil {
+	containerName, err := loadContainerName()
+	if err != nil && !req.ForceDelete {
 		return err
 	}
-	if ollamaBaseInfo.Status != constant.Running {
-		return nil
+	for _, item := range ollamaList {
+		stdout, err := cmd.Execf("docker exec %s ollama rm %s", containerName, item.Name)
+		if err != nil && !req.ForceDelete {
+			return fmt.Errorf("handle ollama rm %s failed, stdout: %s, err: %v", item.Name, stdout, err)
+		}
+		_ = aiRepo.Delete(commonRepo.WithByID(item.ID))
+		logItem := path.Join(global.CONF.System.DataDir, "log", "AITools", item.Name)
+		_ = os.Remove(logItem)
 	}
-	stdout, err := cmd.Execf("docker exec %s ollama list", ollamaBaseInfo.ContainerName)
+	return nil
+}
+
+func (u *AIToolService) Sync() ([]dto.OllamaModelDropList, error) {
+	containerName, err := loadContainerName()
 	if err != nil {
-		return err
+		return nil, err
 	}
-	isExist := false
+	stdout, err := cmd.Execf("docker exec %s ollama list", containerName)
+	if err != nil {
+		return nil, err
+	}
+	var list []model.OllamaModel
 	lines := strings.Split(stdout, "\n")
 	for _, line := range lines {
 		parts := strings.Fields(line)
@@ -177,25 +181,33 @@ func (u *AIToolService) Delete(name string) error {
 		if parts[0] == "NAME" {
 			continue
 		}
-		if parts[0] == name {
-			isExist = true
-			break
+		list = append(list, model.OllamaModel{Name: parts[0], Size: parts[2] + " " + parts[3]})
+	}
+	listInDB, _ := aiRepo.List()
+	var dropList []dto.OllamaModelDropList
+	for _, itemModel := range listInDB {
+		isExit := false
+		for i := 0; i < len(list); i++ {
+			if list[i].Name == itemModel.Name {
+				_ = aiRepo.Update(itemModel.ID, map[string]interface{}{"status": constant.StatusSuccess, "message": "", "size": list[i].Size})
+				list = append(list[:i], list[(i+1):]...)
+				isExit = true
+				break
+			}
 		}
+		if !isExit && itemModel.Status != constant.StatusWaiting {
+			_ = aiRepo.Update(itemModel.ID, map[string]interface{}{"status": constant.StatusDeleted, "message": "not exist", "size": ""})
+			dropList = append(dropList, dto.OllamaModelDropList{ID: itemModel.ID, Name: itemModel.Name})
+			continue
+		}
+	}
+	for _, item := range list {
+		item.Status = constant.StatusSuccess
+		item.From = "remote"
+		_ = aiRepo.Create(&item)
 	}
 
-	if isExist {
-		stdout, err := cmd.Execf("docker exec %s ollama rm %s", ollamaBaseInfo.ContainerName, name)
-		if err != nil {
-			return fmt.Errorf("handle ollama rm %s failed, stdout: %s, err: %v", name, stdout, err)
-		}
-	}
-	logItem := path.Join(global.CONF.System.DataDir, "log", "AITools", name)
-	_ = os.Remove(logItem)
-	logItem2 := path.Join(global.CONF.System.DataDir, "log", "AITools", strings.TrimSuffix(name, ":latest"))
-	if logItem2 != logItem {
-		_ = os.Remove(logItem2)
-	}
-	return nil
+	return dropList, nil
 }
 
 func (u *AIToolService) BindDomain(req dto.OllamaBindDomain) error {
@@ -294,4 +306,47 @@ func (u *AIToolService) UpdateBindDomain(req dto.OllamaBindDomain) error {
 		}
 	}
 	return nil
+}
+
+func loadContainerName() (string, error) {
+	ollamaBaseInfo, err := appInstallRepo.LoadBaseInfo("ollama", "")
+	if err != nil {
+		return "", fmt.Errorf("ollama service is not found, err: %v", err)
+	}
+	if ollamaBaseInfo.Status != constant.Running {
+		return "", fmt.Errorf("container %s of ollama is not running, please check and retry!", ollamaBaseInfo.ContainerName)
+	}
+	return ollamaBaseInfo.ContainerName, nil
+}
+
+func pullOllamaModel(file *os.File, containerName string, info model.OllamaModel) {
+	defer file.Close()
+	cmd := exec.Command("docker", "exec", containerName, "ollama", "pull", info.Name)
+	multiWriter := io.MultiWriter(os.Stdout, file)
+	cmd.Stdout = multiWriter
+	cmd.Stderr = multiWriter
+	_ = cmd.Run()
+	itemSize, err := loadModelSize(info.Name, containerName)
+	if len(itemSize) != 0 {
+		_ = aiRepo.Update(info.ID, map[string]interface{}{"status": constant.StatusSuccess, "size": itemSize})
+	} else {
+		_ = aiRepo.Update(info.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
+	}
+	_, _ = file.WriteString("ollama pull completed!")
+}
+
+func loadModelSize(name string, containerName string) (string, error) {
+	stdout, err := cmd.Execf("docker exec %s ollama list | grep %s", containerName, name)
+	if err != nil {
+		return "", err
+	}
+	lines := strings.Split(string(stdout), "\n")
+	for _, line := range lines {
+		parts := strings.Fields(line)
+		if len(parts) < 5 {
+			continue
+		}
+		return parts[2] + " " + parts[3], nil
+	}
+	return "", fmt.Errorf("no such model %s in ollama list, std: %s", name, string(stdout))
 }

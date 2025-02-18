@@ -6,6 +6,7 @@ const (
 	StatusWaiting   = "Waiting"
 	StatusSuccess   = "Success"
 	StatusFailed    = "Failed"
+	StatusDeleted   = "Deleted"
 	StatusUploading = "Uploading"
 	StatusEnable    = "Enable"
 	StatusDisable   = "Disable"

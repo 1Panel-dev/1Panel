@@ -33,6 +33,9 @@
                         <el-button :disabled="modelInfo.status !== 'Running'" @click="onLoadConn" type="primary" plain>
                             {{ $t('database.databaseConnInfo') }}
                         </el-button>
+                        <el-button :disabled="modelInfo.status !== 'Running'" type="primary" plain @click="onSync()">
+                            {{ $t('database.loadFromRemote') }}
+                        </el-button>
                         <el-button
                             :disabled="modelInfo.status !== 'Running'"
                             icon="Position"
@@ -41,6 +44,9 @@
                             plain
                         >
                             OpenWebUI
+                        </el-button>
+                        <el-button plain :disabled="selects.length === 0" type="primary" @click="onDelete(null)">
+                            {{ $t('commons.button.delete') }}
                         </el-button>
                     </div>
                     <div>
@@ -51,36 +57,61 @@
             <template #main v-if="modelInfo.isExist">
                 <ComplexTable
                     :pagination-config="paginationConfig"
+                    v-model:selects="selects"
                     :class="{ mask: maskShow }"
                     @sort-change="search"
                     @search="search"
                     :data="data"
                 >
-                    <el-table-column :label="$t('commons.table.name')" prop="name" min-width="90">
+                    <el-table-column type="selection" :selectable="selectable" fix />
+                    <el-table-column :label="$t('ai_tools.model.model')" prop="name" min-width="90">
                         <template #default="{ row }">
-                            <el-text
-                                v-if="row.size !== '-'"
-                                type="primary"
-                                class="cursor-pointer"
-                                @click="onLoad(row.name)"
-                            >
+                            <el-text v-if="row.size" type="primary" class="cursor-pointer" @click="onLoad(row.name)">
                                 {{ row.name }}
                             </el-text>
                             <span v-else>{{ row.name }}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('file.size')" prop="size" />
+                    <el-table-column :label="$t('file.size')" prop="size">
+                        <template #default="{ row }">
+                            <span>{{ row.size || '-' }}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('commons.table.status')" prop="status">
+                        <template #default="{ row }">
+                            <el-tag v-if="row.status === 'Success'" type="success">
+                                {{ $t('commons.status.success') }}
+                            </el-tag>
+                            <el-tag v-if="row.status === 'Deleted'" type="info">
+                                {{ $t('database.isDelete') }}
+                            </el-tag>
+                            <el-tag v-if="row.status === 'Failed'" type="danger">
+                                {{ $t('commons.status.failed') }}
+                            </el-tag>
+                            <el-tag v-if="row.status === 'Waiting'">
+                                <el-icon v-if="row.status === 'Waiting'" class="is-loading">
+                                    <Loading />
+                                </el-icon>
+                                {{ $t('commons.status.waiting') }}
+                            </el-tag>
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('commons.button.log')">
                         <template #default="{ row }">
-                            <el-button @click="onLoadLog(row.name)" link type="primary">
+                            <el-button @click="onLoadLog(row)" link type="primary">
                                 {{ $t('website.check') }}
                             </el-button>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.createdAt')" prop="modified" />
+                    <el-table-column
+                        min-width="100"
+                        :label="$t('commons.table.createdAt')"
+                        prop="createdAt"
+                        :formatter="dateFormat"
+                    />
                     <fu-table-operations
                         :ellipsis="mobile ? 0 : 10"
-                        :min-width="mobile ? 'auto' : 400"
+                        :min-width="mobile ? 'auto' : 100"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         fixed="right"
@@ -116,8 +147,21 @@
             </template>
         </el-dialog>
 
+        <OpDialog ref="opRef" @search="search" @submit="onSubmitDelete()">
+            <template #content>
+                <el-form class="mt-4 mb-1" ref="deleteForm" label-position="left">
+                    <el-form-item>
+                        <el-checkbox v-model="forceDelete" :label="$t('website.forceDelete')" />
+                        <span class="input-help">
+                            {{ $t('website.forceDeleteHelper') }}
+                        </span>
+                    </el-form-item>
+                </el-form>
+            </template>
+        </OpDialog>
         <AddDialog ref="addRef" @search="search" @log="onLoadLog" />
         <Log ref="logRef" @close="search" />
+        <Del ref="delRef" @search="search" />
         <Conn ref="connRef" />
         <CodemirrorDialog ref="detailRef" />
         <PortJumpDialog ref="dialogPortJumpRef" />
@@ -129,6 +173,7 @@
 import AppStatus from '@/components/app-status/index.vue';
 import AddDialog from '@/views/ai/model/add/index.vue';
 import Conn from '@/views/ai/model/conn/index.vue';
+import Del from '@/views/ai/model/del/index.vue';
 import Log from '@/components/log-dialog/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import CodemirrorDialog from '@/components/codemirror-dialog/index.vue';
@@ -136,19 +181,28 @@ import { computed, onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { App } from '@/api/interface/app';
 import { GlobalStore } from '@/store';
-import { deleteOllamaModel, loadOllamaModel, searchOllamaModel } from '@/api/modules/ai';
+import {
+    deleteOllamaModel,
+    loadOllamaModel,
+    recreateOllamaModel,
+    searchOllamaModel,
+    syncOllamaModel,
+} from '@/api/modules/ai';
 import { AI } from '@/api/interface/ai';
 import { GetAppPort } from '@/api/modules/app';
+import { dateFormat } from '@/utils/util';
 import router from '@/routers';
-import { MsgSuccess } from '@/utils/message';
+import { MsgInfo, MsgSuccess } from '@/utils/message';
 import BindDomain from '@/views/ai/model/domain/index.vue';
 const globalStore = GlobalStore();
 
 const loading = ref(false);
+const selects = ref<any>([]);
 const maskShow = ref(true);
 const addRef = ref();
 const logRef = ref();
 const detailRef = ref();
+const delRef = ref();
 const connRef = ref();
 const openWebUIPort = ref();
 const dashboardVisible = ref(false);
@@ -165,6 +219,10 @@ const paginationConfig = reactive({
 const searchName = ref();
 const appInstallID = ref(0);
 
+const opRef = ref();
+const operateIDs = ref();
+const forceDelete = ref();
+
 const modelInfo = reactive({
     status: '',
     container: '',
@@ -176,6 +234,10 @@ const modelInfo = reactive({
 const mobile = computed(() => {
     return globalStore.isMobile();
 });
+
+function selectable(row) {
+    return row.status !== 'Waiting';
+}
 
 const search = async () => {
     let params = {
@@ -197,6 +259,23 @@ const search = async () => {
 
 const onCreate = async () => {
     addRef.value.acceptParams();
+};
+
+const onSync = async () => {
+    loading.value = true;
+    await syncOllamaModel()
+        .then((res) => {
+            loading.value = false;
+            if (res.data) {
+                delRef.value.acceptParams({ list: res.data });
+            } else {
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                search();
+            }
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const onLoadConn = async () => {
@@ -246,34 +325,86 @@ const checkExist = (data: App.CheckInstalled) => {
     }
 };
 
+const onSubmitDelete = async () => {
+    loading.value = true;
+    await deleteOllamaModel(operateIDs.value, forceDelete.value)
+        .then(() => {
+            loading.value = false;
+            MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
+            search();
+        })
+        .catch(() => {
+            loading.value = false;
+        });
+};
+
+const onReCreate = async (name: string) => {
+    loading.value = true;
+    await recreateOllamaModel(name)
+        .then(() => {
+            loading.value = false;
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            search();
+        })
+        .catch(() => {
+            loading.value = false;
+        });
+};
+
 const onDelete = async (row: AI.OllamaModelInfo) => {
-    ElMessageBox.confirm(i18n.global.t('commons.msg.delete'), i18n.global.t('commons.button.delete'), {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-        type: 'info',
-    }).then(async () => {
-        loading.value = true;
-        await deleteOllamaModel(row.name)
-            .then(() => {
-                loading.value = false;
-                search();
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            })
-            .catch(() => {
-                loading.value = false;
-            });
+    let names = [];
+    let ids = [];
+    if (row) {
+        ids = [row.id];
+        names = [row.name];
+    } else {
+        for (const item of selects.value) {
+            names.push(item.name);
+            ids.push(item.id);
+        }
+    }
+    operateIDs.value = ids;
+    opRef.value.acceptParams({
+        title: i18n.global.t('commons.button.delete'),
+        names: names,
+        msg: i18n.global.t('commons.msg.operatorHelper', [
+            i18n.global.t('cronjob.cronTask'),
+            i18n.global.t('commons.button.delete'),
+        ]),
+        api: null,
+        params: null,
     });
 };
 
-const onLoadLog = (name: string) => {
-    logRef.value.acceptParams({ id: 0, type: 'ollama-model', name: name, tail: true });
+const onLoadLog = (row: AI.OllamaModelInfo) => {
+    if (row.from === 'remote') {
+        MsgInfo(i18n.global.t('ai_tools.model.from_remote'));
+        return;
+    }
+    if (!row.logFileExist) {
+        MsgInfo(i18n.global.t('ai_tools.model.no_logs'));
+        return;
+    }
+    logRef.value.acceptParams({ id: 0, type: 'ollama-model', name: row.name, tail: true });
 };
 
 const buttons = [
     {
+        label: i18n.global.t('commons.button.retry'),
+        click: (row: AI.OllamaModelInfo) => {
+            onReCreate(row.name);
+        },
+        disabled: (row: any) => {
+            return row.status === 'Success' || row.status === 'Waiting';
+        },
+    },
+    {
         label: i18n.global.t('commons.button.delete'),
         click: (row: AI.OllamaModelInfo) => {
             onDelete(row);
+        },
+        disabled: (row: any) => {
+            return row.status !== 'Success';
         },
     },
 ];

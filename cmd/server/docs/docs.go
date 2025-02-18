@@ -185,7 +185,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.OllamaModelName"
+                            "$ref": "#/definitions/dto.ForceDelete"
                         }
                     }
                 ],
@@ -195,12 +195,21 @@ const docTemplate = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFunctions": [],
-                    "bodyKeys": [
-                        "name"
+                    "BeforeFunctions": [
+                        {
+                            "db": "ollama_models",
+                            "input_column": "id",
+                            "input_value": "id",
+                            "isList": false,
+                            "output_column": "name",
+                            "output_value": "name"
+                        }
                     ],
-                    "formatEN": "remove Ollama model [name]",
-                    "formatZH": "删除模型 [name]",
+                    "bodyKeys": [
+                        "id"
+                    ],
+                    "formatEN": "remove ollama model [name]",
+                    "formatZH": "删除 ollama 模型 [name]",
                     "paramKeys": []
                 }
             }
@@ -243,6 +252,50 @@ const docTemplate = `{
                 }
             }
         },
+        "/ai/ollama/model/recreate": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "Timestamp": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AI"
+                ],
+                "summary": "Rereate Ollama model",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.OllamaModelName"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [
+                        "name"
+                    ],
+                    "formatEN": "re-add Ollama model [name]",
+                    "formatZH": "添加模型重试 [name]",
+                    "paramKeys": []
+                }
+            }
+        },
         "/ai/ollama/model/search": {
             "post": {
                 "security": [
@@ -278,6 +331,40 @@ const docTemplate = `{
                             "$ref": "#/definitions/dto.PageResult"
                         }
                     }
+                }
+            }
+        },
+        "/ai/ollama/model/sync": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "Timestamp": []
+                    }
+                ],
+                "tags": [
+                    "AI"
+                ],
+                "summary": "Sync Ollama model list",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.OllamaModelDropList"
+                            }
+                        }
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [],
+                    "formatEN": "sync Ollama model list",
+                    "formatZH": "同步 Ollama 模型列表",
+                    "paramKeys": []
                 }
             }
         },
@@ -19234,6 +19321,20 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.ForceDelete": {
+            "type": "object",
+            "properties": {
+                "forceDelete": {
+                    "type": "boolean"
+                },
+                "ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
         "dto.ForwardRuleOperate": {
             "type": "object",
             "properties": {
@@ -20580,6 +20681,17 @@ const docTemplate = `{
                 },
                 "websiteID": {
                     "type": "integer"
+                }
+            }
+        },
+        "dto.OllamaModelDropList": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },

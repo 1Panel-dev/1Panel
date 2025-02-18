@@ -608,6 +608,10 @@ const message = {
             create_helper: 'Puxar "{0}" do Ollama.com',
             ollama_doc: 'Você pode visitar o site oficial da Ollama para pesquisar e encontrar mais modelos.',
             container_conn_helper: 'Use este endereço para acesso ou conexão entre contêineres',
+            ollama_sync:
+                'Menyelaraskan model Ollama mendapati model berikut tidak wujud, adakah anda ingin memadamnya?',
+            from_remote: 'Model ini tidak dimuat turun melalui 1Panel, tiada log pengambilan berkaitan.',
+            no_logs: 'Log pengambilan untuk model ini telah dipadam dan tidak dapat dilihat.',
         },
         gpu: {
             gpu: 'Monitor de GPU',

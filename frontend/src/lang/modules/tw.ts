@@ -581,6 +581,9 @@ const message = {
             create_helper: '從 Ollama.com 拉取 "{0}"',
             ollama_doc: '您可以訪問 Ollama 官方網站，搜索並查找更多模型。',
             container_conn_helper: '容器間訪問或連接使用此地址',
+            ollama_sync: '同步 Ollama 模型發現下列模型不存在，是否刪除？',
+            from_remote: '該模型並非通過 1Panel 下載，無相關拉取日誌。',
+            no_logs: '該模型的拉取日誌已被刪除，無法查看相關日誌。',
         },
         gpu: {
             gpu: 'GPU 监控',

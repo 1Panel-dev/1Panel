@@ -600,6 +600,9 @@ const message = {
             create_helper: 'Pull "{0}" from Ollama.com',
             ollama_doc: 'You can visit the Ollama official website to search and find more models.',
             container_conn_helper: 'Use this address for inter-container access or connection',
+            ollama_sync: 'Syncing Ollama model found the following models do not exist, do you want to delete them?',
+            from_remote: 'This model was not downloaded via 1Panel, no related pull logs.',
+            no_logs: 'The pull logs for this model have been deleted and cannot be viewed.',
         },
         gpu: {
             gpu: 'GPU Monitor',

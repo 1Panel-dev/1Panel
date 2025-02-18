@@ -1,9 +1,22 @@
 package dto
 
+import "time"
+
 type OllamaModelInfo struct {
-	Name     string `json:"name"`
-	Size     string `json:"size"`
-	Modified string `json:"modified"`
+	ID           uint   `json:"id"`
+	Name         string `json:"name"`
+	Size         string `json:"size"`
+	From         string `json:"from"`
+	LogFileExist bool   `json:"logFileExist"`
+
+	Status    string    `json:"status"`
+	Message   string    `json:"message"`
+	CreatedAt time.Time `json:"createdAt"`
+}
+
+type OllamaModelDropList struct {
+	ID   uint   `json:"id"`
+	Name string `json:"name"`
 }
 
 type OllamaModelName struct {

@@ -2,9 +2,18 @@ import { ReqPage } from '.';
 
 export namespace AI {
     export interface OllamaModelInfo {
+        id: number;
         name: string;
         size: string;
-        modified: string;
+        from: string;
+        logFileExist: boolean;
+        status: string;
+        message: string;
+        createdAt: Date;
+    }
+    export interface OllamaModelDropInfo {
+        id: number;
+        name: string;
     }
     export interface OllamaModelSearch extends ReqPage {
         info: string;
