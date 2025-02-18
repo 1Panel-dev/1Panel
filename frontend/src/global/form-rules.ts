@@ -422,7 +422,7 @@ const checkDoc = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.nginxDoc')));
     } else {
-        const reg = /^[A-Za-z0-9\n./]+$/;
+        const reg = /^[A-Za-z0-9_\n./]+$/;
         if (!reg.test(value) && value !== '') {
             callback(new Error(i18n.global.t('commons.rule.nginxDoc')));
         } else {

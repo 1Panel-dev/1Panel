@@ -230,7 +230,7 @@ const message = {
             paramComplexity:
                 'Ruangan ini tidak boleh bermula atau berakhir dengan aksara khas dan mesti terdiri daripada aksara rumi, nombor, "{0}" dengan panjang 6-128 aksara.',
             paramUrlAndPort: 'Ruangan ini mesti dalam format "http(s)://(nama domain/IP):(port)".',
-            nginxDoc: 'Ruangan ini mesti terdiri daripada aksara rumi, nombor, dan ".".',
+            nginxDoc: 'Ruangan ini mesti terdiri daripada aksara rumi, nombor, _, dan ".".',
             appName:
                 'Menyokong huruf kecil, nombor, -, dan _, panjang 2-30, dan tidak boleh bermula atau berakhir dengan - atau _',
             containerName:

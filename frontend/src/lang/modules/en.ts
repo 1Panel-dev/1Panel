@@ -225,7 +225,7 @@ const message = {
                 'This field must consist of English, numbers, ".", "-", and "_" characters with a length of 2-30.',
             paramComplexity: `This field mustn't start and end with special characters and must consist of English, numbers, "{0}" characters with a length of 6-128.`,
             paramUrlAndPort: 'This field must be in the format of "http(s)://(domain name/ip):(port)".',
-            nginxDoc: 'This field must consist of English, numbers and "." characters.',
+            nginxDoc: 'This field must consist of English, numbers, _ and "." characters.',
             appName: 'Supports lowercase letters, numbers, -, and _, length 2-30, and cannot start or end with - or _',
             containerName: 'Supports letters, numbers, -, _ and .; cannot start with - _ or .; length: 2-128',
             mirror: 'The mirror acceleration address should start with http(s)://, support English letters (both uppercase and lowercase), numbers, . / and -, and should not contain blank lines.',
