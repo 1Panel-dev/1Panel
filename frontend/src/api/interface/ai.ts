@@ -83,7 +83,7 @@ export namespace AI {
     export interface BindDomain {
         domain: string;
         sslID: number;
-        allowIPs: string[];
+        ipList: string;
         appInstallID: number;
         websiteID?: number;
     }

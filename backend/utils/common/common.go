@@ -3,6 +3,7 @@ package common
 import (
 	"crypto/rand"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/gin-gonic/gin"
 	"io"
 	mathRand "math/rand"
@@ -350,4 +351,23 @@ func GetLang(c *gin.Context) string {
 		lang = "en"
 	}
 	return lang
+}
+
+func HandleIPList(content string) ([]string, error) {
+	ipList := strings.Split(content, "\n")
+	var res []string
+	for _, ip := range ipList {
+		if ip == "" {
+			continue
+		}
+		if net.ParseIP(ip) != nil {
+			res = append(res, ip)
+			continue
+		}
+		if _, _, err := net.ParseCIDR(ip); err != nil {
+			return nil, buserr.New("ErrParseIP")
+		}
+		res = append(res, ip)
+	}
+	return res, nil
 }

@@ -11,11 +11,11 @@ type OllamaModelName struct {
 }
 
 type OllamaBindDomain struct {
-	Domain       string   `json:"domain" validate:"required"`
-	AppInstallID uint     `json:"appInstallID" validate:"required"`
-	SSLID        uint     `json:"sslID"`
-	AllowIPs     []string `json:"allowIPs"`
-	WebsiteID    uint     `json:"websiteID"`
+	Domain       string `json:"domain" validate:"required"`
+	AppInstallID uint   `json:"appInstallID" validate:"required"`
+	SSLID        uint   `json:"sslID"`
+	WebsiteID    uint   `json:"websiteID"`
+	IPList       string `json:"ipList"`
 }
 
 type OllamaBindDomainReq struct {

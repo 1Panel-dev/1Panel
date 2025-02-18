@@ -30,7 +30,7 @@
                                 :rows="3"
                                 type="textarea"
                                 clearable
-                                v-model.trim="req.ipList"
+                                v-model="req.ipList"
                                 :placeholder="$t('xpack.waf.ipGroupHelper')"
                             />
                         </el-form-item>
@@ -128,7 +128,7 @@ const req = ref({
     websiteID: 0,
 });
 const rules = reactive<FormRules>({
-    domain: [Rules.requiredInput],
+    domain: [Rules.domainWithPort],
 });
 const emit = defineEmits(['search']);
 
@@ -196,7 +196,6 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        req.value.allowIPs = req.value.ipList.split('\n');
         if (operate.value === 'update') {
             await updateBindDomain(req.value);
         } else {

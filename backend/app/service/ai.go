@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"io"
 	"os"
 	"os/exec"
@@ -203,6 +204,16 @@ func (u *AIToolService) BindDomain(req dto.OllamaBindDomain) error {
 	if nginxInstall.ID == 0 {
 		return buserr.New("ErrOpenrestyInstall")
 	}
+	var (
+		ipList []string
+		err    error
+	)
+	if len(req.IPList) > 0 {
+		ipList, err = common.HandleIPList(req.IPList)
+		if err != nil {
+			return err
+		}
+	}
 	createWebsiteReq := request.WebsiteCreate{
 		PrimaryDomain: req.Domain,
 		Alias:         strings.ToLower(req.Domain),
@@ -218,8 +229,10 @@ func (u *AIToolService) BindDomain(req dto.OllamaBindDomain) error {
 	if err != nil {
 		return err
 	}
-	if err = ConfigAllowIPs(req.AllowIPs, website); err != nil {
-		return err
+	if len(ipList) > 0 {
+		if err = ConfigAllowIPs(ipList, website); err != nil {
+			return err
+		}
 	}
 	if req.SSLID > 0 {
 		sslReq := request.WebsiteHTTPSOp{
@@ -263,12 +276,22 @@ func (u *AIToolService) UpdateBindDomain(req dto.OllamaBindDomain) error {
 	if nginxInstall.ID == 0 {
 		return buserr.New("ErrOpenrestyInstall")
 	}
+	var (
+		ipList []string
+		err    error
+	)
+	if len(req.IPList) > 0 {
+		ipList, err = common.HandleIPList(req.IPList)
+		if err != nil {
+			return err
+		}
+	}
 	websiteService := NewIWebsiteService()
 	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
 	if err != nil {
 		return err
 	}
-	if err = ConfigAllowIPs(req.AllowIPs, website); err != nil {
+	if err = ConfigAllowIPs(ipList, website); err != nil {
 		return err
 	}
 	if req.SSLID > 0 {
