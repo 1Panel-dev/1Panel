@@ -2519,6 +2519,8 @@ const message = {
         proxyHelper2: 'IP 접근을 제한하여 공용 인터넷에서의 노출을 방지',
         proxyHelper3: '스트리밍을 활성화',
         proxyHelper4: '생성 후, 웹사이트 목록에서 이를 보고 관리할 수 있습니다',
+        proxyHelper5:
+            '활성화한 후, 앱 스토어 - 설치됨 - Ollama - 매개변수에서 포트 외부 접근을 비활성화하여 보안을 강화할 수 있습니다.',
     },
 };
 

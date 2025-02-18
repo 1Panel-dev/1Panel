@@ -106,5 +106,6 @@ export namespace AI {
         sslID: number;
         allowIPs: string[];
         websiteID?: number;
+        connUrl: string;
     }
 }

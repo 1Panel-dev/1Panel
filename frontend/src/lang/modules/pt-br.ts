@@ -2605,6 +2605,8 @@ const message = {
         cronJobHelper: 'Dispara alerta via SMS ao falhar na execução de tarefas',
         licenseHelper: 'A versão profissional suporta alertas via SMS',
         alertCountHelper: 'Frequência máxima diária de alertas',
+        proxyHelper5:
+            'Após ativar, você pode desabilitar o acesso externo à porta na Loja de Aplicativos - Instalados - Ollama - Parâmetros para melhorar a segurança.',
     },
     aitool: {
         proxy: 'Melhoria de Proxy AI',

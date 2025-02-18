@@ -24,6 +24,9 @@
                         </el-alert>
                         <el-form-item :label="$t('website.domain')" prop="domain">
                             <el-input v-model.trim="req.domain" :disabled="operate === 'update'" />
+                            <span class="input-help">
+                                {{ $t('aitool.proxyHelper4') }}
+                            </span>
                         </el-form-item>
                         <el-form-item :label="$t('firewall.address')" prop="ipList">
                             <el-input
@@ -82,7 +85,7 @@
                             </el-select>
                         </el-form-item>
                         <el-alert :closable="false">
-                            {{ $t('aitool.proxyHelper4') }}
+                            {{ $t('aitool.proxyHelper5') }}
                         </el-alert>
                     </el-col>
                 </el-row>

@@ -29,7 +29,20 @@
                             {{ $t('ai_tools.model.container_conn_helper') }}
                         </span>
                     </el-form-item>
-                    <el-form-item :label="$t('database.remoteConn')">
+                    <el-form-item :label="$t('setting.proxyUrl')" v-if="bindDomain.connUrl != ''">
+                        <el-card class="mini-border-card">
+                            <el-descriptions :column="1">
+                                <el-descriptions-item :label="$t('database.connAddress')">
+                                    {{ bindDomain.connUrl }}
+                                    <CopyButton :content="bindDomain.connUrl" type="icon" />
+                                </el-descriptions-item>
+                            </el-descriptions>
+                        </el-card>
+                        <span class="input-help">
+                            {{ $t('database.remoteConnHelper2') }}
+                        </span>
+                    </el-form-item>
+                    <el-form-item :label="$t('database.remoteConn')" v-else>
                         <el-card class="mini-border-card">
                             <el-descriptions :column="1">
                                 <el-descriptions-item :label="$t('database.connAddress')">
@@ -66,6 +79,7 @@ import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { getSettingInfo } from '@/api/modules/setting';
+import { getBindDomain } from '@/api/modules/ai';
 
 const loading = ref(false);
 
@@ -77,16 +91,21 @@ const form = reactive({
 
     remoteIP: '',
 });
+const bindDomain = ref({
+    connUrl: '',
+});
 
 interface DialogProps {
     port: number;
     containerName: string;
+    appinstallID: number;
 }
 
 const acceptParams = (param: DialogProps): void => {
     form.containerName = param.containerName;
     form.port = param.port;
     loadSystemIP();
+    loadBindDomain(param.appinstallID);
     dialogVisible.value = true;
 };
 
@@ -97,6 +116,20 @@ const handleClose = () => {
 const loadSystemIP = async () => {
     const res = await getSettingInfo();
     form.systemIP = res.data.systemIP || i18n.global.t('database.localIP');
+};
+
+const loadBindDomain = async (appInstallID: number) => {
+    if (appInstallID == undefined || appInstallID <= 0) {
+        return;
+    }
+    try {
+        const res = await getBindDomain({
+            appInstallID: appInstallID,
+        });
+        if (res.data.websiteID > 0) {
+            bindDomain.value.connUrl = res.data.connUrl;
+        }
+    } catch (e) {}
 };
 
 defineExpose({

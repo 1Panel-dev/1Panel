@@ -2428,6 +2428,7 @@ const message = {
         proxyHelper2: '限制 IP 访问，防止在公网暴露',
         proxyHelper3: '开启流式传输',
         proxyHelper4: '创建完成之后可以在网站列表中查看并管理',
+        proxyHelper5: '开启之后可以在应用商店 - 已安装 - ollama - 参数中取消端口外部访问以提高安全性',
     },
 };
 export default {

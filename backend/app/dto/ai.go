@@ -40,4 +40,5 @@ type OllamaBindDomainRes struct {
 	SSLID     uint     `json:"sslID"`
 	AllowIPs  []string `json:"allowIPs"`
 	WebsiteID uint     `json:"websiteID"`
+	ConnUrl   string   `json:"connUrl"`
 }

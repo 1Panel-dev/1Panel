@@ -2426,6 +2426,7 @@ const message = {
         proxyHelper2: '限制 IP 訪問，防止在公共網絡上暴露',
         proxyHelper3: '啟用流式傳輸',
         proxyHelper4: '創建後，您可以在網站列表中查看並管理',
+        proxyHelper5: '啟用後，您可以在應用商店 - 已安裝 - Ollama - 參數中取消端口外部訪問以提高安全性。',
     },
 };
 export default {

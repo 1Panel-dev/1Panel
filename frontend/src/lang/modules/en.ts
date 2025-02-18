@@ -2589,6 +2589,8 @@ const message = {
         proxyHelper2: 'Limit IP access to prevent exposure on the public internet',
         proxyHelper3: 'Enable streaming',
         proxyHelper4: 'Once created, you can view and manage it in the website list',
+        proxyHelper5:
+            'After enabling, you can disable external access to the port in the App Store - Installed - Ollama - Parameters to improve security.',
     },
 };
 

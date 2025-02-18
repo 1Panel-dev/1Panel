@@ -18,11 +18,7 @@
                     v-model:appInstallID="appInstallID"
                     @is-exist="checkExist"
                     ref="appStatusRef"
-                >
-                    <template #extra>
-                        <el-button link type="primary" @click="bindDomain">{{ $t('aitool.proxy') }}</el-button>
-                    </template>
-                </AppStatus>
+                ></AppStatus>
             </template>
             <template #toolbar v-if="modelInfo.isExist">
                 <div class="flex justify-between gap-2 flex-wrap sm:flex-row">
@@ -44,6 +40,9 @@
                             plain
                         >
                             OpenWebUI
+                        </el-button>
+                        <el-button plain type="primary" :disabled="modelInfo.status !== 'Running'" @click="bindDomain">
+                            {{ $t('aitool.proxy') }}
                         </el-button>
                         <el-button plain :disabled="selects.length === 0" type="primary" @click="onDelete(null)">
                             {{ $t('commons.button.delete') }}
@@ -279,7 +278,11 @@ const onSync = async () => {
 };
 
 const onLoadConn = async () => {
-    connRef.value.acceptParams({ port: modelInfo.port, containerName: modelInfo.container });
+    connRef.value.acceptParams({
+        port: modelInfo.port,
+        containerName: modelInfo.container,
+        appinstallID: appInstallID.value,
+    });
 };
 
 const onLoad = async (name: string) => {

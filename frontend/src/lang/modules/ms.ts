@@ -2618,6 +2618,8 @@ const message = {
         proxyHelper2: 'Hadkan akses IP untuk mengelakkan pendedahan di internet awam',
         proxyHelper3: 'Aktifkan penstriman',
         proxyHelper4: 'Setelah selesai, anda boleh melihat dan mengurusnya dalam senarai laman web',
+        proxyHelper5:
+            'Selepas diaktifkan, anda boleh melumpuhkan akses luaran ke port dalam App Store - Dipasang - Ollama - Parameter untuk meningkatkan keselamatan.',
     },
 };
 

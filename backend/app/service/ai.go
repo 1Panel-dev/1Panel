@@ -279,6 +279,7 @@ func (u *AIToolService) GetBindDomain(req dto.OllamaBindDomainReq) (*dto.OllamaB
 	if website.WebsiteSSLID > 0 {
 		res.SSLID = website.WebsiteSSLID
 	}
+	res.ConnUrl = fmt.Sprintf("%s://%s", strings.ToLower(website.Protocol), website.PrimaryDomain)
 	res.AllowIPs = GetAllowIps(website)
 	return res, nil
 }
