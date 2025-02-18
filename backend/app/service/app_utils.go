@@ -1163,12 +1163,11 @@ func handleLocalApp(appDir string) (app *model.App, err error) {
 	app.Website = appDefine.Website
 	app.Github = appDefine.Github
 	app.Document = appDefine.Document
-
 	if appDefine.ShortDescZh != "" {
-		appDefine.Description.Zh = appDefine.ShortDescZh
+		app.ShortDescZh = appDefine.ShortDescZh
 	}
 	if appDefine.ShortDescEn != "" {
-		appDefine.Description.En = appDefine.ShortDescEn
+		app.ShortDescEn = appDefine.ShortDescEn
 	}
 	desc, _ := json.Marshal(appDefine.Description)
 	app.Description = string(desc)
