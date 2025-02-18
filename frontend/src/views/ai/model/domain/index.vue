@@ -25,7 +25,10 @@
                         <el-form-item :label="$t('website.domain')" prop="domain">
                             <el-input v-model.trim="req.domain" :disabled="operate === 'update'" />
                             <span class="input-help">
-                                {{ $t('aitool.proxyHelper4') + '   ' }}
+                                {{ $t('aitool.proxyHelper4') }}
+                            </span>
+                            <span class="input-help">
+                                {{ $t('aitool.proxyHelper6') }}
                                 <el-link
                                     class="pageRoute"
                                     icon="Position"
@@ -34,9 +37,6 @@
                                 >
                                     {{ $t('firewall.quickJump') }}
                                 </el-link>
-                            </span>
-                            <span class="input-help">
-                                {{ $t('aitool.proxyHelper6') }}
                             </span>
                         </el-form-item>
                         <el-form-item :label="$t('firewall.address')" prop="ipList">
