@@ -87,6 +87,7 @@ func Init() {
 	handleUserInfo(global.CONF.System.ChangeUserInfo, settingRepo)
 
 	handleCronjobStatus()
+	handleOllamaModelStatus()
 	handleSnapStatus()
 	loadLocalDir()
 	initDir()
@@ -148,6 +149,11 @@ func handleSnapStatus() {
 			_ = snapRepo.UpdateStatus(item.ID, updates)
 		}
 	}
+}
+
+func handleOllamaModelStatus() {
+	message := "the task was interrupted due to the restart of the 1panel service"
+	_ = global.DB.Model(&model.OllamaModel{}).Where("status = ?", constant.StatusWaiting).Updates(map[string]interface{}{"status": constant.StatusCanceled, "message": message}).Error
 }
 
 func handleCronjobStatus() {

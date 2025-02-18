@@ -3,12 +3,13 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"io"
 	"os"
 	"os/exec"
 	"path"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
@@ -152,9 +153,11 @@ func (u *AIToolService) Delete(req dto.ForceDelete) error {
 		return err
 	}
 	for _, item := range ollamaList {
-		stdout, err := cmd.Execf("docker exec %s ollama rm %s", containerName, item.Name)
-		if err != nil && !req.ForceDelete {
-			return fmt.Errorf("handle ollama rm %s failed, stdout: %s, err: %v", item.Name, stdout, err)
+		if item.Status != constant.StatusDeleted {
+			stdout, err := cmd.Execf("docker exec %s ollama rm %s", containerName, item.Name)
+			if err != nil && !req.ForceDelete {
+				return fmt.Errorf("handle ollama rm %s failed, stdout: %s, err: %v", item.Name, stdout, err)
+			}
 		}
 		_ = aiRepo.Delete(commonRepo.WithByID(item.ID))
 		logItem := path.Join(global.CONF.System.DataDir, "log", "AITools", item.Name)

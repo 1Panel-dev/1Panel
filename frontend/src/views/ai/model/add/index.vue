@@ -79,7 +79,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         await createOllamaModel(itemName);
         drawerVisible.value = false;
         emit('search');
-        emit('log', itemName);
+        emit('log', { logFileExist: true, name: itemName, from: 'local' });
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     });
 };

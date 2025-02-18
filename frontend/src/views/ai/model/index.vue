@@ -20,6 +20,13 @@
                     ref="appStatusRef"
                 ></AppStatus>
             </template>
+            <template #prompt>
+                <el-alert type="info" :closable="false">
+                    <template #title>
+                        <span>{{ $t('runtime.systemRestartHelper') }}</span>
+                    </template>
+                </el-alert>
+            </template>
             <template #toolbar v-if="modelInfo.isExist">
                 <div class="flex justify-between gap-2 flex-wrap sm:flex-row">
                     <div class="flex flex-wrap gap-3">
@@ -83,6 +90,9 @@
                             </el-tag>
                             <el-tag v-if="row.status === 'Deleted'" type="info">
                                 {{ $t('database.isDelete') }}
+                            </el-tag>
+                            <el-tag v-if="row.status === 'Cancel'" type="danger">
+                                {{ $t('commons.status.systemrestart') }}
                             </el-tag>
                             <el-tag v-if="row.status === 'Failed'" type="danger">
                                 {{ $t('commons.status.failed') }}
@@ -379,7 +389,7 @@ const onDelete = async (row: AI.OllamaModelInfo) => {
     });
 };
 
-const onLoadLog = (row: AI.OllamaModelInfo) => {
+const onLoadLog = (row: any) => {
     if (row.from === 'remote') {
         MsgInfo(i18n.global.t('ai_tools.model.from_remote'));
         return;
@@ -407,7 +417,7 @@ const buttons = [
             onDelete(row);
         },
         disabled: (row: any) => {
-            return row.status !== 'Success';
+            return row.status !== 'Success' && row.status !== 'Deleted';
         },
     },
 ];

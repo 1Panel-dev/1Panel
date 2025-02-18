@@ -178,7 +178,7 @@ const getContent = async (pre: boolean) => {
                 .replace(/\\u(\w{4})/g, function (match, grp) {
                     return String.fromCharCode(parseInt(grp, 16));
                 })
-                .replace(/\x1b\[[0-9;]*[A-Za-z?](?!\d)/g, ''),
+                .replace(/\x1B\[[0-?9;]*[mKhlGA]/g, ''),
         );
         const newLogs = res.data.lines;
         if (newLogs.length === readReq.pageSize && readReq.page < res.data.total) {
