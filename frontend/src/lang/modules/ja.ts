@@ -14,6 +14,7 @@ const message = {
         fit2cloud: 'FIT2CLOUD',
         lingxia: 'Lingxia',
         button: {
+            run: '実行',
             create: '作成する',
             add: '追加',
             save: '保存',
@@ -121,6 +122,8 @@ const message = {
         },
         msg: {
             noneData: '利用可能なデータはありません',
+            disConn:
+                '端末を切断する場合は、切断ボタンを直接クリックしてください。{0} のような終了コマンドを入力しないでください。',
             delete: `この操作削除は元に戻すことはできません。続けたいですか？`,
             clean: `この操作は取り消すことはできません。続けたいですか？`,
             deleteTitle: '消去',
@@ -1209,6 +1212,7 @@ const message = {
         resource: 'リソース',
         operate: '動作します',
         detail: {
+            ai: 'AI',
             groups: 'グループ',
             hosts: 'ホスト',
             apps: 'アプリ',

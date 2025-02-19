@@ -172,6 +172,7 @@
         <AddDialog ref="addRef" @search="search" @log="onLoadLog" />
         <Log ref="logRef" @close="search" />
         <Del ref="delRef" @search="search" />
+        <Terminal ref="terminalRef" />
         <Conn ref="connRef" />
         <CodemirrorDialog ref="detailRef" />
         <PortJumpDialog ref="dialogPortJumpRef" />
@@ -183,6 +184,7 @@
 import AppStatus from '@/components/app-status/index.vue';
 import AddDialog from '@/views/ai/model/add/index.vue';
 import Conn from '@/views/ai/model/conn/index.vue';
+import Terminal from '@/views/ai/model/terminal/index.vue';
 import Del from '@/views/ai/model/del/index.vue';
 import Log from '@/components/log-dialog/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
@@ -214,6 +216,7 @@ const logRef = ref();
 const detailRef = ref();
 const delRef = ref();
 const connRef = ref();
+const terminalRef = ref();
 const openWebUIPort = ref();
 const dashboardVisible = ref(false);
 const dialogPortJumpRef = ref();
@@ -403,6 +406,15 @@ const onLoadLog = (row: any) => {
 };
 
 const buttons = [
+    {
+        label: i18n.global.t('commons.button.run'),
+        click: (row: AI.OllamaModelInfo) => {
+            terminalRef.value.acceptParams({ name: row.name });
+        },
+        disabled: (row: any) => {
+            return row.status !== 'Success';
+        },
+    },
     {
         label: i18n.global.t('commons.button.retry'),
         click: (row: AI.OllamaModelInfo) => {

@@ -14,6 +14,7 @@ const message = {
         fit2cloud: '飞致云',
         lingxia: '凌霞',
         button: {
+            run: '运行',
             create: '创建',
             add: '添加',
             save: '保存',
@@ -120,6 +121,7 @@ const message = {
             Rollbacking: '快照回滚中，请稍候...',
         },
         msg: {
+            disConn: '如果要断开终端请直接点击断开按钮，不要输入 {0} 等退出命令',
             noneData: '暂无数据',
             delete: '删除 操作不可回滚，是否继续？',
             clean: '清空 操作不可回滚，是否继续？',
@@ -1171,6 +1173,7 @@ const message = {
         resource: '资源',
         operate: '操作',
         detail: {
+            ai: 'AI',
             groups: '分组',
             hosts: '主机',
             apps: '应用',

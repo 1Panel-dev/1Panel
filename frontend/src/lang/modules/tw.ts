@@ -14,6 +14,7 @@ const message = {
         fit2cloud: '飛致雲',
         lingxia: '凌霞',
         button: {
+            run: '運行',
             create: '建立',
             add: '新增',
             save: '儲存',
@@ -122,6 +123,7 @@ const message = {
         },
         msg: {
             noneData: '暫無資料',
+            disConn: '如果要斷開終端，請直接點擊斷開按鈕，不要輸入 {0} 等退出命令。',
             delete: '刪除 操作不可復原，是否繼續？',
             clean: '清空 操作不可復原，是否繼續？',
             deleteTitle: '刪除',
@@ -1169,6 +1171,7 @@ const message = {
         resource: '資源',
         operate: '操作',
         detail: {
+            ai: 'AI',
             groups: '分組',
             hosts: '主機',
             apps: '應用',

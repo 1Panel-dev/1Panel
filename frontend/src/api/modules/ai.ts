@@ -20,6 +20,9 @@ export const loadOllamaModel = (name: string) => {
 export const syncOllamaModel = () => {
     return http.post<Array<AI.OllamaModelDropInfo>>(`/ai/ollama/model/sync`);
 };
+export const closeOllamaModel = (name: string) => {
+    return http.post(`/ai/ollama/close`, { name: name });
+};
 
 export const loadGPUInfo = () => {
     return http.get<any>(`/ai/gpu/load`);

@@ -15,6 +15,7 @@ const message = {
         fit2cloud: 'FIT2CLOUD',
         lingxia: 'Lingxia',
         button: {
+            run: 'Run',
             create: 'Create ',
             add: 'Add ',
             save: 'Save ',
@@ -122,6 +123,8 @@ const message = {
         },
         msg: {
             noneData: 'No data available',
+            disConn:
+                'If you want to disconnect the terminal, please click the disconnect button directly, do not enter exit commands like {0}.',
             delete: `This operation delete can't be undone. Do you want to continue?`,
             clean: `This operation clean can't be undone. Do you want to continue?`,
             deleteTitle: 'Delete',
@@ -1229,6 +1232,7 @@ const message = {
         resource: 'Resource',
         operate: 'Operate',
         detail: {
+            ai: 'AI',
             groups: 'Group',
             hosts: 'Host',
             apps: 'App',

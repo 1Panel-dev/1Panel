@@ -15,6 +15,7 @@ const message = {
         fit2cloud: 'FIT2CLOUD',
         lingxia: 'Lingxia',
         button: {
+            run: 'Jalankan',
             create: 'Cipta',
             add: 'Tambah',
             save: 'Simpan',
@@ -122,6 +123,8 @@ const message = {
         },
         msg: {
             noneData: 'Tiada data tersedia',
+            disConn:
+                'Jika anda ingin memutuskan sambungan terminal, sila klik butang putus sambungan secara langsung, jangan masukkan arahan keluar seperti {0}.',
             delete: 'Operasi ini tidak boleh diundur. Adakah anda mahu meneruskan?',
             clean: 'Operasi ini tidak boleh diundur. Adakah anda mahu meneruskan?',
             deleteTitle: 'Padam',
@@ -1251,6 +1254,7 @@ const message = {
         resource: 'Sumber',
         operate: 'Operasi',
         detail: {
+            ai: 'AI',
             groups: 'Kumpulan',
             hosts: 'Hos',
             apps: 'Aplikasi',

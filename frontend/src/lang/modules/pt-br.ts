@@ -15,6 +15,7 @@ const message = {
         fit2cloud: 'FIT2CLOUD',
         lingxia: 'Lingxia',
         button: {
+            run: 'Executar',
             create: 'Criar',
             add: 'Adicionar',
             save: 'Salvar',
@@ -122,6 +123,8 @@ const message = {
         },
         msg: {
             noneData: 'Nenhum dado disponível',
+            disConn:
+                'Se você deseja desconectar o terminal, clique diretamente no botão de desconexão, não insira comandos de saída como {0}.',
             delete: 'Esta operação de exclusão não pode ser desfeita. Deseja continuar?',
             clean: 'Esta operação de limpeza não pode ser desfeita. Deseja continuar?',
             deleteTitle: 'Excluir',
@@ -1236,6 +1239,7 @@ const message = {
         resource: 'Recurso',
         operate: 'Operar',
         detail: {
+            ai: 'AI',
             groups: 'Grupo',
             hosts: 'Host',
             apps: 'Aplicativo',

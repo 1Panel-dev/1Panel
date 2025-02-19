@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/app/service"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/copier"
@@ -127,6 +128,70 @@ func (b *BaseApi) RedisWsSsh(c *gin.Context) {
 		return
 	}
 	defer killBash(name, strings.Join(commands, " "), pidMap)
+	defer slave.Close()
+
+	tty, err := terminal.NewLocalWsSession(cols, rows, wsConn, slave, false)
+	if wshandleError(wsConn, err) {
+		return
+	}
+
+	quitChan := make(chan bool, 3)
+	tty.Start(quitChan)
+	go slave.Wait(quitChan)
+
+	<-quitChan
+
+	global.LOG.Info("websocket finished")
+	if wshandleError(wsConn, err) {
+		return
+	}
+}
+
+func (b *BaseApi) OllamaWsSsh(c *gin.Context) {
+	wsConn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
+	if err != nil {
+		global.LOG.Errorf("gin context http handler failed, err: %v", err)
+		return
+	}
+	defer wsConn.Close()
+
+	if global.CONF.System.IsDemo {
+		if wshandleError(wsConn, errors.New("   demo server, prohibit this operation!")) {
+			return
+		}
+	}
+
+	cols, err := strconv.Atoi(c.DefaultQuery("cols", "80"))
+	if wshandleError(wsConn, errors.WithMessage(err, "invalid param cols in request")) {
+		return
+	}
+	rows, err := strconv.Atoi(c.DefaultQuery("rows", "40"))
+	if wshandleError(wsConn, errors.WithMessage(err, "invalid param rows in request")) {
+		return
+	}
+	name := c.Query("name")
+	if cmd.CheckIllegal(name) {
+		if wshandleError(wsConn, errors.New("  The command contains illegal characters.")) {
+			return
+		}
+	}
+	container, err := service.LoadContainerName()
+	if wshandleError(wsConn, errors.WithMessage(err, "  load container name for ollama failed")) {
+		return
+	}
+	commands := []string{"ollama", "run", name}
+
+	pidMap := loadMapFromDockerTop(container)
+	fmt.Println("pidMap")
+	for k, v := range pidMap {
+		fmt.Println(k, v)
+	}
+	itemCmds := append([]string{"exec", "-it", container}, commands...)
+	slave, err := terminal.NewCommand(itemCmds)
+	if wshandleError(wsConn, err) {
+		return
+	}
+	defer killBash(container, strings.Join(commands, " "), pidMap)
 	defer slave.Close()
 
 	tty, err := terminal.NewLocalWsSession(cols, rows, wsConn, slave, false)

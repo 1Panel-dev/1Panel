@@ -15,6 +15,7 @@ const message = {
         fit2cloud: 'FIT2CLOUD',
         lingxia: 'Lingxia',
         button: {
+            run: '실행',
             create: '생성',
             add: '추가',
             save: '저장',
@@ -122,6 +123,7 @@ const message = {
         },
         msg: {
             noneData: '데이터가 없습니다',
+            disConn: '터미널을 끊으려면 직접 끊기 버튼을 클릭하세요. {0} 과 같은 종료 명령을 입력하지 마세요.',
             delete: `이 작업은 되돌릴 수 없습니다. 계속하시겠습니까?`,
             clean: `이 작업은 되돌릴 수 없습니다. 계속하시겠습니까?`,
             deleteTitle: '삭제',
@@ -1196,6 +1198,7 @@ const message = {
         resource: '자원',
         operate: '작업',
         detail: {
+            ai: 'AI',
             groups: '그룹',
             hosts: '호스트',
             apps: '애플리케이션',
