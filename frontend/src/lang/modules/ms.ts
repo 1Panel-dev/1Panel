@@ -124,7 +124,7 @@ const message = {
         msg: {
             noneData: 'Tiada data tersedia',
             disConn:
-                'Jika anda ingin memutuskan sambungan terminal, sila klik butang putus sambungan secara langsung, jangan masukkan arahan keluar seperti {0}.',
+                'Sila klik butang putus sambungan secara langsung untuk menamatkan sambungan terminal, mengelakkan penggunaan arahan keluar seperti {0}.',
             delete: 'Operasi ini tidak boleh diundur. Adakah anda mahu meneruskan?',
             clean: 'Operasi ini tidak boleh diundur. Adakah anda mahu meneruskan?',
             deleteTitle: 'Padam',

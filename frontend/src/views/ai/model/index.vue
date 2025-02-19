@@ -92,7 +92,7 @@
                             <el-tag v-if="row.status === 'Deleted'" type="info">
                                 {{ $t('database.isDelete') }}
                             </el-tag>
-                            <el-tag v-if="row.status === 'Cancel'" type="danger">
+                            <el-tag v-if="row.status === 'Canceled'" type="danger">
                                 {{ $t('commons.status.systemrestart') }}
                             </el-tag>
                             <el-tag v-if="row.status === 'Failed'" type="danger">

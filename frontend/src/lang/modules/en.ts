@@ -124,7 +124,7 @@ const message = {
         msg: {
             noneData: 'No data available',
             disConn:
-                'If you want to disconnect the terminal, please click the disconnect button directly, do not enter exit commands like {0}.',
+                'Please click the disconnect button directly to terminate the terminal connection, avoiding the use of exit commands like {0}.',
             delete: `This operation delete can't be undone. Do you want to continue?`,
             clean: `This operation clean can't be undone. Do you want to continue?`,
             deleteTitle: 'Delete',
