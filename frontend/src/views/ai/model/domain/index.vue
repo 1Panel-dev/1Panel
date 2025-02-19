@@ -80,12 +80,7 @@
                                 </el-option>
                             </el-select>
                         </el-form-item>
-                        <el-form-item
-                            :label="$t('website.ssl')"
-                            prop="sslID"
-                            :hide-required-asterisk="true"
-                            v-if="req.enableSSL"
-                        >
+                        <el-form-item :label="$t('website.ssl')" prop="sslID" v-if="req.enableSSL">
                             <el-select
                                 v-model="req.sslID"
                                 :placeholder="$t('website.selectSSL')"
@@ -140,7 +135,7 @@ const acmeAccounts = ref();
 const formRef = ref();
 const req = ref({
     domain: '',
-    sslID: 0,
+    sslID: undefined,
     ipList: '',
     acmeAccountID: 0,
     enableSSL: false,
@@ -150,6 +145,7 @@ const req = ref({
 });
 const rules = reactive<FormRules>({
     domain: [Rules.domainWithPort],
+    sslID: [Rules.requiredSelectBusiness],
 });
 const emit = defineEmits(['search']);
 
@@ -173,7 +169,7 @@ const changeSSl = (sslid: number) => {
 
 const changeSSL = () => {
     if (!req.value.enableSSL) {
-        req.value.sslID = 0;
+        req.value.sslID = undefined;
     } else {
         listAcmeAccount();
     }
@@ -198,7 +194,7 @@ const listSSL = () => {
             }
             changeSSl(req.value.sslID);
         } else {
-            req.value.sslID = 0;
+            req.value.sslID = undefined;
         }
     });
 };
@@ -236,7 +232,7 @@ const search = async (appInstallID: number) => {
             operate.value = 'update';
             req.value.domain = res.data.domain;
             req.value.websiteID = res.data.websiteID;
-            if (res.data.allowIPs.length > 0) {
+            if (res.data.allowIPs && res.data.allowIPs.length > 0) {
                 req.value.ipList = res.data.allowIPs.join('\n');
             }
             if (res.data.sslID > 0) {
