@@ -287,3 +287,8 @@ SystemMode: "模式："
 
 #ai-tool
 ErrOpenrestyInstall: '请先安装 Openresty'
+
+#mobile app
+ErrVerifyToken: '令牌验证错误，请重置后再次扫码'
+ErrInvalidToken: '无效的令牌，请重置后再次扫码'
+ErrExpiredToken: '令牌过期，请重置后再次扫码'

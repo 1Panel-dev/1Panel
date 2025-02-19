@@ -117,11 +117,11 @@ var WebUrlMap = map[string]struct{}{
 	"/xpack/monitor/rank":      {},
 	"/xpack/monitor/log":       {},
 	"/xpack/tamper":            {},
-	"/xpack/gpu":               {},
 	"/xpack/alert/dashboard":   {},
 	"/xpack/alert/log":         {},
 	"/xpack/alert/setting":     {},
 	"/xpack/setting":           {},
+	"/xpack/app":               {},
 }
 
 var DynamicRoutes = []string{

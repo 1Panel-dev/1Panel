@@ -1490,8 +1490,10 @@ const message = {
         proxyDockerHelper:
             'Synchronize proxy server configuration to Docker, support offline server image pulling and other operations',
         apiInterface: 'Enable API',
-        apiInterfaceClose: 'Once closed, API interfaces cannot be accessed. Do you want to continue?',
-        apiInterfaceHelper: 'Allow third-party applications to access the API.',
+        apiInterfaceClose:
+            'API interfaces are unavailable, app functionality will be restricted. Do you want to continue?',
+        apiInterfaceHelper:
+            'Enable panel support for API interface access (this feature needs to be enabled for panel apps).',
         apiInterfaceAlert1: `Don't enable it in production environments because it may increase server security risks.`,
         apiInterfaceAlert2: `Don't use third-party applications to call the API to prevent potential security threats.`,
         apiInterfaceAlert3: 'API Docs',
@@ -1810,6 +1812,7 @@ const message = {
         monitor:
             'Upgrade to the professional version to view the real-time status of the website, visitor trends, visitor sources, request logs and other information. ',
         alert: 'Upgrade to the professional version to receive alarm information via SMS and view alarm logs, fully control various key events, and ensure worry-free system operation',
+        app: 'Upgrade to the professional version to view service information, abnormal monitoring, etc. through the mobile APP. ',
     },
     clean: {
         scan: 'Start scanning',

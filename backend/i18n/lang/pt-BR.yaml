@@ -284,3 +284,8 @@ SystemMode: "modo: "
 
 #ai-tool
 ErrOpenrestyInstall: 'Por favor, instale o Openresty primeiro'
+
+#mobile app
+ErrVerifyToken: 'Erro de verificação do token, por favor, reinicie e escaneie novamente.'
+ErrInvalidToken: 'Token inválido, por favor, reinicie e escaneie novamente.'
+ErrExpiredToken: 'O token expirou, por favor, reinicie e escaneie novamente.'

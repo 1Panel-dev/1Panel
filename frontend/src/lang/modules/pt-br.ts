@@ -1496,8 +1496,10 @@ const message = {
         proxyDockerHelper:
             'Sincronize a configuração do servidor proxy com o Docker, suportando operações de puxar imagens de servidor offline e outras',
         apiInterface: 'Habilitar API',
-        apiInterfaceClose: 'Uma vez fechado, as interfaces da API não poderão ser acessadas. Deseja continuar?',
-        apiInterfaceHelper: 'Permitir que aplicativos de terceiros acessem a API.',
+        apiInterfaceClose:
+            'As interfaces de API estão indisponíveis, a funcionalidade do aplicativo será restrita. Deseja continuar?',
+        apiInterfaceHelper:
+            'Habilite o suporte ao painel para acesso à interface de API (essa funcionalidade precisa ser habilitada para aplicativos de painel).',
         apiInterfaceAlert1:
             'Não habilite em ambientes de produção, pois pode aumentar os riscos de segurança do servidor.',
         apiInterfaceAlert2:
@@ -1826,6 +1828,7 @@ const message = {
         monitor:
             'Upgrade para a versão profissional para visualizar o status em tempo real do site, tendências de visitantes, fontes de visitantes, logs de solicitações e outras informações.',
         alert: 'Upgrade para a versão profissional para receber informações de alarme via SMS e visualizar logs de alarmes, controlar completamente vários eventos chave e garantir a operação sem preocupações do sistema',
+        app: 'Upgrade para a versão profissional para visualizar informações do serviço, monitoramento anômalo, etc., através do aplicativo móvel.',
     },
     clean: {
         scan: 'Iniciar escaneamento',

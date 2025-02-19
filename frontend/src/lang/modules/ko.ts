@@ -1447,10 +1447,11 @@ const message = {
         proxyDockerHelper:
             '프록시 서버 구성을 Docker 에 동기화하여 오프라인 서버 이미지 가져오기 등의 작업을 지원합니다.',
         apiInterface: 'API 활성화',
-        apiInterfaceClose: '비활성화하면 API 인터페이스에 접근할 수 없습니다. 계속하시겠습니까?',
-        apiInterfaceHelper: '서드파티 애플리케이션이 API 에 접근할 수 있도록 허용합니다.',
+        apiInterfaceClose: 'API 인터페이스를 사용할 수 없습니다. 앱 기능이 제한됩니다. 계속하시겠습니까?',
+        apiInterfaceHelper:
+            'API 인터페이스 액세스를 위한 패널 지원을 활성화하세요 (이 기능은 패널 앱에서 활성화해야 합니다).',
         apiInterfaceAlert1: '운영 환경에서는 활성화하지 마십시오. 서버 보안 위험이 증가할 수 있습니다.',
-        apiInterfaceAlert2: '잠재적인 보안 위협을 방지하기 위해 서드파티 애플리케이션으로 API를 호출하지 마십시오.',
+        apiInterfaceAlert2: '잠재적인 보안 위협을 방지하기 위해 서드파티 애플리케이션으로 API 를 호출하지 마십시오.',
         apiInterfaceAlert3: 'API 문서',
         apiInterfaceAlert4: '사용 설명서',
         apiKey: 'API 키',
@@ -1752,6 +1753,7 @@ const message = {
         monitor:
             '전문 버전으로 업그레이드하면 웹사이트의 실시간 상태, 방문자 트렌드, 방문자 출처, 요청 로그 등 정보를 확인할 수 있습니다.',
         alert: '전문 버전으로 업그레이드하면 SMS 를 통해 알림 정보를 받고 알림 로그를 볼 수 있으며, 다양한 주요 이벤트를 완벽하게 제어하여 시스템 운영을 걱정 없이 유지할 수 있습니다.',
+        app: '프로페셔널 버전으로 업그레이드하면 모바일 APP을 통해 서비스 정보, 이상 모니터링 등을 확인할 수 있습니다.',
     },
     clean: {
         scan: '스캔 시작',

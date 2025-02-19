@@ -182,3 +182,10 @@ var (
 	ErrAlertSync   = "ErrAlertSync"
 	ErrAlertRemote = "ErrAlertRemote"
 )
+
+// mobile app
+var (
+	ErrVerifyToken  = "ErrVerifyToken"
+	ErrInvalidToken = "ErrInvalidToken"
+	ErrExpiredToken = "ErrExpiredToken"
+)

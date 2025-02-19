@@ -6,6 +6,27 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "10593804",
+      "name": "过程监控_jurassic",
+      "font_class": "app-3",
+      "unicode": "e69e",
+      "unicode_decimal": 59038
+    },
+    {
+      "icon_id": "26508547",
+      "name": "服务信息",
+      "font_class": "app-2",
+      "unicode": "e6ec",
+      "unicode_decimal": 59116
+    },
+    {
+      "icon_id": "28544760",
+      "name": "移动管理-01",
+      "font_class": "app-1",
+      "unicode": "e639",
+      "unicode_decimal": 58937
+    },
+    {
       "icon_id": "10505865",
       "name": "机器人",
       "font_class": "jiqiren2",
@@ -284,6 +305,13 @@
       "font_class": "xpack",
       "unicode": "e604",
       "unicode_decimal": 58884
+    },
+    {
+      "icon_id": "24848551",
+      "name": "系统监控",
+      "font_class": "gpu-1",
+      "unicode": "e63d",
+      "unicode_decimal": 58941
     },
     {
       "icon_id": "40398413",

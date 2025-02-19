@@ -285,5 +285,10 @@ DBConnErr: "錯誤：初始化資料庫連線失敗，{{ .err }}"
 SystemVersion: "版本："
 SystemMode: "模式："
 
-#ai-tool  
+#ai-tool
 "ErrOpenrestyInstall": "請先安裝 Openresty"
+
+#mobile app
+ErrVerifyToken: '令牌驗證錯誤，請重置後再次掃碼'
+ErrInvalidToken: '無效的令牌，請重置後再次掃碼'
+ErrExpiredToken: '令牌過期，請重置後再次掃碼'

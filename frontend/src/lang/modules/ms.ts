@@ -1509,8 +1509,9 @@ const message = {
         proxyDockerHelper:
             'Selaraskan konfigurasi pelayan proksi ke Docker, menyokong tarikan imej pelayan luar talian dan operasi lain',
         apiInterface: 'Aktifkan API',
-        apiInterfaceClose: 'Setelah ditutup, antara muka API tidak boleh diakses. Adakah anda mahu meneruskan?',
-        apiInterfaceHelper: 'Benarkan aplikasi pihak ketiga mengakses API.',
+        apiInterfaceClose: 'ntaramuka API tidak tersedia, fungsi aplikasi akan terhad. Adakah anda ingin meneruskan?',
+        apiInterfaceHelper:
+            'Aktifkan sokongan panel untuk akses antaramuka API (ciri ini perlu diaktifkan untuk aplikasi panel).',
         apiInterfaceAlert1:
             'Jangan aktifkan dalam persekitaran pengeluaran kerana ia mungkin meningkatkan risiko keselamatan pelayan.',
         apiInterfaceAlert2:
@@ -1839,6 +1840,7 @@ const message = {
         monitor:
             'Tingkatkan ke versi profesional untuk melihat status masa nyata laman web, tren pelawat, sumber pelawat, log permintaan dan maklumat lain.',
         alert: 'Tingkatkan ke versi profesional untuk menerima maklumat amaran melalui SMS dan melihat log amaran, mengawal sepenuhnya pelbagai acara utama, dan memastikan operasi sistem bebas kerisauan.',
+        app: 'Tingkatkan ke versi profesional untuk melihat maklumat perkhidmatan, pemantauan abnormal, dll melalui aplikasi mudah alih.',
     },
     clean: {
         scan: 'Mulakan imbasan',

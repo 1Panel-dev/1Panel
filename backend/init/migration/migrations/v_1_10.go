@@ -390,3 +390,61 @@ var AddOllamaModel = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddAppMenu = &gormigrate.Migration{
+	ID: "20250217-update-xpack-hide-menu",
+	Migrate: func(tx *gorm.DB) error {
+		var (
+			setting model.Setting
+			menu    dto.XpackHideMenu
+		)
+
+		tx.Model(&model.Setting{}).Where("key = ?", "XpackHideMenu").First(&setting)
+
+		if err := json.Unmarshal([]byte(setting.Value), &menu); err != nil {
+			return err
+		}
+
+		var newChildren []dto.XpackHideMenu
+		for _, item := range menu.Children {
+			if item.ID != "4" {
+				newChildren = append(newChildren, item)
+			}
+		}
+		menu.Children = newChildren
+
+		appIsCheck := false
+		for _, item := range menu.Children {
+			if item.IsCheck {
+				appIsCheck = true
+				break
+			}
+		}
+
+		menu.Children = append(menu.Children, dto.XpackHideMenu{
+			ID:      "8",
+			Title:   "xpack.app.app",
+			Path:    "/xpack/app",
+			Label:   "XApp",
+			IsCheck: appIsCheck,
+		})
+
+		data, err := json.Marshal(menu)
+		if err != nil {
+			return err
+		}
+
+		return tx.Model(&model.Setting{}).Where("key = ?", "XpackHideMenu").Updates(map[string]interface{}{"value": string(data)}).Error
+	},
+}
+
+var AddAppPanelName = &gormigrate.Migration{
+	ID: "20250218-add-app-panel-name",
+	Migrate: func(tx *gorm.DB) error {
+
+		if err := tx.Create(&model.Setting{Key: "AppPanelName", Value: ""}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}

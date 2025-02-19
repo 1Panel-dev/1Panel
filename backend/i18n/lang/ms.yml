@@ -286,3 +286,8 @@ SystemMode: "Mod: "
 
 #ai-tool
 ErrOpenrestyInstall: 'Sila pasang Openresty terlebih dahulu'
+
+#mobile app
+ErrVerifyToken: 'Ralat pengesahan token, sila tetapkan semula dan imbas semula.'
+ErrInvalidToken: 'Token tidak sah, sila tetapkan semula dan imbas semula.'
+ErrExpiredToken: 'Token telah tamat tempoh, sila tetapkan semula dan imbas semula.'
