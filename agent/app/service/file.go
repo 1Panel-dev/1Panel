@@ -466,7 +466,7 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 		if req.TaskID != "" {
 			opts = append(opts, taskRepo.WithByID(req.TaskID))
 		} else {
-			opts = append(opts, repo.WithByType(req.TaskType), taskRepo.WithOperate(req.TaskOperate), taskRepo.WithResourceID(req.ID))
+			opts = append(opts, repo.WithByType(req.TaskType), taskRepo.WithOperate(req.TaskOperate), taskRepo.WithResourceID(req.ResourceID))
 		}
 		taskModel, err := taskRepo.GetFirst(opts...)
 		if err != nil {

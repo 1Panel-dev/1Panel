@@ -39,9 +39,12 @@ router.beforeEach((to, from, next) => {
         return;
     }
 
+    if (to.path === '/apps/all' && to.query.install != undefined) {
+        return next();
+    }
+
     const activeMenuKey = 'cachedRoute' + (to.meta.activeMenu || '');
     const cachedRoute = localStorage.getItem(activeMenuKey);
-
     if (
         to.meta.activeMenu &&
         to.meta.activeMenu != from.meta.activeMenu &&
