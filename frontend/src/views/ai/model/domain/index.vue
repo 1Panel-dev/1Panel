@@ -39,7 +39,7 @@
                                 </el-link>
                             </span>
                         </el-form-item>
-                        <el-form-item :label="$t('firewall.address')" prop="ipList">
+                        <el-form-item :label="$t('xpack.waf.whiteList') + ' IP'" prop="ipList">
                             <el-input
                                 :rows="3"
                                 type="textarea"
@@ -47,6 +47,9 @@
                                 v-model="req.ipList"
                                 :placeholder="$t('xpack.waf.ipGroupHelper')"
                             />
+                            <span class="input-help">
+                                {{ $t('aitool.whiteListHelper') }}
+                            </span>
                         </el-form-item>
                         <el-form-item>
                             <el-checkbox v-model="req.enableSSL" @change="changeSSL">
@@ -98,6 +101,9 @@
                         </el-form-item>
                         <el-alert :closable="false">
                             {{ $t('aitool.proxyHelper5') }}
+                            <el-link class="pageRoute" icon="Position" @click="toInstalled()" type="primary">
+                                {{ $t('firewall.quickJump') }}
+                            </el-link>
                         </el-alert>
                     </el-col>
                 </el-row>
@@ -248,6 +254,10 @@ const toWebsite = (websiteID: number) => {
     } else {
         window.location.href = '/websites';
     }
+};
+
+const toInstalled = () => {
+    window.location.href = '/apps/installed';
 };
 
 defineExpose({

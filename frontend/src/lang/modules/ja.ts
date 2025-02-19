@@ -2566,6 +2566,7 @@ const message = {
         proxyHelper5:
             '有効にすると、アプリストア - インストール済み - Ollama - パラメータでポートの外部アクセスを無効にし、セキュリティを向上させることができます。',
         proxyHelper6: 'プロキシ設定を無効にするには、ウェブサイトリストから削除できます。',
+        whiteListHelper: 'ホワイトリスト内のIPのみアクセスを許可する',
     },
 };
 export default {

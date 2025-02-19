@@ -2626,6 +2626,7 @@ const message = {
         proxyHelper5:
             'Selepas diaktifkan, anda boleh melumpuhkan akses luaran ke port dalam App Store - Dipasang - Ollama - Parameter untuk meningkatkan keselamatan.',
         proxyHelper6: 'Untuk melumpuhkan konfigurasi proksi, anda boleh memadamnya dari senarai laman web.',
+        whiteListHelper: 'Hadkan akses kepada hanya IP dalam senarai putih',
     },
 };
 

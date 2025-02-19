@@ -2526,6 +2526,7 @@ const message = {
         proxyHelper5:
             '활성화한 후, 앱 스토어 - 설치됨 - Ollama - 매개변수에서 포트 외부 접근을 비활성화하여 보안을 강화할 수 있습니다.',
         proxyHelper6: '프록시 구성을 비활성화하려면 웹사이트 목록에서 삭제할 수 있습니다.',
+        whiteListHelper: '화이트리스트에 있는 IP만 접근 허용',
     },
 };
 

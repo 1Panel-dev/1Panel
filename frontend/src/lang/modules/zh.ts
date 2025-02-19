@@ -2434,6 +2434,7 @@ const message = {
         proxyHelper4: '创建完成之后可以在网站列表中查看并管理',
         proxyHelper5: '创建完成之后可以在应用商店 - 已安装 - ollama - 参数中取消端口外部访问以提高安全性',
         proxyHelper6: '如需关闭代理配置，可以在网站列表中删除',
+        whiteListHelper: '限制仅白名单中的 IP 可访问',
     },
 };
 export default {

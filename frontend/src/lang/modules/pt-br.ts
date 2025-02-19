@@ -2622,6 +2622,7 @@ const message = {
         proxyHelper3: 'Habilite a transmissão em fluxo',
         proxyHelper4: 'Após a criação, você pode visualizar e gerenciar no lista de sites',
         proxyHelper6: 'Para desativar a configuração de proxy, você pode excluí-la da lista de sites.',
+        whiteListHelper: 'Restringir o acesso apenas aos IPs na lista branca',
     },
 };
 
