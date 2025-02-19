@@ -288,6 +288,7 @@ const message = {
             executing: '執行中',
             installerr: '安裝失敗',
             applyerror: '申請失敗',
+            interrupt: '中斷',
         },
         units: {
             second: '秒',
@@ -331,6 +332,7 @@ const message = {
         network: '網絡',
         supervisor: '進程守護',
         tamper: '防篡改',
+        app: '應用',
     },
     home: {
         recommend: '推薦',

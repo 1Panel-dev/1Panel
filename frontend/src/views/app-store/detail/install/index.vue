@@ -28,7 +28,7 @@
                 <el-input v-model.trim="req.name"></el-input>
             </el-form-item>
             <el-form-item :label="$t('app.version')" prop="version">
-                <el-select v-model="req.version" @change="getAppDetail(req.version)">
+                <el-select v-model="req.version" @change="getDetail(req.version)">
                     <el-option
                         v-for="(version, index) in appVersions"
                         :key="index"

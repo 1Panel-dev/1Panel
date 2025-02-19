@@ -286,6 +286,7 @@ const message = {
             executing: '执行中',
             installerr: '安装失败',
             applyerror: '申请失败',
+            interrupt: '中断',
         },
         units: {
             second: '秒',
@@ -329,6 +330,7 @@ const message = {
         network: '网络',
         supervisor: '进程守护',
         tamper: '防篡改',
+        app: '应用',
     },
     home: {
         recommend: '推荐',

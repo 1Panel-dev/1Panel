@@ -289,6 +289,7 @@ const message = {
             executing: '실행 중',
             installerr: '설치 실패',
             applyerror: '적용 실패',
+            interrupt: '중단됨',
         },
         units: {
             second: '초 | 초 | 초',
@@ -333,7 +334,8 @@ const message = {
         process: '프로세스 | 프로세스들',
         network: '네트워크 | 네트워크들',
         supervisor: '슈퍼바이저',
-        name: '변조 방지',
+        tamper: '변조 방지',
+        app: '애플리케이션',
     },
     home: {
         restart_1panel: '패널 재시작',

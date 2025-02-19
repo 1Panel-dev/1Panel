@@ -293,6 +293,7 @@ const message = {
             executing: 'Executando',
             installerr: 'Falha na instalação',
             applyerror: 'Falha na aplicação',
+            interrupt: 'Interrompido',
         },
         units: {
             second: 'segundo | segundos | segundos',
@@ -337,7 +338,8 @@ const message = {
         process: 'Processo | Processos',
         network: 'Rede | Redes',
         supervisor: 'Supervisor',
-        name: 'Imunidade contra Modificação',
+        tamper: 'À prova de violação',
+        app: 'Aplicativo',
     },
     home: {
         restart_1panel: 'Reiniciar painel',

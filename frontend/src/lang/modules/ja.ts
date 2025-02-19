@@ -288,6 +288,7 @@ const message = {
             executing: '実行中',
             installerr: 'インストールに失敗しました',
             applyerror: '適用に失敗しました',
+            interrupt: '中断',
         },
         units: {
             second: '2番目|2番目|秒',
@@ -332,7 +333,8 @@ const message = {
         process: 'プロセス|プロセス',
         network: 'ネットワーク|ネットワーク',
         supervisor: '監督者',
-        name: '改ざん',
+        tamper: '改ざん防止',
+        app: 'アプリケーション',
     },
     home: {
         restart_1panel: 'パネルを再起動します',

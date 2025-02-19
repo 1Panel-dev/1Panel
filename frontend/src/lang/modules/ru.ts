@@ -289,6 +289,7 @@ const message = {
             executing: 'Выполнение',
             installerr: 'Ошибка установки',
             applyerror: 'Ошибка применения',
+            interrupt: 'Прервано',
         },
         units: {
             second: ' секунда | секунда | секунд',
@@ -333,7 +334,8 @@ const message = {
         process: 'Процесс | Процессы',
         network: 'Сеть | Сети',
         supervisor: 'Супервизор',
-        name: 'Защита от подмены',
+        tamper: 'Защита от несанкционированного доступа',
+        app: 'Приложение',
     },
     home: {
         restart_1panel: 'Перезапустить панель',

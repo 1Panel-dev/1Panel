@@ -294,6 +294,7 @@ const message = {
             executing: 'Executing',
             installerr: 'Installation failed',
             applyerror: 'Apply failed',
+            interrupt: 'Interrupted',
         },
         units: {
             second: 'Second',
@@ -337,7 +338,8 @@ const message = {
         process: 'Process',
         network: 'Network',
         supervisor: 'Supervisor',
-        name: 'Tamper Proof',
+        tamper: 'Tamper-proof',
+        app: 'Application',
     },
     home: {
         recommend: 'recommend',

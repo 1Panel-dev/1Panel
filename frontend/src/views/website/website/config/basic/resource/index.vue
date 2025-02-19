@@ -2,7 +2,7 @@
     <div class="p-w-400">
         <el-descriptions border :column="1">
             <div v-for="(resource, index) of data" :key="index">
-                <el-descriptions-item :label="$t('website.' + resource.type)">{{ resource.name }}</el-descriptions-item>
+                <el-descriptions-item :label="$t('menu.' + resource.type)">{{ resource.name }}</el-descriptions-item>
             </div>
         </el-descriptions>
         <el-form

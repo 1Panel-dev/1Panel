@@ -295,6 +295,7 @@ const message = {
             executing: 'Melaksanakan',
             installerr: 'Pemasangan gagal',
             applyerror: 'Permohonan gagal',
+            interrupt: 'Dihentikan',
         },
         units: {
             second: 'saat | saat | saat',
@@ -339,7 +340,8 @@ const message = {
         process: 'Process | Processes',
         network: 'Network | Networks',
         supervisor: 'Supervisor',
-        name: 'Tamper Proof',
+        tamper: 'Bukti Pengubahsuaian',
+        app: 'Aplikasi',
     },
     home: {
         restart_1panel: 'Mulakan semula panel',

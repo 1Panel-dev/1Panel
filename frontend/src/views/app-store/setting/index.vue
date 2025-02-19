@@ -13,7 +13,7 @@
                 <el-row>
                     <el-col :xs="24" :sm="20" :md="15" :lg="12" :xl="12">
                         <el-form-item :label="$t('app.defaultWebDomain')" prop="defaultDomain">
-                            <el-input v-model="config.defaultDomain">
+                            <el-input v-model="config.defaultDomain" disabled>
                                 <template #prepend>
                                     <el-select v-model="protocol" placeholder="Select" class="p-w-100" disabled>
                                         <el-option label="HTTP" value="http://" />

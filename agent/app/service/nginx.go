@@ -86,7 +86,7 @@ func (n NginxService) GetStatus() (response.NginxStatus, error) {
 		url = fmt.Sprintf("http://127.0.0.1:%v/nginx_status", httpPort)
 	}
 	res, err := http.Get(url)
-	if err != nil {
+	if err != nil || res.StatusCode > 300 {
 		return response.NginxStatus{}, err
 	}
 	defer res.Body.Close()

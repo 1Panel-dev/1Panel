@@ -636,7 +636,6 @@ export function emptyLineFilter(str: string, spilt: string) {
     return results.join(spilt);
 }
 
-// 文件类型映射
 let fileTypes = {
     image: ['.jpg', '.jpeg', '.png', '.bmp', '.gif', '.tiff', '.ico', '.svg', '.webp'],
     compress: ['.zip', '.rar', '.gz', '.war', '.tgz', '.7z', '.tar.gz', '.tar', '.bz2', '.xz', '.tar.bz2', '.tar.xz'],
