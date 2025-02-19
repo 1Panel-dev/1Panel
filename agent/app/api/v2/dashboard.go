@@ -61,6 +61,19 @@ func (b *BaseApi) LoadAppLauncherOption(c *gin.Context) {
 	helper.SuccessWithData(c, data)
 }
 
+func (b *BaseApi) SyncAppLauncher(c *gin.Context) {
+	var req dto.SyncFromMaster
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := dashboardService.Sync(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+
+	helper.SuccessWithOutData(c)
+}
+
 // @Tags Dashboard
 // @Summary Load dashboard base info
 // @Accept json

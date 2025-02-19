@@ -23,7 +23,7 @@
                 </el-popover>
             </template>
             <template #body>
-                <el-scrollbar height="525px" class="moz-height">
+                <el-scrollbar height="545px" class="moz-height">
                     <div class="h-app-card" v-for="(app, index) in apps" :key="index">
                         <el-row :gutter="5">
                             <el-col :span="5">
@@ -64,16 +64,17 @@
                                 <div class="h-app-content" v-else>
                                     <div>
                                         <el-dropdown trigger="hover">
-                                            <el-button plain size="small" link class="h-app-dropdown">
+                                            <el-button type="primary" plain size="small" link class="h-app-dropdown">
                                                 {{ app.currentRow.name }}
                                                 <el-icon class="el-icon--right"><ArrowDown /></el-icon>
                                             </el-button>
                                             <template #dropdown>
-                                                <el-dropdown-menu
-                                                    v-for="(detailItem, index2) in app.detail"
-                                                    :key="index2"
-                                                >
-                                                    <el-dropdown-item @click="app.currentRow = detailItem">
+                                                <el-dropdown-menu>
+                                                    <el-dropdown-item
+                                                        v-for="(detailItem, index2) in app.detail"
+                                                        :key="index2"
+                                                        @click="app.currentRow = detailItem"
+                                                    >
                                                         {{ detailItem.name + ' - ' + detailItem.version }}
                                                     </el-dropdown-item>
                                                 </el-dropdown-menu>
@@ -90,7 +91,8 @@
                                             size="small"
                                             type="primary"
                                             link
-                                            @click="onOperate('stop', app.currentRow)"
+                                            v-if="app.currentRow.status !== 'Running'"
+                                            @click="onOperate('start', app.currentRow)"
                                         >
                                             {{ $t('commons.button.start') }}
                                         </el-button>
@@ -99,9 +101,19 @@
                                             size="small"
                                             type="primary"
                                             link
+                                            v-else
                                             @click="onOperate('stop', app.currentRow)"
                                         >
                                             {{ $t('commons.button.stop') }}
+                                        </el-button>
+                                        <el-button
+                                            :style="mobile ? 'margin-left: -1px' : ''"
+                                            size="small"
+                                            type="primary"
+                                            link
+                                            @click="onOperate('restart', app.currentRow)"
+                                        >
+                                            {{ $t('commons.button.restart') }}
                                         </el-button>
                                         <el-button
                                             :style="mobile ? 'margin-left: -1px' : ''"
@@ -244,6 +256,7 @@ const onChangeStatus = async (row: any) => {
     await changeLauncherStatus(row.key, row.isShow ? 'Enable' : 'Disable')
         .then(() => {
             loading.value = false;
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             search();
         })
         .catch(() => {
@@ -266,8 +279,8 @@ const getConfig = async () => {
 
 const onOperate = async (operation: string, row: any) => {
     ElMessageBox.confirm(
-        i18n.global.t('app.operatorHelper', [i18n.global.t('app.' + operation)]),
-        i18n.global.t('app.' + operation),
+        i18n.global.t('app.operatorHelper', [i18n.global.t('commons.button.' + operation)]),
+        i18n.global.t('commons.button.' + operation),
         {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
             cancelButtonText: i18n.global.t('commons.button.cancel'),
@@ -276,9 +289,9 @@ const onOperate = async (operation: string, row: any) => {
     ).then(async () => {
         loading.value = true;
         let params = {
-            installId: row.installId,
+            installId: row.installID,
             operate: operation,
-            detailId: row.detailId,
+            detailId: row.detailID,
         };
         await installedOp(params)
             .then(() => {
@@ -353,7 +366,7 @@ defineExpose({
 .h-app-dropdown {
     font-weight: 600;
     font-size: 16px;
-    color: #1f2329;
+    color: var(--panel-text-color);
 }
 
 .h-app-margin {

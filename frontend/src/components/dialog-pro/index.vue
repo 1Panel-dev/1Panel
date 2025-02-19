@@ -84,6 +84,7 @@ const dialogVisible = computed({
 
 const handleBeforeClose = () => {
     emit('close');
+    dialogVisible.value = false;
 };
 const open = () => {
     emit('open');

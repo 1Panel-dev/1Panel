@@ -96,16 +96,27 @@ func (u *CronjobService) SearchRecords(search dto.SearchRecord) (int64, interfac
 
 func (u *CronjobService) LoadNextHandle(specStr string) ([]string, error) {
 	spec := cron.NewParser(cron.Minute | cron.Hour | cron.Dom | cron.Month | cron.Dow)
+	now := time.Now()
+	var nexts [5]string
+	if strings.HasPrefix(specStr, "@every ") {
+		duration := time.Minute
+		if strings.HasSuffix(specStr, "s") {
+			duration = time.Second
+		}
+		for i := 0; i < 5; i++ {
+			nextTime := now.Add(duration)
+			nexts[i] = nextTime.Format(constant.DateTimeLayout)
+			now = nextTime
+		}
+		return nexts[:], nil
+	}
 	sched, err := spec.Parse(specStr)
 	if err != nil {
 		return nil, err
 	}
-	now := time.Now()
-	var nexts [5]string
 	for i := 0; i < 5; i++ {
 		nextTime := sched.Next(now)
-		nexts[i] = nextTime.Format("2006-01-02 15:04:05")
-		fmt.Println(nextTime)
+		nexts[i] = nextTime.Format(constant.DateTimeLayout)
 		now = nextTime
 	}
 	return nexts[:], nil

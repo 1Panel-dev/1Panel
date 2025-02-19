@@ -39,6 +39,7 @@ func (u *LauncherService) ChangeShow(req dto.SettingUpdate) error {
 	launcher, _ := launcherRepo.Get(repo.WithByKey(req.Key))
 	if req.Value == constant.StatusEnable {
 		if launcher.ID != 0 {
+			go syncLauncherToAgent(launcher, "create")
 			return nil
 		}
 		launcher.Key = req.Key
@@ -49,6 +50,7 @@ func (u *LauncherService) ChangeShow(req dto.SettingUpdate) error {
 		return nil
 	}
 	if launcher.ID == 0 {
+		go syncLauncherToAgent(launcher, "delete")
 		return nil
 	}
 	if err := launcherRepo.Delete(repo.WithByKey(req.Key)); err != nil {
