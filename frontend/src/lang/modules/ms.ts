@@ -1510,8 +1510,7 @@ const message = {
             'Selaraskan konfigurasi pelayan proksi ke Docker, menyokong tarikan imej pelayan luar talian dan operasi lain',
         apiInterface: 'Aktifkan API',
         apiInterfaceClose: 'ntaramuka API tidak tersedia, fungsi aplikasi akan terhad. Adakah anda ingin meneruskan?',
-        apiInterfaceHelper:
-            'Aktifkan sokongan panel untuk akses antaramuka API (ciri ini perlu diaktifkan untuk aplikasi panel).',
+        apiInterfaceHelper: 'Menyokong akses antara muka API panel (fungsi ini perlu diaktifkan untuk aplikasi panel)',
         apiInterfaceAlert1:
             'Jangan aktifkan dalam persekitaran pengeluaran kerana ia mungkin meningkatkan risiko keselamatan pelayan.',
         apiInterfaceAlert2:
@@ -1831,7 +1830,7 @@ const message = {
         levelUpPro: 'Tingkatkan ke Pro',
         licenseSync: 'Penyegerakan Lesen',
         knowMorePro: 'Ketahui Lebih Lanjut',
-        closeAlert: 'Halaman semasa boleh ditutup dalam tetapan panel',
+        closeAlert: 'Halaman semasa boleh disembunyikan dalam tetapan panel',
         introduce: 'Pengenalan Ciri',
         waf: 'Menaik taraf ke versi profesional boleh menyediakan ciri seperti peta pencegahan, log, rekod blok, sekatan lokasi geografi, peraturan tersuai, halaman pencegahan tersuai, dan sebagainya.',
         tamper: 'Menaik taraf ke versi profesional boleh melindungi laman web daripada pengubahsuaian atau manipulasi tanpa kebenaran.',
@@ -1840,7 +1839,7 @@ const message = {
         monitor:
             'Tingkatkan ke versi profesional untuk melihat status masa nyata laman web, tren pelawat, sumber pelawat, log permintaan dan maklumat lain.',
         alert: 'Tingkatkan ke versi profesional untuk menerima maklumat amaran melalui SMS dan melihat log amaran, mengawal sepenuhnya pelbagai acara utama, dan memastikan operasi sistem bebas kerisauan.',
-        app: 'Tingkatkan ke versi profesional untuk melihat maklumat perkhidmatan, pemantauan abnormal, dll melalui aplikasi mudah alih.',
+        app: 'Tingkatkan ke versi profesional untuk menguruskan pelayan dan melihat ciri pemantauan melalui aplikasi mudah alih.',
     },
     clean: {
         scan: 'Mulakan imbasan',

@@ -1499,7 +1499,7 @@ const message = {
         apiInterfaceClose:
             'As interfaces de API estão indisponíveis, a funcionalidade do aplicativo será restrita. Deseja continuar?',
         apiInterfaceHelper:
-            'Habilite o suporte ao painel para acesso à interface de API (essa funcionalidade precisa ser habilitada para aplicativos de painel).',
+            'Suporta acesso à interface de API do painel (essa funcionalidade precisa ser ativada no aplicativo do painel)',
         apiInterfaceAlert1:
             'Não habilite em ambientes de produção, pois pode aumentar os riscos de segurança do servidor.',
         apiInterfaceAlert2:
@@ -1819,7 +1819,7 @@ const message = {
         levelUpPro: 'Upgrade para Pro',
         licenseSync: 'Sincronização de Licença',
         knowMorePro: 'Saiba mais',
-        closeAlert: 'A página atual pode ser fechada nas configurações do painel',
+        closeAlert: 'A página atual pode ser oculta nas configurações do painel',
         introduce: 'Introdução de recursos',
         waf: 'O upgrade para a versão profissional pode fornecer recursos como mapa de intercepção, logs, registros de bloqueio, bloqueio por localização geográfica, regras personalizadas, páginas de intercepção personalizadas, etc.',
         tamper: 'O upgrade para a versão profissional pode proteger sites contra modificações ou adulterações não autorizadas.',
@@ -1828,7 +1828,7 @@ const message = {
         monitor:
             'Upgrade para a versão profissional para visualizar o status em tempo real do site, tendências de visitantes, fontes de visitantes, logs de solicitações e outras informações.',
         alert: 'Upgrade para a versão profissional para receber informações de alarme via SMS e visualizar logs de alarmes, controlar completamente vários eventos chave e garantir a operação sem preocupações do sistema',
-        app: 'Upgrade para a versão profissional para visualizar informações do serviço, monitoramento anômalo, etc., através do aplicativo móvel.',
+        app: 'Atualize para a versão profissional para gerenciar servidores e visualizar recursos de monitoramento via o aplicativo móvel.',
     },
     clean: {
         scan: 'Iniciar escaneamento',

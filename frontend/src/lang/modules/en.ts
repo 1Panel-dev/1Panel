@@ -1492,8 +1492,7 @@ const message = {
         apiInterface: 'Enable API',
         apiInterfaceClose:
             'API interfaces are unavailable, app functionality will be restricted. Do you want to continue?',
-        apiInterfaceHelper:
-            'Enable panel support for API interface access (this feature needs to be enabled for panel apps).',
+        apiInterfaceHelper: 'Supports panel API interface access (this feature needs to be enabled for the panel app)',
         apiInterfaceAlert1: `Don't enable it in production environments because it may increase server security risks.`,
         apiInterfaceAlert2: `Don't use third-party applications to call the API to prevent potential security threats.`,
         apiInterfaceAlert3: 'API Docs',
@@ -1803,7 +1802,7 @@ const message = {
         levelUpPro: 'Upgrade to Pro',
         licenseSync: 'License Sync',
         knowMorePro: 'Learn More',
-        closeAlert: 'The current page can be closed in the panel settings',
+        closeAlert: 'The current page can be hidden in the panel settings',
         introduce: 'Feature Introduction',
         waf: 'Upgrading to the professional version can provide features such as interception map, logs, block records, geographical location blocking, custom rules, custom interception pages, etc.',
         tamper: 'Upgrading to the professional version can protect websites from unauthorized modifications or tampering.',
@@ -1812,7 +1811,7 @@ const message = {
         monitor:
             'Upgrade to the professional version to view the real-time status of the website, visitor trends, visitor sources, request logs and other information. ',
         alert: 'Upgrade to the professional version to receive alarm information via SMS and view alarm logs, fully control various key events, and ensure worry-free system operation',
-        app: 'Upgrade to the professional version to view service information, abnormal monitoring, etc. through the mobile APP. ',
+        app: 'Upgrade to the professional version to manage servers and view monitoring features via the mobile app.',
     },
     clean: {
         scan: 'Start scanning',
