@@ -111,12 +111,12 @@ const submit = async () => {
                 globalStore.themeConfig.themeColor = xpackRes.data.themeColor;
             }
             loading.value = false;
-            switchTheme();
-            initFavicon();
             uploadRef.value!.clearFiles();
             uploaderFiles.value = [];
             open.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            switchTheme();
+            initFavicon();
             window.location.reload();
         })
         .catch(() => {

@@ -211,7 +211,7 @@ const loadVersion = (row: any) => {
     if (row.productPro && row.productPro !== '0') {
         return i18n.global.t('license.subscription') + ' [ ' + row.expiresAt + ' ] ';
     }
-    if (row.versionConstraint !== 'all') {
+    if (row.versionConstraint && row.versionConstraint !== 'all') {
         return i18n.global.t('license.versionConstraint', ['v' + row.versionConstraint.replace('.x', '')]);
     }
     return i18n.global.t('license.perpetual');

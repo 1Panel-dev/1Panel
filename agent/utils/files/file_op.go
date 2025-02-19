@@ -69,7 +69,7 @@ func (f FileOp) CreateDirWithPath(isDir bool, pathItem string) (string, error) {
 	if !isDir {
 		checkPath = path.Dir(pathItem)
 	}
-	if f.Stat(checkPath) {
+	if !f.Stat(checkPath) {
 		if err := f.CreateDir(checkPath, os.ModePerm); err != nil {
 			global.LOG.Errorf("mkdir %s failed, err: %v", checkPath, err)
 			return pathItem, err

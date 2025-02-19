@@ -7,7 +7,7 @@ const terminalRouter = {
     redirect: '/terminal',
     meta: {
         title: 'menu.terminal',
-        icon: 'p-terminal3',
+        icon: 'p-terminal2',
     },
     children: [
         {

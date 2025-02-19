@@ -6,11 +6,11 @@
   "description": "",
   "glyphs": [
     {
-      "icon_id": "40071541",
+      "icon_id": "5127551",
       "name": "terminal",
-      "font_class": "terminal3",
-      "unicode": "eace",
-      "unicode_decimal": 60110
+      "font_class": "terminal2",
+      "unicode": "e82f",
+      "unicode_decimal": 59439
     },
     {
       "icon_id": "34213658",
@@ -102,20 +102,6 @@
       "font_class": "theme",
       "unicode": "e638",
       "unicode_decimal": 58936
-    },
-    {
-      "icon_id": "6172786",
-      "name": "terminal",
-      "font_class": "terminal",
-      "unicode": "e864",
-      "unicode_decimal": 59492
-    },
-    {
-      "icon_id": "14772948",
-      "name": "terminal",
-      "font_class": "terminal1",
-      "unicode": "e663",
-      "unicode_decimal": 58979
     },
     {
       "icon_id": "15838431",
@@ -655,13 +641,6 @@
       "font_class": "alert-2",
       "unicode": "e701",
       "unicode_decimal": 59137
-    },
-    {
-      "icon_id": "11052436",
-      "name": "命令行",
-      "font_class": "zhongduan",
-      "unicode": "e61e",
-      "unicode_decimal": 58910
     },
     {
       "icon_id": "11124973",
