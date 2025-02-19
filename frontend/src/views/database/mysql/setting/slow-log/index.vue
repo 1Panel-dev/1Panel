@@ -16,62 +16,26 @@
                 <el-button style="float: left; margin-left: 10px" @click="changeSlowLogs">
                     {{ $t('commons.button.save') }}
                 </el-button>
-                <div style="float: left; margin-left: 20px">
-                    <el-checkbox style="margin-top: 2px" :disabled="!currentStatus" border v-model="isWatch">
-                        {{ $t('commons.button.watch') }}
-                    </el-checkbox>
-                </div>
-                <el-button :disabled="!currentStatus" style="margin-left: 20px" @click="onDownload" icon="Download">
-                    {{ $t('file.download') }}
-                </el-button>
             </el-form-item>
         </el-form>
-        <codemirror
-            :autofocus="true"
-            :placeholder="$t('database.noData')"
-            :indent-with-tab="true"
-            :tabSize="4"
-            :style="{ height: getDynamicHeight(), width: '100%' }"
-            :lineWrapping="true"
-            :matchBrackets="true"
-            theme="cobalt"
-            :styleActiveLine="true"
-            :extensions="extensions"
-            @ready="handleReady"
-            v-model="slowLogs"
-            :disabled="true"
-        />
+        <LogFile v-if="variables.slow_query_log === 'ON'" :config="config"></LogFile>
 
         <ConfirmDialog @cancel="onCancel" ref="confirmDialogRef" @confirm="onSave"></ConfirmDialog>
     </div>
 </template>
 <script lang="ts" setup>
-import { Codemirror } from 'vue-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
-import { oneDark } from '@codemirror/theme-one-dark';
-import { nextTick, onBeforeUnmount, reactive, ref, shallowRef } from 'vue';
+import { reactive, ref } from 'vue';
 import { Database } from '@/api/interface/database';
+import LogFile from '@/components/log-file/index.vue';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
-import { loadDBFile, updateMysqlVariables } from '@/api/modules/database';
-import { dateFormatForName, downloadWithContent } from '@/utils/util';
+import { updateMysqlVariables } from '@/api/modules/database';
 import i18n from '@/lang';
-import { MsgError, MsgInfo, MsgSuccess } from '@/utils/message';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+import { MsgError, MsgSuccess } from '@/utils/message';
 
-const extensions = [javascript(), oneDark];
-const slowLogs = ref();
-const view = shallowRef();
-const handleReady = (payload) => {
-    view.value = payload.view;
-};
 const detailShow = ref();
 const currentStatus = ref();
-
+const config = ref();
 const confirmDialogRef = ref();
-
-const isWatch = ref();
-let timer: NodeJS.Timer | null = null;
 
 const variables = reactive({
     slow_query_log: 'OFF',
@@ -96,12 +60,11 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     if (variables.slow_query_log === 'ON') {
         currentStatus.value = true;
         detailShow.value = true;
-        loadMysqlSlowlogs();
-        timer = setInterval(() => {
-            if (variables.slow_query_log === 'ON' && isWatch.value) {
-                loadMysqlSlowlogs();
-            }
-        }, 1000 * 5);
+        config.value = {
+            type: params.type + '-slow-logs',
+            name: params.database,
+            tail: true,
+        };
     } else {
         detailShow.value = false;
     }
@@ -110,6 +73,11 @@ const emit = defineEmits(['loading']);
 
 const handleSlowLogs = async () => {
     if (variables.slow_query_log === 'ON') {
+        config.value = {
+            type: currentDB.type + '-slow-logs',
+            name: currentDB.database,
+            tail: true,
+        };
         detailShow.value = true;
         return;
     }
@@ -119,21 +87,6 @@ const handleSlowLogs = async () => {
         submitInputInfo: i18n.global.t('database.restartNow'),
     };
     confirmDialogRef.value!.acceptParams(params);
-};
-
-const getDynamicHeight = () => {
-    if (variables.slow_query_log === 'ON') {
-        if (globalStore.openMenuTabs) {
-            return `calc(100vh - 467px)`;
-        } else {
-            return `calc(100vh - 437px)`;
-        }
-    }
-    if (globalStore.openMenuTabs) {
-        return `calc(100vh - 413px)`;
-    } else {
-        return `calc(100vh - 383px)`;
-    }
 };
 
 const changeSlowLogs = () => {
@@ -178,31 +131,6 @@ const onSave = async () => {
             emit('loading', false);
         });
 };
-
-const onDownload = async () => {
-    if (!slowLogs.value) {
-        MsgInfo(i18n.global.t('database.noData'));
-        return;
-    }
-    downloadWithContent(slowLogs.value, currentDB.database + '-slowlogs-' + dateFormatForName(new Date()) + '.log');
-};
-
-const loadMysqlSlowlogs = async () => {
-    const res = await loadDBFile(currentDB.type + '-slow-logs', currentDB.database);
-    slowLogs.value = res.data || '';
-    nextTick(() => {
-        const state = view.value.state;
-        view.value.dispatch({
-            selection: { anchor: state.doc.length, head: state.doc.length },
-            scrollIntoView: true,
-        });
-    });
-};
-
-onBeforeUnmount(() => {
-    clearInterval(Number(timer));
-    timer = null;
-});
 
 defineExpose({
     acceptParams,

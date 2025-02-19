@@ -50,10 +50,6 @@ func (u *DBCommonService) LoadDatabaseFile(req dto.OperationWithNameAndType) (st
 		filePath = path.Join(global.CONF.System.DataDir, fmt.Sprintf("apps/postgresql/%s/data/postgresql.conf", req.Name))
 	case "redis-conf":
 		filePath = path.Join(global.CONF.System.DataDir, fmt.Sprintf("apps/redis/%s/conf/redis.conf", req.Name))
-	case "mysql-slow-logs":
-		filePath = path.Join(global.CONF.System.DataDir, fmt.Sprintf("apps/mysql/%s/data/1Panel-slow.log", req.Name))
-	case "mariadb-slow-logs":
-		filePath = path.Join(global.CONF.System.DataDir, fmt.Sprintf("apps/mariadb/%s/db/data/1Panel-slow.log", req.Name))
 	}
 	if _, err := os.Stat(filePath); err != nil {
 		return "", buserr.New("ErrHttpReqNotFound")
