@@ -554,6 +554,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { dateFormatSimple, getProvider, getAccountName } from '@/utils/util';
 import { Website } from '@/api/interface/website';
 import DomainCreate from '@/views/website/website/domain-create/index.vue';
+import { getPathByType } from '@/api/modules/files';
 
 const websiteForm = ref<FormInstance>();
 
@@ -818,12 +819,14 @@ const getRuntimes = async () => {
     } catch (error) {}
 };
 
-const acceptParams = async (installPath: string) => {
+const acceptParams = async () => {
     website.value = initData();
     if (websiteForm.value) {
         websiteForm.value.resetFields();
     }
-    staticPath.value = installPath + '/www/sites/';
+    getPathByType('websiteDir').then((res) => {
+        staticPath.value = res.data + '/sites/';
+    });
 
     const res = await getGroupList('website');
     groups.value = res.data;

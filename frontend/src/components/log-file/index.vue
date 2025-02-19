@@ -46,6 +46,9 @@ interface LogProps {
     tail?: boolean;
     taskID?: string;
     colorMode?: string;
+    taskType?: string;
+    taskOperate?: string;
+    resourceID?: number;
 }
 
 const props = defineProps({
@@ -57,6 +60,9 @@ const props = defineProps({
             name: '',
             tail: false,
             colorMode: 'nginx',
+            taskType: '',
+            taskOperate: '',
+            resourceID: 0,
         }),
     },
     defaultButton: {
@@ -106,6 +112,9 @@ const readReq = reactive({
     pageSize: 500,
     latest: false,
     taskID: '',
+    taskType: '',
+    taskOperate: '',
+    resourceID: 0,
 });
 const isLoading = ref(false);
 const end = ref(false);
@@ -182,6 +191,9 @@ const getContent = async (pre: boolean) => {
     readReq.type = props.config.type;
     readReq.name = props.config.name;
     readReq.taskID = props.config.taskID;
+    readReq.taskType = props.config.taskType;
+    readReq.taskOperate = props.config.taskOperate;
+    readReq.resourceID = props.config.resourceID;
     if (readReq.page < 1) {
         readReq.page = 1;
     }

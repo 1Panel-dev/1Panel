@@ -1810,7 +1810,7 @@ func (w WebsiteService) UpdateProxyFile(req request.NginxProxyUpdate) (err error
 	if err != nil {
 		return err
 	}
-	includePath := fmt.Sprintf("/www/sites/%s/proxy/%s.conf", website.Alias, req.Name)
+	includePath := fmt.Sprintf("%s/%s.conf", GetSitePath(website, SiteProxyDir), req.Name)
 	absolutePath := path.Join(nginxFull.Install.GetPath(), includePath)
 	fileOp := files.NewFileOp()
 	oldRewriteContent, err = fileOp.GetContent(absolutePath)
