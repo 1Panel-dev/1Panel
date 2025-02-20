@@ -13,8 +13,10 @@ func NewAppStoreJob() *app {
 
 func (a *app) Run() {
 	global.LOG.Info("AppStore scheduled task in progress ...")
-	if err := service.NewIAppService().SyncAppListFromRemote(); err != nil {
+	appService := service.NewIAppService()
+	if err := appService.SyncAppListFromRemote(); err != nil {
 		global.LOG.Errorf("AppStore sync failed %s", err.Error())
 	}
+	appService.SyncAppListFromLocal()
 	global.LOG.Info("AppStore scheduled task has completed")
 }
