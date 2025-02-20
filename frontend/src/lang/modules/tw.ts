@@ -580,7 +580,7 @@ const message = {
         model: {
             model: '模型',
             create: '添加模型',
-            create_helper: '從 Ollama.com 拉取 "{0}"',
+            create_helper: '拉取 "{0}"',
             ollama_doc: '您可以訪問 Ollama 官方網站，搜索並查找更多模型。',
             container_conn_helper: '容器間訪問或連接使用此地址',
             ollama_sync: '同步 Ollama 模型發現下列模型不存在，是否刪除？',

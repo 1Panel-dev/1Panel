@@ -596,7 +596,7 @@ const message = {
         model: {
             model: '모델',
             create: '모델 추가',
-            create_helper: 'Ollama.com에서 "{0}" 가져오기',
+            create_helper: '가져오기 "{0}"',
             ollama_doc: 'Ollama 공식 웹사이트를 방문하여 더 많은 모델을 검색하고 찾을 수 있습니다.',
             container_conn_helper: '컨테이너 간 접근 또는 연결에 이 주소를 사용',
             ollama_sync: 'Ollama 모델 동기화 중 다음 모델이 존재하지 않음을 발견했습니다. 삭제하시겠습니까?',

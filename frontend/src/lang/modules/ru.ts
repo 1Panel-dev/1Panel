@@ -606,7 +606,7 @@ const message = {
         model: {
             model: 'Модель',
             create: 'Добавить модель',
-            create_helper: 'Загрузить "{0}" с Ollama.com',
+            create_helper: 'Загрузить "{0}"',
             ollama_doc: 'Вы можете посетить официальный сайт Ollama, чтобы искать и находить больше моделей.',
             container_conn_helper: 'Используйте этот адрес для доступа или подключения между контейнерами',
             ollama_sync:

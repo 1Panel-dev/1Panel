@@ -611,7 +611,7 @@ const message = {
         model: {
             model: 'Model',
             create: 'Tambah Model',
-            create_helper: 'Tarik "{0}" dari Ollama.com',
+            create_helper: 'Tarik "{0}"',
             ollama_doc: 'Anda boleh melawat laman web rasmi Ollama untuk mencari dan menemui lebih banyak model.',
             container_conn_helper: 'Gunakan alamat ini untuk akses atau sambungan antara kontena',
             ollama_sync:

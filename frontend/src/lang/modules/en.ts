@@ -600,7 +600,7 @@ const message = {
         model: {
             model: 'Model',
             create: 'Add Model',
-            create_helper: 'Pull "{0}" from Ollama.com',
+            create_helper: 'Pull "{0}"',
             ollama_doc: 'You can visit the Ollama official website to search and find more models.',
             container_conn_helper: 'Use this address for inter-container access or connection',
             ollama_sync: 'Syncing Ollama model found the following models do not exist, do you want to delete them?',
