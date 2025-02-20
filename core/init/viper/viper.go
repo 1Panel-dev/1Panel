@@ -88,8 +88,8 @@ func Init() {
 
 	global.CONF = serverConfig
 	global.CONF.Base.InstallDir = baseDir
-	global.CONF.Base.IsDemo = v.GetBool("system.is_demo")
-	global.CONF.Base.IsIntl = v.GetBool("system.is_intl")
+	global.CONF.Base.IsDemo = v.GetBool("base.is_demo")
+	global.CONF.Base.IsIntl = v.GetBool("base.is_intl")
 	global.CONF.Base.Version = version
 	global.CONF.Base.Username = username
 	global.CONF.Base.Password = password
