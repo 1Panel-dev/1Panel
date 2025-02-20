@@ -80,7 +80,7 @@ func isValid1PanelTimestamp(panelTimestamp string) bool {
 	}
 	panelTime, err := strconv.ParseInt(panelTimestamp, 10, 64)
 	if err != nil {
-		global.LOG.Errorf("panelTime %d, apiTime %d, err: %v", apiTime, panelTime, err)
+		global.LOG.Errorf("panelTimestamp %s, panelTime %d, apiTime %d, err: %v", panelTimestamp, apiTime, panelTime, err)
 		return false
 	}
 	nowTime := time.Now().Unix()
