@@ -71,18 +71,25 @@ func SessionAuth() gin.HandlerFunc {
 func isValid1PanelTimestamp(panelTimestamp string) bool {
 	apiKeyValidityTime := global.CONF.System.ApiKeyValidityTime
 	apiTime, err := strconv.Atoi(apiKeyValidityTime)
-	if err != nil {
+	if err != nil || apiTime < 0 {
+		global.LOG.Errorf("apiTime %d, err: %v", apiTime, err)
 		return false
+	}
+	if apiTime == 0 {
+		return true
 	}
 	panelTime, err := strconv.ParseInt(panelTimestamp, 10, 64)
 	if err != nil {
+		global.LOG.Errorf("panelTime %d, apiTime %d, err: %v", apiTime, panelTime, err)
 		return false
 	}
 	nowTime := time.Now().Unix()
-	if panelTime > nowTime {
+	tolerance := int64(60)
+	if panelTime > nowTime+tolerance {
+		global.LOG.Errorf("Valid Panel Timestamp, apiTime %d, panelTime %d, nowTime %d, err: %v", apiTime, panelTime, nowTime, err)
 		return false
 	}
-	return apiTime == 0 || nowTime-panelTime <= int64(apiTime*60)
+	return nowTime-panelTime <= int64(apiTime)*60+tolerance
 }
 
 func isValid1PanelToken(panelToken string, panelTimestamp string) bool {
