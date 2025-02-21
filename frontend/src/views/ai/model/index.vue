@@ -430,7 +430,7 @@ const buttons = [
             onDelete(row);
         },
         disabled: (row: any) => {
-            return row.status !== 'Success' && row.status !== 'Deleted';
+            return row.status === 'Waiting';
         },
     },
 ];
