@@ -68,7 +68,11 @@
                             <el-input v-model.trim="account.authorization['token']"></el-input>
                         </el-form-item>
                     </div>
-
+                    <div v-if="account.type === 'FreeMyIP'">
+                        <el-form-item label="Token" prop="authorization.token">
+                            <el-input v-model.trim="account.authorization['token']"></el-input>
+                        </el-form-item>
+                    </div>
                     <div v-if="account.type === 'CloudFlare'">
                         <el-form-item label="EMAIL" prop="authorization.email">
                             <el-input v-model.trim="account.authorization['email']"></el-input>

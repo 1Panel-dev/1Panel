@@ -3,10 +3,12 @@ package ssl
 import (
 	"crypto"
 	"encoding/json"
-	"github.com/go-acme/lego/v4/providers/dns/rainyun"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/go-acme/lego/v4/providers/dns/freemyip"
+	"github.com/go-acme/lego/v4/providers/dns/rainyun"
 
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/go-acme/lego/v4/acme"
@@ -73,6 +75,7 @@ const (
 	Volcengine   DnsType = "Volcengine"
 	CloudFlare   DnsType = "CloudFlare"
 	CloudDns     DnsType = "CloudDns"
+	FreeMyIP     DnsType = "FreeMyIP"
 	NameSilo     DnsType = "NameSilo"
 	NameCheap    DnsType = "NameCheap"
 	NameCom      DnsType = "NameCom"
@@ -155,6 +158,12 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string, websiteSSL model.Web
 		clouddnsConfig.PollingInterval = pollingInterval
 		clouddnsConfig.TTL = ttl
 		p, err = clouddns.NewDNSProviderConfig(clouddnsConfig)
+	case FreeMyIP:
+		freeMyIpConfig := freemyip.NewDefaultConfig()
+		freeMyIpConfig.Token = param.Token
+		freeMyIpConfig.PropagationTimeout = propagationTimeout
+		freeMyIpConfig.PollingInterval = pollingInterval
+		p, err = freemyip.NewDNSProviderConfig(freeMyIpConfig)
 	case NameCheap:
 		namecheapConfig := namecheap.NewDefaultConfig()
 		namecheapConfig.APIKey = param.APIkey
