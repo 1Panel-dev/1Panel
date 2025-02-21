@@ -612,6 +612,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		if err != nil {
 			return err
 		}
+		dockerCLi, err := docker.NewClient()
 		if req.PullImage {
 			images, err := composeV2.GetDockerComposeImagesV2(content, []byte(detail.DockerCompose))
 			if err != nil {
@@ -619,10 +620,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 			}
 			for _, image := range images {
 				t.Log(i18n.GetWithName("PullImageStart", image))
-				if out, err := cmd.ExecWithTimeOut("docker pull "+image, 20*time.Minute); err != nil {
-					if out != "" {
-						err = errors.New(out)
-					}
+				if err = dockerCLi.PullImageWithProcess(t, image); err != nil {
 					err = buserr.WithNameAndErr("ErrDockerPullImage", "", err)
 					return err
 				}
@@ -1046,6 +1044,10 @@ func upApp(task *task.Task, appInstall *model.AppInstall, pullImages bool) error
 				return err
 			}
 			imagePrefix := xpack.GetImagePrefix()
+			dockerCLi, err := docker.NewClient()
+			if err != nil {
+				return err
+			}
 			for _, image := range images {
 				if imagePrefix != "" {
 					lastSlashIndex := strings.LastIndex(image, "/")
@@ -1054,17 +1056,19 @@ func upApp(task *task.Task, appInstall *model.AppInstall, pullImages bool) error
 					}
 					image = imagePrefix + "/" + image
 				}
+
 				task.Log(i18n.GetWithName("PullImageStart", image))
-				if out, err = cmd.ExecWithTimeOut("docker pull "+image, 20*time.Minute); err != nil {
-					if out != "" {
-						if strings.Contains(out, "no such host") {
+				if err = dockerCLi.PullImageWithProcess(task, image); err != nil {
+					errOur := err.Error()
+					if errOur != "" {
+						if strings.Contains(errOur, "no such host") {
 							errMsg = i18n.GetMsgByKey("ErrNoSuchHost") + ":"
 						}
-						if strings.Contains(out, "timeout") {
+						if strings.Contains(errOur, "timeout") {
 							errMsg = i18n.GetMsgByKey("ErrImagePullTimeOut") + ":"
 						}
 					}
-					appInstall.Message = errMsg + out
+					appInstall.Message = errMsg + errOur
 					installErr := errors.New(appInstall.Message)
 					task.LogFailedWithErr(i18n.GetMsgByKey("PullImage"), installErr)
 					return installErr

@@ -2,17 +2,21 @@ package docker
 
 import (
 	"context"
-	"github.com/docker/docker/api/types/network"
-
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/image"
-
+	"encoding/json"
+	"fmt"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/global"
-
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
+	"github.com/docker/docker/api/types/image"
+	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
+	"io"
+	"os"
+	"strings"
+	"time"
 )
 
 func NewDockerClient() (*client.Client, error) {
@@ -26,10 +30,6 @@ func NewDockerClient() (*client.Client, error) {
 		return nil, err
 	}
 	return cli, nil
-}
-
-type Client struct {
-	cli *client.Client
 }
 
 func NewClient() (Client, error) {
@@ -48,10 +48,8 @@ func NewClient() (Client, error) {
 	}, nil
 }
 
-func NewClientWithCli(cli *client.Client) (Client, error) {
-	return Client{
-		cli: cli,
-	}, nil
+type Client struct {
+	cli *client.Client
 }
 
 func (c Client) Close() {
@@ -142,11 +140,75 @@ func CreateDefaultDockerNetwork() error {
 		global.LOG.Errorf("init docker client error %s", err.Error())
 		return err
 	}
+
 	defer cli.Close()
 	if !cli.NetworkExist("1panel-network") {
 		if err := cli.CreateNetwork("1panel-network"); err != nil {
 			global.LOG.Errorf("create default docker network  error %s", err.Error())
 			return err
+		}
+	}
+	return nil
+}
+
+func setLog(id, newLastLine string, task *task.Task) error {
+	data, err := os.ReadFile(task.Task.LogFile)
+	if err != nil {
+		return fmt.Errorf("failed to read file: %v", err)
+	}
+	lines := strings.Split(string(data), "\n")
+	exist := false
+	for index, line := range lines {
+		if strings.Contains(line, id) {
+			lines[index] = newLastLine
+			exist = true
+			break
+		}
+	}
+	if !exist {
+		task.Log(newLastLine)
+		return nil
+	}
+	output := strings.Join(lines, "\n")
+	_ = os.WriteFile(task.Task.LogFile, []byte(output), os.ModePerm)
+	return nil
+}
+
+func (c Client) PullImageWithProcess(task *task.Task, imageName string) error {
+	out, err := c.cli.ImagePull(context.Background(), imageName, image.PullOptions{})
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+	decoder := json.NewDecoder(out)
+	for {
+		var progress map[string]interface{}
+		if err = decoder.Decode(&progress); err != nil {
+			if err == io.EOF {
+				break
+			}
+			return err
+		}
+		timeStr := time.Now().Format("2006/01/02 15:04:05")
+		status, _ := progress["status"].(string)
+		if status == "Downloading" || status == "Extracting" {
+			id, _ := progress["id"].(string)
+			progressDetail, _ := progress["progressDetail"].(map[string]interface{})
+			current, _ := progressDetail["current"].(float64)
+			progressStr := ""
+			total, ok := progressDetail["total"].(float64)
+			if ok {
+				progressStr = fmt.Sprintf("%s %s [%s] --- %.2f%%", timeStr, status, id, (current/total)*100)
+			} else {
+				progressStr = fmt.Sprintf("%s %s [%s] --- %.2f%%", timeStr, status, id, current)
+			}
+
+			_ = setLog(id, progressStr, task)
+		}
+		if status == "Pull complete" || status == "Download complete" {
+			id, _ := progress["id"].(string)
+			progressStr := fmt.Sprintf("%s %s [%s] --- %.2f%%", timeStr, status, id, 100.0)
+			_ = setLog(id, progressStr, task)
 		}
 	}
 	return nil

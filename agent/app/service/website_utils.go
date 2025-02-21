@@ -849,7 +849,7 @@ func opWebsite(website *model.Website, operate string) error {
 				}
 				server.UpdatePHPProxy([]string{website.Proxy}, localPath)
 			} else {
-				proxy := fmt.Sprintf("http://127.0.0.1:%d", runtime.Port)
+				proxy := fmt.Sprintf("http://127.0.0.1:%s", runtime.Port)
 				server.UpdateRootProxy([]string{proxy})
 			}
 		}

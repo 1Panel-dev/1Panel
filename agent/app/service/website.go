@@ -1375,7 +1375,7 @@ func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) error
 			return buserr.New("ErrPHPResource")
 		}
 		website.RuntimeID = req.RuntimeID
-		phpProxy := fmt.Sprintf("127.0.0.1:%d", runtime.Port)
+		phpProxy := fmt.Sprintf("127.0.0.1:%s", runtime.Port)
 		website.Proxy = phpProxy
 		server.UpdatePHPProxy([]string{website.Proxy}, "")
 		website.Type = constant.Runtime

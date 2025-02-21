@@ -1,6 +1,7 @@
 package task
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"log"
@@ -26,6 +27,7 @@ type Task struct {
 	Name      string
 	TaskID    string
 	Logger    *log.Logger
+	Writer    *bufio.Writer
 	SubTasks  []*SubTask
 	Rollbacks []RollbackFunc
 	logFile   *os.File
@@ -111,6 +113,7 @@ func NewTask(name, operate, taskScope, taskID string, resourceID uint) (*Task, e
 	if err != nil {
 		return nil, fmt.Errorf("failed to open log file: %w", err)
 	}
+	writer := bufio.NewWriter(file)
 	logger := log.New(file, "", log.LstdFlags)
 	taskModel := &model.Task{
 		ID:         taskID,
@@ -122,7 +125,7 @@ func NewTask(name, operate, taskScope, taskID string, resourceID uint) (*Task, e
 		Operate:    operate,
 	}
 	taskRepo := repo.NewITaskRepo()
-	task := &Task{Name: name, logFile: file, Logger: logger, taskRepo: taskRepo, Task: taskModel}
+	task := &Task{Name: name, logFile: file, Logger: logger, taskRepo: taskRepo, Task: taskModel, Writer: writer}
 	return task, nil
 }
 

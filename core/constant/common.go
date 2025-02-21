@@ -126,6 +126,7 @@ var WebUrlMap = map[string]struct{}{
 	"/xpack/waf/websites":      {},
 	"/xpack/waf/log":           {},
 	"/xpack/waf/block":         {},
+	"/xpack/waf/blackwhite":    {},
 	"/xpack/monitor/dashboard": {},
 	"/xpack/monitor/setting":   {},
 	"/xpack/monitor/rank":      {},

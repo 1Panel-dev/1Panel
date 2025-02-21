@@ -1,5 +1,5 @@
 <template>
-    <div class="w-full h-full flex items-center justify-center px-8 py-6">
+    <div class="w-full h-full flex items-center justify-center px-8">
         <div v-loading="loading" class="w-full flex-grow flex flex-col">
             <div v-if="mfaShow">
                 <el-form @submit.prevent>
