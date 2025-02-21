@@ -2,12 +2,13 @@ package service
 
 import (
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/constant"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/constant"
 
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
@@ -157,8 +158,9 @@ func handlePostgresqlRecover(req dto.CommonRecover, isRollback bool) error {
 					Timeout: 300,
 				}); err != nil {
 					global.LOG.Errorf("rollback postgresql db %s from %s failed, err: %v", req.DetailName, rollbackFile, err)
+				} else {
+					global.LOG.Infof("rollback postgresql db %s from %s successful", req.DetailName, rollbackFile)
 				}
-				global.LOG.Infof("rollback postgresql db %s from %s successful", req.DetailName, rollbackFile)
 				_ = os.RemoveAll(rollbackFile)
 			} else {
 				_ = os.RemoveAll(rollbackFile)
@@ -171,6 +173,7 @@ func handlePostgresqlRecover(req dto.CommonRecover, isRollback bool) error {
 		Username:   dbInfo.Username,
 		Timeout:    300,
 	}); err != nil {
+		global.LOG.Errorf("recover postgresql db %s from %s failed, err: %v", req.DetailName, req.File, err)
 		return err
 	}
 	isOk = true

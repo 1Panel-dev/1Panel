@@ -2,12 +2,13 @@ package service
 
 import (
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/constant"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/constant"
 
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 
@@ -169,8 +170,9 @@ func handleMysqlRecover(req dto.CommonRecover, isRollback bool) error {
 					Timeout: 300,
 				}); err != nil {
 					global.LOG.Errorf("rollback mysql db %s from %s failed, err: %v", req.DetailName, rollbackFile, err)
+				} else {
+					global.LOG.Infof("rollback mysql db %s from %s successful", req.DetailName, rollbackFile)
 				}
-				global.LOG.Infof("rollback mysql db %s from %s successful", req.DetailName, rollbackFile)
 				_ = os.RemoveAll(rollbackFile)
 			} else {
 				_ = os.RemoveAll(rollbackFile)
@@ -186,6 +188,7 @@ func handleMysqlRecover(req dto.CommonRecover, isRollback bool) error {
 
 		Timeout: 300,
 	}); err != nil {
+		global.LOG.Errorf("recover mysql db %s from %s failed, err: %v", req.DetailName, req.File, err)
 		return err
 	}
 	isOk = true

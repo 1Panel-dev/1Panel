@@ -1262,12 +1262,12 @@ func loadContainerPortForInfo(itemPorts []types.Port) []dto.PortHelper {
 	var exposedPorts []dto.PortHelper
 	samePortMap := make(map[string]dto.PortHelper)
 	ports := transPortToStr(itemPorts)
-	var itemPort dto.PortHelper
 	for _, item := range ports {
 		itemStr := strings.Split(item, "->")
 		if len(itemStr) < 2 {
 			continue
 		}
+		var itemPort dto.PortHelper
 		lastIndex := strings.LastIndex(itemStr[0], ":")
 		if lastIndex == -1 {
 			itemPort.HostPort = itemStr[0]
