@@ -238,7 +238,7 @@ const search = async (appInstallID: number) => {
             if (res.data.sslID > 0) {
                 req.value.enableSSL = true;
                 req.value.sslID = res.data.sslID;
-                listSSL();
+                listAcmeAccount();
             }
         }
     } catch (e) {}
