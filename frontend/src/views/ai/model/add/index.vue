@@ -15,9 +15,9 @@
                     <template #title>
                         <span class="flx-align-center">
                             {{ $t('ai_tools.model.ollama_doc') }}
-                            <el-link class="ml-5" icon="Position" @click="goSearch()" type="primary">
+                            <el-button link class="ml-5" icon="Position" @click="goSearch()" type="primary">
                                 {{ $t('firewall.quickJump') }}
-                            </el-link>
+                            </el-button>
                         </span>
                     </template>
                 </el-alert>

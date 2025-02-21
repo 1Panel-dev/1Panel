@@ -114,14 +114,14 @@
                         </template>
                     </el-table-column>
                     <el-table-column
-                        min-width="100"
-                        :label="$t('commons.table.createdAt')"
+                        min-width="80"
+                        :label="$t('commons.table.date')"
                         prop="createdAt"
                         :formatter="dateFormat"
                     />
                     <fu-table-operations
                         :ellipsis="mobile ? 0 : 10"
-                        :min-width="mobile ? 'auto' : 100"
+                        :min-width="mobile ? 'auto' : 200"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         fixed="right"
