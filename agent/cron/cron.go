@@ -72,6 +72,7 @@ func Run() {
 			global.LOG.Errorf("update cronjob %s %s failed, err: %v", cronJobs[i].Type, cronJobs[i].Name, err)
 		}
 	}
+	global.Cron.Start()
 }
 
 func syncBeforeStart() {

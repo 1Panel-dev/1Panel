@@ -1120,6 +1120,7 @@ const message = {
             runtimes: '运行环境',
             process: '进程管理',
             toolbox: '工具箱',
+            backups: '备份 / 恢复',
             tampers: '防篡改',
             xsetting: '界面设置',
             logs: '日志审计',

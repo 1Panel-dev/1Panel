@@ -33,7 +33,13 @@
                         :min-width="80"
                         prop="name"
                         show-overflow-tooltip
-                    />
+                    >
+                        <template #default="{ row }">
+                            <el-text type="primary" class="cursor-pointer" @click="onInspect(row)">
+                                {{ row.name }}
+                            </el-text>
+                        </template>
+                    </el-table-column>
                     <el-table-column
                         v-if="globalStore.isProductPro"
                         :label="$t('setting.scope')"
@@ -103,6 +109,7 @@
         </LayoutContent>
 
         <Operate ref="dialogRef" @search="search" />
+        <DetailShow ref="detailRef" />
         <OpDialog ref="opRef" @search="search" />
     </div>
 </template>
@@ -111,10 +118,12 @@ import { dateFormat } from '@/utils/util';
 import { onMounted, ref } from 'vue';
 import { searchBackup, deleteBackup, refreshToken } from '@/api/modules/backup';
 import Operate from '@/views/setting/backup-account/operate/index.vue';
+import DetailShow from '@/components/detail-show/index.vue';
 import { Backup } from '@/api/interface/backup';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
+import { Base64 } from 'js-base64';
 const globalStore = GlobalStore();
 
 const loading = ref();
@@ -129,6 +138,7 @@ const paginationConfig = reactive({
 });
 const opRef = ref();
 const dialogRef = ref();
+const detailRef = ref();
 
 const search = async () => {
     let params = {
@@ -143,7 +153,7 @@ const search = async () => {
             loading.value = false;
             data.value = res.data.items || [];
             for (const bac of data.value) {
-                if (bac.id !== 0) {
+                if (bac.vars) {
                     bac.varsJson = JSON.parse(bac.vars);
                 }
             }
@@ -190,6 +200,68 @@ const onOpenDialog = async (
         rowData: { ...rowData },
     };
     dialogRef.value!.acceptParams(params);
+};
+
+const onInspect = (row: any) => {
+    let list = [];
+    list.push({ label: i18n.global.t('commons.table.name'), value: row.name, hideCopy: true });
+    list.push({
+        label: i18n.global.t('commons.table.type'),
+        value: i18n.global.t('setting.' + row.type),
+        hideCopy: true,
+    });
+    if (row.type === 'S3') {
+        list.push({ label: i18n.global.t('setting.mode'), value: row.varsJson['mode'] });
+    }
+    if (row.type === 'COS' || row.type === 'KODO' || row.type === 'MINIO' || row.type === 'OSS' || row.type === 'S3') {
+        if (row.rememberAuth) {
+            list.push({ label: 'Access Key ID', value: Base64.decode(row.accessKey) });
+            list.push({ label: 'Secret Key', value: Base64.decode(row.credential) });
+        }
+    }
+    if (row.type === 'UPYUN') {
+        if (row.rememberAuth) {
+            list.push({ label: i18n.global.t('setting.operator'), value: Base64.decode(row.accessKey) });
+            list.push({ label: i18n.global.t('commons.login.password'), value: Base64.decode(row.credential) });
+        }
+    }
+    if (row.type === 'WebDAV' || row.type === 'SFTP') {
+        list.push({ label: i18n.global.t('setting.address'), value: row.varsJson['address'] || '' });
+        list.push({ label: i18n.global.t('commons.login.username'), value: Base64.decode(row.accessKey) });
+    }
+    if (row.type === 'SFTP') {
+        list.push({ label: i18n.global.t('commons.table.port'), value: row.varsJson['port'] || '' });
+        if (row.rememberAuth) {
+            list.push({ label: i18n.global.t('terminal.authMode'), value: row.varsJson['authMode'] });
+            if (row.varsJson['authMode'] === 'key') {
+                list.push({ label: i18n.global.t('terminal.key'), value: Base64.decode(row.credential) });
+                list.push({ label: i18n.global.t('terminal.keyPassword'), value: row.varsJson['passPhrase'] });
+            } else {
+                list.push({ label: i18n.global.t('commons.login.password'), value: Base64.decode(row.credential) });
+            }
+        }
+    }
+    if (row.type === 'COS' || row.type === 'S3') {
+        list.push({ label: 'Region', value: row.varsJson['region'] || '' });
+    }
+    if (row.type === 'COS' || row.type === 'KODO' || row.type === 'MINIO' || row.type === 'OSS' || row.type === 'S3') {
+        list.push({
+            label: row.type === 'KODO' ? i18n.global.t('setting.domain') : 'Endpoint',
+            value: row.varsJson['endpoint'] || '',
+        });
+        list.push({ label: 'Bucket', value: row.bucket });
+    }
+    if (row.type === 'UPYUN') {
+        list.push({ label: i18n.global.t('setting.serviceName'), value: row.bucket });
+    }
+    if (row.type === 'COS' || row.type === 'OOS' || row.type === 'S3') {
+        list.push({ label: i18n.global.t('setting.scType'), value: row.varsJson['scType'] });
+    }
+    if (row.type === 'KODO') {
+        list.push({ label: i18n.global.t('cronjob.requestExpirationTime'), value: row.varsJson['timeout'] });
+    }
+    list.push({ label: i18n.global.t('setting.backupLabel'), value: row.backupPath });
+    detailRef.value.acceptParams({ list: list });
 };
 
 const refreshItemToken = async (row: any) => {

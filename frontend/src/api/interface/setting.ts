@@ -198,16 +198,6 @@ export namespace Setting {
 
         Children: Array<DataTree>;
     }
-    export interface SnapshotStatus {
-        baseData: string;
-        appImage: string;
-        panelData: string;
-        backupData: string;
-
-        compress: string;
-        size: string;
-        upload: string;
-    }
     export interface UpgradeInfo {
         testVersion: string;
         newVersion: string;

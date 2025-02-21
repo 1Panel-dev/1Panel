@@ -2,17 +2,6 @@ package dto
 
 import "time"
 
-type SnapshotStatus struct {
-	BaseData   string `json:"baseData"`
-	AppImage   string `json:"appImage"`
-	PanelData  string `json:"panelData"`
-	BackupData string `json:"backupData"`
-
-	Compress string `json:"compress"`
-	Size     string `json:"size"`
-	Upload   string `json:"upload"`
-}
-
 type PageSnapshot struct {
 	PageInfo
 	Info    string `json:"info"`

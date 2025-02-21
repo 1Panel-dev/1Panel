@@ -70,7 +70,7 @@ const initCodeMirror = () => {
     const defaultTheme = EditorView.theme({
         '&.cm-editor': {
             minHeight: props.minHeight + 'px',
-            height: props.height ? props.height + 'px' : 'calc(100vh - ' + props.heightDiff + 'px)',
+            height: loadHeight(),
         },
     });
 
@@ -117,6 +117,12 @@ const initCodeMirror = () => {
         state: startState,
         parent: editorRef.value,
     });
+};
+
+const loadHeight = () => {
+    if (props.height || props.heightDiff) {
+        return props.height ? props.height + 'px' : 'calc(100vh - ' + props.heightDiff + 'px)';
+    }
 };
 
 watch(

@@ -280,7 +280,8 @@
                             v-model="dialogData.rowData!.script"
                             placeholder="#Define or paste the content of your shell file here"
                             mode="javascript"
-                            :heightDiff="400"
+                            :heightDiff="0"
+                            :min-height="200"
                         />
                         <el-input
                             v-if="dialogData.rowData!.scriptMode=== 'select'"

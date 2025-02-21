@@ -121,9 +121,6 @@ export const snapshotCreate = (param: Setting.SnapshotCreate) => {
 export const snapshotRecreate = (id: number) => {
     return http.post(`/settings/snapshot/recreate`, { id: id });
 };
-export const loadSnapStatus = (id: number) => {
-    return http.post<Setting.SnapshotStatus>(`/settings/snapshot/status`, { id: id });
-};
 export const snapshotImport = (param: Setting.SnapshotImport) => {
     return http.post(`/settings/snapshot/import`, param);
 };
