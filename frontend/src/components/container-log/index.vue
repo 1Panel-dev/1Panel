@@ -48,7 +48,7 @@
 import { cleanContainerLog } from '@/api/modules/container';
 import i18n from '@/lang';
 import { dateFormatForName, downloadWithContent } from '@/utils/util';
-import { onBeforeUnmount, reactive, ref, shallowRef } from 'vue';
+import { nextTick, onBeforeUnmount, reactive, ref, shallowRef } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
@@ -113,10 +113,12 @@ const searchLogs = async () => {
     );
     terminalSocket.value.onmessage = (event) => {
         logInfo.value += event.data;
-        const state = view.value.state;
-        view.value.dispatch({
-            selection: { anchor: state.doc.length, head: state.doc.length },
-            scrollIntoView: true,
+        nextTick(() => {
+            const state = view.value.state;
+            view.value.dispatch({
+                selection: { anchor: state.doc.length, head: state.doc.length },
+                scrollIntoView: true,
+            });
         });
     };
 };
