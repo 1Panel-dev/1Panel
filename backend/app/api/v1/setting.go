@@ -66,6 +66,10 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
+	if req.Key == "SecurityEntrance" {
+		entranceValue := base64.StdEncoding.EncodeToString([]byte(req.Value))
+		c.SetCookie("SecurityEntrance", entranceValue, 0, "", "", false, true)
+	}
 	helper.SuccessWithData(c, nil)
 }
 
