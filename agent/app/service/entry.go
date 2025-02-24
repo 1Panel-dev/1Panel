@@ -11,6 +11,8 @@ var (
 	launcherRepo           = repo.NewILauncherRepo()
 	appInstallResourceRepo = repo.NewIAppInstallResourceRpo()
 
+	aiRepo = repo.NewIAiRepo()
+
 	mysqlRepo      = repo.NewIMysqlRepo()
 	postgresqlRepo = repo.NewIPostgresqlRepo()
 	databaseRepo   = repo.NewIDatabaseRepo()

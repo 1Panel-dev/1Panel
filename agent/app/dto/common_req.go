@@ -71,3 +71,8 @@ type UpdateGroup struct {
 type OperateWithTask struct {
 	TaskID string `json:"taskID"`
 }
+
+type ForceDelete struct {
+	IDs         []uint `json:"ids"`
+	ForceDelete bool   `json:"forceDelete"`
+}

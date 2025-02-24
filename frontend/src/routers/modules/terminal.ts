@@ -1,7 +1,7 @@
 import { Layout } from '@/routers/constant';
 
 const terminalRouter = {
-    sort: 7,
+    sort: 8,
     path: '/terminal',
     component: Layout,
     redirect: '/terminal',

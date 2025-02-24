@@ -24,6 +24,7 @@ func InitAgentDB() {
 		migrations.InitBackup,
 		migrations.UpdateAppTag,
 		migrations.UpdateApp,
+		migrations.AddOllamaModel,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

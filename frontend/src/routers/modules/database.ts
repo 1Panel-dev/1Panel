@@ -1,7 +1,7 @@
 import { Layout } from '@/routers/constant';
 
 const databaseRouter = {
-    sort: 4,
+    sort: 5,
     path: '/databases',
     component: Layout,
     redirect: '/databases/mysql',

@@ -30,7 +30,7 @@
                     >
                         {{ $t('commons.operate.restart') }}
                     </el-button>
-                    <el-divider direction="vertical" />
+                    <el-divider v-if="!hideSetting" direction="vertical" />
                     <el-button
                         type="primary"
                         link
@@ -42,6 +42,7 @@
                     </el-button>
                     <el-divider v-if="data.app === 'OpenResty'" direction="vertical" />
                     <el-button
+                        v-if="!hideSetting"
                         type="primary"
                         @click="setting"
                         link
@@ -88,6 +89,10 @@ const props = defineProps({
     appName: {
         type: String,
         default: '',
+    },
+    hideSetting: {
+        type: Boolean,
+        default: false,
     },
 });
 

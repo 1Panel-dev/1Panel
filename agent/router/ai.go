@@ -1,0 +1,29 @@
+package router
+
+import (
+	v1 "github.com/1Panel-dev/1Panel/agent/app/api/v2"
+	"github.com/gin-gonic/gin"
+)
+
+type AIToolsRouter struct {
+}
+
+func (a *AIToolsRouter) InitRouter(Router *gin.RouterGroup) {
+	aiToolsRouter := Router.Group("ai")
+
+	baseApi := v1.ApiGroupApp.BaseApi
+	{
+		aiToolsRouter.GET("/ollama/exec", baseApi.OllamaWsSsh)
+		aiToolsRouter.POST("/ollama/close", baseApi.CloseOllamaModel)
+		aiToolsRouter.POST("/ollama/model", baseApi.CreateOllamaModel)
+		aiToolsRouter.POST("/ollama/model/recreate", baseApi.RecreateOllamaModel)
+		aiToolsRouter.POST("/ollama/model/search", baseApi.SearchOllamaModel)
+		aiToolsRouter.POST("/ollama/model/sync", baseApi.SyncOllamaModel)
+		aiToolsRouter.POST("/ollama/model/load", baseApi.LoadOllamaModelDetail)
+		aiToolsRouter.POST("/ollama/model/del", baseApi.DeleteOllamaModel)
+		aiToolsRouter.GET("/gpu/load", baseApi.LoadGpuInfo)
+		aiToolsRouter.POST("/domain/bind", baseApi.BindDomain)
+		aiToolsRouter.POST("/domain/get", baseApi.GetBindDomain)
+		aiToolsRouter.POST("/domain/update", baseApi.UpdateBindDomain)
+	}
+}

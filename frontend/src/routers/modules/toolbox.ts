@@ -1,7 +1,7 @@
 import { Layout } from '@/routers/constant';
 
 const toolboxRouter = {
-    sort: 8,
+    sort: 9,
     path: '/toolbox',
     component: Layout,
     redirect: '/toolbox/supervisor',

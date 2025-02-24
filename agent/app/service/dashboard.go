@@ -17,10 +17,11 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/gpu"
+	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/xpu"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/copier"
-	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/host"
@@ -492,7 +493,17 @@ func loadDiskInfo() []dto.DiskInfo {
 }
 
 func loadGPUInfo() []dto.GPUInfo {
-	list := xpack.LoadGpuInfo()
+	ok, client := gpu.New()
+	var list []interface{}
+	if ok {
+		info, err := client.LoadGpuInfo()
+		if err != nil || len(info.GPUs) == 0 {
+			return nil
+		}
+		for _, item := range info.GPUs {
+			list = append(list, item)
+		}
+	}
 	if len(list) == 0 {
 		return nil
 	}
@@ -542,7 +553,17 @@ func ArryContains(arr []string, element string) bool {
 }
 
 func loadXpuInfo() []dto.XPUInfo {
-	list := xpack.LoadXpuInfo()
+	var list []interface{}
+	ok, xpuClient := xpu.New()
+	if ok {
+		xpus, err := xpuClient.LoadDashData()
+		if err != nil || len(xpus) == 0 {
+			return nil
+		}
+		for _, item := range xpus {
+			list = append(list, item)
+		}
+	}
 	if len(list) == 0 {
 		return nil
 	}

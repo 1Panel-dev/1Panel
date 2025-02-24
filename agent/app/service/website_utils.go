@@ -1231,3 +1231,55 @@ func openProxyCache(website model.Website) error {
 	proxyCachePath := fmt.Sprintf("/www/sites/%s/cache levels=1:2 keys_zone=proxy_cache_zone_of_%s:5m max_size=1g inactive=24h", website.Alias, website.Alias)
 	return updateNginxConfig("", []dto.NginxParam{{Name: "proxy_cache_path", Params: []string{proxyCachePath}}}, &website)
 }
+
+func ConfigAllowIPs(ips []string, website model.Website) error {
+	nginxFull, err := getNginxFull(&website)
+	if err != nil {
+		return err
+	}
+	nginxConfig := nginxFull.SiteConfig
+	config := nginxFull.SiteConfig.Config
+	server := config.FindServers()[0]
+	server.RemoveDirective("allow", nil)
+	server.RemoveDirective("deny", nil)
+	if len(ips) > 0 {
+		server.UpdateAllowIPs(ips)
+	}
+	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
+		return err
+	}
+	return nginxCheckAndReload(nginxConfig.OldContent, config.FilePath, nginxFull.Install.ContainerName)
+}
+
+func GetAllowIps(website model.Website) []string {
+	nginxFull, err := getNginxFull(&website)
+	if err != nil {
+		return nil
+	}
+	config := nginxFull.SiteConfig.Config
+	server := config.FindServers()[0]
+	dirs := server.GetDirectives()
+	var ips []string
+	for _, dir := range dirs {
+		if dir.GetName() == "allow" {
+			ips = append(ips, dir.GetParameters()...)
+		}
+	}
+	return ips
+}
+
+func ConfigAIProxy(website model.Website) error {
+	nginxFull, err := getNginxFull(&website)
+	if err != nil {
+		return nil
+	}
+	config := nginxFull.SiteConfig.Config
+	server := config.FindServers()[0]
+	dirs := server.GetDirectives()
+	for _, dir := range dirs {
+		if dir.GetName() == "location" && dir.GetParameters()[0] == "/" {
+			server.UpdateRootProxyForAi([]string{fmt.Sprintf("http://%s", website.Proxy)})
+		}
+	}
+	return nil
+}

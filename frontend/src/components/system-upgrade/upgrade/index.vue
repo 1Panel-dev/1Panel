@@ -56,7 +56,6 @@ interface DialogProps {
     upgradeVersion: string;
 }
 const acceptParams = (params: DialogProps): void => {
-    console.log(params);
     upgradeInfo.value = params.upgradeInfo;
     upgradeVersion.value = params.upgradeVersion;
     drawerVisible.value = true;
