@@ -187,7 +187,7 @@ func SyncRuntimesStatus(runtimes []model.Runtime) error {
 		}
 	}
 	for _, index := range runtimeContainer {
-		if runtimes[index].Status != constant.StatusBuilding {
+		if runtimes[index].Status != constant.StatusBuilding && runtimes[index].Status != constant.StatusCreating {
 			runtimes[index].Status = constant.StatusStopped
 		}
 	}
@@ -499,7 +499,7 @@ func handleCompose(env gotenv.Env, composeContent []byte, create request.Runtime
 		var volumes []interface{}
 		defaultVolumes := make(map[string]string)
 		switch create.Type {
-		case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimePython:
+		case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimePython, constant.RuntimeDotNet:
 			defaultVolumes = constant.RuntimeDefaultVolumes
 		case constant.RuntimeGo:
 			defaultVolumes = constant.GoDefaultVolumes

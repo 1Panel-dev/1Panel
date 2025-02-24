@@ -76,6 +76,16 @@ const message = {
             down: '停止',
             up: '啟動',
         },
+        operate: {
+            start: '啟動',
+            stop: '停止',
+            restart: '重新啟動',
+            reload: '重新載入',
+            rebuild: '重建',
+            sync: '同步',
+            up: '啟動',
+            down: '停止',
+        },
         search: {
             timeStart: '開始時間',
             timeEnd: '結束時間',

@@ -73,6 +73,16 @@ const message = {
             down: 'Parar',
             up: 'Iniciar',
         },
+        operate: {
+            start: 'Iniciar',
+            stop: 'Parar',
+            restart: 'Reiniciar',
+            reload: 'Recarregar',
+            rebuild: 'Reconstruir',
+            sync: 'Sincronizar',
+            up: 'Iniciar',
+            down: 'Parar',
+        },
         search: {
             timeStart: 'Hora inicial',
             timeEnd: 'Hora final',

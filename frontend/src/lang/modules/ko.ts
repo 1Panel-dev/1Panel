@@ -73,6 +73,16 @@ const message = {
             down: '중지',
             up: '시작',
         },
+        operate: {
+            start: '시작',
+            stop: '중지',
+            restart: '재시작',
+            reload: '다시 로드',
+            rebuild: '재구축',
+            sync: '동기화',
+            up: '실행',
+            down: '중지',
+        },
         search: {
             timeStart: '시작 시간',
             timeEnd: '종료 시간',

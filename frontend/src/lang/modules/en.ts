@@ -76,6 +76,16 @@ const message = {
             down: 'Stop',
             up: 'Start',
         },
+        operate: {
+            start: 'Start',
+            stop: 'Stop',
+            restart: 'Restart',
+            reload: 'Reload',
+            rebuild: 'Rebuild',
+            sync: 'Sync',
+            up: 'Up',
+            down: 'Down',
+        },
         search: {
             timeStart: 'Time start',
             timeEnd: 'Time end',

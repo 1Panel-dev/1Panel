@@ -73,6 +73,16 @@ const message = {
             down: 'Hentikan',
             up: 'Mulakan',
         },
+        operate: {
+            start: 'Mula',
+            stop: 'Hentikan',
+            restart: 'Mulai Semula',
+            reload: 'Muat Semula',
+            rebuild: 'Bangun Semula',
+            sync: 'Segerakkan',
+            up: 'Naik',
+            down: 'Turun',
+        },
         search: {
             timeStart: 'Masa mula',
             timeEnd: 'Masa tamat',

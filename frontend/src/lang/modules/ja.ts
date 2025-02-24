@@ -73,6 +73,16 @@ const message = {
             down: '停止',
             up: '起動',
         },
+        operate: {
+            start: '開始',
+            stop: '停止',
+            restart: '再起動',
+            reload: '再読み込み',
+            rebuild: '再構築',
+            sync: '同期',
+            up: '起動',
+            down: '停止',
+        },
         search: {
             timeStart: '時間開始',
             timeEnd: 'タイムエンド',

@@ -804,6 +804,9 @@ func (u *ContainerService) StreamLogs(ctx *gin.Context, params dto.StreamLog) {
 		select {
 		case msg, ok := <-messageChan:
 			if !ok {
+				if msg == "" {
+					return true
+				}
 				return false
 			}
 			_, err := fmt.Fprintf(w, "data: %v\n\n", msg)
@@ -812,8 +815,10 @@ func (u *ContainerService) StreamLogs(ctx *gin.Context, params dto.StreamLog) {
 			}
 			return true
 		case err := <-errorChan:
-			_, _ = fmt.Fprintf(w, "event: error\ndata: %v\n\n", err.Error())
-			return false
+			if err != nil {
+				_, _ = fmt.Fprintf(w, "event: error\ndata: %v\n\n", err.Error())
+			}
+			return true
 		case <-ctx.Request.Context().Done():
 			return false
 		}

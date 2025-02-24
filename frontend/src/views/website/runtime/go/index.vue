@@ -222,8 +222,8 @@ const goDashboard = async (port: any, protocol: string) => {
 const operateRuntime = async (operate: string, ID: number) => {
     try {
         const action = await ElMessageBox.confirm(
-            i18n.global.t('runtime.operatorHelper', [i18n.global.t('ommons.operate.' + operate)]),
-            i18n.global.t('ommons.operate.' + operate),
+            i18n.global.t('runtime.operatorHelper', [i18n.global.t('commons.operate.' + operate)]),
+            i18n.global.t('commons.operate.' + operate),
             {
                 confirmButtonText: i18n.global.t('commons.button.confirm'),
                 cancelButtonText: i18n.global.t('commons.button.cancel'),

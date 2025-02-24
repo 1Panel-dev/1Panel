@@ -226,7 +226,7 @@ const goInstall = (key: string, type: string) => {
         case 'java':
         case 'go':
         case 'python':
-        case 'donet':
+        case 'dotnet':
             router.push({ path: '/websites/runtimes/' + type });
             break;
         default:

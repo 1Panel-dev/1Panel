@@ -83,6 +83,8 @@ const message = {
             reload: '重载',
             rebuild: '重建',
             sync: '同步',
+            up: '启动',
+            down: '停止',
         },
         search: {
             timeStart: '开始时间',

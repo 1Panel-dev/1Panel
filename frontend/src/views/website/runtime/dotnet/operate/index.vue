@@ -80,7 +80,7 @@ const initData = (type: string) => ({
     environments: [],
     volumes: [],
 });
-let runtime = reactive<Runtime.RuntimeCreate>(initData('donet'));
+let runtime = reactive<Runtime.RuntimeCreate>(initData('dotnet'));
 const rules = ref<any>({
     name: [Rules.requiredInput, Rules.appName],
     appID: [Rules.requiredSelect],
