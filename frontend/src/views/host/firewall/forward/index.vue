@@ -77,7 +77,18 @@
             </div>
         </div>
 
-        <OpDialog ref="opRef" @search="search" />
+        <OpDialog ref="opRef" @search="search" @submit="onSubmitDelete()">
+            <template #content>
+                <el-form class="mt-4 mb-1" ref="deleteForm" label-position="left">
+                    <el-form-item>
+                        <el-checkbox v-model="forceDelete" :label="$t('website.forceDelete')" />
+                        <span class="input-help">
+                            {{ $t('website.forceDeleteHelper') }}
+                        </span>
+                    </el-form-item>
+                </el-form>
+            </template>
+        </OpDialog>
         <OperateDialog @search="search" ref="dialogRef" />
     </div>
 </template>
@@ -91,6 +102,7 @@ import { operateForwardRule, searchFireRule } from '@/api/modules/host';
 import { Host } from '@/api/interface/host';
 import i18n from '@/lang';
 import { GlobalStore } from '@/store';
+import { MsgSuccess } from '@/utils/message';
 
 const globalStore = GlobalStore();
 
@@ -107,6 +119,8 @@ const fireName = ref();
 const fireStatusRef = ref();
 
 const opRef = ref();
+const forceDelete = ref(false);
+const operateRules = ref();
 
 const data = ref();
 const paginationConfig = reactive({
@@ -180,6 +194,7 @@ const onDelete = async (row: Host.RuleForward | null) => {
             });
         }
     }
+    operateRules.value = rules;
     opRef.value.acceptParams({
         title: i18n.global.t('commons.button.delete'),
         names: names,
@@ -187,9 +202,22 @@ const onDelete = async (row: Host.RuleForward | null) => {
             i18n.global.t('firewall.forwardRule'),
             i18n.global.t('commons.button.delete'),
         ]),
-        api: operateForwardRule,
-        params: { rules: rules },
+        api: null,
+        params: null,
     });
+};
+
+const onSubmitDelete = async () => {
+    loading.value = true;
+    await operateForwardRule({ rules: operateRules.value, forceDelete: forceDelete.value })
+        .then(() => {
+            loading.value = false;
+            MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
+            search();
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const buttons = [
@@ -208,6 +236,7 @@ const buttons = [
 ];
 
 onMounted(() => {
+    forceDelete.value = false;
     if (fireName.value !== '-') {
         loading.value = true;
         fireStatusRef.value.acceptParams();
