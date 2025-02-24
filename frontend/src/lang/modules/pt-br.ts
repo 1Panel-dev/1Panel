@@ -293,7 +293,7 @@ const message = {
             executing: 'Executando',
             installerr: 'Falha na instalação',
             applyerror: 'Falha na aplicação',
-            interrupt: 'Interrompido',
+            systemrestart: 'Interrompido',
         },
         units: {
             second: 'segundo | segundos | segundos',
@@ -1773,9 +1773,6 @@ const message = {
         author: 'Autor',
         source: 'Fonte',
         appName: 'Nome do Aplicativo',
-        start: 'Iniciar',
-        stop: 'Parar',
-        rebuild: 'Reconstruir',
         deleteWarn:
             'A operação de exclusão excluirá todos os dados e backups juntos. Esta operação não pode ser desfeita. Deseja continuar?',
         syncSuccess: 'Sincronizado com sucesso',

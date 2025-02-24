@@ -66,20 +66,7 @@
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" prop="status">
                         <template #default="{ row }">
-                            <el-popover
-                                v-if="row.status === 'error' || row.status === 'systemRestart'"
-                                placement="bottom"
-                                :width="400"
-                                trigger="hover"
-                                :content="row.message"
-                            >
-                                <template #reference>
-                                    <Status :key="row.status" :status="row.status"></Status>
-                                </template>
-                            </el-popover>
-                            <div v-else>
-                                <Status :key="row.status" :status="row.status"></Status>
-                            </div>
+                            <RuntimeStatus :row="row" />
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.button.log')" prop="">
@@ -134,12 +121,12 @@ import ExtManagement from './extension-management/index.vue';
 import Extensions from './extension-template/index.vue';
 import AppResources from '@/views/website/runtime/php/check/index.vue';
 import CreateRuntime from '@/views/website/runtime/php/create/index.vue';
-import Status from '@/components/status/index.vue';
 import RouterMenu from '../index.vue';
 import Log from '@/components/log-dialog/index.vue';
 import ComposeLogs from '@/components/compose-log/index.vue';
 import Config from '@/views/website/runtime/php/config/index.vue';
 import Supervisor from '@/views/website/runtime/php/supervisor/index.vue';
+import RuntimeStatus from '@/views/website/runtime/components/runtime-status.vue';
 
 const paginationConfig = reactive({
     cacheSizeKey: 'runtime-page-size',
@@ -177,7 +164,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('app.stop'),
+        label: i18n.global.t('commons.operate.stop'),
         click: function (row: Runtime.Runtime) {
             operateRuntime('down', row.id);
         },
@@ -186,7 +173,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('app.start'),
+        label: i18n.global.t('commons.operate.start'),
         click: function (row: Runtime.Runtime) {
             operateRuntime('up', row.id);
         },
@@ -277,7 +264,7 @@ const openSupervisor = (row: Runtime.Runtime) => {
 };
 
 const openLog = (row: Runtime.RuntimeDTO) => {
-    if (row.status == 'running') {
+    if (row.status == 'Running') {
         composeLogRef.value.acceptParams({ compose: row.path + '/docker-compose.yml', resource: row.name });
     } else {
         logRef.value.acceptParams({ id: row.id, type: 'php', tail: row.status == 'building', heightDiff: 220 });

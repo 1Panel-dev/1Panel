@@ -288,7 +288,7 @@ const message = {
             executing: '執行中',
             installerr: '安裝失敗',
             applyerror: '申請失敗',
-            interrupt: '中斷',
+            systemrestart: '中斷',
         },
         units: {
             second: '秒',
@@ -1756,9 +1756,6 @@ const message = {
         author: '作者',
         source: '來源',
         appName: '應用名稱',
-        start: '啟動',
-        stop: '停止',
-        rebuild: '重建',
         deleteWarn: '刪除操作會把所有數據和備份一並刪除，此操作不可回滾，是否繼續？',
         syncSuccess: '同步成功',
         canUpgrade: '可升級',

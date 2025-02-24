@@ -289,7 +289,7 @@ const message = {
             executing: '실행 중',
             installerr: '설치 실패',
             applyerror: '적용 실패',
-            interrupt: '중단됨',
+            systemrestart: '중단됨',
         },
         units: {
             second: '초 | 초 | 초',
@@ -1699,9 +1699,6 @@ const message = {
         author: '저자',
         source: '출처',
         appName: '애플리케이션 이름',
-        start: '시작',
-        stop: '중지',
-        rebuild: '재빌드',
         deleteWarn:
             '삭제 작업은 모든 데이터와 백업을 함께 삭제합니다. 이 작업은 되돌릴 수 없습니다. 계속 하시겠습니까?',
         syncSuccess: '동기화 성공',

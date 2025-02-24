@@ -16,10 +16,10 @@
                         @click="onOperate('start')"
                         :disabled="data.status === 'Installing'"
                     >
-                        {{ $t('app.start') }}
+                        {{ $t('commons.operate.start') }}
                     </el-button>
                     <el-button type="primary" v-if="data.status === 'Running'" link @click="onOperate('stop')">
-                        {{ $t('app.stop') }}
+                        {{ $t('commons.operate.stop') }}
                     </el-button>
                     <el-divider direction="vertical" />
                     <el-button
@@ -28,7 +28,7 @@
                         :disabled="data.status === 'Installing'"
                         @click="onOperate('restart')"
                     >
-                        {{ $t('commons.button.restart') }}
+                        {{ $t('commons.operate.restart') }}
                     </el-button>
                     <el-divider direction="vertical" />
                     <el-button
@@ -38,7 +38,7 @@
                         @click="onOperate('reload')"
                         :disabled="data.status !== 'Running'"
                     >
-                        {{ $t('app.reload') }}
+                        {{ $t('commons.operate.reload') }}
                     </el-button>
                     <el-divider v-if="data.app === 'OpenResty'" direction="vertical" />
                     <el-button
@@ -136,8 +136,8 @@ const onCheck = async (key: any, name: any) => {
 const onOperate = async (operation: string) => {
     operateReq.operate = operation;
     ElMessageBox.confirm(
-        i18n.global.t('app.operatorHelper', [i18n.global.t('app.' + operation)]),
-        i18n.global.t('app.' + operation),
+        i18n.global.t('app.operatorHelper', [i18n.global.t('commons.operate.' + operation)]),
+        i18n.global.t('commons.operate.' + operation),
         {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
             cancelButtonText: i18n.global.t('commons.button.cancel'),

@@ -119,7 +119,7 @@ func handleRuntimeRecover(runtime *model.Runtime, recoverFile string, isRollback
 	}
 
 	oldRuntime.ID = runtime.ID
-	oldRuntime.Status = constant.RuntimeStarting
+	oldRuntime.Status = constant.StatusStarting
 	if err := runtimeRepo.Save(&oldRuntime); err != nil {
 		global.LOG.Errorf("save db app install failed, err: %v", err)
 		return err

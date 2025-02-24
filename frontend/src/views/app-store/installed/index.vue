@@ -539,8 +539,8 @@ const operate = async () => {
 
 const onOperate = async (operation: string) => {
     ElMessageBox.confirm(
-        i18n.global.t('app.operatorHelper', [i18n.global.t('app.' + operation)]),
-        i18n.global.t('app.' + operation),
+        i18n.global.t('app.operatorHelper', [i18n.global.t('commons.operate.' + operation)]),
+        i18n.global.t('commons.operate.' + operation),
         {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
             cancelButtonText: i18n.global.t('commons.button.cancel'),
@@ -553,7 +553,7 @@ const onOperate = async (operation: string) => {
 
 const buttons = [
     {
-        label: i18n.global.t('commons.button.sync'),
+        label: i18n.global.t('commons.operate.sync'),
         click: (row: any) => {
             openOperate(row, 'sync');
         },
@@ -567,7 +567,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('app.rebuild'),
+        label: i18n.global.t('commons.operate.rebuild'),
         click: (row: any) => {
             openOperate(row, 'rebuild');
         },
@@ -581,7 +581,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('commons.button.restart'),
+        label: i18n.global.t('commons.operate.restart'),
         click: (row: any) => {
             openOperate(row, 'restart');
         },
@@ -595,7 +595,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('app.start'),
+        label: i18n.global.t('commons.operate.start'),
         click: (row: any) => {
             openOperate(row, 'start');
         },
@@ -611,7 +611,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('app.stop'),
+        label: i18n.global.t('commons.operate.stop'),
         click: (row: any) => {
             openOperate(row, 'stop');
         },

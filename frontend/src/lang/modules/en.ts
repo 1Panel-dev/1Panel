@@ -294,7 +294,7 @@ const message = {
             executing: 'Executing',
             installerr: 'Installation failed',
             applyerror: 'Apply failed',
-            interrupt: 'Interrupted',
+            systemrestart: 'Interrupted',
         },
         units: {
             second: 'Second',
@@ -1871,9 +1871,6 @@ const message = {
         author: 'Author',
         source: 'Source',
         appName: 'Application Name',
-        start: 'Start',
-        stop: 'Stop',
-        rebuild: 'Rebuild',
         deleteWarn:
             'The delete operation will delete all data and backups together. This operation cannot be rolled back. Do you want to continue? ',
         syncSuccess: 'Sync successfully',

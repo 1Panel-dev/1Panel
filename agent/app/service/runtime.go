@@ -102,7 +102,7 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, e
 				Resource: create.Resource,
 				Type:     create.Type,
 				Version:  create.Version,
-				Status:   constant.RuntimeNormal,
+				Status:   constant.StatusNormal,
 			}
 			return nil, runtimeRepo.Create(context.Background(), runtime)
 		}
@@ -196,14 +196,17 @@ func (r *RuntimeService) Page(req request.RuntimeSearch) (int64, []response.Runt
 	if err != nil {
 		return 0, nil, err
 	}
+	if err = SyncRuntimesStatus(runtimes); err != nil {
+		return 0, nil, err
+	}
 	for _, runtime := range runtimes {
 		runtimeDTO := response.NewRuntimeDTO(runtime)
 		runtimeDTO.Params = make(map[string]interface{})
-		envs, err := gotenv.Unmarshal(runtime.Env)
+		envMap, err := gotenv.Unmarshal(runtime.Env)
 		if err != nil {
 			return 0, nil, err
 		}
-		for k, v := range envs {
+		for k, v := range envMap {
 			runtimeDTO.Params[k] = v
 		}
 		res = append(res, runtimeDTO)
@@ -498,7 +501,7 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 	switch runtime.Type {
 	case constant.RuntimePHP:
 		runtime.Image = req.Image
-		runtime.Status = constant.RuntimeBuildIng
+		runtime.Status = constant.StatusBuilding
 		_ = runtimeRepo.Save(runtime)
 		client, err := docker.NewClient()
 		if err != nil {
@@ -514,7 +517,7 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 		runtime.Version = req.Version
 		runtime.CodeDir = req.CodeDir
 		runtime.Port = strings.Join(hostPorts, ",")
-		runtime.Status = constant.RuntimeReCreating
+		runtime.Status = constant.StatusReCreating
 		_ = runtimeRepo.Save(runtime)
 		go reCreateRuntime(runtime)
 	}
@@ -559,7 +562,7 @@ func (r *RuntimeService) OperateRuntime(req request.RuntimeOperate) error {
 	}
 	defer func() {
 		if err != nil {
-			runtime.Status = constant.RuntimeError
+			runtime.Status = constant.StatusError
 			runtime.Message = err.Error()
 			_ = runtimeRepo.Save(runtime)
 		}
@@ -576,7 +579,7 @@ func (r *RuntimeService) OperateRuntime(req request.RuntimeOperate) error {
 		if err = runComposeCmdWithLog(req.Operate, runtime.GetComposePath(), runtime.GetLogPath()); err != nil {
 			return err
 		}
-		runtime.Status = constant.RuntimeStopped
+		runtime.Status = constant.StatusStopped
 	case constant.RuntimeRestart:
 		if err = restartRuntime(runtime); err != nil {
 			return err
@@ -661,7 +664,7 @@ func (r *RuntimeService) SyncForRestart() error {
 		return err
 	}
 	for _, runtime := range runtimes {
-		if runtime.Status == constant.RuntimeBuildIng || runtime.Status == constant.RuntimeReCreating || runtime.Status == constant.RuntimeStarting || runtime.Status == constant.RuntimeCreating {
+		if runtime.Status == constant.StatusBuilding || runtime.Status == constant.StatusReCreating || runtime.Status == constant.StatusStarting || runtime.Status == constant.StatusCreating {
 			runtime.Status = constant.SystemRestart
 			runtime.Message = "System restart causing interrupt"
 			_ = runtimeRepo.Save(&runtime)

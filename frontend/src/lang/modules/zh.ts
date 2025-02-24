@@ -76,6 +76,14 @@ const message = {
             down: '停止',
             up: '启动',
         },
+        operate: {
+            start: '启动',
+            stop: '停止',
+            restart: '重启',
+            reload: '重载',
+            rebuild: '重建',
+            sync: '同步',
+        },
         search: {
             timeStart: '开始时间',
             timeEnd: '结束时间',
@@ -286,7 +294,7 @@ const message = {
             executing: '执行中',
             installerr: '安装失败',
             applyerror: '申请失败',
-            interrupt: '中断',
+            systemrestart: '中断',
         },
         units: {
             second: '秒',
@@ -1723,9 +1731,6 @@ const message = {
         author: '作者',
         source: '来源',
         appName: '应用名称',
-        start: '启动',
-        stop: '停止',
-        rebuild: '重建',
         deleteWarn: '删除操作会把所有数据和备份一并删除，此操作不可回滚，是否继续？',
         syncSuccess: '同步成功',
         canUpgrade: '可升级',

@@ -53,25 +53,15 @@
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" prop="status">
                         <template #default="{ row }">
-                            <el-popover
-                                v-if="row.status === 'error'"
-                                placement="bottom"
-                                :width="400"
-                                trigger="hover"
-                                :content="row.message"
-                            >
-                                <template #reference>
-                                    <Status :key="row.status" :status="row.status"></Status>
-                                </template>
-                            </el-popover>
-                            <div v-else>
-                                <Status :key="row.status" :status="row.status"></Status>
-                            </div>
+                            <RuntimeStatus :row="row" />
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.button.log')" prop="path" min-width="90px">
                         <template #default="{ row }">
-                            <el-button @click="openLog(row)" link type="primary">{{ $t('website.check') }}</el-button>
+                            <el-button @click="openLog(row)" link type="primary" v-if="row.status != 'Stopped'">
+                                {{ $t('website.check') }}
+                            </el-button>
+                            <span v-else>-</span>
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -107,7 +97,6 @@ import { Runtime } from '@/api/interface/runtime';
 import { OperateRuntime, RuntimeDeleteCheck, SearchRuntimes, SyncRuntime } from '@/api/modules/runtime';
 import { dateFormat } from '@/utils/util';
 import OperateJava from '@/views/website/runtime/java/operate/index.vue';
-import Status from '@/components/status/index.vue';
 import Delete from '@/views/website/runtime/delete/index.vue';
 import i18n from '@/lang';
 import RouterMenu from '../index.vue';
@@ -117,6 +106,7 @@ import { Promotion } from '@element-plus/icons-vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import AppResources from '@/views/website/runtime/php/check/index.vue';
 import { ElMessageBox } from 'element-plus';
+import RuntimeStatus from '@/views/website/runtime/components/runtime-status.vue';
 
 let timer: NodeJS.Timer | null = null;
 const loading = ref(false);
@@ -141,7 +131,7 @@ const req = reactive<Runtime.RuntimeReq>({
 });
 const buttons = [
     {
-        label: i18n.global.t('app.stop'),
+        label: i18n.global.t('commons.operate.stop'),
         click: function (row: Runtime.Runtime) {
             operateRuntime('down', row.id);
         },
@@ -150,7 +140,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('app.start'),
+        label: i18n.global.t('commons.operate.start'),
         click: function (row: Runtime.Runtime) {
             operateRuntime('up', row.id);
         },
@@ -232,8 +222,8 @@ const goDashboard = async (port: any, protocol: string) => {
 const operateRuntime = async (operate: string, ID: number) => {
     try {
         const action = await ElMessageBox.confirm(
-            i18n.global.t('runtime.operatorHelper', [i18n.global.t('commons.button.' + operate)]),
-            i18n.global.t('commons.button.' + operate),
+            i18n.global.t('runtime.operatorHelper', [i18n.global.t('commons.operate' + operate)]),
+            i18n.global.t('commons.operate.' + operate),
             {
                 confirmButtonText: i18n.global.t('commons.button.confirm'),
                 cancelButtonText: i18n.global.t('commons.button.cancel'),

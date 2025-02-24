@@ -288,7 +288,7 @@ const message = {
             executing: '実行中',
             installerr: 'インストールに失敗しました',
             applyerror: '適用に失敗しました',
-            interrupt: '中断',
+            systemrestart: '中断',
         },
         units: {
             second: '2番目|2番目|秒',
@@ -1729,9 +1729,6 @@ const message = {
         author: '著者',
         source: 'ソース',
         appName: 'アプリケーション名',
-        start: '始める',
-        stop: '停止',
-        rebuild: '再構築します',
         deleteWarn:
             '削除操作は、すべてのデータとバックアップを一緒に削除します。この操作はロールバックすることはできません。続けたいですか？',
         syncSuccess: '正常に同期しました',

@@ -295,7 +295,7 @@ const message = {
             executing: 'Melaksanakan',
             installerr: 'Pemasangan gagal',
             applyerror: 'Permohonan gagal',
-            interrupt: 'Dihentikan',
+            systemrestart: 'Dihentikan',
         },
         units: {
             second: 'saat | saat | saat',
@@ -1786,9 +1786,6 @@ const message = {
         author: 'Pengarang',
         source: 'Sumber',
         appName: 'Nama Aplikasi',
-        start: 'Mula',
-        stop: 'Henti',
-        rebuild: 'Bina Semula',
         deleteWarn:
             'Operasi memadam akan memadam semua data dan sandaran bersama. Operasi ini tidak boleh dipulihkan. Adakah anda mahu meneruskan?',
         syncSuccess: 'Disegerakkan dengan berjaya',
