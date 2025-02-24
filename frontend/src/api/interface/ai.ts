@@ -104,6 +104,7 @@ export namespace AI {
     export interface BindDomainRes {
         domain: string;
         sslID: number;
+        acmeAccountID: number;
         allowIPs: string[];
         websiteID?: number;
         connUrl: string;

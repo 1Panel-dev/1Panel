@@ -202,9 +202,6 @@ const listSSL = () => {
 const listAcmeAccount = () => {
     SearchAcmeAccount({ page: 1, pageSize: 100 }).then((res) => {
         acmeAccounts.value = res.data.items || [];
-        if (acmeAccounts.value.length > 0) {
-            req.value.acmeAccountID = acmeAccounts.value[0].id;
-        }
         listSSL();
     });
 };
@@ -238,6 +235,7 @@ const search = async (appInstallID: number) => {
             if (res.data.sslID > 0) {
                 req.value.enableSSL = true;
                 req.value.sslID = res.data.sslID;
+                req.value.acmeAccountID = res.data.acmeAccountID;
                 listAcmeAccount();
             }
         }

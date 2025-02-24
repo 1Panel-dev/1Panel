@@ -297,6 +297,8 @@ func (u *AIToolService) GetBindDomain(req dto.OllamaBindDomainReq) (*dto.OllamaB
 	res.Domain = website.PrimaryDomain
 	if website.WebsiteSSLID > 0 {
 		res.SSLID = website.WebsiteSSLID
+		ssl, _ := websiteSSLRepo.GetFirst(commonRepo.WithByID(website.WebsiteSSLID))
+		res.AcmeAccountID = ssl.AcmeAccountID
 	}
 	res.ConnUrl = fmt.Sprintf("%s://%s", strings.ToLower(website.Protocol), website.PrimaryDomain)
 	res.AllowIPs = GetAllowIps(website)
