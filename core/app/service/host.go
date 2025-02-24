@@ -231,6 +231,14 @@ func (u *HostService) SearchForTree(search dto.SearchForTree) ([]dto.HostTree, e
 }
 
 func (u *HostService) Create(req dto.HostOperate) (*dto.HostInfo, error) {
+	if req.Name == "local" {
+		return nil, buserr.New("ErrRecordExist")
+	}
+	hostItem, _ := hostRepo.Get(hostRepo.WithByAddr(req.Addr), hostRepo.WithByUser(req.User), hostRepo.WithByPort(req.Port))
+	if hostItem.ID != 0 {
+		return nil, buserr.New("ErrRecordExist")
+	}
+
 	var err error
 	if len(req.Password) != 0 && req.AuthMode == "password" {
 		req.Password, err = u.EncryptHost(req.Password)
@@ -264,37 +272,6 @@ func (u *HostService) Create(req dto.HostOperate) (*dto.HostInfo, error) {
 		}
 		host.GroupID = group.ID
 		req.GroupID = group.ID
-	}
-	var sameHostID uint
-	if req.Name == "local" {
-		hostSame, _ := hostRepo.Get(repo.WithByName("local"))
-		sameHostID = hostSame.ID
-	} else {
-		hostSame, _ := hostRepo.Get(hostRepo.WithByAddr(req.Addr), hostRepo.WithByUser(req.User), hostRepo.WithByPort(req.Port))
-		sameHostID = hostSame.ID
-	}
-	if sameHostID != 0 {
-		host.ID = sameHostID
-		upMap := make(map[string]interface{})
-		upMap["name"] = req.Name
-		upMap["group_id"] = req.GroupID
-		upMap["addr"] = req.Addr
-		upMap["port"] = req.Port
-		upMap["user"] = req.User
-		upMap["auth_mode"] = req.AuthMode
-		upMap["password"] = req.Password
-		upMap["private_key"] = req.PrivateKey
-		upMap["pass_phrase"] = req.PassPhrase
-		upMap["remember_password"] = req.RememberPassword
-		upMap["description"] = req.Description
-		if err := hostRepo.Update(sameHostID, upMap); err != nil {
-			return nil, err
-		}
-		var hostinfo dto.HostInfo
-		if err := copier.Copy(&hostinfo, &host); err != nil {
-			return nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
-		}
-		return &hostinfo, nil
 	}
 
 	if err := hostRepo.Create(&host); err != nil {
