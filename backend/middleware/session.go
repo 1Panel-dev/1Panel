@@ -7,10 +7,10 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/gin-gonic/gin"
 	"net"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -102,27 +102,38 @@ func isValid1PanelToken(panelToken string, panelTimestamp string) bool {
 
 func isIPInWhiteList(clientIP string) bool {
 	ipWhiteString := global.CONF.System.IpWhiteList
-	ipWhiteList := strings.Split(ipWhiteString, "\n")
+	if len(ipWhiteString) == 0 {
+		global.LOG.Error("IP whitelist is empty")
+		return false
+	}
+	ipWhiteList, ipErr := common.HandleIPList(ipWhiteString)
+	if ipErr != nil {
+		global.LOG.Errorf("Failed to handle IP list: %v", ipErr)
+		return false
+	}
+	clientParsedIP := net.ParseIP(clientIP)
+	if clientParsedIP == nil {
+		return false
+	}
+	iPv4 := clientParsedIP.To4()
+	iPv6 := clientParsedIP.To16()
 	for _, cidr := range ipWhiteList {
-		if cidr == "0.0.0.0" {
+		if (iPv4 != nil && (cidr == "0.0.0.0" || cidr == "0.0.0.0/0" || iPv4.String() == cidr)) || (iPv6 != nil && (cidr == "::/0" || iPv6.String() == cidr)) {
 			return true
 		}
 		_, ipNet, err := net.ParseCIDR(cidr)
 		if err != nil {
-			if cidr == clientIP {
-				return true
-			}
 			continue
 		}
-		if ipNet.Contains(net.ParseIP(clientIP)) {
+		if (iPv4 != nil && ipNet.Contains(iPv4)) || (iPv6 != nil && ipNet.Contains(iPv6)) {
 			return true
 		}
 	}
 	return false
 }
 
-func GenerateMD5(input string) string {
+func GenerateMD5(param string) string {
 	hash := md5.New()
-	hash.Write([]byte(input))
+	hash.Write([]byte(param))
 	return hex.EncodeToString(hash.Sum(nil))
 }
