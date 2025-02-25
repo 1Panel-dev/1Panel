@@ -196,7 +196,7 @@
                                 <el-tab-pane :label="$t('container.mount')">
                                     <el-form-item>
                                         <el-table v-if="form.volumes.length !== 0" :data="form.volumes">
-                                            <el-table-column :label="$t('container.server')" min-width="120">
+                                            <el-table-column :label="$t('container.server')" min-width="150">
                                                 <template #default="{ row }">
                                                     <el-radio-group v-model="row.type">
                                                         <el-radio-button value="volume">
@@ -234,7 +234,7 @@
                                                     <el-input v-else v-model="row.sourceDir" />
                                                 </template>
                                             </el-table-column>
-                                            <el-table-column :label="$t('container.mode')" min-width="120">
+                                            <el-table-column :label="$t('container.mode')" min-width="130">
                                                 <template #default="{ row }">
                                                     <el-radio-group v-model="row.mode">
                                                         <el-radio value="rw">{{ $t('container.modeRW') }}</el-radio>
@@ -425,6 +425,7 @@
         </LayoutContent>
         <Command ref="commandRef" />
         <Confirm ref="confirmRef" @submit="submit" />
+        <TaskLog ref="taskLogRef" width="70%" />
     </div>
 </template>
 
@@ -446,14 +447,16 @@ import {
     loadContainerInfo,
 } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
-import { MsgError, MsgSuccess } from '@/utils/message';
-import { checkIpV4V6, checkPort } from '@/utils/util';
+import { MsgError } from '@/utils/message';
+import TaskLog from '@/components/task-log/index.vue';
+import { checkIpV4V6, checkPort, newUUID } from '@/utils/util';
 import router from '@/routers';
 
 const loading = ref(false);
 const isCreate = ref();
 const confirmRef = ref();
 const form = reactive<Container.ContainerHelper>({
+    taskID: '',
     containerID: '',
     name: '',
     image: '',
@@ -557,6 +560,7 @@ const search = async () => {
 };
 
 const commandRef = ref();
+const taskLogRef = ref();
 const images = ref();
 const volumes = ref();
 const networks = ref();
@@ -654,6 +658,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
 };
 const submit = async () => {
     form.cmd = [];
+    form.taskID = newUUID();
     if (form.cmdStr) {
         let itemCmd = splitStringIgnoringQuotes(form.cmdStr);
         for (const item of itemCmd) {
@@ -682,8 +687,7 @@ const submit = async () => {
         await createContainer(form)
             .then(() => {
                 loading.value = false;
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                goBack();
+                openTaskLog(form.taskID);
             })
             .catch(() => {
                 loading.value = false;
@@ -692,14 +696,17 @@ const submit = async () => {
         await updateContainer(form)
             .then(() => {
                 loading.value = false;
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                goBack();
+                openTaskLog(form.taskID);
             })
             .catch(() => {
                 updateContainerID();
                 loading.value = false;
             });
     }
+};
+
+const openTaskLog = (taskID: string) => {
+    taskLogRef.value.openWithTaskID(taskID);
 };
 
 const updateContainerID = async () => {

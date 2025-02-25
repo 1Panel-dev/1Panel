@@ -804,10 +804,7 @@ func (u *ContainerService) StreamLogs(ctx *gin.Context, params dto.StreamLog) {
 		select {
 		case msg, ok := <-messageChan:
 			if !ok {
-				if msg == "" {
-					return true
-				}
-				return false
+				return msg == ""
 			}
 			_, err := fmt.Fprintf(w, "data: %v\n\n", msg)
 			if err != nil {
@@ -1495,12 +1492,12 @@ func loadContainerPortForInfo(itemPorts []types.Port) []dto.PortHelper {
 	var exposedPorts []dto.PortHelper
 	samePortMap := make(map[string]dto.PortHelper)
 	ports := transPortToStr(itemPorts)
-	var itemPort dto.PortHelper
 	for _, item := range ports {
 		itemStr := strings.Split(item, "->")
 		if len(itemStr) < 2 {
 			continue
 		}
+		var itemPort dto.PortHelper
 		lastIndex := strings.LastIndex(itemStr[0], ":")
 		if lastIndex == -1 {
 			itemPort.HostPort = itemStr[0]

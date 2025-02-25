@@ -75,10 +75,10 @@
                 </el-button>
                 <el-button-group>
                     <el-button :disabled="checkStatus('start', null)" @click="onOperate('start', null)">
-                        {{ $t('app.start') }}
+                        {{ $t('commons.operate.start') }}
                     </el-button>
                     <el-button :disabled="checkStatus('stop', null)" @click="onOperate('stop', null)">
-                        {{ $t('app.stop') }}
+                        {{ $t('commons.operate.stop') }}
                     </el-button>
                     <el-button :disabled="checkStatus('restart', null)" @click="onOperate('restart', null)">
                         {{ $t('commons.button.restart') }}
@@ -158,13 +158,13 @@
                                             :disabled="checkStatus('start', row)"
                                             @click="onOperate('start', row)"
                                         >
-                                            {{ $t('app.start') }}
+                                            {{ $t('commons.operate.start') }}
                                         </el-dropdown-item>
                                         <el-dropdown-item
                                             :disabled="checkStatus('stop', row)"
                                             @click="onOperate('stop', row)"
                                         >
-                                            {{ $t('app.stop') }}
+                                            {{ $t('commons.operate.stop') }}
                                         </el-dropdown-item>
                                         <el-dropdown-item
                                             :disabled="checkStatus('restart', row)"

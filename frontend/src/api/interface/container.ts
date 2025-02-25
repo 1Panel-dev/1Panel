@@ -49,6 +49,7 @@ export namespace Container {
         memory: number;
     }
     export interface ContainerHelper {
+        taskID: string;
         containerID: string;
         name: string;
         image: string;
