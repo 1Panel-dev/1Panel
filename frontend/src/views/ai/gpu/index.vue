@@ -329,7 +329,7 @@ const loadEcc = (val: string) => {
     if (val === 'Enabled') {
         return i18n.global.t('ai_tools.gpu.enabled');
     }
-    return val;
+    return val || 0;
 };
 
 const loadProcessType = (val: string) => {
