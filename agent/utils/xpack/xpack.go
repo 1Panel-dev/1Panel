@@ -14,14 +14,6 @@ import (
 
 func RemoveTamper(website string) {}
 
-func LoadGpuInfo() []interface{} {
-	return nil
-}
-
-func LoadXpuInfo() []interface{} {
-	return nil
-}
-
 func StartClam(startClam model.Clam, isUpdate bool) (int, error) {
 	return 0, buserr.New("ErrXpackNotFound")
 }
