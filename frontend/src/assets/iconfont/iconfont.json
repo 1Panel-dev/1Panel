@@ -433,20 +433,6 @@
       "unicode_decimal": 58982
     },
     {
-      "icon_id": "6176565",
-      "name": "监控",
-      "font_class": "gpu-1",
-      "unicode": "e623",
-      "unicode_decimal": 58915
-    },
-    {
-      "icon_id": "640495",
-      "name": "详细信息",
-      "font_class": "gpu-2",
-      "unicode": "e6d8",
-      "unicode_decimal": 59096
-    },
-    {
       "icon_id": "3722144",
       "name": "钻石",
       "font_class": "xpack",

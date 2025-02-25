@@ -64,6 +64,7 @@ const openWithResourceID = (taskType: string, taskOperate: string, resourceID: n
 
 const handleClose = () => {
     open.value = false;
+    bus.emit('close', true);
     bus.emit('refreshTask', true);
 };
 

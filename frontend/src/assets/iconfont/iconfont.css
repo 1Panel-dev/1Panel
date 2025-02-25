@@ -1,9 +1,9 @@
 @font-face {
   font-family: "iconfont"; /* Project id 4776196 */
-  src: url('iconfont.woff2?t=1740392092454') format('woff2'),
-       url('iconfont.woff?t=1740392092454') format('woff'),
-       url('iconfont.ttf?t=1740392092454') format('truetype'),
-       url('iconfont.svg?t=1740392092454#iconfont') format('svg');
+  src: url('iconfont.woff2?t=1740474796282') format('woff2'),
+       url('iconfont.woff?t=1740474796282') format('woff'),
+       url('iconfont.ttf?t=1740474796282') format('truetype'),
+       url('iconfont.svg?t=1740474796282#iconfont') format('svg');
 }
 
 .iconfont {
@@ -256,14 +256,6 @@
 
 .p-waf-3:before {
   content: "\e666";
-}
-
-.p-gpu-1:before {
-  content: "\e623";
-}
-
-.p-gpu-2:before {
-  content: "\e6d8";
 }
 
 .p-xpack:before {

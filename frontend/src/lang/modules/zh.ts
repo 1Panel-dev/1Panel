@@ -2504,14 +2504,6 @@ const message = {
             manage: '管理',
         },
     },
-    alert: {
-        isAlert: '是否告警',
-        alertCount: '告警次数',
-        clamHelper: '扫描到感染文件时触发短信告警',
-        cronJobHelper: '定时任务执行失败时将触发短信告警',
-        licenseHelper: '专业版支持短信告警功能',
-        alertCountHelper: '每日最大告警次数',
-    },
     xpack: {
         expiresAlert: '温馨提醒：专业版试用将于 [{0}] 天后到期，届时将停止使用所有专业版功能。',
         name: '专业版',
@@ -2914,6 +2906,15 @@ const message = {
             monitorTitle4: '实时监控',
             monitorContent4: '实时监控网站的请求信息，包括请求数，流量等',
 
+            alertTitle1: '短信告警',
+            alertContent1:
+                '当服务器资源使用异常、网站及证书过期、新版本更新、密码过期等情况发生时，通过短信告警通知用户，确保及时处理。',
+            alertTitle2: '告警日志',
+            alertContent2: '为用户提供查看告警日志的功能，方便追踪和分析历史告警事件。',
+            alertTitle3: '告警设置',
+            alertContent3:
+                '为用户提供自定义手机号、每日推送次数、每日推送时间的配置，方便用户的设置来更加合理的进行推送告警。',
+
             nodeTitle1: '多节点管理',
             nodeContent1: '管理不同的节点',
             nodeTitle2: '批量升级',
@@ -2921,7 +2922,6 @@ const message = {
         },
         node: {
             node: '节点',
-            masterInfo: '主节点信息',
             addr: '地址',
             memTotal: '内存总计',
             nodeManagement: '节点管理',
@@ -2968,6 +2968,12 @@ const message = {
             nodes: '节点',
         },
         alert: {
+            isAlert: '是否告警',
+            alertCount: '告警次数',
+            clamHelper: '扫描到感染文件时触发短信告警',
+            cronJobHelper: '定时任务执行失败时将触发短信告警',
+            licenseHelper: '专业版支持短信告警功能',
+            alertCountHelper: '每日最大告警次数',
             alert: '短信告警',
             logs: '告警日志',
             list: '告警列表',

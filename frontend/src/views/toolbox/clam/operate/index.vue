@@ -127,8 +127,8 @@
                     </div>
                     <div v-if="!globalStore.isIntl">
                         <el-form-item prop="hasAlert">
-                            <el-checkbox v-model="dialogData.rowData!.hasAlert" :label="$t('alert.isAlert')" />
-                            <span class="input-help">{{ $t('alert.clamHelper') }}</span>
+                            <el-checkbox v-model="dialogData.rowData!.hasAlert" :label="$t('xpack.alert.isAlert')" />
+                            <span class="input-help">{{ $t('xpack.alert.clamHelper') }}</span>
                         </el-form-item>
                         <el-form-item
                             v-if="(dialogData.rowData!.hasAlert || dialogData.rowData!.hasSpec) && !isProductPro"
@@ -141,7 +141,7 @@
                         <el-form-item
                             prop="alertCount"
                             v-if="dialogData.rowData!.hasAlert && isProductPro"
-                            :label="$t('alert.alertCount')"
+                            :label="$t('xpack.alert.alertCount')"
                         >
                             <el-input-number
                                 style="width: 200px"
@@ -150,7 +150,7 @@
                                 :step="1"
                                 v-model.number="dialogData.rowData!.alertCount"
                             ></el-input-number>
-                            <span class="input-help">{{ $t('alert.alertCountHelper') }}</span>
+                            <span class="input-help">{{ $t('xpack.alert.alertCountHelper') }}</span>
                         </el-form-item>
                     </div>
                     <el-form-item :label="$t('commons.table.description')" prop="description">

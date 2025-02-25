@@ -51,6 +51,7 @@
         .el-sub-menu__title {
             background-color: var(--el-menu-item-bg-color);
             box-shadow: 0 0 4px rgba(0, 94, 235, 0.1);
+            margin: 6px 0;
             height: 46px;
             border-radius: 4px;
             &:hover {
