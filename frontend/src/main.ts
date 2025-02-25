@@ -28,6 +28,8 @@ import hljsVuePlugin from '@highlightjs/vue-plugin';
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
 import VirtualScroller from 'vue-virtual-scroller';
 
+import directives from '@/directives/index';
+
 const app = createApp(App);
 app.use(hljsVuePlugin);
 app.component('SvgIcon', SvgIcon);
@@ -43,4 +45,6 @@ app.use(router);
 app.use(i18n);
 app.use(pinia);
 app.use(Components);
+app.use(directives);
+
 app.mount('#app');

@@ -24,7 +24,7 @@
                         </div>
                         <div class="w-full">
                             <el-progress
-                                v-if="value.total === 0"
+                                v-if="value.total === 0 && value.percent != 100"
                                 :percentage="100"
                                 :indeterminate="true"
                                 :duration="1"
