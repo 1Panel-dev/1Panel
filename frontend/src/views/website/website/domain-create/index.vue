@@ -69,6 +69,8 @@
 
 <script lang="ts" setup>
 import { Rules, checkNumberRange } from '@/global/form-rules';
+import i18n from '@/lang';
+import { MsgError } from '@/utils/message';
 import { ref } from 'vue';
 
 const props = defineProps({
@@ -105,10 +107,20 @@ const removeDomain = (index: number) => {
     create.value.domains.splice(index, 1);
 };
 
+const checkDomain = (domain: string) => {
+    const reg =
+        /^([\w\u4e00-\u9fa5\-\*]{1,100}\.){1,10}([\w\u4e00-\u9fa5\-]{1,24}|[\w\u4e00-\u9fa5\-]{1,24}\.[\w\u4e00-\u9fa5\-]{1,24})(:\d{1,5})?$/;
+    return reg.test(domain);
+};
+
 const gengerateDomains = () => {
     const lines = create.value.domainStr.split(/\r?\n/);
     lines.forEach((line) => {
         const [domain, port] = line.split(':');
+        if (!checkDomain(domain)) {
+            MsgError(line + i18n.global.t('commons.rule.domain'));
+            return;
+        }
         const exists = (domain: string, port: number): boolean => {
             return create.value.domains.some((info) => info.domain === domain && info.port === port);
         };

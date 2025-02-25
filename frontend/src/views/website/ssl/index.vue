@@ -36,6 +36,7 @@
                         fix
                         show-overflow-tooltip
                         prop="primaryDomain"
+                        min-width="150px"
                     ></el-table-column>
                     <el-table-column
                         :label="$t('website.otherDomains')"
