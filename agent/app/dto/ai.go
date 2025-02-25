@@ -36,9 +36,10 @@ type OllamaBindDomainReq struct {
 }
 
 type OllamaBindDomainRes struct {
-	Domain    string   `json:"domain"`
-	SSLID     uint     `json:"sslID"`
-	AllowIPs  []string `json:"allowIPs"`
-	WebsiteID uint     `json:"websiteID"`
-	ConnUrl   string   `json:"connUrl"`
+	Domain        string   `json:"domain"`
+	SSLID         uint     `json:"sslID"`
+	AllowIPs      []string `json:"allowIPs"`
+	WebsiteID     uint     `json:"websiteID"`
+	ConnUrl       string   `json:"connUrl"`
+	AcmeAccountID uint     `json:"acmeAccountID"`
 }

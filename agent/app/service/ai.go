@@ -61,7 +61,7 @@ func (u *AIToolService) Search(req dto.SearchWithPage) (int64, []dto.OllamaModel
 		}
 		dtoLists = append(dtoLists, item)
 	}
-	return int64(total), dtoLists, err
+	return total, dtoLists, err
 }
 
 func (u *AIToolService) LoadDetail(name string) (string, error) {
@@ -244,14 +244,18 @@ func (u *AIToolService) BindDomain(req dto.OllamaBindDomain) error {
 		}
 	}
 	createWebsiteReq := request.WebsiteCreate{
-		Domains:      []request.WebsiteDomain{{Domain: req.Domain}},
+		Domains:      []request.WebsiteDomain{{Domain: req.Domain, Port: 80}},
 		Alias:        strings.ToLower(req.Domain),
 		Type:         constant.Deployment,
 		AppType:      constant.InstalledApp,
 		AppInstallID: req.AppInstallID,
 	}
+	if req.SSLID > 0 {
+		createWebsiteReq.WebsiteSSLID = req.SSLID
+		createWebsiteReq.EnableSSL = true
+	}
 	websiteService := NewIWebsiteService()
-	if err := websiteService.CreateWebsite(createWebsiteReq); err != nil {
+	if err = websiteService.CreateWebsite(createWebsiteReq); err != nil {
 		return err
 	}
 	website, err := websiteRepo.GetFirst(websiteRepo.WithAlias(strings.ToLower(req.Domain)))
@@ -260,18 +264,6 @@ func (u *AIToolService) BindDomain(req dto.OllamaBindDomain) error {
 	}
 	if len(ipList) > 0 {
 		if err = ConfigAllowIPs(ipList, website); err != nil {
-			return err
-		}
-	}
-	if req.SSLID > 0 {
-		sslReq := request.WebsiteHTTPSOp{
-			WebsiteID:    website.ID,
-			Enable:       true,
-			Type:         "existed",
-			WebsiteSSLID: req.SSLID,
-			HttpConfig:   "HTTPSOnly",
-		}
-		if _, err = websiteService.OpWebsiteHTTPS(context.Background(), sslReq); err != nil {
 			return err
 		}
 	}
@@ -295,6 +287,8 @@ func (u *AIToolService) GetBindDomain(req dto.OllamaBindDomainReq) (*dto.OllamaB
 	res.Domain = website.PrimaryDomain
 	if website.WebsiteSSLID > 0 {
 		res.SSLID = website.WebsiteSSLID
+		ssl, _ := websiteSSLRepo.GetFirst(repo.WithByID(website.WebsiteSSLID))
+		res.AcmeAccountID = ssl.AcmeAccountID
 	}
 	res.ConnUrl = fmt.Sprintf("%s://%s", strings.ToLower(website.Protocol), website.PrimaryDomain)
 	res.AllowIPs = GetAllowIps(website)

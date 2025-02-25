@@ -116,7 +116,15 @@ let refresh = ref(1);
 const httpPort = ref(0);
 const httpsPort = ref(0);
 
-const em = defineEmits(['setting', 'isExist', 'before', 'after', 'update:loading', 'update:maskShow']);
+const em = defineEmits([
+    'setting',
+    'isExist',
+    'before',
+    'after',
+    'update:loading',
+    'update:maskShow',
+    'update:appInstallID',
+]);
 const setting = () => {
     em('setting', false);
 };
@@ -128,6 +136,7 @@ const onCheck = async (key: any, name: any) => {
             em('isExist', res.data);
             em('update:maskShow', res.data.status !== 'Running');
             operateReq.installId = res.data.appInstallId;
+            em('update:appInstallID', res.data.appInstallId);
             httpPort.value = res.data.httpPort;
             httpsPort.value = res.data.httpsPort;
             refresh.value++;

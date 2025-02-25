@@ -1,98 +1,81 @@
 <template>
-    <DrawerPro v-model="open" :title="$t('aiTools.proxy.proxy')" :back="handleClose" size="large">
+    <DrawerPro v-model="open" :header="$t('aiTools.proxy.proxy')" :back="handleClose" size="large">
         <div v-loading="loading">
             <el-form ref="formRef" label-position="top" @submit.prevent :model="req" :rules="rules">
-                <el-row type="flex" justify="center">
-                    <el-col :span="22">
-                        <el-alert class="common-prompt" :closable="false" type="warning">
-                            <template #default>
-                                <ul>
-                                    <li>{{ $t('aiTools.proxy.proxyHelper1') }}</li>
-                                    <li>{{ $t('aiTools.proxy.proxyHelper2') }}</li>
-                                    <li>{{ $t('aiTools.proxy.proxyHelper3') }}</li>
-                                </ul>
-                            </template>
-                        </el-alert>
-                        <el-form-item :label="$t('website.domain')" prop="domain">
-                            <el-input v-model.trim="req.domain" :disabled="operate === 'update'" />
-                            <span class="input-help">
-                                {{ $t('aiTools.proxy.proxyHelper4') }}
-                            </span>
-                            <span class="input-help">
-                                {{ $t('aiTools.proxy.proxyHelper6') }}
-                                <el-link
-                                    class="pageRoute"
-                                    icon="Position"
-                                    @click="toWebsite(req.websiteID)"
-                                    type="primary"
-                                >
-                                    {{ $t('firewall.quickJump') }}
-                                </el-link>
-                            </span>
-                        </el-form-item>
-                        <el-form-item :label="$t('xpack.waf.whiteList') + ' IP'" prop="ipList">
-                            <el-input
-                                :rows="3"
-                                type="textarea"
-                                clearable
-                                v-model="req.ipList"
-                                :placeholder="$t('xpack.waf.ipGroupHelper')"
-                            />
-                            <span class="input-help">
-                                {{ $t('aiTools.proxy.whiteListHelper') }}
-                            </span>
-                        </el-form-item>
-                        <el-form-item>
-                            <el-checkbox v-model="req.enableSSL" @change="changeSSL">
-                                {{ $t('website.enable') + ' ' + 'HTTPS' }}
-                            </el-checkbox>
-                        </el-form-item>
-                        <el-form-item
-                            :label="$t('website.acmeAccountManage')"
-                            prop="acmeAccountID"
-                            v-if="req.enableSSL"
+                <el-alert class="common-prompt" :closable="false" type="warning">
+                    <template #default>
+                        <ul>
+                            <li>{{ $t('aiTools.proxy.proxyHelper1') }}</li>
+                            <li>{{ $t('aiTools.proxy.proxyHelper2') }}</li>
+                            <li>{{ $t('aiTools.proxy.proxyHelper3') }}</li>
+                        </ul>
+                    </template>
+                </el-alert>
+                <el-form-item :label="$t('website.domain')" prop="domain">
+                    <el-input v-model.trim="req.domain" :disabled="operate === 'update'" />
+                    <span class="input-help">
+                        {{ $t('aiTools.proxy.proxyHelper4') }}
+                    </span>
+                    <span class="input-help">
+                        {{ $t('aiTools.proxy.proxyHelper6') }}
+                        <el-link class="pageRoute" icon="Position" @click="toWebsite(req.websiteID)" type="primary">
+                            {{ $t('firewall.quickJump') }}
+                        </el-link>
+                    </span>
+                </el-form-item>
+                <el-form-item :label="$t('xpack.waf.whiteList') + ' IP'" prop="ipList">
+                    <el-input
+                        :rows="3"
+                        type="textarea"
+                        clearable
+                        v-model="req.ipList"
+                        :placeholder="$t('xpack.waf.ipGroupHelper')"
+                    />
+                    <span class="input-help">
+                        {{ $t('aiTools.proxy.whiteListHelper') }}
+                    </span>
+                </el-form-item>
+                <el-form-item>
+                    <el-checkbox v-model="req.enableSSL" @change="changeSSL">
+                        {{ $t('website.enable') + ' ' + 'HTTPS' }}
+                    </el-checkbox>
+                </el-form-item>
+                <el-form-item :label="$t('website.acmeAccountManage')" prop="acmeAccountID" v-if="req.enableSSL">
+                    <el-select v-model="req.acmeAccountID" :placeholder="$t('website.selectAcme')" @change="loadSSL">
+                        <el-option :key="0" :label="$t('website.imported')" :value="0"></el-option>
+                        <el-option
+                            v-for="(acme, index) in acmeAccounts"
+                            :key="index"
+                            :label="acme.email"
+                            :value="acme.id"
                         >
-                            <el-select
-                                v-model="req.acmeAccountID"
-                                :placeholder="$t('website.selectAcme')"
-                                @change="listSSL"
-                            >
-                                <el-option :key="0" :label="$t('website.imported')" :value="0"></el-option>
-                                <el-option
-                                    v-for="(acme, index) in acmeAccounts"
-                                    :key="index"
-                                    :label="acme.email"
-                                    :value="acme.id"
-                                >
-                                    <span>
-                                        {{ acme.email }}
-                                        <el-tag class="ml-5">{{ getAccountName(acme.type) }}</el-tag>
-                                    </span>
-                                </el-option>
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item :label="$t('website.ssl')" prop="sslID" v-if="req.enableSSL">
-                            <el-select
-                                v-model="req.sslID"
-                                :placeholder="$t('website.selectSSL')"
-                                @change="changeSSl(req.sslID)"
-                            >
-                                <el-option
-                                    v-for="(ssl, index) in ssls"
-                                    :key="index"
-                                    :label="ssl.primaryDomain"
-                                    :value="ssl.id"
-                                ></el-option>
-                            </el-select>
-                        </el-form-item>
-                        <el-alert :closable="false">
-                            {{ $t('aiTools.proxy.proxyHelper5') }}
-                            <el-link class="pageRoute" icon="Position" @click="toInstalled()" type="primary">
-                                {{ $t('firewall.quickJump') }}
-                            </el-link>
-                        </el-alert>
-                    </el-col>
-                </el-row>
+                            <span>
+                                {{ acme.email }}
+                                <el-tag class="ml-5">{{ getAccountName(acme.type) }}</el-tag>
+                            </span>
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item :label="$t('website.ssl')" prop="sslID" v-if="req.enableSSL">
+                    <el-select
+                        v-model="req.sslID"
+                        :placeholder="$t('website.selectSSL')"
+                        @change="changeSSl(req.sslID)"
+                    >
+                        <el-option
+                            v-for="(ssl, index) in ssls"
+                            :key="index"
+                            :label="ssl.primaryDomain"
+                            :value="ssl.id"
+                        ></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-alert :closable="false">
+                    {{ $t('aiTools.proxy.proxyHelper5') }}
+                    <el-link class="pageRoute" icon="Position" @click="toInstalled()" type="primary">
+                        {{ $t('firewall.quickJump') }}
+                    </el-link>
+                </el-alert>
             </el-form>
         </div>
         <template #footer>
@@ -134,6 +117,9 @@ const req = ref({
     appInstallID: 0,
     websiteID: 0,
 });
+const sslReq = reactive({
+    acmeAccountID: '',
+});
 const rules = reactive<FormRules>({
     domain: [Rules.domainWithPort],
     sslID: [Rules.requiredSelectBusiness],
@@ -167,9 +153,7 @@ const changeSSL = () => {
 };
 
 const loadSSL = () => {
-    const sslReq = {
-        acmeAccountID: String(req.value.acmeAccountID),
-    };
+    sslReq.acmeAccountID = String(req.value.acmeAccountID);
     listSSL(sslReq).then((res) => {
         ssls.value = res.data || [];
         if (ssls.value.length > 0) {
@@ -193,9 +177,6 @@ const loadSSL = () => {
 const listAcmeAccount = () => {
     searchAcmeAccount({ page: 1, pageSize: 100 }).then((res) => {
         acmeAccounts.value = res.data.items || [];
-        if (acmeAccounts.value.length > 0) {
-            req.value.acmeAccountID = acmeAccounts.value[0].id;
-        }
         loadSSL();
     });
 };
@@ -229,6 +210,7 @@ const search = async (appInstallID: number) => {
             if (res.data.sslID > 0) {
                 req.value.enableSSL = true;
                 req.value.sslID = res.data.sslID;
+                req.value.acmeAccountID = res.data.acmeAccountID;
                 listAcmeAccount();
             }
         }

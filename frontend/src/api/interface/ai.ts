@@ -107,5 +107,6 @@ export namespace AI {
         allowIPs: string[];
         websiteID?: number;
         connUrl: string;
+        acmeAccountID: number;
     }
 }
