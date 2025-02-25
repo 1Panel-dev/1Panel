@@ -287,6 +287,8 @@ SystemMode: "모드: "
 
 #ai-tool
 ErrOpenrestyInstall: '먼저 Openresty를 설치하세요'
+ErrSSL: "인증서 내용이 비어 있습니다. 인증서를 확인하세요!"
+
 
 #mobile app
 ErrVerifyToken: '토큰 검증 오류가 발생했습니다. 재설정 후 다시 스캔해 주세요.'

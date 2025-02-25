@@ -286,7 +286,8 @@ SystemVersion: "версия: "
 SystemMode: "режим: "
 
 #ai-tool
-"ErrOpenrestyInstall": "Пожалуйста, установите Openresty сначала"
+ErrOpenrestyInstall: "Пожалуйста, установите Openresty сначала"
+ErrSSL: "Содержимое сертификата пустое, пожалуйста, проверьте сертификат!"
 
 #mobile app
 ErrVerifyToken: 'шибка проверки токена, пожалуйста, сбросьте и отсканируйте снова.'

@@ -245,6 +245,15 @@ func (u *AIToolService) BindDomain(req dto.OllamaBindDomain) error {
 			return err
 		}
 	}
+	if req.SSLID > 0 {
+		ssl, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(req.SSLID))
+		if err != nil {
+			return err
+		}
+		if ssl.Pem == "" {
+			return buserr.New("ErrSSL")
+		}
+	}
 	createWebsiteReq := request.WebsiteCreate{
 		PrimaryDomain: req.Domain,
 		Alias:         strings.ToLower(req.Domain),
@@ -318,6 +327,15 @@ func (u *AIToolService) UpdateBindDomain(req dto.OllamaBindDomain) error {
 		ipList, err = common.HandleIPList(req.IPList)
 		if err != nil {
 			return err
+		}
+	}
+	if req.SSLID > 0 {
+		ssl, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(req.SSLID))
+		if err != nil {
+			return err
+		}
+		if ssl.Pem == "" {
+			return buserr.New("ErrSSL")
 		}
 	}
 	websiteService := NewIWebsiteService()
