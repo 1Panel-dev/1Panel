@@ -33,8 +33,8 @@ func (f *FileRouter) InitRouter(Router *gin.RouterGroup) {
 		fileRouter.GET("/download", baseApi.Download)
 		fileRouter.POST("/chunkdownload", baseApi.DownloadChunkFiles)
 		fileRouter.POST("/size", baseApi.Size)
-		fileRouter.GET("/ws", baseApi.Ws)
-		fileRouter.GET("/keys", baseApi.Keys)
+		fileRouter.GET("/wget/process", baseApi.WgetProcess)
+		fileRouter.GET("/wget/process/keys", baseApi.ProcessKeys)
 		fileRouter.POST("/read", baseApi.ReadFileByLine)
 		fileRouter.POST("/batch/role", baseApi.BatchChangeModeAndOwner)
 

@@ -748,7 +748,7 @@ var wsUpgrade = websocket.Upgrader{
 	},
 }
 
-func (b *BaseApi) Ws(c *gin.Context) {
+func (b *BaseApi) WgetProcess(c *gin.Context) {
 	ws, err := wsUpgrade.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		return
@@ -758,7 +758,7 @@ func (b *BaseApi) Ws(c *gin.Context) {
 	go wsClient.Write()
 }
 
-func (b *BaseApi) Keys(c *gin.Context) {
+func (b *BaseApi) ProcessKeys(c *gin.Context) {
 	res := &response.FileProcessKeys{}
 	keys := global.CACHE.PrefixScanKey("file-wget-")
 	res.Keys = keys

@@ -1366,6 +1366,7 @@ const message = {
         minimap: 'Мини-карта кода',
         fileCanNotRead: 'Файл не может быть прочитан',
         panelInstallDir: 'Директорию установки 1Panel нельзя удалить',
+        wgetTask: 'Задача загрузки',
     },
     ssh: {
         setting: 'настройка',

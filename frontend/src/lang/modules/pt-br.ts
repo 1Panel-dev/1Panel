@@ -1362,6 +1362,7 @@ const message = {
         minimap: 'Mini mapa de código',
         fileCanNotRead: 'O arquivo não pode ser lido',
         panelInstallDir: 'O diretório de instalação do 1Panel não pode ser excluído',
+        wgetTask: 'Tarefa de Download',
     },
     ssh: {
         setting: 'configuração',

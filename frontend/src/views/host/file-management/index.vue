@@ -102,6 +102,12 @@
                     {{ $t('menu.terminal') }}
                 </el-button>
 
+                <el-badge :value="processCount" class="btn" v-if="processCount > 0">
+                    <el-button class="btn" @click="openProcess">
+                        {{ $t('file.wgetTask') }}
+                    </el-button>
+                </el-badge>
+
                 <el-button-group class="copy-button" v-if="moveOpen">
                     <el-tooltip class="box-item" effect="dark" :content="$t('file.paste')" placement="bottom">
                         <el-button plain @click="openPaste">{{ $t('file.paste') }}({{ fileMove.count }})</el-button>
@@ -291,7 +297,7 @@
             <Wget ref="wgetRef" @close="closeWget" />
             <Move ref="moveRef" @close="closeMovePage" />
             <Download ref="downloadRef" @close="search" />
-            <Process :open="processPage.open" @close="closeProcess" />
+            <Process ref="processRef" @close="getWgetProcess" />
             <Owner ref="chownRef" @close="search"></Owner>
             <Detail ref="detailRef" />
             <DeleteFile ref="deleteRef" @close="search" />
@@ -313,6 +319,7 @@ import {
     addFavorite,
     removeFavorite,
     searchFavorite,
+    fileWgetKeys,
 } from '@/api/modules/files';
 import { computeSize, copyText, dateFormat, getFileType, getIcon, getRandomStr, downloadFile } from '@/utils/util';
 import { File } from '@/api/interface/file';
@@ -386,7 +393,6 @@ const fileUpload = reactive({ path: '' });
 const fileRename = reactive({ path: '', oldName: '' });
 const fileWget = reactive({ path: '' });
 const fileMove = reactive({ oldPaths: [''], type: '', path: '', name: '', count: 0 });
-const processPage = reactive({ open: false });
 
 const createRef = ref();
 const roleRef = ref();
@@ -411,6 +417,7 @@ const favorites = ref([]);
 const batchRoleRef = ref();
 const dialogVscodeOpenRef = ref();
 const previewRef = ref();
+const processRef = ref();
 
 // editablePath
 const { searchableStatus, searchablePath, searchableInputRef, searchableInputBlur } = useSearchable(paths);
@@ -754,11 +761,17 @@ const closeMovePage = (submit: Boolean) => {
 };
 
 const openProcess = () => {
-    processPage.open = true;
+    processRef.value.acceptParams();
 };
 
-const closeProcess = () => {
-    processPage.open = false;
+const processCount = ref(0);
+const getWgetProcess = async () => {
+    try {
+        const res = await fileWgetKeys();
+        if (res.data && res.data.keys.length > 0) {
+            processCount.value = res.data.keys.length;
+        }
+    } catch (error) {}
 };
 
 const openRename = (item: File.File) => {
@@ -965,6 +978,7 @@ onMounted(() => {
     nextTick(function () {
         handlePath();
     });
+    getWgetProcess();
 });
 </script>
 

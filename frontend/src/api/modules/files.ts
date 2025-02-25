@@ -85,8 +85,8 @@ export const computeDirSize = (params: File.DirSizeReq) => {
     return http.post<File.DirSizeRes>('files/size', params, TimeoutEnum.T_5M);
 };
 
-export const fileKeys = () => {
-    return http.get<File.FileKeys>('files/keys');
+export const fileWgetKeys = () => {
+    return http.get<File.FileKeys>('files//wget/process/keys');
 };
 
 export const getRecycleList = (params: ReqPage) => {

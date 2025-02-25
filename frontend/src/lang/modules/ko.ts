@@ -1320,6 +1320,7 @@ const message = {
         minimap: '코드 미니맵',
         fileCanNotRead: '파일을 읽을 수 없습니다.',
         panelInstallDir: `1Panel 설치 디렉터리는 삭제할 수 없습니다.`,
+        wgetTask: '다운로드 작업',
     },
     ssh: {
         setting: '설정',

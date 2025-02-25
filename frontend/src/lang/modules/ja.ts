@@ -1334,6 +1334,7 @@ const message = {
         minimap: 'コードミニマップ',
         fileCanNotRead: 'ファイルは読み取れません',
         panelInstallDir: `1Panelインストールディレクトリは削除できません`,
+        wgetTask: 'ダウンロードタスク',
     },
     ssh: {
         setting: '設定',

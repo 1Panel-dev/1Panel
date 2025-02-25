@@ -1344,6 +1344,7 @@ const message = {
         minimap: '縮略圖',
         fileCanNotRead: '此文件不支持預覽',
         panelInstallDir: '1Panel 安裝目錄不能删除',
+        wgetTask: '下載任務',
     },
     ssh: {
         autoStart: '開機自啟',

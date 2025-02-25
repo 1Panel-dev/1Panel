@@ -1377,6 +1377,7 @@ const message = {
         minimap: 'Peta mini kod',
         fileCanNotRead: 'Fail tidak dapat dibaca',
         panelInstallDir: 'Direktori pemasangan 1Panel tidak boleh dipadamkan',
+        wgetTask: 'Tugas Muat Turun',
     },
     ssh: {
         setting: 'tetapan',

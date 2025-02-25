@@ -1392,6 +1392,7 @@ const message = {
         minimap: 'Code Mini Map',
         fileCanNotRead: 'File can not read',
         panelInstallDir: '1Panel installation directory cannot be deleted',
+        wgetTask: 'Download Task',
     },
     ssh: {
         autoStart: 'Auto Start',
