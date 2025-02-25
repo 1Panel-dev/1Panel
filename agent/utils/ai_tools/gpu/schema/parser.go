@@ -1,4 +1,4 @@
-package schema_v12
+package schema
 
 import (
 	"encoding/xml"
@@ -6,7 +6,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/gpu/common"
 )
 
-func Parse(buf []byte) (*common.GpuInfo, error) {
+func Parse(buf []byte, version string) (*common.GpuInfo, error) {
 	var (
 		s    smi
 		info common.GpuInfo
@@ -33,8 +33,13 @@ func Parse(buf []byte) (*common.GpuInfo, error) {
 
 		gpuItem.Temperature = s.Gpu[i].Temperature.GpuTemp
 		gpuItem.PerformanceState = s.Gpu[i].PerformanceState
-		gpuItem.PowerDraw = s.Gpu[i].GpuPowerReadings.PowerDraw
-		gpuItem.MaxPowerLimit = s.Gpu[i].GpuPowerReadings.MaxPowerLimit
+		if version == "v12" {
+			gpuItem.PowerDraw = s.Gpu[i].GpuPowerReadings.PowerDraw
+			gpuItem.MaxPowerLimit = s.Gpu[i].GpuPowerReadings.MaxPowerLimit
+		} else {
+			gpuItem.PowerDraw = s.Gpu[i].PowerReadings.PowerDraw
+			gpuItem.MaxPowerLimit = s.Gpu[i].PowerReadings.MaxPowerLimit
+		}
 		gpuItem.MemUsed = s.Gpu[i].FbMemoryUsage.Used
 		gpuItem.MemTotal = s.Gpu[i].FbMemoryUsage.Total
 		gpuItem.GPUUtil = s.Gpu[i].Utilization.GpuUtil

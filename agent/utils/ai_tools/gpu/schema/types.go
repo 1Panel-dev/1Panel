@@ -1,4 +1,4 @@
-package schema_v12
+package schema
 
 type smi struct {
 	AttachedGpus  string `xml:"attached_gpus"`

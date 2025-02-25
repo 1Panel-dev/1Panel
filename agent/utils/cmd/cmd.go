@@ -36,10 +36,12 @@ func handleErr(stdout, stderr bytes.Buffer, err error) (string, error) {
 }
 
 func ExecWithTimeOut(cmdStr string, timeout time.Duration) (string, error) {
+	env := os.Environ()
 	cmd := exec.Command("bash", "-c", cmdStr)
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
+	cmd.Env = env
 	if err := cmd.Start(); err != nil {
 		return "", err
 	}
@@ -62,6 +64,7 @@ func ExecWithTimeOut(cmdStr string, timeout time.Duration) (string, error) {
 }
 
 func ExecWithLogFile(cmdStr string, timeout time.Duration, outputFile string) error {
+	env := os.Environ()
 	cmd := exec.Command("bash", "-c", cmdStr)
 
 	outFile, err := os.OpenFile(outputFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, constant.DirPerm)
@@ -72,6 +75,7 @@ func ExecWithLogFile(cmdStr string, timeout time.Duration, outputFile string) er
 
 	cmd.Stdout = outFile
 	cmd.Stderr = outFile
+	cmd.Env = env
 
 	if err := cmd.Start(); err != nil {
 		return err
@@ -109,6 +113,7 @@ func ExecContainerScript(containerName, cmdStr string, timeout time.Duration) er
 }
 
 func ExecShell(outPath string, timeout time.Duration, name string, arg ...string) error {
+	env := os.Environ()
 	file, err := os.OpenFile(outPath, os.O_WRONLY|os.O_CREATE, constant.FilePerm)
 	if err != nil {
 		return err
@@ -118,6 +123,7 @@ func ExecShell(outPath string, timeout time.Duration, name string, arg ...string
 	cmd := exec.Command(name, arg...)
 	cmd.Stdout = file
 	cmd.Stderr = file
+	cmd.Env = env
 	if err := cmd.Start(); err != nil {
 		return err
 	}
@@ -147,10 +153,12 @@ func (cw *CustomWriter) Write(p []byte) (n int, err error) {
 	return len(p), nil
 }
 func ExecShellWithTask(taskItem *task.Task, timeout time.Duration, name string, arg ...string) error {
+	env := os.Environ()
 	customWriter := &CustomWriter{taskItem: taskItem}
 	cmd := exec.Command(name, arg...)
 	cmd.Stdout = customWriter
 	cmd.Stderr = customWriter
+	cmd.Env = env
 	if err := cmd.Start(); err != nil {
 		return err
 	}
@@ -172,10 +180,12 @@ func ExecShellWithTask(taskItem *task.Task, timeout time.Duration, name string, 
 }
 
 func Execf(cmdStr string, a ...interface{}) (string, error) {
+	env := os.Environ()
 	cmd := exec.Command("bash", "-c", fmt.Sprintf(cmdStr, a...))
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
+	cmd.Env = env
 	err := cmd.Run()
 	if err != nil {
 		return handleErr(stdout, stderr, err)
@@ -184,10 +194,12 @@ func Execf(cmdStr string, a ...interface{}) (string, error) {
 }
 
 func ExecWithCheck(name string, a ...string) (string, error) {
+	env := os.Environ()
 	cmd := exec.Command(name, a...)
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
+	cmd.Env = env
 	err := cmd.Run()
 	if err != nil {
 		return handleErr(stdout, stderr, err)
@@ -196,11 +208,13 @@ func ExecWithCheck(name string, a ...string) (string, error) {
 }
 
 func ExecScript(scriptPath, workDir string) (string, error) {
+	env := os.Environ()
 	cmd := exec.Command("bash", scriptPath)
 	var stdout, stderr bytes.Buffer
 	cmd.Dir = workDir
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
+	cmd.Env = env
 	if err := cmd.Start(); err != nil {
 		return "", err
 	}
@@ -279,6 +293,7 @@ func Which(name string) bool {
 }
 
 func ExecShellWithTimeOut(cmdStr, workdir string, logger *log.Logger, timeout time.Duration) error {
+	env := os.Environ()
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
@@ -286,6 +301,7 @@ func ExecShellWithTimeOut(cmdStr, workdir string, logger *log.Logger, timeout ti
 	cmd.Dir = workdir
 	cmd.Stdout = logger.Writer()
 	cmd.Stderr = logger.Writer()
+	cmd.Env = env
 	if err := cmd.Start(); err != nil {
 		return err
 	}

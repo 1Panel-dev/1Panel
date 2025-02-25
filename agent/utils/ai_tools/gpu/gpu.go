@@ -12,7 +12,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/gpu/common"
-	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/gpu/schema_v12"
+	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/gpu/schema"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 )
 
@@ -28,7 +28,7 @@ func (n NvidiaSMI) LoadGpuInfo() (*common.GpuInfo, error) {
 		return nil, fmt.Errorf("calling nvidia-smi failed, err: %w", err)
 	}
 	data := []byte(itemData)
-	schema := "v11"
+	version := "v11"
 
 	buf := bytes.NewBuffer(data)
 	decoder := xml.NewDecoder(buf)
@@ -51,15 +51,18 @@ func (n NvidiaSMI) LoadGpuInfo() (*common.GpuInfo, error) {
 		parts := strings.Split(directive, " ")
 		s := strings.Trim(parts[len(parts)-1], "\" ")
 		if strings.HasPrefix(s, "nvsmi_device_") && strings.HasSuffix(s, ".dtd") {
-			schema = strings.TrimSuffix(strings.TrimPrefix(s, "nvsmi_device_"), ".dtd")
+			version = strings.TrimSuffix(strings.TrimPrefix(s, "nvsmi_device_"), ".dtd")
 		} else {
 			global.LOG.Debugf("Cannot find schema version in %q", directive)
 		}
 		break
 	}
 
-	if schema != "v12" {
-		return &common.GpuInfo{}, nil
+	if version == "v12" || version == "v11" {
+		return schema.Parse(data, version)
+	} else {
+		global.LOG.Errorf("don't support such schema version %s", version)
 	}
-	return schema_v12.Parse(data)
+
+	return &common.GpuInfo{}, nil
 }
