@@ -766,3 +766,13 @@ export const encryptPassword = (password: string) => {
     const passwordCipher = aesEncrypt(password, aesKey);
     return `${keyCipher}:${passwordCipher}`;
 };
+
+export async function loadJson(lang: string): Promise<Object> {
+    try {
+        lang = lang == 'zh' ? 'zh' : 'en';
+        const jsonModule = await import(`@/assets/json/china/${lang}.json`);
+        return jsonModule.default;
+    } catch (error) {
+        throw new Error(`Language file not found: ${lang}`);
+    }
+}

@@ -163,3 +163,26 @@ func GetLang(c *gin.Context) string {
 	}
 	return lang
 }
+
+func CheckIpInCidr(cidr, checkIP string) bool {
+	ip, ipNet, err := net.ParseCIDR(cidr)
+	if err != nil {
+		global.LOG.Errorf("parse CIDR %s failed, err: %v", cidr, err)
+		return false
+	}
+	for ip := ip.Mask(ipNet.Mask); ipNet.Contains(ip); incIP(ip) {
+		if ip.String() == checkIP {
+			return true
+		}
+	}
+	return false
+}
+
+func incIP(ip net.IP) {
+	for j := len(ip) - 1; j >= 0; j-- {
+		ip[j]++
+		if ip[j] > 0 {
+			break
+		}
+	}
+}

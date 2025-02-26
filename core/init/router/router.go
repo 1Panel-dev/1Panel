@@ -3,6 +3,8 @@ package router
 import (
 	"encoding/base64"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/core/app/repo"
+	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -61,7 +63,7 @@ func checkEntrance(c *gin.Context) bool {
 	return string(entranceValue) == entrance
 }
 
-func handleNoRoute(c *gin.Context) {
+func handleNoRoute(c *gin.Context, resType string) {
 	resPage, err := service.NewIAuthService().GetResponsePage()
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Internal Server Error")
@@ -73,6 +75,9 @@ func handleNoRoute(c *gin.Context) {
 	}
 
 	file := fmt.Sprintf("html/%s.html", resPage)
+	if resPage == "200" && resType != "" {
+		file = fmt.Sprintf("html/200_%s.html", resType)
+	}
 	data, err := res.ErrorMsg.ReadFile(file)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Internal Server Error")
@@ -110,6 +115,43 @@ func checkFrontendPath(c *gin.Context) bool {
 	return true
 }
 
+func checkBindDomain(c *gin.Context) bool {
+	settingRepo := repo.NewISettingRepo()
+	status, _ := settingRepo.Get(repo.WithByKey("BindDomain"))
+	if len(status.Value) == 0 {
+		return true
+	}
+	domains := c.Request.Host
+	parts := strings.Split(c.Request.Host, ":")
+	if len(parts) > 0 {
+		domains = parts[0]
+	}
+	return domains == status.Value
+}
+
+func checkIPLimit(c *gin.Context) bool {
+	settingRepo := repo.NewISettingRepo()
+	status, _ := settingRepo.Get(repo.WithByKey("AllowIPs"))
+	if len(status.Value) == 0 {
+		return true
+	}
+	clientIP := c.ClientIP()
+	for _, ip := range strings.Split(status.Value, ",") {
+		if len(ip) == 0 {
+			continue
+		}
+		if ip == clientIP || (strings.Contains(ip, "/") && common.CheckIpInCidr(ip, clientIP)) {
+			return true
+		}
+	}
+	return false
+}
+
+func checkSession(c *gin.Context) bool {
+	_, err := global.SESSION.Get(c)
+	return err == nil
+}
+
 func setWebStatic(rootRouter *gin.RouterGroup) {
 	rootRouter.StaticFS("/public", http.FS(web.Favicon))
 	rootRouter.StaticFS("/favicon.ico", http.FS(web.Favicon))
@@ -128,16 +170,29 @@ func setWebStatic(rootRouter *gin.RouterGroup) {
 		rootRouter.GET("/"+entrance, func(c *gin.Context) {
 			currentEntrance := authService.GetSecurityEntrance()
 			if currentEntrance != entrance {
-				handleNoRoute(c)
+				handleNoRoute(c, "")
 				return
 			}
 			toIndexHtml(c)
 		})
 	}
 	rootRouter.GET("/", func(c *gin.Context) {
-		if !checkEntrance(c) {
-			handleNoRoute(c)
+		if !checkEntrance(c) && !checkSession(c) {
+			handleNoRoute(c, "")
 			return
+		}
+		if !checkBindDomain(c) {
+			handleNoRoute(c, "err_domain")
+			return
+		}
+		if !checkIPLimit(c) {
+			handleNoRoute(c, "err_ip_limit")
+			return
+		}
+		entrance = authService.GetSecurityEntrance()
+		if entrance != "" {
+			entranceValue := base64.StdEncoding.EncodeToString([]byte(entrance))
+			c.SetCookie("SecurityEntrance", entranceValue, 0, "", "", false, true)
 		}
 		staticServer := http.FileServer(http.FS(web.IndexHtml))
 		staticServer.ServeHTTP(c.Writer, c.Request)
@@ -173,6 +228,14 @@ func Routers() *gin.Engine {
 	}
 
 	Router.NoRoute(func(c *gin.Context) {
+		if !checkBindDomain(c) {
+			handleNoRoute(c, "err_domain")
+			return
+		}
+		if !checkIPLimit(c) {
+			handleNoRoute(c, "err_ip_limit")
+			return
+		}
 		if checkFrontendPath(c) {
 			toIndexHtml(c)
 			return
@@ -181,7 +244,7 @@ func Routers() *gin.Engine {
 			toIndexHtml(c)
 			return
 		}
-		handleNoRoute(c)
+		handleNoRoute(c, "")
 	})
 
 	return Router
