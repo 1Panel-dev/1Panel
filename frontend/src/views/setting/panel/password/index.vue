@@ -5,14 +5,14 @@
                 <el-input type="password" show-password clearable v-model.trim="passForm.oldPassword" />
             </el-form-item>
             <el-form-item
-                v-if="complexityVerification === 'disable'"
+                v-if="complexityVerification === 'Disable'"
                 :label="$t('setting.newPassword')"
                 prop="newPassword"
             >
                 <el-input type="password" show-password clearable v-model.trim="passForm.newPassword" />
             </el-form-item>
             <el-form-item
-                v-if="complexityVerification === 'enable'"
+                v-if="complexityVerification === 'Enable'"
                 :label="$t('setting.newPassword')"
                 prop="newPasswordComplexity"
             >
@@ -80,7 +80,7 @@ const acceptParams = (params: DialogProps): void => {
 };
 
 function checkPassword(rule: any, value: any, callback: any) {
-    let password = complexityVerification.value === 'disable' ? passForm.newPassword : passForm.newPasswordComplexity;
+    let password = complexityVerification.value === 'Disable' ? passForm.newPassword : passForm.newPasswordComplexity;
     if (password !== passForm.retryPassword) {
         return callback(new Error(i18n.global.t('commons.rule.rePassword')));
     }
@@ -92,7 +92,7 @@ const submitChangePassword = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         let password =
-            complexityVerification.value === 'disable' ? passForm.newPassword : passForm.newPasswordComplexity;
+            complexityVerification.value === 'Disable' ? passForm.newPassword : passForm.newPasswordComplexity;
         if (password === passForm.oldPassword) {
             MsgError(i18n.global.t('setting.duplicatePassword'));
             return;

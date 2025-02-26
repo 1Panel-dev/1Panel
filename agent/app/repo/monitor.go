@@ -41,7 +41,7 @@ func (u *MonitorRepo) GetIO(opts ...DBOption) ([]model.MonitorIO, error) {
 	for _, opt := range opts {
 		db = opt(db)
 	}
-	err := db.First(&data).Error
+	err := db.Find(&data).Error
 	return data, err
 }
 func (u *MonitorRepo) GetNetwork(opts ...DBOption) ([]model.MonitorNetwork, error) {
@@ -50,7 +50,7 @@ func (u *MonitorRepo) GetNetwork(opts ...DBOption) ([]model.MonitorNetwork, erro
 	for _, opt := range opts {
 		db = opt(db)
 	}
-	err := db.First(&data).Error
+	err := db.Find(&data).Error
 	return data, err
 }
 

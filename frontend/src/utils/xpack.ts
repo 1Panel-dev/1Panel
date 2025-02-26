@@ -87,23 +87,6 @@ export async function loadMasterProductProFromDB() {
 }
 
 export async function getXpackSettingForTheme() {
-    const res = await getMasterLicenseStatus();
-    if (!res.data) {
-        globalStore.isMasterProductPro = false;
-        resetXSetting();
-        switchTheme();
-        initFavicon();
-        return;
-    }
-    globalStore.isMasterProductPro = res.data.status === 'Bound';
-    if (!globalStore.isMasterProductPro) {
-        globalStore.isMasterProductPro = false;
-        resetXSetting();
-        switchTheme();
-        initFavicon();
-        return;
-    }
-
     let searchXSetting;
     const xpackModules = import.meta.glob('../xpack/api/modules/setting.ts', { eager: true });
     if (xpackModules['../xpack/api/modules/setting.ts']) {

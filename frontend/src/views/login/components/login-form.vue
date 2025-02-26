@@ -184,6 +184,7 @@ import { MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
 import { getSettingInfo } from '@/api/modules/setting';
 import { encryptPassword } from '@/utils/util';
+import { getXpackSettingForTheme } from '@/utils/xpack';
 
 const i18n = useI18n();
 const themeConfig = computed(() => globalStore.themeConfig);
@@ -334,7 +335,6 @@ const login = (formEl: FormInstance | undefined) => {
             menuStore.setMenuList([]);
             tabsStore.removeAllTabs();
             MsgSuccess(i18n.t('commons.msg.loginSuccess'));
-            loadDataFromDB();
             router.push({ name: 'home' });
         } catch (res) {
             if (res.code === 401) {
@@ -369,7 +369,6 @@ const mfaLogin = async (auto: boolean) => {
             menuStore.setMenuList([]);
             tabsStore.removeAllTabs();
             MsgSuccess(i18n.t('commons.msg.loginSuccess'));
-            loadDataFromDB();
             router.push({ name: 'home' });
         } catch (res) {
             if (res.code === 401) {
@@ -415,6 +414,8 @@ const getSetting = async () => {
 onMounted(() => {
     globalStore.isOnRestart = false;
     getSetting();
+    loadDataFromDB();
+    getXpackSettingForTheme();
     if (!globalStore.ignoreCaptcha) {
         loginVerify();
     }
