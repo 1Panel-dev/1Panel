@@ -113,7 +113,7 @@ import { getRandomStr } from '@/utils/util';
 import { getAppService } from '@/api/modules/app';
 import { Rules } from '@/global/form-rules';
 import { App } from '@/api/interface/app';
-import { getDBName } from '@/utils/util';
+import { getDBName, getLabel } from '@/utils/util';
 import { getPathByType } from '@/api/modules/files';
 
 interface ParamObj extends App.FromField {
@@ -256,19 +256,6 @@ const changeService = (value: string, services: App.AppService[]) => {
         }
     });
     updateParam();
-};
-
-const getLabel = (row: ParamObj): string => {
-    const language = localStorage.getItem('lang') || 'zh';
-    let lang = language == 'tw' ? 'zh-Hant' : language;
-    if (row.label && row.label[lang] != '') {
-        return row.label[lang];
-    }
-    if (language == 'zh' || language == 'tw') {
-        return row.labelZh;
-    } else {
-        return row.labelEn;
-    }
 };
 
 const toPage = (key: string) => {

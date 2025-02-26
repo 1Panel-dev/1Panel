@@ -22,7 +22,7 @@ class RequestHttp {
         this.service = axios.create(config);
         this.service.interceptors.request.use(
             (config: AxiosRequestConfig) => {
-                let language = globalStore.language === 'tw' ? 'zh-Hant' : globalStore.language;
+                let language = globalStore.language;
                 config.headers = {
                     'Accept-Language': language,
                     ...config.headers,

@@ -121,6 +121,7 @@ import { reactive, ref } from 'vue';
 import { FormInstance } from 'element-plus';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import { MsgSuccess } from '@/utils/message';
+import { getLabel } from '@/utils/util';
 import i18n from '@/lang';
 
 interface ParamProps {
@@ -225,19 +226,6 @@ const get = async () => {
     } catch (error) {
     } finally {
         loading.value = false;
-    }
-};
-
-const getLabel = (row: EditForm): string => {
-    const language = localStorage.getItem('lang') || 'zh';
-    let lang = language == 'tw' ? 'zh-Hant' : language;
-    if (row.label && row.label[lang] != '') {
-        return row.label[lang];
-    }
-    if (language == 'zh' || language == 'tw') {
-        return row.labelZh;
-    } else {
-        return row.labelEn;
     }
 };
 

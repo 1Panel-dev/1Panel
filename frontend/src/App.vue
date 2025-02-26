@@ -25,7 +25,7 @@ const config = reactive({
 
 const i18nLocale = computed(() => {
     if (globalStore.language === 'zh') return zhCn;
-    if (globalStore.language === 'tw') return zhTw;
+    if (globalStore.language === 'zh-Hant') return zhTw;
     if (globalStore.language === 'en') return en;
     if (globalStore.language === 'ja') return ja;
     if (globalStore.language === 'ms') return ms;

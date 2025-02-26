@@ -55,7 +55,7 @@
                                             English
                                         </el-dropdown-item>
                                         <el-dropdown-item command="zh">中文(简体)</el-dropdown-item>
-                                        <el-dropdown-item command="tw">中文(繁體)</el-dropdown-item>
+                                        <el-dropdown-item command="zh-Hant">中文(繁體)</el-dropdown-item>
                                         <el-dropdown-item v-if="!globalStore.isIntl" command="en">
                                             English
                                         </el-dropdown-item>
@@ -274,7 +274,7 @@ function handleCommand(command: string) {
         dropdownText.value = 'English';
     } else if (command === 'pt-BR') {
         dropdownText.value = 'Português (Brasil)';
-    } else if (command === 'tw') {
+    } else if (command === 'zh-Hant') {
         dropdownText.value = '中文(繁體)';
     } else if (command === 'ko') {
         dropdownText.value = '한국어';

@@ -279,7 +279,7 @@ interface Node {
 
 const languageOptions = ref([
     { value: 'zh', label: '中文(简体)' },
-    { value: 'tw', label: '中文(繁體)' },
+    { value: 'zh-Hant', label: '中文(繁體)' },
     ...(!globalStore.isIntl ? [{ value: 'en', label: 'English' }] : []),
     { value: 'ja', label: '日本語' },
     { value: 'pt-BR', label: 'Português (Brasil)' },
