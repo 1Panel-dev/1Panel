@@ -881,7 +881,7 @@ const toFavorite = (row: File.Favorite) => {
 };
 
 const toTerminal = () => {
-    router.push({ path: '/hosts/terminal', query: { path: req.path } });
+    router.push({ path: '/terminal', query: { path: req.path } });
 };
 
 const openWithVSCode = (row: File.File) => {
