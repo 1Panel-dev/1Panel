@@ -201,7 +201,7 @@ func (u *ContainerService) CreateCompose(req dto.ComposeCreate) error {
 	}
 	go func() {
 		taskItem.AddSubTask(i18n.GetMsgByKey("ComposeCreate"), func(t *task.Task) error {
-			cmd := exec.Command("docker-compose", "-f", req.Path, "up", "-d")
+			cmd := exec.Command("docker", "compose", "-f", req.Path, "up", "-d")
 			out, err := cmd.CombinedOutput()
 			taskItem.Log(i18n.GetWithName("ComposeCreateRes", string(out)))
 			if err != nil {

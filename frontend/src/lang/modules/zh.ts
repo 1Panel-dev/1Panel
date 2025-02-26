@@ -298,6 +298,7 @@ const message = {
             installerr: '安装失败',
             applyerror: '申请失败',
             systemrestart: '中断',
+            starterr: '启动失败',
         },
         units: {
             second: '秒',

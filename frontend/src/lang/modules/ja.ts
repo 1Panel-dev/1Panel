@@ -300,6 +300,7 @@ const message = {
             installerr: 'インストールに失敗しました',
             applyerror: '適用に失敗しました',
             systemrestart: '中断',
+            starterr: '起動に失敗しました',
         },
         units: {
             second: '2番目|2番目|秒',

@@ -306,6 +306,7 @@ const message = {
             installerr: 'Installation failed',
             applyerror: 'Apply failed',
             systemrestart: 'Interrupted',
+            starterr: 'Startup failed',
         },
         units: {
             second: 'Second',

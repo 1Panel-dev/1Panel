@@ -300,6 +300,7 @@ const message = {
             installerr: '安裝失敗',
             applyerror: '申請失敗',
             systemrestart: '中斷',
+            starterr: '啟動失敗',
         },
         units: {
             second: '秒',

@@ -150,7 +150,7 @@ func runComposeCmdWithLog(operate string, composePath string, logPath string) er
 
 	err = cmd.Run()
 	if err != nil {
-		return errors.New(buserr.New("ErrRuntimeStart").Error() + ":" + err.Error())
+		return errors.New(buserr.New("ErrRuntimeStart").Error() + ":" + stderrBuf.String())
 	}
 	return nil
 }
@@ -263,7 +263,7 @@ func buildRuntime(runtime *model.Runtime, oldImageID string, oldEnv string, rebu
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Hour)
 	defer cancel()
 
-	cmd := exec.CommandContext(ctx, "docker-compose", "-f", composePath, "build")
+	cmd := exec.CommandContext(ctx, "docker", "compose", "-f", composePath, "build")
 	cmd.Stdout = logFile
 	var stderrBuf bytes.Buffer
 	multiWriterStderr := io.MultiWriter(&stderrBuf, logFile)

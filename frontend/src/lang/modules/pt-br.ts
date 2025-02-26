@@ -305,6 +305,7 @@ const message = {
             installerr: 'Falha na instalação',
             applyerror: 'Falha na aplicação',
             systemrestart: 'Interrompido',
+            starterr: 'Falha na inicialização',
         },
         units: {
             second: 'segundo | segundos | segundos',

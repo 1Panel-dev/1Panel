@@ -301,6 +301,7 @@ const message = {
             installerr: '설치 실패',
             applyerror: '적용 실패',
             systemrestart: '중단됨',
+            starterr: '시작 실패',
         },
         units: {
             second: '초 | 초 | 초',

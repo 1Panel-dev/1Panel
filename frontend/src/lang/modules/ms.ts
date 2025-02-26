@@ -307,6 +307,7 @@ const message = {
             installerr: 'Pemasangan gagal',
             applyerror: 'Permohonan gagal',
             systemrestart: 'Dihentikan',
+            starterr: 'Permulaan gagal',
         },
         units: {
             second: 'saat | saat | saat',

@@ -301,6 +301,7 @@ const message = {
             installerr: 'Ошибка установки',
             applyerror: 'Ошибка применения',
             systemrestart: 'Прервано',
+            starterr: 'Ошибка запуска',
         },
         units: {
             second: ' секунда | секунда | секунд',
