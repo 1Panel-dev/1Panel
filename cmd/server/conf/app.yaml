@@ -5,7 +5,8 @@ system:
   repo_url: https://resource.1panel.pro
   app_repo: https://apps.1panel.pro
   is_demo: false
-  port: 8888
+  is_intl: true
+  port: 9999
   username: admin
   password: admin123
 
