@@ -1578,6 +1578,8 @@ definitions:
     type: object
   dto.ForwardRuleOperate:
     properties:
+      forceDelete:
+        type: boolean
       rules:
         items:
           properties:
@@ -2480,6 +2482,8 @@ definitions:
     type: object
   dto.OllamaBindDomainRes:
     properties:
+      acmeAccountID:
+        type: integer
       allowIPs:
         items:
           type: string
@@ -8585,7 +8589,7 @@ paths:
         in: path
         name: id
         required: true
-        type: integer
+        type: string
       responses:
         "200":
           description: OK
@@ -16762,7 +16766,15 @@ schemes:
 - https
 securityDefinitions:
   ApiKeyAuth:
-    description: '- `1Panel-Token` is the key for the panel API Key.'
+    description: |-
+      Custom Token Format, Format: md5('1panel' + API-Key + UnixTimestamp).
+      ```
+      eg:
+      curl -X GET "http://localhost:4004/api/v1/dashboard/current" \
+      -H "1Panel-Token: <1panel_token>" \
+      -H "1Panel-Timestamp: <current_unix_timestamp>"
+      ```
+      - `1Panel-Token` is the key for the panel API Key.
     in: header
     name: 1Panel-Token
     type: apiKey

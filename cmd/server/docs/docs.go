@@ -3483,7 +3483,7 @@ const docTemplate = `{
                 "summary": "Container stats",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "container id",
                         "name": "id",
                         "in": "path",
@@ -19382,6 +19382,9 @@ const docTemplate = `{
         "dto.ForwardRuleOperate": {
             "type": "object",
             "properties": {
+                "forceDelete": {
+                    "type": "boolean"
+                },
                 "rules": {
                     "type": "array",
                     "items": {
@@ -20708,6 +20711,9 @@ const docTemplate = `{
         "dto.OllamaBindDomainRes": {
             "type": "object",
             "properties": {
+                "acmeAccountID": {
+                    "type": "integer"
+                },
                 "allowIPs": {
                     "type": "array",
                     "items": {
@@ -26721,7 +26727,7 @@ const docTemplate = `{
     },
     "securityDefinitions": {
         "ApiKeyAuth": {
-            "description": "- ` + "`" + `1Panel-Token` + "`" + ` is the key for the panel API Key.",
+            "description": "Custom Token Format, Format: md5('1panel' + API-Key + UnixTimestamp).\n` + "`" + `` + "`" + `` + "`" + `\neg:\ncurl -X GET \"http://localhost:4004/api/v1/dashboard/current\" \\\n-H \"1Panel-Token: \u003c1panel_token\u003e\" \\\n-H \"1Panel-Timestamp: \u003ccurrent_unix_timestamp\u003e\"\n` + "`" + `` + "`" + `` + "`" + `\n- ` + "`" + `1Panel-Token` + "`" + ` is the key for the panel API Key.",
             "type": "apiKey",
             "name": "1Panel-Token",
             "in": "header"
