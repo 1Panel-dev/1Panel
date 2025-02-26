@@ -6,7 +6,7 @@
                     {{ $t('menu.terminal') }}
                 </el-radio-button>
                 <el-radio-button class="router_card_button" size="large" value="host">
-                    {{ $t('menu.host') }}
+                    {{ $t('terminal.host') }}
                 </el-radio-button>
                 <el-radio-button class="router_card_button" size="large" value="command">
                     {{ $t('terminal.quickCommand') }}

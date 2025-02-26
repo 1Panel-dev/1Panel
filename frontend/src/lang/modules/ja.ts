@@ -331,7 +331,6 @@ const message = {
         aiTools: 'AI',
         container: 'コンテナ|コンテナ',
         cronjob: 'クロンジョブ|クロンの仕事',
-        host: 'ホスト|ホスト',
         system: 'システム',
         security: '安全',
         files: 'ファイル',

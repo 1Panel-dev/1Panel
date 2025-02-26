@@ -331,7 +331,7 @@ const message = {
         aiTools: 'AI',
         container: '容器',
         cronjob: '計劃任務',
-        host: '主機',
+        system: '系統',
         files: '文件',
         monitor: '監控',
         terminal: '終端',

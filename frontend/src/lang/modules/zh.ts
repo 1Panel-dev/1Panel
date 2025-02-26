@@ -329,7 +329,7 @@ const message = {
         aiTools: 'AI',
         container: '容器',
         cronjob: '计划任务',
-        host: '主机',
+        system: '系统',
         files: '文件',
         monitor: '监控',
         terminal: '终端',

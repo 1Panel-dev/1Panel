@@ -7,7 +7,7 @@ const hostRouter = {
     redirect: '/hosts/security',
     meta: {
         icon: 'p-host',
-        title: 'menu.host',
+        title: 'menu.system',
     },
     children: [
         {

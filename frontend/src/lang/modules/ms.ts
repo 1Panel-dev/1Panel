@@ -338,7 +338,6 @@ const message = {
         aiTools: 'AI',
         container: 'Container | Containers',
         cronjob: 'Cron Job | Cron Jobs',
-        host: 'Host | Hosts',
         system: 'System',
         security: 'Security',
         files: 'Files',
