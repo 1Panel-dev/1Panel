@@ -25,8 +25,6 @@ SystemRestart: "系統重啟導致任務中斷"
 ErrInvalidChar: "禁止使用非法字元"
 
 #backup
-ErrBackupInUsed: "該備份帳號已在計劃任務中使用，無法刪除"
-ErrBackupCheck: "備份帳號測試連接失敗 {{.err}}"
 ErrBackupLocalDelete: "暫不支持刪除本地伺服器備份帳號"
 ErrBackupLocalCreate: "暫不支持創建本地伺服器備份帳號"
 
@@ -245,7 +243,7 @@ attackCount: '攻擊頻率限制'
 fileExtCheck: '檔案上傳限制'
 geoRestrict: '地區訪問限制'
 unknownWebsite: '未授權域名訪問'
-notFoundLimit: '404 頻率限制'
+notFoundCount: '404 頻率限制'
 headerDefense: 'Header 規則'
 defaultUaBlack: 'User-Agent 規則'
 methodWhite: 'HTTP 規則'
