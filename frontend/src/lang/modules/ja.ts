@@ -1694,9 +1694,8 @@ const message = {
 
         license: 'ライセンス',
         bindNode: 'ノードをバインド',
-        advancedMenuHide: '高度なメニューを非表示にします',
-        showMainAdvancedMenu:
-            'メニューが1つしか保持されていない場合、メインの詳細メニューのみがサイドバーに表示されます',
+        menuSetting: 'メニュー設定',
+        menuSettingHelper: '1つのメニューだけを保持する場合、サイドバーにはそのメニューが直接表示されます。',
         showAll: 'すべてを表示します',
         hideALL: 'すべてを隠します',
         ifShow: '表示するかどうか',

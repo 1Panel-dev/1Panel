@@ -48,7 +48,7 @@ export namespace Setting {
         weChatVars: string;
         dingVars: string;
         snapshotIgnore: string;
-        xpackHideMenu: string;
+        hideMenu: string;
         noAuthSetting: string;
 
         proxyUrl: string;
@@ -191,7 +191,7 @@ export namespace Setting {
         key: string;
         name: string;
         size: number;
-        isCheck: boolean;
+        isShow: boolean;
         isDisable: boolean;
 
         path: string;

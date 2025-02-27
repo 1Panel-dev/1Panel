@@ -3,6 +3,7 @@ import { Layout } from '@/routers/constant';
 const hostRouter = {
     sort: 7,
     path: '/hosts',
+    name: 'System-Menu',
     component: Layout,
     redirect: '/hosts/security',
     meta: {

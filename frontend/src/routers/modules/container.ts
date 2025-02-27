@@ -3,6 +3,7 @@ import { Layout } from '@/routers/constant';
 const containerRouter = {
     sort: 6,
     path: '/containers',
+    name: 'Container-Menu',
     component: Layout,
     redirect: '/containers/container',
     meta: {
@@ -12,7 +13,7 @@ const containerRouter = {
     children: [
         {
             path: '/containers',
-            name: 'Containers',
+            name: 'Container',
             redirect: '/containers/dashboard',
             component: () => import('@/views/container/index.vue'),
             meta: {},
@@ -30,7 +31,7 @@ const containerRouter = {
                 },
                 {
                     path: 'container',
-                    name: 'Container',
+                    name: 'ContainerItem',
                     component: () => import('@/views/container/container/index.vue'),
                     props: true,
                     hidden: true,

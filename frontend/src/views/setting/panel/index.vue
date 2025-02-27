@@ -160,14 +160,10 @@
                                 <span class="input-help">{{ $t('setting.developerModeHelper') }}</span>
                             </el-form-item>
 
-                            <el-form-item :label="$t('setting.advancedMenuHide')">
-                                <el-input disabled v-model="form.proHideMenus">
-                                    <template #append>
-                                        <el-button v-show="!show" @click="onChangeHideMenus" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
+                            <el-form-item :label="$t('setting.menuSetting')">
+                                <el-button v-show="!show" @click="onChangeHideMenus" icon="Setting">
+                                    {{ $t('commons.button.set') }}
+                                </el-button>
                             </el-form-item>
                         </el-col>
                     </el-row>
@@ -252,8 +248,7 @@ const form = reactive({
     ipWhiteList: '',
     apiKeyValidityTime: 120,
 
-    proHideMenus: ref(i18n.t('setting.unSetting')),
-    hideMenuList: '',
+    hideMenu: '',
 });
 
 const show = ref();
@@ -267,15 +262,6 @@ const hideMenuRef = ref();
 const themeColorRef = ref();
 const apiInterfaceRef = ref();
 const unset = ref(i18n.t('setting.unSetting'));
-
-interface Node {
-    id: string;
-    title: string;
-    path?: string;
-    label: string;
-    isCheck: boolean;
-    children?: Node[];
-}
 
 const languageOptions = ref([
     { value: 'zh', label: '中文(简体)' },
@@ -312,19 +298,7 @@ const search = async () => {
     form.apiKey = res.data.apiKey;
     form.ipWhiteList = res.data.ipWhiteList;
     form.apiKeyValidityTime = res.data.apiKeyValidityTime;
-
-    const json: Node = JSON.parse(res.data.xpackHideMenu);
-    if (json.isCheck === false) {
-        json.children.forEach((child: any) => {
-            if (child.isCheck === true) {
-                child.isCheck = false;
-            }
-        });
-    }
-    form.proHideMenus = JSON.stringify(json);
-    form.hideMenuList = JSON.stringify(json);
-    const checkedTitles = getCheckedTitles(json);
-    form.proHideMenus = checkedTitles.toString();
+    form.hideMenu = res.data.hideMenu;
 
     if (isMasterProductPro.value) {
         const xpackRes = await getXpackSetting();
@@ -341,30 +315,6 @@ const search = async () => {
         form.theme = globalStore.themeConfig.theme || res.data.theme || 'light';
     }
 };
-
-function extractTitles(node: Node, result: string[]): void {
-    if (!node.isCheck && !node.children) {
-        result.push(i18n.t(node.title));
-    }
-    if (node.children) {
-        for (const childNode of node.children) {
-            extractTitles(childNode, result);
-        }
-    }
-}
-
-function getCheckedTitles(json: Node): string[] {
-    let result: string[] = [];
-    extractTitles(json, result);
-    if (result.length === 0) {
-        result.push(i18n.t('setting.unSetting'));
-    }
-    if (result.length === json.children.length) {
-        result = [];
-        result.push(i18n.t('setting.hideALL'));
-    }
-    return result;
-}
 
 const onChangePassword = () => {
     passwordRef.value.acceptParams({ complexityVerification: form.complexityVerification });
@@ -391,7 +341,7 @@ const onChangeProxy = () => {
 };
 
 const onChangeHideMenus = () => {
-    hideMenuRef.value.acceptParams({ menuList: form.hideMenuList });
+    hideMenuRef.value.acceptParams({ hideMenu: form.hideMenu });
 };
 
 const onChangeThemeColor = () => {

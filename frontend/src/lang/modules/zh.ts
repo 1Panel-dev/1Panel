@@ -1689,8 +1689,8 @@ const message = {
 
         license: '许可证',
         bindNode: '绑定节点',
-        advancedMenuHide: '高级功能菜单隐藏',
-        showMainAdvancedMenu: '如果只保留 1 个菜单，则侧边栏只会显示高级功能主菜单',
+        menuSetting: '菜单设置',
+        menuSettingHelper: '如果只保留 1 个菜单，则侧边栏会直接显示该菜单',
         showAll: '全部显示',
         hideALL: '全部隐藏',
         ifShow: '是否显示',

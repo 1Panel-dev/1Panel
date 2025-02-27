@@ -33,7 +33,7 @@ type SettingInfo struct {
 	AppStoreLastModified string `json:"appStoreLastModified"`
 	AppStoreSyncStatus   string `json:"appStoreSyncStatus"`
 
-	XpackHideMenu string `json:"xpackHideMenu"`
+	HideMenu      string `json:"hideMenu"`
 	NoAuthSetting string `json:"noAuthSetting"`
 
 	ProxyUrl        string `json:"proxyUrl"`
@@ -179,13 +179,14 @@ type Clean struct {
 	Size     uint64 `json:"size"`
 }
 
-type XpackHideMenu struct {
-	ID       string          `json:"id"`
-	Label    string          `json:"label"`
-	IsCheck  bool            `json:"isCheck"`
-	Title    string          `json:"title"`
-	Path     string          `json:"path,omitempty"`
-	Children []XpackHideMenu `json:"children,omitempty"`
+type ShowMenu struct {
+	ID       string     `json:"id"`
+	Label    string     `json:"label"`
+	Disabled bool       `json:"disabled"`
+	IsShow   bool       `json:"isShow"`
+	Title    string     `json:"title"`
+	Path     string     `json:"path,omitempty"`
+	Children []ShowMenu `json:"children,omitempty"`
 }
 
 type ApiInterfaceConfig struct {

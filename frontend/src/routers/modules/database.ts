@@ -3,6 +3,7 @@ import { Layout } from '@/routers/constant';
 const databaseRouter = {
     sort: 5,
     path: '/databases',
+    name: 'Database-Menu',
     component: Layout,
     redirect: '/databases/mysql',
     meta: {
@@ -12,7 +13,7 @@ const databaseRouter = {
     children: [
         {
             path: '/databases',
-            name: 'Databases',
+            name: 'Database',
             redirect: '/databases/mysql',
             component: () => import('@/views/database/index.vue'),
             meta: {},

@@ -3,6 +3,7 @@ import { Layout } from '@/routers/constant';
 const settingRouter = {
     sort: 12,
     path: '/settings',
+    name: 'Setting-Menu',
     component: Layout,
     redirect: '/settings/panel',
     meta: {

@@ -3,6 +3,7 @@ import { Layout } from '@/routers/constant';
 const logsRouter = {
     sort: 11,
     path: '/logs',
+    name: 'Log-Menu',
     component: Layout,
     redirect: '/logs/operation',
     meta: {

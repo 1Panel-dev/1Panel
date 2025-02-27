@@ -3,6 +3,7 @@ import { Layout } from '@/routers/constant';
 const appStoreRouter = {
     sort: 2,
     path: '/apps',
+    name: 'App-Menu',
     component: Layout,
     redirect: '/apps/all',
     meta: {

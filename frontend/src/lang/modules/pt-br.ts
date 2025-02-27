@@ -1736,9 +1736,8 @@ const message = {
 
         license: 'Licença',
         bindNode: 'Vincular Nó',
-        advancedMenuHide: 'Ocultar menu avançado',
-        showMainAdvancedMenu:
-            'Se apenas um menu for mantido, somente o menu avançado principal será exibido na barra lateral',
+        menuSetting: 'Configurações do Menu',
+        menuSettingHelper: 'Se apenas 1 menu for mantido, a barra lateral exibirá diretamente esse menu.',
         showAll: 'Mostrar Tudo',
         hideALL: 'Ocultar Tudo',
         ifShow: 'Exibir?',

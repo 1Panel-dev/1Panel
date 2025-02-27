@@ -7,6 +7,7 @@ modules = { ...modules, ...xpackModules };
 
 const homeRouter: RouteRecordRaw = {
     path: '/',
+    name: 'Home-Menu',
     component: Layout,
     redirect: '/',
     meta: {

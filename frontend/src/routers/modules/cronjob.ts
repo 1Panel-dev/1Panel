@@ -3,6 +3,7 @@ import { Layout } from '@/routers/constant';
 const cronRouter = {
     sort: 9,
     path: '/cronjobs',
+    name: 'Cronjob-Menu',
     component: Layout,
     redirect: '/cronjobs',
     meta: {

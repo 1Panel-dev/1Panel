@@ -3,6 +3,7 @@ import { Layout } from '@/routers/constant';
 const toolboxRouter = {
     sort: 9,
     path: '/toolbox',
+    name: 'Toolbox-Menu',
     component: Layout,
     redirect: '/toolbox/supervisor',
     meta: {

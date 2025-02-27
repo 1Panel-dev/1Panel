@@ -1,25 +1,19 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('setting.advancedMenuHide')" :back="handleClose" size="small">
-        <template #content>
-            <ComplexTable
-                class="mb-5 w-full"
-                :data="treeData.hideMenu"
-                :show-header="false"
-                row-key="id"
-                default-expand-all
-            >
-                <el-table-column prop="title" :label="$t('setting.menu')">
-                    <template #default="{ row }">
-                        {{ i18n.global.t(row.title) }}
-                    </template>
-                </el-table-column>
-                <el-table-column prop="isCheck" :label="$t('setting.ifShow')">
-                    <template #default="{ row }">
-                        <el-switch v-model="row.isCheck" @change="onSaveStatus(row)" />
-                    </template>
-                </el-table-column>
-            </ComplexTable>
-        </template>
+    <DrawerPro v-model="drawerVisible" :header="$t('setting.menuSetting')" :back="handleClose" size="small">
+        <el-alert :closable="false" :title="$t('setting.menuSettingHelper')" type="warning" />
+        <ComplexTable :heightDiff="1" :data="treeData.hideMenu" :show-header="false" row-key="id">
+            <el-table-column prop="title" :label="$t('setting.menu')">
+                <template #default="{ row }">
+                    {{ i18n.global.t(row.title) }}
+                </template>
+            </el-table-column>
+            <el-table-column prop="isShow" :label="$t('setting.ifShow')">
+                <template #default="{ row }">
+                    <el-switch v-if="!row.disabled" v-model="row.isShow" @change="onChangeShow(row)" />
+                    <span v-else>-</span>
+                </template>
+            </el-table-column>
+        </ComplexTable>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
@@ -42,35 +36,21 @@ const globalStore = GlobalStore();
 
 const drawerVisible = ref();
 const loading = ref();
-const defaultCheck = ref([]);
-const emit = defineEmits<{ (e: 'search'): void }>();
 interface DialogProps {
-    menuList: string;
+    hideMenu: string;
 }
-const menuList = ref();
+const acceptParams = (params: DialogProps): void => {
+    drawerVisible.value = true;
+    treeData.hideMenu = JSON.parse(params.hideMenu) || [];
+    if (globalStore.isIntl) {
+        treeData.hideMenu = removeXAlertDashboard(treeData.hideMenu);
+    }
+};
 
 const treeData = reactive({
     hideMenu: [],
     checkedData: [],
 });
-
-function loadCheck(data: any, checkList: any) {
-    if (data.children === null) {
-        if (data.isCheck) {
-            checkList.push(data.id);
-        }
-        return;
-    }
-    for (const item of data) {
-        if (item.isCheck) {
-            checkList.push(item.id);
-            continue;
-        }
-        if (item.children) {
-            loadCheck(item.children, checkList);
-        }
-    }
-}
 
 const removeXAlertDashboard = (data: any): any => {
     return data
@@ -83,51 +63,12 @@ const removeXAlertDashboard = (data: any): any => {
         });
 };
 
-const onSaveStatus = async (row: any) => {
-    if (row.label === '/xpack') {
-        if (!row.isCheck) {
-            for (const item of treeData.hideMenu[0].children) {
-                item.isCheck = false;
-            }
-        } else {
-            let flag = false;
-            for (const item of treeData.hideMenu[0].children) {
-                if (item.isCheck) {
-                    flag = true;
-                }
-            }
-            if (!flag && row.isCheck) {
-                for (const item of treeData.hideMenu[0].children) {
-                    item.isCheck = true;
-                }
-            }
-        }
-    } else {
-        let flag = false;
-        if (row.isCheck) {
-            treeData.hideMenu[0].isCheck = true;
-        }
-        for (const item of treeData.hideMenu[0].children) {
-            if (item.isCheck) {
-                flag = true;
-            }
-        }
-        if (!flag) {
-            treeData.hideMenu[0].isCheck = false;
+const onChangeShow = async (row: any) => {
+    if (row.children) {
+        for (const item of row.children) {
+            item.isShow = row.isShow;
         }
     }
-};
-
-const acceptParams = (params: DialogProps): void => {
-    menuList.value = params.menuList;
-    drawerVisible.value = true;
-    treeData.hideMenu = [];
-    defaultCheck.value = [];
-    treeData.hideMenu.push(JSON.parse(menuList.value));
-    if (globalStore.isIntl) {
-        treeData.hideMenu = removeXAlertDashboard(treeData.hideMenu);
-    }
-    loadCheck(treeData.hideMenu, defaultCheck.value);
 };
 
 const handleClose = () => {
@@ -135,18 +76,17 @@ const handleClose = () => {
 };
 
 const saveHideMenus = async () => {
-    ElMessageBox.confirm(i18n.global.t('setting.confirmMessage'), i18n.global.t('setting.advancedMenuHide'), {
+    ElMessageBox.confirm(i18n.global.t('setting.confirmMessage'), i18n.global.t('setting.menuSetting'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',
     }).then(async () => {
-        const updateJson = JSON.stringify(treeData.hideMenu[0]);
-        await updateMenu({ key: 'XpackHideMenu', value: updateJson })
+        const updateJson = JSON.stringify(treeData.hideMenu);
+        await updateMenu({ key: 'HideMenu', value: updateJson })
             .then(async () => {
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 loading.value = false;
                 drawerVisible.value = false;
-                emit('search');
                 window.location.reload();
             })
             .catch(() => {

@@ -3,6 +3,7 @@ import { Layout } from '@/routers/constant';
 const terminalRouter = {
     sort: 8,
     path: '/terminal',
+    name: 'Terminal-Menu',
     component: Layout,
     redirect: '/terminal',
     meta: {

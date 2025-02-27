@@ -97,6 +97,21 @@ func (u *SettingService) Update(key, value string) error {
 			_ = settingRepo.Create("AppStoreLastModified", value)
 			return nil
 		}
+	case "HideMenu":
+		var menus []dto.ShowMenu
+		if err := json.Unmarshal([]byte(value), &menus); err != nil {
+			return err
+		}
+		for i := 0; i < len(menus); i++ {
+			if menus[i].Label == "Home-Menu" || menus[i].Label == "App-Menu" || menus[i].Label == "Setting-Menu" {
+				menus[i].IsShow = true
+			}
+		}
+		menuItem, err := json.Marshal(&menus)
+		if err != nil {
+			return err
+		}
+		value = string(menuItem)
 	}
 
 	if err := settingRepo.Update(key, value); err != nil {

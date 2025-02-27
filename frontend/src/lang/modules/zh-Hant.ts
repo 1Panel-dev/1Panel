@@ -1697,8 +1697,8 @@ const message = {
 
         license: '許可證',
         bindNode: '綁定節點',
-        advancedMenuHide: '高級功能選單隱藏',
-        showMainAdvancedMenu: '如果只保留 1 個選單，則側邊欄只會顯示高級功能主選單',
+        menuSetting: '菜單設定',
+        menuSettingHelper: '如果只保留 1 個菜單，則側邊欄會直接顯示該菜單。',
         showAll: '全部顯示',
         hideALL: '全部隱藏',
         ifShow: '是否顯示',

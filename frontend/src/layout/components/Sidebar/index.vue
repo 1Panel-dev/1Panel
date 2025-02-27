@@ -117,15 +117,6 @@ const loadCurrentName = () => {
 };
 
 const screenWidth = ref(0);
-
-interface Node {
-    id: string;
-    title: string;
-    path?: string;
-    label: string;
-    isCheck: boolean;
-    children?: Node[];
-}
 const listeningWindow = () => {
     window.onresize = () => {
         return (() => {
@@ -204,68 +195,46 @@ const changeNode = (command: string) => {
     }
 };
 
-function extractLabels(node: Node, result: string[]): void {
-    if (node.isCheck) {
-        result.push(node.label);
-    }
-    if (node.children) {
-        for (const childNode of node.children) {
-            extractLabels(childNode, result);
+function getCheckedLabels(menu: any, showMap: any) {
+    for (const item of menu) {
+        if (item.isShow) {
+            showMap[item.label] = true;
+        }
+        if (item.children) {
+            getCheckedLabels(item.children, showMap);
         }
     }
-}
-
-function getCheckedLabels(json: Node): string[] {
-    let result: string[] = [];
-    extractLabels(json, result);
-    return result;
 }
 
 const search = async () => {
-    let checkedLabels: any[] = [];
     const res = await getSettingInfo();
     version.value = res.data.systemVersion;
-    const json: Node = JSON.parse(res.data.xpackHideMenu);
-    checkedLabels = getCheckedLabels(json);
-
+    const menuItem = JSON.parse(res.data.hideMenu);
+    const showMap = new Map();
+    getCheckedLabels(menuItem, showMap);
     let rstMenuList: RouteRecordRaw[] = [];
-    menuStore.menuList.forEach((item) => {
-        let menuItem = JSON.parse(JSON.stringify(item));
-        let menuChildren: RouteRecordRaw[] = [];
-        if (menuItem.path === '/xpack') {
-            if (checkedLabels.length) {
-                menuItem.children = menuItem.children.filter((child: any) => {
-                    return !(globalStore.isIntl && child.path.includes('/xpack/alert'));
-                });
-                menuItem.children.forEach((child: any) => {
-                    for (const str of checkedLabels) {
-                        if (child.name === str) {
-                            child.hidden = false;
-                        }
-                    }
-                    if (child.hidden === false) {
-                        menuChildren.push(child);
-                        if (checkedLabels.length === 2) {
-                            menuItem.meta.title = child.meta.title;
-                        } else {
-                            menuItem.meta.title = 'xpack.menu';
-                        }
-                    }
-                });
-                menuItem.meta.hideInSidebar = false;
-            }
-            menuItem.children = menuChildren as RouteRecordRaw[];
-            rstMenuList.push(menuItem);
-        } else {
-            menuItem.children.forEach((child: any) => {
-                if (!child.hidden) {
-                    menuChildren.push(child);
-                }
-            });
-            menuItem.children = menuChildren as RouteRecordRaw[];
-            rstMenuList.push(menuItem);
+    for (const menu of menuStore.menuList) {
+        let menuItem = JSON.parse(JSON.stringify(menu));
+        if (!showMap[menuItem.name]) {
+            continue;
+        } else if (menuItem.name === 'Xpack-Menu') {
+            menuItem.meta.hideInSidebar = false;
         }
-    });
+        let itemChildren = [];
+        for (const item of menuItem.children) {
+            if (item.name === 'XAlertDashboard' && globalStore.isIntl) {
+                continue;
+            }
+            if (showMap[item.name]) {
+                itemChildren.push(item);
+            }
+        }
+        if (itemChildren.length === 1) {
+            menuItem.meta.title = itemChildren[0].meta.title;
+        }
+        menuItem.children = itemChildren;
+        rstMenuList.push(menuItem);
+    }
     menuStore.menuList = rstMenuList;
 };
 

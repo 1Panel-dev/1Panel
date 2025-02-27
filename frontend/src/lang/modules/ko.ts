@@ -1667,8 +1667,8 @@ const message = {
 
         license: '라이선스',
         bindNode: '노드 바인딩',
-        advancedMenuHide: '고급 메뉴 숨기기',
-        showMainAdvancedMenu: '하나의 메뉴만 유지하면 사이드바에 주 고급 메뉴만 표시됩니다.',
+        menuSetting: '메뉴 설정',
+        menuSettingHelper: '메뉴를 1개만 유지하면 사이드바에 해당 메뉴가 직접 표시됩니다.',
         showAll: '모두 표시',
         hideALL: '모두 숨기기',
         ifShow: '표시 여부',

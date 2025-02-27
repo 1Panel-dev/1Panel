@@ -8,6 +8,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/app/model"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
+	"github.com/1Panel-dev/1Panel/core/init/migration/helper"
 	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
 	"github.com/go-gormigrate/gormigrate/v2"
@@ -302,6 +303,16 @@ var AddMFAInterval = &gormigrate.Migration{
 	ID: "20250207-add-mfa-interval",
 	Migrate: func(tx *gorm.DB) error {
 		if err := tx.Create(&model.Setting{Key: "MFAInterval", Value: "30"}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var UpdateXpackHideMemu = &gormigrate.Migration{
+	ID: "20250227-update-xpack-hide-menu",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Model(&model.Setting{}).Where("key = ?", "XpackHideMenu").Updates(map[string]interface{}{"key": "HideMenu", "value": helper.LoadMenus()}).Error; err != nil {
 			return err
 		}
 		return nil

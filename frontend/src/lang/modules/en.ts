@@ -1829,9 +1829,8 @@ const message = {
 
         license: 'License',
         bindNode: 'Bind Node',
-        advancedMenuHide: 'Advanced Menu Hide',
-        showMainAdvancedMenu:
-            'If only one menu is retained, only the main advanced menu will be displayed in the sidebar',
+        menuSetting: 'Menu Settings',
+        menuSettingHelper: 'If only 1 menu is kept, the sidebar will directly display that menu.',
         showAll: 'Show All',
         hideALL: 'Hide All',
         ifShow: 'Whether to Show',

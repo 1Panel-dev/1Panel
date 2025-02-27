@@ -1751,8 +1751,8 @@ const message = {
 
         license: 'Lesen',
         bindNode: 'Ikatan Nod',
-        advancedMenuHide: 'Sembunyikan menu lanjutan',
-        showMainAdvancedMenu: 'Jika hanya satu menu dikekalkan, hanya menu lanjutan utama akan dipaparkan di bar sisi',
+        menuSetting: 'Tetapan Menu',
+        menuSettingHelper: 'Jika hanya 1 menu yang disimpan, bar sisi akan langsung menampilkan menu tersebut.',
         showAll: 'Papar Semua',
         hideALL: 'Sembunyikan Semua',
         ifShow: 'Sama ada untuk Dipaparkan',

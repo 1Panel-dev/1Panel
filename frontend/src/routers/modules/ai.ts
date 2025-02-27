@@ -3,6 +3,7 @@ import { Layout } from '@/routers/constant';
 const databaseRouter = {
     sort: 4,
     path: '/ai',
+    name: 'AI-Menu',
     component: Layout,
     redirect: '/ai/model',
     meta: {
