@@ -3,12 +3,12 @@
         <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
             <el-form-item :label="$t('setting.ipv6')" prop="ipv6" :rules="Rules.requiredSelect">
                 <el-radio-group style="width: 100%" v-model="form.ipv6" @change="onChangeMode()">
-                    <el-radio value="enable">{{ $t('commons.button.enable') }}</el-radio>
-                    <el-radio value="disable">{{ $t('commons.button.disable') }}</el-radio>
+                    <el-radio value="Enable">{{ $t('commons.button.enable') }}</el-radio>
+                    <el-radio value="Disable">{{ $t('commons.button.disable') }}</el-radio>
                 </el-radio-group>
             </el-form-item>
             <el-form-item
-                v-if="form.ipv6 === 'disable'"
+                v-if="form.ipv6 === 'Disable'"
                 :label="$t('setting.bindAddress')"
                 prop="bindAddress"
                 :rules="Rules.ip"
@@ -82,7 +82,7 @@ const loadInterface = async () => {
 };
 
 const onChangeMode = () => {
-    form.bindAddress = form.ipv6 === 'enable' ? '::' : '0.0.0.0';
+    form.bindAddress = form.ipv6 === 'Enable' ? '::' : '0.0.0.0';
 };
 
 const onSavePort = async (formEl: FormInstance | undefined) => {

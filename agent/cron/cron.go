@@ -28,7 +28,7 @@ func Run() {
 	if err := global.DB.Where("key = ?", "MonitorStatus").Find(&status).Error; err != nil {
 		global.LOG.Errorf("load monitor status from db failed, err: %v", err)
 	}
-	if status.Value == "enable" {
+	if status.Value == "Enable" {
 		if err := global.DB.Where("key = ?", "MonitorInterval").Find(&interval).Error; err != nil {
 			global.LOG.Errorf("load monitor interval from db failed, err: %v", err)
 		}

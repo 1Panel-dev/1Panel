@@ -247,7 +247,6 @@ func loadDbConn(snap *snapHelper, targetDir string, req dto.SnapshotCreate) erro
 		}
 	}
 
-	_ = snap.snapAgentDB.Model(&model.Setting{}).Where("key = ?", "SystemIP").Updates(map[string]interface{}{"value": ""}).Error
 	_ = snap.snapAgentDB.Where("id = ?", snap.SnapID).Delete(&model.Snapshot{}).Error
 
 	return nil

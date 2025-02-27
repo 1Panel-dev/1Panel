@@ -28,7 +28,7 @@ func NewIMonitorRepo() IMonitorRepo {
 
 func (u *MonitorRepo) GetBase(opts ...DBOption) ([]model.MonitorBase, error) {
 	var data []model.MonitorBase
-	db := global.DB
+	db := global.MonitorDB
 	for _, opt := range opts {
 		db = opt(db)
 	}
@@ -37,7 +37,7 @@ func (u *MonitorRepo) GetBase(opts ...DBOption) ([]model.MonitorBase, error) {
 }
 func (u *MonitorRepo) GetIO(opts ...DBOption) ([]model.MonitorIO, error) {
 	var data []model.MonitorIO
-	db := global.DB
+	db := global.MonitorDB
 	for _, opt := range opts {
 		db = opt(db)
 	}
@@ -46,7 +46,7 @@ func (u *MonitorRepo) GetIO(opts ...DBOption) ([]model.MonitorIO, error) {
 }
 func (u *MonitorRepo) GetNetwork(opts ...DBOption) ([]model.MonitorNetwork, error) {
 	var data []model.MonitorNetwork
-	db := global.DB
+	db := global.MonitorDB
 	for _, opt := range opts {
 		db = opt(db)
 	}

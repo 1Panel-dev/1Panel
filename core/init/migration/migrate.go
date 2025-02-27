@@ -22,6 +22,7 @@ func Init() {
 		migrations.RemoveLocalBackup,
 		migrations.AddMFAInterval,
 		migrations.UpdateXpackHideMemu,
+		migrations.AddSystemIP,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

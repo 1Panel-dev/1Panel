@@ -12,8 +12,8 @@
                                 <el-switch
                                     @change="onSaveStatus"
                                     v-model="form.monitorStatus"
-                                    active-value="enable"
-                                    inactive-value="disable"
+                                    active-value="Enable"
+                                    inactive-value="Disable"
                                 />
                             </el-form-item>
                             <el-form-item :label="$t('monitor.storeDays')" prop="monitorStoreDays">
@@ -72,7 +72,7 @@ import { MsgSuccess } from '@/utils/message';
 
 const loading = ref();
 const form = reactive({
-    monitorStatus: 'disable',
+    monitorStatus: 'Disable',
     monitorStoreDays: 30,
     monitorInterval: 1,
     defaultNetwork: '',
@@ -88,7 +88,8 @@ const search = async () => {
     form.monitorStatus = res.data.monitorStatus;
     form.monitorInterval = Number(res.data.monitorInterval);
     form.monitorStoreDays = Number(res.data.monitorStoreDays);
-    form.defaultNetwork = res.data.defaultNetwork;
+    form.defaultNetwork =
+        res.data.defaultNetwork === 'all' ? i18n.global.t('commons.table.all') : res.data.defaultNetwork;
 };
 
 const onSaveStatus = async () => {

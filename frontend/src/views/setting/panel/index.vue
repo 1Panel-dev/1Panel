@@ -118,6 +118,27 @@
                                 </span>
                             </el-form-item>
 
+                            <el-form-item
+                                v-if="globalStore.currentNode === 'local'"
+                                :label="$t('setting.systemIP')"
+                                prop="systemIP"
+                            >
+                                <el-input disabled v-if="form.systemIP" v-model="form.systemIP">
+                                    <template #append>
+                                        <el-button @click="onChangeSystemIP" icon="Setting">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                                <el-input disabled v-if="!form.systemIP" v-model="unset">
+                                    <template #append>
+                                        <el-button @click="onChangeSystemIP" icon="Setting">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                            </el-form-item>
+
                             <el-form-item :label="$t('setting.proxy')" prop="proxyShow">
                                 <el-input disabled v-model="form.proxyShow">
                                     <template #append>
@@ -174,6 +195,7 @@
         <Password ref="passwordRef" />
         <UserName ref="userNameRef" />
         <PanelName ref="panelNameRef" @search="search()" />
+        <SystemIP ref="systemIPRef" @search="search()" />
         <Proxy ref="proxyRef" @search="search()" />
         <ApiInterface ref="apiInterfaceRef" @search="search()" />
         <Timeout ref="timeoutRef" @search="search()" />
@@ -196,6 +218,7 @@ import Password from '@/views/setting/panel/password/index.vue';
 import UserName from '@/views/setting/panel/username/index.vue';
 import Timeout from '@/views/setting/panel/timeout/index.vue';
 import PanelName from '@/views/setting/panel/name/index.vue';
+import SystemIP from '@/views/setting/panel/systemip/index.vue';
 import Proxy from '@/views/setting/panel/proxy/index.vue';
 import HideMenu from '@/views/setting/panel/hidemenu/index.vue';
 import { storeToRefs } from 'pinia';
@@ -233,6 +256,7 @@ const form = reactive({
     language: '',
     complexityVerification: '',
     developerMode: '',
+    systemIP: '',
 
     proxyShow: '',
     proxyUrl: '',
@@ -256,6 +280,7 @@ const show = ref();
 const userNameRef = ref();
 const passwordRef = ref();
 const panelNameRef = ref();
+const systemIPRef = ref();
 const proxyRef = ref();
 const timeoutRef = ref();
 const hideMenuRef = ref();
@@ -299,6 +324,7 @@ const search = async () => {
     form.ipWhiteList = res.data.ipWhiteList;
     form.apiKeyValidityTime = res.data.apiKeyValidityTime;
     form.hideMenu = res.data.hideMenu;
+    form.systemIP = res.data.systemIP;
 
     if (isMasterProductPro.value) {
         const xpackRes = await getXpackSetting();
@@ -327,6 +353,9 @@ const onChangeTitle = () => {
 };
 const onChangeTimeout = () => {
     timeoutRef.value.acceptParams({ sessionTimeout: form.sessionTimeout });
+};
+const onChangeSystemIP = () => {
+    systemIPRef.value.acceptParams({ systemIP: form.systemIP });
 };
 const onChangeProxy = () => {
     proxyRef.value.acceptParams({

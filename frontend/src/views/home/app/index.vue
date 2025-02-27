@@ -4,7 +4,7 @@
             <template #header-r>
                 <el-popover placement="left" :width="226" trigger="click">
                     <el-input size="small" v-model="filter" clearable @input="loadOption()" />
-                    <el-table :show-header="false" :data="options" max-height="500px">
+                    <el-table :show-header="false" :data="options" max-height="150px">
                         <el-table-column prop="key" width="120" show-overflow-tooltip />
                         <el-table-column prop="name">
                             <template #default="{ row }">

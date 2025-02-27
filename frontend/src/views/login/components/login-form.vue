@@ -81,6 +81,7 @@
                         <el-form-item prop="password" class="w-full">
                             <el-input
                                 type="password"
+                                show-password
                                 v-model.trim="loginForm.password"
                                 class="w-full"
                                 size="large"

@@ -46,8 +46,8 @@
                             <el-form-item :label="$t('terminal.cursorBlink')">
                                 <el-switch
                                     v-model="form.cursorBlink"
-                                    active-value="enable"
-                                    inactive-value="disable"
+                                    active-value="Enable"
+                                    inactive-value="Disable"
                                     @change="changeItem()"
                                 />
                             </el-form-item>
@@ -115,7 +115,7 @@ const form = reactive({
     lineHeight: 1.2,
     letterSpacing: 1.2,
     fontSize: 12,
-    cursorBlink: 'enable',
+    cursorBlink: 'Enable',
     cursorStyle: 'underline',
     scrollback: 1000,
     scrollSensitivity: 10,
@@ -171,7 +171,7 @@ const changeItem = () => {
     term.value.options.lineHeight = form.lineHeight;
     term.value.options.letterSpacing = form.letterSpacing;
     term.value.options.fontSize = form.fontSize;
-    term.value.options.cursorBlink = form.cursorBlink === 'enable';
+    term.value.options.cursorBlink = form.cursorBlink === 'Enable';
     term.value.options.cursorStyle = form.cursorStyle;
     term.value.options.scrollback = form.scrollback;
     term.value.options.scrollSensitivity = form.scrollSensitivity;
@@ -183,7 +183,7 @@ const onSetDefault = () => {
     form.lineHeight = 1.2;
     form.letterSpacing = 0;
     form.fontSize = 12;
-    form.cursorBlink = 'enable';
+    form.cursorBlink = 'Enable';
     form.cursorStyle = 'block';
     form.scrollback = 1000;
     form.scrollSensitivity = 6;

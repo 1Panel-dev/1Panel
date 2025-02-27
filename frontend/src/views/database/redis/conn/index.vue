@@ -104,6 +104,8 @@ import { getAppConnInfo } from '@/api/modules/app';
 import { MsgSuccess } from '@/utils/message';
 import { getRandomStr } from '@/utils/util';
 import { getSettingInfo } from '@/api/modules/setting';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const loading = ref(false);
 
@@ -181,6 +183,10 @@ const loadPassword = async () => {
 };
 
 const loadSystemIP = async () => {
+    if (globalStore.currentNode !== 'local') {
+        form.systemIP = globalStore.currentNode || i18n.global.t('database.localIP');
+        return;
+    }
     const res = await getSettingInfo();
     form.systemIP = res.data.systemIP || i18n.global.t('database.localIP');
 };

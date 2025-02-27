@@ -1,7 +1,6 @@
 package dto
 
 type SettingInfo struct {
-	SystemIP       string `json:"systemIP"`
 	DockerSockPath string `json:"dockerSockPath"`
 	SystemVersion  string `json:"systemVersion"`
 

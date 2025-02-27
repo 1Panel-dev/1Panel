@@ -104,9 +104,6 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "EncryptKey", Value: global.CONF.Base.EncryptKey}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "SystemIP", Value: ""}).Error; err != nil {
-			return err
-		}
 		if err := tx.Create(&model.Setting{Key: "DockerSockPath", Value: "unix:///var/run/docker.sock"}).Error; err != nil {
 			return err
 		}
@@ -270,6 +267,19 @@ var AddOllamaModel = &gormigrate.Migration{
 	ID: "20250218-add-ollama-model",
 	Migrate: func(tx *gorm.DB) error {
 		if err := tx.AutoMigrate(&model.OllamaModel{}); err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var UpdateSettingStatus = &gormigrate.Migration{
+	ID: "20250227-update-setting-status",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Model(model.Setting{}).Where("value = ?", "enable").Update("value", constant.StatusEnable).Error; err != nil {
+			return err
+		}
+		if err := tx.Model(model.Setting{}).Where("value = ?", "disable").Update("value", constant.StatusDisable).Error; err != nil {
 			return err
 		}
 		return nil

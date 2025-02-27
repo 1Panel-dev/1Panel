@@ -12,7 +12,7 @@
                     {{ $t('file.reduce') }}
                 </el-button>
                 <el-form-item :label="$t('file.fileRecycleBin')">
-                    <el-switch v-model="status" active-value="enable" inactive-value="disable" @change="changeStatus" />
+                    <el-switch v-model="status" active-value="Enable" inactive-value="Disable" @change="changeStatus" />
                 </el-form-item>
             </div>
             <ComplexTable
@@ -78,7 +78,7 @@ const em = defineEmits(['close']);
 const selects = ref([]);
 const loading = ref(false);
 const files = ref([]);
-const status = ref('enable');
+const status = ref('Enable');
 
 const paginationConfig = reactive({
     cacheSizeKey: 'recycle-page-size',

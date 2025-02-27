@@ -26,7 +26,7 @@
                                 size="small"
                                 class="ml-2"
                                 inactive-value="Disable"
-                                active-value="enable"
+                                active-value="Enable"
                                 @change="onPingOperate"
                                 v-model="onPing"
                             />

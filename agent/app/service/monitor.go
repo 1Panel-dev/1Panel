@@ -9,6 +9,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
+	"github.com/1Panel-dev/1Panel/agent/constant"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -82,7 +83,7 @@ func (m *MonitorService) LoadMonitorData(req dto.MonitorSearch) ([]dto.MonitorDa
 		data = append(data, itemData)
 	}
 	if req.Param == "all" || req.Param == "network" {
-		bases, err := monitorRepo.GetIO(repo.WithByName(req.Info), repo.WithByCreatedAt(req.StartTime, req.EndTime))
+		bases, err := monitorRepo.GetNetwork(repo.WithByName(req.Info), repo.WithByCreatedAt(req.StartTime, req.EndTime))
 		if err != nil {
 			return nil, err
 		}
@@ -119,6 +120,33 @@ func (m *MonitorService) LoadSetting() (*dto.MonitorSetting, error) {
 }
 
 func (m *MonitorService) UpdateSetting(key, value string) error {
+	switch key {
+	case "MonitorStatus":
+		if value == constant.StatusEnable && global.MonitorCronID == 0 {
+			interval, err := settingRepo.Get(settingRepo.WithByKey("MonitorInterval"))
+			if err != nil {
+				return err
+			}
+			if err := StartMonitor(false, interval.Value); err != nil {
+				return err
+			}
+		}
+		if value == constant.StatusDisable && global.MonitorCronID != 0 {
+			monitorCancel()
+			global.Cron.Remove(cron.EntryID(global.MonitorCronID))
+			global.MonitorCronID = 0
+		}
+	case "MonitorInterval":
+		status, err := settingRepo.Get(settingRepo.WithByKey("MonitorStatus"))
+		if err != nil {
+			return err
+		}
+		if status.Value == constant.StatusEnable && global.MonitorCronID != 0 {
+			if err := StartMonitor(true, value); err != nil {
+				return err
+			}
+		}
+	}
 	return settingRepo.Update(key, value)
 }
 

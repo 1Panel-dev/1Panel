@@ -318,3 +318,13 @@ var UpdateXpackHideMemu = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddSystemIP = &gormigrate.Migration{
+	ID: "20250227-add-system-ip",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Create(&model.Setting{Key: "SystemIP", Value: ""}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
