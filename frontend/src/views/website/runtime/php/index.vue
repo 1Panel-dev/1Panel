@@ -127,6 +127,7 @@ import ComposeLogs from '@/components/compose-log/index.vue';
 import Config from '@/views/website/runtime/php/config/index.vue';
 import Supervisor from '@/views/website/runtime/php/supervisor/index.vue';
 import RuntimeStatus from '@/views/website/runtime/components/runtime-status.vue';
+import { disabledButton } from '@/utils/runtime';
 
 const paginationConfig = reactive({
     cacheSizeKey: 'runtime-page-size',
@@ -160,7 +161,7 @@ const buttons = [
             openExtensionsManagement(row);
         },
         disabled: function (row: Runtime.Runtime) {
-            return row.status != 'running';
+            return disabledButton(row, 'extension');
         },
     },
     {
@@ -169,7 +170,7 @@ const buttons = [
             operateRuntime('down', row.id);
         },
         disabled: function (row: Runtime.Runtime) {
-            return row.status === 'recreating' || row.status === 'stopped' || row.status === 'building';
+            return disabledButton(row, 'stop');
         },
     },
     {
@@ -178,12 +179,7 @@ const buttons = [
             operateRuntime('up', row.id);
         },
         disabled: function (row: Runtime.Runtime) {
-            return (
-                row.status === 'starting' ||
-                row.status === 'recreating' ||
-                row.status === 'running' ||
-                row.status === 'building'
-            );
+            return disabledButton(row, 'start');
         },
     },
     {
@@ -192,7 +188,7 @@ const buttons = [
             operateRuntime('restart', row.id);
         },
         disabled: function (row: Runtime.Runtime) {
-            return row.status === 'recreating' || row.status === 'building';
+            return disabledButton(row, 'restart');
         },
     },
     {
@@ -201,7 +197,7 @@ const buttons = [
             openDetail(row);
         },
         disabled: function (row: Runtime.Runtime) {
-            return row.status === 'building';
+            return disabledButton(row, 'edit');
         },
     },
     {
@@ -210,7 +206,7 @@ const buttons = [
             openConfig(row);
         },
         disabled: function (row: Runtime.Runtime) {
-            return row.status === 'building';
+            return disabledButton(row, 'config');
         },
     },
     {
@@ -219,14 +215,11 @@ const buttons = [
             openSupervisor(row);
         },
         disabled: function (row: Runtime.Runtime) {
-            return row.status === 'building';
+            return disabledButton(row, 'config');
         },
     },
     {
         label: i18n.global.t('commons.button.delete'),
-        disabled: function (row: Runtime.Runtime) {
-            return row.status === 'building';
-        },
         click: function (row: Runtime.Runtime) {
             openDelete(row);
         },

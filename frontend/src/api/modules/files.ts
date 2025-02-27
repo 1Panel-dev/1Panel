@@ -86,7 +86,7 @@ export const computeDirSize = (params: File.DirSizeReq) => {
 };
 
 export const fileWgetKeys = () => {
-    return http.get<File.FileKeys>('files//wget/process/keys');
+    return http.get<File.FileKeys>('files/wget/process/keys');
 };
 
 export const getRecycleList = (params: ReqPage) => {

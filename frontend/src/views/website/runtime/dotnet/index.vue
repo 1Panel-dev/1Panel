@@ -108,6 +108,7 @@ import AppResources from '@/views/website/runtime/php/check/index.vue';
 import { ElMessageBox } from 'element-plus';
 import { GlobalStore } from '@/store';
 import RuntimeStatus from '@/views/website/runtime/components/runtime-status.vue';
+import { disabledButton } from '@/utils/runtime';
 
 let timer: NodeJS.Timer | null = null;
 const loading = ref(false);
@@ -142,7 +143,7 @@ const buttons = [
             operateRuntime('down', row.id);
         },
         disabled: function (row: Runtime.Runtime) {
-            return row.status === 'recreating' || row.status === 'stopped';
+            return disabledButton(row, 'stop');
         },
     },
     {
@@ -151,7 +152,7 @@ const buttons = [
             operateRuntime('up', row.id);
         },
         disabled: function (row: Runtime.Runtime) {
-            return row.status === 'starting' || row.status === 'recreating' || row.status === 'running';
+            return disabledButton(row, 'start');
         },
     },
     {
@@ -160,7 +161,7 @@ const buttons = [
             operateRuntime('restart', row.id);
         },
         disabled: function (row: Runtime.Runtime) {
-            return row.status === 'recreating';
+            return disabledButton(row, 'restart');
         },
     },
     {
@@ -169,7 +170,7 @@ const buttons = [
             openDetail(row);
         },
         disabled: function (row: Runtime.Runtime) {
-            return row.status === 'recreating';
+            return disabledButton(row, 'edit');
         },
     },
     {

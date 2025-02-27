@@ -661,7 +661,7 @@ const runtimeResource = ref('appstore');
 const initRuntimeReq = () => ({
     page: 1,
     pageSize: 100,
-    status: 'running',
+    status: 'Running',
     type: 'php',
 });
 const runtimeReq = ref<Runtime.RuntimeReq>(initRuntimeReq());
