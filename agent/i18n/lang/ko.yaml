@@ -238,6 +238,8 @@ cc: "접근 빈도 제한"
 defaultUrlBlack: "URL 규칙"
 sqlInject: "SQL 인젝션"
 ErrDBNotExist: "데이터베이스가 존재하지 않습니다"
+allow: "허용"
+deny: "금지"
 
 # License
 ErrLicense: "라이선스 형식 오류, 확인 후 다시 시도하세요!"

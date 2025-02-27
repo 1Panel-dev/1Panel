@@ -43,11 +43,13 @@
                     <el-table-column :label="$t('app.version')" prop="version"></el-table-column>
                     <el-table-column :label="$t('runtime.externalPort')" prop="port" min-width="110px">
                         <template #default="{ row }">
-                            <span v-for="(port, index) in row.port.split(',')" :key="index">
-                                <el-button link @click="goDashboard(port, 'http')">
-                                    {{ port }}
-                                    <el-icon class="el-icon--right"><Promotion /></el-icon>
-                                </el-button>
+                            <span v-if="row.port != ''">
+                                <span v-for="(port, index) in row.port.split(',')" :key="index">
+                                    <el-button link @click="goDashboard(port, 'http')">
+                                        {{ port }}
+                                        <el-icon class="el-icon--right"><Promotion /></el-icon>
+                                    </el-button>
+                                </span>
                             </span>
                         </template>
                     </el-table-column>

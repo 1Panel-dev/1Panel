@@ -297,7 +297,7 @@
             <Wget ref="wgetRef" @close="closeWget" />
             <Move ref="moveRef" @close="closeMovePage" />
             <Download ref="downloadRef" @close="search" />
-            <Process ref="processRef" @close="getWgetProcess" />
+            <Process ref="processRef" @close="closeProcess" />
             <Owner ref="chownRef" @close="search"></Owner>
             <Detail ref="detailRef" />
             <DeleteFile ref="deleteRef" @close="search" />
@@ -762,6 +762,11 @@ const closeMovePage = (submit: Boolean) => {
 
 const openProcess = () => {
     processRef.value.acceptParams();
+};
+
+const closeProcess = () => {
+    search();
+    getWgetProcess();
 };
 
 const processCount = ref(0);

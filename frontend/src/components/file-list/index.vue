@@ -23,12 +23,12 @@
                     </template>
                     <div class="hidden-paths">
                         <el-button
-                            v-for="(path, index) in paths.slice(1, -1)"
+                            v-for="(item, index) in paths.slice(1, -1)"
                             :key="index"
                             type="text"
                             @click="jump(index)"
                         >
-                            {{ path }}
+                            {{ item }}
                         </el-button>
                     </div>
                 </el-popover>

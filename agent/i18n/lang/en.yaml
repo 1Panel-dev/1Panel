@@ -251,6 +251,8 @@ cc: 'Access Frequency Limit'
 defaultUrlBlack: 'URL Rules'
 sqlInject: 'SQL Injection'
 ErrDBNotExist: "Database does not exist"
+allow: "Allow"
+deny: "Deny"
 
 #task
 TaskStart: "{{.name}} Start [START]"

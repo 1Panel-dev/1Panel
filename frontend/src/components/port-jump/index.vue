@@ -32,7 +32,7 @@ interface DialogProps {
 
 const acceptParams = async (params: DialogProps): Promise<void> => {
     if (Number(params.port) === 0) {
-        MsgError(i18n.global.t('setting.errPort'));
+        MsgError(i18n.global.t('commons.msg.errPort'));
         return;
     }
     let protocol = params.protocol === 'https' ? 'https' : 'http';

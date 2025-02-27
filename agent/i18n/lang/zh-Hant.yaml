@@ -256,6 +256,8 @@ cc: '訪問頻率限制'
 defaultUrlBlack: 'URL 規則'
 sqlInject: 'SQL 注入'
 ErrDBNotExist: "數據庫不存在"
+allow: "允許"
+deny: "禁止"
 
 #task
 TaskStart: "{{.name}} 開始 [START]"

@@ -238,6 +238,8 @@ cc: "Had Kekerapan Akses"
 defaultUrlBlack: "Peraturan URL"
 sqlInject: "Penembakan SQL"
 ErrDBNotExist: "Pangkalan Data Tidak Wujud"
+allow: "Benarkan"
+deny: "Larang"
 
 #license
 ErrLicense: "Format lesen salah, sila semak dan cuba lagi!"

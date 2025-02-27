@@ -2382,7 +2382,7 @@ const message = {
         openrestyWarn: 'PHP 需要升级  OpenResty 至 1.21.4.1 版本以上才能使用',
         toupgrade: '去升级',
         edit: '编辑运行环境',
-        extendHelper: '未列出的扩展可手动输入并选择，如：输入 sockets 后选择下拉列表中的第一个，查看扩展列表',
+        extendHelper: '未列出的扩展可手动输入并选择，如：输入 sockets 后选择下拉列表中的第一个',
         rebuildHelper: '编辑扩展后需要【重建】PHP 应用之后才能生效',
         rebuild: '重建 PHP 应用',
         source: 'PHP 扩展源',

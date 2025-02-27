@@ -236,6 +236,8 @@ cc: "Limite de Frequência de Acesso"
 defaultUrlBlack: "Regras de URL"
 sqlInject: "Injeção de SQL"
 ErrDBNotExist: "Banco de Dados Não Existe"
+allow: "Permitir"
+deny: "Negar"
 
 #license
 ErrLicense: "Erro no formato da licença, por favor, verifique e tente novamente!"

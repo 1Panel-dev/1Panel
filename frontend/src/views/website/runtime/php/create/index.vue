@@ -122,16 +122,24 @@
                     <el-form-item>
                         <el-alert type="warning" :closable="false">
                             <template #default>
-                                <div>{{ $t('runtime.buildHelper') }}</div>
                                 <div>
-                                    <span>{{ $t('runtime.extendHelper') }}</span>
-                                    <el-link
+                                    <div>{{ $t('runtime.buildHelper') }}</div>
+                                    <span>
+                                        {{ $t('runtime.extendHelper') }}
+                                    </span>
+                                    <!-- <el-link
                                         target="_blank"
                                         type="primary"
                                         :href="globalStore.docsUrl + '/user_manual/websites/php/#php_1'"
                                     >
                                         {{ $t('php.toExtensionsList') }}
-                                    </el-link>
+                                    </el-link> -->
+                                    <span
+                                        class="custom-link"
+                                        @click="openLink(globalStore.docsUrl + '/user_manual/websites/php/#php_1')"
+                                    >
+                                        {{ $t('php.toExtensionsList') }}
+                                    </span>
                                 </div>
                             </template>
                         </el-alert>
@@ -286,6 +294,10 @@ const rules = ref<any>({
 });
 
 const em = defineEmits(['close', 'submit']);
+
+const openLink = (url: string) => {
+    window.open(url, '_blank');
+};
 
 const handleClose = () => {
     open.value = false;
@@ -486,3 +498,17 @@ defineExpose({
     acceptParams,
 });
 </script>
+
+<style scoped>
+.custom-link {
+    color: var(--el-color-primary);
+    cursor: pointer;
+    text-decoration: underline;
+    font-size: inherit;
+    line-height: inherit;
+}
+
+.custom-link:hover {
+    color: var(--el-color-primary-light-3);
+}
+</style>

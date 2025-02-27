@@ -236,6 +236,8 @@ cc: "アクセス頻度制限"
 defaultUrlBlack: "URL ルール"
 sqlInject: "SQL インジェクション"
 ErrDBNotExist: "データベースが存在しません"
+allow: "許可"
+deny: "禁止"
 
 #license
 ErrLicense: "ライセンス形式のエラー、チェックして再試行してください！"
