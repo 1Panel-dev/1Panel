@@ -97,8 +97,7 @@ func (u *CronjobService) handleShell(cronjob model.Cronjob, taskID string) error
 			if len(cronjob.Command) != 0 {
 				command = cronjob.Command
 			}
-			scriptFile, _ := os.ReadFile(cronjob.Script)
-			return cmd.ExecShellWithTask(taskItem, 24*time.Hour, "docker", "exec", cronjob.ContainerName, command, "-c", strings.ReplaceAll(string(scriptFile), "\"", "\\\""))
+			return cmd.ExecShellWithTask(taskItem, 24*time.Hour, "docker", "exec", cronjob.ContainerName, command, "-c", strings.ReplaceAll(cronjob.Script, "\"", "\\\""))
 		}
 		if len(cronjob.Executor) == 0 {
 			cronjob.Executor = "bash"

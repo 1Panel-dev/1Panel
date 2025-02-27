@@ -62,6 +62,7 @@ const paginationConfig = reactive({
     currentPage: 1,
     pageSize: 10,
     total: 0,
+    small: true,
 });
 const taskLogRef = ref();
 const req = reactive({

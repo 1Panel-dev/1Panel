@@ -271,7 +271,10 @@
                     </el-card>
 
                     <el-form-item :label="$t('cronjob.shellContent')" prop="script" class="mt-5">
-                        <el-radio-group v-model="dialogData.rowData!.scriptMode">
+                        <el-radio-group
+                            @change="dialogData.rowData!.script = ''"
+                            v-model="dialogData.rowData!.scriptMode"
+                        >
                             <el-radio value="input">{{ $t('commons.button.edit') }}</el-radio>
                             <el-radio value="select">{{ $t('container.pathSelect') }}</el-radio>
                         </el-radio-group>
@@ -280,8 +283,7 @@
                             v-model="dialogData.rowData!.script"
                             placeholder="#Define or paste the content of your shell file here"
                             mode="javascript"
-                            :heightDiff="0"
-                            :min-height="200"
+                            :heightDiff="400"
                         />
                         <el-input
                             v-if="dialogData.rowData!.scriptMode=== 'select'"
@@ -792,6 +794,7 @@ const rules = reactive({
     ],
 
     script: [{ validator: verifyScript, trigger: 'blur', required: true }],
+    containerName: [Rules.requiredSelect],
     appID: [Rules.requiredSelect],
     website: [Rules.requiredSelect],
     dbName: [Rules.requiredSelect],

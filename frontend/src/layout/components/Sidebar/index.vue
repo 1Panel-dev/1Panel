@@ -29,7 +29,12 @@
                                 <el-button link icon="CircleCheck" type="success" />
                                 {{ $t('terminal.local') }}
                             </el-dropdown-item>
-                            <el-dropdown-item v-for="item in nodes" :key="item.name" :command="item.name">
+                            <el-dropdown-item
+                                :disabled="item.status !== 'Healthy'"
+                                v-for="item in nodes"
+                                :key="item.name"
+                                :command="item.name"
+                            >
                                 <el-button v-if="item.status === 'Healthy'" link icon="CircleCheck" type="success" />
                                 <el-button v-else link icon="Warning" type="danger" />
                                 {{ item.name }}

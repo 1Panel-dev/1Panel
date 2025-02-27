@@ -273,6 +273,7 @@ func (u *CronjobService) Delete(req dto.CronjobBatchDelete) error {
 		if cronjob.ID == 0 {
 			return errors.New("find cronjob in db failed")
 		}
+		_ = os.RemoveAll(path.Join(global.Dir.DataDir, "task/shell", cronjob.Name))
 		ids := strings.Split(cronjob.EntryIDs, ",")
 		for _, id := range ids {
 			idItem, _ := strconv.Atoi(id)
