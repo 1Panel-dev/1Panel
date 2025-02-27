@@ -1,5 +1,5 @@
 <template>
-    <DialogPro v-model="open" :title="$t('commons.button.create')" @close="handleClose">
+    <DialogPro v-model="open" :title="$t('commons.button.' + accountData.mode)" @close="handleClose">
         <el-row>
             <el-col :span="22" :offset="1">
                 <el-form ref="accountForm" label-position="top" :model="account" :rules="rules">
@@ -131,7 +131,7 @@ interface AccountProps {
     form: any;
 }
 const accountData = ref<AccountProps>({
-    mode: 'add',
+    mode: 'create',
     form: {},
 });
 

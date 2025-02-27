@@ -87,7 +87,7 @@ const search = () => {
 };
 
 const openCreate = () => {
-    createRef.value.acceptParams({ mode: 'add' });
+    createRef.value.acceptParams({ mode: 'create' });
 };
 
 const openEdit = (form: Website.DnsAccount) => {

@@ -839,8 +839,6 @@ const acceptParams = async () => {
     listAcmeAccount();
 
     open.value = true;
-
-    console.log('runtimeID', website.value.runtimeID);
 };
 
 const changeAppType = (type: string) => {

@@ -306,8 +306,8 @@ const onRecover = async (row: Backup.RecordInfo) => {
     isBackup.value = false;
     if (type.value !== 'app' && type.value !== 'website') {
         ElMessageBox.confirm(
-            i18n.global.t('commons.msg.backupHelper', [name.value + '( ' + detailName.value + ' )']),
-            i18n.global.t('commons.button.backup'),
+            i18n.global.t('commons.msg.recoverHelper', [name.value + '( ' + detailName.value + ' )']),
+            i18n.global.t('commons.button.recover'),
             {
                 confirmButtonText: i18n.global.t('commons.button.confirm'),
                 cancelButtonText: i18n.global.t('commons.button.cancel'),
