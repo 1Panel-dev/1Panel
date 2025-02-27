@@ -8,48 +8,34 @@
         popper-class="file-list"
     >
         <template #reference>
-            <el-button :icon="Folder" :disabled="disabled" @click="openPage()"></el-button>
+            <el-button icon="Folder" :disabled="disabled" @click="openPage()"></el-button>
         </template>
         <div>
-            <el-button class="close" link @click="closePage">
-                <el-icon><Close /></el-icon>
-            </el-button>
-            <BreadCrumbs>
-                <BreadCrumbItem @click="jump(-1)" :right="paths.length == 0">
-                    <el-icon><HomeFilled /></el-icon>
-                </BreadCrumbItem>
-                <template v-if="paths.length > 2">
-                    <BreadCrumbItem>
-                        <el-dropdown ref="dropdown1" trigger="click" @command="jump($event)">
-                            <span class="el-dropdown-link">...</span>
-                            <template #dropdown>
-                                <el-dropdown-menu>
-                                    <el-dropdown-item
-                                        v-for="(item, key) in paths.slice(0, -1)"
-                                        :key="key"
-                                        :command="key"
-                                    >
-                                        {{ item }}
-                                    </el-dropdown-item>
-                                </el-dropdown-menu>
-                            </template>
-                        </el-dropdown>
-                    </BreadCrumbItem>
-                    <BreadCrumbItem @click="jump(paths.length - 1)" :right="true">
-                        <span class="sle" style="max-width: 200px">{{ paths[paths.length - 1] }}</span>
-                    </BreadCrumbItem>
-                </template>
-                <template v-else>
-                    <BreadCrumbItem
-                        v-for="(item, key) in paths"
-                        :key="key"
-                        @click="jump(key)"
-                        :right="key == paths.length - 1"
-                    >
-                        <span class="sle" style="max-width: 200px">{{ item }}</span>
-                    </BreadCrumbItem>
-                </template>
-            </BreadCrumbs>
+            <el-button class="close" link @click="closePage" icon="Close"></el-button>
+            <div>
+                <el-button type="text" icon="HomeFilled" @click="jump(-1)"></el-button>
+                <el-button v-if="paths.length > 0" type="text">
+                    {{ paths[0] }}
+                </el-button>
+                <el-popover v-if="paths.length > 2" placement="bottom" trigger="hover">
+                    <template #reference>
+                        <el-button type="text">...</el-button>
+                    </template>
+                    <div class="hidden-paths">
+                        <el-button
+                            v-for="(path, index) in paths.slice(1, -1)"
+                            :key="index"
+                            type="text"
+                            @click="jump(index)"
+                        >
+                            {{ path }}
+                        </el-button>
+                    </div>
+                </el-popover>
+                <el-button v-if="paths.length > 1" type="text" @click="jump(paths.length - 1)">
+                    {{ paths[paths.length - 1] }}
+                </el-button>
+            </div>
         </div>
         <div class="mt-4">
             <el-button link @click="onAddItem(true)" type="primary" size="small">
@@ -129,9 +115,6 @@
 <script lang="ts" setup>
 import { File } from '@/api/interface/file';
 import { createFile, getFilesList } from '@/api/modules/files';
-import { Folder, HomeFilled, Close } from '@element-plus/icons-vue';
-import BreadCrumbs from '@/components/bread-crumbs/index.vue';
-import BreadCrumbItem from '@/components/bread-crumbs/bread-crumbs-item.vue';
 import { onMounted, onUpdated, reactive, ref, nextTick } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
@@ -361,5 +344,10 @@ onUpdated(() => {
         margin-top: 10px;
         float: right;
     }
+}
+
+.hidden-paths {
+    display: flex;
+    flex-direction: column;
 }
 </style>
