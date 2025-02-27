@@ -129,7 +129,7 @@ const rules = reactive({
     name: [{ validator: checkName, trigger: 'blur' }],
 });
 function checkName(rule: any, value: any, callback: any) {
-    if (value === 'local') {
+    if (value === 'local' && dialogData.value.title !== 'edit') {
         return callback(new Error(i18n.global.t('terminal.localHelper')));
     }
     callback();

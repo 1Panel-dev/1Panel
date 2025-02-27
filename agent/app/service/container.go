@@ -11,7 +11,6 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
-	"path"
 	"path/filepath"
 	"sort"
 	"strconv"
@@ -343,8 +342,7 @@ func (u *ContainerService) ContainerCreateByCommand(req dto.ContainerCreateByCom
 	}
 	go func() {
 		taskItem.AddSubTask(i18n.GetWithName("ContainerCreate", containerName), func(t *task.Task) error {
-			logPath := path.Join(global.Dir.LogDir, task.TaskScopeContainer, req.TaskID+".log")
-			return cmd.ExecShell(logPath, 5*time.Minute, "bash", "-c", req.Command)
+			return cmd.ExecShellWithTask(taskItem, 5*time.Minute, "bash", "-c", req.Command)
 		}, nil)
 		_ = taskItem.Execute()
 	}()
@@ -507,7 +505,6 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerOperate) error {
 				return err
 			}
 			con, err := client.ContainerCreate(ctx, config, hostConf, networkConf, &v1.Platform{}, req.Name)
-			taskItem.LogWithStatus(i18n.GetMsgByKey("ContainerCreate"), err)
 			if err != nil {
 				taskItem.Log(i18n.GetMsgByKey("ContainerCreateFailed"))
 				_ = client.ContainerRemove(ctx, req.Name, container.RemoveOptions{RemoveVolumes: true, Force: true})
