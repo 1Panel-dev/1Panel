@@ -139,7 +139,7 @@ func (u *CronjobService) handleCurl(cronjob model.Cronjob, taskID string) error 
 	}
 
 	taskItem.AddSubTask(i18n.GetWithName("HandleShell", cronjob.Name), func(t *task.Task) error {
-		if err := cmd.ExecShellWithTask(taskItem, 24*time.Hour, "bash", "-c", "curl", cronjob.URL); err != nil {
+		if err := cmd.ExecShellWithTask(taskItem, 24*time.Hour, "curl", cronjob.URL); err != nil {
 			return err
 		}
 		return nil

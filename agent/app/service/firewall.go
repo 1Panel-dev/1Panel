@@ -610,11 +610,7 @@ func (u *FirewallService) updatePingStatus(enable string) error {
 }
 
 func (u *FirewallService) addPortsBeforeStart(client firewall.FirewallClient) error {
-	serverPort, err := settingRepo.Get(settingRepo.WithByKey("ServerPort"))
-	if err != nil {
-		return err
-	}
-	if err := client.Port(fireClient.FireInfo{Port: serverPort.Value, Protocol: "tcp", Strategy: "accept"}, "add"); err != nil {
+	if err := client.Port(fireClient.FireInfo{Port: global.CONF.Base.Port, Protocol: "tcp", Strategy: "accept"}, "add"); err != nil {
 		return err
 	}
 	if err := client.Port(fireClient.FireInfo{Port: "22", Protocol: "tcp", Strategy: "accept"}, "add"); err != nil {

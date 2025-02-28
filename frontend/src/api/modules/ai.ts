@@ -2,11 +2,11 @@ import { AI } from '@/api/interface/ai';
 import http from '@/api';
 import { ResPage } from '../interface';
 
-export const createOllamaModel = (name: string) => {
-    return http.post(`/ai/ollama/model`, { name: name });
+export const createOllamaModel = (name: string, taskID: string) => {
+    return http.post(`/ai/ollama/model`, { name: name, taskID: taskID });
 };
-export const recreateOllamaModel = (name: string) => {
-    return http.post(`/ai/ollama/model/recreate`, { name: name });
+export const recreateOllamaModel = (name: string, taskID: string) => {
+    return http.post(`/ai/ollama/model/recreate`, { name: name, taskID: taskID });
 };
 export const deleteOllamaModel = (ids: Array<number>, force: boolean) => {
     return http.post(`/ai/ollama/model/del`, { ids: ids, forceDelete: force });

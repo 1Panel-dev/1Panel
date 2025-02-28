@@ -168,13 +168,14 @@
             </template>
         </OpDialog>
         <AddDialog ref="addRef" @search="search" @log="onLoadLog" />
-        <Log ref="logRef" @close="search" />
         <Del ref="delRef" @search="search" />
         <Terminal ref="terminalRef" />
         <Conn ref="connRef" />
         <CodemirrorDialog ref="detailRef" />
         <PortJumpDialog ref="dialogPortJumpRef" />
         <BindDomain ref="bindDomainRef" />
+
+        <TaskLog ref="taskLogRef" width="70%" />
     </div>
 </template>
 
@@ -182,9 +183,9 @@
 import AppStatus from '@/components/app-status/index.vue';
 import AddDialog from '@/views/ai/model/add/index.vue';
 import Conn from '@/views/ai/model/conn/index.vue';
+import TaskLog from '@/components/task-log/index.vue';
 import Terminal from '@/views/ai/model/terminal/index.vue';
 import Del from '@/views/ai/model/del/index.vue';
-import Log from '@/components/log-dialog/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import CodemirrorDialog from '@/components/codemirror-dialog/index.vue';
 import { computed, onMounted, reactive, ref } from 'vue';
@@ -200,7 +201,7 @@ import {
 } from '@/api/modules/ai';
 import { AI } from '@/api/interface/ai';
 import { getAppPort } from '@/api/modules/app';
-import { dateFormat } from '@/utils/util';
+import { dateFormat, newUUID } from '@/utils/util';
 import router from '@/routers';
 import { MsgInfo, MsgSuccess } from '@/utils/message';
 import BindDomain from '@/views/ai/model/domain/index.vue';
@@ -210,7 +211,6 @@ const loading = ref(false);
 const selects = ref<any>([]);
 const maskShow = ref(true);
 const addRef = ref();
-const logRef = ref();
 const detailRef = ref();
 const delRef = ref();
 const connRef = ref();
@@ -220,6 +220,7 @@ const dashboardVisible = ref(false);
 const dialogPortJumpRef = ref();
 const appStatusRef = ref();
 const bindDomainRef = ref();
+const taskLogRef = ref();
 const data = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'model-page-size',
@@ -355,15 +356,20 @@ const onSubmitDelete = async () => {
 
 const onReCreate = async (name: string) => {
     loading.value = true;
-    await recreateOllamaModel(name)
+    let taskID = newUUID();
+    await recreateOllamaModel(name, taskID)
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            openTaskLog(taskID);
             search();
         })
         .catch(() => {
             loading.value = false;
         });
+};
+const openTaskLog = (taskID: string) => {
+    taskLogRef.value.openWithTaskID(taskID);
 };
 
 const onDelete = async (row: AI.OllamaModelInfo) => {
@@ -383,7 +389,7 @@ const onDelete = async (row: AI.OllamaModelInfo) => {
         title: i18n.global.t('commons.button.delete'),
         names: names,
         msg: i18n.global.t('commons.msg.operatorHelper', [
-            i18n.global.t('cronjob.cronTask'),
+            i18n.global.t('aiTools.model.model'),
             i18n.global.t('commons.button.delete'),
         ]),
         api: null,
@@ -392,6 +398,9 @@ const onDelete = async (row: AI.OllamaModelInfo) => {
 };
 
 const onLoadLog = (row: any) => {
+    if (row.taskID) {
+        openTaskLog(row.taskID);
+    }
     if (row.from === 'remote') {
         MsgInfo(i18n.global.t('aiTools.model.from_remote'));
         return;
@@ -400,7 +409,7 @@ const onLoadLog = (row: any) => {
         MsgInfo(i18n.global.t('aiTools.model.no_logs'));
         return;
     }
-    logRef.value.acceptParams({ id: 0, type: 'ollama-model', name: row.name, tail: true });
+    taskLogRef.value.openWithResourceID('AI', 'TaskPull', row.id);
 };
 
 const buttons = [

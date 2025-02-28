@@ -46,6 +46,7 @@ import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
 import { createOllamaModel } from '@/api/modules/ai';
+import { newUUID } from '@/utils/util';
 
 const drawerVisible = ref(false);
 const form = reactive({
@@ -63,14 +64,16 @@ const formRef = ref<FormInstance>();
 
 const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
+    let taskID = newUUID();
     formEl.validate(async (valid) => {
         if (!valid) return;
         let itemName = form.name.replaceAll('ollama run ', '').replaceAll('ollama pull ', '');
-        await createOllamaModel(itemName);
-        drawerVisible.value = false;
-        emit('search');
-        emit('log', { logFileExist: true, name: itemName, from: 'local' });
-        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        await createOllamaModel(itemName, taskID).then(() => {
+            drawerVisible.value = false;
+            emit('search');
+            emit('log', { logFileExist: true, name: itemName, from: 'local', taskID: taskID });
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        });
     });
 };
 

@@ -146,11 +146,26 @@ func ExecShell(outPath string, timeout time.Duration, name string, arg ...string
 
 type CustomWriter struct {
 	taskItem *task.Task
+	buffer   bytes.Buffer
 }
 
 func (cw *CustomWriter) Write(p []byte) (n int, err error) {
-	cw.taskItem.Log(string(p))
+	cw.buffer.Write(p)
+	lines := strings.Split(cw.buffer.String(), "\n")
+
+	for i := 0; i < len(lines)-1; i++ {
+		cw.taskItem.Log(lines[i])
+	}
+	cw.buffer.Reset()
+	cw.buffer.WriteString(lines[len(lines)-1])
+
 	return len(p), nil
+}
+func (cw *CustomWriter) Flush() {
+	if cw.buffer.Len() > 0 {
+		cw.taskItem.Log(cw.buffer.String())
+		cw.buffer.Reset()
+	}
 }
 func ExecShellWithTask(taskItem *task.Task, timeout time.Duration, name string, arg ...string) error {
 	env := os.Environ()
@@ -165,6 +180,7 @@ func ExecShellWithTask(taskItem *task.Task, timeout time.Duration, name string, 
 	done := make(chan error, 1)
 	go func() {
 		done <- cmd.Wait()
+		customWriter.Flush()
 	}()
 	after := time.After(timeout)
 	select {

@@ -18,6 +18,7 @@ func Init() {
 	initGlobalData()
 	handleCronjobStatus()
 	handleSnapStatus()
+	handleOllamaModelStatus()
 
 	loadLocalDir()
 }
@@ -80,6 +81,11 @@ func handleCronjobStatus() {
 		_ = global.DB.Where("id = ?", record.CronjobID).First(&cronjob).Error
 		handleCronJobAlert(cronjob)
 	}
+}
+
+func handleOllamaModelStatus() {
+	message := "the task was interrupted due to the restart of the 1panel service"
+	_ = global.DB.Model(&model.OllamaModel{}).Where("status = ?", constant.StatusWaiting).Updates(map[string]interface{}{"status": constant.StatusCanceled, "message": message}).Error
 }
 
 func handleCronJobAlert(cronjob *model.Cronjob) {

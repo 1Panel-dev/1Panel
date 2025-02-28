@@ -3,19 +3,20 @@ package service
 import (
 	"context"
 	"fmt"
-	"io"
 	"os"
-	"os/exec"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/jinzhu/copier"
@@ -25,9 +26,9 @@ type AIToolService struct{}
 
 type IAIToolService interface {
 	Search(search dto.SearchWithPage) (int64, []dto.OllamaModelInfo, error)
-	Create(name string) error
+	Create(req dto.OllamaModelName) error
 	Close(name string) error
-	Recreate(name string) error
+	Recreate(req dto.OllamaModelName) error
 	Delete(req dto.ForceDelete) error
 	Sync() ([]dto.OllamaModelDropList, error)
 	LoadDetail(name string) (string, error)
@@ -55,8 +56,8 @@ func (u *AIToolService) Search(req dto.SearchWithPage) (int64, []dto.OllamaModel
 		if err := copier.Copy(&item, &itemModel); err != nil {
 			return 0, nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 		}
-		logPath := path.Join(global.Dir.DataDir, "log", "AITools", itemModel.Name)
-		if _, err := os.Stat(logPath); err == nil {
+		taskModel, _ := taskRepo.GetFirst(taskRepo.WithResourceID(item.ID), repo.WithByType(task.TaskScopeAI))
+		if len(taskModel.ID) != 0 {
 			item.LogFileExist = true
 		}
 		dtoLists = append(dtoLists, item)
@@ -79,11 +80,11 @@ func (u *AIToolService) LoadDetail(name string) (string, error) {
 	return stdout, err
 }
 
-func (u *AIToolService) Create(name string) error {
-	if cmd.CheckIllegal(name) {
+func (u *AIToolService) Create(req dto.OllamaModelName) error {
+	if cmd.CheckIllegal(req.Name) {
 		return buserr.New("ErrCmdIllegal")
 	}
-	modelInfo, _ := aiRepo.Get(repo.WithByName(name))
+	modelInfo, _ := aiRepo.Get(repo.WithByName(req.Name))
 	if modelInfo.ID != 0 {
 		return buserr.New("ErrRecordExist")
 	}
@@ -91,25 +92,34 @@ func (u *AIToolService) Create(name string) error {
 	if err != nil {
 		return err
 	}
-	logItem := path.Join(global.Dir.DataDir, "log", "AITools", name)
-	if _, err := os.Stat(path.Dir(logItem)); err != nil && os.IsNotExist(err) {
-		if err = os.MkdirAll(path.Dir(logItem), os.ModePerm); err != nil {
-			return err
-		}
-	}
 	info := model.OllamaModel{
-		Name:   name,
+		Name:   req.Name,
 		From:   "local",
 		Status: constant.StatusWaiting,
 	}
 	if err := aiRepo.Create(&info); err != nil {
 		return err
 	}
-	file, err := os.OpenFile(logItem, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	taskItem, err := task.NewTaskWithOps(fmt.Sprintf("ollama-model-%s", req.Name), task.TaskPull, task.TaskScopeAI, req.TaskID, info.ID)
 	if err != nil {
+		global.LOG.Errorf("new task for exec shell failed, err: %v", err)
 		return err
 	}
-	go pullOllamaModel(file, containerName, info)
+	go func() {
+		taskItem.AddSubTask(i18n.GetWithName("OllamaModelPull", req.Name), func(t *task.Task) error {
+			return cmd.ExecShellWithTask(taskItem, time.Hour, "docker", "exec", containerName, "ollama", "pull", info.Name)
+		}, nil)
+		taskItem.AddSubTask(i18n.GetWithName("OllamaModelSize", req.Name), func(t *task.Task) error {
+			itemSize, err := loadModelSize(info.Name, containerName)
+			if len(itemSize) != 0 {
+				_ = aiRepo.Update(info.ID, map[string]interface{}{"status": constant.StatusSuccess, "size": itemSize})
+			} else {
+				_ = aiRepo.Update(info.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
+			}
+			return nil
+		}, nil)
+		_ = taskItem.Execute()
+	}()
 	return nil
 }
 
@@ -128,11 +138,11 @@ func (u *AIToolService) Close(name string) error {
 	return nil
 }
 
-func (u *AIToolService) Recreate(name string) error {
-	if cmd.CheckIllegal(name) {
+func (u *AIToolService) Recreate(req dto.OllamaModelName) error {
+	if cmd.CheckIllegal(req.Name) {
 		return buserr.New("ErrCmdIllegal")
 	}
-	modelInfo, _ := aiRepo.Get(repo.WithByName(name))
+	modelInfo, _ := aiRepo.Get(repo.WithByName(req.Name))
 	if modelInfo.ID == 0 {
 		return buserr.New("ErrRecordNotFound")
 	}
@@ -143,17 +153,17 @@ func (u *AIToolService) Recreate(name string) error {
 	if err := aiRepo.Update(modelInfo.ID, map[string]interface{}{"status": constant.StatusWaiting, "from": "local"}); err != nil {
 		return err
 	}
-	logItem := path.Join(global.Dir.DataDir, "log", "AITools", name)
-	if _, err := os.Stat(path.Dir(logItem)); err != nil && os.IsNotExist(err) {
-		if err = os.MkdirAll(path.Dir(logItem), os.ModePerm); err != nil {
-			return err
-		}
-	}
-	file, err := os.OpenFile(logItem, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	taskItem, err := task.NewTaskWithOps(fmt.Sprintf("ollama-model-%s", req.Name), task.TaskPull, task.TaskScopeAI, req.TaskID, modelInfo.ID)
 	if err != nil {
+		global.LOG.Errorf("new task for exec shell failed, err: %v", err)
 		return err
 	}
-	go pullOllamaModel(file, containerName, modelInfo)
+	go func() {
+		taskItem.AddSubTask(i18n.GetWithName("OllamaModelPull", req.Name), func(t *task.Task) error {
+			return cmd.ExecShellWithTask(taskItem, time.Hour, "docker", "exec", containerName, "ollama", "pull", req.Name)
+		}, nil)
+		_ = taskItem.Execute()
+	}()
 	return nil
 }
 
@@ -352,22 +362,6 @@ func LoadContainerName() (string, error) {
 		return "", fmt.Errorf("container %s of ollama is not running, please check and retry!", ollamaBaseInfo.ContainerName)
 	}
 	return ollamaBaseInfo.ContainerName, nil
-}
-
-func pullOllamaModel(file *os.File, containerName string, info model.OllamaModel) {
-	defer file.Close()
-	cmd := exec.Command("docker", "exec", containerName, "ollama", "pull", info.Name)
-	multiWriter := io.MultiWriter(os.Stdout, file)
-	cmd.Stdout = multiWriter
-	cmd.Stderr = multiWriter
-	_ = cmd.Run()
-	itemSize, err := loadModelSize(info.Name, containerName)
-	if len(itemSize) != 0 {
-		_ = aiRepo.Update(info.ID, map[string]interface{}{"status": constant.StatusSuccess, "size": itemSize})
-	} else {
-		_ = aiRepo.Update(info.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
-	}
-	_, _ = file.WriteString("ollama pull completed!")
 }
 
 func loadModelSize(name string, containerName string) (string, error) {

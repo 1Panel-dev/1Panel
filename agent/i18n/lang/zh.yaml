@@ -312,6 +312,10 @@ SubTask: "子任务"
 RuntimeExtension: "运行环境扩展"
 TaskIsExecuting: "任务正在运行"
 
+# task - ai
+OllamaModelPull: "拉取 Ollama 模型  {{ .name }} "
+OllamaModelSize: "获取 Ollama 模型  {{ .name }} 大小 "
+
 # task - snapshot 
 Snapshot: "快照"
 SnapDBInfo: "写入 1Panel 数据库信息"

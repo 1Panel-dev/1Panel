@@ -20,7 +20,8 @@ type OllamaModelDropList struct {
 }
 
 type OllamaModelName struct {
-	Name string `json:"name"`
+	Name   string `json:"name"`
+	TaskID string `json:"taskID"`
 }
 
 type OllamaBindDomain struct {

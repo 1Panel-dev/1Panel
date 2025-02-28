@@ -130,6 +130,7 @@ const message = {
             Rollbacking: '快照回滚中，请稍候...',
         },
         msg: {
+            disConn: '请直接点击断开按钮断开终端连接，避免使用 {0} 等退出命令',
             noneData: '暂无数据',
             delete: '删除 操作不可回滚，是否继续？',
             clean: '清空 操作不可回滚，是否继续？',

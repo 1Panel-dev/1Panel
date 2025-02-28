@@ -3,12 +3,14 @@ package router
 import (
 	"encoding/base64"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/core/app/repo"
-	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"net/http"
+	"path"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/core/app/repo"
+	"github.com/1Panel-dev/1Panel/core/utils/common"
 
 	"github.com/1Panel-dev/1Panel/core/app/service"
 	"github.com/1Panel-dev/1Panel/core/cmd/server/res"
@@ -155,7 +157,7 @@ func checkSession(c *gin.Context) bool {
 func setWebStatic(rootRouter *gin.RouterGroup) {
 	rootRouter.StaticFS("/public", http.FS(web.Favicon))
 	rootRouter.StaticFS("/favicon.ico", http.FS(web.Favicon))
-	rootRouter.Static("/api/v2/images", "./uploads")
+	rootRouter.Static("/api/v2/images", path.Join(global.CONF.Base.InstallDir, "1panel/uploads/theme"))
 	rootRouter.Use(func(c *gin.Context) {
 		c.Next()
 	})

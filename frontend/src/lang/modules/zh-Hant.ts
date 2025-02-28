@@ -131,6 +131,7 @@ const message = {
         },
         msg: {
             noneData: '暫無數據',
+            disConn: '請直接點選斷開按鈕斷開終端連接，避免使用 {0} 等退出指令。',
             delete: '刪除 操作不可回滾，是否繼續？',
             clean: '清空 操作不可回滾，是否繼續？',
             deleteSuccess: '刪除成功',

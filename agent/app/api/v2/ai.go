@@ -24,7 +24,7 @@ func (b *BaseApi) CreateOllamaModel(c *gin.Context) {
 		return
 	}
 
-	if err := aiToolService.Create(req.Name); err != nil {
+	if err := aiToolService.Create(req); err != nil {
 		helper.BadRequest(c, err)
 		return
 	}
@@ -46,7 +46,7 @@ func (b *BaseApi) RecreateOllamaModel(c *gin.Context) {
 		return
 	}
 
-	if err := aiToolService.Recreate(req.Name); err != nil {
+	if err := aiToolService.Recreate(req); err != nil {
 		helper.BadRequest(c, err)
 		return
 	}

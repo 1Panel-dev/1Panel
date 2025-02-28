@@ -152,8 +152,8 @@
 
                 <div v-if="dialogData.rowData!.specCustom">
                     <el-form-item prop="spec">
-                        <div v-for="(spec, index) of dialogData.rowData.specs" :key="index">
-                            <el-input style="width: 80%" v-model="dialogData.rowData.specs[index]" />
+                        <div v-for="(spec, index) of dialogData.rowData.specs" :key="index" class="w-full">
+                            <el-input class="specCustom" v-model="dialogData.rowData.specs[index]" />
                             <el-popover
                                 placement="top-start"
                                 :title="$t('cronjob.nextTime')"
@@ -677,6 +677,17 @@ const verifyScript = (rule: any, value: any, callback: any) => {
 };
 
 const verifySpec = (rule: any, value: any, callback: any) => {
+    if (dialogData.value.rowData!.specCustom) {
+        for (let i = 0; i < dialogData.value.rowData!.specs.length; i++) {
+            if (dialogData.value.rowData!.specs[i]) {
+                continue;
+            }
+            callback(new Error(i18n.global.t('cronjob.cronSpecRule', [i + 1])));
+            return;
+        }
+        callback();
+        return;
+    }
     if (dialogData.value.rowData!.specObjs.length === 0) {
         callback(new Error(i18n.global.t('commons.rule.requiredInput')));
     }
@@ -792,6 +803,7 @@ const rules = reactive({
         { validator: verifySpec, trigger: 'blur', required: true },
         { validator: verifySpec, trigger: 'change', required: true },
     ],
+    specCustom: [Rules.requiredSelect],
 
     script: [{ validator: verifyScript, trigger: 'blur', required: true }],
     containerName: [Rules.requiredSelect],
@@ -1091,6 +1103,14 @@ defineExpose({
 }
 @media only screen and (max-width: 1000px) {
     .specTypeClass {
+        width: 100% !important;
+    }
+}
+.specCustom {
+    width: 80%;
+}
+@media only screen and (max-width: 1000px) {
+    .specCustom {
         width: 100% !important;
     }
 }
