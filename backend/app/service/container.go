@@ -255,14 +255,14 @@ func (u *ContainerService) ContainerListStats() ([]dto.ContainerListStats, error
 	if err != nil {
 		return nil, err
 	}
-	var datas []dto.ContainerListStats
+	datas := make([]dto.ContainerListStats, len(list))
 	var wg sync.WaitGroup
 	wg.Add(len(list))
 	for i := 0; i < len(list); i++ {
-		go func(item types.Container) {
-			datas = append(datas, loadCpuAndMem(client, item.ID))
+		go func(index int, item types.Container) {
+			datas[index] = loadCpuAndMem(client, item.ID)
 			wg.Done()
-		}(list[i])
+		}(i, list[i])
 	}
 	wg.Wait()
 	return datas, nil
@@ -937,15 +937,41 @@ func calculateCPUPercentUnix(stats *types.StatsJSON) float64 {
 	}
 	return cpuPercent
 }
+
 func calculateMemPercentUnix(memStats types.MemoryStats) float64 {
 	memPercent := 0.0
-	memUsage := float64(memStats.Usage)
+	memUsage := calculateMemUsageUnixNoCache(memStats)
 	memLimit := float64(memStats.Limit)
 	if memUsage > 0.0 && memLimit > 0.0 {
 		memPercent = (memUsage / memLimit) * 100.0
 	}
 	return memPercent
 }
+
+// calculateMemUsageUnixNoCache calculate memory usage of the container.
+// Cache is intentionally excluded to avoid misinterpretation of the output.
+//
+// On cgroup v1 host, the result is `mem.Usage - mem.Stats["total_inactive_file"]` .
+// On cgroup v2 host, the result is `mem.Usage - mem.Stats["inactive_file"] `.
+//
+// This definition is consistent with cadvisor and containerd/CRI.
+// * https://github.com/google/cadvisor/commit/307d1b1cb320fef66fab02db749f07a459245451
+// * https://github.com/containerd/cri/commit/6b8846cdf8b8c98c1d965313d66bc8489166059a
+//
+// On Docker 19.03 and older, the result was `mem.Usage - mem.Stats["cache"]`.
+// See https://github.com/moby/moby/issues/40727 for the background.
+func calculateMemUsageUnixNoCache(mem types.MemoryStats) float64 {
+	// cgroup v1
+	if v, isCgroup1 := mem.Stats["total_inactive_file"]; isCgroup1 && v < mem.Usage {
+		return float64(mem.Usage - v)
+	}
+	// cgroup v2
+	if v := mem.Stats["inactive_file"]; v < mem.Usage {
+		return float64(mem.Usage - v)
+	}
+	return float64(mem.Usage)
+}
+
 func calculateBlockIO(blkio types.BlkioStats) (blkRead float64, blkWrite float64) {
 	for _, bioEntry := range blkio.IoServiceBytesRecursive {
 		switch strings.ToLower(bioEntry.Op) {
