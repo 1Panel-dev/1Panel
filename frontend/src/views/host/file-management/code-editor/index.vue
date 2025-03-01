@@ -11,8 +11,10 @@
     >
         <template #header>
             <div ref="dialogHeader" class="flex items-center justify-between">
-                <span>{{ $t('commons.button.edit') + ' - ' + form.path }}</span>
-                <el-space alignment="center" :size="1" class="dialog-header-icon">
+                <div class="truncate flex-1 mr-2">
+                    <span>{{ $t('commons.button.edit') + ' - ' + form.path }}</span>
+                </div>
+                <el-space alignment="center" :size="1" class="dialog-header-icon flex-shrink-0">
                     <el-tooltip :content="loadTooltip()" placement="top">
                         <el-button
                             @click="toggleFullscreen"
