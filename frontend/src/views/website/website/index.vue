@@ -152,12 +152,18 @@
                             />
                         </template>
                     </el-table-column>
-                    <el-table-column
-                        :label="$t('website.remark')"
-                        prop="remark"
-                        show-overflow-tooltip
-                        min-width="120px"
-                    ></el-table-column>
+                    <el-table-column :label="$t('website.remark')" prop="remark" min-width="120px">
+                        <template #default="{ row }">
+                            <fu-read-write-switch>
+                                <template #read>
+                                    <MsgInfo :info="row.remark" width="180px" />
+                                </template>
+                                <template #default="{ read }">
+                                    <el-input v-model="row.remark" @blur="updateRemark(row, read)" />
+                                </template>
+                            </fu-read-write-switch>
+                        </template>
+                    </el-table-column>
                     <el-table-column
                         :label="$t('commons.table.protocol')"
                         prop="protocol"
@@ -179,7 +185,7 @@
                                     :disabled-date="checkDate"
                                     :shortcuts="shortcuts"
                                     :clearable="false"
-                                    @change="submitDate(row)"
+                                    @change="updateWebsitConfig(row)"
                                     :ref="(el) => setdateRefs(el)"
                                     @visible-change="(visibility:boolean) => pickerVisibility(visibility, row)"
                                     size="small"
@@ -255,7 +261,7 @@ import { Website } from '@/api/interface/website';
 import { App } from '@/api/interface/app';
 import { ElMessageBox } from 'element-plus';
 import { dateFormatSimple } from '@/utils/util';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
 import { getAgentGroupList } from '@/api/modules/group';
 import { Group } from '@/api/interface/group';
@@ -427,7 +433,7 @@ const pickerVisibility = (visibility: boolean, row: any) => {
     }
 };
 
-const submitDate = (row: any) => {
+const updateWebsitConfig = (row: any) => {
     const reqDate = dateFormatSimple(row.expireDate);
     const req = {
         id: row.id,
@@ -548,6 +554,15 @@ const getUrl = (domain: Website.Domain, website: Website.Website): string => {
         url = url + ':' + domain.port;
     }
     return url;
+};
+
+const updateRemark = (row: Website.Website, bulr: Function) => {
+    bulr();
+    if (row.remark && row.remark.length > 128) {
+        MsgError(i18n.global.t('commons.rule.length128Err'));
+        return;
+    }
+    updateWebsitConfig(row);
 };
 
 onMounted(() => {

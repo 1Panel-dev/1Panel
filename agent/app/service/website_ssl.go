@@ -138,7 +138,7 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 	if create.PushDir {
 		fileOP := files.NewFileOp()
 		if !fileOP.Stat(create.Dir) {
-			_ = fileOP.CreateDir(create.Dir, constant.DirPerm)
+			return res, buserr.New("ErrLinkPathNotFound")
 		}
 		websiteSSL.Dir = create.Dir
 	}
@@ -490,7 +490,7 @@ func (w WebsiteSSLService) Update(update request.WebsiteSSLUpdate) error {
 		updateParams["shell"] = ""
 	}
 
-	if websiteSSL.Provider != constant.SelfSigned {
+	if websiteSSL.Provider != constant.SelfSigned && websiteSSL.Provider != constant.Manual {
 		acmeAccount, err := websiteAcmeRepo.GetFirst(repo.WithByID(update.AcmeAccountID))
 		if err != nil {
 			return err

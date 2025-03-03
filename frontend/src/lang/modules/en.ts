@@ -247,6 +247,8 @@ const message = {
             phpExtension: 'Only supports , _ lowercase English and numbers',
             paramHttp: 'Must start with http:// or https://',
             phone: 'The format of the phone number is incorrect',
+            authBasicPassword: 'Supports letters, numbers, and common special characters, length 1-72',
+            length128Err: 'Length cannot exceed 128 characters',
         },
         res: {
             paramError: 'The request failed, please try again later!',

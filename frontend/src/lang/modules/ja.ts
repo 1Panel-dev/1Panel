@@ -240,6 +240,8 @@ const message = {
             phpExtension: '_小文字の英語と数字のみをサポートします',
             paramHttp: 'http://またはhttps://で始める必要があります',
             phone: '電話番号の形式は正しくありません',
+            authBasicPassword: '英字、数字、一般的な特殊文字をサポート、長さ1-72',
+            length128Err: '長さは128文字を超えることはできません',
         },
         res: {
             paramError: 'リクエストが失敗しました。後でもう一度やり直してください！',

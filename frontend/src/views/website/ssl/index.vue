@@ -108,7 +108,7 @@
                         <template #default="{ row }">
                             <fu-read-write-switch>
                                 <template #read>
-                                    <MsgInfo :info="row.description" />
+                                    <MsgInfo :info="row.description" width="180px" />
                                 </template>
                                 <template #default="{ read }">
                                     <el-input v-model="row.description" @blur="updateDesc(row, read)" />
@@ -167,7 +167,7 @@ import Detail from './detail/index.vue';
 import { dateFormat, getProvider } from '@/utils/util';
 import i18n from '@/lang';
 import { Website } from '@/api/interface/website';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
 import SSLUpload from './upload/index.vue';
 import Apply from './apply/index.vue';
@@ -300,6 +300,10 @@ const search = () => {
 
 const updateDesc = (row: Website.SSLDTO, bulr: Function) => {
     bulr();
+    if (row.description && row.description.length > 128) {
+        MsgError(i18n.global.t('commons.rule.length128Err'));
+        return;
+    }
     updateConfig(row);
 };
 

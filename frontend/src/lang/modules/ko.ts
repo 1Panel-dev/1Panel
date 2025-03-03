@@ -241,6 +241,8 @@ const message = {
             phpExtension: '소문자 영어와 숫자, "_"만 지원합니다',
             paramHttp: 'http:// 또는 https:// 로 시작해야 합니다',
             phone: '전화번호 형식이 올바르지 않습니다',
+            authBasicPassword: '알파벳, 숫자 및 일반 특수 문자 지원, 길이 1-72',
+            length128Err: '길이는 128자를 초과할 수 없습니다',
         },
         res: {
             paramError: '요청이 실패했습니다. 나중에 다시 시도하세요!',
