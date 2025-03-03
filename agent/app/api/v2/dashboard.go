@@ -137,24 +137,3 @@ func (b *BaseApi) LoadDashboardCurrentInfo(c *gin.Context) {
 	data := dashboardService.LoadCurrentInfo(ioOption, netOption)
 	helper.SuccessWithData(c, data)
 }
-
-// @Tags Dashboard
-// @Summary System restart
-// @Accept json
-// @Param operation path string true "request"
-// @Success 200
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /dashboard/system/restart/:operation [post]
-func (b *BaseApi) SystemRestart(c *gin.Context) {
-	operation, ok := c.Params.Get("operation")
-	if !ok {
-		helper.BadRequest(c, errors.New("error operation in path"))
-		return
-	}
-	if err := dashboardService.Restart(operation); err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-	helper.SuccessWithOutData(c)
-}

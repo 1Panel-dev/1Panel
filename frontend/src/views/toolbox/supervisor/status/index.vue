@@ -10,10 +10,10 @@
                     </div>
                     <div class="mt-0.5" v-if="!data.init">
                         <el-button type="primary" v-if="data.status != 'running'" link @click="onOperate('start')">
-                            {{ $t('app.start') }}
+                            {{ $t('commons.operate.start') }}
                         </el-button>
                         <el-button type="primary" v-if="data.status == 'running'" link @click="onOperate('stop')">
-                            {{ $t('app.stop') }}
+                            {{ $t('commons.operate.stop') }}
                         </el-button>
                         <el-divider direction="vertical" />
                         <el-button type="primary" link @click="onOperate('restart')">

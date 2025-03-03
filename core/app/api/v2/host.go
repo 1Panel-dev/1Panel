@@ -9,6 +9,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/app/dto"
+	"github.com/1Panel-dev/1Panel/core/app/service"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/copier"
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
@@ -159,7 +160,7 @@ func (b *BaseApi) DeleteHost(c *gin.Context) {
 // @Summary Update host
 // @Accept json
 // @Param request body dto.HostOperate true "request"
-// @Success 200
+// @Success 200 {object} dto.HostInfo
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /core/hosts/update [post]
@@ -214,11 +215,12 @@ func (b *BaseApi) UpdateHost(c *gin.Context) {
 		upMap["pass_phrase"] = req.PassPhrase
 	}
 	upMap["description"] = req.Description
-	if err := hostService.Update(req.ID, upMap); err != nil {
+	hostItem, err := hostService.Update(req.ID, upMap)
+	if err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.SuccessWithData(c, hostItem)
 }
 
 // @Tags Host
@@ -238,11 +240,32 @@ func (b *BaseApi) UpdateHostGroup(c *gin.Context) {
 
 	upMap := make(map[string]interface{})
 	upMap["group_id"] = req.GroupID
-	if err := hostService.Update(req.ID, upMap); err != nil {
+	if _, err := hostService.Update(req.ID, upMap); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithOutData(c)
+}
+
+// @Tags Host
+// @Summary Get host info
+// @Accept json
+// @Param request body dto.OperateByID true "request"
+// @Success 200 {object} dto.HostInfo
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /core/hosts/info [post]
+func (b *BaseApi) GetHostByID(c *gin.Context) {
+	var req dto.OperateByID
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	info, err := hostService.GetHostByID(req.ID)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, info)
 }
 
 func (b *BaseApi) WsSsh(c *gin.Context) {
@@ -265,7 +288,7 @@ func (b *BaseApi) WsSsh(c *gin.Context) {
 	if wshandleError(wsConn, errors.WithMessage(err, "invalid param rows in request")) {
 		return
 	}
-	host, err := hostService.GetHostInfo(uint(id))
+	host, err := service.GetHostInfo(uint(id))
 	if wshandleError(wsConn, errors.WithMessage(err, "load host info by id failed")) {
 		return
 	}

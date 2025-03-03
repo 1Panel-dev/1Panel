@@ -364,7 +364,7 @@ const onConnTerminal = async (title: string, wsID: number, isLocal?: boolean) =>
     const res = await testByID(wsID);
     if (isLocal) {
         for (const tab of terminalTabs.value) {
-            if (tab.title.indexOf('@127.0.0.1:') !== -1 || tab.title === i18n.global.t('terminal.localhost')) {
+            if (tab.title === i18n.global.t('terminal.localhost')) {
                 onReconnect(tab);
             }
         }

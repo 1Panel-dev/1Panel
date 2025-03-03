@@ -52,11 +52,11 @@ const seriesStyle = [
         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
             {
                 offset: 0,
-                color: 'rgba(0, 94, 235, .5)',
+                color: 'rgba(0, 94, 235, .3)',
             },
             {
                 offset: 1,
-                color: 'rgba(0, 94, 235, 0)',
+                color: 'rgba(0, 94, 235, .4)',
             },
         ]),
     },
@@ -64,11 +64,11 @@ const seriesStyle = [
         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
             {
                 offset: 0,
-                color: 'rgba(27, 143, 60, .5)',
+                color: 'rgba(27, 143, 60, .3)',
             },
             {
                 offset: 1,
-                color: 'rgba(27, 143, 60, 0)',
+                color: 'rgba(27, 143, 60, .4)',
             },
         ]),
     },
@@ -76,11 +76,11 @@ const seriesStyle = [
         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
             {
                 offset: 0,
-                color: 'rgba(249, 199, 79, .5)',
+                color: 'rgba(249, 199, 79, .3)',
             },
             {
                 offset: 1,
-                color: 'rgba(249, 199, 79, 0)',
+                color: 'rgba(249, 199, 79, .4)',
             },
         ]),
     },
@@ -88,11 +88,11 @@ const seriesStyle = [
         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
             {
                 offset: 0,
-                color: 'rgba(255, 173, 177, 0.5)',
+                color: 'rgba(255, 173, 177, 0.3)',
             },
             {
                 offset: 1,
-                color: 'rgba(255, 173, 177, 0)',
+                color: 'rgba(255, 173, 177, .4)',
             },
         ]),
     },

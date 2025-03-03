@@ -71,6 +71,13 @@ func (c *SSHClient) Run(shell string) (string, error) {
 	return string(buf), err
 }
 
+func (c *SSHClient) SudoHandleCmd() string {
+	if _, err := c.Run("sudo -n ls"); err == nil {
+		return "sudo "
+	}
+	return ""
+}
+
 func (c *SSHClient) Runf(shell string, args ...interface{}) (string, error) {
 	session, err := c.Client.NewSession()
 	if err != nil {

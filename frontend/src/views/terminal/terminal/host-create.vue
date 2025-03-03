@@ -76,7 +76,7 @@
 import { ElForm } from 'element-plus';
 import { Host } from '@/api/interface/host';
 import { Rules } from '@/global/form-rules';
-import { addHost, testByInfo } from '@/api/modules/terminal';
+import { addHost, editHost, getHostByID, testByInfo } from '@/api/modules/terminal';
 import i18n from '@/lang';
 import { reactive, ref } from 'vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
@@ -88,6 +88,7 @@ type FormInstance = InstanceType<typeof ElForm>;
 const hostRef = ref<FormInstance>();
 
 const groupList = ref();
+const defaultGroup = ref();
 
 let hostInfo = reactive<Host.HostOperate>({
     id: 0,
@@ -118,21 +119,7 @@ interface DialogProps {
     isLocal: boolean;
 }
 const acceptParams = (props: DialogProps) => {
-    hostInfo.addr = '';
-    hostInfo.name = 'local';
-    hostInfo.groupID = 0;
-    hostInfo.addr = '';
-    hostInfo.port = 22;
-    hostInfo.user = '';
-    hostInfo.authMode = 'password';
-    hostInfo.password = '';
-    hostInfo.privateKey = '';
-    hostInfo.description = '';
     isLocal.value = props.isLocal;
-    if (props.isLocal) {
-        hostInfo.addr = '127.0.0.1';
-        hostInfo.user = 'root';
-    }
     loadGroups();
     dialogVisible.value = true;
 };
@@ -143,11 +130,57 @@ const handleClose = () => {
 
 const emit = defineEmits(['on-conn-terminal', 'load-host-tree']);
 
+const loadGroups = async () => {
+    const res = await getGroupList('host');
+    groupList.value = res.data;
+    for (const item of groupList.value) {
+        if (item.isDefault) {
+            defaultGroup.value = item.id;
+            break;
+        }
+    }
+    if (isLocal.value) {
+        loadLocal();
+    } else {
+        setDefault();
+    }
+};
+const loadLocal = async () => {
+    await getHostByID(0)
+        .then((res) => {
+            hostInfo.id = res.data.id || 0;
+            hostInfo.addr = res.data.addr || '';
+            hostInfo.name = 'local';
+            hostInfo.groupID = res.data.groupID || defaultGroup.value;
+            hostInfo.port = res.data.port || 22;
+            hostInfo.user = res.data.user || 'root';
+            hostInfo.authMode = res.data.authMode || 'password';
+            hostInfo.password = res.data.password || '';
+            hostInfo.privateKey = res.data.privateKey || '';
+            hostInfo.description = res.data.description || '';
+        })
+        .catch(() => {
+            setDefault();
+        });
+};
+
+const setDefault = () => {
+    console.log('123');
+    hostInfo.addr = '';
+    hostInfo.name = 'local';
+    hostInfo.groupID = defaultGroup.value;
+    hostInfo.port = 22;
+    hostInfo.user = '';
+    hostInfo.authMode = 'password';
+    hostInfo.password = '';
+    hostInfo.privateKey = '';
+    hostInfo.description = '';
+};
+
 const submitAddHost = (formEl: FormInstance | undefined, ops: string) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        hostInfo.groupID = 0;
         switch (ops) {
             case 'testConn':
                 await testByInfo(hostInfo).then((res) => {
@@ -161,7 +194,12 @@ const submitAddHost = (formEl: FormInstance | undefined, ops: string) => {
                 });
                 break;
             case 'saveAndConn':
-                const res = await addHost(hostInfo);
+                let res;
+                if (hostInfo.id == 0) {
+                    res = await addHost(hostInfo);
+                } else {
+                    res = await editHost(hostInfo);
+                }
                 dialogVisible.value = false;
                 let title = res.data.user + '@' + res.data.addr + ':' + res.data.port;
                 if (res.data.name.length !== 0) {
@@ -173,17 +211,6 @@ const submitAddHost = (formEl: FormInstance | undefined, ops: string) => {
                 break;
         }
     });
-};
-
-const loadGroups = async () => {
-    const res = await getGroupList('host');
-    groupList.value = res.data;
-    for (const item of groupList.value) {
-        if (item.isDefault) {
-            hostInfo.groupID = item.id;
-            break;
-        }
-    }
 };
 
 defineExpose({

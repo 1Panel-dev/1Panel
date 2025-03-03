@@ -8,11 +8,11 @@
                     </div>
                     <div v-if="createdBy === '1Panel'" style="margin-left: 50px">
                         <el-button link type="primary" @click="onComposeOperate('up')">
-                            {{ $t('app.start') }}
+                            {{ $t('commons.operate.start') }}
                         </el-button>
                         <el-divider direction="vertical" />
                         <el-button link type="primary" @click="onComposeOperate('stop')">
-                            {{ $t('app.stop') }}
+                            {{ $t('commons.operate.stop') }}
                         </el-button>
                         <el-divider direction="vertical" />
                         <el-button link type="primary" @click="onComposeOperate('down')">
@@ -40,10 +40,10 @@
             <template #main>
                 <el-button-group>
                     <el-button :disabled="checkStatus('start')" @click="onOperate('start')">
-                        {{ $t('app.start') }}
+                        {{ $t('commons.operate.start') }}
                     </el-button>
                     <el-button :disabled="checkStatus('stop')" @click="onOperate('stop')">
-                        {{ $t('app.stop') }}
+                        {{ $t('commons.operate.stop') }}
                     </el-button>
                     <el-button :disabled="checkStatus('restart')" @click="onOperate('restart')">
                         {{ $t('commons.button.restart') }}

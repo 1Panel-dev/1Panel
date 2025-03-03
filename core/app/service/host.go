@@ -20,11 +20,11 @@ type HostService struct{}
 type IHostService interface {
 	TestLocalConn(id uint) bool
 	TestByInfo(req dto.HostConnTest) bool
-	GetHostInfo(id uint) (*model.Host, error)
+	GetHostByID(id uint) (*dto.HostInfo, error)
 	SearchForTree(search dto.SearchForTree) ([]dto.HostTree, error)
 	SearchWithPage(search dto.SearchHostWithPage) (int64, interface{}, error)
 	Create(hostDto dto.HostOperate) (*dto.HostInfo, error)
-	Update(id uint, upMap map[string]interface{}) error
+	Update(id uint, upMap map[string]interface{}) (*dto.HostInfo, error)
 	Delete(id []uint) error
 
 	EncryptHost(itemVal string) (string, error)
@@ -124,33 +124,6 @@ func (u *HostService) TestLocalConn(id uint) bool {
 	return true
 }
 
-func (u *HostService) GetHostInfo(id uint) (*model.Host, error) {
-	host, err := hostRepo.Get(repo.WithByID(id))
-	if err != nil {
-		return nil, buserr.New("ErrRecordNotFound")
-	}
-	if len(host.Password) != 0 {
-		host.Password, err = encrypt.StringDecrypt(host.Password)
-		if err != nil {
-			return nil, err
-		}
-	}
-	if len(host.PrivateKey) != 0 {
-		host.PrivateKey, err = encrypt.StringDecrypt(host.PrivateKey)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if len(host.PassPhrase) != 0 {
-		host.PassPhrase, err = encrypt.StringDecrypt(host.PassPhrase)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return &host, err
-}
-
 func (u *HostService) SearchWithPage(req dto.SearchHostWithPage) (int64, interface{}, error) {
 	var options []global.DBOption
 	if len(req.Info) != 0 {
@@ -230,6 +203,48 @@ func (u *HostService) SearchForTree(search dto.SearchForTree) ([]dto.HostTree, e
 	return datas, err
 }
 
+func (u *HostService) GetHostByID(id uint) (*dto.HostInfo, error) {
+	var item dto.HostInfo
+	var host model.Host
+	if id == 0 {
+		host, _ = hostRepo.Get(repo.WithByName("local"))
+	} else {
+		host, _ = hostRepo.Get(repo.WithByID(id))
+	}
+	if host.ID == 0 {
+		return nil, buserr.New("ErrRecordNotFound")
+	}
+	if err := copier.Copy(&item, &host); err != nil {
+		return nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
+	}
+	if !item.RememberPassword {
+		item.Password = ""
+		item.PrivateKey = ""
+		item.PassPhrase = ""
+		return &item, nil
+	}
+	var err error
+	if len(host.Password) != 0 {
+		item.Password, err = encrypt.StringDecrypt(host.Password)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if len(host.PrivateKey) != 0 {
+		item.PrivateKey, err = encrypt.StringDecrypt(host.PrivateKey)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if len(host.PassPhrase) != 0 {
+		item.PassPhrase, err = encrypt.StringDecrypt(host.PassPhrase)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &item, err
+}
+
 func (u *HostService) Create(req dto.HostOperate) (*dto.HostInfo, error) {
 	if req.Name == "local" {
 		return nil, buserr.New("ErrRecordExist")
@@ -297,8 +312,16 @@ func (u *HostService) Delete(ids []uint) error {
 	return hostRepo.Delete(repo.WithByIDs(ids))
 }
 
-func (u *HostService) Update(id uint, upMap map[string]interface{}) error {
-	return hostRepo.Update(id, upMap)
+func (u *HostService) Update(id uint, upMap map[string]interface{}) (*dto.HostInfo, error) {
+	if err := hostRepo.Update(id, upMap); err != nil {
+		return nil, err
+	}
+	hostItem, _ := hostRepo.Get(repo.WithByID(id))
+	var hostinfo dto.HostInfo
+	if err := copier.Copy(&hostinfo, &hostItem); err != nil {
+		return nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
+	}
+	return &hostinfo, nil
 }
 
 func (u *HostService) EncryptHost(itemVal string) (string, error) {
@@ -308,4 +331,31 @@ func (u *HostService) EncryptHost(itemVal string) (string, error) {
 	}
 	keyItem, err := encrypt.StringEncrypt(string(privateKey))
 	return keyItem, err
+}
+
+func GetHostInfo(id uint) (*model.Host, error) {
+	host, err := hostRepo.Get(repo.WithByID(id))
+	if err != nil {
+		return nil, buserr.New("ErrRecordNotFound")
+	}
+	if len(host.Password) != 0 {
+		host.Password, err = encrypt.StringDecrypt(host.Password)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if len(host.PrivateKey) != 0 {
+		host.PrivateKey, err = encrypt.StringDecrypt(host.PrivateKey)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if len(host.PassPhrase) != 0 {
+		host.PassPhrase, err = encrypt.StringDecrypt(host.PassPhrase)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &host, err
 }

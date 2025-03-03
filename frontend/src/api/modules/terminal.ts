@@ -7,6 +7,9 @@ import { deepCopy } from '@/utils/util';
 export const searchHosts = (params: Host.SearchWithPage) => {
     return http.post<ResPage<Host.Host>>(`/core/hosts/search`, params);
 };
+export const getHostByID = (id: number) => {
+    return http.post<Host.Host>(`/core/hosts/info`, { id: id });
+};
 export const getHostTree = (params: Host.ReqSearch) => {
     return http.post<Array<Host.HostTree>>(`/core/hosts/tree`, params);
 };
