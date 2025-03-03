@@ -1156,21 +1156,23 @@ func GteSiteDir(alias string) string {
 }
 
 const (
-	SiteConf          = "SiteConf"
-	SiteAccessLog     = "access.log"
-	SiteErrorLog      = "error.log"
-	WebsiteRootDir    = "WebsiteRootDir"
-	SiteDir           = "SiteDir"
-	SiteIndexDir      = "SiteIndexDir"
-	SiteProxyDir      = "SiteProxyDir"
-	SiteSSLDir        = "SiteSSLDir"
-	SiteReWritePath   = "SiteReWritePath"
-	SiteRedirectDir   = "SiteRedirectDir"
-	SiteCacheDir      = "SiteCacheDir"
-	SiteConfDir       = "SiteConfDir"
-	SitesRootDir      = "SitesRootDir"
-	DefaultDir        = "DefaultDir"
-	DefaultRewriteDir = "DefaultRewriteDir"
+	SiteConf              = "SiteConf"
+	SiteAccessLog         = "access.log"
+	SiteErrorLog          = "error.log"
+	WebsiteRootDir        = "WebsiteRootDir"
+	SiteDir               = "SiteDir"
+	SiteIndexDir          = "SiteIndexDir"
+	SiteProxyDir          = "SiteProxyDir"
+	SiteSSLDir            = "SiteSSLDir"
+	SiteReWritePath       = "SiteReWritePath"
+	SiteRedirectDir       = "SiteRedirectDir"
+	SiteCacheDir          = "SiteCacheDir"
+	SiteConfDir           = "SiteConfDir"
+	SitesRootDir          = "SitesRootDir"
+	DefaultDir            = "DefaultDir"
+	DefaultRewriteDir     = "DefaultRewriteDir"
+	SiteRootAuthBasicPath = "SiteRootAuthBasicPath"
+	SitePathAuthBasicDir  = "SitePathAuthBasicDir"
 )
 
 func GetSitePath(website model.Website, confType string) string {
@@ -1195,6 +1197,10 @@ func GetSitePath(website model.Website, confType string) string {
 		return path.Join(GteSiteDir(website.Alias), "rewrite", website.Alias+".conf")
 	case SiteRedirectDir:
 		return path.Join(GteSiteDir(website.Alias), "redirect")
+	case SiteRootAuthBasicPath:
+		return path.Join(GteSiteDir(website.Alias), "auth_basic", "auth.pass")
+	case SitePathAuthBasicDir:
+		return path.Join(GteSiteDir(website.Alias), "path_auth")
 	}
 	return ""
 }

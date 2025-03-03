@@ -14,6 +14,7 @@ ErrApiConfigIPInvalid: "O IP da interface da API não está na lista de permiss�
 ErrApiConfigDisable: "Esta interface proíbe o uso de chamadas de API: {{ .detail }}"
 
 #common
+ErrUsernameIsExist: "Nome de usuário já existe"
 ErrNameIsExist: "O nome já existe"
 ErrDemoEnvironment: "Servidor de demonstração, operação proibida!"
 ErrCmdTimeout: "Tempo limite de execução do comando excedido!"

@@ -14,6 +14,7 @@ ErrApiConfigIPInvalid: "APIインターフェイスIPはホワイトリストに
 ErrApiConfigDisable: "このインターフェイスは、APIインターフェイスコールの使用を禁止しています：{{.Detail}}"
 
 #common
+ErrUsernameIsExist: "ユーザー名は既に存在します"
 ErrNameIsExist: "名前はすでに存在しています"
 ErrDemoEnvironment: "デモサーバー、この操作を禁止します！"
 ErrCmdTimeout: "コマンド実行がタイムアウトしました！"

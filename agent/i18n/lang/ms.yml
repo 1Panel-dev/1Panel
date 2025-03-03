@@ -15,6 +15,7 @@ ErrApiConfigDisable: "Antara muka ini melarang penggunaan panggilan API: {{ .det
 ErrApiConfigKeyTimeInvalid: "Ralat cap waktu antara muka API: {{ .detail }}"
 
 #common
+ErrUsernameIsExist: "Nama pengguna sudah wujud"
 ErrNameIsExist: "Nama sudah wujud"
 ErrDemoEnvironment: "Pelayan demo, operasi ini dilarang!"
 ErrCmdTimeout: "Pelaksanaan arahan telah tamat masa!"

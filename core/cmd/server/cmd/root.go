@@ -49,7 +49,7 @@ func loadDBConn() (*gorm.DB, error) {
 		baseDir = baseDir[:strings.LastIndex(baseDir, "/")]
 	}
 
-	db, err := gorm.Open(sqlite.Open(baseDir+"/1panel/db/1Panel.db"), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open(baseDir+"/1panel/db/core.db"), &gorm.Config{})
 	if err != nil {
 		return nil, fmt.Errorf("init my db conn failed, err: %v \n", err)
 	}

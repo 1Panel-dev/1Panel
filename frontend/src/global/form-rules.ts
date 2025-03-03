@@ -211,6 +211,19 @@ const checkSimplePassword = (rule: any, value: any, callback: any) => {
     }
 };
 
+const checkAuthBasicPassword = (rule: any, value: any, callback: any) => {
+    if (value === '' || typeof value === 'undefined' || value == null) {
+        callback(new Error(i18n.global.t('commons.rule.authBasicPassword')));
+    } else {
+        const reg = /^[a-zA-Z0-9_\-\.@$!%*?&]{1,72}$/;
+        if (!reg.test(value)) {
+            callback(new Error(i18n.global.t('commons.rule.authBasicPassword')));
+        } else {
+            callback();
+        }
+    }
+};
+
 const checkDBName = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.dbName')));
@@ -622,6 +635,7 @@ interface CommonRule {
     phpExtensions: FormItemRule;
     supervisorName: FormItemRule;
     domainOrIP: FormItemRule;
+    authBasicPassword: FormItemRule;
 
     paramCommon: FormItemRule;
     paramComplexity: FormItemRule;
@@ -863,6 +877,10 @@ export const Rules: CommonRule = {
     },
     phone: {
         validator: checkPhone,
+        trigger: 'blur',
+    },
+    authBasicPassword: {
+        validator: checkAuthBasicPassword,
         trigger: 'blur',
     },
 };

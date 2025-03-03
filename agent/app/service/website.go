@@ -1852,21 +1852,15 @@ func (w WebsiteService) ClearProxyCache(req request.NginxCommonReq) error {
 
 func (w WebsiteService) GetAuthBasics(req request.NginxAuthReq) (res response.NginxAuthRes, err error) {
 	var (
-		website      model.Website
-		nginxInstall model.AppInstall
-		authContent  []byte
-		nginxParams  []response.NginxParam
+		website     model.Website
+		authContent []byte
+		nginxParams []response.NginxParam
 	)
 	website, err = websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
 	if err != nil {
 		return
 	}
-	nginxInstall, err = getAppInstallByKey(constant.AppOpenresty)
-	if err != nil {
-		return
-	}
-	authPath := fmt.Sprintf("/www/sites/%s/auth_basic/auth.pass", website.Alias)
-	absoluteAuthPath := path.Join(nginxInstall.GetPath(), authPath)
+	absoluteAuthPath := GetSitePath(website, SiteRootAuthBasicPath)
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(absoluteAuthPath) {
 		return
@@ -1896,22 +1890,17 @@ func (w WebsiteService) GetAuthBasics(req request.NginxAuthReq) (res response.Ng
 
 func (w WebsiteService) UpdateAuthBasic(req request.NginxAuthUpdate) (err error) {
 	var (
-		website      model.Website
-		nginxInstall model.AppInstall
-		params       []dto.NginxParam
-		authContent  []byte
-		authArray    []string
+		website     model.Website
+		params      []dto.NginxParam
+		authContent []byte
+		authArray   []string
 	)
 	website, err = websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
 	if err != nil {
 		return err
 	}
-	nginxInstall, err = getAppInstallByKey(constant.AppOpenresty)
-	if err != nil {
-		return
-	}
 	authPath := fmt.Sprintf("/www/sites/%s/auth_basic/auth.pass", website.Alias)
-	absoluteAuthPath := path.Join(nginxInstall.GetPath(), authPath)
+	absoluteAuthPath := GetSitePath(website, SiteRootAuthBasicPath)
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(path.Dir(absoluteAuthPath)) {
 		_ = fileOp.CreateDir(path.Dir(absoluteAuthPath), constant.DirPerm)
@@ -2025,21 +2014,15 @@ func (w WebsiteService) UpdateAuthBasic(req request.NginxAuthUpdate) (err error)
 
 func (w WebsiteService) GetPathAuthBasics(req request.NginxAuthReq) (res []response.NginxPathAuthRes, err error) {
 	var (
-		website      model.Website
-		nginxInstall model.AppInstall
-		authContent  []byte
+		website     model.Website
+		authContent []byte
 	)
 	website, err = websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
 	if err != nil {
 		return
 	}
-	nginxInstall, err = getAppInstallByKey(constant.AppOpenresty)
-	if err != nil {
-		return
-	}
 	fileOp := files.NewFileOp()
-	authDir := fmt.Sprintf("/www/sites/%s/path_auth", website.Alias)
-	absoluteAuthDir := path.Join(nginxInstall.GetPath(), authDir)
+	absoluteAuthDir := GetSitePath(website, SitePathAuthBasicDir)
 	passDir := path.Join(absoluteAuthDir, "pass")
 	if !fileOp.Stat(absoluteAuthDir) || !fileOp.Stat(passDir) {
 		return
@@ -2097,12 +2080,8 @@ func (w WebsiteService) UpdatePathAuthBasic(req request.NginxPathAuthUpdate) err
 	if err != nil {
 		return err
 	}
-	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
-	if err != nil {
-		return err
-	}
 	fileOp := files.NewFileOp()
-	authDir := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "path_auth")
+	authDir := GetSitePath(website, SitePathAuthBasicDir)
 	if !fileOp.Stat(authDir) {
 		_ = fileOp.CreateDir(authDir, constant.DirPerm)
 	}

@@ -16,6 +16,7 @@ ErrApiConfigDisable: "此接口禁止使用 API 接口调用: {{ .detail }}"
 ErrApiConfigKeyTimeInvalid: "API 接口时间戳错误: {{ .detail }}"
 
 #common
+ErrUsernameIsExist: "用户名已存在"
 ErrNameIsExist: "名称已存在"
 ErrDemoEnvironment: "演示服务器，禁止此操作!"
 ErrCmdTimeout: "命令执行超时！"

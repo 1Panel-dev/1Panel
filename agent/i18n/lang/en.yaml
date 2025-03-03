@@ -6,6 +6,7 @@ ErrStructTransform: "Type conversion failure: {{ .detail }}"
 ErrNotSupportType: "The system does not support the current type: {{ .detail }}"
 
 #common
+ErrUsernameIsExist: "Username already exists"
 ErrNameIsExist: "Name is already exist"
 ErrDemoEnvironment: "Demo server, prohibit this operation!"
 ErrCmdTimeout: "Command execution timed out！"

@@ -10,6 +10,7 @@ ErrApiConfigIPInvalid: "调用 API 接口 IP 不在白名单: {{ .detail }}"
 ErrApiConfigDisable: "此接口禁止使用 API 接口調用: {{ .detail }}"
 
 #common
+ErrUsernameIsExist: "使用者名稱已存在"
 ErrNameIsExist: "名稱已存在"
 ErrDemoEnvironment: "演示伺服器，禁止此操作!"
 ErrCmdTimeout: "指令執行超時！"

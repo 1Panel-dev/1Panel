@@ -15,6 +15,7 @@ ErrApiConfigDisable: "이 인터페이스는 API 호출을 금지합니다: {{ .
 ErrApiConfigKeyTimeInvalid: "API 인터페이스 타임스탬프 오류: {{ .detail }}"
 
 # 공통
+ErrUsernameIsExist: "사용자 이름이 이미 존재합니다"
 ErrNameIsExist: "이름이 이미 존재합니다"
 ErrDemoEnvironment: "데모 서버에서는 이 작업이 금지되어 있습니다!"
 ErrCmdTimeout: "명령어 실행 시간이 초과되었습니다!"

@@ -56,7 +56,7 @@ import { getRandomStr } from '@/utils/util';
 const proxyForm = ref<FormInstance>();
 const rules = ref({
     username: [Rules.requiredInput, Rules.name],
-    password: [Rules.requiredInput],
+    password: [Rules.requiredInput, Rules.authBasicPassword],
     name: [Rules.requiredInput],
     path: [Rules.requiredInput],
 });

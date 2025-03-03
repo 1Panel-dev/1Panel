@@ -85,6 +85,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
         click: function (row: Website.NginxAuthConfig) {
+            row.scope = 'root';
             openEdit(row);
         },
     },
@@ -100,6 +101,7 @@ const pathButtons = [
     {
         label: i18n.global.t('commons.button.edit'),
         click: function (row: Website.NginxAuthConfig) {
+            row.scope = 'path';
             openEdit(row);
         },
     },
