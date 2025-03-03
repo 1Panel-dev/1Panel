@@ -37,6 +37,7 @@ export interface GlobalState {
     isIntl: boolean;
     isTrial: boolean;
     productProExpires: number;
+    licenseVerify: string;
 
     errStatus: string;
 }

@@ -47,9 +47,9 @@ func Start() {
 	session.Init()
 	gin.SetMode(gin.DebugMode)
 	cron.Run()
+	hook.Init()
 	InitOthers()
 	business.Init()
-	hook.Init()
 
 	rootRouter := router.Routers()
 

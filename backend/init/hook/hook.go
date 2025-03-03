@@ -84,6 +84,15 @@ func Init() {
 		global.CONF.System.ApiKeyValidityTime = apiKeyValidityTimeSetting.Value
 	}
 
+	if global.CONF.System.LicenseVerify == "" {
+		licenseVerify, err := settingRepo.Get(settingRepo.WithByKey("LicenseVerify"))
+		if err != nil {
+			global.LOG.Errorf("load service license verify from setting failed, err: %v", err)
+		}
+		global.CONF.System.LicenseVerify = licenseVerify.Value
+	}
+	handleLicenseVerify(global.CONF.System.LicenseVerify, settingRepo)
+
 	handleUserInfo(global.CONF.System.ChangeUserInfo, settingRepo)
 
 	handleCronjobStatus()
@@ -205,6 +214,12 @@ func loadLocalDir() {
 		return
 	}
 	global.LOG.Errorf("error type dir: %T", varMap["dir"])
+}
+
+func handleLicenseVerify(licenseVerify string, settingRepo repo.ISettingRepo) {
+	if err := settingRepo.Update("LicenseVerify", licenseVerify); err != nil {
+		global.LOG.Fatalf("init license verify before start failed, err: %v", err)
+	}
 }
 
 func handleUserInfo(tags string, settingRepo repo.ISettingRepo) {

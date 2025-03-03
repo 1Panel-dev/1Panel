@@ -23,6 +23,7 @@ type System struct {
 	Language           string `mapstructure:"language"`
 	IsDemo             bool   `mapstructure:"is_demo"`
 	IsIntl             bool   `mapstructure:"is_intl"`
+	LicenseVerify      string `mapstructure:"license_verify"`
 	AppRepo            string `mapstructure:"app_repo"`
 	ChangeUserInfo     string `mapstructure:"change_user_info"`
 	OneDriveID         string `mapstructure:"one_drive_id"`

@@ -40,6 +40,7 @@ const GlobalStore = defineStore({
         isIntl: false,
         isTrial: false,
         productProExpires: 0,
+        licenseVerify: '',
 
         errStatus: '',
     }),

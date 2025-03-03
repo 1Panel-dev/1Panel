@@ -62,6 +62,7 @@ export namespace Setting {
         apiKey: string;
         ipWhiteList: string;
         apiKeyValidityTime: number;
+        licenseVerify: string;
     }
     export interface SettingUpdate {
         key: string;

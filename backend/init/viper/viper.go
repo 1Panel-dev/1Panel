@@ -3,6 +3,7 @@ package viper
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"path"
 	"strings"
 
@@ -103,6 +104,7 @@ func Init() {
 	global.CONF.System.Entrance = entrance
 	global.CONF.System.Language = language
 	global.CONF.System.ChangeUserInfo = loadChangeInfo()
+	global.CONF.System.LicenseVerify = os.Getenv("LXWARE_LICENSE_VERIFY")
 	global.Viper = v
 }
 

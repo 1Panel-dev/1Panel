@@ -77,7 +77,7 @@
                     <el-col :xs="24" :sm="24" :md="9" :lg="9" :xl="9">
                         <CardWithHeader :header="$t('license.quickUpdate')" height="160px">
                             <template #body>
-                                <div class="h-app-card">
+                                <div class="h-app-card" v-if="globalStore.licenseVerify != 'TC' || !hasLicense">
                                     <el-row>
                                         <el-col :span="15">
                                             <div class="h-app-content">{{ $t('license.importLicense') }}</div>

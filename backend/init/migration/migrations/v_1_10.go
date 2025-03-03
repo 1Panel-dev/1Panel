@@ -448,3 +448,14 @@ var AddAppPanelName = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddLicenseVerify = &gormigrate.Migration{
+	ID: "20250226-add-license-verify",
+	Migrate: func(tx *gorm.DB) error {
+
+		if err := tx.Create(&model.Setting{Key: "LicenseVerify", Value: "LX"}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
