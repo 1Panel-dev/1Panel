@@ -61,7 +61,7 @@ import { ref } from 'vue';
 import { FormInstance } from 'element-plus';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import TaskLog from '@/components/task-log/index.vue';
+import TaskLog from '@/components/log/task/index.vue';
 import { snapshotRecover, snapshotRollback } from '@/api/modules/setting';
 import { computeSize, newUUID } from '@/utils/util';
 

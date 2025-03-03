@@ -1,12 +1,12 @@
 <template>
     <div v-loading="loading">
-        <LogPro v-model="content" :heightDiff="320"></LogPro>
+        <HighlightLog v-model="content" :heightDiff="320" />
     </div>
 </template>
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue';
 import { getSupervisorLog } from '@/api/modules/host-tool';
-import LogPro from '@/components/log-pro/index.vue';
+import HighlightLog from '@/components/log/hightlight-log/index.vue';
 
 let content = ref('');
 let loading = ref(false);

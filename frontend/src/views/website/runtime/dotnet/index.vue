@@ -103,7 +103,7 @@ import Delete from '@/views/website/runtime/delete/index.vue';
 import i18n from '@/lang';
 import RouterMenu from '../index.vue';
 import router from '@/routers/router';
-import ComposeLogs from '@/components/compose-log/index.vue';
+import ComposeLogs from '@/components/log/compose/index.vue';
 import { Promotion } from '@element-plus/icons-vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import AppResources from '@/views/website/runtime/php/check/index.vue';

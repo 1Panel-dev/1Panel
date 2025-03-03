@@ -548,7 +548,7 @@ import { Group } from '@/api/interface/group';
 import { SearchRuntimes } from '@/api/modules/runtime';
 import { Runtime } from '@/api/interface/runtime';
 import { getRandomStr, getRuntimeLabel } from '@/utils/util';
-import TaskLog from '@/components/task-log/index.vue';
+import TaskLog from '@/components/log/task/index.vue';
 import { getAppService } from '@/api/modules/app';
 import { v4 as uuidv4 } from 'uuid';
 import { dateFormatSimple, getProvider, getAccountName } from '@/utils/util';
@@ -807,7 +807,6 @@ const getRuntimes = async () => {
         if (runtimes.value.length > 0) {
             const first = runtimes.value[0];
             website.value.runtimeID = first.id;
-            console.log('runtimeID', first.id);
             runtimeResource.value = first.resource;
             runtimePorts.value = first.port.split(',').map((port: string) => parseInt(port.trim(), 10));
             if (runtimePorts.value.length > 1) {

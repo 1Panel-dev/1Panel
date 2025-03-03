@@ -145,7 +145,7 @@ import { batchDeleteFile, checkFile, chunkUploadFileData, getUploadList } from '
 import { loadBaseDir } from '@/api/modules/setting';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { handleRecoverByUpload } from '@/api/modules/backup';
-import TaskLog from '@/components/task-log/index.vue';
+import TaskLog from '@/components/log/task/index.vue';
 
 interface DialogProps {
     type: string;

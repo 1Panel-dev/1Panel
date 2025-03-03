@@ -74,7 +74,7 @@ import { ElForm, ElMessageBox } from 'element-plus';
 import { loadBaseDir } from '@/api/modules/setting';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
-import TaskLog from '@/components/task-log/index.vue';
+import TaskLog from '@/components/log/task/index.vue';
 import { listComposeTemplate, testCompose, upCompose } from '@/api/modules/container';
 import { newUUID } from '@/utils/util';
 

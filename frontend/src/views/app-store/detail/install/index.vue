@@ -132,7 +132,7 @@ import { MsgError } from '@/utils/message';
 import { Container } from '@/api/interface/container';
 import { loadResourceLimit } from '@/api/modules/container';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
-import TaskLog from '@/components/task-log/index.vue';
+import TaskLog from '@/components/log/task/index.vue';
 import { newUUID } from '@/utils/util';
 import { computeSizeFromMB } from '@/utils/util';
 

@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import LogFile from '@/components/log-file/index.vue';
+import LogFile from '@/components/log/file/index.vue';
 import LogRouter from '@/views/log/router/index.vue';
 import { nextTick, onMounted, reactive, ref } from 'vue';
 import { getSystemFiles } from '@/api/modules/log';

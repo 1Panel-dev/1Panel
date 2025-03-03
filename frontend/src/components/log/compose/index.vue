@@ -22,7 +22,7 @@ import i18n from '@/lang';
 import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import { GlobalStore } from '@/store';
 import screenfull from 'screenfull';
-import ContainerLog from '@/components/container-log/index.vue';
+import ContainerLog from '@/components/log/container/index.vue';
 
 const open = ref(false);
 const resource = ref('');

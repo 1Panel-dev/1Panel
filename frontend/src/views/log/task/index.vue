@@ -51,7 +51,7 @@ import { dateFormat } from '@/utils/util';
 import { searchTasks } from '@/api/modules/log';
 import { onMounted, reactive, ref } from '@vue/runtime-core';
 import { Log } from '@/api/interface/log';
-import TaskLog from '@/components/task-log/index.vue';
+import TaskLog from '@/components/log/task/index.vue';
 
 const loading = ref();
 const data = ref();

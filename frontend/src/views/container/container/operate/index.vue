@@ -448,7 +448,7 @@ import {
 } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import { MsgError } from '@/utils/message';
-import TaskLog from '@/components/task-log/index.vue';
+import TaskLog from '@/components/log/task/index.vue';
 import { checkIpV4V6, checkPort, newUUID } from '@/utils/util';
 import router from '@/routers';
 

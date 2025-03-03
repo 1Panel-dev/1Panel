@@ -26,7 +26,7 @@
                 </el-button>
             </el-form-item>
         </el-form>
-        <LogPro v-model="slowLogs"></LogPro>
+        <HighlightLog v-model="slowLogs" />
         <ConfirmDialog @cancel="onCancel" ref="confirmDialogRef" @confirm="onSave"></ConfirmDialog>
     </div>
 </template>
@@ -38,7 +38,7 @@ import { loadDBFile, updateMysqlVariables } from '@/api/modules/database';
 import { dateFormatForName, downloadWithContent } from '@/utils/util';
 import i18n from '@/lang';
 import { MsgError, MsgInfo, MsgSuccess } from '@/utils/message';
-import LogPro from '@/components/log-pro/index.vue';
+import HighlightLog from '@/components/log/hightlight-log/index.vue';
 
 const slowLogs = ref();
 const detailShow = ref();
@@ -97,21 +97,6 @@ const handleSlowLogs = async () => {
     confirmDialogRef.value!.acceptParams(params);
 };
 
-// const getDynamicHeight = () => {
-//     if (variables.slow_query_log === 'ON') {
-//         if (globalStore.openMenuTabs) {
-//             return `calc(100vh - 467px)`;
-//         } else {
-//             return `calc(100vh - 437px)`;
-//         }
-//     }
-//     if (globalStore.openMenuTabs) {
-//         return `calc(100vh - 413px)`;
-//     } else {
-//         return `calc(100vh - 383px)`;
-//     }
-// };
-
 const changeSlowLogs = () => {
     if (!(variables.long_query_time > 0 && variables.long_query_time <= 600)) {
         MsgError(i18n.global.t('database.thresholdRangeHelper'));
@@ -166,13 +151,6 @@ const onDownload = async () => {
 const loadMysqlSlowlogs = async () => {
     const res = await loadDBFile(currentDB.type + '-slow-logs', currentDB.database);
     slowLogs.value = res.data || '';
-    // nextTick(() => {
-    //     const state = view.value.state;
-    //     view.value.dispatch({
-    //         selection: { anchor: state.doc.length, head: state.doc.length },
-    //         scrollIntoView: true,
-    //     });
-    // });
 };
 
 onBeforeUnmount(() => {

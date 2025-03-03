@@ -89,7 +89,7 @@ import { Rules } from '@/global/form-rules';
 import Diff from './diff/index.vue';
 import bus from '@/global/bus';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
-import TaskLog from '@/components/task-log/index.vue';
+import TaskLog from '@/components/log/task/index.vue';
 import { v4 as uuidv4 } from 'uuid';
 
 const composeDiffRef = ref();

@@ -43,7 +43,7 @@ import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { imagePull } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
-import TaskLog from '@/components/task-log/index.vue';
+import TaskLog from '@/components/log/task/index.vue';
 import { MsgSuccess } from '@/utils/message';
 import { newUUID } from '@/utils/util';
 

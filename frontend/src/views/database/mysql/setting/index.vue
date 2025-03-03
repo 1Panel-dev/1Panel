@@ -116,7 +116,7 @@
 
 <script lang="ts" setup>
 import { FormInstance } from 'element-plus';
-import ContainerLog from '@/components/container-log/index.vue';
+import ContainerLog from '@/components/log/container/index.vue';
 import Status from '@/views/database/mysql/setting/status/index.vue';
 import Variables from '@/views/database/mysql/setting/variables/index.vue';
 import SlowLog from '@/views/database/mysql/setting/slow-log/index.vue';

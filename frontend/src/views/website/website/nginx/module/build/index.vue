@@ -37,7 +37,7 @@ import { FormInstance } from 'element-plus';
 import { getNginxModules, buildNginx } from '@/api/modules/nginx';
 import i18n from '@/lang';
 import { newUUID } from '@/utils/util';
-import TaskLog from '@/components/task-log/index.vue';
+import TaskLog from '@/components/log/task/index.vue';
 import { Rules } from '@/global/form-rules';
 
 const open = ref(false);

@@ -187,7 +187,7 @@ import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
 import { newUUID } from '@/utils/util';
 import Detail from '../detail/index.vue';
-import TaskLog from '@/components/task-log/index.vue';
+import TaskLog from '@/components/log/task/index.vue';
 import { storeToRefs } from 'pinia';
 
 const globalStore = GlobalStore();

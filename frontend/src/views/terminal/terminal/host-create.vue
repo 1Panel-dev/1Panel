@@ -165,7 +165,6 @@ const loadLocal = async () => {
 };
 
 const setDefault = () => {
-    console.log('123');
     hostInfo.addr = '';
     hostInfo.name = 'local';
     hostInfo.groupID = defaultGroup.value;

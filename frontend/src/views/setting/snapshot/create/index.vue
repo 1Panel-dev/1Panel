@@ -162,7 +162,7 @@ import { ref } from 'vue';
 import { loadSnapshotInfo, snapshotCreate } from '@/api/modules/setting';
 import { computeSize, newUUID } from '@/utils/util';
 import i18n from '@/lang';
-import TaskLog from '@/components/task-log/index.vue';
+import TaskLog from '@/components/log/task/index.vue';
 import { listBackupOptions } from '@/api/modules/backup';
 import { Rules } from '@/global/form-rules';
 import { ElForm } from 'element-plus';

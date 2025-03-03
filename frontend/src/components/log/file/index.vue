@@ -17,7 +17,7 @@
                 <slot name="button"></slot>
             </span>
         </div>
-        <div class="log-container" ref="logContainer" @scroll="onScroll">
+        <div class="log-container" ref="logContainer" @scroll="onScroll" :style="containerStyle">
             <div class="log-spacer" :style="{ height: `${totalHeight}px` }"></div>
             <div
                 v-for="(log, index) in visibleLogs"
@@ -36,7 +36,7 @@ import { downloadFile } from '@/utils/util';
 import { readByLine } from '@/api/modules/files';
 import { GlobalStore } from '@/store';
 import bus from '@/global/bus';
-import hightlight from '@/components/hightlight/index.vue';
+import hightlight from '@/components/log/custom-hightlight/index.vue';
 const globalStore = GlobalStore();
 
 interface LogProps {
@@ -79,7 +79,7 @@ const props = defineProps({
     },
     heightDiff: {
         type: Number,
-        default: 500,
+        default: 420,
     },
     showTail: {
         type: Boolean,
@@ -311,6 +311,10 @@ const init = async () => {
     await getContent(false);
 };
 
+const containerStyle = computed(() => ({
+    height: `calc(100vh - ${props.heightDiff}px)`,
+}));
+
 onMounted(async () => {
     firstLoading.value = true;
     await init();
@@ -330,7 +334,6 @@ defineExpose({ changeTail, onDownload, clearLog });
 </script>
 <style lang="scss" scoped>
 .log-container {
-    height: calc(100vh - 420px);
     overflow-y: auto;
     overflow-x: auto;
     position: relative;

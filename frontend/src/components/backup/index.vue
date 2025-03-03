@@ -119,7 +119,7 @@ import i18n from '@/lang';
 import { Backup } from '@/api/interface/backup';
 import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
-import TaskLog from '@/components/task-log/index.vue';
+import TaskLog from '@/components/log/task/index.vue';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
 

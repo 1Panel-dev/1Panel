@@ -149,7 +149,7 @@
             <SSLUpload ref="sslUploadRef" @close="search()" />
             <Apply ref="applyRef" @search="search" @submit="openLog" />
             <OpDialog ref="opRef" @search="search" @cancel="search" />
-            <Log ref="logRef" @close="search()" />
+            <Log ref="logRef" @close="search()" :heightDiff="220" />
             <CA ref="caRef" @close="search()" />
             <Obtain ref="obtainRef" @close="search()" @submit="openLog" />
         </LayoutContent>
@@ -171,7 +171,7 @@ import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
 import SSLUpload from './upload/index.vue';
 import Apply from './apply/index.vue';
-import Log from '@/components/log-dialog/index.vue';
+import Log from '@/components/log/drawer/index.vue';
 import Obtain from './obtain/index.vue';
 import MsgInfo from '@/components/msg-info/index.vue';
 

@@ -192,7 +192,7 @@ import { ElForm } from 'element-plus';
 import IgnoreRule from '@/views/setting/snapshot/ignore-rule/index.vue';
 import i18n from '@/lang';
 import { Setting } from '@/api/interface/setting';
-import TaskLog from '@/components/task-log/index.vue';
+import TaskLog from '@/components/log/task/index.vue';
 import RecoverStatus from '@/views/setting/snapshot/status/index.vue';
 import SnapshotImport from '@/views/setting/snapshot/import/index.vue';
 import SnapshotCreate from '@/views/setting/snapshot/create/index.vue';

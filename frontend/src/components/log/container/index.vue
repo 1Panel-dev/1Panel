@@ -24,16 +24,6 @@
             {{ $t('commons.button.clean') }}
         </el-button>
     </div>
-    <!-- <div class="log-container" ref="logContainer">
-        <DynamicScroller :items="logs" :min-item-size="32" v-if="logs.length">
-            <template #default="{ item, active }">
-                <DynamicScrollerItem :item="item" :active="active" :size-dependencies="[item]" :data-index="item">
-                    <hightlight :log="item" type="container"></hightlight>
-                </DynamicScrollerItem>
-            </template>
-        </DynamicScroller>
-    </div> -->
-
     <div class="log-container" ref="logContainer">
         <div class="log-spacer" :style="{ height: `${totalHeight}px` }"></div>
         <div
@@ -54,7 +44,7 @@ import { dateFormatForName } from '@/utils/util';
 import { onUnmounted, reactive, ref } from 'vue';
 import { ElMessageBox } from 'element-plus';
 import { MsgError, MsgSuccess } from '@/utils/message';
-import hightlight from '@/components/hightlight/index.vue';
+import hightlight from '@/components/log/custom-hightlight/index.vue';
 
 const props = defineProps({
     container: {
@@ -79,13 +69,15 @@ const logSearch = reactive({
     compose: '',
 });
 const logHeight = 20;
-const logCount = ref(0);
+const logCount = computed(() => logs.value.length);
 const totalHeight = computed(() => logHeight * logCount.value);
 const startIndex = ref(0);
 const containerHeight = ref(500);
-const visibleCount = computed(() => Math.ceil(containerHeight.value / logHeight));
+const visibleCount = computed(() => Math.ceil(containerHeight.value / logHeight) + 2);
 const visibleLogs = computed(() => {
-    return logs.value.slice(startIndex.value, startIndex.value + visibleCount.value);
+    const start = Math.max(0, startIndex.value - 1);
+    const end = startIndex.value + visibleCount.value + 1;
+    return logs.value.slice(start, end);
 });
 
 const timeOptions = ref([
@@ -185,9 +177,21 @@ const onClean = async () => {
     });
 };
 
+const handleScroll = () => {
+    if (logContainer.value) {
+        const scrollTop = logContainer.value.scrollTop;
+        startIndex.value = Math.max(0, Math.floor(scrollTop / logHeight) - 1);
+    }
+};
+
 onUnmounted(() => {
     handleClose();
+    if (logContainer.value) {
+        logContainer.value.removeEventListener('scroll', handleScroll);
+    }
 });
+
+const resizeObserver = ref<ResizeObserver | null>(null);
 
 onMounted(() => {
     logSearch.container = props.container;
@@ -200,8 +204,12 @@ onMounted(() => {
 
     nextTick(() => {
         if (logContainer.value) {
-            logContainer.value.scrollTop = totalHeight.value;
-            containerHeight.value = logContainer.value.getBoundingClientRect().height;
+            containerHeight.value = logContainer.value.clientHeight;
+            logContainer.value.addEventListener('scroll', handleScroll);
+            resizeObserver.value = new ResizeObserver((entries) => {
+                containerHeight.value = entries[0].contentRect.height;
+            });
+            resizeObserver.value.observe(logContainer.value);
         }
     });
 
@@ -227,7 +235,7 @@ onMounted(() => {
 }
 
 .log-container {
-    height: calc(100vh - 405px);
+    height: calc(100vh - 320px);
     overflow-y: auto;
     overflow-x: auto;
     position: relative;

@@ -19,7 +19,7 @@
 import { computed, onMounted, ref } from 'vue';
 import { getWebsite, opWebsiteLog } from '@/api/modules/website';
 import i18n from '@/lang';
-import LogFile from '@/components/log-file/index.vue';
+import LogFile from '@/components/log/file/index.vue';
 import { MsgSuccess } from '@/utils/message';
 
 const props = defineProps({

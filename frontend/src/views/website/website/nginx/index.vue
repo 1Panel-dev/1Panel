@@ -40,7 +40,7 @@
 <script lang="ts" setup>
 import Source from './source/index.vue';
 import { ref } from 'vue';
-import ContainerLog from '@/components/container-log/index.vue';
+import ContainerLog from '@/components/log/container/index.vue';
 import NginxPer from './performance/index.vue';
 import Status from './status/index.vue';
 import Module from './module/index.vue';

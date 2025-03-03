@@ -70,7 +70,7 @@
 
 <script lang="ts" setup>
 import { FormInstance } from 'element-plus';
-import ContainerLog from '@/components/container-log/index.vue';
+import ContainerLog from '@/components/log/container/index.vue';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { onMounted, reactive, ref } from 'vue';
 import { loadDBFile, loadDBBaseInfo, updateDBFile } from '@/api/modules/database';

@@ -27,6 +27,7 @@ import i18n from '@/lang';
 import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue';
 import screenfull from 'screenfull';
 import { GlobalStore } from '@/store';
+import ContainerLog from '@/components/log/container/index.vue';
 
 const logVisible = ref(false);
 const mobile = computed(() => {

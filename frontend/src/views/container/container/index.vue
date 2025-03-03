@@ -406,11 +406,11 @@ import RenameDialog from '@/views/container/container/rename/index.vue';
 import UpgradeDialog from '@/views/container/container/upgrade/index.vue';
 import CommitDialog from '@/views/container/container/commit/index.vue';
 import MonitorDialog from '@/views/container/container/monitor/index.vue';
-import ContainerLogDialog from '@/views/container/container/log/index.vue';
 import TerminalDialog from '@/views/container/container/terminal/index.vue';
 import CodemirrorDialog from '@/components/codemirror-dialog/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
+import ContainerLogDialog from '@/components/log/container-drawer/index.vue';
 import Status from '@/components/status/index.vue';
 import { reactive, onMounted, ref, computed } from 'vue';
 import {

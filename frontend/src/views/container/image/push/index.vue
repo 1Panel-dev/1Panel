@@ -40,7 +40,7 @@ import { ElForm } from 'element-plus';
 import { imagePush } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import { MsgSuccess } from '@/utils/message';
-import TaskLog from '@/components/task-log/index.vue';
+import TaskLog from '@/components/log/task/index.vue';
 import { newUUID } from '@/utils/util';
 
 const drawerVisible = ref(false);

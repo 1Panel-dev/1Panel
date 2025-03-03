@@ -123,7 +123,7 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import MonitorDialog from '@/views/container/container/monitor/index.vue';
-import ContainerLogDialog from '@/views/container/container/log/index.vue';
+import ContainerLogDialog from '@/components/log/container-drawer/index.vue';
 import TerminalDialog from '@/views/container/container/terminal/index.vue';
 import CodemirrorDialog from '@/components/codemirror-dialog/index.vue';
 import Status from '@/components/status/index.vue';
