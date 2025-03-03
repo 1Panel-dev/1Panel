@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('toolbox.fail2ban.logPath')" :back="handleClose" size="small">
+    <DrawerPro v-model="drawerVisible" :header="$t('toolbox.fail2ban.logPath')" @close="handleClose" size="small">
         <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
             <el-form-item :label="$t('toolbox.fail2ban.logPath')" prop="logPath" :rules="Rules.requiredInput">
                 <el-input v-model="form.logPath">

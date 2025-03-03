@@ -2,7 +2,7 @@
     <DrawerPro
         v-model="composeVisible"
         :header="$t('commons.button.edit')"
-        :back="handleClose"
+        @close="handleClose"
         :resource="name"
         size="large"
     >

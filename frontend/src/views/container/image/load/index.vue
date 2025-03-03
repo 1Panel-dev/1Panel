@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="loadVisible" :header="$t('container.importImage')" :back="handleClose" size="small">
+    <DrawerPro v-model="loadVisible" :header="$t('container.importImage')" @close="handleClose" size="small">
         <el-form @submit.prevent v-loading="loading" ref="formRef" :model="form" label-position="top">
             <el-form-item :label="$t('container.path')" :rules="Rules.requiredInput" prop="path">
                 <el-input v-model="form.path">

@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('website.defaultServer')" size="normal" :back="handleClose">
+    <DrawerPro v-model="open" :header="$t('website.defaultServer')" size="normal" @close="handleClose">
         <el-form @submit.prevent label-position="top" v-loading="loading">
             <el-form-item :label="$t('website.defaultServer')">
                 <el-select v-model="defaultId">

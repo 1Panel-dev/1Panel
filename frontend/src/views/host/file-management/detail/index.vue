@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('file.info')" size="small" :back="handleClose">
+    <DrawerPro v-model="open" :header="$t('file.info')" size="small" @close="handleClose">
         <el-descriptions :column="1" border>
             <el-descriptions-item label-class-name="detail-label" :label="$t('file.fileName')">
                 {{ data.name }}

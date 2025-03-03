@@ -3,7 +3,7 @@
         v-model="backupVisible"
         :header="$t('commons.button.backup')"
         :resource="detailName ? name + ' [' + detailName + ']' : name"
-        :back="handleClose"
+        @close="handleClose"
         size="large"
     >
         <template #content>

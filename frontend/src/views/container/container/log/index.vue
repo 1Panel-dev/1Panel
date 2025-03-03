@@ -2,7 +2,7 @@
     <DrawerPro
         v-model="logVisible"
         :header="$t('commons.button.log')"
-        :back="handleClose"
+        @close="handleClose"
         :resource="logSearch.container"
         :size="globalStore.isFullScreen ? 'full' : 'large'"
     >

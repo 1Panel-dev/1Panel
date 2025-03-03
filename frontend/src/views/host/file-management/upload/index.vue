@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('commons.button.upload')" :back="handleClose" size="normal">
+    <DrawerPro v-model="open" :header="$t('commons.button.upload')" @close="handleClose" size="normal">
         <template #content>
             <div class="button-container">
                 <div>

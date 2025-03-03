@@ -2,7 +2,7 @@
     <DrawerPro
         v-model="drawerVisible"
         :header="$t('toolbox.fail2ban.' + form.operate + 'IP')"
-        :back="handleClose"
+        @close="handleClose"
         size="small"
     >
         <el-form ref="formRef" label-position="top" :model="form" @submit.prevent :rules="rules" v-loading="loading">

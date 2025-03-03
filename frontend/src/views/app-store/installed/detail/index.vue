@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('app.param')" :back="handleClose" size="normal">
+    <DrawerPro v-model="open" :header="$t('app.param')" @close="handleClose" size="normal">
         <template #buttons>
             <el-button type="primary" plain @click="editParam" :disabled="loading">
                 {{ edit ? $t('app.detail') : $t('commons.button.edit') }}

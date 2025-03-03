@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('php.extensions')" size="large" :back="handleClose">
+    <DrawerPro v-model="open" :header="$t('php.extensions')" size="large" @close="handleClose">
         <template #content>
             <ComplexTable :data="data" @search="search()" :pagination-config="paginationConfig">
                 <template #toolbar>

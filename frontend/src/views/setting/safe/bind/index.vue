@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('setting.bindInfo')" :back="handleClose" size="small">
+    <DrawerPro v-model="drawerVisible" :header="$t('setting.bindInfo')" @close="handleClose" size="small">
         <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
             <el-form-item :label="$t('setting.ipv6')" prop="ipv6" :rules="Rules.requiredSelect">
                 <el-radio-group style="width: 100%" v-model="form.ipv6" @change="onChangeMode()">

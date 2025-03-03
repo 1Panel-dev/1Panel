@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('file.deCompress')" :resource="name" :back="handleClose" size="normal">
+    <DrawerPro v-model="open" :header="$t('file.deCompress')" :resource="name" @close="handleClose" size="normal">
         <el-form
             ref="fileForm"
             label-position="top"

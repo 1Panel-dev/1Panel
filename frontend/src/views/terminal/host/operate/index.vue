@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('terminal.host')" :back="handleClose" size="large">
+    <DrawerPro v-model="drawerVisible" :header="$t('terminal.host')" @close="handleClose" size="large">
         <el-form ref="hostInfoRef" label-position="top" :model="dialogData.rowData" :rules="rules" v-loading="loading">
             <el-form-item :label="$t('terminal.ip')" prop="addr">
                 <el-input @change="isOK = false" clearable v-model.trim="dialogData.rowData!.addr" />

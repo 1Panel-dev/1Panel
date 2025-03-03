@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('setting.snapshot')" :back="handleClose" size="large">
+    <DrawerPro v-model="drawerVisible" :header="$t('setting.snapshot')" @close="handleClose" size="large">
         <fu-steps
             v-loading="loading"
             class="steps"

@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('setting.panelSSL')" :back="handleClose" size="large">
+    <DrawerPro v-model="drawerVisible" :header="$t('setting.panelSSL')" @close="handleClose" size="large">
         <el-alert class="common-prompt" :closable="false" type="error">
             <template #default>
                 <span>

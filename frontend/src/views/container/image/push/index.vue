@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('container.imagePush')" :back="onCloseLog" size="large">
+    <DrawerPro v-model="drawerVisible" :header="$t('container.imagePush')" @close="onCloseLog" size="large">
         <el-form ref="formRef" label-position="top" :model="form" label-width="80px">
             <el-form-item :label="$t('container.tag')" :rules="Rules.requiredSelect" prop="tagName">
                 <el-select filterable v-model="form.tagName">

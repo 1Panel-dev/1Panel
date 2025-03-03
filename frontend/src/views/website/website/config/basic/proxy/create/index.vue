@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('commons.button.' + proxy.operate)" :back="handleClose" size="normal">
+    <DrawerPro v-model="open" :header="$t('commons.button.' + proxy.operate)" @close="handleClose" size="normal">
         <el-form ref="proxyForm" label-position="top" :model="proxy" :rules="rules" v-loading="loading">
             <el-form-item :label="$t('commons.table.name')" prop="name">
                 <el-input v-model.trim="proxy.name" :disabled="proxy.operate === 'edit'"></el-input>

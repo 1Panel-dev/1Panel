@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('app.defaultWebDomain')" :back="handleClose" size="small">
+    <DrawerPro v-model="drawerVisible" :header="$t('app.defaultWebDomain')" @close="handleClose" size="small">
         <el-form ref="formRef" label-position="top" :model="form" :rules="rules" @submit.prevent v-loading="loading">
             <el-form-item :label="$t('app.defaultWebDomain')" prop="defaultDomain">
                 <el-input v-model="form.defaultDomain">

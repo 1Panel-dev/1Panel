@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" header="DNS" :back="handleClose" size="large">
+    <DrawerPro v-model="drawerVisible" header="DNS" @close="handleClose" size="large">
         <el-alert :title="$t('toolbox.device.dnsAlert')" class="common-prompt" :closable="false" type="warning" />
         <el-radio-group v-model="confShowType" @change="changeMode">
             <el-radio-button value="form">{{ $t('database.baseConf') }}</el-radio-button>

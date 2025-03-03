@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('setting.importSnapshot')" :back="handleClose" size="small">
+    <DrawerPro v-model="drawerVisible" :header="$t('setting.importSnapshot')" @close="handleClose" size="small">
         <el-form ref="formRef" label-position="top" :model="form" :rules="rules" v-loading="loading">
             <el-form-item :label="$t('setting.backupAccount')" prop="from">
                 <el-select v-model="form.backupAccountID" @change="loadFiles" clearable>

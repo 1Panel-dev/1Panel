@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('ssl.organizationDetail')" :back="handleClose" size="large">
+    <DrawerPro v-model="open" :header="$t('ssl.organizationDetail')" @close="handleClose" size="large">
         <div v-loading="loading">
             <el-radio-group v-model="curr">
                 <el-radio-button value="detail">{{ $t('ssl.organizationDetail') }}</el-radio-button>

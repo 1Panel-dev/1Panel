@@ -1,6 +1,6 @@
 <template>
     <div>
-        <DrawerPro v-model="drawerVisible" :header="$t('container.cutLog')" :back="handleClose" size="small">
+        <DrawerPro v-model="drawerVisible" :header="$t('container.cutLog')" @close="handleClose" size="small">
             <el-alert class="common-prompt" :closable="false" type="warning">
                 <template #default>
                     <ul style="margin-left: -20px">

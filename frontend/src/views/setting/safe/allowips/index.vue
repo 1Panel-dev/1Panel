@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('setting.allowIPs')" :back="handleClose" size="small">
+    <DrawerPro v-model="drawerVisible" :header="$t('setting.allowIPs')" @close="handleClose" size="small">
         <el-form ref="formRef" label-position="top" @submit.prevent :model="form" :rules="rules" v-loading="loading">
             <el-form-item :label="$t('setting.allowIPs')" prop="allowIPs">
                 <el-input type="textarea" :placeholder="$t('setting.allowIPEgs')" :rows="3" v-model="form.allowIPs" />

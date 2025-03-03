@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('ssl.' + operate)" size="large" :back="handleClose">
+    <DrawerPro v-model="open" :header="$t('ssl.' + operate)" size="large" @close="handleClose">
         <el-form ref="sslForm" label-position="top" :model="ssl" label-width="100px" :rules="rules" v-loading="loading">
             <el-row :gutter="20">
                 <el-col :span="12">
@@ -224,6 +224,7 @@ const ssl = ref(initData());
 const operate = ref('create');
 const dnsResolve = ref<Website.DNSResolve[]>([]);
 const em = defineEmits(['close', 'submit']);
+
 const handleClose = () => {
     resetForm();
     open.value = false;

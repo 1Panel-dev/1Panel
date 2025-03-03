@@ -4,7 +4,7 @@
             v-model="uploadOpen"
             :header="$t('commons.button.import')"
             :resource="title"
-            :back="handleUploadClose"
+            @close="handleUploadClose"
             size="large"
         >
             <template #content>

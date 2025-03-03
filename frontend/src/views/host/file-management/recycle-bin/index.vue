@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('file.recycleBin')" :back="handleClose" size="large">
+    <DrawerPro v-model="open" :header="$t('file.recycleBin')" @close="handleClose" size="large">
         <template #content>
             <div class="flex space-x-4">
                 <el-button @click="clear" type="primary" :disabled="data == null || data.length == 0">

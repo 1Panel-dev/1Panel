@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('ssl.upload')" size="large" :back="handleClose">
+    <DrawerPro v-model="open" :header="$t('ssl.upload')" size="large" @close="handleClose">
         <el-form ref="sslForm" label-position="top" :model="ssl" label-width="100px" :rules="rules" v-loading="loading">
             <el-form-item :label="$t('website.importType')" prop="type">
                 <el-select v-model="ssl.type">

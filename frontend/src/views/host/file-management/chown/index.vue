@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('file.setRole')" :back="handleClose" :resource="name" size="normal">
+    <DrawerPro v-model="open" :header="$t('file.setRole')" @close="handleClose" :resource="name" size="normal">
         <el-alert :title="$t('file.ownerHelper')" type="info" :closable="false" class="common-prompt" />
         <el-form
             ref="fileForm"

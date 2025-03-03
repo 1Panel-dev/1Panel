@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" header="FTP" :resource="paginationConfig.user" :back="handleClose" size="large">
+    <DrawerPro v-model="drawerVisible" header="FTP" :resource="paginationConfig.user" @close="handleClose" size="large">
         <el-select @change="search" class="p-w-200" clearable v-model="paginationConfig.operation">
             <template #prefix>{{ $t('commons.table.operate') }}</template>
             <el-option value="PUT" :label="$t('commons.button.upload')" />

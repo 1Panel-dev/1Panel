@@ -1,6 +1,6 @@
 <template>
     <div v-loading="loading">
-        <DrawerPro v-model="drawerVisible" :header="$t('terminal.groupChange')" :back="handleClose" size="small">
+        <DrawerPro v-model="drawerVisible" :header="$t('terminal.groupChange')" @close="handleClose" size="small">
             <el-form @submit.prevent ref="hostInfoRef" label-position="top" :model="dialogData" :rules="rules">
                 <el-form-item :label="$t('commons.table.group')" prop="group">
                     <el-select filterable v-model="dialogData.groupID" clearable style="width: 100%">

@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('tool.supervisor.list')" size="60%" :back="handleClose">
+    <DrawerPro v-model="open" :header="$t('tool.supervisor.list')" size="60%" @close="handleClose">
         <template #content>
             <ComplexTable :data="data" v-loading="loading">
                 <template #toolbar>

@@ -2,7 +2,7 @@
     <DrawerPro
         v-model="open"
         :header="process.operate == 'create' ? $t('commons.button.create') : $t('commons.button.edit')"
-        :back="handleClose"
+        @close="handleClose"
         size="small"
     >
         <el-form

@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('ssh.permitRootLogin')" :back="handleClose" size="small">
+    <DrawerPro v-model="drawerVisible" :header="$t('ssh.permitRootLogin')" @close="handleClose" size="small">
         <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
             <el-form-item :label="$t('ssh.permitRootLogin')" prop="permitRootLogin">
                 <el-select v-model="form.permitRootLogin" style="width: 100%">

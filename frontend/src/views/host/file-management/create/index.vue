@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('commons.button.create')" :back="handleClose" size="normal">
+    <DrawerPro v-model="open" :header="$t('commons.button.create')" @close="handleClose" size="normal">
         <el-form
             ref="fileForm"
             label-position="top"

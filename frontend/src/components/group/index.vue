@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('commons.table.group')" @close="handleClose" size="large" :back="handleClose">
+    <DrawerPro v-model="open" :header="$t('commons.table.group')" @close="handleClose" size="large">
         <template #content>
             <ComplexTable :data="data" @search="search()">
                 <template #toolbar>

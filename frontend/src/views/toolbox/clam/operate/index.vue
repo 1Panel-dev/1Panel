@@ -4,7 +4,7 @@
         :header="title"
         size="large"
         :resource="dialogData.title === 'add' ? '' : dialogData.rowData?.name"
-        :back="handleClose"
+        @close="handleClose"
     >
         <el-form ref="formRef" label-position="top" :model="dialogData.rowData" :rules="rules" v-loading="loading">
             <el-row type="flex" justify="center">

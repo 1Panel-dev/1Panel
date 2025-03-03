@@ -3,7 +3,7 @@
         v-model="open"
         :header="$t('commons.button.' + operateReq.operate)"
         :resource="resourceName"
-        :back="handleClose"
+        @close="handleClose"
     >
         <el-descriptions direction="vertical">
             <el-descriptions-item>

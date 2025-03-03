@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="passwordVisible" :header="$t('setting.proxy')" :back="handleClose" size="large">
+    <DrawerPro v-model="passwordVisible" :header="$t('setting.proxy')" @close="handleClose" size="large">
         <el-form ref="formRef" label-position="top" :model="form" :rules="rules" v-loading="loading">
             <el-alert class="common-prompt" :closable="false" type="warning">
                 <template #default>

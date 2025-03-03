@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('app.ignoreList')" :back="handleClose" size="small">
+    <DrawerPro v-model="open" :header="$t('app.ignoreList')" @close="handleClose" size="small">
         <template #content>
             <el-row :gutter="5">
                 <el-col v-for="(app, index) in apps" :key="index">

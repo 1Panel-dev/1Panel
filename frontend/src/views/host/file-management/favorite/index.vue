@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('file.favorite')" :back="handleClose" size="large">
+    <DrawerPro v-model="open" :header="$t('file.favorite')" @close="handleClose" size="large">
         <template #content>
             <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
                 <el-table-column :label="$t('file.path')" show-overflow-tooltip prop="path"></el-table-column>

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <DrawerPro v-model="drawerVisible" :header="$t('container.sockPath')" :back="handleClose" size="small">
+        <DrawerPro v-model="drawerVisible" :header="$t('container.sockPath')" @close="handleClose" size="small">
             <el-form
                 ref="formRef"
                 label-position="top"

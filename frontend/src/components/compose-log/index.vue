@@ -2,7 +2,7 @@
     <DrawerPro
         v-model="open"
         :header="resource"
-        :back="handleClose"
+        @close="handleClose"
         :size="globalStore.isFullScreen ? 'full' : 'large'"
         :resource="resource"
     >

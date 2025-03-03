@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('monitor.defaultNetwork')" :back="handleClose" size="small">
+    <DrawerPro v-model="drawerVisible" :header="$t('monitor.defaultNetwork')" @close="handleClose" size="small">
         <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
             <el-form-item :label="$t('monitor.defaultNetwork')" prop="defaultNetwork" :rules="Rules.requiredSelect">
                 <el-select v-model="form.defaultNetwork" filterable>

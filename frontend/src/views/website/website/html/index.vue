@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('website.defaultHtml')" :back="handleClose" size="normal">
+    <DrawerPro v-model="open" :header="$t('website.defaultHtml')" @close="handleClose" size="normal">
         <el-select v-model="type" class="w-full" @change="get()" v-loading="loading">
             <el-option :value="'404'" :label="$t('website.website404')"></el-option>
             <el-option :value="'domain404'" :label="$t('website.domain404')"></el-option>

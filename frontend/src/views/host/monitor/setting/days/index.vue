@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('monitor.storeDays')" :back="handleClose" size="small">
+    <DrawerPro v-model="drawerVisible" :header="$t('monitor.storeDays')" @close="handleClose" size="small">
         <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
             <el-form-item :label="$t('monitor.storeDays')" :rules="[Rules.integerNumber]" prop="monitorStoreDays">
                 <el-input clearable v-model.number="form.monitorStoreDays" />

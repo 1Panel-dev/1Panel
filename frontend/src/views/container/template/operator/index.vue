@@ -3,7 +3,7 @@
         v-model="drawerVisible"
         :header="$t('container.composeTemplate')"
         :resource="dialogData.title === 'create' ? '' : dialogData.rowData?.name"
-        :back="handleClose"
+        @close="handleClose"
         size="large"
     >
         <el-form

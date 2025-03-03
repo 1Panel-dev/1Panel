@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('file.setRole')" :back="handleClose" :resource="name" size="large">
+    <DrawerPro v-model="open" :header="$t('file.setRole')" @close="handleClose" :resource="name" size="large">
         <FileRole v-loading="loading" :mode="mode" @get-mode="getMode" :key="open.toString()"></FileRole>
         <el-form-item v-if="form.isDir">
             <el-checkbox v-model="form.sub">{{ $t('file.containSub') }}</el-checkbox>

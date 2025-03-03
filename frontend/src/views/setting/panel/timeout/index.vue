@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('setting.sessionTimeout')" :back="handleClose" size="small">
+    <DrawerPro v-model="drawerVisible" :header="$t('setting.sessionTimeout')" @close="handleClose" size="small">
         <el-form ref="formRef" label-position="top" :rules="rules" :model="form" @submit.prevent v-loading="loading">
             <el-form-item :label="$t('setting.sessionTimeout')" prop="sessionTimeout">
                 <el-input clearable v-model.number="form.sessionTimeout" />

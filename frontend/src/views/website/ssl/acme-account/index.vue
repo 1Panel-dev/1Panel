@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('website.acmeAccountManage')" size="large" :back="handleClose">
+    <DrawerPro v-model="open" :header="$t('website.acmeAccountManage')" size="large" @close="handleClose">
         <template #content>
             <div class="mb-1.5">
                 <el-alert :title="$t('ssl.acmeHelper')" type="info" :closable="false" />

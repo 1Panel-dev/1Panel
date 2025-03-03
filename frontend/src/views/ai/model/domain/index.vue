@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('aiTools.proxy.proxy')" :back="handleClose" size="large">
+    <DrawerPro v-model="open" :header="$t('aiTools.proxy.proxy')" @close="handleClose" size="large">
         <div v-loading="loading">
             <el-form ref="formRef" label-position="top" @submit.prevent :model="req" :rules="rules">
                 <el-alert class="common-prompt" :closable="false" type="warning">

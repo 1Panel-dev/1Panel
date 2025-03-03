@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('ssh.pubkey')" :back="handleClose" size="small">
+    <DrawerPro v-model="drawerVisible" :header="$t('ssh.pubkey')" @close="handleClose" size="small">
         <el-form ref="formRef" label-position="top" :rules="rules" :model="form" v-loading="loading">
             <el-form-item :label="$t('ssh.encryptionMode')" prop="encryptionMode">
                 <el-select v-model="form.encryptionMode" @change="onLoadSecret">

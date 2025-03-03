@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('setting.bindDomain')" :back="handleClose" size="small">
+    <DrawerPro v-model="drawerVisible" :header="$t('setting.bindDomain')" @close="handleClose" size="small">
         <el-form ref="formRef" label-position="top" :rules="rules" :model="form" @submit.prevent v-loading="loading">
             <el-form-item :label="$t('setting.bindDomain')" prop="bindDomain">
                 <el-input clearable v-model="form.bindDomain" />

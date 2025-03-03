@@ -3,7 +3,7 @@
         v-model="drawerVisible"
         :header="title + $t('container.repo')"
         :resource="dialogData.rowData?.name"
-        :back="handleClose"
+        @close="handleClose"
         size="small"
     >
         <el-form

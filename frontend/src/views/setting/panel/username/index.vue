@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('setting.user')" :back="handleClose" size="small">
+    <DrawerPro v-model="drawerVisible" :header="$t('setting.user')" @close="handleClose" size="small">
         <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading" :rules="rules">
             <el-form-item :label="$t('setting.user')" prop="userName">
                 <el-input clearable v-model.trim="form.userName" />

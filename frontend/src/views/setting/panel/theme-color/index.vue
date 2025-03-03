@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('xpack.theme.customColor')" :back="handleClose" size="small">
+    <DrawerPro v-model="drawerVisible" :header="$t('xpack.theme.customColor')" @close="handleClose" size="small">
         <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
             <el-row type="flex" justify="center">
                 <el-col :span="22">

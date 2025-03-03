@@ -3,7 +3,7 @@
         v-model="drawerVisible"
         :header="$t('commons.button.bind')"
         :resource="licenseName"
-        :back="handleClose"
+        @close="handleClose"
         size="small"
     >
         <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">

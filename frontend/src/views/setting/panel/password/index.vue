@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="passwordVisible" :header="$t('setting.changePassword')" :back="handleClose" size="small">
+    <DrawerPro v-model="passwordVisible" :header="$t('setting.changePassword')" @close="handleClose" size="small">
         <el-form ref="passFormRef" label-position="top" :model="passForm" :rules="passRules" v-loading="loading">
             <el-form-item :label="$t('setting.oldPassword')" prop="oldPassword">
                 <el-input type="password" show-password clearable v-model.trim="passForm.oldPassword" />

@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('toolbox.fail2ban.sshPort')" :back="handleClose" size="small">
+    <DrawerPro v-model="drawerVisible" :header="$t('toolbox.fail2ban.sshPort')" @close="handleClose" size="small">
         <el-form ref="formRef" label-position="top" :rules="rules" :model="form" @submit.prevent v-loading="loading">
             <el-form-item :label="$t('toolbox.fail2ban.sshPort')" prop="port">
                 <el-input type="number" clearable v-model.number="form.port" />

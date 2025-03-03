@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="dialogVisible" :header="$t('database.databaseConnInfo')" :back="handleClose" size="small">
+    <DrawerPro v-model="dialogVisible" :header="$t('database.databaseConnInfo')" @close="handleClose" size="small">
         <el-form @submit.prevent v-loading="loading" ref="formRef" :model="form" label-position="top">
             <el-form-item :label="$t('database.containerConn')" v-if="form.from === 'local'">
                 <el-card class="mini-border-card">

@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('setting.entrance')" :back="handleClose" size="small">
+    <DrawerPro v-model="drawerVisible" :header="$t('setting.entrance')" @close="handleClose" size="small">
         <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading" :rules="rules">
             <el-form-item :label="$t('setting.entrance')" prop="securityEntrance">
                 <el-input clearable v-model="form.securityEntrance">

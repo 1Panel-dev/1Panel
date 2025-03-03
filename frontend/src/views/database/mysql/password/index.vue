@@ -4,7 +4,7 @@
             v-model="changeVisible"
             :header="title"
             :resource="changeForm.mysqlName"
-            :back="handleClose"
+            @close="handleClose"
             size="small"
         >
             <el-form v-loading="loading" ref="changeFormRef" :model="changeForm" :rules="rules" label-position="top">

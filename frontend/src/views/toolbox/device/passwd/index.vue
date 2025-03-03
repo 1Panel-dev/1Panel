@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="passwordVisible" :header="$t('setting.changePassword')" :back="handleClose" size="small">
+    <DrawerPro v-model="passwordVisible" :header="$t('setting.changePassword')" @close="handleClose" size="small">
         <el-form ref="formRef" label-position="top" :model="form" :rules="passRules" v-loading="loading">
             <el-alert
                 :title="$t('toolbox.device.passwordHelper')"

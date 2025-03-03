@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('aiTools.model.create')" :back="handleClose">
+    <DrawerPro v-model="drawerVisible" :header="$t('aiTools.model.create')" @close="handleClose">
         <el-row type="flex" justify="center">
             <el-col :span="22">
                 <el-alert type="info" :closable="false">

@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('website.dnsAccountManage')" size="large" :back="handleClose">
+    <DrawerPro v-model="open" :header="$t('website.dnsAccountManage')" size="large" @close="handleClose">
         <template #content>
             <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()">
                 <template #toolbar>

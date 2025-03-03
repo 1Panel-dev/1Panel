@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('website.addDomain')" :back="handleClose">
+    <DrawerPro v-model="open" :header="$t('website.addDomain')" @close="handleClose">
         <el-form ref="domainForm" label-position="top" :model="create">
             <DomainCreate v-model:form="create"></DomainCreate>
         </el-form>

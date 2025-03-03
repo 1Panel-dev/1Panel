@@ -4,7 +4,7 @@
         :header="$t('runtime.' + mode)"
         :resource="mode === 'edit' ? runtime.name : ''"
         size="large"
-        :back="handleClose"
+        @close="handleClose"
     >
         <el-form
             v-loading="loading"

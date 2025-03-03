@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('toolbox.device.timeZone')" :back="handleClose" size="small">
+    <DrawerPro v-model="drawerVisible" :header="$t('toolbox.device.timeZone')" @close="handleClose" size="small">
         <el-alert :title="$t('toolbox.device.timeZoneHelper')" class="common-prompt" :closable="false" type="warning" />
         <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
             <el-form-item :label="$t('toolbox.device.timeZone')" prop="timeZone" :rules="Rules.requiredInput">

@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="createVisible" :header="$t('database.create')" :back="handleClose" size="small">
+    <DrawerPro v-model="createVisible" :header="$t('database.create')" @close="handleClose" size="small">
         <div v-loading="loading">
             <el-form ref="formRef" label-position="top" :model="form" :rules="rules">
                 <el-form-item :label="$t('commons.table.name')" prop="name">

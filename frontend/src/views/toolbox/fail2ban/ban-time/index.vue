@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('toolbox.fail2ban.banTime')" :back="handleClose" size="small">
+    <DrawerPro v-model="drawerVisible" :header="$t('toolbox.fail2ban.banTime')" @close="handleClose" size="small">
         <el-form ref="formRef" label-position="top" :model="form" :rules="rules" @submit.prevent v-loading="loading">
             <el-form-item :label="$t('toolbox.fail2ban.banTime')" prop="banTime">
                 <el-input type="number" v-model.number="form.banTime">

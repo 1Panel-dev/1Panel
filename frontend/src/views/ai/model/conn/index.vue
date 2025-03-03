@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('database.databaseConnInfo')" :back="handleClose" size="small">
+    <DrawerPro v-model="drawerVisible" :header="$t('database.databaseConnInfo')" @close="handleClose" size="small">
         <el-form @submit.prevent v-loading="loading" :model="form" label-position="top">
             <el-row type="flex" justify="center">
                 <el-col :span="22">

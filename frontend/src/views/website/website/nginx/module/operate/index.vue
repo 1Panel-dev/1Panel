@@ -4,7 +4,7 @@
         :header="$t('nginx.' + mode)"
         size="large"
         :resource="mode === 'update' ? module.name : ''"
-        :back="handleClose"
+        @close="handleClose"
     >
         <el-form ref="moduleForm" label-position="top" :model="module" :rules="rules">
             <el-form-item :label="$t('commons.table.name')" prop="name">

@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('setting.systemIP')" :back="handleClose" size="small">
+    <DrawerPro v-model="drawerVisible" :header="$t('setting.systemIP')" @close="handleClose" size="small">
         <el-form ref="formRef" label-position="top" :model="form" :rules="rules" @submit.prevent v-loading="loading">
             <el-form-item :label="$t('setting.systemIP')" prop="systemIP">
                 <el-input clearable v-model="form.systemIP" />

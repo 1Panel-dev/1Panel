@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('commons.table.port')" :back="handleClose" size="small">
+    <DrawerPro v-model="drawerVisible" :header="$t('commons.table.port')" @close="handleClose" size="small">
         <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
             <el-form-item :label="$t('commons.table.port')" prop="port" :rules="Rules.port">
                 <el-input clearable v-model.number="form.port" />

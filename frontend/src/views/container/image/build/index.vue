@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('container.imageBuild')" :back="handleClose" size="large">
+    <DrawerPro v-model="drawerVisible" :header="$t('container.imageBuild')" @close="handleClose" size="large">
         <el-form ref="formRef" label-position="top" :model="form" label-width="80px" :rules="rules">
             <el-form-item :label="$t('commons.table.name')" prop="name">
                 <el-input :placeholder="$t('container.imageNameHelper')" v-model.trim="form.name" clearable />

@@ -1,5 +1,11 @@
 <template>
-    <DrawerPro v-model="monitorVisible" :header="$t('menu.monitor')" :back="handleClose" :resource="title" size="large">
+    <DrawerPro
+        v-model="monitorVisible"
+        :header="$t('menu.monitor')"
+        @close="handleClose"
+        :resource="title"
+        size="large"
+    >
         <el-form label-position="top" @submit.prevent>
             <el-form-item :label="$t('container.refreshTime')">
                 <el-select v-model="timeInterval" @change="changeTimer">

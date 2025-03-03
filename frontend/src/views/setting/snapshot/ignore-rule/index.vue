@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('setting.ignoreRule')" :back="handleClose" size="small">
+    <DrawerPro v-model="drawerVisible" :header="$t('setting.ignoreRule')" @close="handleClose" size="small">
         <el-alert :closable="false" type="warning">{{ $t('setting.ignoreHelper') }}</el-alert>
         <el-form ref="formRef" :model="form" :rules="rules" v-loading="loading" class="mt-2">
             <el-form-item prop="tmpRule">

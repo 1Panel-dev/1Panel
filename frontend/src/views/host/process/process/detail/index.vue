@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('app.detail')" :resource="resourceName" :back="handleClose" size="large">
+    <DrawerPro v-model="open" :header="$t('app.detail')" :resource="resourceName" @close="handleClose" size="large">
         <template #content>
             <el-tabs v-model="activeName" type="card">
                 <el-tab-pane :label="$t('process.basic')" name="basic">

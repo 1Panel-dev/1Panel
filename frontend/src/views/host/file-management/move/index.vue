@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="title" :back="handleClose" size="normal">
+    <DrawerPro v-model="open" :header="title" @close="handleClose" size="normal">
         <el-form
             @submit.prevent
             ref="fileForm"

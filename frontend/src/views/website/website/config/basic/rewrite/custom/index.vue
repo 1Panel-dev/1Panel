@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('website.saveCustom')" :back="handleClose">
+    <DrawerPro v-model="open" :header="$t('website.saveCustom')" @close="handleClose">
         <el-form ref="rewriteForm" label-position="top" :model="req" :rules="rules">
             <el-form-item :label="$t('commons.table.name')" prop="name">
                 <el-input v-model="req.name"></el-input>

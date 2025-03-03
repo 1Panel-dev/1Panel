@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('setting.mfa')" :back="handleClose" size="small">
+    <DrawerPro v-model="drawerVisible" :header="$t('setting.mfa')" @close="handleClose" size="small">
         <el-alert class="common-prompt" :closable="false" type="warning">
             <template #default>
                 <span>

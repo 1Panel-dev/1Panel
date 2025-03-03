@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('nginx.build')" size="normal" :back="handleClose">
+    <DrawerPro v-model="open" :header="$t('nginx.build')" size="normal" @close="handleClose">
         <el-form ref="buildForm" label-position="top" :model="build" :rules="rules">
             <el-form-item :label="$t('nginx.mirrorUrl')" prop="mirror">
                 <el-select v-model="build.mirror">

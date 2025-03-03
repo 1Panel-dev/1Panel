@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('toolbox.fail2ban.findTime')" :back="handleClose" size="small">
+    <DrawerPro v-model="drawerVisible" :header="$t('toolbox.fail2ban.findTime')" @close="handleClose" size="small">
         <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
             <el-form-item :label="$t('toolbox.fail2ban.findTime')" prop="findTime" :rules="Rules.integerNumber">
                 <el-input clearable v-model.number="form.findTime">

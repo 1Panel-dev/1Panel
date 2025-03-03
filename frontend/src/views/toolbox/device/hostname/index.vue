@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('toolbox.device.hostname')" :back="handleClose" size="small">
+    <DrawerPro v-model="drawerVisible" :header="$t('toolbox.device.hostname')" @close="handleClose" size="small">
         <el-alert :title="$t('toolbox.device.hostnameHelper')" class="common-prompt" :closable="false" type="warning" />
         <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
             <el-form-item :label="$t('toolbox.device.hostname')" prop="hostname" :rules="Rules.requiredInput">

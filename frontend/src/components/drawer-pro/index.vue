@@ -1,7 +1,7 @@
 <template>
     <el-drawer
         v-model="localOpenPage"
-        @close="closePage"
+        @close="handleClose"
         :destroy-on-close="true"
         :size="size"
         :close-on-press-escape="true"
@@ -73,8 +73,7 @@ const props = defineProps({
 });
 
 const slots = useSlots();
-
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue', 'close']);
 
 const size = computed(() => {
     switch (props.size) {
@@ -106,13 +105,14 @@ const handleBack = () => {
     if (props.back) {
         props.back();
     } else {
-        closePage();
+        handleClose();
     }
 };
 
-const closePage = () => {
+const handleClose = () => {
     localOpenPage.value = false;
     globalStore.isFullScreen = false;
+    emit('close');
 };
 
 function toggleFullscreen() {

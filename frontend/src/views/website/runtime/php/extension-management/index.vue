@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('runtime.extension')" size="large" :back="handleClose">
+    <DrawerPro v-model="open" :header="$t('runtime.extension')" size="large" @close="handleClose">
         <el-descriptions title="" border>
             <el-descriptions-item :label="$t('runtime.loadedExtension')" width="100px">
                 <el-tag v-for="(ext, index) in extensions" :key="index" type="info" class="mr-1 mt-1">{{ ext }}</el-tag>

@@ -1,5 +1,11 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('runtime.runtime')" size="large" :resource="runtime.name" :back="handleClose">
+    <DrawerPro
+        v-model="open"
+        :header="$t('runtime.runtime')"
+        size="large"
+        :resource="runtime.name"
+        @close="handleClose"
+    >
         <template #content>
             <el-tabs tab-position="left" v-model="index">
                 <el-tab-pane :label="$t('website.updateConfig')" name="0">

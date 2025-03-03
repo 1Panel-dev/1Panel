@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('commons.button.' + redirect.operate)" :back="handleClose">
+    <DrawerPro v-model="open" :header="$t('commons.button.' + redirect.operate)" @close="handleClose">
         <el-form ref="redirectForm" label-position="top" :model="redirect" :rules="rules" v-loading="loading">
             <el-form-item :label="$t('commons.table.name')" prop="name">
                 <el-input

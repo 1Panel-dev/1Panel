@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('website.proxyCache')" size="normal" :back="handleClose">
+    <DrawerPro v-model="open" :header="$t('website.proxyCache')" size="normal" @close="handleClose">
         <el-form
             v-loading="loading"
             @submit.prevent

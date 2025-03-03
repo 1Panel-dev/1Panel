@@ -4,7 +4,7 @@
             v-model="changeVisible"
             :header="title"
             :resource="changeForm.postgresqlName"
-            :back="handleClose"
+            @close="handleClose"
             size="small"
         >
             <el-form v-loading="loading" ref="changeFormRef" :rules="rules" :model="changeForm" label-position="top">

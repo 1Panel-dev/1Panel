@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="title" :back="handleClose" size="large">
+    <DrawerPro v-model="drawerVisible" :header="title" @close="handleClose" size="large">
         <el-form ref="formRef" label-position="top" :model="dialogData.rowData" :rules="rules" v-loading="loading">
             <el-form-item :label="$t('commons.table.protocol')" prop="protocol">
                 <el-select class="w-full" v-model="dialogData.rowData!.protocol">

@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('ssl.ca')" size="large" :back="handleClose">
+    <DrawerPro v-model="open" :header="$t('ssl.ca')" size="large" @close="handleClose">
         <template #content>
             <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()" v-loading="loading">
                 <template #toolbar>

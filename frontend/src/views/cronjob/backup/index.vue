@@ -3,7 +3,7 @@
         v-model="backupVisible"
         :header="$t('commons.button.backup')"
         :resource="cronjob"
-        :back="handleClose"
+        @close="handleClose"
         size="large"
     >
         <template #content>

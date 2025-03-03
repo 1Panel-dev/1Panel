@@ -3,7 +3,7 @@
         v-model="drawerVisible"
         :header="title"
         :resource="dialogData.title === 'add' ? '' : dialogData.rowData?.user"
-        :back="handleClose"
+        @close="handleClose"
         size="large"
     >
         <el-form ref="formRef" label-position="top" :model="dialogData.rowData" :rules="rules" v-loading="loading">

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <DrawerPro v-model="drawerVisible" header="IPv6" :back="handleClose" size="small">
+        <DrawerPro v-model="drawerVisible" header="IPv6" @close="handleClose" size="small">
             <el-alert class="common-prompt" :closable="false" type="warning">
                 <template #default>
                     <span class="input-help">

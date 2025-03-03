@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="detailVisible" :header="$t('commons.button.view')" :back="handleClose" size="large">
+    <DrawerPro v-model="detailVisible" :header="$t('commons.button.view')" @close="handleClose" size="large">
         <CodemirrorPro
             :placeholder="$t('commons.msg.noneData')"
             v-model="detailInfo"

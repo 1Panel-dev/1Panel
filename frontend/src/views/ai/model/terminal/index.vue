@@ -2,7 +2,7 @@
     <DrawerPro
         v-model="open"
         :title="$t('menu.terminal')"
-        :back="handleClose"
+        @close="handleClose"
         :resource="title"
         :size="globalStore.isFullScreen ? 'full' : 'large'"
     >

@@ -2,7 +2,7 @@
     <DrawerPro
         v-model="terminalVisible"
         :header="$t('menu.terminal')"
-        :back="handleClose"
+        @close="handleClose"
         :resource="title"
         size="large"
     >

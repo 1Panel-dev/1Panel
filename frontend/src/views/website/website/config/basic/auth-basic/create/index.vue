@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('commons.button.' + authBasic.operate)" :back="handleClose">
+    <DrawerPro v-model="open" :header="$t('commons.button.' + authBasic.operate)" @close="handleClose">
         <el-form-item>
             <el-alert
                 v-if="authBasic.operate === 'edit'"

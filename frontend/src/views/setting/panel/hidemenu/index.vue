@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('setting.menuSetting')" :back="handleClose" size="small">
+    <DrawerPro v-model="drawerVisible" :header="$t('setting.menuSetting')" @close="handleClose" size="small">
         <el-alert :closable="false" :title="$t('setting.menuSettingHelper')" type="warning" />
         <ComplexTable :heightDiff="1" :data="treeData.hideMenu" :show-header="false" row-key="id">
             <el-table-column prop="title" :label="$t('setting.menu')">

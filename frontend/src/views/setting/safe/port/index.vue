@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('setting.panelPort')" :back="handleClose" size="small">
+    <DrawerPro v-model="drawerVisible" :header="$t('setting.panelPort')" @close="handleClose" size="small">
         <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
             <el-form-item :label="$t('setting.panelPort')" prop="serverPort" :rules="Rules.port">
                 <el-input clearable v-model.number="form.serverPort" />

@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('website.create')" size="large" :back="handleClose">
+    <DrawerPro v-model="open" :header="$t('website.create')" size="large" @close="handleClose">
         <template #buttons>
             <span class="drawer-header-button">
                 <template

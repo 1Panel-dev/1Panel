@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('file.rename')" :resource="oldName" :back="handleClose" size="normal">
+    <DrawerPro v-model="open" :header="$t('file.rename')" :resource="oldName" @close="handleClose" size="normal">
         <el-form
             ref="fileForm"
             label-position="top"

@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="title" :back="handleClose" size="large" :fullScreen="true">
+    <DrawerPro v-model="open" :header="title" @close="handleClose" size="large" :fullScreen="true">
         <template #content>
             <div v-if="req.file != 'config'">
                 <el-tabs v-model="req.file" type="card" @tab-click="handleChange">

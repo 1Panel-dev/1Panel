@@ -4,7 +4,7 @@
         :header="$t('runtime.' + mode)"
         size="large"
         :resource="mode === 'edit' ? runtime.name : ''"
-        :back="handleClose"
+        @close="handleClose"
     >
         <el-form
             ref="runtimeForm"

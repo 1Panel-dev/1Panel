@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="dialogVisible" :header="$t('container.imagePrune')" :back="handleClose" size="small">
+    <DrawerPro v-model="dialogVisible" :header="$t('container.imagePrune')" @close="handleClose" size="small">
         <el-form ref="deleteForm" v-loading="loading">
             <el-form-item>
                 <el-radio-group class="w-full" v-model="scope" @change="changeScope">

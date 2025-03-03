@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('commons.button.download')" :back="handleClose" size="normal">
+    <DrawerPro v-model="open" :header="$t('commons.button.download')" @close="handleClose" size="normal">
         <el-form ref="fileForm" label-position="top" :model="addForm" :rules="rules" v-loading="loading">
             <el-form-item :label="$t('file.compressType')" prop="type">
                 <el-select v-model="addForm.type">

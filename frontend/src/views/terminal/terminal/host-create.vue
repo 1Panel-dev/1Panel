@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="dialogVisible" :header="$t('terminal.addHost')" :back="handleClose" size="large">
+    <DrawerPro v-model="dialogVisible" :header="$t('terminal.addHost')" @close="handleClose" size="large">
         <el-form ref="hostRef" label-width="100px" label-position="top" :model="hostInfo" :rules="rules">
             <el-alert
                 v-if="isLocal"

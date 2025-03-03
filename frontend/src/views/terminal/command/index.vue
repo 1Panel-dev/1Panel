@@ -85,7 +85,7 @@
         <DrawerPro
             v-model="cmdVisible"
             :header="$t('commons.button.' + operate) + $t('terminal.quickCommand')"
-            :back="handleClose"
+            @close="handleClose"
             size="small"
         >
             <el-form

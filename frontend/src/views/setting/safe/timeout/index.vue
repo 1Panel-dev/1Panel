@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('setting.expirationTime')" :back="handleClose" size="small">
+    <DrawerPro v-model="drawerVisible" :header="$t('setting.expirationTime')" @close="handleClose" size="small">
         <el-form ref="timeoutFormRef" @submit.prevent label-position="top" :model="form">
             <el-form-item
                 :label="$t('setting.days')"

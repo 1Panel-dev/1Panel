@@ -2,7 +2,7 @@
     <DrawerPro
         v-model="drawerVisible"
         :header="$t('commons.button.upgrade')"
-        :back="handleClose"
+        @close="handleClose"
         size="large"
         :key="refresh"
     >

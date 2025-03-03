@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('app.detail')" :back="handleClose" size="large">
+    <DrawerPro v-model="open" :header="$t('app.detail')" @close="handleClose" size="large">
         <div class="brief" v-loading="loadingApp">
             <div class="detail flex">
                 <div class="w-12 h-12 rounded p-1 shadow-md icon">

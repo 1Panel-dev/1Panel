@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('runtime.moduleManager')" size="large" :back="handleClose">
+    <DrawerPro v-model="open" :header="$t('runtime.moduleManager')" size="large" @close="handleClose">
         <template #content>
             <el-row :gutter="20" v-loading="loading">
                 <el-col :span="10">

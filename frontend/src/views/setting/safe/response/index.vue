@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('setting.noAuthSetting')" :back="handleClose" size="small">
+    <DrawerPro v-model="drawerVisible" :header="$t('setting.noAuthSetting')" @close="handleClose" size="small">
         <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
             <el-form-item :label="$t('setting.responseSetting')" prop="noAuthSetting" :rules="Rules.requiredSelect">
                 <el-select v-model="form.noAuthSetting">

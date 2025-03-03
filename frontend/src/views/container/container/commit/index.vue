@@ -2,7 +2,7 @@
     <DrawerPro
         v-model="drawerVisible"
         :header="$t('container.makeImage')"
-        :back="handleClose"
+        @close="handleClose"
         :resource="form.containerName"
         size="large"
     >

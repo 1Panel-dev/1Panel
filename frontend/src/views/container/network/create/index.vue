@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('container.createNetwork')" :back="handleClose" size="large">
+    <DrawerPro v-model="drawerVisible" :header="$t('container.createNetwork')" @close="handleClose" size="large">
         <el-form ref="formRef" label-position="top" v-loading="loading" :model="form" :rules="rules" label-width="80px">
             <el-form-item :label="$t('container.networkName')" prop="name">
                 <el-input clearable v-model.trim="form.name" />

@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('database.redisQuickCmd')" :back="handleClose" size="large">
+    <DrawerPro v-model="drawerVisible" :header="$t('database.redisQuickCmd')" @close="handleClose" size="large">
         <template #content>
             <el-button type="primary" @click="handleCmdAdd()">
                 {{ $t('commons.button.add') }}

@@ -4,7 +4,7 @@
             v-model="bindVisible"
             :header="$t('database.userBind')"
             :resource="form.mysqlName"
-            :back="handleClose"
+            @close="handleClose"
             size="small"
         >
             <el-form v-loading="loading" ref="changeFormRef" :model="form" :rules="rules" label-position="top">

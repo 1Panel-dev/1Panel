@@ -2,7 +2,7 @@
     <DrawerPro
         v-model="newNameVisible"
         :header="$t('container.rename')"
-        :back="handleClose"
+        @close="handleClose"
         :resource="renameForm.name"
         size="small"
     >

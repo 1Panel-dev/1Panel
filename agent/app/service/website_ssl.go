@@ -448,15 +448,19 @@ func (w WebsiteSSLService) Delete(ids []uint) error {
 		if err != nil {
 			return err
 		}
-		acmeAccount, err := websiteAcmeRepo.GetFirst(repo.WithByID(websiteSSL.AcmeAccountID))
-		if err != nil {
-			return err
+		if websiteSSL.Type != constant.Manual && websiteSSL.Type != constant.SelfSigned {
+			acmeAccount, err := websiteAcmeRepo.GetFirst(repo.WithByID(websiteSSL.AcmeAccountID))
+			if err != nil {
+				return err
+			}
+			client, err := ssl.NewAcmeClient(acmeAccount)
+			if err != nil {
+				return err
+			}
+			go func() {
+				_ = client.RevokeSSL([]byte(websiteSSL.Pem))
+			}()
 		}
-		client, err := ssl.NewAcmeClient(acmeAccount)
-		if err != nil {
-			return err
-		}
-		_ = client.RevokeSSL([]byte(websiteSSL.Pem))
 		_ = websiteSSLRepo.DeleteBy(repo.WithByID(id))
 	}
 	if len(names) > 0 {

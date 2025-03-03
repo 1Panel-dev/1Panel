@@ -1,7 +1,7 @@
 <template>
     <DrawerPro
         v-model="open"
-        :back="handleClose"
+        @close="handleClose"
         size="large"
         :header="$t('commons.button.' + item.operate) + $t('website.loadBalance')"
         :resource="item.operate == 'create' ? '' : item.name"

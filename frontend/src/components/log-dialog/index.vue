@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('commons.button.log')" size="large" :back="handleClose">
+    <DrawerPro v-model="open" :header="$t('commons.button.log')" size="large" @close="handleClose">
         <LogFile :config="config" :height-diff="config.heightDiff"></LogFile>
     </DrawerPro>
 </template>

@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('setting.apiInterface')" :back="handleClose" size="normal">
+    <DrawerPro v-model="drawerVisible" :header="$t('setting.apiInterface')" @close="handleClose" size="normal">
         <el-alert class="common-prompt" :closable="false" type="warning">
             <template #default>
                 <ul>

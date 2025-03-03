@@ -2,7 +2,7 @@
     <DrawerPro
         v-model="drawerVisible"
         :header="title"
-        :back="handleClose"
+        @close="handleClose"
         :resource="dialogData.title === 'create' ? '' : dialogData.rowData?.name"
         size="large"
     >

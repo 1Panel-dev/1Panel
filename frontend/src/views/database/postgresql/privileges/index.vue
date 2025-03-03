@@ -4,7 +4,7 @@
             v-model="changeVisible"
             :header="$t('database.permission')"
             :resource="form.name"
-            :back="handleClose"
+            @close="handleClose"
             size="small"
         >
             <el-form v-loading="loading" :model="form" label-position="top">

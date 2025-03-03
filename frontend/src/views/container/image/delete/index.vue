@@ -1,6 +1,6 @@
 <template>
     <div>
-        <DrawerPro v-model="deleteVisible" :header="$t('container.imageDelete')" :back="handleClose" size="small">
+        <DrawerPro v-model="deleteVisible" :header="$t('container.imageDelete')" @close="handleClose" size="small">
             <el-form @submit.prevent :model="form" label-position="top">
                 <el-form-item :label="$t('container.tag')" prop="tagName">
                     <div style="width: 100%">

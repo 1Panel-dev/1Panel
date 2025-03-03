@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="title" :back="handleClose" size="large">
+    <DrawerPro v-model="open" :header="title" @close="handleClose" size="large">
         <el-form
             ref="fileForm"
             label-position="top"
