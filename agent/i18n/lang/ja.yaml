@@ -28,6 +28,8 @@ ErrTypePortRange: 'ポートレンジは1-65535の間である必要がありま
 Success: "成功"
 Failed: "失敗した"
 SystemRestart: "システムの再起動により、タスクが中断されます"
+ErrGroupIsDefault: "デフォルトグループ、削除できません"
+ErrGroupIsInWebsiteUse: "グループは他のウェブサイトで使用されています、削除できません"
 
 #app
 ErrPortInUsed: "{{.Detail}}ポートはすでに使用されています"

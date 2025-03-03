@@ -166,20 +166,20 @@ var InitSetting = &gormigrate.Migration{
 var InitHost = &gormigrate.Migration{
 	ID: "20240816-init-host",
 	Migrate: func(tx *gorm.DB) error {
-		hostGroup := &model.Group{Name: "default", Type: "host", IsDefault: true}
+		hostGroup := &model.Group{Name: "Default", Type: "host", IsDefault: true}
 		if err := tx.Create(hostGroup).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Group{Name: "default", Type: "node", IsDefault: true}).Error; err != nil {
+		if err := tx.Create(&model.Group{Name: "Default", Type: "node", IsDefault: true}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Group{Name: "default", Type: "command", IsDefault: true}).Error; err != nil {
+		if err := tx.Create(&model.Group{Name: "Default", Type: "command", IsDefault: true}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Group{Name: "default", Type: "website", IsDefault: true}).Error; err != nil {
+		if err := tx.Create(&model.Group{Name: "Default", Type: "website", IsDefault: true}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Group{Name: "default", Type: "redis", IsDefault: true}).Error; err != nil {
+		if err := tx.Create(&model.Group{Name: "Default", Type: "redis", IsDefault: true}).Error; err != nil {
 			return err
 		}
 		host := model.Host{

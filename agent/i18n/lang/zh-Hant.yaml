@@ -24,6 +24,8 @@ Success: "成功"
 Failed: "失敗"
 SystemRestart: "系統重啟導致任務中斷"
 ErrInvalidChar: "禁止使用非法字元"
+ErrGroupIsDefault: "預設分組，無法刪除"
+ErrGroupIsInWebsiteUse: "分組正在被其他網站使用，無法刪除"
 
 #backup
 ErrBackupLocalDelete: "暫不支持刪除本地伺服器備份帳號"

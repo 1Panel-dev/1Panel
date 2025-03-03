@@ -15,7 +15,7 @@ type IGroupRepo interface {
 	Update(id uint, vars map[string]interface{}) error
 	Delete(opts ...global.DBOption) error
 
-	WithByDefault(isDefalut bool) global.DBOption
+	WithByDefault(isDefault bool) global.DBOption
 	CancelDefault(groupType string) error
 }
 
@@ -23,9 +23,9 @@ func NewIGroupRepo() IGroupRepo {
 	return &GroupRepo{}
 }
 
-func (c *GroupRepo) WithByDefault(isDefalut bool) global.DBOption {
+func (c *GroupRepo) WithByDefault(isDefault bool) global.DBOption {
 	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("is_default = ?", isDefalut)
+		return g.Where("is_default = ?", isDefault)
 	}
 }
 

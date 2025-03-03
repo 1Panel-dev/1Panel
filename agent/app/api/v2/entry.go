@@ -67,4 +67,5 @@ var (
 
 	websiteCAService = service.NewIWebsiteCAService()
 	taskService      = service.NewITaskService()
+	groupService     = service.NewIGroupService()
 )

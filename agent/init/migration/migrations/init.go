@@ -57,6 +57,7 @@ var AddTable = &gormigrate.Migration{
 			&model.WebsiteDnsAccount{},
 			&model.WebsiteDomain{},
 			&model.WebsiteSSL{},
+			&model.Group{},
 		)
 	},
 }
@@ -280,6 +281,16 @@ var UpdateSettingStatus = &gormigrate.Migration{
 			return err
 		}
 		if err := tx.Model(model.Setting{}).Where("value = ?", "disable").Update("value", constant.StatusDisable).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var InitDefault = &gormigrate.Migration{
+	ID: "20250301-init-default",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Create(&model.Group{Name: "Default", Type: "website", IsDefault: true}).Error; err != nil {
 			return err
 		}
 		return nil

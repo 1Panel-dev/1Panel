@@ -19,6 +19,8 @@ ErrTypePort: "Port {{ .name }} format error"
 Success: "Success"
 Failed: "Failed"
 SystemRestart: "System restart causes task interruption"
+ErrGroupIsDefault: "Default group, cannot be deleted"
+ErrGroupIsInWebsiteUse: "Group is being used by other websites, cannot be deleted"
 
 #backup
 ErrBackupLocalDelete: "Deleting local server backup accounts is not currently supported."

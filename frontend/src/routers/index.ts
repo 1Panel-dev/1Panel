@@ -42,6 +42,9 @@ router.beforeEach((to, from, next) => {
     if (to.path === '/apps/all' && to.query.install != undefined) {
         return next();
     }
+    // if (to.query.uncached != undefined) {
+    //     return next();
+    // }
 
     const activeMenuKey = 'cachedRoute' + (to.meta.activeMenu || '');
     const cachedRoute = localStorage.getItem(activeMenuKey);

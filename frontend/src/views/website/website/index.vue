@@ -245,7 +245,7 @@ import DefaultHtml from '@/views/website/website/html/index.vue';
 import CreateWebSite from '@/views/website/website/create/index.vue';
 import DeleteWebsite from '@/views/website/website/delete/index.vue';
 import NginxConfig from '@/views/website/website/nginx/index.vue';
-import GroupDialog from '@/components/group/index.vue';
+import GroupDialog from '@/components/agent-group/index.vue';
 import AppStatus from '@/components/app-status/index.vue';
 import i18n from '@/lang';
 import router from '@/routers';
@@ -257,7 +257,7 @@ import { ElMessageBox } from 'element-plus';
 import { dateFormatSimple } from '@/utils/util';
 import { MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
-import { getGroupList } from '@/api/modules/group';
+import { getAgentGroupList } from '@/api/modules/group';
 import { Group } from '@/api/interface/group';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
@@ -359,7 +359,7 @@ const search = async () => {
 };
 
 const listGroup = async () => {
-    const res = await getGroupList('website');
+    const res = await getAgentGroupList('website');
     groups.value = res.data;
 };
 

@@ -30,6 +30,8 @@ ErrTypePortRange: '端口范围需要在 1-65535 之间'
 Success: "成功"
 Failed: "失败"
 SystemRestart: "系统重启导致任务中断"
+ErrGroupIsDefault: "默认分组，无法删除"
+ErrGroupIsInWebsiteUse: "分组正在被其他网站使用，无法删除"
 
 #backup
 ErrBackupInUsed: "该备份账号已在计划任务中使用，无法删除"

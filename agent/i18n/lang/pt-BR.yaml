@@ -28,6 +28,8 @@ ErrTypePortRange: 'O intervalo da porta deve estar entre 1-65535'
 Success: "Sucesso"
 Failed: "Falhou"
 SystemRestart: "A reinicialização do sistema causa interrupção da tarefa"
+ErrGroupIsDefault: "Grupo padrão, não pode ser excluído"
+ErrGroupIsInWebsiteUse: "O grupo está sendo usado por outros sites, não pode ser excluído"
 
 #app
 ErrPortInUsed: "A porta {{ .detail }} já está em uso"

@@ -29,6 +29,8 @@ ErrTypePortRange: '포트 범위는 1-65535 사이여야 합니다'
 Success: "성공"
 Failed: "실패"
 SystemRestart: "시스템 재시작으로 인해 작업이 중단되었습니다"
+ErrGroupIsDefault: "기본 그룹, 삭제할 수 없습니다"
+ErrGroupIsInWebsiteUse: "그룹이 다른 웹사이트에서 사용 중입니다, 삭제할 수 없습니다"
 
 # 애플리케이션
 ErrPortInUsed: "{{ .detail }} 포트가 이미 사용 중입니다"

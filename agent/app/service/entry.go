@@ -45,4 +45,6 @@ var (
 	favoriteRepo = repo.NewIFavoriteRepo()
 
 	taskRepo = repo.NewITaskRepo()
+
+	groupRepo = repo.NewIGroupRepo()
 )

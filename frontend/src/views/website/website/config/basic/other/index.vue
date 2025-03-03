@@ -41,7 +41,7 @@ import { computed, onMounted, reactive, ref } from 'vue';
 import { FormInstance } from 'element-plus';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { getGroupList } from '@/api/modules/group';
+import { getAgentGroupList } from '@/api/modules/group';
 import { Group } from '@/api/interface/group';
 
 const websiteForm = ref<FormInstance>();
@@ -87,7 +87,7 @@ const submit = async (formEl: FormInstance | undefined) => {
     });
 };
 const search = async () => {
-    const res = await getGroupList('website');
+    const res = await getAgentGroupList('website');
     groups.value = res.data;
 
     getWebsite(websiteId.value).then((res) => {

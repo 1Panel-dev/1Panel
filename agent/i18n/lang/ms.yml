@@ -29,6 +29,8 @@ ErrTypePortRange: 'Julat port perlu berada di antara 1-65535'
 Success: "Berjaya"
 Failed: "Gagal"
 SystemRestart: "Mulakan semula sistem menyebabkan gangguan tugas"
+ErrGroupIsDefault: "Kumpulan lalai, tidak boleh dipadam"
+ErrGroupIsInWebsiteUse: "Kumpulan sedang digunakan oleh laman web lain, tidak boleh dipadam"
 
 #app
 ErrPortInUsed: "Port {{ .detail }} sudah digunakan"
