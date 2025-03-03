@@ -122,7 +122,7 @@ const form = reactive({
 });
 
 const acceptParams = () => {
-    search();
+    search(true);
     iniTerm();
 };
 

@@ -2,16 +2,12 @@ package service
 
 import (
 	"encoding/json"
-	"fmt"
 	network "net"
 	"os"
 	"sort"
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
-	"github.com/1Panel-dev/1Panel/agent/buserr"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -33,7 +29,7 @@ import (
 type DashboardService struct{}
 
 type IDashboardService interface {
-	Sync(req dto.SyncFromMaster) error
+	Sync(req []dto.AppLauncherSync) error
 
 	LoadOsInfo() (*dto.OsInfo, error)
 	LoadBaseInfo(ioOption string, netOption string) (*dto.DashboardBase, error)
@@ -48,33 +44,12 @@ func NewIDashboardService() IDashboardService {
 	return &DashboardService{}
 }
 
-func (u *DashboardService) Sync(req dto.SyncFromMaster) error {
-	var launcherItem model.AppLauncher
-	if err := json.Unmarshal([]byte(req.Data), &launcherItem); err != nil {
-		return err
+func (u *DashboardService) Sync(req []dto.AppLauncherSync) error {
+	var launchers []model.AppLauncher
+	for _, item := range req {
+		launchers = append(launchers, model.AppLauncher{Key: item.Key})
 	}
-	launcher, _ := launcherRepo.Get(settingRepo.WithByKey(req.Name))
-	switch req.Operation {
-	case "create":
-		if launcher.ID != 0 {
-			launcherItem.ID = launcher.ID
-			return launcherRepo.Save(&launcherItem)
-		}
-		return launcherRepo.Create(&launcherItem)
-	case "delete":
-		if launcher.ID == 0 {
-			return buserr.New("ErrRecordNotFound")
-		}
-		return launcherRepo.Delete(repo.WithByID(launcher.ID))
-	case "update":
-		if launcher.ID == 0 {
-			return buserr.New("ErrRecordNotFound")
-		}
-		launcherItem.ID = launcher.ID
-		return launcherRepo.Save(&launcherItem)
-	default:
-		return fmt.Errorf("not support such operation %s", req.Operation)
-	}
+	return launcherRepo.SyncAll(launchers)
 }
 
 func (u *DashboardService) LoadOsInfo() (*dto.OsInfo, error) {

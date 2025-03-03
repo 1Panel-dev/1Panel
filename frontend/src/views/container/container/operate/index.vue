@@ -1,7 +1,7 @@
 <template>
     <div>
         <LayoutContent
-            back-name="Container"
+            back-name="ContainerItem"
             :title="isCreate ? $t('container.create') : $t('commons.button.edit') + ' - ' + form.name"
         >
             <template #prompt>

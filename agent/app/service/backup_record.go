@@ -251,16 +251,13 @@ func (u *BackupRecordService) LoadRecordSize(req dto.SearchForSize) ([]dto.Recor
 	var datas []dto.RecordFileSize
 	var wg sync.WaitGroup
 	for i := 0; i < len(list); i++ {
-		item := dto.RecordFileSize{ID: list[i].ID}
+		datas = append(datas, dto.RecordFileSize{ID: list[i].ID})
 		if val, ok := clientMap[fmt.Sprintf("%v", list[i].DownloadID)]; ok {
 			wg.Add(1)
 			go func(index int) {
-				item.Size, _ = val.client.Size(path.Join(val.backupPath, list[i].FilePath))
-				datas = append(datas, item)
+				datas[index].Size, _ = val.client.Size(path.Join(val.backupPath, list[i].FilePath))
 				wg.Done()
 			}(i)
-		} else {
-			datas = append(datas, item)
 		}
 	}
 	wg.Wait()

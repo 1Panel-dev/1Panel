@@ -259,9 +259,6 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.sync'),
-        disabled: (row: any) => {
-            return row.status.indexOf('Lost') !== -1 || row.status === 'Disable';
-        },
         click: (row: any) => {
             onSync(row);
         },

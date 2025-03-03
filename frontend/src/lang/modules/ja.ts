@@ -2997,9 +2997,8 @@ const message = {
                 'このノードに既に1panelサービスが存在します。このノードを追加すると、1panelの元のサービスポートとインストールディレクトリが使用されます。続行しますか？',
             coreExist:
                 'このノードに既に1panel-coreサービスが存在します。このノードを追加できません。確認して再試行してください！',
-            agentExist: 'このノードに既に1panel-agentサービスが存在します',
-            forceAdd: '強制追加',
-            forceAddHelper: '強制追加は、このノードの1panel-agentサービスを強制的に置き換えます',
+            agentExist:
+                'このノードに1panel-agentサービスが既に存在することが検出されました。追加を続行すると、ノードデータは保持され、1panel-agentサービスのみが置き換えられます。続行しますか？',
             reinstallHelper: 'ノード{0}を再インストールします。続行しますか？',
             unhealthyCheck: '異常チェック',
             fixOperation: '修正操作',

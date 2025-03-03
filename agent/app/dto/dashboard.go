@@ -100,6 +100,10 @@ type DashboardCurrent struct {
 	ShotTime time.Time `json:"shotTime"`
 }
 
+type AppLauncherSync struct {
+	Key string `json:"key"`
+}
+
 type DiskInfo struct {
 	Path        string  `json:"path"`
 	Type        string  `json:"type"`

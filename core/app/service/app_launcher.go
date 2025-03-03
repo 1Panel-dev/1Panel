@@ -9,6 +9,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/app/model"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/constant"
+	"github.com/1Panel-dev/1Panel/core/utils/req_helper"
 	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 )
 
@@ -37,32 +38,23 @@ func (u *LauncherService) Search() ([]string, error) {
 
 func (u *LauncherService) ChangeShow(req dto.SettingUpdate) error {
 	launcher, _ := launcherRepo.Get(repo.WithByKey(req.Key))
-	if req.Value == constant.StatusEnable {
-		if launcher.ID != 0 {
-			go syncLauncherToAgent(launcher, "create")
-			return nil
-		}
-		launcher.Key = req.Key
-		if err := launcherRepo.Create(&launcher); err != nil {
+	if req.Value == constant.StatusEnable && launcher.ID == 0 {
+		if err := launcherRepo.Create(&model.AppLauncher{Key: req.Key}); err != nil {
 			return err
 		}
-		go syncLauncherToAgent(launcher, "create")
-		return nil
 	}
-	if launcher.ID == 0 {
-		go syncLauncherToAgent(launcher, "delete")
-		return nil
+	if req.Value == constant.StatusDisable && launcher.ID != 0 {
+		if err := launcherRepo.Delete(repo.WithByKey(req.Key)); err != nil {
+			return err
+		}
 	}
-	if err := launcherRepo.Delete(repo.WithByKey(req.Key)); err != nil {
-		return err
-	}
-	go syncLauncherToAgent(launcher, "delete")
+	go syncLauncherToAgent()
 	return nil
 }
 
-func syncLauncherToAgent(launcher model.AppLauncher, operation string) {
-	itemData, _ := json.Marshal(launcher)
-	itemJson := dto.SyncToAgent{Name: launcher.Key, Operation: operation, Data: string(itemData)}
-	bodyItem, _ := json.Marshal(itemJson)
-	_ = xpack.RequestToAllAgent("/api/v2/backups/sync", http.MethodPost, bytes.NewReader((bodyItem)))
+func syncLauncherToAgent() {
+	launchers, _ := launcherRepo.List()
+	itemData, _ := json.Marshal(launchers)
+	_, _ = req_helper.NewLocalClient("/api/v2/dashboard/app/launcher/sync", http.MethodPost, bytes.NewReader((itemData)))
+	_ = xpack.RequestToAllAgent("/api/v2/dashboard/app/launcher/sync", http.MethodPost, bytes.NewReader((itemData)))
 }

@@ -589,6 +589,7 @@ const changeType = async () => {
                     redirect_uri: res.data.redirect_uri,
                 };
             }
+            break;
         case 'GoogleDrive':
             const res2 = await getClientInfo('GoogleDrive');
             clientInfo.value = res2.data;
@@ -599,9 +600,11 @@ const changeType = async () => {
                     redirect_uri: res2.data.redirect_uri,
                 };
             }
+            break;
         case 'SFTP':
             dialogData.value.rowData.varsJson['port'] = 22;
             dialogData.value.rowData.varsJson['authMode'] = 'password';
+            break;
     }
 };
 const changeClientFrom = () => {

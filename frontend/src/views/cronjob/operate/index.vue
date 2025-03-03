@@ -594,7 +594,7 @@ const acceptParams = (params: DialogProps): void => {
         list = dialogData.value.rowData.sourceAccountIDs.split(',');
         for (const item of list) {
             if (item) {
-                dialogData.value.rowData.sourceAccountItems.push(item);
+                dialogData.value.rowData.sourceAccountItems.push(Number(item));
             }
         }
     }
@@ -678,6 +678,10 @@ const verifyScript = (rule: any, value: any, callback: any) => {
 
 const verifySpec = (rule: any, value: any, callback: any) => {
     if (dialogData.value.rowData!.specCustom) {
+        if (dialogData.value.rowData!.specs.length === 0) {
+            callback(new Error(i18n.global.t('commons.rule.requiredInput')));
+            return;
+        }
         for (let i = 0; i < dialogData.value.rowData!.specs.length; i++) {
             if (dialogData.value.rowData!.specs[i]) {
                 continue;
@@ -803,7 +807,6 @@ const rules = reactive({
         { validator: verifySpec, trigger: 'blur', required: true },
         { validator: verifySpec, trigger: 'change', required: true },
     ],
-    specCustom: [Rules.requiredSelect],
 
     script: [{ validator: verifyScript, trigger: 'blur', required: true }],
     containerName: [Rules.requiredSelect],

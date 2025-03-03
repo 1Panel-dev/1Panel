@@ -635,7 +635,20 @@ function load18n(label: string) {
         case 'docker_log':
             return i18n.global.t('clean.dockerLog');
         case 'task_log':
-            return i18n.global.t('clean.taskLog');
+            return i18n.global.t('logs.task');
+        case 'Database':
+        case 'Cronjob':
+        case 'Database':
+        case 'Container':
+        case 'App':
+        case 'System':
+            return i18n.global.t('menu.' + label.toLowerCase());
+        case 'Snapshot':
+            return i18n.global.t('setting.snapshot');
+        case 'AppStore':
+            return i18n.global.t('menu.apps');
+        case 'AITools':
+            return i18n.global.t('menu.aiTools');
         case 'shell':
             return i18n.global.t('clean.shell');
         case 'containerShell':

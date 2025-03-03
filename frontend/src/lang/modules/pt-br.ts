@@ -3069,9 +3069,8 @@ const message = {
                 'Detectado que já existe um serviço 1panel neste nó. Adicionar este nó usará a porta e o diretório de instalação do serviço original do 1panel. Deseja continuar?',
             coreExist:
                 'Detectado que já existe um serviço 1panel-core neste nó. Não é possível adicionar este nó, por favor verifique e tente novamente!',
-            agentExist: 'Detectado que já existe um serviço 1panel-agent neste nó',
-            forceAdd: 'Adicionar Forçadamente',
-            forceAddHelper: 'Adicionar forçadamente substituirá o serviço 1panel-agent neste nó',
+            agentExist:
+                'Detectado que o serviço 1panel-agent já existe neste nó. Continuar a adicionar irá manter os dados do nó e apenas substituir o serviço 1panel-agent. Você deseja continuar?',
             reinstallHelper: 'Reinstalar o nó {0}, deseja continuar?',
             unhealthyCheck: 'Verificação Anormal',
             fixOperation: 'Operação de Correção',

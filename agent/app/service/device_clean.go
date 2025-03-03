@@ -16,6 +16,7 @@ import (
 	"github.com/docker/docker/api/types/filters"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
@@ -37,7 +38,6 @@ const (
 	uploadPath       = "1panel/uploads"
 	downloadPath     = "1panel/download"
 	logPath          = "1panel/log"
-	taskPath         = "1panel/task"
 )
 
 func (u *DeviceService) Scan() dto.CleanData {
@@ -254,18 +254,10 @@ func (u *DeviceService) Clean(req []dto.Clean) {
 				dropFileOrDir(path.Join(global.Dir.BaseDir, logPath, item.Name))
 			}
 		case "task_log":
-			pathItem := path.Join(global.Dir.BaseDir, taskPath, item.Name)
-			dropFileOrDir(path.Join(global.Dir.BaseDir, taskPath, item.Name))
+			pathItem := path.Join(global.Dir.BaseDir, logPath, item.Name)
+			dropFileOrDir(pathItem)
 			if len(item.Name) == 0 {
-				files, _ := os.ReadDir(pathItem)
-				if len(files) == 0 {
-					continue
-				}
-				for _, file := range files {
-					_ = cronjobRepo.DeleteRecord(cronjobRepo.WithByRecordFile(path.Join(pathItem, file.Name())))
-				}
-			} else {
-				_ = cronjobRepo.DeleteRecord(cronjobRepo.WithByRecordFile(pathItem))
+				_ = taskRepo.Delete(repo.WithByType(item.Name))
 			}
 		case "images":
 			dropImages()
@@ -506,8 +498,8 @@ func loadLogTree(fileOp fileUtils.FileOp) []dto.CleanTree {
 	}
 	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "system_log", Size: uint64(size), Children: list1, Type: "system_log", IsRecommend: true})
 
-	path2 := path.Join(global.Dir.BaseDir, taskPath)
-	list2 := loadTreeWithAllFile(false, path2, "task_log", path2, fileOp)
+	path2 := path.Join(global.Dir.BaseDir, logPath)
+	list2 := loadTreeWithDir(false, "task_log", path2, fileOp)
 	size2, _ := fileOp.GetDirSize(path2)
 	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "task_log", Size: uint64(size2), Children: list2, Type: "task_log"})
 	return treeData
@@ -568,6 +560,9 @@ func loadTreeWithDir(isCheck bool, treeType, pathItem string, fileOp fileUtils.F
 	})
 	for _, file := range files {
 		if (treeType == "old_upgrade" || treeType == "upgrade") && !strings.HasPrefix(file.Name(), "upgrade_2023") {
+			continue
+		}
+		if treeType == "task_log" && file.Name() == "ssl" {
 			continue
 		}
 		if file.IsDir() {

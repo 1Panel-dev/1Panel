@@ -2,6 +2,7 @@ package repo
 
 import (
 	"context"
+
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 
@@ -19,6 +20,7 @@ type ITaskRepo interface {
 	Update(ctx context.Context, task *model.Task) error
 	UpdateRunningTaskToFailed() error
 	CountExecutingTask() (int64, error)
+	Delete(opts ...DBOption) error
 
 	WithByID(id string) DBOption
 	WithResourceID(id uint) DBOption
@@ -107,4 +109,12 @@ func (t TaskRepo) CountExecutingTask() (int64, error) {
 	var count int64
 	err := getTaskDb(t.WithByStatus(constant.StatusExecuting)).Model(&model.Task{}).Count(&count).Error
 	return count, err
+}
+
+func (u TaskRepo) Delete(opts ...DBOption) error {
+	db := global.TaskDB
+	for _, opt := range opts {
+		db = opt(db)
+	}
+	return db.Delete(&model.Task{}).Error
 }

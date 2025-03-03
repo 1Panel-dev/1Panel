@@ -3065,9 +3065,8 @@ const message = {
                 'Dikesan bahawa terdapat perkhidmatan 1panel yang sudah ada pada nod ini. Menambah nod ini akan menggunakan port dan direktori pemasangan perkhidmatan asal 1panel. Adakah anda ingin meneruskan?',
             coreExist:
                 'Dikesan bahawa terdapat perkhidmatan 1panel-core yang sudah ada pada nod ini. Tidak dapat menambah nod ini, sila semak dan cuba lagi!',
-            agentExist: 'Dikesan bahawa terdapat perkhidmatan 1panel-agent yang sudah ada pada nod ini',
-            forceAdd: 'Tambah Secara Paksa',
-            forceAddHelper: 'Tambah secara paksa akan menggantikan perkhidmatan 1panel-agent pada nod ini',
+            agentExist:
+                'Terbukti bahawa perkhidmatan 1panel-agent sudah wujud pada nod ini. Melanjutkan penambahan akan mengekalkan data nod dan hanya menggantikan perkhidmatan 1panel-agent. Adakah anda ingin meneruskan?',
             reinstallHelper: 'Pasang semula nod {0}, adakah anda ingin meneruskan?',
             unhealthyCheck: 'Pemeriksaan Tidak Normal',
             fixOperation: 'Operasi Pembetulan',

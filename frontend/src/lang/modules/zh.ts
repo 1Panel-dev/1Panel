@@ -2935,9 +2935,8 @@ const message = {
             panelExist:
                 '检测到该节点上已存在 1panel 服务，添加该节点将沿用 1panel 原服务的端口以及安装目录，是否继续？',
             coreExist: '检测到该节点上已存在 1panel-core 服务，无法添加该节点，请检查后重试！',
-            agentExist: '检测到该节点上已存在 1panel-agent 服务',
-            forceAdd: '强制添加',
-            forceAddHelper: '强制添加，将强制替换该节点上的 1panel-agent 服务',
+            agentExist:
+                '检测到该节点上已存在 1panel-agent 服务，继续添加将保留该节点数据，仅替换 1panel-agent 服务，是否继续？',
             reinstallHelper: '重新安装节点 {0}, 是否继续？',
             unhealthyCheck: '异常检查',
             fixOperation: '修复方案',

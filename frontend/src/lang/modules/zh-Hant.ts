@@ -2948,9 +2948,8 @@ const message = {
             panelExist:
                 '已檢測到該節點上已存在 1panel 服務，新增該節點將沿用 1panel 原服務的埠號及安裝目錄，是否繼續？',
             coreExist: '已檢測到該節點上已存在 1panel-core 服務，無法新增該節點，請檢查後再試！',
-            agentExist: '已檢測到該節點上已存在 1panel-agent 服務',
-            forceAdd: '強制新增',
-            forceAddHelper: '強制新增將強制替換該節點上的 1panel-agent 服務',
+            agentExist:
+                '檢測到該節點上已存在 1panel-agent 服務，繼續添加將保留該節點數據，僅替換 1panel-agent 服務，是否繼續？',
             reinstallHelper: '重新安裝節點 {0}，是否繼續？',
             unhealthyCheck: '異常檢查',
             fixOperation: '修復方案',
