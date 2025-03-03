@@ -948,24 +948,10 @@ func calculateMemPercentUnix(memStats types.MemoryStats) float64 {
 	return memPercent
 }
 
-// calculateMemUsageUnixNoCache calculate memory usage of the container.
-// Cache is intentionally excluded to avoid misinterpretation of the output.
-//
-// On cgroup v1 host, the result is `mem.Usage - mem.Stats["total_inactive_file"]` .
-// On cgroup v2 host, the result is `mem.Usage - mem.Stats["inactive_file"] `.
-//
-// This definition is consistent with cadvisor and containerd/CRI.
-// * https://github.com/google/cadvisor/commit/307d1b1cb320fef66fab02db749f07a459245451
-// * https://github.com/containerd/cri/commit/6b8846cdf8b8c98c1d965313d66bc8489166059a
-//
-// On Docker 19.03 and older, the result was `mem.Usage - mem.Stats["cache"]`.
-// See https://github.com/moby/moby/issues/40727 for the background.
 func calculateMemUsageUnixNoCache(mem types.MemoryStats) float64 {
-	// cgroup v1
 	if v, isCgroup1 := mem.Stats["total_inactive_file"]; isCgroup1 && v < mem.Usage {
 		return float64(mem.Usage - v)
 	}
-	// cgroup v2
 	if v := mem.Stats["inactive_file"]; v < mem.Usage {
 		return float64(mem.Usage - v)
 	}
