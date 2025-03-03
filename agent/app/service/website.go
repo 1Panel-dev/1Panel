@@ -2618,19 +2618,13 @@ func (w WebsiteService) GetRedirect(id uint) (res []response.NginxRedirectConfig
 func (w WebsiteService) UpdateRedirectFile(req request.NginxRedirectUpdate) (err error) {
 	var (
 		website           model.Website
-		nginxFull         dto.NginxFull
 		oldRewriteContent []byte
 	)
 	website, err = websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
 	if err != nil {
 		return err
 	}
-	nginxFull, err = getNginxFull(&website)
-	if err != nil {
-		return err
-	}
-	includePath := fmt.Sprintf("/www/sites/%s/redirect/%s.conf", website.Alias, req.Name)
-	absolutePath := path.Join(nginxFull.Install.GetPath(), includePath)
+	absolutePath := path.Join(GetSitePath(website, SiteRedirectDir), req.Name+".conf")
 	fileOp := files.NewFileOp()
 	oldRewriteContent, err = fileOp.GetContent(absolutePath)
 	if err != nil {
