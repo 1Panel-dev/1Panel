@@ -1153,7 +1153,7 @@ func (w WebsiteService) PreInstallCheck(req request.WebsiteInstallCheckReq) ([]r
 				Version: install.Version,
 				AppName: install.App.Name,
 			})
-			if install.Status != constant.Running {
+			if install.Status != constant.StatusRunning {
 				showErr = true
 			}
 		}

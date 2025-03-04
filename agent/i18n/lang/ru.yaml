@@ -75,6 +75,7 @@ PullImageStart: "Начало загрузки образа {{ .name }}"
 PullImageSuccess: "Образ успешно загружен"
 UpgradeAppStart: "Начало обновления приложения {{ .name }}"
 UpgradeAppSuccess: "Приложение {{ .name }} успешно обновлено"
+ErrAppIsDown: "{{ .name }} статус приложения аномальный, пожалуйста, проверьте"
 
 #file
 ErrFileCanNotRead: "Файл недоступен для чтения"

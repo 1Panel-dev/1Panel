@@ -373,6 +373,15 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 			return
 		}
 	}
+	if hostName, ok := req.Params["PANEL_DB_HOST"]; ok {
+		database, _ := databaseRepo.Get(repo.WithByName(hostName.(string)))
+		if database.AppInstallID > 0 {
+			databaseInstall, _ := appInstallRepo.GetFirst(repo.WithByID(database.AppInstallID))
+			if databaseInstall.Status != constant.StatusRunning {
+				return nil, buserr.WithName("ErrAppIsDown", databaseInstall.Name)
+			}
+		}
+	}
 	if app.Key == "openresty" && app.Resource == "remote" && common.CompareVersion(appDetail.Version, "1.27") {
 		if dir, ok := req.Params["WEBSITE_DIR"]; ok {
 			siteDir := dir.(string)
@@ -421,7 +430,7 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 		AppId:       appDetail.AppId,
 		AppDetailId: appDetail.ID,
 		Version:     appDetail.Version,
-		Status:      constant.Installing,
+		Status:      constant.StatusInstalling,
 		HttpPort:    httpPort,
 		HttpsPort:   httpsPort,
 		App:         app,
@@ -536,7 +545,7 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 	}
 
 	handleAppStatus := func(t *task.Task) {
-		appInstall.Status = constant.UpErr
+		appInstall.Status = constant.StatusUpErr
 		appInstall.Message = installTask.Task.ErrorMsg
 		_ = appInstallRepo.Save(context.Background(), appInstall)
 	}
@@ -545,7 +554,7 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 
 	go func() {
 		if taskErr := installTask.Execute(); taskErr != nil {
-			appInstall.Status = constant.InstallErr
+			appInstall.Status = constant.StatusInstallErr
 			appInstall.Message = taskErr.Error()
 			if strings.Contains(taskErr.Error(), "Timeout") && strings.Contains(taskErr.Error(), "Pulling") {
 				appInstall.Message = buserr.New("PullImageTimeout").Error() + appInstall.Message
@@ -808,7 +817,7 @@ func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
 	if err != nil {
 		return nil, err
 	}
-	if setting.AppStoreSyncStatus == constant.Syncing {
+	if setting.AppStoreSyncStatus == constant.StatusSyncing {
 		res.IsSyncing = true
 		return res, nil
 	}
@@ -931,7 +940,7 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 			list = updateRes.AppList
 		}
 		settingService := NewISettingService()
-		_ = settingService.Update("AppStoreSyncStatus", constant.Syncing)
+		_ = settingService.Update("AppStoreSyncStatus", constant.StatusSyncing)
 
 		setting, err := settingService.GetSettingInfo()
 		if err != nil {
@@ -1156,7 +1165,7 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 		}
 		tx.Commit()
 
-		_ = settingService.Update("AppStoreSyncStatus", constant.SyncSuccess)
+		_ = settingService.Update("AppStoreSyncStatus", constant.StatusSyncSuccess)
 		_ = settingService.Update("AppStoreLastModified", strconv.Itoa(list.LastModified))
 		t.Log(i18n.GetMsgByKey("AppStoreSyncSuccess"))
 		return nil
@@ -1165,7 +1174,7 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 	go func() {
 		if err = syncTask.Execute(); err != nil {
 			_ = NewISettingService().Update("AppStoreLastModified", "0")
-			_ = NewISettingService().Update("AppStoreSyncStatus", constant.Error)
+			_ = NewISettingService().Update("AppStoreSyncStatus", constant.StatusError)
 		}
 	}()
 

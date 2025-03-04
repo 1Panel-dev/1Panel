@@ -79,19 +79,31 @@
                             v-model="form[p.child.envKey]"
                             v-if="p.child.type == 'service'"
                             @change="changeService(form[p.child.envKey], p.services)"
-                            class="p-w-200"
+                            class="p-w-300"
                         >
                             <el-option
                                 v-for="service in p.services"
                                 :key="service.label"
                                 :value="service.value"
                                 :label="service.label"
+                                :disabled="service.status != 'Running'"
                             >
-                                <span>{{ service.label }}</span>
-                                <span class="float-right" v-if="service.from != ''">
-                                    <el-tag v-if="service.from === 'local'">{{ $t('commons.table.local') }}</el-tag>
-                                    <el-tag v-else type="success">{{ $t('database.remote') }}</el-tag>
-                                </span>
+                                <el-row :gutter="5">
+                                    <el-col :span="10">
+                                        <span>{{ service.label }}</span>
+                                    </el-col>
+                                    <el-col :span="8">
+                                        <span v-if="service.from != ''">
+                                            <el-tag v-if="service.from === 'local'">
+                                                {{ $t('commons.table.local') }}
+                                            </el-tag>
+                                            <el-tag v-else type="success">{{ $t('database.remote') }}</el-tag>
+                                        </span>
+                                    </el-col>
+                                    <el-col :span="6">
+                                        <Status :key="service.status" :status="service.status"></Status>
+                                    </el-col>
+                                </el-row>
                             </el-option>
                         </el-select>
                     </el-form-item>

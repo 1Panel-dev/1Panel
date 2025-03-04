@@ -2958,10 +2958,10 @@ const message = {
         },
         customApp: {
             name: '自定义应用仓库',
-            appStoreType: '应用商店包来源',
+            appStoreType: '仓库来源',
             appStoreUrl: '仓库地址',
-            local: '本机路径',
-            remote: '远程链接',
+            local: '本地',
+            remote: '远程',
             imagePrefix: '镜像前缀',
             imagePrefixHelper:
                 '作用：自定义镜像前缀，修改 compose 文件中的镜像字段，例如：当镜像前缀设置为 1panel/custom 时，MaxKB 的 image 字段将变更为 1panel/custom/maxkb:v1.10.0',

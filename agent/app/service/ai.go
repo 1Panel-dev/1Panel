@@ -358,7 +358,7 @@ func LoadContainerName() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("ollama service is not found, err: %v", err)
 	}
-	if ollamaBaseInfo.Status != constant.Running {
+	if ollamaBaseInfo.Status != constant.StatusRunning {
 		return "", fmt.Errorf("container %s of ollama is not running, please check and retry!", ollamaBaseInfo.ContainerName)
 	}
 	return ollamaBaseInfo.ContainerName, nil

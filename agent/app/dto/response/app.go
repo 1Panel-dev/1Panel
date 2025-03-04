@@ -141,6 +141,7 @@ type AppService struct {
 	Value  string      `json:"value"`
 	Config interface{} `json:"config"`
 	From   string      `json:"from"`
+	Status string      `json:"status"`
 }
 
 type AppParam struct {

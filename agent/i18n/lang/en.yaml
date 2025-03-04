@@ -82,7 +82,7 @@ CustomAppStoreNotConfig: "Please configure the offline package address in the ap
 CustomAppStoreNotFound: "Failed to retrieve app store package, please check if it exists",
 CustomAppStoreFileValid: "App store package must be in .tar.gz format"
 PullImageTimeout: "Image pull timeout, please check the network and try again"
-
+ErrAppIsDown: "{{ .name }} application status is abnormal, please check"
 
 #file
 ErrFileCanNotRead: "File can not read"

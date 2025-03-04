@@ -74,6 +74,7 @@ PullImageStart: "画像の引っ張りを開始{{.name}}"
 PullImageSuccess: "画像が正常に引っ張られました"
 UpgradeAppStart: "アプリケーションのアップグレードを起動{{.name}}"
 UpgradeAppSuccess: "App {{.Name}}アップグレードされました"
+ErrAppIsDown: "{{ .name }} アプリケーションの状態が異常です、確認してください"
 
 #file
 ErrFileCanNotRead: "ファイルは読み取れません"

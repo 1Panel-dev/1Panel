@@ -377,7 +377,7 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 
 func handleError(websiteSSL *model.WebsiteSSL, err error) {
 	if websiteSSL.Status == constant.SSLInit || websiteSSL.Status == constant.SSLError {
-		websiteSSL.Status = constant.Error
+		websiteSSL.Status = constant.StatusError
 	} else {
 		websiteSSL.Status = constant.SSLApplyError
 	}

@@ -55,11 +55,11 @@ type logOption struct {
 func (u *DockerService) LoadDockerStatus() string {
 	client, err := docker.NewDockerClient()
 	if err != nil {
-		return constant.Stopped
+		return constant.StatusStopped
 	}
 	defer client.Close()
 	if _, err := client.Ping(context.Background()); err != nil {
-		return constant.Stopped
+		return constant.StatusStopped
 	}
 
 	return constant.StatusRunning

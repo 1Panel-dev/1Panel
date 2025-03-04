@@ -74,6 +74,7 @@ PullImageStart: "Iniciando o download da imagem {{ .name }}"
 PullImageSuccess: "Imagem baixada com sucesso"
 UpgradeAppStart: "Iniciando a atualização do aplicativo {{ .name }}"
 UpgradeAppSuccess: "Aplicativo {{ .name }} atualizado com sucesso"
+ErrAppIsDown: "{{ .name }} status do aplicativo é anormal, por favor, verifique"
 
 #file
 ErrFileCanNotRead: "Não foi possível ler o arquivo"

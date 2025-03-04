@@ -333,7 +333,7 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 	}
 
 	uninstall := func(t *task.Task) error {
-		install.Status = constant.Uninstalling
+		install.Status = constant.StatusUninstalling
 		_ = appInstallRepo.Save(context.Background(), &install)
 		dir, _ := os.Stat(appDir)
 		if dir != nil {
@@ -434,7 +434,7 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 	uninstallTask.AddSubTask(task.GetTaskName(install.Name, task.TaskUninstall, task.TaskScopeApp), uninstall, nil)
 	go func() {
 		if err := uninstallTask.Execute(); err != nil && !deleteReq.ForceDelete {
-			install.Status = constant.Error
+			install.Status = constant.StatusError
 			_ = appInstallRepo.Save(context.Background(), &install)
 		}
 	}()
@@ -554,7 +554,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 	if err != nil {
 		return err
 	}
-	install.Status = constant.Upgrading
+	install.Status = constant.StatusUpgrading
 
 	var (
 		upErr      error
@@ -747,7 +747,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 			return err
 		}
 		t.LogSuccess(logStr)
-		install.Status = constant.Running
+		install.Status = constant.StatusRunning
 		return appInstallRepo.Save(context.Background(), &install)
 	}
 
@@ -769,8 +769,8 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		err = upgradeTask.Execute()
 		if err != nil {
 			existInstall, _ := appInstallRepo.GetFirst(repo.WithByID(req.InstallID))
-			if existInstall.ID > 0 && existInstall.Status != constant.Running {
-				existInstall.Status = constant.UpgradeErr
+			if existInstall.ID > 0 && existInstall.Status != constant.StatusRunning {
+				existInstall.Status = constant.StatusUpgradeErr
 				existInstall.Message = err.Error()
 				_ = appInstallRepo.Save(context.Background(), &existInstall)
 			}
@@ -889,7 +889,7 @@ func downloadApp(app model.App, appDetail model.AppDetail, appInstall *model.App
 	defer func() {
 		if err != nil {
 			if appInstall != nil {
-				appInstall.Status = constant.DownloadErr
+				appInstall.Status = constant.StatusDownloadErr
 				appInstall.Message = err.Error()
 			}
 		}
@@ -1105,18 +1105,18 @@ func upApp(task *task.Task, appInstall *model.AppInstall, pullImages bool) error
 		if appInstall.Message == "" {
 			appInstall.Message = err.Error()
 		}
-		appInstall.Status = constant.UpErr
+		appInstall.Status = constant.StatusUpErr
 		_ = appInstallRepo.Save(context.Background(), appInstall)
 		return err
 	} else {
-		appInstall.Status = constant.Running
+		appInstall.Status = constant.StatusRunning
 		_ = appInstallRepo.Save(context.Background(), appInstall)
 		return nil
 	}
 }
 
 func rebuildApp(appInstall model.AppInstall) error {
-	appInstall.Status = constant.Rebuilding
+	appInstall.Status = constant.StatusRebuilding
 	_ = appInstallRepo.Save(context.Background(), &appInstall)
 	go func() {
 		dockerComposePath := appInstall.GetComposePath()
@@ -1137,7 +1137,7 @@ func rebuildApp(appInstall model.AppInstall) error {
 		}
 		appInstall.ContainerName = strings.Join(containerNames, ",")
 
-		appInstall.Status = constant.Running
+		appInstall.Status = constant.StatusRunning
 		_ = appInstallRepo.Save(context.Background(), &appInstall)
 	}()
 	return nil
@@ -1336,24 +1336,24 @@ func handleErr(install model.AppInstall, err error, out string) error {
 		install.Message = out
 		reErr = errors.New(out)
 	}
-	install.Status = constant.UpErr
+	install.Status = constant.StatusUpErr
 	_ = appInstallRepo.Save(context.Background(), &install)
 	return reErr
 }
 
 func doNotNeedSync(installed model.AppInstall) bool {
-	return installed.Status == constant.Installing || installed.Status == constant.Rebuilding || installed.Status == constant.Upgrading ||
-		installed.Status == constant.Syncing || installed.Status == constant.Uninstalling || installed.Status == constant.InstallErr
+	return installed.Status == constant.StatusInstalling || installed.Status == constant.StatusRebuilding || installed.Status == constant.StatusUpgrading ||
+		installed.Status == constant.StatusSyncing || installed.Status == constant.StatusUninstalling || installed.Status == constant.StatusInstallErr
 }
 
 func synAppInstall(containers map[string]types.Container, appInstall *model.AppInstall, force bool) {
 	oldStatus := appInstall.Status
 	containerNames := strings.Split(appInstall.ContainerName, ",")
 	if len(containers) == 0 {
-		if appInstall.Status == constant.UpErr && !force {
+		if appInstall.Status == constant.StatusUpErr && !force {
 			return
 		}
-		appInstall.Status = constant.Error
+		appInstall.Status = constant.StatusError
 		appInstall.Message = buserr.WithName("ErrContainerNotFound", strings.Join(containerNames, ",")).Error()
 		_ = appInstallRepo.Save(context.Background(), appInstall)
 		return
@@ -1384,21 +1384,21 @@ func synAppInstall(containers map[string]types.Container, appInstall *model.AppI
 	}
 	switch {
 	case exitedCount == total:
-		appInstall.Status = constant.Stopped
+		appInstall.Status = constant.StatusStopped
 	case runningCount == total:
-		appInstall.Status = constant.Running
-		if oldStatus == constant.Running {
+		appInstall.Status = constant.StatusRunning
+		if oldStatus == constant.StatusRunning {
 			return
 		}
 	case restartingCount == total:
-		appInstall.Status = constant.Restating
+		appInstall.Status = constant.StatusRestarting
 	case pausedCount == total:
-		appInstall.Status = constant.Paused
+		appInstall.Status = constant.StatusPaused
 	case len(notFoundNames) == total:
-		if appInstall.Status == constant.UpErr && !force {
+		if appInstall.Status == constant.StatusUpErr && !force {
 			return
 		}
-		appInstall.Status = constant.Error
+		appInstall.Status = constant.StatusError
 		appInstall.Message = buserr.WithName("ErrContainerNotFound", strings.Join(notFoundNames, ",")).Error()
 	default:
 		var msg string
@@ -1412,7 +1412,7 @@ func synAppInstall(containers map[string]types.Container, appInstall *model.AppI
 			msg = buserr.New("ErrAppWarn").Error()
 		}
 		appInstall.Message = msg
-		appInstall.Status = constant.UnHealthy
+		appInstall.Status = constant.StatusUnHealthy
 	}
 	_ = appInstallRepo.Save(context.Background(), appInstall)
 }
@@ -1761,7 +1761,7 @@ func getMajorVersion(version string) string {
 }
 
 func ignoreUpdate(installed model.AppInstall) bool {
-	if installed.App.Type == "php" || installed.Status == constant.Installing {
+	if installed.App.Type == "php" || installed.Status == constant.StatusInstalling {
 		return true
 	}
 	if installed.App.Key == constant.AppMysql {

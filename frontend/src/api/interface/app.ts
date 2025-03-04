@@ -222,6 +222,7 @@ export namespace App {
         value: string;
         config?: Object;
         from?: string;
+        status: string;
     }
 
     export interface VersionDetail {

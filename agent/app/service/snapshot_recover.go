@@ -303,13 +303,13 @@ func recoverAppData(src string, itemHelper *snapRecoverHelper) error {
 	var wg sync.WaitGroup
 	for i := 0; i < len(appInstalls); i++ {
 		wg.Add(1)
-		appInstalls[i].Status = constant.Rebuilding
+		appInstalls[i].Status = constant.StatusRebuilding
 		_ = appInstallRepo.Save(context.Background(), &appInstalls[i])
 		go func(app model.AppInstall) {
 			defer wg.Done()
 			dockerComposePath := app.GetComposePath()
 			_, _ = compose.Up(dockerComposePath)
-			app.Status = constant.Running
+			app.Status = constant.StatusRunning
 			_ = appInstallRepo.Save(context.Background(), &app)
 		}(appInstalls[i])
 	}

@@ -224,6 +224,7 @@ func (u *BackupRecordService) LoadRecordSize(req dto.SearchForSize) ([]dto.Recor
 	default:
 		_, records, err := backupRepo.PageRecord(
 			req.Page, req.PageSize,
+			repo.WithOrderBy("created_at desc"),
 			repo.WithByName(req.Name),
 			repo.WithByType(req.Type),
 			repo.WithByDetailName(req.DetailName),

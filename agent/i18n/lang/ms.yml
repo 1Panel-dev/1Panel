@@ -75,6 +75,7 @@ PullImageStart: "Memulakan penarikan imej {{ .name }}"
 PullImageSuccess: "Imej berjaya ditarik"
 UpgradeAppStart: "Memulakan peningkatan aplikasi {{ .name }}"
 UpgradeAppSuccess: "Aplikasi {{ .name }} berjaya dinaik taraf"
+ErrAppIsDown: "{{ .name }} status aplikasi tidak normal, sila periksa"
 
 #file
 ErrFileCanNotRead: "Fail tidak boleh dibaca"

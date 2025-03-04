@@ -406,11 +406,11 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 		_ = fileOp.WriteFile(installed.GetComposePath(), strings.NewReader(backupDockerCompose), constant.DirPerm)
 		return err
 	}
-	installed.Status = constant.Running
+	installed.Status = constant.StatusRunning
 	_ = appInstallRepo.Save(context.Background(), &installed)
 
 	website, _ := websiteRepo.GetFirst(websiteRepo.WithAppInstallId(installed.ID))
-	if changePort && website.ID != 0 && website.Status == constant.Running {
+	if changePort && website.ID != 0 && website.Status == constant.StatusRunning {
 		go func() {
 			nginxInstall, err := getNginxFull(&website)
 			if err != nil {
@@ -455,9 +455,9 @@ func (a *AppInstallService) SyncAll(systemInit bool) error {
 		return err
 	}
 	for _, i := range allList {
-		if i.Status == constant.Installing || i.Status == constant.Upgrading || i.Status == constant.Rebuilding || i.Status == constant.Uninstalling {
+		if i.Status == constant.StatusInstalling || i.Status == constant.StatusUpgrading || i.Status == constant.StatusRebuilding || i.Status == constant.StatusUninstalling {
 			if systemInit {
-				i.Status = constant.Error
+				i.Status = constant.StatusError
 				i.Message = "1Panel restart causes the task to terminate"
 				_ = appInstallRepo.Save(context.Background(), &i)
 			}
@@ -498,8 +498,10 @@ func (a *AppInstallService) GetServices(key string) ([]response.AppService, erro
 				}
 				service.Config = paramMap
 				service.From = constant.AppResourceLocal
+				service.Status = install.Status
 			} else {
 				service.From = constant.AppResourceRemote
+				service.Status = constant.StatusRunning
 			}
 			res = append(res, service)
 		}
@@ -508,7 +510,7 @@ func (a *AppInstallService) GetServices(key string) ([]response.AppService, erro
 		if err != nil {
 			return nil, err
 		}
-		installs, err := appInstallRepo.ListBy(appInstallRepo.WithAppId(app.ID), appInstallRepo.WithStatus(constant.Running))
+		installs, err := appInstallRepo.ListBy(appInstallRepo.WithAppId(app.ID), appInstallRepo.WithStatus(constant.StatusRunning))
 		if err != nil {
 			return nil, err
 		}
@@ -521,6 +523,7 @@ func (a *AppInstallService) GetServices(key string) ([]response.AppService, erro
 				Label:  install.Name,
 				Value:  install.ServiceName,
 				Config: paramMap,
+				Status: install.Status,
 			})
 		}
 	}
@@ -774,7 +777,7 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 }
 
 func syncAppInstallStatus(appInstall *model.AppInstall, force bool) error {
-	if appInstall.Status == constant.Installing || appInstall.Status == constant.Rebuilding || appInstall.Status == constant.Upgrading || appInstall.Status == constant.Uninstalling {
+	if appInstall.Status == constant.StatusInstalling || appInstall.Status == constant.StatusRebuilding || appInstall.Status == constant.StatusUpgrading || appInstall.Status == constant.StatusUninstalling {
 		return nil
 	}
 	cli, err := docker.NewClient()
