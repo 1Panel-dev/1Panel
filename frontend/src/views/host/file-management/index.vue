@@ -434,6 +434,7 @@ const mobile = computed(() => {
 });
 
 const search = async () => {
+    getWgetProcess();
     loading.value = true;
     if (req.search != '') {
         req.sortBy = 'name';
@@ -983,7 +984,6 @@ onMounted(() => {
     nextTick(function () {
         handlePath();
     });
-    getWgetProcess();
 });
 </script>
 

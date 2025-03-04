@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -761,7 +762,16 @@ func (b *BaseApi) WgetProcess(c *gin.Context) {
 func (b *BaseApi) ProcessKeys(c *gin.Context) {
 	res := &response.FileProcessKeys{}
 	keys := global.CACHE.PrefixScanKey("file-wget-")
-	res.Keys = keys
+	for _, key := range keys {
+		value := global.CACHE.Get(key)
+		if value == "" {
+			continue
+		}
+		var process files.Process
+		if err := json.Unmarshal([]byte(value), &process); err == nil && process.Percent != 100 {
+			res.Keys = append(res.Keys, key)
+		}
+	}
 	helper.SuccessWithData(c, res)
 }
 
