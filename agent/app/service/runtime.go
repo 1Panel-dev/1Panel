@@ -518,6 +518,7 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 		runtime.CodeDir = req.CodeDir
 		runtime.Port = strings.Join(hostPorts, ",")
 		runtime.Status = constant.StatusReCreating
+		runtime.ContainerName = req.Params["CONTAINER_NAME"].(string)
 		_ = runtimeRepo.Save(runtime)
 		go reCreateRuntime(runtime)
 	}

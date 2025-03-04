@@ -3,6 +3,7 @@ package migrations
 import (
 	"fmt"
 	"path"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -291,6 +292,20 @@ var InitDefault = &gormigrate.Migration{
 	ID: "20250301-init-default",
 	Migrate: func(tx *gorm.DB) error {
 		if err := tx.Create(&model.Group{Name: "Default", Type: "website", IsDefault: true}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var UpdateWebsiteExpireDate = &gormigrate.Migration{
+	ID: "20250304-update-website",
+	Migrate: func(tx *gorm.DB) error {
+		targetDate := time.Date(9999, 12, 31, 0, 0, 0, 0, time.UTC)
+
+		if err := tx.Model(&model.Website{}).
+			Where("expire_date = ?", time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)).
+			Update("expire_date", targetDate).Error; err != nil {
 			return err
 		}
 		return nil

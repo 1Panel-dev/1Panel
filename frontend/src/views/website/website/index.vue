@@ -272,7 +272,7 @@ const shortcuts = [
     {
         text: useI18n().t('website.ever'),
         value: () => {
-            return new Date('1970-01-01');
+            return new Date('9999-12-31');
         },
     },
     {
@@ -379,7 +379,7 @@ const openConfig = (id: number) => {
 
 const isEver = (time: string) => {
     const expireDate = new Date(time);
-    return expireDate < new Date('1970-01-02');
+    return expireDate > new Date('9999-12-30');
 };
 
 const isBeforeNow = (time: string) => {
@@ -415,10 +415,14 @@ const setdateRefs = (ref: any) => {
 };
 
 const initDatePicker = (row: any) => {
-    if (dataRef.value == undefined && row.oldExpireDate == undefined && isBeforeNow(row.expireDate)) {
+    if (
+        (dataRef.value == undefined && row.oldExpireDate == undefined && isBeforeNow(row.expireDate)) ||
+        isEver(row.expireDate)
+    ) {
         row.oldExpireDate = row.expireDate;
         const date = new Date().toLocaleDateString();
         row.expireDate = date;
+        return;
     }
 };
 

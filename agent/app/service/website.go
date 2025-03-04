@@ -259,7 +259,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		primaryDomain = fmt.Sprintf("%s:%v", domains[0].Domain, domains[0].Port)
 	}
 
-	defaultDate, _ := time.Parse(constant.DateLayout, constant.DefaultDate)
+	defaultDate, _ := time.Parse(constant.DateLayout, constant.WebsiteDefaultExpireDate)
 	website := &model.Website{
 		PrimaryDomain:  primaryDomain,
 		Type:           create.Type,

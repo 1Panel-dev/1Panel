@@ -27,6 +27,7 @@ func InitAgentDB() {
 		migrations.AddOllamaModel,
 		migrations.UpdateSettingStatus,
 		migrations.InitDefault,
+		migrations.UpdateWebsiteExpireDate,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)
