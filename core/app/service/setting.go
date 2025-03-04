@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bytes"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/tls"
@@ -8,7 +9,10 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/core/app/model"
+	"github.com/1Panel-dev/1Panel/core/utils/req_helper"
 	"net"
+	"net/http"
 	"os"
 	"path"
 	"strconv"
@@ -265,6 +269,48 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 			return err
 		}
 		secret = string(certFile)
+	case "select":
+		ssl, err := agentRepo.GetWebsiteSSL(repo.WithByID(req.SSLID))
+		if err != nil {
+			return err
+		}
+		secret = ssl.Pem
+		key = ssl.PrivateKey
+		if err := settingRepo.Update("SSLID", strconv.Itoa(int(req.SSLID))); err != nil {
+			return err
+		}
+	case "self":
+		ca, err := agentRepo.GetCA(repo.WithByName("1Panel"))
+		if err != nil {
+			return err
+		}
+		params := make(map[string]interface{})
+		params["domains"] = req.Domain
+		params["time"] = 10
+		params["unit"] = "year"
+		params["keyType"] = "P256"
+		params["id"] = ca.ID
+		jsonData, err := json.Marshal(params)
+		if err != nil {
+			return err
+		}
+		res, err := req_helper.NewLocalClient("/api/v2/websites/ca/obtain", http.MethodPost, bytes.NewReader(jsonData))
+		if err != nil {
+			return err
+		}
+		jsonBytes, err := json.Marshal(res)
+		if err != nil {
+			return err
+		}
+		var ssl model.WebsiteSSL
+		if err := json.Unmarshal(jsonBytes, &ssl); err != nil {
+			return err
+		}
+		secret = ssl.Pem
+		key = ssl.PrivateKey
+		if err := settingRepo.Update("SSLID", strconv.Itoa(int(ssl.ID))); err != nil {
+			return err
+		}
 	}
 
 	if err := os.WriteFile(path.Join(secretDir, "server.crt.tmp"), []byte(secret), 0600); err != nil {
@@ -325,7 +371,18 @@ func (u *SettingService) LoadFromCert() (*dto.SSLInfo, error) {
 		keyFile, _ := os.ReadFile(path.Join(global.CONF.Base.InstallDir, "1panel/secret/server.key"))
 		data.Key = string(keyFile)
 	case "select":
-		// TODO select ssl from website
+		sslID, err := settingRepo.Get(repo.WithByKey("SSLID"))
+		if err != nil {
+			return nil, err
+		}
+		id, _ := strconv.Atoi(sslID.Value)
+		ssl, err := agentRepo.GetWebsiteSSL(repo.WithByID(uint(id)))
+		if err != nil {
+			return nil, err
+		}
+		data.Domain = ssl.PrimaryDomain
+		data.SSLID = uint(id)
+		data.Timeout = ssl.ExpireDate.Format(constant.DateTimeLayout)
 	}
 	return &data, nil
 }

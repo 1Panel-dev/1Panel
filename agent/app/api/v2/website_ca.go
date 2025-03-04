@@ -113,11 +113,12 @@ func (b *BaseApi) ObtainWebsiteCA(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	if _, err := websiteCAService.ObtainSSL(req); err != nil {
+	res, err := websiteCAService.ObtainSSL(req)
+	if err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.SuccessWithData(c, res)
 }
 
 // @Tags Website CA

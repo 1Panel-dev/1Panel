@@ -27,7 +27,9 @@ class RequestHttp {
                     'Accept-Language': language,
                     ...config.headers,
                 };
-                config.headers.CurrentNode = globalStore.currentNode;
+                if (config.headers.CurrentNode == undefined) {
+                    config.headers.CurrentNode = globalStore.currentNode;
+                }
                 if (config.url === '/core/auth/login' || config.url === '/core/auth/mfalogin') {
                     let entrance = Base64.encode(globalStore.entrance);
                     config.headers.EntranceCode = entrance;
@@ -123,6 +125,16 @@ class RequestHttp {
             baseURL: import.meta.env.VITE_API_URL as string,
             timeout: timeout ? timeout : (ResultEnum.TIMEOUT as number),
             withCredentials: true,
+        });
+    }
+    postLocalNode<T>(url: string, params?: object, timeout?: number): Promise<ResultData<T>> {
+        return this.service.post(url, params, {
+            baseURL: import.meta.env.VITE_API_URL as string,
+            timeout: timeout ? timeout : (ResultEnum.TIMEOUT as number),
+            withCredentials: true,
+            headers: {
+                CurrentNode: 'local',
+            },
         });
     }
     put<T>(url: string, params?: object, _object = {}): Promise<ResultData<T>> {

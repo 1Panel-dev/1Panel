@@ -27,10 +27,10 @@
 
             <el-form-item v-if="form.timeout">
                 <el-tag>{{ $t('setting.domainOrIP') }} {{ form.domain }}</el-tag>
-                <el-tag style="margin-left: 5px">{{ $t('setting.timeOut') }} {{ form.timeout }}</el-tag>
+                <el-tag class="p-ml-5">{{ $t('setting.timeOut') }} {{ form.timeout }}</el-tag>
                 <el-button
                     @click="onDownload"
-                    style="margin-left: 5px"
+                    class="p-ml-5"
                     v-if="form.sslType === 'self'"
                     type="primary"
                     link
@@ -116,7 +116,7 @@
 <script lang="ts" setup>
 import { Website } from '@/api/interface/website';
 import { dateFormatSimple, getProvider } from '@/utils/util';
-import { listSSL } from '@/api/modules/website';
+import { listLocalNodeSSL } from '@/api/modules/website';
 import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
@@ -131,7 +131,7 @@ const loading = ref();
 const drawerVisible = ref();
 
 const form = reactive({
-    ssl: 'enable',
+    ssl: 'Enable',
     domain: '',
     sslType: 'self',
     itemSSLType: 'paste',
@@ -172,7 +172,7 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
 
     if (params.sslInfo?.sslID) {
         form.sslID = params.sslInfo.sslID;
-        const ssls = await listSSL({});
+        const ssls = await listLocalNodeSSL({});
         sslList.value = ssls.data || [];
         changeSSl(params.sslInfo?.sslID);
     } else {
@@ -183,7 +183,7 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 const loadSSLs = async () => {
-    const res = await listSSL({});
+    const res = await listLocalNodeSSL({});
     sslList.value = res.data || [];
 };
 
@@ -228,7 +228,7 @@ const onSaveSSL = async (formEl: FormInstance | undefined) => {
                 itemType = form.itemSSLType === 'paste' ? 'import-paste' : 'import-local';
             }
             let param = {
-                ssl: 'enable',
+                ssl: 'Enable',
                 sslType: itemType,
                 domain: '',
                 sslID: form.sslID,

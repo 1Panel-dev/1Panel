@@ -110,6 +110,10 @@ export const listSSL = (req: Website.SSLReq) => {
     return http.post<Website.SSLDTO[]>(`/websites/ssl/search`, req);
 };
 
+export const listLocalNodeSSL = (req: Website.SSLReq) => {
+    return http.postLocalNode<Website.SSLDTO[]>(`/websites/ssl/search`, req);
+};
+
 export const createSSL = (req: Website.SSLCreate) => {
     return http.post<Website.SSLCreate>(`/websites/ssl`, req, TimeoutEnum.T_10M);
 };

@@ -13,4 +13,6 @@ var (
 	upgradeLogRepo = repo.NewIUpgradeLogRepo()
 
 	taskRepo = repo.NewITaskRepo()
+
+	agentRepo = repo.NewIAgentRepo()
 )
