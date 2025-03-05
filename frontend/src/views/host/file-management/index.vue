@@ -256,7 +256,7 @@
                                     link
                                     small
                                     @click="getDirSize(row, $index)"
-                                    :loading="btnLoading == $index"
+                                    :loading="row.btnLoading"
                                 >
                                     <span v-if="row.dirSize == undefined">
                                         {{ $t('file.calculate') }}
@@ -377,7 +377,6 @@ const initData = () => ({
 });
 let req = reactive(initData());
 let loading = ref(false);
-let btnLoading = ref(-1);
 const paths = ref<FilePaths[]>([]);
 let pathWidth = ref(0);
 const history: string[] = [];
@@ -419,7 +418,6 @@ const dialogVscodeOpenRef = ref();
 const previewRef = ref();
 const processRef = ref();
 
-// editablePath
 const { searchableStatus, searchablePath, searchableInputRef, searchableInputBlur } = useSearchable(paths);
 
 const paginationConfig = reactive({
@@ -453,7 +451,6 @@ const search = async () => {
         });
 };
 
-/** just search, no handleSearchResult */
 const searchFile = async () => {
     loading.value = true;
     try {
@@ -548,7 +545,6 @@ const jump = async (url: string) => {
     const { path: oldUrl, pageSize: oldPageSize } = req;
     Object.assign(req, initData(), { path: url, containSub: false, search: '', pageSize: oldPageSize });
     let searchResult = await searchFile();
-    // check search result,the file is exists?
     if (!searchResult.data.path) {
         req.path = oldUrl;
         globalStore.setLastFilePath(req.path);
@@ -566,7 +562,6 @@ const jump = async (url: string) => {
 
 const backForwardJump = async (url: string) => {
     const oldPageSize = req.pageSize;
-    // reset search params before exec jump
     Object.assign(req, initData());
     req.path = url;
     req.containSub = false;
@@ -624,7 +619,7 @@ const getDirSize = async (row: any, index: number) => {
     const req = {
         path: row.path,
     };
-    btnLoading.value = index;
+    data.value[index].btnLoading = true;
     await computeDirSize(req)
         .then(async (res) => {
             let newData = [...data.value];
@@ -632,7 +627,7 @@ const getDirSize = async (row: any, index: number) => {
             data.value = newData;
         })
         .finally(() => {
-            btnLoading.value = -1;
+            data.value[index].btnLoading = false;
         });
 };
 
