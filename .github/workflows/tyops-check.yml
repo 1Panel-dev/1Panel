@@ -1,6 +1,5 @@
 name: Typos Check
 on: pull_request
-
 jobs:
   run:
     name: Spell Check with Typos
@@ -8,6 +7,5 @@ jobs:
     steps:
     - name: Checkout Actions Repository
       uses: actions/checkout@v2
-
     - name: Check spelling
       uses: crate-ci/typos@master

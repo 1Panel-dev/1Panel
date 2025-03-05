@@ -17,4 +17,14 @@ if [ ! -f "install.sh" ]; then
   wget https://github.com/1Panel-dev/installer/raw/main/install.sh
 fi
 
+if [ ! -f "GeoIP.mmdb" ]; then 
+  wget https://resource.1panel.pro/geo/GeoIP.mmdb
+fi
+
+if [ ! -f "lang.tar.gz" ]; then 
+  wget https://resource.1panel.pro/language/lang.tar.gz
+  tar zxvf lang.tar.gz
+  rm -rf lang.tar.gz
+fi
+
 chmod 755 1pctl install.sh

@@ -1,11 +1,13 @@
-# This is an example .goreleaser.yml file with some sensible defaults.
-# Make sure to check the documentation at https://goreleaser.com
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+# vim: set ts=2 sw=2 tw=0 fo=jcroql
+version: 2
+
 before:
   hooks:
     # - export NODE_OPTIONS="--max-old-space-size=8192"
     # - make build_web
-    - chmod +x ./script.sh
-    - ./script.sh
+    - chmod +x ./ci/script.sh
+    - ./ci/script.sh
     - sed -i 's@ORIGINAL_VERSION=.*@ORIGINAL_VERSION=v{{ .Version }}@g' 1pctl
     - go mod tidy
     
@@ -38,22 +40,15 @@ archives:
       - 1pctl
       - 1panel.service
       - install.sh
-      - README.md
-      - LICENSE
-    
+      - GeoIP.mmdb
+      - lang/*
+
 checksum:
   name_template: 'checksums.txt'
-snapshot:
-  name_template: "{{ incpatch .Version }}-next"
-release:
-  draft: true
-  mode: append
-  extra_files:
-    - glob: dist/*.tar.gz
-    - glob: dist/checksums.txt
-  name_template: "Release {{.Tag}}"
 
-# The lines beneath this are called `modelines`. See `:help modeline`
-# Feel free to remove those if you don't want/use them.
-# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
-# vim: set ts=2 sw=2 tw=0 fo=cnqoj
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"

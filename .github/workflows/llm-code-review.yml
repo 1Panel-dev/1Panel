@@ -1,13 +1,10 @@
 name: LLM Code Review
-
 permissions:
   contents: read
   pull-requests: write
-
 on:
   pull_request:
     types: [opened, reopened, synchronize]
-
 jobs:
   llm-code-review:
     runs-on: ubuntu-latest
@@ -18,7 +15,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.ALIYUN_LLM_API_KEY }}
           LANGUAGE: English
           OPENAI_API_ENDPOINT: https://dashscope.aliyuncs.com/compatible-mode/v1
-          MODEL: qwen2-1.5b-instruct
+          MODEL: qwen2.5-coder-3b-instruct
           PROMPT: "Please check the following code differences for any irregularities, potential issues, or optimization suggestions, and provide your answers in English."
           top_p: 1
           temperature: 1

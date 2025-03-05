@@ -1,6 +1,5 @@
-name: sync2gitee
+name: Synchronize to Gitee
 on: [push]
-
 jobs:
   repo-sync:
     runs-on: ubuntu-latest

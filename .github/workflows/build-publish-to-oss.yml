@@ -1,11 +1,8 @@
+name: Create Release And Upload assets
 on:
   push:
-    # Sequence of patterns matched against refs/tags
     tags:
-      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
-
-name: Create Release And Upload assets
-
+      - 'v*'
 jobs:
   create-release:
     runs-on: ubuntu-latest
@@ -24,43 +21,27 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.22'
+          go-version: '1.23'
       - name: Build Release
         uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
-          version: latest
+          version: '~> v2'
           args: release --skip=publish --clean
       - name: Upload Assets
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
           draft: true
-          body: |
-            # 一、安装和升级
-
-            ## 1.1 一键安装
-            ```sh
-            curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_start.sh && sudo bash quick_start.sh
-            ```
-
-            ## 1.2 在线升级
-
-            登录 1Panel Web 控制台，在页面右下角点击 **【检查更新】** 进行在线升级。
-
-            >更多信息请查阅在线文档：https://1panel.cn/docs/
-
-            # 二、更新日志
-
           files: |
             dist/*.tar.gz
             dist/checksums.txt
       - name: Setup OSSUTIL
-        uses: yizhoumo/setup-ossutil@v1
+        uses: yizhoumo/setup-ossutil@v2
         with:
           endpoint: ${{ secrets.OSS_ENDPOINT }}
           access-key-id: ${{ secrets.OSS_ACCESS_KEY_ID }}
           access-key-secret: ${{ secrets.OSS_ACCESS_KEY_SECRET }}
-          ossutil-version: '1.7.14'
+          ossutil-version: '1.7.18'
       - name: Upload Assets to OSS
-        run: ossutil cp -r dist/ oss://resource-fit2cloud-com/1panel/package/stable/${{  github.ref_name }}/release/ --include "*.tar.gz" --include "checksums.txt" --only-current-dir --force
+        run: ossutil cp -r dist/ oss://resource-fit2cloud-com/1panel/package/stable/${{ github.ref_name }}/release/ --include "*.tar.gz" --include "checksums.txt" --only-current-dir --force

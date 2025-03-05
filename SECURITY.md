@@ -1,15 +1,13 @@
-# 安全说明
+# Security policy
 
-如果您发现安全问题，请直接联系我们：
+## Supported versions
 
-- wanghe@fit2cloud.com
+| Version | Supported          |
+| ------- | ------------------ |
+| v1.x     | :white_check_mark: |
 
-感谢您的支持！
+## Reporting a vulnerability
 
-# Security Policy
+We first appreciate and are very thankful that you've found a vulnerability issue in 1Panel! By disclosing such issue to 1Panel development team you are helping 1Panel to become a much more safer project than before! ;)
 
-All security bugs should be reported to the contact as below:
-
-- wanghe@fit2cloud.com
-
-Thanks for your support!
+To protect the existing users of 1Panel, we kindly ask you to not disclose the vulnerability to anyone except the 1Panel development team before a fix has been rolled out. Send an email to `wanghe@fit2cloud.com` instead.

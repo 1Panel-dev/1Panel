@@ -1,8 +1,5 @@
 blank_issues_enabled: false
 contact_links:
-  - name: 问题与讨论 / Questions & Discussions
+  - name: Questions & Discussions
     url: https://github.com/1Panel-dev/1Panel/discussions
-    about: 提出针对本项目安装部署、使用及其他方面的相关问题 / Raise questions about the installation, deployment, use and other aspects of the project.
-  - name: 对 1Panel 项目有其他问题
-    url: https://bbs.fit2cloud.com/c/1p/7
-    about: 如果你对 1Panel 有其他想要提问的，我们欢迎到我们的官方社区进行提问。
+    about: Raise questions about the installation, deployment, use and other aspects of the project.

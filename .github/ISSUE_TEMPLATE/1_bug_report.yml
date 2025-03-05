@@ -1,0 +1,50 @@
+name: 'Bug Report'
+description: 'Report an Bug'
+title: '[Bug] '
+assignees: wanghe-fit2cloud
+body:
+  - type: markdown
+    attributes:
+      value: "## Contact Information"
+  - type: input
+    validations:
+      required: false
+    attributes:
+      label: "Contact Information"
+      description: "The ways to quickly contact you: WeChat group number and nickname, email, etc."
+  - type: markdown
+    attributes:
+      value: "## Environment Information"
+  - type: input
+    validations:
+      required: true
+    attributes:
+      label: "1Panel Version"
+      description: "Log in to the 1Panel Web console and check the current version at the bottom right of the page."
+  - type: markdown
+    attributes:
+      value: "## Detailed information"
+  - type: textarea
+    attributes:
+      label: "Problem Description"
+      description: "Briefly describe the issue you’ve encountered."
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: "Steps to Reproduce"
+      description: "How can this issue be reproduced."
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: "The expected correct result"
+  - type: textarea
+    attributes:
+      label: "Related log output"
+      description: "Please paste any relevant log output here. It will automatically be formatted as code, so no backticks are necessary."
+      render: shell
+  - type: textarea
+    attributes:
+      label: "Additional Information"
+      description: "If you have any additional information to provide, you can include it here (screenshots, videos, etc., are welcome)."

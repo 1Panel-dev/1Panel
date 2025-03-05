@@ -1,0 +1,29 @@
+name: 'Feature Request'
+description: 'Suggest an idea'
+title: '[Feature] '
+assignees: wanghe-fit2cloud
+body:
+  - type: markdown
+    attributes:
+      value: "## Environment Information"
+  - type: input
+    validations:
+      required: true
+    attributes:
+      label: "1Panel Version"
+      description: "Log in to the 1Panel Web console and check the current version at the bottom right of the page."
+  - type: markdown
+    attributes:
+      value: "## Detailed information"
+  - type: textarea
+    attributes:
+      label: "Please describe your needs or suggestions for improvements"
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: "Please describe the solution you suggest"
+  - type: textarea
+    attributes:
+      label: "Additional Information"
+      description: "If you have any additional information to provide, you can include it here (screenshots, videos, etc., are welcome)."
