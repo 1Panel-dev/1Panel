@@ -466,7 +466,7 @@ const buttons = [
         click: (row: Website.Website) => {
             let params = {
                 type: 'website',
-                name: row.primaryDomain,
+                name: row.alias,
                 detailName: row.alias,
             };
             dialogBackupRef.value!.acceptParams(params);

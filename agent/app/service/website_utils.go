@@ -1161,6 +1161,7 @@ const (
 	SiteErrorLog          = "error.log"
 	WebsiteRootDir        = "WebsiteRootDir"
 	SiteDir               = "SiteDir"
+	SitesDir              = "SitesDir"
 	SiteIndexDir          = "SiteIndexDir"
 	SiteProxyDir          = "SiteProxyDir"
 	SiteSSLDir            = "SiteSSLDir"
@@ -1185,6 +1186,8 @@ func GetSitePath(website model.Website, confType string) string {
 		return path.Join(GteSiteDir(website.Alias), "log", "error.log")
 	case SiteDir:
 		return GteSiteDir(website.Alias)
+	case SitesDir:
+		return path.Join(GetWebSiteRootDir(), "sites")
 	case SiteIndexDir:
 		return path.Join(GteSiteDir(website.Alias), "index")
 	case SiteCacheDir:

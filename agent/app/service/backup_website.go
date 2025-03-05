@@ -33,7 +33,7 @@ func (u *BackupService) WebsiteBackup(req dto.CommonBackup) error {
 	}
 
 	timeNow := time.Now().Format(constant.DateTimeSlimLayout)
-	itemDir := fmt.Sprintf("website/%s", req.Name)
+	itemDir := fmt.Sprintf("website/%s", website.Alias)
 	backupDir := path.Join(global.Dir.LocalBackupDir, itemDir)
 	fileName := fmt.Sprintf("%s_%s.tar.gz", website.Alias, timeNow+common.RandStrAndNum(5))
 
@@ -45,7 +45,7 @@ func (u *BackupService) WebsiteBackup(req dto.CommonBackup) error {
 		record := &model.BackupRecord{
 			Type:              "website",
 			Name:              website.Alias,
-			DetailName:        req.DetailName,
+			DetailName:        website.Alias,
 			SourceAccountIDs:  "1",
 			DownloadAccountID: 1,
 			FileDir:           itemDir,
@@ -184,7 +184,7 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 		}
 		taskName := i18n.GetMsgByKey("TaskRecover") + i18n.GetMsgByKey("websiteDir")
 		t.Log(taskName)
-		if err = fileOp.TarGzExtractPro(fmt.Sprintf("%s/%s.web.tar.gz", tmpPath, website.Alias), GetSitePath(*website, SiteDir), ""); err != nil {
+		if err = fileOp.TarGzExtractPro(fmt.Sprintf("%s/%s.web.tar.gz", tmpPath, website.Alias), GetSitePath(*website, SitesDir), secret); err != nil {
 			t.LogFailedWithErr(taskName, err)
 			return err
 		}
