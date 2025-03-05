@@ -127,13 +127,6 @@
                                     <span>
                                         {{ $t('runtime.extendHelper') }}
                                     </span>
-                                    <!-- <el-link
-                                        target="_blank"
-                                        type="primary"
-                                        :href="globalStore.docsUrl + '/user_manual/websites/php/#php_1'"
-                                    >
-                                        {{ $t('php.toExtensionsList') }}
-                                    </el-link> -->
                                     <span
                                         class="custom-link"
                                         @click="openLink(globalStore.docsUrl + '/user_manual/websites/php/#php_1')"
@@ -225,7 +218,7 @@ const phpSources = globalStore.isIntl
     ? [
           {
               label: i18n.global.t('runtime.default'),
-              value: 'https://dl-cdn.alpinelinux.org',
+              value: 'https://deb.debian.org',
           },
           {
               label: i18n.global.t('runtime.xtom'),
@@ -259,7 +252,7 @@ const phpSources = globalStore.isIntl
           },
           {
               label: i18n.global.t('commons.table.default'),
-              value: 'https://dl-cdn.alpinelinux.org',
+              value: 'https://deb.debian.org',
           },
       ];
 

@@ -739,7 +739,7 @@ func (r *RuntimeService) InstallPHPExtension(req request.PHPExtensionInstallReq)
 	}
 	installTask.AddSubTask("", func(t *task.Task) error {
 		installCmd := fmt.Sprintf("docker exec -i %s %s %s", runtime.ContainerName, "install-ext", req.Name)
-		err = cmd2.ExecWithLogFile(installCmd, 15*time.Minute, t.Task.LogFile)
+		err = cmd2.ExecWithLogger(installCmd, t.Logger, 15*time.Minute)
 		if err != nil {
 			return err
 		}
@@ -751,7 +751,7 @@ func (r *RuntimeService) InstallPHPExtension(req request.PHPExtensionInstallReq)
 				return err
 			}
 			commitCmd := fmt.Sprintf("docker commit %s %s", runtime.ContainerName, runtime.Image)
-			err = cmd2.ExecWithLogFile(commitCmd, 15*time.Minute, t.Task.LogFile)
+			err = cmd2.ExecWithLogger(commitCmd, t.Logger, 15*time.Minute)
 			if err != nil {
 				return err
 			}

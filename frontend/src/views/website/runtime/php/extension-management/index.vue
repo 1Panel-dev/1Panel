@@ -6,6 +6,9 @@
             </el-descriptions-item>
         </el-descriptions>
         <div class="mt-5">
+            <TableSearch @search="searchByName()" v-model:searchName="searchName" />
+        </div>
+        <div class="mt-5">
             <el-text>{{ $t('runtime.popularExtension') }}</el-text>
         </div>
         <ComplexTable :data="supportExtensions" @search="search()" :heightDiff="350" v-loading="loading">
@@ -44,6 +47,8 @@ const extensions = ref([]);
 const supportExtensions = ref([]);
 const loading = ref(false);
 const taskLogRef = ref();
+const searchName = ref('');
+const data = ref([]);
 
 const handleClose = () => {
     open.value = false;
@@ -113,8 +118,19 @@ const search = async () => {
     try {
         const res = await GetPHPExtensions(runtime.value.id);
         extensions.value = res.data.extensions;
-        supportExtensions.value = res.data.supportExtensions;
+        data.value = res.data.supportExtensions;
+        searchByName();
     } catch (error) {}
+};
+
+const searchByName = () => {
+    if (searchName.value === '') {
+        supportExtensions.value = data.value;
+        return;
+    }
+    supportExtensions.value = data.value.filter((ext) =>
+        ext.name.toLowerCase().includes(searchName.value.toLowerCase()),
+    );
 };
 
 const acceptParams = (req: Runtime.Runtime): void => {

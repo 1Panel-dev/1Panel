@@ -98,7 +98,7 @@
 
         <CreateRuntime ref="createRef" @close="search" @submit="openCreateLog" />
         <OpDialog ref="opRef" @search="search" />
-        <Log ref="logRef" @close="search" />
+        <Log ref="logRef" @close="search" :heightDiff="280" />
         <Extensions ref="extensionsRef" @close="search" />
         <AppResources ref="checkRef" @close="search" />
         <ExtManagement ref="extManagementRef" @close="search" />

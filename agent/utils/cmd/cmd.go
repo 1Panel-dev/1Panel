@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"errors"
@@ -98,6 +99,50 @@ func ExecWithLogFile(cmdStr string, timeout time.Duration, outputFile string) er
 	}
 
 	return nil
+}
+
+func ExecWithLogger(cmdStr string, logger *log.Logger, timeout time.Duration) error {
+	cmd := exec.Command("bash", "-c", cmdStr)
+
+	stdoutPipe, err := cmd.StdoutPipe()
+	if err != nil {
+		return err
+	}
+	stderrPipe, err := cmd.StderrPipe()
+	if err != nil {
+		return err
+	}
+
+	if err := cmd.Start(); err != nil {
+		return err
+	}
+
+	go func() {
+		scanner := bufio.NewScanner(stdoutPipe)
+		for scanner.Scan() {
+			logger.Print(scanner.Text())
+		}
+	}()
+	go func() {
+		scanner := bufio.NewScanner(stderrPipe)
+		for scanner.Scan() {
+			logger.Print(scanner.Text())
+		}
+	}()
+
+	done := make(chan error, 1)
+	go func() {
+		done <- cmd.Wait()
+	}()
+
+	after := time.After(timeout)
+	select {
+	case <-after:
+		_ = cmd.Process.Kill()
+		return buserr.New("ErrCmdTimeout")
+	case err := <-done:
+		return err
+	}
 }
 
 func ExecContainerScript(containerName, cmdStr string, timeout time.Duration) error {

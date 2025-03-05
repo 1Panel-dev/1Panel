@@ -574,7 +574,7 @@ func unInstallPHPExtension(runtime *model.Runtime, delExtensions []string) error
 	delMap := make(map[string]struct{})
 	for _, ext := range phpExtensions {
 		for _, del := range delExtensions {
-			if ext.Check == del {
+			if ext.Name == del {
 				delMap[ext.Check] = struct{}{}
 				_ = fileOP.DeleteFile(path.Join(dir, "extensions", ext.File))
 				_ = fileOP.DeleteFile(path.Join(dir, "conf", "conf.d", "docker-php-ext-"+ext.Check+".ini"))
