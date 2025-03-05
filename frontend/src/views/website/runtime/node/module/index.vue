@@ -72,7 +72,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('commons.commons.button.uninstall'),
+        label: i18n.global.t('commons.button.uninstall'),
         click: function (row: Runtime.Runtime) {
             operateModule('uninstall', row.name);
         },

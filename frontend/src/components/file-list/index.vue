@@ -14,26 +14,20 @@
             <el-button class="close" link @click="closePage" icon="Close"></el-button>
             <div>
                 <el-button type="text" icon="HomeFilled" @click="jump(-1)"></el-button>
-                <el-button v-if="paths.length > 0" type="text">
-                    {{ paths[0] }}
-                </el-button>
+                <el-button v-if="paths.length > 0" type="text" @click="jump(0)">/{{ paths[0] }}</el-button>
                 <el-popover v-if="paths.length > 2" placement="bottom" trigger="hover">
                     <template #reference>
                         <el-button type="text">...</el-button>
                     </template>
                     <div class="hidden-paths">
-                        <el-button
-                            v-for="(item, index) in paths.slice(1, -1)"
-                            :key="index"
-                            type="text"
-                            @click="jump(index)"
-                        >
-                            {{ item }}
-                        </el-button>
+                        <div v-for="(item, index) in paths.slice(1, -1)" :key="index">
+                            <svg-icon :class="'table-icon'" iconName="p-file-folder"></svg-icon>
+                            <el-link :underline="false" @click="jump(index + 1)">{{ item }}</el-link>
+                        </div>
                     </div>
                 </el-popover>
                 <el-button v-if="paths.length > 1" type="text" @click="jump(paths.length - 1)">
-                    {{ paths[paths.length - 1] }}
+                    /{{ paths[paths.length - 1] }}
                 </el-button>
             </div>
         </div>
@@ -75,7 +69,7 @@
                                 <el-input
                                     ref="rowRefs"
                                     v-model="newFolder"
-                                    style="width: 200px"
+                                    class="p-w-200"
                                     placeholder="new folder"
                                     @input="handleChange(newFolder, row)"
                                 ></el-input>
@@ -323,7 +317,7 @@ onUpdated(() => {
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .file-list {
     position: relative;
     .close {
