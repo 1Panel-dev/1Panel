@@ -978,6 +978,12 @@ const message = {
         requestExpirationTime: '上传请求过期时间（小时）',
         unitHours: '单位：小时',
         alertTitle: '计划任务-{0}「 {1} 」任务失败告警',
+        library: {
+            script: '脚本',
+            library: '脚本库',
+            create: '添加脚本',
+            edit: '修改脚本',
+        },
     },
     monitor: {
         globalFilter: '全局过滤',

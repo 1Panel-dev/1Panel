@@ -27,6 +27,7 @@ ErrDemoEnvironment: "演示服务器，禁止此操作!"
 ErrCmdTimeout: "命令执行超时！"
 ErrEntrance: "安全入口信息错误，请检查后重试！"
 ErrGroupIsDefault: "默认分组，无法删除"
+ErrGroupIsInUse: "分组正被使用，无法删除"
 ErrLocalDelete: "无法删除本地节点！"
 ErrPortInUsed: "{{ .name }} 端口已被占用！"
 

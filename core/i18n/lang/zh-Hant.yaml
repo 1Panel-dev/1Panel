@@ -27,6 +27,7 @@ ErrDemoEnvironment: "演示伺服器，禁止此操作！"
 ErrCmdTimeout: "指令執行逾時！"
 ErrEntrance: "安全入口資訊錯誤，請檢查後再試！"
 ErrGroupIsDefault: "預設分組無法刪除"
+ErrGroupIsInUse: "分組正被使用，無法刪除。"
 ErrLocalDelete: "無法刪除本地節點！"
 ErrPortInUsed: "{{ .name }} 埠已被佔用！"
 

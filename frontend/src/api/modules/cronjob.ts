@@ -56,3 +56,16 @@ export const downloadRecord = (params: Cronjob.Download) => {
 export const handleOnce = (id: number) => {
     return http.post(`cronjobs/handle`, { id: id });
 };
+
+export const searchScript = (params: SearchWithPage) => {
+    return http.post<ResPage<Cronjob.ScriptInfo>>(`/core/script/search`, params);
+};
+export const addScript = (params: Cronjob.ScriptOperate) => {
+    return http.post(`/core/script`, params);
+};
+export const editScript = (params: Cronjob.ScriptOperate) => {
+    return http.post(`/core/script/update`, params);
+};
+export const deleteScript = (ids: Array<number>) => {
+    return http.post(`/core/script/del`, { ids: ids });
+};

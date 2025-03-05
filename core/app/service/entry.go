@@ -12,7 +12,7 @@ var (
 	launcherRepo   = repo.NewILauncherRepo()
 	upgradeLogRepo = repo.NewIUpgradeLogRepo()
 
-	taskRepo = repo.NewITaskRepo()
-
-	agentRepo = repo.NewIAgentRepo()
+	taskRepo   = repo.NewITaskRepo()
+	agentRepo  = repo.NewIAgentRepo()
+	scriptRepo = repo.NewIScriptRepo()
 )

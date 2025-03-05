@@ -994,6 +994,12 @@ const message = {
         requestExpirationTime: 'リクエストの有効期限（時間）のアップロード',
         unitHours: 'ユニット:時間',
         alertTitle: '計画タスク -  {0}「{1}」タスク障害アラート',
+        library: {
+            script: 'スクリプト',
+            library: 'スクリプトライブラリ',
+            create: 'スクリプトを追加',
+            edit: 'スクリプトを編集',
+        },
     },
     monitor: {
         globalFilter: 'グローバルフィルター',

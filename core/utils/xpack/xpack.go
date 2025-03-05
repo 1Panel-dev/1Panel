@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/core/utils/ssh"
 	"github.com/gin-gonic/gin"
 )
 
@@ -31,4 +32,8 @@ func LoadRequestTransport() *http.Transport {
 		ResponseHeaderTimeout: 10 * time.Second,
 		IdleConnTimeout:       15 * time.Second,
 	}
+}
+
+func LoadNodeInfo(currentNode string) (*ssh.ConnInfo, string, error) {
+	return nil, "", nil
 }

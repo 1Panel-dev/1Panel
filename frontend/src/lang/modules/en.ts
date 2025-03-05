@@ -1033,6 +1033,12 @@ const message = {
         requestExpirationTime: 'Upload Request Expiration Time（Hours）',
         unitHours: 'Unit: Hours',
         alertTitle: 'Planned Task - {0} 「{1}」 Task Failure Alert',
+        library: {
+            script: 'Script',
+            library: 'Script Library',
+            create: 'Add Script',
+            edit: 'Edit Script',
+        },
     },
     monitor: {
         globalFilter: 'Global Filter',

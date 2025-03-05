@@ -59,7 +59,7 @@ type LogicSshWsSession struct {
 	IsFlagged       bool
 }
 
-func NewLogicSshWsSession(cols, rows int, isAdmin bool, sshClient *ssh.Client, wsConn *websocket.Conn) (*LogicSshWsSession, error) {
+func NewLogicSshWsSession(cols, rows int, sshClient *ssh.Client, wsConn *websocket.Conn, initCmd string) (*LogicSshWsSession, error) {
 	sshSession, err := sshClient.NewSession()
 	if err != nil {
 		return nil, err
@@ -87,6 +87,10 @@ func NewLogicSshWsSession(cols, rows int, isAdmin bool, sshClient *ssh.Client, w
 	if err := sshSession.Shell(); err != nil {
 		return nil, err
 	}
+	if len(initCmd) != 0 {
+		time.Sleep(100 * time.Millisecond)
+		_, _ = stdinP.Write([]byte(initCmd + "\n"))
+	}
 	return &LogicSshWsSession{
 		stdinPipe:       stdinP,
 		comboOutput:     comboWriter,
@@ -94,7 +98,7 @@ func NewLogicSshWsSession(cols, rows int, isAdmin bool, sshClient *ssh.Client, w
 		inputFilterBuff: inputBuf,
 		session:         sshSession,
 		wsConn:          wsConn,
-		isAdmin:         isAdmin,
+		isAdmin:         true,
 		IsFlagged:       false,
 	}, nil
 }
@@ -110,6 +114,7 @@ func (sws *LogicSshWsSession) Close() {
 		sws.comboOutput = nil
 	}
 }
+
 func (sws *LogicSshWsSession) Start(quitChan chan bool) {
 	go sws.receiveWsMsg(quitChan)
 	go sws.sendComboOutput(quitChan)

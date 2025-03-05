@@ -18,4 +18,5 @@ var (
 	groupService       = service.NewIGroupService()
 	commandService     = service.NewICommandService()
 	appLauncherService = service.NewIAppLauncher()
+	scriptService      = service.NewIScriptService()
 )

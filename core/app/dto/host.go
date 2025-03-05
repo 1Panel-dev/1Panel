@@ -30,12 +30,6 @@ type HostConnTest struct {
 	PassPhrase string `json:"passPhrase"`
 }
 
-type SearchHostWithPage struct {
-	PageInfo
-	GroupID uint   `json:"groupID"`
-	Info    string `json:"info"`
-}
-
 type SearchForTree struct {
 	Info string `json:"info"`
 }

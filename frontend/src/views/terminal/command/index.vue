@@ -18,7 +18,6 @@
             <template #rightToolBar>
                 <el-select v-model="group" @change="search()" clearable class="p-w-200 mr-2.5">
                     <template #prefix>{{ $t('commons.table.group') }}</template>
-                    <el-option :label="$t('commons.table.all')" value=""></el-option>
                     <div v-for="item in groupList" :key="item.id">
                         <el-option
                             v-if="item.name === 'default'"

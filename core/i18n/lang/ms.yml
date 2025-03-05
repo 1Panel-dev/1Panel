@@ -27,6 +27,7 @@ ErrDemoEnvironment: "Pelayan demo, operasi ini dilarang!"
 ErrCmdTimeout: "Perintah telah tamat masa!"
 ErrEntrance: "Maklumat pintu masuk keselamatan salah, sila periksa dan cuba lagi!"
 ErrGroupIsDefault: "Kumpulan lalai tidak boleh dihapuskan"
+ErrGroupIsInUse: "Kumpulan sedang digunakan dan tidak boleh dipadam."
 ErrLocalDelete: "Nod tempatan tidak boleh dihapuskan!"
 ErrPortInUsed: "Port {{ .name }} telah digunakan!"
 

@@ -1017,6 +1017,12 @@ const message = {
         requestExpirationTime: 'Время истечения запроса на загрузку (часы)',
         unitHours: 'Единица: часы',
         alertTitle: 'Плановая задача - {0} «{1}» Оповещение о сбое задачи',
+        library: {
+            script: 'Скрипт',
+            library: 'Библиотека скриптов',
+            create: 'Добавить скрипт',
+            edit: 'Редактировать скрипт',
+        },
     },
     monitor: {
         globalFilter: 'Глобальный фильтр',

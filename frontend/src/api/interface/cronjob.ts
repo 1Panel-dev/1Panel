@@ -120,4 +120,22 @@ export namespace Cronjob {
         targetPath: string;
         interval: number;
     }
+
+    export interface ScriptInfo {
+        id: number;
+        name: string;
+        script: string;
+        groups: string;
+        groupList: Array<number>;
+        groupBelong: Array<string>;
+        description: string;
+        createdAt: Date;
+    }
+    export interface ScriptOperate {
+        id: number;
+        name: string;
+        script: string;
+        groups: string;
+        description: string;
+    }
 }

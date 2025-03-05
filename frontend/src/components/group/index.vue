@@ -52,7 +52,7 @@
                             </el-button>
                             <el-button
                                 link
-                                v-if="!row.edit && !row.isDefault && !row.isDelete"
+                                v-if="hideDefaultButton && !row.edit && !row.isDefault && !row.isDelete"
                                 type="primary"
                                 @click="setDefault(row)"
                             >
@@ -75,6 +75,7 @@ import { Rules } from '@/global/form-rules';
 import { FormInstance } from 'element-plus';
 
 const open = ref(false);
+const hideDefaultButton = ref(false);
 const type = ref();
 const data = ref();
 const handleClose = () => {
@@ -84,10 +85,12 @@ const handleClose = () => {
 };
 interface DialogProps {
     type: string;
+    hideDefaultButton: boolean;
 }
 
 const groupForm = ref<FormInstance>();
 const acceptParams = (params: DialogProps): void => {
+    hideDefaultButton.value = params.hideDefaultButton;
     type.value = params.type;
     open.value = true;
     search();

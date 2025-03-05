@@ -27,6 +27,7 @@ ErrDemoEnvironment: "デモサーバーではこの操作は許可されてい�
 ErrCmdTimeout: "コマンドの実行がタイムアウトしました！"
 ErrEntrance: "セキュリティ情報エラー、再確認してください！"
 ErrGroupIsDefault: "デフォルトグループの削除はできません"
+ErrGroupIsInUse: "グループは使用中のため、削除できません。"
 ErrLocalDelete: "ローカルノードは削除できません！"
 ErrPortInUsed: "{{ .name }} ポートはすでに使用されています！"
 

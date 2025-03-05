@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"net/http"
+	"strconv"
+	"strings"
 
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/model"
@@ -74,6 +76,22 @@ func (u *GroupService) Delete(id uint) error {
 	if group.ID == 0 {
 		return buserr.New("ErrRecordNotFound")
 	}
+	if group.Type == "script" {
+		list, _ := scriptRepo.GetList()
+		if len(list) == 0 {
+			return groupRepo.Delete(repo.WithByID(id))
+		}
+		for _, itemData := range list {
+			groupIDs := strings.Split(itemData.Groups, ",")
+			for _, idItem := range groupIDs {
+				groupID, _ := strconv.Atoi(idItem)
+				if uint(groupID) == id {
+					return buserr.New("ErrGroupIsInUse")
+				}
+			}
+		}
+		return groupRepo.Delete(repo.WithByID(id))
+	}
 	if group.IsDefault {
 		return buserr.New("ErrGroupIsDefault")
 	}
@@ -83,6 +101,8 @@ func (u *GroupService) Delete(id uint) error {
 	}
 	switch group.Type {
 	case "host":
+		err = hostRepo.UpdateGroup(id, defaultGroup.ID)
+	case "script":
 		err = hostRepo.UpdateGroup(id, defaultGroup.ID)
 	case "command":
 		err = commandRepo.UpdateGroup(id, defaultGroup.ID)

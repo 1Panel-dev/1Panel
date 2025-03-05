@@ -638,7 +638,6 @@ function load18n(label: string) {
             return i18n.global.t('logs.task');
         case 'Database':
         case 'Cronjob':
-        case 'Database':
         case 'Container':
         case 'App':
         case 'System':

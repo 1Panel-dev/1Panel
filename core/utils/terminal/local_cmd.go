@@ -25,12 +25,20 @@ type LocalCommand struct {
 	pty *os.File
 }
 
-func NewCommand(commands []string) (*LocalCommand, error) {
-	cmd := exec.Command("docker", commands...)
-
+func NewCommand(initCmd string) (*LocalCommand, error) {
+	cmd := exec.Command("bash")
+	if term := os.Getenv("TERM"); term != "" {
+		cmd.Env = append(os.Environ(), "TERM="+term)
+	} else {
+		cmd.Env = append(os.Environ(), "TERM=xterm")
+	}
 	pty, err := pty.Start(cmd)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to start command")
+	}
+	if len(initCmd) != 0 {
+		time.Sleep(100 * time.Millisecond)
+		_, _ = pty.Write([]byte(initCmd + "\n"))
 	}
 
 	lcmd := &LocalCommand{

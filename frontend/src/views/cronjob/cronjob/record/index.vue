@@ -229,7 +229,7 @@ import { MsgSuccess } from '@/utils/message';
 import { listDbItems } from '@/api/modules/database';
 import { listAppInstalled } from '@/api/modules/app';
 import { shortcuts } from '@/utils/shortcuts';
-import TaskLog from '@/components/log/task/log-without-dialog.vue';
+import TaskLog from '@/components/log/task/index.vue';
 
 const loading = ref();
 const refresh = ref(false);

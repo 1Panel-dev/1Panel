@@ -23,6 +23,7 @@ func Init() {
 		migrations.AddMFAInterval,
 		migrations.UpdateXpackHideMemu,
 		migrations.AddSystemIP,
+		migrations.InitScriptLibrary,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

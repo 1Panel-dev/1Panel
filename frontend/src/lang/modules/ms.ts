@@ -1023,6 +1023,12 @@ const message = {
         requestExpirationTime: 'Waktu luput permintaan muat naik (Jam)',
         unitHours: 'Unit: Jam',
         alertTitle: 'Tugas Terancang - {0} 「{1}」 Amaran Kegagalan Tugas',
+        library: {
+            script: 'Skrip',
+            library: 'Perpustakaan Skrip',
+            create: 'Tambah Skrip',
+            edit: 'Sunting Skrip',
+        },
     },
     monitor: {
         globalFilter: 'Penapis Global',

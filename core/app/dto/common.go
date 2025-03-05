@@ -11,6 +11,12 @@ type SearchPageWithType struct {
 	Info string `json:"info"`
 }
 
+type SearchPageWithGroup struct {
+	PageInfo
+	GroupID uint   `json:"groupID"`
+	Info    string `json:"info"`
+}
+
 type PageInfo struct {
 	Page     int `json:"page" validate:"required,number"`
 	PageSize int `json:"pageSize" validate:"required,number"`

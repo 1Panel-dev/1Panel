@@ -27,6 +27,7 @@ ErrDemoEnvironment: "Servidor de demonstração, essa operação é proibida!"
 ErrCmdTimeout: "Tempo de execução do comando esgotado!"
 ErrEntrance: "Erro nas informações de entrada de segurança, por favor, verifique e tente novamente!"
 ErrGroupIsDefault: "Grupo padrão não pode ser excluído"
+ErrGroupIsInUse: "O grupo está em uso e não pode ser excluído."
 ErrLocalDelete: "O nó local não pode ser excluído!"
 ErrPortInUsed: "A porta {{ .name }} já está em uso!"
 

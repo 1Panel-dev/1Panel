@@ -980,6 +980,12 @@ const message = {
         requestExpirationTime: '上傳請求過期時間（小時）',
         unitHours: '單位：小時',
         alertTitle: '計畫任務-{0}「{1}」任務失敗告警',
+        library: {
+            script: '腳本',
+            library: '腳本庫',
+            create: '添加腳本',
+            edit: '修改腳本',
+        },
     },
     monitor: {
         globalFilter: '全局過濾',

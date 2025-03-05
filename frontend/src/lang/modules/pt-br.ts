@@ -1012,6 +1012,12 @@ const message = {
         requestExpirationTime: 'Tempo de expiração da solicitação de upload (Horas)',
         unitHours: 'Unidade: Horas',
         alertTitle: 'Tarefa Planejada - {0} 「{1}」 Alerta de Falha na Tarefa',
+        library: {
+            script: 'Script',
+            library: 'Biblioteca de Scripts',
+            create: 'Adicionar Script',
+            edit: 'Editar Script',
+        },
     },
     monitor: {
         globalFilter: 'Filtro global',

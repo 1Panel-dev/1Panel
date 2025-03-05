@@ -111,13 +111,13 @@ func (b *BaseApi) HostTree(c *gin.Context) {
 // @Tags Host
 // @Summary Page host
 // @Accept json
-// @Param request body dto.SearchHostWithPage true "request"
+// @Param request body dto.SearchPageWithGroup true "request"
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /core/hosts/search [post]
 func (b *BaseApi) SearchHost(c *gin.Context) {
-	var req dto.SearchHostWithPage
+	var req dto.SearchPageWithGroup
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
@@ -304,7 +304,7 @@ func (b *BaseApi) WsSsh(c *gin.Context) {
 		return
 	}
 	defer client.Close()
-	sws, err := terminal.NewLogicSshWsSession(cols, rows, true, client.Client, wsConn)
+	sws, err := terminal.NewLogicSshWsSession(cols, rows, client.Client, wsConn, "")
 	if wshandleError(wsConn, err) {
 		return
 	}

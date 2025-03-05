@@ -27,6 +27,7 @@ ErrDemoEnvironment: "Demo server, this operation is prohibited!"
 ErrCmdTimeout: "Command execution timeout!"
 ErrEntrance: "Security entrance information error, please check and try again!"
 ErrGroupIsDefault: "Default group, unable to delete"
+ErrGroupIsInUse: "The group is in use and cannot be deleted."
 ErrLocalDelete: "Cannot delete the local node!"
 ErrPortInUsed: "The {{ .name }} port is already in use!"
 
