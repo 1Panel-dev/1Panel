@@ -57,6 +57,7 @@ ErrXpackTimeout: "Requisição expirou, a conexão de rede pode estar instável,
 ErrUnbindMaster: "Foram encontrados nós na gestão de nós, remova-os primeiro e tente novamente!"
 ErrFreeNodeLimit: "O número de nós da versão comunitária atingiu o limite gratuito, por favor acesse www.lxware.cn/1panel para comprar!"
 ErrNodeBound: "Esta licença já está vinculada a outro nó, por favor verifique e tente novamente!"
+ErrNodeBoundLimit: "O nó gratuito atual atingiu seu limite, por favor verifique e tente novamente!"
 ErrNoSuchNode: "As informações deste nó não foram encontradas, por favor verifique e tente novamente!"
 ErrNodeUnbind: "Nó fora do escopo da licença detectado, por favor verifique e tente novamente!"
 ErrNodeBind: "Este nó já está vinculado a uma licença, por favor verifique e tente novamente!"

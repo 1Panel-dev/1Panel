@@ -181,9 +181,9 @@ import LicenseImport from '@/components/license-import/index.vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { Toolbox } from '@/api/interface/toolbox';
 import { createClam, updateClam } from '@/api/modules/toolbox';
-import { specOptions, transObjToSpec, transSpecToObj, weekOptions } from '../../../cronjob/helper';
 import { storeToRefs } from 'pinia';
 import { GlobalStore } from '@/store';
+import { specOptions, transObjToSpec, transSpecToObj, weekOptions } from '@/views/cronjob/cronjob/helper';
 
 const globalStore = GlobalStore();
 const licenseRef = ref();

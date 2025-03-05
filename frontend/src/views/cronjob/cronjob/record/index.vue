@@ -173,11 +173,11 @@
                                     </div>
                                 </el-row>
                                 <el-row v-if="currentRecord?.taskID">
-                                    <TaskLog
+                                    <LogFile
+                                        :defaultButton="false"
                                         class="w-full"
-                                        :taskID="currentRecord?.taskID"
-                                        :key="currentRecord?.taskID"
-                                        :heightDiff="200"
+                                        :heightDiff="410"
+                                        :config="{ type: 'task', taskID: currentRecord?.taskID, tail: true }"
                                     />
                                 </el-row>
                             </el-form>
@@ -223,13 +223,13 @@ import { nextTick, onBeforeUnmount, reactive, ref } from 'vue';
 import { Cronjob } from '@/api/interface/cronjob';
 import { searchRecords, handleOnce, updateStatus, cleanRecords, getRecordLog } from '@/api/modules/cronjob';
 import { dateFormat } from '@/utils/util';
+import LogFile from '@/components/log/file/index.vue';
 import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
 import { listDbItems } from '@/api/modules/database';
 import { listAppInstalled } from '@/api/modules/app';
 import { shortcuts } from '@/utils/shortcuts';
-import TaskLog from '@/components/log/task/index.vue';
 
 const loading = ref();
 const refresh = ref(false);

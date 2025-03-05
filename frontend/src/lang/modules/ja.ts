@@ -2992,8 +2992,14 @@ const message = {
             alertTitle3: 'アラート設定',
             alertContent3:
                 'カスタム電話番号、日々のプッシュ頻度、日々のプッシュ時間設定を提供し、ユーザーがより合理的なプッシュアラートを設定しやすく。',
+
+            nodeTitle1: 'マルチノード管理',
+            nodeContent1: '異なるノードを管理する',
+            nodeTitle2: 'バルクアップグレード',
+            nodeContent2: '複数のノードを一括アップグレード',
         },
         node: {
+            master: '主ノード',
             node: 'ノード',
             addr: 'アドレス',
             memTotal: '総メモリ',

@@ -3060,8 +3060,14 @@ const message = {
             alertTitle3: 'Tetapan Amaran',
             alertContent3:
                 'Memberikan pengguna konfigurasi nombor telefon tersuai, kekerapan push harian, dan masa push harian, memudahkan pengguna untuk menetapkan amaran push yang lebih munasabah.',
+
+            nodeTitle1: 'Pengurusan Multi-Nod',
+            nodeContent1: 'Mengurus nod yang berbeza',
+            nodeTitle2: 'Peningkatan Pukal',
+            nodeContent2: 'Peningkatan secara pukal untuk beberapa nod',
         },
         node: {
+            master: 'Nod Utama',
             node: 'Nod',
             addr: 'Alamat',
             memTotal: 'Jumlah Memori',

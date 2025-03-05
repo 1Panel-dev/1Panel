@@ -105,7 +105,7 @@
         </DrawerPro>
 
         <DialogPro
-            v-model="openRecover"
+            v-model="recoverDialog"
             :title="$t('commons.button.recover') + ' - ' + name"
             @close="handleRecoverClose"
         >
@@ -159,7 +159,7 @@ const uploadPercent = ref<number>(0);
 const selects = ref<any>([]);
 const baseDir = ref();
 const opRef = ref();
-const openRecover = ref();
+const currentRow = ref();
 const data = ref();
 const title = ref();
 const paginationConfig = reactive({
@@ -173,8 +173,9 @@ const name = ref();
 const detailName = ref();
 const remark = ref();
 const secret = ref();
-const fileName = ref();
 const taskLogRef = ref();
+
+const recoverDialog = ref();
 
 const acceptParams = async (params: DialogProps): Promise<void> => {
     type.value = params.type;
@@ -227,7 +228,7 @@ const onHandleRecover = async () => {
         type: type.value,
         name: name.value,
         detailName: detailName.value,
-        file: baseDir.value + fileName.value,
+        file: baseDir.value + currentRow.value.name,
         secret: secret.value,
         taskID: newUUID(),
     };
@@ -247,8 +248,21 @@ const onHandleRecover = async () => {
 };
 
 const onRecover = async (row: File.File) => {
-    fileName.value = row.name;
-    openRecover.value = true;
+    currentRow.value = row;
+    if (type.value !== 'app' && type.value !== 'website') {
+        ElMessageBox.confirm(
+            i18n.global.t('commons.msg.recoverHelper', [row.name]),
+            i18n.global.t('commons.button.recover'),
+            {
+                confirmButtonText: i18n.global.t('commons.button.confirm'),
+                cancelButtonText: i18n.global.t('commons.button.cancel'),
+            },
+        ).then(async () => {
+            onHandleRecover();
+        });
+        return;
+    }
+    recoverDialog.value = true;
 };
 
 const uploaderFiles = ref<UploadFiles>([]);
@@ -284,7 +298,7 @@ const handleUploadClose = () => {
 };
 
 const handleRecoverClose = () => {
-    openRecover.value = false;
+    recoverDialog.value = false;
 };
 
 const handleExceed: UploadProps['onExceed'] = (files) => {

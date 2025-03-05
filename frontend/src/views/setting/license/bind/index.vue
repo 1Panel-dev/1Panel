@@ -74,7 +74,7 @@ const onBind = async (formEl: FormInstance | undefined) => {
 
 const loadNodes = async () => {
     if (!globalStore.isMasterProductPro) {
-        freeNodes.value = [{ id: 0, name: i18n.global.t('terminal.local') }];
+        freeNodes.value = [{ id: 0, name: i18n.global.t('xpack.node.master') }];
         return;
     }
     await listNodeOptions()

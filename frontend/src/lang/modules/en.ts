@@ -3180,8 +3180,14 @@ const message = {
             alertTitle3: 'Alert Settings',
             alertContent3:
                 'Provide users with custom phone numbers, daily push frequency, and daily push time configurations, making it easier for users to set up more reasonable push alerts.',
+
+            nodeTitle1: 'Multi-Node Management',
+            nodeContent1: 'Manage different nodes',
+            nodeTitle2: 'Bulk Upgrade',
+            nodeContent2: 'Bulk upgrade multiple nodes',
         },
         node: {
+            master: 'Main Node',
             node: 'Node',
             addr: 'Address',
             memTotal: 'Total Memory',

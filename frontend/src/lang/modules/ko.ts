@@ -2941,8 +2941,14 @@ const message = {
             alertTitle3: '알림 설정',
             alertContent3:
                 '사용자에게 전화번호, 일일 푸시 빈도, 일일 푸시 시간 등을 사용자 정의할 수 있는 설정을 제공하여 보다 합리적인 푸시 알림을 설정할 수 있도록 합니다.',
+
+            nodeTitle1: '다중 노드 관리',
+            nodeContent1: '다양한 노드 관리',
+            nodeTitle2: '대량 업그레이드',
+            nodeContent2: '여러 노드를 대량 업그레이드',
         },
         node: {
+            master: '주 노드',
             node: '노드',
             addr: '주소',
             memTotal: '총 메모리',

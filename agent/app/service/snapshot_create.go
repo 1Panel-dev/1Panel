@@ -71,11 +71,13 @@ func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate, isCron bool) er
 		return err
 	}
 	if !isCron {
-		go handleSnapshot(req, taskItem)
+		go func() {
+			_ = handleSnapshot(req, taskItem)
+		}()
 		return nil
 	}
-	handleSnapshot(req, taskItem)
-	return nil
+
+	return handleSnapshot(req, taskItem)
 }
 
 func (u *SnapshotService) SnapshotReCreate(id uint) error {
@@ -105,12 +107,14 @@ func (u *SnapshotService) SnapshotReCreate(id uint) error {
 		global.LOG.Errorf("new task for create snapshot failed, err: %v", err)
 		return err
 	}
-	go handleSnapshot(req, taskItem)
+	go func() {
+		_ = handleSnapshot(req, taskItem)
+	}()
 
 	return nil
 }
 
-func handleSnapshot(req dto.SnapshotCreate, taskItem *task.Task) {
+func handleSnapshot(req dto.SnapshotCreate, taskItem *task.Task) error {
 	rootDir := path.Join(global.Dir.TmpDir, "system", req.Name)
 	itemHelper := snapHelper{SnapID: req.ID, Task: *taskItem, FileOp: files.NewFileOp(), Ctx: context.Background()}
 	baseDir := path.Join(rootDir, "base")
@@ -185,10 +189,11 @@ func handleSnapshot(req dto.SnapshotCreate, taskItem *task.Task) {
 	}
 	if err := taskItem.Execute(); err != nil {
 		_ = snapshotRepo.Update(req.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error(), "interrupt_step": taskItem.Task.CurrentStep})
-		return
+		return err
 	}
 	_ = snapshotRepo.Update(req.ID, map[string]interface{}{"status": constant.StatusSuccess, "interrupt_step": ""})
 	_ = os.RemoveAll(rootDir)
+	return nil
 }
 
 type snapHelper struct {

@@ -27,7 +27,7 @@
                         <el-dropdown-menu>
                             <el-dropdown-item command="local">
                                 <el-button link icon="CircleCheck" type="success" />
-                                {{ $t('terminal.local') }}
+                                {{ $t('xpack.node.master') }}
                             </el-dropdown-item>
                             <el-dropdown-item
                                 :disabled="item.status !== 'Healthy'"
@@ -116,9 +116,9 @@ const openChangeNode = () => {
 
 const loadCurrentName = () => {
     if (globalStore.currentNode) {
-        return globalStore.currentNode === 'local' ? i18n.global.t('terminal.local') : globalStore.currentNode;
+        return globalStore.currentNode === 'local' ? i18n.global.t('xpack.node.master') : globalStore.currentNode;
     }
-    return i18n.global.t('terminal.local');
+    return i18n.global.t('xpack.node.master');
 };
 
 const screenWidth = ref(0);

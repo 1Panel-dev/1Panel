@@ -57,6 +57,7 @@ ErrXpackTimeout: "请求超时，网络连接可能不稳定，请稍后再试�
 ErrUnbindMaster: "检测到节点管理内存在节点，无法解绑当前许可证，请先移除后重试！"
 ErrFreeNodeLimit: "社区版节点数量已达到免费上限，请前往 www.lxware.cn/1panel 购买后重试！"
 ErrNodeBound: "该许可证已绑定到其他节点，请检查后重试！"
+ErrNodeBoundLimit: "当前免费节点已经达到上限，请检查后重试！"
 ErrNoSuchNode: "未能找到该节点信息，请检查后重试！"
 ErrNodeUnbind: "检测到该节点未在许可证绑定范围内，请检查后重试！"
 ErrNodeBind: "检测到该节点已绑定许可证，请检查后重试！"

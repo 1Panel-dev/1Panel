@@ -171,7 +171,7 @@ import ClamStatus from '@/views/toolbox/clam/status/index.vue';
 import SettingDialog from '@/views/toolbox/clam/setting/index.vue';
 import { Toolbox } from '@/api/interface/toolbox';
 import router from '@/routers';
-import { transSpecToStr } from '../../cronjob/helper';
+import { transSpecToStr } from '@/views/cronjob/cronjob/helper';
 import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';
 

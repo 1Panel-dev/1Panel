@@ -3064,8 +3064,14 @@ const message = {
             alertTitle3: 'Configurações de Alertas',
             alertContent3:
                 'Permite que os usuários configurem números de telefone personalizados, frequência de envio diário e horários de envio, facilitando a criação de alertas mais adequados.',
+
+            nodeTitle1: 'Gerenciamento de Múltiplos Nós',
+            nodeContent1: 'Gerenciar diferentes nós',
+            nodeTitle2: 'Atualização em Lote',
+            nodeContent2: 'Atualizar vários nós em lote',
         },
         node: {
+            master: 'Nó Principal',
             node: 'Nó',
             addr: 'Endereço',
             memTotal: 'Memória Total',

@@ -462,7 +462,7 @@
             </div>
 
             <div v-if="!globalStore.isIntl">
-                <el-form-item prop="hasAlert" v-if="alertTypes.includes(dialogData.rowData!.type)">
+                <el-form-item prop="hasAlert">
                     <el-checkbox v-model="dialogData.rowData!.hasAlert" :label="$t('xpack.alert.isAlert')" />
                     <span class="input-help">{{ $t('xpack.alert.cronJobHelper') }}</span>
                 </el-form-item>
@@ -561,7 +561,6 @@ const router = useRouter();
 const globalStore = GlobalStore();
 const licenseRef = ref();
 const { isProductPro } = storeToRefs(globalStore);
-const alertTypes = ['app', 'website', 'database', 'directory', 'log', 'snapshot'];
 
 interface DialogProps {
     title: string;
@@ -612,6 +611,8 @@ const acceptParams = (params: DialogProps): void => {
         dialogData.value.rowData.dbType = 'mysql';
         dialogData.value.rowData.isDir = true;
     }
+    dialogData.value.rowData.hasAlert = dialogData.value.rowData!.alertCount > 0;
+    dialogData.value.rowData!.alertCount = dialogData.value.rowData!.alertCount || 3;
     dialogData.value.rowData!.command = dialogData.value.rowData!.command || 'sh';
     dialogData.value.rowData!.isCustom =
         dialogData.value.rowData!.command !== 'sh' &&
@@ -1052,7 +1053,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         }
 
         dialogData.value.rowData.alertCount =
-            dialogData.value.rowData!.hasAlert && isProductPro.value ? dialogData.value.rowData.alertCount : 0;
+            dialogData.value.rowData!.hasAlert && isProductPro.value ? dialogData.value.rowData.alertCount : 3;
         dialogData.value.rowData.alertTitle =
             dialogData.value.rowData!.hasAlert && isProductPro.value
                 ? i18n.global.t('cronjob.alertTitle', [

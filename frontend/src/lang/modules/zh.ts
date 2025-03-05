@@ -2932,6 +2932,7 @@ const message = {
             nodeContent2: '多个节点批量升级',
         },
         node: {
+            master: '主节点',
             node: '节点',
             addr: '地址',
             memTotal: '内存总计',

@@ -103,8 +103,15 @@ func (u *CronjobService) LoadNextHandle(specStr string) ([]string, error) {
 		if strings.HasSuffix(specStr, "s") {
 			duration = time.Second
 		}
+		interval := strings.ReplaceAll(specStr, "@every ", "")
+		interval = strings.ReplaceAll(interval, "s", "")
+		interval = strings.ReplaceAll(interval, "m", "")
+		durationItem, err := strconv.Atoi(interval)
+		if err != nil {
+			return nil, err
+		}
 		for i := 0; i < 5; i++ {
-			nextTime := now.Add(duration)
+			nextTime := now.Add(time.Duration(durationItem) * duration)
 			nexts[i] = nextTime.Format(constant.DateTimeLayout)
 			now = nextTime
 		}

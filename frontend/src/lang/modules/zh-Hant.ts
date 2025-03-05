@@ -2944,8 +2944,14 @@ const message = {
             alertTitle3: '告警設定',
             alertContent3:
                 '為用戶提供自訂手機號、每日推送次數、每日推送時間的配寘，方便用戶的設定來更加合理的進行推送告警。',
+
+            nodeTitle1: '多節點管理',
+            nodeContent1: '管理不同的節點',
+            nodeTitle2: '批量升級',
+            nodeContent2: '多個節點批量升級',
         },
         node: {
+            master: '主節點',
             node: '節點',
             addr: '地址',
             memTotal: '記憶體總計',

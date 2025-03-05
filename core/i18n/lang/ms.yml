@@ -57,6 +57,7 @@ ErrXpackTimeout: "Permintaan tamat masa, sambungan rangkaian mungkin tidak stabi
 ErrUnbindMaster: "Terdapat nod dalam pengurusan nod, sila keluarkan dahulu dan cuba lagi!"
 ErrFreeNodeLimit: "Jumlah nod versi komuniti telah mencapai had percuma, sila lawati www.lxware.cn/1panel untuk pembelian!"
 ErrNodeBound: "Lesen ini telah diikat dengan nod lain, sila semak dan cuba lagi!"
+ErrNodeBoundLimit: "Nod percuma semasa telah mencapai had, sila semak dan cuba lagi!"
 ErrNoSuchNode: "Maklumat nod tidak ditemui, sila semak dan cuba lagi!"
 ErrNodeUnbind: "Nod di luar skop lesen dikesan, sila semak dan cuba lagi!"
 ErrNodeBind: "Nod ini telah diikat dengan lesen, sila semak dan cuba lagi!"
