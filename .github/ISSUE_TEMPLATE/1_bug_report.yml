@@ -1,10 +1,10 @@
-name: 'Bug Report'
+mozafar_sekaloo_vpnname: 'Bug Report'
 description: 'Report an Bug'
 title: '[Bug] '
 assignees: wanghe-fit2cloud
 body:
   - type: markdown
-    attributes:
+    attributes: Https://mozi000
       value: "## Contact Information"
   - type: input
     validations:
