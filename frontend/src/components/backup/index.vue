@@ -81,7 +81,7 @@
         <el-form ref="backupForm" label-position="left" v-loading="loading">
             <el-form-item
                 :label="$t('setting.compressPassword')"
-                style="margin-top: 10px"
+                class="mt-10"
                 v-if="type === 'app' || type === 'website'"
             >
                 <el-input v-model="secret" :placeholder="$t('setting.backupRecoverMessage')" />
@@ -162,6 +162,7 @@ const acceptParams = (params: DialogProps): void => {
     detailName.value = params.detailName;
     backupVisible.value = true;
     status.value = params.status;
+    console.log(type);
     search();
 };
 const handleClose = () => {

@@ -254,7 +254,7 @@ const checkImageName = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.imageName')));
     } else {
-        const reg = /^[a-zA-Z0-9]{1}[a-z:@A-Z0-9_/.-]{0,256}$/;
+        const reg = /^[a-zA-Z0-9]{1}[a-z:@A-Z0-9_/.-]{0,255}$/;
         if (!reg.test(value) && value !== '') {
             callback(new Error(i18n.global.t('commons.rule.imageName')));
         } else {

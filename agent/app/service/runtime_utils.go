@@ -173,6 +173,10 @@ func SyncRuntimesStatus(runtimes []model.Runtime) error {
 	}
 	for _, contain := range containers {
 		if index, ok := runtimeContainer[contain.Names[0]]; ok {
+			if runtimes[index].Status == constant.StatusBuilding || runtimes[index].Status == constant.StatusCreating {
+				delete(runtimeContainer, contain.Names[0])
+				continue
+			}
 			switch contain.State {
 			case "exited":
 				runtimes[index].Status = constant.StatusError

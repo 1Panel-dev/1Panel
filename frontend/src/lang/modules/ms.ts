@@ -199,12 +199,11 @@ const message = {
             commonName:
                 'Ruangan ini mesti bermula dengan aksara bukan khas dan mesti terdiri daripada aksara rumi, Cina, nombor, ".", "-", dan "_" dengan panjang 1-128 aksara.',
             userName:
-                'Ruangan ini mesti terdiri daripada aksara rumi, Cina, nombor, dan "_" dengan panjang 3-30 aksara.',
+                'Menyokong bermula dengan bukan aksara khas, Bahasa Inggeris, Bahasa Cina, nombor, dan _, panjang 3-30',
             simpleName: `Ruangan ini tidak boleh bermula dengan aksara garis bawah ("_") dan mesti terdiri daripada aksara rumi, nombor, dan "_" dengan panjang 3-30 aksara.`,
             simplePassword: `Ruangan ini tidak boleh bermula dengan aksara garis bawah ("_") dan mesti terdiri daripada aksara rumi, nombor, dan "_" dengan panjang 1-30 aksara.`,
             dbName: `Ruangan ini tidak boleh bermula dengan aksara garis bawah ("_") dan mesti terdiri daripada aksara rumi, nombor, dan "_" dengan panjang 1-64 aksara.`,
-            imageName:
-                'Ruangan ini mesti terdiri daripada aksara rumi, nombor, ":", "@", "/", ".", "-", dan "_" dengan panjang 1-256 aksara.',
+            imageName: 'Menyokong bermula dengan bukan aksara khas, Bahasa Inggeris, nombor, :@/.-_, panjang 1-256',
             composeName:
                 'Menyokong aksara bukan khas pada permulaan, huruf kecil, nombor, "-", dan "_", dengan panjang 1-256 aksara.',
             volumeName:
