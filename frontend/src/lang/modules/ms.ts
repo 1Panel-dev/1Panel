@@ -1233,6 +1233,8 @@ const message = {
         },
     },
     logs: {
+        core: 'Perkhidmatan Panel',
+        agent: 'Pemantauan Nod',
         panelLog: 'Log Panel',
         operation: 'Log Operasi',
         login: 'Log Masuk',

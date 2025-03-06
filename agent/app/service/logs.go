@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path"
-	"path/filepath"
 	"sort"
 	"strings"
 	"time"
@@ -25,35 +24,45 @@ func NewILogService() ILogService {
 }
 
 func (u *LogService) ListSystemLogFile() ([]string, error) {
-	var files []string
-	if err := filepath.Walk(global.Dir.LogDir, func(pathItem string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if !info.IsDir() && strings.HasPrefix(info.Name(), "1Panel") {
-			if info.Name() == "1Panel.log" {
-				files = append(files, time.Now().Format("2006-01-02"))
-				return nil
-			}
-			itemFileName := strings.TrimPrefix(info.Name(), "1Panel-")
-			itemFileName = strings.TrimSuffix(itemFileName, ".gz")
-			itemFileName = strings.TrimSuffix(itemFileName, ".log")
-			files = append(files, itemFileName)
-			return nil
-		}
-		return nil
-	}); err != nil {
+	var listFile []string
+	files, err := os.ReadDir(global.Dir.LogDir)
+	if err != nil {
 		return nil, err
 	}
-
-	if len(files) < 2 {
-		return files, nil
+	listMap := make(map[string]struct{})
+	for _, item := range files {
+		if !item.IsDir() && strings.HasPrefix(item.Name(), "1Panel") {
+			if item.Name() == "1Panel.log" || item.Name() == "1Panel-Core.log" {
+				itemName := time.Now().Format("2006-01-02")
+				if _, ok := listMap[itemName]; ok {
+					continue
+				}
+				listMap[itemName] = struct{}{}
+				listFile = append(listFile, itemName)
+				continue
+			}
+			itemFileName := strings.TrimPrefix(item.Name(), "1Panel-Core-")
+			itemFileName = strings.TrimPrefix(itemFileName, "1Panel-")
+			itemFileName = strings.TrimSuffix(itemFileName, ".gz")
+			itemFileName = strings.TrimSuffix(itemFileName, ".log")
+			if len(itemFileName) == 0 {
+				continue
+			}
+			if _, ok := listMap[itemFileName]; ok {
+				continue
+			}
+			listMap[itemFileName] = struct{}{}
+			listFile = append(listFile, itemFileName)
+		}
 	}
-	sort.Slice(files, func(i, j int) bool {
-		return files[i] > files[j]
+	if len(listFile) < 2 {
+		return listFile, nil
+	}
+	sort.Slice(listFile, func(i, j int) bool {
+		return listFile[i] > listFile[j]
 	})
 
-	return files, nil
+	return listFile, nil
 }
 
 func (u *LogService) LoadSystemLog(name string) (string, error) {

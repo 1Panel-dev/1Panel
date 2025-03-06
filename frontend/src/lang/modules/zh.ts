@@ -1181,6 +1181,8 @@ const message = {
         },
     },
     logs: {
+        core: '面板服务',
+        agent: '节点监控',
         panelLog: '面板日志',
         operation: '操作日志',
         login: '访问日志',

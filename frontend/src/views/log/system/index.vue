@@ -5,7 +5,7 @@
                 <LogRouter current="SystemLog" />
             </template>
             <template #leftToolBar>
-                <el-select class="p-w-200 mr-2.5" v-model="logConfig.name" @change="search()">
+                <el-select class="p-w-200 mr-2.5" v-model="itemName" @change="search()">
                     <template #prefix>{{ $t('commons.table.date') }}</template>
                     <el-option v-for="(item, index) in fileList" :key="index" :label="item" :value="item" />
                 </el-select>
@@ -14,6 +14,10 @@
                         {{ $t('commons.button.watch') }}
                     </el-checkbox>
                 </el-button>
+                <el-radio-group class="ml-2" @change="search()" v-model="itemType">
+                    <el-radio-button :label="$t('logs.agent')" value="Agent" />
+                    <el-radio-button :label="$t('logs.core')" value="Core" />
+                </el-radio-group>
             </template>
             <template #main>
                 <LogFile
@@ -48,6 +52,8 @@ const logConfig = reactive({
     colorMode: 'system',
 });
 const showLog = ref(false);
+const itemName = ref();
+const itemType = ref('Agent');
 
 const changeTail = () => {
     logRef.value.changeTail(true);
@@ -57,12 +63,13 @@ const loadFiles = async () => {
     const res = await getSystemFiles();
     fileList.value = res.data || [];
     if (fileList.value) {
-        logConfig.name = fileList.value[0];
+        itemName.value = fileList.value[0];
         search();
     }
 };
 
 const search = () => {
+    logConfig.name = itemType.value === 'Agent' ? itemName.value : 'Core-' + itemName.value;
     showLog.value = false;
     nextTick(() => {
         showLog.value = true;

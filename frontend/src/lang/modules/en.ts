@@ -1253,6 +1253,8 @@ const message = {
         },
     },
     logs: {
+        core: 'Panel Service',
+        agent: 'Node Monitoring',
         panelLog: 'Panel Logs',
         operation: 'Operation Logs',
         login: 'Login Logs',

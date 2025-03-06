@@ -108,15 +108,10 @@ const onLoadUpgradeInfo = async () => {
                 upgradeInfo.value = res.data;
                 if (upgradeInfo.value.newVersion) {
                     upgradeVersion.value = upgradeInfo.value.newVersion;
-                    return;
-                }
-                if (upgradeInfo.value.latestVersion) {
+                } else if (upgradeInfo.value.latestVersion) {
                     upgradeVersion.value = upgradeInfo.value.latestVersion;
-                    return;
-                }
-                if (upgradeInfo.value.testVersion) {
+                } else if (upgradeInfo.value.testVersion) {
                     upgradeVersion.value = upgradeInfo.value.testVersion;
-                    return;
                 }
                 upgradeRef.value.acceptParams({ upgradeInfo: upgradeInfo.value, upgradeVersion: upgradeVersion.value });
             } else {

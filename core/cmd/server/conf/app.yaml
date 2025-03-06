@@ -16,6 +16,6 @@ remote_url:
 log:
   level: debug
   time_zone: Asia/Shanghai
-  log_name: 1Panel
+  log_name: 1Panel-Core
   log_suffix: .log
   max_backup: 10

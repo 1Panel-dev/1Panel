@@ -1183,6 +1183,8 @@ const message = {
         },
     },
     logs: {
+        core: '面板服務',
+        agent: '節點監控',
         panelLog: '面板日誌',
         operation: '操作日誌',
         login: '訪問日誌',

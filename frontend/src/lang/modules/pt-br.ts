@@ -1216,6 +1216,8 @@ const message = {
         alertTitle: 'Tarefa de scan de vírus 「{0}」 detectou alerta de arquivo infectado',
     },
     logs: {
+        core: 'Serviço de Painel',
+        agent: 'Monitoramento de Nós',
         panelLog: 'Logs do painel',
         operation: 'Logs de operação',
         login: 'Logs de login',

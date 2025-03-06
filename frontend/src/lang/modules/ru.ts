@@ -1224,6 +1224,8 @@ const message = {
         },
     },
     logs: {
+        core: 'Сервис панели',
+        agent: 'Мониторинг узлов',
         panelLog: 'Логи панели',
         operation: 'Логи операций',
         login: 'Логи входа',

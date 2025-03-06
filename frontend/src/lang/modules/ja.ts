@@ -1190,6 +1190,8 @@ const message = {
         },
     },
     logs: {
+        core: 'パネルサービス',
+        agent: 'ノード監視',
         panelLog: 'パネルログ',
         operation: '操作ログ',
         login: 'ログインログ',

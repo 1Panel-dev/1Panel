@@ -1178,6 +1178,8 @@ const message = {
         },
     },
     logs: {
+        core: '패널 서비스',
+        agent: '노드 모니터링',
         panelLog: '패널 로그',
         operation: '작업 로그',
         login: '로그인 로그',

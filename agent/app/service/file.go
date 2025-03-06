@@ -446,10 +446,17 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 		logFilePath = ssl.GetLogPath()
 	case constant.TypeSystem:
 		fileName := ""
-		if len(req.Name) == 0 || req.Name == time.Now().Format("2006-01-02") {
+		if len(req.Name) == 0 {
 			fileName = "1Panel.log"
 		} else {
-			fileName = "1Panel-" + req.Name + ".log"
+			if strings.HasSuffix(req.Name, time.Now().Format("2006-01-02")) {
+				fileName = "1Panel.log"
+				if strings.HasPrefix(req.Name, "Core-") {
+					fileName = "1Panel-Core.log"
+				}
+			} else {
+				fileName = "1Panel-" + req.Name + ".log"
+			}
 		}
 		logFilePath = path.Join(global.Dir.DataDir, "log", fileName)
 		if _, err := os.Stat(logFilePath); err != nil {
