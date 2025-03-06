@@ -61,7 +61,9 @@ Please refer to our [documentation](https://docs.1panel.pro/quick_start/) for mo
 
 ## Pro Edition
 
-Compared to the OSS Edition, 1Panel Pro Edition provides users with a wealth of enhanced features and technical support services. Enhanced features include WAF enhancement, website tamper protection, website monitoring, GPU monitoring, custom logo and theme color, etc. [Click to view the detailed introduction of the Pro Edition](https://1panel.pro/pricing).
+Compared to the OSS Edition, 1Panel Pro Edition provides users with a wealth of enhanced features and technical support services. Enhanced features include WAF enhancement, Website monitoring, Mobile APP, custom logo and theme, etc. 
+
+[Click to see Pro Edition details](https://1panel.pro/pricing).
 
 ## Security Information
 
