@@ -229,10 +229,12 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 		return err
 	}
 	newBackup.ID = backup.ID
+	newBackup.CreatedAt = backup.CreatedAt
+	newBackup.UpdatedAt = backup.UpdatedAt
 	if err := backupRepo.Save(&newBackup); err != nil {
 		return err
 	}
-	go syncAccountToAgent(backup, "update")
+	go syncAccountToAgent(newBackup, "update")
 	return nil
 }
 

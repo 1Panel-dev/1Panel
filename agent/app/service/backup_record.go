@@ -112,7 +112,7 @@ func (u *BackupRecordService) DownloadRecord(info dto.DownloadRecord) (string, e
 	}
 	if exist, _ := client.Exist(srcPath); exist {
 		isOK, err := client.Download(srcPath, targetPath)
-		if !isOK {
+		if !isOK || err != nil {
 			return "", fmt.Errorf("cloud storage download failed, err: %v", err)
 		}
 	}

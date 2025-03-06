@@ -28,7 +28,7 @@ import (
 type BackupService struct{}
 
 type IBackupService interface {
-	CheckUsed(name string) error
+	CheckUsed(name string, isPublic bool) error
 	Sync(req dto.SyncFromMaster) error
 
 	LoadBackupOptions() ([]dto.BackupOption, error)
@@ -152,7 +152,7 @@ func (u *BackupService) Create(req dto.BackupOperate) error {
 			return err
 		}
 	}
-	if req.Type != "LOCAL" {
+	if req.Type != constant.Local {
 		isOk, err := u.checkBackupConn(&backup)
 		if err != nil || !isOk {
 			return buserr.WithMap("ErrBackupCheck", map[string]interface{}{"err": err.Error()}, err)
@@ -212,6 +212,9 @@ func (u *BackupService) Delete(id uint) error {
 	if backup.Type == constant.Local {
 		return buserr.New("ErrBackupLocalDelete")
 	}
+	if err := u.CheckUsed(backup.Name, false); err != nil {
+		return err
+	}
 	return backupRepo.Delete(repo.WithByID(id))
 }
 
@@ -238,15 +241,8 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 	}
 	newBackup.Credential = string(itemCredential)
 	if backup.Type == constant.Local {
-		if newBackup.Vars != backup.Vars {
-			oldPath := backup.BackupPath
-			newPath := newBackup.BackupPath
-			if strings.HasSuffix(newPath, "/") && newPath != "/" {
-				newPath = newPath[:strings.LastIndex(newPath, "/")]
-			}
-			if err := files.NewFileOp().CopyDir(oldPath, newPath); err != nil {
-				return err
-			}
+		if err := changeLocalBackup(backup.BackupPath, newBackup.BackupPath); err != nil {
+			return err
 		}
 	}
 
@@ -255,7 +251,7 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 			return err
 		}
 	}
-	if backup.Type != "LOCAL" {
+	if backup.Type != constant.Local {
 		isOk, err := u.checkBackupConn(&newBackup)
 		if err != nil || !isOk {
 			return buserr.WithMap("ErrBackupCheck", map[string]interface{}{"err": err.Error()}, err)
@@ -271,6 +267,8 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 		return err
 	}
 	newBackup.ID = backup.ID
+	newBackup.CreatedAt = backup.CreatedAt
+	newBackup.UpdatedAt = backup.UpdatedAt
 	if err := backupRepo.Save(&newBackup); err != nil {
 		return err
 	}
@@ -372,6 +370,8 @@ func (u *BackupService) Sync(req dto.SyncFromMaster) error {
 			return buserr.New("ErrRecordNotFound")
 		}
 		accountItem.ID = account.ID
+		accountItem.CreatedAt = account.CreatedAt
+		accountItem.UpdatedAt = account.UpdatedAt
 		return backupRepo.Save(&accountItem)
 	default:
 		return fmt.Errorf("not support such operation %s", req.Operation)
@@ -394,8 +394,8 @@ func (u *BackupService) LoadBackupOptions() ([]dto.BackupOption, error) {
 	return data, nil
 }
 
-func (u *BackupService) CheckUsed(name string) error {
-	account, _ := backupRepo.Get(repo.WithByName(name), backupRepo.WithByPublic(true))
+func (u *BackupService) CheckUsed(name string, isPublic bool) error {
+	account, _ := backupRepo.Get(repo.WithByName(name), backupRepo.WithByPublic(isPublic))
 	if account.ID == 0 {
 		return nil
 	}
@@ -541,4 +541,39 @@ func loadBackupNamesByID(accountIDs string, downloadID uint) ([]string, string, 
 		}
 	}
 	return accounts, downloadAccount, nil
+}
+
+func changeLocalBackup(oldPath, newPath string) error {
+	fileOp := files.NewFileOp()
+	if fileOp.Stat(path.Join(oldPath, "app")) {
+		if err := fileOp.Mv(path.Join(oldPath, "app"), newPath); err != nil {
+			return err
+		}
+	}
+	if fileOp.Stat(path.Join(oldPath, "database")) {
+		if err := fileOp.Mv(path.Join(oldPath, "database"), newPath); err != nil {
+			return err
+		}
+	}
+	if fileOp.Stat(path.Join(oldPath, "directory")) {
+		if err := fileOp.Mv(path.Join(oldPath, "directory"), newPath); err != nil {
+			return err
+		}
+	}
+	if fileOp.Stat(path.Join(oldPath, "system_snapshot")) {
+		if err := fileOp.Mv(path.Join(oldPath, "system_snapshot"), newPath); err != nil {
+			return err
+		}
+	}
+	if fileOp.Stat(path.Join(oldPath, "website")) {
+		if err := fileOp.CopyDir(path.Join(oldPath, "website"), newPath); err != nil {
+			return err
+		}
+	}
+	if fileOp.Stat(path.Join(oldPath, "log")) {
+		if err := fileOp.Mv(path.Join(oldPath, "log"), newPath); err != nil {
+			return err
+		}
+	}
+	return nil
 }

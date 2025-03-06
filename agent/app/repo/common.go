@@ -68,13 +68,13 @@ func WithByDetailName(detailName string) DBOption {
 
 func WithByType(tp string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("type = ?", tp)
+		return g.Where("`type` = ?", tp)
 	}
 }
 
 func WithTypes(types []string) DBOption {
 	return func(db *gorm.DB) *gorm.DB {
-		return db.Where("type in (?)", types)
+		return db.Where("`type` in (?)", types)
 	}
 }
 

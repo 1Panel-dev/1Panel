@@ -642,6 +642,10 @@ function load18n(label: string) {
         case 'App':
         case 'System':
             return i18n.global.t('menu.' + label.toLowerCase());
+        case 'RuntimeExtension':
+            return i18n.global.t('website.runtime');
+        case 'Image':
+            return i18n.global.t('container.image');
         case 'Snapshot':
             return i18n.global.t('setting.snapshot');
         case 'AppStore':

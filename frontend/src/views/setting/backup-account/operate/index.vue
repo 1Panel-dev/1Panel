@@ -51,7 +51,7 @@
                 </el-radio-group>
             </el-form-item>
             <el-form-item v-if="hasAccessKey()" label="Access Key ID" prop="accessKey" :rules="Rules.requiredInput">
-                <el-input v-model.trim="dialogData.rowData!.accessKey" />
+                <el-input clearable v-model.trim="dialogData.rowData!.accessKey" />
             </el-form-item>
             <el-form-item v-if="hasAccessKey()" label="Secret Key" prop="credential" :rules="Rules.requiredInput">
                 <el-input show-password clearable v-model.trim="dialogData.rowData!.credential" />
@@ -85,7 +85,7 @@
             </el-form-item>
             <div v-if="dialogData.rowData!.type === 'SFTP'">
                 <el-form-item :label="$t('setting.address')" prop="varsJson.address" :rules="Rules.host">
-                    <el-input v-model.trim="dialogData.rowData!.varsJson['address']" />
+                    <el-input v-model.trim="dialogData.rowData!.varsJson['address']" clearable />
                 </el-form-item>
                 <el-form-item :label="$t('commons.table.port')" prop="varsJson.port" :rules="[Rules.port]">
                     <el-input-number :min="0" :max="65535" v-model.number="dialogData.rowData!.varsJson['port']" />
@@ -171,14 +171,14 @@
                     </template>
                 </el-input>
             </el-form-item>
-            <el-form-item v-if="hasAccessKey()" label="Bucket" :rules="Rules.requiredInput">
+            <el-form-item v-if="hasAccessKey()" label="Bucket" prop="bucket" :rules="Rules.requiredInput">
                 <el-checkbox v-model="dialogData.rowData!.bucketInput" :label="$t('container.input')" />
                 <el-input clearable v-if="dialogData.rowData!.bucketInput" v-model="dialogData.rowData!.bucket" />
                 <div v-else class="w-full">
                     <el-select class="!w-4/5" v-model="dialogData.rowData!.bucket">
                         <el-option v-for="item in buckets" :key="item" :value="item" />
                     </el-select>
-                    <el-button class="!w-1/5" plain @click="getBuckets()">
+                    <el-button class="!w-1/5" plain @click="getBuckets(formRef)">
                         {{ $t('setting.loadBucket') }}
                     </el-button>
                 </div>
@@ -630,7 +630,15 @@ const handleClose = () => {
     drawerVisible.value = false;
 };
 
-const getBuckets = async () => {
+const getBuckets = async (formEl: FormInstance | undefined) => {
+    if (!formEl) return;
+    const result1 = await formEl.validateField('varsJson.endpointItem', callback);
+    const result2 = await formEl.validateField('accessKey', callback);
+    const result3 = await formEl.validateField('credential', callback);
+    const result4 = await formEl.validateField('varsJson.region', callback);
+    if (!result1 || !result2 || !result3 || !result4) {
+        return;
+    }
     loading.value = true;
     let item = deepCopy(dialogData.value.rowData!.varsJson);
     if (dialogData.value.rowData!.type === 'KODO') {
@@ -668,7 +676,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             } else {
                 dialogData.value.rowData!.varsJson['endpoint'] = itemEndpoint;
             }
-            dialogData.value.rowData!.varsJson['endpointItem'] = undefined;
+            dialogData.value.rowData!.varsJson['endpointItem'] = itemEndpoint;
         }
         if (isALIYUNYUN()) {
             dialogData.value.rowData!.varsJson['token'] = undefined;

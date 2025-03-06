@@ -1,7 +1,6 @@
 package log
 
 import (
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"log"
 	"os"
 	"path"
@@ -12,6 +11,7 @@ import (
 	"time"
 	"unsafe"
 
+	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 )
 
@@ -85,7 +85,7 @@ func NewWriterFromConfig(c *Config) (RollingWriter, error) {
 		return nil, err
 	}
 	filepath := FilePath(c)
-	file, err := os.OpenFile(filepath, os.O_RDWR|os.O_CREATE|os.O_APPEND, constant.DirPerm)
+	file, err := os.OpenFile(filepath, os.O_RDWR|os.O_CREATE|os.O_APPEND, constant.FilePerm)
 	if err != nil {
 		return nil, err
 	}

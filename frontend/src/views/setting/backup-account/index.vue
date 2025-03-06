@@ -74,9 +74,13 @@
                                     <br />
                                     {{ $t('setting.refreshTime') + ':' + row.varsJson['refresh_time'] }}
                                 </template>
-                                <el-tag @click="refreshItemToken(row)" class="ml-1">
-                                    {{ 'Token ' + $t('commons.button.refresh') }}
-                                </el-tag>
+                                <el-button
+                                    type="primary"
+                                    link
+                                    icon="Refresh"
+                                    @click="refreshItemToken(row)"
+                                    class="ml-1"
+                                />
                             </el-tooltip>
                         </template>
                     </el-table-column>
@@ -279,6 +283,9 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        disabled: (row: Backup.BackupInfo) => {
+            return row.type === 'LOCAL';
+        },
         click: (row: Backup.BackupInfo) => {
             onDelete(row);
         },

@@ -256,7 +256,7 @@ func (u *DeviceService) Clean(req []dto.Clean) {
 		case "task_log":
 			pathItem := path.Join(global.Dir.BaseDir, logPath, item.Name)
 			dropFileOrDir(pathItem)
-			if len(item.Name) == 0 {
+			if len(item.Name) != 0 {
 				_ = taskRepo.Delete(repo.WithByType(item.Name))
 			}
 		case "images":

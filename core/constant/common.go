@@ -62,7 +62,9 @@ var WebUrlMap = map[string]struct{}{
 	"/containers/setting":   {},
 	"/containers/dashboard": {},
 
-	"/cronjobs": {},
+	"/cronjobs":         {},
+	"/cronjobs/cronjob": {},
+	"/cronjobs/library": {},
 
 	"/databases":                   {},
 	"/databases/mysql":             {},
@@ -146,7 +148,7 @@ var WebUrlMap = map[string]struct{}{
 }
 
 var DynamicRoutes = []string{
-	`^/containers/container/operate/[^/]+$`,
+	`^/containers/container/operate/[^?]+$`,
 	`^/containers/composeDetail/[^/]+$`,
 	`^/databases/mysql/setting/[^/]+/[^/]+$`,
 	`^/databases/postgresql/setting/[^/]+/[^/]+$`,

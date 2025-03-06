@@ -17,7 +17,7 @@ func (b *BaseApi) CheckBackupUsed(c *gin.Context) {
 		return
 	}
 
-	if err := backupService.CheckUsed(name); err != nil {
+	if err := backupService.CheckUsed(name, true); err != nil {
 		helper.BadRequest(c, err)
 		return
 	}
