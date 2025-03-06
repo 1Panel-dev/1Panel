@@ -40,7 +40,7 @@ import { Rules } from '@/global/form-rules';
 import { computed, onMounted, reactive, ref } from 'vue';
 import { FormInstance } from 'element-plus';
 import i18n from '@/lang';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import { getAgentGroupList } from '@/api/modules/group';
 import { Group } from '@/api/interface/group';
 
@@ -73,6 +73,10 @@ const submit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     await formEl.validate((valid) => {
         if (!valid) {
+            return;
+        }
+        if (form.remark && form.remark.length > 128) {
+            MsgError(i18n.global.t('commons.rule.length128Err'));
             return;
         }
         loading.value = true;

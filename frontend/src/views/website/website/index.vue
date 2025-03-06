@@ -156,7 +156,7 @@
                         <template #default="{ row }">
                             <fu-read-write-switch>
                                 <template #read>
-                                    <MsgInfo :info="row.remark" width="180px" />
+                                    <MsgInfo :info="row.remark" :width="'280'" />
                                 </template>
                                 <template #default="{ read }">
                                     <el-input v-model="row.remark" @blur="updateRemark(row, read)" />

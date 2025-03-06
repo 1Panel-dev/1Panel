@@ -181,12 +181,8 @@ func (u *CronjobService) handleCutWebsiteLog(cronjob *model.Cronjob, startTime t
 		msgs      []string
 	)
 	websites := loadWebsForJob(*cronjob)
-	nginx, err := getAppInstallByKey(constant.AppOpenresty)
-	if err != nil {
-		return msgs, "", nil
-	}
-	baseDir := pathUtils.Join(nginx.GetPath(), "www", "sites")
 	fileOp := files.NewFileOp()
+	baseDir := GetOpenrestyDir(SitesRootDir)
 	for _, website := range websites {
 		websiteLogDir := pathUtils.Join(baseDir, website.Alias, "log")
 		srcAccessLogPath := pathUtils.Join(websiteLogDir, "access.log")

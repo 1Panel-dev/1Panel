@@ -93,7 +93,7 @@
                     <el-form-item
                         :label="getLabel(formFields['CONTAINER_PACKAGE_URL'])"
                         :rules="rules.params.CONTAINER_PACKAGE_URL"
-                        v-if="formFields['CONTAINER_PACKAGE_URL']"
+                        v-if="runtime.params['PHP_VERSION'] != '5.6.40' && formFields['CONTAINER_PACKAGE_URL']"
                     >
                         <el-select v-model="runtime.source" filterable default-first-option>
                             <el-option

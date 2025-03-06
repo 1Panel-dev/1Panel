@@ -342,11 +342,7 @@ func handleBackupLogs(targetDir, fileName string, secret string) error {
 		return err
 	}
 	if len(websites) != 0 {
-		nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
-		if err != nil {
-			return err
-		}
-		webItem := path.Join(nginxInstall.GetPath(), "www/sites")
+		webItem := GetOpenrestyDir(SitesRootDir)
 		for _, website := range websites {
 			dirItem := path.Join(targetDir, "website", website.Alias)
 			if _, err := os.Stat(dirItem); err != nil && os.IsNotExist(err) {
