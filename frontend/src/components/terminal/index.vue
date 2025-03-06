@@ -77,17 +77,28 @@ const acceptParams = (props: WsProps) => {
 const newTerm = () => {
     const background = getComputedStyle(document.documentElement).getPropertyValue('--panel-terminal-bg-color').trim();
     term.value = new Terminal({
-        lineHeight: 1.2,
-        fontSize: 12,
+        lineHeight: terminalStore.lineHeight || 1.2,
+        fontSize: terminalStore.fontSize || 12,
         fontFamily: "Monaco, Menlo, Consolas, 'Courier New', monospace",
         theme: {
             background: background,
         },
-        cursorBlink: true,
-        cursorStyle: 'underline',
-        scrollback: 1000,
-        scrollSensitivity: 15,
+        cursorBlink: terminalStore.cursorBlink ? terminalStore.cursorBlink === 'Enable' : true,
+        cursorStyle: terminalStore.cursorStyle ? getStyle() : 'underline',
+        scrollback: terminalStore.scrollback || 1000,
+        scrollSensitivity: terminalStore.scrollSensitivity || 15,
     });
+};
+
+const getStyle = (): 'underline' | 'block' | 'bar' => {
+    switch (terminalStore.cursorStyle) {
+        case 'bar':
+            return 'bar';
+        case 'block':
+            return 'block';
+        default:
+            return 'underline';
+    }
 };
 
 const init = (endpoint: string, args: string) => {

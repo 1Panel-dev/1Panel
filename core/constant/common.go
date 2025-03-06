@@ -51,16 +51,17 @@ var WebUrlMap = map[string]struct{}{
 	"/ai/model": {},
 	"/ai/gpu":   {},
 
-	"/containers":           {},
-	"/containers/container": {},
-	"/containers/image":     {},
-	"/containers/network":   {},
-	"/containers/volume":    {},
-	"/containers/repo":      {},
-	"/containers/compose":   {},
-	"/containers/template":  {},
-	"/containers/setting":   {},
-	"/containers/dashboard": {},
+	"/containers":                   {},
+	"/containers/container/operate": {},
+	"/containers/container":         {},
+	"/containers/image":             {},
+	"/containers/network":           {},
+	"/containers/volume":            {},
+	"/containers/repo":              {},
+	"/containers/compose":           {},
+	"/containers/template":          {},
+	"/containers/setting":           {},
+	"/containers/dashboard":         {},
 
 	"/cronjobs":         {},
 	"/cronjobs/cronjob": {},
@@ -148,7 +149,6 @@ var WebUrlMap = map[string]struct{}{
 }
 
 var DynamicRoutes = []string{
-	`^/containers/container/operate/[^?]+$`,
 	`^/containers/composeDetail/[^/]+$`,
 	`^/databases/mysql/setting/[^/]+/[^/]+$`,
 	`^/databases/postgresql/setting/[^/]+/[^/]+$`,

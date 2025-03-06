@@ -58,12 +58,12 @@
                                         </span>
                                     </div>
                                 </div>
-                                <div v-if="!row.expand && row.sourceAccounts.length > 3">
+                                <div v-if="!row.expand && row.sourceAccounts?.length > 3">
                                     <el-button type="primary" link @click="row.expand = true">
                                         {{ $t('commons.button.expand') }}...
                                     </el-button>
                                 </div>
-                                <div v-if="row.expand && row.sourceAccounts.length > 3">
+                                <div v-if="row.expand && row.sourceAccounts?.length > 3">
                                     <el-button type="primary" link @click="row.expand = false">
                                         {{ $t('commons.button.collapse') }}
                                     </el-button>

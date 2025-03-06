@@ -118,7 +118,9 @@ func (u *AIToolService) Create(req dto.OllamaModelName) error {
 			}
 			return nil
 		}, nil)
-		_ = taskItem.Execute()
+		if err := taskItem.Execute(); err != nil {
+			_ = aiRepo.Update(info.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
+		}
 	}()
 	return nil
 }

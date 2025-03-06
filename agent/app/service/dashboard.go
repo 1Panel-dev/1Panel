@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"fmt"
 	network "net"
 	"os"
 	"sort"
@@ -38,6 +39,7 @@ type IDashboardService interface {
 
 	LoadAppLauncher() ([]dto.AppLauncher, error)
 	ListLauncherOption(filter string) ([]dto.LauncherOption, error)
+	Restart(operation string) error
 }
 
 func NewIDashboardService() IDashboardService {
@@ -50,6 +52,26 @@ func (u *DashboardService) Sync(req []dto.AppLauncherSync) error {
 		launchers = append(launchers, model.AppLauncher{Key: item.Key})
 	}
 	return launcherRepo.SyncAll(launchers)
+}
+
+func (u *DashboardService) Restart(operation string) error {
+	if operation != "1panel" && operation != "system" && operation != "1panel-agent" {
+		return fmt.Errorf("handle restart operation %s failed, err: nonsupport such operation", operation)
+	}
+	itemCmd := fmt.Sprintf("%s systemctl restart 1panel-agent.service && %s systemctl restart 1panel-core.service", cmd.SudoHandleCmd(), cmd.SudoHandleCmd())
+	if operation == "system" {
+		itemCmd = fmt.Sprintf("%s reboot", cmd.SudoHandleCmd())
+	}
+	if operation == "1panel-agent" {
+		itemCmd = fmt.Sprintf("%s systemctl restart 1panel-agent.service", cmd.SudoHandleCmd())
+	}
+	go func() {
+		stdout, err := cmd.Exec(itemCmd)
+		if err != nil {
+			global.LOG.Errorf("handle %s failed, err: %v", itemCmd, stdout)
+		}
+	}()
+	return nil
 }
 
 func (u *DashboardService) LoadOsInfo() (*dto.OsInfo, error) {

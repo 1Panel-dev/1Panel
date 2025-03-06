@@ -34,6 +34,9 @@ const confirmDialogRef = ref();
 const globalStore = GlobalStore();
 
 const onRestart = (type: string) => {
+    if (globalStore.currentNode != 'local' && type === '1panel') {
+        type = '1panel-agent';
+    }
     restartType.value = type;
     let params = {
         header: i18n.global.t('home.restart_' + type),

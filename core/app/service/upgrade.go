@@ -136,8 +136,13 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 
 		global.LOG.Info("backup original data successful, now start to upgrade!")
 
-		if err := files.CopyItem(false, true, path.Join(tmpDir, "1panel*"), "/usr/local/bin"); err != nil {
-			global.LOG.Errorf("upgrade 1panel failed, err: %v", err)
+		if err := files.CopyItem(false, true, path.Join(tmpDir, "1panel-core"), "/usr/local/bin"); err != nil {
+			global.LOG.Errorf("upgrade 1panel-core failed, err: %v", err)
+			u.handleRollback(originalDir, 1)
+			return
+		}
+		if err := files.CopyItem(false, true, path.Join(tmpDir, "1panel-agent"), "/usr/local/bin"); err != nil {
+			global.LOG.Errorf("upgrade 1panel-agent failed, err: %v", err)
 			u.handleRollback(originalDir, 1)
 			return
 		}

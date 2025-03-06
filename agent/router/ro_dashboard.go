@@ -18,5 +18,6 @@ func (s *DashboardRouter) InitRouter(Router *gin.RouterGroup) {
 		cmdRouter.GET("/base/:ioOption/:netOption", baseApi.LoadDashboardBaseInfo)
 		cmdRouter.GET("/current/node", baseApi.LoadCurrentInfoForNode)
 		cmdRouter.GET("/current/:ioOption/:netOption", baseApi.LoadDashboardCurrentInfo)
+		cmdRouter.POST("/system/restart/:operation", baseApi.SystemRestart)
 	}
 }

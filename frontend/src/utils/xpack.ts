@@ -59,7 +59,7 @@ const loadDataFromDB = async () => {
     const res = await getSettingInfo();
     document.title = res.data.panelName;
     globalStore.entrance = res.data.securityEntrance;
-    globalStore.setOpenMenuTabs(res.data.menuTabs === 'enable');
+    globalStore.setOpenMenuTabs(res.data.menuTabs === 'Enable');
 };
 
 export async function loadProductProFromDB() {
@@ -72,7 +72,6 @@ export async function loadProductProFromDB() {
             globalStore.productProExpires = Number(res.data.productPro);
         }
     }
-    loadDataFromDB();
 }
 
 export async function loadMasterProductProFromDB() {
@@ -84,6 +83,7 @@ export async function loadMasterProductProFromDB() {
     }
     switchTheme();
     initFavicon();
+    loadDataFromDB();
 }
 
 export async function getXpackSettingForTheme() {
