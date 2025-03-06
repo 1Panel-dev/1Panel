@@ -2295,6 +2295,7 @@ const message = {
         rainyun: 'Rainyun',
         volcengine: 'Volcengine',
         runtimePortHelper: 'Persekitaran runtime semasa mempunyai beberapa port. Sila pilih port proksi.',
+        runtimePortWarn: 'Persekitaran runtime semasa tidak mempunyai port, tidak dapat proksi',
     },
     php: {
         short_open_tag: 'Sokongan tag pendek',
@@ -3115,6 +3116,8 @@ const message = {
             postNode: 'Segerakkan ke sub-node',
             postNodeHelper: 'Sub-node akan mewarisi dan menggunakan konfigurasi di atas secara lalai',
             nodes: 'Pilih Node',
+            selectNode: 'Pilih Node',
+            selectNodeError: 'Sila pilih node',
         },
         alert: {
             isAlert: 'Amaran',

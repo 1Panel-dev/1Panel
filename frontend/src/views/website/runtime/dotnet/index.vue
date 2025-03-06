@@ -43,14 +43,7 @@
                     <el-table-column :label="$t('app.version')" prop="version"></el-table-column>
                     <el-table-column :label="$t('runtime.externalPort')" prop="port" min-width="110px">
                         <template #default="{ row }">
-                            <span v-if="row.port != ''">
-                                <span v-for="(port, index) in row.port.split(',')" :key="index">
-                                    <el-button link @click="goDashboard(port, 'http')">
-                                        {{ port }}
-                                        <el-icon class="el-icon--right"><Promotion /></el-icon>
-                                    </el-button>
-                                </span>
-                            </span>
+                            <PortJump :row="row" :jump="goDashboard" />
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" prop="status">
@@ -104,12 +97,12 @@ import i18n from '@/lang';
 import RouterMenu from '../index.vue';
 import router from '@/routers/router';
 import ComposeLogs from '@/components/log/compose/index.vue';
-import { Promotion } from '@element-plus/icons-vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import AppResources from '@/views/website/runtime/php/check/index.vue';
 import { ElMessageBox } from 'element-plus';
 import { GlobalStore } from '@/store';
 import RuntimeStatus from '@/views/website/runtime/components/runtime-status.vue';
+import PortJump from '@/views/website/runtime/components/port-jump.vue';
 import { disabledButton } from '@/utils/runtime';
 
 let timer: NodeJS.Timer | null = null;

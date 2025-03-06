@@ -2209,6 +2209,7 @@ const message = {
         rainyun: '雨雲',
         volcengine: 'Volcengine',
         runtimePortHelper: '當前運行環境存在多個端口，請選擇一個代理端口。',
+        runtimePortWarn: '當前運行環境沒有端口，無法代理',
     },
     php: {
         short_open_tag: '短標簽支持',
@@ -2998,6 +2999,8 @@ const message = {
             postNode: '同步至子節點',
             postNodeHelper: '子節點預設繼承並使用上述配置',
             nodes: '節點',
+            selectNode: '選擇節點',
+            selectNodeError: '請選擇節點',
         },
         alert: {
             isAlert: '是否告警',

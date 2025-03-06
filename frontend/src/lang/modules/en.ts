@@ -2382,6 +2382,7 @@ const message = {
         rainyun: 'Rain Yun',
         volcengine: 'Volcengine',
         runtimePortHelper: 'The current runtime environment has multiple ports. Please select a proxy port.',
+        runtimePortWarn: 'The current runtime environment has no ports, unable to proxy',
     },
     php: {
         short_open_tag: 'Short tag support',
@@ -3236,6 +3237,8 @@ const message = {
             postNode: 'Sync to sub-node',
             postNodeHelper: 'Sub-nodes will inherit and use the above configuration by default',
             nodes: 'Nodes',
+            selectNode: 'Select Node',
+            selectNodeError: 'Please select a node',
         },
         alert: {
             isAlert: 'Alert',

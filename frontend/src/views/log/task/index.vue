@@ -17,14 +17,13 @@
             </template>
             <template #main>
                 <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search" :heightDiff="370">
-                    <el-table-column :label="$t('logs.taskName')" prop="name" />
-                    <el-table-column :label="$t('commons.table.type')" prop="type" />
-                    <el-table-column :label="$t('commons.table.status')" prop="status">
+                    <el-table-column :label="$t('logs.taskName')" prop="name" min-width="180px"></el-table-column>
+                    <el-table-column :label="$t('commons.table.status')" prop="status" max-width="100px">
                         <template #default="{ row }">
                             <Status :status="row.status" :msg="row.errorMsg" />
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.button.log')" prop="log">
+                    <el-table-column :label="$t('commons.button.log')" prop="log" max-width="100px">
                         <template #default="{ row }">
                             <el-button @click="openTaskLog(row)" link type="primary">
                                 {{ $t('website.check') }}

@@ -240,7 +240,7 @@
                     <el-form-item
                         :label="$t('setting.proxyPort')"
                         prop="port"
-                        v-if="website.runtimeType !== 'php' && runtimePorts.length > 0"
+                        v-if="website.runtimeType !== 'php' && runtimePorts.length > 1"
                     >
                         <el-select v-model="website.port">
                             <el-option
@@ -252,6 +252,17 @@
                         </el-select>
                         <span class="input-help">{{ $t('website.runtimePortHelper') }}</span>
                     </el-form-item>
+                    <el-text
+                        v-if="
+                            runtimes.length > 0 &&
+                            website.type === 'runtime' &&
+                            website.runtimeType !== 'php' &&
+                            website.port == 0
+                        "
+                        type="danger"
+                    >
+                        {{ $t('website.runtimePortWarn') }}
+                    </el-text>
                 </div>
                 <el-form-item prop="advanced" v-if="website.type === 'deployment' && website.appType === 'new'">
                     <el-checkbox v-model="website.appinstall.advanced" :label="$t('app.advanced')" size="large" />
@@ -542,7 +553,7 @@ import { ElForm, FormInstance } from 'element-plus';
 import { reactive, ref } from 'vue';
 import Params from '@/views/app-store/detail/params/index.vue';
 import Check from '../check/index.vue';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import { getGroupList } from '@/api/modules/group';
 import { Group } from '@/api/interface/group';
 import { SearchRuntimes } from '@/api/modules/runtime';
@@ -787,20 +798,20 @@ const changeRuntimeType = () => {
 };
 
 const changeRuntime = (runID: number) => {
+    website.value.port = 0;
     runtimes.value.forEach((item) => {
         if (item.id === runID) {
             runtimeResource.value = item.resource;
             runtimePorts.value = item.port.split(',').map((port: string) => parseInt(port.trim(), 10));
-            if (runtimePorts.value.length > 1) {
+            if (runtimePorts.value.length > 0) {
                 website.value.port = runtimePorts.value[0];
-            } else {
-                website.value.port = 0;
             }
         }
     });
 };
 
 const getRuntimes = async () => {
+    website.value.port = 0;
     try {
         const res = await SearchRuntimes(runtimeReq.value);
         runtimes.value = res.data.items || [];
@@ -809,10 +820,8 @@ const getRuntimes = async () => {
             website.value.runtimeID = first.id;
             runtimeResource.value = first.resource;
             runtimePorts.value = first.port.split(',').map((port: string) => parseInt(port.trim(), 10));
-            if (runtimePorts.value.length > 1) {
+            if (runtimePorts.value.length > 0) {
                 website.value.port = runtimePorts.value[0];
-            } else {
-                website.value.port = 0;
             }
         }
     } catch (error) {}
@@ -881,6 +890,10 @@ const submit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     await formEl.validate((valid) => {
         if (!valid) {
+            return;
+        }
+        if (website.value.type === 'runtime' && website.value.runtimeType !== 'php' && website.value.port == 0) {
+            MsgError(i18n.global.t('website.runtimePortWarn'));
             return;
         }
         loading.value = true;

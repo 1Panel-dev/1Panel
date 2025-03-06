@@ -2240,6 +2240,7 @@ const message = {
         rainyun: '雨雲',
         volcengine: 'volcengine',
         runtimePortHelper: '現在の実行環境には複数のポートがあります。プロキシポートを選択してください。',
+        runtimePortWarn: '現在の実行環境にはポートがありません。プロキシできません',
     },
     php: {
         short_open_tag: '短いタグサポート',
@@ -3045,6 +3046,8 @@ const message = {
             postNode: 'サブノードへ同期',
             postNodeHelper: 'サブノードはデフォルトで上記の設定を継承して使用します',
             nodes: 'ノードを選択',
+            selectNode: 'ノードを選択',
+            selectNodeError: 'ノードを選択してください',
         },
         alert: {
             isAlert: 'アラート',

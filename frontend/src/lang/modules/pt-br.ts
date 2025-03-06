@@ -2290,6 +2290,7 @@ const message = {
         rainyun: 'Rainyun',
         volcengine: 'Volcengine',
         runtimePortHelper: 'O ambiente de runtime atual possui várias portas. Por favor, selecione uma porta de proxy.',
+        runtimePortWarn: 'O ambiente de execução atual não possui portos, não é possível proxiar',
     },
     php: {
         short_open_tag: 'Suporte para short tags',
@@ -3119,6 +3120,8 @@ const message = {
             postNode: 'Sincronizar para subnó',
             postNodeHelper: 'Subnós herdarão e usarão a configuração acima por padrão',
             nodes: 'Selecionar Nós',
+            selectNode: 'Selecionar Node',
+            selectNodeError: 'Por favor, selecione um nó',
         },
         alert: {
             isAlert: 'Alerta',

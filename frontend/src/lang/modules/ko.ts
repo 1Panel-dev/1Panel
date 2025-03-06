@@ -2204,6 +2204,7 @@ const message = {
         rainyun: 'Rainyun',
         volcengine: 'volcengine',
         runtimePortHelper: '현재 실행 환경에 여러 포트가 있습니다. 프록시 포트를 선택하세요.',
+        runtimePortWarn: '현재 실행 환경에 포트가 없습니다. 프록시할 수 없습니다',
     },
     php: {
         short_open_tag: '짧은 태그 지원',
@@ -2995,6 +2996,8 @@ const message = {
             postNode: '서브 노드로 동기화',
             postNodeHelper: '서브 노드는 기본적으로 위 설정을 상속하고 사용합니다',
             nodes: '노드 선택',
+            selectNode: '노드 선택',
+            selectNodeError: '노드를 선택하세요',
         },
         alert: {
             isAlert: '알림',

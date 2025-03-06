@@ -2292,6 +2292,7 @@ const message = {
         rainyun: 'Rainyun',
         volcengine: 'Volcengine',
         runtimePortHelper: 'O ambiente de runtime atual possui várias portas. Por favor, selecione uma porta de proxy.',
+        runtimePortWarn: 'В текущей среде выполнения нет портов, невозможно проксировать',
     },
     php: {
         short_open_tag: 'Поддержка коротких тегов',
@@ -3109,6 +3110,8 @@ const message = {
             postNode: 'Синхронизировать с подузлом',
             postNodeHelper: 'Подузлы будут наследовать и использовать указанную конфигурацию по умолчанию',
             nodes: 'Выбрать узлы',
+            selectNode: 'Выбрать узел',
+            selectNodeError: 'Пожалуйста, выберите узел',
         },
         alert: {
             isAlert: 'Оповещение',
