@@ -1195,9 +1195,10 @@ func loadConfigInfo(isCreate bool, req dto.ContainerOperate, oldContainer *types
 	for _, volume := range req.Volumes {
 		if volume.Type == "volume" {
 			hostConf.Mounts = append(hostConf.Mounts, mount.Mount{
-				Type:   mount.Type(volume.Type),
-				Source: volume.SourceDir,
-				Target: volume.ContainerDir,
+				Type:     mount.Type(volume.Type),
+				Source:   volume.SourceDir,
+				Target:   volume.ContainerDir,
+				ReadOnly: volume.Mode == "ro",
 			})
 			config.Volumes[volume.ContainerDir] = struct{}{}
 		} else {
