@@ -2897,7 +2897,6 @@ const message = {
             favicon: '網站圖標',
             faviconHelper: '網站圖標 (建議圖片大小為: 16px*16px)',
             reUpload: '選擇文件',
-            supportType: '只能上傳 jpg/png/jpeg/gif 文件!',
             setDefault: '復原預設',
             setHelper: '即將儲存目前介面設定內容，是否繼續？',
             setDefaultHelper: '即將復原所有界面設定到初始狀態，是否繼續？',

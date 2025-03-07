@@ -2890,7 +2890,6 @@ const message = {
             favicon: '웹사이트 아이콘',
             faviconHelper: '웹사이트 아이콘 (권장 이미지 크기: 16px*16px)',
             reUpload: '파일 선택',
-            supportType: 'JPG, PNG, JPEG, 및 GIF 파일만 지원됩니다.',
             setDefault: '기본값 복원',
             setHelper: '현재 설정이 저장됩니다. 계속하시겠습니까?',
             setDefaultHelper: '모든 패널 설정이 기본값으로 복원됩니다. 계속하시겠습니까?',

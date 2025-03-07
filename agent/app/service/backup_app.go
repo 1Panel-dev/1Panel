@@ -202,6 +202,13 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 
 	recoverApp := func(t *task.Task) error {
 		fileOp := files.NewFileOp()
+		if !isRollback {
+			rollbackFile = path.Join(global.Dir.TmpDir, fmt.Sprintf("app/%s_%s.tar.gz", install.Name, time.Now().Format(constant.DateTimeSlimLayout)))
+			if err := handleAppBackup(install, nil, path.Dir(rollbackFile), path.Base(rollbackFile), "", "", ""); err != nil {
+				t.Log(fmt.Sprintf("backup app %s for rollback before recover failed, err: %v", install.Name, err))
+			}
+		}
+
 		if err := fileOp.TarGzExtractPro(recoverFile, path.Dir(recoverFile), secret); err != nil {
 			return err
 		}
@@ -224,13 +231,6 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 		}
 		if oldInstall.App.Key != install.App.Key || oldInstall.Name != install.Name {
 			return errors.New(i18n.GetMsgByKey("AppAttributesNotMatch"))
-		}
-
-		if !isRollback {
-			rollbackFile = path.Join(global.Dir.TmpDir, fmt.Sprintf("app/%s_%s.tar.gz", install.Name, time.Now().Format(constant.DateTimeSlimLayout)))
-			if err := handleAppBackup(install, nil, path.Dir(rollbackFile), path.Base(rollbackFile), "", "", ""); err != nil {
-				t.Log(fmt.Sprintf("backup app %s for rollback before recover failed, err: %v", install.Name, err))
-			}
 		}
 
 		newEnvFile := ""
@@ -348,7 +348,7 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 		}
 		if !isOk {
 			t.Log(i18n.GetMsgByKey("RecoverFailedStartRollBack"))
-			if err := handleAppRecover(install, t, rollbackFile, true, secret, ""); err != nil {
+			if err := handleAppRecover(install, t, rollbackFile, true, "", ""); err != nil {
 				t.LogFailedWithErr(i18n.GetMsgByKey("Rollback"), err)
 				return
 			}

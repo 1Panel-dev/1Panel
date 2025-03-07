@@ -95,23 +95,17 @@
                     </div>
                 </div>
 
-                <div v-if="dbOptionsLocal.length === 0 && dbOptionsRemote.length === 0">
-                    <LayoutContent :title="'Redis ' + $t('menu.database')" :divider="true">
-                        <template #main>
-                            <div class="app-warn">
-                                <div class="flex flex-col gap-2 items-center justify-center w-full sm:flex-row">
-                                    <span>{{ $t('app.checkInstalledWarn', ['Redis']) }}</span>
-                                    <span @click="goRouter('app')" class="flex items-center justify-center gap-0.5">
-                                        <el-icon><Position /></el-icon>
-                                        {{ $t('database.goInstall') }}
-                                    </span>
-                                </div>
-                                <div>
-                                    <img src="@/assets/images/no_app.svg" />
-                                </div>
-                            </div>
-                        </template>
-                    </LayoutContent>
+                <div class="app-warn" v-if="dbOptionsLocal.length === 0 && dbOptionsRemote.length === 0">
+                    <div class="flex flex-col gap-2 items-center justify-center w-full sm:flex-row">
+                        <span>{{ $t('app.checkInstalledWarn', ['Redis']) }}</span>
+                        <span @click="goRouter('app')" class="flex items-center justify-center gap-0.5">
+                            <el-icon><Position /></el-icon>
+                            {{ $t('database.goInstall') }}
+                        </span>
+                    </div>
+                    <div>
+                        <img src="@/assets/images/no_app.svg" />
+                    </div>
                 </div>
             </template>
         </LayoutContent>

@@ -78,6 +78,26 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 		return err
 	}
 	recoverTask.AddSubTask(task.GetTaskName(website.PrimaryDomain, task.TaskRecover, task.TaskScopeWebsite), func(t *task.Task) error {
+		isOk := false
+		if !isRollback {
+			rollbackFile := path.Join(global.Dir.TmpDir, fmt.Sprintf("website/%s_%s.tar.gz", website.Alias, time.Now().Format(constant.DateTimeSlimLayout)))
+			if err := handleWebsiteBackup(website, path.Dir(rollbackFile), path.Base(rollbackFile), "", "", ""); err != nil {
+				return fmt.Errorf("backup website %s for rollback before recover failed, err: %v", website.Alias, err)
+			}
+			defer func() {
+				if !isOk {
+					t.LogStart(i18n.GetMsgByKey("Rollback"))
+					if err := handleWebsiteRecover(website, rollbackFile, true, "", taskID); err != nil {
+						t.LogFailedWithErr(i18n.GetMsgByKey("Rollback"), err)
+						return
+					}
+					t.LogSuccess(i18n.GetMsgByKey("Rollback"))
+					_ = os.RemoveAll(rollbackFile)
+				} else {
+					_ = os.RemoveAll(rollbackFile)
+				}
+			}()
+		}
 		fileOp := files.NewFileOp()
 		tmpPath := strings.ReplaceAll(recoverFile, ".tar.gz", "")
 		t.Log(i18n.GetWithName("DeCompressFile", recoverFile))
@@ -110,27 +130,6 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 			if !fileOp.Stat(temPathWithName + ".app.tar.gz") {
 				return buserr.WithDetail("ErrBackupExist", ".app.tar.gz", nil)
 			}
-		}
-
-		isOk := false
-		if !isRollback {
-			rollbackFile := path.Join(global.Dir.TmpDir, fmt.Sprintf("website/%s_%s.tar.gz", website.Alias, time.Now().Format(constant.DateTimeSlimLayout)))
-			if err := handleWebsiteBackup(website, path.Dir(rollbackFile), path.Base(rollbackFile), "", "", ""); err != nil {
-				return fmt.Errorf("backup website %s for rollback before recover failed, err: %v", website.Alias, err)
-			}
-			defer func() {
-				if !isOk {
-					t.LogStart(i18n.GetMsgByKey("Rollback"))
-					if err := handleWebsiteRecover(website, rollbackFile, true, "", taskID); err != nil {
-						t.LogFailedWithErr(i18n.GetMsgByKey("Rollback"), err)
-						return
-					}
-					t.LogSuccess(i18n.GetMsgByKey("Rollback"))
-					_ = os.RemoveAll(rollbackFile)
-				} else {
-					_ = os.RemoveAll(rollbackFile)
-				}
-			}()
 		}
 
 		nginxInfo, err := appInstallRepo.LoadBaseInfo(constant.AppOpenresty, "")

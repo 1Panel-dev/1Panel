@@ -78,8 +78,9 @@
                 </el-select>
                 <TableSearch @search="search()" v-model:searchName="searchName" />
             </template>
-            <template #main v-if="currentDB">
+            <template #main>
                 <ComplexTable
+                    v-if="currentDB"
                     :class="{ mask: maskShow }"
                     :pagination-config="paginationConfig"
                     @sort-change="search"
@@ -171,6 +172,18 @@
                         fix
                     />
                 </ComplexTable>
+                <div class="app-warn" v-if="dbOptionsLocal.length === 0 && dbOptionsRemote.length === 0">
+                    <div class="flex flex-col gap-2 items-center justify-center w-full sm:flex-row">
+                        <span>{{ $t('app.checkInstalledWarn', [$t('database.noPostgresql')]) }}</span>
+                        <span @click="goRouter('app')" class="flex items-center justify-center gap-0.5">
+                            <el-icon><Position /></el-icon>
+                            {{ $t('database.goInstall') }}
+                        </span>
+                    </div>
+                    <div>
+                        <img src="@/assets/images/no_app.svg" />
+                    </div>
+                </div>
             </template>
         </LayoutContent>
 
@@ -180,25 +193,6 @@
         >
             <span>{{ $t('commons.service.serviceNotStarted', ['PostgreSQL']) }}</span>
         </el-card>
-
-        <div v-if="dbOptionsLocal.length === 0 && dbOptionsRemote.length === 0">
-            <LayoutContent :title="'PostgreSQL ' + $t('menu.database')" :divider="true">
-                <template #main>
-                    <div class="app-warn">
-                        <div class="flex flex-col gap-2 items-center justify-center w-full sm:flex-row">
-                            <span>{{ $t('app.checkInstalledWarn', [$t('database.noPostgresql')]) }}</span>
-                            <span @click="goRouter('app')" class="flex items-center justify-center gap-0.5">
-                                <el-icon><Position /></el-icon>
-                                {{ $t('database.goInstall') }}
-                            </span>
-                        </div>
-                        <div>
-                            <img src="@/assets/images/no_app.svg" />
-                        </div>
-                    </div>
-                </template>
-            </LayoutContent>
-        </div>
 
         <DialogPro v-model="open" :title="$t('app.checkTitle')" size="small">
             <div class="flex justify-center items-center gap-2 flex-wrap">
@@ -468,7 +462,7 @@ const loadDBOptions = async () => {
         }
     }
     if (currentDB.value) {
-        if (currentDB.value.from === 'remote') {
+        if (currentDB.value?.from === 'remote') {
             maskShow.value = false;
         }
         globalStore.setCurrentDB('');
@@ -488,7 +482,7 @@ const loadDBOptions = async () => {
     if (currentDB.value) {
         search();
     }
-    if (currentDB.value.from === 'remote') {
+    if (currentDB.value?.from === 'remote') {
         maskShow.value = false;
     }
 };

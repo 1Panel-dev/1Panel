@@ -54,8 +54,6 @@ const openWithTaskID = (id: string, tail: boolean) => {
     }
     open.value = true;
     bus.emit('refreshTask', true);
-
-    console.log('11111');
 };
 
 const openWithResourceID = (taskType: string, taskOperate: string, resourceID: number) => {

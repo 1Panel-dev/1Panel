@@ -107,6 +107,8 @@ type SearchForSize struct {
 	DetailName string `json:"detailName"`
 	Info       string `json:"info"`
 	CronjobID  uint   `json:"cronjobID"`
+	OrderBy    string `json:"orderBy"`
+	Order      string `json:"order"`
 }
 type RecordFileSize struct {
 	ID   uint   `json:"id"`

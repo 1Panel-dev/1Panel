@@ -206,7 +206,7 @@ func (u *BackupRecordService) LoadRecordSize(req dto.SearchForSize) ([]dto.Recor
 	var list []backupSizeHelper
 	switch req.Type {
 	case "snapshot":
-		_, records, err := snapshotRepo.Page(req.Page, req.PageSize, repo.WithByLikeName(req.Info))
+		_, records, err := snapshotRepo.Page(req.Page, req.PageSize, repo.WithByLikeName(req.Info), repo.WithOrderRuleBy(req.OrderBy, req.Order))
 		if err != nil {
 			return nil, err
 		}
@@ -214,7 +214,7 @@ func (u *BackupRecordService) LoadRecordSize(req dto.SearchForSize) ([]dto.Recor
 			list = append(list, backupSizeHelper{ID: item.ID, DownloadID: item.DownloadAccountID, FilePath: fmt.Sprintf("system_snapshot/%s.tar.gz", item.Name)})
 		}
 	case "cronjob":
-		_, records, err := backupRepo.PageRecord(req.Page, req.PageSize, backupRepo.WithByCronID(req.CronjobID))
+		_, records, err := backupRepo.PageRecord(req.Page, req.PageSize, repo.WithOrderBy("created_at desc"), backupRepo.WithByCronID(req.CronjobID))
 		if err != nil {
 			return nil, err
 		}

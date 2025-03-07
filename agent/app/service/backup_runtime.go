@@ -46,6 +46,25 @@ func handleRuntimeBackup(runtime *model.Runtime, backupDir, fileName string, exc
 
 func handleRuntimeRecover(runtime *model.Runtime, recoverFile string, isRollback bool, secret string) error {
 	isOk := false
+	if !isRollback {
+		rollbackFile := path.Join(global.Dir.TmpDir, fmt.Sprintf("runtime/%s_%s.tar.gz", runtime.Name, time.Now().Format(constant.DateTimeSlimLayout)))
+		if err := handleRuntimeBackup(runtime, path.Dir(rollbackFile), path.Base(rollbackFile), "", secret); err != nil {
+			return fmt.Errorf("backup runtime %s for rollback before recover failed, err: %v", runtime.Name, err)
+		}
+		defer func() {
+			if !isOk {
+				global.LOG.Info("recover failed, start to rollback now")
+				if err := handleRuntimeRecover(runtime, rollbackFile, true, ""); err != nil {
+					global.LOG.Errorf("rollback runtime %s from %s failed, err: %v", runtime.Name, rollbackFile, err)
+					return
+				}
+				global.LOG.Infof("rollback runtime %s from %s successful", runtime.Name, rollbackFile)
+				_ = os.RemoveAll(rollbackFile)
+			} else {
+				_ = os.RemoveAll(rollbackFile)
+			}
+		}()
+	}
 	fileOp := files.NewFileOp()
 	if err := fileOp.TarGzExtractPro(recoverFile, path.Dir(recoverFile), secret); err != nil {
 		return err
@@ -69,26 +88,6 @@ func handleRuntimeRecover(runtime *model.Runtime, recoverFile string, isRollback
 	}
 	if oldRuntime.Type != runtime.Type || oldRuntime.Name != runtime.Name {
 		return errors.New("the current backup file does not match the application")
-	}
-
-	if !isRollback {
-		rollbackFile := path.Join(global.Dir.TmpDir, fmt.Sprintf("runtime/%s_%s.tar.gz", runtime.Name, time.Now().Format(constant.DateTimeSlimLayout)))
-		if err := handleRuntimeBackup(runtime, path.Dir(rollbackFile), path.Base(rollbackFile), "", secret); err != nil {
-			return fmt.Errorf("backup runtime %s for rollback before recover failed, err: %v", runtime.Name, err)
-		}
-		defer func() {
-			if !isOk {
-				global.LOG.Info("recover failed, start to rollback now")
-				if err := handleRuntimeRecover(runtime, rollbackFile, true, secret); err != nil {
-					global.LOG.Errorf("rollback runtime %s from %s failed, err: %v", runtime.Name, rollbackFile, err)
-					return
-				}
-				global.LOG.Infof("rollback runtime %s from %s successful", runtime.Name, rollbackFile)
-				_ = os.RemoveAll(rollbackFile)
-			} else {
-				_ = os.RemoveAll(rollbackFile)
-			}
-		}()
 	}
 
 	newEnvFile, err := coverEnvJsonToStr(runtime.Env)

@@ -2880,7 +2880,6 @@ const message = {
             favicon: '网站图标',
             faviconHelper: '网站图标 (建议图片大小为: 16px*16px)',
             reUpload: '选择文件',
-            supportType: '只能上传 jpg/png/jpeg/gif 文件!',
             setHelper: '即将保存当前界面设置内容，是否继续？',
             setDefaultHelper: '即将恢复所有界面设置到初始状态，是否继续？',
         },

@@ -2935,7 +2935,6 @@ const message = {
             favicon: 'ウェブサイトアイコン',
             faviconHelper: 'ウェブサイトアイコン（推奨画像サイズ：16px*16px）',
             reUpload: 'ファイルを選択',
-            supportType: 'JPG、PNG、JPEG、GIFファイルのみサポートされています。',
             setDefault: 'デフォルトに戻す',
             setHelper: '現在の設定が保存されます。続けますか？',
             setDefaultHelper: 'すべてのパネル設定がデフォルトに戻されます。続けますか？',

@@ -3008,7 +3008,6 @@ const message = {
             favicon: 'Ícone do Site',
             faviconHelper: 'Ícone do site (tamanho recomendado da imagem: 16px*16px)',
             reUpload: 'Selecionar Arquivo',
-            supportType: 'Apenas arquivos JPG, PNG, JPEG e GIF são suportados.',
             setDefault: 'Restaurar Padrão',
             setHelper: 'As configurações atuais serão salvas. Deseja continuar?',
             setDefaultHelper: 'Todas as configurações do painel serão restauradas para o padrão. Deseja continuar?',

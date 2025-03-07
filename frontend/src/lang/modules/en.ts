@@ -3126,7 +3126,6 @@ const message = {
             favicon: 'Website Icon',
             faviconHelper: 'Website icon (recommended image size: 16px*16px)',
             reUpload: 'Choose File',
-            supportType: 'Only JPG, PNG, JPEG, and GIF files are supported.',
             setDefault: 'Restore Default',
             setHelper: 'The current settings will be saved. Do you want to continue?',
             setDefaultHelper: 'All panel settings will be restored to default. Do you want to continue?',

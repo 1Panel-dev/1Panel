@@ -154,7 +154,7 @@ func (u *CronjobService) handleDirectory(cronjob model.Cronjob, startTime time.T
 
 	fileOp := files.NewFileOp()
 	if cronjob.IsDir {
-		if err := fileOp.TarGzCompressPro(true, cronjob.SourceDir, path.Join(backupDir, fileName), cronjob.ExclusionRules, cronjob.Secret); err != nil {
+		if err := fileOp.TarGzCompressPro(true, cronjob.SourceDir, path.Join(backupDir, fileName), cronjob.Secret, cronjob.ExclusionRules); err != nil {
 			return err
 		}
 	} else {

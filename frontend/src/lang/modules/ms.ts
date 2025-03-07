@@ -3005,7 +3005,6 @@ const message = {
             favicon: 'Ikon Laman Web',
             faviconHelper: 'Ikon laman web (saiz imej yang disarankan: 16px*16px)',
             reUpload: 'Pilih Fail',
-            supportType: 'Hanya fail JPG, PNG, JPEG, dan GIF yang disokong.',
             setDefault: 'Pulihkan Tetapan Asal',
             setHelper: 'Tetapan semasa akan disimpan. Adakah anda ingin meneruskan?',
             setDefaultHelper: 'Semua tetapan panel akan dikembalikan ke asal. Adakah anda ingin meneruskan?',
