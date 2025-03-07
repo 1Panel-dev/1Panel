@@ -123,7 +123,6 @@ const message = {
         },
         msg: {
             noneData: '暫無資料',
-            disConn: '請直接點選斷開按鈕斷開終端連接，避免使用 {0} 等退出指令。',
             delete: '刪除 操作不可復原，是否繼續？',
             clean: '清空 操作不可復原，是否繼續？',
             deleteTitle: '刪除',

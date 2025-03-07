@@ -1,11 +1,8 @@
 package ssh
 
 import (
-	"bytes"
 	"fmt"
-	"io"
 	"strings"
-	"sync"
 	"time"
 
 	gossh "golang.org/x/crypto/ssh"
@@ -80,58 +77,6 @@ func (c *ConnInfo) Run(shell string) (string, error) {
 
 func (c *ConnInfo) Close() {
 	_ = c.Client.Close()
-}
-
-type SshConn struct {
-	StdinPipe   io.WriteCloser
-	ComboOutput *wsBufferWriter
-	Session     *gossh.Session
-}
-
-func (c *ConnInfo) NewSshConn(cols, rows int) (*SshConn, error) {
-	sshSession, err := c.Client.NewSession()
-	if err != nil {
-		return nil, err
-	}
-
-	stdinP, err := sshSession.StdinPipe()
-	if err != nil {
-		return nil, err
-	}
-
-	comboWriter := new(wsBufferWriter)
-	sshSession.Stdout = comboWriter
-	sshSession.Stderr = comboWriter
-
-	modes := gossh.TerminalModes{
-		gossh.ECHO:          1,
-		gossh.TTY_OP_ISPEED: 14400,
-		gossh.TTY_OP_OSPEED: 14400,
-	}
-	if err := sshSession.RequestPty("xterm", rows, cols, modes); err != nil {
-		return nil, err
-	}
-	if err := sshSession.Shell(); err != nil {
-		return nil, err
-	}
-	return &SshConn{StdinPipe: stdinP, ComboOutput: comboWriter, Session: sshSession}, nil
-}
-
-func (s *SshConn) Close() {
-	if s.Session != nil {
-		s.Session.Close()
-	}
-}
-
-type wsBufferWriter struct {
-	buffer bytes.Buffer
-	mu     sync.Mutex
-}
-
-func (w *wsBufferWriter) Write(p []byte) (int, error) {
-	w.mu.Lock()
-	defer w.mu.Unlock()
-	return w.buffer.Write(p)
 }
 
 func makePrivateKeySigner(privateKey []byte, passPhrase []byte) (gossh.Signer, error) {

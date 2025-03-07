@@ -16,12 +16,7 @@
                 </template>
             </DrawerHeader>
         </template>
-        <el-alert type="error" :closable="false">
-            <template #title>
-                <span>{{ $t('commons.msg.disConn', ['/bye exit']) }}</span>
-            </template>
-        </el-alert>
-        <Terminal class="mt-2" style="height: calc(100vh - 225px)" ref="terminalRef"></Terminal>
+        <Terminal class="mt-2" style="height: calc(100vh - 175px)" ref="terminalRef"></Terminal>
 
         <template #footer>
             <span class="dialog-footer">
@@ -67,8 +62,8 @@ const loadTooltip = () => {
 const initTerm = () => {
     nextTick(() => {
         terminalRef.value.acceptParams({
-            endpoint: '/api/v1/ai/ollama/exec',
-            args: `name=${itemName.value}`,
+            endpoint: '/api/v1/containers/exec',
+            args: `source=ollama&name=${itemName.value}`,
             error: '',
             initCmd: '',
         });

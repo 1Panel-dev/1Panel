@@ -10,12 +10,7 @@
         <template #header>
             <DrawerHeader :header="$t('container.containerTerminal')" :resource="title" :back="handleClose" />
         </template>
-        <el-alert type="error" :closable="false">
-            <template #title>
-                <span>{{ $t('commons.msg.disConn', ['exit']) }}</span>
-            </template>
-        </el-alert>
-        <el-form ref="formRef" class="mt-2" :model="form" label-position="top">
+        <el-form ref="formRef" :model="form" label-position="top">
             <el-form-item :label="$t('commons.table.user')" prop="user">
                 <el-input placeholder="root" clearable v-model="form.user" />
             </el-form-item>
@@ -51,7 +46,7 @@
             </el-button>
             <el-button v-else @click="onClose()">{{ $t('commons.button.disconnect') }}</el-button>
             <Terminal
-                style="height: calc(100vh - 355px); margin-top: 18px"
+                style="height: calc(100vh - 312px); margin-top: 18px"
                 ref="terminalRef"
                 v-if="terminalOpen"
             ></Terminal>
@@ -104,7 +99,7 @@ const initTerm = (formEl: FormInstance | undefined) => {
         await nextTick();
         terminalRef.value!.acceptParams({
             endpoint: '/api/v1/containers/exec',
-            args: `containerid=${form.containerID}&user=${form.user}&command=${form.command}`,
+            args: `source=container&containerid=${form.containerID}&user=${form.user}&command=${form.command}`,
             error: '',
             initCmd: '',
         });

@@ -123,8 +123,6 @@ const message = {
         },
         msg: {
             noneData: 'Nenhum dado disponível',
-            disConn:
-                'Por favor, clique diretamente no botão de desconexão para encerrar a conexão do terminal, evitando o uso de comandos de saída como {0}.',
             delete: 'Esta operação de exclusão não pode ser desfeita. Deseja continuar?',
             clean: 'Esta operação de limpeza não pode ser desfeita. Deseja continuar?',
             deleteTitle: 'Excluir',

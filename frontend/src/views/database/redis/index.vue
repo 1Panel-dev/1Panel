@@ -309,8 +309,8 @@ const initTerminal = async () => {
             terminalShow.value = true;
             redisStatus.value = 'Running';
             terminalRef.value.acceptParams({
-                endpoint: '/api/v1/databases/redis/exec',
-                args: `name=${currentDBName.value}&from=${currentDB.value.from}`,
+                endpoint: '/api/v1/containers/exec',
+                args: `source=redis&name=${currentDBName.value}&from=${currentDB.value.from}`,
                 error: '',
                 initCmd: '',
             });
@@ -327,8 +327,8 @@ const initTerminal = async () => {
                 if (res.data.status === 'Running') {
                     terminalShow.value = true;
                     terminalRef.value.acceptParams({
-                        endpoint: '/api/v1/databases/redis/exec',
-                        args: `name=${currentDBName.value}&from=${currentDB.value.from}`,
+                        endpoint: '/api/v1/containers/exec',
+                        args: `source=redis&name=${currentDBName.value}&from=${currentDB.value.from}`,
                         error: '',
                         initCmd: '',
                     });
