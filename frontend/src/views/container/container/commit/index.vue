@@ -69,6 +69,9 @@ interface DialogProps {
     containerName: string;
 }
 const acceptParams = (props: DialogProps): void => {
+    form.newImageName = '';
+    form.comment = '';
+    form.author = '';
     form.containerID = props.containerID;
     form.containerName = props.containerName;
     drawerVisible.value = true;

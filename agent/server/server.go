@@ -43,8 +43,8 @@ func Start() {
 	validator.Init()
 	gin.SetMode("debug")
 	cron.Run()
-	InitOthers()
 	hook.Init()
+	InitOthers()
 
 	rootRouter := router.Routers()
 

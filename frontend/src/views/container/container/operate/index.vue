@@ -540,7 +540,7 @@ const search = async () => {
                 form.labels = res.data.labels || [];
                 form.env = res.data.env || [];
                 form.exposedPorts = res.data.exposedPorts || [];
-                for (const item of res.data.exposedPorts) {
+                for (const item of form.exposedPorts) {
                     if (item.hostIP) {
                         item.host = item.hostIP + ':' + item.hostPort;
                     } else {

@@ -29,6 +29,13 @@ func StringEncryptWithKey(text, key string) (string, error) {
 	if len(text) == 0 {
 		return "", nil
 	}
+	if len(key) < 16 {
+		for len(key) < 16 {
+			key += "u"
+		}
+	} else {
+		key = key[:16]
+	}
 	pass := []byte(text)
 	xpass, err := aesEncryptWithSalt([]byte(key), pass)
 	if err == nil {
@@ -64,6 +71,13 @@ func StringDecryptWithBase64(text string) (string, error) {
 func StringDecryptWithKey(text, key string) (string, error) {
 	if len(text) == 0 {
 		return "", nil
+	}
+	if len(key) < 16 {
+		for len(key) < 16 {
+			key += "u"
+		}
+	} else {
+		key = key[:16]
 	}
 	bytesPass, err := base64.StdEncoding.DecodeString(text)
 	if err != nil {
