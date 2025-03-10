@@ -6,15 +6,15 @@ command -v wget >/dev/null || {
 }
 
 if [ ! -f "1pctl" ]; then 
-  wget https://github.com/1Panel-dev/installer/raw/main/1pctl
+  wget https://github.com/1Panel-dev/installer/raw/dev/1pctl
 fi
 
 if [ ! -f "1panel.service" ]; then 
-  wget https://github.com/1Panel-dev/installer/raw/main/1panel.service
+  wget https://github.com/1Panel-dev/installer/raw/dev/1panel.service
 fi
 
 if [ ! -f "install.sh" ]; then 
-  wget https://github.com/1Panel-dev/installer/raw/main/install.sh
+  wget https://github.com/1Panel-dev/installer/raw/dev/install.sh
 fi
 
 if [ ! -f "GeoIP.mmdb" ]; then 
