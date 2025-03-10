@@ -934,11 +934,9 @@ func (u *ContainerService) DownloadContainerLogs(containerType, container, since
 	if cmd.CheckIllegal(container, since, tail) {
 		return buserr.New("ErrCmdIllegal")
 	}
-	commandName := "docker"
 	commandArg := []string{"logs", container}
 	if containerType == "compose" {
-		commandName = "docker compose"
-		commandArg = []string{"-f", container, "logs"}
+		commandArg = []string{"compose", "-f", container, "logs"}
 	}
 	if tail != "0" {
 		commandArg = append(commandArg, "--tail")
@@ -949,7 +947,7 @@ func (u *ContainerService) DownloadContainerLogs(containerType, container, since
 		commandArg = append(commandArg, since)
 	}
 
-	cmd := exec.Command(commandName, commandArg...)
+	cmd := exec.Command("docker", commandArg...)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		_ = cmd.Process.Signal(syscall.SIGTERM)

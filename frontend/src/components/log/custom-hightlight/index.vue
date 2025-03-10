@@ -1,9 +1,11 @@
 <template>
     <span v-for="(token, index) in tokens" :key="index" :class="['token', token.type]" :style="{ color: token.color }">
-        {{ token.text }}
+        <span v-if="token.type != 'html'">{{ token.text }}</span>
+        <span v-else v-html="token.text"></span>
     </span>
 </template>
 <script setup lang="ts">
+import anser from 'anser';
 interface TokenRule {
     type: string;
     pattern: RegExp;
@@ -14,6 +16,7 @@ interface Token {
     text: string;
     type: string;
     color: string;
+    html?: string;
 }
 
 const props = defineProps<{
@@ -128,7 +131,22 @@ const containerRules: TokenRule[] = [
     },
 ];
 
+function hasANSICodes(text: string) {
+    const ansiRegex = /\x1b\[[0-9;]*[mK]/;
+    return ansiRegex.test(text);
+}
+
 function tokenizeLog(log: string): Token[] {
+    if (hasANSICodes(log)) {
+        let html = anser.ansiToHtml(log);
+        return [
+            {
+                text: html,
+                type: 'html',
+                color: '',
+            },
+        ];
+    }
     const tokens: Token[] = [];
     let lastIndex = 0;
     let matches: { index: number; text: string; type: string; color: string }[] = [];

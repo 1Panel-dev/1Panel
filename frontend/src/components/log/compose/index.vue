@@ -12,7 +12,7 @@
             </el-tooltip>
         </template>
         <template #content>
-            <ContainerLog :compose="compose" />
+            <ContainerLog :compose="compose" :resource="resource" />
         </template>
     </DrawerPro>
 </template>

@@ -55,6 +55,10 @@ const props = defineProps({
         type: String,
         default: '',
     },
+    resource: {
+        type: String,
+        default: '',
+    },
 });
 
 const logVisible = ref(false);
@@ -116,6 +120,10 @@ const searchLogs = async () => {
         MsgError(i18n.global.t('container.linesHelper'));
         return;
     }
+    if (!logSearch.isWatch) {
+        stopListening();
+        return;
+    }
     logs.value = [];
     let url = `/api/v2/containers/search/log?container=${logSearch.container}&since=${logSearch.mode}&tail=${logSearch.tail}&follow=${logSearch.isWatch}`;
     if (logSearch.compose !== '') {
@@ -139,20 +147,26 @@ const searchLogs = async () => {
 
 const onDownload = async () => {
     logSearch.tail = 0;
-    let msg = i18n.global.t('container.downLogHelper1', [logSearch.container]);
+    const container = logSearch.compose === '' ? logSearch.container : logSearch.compose;
+    let resource = container;
+    if (props.resource) {
+        resource = props.resource;
+    }
+    const containerType = logSearch.compose === '' ? 'container' : 'compose';
+    let msg = i18n.global.t('container.downLogHelper1', [resource]);
     ElMessageBox.confirm(msg, i18n.global.t('commons.button.download'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',
     }).then(async () => {
         let params = {
-            container: logSearch.container,
+            container: container,
             since: logSearch.mode,
             tail: logSearch.tail,
-            containerType: 'container',
+            containerType: containerType,
         };
         let addItem = {};
-        addItem['name'] = logSearch.container + '-' + dateFormatForName(new Date()) + '.log';
+        addItem['name'] = resource + '-' + dateFormatForName(new Date()) + '.log';
         DownloadFile(params).then((res) => {
             const downloadUrl = window.URL.createObjectURL(new Blob([res]));
             const a = document.createElement('a');
