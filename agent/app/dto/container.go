@@ -8,7 +8,7 @@ type PageContainer struct {
 	PageInfo
 	Name            string `json:"name"`
 	State           string `json:"state" validate:"required,oneof=all created running paused restarting removing exited dead"`
-	OrderBy         string `json:"orderBy" validate:"required,oneof=name createdAt"`
+	OrderBy         string `json:"orderBy" validate:"required,oneof=name createdAt state"`
 	Order           string `json:"order" validate:"required,oneof=null ascending descending"`
 	Filters         string `json:"filters"`
 	ExcludeAppStore bool   `json:"excludeAppStore"`
@@ -102,6 +102,7 @@ type ContainerCreateByCommand struct {
 }
 
 type ContainerUpgrade struct {
+	TaskID    string `json:"taskID"`
 	Name      string `json:"name" validate:"required"`
 	Image     string `json:"image" validate:"required"`
 	ForcePull bool   `json:"forcePull"`

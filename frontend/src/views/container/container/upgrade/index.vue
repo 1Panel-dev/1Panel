@@ -3,7 +3,7 @@
         v-model="drawerVisible"
         :header="$t('commons.button.upgrade')"
         @close="handleClose"
-        :resource="form.containerName"
+        :resource="form.name"
         size="large"
     >
         <el-alert
@@ -48,20 +48,24 @@
             </span>
         </template>
     </DrawerPro>
+    <TaskLog ref="taskLogRef" width="70%" @close="closeTaskLog()" />
 </template>
 
 <script lang="ts" setup>
 import { upgradeContainer } from '@/api/modules/container';
 import { Rules } from '@/global/form-rules';
+import TaskLog from '@/components/log/task/index.vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
+import { newUUID } from '@/utils/util';
 import { ElForm } from 'element-plus';
 import { reactive, ref } from 'vue';
 
 const loading = ref(false);
+const taskLogRef = ref();
 
 const form = reactive({
-    containerName: '',
+    name: '',
     oldImageName: '',
     newImageName: '',
     hasName: true,
@@ -81,7 +85,7 @@ interface DialogProps {
     fromApp: boolean;
 }
 const acceptParams = (props: DialogProps): void => {
-    form.containerName = props.container;
+    form.name = props.container;
     form.oldImageName = props.image;
     form.fromApp = props.fromApp;
     form.hasName = props.image.indexOf('sha256:') === -1;
@@ -102,11 +106,18 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
             cancelButtonText: i18n.global.t('commons.button.cancel'),
         }).then(async () => {
+            let taskID = newUUID();
+            let param = {
+                taskID: taskID,
+                name: form.name,
+                image: form.newImageName,
+                forcePull: form.forcePull,
+            };
             loading.value = true;
-            await upgradeContainer(form.containerName, form.newImageName, form.forcePull)
+            await upgradeContainer(param)
                 .then(() => {
                     loading.value = false;
-                    emit('search');
+                    openTaskLog(taskID);
                     drawerVisible.value = false;
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 })
@@ -116,8 +127,16 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         });
     });
 };
+const openTaskLog = (taskID: string) => {
+    taskLogRef.value.openWithTaskID(taskID);
+};
+
 const handleClose = async () => {
     drawerVisible.value = false;
+    emit('search');
+};
+
+const closeTaskLog = () => {
     emit('search');
 };
 

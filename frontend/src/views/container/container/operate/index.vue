@@ -581,7 +581,7 @@ type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 
 const goBack = () => {
-    router.push({ name: 'Container' });
+    router.push({ name: 'ContainerItem' });
 };
 
 const openDialog = () => {

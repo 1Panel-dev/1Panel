@@ -83,6 +83,12 @@ export namespace Container {
         env: Array<string>;
         restartPolicy: string;
     }
+    export interface ContainerUpgrade {
+        taskID: string;
+        name: string;
+        image: string;
+        forcePull: boolean;
+    }
     export interface Port {
         host: string;
         hostIP: string;

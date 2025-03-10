@@ -24,8 +24,8 @@ export const createContainerByCommand = (command: string, taskID: string) => {
 export const updateContainer = (params: Container.ContainerHelper) => {
     return http.post(`/containers/update`, params, TimeoutEnum.T_10M);
 };
-export const upgradeContainer = (name: string, image: string, forcePull: boolean) => {
-    return http.post(`/containers/upgrade`, { name: name, image: image, forcePull: forcePull }, TimeoutEnum.T_10M);
+export const upgradeContainer = (params: Container.ContainerUpgrade) => {
+    return http.post(`/containers/upgrade`, params, TimeoutEnum.T_10M);
 };
 export const commitContainer = (params: Container.ContainerCommit) => {
     return http.post(`/containers/commit`, params);

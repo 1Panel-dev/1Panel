@@ -604,40 +604,62 @@ func (u *ContainerService) ContainerUpdate(req dto.ContainerOperate) error {
 	if newContainer.ContainerJSONBase != nil && newContainer.ID != req.ContainerID {
 		return buserr.New("ErrContainerName")
 	}
-
 	oldContainer, err := client.ContainerInspect(ctx, req.ContainerID)
 	if err != nil {
 		return err
 	}
-	if !checkImageExist(client, req.Image) || req.ForcePull {
-		if err := pullImages(ctx, client, req.Image); err != nil {
-			if !req.ForcePull {
+
+	taskItem, err := task.NewTaskWithOps(req.Name, task.TaskUpdate, task.TaskScopeContainer, req.TaskID, 1)
+	if err != nil {
+		global.LOG.Errorf("new task for create container failed, err: %v", err)
+		return err
+	}
+	go func() {
+		taskItem.AddSubTask(i18n.GetWithName("ContainerImagePull", req.Image), func(t *task.Task) error {
+			if !checkImageExist(client, req.Image) || req.ForcePull {
+				if err := pullImages(ctx, client, req.Image); err != nil {
+					if !req.ForcePull {
+						return err
+					}
+					return fmt.Errorf("pull image %s failed, err: %v", req.Image, err)
+				}
+			}
+			return nil
+		}, nil)
+
+		taskItem.AddSubTask(i18n.GetWithName("ContainerCreate", req.Name), func(t *task.Task) error {
+			err := client.ContainerRemove(ctx, req.ContainerID, container.RemoveOptions{Force: true})
+			taskItem.LogWithStatus(i18n.GetMsgByKey("ContainerRemoveOld"), err)
+			if err != nil {
 				return err
 			}
-			return fmt.Errorf("pull image %s failed, err: %v", req.Image, err)
+
+			config, hostConf, networkConf, err := loadConfigInfo(false, req, &oldContainer)
+			taskItem.LogWithStatus(i18n.GetMsgByKey("ContainerLoadInfo"), err)
+			if err != nil {
+				taskItem.Log(i18n.GetMsgByKey("ContainerRecreate"))
+				reCreateAfterUpdate(req.Name, client, oldContainer.Config, oldContainer.HostConfig, oldContainer.NetworkSettings)
+				return err
+			}
+
+			con, err := client.ContainerCreate(ctx, config, hostConf, networkConf, &v1.Platform{}, req.Name)
+			if err != nil {
+				taskItem.Log(i18n.GetMsgByKey("ContainerRecreate"))
+				reCreateAfterUpdate(req.Name, client, oldContainer.Config, oldContainer.HostConfig, oldContainer.NetworkSettings)
+				return fmt.Errorf("update container failed, err: %v", err)
+			}
+			err = client.ContainerStart(ctx, con.ID, container.StartOptions{})
+			taskItem.LogWithStatus(i18n.GetMsgByKey("ContainerStartCheck"), err)
+			if err != nil {
+				return fmt.Errorf("update successful but start failed, err: %v", err)
+			}
+			return nil
+		}, nil)
+
+		if err := taskItem.Execute(); err != nil {
+			global.LOG.Error(err.Error())
 		}
-	}
-
-	if err := client.ContainerRemove(ctx, req.ContainerID, container.RemoveOptions{Force: true}); err != nil {
-		return err
-	}
-
-	config, hostConf, networkConf, err := loadConfigInfo(false, req, &oldContainer)
-	if err != nil {
-		reCreateAfterUpdate(req.Name, client, oldContainer.Config, oldContainer.HostConfig, oldContainer.NetworkSettings)
-		return err
-	}
-
-	global.LOG.Infof("new container info %s has been update, now start to recreate", req.Name)
-	con, err := client.ContainerCreate(ctx, config, hostConf, networkConf, &v1.Platform{}, req.Name)
-	if err != nil {
-		reCreateAfterUpdate(req.Name, client, oldContainer.Config, oldContainer.HostConfig, oldContainer.NetworkSettings)
-		return fmt.Errorf("update container failed, err: %v", err)
-	}
-	global.LOG.Infof("update container %s successful! now check if the container is started.", req.Name)
-	if err := client.ContainerStart(ctx, con.ID, container.StartOptions{}); err != nil {
-		return fmt.Errorf("update successful but start failed, err: %v", err)
-	}
+	}()
 
 	return nil
 }
@@ -653,38 +675,59 @@ func (u *ContainerService) ContainerUpgrade(req dto.ContainerUpgrade) error {
 	if err != nil {
 		return err
 	}
-	if !checkImageExist(client, req.Image) || req.ForcePull {
-		if err := pullImages(ctx, client, req.Image); err != nil {
-			if !req.ForcePull {
-				return err
-			}
-			return fmt.Errorf("pull image %s failed, err: %v", req.Image, err)
-		}
-	}
-	config := oldContainer.Config
-	config.Image = req.Image
-	hostConf := oldContainer.HostConfig
-	var networkConf network.NetworkingConfig
-	if oldContainer.NetworkSettings != nil {
-		for networkKey := range oldContainer.NetworkSettings.Networks {
-			networkConf.EndpointsConfig = map[string]*network.EndpointSettings{networkKey: {}}
-			break
-		}
-	}
-	if err := client.ContainerRemove(ctx, req.Name, container.RemoveOptions{Force: true}); err != nil {
+	taskItem, err := task.NewTaskWithOps(req.Name, task.TaskUpgrade, task.TaskScopeContainer, req.TaskID, 1)
+	if err != nil {
+		global.LOG.Errorf("new task for create container failed, err: %v", err)
 		return err
 	}
+	go func() {
+		taskItem.AddSubTask(i18n.GetWithName("ContainerImagePull", req.Image), func(t *task.Task) error {
+			if !checkImageExist(client, req.Image) || req.ForcePull {
+				if err := pullImages(ctx, client, req.Image); err != nil {
+					if !req.ForcePull {
+						return err
+					}
+					return fmt.Errorf("pull image %s failed, err: %v", req.Image, err)
+				}
+			}
+			return nil
+		}, nil)
 
-	global.LOG.Infof("new container info %s has been update, now start to recreate", req.Name)
-	con, err := client.ContainerCreate(ctx, config, hostConf, &networkConf, &v1.Platform{}, req.Name)
-	if err != nil {
-		reCreateAfterUpdate(req.Name, client, oldContainer.Config, oldContainer.HostConfig, oldContainer.NetworkSettings)
-		return fmt.Errorf("upgrade container failed, err: %v", err)
-	}
-	global.LOG.Infof("upgrade container %s successful! now check if the container is started.", req.Name)
-	if err := client.ContainerStart(ctx, con.ID, container.StartOptions{}); err != nil {
-		return fmt.Errorf("upgrade successful but start failed, err: %v", err)
-	}
+		taskItem.AddSubTask(i18n.GetWithName("ContainerCreate", req.Name), func(t *task.Task) error {
+			config := oldContainer.Config
+			config.Image = req.Image
+			hostConf := oldContainer.HostConfig
+			var networkConf network.NetworkingConfig
+			if oldContainer.NetworkSettings != nil {
+				for networkKey := range oldContainer.NetworkSettings.Networks {
+					networkConf.EndpointsConfig = map[string]*network.EndpointSettings{networkKey: {}}
+					break
+				}
+			}
+			err := client.ContainerRemove(ctx, req.Name, container.RemoveOptions{Force: true})
+			taskItem.LogWithStatus(i18n.GetMsgByKey("ContainerRemoveOld"), err)
+			if err != nil {
+				return err
+			}
+
+			con, err := client.ContainerCreate(ctx, config, hostConf, &networkConf, &v1.Platform{}, req.Name)
+			if err != nil {
+				taskItem.Log(i18n.GetMsgByKey("ContainerRecreate"))
+				reCreateAfterUpdate(req.Name, client, oldContainer.Config, oldContainer.HostConfig, oldContainer.NetworkSettings)
+				return fmt.Errorf("upgrade container failed, err: %v", err)
+			}
+			err = client.ContainerStart(ctx, con.ID, container.StartOptions{})
+			taskItem.LogWithStatus(i18n.GetMsgByKey("ContainerStartCheck"), err)
+			if err != nil {
+				return fmt.Errorf("upgrade successful but start failed, err: %v", err)
+			}
+			return nil
+		}, nil)
+
+		if err := taskItem.Execute(); err != nil {
+			global.LOG.Error(err.Error())
+		}
+	}()
 
 	return nil
 }
