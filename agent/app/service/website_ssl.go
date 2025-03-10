@@ -154,6 +154,16 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 			domains = append(domains, domain)
 		}
 	}
+	if create.Provider == constant.Http {
+		if strings.Contains(create.PrimaryDomain, "*") {
+			return res, buserr.New("ErrWildcardDomain")
+		}
+		for _, domain := range domains {
+			if strings.Contains(domain, "*") {
+				return res, buserr.New("ErrWildcardDomain")
+			}
+		}
+	}
 	websiteSSL.Domains = strings.Join(domains, ",")
 
 	if create.Provider == constant.DNSAccount || create.Provider == constant.Http {
@@ -234,6 +244,11 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 		return err
 	}
 
+	domains := []string{websiteSSL.PrimaryDomain}
+	if websiteSSL.Domains != "" {
+		domains = append(domains, strings.Split(websiteSSL.Domains, ",")...)
+	}
+
 	switch websiteSSL.Provider {
 	case constant.DNSAccount:
 		dnsAccount, err = websiteDnsRepo.GetFirst(repo.WithByID(websiteSSL.DnsAccountID))
@@ -251,6 +266,11 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 			}
 			return err
 		}
+		for _, domain := range domains {
+			if strings.Contains(domain, "*") {
+				return buserr.New("ErrWildcardDomain")
+			}
+		}
 		if err := client.UseHTTP(path.Join(appInstall.GetPath(), "root")); err != nil {
 			return err
 		}
@@ -258,11 +278,6 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 		if err := client.UseManualDns(*websiteSSL); err != nil {
 			return err
 		}
-	}
-
-	domains := []string{websiteSSL.PrimaryDomain}
-	if websiteSSL.Domains != "" {
-		domains = append(domains, strings.Split(websiteSSL.Domains, ",")...)
 	}
 
 	var privateKey crypto.PrivateKey

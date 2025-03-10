@@ -157,6 +157,7 @@ ExecShellStart: "开始执行脚本"
 ExecShellSuccess: "脚本执行成功"
 StartUpdateSystemSSL: "开始更新系统证书"
 UpdateSystemSSLSuccess: "更新系统证书成功"
+ErrWildcardDomain: "HTTP 模式无法申请泛域名证书"
 
 #mysql
 ErrUserIsExist: "当前用户已存在，请重新输入"
