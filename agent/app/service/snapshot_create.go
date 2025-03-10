@@ -261,13 +261,15 @@ func snapBaseData(snap snapHelper, targetDir string) error {
 	snap.Task.Log("---------------------- 2 / 8 ----------------------")
 	snap.Task.LogStart(i18n.GetMsgByKey("SnapBaseInfo"))
 
-	err := snap.FileOp.CopyFile("/usr/local/bin/1panel-core", targetDir)
-	snap.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/usr/local/bin/1panel-core"), err)
-	if err != nil {
-		return err
+	if global.IsMaster {
+		err := snap.FileOp.CopyFile("/usr/local/bin/1panel-core", targetDir)
+		snap.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/usr/local/bin/1panel-core"), err)
+		if err != nil {
+			return err
+		}
 	}
 
-	err = snap.FileOp.CopyFile("/usr/local/bin/1panel-agent", targetDir)
+	err := snap.FileOp.CopyFile("/usr/local/bin/1panel-agent", targetDir)
 	snap.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/usr/local/bin/1panel-agent"), err)
 	if err != nil {
 		return err
@@ -279,10 +281,12 @@ func snapBaseData(snap snapHelper, targetDir string) error {
 		return err
 	}
 
-	err = snap.FileOp.CopyFile("/etc/systemd/system/1panel.service", targetDir)
-	snap.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/etc/systemd/system/1panel.service"), err)
-	if err != nil {
-		return err
+	if global.IsMaster {
+		err = snap.FileOp.CopyFile("/etc/systemd/system/1panel-core.service", targetDir)
+		snap.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/etc/systemd/system/1panel-core.service"), err)
+		if err != nil {
+			return err
+		}
 	}
 
 	err = snap.FileOp.CopyFile("/etc/systemd/system/1panel-agent.service", targetDir)

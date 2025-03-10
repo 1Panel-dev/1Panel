@@ -19,7 +19,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/global"
-	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	fileUtils "github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/google/uuid"
@@ -275,12 +274,7 @@ func (u *DeviceService) Clean(req []dto.Clean) {
 	_ = settingRepo.Update("LastCleanData", fmt.Sprintf("%v", len(req)))
 
 	if restart {
-		go func() {
-			_, err := cmd.Exec("systemctl restart 1panel.service")
-			if err != nil {
-				global.LOG.Errorf("restart system port failed, err: %v", err)
-			}
-		}()
+		go common.RestartService(false, true, false)
 	}
 }
 

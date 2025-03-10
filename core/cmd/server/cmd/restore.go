@@ -58,7 +58,10 @@ var restoreCmd = &cobra.Command{
 		geoPath := path.Join(global.CONF.Base.InstallDir, "1panel/geo")
 		_, _ = cmdUtils.Execf("mkdir %s && cp %s %s/", geoPath, path.Join(tmpPath, "GeoIP.mmdb"), geoPath)
 		fmt.Println(i18n.GetMsgByKeyForCmd("RestoreStep3"))
-		if err := files.CopyFile(path.Join(tmpPath, "1panel.service"), "/etc/systemd/system", true); err != nil {
+		if err := files.CopyFile(path.Join(tmpPath, "1panel-core.service"), "/etc/systemd/system", true); err != nil {
+			return err
+		}
+		if err := files.CopyFile(path.Join(tmpPath, "1panel-agent.service"), "/etc/systemd/system", true); err != nil {
 			return err
 		}
 		fmt.Println(i18n.GetMsgByKeyForCmd("RestoreStep4"))

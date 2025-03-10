@@ -43,13 +43,15 @@ func (u *SnapshotService) SnapshotRollback(req dto.SnapshotRecover) error {
 			},
 			nil,
 		)
-		taskItem.AddSubTask(
-			i18n.GetWithName("SnapCopy", "/usr/local/bin/1panel-core"),
-			func(t *task.Task) error {
-				return FileOp.CopyFile(path.Join(baseDir, "1panel"), "/usr/local/bin")
-			},
-			nil,
-		)
+		if global.IsMaster {
+			taskItem.AddSubTask(
+				i18n.GetWithName("SnapCopy", "/usr/local/bin/1panel-core"),
+				func(t *task.Task) error {
+					return FileOp.CopyFile(path.Join(baseDir, "1panel"), "/usr/local/bin")
+				},
+				nil,
+			)
+		}
 		taskItem.AddSubTask(
 			i18n.GetWithName("SnapCopy", "/usr/local/bin/1panel-agent"),
 			func(t *task.Task) error {
@@ -57,17 +59,19 @@ func (u *SnapshotService) SnapshotRollback(req dto.SnapshotRecover) error {
 			},
 			nil,
 		)
-		taskItem.AddSubTask(
-			i18n.GetWithName("SnapCopy", "/etc/systemd/system/1panel.service"),
-			func(t *task.Task) error {
-				return FileOp.CopyFile(path.Join(baseDir, "1panel.service"), "/etc/systemd/system")
-			},
-			nil,
-		)
+		if global.IsMaster {
+			taskItem.AddSubTask(
+				i18n.GetWithName("SnapCopy", "/etc/systemd/system/1panel-core.service"),
+				func(t *task.Task) error {
+					return FileOp.CopyFile(path.Join(baseDir, "1panel-core.service"), "/etc/systemd/system")
+				},
+				nil,
+			)
+		}
 		taskItem.AddSubTask(
 			i18n.GetWithName("SnapCopy", "/etc/systemd/system/1panel-agent.service"),
 			func(t *task.Task) error {
-				return FileOp.CopyFile(path.Join(baseDir, "1panel.service"), "/etc/systemd/system")
+				return FileOp.CopyFile(path.Join(baseDir, "1panel-agent.service"), "/etc/systemd/system")
 			},
 			nil,
 		)

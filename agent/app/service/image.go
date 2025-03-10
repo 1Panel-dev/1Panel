@@ -204,7 +204,6 @@ func (u *ImageService) ImageBuild(req dto.ImageBuild) error {
 		defer tar.Close()
 		taskItem.AddSubTask(i18n.GetMsgByKey("ImageBuild"), func(t *task.Task) error {
 			res, err := client.ImageBuild(context.Background(), tar, opts)
-			taskItem.LogWithStatus(i18n.GetMsgByKey("TaskBuild"), err)
 			if err != nil {
 				return err
 			}

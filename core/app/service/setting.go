@@ -9,8 +9,6 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/core/app/model"
-	"github.com/1Panel-dev/1Panel/core/utils/req_helper"
 	"net"
 	"net/http"
 	"os"
@@ -18,6 +16,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/core/app/model"
+	"github.com/1Panel-dev/1Panel/core/utils/req_helper"
 
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
@@ -170,7 +171,7 @@ func (u *SettingService) UpdateBindInfo(req dto.BindInfo) error {
 	}
 	go func() {
 		time.Sleep(1 * time.Second)
-		_, err := cmd.Exec("systemctl restart 1panel.service")
+		_, err := cmd.Exec("systemctl restart 1panel-core.service")
 		if err != nil {
 			global.LOG.Errorf("restart system with new bind info failed, err: %v", err)
 		}
@@ -221,7 +222,7 @@ func (u *SettingService) UpdatePort(port uint) error {
 	}
 	go func() {
 		time.Sleep(1 * time.Second)
-		if _, err := cmd.Exec("systemctl restart 1panel.service"); err != nil {
+		if _, err := cmd.Exec("systemctl restart 1panel-core.service"); err != nil {
 			global.LOG.Errorf("restart system port failed, err: %v", err)
 		}
 	}()

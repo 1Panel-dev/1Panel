@@ -18,6 +18,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/compose"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/pkg/errors"
@@ -179,7 +180,7 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 			return
 		}
 		_ = os.RemoveAll(rootDir)
-		_, _ = cmd.Exec("systemctl daemon-reload && systemctl restart 1panel.service")
+		common.RestartService(true, true, true)
 	}()
 	return nil
 }
@@ -236,8 +237,8 @@ func backupBeforeRecover(name string, itemHelper *snapRecoverHelper) error {
 	if err != nil {
 		return err
 	}
-	err = itemHelper.FileOp.CopyFile("/etc/systemd/system/1panel.service", baseDir)
-	itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/etc/systemd/system/1panel.service"), err)
+	err = itemHelper.FileOp.CopyFile("/etc/systemd/system/1panel-core.service", baseDir)
+	itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/etc/systemd/system/1panel-core.service"), err)
 	if err != nil {
 		return err
 	}
@@ -327,20 +328,24 @@ func recoverBaseData(src string, itemHelper *snapRecoverHelper) error {
 		return err
 	}
 
-	err = itemHelper.FileOp.CopyFile(path.Join(src, "1panel"), "/usr/local/bin")
-	itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/usr/local/bin/1panel-core"), err)
-	if err != nil {
-		return err
+	if global.IsMaster {
+		err = itemHelper.FileOp.CopyFile(path.Join(src, "1panel"), "/usr/local/bin")
+		itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/usr/local/bin/1panel-core"), err)
+		if err != nil {
+			return err
+		}
 	}
 	err = itemHelper.FileOp.CopyFile(path.Join(src, "1panel-agent"), "/usr/local/bin")
 	itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/usr/local/bin/1panel-agent"), err)
 	if err != nil {
 		return err
 	}
-	err = itemHelper.FileOp.CopyFile(path.Join(src, "1panel.service"), "/etc/systemd/system")
-	itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/etc/systemd/system/1panel.service"), err)
-	if err != nil {
-		return err
+	if global.IsMaster {
+		err = itemHelper.FileOp.CopyFile(path.Join(src, "1panel-core.service"), "/etc/systemd/system")
+		itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/etc/systemd/system/1panel-core.service"), err)
+		if err != nil {
+			return err
+		}
 	}
 	err = itemHelper.FileOp.CopyFile(path.Join(src, "1panel-agent.service"), "/etc/systemd/system")
 	itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/etc/systemd/system/1panel-agent.service"), err)
