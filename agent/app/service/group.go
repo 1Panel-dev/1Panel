@@ -15,6 +15,7 @@ type IGroupService interface {
 	Create(req dto.GroupCreate) error
 	Update(req dto.GroupUpdate) error
 	Delete(id uint) error
+	GetDefault() (model.Group, error)
 }
 
 func NewIGroupService() IGroupService {
@@ -84,4 +85,8 @@ func (u *GroupService) Update(req dto.GroupUpdate) error {
 	upMap["name"] = req.Name
 	upMap["is_default"] = req.IsDefault
 	return groupRepo.Update(req.ID, upMap)
+}
+
+func (u *GroupService) GetDefault() (model.Group, error) {
+	return groupRepo.Get(groupRepo.WithByDefault(true))
 }

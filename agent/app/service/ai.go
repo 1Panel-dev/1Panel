@@ -266,6 +266,8 @@ func (u *AIToolService) BindDomain(req dto.OllamaBindDomain) error {
 		createWebsiteReq.WebsiteSSLID = req.SSLID
 		createWebsiteReq.EnableSSL = true
 	}
+	res, _ := NewIGroupService().GetDefault()
+	createWebsiteReq.WebsiteGroupID = res.ID
 	websiteService := NewIWebsiteService()
 	if err = websiteService.CreateWebsite(createWebsiteReq); err != nil {
 		return err
@@ -334,9 +336,9 @@ func (u *AIToolService) UpdateBindDomain(req dto.OllamaBindDomain) error {
 		sslReq := request.WebsiteHTTPSOp{
 			WebsiteID:    website.ID,
 			Enable:       true,
-			Type:         "existed",
+			Type:         constant.SSLExisted,
 			WebsiteSSLID: req.SSLID,
-			HttpConfig:   "HTTPSOnly",
+			HttpConfig:   constant.HTTPToHTTPS,
 		}
 		if _, err = websiteService.OpWebsiteHTTPS(context.Background(), sslReq); err != nil {
 			return err
@@ -371,7 +373,7 @@ func loadModelSize(name string, containerName string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	lines := strings.Split(string(stdout), "\n")
+	lines := strings.Split(stdout, "\n")
 	for _, line := range lines {
 		parts := strings.Fields(line)
 		if len(parts) < 5 {
@@ -379,5 +381,5 @@ func loadModelSize(name string, containerName string) (string, error) {
 		}
 		return parts[2] + " " + parts[3], nil
 	}
-	return "", fmt.Errorf("no such model %s in ollama list, std: %s", name, string(stdout))
+	return "", fmt.Errorf("no such model %s in ollama list, std: %s", name, stdout)
 }

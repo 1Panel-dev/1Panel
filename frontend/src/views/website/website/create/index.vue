@@ -554,7 +554,7 @@ import { reactive, ref } from 'vue';
 import Params from '@/views/app-store/detail/params/index.vue';
 import Check from '../check/index.vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
-import { getGroupList } from '@/api/modules/group';
+import { getAgentGroupList } from '@/api/modules/group';
 import { Group } from '@/api/interface/group';
 import { SearchRuntimes } from '@/api/modules/runtime';
 import { Runtime } from '@/api/interface/runtime';
@@ -836,7 +836,7 @@ const acceptParams = async () => {
         staticPath.value = res.data + '/sites/';
     });
 
-    const res = await getGroupList('website');
+    const res = await getAgentGroupList('website');
     groups.value = res.data;
     website.value.webSiteGroupId = res.data[0].id;
     website.value.type = 'deployment';

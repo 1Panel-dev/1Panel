@@ -84,8 +84,8 @@ type AppProperty struct {
 	Name               string   `json:"name"`
 	Type               string   `json:"type"`
 	Tags               []string `json:"tags"`
-	ShortDescZh        string   `json:"shortDescZh"`
-	ShortDescEn        string   `json:"shortDescEn"`
+	ShortDescZh        string   `json:"shortDescZh" yaml:"shortDescZh"`
+	ShortDescEn        string   `json:"shortDescEn" yaml:"shortDescEn"`
 	Description        Locale   `json:"description"`
 	Key                string   `json:"key"`
 	Required           []string `json:"Required"`

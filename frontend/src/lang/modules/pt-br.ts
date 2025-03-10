@@ -246,6 +246,7 @@ const message = {
             phone: 'O formato do número de telefone está incorreto',
             authBasicPassword: 'Suporta letras, números e caracteres especiais comuns, comprimento 1-72',
             length128Err: 'O comprimento não pode exceder 128 caracteres',
+            maxLength: 'O comprimento não pode exceder {0} caracteres',
         },
         res: {
             paramError: 'A solicitação falhou, por favor, tente novamente mais tarde!',

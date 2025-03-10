@@ -680,9 +680,15 @@ func applySSL(website *model.Website, websiteSSL model.WebsiteSSL, req request.W
 		}
 		if param.Name == "ssl_protocols" {
 			nginxParams[i].Params = req.SSLProtocol
+			if len(req.SSLProtocol) == 0 {
+				nginxParams[i].Params = []string{"TLSv1.3", "TLSv1.2", "TLSv1.1", "TLSv1"}
+			}
 		}
 		if param.Name == "ssl_ciphers" {
 			nginxParams[i].Params = []string{req.Algorithm}
+			if len(req.Algorithm) == 0 {
+				nginxParams[i].Params = []string{"ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:!aNULL:!eNULL:!EXPORT:!DSS:!DES:!RC4:!3DES:!MD5:!PSK:!KRB5:!SRP:!CAMELLIA:!SEED"}
+			}
 		}
 	}
 	if req.Hsts {

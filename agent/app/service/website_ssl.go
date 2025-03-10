@@ -448,7 +448,7 @@ func (w WebsiteSSLService) Delete(ids []uint) error {
 		if err != nil {
 			return err
 		}
-		if websiteSSL.Type != constant.Manual && websiteSSL.Type != constant.SelfSigned {
+		if websiteSSL.Provider != constant.Manual && websiteSSL.Provider != constant.SelfSigned {
 			acmeAccount, err := websiteAcmeRepo.GetFirst(repo.WithByID(websiteSSL.AcmeAccountID))
 			if err != nil {
 				return err

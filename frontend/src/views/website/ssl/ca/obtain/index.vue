@@ -75,7 +75,7 @@
 
 <script lang="ts" setup>
 import { obtainSSLByCA } from '@/api/modules/website';
-import { Rules, checkNumberRange } from '@/global/form-rules';
+import { Rules, checkNumberRange, checkMaxLength } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
@@ -93,6 +93,7 @@ const rules = ref({
     dir: [Rules.requiredInput],
     time: [Rules.integerNumber, checkNumberRange(1, 10000)],
     shell: [Rules.requiredInput],
+    description: [checkMaxLength(128)],
 });
 
 const initData = () => ({

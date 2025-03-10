@@ -1019,6 +1019,10 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 			dto.NginxParam{
 				Name: "http2",
 			},
+			dto.NginxParam{
+				Name:   "add_header",
+				Params: []string{"Strict-Transport-Security"},
+			},
 		)
 		if err = deleteNginxConfig(constant.NginxScopeServer, nginxParams, &website); err != nil {
 			return nil, err

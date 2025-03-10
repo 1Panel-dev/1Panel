@@ -108,7 +108,7 @@
                         <template #default="{ row }">
                             <fu-read-write-switch>
                                 <template #read>
-                                    <MsgInfo :info="row.description" width="180px" />
+                                    <MsgInfo :info="row.description" width="200" />
                                 </template>
                                 <template #default="{ read }">
                                     <el-input v-model="row.description" @blur="updateDesc(row, read)" />

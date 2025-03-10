@@ -240,6 +240,7 @@ const message = {
             phone: '手机号码格式不正确',
             authBasicPassword: '支持字母、数字以及常见特殊字符，长度1-72',
             length128Err: '长度不能超过128位',
+            maxLength: '长度不能超过 {0} 位',
         },
         res: {
             paramError: '请求失败,请稍后重试!',

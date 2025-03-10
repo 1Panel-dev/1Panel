@@ -248,6 +248,7 @@ const message = {
             phone: 'Format nombor telefon tidak betul.',
             authBasicPassword: 'Menyokong huruf, nombor, dan aksara khas biasa, panjang 1-72',
             length128Err: 'Panjang tidak boleh melebihi 128 aksara',
+            maxLength: 'Panjang tidak boleh melebihi {0} aksara',
         },
         res: {
             paramError: 'Permintaan gagal, sila cuba lagi nanti!',

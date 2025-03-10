@@ -1,31 +1,27 @@
 <template>
     <DrawerPro v-model="drawerVisible" :header="$t('aiTools.model.create')" @close="handleClose">
-        <el-row type="flex" justify="center">
-            <el-col :span="22">
-                <el-alert type="info" :closable="false">
-                    <template #title>
-                        <span class="flx-align-center">
-                            {{ $t('aiTools.model.ollama_doc') }}
-                            <el-button link class="ml-5" icon="Position" @click="goSearch()" type="primary">
-                                {{ $t('firewall.quickJump') }}
-                            </el-button>
-                        </span>
-                    </template>
-                </el-alert>
-                <el-form ref="formRef" label-position="top" class="mt-5" :model="form">
-                    <el-form-item :label="$t('commons.table.name')" :rules="Rules.requiredInput" prop="name">
-                        <el-input v-model.trim="form.name" />
-                        <span class="input-help" v-if="form.name">
-                            {{
-                                $t('aiTools.model.create_helper', [
-                                    form.name.replaceAll('ollama run ', '').replaceAll('ollama pull ', ''),
-                                ])
-                            }}
-                        </span>
-                    </el-form-item>
-                </el-form>
-            </el-col>
-        </el-row>
+        <el-alert type="info" :closable="false">
+            <template #title>
+                <span class="flx-align-center">
+                    {{ $t('aiTools.model.ollama_doc') }}
+                    <el-button link class="ml-5" icon="Position" @click="goSearch()" type="primary">
+                        {{ $t('firewall.quickJump') }}
+                    </el-button>
+                </span>
+            </template>
+        </el-alert>
+        <el-form ref="formRef" label-position="top" class="mt-5" :model="form">
+            <el-form-item :label="$t('commons.table.name')" :rules="Rules.requiredInput" prop="name">
+                <el-input v-model.trim="form.name" />
+                <span class="input-help" v-if="form.name">
+                    {{
+                        $t('aiTools.model.create_helper', [
+                            form.name.replaceAll('ollama run ', '').replaceAll('ollama pull ', ''),
+                        ])
+                    }}
+                </span>
+            </el-form-item>
+        </el-form>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="drawerVisible = false">

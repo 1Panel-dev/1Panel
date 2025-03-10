@@ -596,6 +596,25 @@ const checkPhone = (rule: any, value: any, callback: any) => {
     }
 };
 
+export function checkMaxLength(maxLength: number): FormItemRule {
+    return {
+        required: false,
+        trigger: 'blur',
+        type: 'string',
+        validator: (rule: any, value: any, callback: any) => {
+            if (value === '' || typeof value === 'undefined' || value == null) {
+                callback();
+            } else {
+                if (value.length > maxLength) {
+                    callback(new Error(i18n.global.t('commons.rule.maxLength', [maxLength])));
+                } else {
+                    callback();
+                }
+            }
+        },
+    };
+}
+
 interface CommonRule {
     requiredInput: FormItemRule;
     requiredSelect: FormItemRule;

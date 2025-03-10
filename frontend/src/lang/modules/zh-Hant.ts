@@ -242,6 +242,7 @@ const message = {
             phone: '手機號碼格式不正確',
             authBasicPassword: '支持字母、數字以及常見特殊字符，長度1-72',
             length128Err: '長度不能超過128位',
+            maxLength: '長度不能超過 {0} 位',
         },
         res: {
             paramError: '請求失敗,請稍後重試!',

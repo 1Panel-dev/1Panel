@@ -3,6 +3,7 @@ package repo
 import (
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"gorm.io/gorm"
 )
 
 type GroupRepo struct{}
@@ -13,10 +14,17 @@ type IGroupRepo interface {
 	Create(group *model.Group) error
 	Update(id uint, vars map[string]interface{}) error
 	Delete(opts ...DBOption) error
+	WithByDefault(isDefault bool) DBOption
 }
 
 func NewIGroupRepo() IGroupRepo {
 	return &GroupRepo{}
+}
+
+func (g *GroupRepo) WithByDefault(isDefault bool) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("is_default = ?", isDefault)
+	}
 }
 
 func (g *GroupRepo) Get(opts ...DBOption) (model.Group, error) {

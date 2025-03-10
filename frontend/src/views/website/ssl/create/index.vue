@@ -152,7 +152,7 @@
 <script lang="ts" setup>
 import { Website } from '@/api/interface/website';
 import { createSSL, listWebsites, searchAcmeAccount, searchDnsAccount, updateSSL } from '@/api/modules/website';
-import { Rules } from '@/global/form-rules';
+import { Rules, checkMaxLength } from '@/global/form-rules';
 import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
 import { computed, reactive, ref } from 'vue';
@@ -196,6 +196,7 @@ const rules = ref({
     nameserver1: [Rules.ipv4],
     nameserver2: [Rules.ipv4],
     shell: [Rules.requiredInput],
+    description: [checkMaxLength(128)],
 });
 const websiteID = ref();
 

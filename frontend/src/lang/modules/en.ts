@@ -249,6 +249,7 @@ const message = {
             phone: 'The format of the phone number is incorrect',
             authBasicPassword: 'Supports letters, numbers, and common special characters, length 1-72',
             length128Err: 'Length cannot exceed 128 characters',
+            maxLength: 'Length cannot exceed {0} characters',
         },
         res: {
             paramError: 'The request failed, please try again later!',
