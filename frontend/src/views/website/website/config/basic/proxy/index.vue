@@ -68,6 +68,7 @@ const createRef = ref();
 const fileRef = ref();
 const opRef = ref();
 const cacheRef = ref();
+const hasCache = ref(false);
 
 const buttons = [
     {
@@ -117,7 +118,7 @@ const openCreate = () => {
 };
 
 const openCache = () => {
-    cacheRef.value.acceptParams(id.value);
+    cacheRef.value.acceptParams(id.value, hasCache.value);
 };
 
 const openEdit = (proxyConfig: Website.ProxyConfig) => {
@@ -195,6 +196,7 @@ const search = async () => {
         loading.value = true;
         const res = await getProxyConfig({ id: id.value });
         data.value = res.data || [];
+        hasCache.value = data.value.some((item: Website.ProxyConfig) => item.cache);
     } catch (error) {
     } finally {
         loading.value = false;

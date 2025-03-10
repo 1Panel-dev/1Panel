@@ -2292,6 +2292,7 @@ const message = {
         volcengine: 'Volcengine',
         runtimePortHelper: 'O ambiente de runtime atual possui várias portas. Por favor, selecione uma porta de proxy.',
         runtimePortWarn: 'O ambiente de execução atual não possui portos, não é possível proxiar',
+        cacheWarn: 'Por favor, desligue o interruptor de cache no proxy reverso primeiro',
     },
     php: {
         short_open_tag: 'Suporte para short tags',

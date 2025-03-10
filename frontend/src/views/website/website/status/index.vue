@@ -39,7 +39,7 @@ const props = defineProps({
 
 const isEver = (time: string) => {
     const expireDate = new Date(time);
-    return expireDate < new Date('1970-01-02');
+    return expireDate > new Date('9999-12-30');
 };
 </script>
 

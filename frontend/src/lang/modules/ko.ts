@@ -2206,6 +2206,7 @@ const message = {
         volcengine: 'volcengine',
         runtimePortHelper: '현재 실행 환경에 여러 포트가 있습니다. 프록시 포트를 선택하세요.',
         runtimePortWarn: '현재 실행 환경에 포트가 없습니다. 프록시할 수 없습니다',
+        cacheWarn: '먼저 리버스 프록시의 캐시 스위치를 끄십시오',
     },
     php: {
         short_open_tag: '짧은 태그 지원',

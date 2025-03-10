@@ -2,7 +2,7 @@
     <DialogPro v-model="open" size="w-70" @opened="onOpen" :show-close="false" :top="'5vh'" :fullscreen="isFullscreen">
         <template #header>
             <div ref="dialogHeader" class="flex items-center justify-between">
-                <span>{{ $t('commons.button.edit') + ' - ' + form.path }}</span>
+                <span class="truncate-text">{{ $t('commons.button.edit') + ' - ' + form.path }}</span>
                 <el-space alignment="center" :size="1" class="dialog-header-icon">
                     <el-tooltip :content="loadTooltip()" placement="top">
                         <el-button
@@ -20,128 +20,135 @@
                 </el-space>
             </div>
         </template>
-        <div ref="dialogForm">
-            <el-form :inline="true" :model="config" class="mt-1.5">
-                <el-form-item :label="$t('file.theme')">
-                    <el-select v-model="config.theme" @change="changeTheme()" class="p-w-200">
-                        <el-option v-for="item in themes" :key="item.label" :value="item.value" :label="item.label" />
-                    </el-select>
-                </el-form-item>
-                <el-form-item :label="$t('file.language')">
-                    <el-select v-model="config.language" @change="changeLanguage()" class="!w-32">
-                        <el-option
-                            v-for="lang in Languages"
-                            :key="lang.label"
-                            :value="lang.label"
-                            :label="lang.label"
-                        />
-                    </el-select>
-                </el-form-item>
-                <el-form-item :label="$t('file.eol')">
-                    <el-select v-model="config.eol" @change="changeEOL()" class="p-w-150">
-                        <el-option v-for="eol in eols" :key="eol.label" :value="eol.value" :label="eol.label" />
-                    </el-select>
-                </el-form-item>
-                <el-form-item :label="$t('file.wordWrap')">
-                    <el-select v-model="config.wordWrap" @change="changeWarp()" class="p-w-100">
-                        <el-option :label="$t('commons.button.enable')" value="on"></el-option>
-                        <el-option :label="$t('commons.button.disable')" value="off"></el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item :label="$t('file.minimap')">
-                    <el-select v-model="config.minimap" @change="changeMinimap()" class="p-w-100">
-                        <el-option :label="$t('commons.button.enable')" :value="true"></el-option>
-                        <el-option :label="$t('commons.button.disable')" :value="false"></el-option>
-                    </el-select>
-                </el-form-item>
-            </el-form>
-        </div>
-        <div v-loading="loading">
-            <div class="flex">
-                <div class="monaco-editor sm:w-48 w-1/3 monaco-editor-background border-0 tree-container" v-if="isShow">
-                    <div class="flex items-center justify-between pl-1 sm:pr-4 pr-1 pt-1">
-                        <el-tooltip :content="$t('file.top')" placement="top">
-                            <el-text size="small" @click="getUpData()" class="cursor-pointer">
-                                <el-icon>
-                                    <Top />
-                                </el-icon>
-                                <span class="sm:inline hidden pl-1">{{ $t('file.up') }}</span>
-                            </el-text>
-                        </el-tooltip>
-
-                        <el-tooltip :content="$t('commons.button.refresh')" placement="top">
-                            <el-text size="small" @click="getRefresh(directoryPath)" class="cursor-pointer">
-                                <el-icon>
-                                    <Refresh />
-                                </el-icon>
-                                <span class="sm:inline hidden pl-1">{{ $t('commons.button.refresh') }}</span>
-                            </el-text>
-                        </el-tooltip>
-                    </div>
-                    <el-divider class="!my-1" />
-                    <el-tree-v2
-                        ref="treeRef"
-                        :data="treeData"
-                        :props="treeProps"
-                        @node-expand="handleNodeExpand"
-                        class="monaco-editor-tree monaco-editor-background"
-                        :height="treeHeight"
-                        :indent="6"
-                        :item-size="24"
-                        highlight-current
-                    >
-                        <template #default="{ node, data }">
-                            <!-- 目录 -->
-                            <span v-if="data.isDir" style="display: inline-flex; align-items: center">
-                                <svg-icon className="table-icon" iconName="p-file-folder"></svg-icon>
-                                <small :title="node.label">{{ node.label }}</small>
-                            </span>
-
-                            <!-- 文档 -->
-                            <span
-                                v-else
-                                style="display: inline-flex; align-items: center"
-                                @click="getContent(data.path, data.extension)"
-                            >
-                                <svg-icon className="table-icon" :iconName="getIconName(data.extension)"></svg-icon>
-                                <small :title="node.label" class="min-w-32">{{ node.label }}</small>
-                            </span>
-                        </template>
-                    </el-tree-v2>
-                </div>
-                <div class="relative">
-                    <el-divider
-                        v-if="isShow"
-                        direction="vertical"
-                        :style="{ height: codeHeight }"
-                        class="!m-0 p-0"
-                        :class="isShow ? 'opacity-100' : 'opacity-0'"
-                    ></el-divider>
-                    <el-icon
-                        v-if="isShow"
-                        class="cursor-pointer absolute bg-gray-100 py-2 rounded-l-sm block top-1/3 -left-[9px]"
-                        size="9"
-                        @click="toggleShow"
-                    >
-                        <DArrowLeft />
-                    </el-icon>
-                    <el-icon
-                        v-else
-                        class="cursor-pointer absolute bg-gray-100 py-2 rounded-r-sm block top-1/3 right-[7px]"
-                        size="9"
-                        @click="toggleShow"
-                    >
-                        <DArrowRight />
-                    </el-icon>
-                </div>
-                <div
-                    ref="codeBox"
-                    id="codeBox"
-                    :style="{ height: codeHeight }"
-                    class="flex-1 sm:w-4/5 w-2/3 relative"
-                ></div>
+        <template #content>
+            <div ref="dialogForm">
+                <el-form :inline="true" :model="config" class="mt-1.5">
+                    <el-form-item :label="$t('file.theme')">
+                        <el-select v-model="config.theme" @change="changeTheme()" class="p-w-200">
+                            <el-option
+                                v-for="item in themes"
+                                :key="item.label"
+                                :value="item.value"
+                                :label="item.label"
+                            />
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item :label="$t('file.language')">
+                        <el-select v-model="config.language" @change="changeLanguage()" class="!w-32">
+                            <el-option
+                                v-for="lang in Languages"
+                                :key="lang.label"
+                                :value="lang.label"
+                                :label="lang.label"
+                            />
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item :label="$t('file.eol')">
+                        <el-select v-model="config.eol" @change="changeEOL()" class="p-w-150">
+                            <el-option v-for="eol in eols" :key="eol.label" :value="eol.value" :label="eol.label" />
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item :label="$t('file.wordWrap')">
+                        <el-select v-model="config.wordWrap" @change="changeWarp()" class="p-w-100">
+                            <el-option :label="$t('commons.button.enable')" value="on"></el-option>
+                            <el-option :label="$t('commons.button.disable')" value="off"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item :label="$t('file.minimap')">
+                        <el-select v-model="config.minimap" @change="changeMinimap()" class="p-w-100">
+                            <el-option :label="$t('commons.button.enable')" :value="true"></el-option>
+                            <el-option :label="$t('commons.button.disable')" :value="false"></el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-form>
             </div>
-        </div>
+            <div v-loading="loading">
+                <div class="flex">
+                    <div
+                        class="monaco-editor sm:w-48 w-1/3 monaco-editor-background border-0 tree-container"
+                        v-if="isShow"
+                    >
+                        <div class="flex items-center justify-between pl-1 sm:pr-4 pr-1 pt-1">
+                            <el-tooltip :content="$t('file.top')" placement="top">
+                                <el-text size="small" @click="getUpData()" class="cursor-pointer">
+                                    <el-icon>
+                                        <Top />
+                                    </el-icon>
+                                    <span class="sm:inline hidden pl-1">{{ $t('file.up') }}</span>
+                                </el-text>
+                            </el-tooltip>
+
+                            <el-tooltip :content="$t('commons.button.refresh')" placement="top">
+                                <el-text size="small" @click="getRefresh(directoryPath)" class="cursor-pointer">
+                                    <el-icon>
+                                        <Refresh />
+                                    </el-icon>
+                                    <span class="sm:inline hidden pl-1">{{ $t('commons.button.refresh') }}</span>
+                                </el-text>
+                            </el-tooltip>
+                        </div>
+                        <el-divider class="!my-1" />
+                        <el-tree-v2
+                            ref="treeRef"
+                            :data="treeData"
+                            :props="treeProps"
+                            @node-expand="handleNodeExpand"
+                            class="monaco-editor-tree monaco-editor-background"
+                            :height="treeHeight"
+                            :indent="6"
+                            :item-size="24"
+                            highlight-current
+                        >
+                            <template #default="{ node, data }">
+                                <span v-if="data.isDir" style="display: inline-flex; align-items: center">
+                                    <svg-icon className="table-icon" iconName="p-file-folder"></svg-icon>
+                                    <small :title="node.label">{{ node.label }}</small>
+                                </span>
+                                <span
+                                    v-else
+                                    style="display: inline-flex; align-items: center"
+                                    @click="getContent(data.path, data.extension)"
+                                >
+                                    <svg-icon className="table-icon" :iconName="getIconName(data.extension)"></svg-icon>
+                                    <small :title="node.label" class="min-w-32">{{ node.label }}</small>
+                                </span>
+                            </template>
+                        </el-tree-v2>
+                    </div>
+                    <div class="relative">
+                        <el-divider
+                            v-if="isShow"
+                            direction="vertical"
+                            :style="{ height: codeHeight }"
+                            class="!m-0 p-0"
+                            :class="isShow ? 'opacity-100' : 'opacity-0'"
+                        ></el-divider>
+                        <el-icon
+                            v-if="isShow"
+                            class="cursor-pointer absolute bg-gray-100 py-2 rounded-l-sm block top-1/3 -left-[9px]"
+                            size="9"
+                            @click="toggleShow"
+                        >
+                            <DArrowLeft />
+                        </el-icon>
+                        <el-icon
+                            v-else
+                            class="cursor-pointer absolute bg-gray-100 py-2 rounded-r-sm block top-1/3 right-[7px]"
+                            size="9"
+                            @click="toggleShow"
+                        >
+                            <DArrowRight />
+                        </el-icon>
+                    </div>
+                    <div
+                        ref="codeBox"
+                        id="codeBox"
+                        :style="{ height: codeHeight }"
+                        class="flex-1 sm:w-4/5 w-2/3 relative"
+                    ></div>
+                </div>
+            </div>
+        </template>
         <template #footer>
             <div class="dialog-footer" ref="dialogFooter">
                 <el-button @click="handleReset">{{ $t('commons.button.reset') }}</el-button>
@@ -709,5 +716,13 @@ defineExpose({ acceptParams });
 
 .tree-widget {
     background-color: var(--el-button--primary);
+}
+
+.truncate-text {
+    display: inline-block;
+    max-width: 800px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 </style>

@@ -2242,6 +2242,7 @@ const message = {
         volcengine: 'volcengine',
         runtimePortHelper: '現在の実行環境には複数のポートがあります。プロキシポートを選択してください。',
         runtimePortWarn: '現在の実行環境にはポートがありません。プロキシできません',
+        cacheWarn: 'まずリバースプロキシのキャッシュスイッチをオフにしてください',
     },
     php: {
         short_open_tag: '短いタグサポート',

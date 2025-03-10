@@ -2384,6 +2384,7 @@ const message = {
         volcengine: 'Volcengine',
         runtimePortHelper: 'The current runtime environment has multiple ports. Please select a proxy port.',
         runtimePortWarn: 'The current runtime environment has no ports, unable to proxy',
+        cacheWarn: 'Please turn off the cache switch in the reverse proxy first',
     },
     php: {
         short_open_tag: 'Short tag support',

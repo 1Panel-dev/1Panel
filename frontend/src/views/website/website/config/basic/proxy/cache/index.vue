@@ -10,7 +10,8 @@
             :validate-on-rule-change="false"
         >
             <el-form-item :label="$t('commons.button.start')" prop="open">
-                <el-switch v-model="req.open"></el-switch>
+                <el-switch v-model="req.open" :disabled="hasCache"></el-switch>
+                <span class="input-help" v-if="hasCache">{{ $t('website.cacheWarn') }}</span>
             </el-form-item>
             <el-form-item :label="$t('website.cacheLimit')" prop="cacheLimit">
                 <el-input v-model.number="req.cacheLimit" class="p-w-200">
@@ -78,6 +79,7 @@ import i18n from '@/lang';
 const open = ref(false);
 const loading = ref(false);
 const proxyForm = ref<FormInstance>();
+const hasCache = ref(false);
 
 const req = reactive({
     open: false,
@@ -100,8 +102,9 @@ const handleClose = () => {
     open.value = false;
 };
 
-const acceptParams = (websiteID: number) => {
+const acceptParams = (websiteID: number, cache: boolean) => {
     req.websiteID = websiteID;
+    hasCache.value = cache;
     get();
     open.value = true;
 };

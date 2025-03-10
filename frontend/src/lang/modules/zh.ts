@@ -2201,6 +2201,7 @@ const message = {
         volcengine: '火山引擎',
         runtimePortHelper: '当前运行环境存在多个端口，请选择一个代理端口',
         runtimePortWarn: '当前运行环境没有端口，无法代理',
+        cacheWarn: '请先关闭反代中的缓存开关',
     },
     php: {
         short_open_tag: '短标签支持',
