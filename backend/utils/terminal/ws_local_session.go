@@ -72,6 +72,7 @@ func (sws *LocalWsSession) masterWrite(data []byte) error {
 func (sws *LocalWsSession) receiveWsMsg(exitCh chan bool) {
 	defer func() {
 		if r := recover(); r != nil {
+			setQuit(exitCh)
 			global.LOG.Errorf("A panic occurred during receive ws message, error message: %v", r)
 		}
 	}()
