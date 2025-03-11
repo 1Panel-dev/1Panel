@@ -52,6 +52,8 @@ import { fileWgetKeys } from '@/api/modules/files';
 import { computeSize } from '@/utils/util';
 import { onBeforeUnmount, ref } from 'vue';
 import MsgInfo from '@/components/msg-info/index.vue';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 let processSocket = ref(null) as unknown as WebSocket;
 const res = ref([]);
@@ -87,7 +89,8 @@ const initProcess = () => {
     let href = window.location.href;
     let protocol = href.split('//')[0] === 'http:' ? 'ws' : 'wss';
     let ipLocal = href.split('//')[1].split('/')[0];
-    processSocket = new WebSocket(`${protocol}://${ipLocal}/api/v2/files/wget/process`);
+    let currentNode = globalStore.currentNode;
+    processSocket = new WebSocket(`${protocol}://${ipLocal}/api/v2/files/wget/process?currentNode=${currentNode}`);
     processSocket.onopen = onOpenProcess;
     processSocket.onmessage = onMessage;
     processSocket.onerror = onerror;

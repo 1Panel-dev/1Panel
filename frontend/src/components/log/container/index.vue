@@ -45,6 +45,8 @@ import { onUnmounted, reactive, ref } from 'vue';
 import { ElMessageBox } from 'element-plus';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import hightlight from '@/components/log/custom-hightlight/index.vue';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const props = defineProps({
     container: {
@@ -125,9 +127,10 @@ const searchLogs = async () => {
         return;
     }
     logs.value = [];
-    let url = `/api/v2/containers/search/log?container=${logSearch.container}&since=${logSearch.mode}&tail=${logSearch.tail}&follow=${logSearch.isWatch}`;
+    let currentNode = globalStore.currentNode;
+    let url = `/api/v2/containers/search/log?container=${logSearch.container}&since=${logSearch.mode}&tail=${logSearch.tail}&follow=${logSearch.isWatch}&currentNode=${currentNode}`;
     if (logSearch.compose !== '') {
-        url = `/api/v2/containers/search/log?compose=${logSearch.compose}&since=${logSearch.mode}&tail=${logSearch.tail}&follow=${logSearch.isWatch}`;
+        url = `/api/v2/containers/search/log?compose=${logSearch.compose}&since=${logSearch.mode}&tail=${logSearch.tail}&follow=${logSearch.isWatch}&currentNode=${currentNode}`;
     }
     eventSource = new EventSource(url);
     eventSource.onmessage = (event: MessageEvent) => {
