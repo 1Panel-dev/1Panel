@@ -63,11 +63,3 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 func (b *BaseApi) LoadBaseDir(c *gin.Context) {
 	helper.SuccessWithData(c, global.Dir.DataDir)
 }
-
-func (b *BaseApi) ReloadConn(c *gin.Context) {
-	if err := settingService.ReloadConn(); err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-	helper.SuccessWithOutData(c)
-}

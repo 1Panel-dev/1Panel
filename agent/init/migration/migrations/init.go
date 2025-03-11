@@ -78,7 +78,7 @@ var InitSetting = &gormigrate.Migration{
 	ID: "20240722-init-setting",
 	Migrate: func(tx *gorm.DB) error {
 		global.CONF.Base.EncryptKey = common.RandStr(16)
-		_, nodeInfo, err := xpack.LoadNodeInfo()
+		nodeInfo, err := xpack.LoadNodeInfo(true)
 		if err != nil {
 			return err
 		}

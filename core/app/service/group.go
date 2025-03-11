@@ -12,7 +12,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/global"
-	"github.com/1Panel-dev/1Panel/core/utils/req_helper"
+	"github.com/1Panel-dev/1Panel/core/utils/req_helper/proxy_local"
 	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/jinzhu/copier"
 )
@@ -110,7 +110,7 @@ func (u *GroupService) Delete(id uint) error {
 		err = xpack.UpdateGroup("node", id, defaultGroup.ID)
 	case "website":
 		bodyItem := []byte(fmt.Sprintf(`{"Group":%v, "NewGroup":%v}`, id, defaultGroup.ID))
-		if _, err := req_helper.NewLocalClient("/api/v2/websites/group/change", http.MethodPost, bytes.NewReader(bodyItem)); err != nil {
+		if _, err := proxy_local.NewLocalClient("/api/v2/websites/group/change", http.MethodPost, bytes.NewReader(bodyItem)); err != nil {
 			return err
 		}
 		if err := xpack.UpdateGroup("node", id, defaultGroup.ID); err != nil {

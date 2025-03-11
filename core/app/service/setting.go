@@ -18,7 +18,6 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/core/app/model"
-	"github.com/1Panel-dev/1Panel/core/utils/req_helper"
 
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
@@ -29,6 +28,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/core/utils/firewall"
+	"github.com/1Panel-dev/1Panel/core/utils/req_helper/proxy_local"
 	"github.com/gin-gonic/gin"
 )
 
@@ -295,7 +295,7 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 		if err != nil {
 			return err
 		}
-		res, err := req_helper.NewLocalClient("/api/v2/websites/ca/obtain", http.MethodPost, bytes.NewReader(jsonData))
+		res, err := proxy_local.NewLocalClient("/api/v2/websites/ca/obtain", http.MethodPost, bytes.NewReader(jsonData))
 		if err != nil {
 			return err
 		}

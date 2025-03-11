@@ -9,7 +9,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/app/model"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/constant"
-	"github.com/1Panel-dev/1Panel/core/utils/req_helper"
+	"github.com/1Panel-dev/1Panel/core/utils/req_helper/proxy_local"
 	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 )
 
@@ -55,6 +55,6 @@ func (u *LauncherService) ChangeShow(req dto.SettingUpdate) error {
 func syncLauncherToAgent() {
 	launchers, _ := launcherRepo.List()
 	itemData, _ := json.Marshal(launchers)
-	_, _ = req_helper.NewLocalClient("/api/v2/dashboard/app/launcher/sync", http.MethodPost, bytes.NewReader((itemData)))
+	_, _ = proxy_local.NewLocalClient("/api/v2/dashboard/app/launcher/sync", http.MethodPost, bytes.NewReader((itemData)))
 	_ = xpack.RequestToAllAgent("/api/v2/dashboard/app/launcher/sync", http.MethodPost, bytes.NewReader((itemData)))
 }

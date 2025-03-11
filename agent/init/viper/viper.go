@@ -52,12 +52,12 @@ func Init() {
 	global.CONF = serverConfig
 	global.CONF.Base.IsDemo = v.GetBool("system.is_demo")
 
-	initInstallDir()
+	initBaseInfo()
 	global.Viper = v
 }
 
-func initInstallDir() {
-	_, nodeInfo, err := xpack.LoadNodeInfo()
+func initBaseInfo() {
+	nodeInfo, err := xpack.LoadNodeInfo(true)
 	if err != nil {
 		panic(err)
 	}

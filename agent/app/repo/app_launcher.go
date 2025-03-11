@@ -62,6 +62,10 @@ func (u *LauncherRepo) SyncAll(data []model.AppLauncher) error {
 		tx.Rollback()
 		return err
 	}
+	if len(data) == 0 {
+		tx.Commit()
+		return nil
+	}
 	if err := tx.Model(model.AppLauncher{}).Save(&data).Error; err != nil {
 		tx.Rollback()
 		return err

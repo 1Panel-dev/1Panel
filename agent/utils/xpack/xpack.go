@@ -9,6 +9,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
+	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 )
 
@@ -18,12 +19,13 @@ func StartClam(startClam model.Clam, isUpdate bool) (int, error) {
 	return 0, buserr.New("ErrXpackNotFound")
 }
 
-func LoadNodeInfo() (bool, model.NodeInfo, error) {
+func LoadNodeInfo(isBase bool) (model.NodeInfo, error) {
 	var info model.NodeInfo
 	info.BaseDir = loadParams("BASE_DIR")
 	info.Version = loadParams("ORIGINAL_VERSION")
 	info.Scope = "master"
-	return false, info, nil
+	global.IsMaster = true
+	return info, nil
 }
 
 func loadParams(param string) string {

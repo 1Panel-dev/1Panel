@@ -2,15 +2,12 @@ package hook
 
 import (
 	"os"
-	"path"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
-	"github.com/1Panel-dev/1Panel/agent/app/service"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
-	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 )
 
@@ -31,11 +28,8 @@ func initGlobalData() {
 	if err := settingRepo.Update("SystemStatus", "Free"); err != nil {
 		global.LOG.Fatalf("init service before start failed, err: %v", err)
 	}
+	_, _ = xpack.LoadNodeInfo(false)
 	global.CONF.Base.EncryptKey, _ = settingRepo.GetValueByKey("EncryptKey")
-	_ = service.NewISettingService().ReloadConn()
-	if global.IsMaster {
-		global.CoreDB = common.LoadDBConnByPath(path.Join(global.Dir.DbDir, "core.db"), "core")
-	}
 }
 
 func handleSnapStatus() {
