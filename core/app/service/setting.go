@@ -332,8 +332,14 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 	if err := settingRepo.Update("SSL", req.SSL); err != nil {
 		return err
 	}
-
-	return u.UpdateSystemSSL()
+	go func() {
+		time.Sleep(1 * time.Second)
+		_, err := cmd.Exec("systemctl restart 1panel-core.service")
+		if err != nil {
+			global.LOG.Errorf("restart system failed, err: %v", err)
+		}
+	}()
+	return nil
 }
 
 func (u *SettingService) LoadFromCert() (*dto.SSLInfo, error) {

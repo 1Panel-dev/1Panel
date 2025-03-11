@@ -10,7 +10,7 @@
     "name": "opcache",
     "check": "Zend OPcache",
     "file": "opcache.so",
-    "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82", "83"],
+    "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82", "83","84"],
     "installed": false
   },
   {
@@ -24,28 +24,28 @@
     "name": "memcached",
     "check": "memcached",
     "file": "memcached.so",
-    "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82", "83"],
+    "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82", "83","84"],
     "installed": false
   },
   {
     "name": "redis",
     "check": "redis",
     "file": "redis.so",
-    "versions": [ "56", "70", "71", "72", "73", "74", "80", "81", "82", "83"],
+    "versions": [ "56", "70", "71", "72", "73", "74", "80", "81", "82", "83","84"],
     "installed": false
   },
   {
     "name": "mcrypt",
     "check": "mcrypt",
     "file": "mcrypt.so",
-    "versions": ["70", "71", "72", "73", "74", "80", "81", "82", "83"],
+    "versions": ["70", "71", "72", "73", "74", "80", "81", "82", "83","84"],
     "installed": false
   },
   {
     "name": "apcu",
     "check": "apcu",
     "file": "apcu.so",
-    "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82", "83"],
+    "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82", "83","84"],
     "installed": false
   },
   {
@@ -59,28 +59,28 @@
     "name": "xdebug",
     "check": "xdebug",
     "file": "xdebug.so",
-    "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82", "83"],
+    "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82", "83","84"],
     "installed": false
   },
   {
     "name": "imap",
     "check": "imap",
     "file": "imap.so",
-    "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82", "83"],
+    "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82", "83","84"],
     "installed": false
   },
   {
     "name": "exif",
     "check": "exif",
     "file": "exif.so",
-    "versions": [ "56", "70", "71", "72", "73", "74", "80", "81", "82", "83"],
+    "versions": [ "56", "70", "71", "72", "73", "74", "80", "81", "82", "83","84"],
     "installed": false
   },
   {
     "name": "intl",
     "check": "intl",
     "file": "intl.so",
-    "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82", "83"],
+    "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82", "83","84"],
     "installed": false
   },
   {
@@ -94,126 +94,126 @@
     "name": "Swoole",
     "check": "swoole",
     "file": "swoole.so",
-    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
   },
   {
     "name": "zstd",
     "check": "zstd",
     "file": "zstd.so",
-    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
   },
   {
     "name": "xlswriter",
     "check": "xlswriter",
     "file": "xlswriter.so",
-    "versions": ["70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "versions": ["70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
   },
   {
     "name": "oci8",
     "check": "oci8",
     "file": "oci8.so",
-    "versions": ["70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "versions": ["70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
   },
   {
     "name": "pdo_oci",
     "check": "pdo_oci",
     "file": "pdo_oci.so",
-    "versions": ["70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "versions": ["70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
   },
   {
     "name": "pdo_sqlsrv",
     "check": "pdo_sqlsrv",
     "file": "pdo_sqlsrv.so",
-    "versions": ["70", "71", "72",  "73", "74", "80", "81", "82", "83"],
+    "versions": ["70", "71", "72",  "73", "74", "80", "81", "82", "83","84"],
     "installed": false
   },
   {
     "name": "sqlsrv",
     "check": "sqlsrv",
     "file": "sqlsrv.so",
-    "versions": ["70", "71", "72",  "73", "74","80", "81", "82", "83"],
+    "versions": ["81", "82", "83","84"],
     "installed": false
   },
   {
     "name": "yaf",
     "check": "yaf",
     "file": "yaf.so",
-    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
   },
   {
     "name": "mongodb",
     "check": "mongodb",
     "file": "mongodb.so",
-    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
   },
   {
     "name": "yac",
     "check": "yac",
     "file": "yac.so",
-    "versions": ["70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "versions": ["70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
   },
   {
     "name": "pgsql",
     "check": "pgsql",
     "file": "pgsql.so",
-    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
   },
   {
     "name": "ssh2",
     "check": "ssh2",
     "file": "ssh2.so",
-    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
   },
   {
     "name": "grpc",
     "check": "grpc",
     "file": "grpc.so",
-    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
   },
   {
     "name": "xhprof",
     "check": "xhprof",
     "file": "xhprof.so",
-    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
   },
   {
     "name": "protobuf",
     "check": "protobuf",
     "file": "protobuf.so",
-    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
   },
   {
     "name": "pdo_pgsql",
     "check": "pdo_pgsql",
     "file": "pdo_pgsql.so",
-    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
   },
   {
     "name": "snmp",
     "check": "snmp",
     "file": "snmp.so",
-    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
   },
   {
     "name": "ldap",
     "check": "ldap",
     "file": "ldap.so",
-    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
   },
   {
@@ -227,42 +227,42 @@
     "name": "enchant",
     "check": "enchant",
     "file": "enchant.so",
-    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
   },
   {
     "name": "pspell",
     "check": "pspell",
     "file": "pspell.so",
-    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
   },
   {
     "name": "bz2",
     "check": "bz2",
     "file": "bz2.so",
-    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
   },
   {
     "name": "sysvshm",
     "check": "sysvshm",
     "file": "sysvshm.so",
-    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
   },
   {
     "name": "calendar",
     "check": "calendar",
     "file": "calendar.so",
-    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
   },
   {
     "name": "gmp",
     "check": "gmp",
     "file": "gmp.so",
-    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
   },
   {
@@ -276,62 +276,62 @@
     "name": "sysvmsg",
     "check": "sysvmsg",
     "file": "sysvmsg.so",
-    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
   },
   {
     "name": "igbinary",
     "check": "igbinary",
     "file": "igbinary.so",
-    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
   },
   {
     "name": "zmq",
     "check": "zmq",
     "file": "zmq.so",
-    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
   },
   {
     "name": "smbclient",
     "check": "smbclient",
     "file": "smbclient.so",
-    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
   },
   {
     "name": "event",
     "check": "event",
     "file": "event.so",
-    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
   },
   {
     "name": "mailparse",
     "check": "mailparse",
     "file": "mailparse.so",
-    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
   },
   {
     "name": "yaml",
     "check": "yaml",
     "file": "yaml.so",
-    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
   },
   {
     "name": "sg11",
     "check": "SourceGuardian",
     "file": "sourceguardian.so",
-    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
   },{
   "name": "mysqli",
     "check": "mysqli",
     "file": "mysqli.so",
-    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83"],
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
   }
 ]

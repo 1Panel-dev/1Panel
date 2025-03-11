@@ -134,6 +134,7 @@ const searchByName = () => {
 };
 
 const acceptParams = (req: Runtime.Runtime): void => {
+    searchName.value = '';
     open.value = true;
     runtime.value = req;
     search();
