@@ -1821,3 +1821,29 @@ func getAppTags(appID uint, lang string) ([]response.TagDTO, error) {
 	}
 	return res, nil
 }
+
+func handleOpenrestyFile(appInstall *model.AppInstall) error {
+	websites, _ := websiteRepo.List()
+	if len(websites) == 0 {
+		return nil
+	}
+	hasDefaultWebsite := false
+	for _, website := range websites {
+		if website.DefaultServer {
+			hasDefaultWebsite = true
+			break
+		}
+	}
+	if !hasDefaultWebsite {
+		return nil
+	}
+	installDir := appInstall.GetPath()
+	defaultConfigPath := path.Join(installDir, "conf", "default", "00.default.conf")
+	fileOp := files.NewFileOp()
+	content, err := fileOp.GetContent(defaultConfigPath)
+	if err != nil {
+		return err
+	}
+	newContent := strings.ReplaceAll(string(content), "default_server", "")
+	return fileOp.WriteFile(defaultConfigPath, strings.NewReader(newContent), constant.FilePerm)
+}

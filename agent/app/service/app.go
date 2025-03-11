@@ -537,6 +537,11 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 		if err = runScript(t, appInstall, "init"); err != nil {
 			return err
 		}
+		if app.Key == "openresty" {
+			if err = handleOpenrestyFile(appInstall); err != nil {
+				return err
+			}
+		}
 		if err = upApp(t, appInstall, req.PullImage); err != nil {
 			return err
 		}
