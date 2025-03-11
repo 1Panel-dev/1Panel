@@ -941,21 +941,21 @@ func calculateCPUPercentUnix(stats *types.StatsJSON) float64 {
 func calculateMemPercentUnix(memStats types.MemoryStats) float64 {
 	memPercent := 0.0
 	memUsage := calculateMemUsageUnixNoCache(memStats)
-	memLimit := float64(memStats.Limit)
+	memLimit := memStats.Limit
 	if memUsage > 0.0 && memLimit > 0.0 {
-		memPercent = (memUsage / memLimit) * 100.0
+		memPercent = (float64(memUsage) / float64(memLimit)) * 100.0
 	}
 	return memPercent
 }
 
-func calculateMemUsageUnixNoCache(mem types.MemoryStats) float64 {
+func calculateMemUsageUnixNoCache(mem types.MemoryStats) uint64 {
 	if v, isCgroup1 := mem.Stats["total_inactive_file"]; isCgroup1 && v < mem.Usage {
-		return float64(mem.Usage - v)
+		return mem.Usage - v
 	}
 	if v := mem.Stats["inactive_file"]; v < mem.Usage {
-		return float64(mem.Usage - v)
+		return mem.Usage - v
 	}
-	return float64(mem.Usage)
+	return mem.Usage
 }
 
 func calculateBlockIO(blkio types.BlkioStats) (blkRead float64, blkWrite float64) {
@@ -1075,7 +1075,7 @@ func loadCpuAndMem(client *client.Client, container string) dto.ContainerListSta
 	data.PercpuUsage = len(stats.CPUStats.CPUUsage.PercpuUsage)
 
 	data.MemoryCache = stats.MemoryStats.Stats["cache"]
-	data.MemoryUsage = stats.MemoryStats.Usage
+	data.MemoryUsage = calculateMemUsageUnixNoCache(stats.MemoryStats)
 	data.MemoryLimit = stats.MemoryStats.Limit
 
 	data.MemoryPercent = calculateMemPercentUnix(stats.MemoryStats)
