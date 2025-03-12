@@ -152,11 +152,11 @@
                             />
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('website.remark')" prop="remark" min-width="120px">
+                    <el-table-column :label="$t('website.remark')" prop="remark" min-width="150">
                         <template #default="{ row }">
                             <fu-read-write-switch>
                                 <template #read>
-                                    <MsgInfo :info="row.remark" :width="'280'" />
+                                    <MsgInfo :info="row.remark" :width="'150'" />
                                 </template>
                                 <template #default="{ read }">
                                     <el-input v-model="row.remark" @blur="updateRemark(row, read)" />

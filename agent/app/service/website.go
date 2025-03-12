@@ -1368,8 +1368,11 @@ func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) error
 		return errors.New("nginx config is not valid")
 	}
 	server := servers[0]
-
+	fileOp := files.NewFileOp()
+	indexPHPPath := path.Join(GetSitePath(website, SiteIndexDir), "index.php")
+	indexHtmlPath := path.Join(GetSitePath(website, SiteIndexDir), "index.html")
 	if req.RuntimeID > 0 {
+		server.UpdateDirective("index", []string{"index.php index.html index.htm default.php default.htm default.html"})
 		server.RemoveDirective("location", []string{"~", "[^/]\\.php(/|$)"})
 		runtime, err := runtimeRepo.GetFirst(repo.WithByID(req.RuntimeID))
 		if err != nil {
@@ -1383,11 +1386,18 @@ func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) error
 		website.Proxy = phpProxy
 		server.UpdatePHPProxy([]string{website.Proxy}, "")
 		website.Type = constant.Runtime
+		if !fileOp.Stat(indexPHPPath) {
+			_ = fileOp.WriteFile(indexPHPPath, strings.NewReader(string(nginx_conf.IndexPHP)), constant.FilePerm)
+		}
 	} else {
+		server.UpdateDirective("index", []string{"index.html index.php index.htm default.php default.htm default.html"})
 		website.RuntimeID = 0
 		website.Type = constant.Static
 		website.Proxy = ""
 		server.RemoveDirective("location", []string{"~", "[^/]\\.php(/|$)"})
+		if !fileOp.Stat(indexHtmlPath) {
+			_ = fileOp.WriteFile(indexHtmlPath, strings.NewReader(string(nginx_conf.Index)), constant.FilePerm)
+		}
 	}
 
 	config.FilePath = configPath

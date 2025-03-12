@@ -862,7 +862,7 @@ func opWebsite(website *model.Website, operate string) error {
 		website.Status = constant.WebRunning
 		now := time.Now()
 		if website.ExpireDate.Before(now) {
-			defaultDate, _ := time.Parse(constant.DateLayout, constant.DefaultDate)
+			defaultDate, _ := time.Parse(constant.DateLayout, constant.WebsiteDefaultExpireDate)
 			website.ExpireDate = defaultDate
 		}
 	}

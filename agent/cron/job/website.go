@@ -25,7 +25,7 @@ func (w *website) Run() {
 	global.LOG.Info("Website scheduled task in progress ...")
 	now := time.Now().Add(10 * time.Minute)
 	if len(websites) > 0 {
-		neverExpireDate, _ := time.Parse(constant.DateLayout, constant.DefaultDate)
+		neverExpireDate, _ := time.Parse(constant.DateLayout, constant.WebsiteDefaultExpireDate)
 		var wg sync.WaitGroup
 		for _, site := range websites {
 			if site.Status != constant.WebRunning || neverExpireDate.Equal(site.ExpireDate) {
