@@ -771,3 +771,33 @@ func (f FileOp) TarGzExtractPro(src, dst string, secret string) error {
 	}
 	return cmd.ExecCmdWithDir(commands, dst)
 }
+
+func CopyFileWithName(src, dst string, withName bool) error {
+	source, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer source.Close()
+
+	if path.Base(src) != path.Base(dst) && !withName {
+		dst = path.Join(dst, path.Base(src))
+	}
+	if _, err := os.Stat(path.Dir(dst)); err != nil {
+		if os.IsNotExist(err) {
+			_ = os.MkdirAll(path.Dir(dst), os.ModePerm)
+		}
+	}
+	target, err := os.OpenFile(dst+"_temp", os.O_RDWR|os.O_CREATE|os.O_TRUNC, constant.FilePerm)
+	if err != nil {
+		return err
+	}
+	defer target.Close()
+
+	if _, err = io.Copy(target, source); err != nil {
+		return err
+	}
+	if err = os.Rename(dst+"_temp", dst); err != nil {
+		return err
+	}
+	return nil
+}

@@ -1975,8 +1975,10 @@ const message = {
             'Jika port aplikasi adalah 8080, alamat loncatan akan menjadi http(s)://alamat akses lalai:8080',
         webUIConfig: 'Sila tambah alamat akses di parameter aplikasi atau tetapan kedai aplikasi',
         toLink: 'Loncat',
-        customAppHelper: 'Aplikasi semasa menggunakan pakej kedai nod utama. Sila ubah konfigurasi di nod utama.',
+        customAppHelper:
+            'Sebelum memasang pakej kedai aplikasi tersuai, sila pastikan tidak ada aplikasi yang dipasang.',
         forceUninstall: 'Paksa Nyahpasang',
+        syncCustomApp: 'Segerakan Aplikasi Tersuai',
     },
     website: {
         primaryDomain: 'Domain Utama',

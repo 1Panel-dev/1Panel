@@ -28,10 +28,7 @@
                             </el-input>
                             <span class="input-help">{{ $t('app.defaultWebDomainHepler') }}</span>
                         </el-form-item>
-                        <CustomSetting v-if="globalStore.isMaster && globalStore.isProductPro" />
-                        <el-form-item v-if="!globalStore.isMaster && useCustomApp">
-                            <el-text type="warning">{{ $t('app.customAppHelper') }}</el-text>
-                        </el-form-item>
+                        <CustomSetting v-if="globalStore.isProductPro" />
                     </el-col>
                 </el-row>
             </el-form>

@@ -27,7 +27,7 @@ type IAppInstallRepo interface {
 	WithPort(port int) DBOption
 	WithIdNotInWebsite() DBOption
 	WithIDNotIs(id uint) DBOption
-	ListBy(opts ...DBOption) ([]model.AppInstall, error)
+	ListBy(ctx context.Context, opts ...DBOption) ([]model.AppInstall, error)
 	GetFirst(opts ...DBOption) (model.AppInstall, error)
 	Create(ctx context.Context, install *model.AppInstall) error
 	Save(ctx context.Context, install *model.AppInstall) error
@@ -109,9 +109,9 @@ func (a *AppInstallRepo) WithIdNotInWebsite() DBOption {
 	}
 }
 
-func (a *AppInstallRepo) ListBy(opts ...DBOption) ([]model.AppInstall, error) {
+func (a *AppInstallRepo) ListBy(ctx context.Context, opts ...DBOption) ([]model.AppInstall, error) {
 	var install []model.AppInstall
-	db := getDb(opts...).Model(&model.AppInstall{})
+	db := getTx(ctx, opts...).Model(&model.AppInstall{})
 	err := db.Preload("App").Find(&install).Error
 	return install, err
 }

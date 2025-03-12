@@ -78,7 +78,7 @@ func checkPort(key string, params map[string]interface{}) (int, error) {
 			portN = p
 		}
 
-		oldInstalled, _ := appInstallRepo.ListBy(appInstallRepo.WithPort(portN))
+		oldInstalled, _ := appInstallRepo.ListBy(context.Background(), appInstallRepo.WithPort(portN))
 		if len(oldInstalled) > 0 {
 			var apps []string
 			for _, install := range oldInstalled {
@@ -104,7 +104,7 @@ func checkPortExist(port int) error {
 		errMap["name"] = appInstall.Name
 		return buserr.WithMap("ErrPortExist", errMap, nil)
 	}
-	runtime, _ := runtimeRepo.GetFirst(runtimeRepo.WithPort(port))
+	runtime, _ := runtimeRepo.GetFirst(context.Background(), runtimeRepo.WithPort(port))
 	if runtime != nil {
 		errMap["type"] = i18n.GetMsgByKey("TYPE_RUNTIME")
 		errMap["name"] = runtime.Name
@@ -715,7 +715,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 			_ = fileOp.DeleteDir(path.Join(global.Dir.RuntimeDir, "php"))
 			websites, _ := websiteRepo.List(repo.WithByType("runtime"))
 			for _, website := range websites {
-				runtime, _ := runtimeRepo.GetFirst(repo.WithByID(website.RuntimeID))
+				runtime, _ := runtimeRepo.GetFirst(context.Background(), repo.WithByID(website.RuntimeID))
 				if runtime != nil && runtime.Type == "php" {
 					website.Type = constant.Static
 					website.RuntimeID = 0
@@ -820,7 +820,7 @@ func coverEnvJsonToStr(envJson string) (string, error) {
 
 func checkLimit(app model.App) error {
 	if app.Limit > 0 {
-		installs, err := appInstallRepo.ListBy(appInstallRepo.WithAppId(app.ID))
+		installs, err := appInstallRepo.ListBy(context.Background(), appInstallRepo.WithAppId(app.ID))
 		if err != nil {
 			return err
 		}

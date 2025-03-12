@@ -295,7 +295,7 @@ func recoverAppData(src string, itemHelper *snapRecoverHelper) error {
 		itemHelper.Task.LogSuccess(i18n.GetMsgByKey("RecoverAppImage"))
 	}
 
-	appInstalls, err := appInstallRepo.ListBy()
+	appInstalls, err := appInstallRepo.ListBy(context.Background())
 	itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("RecoverAppList"), err)
 	if err != nil {
 		return err

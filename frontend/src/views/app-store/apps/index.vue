@@ -54,7 +54,7 @@
         </template>
         <template #leftToolBar>
             <el-button @click="sync" type="primary" plain :disabled="syncing">
-                {{ $t('app.syncAppList') }}
+                <span>{{ syncCustomAppstore ? $t('app.syncCustomApp') : $t('app.syncAppList') }}</span>
             </el-button>
             <el-button @click="syncLocal" type="primary" plain :disabled="syncing" class="ml-2">
                 {{ $t('app.syncLocalApp') }}
@@ -167,7 +167,7 @@
     </LayoutContent>
     <Install ref="installRef" />
     <Detail ref="detailRef" />
-    <TaskLog ref="taskLogRef" />
+    <TaskLog ref="taskLogRef" @close="search(req)" />
 </template>
 
 <script lang="ts" setup>
@@ -354,7 +354,7 @@ onMounted(async () => {
     if (isProductPro.value) {
         const res = await getCurrentNodeCustomAppConfig();
         if (res && res.data) {
-            syncCustomAppstore.value = res.data.status === 'enable';
+            syncCustomAppstore.value = res.data.status === 'Enable';
         }
     }
     mainHeight.value = window.innerHeight - 380;

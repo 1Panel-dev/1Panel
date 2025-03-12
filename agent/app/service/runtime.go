@@ -81,7 +81,7 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, e
 	if create.Type != "" {
 		opts = append(opts, repo.WithByType(create.Type))
 	}
-	exist, _ := runtimeRepo.GetFirst(opts...)
+	exist, _ := runtimeRepo.GetFirst(context.Background(), opts...)
 	if exist != nil {
 		return nil, buserr.New("ErrNameIsExist")
 	}
@@ -106,7 +106,7 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, e
 			}
 			return nil, runtimeRepo.Create(context.Background(), runtime)
 		}
-		exist, _ = runtimeRepo.GetFirst(runtimeRepo.WithImage(create.Image))
+		exist, _ = runtimeRepo.GetFirst(context.Background(), runtimeRepo.WithImage(create.Image))
 		if exist != nil {
 			return nil, buserr.New("ErrImageExist")
 		}
@@ -227,7 +227,7 @@ func (r *RuntimeService) DeleteCheck(runTimeId uint) ([]dto.AppResource, error) 
 }
 
 func (r *RuntimeService) Delete(runtimeDelete request.RuntimeDelete) error {
-	runtime, err := runtimeRepo.GetFirst(repo.WithByID(runtimeDelete.ID))
+	runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(runtimeDelete.ID))
 	if err != nil {
 		return err
 	}
@@ -268,7 +268,7 @@ func (r *RuntimeService) Delete(runtimeDelete request.RuntimeDelete) error {
 }
 
 func (r *RuntimeService) Get(id uint) (*response.RuntimeDTO, error) {
-	runtime, err := runtimeRepo.GetFirst(repo.WithByID(id))
+	runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(id))
 	if err != nil {
 		return nil, err
 	}
@@ -426,7 +426,7 @@ func (r *RuntimeService) Get(id uint) (*response.RuntimeDTO, error) {
 }
 
 func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
-	runtime, err := runtimeRepo.GetFirst(repo.WithByID(req.ID))
+	runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(req.ID))
 	if err != nil {
 		return err
 	}
@@ -439,7 +439,7 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 	var hostPorts []string
 	switch runtime.Type {
 	case constant.RuntimePHP:
-		exist, _ := runtimeRepo.GetFirst(runtimeRepo.WithImage(req.Name), runtimeRepo.WithNotId(req.ID))
+		exist, _ := runtimeRepo.GetFirst(context.Background(), runtimeRepo.WithImage(req.Name), runtimeRepo.WithNotId(req.ID))
 		if exist != nil {
 			return buserr.New("ErrImageExist")
 		}
@@ -557,7 +557,7 @@ func (r *RuntimeService) GetNodePackageRunScript(req request.NodePackageReq) ([]
 }
 
 func (r *RuntimeService) OperateRuntime(req request.RuntimeOperate) error {
-	runtime, err := runtimeRepo.GetFirst(repo.WithByID(req.ID))
+	runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(req.ID))
 	if err != nil {
 		return err
 	}
@@ -593,7 +593,7 @@ func (r *RuntimeService) OperateRuntime(req request.RuntimeOperate) error {
 }
 
 func (r *RuntimeService) GetNodeModules(req request.NodeModuleReq) ([]response.NodeModule, error) {
-	runtime, err := runtimeRepo.GetFirst(repo.WithByID(req.ID))
+	runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(req.ID))
 	if err != nil {
 		return nil, err
 	}
@@ -626,7 +626,7 @@ func (r *RuntimeService) GetNodeModules(req request.NodeModuleReq) ([]response.N
 }
 
 func (r *RuntimeService) OperateNodeModules(req request.NodeModuleOperateReq) error {
-	runtime, err := runtimeRepo.GetFirst(repo.WithByID(req.ID))
+	runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(req.ID))
 	if err != nil {
 		return err
 	}
@@ -689,7 +689,7 @@ func (r *RuntimeService) SyncRuntimeStatus() error {
 
 func (r *RuntimeService) GetPHPExtensions(runtimeID uint) (response.PHPExtensionRes, error) {
 	var res response.PHPExtensionRes
-	runtime, err := runtimeRepo.GetFirst(repo.WithByID(runtimeID))
+	runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(runtimeID))
 	if err != nil {
 		return res, err
 	}
@@ -729,7 +729,7 @@ func (r *RuntimeService) GetPHPExtensions(runtimeID uint) (response.PHPExtension
 }
 
 func (r *RuntimeService) InstallPHPExtension(req request.PHPExtensionInstallReq) error {
-	runtime, err := runtimeRepo.GetFirst(repo.WithByID(req.ID))
+	runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(req.ID))
 	if err != nil {
 		return err
 	}
@@ -810,7 +810,7 @@ func (r *RuntimeService) InstallPHPExtension(req request.PHPExtensionInstallReq)
 }
 
 func (r *RuntimeService) UnInstallPHPExtension(req request.PHPExtensionInstallReq) error {
-	runtime, err := runtimeRepo.GetFirst(repo.WithByID(req.ID))
+	runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(req.ID))
 	if err != nil {
 		return err
 	}
@@ -824,7 +824,7 @@ func (r *RuntimeService) UnInstallPHPExtension(req request.PHPExtensionInstallRe
 }
 
 func (r *RuntimeService) GetPHPConfig(id uint) (*response.PHPConfig, error) {
-	runtime, err := runtimeRepo.GetFirst(repo.WithByID(id))
+	runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(id))
 	if err != nil {
 		return nil, err
 	}
@@ -874,7 +874,7 @@ func (r *RuntimeService) GetPHPConfig(id uint) (*response.PHPConfig, error) {
 }
 
 func (r *RuntimeService) UpdatePHPConfig(req request.PHPConfigUpdate) (err error) {
-	runtime, err := runtimeRepo.GetFirst(repo.WithByID(req.ID))
+	runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(req.ID))
 	if err != nil {
 		return err
 	}
@@ -939,7 +939,7 @@ func (r *RuntimeService) UpdatePHPConfig(req request.PHPConfigUpdate) (err error
 }
 
 func (r *RuntimeService) GetPHPConfigFile(req request.PHPFileReq) (*response.FileInfo, error) {
-	runtime, err := runtimeRepo.GetFirst(repo.WithByID(req.ID))
+	runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(req.ID))
 	if err != nil {
 		return nil, err
 	}
@@ -961,7 +961,7 @@ func (r *RuntimeService) GetPHPConfigFile(req request.PHPFileReq) (*response.Fil
 }
 
 func (r *RuntimeService) UpdatePHPConfigFile(req request.PHPFileUpdate) error {
-	runtime, err := runtimeRepo.GetFirst(repo.WithByID(req.ID))
+	runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(req.ID))
 	if err != nil {
 		return err
 	}
@@ -981,7 +981,7 @@ func (r *RuntimeService) UpdatePHPConfigFile(req request.PHPFileUpdate) error {
 }
 
 func (r *RuntimeService) UpdateFPMConfig(req request.FPMConfig) error {
-	runtime, err := runtimeRepo.GetFirst(repo.WithByID(req.ID))
+	runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(req.ID))
 	if err != nil {
 		return err
 	}
@@ -1019,7 +1019,7 @@ var PmKeys = map[string]struct {
 }
 
 func (r *RuntimeService) GetFPMConfig(id uint) (*request.FPMConfig, error) {
-	runtime, err := runtimeRepo.GetFirst(repo.WithByID(id))
+	runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(id))
 	if err != nil {
 		return nil, err
 	}
@@ -1042,7 +1042,7 @@ func (r *RuntimeService) GetFPMConfig(id uint) (*request.FPMConfig, error) {
 }
 
 func (r *RuntimeService) GetSupervisorProcess(id uint) ([]response.SupervisorProcessConfig, error) {
-	runtime, err := runtimeRepo.GetFirst(repo.WithByID(id))
+	runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(id))
 	if err != nil {
 		return nil, err
 	}
@@ -1051,7 +1051,7 @@ func (r *RuntimeService) GetSupervisorProcess(id uint) ([]response.SupervisorPro
 }
 
 func (r *RuntimeService) OperateSupervisorProcess(req request.PHPSupervisorProcessConfig) error {
-	runtime, err := runtimeRepo.GetFirst(repo.WithByID(req.ID))
+	runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(req.ID))
 	if err != nil {
 		return err
 	}
@@ -1060,7 +1060,7 @@ func (r *RuntimeService) OperateSupervisorProcess(req request.PHPSupervisorProce
 }
 
 func (r *RuntimeService) OperateSupervisorProcessFile(req request.PHPSupervisorProcessFileReq) (string, error) {
-	runtime, err := runtimeRepo.GetFirst(repo.WithByID(req.ID))
+	runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(req.ID))
 	if err != nil {
 		return "", err
 	}

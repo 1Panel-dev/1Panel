@@ -80,6 +80,7 @@ const (
 	TaskScopeCompose          = "Compose"
 	TaskScopeImage            = "Image"
 	TaskScopeRuntimeExtension = "RuntimeExtension"
+	TaskScopeCustomAppstore   = "CustomAppstore"
 )
 
 func GetTaskName(resourceName, operate, scope string) string {

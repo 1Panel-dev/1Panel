@@ -69,7 +69,7 @@ func NewIAppInstalledService() IAppInstallService {
 
 func (a *AppInstallService) GetInstallList() ([]dto.AppInstallInfo, error) {
 	var datas []dto.AppInstallInfo
-	appInstalls, err := appInstallRepo.ListBy()
+	appInstalls, err := appInstallRepo.ListBy(context.Background())
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +113,7 @@ func (a *AppInstallService) Page(req request.AppInstalledSearch) (int64, []respo
 	}
 
 	if req.Update {
-		installs, err = appInstallRepo.ListBy(opts...)
+		installs, err = appInstallRepo.ListBy(context.Background(), opts...)
 		if err != nil {
 			return 0, nil, err
 		}
@@ -225,12 +225,12 @@ func (a *AppInstallService) SearchForWebsite(req request.AppInstalledSearch) ([]
 			}
 			opts = append(opts, appInstallRepo.WithAppIdsIn(ids))
 		}
-		installs, err = appInstallRepo.ListBy(opts...)
+		installs, err = appInstallRepo.ListBy(context.Background(), opts...)
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		installs, err = appInstallRepo.ListBy()
+		installs, err = appInstallRepo.ListBy(context.Background())
 		if err != nil {
 			return nil, err
 		}
@@ -450,7 +450,7 @@ func (a *AppInstallService) IgnoreUpgrade(req request.AppInstalledIgnoreUpgrade)
 }
 
 func (a *AppInstallService) SyncAll(systemInit bool) error {
-	allList, err := appInstallRepo.ListBy()
+	allList, err := appInstallRepo.ListBy(context.Background())
 	if err != nil {
 		return err
 	}
@@ -510,7 +510,7 @@ func (a *AppInstallService) GetServices(key string) ([]response.AppService, erro
 		if err != nil {
 			return nil, err
 		}
-		installs, err := appInstallRepo.ListBy(appInstallRepo.WithAppId(app.ID), appInstallRepo.WithStatus(constant.StatusRunning))
+		installs, err := appInstallRepo.ListBy(context.Background(), appInstallRepo.WithAppId(app.ID), appInstallRepo.WithStatus(constant.StatusRunning))
 		if err != nil {
 			return nil, err
 		}

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"sort"
@@ -514,7 +515,7 @@ type portOfApp struct {
 
 func (u *FirewallService) loadPortByApp() []portOfApp {
 	var datas []portOfApp
-	apps, err := appInstallRepo.ListBy()
+	apps, err := appInstallRepo.ListBy(context.Background())
 	if err != nil {
 		return datas
 	}

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/fs"
@@ -158,7 +159,7 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 				return err
 			}
 		case constant.Runtime:
-			runtime, err := runtimeRepo.GetFirst(repo.WithByID(website.RuntimeID))
+			runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(website.RuntimeID))
 			if err != nil {
 				return err
 			}
@@ -240,7 +241,7 @@ func handleWebsiteBackup(website *model.Website, backupDir, fileName, excludes, 
 			}
 			t.LogSuccess(task.GetTaskName(app.Name, task.TaskBackup, task.TaskScopeApp))
 		case constant.Runtime:
-			runtime, err := runtimeRepo.GetFirst(repo.WithByID(website.RuntimeID))
+			runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(website.RuntimeID))
 			if err != nil {
 				return err
 			}
@@ -287,7 +288,7 @@ func checkValidOfWebsite(oldWebsite, website *model.Website) error {
 		}
 	}
 	if oldWebsite.RuntimeID != 0 {
-		if _, err := runtimeRepo.GetFirst(repo.WithByID(oldWebsite.RuntimeID)); err != nil {
+		if _, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(oldWebsite.RuntimeID)); err != nil {
 			return buserr.WithDetail("ErrBackupMatch", "runtime", nil)
 		}
 	}

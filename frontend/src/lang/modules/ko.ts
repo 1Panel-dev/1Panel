@@ -1890,9 +1890,9 @@ const message = {
         defaultWebDomainHepler: '애플리케이션 포트가 8080인 경우 접속 주소는 http(s)://기본 접속 주소:8080입니다',
         webUIConfig: '애플리케이션 매개변수 또는 앱 스토어 설정에서 접속 주소를 추가하세요',
         toLink: '이동',
-        customAppHelper:
-            '현재 애플리케이션은 메인 노드 스토어 패키지를 사용합니다. 설정을 변경하려면 메인 노드에서 작업하세요.',
+        customAppHelper: '사용자 정의 앱 스토어 패키지를 설치하기 전에 설치된 앱이 없는지 확인하십시오.',
         forceUninstall: '강제 제거',
+        syncCustomApp: 'カスタムアプリを同期',
     },
     website: {
         primaryDomain: '기본 도메인',

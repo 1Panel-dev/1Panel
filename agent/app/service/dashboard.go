@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	network "net"
@@ -156,7 +157,7 @@ func (u *DashboardService) LoadBaseInfo(ioOption string, netOption string) (*dto
 	}
 	baseInfo.SystemProxy = "noProxy"
 
-	appInstall, err := appInstallRepo.ListBy()
+	appInstall, err := appInstallRepo.ListBy(context.Background())
 	if err != nil {
 		return nil, err
 	}
@@ -275,7 +276,7 @@ func (u *DashboardService) LoadAppLauncher() ([]dto.AppLauncher, error) {
 		data          []dto.AppLauncher
 		recommendList []dto.AppLauncher
 	)
-	appInstalls, err := appInstallRepo.ListBy()
+	appInstalls, err := appInstallRepo.ListBy(context.Background())
 	if err != nil {
 		return data, err
 	}
@@ -346,7 +347,7 @@ func (u *DashboardService) ListLauncherOption(filter string) ([]dto.LauncherOpti
 	showList := loadShowList()
 	var data []dto.LauncherOption
 	optionMap := make(map[string]bool)
-	appInstalls, err := appInstallRepo.ListBy()
+	appInstalls, err := appInstallRepo.ListBy(context.Background())
 	if err != nil {
 		return data, err
 	}

@@ -727,7 +727,7 @@ func checkRuntimePortExist(port int, scanPort bool, runtimeID uint) error {
 	if runtimeID > 0 {
 		opts = append(opts, repo.WithByNOTID(runtimeID))
 	}
-	runtime, _ := runtimeRepo.GetFirst(opts...)
+	runtime, _ := runtimeRepo.GetFirst(context.Background(), opts...)
 	if runtime != nil {
 		errMap["type"] = i18n.GetMsgByKey("TYPE_RUNTIME")
 		errMap["name"] = runtime.Name

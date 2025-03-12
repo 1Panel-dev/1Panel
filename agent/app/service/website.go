@@ -170,7 +170,7 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 			appName = appInstall.Name
 			appInstallID = appInstall.ID
 		case constant.Runtime:
-			runtime, _ := runtimeRepo.GetFirst(repo.WithByID(web.RuntimeID))
+			runtime, _ := runtimeRepo.GetFirst(context.Background(), repo.WithByID(web.RuntimeID))
 			if runtime != nil {
 				runtimeName = runtime.Name
 				runtimeType = runtime.Type
@@ -372,7 +372,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 			createTask.AddSubTask(i18n.GetMsgByKey("ConfigApp"), configApp, nil)
 		}
 	case constant.Runtime:
-		runtime, err = runtimeRepo.GetFirst(repo.WithByID(create.RuntimeID))
+		runtime, err = runtimeRepo.GetFirst(context.Background(), repo.WithByID(create.RuntimeID))
 		if err != nil {
 			return err
 		}
@@ -557,7 +557,7 @@ func (w WebsiteService) GetWebsite(id uint) (response.WebsiteDTO, error) {
 	res.SitePath = GetSitePath(website, SiteDir)
 	res.SiteDir = website.SiteDir
 	if website.Type == constant.Runtime {
-		runtime, err := runtimeRepo.GetFirst(repo.WithByID(website.RuntimeID))
+		runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(website.RuntimeID))
 		if err != nil {
 			return res, err
 		}
@@ -1146,7 +1146,7 @@ func (w WebsiteService) PreInstallCheck(req request.WebsiteInstallCheckReq) ([]r
 		checkIds = append(req.InstallIds, appInstall.ID)
 	}
 	if len(checkIds) > 0 {
-		installList, _ := appInstallRepo.ListBy(repo.WithByIDs(checkIds))
+		installList, _ := appInstallRepo.ListBy(context.Background(), repo.WithByIDs(checkIds))
 		for _, install := range installList {
 			if err = syncAppInstallStatus(&install, false); err != nil {
 				return nil, err
@@ -1338,7 +1338,7 @@ func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) error
 		return err
 	}
 	if website.Type == constant.Runtime {
-		oldRuntime, err := runtimeRepo.GetFirst(repo.WithByID(website.RuntimeID))
+		oldRuntime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(website.RuntimeID))
 		if err != nil {
 			return err
 		}
@@ -1374,7 +1374,7 @@ func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) error
 	if req.RuntimeID > 0 {
 		server.UpdateDirective("index", []string{"index.php index.html index.htm default.php default.htm default.html"})
 		server.RemoveDirective("location", []string{"~", "[^/]\\.php(/|$)"})
-		runtime, err := runtimeRepo.GetFirst(repo.WithByID(req.RuntimeID))
+		runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(req.RuntimeID))
 		if err != nil {
 			return err
 		}
@@ -3152,7 +3152,7 @@ func (w WebsiteService) GetWebsiteResource(websiteID uint) ([]response.Resource,
 		databaseType string
 	)
 	if website.Type == constant.Runtime {
-		runtime, err := runtimeRepo.GetFirst(repo.WithByID(website.RuntimeID))
+		runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(website.RuntimeID))
 		if err != nil {
 			return nil, err
 		}

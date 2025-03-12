@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -237,7 +238,7 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 		rootIndex = path.Join("/www/sites", parentWebsite.Alias, "index", website.SiteDir)
 		server.UpdateDirective("error_page", []string{"404", "/404.html"})
 		if parentWebsite.Type == constant.Runtime {
-			parentRuntime, err := runtimeRepo.GetFirst(repo.WithByID(parentWebsite.RuntimeID))
+			parentRuntime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(parentWebsite.RuntimeID))
 			if err != nil {
 				return err
 			}
@@ -799,7 +800,7 @@ func opWebsite(website *model.Website, operate string) error {
 		case constant.Deployment:
 			server.RemoveDirective("location", []string{"/"})
 		case constant.Runtime:
-			runtime, err := runtimeRepo.GetFirst(repo.WithByID(website.RuntimeID))
+			runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(website.RuntimeID))
 			if err != nil {
 				return err
 			}
@@ -845,7 +846,7 @@ func opWebsite(website *model.Website, operate string) error {
 		case constant.Runtime:
 			server.UpdateRoot(rootIndex)
 			localPath := ""
-			runtime, err := runtimeRepo.GetFirst(repo.WithByID(website.RuntimeID))
+			runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(website.RuntimeID))
 			if err != nil {
 				return err
 			}
@@ -916,7 +917,7 @@ func checkIsLinkApp(website model.Website) bool {
 		return true
 	}
 	if website.Type == constant.Runtime {
-		runtime, _ := runtimeRepo.GetFirst(repo.WithByID(website.RuntimeID))
+		runtime, _ := runtimeRepo.GetFirst(context.Background(), repo.WithByID(website.RuntimeID))
 		return runtime.Resource == constant.ResourceAppstore
 	}
 	return false
@@ -990,7 +991,7 @@ func getWebsiteDomains(domains []request.WebsiteDomain, defaultPort int, website
 				err = buserr.WithMap("ErrPortExist", errMap, nil)
 				return
 			}
-			runtime, _ := runtimeRepo.GetFirst(runtimeRepo.WithPort(port))
+			runtime, _ := runtimeRepo.GetFirst(context.Background(), runtimeRepo.WithPort(port))
 			if runtime != nil {
 				errMap["type"] = i18n.GetMsgByKey("TYPE_RUNTIME")
 				errMap["name"] = runtime.Name

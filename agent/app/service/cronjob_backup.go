@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path"
@@ -22,7 +23,7 @@ import (
 func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time, taskID string) error {
 	var apps []model.AppInstall
 	if cronjob.AppID == "all" {
-		apps, _ = appInstallRepo.ListBy()
+		apps, _ = appInstallRepo.ListBy(context.Background())
 	} else {
 		itemID, _ := strconv.Atoi(cronjob.AppID)
 		app, err := appInstallRepo.GetFirst(repo.WithByID(uint(itemID)))

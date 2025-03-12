@@ -96,6 +96,8 @@ CustomAppStoreNotFound: "应用商店包获取失败，请检查是否存在"
 CustomAppStoreFileValid: "应用商店包需要 .tar.gz 格式"
 PullImageTimeout: "拉取镜像超时,请尝试增加镜像加速或者更换其他镜像加速"
 ErrAppIsDown: "{{ .name }} 应用状态异常，请检查"
+ErrCustomApps: "存在已经安装的应用，请先卸载"
+ErrCustomRuntimes: "存在已经安装的运行环境，请先删除"
 
 #file
 ErrFileCanNotRead: "此文件不支持预览"
@@ -316,6 +318,7 @@ LocalApp: "本地应用"
 SubTask: "子任务"
 RuntimeExtension: "运行环境扩展"
 TaskIsExecuting: "任务正在运行"
+CustomAppstore: "自定义应用仓库"
 
 # task - ai
 OllamaModelPull: "拉取 Ollama 模型  {{ .name }} "

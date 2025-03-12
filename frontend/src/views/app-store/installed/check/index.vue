@@ -19,7 +19,7 @@
                     >
                         <template #label>
                             <a href="javascript:void(0);" class="check-label-a" @click="toPage(item[0])">
-                                {{ $t('app.' + item[0]) }}
+                                {{ $t('menu.' + item[0]) }}
                             </a>
                         </template>
                         <span class="resources">

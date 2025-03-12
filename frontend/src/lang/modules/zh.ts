@@ -1901,8 +1901,9 @@ const message = {
         defaultWebDomainHepler: '如果应用端口为 8080，则跳转地址为 http(s)://默认访问地址:8080',
         webUIConfig: '请在应用参数或者应用商店设置处添加访问地址',
         toLink: '跳转',
-        customAppHelper: '当前使用的是主节点应用商店包，修改配置请在主节点操作',
+        customAppHelper: '在使用自定义应用商店仓库之前，请确保没有任何已安装的应用。',
         forceUninstall: '强制卸载',
+        syncCustomApp: '同步自定义应用',
     },
     website: {
         primaryDomain: '主域名',

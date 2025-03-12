@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"io/fs"
@@ -433,7 +434,7 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 		}
 		logFilePath = GetSitePath(website, req.Name)
 	case constant.TypePhp:
-		php, err := runtimeRepo.GetFirst(repo.WithByID(req.ID))
+		php, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(req.ID))
 		if err != nil {
 			return nil, err
 		}

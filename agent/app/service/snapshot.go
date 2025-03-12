@@ -181,7 +181,7 @@ func loadOs() string {
 
 func loadApps(fileOp fileUtils.FileOp) ([]dto.DataTree, error) {
 	var data []dto.DataTree
-	apps, err := appInstallRepo.ListBy()
+	apps, err := appInstallRepo.ListBy(context.Background())
 	if err != nil {
 		return data, err
 	}

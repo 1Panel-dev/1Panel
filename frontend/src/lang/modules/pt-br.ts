@@ -1967,8 +1967,9 @@ const message = {
             'Adicione o endereço de acesso nos parâmetros do aplicativo ou nas configurações da loja de aplicativos',
         toLink: 'Ir para',
         customAppHelper:
-            'O aplicativo atual usa o pacote da loja do nó principal. Modifique a configuração no nó principal.',
+            'Antes de instalar um pacote de loja de aplicativos personalizado, certifique-se de que não há aplicativos instalados.',
         forceUninstall: 'Desinstalação Forçada',
+        syncCustomApp: 'Sincronizar Aplicativo Personalizado',
     },
     website: {
         primaryDomain: 'Domínio principal',

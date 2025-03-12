@@ -143,7 +143,7 @@ func (a AppService) PageApp(ctx *gin.Context, req request.AppSearch) (interface{
 			continue
 		}
 		appDTO.Tags = tags
-		installs, _ := appInstallRepo.ListBy(appInstallRepo.WithAppId(ap.ID))
+		installs, _ := appInstallRepo.ListBy(context.Background(), appInstallRepo.WithAppId(ap.ID))
 		appDTO.Installed = len(installs) > 0
 	}
 	res.Items = appDTOs
@@ -349,7 +349,7 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 		err = buserr.WithDetail("Err1PanelNetworkFailed", err.Error(), nil)
 		return
 	}
-	if list, _ := appInstallRepo.ListBy(repo.WithByLowerName(req.Name)); len(list) > 0 {
+	if list, _ := appInstallRepo.ListBy(context.Background(), repo.WithByLowerName(req.Name)); len(list) > 0 {
 		err = buserr.New("ErrAppNameExist")
 		return
 	}
@@ -455,7 +455,7 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 	containerName := constant.ContainerPrefix + app.Key + "-" + common.RandStr(4)
 	if req.Advanced && req.ContainerName != "" {
 		containerName = req.ContainerName
-		appInstalls, _ := appInstallRepo.ListBy(appInstallRepo.WithContainerName(containerName))
+		appInstalls, _ := appInstallRepo.ListBy(context.Background(), appInstallRepo.WithContainerName(containerName))
 		if len(appInstalls) > 0 {
 			err = buserr.New("ErrContainerName")
 			return
@@ -684,7 +684,7 @@ func (a AppService) SyncAppListFromLocal(TaskID string) {
 			} else {
 				oldAppIds = append(oldAppIds, app.ID)
 				if app.Status == constant.AppTakeDown {
-					installs, _ := appInstallRepo.ListBy(appInstallRepo.WithAppId(app.ID))
+					installs, _ := appInstallRepo.ListBy(context.Background(), appInstallRepo.WithAppId(app.ID))
 					if len(installs) > 0 {
 						updateApps = append(updateApps, app)
 						continue
@@ -894,7 +894,7 @@ var InitTypes = map[string]struct{}{
 
 func deleteCustomApp() {
 	var appIDS []uint
-	installs, _ := appInstallRepo.ListBy()
+	installs, _ := appInstallRepo.ListBy(context.Background())
 	for _, install := range installs {
 		appIDS = append(appIDS, install.AppId)
 	}
@@ -1015,10 +1015,9 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 				if _, ok := InitTypes[app.Type]; ok {
 					dockerComposeUrl := fmt.Sprintf("%s/%s", versionUrl, "docker-compose.yml")
 					_, composeRes, err := req_helper.HandleRequest(dockerComposeUrl, http.MethodGet, constant.TimeOut20s)
-					if err != nil {
-						return err
+					if err == nil {
+						detail.DockerCompose = string(composeRes)
 					}
-					detail.DockerCompose = string(composeRes)
 				} else {
 					detail.DockerCompose = ""
 				}
@@ -1052,7 +1051,7 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 				addAppArray = append(addAppArray, v)
 			} else {
 				if v.Status == constant.AppTakeDown {
-					installs, _ := appInstallRepo.ListBy(appInstallRepo.WithAppId(v.ID))
+					installs, _ := appInstallRepo.ListBy(context.Background(), appInstallRepo.WithAppId(v.ID))
 					if len(installs) > 0 {
 						updateAppArray = append(updateAppArray, v)
 						continue
@@ -1124,12 +1123,12 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 					addDetails = append(addDetails, d)
 				} else {
 					if d.Status == constant.AppTakeDown {
-						runtime, _ := runtimeRepo.GetFirst(runtimeRepo.WithDetailId(d.ID))
+						runtime, _ := runtimeRepo.GetFirst(ctx, runtimeRepo.WithDetailId(d.ID))
 						if runtime != nil {
 							updateDetails = append(updateDetails, d)
 							continue
 						}
-						installs, _ := appInstallRepo.ListBy(appInstallRepo.WithDetailIdsIn([]uint{d.ID}))
+						installs, _ := appInstallRepo.ListBy(ctx, appInstallRepo.WithDetailIdsIn([]uint{d.ID}))
 						if len(installs) > 0 {
 							updateDetails = append(updateDetails, d)
 							continue

@@ -3,14 +3,16 @@ package proxy_local
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/core/app/dto"
+	"github.com/1Panel-dev/1Panel/core/i18n"
 	"io"
 	"net"
 	"net/http"
 	"net/url"
 	"os"
-
-	"github.com/1Panel-dev/1Panel/core/app/dto"
+	"strings"
 )
 
 func NewLocalClient(reqUrl, reqMethod string, body io.Reader) (interface{}, error) {
@@ -62,7 +64,7 @@ func NewLocalClient(reqUrl, reqMethod string, body io.Reader) (interface{}, erro
 		return nil, fmt.Errorf("json umarshal resp data failed, err: %v", err)
 	}
 	if respJson.Code != http.StatusOK {
-		return nil, fmt.Errorf("do request success but handle failed, err: %v", respJson.Message)
+		return nil, errors.New(strings.ReplaceAll(respJson.Message, i18n.Get("ErrInternalServerKey"), ""))
 	}
 
 	return respJson.Data, nil

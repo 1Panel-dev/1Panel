@@ -2066,8 +2066,9 @@ const message = {
         webUIConfig: 'Please add the access address in the application parameters or the app store settings',
         toLink: 'Open',
         customAppHelper:
-            'The current package is from the main node app store, please modify the configuration on the main node',
+            'Before installing a custom app store package, please ensure that there are no installed apps.',
         forceUninstall: 'Force Uninstall',
+        syncCustomApp: 'Sync Custom App',
     },
     website: {
         primaryDomain: 'Primary Domain',
