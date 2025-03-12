@@ -50,6 +50,8 @@ require (
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
 	github.com/swaggo/swag v1.16.3
+	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cloudapp v1.0.1105
+	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.1105
 	github.com/tencentyun/cos-go-sdk-v5 v0.7.46
 	github.com/xlzd/gotp v0.1.0
 	golang.org/x/crypto v0.32.0
@@ -219,7 +221,6 @@ require (
 	github.com/spf13/cast v1.6.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/stretchr/testify v1.10.0 // indirect
-	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.1105 // indirect
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/dnspod v1.0.1065 // indirect
 	github.com/therootcompany/xz v1.0.1 // indirect
 	github.com/theupdateframework/notary v0.7.0 // indirect
