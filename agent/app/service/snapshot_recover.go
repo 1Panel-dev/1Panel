@@ -247,10 +247,12 @@ func backupBeforeRecover(name string, itemHelper *snapRecoverHelper) error {
 	if err != nil {
 		return err
 	}
-	err = itemHelper.FileOp.CopyFile("/etc/docker/daemon.json", baseDir)
-	itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/etc/docker/daemon.json"), err)
-	if err != nil {
-		return err
+	if itemHelper.FileOp.Stat("/etc/docker/daemon.json") {
+		err = itemHelper.FileOp.CopyFile("/etc/docker/daemon.json", baseDir)
+		itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/etc/docker/daemon.json"), err)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

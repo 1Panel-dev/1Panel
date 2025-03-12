@@ -570,8 +570,10 @@ const changeType = async () => {
     switch (dialogData.value.rowData!.type) {
         case 'COS':
         case 'OSS':
-        case 'S3':
             dialogData.value.rowData.varsJson['scType'] = 'Standard';
+            break;
+        case 'S3':
+            dialogData.value.rowData.varsJson['scType'] = 'STANDARD';
             dialogData.value.rowData.varsJson['mode'] = 'virtual hosted';
             break;
         case 'KODO':

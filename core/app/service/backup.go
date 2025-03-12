@@ -211,7 +211,7 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 	newBackup.Credential = string(itemCredential)
 
 	if newBackup.Type == constant.OneDrive || newBackup.Type == constant.GoogleDrive {
-		if err := u.loadRefreshTokenByCode(&backup); err != nil {
+		if err := u.loadRefreshTokenByCode(&newBackup); err != nil {
 			return err
 		}
 	}

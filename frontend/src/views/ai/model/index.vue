@@ -175,7 +175,7 @@
         <PortJumpDialog ref="dialogPortJumpRef" />
         <BindDomain ref="bindDomainRef" />
 
-        <TaskLog ref="taskLogRef" width="70%" />
+        <TaskLog ref="taskLogRef" width="70%" @close="search" />
     </div>
 </template>
 

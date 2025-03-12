@@ -244,7 +244,7 @@ func (u *DeviceService) Clean(req []dto.Clean) {
 					continue
 				}
 				for _, file := range files {
-					if file.Name() == "1Panel.log" || file.IsDir() {
+					if file.Name() == "1Panel-Core.log" || file.Name() == "1Panel.log" || file.IsDir() {
 						continue
 					}
 					dropFileOrDir(path.Join(global.Dir.BaseDir, logPath, file.Name()))
@@ -253,10 +253,24 @@ func (u *DeviceService) Clean(req []dto.Clean) {
 				dropFileOrDir(path.Join(global.Dir.BaseDir, logPath, item.Name))
 			}
 		case "task_log":
-			pathItem := path.Join(global.Dir.BaseDir, logPath, item.Name)
-			dropFileOrDir(pathItem)
-			if len(item.Name) != 0 {
-				_ = taskRepo.Delete(repo.WithByType(item.Name))
+			if len(item.Name) == 0 {
+				files, _ := os.ReadDir(path.Join(global.Dir.BaseDir, logPath))
+				if len(files) == 0 {
+					continue
+				}
+				for _, file := range files {
+					if file.Name() == "ssl" || !file.IsDir() {
+						continue
+					}
+					dropFileOrDir(path.Join(global.Dir.BaseDir, logPath, file.Name()))
+				}
+				_ = taskRepo.DeleteAll()
+			} else {
+				pathItem := path.Join(global.Dir.BaseDir, logPath, item.Name)
+				dropFileOrDir(pathItem)
+				if len(item.Name) != 0 {
+					_ = taskRepo.Delete(repo.WithByType(item.Name))
+				}
 			}
 		case "images":
 			dropImages()
@@ -326,7 +340,7 @@ func systemClean(taskItem *task.Task) error {
 				if logFiles[i].IsDir() {
 					continue
 				}
-				if logFiles[i].Name() != "1Panel.log" {
+				if logFiles[i].Name() != "1Panel.log" && logFiles[i].Name() != "1Panel-Core.log" {
 					dropWithTask(path.Join(logPath, logFiles[i].Name()), taskItem, &size, &fileCount)
 				}
 			}
@@ -591,7 +605,10 @@ func loadTreeWithAllFile(isCheck bool, originalPath, treeType, pathItem string, 
 		return lists
 	}
 	for _, file := range files {
-		if treeType == "system_log" && (file.Name() == "1Panel.log" || file.IsDir()) {
+		if treeType == "upload" && (file.Name() == "theme" && file.IsDir()) {
+			continue
+		}
+		if treeType == "system_log" && (file.Name() == "1Panel-Core.log" || file.Name() == "1Panel.log" || file.IsDir()) {
 			continue
 		}
 		if (treeType == "upload" || treeType == "download") && file.IsDir() && (file.Name() == "app" || file.Name() == "database" || file.Name() == "website" || file.Name() == "directory") {

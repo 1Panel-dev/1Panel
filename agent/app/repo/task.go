@@ -21,6 +21,7 @@ type ITaskRepo interface {
 	UpdateRunningTaskToFailed() error
 	CountExecutingTask() (int64, error)
 	Delete(opts ...DBOption) error
+	DeleteAll() error
 
 	WithByID(id string) DBOption
 	WithResourceID(id uint) DBOption
@@ -117,4 +118,8 @@ func (u TaskRepo) Delete(opts ...DBOption) error {
 		db = opt(db)
 	}
 	return db.Delete(&model.Task{}).Error
+}
+
+func (u TaskRepo) DeleteAll() error {
+	return global.TaskDB.Where("1 = 1").Delete(&model.Task{}).Error
 }

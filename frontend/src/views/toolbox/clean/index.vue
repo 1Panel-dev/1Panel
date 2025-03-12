@@ -641,6 +641,7 @@ function load18n(label: string) {
         case 'Container':
         case 'App':
         case 'System':
+        case 'Website':
             return i18n.global.t('menu.' + label.toLowerCase());
         case 'RuntimeExtension':
             return i18n.global.t('website.runtime');
