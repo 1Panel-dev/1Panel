@@ -3,6 +3,7 @@ import { deepCopy } from '@/utils/util';
 import { Base64 } from 'js-base64';
 import { ResPage, SearchWithPage, DescriptionUpdate, ReqPage } from '../interface';
 import { Setting } from '../interface/setting';
+import { TimeoutEnum } from '@/enums/http-enum';
 
 // license
 export const uploadLicense = (oldLicense: string, params: FormData) => {
@@ -14,8 +15,8 @@ export const uploadLicense = (oldLicense: string, params: FormData) => {
 export const searchLicense = (params: ReqPage) => {
     return http.post<ResPage<Setting.License>>('/core/licenses/search', params);
 };
-export const deleteLicense = (id: number, force: boolean) => {
-    return http.post('/core/licenses/del', { id: id, force: force });
+export const deleteLicense = (params: { ids: number }) => {
+    return http.post('/core/licenses/del', params);
 };
 export const getLicenseStatus = () => {
     return http.get<Setting.LicenseStatus>(`/core/licenses/status`);
@@ -27,10 +28,10 @@ export const syncLicense = (id: number) => {
     return http.post(`/core/licenses/sync`, { id: id });
 };
 export const bindLicense = (id: number, nodeID: number) => {
-    return http.post(`/core/licenses/bind`, { nodeID: nodeID, licenseID: id });
+    return http.post(`/core/licenses/bind`, { nodeID: nodeID, licenseID: id }, TimeoutEnum.T_60S);
 };
 export const unbindLicense = (id: number) => {
-    return http.post(`/core/licenses/unbind`, { id: id });
+    return http.post(`/core/licenses/unbind`, { id: id }, TimeoutEnum.T_60S);
 };
 export const loadLicenseOptions = () => {
     return http.get(`/core/licenses/options`);

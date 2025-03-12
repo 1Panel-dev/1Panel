@@ -57,6 +57,7 @@ ErrXpackTimeout: "Request timeout, network connection might be unstable, please 
 ErrUnbindMaster: "Detected nodes in node management, unable to unbind the current license, please remove nodes first and retry!"
 ErrFreeNodeLimit: "Community version node limit reached, please go to www.lxware.cn/1panel to purchase and retry!"
 ErrNodeBound: "This license is bound to another node, please check and retry!"
+ErrNodeBoundDelete: "This license is bound and does not support delete operations. Please check and try again!"
 ErrNodeBoundLimit: "The current free node has reached its limit, please check and try again!"
 ErrNoSuchNode: "Node information not found, please check and retry!"
 ErrNodeUnbind: "This node is not within the license binding range, please check and retry!"

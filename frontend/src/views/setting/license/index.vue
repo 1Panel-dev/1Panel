@@ -84,18 +84,19 @@
         <LicenseImport ref="licenseRef" />
         <LicenseBind ref="bindRef" />
         <LicenseDelete ref="delRef" @search="search" />
+        <OpDialog ref="opRef" @search="search" />
     </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue';
-import { searchLicense, syncLicense, unbindLicense } from '@/api/modules/setting';
+import { deleteLicense, searchLicense, syncLicense, unbindLicense } from '@/api/modules/setting';
 import LicenseImport from '@/components/license-import/index.vue';
 import LicenseDelete from '@/views/setting/license/delete/index.vue';
 import LicenseBind from '@/views/setting/license/bind/index.vue';
 import { dateFormat } from '@/utils/util';
 import i18n from '@/lang';
-import { MsgError, MsgSuccess } from '@/utils/message';
+import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
 import { initFavicon } from '@/utils/xpack';
 
@@ -104,6 +105,7 @@ const loading = ref();
 const licenseRef = ref();
 const delRef = ref();
 const bindRef = ref();
+const opRef = ref();
 
 const data = ref();
 const paginationConfig = reactive({
@@ -233,18 +235,6 @@ const buttons = [
             return row.status === 'Free';
         },
         click: (row: any) => {
-            if (row.freeCount != 0) {
-                if (row.freeNodes) {
-                    MsgError(i18n.global.t('license.unbindMasterHelper', [i18n.global.t('commons.button.unbind')]));
-                    return;
-                }
-                for (const item of data.value) {
-                    if (item.bindNode && item.freeCount == 0) {
-                        MsgError(i18n.global.t('license.unbindMasterHelper', [i18n.global.t('commons.button.unbind')]));
-                        return;
-                    }
-                }
-            }
             onUnbind(row);
         },
     },
@@ -266,11 +256,16 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
         click: (row: any) => {
-            if (row.freeNodes && row.freeCount != 0) {
-                MsgError(i18n.global.t('license.unbindMasterHelper', [i18n.global.t('commons.button.delete')]));
-                return;
-            }
-            delRef.value.acceptParams({ id: row.id, name: row.licenseName });
+            opRef.value.acceptParams({
+                title: i18n.global.t('commons.button.delete'),
+                names: [row.licenseName],
+                msg: i18n.global.t('commons.msg.operatorHelper', [
+                    i18n.global.t('setting.license'),
+                    i18n.global.t('commons.button.delete'),
+                ]),
+                api: deleteLicense,
+                params: { id: row.id },
+            });
         },
     },
 ];

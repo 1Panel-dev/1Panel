@@ -2975,7 +2975,7 @@ const message = {
             checkStatus: '노드 서비스 가용성 확인',
             fixStatus: '노드 로그 조사',
             checkAPI: '노드 API 가용성 확인',
-            fixAPI: '정보 내 요청 주소가 올바른지 확인하고, 잘못된 경우 주 노드 정보를 수정해야 합니다',
+            fixAPI: '노드 로그를 확인하고 방화벽 포트가 정상적으로 열려 있는지 확인합니다.',
             forceDelete: '강제 삭제',
             operateHelper: '다음 노드에 대해 {0} 작업을 수행합니다. 계속하시겠습니까?',
             forceDeleteHelper: '강제 삭제는 노드 삭제 오류를 무시하고 데이터베이스 메타데이터를 삭제합니다',

@@ -1872,8 +1872,6 @@ const message = {
         quickUpdate: 'Quick Update',
         power: 'Authorization',
         unbindHelper: 'Unbinding will clear all professional edition settings for this node. Do you wish to continue?',
-        unbindMasterHelper:
-            'There are currently other nodes besides the master node. The {0} operation is not supported. Please delete the nodes in the node management and try again.',
         importLicense: 'Import License',
         importHelper: 'Please click or drag the license file here',
         levelUpPro: 'Upgrade to Professional Edition',
@@ -3215,7 +3213,7 @@ const message = {
             checkStatus: 'Check Node Service Availability',
             fixStatus: 'Investigate Node Logs',
             checkAPI: 'Check Node API Availability',
-            fixAPI: 'Check if the request address in the information is correct; if incorrect, modify the main node information',
+            fixAPI: 'Check the node logs and verify if the firewall ports are properly opened.',
             forceDelete: 'Force Delete',
             operateHelper: 'The following nodes will undergo {0} operation, do you want to continue?',
             forceDeleteHelper: 'Force delete will ignore node deletion errors and delete database metadata',

@@ -3098,7 +3098,7 @@ const message = {
             checkStatus: 'Verificar Disponibilidade do Serviço do Nó',
             fixStatus: 'Investigar Logs do Nó',
             checkAPI: 'Verificar Disponibilidade da API do Nó',
-            fixAPI: 'Verifique se o endereço de solicitação nas informações está correto; se estiver incorreto, será necessário modificar as informações do nó principal',
+            fixAPI: 'Verifique os logs do nó e confirme se as portas do firewall estão devidamente abertas.',
             forceDelete: 'Excluir Forçadamente',
             operateHelper: 'A operação {0} será realizada nos seguintes nós, deseja continuar?',
             forceDeleteHelper:

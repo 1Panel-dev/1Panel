@@ -3094,7 +3094,7 @@ const message = {
             checkStatus: 'Periksa Ketersediaan Perkhidmatan Nod',
             fixStatus: 'Siasat Log Nod',
             checkAPI: 'Periksa Ketersediaan API Nod',
-            fixAPI: 'Periksa jika alamat permintaan dalam maklumat adalah betul; jika tidak betul, perlu mengubah maklumat nod utama',
+            fixAPI: 'Semak log nod dan periksa sama ada port firewall dibuka dengan betul.',
             forceDelete: 'Hapus Secara Paksa',
             operateHelper: 'Operasi {0} akan dilakukan pada nod berikut, adakah anda ingin meneruskan?',
             forceDeleteHelper:
