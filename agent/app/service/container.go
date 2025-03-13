@@ -892,21 +892,13 @@ func collectLogs(params dto.StreamLog, messageChan chan<- string, errorChan chan
 		errorChan <- fmt.Errorf("failed to get stdout pipe: %v", err)
 		return
 	}
-	stderr, err := dockerCmd.StderrPipe()
-	if err != nil {
-		errorChan <- fmt.Errorf("failed to get stderr pipe: %v", err)
-		return
-	}
+	dockerCmd.Stderr = dockerCmd.Stdout
 	if err = dockerCmd.Start(); err != nil {
 		errorChan <- fmt.Errorf("failed to start command: %v", err)
 		return
 	}
-
 	scanner := bufio.NewScanner(stdout)
-	lineNumber := 0
-
 	for scanner.Scan() {
-		lineNumber++
 		message := scanner.Text()
 		select {
 		case messageChan <- message:
@@ -915,16 +907,9 @@ func collectLogs(params dto.StreamLog, messageChan chan<- string, errorChan chan
 			return
 		}
 	}
-
 	if err = scanner.Err(); err != nil {
 		errorChan <- fmt.Errorf("scanner error: %v", err)
 		return
-	}
-
-	errScanner := bufio.NewScanner(stderr)
-	for errScanner.Scan() {
-		line := errScanner.Text()
-		errorChan <- fmt.Errorf("%v", line)
 	}
 	if err = dockerCmd.Wait(); err != nil {
 		errorChan <- fmt.Errorf("%v", err)

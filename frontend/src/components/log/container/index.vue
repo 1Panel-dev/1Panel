@@ -24,7 +24,7 @@
             {{ $t('commons.button.clean') }}
         </el-button>
     </div>
-    <div class="log-container" ref="logContainer">
+    <div class="log-container" :style="styleVars" ref="logContainer">
         <div class="log-spacer" :style="{ height: `${totalHeight}px` }"></div>
         <div
             v-for="(log, index) in visibleLogs"
@@ -61,7 +61,15 @@ const props = defineProps({
         type: String,
         default: '',
     },
+    highlightDiff: {
+        type: Number,
+        default: 320,
+    },
 });
+
+const styleVars = computed(() => ({
+    '--custom-height': `${props.highlightDiff || 320}px`,
+}));
 
 const logVisible = ref(false);
 const logContainer = ref<HTMLElement | null>(null);
@@ -252,7 +260,7 @@ onMounted(() => {
 }
 
 .log-container {
-    height: calc(100vh - 350px);
+    height: calc(100vh - var(--custom-height, 320px));
     overflow-y: auto;
     overflow-x: auto;
     position: relative;
