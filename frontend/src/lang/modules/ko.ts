@@ -831,7 +831,6 @@ const message = {
         composePathHelper: '구성 파일 저장 경로: {0}',
         composeHelper: '1Panel 에디터나 템플릿을 통해 생성된 컴포지션은 {0}/docker/compose 디렉토리에 저장됩니다.',
         deleteFile: '파일 삭제',
-        allDelete: '영구 삭제',
         deleteComposeHelper:
             '이 작업은 컴포즈와 관련된 모든 파일을 삭제합니다. 구성을 포함한 지속적인 파일도 포함됩니다. 신중히 진행해 주세요!',
         deleteCompose: '" 이 컴포즈를 삭제하시겠습니까?',

@@ -7,12 +7,7 @@
         size="large"
     >
         <template #content>
-            <el-alert type="error" :closable="false">
-                <template #title>
-                    <span>{{ $t('commons.msg.disConn', ['exit']) }}</span>
-                </template>
-            </el-alert>
-            <Terminal style="height: calc(100vh - 235px); margin-top: 18px" ref="terminalRef"></Terminal>
+            <Terminal style="height: calc(100vh - 175px); margin-top: 18px" ref="terminalRef"></Terminal>
         </template>
         <template #footer>
             <span class="dialog-footer">

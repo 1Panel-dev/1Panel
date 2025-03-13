@@ -249,7 +249,7 @@ func (r *Remote) Backup(info BackupInfo) error {
 	if err != nil {
 		return err
 	}
-	backupCmd := fmt.Sprintf("docker run --rm --net=host -i %s /bin/bash -c '%s -h %s -P %d -u%s -p%s %s --default-character-set=%s %s'",
+	backupCmd := fmt.Sprintf("docker run --rm --net=host -i %s /bin/bash -c '%s --routines -h %s -P %d -u%s -p%s %s --default-character-set=%s %s'",
 		image, dumpCmd, r.Address, r.Port, r.User, r.Password, sslSkip(info.Version, r.Type), info.Format, info.Name)
 
 	global.LOG.Debug(strings.ReplaceAll(backupCmd, r.Password, "******"))

@@ -344,24 +344,6 @@ func (b *BaseApi) CleanContainerLog(c *gin.Context) {
 }
 
 // @Tags Container
-// @Summary Load container log
-// @Accept json
-// @Param request body dto.OperationWithNameAndType true "request"
-// @Success 200 {string} content
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /containers/load/log [post]
-func (b *BaseApi) LoadContainerLog(c *gin.Context) {
-	var req dto.OperationWithNameAndType
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-
-	content := containerService.LoadContainerLogs(req)
-	helper.SuccessWithData(c, content)
-}
-
-// @Tags Container
 // @Summary Rename Container
 // @Accept json
 // @Param request body dto.ContainerRename true "request"

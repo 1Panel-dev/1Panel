@@ -859,7 +859,6 @@ const message = {
         composeHelper:
             'Komposisi yang dicipta melalui editor atau templat 1Panel akan disimpan dalam direktori {0}/docker/compose.',
         deleteFile: 'Padam fail',
-        allDelete: 'Padam secara Kekal',
         deleteComposeHelper:
             'Padam semua fail berkaitan komposisi kontena, termasuk fail konfigurasi dan fail berterusan. Sila berhati-hati!',
         deleteCompose: 'Padam komposisi ini.',

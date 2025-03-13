@@ -1,7 +1,11 @@
 <template>
     <div v-loading="loading">
-        <LayoutContent backName="MySQL" :title="props.database + ' ' + $t('commons.button.set')">
+        <LayoutContent backName="MySQL">
             <template #leftToolBar>
+                <el-text class="mx-1">
+                    {{ props.database }}
+                </el-text>
+                <el-divider direction="vertical" />
                 <el-button type="primary" :plain="activeName !== 'conf'" @click="jumpToConf">
                     {{ $t('database.confChange') }}
                 </el-button>
@@ -155,7 +159,6 @@ const mysqlName = ref();
 const mysqlStatus = ref();
 const mysqlVersion = ref();
 const variables = ref();
-const containerID = ref('');
 
 interface DBProps {
     type: string;
@@ -175,11 +178,6 @@ const changeTab = (tab: string) => {
     activeName.value = tab;
 
     switch (tab) {
-        case 'log':
-            nextTick(() => {
-                loadContainerLog(baseInfo.containerID);
-            });
-            break;
         case 'slowLog':
             nextTick(() => {
                 loadSlowLogs();
@@ -273,10 +271,6 @@ const onSaveConf = async () => {
     };
     confirmConfRef.value!.acceptParams(params);
     return;
-};
-
-const loadContainerLog = async (conID: string) => {
-    containerID.value = conID;
 };
 
 const loadBaseInfo = async () => {

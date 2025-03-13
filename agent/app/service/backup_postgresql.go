@@ -190,8 +190,9 @@ func handlePostgresqlRecover(req dto.CommonRecover, parentTask *task.Task, isRol
 						Timeout: 300,
 					}); err != nil {
 						global.LOG.Errorf("rollback postgresql db %s from %s failed, err: %v", req.DetailName, rollbackFile, err)
+					} else {
+						global.LOG.Infof("rollback postgresql db %s from %s successful", req.DetailName, rollbackFile)
 					}
-					global.LOG.Infof("rollback postgresql db %s from %s successful", req.DetailName, rollbackFile)
 					_ = os.RemoveAll(rollbackFile)
 				} else {
 					_ = os.RemoveAll(rollbackFile)
@@ -204,6 +205,7 @@ func handlePostgresqlRecover(req dto.CommonRecover, parentTask *task.Task, isRol
 			Username:   dbInfo.Username,
 			Timeout:    300,
 		}); err != nil {
+			global.LOG.Errorf("recover postgresql db %s from %s failed, err: %v", req.DetailName, req.File, err)
 			return err
 		}
 		isOk = true

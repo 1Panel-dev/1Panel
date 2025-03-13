@@ -13,41 +13,28 @@
                 <div class="float-left">
                     <el-input type="number" v-model.number="variables.long_query_time" />
                 </div>
-                <el-button class="float-left ml-5" @click="changeSlowLogs">
+                <el-button class="float-left ml-2" @click="changeSlowLogs">
                     {{ $t('commons.button.save') }}
-                </el-button>
-                <div class="float-left ml-10">
-                    <el-checkbox :disabled="!currentStatus" border v-model="isWatch">
-                        {{ $t('commons.button.watch') }}
-                    </el-checkbox>
-                </div>
-                <el-button :disabled="!currentStatus" class="ml-20" @click="onDownload" icon="Download">
-                    {{ $t('commons.button.download') }}
                 </el-button>
             </el-form-item>
         </el-form>
-        <HighlightLog v-model="slowLogs" />
+        <LogFile v-if="variables.slow_query_log === 'ON'" :config="config" />
         <ConfirmDialog @cancel="onCancel" ref="confirmDialogRef" @confirm="onSave"></ConfirmDialog>
     </div>
 </template>
 <script lang="ts" setup>
-import { onBeforeUnmount, reactive, ref } from 'vue';
+import { reactive, ref } from 'vue';
 import { Database } from '@/api/interface/database';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
-import { loadDBFile, updateMysqlVariables } from '@/api/modules/database';
-import { dateFormatForName, downloadWithContent } from '@/utils/util';
+import { updateMysqlVariables } from '@/api/modules/database';
+import LogFile from '@/components/log/file/index.vue';
 import i18n from '@/lang';
-import { MsgError, MsgInfo, MsgSuccess } from '@/utils/message';
-import HighlightLog from '@/components/log/hightlight-log/index.vue';
+import { MsgError, MsgSuccess } from '@/utils/message';
 
-const slowLogs = ref();
 const detailShow = ref();
 const currentStatus = ref();
-
+const config = ref();
 const confirmDialogRef = ref();
-
-const isWatch = ref();
-let timer: NodeJS.Timer | null = null;
 
 const variables = reactive({
     slow_query_log: 'OFF',
@@ -72,12 +59,11 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     if (variables.slow_query_log === 'ON') {
         currentStatus.value = true;
         detailShow.value = true;
-        loadMysqlSlowlogs();
-        timer = setInterval(() => {
-            if (variables.slow_query_log === 'ON' && isWatch.value) {
-                loadMysqlSlowlogs();
-            }
-        }, 1000 * 5);
+        config.value = {
+            type: params.type + '-slow-logs',
+            name: params.database,
+            tail: true,
+        };
     } else {
         detailShow.value = false;
     }
@@ -86,6 +72,11 @@ const emit = defineEmits(['loading']);
 
 const handleSlowLogs = async () => {
     if (variables.slow_query_log === 'ON') {
+        config.value = {
+            type: currentDB.type + '-slow-logs',
+            name: currentDB.database,
+            tail: true,
+        };
         detailShow.value = true;
         return;
     }
@@ -139,24 +130,6 @@ const onSave = async () => {
             emit('loading', false);
         });
 };
-
-const onDownload = async () => {
-    if (!slowLogs.value) {
-        MsgInfo(i18n.global.t('database.noData'));
-        return;
-    }
-    downloadWithContent(slowLogs.value, currentDB.database + '-slowlogs-' + dateFormatForName(new Date()) + '.log');
-};
-
-const loadMysqlSlowlogs = async () => {
-    const res = await loadDBFile(currentDB.type + '-slow-logs', currentDB.database);
-    slowLogs.value = res.data || '';
-};
-
-onBeforeUnmount(() => {
-    clearInterval(Number(timer));
-    timer = null;
-});
 
 defineExpose({
     acceptParams,

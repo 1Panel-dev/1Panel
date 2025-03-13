@@ -53,6 +53,11 @@ func (sws *LocalWsSession) handleSlaveEvent(exitCh chan bool) {
 }
 
 func (sws *LocalWsSession) masterWrite(data []byte) error {
+	defer func() {
+		if r := recover(); r != nil {
+			global.LOG.Errorf("A panic occurred during write ws message to master, error message: %v", r)
+		}
+	}()
 	sws.writeMutex.Lock()
 	defer sws.writeMutex.Unlock()
 	wsData, err := json.Marshal(WsMsg{
@@ -72,6 +77,7 @@ func (sws *LocalWsSession) masterWrite(data []byte) error {
 func (sws *LocalWsSession) receiveWsMsg(exitCh chan bool) {
 	defer func() {
 		if r := recover(); r != nil {
+			setQuit(exitCh)
 			global.LOG.Errorf("A panic occurred during receive ws message, error message: %v", r)
 		}
 	}()

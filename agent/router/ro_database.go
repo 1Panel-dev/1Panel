@@ -33,7 +33,6 @@ func (s *DatabaseRouter) InitRouter(Router *gin.RouterGroup) {
 		cmdRouter.POST("/redis/persistence/conf", baseApi.LoadPersistenceConf)
 		cmdRouter.POST("/redis/status", baseApi.LoadRedisStatus)
 		cmdRouter.POST("/redis/conf", baseApi.LoadRedisConf)
-		cmdRouter.GET("/redis/exec", baseApi.RedisWsSsh)
 		cmdRouter.GET("/redis/check", baseApi.CheckHasCli)
 		cmdRouter.POST("/redis/install/cli", baseApi.InstallCli)
 		cmdRouter.POST("/redis/password", baseApi.ChangeRedisPassword)

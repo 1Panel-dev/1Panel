@@ -840,7 +840,6 @@ const message = {
         composeHelper:
             '1パネルの編集者またはテンプレートを介して作成された構成は、{0}/docker/composeディレクトリに保存されます。',
         deleteFile: 'ファイルを削除します',
-        allDelete: '永久に削除します',
         deleteComposeHelper:
             '構成ファイルや永続的なファイルを含む、コンテナに関連するすべてのファイルを削除します。注意して進めてください！',
         deleteCompose: 'この構成を削除します。',

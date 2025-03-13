@@ -207,8 +207,9 @@ func handleMysqlRecover(req dto.CommonRecover, parentTask *task.Task, isRollback
 						Timeout: 300,
 					}); err != nil {
 						global.LOG.Errorf("rollback mysql db %s from %s failed, err: %v", req.DetailName, rollbackFile, err)
+					} else {
+						global.LOG.Infof("rollback mysql db %s from %s successful", req.DetailName, rollbackFile)
 					}
-					global.LOG.Infof("rollback mysql db %s from %s successful", req.DetailName, rollbackFile)
 					_ = os.RemoveAll(rollbackFile)
 				} else {
 					_ = os.RemoveAll(rollbackFile)
@@ -224,6 +225,7 @@ func handleMysqlRecover(req dto.CommonRecover, parentTask *task.Task, isRollback
 
 			Timeout: 300,
 		}); err != nil {
+			global.LOG.Errorf("recover mysql db %s from %s failed, err: %v", req.DetailName, req.File, err)
 			return err
 		}
 		isOk = true

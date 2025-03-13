@@ -130,7 +130,6 @@ const message = {
             Rollbacking: '快照回滚中，请稍候...',
         },
         msg: {
-            disConn: '请直接点击断开按钮断开终端连接，避免使用 {0} 等退出命令',
             noneData: '暂无数据',
             delete: '删除 操作不可回滚，是否继续？',
             clean: '清空 操作不可回滚，是否继续？',
@@ -826,8 +825,7 @@ const message = {
         composePathHelper: '配置文件保存路径: {0}',
         composeHelper: '通过 1Panel 编辑或者模版创建的编排，将保存在 {0}/docker/compose 路径下',
         deleteFile: '删除文件',
-        allDelete: '彻底删除',
-        deleteComposeHelper: '1. 删除容器编排记录 \n2. 删除容器编排的所有文件，包括配置文件和持久化文件',
+        deleteComposeHelper: '删除容器编排的所有文件，包括配置文件和持久化文件，请谨慎操作！',
         deleteCompose: '" 删除此编排',
         createCompose: '创建编排',
         composeDirectory: '编排目录',

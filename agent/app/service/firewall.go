@@ -378,6 +378,10 @@ func (u *FirewallService) OperateForwardRule(req dto.ForwardRuleOperate) error {
 				TargetIP:   r.TargetIP,
 				TargetPort: r.TargetPort,
 			}, r.Operation); err != nil {
+				if req.ForceDelete {
+					global.LOG.Error(err)
+					continue
+				}
 				return err
 			}
 		}

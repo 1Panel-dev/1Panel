@@ -31,7 +31,8 @@ type PortRuleOperate struct {
 }
 
 type ForwardRuleOperate struct {
-	Rules []struct {
+	ForceDelete bool `json:"forceDelete"`
+	Rules       []struct {
 		Operation  string `json:"operation" validate:"required,oneof=add remove"`
 		Num        string `json:"num"`
 		Protocol   string `json:"protocol" validate:"required,oneof=tcp udp tcp/udp"`

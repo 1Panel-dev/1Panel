@@ -13,7 +13,6 @@ func (a *AIToolsRouter) InitRouter(Router *gin.RouterGroup) {
 
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
-		aiToolsRouter.GET("/ollama/exec", baseApi.OllamaWsSsh)
 		aiToolsRouter.POST("/ollama/close", baseApi.CloseOllamaModel)
 		aiToolsRouter.POST("/ollama/model", baseApi.CreateOllamaModel)
 		aiToolsRouter.POST("/ollama/model/recreate", baseApi.RecreateOllamaModel)

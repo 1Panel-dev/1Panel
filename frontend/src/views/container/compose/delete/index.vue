@@ -2,7 +2,7 @@
     <DialogPro v-model="open" :title="$t('commons.button.delete') + ' - ' + composeName" size="small">
         <el-form ref="deleteForm" v-loading="loading">
             <el-form-item>
-                <el-checkbox v-model="deleteFile" :label="$t('container.allDelete')" />
+                <el-checkbox v-model="deleteFile" :label="$t('container.deleteFile')" />
                 <span class="input-help whitespace-break-spaces">
                     {{ $t('container.deleteComposeHelper') }}
                 </span>

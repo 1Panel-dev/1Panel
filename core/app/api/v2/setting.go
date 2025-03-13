@@ -3,8 +3,11 @@ package v2
 import (
 	"encoding/base64"
 	"errors"
+	"fmt"
+	"net/http"
 	"os"
 	"path"
+	"regexp"
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/app/dto"
@@ -74,6 +77,10 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 	}
 	if req.Key == "SecurityEntrance" {
 		entranceValue := base64.StdEncoding.EncodeToString([]byte(req.Value))
+		if !checkEntrancePattern(entranceValue) {
+			helper.ErrorWithDetail(c, http.StatusBadRequest, "ErrInvalidParams", fmt.Errorf("the format of the security entrance %s is incorrect.", entranceValue))
+			return
+		}
 		c.SetCookie("SecurityEntrance", entranceValue, 0, "", "", false, true)
 	}
 	helper.SuccessWithOutData(c)
@@ -433,4 +440,12 @@ func (b *BaseApi) UpdateApiConfig(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithOutData(c)
+}
+
+func checkEntrancePattern(val string) bool {
+	if len(val) == 0 {
+		return true
+	}
+	result, _ := regexp.MatchString("^[a-zA-Z0-9]{5,116}$", val)
+	return result
 }

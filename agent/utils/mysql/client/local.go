@@ -234,7 +234,7 @@ func (r *Local) Backup(info BackupInfo) error {
 		dumpCmd = "mariadb-dump"
 	}
 	global.LOG.Infof("start to %s | gzip > %s.gzip", dumpCmd, info.TargetDir+"/"+info.FileName)
-	cmd := exec.Command("docker", "exec", r.ContainerName, dumpCmd, "-uroot", "-p"+r.Password, "--default-character-set="+info.Format, info.Name)
+	cmd := exec.Command("docker", "exec", r.ContainerName, dumpCmd, "--routines", "-uroot", "-p"+r.Password, "--default-character-set="+info.Format, info.Name)
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
 

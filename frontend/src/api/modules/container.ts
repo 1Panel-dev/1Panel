@@ -36,9 +36,6 @@ export const loadContainerInfo = (name: string) => {
 export const cleanContainerLog = (containerName: string) => {
     return http.post(`/containers/clean/log`, { name: containerName });
 };
-export const loadContainerLog = (type: string, name: string) => {
-    return http.post<string>(`/containers/load/log`, { type: type, name: name });
-};
 export const containerListStats = () => {
     return http.get<Array<Container.ContainerListStats>>(`/containers/list/stats`);
 };

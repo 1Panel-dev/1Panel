@@ -46,7 +46,7 @@
                         </el-row>
                     </el-form>
                 </div>
-                <ContainerLog v-if="activeName === 'log'" :container="containerID" :highlightDiff="350" />
+                <ContainerLog v-if="activeName === 'log'" :container="baseInfo.containerID" :highlightDiff="350" />
             </template>
         </LayoutContent>
 
@@ -109,7 +109,6 @@ const props = withDefaults(defineProps<DBProps>(), {
     database: '',
 });
 
-const containerID = ref('');
 const jumpToConf = async () => {
     activeName.value = 'conf';
     loadPostgresqlConf();
@@ -181,17 +180,12 @@ const onSaveConf = async () => {
     return;
 };
 
-const loadContainerLog = async (conID: string) => {
-    containerID.value = conID;
-};
-
 const loadBaseInfo = async () => {
     const res = await loadDBBaseInfo(props.type, props.database);
     postgresqlName.value = res.data?.name;
     baseInfo.port = res.data?.port;
     baseInfo.containerID = res.data?.containerName;
     loadPostgresqlConf();
-    loadContainerLog(baseInfo.containerID);
 };
 
 const loadPostgresqlConf = async () => {

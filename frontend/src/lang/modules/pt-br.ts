@@ -853,7 +853,6 @@ const message = {
         composeHelper:
             'A composição criada através do editor ou template do 1Panel será salva no diretório {0}/docker/compose.',
         deleteFile: 'Excluir arquivo',
-        allDelete: 'Excluir permanentemente',
         deleteComposeHelper:
             'Excluir todos os arquivos relacionados à composição do container, incluindo arquivos de configuração e arquivos persistentes. Prossiga com cautela!',
         deleteCompose: 'Excluir esta composição.',

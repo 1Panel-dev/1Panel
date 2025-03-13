@@ -233,16 +233,9 @@ func (u *ContainerService) ComposeOperation(req dto.ComposeOperation) error {
 			return errors.New(string(stdout))
 		}
 		if req.WithFile {
-			_ = composeRepo.DeleteRecord(repo.WithByName(req.Name))
 			_ = os.RemoveAll(path.Dir(req.Path))
-		} else {
-			composeItem, _ := composeRepo.GetRecord(repo.WithByName(req.Name))
-			if composeItem.Path == "" {
-				upMap := make(map[string]interface{})
-				upMap["path"] = req.Path
-				_ = composeRepo.UpdateRecord(req.Name, upMap)
-			}
 		}
+		_ = composeRepo.DeleteRecord(repo.WithByName(req.Name))
 		return nil
 	}
 	if req.Operation == "up" {

@@ -92,7 +92,7 @@ import EditDialog from '@/views/container/compose/edit/index.vue';
 import CreateDialog from '@/views/container/compose/create/index.vue';
 import DeleteDialog from '@/views/container/compose/delete/index.vue';
 import ComposeDetail from '@/views/container/compose/detail/index.vue';
-import { loadContainerLog, searchCompose } from '@/api/modules/container';
+import { inspect, searchCompose } from '@/api/modules/container';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import i18n from '@/lang';
 import { Container } from '@/api/interface/container';
@@ -179,7 +179,7 @@ const onDelete = async (row: Container.ComposeInfo) => {
 
 const dialogEditRef = ref();
 const onEdit = async (row: Container.ComposeInfo) => {
-    const res = await loadContainerLog('compose-detail', row.name);
+    const res = await inspect({ id: row.name, type: 'compose' });
     let params = {
         name: row.name,
         path: row.path,

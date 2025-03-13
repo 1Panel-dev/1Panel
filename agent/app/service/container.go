@@ -83,8 +83,6 @@ type IContainerService interface {
 	ComposeUpdate(req dto.ComposeUpdate) error
 	Prune(req dto.ContainerPrune) (dto.ContainerPruneReport, error)
 
-	LoadContainerLogs(req dto.OperationWithNameAndType) string
-
 	StreamLogs(ctx *gin.Context, params dto.StreamLog)
 }
 
@@ -359,6 +357,43 @@ func (u *ContainerService) Inspect(req dto.InspectReq) (string, error) {
 	switch req.Type {
 	case "container":
 		inspectInfo, err = client.ContainerInspect(context.Background(), req.ID)
+	case "compose":
+		filePath := ""
+		cli, err := docker.NewDockerClient()
+		if err != nil {
+			return "", err
+		}
+		defer cli.Close()
+		options := container.ListOptions{All: true}
+		options.Filters = filters.NewArgs()
+		options.Filters.Add("label", fmt.Sprintf("%s=%s", composeProjectLabel, req.ID))
+		containers, err := cli.ContainerList(context.Background(), options)
+		if err != nil {
+			return "", err
+		}
+		for _, container := range containers {
+			config := container.Labels[composeConfigLabel]
+			workdir := container.Labels[composeWorkdirLabel]
+			if len(config) != 0 && len(workdir) != 0 && strings.Contains(config, workdir) {
+				filePath = config
+				break
+			} else {
+				filePath = workdir
+				break
+			}
+		}
+		if len(containers) == 0 {
+			composeItem, _ := composeRepo.GetRecord(repo.WithByName(req.ID))
+			filePath = composeItem.Path
+		}
+		if _, err := os.Stat(filePath); err != nil {
+			return "", err
+		}
+		content, err := os.ReadFile(filePath)
+		if err != nil {
+			return "", err
+		}
+		return string(content), nil
 	case "image":
 		inspectInfo, _, err = client.ImageInspectWithRaw(context.Background(), req.ID)
 	case "network":
@@ -1022,47 +1057,6 @@ func (u *ContainerService) ContainerStats(id string) (*dto.ContainerStats, error
 	return &data, nil
 }
 
-func (u *ContainerService) LoadContainerLogs(req dto.OperationWithNameAndType) string {
-	filePath := ""
-	if req.Type == "compose-detail" {
-		cli, err := docker.NewDockerClient()
-		if err != nil {
-			return ""
-		}
-		defer cli.Close()
-		options := container.ListOptions{All: true}
-		options.Filters = filters.NewArgs()
-		options.Filters.Add("label", fmt.Sprintf("%s=%s", composeProjectLabel, req.Name))
-		containers, err := cli.ContainerList(context.Background(), options)
-		if err != nil {
-			return ""
-		}
-		for _, container := range containers {
-			config := container.Labels[composeConfigLabel]
-			workdir := container.Labels[composeWorkdirLabel]
-			if len(config) != 0 && len(workdir) != 0 && strings.Contains(config, workdir) {
-				filePath = config
-				break
-			} else {
-				filePath = workdir
-				break
-			}
-		}
-		if len(containers) == 0 {
-			composeItem, _ := composeRepo.GetRecord(repo.WithByName(req.Name))
-			filePath = composeItem.Path
-		}
-	}
-	if _, err := os.Stat(filePath); err != nil {
-		return ""
-	}
-	content, err := os.ReadFile(filePath)
-	if err != nil {
-		return ""
-	}
-	return string(content)
-}
-
 func stringsToMap(list []string) map[string]string {
 	var labelMap = make(map[string]string)
 	for _, label := range list {
@@ -1089,15 +1083,21 @@ func calculateCPUPercentUnix(stats *container.StatsResponse) float64 {
 }
 func calculateMemPercentUnix(memStats container.MemoryStats) float64 {
 	memPercent := 0.0
-	memUsage := float64(memStats.Usage)
-	if memStats.Stats["inactive_file"] > 0 {
-		memUsage = memUsage - float64(memStats.Stats["inactive_file"])
-	}
+	memUsage := calculateMemUsageUnixNoCache(memStats)
 	memLimit := float64(memStats.Limit)
 	if memUsage > 0.0 && memLimit > 0.0 {
-		memPercent = (memUsage / memLimit) * 100.0
+		memPercent = (float64(memUsage) / float64(memLimit)) * 100.0
 	}
 	return memPercent
+}
+func calculateMemUsageUnixNoCache(mem container.MemoryStats) uint64 {
+	if v, isCgroup1 := mem.Stats["total_inactive_file"]; isCgroup1 && v < mem.Usage {
+		return mem.Usage - v
+	}
+	if v := mem.Stats["inactive_file"]; v < mem.Usage {
+		return mem.Usage - v
+	}
+	return mem.Usage
 }
 func calculateBlockIO(blkio container.BlkioStats) (blkRead float64, blkWrite float64) {
 	for _, bioEntry := range blkio.IoServiceBytesRecursive {
@@ -1195,8 +1195,8 @@ func loadCpuAndMem(client *client.Client, containerItem string) dto.ContainerLis
 	data.CPUPercent = calculateCPUPercentUnix(stats)
 	data.PercpuUsage = len(stats.CPUStats.CPUUsage.PercpuUsage)
 
-	data.MemoryCache = stats.MemoryStats.Stats["inactive_file"]
-	data.MemoryUsage = stats.MemoryStats.Usage - data.MemoryCache
+	data.MemoryCache = stats.MemoryStats.Stats["cache"]
+	data.MemoryUsage = calculateMemUsageUnixNoCache(stats.MemoryStats)
 	data.MemoryLimit = stats.MemoryStats.Limit
 
 	data.MemoryPercent = calculateMemPercentUnix(stats.MemoryStats)
@@ -1319,9 +1319,10 @@ func loadConfigInfo(isCreate bool, req dto.ContainerOperate, oldContainer *types
 	for _, volume := range req.Volumes {
 		if volume.Type == "volume" {
 			hostConf.Mounts = append(hostConf.Mounts, mount.Mount{
-				Type:   mount.Type(volume.Type),
-				Source: volume.SourceDir,
-				Target: volume.ContainerDir,
+				Type:     mount.Type(volume.Type),
+				Source:   volume.SourceDir,
+				Target:   volume.ContainerDir,
+				ReadOnly: volume.Mode == "ro",
 			})
 			config.Volumes[volume.ContainerDir] = struct{}{}
 		} else {

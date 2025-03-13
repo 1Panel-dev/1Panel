@@ -16,7 +16,7 @@ export const operateFire = (operation: string) => {
 export const operatePortRule = (params: Host.RulePort) => {
     return http.post<Host.RulePort>(`/hosts/firewall/port`, params, TimeoutEnum.T_40S);
 };
-export const operateForwardRule = (params: { rules: Host.RuleForward[] }) => {
+export const operateForwardRule = (params: { rules: Host.RuleForward[]; forceDelete: boolean }) => {
     return http.post<Host.RulePort>(`/hosts/firewall/forward`, params, TimeoutEnum.T_40S);
 };
 export const operateIPRule = (params: Host.RuleIP) => {

@@ -131,7 +131,6 @@ const message = {
         },
         msg: {
             noneData: '暫無數據',
-            disConn: '請直接點選斷開按鈕斷開終端連接，避免使用 {0} 等退出指令。',
             delete: '刪除 操作不可回滾，是否繼續？',
             clean: '清空 操作不可回滾，是否繼續？',
             deleteSuccess: '刪除成功',
@@ -828,8 +827,7 @@ const message = {
         composePathHelper: '配置文件保存路徑: {0}',
         composeHelper: '通過 1Panel 編輯或者模版創建的編排，將保存在 {0}/docker/compose 路徑下',
         deleteFile: '刪除文件',
-        allDelete: '徹底刪除',
-        deleteComposeHelper: '1. 刪除容器編排記錄 \n2. 刪除容器編排的所有文件，包括配置文件和持久化文件',
+        deleteComposeHelper: '刪除容器編排的所有檔案，包括配置文件和持久化文件，請謹慎操作！',
         deleteCompose: '" 刪除此編排',
         createCompose: '創建編排',
         composeDirectory: '編排目錄',

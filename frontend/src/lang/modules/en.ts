@@ -864,9 +864,8 @@ const message = {
         composeHelper:
             'The composition created through 1Panel editor or template will be saved in the {0}/docker/compose directory.',
         deleteFile: 'Delete file',
-        allDelete: 'Permanently Delete',
         deleteComposeHelper:
-            '1. Delete container orchestration records \n2. Delete all container orchestration files, including configuration and persistent files',
+            'Delete all files related to container compose, including configuration files and persistent files. Please proceed with caution!',
         deleteCompose: '"Delete this composition"',
         createCompose: 'Create',
         composeDirectory: 'Compose Directory',
