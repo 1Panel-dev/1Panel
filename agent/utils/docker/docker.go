@@ -48,6 +48,12 @@ func NewClient() (Client, error) {
 	}, nil
 }
 
+func NewClientWithExist(cli *client.Client) Client {
+	return Client{
+		cli: cli,
+	}
+}
+
 type Client struct {
 	cli *client.Client
 }
@@ -174,8 +180,8 @@ func setLog(id, newLastLine string, task *task.Task) error {
 	return nil
 }
 
-func (c Client) PullImageWithProcess(task *task.Task, imageName string) error {
-	out, err := c.cli.ImagePull(context.Background(), imageName, image.PullOptions{})
+func (c Client) PullImageWithProcessAndOptions(task *task.Task, imageName string, options image.PullOptions) error {
+	out, err := c.cli.ImagePull(context.Background(), imageName, options)
 	if err != nil {
 		return err
 	}
@@ -212,4 +218,8 @@ func (c Client) PullImageWithProcess(task *task.Task, imageName string) error {
 		}
 	}
 	return nil
+}
+
+func (c Client) PullImageWithProcess(task *task.Task, imageName string) error {
+	return c.PullImageWithProcessAndOptions(task, imageName, image.PullOptions{})
 }

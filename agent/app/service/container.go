@@ -475,7 +475,7 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerOperate) error {
 	go func() {
 		taskItem.AddSubTask(i18n.GetWithName("ContainerImagePull", req.Image), func(t *task.Task) error {
 			if !checkImageExist(client, req.Image) || req.ForcePull {
-				if err := pullImages(ctx, client, req.Image); err != nil {
+				if err := pullImages(taskItem, client, req.Image); err != nil {
 					if !req.ForcePull {
 						return err
 					}
@@ -617,7 +617,7 @@ func (u *ContainerService) ContainerUpdate(req dto.ContainerOperate) error {
 	go func() {
 		taskItem.AddSubTask(i18n.GetWithName("ContainerImagePull", req.Image), func(t *task.Task) error {
 			if !checkImageExist(client, req.Image) || req.ForcePull {
-				if err := pullImages(ctx, client, req.Image); err != nil {
+				if err := pullImages(taskItem, client, req.Image); err != nil {
 					if !req.ForcePull {
 						return err
 					}
@@ -683,7 +683,7 @@ func (u *ContainerService) ContainerUpgrade(req dto.ContainerUpgrade) error {
 	go func() {
 		taskItem.AddSubTask(i18n.GetWithName("ContainerImagePull", req.Image), func(t *task.Task) error {
 			if !checkImageExist(client, req.Image) || req.ForcePull {
-				if err := pullImages(ctx, client, req.Image); err != nil {
+				if err := pullImages(taskItem, client, req.Image); err != nil {
 					if !req.ForcePull {
 						return err
 					}
@@ -1156,7 +1156,8 @@ func checkImageExist(client *client.Client, imageItem string) bool {
 	return false
 }
 
-func pullImages(ctx context.Context, client *client.Client, imageName string) error {
+func pullImages(task *task.Task, client *client.Client, imageName string) error {
+	dockerCli := docker.NewClientWithExist(client)
 	options := image.PullOptions{}
 	repos, _ := imageRepoRepo.List()
 	if len(repos) != 0 {
@@ -1180,16 +1181,7 @@ func pullImages(ctx context.Context, client *client.Client, imageName string) er
 			options.RegistryAuth = authStr
 		}
 	}
-	out, err := client.ImagePull(ctx, imageName, options)
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-	_, err = io.Copy(io.Discard, out)
-	if err != nil {
-		return err
-	}
-	return nil
+	return dockerCli.PullImageWithProcessAndOptions(task, imageName, options)
 }
 
 func loadCpuAndMem(client *client.Client, containerItem string) dto.ContainerListStats {

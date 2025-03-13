@@ -263,15 +263,12 @@ func (u *ImageService) ImagePull(req dto.ImagePull) error {
 				}
 				imageName = repo.DownloadUrl + "/" + req.ImageName
 			}
-
-			out, err := client.ImagePull(context.TODO(), imageName, options)
+			dockerCli := docker.NewClientWithExist(client)
+			err = dockerCli.PullImageWithProcessAndOptions(taskItem, imageName, options)
 			taskItem.LogWithStatus(i18n.GetMsgByKey("TaskPull"), err)
 			if err != nil {
 				return err
 			}
-			defer out.Close()
-			body, _ := io.ReadAll(out)
-			taskItem.LogSuccess(i18n.GetWithName("ImaegPullRes", "\n"+string(body)))
 			return nil
 		}, nil)
 		_ = taskItem.Execute()
