@@ -1697,6 +1697,9 @@ const message = {
         subscription: '구독',
         perpetual: '영구 라이선스',
         versionConstraint: '{0} 버전 일시불 구매',
+        forceUnbind: '강제 바인딩 해제',
+        forceUnbindHelper:
+            '강제 바인딩 해제를 수행하면 해제 과정에서 발생하는 오류를 무시하고 궁극적으로 라이센스 바인딩을 해제합니다.',
         trialInfo: '버전',
         authorizationId: '구독 인증 ID',
         authorizedUser: '인증된 사용자',
@@ -2973,7 +2976,7 @@ const message = {
             fixSSHConn: '노드를 수동으로 편집하여 연결 정보를 확인합니다',
             checkConnInfo: '에이전트 연결 정보 확인',
             checkStatus: '노드 서비스 가용성 확인',
-            fixStatus: '노드 로그 조사',
+            fixStatus: '"systemctl status 1panel-agent.service"를 실행하여 서비스가 실행 중인지 확인합니다.',
             checkAPI: '노드 API 가용성 확인',
             fixAPI: '노드 로그를 확인하고 방화벽 포트가 정상적으로 열려 있는지 확인합니다.',
             forceDelete: '강제 삭제',

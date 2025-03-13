@@ -1723,6 +1723,9 @@ const message = {
         subscription: 'サブスクリプション',
         perpetual: '永久ライセンス',
         versionConstraint: '{0} バージョン買い取り',
+        forceUnbind: '強制バインド解除',
+        forceUnbindHelper:
+            '強制的にバインド解除を行うと、解除プロセス中に発生するエラーを無視し、最終的にライセンスのバインドを解除します。',
         trialInfo: 'バージョン',
         authorizationId: 'サブスクリプション承認ID',
         authorizedUser: '認定ユーザー',
@@ -3024,7 +3027,7 @@ const message = {
             fixSSHConn: 'ノードを手動で編集し、接続情報を確認',
             checkConnInfo: 'エージェント接続情報を確認',
             checkStatus: 'ノードサービスの可用性を確認',
-            fixStatus: 'ノードログを調査',
+            fixStatus: '「systemctl status 1panel-agent.service」を実行して、サービスが起動しているか確認します。',
             checkAPI: 'ノードAPIの可用性を確認',
             fixAPI: 'ノードのログを確認し、ファイアウォールのポートが正常に開放されているか確認します。',
             forceDelete: '強制削除',

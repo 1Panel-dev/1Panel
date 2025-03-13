@@ -1782,6 +1782,9 @@ const message = {
         subscription: 'Langganan',
         perpetual: 'Lesen Perpetual',
         versionConstraint: '{0} Pembelian versi',
+        forceUnbind: 'Paksakan Nyahikat',
+        forceUnbindHelper:
+            'Memaksa nyahikat akan mengabaikan sebarang ralat yang berlaku semasa proses nyahikat dan akhirnya melepaskan ikatan lesen.',
         trialInfo: 'Versi',
         authorizationId: 'ID Kebenaran Langganan',
         authorizedUser: 'Pengguna yang Dibenarkan',
@@ -3094,7 +3097,8 @@ const message = {
             fixSSHConn: 'Edit nod secara manual untuk mengesahkan maklumat sambungan',
             checkConnInfo: 'Periksa Maklumat Sambungan Ejen',
             checkStatus: 'Periksa Ketersediaan Perkhidmatan Nod',
-            fixStatus: 'Siasat Log Nod',
+            fixStatus:
+                'Jalankan "systemctl status 1panel-agent.service" untuk memeriksa sama ada perkhidmatan sedang berjalan.',
             checkAPI: 'Periksa Ketersediaan API Nod',
             fixAPI: 'Semak log nod dan periksa sama ada port firewall dibuka dengan betul.',
             forceDelete: 'Hapus Secara Paksa',

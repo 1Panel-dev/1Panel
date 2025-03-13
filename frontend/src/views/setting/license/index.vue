@@ -83,8 +83,19 @@
 
         <LicenseImport ref="licenseRef" />
         <LicenseBind ref="bindRef" />
-        <LicenseDelete ref="delRef" @search="search" />
         <OpDialog ref="opRef" @search="search" />
+        <OpDialog ref="opRef2" @search="search" @submit="submitUnbind">
+            <template #content>
+                <el-form class="mt-4 mb-1" ref="deleteForm" label-position="left">
+                    <el-form-item>
+                        <el-checkbox v-model="forceUnbind" :label="$t('license.forceUnbind')" />
+                        <span class="input-help">
+                            {{ $t('license.forceUnbindHelper') }}
+                        </span>
+                    </el-form-item>
+                </el-form>
+            </template>
+        </OpDialog>
     </div>
 </template>
 
@@ -92,7 +103,6 @@
 import { ref, reactive, onMounted } from 'vue';
 import { deleteLicense, searchLicense, syncLicense, unbindLicense } from '@/api/modules/setting';
 import LicenseImport from '@/components/license-import/index.vue';
-import LicenseDelete from '@/views/setting/license/delete/index.vue';
 import LicenseBind from '@/views/setting/license/bind/index.vue';
 import { dateFormat } from '@/utils/util';
 import i18n from '@/lang';
@@ -103,9 +113,11 @@ import { initFavicon } from '@/utils/xpack';
 const globalStore = GlobalStore();
 const loading = ref();
 const licenseRef = ref();
-const delRef = ref();
 const bindRef = ref();
 const opRef = ref();
+const opRef2 = ref();
+const forceUnbind = ref();
+const unbindRow = ref();
 
 const data = ref();
 const paginationConfig = reactive({
@@ -141,28 +153,32 @@ const onSync = async (row: any) => {
 };
 
 const onUnbind = async (row: any) => {
-    ElMessageBox.confirm(i18n.global.t('license.unbindHelper'), i18n.global.t('commons.button.unbind'), {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-        type: 'info',
-    }).then(async () => {
-        loading.value = true;
-        await unbindLicense(row.id)
-            .then(() => {
-                loading.value = false;
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                if (row.freeCount !== 0) {
-                    globalStore.isProductPro = false;
-                    initFavicon();
-                    window.location.reload();
-                    return;
-                }
-                search();
-            })
-            .catch(() => {
-                loading.value = false;
-            });
+    unbindRow.value = row;
+    opRef2.value.acceptParams({
+        title: i18n.global.t('commons.button.unbind'),
+        names: [row.licenseName],
+        msg: i18n.global.t('license.unbindHelper'),
+        api: null,
+        params: null,
     });
+};
+const submitUnbind = async () => {
+    loading.value = true;
+    await unbindLicense(unbindRow.value.id)
+        .then(() => {
+            loading.value = false;
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            if (unbindRow.value.freeCount !== 0) {
+                globalStore.isMasterProductPro = false;
+                initFavicon();
+                window.location.reload();
+                return;
+            }
+            search();
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const search = async () => {

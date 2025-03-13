@@ -555,13 +555,15 @@ func (u *ContainerService) ContainerInfo(req dto.OperationWithName) (*dto.Contai
 	networkSettings := oldContainer.NetworkSettings
 	bridgeNetworkSettings := networkSettings.Networks[data.Network]
 	if bridgeNetworkSettings.IPAMConfig != nil {
-		ipv4Address := bridgeNetworkSettings.IPAMConfig.IPv4Address
 		data.MacAddr = bridgeNetworkSettings.MacAddress
-		data.Ipv4 = ipv4Address
-		ipv6Address := bridgeNetworkSettings.IPAMConfig.IPv6Address
-		data.Ipv6 = ipv6Address
+		if data.Network != "bridge" {
+			data.Ipv4 = bridgeNetworkSettings.IPAMConfig.IPv4Address
+			data.Ipv6 = bridgeNetworkSettings.IPAMConfig.IPv6Address
+		}
 	} else {
-		data.Ipv4 = bridgeNetworkSettings.IPAddress
+		if data.Network != "bridge" {
+			data.Ipv4 = bridgeNetworkSettings.IPAddress
+		}
 	}
 	data.Hostname = oldContainer.Config.Hostname
 	data.DNS = oldContainer.HostConfig.DNS

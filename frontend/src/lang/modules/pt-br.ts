@@ -1767,6 +1767,9 @@ const message = {
         subscription: 'Assinatura',
         perpetual: 'Licença Perpétua',
         versionConstraint: '{0} Compra do versão',
+        forceUnbind: 'Forçar Desvinculação',
+        forceUnbindHelper:
+            'Forçar a desvinculação ignorará quaisquer erros que ocorram durante o processo de desvinculação e, em última análise, liberará a vinculação da licença.',
         trialInfo: 'Versão',
         authorizationId: 'ID de autorização',
         authorizedUser: 'Usuário autorizado',
@@ -3097,7 +3100,7 @@ const message = {
             fixSSHConn: 'Edite o nó manualmente para confirmar as informações de conexão',
             checkConnInfo: 'Verificar Informações de Conexão do Agente',
             checkStatus: 'Verificar Disponibilidade do Serviço do Nó',
-            fixStatus: 'Investigar Logs do Nó',
+            fixStatus: 'Execute "systemctl status 1panel-agent.service" para verificar se o serviço está em execução.',
             checkAPI: 'Verificar Disponibilidade da API do Nó',
             fixAPI: 'Verifique os logs do nó e confirme se as portas do firewall estão devidamente abertas.',
             forceDelete: 'Excluir Forçadamente',

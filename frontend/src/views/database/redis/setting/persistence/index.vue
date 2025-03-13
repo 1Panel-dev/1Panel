@@ -90,9 +90,13 @@
                 <el-table-column :label="$t('commons.table.name')" show-overflow-tooltip prop="fileName" />
                 <el-table-column :label="$t('app.source')" prop="backupType">
                     <template #default="{ row }">
-                        <span v-if="row.source">
-                            {{ $t('setting.' + row.source) }}
+                        <span v-if="row.accountType === 'LOCAL'">
+                            {{ $t('setting.LOCAL') }}
                         </span>
+                        <span v-if="row.accountType && row.accountType !== 'LOCAL'">
+                            {{ $t('setting.' + row.accountType) + ' - ' + row.accountName }}
+                        </span>
+                        <span v-if="!row.accountType">-</span>
                     </template>
                 </el-table-column>
                 <el-table-column :label="$t('file.dir')" show-overflow-tooltip prop="fileDir" />
@@ -205,7 +209,7 @@ const onBackup = async () => {
 };
 const onRecover = async () => {
     let param = {
-        downloadAccountID: currentRow.value.source,
+        downloadAccountID: currentRow.value.downloadAccountID,
         type: 'redis',
         name: database.value,
         detailName: '',

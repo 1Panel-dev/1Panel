@@ -611,8 +611,10 @@ func (u *FirewallService) updatePingStatus(enable string) error {
 }
 
 func (u *FirewallService) addPortsBeforeStart(client firewall.FirewallClient) error {
-	if err := client.Port(fireClient.FireInfo{Port: global.CONF.Base.Port, Protocol: "tcp", Strategy: "accept"}, "add"); err != nil {
-		return err
+	if !global.IsMaster {
+		if err := client.Port(fireClient.FireInfo{Port: global.CONF.Base.Port, Protocol: "tcp", Strategy: "accept"}, "add"); err != nil {
+			return err
+		}
 	}
 	if err := client.Port(fireClient.FireInfo{Port: "22", Protocol: "tcp", Strategy: "accept"}, "add"); err != nil {
 		return err

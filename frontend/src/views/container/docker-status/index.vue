@@ -20,6 +20,7 @@ const loadStatus = async () => {
     await loadDockerStatus()
         .then((res) => {
             isActive.value = res.data === 'Running';
+            em('update:loading', false);
             em('update:is-active', isActive.value);
             em('search');
             em('mounted');

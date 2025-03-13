@@ -425,7 +425,7 @@
         </LayoutContent>
         <Command ref="commandRef" />
         <Confirm ref="confirmRef" @submit="submit" />
-        <TaskLog ref="taskLogRef" width="70%" />
+        <TaskLog ref="taskLogRef" width="70%" @close="goBack" />
     </div>
 </template>
 
@@ -462,7 +462,7 @@ const form = reactive<Container.ContainerHelper>({
     image: '',
     imageInput: false,
     forcePull: false,
-    network: '',
+    network: 'bridge',
     hostname: '',
     domainName: '',
     macAddr: '',
