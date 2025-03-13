@@ -310,6 +310,7 @@ const message = {
             applyerror: 'Falha na aplicação',
             systemrestart: 'Interrompido',
             starterr: 'Falha na inicialização',
+            uperr: 'Falha na inicialização',
         },
         units: {
             second: 'segundo | segundos | segundos',

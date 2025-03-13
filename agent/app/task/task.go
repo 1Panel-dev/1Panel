@@ -224,9 +224,6 @@ func (t *Task) Execute() error {
 	}
 	if t.Task.Status == constant.StatusExecuting {
 		t.Task.Status = constant.StatusSuccess
-		t.Log(i18n.GetWithName("TaskSuccess", t.Name))
-	} else {
-		t.Log(i18n.GetWithName("TaskFailed", t.Name))
 	}
 	t.Log("[TASK-END]")
 	t.Task.EndAt = time.Now()

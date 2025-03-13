@@ -147,7 +147,7 @@ func (u *CronjobRepo) StartRecords(cronjobID uint, targetPath, cronjobType strin
 	var record model.JobRecords
 	record.StartTime = time.Now()
 	record.CronjobID = cronjobID
-	if cronjobType != "directory" && cronjobType != "log" {
+	if cronjobType != "directory" && cronjobType != "log" && cronjobType != "cutWebsiteLog" {
 		record.TaskID = uuid.New().String()
 	}
 	record.Status = constant.StatusWaiting

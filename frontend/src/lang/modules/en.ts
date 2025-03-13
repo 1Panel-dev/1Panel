@@ -312,6 +312,7 @@ const message = {
             applyerror: 'Apply failed',
             systemrestart: 'Interrupted',
             starterr: 'Startup failed',
+            uperr: 'Startup failed',
         },
         units: {
             second: 'Second',
@@ -2916,7 +2917,7 @@ const message = {
             defaultIpBlackHelper: 'Some malicious IPs collected from the Internet to prevent access',
             notFoundCount: '404 Frequency Limit',
             matchValue: 'Match value',
-            headerName: 'Supports English, numbers, -, length 3-30',
+            headerName: 'Supports non-special characters starting with English, numbers, -, length 3-30',
             cdnHelper: 'Websites using CDN can open here to obtain the correct source IP',
             clearLogWarn: 'Clearing the log will not be possible, do you want to continue?',
             commonRuleHelper: 'Rule is fuzzy matching',

@@ -305,6 +305,7 @@ const message = {
             applyerror: '申請失敗',
             systemrestart: '中斷',
             starterr: '啟動失敗',
+            uperr: '啟動失敗',
         },
         units: {
             second: '秒',
@@ -2703,7 +2704,7 @@ const message = {
             defaultIpBlackHelper: '從網路收集的一些惡意 IP，阻止其存取',
             notFoundCount: '404 頻率限制',
             matchValue: '匹配值',
-            headerName: '支援英文、數字、-，長度3-30',
+            headerName: '支持非特殊字元開頭、英文、數字、-，長度3-30',
             cdnHelper: '使用 CDN 的網站可以打開此處來取得正確來源 IP',
             clearLogWarn: '清空日誌將無法復原，是否繼續？',
             commonRuleHelper: '規則為模糊匹配',

@@ -307,6 +307,7 @@ const message = {
             applyerror: 'Ошибка применения',
             systemrestart: 'Прервано',
             starterr: 'Ошибка запуска',
+            uperr: 'Ошибка запуска',
         },
         units: {
             second: ' секунда | секунда | секунд',

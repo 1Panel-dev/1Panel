@@ -981,15 +981,13 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 		t.LogStart(i18n.GetMsgByKey("SyncAppDetail"))
 		for _, l := range list.Apps {
 			app := appsMap[l.AppProperty.Key]
-			_, iconRes, err := req_helper.HandleRequest(l.Icon, http.MethodGet, constant.TimeOut20s)
-			if err != nil {
-				return err
-			}
 			iconStr := ""
-			if !strings.Contains(string(iconRes), "<xml>") {
-				iconStr = base64.StdEncoding.EncodeToString(iconRes)
+			_, iconRes, err := req_helper.HandleRequest(l.Icon, http.MethodGet, constant.TimeOut20s)
+			if err == nil {
+				if !strings.Contains(string(iconRes), "<xml>") {
+					iconStr = base64.StdEncoding.EncodeToString(iconRes)
+				}
 			}
-
 			app.Icon = iconStr
 			app.TagsKey = l.AppProperty.Tags
 			if l.AppProperty.Recommend > 0 {
@@ -1171,7 +1169,6 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 
 		_ = settingService.Update("AppStoreSyncStatus", constant.StatusSyncSuccess)
 		_ = settingService.Update("AppStoreLastModified", strconv.Itoa(list.LastModified))
-		t.Log(i18n.GetMsgByKey("AppStoreSyncSuccess"))
 		return nil
 	}, nil)
 

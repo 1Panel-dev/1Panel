@@ -303,6 +303,7 @@ const message = {
             applyerror: '申请失败',
             systemrestart: '中断',
             starterr: '启动失败',
+            uperr: '启动失败',
         },
         units: {
             second: '秒',
@@ -2691,7 +2692,7 @@ const message = {
             defaultIpBlackHelper: '从互联网收集的一些恶意 IP，阻止其访问',
             notFoundCount: '404 频率限制',
             matchValue: '匹配值',
-            headerName: '支持英文、数字、-,长度3-30',
+            headerName: '支持非特殊字符开头，英文、数字、-,长度3-30',
             cdnHelper: '使用 CDN 的网站可以打开此处来获取正确来源 IP',
             clearLogWarn: '清空日志将无法恢复，是否继续？',
             commonRuleHelper: '规则为模糊匹配',

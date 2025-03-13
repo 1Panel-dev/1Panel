@@ -312,6 +312,7 @@ const message = {
             applyerror: 'Permohonan gagal',
             systemrestart: 'Dihentikan',
             starterr: 'Permulaan gagal',
+            uperr: 'Permulaan gagal',
         },
         units: {
             second: 'saat | saat | saat',

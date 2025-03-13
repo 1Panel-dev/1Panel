@@ -172,7 +172,7 @@
                                         ></highlightjs>
                                     </div>
                                 </el-row>
-                                <el-row v-if="currentRecord?.taskID">
+                                <el-row v-if="currentRecord?.taskID && currentRecord?.taskID != ''">
                                     <LogFile
                                         :defaultButton="false"
                                         class="w-full"
@@ -378,6 +378,7 @@ const search = async () => {
     if (currentRecord.value?.records) {
         loadRecord(currentRecord.value);
     }
+    console.log(currentRecord.value);
 };
 
 const forDetail = async (row: Cronjob.Record) => {

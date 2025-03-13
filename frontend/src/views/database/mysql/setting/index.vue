@@ -86,7 +86,7 @@
                         </el-row>
                     </el-form>
                 </div>
-                <ContainerLog v-if="activeName === 'log'" :container="containerID" />
+                <ContainerLog v-if="activeName === 'log'" :container="baseInfo.containerID" />
                 <SlowLog
                     @loading="changeLoading"
                     @refresh="loadBaseInfo"

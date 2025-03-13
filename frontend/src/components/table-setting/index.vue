@@ -26,6 +26,7 @@ const refreshRate = ref<number>(0);
 const emit = defineEmits(['search']);
 const props = defineProps({
     title: String,
+    rate: Number,
 });
 
 let timer: NodeJS.Timer | null = null;
@@ -57,9 +58,14 @@ onUnmounted(() => {
 });
 
 onMounted(() => {
-    if (props.title) {
+    if (props.title && localStorage.getItem(props.title) != null) {
         let rate = Number(localStorage.getItem(props.title));
         refreshRate.value = rate ? Number(rate) : 0;
+        changeRefresh();
+        return;
+    }
+    if (props.rate) {
+        refreshRate.value = props.rate;
         changeRefresh();
     }
 });

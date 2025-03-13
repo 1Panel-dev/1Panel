@@ -306,6 +306,7 @@ const message = {
             applyerror: '적용 실패',
             systemrestart: '중단됨',
             starterr: '시작 실패',
+            uperr: '실행 실패',
         },
         units: {
             second: '초 | 초 | 초',
@@ -2691,7 +2692,7 @@ const message = {
             defaultIpBlackHelper: '인터넷에서 수집된 일부 악성 IP로 접근을 차단합니다.',
             notFoundCount: '404 빈도 제한',
             matchValue: '매칭 값',
-            headerName: '영어, 숫자, -, 길이 3-30 지원',
+            headerName: '이 필드는 특수 문자로 시작할 수 없으며,영어, 숫자, -, 길이 3-30 지원',
             cdnHelper: 'CDN 을 사용하는 웹사이트는 여기서 원본 IP를 확인할 수 있습니다.',
             clearLogWarn: '로그를 삭제하면 복구할 수 없습니다. 계속하시겠습니까?',
             commonRuleHelper: '규칙은 유사 매칭 방식입니다.',

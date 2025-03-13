@@ -11,7 +11,7 @@
                         <el-option :label="$t('logs.taskRunning')" value="Executing"></el-option>
                     </el-select>
                     <TableRefresh @search="search()" />
-                    <TableSetting title="task-log-refresh" @search="search()" />
+                    <TableSetting @search="search()" :rate="5" />
                 </template>
                 <template #main>
                     <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search" :heightDiff="320">

@@ -304,6 +304,7 @@ const message = {
             applyerror: '適用に失敗しました',
             systemrestart: '中断',
             starterr: '起動に失敗しました',
+            uperr: '起動に失敗しました',
         },
         units: {
             second: '2番目|2番目|秒',
@@ -2734,7 +2735,7 @@ const message = {
             defaultIpBlackHelper: 'インターネットから収集された悪意のあるIPをアクセス防止のために使用',
             notFoundCount: '404頻度制限',
             matchValue: '一致する値',
-            headerName: '英数字、-をサポート、長さは3-30',
+            headerName: 'このフィールドは、特別なキャラクターではなく、英語、数字、-をサポート、長さは3-30',
             cdnHelper: 'CDNを使用しているウェブサイトは、ここで正しいソースIPを取得できます',
             clearLogWarn: 'ログをクリアすると元に戻せません。続けますか？',
             commonRuleHelper: 'ルールは部分一致です',
