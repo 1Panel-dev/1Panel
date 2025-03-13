@@ -62,7 +62,7 @@ func (b *BaseApi) LoadAppLauncherOption(c *gin.Context) {
 }
 
 func (b *BaseApi) SyncAppLauncher(c *gin.Context) {
-	var req []dto.AppLauncherSync
+	var req dto.AppLauncherSync
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}

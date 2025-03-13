@@ -101,7 +101,7 @@ type DashboardCurrent struct {
 }
 
 type AppLauncherSync struct {
-	Key string `json:"key"`
+	Keys []string `json:"keys"`
 }
 
 type DiskInfo struct {

@@ -31,7 +31,7 @@ import (
 type DashboardService struct{}
 
 type IDashboardService interface {
-	Sync(req []dto.AppLauncherSync) error
+	Sync(req dto.AppLauncherSync) error
 
 	LoadOsInfo() (*dto.OsInfo, error)
 	LoadBaseInfo(ioOption string, netOption string) (*dto.DashboardBase, error)
@@ -47,10 +47,10 @@ func NewIDashboardService() IDashboardService {
 	return &DashboardService{}
 }
 
-func (u *DashboardService) Sync(req []dto.AppLauncherSync) error {
+func (u *DashboardService) Sync(req dto.AppLauncherSync) error {
 	var launchers []model.AppLauncher
-	for _, item := range req {
-		launchers = append(launchers, model.AppLauncher{Key: item.Key})
+	for _, item := range req.Keys {
+		launchers = append(launchers, model.AppLauncher{Key: item})
 	}
 	return launcherRepo.SyncAll(launchers)
 }

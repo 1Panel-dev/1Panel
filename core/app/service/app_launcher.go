@@ -54,7 +54,19 @@ func (u *LauncherService) ChangeShow(req dto.SettingUpdate) error {
 
 func syncLauncherToAgent() {
 	launchers, _ := launcherRepo.List()
-	itemData, _ := json.Marshal(launchers)
+	var list []string
+	launcherMap := make(map[string]struct{})
+	for _, item := range launchers {
+		if _, ok := launcherMap[item.Key]; ok {
+			continue
+		}
+		launcherMap[item.Key] = struct{}{}
+		list = append(list, item.Key)
+	}
+	launcherData := struct {
+		Keys []string
+	}{Keys: list}
+	itemData, _ := json.Marshal(launcherData)
 	_, _ = proxy_local.NewLocalClient("/api/v2/dashboard/app/launcher/sync", http.MethodPost, bytes.NewReader((itemData)))
 	_ = xpack.RequestToAllAgent("/api/v2/dashboard/app/launcher/sync", http.MethodPost, bytes.NewReader((itemData)))
 }
