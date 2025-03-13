@@ -115,6 +115,9 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, e
 			return nil, buserr.New("ErrPortNotFound")
 		}
 		hostPorts = append(hostPorts, fmt.Sprintf("%.0f", fpmPort.(float64)))
+		if err := checkPortExist(int(fpmPort.(float64))); err != nil {
+			return nil, err
+		}
 	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo, constant.RuntimePython, constant.RuntimeDotNet:
 		if !fileOp.Stat(create.CodeDir) {
 			return nil, buserr.New("ErrPathNotFound")
@@ -781,6 +784,7 @@ func (r *RuntimeService) InstallPHPExtension(req request.PHPExtensionInstallReq)
 			exist := false
 			var extensionArray []string
 			if ok {
+				extensions = strings.TrimPrefix(extensions, ",")
 				extensionArray = strings.Split(extensions, ",")
 				for _, ext := range extensionArray {
 					if ext == req.Name {
