@@ -53,9 +53,41 @@ type ComposeProject struct {
 }
 
 type Service struct {
-	Image       string   `yaml:"image"`
-	Environment []string `yaml:"environment"`
-	Volumes     []string `json:"volumes"`
+	Image       string      `yaml:"image"`
+	Environment Environment `yaml:"environment"`
+	Volumes     []string    `json:"volumes"`
+}
+
+type Environment struct {
+	Variables map[string]string
+}
+
+func (e *Environment) UnmarshalYAML(value *yaml.Node) error {
+	e.Variables = make(map[string]string)
+	switch value.Kind {
+	case yaml.MappingNode:
+		for i := 0; i < len(value.Content); i += 2 {
+			key := value.Content[i].Value
+			val := value.Content[i+1].Value
+			e.Variables[key] = val
+		}
+	case yaml.SequenceNode:
+		for _, item := range value.Content {
+			var kv string
+			if err := item.Decode(&kv); err != nil {
+				return err
+			}
+			parts := strings.SplitN(kv, "=", 2)
+			if len(parts) == 2 {
+				e.Variables[parts[0]] = parts[1]
+			} else {
+				e.Variables[parts[0]] = ""
+			}
+		}
+	default:
+		return fmt.Errorf("unsupported environment format")
+	}
+	return nil
 }
 
 func replaceEnvVariables(input string, envVars map[string]string) string {

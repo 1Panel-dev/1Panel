@@ -68,11 +68,11 @@
                         fix
                     />
                     <fu-table-operations
-                        :ellipsis="10"
-                        width="300px"
+                        :ellipsis="mobile ? 0 : 5"
+                        :min-width="mobile ? 'auto' : 300"
                         :buttons="buttons"
-                        :label="$t('commons.table.operate')"
                         fixed="right"
+                        :label="$t('commons.table.operate')"
                         fix
                     />
                 </ComplexTable>
@@ -103,6 +103,11 @@ import { ElMessageBox } from 'element-plus';
 import RuntimeStatus from '@/views/website/runtime/components/runtime-status.vue';
 import PortJump from '@/views/website/runtime/components/port-jump.vue';
 import { disabledButton } from '@/utils/runtime';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
+const mobile = computed(() => {
+    return globalStore.isMobile();
+});
 
 let timer: NodeJS.Timer | null = null;
 const loading = ref(false);

@@ -68,7 +68,7 @@
                         fix
                     />
                     <fu-table-operations
-                        :ellipsis="mobile ? 0 : 3"
+                        :ellipsis="mobile ? 0 : 5"
                         :min-width="mobile ? 'auto' : 300"
                         :buttons="buttons"
                         fixed="right"

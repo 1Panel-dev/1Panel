@@ -671,13 +671,7 @@ func getDockerComposeEnvironments(yml []byte) ([]request.Environment, error) {
 	}
 	var res []request.Environment
 	for _, service := range composeProject.Services {
-		for _, env := range service.Environment {
-			envArray := strings.Split(env, ":")
-			key := envArray[0]
-			value := ""
-			if len(envArray) > 1 {
-				value = envArray[1]
-			}
+		for key, value := range service.Environment.Variables {
 			res = append(res, request.Environment{
 				Key:   key,
 				Value: value,
