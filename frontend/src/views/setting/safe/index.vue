@@ -346,7 +346,9 @@ const handleSSL = async () => {
             } else {
                 address = address.replaceAll('settings/safe', 'login');
             }
-            window.location.href = `http://${address}`;
+            setTimeout(() => {
+                window.location.href = `http://${address}`;
+            }, 1000);
         })
         .catch(() => {
             form.ssl = 'Enable';

@@ -247,7 +247,9 @@ const onSaveSSL = async (formEl: FormInstance | undefined) => {
                 } else {
                     address = address.replaceAll('settings/safe', 'login');
                 }
-                window.open(`https://${address}`, '_self');
+                setTimeout(() => {
+                    window.open(`https://${address}`, '_self');
+                }, 1000);
             });
         });
     });

@@ -240,6 +240,13 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 		}
 		_ = os.Remove(path.Join(secretDir, "server.crt"))
 		_ = os.Remove(path.Join(secretDir, "server.key"))
+		go func() {
+			time.Sleep(1 * time.Second)
+			_, err := cmd.Exec("systemctl restart 1panel-core.service")
+			if err != nil {
+				global.LOG.Errorf("restart system failed, err: %v", err)
+			}
+		}()
 		return nil
 	}
 	if _, err := os.Stat(secretDir); err != nil && os.IsNotExist(err) {
@@ -329,17 +336,20 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 	if err := os.Rename(path.Join(secretDir, "server.key.tmp"), path.Join(secretDir, "server.key")); err != nil {
 		return err
 	}
+	status, _ := settingRepo.GetValueByKey("SSL")
+	if req.SSL != status {
+		go func() {
+			time.Sleep(1 * time.Second)
+			_, err := cmd.Exec("systemctl restart 1panel-core.service")
+			if err != nil {
+				global.LOG.Errorf("restart system failed, err: %v", err)
+			}
+		}()
+	}
 	if err := settingRepo.Update("SSL", req.SSL); err != nil {
 		return err
 	}
-	go func() {
-		time.Sleep(1 * time.Second)
-		_, err := cmd.Exec("systemctl restart 1panel-core.service")
-		if err != nil {
-			global.LOG.Errorf("restart system failed, err: %v", err)
-		}
-	}()
-	return nil
+	return u.UpdateSystemSSL()
 }
 
 func (u *SettingService) LoadFromCert() (*dto.SSLInfo, error) {
