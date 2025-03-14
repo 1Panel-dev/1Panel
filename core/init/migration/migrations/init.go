@@ -167,7 +167,7 @@ var InitHost = &gormigrate.Migration{
 	ID: "20240816-init-host",
 	Migrate: func(tx *gorm.DB) error {
 		hostGroup := &model.Group{Name: "Default", Type: "host", IsDefault: true}
-		if err := tx.Create(hostGroup).Error; err != nil {
+		if err := global.DB.Create(hostGroup).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.Group{Name: "Default", Type: "node", IsDefault: true}).Error; err != nil {

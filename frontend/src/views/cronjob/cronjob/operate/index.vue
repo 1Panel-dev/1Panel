@@ -1053,7 +1053,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         }
 
         dialogData.value.rowData.alertCount =
-            dialogData.value.rowData!.hasAlert && isProductPro.value ? dialogData.value.rowData.alertCount : 3;
+            dialogData.value.rowData!.hasAlert && isProductPro.value ? dialogData.value.rowData.alertCount : 0;
         dialogData.value.rowData.alertTitle =
             dialogData.value.rowData!.hasAlert && isProductPro.value
                 ? i18n.global.t('cronjob.alertTitle', [

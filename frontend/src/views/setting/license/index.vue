@@ -164,7 +164,7 @@ const onUnbind = async (row: any) => {
 };
 const submitUnbind = async () => {
     loading.value = true;
-    await unbindLicense(unbindRow.value.id)
+    await unbindLicense(unbindRow.value.id, forceUnbind.value)
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));

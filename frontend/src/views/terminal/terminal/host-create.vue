@@ -46,7 +46,7 @@
                 <el-select filterable v-model="hostInfo.groupID" clearable style="width: 100%">
                     <div v-for="item in groupList" :key="item.id">
                         <el-option
-                            v-if="item.name === 'default'"
+                            v-if="item.name === 'Default'"
                             :label="$t('commons.table.default')"
                             :value="item.id"
                         />

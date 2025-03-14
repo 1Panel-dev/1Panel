@@ -43,7 +43,7 @@
                     <el-option :label="$t('commons.table.all')" :value="0"></el-option>
                     <div v-for="item in groups" :key="item.id">
                         <el-option
-                            v-if="item.name === 'default'"
+                            v-if="item.name === 'Default'"
                             :label="$t('commons.table.default')"
                             :value="item.id"
                         />

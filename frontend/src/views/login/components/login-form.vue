@@ -335,6 +335,7 @@ const login = (formEl: FormInstance | undefined) => {
             globalStore.setAgreeLicense(true);
             menuStore.setMenuList([]);
             tabsStore.removeAllTabs();
+            globalStore.currentNode = 'local';
             MsgSuccess(i18n.t('commons.msg.loginSuccess'));
             router.push({ name: 'home' });
         } catch (res) {
@@ -370,6 +371,7 @@ const mfaLogin = async (auto: boolean) => {
             menuStore.setMenuList([]);
             tabsStore.removeAllTabs();
             MsgSuccess(i18n.t('commons.msg.loginSuccess'));
+            globalStore.currentNode = 'local';
             router.push({ name: 'home' });
         } catch (res) {
             if (res.code === 401) {

@@ -8,10 +8,10 @@
                 <el-table-column :label="$t('commons.table.name')" prop="name">
                     <template #default="{ row }">
                         <div v-if="!row.edit">
-                            <span v-if="row.name === 'default'">
+                            <span v-if="row.name === 'Default'">
                                 {{ $t('commons.table.default') }}
                             </span>
-                            <span v-if="row.name !== 'default'">{{ row.name }}</span>
+                            <span v-if="row.name !== 'Default'">{{ row.name }}</span>
                             <el-tag v-if="row.isDefault" type="success" class="ml-2" size="small">
                                 ({{ $t('commons.table.default') }})
                             </el-tag>

@@ -20,7 +20,7 @@
                     <template #prefix>{{ $t('commons.table.group') }}</template>
                     <div v-for="item in groupList" :key="item.id">
                         <el-option
-                            v-if="item.name === 'default'"
+                            v-if="item.name === 'Default'"
                             :label="$t('commons.table.default')"
                             :value="item.id"
                         />
@@ -64,11 +64,11 @@
                         <template #default="{ row }">
                             <fu-select-rw-switch v-model="row.groupID" @change="updateGroup(row)">
                                 <template #read>
-                                    {{ row.groupBelong === 'default' ? $t('commons.table.default') : row.groupBelong }}
+                                    {{ row.groupBelong === 'Default' ? $t('commons.table.default') : row.groupBelong }}
                                 </template>
                                 <div v-for="item in groupList" :key="item.id">
                                     <el-option
-                                        v-if="item.name === 'default'"
+                                        v-if="item.name === 'Default'"
                                         :label="$t('commons.table.default')"
                                         :value="item.id"
                                     />
@@ -102,7 +102,7 @@
                     <el-select filterable v-model="commandInfo.groupID" clearable style="width: 100%">
                         <div v-for="item in groupList" :key="item.id">
                             <el-option
-                                v-if="item.name === 'default'"
+                                v-if="item.name === 'Default'"
                                 :label="$t('commons.table.default')"
                                 :value="item.id"
                             />

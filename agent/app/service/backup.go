@@ -566,7 +566,7 @@ func changeLocalBackup(oldPath, newPath string) error {
 		}
 	}
 	if fileOp.Stat(path.Join(oldPath, "website")) {
-		if err := fileOp.CopyDir(path.Join(oldPath, "website"), newPath); err != nil {
+		if err := fileOp.Mv(path.Join(oldPath, "website"), newPath); err != nil {
 			return err
 		}
 	}
