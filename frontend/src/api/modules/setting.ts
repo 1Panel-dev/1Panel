@@ -65,7 +65,7 @@ export const UpdateTerminalInfo = (param: Setting.TerminalInfo) => {
     return http.post(`/core/settings/terminal/update`, param);
 };
 export const getSystemAvailable = () => {
-    return http.get(`/settings/search/available`);
+    return http.get(`/core/settings/search/available`);
 };
 export const updateSetting = (param: Setting.SettingUpdate) => {
     return http.post(`/core/settings/update`, param);

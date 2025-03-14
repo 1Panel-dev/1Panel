@@ -218,12 +218,12 @@ func Routers() *gin.Engine {
 	if global.CONF.Base.IsDemo {
 		Router.Use(middleware.DemoHandle())
 	}
+	Router.Use(middleware.GlobalLoading())
 	Router.Use(Proxy())
 
 	PrivateGroup := Router.Group("/api/v2/core")
 	PrivateGroup.Use(middleware.WhiteAllow())
 	PrivateGroup.Use(middleware.BindDomain())
-	PrivateGroup.Use(middleware.GlobalLoading())
 	PrivateGroup.Use(middleware.SetPasswordPublicKey())
 	for _, router := range rou.RouterGroupApp {
 		router.InitRouter(PrivateGroup)
