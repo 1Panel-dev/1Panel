@@ -451,7 +451,7 @@ const listPHPExtensions = async () => {
             page: 1,
             pageSize: 100,
         });
-        phpExtensions.value = res.data;
+        phpExtensions.value = res.data.items;
     } catch (error) {}
 };
 

@@ -64,7 +64,7 @@ export const appInstalledDeleteCheck = (appInstallId: number) => {
 };
 
 export const getAppInstalled = (search: App.AppInstalledSearch) => {
-    return http.post<App.AppInstalled[]>('apps/installed/search', search);
+    return http.post<ResPage<App.AppInstalled>>('apps/installed/search', search);
 };
 
 export const installedOp = (op: App.AppInstalledOp) => {

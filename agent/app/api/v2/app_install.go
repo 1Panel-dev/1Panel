@@ -27,7 +27,10 @@ func (b *BaseApi) SearchAppInstalled(c *gin.Context) {
 			helper.InternalServer(c, err)
 			return
 		}
-		helper.SuccessWithData(c, list)
+		helper.SuccessWithData(c, dto.PageResult{
+			Items: list,
+			Total: int64(len(list)),
+		})
 	} else {
 		total, list, err := appInstallService.Page(req)
 		if err != nil {

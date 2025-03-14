@@ -26,7 +26,10 @@ func (b *BaseApi) PagePHPExtensions(c *gin.Context) {
 			helper.InternalServer(c, err)
 			return
 		}
-		helper.SuccessWithData(c, list)
+		helper.SuccessWithData(c, dto.PageResult{
+			Total: int64(len(list)),
+			Items: list,
+		})
 	} else {
 		total, list, err := phpExtensionsService.Page(req)
 		if err != nil {

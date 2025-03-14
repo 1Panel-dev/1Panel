@@ -51,7 +51,7 @@ export const SearchPHPExtensions = (req: ReqPage) => {
 };
 
 export const ListPHPExtensions = (req: Runtime.PHPExtensionsList) => {
-    return http.post<Runtime.PHPExtensions[]>(`/runtimes/php/extensions/search`, req);
+    return http.post<ResPage<Runtime.PHPExtensions>>(`/runtimes/php/extensions/search`, req);
 };
 
 export const CreatePHPExtensions = (req: Runtime.PHPExtensionsCreate) => {

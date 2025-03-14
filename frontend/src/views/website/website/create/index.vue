@@ -729,10 +729,10 @@ const changeType = (type: string) => {
 
 const searchAppInstalled = (appType: string) => {
     getAppInstalled({ type: appType, unused: true, all: true, page: 1, pageSize: 100 }).then((res) => {
-        appInstalls.value = res.data;
+        appInstalls.value = res.data.items;
         website.value.appInstallId = undefined;
-        if (appType == 'website' && res.data && res.data.length > 0) {
-            website.value.appInstallId = res.data[0].id;
+        if (appType == 'website' && res.data.items && res.data.items.length > 0) {
+            website.value.appInstallId = res.data.items[0].id;
         }
     });
 };
