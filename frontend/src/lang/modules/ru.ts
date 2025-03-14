@@ -1271,7 +1271,7 @@ const message = {
         editPermissions: '@:file.mode',
         owner: 'Владелец',
         file: 'Файл',
-        remoteFile: 'Скачать с удаленного сервера',
+        remoteFile: 'Удалённая загрузка',
         share: 'Поделиться',
         sync: 'Синхронизация данных',
         size: 'Размер',

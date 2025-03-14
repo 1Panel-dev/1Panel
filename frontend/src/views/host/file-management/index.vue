@@ -229,12 +229,12 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('file.mode')" prop="mode" max-width="50" min-width="110px">
+                    <el-table-column :label="$t('file.mode')" prop="mode" min-width="110">
                         <template #default="{ row }">
                             <el-link :underline="false" @click="openMode(row)">{{ row.mode }}</el-link>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.user')" prop="user" show-overflow-tooltip>
+                    <el-table-column :label="$t('commons.table.user')" prop="user" show-overflow-tooltip min-width="90">
                         <template #default="{ row }">
                             <el-link :underline="false" @click="openChown(row)">
                                 {{ row.user ? row.user : '-' }} ({{ row.uid }})
@@ -248,7 +248,7 @@
                             </el-link>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('file.size')" prop="size" max-width="50" sortable>
+                    <el-table-column :label="$t('file.size')" prop="size" min-width="100" sortable>
                         <template #default="{ row, $index }">
                             <span v-if="row.isDir">
                                 <el-button
