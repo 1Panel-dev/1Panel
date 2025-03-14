@@ -1026,7 +1026,7 @@ onMounted(() => {
 }
 
 .favorite-item {
-    max-height: 650px;
+    height: 50vh;
     overflow: auto;
 }
 

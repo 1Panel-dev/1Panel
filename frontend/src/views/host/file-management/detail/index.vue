@@ -29,10 +29,10 @@
                 {{ data.mode }}
             </el-descriptions-item>
             <el-descriptions-item label-class-name="detail-label" :label="$t('commons.table.user')">
-                {{ data.user }}
+                {{ data.user ? data.user : '-' }} ({{ data.uid }})
             </el-descriptions-item>
             <el-descriptions-item label-class-name="detail-label" :label="$t('file.group')">
-                {{ data.group }}
+                {{ data.group ? data.group : '-' }} ({{ data.gid }})
             </el-descriptions-item>
             <el-descriptions-item label-class-name="detail-label" :label="$t('commons.table.updatedAt')">
                 {{ dateFormatSimple(data.modTime) }}

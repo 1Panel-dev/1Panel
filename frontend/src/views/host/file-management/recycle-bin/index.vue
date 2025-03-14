@@ -115,7 +115,9 @@ const changeStatus = async () => {
     try {
         loading.value = true;
         await updateAgentSetting({ key: 'FileRecycleBin', value: status.value });
-        MsgSuccess(i18n.global.t('file.fileRecycleBinMsg', [i18n.global.t('commons.button.' + status.value)]));
+        MsgSuccess(
+            i18n.global.t('file.fileRecycleBinMsg', [i18n.global.t('commons.button.' + status.value.toLowerCase())]),
+        );
         loading.value = false;
     } catch (error) {}
 };

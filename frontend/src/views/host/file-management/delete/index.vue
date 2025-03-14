@@ -6,15 +6,15 @@
                     <el-alert
                         class="mt-2"
                         :show-icon="true"
-                        :type="recycleStatus === 'enable' ? 'warning' : 'error'"
+                        :type="recycleStatus === 'Enable' ? 'warning' : 'error'"
                         :closable="false"
                     >
                         <div class="delete-warn">
-                            <span v-if="recycleStatus === 'enable'">{{ $t('file.deleteHelper') }}</span>
+                            <span v-if="recycleStatus === 'Enable'">{{ $t('file.deleteHelper') }}</span>
                             <span v-else>{{ $t('file.deleteHelper2') }}</span>
                         </div>
                     </el-alert>
-                    <div class="mt-4" v-if="recycleStatus === 'enable'">
+                    <div class="mt-4" v-if="recycleStatus === 'Enable'">
                         <el-checkbox v-model="forceDelete" class="force-delete">
                             <span>{{ $t('file.forceDeleteHelper') }}</span>
                         </el-checkbox>
@@ -67,7 +67,7 @@ const files = ref();
 const loading = ref(false);
 const em = defineEmits(['close']);
 const forceDelete = ref(false);
-const recycleStatus = ref('enable');
+const recycleStatus = ref('Enable');
 
 const acceptParams = (props: File.File[]) => {
     getStatus();
@@ -80,7 +80,7 @@ const getStatus = async () => {
     try {
         const res = await getRecycleStatus();
         recycleStatus.value = res.data;
-        if (recycleStatus.value === 'disable') {
+        if (recycleStatus.value === 'Disable') {
             forceDelete.value = true;
         }
     } catch (error) {}

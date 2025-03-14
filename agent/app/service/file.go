@@ -223,7 +223,7 @@ func (f *FileService) Delete(op request.FileDelete) error {
 	}
 	fo := files.NewFileOp()
 	recycleBinStatus, _ := settingRepo.Get(settingRepo.WithByKey("FileRecycleBin"))
-	if recycleBinStatus.Value == "disable" {
+	if recycleBinStatus.Value == "Disable" {
 		op.ForceDelete = true
 	}
 	if op.ForceDelete {
