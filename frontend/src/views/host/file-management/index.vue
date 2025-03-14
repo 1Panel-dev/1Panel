@@ -763,10 +763,14 @@ const openProcess = () => {
 const closeProcess = () => {
     search();
     getWgetProcess();
+    setTimeout(() => {
+        getWgetProcess();
+    }, 1000);
 };
 
 const processCount = ref(0);
 const getWgetProcess = async () => {
+    processCount.value = 0;
     try {
         const res = await fileWgetKeys();
         if (res.data && res.data.keys.length > 0) {

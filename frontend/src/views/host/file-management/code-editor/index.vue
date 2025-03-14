@@ -437,6 +437,7 @@ const initEditor = () => {
             minimap: {
                 enabled: config.minimap,
             },
+            lineNumbersMinChars: 6,
         });
         if (editor.getModel().getValue() === '') {
             let defaultContent = '\n\n\n\n';

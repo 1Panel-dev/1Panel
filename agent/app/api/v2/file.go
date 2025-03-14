@@ -768,8 +768,12 @@ func (b *BaseApi) ProcessKeys(c *gin.Context) {
 			continue
 		}
 		var process files.Process
-		if err := json.Unmarshal([]byte(value), &process); err == nil && process.Percent != 100 {
-			res.Keys = append(res.Keys, key)
+		if err := json.Unmarshal([]byte(value), &process); err != nil {
+			continue
+		}
+		res.Keys = append(res.Keys, key)
+		if process.Percent == 100 {
+			global.CACHE.Del(key)
 		}
 	}
 	helper.SuccessWithData(c, res)

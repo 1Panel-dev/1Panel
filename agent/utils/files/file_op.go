@@ -7,6 +7,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"io"
 	"io/fs"
 	"net/http"
@@ -394,16 +395,19 @@ func (f FileOp) CopyAndReName(src, dst, name string, cover bool) error {
 	if dst = path.Clean("/" + dst); dst == "" {
 		return os.ErrNotExist
 	}
-	if src == "/" || dst == "/" {
-		return os.ErrInvalid
-	}
-	if dst == src {
+	if src == "/" || dst == src {
 		return os.ErrInvalid
 	}
 
 	srcInfo, err := f.Fs.Stat(src)
 	if err != nil {
 		return err
+	}
+
+	if name != "" && !cover {
+		if f.Stat(filepath.Join(dst, name)) {
+			return buserr.New("ErrFileIsExist")
+		}
 	}
 
 	if srcInfo.IsDir() {
