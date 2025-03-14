@@ -1,7 +1,7 @@
 <template>
     <DrawerPro v-model="open" :header="$t('website.addDomain')" @close="handleClose">
         <el-form ref="domainForm" label-position="top" :model="create">
-            <DomainCreate v-model:form="create"></DomainCreate>
+            <DomainCreate v-model:form="create" @gengerate="domainForm.clearValidate()"></DomainCreate>
         </el-form>
         <template #footer>
             <span class="dialog-footer">

@@ -73,6 +73,7 @@ import i18n from '@/lang';
 import { MsgError } from '@/utils/message';
 import { ref } from 'vue';
 
+const emit = defineEmits(['gengerate']);
 const props = defineProps({
     form: {
         type: Object,
@@ -138,6 +139,7 @@ const gengerateDomains = () => {
             });
         }
     });
+    emit('gengerate');
 };
 
 const handleParams = () => {

@@ -307,7 +307,7 @@
                         <span class="input-help">{{ $t('app.allowPortHelper') }}</span>
                     </el-form-item>
                 </div>
-                <DomainCreate v-model:form="website"></DomainCreate>
+                <DomainCreate v-model:form="website" @gengerate="websiteForm.clearValidate()"></DomainCreate>
                 <el-form-item prop="IPV6">
                     <el-checkbox v-model="website.IPV6" :label="$t('website.ipv6')" size="large" />
                 </el-form-item>
