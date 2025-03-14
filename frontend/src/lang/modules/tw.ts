@@ -374,7 +374,7 @@ const message = {
 
         core: '物理核心',
         logicCore: '邏輯核心',
-        loadAverage: '最近 {0} 分鐘平均負載',
+        loadAverage: '最近 1 分鐘平均負載 | 最近 {n} 分鐘平均負載',
         load: '負載',
         mount: '掛載點',
         fileSystem: '檔案系統',
