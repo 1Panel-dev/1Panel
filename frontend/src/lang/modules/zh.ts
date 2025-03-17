@@ -2041,7 +2041,8 @@ const message = {
         noLog: '当前没有日志...',
         defaultServer: '默认站点',
         noDefaultServer: '未设置',
-        defaultServerHelper: '设置默认站点后,所有未绑定的域名和IP都被定向到默认站点\n可有效防止恶意解析',
+        defaultServerHelper:
+            '设置默认站点后,所有未绑定的域名和IP都被定向到默认站点\n可有效防止恶意解析\n但同时会导致 WAF 未授权域名拦截失败',
         websiteDeploymentHelper: '使用从 1Panel 部署的应用创建网站',
         websiteStatictHelper: '在主机上创建网站目录',
         websiteProxyHelper:
@@ -2978,7 +2979,7 @@ const message = {
             closeHelper: '是否取消使用自定义应用仓库',
             appStoreUrlHelper: '仅支持 .tar.gz 格式',
             postNode: '同步至子节点',
-            postNodeHelper: '子节点默认继承并使用上述配置',
+            postNodeHelper: '把自定义商店包同步至子节点的安装目录下的 tmp/customApp/apps.tar.gz 中',
             nodes: '节点',
             selectNode: '选择节点',
             selectNodeError: '请选择节点',

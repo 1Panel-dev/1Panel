@@ -106,10 +106,10 @@ const handleScroll = (event: WheelEvent) => {
     if (!tabContainer) return;
 
     const target = event.target as HTMLElement;
-    const isInsideTabPane = target.closest('.el-tab-pane');
-    if (isInsideTabPane) {
+    if (!target.classList.contains('el-tabs__item')) {
         return;
     }
+
     event.preventDefault();
     tabContainer.scrollTop += event.deltaY;
 };

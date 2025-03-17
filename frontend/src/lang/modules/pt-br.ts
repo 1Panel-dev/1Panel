@@ -2119,7 +2119,7 @@ const message = {
         defaultServer: 'Site padrão',
         noDefaultServer: 'Não definido',
         defaultServerHelper:
-            'Após definir o site padrão, todos os domínios e IPs não vinculados serão redirecionados para o site padrão\n o que pode prevenir efetivamente análises maliciosas',
+            'Após definir o site padrão, todos os nomes de domínio e IPs desvinculados serão redirecionados para o site padrão\nIsso pode evitar eficazmente a resolução maliciosa\nNo entanto, isso também pode causar falha na interceptação de nomes de domínio não autorizados pelo WAF',
         restoreHelper: 'Tem certeza de que deseja restaurar com este backup?',
         websiteDeploymentHelper: 'Use um aplicativo instalado ou crie um novo aplicativo para criar um site.',
         websiteStatictHelper: 'Crie um diretório de site no host.',
@@ -3123,7 +3123,8 @@ const message = {
             closeHelper: 'Cancelar o uso do repositório de aplicativos personalizados',
             appStoreUrlHelper: 'Apenas formato .tar.gz é suportado',
             postNode: 'Sincronizar para subnó',
-            postNodeHelper: 'Subnós herdarão e usarão a configuração acima por padrão',
+            postNodeHelper:
+                'Sincronize o pacote da loja personalizada para tmp/customApp/apps.tar.gz no diretório de instalação do sub-nó',
             nodes: 'Selecionar Nós',
             selectNode: 'Selecionar Node',
             selectNodeError: 'Por favor, selecione um nó',

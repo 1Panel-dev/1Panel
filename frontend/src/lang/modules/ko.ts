@@ -2041,7 +2041,7 @@ const message = {
         defaultServer: '기본 사이트',
         noDefaultServer: '설정되지 않음',
         defaultServerHelper:
-            '기본 사이트를 설정하면 모든 미연결 도메인 이름 및 IP가 기본 사이트로 연결됩니다.\n이를 통해 악의적인 분석을 효과적으로 방지할 수 있습니다.',
+            '기본 사이트를 설정한 후, 바인딩되지 않은 모든 도메인 이름과 IP는 기본 사이트로 리디렉션됩니다\n이는 악의적인 해석을 효과적으로 방지할 수 있습니다\n하지만 WAF의 무단 도메인 차단이 실패할 수도 있습니다',
         restoreHelper: '이 백업을 사용하여 복원하시겠습니까?',
         websiteDeploymentHelper: '설치된 애플리케이션을 사용하거나 새 애플리케이션을 생성하여 웹사이트를 만드세요.',
         websiteStatictHelper: '호스트에 웹사이트 디렉터리를 생성합니다.',
@@ -2998,7 +2998,8 @@ const message = {
             closeHelper: '사용자 정의 앱 저장소 사용 취소',
             appStoreUrlHelper: '.tar.gz 형식만 지원합니다',
             postNode: '서브 노드로 동기화',
-            postNodeHelper: '서브 노드는 기본적으로 위 설정을 상속하고 사용합니다',
+            postNodeHelper:
+                '사용자 정의 스토어 패키지를 하위 노드의 설치 디렉토리에 있는 tmp/customApp/apps.tar.gz로 동기화합니다',
             nodes: '노드 선택',
             selectNode: '노드 선택',
             selectNodeError: '노드를 선택하세요',

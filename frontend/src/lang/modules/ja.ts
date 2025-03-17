@@ -2074,7 +2074,7 @@ const message = {
         defaultServer: 'デフォルトサイト',
         noDefaultServer: '設定されていません',
         defaultServerHelper:
-            'デフォルトのサイトを設定した後、すべてのアンバウンドドメイン名とIPがデフォルトのサイト nに向けられ、悪意のある分析を効果的に防止できます',
+            'デフォルトサイトを設定した後、すべての未バインドのドメイン名とIPはデフォルトサイトにリダイレクトされます\nこれにより、悪意のある解決を効果的に防ぐことができます\nただし、WAFの未承認ドメイン名の遮断が失敗することもあります',
         restoreHelper: 'このバックアップを使用して復元することは間違いありませんか？',
         websiteDeploymentHelper:
             'インストールされたアプリケーションを使用するか、新しいアプリケーションを作成してWebサイトを作成します。',
@@ -3049,7 +3049,8 @@ const message = {
             closeHelper: 'カスタムアプリリポジトリの使用をキャンセルしますか',
             appStoreUrlHelper: '.tar.gz形式のみサポートされます',
             postNode: 'サブノードへ同期',
-            postNodeHelper: 'サブノードはデフォルトで上記の設定を継承して使用します',
+            postNodeHelper:
+                'カスタムストアパッケージを子ノードのインストールディレクトリの tmp/customApp/apps.tar.gz に同期します',
             nodes: 'ノードを選択',
             selectNode: 'ノードを選択',
             selectNodeError: 'ノードを選択してください',

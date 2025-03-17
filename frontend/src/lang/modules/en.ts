@@ -2216,7 +2216,7 @@ const message = {
         defaultServer: 'Default Site',
         noDefaultServer: 'Not set',
         defaultServerHelper:
-            'After setting the default site, all unbound domain names and IPs are directed to the default site\n which can effectively prevent malicious analysis',
+            'After setting the default site, all unbinded domain names and IPs will be redirected to the default site\nThis can effectively prevent malicious resolution\nHowever, it will also cause the WAF unauthorized domain name interception to fail',
         restoreHelper: 'Are you sure to restore using this backup?',
         websiteDeploymentHelper: 'Create a website using an application deployed from 1Panel',
         websiteStatictHelper: 'Create a website directory on the host',
@@ -3236,7 +3236,8 @@ const message = {
             closeHelper: 'Cancel using custom app repository',
             appStoreUrlHelper: 'Only .tar.gz format is supported',
             postNode: 'Sync to sub-node',
-            postNodeHelper: 'Sub-nodes will inherit and use the above configuration by default',
+            postNodeHelper:
+                'Sync the custom store package to tmp/customApp/apps.tar.gz in the installation directory of the sub-node',
             nodes: 'Nodes',
             selectNode: 'Select Node',
             selectNodeError: 'Please select a node',

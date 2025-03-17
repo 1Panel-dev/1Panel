@@ -2129,7 +2129,7 @@ const message = {
         defaultServer: 'Tapak lalai',
         noDefaultServer: 'Tidak ditetapkan',
         defaultServerHelper:
-            'Selepas menetapkan tapak lalai, semua nama domain dan IP yang tidak terikat akan diarahkan ke tapak lalai\n yang boleh mencegah analisis berniat jahat dengan berkesan',
+            'Setelah menetapkan laman lalai, semua nama domain dan IP yang tidak terikat akan diarahkan ke laman lalai\nIni dapat mencegah penyelesaian yang jahat secara berkesan\nNamun, ini juga boleh menyebabkan kegagalan penghalang nama domain tanpa kebenaran WAF',
         restoreHelper: 'Adakah anda pasti mahu memulihkan menggunakan sandaran ini?',
         websiteDeploymentHelper: 'Gunakan aplikasi yang dipasang atau buat aplikasi baharu untuk mencipta laman web.',
         websiteStatictHelper: 'Cipta direktori laman web pada hos.',
@@ -3121,7 +3121,8 @@ const message = {
             closeHelper: 'Batalkan penggunaan repositori aplikasi khusus',
             appStoreUrlHelper: 'Hanya format .tar.gz disokong',
             postNode: 'Segerakkan ke sub-node',
-            postNodeHelper: 'Sub-node akan mewarisi dan menggunakan konfigurasi di atas secara lalai',
+            postNodeHelper:
+                'Segerakan pakej kedai tersuai ke tmp/customApp/apps.tar.gz dalam direktori pemasangan nod anak',
             nodes: 'Pilih Node',
             selectNode: 'Pilih Node',
             selectNodeError: 'Sila pilih node',
