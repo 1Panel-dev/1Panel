@@ -1267,6 +1267,7 @@ const message = {
         deleteLogs: 'Clearing Logs',
         resource: 'Resource',
         detail: {
+            ai: 'AI',
             groups: 'Group',
             hosts: 'Host',
             apps: 'App',
@@ -1283,6 +1284,8 @@ const message = {
             settings: 'Setting',
             cronjobs: 'Cronjob',
             databases: 'Database',
+            licenses: 'License',
+            nodes: 'Node',
         },
         websiteLog: 'Website Logs',
         runLog: 'Run Log',
@@ -3199,6 +3202,10 @@ const message = {
             addNode: 'Add Node',
             connInfo: 'Connection Information',
             nodeInfo: 'Node Information',
+            nodeSyncHelper: 'Node information synchronization will sync the following information:',
+            nodeSyncHelper1: '1. Public backup account information',
+            nodeSyncHelper2: '2. Overview page recommended application information',
+            nodeSyncHelper3: '3. Connection information between the main node and sub-nodes',
             panelExist:
                 'Detected that there is already 1panel service on this node. Adding this node will use the original service port and installation directory of 1panel. Do you want to continue?',
             coreExist:

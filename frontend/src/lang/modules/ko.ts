@@ -1192,6 +1192,7 @@ const message = {
         deleteLogs: '로그 정리',
         resource: '자원',
         detail: {
+            ai: 'AI',
             groups: '그룹',
             hosts: '호스트',
             apps: '애플리케이션',
@@ -1208,6 +1209,8 @@ const message = {
             settings: '패널 설정',
             cronjobs: '예약 작업',
             databases: '데이터베이스',
+            licenses: '라이선스',
+            nodes: '노드',
         },
         websiteLog: '웹사이트 로그',
         runLog: '실행 로그',
@@ -2962,6 +2965,10 @@ const message = {
             addNode: '노드 추가',
             connInfo: '연결 정보',
             nodeInfo: '노드 정보',
+            nodeSyncHelper: '노드 정보 동기화는 다음 정보를 동기화합니다:',
+            nodeSyncHelper1: '1. 공용 백업 계정 정보',
+            nodeSyncHelper2: '2. 개요 페이지 추천 애플리케이션 정보',
+            nodeSyncHelper3: '3. 주 노드와 하위 노드 간의 연결 정보',
             panelExist:
                 '이 노드에 이미 1panel 서비스가 존재합니다. 이 노드를 추가하면 1panel의 원래 서비스 포트와 설치 디렉토리를 사용합니다. 계속하시겠습니까?',
             coreExist:

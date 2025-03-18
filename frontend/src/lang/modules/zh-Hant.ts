@@ -1196,6 +1196,7 @@ const message = {
         deleteLogs: '清空日誌',
         resource: '資源',
         detail: {
+            ai: 'AI',
             groups: '分組',
             hosts: '主機',
             apps: '應用',
@@ -1212,6 +1213,8 @@ const message = {
             settings: '面板設定',
             cronjobs: '計畫任務',
             databases: '資料庫',
+            licenses: '許可證',
+            nodes: '節點',
         },
         websiteLog: '網站日誌',
         runLog: '運行日誌',
@@ -2962,6 +2965,10 @@ const message = {
             addNode: '新增節點',
             connInfo: '連接資訊',
             nodeInfo: '節點資訊',
+            nodeSyncHelper: '節點信息同步將同步以下信息：',
+            nodeSyncHelper1: '1. 公用的備份帳號信息',
+            nodeSyncHelper2: '2. 概覽頁推薦應用信息',
+            nodeSyncHelper3: '3. 主節點與子節點的連接信息',
             panelExist:
                 '已檢測到該節點上已存在 1panel 服務，新增該節點將沿用 1panel 原服務的埠號及安裝目錄，是否繼續？',
             coreExist: '已檢測到該節點上已存在 1panel-core 服務，無法新增該節點，請檢查後再試！',

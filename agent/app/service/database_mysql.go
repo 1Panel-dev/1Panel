@@ -534,7 +534,7 @@ func (u *MysqlService) LoadStatus(req dto.OperationWithNameAndType) (*dto.MysqlS
 	info.File = "OFF"
 	info.Position = "OFF"
 	masterStatus := "show master status;"
-	if common.CompareAppVersion(app.Version, "8.4.0") {
+	if common.CompareAppVersion(app.Version, "8.4.0") && req.Type == constant.AppMysql {
 		masterStatus = "show binary log status;"
 	}
 	rows, err := executeSqlForRows(app.ContainerName, app.Key, app.Password, masterStatus)

@@ -1247,6 +1247,7 @@ const message = {
         deleteLogs: 'Bersihkan Log',
         resource: 'Sumber',
         detail: {
+            ai: 'AI',
             groups: 'Kumpulan',
             hosts: 'Hos',
             apps: 'Aplikasi',
@@ -1263,6 +1264,8 @@ const message = {
             settings: 'Tetapan Panel',
             cronjobs: 'Tugas Terjadual',
             databases: 'Pangkalan',
+            licenses: 'lesen',
+            nodes: 'nod',
         },
         websiteLog: 'Log Laman Web',
         runLog: 'Log Jalankan',
@@ -3083,6 +3086,10 @@ const message = {
             addNode: 'Tambah Nod',
             connInfo: 'Maklumat Sambungan',
             nodeInfo: 'Maklumat Nod',
+            nodeSyncHelper: 'Penyelarasan maklumat nod akan menyelaraskan maklumat berikut:',
+            nodeSyncHelper1: '1. Maklumat akaun sandaran awam',
+            nodeSyncHelper2: '2. Maklumat aplikasi yang disyorkan di halaman gambaran keseluruhan',
+            nodeSyncHelper3: '3. Maklumat sambungan antara nod utama dan nod sub',
             panelExist:
                 'Dikesan bahawa terdapat perkhidmatan 1panel yang sudah ada pada nod ini. Menambah nod ini akan menggunakan port dan direktori pemasangan perkhidmatan asal 1panel. Adakah anda ingin meneruskan?',
             coreExist:

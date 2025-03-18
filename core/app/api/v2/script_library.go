@@ -68,7 +68,7 @@ func (b *BaseApi) SearchScript(c *gin.Context) {
 // @Tags ScriptLibrary
 // @Summary Delete script
 // @Accept json
-// @Param request body dto.BatchDeleteReq true "request"
+// @Param request body dto.OperateByIDs true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp

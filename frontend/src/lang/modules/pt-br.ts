@@ -1230,6 +1230,7 @@ const message = {
         deleteLogs: 'Limpar logs',
         resource: 'Recurso',
         detail: {
+            ai: 'AI',
             groups: 'Grupos',
             hosts: 'Hosts',
             apps: 'Aplicativos',
@@ -1246,6 +1247,8 @@ const message = {
             settings: 'Configurações do Painel',
             cronjobs: 'Tarefas Agendadas',
             databases: 'Bancos de Dados',
+            licenses: 'licenças',
+            nodes: 'nós',
         },
         websiteLog: 'Logs do website',
         runLog: 'Logs de execução',
@@ -3086,6 +3089,10 @@ const message = {
             addNode: 'Adicionar Nó',
             connInfo: 'Informações de Conexão',
             nodeInfo: 'Informações do Nó',
+            nodeSyncHelper: 'A sincronização das informações do nó irá sincronizar as seguintes informações:',
+            nodeSyncHelper1: '1. Informações da conta de backup pública',
+            nodeSyncHelper2: '2. Informações sobre aplicativos recomendados na página de visão geral',
+            nodeSyncHelper3: '3. Informações de conexão entre o nó principal e os sub-nós',
             panelExist:
                 'Detectado que já existe um serviço 1panel neste nó. Adicionar este nó usará a porta e o diretório de instalação do serviço original do 1panel. Deseja continuar?',
             coreExist:

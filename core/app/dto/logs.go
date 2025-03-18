@@ -42,7 +42,7 @@ type LoginLog struct {
 	Agent     string    `json:"agent"`
 	Status    string    `json:"status"`
 	Message   string    `json:"message"`
-	CreatedAt time.Time `json:"created_at"`
+	CreatedAt time.Time `json:"createdAt"`
 }
 
 type CleanLog struct {

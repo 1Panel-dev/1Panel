@@ -172,7 +172,7 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 		go writeLogs(req.Version)
 		_ = settingRepo.Update("SystemVersion", req.Version)
 		_ = settingRepo.Update("SystemStatus", "Free")
-		_, _ = cmd.ExecWithTimeOut("systemctl daemon-reload && systemctl restart 1panel-core.service && systemctl restart 1pane-agent.service", 1*time.Minute)
+		_, _ = cmd.ExecWithTimeOut("systemctl daemon-reload && systemctl restart 1pane-agent.service && systemctl restart 1panel-core.service", 1*time.Minute)
 	}()
 	return nil
 }

@@ -1204,6 +1204,7 @@ const message = {
         deleteLogs: 'クリーンログ',
         resource: 'リソース',
         detail: {
+            ai: 'AI',
             groups: 'グループ',
             hosts: 'ホスト',
             apps: 'アプリケーション',
@@ -1220,6 +1221,8 @@ const message = {
             settings: 'パネル設定',
             cronjobs: 'スケジュールされたタスク',
             databases: 'データベース',
+            licenses: 'ライセンス',
+            nodes: 'ノード',
         },
         websiteLog: 'ウェブサイトログ',
         runLog: 'ログを実行します',
@@ -3013,6 +3016,11 @@ const message = {
             addNode: 'ノードを追加',
             connInfo: '接続情報',
             nodeInfo: 'ノード情報',
+            nodeSyncHelper: 'ノード情報の同期は、以下の情報を同期します：',
+            nodeSyncHelper1: '1. 公共のバックアップアカウント情報',
+            nodeSyncHelper2: '2. 概要ページの推奨アプリ情報',
+            nodeSyncHelper3: '3. 主ノードとサブノードの接続情報',
+
             panelExist:
                 'このノードに既に1panelサービスが存在します。このノードを追加すると、1panelの元のサービスポートとインストールディレクトリが使用されます。続行しますか？',
             coreExist:

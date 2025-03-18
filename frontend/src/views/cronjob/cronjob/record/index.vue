@@ -176,6 +176,7 @@
                                     <LogFile
                                         :defaultButton="false"
                                         class="w-full"
+                                        :key="currentRecord?.taskID"
                                         :heightDiff="410"
                                         :config="{ type: 'task', taskID: currentRecord?.taskID, tail: true }"
                                     />
@@ -378,7 +379,6 @@ const search = async () => {
     if (currentRecord.value?.records) {
         loadRecord(currentRecord.value);
     }
-    console.log(currentRecord.value);
 };
 
 const forDetail = async (row: Cronjob.Record) => {
@@ -386,6 +386,8 @@ const forDetail = async (row: Cronjob.Record) => {
     loadRecord(row);
 };
 const loadRecord = async (row: Cronjob.Record) => {
+    currentRecord.value = row;
+    console.log(currentRecord.value);
     if (row.records) {
         const res = await getRecordLog(row.id);
         let log = res.data.replace(/\x1B\[[0-?]*[ -/]*[@-~]/g, '');

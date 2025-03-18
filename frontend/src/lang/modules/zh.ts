@@ -1194,6 +1194,7 @@ const message = {
         deleteLogs: '清空日志',
         resource: '资源',
         detail: {
+            ai: 'AI',
             groups: '分组',
             hosts: '主机',
             apps: '应用',
@@ -1210,6 +1211,8 @@ const message = {
             settings: '面板设置',
             cronjobs: '计划任务',
             databases: '数据库',
+            licenses: '许可证',
+            nodes: '节点',
         },
         websiteLog: '网站日志',
         runLog: '运行日志',
@@ -2943,6 +2946,10 @@ const message = {
             addNode: '添加节点',
             connInfo: '连接信息',
             nodeInfo: '节点信息',
+            nodeSyncHelper: '节点信息同步将同步以下信息：',
+            nodeSyncHelper1: '1. 公用的备份账号信息',
+            nodeSyncHelper2: '2. 概览页推荐应用信息',
+            nodeSyncHelper3: '3. 主节点与子节点的连接信息',
             panelExist:
                 '检测到该节点上已存在 1panel 服务，添加该节点将沿用 1panel 原服务的端口以及安装目录，是否继续？',
             coreExist: '检测到该节点上已存在 1panel-core 服务，无法添加该节点，请检查后重试！',

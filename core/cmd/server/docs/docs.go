@@ -18,6 +18,590 @@ const docTemplate = `{
 	"host": "localhost",
 	"basePath": "/api/v2",
 	"paths": {
+		"/agent/groups": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.GroupCreate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Create group",
+				"tags": [
+					"System Group"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"name",
+						"type"
+					],
+					"formatEN": "create group [name][type]",
+					"formatZH": "创建组 [name][type]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/agent/groups/del": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.OperateByID"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Delete group",
+				"tags": [
+					"System Group"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [
+						{
+							"db": "groups",
+							"input_column": "id",
+							"input_value": "id",
+							"isList": false,
+							"output_column": "name",
+							"output_value": "name"
+						},
+						{
+							"db": "groups",
+							"input_column": "id",
+							"input_value": "id",
+							"isList": false,
+							"output_column": "type",
+							"output_value": "type"
+						}
+					],
+					"bodyKeys": [
+						"id"
+					],
+					"formatEN": "delete group [type][name]",
+					"formatZH": "删除组 [type][name]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/agent/groups/search": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.GroupSearch"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.OperateByType"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "List groups",
+				"tags": [
+					"System Group"
+				]
+			}
+		},
+		"/agent/groups/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.GroupUpdate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update group",
+				"tags": [
+					"System Group"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"name",
+						"type"
+					],
+					"formatEN": "update group [name][type]",
+					"formatZH": "更新组 [name][type]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/ai/domain/bind": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.OllamaBindDomain"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Bind domain",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/domain/get": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.OllamaBindDomainReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.OllamaBindDomainRes"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get bind domain",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/gpu/load": {
+			"get": {
+				"consumes": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Load gpu / xpu info",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/ollama/model": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.OllamaModelName"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Create Ollama model",
+				"tags": [
+					"AI"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"name"
+					],
+					"formatEN": "add Ollama model [name]",
+					"formatZH": "添加 Ollama 模型 [name]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/ai/ollama/model/close": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.OllamaModelName"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Close Ollama model conn",
+				"tags": [
+					"AI"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"name"
+					],
+					"formatEN": "close conn for Ollama model [name]",
+					"formatZH": "关闭 Ollama 模型连接 [name]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/ai/ollama/model/del": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.ForceDelete"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Delete Ollama model",
+				"tags": [
+					"AI"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [
+						{
+							"db": "ollama_models",
+							"input_column": "id",
+							"input_value": "ids",
+							"isList": true,
+							"output_column": "name",
+							"output_value": "names"
+						}
+					],
+					"bodyKeys": [
+						"ids"
+					],
+					"formatEN": "remove Ollama model [names]",
+					"formatZH": "删除 Ollama 模型 [names]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/ai/ollama/model/load": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.OllamaModelName"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"type": "string"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Page Ollama models",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/ollama/model/recreate": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.OllamaModelName"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Rereate Ollama model",
+				"tags": [
+					"AI"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"name"
+					],
+					"formatEN": "re-add Ollama model [name]",
+					"formatZH": "添加 Ollama 模型重试 [name]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/ai/ollama/model/search": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.SearchWithPage"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.PageResult"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Page Ollama models",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/ollama/model/sync": {
+			"post": {
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.OllamaModelDropList"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Sync Ollama model list",
+				"tags": [
+					"AI"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [],
+					"formatEN": "sync Ollama model list",
+					"formatZH": "同步 Ollama 模型列表",
+					"paramKeys": []
+				}
+			}
+		},
 		"/apps/:key": {
 			"get": {
 				"consumes": [
@@ -2934,44 +3518,6 @@ const docTemplate = `{
 				"summary": "Load container stats"
 			}
 		},
-		"/containers/load/log": {
-			"post": {
-				"consumes": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"description": "request",
-						"in": "body",
-						"name": "request",
-						"required": true,
-						"schema": {
-							"$ref": "#/definitions/dto.OperationWithNameAndType"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"type": "string"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Load container log",
-				"tags": [
-					"Container"
-				]
-			}
-		},
 		"/containers/logoption/update": {
 			"post": {
 				"consumes": [
@@ -5148,6 +5694,44 @@ const docTemplate = `{
 				}
 			}
 		},
+		"/core/hosts/info": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.OperateByID"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.HostInfo"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get host info",
+				"tags": [
+					"Host"
+				]
+			}
+		},
 		"/core/hosts/search": {
 			"post": {
 				"consumes": [
@@ -5160,7 +5744,7 @@ const docTemplate = `{
 						"name": "request",
 						"required": true,
 						"schema": {
-							"$ref": "#/definitions/dto.SearchHostWithPage"
+							"$ref": "#/definitions/dto.SearchPageWithGroup"
 						}
 					}
 				],
@@ -5319,7 +5903,10 @@ const docTemplate = `{
 				],
 				"responses": {
 					"200": {
-						"description": "OK"
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.HostInfo"
+						}
 					}
 				},
 				"security": [
@@ -12670,6 +13257,194 @@ const docTemplate = `{
 				}
 			}
 		},
+		"/script": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.ScriptOperate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Add script",
+				"tags": [
+					"ScriptLibrary"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"name"
+					],
+					"formatEN": "add script [name]",
+					"formatZH": "添加脚本库脚本 [name]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/script/del": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.OperateByIDs"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Delete script",
+				"tags": [
+					"ScriptLibrary"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [
+						{
+							"db": "script_librarys",
+							"input_column": "id",
+							"input_value": "ids",
+							"isList": true,
+							"output_column": "name",
+							"output_value": "names"
+						}
+					],
+					"bodyKeys": [
+						"ids"
+					],
+					"formatEN": "delete script [names]",
+					"formatZH": "删除脚本库脚本 [names]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/script/search": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.SearchPageWithGroup"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.PageResult"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Page script",
+				"tags": [
+					"ScriptLibrary"
+				]
+			}
+		},
+		"/script/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.ScriptOperate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update script",
+				"tags": [
+					"ScriptLibrary"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [
+						{
+							"db": "cronjobs",
+							"input_column": "id",
+							"input_value": "id",
+							"isList": false,
+							"output_column": "name",
+							"output_value": "name"
+						}
+					],
+					"bodyKeys": [
+						"id"
+					],
+					"formatEN": "update script [name]",
+					"formatZH": "更新脚本库脚本 [name]",
+					"paramKeys": []
+				}
+			}
+		},
 		"/settings/api/config/generate/key": {
 			"post": {
 				"consumes": [
@@ -19496,6 +20271,9 @@ const docTemplate = `{
 				},
 				"name": {
 					"type": "string"
+				},
+				"taskID": {
+					"type": "string"
 				}
 			},
 			"required": [
@@ -20582,8 +21360,25 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.ForceDelete": {
+			"properties": {
+				"forceDelete": {
+					"type": "boolean"
+				},
+				"ids": {
+					"items": {
+						"type": "integer"
+					},
+					"type": "array"
+				}
+			},
+			"type": "object"
+		},
 		"dto.ForwardRuleOperate": {
 			"properties": {
+				"forceDelete": {
+					"type": "boolean"
+				},
 				"rules": {
 					"items": {
 						"properties": {
@@ -20781,6 +21576,55 @@ const docTemplate = `{
 			},
 			"required": [
 				"encryptionMode"
+			],
+			"type": "object"
+		},
+		"dto.GroupCreate": {
+			"properties": {
+				"id": {
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"name",
+				"type"
+			],
+			"type": "object"
+		},
+		"dto.GroupSearch": {
+			"properties": {
+				"type": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"type"
+			],
+			"type": "object"
+		},
+		"dto.GroupUpdate": {
+			"properties": {
+				"id": {
+					"type": "integer"
+				},
+				"isDefault": {
+					"type": "boolean"
+				},
+				"name": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"type"
 			],
 			"type": "object"
 		},
@@ -21703,6 +22547,89 @@ const docTemplate = `{
 			},
 			"type": "object"
 		},
+		"dto.OllamaBindDomain": {
+			"properties": {
+				"appInstallID": {
+					"type": "integer"
+				},
+				"domain": {
+					"type": "string"
+				},
+				"ipList": {
+					"type": "string"
+				},
+				"sslID": {
+					"type": "integer"
+				},
+				"websiteID": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"appInstallID",
+				"domain"
+			],
+			"type": "object"
+		},
+		"dto.OllamaBindDomainReq": {
+			"properties": {
+				"appInstallID": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"appInstallID"
+			],
+			"type": "object"
+		},
+		"dto.OllamaBindDomainRes": {
+			"properties": {
+				"acmeAccountID": {
+					"type": "integer"
+				},
+				"allowIPs": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"connUrl": {
+					"type": "string"
+				},
+				"domain": {
+					"type": "string"
+				},
+				"sslID": {
+					"type": "integer"
+				},
+				"websiteID": {
+					"type": "integer"
+				}
+			},
+			"type": "object"
+		},
+		"dto.OllamaModelDropList": {
+			"properties": {
+				"id": {
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.OllamaModelName": {
+			"properties": {
+				"name": {
+					"type": "string"
+				},
+				"taskID": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
 		"dto.Operate": {
 			"properties": {
 				"operation": {
@@ -21723,6 +22650,14 @@ const docTemplate = `{
 			"required": [
 				"id"
 			],
+			"type": "object"
+		},
+		"dto.OperateByType": {
+			"properties": {
+				"type": {
+					"type": "string"
+				}
+			},
 			"type": "object"
 		},
 		"dto.OperationWithName": {
@@ -21803,7 +22738,8 @@ const docTemplate = `{
 				"orderBy": {
 					"enum": [
 						"name",
-						"createdAt"
+						"createdAt",
+						"state"
 					],
 					"type": "string"
 				},
@@ -22599,6 +23535,12 @@ const docTemplate = `{
 				"name": {
 					"type": "string"
 				},
+				"order": {
+					"type": "string"
+				},
+				"orderBy": {
+					"type": "string"
+				},
 				"page": {
 					"type": "integer"
 				},
@@ -22775,9 +23717,6 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"snapshotIgnore": {
-					"type": "string"
-				},
-				"systemIP": {
 					"type": "string"
 				},
 				"systemVersion": {
@@ -26545,7 +27484,8 @@ const docTemplate = `{
 						"type",
 						"status",
 						"createdAt",
-						"expire_date"
+						"expire_date",
+						"created_at"
 					],
 					"type": "string"
 				},
@@ -26991,6 +27931,9 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"label": {
+					"type": "string"
+				},
+				"status": {
 					"type": "string"
 				},
 				"value": {
@@ -27581,6 +28524,9 @@ const docTemplate = `{
 					"type": "array"
 				},
 				"codeDir": {
+					"type": "string"
+				},
+				"containerStatus": {
 					"type": "string"
 				},
 				"createdAt": {

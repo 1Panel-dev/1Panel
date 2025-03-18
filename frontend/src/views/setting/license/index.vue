@@ -265,6 +265,9 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.sync'),
+        disabled: (row: any) => {
+            return row.status === 'Free';
+        },
         click: (row: any) => {
             onSync(row);
         },

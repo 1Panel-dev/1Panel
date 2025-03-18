@@ -1,20 +1,26 @@
 <template>
     <div>
-        <el-popover placement="bottom-start" :width="200" trigger="click">
-            <template #reference>
+        <el-dropdown @command="changeRefresh">
+            <el-badge
+                badge-style="background-color: transparent; font-size: 12px; border: none; color: black"
+                :offset="[-12, 7]"
+                :value="refreshRateUnit === 0 ? '' : refreshRateUnit + 's'"
+                class="item"
+            >
                 <el-button class="timer-button" icon="Clock"></el-button>
+            </el-badge>
+            <template #dropdown>
+                <el-dropdown-menu>
+                    <el-dropdown-item :command="0">{{ $t('commons.table.noRefresh') }}</el-dropdown-item>
+                    <el-dropdown-item :command="5">{{ $t('commons.table.refreshRateUnit', [5]) }}</el-dropdown-item>
+                    <el-dropdown-item :command="10">{{ $t('commons.table.refreshRateUnit', [10]) }}</el-dropdown-item>
+                    <el-dropdown-item :command="30">{{ $t('commons.table.refreshRateUnit', [30]) }}</el-dropdown-item>
+                    <el-dropdown-item :command="60">{{ $t('commons.table.refreshRateUnit', [60]) }}</el-dropdown-item>
+                    <el-dropdown-item :command="120">{{ $t('commons.table.refreshRateUnit', [120]) }}</el-dropdown-item>
+                    <el-dropdown-item :command="300">{{ $t('commons.table.refreshRateUnit', [300]) }}</el-dropdown-item>
+                </el-dropdown-menu>
             </template>
-            <el-select v-model="refreshRate" @change="changeRefresh">
-                <template #prefix>{{ $t('commons.table.refreshRate') }}</template>
-                <el-option :label="$t('commons.table.noRefresh')" :value="0"></el-option>
-                <el-option :label="$t('commons.table.refreshRateUnit', [5])" :value="5"></el-option>
-                <el-option :label="$t('commons.table.refreshRateUnit', [10])" :value="10"></el-option>
-                <el-option :label="$t('commons.table.refreshRateUnit', [30])" :value="30"></el-option>
-                <el-option :label="$t('commons.table.refreshRateUnit', [60])" :value="60"></el-option>
-                <el-option :label="$t('commons.table.refreshRateUnit', [120])" :value="120"></el-option>
-                <el-option :label="$t('commons.table.refreshRateUnit', [300])" :value="300"></el-option>
-            </el-select>
-        </el-popover>
+        </el-dropdown>
     </div>
 </template>
 
@@ -22,7 +28,7 @@
 import { onMounted, onUnmounted, ref } from 'vue';
 defineOptions({ name: 'TableSetting' });
 
-const refreshRate = ref<number>(0);
+const refreshRateUnit = ref<number>(0);
 const emit = defineEmits(['search']);
 const props = defineProps({
     title: String,
@@ -31,42 +37,43 @@ const props = defineProps({
 
 let timer: NodeJS.Timer | null = null;
 
-const changeRefresh = () => {
-    if (refreshRate.value !== 0) {
+const changeRefresh = (command: number) => {
+    refreshRateUnit.value = command || 0;
+    if (refreshRateUnit.value !== 0) {
         if (timer) {
             clearInterval(Number(timer));
             timer = null;
         }
         timer = setInterval(() => {
             emit('search');
-        }, 1000 * refreshRate.value);
+        }, 1000 * refreshRateUnit.value);
     } else {
         if (timer) {
             clearInterval(Number(timer));
             timer = null;
         }
     }
-    localStorage.setItem(props.title, refreshRate.value + '');
+    localStorage.setItem(props.title, refreshRateUnit.value + '');
 };
 
 onUnmounted(() => {
     clearInterval(Number(timer));
     timer = null;
     if (props.title) {
-        localStorage.setItem(props.title, refreshRate.value + '');
+        localStorage.setItem(props.title, refreshRateUnit.value + '');
     }
 });
 
 onMounted(() => {
     if (props.title && localStorage.getItem(props.title) != null) {
         let rate = Number(localStorage.getItem(props.title));
-        refreshRate.value = rate ? Number(rate) : 0;
-        changeRefresh();
+        refreshRateUnit.value = rate ? Number(rate) : 0;
+        changeRefresh(refreshRateUnit.value);
         return;
     }
     if (props.rate) {
-        refreshRate.value = props.rate;
-        changeRefresh();
+        refreshRateUnit.value = props.rate;
+        changeRefresh(refreshRateUnit.value);
     }
 });
 </script>
