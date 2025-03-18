@@ -31,7 +31,7 @@
                     <el-link
                         style="font-size: 12px; margin-left: 5px"
                         icon="Position"
-                        @click="goRouter('/settings/safe')"
+                        @click="jumpToPath(router, '/settings/safe')"
                         type="primary"
                     >
                         {{ $t('firewall.quickJump') }}
@@ -49,19 +49,23 @@
                                 <el-col :span="6">
                                     <span>{{ $t('menu.website') }}</span>
                                     <div class="count">
-                                        <span @click="goRouter('/websites')">{{ baseInfo?.websiteNumber }}</span>
+                                        <span @click="jumpToPath(router, '/websites')">
+                                            {{ baseInfo?.websiteNumber }}
+                                        </span>
                                     </div>
                                 </el-col>
                                 <el-col :span="6">
                                     <span>{{ $t('menu.database') }} - {{ $t('commons.table.all') }}</span>
                                     <div class="count">
-                                        <span @click="goRouter('/databases')">{{ baseInfo?.databaseNumber }}</span>
+                                        <span @click="jumpToPath(router, '/databases')">
+                                            {{ baseInfo?.databaseNumber }}
+                                        </span>
                                     </div>
                                 </el-col>
                                 <el-col :span="6">
                                     <span>{{ $t('menu.cronjob') }}</span>
                                     <div class="count">
-                                        <span @click="goRouter('/cronjobs')">
+                                        <span @click="jumpToPath(router, '/cronjobs')">
                                             {{ baseInfo?.cronjobNumber }}
                                         </span>
                                     </div>
@@ -69,7 +73,7 @@
                                 <el-col :span="6">
                                     <span>{{ $t('home.appInstalled') }}</span>
                                     <div class="count">
-                                        <span @click="goRouter('/apps/installed')">
+                                        <span @click="jumpToPath(router, '/apps/installed')">
                                             {{ baseInfo?.appInstalledNumber }}
                                         </span>
                                     </div>
@@ -266,7 +270,7 @@ import LicenseImport from '@/components/license-import/index.vue';
 import CardWithHeader from '@/components/card-with-header/index.vue';
 import i18n from '@/lang';
 import { Dashboard } from '@/api/interface/dashboard';
-import { dateFormatForSecond, computeSize, computeSizeFromKBs, loadUpTime } from '@/utils/util';
+import { dateFormatForSecond, computeSize, computeSizeFromKBs, loadUpTime, jumpToPath } from '@/utils/util';
 import { useRouter } from 'vue-router';
 import { loadBaseInfo, loadCurrentInfo } from '@/api/modules/dashboard';
 import { getIOOptions, getNetworkOptions } from '@/api/modules/host';
@@ -380,10 +384,6 @@ const chartsOption = ref({ ioChart1: null, networkChart: null });
 const changeOption = async () => {
     isInit.value = true;
     loadData();
-};
-
-const goRouter = async (path: string) => {
-    router.push({ path: path });
 };
 
 const onLoadNetworkOptions = async () => {

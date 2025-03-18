@@ -88,7 +88,6 @@
                     >
                         <el-input v-model.trim="account.authorization['apiKey']"></el-input>
                     </el-form-item>
-
                     <el-form-item label="API User" prop="authorization.apiUser" v-if="account.type === 'NameCheap'">
                         <el-input v-model.trim="account.authorization['apiUser']"></el-input>
                     </el-form-item>
@@ -99,6 +98,11 @@
                         <el-form-item label="Username" prop="authorization.apiUser">
                             <el-input v-model.trim="account.authorization['apiUser']"></el-input>
                         </el-form-item>
+                        <el-form-item label="Token" prop="authorization.token">
+                            <el-input v-model.trim="account.authorization['token']"></el-input>
+                        </el-form-item>
+                    </div>
+                    <div v-if="account.type === 'FreeMyIP'">
                         <el-form-item label="Token" prop="authorization.token">
                             <el-input v-model.trim="account.authorization['token']"></el-input>
                         </el-form-item>

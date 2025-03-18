@@ -74,7 +74,12 @@
                         <template #title>
                             <span class="flx-align-center">
                                 {{ $t('app.installHelper') }}
-                                <el-link class="ml-5" icon="Position" @click="quickJump()" type="primary">
+                                <el-link
+                                    class="ml-5"
+                                    icon="Position"
+                                    @click="jumpToPath(router, '/containers/setting')"
+                                    type="primary"
+                                >
                                     {{ $t('firewall.quickJump') }}
                                 </el-link>
                                 　
@@ -103,6 +108,7 @@
                                         <el-col :xs="3" :sm="3" :md="3" :lg="4" :xl="4">
                                             <div class="icon">
                                                 <el-avatar
+                                                    @click="openDetail(installed.appKey)"
                                                     shape="square"
                                                     :size="66"
                                                     :src="'data:image/png;base64,' + installed.icon"
@@ -257,7 +263,7 @@
                                                         placement="top-start"
                                                         trigger="hover"
                                                         v-if="installed.appType == 'website'"
-                                                        :width="260"
+                                                        :width="400"
                                                     >
                                                         <template #reference>
                                                             <el-button plain icon="Promotion" size="small">
@@ -358,6 +364,7 @@
     <AppIgnore ref="ignoreRef" @close="search" />
     <ComposeLogs ref="composeLogRef" />
     <TaskLog ref="taskLogRef" />
+    <Detail ref="detailRef" />
 </template>
 
 <script lang="ts" setup>
@@ -383,11 +390,12 @@ import AppIgnore from './ignore/index.vue';
 import ComposeLogs from '@/components/log/compose/index.vue';
 import { App } from '@/api/interface/app';
 import Status from '@/components/status/index.vue';
-import { getAge } from '@/utils/util';
+import { getAge, jumpToPath, toLink } from '@/utils/util';
 import { useRouter } from 'vue-router';
 import { MsgSuccess } from '@/utils/message';
 import { toFolder } from '@/global/business';
 import TaskLog from '@/components/log/task/index.vue';
+import Detail from '@/views/app-store/detail/index.vue';
 
 const data = ref<any>();
 const loading = ref(false);
@@ -430,6 +438,7 @@ const activeName = ref(i18n.global.t('app.installed'));
 const mode = ref('installed');
 const moreTag = ref('');
 const defaultLink = ref('');
+const detailRef = ref();
 
 const options = {
     modifiers: [
@@ -441,6 +450,10 @@ const options = {
             },
         },
     ],
+};
+
+const openDetail = (key: string) => {
+    detailRef.value.acceptParams(key, 'install');
 };
 
 const sync = () => {
@@ -678,10 +691,6 @@ const isAppErr = (row: any) => {
     return row.status.includes('Err') || row.status.includes('Error') || row.status.includes('UnHealthy');
 };
 
-const quickJump = () => {
-    router.push({ name: 'ContainerSetting' });
-};
-
 const openLog = (row: any) => {
     switch (row.status) {
         case 'Installing':
@@ -690,10 +699,6 @@ const openLog = (row: any) => {
         default:
             composeLogRef.value.acceptParams({ compose: row.path + '/docker-compose.yml', resource: row.name });
     }
-};
-
-const toLink = (link: string) => {
-    window.open(link, '_blank');
 };
 
 const getConfig = async () => {

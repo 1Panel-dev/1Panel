@@ -2,7 +2,7 @@
     <div>
         <DialogPro v-model="open" :title="$t('app.checkTitle')" size="small">
             <el-alert :closable="false" :title="$t('setting.systemIPWarning')" type="info">
-                <el-link icon="Position" @click="goRouter('/settings/panel')" type="primary">
+                <el-link icon="Position" @click="jumpToPath(router, '/settings/panel')" type="primary">
                     {{ $t('firewall.quickJump') }}
                 </el-link>
             </el-alert>
@@ -19,6 +19,7 @@ import { ref } from 'vue';
 import { getSettingInfo } from '@/api/modules/setting';
 import i18n from '@/lang';
 import { MsgError, MsgWarning } from '@/utils/message';
+import { jumpToPath } from '@/utils/util';
 import { useRouter } from 'vue-router';
 const router = useRouter();
 
@@ -54,10 +55,6 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
         }
         window.open(`${protocol}://[${res.data.systemIP}]:${params.port}`, '_blank');
     }
-};
-
-const goRouter = async (path: string) => {
-    router.push({ path: path });
 };
 
 defineExpose({ acceptParams });

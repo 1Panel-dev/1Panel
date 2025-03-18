@@ -4,6 +4,7 @@ import (
 	"crypto"
 	"encoding/json"
 	"github.com/go-acme/lego/v4/providers/dns/clouddns"
+	"github.com/go-acme/lego/v4/providers/dns/freemyip"
 	"github.com/go-acme/lego/v4/providers/dns/huaweicloud"
 	"github.com/go-acme/lego/v4/providers/dns/rainyun"
 	"github.com/go-acme/lego/v4/providers/dns/volcengine"
@@ -80,6 +81,7 @@ const (
 	RainYun      DnsType = "RainYun"
 	Volcengine   DnsType = "Volcengine"
 	HuaweiCloud  DnsType = "HuaweiCloud"
+	FreeMyIP     DnsType = "FreeMyIP"
 )
 
 type DNSParam struct {
@@ -211,6 +213,12 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string, websiteSSL model.Web
 		huaweiCloudConfig.PollingInterval = pollingInterval
 		huaweiCloudConfig.TTL = int32(ttl)
 		p, err = huaweicloud.NewDNSProviderConfig(huaweiCloudConfig)
+	case FreeMyIP:
+		freeMyIpConfig := freemyip.NewDefaultConfig()
+		freeMyIpConfig.Token = param.Token
+		freeMyIpConfig.PropagationTimeout = propagationTimeout
+		freeMyIpConfig.PollingInterval = pollingInterval
+		p, err = freemyip.NewDNSProviderConfig(freeMyIpConfig)
 	}
 	if err != nil {
 		return err

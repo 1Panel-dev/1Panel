@@ -24,7 +24,7 @@
                         </el-button>
                     </div>
                     <div class="inline">
-                        <el-dropdown>
+                        <el-dropdown v-if="tags.length > 7">
                             <el-button
                                 class="tag-button"
                                 :type="moreTag !== '' ? 'primary' : ''"

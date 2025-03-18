@@ -251,9 +251,7 @@ const checkTask = async () => {
     try {
         const res = await countExecutingTask();
         taskCount.value = res.data;
-    } catch (error) {
-        console.error(error);
-    }
+    } catch (error) {}
 };
 
 const openTask = () => {

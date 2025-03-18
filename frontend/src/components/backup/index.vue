@@ -162,7 +162,6 @@ const acceptParams = (params: DialogProps): void => {
     detailName.value = params.detailName;
     backupVisible.value = true;
     status.value = params.status;
-    console.log(type);
     search();
 };
 const handleClose = () => {

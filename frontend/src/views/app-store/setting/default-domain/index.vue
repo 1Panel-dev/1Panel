@@ -47,7 +47,7 @@ interface DialogProps {
 
 const acceptParams = (config: DialogProps): void => {
     form.defaultDomain = config.domain;
-    protocol.value;
+    protocol.value = config.protocol;
     drawerVisible.value = true;
 };
 

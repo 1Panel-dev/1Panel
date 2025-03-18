@@ -208,6 +208,10 @@ export const DNSTypes = [
         value: 'Godaddy',
     },
     {
+        label: 'FreeMyIP',
+        value: 'FreeMyIP',
+    },
+    {
         label: i18n.global.t('website.rainyun'),
         value: 'RainYun',
     },

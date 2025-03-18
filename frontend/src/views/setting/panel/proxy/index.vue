@@ -221,7 +221,6 @@ const onSubmit = async () => {
         handleClose();
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     } catch (error) {
-        console.error(error);
     } finally {
         loading.value = false;
     }

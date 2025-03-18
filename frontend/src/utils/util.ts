@@ -776,3 +776,23 @@ export async function loadJson(lang: string): Promise<Object> {
         throw new Error(`Language file not found: ${lang}`);
     }
 }
+
+export const jumpToPath = (router: any, path: string) => {
+    router.push({ path: path, query: { uncached: 'true' } });
+};
+
+export const toLink = (link: string) => {
+    const ipv6Regex = /^https?:\/\/([a-f0-9:]+):(\d+)(\/?.*)?$/i;
+    try {
+        if (ipv6Regex.test(link)) {
+            const match = link.match(ipv6Regex);
+            if (match) {
+                const ipv6 = match[1];
+                const port = match[2];
+                const path = match[3] || '';
+                link = `${link.startsWith('https') ? 'https' : 'http'}://[${ipv6}]:${port}${path}`;
+            }
+        }
+        window.open(link, '_blank');
+    } catch (e) {}
+};
