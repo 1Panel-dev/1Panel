@@ -186,3 +186,22 @@ func incIP(ip net.IP) {
 		}
 	}
 }
+
+func HandleIPList(content string) ([]string, error) {
+	ipList := strings.Split(content, "\n")
+	var res []string
+	for _, ip := range ipList {
+		if ip == "" {
+			continue
+		}
+		if net.ParseIP(ip) != nil {
+			res = append(res, ip)
+			continue
+		}
+		if _, _, err := net.ParseCIDR(ip); err != nil {
+			return nil, err
+		}
+		res = append(res, ip)
+	}
+	return res, nil
+}

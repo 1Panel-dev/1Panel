@@ -401,7 +401,7 @@ export function checkCidrV6(value: string): boolean {
     if (checkIpV6(value.split('/')[0])) {
         return true;
     }
-    const reg = /^(?:[1-9]|[1-9][0-9]|1[0-1][0-9]|12[0-8])$/;
+    const reg = /^(?:[0-9]|[1-9][0-9]|1[0-1][0-9]|12[0-8])$/;
     if (!reg.test(value.split('/')[1])) {
         return true;
     }

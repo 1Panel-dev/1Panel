@@ -75,7 +75,7 @@ import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox, FormInstance } from 'element-plus';
-import { checkCidr, checkIp } from '@/utils/util';
+import { checkCidr, checkCidrV6, checkIpV4V6 } from '@/utils/util';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
 
@@ -146,10 +146,14 @@ function checkIPs(rule: any, value: any, callback: any) {
                 continue;
             }
             if (item.indexOf('/') !== -1) {
-                if (checkCidr(item)) {
+                if (item.indexOf(':') !== -1) {
+                    if (checkCidrV6(item)) {
+                        return callback(new Error(i18n.global.t('firewall.addressFormatError')));
+                    }
+                } else if (checkCidr(item)) {
                     return callback(new Error(i18n.global.t('firewall.addressFormatError')));
                 }
-            } else if (checkIp(item)) {
+            } else if (checkIpV4V6(item)) {
                 return callback(new Error(i18n.global.t('firewall.addressFormatError')));
             }
         }

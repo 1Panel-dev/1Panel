@@ -410,7 +410,7 @@ func (b *BaseApi) ContainerOperation(c *gin.Context) {
 
 // @Tags Container
 // @Summary Container stats
-// @Param id path integer true "容器id"
+// @Param id path string true "容器id"
 // @Success 200 {object} dto.ContainerStats
 // @Security ApiKeyAuth
 // @Security Timestamp

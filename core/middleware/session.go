@@ -12,6 +12,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
+	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/gin-gonic/gin"
 )
 
@@ -77,18 +78,25 @@ func SessionAuth() gin.HandlerFunc {
 func isValid1PanelTimestamp(panelTimestamp string) bool {
 	apiKeyValidityTime := global.Api.ApiKeyValidityTime
 	apiTime, err := strconv.Atoi(apiKeyValidityTime)
-	if err != nil {
+	if err != nil || apiTime < 0 {
+		global.LOG.Errorf("apiTime %d, err: %v", apiTime, err)
 		return false
+	}
+	if apiTime == 0 {
+		return true
 	}
 	panelTime, err := strconv.ParseInt(panelTimestamp, 10, 64)
 	if err != nil {
+		global.LOG.Errorf("panelTimestamp %s, panelTime %d, apiTime %d, err: %v", panelTimestamp, apiTime, panelTime, err)
 		return false
 	}
 	nowTime := time.Now().Unix()
-	if panelTime > nowTime {
+	tolerance := int64(60)
+	if panelTime > nowTime+tolerance {
+		global.LOG.Errorf("Valid Panel Timestamp, apiTime %d, panelTime %d, nowTime %d, err: %v", apiTime, panelTime, nowTime, err)
 		return false
 	}
-	return apiTime == 0 || nowTime-panelTime <= int64(apiTime*60)
+	return nowTime-panelTime <= int64(apiTime)*60+tolerance
 }
 
 func isValid1PanelToken(panelToken string, panelTimestamp string) bool {
@@ -98,27 +106,38 @@ func isValid1PanelToken(panelToken string, panelTimestamp string) bool {
 
 func isIPInWhiteList(clientIP string) bool {
 	ipWhiteString := global.Api.IpWhiteList
-	ipWhiteList := strings.Split(ipWhiteString, "\n")
+	if len(ipWhiteString) == 0 {
+		global.LOG.Error("IP whitelist is empty")
+		return false
+	}
+	ipWhiteList, ipErr := common.HandleIPList(ipWhiteString)
+	if ipErr != nil {
+		global.LOG.Errorf("Failed to handle IP list: %v", ipErr)
+		return false
+	}
+	clientParsedIP := net.ParseIP(clientIP)
+	if clientParsedIP == nil {
+		return false
+	}
+	iPv4 := clientParsedIP.To4()
+	iPv6 := clientParsedIP.To16()
 	for _, cidr := range ipWhiteList {
-		if cidr == "0.0.0.0" {
+		if (iPv4 != nil && (cidr == "0.0.0.0" || cidr == "0.0.0.0/0" || iPv4.String() == cidr)) || (iPv6 != nil && (cidr == "::/0" || iPv6.String() == cidr)) {
 			return true
 		}
 		_, ipNet, err := net.ParseCIDR(cidr)
 		if err != nil {
-			if cidr == clientIP {
-				return true
-			}
 			continue
 		}
-		if ipNet.Contains(net.ParseIP(clientIP)) {
+		if (iPv4 != nil && ipNet.Contains(iPv4)) || (iPv6 != nil && ipNet.Contains(iPv6)) {
 			return true
 		}
 	}
 	return false
 }
 
-func GenerateMD5(input string) string {
+func GenerateMD5(param string) string {
 	hash := md5.New()
-	hash.Write([]byte(input))
+	hash.Write([]byte(param))
 	return hex.EncodeToString(hash.Sum(nil))
 }
