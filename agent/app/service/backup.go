@@ -244,6 +244,7 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 		if err := changeLocalBackup(backup.BackupPath, newBackup.BackupPath); err != nil {
 			return err
 		}
+		global.Dir.LocalBackupDir = newBackup.BackupPath
 	}
 
 	if newBackup.Type == constant.OneDrive || newBackup.Type == constant.GoogleDrive {
@@ -256,16 +257,16 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 		if err != nil || !isOk {
 			return buserr.WithMap("ErrBackupCheck", map[string]interface{}{"err": err.Error()}, err)
 		}
+		newBackup.AccessKey, err = encrypt.StringEncrypt(newBackup.AccessKey)
+		if err != nil {
+			return err
+		}
+		newBackup.Credential, err = encrypt.StringEncrypt(newBackup.Credential)
+		if err != nil {
+			return err
+		}
 	}
 
-	newBackup.AccessKey, err = encrypt.StringEncrypt(newBackup.AccessKey)
-	if err != nil {
-		return err
-	}
-	newBackup.Credential, err = encrypt.StringEncrypt(newBackup.Credential)
-	if err != nil {
-		return err
-	}
 	newBackup.ID = backup.ID
 	newBackup.CreatedAt = backup.CreatedAt
 	newBackup.UpdatedAt = backup.UpdatedAt
@@ -546,34 +547,40 @@ func loadBackupNamesByID(accountIDs string, downloadID uint) ([]string, string, 
 func changeLocalBackup(oldPath, newPath string) error {
 	fileOp := files.NewFileOp()
 	if fileOp.Stat(path.Join(oldPath, "app")) {
-		if err := fileOp.Mv(path.Join(oldPath, "app"), newPath); err != nil {
+		if err := fileOp.CopyDir(path.Join(oldPath, "app"), newPath); err != nil {
 			return err
 		}
 	}
 	if fileOp.Stat(path.Join(oldPath, "database")) {
-		if err := fileOp.Mv(path.Join(oldPath, "database"), newPath); err != nil {
+		if err := fileOp.CopyDir(path.Join(oldPath, "database"), newPath); err != nil {
 			return err
 		}
 	}
 	if fileOp.Stat(path.Join(oldPath, "directory")) {
-		if err := fileOp.Mv(path.Join(oldPath, "directory"), newPath); err != nil {
+		if err := fileOp.CopyDir(path.Join(oldPath, "directory"), newPath); err != nil {
 			return err
 		}
 	}
 	if fileOp.Stat(path.Join(oldPath, "system_snapshot")) {
-		if err := fileOp.Mv(path.Join(oldPath, "system_snapshot"), newPath); err != nil {
+		if err := fileOp.CopyDir(path.Join(oldPath, "system_snapshot"), newPath); err != nil {
 			return err
 		}
 	}
 	if fileOp.Stat(path.Join(oldPath, "website")) {
-		if err := fileOp.Mv(path.Join(oldPath, "website"), newPath); err != nil {
+		if err := fileOp.CopyDir(path.Join(oldPath, "website"), newPath); err != nil {
 			return err
 		}
 	}
 	if fileOp.Stat(path.Join(oldPath, "log")) {
-		if err := fileOp.Mv(path.Join(oldPath, "log"), newPath); err != nil {
+		if err := fileOp.CopyDir(path.Join(oldPath, "log"), newPath); err != nil {
 			return err
 		}
 	}
+	_ = fileOp.RmRf(path.Join(oldPath, "app"))
+	_ = fileOp.RmRf(path.Join(oldPath, "database"))
+	_ = fileOp.RmRf(path.Join(oldPath, "directory"))
+	_ = fileOp.RmRf(path.Join(oldPath, "system_snapshot"))
+	_ = fileOp.RmRf(path.Join(oldPath, "website"))
+	_ = fileOp.RmRf(path.Join(oldPath, "log"))
 	return nil
 }

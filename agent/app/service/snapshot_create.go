@@ -373,12 +373,10 @@ func loadBackupExcludes(snap snapHelper, req []dto.DataTree) []string {
 				continue
 			}
 			if strings.HasPrefix(item.Path, path.Join(global.Dir.LocalBackupDir, "system_snapshot")) {
-				fmt.Println(strings.TrimSuffix(item.Name, ".tar.gz"))
 				if err := snap.snapAgentDB.Where("name = ? AND download_account_id = ?", strings.TrimSuffix(item.Name, ".tar.gz"), "1").Delete(&model.Snapshot{}).Error; err != nil {
 					snap.Task.LogWithStatus("delete snapshot from database", err)
 				}
 			} else {
-				fmt.Println(strings.TrimPrefix(path.Dir(item.Path), global.Dir.LocalBackupDir+"/"), path.Base(item.Path))
 				if err := snap.snapAgentDB.Where("file_dir = ? AND file_name = ?", strings.TrimPrefix(path.Dir(item.Path), global.Dir.LocalBackupDir+"/"), path.Base(item.Path)).Delete(&model.BackupRecord{}).Error; err != nil {
 					snap.Task.LogWithStatus("delete backup file from database", err)
 				}
