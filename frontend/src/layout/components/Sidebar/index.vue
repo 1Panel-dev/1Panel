@@ -11,7 +11,7 @@
         </div>
         <Logo :isCollapse="isCollapse" />
         <div class="el-dropdown-link flex justify-between items-center background">
-            <el-button link class="ml-4" @click="openChangeNode" @mouseenter="openChangeNode">
+            <el-button link @click="openChangeNode" @mouseenter="openChangeNode">
                 {{ loadCurrentName() }}
             </el-button>
             <div>
@@ -43,7 +43,9 @@
                     </template>
                 </el-dropdown>
             </div>
-            <el-tag type="danger" size="small" effect="light" class="mr-2" @click="openTask">{{ taskCount }}</el-tag>
+            <el-tag v-if="!isCollapse" type="danger" size="small" effect="light" class="mr-2" @click="openTask">
+                {{ taskCount }}
+            </el-tag>
         </div>
         <el-scrollbar>
             <el-menu

@@ -83,6 +83,7 @@ const message = {
             sync: 'Синхронизировать',
             up: 'Запустить',
             down: 'Остановить',
+            delete: 'Удалить',
         },
         search: {
             timeStart: 'Время начала',

@@ -83,6 +83,7 @@ const message = {
             sync: 'Segerakkan',
             up: 'Naik',
             down: 'Turun',
+            delete: 'Padam',
         },
         search: {
             timeStart: 'Masa mula',

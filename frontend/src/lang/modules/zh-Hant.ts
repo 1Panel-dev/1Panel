@@ -86,6 +86,7 @@ const message = {
             sync: '同步',
             up: '啟動',
             down: '停止',
+            delete: '刪除',
         },
         search: {
             timeStart: '開始時間',

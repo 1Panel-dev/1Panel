@@ -433,6 +433,11 @@ func handleProcessConfig(configDir, containerName string) ([]response.Supervisor
 
 func (h *HostToolService) GetSupervisorProcessConfig() ([]response.SupervisorProcessConfig, error) {
 	configDir := path.Join(global.Dir.DataDir, "tools", "supervisord", "supervisor.d")
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(configDir) {
+		_ = fileOp.CreateDir(configDir, constant.DirPerm)
+		return []response.SupervisorProcessConfig{}, nil
+	}
 	return handleProcessConfig(configDir, "")
 }
 

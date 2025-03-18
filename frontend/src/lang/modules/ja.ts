@@ -83,6 +83,7 @@ const message = {
             sync: '同期',
             up: '起動',
             down: '停止',
+            delete: '削除',
         },
         search: {
             timeStart: '時間開始',

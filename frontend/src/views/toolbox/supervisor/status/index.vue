@@ -108,8 +108,8 @@ const onOperate = async (operation: string) => {
     em('update:maskShow', false);
     operateReq.operate = operation;
     ElMessageBox.confirm(
-        i18n.global.t('tool.supervisor.operatorHelper', ['Supervisor', i18n.global.t('app.' + operation)]),
-        i18n.global.t('app.' + operation),
+        i18n.global.t('tool.supervisor.operatorHelper', ['Supervisor', i18n.global.t('commons.operate.' + operation)]),
+        i18n.global.t('commons.operate.' + operation),
         {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
             cancelButtonText: i18n.global.t('commons.button.cancel'),

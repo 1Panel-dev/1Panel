@@ -83,6 +83,7 @@ const message = {
             sync: '동기화',
             up: '실행',
             down: '중지',
+            delete: '삭제',
         },
         search: {
             timeStart: '시작 시간',

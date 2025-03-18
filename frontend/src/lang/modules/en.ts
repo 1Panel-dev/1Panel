@@ -86,6 +86,7 @@ const message = {
             sync: 'Sync',
             up: 'Up',
             down: 'Down',
+            delete: 'Delete',
         },
         search: {
             timeStart: 'Time start',
