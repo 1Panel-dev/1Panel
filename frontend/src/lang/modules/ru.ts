@@ -113,8 +113,7 @@ const message = {
             refreshRate: 'Частота обновления',
             refreshRateUnit: 'Без обновления | {n} секунда/раз | {n} секунд/раз',
             selectColumn: 'Выбрать столбец',
-            cover: 'Заменить',
-            skip: 'Пропустить',
+            serialNumber: 'Серийный номер',
         },
         loadingText: {
             Upgrading: 'Обновление системы, пожалуйста, подождите...',

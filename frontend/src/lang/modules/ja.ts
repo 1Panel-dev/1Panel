@@ -74,7 +74,7 @@ const message = {
             createNewFile: '新しいファイルを作成します',
             helpDoc: '文書をヘルプします',
             unbind: 'バインド',
-            cover: '上書き',
+            cover: 'に覆いを',
             skip: 'スキップ',
         },
         search: {
