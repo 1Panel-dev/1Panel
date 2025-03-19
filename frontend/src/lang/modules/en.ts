@@ -1290,6 +1290,7 @@ const message = {
             databases: 'Database',
             licenses: 'License',
             nodes: 'Node',
+            commands: 'Quick Commands',
         },
         websiteLog: 'Website Logs',
         runLog: 'Run Log',

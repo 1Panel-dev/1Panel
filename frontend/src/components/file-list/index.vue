@@ -13,11 +13,11 @@
         <div>
             <el-button class="close" link @click="closePage" icon="Close"></el-button>
             <div>
-                <el-button type="text" icon="HomeFilled" @click="jump(-1)"></el-button>
-                <el-button v-if="paths.length > 0" type="text" @click="jump(0)">/{{ paths[0] }}</el-button>
+                <el-button link icon="HomeFilled" @click="jump(-1)"></el-button>
+                <el-button v-if="paths.length > 0" link @click="jump(0)">/{{ paths[0] }}</el-button>
                 <el-popover v-if="paths.length > 2" placement="bottom" trigger="hover">
                     <template #reference>
-                        <el-button type="text">...</el-button>
+                        <el-button link>...</el-button>
                     </template>
                     <div class="hidden-paths">
                         <div v-for="(item, index) in paths.slice(1, -1)" :key="index">
@@ -26,7 +26,7 @@
                         </div>
                     </div>
                 </el-popover>
-                <el-button v-if="paths.length > 1" type="text" @click="jump(paths.length - 1)">
+                <el-button v-if="paths.length > 1" link @click="jump(paths.length - 1)">
                     /{{ paths[paths.length - 1] }}
                 </el-button>
             </div>

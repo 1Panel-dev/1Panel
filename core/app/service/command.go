@@ -14,7 +14,7 @@ type ICommandService interface {
 	List(req dto.OperateByType) ([]dto.CommandInfo, error)
 	SearchForTree(req dto.OperateByType) ([]dto.CommandTree, error)
 	SearchWithPage(search dto.SearchCommandWithPage) (int64, interface{}, error)
-	Create(commandDto dto.CommandOperate) error
+	Create(req dto.CommandOperate) error
 	Update(id uint, upMap map[string]interface{}) error
 	Delete(ids []uint) error
 }
@@ -98,12 +98,12 @@ func (u *CommandService) SearchWithPage(req dto.SearchCommandWithPage) (int64, i
 	return total, dtoCommands, err
 }
 
-func (u *CommandService) Create(commandDto dto.CommandOperate) error {
-	command, _ := commandRepo.Get(repo.WithByName(commandDto.Name))
+func (u *CommandService) Create(req dto.CommandOperate) error {
+	command, _ := commandRepo.Get(repo.WithByName(req.Name), repo.WithByType(req.Type))
 	if command.ID != 0 {
 		return buserr.New("ErrRecordExist")
 	}
-	if err := copier.Copy(&command, &commandDto); err != nil {
+	if err := copier.Copy(&command, &req); err != nil {
 		return buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 	}
 	if err := commandRepo.Create(&command); err != nil {

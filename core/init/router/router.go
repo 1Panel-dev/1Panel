@@ -218,6 +218,9 @@ func Routers() *gin.Engine {
 	if global.CONF.Base.IsDemo {
 		Router.Use(middleware.DemoHandle())
 	}
+	Router.Use(middleware.JwtAuth())
+	Router.Use(middleware.SessionAuth())
+	Router.Use(middleware.PasswordExpired())
 	Router.Use(middleware.GlobalLoading())
 	Router.Use(Proxy())
 

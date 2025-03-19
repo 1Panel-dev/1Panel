@@ -54,6 +54,10 @@
                     </div>
                 </el-select>
             </el-form-item>
+            <el-form-item :label="$t('commons.table.title')" prop="name">
+                <el-tag v-if="isLocal">local</el-tag>
+                <el-input v-else clearable v-model="hostInfo.name" />
+            </el-form-item>
             <el-form-item :label="$t('commons.table.description')" prop="description">
                 <el-input clearable v-model="hostInfo.description" />
             </el-form-item>
@@ -112,7 +116,14 @@ const rules = reactive({
     authMode: [Rules.requiredSelect],
     password: [Rules.requiredInput],
     privateKey: [Rules.requiredInput],
+    name: [{ validator: checkName, trigger: 'blur' }],
 });
+function checkName(rule: any, value: any, callback: any) {
+    if (value === 'local' && !isLocal.value) {
+        return callback(new Error(i18n.global.t('terminal.localHelper')));
+    }
+    callback();
+}
 
 const isLocal = ref(false);
 interface DialogProps {
@@ -166,7 +177,7 @@ const loadLocal = async () => {
 
 const setDefault = () => {
     hostInfo.addr = '';
-    hostInfo.name = 'local';
+    hostInfo.name = '';
     hostInfo.groupID = defaultGroup.value;
     hostInfo.port = 22;
     hostInfo.user = '';
@@ -204,7 +215,7 @@ const submitAddHost = (formEl: FormInstance | undefined, ops: string) => {
                 if (res.data.name.length !== 0) {
                     title = res.data.name + '-' + title;
                 }
-                let isLocal = hostInfo.addr === '127.0.0.1';
+                let isLocal = hostInfo.name === 'local';
                 emit('on-conn-terminal', title, res.data.id, isLocal);
                 emit('load-host-tree');
                 break;

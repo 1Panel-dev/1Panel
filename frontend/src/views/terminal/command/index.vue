@@ -5,7 +5,7 @@
                 <el-alert type="info" :title="$t('terminal.quickCommandHelper')" :closable="false" />
             </template>
             <template #leftToolBar>
-                <el-button type="primary" @click="onCreate()">
+                <el-button type="primary" @click="onOpenDialog('create')">
                     {{ $t('commons.button.create') }}{{ $t('terminal.quickCommand') }}
                 </el-button>
                 <el-button type="primary" plain @click="onOpenGroupDialog()">
@@ -28,6 +28,7 @@
                     </div>
                 </el-select>
                 <TableSearch @search="search()" v-model:searchName="info" />
+                <TableRefresh @search="search()" />
             </template>
             <template #main>
                 <ComplexTable
@@ -81,50 +82,9 @@
                 </ComplexTable>
             </template>
         </LayoutContent>
-        <DrawerPro
-            v-model="cmdVisible"
-            :header="$t('commons.button.' + operate) + $t('terminal.quickCommand')"
-            @close="handleClose"
-            size="small"
-        >
-            <el-form
-                @submit.prevent
-                ref="commandInfoRef"
-                label-width="100px"
-                label-position="top"
-                :model="commandInfo"
-                :rules="rules"
-            >
-                <el-form-item :label="$t('commons.table.name')" prop="name">
-                    <el-input clearable v-model="commandInfo.name" />
-                </el-form-item>
-                <el-form-item :label="$t('commons.table.group')" prop="name">
-                    <el-select filterable v-model="commandInfo.groupID" clearable style="width: 100%">
-                        <div v-for="item in groupList" :key="item.id">
-                            <el-option
-                                v-if="item.name === 'Default'"
-                                :label="$t('commons.table.default')"
-                                :value="item.id"
-                            />
-                            <el-option v-else :label="item.name" :value="item.id" />
-                        </div>
-                    </el-select>
-                </el-form-item>
-                <el-form-item :label="$t('terminal.command')" prop="command">
-                    <el-input type="textarea" clearable v-model="commandInfo.command" />
-                </el-form-item>
-            </el-form>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="cmdVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button type="primary" @click="submitAddCommand(commandInfoRef)">
-                        {{ $t('commons.button.confirm') }}
-                    </el-button>
-                </span>
-            </template>
-        </DrawerPro>
 
         <OpDialog ref="opRef" @search="search" />
+        <OperateDialog @search="search" ref="dialogRef" />
         <GroupDialog @search="loadGroups" ref="dialogGroupRef" />
     </div>
 </template>
@@ -132,10 +92,9 @@
 <script setup lang="ts">
 import { Command } from '@/api/interface/command';
 import GroupDialog from '@/components/group/index.vue';
-import { addCommand, editCommand, deleteCommand, getCommandPage } from '@/api/modules/command';
+import OperateDialog from '@/views/terminal/command/operate/index.vue';
+import { editCommand, deleteCommand, getCommandPage } from '@/api/modules/command';
 import { reactive, ref } from 'vue';
-import type { ElForm } from 'element-plus';
-import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { getGroupList } from '@/api/modules/group';
@@ -154,75 +113,35 @@ const paginationConfig = reactive({
 });
 const info = ref();
 const group = ref<string>('');
-
+const dialogRef = ref();
 const opRef = ref();
-
-type FormInstance = InstanceType<typeof ElForm>;
-const commandInfoRef = ref<FormInstance>();
-const rules = reactive({
-    name: [Rules.requiredInput],
-    command: [Rules.requiredInput],
-});
-let operate = ref<string>('create');
 
 const acceptParams = () => {
     search();
     loadGroups();
 };
 
-const defaultGroupID = ref();
-let commandInfo = reactive<Command.CommandOperate>({
-    id: 0,
-    type: 'command',
-    name: '',
-    groupID: 0,
-    command: '',
-});
-
-const cmdVisible = ref<boolean>(false);
-
 const loadGroups = async () => {
     const res = await getGroupList('command');
-    groupList.value = res.data;
-    for (const group of groupList.value) {
-        if (group.isDefault) {
-            defaultGroupID.value = group.id;
-            break;
-        }
-    }
+    groupList.value = res.data || [];
 };
 
-const onCreate = async () => {
-    commandInfo.id = 0;
-    commandInfo.name = '';
-    commandInfo.command = '';
-    commandInfo.groupID = defaultGroupID.value;
-    operate.value = 'create';
-    cmdVisible.value = true;
-};
-
-const handleClose = () => {
-    cmdVisible.value = false;
+const onOpenDialog = async (
+    title: string,
+    rowData: Partial<Command.CommandInfo> = {
+        type: 'command',
+    },
+) => {
+    let params = {
+        title,
+        rowData: { ...rowData },
+    };
+    dialogRef.value!.acceptParams(params);
 };
 
 const dialogGroupRef = ref();
 const onOpenGroupDialog = () => {
     dialogGroupRef.value!.acceptParams({ type: 'command' });
-};
-
-const submitAddCommand = (formEl: FormInstance | undefined) => {
-    if (!formEl) return;
-    formEl.validate(async (valid) => {
-        if (!valid) return;
-        if (operate.value === 'create') {
-            await addCommand(commandInfo);
-        } else {
-            await editCommand(commandInfo);
-        }
-        cmdVisible.value = false;
-        search();
-        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-    });
 };
 
 const updateGroup = async (row: any) => {
@@ -260,9 +179,7 @@ const buttons = [
         label: i18n.global.t('commons.button.edit'),
         icon: 'Edit',
         click: (row: any) => {
-            commandInfo = row;
-            operate.value = 'edit';
-            cmdVisible.value = true;
+            onOpenDialog('edit', row);
         },
     },
     {

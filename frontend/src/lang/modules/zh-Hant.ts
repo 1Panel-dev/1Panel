@@ -1219,6 +1219,7 @@ const message = {
             databases: '資料庫',
             licenses: '許可證',
             nodes: '節點',
+            commands: '快速命令',
         },
         websiteLog: '網站日誌',
         runLog: '運行日誌',

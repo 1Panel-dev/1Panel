@@ -1217,6 +1217,7 @@ const message = {
             databases: '数据库',
             licenses: '许可证',
             nodes: '节点',
+            commands: '快速命令',
         },
         websiteLog: '网站日志',
         runLog: '运行日志',

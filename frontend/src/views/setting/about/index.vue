@@ -13,7 +13,7 @@
                     </div>
                     <h3 class="description">{{ globalStore.themeConfig.title || $t('setting.description') }}</h3>
                     <div class="flex justify-center">
-                        <SystemUpgrade />
+                        <SystemUpgrade class="upgrade" />
                     </div>
                     <div class="flex w-full justify-center my-5 flex-wrap md:flex-row gap-4">
                         <el-link @click="toDoc" class="system-link">
@@ -93,5 +93,8 @@ onMounted(() => {
         width: 95%;
         height: 45px;
     }
+}
+.upgrade {
+    all: initial;
 }
 </style>

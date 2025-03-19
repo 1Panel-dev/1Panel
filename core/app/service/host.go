@@ -23,7 +23,7 @@ type IHostService interface {
 	GetHostByID(id uint) (*dto.HostInfo, error)
 	SearchForTree(search dto.SearchForTree) ([]dto.HostTree, error)
 	SearchWithPage(search dto.SearchPageWithGroup) (int64, interface{}, error)
-	Create(hostDto dto.HostOperate) (*dto.HostInfo, error)
+	Create(req dto.HostOperate) (*dto.HostInfo, error)
 	Update(id uint, upMap map[string]interface{}) (*dto.HostInfo, error)
 	Delete(id []uint) error
 
@@ -300,16 +300,19 @@ func (u *HostService) Create(req dto.HostOperate) (*dto.HostInfo, error) {
 }
 
 func (u *HostService) Delete(ids []uint) error {
-	hosts, _ := hostRepo.GetList(repo.WithByIDs(ids))
-	for _, host := range hosts {
+	for _, id := range ids {
+		host, _ := hostRepo.Get(repo.WithByID(id))
 		if host.ID == 0 {
 			return buserr.New("ErrRecordNotFound")
 		}
-		if host.Addr == "127.0.0.1" {
+		if host.Name == "local" {
 			return errors.New("the local connection information cannot be deleted!")
 		}
+		if err := hostRepo.Delete(repo.WithByID(id)); err != nil {
+			return err
+		}
 	}
-	return hostRepo.Delete(repo.WithByIDs(ids))
+	return nil
 }
 
 func (u *HostService) Update(id uint, upMap map[string]interface{}) (*dto.HostInfo, error) {

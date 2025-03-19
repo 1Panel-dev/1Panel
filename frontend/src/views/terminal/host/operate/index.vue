@@ -60,7 +60,7 @@
                     </div>
                 </el-select>
             </el-form-item>
-            <el-form-item :label="$t('commons.table.name')" prop="name">
+            <el-form-item :label="$t('commons.table.title')" prop="name">
                 <el-tag v-if="itemName === 'local'">local</el-tag>
                 <el-input v-else clearable v-model="dialogData.rowData!.name" />
             </el-form-item>

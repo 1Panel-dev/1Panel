@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div @keydown.esc="toggleFullscreen()">
         <el-tabs
             type="card"
             class="terminal-tabs"

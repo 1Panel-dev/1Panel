@@ -3,12 +3,7 @@
         <el-col :span="22" :offset="1">
             <el-form :model="form" :rules="rules" ref="formRef">
                 <el-form-item prop="funcs">
-                    <el-input
-                        type="text"
-                        v-model="form.funcs"
-                        label="value"
-                        :placeholder="$t('php.disableFunctionHelper')"
-                    />
+                    <el-input v-model="form.funcs" label="value" :placeholder="$t('php.disableFunctionHelper')" />
                 </el-form-item>
             </el-form>
             <ComplexTable :data="data" v-loading="loading">

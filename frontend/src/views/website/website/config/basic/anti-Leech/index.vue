@@ -15,7 +15,7 @@
                     </el-form-item>
                     <div v-if="form.enable">
                         <el-form-item :label="$t('website.extends')" prop="extends">
-                            <el-input v-model="form.extends" type="text"></el-input>
+                            <el-input v-model="form.extends"></el-input>
                         </el-form-item>
                         <el-form-item :label="$t('website.browserCache')" prop="cache">
                             <el-switch v-model="form.cache" />
@@ -41,7 +41,7 @@
                             <el-input v-model="form.domains" type="textarea" :rows="6"></el-input>
                         </el-form-item>
                         <el-form-item :label="$t('website.leechReturn')" prop="return">
-                            <el-input v-model="form.return" type="text" :maxlength="35"></el-input>
+                            <el-input v-model="form.return" :maxlength="35"></el-input>
                         </el-form-item>
                         <el-form-item>
                             <el-button

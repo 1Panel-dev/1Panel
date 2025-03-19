@@ -1261,6 +1261,7 @@ const message = {
             databases: 'Базы данных',
             licenses: 'лицензии',
             nodes: 'ноды',
+            commands: 'Быстрые команды',
         },
         websiteLog: 'Логи веб-сайта',
         runLog: 'Логи выполнения',

@@ -100,7 +100,7 @@ const submitChangePassword = async (formEl: FormInstance | undefined) => {
 const search = async () => {
     const res = await getSettingInfo();
     let settingForm = res.data;
-    isComplexity.value = settingForm?.complexityVerification === 'enable';
+    isComplexity.value = settingForm?.complexityVerification === 'Enable';
 };
 
 onMounted(() => {

@@ -1215,6 +1215,7 @@ const message = {
             databases: '데이터베이스',
             licenses: '라이선스',
             nodes: '노드',
+            commands: '빠른 명령',
         },
         websiteLog: '웹사이트 로그',
         runLog: '실행 로그',

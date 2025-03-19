@@ -52,7 +52,7 @@
                     </el-form-item>
 
                     <el-form-item prop="ipOther" v-if="req.ipHeader === 'other'">
-                        <el-input type="text" v-model.trim="req.ipOther" />
+                        <el-input v-model.trim="req.ipOther" />
                     </el-form-item>
                 </div>
                 <el-form-item>

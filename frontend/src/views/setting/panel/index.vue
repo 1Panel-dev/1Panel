@@ -452,7 +452,7 @@ const onSave = async (key: string, val: any) => {
                 handleThemeChange(val);
             }
             if (key === 'MenuTabs') {
-                globalStore.setOpenMenuTabs(val === 'enable');
+                globalStore.setOpenMenuTabs(val === 'Enable');
             }
             MsgSuccess(i18n.t('commons.msg.operationSuccess'));
             search();

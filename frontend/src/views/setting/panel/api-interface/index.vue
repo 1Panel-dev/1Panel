@@ -85,7 +85,7 @@ const formRef = ref();
 const apiURL = `${window.location.protocol}//${window.location.hostname}${
     window.location.port ? `:${window.location.port}` : ''
 }/1panel/swagger/index.html`;
-const panelURL = `${globalStore.docsUrl}/user_manual/api_manual/`;
+const panelURL = `${globalStore.docsUrl}/dev_manual/api_manual/`;
 const form = reactive({
     apiKey: '',
     ipWhiteList: '',

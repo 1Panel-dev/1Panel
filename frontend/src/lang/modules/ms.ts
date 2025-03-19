@@ -1270,6 +1270,7 @@ const message = {
             databases: 'Pangkalan',
             licenses: 'lesen',
             nodes: 'nod',
+            commands: 'Perintah Pantas',
         },
         websiteLog: 'Log Laman Web',
         runLog: 'Log Jalankan',

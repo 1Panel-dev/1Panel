@@ -1227,6 +1227,7 @@ const message = {
             databases: 'データベース',
             licenses: 'ライセンス',
             nodes: 'ノード',
+            commands: 'クイックコマンド',
         },
         websiteLog: 'ウェブサイトログ',
         runLog: 'ログを実行します',

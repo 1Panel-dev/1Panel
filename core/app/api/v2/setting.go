@@ -71,16 +71,19 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
+	if req.Key == "SecurityEntrance" {
+		if !checkEntrancePattern(req.Value) {
+			helper.ErrorWithDetail(c, http.StatusBadRequest, "ErrInvalidParams", fmt.Errorf("the format of the security entrance %s is incorrect.", req.Value))
+			return
+		}
+	}
+
 	if err := settingService.Update(req.Key, req.Value); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
 	if req.Key == "SecurityEntrance" {
 		entranceValue := base64.StdEncoding.EncodeToString([]byte(req.Value))
-		if !checkEntrancePattern(entranceValue) {
-			helper.ErrorWithDetail(c, http.StatusBadRequest, "ErrInvalidParams", fmt.Errorf("the format of the security entrance %s is incorrect.", entranceValue))
-			return
-		}
 		c.SetCookie("SecurityEntrance", entranceValue, 0, "", "", false, true)
 	}
 	helper.SuccessWithOutData(c)

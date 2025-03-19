@@ -53,7 +53,7 @@
             <el-divider border-style="dashed" />
             <div v-if="form.from === 'local'">
                 <el-form-item :label="$t('commons.login.username')" prop="username">
-                    <el-input type="text" readonly disabled v-model="form.username">
+                    <el-input readonly disabled v-model="form.username">
                         <template #append>
                             <el-button-group>
                                 <CopyButton :content="form.username" />

@@ -107,7 +107,7 @@ const acceptParams = () => {
 };
 
 function selectable(row) {
-    return row.addr !== '127.0.0.1';
+    return row.name !== 'local';
 }
 const dialogRef = ref();
 const onOpenDialog = async (
@@ -174,11 +174,11 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        disabled: (row: any) => {
+            return row.name === 'local';
+        },
         click: (row: Host.Host) => {
             onBatchDelete(row);
-        },
-        disabled: (row: any) => {
-            return row.addr === '127.0.0.1';
         },
     },
 ];

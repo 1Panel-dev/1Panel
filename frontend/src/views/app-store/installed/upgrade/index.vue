@@ -57,7 +57,7 @@
 
         <div v-if="operateReq.operate === 'upgrade'">
             <el-text type="warning">{{ $t('app.upgradeWarn') }}</el-text>
-            <el-button class="ml-1.5" type="text" @click="openDiff()">{{ $t('app.showDiff') }}</el-button>
+            <el-button class="ml-1.5" link @click="openDiff()">{{ $t('app.showDiff') }}</el-button>
             <div>
                 <el-checkbox v-model="useNewCompose" :label="$t('app.useCustom')" size="large" />
             </div>
