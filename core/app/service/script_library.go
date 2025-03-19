@@ -94,7 +94,16 @@ func (u *ScriptService) Create(req dto.ScriptOperate) error {
 }
 
 func (u *ScriptService) Delete(req dto.OperateByIDs) error {
-	return scriptRepo.Delete(repo.WithByIDs(req.IDs))
+	for _, item := range req.IDs {
+		scriptItem, _ := scriptRepo.Get(repo.WithByID(item))
+		if scriptItem.ID == 0 || scriptItem.IsSystem {
+			continue
+		}
+		if err := scriptRepo.Delete(repo.WithByID(item)); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (u *ScriptService) Update(req dto.ScriptOperate) error {

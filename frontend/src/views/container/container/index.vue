@@ -386,7 +386,7 @@
 
         <OpDialog ref="opRef" @search="search" />
 
-        <CodemirrorDialog ref="myDetail" />
+        <CodemirrorDrawer ref="myDetail" />
         <PruneDialog @search="search" ref="dialogPruneRef" />
 
         <RenameDialog @search="search" ref="dialogRenameRef" />
@@ -407,7 +407,7 @@ import UpgradeDialog from '@/views/container/container/upgrade/index.vue';
 import CommitDialog from '@/views/container/container/commit/index.vue';
 import MonitorDialog from '@/views/container/container/monitor/index.vue';
 import TerminalDialog from '@/views/container/container/terminal/index.vue';
-import CodemirrorDialog from '@/components/codemirror-dialog/index.vue';
+import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import ContainerLogDialog from '@/components/log/container-drawer/index.vue';
@@ -646,6 +646,7 @@ const onInspect = async (id: string) => {
     let param = {
         header: i18n.global.t('commons.button.view'),
         detailInfo: detailInfo,
+        mode: 'json',
     };
     myDetail.value!.acceptParams(param);
 };

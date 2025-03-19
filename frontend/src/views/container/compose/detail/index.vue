@@ -109,7 +109,7 @@
                     />
                 </ComplexTable>
 
-                <CodemirrorDialog ref="mydetail" />
+                <CodemirrorDrawer ref="myDetail" />
                 <OpDialog ref="opRef" @search="search" />
 
                 <ContainerLogDialog ref="dialogContainerLogRef" />
@@ -125,7 +125,7 @@ import { reactive, ref } from 'vue';
 import MonitorDialog from '@/views/container/container/monitor/index.vue';
 import ContainerLogDialog from '@/components/log/container-drawer/index.vue';
 import TerminalDialog from '@/views/container/container/terminal/index.vue';
-import CodemirrorDialog from '@/components/codemirror-dialog/index.vue';
+import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
 import Status from '@/components/status/index.vue';
 import { dateFormat } from '@/utils/util';
 import { composeOperator, containerOperator, inspect, searchContainer } from '@/api/modules/container';
@@ -192,15 +192,16 @@ const search = async () => {
 };
 
 const detailInfo = ref();
-const mydetail = ref();
+const myDetail = ref();
 const onInspect = async (id: string) => {
     const res = await inspect({ id: id, type: 'container' });
     detailInfo.value = JSON.stringify(JSON.parse(res.data), null, 2);
     let param = {
         header: i18n.global.t('commons.button.view'),
         detailInfo: detailInfo.value,
+        mode: 'yaml',
     };
-    mydetail.value!.acceptParams(param);
+    myDetail.value!.acceptParams(param);
 };
 
 const checkStatus = (operation: string) => {

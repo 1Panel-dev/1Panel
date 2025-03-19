@@ -330,19 +330,12 @@ var AddSystemIP = &gormigrate.Migration{
 }
 
 var InitScriptLibrary = &gormigrate.Migration{
-	ID: "20250303-init-script-library",
+	ID: "20250318-init-script-library",
 	Migrate: func(tx *gorm.DB) error {
 		if err := tx.AutoMigrate(&model.ScriptLibrary{}); err != nil {
 			return err
 		}
-		// defaultGroup := []model.Group{
-		// 	{Name: "docker", Type: "script", IsDefault: false},
-		// 	{Name: "install", Type: "script", IsDefault: false},
-		// 	{Name: "uninstall", Type: "script", IsDefault: false},
-		// }
-		// if err := tx.Create(&defaultGroup).Error; err != nil {
-		// 	return err
-		// }
+		helper.LoadScript()
 		return nil
 	},
 }

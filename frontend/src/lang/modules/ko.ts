@@ -996,6 +996,8 @@ const message = {
             library: '스크립트 라이브러리',
             create: '스크립트 추가',
             edit: '스크립트 수정',
+            groupHelper:
+                '스크립트 특성에 따라 다양한 그룹을 설정하여 스크립트 필터링 작업을 더 빠르게 수행할 수 있습니다.',
         },
     },
     monitor: {

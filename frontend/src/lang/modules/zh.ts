@@ -987,6 +987,7 @@ const message = {
             library: '脚本库',
             create: '添加脚本',
             edit: '修改脚本',
+            groupHelper: '针对脚本特征设置不同的分组，可以更加快速的对脚本进行筛选操作。',
         },
     },
     monitor: {

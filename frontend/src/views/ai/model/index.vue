@@ -171,7 +171,7 @@
         <Del ref="delRef" @search="search" />
         <Terminal ref="terminalRef" />
         <Conn ref="connRef" />
-        <CodemirrorDialog ref="detailRef" />
+        <CodemirrorDrawer ref="detailRef" />
         <PortJumpDialog ref="dialogPortJumpRef" />
         <BindDomain ref="bindDomainRef" />
 
@@ -187,7 +187,7 @@ import TaskLog from '@/components/log/task/index.vue';
 import Terminal from '@/views/ai/model/terminal/index.vue';
 import Del from '@/views/ai/model/del/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
-import CodemirrorDialog from '@/components/codemirror-dialog/index.vue';
+import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
 import { computed, onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { App } from '@/api/interface/app';
@@ -304,6 +304,7 @@ const onLoad = async (name: string) => {
     let param = {
         header: i18n.global.t('commons.button.view'),
         detailInfo: detailInfo,
+        mode: 'json',
     };
     detailRef.value!.acceptParams(param);
 };

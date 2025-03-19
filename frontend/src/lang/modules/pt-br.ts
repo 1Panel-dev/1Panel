@@ -1021,6 +1021,8 @@ const message = {
             library: 'Biblioteca de Scripts',
             create: 'Adicionar Script',
             edit: 'Editar Script',
+            groupHelper:
+                'Defina grupos diferentes com base nas características do script, o que permite operações de filtragem de scripts mais rápidas.',
         },
     },
     monitor: {

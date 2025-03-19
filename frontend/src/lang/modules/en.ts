@@ -1043,6 +1043,8 @@ const message = {
             library: 'Script Library',
             create: 'Add Script',
             edit: 'Edit Script',
+            groupHelper:
+                'Set different groups based on script characteristics, which allows for faster script filtering operations.',
         },
     },
     monitor: {

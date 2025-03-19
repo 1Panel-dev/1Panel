@@ -989,6 +989,7 @@ const message = {
             library: '腳本庫',
             create: '添加腳本',
             edit: '修改腳本',
+            groupHelper: '根據腳本特徵設置不同的分組，可以更快地對腳本進行篩選操作。',
         },
     },
     monitor: {

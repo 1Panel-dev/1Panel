@@ -39,18 +39,13 @@
                             </el-text>
                         </template>
                     </el-table-column>
-                    <el-table-column width="60">
-                        <template #default="{ row }">
-                            <el-tag round v-if="row.isSystem || row.name === '1panel-network'">system</el-tag>
-                        </template>
-                    </el-table-column>
                     <el-table-column :label="$t('commons.table.group')" min-width="120" prop="group">
                         <template #default="{ row }">
-                            <el-tag class="ml-1 mt-1" v-if="!row.isSystem">system</el-tag>
+                            <el-button class="mr-3" size="small" v-if="row.isSystem">system</el-button>
                             <span v-if="row.groupBelong">
-                                <el-tag class="ml-1 mt-1" v-for="(item, index) in row.groupBelong" :key="index">
+                                <el-button size="small" v-for="(item, index) in row.groupBelong" :key="index">
                                     {{ item }}
-                                </el-tag>
+                                </el-button>
                             </span>
                         </template>
                     </el-table-column>
@@ -82,7 +77,7 @@
         <OpDialog ref="opRef" @search="search"></OpDialog>
         <OperateDialog @search="search" ref="dialogRef" />
         <GroupDialog @search="loadGroupOptions" :hideDefaultButton="false" ref="dialogGroupRef" />
-        <CodemirrorDialog ref="myDetail" />
+        <CodemirrorDrawer ref="myDetail" />
         <TerminalDialog ref="runRef" />
     </div>
 </template>
@@ -98,6 +93,7 @@ import { Cronjob } from '@/api/interface/cronjob';
 import i18n from '@/lang';
 import { GlobalStore } from '@/store';
 import { getGroupList } from '@/api/modules/group';
+import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
 
 const globalStore = GlobalStore();
 const mobile = computed(() => {
@@ -145,6 +141,7 @@ const showScript = async (script: string) => {
     let param = {
         header: i18n.global.t('commons.button.view'),
         detailInfo: script,
+        mode: 'shell',
     };
     myDetail.value!.acceptParams(param);
 };
@@ -165,7 +162,7 @@ const onDelete = async (row: Cronjob.ScriptInfo | null) => {
         title: i18n.global.t('commons.button.delete'),
         names: names,
         msg: i18n.global.t('commons.msg.operatorHelper', [
-            i18n.global.t('menu.cronjob'),
+            i18n.global.t('cronjob.library.script'),
             i18n.global.t('commons.button.delete'),
         ]),
         api: deleteScript,
@@ -206,12 +203,18 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.edit'),
+        disabled: (row: any) => {
+            return row.isSystem;
+        },
         click: (row: Cronjob.ScriptInfo) => {
             onOpenDialog('edit', row);
         },
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        disabled: (row: any) => {
+            return row.isSystem;
+        },
         click: (row: Cronjob.ScriptInfo) => {
             onDelete(row);
         },

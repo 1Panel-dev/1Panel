@@ -14,6 +14,7 @@
                 <el-select filterable v-model="dialogData.rowData!.groupList" multiple>
                     <el-option v-for="item in groupOptions" :key="item.id" :label="item.name" :value="item.id" />
                 </el-select>
+                <span class="input-help">{{ $t('cronjob.library.groupHelper') }}</span>
             </el-form-item>
             <el-form-item :label="$t('cronjob.shellContent')" prop="script" class="mt-5">
                 <CodemirrorPro
@@ -76,7 +77,6 @@ const handleClose = () => {
 const rules = reactive({
     name: [Rules.requiredInput],
     script: [Rules.requiredInput],
-    groupList: [Rules.requiredSelect],
 });
 
 type FormInstance = InstanceType<typeof ElForm>;

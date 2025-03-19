@@ -76,14 +76,14 @@
 
         <OpDialog ref="opRef" @search="search" />
 
-        <CodemirrorDialog ref="codemirror" />
+        <CodemirrorDrawer ref="myDetail" />
         <CreateDialog @search="search" ref="dialogCreateRef" />
     </div>
 </template>
 
 <script lang="ts" setup>
 import CreateDialog from '@/views/container/volume/create/index.vue';
-import CodemirrorDialog from '@/components/codemirror-dialog/index.vue';
+import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import { reactive, ref, computed } from 'vue';
 import { computeSize, dateFormat } from '@/utils/util';
@@ -101,7 +101,7 @@ const mobile = computed(() => {
 });
 
 const loading = ref();
-const codemirror = ref();
+const myDetail = ref();
 
 const opRef = ref();
 
@@ -155,8 +155,9 @@ const onInspect = async (id: string) => {
     let param = {
         header: i18n.global.t('commons.button.view'),
         detailInfo: detailInfo,
+        mode: 'json',
     };
-    codemirror.value!.acceptParams(param);
+    myDetail.value!.acceptParams(param);
 };
 
 const onClean = () => {

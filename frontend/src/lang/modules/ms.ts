@@ -1032,6 +1032,8 @@ const message = {
             library: 'Perpustakaan Skrip',
             create: 'Tambah Skrip',
             edit: 'Sunting Skrip',
+            groupHelper:
+                'Tetapkan kumpulan yang berbeza berdasarkan ciri skrip, yang membolehkan operasi penapisan skrip dilakukan dengan lebih pantas.',
         },
     },
     monitor: {

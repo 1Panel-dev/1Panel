@@ -75,7 +75,7 @@
             </template>
         </LayoutContent>
 
-        <CodemirrorDialog ref="mydetail" />
+        <CodemirrorDrawer ref="myDetail" />
 
         <OpDialog ref="opRef" @search="search" />
         <Pull ref="dialogPullRef" @search="search" />
@@ -102,7 +102,7 @@ import Build from '@/views/container/image/build/index.vue';
 import Delete from '@/views/container/image/delete/index.vue';
 import Prune from '@/views/container/image/prune/index.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
-import CodemirrorDialog from '@/components/codemirror-dialog/index.vue';
+import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
 import { searchImage, listImageRepo, imageRemove, inspect, containerPrune } from '@/api/modules/container';
 import i18n from '@/lang';
 import { GlobalStore } from '@/store';
@@ -130,7 +130,7 @@ const searchName = ref();
 
 const isActive = ref(false);
 
-const mydetail = ref();
+const myDetail = ref();
 const dialogPullRef = ref();
 const dialogTagRef = ref();
 const dialogPushRef = ref();
@@ -185,8 +185,9 @@ const onInspect = async (id: string) => {
     let param = {
         header: i18n.global.t('commons.button.view'),
         detailInfo: detailInfo,
+        mode: 'json',
     };
-    mydetail.value!.acceptParams(param);
+    myDetail.value!.acceptParams(param);
 };
 
 const onOpenPull = () => {

@@ -81,14 +81,14 @@
         </LayoutContent>
 
         <OpDialog ref="opRef" @search="search" />
-        <CodemirrorDialog ref="codemirror" />
+        <CodemirrorDrawer ref="myDetail" />
         <CreateDialog @search="search" ref="dialogCreateRef" />
     </div>
 </template>
 
 <script lang="ts" setup>
 import CreateDialog from '@/views/container/network/create/index.vue';
-import CodemirrorDialog from '@/components/codemirror-dialog/index.vue';
+import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
 import { reactive, ref } from 'vue';
 import { dateFormat } from '@/utils/util';
 import { deleteNetwork, searchNetwork, inspect, containerPrune } from '@/api/modules/container';
@@ -99,7 +99,7 @@ import { MsgSuccess } from '@/utils/message';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 
 const loading = ref();
-const codemirror = ref();
+const myDetail = ref();
 
 const data = ref();
 const selects = ref<any>([]);
@@ -209,8 +209,9 @@ const onInspect = async (id: string) => {
     let param = {
         header: i18n.global.t('commons.button.view'),
         detailInfo: detailInfo,
+        mode: 'json',
     };
-    codemirror.value!.acceptParams(param);
+    myDetail.value!.acceptParams(param);
 };
 
 function isSystem(val: string) {
