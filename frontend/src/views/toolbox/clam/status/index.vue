@@ -120,7 +120,10 @@ const changeShow = (val: boolean) => {
 const onOperate = async (service: string, operation: string) => {
     em('update:maskShow', false);
     ElMessageBox.confirm(
-        i18n.global.t('commons.msg.operatorHelper', [' ' + service + ' ', i18n.global.t('app.' + operation)]),
+        i18n.global.t('commons.msg.operatorHelper', [
+            ' ' + service + ' ',
+            i18n.global.t('commons.operate.' + operation),
+        ]),
         i18n.global.t('app.' + operation),
         {
             confirmButtonText: i18n.global.t('commons.button.confirm'),

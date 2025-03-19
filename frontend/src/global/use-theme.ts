@@ -11,7 +11,7 @@ export const useTheme = () => {
             itemTheme = prefersDark ? 'dark' : 'light';
         }
         document.documentElement.className = itemTheme === 'dark' ? 'dark' : 'light';
-        if (globalStore.isProductPro && themeConfig.themeColor) {
+        if (globalStore.isMasterProductPro && themeConfig.themeColor) {
             try {
                 const themeColor = JSON.parse(themeConfig.themeColor);
                 const color = itemTheme === 'dark' ? themeColor.dark : themeColor.light;

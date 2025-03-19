@@ -85,6 +85,9 @@ SubTask: "サブタスク"
 
 #upgrade node
 NodeUpgrade: "{{ .name }} ノードのアップグレード"
+UpgradeCheck: "ノードの更新を確認"
+UpgradeCheckLocal: "ローカルノードは一括アップグレードをサポートしていないため、スキップします..."
+UpgradeCheckLatest: "ノードは既に最新バージョンです、スキップします..."
 NewSSHClient: "SSH接続の初期化"
 BackupBeforeUpgrade: "アップグレード前にデータをバックアップ"
 UploadUpgradeFile: "アップグレードに必要なファイルを配布"

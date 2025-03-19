@@ -84,6 +84,9 @@ SubTask: "Subtarefa"
 
 #upgrade node
 NodeUpgrade: "Atualizar nó {{ .name }}"
+UpgradeCheck: "Verificar atualizações do nó"
+UpgradeCheckLocal: "Nós locais não suportam atualização em lote, pulando..."
+UpgradeCheckLatest: "O nó já está na versão mais recente, pulando..."
 NewSSHClient: "Inicializando a conexão SSH"
 BackupBeforeUpgrade: "Fazer backup dos dados antes da atualização"
 UploadUpgradeFile: "Distribuir arquivos necessários para a atualização"

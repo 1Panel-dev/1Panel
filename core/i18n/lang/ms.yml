@@ -84,6 +84,9 @@ SubTask: "Tugas Sub"
 
 #upgrade node
 NodeUpgrade: "Naik taraf node {{ .name }}"
+UpgradeCheck: "Periksa kemas kini nod"
+UpgradeCheckLocal: "Nod tempatan tidak menyokong peningkatan kelompok, dilangkau..."
+UpgradeCheckLatest: "Nod sudah versi terkini, dilangkau..."
 NewSSHClient: "Memulakan sambungan SSH"
 BackupBeforeUpgrade: "Menyandarkan data sebelum naik taraf"
 UploadUpgradeFile: "Sebarkan fail naik taraf"

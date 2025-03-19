@@ -84,6 +84,9 @@ SubTask: "Subtask"
 
 #upgrade node
 NodeUpgrade: "Upgrade node {{ .name }}"
+UpgradeCheck: "Check for node updates"
+UpgradeCheckLocal: "Local nodes do not support batch upgrades, skipping..."
+UpgradeCheckLatest: "The node is already the latest version, skipping..."
 NewSSHClient: "Initializing SSH connection"
 BackupBeforeUpgrade: "Backup data before upgrade"
 UploadUpgradeFile: "Distribute upgrade files"

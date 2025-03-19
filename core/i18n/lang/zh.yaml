@@ -85,6 +85,9 @@ SubTask: "子任务"
 
 #upgrade node
 NodeUpgrade: "升级节点 {{ .name }}"
+UpgradeCheck: "检查节点更新"
+UpgradeCheckLocal: "本地节点不支持批量升级，跳过..."
+UpgradeCheckLatest: "检测到该节点已是最新版本，跳过..."
 NewSSHClient: "初始化 SSH 连接"
 BackupBeforeUpgrade: "升级前备份数据"
 UploadUpgradeFile: "下发升级所需文件"

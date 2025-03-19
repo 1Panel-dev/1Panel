@@ -84,6 +84,9 @@ SubTask: "서브 작업"
 
 #upgrade node
 NodeUpgrade: "{{ .name }} 노드 업그레이드"
+UpgradeCheck: "노드 업데이트 확인"
+UpgradeCheckLocal: "로컬 노드는 일괄 업그레이드를 지원하지 않으므로 건너뜁니다..."
+UpgradeCheckLatest: "이 노드는 이미 최신 버전입니다. 건너뜁니다..."
 NewSSHClient: "SSH 연결 초기화"
 BackupBeforeUpgrade: "업그레이드 전 데이터 백업"
 UploadUpgradeFile: "업그레이드에 필요한 파일 전송"

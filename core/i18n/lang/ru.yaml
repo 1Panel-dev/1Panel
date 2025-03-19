@@ -84,6 +84,9 @@ SubTask: "Подзадача"
 
 #upgrade node
 NodeUpgrade: "Обновление узла {{ .name }}"
+UpgradeCheck: "Проверить обновления узла"
+UpgradeCheckLocal: "Локальные узлы не поддерживают массовое обновление, пропуск..."
+UpgradeCheckLatest: "Узел уже имеет последнюю версию, пропуск..."
 NewSSHClient: "Инициализация SSH-соединения"
 BackupBeforeUpgrade: "Резервное копирование данных перед обновлением"
 UploadUpgradeFile: "Распределение файлов обновления"
