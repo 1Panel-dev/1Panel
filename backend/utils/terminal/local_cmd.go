@@ -100,4 +100,5 @@ func (lcmd *LocalCommand) Wait(quitChan chan bool) {
 		global.LOG.Errorf("ssh session wait failed, err: %v", err)
 		setQuit(quitChan)
 	}
+	setQuit(quitChan)
 }

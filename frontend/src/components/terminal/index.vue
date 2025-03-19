@@ -85,7 +85,9 @@ function onClose(isKeepShow: boolean = false) {
             term.value.dispose();
         } catch {}
     }
-    terminalElement.value.innerHTML = '';
+    if (terminalElement.value) {
+        terminalElement.value.innerHTML = '';
+    }
 }
 
 // terminal 相关代码 start
@@ -202,10 +204,10 @@ const errorRealTerminal = (ex: any) => {
 
 const closeRealTerminal = (ev: CloseEvent) => {
     if (heartbeatTimer.value) {
-        clearInterval(heartbeatTimer.value);
+        clearInterval(Number(heartbeatTimer.value));
     }
-    term.value.write('The connection has been disconnected.');
-    term.value.write(ev.reason);
+    term.value?.write('The connection has been disconnected.');
+    term.value?.write(ev.reason);
 };
 
 const isWsOpen = () => {
