@@ -19,6 +19,7 @@ import (
 	"github.com/go-acme/lego/v4/lego"
 	"github.com/go-acme/lego/v4/providers/dns/alidns"
 	"github.com/go-acme/lego/v4/providers/dns/clouddns"
+	"github.com/go-acme/lego/v4/providers/dns/cloudns"
 	"github.com/go-acme/lego/v4/providers/dns/cloudflare"
 	"github.com/go-acme/lego/v4/providers/dns/dnspod"
 	"github.com/go-acme/lego/v4/providers/dns/godaddy"
@@ -75,6 +76,7 @@ const (
 	Volcengine   DnsType = "Volcengine"
 	CloudFlare   DnsType = "CloudFlare"
 	CloudDns     DnsType = "CloudDns"
+	ClouDNS      DnsType = "ClouDNS"
 	FreeMyIP     DnsType = "FreeMyIP"
 	NameSilo     DnsType = "NameSilo"
 	NameCheap    DnsType = "NameCheap"
@@ -98,6 +100,9 @@ type DNSParam struct {
 	Region    string `json:"region"`
 	ClientID  string `json:"clientID"`
 	Password  string `json:"password"`
+	AuthID  string `json:"authID"`
+	SubAuthID  string `json:"subAuthID"`
+	AuthPassword  string `json:"authPassword"`
 }
 
 var (
@@ -158,6 +163,15 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string, websiteSSL model.Web
 		clouddnsConfig.PollingInterval = pollingInterval
 		clouddnsConfig.TTL = ttl
 		p, err = clouddns.NewDNSProviderConfig(clouddnsConfig)
+	case ClouDNS:
+		cloudnsConfig := cloudns.NewDefaultConfig()
+		cloudnsConfig.AuthID = param.AuthID
+		cloudnsConfig.SubAuthID = param.SubAuthID
+		cloudnsConfig.AuthPassword = param.AuthPassword
+		cloudnsConfig.PropagationTimeout = propagationTimeout
+		cloudnsConfig.PollingInterval = pollingInterval
+		cloudnsConfig.TTL = ttl
+		p, err = clouddns.NewDNSProviderConfig(cloudnsConfig)
 	case FreeMyIP:
 		freeMyIpConfig := freemyip.NewDefaultConfig()
 		freeMyIpConfig.Token = param.Token

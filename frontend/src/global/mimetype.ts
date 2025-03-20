@@ -185,6 +185,10 @@ export const DNSTypes = [
         value: 'CloudDns',
     },
     {
+        label: 'ClouDNS',
+        value: 'ClouDNS',
+    },
+    {
         label: 'NameSilo',
         value: 'NameSilo',
     },

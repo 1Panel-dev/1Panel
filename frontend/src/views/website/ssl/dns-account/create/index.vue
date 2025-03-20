@@ -97,6 +97,17 @@
                             <el-input v-model.trim="account.authorization['password']"></el-input>
                         </el-form-item>
                     </div>
+                    <div v-if="account.type === 'ClouDNS'">
+                        <el-form-item label="Auth ID" prop="authorization.authID">
+                            <el-input v-model.trim="account.authorization['authID']"></el-input>
+                        </el-form-item>
+                        <el-form-item label="Sub Auth ID" prop="authorization.subAuthID">
+                            <el-input v-model.trim="account.authorization['subAuthID']"></el-input>
+                        </el-form-item>
+                        <el-form-item label="Auth Password" prop="authorization.authPassword">
+                            <el-input v-model.trim="account.authorization['authPassword']"></el-input>
+                        </el-form-item>
+                    </div>
                     <el-form-item
                         label="API Key"
                         prop="authorization.apiKey"
@@ -169,6 +180,27 @@ const rules = ref<any>({
         clientID: [Rules.requiredInput],
         email: [Rules.email],
         password: [Rules.requiredInput],
+        authID: [{
+            validator: (rule: any, value: any, callback: any) => {
+                if (!value && !account.value.authorization.subAuthID) {
+                    callback(new Error(i18n.global.t('commons.validate.requiredInput')));
+                } else {
+                    callback();
+                }
+            },
+            trigger: ['blur', 'change']
+        }],
+        subAuthID: [{
+            validator: (rule: any, value: any, callback: any) => {
+                if (!value && !account.value.authorization.authID) {
+                    callback(new Error(i18n.global.t('commons.validate.requiredInput')));
+                } else {
+                    callback();
+                }
+            },
+            trigger: ['blur', 'change']
+        }],
+        authPassword: [Rules.requiredInput],
     },
 });
 const account = ref({
