@@ -73,7 +73,7 @@
                 <el-button type="primary" plain @click="onClean()">
                     {{ $t('container.containerPrune') }}
                 </el-button>
-                <el-button-group>
+                <el-button-group class="button-group">
                     <el-button :disabled="checkStatus('start', null)" @click="onOperate('start', null)">
                         {{ $t('commons.operate.start') }}
                     </el-button>
@@ -98,10 +98,12 @@
                 </el-button-group>
             </template>
             <template #rightToolBar>
-                <el-checkbox v-model="includeAppStore" @change="search()">
-                    {{ $t('container.includeAppstore') }}
-                </el-checkbox>
                 <TableSearch @search="search()" v-model:searchName="searchName" />
+                <el-tooltip
+                    :content="includeAppStore ? $t('container.includeAppstore') : $t('container.excludeAppstore')"
+                >
+                    <el-button @click="searchWithAppShow(!includeAppStore)" :icon="includeAppStore ? 'View' : 'Hide'" />
+                </el-tooltip>
                 <TableRefresh @search="search()" />
                 <TableSetting title="container-refresh" @search="refresh()" />
                 <fu-table-column-select
@@ -529,6 +531,11 @@ const searchWithStatus = (item: any) => {
     search();
 };
 
+const searchWithAppShow = (item: any) => {
+    includeAppStore.value = item;
+    search();
+};
+
 const loadContainerCount = async () => {
     await loadContainerStatus().then((res) => {
         countItem.all = res.data.all;
@@ -796,5 +803,10 @@ onMounted(() => {
     margin-top: -3px;
     font-size: 6px;
     cursor: pointer;
+}
+.button-group .el-button {
+    margin-left: -1px !important;
+    position: relative !important;
+    z-index: 1 !important;
 }
 </style>

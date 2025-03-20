@@ -117,7 +117,6 @@ const message = {
             protocol: 'Протокол',
             tableSetting: 'Настройки таблицы',
             refreshRate: 'Частота обновления',
-            refreshRateUnit: 'Без обновления | {n} секунда/раз | {n} секунд/раз',
             selectColumn: 'Выбрать столбец',
             local: 'локальный',
             serialNumber: 'Серийный номер',
@@ -358,6 +357,7 @@ const message = {
         supervisor: 'Супервизор',
         tamper: 'Защита от несанкционированного доступа',
         app: 'Приложение',
+        msgCenter: 'Центр задач',
     },
     home: {
         restart_1panel: 'Перезапустить панель',
@@ -917,6 +917,7 @@ const message = {
         sockPathErr: 'Пожалуйста, выберите или введите правильный путь к файлу Docker sock',
         related: 'Связанные',
         includeAppstore: 'Показывать контейнеры из магазина приложений',
+        excludeAppstore: 'Скрыть контейнер магазина приложений',
 
         cleanDockerDiskZone: 'Очистить дисковое пространство, используемое Docker',
         cleanImagesHelper: '(Очистить все образы, не используемые контейнерами)',

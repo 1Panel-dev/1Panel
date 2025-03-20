@@ -117,7 +117,6 @@ const message = {
             protocol: 'プロトコル',
             tableSetting: 'テーブル設定',
             refreshRate: 'リフレッシュレート',
-            refreshRateUnit: '更新なし|{n}秒/時 |{n}秒/時',
             selectColumn: '列を選択します',
             local: 'ローカル',
             serialNumber: 'シリアル番号',
@@ -355,6 +354,7 @@ const message = {
         supervisor: '監督者',
         tamper: '改ざん防止',
         app: 'アプリケーション',
+        msgCenter: 'タスクセンター',
     },
     home: {
         restart_1panel: 'パネルを再起動します',
@@ -900,6 +900,7 @@ const message = {
         sockPathErr: '正しいDockerソックファイルパスを選択または入力してください',
         related: '関連している',
         includeAppstore: 'アプリストアから取得したコンテナを表示',
+        excludeAppstore: 'アプリストアコンテナを隠す',
 
         cleanDockerDiskZone: 'Dockerが使用するディスクスペースをクリーンアップします',
         cleanImagesHelper: '（コンテナで使用されていないすべての画像をクリーンアップ）',

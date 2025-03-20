@@ -1,7 +1,22 @@
 <template>
     <div :class="classObj" class="app-wrapper" v-loading="loading" :element-loading-text="loadingText" fullscreen>
         <div v-if="classObj.mobile && classObj.openSidebar" class="drawer-bg" @click="handleClickOutside" />
-        <div class="app-sidebar" v-if="!globalStore.isFullScreen">
+        <div
+            class="app-sidebar"
+            v-if="!globalStore.isFullScreen"
+            @mouseenter="collapseButtonShow = true"
+            @mouseleave="collapseButtonShow = false"
+        >
+            <el-affix v-if="collapseButtonShow" :offset="124" class="affix">
+                <el-button
+                    size="small"
+                    circle
+                    :style="{ 'margin-left': menuStore.isCollapse ? '60px' : '165px', position: 'absolute' }"
+                    :icon="menuStore.isCollapse ? 'ArrowRight' : 'ArrowLeft'"
+                    plain
+                    @click="handleCollapse()"
+                ></el-button>
+            </el-affix>
             <Sidebar @menu-click="handleMenuClick" :menu-router="!classObj.openMenuTabs" @open-task="openTask" />
         </div>
 
@@ -29,6 +44,7 @@ import TaskList from '@/components/task-list/index.vue';
 const { switchTheme } = useTheme();
 
 useResize();
+const collapseButtonShow = ref();
 
 const taskListRef = ref();
 const openTask = () => {
@@ -57,6 +73,11 @@ const classObj = computed(() => {
 });
 const handleClickOutside = () => {
     menuStore.closeSidebar(false);
+};
+
+const handleCollapse = () => {
+    menuStore.setCollapse();
+    collapseButtonShow.value = false;
 };
 
 watch(
@@ -155,6 +176,7 @@ onMounted(() => {
     overflow: auto;
 }
 .app-sidebar {
+    z-index: 2;
     transition: width 0.3s;
     width: var(--panel-menu-width) !important;
     position: fixed;
@@ -163,6 +185,9 @@ onMounted(() => {
     bottom: 0;
     left: 0;
     overflow: hidden;
+    .affix {
+        z-index: 5;
+    }
 }
 
 .hideSidebar {

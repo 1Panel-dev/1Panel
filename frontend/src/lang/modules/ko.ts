@@ -117,7 +117,6 @@ const message = {
             protocol: '프로토콜',
             tableSetting: '테이블 설정',
             refreshRate: '새로 고침 속도',
-            refreshRateUnit: '새로 고침 안 함 | {n} 초/회 | {n} 초/회',
             selectColumn: '열 선택',
             local: '로컬',
             serialNumber: '일련 번호',
@@ -357,6 +356,7 @@ const message = {
         supervisor: '슈퍼바이저',
         tamper: '변조 방지',
         app: '애플리케이션',
+        msgCenter: '작업 센터',
     },
     home: {
         restart_1panel: '패널 재시작',
@@ -890,6 +890,7 @@ const message = {
         sockPathErr: '올바른 Docker 소켓 파일 경로를 선택하거나 입력해 주세요.',
         related: '관련',
         includeAppstore: '앱 스토어에서 컨테이너 표시',
+        excludeAppstore: '앱스토어 컨테이너 숨기기',
 
         cleanDockerDiskZone: 'Docker 에서 사용하는 디스크 공간 정리',
         cleanImagesHelper: '(사용되지 않는 모든 이미지를 정리합니다.)',

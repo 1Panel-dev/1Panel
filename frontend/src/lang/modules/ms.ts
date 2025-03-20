@@ -117,7 +117,6 @@ const message = {
             protocol: 'Protokol',
             tableSetting: 'Tetapan jadual',
             refreshRate: 'Kadar penyegaran',
-            refreshRateUnit: 'Tiada penyegaran | {n} saat/masa | {n} saat/masa',
             selectColumn: 'Pilih lajur',
             local: 'Tempatan',
             serialNumber: 'Nombor siri',
@@ -363,6 +362,7 @@ const message = {
         supervisor: 'Supervisor',
         tamper: 'Bukti Pengubahsuaian',
         app: 'Aplikasi',
+        msgCenter: 'Pusat Tugas',
     },
     home: {
         restart_1panel: 'Mulakan semula panel',
@@ -921,6 +921,7 @@ const message = {
         sockPathErr: 'Sila pilih atau masukkan laluan fail sock Docker yang betul',
         related: 'Berkaitan',
         includeAppstore: 'Tunjukkan kontena dari gedung aplikasi',
+        excludeAppstore: 'Sembunyikan Kontena Kedai Aplikasi',
 
         cleanDockerDiskZone: 'Bersihkan ruang cakera yang digunakan oleh Docker',
         cleanImagesHelper: '( Bersihkan semua imej yang tidak digunakan oleh mana-mana kontena )',

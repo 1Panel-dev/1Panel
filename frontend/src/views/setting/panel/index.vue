@@ -421,7 +421,7 @@ const onChangeApiInterfaceStatus = async () => {
 const handleThemeChange = async (val: string) => {
     globalStore.themeConfig.theme = val;
     switchTheme();
-    if (globalStore.isProductPro) {
+    if (globalStore.isMasterProductPro) {
         await updateXpackSettingByKey('Theme', val);
         let color: string;
         const themeColor: ThemeColor = JSON.parse(globalStore.themeConfig.themeColor);

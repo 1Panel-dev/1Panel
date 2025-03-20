@@ -122,7 +122,6 @@ const message = {
             tableSetting: '列表設置',
             refreshRate: '刷新頻率',
             noRefresh: '不刷新',
-            refreshRateUnit: '{0} 秒/次',
             selectColumn: '選擇列',
             local: '本地',
             serialNumber: '序號',
@@ -354,6 +353,7 @@ const message = {
         supervisor: '進程守護',
         tamper: '防篡改',
         app: '應用',
+        msgCenter: '任務中心',
     },
     home: {
         recommend: '推薦',
@@ -883,6 +883,7 @@ const message = {
         sockPathErr: '請選擇或輸入正確的 Docker sock 文件路徑',
         related: '相關資源',
         includeAppstore: '顯示應用程式商店容器',
+        excludeAppstore: '隱藏應用商店容器',
 
         cleanDockerDiskZone: '清理 Docker 使用的磁碟空間',
         cleanImagesHelper: '( 清理所有未被任何容器使用的鏡像 )',

@@ -1,23 +1,18 @@
 <template>
     <div>
         <el-dropdown @command="changeRefresh">
-            <el-badge
-                badge-style="background-color: transparent; font-size: 12px; border: none; color: black"
-                :offset="[-12, 7]"
-                :value="refreshRateUnit === 0 ? '' : refreshRateUnit + 's'"
-                class="item"
-            >
-                <el-button class="timer-button" icon="Clock"></el-button>
-            </el-badge>
+            <el-button class="timer-button">
+                {{ refreshRateUnit === 0 ? $t('commons.table.noRefresh') : refreshRateUnit + 's' }}
+            </el-button>
             <template #dropdown>
                 <el-dropdown-menu>
                     <el-dropdown-item :command="0">{{ $t('commons.table.noRefresh') }}</el-dropdown-item>
-                    <el-dropdown-item :command="5">{{ $t('commons.table.refreshRateUnit', [5]) }}</el-dropdown-item>
-                    <el-dropdown-item :command="10">{{ $t('commons.table.refreshRateUnit', [10]) }}</el-dropdown-item>
-                    <el-dropdown-item :command="30">{{ $t('commons.table.refreshRateUnit', [30]) }}</el-dropdown-item>
-                    <el-dropdown-item :command="60">{{ $t('commons.table.refreshRateUnit', [60]) }}</el-dropdown-item>
-                    <el-dropdown-item :command="120">{{ $t('commons.table.refreshRateUnit', [120]) }}</el-dropdown-item>
-                    <el-dropdown-item :command="300">{{ $t('commons.table.refreshRateUnit', [300]) }}</el-dropdown-item>
+                    <el-dropdown-item :command="5">5s</el-dropdown-item>
+                    <el-dropdown-item :command="10">10s</el-dropdown-item>
+                    <el-dropdown-item :command="30">30s</el-dropdown-item>
+                    <el-dropdown-item :command="60">60s</el-dropdown-item>
+                    <el-dropdown-item :command="120">120s</el-dropdown-item>
+                    <el-dropdown-item :command="300">300s</el-dropdown-item>
                 </el-dropdown-menu>
             </template>
         </el-dropdown>

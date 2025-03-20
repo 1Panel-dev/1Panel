@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" size="large" :header="$t('logs.task')" @close="handleClose">
+    <DrawerPro v-model="open" size="large" :header="$t('menu.msgCenter')" @close="handleClose">
         <template #content>
             <LayoutContent v-loading="loading" :title="$t('logs.task')">
                 <template #rightToolBar>

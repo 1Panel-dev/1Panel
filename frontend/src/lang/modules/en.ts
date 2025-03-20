@@ -125,7 +125,6 @@ const message = {
             tableSetting: 'Table setting',
             refreshRate: 'Rate',
             noRefresh: 'No Refresh',
-            refreshRateUnit: '{0} Seconds/Time',
             selectColumn: 'Select column',
             local: 'local',
             serialNumber: 'Serial number',
@@ -363,6 +362,7 @@ const message = {
         supervisor: 'Supervisor',
         tamper: 'Tamper-proof',
         app: 'Application',
+        msgCenter: 'Task Center',
     },
     home: {
         recommend: 'recommend',
@@ -929,6 +929,7 @@ const message = {
         sockPathErr: 'Please select or enter the correct Docker sock file path',
         related: 'Related',
         includeAppstore: 'Show app store container',
+        excludeAppstore: 'Hide App Store Container',
 
         cleanDockerDiskZone: 'Clean up disk space used by Docker',
         cleanImagesHelper: '( Clean up all images that are not used by any containers )',

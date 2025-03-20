@@ -117,7 +117,6 @@ const message = {
             protocol: 'Protocolo',
             tableSetting: 'Configuração da tabela',
             refreshRate: 'Taxa de atualização',
-            refreshRateUnit: 'Sem atualização | {n} segundo/atualização | {n} segundos/atualização',
             selectColumn: 'Selecionar coluna',
             local: 'Local',
             serialNumber: 'Número de série',
@@ -361,6 +360,7 @@ const message = {
         supervisor: 'Supervisor',
         tamper: 'À prova de violação',
         app: 'Aplicativo',
+        msgCenter: 'Central de Tarefas',
     },
     home: {
         restart_1panel: 'Reiniciar painel',
@@ -917,6 +917,7 @@ const message = {
         sockPathErr: 'Por favor, selecione ou insira o caminho correto do arquivo do Docker sock',
         related: 'Relacionado',
         includeAppstore: 'Exibir containers da loja de aplicativos',
+        excludeAppstore: 'Ocultar Contêiner da Loja de Aplicativos',
 
         cleanDockerDiskZone: 'Limpar o espaço em disco usado pelo Docker',
         cleanImagesHelper: '(Limpar todas as imagens que não são usadas por nenhum container)',
