@@ -203,17 +203,10 @@ func (u *ImageService) ImageBuild(req dto.ImageBuild) error {
 	go func() {
 		defer tar.Close()
 		taskItem.AddSubTask(i18n.GetMsgByKey("ImageBuild"), func(t *task.Task) error {
-			res, err := client.ImageBuild(context.Background(), tar, opts)
-			if err != nil {
+			dockerCli := docker.NewClientWithExist(client)
+			if err := dockerCli.BuildImageWithProcessAndOptions(taskItem, tar, opts); err != nil {
 				return err
 			}
-			defer res.Body.Close()
-			body, _ := io.ReadAll(res.Body)
-			if strings.Contains(string(body), "errorDetail") || strings.Contains(string(body), "error:") {
-				taskItem.LogWithStatus(i18n.GetMsgByKey("ImageBuildStdoutCheck"), fmt.Errorf("build image %s failed", req.Name))
-				return err
-			}
-			taskItem.LogSuccess(i18n.GetWithName("ImaegBuildRes", "\n"+string(body)))
 			return nil
 		}, nil)
 
@@ -381,13 +374,10 @@ func (u *ImageService) ImagePush(req dto.ImagePush) error {
 			return nil
 		}, nil)
 		taskItem.AddSubTask(i18n.GetMsgByKey("TaskPush"), func(t *task.Task) error {
-			out, err := client.ImagePush(context.TODO(), newName, options)
-			if err != nil {
+			dockerCli := docker.NewClientWithExist(client)
+			if err := dockerCli.PushImageWithProcessAndOptions(taskItem, newName, options); err != nil {
 				return err
 			}
-			defer out.Close()
-			body, _ := io.ReadAll(out)
-			taskItem.Log(i18n.GetWithName("ImaegPushRes", "\n"+string(body)))
 			return nil
 		}, nil)
 		_ = taskItem.Execute()

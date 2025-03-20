@@ -4,6 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"os"
+	"strings"
+	"time"
+
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/global"
@@ -13,10 +18,6 @@ import (
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
-	"io"
-	"os"
-	"strings"
-	"time"
 )
 
 func NewDockerClient() (*client.Client, error) {
@@ -215,6 +216,111 @@ func (c Client) PullImageWithProcessAndOptions(task *task.Task, imageName string
 			id, _ := progress["id"].(string)
 			progressStr := fmt.Sprintf("%s %s [%s] --- %.2f%%", timeStr, status, id, 100.0)
 			_ = setLog(id, progressStr, task)
+		}
+	}
+	return nil
+}
+
+func (c Client) PushImageWithProcessAndOptions(task *task.Task, imageName string, options image.PushOptions) error {
+	out, err := c.cli.ImagePush(context.Background(), imageName, options)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+	decoder := json.NewDecoder(out)
+	for {
+		var progress map[string]interface{}
+		if err = decoder.Decode(&progress); err != nil {
+			if err == io.EOF {
+				break
+			}
+			return err
+		}
+		if msg, ok := progress["errorDetail"]; ok {
+			return fmt.Errorf("image push failed, err: %v", msg)
+		}
+		if msg, ok := progress["error"]; ok {
+			return fmt.Errorf("image push failed, err: %v", msg)
+		}
+		timeStr := time.Now().Format("2006/01/02 15:04:05")
+		status, _ := progress["status"].(string)
+		switch status {
+		case "Pushing":
+			id, _ := progress["id"].(string)
+			progressDetail, _ := progress["progressDetail"].(map[string]interface{})
+			current, _ := progressDetail["current"].(float64)
+			progressStr := ""
+			total, ok := progressDetail["total"].(float64)
+			if ok {
+				progressStr = fmt.Sprintf("%s %s [%s] --- %.2f%%", timeStr, status, id, (current/total)*100)
+			} else {
+				progressStr = fmt.Sprintf("%s %s [%s] --- %.2f%%", timeStr, status, id, current)
+			}
+
+			_ = setLog(id, progressStr, task)
+		case "Pushed":
+			id, _ := progress["id"].(string)
+			progressStr := fmt.Sprintf("%s %s [%s] --- %.2f%%", timeStr, status, id, 100.0)
+			_ = setLog(id, progressStr, task)
+		default:
+			progressStr, _ := json.Marshal(progress)
+			task.Log(string(progressStr))
+		}
+	}
+	return nil
+}
+
+func (c Client) BuildImageWithProcessAndOptions(task *task.Task, tar io.ReadCloser, options types.ImageBuildOptions) error {
+	out, err := c.cli.ImageBuild(context.Background(), tar, options)
+	if err != nil {
+		return err
+	}
+	defer out.Body.Close()
+	decoder := json.NewDecoder(out.Body)
+	for {
+		var progress map[string]interface{}
+		if err = decoder.Decode(&progress); err != nil {
+			if err == io.EOF {
+				break
+			}
+			return err
+		}
+		if msg, ok := progress["errorDetail"]; ok {
+			return fmt.Errorf("image build failed, err: %v", msg)
+		}
+		if msg, ok := progress["error"]; ok {
+			return fmt.Errorf("image build failed, err: %v", msg)
+		}
+		timeStr := time.Now().Format("2006/01/02 15:04:05")
+		status, _ := progress["status"].(string)
+		stream, _ := progress["stream"].(string)
+		if len(status) == 0 && len(stream) != 0 {
+			if stream != "\n" {
+				task.Log(stream)
+			}
+			continue
+		}
+		switch status {
+		case "Downloading", "Extracting":
+			id, _ := progress["id"].(string)
+			progressDetail, _ := progress["progressDetail"].(map[string]interface{})
+			current, _ := progressDetail["current"].(float64)
+			progressStr := ""
+			total, ok := progressDetail["total"].(float64)
+			if ok {
+				progressStr = fmt.Sprintf("%s %s [%s] --- %.2f%%", timeStr, status, id, (current/total)*100)
+			} else {
+				progressStr = fmt.Sprintf("%s %s [%s] --- %.2f%%", timeStr, status, id, current)
+			}
+
+			_ = setLog(id, progressStr, task)
+		case "Pull complete", "Download complete", "Verifying Checksum":
+			id, _ := progress["id"].(string)
+			progressStr := fmt.Sprintf("%s %s [%s] --- %.2f%%", timeStr, status, id, 100.0)
+			_ = setLog(id, progressStr, task)
+		default:
+			progressStr, _ := json.Marshal(progress)
+			task.Log(string(progressStr))
 		}
 	}
 	return nil

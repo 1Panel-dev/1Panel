@@ -55,7 +55,7 @@ const getType = (status: string) => {
         case 'enable':
         case 'done':
         case 'healthy':
-        case 'used':
+        case 'unused':
         case 'executing':
             return 'success';
         case 'stopped':
