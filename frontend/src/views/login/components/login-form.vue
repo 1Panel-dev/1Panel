@@ -183,7 +183,6 @@ import { loginApi, getCaptcha, mfaLoginApi, getLoginSetting } from '@/api/module
 import { GlobalStore, MenuStore, TabsStore } from '@/store';
 import { MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
-import { getSettingInfo } from '@/api/modules/setting';
 import { encryptPassword } from '@/utils/util';
 import { getXpackSettingForTheme } from '@/utils/xpack';
 
@@ -297,6 +296,8 @@ const agreeWithLogin = () => {
 
 const login = (formEl: FormInstance | undefined) => {
     if (!formEl || isLoggingIn) return;
+    errAuthInfo.value = false;
+    errCaptcha.value = false;
     formEl.validate(async (valid) => {
         if (!valid) return;
         if (isIntl.value) {
@@ -391,18 +392,6 @@ const loginVerify = async () => {
     captcha.captchaLength = res.data.captchaLength ? res.data.captchaLength : 0;
 };
 
-const loadDataFromDB = async () => {
-    const res = await getSettingInfo();
-    document.title = res.data.panelName;
-    i18n.locale.value = res.data.language;
-    i18n.warnHtmlMessage = false;
-    globalStore.entrance = res.data.securityEntrance;
-    globalStore.setOpenMenuTabs(res.data.menuTabs === 'Enable');
-    globalStore.updateLanguage(res.data.language);
-    let theme = globalStore.themeConfig.theme === res.data.theme ? res.data.theme : globalStore.themeConfig.theme;
-    globalStore.setThemeConfig({ ...themeConfig.value, theme: theme, panelName: res.data.panelName });
-};
-
 const getSetting = async () => {
     try {
         const res = await getLoginSetting();
@@ -411,13 +400,20 @@ const getSetting = async () => {
         handleCommand(loginForm.language);
         isIntl.value = res.data.isIntl;
         globalStore.isIntl = isIntl.value;
+
+        document.title = res.data.panelName;
+        i18n.locale.value = res.data.language;
+        i18n.warnHtmlMessage = false;
+        globalStore.setOpenMenuTabs(res.data.menuTabs === 'Enable');
+        globalStore.updateLanguage(res.data.language);
+        let theme = globalStore.themeConfig.theme === res.data.theme ? res.data.theme : globalStore.themeConfig.theme;
+        globalStore.setThemeConfig({ ...themeConfig.value, theme: theme, panelName: res.data.panelName });
     } catch (error) {}
 };
 
 onMounted(() => {
     globalStore.isOnRestart = false;
     getSetting();
-    loadDataFromDB();
     getXpackSettingForTheme();
     if (!globalStore.ignoreCaptcha) {
         loginVerify();

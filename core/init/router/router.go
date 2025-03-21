@@ -215,14 +215,10 @@ func Routers() *gin.Engine {
 	}
 
 	Router.Use(middleware.OperationLog())
+	Router.Use(middleware.PasswordExpired())
 	if global.CONF.Base.IsDemo {
 		Router.Use(middleware.DemoHandle())
 	}
-	Router.Use(middleware.JwtAuth())
-	Router.Use(middleware.SessionAuth())
-	Router.Use(middleware.PasswordExpired())
-	Router.Use(middleware.GlobalLoading())
-	Router.Use(Proxy())
 
 	PrivateGroup := Router.Group("/api/v2/core")
 	PrivateGroup.Use(middleware.WhiteAllow())
@@ -232,6 +228,10 @@ func Routers() *gin.Engine {
 		router.InitRouter(PrivateGroup)
 	}
 
+	Router.Use(middleware.JwtAuth())
+	Router.Use(middleware.SessionAuth())
+	Router.Use(middleware.GlobalLoading())
+	Router.Use(Proxy())
 	Router.NoRoute(func(c *gin.Context) {
 		if !checkBindDomain(c) {
 			handleNoRoute(c, "err_domain")

@@ -31,5 +31,8 @@ export namespace Login {
         isDemo: boolean;
         isIntl: boolean;
         language: string;
+        menuTabs: string;
+        panelName: string;
+        theme: string;
     }
 }
