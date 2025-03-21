@@ -2,7 +2,6 @@ package i18n
 
 import (
 	"embed"
-	"fmt"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/core/global"
@@ -65,10 +64,9 @@ func GetErrMsg(key string, maps map[string]interface{}) string {
 }
 
 func GetMsgByKey(key string) string {
-	content, err := global.I18n.Localize(&i18n.LocalizeConfig{
+	content, _ := global.I18n.Localize(&i18n.LocalizeConfig{
 		MessageID: key,
 	})
-	fmt.Println(err)
 	return content
 }
 

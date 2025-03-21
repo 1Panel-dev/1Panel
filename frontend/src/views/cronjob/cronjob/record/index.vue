@@ -387,7 +387,6 @@ const forDetail = async (row: Cronjob.Record) => {
 };
 const loadRecord = async (row: Cronjob.Record) => {
     currentRecord.value = row;
-    console.log(currentRecord.value);
     if (row.records) {
         const res = await getRecordLog(row.id);
         let log = res.data.replace(/\x1B\[[0-?]*[ -/]*[@-~]/g, '');

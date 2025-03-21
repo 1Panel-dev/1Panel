@@ -7,15 +7,19 @@
             @mouseenter="collapseButtonShow = true"
             @mouseleave="collapseButtonShow = false"
         >
-            <el-affix v-if="collapseButtonShow" :offset="124" class="affix">
-                <el-button
-                    size="small"
-                    circle
-                    :style="{ 'margin-left': menuStore.isCollapse ? '60px' : '165px', position: 'absolute' }"
-                    :icon="menuStore.isCollapse ? 'ArrowRight' : 'ArrowLeft'"
-                    plain
-                    @click="handleCollapse()"
-                ></el-button>
+            <el-affix v-if="collapseButtonShow" :offset="18" class="affix">
+                <el-tooltip
+                    :content="menuStore.isCollapse ? $t('commons.button.expand') : $t('commons.button.collapse')"
+                >
+                    <el-button
+                        size="small"
+                        circle
+                        :style="{ 'margin-left': menuStore.isCollapse ? '60px' : '165px', position: 'absolute' }"
+                        :icon="menuStore.isCollapse ? 'ArrowRight' : 'ArrowLeft'"
+                        plain
+                        @click="handleCollapse()"
+                    ></el-button>
+                </el-tooltip>
             </el-affix>
             <Sidebar @menu-click="handleMenuClick" :menu-router="!classObj.openMenuTabs" @open-task="openTask" />
         </div>

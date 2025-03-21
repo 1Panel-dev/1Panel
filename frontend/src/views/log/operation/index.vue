@@ -10,7 +10,7 @@
                 </el-button>
             </template>
             <template #rightToolBar>
-                <el-select v-model="searchGroup" @change="search()" clearable class="p-w-200 mr-2.5">
+                <el-select v-model="searchGroup" @change="search()" clearable class="p-w-200">
                     <template #prefix>{{ $t('logs.resource') }}</template>
                     <el-option :label="$t('commons.table.all')" value=""></el-option>
                     <el-option :label="$t('logs.detail.apps')" value="apps"></el-option>
@@ -25,11 +25,17 @@
                     <el-option :label="$t('logs.detail.logs')" value="logs"></el-option>
                     <el-option :label="$t('logs.detail.settings')" value="settings"></el-option>
                 </el-select>
-                <el-select v-model="searchStatus" @change="search()" clearable class="p-w-200 mr-2.5">
-                    <template #prefix>{{ $t('commons.table.status') }}</template>
+                <el-select v-model="searchStatus" @change="search()" clearable class="p-w-200">
+                    <template #prefix>{{ $t('xpack.node.node') }}</template>
                     <el-option :label="$t('commons.table.all')" value=""></el-option>
                     <el-option :label="$t('commons.status.success')" value="Success"></el-option>
                     <el-option :label="$t('commons.status.failed')" value="Failed"></el-option>
+                </el-select>
+                <el-select v-model="searchNode" @change="search()" clearable class="p-w-200">
+                    <template #prefix>{{ $t('xpack.node.node') }}</template>
+                    <el-option :label="$t('commons.table.all')" value=""></el-option>
+                    <el-option :label="$t('xpack.node.master')" value="local" />
+                    <el-option v-for="(node, index) in nodes" :key="index" :label="node.name" :value="node.name" />
                 </el-select>
                 <TableSearch @search="search()" v-model:searchName="searchName" />
                 <TableRefresh @search="search()" />
@@ -52,7 +58,11 @@
                             <span v-if="globalStore.language === 'en'">{{ row.detailEN }}</span>
                         </template>
                     </el-table-column>
-
+                    <el-table-column v-if="globalStore.isMasterProductPro" :label="$t('xpack.node.node')" prop="node">
+                        <template #default="{ row }">
+                            <span>{{ row.node === 'local' ? $t('xpack.node.master') : row.node }}</span>
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" prop="status">
                         <template #default="{ row }">
                             <Status :status="row.status" :msg="row.message" />
@@ -81,6 +91,7 @@ import { onMounted, reactive, ref } from '@vue/runtime-core';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
+import { listNodeOptions } from '@/api/modules/setting';
 
 const loading = ref();
 const data = ref();
@@ -94,6 +105,8 @@ const paginationConfig = reactive({
 const searchName = ref<string>('');
 const searchGroup = ref<string>('');
 const searchStatus = ref<string>('');
+const searchNode = ref<string>('');
+const nodes = ref();
 
 const globalStore = GlobalStore();
 
@@ -104,6 +117,7 @@ const search = async () => {
         pageSize: paginationConfig.pageSize,
         status: searchStatus.value,
         source: searchGroup.value,
+        node: searchNode.value,
     };
     loading.value = true;
     await getOperationLogs(params)
@@ -140,6 +154,23 @@ const loadDetail = (log: string) => {
     return log;
 };
 
+const loadNodes = async () => {
+    await listNodeOptions()
+        .then((res) => {
+            if (!res) {
+                nodes.value = [];
+                return;
+            }
+            nodes.value = res.data || [];
+            if (nodes.value.length === 0) {
+                globalStore.currentNode = 'local';
+            }
+        })
+        .catch(() => {
+            nodes.value = [];
+        });
+};
+
 const replacements = {
     '[enable]': 'commons.button.enable',
     '[Enable]': 'commons.button.enable',
@@ -172,6 +203,9 @@ const onSubmitClean = async () => {
 };
 
 onMounted(() => {
+    if (globalStore.isMasterProductPro) {
+        loadNodes();
+    }
     search();
 });
 </script>

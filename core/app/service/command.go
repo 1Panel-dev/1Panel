@@ -15,7 +15,7 @@ type ICommandService interface {
 	SearchForTree(req dto.OperateByType) ([]dto.CommandTree, error)
 	SearchWithPage(search dto.SearchCommandWithPage) (int64, interface{}, error)
 	Create(req dto.CommandOperate) error
-	Update(id uint, upMap map[string]interface{}) error
+	Update(req dto.CommandOperate) error
 	Delete(ids []uint) error
 }
 
@@ -123,6 +123,14 @@ func (u *CommandService) Delete(ids []uint) error {
 	return commandRepo.Delete(repo.WithByIDs(ids))
 }
 
-func (u *CommandService) Update(id uint, upMap map[string]interface{}) error {
-	return commandRepo.Update(id, upMap)
+func (u *CommandService) Update(req dto.CommandOperate) error {
+	command, _ := commandRepo.Get(repo.WithByName(req.Name), repo.WithByType(req.Type))
+	if command.ID != req.ID {
+		return buserr.New("ErrRecordExist")
+	}
+	upMap := make(map[string]interface{})
+	upMap["name"] = req.Name
+	upMap["group_id"] = req.GroupID
+	upMap["command"] = req.Command
+	return commandRepo.Update(req.ID, upMap)
 }

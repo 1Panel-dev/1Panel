@@ -29,7 +29,7 @@
                     :pagination-config="paginationConfig"
                     :data="data"
                     @search="search"
-                    :heightDiff="370"
+                    :heightDiff="300"
                 >
                     <el-table-column type="selection" fix />
                     <el-table-column :label="$t('commons.table.name')" show-overflow-tooltip prop="name" min-width="60">

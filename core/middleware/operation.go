@@ -32,8 +32,10 @@ func OperationLog() gin.HandlerFunc {
 		source := loadLogInfo(c.Request.URL.Path)
 		pathItem := strings.TrimPrefix(c.Request.URL.Path, "/api/v2")
 		pathItem = strings.TrimPrefix(pathItem, "/api/v2/core")
+		currentNode := c.Request.Header.Get("CurrentNode")
 		record := &model.OperationLog{
 			Source:    source,
+			Node:      currentNode,
 			IP:        c.ClientIP(),
 			Method:    strings.ToLower(c.Request.Method),
 			Path:      pathItem,

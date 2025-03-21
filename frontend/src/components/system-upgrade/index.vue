@@ -31,11 +31,12 @@
                     v-if="version !== 'Waiting' && !globalStore.hasNewVersion"
                     type="primary"
                     :underline="false"
+                    class="ml-2"
                     @click="onLoadUpgradeInfo"
                 >
                     {{ $t('commons.button.update') }}
                 </el-link>
-                <el-tag v-if="version === 'Waiting'" round style="margin-left: 10px">
+                <el-tag v-if="version === 'Waiting'" round class="ml-2.5">
                     {{ $t('setting.upgrading') }}
                 </el-tag>
             </div>

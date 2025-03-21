@@ -157,7 +157,7 @@
                                     inactive-value="Disable"
                                 />
                                 <span class="input-help">{{ $t('setting.apiInterfaceHelper') }}</span>
-                                <div v-if="form.apiInterfaceStatus === 'enable'">
+                                <div v-if="form.apiInterfaceStatus === 'Enable'">
                                     <div>
                                         <el-button link type="primary" @click="onChangeApiInterfaceStatus">
                                             {{ $t('commons.button.view') }}

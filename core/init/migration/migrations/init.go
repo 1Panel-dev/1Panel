@@ -339,3 +339,13 @@ var InitScriptLibrary = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddOperationNode = &gormigrate.Migration{
+	ID: "20250321-add-operation-node",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.OperationLog{}); err != nil {
+			return err
+		}
+		return nil
+	},
+}

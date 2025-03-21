@@ -8,6 +8,7 @@ type OperationLog struct {
 	BaseModel
 	Source    string `json:"source"`
 	IP        string `json:"ip"`
+	Node      string `json:"node"`
 	Path      string `json:"path"`
 	Method    string `json:"method"`
 	UserAgent string `json:"userAgent"`

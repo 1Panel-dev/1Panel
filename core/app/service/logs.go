@@ -122,6 +122,9 @@ func (u *LogService) PageOperationLog(req dto.SearchOpLogWithPage) (int64, inter
 	if len(req.Status) != 0 {
 		options = append(options, repo.WithByStatus(req.Status))
 	}
+	if len(req.Node) != 0 {
+		options = append(options, repo.WithByNode(req.Node))
+	}
 
 	total, ops, err := logRepo.PageOperationLog(
 		req.Page,

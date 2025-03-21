@@ -297,6 +297,8 @@ const agreeWithLogin = () => {
 
 const login = (formEl: FormInstance | undefined) => {
     if (!formEl || isLoggingIn) return;
+    errAuthInfo.value = false;
+    errCaptcha.value = false;
     formEl.validate(async (valid) => {
         if (!valid) return;
         if (isIntl.value) {

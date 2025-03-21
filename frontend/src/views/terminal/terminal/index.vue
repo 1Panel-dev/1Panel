@@ -1,5 +1,5 @@
 <template>
-    <div @keydown.esc="toggleFullscreen()">
+    <div tabindex="0">
         <el-tabs
             type="card"
             class="terminal-tabs"
@@ -164,12 +164,12 @@ const mobile = computed(() => {
     return globalStore.isMobile();
 });
 
-function toggleFullscreen() {
+const toggleFullscreen = () => {
     if (screenfull.isEnabled) {
         screenfull.toggle();
     }
     globalStore.isFullScreen = !screenfull.isFullscreen;
-}
+};
 const loadTooltip = () => {
     return i18n.global.t('commons.button.' + (globalStore.isFullScreen ? 'quitFullscreen' : 'fullscreen'));
 };

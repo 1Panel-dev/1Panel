@@ -1,7 +1,11 @@
 <template>
     <div v-loading="loading">
-        <LayoutContent :title="props.database + ' ' + $t('commons.button.set')" backName="PostgreSQL">
+        <LayoutContent backName="PostgreSQL">
             <template #leftToolBar>
+                <el-text class="mx-1">
+                    {{ props.database }}
+                </el-text>
+                <el-divider direction="vertical" />
                 <el-button type="primary" :plain="activeName !== 'conf'" @click="jumpToConf">
                     {{ $t('database.confChange') }}
                 </el-button>

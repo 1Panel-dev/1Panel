@@ -137,11 +137,7 @@ func (b *BaseApi) UpdateCommand(c *gin.Context) {
 		return
 	}
 
-	upMap := make(map[string]interface{})
-	upMap["name"] = req.Name
-	upMap["group_id"] = req.GroupID
-	upMap["command"] = req.Command
-	if err := commandService.Update(req.ID, upMap); err != nil {
+	if err := commandService.Update(req); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}

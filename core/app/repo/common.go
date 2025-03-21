@@ -55,6 +55,11 @@ func WithByStatus(status string) global.DBOption {
 		return g.Where("status = ?", status)
 	}
 }
+func WithByNode(node string) global.DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("node = ?", node)
+	}
+}
 func WithByGroupBelong(group string) global.DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("group_belong = ?", group)

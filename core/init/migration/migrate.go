@@ -24,6 +24,7 @@ func Init() {
 		migrations.UpdateXpackHideMemu,
 		migrations.AddSystemIP,
 		migrations.InitScriptLibrary,
+		migrations.AddOperationNode,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

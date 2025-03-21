@@ -87,6 +87,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         loading.value = true;
+        dialogData.value.rowData.groupList = dialogData.value.rowData.groupList || [];
         dialogData.value.rowData.groups = dialogData.value.rowData.groupList.join(',');
         if (dialogData.value.title === 'create') {
             await addScript(dialogData.value.rowData)

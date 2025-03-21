@@ -29,6 +29,7 @@
                     @sort-change="search"
                     @search="search"
                     :data="data"
+                    :heightDiff="300"
                 >
                     <el-table-column type="selection" fix />
                     <el-table-column

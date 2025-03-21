@@ -5,9 +5,9 @@ import (
 )
 
 type OperationLog struct {
-	ID     uint   `json:"id"`
-	Source string `json:"source"`
-
+	ID        uint   `json:"id"`
+	Source    string `json:"source"`
+	Node      string `json:"node"`
 	IP        string `json:"ip"`
 	Path      string `json:"path"`
 	Method    string `json:"method"`
@@ -26,6 +26,7 @@ type SearchOpLogWithPage struct {
 	PageInfo
 	Source    string `json:"source"`
 	Status    string `json:"status"`
+	Node      string `json:"node"`
 	Operation string `json:"operation"`
 }
 
