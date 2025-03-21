@@ -179,7 +179,7 @@ const loadContainerSetting = async () => {
     countItem.mirrors = res.data.registryMirrors || [];
 
     const settingRes = await getSettingInfo();
-    countItem.sockPath = settingRes.data.dockerSockPath || 'unix:///var/run/docker-x.sock';
+    countItem.sockPath = settingRes.data.dockerSockPath || 'unix:///var/run/docker.sock';
 };
 
 const goRouter = async (val: string) => {

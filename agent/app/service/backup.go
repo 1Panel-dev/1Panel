@@ -342,7 +342,7 @@ func (u *BackupService) checkBackupConn(backup *model.BackupAccount) (bool, erro
 	if _, err := client.Upload(fileItem, targetPath); err != nil {
 		return false, err
 	}
-	_, _ = client.Delete(path.Join(backup.BackupPath, "test"))
+	_, _ = client.Delete(path.Join(backup.BackupPath, "test/1panel"))
 	return true, nil
 }
 

@@ -233,7 +233,7 @@ import {
     updateDaemonJson,
     updateDaemonJsonByfile,
 } from '@/api/modules/container';
-import { getSettingInfo } from '@/api/modules/setting';
+import { getAgentSettingInfo } from '@/api/modules/setting';
 import { MsgSuccess } from '@/utils/message';
 import { checkNumberRange } from '@/global/form-rules';
 import { GlobalStore } from '@/store';
@@ -498,8 +498,8 @@ const search = async () => {
     form.ip6Tables = res.data.ip6Tables;
     form.experimental = res.data.experimental;
 
-    const settingRes = await getSettingInfo();
-    form.dockerSockPath = settingRes.data.dockerSockPath || 'unix:///var/run/docker-x.sock';
+    const settingRes = await getAgentSettingInfo();
+    form.dockerSockPath = settingRes.data.dockerSockPath || 'unix:///var/run/docker.sock';
 };
 
 onMounted(() => {

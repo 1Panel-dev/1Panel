@@ -1560,6 +1560,7 @@ const message = {
         stepOtherData: '其他数据',
         monitorData: '监控数据',
         selectAllImage: '备份所有应用镜像',
+        logLabel: '日志',
         agentLabel: '节点配置',
         appDataLabel: '应用数据',
         appImage: '应用镜像',

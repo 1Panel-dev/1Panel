@@ -1569,6 +1569,7 @@ const message = {
         taskLog: '保留任務日誌',
         monitorData: '保留監控數據',
         selectAllImage: '備份所有應用鏡像',
+        logLabel: '日誌',
         agentLabel: '節點配置',
         appDataLabel: '應用數據',
         appImage: '應用鏡像',

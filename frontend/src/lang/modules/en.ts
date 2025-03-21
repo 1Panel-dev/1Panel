@@ -1771,6 +1771,7 @@ const message = {
         taskLog: 'Retain Task Log',
         monitorData: 'Retain Monitoring Data',
         selectAllImage: 'Backup All Application Images',
+        logLabel: 'Log',
         agentLabel: 'Node Configuration',
         appDataLabel: 'Application Data',
         appImage: 'Application Image',

@@ -191,13 +191,15 @@ func handleDownloadSnapshot(itemHelper *snapRecoverHelper, snap model.Snapshot, 
 
 	account, client, err := NewBackupClientWithID(snap.DownloadAccountID)
 	itemHelper.Task.LogWithStatus(i18n.GetWithName("RecoverDownloadAccount", fmt.Sprintf("%s - %s", account.Type, account.Name)), err)
-	pathItem := account.BackupPath
-	if account.BackupPath != "/" {
-		pathItem = strings.TrimPrefix(account.BackupPath, "/")
+	targetPath := ""
+	if len(account.BackupPath) != 0 {
+		targetPath = path.Join(account.BackupPath, fmt.Sprintf("system_snapshot/%s.tar.gz", snap.Name))
+	} else {
+		targetPath = fmt.Sprintf("system_snapshot/%s.tar.gz", snap.Name)
 	}
 	filePath := fmt.Sprintf("%s/%s.tar.gz", targetDir, snap.Name)
 	_ = os.RemoveAll(filePath)
-	_, err = client.Download(path.Join(pathItem, fmt.Sprintf("system_snapshot/%s.tar.gz", snap.Name)), filePath)
+	_, err = client.Download(targetPath, filePath)
 	itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("Download"), err)
 	return err
 }
