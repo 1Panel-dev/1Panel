@@ -76,7 +76,7 @@
 
         <OpDialog ref="opRef" @search="search"></OpDialog>
         <OperateDialog @search="search" ref="dialogRef" />
-        <GroupDialog @search="loadGroupOptions" :hideDefaultButton="false" ref="dialogGroupRef" />
+        <GroupDialog @search="loadGroupOptions" ref="dialogGroupRef" />
         <CodemirrorDrawer ref="myDetail" />
         <TerminalDialog ref="runRef" />
     </div>
@@ -120,7 +120,7 @@ const groupOptions = ref();
 
 const dialogGroupRef = ref();
 const onOpenGroupDialog = () => {
-    dialogGroupRef.value!.acceptParams({ type: 'script' });
+    dialogGroupRef.value!.acceptParams({ type: 'script', hideDefaultButton: true });
 };
 
 const dialogRef = ref();

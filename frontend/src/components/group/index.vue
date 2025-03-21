@@ -52,7 +52,7 @@
                             </el-button>
                             <el-button
                                 link
-                                v-if="hideDefaultButton && !row.edit && !row.isDefault && !row.isDelete"
+                                v-if="!hideDefaultButton && !row.edit && !row.isDefault && !row.isDelete"
                                 type="primary"
                                 @click="setDefault(row)"
                             >
