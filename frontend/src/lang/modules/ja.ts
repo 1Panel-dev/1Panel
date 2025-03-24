@@ -2297,6 +2297,8 @@ const message = {
         runtimePortHelper: '現在の実行環境には複数のポートがあります。プロキシポートを選択してください。',
         runtimePortWarn: '現在の実行環境にはポートがありません。プロキシできません',
         cacheWarn: 'まずリバースプロキシのキャッシュスイッチをオフにしてください',
+        loadBalanceHelper:
+            'This section only creates load balancing rules, to use the rules please reverse proxy http(s)://<load balance name>',
     },
     php: {
         short_open_tag: '短いタグサポート',

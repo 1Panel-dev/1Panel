@@ -2353,6 +2353,8 @@ const message = {
         runtimePortHelper: 'Persekitaran runtime semasa mempunyai beberapa port. Sila pilih port proksi.',
         runtimePortWarn: 'Persekitaran runtime semasa tidak mempunyai port, tidak dapat proksi',
         cacheWarn: 'Sila matikan suis cache dalam pembalikan proksi terlebih dahulu',
+        loadBalanceHelper:
+            'Di sini hanya mencipta peraturan keseimbangan beban, untuk menggunakan peraturan sila proksi terbalik http(s)://<nama keseimbangan beban>',
     },
     php: {
         short_open_tag: 'Sokongan tag pendek',

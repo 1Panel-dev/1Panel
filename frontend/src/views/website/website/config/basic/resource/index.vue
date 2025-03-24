@@ -85,8 +85,6 @@ const listDatabases = async () => {
                         break;
                     }
                 }
-            } else {
-                req.db = databases.value[0];
             }
         }
     } catch (error) {}

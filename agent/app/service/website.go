@@ -412,7 +412,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 
 	if len(create.FtpUser) != 0 && len(create.FtpPassword) != 0 {
 		createFtpUser := func(t *task.Task) error {
-			indexDir := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "index")
+			indexDir := GetSitePath(*website, SiteIndexDir)
 			itemID, err := NewIFtpService().Create(dto.FtpCreate{User: create.FtpUser, Password: create.FtpPassword, Path: indexDir})
 			if err != nil {
 				createTask.Log(fmt.Sprintf("create ftp for website failed, err: %v", err))
@@ -970,7 +970,7 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 	if err != nil {
 		return nil, err
 	}
-	if err = ChangeHSTSConfig(req.Hsts, nginxInstall, website); err != nil {
+	if err = ChangeHSTSConfig(req.Hsts, website); err != nil {
 		return nil, err
 	}
 	res.Enable = req.Enable
@@ -2775,11 +2775,7 @@ func (w WebsiteService) GetLoadBalances(id uint) ([]dto.NginxUpstream, error) {
 	if err != nil {
 		return nil, err
 	}
-	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
-	if err != nil {
-		return nil, err
-	}
-	includeDir := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "upstream")
+	includeDir := GetSitePath(website, SiteUpstreamDir)
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(includeDir) {
 		return nil, nil
@@ -2870,11 +2866,7 @@ func (w WebsiteService) CreateLoadBalance(req request.WebsiteLBCreate) error {
 	if err != nil {
 		return err
 	}
-	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
-	if err != nil {
-		return err
-	}
-	includeDir := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "upstream")
+	includeDir := GetSitePath(website, SiteUpstreamDir)
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(includeDir) {
 		_ = fileOp.CreateDir(includeDir, constant.DirPerm)
@@ -2949,7 +2941,7 @@ func (w WebsiteService) UpdateLoadBalance(req request.WebsiteLBUpdate) error {
 	if err != nil {
 		return err
 	}
-	includeDir := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "upstream")
+	includeDir := GetSitePath(website, SiteUpstreamDir)
 	fileOp := files.NewFileOp()
 	filePath := path.Join(includeDir, fmt.Sprintf("%s.conf", req.Name))
 	if !fileOp.Stat(filePath) {
@@ -3021,7 +3013,7 @@ func (w WebsiteService) DeleteLoadBalance(req request.WebsiteLBDelete) error {
 	if err != nil {
 		return err
 	}
-	includeDir := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "upstream")
+	includeDir := GetSitePath(website, SiteUpstreamDir)
 	fileOp := files.NewFileOp()
 	filePath := path.Join(includeDir, fmt.Sprintf("%s.conf", req.Name))
 	if !fileOp.Stat(filePath) {
@@ -3042,7 +3034,7 @@ func (w WebsiteService) UpdateLoadBalanceFile(req request.WebsiteLBUpdateFile) e
 	if err != nil {
 		return err
 	}
-	includeDir := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "upstream")
+	includeDir := GetSitePath(website, SiteUpstreamDir)
 	filePath := path.Join(includeDir, fmt.Sprintf("%s.conf", req.Name))
 	fileOp := files.NewFileOp()
 	oldContent, err := fileOp.GetContent(filePath)

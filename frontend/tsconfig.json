@@ -32,7 +32,6 @@
         // 跳过库检查，解决打包失败
         "skipLibCheck": true,
         "ignoreDeprecations": "5.0",
-        "suppressImplicitAnyIndexErrors": true
     },
     // "include": ["./src/views"],
     "exclude": ["node_modules", "dist", "**/*.js", "*.json", "*.md"]

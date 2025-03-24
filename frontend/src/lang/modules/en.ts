@@ -2401,6 +2401,8 @@ const message = {
         runtimePortHelper: 'The current runtime environment has multiple ports. Please select a proxy port.',
         runtimePortWarn: 'The current runtime environment has no ports, unable to proxy',
         cacheWarn: 'Please turn off the cache switch in the reverse proxy first',
+        loadBalanceHelper:
+            'This section only creates load balancing rules, to use the rules please reverse proxy http(s)://<load balance name>',
     },
     php: {
         short_open_tag: 'Short tag support',

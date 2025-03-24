@@ -116,7 +116,7 @@ import { Algorithms, StatusStrategy } from '@/global/mimetype';
 import { Website } from '@/api/interface/website';
 
 const rules = ref<any>({
-    name: [Rules.linuxName],
+    name: [Rules.appName],
     algorithm: [Rules.requiredSelect],
     server: [Rules.requiredInput],
     weight: [checkNumberRange(0, 100)],
@@ -178,6 +178,7 @@ const removeServer = (index: number) => {
 
 const acceptParams = async (req: LoadBalanceOperate) => {
     item.value.websiteID = req.websiteID;
+    item.value.operate = req.operate;
     if (req.operate == 'edit') {
         item.value.operate = 'edit';
         item.value.name = req.upstream?.name || '';

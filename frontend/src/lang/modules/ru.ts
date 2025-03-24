@@ -2349,6 +2349,8 @@ const message = {
         runtimePortHelper: 'O ambiente de runtime atual possui várias portas. Por favor, selecione uma porta de proxy.',
         runtimePortWarn: 'В текущей среде выполнения нет портов, невозможно проксировать',
         cacheWarn: 'Пожалуйста, сначала выключите кэш в обратном прокси',
+        loadBalanceHelper:
+            'Здесь создаются только правила балансировки нагрузки, чтобы использовать правила, пожалуйста, используйте обратный прокси http(s)://<имя балансировки нагрузки>',
     },
     php: {
         short_open_tag: 'Поддержка коротких тегов',

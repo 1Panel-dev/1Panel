@@ -52,10 +52,6 @@ func Start() {
 		Handler: rootRouter,
 	}
 
-	go func() {
-		_ = http.ListenAndServe("0.0.0.0:6060", nil)
-	}()
-
 	if global.IsMaster {
 		_ = os.Remove("/etc/1panel/agent.sock")
 		_ = os.Mkdir("/etc/1panel", constant.DirPerm)

@@ -5,6 +5,7 @@
                 <el-button type="primary" plain @click="create()">
                     {{ $t('commons.button.create') }}
                 </el-button>
+                <el-text type="info" class="!ml-2" :closable="false">{{ $t('website.loadBalanceHelper') }}</el-text>
             </template>
             <el-table-column :label="$t('commons.table.name')" prop="name"></el-table-column>
             <el-table-column :label="$t('website.algorithm')" prop="algorithm">

@@ -1845,5 +1845,8 @@ func handleOpenrestyFile(appInstall *model.AppInstall) error {
 		return err
 	}
 	newContent := strings.ReplaceAll(string(content), "default_server", "")
-	return fileOp.WriteFile(defaultConfigPath, strings.NewReader(newContent), constant.FilePerm)
+	if err := fileOp.WriteFile(defaultConfigPath, strings.NewReader(newContent), constant.FilePerm); err != nil {
+		return err
+	}
+	return createAllWebsitesWAFConfig()
 }

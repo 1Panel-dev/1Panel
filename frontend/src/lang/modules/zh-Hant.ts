@@ -2227,6 +2227,7 @@ const message = {
         runtimePortHelper: '當前運行環境存在多個端口，請選擇一個代理端口。',
         runtimePortWarn: '當前運行環境沒有端口，無法代理',
         cacheWarn: '請先關閉反代中的緩存開關',
+        loadBalanceHelper: '此處只是創建負載均衡規則，使用規則請反向代理 http(s)://<負載均衡名稱>',
     },
     php: {
         short_open_tag: '短標簽支持',
