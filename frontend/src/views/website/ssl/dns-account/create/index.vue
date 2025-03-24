@@ -148,7 +148,7 @@
 import { CreateDnsAccount, UpdateDnsAccount } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
-import { MsgSuccess } from '@/utils/message';
+import { MsgSuccess, MsgError } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { ref } from 'vue';
 import { DNSTypes } from '@/global/mimetype';
@@ -180,26 +180,6 @@ const rules = ref<any>({
         clientID: [Rules.requiredInput],
         email: [Rules.email],
         password: [Rules.requiredInput],
-        authID: [{
-            validator: (rule: any, value: any, callback: any) => {
-                if (!value && !account.value.authorization.subAuthID) {
-                    callback(new Error(i18n.global.t('commons.validate.requiredInput')));
-                } else {
-                    callback();
-                }
-            },
-            trigger: ['blur', 'change']
-        }],
-        subAuthID: [{
-            validator: (rule: any, value: any, callback: any) => {
-                if (!value && !account.value.authorization.authID) {
-                    callback(new Error(i18n.global.t('commons.validate.requiredInput')));
-                } else {
-                    callback();
-                }
-            },
-            trigger: ['blur', 'change']
-        }],
         authPassword: [Rules.requiredInput],
     },
 });
@@ -248,6 +228,12 @@ const submit = async (formEl: FormInstance | undefined) => {
     await formEl.validate((valid) => {
         if (!valid) {
             return;
+        }
+        if (account.value.type === 'ClouDNS') {
+            if (!account.value.authorization.authID && !account.value.authorization.subAuthID) {
+                MsgError('Please input Auth ID or Sub Auth ID');
+                return;
+            }
         }
         loading.value = true;
 
