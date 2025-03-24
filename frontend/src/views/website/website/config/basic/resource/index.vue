@@ -23,7 +23,12 @@
                     >
                         <div class="flex justify-between items-center">
                             <span>{{ item.name }}</span>
-                            <el-tag>{{ item.type }}</el-tag>
+                            <div>
+                                <el-tag>{{ item.type }}</el-tag>
+                                <el-tag class="ml-1">
+                                    {{ item.from === 'local' ? $t('commons.table.local') : $t('database.remote') }}
+                                </el-tag>
+                            </div>
                         </div>
                     </el-option>
                 </el-select>

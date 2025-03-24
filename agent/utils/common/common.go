@@ -399,3 +399,12 @@ func RestartService(core, agent, reload bool) {
 		global.LOG.Errorf("restart 1panel service failed, err: %v, std: %s", err, std)
 	}
 }
+
+func GetSystemVersion(versionString string) string {
+	re := regexp.MustCompile(`v(\d+\.\d+\.\d+)`)
+	match := re.FindStringSubmatch(versionString)
+	if len(match) > 1 {
+		return match[1]
+	}
+	return ""
+}

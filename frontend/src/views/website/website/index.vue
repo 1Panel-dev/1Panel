@@ -272,7 +272,7 @@ const shortcuts = [
     {
         text: useI18n().t('website.ever'),
         value: () => {
-            return new Date('9999-12-31');
+            return new Date('2006-01-02');
         },
     },
     {
@@ -438,7 +438,10 @@ const pickerVisibility = (visibility: boolean, row: any) => {
 };
 
 const updateWebsitConfig = (row: any) => {
-    const reqDate = dateFormatSimple(row.expireDate);
+    let reqDate = dateFormatSimple(row.expireDate);
+    if (reqDate == '2006-01-02') {
+        reqDate = '9999-12-31';
+    }
     const req = {
         id: row.id,
         primaryDomain: row.primaryDomain,

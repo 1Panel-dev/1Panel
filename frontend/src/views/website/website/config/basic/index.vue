@@ -45,7 +45,11 @@
             >
                 <PHP :id="id" v-if="tabIndex == '13'"></PHP>
             </el-tab-pane>
-            <el-tab-pane :label="$t('logs.resource')" name="14">
+            <el-tab-pane
+                :label="$t('logs.resource')"
+                name="14"
+                v-if="website.type === 'runtime' || website.type === 'static'"
+            >
                 <Resource :id="id" v-if="tabIndex == '14'"></Resource>
             </el-tab-pane>
             <el-tab-pane :label="$t('website.other')" name="12">
