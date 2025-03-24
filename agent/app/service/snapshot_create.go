@@ -217,13 +217,13 @@ func loadDbConn(snap *snapHelper, targetDir string, req dto.SnapshotCreate) erro
 		return err
 	}
 
-	agentDb, err := common.LoadDBConnByPathWithErr(path.Join(targetDir, "db"), "agent.db")
+	agentDb, err := common.LoadDBConnByPathWithErr(path.Join(targetDir, "db/agent.db"), "agent.db")
 	snap.Task.LogWithStatus(i18n.GetWithName("SnapNewDB", "agent"), err)
 	if err != nil {
 		return err
 	}
 	snap.snapAgentDB = agentDb
-	coreDb, err := common.LoadDBConnByPathWithErr(path.Join(targetDir, "db"), "core.db")
+	coreDb, err := common.LoadDBConnByPathWithErr(path.Join(targetDir, "db/core.db"), "core.db")
 	snap.Task.LogWithStatus(i18n.GetWithName("SnapNewDB", "core"), err)
 	if err != nil {
 		return err
@@ -253,7 +253,6 @@ func loadDbConn(snap *snapHelper, targetDir string, req dto.SnapshotCreate) erro
 	}
 
 	_ = snap.snapAgentDB.Where("id = ?", snap.SnapID).Delete(&model.Snapshot{}).Error
-
 	return nil
 }
 

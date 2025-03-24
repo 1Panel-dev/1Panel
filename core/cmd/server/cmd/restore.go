@@ -12,7 +12,6 @@ import (
 	"github.com/1Panel-dev/1Panel/core/i18n"
 	cmdUtils "github.com/1Panel-dev/1Panel/core/utils/cmd"
 	"github.com/1Panel-dev/1Panel/core/utils/files"
-	"github.com/pkg/errors"
 
 	"github.com/spf13/cobra"
 )
@@ -45,49 +44,45 @@ var restoreCmd = &cobra.Command{
 			return nil
 		}
 		tmpPath = path.Join(upgradeDir, tmpPath, "original")
-		fmt.Println(i18n.GetMsgWithMapForCmd("RestoreStep1", map[string]interface{}{"name": tmpPath}))
 
-		if err := files.CopyFile(path.Join(tmpPath, "1panel"), "/usr/local/bin", true); err != nil {
+		fmt.Println(i18n.GetMsgWithMapForCmd("RestoreStep1", map[string]interface{}{"name": tmpPath}))
+		if err := files.CopyFile(path.Join(tmpPath, "1panel-agent"), "/usr/local/bin/1panel-agent", true); err != nil {
 			return err
 		}
+		if err := files.CopyFile(path.Join(tmpPath, "1panel-core"), "/usr/local/bin/1panel-core", true); err != nil {
+			return err
+		}
+		sudo := cmdUtils.SudoHandleCmd()
+		_, _ = cmdUtils.Execf("%s chmod 755 /usr/local/bin/1panel-agent /usr/local/bin/1panel-core", sudo)
+
 		fmt.Println(i18n.GetMsgByKeyForCmd("RestoreStep2"))
-		if err := files.CopyFile(path.Join(tmpPath, "1pctl"), "/usr/local/bin", true); err != nil {
+		if err := files.CopyFile(path.Join(tmpPath, "1pctl"), "/usr/local/bin/1pctl", true); err != nil {
 			return err
 		}
+		_, _ = cmdUtils.Execf("%s chmod 755 /usr/local/bin/1pctl", sudo)
 		_, _ = cmdUtils.Execf("cp -r %s /usr/local/bin", path.Join(tmpPath, "lang"))
 		geoPath := path.Join(global.CONF.Base.InstallDir, "1panel/geo")
 		_, _ = cmdUtils.Execf("mkdir %s && cp %s %s/", geoPath, path.Join(tmpPath, "GeoIP.mmdb"), geoPath)
+
 		fmt.Println(i18n.GetMsgByKeyForCmd("RestoreStep3"))
-		if err := files.CopyFile(path.Join(tmpPath, "1panel-core.service"), "/etc/systemd/system", true); err != nil {
+		if err := files.CopyFile(path.Join(tmpPath, "1panel-core.service"), "/etc/systemd/system/1panel-core.service", true); err != nil {
 			return err
 		}
-		if err := files.CopyFile(path.Join(tmpPath, "1panel-agent.service"), "/etc/systemd/system", true); err != nil {
+		if err := files.CopyFile(path.Join(tmpPath, "1panel-agent.service"), "/etc/systemd/system/1panel-agent.service", true); err != nil {
 			return err
 		}
 		fmt.Println(i18n.GetMsgByKeyForCmd("RestoreStep4"))
-		checkPointOfWal()
-		if _, err := os.Stat(path.Join(tmpPath, "1Panel.db")); err == nil {
-			if err := files.CopyFile(path.Join(tmpPath, "1Panel.db"), path.Join(baseDir, "1panel/db"), true); err != nil {
-				return err
+		if _, err := os.Stat(path.Join(tmpPath, "db")); err == nil {
+			dbPath := path.Join(baseDir, "1panel/db")
+			if err := files.CopyItem(true, true, path.Join(tmpPath, "db"), dbPath); err != nil {
+				global.LOG.Errorf("rollback 1panel db failed, err: %v", err)
 			}
 		}
-		if _, err := os.Stat(path.Join(tmpPath, "db.tar.gz")); err == nil {
-			if err := handleUnTar(path.Join(tmpPath, "db.tar.gz"), path.Join(baseDir, "1panel")); err != nil {
-				return err
-			}
-		}
+
 		fmt.Println(i18n.GetMsgByKeyForCmd("RestoreStep5"))
 		fmt.Println(i18n.GetMsgByKeyForCmd("RestoreSuccessful"))
 		return nil
 	},
-}
-
-func checkPointOfWal() {
-	db, err := loadDBConn()
-	if err != nil {
-		return
-	}
-	_ = db.Exec("PRAGMA wal_checkpoint(TRUNCATE);").Error
 }
 
 func loadRestorePath(upgradeDir string) (string, error) {
@@ -98,32 +93,22 @@ func loadRestorePath(upgradeDir string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	var folders []string
+	type itemState struct {
+		Name     string
+		CreateAt time.Time
+	}
+	var folders []itemState
 	for _, file := range files {
 		if file.IsDir() {
-			folders = append(folders, file.Name())
+			info, _ := file.Info()
+			folders = append(folders, itemState{Name: file.Name(), CreateAt: info.ModTime()})
 		}
 	}
 	if len(folders) == 0 {
 		return "no such file", nil
 	}
 	sort.Slice(folders, func(i, j int) bool {
-		return folders[i] > folders[j]
+		return folders[i].CreateAt.After(folders[j].CreateAt)
 	})
-	return folders[0], nil
-}
-
-func handleUnTar(sourceFile, targetDir string) error {
-	if _, err := os.Stat(targetDir); err != nil && os.IsNotExist(err) {
-		if err = os.MkdirAll(targetDir, os.ModePerm); err != nil {
-			return err
-		}
-	}
-
-	commands := fmt.Sprintf("tar zxvfC %s %s", sourceFile, targetDir)
-	stdout, err := cmdUtils.ExecWithTimeOut(commands, 20*time.Second)
-	if err != nil {
-		return errors.New(stdout)
-	}
-	return nil
+	return folders[0].Name, nil
 }

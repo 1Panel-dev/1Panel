@@ -20,7 +20,7 @@
                 </el-button>
             </template>
             <template #leftToolBar>
-                <el-select v-model="logConfig.id" @change="changeWebsite()" class="p-w-200 mr-2.5">
+                <el-select v-model="logConfig.id" @change="changeWebsite()" class="p-w-200">
                     <template #prefix>{{ $t('menu.website') }}</template>
                     <el-option
                         v-for="(website, index) in websites"

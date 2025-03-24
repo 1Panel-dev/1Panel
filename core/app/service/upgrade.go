@@ -86,12 +86,11 @@ func (u *UpgradeService) LoadNotes(req dto.Upgrade) (string, error) {
 
 func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 	global.LOG.Info("start to upgrade now...")
-	timeStr := time.Now().Format(constant.DateTimeSlimLayout)
 	baseDir := path.Join(global.CONF.Base.InstallDir, fmt.Sprintf("1panel/tmp/upgrade/%s", req.Version))
-	rootDir := path.Join(baseDir, fmt.Sprintf("upgrade_%s/downloads", timeStr))
+	downloadDir := path.Join(baseDir, "downloads")
 	_ = os.RemoveAll(baseDir)
-	originalDir := path.Join(baseDir, fmt.Sprintf("upgrade_%s/original", timeStr))
-	if err := os.MkdirAll(rootDir, os.ModePerm); err != nil {
+	originalDir := path.Join(baseDir, "original")
+	if err := os.MkdirAll(downloadDir, os.ModePerm); err != nil {
 		return err
 	}
 	if err := os.MkdirAll(originalDir, os.ModePerm); err != nil {
@@ -110,21 +109,21 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 	fileName := fmt.Sprintf("1panel-%s-%s-%s.tar.gz", req.Version, "linux", itemArch)
 	_ = settingRepo.Update("SystemStatus", "Upgrading")
 	go func() {
-		if err := files.DownloadFileWithProxy(downloadPath+"/"+fileName, rootDir+"/"+fileName); err != nil {
+		if err := files.DownloadFileWithProxy(downloadPath+"/"+fileName, downloadDir+"/"+fileName); err != nil {
 			global.LOG.Errorf("download service file failed, err: %v", err)
 			_ = settingRepo.Update("SystemStatus", "Free")
 			return
 		}
 		global.LOG.Info("download all file successful!")
 		defer func() {
-			_ = os.Remove(rootDir)
+			_ = os.Remove(downloadDir)
 		}()
-		if err := files.HandleUnTar(rootDir+"/"+fileName, rootDir, ""); err != nil {
+		if err := files.HandleUnTar(downloadDir+"/"+fileName, downloadDir, ""); err != nil {
 			global.LOG.Errorf("decompress file failed, err: %v", err)
 			_ = settingRepo.Update("SystemStatus", "Free")
 			return
 		}
-		tmpDir := rootDir + "/" + strings.ReplaceAll(fileName, ".tar.gz", "")
+		tmpDir := downloadDir + "/" + strings.ReplaceAll(fileName, ".tar.gz", "")
 
 		if err := u.handleBackup(originalDir); err != nil {
 			global.LOG.Errorf("handle backup original file failed, err: %v", err)

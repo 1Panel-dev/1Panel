@@ -36,7 +36,7 @@
                 <el-select
                     v-model="req.websiteGroupId"
                     @change="search()"
-                    class="p-w-200 mr-2.5"
+                    class="p-w-200"
                     :disabled="nginxStatus != 'Running'"
                 >
                     <template #prefix>{{ $t('commons.table.group') }}</template>

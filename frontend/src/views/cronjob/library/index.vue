@@ -13,7 +13,7 @@
                 </el-button>
             </template>
             <template #rightToolBar>
-                <el-select v-model="group" @change="search()" clearable class="p-w-200 mr-2.5">
+                <el-select v-model="group" @change="search()" clearable class="p-w-200">
                     <template #prefix>{{ $t('commons.table.group') }}</template>
                     <div v-for="item in groupOptions" :key="item.id">
                         <el-option :label="item.name" :value="item.id" />

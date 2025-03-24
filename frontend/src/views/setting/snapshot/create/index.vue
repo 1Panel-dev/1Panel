@@ -104,7 +104,7 @@
                 </el-tree>
             </fu-step>
             <fu-step id="backupData" :title="$t('setting.stepBackupData')">
-                <div class="mt-5 mb-5" v-if="!form.appData || form.appData.length === 0">
+                <div class="mt-5 mb-5" v-if="!form.backupData || form.backupData.length === 0">
                     <span class="input-help">{{ $t('setting.noBackupData') }}</span>
                 </div>
                 <div v-else>
@@ -218,6 +218,8 @@ const drawerVisible = ref();
 
 const emit = defineEmits(['search']);
 const acceptParams = (): void => {
+    form.downloadAccountID = '';
+    form.fromAccounts = [];
     search();
     loadBackups();
     drawerVisible.value = true;
@@ -259,7 +261,7 @@ const beforeLeave = async (stepItem: any) => {
             loadCheckForSubmit(panelChecks, form.panelData);
             return true;
         case 'backupData':
-            if (!form.appData || form.appData.length === 0) {
+            if (!form.backupData || form.backupData.length === 0) {
                 return true;
             }
             if (form.backupData && form.backupData.length !== 0) {
@@ -500,7 +502,7 @@ const setPanelDefaultCheck = async (list: any) => {
     }
 };
 const setBackupDefaultCheck = async (list: any) => {
-    if (!form.appData || form.appData.length === 0) {
+    if (!form.backupData || form.backupData.length === 0) {
         return;
     }
     for (const item of list) {

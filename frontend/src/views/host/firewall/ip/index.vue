@@ -28,7 +28,7 @@
                         </el-button>
                     </template>
                     <template #rightToolBar>
-                        <el-select v-model="searchStrategy" @change="search()" clearable class="p-w-200 mr-2.5">
+                        <el-select v-model="searchStrategy" @change="search()" clearable class="p-w-200">
                             <template #prefix>{{ $t('firewall.strategy') }}</template>
                             <el-option :label="$t('commons.table.all')" value=""></el-option>
                             <el-option :label="$t('firewall.allow')" value="accept"></el-option>

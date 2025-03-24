@@ -5,7 +5,7 @@
                 <LogRouter current="SystemLog" />
             </template>
             <template #leftToolBar>
-                <el-select class="p-w-200 mr-2.5" v-model="itemName" @change="search()">
+                <el-select class="p-w-200" v-model="itemName" @change="search()">
                     <template #prefix>{{ $t('commons.table.date') }}</template>
                     <el-option v-for="(item, index) in fileList" :key="index" :label="item" :value="item" />
                 </el-select>

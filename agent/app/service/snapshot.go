@@ -124,6 +124,7 @@ func (u *SnapshotService) LoadSnapshotData() (dto.SnapshotData, error) {
 			}
 		}
 	}
+	data.BackupData = itemBackups
 
 	return data, nil
 }
@@ -148,7 +149,7 @@ func (u *SnapshotService) Delete(req dto.SnapshotBatchDelete) error {
 			}
 			for _, item := range accounts {
 				global.LOG.Debugf("remove snapshot file %s.tar.gz from %s", snap.Name, item.name)
-				_, _ = item.client.Delete(path.Join("system_snapshot", snap.Name+".tar.gz"))
+				_, _ = item.client.Delete(path.Join(item.backupPath, "system_snapshot", snap.Name+".tar.gz"))
 			}
 		}
 

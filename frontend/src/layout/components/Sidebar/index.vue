@@ -6,7 +6,7 @@
         element-loading-svg-view-box="-10, -10, 50, 50"
         element-loading-background="rgba(122, 122, 122, 0.01)"
     >
-        <div class="fixed">
+        <div class="fixed" v-if="!isCollapse">
             <PrimaryMenu />
         </div>
         <Logo :isCollapse="isCollapse" />

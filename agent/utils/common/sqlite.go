@@ -60,10 +60,13 @@ func CloseDB(db *gorm.DB) {
 }
 
 func GetDBWithPath(dbPath string) (*gorm.DB, error) {
-	db, _ := gorm.Open(sqlite.Open(dbPath), &gorm.Config{
+	db, err := gorm.Open(sqlite.Open(dbPath), &gorm.Config{
 		DisableForeignKeyConstraintWhenMigrating: true,
 		Logger:                                   newLogger(),
 	})
+	if err != nil {
+		return nil, err
+	}
 	sqlDB, dbError := db.DB()
 	if dbError != nil {
 		return nil, dbError

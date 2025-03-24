@@ -5,7 +5,7 @@
                 <LogRouter current="Task" />
             </template>
             <template #rightToolBar>
-                <el-select v-model="req.status" @change="search()" clearable class="p-w-200 mr-2.5">
+                <el-select v-model="req.status" @change="search()" clearable class="p-w-200">
                     <template #prefix>{{ $t('commons.table.status') }}</template>
                     <el-option :label="$t('commons.table.all')" value=""></el-option>
                     <el-option :label="$t('commons.status.success')" value="Success"></el-option>

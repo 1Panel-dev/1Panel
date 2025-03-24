@@ -90,29 +90,70 @@
                     <el-table-column :label="$t('commons.table.status')" min-width="80" prop="status">
                         <template #default="{ row }">
                             <div>
-                                <el-button link v-if="row.status === 'Waiting'" type="primary">
+                                <el-button
+                                    @click="openWithResource(row, 'create')"
+                                    link
+                                    v-if="row.status === 'Waiting'"
+                                    type="primary"
+                                >
                                     {{ $t('setting.snapshot') }}{{ $t('commons.status.waiting') }}
                                 </el-button>
-                                <el-button link v-if="row.status === 'Failed'" @click="reCreate(row)" type="danger">
+                                <el-button
+                                    @click="openWithResource(row, 'create')"
+                                    link
+                                    v-if="row.status === 'Failed'"
+                                    type="danger"
+                                >
                                     {{ $t('setting.snapshot') }}{{ $t('commons.status.error') }}
                                 </el-button>
-                                <el-button link v-if="row.status === 'Success'" type="success">
+                                <el-button
+                                    v-if="row.status === 'Failed'"
+                                    type="danger"
+                                    class="retry"
+                                    icon="Warning"
+                                    link
+                                    @click="reCreate(row)"
+                                />
+                                <el-button
+                                    @click="openWithResource(row, 'create')"
+                                    link
+                                    v-if="row.status === 'Success'"
+                                    type="success"
+                                >
                                     {{ $t('setting.snapshot') }}{{ $t('commons.status.success') }}
                                 </el-button>
                             </div>
                             <div v-if="row.recoverStatus">
-                                <el-button link v-if="row.recoverStatus === 'Waiting'" type="primary">
+                                <el-button
+                                    @click="openWithResource(row, 'recover')"
+                                    link
+                                    v-if="row.recoverStatus === 'Waiting'"
+                                    type="primary"
+                                >
                                     {{ $t('commons.button.recover') }}{{ $t('commons.status.waiting') }}
                                 </el-button>
                                 <el-button
                                     v-if="row.recoverStatus === 'Failed'"
-                                    @click="onRecover(row)"
+                                    @click="openWithResource(row, 'recover')"
                                     type="danger"
                                     link
                                 >
                                     {{ $t('commons.button.recover') }}{{ $t('commons.status.error') }}
                                 </el-button>
-                                <el-button link v-if="row.recoverStatus === 'Success'" type="success">
+                                <el-button
+                                    v-if="row.recoverStatus === 'Failed'"
+                                    type="danger"
+                                    class="retry"
+                                    icon="Warning"
+                                    link
+                                    @click="onRecover(row)"
+                                />
+                                <el-button
+                                    @click="openWithResource(row, 'recover')"
+                                    link
+                                    v-if="row.recoverStatus === 'Success'"
+                                    type="success"
+                                >
                                     {{ $t('commons.button.recover') }}{{ $t('commons.status.success') }}
                                 </el-button>
                             </div>
@@ -128,6 +169,14 @@
                                 >
                                     {{ $t('setting.rollback') }}{{ $t('commons.status.error') }}
                                 </el-button>
+                                <el-button
+                                    v-if="row.rollbackStatus === 'Failed'"
+                                    icon="Warning"
+                                    class="retry"
+                                    type="danger"
+                                    link
+                                    @click="reRollback(row)"
+                                />
                                 <el-button link v-if="row.recoverStatus === 'Success'" type="success">
                                     {{ $t('setting.rollback') }}{{ $t('commons.status.success') }}
                                 </el-button>
@@ -173,7 +222,7 @@
                 </el-form>
             </template>
         </OpDialog>
-        <TaskLog ref="taskLogRef" width="70%" />
+        <TaskLog ref="taskLogRef" width="70%" @close="search()" />
         <SnapRecover ref="recoverRef" />
     </div>
 </template>
@@ -258,6 +307,10 @@ const reCreate = (row: any) => {
 };
 const openTaskLog = (taskID: string) => {
     taskLogRef.value.openWithTaskID(taskID);
+};
+const openWithResource = (row: any, op: string) => {
+    op = 'create' ? 'TaskCreate' : 'TaskRecover';
+    taskLogRef.value.openWithResourceID('Snapshot', op, row.id);
 };
 
 const reRollback = (row: any) => {
@@ -437,3 +490,10 @@ onMounted(() => {
     search();
 });
 </script>
+
+<style lang="scss" scoped>
+.retry {
+    margin-left: -1px;
+    margin-top: -2px;
+}
+</style>
