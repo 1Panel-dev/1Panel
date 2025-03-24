@@ -32,7 +32,7 @@
 import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { updateSetting } from '@/api/modules/setting';
+import { updateAgentSetting } from '@/api/modules/setting';
 import { ElMessageBox, FormInstance } from 'element-plus';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
@@ -85,7 +85,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
                     ? form.dockerSockPath
                     : 'unix://' + form.dockerSockPath,
             };
-            await updateSetting(params)
+            await updateAgentSetting(params)
                 .then(() => {
                     loading.value = false;
                     handleClose();

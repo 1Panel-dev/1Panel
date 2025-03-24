@@ -124,7 +124,7 @@ const onOperate = async (service: string, operation: string) => {
             ' ' + service + ' ',
             i18n.global.t('commons.operate.' + operation),
         ]),
-        i18n.global.t('app.' + operation),
+        i18n.global.t('commons.operate.' + operation),
         {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
             cancelButtonText: i18n.global.t('commons.button.cancel'),

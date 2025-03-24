@@ -78,7 +78,7 @@
         size="small"
         @close="handleBackupClose"
     >
-        <el-form ref="backupForm" label-position="left" v-loading="loading">
+        <el-form ref="backupForm" @submit.prevent label-position="left" v-loading="loading">
             <el-form-item
                 :label="$t('setting.compressPassword')"
                 class="mt-10"

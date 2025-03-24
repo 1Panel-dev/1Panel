@@ -34,7 +34,6 @@
                 placeholder="# The hosts configuration file does not exist or is empty (/etc/hosts)"
                 v-model="hostsConf"
                 :heightDiff="300"
-                :disabled="true"
             ></CodemirrorPro>
         </div>
         <template #footer>

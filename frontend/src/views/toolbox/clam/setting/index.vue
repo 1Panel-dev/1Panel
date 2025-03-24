@@ -1,30 +1,22 @@
 <template>
     <div v-loading="loading">
-        <LayoutContent>
+        <LayoutContent backName="Clam">
             <template #app>
                 <ClamStatus v-model:loading="loading" />
             </template>
-            <template #title>
-                <back-button name="Clam" header="ClamAV">
-                    <template #leftToolBar>
-                        <el-button type="primary" :plain="activeName !== 'clamd'" @click="search('clamd')">
-                            {{ $t('toolbox.clam.clamConf') }}
-                        </el-button>
-                        <el-button type="primary" :plain="activeName !== 'freshclam'" @click="search('freshclam')">
-                            {{ $t('toolbox.clam.freshClam') }}
-                        </el-button>
-                        <el-button type="primary" :plain="activeName !== 'clamd-log'" @click="search('clamd-log')">
-                            {{ $t('toolbox.clam.clamLog') }}
-                        </el-button>
-                        <el-button
-                            type="primary"
-                            :plain="activeName !== 'freshclam-log'"
-                            @click="search('freshclam-log')"
-                        >
-                            {{ $t('toolbox.clam.freshClamLog') }}
-                        </el-button>
-                    </template>
-                </back-button>
+            <template #leftToolBar>
+                <el-button type="primary" :plain="activeName !== 'clamd'" @click="search('clamd')">
+                    {{ $t('toolbox.clam.clamConf') }}
+                </el-button>
+                <el-button type="primary" :plain="activeName !== 'freshclam'" @click="search('freshclam')">
+                    {{ $t('toolbox.clam.freshClam') }}
+                </el-button>
+                <el-button type="primary" :plain="activeName !== 'clamd-log'" @click="search('clamd-log')">
+                    {{ $t('toolbox.clam.clamLog') }}
+                </el-button>
+                <el-button type="primary" :plain="activeName !== 'freshclam-log'" @click="search('freshclam-log')">
+                    {{ $t('toolbox.clam.freshClamLog') }}
+                </el-button>
             </template>
 
             <template #main>

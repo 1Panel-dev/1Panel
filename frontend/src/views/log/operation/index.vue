@@ -12,28 +12,37 @@
             <template #rightToolBar>
                 <el-select v-model="searchGroup" @change="search()" clearable class="p-w-200">
                     <template #prefix>{{ $t('logs.resource') }}</template>
-                    <el-option :label="$t('commons.table.all')" value=""></el-option>
-                    <el-option :label="$t('logs.detail.apps')" value="apps"></el-option>
-                    <el-option :label="$t('logs.detail.websites')" value="websites"></el-option>
-                    <el-option :label="$t('logs.detail.runtimes')" value="runtimes"></el-option>
-                    <el-option :label="$t('logs.detail.databases')" value="databases"></el-option>
-                    <el-option :label="$t('logs.detail.containers')" value="containers"></el-option>
-                    <el-option :label="$t('logs.detail.cronjobs')" value="cronjobs"></el-option>
-                    <el-option :label="$t('logs.detail.files')" value="files"></el-option>
-                    <el-option :label="$t('logs.detail.hosts')" value="hosts"></el-option>
-                    <el-option :label="$t('logs.detail.process')" value="process"></el-option>
-                    <el-option :label="$t('logs.detail.logs')" value="logs"></el-option>
-                    <el-option :label="$t('logs.detail.settings')" value="settings"></el-option>
+                    <el-option :label="$t('commons.table.all')" value="" />
+                    <el-option :label="$t('logs.detail.apps')" value="apps" />
+                    <el-option :label="$t('logs.detail.websites')" value="websites" />
+                    <el-option :label="$t('logs.detail.runtimes')" value="runtimes" />
+                    <el-option :label="$t('logs.detail.ai')" value="ai" />
+                    <el-option :label="$t('logs.detail.databases')" value="databases" />
+                    <el-option :label="$t('logs.detail.containers')" value="containers" />
+                    <el-option :label="$t('menu.system')" value="hosts" />
+                    <el-option :label="$t('logs.detail.files')" value="files" />
+                    <el-option :label="$t('logs.detail.cronjobs')" value="cronjobs" />
+                    <el-option :label="$t('logs.detail.toolbox')" value="toolbox" />
+                    <el-option :label="$t('logs.detail.process')" value="process" />
+                    <el-option :label="$t('logs.detail.nodes')" value="nodes" />
+                    <el-option :label="$t('logs.detail.tampers')" value="tampers" />
+                    <el-option :label="$t('logs.detail.xsetting')" value="xsetting" />
+                    <el-option :label="$t('logs.detail.licenses')" value="licenses" />
+                    <el-option :label="$t('logs.detail.logs')" value="logs" />
+                    <el-option :label="$t('logs.detail.settings')" value="settings" />
+                    <el-option :label="$t('logs.detail.backups')" value="backups" />
+                    <el-option :label="$t('logs.detail.groups')" value="groups" />
+                    <el-option :label="$t('logs.detail.commands')" value="commands" />
                 </el-select>
                 <el-select v-model="searchStatus" @change="search()" clearable class="p-w-200">
-                    <template #prefix>{{ $t('xpack.node.node') }}</template>
-                    <el-option :label="$t('commons.table.all')" value=""></el-option>
-                    <el-option :label="$t('commons.status.success')" value="Success"></el-option>
-                    <el-option :label="$t('commons.status.failed')" value="Failed"></el-option>
+                    <template #prefix>{{ $t('commons.table.status') }}</template>
+                    <el-option :label="$t('commons.table.all')" value="" />
+                    <el-option :label="$t('commons.status.success')" value="Success" />
+                    <el-option :label="$t('commons.status.failed')" value="Failed" />
                 </el-select>
                 <el-select v-model="searchNode" @change="search()" clearable class="p-w-200">
                     <template #prefix>{{ $t('xpack.node.node') }}</template>
-                    <el-option :label="$t('commons.table.all')" value=""></el-option>
+                    <el-option :label="$t('commons.table.all')" value="" />
                     <el-option :label="$t('xpack.node.master')" value="local" />
                     <el-option v-for="(node, index) in nodes" :key="index" :label="node.name" :value="node.name" />
                 </el-select>
@@ -181,7 +190,7 @@ const replacements = {
     '[delete]': 'commons.button.delete',
     '[get]': 'commons.button.get',
     '[operate]': 'commons.table.operate',
-    '[UserName]': 'commons.button.username',
+    '[UserName]': 'commons.login.username',
     '[PanelName]': 'setting.title',
     '[Language]': 'setting.language',
     '[Theme]': 'setting.theme',

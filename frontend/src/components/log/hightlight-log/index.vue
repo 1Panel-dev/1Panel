@@ -37,7 +37,7 @@ const initLog = async () => {
     if (editorRef.value && scrollerElement.value == undefined) {
         const parentElement = editorRef.value.$el as HTMLElement;
         scrollerElement.value = parentElement.querySelector('.hljs') as HTMLElement;
-        scrollerElement.value.style['min-height'] = '500px';
+        scrollerElement.value.style['min-height'] = '100px';
         scrollerElement.value.style['max-height'] = 'calc(100vh - ' + props.heightDiff + 'px)';
     }
 };

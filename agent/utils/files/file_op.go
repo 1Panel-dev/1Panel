@@ -7,7 +7,6 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"io"
 	"io/fs"
 	"net/http"
@@ -18,6 +17,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
@@ -756,6 +757,28 @@ func (f FileOp) TarGzCompressPro(withDir bool, src, dst, secret, exclusionRules 
 		global.LOG.Debug(commands)
 	}
 	return cmd.ExecCmdWithDir(commands, workdir)
+}
+
+func (f FileOp) TarGzFilesWithCompressPro(list []string, dst, secret string) error {
+	if !f.Stat(path.Dir(dst)) {
+		if err := f.Fs.MkdirAll(path.Dir(dst), constant.FilePerm); err != nil {
+			return err
+		}
+	}
+
+	var filelist []string
+	for _, item := range list {
+		filelist = append(filelist, "-C "+path.Dir(item)+" "+path.Base(item))
+	}
+	commands := ""
+	if len(secret) != 0 {
+		commands = fmt.Sprintf("tar --warning=no-file-changed --ignore-failed-read -zcf - %s | openssl enc -aes-256-cbc -salt -k '%s' -out %s", strings.Join(filelist, " "), secret, dst)
+		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" %s ", secret), "******"))
+	} else {
+		commands = fmt.Sprintf("tar --warning=no-file-changed --ignore-failed-read -zcf %s %s", dst, strings.Join(filelist, " "))
+		global.LOG.Debug(commands)
+	}
+	return cmd.ExecCmd(commands)
 }
 
 func (f FileOp) TarGzExtractPro(src, dst string, secret string) error {

@@ -80,7 +80,7 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, startTime time.Tim
 		record.From = "cronjob"
 		record.Type = "website"
 		record.CronjobID = cronjob.ID
-		record.Name = web.PrimaryDomain
+		record.Name = web.Alias
 		record.DetailName = web.Alias
 		record.DownloadAccountID, record.SourceAccountIDs = cronjob.DownloadAccountID, cronjob.SourceAccountIDs
 		backupDir := path.Join(global.Dir.TmpDir, fmt.Sprintf("website/%s", web.PrimaryDomain))
@@ -150,7 +150,7 @@ func (u *CronjobService) handleDirectory(cronjob model.Cronjob, startTime time.T
 	if err != nil {
 		return err
 	}
-	fileName := fmt.Sprintf("directory%s_%s.tar.gz", strings.ReplaceAll(cronjob.SourceDir, "/", "_"), startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5))
+	fileName := fmt.Sprintf("%s.tar.gz", startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5))
 	backupDir := path.Join(global.Dir.TmpDir, fmt.Sprintf("%s/%s", cronjob.Type, cronjob.Name))
 
 	fileOp := files.NewFileOp()
@@ -160,7 +160,7 @@ func (u *CronjobService) handleDirectory(cronjob model.Cronjob, startTime time.T
 		}
 	} else {
 		fileLists := strings.Split(cronjob.SourceDir, ",")
-		if err := fileOp.Compress(fileLists, backupDir, fileName, files.TarGz, cronjob.Secret); err != nil {
+		if err := fileOp.TarGzFilesWithCompressPro(fileLists, path.Join(backupDir, fileName), cronjob.Secret); err != nil {
 			return err
 		}
 	}

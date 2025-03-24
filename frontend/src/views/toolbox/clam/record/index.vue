@@ -138,7 +138,7 @@
                                         <el-option :value="500" :label="500" />
                                         <el-option :value="1000" :label="1000" />
                                     </el-select>
-                                    <LogPro v-model="logContent"></LogPro>
+                                    <HighlightLog :modelValue="logContent" />
                                 </el-row>
                             </el-form>
                         </el-col>
@@ -164,6 +164,7 @@ import { ElMessageBox } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
 import { shortcuts } from '@/utils/shortcuts';
 import { Toolbox } from '@/api/interface/toolbox';
+import HighlightLog from '@/components/log/hightlight-log/index.vue';
 import { cleanClamRecord, getClamRecordLog, handleClamScan, searchClamRecord } from '@/api/modules/toolbox';
 import { useRouter } from 'vue-router';
 const router = useRouter();
