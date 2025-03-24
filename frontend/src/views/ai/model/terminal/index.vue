@@ -42,7 +42,7 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
 const initTerm = () => {
     nextTick(() => {
         terminalRef.value.acceptParams({
-            endpoint: '/api/v2/ai/containers/exec',
+            endpoint: '/api/v2/containers/exec',
             args: `source=ollama&name=${itemName.value}`,
             error: '',
             initCmd: '',

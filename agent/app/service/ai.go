@@ -164,7 +164,18 @@ func (u *AIToolService) Recreate(req dto.OllamaModelName) error {
 		taskItem.AddSubTask(i18n.GetWithName("OllamaModelPull", req.Name), func(t *task.Task) error {
 			return cmd.ExecShellWithTask(taskItem, time.Hour, "docker", "exec", containerName, "ollama", "pull", req.Name)
 		}, nil)
-		_ = taskItem.Execute()
+		taskItem.AddSubTask(i18n.GetWithName("OllamaModelSize", req.Name), func(t *task.Task) error {
+			itemSize, err := loadModelSize(modelInfo.Name, containerName)
+			if len(itemSize) != 0 {
+				_ = aiRepo.Update(modelInfo.ID, map[string]interface{}{"status": constant.StatusSuccess, "size": itemSize})
+			} else {
+				_ = aiRepo.Update(modelInfo.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
+			}
+			return nil
+		}, nil)
+		if err := taskItem.Execute(); err != nil {
+			_ = aiRepo.Update(modelInfo.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
+		}
 	}()
 	return nil
 }

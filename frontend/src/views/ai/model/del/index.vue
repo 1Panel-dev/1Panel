@@ -12,7 +12,7 @@
                         :indeterminate="isIndeterminate"
                         @change="handleCheckAllChange"
                     >
-                        {{ $t('setting.all') }}
+                        {{ $t('commons.table.all') }}
                     </el-checkbox>
                     <el-checkbox-group v-model="checkedItems" @change="handleCheckedChange">
                         <el-checkbox v-for="(item, index) in list" :key="index" :label="item.name" :value="item.id" />
@@ -55,9 +55,10 @@ interface DialogProps {
     list: Array<AI.OllamaModelDropInfo>;
 }
 const acceptParams = (props: DialogProps): void => {
+    checkAll.value = false;
+    checkedItems.value = [];
     list.value = props.list;
     checkAll.value = true;
-    handleCheckAllChange(true);
     open.value = true;
 };
 
