@@ -1,5 +1,11 @@
 <template>
-    <DrawerPro v-model="open" :header="title" @close="handleClose" size="large" :fullScreen="true">
+    <DrawerPro
+        v-model="open"
+        :header="title"
+        @close="handleClose"
+        :size="globalStore.isFullScreen ? 'full' : 'large'"
+        :fullScreen="true"
+    >
         <template #content>
             <div v-if="req.file != 'config'">
                 <el-tabs v-model="req.file" type="card" @tab-click="handleChange">
@@ -36,6 +42,8 @@ import { operateSupervisorProcessFile } from '@/api/modules/host-tool';
 import i18n from '@/lang';
 import { TabsPaneContext } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const loading = ref(false);
 const content = ref('');

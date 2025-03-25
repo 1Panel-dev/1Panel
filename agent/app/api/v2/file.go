@@ -789,9 +789,6 @@ func (b *BaseApi) ProcessKeys(c *gin.Context) {
 			continue
 		}
 		res.Keys = append(res.Keys, key)
-		if process.Percent == 100 {
-			global.CACHE.Del(key)
-		}
 	}
 	helper.SuccessWithData(c, res)
 }
