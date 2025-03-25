@@ -265,6 +265,7 @@ sqlInject: 'SQL 注入'
 ErrDBNotExist: "数据库不存在"
 allow: "允许"
 deny: "禁止"
+OpenrestyNotFound: "Openresty 未安装"
 
 #task
 TaskStart: "{{.name}} 任务开始 [START]"

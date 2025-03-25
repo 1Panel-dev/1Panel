@@ -245,7 +245,7 @@ const onSaveSSL = async (formEl: FormInstance | undefined) => {
                 if (globalStore.entrance) {
                     address = address.replaceAll('settings/safe', globalStore.entrance);
                 } else {
-                    address = address.replaceAll('settings/safe', 'login');
+                    address = address.replaceAll('settings/safe', '');
                 }
                 setTimeout(() => {
                     window.open(`https://${address}`, '_self');

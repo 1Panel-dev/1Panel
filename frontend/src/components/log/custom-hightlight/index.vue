@@ -89,7 +89,7 @@ const systemRules: TokenRule[] = [
 const taskRules: TokenRule[] = [
     {
         type: 'bracket-text',
-        pattern: /\[([^\,]]+)\]/g,
+        pattern: /\[([^\]]+)\]/g,
         color: '#B87A2B',
     },
 ];
@@ -108,7 +108,7 @@ const defaultRules: TokenRule[] = [
     },
     {
         type: 'ip',
-        pattern: /\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/g,
+        pattern: /\b(?<!\[)\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b(?!\])/g,
         color: '#4A90E2',
     },
     {

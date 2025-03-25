@@ -2,9 +2,11 @@ package common
 
 import (
 	"fmt"
+	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/gin-gonic/gin"
 	mathRand "math/rand"
 	"net"
+	"net/http"
 	"os"
 	"path"
 	"strconv"
@@ -204,4 +206,15 @@ func HandleIPList(content string) ([]string, error) {
 		res = append(res, ip)
 	}
 	return res, nil
+}
+
+func deleteCookie(w http.ResponseWriter) {
+	cookie := &http.Cookie{
+		Name:    constant.SessionName,
+		Value:   "",
+		Path:    "/",
+		Expires: time.Unix(0, 0),
+		MaxAge:  -1,
+	}
+	http.SetCookie(w, cookie)
 }

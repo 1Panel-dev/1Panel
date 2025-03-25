@@ -232,6 +232,7 @@ func (u *SettingService) UpdatePort(port uint) error {
 func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 	secretDir := path.Join(global.CONF.Base.InstallDir, "1panel/secret")
 	if req.SSL == constant.StatusDisable {
+		c.SetCookie(constant.SessionName, "", -1, "/", "", false, true)
 		if err := settingRepo.Update("SSL", constant.StatusDisable); err != nil {
 			return err
 		}
