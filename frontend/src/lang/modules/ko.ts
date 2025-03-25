@@ -129,10 +129,9 @@ const message = {
         },
         msg: {
             noneData: '데이터가 없습니다',
-            disConn:
-                '종료 명령어인 {0} 등을 사용하지 않고 직접 연결 끊기 버튼을 클릭하여 터미널 연결을 종료해 주십시오.',
             delete: `이 작업은 되돌릴 수 없습니다. 계속하시겠습니까?`,
             clean: `이 작업은 되돌릴 수 없습니다. 계속하시겠습니까?`,
+            closeDrawerHelper: '시스템에서 변경 사항을 저장하지 않을 수 있습니다. 계속하시겠습니까?',
             deleteSuccess: '삭제 완료',
             loginSuccess: '로그인 성공',
             operationSuccess: '작업 완료',

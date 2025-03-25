@@ -112,7 +112,7 @@
             <span class="input-help">{{ loadStatus(currentInfo.loadUsagePercent) }}</span>
         </el-col>
         <template v-for="(item, index) of currentInfo.diskData" :key="index">
-            <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center" if="isShow('disk', index)">
+            <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center" v-if="isShow('disk', index)">
                 <el-popover placement="bottom" :width="300" trigger="hover" v-if="chartsOption[`disk${index}`]">
                     <el-row :gutter="5">
                         <el-tag style="font-weight: 500">{{ $t('home.baseInfo') }}:</el-tag>
@@ -164,7 +164,7 @@
             </el-col>
         </template>
         <template v-for="(item, index) of currentInfo.gpuData" :key="index">
-            <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center" if="isShow('gpu', index)">
+            <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center" v-if="isShow('gpu', index)">
                 <el-popover placement="bottom" :width="250" trigger="hover" v-if="chartsOption[`gpu${index}`]">
                     <el-row :gutter="5">
                         <el-tag style="font-weight: 500">{{ $t('home.baseInfo') }}:</el-tag>
@@ -265,7 +265,7 @@ import router from '@/routers';
 import i18n from '@/lang';
 import { nextTick, ref } from 'vue';
 import { toFolder } from '@/global/business';
-const showMore = ref(true);
+const showMore = ref(false);
 const totalCount = ref();
 
 const baseInfo = ref<Dashboard.BaseInfo>({

@@ -136,6 +136,7 @@ const message = {
             noneData: '暫無數據',
             delete: '刪除 操作不可回滾，是否繼續？',
             clean: '清空 操作不可回滾，是否繼續？',
+            closeDrawerHelper: '系統可能不會儲存您所做的變更，是否繼續？',
             deleteSuccess: '刪除成功',
             loginSuccess: '登錄成功',
             operationSuccess: '操作成功',

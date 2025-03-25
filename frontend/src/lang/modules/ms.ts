@@ -129,10 +129,9 @@ const message = {
         },
         msg: {
             noneData: 'Tiada data tersedia',
-            disConn:
-                'Sila klik butang putus sambungan secara langsung untuk menamatkan sambungan terminal, mengelakkan penggunaan arahan keluar seperti {0}.',
             delete: 'Operasi ini tidak boleh diundur. Adakah anda mahu meneruskan?',
             clean: 'Operasi ini tidak boleh diundur. Adakah anda mahu meneruskan?',
+            closeDrawerHelper: 'Sistem mungkin tidak menyimpan perubahan yang anda buat. Adakah anda ingin teruskan?',
             deleteSuccess: 'Berjaya dipadam',
             loginSuccess: 'Berjaya log masuk',
             operationSuccess: 'Berjaya dilakukan',

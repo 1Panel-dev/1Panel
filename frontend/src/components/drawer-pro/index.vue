@@ -2,6 +2,7 @@
     <el-drawer
         v-model="localOpenPage"
         @close="handleClose"
+        :before-close="handleBeforeClose"
         :destroy-on-close="true"
         :size="size"
         :close-on-press-escape="true"
@@ -29,14 +30,16 @@
             </el-page-header>
         </template>
 
-        <div v-if="slots.content">
-            <slot name="content"></slot>
+        <div ref="drawerContent">
+            <div v-if="slots.content">
+                <slot name="content"></slot>
+            </div>
+            <el-row v-else>
+                <el-col :span="22" :offset="1">
+                    <slot></slot>
+                </el-col>
+            </el-row>
         </div>
-        <el-row v-else>
-            <el-col :span="22" :offset="1">
-                <slot></slot>
-            </el-col>
-        </el-row>
 
         <template #footer v-if="slots.footer">
             <slot name="footer"></slot>
@@ -50,6 +53,7 @@ defineOptions({ name: 'DrawerPro' });
 import i18n from '@/lang';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
+const drawerContent = ref();
 
 const props = defineProps({
     header: String,
@@ -111,7 +115,31 @@ const handleBack = () => {
     }
 };
 
+const handleBeforeClose = (done: () => void) => {
+    console.log(drawerContent.value, drawerContent.value.querySelector('.el-form'));
+    if (drawerContent.value) {
+        const hasForm = drawerContent.value.querySelector('.el-form') !== null;
+        if (hasForm) {
+            ElMessageBox.confirm(
+                i18n.global.t('commons.msg.closeDrawerHelper'),
+                i18n.global.t('commons.button.close'),
+                {
+                    confirmButtonText: i18n.global.t('commons.button.confirm'),
+                    cancelButtonText: i18n.global.t('commons.button.cancel'),
+                },
+            ).then(async () => {
+                done();
+            });
+        } else {
+            done();
+        }
+    } else {
+        done();
+    }
+};
+
 const handleClose = () => {
+    console.log('321321');
     localOpenPage.value = false;
     globalStore.isFullScreen = false;
     emit('close');

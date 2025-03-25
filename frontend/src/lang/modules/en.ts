@@ -137,10 +137,9 @@ const message = {
         },
         msg: {
             noneData: 'No data available',
-            disConn:
-                'Please click the disconnect button directly to terminate the terminal connection, avoiding the use of exit commands like {0}.',
             delete: 'This operation delete cannot be rolled back. Do you want to continue?',
             clean: 'This operation clean cannot be rolled back. Do you want to continue?',
+            closeDrawerHelper: 'The system may not save the changes you made. Do you want to continue?',
             deleteSuccess: 'Delete Success',
             loginSuccess: 'Login Success',
             operationSuccess: 'Successful operation',
