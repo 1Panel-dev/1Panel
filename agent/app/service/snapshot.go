@@ -30,7 +30,7 @@ type SnapshotService struct {
 type ISnapshotService interface {
 	SearchWithPage(req dto.PageSnapshot) (int64, interface{}, error)
 	LoadSnapshotData() (dto.SnapshotData, error)
-	SnapshotCreate(req dto.SnapshotCreate, isCron bool) error
+	SnapshotCreate(req dto.SnapshotCreate, jobID uint) error
 	SnapshotReCreate(id uint) error
 	SnapshotRecover(req dto.SnapshotRecover) error
 	SnapshotRollback(req dto.SnapshotRecover) error
@@ -151,6 +151,7 @@ func (u *SnapshotService) Delete(req dto.SnapshotBatchDelete) error {
 				global.LOG.Debugf("remove snapshot file %s.tar.gz from %s", snap.Name, item.name)
 				_, _ = item.client.Delete(path.Join(item.backupPath, "system_snapshot", snap.Name+".tar.gz"))
 			}
+			_ = backupRepo.DeleteRecord(context.Background(), repo.WithByType("snapshot"), backupRepo.WithByFileName(snap.Name+".tar.gz"))
 		}
 
 		if err := snapshotRepo.Delete(repo.WithByID(snap.ID)); err != nil {

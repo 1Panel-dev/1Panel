@@ -26,14 +26,14 @@ import (
 	"gorm.io/gorm"
 )
 
-func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate, isCron bool) error {
+func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate, jobID uint) error {
 	versionItem, _ := settingRepo.Get(settingRepo.WithByKey("SystemVersion"))
 
 	scope := "core"
 	if !global.IsMaster {
 		scope = "agent"
 	}
-	if !isCron {
+	if jobID == 0 {
 		req.Name = fmt.Sprintf("1panel-%s-%s-linux-%s-%s", versionItem.Value, scope, loadOs(), time.Now().Format(constant.DateTimeSlimLayout))
 	}
 	appItem, _ := json.Marshal(req.AppData)
@@ -70,14 +70,14 @@ func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate, isCron bool) er
 		global.LOG.Errorf("new task for create snapshot failed, err: %v", err)
 		return err
 	}
-	if !isCron {
+	if jobID == 0 {
 		go func() {
-			_ = handleSnapshot(req, taskItem)
+			_ = handleSnapshot(req, taskItem, jobID)
 		}()
 		return nil
 	}
 
-	return handleSnapshot(req, taskItem)
+	return handleSnapshot(req, taskItem, jobID)
 }
 
 func (u *SnapshotService) SnapshotReCreate(id uint) error {
@@ -108,13 +108,13 @@ func (u *SnapshotService) SnapshotReCreate(id uint) error {
 		return err
 	}
 	go func() {
-		_ = handleSnapshot(req, taskItem)
+		_ = handleSnapshot(req, taskItem, 0)
 	}()
 
 	return nil
 }
 
-func handleSnapshot(req dto.SnapshotCreate, taskItem *task.Task) error {
+func handleSnapshot(req dto.SnapshotCreate, taskItem *task.Task, jobID uint) error {
 	rootDir := path.Join(global.Dir.TmpDir, "system", req.Name)
 	itemHelper := snapHelper{SnapID: req.ID, Task: *taskItem, FileOp: files.NewFileOp(), Ctx: context.Background()}
 	baseDir := path.Join(rootDir, "base")
@@ -122,7 +122,16 @@ func handleSnapshot(req dto.SnapshotCreate, taskItem *task.Task) error {
 
 	taskItem.AddSubTaskWithAlias(
 		"SnapDBInfo",
-		func(t *task.Task) error { return loadDbConn(&itemHelper, rootDir, req) },
+		func(t *task.Task) error {
+			if err := loadDbConn(&itemHelper, rootDir, req); err != nil {
+				return err
+			}
+			_ = itemHelper.snapAgentDB.Where("id = ?", req.ID).Delete(&model.Snapshot{}).Error
+			if jobID != 0 {
+				_ = itemHelper.snapAgentDB.Where("id = ?", jobID).Delete(&model.JobRecords{}).Error
+			}
+			return nil
+		},
 		nil,
 	)
 
@@ -198,6 +207,7 @@ func handleSnapshot(req dto.SnapshotCreate, taskItem *task.Task) error {
 
 type snapHelper struct {
 	SnapID      uint
+	SnapName    string
 	snapAgentDB *gorm.DB
 	snapCoreDB  *gorm.DB
 	Ctx         context.Context
@@ -251,8 +261,6 @@ func loadDbConn(snap *snapHelper, targetDir string, req dto.SnapshotCreate) erro
 			return err
 		}
 	}
-
-	_ = snap.snapAgentDB.Where("id = ?", snap.SnapID).Delete(&model.Snapshot{}).Error
 	return nil
 }
 

@@ -215,7 +215,7 @@ func (u *CronjobService) handleSystemLog(cronjob model.Cronjob, startTime time.T
 	return nil
 }
 
-func (u *CronjobService) handleSnapshot(cronjob model.Cronjob, startTime time.Time, taskID string) error {
+func (u *CronjobService) handleSnapshot(cronjob model.Cronjob, jobRecord model.JobRecords) error {
 	accountMap, err := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
 	if err != nil {
 		return err
@@ -239,9 +239,9 @@ func (u *CronjobService) handleSnapshot(cronjob model.Cronjob, startTime time.Ti
 		scope = "agent"
 	}
 	req := dto.SnapshotCreate{
-		Name:   fmt.Sprintf("snapshot-1panel-%s-%s-linux-%s-%s", scope, versionItem.Value, loadOs(), startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5)),
+		Name:   fmt.Sprintf("snapshot-1panel-%s-%s-linux-%s-%s", scope, versionItem.Value, loadOs(), jobRecord.StartTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5)),
 		Secret: cronjob.Secret,
-		TaskID: taskID,
+		TaskID: jobRecord.TaskID,
 
 		SourceAccountIDs:  record.SourceAccountIDs,
 		DownloadAccountID: cronjob.DownloadAccountID,
@@ -255,7 +255,7 @@ func (u *CronjobService) handleSnapshot(cronjob model.Cronjob, startTime time.Ti
 		WithTaskLog:       true,
 	}
 
-	if err := NewISnapshotService().SnapshotCreate(req, true); err != nil {
+	if err := NewISnapshotService().SnapshotCreate(req, jobRecord.ID); err != nil {
 		return err
 	}
 	record.FileName = req.Name + ".tar.gz"

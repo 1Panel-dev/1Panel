@@ -619,6 +619,14 @@ func (u *FirewallService) addPortsBeforeStart(client firewall.FirewallClient) er
 		if err := client.Port(fireClient.FireInfo{Port: global.CONF.Base.Port, Protocol: "tcp", Strategy: "accept"}, "add"); err != nil {
 			return err
 		}
+	} else {
+		var portSetting model.Setting
+		_ = global.CoreDB.Where("key = ?", "ServerPort").First(&portSetting).Error
+		if len(portSetting.Value) != 0 {
+			if err := client.Port(fireClient.FireInfo{Port: portSetting.Value, Protocol: "tcp", Strategy: "accept"}, "add"); err != nil {
+				return err
+			}
+		}
 	}
 	if err := client.Port(fireClient.FireInfo{Port: "22", Protocol: "tcp", Strategy: "accept"}, "add"); err != nil {
 		return err
