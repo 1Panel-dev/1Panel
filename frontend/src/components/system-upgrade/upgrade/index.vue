@@ -78,8 +78,8 @@ const onUpgrade = async () => {
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',
     }).then(async () => {
-        globalStore.isLoading = true;
         await upgrade(upgradeVersion.value);
+        globalStore.isLoading = true;
         globalStore.isOnRestart = true;
         drawerVisible.value = false;
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));

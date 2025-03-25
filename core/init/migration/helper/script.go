@@ -430,115 +430,134 @@ exit 0`
 func loadInstallClamAV() string {
 	return `#!/bin/bash
 
-# 检查是否具有 sudo 权限
-if [ "$EUID" -ne 0 ]; then
-  echo "请使用 sudo 或以 root 用户运行此脚本"
-  exit 1
-fi
+# ClamAV 安装配置脚本
+# 支持系统：Ubuntu/Debian/CentOS/RHEL/Rocky/AlmaLinux
 
-# 检测操作系统类型
+# 识别系统类型
 if [ -f /etc/os-release ]; then
-  . /etc/os-release
-  OS=$ID
-  OS_LIKE=$(echo $ID_LIKE | awk '{print $1}')  # 获取类似的发行版信息
+    . /etc/os-release
+    OS=$ID
+    OS_VER=$VERSION_ID
+elif type lsb_release >/dev/null 2>&1; then
+    OS=$(lsb_release -si | tr '[:upper:]' '[:lower:]')
+    OS_VER=$(lsb_release -sr)
 else
-  echo "无法检测操作系统类型"
-  exit 1
+    echo "无法识别操作系统"
+    exit 1
 fi
 
-# 安装 ClamAV
-if [ "$OS" == "ubuntu" ] || [ "$OS" == "debian" ]; then
-  echo "检测到 Debian/Ubuntu 系统，正在安装 ClamAV..."
-  apt-get update
-  apt-get install -y clamav clamav-daemon clamav-freshclam
-elif [ "$OS" == "centos" ] || [ "$OS" == "rhel" ] || [ "$OS_LIKE" == "rhel" ]; then
-  echo "检测到 Red Hat/CentOS 系统，正在安装 ClamAV..."
-  yum install -y epel-release
-  yum install -y clamav clamd clamav-update
-else
-  echo "不支持的操作系统: $OS"
-  exit 1
-fi
+# 安装ClamAV
+install_clamav() {
+    case $OS in
+        ubuntu|debian)
+            apt-get update
+            apt-get install -y clamav clamav-daemon
+            ;;
+        centos|rhel|rocky|almalinux)
+            if [[ $OS_VER == 7* ]]; then
+                yum install -y epel-release
+                yum install -y clamav clamd clamav-update
+            else
+                dnf install -y clamav clamd clamav-update
+            fi
+            ;;
+        *)
+            echo "不支持的OS: $OS"
+            exit 1
+            ;;
+    esac
+}
 
 # 配置 clamd
-CLAMD_CONF="/etc/clamd.d/scan.conf"
-if [ -f "$CLAMD_CONF" ]; then
-  echo "配置 clamd..."
-  # 备份原始配置文件
-  cp "$CLAMD_CONF" "$CLAMD_CONF.bak"
+configure_clamd() {
+    CLAMD_CONF=""
+    if [ -f "/etc/clamd.d/scan.conf" ]; then
+        CLAMD_CONF="/etc/clamd.d/scan.conf"
+    elif [ -f "/etc/clamav/clamd.conf" ]; then
+        CLAMD_CONF="/etc/clamav/clamd.conf"
+    else
+        echo "未找到 freshclam 配置文件，请手动配置"
+        exit 1
+    fi
 
-  # 修改配置文件
-  sed -i 's|^#LogFile .*|LogFile /var/log/clamd.scan|' "$CLAMD_CONF"
-  sed -i 's|^#LogFileMaxSize .*|LogFileMaxSize 2M|' "$CLAMD_CONF"
-  sed -i 's|^#PidFile .*|PidFile /run/clamd.scan/clamd.pid|' "$CLAMD_CONF"
-  sed -i 's|^#DatabaseDirectory .*|DatabaseDirectory /var/lib/clamav|' "$CLAMD_CONF"
-  sed -i 's|^#LocalSocket .*|LocalSocket /run/clamd.scan/clamd.sock|' "$CLAMD_CONF"
-else
-  echo "未找到 clamd 配置文件，请手动配置"
-  exit 1
-fi
+    echo "配置 clamd $CLAMD_CONF..."
+    # 备份原始配置文件
+    cp "$CLAMD_CONF" "$CLAMD_CONF.bak"
+
+    # 修改配置文件
+    sed -i 's|^LogFileMaxSize .*|LogFileMaxSize 2M|' "$CLAMD_CONF"
+    sed -i 's|^PidFile .*|PidFile /run/clamd.scan/clamd.pid|' "$CLAMD_CONF"
+    sed -i 's|^DatabaseDirectory .*|DatabaseDirectory /var/lib/clamav|' "$CLAMD_CONF"
+    sed -i 's|^LocalSocket .*|LocalSocket /run/clamd.scan/clamd.sock|' "$CLAMD_CONF"
+}
 
 # 配置 freshclam
-FRESHCLAM_CONF="/etc/freshclam.conf"
-if [ -f "$FRESHCLAM_CONF" ]; then
-  echo "配置 freshclam..."
-  # 备份原始配置文件
-  cp "$FRESHCLAM_CONF" "$FRESHCLAM_CONF.bak"
+configure_freshclam() {
+    FRESHCLAM_CONF=""
+    if [ -f "/etc/freshclam.conf" ]; then
+        FRESHCLAM_CONF="/etc/freshclam.conf"
+    elif [ -f "/etc/clamav/freshclam.conf" ]; then
+        FRESHCLAM_CONF="/etc/clamav/freshclam.conf"
+    else
+        echo "未找到 freshclam 配置文件，请手动配置"
+        exit 1
+    fi
 
-  # 修改配置文件
-  sed -i 's|^#DatabaseDirectory .*|DatabaseDirectory /var/lib/clamav|' "$FRESHCLAM_CONF"
-  sed -i 's|^#UpdateLogFile .*|UpdateLogFile /var/log/freshclam.log|' "$FRESHCLAM_CONF"
-  sed -i 's|^#PidFile .*|PidFile /var/run/freshclam.pid|' "$FRESHCLAM_CONF"
-  sed -i 's|^#DatabaseMirror .*|DatabaseMirror database.clamav.net|' "$FRESHCLAM_CONF"
-  sed -i 's|^#Checks .*|Checks 12|' "$FRESHCLAM_CONF"
-else
-  echo "未找到 freshclam 配置文件，请手动配置"
-  exit 1
-fi
+    echo "freshclam.con $FRESHCLAM_CONF..."
+    # 备份原始配置文件
+    cp "$FRESHCLAM_CONF" "$FRESHCLAM_CONF.bak"
 
-# 创建必要的目录和文件
-echo "创建必要的目录和文件..."
-mkdir -p /run/clamd.scan
-chown clamav:clamav /run/clamd.scan
-mkdir -p /var/log/clamav
-chown clamav:clamav /var/log/clamav
-touch /var/log/clamd.scan /var/log/freshclam.log
-chown clamav:clamav /var/log/clamd.scan /var/log/freshclam.log
+    # 修改配置文件
+    sed -i 's|^DatabaseDirectory .*|DatabaseDirectory /var/lib/clamav|' "$FRESHCLAM_CONF"
+    sed -i 's|^PidFile .*|PidFile /var/run/freshclam.pid|' "$FRESHCLAM_CONF"
+    sed -i 's/DatabaseMirror db.local.clamav.net/DatabaseMirror database.clamav.net/' "$FRESHCLAM_CONF"
+    sed -i 's|^Checks .*|Checks 12|' "$FRESHCLAM_CONF"
+}
 
-# 设置开机自启动并启动服务
-if command -v systemctl &> /dev/null; then
-  echo "设置 ClamAV 开机自启动..."
-  systemctl enable clamav-daemon
-  systemctl enable clamav-freshclam
+# 服务管理
+setup_service() {
+    case $OS in
+        ubuntu|debian)
+            systemctl stop clamav-freshclam
+            systemctl start clamav-daemon
+            systemctl enable clamav-daemon
+            systemctl start clamav-freshclam
+            systemctl enable clamav-freshclam
+            ;;
+        centos|rhel|rocky|almalinux)
+            if [[ $OS_VER == 7* ]]; then
+                systemctl stop freshclam
+                systemctl start clamd@scan
+                systemctl enable clamd@scan
+                systemctl start freshclam
+                systemctl enable freshclam
+            else
+                systemctl stop clamav-freshclam
+                systemctl start clamd@scan
+                systemctl enable clamd@scan
+                systemctl start clamav-freshclam
+                systemctl enable clamav-freshclam
+            fi
+            ;;
+    esac
+}
 
-  echo "启动 ClamAV 服务..."
-  systemctl start clamav-daemon
-  systemctl start clamav-freshclam
+# 主执行流程
+echo "正在安装 ClamAV..."
+install_clamav
 
-  if systemctl is-active --quiet clamav-daemon && systemctl is-active --quiet clamav-freshclam; then
-    echo "ClamAV 已成功安装并启动"
-  else
-    echo "ClamAV 启动失败，请检查日志"
-    exit 1
-  fi
-else
-  echo "systemctl 不可用，请手动启动 ClamAV"
-  exit 1
-fi
+echo -e "\n\n配置 clamd..."
+configure_clamd
 
-# 更新病毒数据库
-echo "更新 ClamAV 病毒数据库..."
-freshclam
+echo -e "\n\n配置 freshclam..."
+configure_freshclam
 
-# 检查 ClamAV 是否正常运行
-if clamscan --version &> /dev/null; then
-  echo "ClamAV 安装完成并正常运行！"
-else
-  echo "ClamAV 安装或配置出现问题，请检查日志"
-  exit 1
-fi
+echo -e "\n\n设置服务..."
+setup_service
 
-exit 0`
+echo -e "\n\n安装完成！"
+
+echo 0`
 }
 func loadUninstallClamAV() string {
 	return `#!/bin/bash

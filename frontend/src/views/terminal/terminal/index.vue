@@ -1,5 +1,5 @@
 <template>
-    <div tabindex="0">
+    <div>
         <el-tabs
             type="card"
             class="terminal-tabs"
@@ -168,7 +168,6 @@ const toggleFullscreen = () => {
     if (screenfull.isEnabled) {
         screenfull.toggle();
     }
-    globalStore.isFullScreen = !screenfull.isFullscreen;
 };
 const loadTooltip = () => {
     return i18n.global.t('commons.button.' + (globalStore.isFullScreen ? 'quitFullscreen' : 'fullscreen'));
@@ -403,9 +402,17 @@ function syncTerminal() {
     }
 }
 
+const changeFullScreen = () => {
+    globalStore.isFullScreen = screenfull.isFullscreen;
+};
+
 defineExpose({
     acceptParams,
     cleanTimer,
+});
+
+onBeforeUnmount(() => {
+    document.removeEventListener('fullscreenchange', changeFullScreen);
 });
 
 onMounted(() => {
@@ -413,6 +420,7 @@ onMounted(() => {
         const path = String(router.currentRoute.value.query.path);
         initCmd.value = `cd "${path}" \n`;
     }
+    document.addEventListener('fullscreenchange', changeFullScreen);
 });
 </script>
 

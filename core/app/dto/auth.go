@@ -28,15 +28,13 @@ type Login struct {
 	IgnoreCaptcha bool   `json:"ignoreCaptcha"`
 	Captcha       string `json:"captcha"`
 	CaptchaID     string `json:"captchaID"`
-	AuthMethod    string `json:"authMethod" validate:"required,oneof=jwt session"`
 	Language      string `json:"language" validate:"required,oneof=zh en 'zh-Hant' ko ja ru ms 'pt-BR'"`
 }
 
 type MFALogin struct {
-	Name       string `json:"name" validate:"required"`
-	Password   string `json:"password" validate:"required"`
-	Code       string `json:"code" validate:"required"`
-	AuthMethod string `json:"authMethod"`
+	Name     string `json:"name" validate:"required"`
+	Password string `json:"password" validate:"required"`
+	Code     string `json:"code" validate:"required"`
 }
 
 type SystemSetting struct {

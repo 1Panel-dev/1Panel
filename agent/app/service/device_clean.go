@@ -564,10 +564,12 @@ func loadTreeWithDir(isCheck bool, treeType, pathItem string, fileOp fileUtils.F
 		return lists
 	}
 	sort.Slice(files, func(i, j int) bool {
-		return files[i].Name() > files[j].Name()
+		infoI, _ := files[i].Info()
+		infoJ, _ := files[i].Info()
+		return infoI.ModTime().Before(infoJ.ModTime())
 	})
 	for _, file := range files {
-		if (treeType == "old_upgrade" || treeType == "upgrade") && !strings.HasPrefix(file.Name(), "upgrade_2023") {
+		if treeType == "old_upgrade" {
 			continue
 		}
 		if treeType == "task_log" && file.Name() == "ssl" {

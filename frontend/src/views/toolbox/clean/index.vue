@@ -643,6 +643,10 @@ function load18n(label: string) {
         case 'System':
         case 'Website':
             return i18n.global.t('menu.' + label.toLowerCase());
+        case 'Compose':
+            return i18n.global.t('container.compose');
+        case 'CustomAppstore':
+            return i18n.global.t('xpack.customApp.name');
         case 'RuntimeExtension':
             return i18n.global.t('website.runtime');
         case 'Image':

@@ -10,7 +10,6 @@ type CommandRouter struct{}
 
 func (s *CommandRouter) InitRouter(Router *gin.RouterGroup) {
 	commandRouter := Router.Group("commands").
-		Use(middleware.JwtAuth()).
 		Use(middleware.SessionAuth()).
 		Use(middleware.PasswordExpired())
 	baseApi := v2.ApiGroupApp.BaseApi

@@ -11,7 +11,6 @@ type GroupRouter struct {
 
 func (a *GroupRouter) InitRouter(Router *gin.RouterGroup) {
 	groupRouter := Router.Group("groups").
-		Use(middleware.JwtAuth()).
 		Use(middleware.SessionAuth()).
 		Use(middleware.PasswordExpired())
 

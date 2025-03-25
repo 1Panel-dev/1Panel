@@ -207,30 +207,29 @@ func Routers() *gin.Engine {
 
 	swaggerRouter := Router.Group("1panel")
 	docs.SwaggerInfo.BasePath = "/api/v2"
-	swaggerRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth()).GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+	swaggerRouter.Use(middleware.SessionAuth()).GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	PublicGroup := Router.Group("")
 	{
 		PublicGroup.Use(gzip.Gzip(gzip.DefaultCompression))
 		setWebStatic(PublicGroup)
 	}
-
-	Router.Use(middleware.OperationLog())
-	Router.Use(middleware.PasswordExpired())
 	if global.CONF.Base.IsDemo {
 		Router.Use(middleware.DemoHandle())
 	}
 
+	Router.Use(middleware.OperationLog())
+	Router.Use(middleware.GlobalLoading())
+	Router.Use(middleware.PasswordExpired())
+	Router.Use(middleware.WhiteAllow())
+	Router.Use(middleware.BindDomain())
+
 	PrivateGroup := Router.Group("/api/v2/core")
-	PrivateGroup.Use(middleware.WhiteAllow())
-	PrivateGroup.Use(middleware.BindDomain())
 	PrivateGroup.Use(middleware.SetPasswordPublicKey())
 	for _, router := range rou.RouterGroupApp {
 		router.InitRouter(PrivateGroup)
 	}
 
-	Router.Use(middleware.JwtAuth())
 	Router.Use(middleware.SessionAuth())
-	Router.Use(middleware.GlobalLoading())
 	Router.Use(Proxy())
 	Router.NoRoute(func(c *gin.Context) {
 		if !checkBindDomain(c) {

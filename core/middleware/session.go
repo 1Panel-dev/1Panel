@@ -22,10 +22,6 @@ func SessionAuth() gin.HandlerFunc {
 			c.Next()
 			return
 		}
-		if method, exist := c.Get("authMethod"); exist && method == constant.AuthMethodJWT {
-			c.Next()
-			return
-		}
 
 		panelToken := c.GetHeader("1Panel-Token")
 		panelTimestamp := c.GetHeader("1Panel-Timestamp")

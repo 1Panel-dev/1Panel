@@ -138,7 +138,7 @@
                                         <el-option :value="500" :label="500" />
                                         <el-option :value="1000" :label="1000" />
                                     </el-select>
-                                    <HighlightLog :modelValue="logContent" />
+                                    <HighlightLog :modelValue="logContent" :heightDiff="533" />
                                 </el-row>
                             </el-form>
                         </el-col>

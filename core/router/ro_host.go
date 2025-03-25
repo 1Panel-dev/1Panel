@@ -10,7 +10,6 @@ type HostRouter struct{}
 
 func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 	hostRouter := Router.Group("hosts").
-		Use(middleware.JwtAuth()).
 		Use(middleware.SessionAuth()).
 		Use(middleware.PasswordExpired())
 	baseApi := v2.ApiGroupApp.BaseApi

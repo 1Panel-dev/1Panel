@@ -10,7 +10,6 @@ import (
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
-	"github.com/1Panel-dev/1Panel/core/utils/jwt"
 	"github.com/1Panel-dev/1Panel/core/utils/mfa"
 	"github.com/gin-gonic/gin"
 )
@@ -59,7 +58,7 @@ func (u *AuthService) Login(c *gin.Context, info dto.Login, entrance string) (*d
 	if mfa.Value == constant.StatusEnable {
 		return &dto.UserLoginInfo{Name: nameSetting.Value, MfaStatus: mfa.Value}, "", nil
 	}
-	res, err := u.generateSession(c, info.Name, info.AuthMethod)
+	res, err := u.generateSession(c, info.Name)
 	if err != nil {
 		return nil, "", err
 	}
@@ -96,14 +95,14 @@ func (u *AuthService) MFALogin(c *gin.Context, info dto.MFALogin, entrance strin
 	if !success {
 		return nil, "ErrAuth", nil
 	}
-	res, err := u.generateSession(c, info.Name, info.AuthMethod)
+	res, err := u.generateSession(c, info.Name)
 	if err != nil {
 		return nil, "", err
 	}
 	return res, "", nil
 }
 
-func (u *AuthService) generateSession(c *gin.Context, name, authMethod string) (*dto.UserLoginInfo, error) {
+func (u *AuthService) generateSession(c *gin.Context, name string) (*dto.UserLoginInfo, error) {
 	setting, err := settingRepo.Get(repo.WithByKey("SessionTimeout"))
 	if err != nil {
 		return nil, err
@@ -117,18 +116,6 @@ func (u *AuthService) generateSession(c *gin.Context, name, authMethod string) (
 		return nil, err
 	}
 
-	if authMethod == constant.AuthMethodJWT {
-		j := jwt.NewJWT()
-		claims := j.CreateClaims(jwt.BaseClaims{
-			Name:    name,
-			IsAgent: false,
-		})
-		token, err := j.CreateToken(claims)
-		if err != nil {
-			return nil, err
-		}
-		return &dto.UserLoginInfo{Name: name, Token: token}, nil
-	}
 	sessionUser, err := global.SESSION.Get(c)
 	if err != nil {
 		err := global.SESSION.Set(c, sessionUser, httpsSetting.Value == constant.StatusEnable, lifeTime)

@@ -10,10 +10,8 @@ type SettingRouter struct{}
 
 func (s *SettingRouter) InitRouter(Router *gin.RouterGroup) {
 	router := Router.Group("settings").
-		Use(middleware.JwtAuth()).
 		Use(middleware.SessionAuth())
 	settingRouter := Router.Group("settings").
-		Use(middleware.JwtAuth()).
 		Use(middleware.SessionAuth()).
 		Use(middleware.PasswordExpired())
 

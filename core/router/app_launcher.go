@@ -10,7 +10,6 @@ type AppLauncherRouter struct{}
 
 func (s *AppLauncherRouter) InitRouter(Router *gin.RouterGroup) {
 	launcherRouter := Router.Group("launcher").
-		Use(middleware.JwtAuth()).
 		Use(middleware.SessionAuth()).
 		Use(middleware.PasswordExpired())
 	baseApi := v2.ApiGroupApp.BaseApi

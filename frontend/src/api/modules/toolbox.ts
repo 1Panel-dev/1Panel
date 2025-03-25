@@ -42,7 +42,7 @@ export const scan = () => {
     return http.post<Toolbox.CleanData>(`/toolbox/scan`, {});
 };
 export const clean = (param: any) => {
-    return http.post(`/toolbox/clean`, param);
+    return http.post(`/toolbox/clean`, param, TimeoutEnum.T_5M);
 };
 
 // fail2ban

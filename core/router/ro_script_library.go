@@ -10,7 +10,6 @@ type ScriptRouter struct{}
 
 func (s *ScriptRouter) InitRouter(Router *gin.RouterGroup) {
 	scriptRouter := Router.Group("script").
-		Use(middleware.JwtAuth()).
 		Use(middleware.SessionAuth()).
 		Use(middleware.PasswordExpired())
 	baseApi := v2.ApiGroupApp.BaseApi

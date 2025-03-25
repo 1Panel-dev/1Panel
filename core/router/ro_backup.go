@@ -10,7 +10,6 @@ type BackupRouter struct{}
 
 func (s *BackupRouter) InitRouter(Router *gin.RouterGroup) {
 	backupRouter := Router.Group("backups").
-		Use(middleware.JwtAuth()).
 		Use(middleware.SessionAuth()).
 		Use(middleware.PasswordExpired())
 	baseApi := v2.ApiGroupApp.BaseApi
