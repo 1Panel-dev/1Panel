@@ -1816,19 +1816,13 @@ func (w WebsiteService) GetProxies(id uint) (res []request.WebsiteProxyConfig, e
 func (w WebsiteService) UpdateProxyFile(req request.NginxProxyUpdate) (err error) {
 	var (
 		website           model.Website
-		nginxFull         dto.NginxFull
 		oldRewriteContent []byte
 	)
 	website, err = websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
 	if err != nil {
 		return err
 	}
-	nginxFull, err = getNginxFull(&website)
-	if err != nil {
-		return err
-	}
-	includePath := fmt.Sprintf("%s/%s.conf", GetSitePath(website, SiteProxyDir), req.Name)
-	absolutePath := path.Join(nginxFull.Install.GetPath(), includePath)
+	absolutePath := fmt.Sprintf("%s/%s.conf", GetSitePath(website, SiteProxyDir), req.Name)
 	fileOp := files.NewFileOp()
 	oldRewriteContent, err = fileOp.GetContent(absolutePath)
 	if err != nil {

@@ -798,33 +798,38 @@ func (f FileOp) TarGzExtractPro(src, dst string, secret string) error {
 	}
 	return cmd.ExecCmdWithDir(commands, dst)
 }
+func CopyCustomAppFile(srcPath, dstPath string) error {
+	if _, err := os.Stat(srcPath); os.IsNotExist(err) {
+		return fmt.Errorf("source file does not exist: %s", srcPath)
+	}
 
-func CopyFileWithName(src, dst string, withName bool) error {
-	source, err := os.Open(src)
+	destDir := path.Dir(dstPath)
+	if err := os.MkdirAll(destDir, 0755); err != nil {
+		return fmt.Errorf("failed to create destination directory %s: %v", destDir, err)
+	}
+
+	source, err := os.Open(srcPath)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to open source file %s: %v", srcPath, err)
 	}
 	defer source.Close()
 
-	if path.Base(src) != path.Base(dst) && !withName {
-		dst = path.Join(dst, path.Base(src))
-	}
-	if _, err := os.Stat(path.Dir(dst)); err != nil {
-		if os.IsNotExist(err) {
-			_ = os.MkdirAll(path.Dir(dst), os.ModePerm)
-		}
-	}
-	target, err := os.OpenFile(dst+"_temp", os.O_RDWR|os.O_CREATE|os.O_TRUNC, constant.FilePerm)
+	tempFile, err := os.CreateTemp(destDir, "temp_*.tar.gz")
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to create temporary file in %s: %v", destDir, err)
 	}
-	defer target.Close()
+	defer os.Remove(tempFile.Name())
+	defer tempFile.Close()
 
-	if _, err = io.Copy(target, source); err != nil {
-		return err
+	if _, err = io.Copy(tempFile, source); err != nil {
+		return fmt.Errorf("failed to copy file contents: %v", err)
 	}
-	if err = os.Rename(dst+"_temp", dst); err != nil {
-		return err
+
+	tempFile.Close()
+	source.Close()
+
+	if err = os.Rename(tempFile.Name(), dstPath); err != nil {
+		return fmt.Errorf("failed to rename temporary file to %s: %v", dstPath, err)
 	}
 	return nil
 }
