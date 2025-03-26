@@ -11,12 +11,12 @@ import (
 
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
+	"github.com/1Panel-dev/1Panel/backend/utils/systemctl"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/global"
-	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	fileUtils "github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/google/uuid"
@@ -284,12 +284,7 @@ func (u *DeviceService) Clean(req []dto.Clean) {
 	_ = settingRepo.Update("LastCleanData", fmt.Sprintf("%v", len(req)))
 
 	if restart {
-		go func() {
-			_, err := cmd.Exec("systemctl restart 1panel.service")
-			if err != nil {
-				global.LOG.Errorf("restart system port failed, err: %v", err)
-			}
-		}()
+		systemctl.SystemRestart()
 	}
 }
 

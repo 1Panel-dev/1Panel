@@ -63,22 +63,22 @@ func (c *ClamService) LoadBaseInfo() (dto.ClamBaseInfo, error) {
 	var baseInfo dto.ClamBaseInfo
 	baseInfo.Version = "-"
 	baseInfo.FreshVersion = "-"
-	exist1, _ := systemctl.IsExist(clamServiceNameCentOs)
+	exist1, _ := systemctl.SctlIsExist(clamServiceNameCentOs)
 	if exist1 {
 		c.serviceName = clamServiceNameCentOs
 		baseInfo.IsExist = true
-		baseInfo.IsActive, _ = systemctl.IsActive(clamServiceNameCentOs)
+		baseInfo.IsActive, _ = systemctl.SctlIsActive(clamServiceNameCentOs)
 	}
-	exist2, _ := systemctl.IsExist(clamServiceNameUbuntu)
+	exist2, _ := systemctl.SctlIsExist(clamServiceNameUbuntu)
 	if exist2 {
 		c.serviceName = clamServiceNameUbuntu
 		baseInfo.IsExist = true
-		baseInfo.IsActive, _ = systemctl.IsActive(clamServiceNameUbuntu)
+		baseInfo.IsActive, _ = systemctl.SctlIsActive(clamServiceNameUbuntu)
 	}
-	freshExist, _ := systemctl.IsExist(freshClamService)
+	freshExist, _ := systemctl.SctlIsExist(freshClamService)
 	if freshExist {
 		baseInfo.FreshIsExist = true
-		baseInfo.FreshIsActive, _ = systemctl.IsActive(freshClamService)
+		baseInfo.FreshIsActive, _ = systemctl.SctlIsActive(freshClamService)
 	}
 	if !cmd.Which("clamdscan") {
 		baseInfo.IsActive = false
@@ -514,20 +514,20 @@ func (c *ClamService) UpdateFile(req dto.UpdateByNameAndFile) error {
 	_, _ = write.WriteString(req.File)
 	write.Flush()
 
-	_ = systemctl.Restart(service)
+	_ = systemctl.SctlRestart(service)
 	return nil
 }
 
 func StopAllCronJob(withCheck bool) bool {
 	if withCheck {
 		isActive := false
-		exist1, _ := systemctl.IsExist(clamServiceNameCentOs)
+		exist1, _ := systemctl.SctlIsExist(clamServiceNameCentOs)
 		if exist1 {
-			isActive, _ = systemctl.IsActive(clamServiceNameCentOs)
+			isActive, _ = systemctl.SctlIsActive(clamServiceNameCentOs)
 		}
-		exist2, _ := systemctl.IsExist(clamServiceNameUbuntu)
+		exist2, _ := systemctl.SctlIsExist(clamServiceNameUbuntu)
 		if exist2 {
-			isActive, _ = systemctl.IsActive(clamServiceNameUbuntu)
+			isActive, _ = systemctl.SctlIsActive(clamServiceNameUbuntu)
 		}
 		if isActive {
 			return false

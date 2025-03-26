@@ -2,9 +2,7 @@ package toolbox
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
-	"golang.org/x/crypto/bcrypt"
 	"os"
 	"os/user"
 	"path"
@@ -16,11 +14,13 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/systemctl"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type Ftp struct {
 	DefaultUser  string
 	DefaultGroup string
+	serviceConf  *systemctl.ServiceConfig
 }
 
 type FtpList struct {
@@ -38,102 +38,121 @@ type FtpLog struct {
 	Size      string `json:"size"`
 }
 
-type FtpClient interface {
-	Status() (bool, bool)
-	Operate(operate string) error
-	LoadList() ([]FtpList, error)
-	UserAdd(username, path, passwd string) error
-	UserDel(username string) error
-	SetPasswd(username, passwd string) error
-	Reload() error
-	LoadLogs() ([]FtpLog, error)
+var pureftpdService = &systemctl.ServiceConfig{
+	ID:          "pure-ftpd",
+	DisplayName: "Pure-FTPD Service",
+	ServiceName: map[string]string{
+		"systemd":  "pure-ftpd.service",
+		"openrc":   "pure-ftpd",
+		"sysvinit": "pure-ftpd",
+	},
+	UseSocket:   false,
+	Description: "Pure-FTPD service management",
 }
 
+// NewFtpClient 创建 FTP 客户端实例
+// 初始化时自动检查/创建 UID=1000 的默认用户和组
+// 返回值:
+//   - *Ftp: 初始化完成的 FTP 客户端对象
+//   - error: 初始化过程中出现的错误
 func NewFtpClient() (*Ftp, error) {
+	ftp := &Ftp{serviceConf: pureftpdService}
+
 	userItem, err := user.LookupId("1000")
 	if err == nil {
 		groupItem, err := user.LookupGroupId(userItem.Gid)
 		if err != nil {
+			global.LOG.Errorf("Lookup group failed: %v", err)
 			return nil, err
 		}
-		return &Ftp{DefaultUser: userItem.Username, DefaultGroup: groupItem.Name}, err
+		ftp.DefaultUser = userItem.Username
+		ftp.DefaultGroup = groupItem.Name
+		return ftp, nil
 	}
+
 	if err.Error() != user.UnknownUserIdError(1000).Error() {
+		global.LOG.Errorf("User lookup error: %v", err)
 		return nil, err
 	}
 
-	groupItem, err := user.LookupGroupId("1000")
-	if err == nil {
-		stdout2, err := cmd.Execf("useradd -u 1000 -g %s %s", groupItem.Name, "1panel")
-		if err != nil {
-			return nil, errors.New(stdout2)
+	if groupItem, err := user.LookupGroupId("1000"); err == nil {
+		if _, err := cmd.Execf("useradd -u 1000 -g %s %s", groupItem.Name, "1panel"); err != nil {
+			global.LOG.Errorf("Create user failed: %v", err)
+			return nil, fmt.Errorf("create user failed: %v", err)
 		}
-		return &Ftp{DefaultUser: "1panel", DefaultGroup: groupItem.Name}, nil
+		ftp.DefaultUser = "1panel"
+		ftp.DefaultGroup = groupItem.Name
+		return ftp, nil
 	}
-	if err.Error() != user.UnknownGroupIdError("1000").Error() {
-		return nil, err
+
+	if _, err := cmd.Exec("groupadd -g 1000 1panel"); err != nil {
+		global.LOG.Errorf("Create group failed: %v", err)
+		return nil, fmt.Errorf("create group failed: %v", err)
 	}
-	stdout, err := cmd.Exec("groupadd -g 1000 1panel")
-	if err != nil {
-		return nil, errors.New(string(stdout))
+	if _, err := cmd.Exec("useradd -u 1000 -g 1panel 1panel"); err != nil {
+		global.LOG.Errorf("Create user failed: %v", err)
+		return nil, fmt.Errorf("create user failed: %v", err)
 	}
-	stdout2, err := cmd.Exec("useradd -u 1000 -g 1panel 1panel")
-	if err != nil {
-		return nil, errors.New(stdout2)
-	}
-	return &Ftp{DefaultUser: "1panel", DefaultGroup: "1panel"}, nil
+	ftp.DefaultUser = "1panel"
+	ftp.DefaultGroup = "1panel"
+	return ftp, nil
 }
 
 func (f *Ftp) Status() (bool, bool) {
-	isActive, _ := systemctl.IsActive("pure-ftpd.service")
-	isExist, _ := systemctl.IsExist("pure-ftpd.service")
-
-	return isActive, isExist
+	active, err := systemctl.IsActive(f.serviceConf)
+	if err != nil {
+		global.LOG.Warnf("Check service active status failed: %v", err)
+	}
+	exist, err := systemctl.IsExist(f.serviceConf)
+	if err != nil {
+		global.LOG.Warnf("Check service existence failed: %v", err)
+	}
+	return active, exist
 }
 
 func (f *Ftp) Operate(operate string) error {
-	switch operate {
-	case "start", "restart", "stop":
-		stdout, err := cmd.Execf("systemctl %s pure-ftpd.service", operate)
-		if err != nil {
-			return fmt.Errorf("%s the pure-ftpd.service failed, err: %s", operate, stdout)
-		}
-		return nil
-	default:
-		return fmt.Errorf("not support such operation: %v", operate)
+	if err := systemctl.Operate(operate, f.serviceConf); err != nil {
+		global.LOG.Errorf("%s service failed: %v", operate, err)
+		return fmt.Errorf("%s service failed: %v", operate, err)
 	}
+	return nil
 }
 
 func (f *Ftp) UserAdd(username, passwd, path string) error {
 	entry, err := generatePureFtpEntrySimple(username, passwd, path)
 	if err != nil {
+		global.LOG.Errorf("Generate user entry failed: %v", err)
 		return err
 	}
+
 	pwdFile, err := os.OpenFile("/etc/pure-ftpd/pureftpd.passwd", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
+		global.LOG.Errorf("Open passwd file failed: %v", err)
 		return err
 	}
 	defer pwdFile.Close()
 
-	_, err = pwdFile.WriteString("\n" + entry + "\n")
-	if err != nil {
+	if _, err = pwdFile.WriteString("\n" + entry + "\n"); err != nil {
+		global.LOG.Errorf("Write to passwd file failed: %v", err)
 		return err
 	}
-	_ = f.Reload()
-	std2, err := cmd.Execf("chown -R %s:%s %s", f.DefaultUser, f.DefaultGroup, path)
-	if err != nil {
-		return errors.New(std2)
+	if err := f.Reload(); err != nil {
+		global.LOG.Errorf("Reload service failed: %v", err)
+		return err
+	}
+
+	if _, err := cmd.Execf("chown -R %s:%s %s", f.DefaultUser, f.DefaultGroup, path); err != nil {
+		global.LOG.Errorf("Chown command failed: %v", err)
+		return fmt.Errorf("chown failed: %v", err)
 	}
 	return nil
 }
 
 func (f *Ftp) UserDel(username string) error {
-	std, err := cmd.Execf("pure-pw userdel %s", username)
-	if err != nil {
-		return errors.New(std)
+	if _, err := cmd.Execf("pure-pw userdel %s", username); err != nil {
+		return fmt.Errorf("userdel failed: %v", err)
 	}
-	_ = f.Reload()
-	return nil
+	return f.Reload()
 }
 
 func (f *Ftp) SetPasswd(username, passwd string) error {
@@ -141,108 +160,89 @@ func (f *Ftp) SetPasswd(username, passwd string) error {
 	if err != nil {
 		return err
 	}
-	// read now
+
 	pwdFile, err := os.Open("/etc/pure-ftpd/pureftpd.passwd")
 	if err != nil {
 		return err
 	}
 	defer pwdFile.Close()
 
-	var entrys []string
+	var entries []string
 	scanner := bufio.NewScanner(pwdFile)
 	for scanner.Scan() {
 		line := scanner.Text()
-		if line == "" {
-			continue
+		if parts := strings.Split(line, ":"); len(parts) > 1 && parts[0] == username {
+			parts[1] = string(hashedPassword)
+			line = strings.Join(parts, ":")
 		}
-		userEntry := strings.Split(line, ":")
-		if len(userEntry) < 2 {
-			continue
-		}
-		if userEntry[0] == username {
-			userEntry[1] = string(hashedPassword)
-			line = strings.Join(userEntry, ":")
-		}
-		entrys = append(entrys, line)
+		entries = append(entries, line)
 	}
 
-	if err := scanner.Err(); err != nil {
+	if err := os.WriteFile("/etc/pure-ftpd/pureftpd.passwd", []byte(strings.Join(entries, "\n")), 0644); err != nil {
 		return err
 	}
-	pwdFile.Close()
-
-	// write new
-	pwdFile, err = os.Create("/etc/pure-ftpd/pureftpd.passwd")
-	if err != nil {
-		return err
-	}
-	defer pwdFile.Close()
-
-	for _, entry := range entrys {
-		_, err := pwdFile.WriteString(entry + "\n")
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return f.Reload()
 }
 
 func (f *Ftp) SetPath(username, path string) error {
-	std, err := cmd.Execf("pure-pw usermod %s -d %s", username, path)
-	if err != nil {
-		return errors.New(std)
+	if _, err := cmd.Execf("pure-pw usermod %s -d %s", username, path); err != nil {
+		return fmt.Errorf("usermod failed: %v", err)
 	}
-	std2, err := cmd.Execf("chown -R %s:%s %s", f.DefaultUser, f.DefaultGroup, path)
-	if err != nil {
-		return errors.New(std2)
+	if _, err := cmd.Execf("chown -R %s:%s %s", f.DefaultUser, f.DefaultGroup, path); err != nil {
+		return fmt.Errorf("chown failed: %v", err)
 	}
 	return nil
 }
 
 func (f *Ftp) SetStatus(username, status string) error {
-	statusItem := "''"
+	statusFlag := "''"
 	if status == constant.StatusDisable {
-		statusItem = "1"
+		statusFlag = "1"
 	}
-	std, err := cmd.Execf("pure-pw usermod %s -r %s", username, statusItem)
-	if err != nil {
-		return errors.New(std)
+	if _, err := cmd.Execf("pure-pw usermod %s -r %s", username, statusFlag); err != nil {
+		return fmt.Errorf("status update failed: %v", err)
 	}
 	return nil
 }
 
 func (f *Ftp) LoadList() ([]FtpList, error) {
-	std, err := cmd.Exec("pure-pw list")
+	stdout, err := cmd.Exec("pure-pw list")
 	if err != nil {
-		return nil, errors.New(std)
+		global.LOG.Errorf("List users failed: %v", err)
+		return nil, fmt.Errorf("list failed: %v", err)
 	}
+
 	var lists []FtpList
-	lines := strings.Split(std, "\n")
-	for _, line := range lines {
+	for _, line := range strings.Split(stdout, "\n") {
 		parts := strings.Fields(line)
 		if len(parts) < 2 {
 			continue
 		}
-		std2, err := cmd.Execf("pure-pw  show %s | grep 'Allowed client IPs :'", parts[0])
+
+		stdout, err := cmd.Execf("pure-pw show %s | grep 'Allowed client IPs :'", parts[0])
 		if err != nil {
-			global.LOG.Errorf("handle pure-pw show %s failed, err: %v", parts[0], std2)
+			global.LOG.Warnf("Check user %s status failed: %v", parts[0], err)
 			continue
 		}
-		status := constant.StatusDisable
-		itemStd := strings.ReplaceAll(std2, "\n", "")
-		if len(strings.TrimSpace(strings.ReplaceAll(itemStd, "Allowed client IPs :", ""))) == 0 {
-			status = constant.StatusEnable
+
+		status := constant.StatusEnable
+		if cleaned := strings.TrimSpace(strings.ReplaceAll(stdout, "Allowed client IPs :", "")); cleaned != "" {
+			status = constant.StatusDisable
 		}
-		lists = append(lists, FtpList{User: parts[0], Path: strings.ReplaceAll(parts[1], "/./", ""), Status: status})
+
+		lists = append(lists, FtpList{
+			User:   parts[0],
+			Path:   strings.ReplaceAll(parts[1], "/./", ""),
+			Status: status,
+		})
 	}
 	return lists, nil
 }
 
 func (f *Ftp) Reload() error {
-	std, err := cmd.Exec("pure-pw mkdb")
-	if err != nil {
-		return errors.New(std)
+	if _, err := cmd.Exec("pure-pw mkdb"); err != nil {
+		global.LOG.Errorf("Reload database failed: %v", err)
+		return fmt.Errorf("reload failed: %v", err)
 	}
 	return nil
 }

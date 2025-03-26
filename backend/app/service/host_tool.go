@@ -3,6 +3,12 @@ package service
 import (
 	"bytes"
 	"fmt"
+	"os/exec"
+	"os/user"
+	"path"
+	"strconv"
+	"strings"
+
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
@@ -14,12 +20,19 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/systemctl"
 	"github.com/pkg/errors"
 	"gopkg.in/ini.v1"
-	"os/exec"
-	"os/user"
-	"path"
-	"strconv"
-	"strings"
 )
+
+var SupervisorServiceConfig = &systemctl.ServiceConfig{
+	ID:          "supervisor",
+	DisplayName: "Supervisor Service",
+	ServiceName: map[string]string{
+		"systemd":  "supervisord.service",
+		"openrc":   "supervisord",
+		"sysvinit": "supervisord",
+	},
+	UseSocket:   false,
+	Description: "Supervisor process control",
+}
 
 type HostToolService struct{}
 
@@ -50,44 +63,35 @@ func (h *HostToolService) GetToolStatus(req request.HostToolReq) (*response.Host
 			return res, nil
 		}
 		supervisorConfig.IsExist = true
-		serviceExist, _ := systemctl.IsExist(constant.Supervisord)
-		if !serviceExist {
-			serviceExist, _ = systemctl.IsExist(constant.Supervisor)
-			if !serviceExist {
-				supervisorConfig.IsExist = false
-				res.Config = supervisorConfig
-				return res, nil
-			} else {
-				supervisorConfig.ServiceName = constant.Supervisor
-			}
-		} else {
-			supervisorConfig.ServiceName = constant.Supervisord
+
+		exist, _ := systemctl.IsExist(SupervisorServiceConfig)
+		if !exist {
+			supervisorConfig.IsExist = false
+			res.Config = supervisorConfig
+			return res, nil
 		}
 
 		serviceNameSet, _ := settingRepo.Get(settingRepo.WithByKey(constant.SupervisorServiceName))
-		if serviceNameSet.ID != 0 || serviceNameSet.Value != "" {
-			supervisorConfig.ServiceName = serviceNameSet.Value
+		if serviceNameSet.ID != 0 && serviceNameSet.Value != "" {
+			SupervisorServiceConfig.ServiceName["systemd"] = serviceNameSet.Value
 		}
 
 		versionRes, _ := cmd.Exec("supervisord -v")
 		supervisorConfig.Version = strings.TrimSuffix(versionRes, "\n")
-		_, ctlRrr := exec.LookPath("supervisorctl")
-		supervisorConfig.CtlExist = ctlRrr == nil
+		_, ctlErr := exec.LookPath("supervisorctl")
+		supervisorConfig.CtlExist = ctlErr == nil
 
-		active, _ := systemctl.IsActive(supervisorConfig.ServiceName)
+		active, _ := systemctl.IsActive(SupervisorServiceConfig)
+		supervisorConfig.Status = "stopped"
 		if active {
 			supervisorConfig.Status = "running"
-		} else {
-			supervisorConfig.Status = "stopped"
 		}
 
 		pathSet, _ := settingRepo.Get(settingRepo.WithByKey(constant.SupervisorConfigPath))
-		if pathSet.ID != 0 || pathSet.Value != "" {
+		if pathSet.ID != 0 && pathSet.Value != "" {
 			supervisorConfig.ConfigPath = pathSet.Value
 			res.Config = supervisorConfig
 			return res, nil
-		} else {
-			supervisorConfig.Init = true
 		}
 
 		servicePath := "/usr/lib/systemd/system/supervisor.service"
@@ -191,8 +195,9 @@ func (h *HostToolService) CreateToolConfig(req request.HostToolCreate) error {
 				return err
 			}
 		}
-		if err = systemctl.Restart(req.ServiceName); err != nil {
-			global.LOG.Errorf("[init] restart %s failed err %s", req.ServiceName, err.Error())
+
+		if err = systemctl.Operate("restart", SupervisorServiceConfig); err != nil {
+			global.LOG.Errorf("[init] restart supervisor failed: %v", err)
 			return err
 		}
 	}
@@ -200,30 +205,28 @@ func (h *HostToolService) CreateToolConfig(req request.HostToolCreate) error {
 }
 
 func (h *HostToolService) OperateTool(req request.HostToolReq) error {
-	serviceName := req.Type
+	targetConfig := SupervisorServiceConfig
 	if req.Type == constant.Supervisord {
 		serviceNameSet, _ := settingRepo.Get(settingRepo.WithByKey(constant.SupervisorServiceName))
-		if serviceNameSet.ID != 0 || serviceNameSet.Value != "" {
-			serviceName = serviceNameSet.Value
+		if serviceNameSet.ID != 0 && serviceNameSet.Value != "" {
+			targetConfig = &systemctl.ServiceConfig{
+				ID:          SupervisorServiceConfig.ID,
+				ServiceName: map[string]string{"systemd": serviceNameSet.Value},
+			}
 		}
 	}
-	return systemctl.Operate(req.Operate, serviceName)
+	return systemctl.Operate(req.Operate, targetConfig)
 }
 
 func (h *HostToolService) OperateToolConfig(req request.HostToolConfig) (*response.HostToolConfig, error) {
 	fileOp := files.NewFileOp()
 	res := &response.HostToolConfig{}
 	configPath := ""
-	serviceName := "supervisord"
 	switch req.Type {
 	case constant.Supervisord:
 		pathSet, _ := settingRepo.Get(settingRepo.WithByKey(constant.SupervisorConfigPath))
-		if pathSet.ID != 0 || pathSet.Value != "" {
+		if pathSet.ID != 0 && pathSet.Value != "" {
 			configPath = pathSet.Value
-		}
-		serviceNameSet, _ := settingRepo.Get(settingRepo.WithByKey(constant.SupervisorServiceName))
-		if serviceNameSet.ID != 0 || serviceNameSet.Value != "" {
-			serviceName = serviceNameSet.Value
 		}
 	}
 	switch req.Operate {
@@ -249,12 +252,11 @@ func (h *HostToolService) OperateToolConfig(req request.HostToolConfig) (*respon
 		if err = fileOp.WriteFile(configPath, strings.NewReader(req.Content), fileInfo.Mode()); err != nil {
 			return nil, err
 		}
-		if err = systemctl.Restart(serviceName); err != nil {
+		if err = systemctl.Operate("restart", SupervisorServiceConfig); err != nil {
 			_ = fileOp.WriteFile(configPath, bytes.NewReader(oldContent), fileInfo.Mode())
 			return nil, err
 		}
 	}
-
 	return res, nil
 }
 
@@ -265,7 +267,7 @@ func (h *HostToolService) GetToolLog(req request.HostToolLogReq) (string, error)
 	case constant.Supervisord:
 		configPath := "/etc/supervisord.conf"
 		pathSet, _ := settingRepo.Get(settingRepo.WithByKey(constant.SupervisorConfigPath))
-		if pathSet.ID != 0 || pathSet.Value != "" {
+		if pathSet.ID != 0 && pathSet.Value != "" {
 			configPath = pathSet.Value
 		}
 		logfilePath, _ = ini_conf.GetIniValue(configPath, "supervisord", "logfile")

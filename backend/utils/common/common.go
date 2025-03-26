@@ -3,13 +3,12 @@ package common
 import (
 	"crypto/rand"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/buserr"
-	"github.com/gin-gonic/gin"
 	"io"
 	mathRand "math/rand"
 	"net"
 	"os"
 	"path"
+	"path/filepath"
 	"reflect"
 	"regexp"
 	"sort"
@@ -17,6 +16,9 @@ import (
 	"strings"
 	"time"
 	"unicode"
+
+	"github.com/1Panel-dev/1Panel/backend/buserr"
+	"github.com/gin-gonic/gin"
 
 	"golang.org/x/net/idna"
 
@@ -151,6 +153,58 @@ func CopyFile(src, dst string) error {
 		return err
 	}
 	return nil
+}
+
+func CopyDirs(srcDir, dstDir string) error {
+	// 校验源目录有效性
+	srcInfo, err := os.Stat(srcDir)
+	if err != nil {
+		return err
+	}
+	if !srcInfo.IsDir() {
+		return fmt.Errorf("%s is not a directory", srcDir)
+	}
+
+	// 创建目标目录（保留源目录权限）
+	if err := os.MkdirAll(dstDir, srcInfo.Mode()); err != nil {
+		return err
+	}
+
+	// 递归遍历目录
+	return filepath.Walk(srcDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		// 计算相对路径
+		relPath, err := filepath.Rel(srcDir, path)
+		if err != nil {
+			return err
+		}
+		dstPath := filepath.Join(dstDir, relPath)
+
+		// 处理目录
+		if info.IsDir() {
+			return os.MkdirAll(dstPath, info.Mode())
+		}
+
+		// 处理符号链接（可选）
+		if info.Mode()&os.ModeSymlink != 0 {
+			return copySymlink(path, dstPath)
+		}
+
+		// 复制文件（复用CopyFile逻辑）
+		return CopyFile(path, dstPath)
+	})
+}
+
+// 辅助函数：复制符号链接（按需实现）
+func copySymlink(src, dst string) error {
+	link, err := os.Readlink(src)
+	if err != nil {
+		return err
+	}
+	return os.Symlink(link, dst)
 }
 
 func IsCrossVersion(version1, version2 string) bool {
