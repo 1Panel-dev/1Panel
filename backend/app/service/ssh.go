@@ -2,8 +2,6 @@ package service
 
 import (
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/utils/geo"
-	"github.com/gin-gonic/gin"
 	"os"
 	"os/user"
 	"path"
@@ -11,6 +9,9 @@ import (
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/utils/geo"
+	"github.com/gin-gonic/gin"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
@@ -24,6 +25,18 @@ import (
 )
 
 const sshPath = "/etc/ssh/sshd_config"
+
+var sshdServiceConfig = &systemctl.ServiceConfig{
+	ID:          "sshd",
+	DisplayName: "SSH Server",
+	ServiceName: map[string]string{
+		"systemd":  "sshd",
+		"openrc":   "sshd",
+		"sysvinit": "ssh",
+	},
+	UseSocket:   false,
+	Description: "SSH protocol implementation",
+}
 
 type SSHService struct{}
 
@@ -55,32 +68,25 @@ func (u *SSHService) GetSSHInfo() (*dto.SSHInfo, error) {
 		PermitRootLogin:        "yes",
 		UseDNS:                 "yes",
 	}
-	serviceName, err := loadServiceName()
+	// Modified: 使用 ServiceHandle 执行操作
+	_, err := systemctl.NewServiceHandle(sshdServiceConfig)
 	if err != nil {
 		data.Status = constant.StatusDisable
 		data.Message = err.Error()
-	} else {
-		active, err := systemctl.IsActive(serviceName)
-		if !active {
-			data.Status = constant.StatusDisable
-			if err != nil {
-				data.Message = err.Error()
-			}
-		} else {
-			data.Status = constant.StatusEnable
-		}
+		return &data, nil
 	}
 
-	out, err := systemctl.RunSystemCtl("is-enabled", serviceName)
+	active, err := systemctl.IsActive(sshdServiceConfig)
 	if err != nil {
-		data.AutoStart = false
-	} else {
-		if out == "alias\n" {
-			data.AutoStart, _ = systemctl.IsEnable("ssh")
-		} else {
-			data.AutoStart = out == "enabled\n"
-		}
+		global.LOG.Errorf("Check active status failed: %v", err)
 	}
+	data.Status = map[bool]string{true: constant.StatusEnable, false: constant.StatusDisable}[active]
+
+	enabled, err := systemctl.IsEnabled(sshdServiceConfig)
+	if err != nil {
+		global.LOG.Errorf("Check enabled status failed: %v", err)
+	}
+	data.AutoStart = enabled
 
 	sshConf, err := os.ReadFile(sshPath)
 	if err != nil {
@@ -117,107 +123,138 @@ func (u *SSHService) GetSSHInfo() (*dto.SSHInfo, error) {
 }
 
 func (u *SSHService) OperateSSH(operation string) error {
-	serviceName, err := loadServiceName()
+	// Modified: 使用 ServiceHandle 执行操作
+	h, err := systemctl.NewServiceHandle(sshdServiceConfig)
 	if err != nil {
 		return err
 	}
-	sudo := cmd.SudoHandleCmd()
-	if operation == "enable" || operation == "disable" {
-		serviceName += ".service"
-	}
-	if operation == "stop" {
-		isSocketActive, _ := systemctl.IsActive(serviceName + ".socket")
-		if isSocketActive {
-			std, err := cmd.Execf("%s systemctl stop %s", sudo, serviceName+".socket")
-			if err != nil {
-				global.LOG.Errorf("handle systemctl stop %s.socket failed, err: %v", serviceName, std)
-			}
-		}
+	switch operation {
+	case "start", "stop", "restart":
+		_, err = h.WithTimeout(30 * time.Second).Execute(operation)
+	case "enable", "disable":
+		_, err = h.Execute("reenable")
+	default:
+		return fmt.Errorf("unsupported operation: %s", operation)
 	}
 
-	stdout, err := cmd.Execf("%s systemctl %s %s", sudo, operation, serviceName)
 	if err != nil {
-		if strings.Contains(stdout, "alias name or linked unit file") {
-			stdout, err := cmd.Execf("%s systemctl %s ssh", sudo, operation)
-			if err != nil {
-				return fmt.Errorf("%s ssh(alias name or linked unit file) failed, stdout: %s, err: %v", operation, stdout, err)
-			}
+		if serr, ok := err.(systemctl.ServiceError); ok {
+			global.LOG.Errorf("SSH operation failed: %v, Output: %s", serr.Wrapped, serr.Output)
 		}
-		return fmt.Errorf("%s %s failed, stdout: %s, err: %v", operation, serviceName, stdout, err)
+		return fmt.Errorf("%s ssh failed: %v", operation, err)
 	}
 	return nil
 }
 
 func (u *SSHService) Update(req dto.SSHUpdate) error {
-	serviceName, err := loadServiceName()
-	if err != nil {
-		return err
-	}
-
 	sshConf, err := os.ReadFile(sshPath)
 	if err != nil {
-		return err
+		global.LOG.Errorf("Read sshd_config failed: %v", err)
+		return buserr.WithErr("SSH_CONF_READ_FAIL", err)
 	}
+
 	lines := strings.Split(string(sshConf), "\n")
 	newFiles := updateSSHConf(lines, req.Key, req.NewValue)
-	file, err := os.OpenFile(sshPath, os.O_WRONLY|os.O_TRUNC, 0666)
+
+	file, err := os.OpenFile(sshPath, os.O_WRONLY|os.O_TRUNC, 0644)
 	if err != nil {
-		return err
+		global.LOG.Errorf("Open sshd_config failed: %v", err)
+		return buserr.WithErr("SSH_CONF_OPEN_FAIL", err)
 	}
 	defer file.Close()
+
 	if _, err = file.WriteString(strings.Join(newFiles, "\n")); err != nil {
-		return err
+		global.LOG.Errorf("Write sshd_config failed: %v", err)
+		return buserr.WithErr("SSH_CONF_WRITE_FAIL", err)
 	}
-	sudo := cmd.SudoHandleCmd()
+
 	if req.Key == "Port" {
-		stdout, _ := cmd.Execf("%s getenforce", sudo)
-		if stdout == "Enforcing\n" {
-			_, _ = cmd.Execf("%s semanage port -a -t ssh_port_t -p tcp %s", sudo, req.NewValue)
-		}
-
-		ruleItem := dto.PortRuleUpdate{
-			OldRule: dto.PortRuleOperate{
-				Operation: "remove",
-				Port:      req.OldValue,
-				Protocol:  "tcp",
-				Strategy:  "accept",
-			},
-			NewRule: dto.PortRuleOperate{
-				Operation: "add",
-				Port:      req.NewValue,
-				Protocol:  "tcp",
-				Strategy:  "accept",
-			},
-		}
-		if err := NewIFirewallService().UpdatePortRule(ruleItem); err != nil {
-			global.LOG.Errorf("reset firewall rules %s -> %s failed, err: %v", req.OldValue, req.NewValue, err)
-		}
-
-		if err = NewIHostService().Update(1, map[string]interface{}{"port": req.NewValue}); err != nil {
-			global.LOG.Errorf("reset host port %s -> %s failed, err: %v", req.OldValue, req.NewValue, err)
+		if err := u.handlePortChange(req); err != nil {
+			global.LOG.Errorf("Handle port change failed: %v", err)
+			return err
 		}
 	}
 
-	_, _ = cmd.Execf("%s systemctl restart %s", sudo, serviceName)
+	h, err := systemctl.NewServiceHandle(sshdServiceConfig)
+	if err != nil {
+		return buserr.WithErr("SSH_SERVICE_HANDLE_FAIL", err)
+	}
+
+	if _, err := h.WithTimeout(30 * time.Second).Execute("restart"); err != nil {
+		if serr, ok := err.(systemctl.ServiceError); ok {
+			global.LOG.Errorf("Restart sshd failed [%s], Output: %s", serr.Wrapped, serr.Output)
+		}
+		return buserr.WithErr("SSH_SERVICE_RESTART_FAIL", err)
+	}
+
 	return nil
 }
 
 func (u *SSHService) UpdateByFile(value string) error {
-	serviceName, err := loadServiceName()
+	file, err := os.OpenFile(sshPath, os.O_WRONLY|os.O_TRUNC, 0644)
 	if err != nil {
-		return err
-	}
-
-	file, err := os.OpenFile(sshPath, os.O_WRONLY|os.O_TRUNC, 0666)
-	if err != nil {
-		return err
+		global.LOG.Errorf("Open sshd_config failed: %v", err)
+		return buserr.WithErr("SSH_CONF_OPEN_FAIL", err)
 	}
 	defer file.Close()
+
 	if _, err = file.WriteString(value); err != nil {
-		return err
+		global.LOG.Errorf("Write sshd_config failed: %v", err)
+		return buserr.WithErr("SSH_CONF_WRITE_FAIL", err)
 	}
+
+	h, err := systemctl.NewServiceHandle(sshdServiceConfig)
+	if err != nil {
+		return buserr.WithErr("SSH_SERVICE_HANDLE_FAIL", err)
+	}
+
+	if _, err := h.WithTimeout(30 * time.Second).Execute("restart"); err != nil {
+		if serr, ok := err.(systemctl.ServiceError); ok {
+			global.LOG.Errorf("Restart sshd failed [%s], Output: %s", serr.Wrapped, serr.Output)
+		}
+		return buserr.WithErr("SSH_SERVICE_RESTART_FAIL", err)
+	}
+
+	return nil
+}
+
+// 新增的端口变更处理方法
+func (u *SSHService) handlePortChange(req dto.SSHUpdate) error {
 	sudo := cmd.SudoHandleCmd()
-	_, _ = cmd.Execf("%s systemctl restart %s", sudo, serviceName)
+
+	// SELinux 处理
+	if stdout, _ := cmd.Execf("%s getenforce", sudo); strings.Contains(stdout, "Enforcing") {
+		if _, err := cmd.Execf("%s semanage port -a -t ssh_port_t -p tcp %s", sudo, req.NewValue); err != nil {
+			global.LOG.Warnf("SELinux port update failed: %v", err)
+		}
+	}
+
+	// 防火墙规则更新
+	ruleItem := dto.PortRuleUpdate{
+		OldRule: dto.PortRuleOperate{
+			Operation: "remove",
+			Port:      req.OldValue,
+			Protocol:  "tcp",
+			Strategy:  "accept",
+		},
+		NewRule: dto.PortRuleOperate{
+			Operation: "add",
+			Port:      req.NewValue,
+			Protocol:  "tcp",
+			Strategy:  "accept",
+		},
+	}
+	if err := NewIFirewallService().UpdatePortRule(ruleItem); err != nil {
+		global.LOG.Errorf("Firewall rule update failed: %v", err)
+		return buserr.WithErr("FIREWALL_UPDATE_FAIL", err)
+	}
+
+	// 主机端口更新
+	if err := NewIHostService().Update(1, map[string]interface{}{"port": req.NewValue}); err != nil {
+		global.LOG.Errorf("Host port update failed: %v", err)
+		return buserr.WithErr("HOST_PORT_UPDATE_FAIL", err)
+	}
+
 	return nil
 }
 
@@ -535,18 +572,10 @@ func loadFailedSecureDatas(line string) dto.SSHHistory {
 
 func handleGunzip(path string) error {
 	if _, err := cmd.Execf("gunzip %s", path); err != nil {
+		global.LOG.Errorf("Gunzip failed: %v", err)
 		return err
 	}
 	return nil
-}
-
-func loadServiceName() (string, error) {
-	if exist, _ := systemctl.IsExist("sshd"); exist {
-		return "sshd", nil
-	} else if exist, _ := systemctl.IsExist("ssh"); exist {
-		return "ssh", nil
-	}
-	return "", errors.New("The ssh or sshd service is unavailable")
 }
 
 func loadDate(currentYear int, DateStr string, nyc *time.Location) time.Time {
