@@ -116,23 +116,19 @@ const handleBack = () => {
 };
 
 const handleBeforeClose = (done: () => void) => {
-    console.log(drawerContent.value, drawerContent.value.querySelector('.el-form'));
     if (drawerContent.value) {
         const hasForm = drawerContent.value.querySelector('.el-form') !== null;
-        if (hasForm) {
-            ElMessageBox.confirm(
-                i18n.global.t('commons.msg.closeDrawerHelper'),
-                i18n.global.t('commons.button.close'),
-                {
-                    confirmButtonText: i18n.global.t('commons.button.confirm'),
-                    cancelButtonText: i18n.global.t('commons.button.cancel'),
-                },
-            ).then(async () => {
-                done();
-            });
-        } else {
+        const hasTerminal = drawerContent.value.querySelector('.terminal') !== null;
+        if (!hasForm && !hasTerminal) {
             done();
+            return;
         }
+        ElMessageBox.confirm(i18n.global.t('commons.msg.closeDrawerHelper'), i18n.global.t('commons.button.close'), {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+        }).then(async () => {
+            done();
+        });
     } else {
         done();
     }

@@ -25,20 +25,21 @@ type LocalCommand struct {
 	pty *os.File
 }
 
-func NewCommand(initCmd string) (*LocalCommand, error) {
+func NewCommand(script string) (*LocalCommand, error) {
 	cmd := exec.Command("bash")
 	if term := os.Getenv("TERM"); term != "" {
 		cmd.Env = append(os.Environ(), "TERM="+term)
 	} else {
 		cmd.Env = append(os.Environ(), "TERM=xterm")
 	}
+	cmd.Env = append(cmd.Env, "INIT_SCRIPT="+script)
 	pty, err := pty.Start(cmd)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to start command")
 	}
-	if len(initCmd) != 0 {
+	if len(script) != 0 {
 		time.Sleep(100 * time.Millisecond)
-		_, _ = pty.Write([]byte(initCmd + "\n"))
+		_, _ = pty.Write([]byte("bash -c \"$INIT_SCRIPT\"\n"))
 	}
 
 	lcmd := &LocalCommand{

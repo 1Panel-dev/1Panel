@@ -990,6 +990,7 @@ const message = {
             create: '添加脚本',
             edit: '修改脚本',
             groupHelper: '针对脚本特征设置不同的分组，可以更加快速的对脚本进行筛选操作。',
+            handleHelper: '将在 {0} 上执行 {1} 脚本，是否继续？',
         },
     },
     monitor: {

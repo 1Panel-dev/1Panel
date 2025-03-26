@@ -1023,6 +1023,7 @@ const message = {
             edit: 'Editar Script',
             groupHelper:
                 'Defina grupos diferentes com base nas características do script, o que permite operações de filtragem de scripts mais rápidas.',
+            handleHelper: 'Executar o script {1} em {0}, continuar?',
         },
     },
     monitor: {

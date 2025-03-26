@@ -198,7 +198,20 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.handle'),
         click: (row: Cronjob.ScriptInfo) => {
-            runRef.value!.acceptParams({ scriptID: row.id, scriptName: row.name });
+            ElMessageBox.confirm(
+                i18n.global.t('cronjob.library.handleHelper', [
+                    globalStore.currentNode === 'local' ? i18n.global.t('xpack.node.master') : globalStore.currentNode,
+                    row.name,
+                ]),
+                i18n.global.t('commons.button.handle'),
+                {
+                    confirmButtonText: i18n.global.t('commons.button.confirm'),
+                    cancelButtonText: i18n.global.t('commons.button.cancel'),
+                    type: 'info',
+                },
+            ).then(() => {
+                runRef.value!.acceptParams({ scriptID: row.id, scriptName: row.name });
+            });
         },
     },
     {

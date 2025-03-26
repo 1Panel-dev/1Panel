@@ -1045,6 +1045,7 @@ const message = {
             edit: 'Edit Script',
             groupHelper:
                 'Set different groups based on script characteristics, which allows for faster script filtering operations.',
+            handleHelper: 'Execute script {1} on {0}, continue?',
         },
     },
     monitor: {

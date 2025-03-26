@@ -992,6 +992,7 @@ const message = {
             create: '添加腳本',
             edit: '修改腳本',
             groupHelper: '根據腳本特徵設置不同的分組，可以更快地對腳本進行篩選操作。',
+            handleHelper: '將在 {0} 上執行 {1} 腳本，是否繼續？',
         },
     },
     monitor: {

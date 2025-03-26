@@ -1034,6 +1034,7 @@ const message = {
             edit: 'Sunting Skrip',
             groupHelper:
                 'Tetapkan kumpulan yang berbeza berdasarkan ciri skrip, yang membolehkan operasi penapisan skrip dilakukan dengan lebih pantas.',
+            handleHelper: 'Akan melaksanakan skrip {1} pada {0}, teruskan?',
         },
     },
     monitor: {

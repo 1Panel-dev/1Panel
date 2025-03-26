@@ -147,9 +147,7 @@ func (b *BaseApi) RunScript(c *gin.Context) {
 	fileName := strings.ReplaceAll(scriptItem.Name, " ", "_")
 	quitChan := make(chan bool, 3)
 	if currentNode == "local" {
-		tmpFile := path.Join(global.CONF.Base.InstallDir, "1panel/tmp/script")
-		initCmd := fmt.Sprintf("d=%s && mkdir -p $d && echo %s > $d/%s && clear && bash $d/%s", tmpFile, scriptItem.Script, fileName, fileName)
-		slave, err := terminal.NewCommand(initCmd)
+		slave, err := terminal.NewCommand(scriptItem.Script)
 		if wshandleError(wsConn, err) {
 			return
 		}
