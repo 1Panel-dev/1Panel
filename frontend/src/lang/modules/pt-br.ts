@@ -1252,6 +1252,7 @@ const message = {
             logs: 'Auditoria de Logs',
             settings: 'Configurações do Painel',
             cronjobs: 'Tarefas Agendadas',
+            waf: 'WAF',
             databases: 'Bancos de Dados',
             licenses: 'licenças',
             nodes: 'nós',

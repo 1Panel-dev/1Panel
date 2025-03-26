@@ -1227,6 +1227,7 @@ const message = {
             settings: 'パネル設定',
             cronjobs: 'スケジュールされたタスク',
             databases: 'データベース',
+            waf: 'WAF',
             licenses: 'ライセンス',
             nodes: 'ノード',
             commands: 'クイックコマンド',

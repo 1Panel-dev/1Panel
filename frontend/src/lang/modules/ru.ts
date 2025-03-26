@@ -1260,6 +1260,7 @@ const message = {
             logs: 'Аудит журналов',
             settings: 'Настройки панели',
             cronjobs: 'Запланированные задачи',
+            waf: 'WAF',
             databases: 'Базы данных',
             licenses: 'лицензии',
             nodes: 'ноды',

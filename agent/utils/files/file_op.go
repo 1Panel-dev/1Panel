@@ -768,7 +768,7 @@ func (f FileOp) TarGzFilesWithCompressPro(list []string, dst, secret string) err
 
 	var filelist []string
 	for _, item := range list {
-		filelist = append(filelist, "-C "+path.Dir(item)+" "+path.Base(item))
+		filelist = append(filelist, "-C '"+path.Dir(item)+"' '"+path.Base(item)+"' ")
 	}
 	commands := ""
 	if len(secret) != 0 {

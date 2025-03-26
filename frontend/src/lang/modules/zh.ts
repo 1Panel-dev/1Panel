@@ -1218,6 +1218,7 @@ const message = {
             settings: '面板设置',
             cronjobs: '计划任务',
             databases: '数据库',
+            waf: 'WAF',
             licenses: '许可证',
             nodes: '节点',
             commands: '快速命令',

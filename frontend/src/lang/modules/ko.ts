@@ -1214,6 +1214,7 @@ const message = {
             logs: '로그 감사',
             settings: '패널 설정',
             cronjobs: '예약 작업',
+            waf: 'WAF',
             databases: '데이터베이스',
             licenses: '라이선스',
             nodes: '노드',

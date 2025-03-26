@@ -24,6 +24,7 @@
                     <el-option :label="$t('logs.detail.cronjobs')" value="cronjobs" />
                     <el-option :label="$t('logs.detail.toolbox')" value="toolbox" />
                     <el-option :label="$t('logs.detail.process')" value="process" />
+                    <el-option label="WAF" value="waf" />
                     <el-option :label="$t('logs.detail.nodes')" value="nodes" />
                     <el-option :label="$t('logs.detail.tampers')" value="tampers" />
                     <el-option :label="$t('logs.detail.xsetting')" value="xsetting" />

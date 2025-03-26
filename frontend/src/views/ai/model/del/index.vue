@@ -43,8 +43,8 @@ import { onMounted, ref } from 'vue';
 
 defineOptions({ name: 'OpDialog' });
 
-const checkAll = ref(false);
-const isIndeterminate = ref(true);
+const checkAll = ref();
+const isIndeterminate = ref(false);
 const checkedItems = ref([]);
 const list = ref([]);
 
@@ -58,7 +58,6 @@ const acceptParams = (props: DialogProps): void => {
     checkAll.value = false;
     checkedItems.value = [];
     list.value = props.list;
-    checkAll.value = true;
     open.value = true;
 };
 

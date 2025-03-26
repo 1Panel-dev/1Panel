@@ -1290,6 +1290,7 @@ const message = {
             settings: 'Setting',
             cronjobs: 'Cronjob',
             databases: 'Database',
+            waf: 'WAF',
             licenses: 'License',
             nodes: 'Node',
             commands: 'Quick Commands',
