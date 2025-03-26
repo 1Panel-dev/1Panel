@@ -17,6 +17,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
+	"github.com/1Panel-dev/1Panel/backend/utils/systemctl"
 )
 
 type snapHelper struct {
@@ -43,22 +44,43 @@ func snapPanel(snap snapHelper, targetDir string) {
 	defer snap.Wg.Done()
 	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"panel": constant.Running})
 	status := constant.StatusDone
-	if err := common.CopyFile("/usr/local/bin/1panel", path.Join(targetDir, "1panel")); err != nil {
+	serviceHandle, err := systemctl.NewServiceHandle(systemctl.PanelService)
+	if err != nil {
 		status = err.Error()
 	}
-
-	if err := common.CopyFile("/usr/local/bin/1pctl", targetDir); err != nil {
+	servicePath, err := serviceHandle.GetServicePath()
+	if err != nil {
 		status = err.Error()
 	}
-	_, _ = cmd.Execf("cp -r /usr/local/bin/lang %s", targetDir)
+	destFile := path.Base(servicePath)
+	criticalFiles := []struct {
+		desc string
+		src  string
+		dest string
+	}{
+		{"main binary", "/usr/local/bin/1panel", path.Join(targetDir, "1panel")},
+		{"control script", "/usr/local/bin/1pctl", path.Join(targetDir, "1pctl")},
+		{"service file", servicePath, path.Join(targetDir, destFile)},
+	}
 
-	if err := common.CopyFile("/etc/systemd/system/1panel.service", targetDir); err != nil {
-		status = err.Error()
+	for _, file := range criticalFiles {
+		if err := common.CopyFile(file.src, file.dest); err != nil {
+			status = fmt.Errorf("copy %s failed: %w", file.desc, err).Error()
+			global.LOG.Errorf("Copy %s -> %s error: %v", file.src, file.dest, err)
+			break
+		}
+		global.LOG.Infof("Copy %s -> %s success", file.desc, file.dest)
+	}
+
+	// 非关键文件处理
+	if status == constant.StatusDone {
+		if err := common.CopyDirs("/usr/local/bin/lang", path.Join(targetDir, "lang")); err != nil {
+			global.LOG.Warnf("Copy lang files failed: %v", err)
+		}
 	}
 	snap.Status.Panel = status
 	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"panel": status})
 }
-
 func snapDaemonJson(snap snapHelper, targetDir string) {
 	defer snap.Wg.Done()
 	status := constant.StatusDone
