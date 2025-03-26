@@ -1,6 +1,9 @@
 package systemctl
 
 import (
+	"fmt"
+	"os/exec"
+	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/global"
@@ -14,7 +17,8 @@ var (
 		ServiceName: map[string]string{
 			"systemd":  "docker.service",
 			"openrc":   "docker",
-			"sysvinit": "docker",
+			"sysvinit": "dockerd",
+			"snap":     "docker",
 		},
 		UseSocket:   true,
 		Description: "Container runtime service",
@@ -36,8 +40,8 @@ var (
 func RestartDocker() error {
 	h, err := NewServiceHandle(DockerService)
 	if err != nil {
-		global.LOG.Errorf("Create service handle failed: %v", err)
-		return errors.WithMessage(err, "create service handle failed")
+		global.LOG.Errorf("Create docker service handle failed: %v", err)
+		return errors.WithMessage(err, "create docker service handle failed")
 	}
 
 	_, err = h.WithTimeout(30 * time.Second).Execute("restart")
@@ -45,7 +49,7 @@ func RestartDocker() error {
 		if serr, ok := err.(ServiceError); ok {
 			global.LOG.Errorf("Restart docker failed [%s], Output: %s", serr.Wrapped, serr.Output)
 		}
-		return errors.WithMessage(err, "restart service failed")
+		return errors.WithMessage(err, "restart docker failed")
 	}
 	return nil
 }
@@ -53,10 +57,14 @@ func RestartDocker() error {
 func SystemRestart() error {
 	h, err := NewServiceHandle(PanelService)
 	if err != nil {
-		return err
+		global.LOG.Errorf("Create 1panel service handle failed: %v", err)
+		return errors.WithMessage(err, "create 1panel service handle failed")
 	}
 	_, err = h.WithTimeout(30 * time.Second).Execute("restart")
-	return err
+	if serr, ok := err.(ServiceError); ok {
+		global.LOG.Errorf("Restart  1panel failed [%s], Output: %s", serr.Wrapped, serr.Output)
+	}
+	return errors.WithMessage(err, "restart 1panel failed")
 }
 
 func IsActive(config *ServiceConfig) (bool, error) {
@@ -127,4 +135,55 @@ func isInactiveCode(code int) bool {
 
 func isDisabledCode(code int) bool {
 	return code == 1 || code > 0
+}
+
+// 保留原systemctl函数，保持兼容
+func RunSystemCtl(args ...string) (string, error) {
+	cmd := exec.Command("systemctl", args...)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return string(output), fmt.Errorf("failed to run command: %w", err)
+	}
+	return string(output), nil
+}
+
+func SctlIsActive(serviceName string) (bool, error) {
+	out, err := RunSystemCtl("is-active", serviceName)
+	if err != nil {
+		return false, err
+	}
+	return out == "active\n", nil
+}
+
+func IsEnable(serviceName string) (bool, error) {
+	out, err := RunSystemCtl("is-enabled", serviceName)
+	if err != nil {
+		return false, err
+	}
+	return out == "enabled\n", nil
+}
+
+func SctlIsExist(serviceName string) (bool, error) {
+	out, err := RunSystemCtl("is-enabled", serviceName)
+	if err != nil {
+		if strings.Contains(out, "disabled") {
+			return true, nil
+		}
+		return false, nil
+	}
+	return true, nil
+}
+func handlerErr(out string, err error) error {
+	if err != nil {
+		if out != "" {
+			return errors.New(out)
+		}
+		return err
+	}
+	return nil
+}
+
+func SctlRestart(serviceName string) error {
+	out, err := RunSystemCtl("restart", serviceName)
+	return handlerErr(out, err)
 }
