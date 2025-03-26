@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -17,6 +18,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	httpUtil "github.com/1Panel-dev/1Panel/backend/utils/http"
+	"github.com/1Panel-dev/1Panel/backend/utils/systemctl"
 )
 
 type UpgradeService struct{}
@@ -103,126 +105,166 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 	}
 	downloadPath := fmt.Sprintf("%s/%s/%s/release", global.CONF.System.RepoUrl, mode, req.Version)
 	fileName := fmt.Sprintf("1panel-%s-%s-%s.tar.gz", req.Version, "linux", itemArch)
-	_ = settingRepo.Update("SystemStatus", "Upgrading")
+
+	serviceHandle, err := systemctl.NewServiceHandle(systemctl.PanelService)
+	if err != nil {
+		return fmt.Errorf("initialize service handle failed: %w", err)
+	}
+	currentServiceName := systemctl.PanelService.ServiceName[serviceHandle.ManagerName()]
+
+	if err := settingRepo.Update("SystemStatus", "Upgrading"); err != nil {
+		return fmt.Errorf("update system status failed: %w", err)
+	}
+
 	go func() {
+		defer func() {
+			if err := settingRepo.Update("SystemStatus", "Free"); err != nil {
+				global.LOG.Errorf("Reset system status failed: %v", err)
+			}
+		}()
+
 		_ = global.Cron.Stop()
-		defer func() {
-			global.Cron.Start()
-		}()
-		if err := fileOp.DownloadFileWithProxy(downloadPath+"/"+fileName, rootDir+"/"+fileName); err != nil {
-			global.LOG.Errorf("download service file failed, err: %v", err)
-			_ = settingRepo.Update("SystemStatus", "Free")
-			return
-		}
-		global.LOG.Info("download all file successful!")
-		defer func() {
-			_ = os.Remove(rootDir)
-		}()
-		if err := handleUnTar(rootDir+"/"+fileName, rootDir, ""); err != nil {
-			global.LOG.Errorf("decompress file failed, err: %v", err)
-			_ = settingRepo.Update("SystemStatus", "Free")
-			return
-		}
-		tmpDir := rootDir + "/" + strings.ReplaceAll(fileName, ".tar.gz", "")
+		defer global.Cron.Start()
 
-		if err := u.handleBackup(fileOp, originalDir); err != nil {
-			global.LOG.Errorf("handle backup original file failed, err: %v", err)
-			_ = settingRepo.Update("SystemStatus", "Free")
+		if err := fileOp.DownloadFileWithProxy(
+			fmt.Sprintf("%s/%s", downloadPath, fileName),
+			path.Join(rootDir, fileName),
+		); err != nil {
+			global.LOG.Errorf("Failed to download upgrade package: %v", err)
 			return
 		}
-		global.LOG.Info("backup original data successful, now start to upgrade!")
+		defer os.RemoveAll(rootDir)
 
-		if err := common.CopyFile(path.Join(tmpDir, "1panel"), "/usr/local/bin"); err != nil {
-			global.LOG.Errorf("upgrade 1panel failed, err: %v", err)
-			u.handleRollback(originalDir, 1)
+		if err := handleUnTar(path.Join(rootDir, fileName), rootDir, ""); err != nil {
+			global.LOG.Errorf("Failed to extract package: %v", err)
 			return
 		}
 
-		if err := common.CopyFile(path.Join(tmpDir, "1pctl"), "/usr/local/bin"); err != nil {
-			global.LOG.Errorf("upgrade 1pctl failed, err: %v", err)
-			u.handleRollback(originalDir, 2)
-			return
-		}
-		_, _ = cmd.Execf("cp -r %s /usr/local/bin", path.Join(tmpDir, "lang"))
-		geoPath := path.Join(global.CONF.System.BaseDir, "1panel/geo")
-		_, _ = cmd.Execf("mkdir %s && cp %s %s/", geoPath, path.Join(tmpDir, "GeoIP.mmdb"), geoPath)
+		tmpDir := path.Join(rootDir, strings.TrimSuffix(fileName, ".tar.gz"))
 
-		if _, err := cmd.Execf("sed -i -e 's#BASE_DIR=.*#BASE_DIR=%s#g' /usr/local/bin/1pctl", global.CONF.System.BaseDir); err != nil {
-			global.LOG.Errorf("upgrade basedir in 1pctl failed, err: %v", err)
-			u.handleRollback(originalDir, 2)
+		if err := u.handleBackup(fileOp, originalDir, currentServiceName); err != nil {
+			global.LOG.Errorf("Backup failed: %v", err)
 			return
 		}
 
-		if err := common.CopyFile(path.Join(tmpDir, "1panel.service"), "/etc/systemd/system"); err != nil {
-			global.LOG.Errorf("upgrade 1panel.service failed, err: %v", err)
-			u.handleRollback(originalDir, 3)
+		binDir, _ := serviceHandle.GetBinaryPath()
+		servicePath, _ := serviceHandle.GetServicePath()
+		geoPath := path.Join(global.CONF.System.BaseDir, "1panel/geo/GeoIP.mmdb")
+
+		criticalUpdates := []struct {
+			src  string
+			dest string
+			step int
+		}{
+			{path.Join(tmpDir, "1panel"), path.Join(binDir, "1panel"), 1},
+			{path.Join(tmpDir, "1pctl"), path.Join(binDir, "1pctl"), 2},
+			{path.Join(tmpDir, currentServiceName), servicePath, 3},
+		}
+
+		for _, update := range criticalUpdates {
+			if err := common.CopyFile(update.src, update.dest); err != nil {
+				global.LOG.Errorf("Update %s failed: %v", path.Base(update.dest), err)
+				u.handleRollback(originalDir, update.step, currentServiceName)
+				return
+			}
+		}
+
+		if _, err := cmd.Execf("sed -i -e 's#BASE_DIR=.*#BASE_DIR=%s#g' /usr/local/bin/1pctl",
+			global.CONF.System.BaseDir); err != nil {
+			global.LOG.Errorf("Update base directory failed: %v", err)
+			u.handleRollback(originalDir, 2, currentServiceName)
 			return
 		}
 
-		global.LOG.Info("upgrade successful!")
+		// 语言文件和地理数据更新
+		langDir := path.Join(binDir, "lang")
+		if err := common.CopyDirs(path.Join(tmpDir, "lang"), langDir); err != nil {
+			global.LOG.Errorf("Update language files failed: %v", err)
+		}
+		if err := common.CopyFile(path.Join(tmpDir, "GeoIP.mmdb"), geoPath); err != nil {
+			global.LOG.Warnf("Update GeoIP database failed: %v", err)
+		}
+
+		// 服务重载与重启
+		if err := systemctl.SystemRestart(); err != nil {
+			global.LOG.Errorf("Service restart failed: %v", err)
+			return
+		}
+
+		// 后续处理
 		go writeLogs(req.Version)
-		_ = settingRepo.Update("SystemVersion", req.Version)
-		_ = settingRepo.Update("SystemStatus", "Free")
 		checkPointOfWal()
-		_, _ = cmd.ExecWithTimeOut("systemctl daemon-reload && systemctl restart 1panel.service", 1*time.Minute)
+		if err := settingRepo.Update("SystemVersion", req.Version); err != nil {
+			global.LOG.Errorf("Update system version failed: %v", err)
+		}
 	}()
 	return nil
 }
 
-func (u *UpgradeService) handleBackup(fileOp files.FileOp, originalDir string) error {
-	if err := fileOp.Copy("/usr/local/bin/1panel", originalDir); err != nil {
-		return err
+func (u *UpgradeService) handleBackup(fileOp files.FileOp, originalDir, serviceName string) error {
+	h, _ := systemctl.NewServiceHandle(systemctl.PanelService)
+	binDir, _ := h.GetBinaryPath()
+	servicePath, _ := h.GetServicePath()
+	geoPath := path.Join(global.CONF.System.BaseDir, "1panel/geo/GeoIP.mmdb")
+
+	backupItems := []struct {
+		src  string
+		dest string
+	}{
+		{path.Join(binDir, "1panel"), originalDir},
+		{path.Join(binDir, "1pctl"), originalDir},
+		{servicePath, originalDir},
+		{path.Join(binDir, "lang"), originalDir},
+		{geoPath, originalDir},
 	}
-	if err := fileOp.Copy("/usr/local/bin/1pctl", originalDir); err != nil {
-		return err
+
+	for _, item := range backupItems {
+		if err := fileOp.Copy(item.src, item.dest); err != nil {
+			return fmt.Errorf("backup %s failed: %w", path.Base(item.src), err)
+		}
 	}
-	if err := fileOp.Copy("/etc/systemd/system/1panel.service", originalDir); err != nil {
-		return err
-	}
-	_, _ = cmd.Execf("cp -r /usr/local/bin/lang %s", originalDir)
-	_, _ = cmd.Execf("cp %s %s", path.Join(global.CONF.System.BaseDir, "1panel/geo/GeoIP.mmdb"), originalDir)
-	checkPointOfWal()
-	if err := handleTar(path.Join(global.CONF.System.BaseDir, "1panel/db"), originalDir, "db.tar.gz", "db/1Panel.db-*", ""); err != nil {
-		return err
+
+	if err := handleTar(
+		path.Join(global.CONF.System.BaseDir, "1panel/db"),
+		originalDir,
+		"db.tar.gz",
+		"db/1Panel.db-*",
+		"",
+	); err != nil {
+		return fmt.Errorf("database backup failed: %w", err)
 	}
 	return nil
 }
 
-func (u *UpgradeService) handleRollback(originalDir string, errStep int) {
-	_ = settingRepo.Update("SystemStatus", "Free")
+func (u *UpgradeService) handleRollback(originalDir string, errStep int, serviceName string) {
+	global.LOG.Info("Initiating rollback procedure...")
 
-	checkPointOfWal()
-	if _, err := os.Stat(path.Join(originalDir, "1Panel.db")); err == nil {
-		if err := common.CopyFile(path.Join(originalDir, "1Panel.db"), global.CONF.System.DbPath); err != nil {
-			global.LOG.Errorf("rollback 1panel db failed, err: %v", err)
+	h, _ := systemctl.NewServiceHandle(systemctl.PanelService)
+	binDir, _ := h.GetBinaryPath()
+	servicePath, _ := h.GetServicePath()
+	geoPath := path.Join(global.CONF.System.BaseDir, "1panel/geo/GeoIP.mmdb")
+
+	rollbackSteps := []struct {
+		src  string
+		dest string
+	}{
+		{path.Join(originalDir, "1panel"), path.Join(binDir, "1panel")},
+		{path.Join(originalDir, "1pctl"), path.Join(binDir, "1pctl")},
+		{path.Join(originalDir, filepath.Base(servicePath)), servicePath},
+		{path.Join(originalDir, "lang"), path.Join(binDir, "lang")},
+		{path.Join(originalDir, "GeoIP.mmdb"), geoPath},
+	}
+
+	for _, step := range rollbackSteps[:errStep] {
+		if err := common.CopyFile(step.src, step.dest); err != nil {
+			global.LOG.Errorf("Rollback %s failed: %v", path.Base(step.src), err)
 		}
 	}
-	if _, err := os.Stat(path.Join(originalDir, "db.tar.gz")); err == nil {
-		if err := handleUnTar(path.Join(originalDir, "db.tar.gz"), global.CONF.System.DbPath, ""); err != nil {
-			global.LOG.Errorf("rollback 1panel db failed, err: %v", err)
-		}
-	}
-	if err := common.CopyFile(path.Join(originalDir, "1panel"), "/usr/local/bin"); err != nil {
-		global.LOG.Errorf("rollback 1pctl failed, err: %v", err)
-	}
-	if errStep == 1 {
-		return
-	}
-	if err := common.CopyFile(path.Join(originalDir, "1pctl"), "/usr/local/bin"); err != nil {
-		global.LOG.Errorf("rollback 1panel failed, err: %v", err)
-	}
-	_, _ = cmd.Execf("cp -r %s /usr/local/bin", path.Join(originalDir, "lang"))
-	geoPath := path.Join(global.CONF.System.BaseDir, "1panel/geo")
-	_, _ = cmd.Execf("mkdir %s && cp %s %s/", geoPath, path.Join(originalDir, "GeoIP.mmdb"), geoPath)
 
-	if errStep == 2 {
-		return
-	}
-	if err := common.CopyFile(path.Join(originalDir, "1panel.service"), "/etc/systemd/system"); err != nil {
-		global.LOG.Errorf("rollback 1panel failed, err: %v", err)
+	if err := systemctl.SystemRestart(); err != nil {
+		global.LOG.Errorf("Service restart during rollback failed: %v", err)
 	}
 }
-
 func (u *UpgradeService) loadVersionByMode(developer, currentVersion string) (string, string, string) {
 	var current, latest string
 	if global.CONF.System.Mode == "dev" {
