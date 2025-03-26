@@ -339,6 +339,7 @@ const login = (formEl: FormInstance | undefined) => {
             globalStore.currentNode = 'local';
             MsgSuccess(i18n.t('commons.msg.loginSuccess'));
             router.push({ name: 'home' });
+            document.onkeydown = null;
         } catch (res) {
             if (res.code === 401) {
                 if (res.message === 'ErrCaptchaCode') {
@@ -374,6 +375,7 @@ const mfaLogin = async (auto: boolean) => {
             MsgSuccess(i18n.t('commons.msg.loginSuccess'));
             globalStore.currentNode = 'local';
             router.push({ name: 'home' });
+            document.onkeydown = null;
         } catch (res) {
             if (res.code === 401) {
                 errMfaInfo.value = true;

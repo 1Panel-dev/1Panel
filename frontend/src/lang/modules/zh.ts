@@ -1434,6 +1434,7 @@ const message = {
         proxyPort: '代理端口',
         proxyPasswdKeep: '记住密码',
         proxyDocker: 'Docker 代理',
+        proxyDockerHelper: '将代理服务器配置同步至 Docker，支持离线服务器拉取镜像等操作',
         apiInterface: 'API 接口',
         apiInterfaceClose: '关闭后将不能使用 API 接口进行访问，是否继续？',
         apiInterfaceHelper: '提供面板支持 API 接口访问',

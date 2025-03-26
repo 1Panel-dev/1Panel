@@ -64,7 +64,7 @@ const onSave = async (formEl: FormInstance | undefined) => {
                 type: 'info',
             },
         ).then(async () => {
-            await updateFail2ban({ key: 'logPath', value: form.logPath })
+            await updateFail2ban({ key: 'logpath', value: form.logPath })
                 .then(async () => {
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                     loading.value = false;

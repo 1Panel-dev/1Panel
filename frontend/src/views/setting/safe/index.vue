@@ -288,18 +288,23 @@ const handleMFA = async () => {
     ElMessageBox.confirm(i18n.global.t('setting.mfaClose'), i18n.global.t('setting.mfa'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
-    }).then(async () => {
-        loading.value = true;
-        await updateSetting({ key: 'MFAStatus', value: 'Disable' })
-            .then(() => {
-                loading.value = false;
-                search();
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            })
-            .catch(() => {
-                loading.value = false;
-            });
-    });
+    })
+        .then(async () => {
+            loading.value = true;
+            await updateSetting({ key: 'MFAStatus', value: 'Disable' })
+                .then(() => {
+                    loading.value = false;
+                    search();
+                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                })
+                .catch(() => {
+                    loading.value = false;
+                    search();
+                });
+        })
+        .catch(() => {
+            search();
+        });
 };
 
 const onChangeEntrance = () => {

@@ -139,7 +139,6 @@ const handleBeforeClose = (done: () => void) => {
 };
 
 const handleClose = () => {
-    console.log('321321');
     localOpenPage.value = false;
     globalStore.isFullScreen = false;
     emit('close');

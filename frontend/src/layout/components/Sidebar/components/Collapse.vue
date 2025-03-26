@@ -28,8 +28,8 @@
                     {{ $t('menu.msgCenter') }}
                     <el-tag class="msg-tag" v-if="taskCount !== 0" size="small" round>{{ taskCount }}</el-tag>
                 </div>
-                <el-divider v-if="nodes.length > 0" class="divider" />
-                <div v-if="nodes.length > 0" class="mt-2 mb-2">
+                <el-divider v-if="nodes.length > 0 && globalStore.isMasterProductPro" class="divider" />
+                <div v-if="nodes.length > 0 && globalStore.isMasterProductPro" class="mt-2 mb-2">
                     <div class="dropdown-item" @click="changeNode('local')">
                         {{ $t('xpack.node.master') }}
                     </div>
@@ -90,6 +90,10 @@ const loadCurrentName = () => {
 };
 
 const loadNodes = async () => {
+    if (!globalStore.isMasterProductPro) {
+        globalStore.currentNode = 'local';
+        return;
+    }
     await listNodeOptions()
         .then((res) => {
             if (!res) {
