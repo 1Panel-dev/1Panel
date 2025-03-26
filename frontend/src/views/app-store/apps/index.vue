@@ -185,7 +185,7 @@ import Install from '../detail/install/index.vue';
 import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
-import { newUUID } from '@/utils/util';
+import { newUUID, jumpToPath } from '@/utils/util';
 import Detail from '../detail/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
 import { storeToRefs } from 'pinia';
@@ -254,7 +254,7 @@ const openInstall = (app: App.App) => {
         case 'go':
         case 'python':
         case 'dotnet':
-            router.push({ path: '/websites/runtimes/' + app.type });
+            jumpToPath(router, '/websites/runtimes/' + app.type);
             break;
         default:
             const params = {

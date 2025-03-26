@@ -44,6 +44,7 @@ const config = reactive({
 });
 const open = ref(false);
 const showTail = ref(true);
+const emit = defineEmits(['close']);
 
 const openWithTaskID = (id: string, tail: boolean) => {
     config.taskID = id;
@@ -65,7 +66,7 @@ const openWithResourceID = (taskType: string, taskOperate: string, resourceID: n
 
 const handleClose = () => {
     open.value = false;
-    bus.emit('close', true);
+    emit('close', true);
     bus.emit('refreshTask', true);
 };
 

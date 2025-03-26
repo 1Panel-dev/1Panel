@@ -32,7 +32,7 @@
             <el-form @submit.prevent ref="paramForm" :model="paramModel" label-position="top" :rules="rules">
                 <div v-for="(p, index) in params" :key="index">
                     <el-form-item
-                        :prop="p.key"
+                        :prop="'params.' + p.key"
                         :label="getLabel(p)"
                         v-if="p.showValue == undefined || p.showValue == ''"
                     >
@@ -57,7 +57,7 @@
                         </el-select>
                         <el-input v-else v-model.trim="paramModel.params[p.key]" :disabled="!p.edit"></el-input>
                     </el-form-item>
-                    <el-form-item :prop="p.key" :label="getLabel(p)" v-else>
+                    <el-form-item :prop="'params.' + p.key" :label="getLabel(p)" v-else>
                         <el-input v-model.trim="p.showValue" :disabled="!p.edit"></el-input>
                     </el-form-item>
                 </div>

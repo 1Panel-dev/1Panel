@@ -72,7 +72,7 @@ import { ref } from 'vue';
 import Install from './install/index.vue';
 import router from '@/routers';
 import { GlobalStore } from '@/store';
-import { computeSizeFromMB } from '@/utils/util';
+import { computeSizeFromMB, jumpToPath } from '@/utils/util';
 import { storeToRefs } from 'pinia';
 
 const globalStore = GlobalStore();
@@ -133,16 +133,12 @@ const toLink = (link: string) => {
 const openInstall = () => {
     switch (app.value.type) {
         case 'php':
-            router.push({ path: '/websites/runtimes/php' });
-            break;
         case 'node':
-            router.push({ path: '/websites/runtimes/node' });
-            break;
         case 'java':
-            router.push({ path: '/websites/runtimes/java' });
-            break;
         case 'go':
-            router.push({ path: '/websites/runtimes/go' });
+        case 'python':
+        case 'dotnet':
+            jumpToPath(router, '/websites/runtimes/' + app.value.type);
             break;
         default:
             const params = {

@@ -2,10 +2,16 @@ package router
 
 import (
 	"context"
+	"github.com/1Panel-dev/1Panel/core/app/repo"
+	"github.com/1Panel-dev/1Panel/core/cmd/server/res"
+	"github.com/1Panel-dev/1Panel/core/constant"
+	"github.com/1Panel-dev/1Panel/core/global"
+	"github.com/1Panel-dev/1Panel/core/utils/security"
 	"net"
 	"net/http"
 	"net/http/httputil"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
@@ -38,6 +44,13 @@ func Proxy() gin.HandlerFunc {
 			currentNode = c.Request.Header.Get("CurrentNode")
 		}
 
+		if strings.HasPrefix(c.Request.URL.Path, "/api/v2/") && !checkSession(c) {
+			data, _ := res.ErrorMsg.ReadFile("html/401.html")
+			c.Data(401, "text/html; charset=utf-8", data)
+			c.Abort()
+			return
+		}
+
 		if !strings.HasPrefix(c.Request.URL.Path, "/api/v2/core") && (currentNode == "local" || len(currentNode) == 0 || currentNode == "127.0.0.1") {
 			sockPath := "/etc/1panel/agent.sock"
 			if _, err := os.Stat(sockPath); err != nil {
@@ -58,6 +71,13 @@ func Proxy() gin.HandlerFunc {
 					req.URL.Host = "unix"
 				},
 				Transport: transport,
+				ModifyResponse: func(response *http.Response) error {
+					if response.StatusCode == 404 {
+						security.HandleNotSecurity(c, "")
+						c.Abort()
+					}
+					return nil
+				},
 			}
 			proxy.ServeHTTP(c.Writer, c.Request)
 			c.Abort()
@@ -66,4 +86,23 @@ func Proxy() gin.HandlerFunc {
 		xpack.Proxy(c, currentNode)
 		c.Abort()
 	}
+}
+
+func checkSession(c *gin.Context) bool {
+	psession, err := global.SESSION.Get(c)
+	if err != nil {
+		return false
+	}
+	settingRepo := repo.NewISettingRepo()
+	setting, err := settingRepo.Get(repo.WithByKey("SessionTimeout"))
+	if err != nil {
+		return false
+	}
+	lifeTime, _ := strconv.Atoi(setting.Value)
+	httpsSetting, err := settingRepo.Get(repo.WithByKey("SSL"))
+	if err != nil {
+		return false
+	}
+	_ = global.SESSION.Set(c, psession, httpsSetting.Value == constant.StatusEnable, lifeTime)
+	return true
 }

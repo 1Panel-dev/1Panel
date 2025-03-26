@@ -354,7 +354,7 @@
             </div>
         </template>
     </LayoutContent>
-    <Backups ref="backupRef" @close="search" />
+    <Backups ref="backupRef" />
     <Uploads ref="uploadRef" />
     <AppResources ref="checkRef" @close="search" />
     <AppDelete ref="deleteRef" @close="search" />
