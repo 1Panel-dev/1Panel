@@ -62,6 +62,7 @@ ErrNodeBoundLimit: "The current free node has reached its limit, please check an
 ErrNoSuchNode: "Node information not found, please check and retry!"
 ErrNodeUnbind: "This node is not within the license binding range, please check and retry!"
 ErrNodeBind: "This node is already bound to a license, please check and retry!"
+ErrNodeLocalRollback: "The primary node does not support direct rollback. Please manually execute the '1pctl restore' command to rollback!"
 
 # alert
 ErrAlertSync: "Alert information sync error, please check and retry!"

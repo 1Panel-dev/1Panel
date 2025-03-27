@@ -31,7 +31,7 @@ func (o upClient) ListBuckets() ([]interface{}, error) {
 
 func (s upClient) Upload(src, target string) (bool, error) {
 	if _, err := s.client.GetInfo(path.Dir(src)); err != nil {
-		_ = s.client.Mkdir(path.Dir(src))
+		_ = s.client.Mkdir(path.Dir(target))
 	}
 	if err := s.client.Put(&upyun.PutObjectConfig{
 		Path:            target,

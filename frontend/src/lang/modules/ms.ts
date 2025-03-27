@@ -1797,10 +1797,16 @@ const message = {
             'Pulangkan semula pemulihan ini akan menggantikan semua fail dari pemulihan ini, dan mungkin memerlukan mulakan semula perkhidmatan Docker dan 1Panel. Adakah anda mahu meneruskan?',
 
         upgradeHelper: 'Kemas kini memerlukan mulakan semula perkhidmatan 1Panel. Adakah anda mahu meneruskan?',
+        rollbackLocalHelper:
+            'Nod utama tidak menyokong rollback secara langsung. Sila laksanakan arahan [1pctl restore] secara manual untuk rollback!',
         noUpgrade: 'Ia adalah versi terbaru pada masa ini',
         upgradeNotes: 'Nota pelepasan',
         upgradeNow: 'Kemas kini sekarang',
         source: 'Sumber muat turun',
+        versionNotSame:
+            'Versi nod ini tidak sepadan dengan nod utama. Penukaran tidak disokong buat masa ini. Sila periksa dan cuba lagi!',
+        versionCompare:
+            'Nod {0} telah berada pada versi terkini yang boleh dinaik taraf. Sila periksa versi nod utama dan cuba lagi!',
 
         about: 'Mengenai',
         project: 'GitHub',

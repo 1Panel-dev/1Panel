@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/i18n"
 	"github.com/spf13/cobra"
 )
@@ -43,7 +44,7 @@ var resetMFACmd = &cobra.Command{
 			return err
 		}
 
-		return setSettingByKey(db, "MFAStatus", "disable")
+		return setSettingByKey(db, "MFAStatus", constant.StatusDisable)
 	},
 }
 var resetSSLCmd = &cobra.Command{
@@ -59,7 +60,7 @@ var resetSSLCmd = &cobra.Command{
 			return err
 		}
 
-		return setSettingByKey(db, "SSL", "disable")
+		return setSettingByKey(db, "SSL", constant.StatusDisable)
 	},
 }
 var resetEntranceCmd = &cobra.Command{

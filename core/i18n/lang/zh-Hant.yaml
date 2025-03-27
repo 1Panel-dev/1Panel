@@ -62,6 +62,7 @@ ErrNodeBoundLimit: "當前免費節點已達上限，請檢查後重試！"
 ErrNoSuchNode: "未能找到該節點信息，請檢查後重試！"
 ErrNodeUnbind: "檢測到該節點未在許可證綁定範圍內，請檢查後重試！"
 ErrNodeBind: "檢測到該節點已綁定許可證，請檢查後重試！"
+ErrNodeLocalRollback: "主節點暫不支援直接回滾，請手動執行「1pctl restore」命令回滾！"
 
 # alert
 ErrAlertSync: "告警信息同步錯誤，請檢查後重試！"

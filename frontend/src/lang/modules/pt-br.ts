@@ -1782,10 +1782,16 @@ const message = {
             'Reverter essa recuperação substituirá todos os arquivos dessa recuperação e pode exigir reiniciar os serviços Docker e 1Panel. Você deseja continuar?',
 
         upgradeHelper: 'A atualização requer reiniciar o serviço 1Panel. Você deseja continuar?',
+        rollbackLocalHelper:
+            'O nó principal não suporta rollback direto. Por favor, execute manualmente o comando [1pctl restore] para fazer o rollback!',
         noUpgrade: 'Esta é a versão mais recente',
         upgradeNotes: 'Notas de versão',
         upgradeNow: 'Atualizar agora',
         source: 'Fonte para download',
+        versionNotSame:
+            'A versão deste nó não corresponde ao nó principal. A troca não é suportada no momento. Por favor, verifique e tente novamente!',
+        versionCompare:
+            'Detectado que o nó {0} já está na última versão atualizável. Por favor, verifique a versão do nó principal e tente novamente!',
 
         about: 'Sobre',
         project: 'GitHub',

@@ -130,7 +130,7 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 			_ = settingRepo.Update("SystemStatus", "Free")
 			return
 		}
-		itemLog := model.UpgradeLog{NodeID: 0, OldVersion: global.CONF.Base.Version, NewVersion: req.Version, BackupFile: originalDir}
+		itemLog := model.UpgradeLog{NodeID: 0, OldVersion: global.CONF.Base.Version, NewVersion: req.Version, BackupFile: baseDir}
 		_ = upgradeLogRepo.Create(&itemLog)
 
 		global.LOG.Info("backup original data successful, now start to upgrade!")

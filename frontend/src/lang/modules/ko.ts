@@ -1713,10 +1713,16 @@ const message = {
             '이 복구를 롤백하면 해당 복구의 모든 파일이 대체되며 Docker 및 1Panel 서비스를 재시작해야 할 수 있습니다. 계속하시겠습니까?',
 
         upgradeHelper: '업그레이드에는 1Panel 서비스를 재시작해야 합니다. 계속하시겠습니까?',
+        rollbackLocalHelper:
+            '마스터 노드는 직접 롤백을 지원하지 않습니다. 수동으로 [1pctl restore] 명령어를 실행하여 롤백하세요!',
         noUpgrade: '현재 최신 버전입니다',
         upgradeNotes: '릴리스 노트',
         upgradeNow: '지금 업그레이드',
         source: '다운로드 소스',
+        versionNotSame:
+            '이 노드의 버전이 마스터 노드와 일치하지 않습니다. 현재 전환을 지원하지 않습니다. 확인 후 다시 시도하세요!',
+        versionCompare:
+            '노드 {0}이(가) 이미 업그레이드 가능한 최신 버전입니다. 마스터 노드 버전을 확인 후 다시 시도하세요!',
 
         about: '정보',
         project: 'GitHub',

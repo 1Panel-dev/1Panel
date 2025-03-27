@@ -177,11 +177,14 @@ func (u *BackupRecordService) ListAppRecords(name, detailName, fileName string) 
 
 func (u *BackupRecordService) ListFiles(req dto.OperateByID) []string {
 	var datas []string
-	_, client, err := NewBackupClientWithID(req.ID)
+	backupItem, client, err := NewBackupClientWithID(req.ID)
 	if err != nil {
 		return datas
 	}
 	prefix := "system_snapshot"
+	if len(backupItem.BackupPath) != 0 { 
+		prefix = path.Join(backupItem.BackupPath, prefix)
+	}
 	files, err := client.ListObjects(prefix)
 	if err != nil {
 		global.LOG.Debugf("load files failed, err: %v", err)

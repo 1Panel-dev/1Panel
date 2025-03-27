@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/i18n"
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
@@ -41,7 +42,7 @@ var userinfoCmd = &cobra.Command{
 		address := getSettingByKey(db, "SystemIP")
 
 		protocol := "http"
-		if ssl == "enable" {
+		if ssl == constant.StatusEnable {
 			protocol = "https"
 		}
 		if address == "" {

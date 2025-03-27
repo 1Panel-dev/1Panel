@@ -62,6 +62,7 @@ ErrNodeBoundLimit: "O nó gratuito atual atingiu seu limite, por favor verifique
 ErrNoSuchNode: "As informações deste nó não foram encontradas, por favor verifique e tente novamente!"
 ErrNodeUnbind: "Nó fora do escopo da licença detectado, por favor verifique e tente novamente!"
 ErrNodeBind: "Este nó já está vinculado a uma licença, por favor verifique e tente novamente!"
+ErrNodeLocalRollback: "O nó principal não suporta rollback direto. Por favor, execute manualmente o comando '1pctl restore' para fazer o rollback!"
 
 # alert
 ErrAlertSync: "Erro na sincronização das informações de alerta, verifique e tente novamente!"

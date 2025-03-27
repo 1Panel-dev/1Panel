@@ -73,7 +73,7 @@ var restoreCmd = &cobra.Command{
 		}
 		fmt.Println(i18n.GetMsgByKeyForCmd("RestoreStep4"))
 		if _, err := os.Stat(path.Join(tmpPath, "db")); err == nil {
-			dbPath := path.Join(baseDir, "1panel/db")
+			dbPath := path.Join(baseDir, "1panel")
 			if err := files.CopyItem(true, true, path.Join(tmpPath, "db"), dbPath); err != nil {
 				global.LOG.Errorf("rollback 1panel db failed, err: %v", err)
 			}

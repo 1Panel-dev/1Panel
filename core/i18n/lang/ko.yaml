@@ -62,6 +62,7 @@ ErrNodeBoundLimit: "현재 무료 노드가 한도에 도달했습니다. 확인
 ErrNoSuchNode: "노드 정보를 찾을 수 없습니다. 다시 확인하고 시도해 주세요!"
 ErrNodeUnbind: "이 노드가 라이선스 바인딩 범위에 있지 않음을 감지하였습니다. 다시 확인하고 시도해 주세요!"
 ErrNodeBind: "이 노드가 이미 라이선스에 바인딩되어 있음을 감지하였습니다. 다시 확인하고 시도해 주세요!"
+ErrNodeLocalRollback: "마스터 노드는 직접 롤백을 지원하지 않습니다. 수동으로 '1pctl restore' 명령어를 실행하여 롤백하세요!"
 
 # alert
 ErrAlertSync: "경고 정보 동기화 오류, 다시 확인하고 시도해 주세요!"

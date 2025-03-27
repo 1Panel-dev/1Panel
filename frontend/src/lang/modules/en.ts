@@ -1835,17 +1835,16 @@ const message = {
         noUpgrade: 'It is currently the latest version',
         versionHelper:
             'Name rules: [major version].[functional version].[Bug fix version], as shown in the following example:',
-        versionHelper1: 'v1.0.1 is a Bug fix after v1.0.0',
-        versionHelper2: 'v1.1.0 is a feature release after v1.0.0',
+        rollbackLocalHelper:
+            'The primary node does not support direct rollback. Please manually execute the [1pctl restore] command to rollback!',
         upgradeCheck: 'Check for updates',
         upgradeNotes: 'Release note',
         upgradeNow: 'Upgrade now',
         source: 'Download source',
-        hasNewVersion: 'New version Available',
-        versionHigher:
-            'Detected that node {0} version is higher than the main node, switching is not supported at this time. Please upgrade the main node system version and try again!',
-        versionLower:
-            'Detected that node {0} version is lower than the main node, switching is not supported at this time. Please upgrade the system version of this node and try again!',
+        versionNotSame:
+            'The version of this node does not match the primary node. Switching is not supported at this time. Please check and try again!',
+        versionCompare:
+            'Detected that node {0} is already at the latest upgradable version. Please check the primary node version and try again!',
 
         about: 'About',
         project: 'Project Address',

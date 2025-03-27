@@ -63,6 +63,7 @@ ErrNodeBoundLimit: "当前免费节点已经达到上限，请检查后重试！
 ErrNoSuchNode: "未能找到该节点信息，请检查后重试！"
 ErrNodeUnbind: "检测到该节点未在许可证绑定范围内，请检查后重试！"
 ErrNodeBind: "检测到该节点已绑定许可证，请检查后重试！"
+ErrNodeLocalRollback: "主节点暂不支持直接回滚，请手动执行 1pctl restore 命令回滚！"
 
 # alert
 ErrAlertSync: "告警信息同步错误，请检查后重试！"

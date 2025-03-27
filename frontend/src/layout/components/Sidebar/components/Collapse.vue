@@ -57,7 +57,6 @@
 import { GlobalStore, MenuStore } from '@/store';
 import { DropdownInstance } from 'element-plus';
 import { countExecutingTask } from '@/api/modules/log';
-import { compareVersion } from '@/utils/version';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 import { listNodeOptions } from '@/api/modules/setting';
@@ -125,13 +124,8 @@ const changeNode = (command: string) => {
                 location.reload();
                 return;
             }
-            let compareItem = compareVersion(item.version, props.version);
-            if (compareItem) {
-                MsgError(i18n.global.t('setting.versionHigher', [command]));
-                return;
-            }
-            if (!compareItem) {
-                MsgError(i18n.global.t('setting.versionLower', [command]));
+            if (item.version !== props.version) {
+                MsgError(i18n.global.t('setting.versionNotSame'));
                 return;
             }
         }
