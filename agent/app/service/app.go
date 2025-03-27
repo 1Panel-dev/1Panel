@@ -192,16 +192,18 @@ func (a AppService) GetApp(ctx *gin.Context, key string) (*response.AppDTO, erro
 	}
 	var versionsRaw []string
 	hasLatest := false
+	latestVersion := ""
 	for _, detail := range details {
 		if strings.Contains(detail.Version, "latest") {
 			hasLatest = true
+			latestVersion = detail.Version
 			continue
 		}
 		versionsRaw = append(versionsRaw, detail.Version)
 	}
 	appDTO.Versions = common.GetSortedVersions(versionsRaw)
 	if hasLatest {
-		appDTO.Versions = append([]string{"latest"}, appDTO.Versions...)
+		appDTO.Versions = append([]string{latestVersion}, appDTO.Versions...)
 	}
 	tags, err := getAppTags(app.ID, strings.ToLower(common.GetLang(ctx)))
 	if err != nil {

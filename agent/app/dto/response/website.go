@@ -111,8 +111,9 @@ type Resource struct {
 }
 
 type Database struct {
-	Name string `json:"name"`
-	Type string `json:"type"`
-	From string `json:"from"`
-	ID   uint   `json:"id"`
+	Name         string `json:"name"`
+	DatabaseName string `json:"databaseName"`
+	Type         string `json:"type"`
+	From         string `json:"from"`
+	ID           uint   `json:"id"`
 }

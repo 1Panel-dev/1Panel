@@ -1,11 +1,10 @@
 <template>
     <el-dialog
         v-model="open"
-        :destroy-on-close="true"
         :close-on-click-modal="false"
         :close-on-press-escape="false"
         :show-close="showClose"
-        :before-close="handleClose"
+        @close="handleClose"
         :width="width"
     >
         <div>
@@ -44,7 +43,6 @@ const config = reactive({
 });
 const open = ref(false);
 const showTail = ref(true);
-const emit = defineEmits(['close']);
 
 const openWithTaskID = (id: string, tail: boolean) => {
     config.taskID = id;
@@ -64,9 +62,10 @@ const openWithResourceID = (taskType: string, taskOperate: string, resourceID: n
     open.value = true;
 };
 
+const em = defineEmits(['close']);
 const handleClose = () => {
+    em('close', true);
     open.value = false;
-    emit('close', true);
     bus.emit('refreshTask', true);
 };
 

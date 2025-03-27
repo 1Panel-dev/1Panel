@@ -273,19 +273,46 @@
                                                         <table>
                                                             <tbody>
                                                                 <tr v-if="defaultLink != ''">
-                                                                    <td>
+                                                                    <td v-if="installed.httpPort > 0">
                                                                         <el-button
                                                                             type="primary"
                                                                             link
                                                                             @click="
                                                                                 toLink(
-                                                                                    defaultLink +
+                                                                                    'http://' +
+                                                                                        defaultLink +
                                                                                         ':' +
                                                                                         installed.httpPort,
                                                                                 )
                                                                             "
                                                                         >
-                                                                            {{ defaultLink + ':' + installed.httpPort }}
+                                                                            {{
+                                                                                'http://' +
+                                                                                defaultLink +
+                                                                                ':' +
+                                                                                installed.httpPort
+                                                                            }}
+                                                                        </el-button>
+                                                                    </td>
+                                                                    <td v-if="installed.httpsPort > 0">
+                                                                        <el-button
+                                                                            type="primary"
+                                                                            link
+                                                                            @click="
+                                                                                toLink(
+                                                                                    'https://' +
+                                                                                        defaultLink +
+                                                                                        ':' +
+                                                                                        installed.httpsPort,
+                                                                                )
+                                                                            "
+                                                                        >
+                                                                            {{
+                                                                                'https://' +
+                                                                                defaultLink +
+                                                                                ':' +
+                                                                                installed.httpsPort
+                                                                            }}
                                                                         </el-button>
                                                                     </td>
                                                                 </tr>

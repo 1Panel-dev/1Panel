@@ -2,14 +2,7 @@
     <DrawerPro v-model="drawerVisible" :header="$t('app.defaultWebDomain')" @close="handleClose" size="small">
         <el-form ref="formRef" label-position="top" :model="form" :rules="rules" @submit.prevent v-loading="loading">
             <el-form-item :label="$t('app.defaultWebDomain')" prop="defaultDomain">
-                <el-input v-model="form.defaultDomain">
-                    <template #prepend>
-                        <el-select v-model="protocol" placeholder="Select" class="p-w-100">
-                            <el-option label="HTTP" value="http://" />
-                            <el-option label="HTTPS" value="https://" />
-                        </el-select>
-                    </template>
-                </el-input>
+                <el-input v-model="form.defaultDomain"></el-input>
                 <span class="input-help">{{ $t('app.defaultWebDomainHepler') }}</span>
             </el-form-item>
         </el-form>
@@ -36,18 +29,15 @@ const form = reactive({
     defaultDomain: '',
 });
 const rules = reactive({
-    defaultDomain: [Rules.requiredInput],
+    defaultDomain: [Rules.requiredInput, Rules.ipV4V6OrDomain],
 });
 const formRef = ref<FormInstance>();
-const protocol = ref('http://');
 interface DialogProps {
-    protocol: string;
     domain: string;
 }
 
 const acceptParams = (config: DialogProps): void => {
     form.defaultDomain = config.domain;
-    protocol.value = config.protocol;
     drawerVisible.value = true;
 };
 
@@ -64,12 +54,8 @@ const submit = async () => {
         }
         loading.value = true;
         try {
-            let defaultDomain = '';
-            if (form.defaultDomain) {
-                defaultDomain = protocol.value + form.defaultDomain;
-            }
             const req = {
-                defaultDomain: defaultDomain,
+                defaultDomain: form.defaultDomain,
             };
             await updateAppStoreConfig(req);
             MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));

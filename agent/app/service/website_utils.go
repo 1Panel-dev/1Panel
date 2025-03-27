@@ -297,11 +297,7 @@ func moveDefaultWafConfig(websiteDir string, defaultConfigContent []byte, defaul
 	return nil
 }
 
-func createAllWebsitesWAFConfig() error {
-	websites, _ := websiteRepo.List()
-	if len(websites) == 0 {
-		return nil
-	}
+func createAllWebsitesWAFConfig(websites []model.Website) error {
 	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
 	if err != nil {
 		return err

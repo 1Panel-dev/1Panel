@@ -629,6 +629,7 @@ export namespace Website {
         databaseID: number;
         websiteID: number;
         from: string;
+        databaseName: number;
     }
 
     export interface ChangeDatabase {

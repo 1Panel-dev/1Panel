@@ -1834,19 +1834,18 @@ func handleOpenrestyFile(appInstall *model.AppInstall) error {
 			break
 		}
 	}
-	if !hasDefaultWebsite {
-		return nil
+	if hasDefaultWebsite {
+		installDir := appInstall.GetPath()
+		defaultConfigPath := path.Join(installDir, "conf", "default", "00.default.conf")
+		fileOp := files.NewFileOp()
+		content, err := fileOp.GetContent(defaultConfigPath)
+		if err != nil {
+			return err
+		}
+		newContent := strings.ReplaceAll(string(content), "default_server", "")
+		if err := fileOp.WriteFile(defaultConfigPath, strings.NewReader(newContent), constant.FilePerm); err != nil {
+			return err
+		}
 	}
-	installDir := appInstall.GetPath()
-	defaultConfigPath := path.Join(installDir, "conf", "default", "00.default.conf")
-	fileOp := files.NewFileOp()
-	content, err := fileOp.GetContent(defaultConfigPath)
-	if err != nil {
-		return err
-	}
-	newContent := strings.ReplaceAll(string(content), "default_server", "")
-	if err := fileOp.WriteFile(defaultConfigPath, strings.NewReader(newContent), constant.FilePerm); err != nil {
-		return err
-	}
-	return createAllWebsitesWAFConfig()
+	return createAllWebsitesWAFConfig(websites)
 }

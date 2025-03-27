@@ -24,7 +24,7 @@
                         <div class="flex justify-between items-center">
                             <span>{{ item.name }}</span>
                             <div>
-                                <el-tag>{{ item.type }}</el-tag>
+                                <el-tag>{{ item.databaseName }}</el-tag>
                                 <el-tag class="ml-1">
                                     {{ item.from === 'local' ? $t('commons.table.local') : $t('database.remote') }}
                                 </el-tag>
@@ -79,16 +79,11 @@ const listDatabases = async () => {
     try {
         const res = await getWebsiteDatabase();
         databases.value = res.data;
-        if (databases.value.length > 0) {
-            if (website.value.dbID > 0) {
-                for (let i = 0; i < databases.value.length; i++) {
-                    if (
-                        databases.value[i].id === website.value.dbID &&
-                        databases.value[i].type === website.value.dbType
-                    ) {
-                        req.db = databases.value[i].id + databases.value[i].type;
-                        break;
-                    }
+        if (databases.value.length > 0 && website.value.dbID > 0) {
+            for (let i = 0; i < databases.value.length; i++) {
+                if (databases.value[i].id === website.value.dbID && databases.value[i].type === website.value.dbType) {
+                    req.db = databases.value[i].id + databases.value[i].type;
+                    break;
                 }
             }
         }

@@ -3210,10 +3210,11 @@ func (w WebsiteService) ListDatabases() ([]response.Database, error) {
 		database, _ := databaseRepo.Get(repo.WithByName(db.MysqlName))
 		if database.ID > 0 {
 			res = append(res, response.Database{
-				ID:   db.ID,
-				Name: db.Name,
-				Type: database.Type,
-				From: database.From,
+				ID:           db.ID,
+				Name:         db.Name,
+				Type:         database.Type,
+				From:         database.From,
+				DatabaseName: database.Name,
 			})
 		}
 	}
@@ -3222,10 +3223,11 @@ func (w WebsiteService) ListDatabases() ([]response.Database, error) {
 		database, _ := databaseRepo.Get(repo.WithByName(db.PostgresqlName))
 		if database.ID > 0 {
 			res = append(res, response.Database{
-				ID:   db.ID,
-				Name: db.Name,
-				Type: database.Type,
-				From: database.From,
+				ID:           db.ID,
+				Name:         db.Name,
+				Type:         database.Type,
+				From:         database.From,
+				DatabaseName: database.Name,
 			})
 		}
 	}

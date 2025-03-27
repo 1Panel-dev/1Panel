@@ -14,12 +14,6 @@
                     <el-col :xs="24" :sm="20" :md="15" :lg="12" :xl="12">
                         <el-form-item :label="$t('app.defaultWebDomain')" prop="defaultDomain">
                             <el-input v-model="config.defaultDomain" disabled>
-                                <template #prepend>
-                                    <el-select v-model="protocol" placeholder="Select" class="p-w-100" disabled>
-                                        <el-option label="HTTP" value="http://" />
-                                        <el-option label="HTTPS" value="https://" />
-                                    </el-select>
-                                </template>
                                 <template #append>
                                     <el-button @click="setDefaultDomain()" icon="Setting">
                                         {{ $t('commons.button.set') }}
@@ -54,35 +48,15 @@ const config = ref({
 });
 const loading = ref(false);
 const configForm = ref();
-const protocol = ref('http://');
 const domainRef = ref();
 const useCustomApp = ref(false);
-
-function getUrl(url: string) {
-    const regex = /^(https?:\/\/)(.*)/;
-    const match = url.match(regex);
-    if (match) {
-        const protocol = match[1];
-        const remainder = match[2];
-        return {
-            protocol: protocol,
-            remainder: remainder,
-        };
-    } else {
-        return null;
-    }
-}
 
 const search = async () => {
     loading.value = true;
     try {
         const res = await getAppStoreConfig();
         if (res.data.defaultDomain != '') {
-            const url = getUrl(res.data.defaultDomain);
-            if (url) {
-                config.value.defaultDomain = url.remainder;
-                protocol.value = url.protocol;
-            }
+            config.value.defaultDomain = res.data.defaultDomain;
         }
     } catch (error) {
     } finally {
@@ -93,7 +67,6 @@ const search = async () => {
 const setDefaultDomain = () => {
     domainRef.value.acceptParams({
         domain: config.value.defaultDomain,
-        protocol: protocol.value,
     });
 };
 
