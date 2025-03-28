@@ -9,7 +9,6 @@ var (
 	backupRepo     = repo.NewIBackupRepo()
 	logRepo        = repo.NewILogRepo()
 	groupRepo      = repo.NewIGroupRepo()
-	launcherRepo   = repo.NewILauncherRepo()
 	upgradeLogRepo = repo.NewIUpgradeLogRepo()
 
 	taskRepo   = repo.NewITaskRepo()

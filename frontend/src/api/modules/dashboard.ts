@@ -12,10 +12,7 @@ export const loadAppLauncherOption = (filter: string) => {
     return http.post<Array<Dashboard.AppLauncherOption>>(`/dashboard/app/launcher/option`, { filter: filter });
 };
 export const changeLauncherStatus = (key: string, val: string) => {
-    return http.post(`/core/launcher/change/show`, { key: key, value: val });
-};
-export const resetLauncherStatus = () => {
-    return http.post(`/core/launcher/reset`);
+    return http.post(`/dashboard/app/launcher/show`, { key: key, value: val });
 };
 
 export const loadBaseInfo = (ioOption: string, netOption: string) => {

@@ -6,11 +6,11 @@ import (
 	"path"
 	"sort"
 	"strings"
-	"time"
 
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/i18n"
 	cmdUtils "github.com/1Panel-dev/1Panel/core/utils/cmd"
+	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/1Panel-dev/1Panel/core/utils/files"
 
 	"github.com/spf13/cobra"
@@ -93,22 +93,17 @@ func loadRestorePath(upgradeDir string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	type itemState struct {
-		Name     string
-		CreateAt time.Time
-	}
-	var folders []itemState
+	var folders []string
 	for _, file := range files {
 		if file.IsDir() {
-			info, _ := file.Info()
-			folders = append(folders, itemState{Name: file.Name(), CreateAt: info.ModTime()})
+			folders = append(folders, file.Name())
 		}
 	}
 	if len(folders) == 0 {
 		return "no such file", nil
 	}
 	sort.Slice(folders, func(i, j int) bool {
-		return folders[i].CreateAt.After(folders[j].CreateAt)
+		return common.ComparePanelVersion(folders[i], folders[j])
 	})
-	return folders[0].Name, nil
+	return folders[0], nil
 }

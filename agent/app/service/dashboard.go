@@ -13,6 +13,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/gpu"
@@ -31,28 +32,19 @@ import (
 type DashboardService struct{}
 
 type IDashboardService interface {
-	Sync(req dto.AppLauncherSync) error
-
 	LoadOsInfo() (*dto.OsInfo, error)
 	LoadBaseInfo(ioOption string, netOption string) (*dto.DashboardBase, error)
 	LoadCurrentInfoForNode() *dto.NodeCurrent
 	LoadCurrentInfo(ioOption string, netOption string) *dto.DashboardCurrent
 
 	LoadAppLauncher() ([]dto.AppLauncher, error)
+	ChangeShow(req dto.SettingUpdate) error
 	ListLauncherOption(filter string) ([]dto.LauncherOption, error)
 	Restart(operation string) error
 }
 
 func NewIDashboardService() IDashboardService {
 	return &DashboardService{}
-}
-
-func (u *DashboardService) Sync(req dto.AppLauncherSync) error {
-	var launchers []model.AppLauncher
-	for _, item := range req.Keys {
-		launchers = append(launchers, model.AppLauncher{Key: item})
-	}
-	return launcherRepo.SyncAll(launchers)
 }
 
 func (u *DashboardService) Restart(operation string) error {
@@ -285,7 +277,7 @@ func (u *DashboardService) LoadAppLauncher() ([]dto.AppLauncher, error) {
 		return data, err
 	}
 
-	showList := loadShowList()
+	showList, _ := launcherRepo.ListName()
 	defaultList := []string{"openresty", "mysql", "halo", "redis", "maxkb", "wordpress"}
 	allList := common.RemoveRepeatStr(append(defaultList, showList...))
 	for _, showItem := range allList {
@@ -343,8 +335,23 @@ func (u *DashboardService) LoadAppLauncher() ([]dto.AppLauncher, error) {
 	return data, nil
 }
 
+func (u *DashboardService) ChangeShow(req dto.SettingUpdate) error {
+	launcher, _ := launcherRepo.Get(repo.WithByKey(req.Key))
+	if req.Value == constant.StatusEnable && launcher.ID == 0 {
+		if err := launcherRepo.Create(&model.AppLauncher{Key: req.Key}); err != nil {
+			return err
+		}
+	}
+	if req.Value == constant.StatusDisable && launcher.ID != 0 {
+		if err := launcherRepo.Delete(repo.WithByKey(req.Key)); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (u *DashboardService) ListLauncherOption(filter string) ([]dto.LauncherOption, error) {
-	showList := loadShowList()
+	showList, _ := launcherRepo.ListName()
 	var data []dto.LauncherOption
 	optionMap := make(map[string]bool)
 	appInstalls, err := appInstallRepo.ListBy(context.Background())
@@ -496,25 +503,6 @@ func loadGPUInfo() []dto.GPUInfo {
 		dataItem.PowerUsage = dataItem.PowerDraw + " / " + dataItem.MaxPowerLimit
 		dataItem.MemoryUsage = dataItem.MemUsed + " / " + dataItem.MemTotal
 		data = append(data, dataItem)
-	}
-	return data
-}
-
-func loadShowList() []string {
-	var data []string
-	if global.IsMaster {
-		var list []AppLauncher
-		if err := global.CoreDB.Model(AppLauncher{}).Where("1 == 1").Find(&list).Error; err != nil {
-			return []string{}
-		}
-		for _, item := range list {
-			data = append(data, item.Key)
-		}
-		return data
-	}
-	list, _ := launcherRepo.List()
-	for _, item := range list {
-		data = append(data, item.Key)
 	}
 	return data
 }

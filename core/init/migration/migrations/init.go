@@ -240,13 +240,6 @@ var InitTerminalSetting = &gormigrate.Migration{
 	},
 }
 
-var InitAppLauncher = &gormigrate.Migration{
-	ID: "20241029-init-app-launcher",
-	Migrate: func(tx *gorm.DB) error {
-		return tx.AutoMigrate(&model.AppLauncher{})
-	},
-}
-
 var InitBackup = &gormigrate.Migration{
 	ID: "20241107-init-backup",
 	Migrate: func(tx *gorm.DB) error {
@@ -330,7 +323,7 @@ var AddSystemIP = &gormigrate.Migration{
 }
 
 var InitScriptLibrary = &gormigrate.Migration{
-	ID: "20250318-init-script-library",
+	ID: "20250328-init-script-library",
 	Migrate: func(tx *gorm.DB) error {
 		if err := tx.AutoMigrate(&model.ScriptLibrary{}); err != nil {
 			return err

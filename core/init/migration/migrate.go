@@ -14,7 +14,6 @@ func Init() {
 		migrations.InitOneDrive,
 		migrations.InitHost,
 		migrations.InitTerminalSetting,
-		migrations.InitAppLauncher,
 		migrations.InitBackup,
 		migrations.InitGoogle,
 		migrations.AddTaskDB,

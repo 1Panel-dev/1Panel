@@ -13,7 +13,7 @@ func (s *DashboardRouter) InitRouter(Router *gin.RouterGroup) {
 	{
 		cmdRouter.GET("/base/os", baseApi.LoadDashboardOsInfo)
 		cmdRouter.GET("/app/launcher", baseApi.LoadAppLauncher)
-		cmdRouter.POST("/app/launcher/sync", baseApi.SyncAppLauncher)
+		cmdRouter.POST("/app/launcher/show", baseApi.UpdateAppLauncher)
 		cmdRouter.POST("/app/launcher/option", baseApi.LoadAppLauncherOption)
 		cmdRouter.GET("/base/:ioOption/:netOption", baseApi.LoadDashboardBaseInfo)
 		cmdRouter.GET("/current/node", baseApi.LoadCurrentInfoForNode)

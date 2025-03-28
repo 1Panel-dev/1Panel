@@ -61,16 +61,25 @@ func (b *BaseApi) LoadAppLauncherOption(c *gin.Context) {
 	helper.SuccessWithData(c, data)
 }
 
-func (b *BaseApi) SyncAppLauncher(c *gin.Context) {
-	var req dto.AppLauncherSync
+// @Tags Dashboard
+// @Summary Update app Launcher
+// @Accept json
+// @Param request body dto.SettingUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /dashboard/app/launcher/show [post]
+// @x-panel-log {"bodyKeys":["key", "value"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"首页应用 [key] => 显示：[value]","formatEN":"app launcher [key] => show: [value]"}
+func (b *BaseApi) UpdateAppLauncher(c *gin.Context) {
+	var req dto.SettingUpdate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	if err := dashboardService.Sync(req); err != nil {
-		helper.BadRequest(c, err)
+
+	if err := dashboardService.ChangeShow(req); err != nil {
+		helper.InternalServer(c, err)
 		return
 	}
-
 	helper.SuccessWithOutData(c)
 }
 

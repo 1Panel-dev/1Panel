@@ -9,12 +9,10 @@ type LauncherRepo struct{}
 
 type ILauncherRepo interface {
 	Get(opts ...DBOption) (model.AppLauncher, error)
-	List(opts ...DBOption) ([]model.AppLauncher, error)
+	ListName(opts ...DBOption) ([]string, error)
 	Create(launcher *model.AppLauncher) error
 	Save(launcher *model.AppLauncher) error
 	Delete(opts ...DBOption) error
-
-	SyncAll(data []model.AppLauncher) error
 }
 
 func NewILauncherRepo() ILauncherRepo {
@@ -30,14 +28,18 @@ func (u *LauncherRepo) Get(opts ...DBOption) (model.AppLauncher, error) {
 	err := db.First(&launcher).Error
 	return launcher, err
 }
-func (u *LauncherRepo) List(opts ...DBOption) ([]model.AppLauncher, error) {
+func (u *LauncherRepo) ListName(opts ...DBOption) ([]string, error) {
 	var ops []model.AppLauncher
 	db := global.DB.Model(&model.AppLauncher{})
 	for _, opt := range opts {
 		db = opt(db)
 	}
-	err := db.Find(&ops).Error
-	return ops, err
+	_ = db.Find(&ops).Error
+	var names []string
+	for i := 0; i < len(ops); i++ {
+		names = append(names, ops[i].Key)
+	}
+	return names, nil
 }
 
 func (u *LauncherRepo) Create(launcher *model.AppLauncher) error {
@@ -54,22 +56,4 @@ func (u *LauncherRepo) Delete(opts ...DBOption) error {
 		db = opt(db)
 	}
 	return db.Delete(&model.AppLauncher{}).Error
-}
-
-func (u *LauncherRepo) SyncAll(data []model.AppLauncher) error {
-	tx := global.DB.Begin()
-	if err := tx.Where("1 = 1").Delete(&model.AppLauncher{}).Error; err != nil {
-		tx.Rollback()
-		return err
-	}
-	if len(data) == 0 {
-		tx.Commit()
-		return nil
-	}
-	if err := tx.Model(model.AppLauncher{}).Save(&data).Error; err != nil {
-		tx.Rollback()
-		return err
-	}
-	tx.Commit()
-	return nil
 }

@@ -60,7 +60,7 @@ func (u *DeviceService) Scan() dto.CleanData {
 
 	upgradePath := path.Join(global.Dir.BaseDir, upgradePath)
 	upgradeSize, _ := fileOp.GetDirSize(upgradePath)
-	treeData = append(treeData, dto.CleanTree{
+	upgradeTree := dto.CleanTree{
 		ID:          uuid.NewString(),
 		Label:       "upgrade",
 		Size:        uint64(upgradeSize),
@@ -68,7 +68,15 @@ func (u *DeviceService) Scan() dto.CleanData {
 		IsRecommend: true,
 		Type:        "upgrade",
 		Children:    loadTreeWithDir(true, "upgrade", upgradePath, fileOp),
-	})
+	}
+	if len(upgradeTree.Children) != 0 {
+		sort.Slice(upgradeTree.Children, func(i, j int) bool {
+			return common.CompareVersion(upgradeTree.Children[i].Label, upgradeTree.Children[j].Label)
+		})
+		upgradeTree.Children[0].IsCheck = false
+		upgradeTree.Children[0].IsRecommend = false
+	}
+	treeData = append(treeData, upgradeTree)
 
 	snapTree := loadSnapshotTree(fileOp)
 	snapSize := uint64(0)
@@ -563,11 +571,6 @@ func loadTreeWithDir(isCheck bool, treeType, pathItem string, fileOp fileUtils.F
 	if err != nil {
 		return lists
 	}
-	sort.Slice(files, func(i, j int) bool {
-		infoI, _ := files[i].Info()
-		infoJ, _ := files[i].Info()
-		return infoI.ModTime().Before(infoJ.ModTime())
-	})
 	for _, file := range files {
 		if treeType == "old_upgrade" {
 			continue
@@ -588,10 +591,6 @@ func loadTreeWithDir(isCheck bool, treeType, pathItem string, fileOp fileUtils.F
 				Name:        strings.TrimPrefix(file.Name(), "/"),
 				IsCheck:     isCheck,
 				IsRecommend: isCheck,
-			}
-			if treeType == "upgrade" && len(lists) == 0 {
-				item.IsCheck = false
-				item.IsRecommend = false
 			}
 			lists = append(lists, item)
 		}
@@ -741,4 +740,32 @@ func scanFile(pathItem string, size *int64, count *int) {
 			*size += fileInfo.Size()
 		}
 	}
+}
+
+func loadRestorePath(upgradeDir string) (string, error) {
+	if _, err := os.Stat(upgradeDir); err != nil && os.IsNotExist(err) {
+		return "no such file", nil
+	}
+	files, err := os.ReadDir(upgradeDir)
+	if err != nil {
+		return "", err
+	}
+	type itemState struct {
+		Name     string
+		CreateAt time.Time
+	}
+	var folders []itemState
+	for _, file := range files {
+		if file.IsDir() {
+			info, _ := file.Info()
+			folders = append(folders, itemState{Name: file.Name(), CreateAt: info.ModTime()})
+		}
+	}
+	if len(folders) == 0 {
+		return "no such file", nil
+	}
+	sort.Slice(folders, func(i, j int) bool {
+		return folders[i].CreateAt.After(folders[j].CreateAt)
+	})
+	return folders[0].Name, nil
 }
