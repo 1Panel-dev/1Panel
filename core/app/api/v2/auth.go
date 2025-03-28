@@ -39,7 +39,7 @@ func (b *BaseApi) Login(c *gin.Context) {
 
 	user, msgKey, err := authService.Login(c, req, string(entrance))
 	go saveLoginLogs(c, err)
-	if msgKey == "ErrAuth" {
+	if msgKey == "ErrAuth" || msgKey == "ErrEntrance" {
 		helper.BadAuth(c, msgKey, err)
 		return
 	}

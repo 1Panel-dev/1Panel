@@ -107,13 +107,19 @@
                         :label="$t('website.appInstalled')"
                         prop="appInstallId"
                     >
-                        <el-select v-model="website.appInstallId" class="p-w-200">
+                        <el-select v-model="website.appInstallId" class="p-w-300">
                             <el-option
                                 v-for="(appInstall, index) in appInstalls"
                                 :key="index"
                                 :label="appInstall.name"
                                 :value="appInstall.id"
-                            ></el-option>
+                                :disabled="appInstall.status !== 'Running'"
+                            >
+                                <div class="flex justify-between items-center w-full">
+                                    <span>{{ appInstall.name }}</span>
+                                    <span><Status :key="appInstall.status" :status="appInstall.status"></Status></span>
+                                </div>
+                            </el-option>
                         </el-select>
                     </el-form-item>
                     <div v-if="website.appType == 'new'">

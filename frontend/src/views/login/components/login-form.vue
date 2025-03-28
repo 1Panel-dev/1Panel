@@ -181,7 +181,7 @@ import { useRouter } from 'vue-router';
 import type { ElForm } from 'element-plus';
 import { loginApi, getCaptcha, mfaLoginApi, getLoginSetting } from '@/api/modules/auth';
 import { GlobalStore, MenuStore, TabsStore } from '@/store';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
 import { encryptPassword } from '@/utils/util';
 import { getXpackSettingForTheme } from '@/utils/xpack';
@@ -338,6 +338,7 @@ const login = (formEl: FormInstance | undefined) => {
             tabsStore.removeAllTabs();
             globalStore.currentNode = 'local';
             MsgSuccess(i18n.t('commons.msg.loginSuccess'));
+            console.log('loiin syc');
             router.push({ name: 'home' });
             document.onkeydown = null;
         } catch (res) {
@@ -346,12 +347,15 @@ const login = (formEl: FormInstance | undefined) => {
                     loginForm.captcha = '';
                     errCaptcha.value = true;
                     errAuthInfo.value = false;
+                    return;
                 }
                 if (res.message === 'ErrAuth') {
                     globalStore.ignoreCaptcha = false;
                     errCaptcha.value = false;
                     errAuthInfo.value = true;
+                    return;
                 }
+                MsgError(res.message);
             }
             loginVerify();
         } finally {
