@@ -25,7 +25,7 @@
                 />
             </ComplexTable>
         </el-tab-pane>
-        <el-tab-pane :label="$t('website.path')">
+        <el-tab-pane :label="$t('website.path')" v-if="showPath">
             <ComplexTable :data="pathData" @search="searchPath" v-loading="loading" :heightDiff="420">
                 <template #toolbar>
                     <el-button type="primary" plain @click="openCreate('path')">
@@ -54,7 +54,13 @@
 
 <script lang="ts" setup name="proxy">
 import { Website } from '@/api/interface/website';
-import { operateAuthConfig, getAuthConfig, getPathAuthConfig, operatePathAuthConfig } from '@/api/modules/website';
+import {
+    operateAuthConfig,
+    getAuthConfig,
+    getPathAuthConfig,
+    operatePathAuthConfig,
+    getWebsite,
+} from '@/api/modules/website';
 import { computed, onMounted, ref } from 'vue';
 import i18n from '@/lang';
 import Create from './create/index.vue';
@@ -80,6 +86,7 @@ const createRef = ref();
 const enable = ref(false);
 const opRef = ref();
 const pathData = ref([]);
+const showPath = ref(false);
 
 const buttons = [
     {
@@ -207,7 +214,14 @@ const searchAll = () => {
     searchPath();
 };
 
+const getSiteDetail = async () => {
+    getWebsite(id.value).then(async (res) => {
+        showPath.value = res.data.type !== 'proxy' && res.data.type !== 'deployment';
+    });
+};
+
 onMounted(() => {
+    getSiteDetail();
     searchAll();
 });
 </script>

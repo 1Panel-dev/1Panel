@@ -517,19 +517,19 @@ func (u *SettingService) GenerateApiKey() (string, error) {
 }
 
 func (u *SettingService) UpdateApiConfig(req dto.ApiInterfaceConfig) error {
-	if err := settingRepo.Update("ApiInterfaceStatus", req.ApiInterfaceStatus); err != nil {
+	if err := settingRepo.UpdateOrCreate("ApiInterfaceStatus", req.ApiInterfaceStatus); err != nil {
 		return err
 	}
 	global.Api.ApiInterfaceStatus = req.ApiInterfaceStatus
-	if err := settingRepo.Update("ApiKey", req.ApiKey); err != nil {
+	if err := settingRepo.UpdateOrCreate("ApiKey", req.ApiKey); err != nil {
 		return err
 	}
 	global.Api.ApiKey = req.ApiKey
-	if err := settingRepo.Update("IpWhiteList", req.IpWhiteList); err != nil {
+	if err := settingRepo.UpdateOrCreate("IpWhiteList", req.IpWhiteList); err != nil {
 		return err
 	}
 	global.Api.IpWhiteList = req.IpWhiteList
-	if err := settingRepo.Update("ApiKeyValidityTime", req.ApiKeyValidityTime); err != nil {
+	if err := settingRepo.UpdateOrCreate("ApiKeyValidityTime", req.ApiKeyValidityTime); err != nil {
 		return err
 	}
 	global.Api.ApiKeyValidityTime = req.ApiKeyValidityTime

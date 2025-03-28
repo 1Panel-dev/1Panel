@@ -26,8 +26,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/init/viper"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
 
-	_ "net/http/pprof"
-
 	"github.com/gin-gonic/gin"
 )
 

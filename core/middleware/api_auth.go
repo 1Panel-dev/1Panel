@@ -39,6 +39,7 @@ func ApiAuth() gin.HandlerFunc {
 					helper.BadAuth(c, "ErrApiConfigIPInvalid", nil)
 					return
 				}
+				c.Set("API_AUTH", true)
 				c.Next()
 				return
 			} else {

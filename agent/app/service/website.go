@@ -410,26 +410,6 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		website.ParentWebsiteID = parentWebsite.ID
 	}
 
-	if len(create.FtpUser) != 0 && len(create.FtpPassword) != 0 {
-		createFtpUser := func(t *task.Task) error {
-			indexDir := GetSitePath(*website, SiteIndexDir)
-			itemID, err := NewIFtpService().Create(dto.FtpCreate{User: create.FtpUser, Password: create.FtpPassword, Path: indexDir})
-			if err != nil {
-				createTask.Log(fmt.Sprintf("create ftp for website failed, err: %v", err))
-			}
-			website.FtpID = itemID
-			return nil
-		}
-		deleteFtpUser := func(t *task.Task) {
-			if website.FtpID > 0 {
-				if err = NewIFtpService().Delete(dto.BatchDeleteReq{Ids: []uint{website.FtpID}}); err != nil {
-					createTask.Log(err.Error())
-				}
-			}
-		}
-		createTask.AddSubTask(i18n.GetWithName("ConfigFTP", create.FtpUser), createFtpUser, deleteFtpUser)
-	}
-
 	configNginx := func(t *task.Task) error {
 		if err = configDefaultNginx(website, domains, appInstall, runtime); err != nil {
 			return err
@@ -486,6 +466,19 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 			return nil
 		}
 		createTask.AddSubTaskWithIgnoreErr(i18n.GetMsgByKey("EnableSSL"), enableSSL)
+	}
+
+	if len(create.FtpUser) != 0 && len(create.FtpPassword) != 0 {
+		createFtpUser := func(t *task.Task) error {
+			indexDir := GetSitePath(*website, SiteIndexDir)
+			itemID, err := NewIFtpService().Create(dto.FtpCreate{User: create.FtpUser, Password: create.FtpPassword, Path: indexDir})
+			if err != nil {
+				return err
+			}
+			website.FtpID = itemID
+			return nil
+		}
+		createTask.AddSubTaskWithIgnoreErr(i18n.GetWithName("ConfigFTP", create.FtpUser), createFtpUser)
 	}
 
 	return createTask.Execute()
@@ -2061,7 +2054,7 @@ func (w WebsiteService) GetPathAuthBasics(req request.NginxAuthReq) (res []respo
 			}
 			directives := config.Directives
 			location, _ := directives[0].(*components.Location)
-			pathAuth.Path = location.Match
+			pathAuth.Path = strings.TrimPrefix(location.Match, "^")
 			passPath := path.Join(passDir, fmt.Sprintf("%s.pass", name))
 			authContent, err = fileOp.GetContent(passPath)
 			if err != nil {
@@ -2130,7 +2123,7 @@ func (w WebsiteService) UpdatePathAuthBasic(req request.NginxPathAuthUpdate) err
 	directives := config.Directives
 	location, _ := directives[0].(*components.Location)
 	location.UpdateDirective("auth_basic_user_file", []string{fmt.Sprintf("/www/sites/%s/path_auth/pass/%s", website.Alias, fmt.Sprintf("%s.pass", req.Name))})
-	location.ChangePath("~*", req.Path)
+	location.ChangePath("~*", fmt.Sprintf("^%s", req.Path))
 	var passwdHash []byte
 	passwdHash, err = bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {

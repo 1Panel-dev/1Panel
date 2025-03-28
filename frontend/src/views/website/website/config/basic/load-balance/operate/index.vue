@@ -198,6 +198,7 @@ const acceptParams = async (req: LoadBalanceOperate) => {
         });
         item.value.servers = servers;
     } else {
+        item.value.name = '';
         item.value.servers = [initServer()];
     }
     open.value = true;

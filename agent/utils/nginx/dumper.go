@@ -90,6 +90,18 @@ func DumpBlock(b components.IBlock, style *Style, startLine int) string {
 	}
 
 	directives := b.GetDirectives()
+
+	var sortDirectives []components.IDirective
+	var proxyIncludes []components.IDirective
+	for _, directive := range directives {
+		if directive.GetName() == "include" && strings.Contains(strings.Join(directive.GetParameters(), " "), "/proxy/") {
+			proxyIncludes = append(proxyIncludes, directive)
+		} else {
+			sortDirectives = append(sortDirectives, directive)
+		}
+	}
+	directives = append(sortDirectives, proxyIncludes...)
+
 	for i, directive := range directives {
 
 		if directive.GetLine() > line {

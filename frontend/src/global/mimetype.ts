@@ -355,11 +355,6 @@ export const Algorithms = [
         value: 'least_conn',
         placeHolder: i18n.global.t('website.leastConnHelper'),
     },
-    {
-        label: i18n.global.t('website.leastTime'),
-        value: 'least_time',
-        placeHolder: i18n.global.t('website.leastTimeHelper'),
-    },
 ];
 
 export const StatusStrategy = [

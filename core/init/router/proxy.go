@@ -44,7 +44,9 @@ func Proxy() gin.HandlerFunc {
 			currentNode = c.Request.Header.Get("CurrentNode")
 		}
 
-		if strings.HasPrefix(c.Request.URL.Path, "/api/v2/") && !checkSession(c) {
+		apiReq := c.GetBool("API_AUTH")
+
+		if !apiReq && strings.HasPrefix(c.Request.URL.Path, "/api/v2/") && !checkSession(c) {
 			data, _ := res.ErrorMsg.ReadFile("html/401.html")
 			c.Data(401, "text/html; charset=utf-8", data)
 			c.Abort()

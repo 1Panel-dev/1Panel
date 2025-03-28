@@ -331,20 +331,25 @@ func buildRuntime(runtime *model.Runtime, oldImageID string, oldEnv string, rebu
 		if out, err := compose.Up(composePath); err != nil {
 			runtime.Status = constant.StatusStartErr
 			runtime.Message = out
-		} else {
-			extensions := getRuntimeEnv(runtime.Env, "PHP_EXTENSIONS")
-			if extensions != "" {
-				installCmd := fmt.Sprintf("docker exec -i %s %s %s", runtime.ContainerName, "install-ext", extensions)
-				err = cmd2.ExecWithLogFile(installCmd, 60*time.Minute, logPath)
-				if err != nil {
-					runtime.Status = constant.StatusError
-					runtime.Message = buserr.New("ErrImageBuildErr").Error() + ":" + err.Error()
-					_ = runtimeRepo.Save(runtime)
-					return
-				}
-			}
-			runtime.Status = constant.StatusRunning
+			_ = runtimeRepo.Save(runtime)
 		}
+		extensions := getRuntimeEnv(runtime.Env, "PHP_EXTENSIONS")
+		if extensions != "" {
+			installCmd := fmt.Sprintf("docker exec -i %s %s %s", runtime.ContainerName, "install-ext", extensions)
+			err = cmd2.ExecWithLogFile(installCmd, 60*time.Minute, logPath)
+			if err != nil {
+				runtime.Status = constant.StatusError
+				runtime.Message = buserr.New("ErrImageBuildErr").Error() + ":" + err.Error()
+				_ = runtimeRepo.Save(runtime)
+				return
+			}
+		}
+		if out, err := compose.DownAndUp(composePath); err != nil {
+			runtime.Status = constant.StatusStartErr
+			runtime.Message = out
+			_ = runtimeRepo.Save(runtime)
+		}
+		runtime.Status = constant.StatusRunning
 	}
 	_ = runtimeRepo.Save(runtime)
 }
