@@ -5,9 +5,9 @@
                 <template #default>
                     {{ $t('setting.proxyHelper') }}
                     <ul class="-ml-5">
-                        <li v-if="isMasterProductPro">{{ $t('setting.proxyHelper1') }}</li>
-                        <li v-if="isMasterProductPro">{{ $t('setting.proxyHelper2') }}</li>
-                        <li v-if="isMasterProductPro">{{ $t('setting.proxyHelper4') }}</li>
+                        <li>{{ $t('setting.proxyHelper1') }}</li>
+                        <li>{{ $t('setting.proxyHelper2') }}</li>
+                        <li>{{ $t('setting.proxyHelper4') }}</li>
                         <li>{{ $t('setting.proxyHelper3') }}</li>
                     </ul>
                 </template>
@@ -217,11 +217,11 @@ const onSubmit = async () => {
             proxyUrl = '';
         }
         await updateXpackSettingByKey('ProxyDocker', proxyUrl);
+        await updateDaemonJson(`${form.proxyType}-proxy`, proxyUrl);
         emit('search');
         handleClose();
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-    } catch (error) {
-    } finally {
+    } catch {
         loading.value = false;
     }
 };

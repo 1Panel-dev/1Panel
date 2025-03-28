@@ -91,7 +91,7 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "ProxyPasswd", Value: ""}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "PrsoxyPasswdKeep", Value: ""}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "ProxyPasswdKeep", Value: ""}).Error; err != nil {
 			return err
 		}
 		val := `{"id":"1","label":"/xpack","isCheck":true,"title":"xpack.menu","children":[{"id":"2","label":"Dashboard","isCheck":true,"title":"xpack.waf.name","path":"/xpack/waf/dashboard"},{"id":"3","label":"Tamper","isCheck":true,"title":"xpack.tamper.tamper","path":"/xpack/tamper"},{"id":"4","label":"GPU","isCheck":true,"title":"xpack.gpu.gpu","path":"/xpack/gpu"},{"id":"5","label":"XSetting","isCheck":true,"title":"xpack.setting.setting","path":"/xpack/setting"},{"id":"6","label":"MonitorDashboard","isCheck":true,"title":"xpack.monitor.name","path":"/xpack/monitor/dashboard"},{"id":"7","label":"XAlertDashboard","isCheck":true,"title":"xpack.alert.alert","path":"/xpack/alert/dashboard"},{"id":"8","label":"Node","isCheck":true,"title":"xpack.node.nodeManagement","path":"/xpack/node"}]}`
