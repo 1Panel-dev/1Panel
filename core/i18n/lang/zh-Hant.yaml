@@ -43,6 +43,9 @@ ErrBackupPublic: "檢測到該備份帳號為非公用，請檢查後再試！"
 ErrOSSConn: "無法獲取最新版本，請確認伺服器是否能夠連接外部網路。"
 
 #license
+LicenseCheck: '檢查許可證是否可用'
+ErrLicenseInUsed: '檢測到該許可證已被綁定，請檢查後重試！'
+ErrLicenseExpired: '檢測到該許可證已過期，請檢查後重試！'
 ErrLicense: "許可證格式錯誤，請檢查後重試！"
 ErrLicenseCheck: "許可證校驗失敗，請檢查後重試！"
 ErrXpackVersion: "許可證校驗失敗，該許可證受版本限制，無法成功導入，請檢查後重試！"

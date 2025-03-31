@@ -43,6 +43,9 @@ ErrBackupPublic: "A conta de backup detectada não é pública, por favor verifi
 ErrOSSConn: "Não foi possível obter a versão mais recente, verifique a conectividade externa do servidor."
 
 #license
+LicenseCheck: 'Verificar se a licença está disponível'
+ErrLicenseInUsed: 'Esta licença já está vinculada. Por favor, verifique e tente novamente!'
+ErrLicenseExpired: 'Esta licença expirou. Por favor, verifique e tente novamente!'
 ErrLicense: "Formato de licença inválido, por favor verifique e tente novamente!"
 ErrLicenseCheck: "Falha na verificação da licença, por favor verifique e tente novamente!"
 ErrXpackVersion: "Falha na verificação da licença, esta licença é restrita a uma versão específica, por favor verifique e tente novamente!"

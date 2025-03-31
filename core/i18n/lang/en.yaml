@@ -43,6 +43,9 @@ ErrBackupPublic: "Detected that this backup account is not public, please check 
 ErrOSSConn: "Unable to get the latest version, please check the server's external network connectivity."
 
 #license
+LicenseCheck: 'Check if the license is available'
+ErrLicenseInUsed: 'The license is already bound. Please check and try again!'
+ErrLicenseExpired: 'The license has expired. Please check and try again!'
 ErrLicense: "License format error, please check and retry!"
 ErrLicenseCheck: "License validation failed, please check and retry!"
 ErrXpackVersion: "License validation failed, this license is version-limited, cannot import, please check and retry!"

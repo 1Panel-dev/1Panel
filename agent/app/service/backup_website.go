@@ -39,7 +39,7 @@ func (u *BackupService) WebsiteBackup(req dto.CommonBackup) error {
 	fileName := fmt.Sprintf("%s_%s.tar.gz", website.Alias, timeNow+common.RandStrAndNum(5))
 
 	go func() {
-		if err = handleWebsiteBackup(&website, backupDir, fileName, "", req.Secret, req.TaskID); err != nil {
+		if err = handleWebsiteBackup(&website, nil, backupDir, fileName, "", req.Secret, req.TaskID); err != nil {
 			global.LOG.Errorf("backup website %s failed, err: %v", website.Alias, err)
 			return
 		}
@@ -82,7 +82,7 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 		isOk := false
 		if !isRollback {
 			rollbackFile := path.Join(global.Dir.TmpDir, fmt.Sprintf("website/%s_%s.tar.gz", website.Alias, time.Now().Format(constant.DateTimeSlimLayout)))
-			if err := handleWebsiteBackup(website, path.Dir(rollbackFile), path.Base(rollbackFile), "", "", ""); err != nil {
+			if err := handleWebsiteBackup(website, recoverTask, path.Dir(rollbackFile), path.Base(rollbackFile), "", "", taskID); err != nil {
 				return fmt.Errorf("backup website %s for rollback before recover failed, err: %v", website.Alias, err)
 			}
 			defer func() {
@@ -202,12 +202,20 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 	return recoverTask.Execute()
 }
 
-func handleWebsiteBackup(website *model.Website, backupDir, fileName, excludes, secret, taskID string) error {
-	backupTask, err := task.NewTaskWithOps(website.Alias, task.TaskBackup, task.TaskScopeWebsite, taskID, website.ID)
-	if err != nil {
-		return err
+func handleWebsiteBackup(website *model.Website, parentTask *task.Task, backupDir, fileName, excludes, secret, taskID string) error {
+	var (
+		err        error
+		backupTask *task.Task
+	)
+	backupTask = parentTask
+	if parentTask == nil {
+		backupTask, err = task.NewTaskWithOps(website.Alias, task.TaskBackup, task.TaskScopeWebsite, taskID, website.ID)
+		if err != nil {
+			return err
+		}
 	}
-	backupTask.AddSubTask(task.GetTaskName(website.Alias, task.TaskBackup, task.TaskScopeWebsite), func(t *task.Task) error {
+
+	backupWebsite := func(t *task.Task) error {
 		fileOp := files.NewFileOp()
 		tmpDir := fmt.Sprintf("%s/%s", backupDir, strings.ReplaceAll(fileName, ".tar.gz", ""))
 		if !fileOp.Stat(tmpDir) {
@@ -273,7 +281,11 @@ func handleWebsiteBackup(website *model.Website, backupDir, fileName, excludes, 
 		}
 		t.Log(i18n.GetWithName("CompressFileSuccess", fileName))
 		return nil
-	}, nil)
+	}
+	backupTask.AddSubTask(task.GetTaskName(website.Alias, task.TaskBackup, task.TaskScopeApp), backupWebsite, nil)
+	if parentTask != nil {
+		return backupWebsite(parentTask)
+	}
 	return backupTask.Execute()
 }
 

@@ -85,7 +85,7 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, startTime time.Tim
 		record.DownloadAccountID, record.SourceAccountIDs = cronjob.DownloadAccountID, cronjob.SourceAccountIDs
 		backupDir := path.Join(global.Dir.TmpDir, fmt.Sprintf("website/%s", web.Alias))
 		record.FileName = fmt.Sprintf("website_%s_%s.tar.gz", web.Alias, startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5))
-		if err := handleWebsiteBackup(&web, backupDir, record.FileName, cronjob.ExclusionRules, cronjob.Secret, taskID); err != nil {
+		if err := handleWebsiteBackup(&web, nil, backupDir, record.FileName, cronjob.ExclusionRules, cronjob.Secret, taskID); err != nil {
 			return err
 		}
 		downloadPath, err := u.uploadCronjobBackFile(cronjob, accountMap, path.Join(backupDir, record.FileName))

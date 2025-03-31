@@ -43,6 +43,9 @@ ErrBackupPublic: "Akaun sandaran ini dikesan tidak awam, sila semak semula dan c
 ErrOSSConn: "Tidak dapat mendapatkan versi terkini, sila semak sambungan rangkaian luar pelayan."
 
 #license
+LicenseCheck: 'Periksa sama ada lesen tersedia'
+ErrLicenseInUsed: 'Lesen ini telah terikat. Sila periksa dan cuba lagi!'
+ErrLicenseExpired: 'Lesen ini telah tamat tempoh. Sila periksa dan cuba lagi!'
 ErrLicense: "Format lesen tidak sah, sila semak dan cuba lagi!"
 ErrLicenseCheck: "Pengesahan lesen gagal, sila semak dan cuba lagi!"
 ErrXpackVersion: "Pengesahan lesen gagal, lesen ini terhad kepada versi tertentu, sila semak dan cuba lagi!"

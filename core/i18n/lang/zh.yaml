@@ -44,6 +44,9 @@ ErrBackupPublic: "检测到该备份账号为非公用，请检查后重试！"
 ErrOSSConn: "无法获取最新版本，请确认服务器是否能够连接外部网络。"
 
 #license
+LicenseCheck: '检查许可证是否可用'
+ErrLicenseInUsed: '检查到该许可证已被绑定，请检查后重试！'
+ErrLicenseExpired: '检查到该许可证已过期，请检查后重试！'
 ErrLicense: "许可证格式错误，请检查后重试！"
 ErrLicenseCheck: "许可证校验失败，请检查后重试！"
 ErrXpackVersion: "许可证校验失败，该许可证受版本限制，无法成功导入，请检查后重试！"

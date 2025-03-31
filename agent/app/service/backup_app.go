@@ -204,7 +204,7 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 		fileOp := files.NewFileOp()
 		if !isRollback {
 			rollbackFile = path.Join(global.Dir.TmpDir, fmt.Sprintf("app/%s_%s.tar.gz", install.Name, time.Now().Format(constant.DateTimeSlimLayout)))
-			if err := handleAppBackup(install, nil, path.Dir(rollbackFile), path.Base(rollbackFile), "", "", ""); err != nil {
+			if err := handleAppBackup(install, recoverTask, path.Dir(rollbackFile), path.Base(rollbackFile), "", "", taskID); err != nil {
 				t.Log(fmt.Sprintf("backup app %s for rollback before recover failed, err: %v", install.Name, err))
 			}
 		}
