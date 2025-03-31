@@ -1,13 +1,11 @@
 package service
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"os"
 	"path"
 	"strings"
-	"sync"
 
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 
@@ -19,7 +17,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
-	"github.com/1Panel-dev/1Panel/agent/utils/compose"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/pkg/errors"
 )
@@ -160,6 +157,17 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 					itemHelper.Task.LogStart(i18n.GetWithName("RecoverPanelData", snap.Name))
 					err := itemHelper.FileOp.TarGzExtractPro(path.Join(rootDir, snap.Name, "/1panel_data.tar.gz"), path.Join(snapJson.BaseDir, "1panel"), "")
 					itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("Decompress"), err)
+					if err != nil {
+						return err
+					}
+
+					if len(snapJson.OperestyDir) != 0 {
+						err := itemHelper.FileOp.TarGzExtractPro(path.Join(rootDir, snap.Name, "/website.tar.gz"), snapJson.OperestyDir, "")
+						itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("RecoverWebsite"), err)
+						if err != nil {
+							return err
+						}
+					}
 					return err
 				},
 				nil,
@@ -219,11 +227,24 @@ func backupBeforeRecover(name string, itemHelper *snapRecoverHelper) error {
 	if err != nil {
 		return err
 	}
-	err = itemHelper.FileOp.CopyDirWithExclude(global.Dir.LocalBackupDir, rootDir, []string{"system_snapshot"})
-	itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", global.Dir.LocalBackupDir), err)
-	if err != nil {
-		return err
+
+	openrestyDir, _ := settingRepo.GetValueByKey("WEBSITE_DIR")
+	if len(openrestyDir) != 0 && !strings.Contains(openrestyDir, global.Dir.DataDir) {
+		err := itemHelper.FileOp.CopyDirWithExclude(openrestyDir, rootDir, nil)
+		itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", openrestyDir), err)
+		if err != nil {
+			return err
+		}
 	}
+
+	if len(global.Dir.LocalBackupDir) != 0 && !strings.Contains(global.Dir.LocalBackupDir, global.Dir.DataDir) {
+		err = itemHelper.FileOp.CopyDirWithExclude(global.Dir.LocalBackupDir, rootDir, []string{"system_snapshot"})
+		itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", global.Dir.LocalBackupDir), err)
+		if err != nil {
+			return err
+		}
+	}
+
 	err = itemHelper.FileOp.CopyFile("/usr/local/bin/1pctl", baseDir)
 	itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/usr/local/bin/1pctl"), err)
 	if err != nil {
@@ -235,18 +256,16 @@ func backupBeforeRecover(name string, itemHelper *snapRecoverHelper) error {
 		if err != nil {
 			return err
 		}
-	}
-	err = itemHelper.FileOp.CopyFile("/usr/local/bin/1panel-agent", baseDir)
-	itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/usr/local/bin/1panel-agent"), err)
-	if err != nil {
-		return err
-	}
-	if global.IsMaster {
 		err = itemHelper.FileOp.CopyFile("/etc/systemd/system/1panel-core.service", baseDir)
 		itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/etc/systemd/system/1panel-core.service"), err)
 		if err != nil {
 			return err
 		}
+	}
+	err = itemHelper.FileOp.CopyFile("/usr/local/bin/1panel-agent", baseDir)
+	itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/usr/local/bin/1panel-agent"), err)
+	if err != nil {
+		return err
 	}
 	err = itemHelper.FileOp.CopyFile("/etc/systemd/system/1panel-agent.service", baseDir)
 	itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/etc/systemd/system/1panel-agent.service"), err)
@@ -294,35 +313,13 @@ func recoverAppData(src string, itemHelper *snapRecoverHelper) error {
 	if _, err := os.Stat(path.Join(src, "images.tar.gz")); err != nil {
 		itemHelper.Task.Log(i18n.GetMsgByKey("RecoverAppEmpty"))
 		return nil
-	} else {
-		std, err := cmd.Execf("docker load < %s", path.Join(src, "images.tar.gz"))
-		if err != nil {
-			itemHelper.Task.LogFailedWithErr(i18n.GetMsgByKey("RecoverAppImage"), errors.New(std))
-			return fmt.Errorf("docker load images failed, err: %v", err)
-		}
-		itemHelper.Task.LogSuccess(i18n.GetMsgByKey("RecoverAppImage"))
 	}
-
-	appInstalls, err := appInstallRepo.ListBy(context.Background())
-	itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("RecoverAppList"), err)
+	std, err := cmd.Execf("docker load < %s", path.Join(src, "images.tar.gz"))
 	if err != nil {
-		return err
+		itemHelper.Task.LogFailedWithErr(i18n.GetMsgByKey("RecoverAppImage"), errors.New(std))
+		return fmt.Errorf("docker load images failed, err: %v", err)
 	}
-
-	var wg sync.WaitGroup
-	for i := 0; i < len(appInstalls); i++ {
-		wg.Add(1)
-		appInstalls[i].Status = constant.StatusRebuilding
-		_ = appInstallRepo.Save(context.Background(), &appInstalls[i])
-		go func(app model.AppInstall) {
-			defer wg.Done()
-			dockerComposePath := app.GetComposePath()
-			_, _ = compose.Up(dockerComposePath)
-			app.Status = constant.StatusRunning
-			_ = appInstallRepo.Save(context.Background(), &app)
-		}(appInstalls[i])
-	}
-	wg.Wait()
+	itemHelper.Task.LogSuccess(i18n.GetMsgByKey("RecoverAppImage"))
 	return nil
 }
 

@@ -1,329 +1,422 @@
-ErrInvalidParams: "요청 매개변수 오류: {{ .detail }}"
-ErrTokenParse: "토큰 생성 오류: {{ .detail }}"
-ErrInitialPassword: "초기 비밀번호 오류"
-ErrInternalServer: "서버 내부 오류: {{ .detail }}"
-ErrRecordExist: "기록이 이미 존재합니다"
-ErrRecordNotFound: "기록을 찾을 수 없습니다"
-ErrStructTransform: "형식 변환 실패: {{ .detail }}"
-ErrNotLogin: "사용자가 로그인되지 않았습니다: {{ .detail }}"
-ErrPasswordExpired: "현재 비밀번호가 만료되었습니다: {{ .detail }}"
-ErrNotSupportType: "시스템에서 현재 유형을 지원하지 않습니다: {{ .detail }}"
-ErrApiConfigStatusInvalid: "API 인터페이스 액세스 금지: {{ .detail }}"
-ErrApiConfigKeyInvalid: "API 인터페이스 키 오류: {{ .detail }}"
-ErrApiConfigIPInvalid: "API 인터페이스 IP가 화이트리스트에 없습니다: {{ .detail }}"
-ErrApiConfigDisable: "이 인터페이스는 API 호출을 금지합니다: {{ .detail }}"
-ErrApiConfigKeyTimeInvalid: "API 인터페이스 타임스탬프 오류: {{ .detail }}"
+ErrInvalidParams: '요청 매개변수 오류: {{ .detail }}'
+ErrTokenParse: '토큰 생성 오류: {{ .detail }}'
+ErrInitialPassword: '원래 비밀번호가 올바르지 않습니다'
+ErrInternalServer: '내부 서버 오류: {{ .detail }}'
+ErrRecordExist: '레코드가 이미 존재합니다'
+ErrRecordNotFound: '레코드를 찾을 수 없습니다'
+ErrStructTransform: '유형 변환에 실패했습니다: {{ .err }}'
+ErrNotLogin: '사용자가 로그인하지 않았습니다: {{ .detail }}'
+ErrPasswordExpired: '현재 비밀번호가 만료되었습니다: {{ .detail }}'
+ErrNotSupportType: '시스템은 현재 유형 {{ .name }}을 지원하지 않습니다.'
+ErrProxy: '요청 오류, 노드 상태를 확인하세요: {{ .detail }}'
+ErrApiConfigStatusInvalid: 'API 인터페이스에 대한 액세스가 금지되었습니다: {{ .detail }}'
+ErrApiConfigKeyInvalid: 'API 인터페이스 키 오류: {{ .detail }}'
+ErrApiConfigIPInvalid: 'API 인터페이스를 호출하는 데 사용된 IP가 허용 목록에 없습니다: {{ .detail }}'
+ErrApiConfigDisable: '이 인터페이스는 API 인터페이스 호출 사용을 금지합니다: {{ .detail }}'
+ErrApiConfigKeyTimeInvalid: 'API 인터페이스 타임스탬프 오류: {{ .detail }}'
 
-# 공통
-ErrUsernameIsExist: "사용자 이름이 이미 존재합니다"
-ErrNameIsExist: "이름이 이미 존재합니다"
-ErrDemoEnvironment: "데모 서버에서는 이 작업이 금지되어 있습니다!"
-ErrCmdTimeout: "명령어 실행 시간이 초과되었습니다!"
-ErrCmdIllegal: "명령어에 잘못된 문자가 포함되어 있습니다. 수정 후 다시 시도하세요!"
-ErrPortExist: '{{ .port }} 포트가 {{ .type }} [{{ .name }}]에 의해 이미 사용 중입니다'
-TYPE_APP: "애플리케이션"
-TYPE_RUNTIME: "실행 환경"
-TYPE_DOMAIN: "도메인 이름"
-ErrTypePort: '포트 {{ .name }} 형식 오류'
-ErrTypePortRange: '포트 범위는 1-65535 사이여야 합니다'
-Success: "성공"
-Failed: "실패"
-SystemRestart: "시스템 재시작으로 인해 작업이 중단되었습니다"
-ErrGroupIsDefault: "기본 그룹, 삭제할 수 없습니다"
-ErrGroupIsInWebsiteUse: "그룹이 다른 웹사이트에서 사용 중입니다, 삭제할 수 없습니다"
+#흔한
+ErrUsernameIsExist: '사용자 이름이 이미 존재합니다'
+ErrNameIsExist: '이름이 이미 존재합니다'
+ErrDemoEnvironment: '데모 서버, 이 작업은 금지되어 있습니다!'
+ErrCmdTimeout: '명령 실행 시간이 초과되었습니다!'
+ErrCmdIllegal: '실행 명령에 잘못된 문자가 있습니다. 수정하여 다시 시도하세요!'
+ErrPortExist: '{{ .port }} 포트는 이미 {{ .type }} [{{ .name }}]에 의해 사용되고 있습니다.'
+TYPE_APP: '응용 프로그램'
+TYPE_RUNTIME: '런타임 환경'
+TYPE_DOMAIN: '도메인 이름'
+ErrTypePort: '포트 {{ .name }} 형식이 올바르지 않습니다'
+ErrTypePortRange: '포트 범위는 1-65535 사이여야 합니다.'
+Success: '성공'
+Failed: '실패했습니다'
+SystemRestart: '시스템 재시작으로 인해 작업이 중단되었습니다'
+ErrGroupIsDefault: '기본 그룹, 삭제할 수 없습니다'
+ErrGroupIsInWebsiteUse: '그룹이 다른 웹사이트에서 사용 중이므로 삭제할 수 없습니다.'
 
-# 애플리케이션
-ErrPortInUsed: "{{ .detail }} 포트가 이미 사용 중입니다"
-ErrAppLimit: "앱 설치 제한을 초과했습니다"
-ErrAppRequired: "{{ .detail }} 앱이 필요합니다"
-ErrNotInstall: "앱이 설치되지 않았습니다"
-ErrPortInOtherApp: "{{ .port }} 포트가 {{ .apps }} 앱에 의해 이미 사용 중입니다"
-ErrDbUserNotValid: "데이터베이스 사용자 이름과 비밀번호가 일치하지 않습니다!"
-ErrDockerComposeNotValid: "docker-compose 파일 형식 오류!"
-ErrUpdateBuWebsite: "애플리케이션이 성공적으로 업데이트되었지만, 웹사이트 구성 파일 수정에 실패했습니다. 구성을 확인하세요!"
-Err1PanelNetworkFailed: "기본 컨테이너 네트워크 생성 실패! {{ .detail }}"
-ErrFileParse: "애플리케이션 docker-compose 파일 분석 실패!"
-ErrInstallDirNotFound: "설치 디렉터리가 존재하지 않습니다"
-AppStoreIsUpToDate: "최신 상태입니다"
-LocalAppVersionNull: "{{.name}} 앱 버전이 동기화되지 않았습니다! 애플리케이션 목록에 추가할 수 없습니다"
-LocalAppVersionErr: "{{.name}} 버전 {{.version}} 동기화 실패! {{.err}}"
-ErrFileNotFound: "{{.name}} 파일이 존재하지 않습니다"
-ErrFileParseApp: "{{.name}} 파일 분석 실패 {{.err}}"
-ErrAppDirNull: "버전 폴더가 존재하지 않습니다"
-LocalAppErr: "앱 {{.name}} 동기화 실패! {{.err}}"
-ErrContainerName: "컨테이너 이름이 이미 존재합니다"
-ErrAppSystemRestart: "1Panel 재시작으로 인해 작업이 중단되었습니다"
-ErrCreateHttpClient: "HTTP 요청 생성 실패 {{.err}}"
-ErrHttpReqTimeOut: "요청 시간이 초과되었습니다 {{.err}}"
-ErrHttpReqFailed: "요청 실패 {{.err}}"
-ErrHttpReqNotFound: "파일이 존재하지 않습니다"
-ErrNoSuchHost: "네트워크 연결 실패"
-ErrImagePullTimeOut: "이미지 가져오기 시간 초과"
-ErrContainerNotFound: "{{ .name }} 컨테이너가 존재하지 않습니다"
-ErrContainerMsg: "{{ .name }} 컨테이너가 비정상적입니다. 자세한 내용은 컨테이너 페이지의 로그를 확인하세요"
-ErrAppBackup: "{{ .name }} 애플리케이션 백업 실패 오류 {{.err}}"
-ErrImagePull: "{{ .name }} 이미지 가져오기 실패 오류 {{.err}}"
-ErrVersionTooLow: "현재 1Panel 버전이 낮아 앱 스토어를 업데이트할 수 없습니다. 버전을 업그레이드하세요"
-ErrAppNameExist: "앱 이름이 이미 존재합니다"
-AppStoreIsSyncing: "앱 스토어가 동기화 중입니다. 나중에 다시 시도하세요"
-ErrGetCompose: "docker-compose.yml 파일 가져오기 실패! {{ .detail }}"
-ErrAppWarn: "비정상 상태, 로그를 확인하세요"
-ErrAppParamKey: "매개변수 {{ .name }} 필드 예외"
-ErrAppUpgrade: "애플리케이션 {{ .name }} 업그레이드 실패 {{ .err }}"
-AppRecover: "앱 {{ .name }} 롤백 완료"
-PullImageStart: "이미지 {{ .name }} 가져오기 시작"
-PullImageSuccess: "이미지 가져오기 성공"
-UpgradeAppStart: "애플리케이션 {{ .name }} 업그레이드 시작"
-UpgradeAppSuccess: "앱 {{ .name }} 업그레이드 성공"
-ErrAppIsDown: "{{ .name }} 애플리케이션 상태가 비정상입니다. 확인하세요"
+#지원
+ErrBackupInUsed: '백업 계정이 예약된 작업에 사용되었으므로 삭제할 수 없습니다.'
+ErrBackupCheck: '백업 계정 테스트 연결에 실패했습니다 {{ .err }}'
+ErrBackupLocalDelete: '로컬 서버 백업 계정 삭제는 아직 지원되지 않습니다.'
+ErrBackupLocalCreate: '로컬 서버 백업 계정 생성은 아직 지원되지 않습니다.'
 
-# 파일
-ErrFileCanNotRead: "파일을 읽을 수 없습니다"
-ErrFileToLarge: "파일이 너무 큽니다"
-ErrPathNotFound: "경로를 찾을 수 없습니다"
-ErrMovePathFailed: "대상 경로가 원래 경로를 포함할 수 없습니다!"
-ErrLinkPathNotFound: "대상 경로가 존재하지 않습니다!"
-ErrFileIsExist: "파일 또는 디렉터리가 이미 존재합니다!"
-ErrFileUpload: "파일 업로드 실패 {{.name}}  {{.detail}}"
-ErrFileDownloadDir: "다운로드 폴더는 지원되지 않습니다"
-ErrCmdNotFound: "{{ .name }} 명령이 존재하지 않습니다. 호스트에 이 명령을 먼저 설치하세요"
-ErrSourcePathNotFound: "소스 디렉터리가 존재하지 않습니다"
-ErrFavoriteExist: "이 경로는 이미 즐겨찾기에 추가되었습니다"
-ErrInvalidChar: "잘못된 문자는 금지됩니다"
-ErrPathNotDelete: "선택한 디렉터리는 삭제할 수 없습니다"
+#앱
+ErrPortInUsed: '{{ .detail }} 포트가 이미 사용 중입니다!'
+ErrAppLimit: '설치된 애플리케이션 수가 한도를 초과했습니다'
+ErrAppRequired: '먼저 {{ .detail }} 애플리케이션을 설치하세요'
+ErrNotInstall: '응용 프로그램이 설치되지 않았습니다'
+ErrPortInOtherApp: '{{ .port }} 포트는 이미 {{ .apps }} 애플리케이션에 의해 사용되고 있습니다!'
+ErrDbUserNotValid: '기존 데이터베이스, 사용자 이름 및 비밀번호가 일치하지 않습니다!'
+ErrDockerComposeNotValid: 'docker-compose 파일 형식이 올바르지 않습니다'
+ErrUpdateBuWebsite: '응용 프로그램이 성공적으로 업데이트되었지만, 웹사이트 구성 파일 수정에 실패했습니다. 구성을 확인하세요! '
+Err1PanelNetworkFailed: '기본 컨테이너 네트워크 생성에 실패했습니다! {{ .세부 사항 }}'
+ErrFileParse: '응용 프로그램 docker-compose 파일 구문 분석에 실패했습니다!'
+ErrInstallDirNotFound: '설치 디렉토리가 존재하지 않습니다. 제거를 원하실 경우 강제 제거 를 선택해주세요.'
+AppStoreIsUpToDate: '앱 스토어가 이미 최신 버전입니다'
+LocalAppVersionNull: '{{ .name }} 애플리케이션이 버전과 동기화되지 않았습니다! 앱 목록에 추가할 수 없습니다.'
+LocalAppVersionErr: '{{ .name }} 동기화 버전 {{ .version }}이 실패했습니다! {{ .err }}'
+ErrFileNotFound: '{{ .name }} 파일이 존재하지 않습니다'
+ErrFileParseApp: '{{ .name }} 파일 구문 분석에 실패했습니다 {{ .err }}'
+ErrAppDirNull: '버전 폴더가 존재하지 않습니다'
+LocalAppErr: '애플리케이션 {{ .name }} 동기화에 실패했습니다! {{ .err }}'
+ErrContainerName: '컨테이너 이름이 이미 존재합니다'
+ErrAppSystemRestart: '1패널 재시작으로 인해 작업이 종료되었습니다'
+ErrCreateHttpClient: '요청 {{ .err }}을(를) 생성하지 못했습니다.'
+ErrHttpReqTimeOut: '요청 시간이 초과되었습니다 {{ .err }}'
+ErrHttpReqFailed: '요청이 실패했습니다 {{ .err }}'
+ErrNoSuchHost: '요청한 서버 {{ .err }}을 찾을 수 없습니다'
+ErrHttpReqNotFound: '요청한 리소스 {{ .err }}을 찾을 수 없습니다.'
+ErrImagePullTimeOut: '이미지 풀링 시간 초과'
+ErrContainerNotFound: '{{ .name }} 컨테이너가 존재하지 않습니다'
+ErrContainerMsg: '{{ .name }} 컨테이너가 비정상입니다. 자세한 내용은 컨테이너 페이지의 로그를 확인하세요.'
+ErrAppBackup: '{{ .name }} 애플리케이션 백업에 실패했습니다 {{ .err }}'
+ErrImagePull: '이미지 가져오기에 실패했습니다 {{ .err }}'
+ErrVersionTooLow: '현재 1Panel 버전이 너무 낮아 App Store를 업데이트할 수 없습니다. 작동하시기 전에 버전을 업그레이드하세요.'
+ErrAppNameExist: '응용 프로그램 이름이 이미 존재합니다'
+AppStoreIsSyncing: 'App Store가 동기화 중입니다. 나중에 다시 시도하세요.'
+ErrGetCompose: 'docker-compose.yml 파일을 가져오지 못했습니다! {{ .detail }}'
+ErrAppWarn: '비정상적인 상태입니다. 로그를 확인해 주세요.'
+ErrAppParamKey: '매개변수 {{ .name }} 필드가 비정상입니다.'
+ErrAppUpgrade: '애플리케이션 {{ .name }} 업그레이드에 실패했습니다 {{ .err }}'
+AppRecover: '롤백 애플리케이션 {{ .name }}'
+PullImageStart: '이미지 {{ .name }} 가져오기 시작'
+PullImageSuccess: '이미지 가져오기 성공'
+UpgradeAppStart: '애플리케이션 {{ .name }} 업그레이드 시작'
+UpgradeAppSuccess: '애플리케이션 {{ .name }}이 성공적으로 업그레이드되었습니다.'
+AppStoreIsLastVersion: '앱스토어가 이미 최신 버전입니다'
+AppStoreSyncSuccess: '앱스토어 동기화 성공'
+SyncAppDetail: '애플리케이션 구성 동기화'
+AppVersionNotMatch: '{{ .name }} 애플리케이션에 더 높은 1Panel 버전이 필요하므로 동기화를 건너뜁니다.'
+MoveSiteDir: '현재 업그레이드에는 OpenResty 웹사이트 디렉토리 마이그레이션이 필요합니다.'
+MoveSiteToDir: '사이트 디렉토리를 {{ .name }}로 마이그레이션'
+ErrMoveSiteDir: '사이트 디렉토리를 마이그레이션하지 못했습니다'
+MoveSiteDirSuccess: '웹사이트 디렉토리 마이그레이션 성공'
+DeleteRuntimePHP: 'PHP 런타임 삭제'
+CustomAppStoreNotConfig: '앱 스토어에서 오프라인 패키지 주소를 설정해주세요'
+CustomAppStoreNotFound: '앱 스토어 패키지를 가져오지 못했습니다. 해당 패키지가 있는지 확인하세요'
+CustomAppStoreFileValid: '앱 스토어 패키지는 .tar.gz 형식이어야 합니다.'
+PullImageTimeout: '이미지 가져오기 시간 초과, 이미지 가속을 높이거나 다른 이미지 가속으로 변경해 보세요.'
+ErrAppIsDown: '{{ .name }} 애플리케이션 상태가 비정상적입니다. 확인해 주세요'
+ErrCustomApps: '설치된 애플리케이션이 있습니다. 먼저 제거해 주세요'
+ErrCustomRuntimes: '설치된 런타임 환경이 있습니다. 먼저 삭제해 주세요'
 
-# 웹사이트
-ErrDomainIsExist: "도메인 이름이 이미 존재합니다"
-ErrAliasIsExist: "별칭이 이미 존재합니다"
-ErrAppDelete: "다른 웹사이트에서 이 애플리케이션을 사용 중입니다"
-ErrGroupIsUsed: "그룹이 사용 중이므로 삭제할 수 없습니다"
-ErrBackupMatch: "백업 파일이 현재 웹사이트 데이터와 일치하지 않습니다: {{ .detail }}"
-ErrBackupExist: "백업 파일이 원본 데이터의 일부와 일치하지 않습니다: {{ .detail }}"
-ErrPHPResource: "로컬 런타임에서 전환을 지원하지 않습니다!"
-ErrPathPermission: "인덱스 디렉터리에 1000:1000 권한이 아닌 폴더가 감지되었습니다. 웹사이트 액세스 시 '접근 거부' 오류가 발생할 수 있습니다. 상단의 저장 버튼을 클릭하세요"
-ErrDomainIsUsed: "도메인이 웹사이트 {{ .name }}에서 이미 사용 중입니다"
-ErrDomainFormat: "{{ .name }} 도메인 형식 오류"
-ErrDefaultAlias: "기본은 예약된 코드 이름입니다. 다른 이름을 사용하세요"
-ErrImageNotExist: "실행 환경 {{.name}} 이미지가 존재하지 않습니다. 실행 환경을 다시 편집하세요"
+#파일
+ErrFileCanNotRead: '이 파일은 미리보기를 지원하지 않습니다'
+ErrFileToLarge: '파일이 10M보다 커서 열 수 없습니다'
+ErrPathNotFound: '디렉토리가 존재하지 않습니다'
+ErrMovePathFailed: '대상 경로에는 원래 경로가 포함될 수 없습니다!'
+ErrLinkPathNotFound: '대상 경로가 존재하지 않습니다!'
+ErrFileIsExist: '파일이나 폴더가 이미 존재합니다!'
+ErrFileUpload: '{{ .name }}이 파일 {{ .detail }}을 업로드하지 못했습니다.'
+ErrFileDownloadDir: '다운로드 폴더가 지원되지 않습니다'
+ErrCmdNotFound: '{{ .name}} 명령이 존재하지 않습니다. 먼저 호스트에 이 명령을 설치하세요'
+ErrSourcePathNotFound: '소스 디렉토리가 존재하지 않습니다'
+ErrFavoriteExist: '이 경로는 이미 즐겨찾기되었습니다'
+ErrInvalidChar: '불법 문자는 허용되지 않습니다'
+ErrPathNotDelete: '선택한 디렉토리를 삭제할 수 없습니다'
 
-# SSL 관련
-ErrSSLCannotDelete: "인증서 {{ .name }}은(는) 웹사이트에서 사용 중이므로 삭제할 수 없습니다."
-ErrAccountCannotDelete: "계정과 연결된 인증서는 삭제할 수 없습니다."
-ErrSSLApply: "인증서가 성공적으로 서명되었지만 Openresty 다시 로드에 실패했습니다. 구성을 확인하세요!"
-ErrEmailIsExist: "이메일이 이미 존재합니다."
-ErrSSLKeyNotFound: "개인 키 파일이 존재하지 않습니다."
-ErrSSLCertificateNotFound: "인증서 파일이 존재하지 않습니다."
-ErrSSLKeyFormat: "개인 키 파일 검증 오류"
-ErrSSLCertificateFormat: "인증서 파일 형식 오류입니다. pem 형식을 사용하세요."
-ErrEabKidOrEabHmacKeyCannotBlank: "EabKid 또는 EabHmacKey 는 비워둘 수 없습니다."
-ErrOpenrestyNotFound: "HTTP 모드는 먼저 Openresty 를 설치해야 합니다."
-ApplySSLStart: "인증서를 신청하기 시작합니다. 도메인 이름 [{{ .domain }}], 신청 방법 [{{ .type }}]"
-dnsAccount: "DNS 자동"
-dnsManual: "DNS 수동"
-http: "HTTP"
-ApplySSLFailed: "도메인 [{{ .domain }}] 인증서 신청 실패, {{ .detail }}"
-ApplySSLSuccess: "도메인 [{{ .domain }}] 인증서 신청 성공!"
-DNSAccountName: "DNS 계정 [{{ .name }}] 제조사 [{{ .type }}]"
-PushDirLog: "인증서를 디렉토리 [{{ .path }}]에 푸시했습니다. {{ .status }}"
-ErrDeleteCAWithSSL: "현재 조직에 발급된 인증서가 있으므로 삭제할 수 없습니다."
-ErrDeleteWithPanelSSL: "패널 SSL 구성이 이 인증서를 사용 중이므로 삭제할 수 없습니다."
-ErrDefaultCA: "기본 인증 기관은 삭제할 수 없습니다."
-ApplyWebSiteSSLLog: "{{ .name }} 웹사이트 인증서를 업데이트하기 시작합니다."
-ErrUpdateWebsiteSSL: "{{ .name }} 웹사이트 인증서 업데이트 실패: {{ .err }}"
-ApplyWebSiteSSLSuccess: "웹사이트 인증서 업데이트 성공"
-ErrExecShell: "스크립트 실행 실패 {{ .err }}"
-ExecShellStart: "스크립트 실행 시작"
-ExecShellSuccess: "스크립트 실행 성공"
-StartUpdateSystemSSL: "시스템 인증서 업데이트 시작"
-UpdateSystemSSLSuccess: "시스템 인증서 업데이트 성공"
+#웹사이트
+ErrDomainIsExist: '도메인 이름이 이미 존재합니다'
+ErrAliasIsExist: '별칭이 이미 존재합니다'
+ErrAppDelete: '다른 웹사이트에서 이 앱을 사용하고 있어 삭제할 수 없습니다'
+ErrBackupMatch: '백업 파일이 현재 웹사이트 데이터 중 일부 {{ .detail }}와 일치하지 않습니다.'
+ErrBackupExist: '백업 파일에 있는 소스 데이터의 해당 부분이 존재하지 않습니다 {{ .detail }}'
+ErrPHPResource: '로컬 운영 환경이 전환을 지원하지 않습니다! '
+ErrPathPermission: '인덱스 디렉토리에서 1000:1000이 아닌 권한을 가진 폴더가 감지되었습니다. 이로 인해 웹사이트에서 액세스 거부 오류가 발생할 수 있습니다. 위의 저장 버튼을 클릭해주세요.'
+ErrDomainIsUsed: '[{{ .name }}] 웹사이트에서 이미 도메인 이름을 사용하고 있습니다.'
+ErrDomainFormat: '{{ .name }} 도메인 이름 형식이 올바르지 않습니다'
+ErrDefaultAlias: '기본값은 예약된 코드입니다. 다른 코드를 사용하세요'
+ErrParentWebsite: '먼저 하위 사이트 {{ .name }}을 삭제해야 합니다.'
+ErrBuildDirNotFound: '빌드 디렉토리가 존재하지 않습니다'
+ErrImageNotExist: '운영 환경 {{ .name }} 이미지가 존재하지 않습니다. 운영 환경을 다시 편집하세요.'
 
-# MySQL
-ErrUserIsExist: "현재 사용자가 이미 존재합니다. 새로운 사용자를 입력하세요."
-ErrDatabaseIsExist: "현재 데이터베이스가 이미 존재합니다. 새로운 데이터베이스를 입력하세요."
-ErrExecTimeOut: "SQL 실행이 시간 초과되었습니다. 데이터베이스를 확인하세요."
-ErrRemoteExist: "원격 데이터베이스에 동일한 이름이 이미 존재합니다. 이름을 수정한 후 다시 시도하세요."
-ErrLocalExist: "로컬 데이터베이스에 동일한 이름이 이미 존재합니다. 이름을 수정한 후 다시 시도하세요."
+#SSL인증
+ErrSSLCannotDelete: '{{ .name }} 인증서는 웹사이트에서 사용 중이므로 삭제할 수 없습니다.'
+ErrAccountCannotDelete: '계정이 인증서와 연결되어 있어 삭제할 수 없습니다.'
+ErrSSLApply: '인증서 갱신이 성공했으나, openresty 재로드에 실패했습니다. 구성을 확인해 주세요!'
+ErrEmailIsExist: '사서함이 이미 존재합니다'
+ErrSSLKeyNotFound: '개인 키 파일이 존재하지 않습니다'
+ErrSSLCertificateNotFound: '인증서 파일이 존재하지 않습니다'
+ErrSSLKeyFormat: '개인 키 파일 검증에 실패했습니다'
+ErrSSLCertificateFormat: '인증서 파일 형식이 올바르지 않습니다. pem 형식을 사용하세요.'
+ErrEabKidOrEabHmacKeyCannotBlank: 'EabKid 또는 EabHmacKey는 비워둘 수 없습니다'
+ErrOpenrestyNotFound: 'Http 모드를 사용하려면 먼저 Openresty를 설치해야 합니다.'
+ApplySSLStart: '인증서 신청 시작, 도메인 이름 [{{ .domain }}] 신청 방법 [{{ .type }}] '
+dnsAccount: 'DNS 자동'
+dnsManual: 'DNS 매뉴얼'
+http: 'HTTP'
+ApplySSLFailed: '[{{ .domain }}] 인증서 신청이 실패했습니다. {{ .detail }} '
+ApplySSLSuccess: '[{{ .domain }}] 인증서 신청이 성공적으로 완료되었습니다! ! '
+DNSAccountName: 'DNS 계정 [{{ .name }}] 공급업체 [{{ .type }}]'
+PushDirLog: '인증서가 [{{ .path }}] {{ .status }} 디렉토리로 푸시되었습니다.'
+ErrDeleteCAWithSSL: '현재 조직에는 발급된 인증서가 있어 삭제할 수 없습니다.'
+ErrDeleteWithPanelSSL: '패널 SSL 구성은 이 인증서를 사용하므로 삭제할 수 없습니다.'
+ErrDefaultCA: '기본 권한을 삭제할 수 없습니다'
+ApplyWebSiteSSLLog: '{{ .name }} 웹사이트 인증서 갱신 시작'
+ErrUpdateWebsiteSSL: '{{ .name }} 웹사이트 인증서 업데이트에 실패했습니다: {{ .err }}'
+ApplyWebSiteSSLSuccess: '웹사이트 인증서 업데이트 성공'
+ErrExecShell: '스크립트 {{ .err }}을 실행하지 못했습니다.'
+ExecShellStart: '스크립트 실행 시작'
+ExecShellSuccess: '스크립트 실행 성공'
+StartUpdateSystemSSL: '시스템 인증서 업데이트 시작'
+UpdateSystemSSLSuccess: '시스템 인증서 업데이트가 성공적으로 완료되었습니다.'
+ErrWildcardDomain: 'HTTP 모드에서 와일드카드 도메인 이름 인증서를 신청할 수 없습니다'
 
-# Redis
-ErrTypeOfRedis: "복구 파일 형식이 현재 지속성 모드와 일치하지 않습니다. 파일 형식을 수정한 후 다시 시도하세요."
+#마이SQL
+ErrUserIsExist: '현재 사용자가 이미 존재합니다. 다시 입력하세요'
+ErrDatabaseIsExist: '현재 데이터베이스가 이미 존재합니다. 다시 입력하세요'
+ErrExecTimeOut: 'SQL 실행 시간이 초과되었습니다. 데이터베이스를 확인하십시오.'
+ErrRemoteExist: '이 이름을 가진 원격 데이터베이스가 이미 존재합니다. 수정하고 다시 시도하세요'
+ErrLocalExist: '이름이 로컬 데이터베이스에 이미 존재합니다. 이름을 수정하고 다시 시도하세요'
 
-# Container
-ErrInUsed: "{{ .detail }}이(가) 사용 중이므로 삭제할 수 없습니다."
-ErrObjectInUsed: "이 객체는 사용 중이므로 삭제할 수 없습니다."
-ErrObjectBeDependent: "이 이미지는 다른 이미지에 의해 의존되고 있어 삭제할 수 없습니다."
-ErrPortRules: "포트 수가 일치하지 않습니다. 다시 입력하세요!"
-ErrPgImagePull: "이미지 가져오기 시간이 초과되었습니다. 이미지 가속 구성을 설정하거나 postgres:16.0-alpine 이미지를 수동으로 가져온 후 다시 시도하세요."
+#레디스
+ErrTypeOfRedis: '복구 파일 유형이 현재 지속성 방법과 일치하지 않습니다. 수정하고 다시 시도하세요'
 
-# Runtime
-ErrDirNotFound: "빌드 폴더가 존재하지 않습니다! 파일의 무결성을 확인하세요!"
-ErrFileNotExist: "{{ .detail }} 파일이 존재하지 않습니다! 소스 파일의 무결성을 확인하세요!"
-ErrImageBuildErr: "이미지 빌드 실패"
-ErrImageExist: "이미지가 이미 존재합니다!"
-ErrDelWithWebsite: "운영 환경이 웹사이트와 연결되어 있어 삭제할 수 없습니다."
-ErrRuntimeStart: "실행 시작 실패"
-ErrPackageJsonNotFound: "package.json 파일이 존재하지 않습니다."
-ErrScriptsNotFound: "package.json 에서 스크립트 구성 항목을 찾을 수 없습니다."
-ErrContainerNameNotFound: "컨테이너 이름을 가져올 수 없습니다. .env 파일을 확인하세요."
-ErrNodeModulesNotFound: "node_modules 폴더가 존재하지 않습니다! 실행 환경을 편집하거나 실행 환경이 성공적으로 시작되기를 기다리세요."
+#컨테이너
+ErrInUsed: '{{ .detail }}이 사용 중이므로 삭제할 수 없습니다'
+ErrObjectInUsed: '개체가 사용 중이므로 삭제할 수 없습니다'
+ErrObjectBeDependent: '이 이미지는 다른 이미지에 의존하므로 삭제할 수 없습니다'
+ErrPortRules: '포트 번호가 일치하지 않습니다. 다시 입력하세요!'
+ErrPgImagePull: '이미지 풀링 시간이 초과되었습니다. 이미지 가속을 구성하거나 {{ .name }} 이미지를 수동으로 풀링한 다음 다시 시도하세요.'
 
-# Setting
-ErrBackupInUsed: "백업 계정이 크론 작업에 사용 중이므로 삭제할 수 없습니다."
-ErrBackupCheck: "백업 계정 연결 테스트 실패 {{ .err }}"
-ErrOSSConn: "최신 버전을 가져올 수 없습니다. 서버가 외부 네트워크에 연결할 수 있는지 확인하세요."
-ErrEntrance: "보안 입구 정보 오류. 확인 후 다시 시도하세요!"
+#실행 시간
+ErrDirNotFound: '빌드 폴더가 존재하지 않습니다! 파일 무결성을 확인하세요!'
+ErrFileNotExist: '{{ .detail }} 파일이 존재하지 않습니다! 소스 파일의 무결성을 확인하세요!'
+ErrImageBuildErr: '이미지 빌드 실패'
+ErrImageExist: '이미지가 이미 존재합니다!'
+ErrDelWithWebsite: '운영 환경이 이미 웹사이트와 연결되어 있어 삭제할 수 없습니다'
+ErrRuntimeStart: '시작 실패'
+ErrPackageJsonNotFound: 'package.json 파일이 존재하지 않습니다'
+ErrScriptsNotFound: 'package.json에서 스크립트 구성 항목을 찾을 수 없습니다.'
+ErrContainerNameNotFound: '컨테이너 이름을 가져올 수 없습니다. .env 파일을 확인하세요.'
+ErrNodeModulesNotFound: 'node_modules 폴더가 없습니다! 런타임 환경을 편집하거나 런타임 환경이 성공적으로 시작될 때까지 기다리십시오'
+ErrContainerNameIsNull: '컨테이너 이름이 존재하지 않습니다'
 
-# Tool
-ErrConfigNotFound: "구성 파일이 존재하지 않습니다."
-ErrConfigParse: "구성 파일 형식 오류"
-ErrConfigIsNull: "구성 파일은 비워둘 수 없습니다."
-ErrConfigDirNotFound: "실행 디렉토리가 존재하지 않습니다."
-ErrConfigAlreadyExist: "동일한 이름의 구성 파일이 이미 존재합니다."
-ErrUserFindErr: "사용자 {{ .name }} 찾기 실패 {{ .err }}"
+#도구
+ErrConfigNotFound: '구성 파일이 존재하지 않습니다'
+ErrConfigParse: '구성 파일 형식이 올바르지 않습니다'
+ErrConfigIsNull: '구성 파일은 비어 있을 수 없습니다'
+ErrConfigDirNotFound: '실행 디렉토리가 존재하지 않습니다'
+ErrConfigAlreadyExist: '같은 이름의 구성 파일이 이미 존재합니다'
+ErrUserFindErr: '사용자 {{ .name }} 검색에 실패했습니다 {{ .err }}'
 
-# SSH
-ErrFirewallNone: "시스템에서 firewalld 또는 ufw 서비스를 감지하지 못했습니다. 확인 후 다시 시도하세요!"
-ErrFirewallBoth: "시스템에서 firewalld 와 ufw 서비스가 모두 감지되었습니다. 충돌을 방지하려면 하나를 제거한 후 다시 시도하세요!"
+#ssh
+ErrFirewallNone: '시스템 방화벽이나 ufw 서비스가 감지되지 않았습니다. 확인하고 다시 시도하세요!'
+ErrFirewallBoth: '시스템에 방화벽과 ufw 서비스가 모두 있는 것으로 감지되었습니다. 충돌을 피하려면 제거한 후 다시 시도하세요!'
 
-# Cronjob
-ErrBashExecute: "스크립트 실행 오류. 작업 출력 텍스트 영역에서 구체적인 정보를 확인하세요."
-ErrCutWebsiteLog: "{{ .name }} 웹사이트 로그 자르기 실패, 오류 {{ .err }}"
-CutWebsiteLogSuccess: "{{ .name }} 웹사이트 로그 자르기 성공, 백업 경로 {{ .path }}"
+#크론잡
+ErrCutWebsiteLog: '{{ .name }} 웹사이트 로그 잘라내기에 실패했습니다. 오류 {{ .err }}'
+CutWebsiteLogSuccess: '{{ .name }} 웹사이트 로그가 성공적으로 잘렸습니다. 백업 경로 {{ .path }}'
+HandleShell: '스크립트 {{ .name }} 실행'
+HandleNtpSync: '시스템 시간 동기화'
+HandleSystemClean: '시스템 캐시 정리'
 
-# Toolbox
-ErrNotExistUser: "현재 사용자가 존재하지 않습니다. 수정 후 다시 시도하세요!"
-ErrBanAction: "설정 실패, 현재 {{ .name }} 서비스가 사용할 수 없습니다. 확인 후 다시 시도하세요!"
-ErrClamdscanNotFound: "clamdscan 명령을 감지하지 못했습니다. 설치 문서를 참조하세요!"
+#도구상자
+ErrNotExistUser: '현재 사용자가 존재하지 않습니다. 수정한 후 다시 시도하세요!'
+ErrBanAction: '설정에 실패했습니다. 현재 {{ .name }} 서비스를 사용할 수 없습니다. 확인하고 다시 시도하세요!'
+ErrClamdscanNotFound: 'clamdscan 명령이 감지되지 않았습니다. 설명서를 참조하여 설치하세요!'
 
-# WAF
-ErrScope: "이 설정의 수정은 지원되지 않습니다"
-ErrStateChange: "상태 변경 실패"
-ErrRuleExist: "규칙이 이미 존재합니다"
-ErrRuleNotExist: "규칙이 존재하지 않습니다"
-ErrParseIP: "IP 형식이 잘못되었습니다"
-ErrDefaultIP: "default는 예약된 이름입니다. 다른 이름을 사용하세요"
-ErrGroupInUse: "IP 그룹이 블랙리스트/화이트리스트에서 사용 중입니다. 삭제할 수 없습니다"
-ErrGroupExist: "IP 그룹 이름이 이미 존재합니다"
-ErrIPRange: "IP 범위가 잘못되었습니다"
-ErrIPExist: "IP가 이미 존재합니다"
-urlDefense: "URL 규칙"
-urlHelper: "금지된 URL"
-dirFilter: "디렉토리 필터"
-xss: "XSS"
-phpExec: "PHP 스크립트 실행"
-oneWordTrojan: "원워드 트로이 목마"
-appFilter: "애플리케이션 위험 디렉토리 필터"
-webshell: "Webshell"
-args: "매개변수 규칙"
-protocolFilter: "프로토콜 필터"
-javaFileter: "Java 위험 파일 필터"
-scannerFilter: "스캐너 필터"
-escapeFilter: "이스케이프 필터"
-customRule: "사용자 정의 규칙"
-httpMethod: "HTTP 메소드 필터"
-fileExt: "파일 업로드 제한"
-defaultIpBlack: "악성 IP 그룹"
-cookie: "쿠키 규칙"
-urlBlack: "URL 블랙리스트"
-uaBlack: "User-Agent 블랙리스트"
-attackCount: "공격 빈도 제한"
-fileExtCheck: "파일 업로드 제한"
-geoRestrict: "지역 접근 제한"
-unknownWebsite: "무단 도메인 접근"
-notFoundCount: "404 빈도 제한"
-headerDefense: "헤더 규칙"
-defaultUaBlack: "User-Agent 규칙"
-methodWhite: "HTTP 규칙"
-captcha: "인간-기계 검증"
-fiveSeconds: "5초 검증"
-vulnCheck: "보충 규칙"
-acl: "사용자 정의 규칙"
-sql: "SQL 인젝션"
-cc: "접근 빈도 제한"
-defaultUrlBlack: "URL 규칙"
-sqlInject: "SQL 인젝션"
-ErrDBNotExist: "데이터베이스가 존재하지 않습니다"
-allow: "허용"
-deny: "금지"
+#와프
+ErrScope: '이 구성을 수정하는 것은 지원되지 않습니다'
+ErrStateChange: '상태 변경에 실패했습니다'
+ErrRuleExist: '규칙이 이미 존재합니다'
+ErrRuleNotExist: '규칙이 존재하지 않습니다'
+ErrParseIP: '잘못된 IP 형식'
+ErrDefaultIP: '기본값은 예약된 이름입니다. 다른 이름으로 변경해 주세요'
+ErrGroupInUse: 'IP 그룹이 블랙리스트/화이트리스트에 사용 중이므로 삭제할 수 없습니다.'
+ErrGroupExist: 'IP 그룹 이름이 이미 존재합니다'
+ErrIPRange: '잘못된 IP 범위'
+ErrIPExist: 'IP가 이미 존재합니다'
+urlDefense: 'URL 규칙'
+urlHelper: '금지된 URL'
+dirFilter: '디렉토리 필터'
+xss: 'XSS'
+phpExec: 'PHP 스크립트 실행'
+oneWordTrojan: '한 단어 트로이'
+appFilter: '위험한 디렉토리 필터링 적용'
+webshell: '웹쉘'
+args: '매개변수 규칙'
+protocolFilter: '프로토콜 필터링'
+javaFileter: 'Java 위험 파일 필터'
+scannerFilter: '스캐너 필터'
+escapeFilter: '탈출 필터'
+customRule: '사용자 정의 규칙'
+httpMethod: 'HTTP 메서드 필터링'
+fileExt: '파일 업로드 제한'
+defaultIpBlack: '악성 IP 그룹'
+cookie: '쿠키 규칙'
+urlBlack: 'URL 블랙리스트'
+uaBlack: '사용자 에이전트 블랙리스트'
+attackCount: '공격 빈도 제한'
+fileExtCheck: '파일 업로드 제한'
+geoRestrict: '지역 접근 제한'
+unknownWebsite: '허가받지 않은 도메인 이름 접근'
+notFoundCount: '404 속도 제한'
+headerDefense: '헤더 규칙'
+defaultUaBlack: '사용자 에이전트 규칙'
+methodWhite: 'HTTP 규칙'
+captcha: '인간-기계 검증'
+fiveSeconds: '5초 검증'
+vulnCheck: '보충 규칙'
+acl: '사용자 정의 규칙'
+sql: 'SQL 주입'
+cc: '접근 주파수 제한'
+defaultUrlBlack: 'URL 규칙'
+sqlInject: 'SQL 주입'
+ErrDBNotExist: '데이터베이스가 존재하지 않습니다'
+allow: '허용하다'
+deny: '거부하다'
+OpenrestyNotFound: 'Openresty가 설치되지 않았습니다'
 
-# License
-ErrLicense: "라이선스 형식 오류, 확인 후 다시 시도하세요!"
-ErrLicenseCheck: "라이선스 검증 실패, 확인 후 다시 시도하세요!"
-ErrXpackVersion: "라이선스 검증 실패, 이 라이선스는 버전 제한이 있어 성공적으로 가져올 수 없습니다. 확인 후 다시 시도하세요!"
-ErrLicenseSave: "라이선스 정보 저장 실패, 오류 {{ .err }}. 다시 시도하세요!"
-ErrLicenseSync: "라이선스 정보 동기화 실패, 데이터베이스에서 라이선스 정보를 감지하지 못했습니다!"
-ErrXpackNotFound: "이 섹션은 전문가 버전 기능입니다. Panel 설정 - 라이선스 인터페이스에서 먼저 라이선스를 가져오세요."
-ErrXpackNotActive: "이 섹션은 전문가 버전 기능입니다. Panel 설정 - 라이선스 인터페이스에서 먼저 라이선스 상태를 동기화하세요."
-ErrXpackOutOfDate: "현재 라이선스가 만료되었습니다. Panel 설정 - 라이선스 인터페이스에서 라이선스를 다시 가져오세요."
-ErrXpackLost: "라이선스가 최대 재시도 횟수에 도달했습니다. [설정] - [라이선스] 페이지로 이동하여 동기화 버튼을 수동으로 클릭해 전문가 버전 기능을 정상적으로 작동시키세요."
-ErrXpackTimeout: "요청 시간이 초과되었습니다. 네트워크 연결이 불안정할 수 있으니 나중에 다시 시도하세요!"
+#일
+TaskStart: '[START] {{ .name }} 작업이 시작됩니다.'
+TaskEnd: '{{ .name }} 작업이 완료되었습니다 [완료]'
+TaskFailed: '{{ .name }} 작업이 실패했습니다'
+TaskTimeout: '{{ .name }}의 시간이 초과되었습니다'
+TaskSuccess: '{{ .name }} 작업이 성공했습니다'
+TaskRetry: '{{ .name }}번째 재시도 시작'
+SubTaskSuccess: '{{ .name }}이 성공했습니다'
+SubTaskFailed: '{{ .name }}이 실패했습니다: {{ .err }}'
+TaskInstall: '설치'
+TaskUninstall: '제거'
+TaskCreate: '생성'
+TaskDelete: '삭제'
+TaskUpgrade: '업그레이드'
+TaskUpdate: '업데이트'
+TaskRestart: '다시 시작'
+TaskBackup: '백업'
+TaskRecover: '복구'
+TaskRollback: '롤백'
+TaskPull: '당기기'
+TaskBuild: '빌드'
+TaskPush: '푸시'
+TaskHandle: '실행'
+Website: '웹사이트'
+App: '애플리케이션'
+Runtime: '런타임 환경'
+Database: '데이터베이스'
+ConfigFTP: 'FTP 사용자 {{ .name }} 생성'
+ConfigOpenresty: 'Openresty 구성 파일 생성'
+InstallAppSuccess: '애플리케이션 {{ .name }}이 성공적으로 설치되었습니다.'
+ConfigRuntime: '런타임 환경 구성'
+ConfigApp: '구성 애플리케이션'
+SuccessStatus: '{{ .name }}이 성공했습니다'
+FailedStatus: '{{ .name }}이(가) {{ .err }}에 실패했습니다'
+HandleLink: '핸들 애플리케이션 연결'
+HandleDatabaseApp: '애플리케이션 매개변수 처리'
+ExecShell: '{{ .name }} 스크립트 실행'
+PullImage: '이미지 가져오기'
+Start: '시작'
+Run: '시작'
+Stop: '정지'
+Image: '거울'
+Compose : '오케스트레이션'
+Container: '컨테이너'
+AppLink: '연결된 애플리케이션'
+EnableSSL: 'HTTPS 활성화'
+AppStore: '앱스토어'
+TaskSync: '동기화'
+LocalApp: '로컬 애플리케이션'
+SubTask: '하위 작업'
+RuntimeExtension: '런타임 환경 확장'
+TaskIsExecuting: '작업이 실행 중입니다'
+CustomAppstore: '사용자 정의 애플리케이션 웨어하우스'
 
-# Alert
-ErrAlert: "알림 정보 형식 오류, 확인 후 다시 시도하세요!"
-ErrAlertPush: "알림 전송 오류, 확인 후 다시 시도하세요!"
-ErrAlertSave: "알림 저장 오류, 확인 후 다시 시도하세요!"
-ErrAlertSync: "알림 동기화 오류, 확인 후 다시 시도하세요!"
-ErrAlertRemote: "원격 알림 오류, 확인 후 다시 시도하세요!"
+# 작업 - ai
+OllamaModelPull: 'Ollama 모델 {{ .name }}을(를) 끌어오세요'
+OllamaModelSize: 'Ollama 모델 {{ .name }}의 크기를 가져옵니다'
 
-# CMD
-AppVersion: "앱 버전"
-AppCommands: "앱 관련 명령어"
-AppInit: "앱 초기화"
-AppKeyVal: "앱 키 (영어만 지원)"
-AppCreateFileErr: "파일 {{ .name }} 생성 실패 {{ .err }}"
-AppCreateDirErr: "폴더 {{ .name }} 생성 실패 {{ .err }}"
-AppMissKey: "앱 키가 없습니다. -k 옵션으로 지정하세요."
-AppMissVersion: "앱 버전이 없습니다. -v 옵션으로 지정하세요."
-AppVersionExist: "버전이 이미 존재합니다!"
-AppCreateSuccessful: "생성 성공!"
-AppWriteErr: "파일 {{ .name }} 쓰기 실패 {{ .err }}"
-SudoHelper: "{{ .cmd }} 명령을 사용하거나 root 사용자로 전환하세요."
-ListenIPCommands: "IP 변경"
-ListenIPv4: "IPv4 에서 수신 대기"
-ListenIPv6: "IPv6 에서 수신 대기"
-ListenChangeSuccessful: "변경 성공! 현재 {{ .value }}에서 수신 대기 중입니다."
-ResetCommands: "시스템 정보 초기화"
-ResetMFA: "1Panel 이중 인증 취소"
-ResetHttps: "1Panel HTTPS 로그인 취소"
-ResetEntrance: "1Panel 보안 입구 취소"
-ResetIPs: "1Panel 허용 IP 제한 취소"
-ResetDomain: "1Panel 도메인 바인딩 취소"
-RestoreCommands: "1Panel 서비스 및 데이터 복구"
-RestoreNoSuchFile: "복구 가능한 파일이 없습니다."
-RestoreStep1: "(1/5) {{ .name }} 디렉토리에서 1Panel 서비스 및 데이터 복구 시작..."
-RestoreStep2: "(2/5) 1Panel 바이너리 복구 성공"
-RestoreStep3: "(3/5) 1Panel 스크립트 복구 성공"
-RestoreStep4: "(4/5) 1Panel 서비스 복구 성공"
-RestoreStep5: "(5/5) 1Panel 데이터 복구 성공"
-RestoreSuccessful: "복구 성공! 서비스를 다시 시작합니다. 잠시만 기다려주세요..."
-UpdateCommands: "패널 정보 업데이트"
-UpdateUser: "패널 사용자 업데이트"
-UpdatePassword: "패널 비밀번호 업데이트"
-UpdatePort: "패널 포트 업데이트"
-UpdateUserNull: "오류: 패널 사용자가 비어 있습니다!"
-UpdateUserBlank: "오류: 패널 사용자에 공백이 포함되어 있습니다!"
-UpdateUserFormat: "오류: 잘못된 패널 사용자 형식! 영어, 중국어, 숫자, _만 지원하며 길이는 3~30자입니다."
-UpdateUserErr: "오류: 패널 사용자 업데이트 실패 {{ .err }}"
-UpdateSuccessful: "업데이트 성공!"
-UpdateUserResult: "패널 사용자: {{ .name }}"
-UpdatePasswordRead: "오류: 패널 비밀번호 정보 읽기 실패 {{ .err }}"
-UpdatePasswordNull: "오류: 패널 비밀번호가 비어 있습니다!"
-UpdateUPasswordBlank: "오류: 패널 비밀번호에 공백이 포함되어 있습니다!"
-UpdatePasswordFormat: "오류: 패널 비밀번호는 문자, 숫자, 특수 문자 !@#$%*_,.?만 지원하며 길이는 8~30자입니다!"
-UpdatePasswordLen: "오류: 6자 이상의 비밀번호를 입력하세요!"
-UpdatePasswordRe: "비밀번호 확인:"
-UpdatePasswordErr: "오류: 패널 비밀번호 업데이트 실패 {{ .err }}"
-UpdatePasswordSame: "오류: 두 비밀번호가 일치하지 않습니다. 확인 후 다시 시도하세요!"
-UpdatePasswordResult: "패널 비밀번호: {{ .name }}"
-UpdatePortFormat: "오류: 입력한 포트 번호는 1~65535 사이여야 합니다!"
-UpdatePortUsed: "오류: 포트 번호가 이미 사용 중입니다. 확인 후 다시 시도하세요!"
-UpdatePortErr: "오류: 패널 포트 업데이트 실패 {{ .err }}"
-UpdatePortResult: "패널 포트: {{ .name }}"
-UpdatePortFirewallAdd: "방화벽 포트 규칙 추가 실패 {{ .err }}, 방화벽 규칙에 {{ .name }} 포트를 수동으로 추가하세요."
-UpdatePortFirewallDel: "오류: 방화벽 포트 삭제 실패 {{ .err }}"
-UpdatePortFirewallReload: "방화벽 다시 로드 실패 {{ .err }}, 방화벽을 수동으로 다시 로드하세요."
-UserInfo: "패널 정보 가져오기"
-UserInfoAddr: "패널 주소: "
-UserInfoPassHelp: "팁: 비밀번호를 변경하려면 다음 명령어를 실행할 수 있습니다: "
-DBConnErr: "오류: 데이터베이스 연결 초기화 실패 {{ .err }}"
-SystemVersion: "버전: "
-SystemMode: "모드: "
+# 작업-스냅샷
+Snapshot: '스냅샷'
+SnapDBInfo: '1Panel 데이터베이스 정보 쓰기'
+SnapCopy: '파일 및 디렉토리 {{ .name }} 복사'
+SnapNewDB: '데이터베이스 {{ .name }} 연결 초기화'
+SnapDeleteOperationLog: '작업 로그 삭제'
+SnapDeleteLoginLog: '액세스 로그 삭제'
+SnapDeleteMonitor: '모니터링 데이터 삭제'
+SnapRemoveSystemIP: '시스템 IP 제거'
+SnapBaseInfo: '1패널 기본 정보 쓰기'
+SnapInstallApp: '1Panel 설치된 애플리케이션 백업'
+SnapDockerSave: '설치된 애플리케이션 압축'
+SnapLocalBackup: '1Panel 로컬 백업 디렉토리 백업'
+SnapCompressBackup: '로컬 백업 디렉토리 압축'
+SnapPanelData: '1Panel 데이터 디렉토리 백업'
+SnapCompressPanel: '압축 데이터 디렉토리'
+SnapWebsite: '1Panel 웹사이트 디렉토리 백업'
+SnapCloseDBConn: '데이터베이스 연결 닫기'
+SnapCompress: '스냅샷 파일 만들기'
+SnapCompressFile: '스냅샷 파일 압축'
+SnapCheckCompress: '스냅샷 압축 파일 확인'
+SnapCompressSize: '스냅샷 파일 크기 {{ .name }}'
+SnapUpload: '스냅샷 파일 업로드'
+SnapLoadBackup: '백업 계정 정보 가져오기'
+SnapUploadTo: '스냅샷 파일을 {{ .name }}에 업로드'
+SnapUploadRes: '스냅샷 파일을 {{ .name }}에 업로드'
+
+SnapshotRecover: '스냅샷 복원'
+RecoverDownload: '스냅샷 파일 다운로드'
+Download: '다운로드'
+RecoverDownloadAccount: '스냅샷 다운로드 백업 계정 {{ .name }} 가져오기'
+RecoverDecompress: '스냅샷 압축 파일 압축 해제'
+Decompress: '감압'
+BackupBeforeRecover: '스냅샷 전에 시스템 관련 데이터 백업'
+Readjson: '스냅샷에서 Json 파일을 읽습니다'
+ReadjsonPath: '스냅샷의 Json 파일 경로 가져오기'
+ReadjsonContent: 'Json 파일 읽기'
+ReadjsonMarshal: 'Json 이스케이프 처리'
+RecoverApp: '설치된 앱 복원'
+RecoverWebsite: '웹사이트 디렉토리 복구'
+RecoverAppImage: '스냅샷 이미지 백업 복원'
+RecoverCompose: '다른 Composer 콘텐츠 복원'
+RecoverComposeList: '모든 작곡가를 복원합니다'
+RecoverComposeItem: '작성 {{ .name }} 복구'
+RecoverAppEmpty: '스냅샷 파일에서 애플리케이션 이미지 백업을 찾을 수 없습니다'
+RecoverBaseData: '기본 데이터 및 파일 복구'
+RecoverDaemonJsonEmpty: '스냅샷 파일과 현재 머신 모두 컨테이너 구성 daemon.json 파일이 없습니다.'
+RecoverDaemonJson: '컨테이너 구성 daemon.json 파일 복원'
+RecoverDBData: '데이터베이스 데이터 복구'
+RecoverBackups: '로컬 백업 디렉토리 복원'
+RecoverPanelData: '복구 데이터 디렉토리'
+
+# 작업 - 컨테이너
+ContainerNewCliet: 'Docker 클라이언트 초기화'
+ContainerImagePull: '컨테이너 이미지 {{ .name }} 가져오기'
+ContainerRemoveOld: '원래 컨테이너 {{ .name }} 제거'
+ContainerImageCheck: '이미지가 정상적으로 당겨졌는지 확인'
+ContainerLoadInfo: '기본 컨테이너 정보 가져오기'
+ContainerRecreate: '컨테이너 업데이트에 실패했습니다. 이제 원래 컨테이너를 복원하기 시작합니다.'
+ContainerCreate: '새로운 컨테이너 {{ .name }}를 만듭니다'
+ContainerCreateFailed: '컨테이너 생성에 실패했습니다. 실패한 컨테이너를 삭제하세요'
+ContainerStartCheck: '컨테이너가 시작되었는지 확인'
+
+# 작업 - 이미지
+ImageBuild: '이미지 빌드'
+ImageBuildStdoutCheck: '이미지 출력 콘텐츠 구문 분석'
+ImaegBuildRes: '이미지 빌드 출력: {{ .name }}'
+ImagePull: '이미지 가져오기'
+ImageRepoAuthFromDB: '데이터베이스에서 저장소 인증 정보 가져오기'
+ImaegPullRes: '이미지 풀 출력: {{ .name }}'
+ImagePush: '이미지 푸시'
+ImageRenameTag: '이미지 태그 수정'
+ImageNewTag: '새로운 이미지 태그 {{ .name }}'
+ImaegPushRes: '이미지 푸시 출력: {{ .name }}'
+ComposeCreate: '작곡 만들기'
+ComposeCreateRes: 'Compose 생성 출력: {{ .name }}'
+
+# 작업 - 웹사이트
+BackupNginxConfig: '웹사이트 OpenResty 구성 파일 백업'
+CompressFileSuccess: '디렉토리 압축이 성공했습니다. {{ .name }}으로 압축되었습니다.'
+CompressDir: '압축 디렉토리'
+DeCompressFile: '파일 {{ .name }} 압축 해제'
+ErrCheckValid: '백업 파일 검증에 실패했습니다, {{ .name }}'
+Rollback: '롤백'
+websiteDir: '웹사이트 디렉토리'
+RecoverFailedStartRollBack: '복구 실패, 롤백 시작'
+AppBackupFileIncomplete: '백업 파일이 불완전하며 app.json 또는 app.tar.gz 파일이 없습니다.'
+AppAttributesNotMatch: '애플리케이션 유형 또는 이름이 일치하지 않습니다'
+
+#알리다
+ErrAlert: '경고 메시지의 형식이 올바르지 않습니다. 확인하고 다시 시도하세요!'
+ErrAlertPush: '알림 정보를 푸시하는 중 오류가 발생했습니다. 확인하고 다시 시도하세요!'
+ErrAlertSave: '알람 정보를 저장하는 중 오류가 발생했습니다. 확인하고 다시 시도하세요!'
+ErrAlertSync: '알람 정보 동기화 오류입니다. 확인하고 다시 시도하세요!'
+ErrAlertRemote: '알람 메시지 원격 오류, 확인하고 다시 시도하세요!'

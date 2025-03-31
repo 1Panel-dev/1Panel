@@ -463,6 +463,13 @@ func (a *AppInstallService) SyncAll(systemInit bool) error {
 			}
 			continue
 		}
+		if i.Status == constant.StatusWaitingRestart {
+			dockerComposePath := i.GetComposePath()
+			_, _ = compose.Up(dockerComposePath)
+			i.Status = constant.StatusRunning
+			_ = appInstallRepo.Save(context.Background(), &i)
+			continue
+		}
 		if !systemInit {
 			if err = syncAppInstallStatus(&i, false); err != nil {
 				global.LOG.Errorf("sync install app[%s] error,mgs: %s", i.Name, err.Error())

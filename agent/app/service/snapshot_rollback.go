@@ -89,6 +89,16 @@ func (u *SnapshotService) SnapshotRollback(req dto.SnapshotRecover) error {
 			},
 			nil,
 		)
+		openrestyDir, _ := settingRepo.GetValueByKey("WEBSITE_DIR")
+		if len(openrestyDir) != 0 {
+			taskItem.AddSubTask(
+				i18n.GetWithName("SnapCopy", openrestyDir),
+				func(t *task.Task) error {
+					return FileOp.CopyDir(path.Join(rootDir, "www"), openrestyDir)
+				},
+				nil,
+			)
+		}
 		taskItem.AddSubTask(
 			i18n.GetWithName("SnapCopy", global.Dir.BaseDir),
 			func(t *task.Task) error {

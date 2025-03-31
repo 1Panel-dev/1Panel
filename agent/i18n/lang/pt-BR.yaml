@@ -1,326 +1,422 @@
-ErrInvalidParams: "Erro nos parâmetros da solicitação: {{ .detail }}"
-ErrTokenParse: "Erro na geração do token: {{ .detail }}"
-ErrInitialPassword: "Erro na senha inicial"
-ErrInternalServer: "Erro interno do serviço: {{ .detail }}"
-ErrRecordExist: "Registro já existente"
-ErrRecordNotFound: "Registros não encontrados"
-ErrStructTransform: "Falha na conversão de tipo: {{ .detail }}"
-ErrNotLogin: "Usuário não está logado: {{ .detail }}"
-ErrPasswordExpired: "A senha atual expirou: {{ .detail }}"
-ErrNotSupportType: "O sistema não suporta o tipo atual: {{ .detail }}"
-ErrApiConfigStatusInvalid: "Acesso à interface da API proibido: {{ .detail }}"
-ErrApiConfigKeyInvalid: "Erro na chave da interface da API: {{ .detail }}"
-ErrApiConfigIPInvalid: "O IP da interface da API não está na lista de permissões: {{ .detail }}"
-ErrApiConfigDisable: "Esta interface proíbe o uso de chamadas de API: {{ .detail }}"
+ErrInvalidParams: 'Erro de parâmetro de solicitação: {{ .detail }}'
+ErrTokenParse: 'Erro de geração de token: {{ .detail }}'
+ErrInitialPassword: 'A senha original está incorreta'
+ErrInternalServer: 'Erro interno do servidor: {{ .detail }}'
+ErrRecordExist: 'O registro já existe'
+ErrRecordNotFound: 'Registro não encontrado'
+ErrStructTransform: 'Falha na conversão de tipo: {{ .err }}'
+ErrNotLogin: 'Usuário não logado: {{ .detail }}'
+ErrPasswordExpired: 'A senha atual expirou: {{ .detail }}'
+ErrNotSupportType: 'O sistema não suporta o tipo atual: {{ .name }}'
+ErrProxy: 'Erro de solicitação, verifique o status do nó: {{ .detail }}'
+ErrApiConfigStatusInvalid: 'O acesso à interface da API é proibido: {{ .detail }}'
+ErrApiConfigKeyInvalid: 'Erro de chave da interface da API: {{ .detail }}'
+ErrApiConfigIPInvalid: 'O IP usado para chamar a interface da API não está na lista de permissões: {{ .detail }}'
+ErrApiConfigDisable: 'Esta interface proíbe o uso de chamadas de interface de API: {{ .detail }}'
+ErrApiConfigKeyTimeInvalid: 'Erro de registro de data e hora da interface da API: {{ .detail }}'
 
-#common
-ErrUsernameIsExist: "Nome de usuário já existe"
-ErrNameIsExist: "O nome já existe"
-ErrDemoEnvironment: "Servidor de demonstração, operação proibida!"
-ErrCmdTimeout: "Tempo limite de execução do comando excedido!"
-ErrCmdIllegal: "O comando contém caracteres ilegais. Por favor, modifique e tente novamente!"
+#comum
+ErrUsernameIsExist: 'Nome de usuário já existe'
+ErrNameIsExist: 'Nome já existe'
+ErrDemoEnvironment: 'Servidor de demonstração, esta operação é proibida!'
+ErrCmdTimeout: 'Tempo limite de execução do comando expirou!'
+ErrCmdIllegal: 'Há caracteres ilegais no comando de execução, modifique-o e tente novamente!'
 ErrPortExist: 'A porta {{ .port }} já está ocupada por {{ .type }} [{{ .name }}]'
-TYPE_APP: "Aplicação"
-TYPE_RUNTIME: "Ambiente de execução"
-TYPE_DOMAIN: "Nome de domínio"
-ErrTypePort: 'Erro no formato da porta {{ .name }}'
-ErrTypePortRange: 'O intervalo da porta deve estar entre 1-65535'
-Success: "Sucesso"
-Failed: "Falhou"
-SystemRestart: "A reinicialização do sistema causa interrupção da tarefa"
-ErrGroupIsDefault: "Grupo padrão, não pode ser excluído"
-ErrGroupIsInWebsiteUse: "O grupo está sendo usado por outros sites, não pode ser excluído"
+TYPE_APP: 'Aplicativo'
+TYPE_RUNTIME: 'Ambiente de tempo de execução'
+TYPE_DOMAIN: 'Nome de domínio'
+ErrTypePort: 'O formato da porta {{ .name }} está incorreto'
+ErrTypePortRange: 'O intervalo de portas precisa estar entre 1-65535'
+Success: 'Sucesso'
+Failed: 'Falhou'
+SystemRestart: 'Tarefa interrompida devido à reinicialização do sistema'
+ErrGroupIsDefault: 'Grupo padrão, não pode ser excluído'
+ErrGroupIsInWebsiteUse: 'O grupo está sendo usado por outro site e não pode ser excluído.'
 
-#app
-ErrPortInUsed: "A porta {{ .detail }} já está em uso"
-ErrAppLimit: "O limite de instalação de aplicativos foi excedido"
-ErrAppRequired: "O aplicativo {{ .detail }} é necessário"
-ErrNotInstall: "Aplicativo não instalado"
-ErrPortInOtherApp: "A porta {{ .port }} já está em uso pelo aplicativo {{ .apps }}"
-ErrDbUserNotValid: "Banco de dados padrão, nome de usuário e senha não correspondem!"
-ErrDockerComposeNotValid: "Erro no formato do arquivo docker-compose!"
-ErrUpdateBuWebsite: "O aplicativo foi atualizado com sucesso, mas a modificação do arquivo de configuração do site falhou. Verifique a configuração!"
-Err1PanelNetworkFailed: "Falha ao criar a rede padrão do container! {{ .detail }}"
-ErrFileParse: "Falha ao analisar o arquivo docker-compose do aplicativo!"
-ErrInstallDirNotFound: "O diretório de instalação não existe"
-AppStoreIsUpToDate: "Atualizado"
-LocalAppVersionNull: "O aplicativo {{.name}} não está sincronizado com a versão! Não foi possível adicionar à lista de aplicativos"
-LocalAppVersionErr: "Falha ao sincronizar a versão {{.version}} do {{.name}}! {{.err}}"
-ErrFileNotFound: "O arquivo {{.name}} não existe"
-ErrFileParseApp: "Falha ao analisar o arquivo {{.name}} {{.err}}"
-ErrAppDirNull: "O diretório da versão não existe"
-LocalAppErr: "Falha ao sincronizar o aplicativo {{.name}}! {{.err}}"
-ErrContainerName: "O nome do container já existe"
-ErrAppSystemRestart: "A reinicialização do 1Panel causa a interrupção da tarefa"
-ErrCreateHttpClient: "Falha ao criar a solicitação HTTP {{.err}}"
-ErrHttpReqTimeOut: "Tempo limite da solicitação excedido {{.err}}"
-ErrHttpReqFailed: "Falha na solicitação {{.err}}"
-ErrHttpReqNotFound: "O arquivo não existe"
-ErrNoSuchHost: "Falha na conexão de rede"
-ErrImagePullTimeOut: "Tempo limite ao puxar a imagem"
-ErrContainerNotFound: "O container {{ .name }} não existe"
-ErrContainerMsg: "O container {{ .name }} está anormal, verifique o log na página do container para mais detalhes"
-ErrAppBackup: "Falha no backup do aplicativo {{ .name }} erro {{.err}}"
-ErrImagePull: "Falha ao puxar a imagem {{ .name }} erro {{.err}}"
-ErrVersionTooLow: "A versão atual do 1Panel é muito baixa para atualizar a loja de aplicativos, por favor atualize a versão"
-ErrAppNameExist: "O nome do aplicativo já existe"
-AppStoreIsSyncing: "A loja de aplicativos está sincronizando, tente novamente mais tarde"
-ErrGetCompose: "Falha ao obter o arquivo docker-compose.yml! {{ .detail }}"
-ErrAppWarn: "Status anormal, verifique o log"
-ErrAppParamKey: "Exceção no campo do parâmetro {{ .name }}"
-ErrAppUpgrade: "Falha ao atualizar o aplicativo {{ .name }} {{ .err }}"
-AppRecover: "Aplicativo {{ .name }} revertido"
-PullImageStart: "Iniciando o download da imagem {{ .name }}"
-PullImageSuccess: "Imagem baixada com sucesso"
-UpgradeAppStart: "Iniciando a atualização do aplicativo {{ .name }}"
-UpgradeAppSuccess: "Aplicativo {{ .name }} atualizado com sucesso"
-ErrAppIsDown: "{{ .name }} status do aplicativo é anormal, por favor, verifique"
+#backup
+ErrBackupInUsed: 'A conta de backup foi usada na tarefa agendada e não pode ser excluída.'
+ErrBackupCheck: 'Falha na conexão de teste da conta de backup {{ .err }}'
+ErrBackupLocalDelete: 'A exclusão da conta de backup do servidor local ainda não é suportada'
+ErrBackupLocalCreate: 'A criação de contas de backup do servidor local ainda não é suportada'
 
-#file
-ErrFileCanNotRead: "Não foi possível ler o arquivo"
-ErrFileToLarge: "O arquivo é muito grande"
-ErrPathNotFound: "Caminho não encontrado"
-ErrMovePathFailed: "O caminho de destino não pode conter o caminho original!"
-ErrLinkPathNotFound: "O caminho de destino não existe!"
-ErrFileIsExist: "O arquivo ou diretório já existe!"
-ErrFileUpload: "Falha ao fazer upload do arquivo {{.name}}  {{.detail}}"
-ErrFileDownloadDir: "Pasta de download não é suportada"
-ErrCmdNotFound: "O comando {{ .name }} não existe, por favor, instale este comando no host primeiro"
-ErrSourcePathNotFound: "O diretório de origem não existe"
-ErrFavoriteExist: "Este caminho já foi adicionado aos favoritos"
-ErrInvalidChar: "Caracteres ilegais são proibidos"
-ErrPathNotDelete: "O diretório selecionado não pode ser excluído"
+#aplicativo
+ErrPortInUsed: 'A porta {{ .detail }} já está ocupada!'
+ErrAppLimit: 'O número de aplicativos instalados excedeu o limite'
+ErrAppRequired: 'Instale primeiro o aplicativo {{ .detail }}'
+ErrNotInstall: 'Aplicativo não instalado'
+ErrPortInOtherApp: 'A porta {{ .port }} já está ocupada pelo aplicativo {{ .apps }}!'
+ErrDbUserNotValid: 'Banco de dados existente, nome de usuário e senha não correspondem!'
+ErrDockerComposeNotValid: 'O formato do arquivo docker-compose está incorreto'
+ErrUpdateBuWebsite: 'O aplicativo foi atualizado com sucesso, mas a modificação do arquivo de configuração do site falhou. Por favor, verifique a configuração! '
+Err1PanelNetworkFailed: 'Falha na criação da rede de contêiner padrão! {{ .detalhe }}'
+ErrFileParse: 'Falha na análise do arquivo docker-compose do aplicativo!'
+ErrInstallDirNotFound: 'O diretório de instalação não existe. Se precisar desinstalar, selecione Forçar desinstalação'
+AppStoreIsUpToDate: 'A loja de aplicativos já é a versão mais recente'
+LocalAppVersionNull: 'O aplicativo {{ .name }} não está sincronizado com a versão! Não é possível adicionar à lista de aplicativos'
+LocalAppVersionErr: '{{ .name }} sincronização da versão {{ .version }} falhou! {{ .err }}'
+ErrFileNotFound: 'arquivo {{ .name }} não existe'
+ErrFileParseApp: 'Falha na análise do arquivo {{ .name }} {{ .err }}'
+ErrAppDirNull: 'A pasta da versão não existe'
+LocalAppErr: 'Falha na sincronização do aplicativo {{ .name }}! {{ .err }}'
+ErrContainerName: 'O nome do contêiner já existe'
+ErrAppSystemRestart: '1A reinicialização do painel causou o encerramento da tarefa'
+ErrCreateHttpClient: 'Falha ao criar solicitação {{ .err }}'
+ErrHttpReqTimeOut: 'Tempo limite da solicitação esgotado {{ .err }}'
+ErrHttpReqFailed: 'Falha na solicitação {{ .err }}'
+ErrNoSuchHost: 'Não foi possível encontrar o servidor solicitado {{ .err }}'
+ErrHttpReqNotFound: 'O recurso solicitado {{ .err }} não pôde ser encontrado'
+ErrImagePullTimeOut: 'Tempo limite de extração de imagem'
+ErrContainerNotFound: '{{ .name }} container não existe'
+ErrContainerMsg: 'O contêiner {{ .name }} está anormal. Por favor, verifique o log na página do contêiner para obter detalhes.'
+ErrAppBackup: '{{ .name }} falha no backup do aplicativo {{ .err }}'
+ErrImagePull: 'Falha na extração de imagem {{ .err }}'
+ErrVersionTooLow: 'A versão atual do 1Panel é muito antiga para atualizar a App Store. Por favor, atualize a versão antes de operar.'
+ErrAppNameExist: 'O nome do aplicativo já existe'
+AppStoreIsSyncing: 'A App Store está sincronizando, tente novamente mais tarde'
+ErrGetCompose: 'Falha ao obter o arquivo docker-compose.yml! {{ .detail }}'
+ErrAppWarn: 'Status anormal, verifique o log'
+ErrAppParamKey: 'O campo de parâmetro {{ .name }} está anormal'
+ErrAppUpgrade: 'Falha na atualização do aplicativo {{ .name }} {{ .err }}'
+AppRecover: 'Reverter aplicativo {{ .name }}'
+PullImageStart: 'Comece a extrair a imagem {{ .name }}'
+PullImageSuccess: 'Imagem retirada com sucesso'
+UpgradeAppStart: 'Iniciar atualização do aplicativo {{ .name }}'
+UpgradeAppSuccess: 'Aplicativo {{ .name }} atualizado com sucesso'
+AppStoreIsLastVersion: 'A App Store já é a versão mais recente'
+AppStoreSyncSuccess: 'Sincronização da App Store bem-sucedida'
+SyncAppDetail: 'Sincronizar configuração do aplicativo'
+AppVersionNotMatch: 'o aplicativo {{ .name }} requer uma versão superior do 1Panel, ignorando a sincronização'
+MoveSiteDir: 'A atualização atual requer a migração do diretório do site OpenResty'
+MoveSiteToDir: 'Migrar diretório do site para {{ .name }}'
+ErrMoveSiteDir: 'Falha ao migrar o diretório do site'
+MoveSiteDirSuccess: 'Migração bem-sucedida do diretório do site'
+DeleteRuntimePHP: 'Excluir tempo de execução do PHP'
+CustomAppStoreNotConfig: 'Defina o endereço do pacote offline na app store'
+CustomAppStoreNotFound: 'Falha ao obter o pacote da app store, verifique se ele existe'
+CustomAppStoreFileValid: 'Os pacotes da App Store precisam estar no formato .tar.gz'
+PullImageTimeout: 'Tempo limite para puxar imagem, tente aumentar a aceleração da imagem ou altere para outra aceleração de imagem'
+ErrAppIsDown: 'O status do aplicativo {{ .name }} é anormal, verifique'
+ErrCustomApps: 'Há um aplicativo instalado, desinstale-o primeiro'
+ErrCustomRuntimes: 'Há um ambiente de execução instalado, exclua-o primeiro'
 
-#website
-ErrDomainIsExist: "O domínio já existe"
-ErrAliasIsExist: "O alias já existe"
-ErrAppDelete: "Outro site usa este aplicativo"
-ErrGroupIsUsed: "O grupo está em uso e não pode ser excluído"
-ErrBackupMatch: "O arquivo de backup não corresponde aos dados parciais atuais do site: {{ .detail }}"
-ErrBackupExist: "O arquivo de backup corresponde a uma parte dos dados originais que não existe: {{ .detail }}"
-ErrPHPResource: "O ambiente local não suporta a troca!"
-ErrPathPermission: "Foi detectada uma pasta com permissões diferentes de 1000:1000 no diretório de índice, o que pode causar um erro de acesso negado ao acessar o site. Clique no botão salvar acima"
-ErrDomainIsUsed: "O domínio já está sendo usado pelo site {{ .name }}"
-ErrDomainFormat: "O formato do domínio {{ .name }} está incorreto"
-ErrDefaultAlias: "default é um nome reservado, por favor, use outro nome"
-ErrImageNotExist: "A imagem do ambiente de execução {{.name}} não existe, por favor, reconfigure o ambiente"
+#arquivo
+ErrFileCanNotRead: 'Este arquivo não suporta visualização'
+ErrFileToLarge: 'O arquivo é maior que 10M e não pode ser aberto'
+ErrPathNotFound: 'O diretório não existe'
+ErrMovePathFailed: 'O caminho de destino não pode conter o caminho original!'
+ErrLinkPathNotFound: 'O caminho de destino não existe!'
+ErrFileIsExist: 'O arquivo ou pasta já existe!'
+ErrFileUpload: '{{ .name }} falhou ao carregar o arquivo {{ .detail }}'
+ErrFileDownloadDir: 'A pasta de download não é suportada'
+ErrCmdNotFound: 'O comando {{ .name}} não existe, instale este comando no host primeiro'
+ErrSourcePathNotFound: 'O diretório de origem não existe'
+ErrFavoriteExist: 'Este caminho já foi favorito'
+ErrInvalidChar: 'Caracteres ilegais não são permitidos'
+ErrPathNotDelete: 'O diretório selecionado não pode ser excluído'
+
+#site
+ErrDomainIsExist: 'Nome de domínio já existe'
+ErrAliasIsExist: 'Alias já existe'
+ErrAppDelete: 'Outros sites usam este aplicativo e não podem excluí-lo'
+ErrBackupMatch: 'O arquivo de backup não corresponde a alguns dados atuais do site {{ .detail }}'
+ErrBackupExist: 'A parte correspondente dos dados de origem no arquivo de backup não existe {{ .detail }}'
+ErrPHPResource: 'O ambiente operacional local não suporta comutação! '
+ErrPathPermission: 'Uma pasta com permissões diferentes de 1000:1000 foi detectada no diretório de índice, o que pode causar um erro de acesso negado no site. Clique no botão Salvar acima'
+ErrDomainIsUsed: 'O nome de domínio já está sendo usado pelo site [{{ .name }}]'
+ErrDomainFormat: 'o formato do nome de domínio {{ .name }} está incorreto'
+ErrDefaultAlias: 'padrão é um código reservado, use outro código'
+ErrParentWebsite: 'Você precisa excluir o subsite {{ .name }} primeiro'
+ErrBuildDirNotFound: 'O diretório de compilação não existe'
+ErrImageNotExist: 'A imagem do ambiente operacional {{ .name }} não existe, edite novamente o ambiente operacional'
 
 #ssl
-ErrSSLCannotDelete: "O certificado {{ .name }} está sendo usado pelo site e não pode ser removido"
-ErrAccountCannotDelete: "O certificado associado à conta não pode ser excluído"
-ErrSSLApply: "O certificado foi assinado com sucesso, mas o recarregamento do OpenResty falhou, por favor, verifique a configuração!"
-ErrEmailIsExist: "O email já existe"
-ErrSSLKeyNotFound: "O arquivo da chave privada não existe"
-ErrSSLCertificateNotFound: "O arquivo do certificado não existe"
-ErrSSLKeyFormat: "Erro na verificação do arquivo da chave privada"
-ErrSSLCertificateFormat: "Erro no formato do arquivo do certificado, por favor, use o formato PEM"
-ErrEabKidOrEabHmacKeyCannotBlank: "EabKid ou EabHmacKey não podem estar vazios"
-ErrOpenrestyNotFound: "O modo HTTP requer a instalação prévia do OpenResty"
-ApplySSLStart: "Iniciando aplicação do certificado, domínio [{{ .domain }}], método de aplicação [{{ .type }}]"
-dnsAccount: "DNS Automático"
-dnsManual: "DNS Manual"
-http: "HTTP"
-ApplySSLFailed: "A aplicação do certificado para [{{ .domain }}] falhou, {{.detail}}"
-ApplySSLSuccess: "Certificado para [{{ .domain }}] aplicado com sucesso!"
-DNSAccountName: "Conta DNS [{{ .name }}], provedor [{{.type}}]"
-PushDirLog: "Certificado enviado para o diretório [{{ .path }}] {{ .status }}"
-ErrDeleteCAWithSSL: "Há um certificado emitido sob a organização atual, não pode ser excluído"
-ErrDeleteWithPanelSSL: "A configuração SSL do painel usa este certificado, não pode ser excluído"
-ErrDefaultCA: "A autoridade certificadora padrão não pode ser excluída"
-ApplyWebSiteSSLLog: "Iniciando atualização do certificado do site {{ .name }}"
-ErrUpdateWebsiteSSL: "Falha ao atualizar o certificado do site {{ .name }}: {{ .err }}"
-ApplyWebSiteSSLSuccess: "Certificado do site atualizado com sucesso"
-ErrExecShell: "Falha na execução do script {{ .err }}"
-ExecShellStart: "Iniciando execução do script"
-ExecShellSuccess: "Script executado com sucesso"
-StartUpdateSystemSSL: "Iniciando atualização do certificado do sistema"
-UpdateSystemSSLSuccess: "Certificado do sistema atualizado com sucesso"
+ErrSSLCannotDelete: 'O certificado {{ .name }} está sendo usado por um site e não pode ser excluído'
+ErrAccountCannotDelete: 'A conta está associada a um certificado e não pode ser excluída'
+ErrSSLApply: 'Renovação do certificado bem-sucedida, falha na recarga do Openresty, verifique a configuração!'
+ErrEmailIsExist: 'A caixa de correio já existe'
+ErrSSLKeyNotFound: 'O arquivo de chave privada não existe'
+ErrSSLCertificateNotFound: 'O arquivo de certificado não existe'
+ErrSSLKeyFormat: 'Falha na verificação do arquivo de chave privada'
+ErrSSLCertificateFormat: 'O formato do arquivo de certificado está incorreto, use o formato pem'
+ErrEabKidOrEabHmacKeyCannotBlank: 'EabKid ou EabHmacKey não podem estar em branco'
+ErrOpenrestyNotFound: 'O modo HTTP requer que o Openresty seja instalado primeiro'
+ApplySSLStart: 'Comece a solicitar um certificado, nome de domínio [{{ .domain }}] método de solicitação [{{ .type }}]'
+dnsAccount: 'DNS Automático'
+dnsManual: 'Manual DNS'
+http: 'HTTP'
+ApplySSLFailed: 'Falha na solicitação de certificado [{{ .domain }}], {{ .detail }} '
+ApplySSLSuccess: 'Solicitação de certificado [{{ .domain }}] realizada com sucesso! ! '
+DNSAccountName: 'Conta DNS [{{ .name }}] fornecedor [{{ .type }}]'
+PushDirLog: 'Certificado enviado para o diretório [{{ .path }}] {{ .status }}'
+ErrDeleteCAWithSSL: 'A organização atual tem um certificado que foi emitido e não pode ser excluído.'
+ErrDeleteWithPanelSSL: 'A configuração SSL do painel usa este certificado e não pode ser excluída'
+ErrDefaultCA: 'A autoridade padrão não pode ser excluída'
+ApplyWebSiteSSLLog: 'Iniciando a renovação do certificado do site {{ .name }}'
+ErrUpdateWebsiteSSL: 'Falha na atualização do certificado do site {{ .name }}: {{ .err }}'
+ApplyWebSiteSSLSuccess: 'Atualizar certificado do site com sucesso'
+ErrExecShell: 'Falha ao executar o script {{ .err }}'
+ExecShellStart: 'Iniciar execução do script'
+ExecShellSuccess: 'Execução do script bem-sucedida'
+StartUpdateSystemSSL: 'Iniciar atualização do certificado do sistema'
+UpdateSystemSSLSuccess: 'Atualizar certificado do sistema com sucesso'
+ErrWildcardDomain: 'Não é possível solicitar certificado de nome de domínio curinga no modo HTTP'
 
 #mysql
-ErrUserIsExist: "O usuário atual já existe. Por favor, insira um novo usuário"
-ErrDatabaseIsExist: "O banco de dados atual já existe. Por favor, insira um novo banco de dados"
-ErrExecTimeOut: "Tempo de execução SQL expirado, por favor, verifique o banco de dados"
-ErrRemoteExist: "O banco de dados remoto já existe com este nome, por favor, modifique e tente novamente"
-ErrLocalExist: "O banco de dados local já existe com este nome, por favor, modifique e tente novamente"
+ErrUserIsExist: 'O usuário atual já existe, digite novamente'
+ErrDatabaseIsExist: 'O banco de dados atual já existe, digite novamente'
+ErrExecTimeOut: 'Tempo limite de execução do SQL expirou, verifique o banco de dados'
+ErrRemoteExist: 'O banco de dados remoto já existe com este nome, modifique-o e tente novamente'
+ErrLocalExist: 'O nome já existe no banco de dados local, modifique-o e tente novamente'
 
 #redis
-ErrTypeOfRedis: "O tipo do arquivo de recuperação não corresponde ao modo de persistência atual. Modifique o tipo do arquivo e tente novamente"
+ErrTypeOfRedis: 'O tipo de arquivo de recuperação não corresponde ao método de persistência atual, modifique-o e tente novamente'
 
-#container
-ErrInUsed: "{{ .detail }} está em uso e não pode ser excluído"
-ErrObjectInUsed: "Este objeto está em uso e não pode ser excluído"
-ErrPortRules: "O número de portas não corresponde. Por favor, insira novamente!"
-ErrPgImagePull: "Tempo limite ao tentar puxar a imagem. Configure a aceleração de imagem ou puxe manualmente a imagem postgres:16.0-alpine e tente novamente"
+#recipiente
+ErrInUsed: '{{ .detail }} está em uso e não pode ser excluído'
+ErrObjectInUsed: 'O objeto está em uso e não pode ser excluído'
+ErrObjectBeDependent: 'Esta imagem depende de outras imagens e não pode ser excluída'
+ErrPortRules: 'O número da porta não corresponde, digite novamente!'
+ErrPgImagePull: 'Tempo limite para extração de imagem. Configure a aceleração de imagem ou extraia manualmente a imagem {{ .name }} e tente novamente'
 
-#runtime
-ErrDirNotFound: "A pasta de build não existe! Por favor, verifique a integridade dos arquivos!"
-ErrFileNotExist: "O arquivo {{ .detail }} não existe! Por favor, verifique a integridade do arquivo de origem!"
-ErrImageBuildErr: "Falha ao construir a imagem"
-ErrImageExist: "A imagem já existe!"
-ErrDelWithWebsite: "O ambiente operacional está associado a um site e não pode ser excluído"
-ErrRuntimeStart: "Falha ao iniciar"
-ErrPackageJsonNotFound: "O arquivo package.json não existe"
-ErrScriptsNotFound: "Nenhum item de configuração de scripts foi encontrado no package.json"
-ErrContainerNameNotFound: "Não foi possível obter o nome do contêiner. Por favor, verifique o arquivo .env"
-ErrNodeModulesNotFound: "A pasta node_modules não existe! Edite o ambiente de execução ou aguarde até que o ambiente seja iniciado com sucesso"
+#tempo de execução
+ErrDirNotFound: 'A pasta de compilação não existe! Verifique a integridade do arquivo!'
+ErrFileNotExist: 'O arquivo {{ .detail }} não existe! Verifique a integridade do arquivo de origem!'
+ErrImageBuildErr: 'Falha na criação da imagem'
+ErrImageExist: 'A imagem já existe!'
+ErrDelWithWebsite: 'O ambiente operacional já está associado a um site e não pode ser excluído'
+ErrRuntimeStart: 'Falha na inicialização'
+ErrPackageJsonNotFound: 'o arquivo package.json não existe'
+ErrScriptsNotFound: 'O item de configuração de scripts não foi encontrado em package.json'
+ErrContainerNameNotFound: 'Não foi possível obter o nome do contêiner, verifique o arquivo .env'
+ErrNodeModulesNotFound: 'A pasta node_modules não existe! Edite o ambiente de execução ou aguarde até que o ambiente de execução inicie com sucesso'
+ErrContainerNameIsNull: 'O nome do contêiner não existe'
 
-#setting
-ErrBackupInUsed: "A conta de backup já está sendo usada em um cronjob e não pode ser excluída"
-ErrBackupCheck: "Falha ao testar a conexão com a conta de backup {{ .err }}"
-ErrOSSConn: "Não foi possível recuperar a versão mais recente. Por favor, verifique se o servidor pode se conectar à rede externa."
-ErrEntrance: "Erro nas informações da entrada de segurança. Por favor, verifique e tente novamente!"
-
-#tool
-ErrConfigNotFound: "O arquivo de configuração não existe"
-ErrConfigParse: "Erro no formato do arquivo de configuração"
-ErrConfigIsNull: "O arquivo de configuração não pode estar vazio"
-ErrConfigDirNotFound: "O diretório de execução não existe"
-ErrConfigAlreadyExist: "Um arquivo de configuração com o mesmo nome já existe"
-ErrUserFindErr: "Falha ao encontrar o usuário {{ .name }} {{ .err }}"
+#ferramenta
+ErrConfigNotFound: 'O arquivo de configuração não existe'
+ErrConfigParse: 'O formato do arquivo de configuração está incorreto'
+ErrConfigIsNull: 'O arquivo de configuração não pode estar vazio'
+ErrConfigDirNotFound: 'O diretório de execução não existe'
+ErrConfigAlreadyExist: 'Um arquivo de configuração com o mesmo nome já existe'
+ErrUserFindErr: 'Falha na pesquisa do usuário {{ .name }} {{ .err }}'
 
 #ssh
-ErrFirewallNone: "Nenhum serviço firewalld ou ufw foi detectado no sistema. Por favor, verifique e tente novamente!"
-ErrFirewallBoth: "Os serviços firewalld e ufw foram detectados no sistema. Para evitar conflitos, desinstale um deles e tente novamente!"
+ErrFirewallNone: 'Nenhum firewall de sistema ou serviço ufw detectado, verifique e tente novamente!'
+ErrFirewallBoth: 'Foi detectado que o sistema possui serviços firewalld e ufw. Para evitar conflitos, desinstale e tente novamente!'
 
 #cronjob
-ErrBashExecute: "Erro na execução do script. Por favor, verifique as informações específicas na área de saída da tarefa."
-ErrCutWebsiteLog: "Falha ao cortar os logs do site {{ .name }}, erro {{ .err }}"
-CutWebsiteLogSuccess: "Logs do site {{ .name }} cortados com sucesso, caminho do backup {{ .path }}"
+ErrCutWebsiteLog: '{{ .name }} falha ao cortar o log do site, erro {{ .err }}'
+CutWebsiteLogSuccess: '{{ .name }} registro do site cortado com sucesso, caminho de backup {{ .path }}'
+HandleShell: 'Executar script {{ .name }}'
+HandleNtpSync: 'Sincronização de hora do sistema'
+HandleSystemClean: 'Limpeza de cache do sistema'
 
-#toolbox
-ErrNotExistUser: "O usuário atual não existe. Por favor, modifique e tente novamente!"
-ErrBanAction: "Falha na configuração. O serviço {{ .name }} atual está indisponível, por favor, verifique e tente novamente!"
-ErrClamdscanNotFound: "O comando clamdscan não foi detectado. Por favor, consulte a documentação para instalá-lo!"
+#caixa de ferramentas
+ErrNotExistUser: 'O usuário atual não existe, modifique e tente novamente!'
+ErrBanAction: 'Falha na configuração. O serviço atual {{ .name }} não está disponível. Verifique e tente novamente!'
+ErrClamdscanNotFound: 'O comando clamdscan não foi detectado, consulte a documentação para instalá-lo!'
 
 #waf
-ErrScope: "Modificação desta configuração não é suportada"
-ErrStateChange: "Falha ao alterar o status"
-ErrRuleExist: "Regra já existe"
-ErrRuleNotExist: "Regra não existe"
-ErrParseIP: "Formato de IP incorreto"
-ErrDefaultIP: "default é um nome reservado, por favor, use outro nome"
-ErrGroupInUse: "Grupo de IP está em uso pela lista negra/branca, não pode ser excluído"
-ErrGroupExist: "Nome do grupo de IP já existe"
-ErrIPRange: "Intervalo de IP incorreto"
-ErrIPExist: "IP já existe"
-urlDefense: "Regras de URL"
-urlHelper: "URLs Proibidas"
-dirFilter: "Filtro de Diretório"
-xss: "XSS"
-phpExec: "Execução de Script PHP"
-oneWordTrojan: "Trojan de Uma Palavra"
-appFilter: "Filtro de Diretório Perigoso de Aplicação"
-webshell: "Webshell"
-args: "Regras de Parâmetro"
-protocolFilter: "Filtro de Protocolo"
-javaFileter: "Filtro de Arquivo Perigoso Java"
-scannerFilter: "Filtro de Scanner"
-escapeFilter: "Filtro de Escape"
-customRule: "Regras Personalizadas"
-httpMethod: "Filtro de Método HTTP"
-fileExt: "Restrição de Upload de Arquivo"
-defaultIpBlack: "Grupo de IP Malicioso"
-cookie: "Regras de Cookie"
-urlBlack: "Lista Negra de URL"
-uaBlack: "Lista Negra de User-Agent"
-attackCount: "Limite de Frequência de Ataque"
-fileExtCheck: "Restrição de Upload de Arquivo"
-geoRestrict: "Restrição de Acesso Regional"
-unknownWebsite: "Acesso a Domínio Não Autorizado"
-notFoundCount: "Limite de Frequência de 404"
-headerDefense: "Regras de Cabeçalho"
-defaultUaBlack: "Regras de User-Agent"
-methodWhite: "Regras HTTP"
-captcha: "Verificação Humano-Máquina"
-fiveSeconds: "Verificação de 5 Segundos"
-vulnCheck: "Regras Complementares"
-acl: "Regras Personalizadas"
-sql: "Injeção de SQL"
-cc: "Limite de Frequência de Acesso"
-defaultUrlBlack: "Regras de URL"
-sqlInject: "Injeção de SQL"
-ErrDBNotExist: "Banco de Dados Não Existe"
-allow: "Permitir"
-deny: "Negar"
+ErrScope: 'A modificação desta configuração não é suportada'
+ErrStateChange: 'Falha na alteração de estado'
+ErrRuleExist: 'A regra já existe'
+ErrRuleNotExist: 'A regra não existe'
+ErrParseIP: 'Formato de IP errado'
+ErrDefaultIP: 'padrão é um nome reservado, altere-o para outro nome'
+ErrGroupInUse: 'O grupo de IP é usado pela lista negra/lista branca e não pode ser excluído'
+ErrGroupExist: 'O nome do grupo IP já existe'
+ErrIPRange: 'Intervalo de IP errado'
+ErrIPExist: 'IP já existe'
+urlDefense: 'regras de URL'
+urlHelper: 'URL proibido'
+dirFilter: 'Filtro de diretório'
+xss: 'XSS'
+phpExec: 'Execução de script PHP'
+oneWordTrojan: 'Cavalo de Tróia de Uma Palavra'
+appFilter: 'Aplicar filtragem de diretório perigosa'
+webshell: 'Webshell'
+args: 'Regras de parâmetros'
+protocolFilter: 'Filtragem de protocolo'
+javaFileter: 'Filtro de arquivo perigoso Java'
+scannerFilter: 'Filtro do scanner'
+escapeFilter: 'filtro de escape'
+customRule: 'Regra personalizada'
+httpMethod: 'Filtragem de método HTTP'
+fileExt: 'Restrições de upload de arquivo'
+defaultIpBlack: 'Grupo de IP malicioso'
+cookie: 'Regras de cookies'
+urlBlack: 'lista negra de URLs'
+uaBlack: 'Lista negra de agentes do usuário'
+attackCount: 'Limite de frequência de ataque'
+fileExtCheck: 'Restrições de upload de arquivo'
+geoRestrict: 'Restrições de acesso regionais'
+unknownWebsite: 'Acesso não autorizado ao nome de domínio'
+notFoundCount: 'Limite de taxa 404'
+headerDefense: 'Regras de cabeçalho'
+defaultUaBlack: 'Regras do agente do usuário'
+methodWhite: 'regras HTTP'
+captcha: 'verificação homem-máquina'
+fiveSeconds: 'verificação de 5 segundos'
+vulnCheck: 'Regras suplementares'
+acl: 'Regras personalizadas'
+sql: 'injeção de SQL'
+cc: 'Limite de frequência de acesso'
+defaultUrlBlack: 'regras de URL'
+sqlInject: 'injeção de SQL'
+ErrDBNotExist: 'O banco de dados não existe'
+allow: 'permitir'
+deny: 'negar'
+OpenrestyNotFound: 'Openresty não está instalado'
 
-#license
-ErrLicense: "Erro no formato da licença, por favor, verifique e tente novamente!"
-ErrLicenseCheck: "Falha na verificação da licença, por favor, verifique e tente novamente!"
-ErrLicenseSave: "Falha ao salvar as informações da licença, erro {{ .err }}, por favor, tente novamente!"
-ErrLicenseSync: "Falha ao sincronizar as informações da licença, nenhuma informação de licença detectada no banco de dados!"
-ErrXpackNotFound: "Esta seção é um recurso da edição profissional. Por favor, importe a licença primeiro na interface Configurações do Painel - Licença."
-ErrXpackNotActive: "Esta seção é um recurso da edição profissional. Por favor, sincronize o status da licença primeiro na interface Configurações do Painel - Licença."
-ErrXpackOutOfDate: "A licença atual expirou, por favor, reimporte a licença na interface Configurações do Painel - Licença."
-ErrXpackLost: "A licença atingiu o número máximo de tentativas de reexecução. Por favor, acesse as páginas [Configurações] [Licença] e clique manualmente no botão de sincronização para garantir que os recursos da versão profissional funcionem corretamente."
-ErrXpackTimeout: "Tempo limite de solicitação, a conexão de rede pode estar instável, por favor, tente novamente mais tarde!"
+#tarefa
+TaskStart: '{{ .name }} A tarefa inicia [START]'
+TaskEnd: '{{ .name }} Tarefa concluída [CONCLUÍDA]'
+TaskFailed: '{{ .name }} tarefa falhou'
+TaskTimeout: '{{ .name }} expirou'
+TaskSuccess: '{{ .name }} Tarefa bem-sucedida'
+TaskRetry: 'Iniciar {{ .name }}ª nova tentativa'
+SubTaskSuccess: '{{ .name }} bem-sucedido'
+SubTaskFailed: '{{ .name }} falhou: {{ .err }}'
+TaskInstall: 'Instalar'
+TaskUninstall: 'Desinstalar'
+TaskCreate: 'Criar'
+TaskDelete: 'Excluir'
+TaskUpgrade: 'Atualizar'
+TaskUpdate: 'Atualizar'
+TaskRestart: 'Reiniciar'
+Backup de Tarefa: 'Backup'
+TaskRecover: 'Recuperar'
+TaskRollback: 'Reverter'
+TaskPull: 'Puxar'
+TaskBuild: 'Construir'
+TaskPush: 'Empurrar'
+TaskHandle: 'Executar'
+Website: 'Site'
+App: 'Aplicativo'
+Runtime: 'Ambiente de tempo de execução'
+Database: 'Banco de dados'
+ConfigFTP: 'Criar usuário FTP {{ .name }}'
+ConfigOpenresty: 'Criar arquivo de configuração Openresty'
+InstallAppSuccess: 'Aplicativo {{ .name }} instalado com sucesso'
+ConfigRuntime: 'Configurar o ambiente de tempo de execução'
+ConfigApp: 'Aplicativo de configuração'
+SuccessStatus: '{{ .name }} bem-sucedido'
+FailedStatus: '{{ .name }} falhou {{ .err }}'
+HandleLink: 'Manipular associação de aplicativos'
+HandleDatabaseApp: 'Manipulando parâmetros do aplicativo'
+ExecShell: 'Executar script {{ .name }}'
+PullImage: 'Puxar imagem'
+Start: 'Iniciar'
+Run: 'Iniciar'
+Stop: 'Pare'
+Image: 'Espelho'
+Compose: 'Orquestração'
+Container: 'Recipiente'
+AppLink: 'Aplicativo vinculado'
+EnableSSL: 'Habilitar HTTPS'
+AppStore: 'Loja de aplicativos'
+TaskSync: 'Sincronizar'
+LocalApp: 'Aplicativo local'
+SubTask: 'Subtarefa'
+RuntimeExtension: 'Extensão do ambiente de tempo de execução'
+TaskIsExecuting: 'A tarefa está em execução'
+CustomAppstore: 'Armazém de aplicativos personalizados'
 
-#license
-ErrAlert: "Erro no formato das informações do alerta, por favor, verifique e tente novamente!"
-ErrAlertPush: "Erro no envio do alerta, por favor, verifique e tente novamente!"
-ErrAlertSave: "Erro ao salvar o alerta, por favor, verifique e tente novamente!"
-ErrAlertSync: "Erro na sincronização do alerta, por favor, verifique e tente novamente!"
-ErrAlertRemote: "Erro de alerta remoto, por favor, verifique e tente novamente!"
+# tarefa - ai
+OllamaModelPull: 'Puxar modelo Ollama {{ .name }}'
+OllamaModelSize: 'Obtenha o tamanho do modelo Ollama {{ .name }}'
 
-#cmd
-AppVersion: "Versão do aplicativo"
-AppCommands: "Comandos relacionados ao aplicativo"
-AppInit: "Inicializar aplicativo"
-AppKeyVal: "Chave do aplicativo (somente suporta inglês)"
-AppCreateFileErr: "Falha ao criar o arquivo {{ .name }} {{ .err }}"
-AppCreateDirErr: "Falha ao criar a pasta {{ .name }} {{ .err }}"
-AppMissKey: "Chave do aplicativo ausente, use -k para especificar"
-AppMissVersion: "Versão do aplicativo ausente, use -v para especificar"
-AppVersionExist: "A versão já existe!"
-AppCreateSuccessful: "Criação bem-sucedida!"
-AppWriteErr: "Falha ao escrever no arquivo {{ .name }} {{ .err }}"
-SudoHelper: "Por favor, use {{ .cmd }} ou altere para o usuário root"
-ListenIPCommands: "Trocar IP de escuta"
-ListenIPv4: "Escutando em IPv4"
-ListenIPv6: "Escutando em IPv6"
-ListenChangeSuccessful: "Troca bem-sucedida! Agora escutando em {{ .value }}"
-ResetCommands: "Redefinir informações do sistema"
-ResetMFA: "Cancelar autenticação de dois fatores do 1Panel"
-ResetHttps: "Cancelar login https do 1Panel"
-ResetEntrance: "Cancelar entrada segura do 1Panel"
-ResetIPs: "Cancelar restrições de IP autorizado do 1Panel"
-ResetDomain: "Cancelar vinculação de domínio do 1Panel"
-RestoreCommands: "Restaurar serviço e dados do 1Panel"
-RestoreNoSuchFile: "Nenhum arquivo disponível para restauração"
-RestoreStep1: "(1/5) Iniciando a restauração do serviço e dados do 1Panel a partir do diretório {{ .name }}..."
-RestoreStep2: "(2/5) Restauração do binário do 1Panel bem-sucedida"
-RestoreStep3: "(3/5) Restauração dos scripts do 1Panel bem-sucedida"
-RestoreStep4: "(4/5) Restauração do serviço do 1Panel bem-sucedida"
-RestoreStep5: "(5/5) Restauração dos dados do 1Panel bem-sucedida"
-RestoreSuccessful: "Restauração bem-sucedida! Reiniciando o serviço, por favor, aguarde..."
-UpdateCommands: "Atualizar informações do painel"
-UpdateUser: "Atualizar usuário do painel"
-UpdatePassword: "Atualizar senha do painel"
-UpdatePort: "Atualizar porta do painel"
-UpdateUserNull: "Erro: usuário do painel está vazio!"
-UpdateUserBlank: "Erro: o usuário do painel contém espaços!"
-UpdateUserFormat: "Erro: Formato de usuário do painel inválido! Apenas suporta inglês, chinês, números e _, comprimento de 3-30."
-UpdateUserErr: "Erro: Falha ao atualizar o usuário do painel, {{ .err }}"
-UpdateSuccessful: "Atualização bem-sucedida!"
-UpdateUserResult: "Usuário do painel: {{ .name }}"
-UpdatePasswordRead: "Erro: Falha ao ler as informações da senha do painel, {{ .err }}"
-UpdatePasswordNull: "Erro: A senha do painel está vazia!"
-UpdateUPasswordBlank: "Erro: A senha do painel contém espaços!"
-UpdatePasswordFormat: "Erro: A senha do painel suporta apenas letras, números, caracteres especiais !@#$%*_,.?, comprimento de 8-30!"
-UpdatePasswordLen: "Erro: Por favor, insira uma senha com mais de 6 caracteres!"
-UpdatePasswordRe: "Confirmar senha:"
-UpdatePasswordErr: "Erro: Falha ao atualizar a senha do painel, {{ .err }}"
-UpdatePasswordSame: "Erro: As duas senhas não correspondem, por favor, verifique e tente novamente!"
-UpdatePasswordResult: "Senha do painel: {{ .name }}"
-UpdatePortFormat: "Erro: O número da porta deve estar entre 1 e 65535!"
-UpdatePortUsed: "Erro: O número da porta já está em uso, por favor, verifique e tente novamente!"
-UpdatePortErr: "Erro: Falha ao atualizar a porta do painel, {{ .err }}"
-UpdatePortResult: "Porta do painel: {{ .name }}"
-UpdatePortFirewallAdd: "Falha ao adicionar regra de porta ao firewall, {{ .err }}, por favor, adicione manualmente a porta {{ .name }} às regras do firewall."
-UpdatePortFirewallDel: "Erro: Falha ao excluir a porta do firewall, {{ .err }}"
-UpdatePortFirewallReload: "Falha ao recarregar o firewall, {{ .err }}, por favor, recarregue o firewall manualmente."
-UserInfo: "Obter informações do painel"
-UserInfoAddr: "Endereço do painel: "
-UserInfoPassHelp: "Dica: Para alterar a senha, você pode executar o comando: "
-DBConnErr: "Erro: Falha ao inicializar a conexão com o banco de dados, {{ .err }}"
-SystemVersion: "versão: "
-SystemMode: "modo: "
+# tarefa-instantânea
+Snapshot: 'Instantâneo'
+SnapDBInfo: 'Escrever informações do banco de dados 1Panel'
+SnapCopy: 'Copiar arquivos e diretórios {{ .name }}'
+SnapNewDB: 'Inicializar conexão com o banco de dados {{ .name }}'
+SnapDeleteOperationLog: 'Excluir log de operação'
+SnapDeleteLoginLog: 'Excluir log de acesso'
+SnapDeleteMonitor: 'Excluir dados de monitoramento'
+SnapRemoveSystemIP: 'Remover IP do sistema'
+SnapBaseInfo: 'Escreva informações básicas do 1Panel'
+SnapInstallApp: 'Fazer backup dos aplicativos instalados do 1Panel'
+SnapDockerSave: 'Compactar aplicativos instalados'
+SnapLocalBackup: 'Backup do diretório de backup local do 1Panel'
+SnapCompressBackup: 'Compactar diretório de backup local'
+SnapPanelData: 'Backup do diretório de dados do 1Panel'
+SnapCompressPanel: 'Diretório de dados compactados'
+SnapWebsite: 'Backup do diretório do site 1Panel'
+SnapCloseDBConn: 'Fechar a conexão com o banco de dados'
+SnapCompress: 'Criar arquivos de instantâneos'
+SnapCompressFile: 'Compactar arquivo de instantâneo'
+SnapCheckCompress: 'Verificar arquivo de compactação de instantâneo'
+SnapCompressSize: 'Tamanho do arquivo de instantâneo {{ .name }}'
+SnapUpload: 'Carregar arquivo de instantâneo'
+SnapLoadBackup: 'Obter informações da conta de backup'
+SnapUploadTo: 'Carregar arquivo de instantâneo para {{ .name }}'
+SnapUploadRes: 'Carregar arquivo de instantâneo para {{ .name }}'
+
+SnapshotRecover: 'Restauração de instantâneo'
+RecoverDownload: 'Baixar arquivo de instantâneo'
+Download: 'Baixar'
+RecoverDownloadAccount: 'Obter conta de backup de download de instantâneo {{ .name }}'
+RecoverDecompress: 'Descompacte arquivos compactados de instantâneos'
+Decompress: 'Descompressão'
+BackupBeforeRecover: 'Fazer backup de dados relacionados ao sistema antes do snapshot'
+Readjson: 'Ler o arquivo Json no snapshot'
+ReadjsonPath: 'Obtenha o caminho do arquivo Json no snapshot'
+ReadjsonContent: 'Ler arquivo Json'
+ReadjsonMarshal: 'Processamento de escape JSON'
+RecoverApp: 'Restaurar aplicativos instalados'
+RecoverWebsite: 'Recuperar diretório de sites'
+RecoverAppImage: 'Restaurar backup de imagem instantânea'
+RecoverCompose: 'Restaurar outro conteúdo do compositor'
+RecoverComposeList: 'Obter todos os compositores para serem restaurados'
+RecoverComposeItem: 'Recuperar composição {{ .name }}'
+RecoverAppEmpty: 'Nenhum backup de imagem de aplicativo foi encontrado no arquivo de instantâneo'
+RecoverBaseData: 'Recuperar dados e arquivos básicos'
+RecoverDaemonJsonEmpty: 'O arquivo de instantâneo e a máquina atual não têm o arquivo daemon.json de configuração do contêiner'
+RecoverDaemonJson: 'Restaurar arquivo daemon.json de configuração do contêiner'
+RecoverDBData: 'Recuperar dados do banco de dados'
+RecoverBackups: 'Restaurar diretório de backup local'
+RecoverPanelData: 'Diretório de dados de recuperação'
+
+# tarefa - contêiner
+ContainerNewCliet: 'Inicializar cliente Docker'
+ContainerImagePull: 'Puxar imagem do contêiner {{ .name }}'
+ContainerRemoveOld: 'Remover o contêiner original {{ .name }}'
+ContainerImageCheck: 'Verifique se a imagem é extraída normalmente'
+ContainerLoadInfo: 'Obter informações básicas do contêiner'
+ContainerRecreate: 'A atualização do contêiner falhou, agora iniciando a restauração do contêiner original'
+ContainerCreate: 'Criar um novo contêiner {{ .name }}'
+ContainerCreateFailed: 'Falha na criação do contêiner, exclua o contêiner com falha'
+ContainerStartCheck: 'Verifique se o contêiner foi iniciado'
+
+# tarefa - imagem
+ImageBuild: 'Construção de imagem'
+ImageBuildStdoutCheck: 'Analisar conteúdo de saída da imagem'
+ImaegBuildRes: 'Saída da criação da imagem: {{ .name }}'
+ImagePull: 'Puxar imagem'
+ImageRepoAuthFromDB: 'Obter informações de autenticação do repositório do banco de dados'
+ImaegPullRes: 'Saída de extração de imagem: {{ .name }}'
+ImagePush: 'Enviar imagem'
+ImageRenameTag: 'Modificar tag de imagem'
+ImageNewTag: 'Nova tag de imagem {{ .name }}'
+ImaegPushRes: 'Saída de envio de imagem: {{ .name }}'
+ComposeCreate: 'Criar uma composição'
+ComposeCreateRes: 'Compose cria saída: {{ .name }}'
+
+# tarefa - site
+BackupNginxConfig: 'Fazer backup do arquivo de configuração do OpenResty do site'
+CompressFileSuccess: 'Diretório compactado com sucesso, compactado para {{ .name }}'
+CompressDir: 'Diretório de compressão'
+DeCompressFile: 'Descompacte o arquivo {{ .name }}'
+ErrCheckValid: 'Falha na verificação do arquivo de backup, {{ .name }}'
+Rollback: 'Reversão'
+websiteDir: 'Diretório de sites'
+RecoverFailedStartRollBack: 'Falha na recuperação, iniciar reversão'
+AppBackupFileIncomplete: 'O arquivo de backup está incompleto e não contém os arquivos app.json ou app.tar.gz'
+AppAttributesNotMatch: 'O tipo ou nome do aplicativo não corresponde'
+
+#alerta
+ErrAlert: 'O formato da mensagem de aviso está incorreto, verifique e tente novamente!'
+ErrAlertPush: 'Erro ao enviar informações de alerta, verifique e tente novamente!'
+ErrAlertSave: 'Erro ao salvar as informações do alarme. Verifique e tente novamente!'
+ErrAlertSync: 'Erro de sincronização de informações de alarme, verifique e tente novamente!'
+ErrAlertRemote: 'Erro remoto na mensagem de alarme, verifique e tente novamente!'

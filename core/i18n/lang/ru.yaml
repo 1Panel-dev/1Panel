@@ -79,7 +79,7 @@ SubTaskFailed: "{{ .name }} не удалось: {{ .err }}"
 TaskInstall: "Установить"
 TaskUpgrade: "Обновить"
 SuccessStatus: "{{ .name }} успешно"
-FailedStatus: "{{ .name }} не удалось {{.err}}"
+FailedStatus: "{{ .name }} не удалось {{ .err }}"
 Start: "Начать"
 SubTask: "Подзадача"
 

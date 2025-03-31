@@ -79,7 +79,7 @@ SubTaskFailed: "{{ .name }} 失敗: {{ .err }}"
 TaskInstall: "安裝"
 TaskUpgrade: "升級"
 SuccessStatus: "{{ .name }} 成功"
-FailedStatus: "{{ .name }} 失敗 {{.err}}"
+FailedStatus: "{{ .name }} 失敗 {{ .err }}"
 Start: "開始"
 SubTask: "子任務"
 

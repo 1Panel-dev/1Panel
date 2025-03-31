@@ -79,7 +79,7 @@ SubTaskFailed: "{{ .name }} gagal: {{ .err }}"
 TaskInstall: "Pasang"
 TaskUpgrade: "Kemas kini"
 SuccessStatus: "{{ .name }} berjaya"
-FailedStatus: "{{ .name }} gagal {{.err}}"
+FailedStatus: "{{ .name }} gagal {{ .err }}"
 Start: "Mula"
 SubTask: "Tugas Sub"
 

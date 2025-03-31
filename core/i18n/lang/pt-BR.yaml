@@ -79,7 +79,7 @@ SubTaskFailed: "{{ .name }} falhou: {{ .err }}"
 TaskInstall: "Instalar"
 TaskUpgrade: "Atualizar"
 SuccessStatus: "{{ .name }} bem-sucedido"
-FailedStatus: "{{ .name }} falhou {{.err}}"
+FailedStatus: "{{ .name }} falhou {{ .err }}"
 Start: "Iniciar"
 SubTask: "Subtarefa"
 

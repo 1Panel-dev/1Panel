@@ -79,7 +79,7 @@ SubTaskFailed: "{{ .name }} failed: {{ .err }}"
 TaskInstall: "Install"
 TaskUpgrade: "Upgrade"
 SuccessStatus: "{{ .name }} succeeded"
-FailedStatus: "{{ .name }} failed {{.err}}"
+FailedStatus: "{{ .name }} failed {{ .err }}"
 Start: "Start"
 SubTask: "Subtask"
 

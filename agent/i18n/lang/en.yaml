@@ -1,379 +1,422 @@
-ErrInvalidParams: "Request parameter error: {{ .detail }}"
-ErrInternalServer: "Service internal error: {{ .detail }}"
-ErrRecordExist: "Record already exists"
-ErrRecordNotFound: "Records not found"
-ErrStructTransform: "Type conversion failure: {{ .detail }}"
-ErrNotSupportType: "The system does not support the current type: {{ .detail }}"
+ErrInvalidParams: 'Request parameter error: {{ .detail }}'
+ErrTokenParse: 'Token generation error: {{ .detail }}'
+ErrInitialPassword: 'Original password is incorrect'
+ErrInternalServer: 'Internal server error: {{ .detail }}'
+ErrRecordExist: 'Record already exists'
+ErrRecordNotFound: 'Record not found'
+ErrStructTransform: 'Type conversion failed: {{ .err }}'
+ErrNotLogin: 'User not logged in: {{ .detail }}'
+ErrPasswordExpired: 'The current password has expired: {{ .detail }}'
+ErrNotSupportType: 'The system does not support the current type: {{ .name }}'
+ErrProxy: 'Request error, please check the node status: {{ .detail }}'
+ErrApiConfigStatusInvalid: 'Access to the API interface is prohibited: {{ .detail }}'
+ErrApiConfigKeyInvalid: 'API interface key error: {{ .detail }}'
+ErrApiConfigIPInvalid: 'The IP used to call the API interface is not in the whitelist: {{ .detail }}'
+ErrApiConfigDisable: 'This interface prohibits the use of API interface calls: {{ .detail }}'
+ErrApiConfigKeyTimeInvalid: 'API interface timestamp error: {{ .detail }}'
 
 #common
-ErrUsernameIsExist: "Username already exists"
-ErrNameIsExist: "Name is already exist"
-ErrDemoEnvironment: "Demo server, prohibit this operation!"
-ErrCmdTimeout: "Command execution timed out！"
-ErrCmdIllegal: "The command contains illegal characters. Please modify and try again!"
-ErrPortExist: "{{ .port }} port is already occupied by {{ .type }} [{{ .name }}]"
-TYPE_APP: "Application"
-TYPE_RUNTIME: "Runtime environment"
-TYPE_DOMAIN: "Domain name"
-ErrTypePort: "Port {{ .name }} format error"
-Success: "Success"
-Failed: "Failed"
-SystemRestart: "System restart causes task interruption"
-ErrGroupIsDefault: "Default group, cannot be deleted"
-ErrGroupIsInWebsiteUse: "Group is being used by other websites, cannot be deleted"
+ErrUsernameIsExist: 'Username already exists'
+ErrNameIsExist: 'Name already exists'
+ErrDemoEnvironment: 'Demo server, this operation is forbidden!'
+ErrCmdTimeout: 'Command execution timed out!'
+ErrCmdIllegal: 'There are illegal characters in the execution command, please modify it and try again!'
+ErrPortExist: '{{ .port }} port is already occupied by {{ .type }} [{{ .name }}]'
+TYPE_APP: 'Application'
+TYPE_RUNTIME: 'Runtime environment'
+TYPE_DOMAIN: 'Domain Name'
+ErrTypePort: 'Port {{ .name }} format is incorrect'
+ErrTypePortRange: 'The port range needs to be between 1-65535'
+Success: 'Success'
+Failed: 'Failed'
+SystemRestart: 'Task interrupted due to system restart'
+ErrGroupIsDefault: 'Default group, cannot be deleted'
+ErrGroupIsInWebsiteUse: 'The group is being used by another website and cannot be deleted.'
 
 #backup
-ErrBackupLocalDelete: "Deleting local server backup accounts is not currently supported."
-ErrBackupLocalCreate: "Creating local server backup accounts is not currently supported."
+ErrBackupInUsed: 'The backup account has been used in the scheduled task and cannot be deleted.'
+ErrBackupCheck: 'Backup account test connection failed {{ .err }}'
+ErrBackupLocalDelete: 'Deleting the local server backup account is not supported yet'
+ErrBackupLocalCreate: 'Creating local server backup accounts is not supported yet'
 
 #app
-ErrPortInUsed: "{{ .detail }} port already in use"
-ErrAppLimit: "App exceeds install limit"
-ErrAppRequired: "{{ .detail }} app is required"
-ErrNotInstall: "App not installed"
-ErrPortInOtherApp: "{{ .port }} port  already in use by app  {{ .apps }}"
-ErrDbUserNotValid: "Stock database, username and password do not match！"
-ErrDockerComposeNotValid: "docker-compose file format error!"
-ErrUpdateBuWebsite: "The application was updated successfully, but the modification of the website configuration file failed, please check the configuration!"
-Err1PanelNetworkFailed: "Default container network creation failed! {{ .detail }}"
-ErrFileParse: "Application docker-compose file parsing failed!"
-ErrInstallDirNotFound: "The installation directory does not exist. To uninstall it, please choose to force uninstall."
-AppStoreIsUpToDate: "The app store is already up to date！"
-LocalAppVersionNull: "The {{.name}} app is not synced to version! Could not add to application list"
-LocalAppVersionErr: "{{.name}} failed to sync version {{.version}}! {{.err}}"
-ErrFileNotFound: "{{.name}} file does not exist"
-ErrFileParseApp: "Failed to parse {{.name}} file {{.err}}"
-ErrAppDirNull: "version folder does not exist"
-LocalAppErr: "App {{.name}} sync failed! {{.err}}"
-ErrContainerName: "ContainerName is already exist"
-ErrAppSystemRestart: "1Panel restart causes the task to terminate"
-ErrCreateHttpClient: "Failed to create HTTP request {{.err}}"
-ErrHttpReqTimeOut: "Request timed out {{.err}}"
-ErrHttpReqFailed: "Request failed {{.err}}"
-ErrHttpReqNotFound: "The file does not exist"
-ErrNoSuchHost: "Network connection failed"
-ErrImagePullTimeOut: "Image pull timeout"
-ErrContainerNotFound: "{{ .name }} container does not exist"
-ErrContainerMsg: "{{ .name }} container is abnormal, please check the log on the container page for details"
-ErrAppBackup: "{{ .name }} application backup failed err {{.err}}"
-ErrImagePull: "{{ .name }} image pull failed err {{.err}}"
-ErrVersionTooLow: "The current 1Panel version is too low to update the app store, please upgrade the version"
-ErrAppNameExist: "App name is already exist"
-AppStoreIsSyncing: "The App Store is syncing, please try again later"
-ErrGetCompose: "Failed to obtain docker-compose.yml file! {{ .detail }}"
-ErrAppWarn: "Abnormal status, please check the log"
-ErrAppParamKey: "Parameter {{ .name }} field exception"
-ErrAppUpgrade: "Failed to upgrade application {{ .name }} {{ .err }}"
-AppRecover: "App {{ .name }} rolled back "
-PullImageStart: "Start pulling image {{ .name }}"
-PullImageSuccess: "Image pulled successfully"
-UpgradeAppStart: "Start upgrading application {{ .name }}"
-UpgradeAppSuccess: "App {{ .name }} upgraded successfully"
-AppStoreIsLastVersion: "The app store is up to date"
-AppStoreSyncSuccess: "App store synchronized successfully"
-SyncAppDetail: "Synchronize app configuration"
-AppVersionNotMatch: "{{ .name }} app requires an update to 1Panel, skipping synchronization"
-MoveSiteDir: "The current upgrade requires migrating the OpenResty website directory"
-MoveSiteToDir: "Migrate the website directory to {{ .name }}"
-ErrMoveSiteDir: "Failed to migrate the website directory"
-MoveSiteDirSuccess: "Successfully migrated the website directory"
-DeleteRuntimePHP: "Delete PHP runtime environment",
-CustomAppStoreNotConfig: "Please configure the offline package address in the app store settings",
-CustomAppStoreNotFound: "Failed to retrieve app store package, please check if it exists",
-CustomAppStoreFileValid: "App store package must be in .tar.gz format"
-PullImageTimeout: "Image pull timeout, please check the network and try again"
-ErrAppIsDown: "{{ .name }} application status is abnormal, please check"
+ErrPortInUsed: '{{ .detail }} port is already occupied!'
+ErrAppLimit: 'The number of applications installed has exceeded the limit'
+ErrAppRequired: 'Please install the {{ .detail }} application first'
+ErrNotInstall: 'Application not installed'
+ErrPortInOtherApp: '{{ .port }} port is already occupied by application {{ .apps }}!'
+ErrDbUserNotValid: 'Existing database, username and password do not match!'
+ErrDockerComposeNotValid: 'The docker-compose file format is incorrect'
+ErrUpdateBuWebsite: 'The application was updated successfully, but the website configuration file modification failed. Please check the configuration! '
+Err1PanelNetworkFailed: 'Default container network creation failed! {{ .detail }}'
+ErrFileParse: 'Application docker-compose file parsing failed!'
+ErrInstallDirNotFound: 'The installation directory does not exist. If you need to uninstall, please select Force Uninstall'
+AppStoreIsUpToDate: 'The app store is already the latest version'
+LocalAppVersionNull: '{{ .name }} application is not synchronized to the version! Cannot be added to the application list'
+LocalAppVersionErr: '{{ .name }} sync version {{ .version }} failed! {{ .err }}'
+ErrFileNotFound: '{{ .name }} file does not exist'
+ErrFileParseApp: '{{ .name }} file parsing failed {{ .err }}'
+ErrAppDirNull: 'The version folder does not exist'
+LocalAppErr: 'Application {{ .name }} sync failed! {{ .err }}'
+ErrContainerName: 'Container name already exists'
+ErrAppSystemRestart: '1Panel restart caused the task to terminate'
+ErrCreateHttpClient: 'Failed to create request {{ .err }}'
+ErrHttpReqTimeOut: 'Request timed out {{ .err }}'
+ErrHttpReqFailed: 'Request failed {{ .err }}'
+ErrNoSuchHost: 'Unable to find the requested server {{ .err }}'
+ErrHttpReqNotFound: 'The requested resource {{ .err }} could not be found'
+ErrImagePullTimeOut: 'Image pull timeout'
+ErrContainerNotFound: '{{ .name }} container does not exist'
+ErrContainerMsg: '{{ .name }} container is abnormal. Please check the log on the container page for details'
+ErrAppBackup: '{{ .name }} application backup failed {{ .err }}'
+ErrImagePull: 'Image pull failed {{ .err }}'
+ErrVersionTooLow: 'The current 1Panel version is too low to update the App Store. Please upgrade the version before operating.'
+ErrAppNameExist: 'The application name already exists'
+AppStoreIsSyncing: 'The App Store is syncing, please try again later'
+ErrGetCompose: 'Failed to obtain the docker-compose.yml file! {{ .detail }}'
+ErrAppWarn: 'Abnormal status, please check the log'
+ErrAppParamKey: 'Parameter {{ .name }} field is abnormal'
+ErrAppUpgrade: 'Application {{ .name }} upgrade failed {{ .err }}'
+AppRecover: 'Rollback application {{ .name }}'
+PullImageStart: 'Start pulling image {{ .name }}'
+PullImageSuccess: 'Image pull successful'
+UpgradeAppStart: 'Start upgrading application {{ .name }}'
+UpgradeAppSuccess: 'Application {{ .name }} upgraded successfully'
+AppStoreIsLastVersion: 'The App Store is already the latest version'
+AppStoreSyncSuccess: 'App Store synchronization successful'
+SyncAppDetail: 'Synchronize application configuration'
+AppVersionNotMatch: '{{ .name }} application requires a higher 1Panel version, skipping synchronization'
+MoveSiteDir: 'The current upgrade requires migration of the OpenResty website directory'
+MoveSiteToDir: 'Migrate site directory to {{ .name }}'
+ErrMoveSiteDir: 'Failed to migrate site directory'
+MoveSiteDirSuccess: 'Successful migration of website directory'
+DeleteRuntimePHP: 'Delete PHP runtime'
+CustomAppStoreNotConfig: 'Please set the offline package address in the app store'
+CustomAppStoreNotFound: 'Failed to obtain the app store package, please check whether it exists'
+CustomAppStoreFileValid: 'App store packages need to be in .tar.gz format'
+PullImageTimeout: 'Pull image timeout, please try to increase the image acceleration or change to another image acceleration'
+ErrAppIsDown: '{{ .name }} application status is abnormal, please check'
+ErrCustomApps: 'There is an installed application, please uninstall it first'
+ErrCustomRuntimes: 'There is an installed runtime environment, please delete it first'
 
 #file
-ErrFileCanNotRead: "File can not read"
-ErrFileToLarge: "file is too large"
-ErrPathNotFound: "Path is not found"
-ErrMovePathFailed: "The target path cannot contain the original path!"
-ErrLinkPathNotFound: "Target path does not exist!"
-ErrFileIsExist: "File or directory already exists!"
-ErrFileUpload: "Failed to upload file {{.name}}  {{.detail}}"
-ErrFileDownloadDir: "Download folder not supported"
-ErrCmdNotFound: "{{ .name}} command does not exist, please install this command on the host first"
-ErrSourcePathNotFound:  "Source directory does not exist"
-ErrFavoriteExist: "This path has been collected"
-ErrInvalidChar: "Illegal characters are prohibited"
-ErrPathNotDelete: "The selected directory cannot be deleted"
+ErrFileCanNotRead: 'This file does not support preview'
+ErrFileToLarge: 'The file is larger than 10M and cannot be opened'
+ErrPathNotFound: 'Directory does not exist'
+ErrMovePathFailed: 'The target path cannot contain the original path!'
+ErrLinkPathNotFound: 'The target path does not exist!'
+ErrFileIsExist: 'The file or folder already exists!'
+ErrFileUpload: '{{ .name }} failed to upload file {{ .detail }}'
+ErrFileDownloadDir: 'Download folder is not supported'
+ErrCmdNotFound: '{{ .name}} command does not exist, please install this command on the host first'
+ErrSourcePathNotFound: 'Source directory does not exist'
+ErrFavoriteExist: 'This path has already been favorited'
+ErrInvalidChar: 'Illegal characters are not allowed'
+ErrPathNotDelete: 'The selected directory cannot be deleted'
 
 #website
-ErrDomainIsExist: "Domain is already exist"
-ErrAliasIsExist: "Alias is already exist"
-ErrAppDelete: "Other Website use this App"
-ErrGroupIsUsed: "The group is in use and cannot be deleted"
-ErrBackupMatch: "the backup file does not match the current partial data of the website: {{ .detail}}"
-ErrBackupExist: "the backup file corresponds to a portion of the original data that does not exist: {{ .detail}}"
-ErrPHPResource: "The local runtime does not support switching！"
-ErrPathPermission: "A folder with non-1000:1000 permissions was detected in the index directory, which may cause an Access denied error when accessing the website. Please click the save button above"
-ErrDomainIsUsed: "Domain is already used by website {{ .name }}"
-ErrDomainFormat: "{{ .name }} domain format error"
-ErrDefaultAlias: "default is a reserved code name, please use another code name"
-ErrParentWebsite: "You need to delete the subsite(s) {{ .name }} first"
-ErrBuildDirNotFound: "Build directory does not exist"
-ErrImageNotExist: "Running environment {{.name}} image does not exist, please re-edit the running environment"
+ErrDomainIsExist: 'Domain name already exists'
+ErrAliasIsExist: 'Alias already exists'
+ErrAppDelete: 'Other websites use this app and cannot delete it'
+ErrBackupMatch: 'The backup file does not match some of the current website data {{ .detail }}'
+ErrBackupExist: 'The corresponding part of the source data in the backup file does not exist {{ .detail }}'
+ErrPHPResource: 'The local operating environment does not support switching! '
+ErrPathPermission: 'A folder with non-1000:1000 permissions was detected in the index directory, which may cause an Access denied error on the website. Please click the Save button above'
+ErrDomainIsUsed: 'The domain name is already used by the website [{{ .name }}]'
+ErrDomainFormat: '{{ .name }} domain name format is incorrect'
+ErrDefaultAlias: 'default is a reserved code, please use another code'
+ErrParentWebsite: 'You need to delete the subsite {{ .name }} first'
+ErrBuildDirNotFound: 'The build directory does not exist'
+ErrImageNotExist: 'The operating environment {{ .name }} image does not exist, please re-edit the operating environment'
 
 #ssl
-ErrSSLCannotDelete: "The certificate {{ .name }} is being used by the website and cannot be removed"
-ErrAccountCannotDelete: "The certificate associated with the account cannot be deleted"
-ErrSSLApply: "The certificate continues to be signed successfully, but openresty reload fails, please check the configuration！"
-ErrEmailIsExist: "Email is already exist"
-ErrSSLKeyNotFound: "The private key file does not exist"
-ErrSSLCertificateNotFound: "The certificate file does not exist"
-ErrSSLKeyFormat: "Private key file verification error"
-ErrSSLCertificateFormat: "Certificate file format error, please use pem format"
-ErrEabKidOrEabHmacKeyCannotBlank: "EabKid or EabHmacKey cannot be empty"
-ErrOpenrestyNotFound: "Http mode requires Openresty to be installed first"
-ApplySSLStart: "Start applying for certificate, domain name [{{ .domain }}] application method [{{ .type }}] "
-dnsAccount: "DNS Automatic"
-dnsManual: "DNS Manual"
-http: "HTTP"
-ApplySSLFailed: "Application for [{{ .domain }}] certificate failed, {{.detail}} "
-ApplySSLSuccess: "Application for [{{ .domain }}] certificate successful! ! "
-DNSAccountName: "DNS account [{{ .name }}] manufacturer [{{.type}}]"
-PushDirLog: "Certificate pushed to directory [{{ .path }}] {{ .status }}"
-ErrDeleteCAWithSSL: "There is an issued certificate under the current organization and cannot be deleted"
-ErrDeleteWithPanelSSL: "Panel SSL configuration uses this certificate and cannot be deleted"
-ErrDefaultCA: "The default organization cannot be deleted"
-ApplyWebSiteSSLLog: "Start updating {{ .name }} website certificate"
-ErrUpdateWebsiteSSL: "{{ .name }} website failed to update certificate: {{ .err }}"
-ApplyWebSiteSSLSuccess: "Update website certificate successfully"
-StartUpdateSystemSSL: "Start updating system certificate"
-UpdateSystemSSLSuccess: "Update system certificate successfully"
-ErrExecShell: "Exec Shell err {{.err}}"
-ExecShellStart: "Start executing script"
-ExecShellSuccess: "Script executed successfully"
+ErrSSLCannotDelete: 'The {{ .name }} certificate is being used by a website and cannot be deleted'
+ErrAccountCannotDelete: 'The account is associated with a certificate and cannot be deleted'
+ErrSSLApply: 'Certificate renewal successful, openresty reload failed, please check the configuration!'
+ErrEmailIsExist: 'The mailbox already exists'
+ErrSSLKeyNotFound: 'The private key file does not exist'
+ErrSSLCertificateNotFound: 'The certificate file does not exist'
+ErrSSLKeyFormat: 'Private key file verification failed'
+ErrSSLCertificateFormat: 'The certificate file format is incorrect, please use pem format'
+ErrEabKidOrEabHmacKeyCannotBlank: 'EabKid or EabHmacKey cannot be blank'
+ErrOpenrestyNotFound: 'Http mode requires Openresty to be installed first'
+ApplySSLStart: 'Start applying for a certificate, domain name [{{ .domain }}] application method [{{ .type }}] '
+dnsAccount: 'DNS Auto'
+dnsManual: 'DNS Manual'
+http: 'HTTP'
+ApplySSLFailed: 'Application for [{{ .domain }}] certificate failed, {{ .detail }} '
+ApplySSLSuccess: 'Apply for [{{ .domain }}] certificate successfully! !'
+DNSAccountName: 'DNS account [{{ .name }}] vendor [{{ .type }}]'
+PushDirLog: 'Certificate pushed to directory [{{ .path }}] {{ .status }}'
+ErrDeleteCAWithSSL: 'The current organization has a certificate that has been issued and cannot be deleted.'
+ErrDeleteWithPanelSSL: 'Panel SSL configuration uses this certificate and cannot be deleted'
+ErrDefaultCA: 'The default authority cannot be deleted'
+ApplyWebSiteSSLLog: 'Starting to renew the {{ .name }} website certificate'
+ErrUpdateWebsiteSSL: '{{ .name }} website certificate update failed: {{ .err }}'
+ApplyWebSiteSSLSuccess: 'Update website certificate successfully'
+ErrExecShell: 'Failed to execute script {{ .err }}'
+ExecShellStart: 'Start executing the script'
+ExecShellSuccess: 'Script execution successful'
+StartUpdateSystemSSL: 'Start updating system certificate'
+UpdateSystemSSLSuccess: 'Update system certificate successfully'
+ErrWildcardDomain: 'Unable to apply for wildcard domain name certificate in HTTP mode'
 
 #mysql
-ErrUserIsExist: "The current user already exists. Please enter a new user"
-ErrDatabaseIsExist: "The current database already exists. Please enter a new database"
-ErrExecTimeOut: "SQL execution timed out, please check the database"
-ErrRemoteExist: "The remote database already exists with that name, please modify it and try again"
-ErrLocalExist: "The local database already exists with that name, please modify it and try again"
+ErrUserIsExist: 'The current user already exists, please re-enter'
+ErrDatabaseIsExist: 'The current database already exists, please re-enter'
+ErrExecTimeOut: 'SQL execution timed out, please check the database'
+ErrRemoteExist: 'The remote database already exists with this name, please modify it and try again'
+ErrLocalExist: 'The name already exists in the local database, please modify it and try again'
 
 #redis
-ErrTypeOfRedis: "The recovery file type does not match the current persistence mode. Modify the file type and try again"
+ErrTypeOfRedis: 'The recovery file type does not match the current persistence method, please modify it and try again'
 
 #container
-ErrInUsed: "{{ .detail }} is in use and cannot be deleted"
-ErrObjectInUsed: "This object is in use and cannot be deleted"
-ErrObjectBeDependent: "This image is dependent on other images and can't be deleted"
-ErrPortRules: "The number of ports does not match, please re-enter!"
-ErrPgImagePull: "Image pull timeout. Please configure image acceleration or manually pull the postgres:16.0-alpine image and try again"
+ErrInUsed: '{{ .detail }} is in use and cannot be deleted'
+ErrObjectInUsed: 'The object is in use and cannot be deleted'
+ErrObjectBeDependent: 'This image depends on other images and cannot be deleted'
+ErrPortRules: 'Port number does not match, please re-enter!'
+ErrPgImagePull: 'Image pull timed out, please configure image acceleration or manually pull the {{ .name }} image and try again'
 
 #runtime
-ErrDirNotFound: "The build folder does not exist! Please check file integrity！"
-ErrFileNotExist: "{{ .detail }} file does not exist! Please check source file integrity！"
-ErrImageBuildErr: "Image build failed"
-ErrImageExist: "Image is already exist！"
-ErrDelWithWebsite: "The operating environment has been associated with a website and cannot be deleted"
-ErrRuntimeStart: "Failed to start"
-ErrPackageJsonNotFound: "package.json file does not exist"
-ErrScriptsNotFound: "No scripts configuration item was found in package.json"
-ErrContainerNameNotFound: "Unable to get container name, please check .env file"
-ErrNodeModulesNotFound: "The node_modules folder does not exist! Please edit the running environment or wait for the running environment to start successfully"
-ErrContainerNameIsNull: "Container name cannot be empty"
-
-#setting
-ErrBackupInUsed: "The backup account is already being used in a cronjob and cannot be deleted."
-ErrBackupCheck: "Backup account test connection failed {{ .err}}"
-ErrOSSConn: "Unable to retrieve the latest version, please check if the server can connect to the external network."
-ErrEntrance: "Security entrance information error. Please check and try again!"
+ErrDirNotFound: 'The build folder does not exist! Please check the file integrity!'
+ErrFileNotExist: '{{ .detail }} file does not exist! Please check the integrity of the source file!'
+ErrImageBuildErr: 'Image build failed'
+ErrImageExist: 'Image already exists!'
+ErrDelWithWebsite: 'The operating environment is already associated with a website and cannot be deleted'
+ErrRuntimeStart: 'Startup failed'
+ErrPackageJsonNotFound: 'package.json file does not exist'
+ErrScriptsNotFound: 'The scripts configuration item was not found in package.json'
+ErrContainerNameNotFound: 'Unable to get container name, please check .env file'
+ErrNodeModulesNotFound: 'The node_modules folder does not exist! Please edit the runtime environment or wait for the runtime environment to start successfully'
+ErrContainerNameIsNull: 'Container name does not exist'
 
 #tool
-ErrConfigNotFound: "Configuration file does not exist"
-ErrConfigParse: "Configuration file format error"
-ErrConfigIsNull: "The configuration file is not allowed to be empty"
-ErrConfigDirNotFound: "The running directory does not exist"
-ErrConfigAlreadyExist: "A configuration file with the same name already exists"
-ErrUserFindErr: "Failed to find user {{ .name }} {{ .err }}"
+ErrConfigNotFound: 'Configuration file does not exist'
+ErrConfigParse: 'The configuration file format is incorrect'
+ErrConfigIsNull: 'Configuration file cannot be empty'
+ErrConfigDirNotFound: 'The running directory does not exist'
+ErrConfigAlreadyExist: 'A configuration file with the same name already exists'
+ErrUserFindErr: 'User {{ .name }} search failed {{ .err }}'
 
 #ssh
-ErrFirewallNone: "No firewalld or ufw service detected on the system. Please check and try again!"
-ErrFirewallBoth: "Both firewalld and ufw services are detected on the system. To avoid conflicts, please uninstall one and try again!"
+ErrFirewallNone: 'No system firewalld or ufw service detected, please check and try again!'
+ErrFirewallBoth: 'It is detected that the system has both firewalld and ufw services. To avoid conflicts, please uninstall and try again!'
 
 #cronjob
-ErrCutWebsiteLog: "{{ .name }} website log cutting failed, error {{ .err }}"
-CutWebsiteLogSuccess: "{{ .name }} website log cut successfully, backup path {{ .path }}"
-HandleShell: "Execute script {{ .name }}"
-HandleNtpSync: "System time synchronization"
-HandleSystemClean: "System cache cleanup"
+ErrCutWebsiteLog: '{{ .name }} website log cutting failed, error {{ .err }}'
+CutWebsiteLogSuccess: '{{ .name }} website log cut successfully, backup path {{ .path }}'
+HandleShell: 'Execute script {{ .name }}'
+HandleNtpSync: 'System time synchronization'
+HandleSystemClean: 'System cache cleanup'
 
 #toolbox
-ErrNotExistUser: "The current user does not exist. Please modify and retry!"
-ErrBanAction: "Setting failed, the current {{ .name }} service is unavailable, please check and try again!"
-ErrClamdscanNotFound: "The clamdscan command was not detected, please refer to the documentation to install it!"
+ErrNotExistUser: 'The current user does not exist, please modify and try again!'
+ErrBanAction: 'Setting failed. The current {{ .name }} service is unavailable. Please check and try again!'
+ErrClamdscanNotFound: 'The clamdscan command was not detected, please refer to the documentation to install it!'
 
 #waf
-ErrScope: "Modification of this configuration is not supported"
-ErrStateChange: "State modification failed"
-ErrRuleExist: "Rule is Exist"
-ErrRuleNotExist: "Rule is not Exist"
-ErrParseIP: "IP format error"
-ErrDefaultIP: "default is a reserved name, please change it to another name"
-ErrGroupInUse: "The IP group is used by the black/white list and cannot be deleted"
-ErrGroupExist: "IP group name already exists"
-ErrIPRange: "Wrong IP range"
-ErrIPExist: "IP is exit"
-urlDefense: 'URL Rules'
-urlHelper: 'Forbidden Access URLs'
-dirFilter: 'Directory Filtering'
+ErrScope: 'Modifying this configuration is not supported'
+ErrStateChange: 'State change failed'
+ErrRuleExist: 'Rule already exists'
+ErrRuleNotExist: 'Rule does not exist'
+ErrParseIP: 'Wrong IP format'
+ErrDefaultIP: 'default is a reserved name, please change it to another name'
+ErrGroupInUse: 'IP group is used by blacklist/whitelist and cannot be deleted'
+ErrGroupExist: 'IP group name already exists'
+ErrIPRange: 'Wrong IP range'
+ErrIPExist: 'IP already exists'
+urlDefense: 'URL rules'
+urlHelper: 'Prohibited URL'
+dirFilter: 'Directory filter'
 xss: 'XSS'
-phpExec: 'PHP Script Execution'
-oneWordTrojan: 'One-Liner Trojan'
-appFilter: 'Application Dangerous Directory Filtering'
+phpExec: 'PHP script execution'
+oneWordTrojan: 'One Word Trojan'
+appFilter: 'Apply dangerous directory filtering'
 webshell: 'Webshell'
-args: 'Parameter Rules'
-protocolFilter: 'Protocol Filtering'
-javaFileter: 'Java Dangerous File Filtering'
-scannerFilter: 'Scanner Filtering'
-escapeFilter: 'Escape Filtering'
-customRule: 'Custom Rules'
-httpMethod: 'HTTP Method Filtering'
-fileExt: 'File Upload Restrictions'
-defaultIpBlack: 'Malicious IP Group'
+args: 'Parameter rules'
+protocolFilter: 'Protocol filtering'
+javaFileter: 'Java dangerous file filter'
+scannerFilter: 'Scanner filter'
+escapeFilter: 'escape filter'
+customRule: 'Custom rule'
+httpMethod: 'HTTP method filtering'
+fileExt: 'File upload restrictions'
+defaultIpBlack: 'Malicious IP group'
 cookie: 'Cookie Rules'
-urlBlack: 'URL Blacklist'
-uaBlack: 'User-Agent Blacklist'
-attackCount: 'Attack Frequency Limit'
-fileExtCheck: 'File Upload Restrictions'
-geoRestrict: 'Geographical Access Restrictions'
-unknownWebsite: 'Unauthorized Domain Access'
-notFoundCount: '404 Frequency Limit'
-headerDefense: 'Header Rules'
-defaultUaBlack: 'User-Agent Rules'
-methodWhite: 'HTTP Rules'
-captcha: 'Captcha'
-fiveSeconds: '5 Seconds Verification'
-vulnCheck: 'Supplementary Rules'
-acl: 'Custom Rules'
-sql: 'SQL Injection'
-cc: 'Access Frequency Limit'
-defaultUrlBlack: 'URL Rules'
-sqlInject: 'SQL Injection'
-ErrDBNotExist: "Database does not exist"
-allow: "Allow"
-deny: "Deny"
+urlBlack: 'URL blacklist'
+uaBlack: 'User-Agent blacklist'
+attackCount: 'Attack frequency limit'
+fileExtCheck: 'File upload restrictions'
+geoRestrict: 'Regional access restrictions'
+unknownWebsite: 'Unauthorized domain name access'
+notFoundCount: '404 Rate Limit'
+headerDefense: 'Header rules'
+defaultUaBlack: 'User-Agent rules'
+methodWhite: 'HTTP rules'
+captcha: 'human-machine verification'
+fiveSeconds: '5 seconds verification'
+vulnCheck: 'Supplementary rules'
+acl: 'Custom rules'
+sql: 'SQL injection'
+cc: 'Access frequency limit'
+defaultUrlBlack: 'URL rules'
+sqlInject: 'SQL injection'
+ErrDBNotExist: 'Database does not exist'
+allow: 'allow'
+deny: 'deny'
+OpenrestyNotFound: 'Openresty is not installed'
 
 #task
-TaskStart: "{{.name}} Start [START]"
-TaskEnd: "{{.name}} End [COMPLETED]"
-TaskFailed: "{{.name}} Failed"
-TaskTimeout: "{{.name}} Timeout"
-TaskSuccess: "{{.name}} Success"
-TaskRetry: "Starting {{.name}} Retry"
-SubTaskSuccess: "{{ .name }} Success"
-SubTaskFailed: "{{ .name }} Failed: {{ .err }}"
-TaskInstall: "Install"
-TaskUninstall: "Uninstall"
-TaskCreate: "Create"
-TaskDelete: "Delete"
-TaskUpgrade: "Upgrade"
-TaskUpdate: "Update"
-TaskRestart: "Restart"
-TaskRollback: "Rollback"
-TaskPull: "Pull"
-TaskBuild: "Build"
-TaskPush: "Push"
-TaskHandle: "Execute"
-Website: "Website"
-App: "App"
-Runtime: "Runtime"
-Database: "Database"
-ConfigFTP: "Create FTP User {{ .name }}"
-ConfigOpenresty: "Create Openresty Configuration File"
-InstallAppSuccess: "App {{ .name }} Installed Successfully"
-ConfigRuntime: "Configure Runtime"
-ConfigApp: "Configure App"
-SuccessStatus: "{{ .name }} Success"
-FailedStatus: "{{ .name }} Failed {{.err}}"
-HandleLink: "Handle App Link"
-HandleDatabaseApp: "Handle App Parameters"
-ExecShell: "Execute {{ .name }} Script"
-PullImage: "Pull Image"
-Start: "Start"
-Run: "Run"
-Stop: "Stop"
-Image: "Image"
-Container: "Container"
-Compose: "Compose"
-AppLink: "Associated Application"
-EnableSSL: "Enable HTTPS"
-AppStore: "App Store"
-TaskSync: "Sync"
-LocalApp: "Local App"
-SubTask: "Subtask"
-RuntimeExtension: "Runtime Extension"
-TaskIsExecuting: "Task is executing"
+TaskStart: '{{ .name }} task starts [START]'
+TaskEnd: '{{ .name }} Task completed [COMPLETED]'
+TaskFailed: '{{ .name }} task failed'
+TaskTimeout: '{{ .name }} timed out'
+TaskSuccess: '{{ .name }} Task succeeded'
+TaskRetry: 'Start {{ .name }}th retry'
+SubTaskSuccess: '{{ .name }} succeeded'
+SubTaskFailed: '{{ .name }} failed: {{ .err }}'
+TaskInstall: 'Install'
+TaskUninstall: 'Uninstall'
+TaskCreate: 'Create'
+TaskDelete: 'Delete'
+TaskUpgrade: 'Upgrade'
+TaskUpdate: 'Update'
+TaskRestart: 'Restart'
+TaskBackup: 'Backup'
+TaskRecover: 'Recover'
+TaskRollback: 'Rollback'
+TaskPull: 'Pull'
+TaskBuild: 'Build'
+TaskPush: 'Push'
+TaskHandle: 'Execute'
+Website: 'Website'
+App: 'Application'
+Runtime: 'Runtime environment'
+Database: 'Database'
+ConfigFTP: 'Create FTP user {{ .name }}'
+ConfigOpenresty: 'Create Openresty configuration file'
+InstallAppSuccess: 'Application {{ .name }} installed successfully'
+ConfigRuntime: 'Configure the runtime environment'
+ConfigApp: 'Configuration Application'
+SuccessStatus: '{{ .name }} succeeded'
+FailedStatus: '{{ .name }} failed {{ .err }}'
+HandleLink: 'Handle application association'
+HandleDatabaseApp: 'Handling application parameters'
+ExecShell: 'Execute {{ .name }} script'
+PullImage: 'Pull image'
+Start: 'Start'
+Run: 'Start'
+Stop: 'Stop'
+Image: 'Mirror'
+Compose: 'Orchestration'
+Container: 'Container'
+AppLink: 'Linked Application'
+EnableSSL: 'Enable HTTPS'
+AppStore: 'App Store'
+TaskSync: 'Synchronize'
+LocalApp: 'Local Application'
+SubTask: 'Subtask'
+RuntimeExtension: 'Runtime Environment Extension'
+TaskIsExecuting: 'Task is running'
+CustomAppstore: 'Custom application warehouse'
 
-# task - snapshot 
-Snapshot: "Snapshot"
-SnapDBInfo: "Write 1Panel database information"
-SnapCopy: "Copy files & directories {{ .name }} "
-SnapNewDB: "Initialize database {{ .name }} connection "
-SnapDeleteOperationLog: "Delete operation log"
-SnapDeleteLoginLog: "Delete access log"
-SnapDeleteMonitor: "Delete monitoring data"
-SnapRemoveSystemIP: "Remove system IP"
-SnapBaseInfo: "Write 1Panel basic information"
-SnapInstallApp: "Backup installed applications in 1Panel"
-SnapDockerSave: "Compress installed applications"
-SnapLocalBackup: "Backup 1Panel local backup directory"
-SnapCompressBackup: "Compress local backup directory"
-SnapPanelData: "Backup 1Panel data directory"
-SnapCompressPanel: "Compress data directory"
-SnapCloseDBConn: "Close database connection"
-SnapCompress: "Create snapshot file"
-SnapCompressFile: "Compress snapshot file"
-SnapCheckCompress: "Check snapshot compressed file"
-SnapCompressSize: "Snapshot file size {{ .name }}"
-SnapUpload: "Upload snapshot file"
-SnapLoadBackup: "Get backup account information"
-SnapUploadTo: "Upload snapshot file to {{ .name }}"
-SnapUploadRes: "Upload snapshot file to {{ .name }}"
+# task - ai
+OllamaModelPull: 'Pull Ollama model {{ .name }}'
+OllamaModelSize: 'Get the size of Ollama model {{ .name }}'
+
+# task-snapshot
+Snapshot: 'Snapshot'
+SnapDBInfo: 'Write 1Panel database information'
+SnapCopy: 'Copy files & directories {{ .name }}'
+SnapNewDB: 'Initialize database {{ .name }} connection'
+SnapDeleteOperationLog: 'Delete operation log'
+SnapDeleteLoginLog: 'Delete access log'
+SnapDeleteMonitor: 'Delete monitoring data'
+SnapRemoveSystemIP: 'Remove system IP'
+SnapBaseInfo: 'Write 1Panel basic information'
+SnapInstallApp: 'Backup 1Panel installed applications'
+SnapDockerSave: 'Compress installed applications'
+SnapLocalBackup: 'Backup 1Panel local backup directory'
+SnapCompressBackup: 'Compress local backup directory'
+SnapPanelData: 'Backup 1Panel data directory'
+SnapCompressPanel: 'Compressed Data Directory'
+SnapWebsite: 'Backup 1Panel website directory'
+SnapCloseDBConn: 'Close the database connection'
+SnapCompress: 'Make snapshot files'
+SnapCompressFile: 'Compress snapshot file'
+SnapCheckCompress: 'Check snapshot compression file'
+SnapCompressSize: 'Snapshot file size {{ .name }}'
+SnapUpload: 'Upload snapshot file'
+SnapLoadBackup: 'Get backup account information'
+SnapUploadTo: 'Upload snapshot file to {{ .name }}'
+SnapUploadRes: 'Upload snapshot file to {{ .name }}'
+
+SnapshotRecover: 'Snapshot Restore'
+RecoverDownload: 'Download snapshot file'
+Download: 'Download'
+RecoverDownloadAccount: 'Get snapshot download backup account {{ .name }}'
+RecoverDecompress: 'Decompress snapshot compressed files'
+Decompress: 'Decompression'
+BackupBeforeRecover: 'Backup system-related data before snapshot'
+Readjson: 'Read the Json file in the snapshot'
+ReadjsonPath: 'Get the Json file path in the snapshot'
+ReadjsonContent: 'Read Json file'
+ReadjsonMarshal: 'Json escape processing'
+RecoverApp: 'Restore installed apps'
+RecoverWebsite: 'Recover website directory'
+RecoverAppImage: 'Restore snapshot image backup'
+RecoverCompose: 'Restore other composer content'
+RecoverComposeList: 'Get all composers to be restored'
+RecoverComposeItem: 'Recover compose {{ .name }}'
+RecoverAppEmpty: 'No application image backup was found in the snapshot file'
+RecoverBaseData: 'Recover base data and files'
+RecoverDaemonJsonEmpty: 'Both the snapshot file and the current machine do not have the container configuration daemon.json file'
+RecoverDaemonJson: 'Restore container configuration daemon.json file'
+RecoverDBData: 'Recover database data'
+RecoverBackups: 'Restore local backup directory'
+RecoverPanelData: 'Recovery data directory'
 
 # task - container
-ContainerNewCliet: "Initialize Docker Client" 
-ContainerImagePull: "Pull container image {{ .name }}" 
-ContainerRemoveOld: "Remove the original container { .name }"
-ContainerImageCheck: "Check if the image is pulled correctly"
-ContainerLoadInfo: "Retrieve basic information about the container"
-ContainerRecreate: "Container update failed, now starting to restore the original container"
-ContainerCreate: "Create new container {{ .name }}" 
-ContainerCreateFailed: "Container creation failed, delete the failed container" 
-ContainerStartCheck: "Check if the container has started" 
+ContainerNewCliet: 'Initialize Docker Client'
+ContainerImagePull: 'Pull container image {{ .name }}'
+ContainerRemoveOld: 'Remove the original container {{ .name }}'
+ContainerImageCheck: 'Check if the image is pulled normally'
+ContainerLoadInfo: 'Get basic container information'
+ContainerRecreate: 'Container update failed, now starting to restore the original container'
+ContainerCreate: 'Create a new container {{ .name }}'
+ContainerCreateFailed: 'Container creation failed, delete the failed container'
+ContainerStartCheck: 'Check if the container has been started'
 
 # task - image
-ImageBuild: "Image build" 
-ImageBuildStdoutCheck: "Parse image output" 
-ImaegBuildRes: "Image build output: {{ .name }}" 
-ImagePull: "Pull image" 
-ImageRepoAuthFromDB: "Get repository authentication information from database" 
-ImaegPullRes: "Image pull output: {{ .name }}" 
-ImagePush: "Push image" 
-ImageRenameTag: "Rename image tag" 
-ImageNewTag: "New image tag {{ .name }}" 
-ImaegPushRes: "Image push output: {{ .name }}" 
-ComposeCreate: "Create compose" 
-ComposeCreateRes: "Compose creation output: {{ .name }}"
+ImageBuild: 'Image Build'
+ImageBuildStdoutCheck: 'Parse image output content'
+ImaegBuildRes: 'Image build output: {{ .name }}'
+ImagePull: 'Pull image'
+ImageRepoAuthFromDB: 'Get repository authentication information from the database'
+ImaegPullRes: 'Image pull output: {{ .name }}'
+ImagePush: 'Push image'
+ImageRenameTag: 'Modify image tag'
+ImageNewTag: 'New image tag {{ .name }}'
+ImaegPushRes: 'Image push output: {{ .name }}'
+ComposeCreate: 'Create a composition'
+ComposeCreateRes: 'Compose create output: {{ .name }}'
 
 # task - website
-BackupNginxConfig: "Backup website OpenResty configuration file"
-CompressFileSuccess: "Directory compression successful, compressed as {{.name}}"
-CompressDir: "Compress directory"
-DeCompressFile: "Decompress file {{ .name }}"
-ErrCheckValid: "Failed to validate backup file, {{ .name }}"
-Rollback: "Rollback"
-websiteDir: "Website directory"
-RecoverFailedStartRollBack: "Recovery failed, starting rollback"
-AppBackupFileIncomplete: "Backup file is incomplete; missing app.json or app.tar.gz file"
-AppAttributesNotMatch: "Application type or name does not match"
+BackupNginxConfig: 'Backup website OpenResty configuration file'
+CompressFileSuccess: 'Compress directory successfully, compressed to {{ .name }}'
+CompressDir: 'Compression directory'
+DeCompressFile: 'Decompress file {{ .name }}'
+ErrCheckValid: 'Backup file verification failed, {{ .name }}'
+Rollback: 'Rollback'
+websiteDir: 'Website Directory'
+RecoverFailedStartRollBack: 'Recovery failed, start rollback'
+AppBackupFileIncomplete: 'The backup file is incomplete and lacks app.json or app.tar.gz files'
+AppAttributesNotMatch: 'Application type or name does not match'
 
 #alert
-ErrAlert: "Alert information format error, please check and try again!"
-ErrAlertPush: "Alert push error, please check and try again!"
-ErrAlertSave: "Alert save error, please check and try again!"
-ErrAlertSync: "Alert sync error, please check and try again!"
-ErrAlertRemote: "Remote alert error, please check and try again!"
+ErrAlert: 'The format of the warning message is incorrect, please check and try again!'
+ErrAlertPush: 'Error in pushing alert information, please check and try again!'
+ErrAlertSave: 'Error saving the alarm information, please check and try again!'
+ErrAlertSync: 'Alarm information synchronization error, please check and try again!'
+ErrAlertRemote: 'Alarm message remote error, please check and try again!'

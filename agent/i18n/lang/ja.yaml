@@ -1,326 +1,422 @@
-ErrInvalidParams: "リクエストパラメーターエラー：{{.Detail}}"
-ErrTokenParse: "トークン生成エラー：{{.Detail}}"
-ErrInitialPassword: "初期パスワードエラー"
-ErrInternalServer: "サービス内部エラー：{{.Detail}}"
-ErrRecordExist: "レコードはすでに存在します"
-ErrRecordNotFound: "記録が見つかりません"
-ErrStructTransform: "タイプ変換障害：{{.Detail}}"
-ErrNotLogin: "ユーザーはログインしません：{{.Detail}}"
-ErrPasswordExpired: "現在のパスワードが期限切れになっています：{{.Detail}}"
-ErrNotSupportType: "システムは現在のタイプをサポートしていません：{{.Detail}}"
-ErrApiConfigStatusInvalid: "APIインターフェイスアクセス禁止：{{.Detail}}"
-ErrApiConfigKeyInvalid: "APIインターフェイスキーエラー：{{.Detail}}"
-ErrApiConfigIPInvalid: "APIインターフェイスIPはホワイトリストにありません：{{.Detail}}"
-ErrApiConfigDisable: "このインターフェイスは、APIインターフェイスコールの使用を禁止しています：{{.Detail}}"
+ErrInvalidParams: 'リクエストパラメータエラー: {{ .detail }}'
+ErrTokenParse: 'トークン生成エラー: {{ .detail }}'
+ErrInitialPassword: '元のパスワードが正しくありません'
+ErrInternalServer: '内部サーバーエラー: {{ .detail }}'
+ErrRecordExist: 'レコードがすでに存在します'
+ErrRecordNotFound: 'レコードが見つかりません'
+ErrStructTransform: '型変換に失敗しました: {{ .err }}'
+ErrNotLogin: 'ユーザーがログインしていません: {{ .detail }}'
+ErrPasswordExpired: '現在のパスワードの有効期限が切れています: {{ .detail }}'
+ErrNotSupportType: 'システムは現在のタイプ: {{ .name }} をサポートしていません'
+ErrProxy: 'リクエスト エラーです。ノードのステータスを確認してください: {{ .detail }}'
+ErrApiConfigStatusInvalid: 'API インターフェースへのアクセスは禁止されています: {{ .detail }}'
+ErrApiConfigKeyInvalid: 'API インターフェース キー エラー: {{ .detail }}'
+ErrApiConfigIPInvalid: 'API インターフェースの呼び出しに使用された IP がホワイトリストにありません: {{ .detail }}'
+ErrApiConfigDisable: 'このインターフェースは、API インターフェース呼び出しの使用を禁止しています: {{ .detail }}'
+ErrApiConfigKeyTimeInvalid: 'API インターフェースのタイムスタンプ エラー: {{ .detail }}'
 
 #common
-ErrUsernameIsExist: "ユーザー名は既に存在します"
-ErrNameIsExist: "名前はすでに存在しています"
-ErrDemoEnvironment: "デモサーバー、この操作を禁止します！"
-ErrCmdTimeout: "コマンド実行がタイムアウトしました！"
-ErrCmdIllegal: "コマンドには違法な文字が含まれています。変更してもう一度やり直してください！"
-ErrPortExist: '{{.port}}ポートはすでに{{.type}} [{{.name}}]によって占有されています。'
-TYPE_APP: "応用"
-TYPE_RUNTIME: "ランタイム環境"
-TYPE_DOMAIN: "ドメイン名"
-ErrTypePort: 'port {{.name}}フォーマットエラー'
-ErrTypePortRange: 'ポートレンジは1-65535の間である必要があります'
-Success: "成功"
-Failed: "失敗した"
-SystemRestart: "システムの再起動により、タスクが中断されます"
-ErrGroupIsDefault: "デフォルトグループ、削除できません"
-ErrGroupIsInWebsiteUse: "グループは他のウェブサイトで使用されています、削除できません"
+ErrUsernameIsExist: 'ユーザー名は既に存在します'
+ErrNameIsExist: '名前は既に存在します'
+ErrDemoEnvironment: 'デモ サーバー、この操作は禁止されています!'
+ErrCmdTimeout: 'コマンドの実行がタイムアウトしました!'
+ErrCmdIllegal: '実行コマンドに不正な文字が含まれています。修正してもう一度お試しください。'
+ErrPortExist: '{{ .port }} ポートは、{{ .type }} [{{ .name }}] によって既に使用されています'
+TYPE_APP: 'アプリケーション'
+TYPE_RUNTIME: 'ランタイム環境'
+TYPE_DOMAIN: 'ドメイン名'
+ErrTypePort: 'ポート {{ .name }} の形式が正しくありません'
+ErrTypePortRange: 'ポート範囲は 1 ～ 65535 である必要があります'
+Success: '成功'
+Failed: '失敗'
+SystemRestart: 'システムの再起動によりタスクが中断されました'
+ErrGroupIsDefault: 'デフォルト グループ、削除できません'
+ErrGroupIsInWebsiteUse: 'グループは別の Web サイトで使用されているため、削除できません。'
+
+#backup
+ErrBackupInUsed: 'バックアップ アカウントはスケジュールされたタスクで使用されているため、削除できません。'
+ErrBackupCheck: 'バックアップ アカウントのテスト接続に失敗しました {{ .err }}'
+ErrBackupLocalDelete: 'ローカル サーバーのバックアップ アカウントの削除はまだサポートされていません'
+ErrBackupLocalCreate: 'ローカル サーバーのバックアップ アカウントの作成はまだサポートされていません'
 
 #app
-ErrPortInUsed: "{{.Detail}}ポートはすでに使用されています"
-ErrAppLimit: "アプリはインストール制限を超えています"
-ErrAppRequired: "{{.Detail}}アプリが必要です"
-ErrNotInstall: "アプリがインストールされていません"
-ErrPortInOtherApp: "{{.port}}ポートは既にapp {{.apps}}で使用されています"
-ErrDbUserNotValid: "ストックデータベース、ユーザー名、パスワードが一致しません！"
-ErrDockerComposeNotValid: "Docker-Composeファイル形式のエラー！"
-ErrUpdateBuWebsite: 'アプリケーションは正常に更新されましたが、Webサイト構成ファイルの変更に失敗しました。構成を確認してください！'
-Err1PanelNetworkFailed: 'デフォルトのコンテナネットワークの作成に失敗しました！{{ 。詳細 }}'
-ErrFileParse: 'アプリケーションDocker-Composeファイルの解析は失敗しました！'
-ErrInstallDirNotFound: 'インストールディレクトリは存在しません'
-AppStoreIsUpToDate: '最新の'
-LocalAppVersionNull: '{{.name}}アプリはバージョンに同期されません！アプリケーションリストに追加できませんでした'
-LocalAppVersionErr: '{{.name}}}バージョン{{.version}}の同期に失敗しました！{{.err}}'
-ErrFileNotFound: '{{.name}}ファイルは存在しません'
-ErrFileParseApp: '{{.name}} file {{.err}}を解析できなかった'
-ErrAppDirNull: 'バージョンフォルダーは存在しません'
-LocalAppErr: "app {{.name}}同期が失敗しました！{{.err}}"
-ErrContainerName: "cantablernameはすでに存在しています"
-ErrAppSystemRestart: "1パネルの再起動により、タスクが終了します"
-ErrCreateHttpClient: "http request {{.err}}の作成に失敗しました"
-ErrHttpReqTimeOut: "リクエスト{{.err}}"
-ErrHttpReqFailed: "リクエストが失敗しました{{.err}}"
-ErrHttpReqNotFound: "ファイルは存在しません"
-ErrNoSuchHost: "ネットワーク接続に失敗しました"
-ErrImagePullTimeOut: '画像プルタイムアウト'
-ErrContainerNotFound: '{{.name}}コンテナは存在しません'
-ErrContainerMsg: '{{.name}}コンテナは異常です。詳細については、コンテナページのログを確認してください'
-ErrAppBackup: '{{.name}}アプリケーションバックアップが失敗したerr {{.err}}'
-ErrImagePull: '{{.name}}画像プルFailed err {{.err}}'
-ErrVersionTooLow: '現在の1パネルバージョンが低すぎてApp Storeを更新できないので、バージョンをアップグレードしてください'
-ErrAppNameExist: 'アプリ名はすでに存在しています'
-AppStoreIsSyncing: 'App Storeが同期しています。後でもう一度やり直してください'
-ErrGetCompose: "docker-compose.ymlファイルを取得できませんでした！{{ 。詳細 }}"
-ErrAppWarn: "異常なステータス、ログを確認してください"
-ErrAppParamKey: "parameter {{.name}}フィールド例外"
-ErrAppUpgrade: "アプリケーションのアップグレードに失敗しました{{.name}} {{.err}}"
-AppRecover: "app {{.name}}ロールバック"
-PullImageStart: "画像の引っ張りを開始{{.name}}"
-PullImageSuccess: "画像が正常に引っ張られました"
-UpgradeAppStart: "アプリケーションのアップグレードを起動{{.name}}"
-UpgradeAppSuccess: "App {{.Name}}アップグレードされました"
-ErrAppIsDown: "{{ .name }} アプリケーションの状態が異常です、確認してください"
+ErrPortInUsed: '{{ .detail }} ポートはすでに使用されています!'
+ErrAppLimit: 'インストールされているアプリケーションの数が制限を超えました'
+ErrAppRequired: 'まず {{ .detail }} アプリケーションをインストールしてください'
+ErrNotInstall: 'アプリケーションがインストールされていません'
+ErrPortInOtherApp: '{{ .port }} ポートは既にアプリケーション {{ .apps }} によって使用されています!'
+ErrDbUserNotValid: '既存のデータベース、ユーザー名、およびパスワードが一致しません!'
+ErrDockerComposeNotValid: 'docker-compose ファイルの形式が正しくありません'
+ErrUpdateBuWebsite: 'アプリケーションは正常に更新されましたが、Web サイト構成ファイルの変更に失敗しました。設定を確認してください! '
+Err1PanelNetworkFailed: 'デフォルトのコンテナ ネットワークの作成に失敗しました。 {{ .detail }}'
+ErrFileParse: 'アプリケーションの docker-compose ファイルの解析に失敗しました!'
+ErrInstallDirNotFound: 'インストール ディレクトリが存在しません。アンインストールする必要がある場合は、強制アンインストールを選択してください。'
+AppStoreIsUpToDate: 'アプリストアはすでに最新バージョンです'
+LocalAppVersionNull: '{{ .name }} アプリケーションはバージョンに同期されていません。アプリリストに追加できません'
+LocalAppVersionErr: '{{ .name }} バージョン {{ .version }} の同期に失敗しました! {{ .err }}'
+ErrFileNotFound: '{{ .name }} ファイルが存在しません'
+ErrFileParseApp: '{{ .name }} ファイルの解析に失敗しました {{ .err }}'
+ErrAppDirNull: 'バージョン フォルダーが存在しません'
+LocalAppErr: 'アプリケーション {{ .name }} の同期に失敗しました! {{ .err }}'
+ErrContainerName: 'コンテナ名が既に存在します'
+ErrAppSystemRestart: '1Panel の再起動によりタスクが終了しました'
+ErrCreateHttpClient: 'リクエスト {{ .err }} の作成に失敗しました'
+ErrHttpReqTimeOut: 'リクエストがタイムアウトしました {{ .err }}'
+ErrHttpReqFailed: 'リクエストが失敗しました {{ .err }}'
+ErrNoSuchHost: '要求されたサーバー {{ .err }} が見つかりません'
+ErrHttpReqNotFound: '要求されたリソース {{ .err }} が見つかりませんでした'
+ErrImagePullTimeOut: 'イメージ プル タイムアウト'
+ErrContainerNotFound: '{{ .name }} コンテナが存在しません'
+ErrContainerMsg: '{{ .name }} コンテナが異常です。詳細についてはコンテナページのログを確認してください。'
+ErrAppBackup: '{{ .name }} アプリケーションのバックアップに失敗しました。エラー {{ .err }}'
+ErrImagePull: 'イメージのプルに失敗しました {{ .err }}'
+ErrVersionTooLow: '現在の 1Panel のバージョンが低すぎるため、App Store を更新できません。操作する前にバージョンをアップグレードしてください。'
+ErrAppNameExist: 'アプリケーション名がすでに存在します'
+AppStoreIsSyncing: 'App Store が同期中です。しばらくしてからもう一度お試しください'
+ErrGetCompose: 'docker-compose.yml ファイルの取得に失敗しました! {{ .detail }}'
+ErrAppWarn: '異常な状態です。ログを確認してください'
+ErrAppParamKey: 'パラメータ {{ .name }} フィールドが異常です'
+ErrAppUpgrade: 'アプリケーション {{ .name }} のアップグレードに失敗しました {{ .err }}'
+AppRecover: 'アプリケーション {{ .name }} をロールバックします'
+PullImageStart: "イメージ {{ .name }} のプルを開始します"
+PullImageSuccess: 'イメージのプルが成功しました'
+UpgradeAppStart: 'アプリケーション {{ .name }} のアップグレードを開始します'
+UpgradeAppSuccess: 'アプリケーション {{ .name }} が正常にアップグレードされました'
+AppStoreIsLastVersion: 'App Store はすでに最新バージョンです'
+AppStoreSyncSuccess: 'App Store の同期が成功しました'
+SyncAppDetail: 'アプリケーション構成を同期する'
+AppVersionNotMatch: '{{ .name }} アプリケーションには、より高い 1Panel バージョンが必要なため、同期をスキップします'
+MoveSiteDir: '現在のアップグレードでは、OpenResty Web サイト ディレクトリの移行が必要です'
+MoveSiteToDir: 'サイト ディレクトリを {{ .name }} に移行します'
+ErrMoveSiteDir: 'サイト ディレクトリの移行に失敗しました'
+MoveSiteDirSuccess: 'Web サイト ディレクトリの移行に成功しました'
+DeleteRuntimePHP: 'PHP ランタイムを削除する'
+CustomAppStoreNotConfig: 'アプリストアでオフライン パッケージ アドレスを設定してください'
+CustomAppStoreNotFound: 'アプリストア パッケージを取得できませんでした。存在するかどうかを確認してください'
+CustomAppStoreFileValid: 'App Store パッケージは .tar.gz 形式である必要があります'
+PullImageTimeout: 'プル イメージのタイムアウトです。イメージのアクセラレーションを増やすか、別のイメージのアクセラレーションに変更してください'
+ErrAppIsDown: '{{ .name }} アプリケーションの状態が異常です。確認してください'
+ErrCustomApps: 'インストールされているアプリケーションがあります。まずアンインストールしてください'
+ErrCustomRuntimes: 'ランタイム環境がインストールされています。まずそれを削除してください'
 
 #file
-ErrFileCanNotRead: "ファイルは読み取れません"
-ErrFileToLarge: "ファイルが大きすぎます"
-ErrPathNotFound: "パスは見つかりません"
-ErrMovePathFailed: "ターゲットパスには元のパスが含まれていません！"
-ErrLinkPathNotFound: "ターゲットパスは存在しません！"
-ErrFileIsExist: "ファイルまたはディレクトリはすでに存在します！"
-ErrFileUpload: "file {{.name}} {{.detail}}}のアップロードに失敗しました"
-ErrFileDownloadDir: "サポートされていないフォルダーをダウンロードします"
-ErrCmdNotFound: "{{.name}}コマンドは存在しません。最初にホストにこのコマンドをインストールしてください"
-ErrSourcePathNotFound:  "ソースディレクトリは存在しません"
-ErrFavoriteExist: "このパスが収集されました"
-ErrInvalidChar: "違法なキャラクターは禁止されています"
-ErrPathNotDelete: "選択したディレクトリを削除することはできません"
+ErrFileCanNotRead: 'このファイルはプレビューをサポートしていません'
+ErrFileToLarge: 'ファイルは 10M より大きいため開けません'
+ErrPathNotFound: 'ディレクトリが存在しません'
+ErrMovePathFailed: 'ターゲット パスに元のパスを含めることはできません!'
+ErrLinkPathNotFound: 'ターゲット パスが存在しません!'
+ErrFileIsExist: 'ファイルまたはフォルダーは既に存在します!'
+ErrFileUpload: '{{ .name }} はファイル {{ .detail }} のアップロードに失敗しました'
+ErrFileDownloadDir: 'ダウンロード フォルダーはサポートされていません'
+ErrCmdNotFound: '{{ .name}} コマンドが存在しません。まずこのコマンドをホストにインストールしてください'
+ErrSourcePathNotFound: 'ソース ディレクトリが存在しません'
+ErrFavoriteExist: 'このパスはすでにお気に入りに登録されています'
+ErrInvalidChar: '不正な文字は許可されません'
+ErrPathNotDelete: '選択されたディレクトリは削除できません'
 
 #website
-ErrDomainIsExist: "ドメインはすでに存在しています"
-ErrAliasIsExist: "エイリアスはすでに存在しています"
-ErrAppDelete: '他のウェブサイトはこのアプリを使用します'
-ErrGroupIsUsed: "グループは使用されており、削除することはできません"
-ErrBackupMatch: "バックアップファイルは、ウェブサイトの現在の部分的なデータと一致しません：{{.Detail}}"
-ErrBackupExist: 'バックアップファイルは、存在しない元のデータの一部に対応しています。{{.Detail}}'
-ErrPHPResource: 'ローカルランタイムはスイッチングをサポートしません！'
-ErrPathPermission: 'インデックスディレクトリで1000：1000以外のアクセス許可を持つフォルダーが検出されたため、Webサイトにアクセスするとアクセスが拒否された場合があります。上の[保存]ボタンをクリックしてください'
-ErrDomainIsUsed: "ドメインはすでにWebサイトで使用されています{{.Name}}"
-ErrDomainFormat: "{{.name}}ドメイン形式エラー"
-ErrDefaultAlias: "デフォルトは予約済みのコード名です。別のコード名を使用してください"
-ErrImageNotExist: "実行中の環境{{.name}}画像は存在しません。実行中の環境を再編集してください"
+ErrDomainIsExist: 'ドメイン名は既に存在します'
+ErrAliasIsExist: 'エイリアスがすでに存在します'
+ErrAppDelete: '他のウェブサイトがこのアプリを使用しているため、削除できません'
+ErrBackupMatch: 'バックアップ ファイルは、現在の Web サイト データ {{ .detail }} の一部と一致しません'
+ErrBackupExist: 'バックアップ ファイル内のソース データの対応する部分が存在しません {{ .detail }}'
+ErrPHPResource: 'ローカルオペレーティング環境は切り替えをサポートしていません! '
+ErrPathPermission: 'インデックス ディレクトリに 1000:1000 以外の権限を持つフォルダーが検出されました。これにより、Web サイトでアクセス拒否エラーが発生する可能性があります。上記の保存ボタンをクリックしてください。'
+ErrDomainIsUsed: 'ドメイン名はウェブサイト [{{ .name }}] で既に使用されています'
+ErrDomainFormat: '{{ .name }} ドメイン名の形式が正しくありません'
+ErrDefaultAlias: 'デフォルトは予約済みのコードです。別のコードを使用してください'
+ErrParentWebsite: 'まずサブサイト {{ .name }} を削除する必要があります'
+ErrBuildDirNotFound: 'ビルド ディレクトリが存在しません'
+ErrImageNotExist: 'オペレーティング環境 {{ .name }} イメージが存在しません。オペレーティング環境を再編集してください'
 
 #ssl
-ErrSSLCannotDelete: "証明書{{.Name}}はWebサイトで使用されており、削除できません"
-ErrAccountCannotDelete: "アカウントに関連付けられた証明書を削除することはできません"
-ErrSSLApply: "証明書は引き続き正常に署名されていますが、OpenRestyリロードが失敗します。構成を確認してください！"
-ErrEmailIsExist: 'メールはすでに存在しています'
-ErrSSLKeyNotFound: '秘密キーファイルは存在しません'
-ErrSSLCertificateNotFound: '証明書ファイルは存在しません'
-ErrSSLKeyFormat: '秘密キーファイル検証エラー'
-ErrSSLCertificateFormat: '証明書ファイル形式エラー、PEM形式を使用してください'
-ErrEabKidOrEabHmacKeyCannotBlank: 'eabkidまたはeabhmackeyは空にすることはできません'
-ErrOpenrestyNotFound: 'HTTPモードでは、最初にOpenRestyをインストールする必要があります'
-ApplySSLStart: '証明書、ドメイン名[{{.domain}}]アプリケーションメソッド[{{.type}}]の申請を開始します'
-dnsAccount: "DNSオートマチック"
-dnsManual: "DNSマニュアル"
-http: "http"
-ApplySSLFailed: '[{{.domain}}]証明書のアプリケーションが失敗しました、{{.detail}}'
-ApplySSLSuccess: '[{{{.domain}}]証明書のアプリケーションが成功しました！！'
-DNSAccountName: 'dnsアカウント[{{.name}}]メーカー[{{.type}}]'
-PushDirLog: 'ディレクトリにプッシュされた証明書[{{.Path}}] {{.Status}}'
-ErrDeleteCAWithSSL: "現在の組織の下に発行された証明書があり、削除できません"
-ErrDeleteWithPanelSSL: "パネルSSL構成はこの証明書を使用しており、削除できません"
-ErrDefaultCA: "デフォルトの証明書当局は削除できません"
-ApplyWebSiteSSLLog: "{{.name}} Webサイト証明書の更新を開始します"
-ErrUpdateWebsiteSSL: "{{.name}}ウェブサイトは証明書の更新に失敗しました：{{.err}}"
-ApplyWebSiteSSLSuccess: "ウェブサイトの証明書を正常に更新します"
-ErrExecShell: "スクリプトの実行に失敗した{{.err}}"
-ExecShellStart: "スクリプトの実行を開始します"
-ExecShellSuccess: "スクリプトは正常に実行されました"
-StartUpdateSystemSSL: "システム証明書の更新を開始します"
-UpdateSystemSSLSuccess: "システム証明書を正常に更新します"
+ErrSSLCannotDelete: '{{ .name }} 証明書は Web サイトで使用されているため、削除できません'
+ErrAccountCannotDelete: 'アカウントは証明書に関連付けられているため、削除できません'
+ErrSSLApply: '証明書の更新は成功しましたが、openresty の再ロードに失敗しました。設定を確認してください。'
+ErrEmailIsExist: 'メールボックスは既に存在します'
+ErrSSLKeyNotFound: '秘密鍵ファイルが存在しません'
+ErrSSLCertificateNotFound: '証明書ファイルが存在しません'
+ErrSSLKeyFormat: '秘密鍵ファイルの検証に失敗しました'
+ErrSSLCertificateFormat: '証明書ファイルの形式が正しくありません。pem 形式を使用してください'
+ErrEabKidOrEabHmacKeyCannotBlank: 'EabKid または EabHmacKey は空白にできません'
+ErrOpenrestyNotFound: 'Http モードでは、まず Openresty をインストールする必要があります'
+ApplySSLStart: '証明書の申請を開始します。ドメイン名 [{{ .domain }}] 申請方法 [{{ .type }}] '
+dnsAccount: 'DNS 自動'
+dnsManual: 'DNS マニュアル'
+http: "HTTP"
+ApplySSLFailed: '[{{ .domain }}] 証明書の申請に失敗しました、{{ .detail }}'
+ApplySSLSuccess: '[{{ .domain }}] 証明書の申請に成功しました! '
+DNSAccountName: 'DNS アカウント [{{ .name }}] ベンダー [{{ .type }}]'
+PushDirLog: '証明書がディレクトリ [{{ .path }}] {{ .status }} にプッシュされました'
+ErrDeleteCAWithSSL: '現在の組織には発行済みの証明書があり、削除できません。'
+ErrDeleteWithPanelSSL: 'パネル SSL 構成はこの証明書を使用しているため、削除できません'
+ErrDefaultCA: 'デフォルトの権限を削除できません'
+ApplyWebSiteSSLLog: '{{ .name }} ウェブサイト証明書の更新を開始しています'
+ErrUpdateWebsiteSSL: '{{ .name }} Web サイト証明書の更新に失敗しました: {{ .err }}'
+ApplyWebSiteSSLSuccess: 'Web サイトの証明書を正常に更新しました'
+ErrExecShell: 'スクリプト {{ .err }} の実行に失敗しました'
+ExecShellStart: 'スクリプトの実行を開始します'
+ExecShellSuccess: 'スクリプトの実行が成功しました'
+StartUpdateSystemSSL: 'システム証明書の更新を開始します'
+UpdateSystemSSLSuccess: 'システム証明書を正常に更新しました'
+ErrWildcardDomain: 'HTTP モードでワイルドカード ドメイン名証明書を申請できません'
 
 #mysql
-ErrUserIsExist: "現在のユーザーはすでに存在しています。新しいユーザーを入力してください"
-ErrDatabaseIsExist: "現在のデータベースはすでに存在しています。新しいデータベースを入力してください"
-ErrExecTimeOut: "SQL実行のタイミングを出して、データベースを確認してください"
-ErrRemoteExist: "リモートデータベースはすでにその名前に存在しています。それを変更して、再試行してください"
-ErrLocalExist: "ローカルデータベースはすでにその名前に存在しています。それを変更して、もう一度試してください"
+ErrUserIsExist: '現在のユーザーは既に存在します。再入力してください'
+ErrDatabaseIsExist: '現在のデータベースは既に存在します。再入力してください'
+ErrExecTimeOut: 'SQL 実行がタイムアウトしました。データベースを確認してください'
+ErrRemoteExist: 'この名前のリモート データベースは既に存在します。変更してもう一度お試しください'
+ErrLocalExist: '名前はローカル データベースに既に存在します。変更してもう一度お試しください'
 
 #redis
-ErrTypeOfRedis: "回復ファイルのタイプは、現在の永続性モードと一致しません。ファイルタイプを変更して、再試行してください"
+ErrTypeOfRedis: 'リカバリ ファイルの種類が現在の永続化方法と一致しません。変更して再試行してください'
 
 #container
-ErrInUsed: "{{.Detail}}が使用されており、削除できません"
-ErrObjectInUsed: "このオブジェクトは使用されており、削除することはできません"
-ErrPortRules: "ポートの数が一致しません。再入力してください！"
-ErrPgImagePull: "画像プルタイムアウト。画像の加速を構成するか、Postgres：16.0-Alpine画像を手動で引いて、再試行してください"
+ErrInUsed: '{{ .detail }} は使用中のため削除できません'
+ErrObjectInUsed: 'オブジェクトは使用中のため削除できません'
+ErrObjectBeDependent: 'このイメージは他のイメージに依存しているため、削除できません'
+ErrPortRules: 'ポート番号が一致しません。再入力してください。'
+ErrPgImagePull: 'イメージのプルがタイムアウトしました。イメージのアクセラレーションを設定するか、{{ .name }} イメージを手動でプルして再試行してください'
 
 #runtime
-ErrDirNotFound: "ビルドフォルダーは存在しません！ファイルの整合性を確認してください！"
-ErrFileNotExist: "{{.Detail}}ファイルは存在しません！ソースファイルの完全性を確認してください！"
-ErrImageBuildErr: "画像ビルドが失敗しました"
-ErrImageExist: "画像はすでに存在しています！"
-ErrDelWithWebsite: "運用環境はウェブサイトに関連付けられており、削除することはできません"
-ErrRuntimeStart: "開始に失敗しました"
-ErrPackageJsonNotFound: "package.jsonファイルは存在しません"
-ErrScriptsNotFound: "Package.jsonにスクリプト構成アイテムは見つかりませんでした"
-ErrContainerNameNotFound: "コンテナ名を取得できない場合は、.envファイルを確認してください"
-ErrNodeModulesNotFound: "node_modulesフォルダーは存在しません！実行中の環境を編集するか、実行中の環境が正常に開始するのを待ちます"
-
-#setting
-ErrBackupInUsed: "バックアップアカウントは既にCronjobで使用されており、削除することはできません。"
-ErrBackupCheck: "バックアップアカウントテスト接続に失敗した{{.err}}"
-ErrOSSConn: "最新バージョンを取得できない場合は、サーバーが外部ネットワークに接続できるかどうかを確認してください。"
-ErrEntrance: "セキュリティ入り口情報エラー。チェックしてもう一度やり直してください！"
+ErrDirNotFound: 'ビルド フォルダーが存在しません。ファイルの整合性を確認してください。'
+ErrFileNotExist: '{{ .detail }} ファイルが存在しません。ソース ファイルの整合性を確認してください。'
+ErrImageBuildErr: 'イメージのビルドに失敗しました'
+ErrImageExist: '画像がすでに存在します!'
+ErrDelWithWebsite: 'オペレーティング環境は既に Web サイトに関連付けられているため、削除できません'
+ErrRuntimeStart: '起動に失敗しました'
+ErrPackageJsonNotFound: 'package.json ファイルが存在しません'
+ErrScriptsNotFound: 'スクリプト構成項目が package.json に見つかりませんでした'
+ErrContainerNameNotFound: 'コンテナ名を取得できません。.env ファイルを確認してください'
+ErrNodeModulesNotFound: 'node_modules フォルダが存在しません。ランタイム環境を編集するか、ランタイム環境が正常に起動するまでお待ちください。'
+ErrContainerNameIsNull: 'コンテナ名が存在しません'
 
 #tool
-ErrConfigNotFound: "構成ファイルは存在しません"
-ErrConfigParse: "構成ファイル形式エラー"
-ErrConfigIsNull: "構成ファイルは空にすることは許可されていません"
-ErrConfigDirNotFound: "実行中のディレクトリは存在しません"
-ErrConfigAlreadyExist: "同じ名前の構成ファイルが既に存在しています"
-ErrUserFindErr: "ユーザー{{.name}} {{.err}}を見つけられなかった"
+ErrConfigNotFound: '構成ファイルが存在しません'
+ErrConfigParse: '構成ファイルの形式が正しくありません'
+ErrConfigIsNull: '構成ファイルは空にできません'
+ErrConfigDirNotFound: '実行ディレクトリが存在しません'
+ErrConfigAlreadyExist: '同じ名前の設定ファイルがすでに存在します'
+ErrUserFindErr: 'ユーザー {{ .name }} の検索に失敗しました {{ .err }}'
 
 #ssh
-ErrFirewallNone: "システムでFirewalldまたはUFWサービスは検出されませんでした。チェックしてもう一度やり直してください！"
-ErrFirewallBoth: "FirewalldサービスとUFWサービスの両方がシステムで検出されます。競合を避けるために、1つをアンインストールして再試行してください！"
+ErrFirewallNone: 'システムのファイアウォールまたは ufw サービスが検出されませんでした。確認してもう一度お試しください。'
+ErrFirewallBoth: 'システムにfirewalldとufwの両方のサービスがあることが検出されました。競合を避けるため、アンインストールしてもう一度お試しください。'
 
 #cronjob
-ErrBashExecute: "スクリプト実行エラー、タスク出力テキスト領域の特定の情報を確認してください。"
-ErrCutWebsiteLog: "{{.Name}} Webサイトログの切断が失敗した、エラー{{.err}}"
-CutWebsiteLogSuccess: "{{.Name}} Webサイトログカットに正常にカット、バックアップパス{{.Path}}"
+ErrCutWebsiteLog: '{{ .name }} ウェブサイトのログの切り取りに失敗しました。エラー {{ .err }}'
+CutWebsiteLogSuccess: '{{ .name }} ウェブサイトのログが正常にカットされました。バックアップ パス {{ .path }}'
+HandleShell: 'スクリプト {{ .name }} を実行します'
+HandleNtpSync: 'システム時刻の同期'
+HandleSystemClean: 'システム キャッシュのクリーンアップ'
 
 #toolbox
-ErrNotExistUser: "現在のユーザーは存在しません。変更して再試行してください！"
-ErrBanAction: "失敗した設定では、現在の{{.name}}サービスが利用できません。チェックして再試行してください！"
-ErrClamdscanNotFound: "Clamdscanコマンドは検出されませんでした。インストールするためにドキュメントを参照してください！"
+ErrNotExistUser: '現在のユーザーは存在しません。変更してもう一度お試しください。'
+ErrBanAction: '設定に失敗しました。現在の {{ .name }} サービスは利用できません。確認してもう一度お試しください。'
+ErrClamdscanNotFound: 'clamdscan コマンドが検出されませんでした。インストールするにはドキュメントを参照してください。'
 
 #waf
-ErrScope: "この設定の変更はサポートされていません"
-ErrStateChange: "ステータスの変更に失敗しました"
-ErrRuleExist: "ルールはすでに存在します"
-ErrRuleNotExist: "ルールが存在しません"
-ErrParseIP: "IP 形式が正しくありません"
-ErrDefaultIP: "default は予約名です。他の名前を使用してください"
-ErrGroupInUse: "IP グループはブラックリスト/ホワイトリストで使用中です。削除できません"
-ErrGroupExist: "IP グループ名はすでに存在します"
-ErrIPRange: "IP 範囲が正しくありません"
-ErrIPExist: "IP はすでに存在します"
-urlDefense: "URL ルール"
-urlHelper: "禁止された URL"
-dirFilter: "ディレクトリフィルタ"
-xss: "XSS"
-phpExec: "PHP スクリプト実行"
-oneWordTrojan: "ワンワードトロイの木馬"
-appFilter: "アプリケーション危険ディレクトリフィルタ"
-webshell: "Webshell"
-args: "パラメータルール"
-protocolFilter: "プロトコルフィルタ"
-javaFileter: "Java 危険ファイルフィルタ"
-scannerFilter: "スキャナフィルタ"
-escapeFilter: "エスケープフィルタ"
-customRule: "カスタムルール"
-httpMethod: "HTTP メソッドフィルタ"
-fileExt: "ファイルアップロード制限"
-defaultIpBlack: "悪意のある IP グループ"
-cookie: "Cookie ルール"
-urlBlack: "URL ブラックリスト"
-uaBlack: "User-Agent ブラックリスト"
-attackCount: "攻撃頻度制限"
-fileExtCheck: "ファイルアップロード制限"
-geoRestrict: "地域アクセス制限"
-unknownWebsite: "未承認ドメインアクセス"
-notFoundCount: "404 頻度制限"
-headerDefense: "Header ルール"
-defaultUaBlack: "User-Agent ルール"
-methodWhite: "HTTP ルール"
-captcha: "人間と機械の検証"
-fiveSeconds: "5 秒検証"
-vulnCheck: "補足ルール"
-acl: "カスタムルール"
-sql: "SQL インジェクション"
-cc: "アクセス頻度制限"
-defaultUrlBlack: "URL ルール"
-sqlInject: "SQL インジェクション"
-ErrDBNotExist: "データベースが存在しません"
-allow: "許可"
-deny: "禁止"
+ErrScope: 'この構成の変更はサポートされていません'
+ErrStateChange: '状態の変更に失敗しました'
+ErrRuleExist: 'ルールは既に存在します'
+ErrRuleNotExist: 'ルールが存在しません'
+ErrParseIP: 'IP 形式が間違っています'
+ErrDefaultIP: 'デフォルトは予約名です。別の名前に変更してください'
+ErrGroupInUse: 'IP グループはブラックリスト/ホワイトリストで使用されており、削除できません'
+ErrGroupExist: 'IP グループ名がすでに存在します'
+ErrIPRange: 'IP 範囲が間違っています'
+ErrIPExist: 'IP がすでに存在します'
+urlDefense: 'URL ルール'
+urlHelper: '禁止された URL'
+dirFilter: 'ディレクトリ フィルター'
+xss: 'XSS'
+phpExec: 'PHP スクリプトの実行'
+oneWordTrojan: 'ワンワードトロイの木馬'
+appFilter: '危険なディレクトリフィルタリングを適用する'
+webshell: 'ウェブシェル'
+args: 'パラメータルール'
+protocolFilter: 'プロトコルフィルタリング'
+javaFileter: 'Java 危険ファイル フィルター'
+scannerFilter: 'スキャナ フィルタ'
+escapeFilter: 'エスケープフィルター'
+customRule: 'カスタムルール'
+httpMethod: 'HTTP メソッド フィルタリング'
+fileExt: 'ファイルアップロード制限'
+defaultIpBlack: '悪意のある IP グループ'
+cookie: 'クッキールール'
+urlBlack: 'URL ブラックリスト'
+uaBlack: 'ユーザーエージェント ブラックリスト'
+attackCount: '攻撃頻度の制限'
+fileExtCheck: 'ファイルアップロード制限'
+geoRestrict: '地域アクセス制限'
+unknownWebsite: '不正なドメイン名アクセス'
+notFoundCount: '404 レート制限'
+headerDefense: 'ヘッダールール'
+defaultUaBlack: 'ユーザーエージェントルール'
+methodWhite: 'HTTP ルール'
+captcha: '人間と機械による認証'
+fiveSeconds: '5秒検証'
+vulnCheck: '補足ルール'
+acl: 'カスタムルール'
+sql: 'SQL インジェクション'
+cc: 'アクセス頻度制限'
+defaultUrlBlack: 'URL ルール'
+sqlInject: 'SQL インジェクション'
+ErrDBNotExist: 'データベースが存在しません'
+allow: '許可'
+deny: '拒否'
+OpenrestyNotFound: 'Openresty がインストールされていません'
 
-#license
-ErrLicense: "ライセンス形式のエラー、チェックして再試行してください！"
-ErrLicenseCheck: "ライセンスの確認が失敗しました。チェックしてもう一度やり直してください！"
-ErrLicenseSave: "ライセンス情報の保存に失敗しました、{{.err}}、もう一度やり直してください！"
-ErrLicenseSync: "ライセンス情報の同期に失敗し、データベースでライセンス情報は検出されませんでした！"
-ErrXpackNotFound: "このセクションはプロフェッショナルエディション機能です。最初にパネルsettings-licenseインターフェイスにライセンスをインポートしてください"
-ErrXpackNotActive: "このセクションはプロフェッショナルエディション機能です。最初にパネル設定リセンスインターフェイスでライセンスステータスを同期してください"
-ErrXpackOutOfDate: "現在のライセンスの有効期限が切れています。パネル設定リセンスインターフェイスにライセンスを再輸入してください"
-ErrXpackLost: "ライセンスは、再試行の最大数に達しました。[設定] [ライセンス]ページに移動し、[同期]ボタンを手動でクリックして、プロフェッショナルバージョンの機能が適切に機能していることを確認してください。"
-ErrXpackTimeout: "リクエストタイムアウト、ネットワーク接続が不安定な場合があります。後でもう一度やり直してください！"
+#task
+TaskStart: '{{ .name }} タスクが開始されました [START]'
+TaskEnd: '{{ .name }} タスクが完了しました [COMPLETED]'
+TaskFailed: '{{ .name }} タスクが失敗しました'
+TaskTimeout: '{{ .name }} がタイムアウトしました'
+TaskSuccess: '{{ .name }} タスクが成功しました'
+TaskRetry: '{{ .name }} 回目の再試行を開始します'
+SubTaskSuccess: '{{ .name }} が成功しました'
+SubTaskFailed: '{{ .name }} が失敗しました: {{ .err }}'
+TaskInstall: 'インストール'
+TaskUninstall: 'アンインストール'
+TaskCreate: '作成'
+TaskDelete: '削除'
+TaskUpgrade: 'アップグレード'
+TaskUpdate: '更新'
+TaskRestart: '再起動'
+TaskBackup: 'バックアップ'
+TaskRecover: '回復'
+TaskRollback: 'ロールバック'
+TaskPull: 'プル'
+TaskBuild: 'ビルド'
+TaskPush: 'プッシュ'
+TaskHandle: '実行'
+Website: 'ウェブサイト'
+App: 'アプリケーション'
+Runtime: 'ランタイム環境'
+Database: 'データベース'
+ConfigFTP: 'FTP ユーザー {{ .name }} を作成します'
+ConfigOpenresty: 'Openresty 構成ファイルを作成する'
+InstallAppSuccess: 'アプリケーション {{ .name }} が正常にインストールされました'
+ConfigRuntime: 'ランタイム環境を構成する'
+ConfigApp: '構成アプリケーション'
+SuccessStatus: '{{ .name }} は成功しました'
+FailedStatus: '{{ .name }} が {{ .err }} に失敗しました'
+HandleLink: 'ハンドルアプリケーションの関連付け'
+HandleDatabaseApp: 'アプリケーション パラメータの処理'
+ExecShell: '{{ .name }} スクリプトを実行する'
+PullImage: 'イメージをプル'
+Start: '開始'
+Run: '開始'
+Stop: '停止'
+Image: '鏡'
+Compose: 'オーケストレーション'
+Container: 'コンテナ'
+AppLink: 'リンクされたアプリケーション'
+EnableSSL: 'HTTPS を有効にする'
+AppStore: 'Appストア'
+TaskSync: '同期'
+LocalApp: 'ローカルアプリケーション'
+SubTask: 'サブタスク'
+RuntimeExtension: 'ランタイム環境拡張'
+TaskIsExecuting: 'タスクは実行中です'
+CustomAppstore: 'カスタム アプリケーション ウェアハウス'
 
-#license
-ErrAlert: "情報形式のエラーをアラートしてください。チェックして再試行してください！"
-ErrAlertPush: "アラートプッシュエラー、チェックして再試行してください！"
-ErrAlertSave: "エラーを保存してください、チェックして再試行してください！"
-ErrAlertSync: "アラート同期エラー、チェックして再試行してください！"
-ErrAlertRemote: "リモートアラートエラー、チェックして再試行してください！"
+#task - ai
+OllamaModelPull: 'Ollama モデル {{ .name }} をプルします'
+OllamaModelSize: "Ollama モデル {{ .name }} のサイズを取得します"
 
-#cmd
-AppVersion: "アプリバージョン"
-AppCommands: "アプリ関連のコマンド"
-AppInit: "アプリを初期化します"
-AppKeyVal: "アプリキー（英語のみをサポートする）"
-AppCreateFileErr: "file {{.name}}作成に失敗した{{.err}}"
-AppCreateDirErr: "Folder {{.name}}作成に失敗した{{.err}}"
-AppMissKey: "アプリキーがありません、-kを使用して指定します"
-AppMissVersion: "アプリバージョンがありません、-vを使用して指定します"
-AppVersionExist: "バージョンはすでに存在します！"
-AppCreateSuccessful: "創造は成功しました！"
-AppWriteErr: "file {{.name}} write failed {{.err}}"
-SudoHelper: "{{.cmd}}を使用するか、ルートユーザーに切り替えてください"
-ListenIPCommands: "リスニングIPを切り替えます"
-ListenIPv4: "IPv4で聞いてください"
-ListenIPv6: "IPv6で聞く"
-ListenChangeSuccessful: "切り替え成功！{{.Value}}で聞いています"
-ResetCommands: "システム情報をリセットします"
-ResetMFA: "1パネルの2要素認証をキャンセルします"
-ResetHttps: "1Panel HTTPSログインをキャンセルします"
-ResetEntrance: "1パネルの安全な入り口をキャンセルします"
-ResetIPs: "1パネル認定IP制限をキャンセルします"
-ResetDomain: "1パネルドメインバインディングをキャンセルします"
-RestoreCommands: "ロールバック1パネルサービスとデータ"
-RestoreNoSuchFile: "ロールバックに使用できるファイルはありません"
-RestoreStep1: "（1/5）{{.name}}ディレクトリからの1パネルサービスとデータの開始ロールバック..."
-RestoreStep2: "（2/5）1パネルバイナリロールバックが成功しました"
-RestoreStep3: "（3/5）1パネルスクリプトロールバック成功"
-RestoreStep4: "（4/5）1パネルサービスロールバックが成功しました"
-RestoreStep5: "（5/5）1パネルデータロールバックが成功しました"
-RestoreSuccessful: "ロールバックが成功しました！サービスを再起動します、待ってください..."
-UpdateCommands: "パネル情報を更新します"
-UpdateUser: "パネルユーザーを更新します"
-UpdatePassword: "パスワードを更新します"
-UpdatePort: "パネルポートを更新します"
-UpdateUserNull: "エラー：パネルユーザーは空です！"
-UpdateUserBlank: "エラー：パネルユーザーにはスペースが含まれています！"
-UpdateUserFormat: "エラー：無効なパネルユーザー形式！英語、中国語、数字、_、長さ3〜30のみをサポートしています"
-UpdateUserErr: "エラー：パネルユーザーの更新に失敗しました{{.err}}"
-UpdateSuccessful: "更新成功！"
-UpdateUserResult: "パネルユーザー：{{.name}}"
-UpdatePasswordRead: "エラー：パネルパスワード情報の読み取りに失敗しました、{{.err}}"
-UpdatePasswordNull: "エラー：パネルパスワードは空です！"
-UpdateUPasswordBlank: "エラー：パスワードにはスペースが含まれています！"
-UpdatePasswordFormat: "エラー：パネルパスワードは、文字、数字、特殊文字のみをサポートします！@＃$％*_、。、、長さ8-30！"
-UpdatePasswordLen: "エラー：6文字より長くパスワードを入力してください！"
-UpdatePasswordRe: "パスワードを認証する："
-UpdatePasswordErr: "エラー：{{.err}}のパスワードの更新に失敗しました"
-UpdatePasswordSame: "エラー：2つのパスワードが一致しません。チェックして再試行してください！"
-UpdatePasswordResult: "パネルパスワード：{{.name}}"
-UpdatePortFormat: "エラー：入力ポート番号は1〜65535でなければなりません！"
-UpdatePortUsed: "エラー：ポート番号はすでに使用されています。チェックして再試行してください！"
-UpdatePortErr: "エラー：パネルポートの更新に失敗しました{{.err}}"
-UpdatePortResult: "パネルポート：{{.name}}"
-UpdatePortFirewallAdd: "ファイアウォールポートルールの追加に失敗した{{.err}}、ファイアウォールルールに{{.name}}ポートを手動で追加してください。"
-UpdatePortFirewallDel: "エラー：ファイアウォールポートの削除に失敗しました、{{.err}}"
-UpdatePortFirewallReload: "ファイアウォールのリロードに失敗しました{{.err}}、ファイアウォールを手動でリロードしてください。"
-UserInfo: "パネル情報を取得します"
-UserInfoAddr: "パネルアドレス："
-UserInfoPassHelp: "ヒント：パスワードを変更するには、コマンドを実行できます。"
-DBConnErr: "エラー：データベース接続の初期化に失敗しました、{{.err}}"
-SystemVersion: "バージョン："
-SystemMode: "モード："
+#task - snapshot 
+Snapshot: 'スナップショット'
+SnapDBInfo: '1Panel データベース情報を書き込む'
+SnapCopy: 'ファイルとディレクトリ {{ .name }} をコピーします'
+SnapNewDB: 'データベース {{ .name }} 接続を初期化します'
+SnapDeleteOperationLog: '操作ログの削除'
+SnapDeleteLoginLog: 'アクセスログを削除する'
+SnapDeleteMonitor: '監視データを削除する'
+SnapRemoveSystemIP: 'システム IP を削除します'
+SnapBaseInfo: '1Panel の基本情報を書き込む'
+SnapInstallApp: '1Panel にインストールされたアプリケーションをバックアップする'
+SnapDockerSave: 'インストールされたアプリケーションを圧縮する'
+SnapLocalBackup: '1Panel ローカル バックアップ ディレクトリをバックアップします'
+SnapCompressBackup: 'ローカル バックアップ ディレクトリを圧縮する'
+SnapPanelData: '1Panel データ ディレクトリをバックアップ'
+SnapCompressPanel: '圧縮データ ディレクトリ'
+SnapWebsite: '1Panel ウェブサイト ディレクトリのバックアップ'
+SnapCloseDBConn: 'データベース接続を閉じる'
+SnapCompress: 'スナップショット ファイルを作成する'
+SnapCompressFile: 'スナップショット ファイルを圧縮する'
+SnapCheckCompress: 'スナップショット圧縮ファイルをチェックする'
+SnapCompressSize: 'スナップショット ファイル サイズ {{ .name }}'
+SnapUpload: 'スナップショット ファイルをアップロード'
+SnapLoadBackup: 'バックアップ アカウント情報を取得する'
+SnapUploadTo: 'スナップショット ファイルを {{ .name }} にアップロードします'
+SnapUploadRes: 'スナップショット ファイルを {{ .name }} にアップロードします'
+
+SnapshotRecover: 'スナップショットの復元'
+RecoverDownload: 'スナップショット ファイルをダウンロード'
+Download: 'ダウンロード'
+RecoverDownloadAccount: 'スナップショット ダウンロード バックアップ アカウント {{ .name }} を取得します'
+RecoverDecompress: 'スナップショット圧縮ファイルを解凍する'
+Decompress: '減圧'
+BackupBeforeRecover: 'スナップショットの前にシステム関連データをバックアップする'
+Readjson: 'スナップショット内の Json ファイルを読み取ります'
+ReadjsonPath: 'スナップショット内の Json ファイル パスを取得します'
+ReadjsonContent: 'Json ファイルを読み取ります'
+ReadjsonMarshal: 'Json エスケープ処理'
+RecoverApp: 'インストールされたアプリを復元する'
+RecoverWebsite: 'ウェブサイトディレクトリを回復する'
+RecoverAppImage: 'スナップショットイメージのバックアップを復元する'
+RecoverCompose: '他のコンポーザーのコンテンツを復元する'
+RecoverComposeList: 'すべてのコンポーザーを復元する'
+RecoverComposeItem: '{{ .name }} の作成を回復する'
+RecoverAppEmpty: 'スナップショット ファイルにアプリケーション イメージのバックアップが見つかりませんでした'
+RecoverBaseData: '基本データとファイルを回復する'
+RecoverDaemonJsonEmpty: 'スナップショット ファイルと現在のマシンの両方に、コンテナー構成 daemon.json ファイルがありません'
+RecoverDaemonJson: 'コンテナ構成 daemon.json ファイルを復元する'
+RecoverDBData: 'データベース データを回復する'
+RecoverBackups: 'ローカル バックアップ ディレクトリを復元する'
+RecoverPanelData: 'リカバリデータディレクトリ'
+
+#task - container
+ContainerNewCliet: 'Docker クライアントを初期化する'
+ContainerImagePull: 'コンテナ イメージ {{ .name }} をプルします'
+ContainerRemoveOld: '元のコンテナ {{ .name }} を削除します'
+ContainerImageCheck: 'イメージが正常にプルされているかどうかを確認します'
+ContainerLoadInfo: 'コンテナの基本情報を取得する'
+ContainerRecreate: 'コンテナの更新に失敗しました。元のコンテナの復元を開始しています'
+ContainerCreate: '新しいコンテナ {{ .name }} を作成します'
+ContainerCreateFailed: 'コンテナの作成に失敗しました。失敗したコンテナを削除してください'
+ContainerStartCheck: 'コンテナが起動されているかどうかを確認します'
+
+#task - image
+ImageBuild: 'イメージビルド'
+ImageBuildStdoutCheck: '画像出力コンテンツを解析する'
+ImaegBuildRes: 'イメージビルド出力: {{ .name }}'
+ImagePull: '画像をプル'
+ImageRepoAuthFromDB: 'データベースからリポジトリ認証情報を取得する'
+ImaegPullRes: "画像プル出力: {{ .name }}"
+ImagePush: '画像をプッシュ'
+ImageRenameTag: '画像タグを変更する'
+ImageNewTag: '新しい画像タグ {{ .name }}'
+ImaegPushRes: '画像プッシュ出力: {{ .name }}'
+ComposeCreate: 'コンポジションを作成する'
+ComposeCreateRes: "Compose 作成出力: {{ .name }}"
+
+#task - website
+BackupNginxConfig: 'ウェブサイトの OpenResty 構成ファイルをバックアップする'
+CompressFileSuccess: 'ディレクトリを正常に圧縮しました。{{ .name }} に圧縮されました'
+CompressDir: '圧縮ディレクトリ'
+DeCompressFile: 'ファイル {{ .name }} を解凍します'
+ErrCheckValid: 'バックアップ ファイルの検証に失敗しました、{{ .name }}'
+Rollback: 'ロールバック'
+websiteDir: 'ウェブサイトディレクトリ'
+RecoverFailedStartRollBack: 'リカバリに失敗しました。ロールバックを開始します'
+AppBackupFileIncomplete: 'バックアップ ファイルが不完全で、app.json または app.tar.gz ファイルが不足しています'
+AppAttributesNotMatch: 'アプリケーションの種類または名前が一致しません'
+
+#alert
+ErrAlert: '警告メッセージの形式が正しくありません。確認してもう一度お試しください。'
+ErrAlertPush: 'アラート情報のプッシュ中にエラーが発生しました。確認してもう一度お試しください。'
+ErrAlertSave: 'アラーム情報の保存中にエラーが発生しました。確認してもう一度お試しください。'
+ErrAlertSync: 'アラーム情報の同期エラーです。確認してもう一度お試しください。'
+ErrAlertRemote: 'アラーム メッセージのリモート エラーです。確認してもう一度お試しください。'

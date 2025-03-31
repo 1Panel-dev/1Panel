@@ -52,12 +52,12 @@ Err1PanelNetworkFailed: '默认容器网络创建失败！{{ .detail }}'
 ErrFileParse: '应用 docker-compose 文件解析失败!'
 ErrInstallDirNotFound: '安装目录不存在，如需卸载，请选择强制卸载'
 AppStoreIsUpToDate: '应用商店已经是最新版本'
-LocalAppVersionNull: '{{.name}} 应用未同步到版本！无法添加到应用列表'
-LocalAppVersionErr: '{{.name}} 同步版本 {{.version}} 失败！{{ .err }}'
-ErrFileNotFound: '{{.name}} 文件不存在'
-ErrFileParseApp: '{{.name}} 文件解析失败 {{ .err }}'
+LocalAppVersionNull: '{{ .name }} 应用未同步到版本！无法添加到应用列表'
+LocalAppVersionErr: '{{ .name }} 同步版本 {{ .version }} 失败！{{ .err }}'
+ErrFileNotFound: '{{ .name }} 文件不存在'
+ErrFileParseApp: '{{ .name }} 文件解析失败 {{ .err }}'
 ErrAppDirNull: '版本文件夹不存在'
-LocalAppErr: "应用 {{.name}} 同步失败！{{ .err }}"
+LocalAppErr: "应用 {{ .name }} 同步失败！{{ .err }}"
 ErrContainerName: "容器名称已存在"
 ErrAppSystemRestart: "1Panel 重启导致任务终止"
 ErrCreateHttpClient: "创建请求失败 {{ .err }}"
@@ -68,7 +68,7 @@ ErrHttpReqNotFound: "无法找到请求的资源 {{ .err }}"
 ErrImagePullTimeOut: '镜像拉取超时'
 ErrContainerNotFound: '{{ .name }} 容器不存在'
 ErrContainerMsg: '{{ .name }} 容器异常，具体请在容器页面查看日志'
-ErrAppBackup: '{{ .name }} 应用备份失败 err {{ .err }}'
+ErrAppBackup: '{{ .name }} 应用备份失败 {{ .err }}'
 ErrImagePull: '镜像拉取失败 {{ .err }}'
 ErrVersionTooLow: '当前 1Panel 版本过低，无法更新应用商店，请升级版本之后操作'
 ErrAppNameExist: '应用名称已存在'
@@ -127,7 +127,7 @@ ErrDomainFormat: "{{ .name }} 域名格式不正确"
 ErrDefaultAlias: "default 为保留代号，请使用其他代号"
 ErrParentWebsite: "需要先删除子网站 {{ .name }}"
 ErrBuildDirNotFound: "构建目录不存在"
-ErrImageNotExist: "运行环境 {{.name}} 镜像不存在，请重新编辑运行环境"
+ErrImageNotExist: "运行环境 {{ .name }} 镜像不存在，请重新编辑运行环境"
 
 #ssl
 ErrSSLCannotDelete: "{{ .name }} 证书正在被网站使用，无法删除"
@@ -144,9 +144,9 @@ ApplySSLStart: '开始申请证书，域名 [{{ .domain }}] 申请方式 [{{ .ty
 dnsAccount: "DNS 自动"
 dnsManual: "DNS 手动"
 http: "HTTP"
-ApplySSLFailed: '申请  [{{ .domain }}] 证书失败， {{.detail}} '
+ApplySSLFailed: '申请  [{{ .domain }}] 证书失败， {{ .detail }} '
 ApplySSLSuccess: '申请 [{{ .domain }}] 证书成功！！'
-DNSAccountName: 'DNS 账号 [{{ .name }}] 厂商 [{{.type}}]'
+DNSAccountName: 'DNS 账号 [{{ .name }}] 厂商 [{{ .type }}]'
 PushDirLog: '证书推送到目录 [{{ .path }}] {{ .status }}'
 ErrDeleteCAWithSSL: "当前机构下存在已签发证书，无法删除"
 ErrDeleteWithPanelSSL: "面板 SSL 配置使用此证书，无法删除"
@@ -268,12 +268,12 @@ deny: "禁止"
 OpenrestyNotFound: "Openresty 未安装"
 
 #task
-TaskStart: "{{.name}} 任务开始 [START]"
-TaskEnd: "{{.name}} 任务结束 [COMPLETED]"
-TaskFailed: "{{.name}} 任务失败"
-TaskTimeout: "{{.name}} 超时"
-TaskSuccess: "{{.name}} 任务成功"
-TaskRetry: "开始第 {{.name}} 次重试"
+TaskStart: "{{ .name }} 任务开始 [START]"
+TaskEnd: "{{ .name }} 任务结束 [COMPLETED]"
+TaskFailed: "{{ .name }} 任务失败"
+TaskTimeout: "{{ .name }} 超时"
+TaskSuccess: "{{ .name }} 任务成功"
+TaskRetry: "开始第 {{ .name }} 次重试"
 SubTaskSuccess: "{{ .name }} 成功"
 SubTaskFailed: "{{ .name }} 失败: {{ .err }}"
 TaskInstall: "安装"
@@ -341,6 +341,7 @@ SnapLocalBackup: "备份 1Panel 本地备份目录"
 SnapCompressBackup: "压缩本地备份目录"
 SnapPanelData: "备份 1Panel 数据目录"
 SnapCompressPanel: "压缩数据目录"
+SnapWebsite: "备份 1Panel 网站目录"
 SnapCloseDBConn: "关闭数据库连接"
 SnapCompress: "制作快照文件"
 SnapCompressFile: "压缩快照文件"
@@ -363,8 +364,8 @@ ReadjsonPath: "获取快照内 Json 文件路径"
 ReadjsonContent: "读取 Json 文件"
 ReadjsonMarshal: "Json 转义处理"
 RecoverApp: "恢复已安装应用"
+RecoverWebsite: "恢复网站目录"
 RecoverAppImage: "恢复快照镜像备份"
-RecoverAppList: "获取所有待恢复应用"
 RecoverCompose: "恢复其他编排内容"
 RecoverComposeList: "获取所有待恢复编排"
 RecoverComposeItem: "恢复编排 {{ .name }}"
@@ -403,7 +404,7 @@ ComposeCreateRes: "编排创建输出：{{ .name }}"
 
 # task - website
 BackupNginxConfig: "备份网站 OpenResty 配置文件"
-CompressFileSuccess: "压缩目录成功，压缩为 {{.name}}"
+CompressFileSuccess: "压缩目录成功，压缩为 {{ .name }}"
 CompressDir: "压缩目录"
 DeCompressFile: "解压文件 {{ .name }}"
 ErrCheckValid: "校验备份文件失败，{{ .name }}"

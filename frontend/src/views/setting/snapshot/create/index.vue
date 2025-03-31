@@ -93,9 +93,9 @@
                     :props="defaultProps"
                     show-checkbox
                 >
-                    <template #default="{ node, data }">
+                    <template #default="{ data }">
                         <div class="float-left">
-                            <span>{{ load18n(node, data.label) }}</span>
+                            <span>{{ data.label }}</span>
                         </div>
                         <div class="ml-4 float-left">
                             <span v-if="data.size">{{ computeSize(data.size) }}</span>
@@ -220,6 +220,7 @@ const emit = defineEmits(['search']);
 const acceptParams = (): void => {
     form.downloadAccountID = '';
     form.fromAccounts = [];
+    nowIndex.value = 0;
     search();
     loadBackups();
     drawerVisible.value = true;
@@ -360,12 +361,7 @@ const changeAccount = async () => {
 const load18n = (node: any, label: string) => {
     if (node.level === 1) {
         switch (label) {
-            case 'agent':
-            case 'conf':
-            case 'docker':
             case 'log':
-            case 'runtime':
-            case 'task':
             case 'app':
             case 'database':
             case 'website':
@@ -483,7 +479,6 @@ const setAppDefaultCheck = async (list: any) => {
     for (const item of list) {
         if (item.isCheck) {
             appRef.value.setChecked(item.id, true, true);
-            continue;
         }
         if (item.children) {
             setAppDefaultCheck(item.children);

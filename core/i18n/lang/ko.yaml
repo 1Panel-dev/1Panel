@@ -79,7 +79,7 @@ SubTaskFailed: "{{ .name }} 실패: {{ .err }}"
 TaskInstall: "설치"
 TaskUpgrade: "업그레이드"
 SuccessStatus: "{{ .name }} 성공"
-FailedStatus: "{{ .name }} 실패 {{.err}}"
+FailedStatus: "{{ .name }} 실패 {{ .err }}"
 Start: "시작"
 SubTask: "서브 작업"
 

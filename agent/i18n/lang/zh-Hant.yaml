@@ -1,251 +1,255 @@
-ErrInvalidParams: "請求參數錯誤: {{ .detail }}"
-ErrInternalServer: "伺服器內部錯誤: {{ .detail }}"
-ErrRecordExist: "記錄已存在"
-ErrRecordNotFound: "記錄未找到"
-ErrStructTransform: "類型轉換失敗: {{ .detail }}"
-ErrNotSupportType: "系統暫不支持當前類型: {{ .detail }}"
-ErrApiConfigStatusInvalid: "API 接口禁止訪問: {{ .detail }}"
-ErrApiConfigKeyInvalid: "API 接口密钥錯誤: {{ .detail }}"
-ErrApiConfigIPInvalid: "调用 API 接口 IP 不在白名单: {{ .detail }}"
-ErrApiConfigDisable: "此接口禁止使用 API 接口調用: {{ .detail }}"
+ErrInvalidParams: '請求參數錯誤: {{ .detail }}'
+ErrTokenParse: 'Token 產生錯誤: {{ .detail }}'
+ErrInitialPassword: '原密碼錯誤'
+ErrInternalServer: '服務內部錯誤: {{ .detail }}'
+ErrRecordExist: '記錄已存在'
+ErrRecordNotFound: '記錄未能找到'
+ErrStructTransform: '型別轉換失敗: {{ .err }}'
+ErrNotLogin: '使用者未登入: {{ .detail }}'
+ErrPasswordExpired: '目前密碼已過期: {{ .detail }}'
+ErrNotSupportType: '系統暫不支援目前類型: {{ .name }}'
+ErrProxy: '請求錯誤，請檢查該節點狀態: {{ .detail }}'
+ErrApiConfigStatusInvalid: 'API 介面禁止存取: {{ .detail }}'
+ErrApiConfigKeyInvalid: 'API 介面金鑰錯誤: {{ .detail }}'
+ErrApiConfigIPInvalid: '呼叫API 介面IP 不在白名單: {{ .detail }}'
+ErrApiConfigDisable: '此介面禁止使用API 介面呼叫: {{ .detail }}'
+ErrApiConfigKeyTimeInvalid: 'API 介面時間戳記錯誤: {{ .detail }}'
 
 #common
-ErrUsernameIsExist: "使用者名稱已存在"
-ErrNameIsExist: "名稱已存在"
-ErrDemoEnvironment: "演示伺服器，禁止此操作!"
-ErrCmdTimeout: "指令執行超時！"
-ErrCmdIllegal: "執行命令中存在不合法字符，請修改後重試！"
-ErrPortExist: "{{ .port }} 埠已被 {{ .type }} [{{ .name }}] 佔用"
-TYPE_APP: "應用"
-TYPE_RUNTIME: "運作環境"
-TYPE_DOMAIN: "網域名稱"
-ErrTypePort: "埠 {{ .name }} 格式錯誤"
-Success: "成功"
-Failed: "失敗"
-SystemRestart: "系統重啟導致任務中斷"
-ErrInvalidChar: "禁止使用非法字元"
-ErrGroupIsDefault: "預設分組，無法刪除"
-ErrGroupIsInWebsiteUse: "分組正在被其他網站使用，無法刪除"
+ErrUsernameIsExist: '使用者名稱已存在'
+ErrNameIsExist: '名稱已存在'
+ErrDemoEnvironment: '示範伺服器，禁止此操作!'
+ErrCmdTimeout: '指令執行逾時！'
+ErrCmdIllegal: '執行指令中存在不合法字符，請修改後重試！'
+ErrPortExist: '{{ .port }} 埠已被{{ .type }} [{{ .name }}] 佔用'
+TYPE_APP: '應用'
+TYPE_RUNTIME: '運作環境'
+TYPE_DOMAIN: '網域名稱'
+ErrTypePort: '埠{{ .name }} 格式錯誤'
+ErrTypePortRange: '連接埠範圍需要在1-65535 之間'
+Success: '成功'
+Failed: '失敗'
+SystemRestart: '系統重新啟動導致任務中斷'
+ErrGroupIsDefault: '預設分組，無法刪除'
+ErrGroupIsInWebsiteUse: '分組正在被其他網站使用，無法刪除'
 
 #backup
-ErrBackupLocalDelete: "暫不支持刪除本地伺服器備份帳號"
-ErrBackupLocalCreate: "暫不支持創建本地伺服器備份帳號"
+ErrBackupInUsed: '此備份帳號已在排程任務中使用，無法刪除'
+ErrBackupCheck: '備份帳號測試連線失敗{{ .err }}'
+ErrBackupLocalDelete: '暫時不支援刪除本機伺服器備份帳號'
+ErrBackupLocalCreate: '暫時不支援建立本機伺服器備份帳號'
 
 #app
-ErrPortInUsed: "{{ .detail }} 端口已被佔用！"
-ErrAppLimit: "應用超出安裝數量限制"
-ErrAppRequired: "請先安裝 {{ .detail }} 應用"
-ErrNotInstall: "應用未安裝"
-ErrPortInOtherApp: "{{ .port }} 端口已被應用 {{ .apps }} 佔用！"
-ErrDbUserNotValid: "儲存資料庫，用戶名密碼不匹配！"
-ErrDockerComposeNotValid: "docker-compose 文件格式錯誤"
-ErrUpdateBuWebsite: "應用更新成功，但是網站配置文件修改失敗，請檢查配置！"
-Err1PanelNetworkFailed: "默認容器網絡創建失敗！{{ .detail }}"
-ErrFileParse: "應用 docker-compose 文件解析失敗!"
-ErrInstallDirNotFound: "安裝目錄不存在，如需卸載，請選擇強制卸載"
-AppStoreIsUpToDate: "應用商店已經是最新版本"
-LocalAppVersionNull: "{{.name}} 應用未同步到版本！無法添加到應用列表"
-LocalAppVersionErr: "{{.name}} 同步版本 {{.version}} 失敗！{{.err}}"
-ErrFileNotFound: "{{.name}} 文件不存在"
-ErrFileParseApp: "{{.name}} 文件解析失敗 {{.err}}"
-ErrAppDirNull: "版本資料夾不存在"
-LocalAppErr: "應用 {{.name}} 同步失敗！{{.err}}"
-ErrContainerName: "容器名稱已存在"
-ErrAppSystemRestart: "1Panel 重啟導致任務中斷"
-ErrCreateHttpClient: "創建HTTP請求失敗 {{.err}}"
-ErrHttpReqTimeOut: "請求超時 {{.err}}"
-ErrHttpReqFailed: "請求失敗 {{.err}}"
-ErrHttpReqNotFound: "文件不存在"
-ErrNoSuchHost: "網路連接失敗"
-ErrImagePullTimeOut: "鏡像拉取超時"
-ErrContainerNotFound: "{{ .name }} 容器不存在"
-ErrContainerMsg: "{{ .name }} 容器異常，具體請在容器頁面查看日誌"
-ErrAppBackup: "{{ .name }} 應用備份失敗 err {{.err}}"
-ErrImagePull: "{{ .name }} 鏡像拉取失敗 err {{.err}}"
-ErrVersionTooLow: "當前 1Panel 版本過低，無法更新應用商店，請升級版本之後操作"
-ErrAppNameExist: "應用名稱已存在"
-AppStoreIsSyncing: "應用程式商店正在同步中，請稍後再試"
-ErrGetCompose: "docker-compose.yml 檔案取得失敗！{{ .detail }}"
-ErrAppWarn: "狀態異常，請查看日誌"
-ErrAppParamKey: "參數 {{ .name }} 欄位異常"
-ErrAppUpgrade: "應用程式 {{ .name }} 升級失敗 {{ .err }}"
-AppRecover: "應用程式 {{ .name }} 回滾 "
-PullImageStart: "開始拉取鏡像 {{ .name }}"
-PullImageSuccess: "鏡像拉取成功"
-UpgradeAppStart: "開始升級應用程式 {{ .name }}"
-UpgradeAppSuccess: "應用程式 {{ .name }} 升級成功"
-AppStoreIsLastVersion: "應用商店已經是最新版本"
-AppStoreSyncSuccess: "應用商店同步成功"
-SyncAppDetail: "同步應用配置"
-AppVersionNotMatch: "{{ .name }} 應用需要更新 1Panel，跳過同步"
-MoveSiteDir: "當前升級需要遷移 OpenResty 網站目錄"
-MoveSiteToDir: "遷移網站目錄到 {{ .name }}"
-ErrMoveSiteDir: "遷移網站目錄失敗"
-MoveSiteDirSuccess: "遷移網站目錄成功"
-DeleteRuntimePHP: "刪除運行環境 PHP 版本",
-CustomAppStoreNotConfig: "請在應用商店設置離線包地址",
-CustomAppStoreNotFound: "應用商店包獲取失敗，請檢查是否存在",
-CustomAppStoreFileValid: "應用商店包需要 .tar.gz 格式"
-PullImageTimeout: "拉取鏡像超時，請嘗試增加鏡像加速或更換其他鏡像加速"
-ErrAppIsDown: "{{ .name }} 應用狀態異常，請檢查"
+ErrPortInUsed: '{{ .detail }} 連接埠已被佔用！'
+ErrAppLimit: '應用程式超出安裝數量限制'
+ErrAppRequired: '請先安裝{{ .detail }} 應用'
+ErrNotInstall: '應用程式未安裝'
+ErrPortInOtherApp: '{{ .port }} 連接埠已被應用程式{{ .apps }} 佔用！'
+ErrDbUserNotValid: '存量資料庫，使用者名稱密碼不符！'
+ErrDockerComposeNotValid: 'docker-compose 檔案格式錯誤'
+ErrUpdateBuWebsite: '應用程式更新成功，但網站設定檔修改失敗，請檢查設定！ '
+Err1PanelNetworkFailed: '預設容器網路建立失敗！ {{ .detail }}'
+ErrFileParse: '應用docker-compose 檔案解析失敗!'
+ErrInstallDirNotFound: '安裝目錄不存在，如需卸載，請選擇強制卸載'
+AppStoreIsUpToDate: '應用程式商店已經是最新版本'
+LocalAppVersionNull: '{{ .name }} 應用程式未同步到版本！無法加入到應用程式列表'
+LocalAppVersionErr: '{{ .name }} 同步版本{{ .version }} 失敗！ {{ .err }}'
+ErrFileNotFound: '{{ .name }} 檔案不存在'
+ErrFileParseApp: '{{ .name }} 檔案解析失敗{{ .err }}'
+ErrAppDirNull: '版本資料夾不存在'
+LocalAppErr: '應用程式{{ .name }} 同步失敗！{{ .err }}'
+ErrContainerName: '容器名稱已存在'
+ErrAppSystemRestart: '1Panel 重新啟動導致任務終止'
+ErrCreateHttpClient: '建立請求失敗{{ .err }}'
+ErrHttpReqTimeOut: '請求逾時{{ .err }}'
+ErrHttpReqFailed: '請求失敗{{ .err }}'
+ErrNoSuchHost: '無法找到請求的伺服器{{ .err }}'
+ErrHttpReqNotFound: '無法找到要求的資源{{ .err }}'
+ErrImagePullTimeOut: '鏡像拉取逾時'
+ErrContainerNotFound: '{{ .name }} 容器不存在'
+ErrContainerMsg: '{{ .name }} 容器異常，請在容器頁面上查看日誌'
+ErrAppBackup: '{{ .name }} 應用備份失敗 {{ .err }}'
+ErrImagePull: '鏡像拉取失敗{{ .err }}'
+ErrVersionTooLow: '目前1Panel 版本過低，無法更新應用程式商店，請升級版本之後操作'
+ErrAppNameExist: '應用程式名稱已存在'
+AppStoreIsSyncing: '應用程式商店正在同步中，請稍後再試'
+ErrGetCompose: 'docker-compose.yml 檔案取得失敗！{{ .detail }}'
+ErrAppWarn: '狀態異常，請檢視日誌'
+ErrAppParamKey: '參數{{ .name }} 欄位異常'
+ErrAppUpgrade: '應用程式{{ .name }} 升級失敗{{ .err }}'
+AppRecover: '應用程式{{ .name }} 回滾'
+PullImageStart: '開始拉取鏡像{{ .name }}'
+PullImageSuccess: '鏡像拉取成功'
+UpgradeAppStart: '開始升級應用程式{{ .name }}'
+UpgradeAppSuccess: '應用程式{{ .name }} 升級成功'
+AppStoreIsLastVersion: '應用程式商店已經是最新版本'
+AppStoreSyncSuccess: '應用程式商店同步成功'
+SyncAppDetail: '同步應用程式設定'
+AppVersionNotMatch: '{{ .name }} 應用程式需要更高的1Panel 版本，跳過同步'
+MoveSiteDir: '目前升級需要遷移OpenResty 網站目錄'
+MoveSiteToDir: '遷移網站目錄到{{ .name }}'
+ErrMoveSiteDir: '遷移網站目錄失敗'
+MoveSiteDirSuccess: '遷移網站目錄成功'
+DeleteRuntimePHP: '刪除PHP 運行環境'
+CustomAppStoreNotConfig: '請在應用程式商店設定離線套件位址'
+CustomAppStoreNotFound: '應用程式商店套件取得失敗，請檢查是否存在'
+CustomAppStoreFileValid: '應用程式商店包需要.tar.gz 格式'
+PullImageTimeout: '拉取鏡像逾時,請嘗試增加鏡像加速或更換其他鏡像加速'
+ErrAppIsDown: '{{ .name }} 應用程式狀態異常，請檢查'
+ErrCustomApps: '存在已安裝的應用程式，請先解除安裝'
+ErrCustomRuntimes: '存在已安裝的運作環境，請先刪除'
 
 #file
-ErrFileCanNotRead: "此文件不支持預覽"
-ErrFileToLarge: "文件超過10M,無法打開"
-ErrPathNotFound: "目錄不存在"
-ErrMovePathFailed: "目標路徑不能包含原路徑！"
-ErrLinkPathNotFound: "目標路徑不存在!"
-ErrFileIsExist: "文件或文件夾已存在！"
-ErrFileUpload: "{{ .name }} 上傳文件失敗 {{ .detail}}"
-ErrFileDownloadDir: "不支持下載文件夾"
-ErrCmdNotFound: "{{ .name}} 命令不存在，請先在宿主機安裝此命令"
-ErrSourcePathNotFound:  "源目錄不存在"
-ErrFavoriteExist: "已收藏此路徑"
-ErrPathNotDelete: "所選目錄不可删除"
+ErrFileCanNotRead: '此檔案不支援預覽'
+ErrFileToLarge: '檔案超過10M，無法開啟'
+ErrPathNotFound: '目錄不存在'
+ErrMovePathFailed: '目標路徑不能包含原路徑！'
+ErrLinkPathNotFound: '目標路徑不存在!'
+ErrFileIsExist: '檔案或資料夾已存在！'
+ErrFileUpload: '{{ .name }} 上傳檔案失敗{{ .detail }}'
+ErrFileDownloadDir: '不支援下載資料夾'
+ErrCmdNotFound: '{{ .name}} 指令不存在，請先在宿主機安裝此指令'
+ErrSourcePathNotFound: '來源目錄不存在'
+ErrFavoriteExist: '已收藏此路徑'
+ErrInvalidChar: '禁止使用非法字元'
+ErrPathNotDelete: '所選目錄不可刪除'
 
 #website
-ErrDomainIsExist: "域名已存在"
-ErrAliasIsExist: "代號已存在"
-ErrAppDelete: "其他網站使用此應用,無法刪除"
-ErrGroupIsUsed: "分組正在使用中，無法刪除"
-ErrBackupMatch: "該備份文件與當前網站部分數據不匹配: {{ .detail}}"
-ErrBackupExist: "該備份文件對應部分原數據不存在: {{ .detail}}"
-ErrPHPResource: "本地運行環境不支持切換！"
-ErrPathPermission: "index 目錄下偵測到非 1000:1000 權限資料夾，可能導致網站存取 Access denied 錯誤，請點擊上方儲存按鈕"
-ErrDomainIsUsed: "域名已被網站【{{ .name }}】使用"
-ErrDomainFormat: "{{ .name }} 域名格式不正確"
-ErrDefaultAlias: "default 為保留代號，請使用其他代號"
-ErrParentWebsite: "需要先刪除子網站 {{ .name }}"
-ErrBuildDirNotFound: "編譯目錄不存在"
-ErrImageNotExist: "執行環境 {{.name}} 鏡像不存在，請重新編輯執行環境"
+ErrDomainIsExist: '網域已存在'
+ErrAliasIsExist: '代號已存在'
+ErrAppDelete: '其他網站使用此應用程式，無法刪除'
+ErrBackupMatch: '該備份檔案與目前網站部分資料不符{{ .detail }}'
+ErrBackupExist: '該備份檔案對應部分來源資料不存在{{ .detail }}'
+ErrPHPResource: '本地運行環境不支援切換！ '
+ErrPathPermission: 'index 目錄下偵測到非1000:1000 權限資料夾，可能導致網站存取Access denied 錯誤，請點擊上方儲存按鈕'
+ErrDomainIsUsed: '網域名稱已被網站【{{ .name }}】使用'
+ErrDomainFormat: '{{ .name }} 網域格式不正確'
+ErrDefaultAlias: 'default 為保留代號，請使用其他代號'
+ErrParentWebsite: '需要先移除子網站{{ .name }}'
+ErrBuildDirNotFound: '建置目錄不存在'
+ErrImageNotExist: '執行環境{{ .name }} 映像不存在，請重新編輯執行環境'
 
 #ssl
-ErrSSLCannotDelete: "{{ .name }} 證書正在被網站使用，無法刪除"
-ErrAccountCannotDelete: "帳號關聯證書，無法刪除"
-ErrSSLApply: "證書續簽成功，openresty reload失敗，請檢查配置！"
-ErrEmailIsExist: "郵箱已存在"
-ErrSSLKeyNotFound: "私鑰文件不存在"
-ErrSSLCertificateNotFound: "證書文件不存在"
-ErrSSLKeyFormat: "私鑰文件校驗錯誤"
-ErrSSLCertificateFormat: "證書文件格式錯誤，請使用 pem 格式"
-ErrEabKidOrEabHmacKeyCannotBlank: "EabKid 或 EabHmacKey 不能為空"
-ErrOpenrestyNotFound: "Http 模式需要先安裝 Openresty"
-ApplySSLStart: "開始申請憑證,網域 [{{ .domain }}] 申請方式 [{{ .type }}] "
-dnsAccount: "DNS 自動"
-dnsManual: "DNS 手排"
-http: "HTTP"
-ApplySSLFailed: "申請 [{{ .domain }}] 憑證失敗, {{.detail}} "
-ApplySSLSuccess: "申請 [{{ .domain }}] 憑證成功！ ！ "
-DNSAccountName: "DNS 帳號 [{{ .name }}] 廠商 [{{.type}}]"
-PushDirLog: "憑證推送到目錄 [{{ .path }}] {{ .status }}"
-ErrDeleteCAWithSSL: "目前機構下存在已簽發證書，無法刪除"
-ErrDeleteWithPanelSSL: "面板 SSL 配置使用此證書，無法刪除"
-ErrDefaultCA: "默認機構不能刪除"
-ApplyWebSiteSSLLog: "開始更新 {{ .name }} 網站憑證"
-ErrUpdateWebsiteSSL: "{{ .name }} 網站更新憑證失敗: {{ .err }}"
-ApplyWebSiteSSLSuccess: "更新網站憑證成功"
-StartUpdateSystemSSL: "開始更新系統證書"
-UpdateSystemSSLSuccess: "更新系統證書成功"
-ErrExecShell: "執行腳本失敗 {{.err}}"
-ExecShellStart: "開始執行腳本"
-ExecShellSuccess: "腳本執行成功"
-
+ErrSSLCannotDelete: '{{ .name }} 憑證正在被網站使用，無法刪除'
+ErrAccountCannotDelete: '帳號關聯證書，無法刪除'
+ErrSSLApply: '憑證續簽成功，openresty reload失敗，請檢查設定！'
+ErrEmailIsExist: '郵箱已存在'
+ErrSSLKeyNotFound: '私鑰檔案不存在'
+ErrSSLCertificateNotFound: '憑證檔案不存在'
+ErrSSLKeyFormat: '私鑰檔案校驗失敗'
+ErrSSLCertificateFormat: '憑證檔案格式錯誤，請使用pem 格式'
+ErrEabKidOrEabHmacKeyCannotBlank: 'EabKid 或EabHmacKey 不能為空'
+ErrOpenrestyNotFound: 'Http 模式需要先安裝Openresty'
+ApplySSLStart: '開始申請證書，網域名稱[{{ .domain }}] 申請方式[{{ .type }}] '
+dnsAccount: 'DNS 自動'
+dnsManual: 'DNS 手排'
+http: 'HTTP'
+ApplySSLFailed: '申請[{{ .domain }}] 憑證失敗， {{ .detail }} '
+ApplySSLSuccess: '申請[{{ .domain }}] 憑證成功！ ！ '
+DNSAccountName: 'DNS 帳號[{{ .name }}] 廠商[{{ .type }}]'
+PushDirLog: '憑證推送到目錄[{{ .path }}] {{ .status }}'
+ErrDeleteCAWithSSL: '目前機構下存在已簽發證書，無法刪除'
+ErrDeleteWithPanelSSL: '面板SSL 配置使用此證書，無法刪除'
+ErrDefaultCA: '預設機構不能刪除'
+ApplyWebSiteSSLLog: '開始更新{{ .name }} 網站憑證'
+ErrUpdateWebsiteSSL: '{{ .name }} 網站更新憑證失敗: {{ .err }}'
+ApplyWebSiteSSLSuccess: '更新網站憑證成功'
+ErrExecShell: '執行腳本失敗{{ .err }}'
+ExecShellStart: '開始執行腳本'
+ExecShellSuccess: '腳本執行成功'
+StartUpdateSystemSSL: '開始更新系統憑證'
+UpdateSystemSSLSuccess: '更新系統憑證成功'
+ErrWildcardDomain: 'HTTP 模式無法申請泛網域憑證'
 
 #mysql
-ErrUserIsExist: "當前用戶已存在，請重新輸入"
-ErrDatabaseIsExist: "當前資料庫已存在，請重新輸入"
-ErrExecTimeOut: "SQL 執行超時，請檢查數據庫"
-ErrRemoteExist: "遠程數據庫已存在該名稱，請修改後重試"
-ErrLocalExist: "本地數據庫已存在該名稱，請修改後重試"
+ErrUserIsExist: '目前使用者已存在，請重新輸入'
+ErrDatabaseIsExist: '目前資料庫已存在，請重新輸入'
+ErrExecTimeOut: 'SQL 執行逾時，請檢查資料庫'
+ErrRemoteExist: '遠端資料庫已存在該名稱，請修改後重試'
+ErrLocalExist: '本機資料庫已存在該名稱，請修改後重試'
 
 #redis
-ErrTypeOfRedis: "恢復文件類型與當前持久化方式不符，請修改後重試"
+ErrTypeOfRedis: '恢復檔案類型與目前持久化方式不符，請修改後重試'
 
 #container
-ErrInUsed: "{{ .detail }} 正被使用，無法刪除"
-ErrObjectInUsed: "該對象正被使用，無法刪除"
-ErrObjectBeDependent: "該鏡像依賴於其他鏡像，無法刪除"
-ErrPortRules: "端口數目不匹配，請重新輸入！"
-ErrPgImagePull: "鏡像拉取超時，請配置鏡像加速或手動拉取 postgres:16.0-alpine 鏡像後重試"
+ErrInUsed: '{{ .detail }} 正被使用，無法刪除'
+ErrObjectInUsed: '該物件正被使用，無法刪除'
+ErrObjectBeDependent: '此鏡像依賴其他鏡像，無法刪除'
+ErrPortRules: '連接埠數目不匹配，請重新輸入！'
+ErrPgImagePull: '鏡像拉取逾時，請配置鏡像加速或手動拉取{{ .name }} 鏡像後重試'
 
 #runtime
-ErrDirNotFound: "build 文件夾不存在！請檢查文件完整性！"
-ErrFileNotExist: "{{ .detail }} 文件不存在！請檢查源文件完整性！"
-ErrImageBuildErr: "鏡像 build 失敗"
-ErrImageExist: "鏡像已存在！"
-ErrDelWithWebsite: "運行環境已經關聯網站，無法刪除"
-ErrRuntimeStart: "啟動失敗"
-ErrPackageJsonNotFound: "package.json 文件不存在"
-ErrScriptsNotFound: "沒有在 package.json 中找到 scripts 配置項"
-ErrContainerNameNotFound: "無法取得容器名稱，請檢查 .env 文件"
-ErrNodeModulesNotFound: "node_modules 文件夾不存在！請編輯運行環境或者等待運行環境啟動成功"
-ErrContainerNameIsNull: "容器名稱不能為空"
-
-#setting
-ErrBackupInUsed: "該備份帳號已在計劃任務中使用，無法刪除"
-ErrBackupCheck: "備份帳號測試連接失敗 {{ .err}}"
-ErrOSSConn: "無法獲取最新版本，請確認伺服器是否能夠連接外部網路。"
-ErrEntrance: "安全入口信息錯誤，請檢查後重試！"
+ErrDirNotFound: 'build 資料夾不存在！請檢查檔案完整性！'
+ErrFileNotExist: '{{ .detail }} 檔案不存在！請檢查來源檔案完整性！'
+ErrImageBuildErr: '鏡像build 失敗'
+ErrImageExist: '鏡像已存在！'
+ErrDelWithWebsite: '運行環境已經關聯網站，無法刪除'
+ErrRuntimeStart: '啟動失敗'
+ErrPackageJsonNotFound: 'package.json 檔案不存在'
+ErrScriptsNotFound: '沒有在package.json 中找到scripts 設定項'
+ErrContainerNameNotFound: '無法取得容器名稱，請檢查.env 檔案'
+ErrNodeModulesNotFound: 'node_modules 資料夾不存在！請編輯運行環境或等待運行環境啟動成功'
+ErrContainerNameIsNull: '容器名稱不存在'
 
 #tool
-ErrConfigNotFound: "配置文件不存在"
-ErrConfigParse: "配置文件格式有誤"
-ErrConfigIsNull: "配置文件不允許為空"
-ErrConfigDirNotFound: "運行目錄不存在"
-ErrConfigAlreadyExist: "已存在同名配置文件"
-ErrUserFindErr: "用戶 {{ .name }} 查找失敗 {{ .err }}"
+ErrConfigNotFound: '設定檔不存在'
+ErrConfigParse: '設定檔格式有誤'
+ErrConfigIsNull: '設定檔不允許為空'
+ErrConfigDirNotFound: '運行目錄不存在'
+ErrConfigAlreadyExist: '已存在同名設定檔'
+ErrUserFindErr: '使用者{{ .name }} 尋找失敗{{ .err }}'
 
 #ssh
-ErrFirewallNone: "未檢測到系統 firewalld 或 ufw 服務，請檢查後重試！"
-ErrFirewallBoth: "檢測到系統同時存在 firewalld 或 ufw 服務，為避免衝突，請卸載後重試！"
+ErrFirewallNone: '未偵測到系統firewalld 或ufw 服務，請檢查後重試！'
+ErrFirewallBoth: '偵測到系統同時存在firewalld 或ufw 服務，為避免衝突，請卸載後重試！'
 
 #cronjob
-ErrCutWebsiteLog: "{{ .name }} 網站日誌切割失敗，錯誤 {{ .err }}"
-CutWebsiteLogSuccess: "{{ .name }} 網站日誌切割成功，備份路徑 {{ .path }}"
-HandleShell: "執行腳本 {{ .name }}"
-HandleNtpSync: "系統時間同步"
-HandleSystemClean: "系統快取清理"
+ErrCutWebsiteLog: '{{ .name }} 網站日誌切割失敗，錯誤{{ .err }}'
+CutWebsiteLogSuccess: '{{ .name }} 網站日誌切割成功，備份路徑{{ .path }}'
+HandleShell: '執行腳本{{ .name }}'
+HandleNtpSync: '系統時間同步'
+HandleSystemClean: '系統快取清理'
 
 #toolbox
-ErrNotExistUser: "當前使用者不存在，請修改後重試！"
-ErrBanAction: "設置失敗，當前 {{ .name }} 服務不可用，請檢查後重試！"
-ErrClamdscanNotFound: "未偵測到 clamdscan 指令，請參考文件安裝！"
+ErrNotExistUser: '目前使用者不存在，請修改後重試！'
+ErrBanAction: '設定失敗，目前{{ .name }} 服務不可用，請檢查後再試一次！'
+ErrClamdscanNotFound: '未偵測到clamdscan 指令，請參考文件安裝！'
 
 #waf
-ErrScope: "不支援修改此配置"
-ErrStateChange: "狀態修改失敗"
-ErrRuleExist: "規則已存在"
-ErrRuleNotExist: "規則不存在"
-ErrParseIP: "IP 格式錯誤"
-ErrDefaultIP: "default 為保留名稱，請更換其他名稱"
-ErrGroupInUse: "IP 群組被黑/白名單使用，無法刪除"
-ErrGroupExist: "IP 群組名稱已存在"
-ErrIPRange: "IP 範圍錯誤"
-ErrIPExist: "IP 已存在"
+ErrScope: '不支援修改此配置'
+ErrStateChange: '狀態修改失敗'
+ErrRuleExist: '規則已存在'
+ErrRuleNotExist: '規則不存在'
+ErrParseIP: 'IP 格式錯誤'
+ErrDefaultIP: 'default 為保留名稱，請更換其他名稱'
+ErrGroupInUse: 'IP 群組被駭/白名單使用，無法刪除'
+ErrGroupExist: 'IP 群組名稱已存在'
+ErrIPRange: 'IP 範圍錯誤'
+ErrIPExist: 'IP 已存在'
 urlDefense: 'URL 規則'
-urlHelper: '禁止訪問的 URL'
+urlHelper: '禁止訪問的URL'
 dirFilter: '目錄過濾'
 xss: 'XSS'
 phpExec: 'PHP 腳本執行'
 oneWordTrojan: '一句話木馬'
-appFilter: '應用危險目錄過濾'
+appFilter: '套用危險目錄過濾'
 webshell: 'Webshell'
 args: '參數規則'
-protocolFilter: '協議過濾'
+protocolFilter: '協定過濾'
 javaFileter: 'Java 危險檔案過濾'
 scannerFilter: '掃描器過濾'
 escapeFilter: '轉義過濾'
-customRule: '自定義規則'
+customRule: '自訂規則'
 httpMethod: 'HTTP 方法過濾'
 fileExt: '檔案上傳限制'
-defaultIpBlack: '惡意 IP 組'
+defaultIpBlack: '惡意IP 群組'
 cookie: 'Cookie 規則'
 urlBlack: 'URL 黑名單'
 uaBlack: 'User-Agent 黑名單'
 attackCount: '攻擊頻率限制'
 fileExtCheck: '檔案上傳限制'
 geoRestrict: '地區訪問限制'
-unknownWebsite: '未授權域名訪問'
+unknownWebsite: '未授權網域存取'
 notFoundCount: '404 頻率限制'
 headerDefense: 'Header 規則'
 defaultUaBlack: 'User-Agent 規則'
@@ -253,132 +257,166 @@ methodWhite: 'HTTP 規則'
 captcha: '人機驗證'
 fiveSeconds: '5 秒驗證'
 vulnCheck: '補充規則'
-acl: '自定義規則'
+acl: '自訂規則'
 sql: 'SQL 注入'
 cc: '訪問頻率限制'
 defaultUrlBlack: 'URL 規則'
 sqlInject: 'SQL 注入'
-ErrDBNotExist: "數據庫不存在"
-allow: "允許"
-deny: "禁止"
+ErrDBNotExist: '資料庫不存在'
+allow: '允許'
+deny: '禁止'
+OpenrestyNotFound: 'Openresty 未安裝'
 
 #task
-TaskStart: "{{.name}} 開始 [START]"
-TaskEnd: "{{.name}} 結束 [COMPLETED]"
-TaskFailed: "{{.name}} 失敗"
-TaskTimeout: "{{.name}} 超時"
-TaskSuccess: "{{.name}} 成功"
-TaskRetry: "開始第 {{.name}} 次重試"
-SubTaskSuccess: "{{ .name }} 成功"
-SubTaskFailed: "{{ .name }} 失敗: {{ .err }}"
-TaskInstall: "安裝"
-TaskUninstall: "卸載"
-TaskCreate: "創建"
-TaskDelete: "刪除"
-TaskUpgrade: "升級"
-TaskUpdate: "更新"
-TaskRestart: "重啟"
-TaskRollback: "回滚"
-TaskPull: "拉取"
-TaskBuild: "建構"
-TaskPush: "推送"
-TaskHandle: "執行"
-Website: "網站"
-App: "應用"
-Runtime: "運行環境"
-Database: "數據庫"
-ConfigFTP: "創建 FTP 用戶 {{ .name }}"
-ConfigOpenresty: "創建 Openresty 配置文件"
-InstallAppSuccess: "應用 {{ .name }} 安裝成功"
-ConfigRuntime: "配置運行環境"
-ConfigApp: "配置應用"
-SuccessStatus: "{{ .name }} 成功"
-FailedStatus: "{{ .name }} 失敗 {{.err}}"
-HandleLink: "處理應用關聯"
-HandleDatabaseApp: "處理應用參數"
-ExecShell: "執行 {{ .name }} 腳本"
-PullImage: "拉取鏡像"
-Start: "開始"
-Run: "啟動"
-Stop: "停止"
-Image: "鏡像"
-Container: "容器"
-Compose: "編排"
-AppLink: "關聯應用"
-EnableSSL: "開啟 HTTPS"
-AppStore: "應用商店"
-TaskSync: "同步"
-LocalApp: "本地應用"
-SubTask: "子任務"
-RuntimeExtension: "運行環境擴展"
-TaskIsExecuting: "任務正在執行中"
+TaskStart: '{{ .name }} 任務開始[START]'
+TaskEnd: '{{ .name }} 任務結束[COMPLETED]'
+TaskFailed: '{{ .name }} 任務失敗'
+TaskTimeout: '{{ .name }} 逾時'
+TaskSuccess: '{{ .name }} 任務成功'
+TaskRetry: '開始第{{ .name }} 次重試'
+SubTaskSuccess: '{{ .name }} 成功'
+SubTaskFailed: '{{ .name }} 失敗: {{ .err }}'
+TaskInstall: '安裝'
+TaskUninstall: '卸載'
+TaskCreate: '建立'
+TaskDelete: '刪除'
+TaskUpgrade: '升級'
+TaskUpdate: '更新'
+TaskRestart: '重啟'
+TaskBackup: '備份'
+TaskRecover: '恢復'
+TaskRollback: '回滾'
+TaskPull: '拉取'
+TaskBuild: '建置'
+TaskPush: '推送'
+TaskHandle: '執行'
+Website: '網站'
+App: '應用程式'
+Runtime: '運作環境'
+Database: '資料庫'
+ConfigFTP: '建立FTP 使用者{{ .name }}'
+ConfigOpenresty: '建立Openresty 設定檔'
+InstallAppSuccess: '應用程式{{ .name }} 安裝成功'
+ConfigRuntime: '設定運行環境'
+ConfigApp: '設定應用程式'
+SuccessStatus: '{{ .name }} 成功'
+FailedStatus: '{{ .name }} 失敗{{ .err }}'
+HandleLink: '處理應用程式關聯'
+HandleDatabaseApp: '處理應用程式參數'
+ExecShell: '執行{{ .name }} 腳本'
+PullImage: '拉取鏡像'
+Start: '開始'
+Run: '啟動'
+Stop: '停止'
+Image: '鏡像'
+Compose: '編排'
+Container: '容器'
+AppLink: '關聯應用程式'
+EnableSSL: '開啟HTTPS'
+AppStore: '應用程式商店'
+TaskSync: '同步'
+LocalApp: '本地應用'
+SubTask: '子任務'
+RuntimeExtension: '運行環境擴充'
+TaskIsExecuting: '任務正在運作'
+CustomAppstore: '自訂應用程式倉庫'
 
-# task - snapshot 
-Snapshot: "快照"
-SnapDBInfo: "寫入 1Panel 資料庫資訊"
-SnapCopy: "複製檔案&目錄 {{ .name }} "
-SnapNewDB: "初始化資料庫 {{ .name }} 連接 "
-SnapDeleteOperationLog: "刪除操作日誌"
-SnapDeleteLoginLog: "刪除訪問日誌"
-SnapDeleteMonitor: "刪除監控數據"
-SnapRemoveSystemIP: "移除系統 IP"
-SnapBaseInfo: "寫入 1Panel 基本資訊"
-SnapInstallApp: "備份 1Panel 已安裝應用"
-SnapDockerSave: "壓縮已安裝應用"
-SnapLocalBackup: "備份 1Panel 本地備份目錄"
-SnapCompressBackup: "壓縮本地備份目錄"
-SnapPanelData: "備份 1Panel 資料目錄"
-SnapCompressPanel: "壓縮資料目錄"
-SnapCloseDBConn: "關閉資料庫連接"
-SnapCompress: "製作快照檔案"
-SnapCompressFile: "壓縮快照檔案"
-SnapCheckCompress: "檢查快照壓縮檔案"
-SnapCompressSize: "快照檔案大小 {{ .name }}"
-SnapUpload: "上傳快照檔案"
-SnapLoadBackup: "獲取備份帳號資訊"
-SnapUploadTo: "上傳快照檔案到 {{ .name }}"
-SnapUploadRes: "上傳快照檔案到 {{ .name }}"
+# task - ai
+OllamaModelPull: '拉取Ollama 模型{{ .name }} '
+OllamaModelSize: '取得Ollama 模型{{ .name }} 大小'
+
+# task - snapshot
+Snapshot: '快照'
+SnapDBInfo: '寫入1Panel 資料庫資訊'
+SnapCopy: '複製檔案&目錄{{ .name }} '
+SnapNewDB: '初始化資料庫{{ .name }} 連線'
+SnapDeleteOperationLog: '刪除操作日誌'
+SnapDeleteLoginLog: '刪除存取日誌'
+SnapDeleteMonitor: '刪除監控資料'
+SnapRemoveSystemIP: '移除系統IP'
+SnapBaseInfo: '寫入1Panel 基本資料'
+SnapInstallApp: '備份1Panel 已安裝應用程式'
+SnapDockerSave: '壓縮已安裝應用'
+SnapLocalBackup: '備份1Panel 本機備份目錄'
+SnapCompressBackup: '壓縮本機備份目錄'
+SnapPanelData: '備份1Panel 資料目錄'
+SnapCompressPanel: '壓縮資料目錄'
+SnapWebsite: '備份1Panel 網站目錄'
+SnapCloseDBConn: '關閉資料庫連線'
+SnapCompress: '製作快照檔案'
+SnapCompressFile: '壓縮快照檔案'
+SnapCheckCompress: '檢查快照壓縮檔'
+SnapCompressSize: '快照檔案大小{{ .name }}'
+SnapUpload: '上傳快照檔案'
+SnapLoadBackup: '取得備份帳號資訊'
+SnapUploadTo: '上傳快照檔案到{{ .name }}'
+SnapUploadRes: '上傳快照檔案到{{ .name }}'
+
+SnapshotRecover: '快照恢復'
+RecoverDownload: '下載快照檔案'
+Download: '下載'
+RecoverDownloadAccount: '取得快照下載備份帳號{{ .name }}'
+RecoverDecompress: '解壓縮快照壓縮檔'
+Decompress: '解壓縮'
+BackupBeforeRecover: '快照前備份系統相關資料'
+Readjson: '讀取快照內Json 檔案'
+ReadjsonPath: '取得快照內Json 檔案路徑'
+ReadjsonContent: '讀取Json 檔案'
+ReadjsonMarshal: 'Json 轉義處理'
+RecoverApp: '恢復已安裝應用程式'
+RecoverWebsite: '恢復網站目錄'
+RecoverAppImage: '恢復快照鏡像備份'
+RecoverCompose: '恢復其他編排內容'
+RecoverComposeList: '取得所有待恢復編排'
+RecoverComposeItem: '恢復編排{{ .name }}'
+RecoverAppEmpty: '快照檔案中未發現應用程式鏡像備份'
+RecoverBaseData: '恢復基礎資料及檔案'
+RecoverDaemonJsonEmpty: '快照檔案及目前機器都不存在容器配置daemon.json 檔案'
+RecoverDaemonJson: '恢復容器配置daemon.json 檔案'
+RecoverDBData: '恢復資料庫資料'
+RecoverBackups: '還原本機備份目錄'
+RecoverPanelData: '恢復資料目錄'
 
 # task - container
-ContainerNewCliet: "初始化 Docker 客戶端" 
-ContainerImagePull: "拉取容器鏡像 {{ .name }}" 
-ContainerRemoveOld: "刪除原容器 { .name }"
-ContainerImageCheck: "檢查鏡像是否正常拉取"
-ContainerLoadInfo: "獲取容器基本信息"
-ContainerRecreate: "容器更新失敗，現在開始恢復原容器"
-ContainerCreate: "創建新容器 {{ .name }}" 
-ContainerCreateFailed: "容器創建失敗，刪除失敗容器" 
-ContainerStartCheck: "檢查容器是否已啟動" 
+ContainerNewCliet: '初始化Docker Client'
+ContainerImagePull: '拉取容器鏡像{{ .name }}'
+ContainerRemoveOld: '刪除原容器{{ .name }}'
+ContainerImageCheck: '檢查鏡像是否正常拉取'
+ContainerLoadInfo: '取得容器基本資訊'
+ContainerRecreate: '容器更新失敗，現在開始恢復原容器'
+ContainerCreate: '建立新容器{{ .name }}'
+ContainerCreateFailed: '容器建立失敗，刪除失敗容器'
+ContainerStartCheck: '檢查容器是否已啟動'
 
 # task - image
-ImageBuild: "鏡像構建" 
-ImageBuildStdoutCheck: "解析鏡像輸出內容" 
-ImaegBuildRes: "鏡像構建輸出：{{ .name }}" 
-ImagePull: "拉取鏡像" 
-ImageRepoAuthFromDB: "從數據庫獲取倉庫認證信息" 
-ImaegPullRes: "鏡像拉取輸出：{{ .name }}" 
-ImagePush: "推送鏡像" 
-ImageRenameTag: "修改鏡像 Tag" 
-ImageNewTag: "新鏡像 Tag {{ .name }}" 
-ImaegPushRes: "鏡像推送輸出：{{ .name }}" 
-ComposeCreate: "創建編排" 
-ComposeCreateRes: "編排創建輸出：{{ .name }}"
+ImageBuild: '鏡像建置'
+ImageBuildStdoutCheck: '解析鏡像輸出內容'
+ImaegBuildRes: '鏡像建置輸出：{{ .name }}'
+ImagePull: '拉取鏡像'
+ImageRepoAuthFromDB: '從資料庫取得倉庫認證資訊'
+ImaegPullRes: '鏡像拉取輸出：{{ .name }}'
+ImagePush: '推播鏡像'
+ImageRenameTag: '修改鏡像Tag'
+ImageNewTag: '新鏡像Tag {{ .name }}'
+ImaegPushRes: '鏡像推播輸出：{{ .name }}'
+ComposeCreate: '建立編排'
+ComposeCreateRes: '編排建立輸出：{{ .name }}'
 
 # task - website
-BackupNginxConfig: "備份網站 OpenResty 配置檔案"
-CompressFileSuccess: "壓縮目錄成功，壓縮為 {{.name}}"
-CompressDir: "壓縮目錄"
-DeCompressFile: "解壓檔案 {{ .name }}"
-ErrCheckValid: "校驗備份檔案失敗，{{ .name }}"
-Rollback: "回滾"
-websiteDir: "網站目錄"
-RecoverFailedStartRollBack: "恢復失敗，開始回滾"
-AppBackupFileIncomplete: "備份文件不完整，缺少 app.json 或 app.tar.gz 文件"
-AppAttributesNotMatch: "應用類型或名稱不一致"
+BackupNginxConfig: '備份網站OpenResty 設定檔'
+CompressFileSuccess: '壓縮目錄成功，壓縮為{{ .name }}'
+CompressDir: '壓縮目錄'
+DeCompressFile: '解壓縮檔案{{ .name }}'
+ErrCheckValid: '校驗備份檔失敗，{{ .name }}'
+Rollback: '回滾'
+websiteDir: '網站目錄'
+RecoverFailedStartRollBack: '恢復失敗，開始回溯'
+AppBackupFileIncomplete: '備份檔案不完整缺少app.json 或app.tar.gz 檔案'
+AppAttributesNotMatch: '應用程式類型或名稱不一致'
 
-# alert
-ErrAlert: "告警資訊格式錯誤，請檢查後重試！"
-ErrAlertPush: "告警資訊推送錯誤，請檢查後重試！"
-ErrAlertSave: "告警資訊保存錯誤，請檢查後重試！"
-ErrAlertSync: "告警資訊同步錯誤，請檢查後重試！"
-ErrAlertRemote: "告警資訊遠端錯誤，請檢查後重試！"
+#alert
+ErrAlert: '警告訊息格式錯誤，請檢查後重試！'
+ErrAlertPush: '警告訊息推送錯誤，請檢查後重試！'
+ErrAlertSave: '警告訊息儲存錯誤，請檢查後重試！'
+ErrAlertSync: '警告訊息同步錯誤，請檢查後重試！'
+ErrAlertRemote: '警告訊息遠端錯誤，請檢查後重試！'

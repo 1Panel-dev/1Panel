@@ -116,7 +116,8 @@ func (u *SnapshotService) SnapshotReCreate(id uint) error {
 
 func handleSnapshot(req dto.SnapshotCreate, taskItem *task.Task, jobID uint) error {
 	rootDir := path.Join(global.Dir.TmpDir, "system", req.Name)
-	itemHelper := snapHelper{SnapID: req.ID, Task: *taskItem, FileOp: files.NewFileOp(), Ctx: context.Background()}
+	openrestyDir, _ := settingRepo.GetValueByKey("WEBSITE_DIR")
+	itemHelper := snapHelper{SnapID: req.ID, Task: *taskItem, FileOp: files.NewFileOp(), Ctx: context.Background(), OpenrestyDir: openrestyDir}
 	baseDir := path.Join(rootDir, "base")
 	_ = os.MkdirAll(baseDir, os.ModePerm)
 
@@ -168,7 +169,7 @@ func handleSnapshot(req dto.SnapshotCreate, taskItem *task.Task, jobID uint) err
 		req.InterruptStep = ""
 	}
 
-	taskItem.AddSubTask(
+	taskItem.AddSubTaskWithAlias(
 		"SnapCloseDBConn",
 		func(t *task.Task) error {
 			taskItem.Log("---------------------- 6 / 8 ----------------------")
@@ -214,6 +215,8 @@ type snapHelper struct {
 	FileOp      files.FileOp
 	Wg          *sync.WaitGroup
 	Task        task.Task
+
+	OpenrestyDir string
 }
 
 func loadDbConn(snap *snapHelper, targetDir string, req dto.SnapshotCreate) error {
@@ -243,6 +246,12 @@ func loadDbConn(snap *snapHelper, targetDir string, req dto.SnapshotCreate) erro
 	if !req.WithMonitorData {
 		err = os.Remove(path.Join(targetDir, "db/monitor.db"))
 		snap.Task.LogWithStatus(i18n.GetMsgByKey("SnapDeleteMonitor"), err)
+		if err != nil {
+			return err
+		}
+	}
+	if !req.WithTaskLog {
+		err = os.Remove(path.Join(targetDir, "db/task.db"))
 		if err != nil {
 			return err
 		}
@@ -312,6 +321,7 @@ func snapBaseData(snap snapHelper, targetDir string) error {
 
 	remarkInfo, _ := json.MarshalIndent(SnapshotJson{
 		BaseDir:       global.Dir.BaseDir,
+		OperestyDir:   snap.OpenrestyDir,
 		BackupDataDir: global.Dir.LocalBackupDir,
 	}, "", "\t")
 	err = os.WriteFile(path.Join(targetDir, "snapshot.json"), remarkInfo, 0640)
@@ -327,6 +337,12 @@ func snapAppImage(snap snapHelper, req dto.SnapshotCreate, targetDir string) err
 	snap.Task.Log("---------------------- 3 / 8 ----------------------")
 	snap.Task.LogStart(i18n.GetMsgByKey("SnapInstallApp"))
 
+	var appInstalls []model.AppInstall
+	_ = snap.snapAgentDB.Where("1 = 1").Find(&appInstalls).Error
+	for _, item := range appInstalls {
+		_ = snap.snapAgentDB.Where("id = ?", item.ID).Updates(map[string]interface{}{"status": constant.StatusWaitingRestart}).Error
+	}
+
 	var imageList []string
 	existStr, _ := cmd.Exec("docker images | awk '{print $1\":\"$2}' | grep -v REPOSITORY:TAG")
 	existImages := strings.Split(existStr, "\n")
@@ -334,6 +350,9 @@ func snapAppImage(snap snapHelper, req dto.SnapshotCreate, targetDir string) err
 		for _, item := range app.Children {
 			if item.Label == "appImage" && item.IsCheck {
 				for _, existImage := range existImages {
+					if len(existImage) == 0 {
+						continue
+					}
 					if existImage == item.Name {
 						imageList = append(imageList, item.Name)
 					}
@@ -342,10 +361,10 @@ func snapAppImage(snap snapHelper, req dto.SnapshotCreate, targetDir string) err
 		}
 	}
 
+	snap.Task.Log(strings.Join(imageList, " "))
 	if len(imageList) != 0 {
 		snap.Task.Logf("docker save %s | gzip -c > %s", strings.Join(imageList, " "), path.Join(targetDir, "images.tar.gz"))
 		std, err := cmd.Execf("docker save %s | gzip -c > %s", strings.Join(imageList, " "), path.Join(targetDir, "images.tar.gz"))
-		snap.Task.LogWithStatus(i18n.GetMsgByKey("SnapDockerSave"), errors.New(std))
 		if err != nil {
 			snap.Task.LogFailedWithErr(i18n.GetMsgByKey("SnapDockerSave"), errors.New(std))
 			return errors.New(std)
@@ -421,24 +440,31 @@ func snapPanelData(snap snapHelper, req dto.SnapshotCreate, targetDir string) er
 			}
 		}
 	}
-	excludes = append(excludes, "./tmp")
 	excludes = append(excludes, "./cache")
-	excludes = append(excludes, "./uploads")
 	excludes = append(excludes, "./db")
-	excludes = append(excludes, "./resource")
+	excludes = append(excludes, "./tmp")
 	if !req.WithSystemLog {
 		excludes = append(excludes, "./log/1Panel*")
 	}
 	if !req.WithTaskLog {
+		excludes = append(excludes, "./log/AI")
+		excludes = append(excludes, "./log/AppStore")
+		excludes = append(excludes, "./log/Cronjob")
+		excludes = append(excludes, "./log/Image")
+		excludes = append(excludes, "./log/Compose")
+		excludes = append(excludes, "./log/Database")
+		excludes = append(excludes, "./log/RuntimeExtension")
+		excludes = append(excludes, "./log/Website")
 		excludes = append(excludes, "./log/App")
 		excludes = append(excludes, "./log/Snapshot")
-		excludes = append(excludes, "./log/AppStore")
-		excludes = append(excludes, "./log/Website")
 	}
 
 	rootDir := global.Dir.DataDir
 	if strings.Contains(global.Dir.LocalBackupDir, rootDir) {
 		excludes = append(excludes, "."+strings.ReplaceAll(global.Dir.LocalBackupDir, rootDir, ""))
+	}
+	if len(snap.OpenrestyDir) != 0 && strings.Contains(snap.OpenrestyDir, rootDir) {
+		excludes = append(excludes, "."+strings.ReplaceAll(snap.OpenrestyDir, rootDir, ""))
 	}
 	ignoreVal, _ := settingRepo.Get(settingRepo.WithByKey("SnapshotIgnore"))
 	rules := strings.Split(ignoreVal.Value, ",")
@@ -450,6 +476,16 @@ func snapPanelData(snap snapHelper, req dto.SnapshotCreate, targetDir string) er
 	}
 	err := snap.FileOp.TarGzCompressPro(false, rootDir, path.Join(targetDir, "1panel_data.tar.gz"), "", strings.Join(excludes, ";"))
 	snap.Task.LogWithStatus(i18n.GetMsgByKey("SnapCompressPanel"), err)
+	if err != nil {
+		return err
+	}
+	if len(snap.OpenrestyDir) != 0 {
+		err := snap.FileOp.TarGzCompressPro(false, snap.OpenrestyDir, path.Join(targetDir, "website.tar.gz"), "", "")
+		snap.Task.LogWithStatus(i18n.GetMsgByKey("SnapWebsite"), err)
+		if err != nil {
+			return err
+		}
+	}
 
 	return err
 }

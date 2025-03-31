@@ -135,6 +135,7 @@ func (u *SnapshotService) UpdateDescription(req dto.UpdateDescription) error {
 
 type SnapshotJson struct {
 	BaseDir       string `json:"baseDir"`
+	OperestyDir   string `json:"operestyDir"`
 	BackupDataDir string `json:"backupDataDir"`
 	Size          uint64 `json:"size"`
 }
@@ -322,12 +323,12 @@ func loadPanelFile(fileOp fileUtils.FileOp) ([]dto.DataTree, error) {
 			Path:    path.Join(global.Dir.DataDir, fileItem.Name()),
 		}
 		switch itemData.Label {
-		case "agent", "conf", "runtime", "docker", "secret", "task":
+		case "agent", "runtime", "docker", "task", "geo", "secret", "uploads":
 			itemData.IsDisable = true
-		case "clamav":
+		case "clamav", "download", "resource":
 			panelPath := path.Join(global.Dir.DataDir, itemData.Label)
 			itemData.Children, _ = loadFile(panelPath, 5, fileOp)
-		default:
+		case "apps", "backup", "log", "db", "tmp":
 			continue
 		}
 		if fileItem.IsDir() {
@@ -349,6 +350,19 @@ func loadPanelFile(fileOp fileUtils.FileOp) ([]dto.DataTree, error) {
 		}
 
 		data = append(data, itemData)
+	}
+
+	openrestySite, _ := settingRepo.GetValueByKey("WEBSITE_DIR")
+	if len(openrestySite) != 0 && !strings.Contains(openrestySite, global.Dir.DataDir) {
+		sizeItem, _ := fileOp.GetDirSize(openrestySite)
+		data = append(data, dto.DataTree{
+			ID:        uuid.NewString(),
+			Label:     "www",
+			IsCheck:   true,
+			IsDisable: true,
+			Path:      openrestySite,
+			Size:      uint64(sizeItem),
+		})
 	}
 
 	return data, nil

@@ -309,7 +309,7 @@ const openTaskLog = (taskID: string) => {
     taskLogRef.value.openWithTaskID(taskID);
 };
 const openWithResource = (row: any, op: string) => {
-    op = 'create' ? 'TaskCreate' : 'TaskRecover';
+    op = op === 'create' ? 'TaskCreate' : 'TaskRecover';
     taskLogRef.value.openWithResourceID('Snapshot', op, row.id);
 };
 

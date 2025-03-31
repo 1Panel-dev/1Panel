@@ -18,6 +18,7 @@ func Init() {
 	global.Dir.LogDir, _ = fileOp.CreateDirWithPath(true, path.Join(baseDir, "1panel/log"))
 	global.Dir.TmpDir, _ = fileOp.CreateDirWithPath(true, path.Join(baseDir, "1panel/tmp"))
 
+	global.Dir.AppDir, _ = fileOp.CreateDirWithPath(true, path.Join(baseDir, "1panel/apps"))
 	global.Dir.ResourceDir, _ = fileOp.CreateDirWithPath(true, path.Join(baseDir, "1panel/resource"))
 	global.Dir.AppResourceDir, _ = fileOp.CreateDirWithPath(true, path.Join(baseDir, "1panel/resource/apps"))
 	global.Dir.AppInstallDir, _ = fileOp.CreateDirWithPath(true, path.Join(baseDir, "1panel/apps"))

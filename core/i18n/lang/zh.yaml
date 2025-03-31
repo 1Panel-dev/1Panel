@@ -34,7 +34,7 @@ ErrInternalServerKey: "服务内部错误:"
 
 #app 
 CustomAppStoreFileValid: "应用商店包需要 .tar.gz 格式"
-ErrFileNotFound: '{{.name}} 文件不存在'
+ErrFileNotFound: '{{ .name }} 文件不存在'
 
 #backup
 ErrBackupInUsed: "该备份账号已在计划任务中使用，无法删除"
@@ -80,7 +80,7 @@ SubTaskFailed: "{{ .name }} 失败: {{ .err }}"
 TaskInstall: "安装"
 TaskUpgrade: "升级"
 SuccessStatus: "{{ .name }} 成功" 
-FailedStatus: "{{ .name }} 失败 {{.err}}"
+FailedStatus: "{{ .name }} 失败 {{ .err }}"
 Start: "开始"
 SubTask: "子任务"
 
