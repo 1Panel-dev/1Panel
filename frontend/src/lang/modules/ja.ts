@@ -3074,8 +3074,7 @@ const message = {
             nodeInfo: 'ノード情報',
             nodeSyncHelper: 'ノード情報の同期は、以下の情報を同期します：',
             nodeSyncHelper1: '1. 公共のバックアップアカウント情報',
-            nodeSyncHelper2: '2. 概要ページの推奨アプリ情報',
-            nodeSyncHelper3: '3. 主ノードとサブノードの接続情報',
+            nodeSyncHelper2: '2. 主ノードとサブノードの接続情報',
 
             panelExist:
                 'このノードに既に1panelサービスが存在します。このノードを追加すると、1panelの元のサービスポートとインストールディレクトリが使用されます。続行しますか？',
@@ -3083,6 +3082,7 @@ const message = {
                 'このノードに既に1panel-coreサービスが存在します。このノードを追加できません。確認して再試行してください！',
             agentExist:
                 'このノードに1panel-agentサービスが既に存在することが検出されました。追加を続行すると、ノードデータは保持され、1panel-agentサービスのみが置き換えられます。続行しますか？',
+            errLicense: 'このノードにバインドされたライセンスが利用できません。確認して再試行してください！',
             reinstallHelper: 'ノード{0}を再インストールします。続行しますか？',
             unhealthyCheck: '異常チェック',
             fixOperation: '修正操作',

@@ -3023,14 +3023,14 @@ const message = {
             nodeInfo: '노드 정보',
             nodeSyncHelper: '노드 정보 동기화는 다음 정보를 동기화합니다:',
             nodeSyncHelper1: '1. 공용 백업 계정 정보',
-            nodeSyncHelper2: '2. 개요 페이지 추천 애플리케이션 정보',
-            nodeSyncHelper3: '3. 주 노드와 하위 노드 간의 연결 정보',
+            nodeSyncHelper2: '2. 주 노드와 하위 노드 간의 연결 정보',
             panelExist:
                 '이 노드에 이미 1panel 서비스가 존재합니다. 이 노드를 추가하면 1panel의 원래 서비스 포트와 설치 디렉토리를 사용합니다. 계속하시겠습니까?',
             coreExist:
                 '이 노드에 이미 1panel-core 서비스가 존재합니다. 이 노드를 추가할 수 없습니다. 확인 후 다시 시도하십시오!',
             agentExist:
                 '이 노드에 1panel-agent 서비스가 이미 존재하는 것으로 감지되었습니다. 추가를 계속하면 노드 데이터는 유지되고 1panel-agent 서비스만 교체됩니다. 계속하시겠습니까?',
+            errLicense: '이 노드에 연결된 라이선스를 사용할 수 없습니다. 확인 후 다시 시도하세요!',
             reinstallHelper: '노드 {0}를 재설치합니다. 계속하시겠습니까?',
             unhealthyCheck: '비정상 체크',
             fixOperation: '수정 작업',

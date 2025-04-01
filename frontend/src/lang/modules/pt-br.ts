@@ -3147,14 +3147,14 @@ const message = {
             nodeInfo: 'Informações do Nó',
             nodeSyncHelper: 'A sincronização das informações do nó irá sincronizar as seguintes informações:',
             nodeSyncHelper1: '1. Informações da conta de backup pública',
-            nodeSyncHelper2: '2. Informações sobre aplicativos recomendados na página de visão geral',
-            nodeSyncHelper3: '3. Informações de conexão entre o nó principal e os sub-nós',
+            nodeSyncHelper2: '2. Informações de conexão entre o nó principal e os sub-nós',
             panelExist:
                 'Detectado que já existe um serviço 1panel neste nó. Adicionar este nó usará a porta e o diretório de instalação do serviço original do 1panel. Deseja continuar?',
             coreExist:
                 'Detectado que já existe um serviço 1panel-core neste nó. Não é possível adicionar este nó, por favor verifique e tente novamente!',
             agentExist:
                 'Detectado que o serviço 1panel-agent já existe neste nó. Continuar a adicionar irá manter os dados do nó e apenas substituir o serviço 1panel-agent. Você deseja continuar?',
+            errLicense: 'A licença vinculada a este nó não está disponível. Por favor, verifique e tente novamente!',
             reinstallHelper: 'Reinstalar o nó {0}, deseja continuar?',
             unhealthyCheck: 'Verificação Anormal',
             fixOperation: 'Operação de Correção',

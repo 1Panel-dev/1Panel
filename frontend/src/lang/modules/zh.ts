@@ -2964,13 +2964,13 @@ const message = {
             nodeInfo: '节点信息',
             nodeSyncHelper: '节点信息同步将同步以下信息：',
             nodeSyncHelper1: '1. 公用的备份账号信息',
-            nodeSyncHelper2: '2. 概览页推荐应用信息',
-            nodeSyncHelper3: '3. 主节点与子节点的连接信息',
+            nodeSyncHelper2: '2. 主节点与子节点的连接信息',
             panelExist:
                 '检测到该节点上已存在 1panel 服务，添加该节点将沿用 1panel 原服务的端口以及安装目录，是否继续？',
             coreExist: '检测到该节点上已存在 1panel-core 服务，无法添加该节点，请检查后重试！',
             agentExist:
                 '检测到该节点上已存在 1panel-agent 服务，继续添加将保留该节点数据，仅替换 1panel-agent 服务，是否继续？',
+            errLicense: '检测到该节点绑定的许可证不可用，请检查后重试！',
             reinstallHelper: '重新安装节点 {0}, 是否继续？',
             unhealthyCheck: '异常检查',
             fixOperation: '修复方案',

@@ -27,33 +27,13 @@
                     <div class="h-app-card" v-for="(app, index) in apps" :key="index">
                         <el-row :gutter="5">
                             <el-col :span="5">
-                                <div>
-                                    <el-badge
-                                        badge-style="background-color: transparent; font-size: 10px; border: none"
-                                        v-if="app.isRecommend"
-                                        :offset="[-60, 0]"
-                                    >
-                                        <template #content>
-                                            <svg-icon iconName="p-tuijian"></svg-icon>
-                                        </template>
-                                        <el-avatar
-                                            shape="square"
-                                            :size="55"
-                                            :src="'data:image/png;base64,' + app.icon"
-                                        />
-                                    </el-badge>
-                                    <el-avatar
-                                        v-else
-                                        shape="square"
-                                        :size="55"
-                                        :src="'data:image/png;base64,' + app.icon"
-                                    />
-                                </div>
+                                <el-avatar shape="square" :size="55" :src="'data:image/png;base64,' + app.icon" />
                             </el-col>
                             <el-col :span="16">
                                 <div class="h-app-content" v-if="!app.currentRow">
                                     <div>
                                         <span class="h-app-title">{{ app.name }}</span>
+                                        <svg-icon class="svg-icon" iconName="p-huobao1"></svg-icon>
                                     </div>
                                     <div class="h-app-desc">
                                         <span>
@@ -335,6 +315,7 @@ defineExpose({
         }
 
         .h-app-desc {
+            margin-top: 2px;
             span {
                 font-weight: 400;
                 font-size: 12px;
@@ -360,6 +341,12 @@ defineExpose({
     font-weight: 400;
     font-size: 12px;
     color: var(--el-text-color-regular);
+}
+
+.svg-icon {
+    font-size: 5px !important;
+    margin-left: 5px;
+    margin-bottom: 2px;
 }
 
 .h-button-setting {

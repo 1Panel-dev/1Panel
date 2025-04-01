@@ -34,7 +34,7 @@
                         {{ $t('xpack.node.master') }}
                     </div>
                     <div
-                        class="dropdown-item"
+                        class="dropdown-item mt-1"
                         @click="changeNode(item.name)"
                         :disabled="item.status !== 'Healthy'"
                         v-for="item in nodes"
@@ -208,7 +208,7 @@ onMounted(() => {
 }
 
 .dropdown-item {
-    padding: 6px 8px;
+    padding: 2px 8px;
     cursor: pointer;
     transition: background 0.3s;
     .icon {

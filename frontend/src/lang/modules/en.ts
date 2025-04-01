@@ -3219,14 +3219,14 @@ const message = {
             nodeInfo: 'Node Information',
             nodeSyncHelper: 'Node information synchronization will sync the following information:',
             nodeSyncHelper1: '1. Public backup account information',
-            nodeSyncHelper2: '2. Overview page recommended application information',
-            nodeSyncHelper3: '3. Connection information between the main node and sub-nodes',
+            nodeSyncHelper2: '2. Connection information between the main node and sub-nodes',
             panelExist:
                 'Detected that there is already 1panel service on this node. Adding this node will use the original service port and installation directory of 1panel. Do you want to continue?',
             coreExist:
                 'Detected that there is already 1panel-core service on this node. Unable to add this node, please check and try again!',
             agentExist:
                 'Detected that the 1panel-agent service already exists on this node. Continuing to add will retain the node data and only replace the 1panel-agent service. Do you want to continue?',
+            errLicense: 'The license bound to this node is unavailable. Please check and try again!',
             reinstallHelper: 'Reinstall node {0}, do you want to continue?',
             unhealthyCheck: 'Abnormal Check',
             fixOperation: 'Fix Operation',

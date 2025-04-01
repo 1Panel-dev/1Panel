@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "29971586",
+      "name": "火爆",
+      "font_class": "huobao1",
+      "unicode": "e604",
+      "unicode_decimal": 58884
+    },
+    {
       "icon_id": "10199157",
       "name": "个人中心",
       "font_class": "gerenzhongxin1",

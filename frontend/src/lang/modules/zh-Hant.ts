@@ -2982,13 +2982,13 @@ const message = {
             nodeInfo: '節點資訊',
             nodeSyncHelper: '節點信息同步將同步以下信息：',
             nodeSyncHelper1: '1. 公用的備份帳號信息',
-            nodeSyncHelper2: '2. 概覽頁推薦應用信息',
-            nodeSyncHelper3: '3. 主節點與子節點的連接信息',
+            nodeSyncHelper2: '2. 主節點與子節點的連接信息',
             panelExist:
                 '已檢測到該節點上已存在 1panel 服務，新增該節點將沿用 1panel 原服務的埠號及安裝目錄，是否繼續？',
             coreExist: '已檢測到該節點上已存在 1panel-core 服務，無法新增該節點，請檢查後再試！',
             agentExist:
                 '檢測到該節點上已存在 1panel-agent 服務，繼續添加將保留該節點數據，僅替換 1panel-agent 服務，是否繼續？',
+            errLicense: '檢測到該節點綁定的許可證不可用，請檢查後重試！',
             reinstallHelper: '重新安裝節點 {0}，是否繼續？',
             unhealthyCheck: '異常檢查',
             fixOperation: '修復方案',

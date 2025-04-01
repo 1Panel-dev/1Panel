@@ -3144,14 +3144,14 @@ const message = {
             nodeInfo: 'Maklumat Nod',
             nodeSyncHelper: 'Penyelarasan maklumat nod akan menyelaraskan maklumat berikut:',
             nodeSyncHelper1: '1. Maklumat akaun sandaran awam',
-            nodeSyncHelper2: '2. Maklumat aplikasi yang disyorkan di halaman gambaran keseluruhan',
-            nodeSyncHelper3: '3. Maklumat sambungan antara nod utama dan nod sub',
+            nodeSyncHelper2: '2. Maklumat sambungan antara nod utama dan nod sub',
             panelExist:
                 'Dikesan bahawa terdapat perkhidmatan 1panel yang sudah ada pada nod ini. Menambah nod ini akan menggunakan port dan direktori pemasangan perkhidmatan asal 1panel. Adakah anda ingin meneruskan?',
             coreExist:
                 'Dikesan bahawa terdapat perkhidmatan 1panel-core yang sudah ada pada nod ini. Tidak dapat menambah nod ini, sila semak dan cuba lagi!',
             agentExist:
                 'Terbukti bahawa perkhidmatan 1panel-agent sudah wujud pada nod ini. Melanjutkan penambahan akan mengekalkan data nod dan hanya menggantikan perkhidmatan 1panel-agent. Adakah anda ingin meneruskan?',
+            errLicense: 'Lesen yang terikat pada nod ini tidak tersedia. Sila periksa dan cuba lagi!',
             reinstallHelper: 'Pasang semula nod {0}, adakah anda ingin meneruskan?',
             unhealthyCheck: 'Pemeriksaan Tidak Normal',
             fixOperation: 'Operasi Pembetulan',
