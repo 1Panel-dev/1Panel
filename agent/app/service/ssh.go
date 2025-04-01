@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/user"
 	"path"
-	"path/filepath"
 	"sort"
 	"strings"
 	"time"
@@ -288,25 +287,26 @@ func (u *SSHService) LoadLog(ctx *gin.Context, req dto.SearchSSHLog) (*dto.SSHLo
 	var fileList []sshFileItem
 	var data dto.SSHLog
 	baseDir := "/var/log"
-	if err := filepath.Walk(baseDir, func(pathItem string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
+	fileItems, err := os.ReadDir(baseDir)
+	if err != nil {
+		return &data, err
+	}
+	for _, item := range fileItems {
+		if item.IsDir() || (!strings.HasPrefix(item.Name(), "secure") && !strings.HasPrefix(item.Name(), "auth")) {
+			continue
 		}
-		if !info.IsDir() && (strings.HasPrefix(info.Name(), "secure") || strings.HasPrefix(info.Name(), "auth")) {
-			if !strings.HasSuffix(info.Name(), ".gz") {
-				fileList = append(fileList, sshFileItem{Name: pathItem, Year: info.ModTime().Year()})
-				return nil
-			}
-			itemFileName := strings.TrimSuffix(pathItem, ".gz")
-			if _, err := os.Stat(itemFileName); err != nil && os.IsNotExist(err) {
-				if err := handleGunzip(pathItem); err == nil {
-					fileList = append(fileList, sshFileItem{Name: itemFileName, Year: info.ModTime().Year()})
-				}
+		info, _ := item.Info()
+		itemPath := path.Join(baseDir, info.Name())
+		if !strings.HasSuffix(item.Name(), ".gz") {
+			fileList = append(fileList, sshFileItem{Name: itemPath, Year: info.ModTime().Year()})
+			continue
+		}
+		itemFileName := strings.TrimSuffix(itemPath, ".gz")
+		if _, err := os.Stat(itemFileName); err != nil && os.IsNotExist(err) {
+			if err := handleGunzip(itemPath); err == nil {
+				fileList = append(fileList, sshFileItem{Name: itemFileName, Year: info.ModTime().Year()})
 			}
 		}
-		return nil
-	}); err != nil {
-		return nil, err
 	}
 	fileList = sortFileList(fileList)
 

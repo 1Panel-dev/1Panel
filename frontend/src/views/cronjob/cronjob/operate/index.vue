@@ -420,11 +420,10 @@
                         @change="changeAccount"
                     >
                         <div v-for="item in backupOptions" :key="item.id">
-                            <el-option
-                                v-if="item.type !== $t('setting.LOCAL')"
-                                :value="item.id"
-                                :label="item.type + ' - ' + item.name"
-                            />
+                            <el-option v-if="item.type !== $t('setting.LOCAL')" :value="item.id" :label="item.name">
+                                {{ item.name }}
+                                <el-tag class="tagClass" type="primary">{{ item.type }}</el-tag>
+                            </el-option>
                             <el-option v-else :value="item.id" :label="item.type" />
                         </div>
                     </el-select>
@@ -450,11 +449,10 @@
                 <el-form-item :label="$t('cronjob.default_download_path')" prop="downloadAccountID">
                     <el-select class="selectClass" v-model="dialogData.rowData!.downloadAccountID">
                         <div v-for="item in accountOptions" :key="item.id">
-                            <el-option
-                                v-if="item.type !== $t('setting.LOCAL')"
-                                :value="item.id"
-                                :label="item.type + ' - ' + item.name"
-                            />
+                            <el-option v-if="item.type !== $t('setting.LOCAL')" :value="item.id" :label="item.name">
+                                {{ item.name }}
+                                <el-tag class="tagClass" type="primary">{{ item.type }}</el-tag>
+                            </el-option>
                             <el-option v-else :value="item.id" :label="item.type" />
                         </div>
                     </el-select>

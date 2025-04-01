@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path"
-	"path/filepath"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 )
@@ -80,13 +79,14 @@ func (c localClient) ListObjects(prefix string) ([]string, error) {
 	if _, err := os.Stat(prefix); err != nil {
 		return files, nil
 	}
-	if err := filepath.Walk(prefix, func(path string, info os.FileInfo, err error) error {
-		if !info.IsDir() {
-			files = append(files, info.Name())
+	list, err := os.ReadDir(prefix)
+	if err != nil {
+		return files, err
+	}
+	for i := 0; i < len(list); i++ {
+		if !list[i].IsDir() {
+			files = append(files, list[i].Name())
 		}
-		return nil
-	}); err != nil {
-		return nil, err
 	}
 
 	return files, nil

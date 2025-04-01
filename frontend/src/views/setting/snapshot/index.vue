@@ -46,7 +46,7 @@
                                     <div v-if="row.expand || (!row.expand && index < 3)">
                                         <span type="info">
                                             <span>
-                                                {{ loadName(item) }}
+                                                {{ item === 'localhost' ? $t('setting.LOCAL') : item }}
                                             </span>
                                             <el-icon
                                                 v-if="item === row.downloadAccount"
@@ -479,11 +479,6 @@ const loadSize = async (params: any) => {
         .catch(() => {
             loading.value = false;
         });
-};
-
-const loadName = (from: any) => {
-    let items = from.split(' - ');
-    return i18n.global.t('setting.' + items[0]) + ' ' + items[1];
 };
 
 onMounted(() => {

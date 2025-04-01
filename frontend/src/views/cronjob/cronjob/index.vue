@@ -100,9 +100,7 @@
                                     <div v-if="row.accountExpand || (!row.accountExpand && index < 3)">
                                         <div v-if="row.expand || (!row.expand && index < 3)">
                                             <span type="info">
-                                                <span>
-                                                    {{ loadName(item) }}
-                                                </span>
+                                                {{ item === 'localhost' ? $t('setting.LOCAL') : item }}
                                                 <el-icon
                                                     v-if="item === row.downloadAccount"
                                                     size="12"
@@ -352,11 +350,6 @@ const loadDetail = (row: any) => {
         rowData: { ...row },
     };
     dialogRecordRef.value!.acceptParams(params);
-};
-
-const loadName = (from: any) => {
-    let items = from.split(' - ');
-    return i18n.global.t('setting.' + items[0]) + ' ' + items[1];
 };
 
 const buttons = [

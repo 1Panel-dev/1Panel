@@ -12,7 +12,6 @@ func (s *LogRouter) InitRouter(Router *gin.RouterGroup) {
 	baseApi := v2.ApiGroupApp.BaseApi
 	{
 		operationRouter.GET("/system/files", baseApi.GetSystemFiles)
-		operationRouter.POST("/system", baseApi.GetSystemLogs)
 		operationRouter.POST("/tasks/search", baseApi.PageTasks)
 		operationRouter.GET("/tasks/executing/count", baseApi.CountExecutingTasks)
 	}

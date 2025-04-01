@@ -1,13 +1,6 @@
 package service
 
 import (
-	"os"
-	"path"
-	"path/filepath"
-	"sort"
-	"strings"
-	"time"
-
 	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/utils/common"
 	geo2 "github.com/1Panel-dev/1Panel/core/utils/geo"
@@ -26,7 +19,6 @@ type LogService struct{}
 const logs = "https://resource.fit2cloud.com/installation-log.sh"
 
 type ILogService interface {
-	ListSystemLogFile() ([]string, error)
 	CreateLoginLog(operation model.LoginLog) error
 	PageLoginLog(ctx *gin.Context, search dto.SearchLgLogWithPage) (int64, interface{}, error)
 
@@ -42,39 +34,6 @@ func NewILogService() ILogService {
 
 func (u *LogService) CreateLoginLog(operation model.LoginLog) error {
 	return logRepo.CreateLoginLog(&operation)
-}
-
-func (u *LogService) ListSystemLogFile() ([]string, error) {
-	logDir := path.Join(global.CONF.Base.InstallDir, "1panel/log")
-	var files []string
-	if err := filepath.Walk(logDir, func(pathItem string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if !info.IsDir() && strings.HasPrefix(info.Name(), "1Panel") {
-			if info.Name() == "1Panel.log" {
-				files = append(files, time.Now().Format("2006-01-02"))
-				return nil
-			}
-			itemFileName := strings.TrimPrefix(info.Name(), "1Panel-")
-			itemFileName = strings.TrimSuffix(itemFileName, ".gz")
-			itemFileName = strings.TrimSuffix(itemFileName, ".log")
-			files = append(files, itemFileName)
-			return nil
-		}
-		return nil
-	}); err != nil {
-		return nil, err
-	}
-
-	if len(files) < 2 {
-		return files, nil
-	}
-	sort.Slice(files, func(i, j int) bool {
-		return files[i] > files[j]
-	})
-
-	return files, nil
 }
 
 func (u *LogService) PageLoginLog(ctx *gin.Context, req dto.SearchLgLogWithPage) (int64, interface{}, error) {

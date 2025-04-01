@@ -55,7 +55,7 @@
                     <el-table-column :label="$t('commons.table.type')" :min-width="80" prop="type">
                         <template #default="{ row }">
                             <el-tag>{{ $t('setting.' + row.type) }}</el-tag>
-                            <el-tooltip v-if="row.type === 'OneDrive'">
+                            <el-tooltip v-if="hasTokenRefresh(row)">
                                 <template #content>
                                     {{ $t('setting.clickToRefresh') }}
                                     <br />
@@ -175,6 +175,10 @@ const loadEndpoint = (row: any) => {
         return row.varsJson['domain'];
     }
     return '';
+};
+
+const hasTokenRefresh = (row: any) => {
+    return row.type === 'OneDrive' || row.type === 'ALIYUN' || row.type === 'GoogleDrive';
 };
 
 const onDelete = async (row: Backup.BackupInfo) => {

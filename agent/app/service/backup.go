@@ -147,7 +147,7 @@ func (u *BackupService) Create(req dto.BackupOperate) error {
 	}
 	backup.Credential = string(itemCredential)
 
-	if req.Type == constant.OneDrive || req.Type == constant.GoogleDrive {
+	if req.Type == constant.OneDrive || req.Type == constant.GoogleDrive || req.Type == constant.ALIYUN {
 		if err := loadRefreshTokenByCode(&backup); err != nil {
 			return err
 		}
@@ -247,7 +247,7 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 		global.Dir.LocalBackupDir = newBackup.BackupPath
 	}
 
-	if newBackup.Type == constant.OneDrive || newBackup.Type == constant.GoogleDrive {
+	if newBackup.Type == constant.OneDrive || newBackup.Type == constant.GoogleDrive || newBackup.Type == constant.ALIYUN {
 		if err := loadRefreshTokenByCode(&newBackup); err != nil {
 			return err
 		}
@@ -501,16 +501,19 @@ func loadRefreshTokenByCode(backup *model.BackupAccount) error {
 		if err != nil {
 			return err
 		}
-	} else {
+	}
+	if backup.Type == constant.OneDrive {
 		refreshToken, err = client.RefreshToken("authorization_code", "refreshToken", varMap)
 		if err != nil {
 			return err
 		}
 	}
-	delete(varMap, "code")
+	if backup.Type != constant.ALIYUN {
+		delete(varMap, "code")
+		varMap["refresh_token"] = refreshToken
+	}
 	varMap["refresh_status"] = constant.StatusSuccess
 	varMap["refresh_time"] = time.Now().Format(constant.DateTimeLayout)
-	varMap["refresh_token"] = refreshToken
 	itemVars, err := json.Marshal(varMap)
 	if err != nil {
 		return fmt.Errorf("json marshal var map failed, err: %v", err)
@@ -535,10 +538,9 @@ func loadBackupNamesByID(accountIDs string, downloadID uint) ([]string, string, 
 	var accounts []string
 	var downloadAccount string
 	for _, item := range list {
-		itemName := fmt.Sprintf("%s - %s", item.Type, item.Name)
-		accounts = append(accounts, itemName)
+		accounts = append(accounts, item.Name)
 		if item.ID == downloadID {
-			downloadAccount = itemName
+			downloadAccount = item.Name
 		}
 	}
 	return accounts, downloadAccount, nil

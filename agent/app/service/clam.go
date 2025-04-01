@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/exec"
 	"path"
-	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -543,16 +542,15 @@ func StopAllCronJob(withCheck bool) bool {
 func loadFileByName(name string) []string {
 	var logPaths []string
 	pathItem := path.Join(global.Dir.DataDir, resultDir, name)
-	_ = filepath.Walk(pathItem, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return nil
+	fileItems, err := os.ReadDir(pathItem)
+	if err != nil {
+		return logPaths
+	}
+	for _, item := range fileItems {
+		if !item.IsDir() {
+			logPaths = append(logPaths, item.Name())
 		}
-		if info.IsDir() || info.Name() == name {
-			return nil
-		}
-		logPaths = append(logPaths, info.Name())
-		return nil
-	})
+	}
 	return logPaths
 }
 func loadResultFromLog(pathItem string) dto.ClamLog {
