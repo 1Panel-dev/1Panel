@@ -566,10 +566,8 @@ func (u *FirewallService) pingStatus() string {
 	if _, err := os.Stat("/etc/sysctl.conf"); err != nil {
 		return constant.StatusNone
 	}
-	sudo := cmd.SudoHandleCmd()
-	command := fmt.Sprintf("%s cat /etc/sysctl.conf | grep net/ipv4/icmp_echo_ignore_all= ", sudo)
-	stdout, _ := cmd.Exec(command)
-	if stdout == "net/ipv4/icmp_echo_ignore_all=1\n" {
+	stdout, _ := cmd.Execf("%s sysctl -a 2>/dev/null | grep 'net.ipv4.icmp.echo_ignore_all'", cmd.SudoHandleCmd())
+	if stdout == "net.ipv4.icmp_echo_ignore_all = 1\n" {
 		return constant.StatusEnable
 	}
 	return constant.StatusDisable
@@ -582,17 +580,30 @@ func (u *FirewallService) updatePingStatus(enable string) error {
 	}
 	files := strings.Split(string(lineBytes), "\n")
 	var newFiles []string
-	hasLine := false
-	for _, line := range files {
-		if strings.Contains(line, "net/ipv4/icmp_echo_ignore_all") || strings.HasPrefix(line, "net/ipv4/icmp_echo_ignore_all") {
-			newFiles = append(newFiles, "net/ipv4/icmp_echo_ignore_all="+enable)
-			hasLine = true
-		} else {
-			newFiles = append(newFiles, line)
-		}
+	var hasIpv6 bool
+	ipv6Status, _ := cmd.Exec("sysctl -a 2>/dev/null | grep 'net.ipv6.icmp.echo_ignore_all'")
+	if len(strings.ReplaceAll(ipv6Status, "\n", "")) != 0 {
+		hasIpv6 = true
 	}
-	if !hasLine {
-		newFiles = append(newFiles, "net/ipv4/icmp_echo_ignore_all="+enable)
+	hasIPv4Line, hasIPv6Line := false, false
+	for _, line := range files {
+		if strings.Contains(line, "net/ipv4/icmp_echo_ignore_all") || strings.Contains(line, "net.ipv4.icmp_echo_ignore_all") {
+			newFiles = append(newFiles, "net.ipv4.icmp_echo_ignore_all="+enable)
+			hasIPv4Line = true
+			continue
+		}
+		if hasIpv6 && strings.Contains(line, "net/ipv6/icmp/echo_ignore_all") || strings.Contains(line, "net.ipv6.icmp.echo_ignore_all") {
+			newFiles = append(newFiles, "net.ipv6.icmp.echo_ignore_all="+enable)
+			hasIPv6Line = true
+			continue
+		}
+		newFiles = append(newFiles, line)
+	}
+	if !hasIPv4Line {
+		newFiles = append(newFiles, "net.ipv4.icmp_echo_ignore_all="+enable)
+	}
+	if !hasIPv6Line {
+		newFiles = append(newFiles, "net.ipv6.icmp.echo_ignore_all="+enable)
 	}
 	file, err := os.OpenFile(confPath, os.O_WRONLY|os.O_TRUNC, constant.FilePerm)
 	if err != nil {
