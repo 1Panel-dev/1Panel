@@ -19,8 +19,8 @@ import (
 	"github.com/go-acme/lego/v4/lego"
 	"github.com/go-acme/lego/v4/providers/dns/alidns"
 	"github.com/go-acme/lego/v4/providers/dns/clouddns"
-	"github.com/go-acme/lego/v4/providers/dns/cloudns"
 	"github.com/go-acme/lego/v4/providers/dns/cloudflare"
+	"github.com/go-acme/lego/v4/providers/dns/cloudns"
 	"github.com/go-acme/lego/v4/providers/dns/dnspod"
 	"github.com/go-acme/lego/v4/providers/dns/godaddy"
 	"github.com/go-acme/lego/v4/providers/dns/huaweicloud"
@@ -88,21 +88,21 @@ const (
 )
 
 type DNSParam struct {
-	ID        string `json:"id"`
-	Token     string `json:"token"`
-	AccessKey string `json:"accessKey"`
-	SecretKey string `json:"secretKey"`
-	Email     string `json:"email"`
-	APIkey    string `json:"apiKey"`
-	APIUser   string `json:"apiUser"`
-	APISecret string `json:"apiSecret"`
-	SecretID  string `json:"secretID"`
-	Region    string `json:"region"`
-	ClientID  string `json:"clientID"`
-	Password  string `json:"password"`
-	AuthID  string `json:"authID"`
-	SubAuthID  string `json:"subAuthID"`
-	AuthPassword  string `json:"authPassword"`
+	ID           string `json:"id"`
+	Token        string `json:"token"`
+	AccessKey    string `json:"accessKey"`
+	SecretKey    string `json:"secretKey"`
+	Email        string `json:"email"`
+	APIkey       string `json:"apiKey"`
+	APIUser      string `json:"apiUser"`
+	APISecret    string `json:"apiSecret"`
+	SecretID     string `json:"secretID"`
+	Region       string `json:"region"`
+	ClientID     string `json:"clientID"`
+	Password     string `json:"password"`
+	AuthID       string `json:"authID"`
+	SubAuthID    string `json:"subAuthID"`
+	AuthPassword string `json:"authPassword"`
 }
 
 var (
@@ -171,7 +171,7 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string, websiteSSL model.Web
 		cloudnsConfig.PropagationTimeout = propagationTimeout
 		cloudnsConfig.PollingInterval = pollingInterval
 		cloudnsConfig.TTL = ttl
-		p, err = clouddns.NewDNSProviderConfig(cloudnsConfig)
+		p, err = cloudns.NewDNSProviderConfig(cloudnsConfig)
 	case FreeMyIP:
 		freeMyIpConfig := freemyip.NewDefaultConfig()
 		freeMyIpConfig.Token = param.Token
