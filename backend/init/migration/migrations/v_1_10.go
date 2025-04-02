@@ -459,3 +459,13 @@ var AddLicenseVerify = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddMcpServer = &gormigrate.Migration{
+	ID: "20250401-add-mcp-server",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.McpServer{}); err != nil {
+			return err
+		}
+		return nil
+	},
+}

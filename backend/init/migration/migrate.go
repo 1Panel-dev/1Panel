@@ -106,6 +106,8 @@ func Init() {
 		migrations.AddAppMenu,
 		migrations.AddAppPanelName,
 		migrations.AddLicenseVerify,
+
+		migrations.AddMcpServer,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

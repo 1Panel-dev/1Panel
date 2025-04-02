@@ -288,6 +288,7 @@ SystemMode: "模式: "
 #ai-tool
 ErrOpenrestyInstall: '请先安装 Openresty'
 ErrSSL: "证书内容为空，请检查证书!"
+ErrSsePath: "SSE 路径重复"
 
 #mobile app
 ErrVerifyToken: '令牌验证错误，请重置后再次扫码'

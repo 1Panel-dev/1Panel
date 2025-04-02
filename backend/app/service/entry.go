@@ -46,4 +46,6 @@ var (
 	phpExtensionsRepo = repo.NewIPHPExtensionsRepo()
 
 	favoriteRepo = repo.NewIFavoriteRepo()
+
+	mcpServerRepo = repo.NewIMcpServerRepo()
 )

@@ -37,3 +37,6 @@ var DomainNotFoundHTML []byte
 
 //go:embed stop.html
 var StopHTML []byte
+
+//go:embed sse.conf
+var SSE []byte

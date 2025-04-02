@@ -285,6 +285,7 @@ SystemMode: "モード: "
 #ai-tool
 ErrOpenrestyInstall: 'まず Openresty をインストールしてください'
 ErrSSL: "証明書の内容が空です。証明書を確認してください！"
+ErrSsePath: "SSE パスが重複しています"
 
 
 #mobile app

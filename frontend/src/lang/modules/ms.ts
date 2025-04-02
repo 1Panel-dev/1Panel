@@ -2629,6 +2629,27 @@ const message = {
         proxyHelper6: 'Untuk melumpuhkan konfigurasi proksi, anda boleh memadamnya dari senarai laman web.',
         whiteListHelper: 'Hadkan akses kepada hanya IP dalam senarai putih',
     },
+    mcp: {
+        server: 'Pelayan MCP',
+        create: 'Tambah Pelayan',
+        edit: 'Edit Pelayan',
+        commandHelper: 'Contoh: npx -y {0}',
+        baseUrl: 'Laluan Akses Luar',
+        baseUrlHelper: 'Contoh: https://127.0.0.1:8080',
+        ssePath: 'Laluan SSE',
+        ssePathHelper: 'Contoh: /sse, berhati-hati jangan bertindan dengan pelayan lain',
+        environment: 'Pemboleh Ubah Persekitaran',
+        envKey: 'Nama Pemboleh Ubah',
+        envValue: 'Nilai Pemboleh Ubah',
+        externalUrl: 'Alamat Sambungan Luar',
+        operatorHelper: 'Akan melakukan operasi {1} pada {0}, teruskan?',
+        domain: 'Alamat Akses Lalai',
+        domainHelper: 'Contoh: 192.168.1.1 atau example.com',
+        bindDomain: 'Sematkan Laman Web',
+        commandPlaceHolder: 'Kini hanya menyokong perintah yang bermula dengan npx dan binari',
+        importMcpJson: 'Import Konfigurasi Pelayan MCP',
+        importMcpJsonError: 'Struktur mcpServers tidak betul',
+    },
 };
 
 export default {

@@ -28,6 +28,15 @@ const databaseRouter = {
                 requiresAuth: true,
             },
         },
+        {
+            path: '/ai/mcp',
+            name: 'MCPServer',
+            component: () => import('@/views/ai/mcp/server/index.vue'),
+            meta: {
+                title: 'MCP',
+                requiresAuth: true,
+            },
+        },
     ],
 };
 

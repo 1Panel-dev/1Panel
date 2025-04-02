@@ -287,7 +287,7 @@ SystemMode: "Mod: "
 #ai-tool
 ErrOpenrestyInstall: 'Sila pasang Openresty terlebih dahulu'
 ErrSSL: "Kandungan sijil kosong, sila periksa sijil!"
-
+ErrSsePath: "Laluan SSE bertindan"
 
 #mobile app
 ErrVerifyToken: 'Ralat pengesahan token, sila tetapkan semula dan imbas semula.'

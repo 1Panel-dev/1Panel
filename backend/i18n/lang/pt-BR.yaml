@@ -285,6 +285,7 @@ SystemMode: "modo: "
 #ai-tool
 ErrOpenrestyInstall: 'Por favor, instale o Openresty primeiro'
 ErrSSL: "O conteúdo do certificado está vazio, por favor, verifique o certificado!"
+ErrSsePath: "Caminho SSE duplicado"
 
 #mobile app
 ErrVerifyToken: 'Erro de verificação do token, por favor, reinicie e escaneie novamente.'

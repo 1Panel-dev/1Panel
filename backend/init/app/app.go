@@ -23,8 +23,11 @@ func Init() {
 
 	constant.SSLLogDir = path.Join(global.CONF.System.DataDir, "log", "ssl")
 
+	constant.McpDir = path.Join(constant.DataDir, "mcp")
+
 	dirs := []string{constant.DataDir, constant.ResourceDir, constant.AppResourceDir, constant.AppInstallDir,
-		global.CONF.System.Backup, constant.RuntimeDir, constant.LocalAppResourceDir, constant.RemoteAppResourceDir, constant.SSLLogDir}
+		global.CONF.System.Backup, constant.RuntimeDir, constant.LocalAppResourceDir, constant.RemoteAppResourceDir,
+		constant.SSLLogDir, constant.McpDir}
 
 	fileOp := files.NewFileOp()
 	for _, dir := range dirs {

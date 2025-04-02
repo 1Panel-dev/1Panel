@@ -2530,6 +2530,27 @@ const message = {
         proxyHelper6: '프록시 구성을 비활성화하려면 웹사이트 목록에서 삭제할 수 있습니다.',
         whiteListHelper: '화이트리스트에 있는 IP만 접근 허용',
     },
+    mcp: {
+        server: 'MCP サーバー',
+        create: 'サーバーを追加',
+        edit: 'サーバーを編集',
+        commandHelper: '例: npx -y {0}',
+        baseUrl: '外部アクセスパス',
+        baseUrlHelper: '例: https://127.0.0.1:8080',
+        ssePath: 'SSE パス',
+        ssePathHelper: '例: /sse, 他のサーバーと重複しないように注意してください',
+        environment: '環境変数',
+        envKey: '変数名',
+        envValue: '変数値',
+        externalUrl: '外部接続アドレス',
+        operatorHelper: '{0} に {1} 操作を実行します、続行しますか？',
+        domain: 'デフォルトアクセスアドレス',
+        domainHelper: '例: 192.168.1.1 または example.com',
+        bindDomain: 'ウェブサイトをバインド',
+        commandPlaceHolder: '現在、npx およびバイナリ起動のコマンドのみをサポートしています',
+        importMcpJson: 'MCP サーバー設定をインポート',
+        importMcpJsonError: 'mcpServers 構造が正しくありません',
+    },
 };
 
 export default {

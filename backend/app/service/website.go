@@ -496,6 +496,10 @@ func (w WebsiteService) DeleteWebsite(req request.WebsiteDelete) error {
 	if err := websiteDomainRepo.DeleteBy(ctx, websiteDomainRepo.WithWebsiteId(req.ID)); err != nil {
 		return err
 	}
+	websiteID := GetWebsiteID()
+	if req.ID == websiteID {
+		_ = settingRepo.UpdateOrCreate("MCP_WEBSITE_ID", "0")
+	}
 	tx.Commit()
 
 	uploadDir := path.Join(global.CONF.System.BaseDir, fmt.Sprintf("1panel/uploads/website/%s", website.Alias))

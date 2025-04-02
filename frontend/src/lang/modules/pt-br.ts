@@ -2626,6 +2626,27 @@ const message = {
         proxyHelper6: 'Para desativar a configuração de proxy, você pode excluí-la da lista de sites.',
         whiteListHelper: 'Restringir o acesso apenas aos IPs na lista branca',
     },
+    mcp: {
+        server: 'Servidor MCP',
+        create: 'Adicionar Servidor',
+        edit: 'Editar Servidor',
+        commandHelper: 'Por exemplo: npx -y {0}',
+        baseUrl: 'Caminho de Acesso Externo',
+        baseUrlHelper: 'Por exemplo: https://127.0.0.1:8080',
+        ssePath: 'Caminho SSE',
+        ssePathHelper: 'Por exemplo: /sse, tome cuidado para não duplicar com outros servidores',
+        environment: 'Variáveis de Ambiente',
+        envKey: 'Nome da Variável',
+        envValue: 'Valor da Variável',
+        externalUrl: 'Endereço de Conexão Externo',
+        operatorHelper: 'Será realizada a operação {1} no {0}, continuar?',
+        domain: 'Endereço de Acesso Padrão',
+        domainHelper: 'Por exemplo: 192.168.1.1 ou example.com',
+        bindDomain: 'Vincular Site',
+        commandPlaceHolder: 'Atualmente, apenas comandos iniciados com npx e binário são suportados',
+        importMcpJson: 'Importar Configuração do Servidor MCP',
+        importMcpJsonError: 'A estrutura mcpServers está incorreta',
+    },
 };
 
 export default {

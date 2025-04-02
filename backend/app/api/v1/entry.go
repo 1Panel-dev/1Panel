@@ -68,4 +68,6 @@ var (
 	favoriteService   = service.NewIFavoriteService()
 
 	websiteCAService = service.NewIWebsiteCAService()
+
+	mcpServerService = service.NewIMcpServerService()
 )

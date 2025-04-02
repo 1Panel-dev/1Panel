@@ -288,6 +288,7 @@ SystemMode: "mode: "
 #ai-tool
 ErrOpenrestyInstall: 'Please install Openresty first'
 ErrSSL: "Certificate content is empty, please check the certificate!"
+ErrSsePath: "SSE path is duplicated"
 
 #mobile app
 ErrVerifyToken: 'Token verification error, please reset and scan again.'

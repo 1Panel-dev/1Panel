@@ -46,7 +46,9 @@ func NewLocation(directive IDirective) *Location {
 				location.Host = params[1]
 			}
 		case "proxy_cache":
-			location.Cache = true
+			if params[0] != "off" {
+				location.Cache = true
+			}
 		case "if":
 			if params[0] == "(" && params[1] == "$uri" && params[2] == "~*" {
 				dirs := dir.GetBlock().GetDirectives()

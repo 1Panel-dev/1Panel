@@ -1,0 +1,251 @@
+<template>
+    <el-drawer
+        :destroy-on-close="true"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        v-model="open"
+        size="50%"
+    >
+        <template #header>
+            <DrawerHeader
+                :header="$t('mcp.' + mode)"
+                :hideResource="mode == 'create'"
+                :resource="mcpServer.name"
+                :back="handleClose"
+            />
+        </template>
+        <el-row v-loading="loading">
+            <el-col :span="22" :offset="1">
+                <el-form ref="mcpServerForm" label-position="top" :model="mcpServer" label-width="125px" :rules="rules">
+                    <el-form-item>
+                        <el-button @click="importRef.acceptParams()" type="primary" plain>
+                            {{ $t('mcp.importMcpJson') }}
+                        </el-button>
+                    </el-form-item>
+                    <el-form-item :label="$t('commons.table.name')" prop="name">
+                        <el-input v-model="mcpServer.name" :disabled="mode == 'edit'" />
+                    </el-form-item>
+                    <el-form-item :label="$t('runtime.runScript')" prop="command">
+                        <el-input
+                            v-model="mcpServer.command"
+                            type="textarea"
+                            :rows="3"
+                            :placeholder="$t('mcp.commandPlaceHolder')"
+                        ></el-input>
+                        <span class="input-help">
+                            {{ $t('mcp.commandHelper', ['@modelcontextprotocol/server-github']) }}
+                        </span>
+                    </el-form-item>
+                    <div>
+                        <el-text>{{ $t('mcp.environment') }}</el-text>
+                        <div class="mt-1">
+                            <el-row :gutter="20" v-for="(env, index) in mcpServer.environments" :key="index">
+                                <el-col :span="8">
+                                    <el-form-item :prop="`environments.${index}.key`" :rules="rules.key">
+                                        <el-input v-model="env.key" :placeholder="$t('mcp.envKey')" />
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="8">
+                                    <el-form-item :prop="`environments.${index}.value`" :rules="rules.value">
+                                        <el-input v-model="env.value" :placeholder="$t('mcp.envValue')" />
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="4">
+                                    <el-form-item>
+                                        <el-button type="primary" @click="removeEnv(index)" link class="mt-1">
+                                            {{ $t('commons.button.delete') }}
+                                        </el-button>
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+                            <el-row :gutter="20">
+                                <el-col :span="4">
+                                    <el-button class="mb-2" @click="addEnv">{{ $t('commons.button.add') }}</el-button>
+                                </el-col>
+                            </el-row>
+                        </div>
+                    </div>
+                    <Volumes :volumes="mcpServer.volumes" />
+                    <el-row :gutter="20">
+                        <el-col :span="6">
+                            <el-form-item :label="$t('commons.table.port')" prop="port">
+                                <el-input v-model.number="mcpServer.port" />
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="6">
+                            <el-form-item :label="$t('app.allowPort')" prop="hostIP">
+                                <el-switch
+                                    v-model="mcpServer.hostIP"
+                                    :active-value="'0.0.0.0'"
+                                    :inactive-value="'127.0.0.1'"
+                                />
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-form-item :label="$t('mcp.baseUrl')" prop="baseUrl">
+                        <el-input v-model.trim="mcpServer.baseUrl"></el-input>
+                        <span class="input-help">
+                            {{ $t('mcp.baseUrlHelper') }}
+                        </span>
+                    </el-form-item>
+                    <el-form-item :label="$t('app.containerName')" prop="containerName">
+                        <el-input v-model.trim="mcpServer.containerName"></el-input>
+                    </el-form-item>
+                    <el-form-item :label="$t('mcp.ssePath')" prop="ssePath">
+                        <el-input v-model.trim="mcpServer.ssePath"></el-input>
+                        <span class="input-help">
+                            {{ $t('mcp.ssePathHelper') }}
+                        </span>
+                    </el-form-item>
+                </el-form>
+            </el-col>
+        </el-row>
+        <template #footer>
+            <span>
+                <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button type="primary" @click="submit(mcpServerForm)" :disabled="loading">
+                    {{ $t('commons.button.confirm') }}
+                </el-button>
+            </span>
+        </template>
+    </el-drawer>
+    <Import ref="importRef" @confirm="getImport" />
+</template>
+
+<script lang="ts" setup>
+import { AI } from '@/api/interface/ai';
+import { createMcpServer, getMcpDomain, updateMcpServer } from '@/api/modules/ai';
+import { Rules } from '@/global/form-rules';
+import i18n from '@/lang';
+import { MsgError, MsgSuccess } from '@/utils/message';
+import { FormInstance } from 'element-plus';
+import { ref, watch } from 'vue';
+import Volumes from '../volume/index.vue';
+import Import from '../import/index.vue';
+
+const open = ref(false);
+const mode = ref('create');
+const loading = ref(false);
+const mcpServerForm = ref();
+const importRef = ref();
+const newMcpServer = () => {
+    return {
+        id: 0,
+        name: '',
+        port: 8000,
+        status: '',
+        message: '',
+        baseUrl: '',
+        ssePath: '',
+        command: '',
+        containerName: '',
+        environments: [],
+        volumes: [],
+        hostIP: '127.0.0.1',
+    };
+};
+const em = defineEmits(['close']);
+const mcpServer = ref(newMcpServer());
+const rules = ref({
+    name: [Rules.requiredInput, Rules.appName],
+    command: [Rules.requiredInput],
+    port: [Rules.requiredInput, Rules.port],
+    containerName: [Rules.requiredInput],
+    baseUrl: [Rules.requiredInput],
+    ssePath: [Rules.requiredInput],
+    key: [Rules.requiredInput],
+    value: [Rules.requiredInput],
+});
+
+const acceptParams = async (params: AI.McpServer) => {
+    mode.value = params.id ? 'edit' : 'create';
+    if (mode.value == 'edit') {
+        mcpServer.value = params;
+        if (!mcpServer.value.environments) {
+            mcpServer.value.environments = [];
+        }
+        if (!mcpServer.value.volumes) {
+            mcpServer.value.volumes = [];
+        }
+    } else {
+        mcpServer.value = newMcpServer();
+        if (params.port) {
+            mcpServer.value.port = params.port;
+        }
+        try {
+            const res = await getMcpDomain();
+            mcpServer.value.baseUrl = res.data.connUrl;
+        } catch (error) {
+            MsgError(error);
+        }
+    }
+    open.value = true;
+};
+
+watch(
+    () => mcpServer.value.name,
+    (newVal) => {
+        if (newVal && mode.value == 'create') {
+            mcpServer.value.containerName = newVal;
+            mcpServer.value.ssePath = '/' + newVal;
+        }
+    },
+    { deep: true },
+);
+
+const addEnv = () => {
+    mcpServer.value.environments.push({
+        key: '',
+        value: '',
+    });
+};
+
+const removeEnv = (index: number) => {
+    mcpServer.value.environments.splice(index, 1);
+};
+
+const handleClose = () => {
+    open.value = false;
+    em('close', false);
+};
+
+const getImport = async (data: AI.ImportMcpServer[]) => {
+    if (!data) {
+        return;
+    }
+    const importServer = data[0];
+    mcpServer.value.name = importServer.name;
+    mcpServer.value.containerName = importServer.containerName;
+    mcpServer.value.ssePath = importServer.ssePath;
+    mcpServer.value.command = importServer.command;
+    mcpServer.value.environments = importServer.environments || [];
+};
+
+const submit = async (formEl: FormInstance | undefined) => {
+    if (!formEl) return;
+    await formEl.validate(async (valid) => {
+        if (!valid) {
+            return;
+        }
+        try {
+            loading.value = true;
+            if (mode.value == 'create') {
+                await createMcpServer(mcpServer.value);
+                MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
+            } else {
+                await updateMcpServer(mcpServer.value);
+                MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
+            }
+            handleClose();
+        } catch (error) {
+            MsgError(error);
+        } finally {
+            loading.value = false;
+        }
+    });
+};
+
+defineExpose({
+    acceptParams,
+});
+</script>

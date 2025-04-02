@@ -2601,6 +2601,27 @@ const message = {
         proxyHelper6: 'To disable proxy configuration, you can delete it from the website list.',
         whiteListHelper: 'Restrict access to only IPs in the whitelist',
     },
+    mcp: {
+        server: 'MCP Server',
+        create: 'Add Server',
+        edit: 'Edit Server',
+        commandHelper: 'For example: npx -y {0}',
+        baseUrl: 'External Access Path',
+        baseUrlHelper: 'For example: https://127.0.0.1:8080',
+        ssePath: 'SSE Path',
+        ssePathHelper: 'For example: /sse, note not to duplicate with other servers',
+        environment: 'Environment Variables',
+        envKey: 'Variable Name',
+        envValue: 'Variable Value',
+        externalUrl: 'External Connection Address',
+        operatorHelper: 'Will perform {1} operation on {0}, continue?',
+        domain: 'Default Access Address',
+        domainHelper: 'For example: 192.168.1.1 or example.com',
+        bindDomain: 'Bind Website',
+        commandPlaceHolder: 'Currently only supports commands started with npx and binary',
+        importMcpJson: 'Import MCP Server Configuration',
+        importMcpJsonError: 'mcpServers structure is incorrect',
+    },
 };
 
 export default {
