@@ -2195,6 +2195,7 @@ const message = {
             '역방향 프록시 백엔드가 HTTPS 인 경우 원본 SNI 를 설정해야 할 수 있습니다. 자세한 내용은 CDN 서비스 제공자의 문서를 참조하세요.',
         huaweicloud: '화웨이 클라우드',
         rainyun: '레인윤',
+        westCN: 'West CN',
     },
     php: {
         short_open_tag: '짧은 태그 지원',

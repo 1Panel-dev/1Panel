@@ -2284,6 +2284,7 @@ const message = {
             'Apabila backend proksi terbalik adalah HTTPS, anda mungkin perlu menetapkan sumber SNI. Sila rujuk dokumentasi penyedia perkhidmatan CDN untuk butiran.',
         huaweicloud: 'Huawei Cloud',
         rainyun: 'Rain Yun',
+        westCN: 'West CN',
     },
     php: {
         short_open_tag: 'Sokongan tag pendek',

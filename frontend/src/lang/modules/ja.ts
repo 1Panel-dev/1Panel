@@ -2233,6 +2233,8 @@ const message = {
         sniHelper:
             '逆プロキシバックエンドがHTTPSの場合、Origin SNIを設定する必要がある場合があります。詳細については、CDNサービスプロバイダーのドキュメントを参照してください。',
         huaweicloud: 'huaweiCloud',
+        rainyun: 'Rain Yun',
+        westCN: 'West CN',
     },
     php: {
         short_open_tag: '短いタグサポート',

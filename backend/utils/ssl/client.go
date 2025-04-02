@@ -3,6 +3,7 @@ package ssl
 import (
 	"crypto"
 	"encoding/json"
+	"github.com/go-acme/lego/v4/providers/dns/westcn"
 	"os"
 	"strings"
 	"time"
@@ -85,6 +86,7 @@ const (
 	TencentCloud DnsType = "TencentCloud"
 	HuaweiCloud  DnsType = "HuaweiCloud"
 	RainYun      DnsType = "RainYun"
+	WestCN       DnsType = "WestCN"
 )
 
 type DNSParam struct {
@@ -103,6 +105,7 @@ type DNSParam struct {
 	AuthID       string `json:"authID"`
 	SubAuthID    string `json:"subAuthID"`
 	AuthPassword string `json:"authPassword"`
+	Username     string `json:"username"`
 }
 
 var (
@@ -233,6 +236,14 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string, websiteSSL model.Web
 		rainyunConfig.PollingInterval = pollingInterval
 		rainyunConfig.TTL = ttl
 		p, err = rainyun.NewDNSProviderConfig(rainyunConfig)
+	case WestCN:
+		westcnConfig := westcn.NewDefaultConfig()
+		westcnConfig.Username = param.Username
+		westcnConfig.Password = param.Password
+		westcnConfig.PropagationTimeout = propagationTimeout
+		westcnConfig.PollingInterval = pollingInterval
+		westcnConfig.TTL = ttl
+		p, err = westcn.NewDNSProviderConfig(westcnConfig)
 	}
 	if err != nil {
 		return err

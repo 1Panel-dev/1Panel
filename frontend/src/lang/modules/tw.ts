@@ -2116,6 +2116,7 @@ const message = {
         sniHelper: '反代後端為 https 的時候可能需要設定回源 SNI，具體需要看 CDN 服務商文件',
         huaweicloud: '華為雲',
         rainyun: '雨雲',
+        westCN: '西部數據',
     },
     php: {
         short_open_tag: '短標籤支援',

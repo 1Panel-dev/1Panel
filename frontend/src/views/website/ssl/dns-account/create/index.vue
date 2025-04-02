@@ -130,6 +130,14 @@
                             <el-input v-model.trim="account.authorization['token']"></el-input>
                         </el-form-item>
                     </div>
+                    <div v-if="account.type === 'WestCN'">
+                        <el-form-item label="Username" prop="authorization.username">
+                            <el-input v-model.trim="account.authorization['username']"></el-input>
+                        </el-form-item>
+                        <el-form-item label="Password" prop="authorization.password">
+                            <el-input v-model.trim="account.authorization['password']"></el-input>
+                        </el-form-item>
+                    </div>
                 </el-form>
             </el-col>
         </el-row>
@@ -181,6 +189,7 @@ const rules = ref<any>({
         email: [Rules.email],
         password: [Rules.requiredInput],
         authPassword: [Rules.requiredInput],
+        username: [Rules.requiredInput],
     },
 });
 const account = ref({
@@ -230,7 +239,7 @@ const submit = async (formEl: FormInstance | undefined) => {
             return;
         }
         if (account.value.type === 'ClouDNS') {
-            if (!account.value.authorization.authID && !account.value.authorization.subAuthID) {
+            if (!account.value.authorization['authID'] && !account.value.authorization['subAuthID']) {
                 MsgError('Please input Auth ID or Sub Auth ID');
                 return;
             }

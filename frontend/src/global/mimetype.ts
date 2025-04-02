@@ -212,6 +212,10 @@ export const DNSTypes = [
         label: i18n.global.t('website.rainyun'),
         value: 'RainYun',
     },
+    {
+        label: i18n.global.t('website.westCN'),
+        value: 'WestCN',
+    },
 ];
 
 export const Fields = [
