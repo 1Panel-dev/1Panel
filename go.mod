@@ -58,6 +58,7 @@ require (
 	golang.org/x/sys v0.29.0
 	golang.org/x/term v0.28.0
 	golang.org/x/text v0.21.0
+	google.golang.org/genproto v0.0.0-20241021214115-324edc3d5d38
 	gopkg.in/ini.v1 v1.67.0
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/gorm v1.25.7
@@ -149,7 +150,6 @@ require (
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/go-version v1.7.0 // indirect
-	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/huaweicloud/huaweicloud-sdk-go-v3 v0.1.128 // indirect
 	github.com/imdario/mergo v0.3.16 // indirect
@@ -259,7 +259,6 @@ require (
 	golang.org/x/sync v0.10.0 // indirect
 	golang.org/x/time v0.8.0 // indirect
 	golang.org/x/tools v0.28.0 // indirect
-	google.golang.org/genproto v0.0.0-20241021214115-324edc3d5d38 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20241118233622-e639e219e697 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20241209162323-e6fa225c2576 // indirect
 	google.golang.org/grpc v1.67.1 // indirect
@@ -271,13 +270,10 @@ require (
 	k8s.io/client-go v0.29.2 // indirect
 	k8s.io/klog/v2 v2.120.1 // indirect
 	k8s.io/utils v0.0.0-20240102154912-e7106e64919e // indirect
-	modernc.org/gc/v3 v3.0.0-20240107210532-573471604cb6 // indirect
 	modernc.org/libc v1.49.3 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
 	modernc.org/memory v1.8.0 // indirect
 	modernc.org/sqlite v1.29.7 // indirect
-	modernc.org/strutil v1.2.0 // indirect
-	modernc.org/token v1.1.0 // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.1 // indirect
 	sigs.k8s.io/yaml v1.4.0 // indirect

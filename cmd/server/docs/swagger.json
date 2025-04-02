@@ -7848,631 +7848,6 @@
                 }
             }
         },
-        "/host/conffile/update": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    },
-                    {
-                        "Timestamp": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "SSH"
-                ],
-                "summary": "Update host SSH setting by file",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.SSHConf"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFunctions": [],
-                    "bodyKeys": [],
-                    "formatEN": "update SSH conf",
-                    "formatZH": "修改 SSH 配置文件",
-                    "paramKeys": []
-                }
-            }
-        },
-        "/host/ssh/conf": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    },
-                    {
-                        "Timestamp": []
-                    }
-                ],
-                "tags": [
-                    "SSH"
-                ],
-                "summary": "Load host SSH conf",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/host/ssh/generate": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    },
-                    {
-                        "Timestamp": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "SSH"
-                ],
-                "summary": "Generate host SSH secret",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.GenerateSSH"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFunctions": [],
-                    "bodyKeys": [],
-                    "formatEN": "generate SSH secret",
-                    "formatZH": "生成 SSH 密钥 ",
-                    "paramKeys": []
-                }
-            }
-        },
-        "/host/ssh/log": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    },
-                    {
-                        "Timestamp": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "SSH"
-                ],
-                "summary": "Load host SSH logs",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.SearchSSHLog"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.SSHLog"
-                        }
-                    }
-                }
-            }
-        },
-        "/host/ssh/operate": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    },
-                    {
-                        "Timestamp": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "SSH"
-                ],
-                "summary": "Operate SSH",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.Operate"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFunctions": [],
-                    "bodyKeys": [
-                        "operation"
-                    ],
-                    "formatEN": "[operation] SSH",
-                    "formatZH": "[operation] SSH ",
-                    "paramKeys": []
-                }
-            }
-        },
-        "/host/ssh/search": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    },
-                    {
-                        "Timestamp": []
-                    }
-                ],
-                "tags": [
-                    "SSH"
-                ],
-                "summary": "Load host SSH setting info",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.SSHInfo"
-                        }
-                    }
-                }
-            }
-        },
-        "/host/ssh/secret": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    },
-                    {
-                        "Timestamp": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "SSH"
-                ],
-                "summary": "Load host SSH secret",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.GenerateLoad"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/host/ssh/update": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    },
-                    {
-                        "Timestamp": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "SSH"
-                ],
-                "summary": "Update host SSH setting",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.SSHUpdate"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFunctions": [],
-                    "bodyKeys": [
-                        "key",
-                        "value"
-                    ],
-                    "formatEN": "update SSH setting [key] =\u003e [value]",
-                    "formatZH": "修改 SSH 配置 [key] =\u003e [value]",
-                    "paramKeys": []
-                }
-            }
-        },
-        "/host/tool": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    },
-                    {
-                        "Timestamp": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Host tool"
-                ],
-                "summary": "Get tool status",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.HostToolReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.HostToolRes"
-                        }
-                    }
-                }
-            }
-        },
-        "/host/tool/config": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    },
-                    {
-                        "Timestamp": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Host tool"
-                ],
-                "summary": "Get tool config",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.HostToolConfig"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.HostToolConfig"
-                        }
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFunctions": [],
-                    "bodyKeys": [
-                        "operate"
-                    ],
-                    "formatEN": "[operate] tool config",
-                    "formatZH": "[operate] 主机工具配置文件 ",
-                    "paramKeys": []
-                }
-            }
-        },
-        "/host/tool/create": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    },
-                    {
-                        "Timestamp": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Host tool"
-                ],
-                "summary": "Create Host tool Config",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.HostToolCreate"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFunctions": [],
-                    "bodyKeys": [
-                        "type"
-                    ],
-                    "formatEN": "create [type] config",
-                    "formatZH": "创建 [type] 配置",
-                    "paramKeys": []
-                }
-            }
-        },
-        "/host/tool/log": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    },
-                    {
-                        "Timestamp": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Host tool"
-                ],
-                "summary": "Get tool logs",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.HostToolLogReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/host/tool/operate": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    },
-                    {
-                        "Timestamp": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Host tool"
-                ],
-                "summary": "Operate tool",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.HostToolReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFunctions": [],
-                    "bodyKeys": [
-                        "operate",
-                        "type"
-                    ],
-                    "formatEN": "[operate] [type]",
-                    "formatZH": "[operate] [type] ",
-                    "paramKeys": []
-                }
-            }
-        },
-        "/host/tool/supervisor/process": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    },
-                    {
-                        "Timestamp": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Host tool"
-                ],
-                "summary": "Get Supervisor process config",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.SupervisorProcessConfig"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    },
-                    {
-                        "Timestamp": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Host tool"
-                ],
-                "summary": "Create Supervisor process",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.SupervisorProcessConfig"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFunctions": [],
-                    "bodyKeys": [
-                        "operate"
-                    ],
-                    "formatEN": "[operate] process",
-                    "formatZH": "[operate] 守护进程 ",
-                    "paramKeys": []
-                }
-            }
-        },
-        "/host/tool/supervisor/process/file": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    },
-                    {
-                        "Timestamp": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Host tool"
-                ],
-                "summary": "Get Supervisor process config",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.SupervisorProcessFileReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFunctions": [],
-                    "bodyKeys": [
-                        "operate"
-                    ],
-                    "formatEN": "[operate] Supervisor Process Config file",
-                    "formatZH": "[operate] Supervisor 进程文件 ",
-                    "paramKeys": []
-                }
-            }
-        },
         "/hosts": {
             "post": {
                 "security": [
@@ -8910,6 +8285,48 @@
                     ],
                     "formatEN": "update quick command [name]",
                     "formatZH": "更新快捷命令 [name]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/hosts/conffile/update": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "Timestamp": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SSH"
+                ],
+                "summary": "Update host SSH setting by file",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SSHConf"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [],
+                    "formatEN": "update SSH conf",
+                    "formatZH": "修改 SSH 配置文件",
                     "paramKeys": []
                 }
             }
@@ -9451,6 +8868,261 @@
                 }
             }
         },
+        "/hosts/ssh/conf": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "Timestamp": []
+                    }
+                ],
+                "tags": [
+                    "SSH"
+                ],
+                "summary": "Load host SSH conf",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/hosts/ssh/generate": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "Timestamp": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SSH"
+                ],
+                "summary": "Generate host SSH secret",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GenerateSSH"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [],
+                    "formatEN": "generate SSH secret",
+                    "formatZH": "生成 SSH 密钥 ",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/hosts/ssh/log": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "Timestamp": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SSH"
+                ],
+                "summary": "Load host SSH logs",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SearchSSHLog"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SSHLog"
+                        }
+                    }
+                }
+            }
+        },
+        "/hosts/ssh/operate": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "Timestamp": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SSH"
+                ],
+                "summary": "Operate SSH",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.Operate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [
+                        "operation"
+                    ],
+                    "formatEN": "[operation] SSH",
+                    "formatZH": "[operation] SSH ",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/hosts/ssh/search": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "Timestamp": []
+                    }
+                ],
+                "tags": [
+                    "SSH"
+                ],
+                "summary": "Load host SSH setting info",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SSHInfo"
+                        }
+                    }
+                }
+            }
+        },
+        "/hosts/ssh/secret": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "Timestamp": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SSH"
+                ],
+                "summary": "Load host SSH secret",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GenerateLoad"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/hosts/ssh/update": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "Timestamp": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SSH"
+                ],
+                "summary": "Update host SSH setting",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SSHUpdate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [
+                        "key",
+                        "value"
+                    ],
+                    "formatEN": "update SSH setting [key] =\u003e [value]",
+                    "formatZH": "修改 SSH 配置 [key] =\u003e [value]",
+                    "paramKeys": []
+                }
+            }
+        },
         "/hosts/test/byid/{id}": {
             "post": {
                 "security": [
@@ -9522,6 +9194,334 @@
                             "type": "boolean"
                         }
                     }
+                }
+            }
+        },
+        "/hosts/tool": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "Timestamp": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Host tool"
+                ],
+                "summary": "Get tool status",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.HostToolReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.HostToolRes"
+                        }
+                    }
+                }
+            }
+        },
+        "/hosts/tool/config": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "Timestamp": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Host tool"
+                ],
+                "summary": "Get tool config",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.HostToolConfig"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.HostToolConfig"
+                        }
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [
+                        "operate"
+                    ],
+                    "formatEN": "[operate] tool config",
+                    "formatZH": "[operate] 主机工具配置文件 ",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/hosts/tool/create": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "Timestamp": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Host tool"
+                ],
+                "summary": "Create Host tool Config",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.HostToolCreate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [
+                        "type"
+                    ],
+                    "formatEN": "create [type] config",
+                    "formatZH": "创建 [type] 配置",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/hosts/tool/log": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "Timestamp": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Host tool"
+                ],
+                "summary": "Get tool logs",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.HostToolLogReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/hosts/tool/operate": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "Timestamp": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Host tool"
+                ],
+                "summary": "Operate tool",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.HostToolReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [
+                        "operate",
+                        "type"
+                    ],
+                    "formatEN": "[operate] [type]",
+                    "formatZH": "[operate] [type] ",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/hosts/tool/supervisor/process": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "Timestamp": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Host tool"
+                ],
+                "summary": "Get Supervisor process config",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.SupervisorProcessConfig"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "Timestamp": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Host tool"
+                ],
+                "summary": "Create Supervisor process",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.SupervisorProcessConfig"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [
+                        "operate"
+                    ],
+                    "formatEN": "[operate] process",
+                    "formatZH": "[operate] 守护进程 ",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/hosts/tool/supervisor/process/file": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    },
+                    {
+                        "Timestamp": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Host tool"
+                ],
+                "summary": "Get Supervisor process config",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.SupervisorProcessFileReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFunctions": [],
+                    "bodyKeys": [
+                        "operate"
+                    ],
+                    "formatEN": "[operate] Supervisor Process Config file",
+                    "formatZH": "[operate] Supervisor 进程文件 ",
+                    "paramKeys": []
                 }
             }
         },
@@ -21978,6 +21978,9 @@
                 "lastCleanTime": {
                     "type": "string"
                 },
+                "licenseVerify": {
+                    "type": "string"
+                },
                 "localTime": {
                     "type": "string"
                 },
@@ -26724,7 +26727,7 @@
     },
     "securityDefinitions": {
         "ApiKeyAuth": {
-            "description": "Custom Token Format, Format: md5('1panel' + API-Key + UnixTimestamp).\n```\neg:\ncurl -X GET \"http://localhost:4004/api/v1/dashboard/current\" \\\n-H \"1Panel-Token: \u003c1panel_token\u003e\" \\\n-H \"1Panel-Timestamp: \u003ccurrent_unix_timestamp\u003e\"\n```\n- `1Panel-Token` is the key for the panel API Key.",
+            "description": "- `1Panel-Token` is the key for the panel API Key.",
             "type": "apiKey",
             "name": "1Panel-Token",
             "in": "header"

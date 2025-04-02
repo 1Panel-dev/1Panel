@@ -3342,6 +3342,8 @@ definitions:
         type: string
       lastCleanTime:
         type: string
+      licenseVerify:
+        type: string
       localTime:
         type: string
       menuTabs:
@@ -11237,381 +11239,6 @@ paths:
         formatEN: update group [name][type]
         formatZH: 更新组 [name][type]
         paramKeys: []
-  /host/conffile/update:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.SSHConf'
-      responses:
-        "200":
-          description: OK
-      security:
-      - ApiKeyAuth: []
-      - Timestamp: []
-      summary: Update host SSH setting by file
-      tags:
-      - SSH
-      x-panel-log:
-        BeforeFunctions: []
-        bodyKeys: []
-        formatEN: update SSH conf
-        formatZH: 修改 SSH 配置文件
-        paramKeys: []
-  /host/ssh/conf:
-    get:
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      security:
-      - ApiKeyAuth: []
-      - Timestamp: []
-      summary: Load host SSH conf
-      tags:
-      - SSH
-  /host/ssh/generate:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.GenerateSSH'
-      responses:
-        "200":
-          description: OK
-      security:
-      - ApiKeyAuth: []
-      - Timestamp: []
-      summary: Generate host SSH secret
-      tags:
-      - SSH
-      x-panel-log:
-        BeforeFunctions: []
-        bodyKeys: []
-        formatEN: generate SSH secret
-        formatZH: '生成 SSH 密钥 '
-        paramKeys: []
-  /host/ssh/log:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.SearchSSHLog'
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.SSHLog'
-      security:
-      - ApiKeyAuth: []
-      - Timestamp: []
-      summary: Load host SSH logs
-      tags:
-      - SSH
-  /host/ssh/operate:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.Operate'
-      responses:
-        "200":
-          description: OK
-      security:
-      - ApiKeyAuth: []
-      - Timestamp: []
-      summary: Operate SSH
-      tags:
-      - SSH
-      x-panel-log:
-        BeforeFunctions: []
-        bodyKeys:
-        - operation
-        formatEN: '[operation] SSH'
-        formatZH: '[operation] SSH '
-        paramKeys: []
-  /host/ssh/search:
-    post:
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.SSHInfo'
-      security:
-      - ApiKeyAuth: []
-      - Timestamp: []
-      summary: Load host SSH setting info
-      tags:
-      - SSH
-  /host/ssh/secret:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.GenerateLoad'
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      security:
-      - ApiKeyAuth: []
-      - Timestamp: []
-      summary: Load host SSH secret
-      tags:
-      - SSH
-  /host/ssh/update:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.SSHUpdate'
-      responses:
-        "200":
-          description: OK
-      security:
-      - ApiKeyAuth: []
-      - Timestamp: []
-      summary: Update host SSH setting
-      tags:
-      - SSH
-      x-panel-log:
-        BeforeFunctions: []
-        bodyKeys:
-        - key
-        - value
-        formatEN: update SSH setting [key] => [value]
-        formatZH: 修改 SSH 配置 [key] => [value]
-        paramKeys: []
-  /host/tool:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/request.HostToolReq'
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.HostToolRes'
-      security:
-      - ApiKeyAuth: []
-      - Timestamp: []
-      summary: Get tool status
-      tags:
-      - Host tool
-  /host/tool/config:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/request.HostToolConfig'
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.HostToolConfig'
-      security:
-      - ApiKeyAuth: []
-      - Timestamp: []
-      summary: Get tool config
-      tags:
-      - Host tool
-      x-panel-log:
-        BeforeFunctions: []
-        bodyKeys:
-        - operate
-        formatEN: '[operate] tool config'
-        formatZH: '[operate] 主机工具配置文件 '
-        paramKeys: []
-  /host/tool/create:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/request.HostToolCreate'
-      responses:
-        "200":
-          description: OK
-      security:
-      - ApiKeyAuth: []
-      - Timestamp: []
-      summary: Create Host tool Config
-      tags:
-      - Host tool
-      x-panel-log:
-        BeforeFunctions: []
-        bodyKeys:
-        - type
-        formatEN: create [type] config
-        formatZH: 创建 [type] 配置
-        paramKeys: []
-  /host/tool/log:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/request.HostToolLogReq'
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      security:
-      - ApiKeyAuth: []
-      - Timestamp: []
-      summary: Get tool logs
-      tags:
-      - Host tool
-  /host/tool/operate:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/request.HostToolReq'
-      responses:
-        "200":
-          description: OK
-      security:
-      - ApiKeyAuth: []
-      - Timestamp: []
-      summary: Operate tool
-      tags:
-      - Host tool
-      x-panel-log:
-        BeforeFunctions: []
-        bodyKeys:
-        - operate
-        - type
-        formatEN: '[operate] [type]'
-        formatZH: '[operate] [type] '
-        paramKeys: []
-  /host/tool/supervisor/process:
-    get:
-      consumes:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.SupervisorProcessConfig'
-      security:
-      - ApiKeyAuth: []
-      - Timestamp: []
-      summary: Get Supervisor process config
-      tags:
-      - Host tool
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/request.SupervisorProcessConfig'
-      responses:
-        "200":
-          description: OK
-      security:
-      - ApiKeyAuth: []
-      - Timestamp: []
-      summary: Create Supervisor process
-      tags:
-      - Host tool
-      x-panel-log:
-        BeforeFunctions: []
-        bodyKeys:
-        - operate
-        formatEN: '[operate] process'
-        formatZH: '[operate] 守护进程 '
-        paramKeys: []
-  /host/tool/supervisor/process/file:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/request.SupervisorProcessFileReq'
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      security:
-      - ApiKeyAuth: []
-      - Timestamp: []
-      summary: Get Supervisor process config
-      tags:
-      - Host tool
-      x-panel-log:
-        BeforeFunctions: []
-        bodyKeys:
-        - operate
-        formatEN: '[operate] Supervisor Process Config file'
-        formatZH: '[operate] Supervisor 进程文件 '
-        paramKeys: []
   /hosts:
     post:
       consumes:
@@ -11877,6 +11504,32 @@ paths:
         - name
         formatEN: update quick command [name]
         formatZH: 更新快捷命令 [name]
+        paramKeys: []
+  /hosts/conffile/update:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SSHConf'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      - Timestamp: []
+      summary: Update host SSH setting by file
+      tags:
+      - SSH
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys: []
+        formatEN: update SSH conf
+        formatZH: 修改 SSH 配置文件
         paramKeys: []
   /hosts/del:
     post:
@@ -12197,6 +11850,157 @@ paths:
       summary: Page host
       tags:
       - Host
+  /hosts/ssh/conf:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      - Timestamp: []
+      summary: Load host SSH conf
+      tags:
+      - SSH
+  /hosts/ssh/generate:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GenerateSSH'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      - Timestamp: []
+      summary: Generate host SSH secret
+      tags:
+      - SSH
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys: []
+        formatEN: generate SSH secret
+        formatZH: '生成 SSH 密钥 '
+        paramKeys: []
+  /hosts/ssh/log:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SearchSSHLog'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SSHLog'
+      security:
+      - ApiKeyAuth: []
+      - Timestamp: []
+      summary: Load host SSH logs
+      tags:
+      - SSH
+  /hosts/ssh/operate:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Operate'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      - Timestamp: []
+      summary: Operate SSH
+      tags:
+      - SSH
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - operation
+        formatEN: '[operation] SSH'
+        formatZH: '[operation] SSH '
+        paramKeys: []
+  /hosts/ssh/search:
+    post:
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SSHInfo'
+      security:
+      - ApiKeyAuth: []
+      - Timestamp: []
+      summary: Load host SSH setting info
+      tags:
+      - SSH
+  /hosts/ssh/secret:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GenerateLoad'
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      - Timestamp: []
+      summary: Load host SSH secret
+      tags:
+      - SSH
+  /hosts/ssh/update:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SSHUpdate'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      - Timestamp: []
+      summary: Update host SSH setting
+      tags:
+      - SSH
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - key
+        - value
+        formatEN: update SSH setting [key] => [value]
+        formatZH: 修改 SSH 配置 [key] => [value]
+        paramKeys: []
   /hosts/test/byid/{id}:
     post:
       consumes:
@@ -12240,6 +12044,204 @@ paths:
       summary: Test host conn by info
       tags:
       - Host
+  /hosts/tool:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.HostToolReq'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.HostToolRes'
+      security:
+      - ApiKeyAuth: []
+      - Timestamp: []
+      summary: Get tool status
+      tags:
+      - Host tool
+  /hosts/tool/config:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.HostToolConfig'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.HostToolConfig'
+      security:
+      - ApiKeyAuth: []
+      - Timestamp: []
+      summary: Get tool config
+      tags:
+      - Host tool
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - operate
+        formatEN: '[operate] tool config'
+        formatZH: '[operate] 主机工具配置文件 '
+        paramKeys: []
+  /hosts/tool/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.HostToolCreate'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      - Timestamp: []
+      summary: Create Host tool Config
+      tags:
+      - Host tool
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - type
+        formatEN: create [type] config
+        formatZH: 创建 [type] 配置
+        paramKeys: []
+  /hosts/tool/log:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.HostToolLogReq'
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      - Timestamp: []
+      summary: Get tool logs
+      tags:
+      - Host tool
+  /hosts/tool/operate:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.HostToolReq'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      - Timestamp: []
+      summary: Operate tool
+      tags:
+      - Host tool
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - operate
+        - type
+        formatEN: '[operate] [type]'
+        formatZH: '[operate] [type] '
+        paramKeys: []
+  /hosts/tool/supervisor/process:
+    get:
+      consumes:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.SupervisorProcessConfig'
+      security:
+      - ApiKeyAuth: []
+      - Timestamp: []
+      summary: Get Supervisor process config
+      tags:
+      - Host tool
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.SupervisorProcessConfig'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      - Timestamp: []
+      summary: Create Supervisor process
+      tags:
+      - Host tool
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - operate
+        formatEN: '[operate] process'
+        formatZH: '[operate] 守护进程 '
+        paramKeys: []
+  /hosts/tool/supervisor/process/file:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.SupervisorProcessFileReq'
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      - Timestamp: []
+      summary: Get Supervisor process config
+      tags:
+      - Host tool
+      x-panel-log:
+        BeforeFunctions: []
+        bodyKeys:
+        - operate
+        formatEN: '[operate] Supervisor Process Config file'
+        formatZH: '[operate] Supervisor 进程文件 '
+        paramKeys: []
   /hosts/tree:
     post:
       consumes:
@@ -16766,15 +16768,7 @@ schemes:
 - https
 securityDefinitions:
   ApiKeyAuth:
-    description: |-
-      Custom Token Format, Format: md5('1panel' + API-Key + UnixTimestamp).
-      ```
-      eg:
-      curl -X GET "http://localhost:4004/api/v1/dashboard/current" \
-      -H "1Panel-Token: <1panel_token>" \
-      -H "1Panel-Timestamp: <current_unix_timestamp>"
-      ```
-      - `1Panel-Token` is the key for the panel API Key.
+    description: '- `1Panel-Token` is the key for the panel API Key.'
     in: header
     name: 1Panel-Token
     type: apiKey
