@@ -163,6 +163,11 @@
                 <el-form class="mt-4 mb-1" v-if="showClean" ref="deleteForm" label-position="left">
                     <el-form-item>
                         <el-checkbox v-model="cleanData" :label="$t('cronjob.cleanData')" />
+                        <el-checkbox
+                            v-if="cleanData"
+                            v-model="cleanRemoteData"
+                            :label="$t('cronjob.cleanRemoteData')"
+                        />
                         <span class="input-help">
                             {{ $t('cronjob.cleanDataHelper') }}
                         </span>
@@ -197,6 +202,7 @@ const operateIDs = ref();
 const opRef = ref();
 const showClean = ref();
 const cleanData = ref();
+const cleanRemoteData = ref(true);
 
 const data = ref();
 const paginationConfig = reactive({
@@ -312,7 +318,7 @@ const onDelete = async (row: Cronjob.CronjobInfo | null) => {
 
 const onSubmitDelete = async () => {
     loading.value = true;
-    await deleteCronjob({ ids: operateIDs.value, cleanData: cleanData.value })
+    await deleteCronjob({ ids: operateIDs.value, cleanData: cleanData.value, cleanRemoteData: cleanRemoteData.value })
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));

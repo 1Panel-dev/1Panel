@@ -71,14 +71,16 @@ type CronjobDownload struct {
 }
 
 type CronjobClean struct {
-	IsDelete  bool `json:"isDelete"`
-	CleanData bool `json:"cleanData"`
-	CronjobID uint `json:"cronjobID" validate:"required"`
+	IsDelete        bool `json:"isDelete"`
+	CleanData       bool `json:"cleanData"`
+	CleanRemoteData bool `json:"cleanRemoteData"`
+	CronjobID       uint `json:"cronjobID" validate:"required"`
 }
 
 type CronjobBatchDelete struct {
-	CleanData bool   `json:"cleanData"`
-	IDs       []uint `json:"ids" validate:"required"`
+	CleanData       bool   `json:"cleanData"`
+	CleanRemoteData bool   `json:"cleanRemoteData"`
+	IDs             []uint `json:"ids" validate:"required"`
 }
 
 type CronjobInfo struct {

@@ -992,6 +992,7 @@ const message = {
         errHandle: '크론 작업 실행 실패',
         noRecord: '크론 작업을 트리거하고 나면 여기에 레코드가 표시됩니다.',
         cleanData: '데이터 정리',
+        cleanRemoteData: '원격 데이터 삭제',
         cleanDataHelper: '이 작업에서 생성된 백업 파일을 삭제합니다.',
         noLogs: '작업 출력이 아직 없습니다...',
         errPath: '백업 경로 [{0}] 오류, 다운로드할 수 없습니다!',

@@ -998,6 +998,7 @@ const message = {
         errHandle: 'cronjob実行障害',
         noRecord: 'Cronジョブをトリガーすると、ここにレコードが表示されます。',
         cleanData: 'クリーンデータ',
+        cleanRemoteData: 'リモートデータを削除',
         cleanDataHelper: 'このタスク中に生成されたバックアップファイルを削除します。',
         noLogs: 'タスク出力はまだありません...',
         errPath: 'バックアップパス[{0}]エラー、ダウンロードできません！',

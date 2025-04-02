@@ -965,6 +965,7 @@ const message = {
         errHandle: '任務執行失敗',
         noRecord: '目前計劃任務暫未產生記錄',
         cleanData: '刪除備份檔案',
+        cleanRemoteData: '刪除遠端備份檔案',
         cleanDataHelper: '刪除該任務執行過程中產生的備份檔案',
         noLogs: '暫無任務輸出...',
         errPath: '備份路徑 [{0}] 錯誤，無法下載！',
