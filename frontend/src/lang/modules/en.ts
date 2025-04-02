@@ -191,6 +191,7 @@ const message = {
             rePassword: 'Confirm password is inconsistent with the password.',
             requiredInput: 'This field is required.',
             requiredSelect: 'Select an item in the list',
+            illegalChar: 'Injection of characters & ; $ \' ` ( ) " > < | is currently not supported',
             illegalInput: `This field mustn't contains illegal characters.`,
             commonName:
                 'This field must start with non-special characters and must consist of English, Chinese, numbers, ".", "-", and "_" characters with a length of 1-128.',
@@ -427,6 +428,8 @@ const message = {
         permission: 'Permissions',
         permissionForIP: 'IP',
         permissionAll: 'All of them(%)',
+        localhostHelper:
+            'Configuring database permissions as "localhost" for container deployment will prevent external access to the container. Please choose carefully!',
         databaseConnInfo: 'Connection info',
         rootPassword: 'Root password',
         serviceName: 'Service Name',
@@ -438,6 +441,7 @@ const message = {
         remoteConnHelper:
             'Remote connection to MySQL as user root may have security risks. Therefore, perform this operation with caution.',
         changePassword: 'Password',
+        changeConnHelper: 'This operation will modify the current database {0}. Do you want to continue?',
         changePasswordHelper:
             'The database has been associated with an application. Changing the password will change the database password of the application at the same time. The change takes effect after the application restarts.',
 

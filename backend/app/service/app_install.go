@@ -839,6 +839,9 @@ func updateInstallInfoInDB(appKey, appName, param string, value interface{}) err
 			"param": strings.ReplaceAll(appInstall.Param, oldVal, newVal),
 			"env":   strings.ReplaceAll(appInstall.Env, oldVal, newVal),
 		}, commonRepo.WithByID(appInstall.ID))
+		if appKey == "mysql" || appKey == "postgresql" {
+			return nil
+		}
 	}
 	if param == "user-password" {
 		oldVal = fmt.Sprintf("\"PANEL_DB_USER_PASSWORD\":\"%v\"", appInstall.UserPassword)

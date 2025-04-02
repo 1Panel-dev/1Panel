@@ -24,6 +24,7 @@
                                     show-password
                                     v-model="changeForm.password"
                                 ></el-input>
+                                <span class="input-help">{{ $t('commons.rule.illegalChar') }}</span>
                             </el-form-item>
                         </div>
                         <div v-if="changeForm.operation === 'privilege'">
@@ -33,10 +34,11 @@
                                     <el-option
                                         v-if="changeForm.from !== 'local'"
                                         value="localhost"
-                                        :label="$t('terminal.localhost')"
+                                        :label="$t('terminal.localhost') + '(localhost)'"
                                     />
                                     <el-option value="ip" :label="$t('database.permissionForIP')" />
                                 </el-select>
+                                <span class="input-help">{{ $t('database.localhostHelper') }}</span>
                             </el-form-item>
                             <el-form-item v-if="changeForm.privilege === 'ip'" prop="privilegeIPs">
                                 <el-input clearable :rows="3" type="textarea" v-model="changeForm.privilegeIPs" />
@@ -69,7 +71,6 @@ import { deleteCheckMysqlDB, updateMysqlAccess, updateMysqlPassword } from '@/ap
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { Rules } from '@/global/form-rules';
 import { MsgSuccess } from '@/utils/message';
-import { checkIp } from '@/utils/util';
 
 const loading = ref();
 const changeVisible = ref(false);
@@ -92,19 +93,9 @@ const changeForm = reactive({
 const confirmDialogRef = ref();
 
 const rules = reactive({
-    password: [Rules.paramComplexity],
-    privilegeIPs: [{ validator: checkIPs, trigger: 'blur', required: true }],
+    password: [Rules.requiredInput, Rules.noSpace, Rules.illegal],
+    privilegeIPs: [Rules.requiredInput, Rules.noSpace, Rules.illegal],
 });
-
-function checkIPs(rule: any, value: any, callback: any) {
-    let ips = changeForm.privilegeIPs.split(',');
-    for (const item of ips) {
-        if (checkIp(item)) {
-            return callback(new Error(i18n.global.t('commons.rule.ip')));
-        }
-    }
-    callback();
-}
 
 interface DialogProps {
     id: number;

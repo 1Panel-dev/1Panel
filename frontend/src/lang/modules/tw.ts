@@ -192,6 +192,7 @@ const message = {
             rePassword: '密碼不一致，請檢查後重新輸入',
             requiredInput: '請填寫必填項',
             requiredSelect: '請選擇必選項',
+            illegalChar: '暫不支援注入字元 & ; $ \' ` ( ) " > < |',
             illegalInput: '輸入框中存在不合法字元',
             commonName: '支援非特殊字元開頭,英文、中文、數字、.-和_,長度1-128',
             userName: '支援英文、中文、數字和_,長度3-30',
@@ -418,6 +419,7 @@ const message = {
         permission: '權限',
         permissionForIP: '指定 IP',
         permissionAll: '所有人(%)',
+        localhostHelper: '將容器部署的資料庫權限配置為"localhost"會導致容器外部無法存取，請謹慎選擇！',
         databaseConnInfo: '連接資訊',
         rootPassword: 'root 密碼',
         serviceName: '服務名稱',
@@ -428,6 +430,7 @@ const message = {
         remoteHelper: '多個 ip 以逗號分隔，例：172.16.10.111,172.16.10.112',
         remoteConnHelper: 'root 帳號遠端連接 MySQL 有安全風險，開啟需謹慎！',
         changePassword: '改密',
+        changeConnHelper: '此操作將修改當前資料庫 {0}，是否繼續？',
         changePasswordHelper: '目前資料庫已經關聯應用，修改密碼將同步修改應用中資料庫密碼，修改後重啟生效。',
 
         portHelper: '該埠為容器對外暴露埠，修改需要單獨儲存並且重啟容器！',

@@ -24,6 +24,7 @@
                                     show-password
                                     v-model="changeForm.password"
                                 ></el-input>
+                                <span class="input-help">{{ $t('commons.rule.illegalChar') }}</span>
                             </el-form-item>
                         </div>
                     </el-col>
@@ -71,7 +72,7 @@ const changeForm = reactive({
 });
 const confirmDialogRef = ref();
 const rules = reactive({
-    password: [Rules.paramComplexity],
+    password: [Rules.requiredInput, Rules.noSpace, Rules.illegal],
 });
 
 interface DialogProps {

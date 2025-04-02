@@ -9,7 +9,7 @@
         <template #header>
             <DrawerHeader :header="$t('database.databaseConnInfo')" :back="handleClose" />
         </template>
-        <el-form @submit.prevent v-loading="loading" ref="formRef" :model="form" label-position="top">
+        <el-form @submit.prevent v-loading="loading" ref="formRef" :rules="rules" :model="form" label-position="top">
             <el-row type="flex" justify="center">
                 <el-col :span="22">
                     <el-form-item :label="$t('database.containerConn')" v-if="form.from === 'local'">
@@ -68,7 +68,13 @@
                     <el-divider border-style="dashed" />
                     <div v-if="form.from === 'local'">
                         <el-form-item :label="$t('commons.login.username')" prop="username">
-                            <el-input type="text" readonly disabled v-model="form.username">
+                            <el-input
+                                type="text"
+                                style="width: calc(100% - 60px)"
+                                readonly
+                                disabled
+                                v-model="form.username"
+                            >
                                 <template #append>
                                     <el-button-group>
                                         <CopyButton :content="form.username" />
@@ -76,11 +82,7 @@
                                 </template>
                             </el-input>
                         </el-form-item>
-                        <el-form-item
-                            :label="$t('commons.login.password')"
-                            :rules="Rules.paramComplexity"
-                            prop="password"
-                        >
+                        <el-form-item :label="$t('commons.login.password')" prop="password">
                             <el-input
                                 style="width: calc(100% - 205px)"
                                 type="password"
@@ -94,6 +96,7 @@
                                     {{ $t('commons.button.random') }}
                                 </el-button>
                             </el-button-group>
+                            <span class="input-help">{{ $t('commons.rule.illegalChar') }}</span>
                         </el-form-item>
                     </div>
                     <div v-if="form.from !== 'local'">
@@ -109,8 +112,6 @@
                 </el-col>
             </el-row>
         </el-form>
-
-        <ConfirmDialog ref="confirmDialogRef" @confirm="onSubmit" @cancel="loadPassword"></ConfirmDialog>
 
         <template #footer>
             <span class="dialog-footer">
@@ -131,7 +132,6 @@ import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { getDatabase, updatePostgresqlPassword } from '@/api/modules/database';
-import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { GetAppConnInfo } from '@/api/modules/app';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
@@ -157,7 +157,9 @@ const form = reactive({
     remoteIP: '',
 });
 
-const confirmDialogRef = ref();
+const rules = reactive({
+    password: [Rules.requiredInput, Rules.noSpace, Rules.illegal],
+});
 
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
@@ -225,36 +227,36 @@ const loadPassword = async () => {
     form.remoteIP = res.data.address;
 };
 
-const onSubmit = async () => {
-    let param = {
-        id: 0,
-        from: form.from,
-        type: form.type,
-        database: form.database,
-        value: form.password,
-    };
-    loading.value = true;
-    await updatePostgresqlPassword(param)
-        .then(() => {
-            loading.value = false;
-            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            dialogVisible.value = false;
-        })
-        .catch(() => {
-            loading.value = false;
-        });
-};
-
 const onSave = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        let params = {
-            header: i18n.global.t('database.confChange'),
-            operationInfo: i18n.global.t('database.restartNowHelper'),
-            submitInputInfo: i18n.global.t('database.restartNow'),
-        };
-        confirmDialogRef.value!.acceptParams(params);
+        ElMessageBox.confirm(
+            i18n.global.t('database.changeConnHelper', [i18n.global.t('commons.login.password')]),
+            i18n.global.t('commons.msg.infoTitle'),
+            {
+                confirmButtonText: i18n.global.t('commons.button.confirm'),
+                cancelButtonText: i18n.global.t('commons.button.cancel'),
+            },
+        ).then(async () => {
+            let param = {
+                id: 0,
+                from: form.from,
+                type: form.type,
+                database: form.database,
+                value: form.password,
+            };
+            loading.value = true;
+            await updatePostgresqlPassword(param)
+                .then(() => {
+                    loading.value = false;
+                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                    dialogVisible.value = false;
+                })
+                .catch(() => {
+                    loading.value = false;
+                });
+        });
     });
 };
 
