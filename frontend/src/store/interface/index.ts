@@ -41,6 +41,7 @@ export interface GlobalState {
     errStatus: string;
 
     currentNode: string;
+    isOffline: boolean;
 }
 
 export interface MenuState {

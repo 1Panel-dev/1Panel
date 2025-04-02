@@ -3289,6 +3289,8 @@ const message = {
             pushSuccess: 'Tekanan Berjaya',
             syncError: 'Penyelarasan Gagal',
             success: 'Amaran Berjaya',
+            pushing: 'Sedang menghantar...',
+            error: 'Amaran gagal',
             cleanLog: 'Bersihkan Log',
             cleanAlertLogs: 'Bersihkan Log Amaran',
             daily: 'Bilangan Amaran Harian: {0}',
@@ -3345,6 +3347,15 @@ const message = {
             defaultPhone: 'Secara lalai ke nombor telefon akaun terikat lesen',
             noticeAlert: 'Amaran Pemberitahuan',
             resourceAlert: 'Amaran Sumber',
+            syncToNode: 'Penyegerakan ke nod anak',
+            syncToNodeHelper: 'Penyegerakan tetapan amaran ke nod lain',
+            nodes: 'Nod',
+            selectNode: 'Pilih nod',
+            selectNodeError: 'Sila pilih nod',
+            syncToNodeClose:
+                'Menutup ini tidak akan menyegerakkan tetapan amaran ke nod lain. Adakah anda ingin meneruskan?',
+            agentOfflineAlertHelper:
+                'Amaran luar talian nod anak akan diimbas dan dilaksanakan oleh nod utama setiap 30 minit',
         },
         theme: {
             lingXiaGold: 'Ling Xia Emas',

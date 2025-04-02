@@ -44,6 +44,7 @@ const GlobalStore = defineStore({
         errStatus: '',
 
         currentNode: 'local',
+        isOffline: false,
     }),
     getters: {
         isDarkTheme: (state) =>

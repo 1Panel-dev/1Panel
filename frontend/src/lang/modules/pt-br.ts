@@ -3290,6 +3290,8 @@ const message = {
             pushSuccess: 'Envio Bem-sucedido',
             syncError: 'Sincronização Falhou',
             success: 'Alerta Bem-sucedido',
+            pushing: 'Enviando...',
+            error: 'Falha no alerta',
             cleanLog: 'Limpar Registros',
             cleanAlertLogs: 'Limpar Registros de Alertas',
             daily: 'Contagem Diária de Alertas: {0}',
@@ -3346,6 +3348,15 @@ const message = {
             defaultPhone: 'Número de telefone padrão vinculado à conta de licença',
             noticeAlert: 'Alerta de Notificação',
             resourceAlert: 'Alerta de Recursos',
+            syncToNode: 'Sincronizar para o nó filho',
+            syncToNodeHelper: 'Sincronizar configurações de alerta para outros nós',
+            nodes: 'Nós',
+            selectNode: 'Selecionar nó',
+            selectNodeError: 'Por favor, selecione um nó',
+            syncToNodeClose:
+                'Ao fechar, as configurações de alerta não serão sincronizadas para outros nós. Deseja continuar?',
+            agentOfflineAlertHelper:
+                'O alerta de offline do nó filho será verificado e executado pelo nó principal a cada 30 minutos',
         },
         theme: {
             lingXiaGold: 'Ling Xia Gold',

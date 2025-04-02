@@ -3359,6 +3359,8 @@ const message = {
             pushSuccess: 'Push Successful',
             syncError: 'Sync Failed',
             success: 'Alert Successful',
+            pushing: 'Pushing...',
+            error: 'Alert Failed',
             cleanLog: 'Clean Logs',
             cleanAlertLogs: 'Clean Alert Logs',
             daily: 'Daily Alert Count: {0}',
@@ -3415,6 +3417,14 @@ const message = {
             defaultPhone: 'Default to license-bound account phone number',
             noticeAlert: 'Notice Alert',
             resourceAlert: 'Resource Alert',
+            syncToNode: 'Sync to Node',
+            syncToNodeHelper: 'Sync alert settings to other nodes',
+            nodes: 'Node',
+            selectNode: 'Select Node',
+            selectNodeError: 'Please select a node',
+            syncToNodeClose: 'After closing, set the async alert settings to another node. Do you want to continue?',
+            agentOfflineAlertHelper:
+                'The child node offline alert will be scanned and executed by the main node every 30 minutes',
         },
         theme: {
             lingXiaGold: 'Ling Xia Gold',

@@ -3210,6 +3210,8 @@ const message = {
             pushSuccess: 'プッシュ成功',
             syncError: '同期失敗',
             success: 'アラート成功',
+            pushing: 'プッシュ中...',
+            error: 'アラート失敗',
             cleanLog: 'ログをクリア',
             cleanAlertLogs: 'アラートログをクリア',
             daily: '1日のアラート数：{0}',
@@ -3266,6 +3268,14 @@ const message = {
             defaultPhone: 'ライセンスに紐付けられたアカウントの電話番号をデフォルトにする',
             noticeAlert: '通知アラート',
             resourceAlert: 'リソースアラート',
+            syncToNode: '子ノードに同期',
+            syncToNodeHelper: '他のノードにアラート設定を同期',
+            nodes: 'ノード',
+            selectNode: 'ノードを選択',
+            selectNodeError: 'ノードを選択してください',
+            syncToNodeClose: '閉じると他のノードへのアラート設定は同期されません。続行しますか？',
+            agentOfflineAlertHelper:
+                '子ノードのオフラインアラートは、メインノードが 30 分ごとにスキャンしてアラートタスクを実行します',
         },
         theme: {
             lingXiaGold: '凌霞金',
