@@ -1,12 +1,12 @@
 package toolbox
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"os"
 	"os/user"
 	"path"
-	"path/filepath"
 	"strings"
 	"time"
 
@@ -14,11 +14,27 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/systemctl"
+	"github.com/1Panel-dev/1Panel/agent/utils/toolbox/helper"
 )
 
 type Ftp struct {
 	DefaultUser  string
 	DefaultGroup string
+}
+
+type FtpList struct {
+	User   string
+	Path   string
+	Status string
+}
+
+type FtpLog struct {
+	IP        string `json:"ip"`
+	User      string `json:"user"`
+	Time      string `json:"time"`
+	Operation string `json:"operation"`
+	Status    string `json:"status"`
+	Size      string `json:"size"`
 }
 
 type FtpClient interface {
@@ -88,9 +104,19 @@ func (f *Ftp) Operate(operate string) error {
 }
 
 func (f *Ftp) UserAdd(username, passwd, path string) error {
-	std, err := cmd.Execf("pure-pw useradd %s -u %s -d %s <<EOF \n%s\n%s\nEOF", username, f.DefaultUser, path, passwd, passwd)
+	entry, err := generatePureFtpEntrySimple(username, passwd, path)
 	if err != nil {
-		return errors.New(std)
+		return fmt.Errorf("generate pure-ftpd entry failed, err: %v", err)
+	}
+	pwdFile, err := os.OpenFile("/etc/pure-ftpd/pureftpd.passwd", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return err
+	}
+	defer pwdFile.Close()
+
+	_, err = pwdFile.WriteString("\n" + entry + "\n")
+	if err != nil {
+		return err
 	}
 	_ = f.Reload()
 	std2, err := cmd.Execf("chown -R %s:%s %s", f.DefaultUser, f.DefaultGroup, path)
@@ -110,10 +136,52 @@ func (f *Ftp) UserDel(username string) error {
 }
 
 func (f *Ftp) SetPasswd(username, passwd string) error {
-	std, err := cmd.Execf("pure-pw passwd %s <<EOF \n%s\n%s\nEOF", username, passwd, passwd)
+	hashedPassword, err := helper.Generate([]byte(passwd))
 	if err != nil {
-		return errors.New(std)
+		return err
 	}
+	pwdFile, err := os.Open("/etc/pure-ftpd/pureftpd.passwd")
+	if err != nil {
+		return err
+	}
+	defer pwdFile.Close()
+
+	var entrys []string
+	scanner := bufio.NewScanner(pwdFile)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if line == "" {
+			continue
+		}
+		userEntry := strings.Split(line, ":")
+		if len(userEntry) < 2 {
+			continue
+		}
+		if userEntry[0] == username {
+			userEntry[1] = string(hashedPassword)
+			line = strings.Join(userEntry, ":")
+		}
+		entrys = append(entrys, line)
+	}
+
+	if err := scanner.Err(); err != nil {
+		return err
+	}
+	pwdFile.Close()
+
+	pwdFile, err = os.Create("/etc/pure-ftpd/pureftpd.passwd")
+	if err != nil {
+		return err
+	}
+	defer pwdFile.Close()
+
+	for _, entry := range entrys {
+		_, err := pwdFile.WriteString(entry + "\n")
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -155,7 +223,7 @@ func (f *Ftp) LoadList() ([]FtpList, error) {
 		}
 		std2, err := cmd.Execf("pure-pw  show %s | grep 'Allowed client IPs :'", parts[0])
 		if err != nil {
-			global.LOG.Errorf("handle pure-pw show %s faile, err: %v", parts[0], std2)
+			global.LOG.Errorf("handle pure-pw show %s failed, err: %v", parts[0], std2)
 			continue
 		}
 		status := constant.StatusDisable
@@ -166,12 +234,6 @@ func (f *Ftp) LoadList() ([]FtpList, error) {
 		lists = append(lists, FtpList{User: parts[0], Path: strings.ReplaceAll(parts[1], "/./", ""), Status: status})
 	}
 	return lists, nil
-}
-
-type FtpList struct {
-	User   string
-	Path   string
-	Status string
 }
 
 func (f *Ftp) Reload() error {
@@ -188,7 +250,7 @@ func (f *Ftp) LoadLogs(user, operation string) ([]FtpLog, error) {
 	if _, err := os.Stat("/etc/pure-ftpd/conf"); err != nil && os.IsNotExist(err) {
 		std, err := cmd.Exec("cat /etc/pure-ftpd/pure-ftpd.conf | grep AltLog | grep clf:")
 		logItem = "/var/log/pureftpd.log"
-		if err == nil && !strings.HasPrefix(logItem, "#") {
+		if err == nil && !strings.HasPrefix(std, "#") {
 			logItem = std
 		}
 	} else {
@@ -197,7 +259,7 @@ func (f *Ftp) LoadLogs(user, operation string) ([]FtpLog, error) {
 		}
 		std, err := cmd.Exec("cat /etc/pure-ftpd/conf/AltLog")
 		logItem = "/var/log/pure-ftpd/transfer.log"
-		if err != nil && !strings.HasPrefix(logItem, "#") {
+		if err != nil && !strings.HasPrefix(std, "#") {
 			logItem = std
 		}
 	}
@@ -207,21 +269,37 @@ func (f *Ftp) LoadLogs(user, operation string) ([]FtpLog, error) {
 	logItem = strings.ReplaceAll(logItem, "\n", "")
 	logPath := strings.Trim(logItem, " ")
 
-	fileName := path.Base(logPath)
+	logDir := path.Dir(logPath)
+	filesItem, err := os.ReadDir(logDir)
+	if err != nil {
+		return logs, err
+	}
 	var fileList []string
-	if err := filepath.Walk(path.Dir(logPath), func(pathItem string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
+	for i := 0; i < len(filesItem); i++ {
+		if filesItem[i].IsDir() {
+			continue
 		}
-		if !info.IsDir() && strings.HasPrefix(info.Name(), fileName) {
-			fileList = append(fileList, pathItem)
+		itemPath := path.Join(logDir, filesItem[i].Name())
+		if !strings.HasSuffix(itemPath, ".gz") {
+			fileList = append(fileList, itemPath)
+			continue
 		}
-		return nil
-	}); err != nil {
-		return nil, err
+		itemFileName := strings.TrimSuffix(itemPath, ".gz")
+		if _, err := os.Stat(itemFileName); err != nil && os.IsNotExist(err) {
+			if err := handleGunzip(itemPath); err == nil {
+				fileList = append(fileList, itemFileName)
+			}
+		}
 	}
 	logs = loadLogsByFiles(fileList, user, operation)
 	return logs, nil
+}
+
+func handleGunzip(path string) error {
+	if _, err := cmd.Execf("gunzip %s", path); err != nil {
+		return err
+	}
+	return nil
 }
 
 func loadLogsByFiles(fileList []string, user, operation string) []FtpLog {
@@ -262,11 +340,10 @@ func loadLogsByFiles(fileList []string, user, operation string) []FtpLog {
 	return logs
 }
 
-type FtpLog struct {
-	IP        string `json:"ip"`
-	User      string `json:"user"`
-	Time      string `json:"time"`
-	Operation string `json:"operation"`
-	Status    string `json:"status"`
-	Size      string `json:"size"`
+func generatePureFtpEntrySimple(username, password, path string) (string, error) {
+	passwdAfterSha512, err := helper.Generate([]byte(password))
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%s:%s:1000:1000::%s/./::::::::::::", username, passwdAfterSha512, path), nil
 }

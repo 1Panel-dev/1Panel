@@ -153,17 +153,19 @@ echo "配置 Pure-FTPd..."
 PURE_FTPD_CONF="/etc/pure-ftpd/pure-ftpd.conf"
 if [ -f "$PURE_FTPD_CONF" ]; then
     cp "$PURE_FTPD_CONF" "$PURE_FTPD_CONF.bak"
-    echo "PureDB /etc/pure-ftpd/pureftpd.pdb" >> "$PURE_FTPD_CONF"
-    sed -i 's/^# UnixAuthentication/UnixAuthentication/' "$PURE_FTPD_CONF"
-    echo "NoAnonymous yes" >> "$PURE_FTPD_CONF"
-    echo "PassivePortRange 39000 40000" >> "$PURE_FTPD_CONF"
-    echo "ChrootEveryone yes" >> "$PURE_FTPD_CONF"
-    echo "VerboseLog yes" >> "$PURE_FTPD_CONF"
+    sed -i 's/^NoAnonymous[[:space:]]\+no$/NoAnonymous yes/' "$PURE_FTPD_CONF"
+    sed -i 's/^PAMAuthentication[[:space:]]\+yes$/PAMAuthentication no/' "$PURE_FTPD_CONF"
+    sed -i 's/^# PassivePortRange[[:space:]]\+30000 50000$/PassivePortRange 39000 40000/' "$PURE_FTPD_CONF"
+    sed -i 's/^VerboseLog[[:space:]]\+no$/VerboseLog yes/' "$PURE_FTPD_CONF"
+    sed -i 's/^# PureDB[[:space:]]\+\/etc\/pure-ftpd\/pureftpd\.pdb[[:space:]]*$/PureDB \/etc\/pure-ftpd\/pureftpd.pdb/' "$PURE_FTPD_CONF"
 else
     echo '/etc/pure-ftpd/pureftpd.pdb' > /etc/pure-ftpd/conf/PureDB
     echo yes > /etc/pure-ftpd/conf/VerboseLog 
     echo yes > /etc/pure-ftpd/conf/NoAnonymous
     echo '39000 40000' > /etc/pure-ftpd/conf/PassivePortRange
+    echo 'no' > /etc/pure-ftpd/conf/PAMAuthentication
+    echo 'no' > /etc/pure-ftpd/conf/UnixAuthentication
+    echo 'clf:/var/log/pure-ftpd/transfer.log' > /etc/pure-ftpd/conf/AltLog
     ln -s /etc/pure-ftpd/conf/PureDB /etc/pure-ftpd/auth/50puredb
 fi
 
