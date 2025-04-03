@@ -1,13 +1,8 @@
 <template>
     <div :class="classObj" class="app-wrapper" v-loading="loading" :element-loading-text="loadingText" fullscreen>
         <div v-if="classObj.mobile && classObj.openSidebar" class="drawer-bg" @click="handleClickOutside" />
-        <div
-            class="app-sidebar"
-            v-if="!globalStore.isFullScreen"
-            @mouseenter="collapseButtonShow = true"
-            @mouseleave="collapseButtonShow = false"
-        >
-            <el-affix v-if="collapseButtonShow" :offset="18" class="affix">
+        <div class="app-sidebar" v-if="!globalStore.isFullScreen">
+            <el-affix :offset="18" class="affix">
                 <el-tooltip
                     :content="menuStore.isCollapse ? $t('commons.button.expand') : $t('commons.button.collapse')"
                 >
@@ -48,7 +43,6 @@ import TaskList from '@/components/task-list/index.vue';
 const { switchTheme } = useTheme();
 
 useResize();
-const collapseButtonShow = ref();
 
 const taskListRef = ref();
 const openTask = () => {
@@ -81,7 +75,6 @@ const handleClickOutside = () => {
 
 const handleCollapse = () => {
     menuStore.setCollapse();
-    collapseButtonShow.value = false;
 };
 
 watch(

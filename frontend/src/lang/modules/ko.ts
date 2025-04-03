@@ -3048,6 +3048,8 @@ const message = {
             baseDir: '설치 디렉토리',
             baseDirHelper: '설치 디렉토리가 비어 있으면 기본적으로 /opt 디렉토리에 설치됩니다',
             nodePort: '노드 포트',
+            offline: '오프라인 모드',
+            offlineHelper: '노드가 오프라인 환경일 때 사용',
         },
         customApp: {
             name: '사용자 정의 앱 저장소',

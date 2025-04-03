@@ -3171,6 +3171,8 @@ const message = {
             baseDir: 'Direktori Pemasangan',
             baseDirHelper: 'Apabila direktori pemasangan kosong, secara lalai akan dipasang di direktori /opt',
             nodePort: 'Port Nod',
+            offline: 'Mod luar talian',
+            offlineHelper: 'Digunakan apabila nod berada dalam persekitaran luar talian',
         },
         customApp: {
             name: 'Repositori Aplikasi Khusus',

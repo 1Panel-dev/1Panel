@@ -3245,6 +3245,8 @@ const message = {
             baseDirHelper:
                 'When the installation directory is empty, it will be installed in the /opt directory by default',
             nodePort: 'Node Port',
+            offline: 'Offline mode',
+            offlineHelper: 'Used when the node is in an offline environment',
         },
         customApp: {
             name: 'Custom App Repository',

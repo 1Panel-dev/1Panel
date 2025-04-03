@@ -3006,6 +3006,8 @@ const message = {
             baseDir: '安裝目錄',
             baseDirHelper: '安裝目錄為空時，預設安裝於 /opt 目錄下',
             nodePort: '節點端口',
+            offline: '離線模式',
+            offlineHelper: '當節點處於離線環境時使用',
         },
         customApp: {
             name: '自訂應用倉庫',

@@ -3100,6 +3100,8 @@ const message = {
             baseDir: 'インストールディレクトリ',
             baseDirHelper: 'インストールディレクトリが空の場合、デフォルトで/optディレクトリにインストールされます',
             nodePort: 'ノードポート',
+            offline: 'オフラインモード',
+            offlineHelper: 'ノードがオフライン環境にある場合に使用',
         },
         customApp: {
             name: 'カスタムアプリリポジトリ',

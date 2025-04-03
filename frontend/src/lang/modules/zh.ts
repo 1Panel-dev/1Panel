@@ -2988,6 +2988,8 @@ const message = {
             baseDir: '安装目录',
             baseDirHelper: '安装目录为空时，默认安装在 /opt 目录下',
             nodePort: '节点端口',
+            offline: '离线模式',
+            offlineHelper: '节点为离线环境时使用',
         },
         customApp: {
             name: '自定义应用仓库',

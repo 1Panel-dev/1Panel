@@ -3173,6 +3173,8 @@ const message = {
             baseDir: 'Diretório de Instalação',
             baseDirHelper: 'Quando o diretório de instalação está vazio, será instalado por padrão no diretório /opt',
             nodePort: 'Porta do Nó',
+            offline: 'Modo offline',
+            offlineHelper: 'Usado quando o nó está em ambiente offline',
         },
         customApp: {
             name: 'Repositório de Aplicativos Personalizados',
