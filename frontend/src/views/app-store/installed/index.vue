@@ -390,7 +390,7 @@
     <PortJumpDialog ref="dialogPortJumpRef" />
     <AppIgnore ref="ignoreRef" @close="search" />
     <ComposeLogs ref="composeLogRef" />
-    <TaskLog ref="taskLogRef" />
+    <TaskLog ref="taskLogRef" @close="search" />
     <Detail ref="detailRef" />
 </template>
 

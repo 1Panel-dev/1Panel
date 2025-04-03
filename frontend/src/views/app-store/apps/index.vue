@@ -167,7 +167,7 @@
     </LayoutContent>
     <Install ref="installRef" />
     <Detail ref="detailRef" />
-    <TaskLog ref="taskLogRef" @close="search(req)" />
+    <TaskLog ref="taskLogRef" @close="refresh" />
 </template>
 
 <script lang="ts" setup>
@@ -189,6 +189,7 @@ import { newUUID, jumpToPath } from '@/utils/util';
 import Detail from '../detail/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
 import { storeToRefs } from 'pinia';
+import bus from '@/global/bus';
 
 const globalStore = GlobalStore();
 const { isProductPro } = storeToRefs(globalStore);
@@ -228,12 +229,28 @@ const detailRef = ref();
 const taskLogRef = ref();
 const syncCustomAppstore = ref(false);
 
+const refresh = () => {
+    search(req);
+};
+
 const search = async (req: App.AppReq) => {
     loading.value = true;
     req.pageSize = paginationConfig.pageSize;
     req.page = paginationConfig.currentPage;
     localStorage.setItem('app-page-size', req.pageSize + '');
-    await searchApp(req)
+
+    const customReq = {
+        page: req.page,
+        pageSize: req.pageSize,
+        tags: req.tags,
+        name: req.name,
+        resource: req.resource,
+        showCurrentArch: req.showCurrentArch,
+    };
+    if (syncCustomAppstore.value && req.resource === 'remote') {
+        customReq.resource = 'custom';
+    }
+    await searchApp(customReq)
         .then((res) => {
             apps.value = res.data.items;
             paginationConfig.total = res.data.total;
@@ -341,6 +358,9 @@ const searchByName = () => {
 };
 
 onMounted(async () => {
+    bus.on('refreshTask', () => {
+        search(req);
+    });
     if (router.currentRoute.value.query.install) {
         installKey.value = String(router.currentRoute.value.query.install);
         const params = {

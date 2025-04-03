@@ -62,7 +62,7 @@
         </div>
         <MdEditor previewOnly v-model="app.readMe" :theme="isDarkTheme ? 'dark' : 'light'" />
     </DrawerPro>
-    <Install ref="installRef"></Install>
+    <Install ref="installRef" />
 </template>
 
 <script lang="ts" setup>

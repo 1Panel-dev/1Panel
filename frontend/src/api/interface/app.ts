@@ -70,6 +70,8 @@ export namespace App {
         tags?: string[];
         type?: string;
         recommend?: boolean;
+        resource?: string;
+        showCurrentArch?: boolean;
     }
 
     export interface AppParams {
