@@ -338,7 +338,6 @@ const login = (formEl: FormInstance | undefined) => {
             tabsStore.removeAllTabs();
             globalStore.currentNode = 'local';
             MsgSuccess(i18n.t('commons.msg.loginSuccess'));
-            console.log('loiin syc');
             router.push({ name: 'home' });
             document.onkeydown = null;
         } catch (res) {

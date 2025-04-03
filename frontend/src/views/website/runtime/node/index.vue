@@ -16,6 +16,10 @@
                     {{ $t('runtime.create') }}
                 </el-button>
             </template>
+            <template #rightToolBar>
+                <TableRefresh @search="search()" />
+                <TableSetting title="node-runtime-refresh" @search="search()" />
+            </template>
             <template #main>
                 <ComplexTable :pagination-config="paginationConfig" :data="items" @search="search()" :heightDiff="350">
                     <el-table-column
@@ -88,7 +92,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { Runtime } from '@/api/interface/runtime';
 import { OperateRuntime, RuntimeDeleteCheck, SearchRuntimes, SyncRuntime } from '@/api/modules/runtime';
 import { dateFormat } from '@/utils/util';
@@ -111,7 +115,6 @@ const mobile = computed(() => {
     return globalStore.isMobile();
 });
 
-let timer: NodeJS.Timer | null = null;
 const loading = ref(false);
 const items = ref<Runtime.RuntimeDTO[]>([]);
 const operateRef = ref();
@@ -265,15 +268,6 @@ const toFolder = (folder: string) => {
 onMounted(() => {
     sync();
     search();
-    timer = setInterval(() => {
-        search();
-        sync();
-    }, 1000 * 10);
-});
-
-onUnmounted(() => {
-    clearInterval(Number(timer));
-    timer = null;
 });
 </script>
 

@@ -3000,6 +3000,15 @@ func (w WebsiteService) DeleteLoadBalance(req request.WebsiteLBDelete) error {
 	if err != nil {
 		return err
 	}
+	proxies, _ := w.GetProxies(website.ID)
+	if len(proxies) > 0 {
+		for _, proxy := range proxies {
+			if strings.HasSuffix(proxy.ProxyPass, fmt.Sprintf("://%s", req.Name)) {
+				return buserr.New("ErrProxyIsUsed")
+			}
+		}
+	}
+
 	includeDir := GetSitePath(website, SiteUpstreamDir)
 	fileOp := files.NewFileOp()
 	filePath := path.Join(includeDir, fmt.Sprintf("%s.conf", req.Name))

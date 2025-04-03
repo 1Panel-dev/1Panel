@@ -128,6 +128,7 @@ ErrDefaultAlias: "default 为保留代号，请使用其他代号"
 ErrParentWebsite: "需要先删除子网站 {{ .name }}"
 ErrBuildDirNotFound: "构建目录不存在"
 ErrImageNotExist: "运行环境 {{ .name }} 镜像不存在，请重新编辑运行环境"
+ErrProxyIsUsed: "负载均衡已被反向代理使用，无法删除"
 
 #ssl
 ErrSSLCannotDelete: "{{ .name }} 证书正在被网站使用，无法删除"

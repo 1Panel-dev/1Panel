@@ -100,6 +100,17 @@ const handleMenuClick = async (path) => {
     tabsStore.activeTabPath = route.path;
 };
 
+const toLogin = () => {
+    let baseUrl = window.location.origin;
+    let newUrl = '';
+    if (globalStore.entrance) {
+        newUrl = baseUrl + '/' + globalStore.entrance;
+    } else {
+        newUrl = baseUrl + '/login';
+    }
+    window.open(newUrl, '_self');
+};
+
 const loadStatus = async () => {
     loading.value = globalStore.isLoading;
     loadingText.value = globalStore.loadingText;
@@ -109,6 +120,7 @@ const loadStatus = async () => {
                 .then((res) => {
                     if (res) {
                         location.reload();
+                        toLogin();
                         clearInterval(Number(timer));
                         timer = null;
                     }

@@ -25,7 +25,7 @@
                 class="log-item"
                 :style="{ top: `${(startIndex + index) * logHeight}px` }"
             >
-                <hightlight :log="log" :type="config.colorMode"></hightlight>
+                <hightlight :log="log" :type="config.colorMode ?? 'nginx'"></hightlight>
             </div>
         </div>
     </div>
@@ -41,7 +41,7 @@ const globalStore = GlobalStore();
 
 interface LogProps {
     id?: number;
-    type: string;
+    type?: string;
     name?: string;
     tail?: boolean;
     taskID?: string;
@@ -63,6 +63,7 @@ const props = defineProps({
             taskType: '',
             taskOperate: '',
             resourceID: 0,
+            taskID: '',
         }),
     },
     defaultButton: {

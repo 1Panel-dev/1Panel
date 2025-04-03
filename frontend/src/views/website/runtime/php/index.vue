@@ -2,13 +2,7 @@
     <div>
         <RouterMenu />
         <LayoutContent :title="'PHP'" v-loading="loading">
-            <template #prompt>
-                <el-alert type="info" :closable="false">
-                    <template #title>
-                        <span>{{ $t('runtime.systemRestartHelper') }}</span>
-                    </template>
-                </el-alert>
-            </template>
+            <template #prompt></template>
             <template #leftToolBar>
                 <el-button type="primary" @click="openCreate">
                     {{ $t('runtime.create') }}
@@ -21,6 +15,10 @@
                 <el-button type="primary" plain @click="onOpenBuildCache()">
                     {{ $t('container.cleanBuildCache') }}
                 </el-button>
+            </template>
+            <template #rightToolBar>
+                <TableRefresh @search="search()" />
+                <TableSetting title="php-runtime-refresh" @search="search()" />
             </template>
             <template #main>
                 <ComplexTable :pagination-config="paginationConfig" :data="items" @search="search()" :heightDiff="350">
@@ -101,7 +99,7 @@
         <Log ref="logRef" @close="search" :heightDiff="280" />
         <Extensions ref="extensionsRef" @close="search" />
         <AppResources ref="checkRef" @close="search" />
-        <ExtManagement ref="extManagementRef" @close="search" />
+        <ExtManagement ref="extManagementRef" />
         <ComposeLogs ref="composeLogRef" />
         <Config ref="configRef" />
         <Supervisor ref="supervisorRef" />
@@ -109,7 +107,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { Runtime } from '@/api/interface/runtime';
 import { DeleteRuntime, OperateRuntime, RuntimeDeleteCheck, SearchRuntimes } from '@/api/modules/runtime';
 import { dateFormat } from '@/utils/util';
@@ -146,7 +144,6 @@ let req = reactive<Runtime.RuntimeReq>({
     pageSize: 40,
     type: 'php',
 });
-let timer: NodeJS.Timer | null = null;
 const opRef = ref();
 const logRef = ref();
 const extensionsRef = ref();
@@ -265,7 +262,7 @@ const openLog = (row: Runtime.RuntimeDTO) => {
     if (row.status == 'Running') {
         composeLogRef.value.acceptParams({ compose: row.path + '/docker-compose.yml', resource: row.name });
     } else {
-        logRef.value.acceptParams({ id: row.id, type: 'php', tail: row.status == 'building', heightDiff: 220 });
+        logRef.value.acceptParams({ id: row.id, type: 'php', tail: row.status == 'Building', heightDiff: 220 });
     }
 };
 
@@ -348,14 +345,6 @@ const onOpenBuildCache = () => {
 
 onMounted(() => {
     search();
-    timer = setInterval(() => {
-        search();
-    }, 10000 * 1);
-});
-
-onUnmounted(() => {
-    clearInterval(Number(timer));
-    timer = null;
 });
 </script>
 
