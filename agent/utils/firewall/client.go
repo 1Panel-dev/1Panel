@@ -1,7 +1,8 @@
 package firewall
 
 import (
-	"github.com/1Panel-dev/1Panel/agent/buserr"
+	"errors"
+
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/client"
 )
@@ -12,7 +13,7 @@ type FirewallClient interface {
 	Stop() error
 	Restart() error
 	Reload() error
-	Status() (bool, error) // running not running
+	Status() (bool, error)
 	Version() (string, error)
 
 	ListPort() ([]client.FireInfo, error)
@@ -31,7 +32,7 @@ func NewFirewallClient() (FirewallClient, error) {
 	ufw := cmd.Which("ufw")
 
 	if firewalld && ufw {
-		return nil, buserr.New("ErrFirewallBoth")
+		return nil, errors.New("It is detected that the system has both firewalld and ufw services. To avoid conflicts, please uninstall and try again!")
 	}
 
 	if firewalld {
@@ -40,5 +41,5 @@ func NewFirewallClient() (FirewallClient, error) {
 	if ufw {
 		return client.NewUfw()
 	}
-	return nil, buserr.New("ErrFirewallNone")
+	return nil, errors.New("No system firewalld or ufw service detected, please check and try again!")
 }

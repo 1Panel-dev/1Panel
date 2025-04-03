@@ -199,10 +199,6 @@ ErrConfigDirNotFound: 'Direktori berjalan tidak wujud'
 ErrConfigAlreadyExist: 'Fail konfigurasi dengan nama yang sama sudah wujud'
 ErrUserFindErr: 'Pengguna {{ .name }} carian gagal {{ .err }}'
 
-#ssh
-ErrFirewallNone: 'Tiada sistem firewalld atau perkhidmatan ufw dikesan, sila semak dan cuba lagi!'
-ErrFirewallBoth: 'Telah dikesan bahawa sistem mempunyai perkhidmatan firewalld dan ufw. Untuk mengelakkan konflik, sila nyahpasang dan cuba lagi!'
-
 #cronjob
 ErrCutWebsiteLog: '{{ .name }} pemotongan log tapak web gagal, ralat {{ .err }}'
 CutWebsiteLogSuccess: '{{ .name }} log tapak web berjaya dipotong, laluan sandaran {{ .path }}'

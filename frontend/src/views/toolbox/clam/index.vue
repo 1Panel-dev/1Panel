@@ -240,8 +240,9 @@ const getStatus = (status: any) => {
 const toFolder = (folder: string) => {
     router.push({ path: '/hosts/files', query: { path: folder } });
 };
-const toDoc = async () => {
-    window.open(globalStore.docsUrl + '/user_manual/toolbox/clam/', '_blank', 'noopener,noreferrer');
+
+const toDoc = () => {
+    router.push({ name: 'Library' });
 };
 
 const onChange = async (row: any) => {

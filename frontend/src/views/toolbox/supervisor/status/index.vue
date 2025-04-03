@@ -71,8 +71,7 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { HostTool } from '@/api/interface/host-tool';
 import InitPage from './init/index.vue';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
+import router from '@/routers';
 
 let operateReq = reactive({
     installId: 0,
@@ -96,8 +95,8 @@ const setting = () => {
     em('setting', true);
 };
 
-const toDoc = async () => {
-    window.open(globalStore.docsUrl + '/user_manual/toolbox/supervisor/', '_blank', 'noopener,noreferrer');
+const toDoc = () => {
+    router.push({ name: 'Library' });
 };
 
 const init = async () => {

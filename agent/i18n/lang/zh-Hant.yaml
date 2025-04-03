@@ -199,10 +199,6 @@ ErrConfigDirNotFound: '運行目錄不存在'
 ErrConfigAlreadyExist: '已存在同名設定檔'
 ErrUserFindErr: '使用者{{ .name }} 尋找失敗{{ .err }}'
 
-#ssh
-ErrFirewallNone: '未偵測到系統firewalld 或ufw 服務，請檢查後重試！'
-ErrFirewallBoth: '偵測到系統同時存在firewalld 或ufw 服務，為避免衝突，請卸載後重試！'
-
 #cronjob
 ErrCutWebsiteLog: '{{ .name }} 網站日誌切割失敗，錯誤{{ .err }}'
 CutWebsiteLogSuccess: '{{ .name }} 網站日誌切割成功，備份路徑{{ .path }}'

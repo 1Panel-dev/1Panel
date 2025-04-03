@@ -4,7 +4,6 @@
 
         <div v-loading="loading">
             <FireStatus
-                v-show="fireName !== '-'"
                 ref="fireStatusRef"
                 @search="search"
                 v-model:loading="loading"
@@ -55,24 +54,6 @@
                     </template>
                 </LayoutContent>
             </div>
-            <div v-else>
-                <LayoutContent :title="$t('menu.firewall')" :divider="true">
-                    <template #main>
-                        <div class="app-warn">
-                            <div class="flex flex-col gap-2 items-center justify-center w-full sm:flex-row">
-                                <span>{{ $t('firewall.notSupport') }}</span>
-                                <span @click="toDoc" class="flex items-center justify-center gap-0.5">
-                                    <el-icon><Position /></el-icon>
-                                    {{ $t('firewall.quickJump') }}
-                                </span>
-                            </div>
-                            <div>
-                                <img src="@/assets/images/no_app.svg" />
-                            </div>
-                        </div>
-                    </template>
-                </LayoutContent>
-            </div>
         </div>
 
         <OpDialog ref="opRef" @search="search" @submit="onSubmitDelete()">
@@ -99,9 +80,7 @@ import { onMounted, reactive, ref } from 'vue';
 import { operateForwardRule, searchFireRule } from '@/api/modules/host';
 import { Host } from '@/api/interface/host';
 import i18n from '@/lang';
-import { GlobalStore } from '@/store';
 import { MsgSuccess } from '@/utils/message';
-const globalStore = GlobalStore();
 
 const loading = ref();
 const activeTag = ref('forward');
@@ -169,9 +148,6 @@ const onOpenDialog = async (
         rowData: { ...rowData },
     };
     dialogRef.value!.acceptParams(params);
-};
-const toDoc = () => {
-    window.open(globalStore.docsUrl + '/user_manual/hosts/firewall/', '_blank', 'noopener,noreferrer');
 };
 const onDelete = async (row: Host.RuleForward | null) => {
     let names = [];

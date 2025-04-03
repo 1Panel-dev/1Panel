@@ -199,10 +199,6 @@ ErrConfigDirNotFound: 'Рабочий каталог не существует'
 ErrConfigAlreadyExist: 'Файл конфигурации с таким именем уже существует'
 ErrUserFindErr: 'Поиск пользователя {{ .name }} не удался {{ .err }}'
 
-#ссш
-ErrFirewallNone: 'Системные службы firewalld или ufw не обнаружены. Проверьте и повторите попытку!'
-ErrFirewallBoth: 'Обнаружено, что в системе есть службы firewalld и ufw. Чтобы избежать конфликтов, удалите их и повторите попытку!'
-
 #cronjob
 ErrCutWebsiteLog: '{{ .name }} не удалось вырезать журнал веб-сайта, ошибка {{ .err }}'
 CutWebsiteLogSuccess: 'Журнал веб-сайта {{ .name }} успешно вырезан, путь к резервной копии {{ .path }}'

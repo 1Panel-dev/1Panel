@@ -199,10 +199,6 @@ ErrConfigDirNotFound: 'The running directory does not exist'
 ErrConfigAlreadyExist: 'A configuration file with the same name already exists'
 ErrUserFindErr: 'User {{ .name }} search failed {{ .err }}'
 
-#ssh
-ErrFirewallNone: 'No system firewalld or ufw service detected, please check and try again!'
-ErrFirewallBoth: 'It is detected that the system has both firewalld and ufw services. To avoid conflicts, please uninstall and try again!'
-
 #cronjob
 ErrCutWebsiteLog: '{{ .name }} website log cutting failed, error {{ .err }}'
 CutWebsiteLogSuccess: '{{ .name }} website log cut successfully, backup path {{ .path }}'

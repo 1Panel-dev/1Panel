@@ -199,10 +199,6 @@ ErrConfigDirNotFound: '実行ディレクトリが存在しません'
 ErrConfigAlreadyExist: '同じ名前の設定ファイルがすでに存在します'
 ErrUserFindErr: 'ユーザー {{ .name }} の検索に失敗しました {{ .err }}'
 
-#ssh
-ErrFirewallNone: 'システムのファイアウォールまたは ufw サービスが検出されませんでした。確認してもう一度お試しください。'
-ErrFirewallBoth: 'システムにfirewalldとufwの両方のサービスがあることが検出されました。競合を避けるため、アンインストールしてもう一度お試しください。'
-
 #cronjob
 ErrCutWebsiteLog: '{{ .name }} ウェブサイトのログの切り取りに失敗しました。エラー {{ .err }}'
 CutWebsiteLogSuccess: '{{ .name }} ウェブサイトのログが正常にカットされました。バックアップ パス {{ .path }}'

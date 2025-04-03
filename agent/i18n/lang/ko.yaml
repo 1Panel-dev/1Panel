@@ -199,10 +199,6 @@ ErrConfigDirNotFound: '실행 디렉토리가 존재하지 않습니다'
 ErrConfigAlreadyExist: '같은 이름의 구성 파일이 이미 존재합니다'
 ErrUserFindErr: '사용자 {{ .name }} 검색에 실패했습니다 {{ .err }}'
 
-#ssh
-ErrFirewallNone: '시스템 방화벽이나 ufw 서비스가 감지되지 않았습니다. 확인하고 다시 시도하세요!'
-ErrFirewallBoth: '시스템에 방화벽과 ufw 서비스가 모두 있는 것으로 감지되었습니다. 충돌을 피하려면 제거한 후 다시 시도하세요!'
-
 #크론잡
 ErrCutWebsiteLog: '{{ .name }} 웹사이트 로그 잘라내기에 실패했습니다. 오류 {{ .err }}'
 CutWebsiteLogSuccess: '{{ .name }} 웹사이트 로그가 성공적으로 잘렸습니다. 백업 경로 {{ .path }}'

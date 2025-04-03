@@ -4,7 +4,6 @@
 
         <div v-loading="loading">
             <FireStatus
-                v-show="fireName !== '-'"
                 ref="fireStatusRef"
                 @search="search"
                 v-model:loading="loading"
@@ -139,24 +138,6 @@
                     </template>
                 </LayoutContent>
             </div>
-            <div v-else>
-                <LayoutContent :title="$t('menu.firewall')" :divider="true">
-                    <template #main>
-                        <div class="app-warn">
-                            <div class="flex flex-col gap-2 items-center justify-center w-full sm:flex-row">
-                                <span>{{ $t('firewall.notSupport') }}</span>
-                                <span @click="toDoc" class="flex items-center justify-center gap-0.5">
-                                    <el-icon><Position /></el-icon>
-                                    {{ $t('firewall.quickJump') }}
-                                </span>
-                            </div>
-                            <div>
-                                <img src="@/assets/images/no_app.svg" />
-                            </div>
-                        </div>
-                    </template>
-                </LayoutContent>
-            </div>
         </div>
 
         <OpDialog ref="opRef" @search="search" />
@@ -175,8 +156,6 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
 import router from '@/routers';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
 
 const loading = ref();
 const activeTag = ref('port');
@@ -248,9 +227,6 @@ const onOpenDialog = async (
 
 const quickJump = () => {
     router.push({ name: 'AppInstalled' });
-};
-const toDoc = () => {
-    window.open(globalStore.docsUrl + '/user_manual/hosts/firewall/', '_blank', 'noopener,noreferrer');
 };
 
 const onChangeStatus = async (row: Host.RuleInfo, status: string) => {

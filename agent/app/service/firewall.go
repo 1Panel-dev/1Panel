@@ -48,8 +48,9 @@ func (u *FirewallService) LoadBaseInfo() (dto.FirewallBaseInfo, error) {
 	baseInfo.Name = "-"
 	client, err := firewall.NewFirewallClient()
 	if err != nil {
+		global.LOG.Errorf("load firewall failed, err: %v", err)
 		baseInfo.IsExist = false
-		return baseInfo, err
+		return baseInfo, nil
 	}
 	baseInfo.IsExist = true
 	baseInfo.Name = client.Name()

@@ -199,10 +199,6 @@ ErrConfigDirNotFound: 'O diretório de execução não existe'
 ErrConfigAlreadyExist: 'Um arquivo de configuração com o mesmo nome já existe'
 ErrUserFindErr: 'Falha na pesquisa do usuário {{ .name }} {{ .err }}'
 
-#ssh
-ErrFirewallNone: 'Nenhum firewall de sistema ou serviço ufw detectado, verifique e tente novamente!'
-ErrFirewallBoth: 'Foi detectado que o sistema possui serviços firewalld e ufw. Para evitar conflitos, desinstale e tente novamente!'
-
 #cronjob
 ErrCutWebsiteLog: '{{ .name }} falha ao cortar o log do site, erro {{ .err }}'
 CutWebsiteLogSuccess: '{{ .name }} registro do site cortado com sucesso, caminho de backup {{ .path }}'
