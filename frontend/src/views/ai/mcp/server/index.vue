@@ -33,7 +33,7 @@
                             <CopyButton :content="row.baseUrl + row.ssePath" type="icon" />
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.status')" prop="status" width="100px">
+                    <el-table-column :label="$t('commons.table.status')" prop="status" width="120px">
                         <template #default="{ row }">
                             <el-popover
                                 v-if="row.status === 'error'"
@@ -52,7 +52,7 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.button.log')" prop="path" width="100px">
+                    <el-table-column :label="$t('commons.button.log')" prop="path" width="120px">
                         <template #default="{ row }">
                             <el-button
                                 @click="openLog(row)"
@@ -73,8 +73,8 @@
                         fix
                     />
                     <fu-table-operations
-                        :ellipsis="mobile ? 0 : 10"
-                        :min-width="mobile ? 'auto' : 300"
+                        :ellipsis="mobile ? 0 : 2"
+                        :min-width="mobile ? 'auto' : 200"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         fixed="right"
