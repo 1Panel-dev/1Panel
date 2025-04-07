@@ -346,12 +346,14 @@ const login = (formEl: FormInstance | undefined) => {
                     loginForm.captcha = '';
                     errCaptcha.value = true;
                     errAuthInfo.value = false;
+                    loginVerify();
                     return;
                 }
                 if (res.message === 'ErrAuth') {
                     globalStore.ignoreCaptcha = false;
                     errCaptcha.value = false;
                     errAuthInfo.value = true;
+                    loginVerify();
                     return;
                 }
                 MsgError(res.message);

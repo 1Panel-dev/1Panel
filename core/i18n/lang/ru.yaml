@@ -30,6 +30,7 @@ ErrGroupIsDefault: "Группу по умолчанию нельзя удали
 ErrGroupIsInUse: "Группа используется и не может быть удалена."
 ErrLocalDelete: "Локальный узел нельзя удалить!"
 ErrPortInUsed: "Порт {{ .name }} уже используется!"
+ErrInternalServerKey: "Внутренняя ошибка сервера:"
 
 # app
 CustomAppStoreFileValid: "Пакет магазина приложений должен быть в формате .tar.gz"

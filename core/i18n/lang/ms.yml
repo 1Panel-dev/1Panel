@@ -30,6 +30,7 @@ ErrGroupIsDefault: "Kumpulan lalai tidak boleh dihapuskan"
 ErrGroupIsInUse: "Kumpulan sedang digunakan dan tidak boleh dipadam."
 ErrLocalDelete: "Nod tempatan tidak boleh dihapuskan!"
 ErrPortInUsed: "Port {{ .name }} telah digunakan!"
+ErrInternalServerKey: "Ralat dalaman pelayan:"
 
 # app
 CustomAppStoreFileValid: "Pakej stor aplikasi perlu dalam format .tar.gz"
