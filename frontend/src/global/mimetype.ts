@@ -169,24 +169,12 @@ export const DNSTypes = [
         value: 'HuaweiCloud',
     },
     {
-        label: i18n.global.t('website.volcengine'),
-        value: 'Volcengine',
-    },
-    {
-        label: 'DNSPod (' + i18n.global.t('ssl.deprecated') + ')',
-        value: 'DnsPod',
+        label: 'GoDaddy',
+        value: 'Godaddy',
     },
     {
         label: 'Cloudflare',
         value: 'CloudFlare',
-    },
-    {
-        label: 'CloudDNS',
-        value: 'CloudDns',
-    },
-    {
-        label: 'ClouDNS',
-        value: 'ClouDNS',
     },
     {
         label: 'NameSilo',
@@ -197,12 +185,16 @@ export const DNSTypes = [
         value: 'NameCheap',
     },
     {
-        label: 'Name.com',
-        value: 'NameCom',
+        label: 'CloudDNS',
+        value: 'CloudDns',
     },
     {
-        label: 'GoDaddy',
-        value: 'Godaddy',
+        label: 'ClouDNS',
+        value: 'ClouDNS',
+    },
+    {
+        label: 'Name.com',
+        value: 'NameCom',
     },
     {
         label: 'FreeMyIP',
@@ -215,6 +207,14 @@ export const DNSTypes = [
     {
         label: i18n.global.t('website.westCN'),
         value: 'WestCN',
+    },
+    {
+        label: i18n.global.t('website.volcengine'),
+        value: 'Volcengine',
+    },
+    {
+        label: 'DNSPod (' + i18n.global.t('ssl.deprecated') + ')',
+        value: 'DnsPod',
     },
 ];
 
