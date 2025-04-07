@@ -71,6 +71,9 @@ const GlobalStore = defineStore({
             this.csrfToken = token;
         },
         updateLanguage(language: any) {
+            if (language === 'pt-BR') {
+                language = 'pt-br';
+            }
             this.language = language;
             localStorage.setItem('lang', language);
         },
