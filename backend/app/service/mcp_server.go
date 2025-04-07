@@ -118,8 +118,12 @@ func (m McpServerService) Update(req request.McpServerUpdate) error {
 	if err := files.NewFileOp().SaveFile(dockerComposePath, mcpServer.DockerCompose, 0644); err != nil {
 		return err
 	}
-	startMcp(mcpServer)
-	return syncMcpServerContainerStatus(mcpServer)
+	mcpServer.Status = constant.RuntimeStarting
+	if err := mcpServerRepo.Save(mcpServer); err != nil {
+		return err
+	}
+	go startMcp(mcpServer)
+	return nil
 }
 
 func (m McpServerService) Create(create request.McpServerCreate) error {
@@ -150,7 +154,7 @@ func (m McpServerService) Create(create request.McpServerCreate) error {
 		ContainerName: create.ContainerName,
 		Port:          create.Port,
 		Command:       create.Command,
-		Status:        constant.RuntimeNormal,
+		Status:        constant.RuntimeStarting,
 		BaseURL:       create.BaseURL,
 		SsePath:       create.SsePath,
 		Dir:           mcpDir,
@@ -175,9 +179,9 @@ func (m McpServerService) Create(create request.McpServerCreate) error {
 	if err := mcpServerRepo.Create(mcpServer); err != nil {
 		return err
 	}
-	startMcp(mcpServer)
 	addProxy(mcpServer)
-	return syncMcpServerContainerStatus(mcpServer)
+	go startMcp(mcpServer)
+	return nil
 }
 
 func (m McpServerService) Delete(id uint) error {
@@ -584,6 +588,7 @@ func startMcp(mcpServer *model.McpServer) {
 		mcpServer.Status = constant.RuntimeRunning
 		mcpServer.Message = ""
 	}
+	_ = syncMcpServerContainerStatus(mcpServer)
 }
 
 func syncMcpServerContainerStatus(mcpServer *model.McpServer) error {

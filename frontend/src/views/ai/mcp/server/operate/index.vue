@@ -65,7 +65,7 @@
                             </el-row>
                         </div>
                     </div>
-                    <Volumes :volumes="mcpServer.volumes" />
+                    <Volumes :volumes="mcpServer.volumes" class="mb-2" />
                     <el-row :gutter="20">
                         <el-col :span="6">
                             <el-form-item :label="$t('commons.table.port')" prop="port">

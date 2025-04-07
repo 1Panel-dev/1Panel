@@ -18,7 +18,7 @@
                         :label="$t('commons.table.name')"
                         fix
                         prop="name"
-                        min-width="120px"
+                        width="200px"
                         show-overflow-tooltip
                     >
                         <template #default="{ row }">
@@ -27,18 +27,13 @@
                             </el-text>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.port')" prop="port" max-width="50px">
-                        <template #default="{ row }">
-                            {{ row.port }}
-                        </template>
-                    </el-table-column>
                     <el-table-column :label="$t('mcp.externalUrl')" prop="baseUrl" min-width="200px">
                         <template #default="{ row }">
                             {{ row.baseUrl + row.ssePath }}
                             <CopyButton :content="row.baseUrl + row.ssePath" type="icon" />
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.status')" prop="status" max-width="50px">
+                    <el-table-column :label="$t('commons.table.status')" prop="status" width="100px">
                         <template #default="{ row }">
                             <el-popover
                                 v-if="row.status === 'error'"
@@ -57,7 +52,7 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.button.log')" prop="path" min-width="90px">
+                    <el-table-column :label="$t('commons.button.log')" prop="path" width="100px">
                         <template #default="{ row }">
                             <el-button
                                 @click="openLog(row)"
@@ -74,12 +69,12 @@
                         :label="$t('commons.table.date')"
                         :formatter="dateFormat"
                         show-overflow-tooltip
-                        min-width="120"
+                        width="180"
                         fix
                     />
                     <fu-table-operations
                         :ellipsis="mobile ? 0 : 10"
-                        :min-width="mobile ? 'auto' : 400"
+                        :min-width="mobile ? 'auto' : 300"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         fixed="right"
@@ -92,6 +87,7 @@
         <OpDialog ref="opRef" @search="search" />
         <ComposeLogs ref="composeLogRef" />
         <BindDomain ref="bindDomainRef" @close="searchWithTimeOut" />
+        <Config ref="configRef" />
     </div>
 </template>
 
@@ -107,6 +103,7 @@ import { GlobalStore } from '@/store';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import BindDomain from './bind/index.vue';
+import Config from './config/index.vue';
 const globalStore = GlobalStore();
 
 const loading = ref(false);
@@ -114,6 +111,7 @@ const createRef = ref();
 const opRef = ref();
 const composeLogRef = ref();
 const bindDomainRef = ref();
+const configRef = ref();
 const items = ref<AI.McpServer[]>([]);
 const paginationConfig = reactive({
     cacheSizeKey: 'mcp-server-page-size',
@@ -126,6 +124,12 @@ const mobile = computed(() => {
 });
 
 const buttons = [
+    {
+        label: i18n.global.t('menu.config'),
+        click: (row: AI.McpServer) => {
+            openConfig(row);
+        },
+    },
     {
         label: i18n.global.t('commons.button.edit'),
         click: (row: AI.McpServer) => {
@@ -239,6 +243,10 @@ const opServer = async (row: AI.McpServer, operate: string) => {
 
 const openDomain = () => {
     bindDomainRef.value.acceptParams();
+};
+
+const openConfig = (row: AI.McpServer) => {
+    configRef.value.acceptParams(row);
 };
 
 onMounted(() => {
