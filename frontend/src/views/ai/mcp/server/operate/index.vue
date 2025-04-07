@@ -82,8 +82,15 @@
                             </el-form-item>
                         </el-col>
                     </el-row>
-                    <el-form-item :label="$t('mcp.baseUrl')" prop="baseUrl">
-                        <el-input v-model.trim="mcpServer.baseUrl"></el-input>
+                    <el-form-item :label="$t('mcp.baseUrl')" prop="url">
+                        <el-input v-model.trim="mcpServer.url">
+                            <template #prepend>
+                                <el-select v-model="mcpServer.protocol" class="pre-select">
+                                    <el-option label="http" value="http://" />
+                                    <el-option label="https" value="https://" />
+                                </el-select>
+                            </template>
+                        </el-input>
                         <span class="input-help">
                             {{ $t('mcp.baseUrlHelper') }}
                         </span>
@@ -142,6 +149,8 @@ const newMcpServer = () => {
         environments: [],
         volumes: [],
         hostIP: '127.0.0.1',
+        protocol: 'http://',
+        url: '',
     };
 };
 const em = defineEmits(['close']);
@@ -151,7 +160,7 @@ const rules = ref({
     command: [Rules.requiredInput],
     port: [Rules.requiredInput, Rules.port],
     containerName: [Rules.requiredInput],
-    baseUrl: [Rules.requiredInput],
+    url: [Rules.requiredInput],
     ssePath: [Rules.requiredInput],
     key: [Rules.requiredInput],
     value: [Rules.requiredInput],
@@ -167,6 +176,9 @@ const acceptParams = async (params: AI.McpServer) => {
         if (!mcpServer.value.volumes) {
             mcpServer.value.volumes = [];
         }
+        const parts = mcpServer.value.baseUrl.split(/(https?:\/\/)/).filter(Boolean);
+        mcpServer.value.protocol = parts[0];
+        mcpServer.value.url = parts[1];
     } else {
         mcpServer.value = newMcpServer();
         if (params.port) {
@@ -174,7 +186,12 @@ const acceptParams = async (params: AI.McpServer) => {
         }
         try {
             const res = await getMcpDomain();
-            mcpServer.value.baseUrl = res.data.connUrl;
+            if (res.data.connUrl != '') {
+                const parts = res.data.connUrl.split(/(https?:\/\/)/).filter(Boolean);
+                mcpServer.value.protocol = parts[0];
+                mcpServer.value.url = parts[1];
+                mcpServer.value.baseUrl = res.data.connUrl;
+            }
         } catch (error) {
             MsgError(error);
         }
@@ -229,6 +246,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         }
         try {
             loading.value = true;
+            mcpServer.value.baseUrl = mcpServer.value.protocol + mcpServer.value.url;
             if (mode.value == 'create') {
                 await createMcpServer(mcpServer.value);
                 MsgSuccess(i18n.global.t('commons.msg.createSuccess'));

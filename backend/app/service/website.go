@@ -498,7 +498,7 @@ func (w WebsiteService) DeleteWebsite(req request.WebsiteDelete) error {
 	}
 	websiteID := GetWebsiteID()
 	if req.ID == websiteID {
-		_ = settingRepo.UpdateOrCreate("MCP_WEBSITE_ID", "0")
+		_ = settingRepo.Update("MCP_WEBSITE_ID", "0")
 	}
 	tx.Commit()
 

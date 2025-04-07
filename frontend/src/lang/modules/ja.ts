@@ -2579,7 +2579,7 @@ const message = {
         edit: 'サーバーを編集',
         commandHelper: '例: npx -y {0}',
         baseUrl: '外部アクセスパス',
-        baseUrlHelper: '例: https://127.0.0.1:8080',
+        baseUrlHelper: '例: http://192.168.1.2:8000',
         ssePath: 'SSE パス',
         ssePathHelper: '例: /sse, 他のサーバーと重複しないように注意してください',
         environment: '環境変数',

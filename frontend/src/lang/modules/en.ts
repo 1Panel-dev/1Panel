@@ -2609,7 +2609,7 @@ const message = {
         edit: 'Edit MCP Server',
         commandHelper: 'For example: npx -y {0}',
         baseUrl: 'External Access Path',
-        baseUrlHelper: 'For example: https://127.0.0.1:8080',
+        baseUrlHelper: 'For example: http://192.168.1.2:8000',
         ssePath: 'SSE Path',
         ssePathHelper: 'For example: /sse, note not to duplicate with other servers',
         environment: 'Environment Variables',

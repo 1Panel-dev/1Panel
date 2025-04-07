@@ -2637,7 +2637,7 @@ const message = {
         edit: 'Edit Pelayan',
         commandHelper: 'Contoh: npx -y {0}',
         baseUrl: 'Laluan Akses Luar',
-        baseUrlHelper: 'Contoh: https://127.0.0.1:8080',
+        baseUrlHelper: 'Contoh: http://192.168.1.2:8000',
         ssePath: 'Laluan SSE',
         ssePathHelper: 'Contoh: /sse, berhati-hati jangan bertindan dengan pelayan lain',
         environment: 'Pemboleh Ubah Persekitaran',

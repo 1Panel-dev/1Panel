@@ -2446,7 +2446,7 @@ const message = {
         edit: '编辑 MCP Server',
         commandHelper: '例如：npx -y {0}',
         baseUrl: '外部访问路径',
-        baseUrlHelper: '例如：https://127.0.0.1:8080',
+        baseUrlHelper: '例如：http://192.168.1.1:8000',
         ssePath: 'SSE 路径',
         ssePathHelper: '例如：/sse,注意不要与其他 Server 重复',
         environment: '环境变量',

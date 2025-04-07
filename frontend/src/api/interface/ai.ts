@@ -135,6 +135,8 @@ export namespace AI {
         volumes: Volume[];
         dir?: string;
         hostIP: string;
+        protocol: string;
+        url: string;
     }
 
     export interface McpServerSearch extends ReqPage {

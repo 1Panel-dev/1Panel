@@ -2635,7 +2635,7 @@ const message = {
         edit: 'Editar Servidor',
         commandHelper: 'Por exemplo: npx -y {0}',
         baseUrl: 'Caminho de Acesso Externo',
-        baseUrlHelper: 'Por exemplo: https://127.0.0.1:8080',
+        baseUrlHelper: 'Por exemplo: http://192.168.1.2:8000',
         ssePath: 'Caminho SSE',
         ssePathHelper: 'Por exemplo: /sse, tome cuidado para não duplicar com outros servidores',
         environment: 'Variáveis de Ambiente',

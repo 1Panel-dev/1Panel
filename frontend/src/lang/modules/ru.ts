@@ -2631,7 +2631,7 @@ const message = {
         edit: 'Редактировать сервер',
         commandHelper: 'Например: npx -y {0}',
         baseUrl: 'Внешний путь доступа',
-        baseUrlHelper: 'Например: https://127.0.0.1:8080',
+        baseUrlHelper: 'Например: http://192.168.1.2:8000',
         ssePath: 'Путь SSE',
         ssePathHelper: 'Например: /sse, будьте осторожны, чтобы не дублировать с другими серверами',
         environment: 'Переменные среды',

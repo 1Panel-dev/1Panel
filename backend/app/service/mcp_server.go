@@ -238,7 +238,7 @@ func (m McpServerService) GetBindDomain() (response.McpBindDomainRes, error) {
 	}
 	website, err := websiteRepo.GetFirst(commonRepo.WithByID(websiteID))
 	if err != nil {
-		return res, err
+		return res, nil
 	}
 	res.WebsiteID = website.ID
 	res.Domain = website.PrimaryDomain
