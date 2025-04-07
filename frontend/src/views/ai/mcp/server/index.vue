@@ -1,7 +1,7 @@
 <template>
     <div>
         <RouterMenu />
-        <LayoutContent :title="$t('container.server')" v-loading="loading">
+        <LayoutContent :title="'Servers'" v-loading="loading">
             <template #toolbar>
                 <div class="flex flex-wrap gap-3">
                     <el-button type="primary" @click="openCreate">
@@ -189,7 +189,10 @@ const openDetail = (row: AI.McpServer) => {
 };
 
 const openCreate = () => {
-    const maxPort = Math.max(...items.value.map((item) => item.port));
+    let maxPort = 8000;
+    if (items.value && items.value.length > 0) {
+        maxPort = Math.max(...items.value.map((item) => item.port));
+    }
     createRef.value.acceptParams({ port: maxPort + 1 });
 };
 

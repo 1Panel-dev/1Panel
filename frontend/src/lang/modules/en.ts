@@ -2605,8 +2605,8 @@ const message = {
     },
     mcp: {
         server: 'MCP Server',
-        create: 'Add Server',
-        edit: 'Edit Server',
+        create: 'Add MCP Server',
+        edit: 'Edit MCP Server',
         commandHelper: 'For example: npx -y {0}',
         baseUrl: 'External Access Path',
         baseUrlHelper: 'For example: https://127.0.0.1:8080',
