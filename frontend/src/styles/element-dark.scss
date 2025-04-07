@@ -177,6 +177,9 @@ html.dark {
         background-color: var(--panel-main-bg-color-1);
         transition: background-color 1000s ease-out 0.5s;
     }
+    .el-form-item .el-input__inner:-webkit-autofill {
+        -webkit-text-fill-color: var(--el-text-color-regular) !important;
+    }
 
     .el-input.is-disabled .el-input__wrapper {
         --el-disabled-bg-color: var(--panel-main-bg-color-9);
