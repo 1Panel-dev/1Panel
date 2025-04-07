@@ -411,8 +411,7 @@ const getSetting = async () => {
         i18n.warnHtmlMessage = false;
         globalStore.setOpenMenuTabs(res.data.menuTabs === 'Enable');
         globalStore.updateLanguage(res.data.language);
-        let theme = globalStore.themeConfig.theme === res.data.theme ? res.data.theme : globalStore.themeConfig.theme;
-        globalStore.setThemeConfig({ ...themeConfig.value, theme: theme, panelName: res.data.panelName });
+        globalStore.setThemeConfig({ ...themeConfig.value, theme: res.data.theme, panelName: res.data.panelName });
     } catch (error) {}
 };
 

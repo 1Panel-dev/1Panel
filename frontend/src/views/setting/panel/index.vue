@@ -327,6 +327,7 @@ const search = async () => {
     form.apiKeyValidityTime = res.data.apiKeyValidityTime;
     form.hideMenu = res.data.hideMenu;
     form.systemIP = res.data.systemIP;
+    form.theme = res.data.theme;
 
     if (isMasterProductPro.value) {
         const xpackRes = await getXpackSetting();
@@ -340,7 +341,7 @@ const search = async () => {
             form.proxyDocker = xpackRes.data.proxyDocker;
         }
     } else {
-        form.theme = globalStore.themeConfig.theme || res.data.theme || 'light';
+        globalStore.themeConfig.theme = form.theme;
     }
 };
 
