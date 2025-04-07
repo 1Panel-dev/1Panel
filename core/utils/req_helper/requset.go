@@ -87,6 +87,7 @@ func handleGetWithTransport(url string, transport *http.Transport) (*http.Respon
 		Timeout: time.Second * 300,
 	}
 	client.Transport = transport
+	defer client.CloseIdleConnections()
 
 	req, err := http.NewRequestWithContext(context.Background(), "GET", url, nil)
 	if err != nil {

@@ -30,6 +30,7 @@ func PostLocalCore(url string) error {
 		return err
 	}
 	client := &http.Client{}
+	defer client.CloseIdleConnections()
 	resp, err := client.Do(req)
 	if err != nil {
 		return err

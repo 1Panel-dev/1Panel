@@ -403,6 +403,7 @@ func (a aliClient) uploadPart(uri string, reader io.Reader) error {
 		return err
 	}
 	client := &http.Client{}
+	defer client.CloseIdleConnections()
 	response, err := client.Do(req)
 	if err != nil {
 		return err
@@ -428,6 +429,7 @@ func (a aliClient) handleDownload(uri string, target string) error {
 	req.Header.Add("origin", "https://www.aliyundrive.com")
 	req.Header.Add("referer", "https://www.aliyundrive.com/")
 	client := &http.Client{}
+	defer client.CloseIdleConnections()
 	response, err := client.Do(req)
 	if err != nil {
 		return err

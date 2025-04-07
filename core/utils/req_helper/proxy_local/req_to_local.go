@@ -5,14 +5,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/core/app/dto"
-	"github.com/1Panel-dev/1Panel/core/i18n"
 	"io"
 	"net"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/core/app/dto"
+	"github.com/1Panel-dev/1Panel/core/i18n"
 )
 
 func NewLocalClient(reqUrl, reqMethod string, body io.Reader) (interface{}, error) {
@@ -31,6 +32,7 @@ func NewLocalClient(reqUrl, reqMethod string, body io.Reader) (interface{}, erro
 	client := &http.Client{
 		Transport: transport,
 	}
+	defer client.CloseIdleConnections()
 	parsedURL, err := url.Parse("http://unix")
 	if err != nil {
 		return nil, fmt.Errorf("handle url Parse failed, err: %v \n", err)

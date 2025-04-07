@@ -274,6 +274,7 @@ func (f FileOp) DownloadFileWithProcess(url, dst, key string, ignoreCertificate 
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}
 	}
+	defer client.CloseIdleConnections()
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil

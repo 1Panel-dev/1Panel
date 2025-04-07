@@ -301,6 +301,7 @@ func (a aliClient) uploadPart(uri string, reader io.Reader) error {
 		return err
 	}
 	client := &http.Client{}
+	defer client.CloseIdleConnections()
 	response, err := client.Do(req)
 	if err != nil {
 		return err

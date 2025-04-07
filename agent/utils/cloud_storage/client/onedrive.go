@@ -213,6 +213,7 @@ func RefreshToken(grantType string, tokenType string, varMap map[string]interfac
 	}
 	data.Set("redirect_uri", loadParamFromVars("redirect_uri", varMap))
 	client := &http.Client{}
+	defer client.CloseIdleConnections()
 	url := "https://login.microsoftonline.com/common/oauth2/v2.0/token"
 	if isCN == "true" {
 		url = "https://login.chinacloudapi.cn/common/oauth2/v2.0/token"

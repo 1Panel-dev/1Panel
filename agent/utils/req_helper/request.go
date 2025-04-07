@@ -19,6 +19,7 @@ func HandleGet(url string) (*http.Response, error) {
 		Timeout: time.Second * 300,
 	}
 	client.Transport = loadRequestTransport()
+	defer client.CloseIdleConnections()
 
 	req, err := http.NewRequestWithContext(context.Background(), "GET", url, nil)
 	if err != nil {

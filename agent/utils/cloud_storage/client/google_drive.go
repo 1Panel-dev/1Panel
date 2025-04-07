@@ -226,6 +226,7 @@ func (g *googleDriveClient) handleDownload(urlItem string, target string) error 
 			Proxy: http.ProxyURL(proxyURL),
 		},
 	}
+	defer client.CloseIdleConnections()
 	response, err := client.Do(req)
 	if err != nil {
 		return err

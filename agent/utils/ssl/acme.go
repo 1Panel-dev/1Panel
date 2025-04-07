@@ -181,6 +181,7 @@ func getZeroSSLEabCredentials(email string) (*zeroSSLRes, error) {
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
+	defer client.CloseIdleConnections()
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
