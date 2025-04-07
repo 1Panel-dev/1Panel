@@ -9,7 +9,20 @@
         <template #header>
             <DrawerHeader :header="$t('menu.config')" :back="handleClose" />
         </template>
-        <el-input type="textarea" :autosize="{ minRows: 10, maxRows: 20 }" v-model="prettyJson" readonly />
+        <codemirror
+            :autofocus="true"
+            :placeholder="$t('commons.msg.noneData')"
+            :indent-with-tab="true"
+            :tabSize="4"
+            style="height: 300px"
+            :lineWrapping="true"
+            :matchBrackets="true"
+            theme="cobalt"
+            :styleActiveLine="true"
+            :extensions="extensions"
+            v-model="prettyJson"
+            :disabled="true"
+        />
         <CopyButton :content="prettyJson" class="mt-2" />
         <template #footer>
             <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
@@ -20,6 +33,11 @@
 <script lang="ts" setup>
 import { AI } from '@/api/interface/ai';
 import { ref } from 'vue';
+import { Codemirror } from 'vue-codemirror';
+import { javascript } from '@codemirror/lang-javascript';
+import { oneDark } from '@codemirror/theme-one-dark';
+
+const extensions = [javascript(), oneDark];
 
 const open = ref(false);
 const jsonObj = ref({
@@ -35,13 +53,7 @@ const acceptParams = (mcpServer: AI.McpServer) => {
     jsonObj.value.mcpServers[mcpServer.name] = {
         url: mcpServer.baseUrl + mcpServer.ssePath,
     };
-    if (mcpServer.environments) {
-        jsonObj.value.mcpServers[mcpServer.name].env = {};
-        for (const env of mcpServer.environments) {
-            jsonObj.value.mcpServers[mcpServer.name].env[env.key] = env.value;
-        }
-    }
-    prettyJson.value = JSON.stringify(jsonObj.value, null, 4);
+    prettyJson.value = JSON.stringify(jsonObj.value, null, 2);
     open.value = true;
 };
 
