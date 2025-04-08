@@ -410,11 +410,20 @@ func (b *BaseApi) CheckFile(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	if _, err := os.Stat(req.Path); err != nil {
-		helper.SuccessWithData(c, false)
+	fileOp := files.NewFileOp()
+	if fileOp.Stat(req.Path) {
+		helper.SuccessWithData(c, true)
 		return
 	}
-	helper.SuccessWithData(c, true)
+	if req.WithInit {
+		if err := fileOp.CreateDir(req.Path, 0644); err != nil {
+			helper.SuccessWithData(c, false)
+			return
+		}
+		helper.SuccessWithData(c, true)
+		return
+	}
+	helper.SuccessWithData(c, false)
 }
 
 // @Tags File

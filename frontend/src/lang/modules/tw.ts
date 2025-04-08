@@ -1319,6 +1319,7 @@ const message = {
         existFileHelper: '上傳的檔案存在同名檔案，是否覆蓋？',
         existFileSize: '文件大小（新->舊）',
         existFileDirHelper: '選擇的檔案/資料夾存在同名，請謹慎操作！',
+        noSuchFile: '找不到該檔案或目錄，請檢查後重試。',
     },
     ssh: {
         setting: '設定',

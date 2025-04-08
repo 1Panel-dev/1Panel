@@ -60,8 +60,9 @@ import DrawerHeader from '@/components/drawer-header/index.vue';
 import { snapshotImport } from '@/api/modules/setting';
 import { getBackupList, getFilesFromBackup } from '@/api/modules/setting';
 import { Rules } from '@/global/form-rules';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import router from '@/routers';
+import { CheckFile } from '@/api/modules/files';
 
 const drawerVisible = ref(false);
 const loading = ref();
@@ -109,7 +110,12 @@ const checkDisable = (val: string) => {
     return false;
 };
 const toFolder = async () => {
-    router.push({ path: '/hosts/files', query: { path: backupPath.value } });
+    const res = await CheckFile(backupPath.value, true);
+    if (res.data) {
+        router.push({ path: '/hosts/files', query: { path: backupPath.value } });
+    } else {
+        MsgError(i18n.global.t('file.noSuchFile'));
+    }
 };
 
 const submitImport = async (formEl: FormInstance | undefined) => {

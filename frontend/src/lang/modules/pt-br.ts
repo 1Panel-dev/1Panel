@@ -1393,6 +1393,7 @@ const message = {
         existFileHelper: 'O arquivo enviado contém um arquivo com o mesmo nome. Deseja substituí-lo?',
         existFileSize: 'Tamanho do arquivo (novo -> antigo)',
         existFileDirHelper: 'O arquivo/pasta selecionado tem um nome duplicado. Por favor, prossiga com cautela!',
+        noSuchFile: 'O arquivo ou diretório não foi encontrado. Por favor, verifique e tente novamente.',
     },
     ssh: {
         setting: 'configuração',
