@@ -165,8 +165,10 @@ const rules = ref({
     key: [Rules.requiredInput],
     value: [Rules.requiredInput],
 });
+const hasWebsite = ref(false);
 
 const acceptParams = async (params: AI.McpServer) => {
+    hasWebsite.value = false;
     mode.value = params.id ? 'edit' : 'create';
     if (mode.value == 'edit') {
         mcpServer.value = params;
@@ -191,6 +193,7 @@ const acceptParams = async (params: AI.McpServer) => {
                 mcpServer.value.protocol = parts[0];
                 mcpServer.value.url = parts[1];
                 mcpServer.value.baseUrl = res.data.connUrl;
+                hasWebsite.value = true;
             }
         } catch (error) {
             MsgError(error);
@@ -242,6 +245,18 @@ const submit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     await formEl.validate(async (valid) => {
         if (!valid) {
+            return;
+        }
+        let request = true;
+        if (!hasWebsite.value) {
+            await ElMessageBox.confirm(i18n.global.t('app.installWarn'), i18n.global.t('app.checkTitle'), {
+                confirmButtonText: i18n.global.t('commons.button.confirm'),
+                cancelButtonText: i18n.global.t('commons.button.cancel'),
+            }).catch(() => {
+                request = false;
+            });
+        }
+        if (!request) {
             return;
         }
         try {

@@ -59,7 +59,7 @@ const onConfirm = async () => {
         mcpServerConfig.value = Object.entries(data.mcpServers).map(([name, config]: any) => ({
             name,
             command: [config.command, ...config.args].join(' '),
-            environments: data.env ? Object.entries(data.env).map(([key, value]) => ({ key, value })) : [],
+            environments: config.env ? Object.entries(config.env).map(([key, value]) => ({ key, value })) : [],
             ssePath: '/' + name,
             containerName: name,
         }));
