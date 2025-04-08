@@ -2458,6 +2458,7 @@ const message = {
         commandPlaceHolder: '當前僅支持 npx 和二進制啟動的命令',
         importMcpJson: '導入 MCP Server配置',
         importMcpJsonError: 'mcpServers 結構不正確',
+        bindDomainHelper: '綁定網站之後會修改所有已安裝 MCP Server 的訪問地址，並關閉端口的外部訪問',
     },
 };
 export default {

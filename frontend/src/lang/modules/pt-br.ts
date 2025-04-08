@@ -2649,6 +2649,8 @@ const message = {
         commandPlaceHolder: 'Atualmente, apenas comandos iniciados com npx e binário são suportados',
         importMcpJson: 'Importar Configuração do Servidor MCP',
         importMcpJsonError: 'A estrutura mcpServers está incorreta',
+        bindDomainHelper:
+            'Após vincular o site, ele modificará o endereço de acesso de todos os servidores MCP instalados e fechará o acesso externo às portas',
     },
 };
 

@@ -2651,6 +2651,8 @@ const message = {
         commandPlaceHolder: 'Kini hanya menyokong perintah yang bermula dengan npx dan binari',
         importMcpJson: 'Import Konfigurasi Pelayan MCP',
         importMcpJsonError: 'Struktur mcpServers tidak betul',
+        bindDomainHelper:
+            'Setelah mengikat laman web, ia akan mengubah alamat akses semua Pelayan MCP yang dipasang dan menutup akses luaran ke pelabuhan',
     },
 };
 

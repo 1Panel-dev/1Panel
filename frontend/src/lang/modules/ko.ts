@@ -2552,6 +2552,8 @@ const message = {
         commandPlaceHolder: '現在、npx およびバイナリ起動のコマンドのみをサポートしています',
         importMcpJson: 'MCP サーバー設定をインポート',
         importMcpJsonError: 'mcpServers 構造が正しくありません',
+        bindDomainHelper:
+            '웹사이트를 바인딩한 후, 설치된 모든 MCP 서버의 접근 주소를 수정하고 포트의 외부 접근을 닫습니다',
     },
 };
 

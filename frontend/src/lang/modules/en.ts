@@ -2623,6 +2623,8 @@ const message = {
         commandPlaceHolder: 'Currently only supports commands started with npx and binary',
         importMcpJson: 'Import MCP Server Configuration',
         importMcpJsonError: 'mcpServers structure is incorrect',
+        bindDomainHelper:
+            'After binding the website, it will modify the access address of all installed MCP Servers and close external access to the ports',
     },
 };
 

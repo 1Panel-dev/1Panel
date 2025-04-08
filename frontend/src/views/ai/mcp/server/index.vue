@@ -101,7 +101,7 @@ import McpServerOperate from './operate/index.vue';
 import ComposeLogs from '@/components/compose-log/index.vue';
 import { GlobalStore } from '@/store';
 import i18n from '@/lang';
-import { MsgError, MsgSuccess } from '@/utils/message';
+import { MsgSuccess } from '@/utils/message';
 import BindDomain from './bind/index.vue';
 import Config from './config/index.vue';
 const globalStore = GlobalStore();
@@ -193,7 +193,7 @@ const openDetail = (row: AI.McpServer) => {
 };
 
 const openCreate = () => {
-    let maxPort = 8000;
+    let maxPort = 7999;
     if (items.value && items.value.length > 0) {
         maxPort = Math.max(...items.value.map((item) => item.port));
     }
@@ -216,9 +216,7 @@ const deleteServer = async (row: AI.McpServer) => {
             api: deleteMcpServer,
             params: { id: row.id },
         });
-    } catch (error) {
-        MsgError(error);
-    }
+    } catch (error) {}
 };
 
 const opServer = async (row: AI.McpServer, operate: string) => {
@@ -235,9 +233,7 @@ const opServer = async (row: AI.McpServer, operate: string) => {
             await operateMcpServer({ id: row.id, operate: operate });
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             search();
-        } catch (error) {
-            MsgError(error);
-        }
+        } catch (error) {}
     });
 };
 

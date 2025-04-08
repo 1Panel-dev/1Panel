@@ -37,7 +37,6 @@
 
 <script lang="ts" setup>
 import i18n from '@/lang';
-import { MsgError } from '@/utils/message';
 import { ref } from 'vue';
 
 const submitVisible = ref(false);
@@ -64,7 +63,6 @@ const onConfirm = async () => {
             containerName: name,
         }));
     } catch (error) {
-        MsgError(error);
         return;
     }
     emit('confirm', mcpServerConfig.value);

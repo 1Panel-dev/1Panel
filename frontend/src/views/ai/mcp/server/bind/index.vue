@@ -38,6 +38,7 @@
                                     {{ $t('firewall.quickJump') }}
                                 </el-link>
                             </span>
+                            <el-text type="danger">{{ $t('mcp.bindDomainHelper') }}</el-text>
                         </el-form-item>
                         <el-form-item :label="$t('xpack.waf.whiteList') + ' IP'" prop="ipList">
                             <el-input

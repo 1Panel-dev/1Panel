@@ -2593,6 +2593,8 @@ const message = {
         commandPlaceHolder: '現在、npx およびバイナリ起動のコマンドのみをサポートしています',
         importMcpJson: 'MCP サーバー設定をインポート',
         importMcpJsonError: 'mcpServers 構造が正しくありません',
+        bindDomainHelper:
+            'ウェブサイトをバインドした後、インストールされたすべての MCP サーバーのアクセスアドレスを変更し、ポートへの外部アクセスを閉じます',
     },
 };
 export default {

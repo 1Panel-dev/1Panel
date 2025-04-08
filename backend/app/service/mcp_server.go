@@ -387,6 +387,7 @@ func updateMcpConfig(websiteID uint) {
 	for _, server := range servers {
 		if server.BaseURL != baseUrl {
 			server.BaseURL = baseUrl
+			server.HostIP = "127.0.0.1"
 			go updateMcpServer(&server)
 		}
 	}
@@ -484,6 +485,7 @@ func addMCPProxy(websiteID uint) error {
 			return buserr.WithErr(constant.ErrUpdateBuWebsite, err)
 		}
 		server.BaseURL = baseUrl
+		server.HostIP = "127.0.0.1"
 		go updateMcpServer(&server)
 	}
 	nginxInclude := fmt.Sprintf("/www/sites/%s/proxy/*.conf", website.Alias)

@@ -67,7 +67,7 @@
                     </div>
                     <Volumes :volumes="mcpServer.volumes" class="mb-2" />
                     <el-row :gutter="20">
-                        <el-col :span="6">
+                        <el-col :span="8">
                             <el-form-item :label="$t('commons.table.port')" prop="port">
                                 <el-input v-model.number="mcpServer.port" />
                             </el-form-item>
@@ -124,7 +124,7 @@ import { AI } from '@/api/interface/ai';
 import { createMcpServer, getMcpDomain, updateMcpServer } from '@/api/modules/ai';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
-import { MsgError, MsgSuccess } from '@/utils/message';
+import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { ref, watch } from 'vue';
 import Volumes from '../volume/index.vue';
@@ -195,9 +195,7 @@ const acceptParams = async (params: AI.McpServer) => {
                 mcpServer.value.baseUrl = res.data.connUrl;
                 hasWebsite.value = true;
             }
-        } catch (error) {
-            MsgError(error);
-        }
+        } catch (error) {}
     }
     open.value = true;
 };
@@ -248,7 +246,7 @@ const submit = async (formEl: FormInstance | undefined) => {
             return;
         }
         let request = true;
-        if (!hasWebsite.value) {
+        if (mcpServer.value.hostIP != '0.0.0.0' && !hasWebsite.value) {
             await ElMessageBox.confirm(i18n.global.t('app.installWarn'), i18n.global.t('app.checkTitle'), {
                 confirmButtonText: i18n.global.t('commons.button.confirm'),
                 cancelButtonText: i18n.global.t('commons.button.cancel'),
@@ -270,8 +268,6 @@ const submit = async (formEl: FormInstance | undefined) => {
                 MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
             }
             handleClose();
-        } catch (error) {
-            MsgError(error);
         } finally {
             loading.value = false;
         }
