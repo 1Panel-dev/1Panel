@@ -1,8 +1,13 @@
 <template>
     <div v-loading="loading">
-        <docker-status v-model:isActive="isActive" v-model:loading="loading" @search="search" />
+        <docker-status
+            v-model:isActive="isActive"
+            v-model:isExist="isExist"
+            v-model:loading="loading"
+            @search="search"
+        />
 
-        <LayoutContent :title="$t('container.repo')" :class="{ mask: !isActive }">
+        <LayoutContent v-if="isExist" :title="$t('container.repo')" :class="{ mask: !isActive }">
             <template #leftToolBar>
                 <el-button type="primary" @click="onOpenDialog('add')">
                     {{ $t('container.createRepo') }}
@@ -75,9 +80,10 @@ const searchName = ref();
 const opRef = ref();
 
 const isActive = ref();
+const isExist = ref();
 
 const search = async () => {
-    if (!isActive.value) {
+    if (!isActive.value || !isExist.value) {
         return;
     }
     let params = {

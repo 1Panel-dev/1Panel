@@ -335,6 +335,10 @@ export namespace Container {
     export interface DaemonJsonUpdateByFile {
         file: string;
     }
+    export interface DockerStatus {
+        isActive: boolean;
+        isExist: boolean;
+    }
     export interface DaemonJsonConf {
         isSwarm: boolean;
         isExist: boolean;

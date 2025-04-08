@@ -1024,6 +1024,8 @@ const message = {
             groupHelper:
                 'Defina grupos diferentes com base nas características do script, o que permite operações de filtragem de scripts mais rápidas.',
             handleHelper: 'Executar o script {1} em {0}, continuar?',
+            noSuchApp:
+                'O serviço {0} não foi detectado. Por favor, instale-o rapidamente usando a biblioteca de scripts primeiro!',
         },
     },
     monitor: {
@@ -1149,7 +1151,6 @@ const message = {
     fail2ban: {
         sshPort: 'Porta de escuta do SSH',
         sshPortHelper: 'O Fail2ban atual escuta a porta de conexão SSH do host',
-        noFail2ban: `O serviço Fail2ban não foi detectado. Consulte a documentação oficial para instalá-lo.`,
         unActive: `O serviço Fail2ban não está ativado no momento.`,
         operation: 'Você realizará a operação "{0}" no serviço Fail2ban. Deseja continuar?',
         fail2banChange: 'Modificação da configuração do Fail2ban',
@@ -1172,7 +1173,6 @@ const message = {
     ftp: {
         ftp: 'Conta FTP | Contas FTP',
         notStart: 'O serviço FTP não está em execução, por favor, inicie-o primeiro!',
-        noFtp: `O serviço FTP (pure-ftpd) não foi detectado. Consulte a documentação oficial para instalá-lo.`,
         operation: 'Isso realizará a operação "{0}" no serviço FTP. Deseja continuar?',
         noPasswdMsg: 'Não foi possível obter a senha atual da conta FTP, por favor, defina a senha e tente novamente!',
         enableHelper: 'Ativar a conta FTP selecionada restaurará suas permissões de acesso. Deseja continuar?',
@@ -1192,7 +1192,6 @@ const message = {
         hideFresh: 'Ocultar serviço de atualização de assinaturas',
         clamHelper:
             'A configuração mínima recomendada para o ClamAV é: 3 GiB de RAM ou mais, CPU de 1 núcleo com 2.0 GHz ou superior, e pelo menos 5 GiB de espaço livre no disco rígido.',
-        noClam: 'Serviço ClamAV não detectado, consulte a documentação oficial para instalação!',
         notStart: 'O serviço ClamAV não está em execução, por favor, inicie-o primeiro!',
         removeRecord: 'Excluir arquivos de relatório',
         noRecords: 'Clique no botão "Acionar" para iniciar o scan e você verá registros aqui.',
@@ -2477,8 +2476,6 @@ const message = {
     firewall: {
         create: 'Criar regra',
         edit: 'Editar regra',
-        notSupport:
-            'Nenhum firewall do sistema detectado (firewalld ou ufw). Consulte a documentação oficial para instalação.',
         ccDeny: 'Proteção contra CC',
         ipWhiteList: 'Lista de IPs permitidos',
         ipBlockList: 'Lista de IPs bloqueados',

@@ -25,8 +25,8 @@ type IDockerService interface {
 	UpdateLogOption(req dto.LogOption) error
 	UpdateIpv6Option(req dto.Ipv6Option) error
 	UpdateConfByFile(info dto.DaemonJsonUpdateByFile) error
-	LoadDockerStatus() string
-	LoadDockerConf() *dto.DaemonJsonConf
+	LoadDockerStatus() *dto.DockerStatus
+	LoadDockerConf() (*dto.DaemonJsonConf, error)
 	OperateDocker(req dto.DockerOperation) error
 }
 
@@ -52,42 +52,42 @@ type logOption struct {
 	LogMaxFile string `json:"max-file"`
 }
 
-func (u *DockerService) LoadDockerStatus() string {
-	client, err := docker.NewDockerClient()
-	if err != nil {
-		return constant.StatusStopped
-	}
-	defer client.Close()
-	if _, err := client.Ping(context.Background()); err != nil {
-		return constant.StatusStopped
-	}
-
-	return constant.StatusRunning
-}
-
-func (u *DockerService) LoadDockerConf() *dto.DaemonJsonConf {
+func (u *DockerService) LoadDockerStatus() *dto.DockerStatus {
 	ctx := context.Background()
-	var data dto.DaemonJsonConf
-	data.IPTables = true
-	data.Version = "-"
+	var data dto.DockerStatus
 	if !cmd.Which("docker") {
 		data.IsExist = false
 		return &data
 	}
 	data.IsExist = true
-	data.IsActive = true
+	data.IsActive, _ = systemctl.IsActive("docker")
 	client, err := docker.NewDockerClient()
 	if err != nil {
+		global.LOG.Errorf("load docker client failed, err: %v", err)
 		data.IsActive = false
-	} else {
-		defer client.Close()
-		if _, err := client.Ping(ctx); err != nil {
-			data.IsActive = false
-		}
-		itemVersion, err := client.ServerVersion(ctx)
-		if err == nil {
-			data.Version = itemVersion.Version
-		}
+		return &data
+	}
+	defer client.Close()
+	if _, err := client.Ping(ctx); err != nil {
+		global.LOG.Errorf("ping docker client failed, err: %v", err)
+		data.IsActive = false
+	}
+
+	return &data
+}
+
+func (u *DockerService) LoadDockerConf() (*dto.DaemonJsonConf, error) {
+	ctx := context.Background()
+	var data dto.DaemonJsonConf
+	data.IPTables = true
+	data.Version = "-"
+	client, err := docker.NewDockerClient()
+	if err != nil {
+		return &data, err
+	}
+	itemVersion, err := client.ServerVersion(ctx)
+	if err == nil {
+		data.Version = itemVersion.Version
 	}
 	data.IsSwarm = false
 	stdout2, _ := cmd.Exec("docker info  | grep Swarm")
@@ -95,23 +95,23 @@ func (u *DockerService) LoadDockerConf() *dto.DaemonJsonConf {
 		data.IsSwarm = true
 	}
 	if _, err := os.Stat(constant.DaemonJsonPath); err != nil {
-		return &data
+		return &data, nil
 	}
 	file, err := os.ReadFile(constant.DaemonJsonPath)
 	if err != nil {
-		return &data
+		return &data, nil
 	}
 	var conf daemonJsonItem
 	daemonMap := make(map[string]interface{})
 	if err := json.Unmarshal(file, &daemonMap); err != nil {
-		return &data
+		return &data, nil
 	}
 	arr, err := json.Marshal(daemonMap)
 	if err != nil {
-		return &data
+		return &data, err
 	}
 	if err := json.Unmarshal(arr, &conf); err != nil {
-		return &data
+		return &data, err
 	}
 	if _, ok := daemonMap["iptables"]; !ok {
 		conf.IPTables = true
@@ -133,7 +133,7 @@ func (u *DockerService) LoadDockerConf() *dto.DaemonJsonConf {
 	data.Registries = conf.Registries
 	data.IPTables = conf.IPTables
 	data.LiveRestore = conf.LiveRestore
-	return &data
+	return &data, nil
 }
 
 func (u *DockerService) UpdateConf(req dto.SettingUpdate) error {

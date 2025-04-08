@@ -991,6 +991,7 @@ const message = {
             edit: '修改脚本',
             groupHelper: '针对脚本特征设置不同的分组，可以更加快速的对脚本进行筛选操作。',
             handleHelper: '将在 {0} 上执行 {1} 脚本，是否继续？',
+            noSuchApp: '未检测到 {0} 服务，请先使用脚本库安装脚本快速安装！',
         },
     },
     monitor: {
@@ -1118,7 +1119,6 @@ const message = {
         fail2ban: {
             sshPort: '监听 SSH 端口',
             sshPortHelper: '当前 Fail2ban 监听主机 SSH 连接端口',
-            noFail2ban: '未检测到 Fail2ban 服务，请参考官方文档进行安装！',
             unActive: '当前未开启 Fail2ban 服务，请先开启！',
             operation: '对 Fail2ban 服务进行 [{0}] 操作，是否继续？',
             fail2banChange: 'Fail2ban 配置修改',
@@ -1141,7 +1141,6 @@ const message = {
         ftp: {
             ftp: 'FTP 账户',
             notStart: '当前未开启 FTP 服务，请先开启！',
-            noFtp: '未检测到 FTP (pure-ftpd) 服务，请参考官方文档进行安装！',
             operation: '对 FTP 服务进行 [{0}] 操作，是否继续？',
             noPasswdMsg: '无法获取当前 FTP 账号密码，请先设置密码后重试！',
             enableHelper: '启用选中的 FTP 账号后，该 FTP 账号恢复访问权限，是否继续操作？',
@@ -1159,7 +1158,6 @@ const message = {
             hideFresh: '隐藏病毒库服务',
             clamHelper:
                 'ClamAV 的最低建议配置为：3 GiB 以上的 RAM，2.0 GHz 以上的单核 CPU，以及至少 5 GiB 的可用硬盘空间',
-            noClam: '未检测到 ClamAV 服务，请参考官方文档进行安装！',
             notStart: '当前未开启 ClamAV 服务，请先开启！',
             removeRecord: '删除报告文件',
             removeResultHelper: '删除任务执行过程中生成的报告文件，以清理存储空间。',
@@ -2347,7 +2345,6 @@ const message = {
     firewall: {
         create: '创建规则',
         edit: '编辑规则',
-        notSupport: '未检测到系统防火墙（firewalld 或者 ufw），请参考官方文档进行安装',
         ccDeny: 'CC 防护',
         ipWhiteList: 'IP 白名单',
         ipBlockList: 'IP 黑名单',

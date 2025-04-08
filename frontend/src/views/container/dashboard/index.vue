@@ -1,8 +1,13 @@
 <template>
     <div v-loading="loading">
-        <docker-status v-model:isActive="isActive" v-model:loading="loading" @search="search" />
+        <docker-status
+            v-model:isActive="isActive"
+            v-model:isExist="isExist"
+            v-model:loading="loading"
+            @search="search"
+        />
 
-        <div :class="{ mask: !isActive }">
+        <div v-if="isExist" :class="{ mask: !isActive }">
             <CardWithHeader :header="$t('menu.container')" class="mt-5">
                 <template #body>
                     <span class="count" @click="goRouter('Container')">{{ countItem.containerCount }}</span>
@@ -121,6 +126,7 @@ import { onMounted, reactive, ref } from 'vue';
 
 const loading = ref();
 const isActive = ref(false);
+const isExist = ref(false);
 const countItem = reactive({
     all: 0,
     created: 0,
@@ -145,7 +151,7 @@ const countItem = reactive({
 });
 
 const search = () => {
-    if (!isActive.value) {
+    if (!isActive.value || !isExist.value) {
         return;
     }
     loadContainerCount();

@@ -1046,6 +1046,7 @@ const message = {
             groupHelper:
                 'Set different groups based on script characteristics, which allows for faster script filtering operations.',
             handleHelper: 'Execute script {1} on {0}, continue?',
+            noSuchApp: 'The {0} service was not detected. Please install it quickly using the script library first!',
         },
     },
     monitor: {
@@ -1185,7 +1186,6 @@ const message = {
         fail2ban: {
             sshPort: 'Listen to SSH Port',
             sshPortHelper: 'Current Fail2ban listens to the SSH connection port of the host',
-            noFail2ban: 'Fail2ban service not detected, please refer to the official documentation for installation!',
             unActive: 'The Fail2ban service is not enabled at present, please enable it first!',
             operation: 'Perform [{0}] operation on Fail2ban service, continue?',
             fail2banChange: 'Fail2ban Configuration Modification',
@@ -1208,7 +1208,6 @@ const message = {
         ftp: {
             ftp: 'FTP Account',
             notStart: 'FTP service is currently not running, please start it first!',
-            noFtp: 'FTP (pure-ftpd) service not detected, please refer to the official documentation for installation!',
             operation: 'Perform [{0}] operation on FTP service, continue?',
             noPasswdMsg: 'Can not get the current FTP account password, please set the password and try again! ',
             enableHelper:
@@ -1230,7 +1229,6 @@ const message = {
             hideFresh: 'Hide Virus Database Service',
             clamHelper:
                 'The minimum recommended configuration for ClamAV is: 3 GiB of RAM or more, single-core CPU with 2.0 GHz or higher, and at least 5 GiB of available hard disk space.',
-            noClam: 'ClamAV service not detected, please refer to the official documentation for installation!',
             notStart: 'ClamAV service is currently not running, please start it first!',
             removeRecord: 'Delete Report Files',
             removeResultHelper: 'Delete report files generated during task execution to free up storage space.',
@@ -2538,8 +2536,6 @@ const message = {
     firewall: {
         create: 'Create Rule',
         edit: 'Edit rule',
-        notSupport:
-            'No system firewall detected (firewalld or ufw). Please refer to the official documentation for installation.',
         ccDeny: 'CC Protection',
         ipWhiteList: 'IP Whitelist',
         ipBlockList: 'IP Blacklist',

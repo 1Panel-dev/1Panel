@@ -1,8 +1,13 @@
 <template>
     <div v-loading="loading">
-        <docker-status v-model:isActive="isActive" v-model:loading="loading" @search="search" />
+        <docker-status
+            v-model:isActive="isActive"
+            v-model:isExist="isExist"
+            v-model:loading="loading"
+            @search="search"
+        />
 
-        <LayoutContent :title="$t('container.volume')" :class="{ mask: !isActive }">
+        <LayoutContent v-if="isExist" :title="$t('container.volume')" :class="{ mask: !isActive }">
             <template #leftToolBar>
                 <el-button type="primary" @click="onCreate()">
                     {{ $t('container.createVolume') }}
@@ -115,6 +120,7 @@ const paginationConfig = reactive({
 });
 const searchName = ref();
 const isActive = ref(false);
+const isExist = ref(false);
 
 const toFolder = (folder: string) => {
     router.push({ path: '/hosts/files', query: { path: folder } });
@@ -129,7 +135,7 @@ const onCreate = async () => {
 };
 
 const search = async () => {
-    if (!isActive.value) {
+    if (!isActive.value || !isExist.value) {
         return;
     }
     const params = {

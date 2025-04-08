@@ -12,7 +12,7 @@ import (
 // @Tags Container Docker
 // @Summary Load docker status
 // @Produce json
-// @Success 200 {string} status
+// @Success 200 {string} dto.DockerStatus
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /containers/docker/status [get]
@@ -49,7 +49,11 @@ func (b *BaseApi) LoadDaemonJsonFile(c *gin.Context) {
 // @Security Timestamp
 // @Router /containers/daemonjson [get]
 func (b *BaseApi) LoadDaemonJson(c *gin.Context) {
-	conf := dockerService.LoadDockerConf()
+	conf, err := dockerService.LoadDockerConf()
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
 	helper.SuccessWithData(c, conf)
 }
 

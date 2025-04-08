@@ -1035,6 +1035,8 @@ const message = {
             groupHelper:
                 'Tetapkan kumpulan yang berbeza berdasarkan ciri skrip, yang membolehkan operasi penapisan skrip dilakukan dengan lebih pantas.',
             handleHelper: 'Akan melaksanakan skrip {1} pada {0}, teruskan?',
+            noSuchApp:
+                'Perkhidmatan {0} tidak dikesan. Sila pasang dengan cepat menggunakan pustaka skrip terlebih dahulu!',
         },
     },
     monitor: {
@@ -1161,7 +1163,6 @@ const message = {
         fail2ban: {
             sshPort: 'Dengar pada port SSH',
             sshPortHelper: 'Fail2ban semasa mendengar pada port sambungan SSH hos',
-            noFail2ban: 'Perkhidmatan Fail2ban tidak dikesan. Rujuk dokumen rasmi untuk memasang.',
             unActive: 'Perkhidmatan Fail2ban tidak diaktifkan pada masa ini.',
             operation: 'Anda akan melaksanakan operasi "{0}" pada perkhidmatan Fail2ban. Adakah anda mahu meneruskan?',
             fail2banChange: 'Pengubahan Konfigurasi Fail2ban',
@@ -1185,7 +1186,6 @@ const message = {
         ftp: {
             ftp: 'Akaun FTP | Akaun FTP',
             notStart: 'Perkhidmatan FTP tidak berjalan pada masa ini, sila mulakan dahulu!',
-            noFtp: 'Perkhidmatan FTP (pure-ftpd) tidak dikesan. Rujuk dokumen rasmi untuk memasang.',
             operation: 'Ini akan melaksanakan operasi "{0}" pada perkhidmatan FTP. Adakah anda mahu meneruskan?',
             noPasswdMsg:
                 'Tidak dapat mendapatkan kata laluan akaun FTP semasa, sila tetapkan kata laluan dan cuba lagi!',
@@ -1208,7 +1208,6 @@ const message = {
             hideFresh: 'Sembunyikan perkhidmatan pengemas kini tanda tangan',
             clamHelper:
                 'Konfigurasi minimum yang disyorkan untuk ClamAV ialah: RAM 3 GiB atau lebih, CPU teras tunggal dengan 2.0 GHz atau lebih tinggi, dan sekurang-kurangnya 5 GiB ruang cakera keras yang tersedia.',
-            noClam: 'Perkhidmatan ClamAV tidak dikesan, sila rujuk dokumentasi rasmi untuk pemasangan!',
             notStart: 'Perkhidmatan ClamAV tidak berjalan pada masa ini, sila mulakan dahulu!',
             removeRecord: 'Padam fail laporan',
             noRecords: 'Klik butang "Picu" untuk memulakan imbasan dan anda akan melihat rekod di sini.',
@@ -2482,8 +2481,6 @@ const message = {
     firewall: {
         create: 'Buat peraturan',
         edit: 'Edit peraturan',
-        notSupport:
-            'Tiada firewall sistem yang dikesan (firewalld atau ufw). Sila rujuk dokumentasi rasmi untuk pemasangan.',
         ccDeny: 'Perlindungan CC',
         ipWhiteList: 'Senarai putih IP',
         ipBlockList: 'Senarai blok IP',

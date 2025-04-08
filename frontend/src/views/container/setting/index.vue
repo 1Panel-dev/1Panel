@@ -1,18 +1,26 @@
 <template>
     <div v-loading="loading">
-        <div class="app-status p-mt-20">
+        <docker-status
+            v-model:isActive="isActive"
+            v-model:isExist="isExist"
+            :is-hide="true"
+            v-model:loading="loading"
+            @search="search"
+        />
+
+        <div v-if="isExist" class="app-status p-mt-20">
             <el-card>
                 <div class="flex w-full flex-col gap-4 md:flex-row">
                     <div class="flex flex-wrap gap-4">
                         <el-tag class="float-left" effect="dark" type="success">Docker</el-tag>
-                        <Status class="mt-0.5" :status="form.isActive ? 'enable' : 'disable'" />
+                        <Status class="mt-0.5" :status="isActive ? 'enable' : 'disable'" />
                         <el-tag>{{ $t('app.version') }}: {{ form.version }}</el-tag>
                     </div>
                     <div class="mt-0.5">
-                        <el-button v-if="form.isActive" type="primary" @click="onOperator('stop')" link>
+                        <el-button v-if="isActive" type="primary" @click="onOperator('stop')" link>
                             {{ $t('commons.operate.stop') }}
                         </el-button>
-                        <el-button v-if="!form.isActive" type="primary" @click="onOperator('start')" link>
+                        <el-button v-if="!isActive" type="primary" @click="onOperator('start')" link>
                             {{ $t('commons.operate.start') }}
                         </el-button>
                         <el-divider direction="vertical" />
@@ -24,7 +32,7 @@
             </el-card>
         </div>
 
-        <LayoutContent class="p-mt-20" :title="$t('container.setting')">
+        <LayoutContent v-if="isExist" class="p-mt-20" :title="$t('container.setting')">
             <template #main>
                 <el-radio-group v-model="confShowType" @change="changeMode">
                     <el-radio-button value="base">{{ $t('database.baseConf') }}</el-radio-button>
@@ -225,6 +233,7 @@ import LogOption from '@/views/container/setting/log/index.vue';
 import Ipv6Option from '@/views/container/setting/ipv6/index.vue';
 import SockPath from '@/views/container/setting/sock-path/index.vue';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
+import DockerStatus from '@/views/container/docker-status/index.vue';
 import i18n from '@/lang';
 import {
     dockerOperate,
@@ -244,6 +253,9 @@ const mobile = computed(() => {
 });
 const unset = ref(i18n.global.t('setting.unSetting'));
 const submitInput = ref();
+
+const isActive = ref(false);
+const isExist = ref(false);
 
 const loading = ref(false);
 const showDaemonJsonAlert = ref(false);
@@ -265,7 +277,6 @@ const sockPathRef = ref();
 const form = reactive({
     isSwarm: false,
     isActive: false,
-    isExist: false,
     version: '',
     mirrors: '',
     registries: '',
@@ -475,8 +486,6 @@ const changeMode = async () => {
 const search = async () => {
     const res = await loadDaemonJson();
     form.isSwarm = res.data.isSwarm;
-    form.isActive = res.data.isActive;
-    form.isExist = res.data.isExist;
     form.version = res.data.version;
     form.cgroupDriver = res.data.cgroupDriver || 'cgroupfs';
     form.liveRestore = res.data.liveRestore;

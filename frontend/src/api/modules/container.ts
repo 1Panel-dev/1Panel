@@ -187,7 +187,7 @@ export const loadDaemonJsonFile = () => {
     return http.get<string>(`/containers/daemonjson/file`);
 };
 export const loadDockerStatus = () => {
-    return http.get<string>(`/containers/docker/status`);
+    return http.get<Container.DockerStatus>(`/containers/docker/status`);
 };
 export const updateDaemonJson = (key: string, value: string) => {
     return http.post(`/containers/daemonjson/update`, { key: key, value: value }, TimeoutEnum.T_60S);

@@ -1,8 +1,14 @@
 <template>
     <div v-loading="loading">
-        <docker-status v-model:isActive="isActive" v-model:loading="loading" @search="search" @mounted="loadRepos" />
+        <docker-status
+            v-model:isActive="isActive"
+            v-model:isExist="isExist"
+            v-model:loading="loading"
+            @search="search"
+            @mounted="loadRepos"
+        />
 
-        <LayoutContent :title="$t('container.image')" :class="{ mask: !isActive }">
+        <LayoutContent v-if="isExist" :title="$t('container.image')" :class="{ mask: !isActive }">
             <template #leftToolBar>
                 <el-button type="primary" plain @click="onOpenPull">
                     {{ $t('container.imagePull') }}
@@ -129,6 +135,7 @@ const paginationConfig = reactive({
 const searchName = ref();
 
 const isActive = ref(false);
+const isExist = ref(false);
 
 const myDetail = ref();
 const dialogPullRef = ref();
@@ -141,7 +148,7 @@ const dialogDeleteRef = ref();
 const dialogPruneRef = ref();
 
 const search = async () => {
-    if (!isActive.value) {
+    if (!isActive.value || !isExist.value) {
         return;
     }
     const repoSearch = {

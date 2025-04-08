@@ -4,10 +4,13 @@ type DaemonJsonUpdateByFile struct {
 	File string `json:"file"`
 }
 
+type DockerStatus struct {
+	IsActive bool `json:"isActive"`
+	IsExist  bool `json:"isExist"`
+}
+
 type DaemonJsonConf struct {
 	IsSwarm      bool     `json:"isSwarm"`
-	IsExist      bool     `json:"isExist"`
-	IsActive     bool     `json:"isActive"`
 	Version      string   `json:"version"`
 	Mirrors      []string `json:"registryMirrors"`
 	Registries   []string `json:"insecureRegistries"`

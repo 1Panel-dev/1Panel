@@ -1,8 +1,13 @@
 <template>
     <div v-loading="loading">
-        <docker-status v-model:isActive="isActive" v-model:loading="loading" @search="search" />
+        <docker-status
+            v-model:isActive="isActive"
+            v-model:isExist="isExist"
+            v-model:loading="loading"
+            @search="search"
+        />
 
-        <LayoutContent :title="$t('container.network')" :class="{ mask: !isActive }">
+        <LayoutContent v-if="isExist" :title="$t('container.network')" :class="{ mask: !isActive }">
             <template #leftToolBar>
                 <el-button type="primary" @click="onCreate()">
                     {{ $t('container.createNetwork') }}
@@ -113,6 +118,7 @@ const searchName = ref();
 
 const opRef = ref();
 const isActive = ref(false);
+const isExist = ref(false);
 const dialogCreateRef = ref<DialogExpose>();
 
 interface DialogExpose {
@@ -150,7 +156,7 @@ function selectable(row) {
 }
 
 const search = async () => {
-    if (!isActive.value) {
+    if (!isActive.value || !isExist.value) {
         return;
     }
     const params = {

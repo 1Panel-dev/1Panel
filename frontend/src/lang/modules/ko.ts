@@ -999,6 +999,7 @@ const message = {
             groupHelper:
                 '스크립트 특성에 따라 다양한 그룹을 설정하여 스크립트 필터링 작업을 더 빠르게 수행할 수 있습니다.',
             handleHelper: '{0} 에서 {1} 스크립트를 실행합니다. 계속하시겠습니까?',
+            noSuchApp: '{0} 서비스가 감지되지 않았습니다. 스크립트 라이브러리를 사용하여 먼저 빠르게 설치하세요!',
         },
     },
     monitor: {
@@ -1114,7 +1115,6 @@ const message = {
         fail2ban: {
             sshPort: 'SSH 포트 청취',
             sshPortHelper: '현재 Fail2ban 은 호스트의 SSH 연결 포트를 청취합니다.',
-            noFail2ban: 'Fail2ban 서비스가 감지되지 않았습니다. 공식 문서를 참조하여 설치하세요.',
             unActive: '현재 Fail2ban 서비스가 활성화되어 있지 않습니다.',
             operation: 'Fail2ban 서비스에서 "{0}" 작업을 수행합니다. 계속하시겠습니까?',
             fail2banChange: 'Fail2ban 구성 수정',
@@ -1137,7 +1137,6 @@ const message = {
         ftp: {
             ftp: 'FTP 계정 | FTP 계정들',
             notStart: 'FTP 서비스가 현재 실행 중이 아닙니다. 먼저 시작하세요!',
-            noFtp: `FTP (pure-ftpd) 서비스가 감지되지 않았습니다. 공식 문서를 참조하여 설치하세요.`,
             operation: 'FTP 서비스에서 "{0}" 작업을 수행합니다. 계속하시겠습니까?',
             noPasswdMsg: '현재 FTP 계정의 비밀번호를 가져올 수 없습니다. 비밀번호를 설정한 후 다시 시도하세요!',
             enableHelper: '선택한 FTP 계정을 활성화하면 접근 권한이 복원됩니다. 계속하시겠습니까?',
@@ -1155,7 +1154,6 @@ const message = {
             hideFresh: '서명 업데이트 서비스 숨기기',
             clamHelper:
                 'ClamAV의 최소 권장 구성은 다음과 같습니다: RAM 3 GiB 이상, 2.0 GHz 이상의 단일 코어 CPU, 최소 5 GiB의 사용 가능한 하드 디스크 공간.',
-            noClam: 'ClamAV 서비스가 감지되지 않았습니다. 공식 문서를 참조하여 설치하세요!',
             notStart: 'ClamAV 서비스가 현재 실행 중이 아닙니다. 먼저 시작하세요!',
             removeRecord: '보고서 파일 삭제',
             noRecords: '"Trigger" 버튼을 클릭하여 스캔을 시작하면 이곳에서 기록을 확인할 수 있습니다.',
@@ -2385,7 +2383,6 @@ const message = {
     firewall: {
         create: '규칙 만들기',
         edit: '규칙 수정',
-        notSupport: '시스템 방화벽이 감지되지 않았습니다 (firewalld 또는 ufw). 설치 방법은 공식 문서를 참조하세요.',
         ccDeny: 'CC 보호',
         ipWhiteList: 'IP 허용 목록',
         ipBlockList: 'IP 차단 목록',

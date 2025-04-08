@@ -34,31 +34,14 @@
             </div>
         </el-card>
     </div>
-    <div v-if="!baseInfo.isExist">
-        <LayoutContent :title="$t('menu.firewall')" :divider="true">
-            <template #main>
-                <div class="app-warn">
-                    <div class="flex flex-col gap-2 items-center justify-center w-full sm:flex-row">
-                        <span>{{ $t('firewall.notSupport') }}</span>
-                        <span @click="toDoc" class="flex items-center justify-center gap-0.5">
-                            <el-icon><Position /></el-icon>
-                            {{ $t('firewall.quickJump') }}
-                        </span>
-                    </div>
-                    <div>
-                        <img src="@/assets/images/no_app.svg" />
-                    </div>
-                </div>
-            </template>
-        </LayoutContent>
-    </div>
+    <NoSuchService v-if="!baseInfo.isExist" name="Firewalld / Ufw" />
 </template>
 
 <script lang="ts" setup>
 import { Host } from '@/api/interface/host';
 import { loadFireBaseInfo, operateFire } from '@/api/modules/host';
 import i18n from '@/lang';
-import router from '@/routers';
+import NoSuchService from '@/components/layout-content/no-such-service.vue';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
 import { ref } from 'vue';
@@ -71,10 +54,6 @@ const acceptParams = (): void => {
     loadBaseInfo(true);
 };
 const emit = defineEmits(['search', 'update:is-active', 'update:loading', 'update:maskShow', 'update:name']);
-
-const toDoc = () => {
-    router.push({ name: 'Library' });
-};
 
 const loadBaseInfo = async (search: boolean) => {
     await loadFireBaseInfo()

@@ -129,24 +129,7 @@
                 <span>{{ $t('toolbox.ftp.notStart') }}</span>
             </el-card>
         </div>
-        <div v-else>
-            <LayoutContent title="FTP" :divider="true">
-                <template #main>
-                    <div class="app-warn">
-                        <div class="flex flex-col gap-2 items-center justify-center w-full sm:flex-row">
-                            <span>{{ $t('toolbox.ftp.noFtp') }}</span>
-                            <span @click="toDoc" class="flex items-center justify-center gap-0.5">
-                                <el-icon><Position /></el-icon>
-                                {{ $t('firewall.quickJump') }}
-                            </span>
-                        </div>
-                        <div>
-                            <img src="@/assets/images/no_app.svg" />
-                        </div>
-                    </div>
-                </template>
-            </LayoutContent>
-        </div>
+        <NoSuchService v-else name="FTP (pure-ftpd)" />
 
         <OpDialog ref="opRef" @search="search" @submit="onSubmitDelete()" />
         <OperateDialog @search="search" ref="dialogRef" />
@@ -214,10 +197,6 @@ const search = async (column?: any) => {
         .catch(() => {
             loading.value = false;
         });
-};
-
-const toDoc = () => {
-    router.push({ name: 'Library' });
 };
 
 const toFolder = (folder: string) => {

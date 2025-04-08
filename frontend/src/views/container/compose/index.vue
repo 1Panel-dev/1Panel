@@ -4,9 +4,14 @@
             <ComposeDetail ref="composeDetailRef" />
         </div>
 
-        <docker-status v-model:isActive="isActive" v-model:loading="loading" @search="search" />
+        <docker-status
+            v-model:isActive="isActive"
+            v-model:isExist="isExist"
+            v-model:loading="loading"
+            @search="search"
+        />
 
-        <LayoutContent v-if="!isOnDetail" :title="$t('container.compose')" :class="{ mask: !isActive }">
+        <LayoutContent v-if="!isOnDetail && isExist" :title="$t('container.compose')" :class="{ mask: !isActive }">
             <template #leftToolBar>
                 <el-button type="primary" @click="onOpenDialog()">
                     {{ $t('container.createCompose') }}
@@ -113,13 +118,14 @@ const paginationConfig = reactive({
 const searchName = ref();
 
 const isActive = ref(false);
+const isExist = ref(false);
 
 const toComposeFolder = async (row: Container.ComposeInfo) => {
     router.push({ path: '/hosts/files', query: { path: row.workdir } });
 };
 
 const search = async () => {
-    if (!isActive.value) {
+    if (!isActive.value || !isExist.value) {
         return;
     }
     let params = {

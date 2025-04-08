@@ -129,24 +129,7 @@
                 </template>
             </LayoutContent>
         </div>
-        <div v-else>
-            <LayoutContent title="Fail2ban" :divider="true">
-                <template #main>
-                    <div class="app-warn">
-                        <div class="flex flex-col gap-2 items-center justify-center w-full sm:flex-row">
-                            <span>{{ $t('toolbox.fail2ban.noFail2ban') }}</span>
-                            <span @click="toDoc" class="flex items-center justify-center gap-0.5">
-                                <el-icon><Position /></el-icon>
-                                {{ $t('firewall.quickJump') }}
-                            </span>
-                        </div>
-                        <div>
-                            <img src="@/assets/images/no_app.svg" />
-                        </div>
-                    </div>
-                </template>
-            </LayoutContent>
-        </div>
+        <NoSuchService v-else name="Fail2ban" />
 
         <MaxRetry ref="maxRetryRef" @search="search" />
         <BanTime ref="banTimeRef" @search="search" />
@@ -166,6 +149,7 @@ import BanTime from '@/views/toolbox/fail2ban/ban-time/index.vue';
 import FindTime from '@/views/toolbox/fail2ban/find-time/index.vue';
 import BanAction from '@/views/toolbox/fail2ban/ban-action/index.vue';
 import LogPath from '@/views/toolbox/fail2ban/log-path/index.vue';
+import NoSuchService from '@/components/layout-content/no-such-service.vue';
 import Port from '@/views/toolbox/fail2ban/port/index.vue';
 import IPs from '@/views/toolbox/fail2ban/ips/index.vue';
 import i18n from '@/lang';
@@ -173,7 +157,6 @@ import { MsgSuccess } from '@/utils/message';
 import { getFail2banConf, getFail2banBase, operateFail2ban, updateFail2banByFile } from '@/api/modules/toolbox';
 import { ElMessageBox } from 'element-plus';
 import { transTimeUnit } from '@/utils/util';
-import router from '@/routers';
 
 const loading = ref(false);
 const formRef = ref();
@@ -208,10 +191,6 @@ const form = reactive({
 
 const onLoadList = async (type: string) => {
     listRef.value.acceptParams({ operate: type });
-};
-
-const toDoc = () => {
-    router.push({ name: 'Library' });
 };
 
 const onSaveFile = async () => {

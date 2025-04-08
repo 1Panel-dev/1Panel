@@ -1,8 +1,13 @@
 <template>
     <div v-loading="loading">
-        <docker-status v-model:isActive="isActive" v-model:loading="loading" @search="search" />
+        <docker-status
+            v-model:isActive="isActive"
+            v-model:isExist="isExist"
+            v-model:loading="loading"
+            @search="search"
+        />
 
-        <LayoutContent :title="$t('container.composeTemplate')" :class="{ mask: !isActive }">
+        <LayoutContent v-if="isExist" :title="$t('container.composeTemplate')" :class="{ mask: !isActive }">
             <template #leftToolBar>
                 <el-button type="primary" @click="onOpenDialog('create')">
                     {{ $t('container.createComposeTemplate') }}
@@ -81,9 +86,10 @@ const searchName = ref();
 const detailRef = ref();
 const opRef = ref();
 const isActive = ref(false);
+const isExist = ref(false);
 
 const search = async () => {
-    if (!isActive.value) {
+    if (!isActive.value || !isExist.value) {
         return;
     }
     let params = {

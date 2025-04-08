@@ -993,6 +993,7 @@ const message = {
             edit: '修改腳本',
             groupHelper: '根據腳本特徵設置不同的分組，可以更快地對腳本進行篩選操作。',
             handleHelper: '將在 {0} 上執行 {1} 腳本，是否繼續？',
+            noSuchApp: '未檢測到 {0} 服務，請先使用腳本庫快速安裝！',
         },
     },
     monitor: {
@@ -1120,7 +1121,6 @@ const message = {
         fail2ban: {
             sshPort: '監聽 SSH 端口',
             sshPortHelper: '當前 Fail2ban 監聽主機 SSH 連接端口',
-            noFail2ban: '未檢測到 Fail2ban 服務，請參考官方文檔進行安裝！',
             unActive: '當前未開啟 Fail2ban 服務，請先開啟！',
             operation: '對 Fail2ban 服務進行 [{0}] 操作，是否繼續？',
             fail2banChange: 'Fail2ban 配置修改',
@@ -1143,7 +1143,6 @@ const message = {
         ftp: {
             ftp: 'FTP 帳戶',
             notStart: '當前未 FTP 服務，請先開啟！',
-            noFtp: '未檢測到 FTP (pure-ftpd) 服務，請參考官方文檔進行安裝！',
             operation: '對 FTP 服務進行 [{0}] 操作，是否繼續？',
             noPasswdMsg: '無法獲取當前 FTP 賬號密碼，請先設置密碼後重試！',
             enableHelper: '啟用選取的 FTP 帳號後，該 FTP 帳號將恢復訪問權限，是否繼續操作？',
@@ -1161,7 +1160,6 @@ const message = {
             hideFresh: '隱藏病毒庫服務',
             clamHelper:
                 'ClamAV 的最低建議配置為：3 GiB 以上的 RAM，2.0 GHz 以上的單核 CPU，以及至少 5 GiB 的可用硬盤空間。',
-            noClam: '未檢測到 ClamAV 服務，請參考官方文檔進行安裝！',
             notStart: '當前未 ClamAV 服務，請先開啟！',
             removeRecord: '刪除報告文件',
             removeResultHelper: '刪除任務執行過程中生成的報告文件，以清理存儲空間。',
@@ -2356,7 +2354,6 @@ const message = {
     firewall: {
         create: '創建規則',
         edit: '編輯規則',
-        notSupport: '未檢測到系統防火墻（firewalld 或者 ufw），請參考官方文檔進行安裝',
         ccDeny: 'CC 防護',
         ipWhiteList: 'IP 白名單',
         ipBlockList: 'IP 黑名單',

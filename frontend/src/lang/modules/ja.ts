@@ -1005,6 +1005,8 @@ const message = {
             groupHelper:
                 'スクリプトの特徴に基づいて異なるグループを設定することで、スクリプトのフィルタリング操作をより迅速に行うことができます。',
             handleHelper: '{0} で {1} スクリプトを実行します。続行しますか？',
+            noSuchApp:
+                '{0} サービスが検出されませんでした。スクリプトライブラリを使って素早くインストールしてください！',
         },
     },
     monitor: {
@@ -1123,7 +1125,6 @@ const message = {
         fail2ban: {
             sshPort: 'SSHポートを聞いてください',
             sshPortHelper: '現在のFAL2BANは、ホストのSSH接続ポートに耳を傾けます',
-            noFail2ban: `Fail2banサービスは検出されません。インストールする公式ドキュメントを参照してください。`,
             unActive: `現在、Fail2Banサービスは有効になっていません。`,
             operation: 'fail2banサービスで操作「{0}」を実行します。続けたいですか？',
             fail2banChange: 'fail2ban構成の変更',
@@ -1146,7 +1147,6 @@ const message = {
         ftp: {
             ftp: 'FTPアカウント|FTPアカウント',
             notStart: 'FTP Serviceは現在実行されていません。最初に開始してください！',
-            noFtp: `FTP（Pure-FTPD）サービスは検出されません。インストールする公式ドキュメントを参照してください。`,
             operation: 'これにより、FTPサービスで「{0}」操作が実行されます。続けたいですか？',
             noPasswdMsg: '現在のFTPアカウントパスワードを取得できません。パスワードを設定して再試行してください！',
             enableHelper: '選択したFTPアカウントを有効にすると、アクセス許可が復元されます。続けたいですか？',
@@ -1166,7 +1166,6 @@ const message = {
             hideFresh: '署名のアップデーターサービスを非表示にします',
             clamHelper:
                 'Clamavの最小推奨構成は、3ギブ以上のRAM、2.0 GHz以上のシングルコアCPU、および少なくとも5 GIBの利用可能なハードディスクスペースです。',
-            noClam: 'CLAMAVサービスは検出されていません。インストールのための公式ドキュメントを参照してください！',
             notStart: 'Clamav Serviceは現在実行されていません。最初に開始してください！',
             removeRecord: 'ペポートファイルを削除します',
             noRecords: '[トリガー]ボタンをクリックしてスキャンを開始すると、ここにレコードが表示されます。',
@@ -2424,8 +2423,6 @@ const message = {
     firewall: {
         create: 'ルールを作成します',
         edit: 'ルールを編集します',
-        notSupport:
-            'システムファイアウォールは検出されません（ファイアウォールまたはUFW）。インストールのための公式ドキュメントを参照してください。',
         ccDeny: 'CC保護',
         ipWhiteList: 'IP AllowList',
         ipBlockList: 'IPブロックリスト',

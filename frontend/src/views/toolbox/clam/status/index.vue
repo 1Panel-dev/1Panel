@@ -63,32 +63,16 @@
                 </div>
             </el-card>
         </div>
-        <LayoutContent :title="$t('toolbox.clam.clam')" :divider="true" v-if="!data.isExist" v-loading="loading">
-            <template #main>
-                <div class="app-warn">
-                    <div class="flex flex-col gap-2 items-center justify-center w-full sm:flex-row">
-                        <span v-if="!data.isExist">{{ $t('toolbox.clam.noClam') }}</span>
-                        <span @click="toDoc()" v-if="!data.isExist" class="flex items-center justify-center gap-0.5">
-                            <el-icon><Position /></el-icon>
-                            {{ $t('firewall.quickJump') }}
-                        </span>
-                    </div>
-                    <div>
-                        <img alt="" src="@/assets/images/no_app.svg" />
-                    </div>
-                </div>
-            </template>
-        </LayoutContent>
+        <NoSuchService v-if="!data.isExist" name="ClamAV" />
     </div>
 </template>
 <script lang="ts" setup>
 import { searchClamBaseInfo, updateClamBaseInfo } from '@/api/modules/toolbox';
+import NoSuchService from '@/components/layout-content/no-such-service.vue';
 import { onMounted, ref } from 'vue';
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
 
 const data = ref({
     isExist: false,
@@ -106,10 +90,6 @@ const em = defineEmits(['setting', 'getStatus', 'update:loading', 'update:maskSh
 
 const setting = () => {
     em('setting', true);
-};
-
-const toDoc = async () => {
-    window.open(globalStore.docsUrl + '/user_manual/toolbox/clam/', '_blank', 'noopener,noreferrer');
 };
 
 const changeShow = (val: boolean) => {

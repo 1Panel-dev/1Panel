@@ -1,8 +1,8 @@
 <template>
     <div v-loading="loading">
-        <docker-status v-model:isActive="isActive" @search="search" />
+        <docker-status v-model:isActive="isActive" v-model:isExist="isExist" @search="search" />
 
-        <div class="mt-5" v-if="isActive">
+        <div class="mt-5" v-if="isExist && isActive">
             <el-tag @click="searchWithStatus('all')" v-if="countItem.all" effect="plain" size="large">
                 {{ $t('commons.table.all') }} * {{ countItem.all }}
             </el-tag>
@@ -65,7 +65,7 @@
             </el-tag>
         </div>
 
-        <LayoutContent :title="$t('menu.container')" :class="{ mask: !isActive }">
+        <LayoutContent :title="$t('menu.container')" v-if="isExist" :class="{ mask: !isActive }">
             <template #leftToolBar>
                 <el-button type="primary" @click="onContainerOperate('')">
                     {{ $t('container.create') }}
@@ -433,6 +433,7 @@ const mobile = computed(() => {
     return globalStore.isMobile();
 });
 const isActive = ref(false);
+const isExist = ref(false);
 
 const loading = ref(false);
 const data = ref();
@@ -495,7 +496,7 @@ const dialogRenameRef = ref();
 const dialogPruneRef = ref();
 
 const search = async (column?: any) => {
-    if (!isActive.value) {
+    if (!isActive.value || !isExist.value) {
         return;
     }
     localStorage.setItem('includeAppStore', includeAppStore.value ? 'true' : 'false');
