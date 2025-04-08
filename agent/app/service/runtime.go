@@ -736,6 +736,9 @@ func (r *RuntimeService) InstallPHPExtension(req request.PHPExtensionInstallReq)
 	if err != nil {
 		return err
 	}
+	if task.CheckResourceTaskIsExecuting(task.TaskInstall, task.TaskScopeRuntimeExtension, runtime.ID) {
+		return buserr.New("ErrInstallExtension")
+	}
 	installTask, err := task.NewTaskWithOps(req.Name, task.TaskInstall, task.TaskScopeRuntimeExtension, req.TaskID, runtime.ID)
 	if err != nil {
 		return err

@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"path/filepath"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -428,6 +429,11 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 			}
 		}
 		_ = op.DeleteDir(appDir)
+		parentDir := filepath.Dir(appDir)
+		entries, err := os.ReadDir(parentDir)
+		if err == nil && len(entries) == 0 {
+			_ = op.DeleteDir(parentDir)
+		}
 		tx.Commit()
 		return nil
 	}

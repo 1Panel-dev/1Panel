@@ -112,7 +112,7 @@ func (t TaskRepo) CountExecutingTask() (int64, error) {
 	return count, err
 }
 
-func (u TaskRepo) Delete(opts ...DBOption) error {
+func (t TaskRepo) Delete(opts ...DBOption) error {
 	db := global.TaskDB
 	for _, opt := range opts {
 		db = opt(db)
@@ -120,6 +120,6 @@ func (u TaskRepo) Delete(opts ...DBOption) error {
 	return db.Delete(&model.Task{}).Error
 }
 
-func (u TaskRepo) DeleteAll() error {
+func (t TaskRepo) DeleteAll() error {
 	return global.TaskDB.Where("1 = 1").Delete(&model.Task{}).Error
 }

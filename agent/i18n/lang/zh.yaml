@@ -417,3 +417,6 @@ ErrAlertPush: "告警信息推送错误，请检查后重试！"
 ErrAlertSave: "告警信息保存错误，请检查后重试！"
 ErrAlertSync: "告警信息同步错误，请检查后重试！"
 ErrAlertRemote: "告警信息远端错误，请检查后重试！"
+
+#task - runtime
+ErrInstallExtension: "已有安装任务正在进行，请等待任务结束"

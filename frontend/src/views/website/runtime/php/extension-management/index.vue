@@ -89,9 +89,10 @@ const installExtension = async (row: Runtime.SupportExtension) => {
         try {
             await InstallPHPExtension(req);
             taskLogRef.value.openWithTaskID(req.taskID);
-
+        } catch (error) {
+        } finally {
             loading.value = false;
-        } catch (error) {}
+        }
     });
 };
 
