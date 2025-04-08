@@ -18,12 +18,7 @@
                                 <el-input disabled v-model="changeForm.userName"></el-input>
                             </el-form-item>
                             <el-form-item :label="$t('commons.login.password')" prop="password">
-                                <el-input
-                                    type="password"
-                                    clearable
-                                    show-password
-                                    v-model="changeForm.password"
-                                ></el-input>
+                                <el-input type="password" clearable show-password v-model="changeForm.password" />
                                 <span class="input-help">{{ $t('commons.rule.illegalChar') }}</span>
                             </el-form-item>
                         </div>
@@ -38,7 +33,9 @@
                                     />
                                     <el-option value="ip" :label="$t('database.permissionForIP')" />
                                 </el-select>
-                                <span class="input-help">{{ $t('database.localhostHelper') }}</span>
+                                <span v-if="changeForm.from !== 'local'" class="input-help">
+                                    {{ $t('database.localhostHelper') }}
+                                </span>
                             </el-form-item>
                             <el-form-item v-if="changeForm.privilege === 'ip'" prop="privilegeIPs">
                                 <el-input clearable :rows="3" type="textarea" v-model="changeForm.privilegeIPs" />

@@ -122,7 +122,9 @@ func (u *CronjobService) CleanRecord(req dto.CronjobClean) error {
 				}
 			}
 			cronjob.RetainCopies = 0
-			u.removeExpiredBackup(cronjob, accountMap, model.BackupRecord{})
+			if len(accountMap) != 0 {
+				u.removeExpiredBackup(cronjob, accountMap, model.BackupRecord{})
+			}
 		} else {
 			u.removeExpiredLog(cronjob)
 		}

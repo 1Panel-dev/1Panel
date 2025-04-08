@@ -18,6 +18,7 @@
                         </el-form-item>
                         <el-form-item :label="$t('commons.login.password')" prop="password">
                             <el-input type="password" clearable show-password v-model="form.password"></el-input>
+                            <span class="input-help">{{ $t('commons.rule.illegalChar') }}</span>
                         </el-form-item>
                         <el-form-item :label="$t('database.permission')" prop="permission">
                             <el-select v-model="form.permission">
@@ -25,10 +26,13 @@
                                 <el-option
                                     v-if="form.from !== 'local'"
                                     value="localhost"
-                                    :label="$t('terminal.localhost')"
+                                    :label="$t('terminal.localhost') + '(localhost)'"
                                 />
                                 <el-option value="ip" :label="$t('database.permissionForIP')" />
                             </el-select>
+                            <span v-if="form.from !== 'local'" class="input-help">
+                                {{ $t('database.localhostHelper') }}
+                            </span>
                         </el-form-item>
                         <el-form-item v-if="form.permission === 'ip'" prop="permissionIPs">
                             <el-input clearable :rows="3" type="textarea" v-model="form.permissionIPs" />
@@ -60,7 +64,6 @@ import { bindUser } from '@/api/modules/database';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { Rules } from '@/global/form-rules';
 import { MsgSuccess } from '@/utils/message';
-import { checkIp } from '@/utils/util';
 
 const loading = ref();
 const bindVisible = ref(false);
@@ -79,20 +82,10 @@ const confirmDialogRef = ref();
 
 const rules = reactive({
     username: [Rules.requiredInput, Rules.name],
-    password: [Rules.paramComplexity],
+    password: [Rules.requiredInput, Rules.noSpace, Rules.illegal],
     permission: [Rules.requiredSelect],
-    permissionIPs: [{ validator: checkIPs, trigger: 'blur', required: true }],
+    permissionIPs: [Rules.requiredInput, Rules.noSpace, Rules.illegal],
 });
-
-function checkIPs(rule: any, value: any, callback: any) {
-    let ips = form.permissionIPs.split(',');
-    for (const item of ips) {
-        if (checkIp(item)) {
-            return callback(new Error(i18n.global.t('commons.rule.ip')));
-        }
-    }
-    callback();
-}
 
 interface DialogProps {
     from: string;
