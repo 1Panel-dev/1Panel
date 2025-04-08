@@ -114,6 +114,7 @@ const changeNode = (command: string) => {
     }
     if (command == 'local') {
         globalStore.currentNode = command || 'local';
+        globalStore.isOffline = false;
         location.reload();
         return;
     }
@@ -121,6 +122,7 @@ const changeNode = (command: string) => {
         if (item.name == command) {
             if (props.version == item.version) {
                 globalStore.currentNode = command || 'local';
+                globalStore.isOffline = item.isOffline;
                 location.reload();
                 return;
             }
