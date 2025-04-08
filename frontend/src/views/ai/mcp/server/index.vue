@@ -58,7 +58,9 @@
                                 @click="openLog(row)"
                                 link
                                 type="primary"
-                                :disabled="row.status !== 'running' && row.status !== 'error'"
+                                :disabled="
+                                    row.status !== 'running' && row.status !== 'error' && row.status !== 'restarting'
+                                "
                             >
                                 {{ $t('website.check') }}
                             </el-button>

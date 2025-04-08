@@ -52,6 +52,7 @@ func (m McpServerService) Page(req request.McpServerSearch) response.McpServersR
 
 	total, data, _ := mcpServerRepo.Page(req.PageInfo.Page, req.PageInfo.PageSize)
 	for _, item := range data {
+		_ = syncMcpServerContainerStatus(&item)
 		serverDTO := response.McpServerDTO{
 			McpServer:    item,
 			Environments: make([]request.Environment, 0),
@@ -158,6 +159,7 @@ func (m McpServerService) Create(create request.McpServerCreate) error {
 		BaseURL:       create.BaseURL,
 		SsePath:       create.SsePath,
 		Dir:           mcpDir,
+		HostIP:        create.HostIP,
 	}
 	if err := handleCreateParams(mcpServer, create.Environments, create.Volumes); err != nil {
 		return err
@@ -616,6 +618,8 @@ func syncMcpServerContainerStatus(mcpServer *model.McpServer) error {
 		mcpServer.Status = constant.RuntimeRunning
 	case "paused":
 		mcpServer.Status = constant.RuntimeStopped
+	case "restarting":
+		mcpServer.Status = constant.RuntimeReStarting
 	default:
 		if mcpServer.Status != constant.RuntimeBuildIng {
 			mcpServer.Status = constant.RuntimeStopped

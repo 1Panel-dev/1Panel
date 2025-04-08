@@ -13,6 +13,7 @@ const (
 	RuntimeStopped    = "stopped"
 	RuntimeUnhealthy  = "unhealthy"
 	RuntimeCreating   = "creating"
+	RuntimeReStarting = "restarting"
 
 	RuntimePHP    = "php"
 	RuntimeNode   = "node"
