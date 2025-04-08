@@ -188,18 +188,19 @@ func (r *Local) ChangeAccess(info AccessChangeInfo) error {
 		info.Name = "*"
 		info.Password = r.Password
 	}
-	if info.Permission != info.OldPermission {
-		if err := r.Delete(DeleteInfo{
-			Version:     info.Version,
-			Username:    info.Username,
-			Permission:  info.OldPermission,
-			ForceDelete: true,
-			Timeout:     300}); err != nil {
-			return err
-		}
-		if info.Username == "root" {
-			return nil
-		}
+	if info.Permission == info.OldPermission {
+		return nil
+	}
+	if err := r.Delete(DeleteInfo{
+		Version:     info.Version,
+		Username:    info.Username,
+		Permission:  info.OldPermission,
+		ForceDelete: true,
+		Timeout:     300}); err != nil {
+		return err
+	}
+	if info.Username == "root" {
+		return nil
 	}
 	if err := r.CreateUser(CreateInfo{
 		Name:       info.Name,

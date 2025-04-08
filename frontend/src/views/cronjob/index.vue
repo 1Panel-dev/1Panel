@@ -288,6 +288,7 @@ const onDelete = async (row: Cronjob.CronjobInfo | null) => {
     let ids = [];
     showClean.value = false;
     cleanData.value = false;
+    cleanRemoteData.value = true;
     if (row) {
         ids = [row.id];
         names = [row.name];

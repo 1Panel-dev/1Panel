@@ -350,12 +350,18 @@ func (u *CronjobService) removeExpiredBackup(cronjob model.Cronjob, accountMap m
 		if cronjob.Type == "snapshot" {
 			for _, account := range accounts {
 				if len(account) != 0 {
+					if _, ok := accountMap[account]; !ok {
+						continue
+					}
 					_, _ = accountMap[account].client.Delete(path.Join(accountMap[account].backupPath, "system_snapshot", records[i].FileName))
 				}
 			}
 			_ = snapshotRepo.Delete(commonRepo.WithByName(strings.TrimSuffix(records[i].FileName, ".tar.gz")))
 		} else {
 			for _, account := range accounts {
+				if _, ok := accountMap[account]; !ok {
+					continue
+				}
 				if len(account) != 0 {
 					_, _ = accountMap[account].client.Delete(path.Join(accountMap[account].backupPath, records[i].FileDir, records[i].FileName))
 				}
