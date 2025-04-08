@@ -2455,7 +2455,7 @@ const message = {
         domain: '默認訪問地址',
         domainHelper: '例如：192.168.1.1 或者 example.com',
         bindDomain: '綁定網站',
-        commandPlaceHolder: '當前僅支持 npx 和二進制啟動的命令',
+        commandPlaceHolder: '當前僅支持 npx 啟動命令',
         importMcpJson: '導入 MCP Server配置',
         importMcpJsonError: 'mcpServers 結構不正確',
         bindDomainHelper: '綁定網站之後會修改所有已安裝 MCP Server 的訪問地址，並關閉端口的外部訪問',

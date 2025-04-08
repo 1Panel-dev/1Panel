@@ -2648,7 +2648,7 @@ const message = {
         domain: 'Alamat Akses Lalai',
         domainHelper: 'Contoh: 192.168.1.1 atau example.com',
         bindDomain: 'Sematkan Laman Web',
-        commandPlaceHolder: 'Kini hanya menyokong perintah yang bermula dengan npx dan binari',
+        commandPlaceHolder: 'Kini hanya menyokong perintah pelancaran npx',
         importMcpJson: 'Import Konfigurasi Pelayan MCP',
         importMcpJsonError: 'Struktur mcpServers tidak betul',
         bindDomainHelper:

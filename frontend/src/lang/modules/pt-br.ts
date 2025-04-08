@@ -2646,7 +2646,7 @@ const message = {
         domain: 'Endereço de Acesso Padrão',
         domainHelper: 'Por exemplo: 192.168.1.1 ou example.com',
         bindDomain: 'Vincular Site',
-        commandPlaceHolder: 'Atualmente, apenas comandos iniciados com npx e binário são suportados',
+        commandPlaceHolder: 'Atualmente, apenas comandos de inicialização npx são suportados',
         importMcpJson: 'Importar Configuração do Servidor MCP',
         importMcpJsonError: 'A estrutura mcpServers está incorreta',
         bindDomainHelper:

@@ -2620,7 +2620,7 @@ const message = {
         domain: 'Default Access Address',
         domainHelper: 'For example: 192.168.1.1 or example.com',
         bindDomain: 'Bind Website',
-        commandPlaceHolder: 'Currently only supports commands started with npx and binary',
+        commandPlaceHolder: 'Currently only supports npx startup commands',
         importMcpJson: 'Import MCP Server Configuration',
         importMcpJsonError: 'mcpServers structure is incorrect',
         bindDomainHelper:

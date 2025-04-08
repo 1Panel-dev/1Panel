@@ -2642,8 +2642,7 @@ const message = {
         domain: 'Адрес доступа по умолчанию',
         domainHelper: 'Например: 192.168.1.1 или example.com',
         bindDomain: 'Привязать сайт',
-        commandPlaceHolder:
-            'В настоящее время поддерживаются только команды, запускаемые с помощью npx и бинарных файлов',
+        commandPlaceHolder: 'В настоящее время поддерживаются только команды запуска npx',
         importMcpJson: 'Импортировать конфигурацию сервера MCP',
         importMcpJsonError: 'Структура mcpServers некорректна',
         bindDomainHelper:
