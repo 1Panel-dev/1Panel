@@ -3018,6 +3018,7 @@ const message = {
             logSaveSize: 'Максимальный размер сохранения логов',
             logSaveSizeHelper: 'Это размер сохранения логов для одного сайта',
             '360se': '360 Secure Browser',
+            websites: 'Список веб-сайтов',
         },
         tamper: {
             tamper: 'Защита от подделки сайта',

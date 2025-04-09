@@ -3025,6 +3025,7 @@ const message = {
             logSaveSize: 'Tamanho Máximo de Salvamento de Log',
             logSaveSizeHelper: 'Este é o tamanho de salvamento de log para um único site',
             '360se': 'Navegador de Segurança 360',
+            websites: 'Lista de Sites',
         },
         tamper: {
             tamper: 'Proteção contra adulteração do site',

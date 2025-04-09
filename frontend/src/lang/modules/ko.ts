@@ -2912,6 +2912,7 @@ const message = {
             logSaveSize: '최대 로그 저장 크기',
             logSaveSizeHelper: '이것은 단일 웹사이트의 로그 저장 크기입니다',
             '360se': '360 보안 브라우저',
+            websites: '웹사이트 목록',
         },
         tamper: {
             tamper: '웹사이트 변조 방지',

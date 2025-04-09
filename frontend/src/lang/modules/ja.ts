@@ -2956,6 +2956,7 @@ const message = {
             logSaveSize: '最大ログ保存サイズ',
             logSaveSizeHelper: 'これは単一ウェブサイトのログ保存サイズです',
             '360se': '360 セキュリティブラウザ',
+            websites: 'ウェブサイトリスト',
         },
         tamper: {
             tamper: 'ウェブサイトの改ざん防止',

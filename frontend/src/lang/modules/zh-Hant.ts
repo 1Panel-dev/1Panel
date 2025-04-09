@@ -2877,6 +2877,7 @@ const message = {
             logSaveSize: '最大日誌保存大小',
             logSaveSizeHelper: '此處為單個網站的日誌保存大小',
             '360se': '360 安全瀏覽器',
+            websites: '網站列表',
         },
         tamper: {
             tamper: '網站防篡改',

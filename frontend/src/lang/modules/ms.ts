@@ -3024,6 +3024,7 @@ const message = {
             logSaveSize: 'Saiz Simpanan Log Maksimum',
             logSaveSizeHelper: 'Ini adalah saiz simpanan log untuk satu laman web',
             '360se': '360 Pelayar Keselamatan',
+            websites: 'Senarai Laman Web',
         },
         tamper: {
             tamper: 'Perlindungan daripada peng篡改 laman web',

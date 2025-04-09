@@ -3100,6 +3100,7 @@ const message = {
             logSaveSize: 'Maximum Log Save Size',
             logSaveSizeHelper: 'This is the log save size for a single website',
             '360se': '360 Security Browser',
+            websites: 'Website List',
         },
         tamper: {
             tamper: 'Website Tamper Protection',
