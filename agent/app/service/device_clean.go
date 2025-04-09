@@ -741,31 +741,3 @@ func scanFile(pathItem string, size *int64, count *int) {
 		}
 	}
 }
-
-func loadRestorePath(upgradeDir string) (string, error) {
-	if _, err := os.Stat(upgradeDir); err != nil && os.IsNotExist(err) {
-		return "no such file", nil
-	}
-	files, err := os.ReadDir(upgradeDir)
-	if err != nil {
-		return "", err
-	}
-	type itemState struct {
-		Name     string
-		CreateAt time.Time
-	}
-	var folders []itemState
-	for _, file := range files {
-		if file.IsDir() {
-			info, _ := file.Info()
-			folders = append(folders, itemState{Name: file.Name(), CreateAt: info.ModTime()})
-		}
-	}
-	if len(folders) == 0 {
-		return "no such file", nil
-	}
-	sort.Slice(folders, func(i, j int) bool {
-		return folders[i].CreateAt.After(folders[j].CreateAt)
-	})
-	return folders[0].Name, nil
-}

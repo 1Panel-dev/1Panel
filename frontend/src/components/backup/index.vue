@@ -4,27 +4,27 @@
         :header="$t('commons.button.backup')"
         :resource="detailName ? name + ' [' + detailName + ']' : name"
         @close="handleClose"
-        size="large"
+        size="60%"
     >
         <template #content>
-            <div class="mb-5" v-if="type === 'app'">
-                <el-alert :closable="false" type="warning">
-                    <div class="mt-2 text-xs">
-                        <span>{{ $t('setting.backupJump') }}</span>
-                        <span class="jump" @click="goFile()">
-                            <el-icon class="ml-2"><Position /></el-icon>
-                            {{ $t('firewall.quickJump') }}
-                        </span>
-                    </div>
-                </el-alert>
-            </div>
+            <el-alert v-if="type === 'app'" :closable="false" type="warning">
+                <div class="mt-2 text-xs">
+                    <span>{{ $t('setting.backupJump') }}</span>
+                    <span class="jump" @click="goFile()">
+                        <el-icon class="ml-2"><Position /></el-icon>
+                        {{ $t('firewall.quickJump') }}
+                    </span>
+                </div>
+            </el-alert>
 
             <ComplexTable
+                class="mt-5"
                 v-loading="loading"
                 :pagination-config="paginationConfig"
                 v-model:selects="selects"
                 @search="search"
                 :data="data"
+                style="width: 100%"
             >
                 <template #toolbar>
                     <el-button type="primary" :disabled="status && status != 'Running'" @click="onBackup()">
@@ -49,7 +49,7 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column :label="$t('app.source')" prop="backupType">
+                <el-table-column min-width="100px" :label="$t('app.source')" prop="backupType">
                     <template #default="{ row }">
                         <span v-if="row.accountType === 'LOCAL'">
                             {{ $t('setting.LOCAL') }}
@@ -61,13 +61,24 @@
                     </template>
                 </el-table-column>
                 <el-table-column
+                    min-width="120px"
+                    :label="$t('commons.table.description')"
+                    prop="description"
+                    show-overflow-tooltip
+                >
+                    <template #default="{ row }">
+                        <fu-input-rw-switch v-model="row.description" @blur="onChange(row)" />
+                    </template>
+                </el-table-column>
+                <el-table-column
+                    min-width="80px"
                     prop="createdAt"
                     :label="$t('commons.table.date')"
                     :formatter="dateFormat"
                     show-overflow-tooltip
                 />
 
-                <fu-table-operations width="230px" :buttons="buttons" :label="$t('commons.table.operate')" fix />
+                <fu-table-operations width="200px" :buttons="buttons" :label="$t('commons.table.operate')" fix />
             </ComplexTable>
         </template>
     </DrawerPro>
@@ -78,13 +89,15 @@
         size="small"
         @close="handleBackupClose"
     >
-        <el-form ref="backupForm" @submit.prevent label-position="left" v-loading="loading">
-            <el-form-item
-                :label="$t('setting.compressPassword')"
-                class="mt-10"
-                v-if="type === 'app' || type === 'website'"
-            >
+        <el-alert :closable="false">
+            {{ $t('commons.msg.' + (isBackup ? 'backupHelper' : 'recoverHelper'), [name + '( ' + detailName + ' )']) }}
+        </el-alert>
+        <el-form class="mt-5" ref="backupForm" @submit.prevent label-position="top" v-loading="loading">
+            <el-form-item :label="$t('setting.compressPassword')" v-if="type === 'app' || type === 'website'">
                 <el-input v-model="secret" :placeholder="$t('setting.backupRecoverMessage')" />
+            </el-form-item>
+            <el-form-item v-if="isBackup" :label="$t('commons.table.description')">
+                <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 5 }" v-model="description" />
             </el-form-item>
         </el-form>
         <template #footer>
@@ -114,6 +127,7 @@ import {
     downloadBackupRecord,
     searchBackupRecords,
     loadRecordSize,
+    updateRecordDescription,
 } from '@/api/modules/backup';
 import i18n from '@/lang';
 import { Backup } from '@/api/interface/backup';
@@ -142,6 +156,7 @@ const detailName = ref();
 const backupPath = ref();
 const status = ref();
 const secret = ref();
+const description = ref();
 
 const open = ref();
 const isBackup = ref();
@@ -179,6 +194,11 @@ const loadBackupDir = async () => {
 
 const goFile = async () => {
     router.push({ name: 'File', query: { path: `${backupPath.value}/app/${name.value}/${detailName.value}` } });
+};
+
+const onChange = async (info: any) => {
+    await updateRecordDescription(info.id, info.description);
+    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
 };
 
 const search = async () => {
@@ -236,6 +256,7 @@ const backup = async (close: boolean) => {
         detailName: detailName.value,
         secret: secret.value,
         taskID: taskID,
+        description: description.value,
     };
     loading.value = true;
     try {
@@ -285,20 +306,8 @@ const recover = async (close: boolean, row?: any) => {
 };
 
 const onBackup = async () => {
+    description.value = '';
     isBackup.value = true;
-    if (type.value !== 'app' && type.value !== 'website') {
-        ElMessageBox.confirm(
-            i18n.global.t('commons.msg.backupHelper', [name.value + '( ' + detailName.value + ' )']),
-            i18n.global.t('commons.button.backup'),
-            {
-                confirmButtonText: i18n.global.t('commons.button.confirm'),
-                cancelButtonText: i18n.global.t('commons.button.cancel'),
-            },
-        ).then(async () => {
-            backup(true);
-        });
-        return;
-    }
     open.value = true;
 };
 

@@ -60,6 +60,8 @@ type CommonBackup struct {
 	Secret     string `json:"secret"`
 	TaskID     string `json:"taskID"`
 	FileName   string `json:"fileName"`
+
+	Description string `json:"description"`
 }
 type CommonRecover struct {
 	DownloadAccountID uint   `json:"downloadAccountID" validate:"required"`
@@ -92,6 +94,7 @@ type BackupRecords struct {
 	DownloadAccountID uint      `json:"downloadAccountID"`
 	FileDir           string    `json:"fileDir"`
 	FileName          string    `json:"fileName"`
+	Description       string    `json:"description"`
 }
 
 type DownloadRecord struct {

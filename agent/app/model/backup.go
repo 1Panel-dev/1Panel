@@ -26,4 +26,6 @@ type BackupRecord struct {
 	DetailName string `json:"detailName"`
 	FileDir    string `json:"fileDir"`
 	FileName   string `json:"fileName"`
+
+	Description string `json:"description"`
 }

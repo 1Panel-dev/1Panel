@@ -58,6 +58,7 @@ func (u *BackupService) AppBackup(req dto.CommonBackup) (*model.BackupRecord, er
 			DownloadAccountID: 1,
 			FileDir:           itemDir,
 			FileName:          fileName,
+			Description:       req.Description,
 		}
 		if err := backupRepo.CreateRecord(record); err != nil {
 			global.LOG.Errorf("save backup record failed, err: %v", err)

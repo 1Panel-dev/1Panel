@@ -103,6 +103,7 @@ onMounted(() => {
         let itemSize = Number(localStorage.getItem(props.paginationConfig.cacheSizeKey));
         if (itemSize) {
             props.paginationConfig.pageSize = itemSize;
+            sizeChange();
         }
     }
     let heightDiff = 320;

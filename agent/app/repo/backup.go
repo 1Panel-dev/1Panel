@@ -24,6 +24,7 @@ type IBackupRepo interface {
 	CreateRecord(record *model.BackupRecord) error
 	DeleteRecord(ctx context.Context, opts ...DBOption) error
 	UpdateRecord(record *model.BackupRecord) error
+	UpdateRecordByMap(id uint, upMap map[string]interface{}) error
 	WithByDetailName(detailName string) DBOption
 	WithByFileName(fileName string) DBOption
 	WithByCronID(cronjobID uint) DBOption
@@ -142,6 +143,10 @@ func (u *BackupRepo) CreateRecord(record *model.BackupRecord) error {
 
 func (u *BackupRepo) UpdateRecord(record *model.BackupRecord) error {
 	return global.DB.Save(record).Error
+}
+
+func (u *BackupRepo) UpdateRecordByMap(id uint, upMap map[string]interface{}) error {
+	return global.DB.Model(&model.BackupRecord{}).Where("id = ?", id).Updates(upMap).Error
 }
 
 func (u *BackupRepo) DeleteRecord(ctx context.Context, opts ...DBOption) error {

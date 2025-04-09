@@ -26,6 +26,7 @@ type IBackupRecordService interface {
 
 	ListFiles(req dto.OperateByID) []string
 	LoadRecordSize(req dto.SearchForSize) ([]dto.RecordFileSize, error)
+	UpdateDescription(req dto.UpdateDescription) error
 }
 
 func NewIBackupRecordService() IBackupRecordService {
@@ -260,4 +261,8 @@ func (u *BackupRecordService) LoadRecordSize(req dto.SearchForSize) ([]dto.Recor
 	}
 	wg.Wait()
 	return datas, nil
+}
+
+func (u *BackupRecordService) UpdateDescription(req dto.UpdateDescription) error {
+	return backupRepo.UpdateRecordByMap(req.ID, map[string]interface{}{"description": req.Description})
 }

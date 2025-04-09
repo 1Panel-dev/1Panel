@@ -44,6 +44,7 @@ func (u *BackupService) PostgresqlBackup(req dto.CommonBackup) error {
 		DownloadAccountID: 1,
 		FileDir:           itemDir,
 		FileName:          fileName,
+		Description:       req.Description,
 	}
 	if err := backupRepo.CreateRecord(record); err != nil {
 		global.LOG.Errorf("save backup record failed, err: %v", err)

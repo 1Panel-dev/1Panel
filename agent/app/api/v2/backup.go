@@ -304,6 +304,27 @@ func (b *BaseApi) DownloadRecord(c *gin.Context) {
 }
 
 // @Tags Backup Account
+// @Summary Update backup record description
+// @Accept json
+// @Param request body dto.UpdateDescription true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /backup/record/description/update [post]
+func (b *BaseApi) UpdateRecordDescription(c *gin.Context) {
+	var req dto.UpdateDescription
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := backupRecordService.UpdateDescription(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}
+
+// @Tags Backup Account
 // @Summary Delete backup record
 // @Accept json
 // @Param request body dto.BatchDeleteReq true "request"

@@ -32,5 +32,6 @@ func (s *BackupRouter) InitRouter(Router *gin.RouterGroup) {
 		backupRouter.POST("/record/search/bycronjob", baseApi.SearchBackupRecordsByCronjob)
 		backupRouter.POST("/record/download", baseApi.DownloadRecord)
 		backupRouter.POST("/record/del", baseApi.DeleteBackupRecord)
+		backupRouter.POST("/record/description/update", baseApi.UpdateRecordDescription)
 	}
 }
