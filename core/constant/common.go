@@ -33,6 +33,8 @@ const (
 
 	OneDriveRedirectURI = "http://localhost/login/authorized"
 	GoogleRedirectURI   = "http://localhost:8080"
+
+	DaemonJsonPath = "/etc/docker/daemon.json"
 )
 
 const (

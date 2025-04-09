@@ -1520,6 +1520,11 @@ const message = {
         proxyDocker: 'Docker Proxy',
         proxyDockerHelper:
             'Synchronize proxy server configuration to Docker, support offline server image pulling and other operations',
+        syncToNode: 'Sync to Node',
+        syncToNodeHelper: 'Sync settings to other nodes',
+        nodes: 'Node',
+        selectNode: 'Select Node',
+        selectNodeError: 'Please select a node',
         apiInterface: 'API Interface',
         apiInterfaceClose: 'Once closed, API interfaces cannot be accessed. Do you want to continue?',
         apiInterfaceHelper: 'Provide panel support for API interface access',

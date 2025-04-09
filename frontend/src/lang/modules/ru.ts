@@ -1494,6 +1494,11 @@ const message = {
         proxyDocker: 'Прокси Docker',
         proxyDockerHelper:
             'Синхронизировать конфигурацию прокси-сервера с Docker, поддержка офлайн загрузки образов и других операций',
+        syncToNode: 'Синхронизация с дочерним узлом',
+        syncToNodeHelper: 'Синхронизация настроек с другими узлами',
+        nodes: 'Узлы',
+        selectNode: 'Выберите узел',
+        selectNodeError: 'Пожалуйста, выберите узел',
         apiInterface: 'Включить API',
         apiInterfaceClose: 'После закрытия API-интерфейсы будут недоступны. Хотите продолжить?',
         apiInterfaceHelper: 'Разрешить сторонним приложениям доступ к API.',

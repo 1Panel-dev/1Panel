@@ -1505,6 +1505,11 @@ const message = {
         proxyDocker: 'Proksi Docker',
         proxyDockerHelper:
             'Selaraskan konfigurasi pelayan proksi ke Docker, menyokong tarikan imej pelayan luar talian dan operasi lain',
+        syncToNode: 'Penyegerakan ke nod anak',
+        syncToNodeHelper: 'Penyegerakan tetapan ke nod lain',
+        nodes: 'Nod',
+        selectNode: 'Pilih nod',
+        selectNodeError: 'Sila pilih nod',
         apiInterface: 'Aktifkan API',
         apiInterfaceClose: 'Setelah ditutup, antara muka API tidak boleh diakses. Adakah anda mahu meneruskan?',
         apiInterfaceHelper: 'Benarkan aplikasi pihak ketiga mengakses API.',

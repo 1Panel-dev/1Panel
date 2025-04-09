@@ -139,7 +139,7 @@
                                 </el-input>
                             </el-form-item>
 
-                            <el-form-item :label="$t('setting.proxy')" prop="proxyShow">
+                            <el-form-item :label="$t('setting.proxy')" prop="proxyShow" v-if="isMaster">
                                 <el-input disabled v-model="form.proxyShow">
                                     <template #append>
                                         <el-button @click="onChangeProxy" icon="Setting">
@@ -229,7 +229,7 @@ const loading = ref(false);
 const i18n = useI18n();
 const globalStore = GlobalStore();
 
-const { isMasterProductPro } = storeToRefs(globalStore);
+const { isMasterProductPro, isMaster } = storeToRefs(globalStore);
 
 const { switchTheme } = useTheme();
 const mobile = computed(() => {
@@ -266,6 +266,8 @@ const form = reactive({
     proxyPasswd: '',
     proxyPasswdKeep: '',
     proxyDocker: '',
+    proxyDockerSyncToNode: '',
+    proxyDockerSyncNodes: '',
 
     apiInterfaceStatus: 'Disable',
     apiKey: '',
@@ -339,6 +341,8 @@ const search = async () => {
                 : '{"light":"#005eeb","dark":"#F0BE96"}';
             globalStore.themeConfig.theme = form.theme;
             form.proxyDocker = xpackRes.data.proxyDocker;
+            form.proxyDockerSyncToNode = xpackRes.data.proxyDockerSyncToNode;
+            form.proxyDockerSyncNodes = xpackRes.data.proxyDockerSyncNodes;
         }
     } else {
         globalStore.themeConfig.theme = form.theme;
@@ -369,6 +373,8 @@ const onChangeProxy = () => {
         passwd: form.proxyPasswd,
         passwdKeep: form.proxyPasswdKeep,
         proxyDocker: form.proxyDocker,
+        proxyDockerSyncToNode: form.proxyDockerSyncToNode,
+        proxyDockerSyncNodes: form.proxyDockerSyncNodes,
     });
 };
 

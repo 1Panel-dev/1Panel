@@ -1443,6 +1443,11 @@ const message = {
         proxyDocker: 'Docker 프록시',
         proxyDockerHelper:
             '프록시 서버 구성을 Docker 에 동기화하여 오프라인 서버 이미지 가져오기 등의 작업을 지원합니다.',
+        syncToNode: '자식 노드로 동기화',
+        syncToNodeHelper: '다른 노드로 설정 동기화',
+        nodes: '노드',
+        selectNode: '노드 선택',
+        selectNodeError: '노드를 선택해 주세요',
         apiInterface: 'API 활성화',
         apiInterfaceClose: '비활성화하면 API 인터페이스에 접근할 수 없습니다. 계속하시겠습니까?',
         apiInterfaceHelper: '서드파티 애플리케이션이 API 에 접근할 수 있도록 허용합니다.',

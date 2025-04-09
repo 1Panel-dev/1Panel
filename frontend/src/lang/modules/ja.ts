@@ -1461,6 +1461,11 @@ const message = {
         proxyDocker: 'Dockerプロキシ',
         proxyDockerHelper:
             'プロキシサーバーの構成をDockerに同期し、オフラインサーバーイメージの引っ張りやその他の操作をサポートします',
+        syncToNode: '子ノードに同期',
+        syncToNodeHelper: '選択したノードへの同期設定',
+        nodes: 'ノード',
+        selectNode: 'ノードを選択',
+        selectNodeError: 'ノードを選択してください',
         apiInterface: 'APIを有効にします',
         apiInterfaceClose: '閉じたら、APIインターフェイスにアクセスできません。続けたいですか？',
         apiInterfaceHelper: 'サードパーティのアプリケーションにAPIにアクセスできるようにします。',

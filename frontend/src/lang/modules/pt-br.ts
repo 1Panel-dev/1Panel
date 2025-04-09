@@ -1490,6 +1490,11 @@ const message = {
         proxyDocker: 'Proxy Docker',
         proxyDockerHelper:
             'Sincronize a configuração do servidor proxy com o Docker, suportando operações de puxar imagens de servidor offline e outras',
+        syncToNode: 'Sincronizar para o nó filho',
+        syncToNodeHelper: 'Sincronizar de alerta para outros nós',
+        nodes: 'Nós',
+        selectNode: 'Selecionar nó',
+        selectNodeError: 'Por favor, selecione um nó',
         apiInterface: 'Habilitar API',
         apiInterfaceClose: 'Uma vez fechado, as interfaces da API não poderão ser acessadas. Deseja continuar?',
         apiInterfaceHelper: 'Permitir que aplicativos de terceiros acessem a API.',
