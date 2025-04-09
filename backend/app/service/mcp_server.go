@@ -279,10 +279,12 @@ func (m McpServerService) BindDomain(req request.McpBindDomain) error {
 			return buserr.New("ErrSSL")
 		}
 	}
+	group, _ := groupRepo.Get(groupRepo.WithByWebsiteDefault())
 	createWebsiteReq := request.WebsiteCreate{
-		PrimaryDomain: req.Domain,
-		Alias:         strings.ToLower(req.Domain),
-		Type:          constant.Static,
+		PrimaryDomain:  req.Domain,
+		Alias:          strings.ToLower(req.Domain),
+		Type:           constant.Static,
+		WebsiteGroupID: group.ID,
 	}
 	websiteService := NewIWebsiteService()
 	if err := websiteService.CreateWebsite(createWebsiteReq); err != nil {
@@ -386,13 +388,16 @@ func updateMcpConfig(websiteID uint) {
 	} else {
 		baseUrl = fmt.Sprintf("https://%s", websiteDomain.Domain)
 	}
-	for _, server := range servers {
-		if server.BaseURL != baseUrl {
-			server.BaseURL = baseUrl
-			server.HostIP = "127.0.0.1"
-			go updateMcpServer(&server)
+
+	go func() {
+		for _, server := range servers {
+			if server.BaseURL != baseUrl {
+				server.BaseURL = baseUrl
+				server.HostIP = "127.0.0.1"
+				_ = updateMcpServer(&server)
+			}
 		}
-	}
+	}()
 }
 
 func addProxy(server *model.McpServer) {
@@ -502,13 +507,13 @@ func updateMcpServer(mcpServer *model.McpServer) error {
 	if err := gotenv.Write(env, path.Join(mcpServer.Dir, ".env")); err != nil {
 		return err
 	}
+	_ = mcpServerRepo.Save(mcpServer)
 	composePath := path.Join(constant.McpDir, mcpServer.Name, "docker-compose.yml")
 	_, _ = compose.Down(composePath)
 	if _, err := compose.Up(composePath); err != nil {
 		mcpServer.Status = constant.RuntimeError
 		mcpServer.Message = err.Error()
 	}
-
 	return mcpServerRepo.Save(mcpServer)
 }
 

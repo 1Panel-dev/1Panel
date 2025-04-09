@@ -16,6 +16,7 @@ type IGroupRepo interface {
 	Delete(opts ...DBOption) error
 	CancelDefault(groupType string) error
 	WithByHostDefault() DBOption
+	WithByWebsiteDefault() DBOption
 }
 
 func NewIGroupRepo() IGroupRepo {
@@ -53,6 +54,12 @@ func (u *GroupRepo) Update(id uint, vars map[string]interface{}) error {
 func (u *GroupRepo) WithByHostDefault() DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("is_default = ? AND type = ?", 1, "host")
+	}
+}
+
+func (u *GroupRepo) WithByWebsiteDefault() DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("is_default = ? AND type = ?", 1, "website")
 	}
 }
 
