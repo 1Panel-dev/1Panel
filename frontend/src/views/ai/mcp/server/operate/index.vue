@@ -170,6 +170,14 @@ const hasWebsite = ref(false);
 const acceptParams = async (params: AI.McpServer) => {
     hasWebsite.value = false;
     mode.value = params.id ? 'edit' : 'create';
+    let mcpDomainRes;
+    try {
+        mcpDomainRes = await getMcpDomain();
+        if (mcpDomainRes.data.connUrl != '') {
+            hasWebsite.value = true;
+        }
+    } catch (error) {}
+
     if (mode.value == 'edit') {
         mcpServer.value = params;
         if (!mcpServer.value.environments) {
@@ -186,16 +194,12 @@ const acceptParams = async (params: AI.McpServer) => {
         if (params.port) {
             mcpServer.value.port = params.port;
         }
-        try {
-            const res = await getMcpDomain();
-            if (res.data.connUrl != '') {
-                const parts = res.data.connUrl.split(/(https?:\/\/)/).filter(Boolean);
-                mcpServer.value.protocol = parts[0];
-                mcpServer.value.url = parts[1];
-                mcpServer.value.baseUrl = res.data.connUrl;
-                hasWebsite.value = true;
-            }
-        } catch (error) {}
+        if (mcpDomainRes.data && mcpDomainRes.data.connUrl != '') {
+            const parts = mcpDomainRes.data.connUrl.split(/(https?:\/\/)/).filter(Boolean);
+            mcpServer.value.protocol = parts[0];
+            mcpServer.value.url = parts[1];
+            mcpServer.value.baseUrl = mcpDomainRes.data.connUrl;
+        }
     }
     open.value = true;
 };
