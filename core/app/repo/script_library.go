@@ -9,10 +9,11 @@ import (
 type IScriptRepo interface {
 	Get(opts ...global.DBOption) (model.ScriptLibrary, error)
 	GetList(opts ...global.DBOption) ([]model.ScriptLibrary, error)
-	Create(snap *model.ScriptLibrary) error
+	Create(script *model.ScriptLibrary) error
 	Update(id uint, vars map[string]interface{}) error
 	Page(limit, offset int, opts ...global.DBOption) (int64, []model.ScriptLibrary, error)
 	Delete(opts ...global.DBOption) error
+	SyncAll(scripts []model.ScriptLibrary) error
 
 	WithByInfo(info string) global.DBOption
 }
@@ -34,13 +35,13 @@ func (u *ScriptRepo) Get(opts ...global.DBOption) (model.ScriptLibrary, error) {
 }
 
 func (u *ScriptRepo) GetList(opts ...global.DBOption) ([]model.ScriptLibrary, error) {
-	var snaps []model.ScriptLibrary
+	var scripts []model.ScriptLibrary
 	db := global.DB.Model(&model.ScriptLibrary{})
 	for _, opt := range opts {
 		db = opt(db)
 	}
-	err := db.Find(&snaps).Error
-	return snaps, err
+	err := db.Find(&scripts).Error
+	return scripts, err
 }
 
 func (u *ScriptRepo) Page(page, size int, opts ...global.DBOption) (int64, []model.ScriptLibrary, error) {
@@ -69,6 +70,20 @@ func (u *ScriptRepo) Delete(opts ...global.DBOption) error {
 		db = opt(db)
 	}
 	return db.Delete(&model.ScriptLibrary{}).Error
+}
+
+func (u *ScriptRepo) SyncAll(scripts []model.ScriptLibrary) error {
+	tx := global.DB.Begin()
+	if err := tx.Where("is_system = ?", 1).Delete(&model.ScriptLibrary{}).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	if err := tx.Save(&scripts).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	tx.Commit()
+	return nil
 }
 
 func (u *ScriptRepo) WithByInfo(info string) global.DBOption {

@@ -47,10 +47,12 @@ type SubTask struct {
 const (
 	TaskUpgrade = "TaskUpgrade"
 	TaskAddNode = "TaskAddNode"
+	TaskSync    = "TaskSync"
 )
 
 const (
 	TaskScopeSystem = "System"
+	TaskScopeScript = "Script"
 )
 
 const (

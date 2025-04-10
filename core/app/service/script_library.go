@@ -1,31 +1,45 @@
 package service
 
 import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"os"
+	"path"
 	"strconv"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/model"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
+	"github.com/1Panel-dev/1Panel/core/app/task"
 	"github.com/1Panel-dev/1Panel/core/buserr"
+	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
+	"github.com/1Panel-dev/1Panel/core/i18n"
+	"github.com/1Panel-dev/1Panel/core/utils/common"
+	"github.com/1Panel-dev/1Panel/core/utils/files"
+	"github.com/1Panel-dev/1Panel/core/utils/req_helper"
+	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
+	"gopkg.in/yaml.v2"
 )
 
 type ScriptService struct{}
 
 type IScriptService interface {
-	Search(req dto.SearchPageWithGroup) (int64, interface{}, error)
+	Search(ctx *gin.Context, req dto.SearchPageWithGroup) (int64, interface{}, error)
 	Create(req dto.ScriptOperate) error
 	Update(req dto.ScriptOperate) error
 	Delete(ids dto.OperateByIDs) error
+	Sync() error
 }
 
 func NewIScriptService() IScriptService {
 	return &ScriptService{}
 }
 
-func (u *ScriptService) Search(req dto.SearchPageWithGroup) (int64, interface{}, error) {
+func (u *ScriptService) Search(ctx *gin.Context, req dto.SearchPageWithGroup) (int64, interface{}, error) {
 	options := []global.DBOption{repo.WithOrderBy("created_at desc")}
 	if len(req.Info) != 0 {
 		options = append(options, scriptRepo.WithByInfo(req.Info))
@@ -45,7 +59,20 @@ func (u *ScriptService) Search(req dto.SearchPageWithGroup) (int64, interface{},
 		if err := copier.Copy(&item, &itemData); err != nil {
 			global.LOG.Errorf("copy backup account to dto backup info failed, err: %v", err)
 		}
-		matchGourp := false
+		if item.IsSystem {
+			lang := strings.ToLower(common.GetLang(ctx))
+			var nameMap = make(map[string]string)
+			_ = json.Unmarshal([]byte(item.Name), &nameMap)
+			var descriptionMap = make(map[string]string)
+			_ = json.Unmarshal([]byte(item.Description), &descriptionMap)
+			if val, ok := nameMap[lang]; ok {
+				item.Name = val
+			}
+			if val, ok := descriptionMap[lang]; ok {
+				item.Description = val
+			}
+		}
+		matchGroup := false
 		groupIDs := strings.Split(itemData.Groups, ",")
 		for _, idItem := range groupIDs {
 			id, _ := strconv.Atoi(idItem)
@@ -53,7 +80,7 @@ func (u *ScriptService) Search(req dto.SearchPageWithGroup) (int64, interface{},
 				continue
 			}
 			if uint(id) == req.GroupID {
-				matchGourp = true
+				matchGroup = true
 			}
 			item.GroupList = append(item.GroupList, uint(id))
 			item.GroupBelong = append(item.GroupBelong, groupMap[uint(id)])
@@ -62,7 +89,7 @@ func (u *ScriptService) Search(req dto.SearchPageWithGroup) (int64, interface{},
 			data = append(data, item)
 			continue
 		}
-		if matchGourp {
+		if matchGroup {
 			data = append(data, item)
 		}
 	}
@@ -124,4 +151,97 @@ func (u *ScriptService) Update(req dto.ScriptOperate) error {
 
 func LoadScriptInfo(id uint) (model.ScriptLibrary, error) {
 	return scriptRepo.Get(repo.WithByID(id))
+}
+
+func (u *ScriptService) Sync() error {
+	syncTask, err := task.NewTaskWithOps(i18n.GetMsgByKey("LocalApp"), task.TaskSync, task.TaskScopeScript, "", 0)
+	if err != nil {
+		global.LOG.Errorf("create sync task failed %v", err)
+		return err
+	}
+
+	syncTask.AddSubTask(task.GetTaskName(i18n.GetMsgByKey("LocalApp"), task.TaskSync, task.TaskScopeScript), func(t *task.Task) (err error) {
+		versionUrl := fmt.Sprintf("%s/scripts/version.txt", global.CONF.RemoteURL.ResourceURL)
+		_, versionRes, err := req_helper.HandleRequest(versionUrl, http.MethodGet, constant.TimeOut20s)
+		if err != nil {
+			return fmt.Errorf("load scripts version from remote failed, err: %v", err)
+		}
+		var scriptSetting model.Setting
+		_ = global.DB.Where("key = ?", "ScriptVersion").First(&scriptSetting).Error
+		if scriptSetting.Value == string(versionRes) {
+			syncTask.Log("The local and remote versions are detected to be consistent. Skip...")
+			return nil
+		}
+
+		syncTask.Log("start to download data.yaml")
+		dataUrl := fmt.Sprintf("%s/scripts/data.yaml", global.CONF.RemoteURL.ResourceURL)
+		_, dataRes, err := req_helper.HandleRequest(dataUrl, http.MethodGet, constant.TimeOut20s)
+		if err != nil {
+			return fmt.Errorf("load scripts data.yaml from remote failed, err: %v", err)
+		}
+
+		syncTask.Log("download successful!")
+		var scripts Scripts
+		if err = yaml.Unmarshal(dataRes, &scripts); err != nil {
+			return fmt.Errorf("the format of data.yaml is err: %v", err)
+		}
+
+		syncTask.Log("start to download scripts.tar.gz")
+		tmpDir := path.Join(global.CONF.Base.InstallDir, "1panel/tmp/script")
+		if _, err := os.Stat(tmpDir); err != nil {
+			_ = os.MkdirAll(tmpDir, 0755)
+		}
+		scriptsUrl := fmt.Sprintf("%s/scripts/scripts.tar.gz", global.CONF.RemoteURL.ResourceURL)
+		if err := files.DownloadFile(scriptsUrl, tmpDir+"/scripts.tar.gz"); err != nil {
+			return fmt.Errorf("download scripts.tar.gz failed, err: %v", err)
+		}
+		syncTask.Log("download successful! now start to decompress...")
+		if err := files.HandleUnTar(tmpDir+"/scripts.tar.gz", tmpDir, ""); err != nil {
+			return fmt.Errorf("handle decompress scripts.tar.gz failed, err: %v", err)
+		}
+		var scriptsForDB []model.ScriptLibrary
+		for _, item := range scripts.Scripts.Sh {
+			itemName, _ := json.Marshal(item.Name)
+			itemDescription, _ := json.Marshal(item.Description)
+			shell, _ := os.ReadFile(fmt.Sprintf("%s/scripts/sh/%s.sh", tmpDir, item.Key))
+			scriptItem := model.ScriptLibrary{
+				Name:        string(itemName),
+				IsSystem:    true,
+				Script:      string(shell),
+				Description: string(itemDescription),
+			}
+			scriptsForDB = append(scriptsForDB, scriptItem)
+		}
+
+		syncTask.Log("analytic completion! now start to refresh database...")
+		if err := scriptRepo.SyncAll(scriptsForDB); err != nil {
+			return fmt.Errorf("sync script with db failed, err: %v", err)
+		}
+		_ = os.RemoveAll(tmpDir)
+		if err := global.DB.Model(&model.Setting{}).Where("key = ?", "ScriptVersion").Updates(map[string]interface{}{"value": string(versionRes)}).Error; err != nil {
+			return fmt.Errorf("update script version in db failed, err: %v", err)
+		}
+		return nil
+	}, nil)
+
+	if err := syncTask.Execute(); err != nil {
+		return fmt.Errorf("sync scripts from remote failed, err: %v", err)
+	}
+	return nil
+}
+
+type Scripts struct {
+	Scripts ScriptDetail `json:"scripts"`
+}
+
+type ScriptDetail struct {
+	Sh []ScriptHelper `json:"sh"`
+}
+
+type ScriptHelper struct {
+	Key         string            `json:"key"`
+	Sort        uint              `json:"sort"`
+	Groups      string            `json:"groups"`
+	Name        map[string]string `json:"name"`
+	Description map[string]string `json:"description"`
 }

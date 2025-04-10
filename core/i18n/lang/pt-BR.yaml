@@ -82,10 +82,14 @@ SubTaskSuccess: "{{ .name }} bem-sucedido"
 SubTaskFailed: "{{ .name }} falhou: {{ .err }}"
 TaskInstall: "Instalar"
 TaskUpgrade: "Atualizar"
+TaskSync: 'Sincronizar'
 SuccessStatus: "{{ .name }} bem-sucedido"
 FailedStatus: "{{ .name }} falhou {{ .err }}"
 Start: "Iniciar"
 SubTask: "Subtarefa"
+
+#script 
+ScriptLibrary: "Biblioteca de Scripts"
 
 #upgrade node
 NodeUpgrade: "Atualizar nó {{ .name }}"

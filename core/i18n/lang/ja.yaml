@@ -83,10 +83,14 @@ SubTaskSuccess: "{{ .name }} 成功"
 SubTaskFailed: "{{ .name }} 失敗: {{ .err }}"
 TaskInstall: "インストール"
 TaskUpgrade: "アップグレード"
+TaskSync: '同期'
 SuccessStatus: "{{ .name }} 成功"
 FailedStatus: "{{ .name }} 失敗 {{ .err }}"
 Start: "開始"
 SubTask: "サブタスク"
+
+#script 
+ScriptLibrary: "スクリプトライブラリ"
 
 #upgrade node
 NodeUpgrade: "{{ .name }} ノードのアップグレード"

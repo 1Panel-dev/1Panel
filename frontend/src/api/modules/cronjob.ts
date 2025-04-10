@@ -63,6 +63,9 @@ export const searchScript = (params: SearchWithPage) => {
 export const addScript = (params: Cronjob.ScriptOperate) => {
     return http.post(`/core/script`, params);
 };
+export const syncScript = () => {
+    return http.post(`/core/script/sync`, {}, TimeoutEnum.T_60S);
+};
 export const editScript = (params: Cronjob.ScriptOperate) => {
     return http.post(`/core/script/update`, params);
 };

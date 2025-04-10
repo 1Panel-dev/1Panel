@@ -386,11 +386,11 @@ func RestartService(core, agent, reload bool) {
 	}
 	switch {
 	case core && agent:
-		command += "systemctl restart 1panel-core.service && systemctl restart 1pane-agent.service"
+		command += "systemctl restart 1panel-core.service && systemctl restart 1panel-agent.service"
 	case core:
 		command += "systemctl restart 1panel-core.service"
 	case agent:
-		command += "systemctl restart 1pane-agent.service"
+		command += "systemctl restart 1panel-agent.service"
 	default:
 		return
 	}

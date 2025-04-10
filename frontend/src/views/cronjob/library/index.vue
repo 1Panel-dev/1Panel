@@ -5,6 +5,9 @@
                 <el-button type="primary" @click="onOpenDialog('create')">
                     {{ $t('commons.button.add') }}
                 </el-button>
+                <el-button type="primary" plain @click="onSync()">
+                    {{ $t('commons.button.sync') }}
+                </el-button>
                 <el-button type="primary" plain @click="onOpenGroupDialog()">
                     {{ $t('commons.table.group') }}
                 </el-button>
@@ -83,11 +86,11 @@
 </template>
 
 <script setup lang="ts">
-import { dateFormat } from '@/utils/util';
+import { dateFormat, deepCopy, getCurrentDateFormatted } from '@/utils/util';
 import GroupDialog from '@/components/group/index.vue';
 import OperateDialog from '@/views/cronjob/library/operate/index.vue';
 import TerminalDialog from '@/views/cronjob/library/run/index.vue';
-import { deleteScript, searchScript } from '@/api/modules/cronjob';
+import { deleteScript, searchScript, syncScript } from '@/api/modules/cronjob';
 import { onMounted, reactive, ref } from '@vue/runtime-core';
 import { Cronjob } from '@/api/interface/cronjob';
 import i18n from '@/lang';
@@ -170,6 +173,24 @@ const onDelete = async (row: Cronjob.ScriptInfo | null) => {
     });
 };
 
+const onSync = async () => {
+    ElMessageBox.confirm(i18n.global.t('cronjob.library.syncHelper', i18n.global.t('commons.button.sync')), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'info',
+    }).then(async () => {
+        loading.value = true;
+        await syncScript()
+            .then(() => {
+                loading.value = false;
+                search();
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+    });
+};
+
 const search = async () => {
     let params = {
         info: searchInfo.value,
@@ -212,6 +233,18 @@ const buttons = [
             ).then(() => {
                 runRef.value!.acceptParams({ scriptID: row.id, scriptName: row.name });
             });
+        },
+    },
+    {
+        label: i18n.global.t('commons.button.clone'),
+        disabled: (row: any) => {
+            return !row.isSystem;
+        },
+        click: (row: Cronjob.ScriptInfo) => {
+            let item = deepCopy(row) as Cronjob.ScriptInfo;
+            item.id = 0;
+            item.name += '-' + getCurrentDateFormatted();
+            onOpenDialog('create', item);
         },
     },
     {

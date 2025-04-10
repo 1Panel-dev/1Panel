@@ -36,6 +36,7 @@ const message = {
             view: '详情',
             watch: '追踪',
             handle: '执行',
+            clone: '克隆',
             expand: '展开',
             collapse: '收起',
             log: '日志',
@@ -992,6 +993,7 @@ const message = {
             groupHelper: '针对脚本特征设置不同的分组，可以更加快速的对脚本进行筛选操作。',
             handleHelper: '将在 {0} 上执行 {1} 脚本，是否继续？',
             noSuchApp: '未检测到 {0} 服务，请先使用脚本库安装脚本快速安装！',
+            syncHelper: '即将同步系统脚本库，该操作仅针对系统脚本，是否继续？',
         },
     },
     monitor: {

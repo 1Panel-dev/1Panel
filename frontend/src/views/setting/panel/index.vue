@@ -149,7 +149,7 @@
                                 </el-input>
                             </el-form-item>
 
-                            <el-form-item :label="$t('setting.apiInterface')" prop="apiInterface">
+                            <el-form-item :label="$t('setting.apiInterface')" prop="apiInterface" v-if="isMaster">
                                 <el-switch
                                     @change="onChangeApiInterfaceStatus"
                                     v-model="form.apiInterfaceStatus"

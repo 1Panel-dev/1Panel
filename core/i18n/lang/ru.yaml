@@ -82,10 +82,14 @@ SubTaskSuccess: "{{ .name }} успешно"
 SubTaskFailed: "{{ .name }} не удалось: {{ .err }}"
 TaskInstall: "Установить"
 TaskUpgrade: "Обновить"
+TaskSync: 'Синхронизация'
 SuccessStatus: "{{ .name }} успешно"
 FailedStatus: "{{ .name }} не удалось {{ .err }}"
 Start: "Начать"
 SubTask: "Подзадача"
+
+#script 
+ScriptLibrary: "Библиотека скриптов"
 
 #upgrade node
 NodeUpgrade: "Обновление узла {{ .name }}"

@@ -24,6 +24,7 @@ func Init() {
 		migrations.AddSystemIP,
 		migrations.InitScriptLibrary,
 		migrations.AddOperationNode,
+		migrations.AddScriptVersion,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

@@ -53,7 +53,7 @@ func (b *BaseApi) SearchScript(c *gin.Context) {
 		return
 	}
 
-	total, list, err := scriptService.Search(req)
+	total, list, err := scriptService.Search(c, req)
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -81,6 +81,21 @@ func (b *BaseApi) DeleteScript(c *gin.Context) {
 	}
 
 	if err := scriptService.Delete(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}
+
+// @Tags ScriptLibrary
+// @Summary Sync script from remote
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /script/sync [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"同步脚本库脚本","formatEN":"sync scripts"}
+func (b *BaseApi) SyncScript(c *gin.Context) {
+	if err := scriptService.Sync(); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}

@@ -82,10 +82,14 @@ SubTaskSuccess: "{{ .name }} 성공"
 SubTaskFailed: "{{ .name }} 실패: {{ .err }}"
 TaskInstall: "설치"
 TaskUpgrade: "업그레이드"
+TaskSync: '동기화'
 SuccessStatus: "{{ .name }} 성공"
 FailedStatus: "{{ .name }} 실패 {{ .err }}"
 Start: "시작"
 SubTask: "서브 작업"
+
+#script 
+ScriptLibrary: "스크립트 라이브러리"
 
 #upgrade node
 NodeUpgrade: "{{ .name }} 노드 업그레이드"

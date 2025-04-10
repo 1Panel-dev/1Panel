@@ -36,6 +36,7 @@ const message = {
             view: '詳情',
             watch: '追蹤',
             handle: '執行',
+            clone: '克隆',
             expand: '展開',
             collapse: '收起',
             log: '日誌',
@@ -994,6 +995,7 @@ const message = {
             groupHelper: '根據腳本特徵設置不同的分組，可以更快地對腳本進行篩選操作。',
             handleHelper: '將在 {0} 上執行 {1} 腳本，是否繼續？',
             noSuchApp: '未檢測到 {0} 服務，請先使用腳本庫快速安裝！',
+            syncHelper: '即將同步系統腳本庫，該操作僅針對系統腳本，是否繼續？',
         },
     },
     monitor: {

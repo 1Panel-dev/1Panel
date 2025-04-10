@@ -82,10 +82,14 @@ SubTaskSuccess: "{{ .name }} berjaya"
 SubTaskFailed: "{{ .name }} gagal: {{ .err }}"
 TaskInstall: "Pasang"
 TaskUpgrade: "Kemas kini"
+TaskSync: 'Selaraskan'
 SuccessStatus: "{{ .name }} berjaya"
 FailedStatus: "{{ .name }} gagal {{ .err }}"
 Start: "Mula"
 SubTask: "Tugas Sub"
+
+#script 
+ScriptLibrary: "Pustaka Skrip"
 
 #upgrade node
 NodeUpgrade: "Naik taraf node {{ .name }}"

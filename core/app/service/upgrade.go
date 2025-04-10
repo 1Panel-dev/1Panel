@@ -174,7 +174,7 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 		_ = settingRepo.Update("SystemStatus", "Free")
 
 		_, _ = cmd.ExecWithTimeOut("systemctl daemon-reload", 30*time.Second)
-		_, _ = cmd.ExecWithTimeOut("systemctl restart 1pane-agent.service", 1*time.Second)
+		_, _ = cmd.ExecWithTimeOut("systemctl restart 1panel-agent.service", 1*time.Second)
 		_, _ = cmd.ExecWithTimeOut("systemctl restart 1panel-core.service", 1*time.Second)
 	}()
 	return nil

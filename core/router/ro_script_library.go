@@ -18,6 +18,7 @@ func (s *ScriptRouter) InitRouter(Router *gin.RouterGroup) {
 		scriptRouter.POST("/search", baseApi.SearchScript)
 		scriptRouter.POST("/del", baseApi.DeleteScript)
 		scriptRouter.POST("/update", baseApi.UpdateScript)
+		scriptRouter.POST("/sync", baseApi.SyncScript)
 		scriptRouter.GET("/run", baseApi.RunScript)
 	}
 }

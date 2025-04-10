@@ -34,6 +34,7 @@ const message = {
             view: 'Visualizar',
             watch: 'Monitorar',
             handle: 'Disparar',
+            clone: 'Clonar',
             expand: 'Expandir',
             collapse: 'Recolher',
             log: 'Logs',
@@ -1026,6 +1027,8 @@ const message = {
             handleHelper: 'Executar o script {1} em {0}, continuar?',
             noSuchApp:
                 'O serviço {0} não foi detectado. Por favor, instale-o rapidamente usando a biblioteca de scripts primeiro!',
+            syncHelper:
+                'Preparando para sincronizar a biblioteca de scripts do sistema. Esta operação afeta apenas scripts do sistema. Continuar?',
         },
     },
     monitor: {

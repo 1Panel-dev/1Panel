@@ -34,6 +34,7 @@ const message = {
             view: 'Lihat',
             watch: 'Pantau',
             handle: 'Picu',
+            clone: 'Klon',
             expand: 'Kembang',
             collapse: 'Runtuh',
             log: 'Log',
@@ -1037,6 +1038,7 @@ const message = {
             handleHelper: 'Akan melaksanakan skrip {1} pada {0}, teruskan?',
             noSuchApp:
                 'Perkhidmatan {0} tidak dikesan. Sila pasang dengan cepat menggunakan pustaka skrip terlebih dahulu!',
+            syncHelper: 'Akan menyelaraskan pustaka skrip sistem. Operasi ini hanya melibatkan skrip sistem. Teruskan?',
         },
     },
     monitor: {

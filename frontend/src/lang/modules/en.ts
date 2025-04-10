@@ -36,6 +36,7 @@ const message = {
             view: 'View',
             watch: 'Watch',
             handle: 'Handle',
+            clone: 'Clone',
             expand: 'Expand',
             collapse: 'Collapse',
             log: 'Log',
@@ -1047,6 +1048,7 @@ const message = {
                 'Set different groups based on script characteristics, which allows for faster script filtering operations.',
             handleHelper: 'Execute script {1} on {0}, continue?',
             noSuchApp: 'The {0} service was not detected. Please install it quickly using the script library first!',
+            syncHelper: 'About to sync system script library. This operation only affects system scripts. Continue?',
         },
     },
     monitor: {

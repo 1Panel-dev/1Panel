@@ -82,10 +82,14 @@ SubTaskSuccess: "{{ .name }} 成功"
 SubTaskFailed: "{{ .name }} 失敗: {{ .err }}"
 TaskInstall: "安裝"
 TaskUpgrade: "升級"
+TaskSync: '同步'
 SuccessStatus: "{{ .name }} 成功"
 FailedStatus: "{{ .name }} 失敗 {{ .err }}"
 Start: "開始"
 SubTask: "子任務"
+
+#script 
+ScriptLibrary: "腳本庫"
 
 #upgrade node
 NodeUpgrade: "升級節點 {{ .name }}"
