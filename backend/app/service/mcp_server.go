@@ -430,7 +430,7 @@ func addProxy(server *model.McpServer) {
 	if !ok {
 		return
 	}
-	location.UpdateDirective("proxy_pass", []string{fmt.Sprintf("http://127.0.1:%d%s", server.Port, server.SsePath)})
+	location.UpdateDirective("proxy_pass", []string{fmt.Sprintf("http://127.0.0.1:%d%s", server.Port, server.SsePath)})
 	location.ChangePath("^~", server.SsePath)
 	if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 		global.LOG.Errorf("write config failed, err: %v", buserr.WithErr(constant.ErrUpdateBuWebsite, err))
@@ -486,7 +486,7 @@ func addMCPProxy(websiteID uint) error {
 			err = errors.New("error")
 			return err
 		}
-		location.UpdateDirective("proxy_pass", []string{fmt.Sprintf("http://127.0.1:%d%s", server.Port, server.SsePath)})
+		location.UpdateDirective("proxy_pass", []string{fmt.Sprintf("http://127.0.0.1:%d%s", server.Port, server.SsePath)})
 		location.ChangePath("^~", server.SsePath)
 		if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 			return buserr.WithErr(constant.ErrUpdateBuWebsite, err)
