@@ -169,7 +169,8 @@ func hasOs(name string) bool {
 		strings.Contains(name, "arm64") ||
 		strings.Contains(name, "armv7") ||
 		strings.Contains(name, "ppc64le") ||
-		strings.Contains(name, "s390x")
+		strings.Contains(name, "s390x") ||
+		strings.Contains(name, "riscv64")
 }
 
 func loadOs() string {
