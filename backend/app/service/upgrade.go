@@ -357,5 +357,8 @@ func loadArch() (string, error) {
 	if strings.Contains(std, "s390x") {
 		return "s390x", nil
 	}
+	if strings.Contains(std, "riscv64") {
+		return "riscv64", nil
+	}
 	return "", fmt.Errorf("unsupported such arch: %s", std)
 }
