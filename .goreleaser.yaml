@@ -10,7 +10,7 @@ before:
     - ./ci/script.sh
     - sed -i 's@ORIGINAL_VERSION=.*@ORIGINAL_VERSION=v{{ .Version }}@g' 1pctl
     - go mod tidy
-    
+
 builds:
   - main: ./cmd/server/main.go
     binary: 1panel
@@ -31,6 +31,7 @@ builds:
       - arm
       - ppc64le
       - s390x
+      - riscv64
 
 archives:
   - formats: [ 'tar.gz' ]
