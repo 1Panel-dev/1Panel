@@ -2,8 +2,6 @@ package service
 
 import (
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/utils/geo"
-	"github.com/gin-gonic/gin"
 	"os"
 	"os/user"
 	"path"
@@ -11,6 +9,9 @@ import (
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/utils/geo"
+	"github.com/gin-gonic/gin"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
@@ -59,26 +60,16 @@ func (u *SSHService) GetSSHInfo() (*dto.SSHInfo, error) {
 	if err != nil {
 		data.Status = constant.StatusDisable
 		data.Message = err.Error()
-	} else {
-		active, err := systemctl.IsActive(serviceName)
-		if !active {
-			data.Status = constant.StatusDisable
-			if err != nil {
-				data.Message = err.Error()
-			}
-		} else {
-			data.Status = constant.StatusEnable
-		}
 	}
-
-	out, err := systemctl.RunSystemCtl("is-enabled", serviceName)
-	if err != nil {
-		data.AutoStart = false
+	isEnabled, _ := systemctl.IsEnable(serviceName)
+	data.AutoStart = isEnabled
+	isActive, err := systemctl.IsActive(serviceName)
+	if isActive {
+		data.Status = constant.StatusEnable
 	} else {
-		if out == "alias\n" {
-			data.AutoStart, _ = systemctl.IsEnable("ssh")
-		} else {
-			data.AutoStart = out == "enabled\n"
+		data.Status = constant.StatusDisable
+		if err != nil {
+			data.Message = err.Error()
 		}
 	}
 
@@ -121,29 +112,26 @@ func (u *SSHService) OperateSSH(operation string) error {
 	if err != nil {
 		return err
 	}
-	sudo := cmd.SudoHandleCmd()
-	if operation == "enable" || operation == "disable" {
-		serviceName += ".service"
-	}
-	if operation == "stop" {
+	switch operation {
+	case "enable":
+		return systemctl.Enable(serviceName)
+	case "disable":
+		return systemctl.Disable(serviceName)
+	case "start":
+		return systemctl.Start(serviceName)
+	case "stop":
 		isSocketActive, _ := systemctl.IsActive(serviceName + ".socket")
 		if isSocketActive {
-			std, err := cmd.Execf("%s systemctl stop %s", sudo, serviceName+".socket")
-			if err != nil {
-				global.LOG.Errorf("handle systemctl stop %s.socket failed, err: %v", serviceName, std)
+			if err := systemctl.Stop(serviceName + ".socket"); err != nil {
+				global.LOG.Errorf("Failed to stop %s.socket: %v", serviceName, err)
 			}
 		}
+		return systemctl.Stop(serviceName)
+	case "restart":
+		return systemctl.Restart(serviceName)
 	}
-
-	stdout, err := cmd.Execf("%s systemctl %s %s", sudo, operation, serviceName)
-	if err != nil {
-		if strings.Contains(stdout, "alias name or linked unit file") {
-			stdout, err := cmd.Execf("%s systemctl %s ssh", sudo, operation)
-			if err != nil {
-				return fmt.Errorf("%s ssh(alias name or linked unit file) failed, stdout: %s, err: %v", operation, stdout, err)
-			}
-		}
-		return fmt.Errorf("%s %s failed, stdout: %s, err: %v", operation, serviceName, stdout, err)
+	if result, err := systemctl.CustomAction(operation, serviceName); err != nil {
+		return fmt.Errorf("failed to execute custom action: %v", result.Output)
 	}
 	return nil
 }
@@ -198,7 +186,10 @@ func (u *SSHService) Update(req dto.SSHUpdate) error {
 		}
 	}
 
-	_, _ = cmd.Execf("%s systemctl restart %s", sudo, serviceName)
+	err = systemctl.Restart(serviceName)
+	if err != nil {
+		global.LOG.Errorf("handle restart %s failed, err: %v", serviceName, err)
+	}
 	return nil
 }
 
@@ -216,8 +207,10 @@ func (u *SSHService) UpdateByFile(value string) error {
 	if _, err = file.WriteString(value); err != nil {
 		return err
 	}
-	sudo := cmd.SudoHandleCmd()
-	_, _ = cmd.Execf("%s systemctl restart %s", sudo, serviceName)
+	err = systemctl.Restart(serviceName)
+	if err != nil {
+		global.LOG.Errorf("handle restart %s failed, err: %v", serviceName, err)
+	}
 	return nil
 }
 
@@ -541,12 +534,14 @@ func handleGunzip(path string) error {
 }
 
 func loadServiceName() (string, error) {
-	if exist, _ := systemctl.IsExist("sshd"); exist {
-		return "sshd", nil
-	} else if exist, _ := systemctl.IsExist("ssh"); exist {
-		return "ssh", nil
+	serviceName, err := systemctl.GetServiceName("ssh")
+	if err != nil {
+		if errors.Is(err, systemctl.ErrServiceNotFound) {
+			return "", fmt.Errorf("SSH service unavailable. Please ensure OpenSSH server is installed and configured")
+		}
+		return "", fmt.Errorf("failed to load SSH service name: %w", err)
 	}
-	return "", errors.New("The ssh or sshd service is unavailable")
+	return serviceName, nil
 }
 
 func loadDate(currentYear int, DateStr string, nyc *time.Location) time.Time {

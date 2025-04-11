@@ -3,6 +3,12 @@ package service
 import (
 	"bytes"
 	"fmt"
+	"os/exec"
+	"os/user"
+	"path"
+	"strconv"
+	"strings"
+
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
@@ -14,11 +20,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/systemctl"
 	"github.com/pkg/errors"
 	"gopkg.in/ini.v1"
-	"os/exec"
-	"os/user"
-	"path"
-	"strconv"
-	"strings"
 )
 
 type HostToolService struct{}
@@ -39,91 +40,120 @@ func NewIHostToolService() IHostToolService {
 }
 
 func (h *HostToolService) GetToolStatus(req request.HostToolReq) (*response.HostToolRes, error) {
-	res := &response.HostToolRes{}
-	res.Type = req.Type
+	res := &response.HostToolRes{Type: req.Type}
 	switch req.Type {
 	case constant.Supervisord:
-		supervisorConfig := &response.Supervisor{}
-		if !cmd.Which(constant.Supervisord) {
-			supervisorConfig.IsExist = false
-			res.Config = supervisorConfig
-			return res, nil
-		}
-		supervisorConfig.IsExist = true
-		serviceExist, _ := systemctl.IsExist(constant.Supervisord)
-		if !serviceExist {
-			serviceExist, _ = systemctl.IsExist(constant.Supervisor)
-			if !serviceExist {
-				supervisorConfig.IsExist = false
-				res.Config = supervisorConfig
-				return res, nil
-			} else {
-				supervisorConfig.ServiceName = constant.Supervisor
-			}
-		} else {
-			supervisorConfig.ServiceName = constant.Supervisord
-		}
-
-		serviceNameSet, _ := settingRepo.Get(settingRepo.WithByKey(constant.SupervisorServiceName))
-		if serviceNameSet.ID != 0 || serviceNameSet.Value != "" {
-			supervisorConfig.ServiceName = serviceNameSet.Value
-		}
-
-		versionRes, _ := cmd.Exec("supervisord -v")
-		supervisorConfig.Version = strings.TrimSuffix(versionRes, "\n")
-		_, ctlRrr := exec.LookPath("supervisorctl")
-		supervisorConfig.CtlExist = ctlRrr == nil
-
-		active, _ := systemctl.IsActive(supervisorConfig.ServiceName)
-		if active {
-			supervisorConfig.Status = "running"
-		} else {
-			supervisorConfig.Status = "stopped"
-		}
-
-		pathSet, _ := settingRepo.Get(settingRepo.WithByKey(constant.SupervisorConfigPath))
-		if pathSet.ID != 0 || pathSet.Value != "" {
-			supervisorConfig.ConfigPath = pathSet.Value
-			res.Config = supervisorConfig
-			return res, nil
-		} else {
-			supervisorConfig.Init = true
-		}
-
-		servicePath := "/usr/lib/systemd/system/supervisor.service"
-		fileOp := files.NewFileOp()
-		if !fileOp.Stat(servicePath) {
-			servicePath = "/usr/lib/systemd/system/supervisord.service"
-		}
-		if fileOp.Stat(servicePath) {
-			startCmd, _ := ini_conf.GetIniValue(servicePath, "Service", "ExecStart")
-			if startCmd != "" {
-				args := strings.Fields(startCmd)
-				cIndex := -1
-				for i, arg := range args {
-					if arg == "-c" {
-						cIndex = i
-						break
-					}
-				}
-				if cIndex != -1 && cIndex+1 < len(args) {
-					supervisorConfig.ConfigPath = args[cIndex+1]
-				}
-			}
-		}
-		if supervisorConfig.ConfigPath == "" {
-			configPath := "/etc/supervisord.conf"
-			if !fileOp.Stat(configPath) {
-				configPath = "/etc/supervisor/supervisord.conf"
-				if fileOp.Stat(configPath) {
-					supervisorConfig.ConfigPath = configPath
-				}
-			}
-		}
-
-		res.Config = supervisorConfig
+		return h.getSupervisorStatus(res)
 	}
 	return res, nil
+}
+
+func (h *HostToolService) getSupervisorStatus(res *response.HostToolRes) (*response.HostToolRes, error) {
+	supervisorConfig := &response.Supervisor{}
+
+	// 1. 检查supervisord是否安装
+	if !cmd.Which(constant.Supervisord) {
+		supervisorConfig.IsExist = false
+		res.Config = supervisorConfig
+		return res, nil
+	}
+	supervisorConfig.IsExist = true
+
+	// 2. 获取服务名称（兼容不同平台）
+	serviceName, err := h.determineServiceName()
+	if err != nil || serviceName == "" {
+		supervisorConfig.IsExist = false
+		res.Config = supervisorConfig
+		return res, nil
+	}
+	supervisorConfig.ServiceName = serviceName
+
+	// 3. 从数据库获取自定义服务名
+	if nameSetting, _ := settingRepo.Get(settingRepo.WithByKey(constant.SupervisorServiceName)); nameSetting.Value != "" {
+		supervisorConfig.ServiceName = nameSetting.Value
+	}
+
+	// 4. 获取版本信息
+	if version, err := cmd.Exec("supervisord -v"); err == nil {
+		supervisorConfig.Version = strings.TrimSpace(version)
+	}
+
+	// 5. 检查supervisorctl是否存在
+	_, errCtl := exec.LookPath("supervisorctl")
+	supervisorConfig.CtlExist = errCtl == nil
+
+	// 6. 检查服务状态
+	if active, err := systemctl.IsActive(supervisorConfig.ServiceName); err == nil && active {
+		supervisorConfig.Status = "running"
+	} else {
+		supervisorConfig.Status = "stopped"
+	}
+
+	// 7. 获取配置文件路径
+	h.resolveConfigPath(supervisorConfig)
+
+	res.Config = supervisorConfig
+	return res, nil
+}
+
+func (h *HostToolService) determineServiceName() (string, error) {
+	// 优先级 1: 数据库配置
+	if setting, _ := settingRepo.Get(settingRepo.WithByKey(constant.SupervisorServiceName)); setting.Value != "" {
+		serviceName, err := systemctl.GetServiceName(setting.Value)
+		if err != nil {
+			return "", fmt.Errorf("get service name error: %v", err)
+		}
+		return serviceName, nil
+	}
+	// 优先级 2: 自动检测服务名
+	if serviceName, err := systemctl.GetServiceName(constant.Supervisord); err == nil {
+		return serviceName, nil
+	}
+	return systemctl.GetServiceName(constant.Supervisor)
+}
+
+func (h *HostToolService) resolveConfigPath(config *response.Supervisor) {
+	// 1. 数据库配置优先
+	if pathSetting, _ := settingRepo.Get(settingRepo.WithByKey(constant.SupervisorConfigPath)); pathSetting.Value != "" {
+		config.ConfigPath = pathSetting.Value
+		return
+	}
+
+	// 2. 尝试获取服务文件路径
+	if servicePath, err := systemctl.GetServicePath(config.ServiceName); err == nil {
+		if startCmd, _ := ini_conf.GetIniValue(servicePath, "Service", "ExecStart"); startCmd != "" {
+			if path := parseConfigPathFromCommand(startCmd); path != "" {
+				config.ConfigPath = path
+				return
+			}
+		}
+	}
+
+	// 3. 尝试默认路径
+	defaultPaths := []string{
+		"/etc/supervisord.conf",
+		"/etc/supervisor/supervisord.conf",
+		"/usr/local/etc/supervisord.conf",
+	}
+	for _, path := range defaultPaths {
+		if systemctl.FileExist(path) {
+			config.ConfigPath = path
+			return
+		}
+	}
+
+	// 4. 标记需要初始化配置
+	config.Init = true
+}
+
+func parseConfigPathFromCommand(cmd string) string {
+	parts := strings.Fields(cmd)
+	for i, part := range parts {
+		if part == "-c" && i+1 < len(parts) {
+			return parts[i+1]
+		}
+	}
+	return ""
 }
 
 func (h *HostToolService) CreateToolConfig(req request.HostToolCreate) error {
@@ -200,14 +230,28 @@ func (h *HostToolService) CreateToolConfig(req request.HostToolCreate) error {
 }
 
 func (h *HostToolService) OperateTool(req request.HostToolReq) error {
-	serviceName := req.Type
-	if req.Type == constant.Supervisord {
+	var serviceName string
+	var err error
+	switch req.Type {
+	case constant.Supervisord:
 		serviceNameSet, _ := settingRepo.Get(settingRepo.WithByKey(constant.SupervisorServiceName))
 		if serviceNameSet.ID != 0 || serviceNameSet.Value != "" {
 			serviceName = serviceNameSet.Value
+		} else {
+			serviceName = req.Type
 		}
+	default:
+		serviceName = req.Type
 	}
-	return systemctl.Operate(req.Operate, serviceName)
+	serviceName, err = systemctl.GetServiceName(serviceName)
+	if err != nil {
+		if errors.Is(err, systemctl.ErrServiceNotFound) {
+			return fmt.Errorf("%s service unavailable. Please ensure supervisor server is installed and configured", serviceName)
+		}
+		return err
+	}
+	_, err = systemctl.CustomAction(req.Operate, serviceName)
+	return err
 }
 
 func (h *HostToolService) OperateToolConfig(req request.HostToolConfig) (*response.HostToolConfig, error) {

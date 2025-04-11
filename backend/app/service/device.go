@@ -18,6 +18,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/ntp"
+	"github.com/1Panel-dev/1Panel/backend/utils/systemctl"
 	"github.com/shirou/gopsutil/v3/mem"
 )
 
@@ -121,7 +122,7 @@ func (u *DeviceService) Update(key, value string) error {
 			return err
 		}
 		go func() {
-			_, err := cmd.Exec("systemctl restart 1panel.service")
+			err := systemctl.Restart("1panel")
 			if err != nil {
 				global.LOG.Errorf("restart system for new time zone failed, err: %v", err)
 			}

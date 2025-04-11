@@ -17,6 +17,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
+	"github.com/1Panel-dev/1Panel/backend/utils/systemctl"
 )
 
 type snapHelper struct {
@@ -43,16 +44,34 @@ func snapPanel(snap snapHelper, targetDir string) {
 	defer snap.Wg.Done()
 	_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"panel": constant.Running})
 	status := constant.StatusDone
-	if err := common.CopyFile("/usr/local/bin/1panel", path.Join(targetDir, "1panel")); err != nil {
-		status = err.Error()
+	h, err := systemctl.DefaultHandler("1panel")
+
+	if err != nil {
+		status = fmt.Sprintf("initialize service handle failed: %v", err)
+		snap.Status.Panel = status
+		_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"panel": status})
+		return
 	}
 
-	if err := common.CopyFile("/usr/local/bin/1pctl", targetDir); err != nil {
+	binDir := systemctl.BinaryPath
+	servicePath, err := h.GetServicePath()
+	if err != nil {
+		status = fmt.Sprintf("get service path failed: %v", err)
+		snap.Status.Panel = status
+		_ = snapshotRepo.UpdateStatus(snap.Status.ID, map[string]interface{}{"panel": status})
+		return
+	}
+
+	if err := common.CopyFile(path.Join(binDir, "1panel"), path.Join(targetDir, "1panel")); err != nil {
 		status = err.Error()
 	}
-	_, _ = cmd.Execf("cp -r /usr/local/bin/lang %s", targetDir)
-
-	if err := common.CopyFile("/etc/systemd/system/1panel.service", targetDir); err != nil {
+	if err := common.CopyFile(path.Join(binDir, "1pctl"), targetDir); err != nil {
+		status = err.Error()
+	}
+	if _, err := cmd.Execf("cp -r %s/lang %s", binDir, targetDir); err != nil {
+		status = err.Error()
+	}
+	if err := common.CopyFile(servicePath, targetDir); err != nil {
 		status = err.Error()
 	}
 	snap.Status.Panel = status
@@ -260,7 +279,7 @@ func handleSnapTar(sourceDir, targetDir, name, exclusionRules string, secret str
 		commands = fmt.Sprintf("tar --warning=no-file-changed --ignore-failed-read --exclude-from=<(find %s -type s -print) -zcf %s %s %s %s", sourceDir, " -"+exStr, path, extraCmd, targetDir+"/"+name)
 		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" %s ", secret), "******"))
 	} else {
-		commands = fmt.Sprintf("tar --warning=no-file-changed --ignore-failed-read --exclude-from=<(find %s -type s -printf '%s' | sed 's|^|./|') -zcf %s %s -C %s .", sourceDir, "%P\n", targetDir+"/"+name, exStr, sourceDir)
+		commands = fmt.Sprintf("tar --warning=no-file-changed --ignore-failed-read --exclude-from=<(find %s -type s -printf '%%P\n' | sed 's|^|./|') -zcf %s %s -C %s .", sourceDir, targetDir+"/"+name, exStr, sourceDir)
 		global.LOG.Debug(commands)
 	}
 	stdout, err := cmd.ExecWithTimeOut(commands, 30*time.Minute)

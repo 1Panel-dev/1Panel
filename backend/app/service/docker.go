@@ -365,17 +365,18 @@ func (u *DockerService) UpdateConfByFile(req dto.DaemonJsonUpdateByFile) error {
 
 func (u *DockerService) OperateDocker(req dto.DockerOperation) error {
 	service := "docker"
-	sudo := cmd.SudoHandleCmd()
-	dockerCmd, err := getDockerRestartCommand()
+	h, err := systemctl.DefaultHandler(service)
 	if err != nil {
 		return err
 	}
 	if req.Operation == "stop" {
-		isSocketActive, _ := systemctl.IsActive("docker.socket")
-		if isSocketActive {
-			std, err := cmd.Execf("%s systemctl stop docker.socket", sudo)
-			if err != nil {
-				global.LOG.Errorf("handle systemctl stop docker.socket failed, err: %v", std)
+		socketHandle, err := systemctl.DefaultHandler("docker.socket")
+		if err == nil {
+			status, err := socketHandle.CheckStatus()
+			if err == nil && status.IsActive {
+				if std, err := socketHandle.ExecuteAction("stop"); err != nil {
+					global.LOG.Errorf("handle stop docker.socket failed, err: %v", std)
+				}
 			}
 		}
 	}
@@ -385,14 +386,12 @@ func (u *DockerService) OperateDocker(req dto.DockerOperation) error {
 			return err
 		}
 	}
-
-	stdout, err := cmd.Execf("%s %s %s", dockerCmd, req.Operation, service)
+	result, err := h.ExecuteAction(req.Operation)
 	if err != nil {
-		return errors.New(stdout)
+		return errors.New(result.Output)
 	}
 	return nil
 }
-
 func changeLogOption(daemonMap map[string]interface{}, logMaxFile, logMaxSize string) {
 	if opts, ok := daemonMap["log-opts"]; ok {
 		if len(logMaxFile) != 0 || len(logMaxSize) != 0 {
@@ -451,31 +450,23 @@ func validateDockerConfig() error {
 		return nil
 	}
 	if err != nil || (stdout != "" && strings.TrimSpace(stdout) != "configuration OK") {
-		return fmt.Errorf("Docker configuration validation failed, err: %v", stdout)
+		return fmt.Errorf("docker configuration validation failed, err: %v", stdout)
 	}
 	return nil
 }
 
-func getDockerRestartCommand() (string, error) {
-	stdout, err := cmd.Exec("which docker")
-	if err != nil {
-		return "", fmt.Errorf("failed to find docker: %v", err)
-	}
-	dockerPath := stdout
-	if strings.Contains(dockerPath, "snap") {
-		return "snap", nil
-	}
-	return "systemctl", nil
-}
+// func getDockerRestartCommand() (string, error) {
+// 	stdout, err := cmd.Exec("which docker")
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to find docker: %v", err)
+// 	}
+// 	dockerPath := stdout
+// 	if strings.Contains(dockerPath, "snap") {
+// 		return "snap", nil
+// 	}
+// 	return "systemctl", nil
+// }
 
 func restartDocker() error {
-	restartCmd, err := getDockerRestartCommand()
-	if err != nil {
-		return err
-	}
-	stdout, err := cmd.Execf("%s restart docker", restartCmd)
-	if err != nil {
-		return fmt.Errorf("failed to restart Docker: %s", stdout)
-	}
-	return nil
+	return systemctl.Restart("docker")
 }

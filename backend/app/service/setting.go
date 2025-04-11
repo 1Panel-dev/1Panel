@@ -21,10 +21,10 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
-	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
+	"github.com/1Panel-dev/1Panel/backend/utils/systemctl"
 	"github.com/gin-gonic/gin"
 	"github.com/robfig/cron/v3"
 )
@@ -166,7 +166,7 @@ func (u *SettingService) UpdateBindInfo(req dto.BindInfo) error {
 	}
 	go func() {
 		time.Sleep(1 * time.Second)
-		_, err := cmd.Exec("systemctl restart 1panel.service")
+		err := systemctl.Restart("1panel")
 		if err != nil {
 			global.LOG.Errorf("restart system with new bind info failed, err: %v", err)
 		}
@@ -214,7 +214,7 @@ func (u *SettingService) UpdatePort(port uint) error {
 	}
 	go func() {
 		time.Sleep(1 * time.Second)
-		_, err := cmd.Exec("systemctl restart 1panel.service")
+		err := systemctl.Restart("1panel")
 		if err != nil {
 			global.LOG.Errorf("restart system port failed, err: %v", err)
 		}
@@ -237,7 +237,7 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 		c.SetCookie(constant.SessionName, sID, 0, "", "", false, true)
 
 		go func() {
-			_, err := cmd.Exec("systemctl restart 1panel.service")
+			err := systemctl.Restart("1panel")
 			if err != nil {
 				global.LOG.Errorf("restart system failed, err: %v", err)
 			}
@@ -335,7 +335,7 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 	c.SetCookie(constant.SessionName, sID, 0, "", "", true, true)
 	go func() {
 		time.Sleep(1 * time.Second)
-		_, err := cmd.Exec("systemctl restart 1panel.service")
+		err := systemctl.Restart("1panel")
 		if err != nil {
 			global.LOG.Errorf("restart system failed, err: %v", err)
 		}
@@ -552,7 +552,7 @@ func (u *SettingService) GenerateRSAKey() error {
 		return err
 	}
 	privateKeyPEM := exportPrivateKeyToPEM(privateKey)
-	publicKeyPEM, err := exportPublicKeyToPEM(&privateKey.PublicKey)
+	publicKeyPEM, _ := exportPublicKeyToPEM(&privateKey.PublicKey)
 	err = settingRepo.UpdateOrCreate("PASSWORD_PRIVATE_KEY", privateKeyPEM)
 	if err != nil {
 		return err

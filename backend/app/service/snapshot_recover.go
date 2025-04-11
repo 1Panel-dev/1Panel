@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"sync"
 
@@ -15,6 +16,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
+	"github.com/1Panel-dev/1Panel/backend/utils/systemctl"
 	"github.com/pkg/errors"
 )
 
@@ -91,8 +93,19 @@ func (u *SnapshotService) HandleSnapshotRecover(snap model.Snapshot, isRecover b
 		req.IsNew = true
 	}
 
+	h, err := systemctl.DefaultHandler("1panel")
+	if err != nil {
+		updateRecoverStatus(snap.ID, isRecover, "ServiceHandle", constant.StatusFailed, fmt.Sprintf("initialize service handle failed: %v", err))
+		return
+	}
+
 	if req.IsNew || snap.InterruptStep == "1PanelBinary" {
-		if err := recoverPanel(path.Join(snapFileDir, "1panel/1panel"), "/usr/local/bin"); err != nil {
+		binDir := systemctl.BinaryPath
+		// if err != nil {
+		// 	updateRecoverStatus(snap.ID, isRecover, "GetBinaryPath", constant.StatusFailed, fmt.Sprintf("get binary path failed: %v", err))
+		// 	return
+		// }
+		if err := recoverPanel(path.Join(snapFileDir, "1panel/1panel"), binDir); err != nil {
 			updateRecoverStatus(snap.ID, isRecover, "1PanelBinary", constant.StatusFailed, err.Error())
 			return
 		}
@@ -100,16 +113,34 @@ func (u *SnapshotService) HandleSnapshotRecover(snap model.Snapshot, isRecover b
 		req.IsNew = true
 	}
 	if req.IsNew || snap.InterruptStep == "1PctlBinary" {
-		if err := recoverPanel(path.Join(snapFileDir, "1panel/1pctl"), "/usr/local/bin"); err != nil {
+		binDir := systemctl.BinaryPath
+		// if err != nil {
+		// 	updateRecoverStatus(snap.ID, isRecover, "GetBinaryPath", constant.StatusFailed, fmt.Sprintf("get binary path failed: %v", err))
+		// 	return
+		// }
+		if err := recoverPanel(path.Join(snapFileDir, "1panel/1pctl"), binDir); err != nil {
 			updateRecoverStatus(snap.ID, isRecover, "1PctlBinary", constant.StatusFailed, err.Error())
 			return
 		}
-		_, _ = cmd.Execf("cp -r %s %s", path.Join(snapFileDir, "1panel/lang"), "/usr/local/bin/")
+		langDir := path.Join(binDir, "lang")
+		if err := os.RemoveAll(langDir); err != nil {
+			updateRecoverStatus(snap.ID, isRecover, "RemoveLang", constant.StatusFailed, fmt.Sprintf("remove lang dir failed: %v", err))
+			return
+		}
+		if err := common.CopyDirs(path.Join(snapFileDir, "1panel/lang"), langDir); err != nil {
+			updateRecoverStatus(snap.ID, isRecover, "CopyLang", constant.StatusFailed, fmt.Sprintf("copy lang files failed: %v", err))
+			return
+		}
 		global.LOG.Debug("recover 1pctl from snapshot file successful!")
 		req.IsNew = true
 	}
 	if req.IsNew || snap.InterruptStep == "1PanelService" {
-		if err := recoverPanel(path.Join(snapFileDir, "1panel/1panel.service"), "/etc/systemd/system"); err != nil {
+		servicePath, err := h.GetServicePath()
+		if err != nil {
+			updateRecoverStatus(snap.ID, isRecover, "GetServicePath", constant.StatusFailed, fmt.Sprintf("get service path failed: %v", err))
+			return
+		}
+		if err := recoverPanel(path.Join(snapFileDir, "1panel/"+filepath.Base(servicePath)), filepath.Dir(servicePath)); err != nil {
 			updateRecoverStatus(snap.ID, isRecover, "1PanelService", constant.StatusFailed, err.Error())
 			return
 		}
@@ -147,7 +178,9 @@ func (u *SnapshotService) HandleSnapshotRecover(snap model.Snapshot, isRecover b
 		global.LOG.Debugf("remove the file %s after the operation is successful", path.Dir(snapFileDir))
 		_ = os.RemoveAll(path.Dir(snapFileDir))
 	}
-	_, _ = cmd.Exec("systemctl daemon-reload && systemctl restart 1panel.service")
+	if err := systemctl.Restart("1panel"); err != nil {
+		global.LOG.Errorf("restart 1panel service failed: %v", err)
+	}
 }
 
 func backupBeforeRecover(snap model.Snapshot) error {
