@@ -12,7 +12,7 @@
             </el-tooltip>
         </template>
         <template #content>
-            <ContainerLog :compose="compose" :resource="resource" />
+            <ContainerLog :compose="compose" :resource="resource" :highlightDiff="highlightDiff" />
         </template>
     </DrawerPro>
 </template>
@@ -29,11 +29,19 @@ const resource = ref('');
 const globalStore = GlobalStore();
 const logVisible = ref(false);
 const compose = ref('');
+const highlightDiff = ref(320);
 
 interface DialogProps {
     compose: string;
     resource: string;
 }
+
+const defaultProps = defineProps({
+    highlightDiff: {
+        type: Number,
+        default: 320,
+    },
+});
 
 const mobile = computed(() => {
     return globalStore.isMobile();
@@ -56,6 +64,7 @@ watch(logVisible, (val) => {
 });
 
 const acceptParams = (props: DialogProps): void => {
+    highlightDiff.value = defaultProps.highlightDiff;
     compose.value = props.compose;
     resource.value = props.resource;
     open.value = true;

@@ -22,6 +22,9 @@
                     {{ $t('commons.button.delete') }}
                 </el-button>
             </template>
+            <template #rightToolBar>
+                <TableRefresh @search="search()" />
+            </template>
             <template #main>
                 <ComplexTable
                     :data="data"

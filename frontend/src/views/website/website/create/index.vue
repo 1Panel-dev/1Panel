@@ -606,7 +606,7 @@ const initData = () => ({
     ftpUser: '',
     ftpPassword: '',
     proxyType: 'tcp',
-    port: 0,
+    port: 9000,
     proxyProtocol: 'http://',
     proxyAddress: '',
     runtimeType: 'php',
@@ -808,9 +808,13 @@ const changeRuntime = (runID: number) => {
     runtimes.value.forEach((item) => {
         if (item.id === runID) {
             runtimeResource.value = item.resource;
-            runtimePorts.value = item.port.split(',').map((port: string) => parseInt(port.trim(), 10));
-            if (runtimePorts.value.length > 0) {
-                website.value.port = runtimePorts.value[0];
+            if (runtimeResource.value == 'local') {
+                website.value.port = 9000;
+            } else {
+                runtimePorts.value = item.port.split(',').map((port: string) => parseInt(port.trim(), 10));
+                if (runtimePorts.value.length > 0) {
+                    website.value.port = runtimePorts.value[0];
+                }
             }
         }
     });

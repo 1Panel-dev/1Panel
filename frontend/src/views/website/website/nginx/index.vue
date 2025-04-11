@@ -31,7 +31,7 @@
             <Status v-if="activeName === '1'" :status="status" />
             <Source v-if="activeName === '2'" />
             <NginxPer v-if="activeName === '3'" />
-            <ContainerLog v-if="activeName === '4'" :container="containerName" />
+            <ContainerLog v-if="activeName === '4'" :container="containerName" :highlightDiff="350" />
             <Module v-if="activeName === '5'" />
         </template>
     </LayoutContent>

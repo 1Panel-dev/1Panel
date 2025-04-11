@@ -570,14 +570,14 @@ func setListen(server *components.Server, port string, ipv6, http3, defaultServe
 	}
 	server.UpdateListen(port, defaultServer, params...)
 	if ssl && http3 {
-		server.UpdateListen(port, defaultServer, "quic")
+		server.UpdateListen(port, defaultServer, "quic", "reuseport")
 	}
 	if !ipv6 {
 		return
 	}
 	server.UpdateListen("[::]:"+port, defaultServer, params...)
 	if ssl && http3 {
-		server.UpdateListen("[::]:"+port, defaultServer, "quic")
+		server.UpdateListen("[::]:"+port, defaultServer, "quic", "reuseport")
 	}
 }
 
@@ -713,10 +713,10 @@ func applySSL(website *model.Website, websiteSSL model.WebsiteSSL, req request.W
 	}
 	if !req.Http3 {
 		for _, port := range httpsPort {
-			server.RemoveListen(strconv.Itoa(port), "quic")
+			server.RemoveListen(strconv.Itoa(port), "quic", "reuseport")
 			if website.IPV6 {
 				httpsPortIPV6 := "[::]:" + strconv.Itoa(port)
-				server.RemoveListen(httpsPortIPV6, "quic")
+				server.RemoveListen(httpsPortIPV6, "quic", "reuseport")
 			}
 		}
 		server.RemoveDirective("add_header", []string{"Alt-Svc"})

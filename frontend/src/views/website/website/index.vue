@@ -51,15 +51,14 @@
                     </div>
                 </el-select>
                 <TableSearch @search="search()" v-model:searchName="req.name" />
-                <div class="!ml-2.5">
-                    <fu-table-column-select
-                        :columns="columns"
-                        trigger="hover"
-                        :title="$t('commons.table.selectColumn')"
-                        popper-class="popper-class"
-                        :only-icon="true"
-                    />
-                </div>
+                <TableRefresh @search="search()" />
+                <fu-table-column-select
+                    :columns="columns"
+                    trigger="hover"
+                    :title="$t('commons.table.selectColumn')"
+                    popper-class="popper-class"
+                    :only-icon="true"
+                />
             </template>
             <template v-if="!openNginxConfig" #main>
                 <ComplexTable

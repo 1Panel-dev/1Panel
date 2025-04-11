@@ -18,6 +18,7 @@ type IRuntimeRepo interface {
 	WithStatus(status string) DBOption
 	WithDetailId(id uint) DBOption
 	WithPort(port int) DBOption
+	WithNormalStatus(status string) DBOption
 	Page(page, size int, opts ...DBOption) (int64, []model.Runtime, error)
 	Create(ctx context.Context, runtime *model.Runtime) error
 	Save(runtime *model.Runtime) error
@@ -33,6 +34,12 @@ func NewIRunTimeRepo() IRuntimeRepo {
 func (r *RuntimeRepo) WithStatus(status string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("status = ?", status)
+	}
+}
+
+func (r *RuntimeRepo) WithNormalStatus(status string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("status = ? or status = 'Normal'", status)
 	}
 }
 

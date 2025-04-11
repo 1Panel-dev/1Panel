@@ -317,6 +317,7 @@ const containerStyle = computed(() => ({
 }));
 
 onMounted(async () => {
+    logs.value = [];
     firstLoading.value = true;
     await init();
     nextTick(() => {

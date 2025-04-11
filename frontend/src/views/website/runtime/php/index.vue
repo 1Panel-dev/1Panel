@@ -96,11 +96,11 @@
 
         <CreateRuntime ref="createRef" @close="search" @submit="openCreateLog" />
         <OpDialog ref="opRef" @search="search" />
-        <Log ref="logRef" @close="search" :heightDiff="280" />
+        <Log ref="logRef" @close="search" :heightDiff="200" />
         <Extensions ref="extensionsRef" @close="search" />
         <AppResources ref="checkRef" @close="search" />
         <ExtManagement ref="extManagementRef" />
-        <ComposeLogs ref="composeLogRef" />
+        <ComposeLogs ref="composeLogRef" :highlightDiff="400" />
         <Config ref="configRef" />
         <Supervisor ref="supervisorRef" />
     </div>
@@ -262,12 +262,12 @@ const openLog = (row: Runtime.RuntimeDTO) => {
     if (row.status == 'Running') {
         composeLogRef.value.acceptParams({ compose: row.path + '/docker-compose.yml', resource: row.name });
     } else {
-        logRef.value.acceptParams({ id: row.id, type: 'php', tail: row.status == 'Building', heightDiff: 220 });
+        logRef.value.acceptParams({ id: row.id, type: 'php', tail: row.status == 'Building' });
     }
 };
 
 const openCreateLog = (id: number) => {
-    logRef.value.acceptParams({ id: id, type: 'php', tail: true, heightDiff: 220 });
+    logRef.value.acceptParams({ id: id, type: 'php', tail: true });
 };
 
 const openExtensions = () => {

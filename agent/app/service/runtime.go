@@ -190,7 +190,11 @@ func (r *RuntimeService) Page(req request.RuntimeSearch) (int64, []response.Runt
 		opts = append(opts, repo.WithByLikeName(req.Name))
 	}
 	if req.Status != "" {
-		opts = append(opts, runtimeRepo.WithStatus(req.Status))
+		if req.Type == constant.TypePhp {
+			opts = append(opts, runtimeRepo.WithNormalStatus(req.Status))
+		} else {
+			opts = append(opts, runtimeRepo.WithStatus(req.Status))
+		}
 	}
 	if req.Type != "" {
 		opts = append(opts, repo.WithByType(req.Type))
@@ -203,6 +207,9 @@ func (r *RuntimeService) Page(req request.RuntimeSearch) (int64, []response.Runt
 		return 0, nil, err
 	}
 	for _, runtime := range runtimes {
+		if runtime.Resource == constant.ResourceLocal {
+			runtime.Status = constant.StatusNormal
+		}
 		runtimeDTO := response.NewRuntimeDTO(runtime)
 		runtimeDTO.Params = make(map[string]interface{})
 		envMap, err := gotenv.Unmarshal(runtime.Env)
