@@ -386,6 +386,15 @@ func (u *DockerService) OperateDocker(req dto.DockerOperation) error {
 			return err
 		}
 	}
+
+	if isDockerSnapInstalled() {
+		command := fmt.Sprintf("snap %s docker", req.Operation)
+		stdout, err := cmd.Exec(command)
+		if err != nil {
+			return fmt.Errorf("failed to restart docker: %v", stdout)
+		}
+		return nil
+	}
 	result, err := h.ExecuteAction(req.Operation)
 	if err != nil {
 		return errors.New(result.Output)
@@ -455,18 +464,22 @@ func validateDockerConfig() error {
 	return nil
 }
 
-// func getDockerRestartCommand() (string, error) {
-// 	stdout, err := cmd.Exec("which docker")
-// 	if err != nil {
-// 		return "", fmt.Errorf("failed to find docker: %v", err)
-// 	}
-// 	dockerPath := stdout
-// 	if strings.Contains(dockerPath, "snap") {
-// 		return "snap", nil
-// 	}
-// 	return "systemctl", nil
-// }
+func isDockerSnapInstalled() bool {
+	stdout, err := cmd.Exec("which docker")
+	if err != nil {
+		return false
+	}
+	stdout = strings.TrimSpace(stdout)
+	return strings.Contains(stdout, "snap")
+}
 
 func restartDocker() error {
+	if isDockerSnapInstalled() {
+		stdout, err := cmd.Exec("snap restart docker")
+		if err != nil {
+			return fmt.Errorf("failed to restart docker: %v", stdout)
+		}
+		return nil
+	}
 	return systemctl.Restart("docker")
 }
