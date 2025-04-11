@@ -178,6 +178,9 @@ func (u *SnapshotService) HandleSnapshotRecover(snap model.Snapshot, isRecover b
 		global.LOG.Debugf("remove the file %s after the operation is successful", path.Dir(snapFileDir))
 		_ = os.RemoveAll(path.Dir(snapFileDir))
 	}
+	if h.ManagerName() == "systemd" {
+		_, _ = cmd.Exec("systemctl daemon-reload")
+	}
 	if err := systemctl.Restart("1panel"); err != nil {
 		global.LOG.Errorf("restart 1panel service failed: %v", err)
 	}
