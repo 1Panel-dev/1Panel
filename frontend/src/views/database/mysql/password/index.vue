@@ -74,6 +74,8 @@ const changeVisible = ref(false);
 type FormInstance = InstanceType<typeof ElForm>;
 const changeFormRef = ref<FormInstance>();
 const title = ref();
+const oldPrivilege = ref();
+const oldPrivilegeIPs = ref();
 const changeForm = reactive({
     id: 0,
     from: '',
@@ -124,6 +126,8 @@ const acceptParams = (params: DialogProps): void => {
     changeForm.privilegeIPs = params.privilegeIPs;
     changeForm.value = params.value;
     changeVisible.value = true;
+    oldPrivilege.value = params.privilege;
+    oldPrivilegeIPs.value = params.privilegeIPs;
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -165,6 +169,10 @@ const submitChangeInfo = async (formEl: FormInstance | undefined) => {
                         loading.value = false;
                     });
             }
+            return;
+        }
+        if (changeForm.privilege === oldPrivilege.value && changeForm.privilegeIPs === oldPrivilegeIPs.value) {
+            changeVisible.value = false;
             return;
         }
         if (changeForm.privilege !== 'ip') {
