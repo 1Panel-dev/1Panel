@@ -3,13 +3,12 @@ package common
 import (
 	"crypto/rand"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/buserr"
-	"github.com/gin-gonic/gin"
 	"io"
 	mathRand "math/rand"
 	"net"
 	"os"
 	"path"
+	"path/filepath"
 	"reflect"
 	"regexp"
 	"sort"
@@ -17,6 +16,9 @@ import (
 	"strings"
 	"time"
 	"unicode"
+
+	"github.com/1Panel-dev/1Panel/backend/buserr"
+	"github.com/gin-gonic/gin"
 
 	"golang.org/x/net/idna"
 
@@ -124,6 +126,9 @@ func GetSortedVersions(versions []string) []string {
 }
 
 func CopyFile(src, dst string) error {
+	if fi, err := os.Stat(src); err == nil && fi.IsDir() {
+		return fmt.Errorf("src is a directory, use CopyDirs instead")
+	}
 	source, err := os.Open(src)
 	if err != nil {
 		return err
@@ -152,7 +157,57 @@ func CopyFile(src, dst string) error {
 	}
 	return nil
 }
+func CopyDirs(srcDir, dstDir string) error {
+	srcInfo, err := os.Stat(srcDir)
+	if err != nil {
+		return err
+	}
+	if !srcInfo.IsDir() {
+		return fmt.Errorf("%s is not a directory", srcDir)
+	}
+	if err := os.MkdirAll(dstDir, srcInfo.Mode()); err != nil {
+		return err
+	}
+	return filepath.Walk(srcDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		relPath, err := filepath.Rel(srcDir, path)
+		if err != nil {
+			return err
+		}
+		dstPath := filepath.Join(dstDir, relPath)
+		if info.IsDir() {
+			return os.MkdirAll(dstPath, info.Mode())
+		}
+		if info.Mode()&os.ModeSymlink != 0 {
+			return copySymlink(path, dstPath)
+		}
+		return CopyFile(path, dstPath)
+	})
+}
 
+func copySymlink(src, dst string) error {
+	link, err := os.Readlink(src)
+	if err != nil {
+		return err
+	}
+	return os.Symlink(link, dst)
+}
+func Copy(src, dst string) error {
+	fi, err := os.Stat(src)
+	if err != nil {
+		return err
+	}
+	switch mode := fi.Mode(); {
+	case mode.IsDir():
+		return CopyDirs(src, dst)
+	case mode.IsRegular():
+		return CopyFile(src, dst)
+	default:
+		return fmt.Errorf("unsupported file type: %s", mode)
+	}
+}
 func IsCrossVersion(version1, version2 string) bool {
 	version1s := strings.Split(version1, ".")
 	version2s := strings.Split(version2, ".")
