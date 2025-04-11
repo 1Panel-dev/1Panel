@@ -4,13 +4,14 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"golang.org/x/crypto/bcrypt"
 	"os"
 	"os/user"
 	"path"
 	"path/filepath"
 	"strings"
 	"time"
+
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
@@ -94,9 +95,9 @@ func (f *Ftp) Status() (bool, bool) {
 func (f *Ftp) Operate(operate string) error {
 	switch operate {
 	case "start", "restart", "stop":
-		stdout, err := cmd.Execf("systemctl %s pure-ftpd.service", operate)
+		stdout, err := systemctl.CustomAction(operate, "pure-ftpd")
 		if err != nil {
-			return fmt.Errorf("%s the pure-ftpd.service failed, err: %s", operate, stdout)
+			return fmt.Errorf("%s the pure-ftpd service failed, err: %s", operate, stdout.Output)
 		}
 		return nil
 	default:
