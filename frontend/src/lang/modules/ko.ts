@@ -2550,7 +2550,7 @@ const message = {
         domain: 'デフォルトアクセスアドレス',
         domainHelper: '例: 192.168.1.1 または example.com',
         bindDomain: 'ウェブサイトをバインド',
-        commandPlaceHolder: '현재 npx 시작 명령만 지원합니다',
+        commandPlaceHolder: '현재 npx 및 바이너리 시작 명령만 지원합니다',
         importMcpJson: 'MCP サーバー設定をインポート',
         importMcpJsonError: 'mcpServers 構造が正しくありません',
         bindDomainHelper:
