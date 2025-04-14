@@ -2591,7 +2591,7 @@ const message = {
         domain: 'デフォルトアクセスアドレス',
         domainHelper: '例: 192.168.1.1 または example.com',
         bindDomain: 'ウェブサイトをバインド',
-        commandPlaceHolder: '現在、npx スタートアップコマンドのみをサポートしています',
+        commandPlaceHolder: '現在、npx およびバイナリスタートアップコマンドのみをサポートしています',
         importMcpJson: 'MCP サーバー設定をインポート',
         importMcpJsonError: 'mcpServers 構造が正しくありません',
         bindDomainHelper:
