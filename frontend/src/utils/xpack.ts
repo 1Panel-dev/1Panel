@@ -97,6 +97,9 @@ export async function getXpackSettingForTheme() {
             globalStore.themeConfig.logo = res2.data?.logo;
             globalStore.themeConfig.logoWithText = res2.data?.logoWithText;
             globalStore.themeConfig.favicon = res2.data?.favicon;
+            globalStore.themeConfig.loginImage = res2.data?.loginImage;
+            globalStore.themeConfig.loginBgType = res2.data?.loginBgType;
+            globalStore.themeConfig.loginBackground = res2.data?.loginBackground;
             globalStore.themeConfig.themeColor = res2.data?.themeColor;
             globalStore.themeConfig.theme = res2.data?.theme || 'auto';
         } else {

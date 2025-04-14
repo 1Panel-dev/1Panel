@@ -10,6 +10,9 @@ export interface ThemeConfigProp {
     logo: string;
     logoWithText: string;
     favicon: string;
+    loginImage: string;
+    loginBgType: string;
+    loginBackground: string;
     themeColor: string;
 }
 

@@ -2,15 +2,23 @@
     <div class="flex items-center justify-center min-h-screen relative bg-gray-100">
         <div
             class="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            :style="{ backgroundImage: `url(${backgroundImage})` }"
+            :style="
+                globalStore.themeConfig.loginBgType === 'color'
+                    ? { backgroundColor: globalStore.themeConfig.loginBackground }
+                    : { backgroundImage: `url(${loadImage('loginBackground')})` }
+            "
         ></div>
         <div
             :style="{ opacity: backgroundOpacity, width: containerWidth, height: containerHeight }"
             class="bg-white shadow-lg relative z-10 border border-gray-200 flex overflow-hidden"
         >
             <div class="grid grid-cols-1 md:grid-cols-2 items-stretch w-full h-full">
-                <div v-if="showLogo">
-                    <img :src="logoImage" class="max-w-full max-h-full object-contain" />
+                <div v-if="showLogo" class="flex justify-center">
+                    <img
+                        :src="loadImage('loginImage')"
+                        class="max-w-full max-h-full object-cover bg-cover bg-center"
+                        alt="1panel"
+                    />
                 </div>
                 <div :class="loginFormClass">
                     <LoginForm ref="loginRef"></LoginForm>
@@ -25,10 +33,8 @@ import LoginForm from './components/login-form.vue';
 import { ref, onMounted } from 'vue';
 import { GlobalStore } from '@/store';
 
-const gStore = GlobalStore();
-const backgroundOpacity = ref(0.8);
-const backgroundImage = ref(new URL('@/assets/images/1panel-login-bg.jpg', import.meta.url).href);
-const logoImage = ref(new URL('@/assets/images/1panel-login.jpg', import.meta.url).href);
+const globalStore = GlobalStore();
+const backgroundOpacity = ref(1);
 
 const mySafetyCode = defineProps({
     code: {
@@ -40,8 +46,30 @@ const mySafetyCode = defineProps({
 const getStatus = async () => {
     let code = mySafetyCode.code;
     if (code != '') {
-        gStore.entrance = code;
+        globalStore.entrance = code;
     }
+};
+
+const loadImage = (name: string) => {
+    switch (name) {
+        case 'loginImage':
+            if (globalStore.themeConfig.loginImage === 'loginImage') {
+                return `/api/v2/images/loginImage?t=${Date.now()}`;
+            }
+            return new URL('@/assets/images/1panel-login.jpg', import.meta.url).href;
+        case 'loginBackground':
+            if (globalStore.themeConfig.loginBgType === 'image') {
+                if (globalStore.themeConfig.loginBackground === 'loginBackground') {
+                    return `/api/v2/images/loginBackground?t=${Date.now()}`;
+                }
+                return new URL('@/assets/images/1panel-login-bg.jpg', import.meta.url).href;
+            } else if (globalStore.themeConfig.loginBgType === 'color') {
+                return globalStore.themeConfig.loginBackground;
+            } else {
+                return new URL('@/assets/images/1panel-login-bg.jpg', import.meta.url).href;
+            }
+    }
+    return '';
 };
 
 onMounted(() => {

@@ -9,6 +9,9 @@ export const useLogo = async () => {
         globalStore.themeConfig.title = res.data.title;
         globalStore.themeConfig.logo = res.data.logo;
         globalStore.themeConfig.logoWithText = res.data.logoWithText;
+        globalStore.themeConfig.loginImage = res.data?.loginImage;
+        globalStore.themeConfig.loginBgType = res.data?.loginBgType;
+        globalStore.themeConfig.loginBackground = res.data?.loginBackground;
         globalStore.themeConfig.favicon = res.data.favicon;
     }
 
