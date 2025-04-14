@@ -179,16 +179,18 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 			global.LOG.Warnf("Update GeoIP database failed: %v", err)
 		}
 
-		if err := systemctl.Restart("1panel"); err != nil {
-			global.LOG.Errorf("Service restart failed: %v", err)
-			return
-		}
-
 		global.LOG.Info("upgrade successful!")
 		go writeLogs(req.Version)
 		checkPointOfWal()
 		if err := settingRepo.Update("SystemVersion", req.Version); err != nil {
 			global.LOG.Errorf("Update system version failed: %v", err)
+		}
+		if serviceHandle.ManagerName() == "systemd" {
+			_, _ = cmd.Exec("systemctl daemon-reload")
+		}
+		if err := systemctl.Restart("1panel"); err != nil {
+			global.LOG.Errorf("Service restart failed: %v", err)
+			return
 		}
 	}()
 	return nil
