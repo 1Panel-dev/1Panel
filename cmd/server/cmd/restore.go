@@ -58,8 +58,15 @@ var restoreCmd = &cobra.Command{
 		geoPath := path.Join(global.CONF.System.BaseDir, "1panel/geo")
 		_, _ = cmdUtils.Execf("mkdir %s && cp %s %s/", geoPath, path.Join(tmpPath, "GeoIP.mmdb"), geoPath)
 		fmt.Println(i18n.GetMsgByKeyForCmd("RestoreStep3"))
-		if err := common.CopyFile(path.Join(tmpPath, "1panel.service"), "/etc/systemd/system"); err != nil {
-			return err
+		if isSystemd() {
+			if err := common.CopyFile(path.Join(tmpPath, "1panel.service"), "/etc/systemd/system"); err != nil {
+				return err
+			}
+
+		} else {
+			if err := common.CopyFile(path.Join(tmpPath, "1paneld"), "/etc/init.d"); err != nil {
+				return err
+			}
 		}
 		fmt.Println(i18n.GetMsgByKeyForCmd("RestoreStep4"))
 		checkPointOfWal()
@@ -123,4 +130,11 @@ func handleUnTar(sourceFile, targetDir string) error {
 		return errors.New(stdout)
 	}
 	return nil
+}
+
+func isSystemd() bool {
+	if _, err := os.Stat("/etc/systemd/system"); err == nil {
+		return true
+	}
+	return false
 }
