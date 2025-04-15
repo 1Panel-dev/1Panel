@@ -26,6 +26,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	cmd2 "github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/compose"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
@@ -666,7 +667,9 @@ func (r *RuntimeService) OperateNodeModules(req request.NodeModuleOperateReq) er
 		}
 	}
 	cmd += " " + req.Module
-	return cmd2.ExecContainerScript(containerName, cmd, 5*time.Minute)
+
+	cmdMgr := cmd2.NewCommandMgr(cmd2.WithTimeout(5 * time.Minute))
+	return cmdMgr.Run("docker", "exec", "-i", containerName, "bash", "-c", fmt.Sprintf("'%s'", cmd))
 }
 
 func (r *RuntimeService) SyncForRestart() error {
@@ -703,8 +706,8 @@ func (r *RuntimeService) GetPHPExtensions(runtimeID uint) (response.PHPExtension
 	if err != nil {
 		return res, err
 	}
-	phpCmd := fmt.Sprintf("docker exec -i %s %s", runtime.ContainerName, "php -m")
-	out, err := cmd2.ExecWithTimeOut(phpCmd, 20*time.Second)
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(20 * time.Second))
+	out, err := cmdMgr.RunWithStdoutBashCf("docker exec -i %s php -m", runtime.ContainerName)
 	if err != nil {
 		if out != "" {
 			return res, errors.New(out)
@@ -750,9 +753,9 @@ func (r *RuntimeService) InstallPHPExtension(req request.PHPExtensionInstallReq)
 	if err != nil {
 		return err
 	}
+	cmdMgr := cmd2.NewCommandMgr(cmd.WithTask(*installTask), cmd.WithTimeout(15*time.Minute))
 	installTask.AddSubTask("", func(t *task.Task) error {
-		installCmd := fmt.Sprintf("docker exec -i %s %s %s", runtime.ContainerName, "install-ext", req.Name)
-		err = cmd2.ExecWithLogger(installCmd, t.Logger, 15*time.Minute)
+		err = cmdMgr.RunBashCf("docker exec -i %s install-ext %s", runtime.ContainerName, req.Name)
 		if err != nil {
 			return err
 		}
@@ -763,8 +766,7 @@ func (r *RuntimeService) InstallPHPExtension(req request.PHPExtensionInstallReq)
 			if err != nil {
 				return err
 			}
-			commitCmd := fmt.Sprintf("docker commit %s %s", runtime.ContainerName, runtime.Image)
-			err = cmd2.ExecWithLogger(commitCmd, t.Logger, 15*time.Minute)
+			err = cmdMgr.RunBashCf("docker commit %s %s", runtime.ContainerName, runtime.Image)
 			if err != nil {
 				return err
 			}

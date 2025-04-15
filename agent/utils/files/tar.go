@@ -1,8 +1,6 @@
 package files
 
 import (
-	"fmt"
-
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 )
 
@@ -19,7 +17,7 @@ func NewTarArchiver(compressType CompressType) ShellArchiver {
 }
 
 func (t TarArchiver) Extract(FilePath string, dstDir string, secret string) error {
-	return cmd.ExecCmd(fmt.Sprintf("%s %s \"%s\" -C \"%s\"", t.Cmd, t.getOptionStr("extract"), FilePath, dstDir))
+	return cmd.RunDefaultBashCf("%s %s \"%s\" -C \"%s\"", t.Cmd, t.getOptionStr("extract"), FilePath, dstDir)
 }
 
 func (t TarArchiver) Compress(sourcePaths []string, dstFile string, secret string) error {

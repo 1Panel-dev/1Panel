@@ -62,7 +62,7 @@ func GetRemoteTime(site string) (time.Time, error) {
 func UpdateSystemTime(dateTime string) error {
 	system := runtime.GOOS
 	if system == "linux" {
-		stdout2, err := cmd.Execf(`%s date -s "%s"`, cmd.SudoHandleCmd(), dateTime)
+		stdout2, err := cmd.RunDefaultWithStdoutBashCf(`%s date -s "%s"`, cmd.SudoHandleCmd(), dateTime)
 		if err != nil {
 			return fmt.Errorf("update system time failed,stdout: %s, err: %v", stdout2, err)
 		}
@@ -74,7 +74,7 @@ func UpdateSystemTime(dateTime string) error {
 func UpdateSystemTimeZone(timezone string) error {
 	system := runtime.GOOS
 	if system == "linux" {
-		stdout, err := cmd.Execf(`%s timedatectl set-timezone "%s"`, cmd.SudoHandleCmd(), timezone)
+		stdout, err := cmd.RunDefaultWithStdoutBashCf(`%s timedatectl set-timezone "%s"`, cmd.SudoHandleCmd(), timezone)
 		if err != nil {
 			return fmt.Errorf("update system time zone failed, stdout: %s, err: %v", stdout, err)
 		}

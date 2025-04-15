@@ -84,7 +84,7 @@ func (c *ClamService) LoadBaseInfo() (dto.ClamBaseInfo, error) {
 	}
 
 	if baseInfo.IsActive {
-		version, err := cmd.Exec("clamdscan --version")
+		version, err := cmd.RunDefaultWithStdoutBashC("clamdscan --version")
 		if err == nil {
 			if strings.Contains(version, "/") {
 				baseInfo.Version = strings.TrimPrefix(strings.Split(version, "/")[0], "ClamAV ")
@@ -96,7 +96,7 @@ func (c *ClamService) LoadBaseInfo() (dto.ClamBaseInfo, error) {
 		_ = StopAllCronJob(false)
 	}
 	if baseInfo.FreshIsActive {
-		version, err := cmd.Exec("freshclam --version")
+		version, err := cmd.RunDefaultWithStdoutBashC("freshclam --version")
 		if err == nil {
 			if strings.Contains(version, "/") {
 				baseInfo.FreshVersion = strings.TrimPrefix(strings.Split(version, "/")[0], "ClamAV ")
@@ -111,13 +111,13 @@ func (c *ClamService) LoadBaseInfo() (dto.ClamBaseInfo, error) {
 func (c *ClamService) Operate(operate string) error {
 	switch operate {
 	case "start", "restart", "stop":
-		stdout, err := cmd.Execf("systemctl %s %s", operate, c.serviceName)
+		stdout, err := cmd.RunDefaultWithStdoutBashCf("systemctl %s %s", operate, c.serviceName)
 		if err != nil {
 			return fmt.Errorf("%s the %s failed, err: %s", operate, c.serviceName, stdout)
 		}
 		return nil
 	case "fresh-start", "fresh-restart", "fresh-stop":
-		stdout, err := cmd.Execf("systemctl %s %s", strings.TrimPrefix(operate, "fresh-"), freshClamService)
+		stdout, err := cmd.RunDefaultWithStdoutBashCf("systemctl %s %s", strings.TrimPrefix(operate, "fresh-"), freshClamService)
 		if err != nil {
 			return fmt.Errorf("%s the %s failed, err: %s", operate, c.serviceName, stdout)
 		}
@@ -344,7 +344,7 @@ func (c *ClamService) HandleOnce(req dto.OperateByID) error {
 			}
 		}
 		global.LOG.Debugf("clamdscan --fdpass %s %s -l %s", strategy, clam.Path, logFile)
-		stdout, err := cmd.Execf("clamdscan --fdpass %s %s -l %s", strategy, clam.Path, logFile)
+		stdout, err := cmd.RunDefaultWithStdoutBashCf("clamdscan --fdpass %s %s -l %s", strategy, clam.Path, logFile)
 		if err != nil {
 			global.LOG.Errorf("clamdscan failed, stdout: %v, err: %v", stdout, err)
 		}

@@ -20,15 +20,13 @@ type Iptables struct {
 
 func NewIptables() (*Iptables, error) {
 	iptables := new(Iptables)
-	if cmd.HasNoPasswordSudo() {
-		iptables.CmdStr = "sudo"
-	}
+	iptables.CmdStr = cmd.SudoHandleCmd()
 
 	return iptables, nil
 }
 
 func (iptables *Iptables) run(rule string) error {
-	stdout, err := cmd.Execf("%s iptables -t nat %s", iptables.CmdStr, rule)
+	stdout, err := cmd.RunDefaultWithStdoutBashCf("%s iptables -t nat %s", iptables.CmdStr, rule)
 	if err != nil {
 		return fmt.Errorf("%s, %s", err, stdout)
 	}
@@ -44,7 +42,7 @@ func (iptables *Iptables) runf(rule string, a ...any) error {
 }
 
 func (iptables *Iptables) Check() error {
-	stdout, err := cmd.Exec("cat /proc/sys/net/ipv4/ip_forward")
+	stdout, err := cmd.RunDefaultWithStdoutBashC("cat /proc/sys/net/ipv4/ip_forward")
 	if err != nil {
 		return fmt.Errorf("%s, %s", err, stdout)
 	}
@@ -68,7 +66,7 @@ func (iptables *Iptables) NatList(chain ...string) ([]IptablesNatInfo, error) {
 	if len(chain) == 1 {
 		rule = fmt.Sprintf("%s iptables -t nat -nL %s --line", iptables.CmdStr, chain[0])
 	}
-	stdout, err := cmd.Exec(rule)
+	stdout, err := cmd.RunDefaultWithStdoutBashC(rule)
 	if err != nil {
 		return nil, err
 	}

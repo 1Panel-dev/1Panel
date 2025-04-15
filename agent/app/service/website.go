@@ -1539,11 +1539,8 @@ func (w WebsiteService) UpdateSitePermission(req request.WebsiteUpdateDirPermiss
 		return err
 	}
 	absoluteIndexPath := GetSitePath(website, SiteIndexDir)
-	chownCmd := fmt.Sprintf("chown -R %s:%s %s", req.User, req.Group, absoluteIndexPath)
-	if cmd.HasNoPasswordSudo() {
-		chownCmd = fmt.Sprintf("sudo %s", chownCmd)
-	}
-	if out, err := cmd.ExecWithTimeOut(chownCmd, 10*time.Second); err != nil {
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(10 * time.Second))
+	if out, err := cmdMgr.RunWithStdoutBashCf("%s chown -R %s:%s %s", cmd.SudoHandleCmd(), req.User, req.Group, absoluteIndexPath); err != nil {
 		if out != "" {
 			return errors.New(out)
 		}

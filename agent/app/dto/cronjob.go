@@ -40,6 +40,8 @@ type CronjobCreate struct {
 	SourceAccountIDs  string `json:"sourceAccountIDs"`
 	DownloadAccountID uint   `json:"downloadAccountID"`
 	RetainCopies      int    `json:"retainCopies" validate:"number,min=1"`
+	RetryTimes        int    `json:"retryTimes" validate:"number,min=0"`
+	Timeout           uint   `json:"timeout" validate:"number,min=1"`
 	Secret            string `json:"secret"`
 
 	AlertCount uint   `json:"alertCount"`
@@ -72,6 +74,8 @@ type CronjobUpdate struct {
 	SourceAccountIDs  string `json:"sourceAccountIDs"`
 	DownloadAccountID uint   `json:"downloadAccountID"`
 	RetainCopies      int    `json:"retainCopies" validate:"number,min=1"`
+	RetryTimes        int    `json:"retryTimes" validate:"number,min=0"`
+	Timeout           uint   `json:"timeout" validate:"number,min=1"`
 	Secret            string `json:"secret"`
 
 	AlertCount uint   `json:"alertCount"`
@@ -122,6 +126,8 @@ type CronjobInfo struct {
 	IsDir          bool   `json:"isDir"`
 	SourceDir      string `json:"sourceDir"`
 	RetainCopies   int    `json:"retainCopies"`
+	RetryTimes     int    `json:"retryTimes"`
+	Timeout        uint   `json:"timeout"`
 
 	SourceAccounts    []string `json:"sourceAccounts"`
 	DownloadAccount   string   `json:"downloadAccount"`

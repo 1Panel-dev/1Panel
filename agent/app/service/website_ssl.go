@@ -354,7 +354,8 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 				workDir = websiteSSL.Dir
 			}
 			printSSLLog(logger, "ExecShellStart", nil, apply.DisableLog)
-			if err = cmd.ExecShellWithTimeOut(websiteSSL.Shell, workDir, logger, 30*time.Minute); err != nil {
+			cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(30*time.Minute), cmd.WithLogger(logger), cmd.WithWorkDir(workDir))
+			if err = cmdMgr.RunBashC(websiteSSL.Shell); err != nil {
 				printSSLLog(logger, "ErrExecShell", map[string]interface{}{"err": err.Error()}, apply.DisableLog)
 			} else {
 				printSSLLog(logger, "ExecShellSuccess", nil, apply.DisableLog)

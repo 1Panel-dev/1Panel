@@ -9,7 +9,7 @@ import (
 func UpdatePort(oldPort, newPort string) error {
 	firewalld := cmd.Which("firewalld")
 	if firewalld {
-		status, _ := cmd.Exec("LANGUAGE=en_US:en firewall-cmd --state")
+		status, _ := cmd.RunDefaultWithStdoutBashC("LANGUAGE=en_US:en firewall-cmd --state")
 		isRunning := status == "running\n"
 		if isRunning {
 			return firewallUpdatePort(oldPort, newPort)
@@ -20,7 +20,7 @@ func UpdatePort(oldPort, newPort string) error {
 	if !ufw {
 		return nil
 	}
-	status, _ := cmd.Exec("LANGUAGE=en_US:en ufw status | grep Status")
+	status, _ := cmd.RunDefaultWithStdoutBashC("LANGUAGE=en_US:en ufw status | grep Status")
 	isRuning := status == "Status: active\n"
 	if isRuning {
 		return ufwUpdatePort(oldPort, newPort)
@@ -29,22 +29,22 @@ func UpdatePort(oldPort, newPort string) error {
 }
 
 func firewallUpdatePort(oldPort, newPort string) error {
-	stdout, err := cmd.Execf("firewall-cmd --zone=public --add-port=%s/tcp --permanent", newPort)
+	stdout, err := cmd.RunDefaultWithStdoutBashCf("firewall-cmd --zone=public --add-port=%s/tcp --permanent", newPort)
 	if err != nil {
 		return fmt.Errorf("add (port: %s/tcp) failed, err: %s", newPort, stdout)
 	}
 
-	_, _ = cmd.Execf("firewall-cmd --zone=public --remove-port=%s/tcp --permanent", oldPort)
-	_, _ = cmd.Exec("firewall-cmd --reload")
+	_, _ = cmd.RunDefaultWithStdoutBashCf("firewall-cmd --zone=public --remove-port=%s/tcp --permanent", oldPort)
+	_, _ = cmd.RunDefaultWithStdoutBashC("firewall-cmd --reload")
 	return nil
 }
 
 func ufwUpdatePort(oldPort, newPort string) error {
-	stdout, err := cmd.Execf("ufw allow %s", newPort)
+	stdout, err := cmd.RunDefaultWithStdoutBashCf("ufw allow %s", newPort)
 	if err != nil {
 		return fmt.Errorf("add (port: %s/tcp) failed, err: %s", newPort, stdout)
 	}
 
-	_, _ = cmd.Execf("ufw delete allow %s", oldPort)
+	_, _ = cmd.RunDefaultWithStdoutBashCf("ufw delete allow %s", oldPort)
 	return nil
 }

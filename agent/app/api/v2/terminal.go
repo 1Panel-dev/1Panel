@@ -165,7 +165,7 @@ func loadMapFromDockerTop(containerID string) map[string]string {
 	pidMap := make(map[string]string)
 	sudo := cmd.SudoHandleCmd()
 
-	stdout, err := cmd.Execf("%s docker top %s -eo pid,command ", sudo, containerID)
+	stdout, err := cmd.RunDefaultWithStdoutBashCf("%s docker top %s -eo pid,command ", sudo, containerID)
 	if err != nil {
 		return pidMap
 	}
@@ -192,7 +192,7 @@ func killBash(containerID, comm string, pidMap map[string]string) {
 			}
 		}
 		if !isOld && command == comm {
-			_, _ = cmd.Execf("%s kill -9 %s", sudo, pid)
+			_, _ = cmd.RunDefaultWithStdoutBashCf("%s kill -9 %s", sudo, pid)
 		}
 	}
 }

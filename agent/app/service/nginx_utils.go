@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"path"
 	"strings"
@@ -230,11 +229,17 @@ func getNginxParamsFromStaticFile(scope dto.NginxKey, newParams []dto.NginxParam
 }
 
 func opNginx(containerName, operate string) error {
-	nginxCmd := fmt.Sprintf("docker exec -i %s %s", containerName, "nginx -s reload")
+	var (
+		out string
+		err error
+	)
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(20 * time.Second))
 	if operate == constant.NginxCheck {
-		nginxCmd = fmt.Sprintf("docker exec -i %s %s", containerName, "nginx -t")
+		out, err = cmdMgr.RunWithStdout("docker", "exec", "-i", containerName, "nginx -t")
+	} else {
+		out, err = cmdMgr.RunWithStdout("docker", "exec", "-i", containerName, "nginx -s reload")
 	}
-	if out, err := cmd.ExecWithTimeOut(nginxCmd, 20*time.Second); err != nil {
+	if err != nil {
 		if out != "" {
 			return errors.New(out)
 		}

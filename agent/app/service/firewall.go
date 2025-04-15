@@ -191,19 +191,19 @@ func (u *FirewallService) OperateFirewall(operation string) error {
 			_ = client.Stop()
 			return err
 		}
-		_, _ = cmd.Exec("systemctl restart docker")
+		_, _ = cmd.RunDefaultWithStdoutBashC("systemctl restart docker")
 		return nil
 	case "stop":
 		if err := client.Stop(); err != nil {
 			return err
 		}
-		_, _ = cmd.Exec("systemctl restart docker")
+		_, _ = cmd.RunDefaultWithStdoutBashC("systemctl restart docker")
 		return nil
 	case "restart":
 		if err := client.Restart(); err != nil {
 			return err
 		}
-		_, _ = cmd.Exec("systemctl restart docker")
+		_, _ = cmd.RunDefaultWithStdoutBashC("systemctl restart docker")
 		return nil
 	case "disablePing":
 		return u.updatePingStatus("0")
@@ -567,7 +567,7 @@ func (u *FirewallService) pingStatus() string {
 	if _, err := os.Stat("/etc/sysctl.conf"); err != nil {
 		return constant.StatusNone
 	}
-	stdout, _ := cmd.Execf("%s sysctl -a 2>/dev/null | grep 'net.ipv4.icmp.echo_ignore_all'", cmd.SudoHandleCmd())
+	stdout, _ := cmd.RunDefaultWithStdoutBashCf("%s sysctl -a 2>/dev/null | grep 'net.ipv4.icmp.echo_ignore_all'", cmd.SudoHandleCmd())
 	if stdout == "net.ipv4.icmp_echo_ignore_all = 1\n" {
 		return constant.StatusEnable
 	}
@@ -582,7 +582,7 @@ func (u *FirewallService) updatePingStatus(enable string) error {
 	files := strings.Split(string(lineBytes), "\n")
 	var newFiles []string
 	var hasIpv6 bool
-	ipv6Status, _ := cmd.Exec("sysctl -a 2>/dev/null | grep 'net.ipv6.icmp.echo_ignore_all'")
+	ipv6Status, _ := cmd.RunDefaultWithStdoutBashC("sysctl -a 2>/dev/null | grep 'net.ipv6.icmp.echo_ignore_all'")
 	if len(strings.ReplaceAll(ipv6Status, "\n", "")) != 0 {
 		hasIpv6 = true
 	}
@@ -616,9 +616,7 @@ func (u *FirewallService) updatePingStatus(enable string) error {
 		return err
 	}
 
-	sudo := cmd.SudoHandleCmd()
-	command := fmt.Sprintf("%s sysctl -p", sudo)
-	stdout, err := cmd.Exec(command)
+	stdout, err := cmd.RunDefaultWithStdoutBashCf("%s sysctl -p", cmd.SudoHandleCmd())
 	if err != nil {
 		return fmt.Errorf("update ping status failed, err: %v", stdout)
 	}

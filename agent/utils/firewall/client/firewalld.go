@@ -24,12 +24,12 @@ func (f *Firewall) Name() string {
 }
 
 func (f *Firewall) Status() (bool, error) {
-	stdout, _ := cmd.Exec("LANGUAGE=en_US:en firewall-cmd --state")
+	stdout, _ := cmd.RunDefaultWithStdoutBashC("LANGUAGE=en_US:en firewall-cmd --state")
 	return stdout == "running\n", nil
 }
 
 func (f *Firewall) Version() (string, error) {
-	stdout, err := cmd.Exec("LANGUAGE=en_US:en firewall-cmd --version")
+	stdout, err := cmd.RunDefaultWithStdoutBashC("LANGUAGE=en_US:en firewall-cmd --version")
 	if err != nil {
 		return "", fmt.Errorf("load the firewall version failed, err: %s", stdout)
 	}
@@ -37,7 +37,7 @@ func (f *Firewall) Version() (string, error) {
 }
 
 func (f *Firewall) Start() error {
-	stdout, err := cmd.Exec("systemctl start firewalld")
+	stdout, err := cmd.RunDefaultWithStdoutBashC("systemctl start firewalld")
 	if err != nil {
 		return fmt.Errorf("enable the firewall failed, err: %s", stdout)
 	}
@@ -45,7 +45,7 @@ func (f *Firewall) Start() error {
 }
 
 func (f *Firewall) Stop() error {
-	stdout, err := cmd.Exec("systemctl stop firewalld")
+	stdout, err := cmd.RunDefaultWithStdoutBashC("systemctl stop firewalld")
 	if err != nil {
 		return fmt.Errorf("stop the firewall failed, err: %s", stdout)
 	}
@@ -53,7 +53,7 @@ func (f *Firewall) Stop() error {
 }
 
 func (f *Firewall) Restart() error {
-	stdout, err := cmd.Exec("systemctl restart firewalld")
+	stdout, err := cmd.RunDefaultWithStdoutBashC("systemctl restart firewalld")
 	if err != nil {
 		return fmt.Errorf("restart the firewall failed, err: %s", stdout)
 	}
@@ -61,7 +61,7 @@ func (f *Firewall) Restart() error {
 }
 
 func (f *Firewall) Reload() error {
-	stdout, err := cmd.Exec("firewall-cmd --reload")
+	stdout, err := cmd.RunDefaultWithStdoutBashC("firewall-cmd --reload")
 	if err != nil {
 		return fmt.Errorf("reload firewall failed, err: %s", stdout)
 	}
@@ -74,7 +74,7 @@ func (f *Firewall) ListPort() ([]FireInfo, error) {
 	wg.Add(2)
 	go func() {
 		defer wg.Done()
-		stdout, err := cmd.Exec("firewall-cmd --zone=public --list-ports")
+		stdout, err := cmd.RunDefaultWithStdoutBashC("firewall-cmd --zone=public --list-ports")
 		if err != nil {
 			return
 		}
@@ -95,7 +95,7 @@ func (f *Firewall) ListPort() ([]FireInfo, error) {
 
 	go func() {
 		defer wg.Done()
-		stdout1, err := cmd.Exec("firewall-cmd --zone=public --list-rich-rules")
+		stdout1, err := cmd.RunDefaultWithStdoutBashC("firewall-cmd --zone=public --list-rich-rules")
 		if err != nil {
 			return
 		}
@@ -118,7 +118,7 @@ func (f *Firewall) ListForward() ([]FireInfo, error) {
 	if err := f.EnableForward(); err != nil {
 		global.LOG.Errorf("init port forward failed, err: %v", err)
 	}
-	stdout, err := cmd.Exec("firewall-cmd --zone=public --list-forward-ports")
+	stdout, err := cmd.RunDefaultWithStdoutBashC("firewall-cmd --zone=public --list-forward-ports")
 	if err != nil {
 		return nil, err
 	}
@@ -147,7 +147,7 @@ func (f *Firewall) ListForward() ([]FireInfo, error) {
 }
 
 func (f *Firewall) ListAddress() ([]FireInfo, error) {
-	stdout, err := cmd.Exec("firewall-cmd --zone=public --list-rich-rules")
+	stdout, err := cmd.RunDefaultWithStdoutBashC("firewall-cmd --zone=public --list-rich-rules")
 	if err != nil {
 		return nil, err
 	}
@@ -170,7 +170,7 @@ func (f *Firewall) Port(port FireInfo, operation string) error {
 		return buserr.New("ErrCmdIllegal")
 	}
 
-	stdout, err := cmd.Execf("firewall-cmd --zone=public --%s-port=%s/%s --permanent", operation, port.Port, port.Protocol)
+	stdout, err := cmd.RunDefaultWithStdoutBashCf("firewall-cmd --zone=public --%s-port=%s/%s --permanent", operation, port.Port, port.Protocol)
 	if err != nil {
 		return fmt.Errorf("%s (port: %s/%s strategy: %s) failed, err: %s", operation, port.Port, port.Protocol, port.Strategy, stdout)
 	}
@@ -195,12 +195,12 @@ func (f *Firewall) RichRules(rule FireInfo, operation string) error {
 		ruleStr += fmt.Sprintf("protocol=%s ", rule.Protocol)
 	}
 	ruleStr += rule.Strategy
-	stdout, err := cmd.Execf("firewall-cmd --zone=public --%s-rich-rule '%s' --permanent", operation, ruleStr)
+	stdout, err := cmd.RunDefaultWithStdoutBashCf("firewall-cmd --zone=public --%s-rich-rule '%s' --permanent", operation, ruleStr)
 	if err != nil {
 		return fmt.Errorf("%s rich rules (%s) failed, err: %s", operation, ruleStr, stdout)
 	}
 	if len(rule.Address) == 0 {
-		stdout1, err := cmd.Execf("firewall-cmd --zone=public --%s-rich-rule '%s' --permanent", operation, strings.ReplaceAll(ruleStr, "family=ipv4 ", "family=ipv6 "))
+		stdout1, err := cmd.RunDefaultWithStdoutBashCf("firewall-cmd --zone=public --%s-rich-rule '%s' --permanent", operation, strings.ReplaceAll(ruleStr, "family=ipv4 ", "family=ipv6 "))
 		if err != nil {
 			return fmt.Errorf("%s rich rules (%s) failed, err: %s", operation, strings.ReplaceAll(ruleStr, "family=ipv4 ", "family=ipv6 "), stdout1)
 		}
@@ -214,7 +214,7 @@ func (f *Firewall) PortForward(info Forward, operation string) error {
 		ruleStr = fmt.Sprintf("firewall-cmd --zone=public --%s-forward-port=port=%s:proto=%s:toaddr=%s:toport=%s --permanent", operation, info.Port, info.Protocol, info.TargetIP, info.TargetPort)
 	}
 
-	stdout, err := cmd.Exec(ruleStr)
+	stdout, err := cmd.RunDefaultWithStdoutBashC(ruleStr)
 	if err != nil {
 		return fmt.Errorf("%s port forward failed, err: %s", operation, stdout)
 	}
@@ -247,10 +247,10 @@ func (f *Firewall) loadInfo(line string) FireInfo {
 }
 
 func (f *Firewall) EnableForward() error {
-	stdout, err := cmd.Exec("firewall-cmd --zone=public --query-masquerade")
+	stdout, err := cmd.RunDefaultWithStdoutBashC("firewall-cmd --zone=public --query-masquerade")
 	if err != nil {
 		if strings.HasSuffix(strings.TrimSpace(stdout), "no") {
-			stdout, err = cmd.Exec("firewall-cmd --zone=public --add-masquerade --permanent")
+			stdout, err = cmd.RunDefaultWithStdoutBashC("firewall-cmd --zone=public --add-masquerade --permanent")
 			if err != nil {
 				return fmt.Errorf("%s: %s", err, stdout)
 			}

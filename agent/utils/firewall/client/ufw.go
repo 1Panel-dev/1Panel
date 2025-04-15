@@ -15,11 +15,7 @@ type Ufw struct {
 
 func NewUfw() (*Ufw, error) {
 	var ufw Ufw
-	if cmd.HasNoPasswordSudo() {
-		ufw.CmdStr = "LANGUAGE=en_US:en sudo ufw"
-	} else {
-		ufw.CmdStr = "LANGUAGE=en_US:en ufw"
-	}
+	ufw.CmdStr = fmt.Sprintf("LANGUAGE=en_US:en %s ufw", cmd.SudoHandleCmd())
 	return &ufw, nil
 }
 
@@ -28,11 +24,11 @@ func (f *Ufw) Name() string {
 }
 
 func (f *Ufw) Status() (bool, error) {
-	stdout, _ := cmd.Execf("%s status | grep Status", f.CmdStr)
+	stdout, _ := cmd.RunDefaultWithStdoutBashCf("%s status | grep Status", f.CmdStr)
 	if stdout == "Status: active\n" {
 		return true, nil
 	}
-	stdout1, _ := cmd.Execf("%s status | grep 状态", f.CmdStr)
+	stdout1, _ := cmd.RunDefaultWithStdoutBashCf("%s status | grep 状态", f.CmdStr)
 	if stdout1 == "状态： 激活\n" {
 		return true, nil
 	}
@@ -40,7 +36,7 @@ func (f *Ufw) Status() (bool, error) {
 }
 
 func (f *Ufw) Version() (string, error) {
-	stdout, err := cmd.Execf("%s version | grep ufw", f.CmdStr)
+	stdout, err := cmd.RunDefaultWithStdoutBashCf("%s version | grep ufw", f.CmdStr)
 	if err != nil {
 		return "", fmt.Errorf("load the firewall status failed, err: %s", stdout)
 	}
@@ -49,7 +45,7 @@ func (f *Ufw) Version() (string, error) {
 }
 
 func (f *Ufw) Start() error {
-	stdout, err := cmd.Execf("echo y | %s enable", f.CmdStr)
+	stdout, err := cmd.RunDefaultWithStdoutBashCf("echo y | %s enable", f.CmdStr)
 	if err != nil {
 		return fmt.Errorf("enable the firewall failed, err: %s", stdout)
 	}
@@ -57,7 +53,7 @@ func (f *Ufw) Start() error {
 }
 
 func (f *Ufw) Stop() error {
-	stdout, err := cmd.Execf("%s disable", f.CmdStr)
+	stdout, err := cmd.RunDefaultWithStdoutBashCf("%s disable", f.CmdStr)
 	if err != nil {
 		return fmt.Errorf("stop the firewall failed, err: %s", stdout)
 	}
@@ -79,7 +75,7 @@ func (f *Ufw) Reload() error {
 }
 
 func (f *Ufw) ListPort() ([]FireInfo, error) {
-	stdout, err := cmd.Execf("%s status verbose", f.CmdStr)
+	stdout, err := cmd.RunDefaultWithStdoutBashCf("%s status verbose", f.CmdStr)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +104,7 @@ func (f *Ufw) ListForward() ([]FireInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	panelChian, _ := cmd.Execf("%s iptables -t nat -L -n | grep 'Chain 1PANEL'", iptables.CmdStr)
+	panelChian, _ := cmd.RunDefaultWithStdoutBashCf("%s iptables -t nat -L -n | grep 'Chain 1PANEL'", iptables.CmdStr)
 	if len(strings.ReplaceAll(panelChian, "\n", "")) == 0 {
 		if err := f.EnableForward(); err != nil {
 			global.LOG.Errorf("init port forward failed, err: %v", err)
@@ -140,7 +136,7 @@ func (f *Ufw) ListForward() ([]FireInfo, error) {
 }
 
 func (f *Ufw) ListAddress() ([]FireInfo, error) {
-	stdout, err := cmd.Execf("%s status verbose", f.CmdStr)
+	stdout, err := cmd.RunDefaultWithStdoutBashCf("%s status verbose", f.CmdStr)
 	if err != nil {
 		return nil, err
 	}
@@ -190,7 +186,7 @@ func (f *Ufw) Port(port FireInfo, operation string) error {
 	if len(port.Protocol) != 0 {
 		command += fmt.Sprintf("/%s", port.Protocol)
 	}
-	stdout, err := cmd.Exec(command)
+	stdout, err := cmd.RunDefaultWithStdoutBashC(command)
 	if err != nil {
 		return fmt.Errorf("%s (%s) failed, err: %s", operation, command, stdout)
 	}
@@ -227,10 +223,10 @@ func (f *Ufw) RichRules(rule FireInfo, operation string) error {
 		ruleStr += fmt.Sprintf("to any port %s ", rule.Port)
 	}
 
-	stdout, err := cmd.Exec(ruleStr)
+	stdout, err := cmd.RunDefaultWithStdoutBashC(ruleStr)
 	if err != nil {
 		if strings.Contains(stdout, "ERROR: Invalid position") || strings.Contains(stdout, "ERROR: 无效位置") {
-			stdout, err := cmd.Exec(strings.ReplaceAll(ruleStr, "insert 1 ", ""))
+			stdout, err := cmd.RunDefaultWithStdoutBashC(strings.ReplaceAll(ruleStr, "insert 1 ", ""))
 			if err != nil {
 				return fmt.Errorf("%s rich rules (%s), failed, err: %s", operation, ruleStr, stdout)
 			}

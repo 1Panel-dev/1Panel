@@ -209,7 +209,7 @@ func port() {
 	fmt.Println("\n" + i18n.GetMsgByKeyForCmd("UpdateSuccessful"))
 	fmt.Println(i18n.GetMsgWithMapForCmd("UpdatePortResult", map[string]interface{}{"name": newPortStr}))
 
-	std, err := cmd.Exec("1pctl restart")
+	std, err := cmd.RunDefaultWithStdoutBashC("1pctl restart")
 	if err != nil {
 		fmt.Println(std)
 	}

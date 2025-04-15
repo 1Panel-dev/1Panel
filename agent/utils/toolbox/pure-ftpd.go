@@ -63,7 +63,7 @@ func NewFtpClient() (*Ftp, error) {
 
 	groupItem, err := user.LookupGroupId("1000")
 	if err == nil {
-		stdout2, err := cmd.Execf("useradd -u 1000 -g %s %s", groupItem.Name, "1panel")
+		stdout2, err := cmd.RunDefaultWithStdoutBashCf("useradd -u 1000 -g %s %s", groupItem.Name, "1panel")
 		if err != nil {
 			return nil, errors.New(stdout2)
 		}
@@ -72,11 +72,11 @@ func NewFtpClient() (*Ftp, error) {
 	if err.Error() != user.UnknownGroupIdError("1000").Error() {
 		return nil, err
 	}
-	stdout, err := cmd.Exec("groupadd -g 1000 1panel")
+	stdout, err := cmd.RunDefaultWithStdoutBashC("groupadd -g 1000 1panel")
 	if err != nil {
 		return nil, errors.New(string(stdout))
 	}
-	stdout2, err := cmd.Exec("useradd -u 1000 -g 1panel 1panel")
+	stdout2, err := cmd.RunDefaultWithStdoutBashC("useradd -u 1000 -g 1panel 1panel")
 	if err != nil {
 		return nil, errors.New(stdout2)
 	}
@@ -93,7 +93,7 @@ func (f *Ftp) Status() (bool, bool) {
 func (f *Ftp) Operate(operate string) error {
 	switch operate {
 	case "start", "restart", "stop":
-		stdout, err := cmd.Execf("systemctl %s pure-ftpd.service", operate)
+		stdout, err := cmd.RunDefaultWithStdoutBashCf("systemctl %s pure-ftpd.service", operate)
 		if err != nil {
 			return fmt.Errorf("%s the pure-ftpd.service failed, err: %s", operate, stdout)
 		}
@@ -119,7 +119,7 @@ func (f *Ftp) UserAdd(username, passwd, path string) error {
 		return err
 	}
 	_ = f.Reload()
-	std2, err := cmd.Execf("chown -R %s:%s %s", f.DefaultUser, f.DefaultGroup, path)
+	std2, err := cmd.RunDefaultWithStdoutBashCf("chown -R %s:%s %s", f.DefaultUser, f.DefaultGroup, path)
 	if err != nil {
 		return errors.New(std2)
 	}
@@ -127,7 +127,7 @@ func (f *Ftp) UserAdd(username, passwd, path string) error {
 }
 
 func (f *Ftp) UserDel(username string) error {
-	std, err := cmd.Execf("pure-pw userdel %s", username)
+	std, err := cmd.RunDefaultWithStdoutBashCf("pure-pw userdel %s", username)
 	if err != nil {
 		return errors.New(std)
 	}
@@ -186,11 +186,11 @@ func (f *Ftp) SetPasswd(username, passwd string) error {
 }
 
 func (f *Ftp) SetPath(username, path string) error {
-	std, err := cmd.Execf("pure-pw usermod %s -d %s", username, path)
+	std, err := cmd.RunDefaultWithStdoutBashCf("pure-pw usermod %s -d %s", username, path)
 	if err != nil {
 		return errors.New(std)
 	}
-	std2, err := cmd.Execf("chown -R %s:%s %s", f.DefaultUser, f.DefaultGroup, path)
+	std2, err := cmd.RunDefaultWithStdoutBashCf("chown -R %s:%s %s", f.DefaultUser, f.DefaultGroup, path)
 	if err != nil {
 		return errors.New(std2)
 	}
@@ -202,7 +202,7 @@ func (f *Ftp) SetStatus(username, status string) error {
 	if status == constant.StatusDisable {
 		statusItem = "1"
 	}
-	std, err := cmd.Execf("pure-pw usermod %s -r %s", username, statusItem)
+	std, err := cmd.RunDefaultWithStdoutBashCf("pure-pw usermod %s -r %s", username, statusItem)
 	if err != nil {
 		return errors.New(std)
 	}
@@ -210,7 +210,7 @@ func (f *Ftp) SetStatus(username, status string) error {
 }
 
 func (f *Ftp) LoadList() ([]FtpList, error) {
-	std, err := cmd.Exec("pure-pw list")
+	std, err := cmd.RunDefaultWithStdoutBashC("pure-pw list")
 	if err != nil {
 		return nil, errors.New(std)
 	}
@@ -221,7 +221,7 @@ func (f *Ftp) LoadList() ([]FtpList, error) {
 		if len(parts) < 2 {
 			continue
 		}
-		std2, err := cmd.Execf("pure-pw  show %s | grep 'Allowed client IPs :'", parts[0])
+		std2, err := cmd.RunDefaultWithStdoutBashCf("pure-pw  show %s | grep 'Allowed client IPs :'", parts[0])
 		if err != nil {
 			global.LOG.Errorf("handle pure-pw show %s failed, err: %v", parts[0], std2)
 			continue
@@ -237,7 +237,7 @@ func (f *Ftp) LoadList() ([]FtpList, error) {
 }
 
 func (f *Ftp) Reload() error {
-	std, err := cmd.Exec("pure-pw mkdb")
+	std, err := cmd.RunDefaultWithStdoutBashC("pure-pw mkdb")
 	if err != nil {
 		return errors.New(std)
 	}
@@ -248,7 +248,7 @@ func (f *Ftp) LoadLogs(user, operation string) ([]FtpLog, error) {
 	var logs []FtpLog
 	logItem := ""
 	if _, err := os.Stat("/etc/pure-ftpd/conf"); err != nil && os.IsNotExist(err) {
-		std, err := cmd.Exec("cat /etc/pure-ftpd/pure-ftpd.conf | grep AltLog | grep clf:")
+		std, err := cmd.RunDefaultWithStdoutBashC("cat /etc/pure-ftpd/pure-ftpd.conf | grep AltLog | grep clf:")
 		logItem = "/var/log/pureftpd.log"
 		if err == nil && !strings.HasPrefix(std, "#") {
 			logItem = std
@@ -257,7 +257,7 @@ func (f *Ftp) LoadLogs(user, operation string) ([]FtpLog, error) {
 		if err != nil {
 			return logs, err
 		}
-		std, err := cmd.Exec("cat /etc/pure-ftpd/conf/AltLog")
+		std, err := cmd.RunDefaultWithStdoutBashC("cat /etc/pure-ftpd/conf/AltLog")
 		logItem = "/var/log/pure-ftpd/transfer.log"
 		if err != nil && !strings.HasPrefix(std, "#") {
 			logItem = std
@@ -296,7 +296,7 @@ func (f *Ftp) LoadLogs(user, operation string) ([]FtpLog, error) {
 }
 
 func handleGunzip(path string) error {
-	if _, err := cmd.Execf("gunzip %s", path); err != nil {
+	if _, err := cmd.RunDefaultWithStdoutBashCf("gunzip %s", path); err != nil {
 		return err
 	}
 	return nil

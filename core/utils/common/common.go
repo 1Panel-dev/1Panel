@@ -2,8 +2,6 @@ package common
 
 import (
 	"fmt"
-	"github.com/1Panel-dev/1Panel/core/constant"
-	"github.com/gin-gonic/gin"
 	mathRand "math/rand"
 	"net"
 	"net/http"
@@ -12,6 +10,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/core/constant"
+	"github.com/gin-gonic/gin"
 
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/cmd"
@@ -42,7 +43,7 @@ func LoadTimeZoneByCmd() string {
 	if _, err := time.LoadLocation(loc); err != nil {
 		loc = "Asia/Shanghai"
 	}
-	std, err := cmd.Exec("timedatectl | grep 'Time zone'")
+	std, err := cmd.RunDefaultWithStdoutBashC("timedatectl | grep 'Time zone'")
 	if err != nil {
 		return loc
 	}
@@ -116,7 +117,7 @@ func SplitStr(str string, spi ...string) []string {
 }
 
 func LoadArch() (string, error) {
-	std, err := cmd.Exec("uname -a")
+	std, err := cmd.RunDefaultWithStdoutBashC("uname -a")
 	if err != nil {
 		return "", fmt.Errorf("std: %s, err: %s", std, err.Error())
 	}

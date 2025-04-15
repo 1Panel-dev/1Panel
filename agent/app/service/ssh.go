@@ -125,17 +125,17 @@ func (u *SSHService) OperateSSH(operation string) error {
 	if operation == "stop" {
 		isSocketActive, _ := systemctl.IsActive(serviceName + ".socket")
 		if isSocketActive {
-			std, err := cmd.Execf("%s systemctl stop %s", sudo, serviceName+".socket")
+			std, err := cmd.RunDefaultWithStdoutBashCf("%s systemctl stop %s", sudo, serviceName+".socket")
 			if err != nil {
 				global.LOG.Errorf("handle systemctl stop %s.socket failed, err: %v", serviceName, std)
 			}
 		}
 	}
 
-	stdout, err := cmd.Execf("%s systemctl %s %s", sudo, operation, serviceName)
+	stdout, err := cmd.RunDefaultWithStdoutBashCf("%s systemctl %s %s", sudo, operation, serviceName)
 	if err != nil {
 		if strings.Contains(stdout, "alias name or linked unit file") {
-			stdout, err := cmd.Execf("%s systemctl %s ssh", sudo, operation)
+			stdout, err := cmd.RunDefaultWithStdoutBashCf("%s systemctl %s ssh", sudo, operation)
 			if err != nil {
 				return fmt.Errorf("%s ssh(alias name or linked unit file) failed, stdout: %s, err: %v", operation, stdout, err)
 			}
@@ -167,9 +167,9 @@ func (u *SSHService) Update(req dto.SSHUpdate) error {
 	}
 	sudo := cmd.SudoHandleCmd()
 	if req.Key == "Port" {
-		stdout, _ := cmd.Execf("%s getenforce", sudo)
+		stdout, _ := cmd.RunDefaultWithStdoutBashCf("%s getenforce", sudo)
 		if stdout == "Enforcing\n" {
-			_, _ = cmd.Execf("%s semanage port -a -t ssh_port_t -p tcp %s", sudo, req.NewValue)
+			_, _ = cmd.RunDefaultWithStdoutBashCf("%s semanage port -a -t ssh_port_t -p tcp %s", sudo, req.NewValue)
 		}
 
 		ruleItem := dto.PortRuleUpdate{
@@ -191,7 +191,7 @@ func (u *SSHService) Update(req dto.SSHUpdate) error {
 		}
 	}
 
-	_, _ = cmd.Execf("%s systemctl restart %s", sudo, serviceName)
+	_, _ = cmd.RunDefaultWithStdoutBashCf("%s systemctl restart %s", sudo, serviceName)
 	return nil
 }
 
@@ -210,7 +210,7 @@ func (u *SSHService) UpdateByFile(value string) error {
 		return err
 	}
 	sudo := cmd.SudoHandleCmd()
-	_, _ = cmd.Execf("%s systemctl restart %s", sudo, serviceName)
+	_, _ = cmd.RunDefaultWithStdoutBashCf("%s systemctl restart %s", sudo, serviceName)
 	return nil
 }
 
@@ -230,7 +230,7 @@ func (u *SSHService) GenerateSSH(req dto.GenerateSSH) error {
 	if len(req.Password) != 0 {
 		command = fmt.Sprintf("ssh-keygen -t %s -P %s -f %s/.ssh/id_item_%s | echo y", req.EncryptionMode, req.Password, currentUser.HomeDir, req.EncryptionMode)
 	}
-	stdout, err := cmd.Exec(command)
+	stdout, err := cmd.RunDefaultWithStdoutBashC(command)
 	if err != nil {
 		return fmt.Errorf("generate failed, err: %v, message: %s", err, stdout)
 	}
@@ -248,7 +248,7 @@ func (u *SSHService) GenerateSSH(req dto.GenerateSSH) error {
 		}
 		defer authFile.Close()
 	}
-	stdout1, err := cmd.Execf("cat %s >> %s/.ssh/authorized_keys", secretPubFile, currentUser.HomeDir)
+	stdout1, err := cmd.RunDefaultWithStdoutBashCf("cat %s >> %s/.ssh/authorized_keys", secretPubFile, currentUser.HomeDir)
 	if err != nil {
 		return fmt.Errorf("generate failed, err: %v, message: %s", err, stdout1)
 	}
@@ -423,7 +423,7 @@ func loadSSHData(ctx *gin.Context, command string, showCountFrom, showCountTo, c
 	if err != nil {
 		return datas, 0, 0
 	}
-	stdout, err := cmd.Exec(command)
+	stdout, err := cmd.RunDefaultWithStdoutBashC(command)
 	if err != nil {
 		return datas, 0, 0
 	}
@@ -532,7 +532,7 @@ func loadFailedSecureDatas(line string) dto.SSHHistory {
 }
 
 func handleGunzip(path string) error {
-	if _, err := cmd.Execf("gunzip %s", path); err != nil {
+	if _, err := cmd.RunDefaultWithStdoutBashCf("gunzip %s", path); err != nil {
 		return err
 	}
 	return nil

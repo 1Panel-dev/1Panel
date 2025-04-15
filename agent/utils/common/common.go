@@ -270,7 +270,7 @@ func LoadTimeZoneByCmd() string {
 	if _, err := time.LoadLocation(loc); err != nil {
 		loc = "Asia/Shanghai"
 	}
-	std, err := cmd.Exec("timedatectl | grep 'Time zone'")
+	std, err := cmd.RunDefaultWithStdoutBashC("timedatectl | grep 'Time zone'")
 	if err != nil {
 		return loc
 	}
@@ -394,7 +394,8 @@ func RestartService(core, agent, reload bool) {
 	default:
 		return
 	}
-	std, err := cmd.ExecWithTimeOut(command, 1*time.Minute)
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(1 * time.Second))
+	std, err := cmdMgr.RunWithStdoutBashC(command)
 	if err != nil {
 		global.LOG.Errorf("restart 1panel service failed, err: %v, std: %s", err, std)
 	}

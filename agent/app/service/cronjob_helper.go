@@ -23,49 +23,33 @@ import (
 )
 
 func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
-	var (
-		message []byte
-		err     error
-	)
 	record := cronjobRepo.StartRecords(cronjob.ID, "", cronjob.Type)
 	go func() {
-		switch cronjob.Type {
-		case "shell":
-			if len(cronjob.Script) == 0 {
-				return
+		var (
+			message []byte
+			err     error
+		)
+		cronjob.RetryTimes = cronjob.RetryTimes + 1
+		for i := uint(0); i < cronjob.RetryTimes; i++ {
+			ctx, cancel := context.WithTimeout(context.Background(), time.Duration(cronjob.Timeout)*time.Second)
+			done := make(chan error)
+			go func() {
+				message, err = u.handleJob(cronjob, record)
+				if err != nil {
+					global.LOG.Debugf("try handle cron job [%s] %s failed %d/%d, err: %v", cronjob.Type, cronjob.Name, i+1, cronjob.RetryTimes, err)
+				}
+				close(done)
+			}()
+			select {
+			case <-done:
+				cancel()
+			case <-ctx.Done():
+				global.LOG.Debugf("try handle cron job [%s] %s failed %d/%d, err: timeout", cronjob.Type, cronjob.Name, i+1, cronjob.RetryTimes)
+				err = fmt.Errorf("handle timeout")
+				cancel()
+				continue
 			}
-			err = u.handleShell(*cronjob, record.TaskID)
-		case "curl":
-			if len(cronjob.URL) == 0 {
-				return
-			}
-			err = u.handleCurl(*cronjob, record.TaskID)
-		case "ntp":
-			err = u.handleNtpSync(*cronjob, record.TaskID)
-		case "cutWebsiteLog":
-			var messageItem []string
-			messageItem, record.File, err = u.handleCutWebsiteLog(cronjob, record.StartTime)
-			message = []byte(strings.Join(messageItem, "\n"))
-		case "clean":
-			err = u.handleSystemClean(*cronjob, record.TaskID)
-		case "website":
-			err = u.handleWebsite(*cronjob, record.StartTime, record.TaskID)
-		case "app":
-			err = u.handleApp(*cronjob, record.StartTime, record.TaskID)
-		case "database":
-			err = u.handleDatabase(*cronjob, record.StartTime, record.TaskID)
-		case "directory":
-			if len(cronjob.SourceDir) == 0 {
-				return
-			}
-			err = u.handleDirectory(*cronjob, record.StartTime)
-		case "log":
-			err = u.handleSystemLog(*cronjob, record.StartTime)
-		case "snapshot":
-			_ = cronjobRepo.UpdateRecords(record.ID, map[string]interface{}{"records": record.Records})
-			err = u.handleSnapshot(*cronjob, record)
 		}
-
 		if err != nil {
 			if len(message) != 0 {
 				record.Records, _ = mkdirAndWriteFile(cronjob, record.StartTime, message)
@@ -84,6 +68,50 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 	}()
 }
 
+func (u *CronjobService) handleJob(cronjob *model.Cronjob, record model.JobRecords) ([]byte, error) {
+	var (
+		message []byte
+		err     error
+	)
+	switch cronjob.Type {
+	case "shell":
+		if len(cronjob.Script) == 0 {
+			return nil, fmt.Errorf("the script content is empty and is skipped")
+		}
+		err = u.handleShell(*cronjob, record.TaskID)
+	case "curl":
+		if len(cronjob.URL) == 0 {
+			return nil, fmt.Errorf("the url is empty and is skipped")
+		}
+		err = u.handleCurl(*cronjob, record.TaskID)
+	case "ntp":
+		err = u.handleNtpSync(*cronjob, record.TaskID)
+	case "cutWebsiteLog":
+		var messageItem []string
+		messageItem, record.File, err = u.handleCutWebsiteLog(cronjob, record.StartTime)
+		message = []byte(strings.Join(messageItem, "\n"))
+	case "clean":
+		err = u.handleSystemClean(*cronjob, record.TaskID)
+	case "website":
+		err = u.handleWebsite(*cronjob, record.StartTime, record.TaskID)
+	case "app":
+		err = u.handleApp(*cronjob, record.StartTime, record.TaskID)
+	case "database":
+		err = u.handleDatabase(*cronjob, record.StartTime, record.TaskID)
+	case "directory":
+		if len(cronjob.SourceDir) == 0 {
+			return nil, fmt.Errorf("the source dir is empty and is skipped")
+		}
+		err = u.handleDirectory(*cronjob, record.StartTime)
+	case "log":
+		err = u.handleSystemLog(*cronjob, record.StartTime)
+	case "snapshot":
+		_ = cronjobRepo.UpdateRecords(record.ID, map[string]interface{}{"records": record.Records})
+		err = u.handleSnapshot(*cronjob, record)
+	}
+	return message, err
+}
+
 func (u *CronjobService) handleShell(cronjob model.Cronjob, taskID string) error {
 	taskItem, err := task.NewTaskWithOps(fmt.Sprintf("cronjob-%s", cronjob.Name), task.TaskHandle, task.TaskScopeCronjob, taskID, cronjob.ID)
 	if err != nil {
@@ -91,13 +119,14 @@ func (u *CronjobService) handleShell(cronjob model.Cronjob, taskID string) error
 		return err
 	}
 
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTask(*taskItem), cmd.WithTimeout(24*time.Hour))
 	taskItem.AddSubTask(i18n.GetWithName("HandleShell", cronjob.Name), func(t *task.Task) error {
 		if len(cronjob.ContainerName) != 0 {
 			command := "sh"
 			if len(cronjob.Command) != 0 {
 				command = cronjob.Command
 			}
-			return cmd.ExecShellWithTask(taskItem, 24*time.Hour, "docker", "exec", cronjob.ContainerName, command, "-c", strings.ReplaceAll(cronjob.Script, "\"", "\\\""))
+			return cmdMgr.Run("docker", "exec", cronjob.ContainerName, command, "-c", strings.ReplaceAll(cronjob.Script, "\"", "\\\""))
 		}
 		if len(cronjob.Executor) == 0 {
 			cronjob.Executor = "bash"
@@ -114,14 +143,14 @@ func (u *CronjobService) handleShell(cronjob model.Cronjob, taskID string) error
 				return err
 			}
 			if len(cronjob.User) == 0 {
-				return cmd.ExecShellWithTask(taskItem, 24*time.Hour, cronjob.Executor, fileItem)
+				return cmdMgr.Run(cronjob.Executor, fileItem)
 			}
-			return cmd.ExecShellWithTask(taskItem, 24*time.Hour, "sudo", "-u", cronjob.User, cronjob.Executor, fileItem)
+			return cmdMgr.Run("sudo", "-u", cronjob.User, cronjob.Executor, fileItem)
 		}
 		if len(cronjob.User) == 0 {
-			return cmd.ExecShellWithTask(taskItem, 24*time.Hour, cronjob.Executor, cronjob.Script)
+			return cmdMgr.Run(cronjob.Executor, cronjob.Script)
 		}
-		if err := cmd.ExecShellWithTask(taskItem, 24*time.Hour, "sudo", "-u", cronjob.User, cronjob.Executor, cronjob.Script); err != nil {
+		if err := cmdMgr.Run("sudo", "-u", cronjob.User, cronjob.Executor, cronjob.Script); err != nil {
 			return err
 		}
 		return nil
@@ -139,10 +168,8 @@ func (u *CronjobService) handleCurl(cronjob model.Cronjob, taskID string) error 
 	}
 
 	taskItem.AddSubTask(i18n.GetWithName("HandleShell", cronjob.Name), func(t *task.Task) error {
-		if err := cmd.ExecShellWithTask(taskItem, 24*time.Hour, "curl", cronjob.URL); err != nil {
-			return err
-		}
-		return nil
+		cmdMgr := cmd.NewCommandMgr(cmd.WithTask(*taskItem), cmd.WithTimeout(time.Hour))
+		return cmdMgr.Run("curl", cronjob.URL)
 	},
 		nil,
 	)
@@ -214,7 +241,8 @@ func (u *CronjobService) handleCutWebsiteLog(cronjob *model.Cronjob, startTime t
 }
 
 func backupLogFile(dstFilePath, websiteLogDir string, fileOp files.FileOp) error {
-	if err := cmd.ExecCmd(fmt.Sprintf("tar -czf %s -C %s %s", dstFilePath, websiteLogDir, strings.Join([]string{"access.log", "error.log"}, " "))); err != nil {
+	cmdMgr := cmd.NewCommandMgr()
+	if err := cmdMgr.RunBashCf("tar -czf %s -C %s %s", dstFilePath, websiteLogDir, strings.Join([]string{"access.log", "error.log"}, " ")); err != nil {
 		dstDir := pathUtils.Dir(dstFilePath)
 		if err = fileOp.Copy(pathUtils.Join(websiteLogDir, "access.log"), dstDir); err != nil {
 			return err
@@ -222,7 +250,7 @@ func backupLogFile(dstFilePath, websiteLogDir string, fileOp files.FileOp) error
 		if err = fileOp.Copy(pathUtils.Join(websiteLogDir, "error.log"), dstDir); err != nil {
 			return err
 		}
-		if err = cmd.ExecCmd(fmt.Sprintf("tar -czf %s -C %s %s", dstFilePath, dstDir, strings.Join([]string{"access.log", "error.log"}, " "))); err != nil {
+		if err = cmdMgr.RunBashCf("tar -czf %s -C %s %s", dstFilePath, dstDir, strings.Join([]string{"access.log", "error.log"}, " ")); err != nil {
 			return err
 		}
 		_ = fileOp.DeleteFile(pathUtils.Join(dstDir, "access.log"))

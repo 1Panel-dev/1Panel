@@ -31,14 +31,15 @@ func (x XpuSMI) loadDeviceData(device Device, wg *sync.WaitGroup, res *[]XPUSimp
 	var wgCmd sync.WaitGroup
 	wgCmd.Add(2)
 
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(5 * time.Second))
 	go func() {
 		defer wgCmd.Done()
-		xpuData, xpuErr = cmd.ExecWithTimeOut(fmt.Sprintf("xpu-smi discovery -d %d -j", device.DeviceID), 5*time.Second)
+		xpuData, xpuErr = cmdMgr.RunWithStdoutBashCf("xpu-smi discovery -d %d -j", device.DeviceID)
 	}()
 
 	go func() {
 		defer wgCmd.Done()
-		statsData, statsErr = cmd.ExecWithTimeOut(fmt.Sprintf("xpu-smi stats -d %d -j", device.DeviceID), 5*time.Second)
+		statsData, statsErr = cmdMgr.RunWithStdoutBashCf("xpu-smi stats -d %d -j", device.DeviceID)
 	}()
 
 	wgCmd.Wait()
@@ -91,7 +92,8 @@ func (x XpuSMI) loadDeviceData(device Device, wg *sync.WaitGroup, res *[]XPUSimp
 }
 
 func (x XpuSMI) LoadDashData() ([]XPUSimpleInfo, error) {
-	data, err := cmd.ExecWithTimeOut("xpu-smi discovery -j", 5*time.Second)
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(5 * time.Second))
+	data, err := cmdMgr.RunWithStdoutBashC("xpu-smi discovery -j")
 	if err != nil {
 		return nil, fmt.Errorf("calling xpu-smi failed, err: %w", err)
 	}
@@ -119,7 +121,8 @@ func (x XpuSMI) LoadDashData() ([]XPUSimpleInfo, error) {
 }
 
 func (x XpuSMI) LoadGpuInfo() (*XpuInfo, error) {
-	data, err := cmd.ExecWithTimeOut("xpu-smi discovery -j", 5*time.Second)
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(5 * time.Second))
+	data, err := cmdMgr.RunWithStdoutBashC("xpu-smi discovery -j")
 	if err != nil {
 		return nil, fmt.Errorf("calling xpu-smi  failed, err: %w", err)
 	}
@@ -141,7 +144,7 @@ func (x XpuSMI) LoadGpuInfo() (*XpuInfo, error) {
 
 	wg.Wait()
 
-	processData, err := cmd.ExecWithTimeOut(fmt.Sprintf("xpu-smi ps -j"), 5*time.Second)
+	processData, err := cmdMgr.RunWithStdoutBashC("xpu-smi ps -j")
 	if err != nil {
 		return nil, fmt.Errorf("calling xpu-smi ps failed, err: %w", err)
 	}
@@ -188,14 +191,15 @@ func (x XpuSMI) loadDeviceInfo(device Device, wg *sync.WaitGroup, res *XpuInfo, 
 	var wgCmd sync.WaitGroup
 	wgCmd.Add(2)
 
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(5 * time.Second))
 	go func() {
 		defer wgCmd.Done()
-		xpuData, xpuErr = cmd.ExecWithTimeOut(fmt.Sprintf("xpu-smi discovery -d %d -j", device.DeviceID), 5*time.Second)
+		xpuData, xpuErr = cmdMgr.RunWithStdoutBashCf("xpu-smi discovery -d %d -j", device.DeviceID)
 	}()
 
 	go func() {
 		defer wgCmd.Done()
-		statsData, statsErr = cmd.ExecWithTimeOut(fmt.Sprintf("xpu-smi stats -d %d -j", device.DeviceID), 5*time.Second)
+		statsData, statsErr = cmdMgr.RunWithStdoutBashCf("xpu-smi stats -d %d -j", device.DeviceID)
 	}()
 
 	wgCmd.Wait()

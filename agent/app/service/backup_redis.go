@@ -96,7 +96,7 @@ func handleRedisBackup(redisInfo *repo.RootInfo, parentTask *task.Task, backupDi
 			}
 		}
 
-		stdout, err := cmd.Execf("docker exec %s redis-cli -a %s --no-auth-warning save", redisInfo.ContainerName, redisInfo.Password)
+		stdout, err := cmd.RunDefaultWithStdoutBashCf("docker exec %s redis-cli -a %s --no-auth-warning save", redisInfo.ContainerName, redisInfo.Password)
 		if err != nil {
 			return errors.New(string(stdout))
 		}
@@ -109,14 +109,14 @@ func handleRedisBackup(redisInfo *repo.RootInfo, parentTask *task.Task, backupDi
 			return nil
 		}
 		if strings.HasSuffix(fileName, ".aof") {
-			stdout1, err := cmd.Execf("docker cp %s:/data/appendonly.aof %s/%s", redisInfo.ContainerName, backupDir, fileName)
+			stdout1, err := cmd.RunDefaultWithStdoutBashCf("docker cp %s:/data/appendonly.aof %s/%s", redisInfo.ContainerName, backupDir, fileName)
 			if err != nil {
 				return errors.New(string(stdout1))
 			}
 			return nil
 		}
 
-		stdout1, err1 := cmd.Execf("docker cp %s:/data/dump.rdb %s/%s", redisInfo.ContainerName, backupDir, fileName)
+		stdout1, err1 := cmd.RunDefaultWithStdoutBashCf("docker cp %s:/data/dump.rdb %s/%s", redisInfo.ContainerName, backupDir, fileName)
 		if err1 != nil {
 			return errors.New(string(stdout1))
 		}

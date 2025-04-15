@@ -23,7 +23,8 @@ func New() (bool, NvidiaSMI) {
 }
 
 func (n NvidiaSMI) LoadGpuInfo() (*common.GpuInfo, error) {
-	itemData, err := cmd.ExecWithTimeOut("nvidia-smi -q -x", 5*time.Second)
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(5 * time.Second))
+	itemData, err := cmdMgr.RunWithStdoutBashC("nvidia-smi -q -x")
 	if err != nil {
 		return nil, fmt.Errorf("calling nvidia-smi failed, err: %w", err)
 	}

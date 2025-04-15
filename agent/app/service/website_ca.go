@@ -378,7 +378,8 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) (*model.Website
 			workDir = websiteSSL.Dir
 		}
 		logger.Println(i18n.GetMsgByKey("ExecShellStart"))
-		if err = cmd.ExecShellWithTimeOut(websiteSSL.Shell, workDir, logger, 30*time.Minute); err != nil {
+		cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(30*time.Minute), cmd.WithLogger(logger), cmd.WithWorkDir(workDir))
+		if err = cmdMgr.RunBashC(websiteSSL.Shell); err != nil {
 			logger.Println(i18n.GetMsgWithMap("ErrExecShell", map[string]interface{}{"err": err.Error()}))
 		} else {
 			logger.Println(i18n.GetMsgByKey("ExecShellSuccess"))

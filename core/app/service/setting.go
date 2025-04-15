@@ -171,7 +171,7 @@ func (u *SettingService) UpdateBindInfo(req dto.BindInfo) error {
 	}
 	go func() {
 		time.Sleep(1 * time.Second)
-		_, err := cmd.Exec("systemctl restart 1panel-core.service")
+		_, err := cmd.RunDefaultWithStdoutBashC("systemctl restart 1panel-core.service")
 		if err != nil {
 			global.LOG.Errorf("restart system with new bind info failed, err: %v", err)
 		}
@@ -222,7 +222,7 @@ func (u *SettingService) UpdatePort(port uint) error {
 	}
 	go func() {
 		time.Sleep(1 * time.Second)
-		if _, err := cmd.Exec("systemctl restart 1panel-core.service"); err != nil {
+		if _, err := cmd.RunDefaultWithStdoutBashC("systemctl restart 1panel-core.service"); err != nil {
 			global.LOG.Errorf("restart system port failed, err: %v", err)
 		}
 	}()
@@ -243,7 +243,7 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 		_ = os.Remove(path.Join(secretDir, "server.key"))
 		go func() {
 			time.Sleep(1 * time.Second)
-			_, err := cmd.Exec("systemctl restart 1panel-core.service")
+			_, err := cmd.RunDefaultWithStdoutBashC("systemctl restart 1panel-core.service")
 			if err != nil {
 				global.LOG.Errorf("restart system failed, err: %v", err)
 			}
@@ -341,7 +341,7 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 	if req.SSL != status {
 		go func() {
 			time.Sleep(1 * time.Second)
-			_, err := cmd.Exec("systemctl restart 1panel-core.service")
+			_, err := cmd.RunDefaultWithStdoutBashC("systemctl restart 1panel-core.service")
 			if err != nil {
 				global.LOG.Errorf("restart system failed, err: %v", err)
 			}

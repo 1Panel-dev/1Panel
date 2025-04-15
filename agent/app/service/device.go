@@ -79,7 +79,7 @@ func (u *DeviceService) LoadBaseInfo() (dto.DeviceBaseInfo, error) {
 }
 
 func (u *DeviceService) LoadTimeZone() ([]string, error) {
-	std, err := cmd.Exec("timedatectl list-timezones")
+	std, err := cmd.NewCommandMgr(cmd.WithTimeout(10 * time.Minute)).RunWithStdoutBashC("timedatectl list-timezones")
 	if err != nil {
 		return []string{}, err
 	}
@@ -129,7 +129,7 @@ func (u *DeviceService) Update(key, value string) error {
 		if cmd.CheckIllegal(value) {
 			return buserr.New("ErrCmdIllegal")
 		}
-		std, err := cmd.Execf("%s hostnamectl set-hostname %s", cmd.SudoHandleCmd(), value)
+		std, err := cmd.RunDefaultWithStdoutBashCf("%s hostnamectl set-hostname %s", cmd.SudoHandleCmd(), value)
 		if err != nil {
 			return errors.New(std)
 		}
@@ -220,7 +220,7 @@ func (u *DeviceService) UpdatePasswd(req dto.ChangePasswd) error {
 	if cmd.CheckIllegal(req.User, req.Passwd) {
 		return buserr.New("ErrCmdIllegal")
 	}
-	std, err := cmd.Execf("%s echo '%s:%s' | %s chpasswd", cmd.SudoHandleCmd(), req.User, req.Passwd, cmd.SudoHandleCmd())
+	std, err := cmd.RunDefaultWithStdoutBashCf("%s echo '%s:%s' | %s chpasswd", cmd.SudoHandleCmd(), req.User, req.Passwd, cmd.SudoHandleCmd())
 	if err != nil {
 		if strings.Contains(err.Error(), "does not exist") {
 			return buserr.New("ErrNotExistUser")
@@ -235,7 +235,7 @@ func (u *DeviceService) UpdateSwap(req dto.SwapHelper) error {
 		return buserr.New("ErrCmdIllegal")
 	}
 	if !req.IsNew {
-		std, err := cmd.Execf("%s swapoff %s", cmd.SudoHandleCmd(), req.Path)
+		std, err := cmd.RunDefaultWithStdoutBashCf("%s swapoff %s", cmd.SudoHandleCmd(), req.Path)
 		if err != nil {
 			return fmt.Errorf("handle swapoff %s failed, err: %s", req.Path, std)
 		}
@@ -246,17 +246,17 @@ func (u *DeviceService) UpdateSwap(req dto.SwapHelper) error {
 		}
 		return operateSwapWithFile(true, req)
 	}
-	std1, err := cmd.Execf("%s dd if=/dev/zero of=%s bs=1024 count=%d", cmd.SudoHandleCmd(), req.Path, req.Size)
+	std1, err := cmd.RunDefaultWithStdoutBashCf("%s dd if=/dev/zero of=%s bs=1024 count=%d", cmd.SudoHandleCmd(), req.Path, req.Size)
 	if err != nil {
 		return fmt.Errorf("handle dd path %s failed, err: %s", req.Path, std1)
 	}
-	std2, err := cmd.Execf("%s mkswap -f %s", cmd.SudoHandleCmd(), req.Path)
+	std2, err := cmd.RunDefaultWithStdoutBashCf("%s mkswap -f %s", cmd.SudoHandleCmd(), req.Path)
 	if err != nil {
 		return fmt.Errorf("handle dd path %s failed, err: %s", req.Path, std2)
 	}
-	std3, err := cmd.Execf("%s swapon %s", cmd.SudoHandleCmd(), req.Path)
+	std3, err := cmd.RunDefaultWithStdoutBashCf("%s swapon %s", cmd.SudoHandleCmd(), req.Path)
 	if err != nil {
-		_, _ = cmd.Execf("%s swapoff %s", cmd.SudoHandleCmd(), req.Path)
+		_, _ = cmd.RunDefaultWithStdoutBashCf("%s swapoff %s", cmd.SudoHandleCmd(), req.Path)
 		return fmt.Errorf("handle dd path %s failed, err: %s", req.Path, std3)
 	}
 	return operateSwapWithFile(false, req)
@@ -373,7 +373,7 @@ func loadHosts() []dto.HostHelper {
 }
 
 func loadHostname() string {
-	std, err := cmd.Exec("hostname")
+	std, err := cmd.RunDefaultWithStdoutBashC("hostname")
 	if err != nil {
 		return ""
 	}
@@ -381,7 +381,7 @@ func loadHostname() string {
 }
 
 func loadUser() string {
-	std, err := cmd.Exec("whoami")
+	std, err := cmd.RunDefaultWithStdoutBashC("whoami")
 	if err != nil {
 		return ""
 	}
@@ -390,7 +390,7 @@ func loadUser() string {
 
 func loadSwap() []dto.SwapHelper {
 	var data []dto.SwapHelper
-	std, err := cmd.Execf("%s swapon --summary", cmd.SudoHandleCmd())
+	std, err := cmd.RunDefaultWithStdoutBashCf("%s swapon --summary", cmd.SudoHandleCmd())
 	if err != nil {
 		return data
 	}

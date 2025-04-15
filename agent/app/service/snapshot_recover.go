@@ -314,7 +314,7 @@ func recoverAppData(src string, itemHelper *snapRecoverHelper) error {
 		itemHelper.Task.Log(i18n.GetMsgByKey("RecoverAppEmpty"))
 		return nil
 	}
-	std, err := cmd.Execf("docker load < %s", path.Join(src, "images.tar.gz"))
+	std, err := cmd.RunDefaultWithStdoutBashCf("docker load < %s", path.Join(src, "images.tar.gz"))
 	if err != nil {
 		itemHelper.Task.LogFailedWithErr(i18n.GetMsgByKey("RecoverAppImage"), errors.New(std))
 		return fmt.Errorf("docker load images failed, err: %v", err)
@@ -371,7 +371,7 @@ func recoverBaseData(src string, itemHelper *snapRecoverHelper) error {
 		}
 	}
 
-	_, _ = cmd.Exec("systemctl restart docker")
+	_, _ = cmd.RunDefaultWithStdoutBashC("systemctl restart docker")
 	return nil
 }
 
@@ -400,7 +400,7 @@ func restartCompose(composePath string, itemHelper *snapRecoverHelper) error {
 			continue
 		}
 		upCmd := fmt.Sprintf("docker compose -f %s up -d", pathItem)
-		stdout, err := cmd.Exec(upCmd)
+		stdout, err := cmd.RunDefaultWithStdoutBashC(upCmd)
 		if err != nil {
 			itemHelper.Task.LogFailedWithErr(i18n.GetMsgByKey("RecoverCompose"), errors.New(stdout))
 			continue

@@ -154,7 +154,7 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 			u.handleRollback(originalDir, 2)
 			return
 		}
-		if _, err := cmd.Execf("sed -i -e 's#BASE_DIR=.*#BASE_DIR=%s#g' /usr/local/bin/1pctl", global.CONF.Base.InstallDir); err != nil {
+		if _, err := cmd.RunDefaultWithStdoutBashCf("sed -i -e 's#BASE_DIR=.*#BASE_DIR=%s#g' /usr/local/bin/1pctl", global.CONF.Base.InstallDir); err != nil {
 			global.LOG.Errorf("upgrade basedir in 1pctl failed, err: %v", err)
 			u.handleRollback(originalDir, 2)
 			return
@@ -173,9 +173,10 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 		global.CONF.Base.Version = req.Version
 		_ = settingRepo.Update("SystemStatus", "Free")
 
-		_, _ = cmd.ExecWithTimeOut("systemctl daemon-reload", 30*time.Second)
-		_, _ = cmd.ExecWithTimeOut("systemctl restart 1panel-agent.service", 1*time.Second)
-		_, _ = cmd.ExecWithTimeOut("systemctl restart 1panel-core.service", 1*time.Second)
+		cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(10 * time.Second))
+		_, _ = cmdMgr.RunWithStdoutBashC("systemctl daemon-reload")
+		_, _ = cmdMgr.RunWithStdoutBashC("systemctl restart 1panel-agent.service")
+		_, _ = cmdMgr.RunWithStdoutBashC("systemctl restart 1panel-core.service")
 	}()
 	return nil
 }
@@ -352,7 +353,7 @@ func (u *UpgradeService) loadReleaseNotes(path string) (string, error) {
 }
 
 func loadArch() (string, error) {
-	std, err := cmd.Exec("uname -a")
+	std, err := cmd.RunDefaultWithStdoutBashC("uname -a")
 	if err != nil {
 		return "", fmt.Errorf("std: %s, err: %s", std, err.Error())
 	}

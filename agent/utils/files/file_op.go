@@ -117,11 +117,11 @@ func (f FileOp) DeleteFile(dst string) error {
 }
 
 func (f FileOp) CleanDir(dst string) error {
-	return cmd.ExecCmd(fmt.Sprintf("rm -rf %s/*", dst))
+	return cmd.RunDefaultBashCf("rm -rf %s/*", dst)
 }
 
 func (f FileOp) RmRf(dst string) error {
-	return cmd.ExecCmd(fmt.Sprintf("rm -rf %s", dst))
+	return cmd.RunDefaultBashCf("rm -rf %s", dst)
 }
 
 func (f FileOp) WriteFile(dst string, in io.Reader, mode fs.FileMode) error {
@@ -172,14 +172,12 @@ func (f FileOp) SaveFileWithByte(dst string, content []byte, mode fs.FileMode) e
 }
 
 func (f FileOp) ChownR(dst string, uid string, gid string, sub bool) error {
-	cmdStr := fmt.Sprintf(`chown %s:%s "%s"`, uid, gid, dst)
+	cmdStr := fmt.Sprintf(`%s chown %s:%s "%s"`, cmd.SudoHandleCmd(), uid, gid, dst)
 	if sub {
 		cmdStr = fmt.Sprintf(`chown -R %s:%s "%s"`, uid, gid, dst)
 	}
-	if cmd.HasNoPasswordSudo() {
-		cmdStr = fmt.Sprintf("sudo %s", cmdStr)
-	}
-	if msg, err := cmd.ExecWithTimeOut(cmdStr, 10*time.Second); err != nil {
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(10 * time.Second))
+	if msg, err := cmdMgr.RunWithStdoutBashC(cmdStr); err != nil {
 		if msg != "" {
 			return errors.New(msg)
 		}
@@ -189,14 +187,12 @@ func (f FileOp) ChownR(dst string, uid string, gid string, sub bool) error {
 }
 
 func (f FileOp) ChmodR(dst string, mode int64, sub bool) error {
-	cmdStr := fmt.Sprintf(`chmod %v "%s"`, fmt.Sprintf("%04o", mode), dst)
+	cmdStr := fmt.Sprintf(`%s chmod %v "%s"`, cmd.SudoHandleCmd(), fmt.Sprintf("%04o", mode), dst)
 	if sub {
-		cmdStr = fmt.Sprintf(`chmod -R %v "%s"`, fmt.Sprintf("%04o", mode), dst)
+		cmdStr = fmt.Sprintf(`%s chmod -R %v "%s"`, cmd.SudoHandleCmd(), fmt.Sprintf("%04o", mode), dst)
 	}
-	if cmd.HasNoPasswordSudo() {
-		cmdStr = fmt.Sprintf("sudo %s", cmdStr)
-	}
-	if msg, err := cmd.ExecWithTimeOut(cmdStr, 10*time.Second); err != nil {
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(10 * time.Second))
+	if msg, err := cmdMgr.RunWithStdoutBashC(cmdStr); err != nil {
 		if msg != "" {
 			return errors.New(msg)
 		}
@@ -206,14 +202,12 @@ func (f FileOp) ChmodR(dst string, mode int64, sub bool) error {
 }
 
 func (f FileOp) ChmodRWithMode(dst string, mode fs.FileMode, sub bool) error {
-	cmdStr := fmt.Sprintf(`chmod %v "%s"`, fmt.Sprintf("%o", mode.Perm()), dst)
+	cmdStr := fmt.Sprintf(`%s chmod %v "%s"`, cmd.SudoHandleCmd(), fmt.Sprintf("%o", mode.Perm()), dst)
 	if sub {
-		cmdStr = fmt.Sprintf(`chmod -R %v "%s"`, fmt.Sprintf("%o", mode.Perm()), dst)
+		cmdStr = fmt.Sprintf(`%s chmod -R %v "%s"`, cmd.SudoHandleCmd(), fmt.Sprintf("%o", mode.Perm()), dst)
 	}
-	if cmd.HasNoPasswordSudo() {
-		cmdStr = fmt.Sprintf("sudo %s", cmdStr)
-	}
-	if msg, err := cmd.ExecWithTimeOut(cmdStr, 10*time.Second); err != nil {
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(10 * time.Second))
+	if msg, err := cmdMgr.RunWithStdoutBashC(cmdStr); err != nil {
 		if msg != "" {
 			return errors.New(msg)
 		}
@@ -351,8 +345,7 @@ func (f FileOp) Cut(oldPaths []string, dst, name string, cover bool) error {
 			coverFlag = "-f"
 		}
 
-		cmdStr := fmt.Sprintf(`mv %s '%s' '%s'`, coverFlag, p, dstPath)
-		if err := cmd.ExecCmd(cmdStr); err != nil {
+		if err := cmd.RunDefaultBashCf(`mv %s '%s' '%s'`, coverFlag, p, dstPath); err != nil {
 			return err
 		}
 	}
@@ -360,8 +353,7 @@ func (f FileOp) Cut(oldPaths []string, dst, name string, cover bool) error {
 }
 
 func (f FileOp) Mv(oldPath, dstPath string) error {
-	cmdStr := fmt.Sprintf(`mv '%s' '%s'`, oldPath, dstPath)
-	if err := cmd.ExecCmd(cmdStr); err != nil {
+	if err := cmd.RunDefaultBashCf(`mv '%s' '%s'`, oldPath, dstPath); err != nil {
 		return err
 	}
 	return nil
@@ -417,20 +409,19 @@ func (f FileOp) CopyAndReName(src, dst, name string, cover bool) error {
 		if name != "" && !cover {
 			dstPath = filepath.Join(dst, name)
 		}
-		return cmd.ExecCmd(fmt.Sprintf(`cp -rf '%s' '%s'`, src, dstPath))
+		return cmd.RunDefaultBashCf(`cp -rf '%s' '%s'`, src, dstPath)
 	} else {
 		dstPath := filepath.Join(dst, name)
 		if cover {
 			dstPath = dst
 		}
-		return cmd.ExecCmd(fmt.Sprintf(`cp -f '%s' '%s'`, src, dstPath))
+		return cmd.RunDefaultBashCf(`cp -f '%s' '%s'`, src, dstPath)
 	}
 }
 
 func (f FileOp) CopyDirWithNewName(src, dst, newName string) error {
 	dstDir := filepath.Join(dst, newName)
-	str := fmt.Sprintf(`cp -rf '%s' '%s'`, src, dstDir)
-	return cmd.ExecCmd(str)
+	return cmd.RunDefaultBashCf(`cp -rf '%s' '%s'`, src, dstDir)
 }
 
 func (f FileOp) CopyDir(src, dst string) error {
@@ -442,7 +433,7 @@ func (f FileOp) CopyDir(src, dst string) error {
 	if err = f.Fs.MkdirAll(dstDir, srcInfo.Mode()); err != nil {
 		return err
 	}
-	return cmd.ExecCmd(fmt.Sprintf(`cp -rf '%s' '%s'`, src, dst+"/"))
+	return cmd.RunDefaultBashCf(`cp -rf '%s' '%s'`, src, dst+"/")
 }
 
 func (f FileOp) CopyDirWithExclude(src, dst string, excludeNames []string) error {
@@ -455,7 +446,7 @@ func (f FileOp) CopyDirWithExclude(src, dst string, excludeNames []string) error
 		return err
 	}
 	if len(excludeNames) == 0 {
-		return cmd.ExecCmd(fmt.Sprintf(`cp -rf '%s' '%s'`, src, dst+"/"))
+		return cmd.RunDefaultBashCf(`cp -rf '%s' '%s'`, src, dst+"/")
 	}
 	tmpFiles, err := os.ReadDir(src)
 	if err != nil {
@@ -488,7 +479,7 @@ func (f FileOp) CopyDirWithExclude(src, dst string, excludeNames []string) error
 
 func (f FileOp) CopyFile(src, dst string) error {
 	dst = filepath.Clean(dst) + string(filepath.Separator)
-	return cmd.ExecCmd(fmt.Sprintf(`cp -f '%s' '%s'`, src, dst+"/"))
+	return cmd.RunDefaultBashCf(`cp -f '%s' '%s'`, src, dst+"/")
 }
 
 func (f FileOp) GetDirSize(path string) (int64, error) {
@@ -757,7 +748,9 @@ func (f FileOp) TarGzCompressPro(withDir bool, src, dst, secret, exclusionRules 
 		commands = fmt.Sprintf("tar --warning=no-file-changed --ignore-failed-read --exclude-from=<(find %s -type s -printf '%s' | sed 's|^|%s/|') -zcf %s %s %s", src, "%P\n", itemPrefix, dst, exStr, srcItem)
 		global.LOG.Debug(commands)
 	}
-	return cmd.ExecCmdWithDir(commands, workdir)
+
+	cmdMgr := cmd.NewCommandMgr(cmd.WithWorkDir(workdir))
+	return cmdMgr.RunBashC(commands)
 }
 
 func (f FileOp) TarGzFilesWithCompressPro(list []string, dst, secret string) error {
@@ -779,7 +772,7 @@ func (f FileOp) TarGzFilesWithCompressPro(list []string, dst, secret string) err
 		commands = fmt.Sprintf("tar --warning=no-file-changed --ignore-failed-read -zcf %s %s", dst, strings.Join(filelist, " "))
 		global.LOG.Debug(commands)
 	}
-	return cmd.ExecCmd(commands)
+	return cmd.RunDefaultBashC(commands)
 }
 
 func (f FileOp) TarGzExtractPro(src, dst string, secret string) error {
@@ -797,7 +790,8 @@ func (f FileOp) TarGzExtractPro(src, dst string, secret string) error {
 		commands = fmt.Sprintf("tar zxvf %s", src)
 		global.LOG.Debug(commands)
 	}
-	return cmd.ExecCmdWithDir(commands, dst)
+	cmdMgr := cmd.NewCommandMgr(cmd.WithWorkDir(dst))
+	return cmdMgr.RunBashC(commands)
 }
 func CopyCustomAppFile(srcPath, dstPath string) error {
 	if _, err := os.Stat(srcPath); os.IsNotExist(err) {

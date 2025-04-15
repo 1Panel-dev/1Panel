@@ -189,7 +189,7 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 			t.LogFailedWithErr(taskName, err)
 			return err
 		}
-		stdout, err := cmd.Execf("docker exec -i %s nginx -s reload", nginxInfo.ContainerName)
+		stdout, err := cmd.RunDefaultWithStdoutBashCf("docker exec -i %s nginx -s reload", nginxInfo.ContainerName)
 		if err != nil {
 			return errors.New(stdout)
 		}

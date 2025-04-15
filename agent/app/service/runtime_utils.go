@@ -6,8 +6,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/i18n"
-	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"io"
 	"os"
 	"os/exec"
@@ -15,6 +13,9 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/i18n"
+	"github.com/1Panel-dev/1Panel/agent/utils/common"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
@@ -335,9 +336,8 @@ func buildRuntime(runtime *model.Runtime, oldImageID string, oldEnv string, rebu
 		}
 		extensions := getRuntimeEnv(runtime.Env, "PHP_EXTENSIONS")
 		if extensions != "" {
-			installCmd := fmt.Sprintf("docker exec -i %s %s %s", runtime.ContainerName, "install-ext", extensions)
-			err = cmd2.ExecWithLogFile(installCmd, 60*time.Minute, logPath)
-			if err != nil {
+			cmdMgr := cmd2.NewCommandMgr(cmd2.WithTimeout(60*time.Minute), cmd2.WithOutputFile(logPath))
+			if err = cmdMgr.Run("docker", "exec", "-i", runtime.ContainerName, "install-ext", extensions); err != nil {
 				runtime.Status = constant.StatusError
 				runtime.Message = buserr.New("ErrImageBuildErr").Error() + ":" + err.Error()
 				_ = runtimeRepo.Save(runtime)

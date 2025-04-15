@@ -290,7 +290,7 @@ func loadAppImage(list []dto.DataTree) []dto.DataTree {
 
 	for i := 0; i < len(list); i++ {
 		itemAppImage := dto.DataTree{ID: uuid.NewString(), Label: "appImage"}
-		stdout, err := cmd.Execf("cat %s | grep image: ", path.Join(global.Dir.AppDir, list[i].Key, list[i].Name, "docker-compose.yml"))
+		stdout, err := cmd.RunDefaultWithStdoutBashCf("cat %s | grep image: ", path.Join(global.Dir.AppDir, list[i].Key, list[i].Name, "docker-compose.yml"))
 		if err != nil {
 			list[i].Children = append(list[i].Children, itemAppImage)
 			continue

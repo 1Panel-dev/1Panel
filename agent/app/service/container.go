@@ -340,7 +340,8 @@ func (u *ContainerService) ContainerCreateByCommand(req dto.ContainerCreateByCom
 	}
 	go func() {
 		taskItem.AddSubTask(i18n.GetWithName("ContainerCreate", containerName), func(t *task.Task) error {
-			return cmd.ExecShellWithTask(taskItem, 5*time.Minute, "bash", "-c", req.Command)
+			cmdMgr := cmd.NewCommandMgr(cmd.WithTask(*taskItem), cmd.WithTimeout(5*time.Minute))
+			return cmdMgr.RunBashC(req.Command)
 		}, nil)
 		_ = taskItem.Execute()
 	}()

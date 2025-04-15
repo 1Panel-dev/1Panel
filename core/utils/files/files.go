@@ -66,7 +66,7 @@ func CopyItem(isDir, withName bool, src, dst string) error {
 	if !isDir {
 		cmdStr = fmt.Sprintf(`cp -f %s %s`, src, dst+"/")
 	}
-	stdout, err := cmd.Exec(cmdStr)
+	stdout, err := cmd.RunDefaultWithStdoutBashC(cmdStr)
 	if err != nil {
 		return fmt.Errorf("handle %s failed, stdout: %s, err: %v", cmdStr, stdout, err)
 	}
@@ -111,7 +111,8 @@ func HandleTar(sourceDir, targetDir, name, exclusionRules string, secret string)
 		commands = fmt.Sprintf("tar --warning=no-file-changed --ignore-failed-read -zcf %s %s %s", targetDir+"/"+name, excludeRules, path)
 		global.LOG.Debug(commands)
 	}
-	stdout, err := cmd.ExecWithTimeOut(commands, 24*time.Hour)
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(24 * time.Hour))
+	stdout, err := cmdMgr.RunWithStdoutBashC(commands)
 	if err != nil {
 		if len(stdout) != 0 {
 			global.LOG.Errorf("do handle tar failed, stdout: %s, err: %v", stdout, err)
@@ -137,7 +138,8 @@ func HandleUnTar(sourceFile, targetDir string, secret string) error {
 		global.LOG.Debug(commands)
 	}
 
-	stdout, err := cmd.ExecWithTimeOut(commands, 24*time.Hour)
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(24 * time.Hour))
+	stdout, err := cmdMgr.RunWithStdoutBashC(commands)
 	if err != nil {
 		global.LOG.Errorf("do handle untar failed, stdout: %s, err: %v", stdout, err)
 		return errors.New(stdout)

@@ -23,7 +23,7 @@ func (z ZipArchiver) Extract(filePath, dstDir string, secret string) error {
 	if err := checkCmdAvailability("unzip"); err != nil {
 		return err
 	}
-	return cmd.ExecCmd(fmt.Sprintf("unzip -qo %s -d %s", filePath, dstDir))
+	return cmd.RunDefaultBashCf("unzip -qo %s -d %s", filePath, dstDir)
 }
 
 func (z ZipArchiver) Compress(sourcePaths []string, dstFile string, _ string) error {
@@ -41,8 +41,8 @@ func (z ZipArchiver) Compress(sourcePaths []string, dstFile string, _ string) er
 	for i, sp := range sourcePaths {
 		relativePaths[i] = path.Base(sp)
 	}
-	cmdStr := fmt.Sprintf("zip -qr %s  %s", tmpFile, strings.Join(relativePaths, " "))
-	if err = cmd.ExecCmdWithDir(cmdStr, baseDir); err != nil {
+	cmdMgr := cmd.NewCommandMgr(cmd.WithWorkDir(baseDir))
+	if err = cmdMgr.Run("zip", "-qr", tmpFile, strings.Join(relativePaths, " ")); err != nil {
 		return err
 	}
 	if err = op.Mv(tmpFile, dstFile); err != nil {

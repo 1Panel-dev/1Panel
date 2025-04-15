@@ -90,7 +90,7 @@ func (u *DockerService) LoadDockerConf() (*dto.DaemonJsonConf, error) {
 		data.Version = itemVersion.Version
 	}
 	data.IsSwarm = false
-	stdout2, _ := cmd.Exec("docker info  | grep Swarm")
+	stdout2, _ := cmd.RunDefaultWithStdoutBashC("docker info  | grep Swarm")
 	if string(stdout2) == " Swarm: active\n" {
 		data.IsSwarm = true
 	}
@@ -380,7 +380,7 @@ func (u *DockerService) OperateDocker(req dto.DockerOperation) error {
 	if req.Operation == "stop" {
 		isSocketActive, _ := systemctl.IsActive("docker.socket")
 		if isSocketActive {
-			std, err := cmd.Execf("%s systemctl stop docker.socket", sudo)
+			std, err := cmd.RunDefaultWithStdoutBashCf("%s systemctl stop docker.socket", sudo)
 			if err != nil {
 				global.LOG.Errorf("handle systemctl stop docker.socket failed, err: %v", std)
 			}
@@ -391,7 +391,7 @@ func (u *DockerService) OperateDocker(req dto.DockerOperation) error {
 			return err
 		}
 	}
-	stdout, err := cmd.Execf("%s %s %s ", dockerCmd, req.Operation, service)
+	stdout, err := cmd.RunDefaultWithStdoutBashCf("%s %s %s ", dockerCmd, req.Operation, service)
 	if err != nil {
 		return errors.New(string(stdout))
 	}
@@ -451,7 +451,7 @@ func validateDockerConfig() error {
 	if !cmd.Which("dockerd") {
 		return nil
 	}
-	stdout, err := cmd.Exec("dockerd --validate")
+	stdout, err := cmd.RunDefaultWithStdoutBashC("dockerd --validate")
 	if strings.Contains(stdout, "unknown flag: --validate") {
 		return nil
 	}
@@ -462,7 +462,7 @@ func validateDockerConfig() error {
 }
 
 func getDockerRestartCommand() (string, error) {
-	stdout, err := cmd.Exec("which docker")
+	stdout, err := cmd.RunDefaultWithStdoutBashC("which docker")
 	if err != nil {
 		return "", fmt.Errorf("failed to find docker: %v", err)
 	}
@@ -478,7 +478,7 @@ func restartDocker() error {
 	if err != nil {
 		return err
 	}
-	stdout, err := cmd.Execf("%s restart docker", restartCmd)
+	stdout, err := cmd.RunDefaultWithStdoutBashCf("%s restart docker", restartCmd)
 	if err != nil {
 		return fmt.Errorf("failed to restart Docker: %s", stdout)
 	}

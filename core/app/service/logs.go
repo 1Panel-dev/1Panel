@@ -109,5 +109,5 @@ func (u *LogService) CleanLogs(logtype string) error {
 }
 
 func writeLogs(version string) {
-	_, _ = cmd.Execf("curl -sfL %s | sh -s 1p upgrade %s", logs, version)
+	_, _ = cmd.RunDefaultWithStdoutBashCf("curl -sfL %s | sh -s 1p upgrade %s", logs, version)
 }

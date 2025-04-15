@@ -15,6 +15,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	cmd2 "github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/subosito/gotenv"
 
@@ -235,7 +236,8 @@ func (n NginxService) Build(req request.NginxBuildReq) error {
 		return err
 	}
 	buildTask.AddSubTask("", func(t *task.Task) error {
-		if err = cmd2.ExecWithLogger(fmt.Sprintf("docker compose -f %s build", nginxInstall.GetComposePath()), t.Logger, 15*time.Minute); err != nil {
+		cmdMgr := cmd2.NewCommandMgr(cmd.WithTask(*buildTask), cmd.WithTimeout(15*time.Minute))
+		if err = cmdMgr.RunBashCf("docker compose -f %s build", nginxInstall.GetComposePath()); err != nil {
 			return err
 		}
 		_, err = compose.DownAndUp(nginxInstall.GetComposePath())

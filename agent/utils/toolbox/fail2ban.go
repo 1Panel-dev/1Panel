@@ -28,7 +28,7 @@ func NewFail2Ban() (*Fail2ban, error) {
 			if err := initLocalFile(); err != nil {
 				return nil, err
 			}
-			stdout, err := cmd.Exec("systemctl restart fail2ban.service")
+			stdout, err := cmd.RunDefaultWithStdoutBashC("systemctl restart fail2ban.service")
 			if err != nil {
 				global.LOG.Errorf("restart fail2ban failed, err: %s", stdout)
 				return nil, err
@@ -47,7 +47,7 @@ func (f *Fail2ban) Status() (bool, bool, bool) {
 }
 
 func (f *Fail2ban) Version() string {
-	stdout, err := cmd.Exec("fail2ban-client version")
+	stdout, err := cmd.RunDefaultWithStdoutBashC("fail2ban-client version")
 	if err != nil {
 		global.LOG.Errorf("load the fail2ban version failed, err: %s", stdout)
 		return "-"
@@ -58,13 +58,13 @@ func (f *Fail2ban) Version() string {
 func (f *Fail2ban) Operate(operate string) error {
 	switch operate {
 	case "start", "restart", "stop", "enable", "disable":
-		stdout, err := cmd.Execf("systemctl %s fail2ban.service", operate)
+		stdout, err := cmd.RunDefaultWithStdoutBashCf("systemctl %s fail2ban.service", operate)
 		if err != nil {
 			return fmt.Errorf("%s the fail2ban.service failed, err: %s", operate, stdout)
 		}
 		return nil
 	case "reload":
-		stdout, err := cmd.Exec("fail2ban-client reload")
+		stdout, err := cmd.RunDefaultWithStdoutBashC("fail2ban-client reload")
 		if err != nil {
 			return fmt.Errorf("fail2ban-client reload, err: %s", stdout)
 		}
@@ -76,15 +76,15 @@ func (f *Fail2ban) Operate(operate string) error {
 
 func (f *Fail2ban) ReBanIPs(ips []string) error {
 	ipItems, _ := f.ListBanned()
-	stdout, err := cmd.Execf("fail2ban-client unban --all")
+	stdout, err := cmd.RunDefaultWithStdoutBashCf("fail2ban-client unban --all")
 	if err != nil {
-		stdout1, err := cmd.Execf("fail2ban-client set sshd banip %s", strings.Join(ipItems, " "))
+		stdout1, err := cmd.RunDefaultWithStdoutBashCf("fail2ban-client set sshd banip %s", strings.Join(ipItems, " "))
 		if err != nil {
 			global.LOG.Errorf("rebanip after fail2ban-client unban --all failed, err: %s", stdout1)
 		}
 		return fmt.Errorf("fail2ban-client unban --all failed, err: %s", stdout)
 	}
-	stdout1, err := cmd.Execf("fail2ban-client set sshd banip %s", strings.Join(ips, " "))
+	stdout1, err := cmd.RunDefaultWithStdoutBashCf("fail2ban-client set sshd banip %s", strings.Join(ips, " "))
 	if err != nil {
 		return fmt.Errorf("handle `fail2ban-client set sshd banip %s` failed, err: %s", strings.Join(ips, " "), stdout1)
 	}
@@ -93,7 +93,7 @@ func (f *Fail2ban) ReBanIPs(ips []string) error {
 
 func (f *Fail2ban) ListBanned() ([]string, error) {
 	var lists []string
-	stdout, err := cmd.Exec("fail2ban-client status sshd | grep 'Banned IP list:'")
+	stdout, err := cmd.RunDefaultWithStdoutBashC("fail2ban-client status sshd | grep 'Banned IP list:'")
 	if err != nil {
 		return lists, err
 	}
@@ -113,7 +113,7 @@ func (f *Fail2ban) ListBanned() ([]string, error) {
 
 func (f *Fail2ban) ListIgnore() ([]string, error) {
 	var lists []string
-	stdout, err := cmd.Exec("fail2ban-client get sshd ignoreip")
+	stdout, err := cmd.RunDefaultWithStdoutBashC("fail2ban-client get sshd ignoreip")
 	if err != nil {
 		return lists, err
 	}

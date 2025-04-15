@@ -91,7 +91,7 @@ func (u *ImageRepoService) Create(req dto.ImageRepoCreate) error {
 		if err := u.handleRegistries(req.DownloadUrl, "", "create"); err != nil {
 			return fmt.Errorf("create registry %s failed, err: %v", req.DownloadUrl, err)
 		}
-		stdout, err := cmd.Exec("systemctl restart docker")
+		stdout, err := cmd.RunDefaultWithStdoutBashC("systemctl restart docker")
 		if err != nil {
 			return errors.New(string(stdout))
 		}
@@ -105,7 +105,7 @@ func (u *ImageRepoService) Create(req dto.ImageRepoCreate) error {
 					cancel()
 					return errors.New("the docker service cannot be restarted")
 				default:
-					stdout, err := cmd.Exec("systemctl is-active docker")
+					stdout, err := cmd.RunDefaultWithStdoutBashC("systemctl is-active docker")
 					if string(stdout) == "active\n" && err == nil {
 						global.LOG.Info("docker restart with new conf successful!")
 						return nil
@@ -172,7 +172,8 @@ func (u *ImageRepoService) Update(req dto.ImageRepoUpdate) error {
 	}
 	if repo.Auth != req.Auth || repo.DownloadUrl != req.DownloadUrl {
 		if repo.Auth {
-			_, _ = cmd.ExecWithCheck("docker", "logout", repo.DownloadUrl)
+			cmdMgr := cmd.NewCommandMgr()
+			_, _ = cmdMgr.RunWithStdout("docker", "logout", "-i", repo.DownloadUrl)
 		}
 		if req.Auth {
 			if err := u.CheckConn(req.DownloadUrl, req.Username, req.Password); err != nil {
@@ -200,7 +201,8 @@ func (u *ImageRepoService) Update(req dto.ImageRepoUpdate) error {
 }
 
 func (u *ImageRepoService) CheckConn(host, user, password string) error {
-	stdout, err := cmd.ExecWithCheck("docker", "login", "-u", user, "-p", password, host)
+	cmdMgr := cmd.NewCommandMgr()
+	stdout, err := cmdMgr.RunWithStdout("docker", "login", "-u", user, "-p", password, host)
 	if err != nil {
 		return fmt.Errorf("stdout: %s, stderr: %v", stdout, err)
 	}

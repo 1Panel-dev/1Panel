@@ -73,7 +73,7 @@ func (u *AIToolService) LoadDetail(name string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	stdout, err := cmd.Execf("docker exec %s ollama show %s", containerName, name)
+	stdout, err := cmd.RunDefaultWithStdoutBashCf("docker exec %s ollama show %s", containerName, name)
 	if err != nil {
 		return "", err
 	}
@@ -107,7 +107,8 @@ func (u *AIToolService) Create(req dto.OllamaModelName) error {
 	}
 	go func() {
 		taskItem.AddSubTask(i18n.GetWithName("OllamaModelPull", req.Name), func(t *task.Task) error {
-			return cmd.ExecShellWithTask(taskItem, time.Hour, "docker", "exec", containerName, "ollama", "pull", info.Name)
+			cmdMgr := cmd.NewCommandMgr(cmd.WithTask(*taskItem), cmd.WithTimeout(time.Hour))
+			return cmdMgr.Run("docker", "exec", containerName, "ollama", "pull", info.Name)
 		}, nil)
 		taskItem.AddSubTask(i18n.GetWithName("OllamaModelSize", req.Name), func(t *task.Task) error {
 			itemSize, err := loadModelSize(info.Name, containerName)
@@ -133,7 +134,7 @@ func (u *AIToolService) Close(name string) error {
 	if err != nil {
 		return err
 	}
-	stdout, err := cmd.Execf("docker exec %s ollama stop %s", containerName, name)
+	stdout, err := cmd.RunDefaultWithStdoutBashCf("docker exec %s ollama stop %s", containerName, name)
 	if err != nil {
 		return fmt.Errorf("handle ollama stop %s failed, stdout: %s, err: %v", name, stdout, err)
 	}
@@ -162,7 +163,8 @@ func (u *AIToolService) Recreate(req dto.OllamaModelName) error {
 	}
 	go func() {
 		taskItem.AddSubTask(i18n.GetWithName("OllamaModelPull", req.Name), func(t *task.Task) error {
-			return cmd.ExecShellWithTask(taskItem, time.Hour, "docker", "exec", containerName, "ollama", "pull", req.Name)
+			cmdMgr := cmd.NewCommandMgr(cmd.WithTask(*taskItem), cmd.WithTimeout(time.Hour))
+			return cmdMgr.Run("docker", "exec", containerName, "ollama", "pull", req.Name)
 		}, nil)
 		taskItem.AddSubTask(i18n.GetWithName("OllamaModelSize", req.Name), func(t *task.Task) error {
 			itemSize, err := loadModelSize(modelInfo.Name, containerName)
@@ -191,7 +193,7 @@ func (u *AIToolService) Delete(req dto.ForceDelete) error {
 	}
 	for _, item := range ollamaList {
 		if item.Status != constant.StatusDeleted {
-			stdout, err := cmd.Execf("docker exec %s ollama rm %s", containerName, item.Name)
+			stdout, err := cmd.RunDefaultWithStdoutBashCf("docker exec %s ollama rm %s", containerName, item.Name)
 			if err != nil && !req.ForceDelete {
 				return fmt.Errorf("handle ollama rm %s failed, stdout: %s, err: %v", item.Name, stdout, err)
 			}
@@ -208,7 +210,7 @@ func (u *AIToolService) Sync() ([]dto.OllamaModelDropList, error) {
 	if err != nil {
 		return nil, err
 	}
-	stdout, err := cmd.Execf("docker exec %s ollama list", containerName)
+	stdout, err := cmd.RunDefaultWithStdoutBashCf("docker exec %s ollama list", containerName)
 	if err != nil {
 		return nil, err
 	}
@@ -380,7 +382,7 @@ func LoadContainerName() (string, error) {
 }
 
 func loadModelSize(name string, containerName string) (string, error) {
-	stdout, err := cmd.Execf("docker exec %s ollama list | grep %s", containerName, name)
+	stdout, err := cmd.RunDefaultWithStdoutBashCf("docker exec %s ollama list | grep %s", containerName, name)
 	if err != nil {
 		return "", err
 	}

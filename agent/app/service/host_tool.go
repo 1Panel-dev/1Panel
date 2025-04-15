@@ -72,7 +72,7 @@ func (h *HostToolService) GetToolStatus(req request.HostToolReq) (*response.Host
 			supervisorConfig.ServiceName = serviceNameSet.Value
 		}
 
-		versionRes, _ := cmd.Exec("supervisord -v")
+		versionRes, _ := cmd.RunDefaultWithStdoutBashC("supervisord -v")
 		supervisorConfig.Version = strings.TrimSuffix(versionRes, "\n")
 		_, ctlRrr := exec.LookPath("supervisorctl")
 		supervisorConfig.CtlExist = ctlRrr == nil
@@ -547,7 +547,8 @@ func operateSupervisorCtl(operate, name, group, includeDir, containerName string
 		err    error
 	)
 	if containerName != "" {
-		output, err = cmd.ExecWithTimeOut(fmt.Sprintf("docker exec  %s supervisorctl %s", containerName, strings.Join(processNames, " ")), 2*time.Second)
+		cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(2 * time.Second))
+		output, err = cmdMgr.RunWithStdoutBashCf("docker exec  %s supervisorctl %s", containerName, strings.Join(processNames, " "))
 	} else {
 		var out []byte
 		out, err = exec.Command("supervisorctl", processNames...).Output()
@@ -589,8 +590,8 @@ func getProcessStatus(config *response.SupervisorProcessConfig, containerName st
 	)
 	processNames = append(processNames, getProcessName(config.Name, config.Numprocs)...)
 	if containerName != "" {
-		execStr := fmt.Sprintf("docker exec  %s supervisorctl %s", containerName, strings.Join(processNames, " "))
-		output, err = cmd.ExecWithTimeOut(execStr, 3*time.Second)
+		cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(3 * time.Second))
+		output, err = cmdMgr.RunWithStdoutBashCf("docker exec %s supervisorctl %s", containerName, strings.Join(processNames, " "))
 	} else {
 		var out []byte
 		out, err = exec.Command("supervisorctl", processNames...).Output()

@@ -59,7 +59,7 @@ func (u *DashboardService) Restart(operation string) error {
 		itemCmd = fmt.Sprintf("%s systemctl restart 1panel-agent.service", cmd.SudoHandleCmd())
 	}
 	go func() {
-		stdout, err := cmd.Exec(itemCmd)
+		stdout, err := cmd.RunDefaultWithStdoutBashC(itemCmd)
 		if err != nil {
 			global.LOG.Errorf("handle %s failed, err: %v", itemCmd, stdout)
 		}
@@ -389,9 +389,11 @@ type diskInfo struct {
 
 func loadDiskInfo() []dto.DiskInfo {
 	var datas []dto.DiskInfo
-	stdout, err := cmd.ExecWithTimeOut("df -hT -P|grep '/'|grep -v tmpfs|grep -v 'snap/core'|grep -v udev", 2*time.Second)
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(2 * time.Second))
+	stdout, err := cmdMgr.RunWithStdoutBashC("df -hT -P|grep '/'|grep -v tmpfs|grep -v 'snap/core'|grep -v udev")
 	if err != nil {
-		stdout, err = cmd.ExecWithTimeOut("df -lhT -P|grep '/'|grep -v tmpfs|grep -v 'snap/core'|grep -v udev", 1*time.Second)
+		cmdMgr2 := cmd.NewCommandMgr(cmd.WithTimeout(1 * time.Second))
+		stdout, err = cmdMgr2.RunWithStdoutBashC("df -lhT -P|grep '/'|grep -v tmpfs|grep -v 'snap/core'|grep -v udev")
 		if err != nil {
 			return datas
 		}

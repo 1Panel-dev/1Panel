@@ -29,7 +29,7 @@ func LoadNodeInfo(isBase bool) (model.NodeInfo, error) {
 }
 
 func loadParams(param string) string {
-	stdout, err := cmd.Execf("grep '^%s=' /usr/local/bin/1pctl | cut -d'=' -f2", param)
+	stdout, err := cmd.RunDefaultWithStdoutBashCf("grep '^%s=' /usr/local/bin/1pctl | cut -d'=' -f2", param)
 	if err != nil {
 		panic(err)
 	}

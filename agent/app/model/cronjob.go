@@ -32,6 +32,8 @@ type Cronjob struct {
 
 	SourceAccountIDs  string `json:"sourceAccountIDs"`
 	DownloadAccountID uint   `json:"downloadAccountID"`
+	RetryTimes        uint   `json:"retryTimes"`
+	Timeout           uint   `json:"timeout"`
 	RetainCopies      uint64 `json:"retainCopies"`
 
 	Status   string       `json:"status"`

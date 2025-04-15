@@ -27,7 +27,7 @@ func (t TarGzArchiver) Extract(filePath, dstDir string, secret string) error {
 		commands = fmt.Sprintf("tar -zxvf '%s' -C '%s' > /dev/null 2>&1", filePath, dstDir)
 		global.LOG.Debug(commands)
 	}
-	if err = cmd.ExecCmd(commands); err != nil {
+	if err = cmd.RunDefaultBashC(commands); err != nil {
 		return err
 	}
 	return nil
@@ -52,7 +52,7 @@ func (t TarGzArchiver) Compress(sourcePaths []string, dstFile string, secret str
 		commands = fmt.Sprintf("tar -zcf \"%s\" -C \"%s\" %s", dstFile, aheadDir, itemDir)
 		global.LOG.Debug(commands)
 	}
-	if err := cmd.ExecCmd(commands); err != nil {
+	if err := cmd.RunDefaultBashC(commands); err != nil {
 		return err
 	}
 	return nil
