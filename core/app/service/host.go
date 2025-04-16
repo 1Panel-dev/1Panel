@@ -79,16 +79,9 @@ func (u *HostService) TestLocalConn(id uint) bool {
 		host model.Host
 		err  error
 	)
-	if id == 0 {
-		host, err = hostRepo.Get(hostRepo.WithByAddr("127.0.0.1"))
-		if err != nil {
-			return false
-		}
-	} else {
-		host, err = hostRepo.Get(repo.WithByID(id))
-		if err != nil {
-			return false
-		}
+	host, err = hostRepo.Get(repo.WithByID(id))
+	if err != nil {
+		return false
 	}
 	var connInfo ssh.ConnInfo
 	if err := copier.Copy(&connInfo, &host); err != nil {
@@ -206,11 +199,7 @@ func (u *HostService) SearchForTree(search dto.SearchForTree) ([]dto.HostTree, e
 func (u *HostService) GetHostByID(id uint) (*dto.HostInfo, error) {
 	var item dto.HostInfo
 	var host model.Host
-	if id == 0 {
-		host, _ = hostRepo.Get(repo.WithByName("local"))
-	} else {
-		host, _ = hostRepo.Get(repo.WithByID(id))
-	}
+	host, _ = hostRepo.Get(repo.WithByID(id))
 	if host.ID == 0 {
 		return nil, buserr.New("ErrRecordNotFound")
 	}
@@ -246,9 +235,6 @@ func (u *HostService) GetHostByID(id uint) (*dto.HostInfo, error) {
 }
 
 func (u *HostService) Create(req dto.HostOperate) (*dto.HostInfo, error) {
-	if req.Name == "local" {
-		return nil, buserr.New("ErrRecordExist")
-	}
 	hostItem, _ := hostRepo.Get(hostRepo.WithByAddr(req.Addr), hostRepo.WithByUser(req.User), hostRepo.WithByPort(req.Port))
 	if hostItem.ID != 0 {
 		return nil, buserr.New("ErrRecordExist")
@@ -304,9 +290,6 @@ func (u *HostService) Delete(ids []uint) error {
 		host, _ := hostRepo.Get(repo.WithByID(id))
 		if host.ID == 0 {
 			return buserr.New("ErrRecordNotFound")
-		}
-		if host.Name == "local" {
-			return errors.New("the local connection information cannot be deleted!")
 		}
 		if err := hostRepo.Delete(repo.WithByID(id)); err != nil {
 			return err

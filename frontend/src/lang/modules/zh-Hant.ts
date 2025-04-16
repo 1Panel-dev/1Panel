@@ -1040,7 +1040,6 @@ const message = {
     terminal: {
         local: '本機',
         localHelper: 'local 名稱僅用於系統本機標識',
-        connLocalErr: '無法自動認證，請填寫本地服務器的登錄信息！',
         testConn: '連接測試',
         saveAndConn: '保存並連接',
         connTestOk: '連接信息可用',

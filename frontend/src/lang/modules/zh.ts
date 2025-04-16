@@ -1038,7 +1038,6 @@ const message = {
     terminal: {
         local: '本机',
         localHelper: 'local 名称仅用于系统本机标识',
-        connLocalErr: '无法自动认证，请填写本地服务器的登录信息！',
         testConn: '连接测试',
         saveAndConn: '保存并连接',
         connTestOk: '连接信息可用',

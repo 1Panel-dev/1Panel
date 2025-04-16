@@ -1043,7 +1043,6 @@ const message = {
     terminal: {
         local: '로컬',
         localHelper: '로컬 이름은 시스템 로컬 식별에만 사용됩니다.',
-        connLocalErr: '자동 인증에 실패했습니다. 로컬 서버 로그인 정보를 입력해주세요.',
         testConn: '연결 테스트',
         saveAndConn: '저장 후 연결',
         connTestOk: '연결 정보가 유효합니다.',

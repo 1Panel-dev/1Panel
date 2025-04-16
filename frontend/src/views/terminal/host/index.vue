@@ -34,7 +34,7 @@
                     :data="data"
                     @search="search"
                 >
-                    <el-table-column type="selection" :selectable="selectable" fix />
+                    <el-table-column type="selection" fix />
                     <el-table-column :label="$t('terminal.ip')" prop="addr" fix />
                     <el-table-column :label="$t('commons.login.username')" show-overflow-tooltip prop="user" />
                     <el-table-column :label="$t('commons.table.port')" prop="port" />
@@ -106,9 +106,6 @@ const acceptParams = () => {
     search();
 };
 
-function selectable(row) {
-    return row.name !== 'local';
-}
 const dialogRef = ref();
 const onOpenDialog = async (
     title: string,
@@ -174,9 +171,6 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
-        disabled: (row: any) => {
-            return row.name === 'local';
-        },
         click: (row: Host.Host) => {
             onBatchDelete(row);
         },

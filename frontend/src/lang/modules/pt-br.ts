@@ -1069,8 +1069,6 @@ const message = {
     terminal: {
         local: 'Local',
         localHelper: 'O nome local é usado apenas para identificação local do sistema.',
-        connLocalErr:
-            'Não foi possível autenticar automaticamente, por favor, preencha as informações de login do servidor local.',
         testConn: 'Testar conexão',
         saveAndConn: 'Salvar e conectar',
         connTestOk: 'Informações de conexão disponíveis',

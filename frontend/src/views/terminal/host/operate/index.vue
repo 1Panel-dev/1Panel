@@ -61,8 +61,7 @@
                 </el-select>
             </el-form-item>
             <el-form-item :label="$t('commons.table.title')" prop="name">
-                <el-tag v-if="itemName === 'local'">local</el-tag>
-                <el-input v-else clearable v-model="dialogData.rowData!.name" />
+                <el-input clearable v-model="dialogData.rowData!.name" />
             </el-form-item>
             <el-form-item :label="$t('commons.table.description')" prop="description">
                 <el-input clearable type="textarea" v-model="dialogData.rowData!.description" />
@@ -103,12 +102,10 @@ const drawerVisible = ref(false);
 const dialogData = ref<DialogProps>({
     title: '',
 });
-const itemName = ref();
 
 const groupList = ref();
 const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
-    itemName.value = params.rowData.name;
     title.value = i18n.global.t('commons.button.' + dialogData.value.title);
     drawerVisible.value = true;
     loadGroups();
@@ -126,14 +123,7 @@ const rules = reactive({
     port: [Rules.requiredInput, Rules.port],
     user: [Rules.requiredInput],
     authMode: [Rules.requiredSelect],
-    name: [{ validator: checkName, trigger: 'blur' }],
 });
-function checkName(rule: any, value: any, callback: any) {
-    if (value === 'local' && dialogData.value.title !== 'edit') {
-        return callback(new Error(i18n.global.t('terminal.localHelper')));
-    }
-    callback();
-}
 
 const loadGroups = async () => {
     const res = await getGroupList('host');

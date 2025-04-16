@@ -1,14 +1,6 @@
 <template>
     <DrawerPro v-model="dialogVisible" :header="$t('terminal.addHost')" @close="handleClose" size="large">
         <el-form ref="hostRef" label-width="100px" label-position="top" :model="hostInfo" :rules="rules">
-            <el-alert
-                v-if="isLocal"
-                class="common-prompt"
-                center
-                :title="$t('terminal.connLocalErr')"
-                :closable="false"
-                type="warning"
-            />
             <el-form-item :label="$t('terminal.ip')" prop="addr">
                 <el-input @change="isOK = false" clearable v-model.trim="hostInfo.addr" />
             </el-form-item>
@@ -55,8 +47,7 @@
                 </el-select>
             </el-form-item>
             <el-form-item :label="$t('commons.table.title')" prop="name">
-                <el-tag v-if="isLocal">local</el-tag>
-                <el-input v-else clearable v-model="hostInfo.name" />
+                <el-input clearable v-model="hostInfo.name" />
             </el-form-item>
             <el-form-item :label="$t('commons.table.description')" prop="description">
                 <el-input clearable v-model="hostInfo.description" />
@@ -80,7 +71,7 @@
 import { ElForm } from 'element-plus';
 import { Host } from '@/api/interface/host';
 import { Rules } from '@/global/form-rules';
-import { addHost, editHost, getHostByID, testByInfo } from '@/api/modules/terminal';
+import { addHost, testByInfo } from '@/api/modules/terminal';
 import i18n from '@/lang';
 import { reactive, ref } from 'vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
@@ -116,21 +107,9 @@ const rules = reactive({
     authMode: [Rules.requiredSelect],
     password: [Rules.requiredInput],
     privateKey: [Rules.requiredInput],
-    name: [{ validator: checkName, trigger: 'blur' }],
 });
-function checkName(rule: any, value: any, callback: any) {
-    if (value === 'local' && !isLocal.value) {
-        return callback(new Error(i18n.global.t('terminal.localHelper')));
-    }
-    callback();
-}
 
-const isLocal = ref(false);
-interface DialogProps {
-    isLocal: boolean;
-}
-const acceptParams = (props: DialogProps) => {
-    isLocal.value = props.isLocal;
+const acceptParams = () => {
     loadGroups();
     dialogVisible.value = true;
 };
@@ -150,29 +129,7 @@ const loadGroups = async () => {
             break;
         }
     }
-    if (isLocal.value) {
-        loadLocal();
-    } else {
-        setDefault();
-    }
-};
-const loadLocal = async () => {
-    await getHostByID(0)
-        .then((res) => {
-            hostInfo.id = res.data.id || 0;
-            hostInfo.addr = res.data.addr || '';
-            hostInfo.name = 'local';
-            hostInfo.groupID = res.data.groupID || defaultGroup.value;
-            hostInfo.port = res.data.port || 22;
-            hostInfo.user = res.data.user || 'root';
-            hostInfo.authMode = res.data.authMode || 'password';
-            hostInfo.password = res.data.password || '';
-            hostInfo.privateKey = res.data.privateKey || '';
-            hostInfo.description = res.data.description || '';
-        })
-        .catch(() => {
-            setDefault();
-        });
+    setDefault();
 };
 
 const setDefault = () => {
@@ -204,19 +161,13 @@ const submitAddHost = (formEl: FormInstance | undefined, ops: string) => {
                 });
                 break;
             case 'saveAndConn':
-                let res;
-                if (hostInfo.id == 0) {
-                    res = await addHost(hostInfo);
-                } else {
-                    res = await editHost(hostInfo);
-                }
+                const res = await addHost(hostInfo);
                 dialogVisible.value = false;
                 let title = res.data.user + '@' + res.data.addr + ':' + res.data.port;
                 if (res.data.name.length !== 0) {
                     title = res.data.name + '-' + title;
                 }
-                let isLocal = hostInfo.name === 'local';
-                emit('on-conn-terminal', title, res.data.id, isLocal);
+                emit('on-conn-terminal', title, res.data.id);
                 emit('load-host-tree');
                 break;
         }

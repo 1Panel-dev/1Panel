@@ -25,21 +25,19 @@ type LocalCommand struct {
 	pty *os.File
 }
 
-func NewCommand(initCmd string) (*LocalCommand, error) {
-	cmd := exec.Command("bash")
+func NewCommand(name string, arg ...string) (*LocalCommand, error) {
+	cmd := exec.Command(name, arg...)
 	if term := os.Getenv("TERM"); term != "" {
 		cmd.Env = append(os.Environ(), "TERM="+term)
 	} else {
 		cmd.Env = append(os.Environ(), "TERM=xterm")
 	}
+	homeDir, _ := os.UserHomeDir()
+	cmd.Dir = homeDir
 
 	pty, err := pty.Start(cmd)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to start command")
-	}
-	if len(initCmd) != 0 {
-		time.Sleep(100 * time.Millisecond)
-		_, _ = pty.Write([]byte(initCmd + "\n"))
 	}
 
 	lcmd := &LocalCommand{
@@ -99,4 +97,5 @@ func (lcmd *LocalCommand) Wait(quitChan chan bool) {
 		global.LOG.Errorf("ssh session wait failed, err: %v", err)
 		setQuit(quitChan)
 	}
+	setQuit(quitChan)
 }

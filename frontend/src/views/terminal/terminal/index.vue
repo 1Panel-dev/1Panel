@@ -103,7 +103,7 @@
                         >
                             <template #default="{ node, data }">
                                 <span class="custom-tree-node">
-                                    <span v-if="node.label === 'default'">{{ $t('commons.table.default') }}</span>
+                                    <span v-if="node.label === 'Default'">{{ $t('commons.table.default') }}</span>
                                     <div v-else>
                                         <span v-if="node.label.length <= 25">
                                             <a @click="onClickConn(node, data)">{{ node.label }}</a>
@@ -173,8 +173,6 @@ const loadTooltip = () => {
     return i18n.global.t('commons.button.' + (globalStore.isFullScreen ? 'quitFullscreen' : 'fullscreen'));
 };
 
-const localHostID = ref();
-
 let timer: NodeJS.Timer | null = null;
 const terminalValue = ref();
 const terminalTabs = ref([]) as any;
@@ -209,26 +207,7 @@ const acceptParams = async () => {
     timer = setInterval(() => {
         syncTerminal();
     }, 1000 * 5);
-    for (let gIndex = 0; gIndex < hostTree.value.length; gIndex++) {
-        if (!hostTree.value[gIndex].children) {
-            continue;
-        }
-        for (let i = 0; i < hostTree.value[gIndex].children.length; i++) {
-            if (hostTree.value[gIndex].children[i].label.startsWith('local - ')) {
-                localHostID.value = hostTree.value[gIndex].children[i].id;
-                hostTree.value[gIndex].children.splice(i, 1);
-                if (hostTree.value[gIndex].children.length === 0) {
-                    hostTree.value.splice(gIndex, 1);
-                }
-                if (terminalTabs.value.length !== 0) {
-                    return;
-                }
-                onNewLocal();
-                return;
-            }
-        }
-    }
-
+    onNewLocal();
     if (!mobile.value) {
         screenfull.on('change', () => {
             globalStore.isFullScreen = screenfull.isFullscreen;
@@ -329,17 +308,34 @@ function beforeLeave(activeName: string) {
 }
 
 const onNewSsh = () => {
-    dialogRef.value!.acceptParams({ isLocal: false });
+    dialogRef.value!.acceptParams();
 };
 const onNewLocal = () => {
-    onConnTerminal(i18n.global.t('terminal.localhost'), localHostID.value, false);
+    terminalTabs.value.push({
+        index: tabIndex,
+        title: i18n.global.t('terminal.localhost'),
+        wsID: 0,
+        status: 'online',
+        latency: 0,
+    });
+    terminalValue.value = tabIndex;
+    nextTick(() => {
+        ctx.refs[`t-${terminalValue.value}`] &&
+            ctx.refs[`t-${terminalValue.value}`][0].acceptParams({
+                endpoint: '/api/v2/hosts/exec',
+                initCmd: initCmd.value,
+                error: '',
+            });
+        initCmd.value = '';
+    });
+    tabIndex++;
 };
 
 const onClickConn = (node: Node, data: Tree) => {
     if (node.level === 1) {
         return;
     }
-    onConnTerminal(node.label, data.id, false);
+    onConnTerminal(node.label, data.id);
 };
 
 const onReconnect = async (item: any) => {
@@ -347,6 +343,20 @@ const onReconnect = async (item: any) => {
         ctx.refs[`t-${item.index}`] && ctx.refs[`t-${item.index}`][0].onClose();
     }
     item.Refresh = !item.Refresh;
+    if (item.wsID === 0) {
+        nextTick(() => {
+            ctx.refs[`t-${item.index}`] &&
+                ctx.refs[`t-${item.index}`][0].acceptParams({
+                    endpoint: '/api/v2/hosts/exec',
+                    initCmd: initCmd.value,
+                    error: '',
+                });
+            initCmd.value = '';
+        });
+        syncTerminal();
+        return;
+    }
+
     const res = await testByID(item.wsID);
     nextTick(() => {
         ctx.refs[`t-${item.index}`] &&
@@ -359,16 +369,8 @@ const onReconnect = async (item: any) => {
     syncTerminal();
 };
 
-const onConnTerminal = async (title: string, wsID: number, isLocal?: boolean) => {
+const onConnTerminal = async (title: string, wsID: number) => {
     const res = await testByID(wsID);
-    if (isLocal) {
-        for (const tab of terminalTabs.value) {
-            if (tab.title === i18n.global.t('terminal.localhost')) {
-                onReconnect(tab);
-            }
-        }
-        return;
-    }
     terminalTabs.value.push({
         index: tabIndex,
         title: title,
@@ -377,9 +379,6 @@ const onConnTerminal = async (title: string, wsID: number, isLocal?: boolean) =>
         latency: 0,
     });
     terminalValue.value = tabIndex;
-    if (!res.data && title === i18n.global.t('terminal.localhost')) {
-        dialogRef.value!.acceptParams({ isLocal: true });
-    }
     nextTick(() => {
         ctx.refs[`t-${terminalValue.value}`] &&
             ctx.refs[`t-${terminalValue.value}`][0].acceptParams({
