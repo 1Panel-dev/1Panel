@@ -935,7 +935,7 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 				t.Log(i18n.GetMsgByKey("AppStoreIsSyncing"))
 				return nil
 			}
-			t.Log(i18n.GetMsgByKey("AppStoreIsLastVersion"))
+			t.Log(i18n.GetMsgByKey("AppStoreIsUpToDate"))
 			return nil
 		}
 		list := &dto.AppList{}

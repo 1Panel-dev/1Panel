@@ -5,6 +5,7 @@ import "github.com/1Panel-dev/1Panel/agent/app/dto"
 type WebsiteSSLSearch struct {
 	dto.PageInfo
 	AcmeAccountID string `json:"acmeAccountID"`
+	Domain        string `json:"domain"`
 }
 
 type WebsiteSSLCreate struct {

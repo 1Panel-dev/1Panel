@@ -16,6 +16,7 @@ type ISSLRepo interface {
 	WithByAcmeAccountId(acmeAccountId uint) DBOption
 	WithByDnsAccountId(dnsAccountId uint) DBOption
 	WithByCAID(caID uint) DBOption
+	WithByDomain(domain string) DBOption
 	Page(page, size int, opts ...DBOption) (int64, []model.WebsiteSSL, error)
 	GetFirst(opts ...DBOption) (*model.WebsiteSSL, error)
 	List(opts ...DBOption) ([]model.WebsiteSSL, error)
@@ -49,6 +50,11 @@ func (w WebsiteSSLRepo) WithByDnsAccountId(dnsAccountId uint) DBOption {
 func (w WebsiteSSLRepo) WithByCAID(caID uint) DBOption {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Where("ca_id = ?", caID)
+	}
+}
+func (w WebsiteSSLRepo) WithByDomain(domain string) DBOption {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("primary_domain Like ? or domains Like ?", "%"+domain+"%", "%"+domain+"%")
 	}
 }
 

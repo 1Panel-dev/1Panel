@@ -56,8 +56,13 @@ func NewIWebsiteSSLService() IWebsiteSSLService {
 func (w WebsiteSSLService) Page(search request.WebsiteSSLSearch) (int64, []response.WebsiteSSLDTO, error) {
 	var (
 		result []response.WebsiteSSLDTO
+		opts   []repo.DBOption
 	)
-	total, sslList, err := websiteSSLRepo.Page(search.Page, search.PageSize, repo.WithOrderBy("created_at desc"))
+	opts = append(opts, repo.WithOrderBy("created_at desc"))
+	if search.Domain != "" {
+		opts = append(opts, websiteSSLRepo.WithByDomain(search.Domain))
+	}
+	total, sslList, err := websiteSSLRepo.Page(search.Page, search.PageSize, opts...)
 	if err != nil {
 		return 0, nil, err
 	}

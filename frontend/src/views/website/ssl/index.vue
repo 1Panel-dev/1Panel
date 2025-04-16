@@ -23,7 +23,15 @@
                 </el-button>
             </template>
             <template #rightToolBar>
+                <TableSearch @search="search()" v-model:searchName="req.domain" />
                 <TableRefresh @search="search()" />
+                <fu-table-column-select
+                    :columns="columns"
+                    trigger="hover"
+                    :title="$t('commons.table.selectColumn')"
+                    popper-class="popper-class"
+                    :only-icon="true"
+                />
             </template>
             <template #main>
                 <ComplexTable
@@ -32,41 +40,33 @@
                     @search="search()"
                     v-model:selects="selects"
                     v-loading="loading"
+                    :columns="columns"
+                    localKey="sslColumn"
                 >
                     <el-table-column type="selection" width="30" />
                     <el-table-column
                         :label="$t('website.domain')"
-                        fix
                         show-overflow-tooltip
                         prop="primaryDomain"
                         min-width="150px"
                     ></el-table-column>
                     <el-table-column
                         :label="$t('website.otherDomains')"
-                        fix
                         show-overflow-tooltip
                         prop="domains"
                         min-width="90px"
                     ></el-table-column>
-                    <el-table-column
-                        :label="$t('ssl.applyType')"
-                        fix
-                        show-overflow-tooltip
-                        prop="provider"
-                        min-width="110px"
-                    >
+                    <el-table-column :label="$t('ssl.applyType')" show-overflow-tooltip prop="provider" width="90px">
                         <template #default="{ row }">{{ getProvider(row.provider) }}</template>
                     </el-table-column>
                     <el-table-column
                         :label="$t('ssl.acmeAccount')"
-                        fix
                         show-overflow-tooltip
                         prop="acmeAccount.email"
-                        min-width="110px"
+                        width="150px"
                     ></el-table-column>
                     <el-table-column
                         :label="$t('commons.table.status')"
-                        fix
                         show-overflow-tooltip
                         prop="status"
                         width="100px"
@@ -94,7 +94,7 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.button.log')" width="100px">
+                    <el-table-column :label="$t('commons.button.log')" width="80px">
                         <template #default="{ row }">
                             <el-button @click="openSSLLog(row)" link type="primary" v-if="row.provider != 'manual'">
                                 {{ $t('website.check') }}
@@ -103,11 +103,11 @@
                     </el-table-column>
                     <el-table-column
                         :label="$t('website.brand')"
-                        fix
                         show-overflow-tooltip
                         prop="organization"
+                        width="150px"
                     ></el-table-column>
-                    <el-table-column :label="$t('website.remark')" fix prop="description" min-width="100px">
+                    <el-table-column :label="$t('website.remark')" prop="description" width="100px">
                         <template #default="{ row }">
                             <fu-read-write-switch>
                                 <template #read>
@@ -119,7 +119,7 @@
                             </fu-read-write-switch>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('ssl.autoRenew')" fix min-width="100px">
+                    <el-table-column :label="$t('ssl.autoRenew')" width="100px">
                         <template #default="{ row }">
                             <el-switch
                                 :disabled="row.provider === 'dnsManual' || row.provider === 'manual'"
@@ -133,7 +133,7 @@
                         :label="$t('website.expireDate')"
                         :formatter="dateFormat"
                         show-overflow-tooltip
-                        width="200px"
+                        width="180px"
                     />
                     <fu-table-operations
                         :ellipsis="3"
@@ -198,6 +198,10 @@ const logRef = ref();
 const caRef = ref();
 const obtainRef = ref();
 let selects = ref<any>([]);
+const columns = ref([]);
+const req = reactive({
+    domain: '',
+});
 
 const routerButton = [
     {
@@ -286,12 +290,13 @@ const mobile = computed(() => {
 });
 
 const search = () => {
-    const req = {
+    const request = {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
+        domain: req.domain,
     };
     loading.value = true;
-    searchSSL(req)
+    searchSSL(request)
         .then((res) => {
             data.value = res.data.items || [];
             paginationConfig.total = res.data.total;
