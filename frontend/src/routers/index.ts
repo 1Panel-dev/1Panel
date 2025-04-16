@@ -76,7 +76,13 @@ router.afterEach((to) => {
             notMathParam = false;
         }
         if (notMathParam) {
-            localStorage.setItem('cachedRoute' + to.meta.activeMenu, to.path);
+            if (to.meta.activeMenu === '/cronjobs' && to.path === '/cronjobs/cronjob/operate') {
+                localStorage.setItem('cachedRoute' + to.meta.activeMenu, '/cronjobs/cronjob');
+            } else if (to.meta.activeMenu === '/containers' && to.path === '/containers/container/operate') {
+                localStorage.setItem('cachedRoute' + to.meta.activeMenu, '/containers/container');
+            } else {
+                localStorage.setItem('cachedRoute' + to.meta.activeMenu, to.path);
+            }
         }
     }
 

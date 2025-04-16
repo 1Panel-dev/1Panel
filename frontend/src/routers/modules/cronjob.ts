@@ -29,6 +29,16 @@ const cronRouter = {
                     },
                 },
                 {
+                    path: 'cronjob/operate',
+                    name: 'CronjobOperate',
+                    component: () => import('@/views/cronjob/cronjob/operate/index.vue'),
+                    hidden: true,
+                    meta: {
+                        activeMenu: '/cronjobs',
+                        requiresAuth: false,
+                    },
+                },
+                {
                     path: 'library',
                     name: 'Library',
                     component: () => import('@/views/cronjob/library/index.vue'),

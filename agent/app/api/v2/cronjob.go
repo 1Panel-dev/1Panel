@@ -12,14 +12,14 @@ import (
 // @Tags Cronjob
 // @Summary Create cronjob
 // @Accept json
-// @Param request body dto.CronjobCreate true "request"
+// @Param request body dto.CronjobOperate true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /cronjobs [post]
 // @x-panel-log {"bodyKeys":["type","name"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建计划任务 [type][name]","formatEN":"create cronjob [type][name]"}
 func (b *BaseApi) CreateCronjob(c *gin.Context) {
-	var req dto.CronjobCreate
+	var req dto.CronjobOperate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
@@ -29,6 +29,28 @@ func (b *BaseApi) CreateCronjob(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithOutData(c)
+}
+
+// @Tags Cronjob
+// @Summary Load cronjob info
+// @Accept json
+// @Param request body dto.OperateByID true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /cronjobs/load/info [post]
+func (b *BaseApi) LoadCronjobInfo(c *gin.Context) {
+	var req dto.OperateByID
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	data, err := cronjobService.LoadInfo(req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
 }
 
 // @Tags Cronjob
@@ -174,14 +196,14 @@ func (b *BaseApi) DeleteCronjob(c *gin.Context) {
 // @Tags Cronjob
 // @Summary Update cronjob
 // @Accept json
-// @Param request body dto.CronjobUpdate true "request"
+// @Param request body dto.CronjobOperate true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /cronjobs/update [post]
 // @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"cronjobs","output_column":"name","output_value":"name"}],"formatZH":"更新计划任务 [name]","formatEN":"update cronjob [name]"}
 func (b *BaseApi) UpdateCronjob(c *gin.Context) {
-	var req dto.CronjobUpdate
+	var req dto.CronjobOperate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}

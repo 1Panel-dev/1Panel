@@ -2,7 +2,7 @@
     <div>
         <LayoutContent v-loading="loading" v-if="!isRecordShow" :title="$t('menu.cronjob')">
             <template #leftToolBar>
-                <el-button type="primary" @click="onOpenDialog('create')">
+                <el-button type="primary" @click="onOpenDialog('')">
                     {{ $t('commons.button.create') }}{{ $t('menu.cronjob') }}
                 </el-button>
                 <el-button-group class="ml-4">
@@ -150,14 +150,12 @@
                 </el-form>
             </template>
         </OpDialog>
-        <OperateDialog @search="search" ref="dialogRef" />
         <Records @search="search" ref="dialogRecordRef" />
         <Backups @search="search" ref="dialogBackupRef" />
     </div>
 </template>
 
 <script lang="ts" setup>
-import OperateDialog from '@/views/cronjob/cronjob/operate/index.vue';
 import Records from '@/views/cronjob/cronjob/record/index.vue';
 import Backups from '@/views/cronjob/cronjob/backup/index.vue';
 import { computed, onMounted, reactive, ref } from 'vue';
@@ -168,6 +166,7 @@ import { ElMessageBox } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
 import { transSpecToStr } from './helper';
 import { GlobalStore } from '@/store';
+import router from '@/routers';
 
 const globalStore = GlobalStore();
 const mobile = computed(() => {
@@ -219,29 +218,8 @@ const search = async (column?: any) => {
 const dialogRecordRef = ref();
 const dialogBackupRef = ref();
 
-const dialogRef = ref();
-const onOpenDialog = async (
-    title: string,
-    rowData: Partial<Cronjob.CronjobInfo> = {
-        specObjs: [
-            {
-                specType: 'perMonth',
-                week: 1,
-                day: 3,
-                hour: 1,
-                minute: 30,
-                second: 30,
-            },
-        ],
-        type: 'shell',
-        retainCopies: 7,
-    },
-) => {
-    let params = {
-        title,
-        rowData: { ...rowData },
-    };
-    dialogRef.value!.acceptParams(params);
+const onOpenDialog = async (id: string) => {
+    router.push({ name: 'CronjobOperate', query: { id: id } });
 };
 
 const onDelete = async (row: Cronjob.CronjobInfo | null) => {
@@ -362,7 +340,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
         click: (row: Cronjob.CronjobInfo) => {
-            onOpenDialog('edit', row);
+            onOpenDialog(row.id + '');
         },
     },
     {

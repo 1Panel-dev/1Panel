@@ -111,10 +111,10 @@ func (c *CommandHelper) run(name string, arg ...string) (string, error) {
 		cmd.Dir = c.workDir
 	}
 
-	if err := cmd.Start(); err != nil {
-		return "", err
-	}
 	if c.timeout != 0 {
+		if err := cmd.Start(); err != nil {
+			return "", err
+		}
 		done := make(chan error, 1)
 		go func() {
 			done <- cmd.Wait()

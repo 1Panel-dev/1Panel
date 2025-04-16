@@ -953,7 +953,7 @@ const message = {
         app: 'Backup de app',
         website: 'Backup de site',
         rulesHelper:
-            'Quando houver múltiplas regras de exclusão de compressão, elas devem ser exibidas com quebras de linha. Por exemplo,\n*.log\n*.sql',
+            'Quando existem múltiplas regras de exclusão de compactação, separe-as com [,]. Exemplo: *.log,*.sql',
         lastRecordTime: 'Última execução',
         all: 'Todos',
         failedRecord: 'Registros de falha',
@@ -980,6 +980,9 @@ const message = {
         url: 'Endereço URL',
         targetHelper: 'As contas de backup são mantidas nas configurações do painel.',
         retainCopies: 'Manter cópias',
+        retryTimes: 'Tentativas de Repetição',
+        timeout: 'Tempo Limite',
+        retryTimesHelper: '0 significa não repetir após falha',
         retainCopiesHelper: 'Número de cópias a serem mantidas para registros de execução e logs',
         retainCopiesHelper1: 'Número de cópias a serem mantidas para arquivos de backup',
         retainCopiesUnit: ' cópias (Visualizar)',

@@ -958,7 +958,7 @@ const message = {
         app: 'Aplikasi sandaran',
         website: 'Laman web sandaran',
         rulesHelper:
-            'Apabila terdapat pelbagai peraturan pengecualian mampatan, ia perlu dipaparkan dengan pemecahan baris. Sebagai contoh,\n*.log \n*.sql',
+            'Apabila terdapat pelbagai peraturan pengecualian mampatan, gunakan [,] sebagai pemisah. Contoh: *.log,*.sql',
         lastRecordTime: 'Waktu pelaksanaan terakhir',
         all: 'Semua',
         failedRecord: 'Rekod kegagalan',
@@ -985,6 +985,9 @@ const message = {
         url: 'Alamat URL',
         targetHelper: 'Akaun sandaran diselenggara dalam tetapan panel.',
         retainCopies: 'Simpan salinan',
+        retryTimes: 'Bilangan Cubaan Semula',
+        timeout: 'Masa Tamat',
+        retryTimesHelper: '0 bermaksud tiada cubaan semula selepas gagal',
         retainCopiesHelper: 'Bilangan salinan untuk menyimpan rekod pelaksanaan dan log',
         retainCopiesHelper1: 'Bilangan salinan untuk menyimpan fail sandaran',
         retainCopiesUnit: ' salinan (Lihat)',

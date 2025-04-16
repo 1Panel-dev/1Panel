@@ -11,15 +11,19 @@ export const loadNextHandle = (spec: string) => {
     return http.post<Array<String>>(`/cronjobs/next`, { spec: spec });
 };
 
+export const loadCronjobInfo = (id: number) => {
+    return http.post<Cronjob.CronjobOperate>(`/cronjobs/load/info`, { id: id });
+};
+
 export const getRecordLog = (id: number) => {
     return http.post<string>(`/cronjobs/records/log`, { id: id });
 };
 
-export const addCronjob = (params: Cronjob.CronjobCreate) => {
-    return http.post<Cronjob.CronjobCreate>(`/cronjobs`, params);
+export const addCronjob = (params: Cronjob.CronjobOperate) => {
+    return http.post<Cronjob.CronjobOperate>(`/cronjobs`, params);
 };
 
-export const editCronjob = (params: Cronjob.CronjobUpdate) => {
+export const editCronjob = (params: Cronjob.CronjobOperate) => {
     return http.post(`/cronjobs/update`, params);
 };
 

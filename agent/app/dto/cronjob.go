@@ -15,43 +15,10 @@ type CronjobSpec struct {
 	Spec string `json:"spec" validate:"required"`
 }
 
-type CronjobCreate struct {
+type CronjobOperate struct {
+	ID         uint   `json:"id"`
 	Name       string `json:"name" validate:"required"`
 	Type       string `json:"type" validate:"required"`
-	SpecCustom bool   `json:"specCustom"`
-	Spec       string `json:"spec" validate:"required"`
-
-	Executor      string `json:"executor"`
-	ScriptMode    string `json:"scriptMode"`
-	Script        string `json:"script"`
-	Command       string `json:"command"`
-	ContainerName string `json:"containerName"`
-	User          string `json:"user"`
-
-	AppID          string `json:"appID"`
-	Website        string `json:"website"`
-	ExclusionRules string `json:"exclusionRules"`
-	DBType         string `json:"dbType"`
-	DBName         string `json:"dbName"`
-	URL            string `json:"url"`
-	IsDir          bool   `json:"isDir"`
-	SourceDir      string `json:"sourceDir"`
-
-	SourceAccountIDs  string `json:"sourceAccountIDs"`
-	DownloadAccountID uint   `json:"downloadAccountID"`
-	RetainCopies      int    `json:"retainCopies" validate:"number,min=1"`
-	RetryTimes        int    `json:"retryTimes" validate:"number,min=0"`
-	Timeout           uint   `json:"timeout" validate:"number,min=1"`
-	Secret            string `json:"secret"`
-
-	AlertCount uint   `json:"alertCount"`
-	AlertTitle string `json:"alertTitle"`
-}
-
-type CronjobUpdate struct {
-	ID         uint   `json:"id" validate:"required"`
-	Type       string `json:"type" validate:"required"`
-	Name       string `json:"name" validate:"required"`
 	SpecCustom bool   `json:"specCustom"`
 	Spec       string `json:"spec" validate:"required"`
 

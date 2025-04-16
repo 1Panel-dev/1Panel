@@ -444,6 +444,21 @@ export function getProvider(provider: string): string {
     }
 }
 
+export function transferTimeToSecond(item: string): any {
+    if (item.indexOf('s') !== -1) {
+        return Number(item.replaceAll('s', ''));
+    }
+    if (item.indexOf('m') !== -1) {
+        return Number(item.replaceAll('m', '')) * 60;
+    }
+    if (item.indexOf('h') !== -1) {
+        return Number(item.replaceAll('h', '')) * 60 * 60;
+    }
+    if (item.indexOf('d') !== -1) {
+        return Number(item.replaceAll('d', '')) * 60 * 60 * 24;
+    }
+    return Number(item);
+}
 export function splitTime(item: string): any {
     if (item.indexOf('s') !== -1) {
         return { time: Number(item.replaceAll('s', '')), unit: 's' };
