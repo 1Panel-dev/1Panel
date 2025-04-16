@@ -1,9 +1,9 @@
 <template>
     <div v-if="recordShow" v-loading="loading">
-        <div class="app-status p-mt-20">
+        <div class="app-status card-interval">
             <el-card>
                 <div class="flex w-full flex-col gap-4 md:flex-row">
-                    <div class="flex flex-wrap gap-4">
+                    <div class="flex flex-wrap gap-4 ml-3">
                         <el-popover
                             v-if="dialogData.rowData.name.length >= 15"
                             placement="top-start"

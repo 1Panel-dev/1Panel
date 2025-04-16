@@ -21,7 +21,7 @@
 
         <el-alert
             v-if="!isSafety && globalStore.showEntranceWarn"
-            style="margin-top: 20px"
+            class="card-interval"
             type="warning"
             @close="hideEntrance"
         >
@@ -40,7 +40,7 @@
             </template>
         </el-alert>
 
-        <el-row :gutter="20" style="margin-top: 20px">
+        <el-row :gutter="7" class="card-interval">
             <el-col :xs="24" :sm="24" :md="16" :lg="16" :xl="16">
                 <CardWithHeader :header="$t('menu.home')" height="166px">
                     <template #body>
@@ -82,12 +82,12 @@
                         </div>
                     </template>
                 </CardWithHeader>
-                <CardWithHeader :header="$t('commons.table.status')" style="margin-top: 20px">
+                <CardWithHeader :header="$t('commons.table.status')" class="card-interval">
                     <template #body>
                         <Status ref="statusRef" style="margin-bottom: 33px" />
                     </template>
                 </CardWithHeader>
-                <CardWithHeader :header="$t('menu.monitor')" style="margin-top: 20px; margin-bottom: 20px">
+                <CardWithHeader :header="$t('menu.monitor')" class="card-interval">
                     <template #header-r>
                         <el-radio-group
                             style="float: right; margin-left: 5px"
@@ -253,7 +253,7 @@
                     </template>
                 </CardWithHeader>
 
-                <AppLauncher ref="appRef" style="margin-top: 20px" />
+                <AppLauncher ref="appRef" class="card-interval" />
             </el-col>
         </el-row>
 

@@ -7,8 +7,8 @@
     .el-menu-item {
         border-radius: 4px;
         background-color: var(--el-menu-item-bg-color);
-        margin: 6px 0;
-        height: 46px;
+        margin: 7px 0;
+        height: 42px;
         box-shadow: 0px 0px 4px rgba(0, 94, 235, 0.1);
         box-sizing: border-box;
 
@@ -51,7 +51,7 @@
         .el-sub-menu__title {
             background-color: var(--el-menu-item-bg-color);
             box-shadow: 0 0 4px rgba(0, 94, 235, 0.1);
-            margin: 6px 0;
+            margin-top: 7px;
             height: 46px;
             border-radius: 4px;
             &:hover {

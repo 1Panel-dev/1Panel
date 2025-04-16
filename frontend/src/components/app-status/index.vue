@@ -2,7 +2,7 @@
     <div class="app-status" v-if="data.isExist">
         <el-card>
             <div class="flex w-full flex-col gap-4 md:flex-row">
-                <div class="flex flex-wrap gap-4">
+                <div class="flex flex-wrap gap-4 ml-3">
                     <el-tag effect="dark" type="success">{{ data.app }}</el-tag>
                     <Status class="mt-0.5" :key="refresh" :status="data.status"></Status>
                     <el-tag>{{ $t('app.version') }}{{ data.version }}</el-tag>

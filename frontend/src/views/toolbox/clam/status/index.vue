@@ -1,9 +1,9 @@
 <template>
     <div>
-        <div class="app-status tool-status" v-if="data.isExist">
+        <div class="app-status" v-if="data.isExist">
             <el-card>
                 <div class="flex w-full flex-col gap-4 md:flex-row">
-                    <div class="flex flex-wrap gap-4">
+                    <div class="flex flex-wrap gap-4 ml-3">
                         <el-tag class="w-17" effect="dark" type="success">ClamAV</el-tag>
                         <Status class="mt-0.5" :status="data.isActive ? 'enable' : 'disable'" />
                         <el-tag class="w-24">{{ $t('app.version') }}:{{ data.version }}</el-tag>
@@ -33,7 +33,7 @@
                     </div>
                 </div>
                 <div class="flex w-full flex-col gap-4 md:flex-row mt-5" v-if="showFresh">
-                    <div class="flex flex-wrap gap-4">
+                    <div class="flex flex-wrap gap-4 ml-3">
                         <el-tag class="w-16" effect="dark" type="success">FreshClam</el-tag>
                         <Status class="mt-0.5" :status="data.freshIsActive ? 'enable' : 'disable'" />
                         <el-tag class="w-24">{{ $t('app.version') }}:{{ data.freshVersion }}</el-tag>

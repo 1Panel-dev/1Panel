@@ -1,8 +1,8 @@
 <template>
-    <div class="app-status" style="margin-top: 20px" v-if="baseInfo.isExist">
+    <div class="app-status card-interval" v-if="baseInfo.isExist">
         <el-card>
             <div class="flex w-full flex-col gap-4 md:flex-row">
-                <div class="flex flex-wrap gap-4">
+                <div class="flex flex-wrap gap-4 ml-3">
                     <el-tag effect="dark" type="success">{{ baseInfo.name }}</el-tag>
                     <Status class="mt-0.5" :status="baseInfo.isActive ? 'enable' : 'disable'" />
                     <el-tag>{{ $t('app.version') }}: {{ baseInfo.version }}</el-tag>

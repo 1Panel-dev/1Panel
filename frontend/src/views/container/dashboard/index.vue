@@ -8,7 +8,7 @@
         />
 
         <div v-if="isExist" :class="{ mask: !isActive }">
-            <CardWithHeader :header="$t('menu.container')" class="mt-5">
+            <CardWithHeader :header="$t('menu.container')" class="card-interval">
                 <template #body>
                     <span class="count" @click="goRouter('Container')">{{ countItem.containerCount }}</span>
                 </template>
@@ -39,7 +39,7 @@
                     </el-tag>
                 </template>
             </CardWithHeader>
-            <el-row :gutter="20" class="mt-5">
+            <el-row :gutter="7" class="card-interval">
                 <el-col :span="8">
                     <CardWithHeader :header="$t('container.compose')">
                         <template #body>
@@ -69,7 +69,7 @@
                     </CardWithHeader>
                 </el-col>
             </el-row>
-            <el-row :gutter="20" class="mt-5">
+            <el-row :gutter="7" class="card-interval">
                 <el-col :span="8">
                     <CardWithHeader :header="$t('container.imageRepo')">
                         <template #body>
@@ -92,7 +92,7 @@
                     </CardWithHeader>
                 </el-col>
             </el-row>
-            <CardWithHeader :header="$t('container.setting')" class="mt-5">
+            <CardWithHeader :header="$t('container.setting')" class="card-interval">
                 <template #body>
                     <el-descriptions :column="1" border>
                         <el-descriptions-item :label="$t('container.sockPath')">

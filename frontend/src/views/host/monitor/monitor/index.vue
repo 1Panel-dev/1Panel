@@ -19,7 +19,7 @@
                 </div>
             </el-card>
         </div>
-        <el-row :gutter="20" style="margin-top: 20px">
+        <el-row :gutter="7" class="card-interval">
             <el-col :span="24">
                 <el-card style="overflow: inherit">
                     <template #header>
@@ -51,7 +51,7 @@
                 </el-card>
             </el-col>
         </el-row>
-        <el-row :gutter="20" style="margin-top: 20px">
+        <el-row :gutter="7" class="card-interval">
             <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
                 <el-card style="overflow: inherit">
                     <template #header>
@@ -113,7 +113,7 @@
                 </el-card>
             </el-col>
         </el-row>
-        <el-row :gutter="20" style="margin-top: 20px">
+        <el-row :gutter="7" class="card-interval">
             <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
                 <el-card style="overflow: inherit">
                     <template #header>
@@ -570,7 +570,7 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .content-container__search {
-    margin-top: 20px;
+    margin-top: 7px;
     .el-card {
         --el-card-padding: 12px;
     }

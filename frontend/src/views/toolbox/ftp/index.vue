@@ -1,9 +1,9 @@
 <template>
     <div>
-        <div class="app-status mt-5">
+        <div class="app-status card-interval">
             <el-card v-if="form.isExist">
                 <div class="flex w-full flex-col gap-4 md:flex-row">
-                    <div class="flex flex-wrap gap-4">
+                    <div class="flex flex-wrap gap-4 ml-3">
                         <el-tag effect="dark" type="success">FTP</el-tag>
                         <Status class="mt-0.5" :status="form.isActive ? 'enable' : 'disable'" />
                     </div>

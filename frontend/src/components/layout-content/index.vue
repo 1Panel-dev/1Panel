@@ -93,11 +93,11 @@ const showBack = computed(() => {
 @use '@/styles/mixins.scss' as *;
 
 .content-container__app {
-    margin-top: 20px;
+    margin-top: 7px;
 }
 
 .content-container__search {
-    margin-top: 20px;
+    margin-top: 7px;
     .el-card {
         --el-card-padding: 12px;
     }
@@ -121,7 +121,7 @@ const showBack = computed(() => {
 }
 
 .content-container__main {
-    margin-top: 20px;
+    margin-top: 7px;
 }
 
 .prompt {

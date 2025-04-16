@@ -2,7 +2,7 @@
     <div :class="classObj" class="app-wrapper" v-loading="loading" :element-loading-text="loadingText" fullscreen>
         <div v-if="classObj.mobile && classObj.openSidebar" class="drawer-bg" @click="handleClickOutside" />
         <div class="app-sidebar" v-if="!globalStore.isFullScreen">
-            <el-affix :offset="18" class="affix">
+            <el-affix :offset="17" class="affix">
                 <el-tooltip
                     :content="menuStore.isCollapse ? $t('commons.button.expand') : $t('commons.button.collapse')"
                 >
@@ -180,7 +180,7 @@ onMounted(() => {
     overflow-x: hidden;
 }
 .app-main {
-    padding: 20px;
+    padding: 7px 20px;
     flex: 1;
     overflow: auto;
 }

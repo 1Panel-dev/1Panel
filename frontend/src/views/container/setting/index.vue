@@ -8,10 +8,10 @@
             @search="search"
         />
 
-        <div v-if="isExist" class="app-status p-mt-20">
+        <div v-if="isExist" class="app-status card-interval">
             <el-card>
                 <div class="flex w-full flex-col gap-4 md:flex-row">
-                    <div class="flex flex-wrap gap-4">
+                    <div class="flex flex-wrap gap-4 ml-3">
                         <el-tag class="float-left" effect="dark" type="success">Docker</el-tag>
                         <Status class="mt-0.5" :status="isActive ? 'enable' : 'disable'" />
                         <el-tag>{{ $t('app.version') }}: {{ form.version }}</el-tag>
@@ -32,7 +32,7 @@
             </el-card>
         </div>
 
-        <LayoutContent v-if="isExist" class="p-mt-20" :title="$t('container.setting')">
+        <LayoutContent v-if="isExist" class="card-interval" :title="$t('container.setting')">
             <template #main>
                 <el-radio-group v-model="confShowType" @change="changeMode">
                     <el-radio-button value="base">{{ $t('database.baseConf') }}</el-radio-button>

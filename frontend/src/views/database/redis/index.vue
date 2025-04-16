@@ -3,7 +3,7 @@
         <div class="app-status mt-5" v-if="currentDB && currentDB.from === 'remote'">
             <el-card>
                 <div class="flex w-full flex-col gap-4 md:flex-row">
-                    <div class="flex flex-wrap gap-4">
+                    <div class="flex flex-wrap gap-4 ml-3">
                         <el-tag class="float-left" effect="dark" type="success">Redis</el-tag>
                         <el-tag>{{ $t('app.version') }}: {{ currentDB?.version }}</el-tag>
                     </div>

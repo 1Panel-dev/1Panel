@@ -2,7 +2,7 @@
     <div v-loading="loading">
         <docker-status v-model:isActive="isActive" v-model:isExist="isExist" @search="search" />
 
-        <div class="mt-5" v-if="isExist && isActive">
+        <div class="card-interval" v-if="isExist && isActive">
             <el-tag @click="searchWithStatus('all')" v-if="countItem.all" effect="plain" size="large">
                 {{ $t('commons.table.all') }} * {{ countItem.all }}
             </el-tag>

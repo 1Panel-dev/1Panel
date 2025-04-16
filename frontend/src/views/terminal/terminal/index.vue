@@ -2,8 +2,8 @@
     <div>
         <el-tabs
             type="card"
-            class="terminal-tabs"
-            style="background-color: var(--panel-terminal-tag-bg-color); margin-top: 20px"
+            class="terminal-tabs card-interval"
+            style="background-color: var(--panel-terminal-tag-bg-color)"
             v-model="terminalValue"
             :before-leave="beforeLeave"
             @tab-change="quickCmd = ''"
@@ -246,13 +246,13 @@ const cleanTimer = () => {
 };
 
 const loadHeight = () => {
-    return globalStore.openMenuTabs ? '269px' : '229px';
+    return globalStore.openMenuTabs ? '230px' : '190px';
 };
 const loadEmptyHeight = () => {
-    return globalStore.openMenuTabs ? '240px' : '200px';
+    return globalStore.openMenuTabs ? '201px' : '156px';
 };
 const loadFullScreenHeight = () => {
-    return globalStore.openMenuTabs ? '66px' : '90px';
+    return globalStore.openMenuTabs ? '105px' : '60px';
 };
 
 const handleTabsRemove = (targetName: string, action: 'remove' | 'add') => {

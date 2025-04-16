@@ -144,7 +144,7 @@ html {
     font-size: 12px;
 
     .el-card {
-        --el-card-padding: 12px;
+        --el-card-padding: 9px;
 
         .buttons {
             margin-left: 100px;
@@ -269,6 +269,10 @@ html {
 
 .p-w-200 {
     width: 200px !important;
+}
+
+.card-interval {
+    margin-top: 7px;
 }
 
 .p-w-300 {

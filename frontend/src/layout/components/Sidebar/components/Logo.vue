@@ -41,7 +41,7 @@ const goHome = () => {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 55px;
+    height: 49px;
     z-index: 1;
     img {
         object-fit: contain;

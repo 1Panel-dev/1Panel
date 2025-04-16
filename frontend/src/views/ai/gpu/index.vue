@@ -33,7 +33,7 @@
                             {{ gpuInfo.cudaVersion }}
                         </el-descriptions-item>
                     </el-descriptions>
-                    <el-collapse v-model="activeNames" class="mt-5">
+                    <el-collapse v-model="activeNames" class="card-interval">
                         <el-collapse-item v-for="item in gpuInfo.gpu" :key="item.index" :name="item.index">
                             <template #title>
                                 <span class="name-class">{{ item.index + '. ' + item.productName }}</span>
@@ -152,7 +152,7 @@
                                     }}
                                 </el-descriptions-item>
                             </el-descriptions>
-                            <div class="mt-5">
+                            <div class="card-interval">
                                 <span class="title-class">{{ $t('aiTools.gpu.process') }}</span>
                             </div>
                             <el-table :data="item.processes" v-if="item.processes?.length !== 0">
@@ -191,7 +191,7 @@
                             {{ xpuInfo.driverVersion }}
                         </el-descriptions-item>
                     </el-descriptions>
-                    <el-collapse v-model="activeNames" class="mt-5">
+                    <el-collapse v-model="activeNames" class="card-interval">
                         <el-collapse-item
                             v-for="item in xpuInfo.xpu"
                             :key="item.basic.deviceID"
@@ -226,7 +226,7 @@
                                     {{ item.basic.pciBdfAddress }}
                                 </el-descriptions-item>
                             </el-descriptions>
-                            <div class="mt-5">
+                            <div class="card-interval">
                                 <span class="title-class">{{ $t('aiTools.gpu.process') }}</span>
                             </div>
                             <el-table :data="item.processes" v-if="item.processes?.length !== 0">
