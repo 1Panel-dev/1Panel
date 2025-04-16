@@ -7,7 +7,7 @@
         @close="handleClose"
         :width="width"
     >
-        <div>
+        <div v-if="open">
             <LogFile :config="config" :showTail="showTail"></LogFile>
         </div>
     </el-dialog>
@@ -33,6 +33,8 @@ defineProps({
 });
 
 const config = reactive({
+    id: 0,
+    name: '',
     taskID: '',
     type: 'task',
     taskOperate: '',

@@ -96,3 +96,94 @@ func makePrivateKeySigner(privateKey []byte, passPhrase []byte) (gossh.Signer, e
 	}
 	return gossh.ParsePrivateKey(privateKey)
 }
+
+func (c *SSHClient) RunWithStreamOutput(command string, outputCallback func(string)) error {
+	session, err := c.Client.NewSession()
+	if err != nil {
+		return fmt.Errorf("failed to create SSH session: %w", err)
+	}
+	defer session.Close()
+
+	stdout, err := session.StdoutPipe()
+	if err != nil {
+		return fmt.Errorf("failed to set up stdout pipe: %w", err)
+	}
+
+	stderr, err := session.StderrPipe()
+	if err != nil {
+		return fmt.Errorf("failed to set up stderr pipe: %w", err)
+	}
+
+	if err := session.Start(command); err != nil {
+		return fmt.Errorf("failed to start command: %w", err)
+	}
+
+	stdoutCh := make(chan string, 100)
+	stderrCh := make(chan string, 100)
+	doneCh := make(chan struct{})
+
+	go func() {
+		buffer := make([]byte, 1024)
+		for {
+			n, err := stdout.Read(buffer)
+			if err != nil {
+				close(stdoutCh)
+				return
+			}
+			if n > 0 {
+				stdoutCh <- string(buffer[:n])
+			}
+		}
+	}()
+
+	go func() {
+		buffer := make([]byte, 1024)
+		for {
+			n, err := stderr.Read(buffer)
+			if err != nil {
+				close(stderrCh)
+				return
+			}
+			if n > 0 {
+				stderrCh <- string(buffer[:n])
+			}
+		}
+	}()
+
+	go func() {
+		for {
+			select {
+			case stdoutOutput, ok := <-stdoutCh:
+				if !ok {
+					stdoutCh = nil
+					if stderrCh == nil {
+						close(doneCh)
+						return
+					}
+					continue
+				}
+				if outputCallback != nil {
+					outputCallback(stdoutOutput)
+				}
+
+			case stderrOutput, ok := <-stderrCh:
+				if !ok {
+					stderrCh = nil
+					if stdoutCh == nil {
+						close(doneCh)
+						return
+					}
+					continue
+				}
+				if outputCallback != nil {
+					outputCallback(stderrOutput)
+				}
+			}
+		}
+	}()
+
+	err = session.Wait()
+	<-doneCh
+
+	return err
+}

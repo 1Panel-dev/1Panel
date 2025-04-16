@@ -48,16 +48,13 @@ const (
 	TaskUpgrade = "TaskUpgrade"
 	TaskAddNode = "TaskAddNode"
 	TaskSync    = "TaskSync"
+	TaskRsync   = "TaskRsync"
 )
 
 const (
 	TaskScopeSystem = "System"
 	TaskScopeScript = "Script"
-)
-
-const (
-	TaskSuccess = "Success"
-	TaskFailed  = "Failed"
+	TaskScopeNodeFile = "NodeFile"
 )
 
 func GetTaskName(resourceName, operate, scope string) string {
@@ -72,7 +69,7 @@ func NewTask(name, operate, taskScope, taskID string, resourceID uint) (*Task, e
 	if taskID == "" {
 		taskID = uuid.New().String()
 	}
-	logItem := path.Join(global.CONF.Base.InstallDir, "1panel/log")
+	logItem := path.Join(global.CONF.Base.InstallDir, "1panel/log/task")
 	logDir := path.Join(logItem, taskScope)
 	if _, err := os.Stat(logDir); os.IsNotExist(err) {
 		if err = os.MkdirAll(logDir, constant.DirPerm); err != nil {

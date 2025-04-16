@@ -217,7 +217,6 @@ func sortFileList(list []FileSearchInfo, sortBy, sortOrder string) {
 }
 
 func (f *FileInfo) listChildren(option FileOption) error {
-	afs := &afero.Afero{Fs: f.Fs}
 	var (
 		files []FileSearchInfo
 		err   error
@@ -230,7 +229,7 @@ func (f *FileInfo) listChildren(option FileOption) error {
 			return err
 		}
 	} else {
-		files, err = f.getFiles(afs, option)
+		files, err = f.getFiles(option)
 		if err != nil {
 			return err
 		}
@@ -261,21 +260,24 @@ func (f *FileInfo) listChildren(option FileOption) error {
 	return nil
 }
 
-func (f *FileInfo) getFiles(afs *afero.Afero, option FileOption) ([]FileSearchInfo, error) {
-	dirFiles, err := afs.ReadDir(f.Path)
+func (f *FileInfo) getFiles(option FileOption) ([]FileSearchInfo, error) {
+	infos, err := os.ReadDir(f.Path)
 	if err != nil {
 		return nil, err
 	}
-
 	var (
 		dirs     []FileSearchInfo
 		fileList []FileSearchInfo
 	)
 
-	for _, file := range dirFiles {
+	for _, file := range infos {
+		fileInfo, err := file.Info()
+		if err != nil {
+			continue
+		}
 		info := FileSearchInfo{
 			Path:     f.Path,
-			FileInfo: file,
+			FileInfo: fileInfo,
 		}
 		if file.IsDir() {
 			dirs = append(dirs, info)

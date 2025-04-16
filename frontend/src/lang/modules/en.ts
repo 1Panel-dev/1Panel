@@ -3105,6 +3105,8 @@ const message = {
             logSaveSizeHelper: 'This is the log save size for a single website',
             '360se': '360 Security Browser',
             websites: 'Website List',
+            trend: 'Trend Statistics',
+            reqCount: 'Request Count',
         },
         tamper: {
             tamper: 'Website Tamper Protection',
@@ -3452,6 +3454,10 @@ const message = {
             setDefaultHelper:
                 'The theme color scheme is about to be restored to its initial state. Do you want to continue?',
             setHelper: 'The currently selected theme color scheme is about to be saved. Do you want to continue?',
+        },
+        exchange: {
+            exchange: 'File Exchange',
+            exchangeConfirm: "Do you want to transfer the file/folder {1} from {0} node to {2} node's {3} directory?",
         },
     },
 };

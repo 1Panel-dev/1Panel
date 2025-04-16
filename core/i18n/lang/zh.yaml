@@ -173,3 +173,11 @@ UserInfoPassHelp: "提示：修改密码可执行命令："
 DBConnErr: "错误：初始化数据库连接失败，{{ .err }}"
 SystemVersion: "版本："
 SystemMode: "模式："
+
+#exchange
+LocalNodeIpFailed: "无法获取主节点 IP ，请编辑主节点增加 IP 地址和 SSH 认证信息"
+HandlePrivateKey: "处理节点私钥"
+HandlePublicKey: "处理节点公钥"
+ExchangeFile: "开始从 {{ .source }} 节点同步 {{ .sourcePath }} 到 {{ .dest  }} 节点 {{ .destPath }}"
+TaskRsync: "同步"
+NodeFile: "节点文件"

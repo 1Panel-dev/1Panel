@@ -2883,6 +2883,8 @@ const message = {
             logSaveSizeHelper: '此處為單個網站的日誌保存大小',
             '360se': '360 安全瀏覽器',
             websites: '網站列表',
+            trend: '趨勢統計',
+            reqCount: '請求數',
         },
         tamper: {
             tamper: '網站防篡改',
@@ -3206,6 +3208,10 @@ const message = {
             setDefault: '復原預設',
             setDefaultHelper: '即將復原主題配色到初始狀態，是否繼續？',
             setHelper: '即將儲存目前選定的主題配色，是否繼續？',
+        },
+        exchange: {
+            exchange: '文件對傳',
+            exchangeConfirm: '是否將 {0} 節點文件/文件夾 {1} 傳輸到 {2} 節點 {3} 目錄？',
         },
     },
 };

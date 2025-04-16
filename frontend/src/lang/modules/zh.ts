@@ -2867,6 +2867,8 @@ const message = {
             logSaveSizeHelper: '此处为单个网站的日志保存大小',
             '360se': '360 安全浏览器',
             websites: '网站列表',
+            trend: '趋势统计',
+            reqCount: '请求数',
         },
         tamper: {
             tamper: '网站防篡改',
@@ -3188,6 +3190,10 @@ const message = {
             customColor: '自定义主题色',
             setDefaultHelper: '即将恢复主题配色到初始状态，是否继续？',
             setHelper: '即将保存当前选定的主题配色，是否继续？',
+        },
+        exchange: {
+            exchange: '文件对传',
+            exchangeConfirm: '是否将 {0} 节点文件/文件夹 {1} 传输到 {2} 节点 {3} 目录？',
         },
     },
 };

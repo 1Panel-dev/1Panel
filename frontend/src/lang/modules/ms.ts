@@ -3030,6 +3030,8 @@ const message = {
             logSaveSizeHelper: 'Ini adalah saiz simpanan log untuk satu laman web',
             '360se': '360 Pelayar Keselamatan',
             websites: 'Senarai Laman Web',
+            trend: 'Statistik Trend',
+            reqCount: 'Jumlah Permintaan',
         },
         tamper: {
             tamper: 'Perlindungan daripada peng篡改 laman web',
@@ -3385,6 +3387,10 @@ const message = {
             setDefault: 'Lalai',
             setDefaultHelper: 'Skema warna tema akan dipulihkan ke keadaan asalnya. Adakah anda ingin meneruskan?',
             setHelper: 'Skema warna tema yang dipilih sekarang akan disimpan. Adakah anda ingin meneruskan?',
+        },
+        exchange: {
+            exchange: 'Pertukaran Fail',
+            exchangeConfirm: 'Adakah anda mahu memindahkan fail/folder {1} dari node {0} ke direktori {3} node {2}?',
         },
     },
 };

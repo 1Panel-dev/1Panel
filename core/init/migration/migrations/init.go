@@ -95,7 +95,7 @@ var InitSetting = &gormigrate.Migration{
 			return err
 		}
 		val := `{"id":"1","label":"/xpack","isCheck":true,"title":"xpack.menu","children":[{"id":"2","label":"Dashboard","isCheck":true,"title":"xpack.waf.name","path":"/xpack/waf/dashboard"},{"id":"3","label":"Tamper","isCheck":true,"title":"xpack.tamper.tamper","path":"/xpack/tamper"},{"id":"4","label":"GPU","isCheck":true,"title":"xpack.gpu.gpu","path":"/xpack/gpu"},{"id":"5","label":"XSetting","isCheck":true,"title":"xpack.setting.setting","path":"/xpack/setting"},{"id":"6","label":"MonitorDashboard","isCheck":true,"title":"xpack.monitor.name","path":"/xpack/monitor/dashboard"},{"id":"7","label":"XAlertDashboard","isCheck":true,"title":"xpack.alert.alert","path":"/xpack/alert/dashboard"},{"id":"8","label":"Node","isCheck":true,"title":"xpack.node.nodeManagement","path":"/xpack/node"}]}`
-		if err := tx.Create(&model.Setting{Key: "XpackHideMenu", Value: val}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "HideMenu", Value: val}).Error; err != nil {
 			return err
 		}
 
@@ -303,9 +303,9 @@ var AddMFAInterval = &gormigrate.Migration{
 }
 
 var UpdateXpackHideMemu = &gormigrate.Migration{
-	ID: "20250227-update-xpack-hide-menu",
+	ID: "20250414-update-xpack-hide-menu",
 	Migrate: func(tx *gorm.DB) error {
-		if err := tx.Model(&model.Setting{}).Where("key = ?", "XpackHideMenu").Updates(map[string]interface{}{"key": "HideMenu", "value": helper.LoadMenus()}).Error; err != nil {
+		if err := tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Updates(map[string]interface{}{"key": "HideMenu", "value": helper.LoadMenus()}).Error; err != nil {
 			return err
 		}
 		return nil

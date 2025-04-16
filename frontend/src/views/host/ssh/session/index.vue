@@ -78,7 +78,7 @@ const initProcess = () => {
     let protocol = href.split('//')[0] === 'http:' ? 'ws' : 'wss';
     let ipLocal = href.split('//')[1].split('/')[0];
     let currentNode = globalStore.currentNode;
-    processSocket = new WebSocket(`${protocol}://${ipLocal}/api/v2/process/ws?currentNode=${currentNode}`);
+    processSocket = new WebSocket(`${protocol}://${ipLocal}/api/v2/process/ws?operateNode=${currentNode}`);
     processSocket.onopen = onOpenProcess;
     processSocket.onmessage = onMessage;
     processSocket.onerror = onerror;

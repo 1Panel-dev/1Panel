@@ -9,6 +9,10 @@ export const getFilesList = (params: File.ReqFile) => {
     return http.post<File.File>('files/search', params, TimeoutEnum.T_5M);
 };
 
+export const getFilesListByNode = (params: File.ReqNodeFile) => {
+    return http.post<File.File>('files/search?operateNode=' + params.node, params, TimeoutEnum.T_5M);
+};
+
 export const getUploadList = (params: File.SearchUploadInfo) => {
     return http.post<ResPage<File.UploadInfo>>('files/upload/search', params);
 };
@@ -23,6 +27,10 @@ export const createFile = (form: File.FileCreate) => {
 
 export const deleteFile = (form: File.FileDelete) => {
     return http.post<File.File>('files/del', form);
+};
+
+export const deleteFileByNode = (form: File.FileDelete, node: string) => {
+    return http.post<File.File>('files/del?operateNode=' + node, form);
 };
 
 export const batchDeleteFile = (form: File.FileBatchDelete) => {
@@ -127,6 +135,10 @@ export const batchChangeRole = (params: File.FileRole) => {
 
 export const getRecycleStatus = () => {
     return http.get<string>('files/recycle/status');
+};
+
+export const getRecycleStatusByNode = (node: string) => {
+    return http.get<string>('files/recycle/status?operateNode=' + node);
 };
 
 export const getPathByType = (pathType: string) => {

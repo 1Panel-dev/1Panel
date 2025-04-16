@@ -513,7 +513,7 @@ func (f *FileService) GetPathByType(pathType string) string {
 	if pathType == "websiteDir" {
 		value, _ := settingRepo.GetValueByKey("WEBSITE_DIR")
 		if value == "" {
-			return path.Join(global.Dir.BaseDir, "www")
+			return path.Join(global.Dir.BaseDir, "1panel", "www")
 		}
 		return value
 	}

@@ -36,6 +36,10 @@ export namespace File {
         isDetail?: boolean;
     }
 
+    export interface ReqNodeFile extends ReqFile {
+        node: string;
+    }
+
     export interface SearchUploadInfo extends ReqPage {
         path: string;
     }

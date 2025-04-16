@@ -40,6 +40,7 @@ func LoadMenus() string {
 				{ID: "111", Disabled: false, Title: "xpack.node.nodeManagement", IsShow: true, Label: "Node", Path: "/xpack/node"},
 				{ID: "113", Disabled: false, Title: "xpack.monitor.name", IsShow: true, Label: "MonitorDashboard", Path: "/xpack/monitor/dashboard"},
 				{ID: "114", Disabled: false, Title: "xpack.tamper.tamper", IsShow: true, Label: "Tamper", Path: "/xpack/tamper"},
+				{ID: "117", Disabled: false, Title: "xpack.exchange.exchange", IsShow: true, Label: "FileExange", Path: "/xpack/exchange/file"},
 				{ID: "116", Disabled: false, Title: "xpack.alert.alert", IsShow: true, Label: "XAlertDashboard", Path: "/xpack/alert/dashboard"},
 				{ID: "115", Disabled: false, Title: "xpack.setting.setting", IsShow: true, Label: "XSetting", Path: "/xpack/setting"},
 			}},

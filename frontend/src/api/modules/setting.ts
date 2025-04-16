@@ -40,6 +40,10 @@ export const listNodeOptions = () => {
     return http.get<Array<Setting.NodeItem>>(`/core/nodes/list`);
 };
 
+export const listAllNodes = () => {
+    return http.get<Array<Setting.NodeItem>>(`/core/nodes/all`);
+};
+
 // agent
 export const loadBaseDir = () => {
     return http.get<string>(`/settings/basedir`);

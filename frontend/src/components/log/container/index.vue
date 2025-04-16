@@ -136,9 +136,9 @@ const searchLogs = async () => {
     }
     logs.value = [];
     let currentNode = globalStore.currentNode;
-    let url = `/api/v2/containers/search/log?container=${logSearch.container}&since=${logSearch.mode}&tail=${logSearch.tail}&follow=${logSearch.isWatch}&currentNode=${currentNode}`;
+    let url = `/api/v2/containers/search/log?container=${logSearch.container}&since=${logSearch.mode}&tail=${logSearch.tail}&follow=${logSearch.isWatch}&operateNode=${currentNode}`;
     if (logSearch.compose !== '') {
-        url = `/api/v2/containers/search/log?compose=${logSearch.compose}&since=${logSearch.mode}&tail=${logSearch.tail}&follow=${logSearch.isWatch}&currentNode=${currentNode}`;
+        url = `/api/v2/containers/search/log?compose=${logSearch.compose}&since=${logSearch.mode}&tail=${logSearch.tail}&follow=${logSearch.isWatch}&operateNode=${currentNode}`;
     }
     eventSource = new EventSource(url);
     eventSource.onmessage = (event: MessageEvent) => {

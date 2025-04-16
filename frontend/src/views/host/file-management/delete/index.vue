@@ -1,6 +1,6 @@
 <template>
     <DialogPro v-model="open" :title="$t('commons.button.delete')" size="small">
-        <div>
+        <div v-loading="loading">
             <el-row>
                 <el-col :span="22" :offset="1">
                     <el-alert
@@ -58,7 +58,7 @@ import i18n from '@/lang';
 import { ref } from 'vue';
 import { File } from '@/api/interface/file';
 import { getIcon } from '@/utils/util';
-import { deleteFile, getRecycleStatus } from '@/api/modules/files';
+import { deleteFile, deleteFileByNode, getRecycleStatus, getRecycleStatusByNode } from '@/api/modules/files';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { loadBaseDir } from '@/api/modules/setting';
 
@@ -68,8 +68,13 @@ const loading = ref(false);
 const em = defineEmits(['close']);
 const forceDelete = ref(false);
 const recycleStatus = ref('Enable');
+const reqNode = ref('');
 
-const acceptParams = (props: File.File[]) => {
+const acceptParams = (props: File.File[], node: string) => {
+    reqNode.value = '';
+    if (node != '') {
+        reqNode.value = node;
+    }
     getStatus();
     files.value = props;
     open.value = true;
@@ -77,13 +82,22 @@ const acceptParams = (props: File.File[]) => {
 };
 
 const getStatus = async () => {
+    loading.value = true;
     try {
-        const res = await getRecycleStatus();
+        let res;
+        if (reqNode.value != '') {
+            res = await getRecycleStatusByNode(reqNode.value);
+        } else {
+            res = await getRecycleStatus();
+        }
         recycleStatus.value = res.data;
         if (recycleStatus.value === 'Disable') {
             forceDelete.value = true;
         }
-    } catch (error) {}
+    } catch (error) {
+    } finally {
+        loading.value = false;
+    }
 };
 
 const onConfirm = async () => {
@@ -100,7 +114,13 @@ const onConfirm = async () => {
                 return;
             }
         }
-        pros.push(deleteFile({ path: s['path'], isDir: s['isDir'], forceDelete: forceDelete.value }));
+        if (reqNode.value != '') {
+            pros.push(
+                deleteFileByNode({ path: s['path'], isDir: s['isDir'], forceDelete: forceDelete.value }, reqNode.value),
+            );
+        } else {
+            pros.push(deleteFile({ path: s['path'], isDir: s['isDir'], forceDelete: forceDelete.value }));
+        }
     }
     loading.value = true;
     Promise.all(pros)

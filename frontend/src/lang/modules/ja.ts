@@ -2963,6 +2963,8 @@ const message = {
             logSaveSizeHelper: 'これは単一ウェブサイトのログ保存サイズです',
             '360se': '360 セキュリティブラウザ',
             websites: 'ウェブサイトリスト',
+            trend: 'トレンド統計',
+            reqCount: 'リクエスト数',
         },
         tamper: {
             tamper: 'ウェブサイトの改ざん防止',
@@ -3305,6 +3307,10 @@ const message = {
             setDefault: 'デフォルトに戻す',
             setDefaultHelper: 'テーマカラーを初期状態に戻そうとしています。続行しますか？',
             setHelper: '現在選択されているテーマカラーを保存しようとしています。続行しますか？',
+        },
+        exchange: {
+            exchange: 'ファイル交換',
+            exchangeConfirm: '{0} ノードのファイル/フォルダ {1} を {2} ノードの {3} ディレクトリに転送しますか？',
         },
     },
 };

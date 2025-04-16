@@ -2919,6 +2919,8 @@ const message = {
             logSaveSizeHelper: '이것은 단일 웹사이트의 로그 저장 크기입니다',
             '360se': '360 보안 브라우저',
             websites: '웹사이트 목록',
+            trend: '추세 통계',
+            reqCount: '요청 수',
         },
         tamper: {
             tamper: '웹사이트 변조 방지',
@@ -3249,6 +3251,10 @@ const message = {
             setDefault: '기본값',
             setDefaultHelper: '테마 색상 스킴이 초기 상태로 복원됩니다. 계속하시겠습니까?',
             setHelper: '현재 선택한 테마 색상 스킴이 저장됩니다. 계속하시겠습니까?',
+        },
+        exchange: {
+            exchange: '파일 교환',
+            exchangeConfirm: '{0} 노드의 파일/폴더 {1}을(를) {2} 노드의 {3} 디렉토리로 전송하시겠습니까?',
         },
     },
 };

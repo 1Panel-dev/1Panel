@@ -3032,6 +3032,8 @@ const message = {
             logSaveSizeHelper: 'Este é o tamanho de salvamento de log para um único site',
             '360se': 'Navegador de Segurança 360',
             websites: 'Lista de Sites',
+            trend: 'Estatísticas de Tendência',
+            reqCount: 'Contagem de Solicitações',
         },
         tamper: {
             tamper: 'Proteção contra adulteração do site',
@@ -3387,6 +3389,10 @@ const message = {
             setDefault: 'Restaurar Padrão',
             setDefaultHelper: 'O esquema de cores do tema será restaurado para o estado inicial. Deseja continuar?',
             setHelper: 'O esquema de cores do tema selecionado será salvo. Deseja continuar?',
+        },
+        exchange: {
+            exchange: 'Troca de Arquivos',
+            exchangeConfirm: 'Deseja transferir o arquivo/pasta {1} do nó {0} para o diretório {3} do nó {2}?',
         },
     },
 };

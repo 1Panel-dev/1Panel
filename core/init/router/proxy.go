@@ -19,13 +19,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var wsUrl = map[string]struct{}{
-	"/api/v2/process/ws":         {},
-	"/api/v2/files/wget/process": {},
-
-	"/api/v2/containers/search/log": {},
-}
-
 func Proxy() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		reqPath := c.Request.URL.Path
@@ -38,8 +31,8 @@ func Proxy() gin.HandlerFunc {
 			return
 		}
 		var currentNode string
-		if _, ok := wsUrl[reqPath]; ok {
-			currentNode = c.Query("currentNode")
+		if c.Query("operateNode") != "" {
+			currentNode = c.Query("operateNode")
 		} else {
 			currentNode = c.Request.Header.Get("CurrentNode")
 		}
