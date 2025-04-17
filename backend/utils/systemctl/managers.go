@@ -297,7 +297,7 @@ func (m *sysvinitManager) BuildCommand(action string, config *ServiceConfig) ([]
 			"sh",
 			"-c",
 			fmt.Sprintf("if ls /etc/rc*.d/S*%s >/dev/null 2>&1; then echo 'enabled'; else echo 'disabled'; fi", service)}, nil
-	case "is-active":
+	case "is-active", "status":
 		return []string{
 			"sh",
 			"-c",
@@ -335,23 +335,6 @@ func (m *sysvinitManager) ParseStatus(output string, config *ServiceConfig, stat
 		return result, err
 	}
 	return false, fmt.Errorf("unsupported status type: %s", statusType)
-	// service := config.ServiceName[m.name]
-	// serviceRegex := regexp.MustCompile(fmt.Sprintf(`\b%s\b`, regexp.QuoteMeta(service)))
-	// lines := strings.Split(output, "\n")
-	// for _, line := range lines {
-	// 	if serviceRegex.MatchString(line) {
-	// 		if strings.Contains(line, "not found") {
-	// 			return false, nil
-	// 		}
-	// 		result, err := m.baseManager.ParseStatus(line, config, statusType)
-	// 		if err != nil {
-	// 			return false, err
-	// 		}
-	// 		return result, nil
-	// 	}
-	// }
-
-	// return false, nil
 }
 
 func (m *sysvinitManager) FindServices(keyword string) ([]string, error) {
@@ -373,10 +356,12 @@ type openrcManager struct{ baseManager }
 
 func newOpenrcManager() ServiceManager {
 	return &openrcManager{baseManager{
-		name:         "openrc",
-		cmdTool:      "rc-service",
-		activeRegex:  regexp.MustCompile(`(?i)^\s*status:\s+(started|running|active)\s*$`),
-		enabledRegex: regexp.MustCompile(`(?i)^[^\|]+\|\s*(default|enabled)\b.*$`),
+		name:    "openrc",
+		cmdTool: "rc-service",
+		// activeRegex:  regexp.MustCompile(`(?i)^\s*status:\s+(started|running|active)\s*$`),
+		// enabledRegex: regexp.MustCompile(`(?i)^[^\|]+\|\s*(default|enabled)\b.*$`),
+		activeRegex:  regexp.MustCompile(`(?i)(?:^|\s)\b(running|active)\b(?:$|\s)`),
+		enabledRegex: regexp.MustCompile(`(?i)(?:^|\s)\b(enabled)\b(?:$|\s)`),
 	}}
 }
 func (m *openrcManager) IsAvailable() bool {
@@ -386,25 +371,39 @@ func (m *openrcManager) IsAvailable() bool {
 
 func (m *openrcManager) ServiceExists(config *ServiceConfig) (bool, error) {
 	return m.commonServiceExists(config, func(name string) (bool, error) {
-		ctx, cancel := context.WithTimeout(context.Background(), serviceCheckTimeout)
-		defer cancel()
-		out, err := executeCommand(ctx, m.cmdTool, "-l")
-		if err != nil {
-			return false, fmt.Errorf("rc-service -l failed: %w", err)
+		_, err := os.Stat(filepath.Join("/etc/init.d", name))
+		if os.IsNotExist(err) {
+			return false, nil
+		} else if err != nil {
+			return false, fmt.Errorf("stat /etc/init.d/%s failed: %w", name, err)
 		}
-		return bytes.Contains(out, []byte(name)), nil
+		return true, nil
 	})
 }
 
 func (m *openrcManager) BuildCommand(action string, config *ServiceConfig) ([]string, error) {
 	cmdArgs := m.buildBaseCommand()
 	service := config.ServiceName[m.name]
-	if action == "is-enabled" {
-		cmdArgs = []string{"rc-update", "check", service}
+	switch action {
+	case "is-enabled":
+		return []string{
+			"sh",
+			"-c",
+			fmt.Sprintf("if ls /etc/runlevels/default/%s >/dev/null 2>&1; then echo 'enabled'; else echo 'disabled'; fi", service)}, nil
+	case "is-active", "status":
+		return []string{
+			"sh",
+			"-c",
+			fmt.Sprintf("if service %s status >/dev/null 2>&1; then echo 'active'; else echo 'inactive'; fi", service),
+		}, nil
+	case "enable":
+		return []string{"rc-update", "add", service, "default"}, nil
+	case "disable":
+		return []string{"rc-update", "del", service, "default"}, nil
+	default:
+		cmdArgs = append(cmdArgs, service, action)
 		return cmdArgs, nil
 	}
-	cmdArgs = append(cmdArgs, service, action)
-	return cmdArgs, nil
 }
 
 func (m *openrcManager) ParseStatus(output string, config *ServiceConfig, statusType string) (bool, error) {
@@ -418,19 +417,15 @@ func (m *openrcManager) ParseStatus(output string, config *ServiceConfig, status
 	return result, nil
 }
 func (m *openrcManager) FindServices(keyword string) ([]string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	out, err := executeCommand(ctx, m.cmdTool, "-l")
+	files, err := os.ReadDir("/etc/init.d/")
 	if err != nil {
-		return nil, fmt.Errorf("failed to list openrc services: %w", err)
+		return nil, fmt.Errorf("failed to read init.d directory: %w", err)
 	}
-
+	keyword = strings.ToLower(keyword)
 	var services []string
-	lines := strings.Split(string(out), "\n")
-	for _, line := range lines {
-		if strings.Contains(line, keyword) {
-			services = append(services, strings.TrimSpace(line))
+	for _, file := range files {
+		if strings.Contains(file.Name(), keyword) {
+			services = append(services, file.Name())
 		}
 	}
 	return services, nil
