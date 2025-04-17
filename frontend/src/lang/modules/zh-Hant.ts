@@ -2550,6 +2550,7 @@ const message = {
             ERROR: '錯誤',
             statusCode: '狀態碼',
             manage: '管理',
+            autoRestart: '自動重啟',
         },
     },
     xpack: {
@@ -2793,6 +2794,7 @@ const message = {
             strict: '嚴格模式',
             strictHelper: '使用更嚴格的規則來校驗請求',
             saveLog: '保存日誌',
+            remoteURLHelper: '遠程 URL 需要保證每行一個 IP 並且沒有其他字符',
         },
         monitor: {
             name: '網站監控',

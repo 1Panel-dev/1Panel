@@ -26,12 +26,13 @@ type HostToolConfig struct {
 }
 
 type SupervisorProcessConfig struct {
-	Name     string `json:"name"`
-	Operate  string `json:"operate"`
-	Command  string `json:"command"`
-	User     string `json:"user"`
-	Dir      string `json:"dir"`
-	Numprocs string `json:"numprocs"`
+	Name        string `json:"name"`
+	Operate     string `json:"operate"`
+	Command     string `json:"command"`
+	User        string `json:"user"`
+	Dir         string `json:"dir"`
+	Numprocs    string `json:"numprocs"`
+	AutoRestart string `json:"autoRestart"`
 }
 
 type SupervisorProcessFileReq struct {

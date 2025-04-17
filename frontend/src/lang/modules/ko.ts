@@ -2578,6 +2578,7 @@ const message = {
             ERROR: '오류',
             statusCode: '상태 코드',
             manage: '관리',
+            autoRestart: '자동 재시작',
         },
     },
     xpack: {
@@ -2828,6 +2829,7 @@ const message = {
             strict: '엄격 모드',
             strictHelper: '더 엄격한 규칙을 사용하여 요청을 검증합니다',
             saveLog: '로그 저장',
+            remoteURLHelper: '원격 URL은 한 줄에 하나의 IP만 포함하고 다른 문자는 포함하지 않아야 합니다',
         },
         monitor: {
             name: '웹사이트 모니터링',

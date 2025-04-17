@@ -2753,6 +2753,7 @@ const message = {
             ERROR: 'Error',
             statusCode: 'Status code',
             manage: 'Management',
+            autoRestart: 'Auto Restart',
         },
     },
     xpack: {
@@ -3013,6 +3014,7 @@ const message = {
             strict: 'Strict Mode',
             strictHelper: 'Use stricter rules to validate requests',
             saveLog: 'Save Log',
+            remoteURLHelper: 'The remote URL needs to ensure one IP per line and no other characters',
         },
         monitor: {
             name: 'Website Monitoring',

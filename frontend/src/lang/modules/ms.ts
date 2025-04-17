@@ -2680,6 +2680,7 @@ const message = {
             ERROR: 'Ralat',
             statusCode: 'Kod status',
             manage: 'Pengurusan',
+            autoRestart: 'Auto Restart',
         },
     },
     xpack: {
@@ -2938,6 +2939,7 @@ const message = {
             strict: 'Mod Strict',
             strictHelper: 'Gunakan peraturan yang lebih ketat untuk mengesahkan permintaan',
             saveLog: 'Simpan Log',
+            remoteURLHelper: 'URL jauh perlu memastikan satu IP setiap baris dan tiada aksara lain',
         },
         monitor: {
             name: 'Pemantauan Laman Web',

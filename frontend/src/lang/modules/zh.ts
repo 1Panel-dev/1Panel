@@ -2542,6 +2542,7 @@ const message = {
             ERROR: '错误',
             statusCode: '状态码',
             manage: '管理',
+            autoRestart: '自动重启',
         },
     },
     xpack: {
@@ -2782,6 +2783,7 @@ const message = {
             strict: '严格模式',
             strictHelper: '使用更严格的规则来校验请求',
             saveLog: '保存日志',
+            remoteURLHelper: '远程 URL 需要保证每行一个 IP 并且没有其他字符',
         },
         monitor: {
             name: '网站监控',

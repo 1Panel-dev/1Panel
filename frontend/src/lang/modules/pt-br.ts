@@ -2677,6 +2677,7 @@ const message = {
             ERROR: 'Erro',
             statusCode: 'Código de status',
             manage: 'Gerenciamento',
+            autoRestart: 'Reinicialização Automática',
         },
     },
     xpack: {
@@ -2938,6 +2939,7 @@ const message = {
             strict: 'Modo estrito',
             strictHelper: 'Usa regras mais rigorosas para validar solicitações',
             saveLog: 'Salvar log',
+            remoteURLHelper: 'O URL remoto precisa garantir um IP por linha e nenhum outro caractere',
         },
         monitor: {
             name: 'Monitoramento de Websites',

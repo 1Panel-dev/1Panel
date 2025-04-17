@@ -2619,6 +2619,7 @@ const message = {
             ERROR: 'エラー',
             statusCode: 'ステータスコード',
             manage: '管理',
+            autoRestart: '自動再起動',
         },
     },
     xpack: {
@@ -2873,6 +2874,7 @@ const message = {
             strict: '厳格モード',
             strictHelper: 'より厳格なルールを使用してリクエストを検証します',
             saveLog: 'ログを保存',
+            remoteURLHelper: 'リモート URL は、1行に1つのIPで、他の文字がないことを保証する必要があります',
         },
         monitor: {
             name: 'ウェブサイトモニタリング',

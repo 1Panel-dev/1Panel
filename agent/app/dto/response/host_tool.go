@@ -23,13 +23,14 @@ type HostToolConfig struct {
 }
 
 type SupervisorProcessConfig struct {
-	Name     string          `json:"name"`
-	Command  string          `json:"command"`
-	User     string          `json:"user"`
-	Dir      string          `json:"dir"`
-	Numprocs string          `json:"numprocs"`
-	Msg      string          `json:"msg"`
-	Status   []ProcessStatus `json:"status"`
+	Name        string          `json:"name"`
+	Command     string          `json:"command"`
+	User        string          `json:"user"`
+	Dir         string          `json:"dir"`
+	Numprocs    string          `json:"numprocs"`
+	Msg         string          `json:"msg"`
+	Status      []ProcessStatus `json:"status"`
+	AutoRestart string          `json:"autoRestart"`
 }
 
 type ProcessStatus struct {
