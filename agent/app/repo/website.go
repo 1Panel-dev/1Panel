@@ -18,6 +18,7 @@ type IWebsiteRepo interface {
 	WithDomainLike(domain string) DBOption
 	WithRuntimeID(runtimeID uint) DBOption
 	WithParentID(websiteID uint) DBOption
+	WithType(websiteType string) DBOption
 
 	Page(page, size int, opts ...DBOption) (int64, []model.Website, error)
 	List(opts ...DBOption) ([]model.Website, error)
@@ -90,6 +91,12 @@ func (w *WebsiteRepo) WithGroupID(groupId uint) DBOption {
 func (w *WebsiteRepo) WithDefaultServer() DBOption {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Where("default_server = 1")
+	}
+}
+
+func (w *WebsiteRepo) WithType(websiteType string) DBOption {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("type = ?", websiteType)
 	}
 }
 

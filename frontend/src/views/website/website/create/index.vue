@@ -2,32 +2,7 @@
     <DrawerPro v-model="open" :header="$t('website.create')" size="large" @close="handleClose">
         <template #buttons>
             <span class="drawer-header-button">
-                <template
-                    v-for="item in [
-                        {
-                            label: i18n.global.t('website.deployment'),
-                            value: 'deployment',
-                        },
-                        {
-                            label: i18n.global.t('runtime.runtime'),
-                            value: 'runtime',
-                        },
-
-                        {
-                            label: i18n.global.t('website.proxy'),
-                            value: 'proxy',
-                        },
-                        {
-                            label: i18n.global.t('website.static'),
-                            value: 'static',
-                        },
-                        {
-                            label: i18n.global.t('website.subsite'),
-                            value: 'subsite',
-                        },
-                    ]"
-                    :key="item.value"
-                >
+                <template v-for="item in WebsiteTypes" :key="item.value">
                     <el-button
                         :class="website.type === item.value ? 'active-button' : ''"
                         @click="changeType(item.value)"
@@ -572,6 +547,7 @@ import { dateFormatSimple, getProvider, getAccountName } from '@/utils/util';
 import { Website } from '@/api/interface/website';
 import DomainCreate from '@/views/website/website/domain-create/index.vue';
 import { getPathByType } from '@/api/modules/files';
+import { WebsiteTypes } from '@/global/mimetype';
 
 const websiteForm = ref<FormInstance>();
 

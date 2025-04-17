@@ -150,6 +150,9 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 	if req.WebsiteGroupID != 0 {
 		opts = append(opts, websiteRepo.WithGroupID(req.WebsiteGroupID))
 	}
+	if req.Type != "" {
+		opts = append(opts, websiteRepo.WithType(req.Type))
+	}
 	total, websites, err := websiteRepo.Page(req.Page, req.PageSize, opts...)
 	if err != nil {
 		return 0, nil, err

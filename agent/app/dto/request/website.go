@@ -10,6 +10,7 @@ type WebsiteSearch struct {
 	OrderBy        string `json:"orderBy" validate:"required,oneof=primary_domain type status createdAt expire_date created_at"`
 	Order          string `json:"order" validate:"required,oneof=null ascending descending"`
 	WebsiteGroupID uint   `json:"websiteGroupId"`
+	Type           string `json:"type"`
 }
 
 type WebsiteCreate struct {

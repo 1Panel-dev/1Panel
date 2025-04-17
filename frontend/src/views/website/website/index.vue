@@ -33,6 +33,16 @@
                 </el-button>
             </template>
             <template v-if="!openNginxConfig && nginxIsExist" #rightToolBar>
+                <el-select class="p-w-200" v-model="req.type" @change="search()" :disabled="nginxStatus != 'Running'">
+                    <template #prefix>{{ $t('commons.table.type') }}</template>
+                    <el-option :label="$t('commons.table.all')" :value="''"></el-option>
+                    <el-option
+                        v-for="item in WebsiteTypes"
+                        :label="item.label"
+                        :value="item.value"
+                        :key="item.value"
+                    ></el-option>
+                </el-select>
                 <el-select
                     v-model="req.websiteGroupId"
                     @change="search()"
@@ -265,6 +275,7 @@ import { useI18n } from 'vue-i18n';
 import { getAgentGroupList } from '@/api/modules/group';
 import { Group } from '@/api/interface/group';
 import { GlobalStore } from '@/store';
+import { WebsiteTypes } from '@/global/mimetype';
 const globalStore = GlobalStore();
 
 const shortcuts = [
@@ -317,6 +328,7 @@ let req = reactive({
     orderBy: 'createdAt',
     order: 'null',
     websiteGroupId: 0,
+    type: '',
 });
 const mobile = computed(() => {
     return globalStore.isMobile();
