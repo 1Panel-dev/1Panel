@@ -21,6 +21,9 @@ export const addHost = (params: Host.HostOperate) => {
     if (request.privateKey) {
         request.privateKey = Base64.encode(request.privateKey);
     }
+    if (params.isLocal) {
+        return http.post(`/settings/ssh`, request);
+    }
     return http.post<Host.HostOperate>(`/core/hosts`, request);
 };
 export const testByInfo = (params: Host.HostConnTest) => {
@@ -30,6 +33,9 @@ export const testByInfo = (params: Host.HostConnTest) => {
     }
     if (request.privateKey) {
         request.privateKey = Base64.encode(request.privateKey);
+    }
+    if (params.isLocal) {
+        return http.post<boolean>(`/settings/ssh/check/info`, request);
     }
     return http.post<boolean>(`/core/hosts/test/byinfo`, request);
 };
@@ -51,4 +57,9 @@ export const editHostGroup = (params: Host.GroupChange) => {
 };
 export const deleteHost = (params: { ids: number[] }) => {
     return http.post(`/core/hosts/del`, params);
+};
+
+// agent
+export const testLocalConn = () => {
+    return http.post<boolean>(`/settings/ssh/check`);
 };

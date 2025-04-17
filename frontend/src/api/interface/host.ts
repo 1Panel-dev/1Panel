@@ -25,6 +25,7 @@ export namespace Host {
         description: string;
     }
     export interface HostOperate {
+        isLocal: boolean;
         id: number;
         name: string;
         groupID: number;
@@ -40,6 +41,7 @@ export namespace Host {
         description: string;
     }
     export interface HostConnTest {
+        isLocal: boolean;
         addr: string;
         port: number;
         user: string;

@@ -1050,6 +1050,7 @@ const message = {
     terminal: {
         local: 'ローカル',
         localHelper: 'ローカル名はシステムのローカル識別にのみ使用されます。',
+        connLocalErr: '自動的に認証できない場合は、ローカルサーバーのログイン情報を入力してください。',
         testConn: 'テスト接続',
         saveAndConn: '保存して接続します',
         connTestOk: '利用可能な接続情報',

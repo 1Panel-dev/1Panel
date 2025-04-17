@@ -25,6 +25,7 @@ type SystemDir struct {
 	BaseDir        string
 	DbDir          string
 	LogDir         string
+	TaskDir        string
 	DataDir        string
 	TmpDir         string
 	LocalBackupDir string

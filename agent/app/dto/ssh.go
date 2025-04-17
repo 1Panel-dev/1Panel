@@ -24,6 +24,7 @@ type SSHInfo struct {
 type GenerateSSH struct {
 	EncryptionMode string `json:"encryptionMode" validate:"required,oneof=rsa ed25519 ecdsa dsa"`
 	Password       string `json:"password"`
+	Name           string `json:"name"`
 }
 
 type GenerateLoad struct {

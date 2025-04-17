@@ -254,10 +254,10 @@ func (u *SSHService) GenerateSSH(req dto.GenerateSSH) error {
 	}
 
 	fileOp := files.NewFileOp()
-	if err := fileOp.Rename(secretFile, fmt.Sprintf("%s/.ssh/id_%s", currentUser.HomeDir, req.EncryptionMode)); err != nil {
+	if err := fileOp.Rename(secretFile, fmt.Sprintf("%s/.ssh/id_%s%s", currentUser.HomeDir, req.EncryptionMode, req.Name)); err != nil {
 		return err
 	}
-	if err := fileOp.Rename(secretPubFile, fmt.Sprintf("%s/.ssh/id_%s.pub", currentUser.HomeDir, req.EncryptionMode)); err != nil {
+	if err := fileOp.Rename(secretPubFile, fmt.Sprintf("%s/.ssh/id_%s%s.pub", currentUser.HomeDir, req.EncryptionMode, req.Name)); err != nil {
 		return err
 	}
 

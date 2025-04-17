@@ -139,7 +139,12 @@
             ></el-button>
         </el-tooltip>
 
-        <HostDialog ref="dialogRef" @on-conn-terminal="onConnTerminal" @load-host-tree="loadHostTree" />
+        <HostDialog
+            ref="dialogRef"
+            @on-conn-terminal="onConnTerminal"
+            @on-new-local="onNewLocal"
+            @load-host-tree="loadHostTree"
+        />
     </div>
 </template>
 
@@ -152,7 +157,7 @@ import { ElTree } from 'element-plus';
 import screenfull from 'screenfull';
 import i18n from '@/lang';
 import { Host } from '@/api/interface/host';
-import { getHostTree, testByID } from '@/api/modules/terminal';
+import { getHostTree, testByID, testLocalConn } from '@/api/modules/terminal';
 import { GlobalStore } from '@/store';
 import router from '@/routers';
 import { getCommandTree } from '@/api/modules/command';
@@ -308,9 +313,14 @@ function beforeLeave(activeName: string) {
 }
 
 const onNewSsh = () => {
-    dialogRef.value!.acceptParams();
+    dialogRef.value!.acceptParams({ isLocal: false });
 };
-const onNewLocal = () => {
+const onNewLocal = async () => {
+    const res = await testLocalConn();
+    if (!res.data) {
+        dialogRef.value!.acceptParams({ isLocal: true });
+        return;
+    }
     terminalTabs.value.push({
         index: tabIndex,
         title: i18n.global.t('terminal.localhost'),
@@ -322,7 +332,7 @@ const onNewLocal = () => {
     nextTick(() => {
         ctx.refs[`t-${terminalValue.value}`] &&
             ctx.refs[`t-${terminalValue.value}`][0].acceptParams({
-                endpoint: '/api/v2/hosts/exec',
+                endpoint: '/api/v2/hosts/terminal',
                 initCmd: initCmd.value,
                 error: '',
             });
@@ -344,12 +354,13 @@ const onReconnect = async (item: any) => {
     }
     item.Refresh = !item.Refresh;
     if (item.wsID === 0) {
+        const res = await testLocalConn();
         nextTick(() => {
             ctx.refs[`t-${item.index}`] &&
                 ctx.refs[`t-${item.index}`][0].acceptParams({
-                    endpoint: '/api/v2/hosts/exec',
+                    endpoint: '/api/v2/hosts/terminal',
                     initCmd: initCmd.value,
-                    error: '',
+                    error: res.data ? '' : 'Failed to set up the connection. Please check the host information',
                 });
             initCmd.value = '';
         });

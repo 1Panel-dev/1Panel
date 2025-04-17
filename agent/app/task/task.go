@@ -114,13 +114,13 @@ func NewTask(name, operate, taskScope, taskID string, resourceID uint) (*Task, e
 	if taskID == "" {
 		taskID = uuid.New().String()
 	}
-	logDir := path.Join(global.Dir.LogDir, taskScope)
+	logDir := path.Join(global.Dir.TaskDir, taskScope)
 	if _, err := os.Stat(logDir); os.IsNotExist(err) {
 		if err = os.MkdirAll(logDir, constant.DirPerm); err != nil {
 			return nil, fmt.Errorf("failed to create log directory: %w", err)
 		}
 	}
-	logPath := path.Join(global.Dir.LogDir, taskScope, taskID+".log")
+	logPath := path.Join(global.Dir.TaskDir, taskScope, taskID+".log")
 	file, err := os.OpenFile(logPath, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, constant.FilePerm)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open log file: %w", err)
@@ -267,7 +267,7 @@ func (t *Task) LogFailed(msg string) {
 }
 
 func (t *Task) LogFailedWithErr(msg string, err error) {
-	t.Logger.Println(fmt.Sprintf("%s %s : %s", msg, i18n.GetMsgByKey("Failed"), err.Error()))
+	t.Logger.Printf("%s %s : %s\n", msg, i18n.GetMsgByKey("Failed"), err.Error())
 }
 
 func (t *Task) LogSuccess(msg string) {
@@ -278,7 +278,7 @@ func (t *Task) LogSuccessF(format string, v ...any) {
 }
 
 func (t *Task) LogStart(msg string) {
-	t.Logger.Println(fmt.Sprintf("%s%s", i18n.GetMsgByKey("Start"), msg))
+	t.Logger.Printf("%s%s\n", i18n.GetMsgByKey("Start"), msg)
 }
 
 func (t *Task) LogWithOps(operate, msg string) {

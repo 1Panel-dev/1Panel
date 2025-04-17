@@ -311,3 +311,13 @@ var UpdateWebsiteExpireDate = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddLocalSSHSetting = &gormigrate.Migration{
+	ID: "20250417-add-local-ssh-setting",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Create(&model.Setting{Key: "LocalSSHConn", Value: ""}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}

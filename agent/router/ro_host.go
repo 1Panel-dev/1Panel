@@ -47,6 +47,6 @@ func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 		hostRouter.GET("/tool/supervisor/process", baseApi.GetProcess)
 		hostRouter.POST("/tool/supervisor/process/file", baseApi.GetProcessFile)
 
-		hostRouter.GET("/exec", baseApi.WsSSH)
+		hostRouter.GET("/terminal", baseApi.WsSSH)
 	}
 }

@@ -40,24 +40,21 @@ func (b *BaseApi) WsSSH(c *gin.Context) {
 	if wshandleError(wsConn, errors.WithMessage(err, "invalid param rows in request")) {
 		return
 	}
-	name, err := loadExecutor()
-	if wshandleError(wsConn, err) {
-		return
-	}
-	slave, err := terminal.NewCommand(name)
-	if wshandleError(wsConn, err) {
-		return
-	}
-	defer slave.Close()
 
-	tty, err := terminal.NewLocalWsSession(cols, rows, wsConn, slave, false)
+	client, err := loadLocalConn()
+	if wshandleError(wsConn, errors.WithMessage(err, "failed to set up the connection. Please check the host information")) {
+		return
+	}
+	defer client.Close()
+	sws, err := terminal.NewLogicSshWsSession(cols, rows, client.Client, wsConn, "")
 	if wshandleError(wsConn, err) {
 		return
 	}
+	defer sws.Close()
 
 	quitChan := make(chan bool, 3)
-	tty.Start(quitChan)
-	go slave.Wait(quitChan)
+	sws.Start(quitChan)
+	go sws.Wait(quitChan)
 
 	<-quitChan
 
@@ -253,13 +250,4 @@ var upGrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
 		return true
 	},
-}
-
-func loadExecutor() (string, error) {
-	std, err := cmd.RunDefaultWithStdoutBashC("echo $SHELL")
-	if err != nil {
-		return "", fmt.Errorf("load default executor failed, err: %s", std)
-	}
-
-	return strings.ReplaceAll(std, "\n", ""), nil
 }
