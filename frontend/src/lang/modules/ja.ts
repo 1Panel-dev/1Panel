@@ -2974,6 +2974,7 @@ const message = {
             websites: 'ウェブサイトリスト',
             trend: 'トレンド統計',
             reqCount: 'リクエスト数',
+            uriHelper: '/test/* や /*/index.php を使用して Uri を除外できます',
         },
         tamper: {
             tamper: 'ウェブサイトの改ざん防止',

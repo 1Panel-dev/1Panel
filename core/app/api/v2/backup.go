@@ -47,7 +47,7 @@ func (b *BaseApi) RefreshToken(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Backup Account
@@ -112,7 +112,7 @@ func (b *BaseApi) DeleteBackup(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Backup Account
@@ -134,5 +134,5 @@ func (b *BaseApi) UpdateBackup(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }

@@ -25,7 +25,7 @@ func (b *BaseApi) CreateCommand(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Command
@@ -119,7 +119,7 @@ func (b *BaseApi) DeleteCommand(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Command
@@ -141,5 +141,5 @@ func (b *BaseApi) UpdateCommand(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }

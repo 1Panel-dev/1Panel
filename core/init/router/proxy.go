@@ -31,8 +31,9 @@ func Proxy() gin.HandlerFunc {
 			return
 		}
 		var currentNode string
-		if c.Query("operateNode") != "" {
-			currentNode = c.Query("operateNode")
+		queryNode := c.Query("operateNode")
+		if queryNode != "" && queryNode != "undefined" {
+			currentNode = queryNode
 		} else {
 			currentNode = c.Request.Header.Get("CurrentNode")
 		}

@@ -3043,6 +3043,7 @@ const message = {
             websites: 'Lista de Sites',
             trend: 'Estatísticas de Tendência',
             reqCount: 'Contagem de Solicitações',
+            uriHelper: 'Você pode usar /test/* ou /*/index.php para excluir Uri',
         },
         tamper: {
             tamper: 'Proteção contra adulteração do site',

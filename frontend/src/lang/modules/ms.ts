@@ -3041,6 +3041,7 @@ const message = {
             websites: 'Senarai Laman Web',
             trend: 'Statistik Trend',
             reqCount: 'Jumlah Permintaan',
+            uriHelper: 'Anda boleh menggunakan /test/* atau /*/index.php untuk mengecualikan Uri',
         },
         tamper: {
             tamper: 'Perlindungan daripada peng篡改 laman web',

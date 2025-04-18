@@ -78,5 +78,5 @@ func (b *BaseApi) CleanLogs(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }

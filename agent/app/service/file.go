@@ -204,15 +204,25 @@ func (f *FileService) Create(op request.FileCreate) error {
 		}
 	}
 	if op.IsDir {
-		return fo.CreateDirWithMode(op.Path, fs.FileMode(mode))
+		if err := fo.CreateDirWithMode(op.Path, fs.FileMode(mode)); err != nil {
+			return err
+		}
+		handleDefaultOwn(op.Path)
+		return nil
 	}
 	if op.IsLink {
 		if !fo.Stat(op.LinkPath) {
 			return buserr.New("ErrLinkPathNotFound")
 		}
-		return fo.LinkFile(op.LinkPath, op.Path, op.IsSymlink)
+		if err := fo.LinkFile(op.LinkPath, op.Path, op.IsSymlink); err != nil {
+			return err
+		}
 	}
-	return fo.CreateFileWithMode(op.Path, fs.FileMode(mode))
+	if err := fo.CreateFileWithMode(op.Path, fs.FileMode(mode)); err != nil {
+		return err
+	}
+	handleDefaultOwn(op.Path)
+	return nil
 }
 
 func (f *FileService) Delete(op request.FileDelete) error {

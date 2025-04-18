@@ -3116,6 +3116,7 @@ const message = {
             websites: 'Website List',
             trend: 'Trend Statistics',
             reqCount: 'Request Count',
+            uriHelper: 'You can use /test/* or /*/index.php to exclude Uri',
         },
         tamper: {
             tamper: 'Website Tamper Protection',

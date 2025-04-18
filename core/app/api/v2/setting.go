@@ -54,7 +54,7 @@ func (b *BaseApi) GetTerminalSettingInfo(c *gin.Context) {
 // @Security Timestamp
 // @Router /core/settings/search/available [get]
 func (b *BaseApi) GetSystemAvailable(c *gin.Context) {
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags System Setting
@@ -86,7 +86,7 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 		entranceValue := base64.StdEncoding.EncodeToString([]byte(req.Value))
 		c.SetCookie("SecurityEntrance", entranceValue, 0, "", "", false, true)
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags System Setting
@@ -108,7 +108,7 @@ func (b *BaseApi) UpdateTerminalSetting(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags System Setting
@@ -139,7 +139,7 @@ func (b *BaseApi) UpdateProxy(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags System Setting
@@ -161,7 +161,7 @@ func (b *BaseApi) UpdateMenu(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags System Setting
@@ -183,7 +183,7 @@ func (b *BaseApi) UpdatePassword(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags System Setting
@@ -205,7 +205,7 @@ func (b *BaseApi) UpdateSSL(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags System Setting
@@ -274,7 +274,7 @@ func (b *BaseApi) UpdateBindInfo(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags System Setting
@@ -296,7 +296,7 @@ func (b *BaseApi) UpdatePort(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags System Setting
@@ -318,7 +318,7 @@ func (b *BaseApi) HandlePasswordExpired(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags System Setting
@@ -380,7 +380,7 @@ func (b *BaseApi) MFABind(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 func (b *BaseApi) ReloadSSL(c *gin.Context) {
@@ -393,7 +393,7 @@ func (b *BaseApi) ReloadSSL(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags System Setting
@@ -442,7 +442,7 @@ func (b *BaseApi) UpdateApiConfig(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 func checkEntrancePattern(val string) bool {

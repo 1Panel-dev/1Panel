@@ -153,7 +153,7 @@ func (b *BaseApi) DeleteHost(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Host
@@ -244,7 +244,7 @@ func (b *BaseApi) UpdateHostGroup(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Host

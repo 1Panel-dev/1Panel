@@ -62,7 +62,7 @@ func (b *BaseApi) Upgrade(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags System Setting
@@ -84,5 +84,5 @@ func (b *BaseApi) Rollback(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }

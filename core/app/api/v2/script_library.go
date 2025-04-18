@@ -36,7 +36,7 @@ func (b *BaseApi) CreateScript(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags ScriptLibrary
@@ -84,7 +84,7 @@ func (b *BaseApi) DeleteScript(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags ScriptLibrary
@@ -99,7 +99,7 @@ func (b *BaseApi) SyncScript(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags ScriptLibrary
@@ -121,7 +121,7 @@ func (b *BaseApi) UpdateScript(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 func (b *BaseApi) RunScript(c *gin.Context) {

@@ -2930,6 +2930,7 @@ const message = {
             websites: '웹사이트 목록',
             trend: '추세 통계',
             reqCount: '요청 수',
+            uriHelper: '/test/* 또는 /*/index.php를 사용하여 Uri를 제외할 수 있습니다',
         },
         tamper: {
             tamper: '웹사이트 변조 방지',

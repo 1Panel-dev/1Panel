@@ -2894,6 +2894,7 @@ const message = {
             websites: '網站列表',
             trend: '趨勢統計',
             reqCount: '請求數',
+            uriHelper: '可以使用 /test/* 或者 /*/index.php 來排除 Uri',
         },
         tamper: {
             tamper: '網站防篡改',

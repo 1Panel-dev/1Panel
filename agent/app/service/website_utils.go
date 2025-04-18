@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
@@ -1356,4 +1357,18 @@ func ConfigAIProxy(website model.Website) error {
 		}
 	}
 	return nil
+}
+
+func handleDefaultOwn(dir string) {
+	parentDir := path.Dir(dir)
+	info, err := os.Stat(parentDir)
+	if err != nil {
+		return
+	}
+	stat, ok := info.Sys().(*syscall.Stat_t)
+	uid, gid := -1, -1
+	if ok {
+		uid, gid = int(stat.Uid), int(stat.Gid)
+	}
+	_ = os.Chown(dir, uid, gid)
 }

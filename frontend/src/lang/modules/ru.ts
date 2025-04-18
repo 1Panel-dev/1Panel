@@ -3034,6 +3034,7 @@ const message = {
             websites: 'Список веб-сайтов',
             trend: 'Статистика тренда',
             reqCount: 'Количество запросов',
+            uriHelper: 'Вы можете использовать /test/* или /*/index.php для исключения Uri',
         },
         tamper: {
             tamper: 'Защита от подделки сайта',
