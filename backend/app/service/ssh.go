@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"net"
 	"os"
 	"os/user"
 	"path"
@@ -291,7 +292,7 @@ func (u *SSHService) LoadLog(c *gin.Context, req dto.SearchSSHLog) (*dto.SSHLog,
 		if err != nil {
 			return err
 		}
-		if !info.IsDir() && (strings.HasPrefix(info.Name(), "secure") || strings.HasPrefix(info.Name(), "auth")) {
+		if !info.IsDir() && (strings.HasPrefix(info.Name(), "secure") || strings.HasPrefix(info.Name(), "auth") || strings.HasPrefix(info.Name(), "messages")) {
 			if !strings.HasSuffix(info.Name(), ".gz") {
 				fileList = append(fileList, sshFileItem{Name: pathItem, Year: info.ModTime().Year()})
 				return nil
@@ -319,7 +320,8 @@ func (u *SSHService) LoadLog(c *gin.Context, req dto.SearchSSHLog) (*dto.SSHLog,
 	nyc, _ := time.LoadLocation(common.LoadTimeZoneByCmd())
 	for _, file := range fileList {
 		commandItem := ""
-		if strings.HasPrefix(path.Base(file.Name), "secure") {
+		switch {
+		case strings.HasPrefix(path.Base(file.Name), "secure"):
 			switch req.Status {
 			case constant.StatusSuccess:
 				commandItem = fmt.Sprintf("cat %s | grep -a Accepted %s", file.Name, command)
@@ -328,8 +330,16 @@ func (u *SSHService) LoadLog(c *gin.Context, req dto.SearchSSHLog) (*dto.SSHLog,
 			default:
 				commandItem = fmt.Sprintf("cat %s | grep -aE '(Failed password for|Accepted)' %s", file.Name, command)
 			}
-		}
-		if strings.HasPrefix(path.Base(file.Name), "auth.log") {
+		case strings.HasPrefix(path.Base(file.Name), "messages"):
+			switch req.Status {
+			case constant.StatusSuccess:
+				commandItem = fmt.Sprintf("cat %s | grep -aE 'sshd.*Accepted (password|publickey)' %s", file.Name, command)
+			case constant.StatusFailed:
+				commandItem = fmt.Sprintf("cat %s | grep -aE 'sshd.*(Failed password for|Connection closed by authenticating user)' %s", file.Name, command)
+			default:
+				commandItem = fmt.Sprintf("cat %s | grep -aE 'sshd.*(Accepted|Failed password for|Connection closed)' %s", file.Name, command)
+			}
+		case strings.HasPrefix(path.Base(file.Name), "auth.log"):
 			switch req.Status {
 			case constant.StatusSuccess:
 				commandItem = fmt.Sprintf("cat %s | grep -a Accepted %s", file.Name, command)
@@ -425,107 +435,160 @@ func loadSSHData(c *gin.Context, command string, showCountFrom, showCountTo, cur
 	lines := strings.Split(string(stdout2), "\n")
 	for i := len(lines) - 1; i >= 0; i-- {
 		var itemData dto.SSHHistory
+		line := strings.TrimSpace(lines[i])
+		if line == "" {
+			continue
+		}
+
+		parts := strings.Fields(line)
+		if len(parts) < 12 {
+			continue
+		}
+
+		// 统一时间解析逻辑
+		var dateStr string
+		var timeIndex int
+		if strings.Contains(parts[0], "-") { // 处理RFC3339时间格式
+			t, err := time.Parse(time.RFC3339Nano, parts[0])
+			if err == nil {
+				dateStr = t.Format("2006 Jan 2 15:04:05")
+				timeIndex = 0
+			}
+		} else { // 处理系统日志格式
+			dateParts := parts[:3]
+			if len(dateParts) < 3 {
+				continue
+			}
+			dateStr = strings.Join(dateParts, " ")
+			timeIndex = 3
+		}
+
+		// 根据日志类型解析内容
 		switch {
-		case strings.Contains(lines[i], "Failed password for"):
-			itemData = loadFailedSecureDatas(lines[i])
-			if len(itemData.Address) != 0 {
-				if successCount+failedCount >= showCountFrom && successCount+failedCount < showCountTo {
-					itemData.Area, _ = geo.GetIPLocation(itemData.Address, common.GetLang(c))
-					itemData.Date = loadDate(currentYear, itemData.DateStr, nyc)
-					datas = append(datas, itemData)
-				}
-				failedCount++
-			}
-		case strings.Contains(lines[i], "Connection closed by authenticating user"):
-			itemData = loadFailedAuthDatas(lines[i])
-			if len(itemData.Address) != 0 {
-				if successCount+failedCount >= showCountFrom && successCount+failedCount < showCountTo {
-					itemData.Area, _ = geo.GetIPLocation(itemData.Address, common.GetLang(c))
-					itemData.Date = loadDate(currentYear, itemData.DateStr, nyc)
-					datas = append(datas, itemData)
-				}
-				failedCount++
-			}
-		case strings.Contains(lines[i], "Accepted "):
-			itemData = loadSuccessDatas(lines[i])
-			if len(itemData.Address) != 0 {
-				if successCount+failedCount >= showCountFrom && successCount+failedCount < showCountTo {
-					itemData.Area, _ = geo.GetIPLocation(itemData.Address, common.GetLang(c))
-					itemData.Date = loadDate(currentYear, itemData.DateStr, nyc)
-					datas = append(datas, itemData)
-				}
-				successCount++
-			}
+		case strings.Contains(line, "Failed password for"):
+			itemData = parseFailedPasswordLog(parts, timeIndex, dateStr)
+		case strings.Contains(line, "Connection closed by authenticating user"):
+			itemData = parseConnectionClosedLog(parts, timeIndex, dateStr)
+		case strings.Contains(line, "Accepted"):
+			itemData = parseAcceptedLog(parts, timeIndex, dateStr)
+		default:
+			continue
+		}
+		if itemData.Address == "" {
+			continue
+		}
+
+		total := successCount + failedCount
+		if total >= showCountFrom && total < showCountTo {
+			itemData.Area, _ = geo.GetIPLocation(itemData.Address, common.GetLang(c))
+			itemData.Date = parseLogDate(currentYear, dateStr, nyc)
+			datas = append(datas, itemData)
+		}
+
+		if itemData.Status == constant.StatusSuccess {
+			successCount++
+		} else {
+			failedCount++
+		}
+
+		if total >= showCountTo {
+			break
 		}
 	}
 	return datas, successCount, failedCount
 }
 
-func loadSuccessDatas(line string) dto.SSHHistory {
-	var data dto.SSHHistory
-	parts := strings.Fields(line)
-	index, dataStr := analyzeDateStr(parts)
-	if dataStr == "" {
-		return data
+func parseFailedPasswordLog(parts []string, timeIndex int, dateStr string) dto.SSHHistory {
+	data := dto.SSHHistory{
+		DateStr:  dateStr,
+		Status:   constant.StatusFailed,
+		AuthMode: "publickey",
 	}
-	data.DateStr = dataStr
-	data.AuthMode = parts[4+index]
-	data.User = parts[6+index]
-	data.Address = parts[8+index]
-	data.Port = parts[10+index]
-	data.Status = constant.StatusSuccess
-	return data
-}
 
-func loadFailedAuthDatas(line string) dto.SSHHistory {
-	var data dto.SSHHistory
-	parts := strings.Fields(line)
-	index, dataStr := analyzeDateStr(parts)
-	if dataStr == "" {
-		return data
+	// 查找关键字段位置
+	for i := timeIndex; i < len(parts); i++ {
+		switch parts[i] {
+		case "for":
+			if i+1 < len(parts) {
+				data.User = parts[i+1]
+			}
+		case "from":
+			if i+1 < len(parts) {
+				data.Address = parts[i+1]
+			}
+		case "port":
+			if i+1 < len(parts) {
+				data.Port = parts[i+1]
+			}
+		case "password":
+			data.AuthMode = "password"
+		}
 	}
-	data.DateStr = dataStr
-	switch index {
-	case 1:
-		data.User = parts[9]
-	case 2:
-		data.User = parts[10]
-	default:
-		data.User = parts[7]
-	}
-	data.AuthMode = parts[6+index]
-	data.Address = parts[9+index]
-	data.Port = parts[11+index]
-	data.Status = constant.StatusFailed
-	if strings.Contains(line, ": ") {
-		data.Message = strings.Split(line, ": ")[1]
-	}
-	return data
-}
-func loadFailedSecureDatas(line string) dto.SSHHistory {
-	var data dto.SSHHistory
-	parts := strings.Fields(line)
-	index, dataStr := analyzeDateStr(parts)
-	if dataStr == "" {
-		return data
-	}
-	data.DateStr = dataStr
-	if strings.Contains(line, " invalid ") {
-		data.AuthMode = parts[4+index]
-		index += 2
-	} else {
-		data.AuthMode = parts[4+index]
-	}
-	data.User = parts[6+index]
-	data.Address = parts[8+index]
-	data.Port = parts[10+index]
-	data.Status = constant.StatusFailed
-	if strings.Contains(line, ": ") {
-		data.Message = strings.Split(line, ": ")[1]
+
+	if strings.Contains(strings.Join(parts, " "), "invalid user") {
+		data.Message = "invalid user attempt"
 	}
 	return data
 }
 
+func parseConnectionClosedLog(parts []string, timeIndex int, dateStr string) dto.SSHHistory {
+	data := dto.SSHHistory{
+		DateStr: dateStr,
+		Status:  constant.StatusFailed,
+	}
+
+	// 解析Alpine格式的特殊字段
+	fieldStart := timeIndex + 5 // 跳过时间、主机、进程字段
+	for i := fieldStart; i < len(parts); i++ {
+		switch {
+		case parts[i] == "user":
+			if i+1 < len(parts) {
+				data.User = parts[i+1]
+			}
+		case parts[i] == "port":
+			if i+1 < len(parts) {
+				data.Port = parts[i+1]
+			}
+		case isIPAddress(parts[i]):
+			data.Address = parts[i]
+		}
+	}
+	return data
+}
+
+func parseAcceptedLog(parts []string, timeIndex int, dateStr string) dto.SSHHistory {
+	data := dto.SSHHistory{
+		DateStr:  dateStr,
+		Status:   constant.StatusSuccess,
+		AuthMode: "password", // 默认值
+	}
+
+	// 处理不同日志格式
+	fieldStart := timeIndex + 5 // 基础字段偏移
+	for i := fieldStart; i < len(parts); i++ {
+		switch {
+		case parts[i] == "for":
+			if i+1 < len(parts) {
+				data.User = parts[i+1]
+			}
+		case parts[i] == "from":
+			if i+1 < len(parts) {
+				data.Address = parts[i+1]
+			}
+		case parts[i] == "port":
+			if i+1 < len(parts) {
+				data.Port = parts[i+1]
+			}
+		case strings.Contains(parts[i], "ssh2:"):
+			data.AuthMode = "publickey"
+		case parts[i] == "publickey":
+			data.AuthMode = "publickey"
+		case parts[i] == "password":
+			data.AuthMode = "password"
+		}
+	}
+	return data
+}
 func handleGunzip(path string) error {
 	if _, err := cmd.Execf("gunzip %s", path); err != nil {
 		return err
@@ -544,32 +607,26 @@ func loadServiceName() (string, error) {
 	return serviceName, nil
 }
 
-func loadDate(currentYear int, DateStr string, nyc *time.Location) time.Time {
-	itemDate, err := time.ParseInLocation("2006 Jan 2 15:04:05", fmt.Sprintf("%d %s", currentYear, DateStr), nyc)
-	if err != nil {
-		itemDate, _ = time.ParseInLocation("2006 Jan 2 15:04:05", DateStr, nyc)
+func parseLogDate(currentYear int, dateStr string, loc *time.Location) time.Time {
+	// 处理带年份和不带年份的情况
+	formats := []string{
+		"2006 Jan 2 15:04:05",
+		"Jan 2 15:04:05",
 	}
-	return itemDate
+
+	for _, format := range formats {
+		t, err := time.ParseInLocation(format, dateStr, loc)
+		if err == nil {
+			if t.Year() == 0 {
+				return time.Date(currentYear, t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second(), 0, loc)
+			}
+			return t
+		}
+	}
+	return time.Now().In(loc)
 }
 
-func analyzeDateStr(parts []string) (int, string) {
-	t, err := time.Parse(time.RFC3339Nano, parts[0])
-	if err == nil {
-		if len(parts) < 12 {
-			return 0, ""
-		}
-		return 0, t.Format("2006 Jan 2 15:04:05")
-	}
-	t, err = time.Parse(constant.DateTimeLayout, fmt.Sprintf("%s %s", parts[0], parts[1]))
-	if err == nil {
-		if len(parts) < 14 {
-			return 0, ""
-		}
-		return 1, t.Format("2006 Jan 2 15:04:05")
-	}
+func isIPAddress(s string) bool {
+	return net.ParseIP(s) != nil
 
-	if len(parts) < 14 {
-		return 0, ""
-	}
-	return 2, fmt.Sprintf("%s %s %s", parts[0], parts[1], parts[2])
 }
