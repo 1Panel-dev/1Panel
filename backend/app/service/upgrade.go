@@ -153,7 +153,7 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 		}{
 			{path.Join(tmpDir, "1panel"), path.Join(binDir, "1panel"), 1},
 			{path.Join(tmpDir, "1pctl"), path.Join(binDir, "1pctl"), 2},
-			{path.Join(tmpDir, currentServiceName), servicePath, 3},
+			{selectInitScript(path.Join(tmpDir, "initscript"), currentServiceName), path.Join(servicePath, currentServiceName), 3},
 		}
 
 		for _, update := range criticalUpdates {
@@ -399,4 +399,27 @@ func loadArch() (string, error) {
 		return "riscv64", nil
 	}
 	return "", fmt.Errorf("unsupported such arch: %s", std)
+}
+
+func selectInitScript(path string, serviceName string) string {
+	path = strings.TrimSuffix(path, "/")
+	mgr := systemctl.GetGlobalManager().Name()
+	var serviceFileName string
+	switch mgr {
+	case "systemd":
+		serviceFileName = "1panel.service"
+	case "openrc":
+		serviceFileName = "1paneld.openrc"
+	case "sysvinit":
+		isWrt := systemctl.FileExist("/etc/rc.common")
+		if isWrt {
+			serviceFileName = "1paneld.procd"
+		} else {
+			serviceFileName = "1paneld.init"
+		}
+	default:
+		serviceFileName = serviceName
+		global.LOG.Warnf("[%s]unselect InitScript, used default: %s", mgr, serviceName)
+	}
+	return filepath.Join(path, serviceFileName)
 }
