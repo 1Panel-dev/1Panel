@@ -153,7 +153,7 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 		}{
 			{path.Join(tmpDir, "1panel"), path.Join(binDir, "1panel"), 1},
 			{path.Join(tmpDir, "1pctl"), path.Join(binDir, "1pctl"), 2},
-			{selectInitScript(path.Join(tmpDir, "initscript"), currentServiceName), path.Join(servicePath, currentServiceName), 3},
+			{selectInitScript(path.Join(tmpDir, "initscript"), currentServiceName), servicePath, 3},
 		}
 
 		for _, update := range criticalUpdates {
@@ -421,5 +421,15 @@ func selectInitScript(path string, serviceName string) string {
 		serviceFileName = serviceName
 		global.LOG.Warnf("[%s]unselect InitScript, used default: %s", mgr, serviceName)
 	}
-	return filepath.Join(path, serviceFileName)
+	sourcePath := filepath.Join(path, serviceFileName)
+	targetPath := filepath.Join(path, serviceName)
+
+	if serviceFileName != serviceName {
+		if _, err := cmd.Execf("cp %s %s", sourcePath, targetPath); err != nil {
+			global.LOG.Errorf("Failed to copy init script from %s to %s: %v",
+				serviceFileName, serviceName, err)
+		}
+	}
+
+	return targetPath
 }
