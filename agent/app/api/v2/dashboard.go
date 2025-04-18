@@ -80,7 +80,7 @@ func (b *BaseApi) UpdateAppLauncher(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Dashboard
@@ -165,5 +165,5 @@ func (b *BaseApi) SystemRestart(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }

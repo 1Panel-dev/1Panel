@@ -136,7 +136,7 @@ func (b *BaseApi) CreateCompose(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Container Compose
@@ -158,7 +158,7 @@ func (b *BaseApi) OperatorCompose(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Container
@@ -180,7 +180,7 @@ func (b *BaseApi) ContainerUpdate(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Container
@@ -252,7 +252,7 @@ func (b *BaseApi) ContainerCreate(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Container
@@ -273,7 +273,7 @@ func (b *BaseApi) ContainerCreateByCommand(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Container
@@ -295,7 +295,7 @@ func (b *BaseApi) ContainerUpgrade(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Container
@@ -340,7 +340,7 @@ func (b *BaseApi) CleanContainerLog(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Container
@@ -362,7 +362,7 @@ func (b *BaseApi) ContainerRename(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Container
@@ -383,7 +383,7 @@ func (b *BaseApi) ContainerCommit(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Container
@@ -405,7 +405,7 @@ func (b *BaseApi) ContainerOperation(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Container
@@ -526,7 +526,7 @@ func (b *BaseApi) DeleteNetwork(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Container Network
@@ -548,7 +548,7 @@ func (b *BaseApi) CreateNetwork(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Container Volume
@@ -613,7 +613,7 @@ func (b *BaseApi) DeleteVolume(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Container Volume
@@ -635,7 +635,7 @@ func (b *BaseApi) CreateVolume(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Container Compose
@@ -657,7 +657,7 @@ func (b *BaseApi) ComposeUpdate(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Container

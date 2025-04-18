@@ -112,7 +112,7 @@ func (b *BaseApi) CreateFile(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags File
@@ -134,7 +134,7 @@ func (b *BaseApi) DeleteFile(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags File
@@ -156,7 +156,7 @@ func (b *BaseApi) BatchDeleteFile(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags File
@@ -178,7 +178,7 @@ func (b *BaseApi) ChangeFileMode(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags File
@@ -199,7 +199,7 @@ func (b *BaseApi) ChangeFileOwner(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags File
@@ -221,7 +221,7 @@ func (b *BaseApi) CompressFile(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags File
@@ -243,7 +243,7 @@ func (b *BaseApi) DeCompressFile(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags File
@@ -286,7 +286,7 @@ func (b *BaseApi) SaveContent(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags File
@@ -452,7 +452,7 @@ func (b *BaseApi) ChangeFileName(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags File
@@ -497,7 +497,7 @@ func (b *BaseApi) MoveFile(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags File
@@ -830,7 +830,7 @@ func (b *BaseApi) BatchChangeModeAndOwner(c *gin.Context) {
 	if err := fileService.BatchChangeModeAndOwner(req); err != nil {
 		helper.InternalServer(c, err)
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 func (b *BaseApi) GetPathByType(c *gin.Context) {

@@ -92,7 +92,7 @@ func (b *BaseApi) LogOut(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Auth

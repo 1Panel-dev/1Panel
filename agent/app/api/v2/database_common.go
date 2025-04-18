@@ -70,5 +70,5 @@ func (b *BaseApi) UpdateDBConfByFile(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }

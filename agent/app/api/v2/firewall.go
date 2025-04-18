@@ -68,7 +68,7 @@ func (b *BaseApi) OperateFirewall(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Firewall
@@ -90,7 +90,7 @@ func (b *BaseApi) OperatePortRule(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // OperateForwardRule
@@ -113,7 +113,7 @@ func (b *BaseApi) OperateForwardRule(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Firewall
@@ -135,7 +135,7 @@ func (b *BaseApi) OperateIPRule(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Firewall
@@ -156,7 +156,7 @@ func (b *BaseApi) BatchOperateRule(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Firewall
@@ -177,7 +177,7 @@ func (b *BaseApi) UpdateFirewallDescription(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Firewall
@@ -198,7 +198,7 @@ func (b *BaseApi) UpdatePortRule(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Firewall
@@ -219,5 +219,5 @@ func (b *BaseApi) UpdateAddrRule(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }

@@ -95,12 +95,16 @@ export const updateAppInstallParams = (req: any) => {
     return http.post<any>(`apps/installed/params/update`, req);
 };
 
-export const ignoreUpgrade = (req: any) => {
+export const ignoreUpgrade = (req: App.AppIgnoreReq) => {
     return http.post<any>(`apps/installed/ignore`, req);
 };
 
 export const getIgnoredApp = () => {
     return http.get<App.IgnoredApp>(`apps/ignored/detail`);
+};
+
+export const cancelAppIgnore = (req: App.CancelAppIgnore) => {
+    return http.post(`apps/ignored/cancel`, req);
 };
 
 export const updateInstallConfig = (req: App.AppConfigUpdate) => {

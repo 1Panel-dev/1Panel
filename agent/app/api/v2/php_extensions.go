@@ -61,7 +61,7 @@ func (b *BaseApi) CreatePHPExtensions(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags PHP Extensions
@@ -81,7 +81,7 @@ func (b *BaseApi) UpdatePHPExtensions(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags PHP Extensions
@@ -101,5 +101,5 @@ func (b *BaseApi) DeletePHPExtensions(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }

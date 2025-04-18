@@ -1962,6 +1962,8 @@ const message = {
         customAppHelper: '사용자 정의 앱 스토어 패키지를 설치하기 전에 설치된 앱이 없는지 확인하십시오.',
         forceUninstall: '강제 제거',
         syncCustomApp: 'カスタムアプリを同期',
+        ignoreAll: '후속 모든 버전 무시',
+        ignoreVersion: '지정된 버전 무시',
     },
     website: {
         primaryDomain: '기본 도메인',
@@ -2831,6 +2833,11 @@ const message = {
             strictHelper: '더 엄격한 규칙을 사용하여 요청을 검증합니다',
             saveLog: '로그 저장',
             remoteURLHelper: '원격 URL은 한 줄에 하나의 IP만 포함하고 다른 문자는 포함하지 않아야 합니다',
+            notFound: 'Not Found (404)',
+            serviceUnavailable: '서비스 불가 (503)',
+            gatewayTimeout: '게이트웨이 시간 초과 (504)',
+            belongToIpGroup: 'IP 그룹에 속함',
+            notBelongToIpGroup: 'IP 그룹에 속하지 않음',
         },
         monitor: {
             name: '웹사이트 모니터링',

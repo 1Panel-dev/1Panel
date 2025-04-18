@@ -49,7 +49,7 @@ func (b *BaseApi) ReduceRecycleBinFile(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags File
@@ -65,7 +65,7 @@ func (b *BaseApi) ClearRecycleBinFile(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags File

@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path"
 	"strings"
@@ -234,11 +235,13 @@ func opNginx(containerName, operate string) error {
 		err error
 	)
 	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(20 * time.Second))
+	cmdStr := fmt.Sprintf("docker exec -i %s nginx ", containerName)
 	if operate == constant.NginxCheck {
-		out, err = cmdMgr.RunWithStdout("docker", "exec", "-i", containerName, "nginx -t")
+		cmdStr = cmdStr + "-t"
 	} else {
-		out, err = cmdMgr.RunWithStdout("docker", "exec", "-i", containerName, "nginx -s reload")
+		cmdStr = cmdStr + "-s reload"
 	}
+	out, err = cmdMgr.RunWithStdoutBashC(cmdStr)
 	if err != nil {
 		if out != "" {
 			return errors.New(out)

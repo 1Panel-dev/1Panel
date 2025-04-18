@@ -40,7 +40,7 @@ func (b *BaseApi) CreateSnapshot(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags System Setting
@@ -62,7 +62,7 @@ func (b *BaseApi) RecreateSnapshot(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags System Setting
@@ -84,7 +84,7 @@ func (b *BaseApi) ImportSnapshot(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags System Setting
@@ -106,7 +106,7 @@ func (b *BaseApi) UpdateSnapDescription(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags System Setting
@@ -153,7 +153,7 @@ func (b *BaseApi) RecoverSnapshot(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags System Setting
@@ -175,7 +175,7 @@ func (b *BaseApi) RollbackSnapshot(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags System Setting
@@ -197,5 +197,5 @@ func (b *BaseApi) DeleteSnapshot(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }

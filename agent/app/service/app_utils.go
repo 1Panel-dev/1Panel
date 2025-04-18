@@ -1490,7 +1490,8 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool)
 		}
 		var versions []string
 		for _, detail := range details {
-			if detail.IgnoreUpgrade || installed.Version == "latest" {
+			ignores, _ := appIgnoreUpgradeRepo.List(runtimeRepo.WithDetailId(detail.ID), appIgnoreUpgradeRepo.WithScope("version"))
+			if len(ignores) > 0 || installed.Version == "latest" {
 				continue
 			}
 			if common.IsCrossVersion(installed.Version, detail.Version) && !app.CrossVersionUpdate {
@@ -1780,6 +1781,10 @@ func ignoreUpdate(installed model.AppInstall) bool {
 				return false
 			}
 		}
+		return true
+	}
+	ignores, _ := appIgnoreUpgradeRepo.List(appDetailRepo.WithAppId(installed.AppId), appIgnoreUpgradeRepo.WithScope("all"))
+	if len(ignores) > 0 {
 		return true
 	}
 	return false

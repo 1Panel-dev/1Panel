@@ -73,7 +73,7 @@ func (a AppInstallResourceRpo) DeleteBy(ctx context.Context, opts ...DBOption) e
 	return getTx(ctx, opts...).Delete(&model.AppInstallResource{}).Error
 }
 
-func (a *AppInstallResourceRpo) BatchUpdateBy(maps map[string]interface{}, opts ...DBOption) error {
+func (a AppInstallResourceRpo) BatchUpdateBy(maps map[string]interface{}, opts ...DBOption) error {
 	db := getDb(opts...).Model(&model.AppInstallResource{})
 	if len(opts) == 0 {
 		db = db.Where("1=1")

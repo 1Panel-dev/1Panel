@@ -85,7 +85,7 @@ func (b *BaseApi) ImageBuild(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Container Image
@@ -108,7 +108,7 @@ func (b *BaseApi) ImagePull(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Container Image
@@ -131,7 +131,7 @@ func (b *BaseApi) ImagePush(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Container Image
@@ -178,7 +178,7 @@ func (b *BaseApi) ImageSave(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Container Image
@@ -201,7 +201,7 @@ func (b *BaseApi) ImageTag(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Container Image
@@ -224,5 +224,5 @@ func (b *BaseApi) ImageLoad(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }

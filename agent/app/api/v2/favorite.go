@@ -71,5 +71,5 @@ func (b *BaseApi) DeleteFavorite(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }

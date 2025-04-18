@@ -6,5 +6,5 @@ import (
 )
 
 func (b *BaseApi) CheckHealth(c *gin.Context) {
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }

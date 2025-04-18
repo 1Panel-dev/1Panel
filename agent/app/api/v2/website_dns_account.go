@@ -49,7 +49,7 @@ func (b *BaseApi) CreateWebsiteDnsAccount(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website DNS
@@ -70,7 +70,7 @@ func (b *BaseApi) UpdateWebsiteDnsAccount(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website DNS
@@ -91,5 +91,5 @@ func (b *BaseApi) DeleteWebsiteDnsAccount(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }

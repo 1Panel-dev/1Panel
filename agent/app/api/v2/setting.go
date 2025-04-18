@@ -36,7 +36,7 @@ func (b *BaseApi) GetSettingInfo(c *gin.Context) {
 // @Security Timestamp
 // @Router /settings/search/available [get]
 func (b *BaseApi) GetSystemAvailable(c *gin.Context) {
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags System Setting
@@ -58,7 +58,7 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags System Setting

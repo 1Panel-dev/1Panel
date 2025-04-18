@@ -25,7 +25,7 @@ func (b *BaseApi) CreateGroup(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags System Group
@@ -47,7 +47,7 @@ func (b *BaseApi) DeleteGroup(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags System Group
@@ -69,7 +69,7 @@ func (b *BaseApi) UpdateGroup(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags System Group

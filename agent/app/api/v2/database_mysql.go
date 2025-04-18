@@ -37,7 +37,7 @@ func (b *BaseApi) CreateMysql(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Database Mysql
@@ -68,7 +68,7 @@ func (b *BaseApi) BindUser(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Database Mysql
@@ -90,7 +90,7 @@ func (b *BaseApi) UpdateMysqlDescription(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Database Mysql
@@ -121,7 +121,7 @@ func (b *BaseApi) ChangeMysqlPassword(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Database Mysql
@@ -143,7 +143,7 @@ func (b *BaseApi) ChangeMysqlAccess(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Database Mysql
@@ -165,7 +165,7 @@ func (b *BaseApi) UpdateMysqlVariables(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Database Mysql
@@ -230,7 +230,7 @@ func (b *BaseApi) LoadDBFromRemote(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Database Mysql
@@ -277,7 +277,7 @@ func (b *BaseApi) DeleteMysql(c *gin.Context) {
 		return
 	}
 	tx.Commit()
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Database Mysql

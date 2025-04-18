@@ -36,6 +36,11 @@
             <el-form-item :label="$t('app.versionSelect')" prop="detailId">
                 <el-select v-model="operateReq.version" @change="getVersions(operateReq.version)">
                     <el-option
+                        v-if="operateReq.operate == 'ignore'"
+                        :value="'all'"
+                        :label="$t('commons.table.all') + $t('app.version')"
+                    ></el-option>
+                    <el-option
                         v-for="(version, index) in versions"
                         :key="index"
                         :value="version.version"
@@ -124,6 +129,11 @@ const newCompose = ref('');
 const useNewCompose = ref(false);
 const appInstallID = ref(0);
 const taskLogRef = ref();
+const ignoreAppReq = reactive({
+    appID: 0,
+    appDetailID: 0,
+    scope: 'app',
+});
 
 const toLink = (link: string) => {
     window.open(link, '_blank');
@@ -163,6 +173,10 @@ const acceptParams = (id: number, name: string, dockerCompose: string, op: strin
     oldContent.value = dockerCompose;
     appInstallID.value = id;
     getVersions('');
+    ignoreAppReq.appID = appDetail.appId;
+    if (op === 'ignore') {
+        operateReq.detailId = -1;
+    }
     open.value = true;
 };
 
@@ -212,7 +226,7 @@ const operate = async () => {
                 loading.value = false;
             });
     } else {
-        await ignoreUpgrade(operateReq)
+        await ignoreUpgrade(ignoreAppReq)
             .then(() => {
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 bus.emit('upgrade', true);

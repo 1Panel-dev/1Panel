@@ -90,7 +90,7 @@ func (b *BaseApi) InstallCli(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Database Redis
@@ -112,7 +112,7 @@ func (b *BaseApi) UpdateRedisConf(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Database Redis
@@ -143,7 +143,7 @@ func (b *BaseApi) ChangeRedisPassword(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Database Redis
@@ -165,5 +165,5 @@ func (b *BaseApi) UpdateRedisPersistenceConf(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }

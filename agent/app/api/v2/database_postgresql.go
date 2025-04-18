@@ -37,7 +37,7 @@ func (b *BaseApi) CreatePostgresql(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Database Postgresql
@@ -59,7 +59,7 @@ func (b *BaseApi) BindPostgresqlUser(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Database Postgresql
@@ -81,7 +81,7 @@ func (b *BaseApi) UpdatePostgresqlDescription(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Database Postgresql
@@ -103,7 +103,7 @@ func (b *BaseApi) ChangePostgresqlPrivileges(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Database Postgresql
@@ -134,7 +134,7 @@ func (b *BaseApi) ChangePostgresqlPassword(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Database Postgresql
@@ -182,7 +182,7 @@ func (b *BaseApi) LoadPostgresqlDBFromRemote(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Database Postgresql
@@ -228,5 +228,5 @@ func (b *BaseApi) DeletePostgresql(c *gin.Context) {
 		return
 	}
 	tx.Commit()
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }

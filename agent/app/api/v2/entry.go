@@ -13,8 +13,9 @@ type BaseApi struct{}
 var (
 	dashboardService = service.NewIDashboardService()
 
-	appService        = service.NewIAppService()
-	appInstallService = service.NewIAppInstalledService()
+	appService              = service.NewIAppService()
+	appInstallService       = service.NewIAppInstalledService()
+	appIgnoreUpgradeService = service.NewIAppIgnoreUpgradeService()
 
 	aiToolService = service.NewIAIToolService()
 

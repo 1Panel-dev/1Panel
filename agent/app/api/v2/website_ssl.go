@@ -85,7 +85,7 @@ func (b *BaseApi) ApplyWebsiteSSL(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website SSL
@@ -127,7 +127,7 @@ func (b *BaseApi) DeleteWebsiteSSL(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website SSL
@@ -192,7 +192,7 @@ func (b *BaseApi) UpdateWebsiteSSL(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website SSL
@@ -213,7 +213,7 @@ func (b *BaseApi) UploadWebsiteSSL(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website SSL

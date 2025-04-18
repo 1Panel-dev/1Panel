@@ -44,7 +44,7 @@ func (b *BaseApi) CleanMonitor(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Monitor
@@ -81,7 +81,7 @@ func (b *BaseApi) UpdateMonitorSetting(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 func (b *BaseApi) GetNetworkOptions(c *gin.Context) {

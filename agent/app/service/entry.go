@@ -10,6 +10,7 @@ var (
 	appInstallRepo         = repo.NewIAppInstallRepo()
 	launcherRepo           = repo.NewILauncherRepo()
 	appInstallResourceRepo = repo.NewIAppInstallResourceRpo()
+	appIgnoreUpgradeRepo   = repo.NewIAppIgnoreUpgradeRepo()
 
 	aiRepo = repo.NewIAiRepo()
 

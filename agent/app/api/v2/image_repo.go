@@ -69,7 +69,7 @@ func (b *BaseApi) CheckRepoStatus(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Container Image-repo
@@ -92,7 +92,7 @@ func (b *BaseApi) CreateRepo(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Container Image-repo
@@ -115,7 +115,7 @@ func (b *BaseApi) DeleteRepo(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Container Image-repo
@@ -138,5 +138,5 @@ func (b *BaseApi) UpdateRepo(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }

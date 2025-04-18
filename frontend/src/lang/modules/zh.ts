@@ -1926,6 +1926,8 @@ const message = {
         customAppHelper: '在使用自定义应用商店仓库之前，请确保没有任何已安装的应用。',
         forceUninstall: '强制卸载',
         syncCustomApp: '同步自定义应用',
+        ignoreAll: '忽略后续所有版本',
+        ignoreVersion: '忽略指定版本',
     },
     website: {
         primaryDomain: '主域名',
@@ -2784,6 +2786,11 @@ const message = {
             strictHelper: '使用更严格的规则来校验请求',
             saveLog: '保存日志',
             remoteURLHelper: '远程 URL 需要保证每行一个 IP 并且没有其他字符',
+            notFound: 'Not Found (404)',
+            serviceUnavailable: '服务不可用 (503)',
+            gatewayTimeout: '网关超时 (504)',
+            belongToIpGroup: '属于 IP 组',
+            notBelongToIpGroup: '不属于 IP 组',
         },
         monitor: {
             name: '网站监控',

@@ -84,7 +84,7 @@ func (b *BaseApi) CreateWebsite(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website
@@ -106,7 +106,7 @@ func (b *BaseApi) OpWebsite(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website
@@ -128,7 +128,7 @@ func (b *BaseApi) DeleteWebsite(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website
@@ -149,7 +149,7 @@ func (b *BaseApi) UpdateWebsite(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website
@@ -237,7 +237,7 @@ func (b *BaseApi) UpdateNginxConfig(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website HTTPS
@@ -326,7 +326,7 @@ func (b *BaseApi) UpdateWebsiteNginxConfig(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website
@@ -369,7 +369,7 @@ func (b *BaseApi) ChangeDefaultServer(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website PHP
@@ -390,7 +390,7 @@ func (b *BaseApi) ChangePHPVersion(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website
@@ -432,7 +432,7 @@ func (b *BaseApi) UpdateRewriteConfig(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website
@@ -453,7 +453,7 @@ func (b *BaseApi) UpdateSiteDir(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website
@@ -474,7 +474,7 @@ func (b *BaseApi) UpdateSiteDirPermission(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website
@@ -517,7 +517,7 @@ func (b *BaseApi) UpdateProxyConfig(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website
@@ -538,7 +538,7 @@ func (b *BaseApi) UpdateProxyConfigFile(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website
@@ -579,7 +579,7 @@ func (b *BaseApi) UpdateAuthConfig(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website
@@ -620,7 +620,7 @@ func (b *BaseApi) UpdatePathAuthConfig(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website
@@ -661,7 +661,7 @@ func (b *BaseApi) UpdateAntiLeech(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website
@@ -683,7 +683,7 @@ func (b *BaseApi) UpdateRedirectConfig(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website
@@ -725,7 +725,7 @@ func (b *BaseApi) UpdateRedirectConfigFile(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website
@@ -788,7 +788,7 @@ func (b *BaseApi) UpdateDefaultHtml(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website
@@ -830,7 +830,7 @@ func (b *BaseApi) CreateLoadBalance(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website
@@ -850,7 +850,7 @@ func (b *BaseApi) DeleteLoadBalance(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website
@@ -870,7 +870,7 @@ func (b *BaseApi) UpdateLoadBalance(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website
@@ -890,7 +890,7 @@ func (b *BaseApi) UpdateLoadBalanceFile(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 func (b *BaseApi) ChangeWebsiteGroup(c *gin.Context) {
@@ -902,7 +902,7 @@ func (b *BaseApi) ChangeWebsiteGroup(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website
@@ -922,7 +922,7 @@ func (b *BaseApi) UpdateProxyCache(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Summary Get website proxy cache config
@@ -964,7 +964,7 @@ func (b *BaseApi) SetRealIPConfig(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website
@@ -1044,7 +1044,7 @@ func (b *BaseApi) ChangeWebsiteDatabase(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website
@@ -1064,7 +1064,7 @@ func (b *BaseApi) OperateCustomRewrite(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website
@@ -1099,5 +1099,5 @@ func (b *BaseApi) ClearProxyCache(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }

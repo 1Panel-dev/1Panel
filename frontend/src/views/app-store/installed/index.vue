@@ -218,7 +218,7 @@
                                                                 round
                                                                 size="small"
                                                                 :disabled="installed.status === 'Upgrading'"
-                                                                @click="openOperate(installed, 'ignore')"
+                                                                @click="ignoreApp(installed)"
                                                                 v-if="mode === 'upgrade'"
                                                             >
                                                                 {{ $t('commons.button.ignore') }}
@@ -392,6 +392,7 @@
     <ComposeLogs ref="composeLogRef" />
     <TaskLog ref="taskLogRef" @close="search" />
     <Detail ref="detailRef" />
+    <IgnoreApp ref="ignoreAppRef" @close="search" />
 </template>
 
 <script lang="ts" setup>
@@ -423,6 +424,7 @@ import { MsgSuccess } from '@/utils/message';
 import { toFolder } from '@/global/business';
 import TaskLog from '@/components/log/task/index.vue';
 import Detail from '@/views/app-store/detail/index.vue';
+import IgnoreApp from '@/views/app-store/installed/ignore/create/index.vue';
 
 const data = ref<any>();
 const loading = ref(false);
@@ -466,6 +468,7 @@ const mode = ref('installed');
 const moreTag = ref('');
 const defaultLink = ref('');
 const detailRef = ref();
+const ignoreAppRef = ref();
 
 const options = {
     modifiers: [
@@ -538,7 +541,7 @@ const search = async () => {
 const openOperate = (row: any, op: string) => {
     operateReq.installId = row.id;
     operateReq.operate = op;
-    if (op == 'upgrade' || op == 'ignore') {
+    if (op == 'upgrade') {
         upgradeRef.value.acceptParams(row.id, row.name, row.dockerCompose, op, row.app);
     } else if (op == 'delete') {
         appInstalledDeleteCheck(row.id).then(async (res) => {
@@ -556,6 +559,10 @@ const openOperate = (row: any, op: string) => {
 
 const openIgnore = () => {
     ignoreRef.value.acceptParams();
+};
+
+const ignoreApp = (row: App.AppInstalled) => {
+    ignoreAppRef.value.acceptParams(row);
 };
 
 const operate = async () => {

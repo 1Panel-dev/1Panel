@@ -11,11 +11,12 @@
                             <el-col :span="12">
                                 <span>{{ app.name }}</span>
                                 <div class="app-margin">
-                                    <el-tag>{{ app.version }}</el-tag>
+                                    <el-tag v-if="app.version != ''">{{ app.version }}</el-tag>
+                                    <el-tag v-else>{{ $t('commons.table.all') + $t('app.version') }}</el-tag>
                                 </div>
                             </el-col>
                             <el-col :span="6">
-                                <el-button type="primary" link @click="cancelIgnore(app.detailID)">
+                                <el-button type="primary" link @click="cancelIgnore(app.ID)">
                                     {{ $t('app.cancelIgnore') }}
                                 </el-button>
                             </el-col>
@@ -32,10 +33,11 @@
     </DrawerPro>
 </template>
 <script lang="ts" setup>
-import { getIgnoredApp, ignoreUpgrade } from '@/api/modules/app';
+import { cancelAppIgnore, getIgnoredApp } from '@/api/modules/app';
 import { ref } from 'vue';
 import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
+import bus from '@/global/bus';
 
 const open = ref(false);
 const loading = ref(false);
@@ -61,8 +63,9 @@ const getApps = async () => {
 
 const cancelIgnore = async (id: number) => {
     loading.value = true;
-    await ignoreUpgrade({ detailID: id, operate: 'cancel' })
+    await cancelAppIgnore({ id: id })
         .then(() => {
+            bus.emit('upgrade', true);
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .finally(() => {

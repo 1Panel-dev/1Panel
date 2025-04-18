@@ -61,7 +61,7 @@ func (b *BaseApi) UpdateNginxConfigByScope(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags OpenResty
@@ -98,7 +98,7 @@ func (b *BaseApi) UpdateNginxFile(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags OpenResty
@@ -119,7 +119,7 @@ func (b *BaseApi) BuildNginx(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags OpenResty
@@ -140,7 +140,7 @@ func (b *BaseApi) UpdateNginxModule(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags OpenResty

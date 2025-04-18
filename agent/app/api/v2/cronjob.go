@@ -28,7 +28,7 @@ func (b *BaseApi) CreateCronjob(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Cronjob
@@ -168,7 +168,7 @@ func (b *BaseApi) CleanRecord(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Cronjob
@@ -190,7 +190,7 @@ func (b *BaseApi) DeleteCronjob(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Cronjob
@@ -212,7 +212,7 @@ func (b *BaseApi) UpdateCronjob(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Cronjob
@@ -234,7 +234,7 @@ func (b *BaseApi) UpdateCronjobStatus(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Cronjob
@@ -280,5 +280,5 @@ func (b *BaseApi) HandleOnce(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }

@@ -11,7 +11,7 @@ export const searchWebsites = (req: Website.WebSiteSearch) => {
 };
 
 export const listWebsites = () => {
-    return http.get<Website.WebsiteDTO>(`/websites/list`);
+    return http.get<Website.WebsiteDTO[]>(`/websites/list`);
 };
 
 export const createWebsite = (req: Website.WebSiteCreateReq) => {

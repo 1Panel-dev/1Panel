@@ -27,7 +27,7 @@ func (b *BaseApi) CreateBackup(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Backup Account

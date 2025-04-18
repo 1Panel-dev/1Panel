@@ -264,6 +264,14 @@ export const Patterns = [
         value: 'regex',
         hidden: ['Method'],
     },
+    {
+        label: i18n.global.t('xpack.waf.belongToIpGroup'),
+        value: 'belongToIpGroup',
+    },
+    {
+        label: i18n.global.t('xpack.waf.notBelongToIpGroup'),
+        value: 'notBelongToIpGroup',
+    },
 ];
 
 export const HttpCodes = [
@@ -276,12 +284,24 @@ export const HttpCodes = [
         value: 403,
     },
     {
+        label: i18n.global.t('xpack.waf.notFound'),
+        value: 404,
+    },
+    {
         label: i18n.global.t('xpack.waf.noRes'),
         value: 444,
     },
     {
         label: i18n.global.t('xpack.waf.serverErr'),
         value: 500,
+    },
+    {
+        label: i18n.global.t('xpack.waf.serviceUnavailable'),
+        value: 503,
+    },
+    {
+        label: i18n.global.t('xpack.waf.gatewayTimeout'),
+        value: 504,
     },
 ];
 

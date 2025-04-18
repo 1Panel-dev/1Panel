@@ -22,7 +22,7 @@ func (b *BaseApi) CheckBackupUsed(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 func (b *BaseApi) SyncBackupAccount(c *gin.Context) {
@@ -36,7 +36,7 @@ func (b *BaseApi) SyncBackupAccount(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Backup Account
@@ -58,7 +58,7 @@ func (b *BaseApi) CreateBackup(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Backup Account
@@ -78,7 +78,7 @@ func (b *BaseApi) RefreshToken(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Backup Account
@@ -122,7 +122,7 @@ func (b *BaseApi) DeleteBackup(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Backup Account
@@ -144,7 +144,7 @@ func (b *BaseApi) UpdateBackup(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Backup Account
@@ -321,7 +321,7 @@ func (b *BaseApi) UpdateRecordDescription(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Backup Account
@@ -343,7 +343,7 @@ func (b *BaseApi) DeleteBackupRecord(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Backup Account
@@ -406,7 +406,7 @@ func (b *BaseApi) Backup(c *gin.Context) {
 			return
 		}
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Backup Account
@@ -461,7 +461,7 @@ func (b *BaseApi) Recover(c *gin.Context) {
 			return
 		}
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Backup Account
@@ -501,5 +501,5 @@ func (b *BaseApi) RecoverByUpload(c *gin.Context) {
 			return
 		}
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }

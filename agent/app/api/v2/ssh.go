@@ -40,7 +40,7 @@ func (b *BaseApi) OperateSSH(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags SSH
@@ -62,7 +62,7 @@ func (b *BaseApi) UpdateSSH(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags SSH
@@ -84,7 +84,7 @@ func (b *BaseApi) UpdateSSHByfile(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags SSH
@@ -106,7 +106,7 @@ func (b *BaseApi) GenerateSSH(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags SSH

@@ -46,7 +46,7 @@ func SuccessWithData(ctx *gin.Context, data interface{}) {
 	ctx.Abort()
 }
 
-func SuccessWithOutData(ctx *gin.Context) {
+func Success(ctx *gin.Context) {
 	res := dto.Response{
 		Code:    http.StatusOK,
 		Message: "success",

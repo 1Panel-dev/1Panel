@@ -35,7 +35,7 @@ func (b *BaseApi) CreateDatabase(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Database
@@ -194,7 +194,7 @@ func (b *BaseApi) DeleteDatabase(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Database
@@ -224,5 +224,5 @@ func (b *BaseApi) UpdateDatabase(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }

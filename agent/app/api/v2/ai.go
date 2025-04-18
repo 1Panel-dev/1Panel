@@ -160,7 +160,7 @@ func (b *BaseApi) DeleteOllamaModel(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags AI
@@ -211,7 +211,7 @@ func (b *BaseApi) BindDomain(c *gin.Context) {
 		helper.BadRequest(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags AI
@@ -252,5 +252,5 @@ func (b *BaseApi) UpdateBindDomain(c *gin.Context) {
 		helper.BadRequest(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }

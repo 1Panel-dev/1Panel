@@ -2040,6 +2040,8 @@ const message = {
             'Antes de instalar um pacote de loja de aplicativos personalizado, certifique-se de que não há aplicativos instalados.',
         forceUninstall: 'Desinstalação Forçada',
         syncCustomApp: 'Sincronizar Aplicativo Personalizado',
+        ignoreAll: 'Ignorar todas as versões subsequentes',
+        ignoreVersion: 'Ignorar versão especificada',
     },
     website: {
         primaryDomain: 'Domínio principal',
@@ -2942,6 +2944,11 @@ const message = {
             strictHelper: 'Usa regras mais rigorosas para validar solicitações',
             saveLog: 'Salvar log',
             remoteURLHelper: 'O URL remoto precisa garantir um IP por linha e nenhum outro caractere',
+            notFound: 'Not Found (404)',
+            serviceUnavailable: 'Serviço Indisponível (503)',
+            gatewayTimeout: 'Tempo Limite da Porta de Entrada (504)',
+            belongToIpGroup: 'Pertence ao Grupo de IP',
+            notBelongToIpGroup: 'Não pertence ao Grupo de IP',
         },
         monitor: {
             name: 'Monitoramento de Websites',

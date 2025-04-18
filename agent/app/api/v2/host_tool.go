@@ -47,7 +47,7 @@ func (b *BaseApi) InitToolConfig(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Host tool
@@ -69,7 +69,7 @@ func (b *BaseApi) OperateTool(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Host tool
@@ -137,7 +137,7 @@ func (b *BaseApi) OperateProcess(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Host tool

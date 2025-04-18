@@ -25,7 +25,7 @@ func (b *BaseApi) CreateClam(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Clam
@@ -47,7 +47,7 @@ func (b *BaseApi) UpdateClam(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Clam
@@ -69,7 +69,7 @@ func (b *BaseApi) UpdateClamStatus(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Clam
@@ -135,7 +135,7 @@ func (b *BaseApi) OperateClam(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Clam
@@ -157,7 +157,7 @@ func (b *BaseApi) CleanClamRecord(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Clam
@@ -249,7 +249,7 @@ func (b *BaseApi) UpdateFile(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Clam
@@ -271,7 +271,7 @@ func (b *BaseApi) DeleteClam(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Clam
@@ -293,5 +293,5 @@ func (b *BaseApi) HandleClamScan(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }

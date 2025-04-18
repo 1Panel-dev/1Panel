@@ -77,7 +77,7 @@ func (b *BaseApi) UpdateDaemonJson(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Container Docker
@@ -100,7 +100,7 @@ func (b *BaseApi) UpdateLogOption(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Container Docker
@@ -123,7 +123,7 @@ func (b *BaseApi) UpdateIpv6Option(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Container Docker
@@ -146,7 +146,7 @@ func (b *BaseApi) UpdateDaemonJsonByFile(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Container Docker
@@ -169,5 +169,5 @@ func (b *BaseApi) OperateDocker(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }

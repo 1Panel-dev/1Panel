@@ -72,7 +72,7 @@ func (b *BaseApi) DeleteRuntime(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website
@@ -114,7 +114,7 @@ func (b *BaseApi) UpdateRuntime(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Runtime
@@ -179,7 +179,7 @@ func (b *BaseApi) OperateRuntime(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Runtime
@@ -221,7 +221,7 @@ func (b *BaseApi) OperateNodeModules(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Runtime
@@ -236,7 +236,7 @@ func (b *BaseApi) SyncStatus(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Runtime
@@ -279,7 +279,7 @@ func (b *BaseApi) InstallPHPExtension(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Runtime
@@ -300,7 +300,7 @@ func (b *BaseApi) UnInstallPHPExtension(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Runtime
@@ -343,7 +343,7 @@ func (b *BaseApi) UpdatePHPConfig(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Runtime
@@ -364,7 +364,7 @@ func (b *BaseApi) UpdatePHPFile(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Runtime
@@ -405,7 +405,7 @@ func (b *BaseApi) UpdateFPMConfig(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Runtime
@@ -470,7 +470,7 @@ func (b *BaseApi) OperateSupervisorProcess(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Runtime

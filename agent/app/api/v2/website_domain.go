@@ -24,7 +24,7 @@ func (b *BaseApi) DeleteWebDomain(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website Domain
@@ -89,5 +89,5 @@ func (b *BaseApi) UpdateWebDomain(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }

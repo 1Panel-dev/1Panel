@@ -82,7 +82,7 @@ func (b *BaseApi) UpdateDeviceByFile(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Device
@@ -120,7 +120,7 @@ func (b *BaseApi) UpdateDeviceConf(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Device
@@ -141,7 +141,7 @@ func (b *BaseApi) UpdateDeviceHost(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Device
@@ -170,7 +170,7 @@ func (b *BaseApi) UpdateDevicePasswd(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Device
@@ -192,7 +192,7 @@ func (b *BaseApi) UpdateDeviceSwap(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Device
@@ -246,5 +246,5 @@ func (b *BaseApi) SystemClean(c *gin.Context) {
 
 	deviceService.Clean(req)
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }

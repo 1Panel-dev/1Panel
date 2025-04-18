@@ -12,5 +12,4 @@ type AppDetail struct {
 	DownloadUrl         string `json:"downloadUrl"`
 	DownloadCallBackUrl string `json:"downloadCallBackUrl"`
 	Update              bool   `json:"update"`
-	IgnoreUpgrade       bool   `json:"ignoreUpgrade"`
 }

@@ -58,7 +58,7 @@
                 <span class="input-help" v-if="ssl.provider === 'dnsManual'">
                     {{ $t('ssl.dnsMauanlHelper') }}
                 </span>
-                <span class="input-help" v-if="ssl.provider === 'http'">
+                <span class="input-help text-red-500" v-if="ssl.provider === 'http'">
                     {{ $t('ssl.httpHelper') }}
                 </span>
                 <span class="input-help text-red-500" v-if="ssl.provider === 'http'">

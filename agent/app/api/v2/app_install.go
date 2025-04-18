@@ -158,7 +158,7 @@ func (b *BaseApi) SyncInstalled(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags App
@@ -179,7 +179,7 @@ func (b *BaseApi) OperateInstalled(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags App
@@ -239,7 +239,7 @@ func (b *BaseApi) ChangeAppPort(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags App
@@ -304,28 +304,7 @@ func (b *BaseApi) UpdateInstalled(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
-}
-
-// @Tags App
-// @Summary ignore App Update
-// @Accept json
-// @Param request body request.AppInstalledIgnoreUpgrade true "request"
-// @Success 200
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /apps/installed/ignore [post]
-// @x-panel-log {"bodyKeys":["installId"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"忽略应用 [installId] 版本升级","formatEN":"Application param update [installId]"}
-func (b *BaseApi) IgnoreUpgrade(c *gin.Context) {
-	var req request.AppInstalledIgnoreUpgrade
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-	if err := appInstallService.IgnoreUpgrade(req); err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags App
@@ -346,5 +325,5 @@ func (b *BaseApi) UpdateAppConfig(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }

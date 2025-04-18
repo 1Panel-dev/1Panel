@@ -34,5 +34,5 @@ func (b *BaseApi) StopProcess(c *gin.Context) {
 		helper.BadRequest(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }

@@ -52,7 +52,7 @@ export namespace App {
     }
 
     export interface AppDetail extends CommonModel {
-        appId: string;
+        appId: number;
         icon: string;
         version: string;
         readme: string;
@@ -132,7 +132,7 @@ export namespace App {
 
     export interface AppInstalled extends CommonModel {
         name: string;
-        appId: number;
+        appID: number;
         appDetailId: string;
         env: string;
         status: string;
@@ -270,6 +270,16 @@ export namespace App {
     export interface AppUpdateVersionReq {
         appInstallID: number;
         updateVersion?: string;
+    }
+
+    export interface AppIgnoreReq {
+        appID: number;
+        appDetailID: number;
+        scope: string;
+    }
+
+    export interface CancelAppIgnore {
+        id: number;
     }
 
     export interface AppStoreSync {

@@ -69,7 +69,7 @@ func (b *BaseApi) OperateFtp(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags FTP
@@ -125,7 +125,7 @@ func (b *BaseApi) CreateFtp(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags FTP
@@ -147,7 +147,7 @@ func (b *BaseApi) DeleteFtp(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags FTP
@@ -164,7 +164,7 @@ func (b *BaseApi) SyncFtp(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags FTP
@@ -194,5 +194,5 @@ func (b *BaseApi) UpdateFtp(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }

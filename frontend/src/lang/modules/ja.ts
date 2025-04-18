@@ -1994,6 +1994,8 @@ const message = {
             'カスタムアプリストアパッケージをインストールする前に、インストールされているアプリがないことを確認してください。',
         forceUninstall: '強制アンインストール',
         syncCustomApp: 'カスタムアプリを同期',
+        ignoreAll: '後続のすべてのバージョンを無視',
+        ignoreVersion: '指定されたバージョンを無視',
     },
     website: {
         primaryDomain: 'プライマリドメイン',
@@ -2876,6 +2878,11 @@ const message = {
             strictHelper: 'より厳格なルールを使用してリクエストを検証します',
             saveLog: 'ログを保存',
             remoteURLHelper: 'リモート URL は、1行に1つのIPで、他の文字がないことを保証する必要があります',
+            notFound: 'Not Found (404)',
+            serviceUnavailable: 'サービスを利用できません (503)',
+            gatewayTimeout: 'ゲートウェイタイムアウト (504)',
+            belongToIpGroup: 'IP グループに属しています',
+            notBelongToIpGroup: 'IP グループに属していません',
         },
         monitor: {
             name: 'ウェブサイトモニタリング',

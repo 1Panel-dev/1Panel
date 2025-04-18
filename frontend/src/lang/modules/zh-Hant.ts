@@ -1936,6 +1936,8 @@ const message = {
         customAppHelper: '在安裝自訂應用商店包之前，請確保沒有任何已安裝的應用。',
         forceUninstall: '強制卸載',
         syncCustomApp: '同步自訂應用',
+        ignoreAll: '忽略後續所有版本',
+        ignoreVersion: '忽略指定版本',
     },
     website: {
         primaryDomain: '主域名',
@@ -2796,6 +2798,11 @@ const message = {
             strictHelper: '使用更嚴格的規則來校驗請求',
             saveLog: '保存日誌',
             remoteURLHelper: '遠程 URL 需要保證每行一個 IP 並且沒有其他字符',
+            notFound: 'Not Found (404)',
+            serviceUnavailable: '服務不可用 (503)',
+            gatewayTimeout: '網關超時 (504)',
+            belongToIpGroup: '屬於 IP 組',
+            notBelongToIpGroup: '不屬於 IP 組',
         },
         monitor: {
             name: '網站監控',

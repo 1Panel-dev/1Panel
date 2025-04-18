@@ -58,7 +58,7 @@ func (b *BaseApi) SyncApp(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags App
@@ -74,7 +74,7 @@ func (b *BaseApi) SyncLocalApp(c *gin.Context) {
 		return
 	}
 	go appService.SyncAppListFromLocal(req.TaskID)
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags App
@@ -148,22 +148,6 @@ func (b *BaseApi) GetAppDetailByID(c *gin.Context) {
 }
 
 // @Tags App
-// @Summary Get Ignore App
-// @Accept json
-// @Success 200 {array} response.IgnoredApp
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /apps/ignored [get]
-func (b *BaseApi) GetIgnoredApp(c *gin.Context) {
-	res, err := appService.GetIgnoredApp()
-	if err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-	helper.SuccessWithData(c, res)
-}
-
-// @Tags App
 // @Summary Install app
 // @Accept json
 // @Param request body request.AppInstallCreate true "request"
@@ -227,7 +211,7 @@ func (b *BaseApi) UpdateAppstoreConfig(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags App

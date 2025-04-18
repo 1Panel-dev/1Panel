@@ -25,7 +25,7 @@ func (b *BaseApi) CreateComposeTemplate(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Container Compose-template
@@ -91,7 +91,7 @@ func (b *BaseApi) DeleteComposeTemplate(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Container Compose-template
@@ -116,5 +116,5 @@ func (b *BaseApi) UpdateComposeTemplate(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }

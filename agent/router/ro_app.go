@@ -22,6 +22,7 @@ func (a *AppRouter) InitRouter(Router *gin.RouterGroup) {
 		appRouter.GET("/details/:id", baseApi.GetAppDetailByID)
 		appRouter.POST("/install", baseApi.InstallApp)
 		appRouter.GET("/tags", baseApi.GetAppTags)
+
 		appRouter.POST("/installed/check", baseApi.CheckAppInstalled)
 		appRouter.POST("/installed/loadport", baseApi.LoadPort)
 		appRouter.POST("/installed/conninfo", baseApi.LoadConnInfo)
@@ -35,11 +36,13 @@ func (a *AppRouter) InitRouter(Router *gin.RouterGroup) {
 		appRouter.POST("/installed/conf", baseApi.GetDefaultConfig)
 		appRouter.GET("/installed/params/:appInstallId", baseApi.GetParams)
 		appRouter.POST("/installed/params/update", baseApi.UpdateInstalled)
-		appRouter.POST("/installed/ignore", baseApi.IgnoreUpgrade)
-		appRouter.GET("/ignored/detail", baseApi.GetIgnoredApp)
 		appRouter.POST("/installed/update/versions", baseApi.GetUpdateVersions)
 		appRouter.POST("/installed/config/update", baseApi.UpdateAppConfig)
 		appRouter.POST("/store/update", baseApi.UpdateAppstoreConfig)
 		appRouter.GET("/store/config", baseApi.GetAppstoreConfig)
+
+		appRouter.POST("/installed/ignore", baseApi.IgnoreAppUpgrade)
+		appRouter.GET("/ignored/detail", baseApi.ListAppIgnored)
+		appRouter.POST("/ignored/cancel", baseApi.CancelIgnoreAppUpgrade)
 	}
 }

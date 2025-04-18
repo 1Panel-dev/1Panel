@@ -66,7 +66,7 @@ func (b *BaseApi) OperateFail2Ban(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Fail2ban
@@ -87,7 +87,7 @@ func (b *BaseApi) OperateSSHD(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Fail2ban
@@ -109,7 +109,7 @@ func (b *BaseApi) UpdateFail2BanConf(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Fail2ban
@@ -148,5 +148,5 @@ func (b *BaseApi) UpdateFail2BanConfByFile(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }

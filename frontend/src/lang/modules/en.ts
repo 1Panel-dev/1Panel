@@ -2091,6 +2091,8 @@ const message = {
             'Before installing a custom app store package, please ensure that there are no installed apps.',
         forceUninstall: 'Force Uninstall',
         syncCustomApp: 'Sync Custom App',
+        ignoreAll: 'Ignore all subsequent versions',
+        ignoreVersion: 'Ignore specified version',
     },
     website: {
         primaryDomain: 'Primary Domain',
@@ -3016,6 +3018,11 @@ const message = {
             strictHelper: 'Use stricter rules to validate requests',
             saveLog: 'Save Log',
             remoteURLHelper: 'The remote URL needs to ensure one IP per line and no other characters',
+            notFound: 'Not Found (404)',
+            serviceUnavailable: 'Service Unavailable (503)',
+            gatewayTimeout: 'Gateway Timeout (504)',
+            belongToIpGroup: 'Belongs to IP Group',
+            notBelongToIpGroup: 'Does not belong to IP Group',
         },
         monitor: {
             name: 'Website Monitoring',

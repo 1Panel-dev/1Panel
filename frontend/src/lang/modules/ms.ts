@@ -2048,6 +2048,8 @@ const message = {
             'Sebelum memasang pakej kedai aplikasi tersuai, sila pastikan tidak ada aplikasi yang dipasang.',
         forceUninstall: 'Paksa Nyahpasang',
         syncCustomApp: 'Segerakan Aplikasi Tersuai',
+        ignoreAll: 'Abaikan semua versi berikutnya',
+        ignoreVersion: 'Abaikan versi yang ditentukan',
     },
     website: {
         primaryDomain: 'Domain Utama',
@@ -2941,6 +2943,11 @@ const message = {
             strictHelper: 'Gunakan peraturan yang lebih ketat untuk mengesahkan permintaan',
             saveLog: 'Simpan Log',
             remoteURLHelper: 'URL jauh perlu memastikan satu IP setiap baris dan tiada aksara lain',
+            notFound: 'Not Found (404)',
+            serviceUnavailable: 'Perkhidmatan Tidak Tersedia (503)',
+            gatewayTimeout: 'Timeout Gateway (504)',
+            belongToIpGroup: 'Tergolong dalam Kumpulan IP',
+            notBelongToIpGroup: 'Tidak tergolong dalam Kumpulan IP',
         },
         monitor: {
             name: 'Pemantauan Laman Web',

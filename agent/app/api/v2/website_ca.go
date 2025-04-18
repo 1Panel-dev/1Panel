@@ -96,7 +96,7 @@ func (b *BaseApi) DeleteWebsiteCA(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website CA
@@ -144,7 +144,7 @@ func (b *BaseApi) RenewWebsiteCA(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithOutData(c)
+	helper.Success(c)
 }
 
 // @Tags Website CA

@@ -59,6 +59,7 @@ var AddTable = &gormigrate.Migration{
 			&model.WebsiteDomain{},
 			&model.WebsiteSSL{},
 			&model.Group{},
+			&model.AppIgnoreUpgrade{},
 		)
 	},
 }
@@ -316,6 +317,16 @@ var AddLocalSSHSetting = &gormigrate.Migration{
 	ID: "20250417-add-local-ssh-setting",
 	Migrate: func(tx *gorm.DB) error {
 		if err := tx.Create(&model.Setting{Key: "LocalSSHConn", Value: ""}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var AddAppIgnore = &gormigrate.Migration{
+	ID: "20250408-add-app-ignore",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.AppIgnoreUpgrade{}); err != nil {
 			return err
 		}
 		return nil
