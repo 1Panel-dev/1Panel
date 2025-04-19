@@ -38,7 +38,7 @@
 - **Application Store**: 1Panel curates a wide range of high-quality open-source tools and applications, facilitating easy installation and updates for its users.
 - **Security and Reliability**: By leveraging containerization and secure application deployment practices, 1Panel minimizes vulnerability exposure. It further enhances security through integrated firewall management and log auditing capabilities.
 - **One-Click Backup & Restore**: Data protection is made simple with 1Panel's one-click backup and restore functionality, supporting various cloud storage solutions to ensure data integrity and availability.
-- **MCP Server**：1Panel MCP Server allow user to execute server operations via natural language.
+- **MCP Server**: [1Panel MCP Server](https://github.com/1Panel-dev/mcp-1panel) allow user to execute server operations via natural language.
 
 ## Quick Start
 
