@@ -71,7 +71,12 @@ func snapPanel(snap snapHelper, targetDir string) {
 	if _, err := cmd.Execf("cp -r %s/lang %s", binDir, targetDir); err != nil {
 		status = err.Error()
 	}
-	if err := common.CopyFile(servicePath, targetDir); err != nil {
+	initScriptDir := path.Join(constant.DataDir, "initscript")
+	if err := common.CopyFile(servicePath, initScriptDir); err != nil {
+		status = err.Error()
+	}
+	global.LOG.Debugf("from %s copy init script to %s", initScriptDir, path.Join(targetDir, "initscript"))
+	if err := common.CopyDirs(initScriptDir, path.Join(targetDir, "initscript")); err != nil { // copy init script to targetDir
 		status = err.Error()
 	}
 	snap.Status.Panel = status
