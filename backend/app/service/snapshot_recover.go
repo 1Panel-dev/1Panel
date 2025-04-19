@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path"
-	"path/filepath"
 	"strings"
 	"sync"
 
@@ -101,10 +100,6 @@ func (u *SnapshotService) HandleSnapshotRecover(snap model.Snapshot, isRecover b
 
 	if req.IsNew || snap.InterruptStep == "1PanelBinary" {
 		binDir := systemctl.BinaryPath
-		// if err != nil {
-		// 	updateRecoverStatus(snap.ID, isRecover, "GetBinaryPath", constant.StatusFailed, fmt.Sprintf("get binary path failed: %v", err))
-		// 	return
-		// }
 		if err := recoverPanel(path.Join(snapFileDir, "1panel/1panel"), binDir); err != nil {
 			updateRecoverStatus(snap.ID, isRecover, "1PanelBinary", constant.StatusFailed, err.Error())
 			return
@@ -114,10 +109,6 @@ func (u *SnapshotService) HandleSnapshotRecover(snap model.Snapshot, isRecover b
 	}
 	if req.IsNew || snap.InterruptStep == "1PctlBinary" {
 		binDir := systemctl.BinaryPath
-		// if err != nil {
-		// 	updateRecoverStatus(snap.ID, isRecover, "GetBinaryPath", constant.StatusFailed, fmt.Sprintf("get binary path failed: %v", err))
-		// 	return
-		// }
 		if err := recoverPanel(path.Join(snapFileDir, "1panel/1pctl"), binDir); err != nil {
 			updateRecoverStatus(snap.ID, isRecover, "1PctlBinary", constant.StatusFailed, err.Error())
 			return
@@ -136,11 +127,13 @@ func (u *SnapshotService) HandleSnapshotRecover(snap model.Snapshot, isRecover b
 	}
 	if req.IsNew || snap.InterruptStep == "1PanelService" {
 		servicePath, err := h.GetServicePath()
+		currentServiceName := h.GetServiceName()
 		if err != nil {
 			updateRecoverStatus(snap.ID, isRecover, "GetServicePath", constant.StatusFailed, fmt.Sprintf("get service path failed: %v", err))
 			return
 		}
-		if err := recoverPanel(path.Join(snapFileDir, "1panel/"+filepath.Base(servicePath)), filepath.Dir(servicePath)); err != nil {
+		global.LOG.Debugf("current service path: %s", servicePath)
+		if err := common.CopyFile(selectInitScript(path.Join(snapFileDir, "1panel/initscript"), currentServiceName), servicePath); err != nil {
 			updateRecoverStatus(snap.ID, isRecover, "1PanelService", constant.StatusFailed, err.Error())
 			return
 		}
