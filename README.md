@@ -1,5 +1,5 @@
 <p align="center"><a href="https://1panel.pro"><img src="https://resource.1panel.pro/img/1panel-logo.png" alt="1Panel" width="300" /></a></p>
-<p align="center"><b>Top-Rated Web-based Linux Server Management Tool</b>新一代的 Linux 服务器运维管理面板</p>
+<p align="center"><b>Top-Rated Web-based Linux Server Management Tool</b></p>
 <p align="center">
   <a href="https://trendshift.io/repositories/2462" target="_blank"><img src="https://trendshift.io/api/badge/repositories/2462" alt="1Panel-dev%2F1Panel | Trendshift" style="width: 240px; height: auto;" /></a>
 </p>
