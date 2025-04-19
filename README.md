@@ -31,7 +31,7 @@
 
 ------------------------------
 
-1Panel is an open-source, modern web-based control panel for Linux server management.
+1Panel provides an intuitive web interface and MCP Server to manage websites, files, containers, databases, and LLMs on a Linux server.
 
 - **Efficient Management**: Through a user-friendly web graphical interface, 1Panel enables users to effortlessly manage their Linux servers. Key features include host monitoring, file management, database administration, container management, LLMs management.
 - **Rapid Website Deployment**: With deep integration of the popular open-source website building software WordPress, 1Panel streamlines the process of domain binding and SSL certificate configuration, all achievable with just one click.
