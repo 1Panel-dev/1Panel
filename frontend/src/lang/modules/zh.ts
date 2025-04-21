@@ -1928,6 +1928,8 @@ const message = {
         syncCustomApp: '同步自定义应用',
         ignoreAll: '忽略后续所有版本',
         ignoreVersion: '忽略指定版本',
+        specifyIP: '绑定主机 IP',
+        specifyIPHelper: '设置端口绑定的主机地址，一般为本机 IP',
     },
     website: {
         primaryDomain: '主域名',

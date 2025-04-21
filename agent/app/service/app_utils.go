@@ -1690,7 +1690,7 @@ func addDockerComposeCommonParam(composeMap map[string]interface{}, serviceName 
 	if portExist {
 		allowHost := "127.0.0.1"
 		if req.Advanced && req.AllowPort {
-			allowHost = ""
+			allowHost = req.SpecifyIP
 		}
 		params[constant.HostIP] = allowHost
 	}
@@ -1703,6 +1703,7 @@ func getAppCommonConfig(envs map[string]interface{}) request.AppContainerConfig 
 
 	if hostIp, ok := envs[constant.HostIP]; ok {
 		config.AllowPort = hostIp.(string) != "127.0.0.1"
+		config.SpecifyIP = hostIp.(string)
 	} else {
 		config.AllowPort = true
 	}

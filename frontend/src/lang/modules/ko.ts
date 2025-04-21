@@ -1964,6 +1964,8 @@ const message = {
         syncCustomApp: 'カスタムアプリを同期',
         ignoreAll: '후속 모든 버전 무시',
         ignoreVersion: '지정된 버전 무시',
+        specifyIP: '호스트 IP 바인딩',
+        specifyIPHelper: '포트 바인딩을 위한 호스트 주소를 설정합니다. 일반적으로 로컬 머신의 IP입니다',
     },
     website: {
         primaryDomain: '기본 도메인',

@@ -615,6 +615,20 @@ export function checkMaxLength(maxLength: number): FormItemRule {
     };
 }
 
+const checkIpv4orV6 = (rule: any, value: any, callback: any) => {
+    if (value === '' || value == null) {
+        return callback();
+    }
+
+    const ipv4 = /^(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}$/;
+    const ipv6 = /^((?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}|(?:[A-Fa-f0-9]{1,4}:){1,7}:|:(?::[A-Fa-f0-9]{1,4}){1,7})$/;
+
+    if (!ipv4.test(value) && !ipv6.test(value)) {
+        return callback(new Error(i18n.global.t('commons.rule.ip')));
+    }
+    callback();
+};
+
 interface CommonRule {
     requiredInput: FormItemRule;
     requiredSelect: FormItemRule;
@@ -655,6 +669,7 @@ interface CommonRule {
     supervisorName: FormItemRule;
     domainOrIP: FormItemRule;
     authBasicPassword: FormItemRule;
+    ipv4orV6: FormItemRule;
 
     paramCommon: FormItemRule;
     paramComplexity: FormItemRule;
@@ -900,6 +915,10 @@ export const Rules: CommonRule = {
     },
     authBasicPassword: {
         validator: checkAuthBasicPassword,
+        trigger: 'blur',
+    },
+    ipv4orV6: {
+        validator: checkIpv4orV6,
         trigger: 'blur',
     },
 };

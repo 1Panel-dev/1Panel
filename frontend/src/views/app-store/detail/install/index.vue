@@ -56,6 +56,10 @@
                     <el-checkbox v-model="req.allowPort" :label="$t('app.allowPort')" size="large" />
                     <span class="input-help">{{ $t('app.allowPortHelper') }}</span>
                 </el-form-item>
+                <el-form-item :label="$t('app.specifyIP')" v-if="req.allowPort" prop="specifyIP">
+                    <el-input v-model="req.specifyIP"></el-input>
+                    <span class="input-help">{{ $t('app.specifyIPHelper') }}</span>
+                </el-form-item>
                 <el-form-item
                     :label="$t('container.cpuQuota')"
                     prop="cpuQuota"
@@ -153,6 +157,7 @@ const rules = ref<FormRules>({
     containerName: [Rules.containerName],
     cpuQuota: [Rules.requiredInput, checkNumberRange(0, 99999)],
     memoryLimit: [Rules.requiredInput, checkNumberRange(0, 9999999999)],
+    specifyIP: [Rules.ipv4orV6],
 });
 const loading = ref(false);
 const paramForm = ref<FormInstance>();
@@ -174,6 +179,7 @@ const initData = () => ({
     pullImage: true,
     taskID: '',
     gpuConfig: false,
+    specifyIP: '',
 });
 const req = reactive(initData());
 const limits = ref<Container.ResourceLimit>({

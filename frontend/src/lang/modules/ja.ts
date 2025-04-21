@@ -1996,6 +1996,8 @@ const message = {
         syncCustomApp: 'カスタムアプリを同期',
         ignoreAll: '後続のすべてのバージョンを無視',
         ignoreVersion: '指定されたバージョンを無視',
+        specifyIP: 'ホスト IP をバインド',
+        specifyIPHelper: 'ポートにバインドするホストアドレスを設定します、通常はローカルマシンの IP です',
     },
     website: {
         primaryDomain: 'プライマリドメイン',

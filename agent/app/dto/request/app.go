@@ -39,6 +39,7 @@ type AppContainerConfig struct {
 	GpuConfig     bool    `json:"gpuConfig"`
 	WebUI         string  `json:"webUI"`
 	Type          string  `json:"type"`
+	SpecifyIP     string  `json:"specifyIP"`
 }
 
 type AppInstalledSearch struct {

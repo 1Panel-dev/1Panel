@@ -2050,6 +2050,8 @@ const message = {
         syncCustomApp: 'Segerakan Aplikasi Tersuai',
         ignoreAll: 'Abaikan semua versi berikutnya',
         ignoreVersion: 'Abaikan versi yang ditentukan',
+        specifyIP: 'Bind IP Hos',
+        specifyIPHelper: 'Tetapkan alamat hos untuk mengikat port, biasanya IP mesin tempatan',
     },
     website: {
         primaryDomain: 'Domain Utama',

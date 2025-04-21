@@ -75,6 +75,10 @@
                         <el-checkbox v-model="paramModel.allowPort" :label="$t('app.allowPort')" size="large" />
                         <span class="input-help">{{ $t('app.allowPortHelper') }}</span>
                     </el-form-item>
+                    <el-form-item :label="$t('app.specifyIP')" v-if="paramModel.allowPort" prop="specifyIP">
+                        <el-input v-model="paramModel.specifyIP"></el-input>
+                        <span class="input-help">{{ $t('app.specifyIPHelper') }}</span>
+                    </el-form-item>
                     <el-form-item :label="$t('container.cpuQuota')" prop="cpuQuota">
                         <el-input type="number" class="!w-2/5" v-model.number="paramModel.cpuQuota" maxlength="5">
                             <template #append>{{ $t('app.cpuCore') }}</template>
@@ -221,6 +225,7 @@ const get = async () => {
         paramModel.value.advanced = false;
         paramModel.value.dockerCompose = res.data.dockerCompose;
         paramModel.value.isHostMode = res.data.hostMode;
+        paramModel.value.specifyIP = res.data.specifyIP;
         appConfigUpdate.value.webUI = res.data.webUI;
         appType.value = res.data.type;
     } catch (error) {

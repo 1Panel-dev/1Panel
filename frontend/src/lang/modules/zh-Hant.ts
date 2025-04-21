@@ -1938,6 +1938,8 @@ const message = {
         syncCustomApp: '同步自訂應用',
         ignoreAll: '忽略後續所有版本',
         ignoreVersion: '忽略指定版本',
+        specifyIP: '綁定主機 IP',
+        specifyIPHelper: '設置端口綁定的主機地址，一般為本機 IP',
     },
     website: {
         primaryDomain: '主域名',

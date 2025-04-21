@@ -259,6 +259,7 @@ export namespace App {
         hostMode?: boolean;
         type: string;
         webUI: string;
+        specifyIP: string;
     }
 
     export interface IgnoredApp {

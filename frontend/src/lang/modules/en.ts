@@ -2093,6 +2093,8 @@ const message = {
         syncCustomApp: 'Sync Custom App',
         ignoreAll: 'Ignore all subsequent versions',
         ignoreVersion: 'Ignore specified version',
+        specifyIP: 'Bind Host IP',
+        specifyIPHelper: 'Set the host address to bind the port, usually the local machine IP',
     },
     website: {
         primaryDomain: 'Primary Domain',

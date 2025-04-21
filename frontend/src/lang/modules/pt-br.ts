@@ -2042,6 +2042,8 @@ const message = {
         syncCustomApp: 'Sincronizar Aplicativo Personalizado',
         ignoreAll: 'Ignorar todas as versões subsequentes',
         ignoreVersion: 'Ignorar versão especificada',
+        specifyIP: 'Vincular IP do Host',
+        specifyIPHelper: 'Defina o endereço do host para vincular a porta, geralmente o IP da máquina local',
     },
     website: {
         primaryDomain: 'Domínio principal',
