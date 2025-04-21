@@ -179,7 +179,7 @@
                     :data="data"
                     @search="search"
                     @sort-change="changeSort"
-                    :heightDiff="350"
+                    :heightDiff="300"
                 >
                     <el-table-column type="selection" width="30" />
                     <el-table-column

@@ -42,6 +42,7 @@
                     v-loading="loading"
                     :columns="columns"
                     localKey="sslColumn"
+                    :height-diff="260"
                 >
                     <el-table-column type="selection" width="30" />
                     <el-table-column

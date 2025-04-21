@@ -37,7 +37,7 @@
                     @sort-change="changeSort"
                     @filter-change="changeFilter"
                     ref="tableRef"
-                    :heightDiff="300"
+                    :heightDiff="220"
                 >
                     <el-table-column :label="$t('commons.table.type')" fix prop="type"></el-table-column>
                     <el-table-column :label="'PID'" fix prop="PID" max-width="60px" sortable></el-table-column>

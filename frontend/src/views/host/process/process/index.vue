@@ -37,42 +37,43 @@
                     @sort-change="changeSort"
                     @filter-change="changeFilter"
                     ref="tableRef"
-                    :heightDiff="300"
+                    :heightDiff="220"
                 >
-                    <el-table-column :label="'PID'" fix prop="PID" max-width="60px" sortable></el-table-column>
-                    <el-table-column
-                        :label="$t('commons.table.name')"
-                        fix
-                        prop="name"
-                        min-width="120px"
-                    ></el-table-column>
+                    <el-table-column :label="'PID'" prop="PID" max-width="60px" sortable></el-table-column>
+                    <el-table-column :label="$t('commons.table.name')" prop="name" min-width="120px"></el-table-column>
                     <el-table-column
                         :label="$t('process.ppid')"
-                        min-width="120px"
-                        fix
+                        max-width="60px"
                         prop="PPID"
                         sortable
                     ></el-table-column>
-                    <el-table-column :label="$t('process.numThreads')" fix prop="numThreads"></el-table-column>
-                    <el-table-column :label="$t('commons.table.user')" fix prop="username"></el-table-column>
+                    <el-table-column
+                        :label="$t('process.numThreads')"
+                        max-width="60px"
+                        prop="numThreads"
+                    ></el-table-column>
+                    <el-table-column
+                        :label="$t('commons.table.user')"
+                        max-width="60px"
+                        prop="username"
+                    ></el-table-column>
                     <el-table-column
                         :label="'CPU'"
-                        fix
+                        max-width="60px"
                         prop="cpuValue"
                         :formatter="cpuFormatter"
                         sortable
                     ></el-table-column>
                     <el-table-column
                         :label="$t('process.memory')"
-                        fix
+                        max-width="60px"
                         prop="rssValue"
                         :formatter="memFormatter"
                         sortable
                     ></el-table-column>
-                    <el-table-column :label="$t('process.numConnections')" fix prop="numConnections"></el-table-column>
+                    <el-table-column :label="$t('process.numConnections')" prop="numConnections"></el-table-column>
                     <el-table-column
                         :label="$t('commons.table.status')"
-                        fix
                         prop="status"
                         column-key="status"
                         :filters="[
@@ -93,7 +94,6 @@
                     </el-table-column>
                     <el-table-column
                         :label="$t('process.startTime')"
-                        fix
                         prop="startTime"
                         min-width="140px"
                     ></el-table-column>

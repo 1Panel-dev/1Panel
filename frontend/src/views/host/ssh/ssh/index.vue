@@ -39,7 +39,7 @@
 
         <LayoutContent>
             <template #main>
-                <MainDiv :heightDiff="3200">
+                <MainDiv :heightDiff="320">
                     <el-radio-group v-model="confShowType" @change="changeMode">
                         <el-radio-button value="base">{{ $t('database.baseConf') }}</el-radio-button>
                         <el-radio-button value="all">{{ $t('database.allConf') }}</el-radio-button>

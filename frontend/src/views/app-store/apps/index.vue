@@ -77,7 +77,7 @@
         </template>
         <template #main>
             <div>
-                <MainDiv :heightDiff="350">
+                <MainDiv :heightDiff="300">
                     <el-alert type="info" :title="$t('app.appHelper')" :closable="false" />
                     <el-row :gutter="5">
                         <el-col

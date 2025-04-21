@@ -29,7 +29,7 @@
                 </el-button>
             </template>
             <template #main>
-                <MainDiv :heightDiff="320">
+                <MainDiv :heightDiff="260">
                     <Basic :website="website" v-if="index === 'basic'" :heightDiff="320"></Basic>
                     <Log :id="id" v-if="index === 'log'"></Log>
                     <Resource :id="id" v-if="index === 'resource'"></Resource>

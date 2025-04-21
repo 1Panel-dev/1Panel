@@ -77,7 +77,7 @@
                     @sort-change="changeSort"
                     @search="search()"
                     :class="{ mask: nginxStatus != 'Running' }"
-                    :heightDiff="370"
+                    :heightDiff="310"
                     :columns="columns"
                     localKey="websiteColumn"
                 >

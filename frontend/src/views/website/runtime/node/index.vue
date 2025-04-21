@@ -21,7 +21,7 @@
                 <TableSetting title="node-runtime-refresh" @search="search()" />
             </template>
             <template #main>
-                <ComplexTable :pagination-config="paginationConfig" :data="items" @search="search()" :heightDiff="350">
+                <ComplexTable :pagination-config="paginationConfig" :data="items" @search="search()" :heightDiff="260">
                     <el-table-column
                         :label="$t('commons.table.name')"
                         fix

@@ -62,7 +62,7 @@
         </template>
         <template #main>
             <div>
-                <MainDiv :heightDiff="mode === 'upgrade' ? 320 : 350">
+                <MainDiv :heightDiff="mode === 'upgrade' ? 270 : 300">
                     <el-alert
                         type="info"
                         :title="$t('app.upgradeHelper')"
