@@ -132,19 +132,20 @@ type AppForm struct {
 }
 
 type AppFormFields struct {
-	Type     string         `json:"type"`
-	LabelZh  string         `json:"labelZh"`
-	LabelEn  string         `json:"labelEn"`
-	Label    Locale         `json:"label"`
-	Required bool           `json:"required"`
-	Default  interface{}    `json:"default"`
-	EnvKey   string         `json:"envKey"`
-	Disabled bool           `json:"disabled"`
-	Edit     bool           `json:"edit"`
-	Rule     string         `json:"rule"`
-	Multiple bool           `json:"multiple"`
-	Child    interface{}    `json:"child"`
-	Values   []AppFormValue `json:"values"`
+	Type        string         `json:"type"`
+	LabelZh     string         `json:"labelZh"`
+	LabelEn     string         `json:"labelEn"`
+	Label       Locale         `json:"label"`
+	Description Locale         `json:"description"`
+	Required    bool           `json:"required"`
+	Default     interface{}    `json:"default"`
+	EnvKey      string         `json:"envKey"`
+	Disabled    bool           `json:"disabled"`
+	Edit        bool           `json:"edit"`
+	Rule        string         `json:"rule"`
+	Multiple    bool           `json:"multiple"`
+	Child       interface{}    `json:"child"`
+	Values      []AppFormValue `json:"values"`
 }
 
 type AppFormValue struct {

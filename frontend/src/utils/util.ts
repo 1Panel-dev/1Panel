@@ -666,6 +666,15 @@ export function getLabel(row: any) {
     }
 }
 
+export function getDescription(row: any) {
+    const language = localStorage.getItem('lang') || 'zh';
+    let lang = language == 'tw' ? 'zh-Hant' : language;
+    if (row.description && row.description[lang] != '') {
+        return row.description[lang];
+    }
+    return '';
+}
+
 export function emptyLineFilter(str: string, spilt: string) {
     let list = str.split(spilt);
     let results = [];

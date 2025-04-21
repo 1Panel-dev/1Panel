@@ -92,6 +92,7 @@ export namespace App {
         multiple?: boolean;
         allowCreate?: boolean;
         label: Locale;
+        description: Locale;
     }
 
     export interface FromFieldChild extends FromField {

@@ -116,6 +116,7 @@
                     </span>
                 </el-col>
             </el-row>
+            <span class="input-help" v-if="p.description">{{ getDescription(p) }}</span>
         </el-form-item>
     </div>
 </template>
@@ -125,7 +126,7 @@ import { getRandomStr } from '@/utils/util';
 import { getAppService } from '@/api/modules/app';
 import { Rules } from '@/global/form-rules';
 import { App } from '@/api/interface/app';
-import { getDBName, getLabel } from '@/utils/util';
+import { getDBName, getLabel, getDescription } from '@/utils/util';
 import { getPathByType } from '@/api/modules/files';
 
 interface ParamObj extends App.FromField {
