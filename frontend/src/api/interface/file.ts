@@ -206,4 +206,13 @@ export namespace File {
         group: string;
         sub: boolean;
     }
+
+    export interface UserGroupResponse {
+        users: UserInfo[];
+        groups: string[];
+    }
+    export interface UserInfo {
+        username: string;
+        group: string;
+    }
 }

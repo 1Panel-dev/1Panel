@@ -251,3 +251,49 @@ var upGrader = websocket.Upgrader{
 		return true
 	},
 }
+
+func (b *BaseApi) HandleLocalTerminal(c *gin.Context) {
+	wsConn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
+	if err != nil {
+		global.LOG.Errorf("websocket upgrade failed: %v", err)
+		return
+	}
+	defer wsConn.Close()
+
+	if global.CONF.Base.IsDemo {
+		if wshandleError(wsConn, errors.New("demo server, prohibit this operation!")) {
+			return
+		}
+	}
+
+	cols, err := strconv.Atoi(c.DefaultQuery("cols", "80"))
+	if wshandleError(wsConn, errors.WithMessage(err, "invalid param cols")) {
+		return
+	}
+	rows, err := strconv.Atoi(c.DefaultQuery("rows", "40"))
+	if wshandleError(wsConn, errors.WithMessage(err, "invalid param rows")) {
+		return
+	}
+
+	cwd := c.DefaultQuery("cwd", "/")
+	initCmd := c.DefaultQuery("cmd", "")
+
+	slave, err := terminal.NewLocalTerminalInDir(cwd, initCmd)
+	if wshandleError(wsConn, err) {
+		return
+	}
+	defer slave.Close()
+
+	tty, err := terminal.NewLocalWsSession(cols, rows, wsConn, slave, false)
+	if wshandleError(wsConn, err) {
+		return
+	}
+
+	quitChan := make(chan bool, 3)
+	tty.Start(quitChan)
+	go slave.Wait(quitChan)
+
+	<-quitChan
+
+	global.LOG.Infof("local terminal session finished")
+}

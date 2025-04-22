@@ -1,8 +1,11 @@
 package terminal
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"strings"
 	"syscall"
 	"time"
 	"unsafe"
@@ -49,6 +52,53 @@ func NewCommand(name string, arg ...string) (*LocalCommand, error) {
 	}
 
 	return lcmd, nil
+}
+
+func NewLocalTerminalInDir(cwd string, initCmd string) (*LocalCommand, error) {
+	cmd := exec.Command("bash", "--noprofile", "--norc")
+
+	if initCmd == "" {
+		initCmd = `export PS1="\u@\h:\w\$ " && clear`
+	}
+
+	if cwd != "" {
+		absPath, err := filepath.Abs(cwd)
+		if err != nil {
+			return nil, fmt.Errorf("invalid directory path: %s", cwd)
+		}
+
+		forbiddenDirs := []string{"/etc", "/root", "/boot", "/proc", "/sys"}
+		for _, forbid := range forbiddenDirs {
+			if strings.HasPrefix(absPath, forbid) {
+				return nil, fmt.Errorf("access to directory '%s' is not allowed", absPath)
+			}
+		}
+
+		cmd.Dir = absPath
+	}
+
+	term := os.Getenv("TERM")
+	if term == "" {
+		term = "xterm"
+	}
+	cmd.Env = append(os.Environ(), "TERM="+term)
+
+	ptyFile, err := pty.Start(cmd)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to start terminal")
+	}
+
+	if initCmd != "" {
+		time.Sleep(100 * time.Millisecond)
+		_, _ = ptyFile.Write([]byte(initCmd + "\n"))
+	}
+
+	return &LocalCommand{
+		closeSignal:  DefaultCloseSignal,
+		closeTimeout: DefaultCloseTimeout,
+		cmd:          cmd,
+		pty:          ptyFile,
+	}, nil
 }
 
 func (lcmd *LocalCommand) Read(p []byte) (n int, err error) {

@@ -842,3 +842,31 @@ func (b *BaseApi) GetPathByType(c *gin.Context) {
 	resPath := fileService.GetPathByType(pathType)
 	helper.SuccessWithData(c, resPath)
 }
+
+// @Tags File
+// @Summary system mount
+// @Accept json
+// @Success 200 {object} dto.DiskInfo
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /mount [post]
+func (b *BaseApi) GetHostMount(c *gin.Context) {
+	disks := fileService.GetHostMount()
+	helper.SuccessWithData(c, disks)
+}
+
+// @Tags File
+// @Summary system user and group
+// @Accept json
+// @Success 200 {object} response.UserGroupResponse
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /user/group [post]
+func (b *BaseApi) GetUsersAndGroups(c *gin.Context) {
+	res, err := fileService.GetUsersAndGroups()
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}
