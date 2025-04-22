@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
 	"syscall"
 	"time"
 	"unsafe"
@@ -55,7 +54,18 @@ func NewCommand(name string, arg ...string) (*LocalCommand, error) {
 }
 
 func NewLocalTerminalInDir(cwd string, initCmd string) (*LocalCommand, error) {
-	cmd := exec.Command("bash", "--noprofile", "--norc")
+	shellPath, err := getSafeShellPath()
+	if err != nil {
+		return nil, fmt.Errorf("failed to find safe shell: %w", err)
+	}
+	var cmd *exec.Cmd
+
+	switch shellPath {
+	case "bash", "zsh":
+		cmd = exec.Command(shellPath, "--noprofile", "--norc")
+	default:
+		cmd = exec.Command(shellPath)
+	}
 
 	if initCmd == "" {
 		initCmd = `export PS1="\u@\h:\w\$ " && clear`
@@ -66,14 +76,6 @@ func NewLocalTerminalInDir(cwd string, initCmd string) (*LocalCommand, error) {
 		if err != nil {
 			return nil, fmt.Errorf("invalid directory path: %s", cwd)
 		}
-
-		forbiddenDirs := []string{"/etc", "/root", "/boot", "/proc", "/sys"}
-		for _, forbid := range forbiddenDirs {
-			if strings.HasPrefix(absPath, forbid) {
-				return nil, fmt.Errorf("access to directory '%s' is not allowed", absPath)
-			}
-		}
-
 		cmd.Dir = absPath
 	}
 
@@ -148,4 +150,23 @@ func (lcmd *LocalCommand) Wait(quitChan chan bool) {
 		setQuit(quitChan)
 	}
 	setQuit(quitChan)
+}
+
+func getSafeShellPath() (string, error) {
+	allowedShells := []string{"/bin/bash", "/usr/bin/bash", "/bin/zsh", "/usr/bin/zsh", "/bin/sh", "/usr/bin/sh"}
+
+	for _, path := range allowedShells {
+		if stat, err := os.Stat(path); err == nil && !stat.IsDir() {
+			return path, nil
+		}
+	}
+
+	fallbacks := []string{"sh", "bash", "zsh"}
+	for _, name := range fallbacks {
+		if fullPath, err := exec.LookPath(name); err == nil {
+			return fullPath, nil
+		}
+	}
+
+	return "", errors.New("no compatible shell found (bash/zsh/sh)")
 }
