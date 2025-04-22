@@ -4,6 +4,7 @@ import { AxiosRequestConfig } from 'axios';
 import { ResPage } from '../interface';
 import { TimeoutEnum } from '@/enums/http-enum';
 import { ReqPage } from '@/api/interface';
+import { Dashboard } from '@/api/interface/dashboard';
 
 export const getFilesList = (params: File.ReqFile) => {
     return http.post<File.File>('files/search', params, TimeoutEnum.T_5M);
@@ -143,4 +144,12 @@ export const getRecycleStatusByNode = (node: string) => {
 
 export const getPathByType = (pathType: string) => {
     return http.get<string>(`files/path/${pathType}`);
+};
+
+export const searchHostMount = () => {
+    return http.post<Dashboard.DiskInfo[]>(`/files/mount`);
+};
+
+export const searchUserGroup = () => {
+    return http.post<File.UserGroupResponse>(`/files/user/group`);
 };

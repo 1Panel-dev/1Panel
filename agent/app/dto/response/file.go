@@ -54,3 +54,13 @@ type ExistFileInfo struct {
 	Size    int64     `json:"size"`
 	ModTime time.Time `json:"modTime"`
 }
+
+type UserInfo struct {
+	Username string `json:"username"`
+	Group    string `json:"group"`
+}
+
+type UserGroupResponse struct {
+	Users  []UserInfo `json:"users"`
+	Groups []string   `json:"groups"`
+}

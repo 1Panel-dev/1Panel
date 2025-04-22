@@ -109,6 +109,12 @@ const showBack = computed(() => {
     .el-button + .el-button {
         margin: 0 !important;
     }
+    .el-button-group > .el-button + .el-button {
+        margin-left: 0 !important;
+    }
+    .el-button-group > .el-button:not(:last-child) {
+        margin-right: -1px !important;
+    }
 }
 
 .content-container_form {

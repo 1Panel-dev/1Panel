@@ -4,10 +4,20 @@
             <FileRole :mode="mode" @get-mode="getMode" :key="open.toString()"></FileRole>
             <el-form ref="fileForm" label-position="left" :model="addForm" label-width="100px" :rules="rules">
                 <el-form-item :label="$t('commons.table.user')" prop="user">
-                    <el-input v-model.trim="addForm.user" />
+                    <el-select v-model="addForm.user" @change="handleUserChange" filterable allow-create>
+                        <el-option
+                            v-for="item in users"
+                            :key="item.username"
+                            :label="item.username"
+                            :value="item.username"
+                        />
+                    </el-select>
                 </el-form-item>
+
                 <el-form-item :label="$t('file.group')" prop="group">
-                    <el-input v-model.trim="addForm.group" />
+                    <el-select v-model="addForm.group" filterable allow-create>
+                        <el-option v-for="group in groups" :key="group" :label="group" :value="group" />
+                    </el-select>
                 </el-form-item>
                 <el-form-item>
                     <el-checkbox v-model="addForm.sub">{{ $t('file.containSub') }}</el-checkbox>
@@ -26,7 +36,7 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
 import { File } from '@/api/interface/file';
-import { batchChangeRole } from '@/api/modules/files';
+import { batchChangeRole, searchUserGroup } from '@/api/modules/files';
 import i18n from '@/lang';
 import FileRole from '@/components/file-role/index.vue';
 import { MsgSuccess } from '@/utils/message';
@@ -41,6 +51,8 @@ const open = ref(false);
 const loading = ref(false);
 const mode = ref('0755');
 const files = ref<File.File[]>([]);
+const users = ref<File.UserInfo[]>([]);
+const groups = ref<string[]>([]);
 
 const rules = reactive<FormRules>({
     user: [Rules.requiredInput],
@@ -76,6 +88,23 @@ const acceptParams = (props: BatchRoleProps) => {
     open.value = true;
 };
 
+const getUserAndGroup = async () => {
+    try {
+        const res = await searchUserGroup();
+        users.value = res.data.users;
+        groups.value = res.data.groups;
+    } catch (error) {
+        console.error('Failed to fetch user and group:', error);
+    }
+};
+
+const handleUserChange = (val: string) => {
+    const found = users.value.find((u) => u.username === val);
+    if (found) {
+        addForm.group = found.group;
+    }
+};
+
 const getMode = (val: number) => {
     addForm.mode = val;
 };
@@ -96,6 +125,9 @@ const submit = async () => {
             loading.value = false;
         });
 };
+onMounted(() => {
+    getUserAndGroup();
+});
 
 defineExpose({ acceptParams });
 </script>

@@ -1,13 +1,18 @@
 package service
 
 import (
+	"bufio"
 	"context"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"io"
 	"io/fs"
 	"os"
+	"os/user"
 	"path"
 	"path/filepath"
+	"sort"
+	"strconv"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -55,6 +60,8 @@ type IFileService interface {
 
 	GetPathByType(pathType string) string
 	BatchCheckFiles(req request.FilePathsCheck) []response.ExistFileInfo
+	GetHostMount() []dto.DiskInfo
+	GetUsersAndGroups() (*response.UserGroupResponse, error)
 }
 
 var filteredPaths = []string{
@@ -543,4 +550,102 @@ func (f *FileService) BatchCheckFiles(req request.FilePathsCheck) []response.Exi
 		}
 	}
 	return fileList
+}
+
+func (f *FileService) GetHostMount() []dto.DiskInfo {
+	return loadDiskInfo()
+}
+
+func (f *FileService) GetUsersAndGroups() (*response.UserGroupResponse, error) {
+	groupMap, err := getValidGroups()
+	if err != nil {
+		return nil, err
+	}
+
+	users, groupSet, err := getValidUsers(groupMap)
+	if err != nil {
+		return nil, err
+	}
+
+	var groups []string
+	for group := range groupSet {
+		groups = append(groups, group)
+	}
+	sort.Strings(groups)
+
+	return &response.UserGroupResponse{
+		Users:  users,
+		Groups: groups,
+	}, nil
+}
+
+func getValidGroups() (map[string]bool, error) {
+	groupFile, err := os.Open("/etc/group")
+	if err != nil {
+		return nil, fmt.Errorf("failed to open /etc/group: %w", err)
+	}
+	defer groupFile.Close()
+
+	groupMap := make(map[string]bool)
+	scanner := bufio.NewScanner(groupFile)
+	for scanner.Scan() {
+		parts := strings.Split(scanner.Text(), ":")
+		if len(parts) < 3 {
+			continue
+		}
+		groupName := parts[0]
+		gid, _ := strconv.Atoi(parts[2])
+		if groupName == "root" || gid >= 1000 {
+			groupMap[groupName] = true
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		return nil, fmt.Errorf("failed to scan /etc/group: %w", err)
+	}
+	return groupMap, nil
+}
+
+func getValidUsers(validGroups map[string]bool) ([]response.UserInfo, map[string]struct{}, error) {
+	passwdFile, err := os.Open("/etc/passwd")
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to open /etc/passwd: %w", err)
+	}
+	defer passwdFile.Close()
+
+	var users []response.UserInfo
+	groupSet := make(map[string]struct{})
+	scanner := bufio.NewScanner(passwdFile)
+	for scanner.Scan() {
+		parts := strings.Split(scanner.Text(), ":")
+		if len(parts) < 4 {
+			continue
+		}
+
+		username := parts[0]
+		uid, _ := strconv.Atoi(parts[2])
+		gid := parts[3]
+
+		if username != "root" && uid < 1000 {
+			continue
+		}
+
+		groupName := gid
+		if g, err := user.LookupGroupId(gid); err == nil {
+			groupName = g.Name
+		}
+
+		if !validGroups[groupName] {
+			continue
+		}
+
+		users = append(users, response.UserInfo{
+			Username: username,
+			Group:    groupName,
+		})
+		groupSet[groupName] = struct{}{}
+	}
+	if err := scanner.Err(); err != nil {
+		return nil, nil, fmt.Errorf("failed to scan /etc/passwd: %w", err)
+	}
+	return users, groupSet, nil
 }

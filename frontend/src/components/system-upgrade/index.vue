@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="flex w-full flex-col gap-2 md:flex-row items-center">
-            <div class="flex flex-wrap items-center" v-if="props.footer">
+            <div class="flex flex-wrap gap-y-2 items-center" v-if="props.footer">
                 <el-link type="primary" :underline="false" @click="toForum">
                     <span class="font-normal">{{ $t('setting.forum') }}</span>
                 </el-link>
@@ -14,31 +14,22 @@
                     <span class="font-normal">{{ $t('setting.project') }}</span>
                 </el-link>
                 <el-divider direction="vertical" />
-            </div>
-            <div class="flex flex-wrap items-center">
-                <el-link :underline="false" class="-ml-2" type="primary" @click="toLxware">
-                    {{ $t(!isMasterProductPro ? 'license.community' : 'license.pro') }}
-                </el-link>
-                <el-link :underline="false" class="version" type="primary" @click="copyText(version)">
-                    {{ version }}
-                </el-link>
-                <el-badge is-dot class="-mt-0.5" v-if="version !== 'Waiting' && globalStore.hasNewVersion">
-                    <el-link class="ml-2" :underline="false" type="primary" @click="onLoadUpgradeInfo">
-                        {{ $t('commons.button.update') }}
+                <div class="flex flex-wrap items-center">
+                    <el-link :underline="false" type="primary" @click="toLxware">
+                        {{ $t(!isMasterProductPro ? 'license.community' : 'license.pro') }}
                     </el-link>
-                </el-badge>
-                <el-link
-                    v-if="version !== 'Waiting' && !globalStore.hasNewVersion"
-                    type="primary"
-                    :underline="false"
-                    class="ml-2"
-                    @click="onLoadUpgradeInfo"
-                >
-                    {{ $t('commons.button.update') }}
-                </el-link>
-                <el-tag v-if="version === 'Waiting'" round class="ml-2.5">
-                    {{ $t('setting.upgrading') }}
-                </el-tag>
+                    <el-link :underline="false" class="version" type="primary" @click="copyText(version)">
+                        {{ version }}
+                    </el-link>
+                    <el-badge is-dot class="-mt-0.5" :hidden="version !== 'Waiting' && globalStore.hasNewVersion">
+                        <el-link class="ml-2" :underline="false" type="primary" @click="onLoadUpgradeInfo">
+                            {{ $t('commons.button.update') }}
+                        </el-link>
+                    </el-badge>
+                    <el-tag v-if="version === 'Waiting'" round class="ml-2.5">
+                        {{ $t('setting.upgrading') }}
+                    </el-tag>
+                </div>
             </div>
         </div>
 

@@ -30,7 +30,7 @@
                     :page-sizes="[5, 10, 20, 50, 100]"
                     @size-change="sizeChange"
                     @current-change="currentChange"
-                    :small="mobile || paginationConfig.small"
+                    :size="mobile || paginationConfig.small ? 'small' : 'default'"
                     :layout="mobile ? 'total, prev, pager, next' : 'total, sizes, prev, pager, next, jumper'"
                 />
             </slot>

@@ -46,7 +46,8 @@ func (b *BaseApi) WsSSH(c *gin.Context) {
 		return
 	}
 	defer client.Close()
-	sws, err := terminal.NewLogicSshWsSession(cols, rows, client.Client, wsConn, "")
+	command := c.DefaultQuery("command", "")
+	sws, err := terminal.NewLogicSshWsSession(cols, rows, client.Client, wsConn, command)
 	if wshandleError(wsConn, err) {
 		return
 	}
