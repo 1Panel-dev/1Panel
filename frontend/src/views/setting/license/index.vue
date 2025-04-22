@@ -6,6 +6,9 @@
                     {{ $t('commons.button.add') }}
                 </el-button>
             </template>
+            <template #prompt>
+                <el-alert type="info" :title="$t('license.licenseAlert')" :closable="false" />
+            </template>
             <template #rightToolBar>
                 <TableRefresh @search="search()" />
                 <TableSetting title="backup-account-refresh" @search="search()" />
@@ -36,32 +39,21 @@
                             <span v-else>-</span>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('setting.bindNode')">
+                    <el-table-column :label="$t('setting.bindNode')" :min-width="120">
                         <template #default="{ row }">
-                            <span v-if="row.freeCount !== 0 && (row.status === 'Free' || row.status === 'Exceptional')">
-                                -
-                            </span>
-                            <div v-else>
-                                <span v-if="row.freeCount === 0">{{ row.bindNode || '-' }}</span>
-                                <div v-else>
-                                    <el-popover
-                                        placement="bottom"
-                                        :width="120"
-                                        trigger="hover"
-                                        v-if="row.freeNodes && row.freeNodes.length != 0"
-                                    >
-                                        <div v-for="(item, index) of row.freeNodes" :key="index">
-                                            <el-tag>{{ item.name }}</el-tag>
-                                        </div>
-                                        <template #reference>
-                                            <el-button link type="primary">
-                                                ({{ row.bindCount }} / {{ row.freeCount }})
-                                            </el-button>
-                                        </template>
-                                    </el-popover>
-                                    <span v-else link type="primary">({{ row.bindCount }} / {{ row.freeCount }})</span>
+                            <div v-if="row.status !== 'Free'">
+                                <div>
+                                    {{ $t('license.pro') }}:
+                                    {{ row.bindNode === '127.0.0.1' ? $t('xpack.node.master') : row.bindNode }}
+                                </div>
+                                <div>
+                                    {{ $t('license.oss') }}:
+                                    <el-button class="bind-button" @click="onBindFree(row)" link type="primary">
+                                        {{ row.bindCount }} / {{ row.freeCount }}
+                                    </el-button>
                                 </div>
                             </div>
+                            <span v-else>-</span>
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -82,7 +74,8 @@
         </LayoutContent>
 
         <LicenseImport ref="licenseRef" />
-        <LicenseBind ref="bindRef" />
+        <BindFree ref="bindFreeRef" />
+        <BindXpack ref="bindXpackRef" />
         <OpDialog ref="opRef" @search="search" />
         <OpDialog ref="opRef2" @search="search" @submit="submitUnbind">
             <template #content>
@@ -103,17 +96,19 @@
 import { ref, reactive, onMounted } from 'vue';
 import { deleteLicense, searchLicense, syncLicense, unbindLicense } from '@/api/modules/setting';
 import LicenseImport from '@/components/license-import/index.vue';
-import LicenseBind from '@/views/setting/license/bind/index.vue';
+import BindFree from '@/views/setting/license/bind/free.vue';
+import BindXpack from '@/views/setting/license/bind/xpack.vue';
 import { dateFormat } from '@/utils/util';
 import i18n from '@/lang';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
 import { initFavicon } from '@/utils/xpack';
 
 const globalStore = GlobalStore();
 const loading = ref();
 const licenseRef = ref();
-const bindRef = ref();
+const bindFreeRef = ref();
+const bindXpackRef = ref();
 const opRef = ref();
 const opRef2 = ref();
 const forceUnbind = ref();
@@ -152,7 +147,19 @@ const onSync = async (row: any) => {
         });
 };
 
+const onBindFree = async (row: any) => {
+    bindFreeRef.value.acceptParams({
+        licenseID: row.id,
+        licenseName: row.licenseName,
+        freeNodes: row.freeNodes || [],
+    });
+};
+
 const onUnbind = async (row: any) => {
+    if (row.freeNodes && (row.freeNodes.length > 1 || !row.freeNodes[0].isXpack)) {
+        MsgError(i18n.global.t('license.licenseUnbindHelper'));
+        return;
+    }
     unbindRow.value = row;
     opRef2.value.acceptParams({
         title: i18n.global.t('commons.button.unbind'),
@@ -242,7 +249,7 @@ const buttons = [
             return row.status !== 'Free';
         },
         click: (row: any) => {
-            bindRef.value.acceptParams({ licenseID: row.id, licenseName: row.licenseName });
+            bindXpackRef.value.acceptParams({ licenseID: row.id, licenseName: row.licenseName });
         },
     },
     {
@@ -256,9 +263,6 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.edit'),
-        disabled: (row: any) => {
-            return row.status === 'Free';
-        },
         click: (row: any) => {
             licenseRef.value.acceptParams({ oldLicense: row.licenseName });
         },
@@ -293,3 +297,9 @@ onMounted(() => {
     search();
 });
 </script>
+
+<style lang="scss" scoped>
+.bind-button {
+    margin-top: -2px;
+}
+</style>

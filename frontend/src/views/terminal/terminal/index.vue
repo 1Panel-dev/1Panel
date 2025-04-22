@@ -374,8 +374,10 @@ const onReconnect = async (item: any) => {
             ctx.refs[`t-${item.index}`][0].acceptParams({
                 endpoint: '/api/v2/core/hosts/terminal',
                 args: `id=${item.wsID}`,
+                initCmd: initCmd.value,
                 error: res.data ? '' : 'Failed to set up the connection. Please check the host information',
             });
+        initCmd.value = '';
     });
     syncTerminal();
 };

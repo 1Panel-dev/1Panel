@@ -63,6 +63,8 @@ ErrFreeNodeLimit: "Community version node limit reached, please go to www.lxware
 ErrNodeBound: "This license is bound to another node, please check and retry!"
 ErrNodeBoundDelete: "This license is bound and does not support delete operations. Please check and try again!"
 ErrNodeBoundLimit: "The current free node has reached its limit, please check and try again!"
+ErrLicenseFree: "Free nodes can only be used when the license is properly bound to a node. Please verify and try again!"
+ErrLicenseUnbind: "Community Edition nodes detected for this license. Please unbind in [Panel Settings - License] and try again!"
 ErrNoSuchNode: "Node information not found, please check and retry!"
 ErrNodeUnbind: "This node is not within the license binding range, please check and retry!"
 ErrNodeBind: "This node is already bound to a license, please check and retry!"

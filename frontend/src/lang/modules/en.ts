@@ -301,6 +301,7 @@ const message = {
             uninstalling: 'Uninstalling',
             lost: 'Lost Contact',
             bound: 'Bound',
+            unbind: 'Unbound',
             exceptional: 'Exceptional',
             free: 'Free',
             enable: 'Enabled',
@@ -1880,6 +1881,10 @@ const message = {
         oss: 'Open Source Software',
         pro: 'Pro',
         trial: 'Trial',
+        add: 'Add Community Edition',
+        licenseAlert:
+            'Community Edition nodes can only be added when the license is properly bound to a node. Only nodes properly bound to the license support switching.',
+        licenseUnbindHelper: 'Community Edition nodes detected for this license. Please unbind and try again!',
         subscription: 'Subscription',
         perpetual: 'Perpetual',
         versionConstraint: '{0} Version Buyout',
@@ -3241,6 +3246,11 @@ const message = {
             master: 'Main Node',
             node: 'Node',
             addr: 'Address',
+            nodeUnhealthy: 'Node status abnormal',
+            nodeUnhealthyHelper: 'Abnormal node status detected. Please check in [Node Management] and try again!',
+            nodeUnbind: 'Node not bound to license',
+            nodeUnbindHelper:
+                'Detected that this node is not bound to a license. Please bind it in [Panel Settings - License] menu and try again!',
             memTotal: 'Total Memory',
             nodeManagement: 'Node Management',
             addNode: 'Add Node',
@@ -3275,6 +3285,7 @@ const message = {
                 'When the installation directory is empty, it will be installed in the /opt directory by default',
             nodePort: 'Node Port',
             offline: 'Offline mode',
+            freeCount: 'Free quota [{0}]',
             offlineHelper: 'Used when the node is in an offline environment',
         },
         customApp: {

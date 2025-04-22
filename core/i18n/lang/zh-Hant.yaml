@@ -63,6 +63,8 @@ ErrFreeNodeLimit: "社區版節點數量已達免費上限，請前往 www.lxwar
 ErrNodeBound: "該許可證已綁定到其他節點，請檢查後重試！"
 ErrNodeBoundDelete: "該許可證已被綁定，不支持刪除操作，請檢查後重試！"
 ErrNodeBoundLimit: "當前免費節點已達上限，請檢查後重試！"
+ErrLicenseFree: "僅當許可證正常綁定到節點後，才能使用其免費節點，請檢查後重試！"
+ErrLicenseUnbind: "檢測到該許可證存在社區版節點，請在 [面板設定 - 許可證] 中解除綁定後重試！"
 ErrNoSuchNode: "未能找到該節點信息，請檢查後重試！"
 ErrNodeUnbind: "檢測到該節點未在許可證綁定範圍內，請檢查後重試！"
 ErrNodeBind: "檢測到該節點已綁定許可證，請檢查後重試！"

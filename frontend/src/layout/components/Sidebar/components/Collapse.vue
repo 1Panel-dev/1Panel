@@ -41,9 +41,18 @@
                         :key="item.name"
                     >
                         {{ item.name }}
-                        <el-icon class="icon-status" v-if="item.status !== 'Healthy'" type="danger">
-                            <Warning />
-                        </el-icon>
+                        <el-tooltip
+                            :content="item.isBound ? $t('xpack.node.nodeUnhealthy') : $t('xpack.node.nodeUnbind')"
+                            placement="right"
+                        >
+                            <el-icon
+                                class="icon-status"
+                                v-if="item.status !== 'Healthy' || !item.isBound"
+                                type="danger"
+                            >
+                                <Warning />
+                            </el-icon>
+                        </el-tooltip>
                     </div>
                 </div>
                 <el-divider class="divider" />
@@ -120,16 +129,21 @@ const changeNode = (command: string) => {
     }
     for (const item of nodes.value) {
         if (item.name == command) {
-            if (props.version == item.version) {
-                globalStore.currentNode = command || 'local';
-                globalStore.isOffline = item.isOffline;
-                location.reload();
+            if (!item.isBound) {
+                MsgError(i18n.global.t('xpack.node.nodeUnbindHelper'));
                 return;
             }
-            if (item.version !== props.version) {
+            if (item.status !== 'Healthy') {
+                MsgError(i18n.global.t('xpack.node.nodeUnhealthyHelper'));
+                return;
+            }
+            if (props.version != item.version) {
                 MsgError(i18n.global.t('setting.versionNotSame'));
                 return;
             }
+            globalStore.currentNode = command || 'local';
+            globalStore.isOffline = item.isOffline;
+            location.reload();
         }
     }
 };

@@ -295,6 +295,7 @@ const message = {
             uninstalling: '제거 중',
             lost: '연결 끊김',
             bound: '바인딩됨',
+            unbind: '미바인드',
             exceptional: '예외',
             free: '여유',
             enable: '활성화됨',
@@ -1760,6 +1761,10 @@ const message = {
         oss: '오픈 소스 소프트웨어',
         pro: 'Pro',
         trial: '체험판',
+        add: '커뮤니티 에디션 추가',
+        licenseAlert:
+            '라이선스가 노드에 정상적으로 바인딩된 경우에만 커뮤니티 에디션 노드를 추가할 수 있습니다. 라이선스에 정상적으로 바인딩된 노드만 전환이 지원됩니다.',
+        licenseUnbindHelper: '이 라이선스에 커뮤니티 에디션 노드가 존재합니다. 바인딩 해제 후 다시 시도하세요!',
         subscription: '구독',
         perpetual: '영구 라이선스',
         versionConstraint: '{0} 버전 일시불 구매',
@@ -3048,6 +3053,11 @@ const message = {
             master: '주 노드',
             node: '노드',
             addr: '주소',
+            nodeUnhealthy: '노드 상태 이상',
+            nodeUnhealthyHelper: '노드 상태 이상이 감지되었습니다. [노드 관리]에서 확인 후 다시 시도하세요!',
+            nodeUnbind: '노드가 라이선스에 바인딩되지 않음',
+            nodeUnbindHelper:
+                '이 노드가 라이선스에 바인딩되지 않은 것으로 감지되었습니다. [패널 설정 - 라이선스] 메뉴에서 바인딩 후 다시 시도하세요!',
             memTotal: '총 메모리',
             nodeManagement: '노드 관리',
             addNode: '노드 추가',
@@ -3081,6 +3091,7 @@ const message = {
             baseDirHelper: '설치 디렉토리가 비어 있으면 기본적으로 /opt 디렉토리에 설치됩니다',
             nodePort: '노드 포트',
             offline: '오프라인 모드',
+            freeCount: '무료 할당량 [{0}]',
             offlineHelper: '노드가 오프라인 환경일 때 사용',
         },
         customApp: {

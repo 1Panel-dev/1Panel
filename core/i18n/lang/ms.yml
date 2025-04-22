@@ -63,6 +63,8 @@ ErrFreeNodeLimit: "Jumlah nod versi komuniti telah mencapai had percuma, sila la
 ErrNodeBound: "Lesen ini telah diikat dengan nod lain, sila semak dan cuba lagi!"
 ErrNodeBoundDelete: "Lisensi ini telah diikat dan tidak menyokong operasi penghapusan. Sila semak dan cuba lagi!"
 ErrNodeBoundLimit: "Nod percuma semasa telah mencapai had, sila semak dan cuba lagi!"
+ErrLicenseFree: "Nod percuma hanya boleh digunakan apabila lesen terikat dengan betul pada nod. Sila semak dan cuba lagi!"
+ErrLicenseUnbind: "Nod Edisi Komuniti dikesan untuk lesen ini. Sila lepaskan ikatan dalam [Tetapan Panel - Lesen] dan cuba lagi!"
 ErrNoSuchNode: "Maklumat nod tidak ditemui, sila semak dan cuba lagi!"
 ErrNodeUnbind: "Nod di luar skop lesen dikesan, sila semak dan cuba lagi!"
 ErrNodeBind: "Nod ini telah diikat dengan lesen, sila semak dan cuba lagi!"

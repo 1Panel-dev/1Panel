@@ -301,6 +301,7 @@ const message = {
             uninstalling: 'Menyahpasang',
             lost: 'Hilang',
             bound: 'Terikat',
+            unbind: 'Tidak terikat',
             exceptional: 'Luar biasa',
             free: 'Bebas',
             enable: 'Aktif',
@@ -1845,6 +1846,10 @@ const message = {
         oss: 'Perisian Sumber Terbuka',
         pro: 'Pro',
         trial: 'Percubaan',
+        add: 'Tambah Edisi Komuniti',
+        licenseAlert:
+            'Nod Edisi Komuniti hanya boleh ditambah apabila lesen terikat dengan betul pada nod. Hanya nod yang terikat dengan betul pada lesen menyokong penukaran.',
+        licenseUnbindHelper: 'Nod Edisi Komuniti dikesan untuk lesen ini. Sila lepaskan ikatan dan cuba lagi!',
         subscription: 'Langganan',
         perpetual: 'Lesen Perpetual',
         versionConstraint: '{0} Pembelian versi',
@@ -3169,6 +3174,11 @@ const message = {
             master: 'Nod Utama',
             node: 'Nod',
             addr: 'Alamat',
+            nodeUnhealthy: 'Status nod tidak normal',
+            nodeUnhealthyHelper: 'Status nod tidak normal dikesan. Sila semak dalam [Pengurusan Nod] dan cuba lagi!',
+            nodeUnbind: 'Nod tidak terikat pada lesen',
+            nodeUnbindHelper:
+                'Terdeteksi nod ini tidak terikat pada lesen. Sila ikat dalam menu [Tetapan Panel - Lesen] dan cuba lagi!',
             memTotal: 'Jumlah Memori',
             nodeManagement: 'Pengurusan Nod',
             addNode: 'Tambah Nod',
@@ -3204,6 +3214,7 @@ const message = {
             baseDirHelper: 'Apabila direktori pemasangan kosong, secara lalai akan dipasang di direktori /opt',
             nodePort: 'Port Nod',
             offline: 'Mod luar talian',
+            freeCount: 'Had percuma [{0}]',
             offlineHelper: 'Digunakan apabila nod berada dalam persekitaran luar talian',
         },
         customApp: {

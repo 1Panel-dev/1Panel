@@ -33,8 +33,11 @@ export const bindLicense = (id: number, nodeID: number) => {
 export const unbindLicense = (id: number, force: boolean) => {
     return http.post(`/core/licenses/unbind`, { id: id, force: force }, TimeoutEnum.T_60S);
 };
+export const changeBind = (id: number, nodeIDs: Array<number>) => {
+    return http.post(`/core/licenses/bind/free`, { licenseID: id, nodeIDs: nodeIDs }, TimeoutEnum.T_60S);
+};
 export const loadLicenseOptions = () => {
-    return http.get(`/core/licenses/options`);
+    return http.get<Array<Setting.LicenseOptions>>(`/core/licenses/options`);
 };
 export const listNodeOptions = () => {
     return http.get<Array<Setting.NodeItem>>(`/core/nodes/list`);

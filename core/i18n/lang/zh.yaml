@@ -63,6 +63,8 @@ ErrFreeNodeLimit: "社区版节点数量已达到免费上限，请前往 www.lx
 ErrNodeBound: "该许可证已绑定到其他节点，请检查后重试！"
 ErrNodeBoundDelete: "该许可证已被绑定，不支持删除操作，请检查后重试！"
 ErrNodeBoundLimit: "当前免费节点已经达到上限，请检查后重试！"
+ErrLicenseFree: "仅当许可证正常绑定到节点后，才能使用其免费节点，请检查后重试！"
+ErrLicenseUnbind: "检测到该许可证存在社区版节点，请在 [ 面板设置 - 许可证 ] 中解绑后重试！"
 ErrNoSuchNode: "未能找到该节点信息，请检查后重试！"
 ErrNodeUnbind: "检测到该节点未在许可证绑定范围内，请检查后重试！"
 ErrNodeBind: "检测到该节点已绑定许可证，请检查后重试！"

@@ -299,6 +299,7 @@ const message = {
             uninstalling: 'Desinstalando',
             lost: 'Perdido',
             bound: 'Vinculado',
+            unbind: 'Desvinculado',
             exceptional: 'Excepcional',
             free: 'Livre',
             enable: 'Habilitado',
@@ -1831,6 +1832,11 @@ const message = {
         oss: 'Open Source Software',
         pro: 'Pro',
         trial: 'Teste',
+        add: 'Adicionar Edição Comunitária',
+        licenseAlert:
+            'Nós da Edição Comunitária só podem ser adicionados quando a licença está devidamente vinculada a um nó. Apenas nós devidamente vinculados à licença suportam troca.',
+        licenseUnbindHelper:
+            'Nós da Edição Comunitária detectados para esta licença. Por favor, desvincule e tente novamente!',
         subscription: 'Assinatura',
         perpetual: 'Licença Perpétua',
         versionConstraint: '{0} Compra do versão',
@@ -3173,6 +3179,12 @@ const message = {
             master: 'Nó Principal',
             node: 'Nó',
             addr: 'Endereço',
+            nodeUnhealthy: 'Estado do nó anormal',
+            nodeUnhealthyHelper:
+                'Estado anormal do nó detectado. Por favor verifique em [Gestão de Nós] e tente novamente!',
+            nodeUnbind: 'Nó não vinculado à licença',
+            nodeUnbindHelper:
+                'Detectamos que este nó não está vinculado a uma licença. Por favor vincule no menu [Configurações do Painel - Licença] e tente novamente!',
             memTotal: 'Memória Total',
             nodeManagement: 'Gerenciamento de Nó',
             addNode: 'Adicionar Nó',
@@ -3207,6 +3219,7 @@ const message = {
             baseDirHelper: 'Quando o diretório de instalação está vazio, será instalado por padrão no diretório /opt',
             nodePort: 'Porta do Nó',
             offline: 'Modo offline',
+            freeCount: 'Cota gratuita [{0}]',
             offlineHelper: 'Usado quando o nó está em ambiente offline',
         },
         customApp: {

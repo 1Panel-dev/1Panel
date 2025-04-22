@@ -216,6 +216,13 @@ export namespace Setting {
         smsUsed: number;
         smsTotal: number;
     }
+    export interface LicenseOptions {
+        id: number;
+        licenseName: string;
+        totalFreeCount: number;
+        availableXpackCount: number;
+        availableFreeCount: number;
+    }
     export interface LicenseStatus {
         productPro: string;
         status: string;
@@ -227,5 +234,7 @@ export namespace Setting {
         addr: string;
         status: string;
         version: string;
+        isXpack: boolean;
+        isBound: boolean;
     }
 }

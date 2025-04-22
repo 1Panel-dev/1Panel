@@ -63,6 +63,8 @@ ErrFreeNodeLimit: "O número de nós da versão comunitária atingiu o limite gr
 ErrNodeBound: "Esta licença já está vinculada a outro nó, por favor verifique e tente novamente!"
 ErrNodeBoundDelete: "Esta licença está vinculada e não suporta operações de exclusão. Por favor, verifique e tente novamente!"
 ErrNodeBoundLimit: "O nó gratuito atual atingiu seu limite, por favor verifique e tente novamente!"
+ErrLicenseFree: "Nós gratuitos só podem ser usados quando a licença está devidamente vinculada a um nó. Por favor verifique e tente novamente!"
+ErrLicenseUnbind: "Nós da Edição Comunitária detectados para esta licença. Por favor desvincule em [Configurações do Painel - Licença] e tente novamente!"
 ErrNoSuchNode: "As informações deste nó não foram encontradas, por favor verifique e tente novamente!"
 ErrNodeUnbind: "Nó fora do escopo da licença detectado, por favor verifique e tente novamente!"
 ErrNodeBind: "Este nó já está vinculado a uma licença, por favor verifique e tente novamente!"

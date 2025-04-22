@@ -293,6 +293,7 @@ const message = {
             uninstalling: 'アンインストール中',
             lost: '接続失効',
             bound: 'バインド済み',
+            unbind: '未バインド',
             exceptional: '異常',
             free: '空き',
             enable: '有効',
@@ -1787,6 +1788,11 @@ const message = {
         oss: '無料',
         pro: '専門',
         trial: '体験',
+        add: 'コミュニティ版を追加',
+        licenseAlert:
+            'ライセンスがノードに正常にバインドされている場合のみ、コミュニティ版ノードを追加できます。ライセンスに正常にバインドされているノードのみ切り替えがサポートされます。',
+        licenseUnbindHelper:
+            'このライセンスにコミュニティ版ノードが存在します。バインドを解除してから再試行してください！',
         subscription: 'サブスクリプション',
         perpetual: '永久ライセンス',
         versionConstraint: '{0} バージョン買い取り',
@@ -3099,6 +3105,11 @@ const message = {
             master: '主ノード',
             node: 'ノード',
             addr: 'アドレス',
+            nodeUnhealthy: 'ノード状態異常',
+            nodeUnhealthyHelper: 'ノード状態異常を検出しました。[ノード管理]で確認してから再試行してください！',
+            nodeUnbind: 'ノードがライセンスにバインドされていません',
+            nodeUnbindHelper:
+                'このノードがライセンスにバインドされていないことを検出しました。[パネル設定 - ライセンス]メニューでバインドしてから再試行してください！',
             memTotal: '総メモリ',
             nodeManagement: 'ノード管理',
             addNode: 'ノードを追加',
@@ -3133,6 +3144,7 @@ const message = {
             baseDirHelper: 'インストールディレクトリが空の場合、デフォルトで/optディレクトリにインストールされます',
             nodePort: 'ノードポート',
             offline: 'オフラインモード',
+            freeCount: '無料枠 [{0}]',
             offlineHelper: 'ノードがオフライン環境にある場合に使用',
         },
         customApp: {
