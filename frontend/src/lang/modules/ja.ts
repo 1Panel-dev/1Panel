@@ -1997,7 +1997,8 @@ const message = {
         ignoreAll: '後続のすべてのバージョンを無視',
         ignoreVersion: '指定されたバージョンを無視',
         specifyIP: 'ホスト IP をバインド',
-        specifyIPHelper: 'ポートにバインドするホストアドレスを設定します、通常はローカルマシンの IP です',
+        specifyIPHelper:
+            'ポートにバインドするホストアドレス/ネットワークインターフェースを設定します（この機能がわからない場合は、入力しないでください）',
     },
     website: {
         primaryDomain: 'プライマリドメイン',

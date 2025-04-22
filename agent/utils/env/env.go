@@ -10,7 +10,7 @@ import (
 )
 
 func Write(envMap map[string]string, filename string) error {
-	content, err := Marshal(envMap)
+	content, err := marshal(envMap)
 	if err != nil {
 		return err
 	}
@@ -26,10 +26,10 @@ func Write(envMap map[string]string, filename string) error {
 	return file.Sync()
 }
 
-func Marshal(envMap map[string]string) (string, error) {
+func marshal(envMap map[string]string) (string, error) {
 	lines := make([]string, 0, len(envMap))
 	for k, v := range envMap {
-		if d, err := strconv.Atoi(v); err == nil {
+		if d, err := strconv.Atoi(v); err == nil && !isStartWithZero(v) {
 			lines = append(lines, fmt.Sprintf(`%s=%d`, k, d))
 		} else {
 			lines = append(lines, fmt.Sprintf(`%s="%s"`, k, v))
@@ -49,4 +49,11 @@ func GetEnvValueByKey(envPath, key string) (string, error) {
 		return "", fmt.Errorf("key %s not found in %s", key, envPath)
 	}
 	return value, nil
+}
+
+func isStartWithZero(value string) bool {
+	if strings.HasPrefix(value, "0") && len(value) > 1 {
+		return true
+	}
+	return false
 }

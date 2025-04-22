@@ -2094,7 +2094,8 @@ const message = {
         ignoreAll: 'Ignore all subsequent versions',
         ignoreVersion: 'Ignore specified version',
         specifyIP: 'Bind Host IP',
-        specifyIPHelper: 'Set the host address to bind the port, usually the local machine IP',
+        specifyIPHelper:
+            'Set the host address/network interface to bind the port (if you are not sure about this, please do not fill it in)',
     },
     website: {
         primaryDomain: 'Primary Domain',

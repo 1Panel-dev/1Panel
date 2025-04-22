@@ -1939,7 +1939,7 @@ const message = {
         ignoreAll: '忽略後續所有版本',
         ignoreVersion: '忽略指定版本',
         specifyIP: '綁定主機 IP',
-        specifyIPHelper: '設置端口綁定的主機地址，一般為本機 IP',
+        specifyIPHelper: '設置端口綁定的主機地址/網卡（如果你不清楚這個的作用，請不要填寫）',
     },
     website: {
         primaryDomain: '主域名',

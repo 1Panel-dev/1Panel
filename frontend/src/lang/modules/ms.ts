@@ -2051,7 +2051,8 @@ const message = {
         ignoreAll: 'Abaikan semua versi berikutnya',
         ignoreVersion: 'Abaikan versi yang ditentukan',
         specifyIP: 'Bind IP Hos',
-        specifyIPHelper: 'Tetapkan alamat hos untuk mengikat port, biasanya IP mesin tempatan',
+        specifyIPHelper:
+            'Tetapkan alamat hos/antara muka rangkaian untuk mengikat port (jika anda tidak pasti mengenai ini, jangan isi)',
     },
     website: {
         primaryDomain: 'Domain Utama',

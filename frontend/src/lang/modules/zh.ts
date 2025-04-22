@@ -1929,7 +1929,7 @@ const message = {
         ignoreAll: '忽略后续所有版本',
         ignoreVersion: '忽略指定版本',
         specifyIP: '绑定主机 IP',
-        specifyIPHelper: '设置端口绑定的主机地址，一般为本机 IP',
+        specifyIPHelper: '设置端口绑定的主机地址/网卡（如果你不清楚这个的作用，请不要填写）',
     },
     website: {
         primaryDomain: '主域名',

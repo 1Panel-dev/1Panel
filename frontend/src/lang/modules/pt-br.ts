@@ -2043,7 +2043,8 @@ const message = {
         ignoreAll: 'Ignorar todas as versões subsequentes',
         ignoreVersion: 'Ignorar versão especificada',
         specifyIP: 'Vincular IP do Host',
-        specifyIPHelper: 'Defina o endereço do host para vincular a porta, geralmente o IP da máquina local',
+        specifyIPHelper:
+            'Defina o endereço do host/interface de rede para vincular a porta (se você não tiver certeza sobre isso, por favor, não preencha)',
     },
     website: {
         primaryDomain: 'Domínio principal',

@@ -1965,7 +1965,8 @@ const message = {
         ignoreAll: '후속 모든 버전 무시',
         ignoreVersion: '지정된 버전 무시',
         specifyIP: '호스트 IP 바인딩',
-        specifyIPHelper: '포트 바인딩을 위한 호스트 주소를 설정합니다. 일반적으로 로컬 머신의 IP입니다',
+        specifyIPHelper:
+            '포트 바인딩을 위한 호스트 주소/네트워크 인터페이스를 설정합니다 (이 기능을 잘 모를 경우, 입력하지 마십시오)',
     },
     website: {
         primaryDomain: '기본 도메인',

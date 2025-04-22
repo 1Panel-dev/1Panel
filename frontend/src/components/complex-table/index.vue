@@ -51,7 +51,7 @@ const props = defineProps({
     },
     heightDiff: {
         type: Number,
-        default: 0,
+        default: 320,
     },
     height: {
         type: Number,
