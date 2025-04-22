@@ -93,7 +93,9 @@ const getUserAndGroup = async () => {
         const res = await searchUserGroup();
         users.value = res.data.users;
         groups.value = res.data.groups;
-    } catch (error) {}
+    } catch (error) {
+        console.error('Failed to fetch user and group:', error);
+    }
 };
 
 const handleUserChange = (val: string) => {

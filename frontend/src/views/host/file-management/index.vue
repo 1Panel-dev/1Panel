@@ -49,7 +49,11 @@
                                                     :content="hidePath.name"
                                                     placement="bottom"
                                                 >
-                                                    {{ truncateText(hidePath.name, 20) }}
+                                                    {{
+                                                        hidePath.name.length > 25
+                                                            ? hidePath.name.substring(0, 22) + '...'
+                                                            : hidePath.name
+                                                    }}
                                                 </el-tooltip>
                                             </el-dropdown-item>
                                         </el-dropdown-menu>
@@ -61,7 +65,7 @@
                                         class="path-segment cursor-pointer mr-2 pathname"
                                         @click.stop="jump(path.url)"
                                     >
-                                        {{ truncateText(path.name, 20) }}
+                                        {{ path.name.length > 25 ? path.name.substring(0, 22) + '...' : path.name }}
                                     </el-link>
                                 </el-tooltip>
                             </template>
@@ -71,7 +75,7 @@
                                         class="path-segment cursor-pointer mr-2 pathname"
                                         @click.stop="jump(path.url)"
                                     >
-                                        {{ truncateText(path.name, 20) }}
+                                        {{ path.name.length > 25 ? path.name.substring(0, 22) + '...' : path.name }}
                                     </el-link>
                                 </el-tooltip>
                             </template>
@@ -120,7 +124,11 @@
                                                     :content="hidePath.name"
                                                     placement="bottom"
                                                 >
-                                                    {{ truncateText(hidePath.name, 20) }}
+                                                    {{
+                                                        hidePath.name.length > 25
+                                                            ? hidePath.name.substring(0, 22) + '...'
+                                                            : hidePath.name
+                                                    }}
                                                 </el-tooltip>
                                             </el-dropdown-item>
                                         </el-dropdown-menu>
@@ -132,7 +140,7 @@
                                         class="path-segment cursor-pointer mr-2 pathname"
                                         @click.stop="jump(path.url)"
                                     >
-                                        {{ truncateText(path.name, 20) }}
+                                        {{ path.name.length > 25 ? path.name.substring(0, 22) + '...' : path.name }}
                                     </el-link>
                                 </el-tooltip>
                             </template>
@@ -709,24 +717,6 @@ const updateButtons = async () => {
     }
 };
 
-const truncateText = (text: string, maxLength: number): string => {
-    if (!text) return '';
-    let width = 0;
-    let result = '';
-
-    for (const char of text) {
-        const charWidth = /[^\x00-\xff]/.test(char) ? 2 : 1; // 中文为 2，英文为 1
-        if (width + charWidth > maxLength) {
-            result += '...';
-            break;
-        }
-        result += char;
-        width += charWidth;
-    }
-
-    return result;
-};
-
 const handlePath = () => {
     nextTick(function () {
         let breadCrumbWidth = breadCrumbRef.value.offsetWidth;
@@ -1239,7 +1229,9 @@ const getHostMount = async () => {
     try {
         const res = await searchHostMount();
         hostMount.value = res.data;
-    } catch (error) {}
+    } catch (error) {
+        console.error('Error fetching host mount:', error);
+    }
 };
 
 onMounted(() => {
