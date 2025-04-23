@@ -35,6 +35,8 @@ type Website struct {
 	DbType string `json:"dbType"`
 	DbID   uint   `json:"dbID"`
 
+	Favorite bool `json:"favorite"`
+
 	Domains    []WebsiteDomain `json:"domains" gorm:"-:migration"`
 	WebsiteSSL WebsiteSSL      `json:"webSiteSSL" gorm:"-:migration"`
 }

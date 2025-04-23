@@ -26,6 +26,7 @@ export namespace Website {
         childSites?: string[];
         dbID: number;
         dbType: string;
+        favorite: boolean;
     }
 
     export interface WebsiteDTO extends Website {
@@ -100,6 +101,7 @@ export namespace Website {
         webSiteGroupId: number;
         expireDate?: string;
         IPV6: boolean;
+        favorite: boolean;
     }
 
     export interface WebSiteOp {

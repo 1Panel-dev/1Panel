@@ -2381,6 +2381,8 @@ const message = {
         cacheWarn: 'Sila matikan suis cache dalam pembalikan proksi terlebih dahulu',
         loadBalanceHelper:
             'Di sini hanya mencipta peraturan keseimbangan beban, untuk menggunakan peraturan sila proksi terbalik http(s)://<nama keseimbangan beban>',
+        favorite: 'Kegemaran',
+        cancelFavorite: 'Batalkan Kegemaran',
     },
     php: {
         short_open_tag: 'Sokongan tag pendek',

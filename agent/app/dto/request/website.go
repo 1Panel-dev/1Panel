@@ -7,7 +7,7 @@ import (
 type WebsiteSearch struct {
 	dto.PageInfo
 	Name           string `json:"name"`
-	OrderBy        string `json:"orderBy" validate:"required,oneof=primary_domain type status createdAt expire_date created_at"`
+	OrderBy        string `json:"orderBy" validate:"required,oneof=primary_domain type status createdAt expire_date created_at favorite"`
 	Order          string `json:"order" validate:"required,oneof=null ascending descending"`
 	WebsiteGroupID uint   `json:"websiteGroupId"`
 	Type           string `json:"type"`
@@ -85,6 +85,7 @@ type WebsiteUpdate struct {
 	WebsiteGroupID uint   `json:"webSiteGroupID"`
 	ExpireDate     string `json:"expireDate"`
 	IPV6           bool   `json:"IPV6"`
+	Favorite       bool   `json:"favorite"`
 }
 
 type WebsiteDelete struct {

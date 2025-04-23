@@ -2420,6 +2420,8 @@ const message = {
         cacheWarn: 'Please turn off the cache switch in the reverse proxy first',
         loadBalanceHelper:
             'This section only creates load balancing rules, to use the rules please reverse proxy http(s)://<load balance name>',
+        favorite: 'Favorite',
+        cancelFavorite: 'Cancel Favorite',
     },
     php: {
         short_open_tag: 'Short tag support',

@@ -35,6 +35,7 @@ type WebsiteRes struct {
 	AppInstallID  uint      `json:"appInstallId"`
 	ChildSites    []string  `json:"childSites"`
 	RuntimeType   string    `json:"runtimeType"`
+	Favorite      bool      `json:"favorite"`
 }
 
 type WebsiteOption struct {

@@ -2288,6 +2288,8 @@ const message = {
         cacheWarn: '먼저 리버스 프록시의 캐시 스위치를 끄십시오',
         loadBalanceHelper:
             '여기서는 로드 밸런싱 규칙만 생성합니다. 규칙을 사용하려면 리버스 프록시 http(s)://<로드 밸런스 이름>을 사용하십시오',
+        favorite: '즐겨찾기',
+        cancelFavorite: '즐겨찾기 취소',
     },
     php: {
         short_open_tag: '짧은 태그 지원',

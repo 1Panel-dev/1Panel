@@ -198,6 +198,7 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 			SitePath:      sitePath,
 			AppInstallID:  appInstallID,
 			RuntimeType:   runtimeType,
+			Favorite:      web.Favorite,
 		}
 
 		sites, _ := websiteRepo.List(websiteRepo.WithParentID(web.ID))
@@ -529,6 +530,7 @@ func (w WebsiteService) UpdateWebsite(req request.WebsiteUpdate) error {
 	website.WebsiteGroupID = req.WebsiteGroupID
 	website.Remark = req.Remark
 	website.IPV6 = req.IPV6
+	website.Favorite = req.Favorite
 
 	if req.ExpireDate != "" {
 		expireDate, err := time.Parse(constant.DateLayout, req.ExpireDate)

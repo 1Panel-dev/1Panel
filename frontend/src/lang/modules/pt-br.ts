@@ -2377,6 +2377,8 @@ const message = {
         cacheWarn: 'Por favor, desligue o interruptor de cache no proxy reverso primeiro',
         loadBalanceHelper:
             'Esta seção apenas cria regras de balanceamento de carga, para usar as regras, por favor, proxy reverso http(s)://<nome do balanceamento de carga>',
+        favorite: 'Favorito',
+        cancelFavorite: 'Cancelar Favorito',
     },
     php: {
         short_open_tag: 'Suporte para short tags',

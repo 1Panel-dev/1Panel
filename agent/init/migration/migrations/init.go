@@ -342,3 +342,13 @@ var UpdateWebsiteSSL = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var UpdateWebsite = &gormigrate.Migration{
+	ID: "20250424-update-website",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.Website{}); err != nil {
+			return err
+		}
+		return nil
+	},
+}

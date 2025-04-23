@@ -90,34 +90,71 @@
                         sortable
                         show-overflow-tooltip
                     >
-                        <template #default="{ row }">
-                            <el-text type="primary" class="cursor-pointer" @click="openConfig(row.id)">
-                                {{ row.primaryDomain }}
-                            </el-text>
-                            <el-popover
-                                placement="right"
-                                trigger="hover"
-                                :width="300"
-                                @before-enter="searchDomains(row.id)"
-                            >
-                                <template #reference>
-                                    <el-button link icon="Promotion" class="ml-2.5"></el-button>
-                                </template>
-                                <table>
-                                    <tbody>
-                                        <tr v-for="(domain, index) in domains" :key="index">
-                                            <td>
-                                                <el-button type="primary" link @click="openUrl(getUrl(domain, row))">
-                                                    {{ getUrl(domain, row) }}
-                                                </el-button>
-                                            </td>
-                                            <td>
-                                                <CopyButton :content="getUrl(domain, row)" type="icon" />
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </el-popover>
+                        <template #default="{ row, $index }">
+                            <div class="name-row" @mouseenter="showFavorite($index)" @mouseleave="hideFavorite">
+                                <div>
+                                    <el-text type="primary" class="cursor-pointer" @click="openConfig(row.id)">
+                                        {{ row.primaryDomain }}
+                                    </el-text>
+                                    <el-popover
+                                        placement="right"
+                                        trigger="hover"
+                                        :width="300"
+                                        @before-enter="searchDomains(row.id)"
+                                    >
+                                        <template #reference>
+                                            <el-button link icon="Promotion" class="ml-2.5"></el-button>
+                                        </template>
+                                        <table>
+                                            <tbody>
+                                                <tr v-for="(domain, index) in domains" :key="index">
+                                                    <td>
+                                                        <el-button
+                                                            type="primary"
+                                                            link
+                                                            @click="openUrl(getUrl(domain, row))"
+                                                        >
+                                                            {{ getUrl(domain, row) }}
+                                                        </el-button>
+                                                    </td>
+                                                    <td>
+                                                        <CopyButton :content="getUrl(domain, row)" type="icon" />
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </el-popover>
+                                </div>
+                                <div>
+                                    <el-tooltip
+                                        effect="dark"
+                                        :content="$t('website.cancelFavorite')"
+                                        placement="top-start"
+                                        v-if="row.favorite"
+                                    >
+                                        <el-button
+                                            link
+                                            icon="Star"
+                                            type="warning"
+                                            @click="favoriteWebsite(row)"
+                                        ></el-button>
+                                    </el-tooltip>
+
+                                    <el-tooltip
+                                        effect="dark"
+                                        :content="$t('website.favorite')"
+                                        placement="top-start"
+                                        v-if="!row.favorite && hoveredRowIndex === $index"
+                                    >
+                                        <el-button
+                                            link
+                                            icon="Star"
+                                            type="info"
+                                            @click="favoriteWebsite(row)"
+                                        ></el-button>
+                                    </el-tooltip>
+                                </div>
+                            </div>
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -222,8 +259,8 @@
                         </template>
                     </el-table-column>
                     <fu-table-operations
-                        :ellipsis="10"
-                        width="300px"
+                        :ellipsis="1"
+                        width="150px"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         :fixed="mobile ? false : 'right'"
@@ -314,6 +351,7 @@ let groups = ref<Group.GroupInfo[]>([]);
 const dataRef = ref();
 const domains = ref<Website.Domain[]>([]);
 const columns = ref([]);
+const hoveredRowIndex = ref(-1);
 
 const paginationConfig = reactive({
     cacheSizeKey: 'website-page-size',
@@ -325,8 +363,8 @@ let req = reactive({
     name: '',
     page: 1,
     pageSize: 10,
-    orderBy: 'createdAt',
-    order: 'null',
+    orderBy: 'favorite',
+    order: 'descending',
     websiteGroupId: 0,
     type: '',
 });
@@ -336,6 +374,19 @@ const mobile = computed(() => {
 
 const goRouter = async (key: string) => {
     router.push({ name: 'AppAll', query: { install: key } });
+};
+
+const showFavorite = (index: any) => {
+    hoveredRowIndex.value = index;
+};
+
+const hideFavorite = () => {
+    hoveredRowIndex.value = -1;
+};
+
+const favoriteWebsite = (row: Website.Website) => {
+    row.favorite = !row.favorite;
+    updateWebsitConfig(row);
 };
 
 const changeSort = ({ prop, order }) => {
@@ -353,8 +404,8 @@ const changeSort = ({ prop, order }) => {
         req.orderBy = prop;
         req.order = order;
     } else {
-        req.orderBy = 'created_at';
-        req.order = 'null';
+        req.orderBy = 'favorite';
+        req.order = 'descending';
     }
     search();
 };
@@ -460,6 +511,7 @@ const updateWebsitConfig = (row: any) => {
         webSiteGroupId: row.webSiteGroupId,
         expireDate: reqDate,
         IPV6: row.IPV6,
+        favorite: row.favorite,
     };
 
     updateWebsite(req).then(() => {
@@ -588,3 +640,12 @@ onMounted(() => {
     listGroup();
 });
 </script>
+
+<style lang="css" scoped>
+.name-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+</style>

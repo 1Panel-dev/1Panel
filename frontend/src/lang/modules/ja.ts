@@ -2327,6 +2327,8 @@ const message = {
         cacheWarn: 'まずリバースプロキシのキャッシュスイッチをオフにしてください',
         loadBalanceHelper:
             'This section only creates load balancing rules, to use the rules please reverse proxy http(s)://<load balance name>',
+        favorite: 'お気に入り',
+        cancelFavorite: 'お気に入りを解除',
     },
     php: {
         short_open_tag: '短いタグサポート',
