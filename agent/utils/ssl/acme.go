@@ -4,13 +4,19 @@ import (
 	"crypto"
 	"crypto/ecdsa"
 	"crypto/rsa"
+	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"net/url"
+	"os"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/go-acme/lego/v4/certcrypto"
@@ -69,7 +75,7 @@ func GetPrivateKey(priKey crypto.PrivateKey, keyType KeyType) ([]byte, error) {
 	return pem.EncodeToMemory(block), nil
 }
 
-func NewRegisterClient(acmeAccount *model.WebsiteAcmeAccount) (*AcmeClient, error) {
+func NewRegisterClient(acmeAccount *model.WebsiteAcmeAccount, proxyURL string) (*AcmeClient, error) {
 	var (
 		priKey crypto.PrivateKey
 		err    error
@@ -102,7 +108,7 @@ func NewRegisterClient(acmeAccount *model.WebsiteAcmeAccount) (*AcmeClient, erro
 		Email: acmeAccount.Email,
 		Key:   priKey,
 	}
-	config := newConfig(myUser, acmeAccount.Type)
+	config := newConfig(myUser, acmeAccount.Type, proxyURL)
 	client, err := lego.NewClient(config)
 	if err != nil {
 		return nil, err
@@ -149,8 +155,71 @@ func NewRegisterClient(acmeAccount *model.WebsiteAcmeAccount) (*AcmeClient, erro
 	return acmeClient, nil
 }
 
-func newConfig(user *AcmeUser, accountType string) *lego.Config {
-	config := lego.NewConfig(user)
+func NewConfigWithProxy(user registration.User, proxy string) *lego.Config {
+	return &lego.Config{
+		CADirURL:   lego.LEDirectoryProduction,
+		User:       user,
+		HTTPClient: createHTTPClientWithProxy(proxy),
+		Certificate: lego.CertificateConfig{
+			KeyType: certcrypto.RSA2048,
+			Timeout: 30 * time.Second,
+		},
+	}
+}
+
+func initCertPool() *x509.CertPool {
+	customCACertsPath := os.Getenv("LEGO_CA_CERTIFICATES")
+	if customCACertsPath == "" {
+		return nil
+	}
+
+	useSystemCertPool, _ := strconv.ParseBool(os.Getenv("LEGO_CA_SYSTEM_CERT_POOL"))
+
+	caCerts := strings.Split(customCACertsPath, string(os.PathListSeparator))
+
+	certPool, err := lego.CreateCertPool(caCerts, useSystemCertPool)
+	if err != nil {
+		panic(fmt.Sprintf("create certificates pool: %v", err))
+	}
+
+	return certPool
+}
+
+func createHTTPClientWithProxy(proxyURL string) *http.Client {
+	var proxyFunc func(*http.Request) (*url.URL, error)
+	if proxyURL != "" {
+		parsedURL, err := url.Parse(proxyURL)
+		if err != nil {
+			proxyFunc = http.ProxyFromEnvironment
+		} else {
+			proxyFunc = http.ProxyURL(parsedURL)
+		}
+	} else {
+		proxyFunc = func(_ *http.Request) (*url.URL, error) {
+			return nil, nil
+		}
+	}
+
+	return &http.Client{
+		Timeout: 2 * time.Minute,
+		Transport: &http.Transport{
+			Proxy: proxyFunc,
+			DialContext: (&net.Dialer{
+				Timeout:   30 * time.Second,
+				KeepAlive: 30 * time.Second,
+			}).DialContext,
+			TLSHandshakeTimeout:   30 * time.Second,
+			ResponseHeaderTimeout: 30 * time.Second,
+			TLSClientConfig: &tls.Config{
+				ServerName: os.Getenv("LEGO_CA_SERVER_NAME"),
+				RootCAs:    initCertPool(),
+			},
+		},
+	}
+}
+
+func newConfig(user *AcmeUser, accountType, proxyURL string) *lego.Config {
+	config := NewConfigWithProxy(user, proxyURL)
 	switch accountType {
 	case "letsencrypt":
 		config.CADirURL = "https://acme-v02.api.letsencrypt.org/directory"

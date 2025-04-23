@@ -244,7 +244,11 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 	if err != nil {
 		return err
 	}
-	client, err := ssl.NewAcmeClient(acmeAccount)
+	proxyURL := ""
+	if websiteSSL.UseProxy {
+		//TODO  get proxyURL
+	}
+	client, err := ssl.NewAcmeClient(acmeAccount, proxyURL)
 	if err != nil {
 		return err
 	}
@@ -413,7 +417,8 @@ func (w WebsiteSSLService) GetDNSResolve(req request.WebsiteDNSReq) ([]response.
 		return nil, err
 	}
 
-	client, err := ssl.NewAcmeClient(acmeAccount)
+	//TODO  get proxyURL
+	client, err := ssl.NewAcmeClient(acmeAccount, "")
 	if err != nil {
 		return nil, err
 	}
@@ -474,7 +479,8 @@ func (w WebsiteSSLService) Delete(ids []uint) error {
 			if err != nil {
 				return err
 			}
-			client, err := ssl.NewAcmeClient(acmeAccount)
+			//TODO  get proxyURL
+			client, err := ssl.NewAcmeClient(acmeAccount, "")
 			if err != nil {
 				return err
 			}

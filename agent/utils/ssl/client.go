@@ -50,16 +50,17 @@ func (u *AcmeUser) GetPrivateKey() crypto.PrivateKey {
 }
 
 type AcmeClient struct {
-	Config *lego.Config
-	Client *lego.Client
-	User   *AcmeUser
+	Config   *lego.Config
+	Client   *lego.Client
+	User     *AcmeUser
+	ProxyURL string
 }
 
-func NewAcmeClient(acmeAccount *model.WebsiteAcmeAccount) (*AcmeClient, error) {
+func NewAcmeClient(acmeAccount *model.WebsiteAcmeAccount, ProxyURL string) (*AcmeClient, error) {
 	if acmeAccount.Email == "" {
 		return nil, errors.New("email can not blank")
 	}
-	client, err := NewRegisterClient(acmeAccount)
+	client, err := NewRegisterClient(acmeAccount, ProxyURL)
 	if err != nil {
 		return nil, err
 	}

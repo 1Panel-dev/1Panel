@@ -332,3 +332,13 @@ var AddAppIgnore = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var UpdateWebsiteSSL = &gormigrate.Migration{
+	ID: "20250422-update-websiteSSL",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.WebsiteSSL{}); err != nil {
+			return err
+		}
+		return nil
+	},
+}

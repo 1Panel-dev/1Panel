@@ -31,6 +31,8 @@ func marshal(envMap map[string]string) (string, error) {
 	for k, v := range envMap {
 		if d, err := strconv.Atoi(v); err == nil && !isStartWithZero(v) {
 			lines = append(lines, fmt.Sprintf(`%s=%d`, k, d))
+		} else if hasEvenDoubleQuotes(v) {
+			lines = append(lines, fmt.Sprintf(`%s='%s'`, k, v))
 		} else {
 			lines = append(lines, fmt.Sprintf(`%s="%s"`, k, v))
 		}
@@ -56,4 +58,14 @@ func isStartWithZero(value string) bool {
 		return true
 	}
 	return false
+}
+
+func hasEvenDoubleQuotes(s string) bool {
+	count := 0
+	for _, ch := range s {
+		if ch == '"' {
+			count++
+		}
+	}
+	return count%2 == 0
 }

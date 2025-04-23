@@ -30,6 +30,7 @@ func InitAgentDB() {
 		migrations.UpdateWebsiteExpireDate,
 		migrations.AddLocalSSHSetting,
 		migrations.AddAppIgnore,
+		migrations.UpdateWebsiteSSL,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

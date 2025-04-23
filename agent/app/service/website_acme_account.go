@@ -53,7 +53,8 @@ func (w WebsiteAcmeAccountService) Create(create request.WebsiteAcmeAccountCreat
 		acmeAccount.EabHmacKey = create.EabHmacKey
 	}
 
-	client, err := ssl.NewAcmeClient(acmeAccount)
+	//TODO use proxy url
+	client, err := ssl.NewAcmeClient(acmeAccount, "")
 	if err != nil {
 		return nil, err
 	}
