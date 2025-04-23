@@ -93,6 +93,13 @@ SubTask: "Подзадача"
 #script 
 ScriptLibrary: "Библиотека скриптов"
 
+Node: "Узел"
+SyncNode: "Синхронизация данных узла {{ .name }}"
+SyncPackageBackups: "Упаковка данных резервных копий аккаунтов"
+SyncPackageProxy: "Упаковка данных системного прокси"
+SyncPackagePanelJson: "Упаковка базовых данных узла"
+SyncPackageEncrypt: "Шифрование пакета данных"
+
 #upgrade node
 NodeUpgrade: "Обновление узла {{ .name }}"
 UpgradeCheck: "Проверить обновления узла"

@@ -93,6 +93,13 @@ SubTask: "서브 작업"
 #script 
 ScriptLibrary: "스크립트 라이브러리"
 
+Node: "노드"
+SyncNode: "노드 데이터 동기화 {{ .name }}"
+SyncPackageBackups: "백업 계정 데이터 패키징"
+SyncPackageProxy: "시스템 프록시 데이터 패키징"
+SyncPackagePanelJson: "노드 기본 데이터 패키징"
+SyncPackageEncrypt: "데이터 패키지 암호화"
+
 #upgrade node
 NodeUpgrade: "{{ .name }} 노드 업그레이드"
 UpgradeCheck: "노드 업데이트 확인"

@@ -94,6 +94,13 @@ SubTask: "サブタスク"
 #script 
 ScriptLibrary: "スクリプトライブラリ"
 
+Node: "ノード"
+SyncNode: "ノードデータ同期 {{ .name }}"
+SyncPackageBackups: "バックアップアカウントデータのパッケージ化"
+SyncPackageProxy: "システムプロキシデータのパッケージ化"
+SyncPackagePanelJson: "ノード基本データのパッケージ化"
+SyncPackageEncrypt: "データパッケージの暗号化"
+
 #upgrade node
 NodeUpgrade: "{{ .name }} ノードのアップグレード"
 UpgradeCheck: "ノードの更新を確認"

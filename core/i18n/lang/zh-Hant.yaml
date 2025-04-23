@@ -93,6 +93,13 @@ SubTask: "子任務"
 #script 
 ScriptLibrary: "腳本庫"
 
+Node: "節點"
+SyncNode: "同步節點數據 {{ .name }}"
+SyncPackageBackups: "打包備份帳號數據"
+SyncPackageProxy: "打包系統代理數據"
+SyncPackagePanelJson: "打包節點基礎數據"
+SyncPackageEncrypt: "數據包加密"
+
 #upgrade node
 NodeUpgrade: "升級節點 {{ .name }}"
 UpgradeCheck: "檢查節點更新"

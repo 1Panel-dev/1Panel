@@ -2,7 +2,6 @@ package service
 
 import (
 	"bufio"
-	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -121,7 +120,11 @@ func (u *BackupService) Create(req dto.BackupOperate) error {
 	if err := backupRepo.Create(&backup); err != nil {
 		return err
 	}
-	go syncAccountToAgent(backup, "create")
+	go func() {
+		if err := xpack.Sync(constant.SyncBackupAccounts); err != nil {
+			global.LOG.Errorf("sync backup account to node failed, err: %v", err)
+		}
+	}()
 	return nil
 }
 
@@ -176,7 +179,11 @@ func (u *BackupService) Delete(name string) error {
 		return buserr.New("ErrBackupInUsed")
 	}
 
-	go syncAccountToAgent(backup, "delete")
+	go func() {
+		if err := xpack.Sync(constant.SyncBackupAccounts); err != nil {
+			global.LOG.Errorf("sync backup account to node failed, err: %v", err)
+		}
+	}()
 	return backupRepo.Delete(repo.WithByName(name))
 }
 
@@ -234,7 +241,11 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 	if err := backupRepo.Save(&newBackup); err != nil {
 		return err
 	}
-	go syncAccountToAgent(newBackup, "update")
+	go func() {
+		if err := xpack.Sync(constant.SyncBackupAccounts); err != nil {
+			global.LOG.Errorf("sync backup account to node failed, err: %v", err)
+		}
+	}()
 	return nil
 }
 
@@ -364,17 +375,4 @@ func (u *BackupService) checkBackupConn(backup *model.BackupAccount) (bool, erro
 	}
 	_, _ = client.Delete(path.Join(backup.BackupPath, "test/1panel"))
 	return true, nil
-}
-
-func syncAccountToAgent(backup model.BackupAccount, operation string) {
-	if !backup.IsPublic {
-		return
-	}
-	backup.AccessKey, _ = encrypt.StringDecryptWithBase64(backup.AccessKey)
-	backup.Credential, _ = encrypt.StringDecryptWithBase64(backup.Credential)
-	itemData, _ := json.Marshal(backup)
-	itemJson := dto.SyncToAgent{Name: backup.Name, Operation: operation, Data: string(itemData)}
-	bodyItem, _ := json.Marshal(itemJson)
-	_ = xpack.RequestToAllAgent("/api/v2/backups/sync", http.MethodPost, bytes.NewReader((bodyItem)))
-	_, _ = proxy_local.NewLocalClient("/api/v2/backups/sync", http.MethodPost, bytes.NewReader((bodyItem)))
 }

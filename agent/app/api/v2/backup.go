@@ -25,20 +25,6 @@ func (b *BaseApi) CheckBackupUsed(c *gin.Context) {
 	helper.Success(c)
 }
 
-func (b *BaseApi) SyncBackupAccount(c *gin.Context) {
-	var req dto.SyncFromMaster
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-
-	if err := backupService.Sync(req); err != nil {
-		helper.BadRequest(c, err)
-		return
-	}
-
-	helper.Success(c)
-}
-
 // @Tags Backup Account
 // @Summary Create backup account
 // @Accept json

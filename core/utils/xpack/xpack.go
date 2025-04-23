@@ -4,7 +4,6 @@ package xpack
 
 import (
 	"crypto/tls"
-	"io"
 	"net"
 	"net/http"
 	"time"
@@ -18,8 +17,6 @@ func Proxy(c *gin.Context, currentNode string) {}
 func UpdateGroup(name string, group, newGroup uint) error { return nil }
 
 func CheckBackupUsed(name string) error { return nil }
-
-func RequestToAllAgent(reqUrl, reqMethod string, reqBody io.Reader) error { return nil }
 
 func LoadRequestTransport() *http.Transport {
 	return &http.Transport{
@@ -37,3 +34,5 @@ func LoadRequestTransport() *http.Transport {
 func LoadNodeInfo(currentNode string) (*ssh.ConnInfo, string, error) {
 	return nil, "", nil
 }
+
+func Sync(dataType string) error { return nil }

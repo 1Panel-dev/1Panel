@@ -12,7 +12,6 @@ func (s *BackupRouter) InitRouter(Router *gin.RouterGroup) {
 	baseApi := v2.ApiGroupApp.BaseApi
 	{
 		backupRouter.GET("/check/:name", baseApi.CheckBackupUsed)
-		backupRouter.POST("/sync", baseApi.SyncBackupAccount)
 		backupRouter.GET("/options", baseApi.LoadBackupOptions)
 		backupRouter.POST("/search", baseApi.SearchBackup)
 

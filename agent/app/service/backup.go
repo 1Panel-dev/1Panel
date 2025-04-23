@@ -11,10 +11,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
-
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
@@ -29,7 +28,6 @@ type BackupService struct{}
 
 type IBackupService interface {
 	CheckUsed(name string, isPublic bool) error
-	Sync(req dto.SyncFromMaster) error
 
 	LoadBackupOptions() ([]dto.BackupOption, error)
 	SearchWithPage(search dto.SearchPageWithType) (int64, interface{}, error)
@@ -344,39 +342,6 @@ func (u *BackupService) checkBackupConn(backup *model.BackupAccount) (bool, erro
 	}
 	_, _ = client.Delete(path.Join(backup.BackupPath, "test/1panel"))
 	return true, nil
-}
-
-func (u *BackupService) Sync(req dto.SyncFromMaster) error {
-	var accountItem model.BackupAccount
-	if err := json.Unmarshal([]byte(req.Data), &accountItem); err != nil {
-		return err
-	}
-	accountItem.AccessKey, _ = encrypt.StringEncryptWithBase64(accountItem.AccessKey)
-	accountItem.Credential, _ = encrypt.StringEncryptWithBase64(accountItem.Credential)
-	account, _ := backupRepo.Get(repo.WithByName(req.Name))
-	switch req.Operation {
-	case "create":
-		if account.ID != 0 {
-			accountItem.ID = account.ID
-			return backupRepo.Save(&accountItem)
-		}
-		return backupRepo.Create(&accountItem)
-	case "delete":
-		if account.ID == 0 {
-			return buserr.New("ErrRecordNotFound")
-		}
-		return backupRepo.Delete(repo.WithByID(account.ID))
-	case "update":
-		if account.ID == 0 {
-			return buserr.New("ErrRecordNotFound")
-		}
-		accountItem.ID = account.ID
-		accountItem.CreatedAt = account.CreatedAt
-		accountItem.UpdatedAt = account.UpdatedAt
-		return backupRepo.Save(&accountItem)
-	default:
-		return fmt.Errorf("not support such operation %s", req.Operation)
-	}
 }
 
 func (u *BackupService) LoadBackupOptions() ([]dto.BackupOption, error) {

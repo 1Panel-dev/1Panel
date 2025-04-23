@@ -93,6 +93,13 @@ SubTask: "Subtarefa"
 #script 
 ScriptLibrary: "Biblioteca de Scripts"
 
+Node: "Nó"
+SyncNode: "Sincronizar dados do nó {{ .name }}"
+SyncPackageBackups: "Empacotar dados da conta de backup"
+SyncPackageProxy: "Empacotar dados de proxy do sistema"
+SyncPackagePanelJson: "Empacotar dados básicos do nó"
+SyncPackageEncrypt: "Criptografia de pacote de dados"
+
 #upgrade node
 NodeUpgrade: "Atualizar nó {{ .name }}"
 UpgradeCheck: "Verificar atualizações do nó"

@@ -93,6 +93,14 @@ SubTask: "子任务"
 #script 
 ScriptLibrary: "脚本库"
 
+#sync node
+Node: "节点"
+SyncNode: "同步节点数据 {{ .name }}"
+SyncPackageBackups: "打包备份账号数据"
+SyncPackageProxy: "打包系统代理数据"
+SyncPackagePanelJson: "打包节点基础数据"
+SyncPackageEncrypt: "数据包加密"
+
 #upgrade node
 NodeUpgrade: "升级节点 {{ .name }}"
 UpgradeCheck: "检查节点更新"

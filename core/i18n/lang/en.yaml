@@ -93,6 +93,13 @@ SubTask: "Subtask"
 #script 
 ScriptLibrary: "Script Library"
 
+Node: "Node"
+SyncNode: "Sync node data {{ .name }}"
+SyncPackageBackups: "Package backup account data"
+SyncPackageProxy: "Package system proxy data"
+SyncPackagePanelJson: "Package node basic data"
+SyncPackageEncrypt: "Data package encryption"
+
 #upgrade node
 NodeUpgrade: "Upgrade node {{ .name }}"
 UpgradeCheck: "Check for node updates"

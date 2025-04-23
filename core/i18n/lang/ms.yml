@@ -93,6 +93,13 @@ SubTask: "Tugas Sub"
 #script 
 ScriptLibrary: "Pustaka Skrip"
 
+Node: "Nod"
+SyncNode: "Segerakkan data nod {{ .name }}"
+SyncPackageBackups: "Pakej data akaun sandaran"
+SyncPackageProxy: "Pakej data proksi sistem"
+SyncPackagePanelJson: "Pakej data asas nod"
+SyncPackageEncrypt: "Enkripsi pakej data"
+
 #upgrade node
 NodeUpgrade: "Naik taraf node {{ .name }}"
 UpgradeCheck: "Periksa kemas kini nod"

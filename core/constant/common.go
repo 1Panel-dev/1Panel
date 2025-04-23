@@ -42,6 +42,11 @@ const (
 	FilePerm = 0644
 )
 
+const (
+	SyncSystemProxy    = "SyncSystemProxy"
+	SyncBackupAccounts = "SyncBackupAccounts"
+)
+
 var WebUrlMap = map[string]struct{}{
 	"/apps":           {},
 	"/apps/all":       {},

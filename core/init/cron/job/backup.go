@@ -8,6 +8,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/cloud_storage/client"
+	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 )
 
 type backup struct{}
@@ -57,5 +58,10 @@ func (b *backup) Run() {
 		varsItem, _ := json.Marshal(varMap)
 		_ = global.DB.Model(&model.BackupAccount{}).Where("id = ?", backupItem.ID).Updates(map[string]interface{}{"vars": string(varsItem)}).Error
 		global.LOG.Infof("Refresh %s-%s access_token successful!", backupItem.Type, backupItem.Name)
+		go func() {
+			if err := xpack.Sync(constant.SyncBackupAccounts); err != nil {
+				global.LOG.Errorf("sync backup account to node failed, err: %v", err)
+			}
+		}()
 	}
 }
