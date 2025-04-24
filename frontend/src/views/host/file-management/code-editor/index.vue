@@ -328,6 +328,7 @@ const handleClose = () => {
                 saveContent();
             })
             .finally(() => {
+                isEdit.value = false;
                 closeEditor();
             });
     } else {
