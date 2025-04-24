@@ -52,7 +52,7 @@
                             </el-button>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.type')" :min-width="80" prop="type">
+                    <el-table-column :label="$t('commons.table.type')" :min-width="100" prop="type">
                         <template #default="{ row }">
                             <el-tag>{{ $t('setting.' + row.type) }}</el-tag>
                             <el-tooltip v-if="hasTokenRefresh(row)">

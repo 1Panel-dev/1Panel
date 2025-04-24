@@ -3070,6 +3070,7 @@ const message = {
             syncHelper: '마스터 노드 데이터가 변경되면, 이 자식 노드에 실시간으로 동기화됩니다,',
             syncBackupAccount: '계정 데이터 백업,',
             syncProxy: '시스템 프록시 데이터,',
+            syncNodeInfo: '노드 기본 데이터,',
             nodeSyncHelper: '노드 정보 동기화는 다음 정보를 동기화합니다:',
             nodeSyncHelper1: '1. 공용 백업 계정 정보',
             nodeSyncHelper2: '2. 주 노드와 하위 노드 간의 연결 정보',

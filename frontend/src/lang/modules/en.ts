@@ -3263,6 +3263,7 @@ const message = {
             syncHelper: 'When master node data changes, it synchronizes to this child node in real-time',
             syncBackupAccount: 'Backup account data',
             syncProxy: 'System proxy data',
+            syncNodeInfo: 'Node basic data,',
             nodeSyncHelper: 'Node information synchronization will sync the following information:',
             nodeSyncHelper1: '1. Public backup account information',
             nodeSyncHelper2: '2. Connection information between the main node and sub-nodes',

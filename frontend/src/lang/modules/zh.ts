@@ -3008,6 +3008,7 @@ const message = {
             syncHelper: '主节点数据发生变化时，实时同步到该子节点',
             syncBackupAccount: '备份账号数据',
             syncProxy: '系统代理数据',
+            syncNodeInfo: '节点基础数据',
             nodeSyncHelper: '节点信息同步将同步以下信息：',
             nodeSyncHelper1: '1. 公用的备份账号信息',
             nodeSyncHelper2: '2. 主节点与子节点的连接信息',

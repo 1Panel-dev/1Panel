@@ -3197,6 +3197,7 @@ const message = {
             syncHelper: 'Quando os dados do nó mestre mudam, são sincronizados em tempo real para este nó filho,',
             syncBackupAccount: 'Dados de conta de backup,',
             syncProxy: 'Dados de proxy do sistema,',
+            syncNodeInfo: 'Dados básicos do nó,',
             nodeSyncHelper: 'A sincronização das informações do nó irá sincronizar as seguintes informações:',
             nodeSyncHelper1: '1. Informações da conta de backup pública',
             nodeSyncHelper2: '2. Informações de conexão entre o nó principal e os sub-nós',

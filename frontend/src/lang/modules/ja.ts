@@ -3122,6 +3122,7 @@ const message = {
             syncHelper: 'マスターノードのデータが変更されると、この子ノードにリアルタイムで同期されます,',
             syncBackupAccount: 'アカウントデータのバックアップ,',
             syncProxy: 'システムプロキシデータ,',
+            syncNodeInfo: 'ノード基本データ,',
             nodeSyncHelper: 'ノード情報の同期は、以下の情報を同期します：',
             nodeSyncHelper1: '1. 公共のバックアップアカウント情報',
             nodeSyncHelper2: '2. 主ノードとサブノードの接続情報',

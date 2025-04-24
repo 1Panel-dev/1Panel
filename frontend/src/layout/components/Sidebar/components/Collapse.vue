@@ -1,11 +1,12 @@
 <template>
     <div>
         <el-popover
-            placement="right"
+            placement="right-end"
             :show-arrow="false"
             :offset="0"
             :width="200"
             trigger="hover"
+            @before-enter="showPopover"
             popper-class="custom-popover-dropdown"
         >
             <template #reference>
@@ -28,33 +29,46 @@
                     {{ $t('menu.msgCenter') }}
                     <el-tag class="msg-tag" v-if="taskCount !== 0" size="small" round>{{ taskCount }}</el-tag>
                 </div>
-                <el-divider v-if="nodes.length > 0 && globalStore.isMasterProductPro" class="divider" />
-                <div v-if="nodes.length > 0 && globalStore.isMasterProductPro" class="mt-2 mb-2">
-                    <div class="dropdown-item" @click="changeNode('local')">
-                        {{ $t('xpack.node.master') }}
-                    </div>
-                    <div
-                        class="dropdown-item mt-1"
-                        @click="changeNode(item.name)"
-                        :disabled="item.status !== 'Healthy'"
-                        v-for="item in nodes"
-                        :key="item.name"
-                    >
-                        {{ item.name }}
-                        <el-tooltip
-                            :content="item.isBound ? $t('xpack.node.nodeUnhealthy') : $t('xpack.node.nodeUnbind')"
-                            placement="right"
+                <el-divider v-if="showNodes()" class="divider" />
+
+                <div v-if="showNodes()" class="mb-2">
+                    <el-scrollbar max-height="168px" :noresize="true">
+                        <div
+                            class="dropdown-item mt-1"
+                            @click="changeNode(item.name)"
+                            :disabled="item.status !== 'Healthy'"
+                            v-for="item in nodeOptions"
+                            :key="item.name"
                         >
-                            <el-icon
-                                class="icon-status"
-                                v-if="item.status !== 'Healthy' || !item.isBound"
-                                type="danger"
-                            >
-                                <Warning />
-                            </el-icon>
-                        </el-tooltip>
+                            <div class="node">
+                                {{ item.name }}
+                                <el-tooltip
+                                    v-if="item.status !== 'Healthy' || !item.isBound"
+                                    :content="
+                                        item.isBound ? $t('xpack.node.nodeUnhealthy') : $t('xpack.node.nodeUnbind')
+                                    "
+                                    placement="right"
+                                >
+                                    <el-icon class="icon-status" type="danger">
+                                        <Warning />
+                                    </el-icon>
+                                </el-tooltip>
+                            </div>
+                        </div>
+                    </el-scrollbar>
+                    <div class="dropdown-item -mb-1" @click="changeNode('local')">
+                        <div class="node">{{ $t('xpack.node.master') }}</div>
                     </div>
                 </div>
+                <el-input
+                    v-if="showNodes() && nodeOptions?.length > 5"
+                    suffix-icon="Search"
+                    v-model="filter"
+                    @input="changeFilter"
+                    class="w-full filter-input"
+                    size="small"
+                    clearable
+                />
                 <el-divider class="divider" />
                 <div class="dropdown-item mt-2" @click="logout">{{ $t('commons.login.logout') }}</div>
             </div>
@@ -73,9 +87,11 @@ import bus from '@/global/bus';
 import { logOutApi } from '@/api/modules/auth';
 import router from '@/routers';
 
+const filter = ref();
 const globalStore = GlobalStore();
 const menuStore = MenuStore();
 const nodes = ref([]);
+const nodeOptions = ref([]);
 const nodeChangeRef = ref<DropdownInstance>();
 const props = defineProps({
     version: String,
@@ -97,6 +113,20 @@ const loadCurrentName = () => {
     return i18n.global.t('xpack.node.master');
 };
 
+const showPopover = () => {
+    filter.value = '';
+    changeFilter();
+};
+
+const changeFilter = () => {
+    nodeOptions.value = [];
+    for (const item of nodes.value) {
+        if (item.name.indexOf(filter.value) !== -1) {
+            nodeOptions.value.push(item);
+        }
+    }
+};
+
 const loadNodes = async () => {
     if (!globalStore.isMasterProductPro) {
         globalStore.currentNode = 'local';
@@ -112,6 +142,7 @@ const loadNodes = async () => {
             if (nodes.value.length === 0) {
                 globalStore.currentNode = 'local';
             }
+            nodeOptions.value = nodes.value || [];
         })
         .catch(() => {
             nodes.value = [];
@@ -124,7 +155,9 @@ const changeNode = (command: string) => {
     if (command == 'local') {
         globalStore.currentNode = command || 'local';
         globalStore.isOffline = false;
-        location.reload();
+        router.push({ name: 'home' }).then(() => {
+            location.reload();
+        });
         return;
     }
     for (const item of nodes.value) {
@@ -143,9 +176,15 @@ const changeNode = (command: string) => {
             }
             globalStore.currentNode = command || 'local';
             globalStore.isOffline = item.isOffline;
-            location.reload();
+            router.push({ name: 'home' }).then(() => {
+                location.reload();
+            });
         }
     }
+};
+
+const showNodes = () => {
+    return nodes.value.length > 0 && globalStore.isMasterProductPro;
 };
 
 const taskCount = ref(0);
@@ -213,8 +252,8 @@ onMounted(() => {
     .divider {
         display: block;
         height: 1px;
-        width: 100%;
-        margin: 3px 0;
+        width: 91%;
+        margin: 3px 8px;
         border-top: 1px var(--el-border-color) var(--el-border-style);
     }
 }
@@ -234,6 +273,9 @@ onMounted(() => {
         float: right;
         font-size: 18px;
     }
+    .node {
+        padding: 3px 0;
+    }
     .msg-tag {
         float: right;
         background-color: transparent;
@@ -249,7 +291,10 @@ onMounted(() => {
         }
     }
 }
-
+.filter-input {
+    padding: 0 8px;
+    margin-bottom: 4px;
+}
 .dropdown-item:hover {
     background: var(--el-menu-item-bg-color-active);
 }

@@ -3026,6 +3026,7 @@ const message = {
             syncHelper: '當主節點數據發生變化時，實時同步到該子節點,',
             syncBackupAccount: '備份帳號數據,',
             syncProxy: '系統代理數據,',
+            syncNodeInfo: '節點基礎數據,',
             nodeSyncHelper: '節點信息同步將同步以下信息：',
             nodeSyncHelper1: '1. 公用的備份帳號信息',
             nodeSyncHelper2: '2. 主節點與子節點的連接信息',
