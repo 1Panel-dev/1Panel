@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"net"
 	"net/http"
 	"os"
@@ -199,6 +200,7 @@ func (u *SettingService) UpdateProxy(req dto.ProxyUpdate) error {
 	if err := settingRepo.Update("ProxyPasswdKeep", req.ProxyPasswdKeep); err != nil {
 		return err
 	}
+	_ = xpack.Sync(constant.SyncSystemProxy)
 	return nil
 }
 

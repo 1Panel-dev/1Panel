@@ -2379,6 +2379,8 @@ const message = {
             'Esta seção apenas cria regras de balanceamento de carga, para usar as regras, por favor, proxy reverso http(s)://<nome do balanceamento de carga>',
         favorite: 'Favorito',
         cancelFavorite: 'Cancelar Favorito',
+        useProxy: 'Usar Proxy',
+        useProxyHelper: 'Usar o endereço do servidor proxy nas configurações do painel',
     },
     php: {
         short_open_tag: 'Suporte para short tags',

@@ -102,6 +102,10 @@ export const deleteAcmeAccount = (req: Website.DelReq) => {
     return http.post<any>(`/websites/acme/del`, req);
 };
 
+export const updateAcmeAccount = (req: Website.AcmeAccountUpdate) => {
+    return http.post<Website.AcmeAccount>(`/websites/acme/update`, req, TimeoutEnum.T_10M);
+};
+
 export const searchSSL = (req: ReqPage) => {
     return http.post<ResPage<Website.SSLDTO>>(`/websites/ssl/search`, req);
 };

@@ -6,6 +6,12 @@
                     <el-form-item :label="$t('website.email')" prop="email">
                         <el-input v-model.trim="account.email"></el-input>
                     </el-form-item>
+                    <el-form-item :label="$t('website.useProxy')" prop="useProxy">
+                        <el-switch v-model="account.useProxy"></el-switch>
+                        <span class="input-help">
+                            {{ $t('website.useProxyHelper') }}
+                        </span>
+                    </el-form-item>
                     <el-form-item :label="$t('website.acmeAccountType')" prop="type">
                         <el-select v-model="account.type">
                             <el-option
@@ -32,14 +38,15 @@
                             ></el-option>
                         </el-select>
                     </el-form-item>
-                    <div v-if="account.type == 'google'">
+                    <div v-if="account.type == 'google' || account.type == 'freessl'">
                         <el-form-item label="EAB kid" prop="eabKid">
                             <el-input v-model.trim="account.eabKid"></el-input>
                         </el-form-item>
                         <el-form-item label="EAB HmacKey" prop="eabHmacKey">
-                            <el-input v-model.trim="account.eabHmacKey"></el-input>
+                            <el-input type="textarea" :rows="3" v-model.trim="account.eabHmacKey"></el-input>
                         </el-form-item>
                         <el-link
+                            v-if="account.type == 'google'"
                             class="ml-1.5"
                             type="primary"
                             target="_blank"
@@ -87,6 +94,7 @@ const initData = () => ({
     eabKid: '',
     eabHmacKey: '',
     keyType: 'P256',
+    useProxy: false,
 });
 
 const account = ref(initData());

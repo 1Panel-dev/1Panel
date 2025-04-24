@@ -17,6 +17,7 @@ type IWebsiteAcmeAccountService interface {
 	Page(search dto.PageInfo) (int64, []response.WebsiteAcmeAccountDTO, error)
 	Create(create request.WebsiteAcmeAccountCreate) (*response.WebsiteAcmeAccountDTO, error)
 	Delete(id uint) error
+	Update(update request.WebsiteAcmeAccountUpdate) (*response.WebsiteAcmeAccountDTO, error)
 }
 
 func NewIWebsiteAcmeAccountService() IWebsiteAcmeAccountService {
@@ -40,12 +41,13 @@ func (w WebsiteAcmeAccountService) Create(create request.WebsiteAcmeAccountCreat
 		return nil, buserr.New("ErrEmailIsExist")
 	}
 	acmeAccount := &model.WebsiteAcmeAccount{
-		Email:   create.Email,
-		Type:    create.Type,
-		KeyType: create.KeyType,
+		Email:    create.Email,
+		Type:     create.Type,
+		KeyType:  create.KeyType,
+		UseProxy: create.UseProxy,
 	}
 
-	if create.Type == "google" {
+	if create.Type == "google" || create.Type == "freessl" {
 		if create.EabKid == "" || create.EabHmacKey == "" {
 			return nil, buserr.New("ErrEabKidOrEabHmacKeyCannotBlank")
 		}
@@ -53,8 +55,7 @@ func (w WebsiteAcmeAccountService) Create(create request.WebsiteAcmeAccountCreat
 		acmeAccount.EabHmacKey = create.EabHmacKey
 	}
 
-	//TODO use proxy url
-	client, err := ssl.NewAcmeClient(acmeAccount, "")
+	client, err := ssl.NewAcmeClient(acmeAccount, getSystemProxy(acmeAccount.UseProxy))
 	if err != nil {
 		return nil, err
 	}
@@ -76,4 +77,16 @@ func (w WebsiteAcmeAccountService) Delete(id uint) error {
 		return buserr.New("ErrAccountCannotDelete")
 	}
 	return websiteAcmeRepo.DeleteBy(repo.WithByID(id))
+}
+
+func (w WebsiteAcmeAccountService) Update(update request.WebsiteAcmeAccountUpdate) (*response.WebsiteAcmeAccountDTO, error) {
+	account, err := websiteAcmeRepo.GetFirst(repo.WithByID(update.ID))
+	if err != nil {
+		return nil, err
+	}
+	account.UseProxy = update.UseProxy
+	if err := websiteAcmeRepo.Save(*account); err != nil {
+		return nil, err
+	}
+	return &response.WebsiteAcmeAccountDTO{WebsiteAcmeAccount: *account}, nil
 }

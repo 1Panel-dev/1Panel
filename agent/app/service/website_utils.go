@@ -1372,3 +1372,12 @@ func handleDefaultOwn(dir string) {
 	}
 	_ = os.Chown(dir, uid, gid)
 }
+
+func getSystemProxy(useProxy bool) *dto.SystemProxy {
+	if !useProxy {
+		return nil
+	}
+	settingService := NewISettingService()
+	systemProxy, _ := settingService.GetSystemProxy()
+	return systemProxy
+}

@@ -333,20 +333,20 @@ var AddAppIgnore = &gormigrate.Migration{
 	},
 }
 
-var UpdateWebsiteSSL = &gormigrate.Migration{
-	ID: "20250422-update-websiteSSL",
+var UpdateWebsite = &gormigrate.Migration{
+	ID: "20250424-update-website",
 	Migrate: func(tx *gorm.DB) error {
-		if err := tx.AutoMigrate(&model.WebsiteSSL{}); err != nil {
+		if err := tx.AutoMigrate(&model.Website{}); err != nil {
 			return err
 		}
 		return nil
 	},
 }
 
-var UpdateWebsite = &gormigrate.Migration{
-	ID: "20250424-update-website",
+var UpdateWebsiteAcmeAccount = &gormigrate.Migration{
+	ID: "20250422-update-websiteAcmeAccount",
 	Migrate: func(tx *gorm.DB) error {
-		if err := tx.AutoMigrate(&model.Website{}); err != nil {
+		if err := tx.AutoMigrate(&model.WebsiteAcmeAccount{}); err != nil {
 			return err
 		}
 		return nil

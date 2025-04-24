@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"errors"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -98,5 +99,13 @@ func (s *SettingRepo) DelMonitorNet(timeForDelete time.Time) error {
 }
 
 func (s *SettingRepo) UpdateOrCreate(key, value string) error {
-	return global.DB.Model(&model.Setting{}).Where("key = ?", key).Assign(model.Setting{Key: key, Value: value}).FirstOrCreate(&model.Setting{}).Error
+	var setting model.Setting
+	result := global.DB.Where("key = ?", key).First(&setting)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return global.DB.Create(&model.Setting{Key: key, Value: value}).Error
+		}
+		return result.Error
+	}
+	return global.DB.Model(&setting).UpdateColumn("value", value).Error
 }

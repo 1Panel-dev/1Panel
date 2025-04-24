@@ -267,10 +267,17 @@ export namespace Website {
         email: string;
         url: string;
         type: string;
+        useProxy: boolean;
     }
 
     export interface AcmeAccountCreate {
         email: string;
+        useProxy: boolean;
+    }
+
+    export interface AcmeAccountUpdate {
+        id: number;
+        useProxy: boolean;
     }
 
     export interface DNSResolveReq {

@@ -2237,6 +2237,8 @@ const message = {
         loadBalanceHelper: '此处只是创建负载均衡规则，使用规则请反向代理 http://<负载均衡名称>',
         favorite: '收藏',
         cancelFavorite: '取消收藏',
+        useProxy: '使用代理',
+        useProxyHelper: '使用面板设置中的代理服务器地址',
     },
     php: {
         short_open_tag: '短标签支持',

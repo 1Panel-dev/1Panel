@@ -2422,6 +2422,8 @@ const message = {
             'This section only creates load balancing rules, to use the rules please reverse proxy http(s)://<load balance name>',
         favorite: 'Favorite',
         cancelFavorite: 'Cancel Favorite',
+        useProxy: 'Use Proxy',
+        useProxyHelper: 'Use the proxy server address in the panel settings',
     },
     php: {
         short_open_tag: 'Short tag support',

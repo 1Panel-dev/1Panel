@@ -2290,6 +2290,8 @@ const message = {
             '여기서는 로드 밸런싱 규칙만 생성합니다. 규칙을 사용하려면 리버스 프록시 http(s)://<로드 밸런스 이름>을 사용하십시오',
         favorite: '즐겨찾기',
         cancelFavorite: '즐겨찾기 취소',
+        useProxy: '프록시 사용',
+        useProxyHelper: '패널 설정의 프록시 서버 주소 사용',
     },
     php: {
         short_open_tag: '짧은 태그 지원',

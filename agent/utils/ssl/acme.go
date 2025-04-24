@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"io"
 	"net"
 	"net/http"
@@ -75,7 +76,7 @@ func GetPrivateKey(priKey crypto.PrivateKey, keyType KeyType) ([]byte, error) {
 	return pem.EncodeToMemory(block), nil
 }
 
-func NewRegisterClient(acmeAccount *model.WebsiteAcmeAccount, proxyURL string) (*AcmeClient, error) {
+func NewRegisterClient(acmeAccount *model.WebsiteAcmeAccount, proxy *dto.SystemProxy) (*AcmeClient, error) {
 	var (
 		priKey crypto.PrivateKey
 		err    error
@@ -108,13 +109,13 @@ func NewRegisterClient(acmeAccount *model.WebsiteAcmeAccount, proxyURL string) (
 		Email: acmeAccount.Email,
 		Key:   priKey,
 	}
-	config := newConfig(myUser, acmeAccount.Type, proxyURL)
+	config := NewConfigWithProxy(myUser, acmeAccount.Type, proxy)
 	client, err := lego.NewClient(config)
 	if err != nil {
 		return nil, err
 	}
 	var reg *registration.Resource
-	if acmeAccount.Type == "zerossl" || acmeAccount.Type == "google" {
+	if acmeAccount.Type == "zerossl" || acmeAccount.Type == "google" || acmeAccount.Type == "freessl" {
 		if acmeAccount.Type == "zerossl" {
 			var res *zeroSSLRes
 			res, err = getZeroSSLEabCredentials(acmeAccount.Email)
@@ -155,14 +156,38 @@ func NewRegisterClient(acmeAccount *model.WebsiteAcmeAccount, proxyURL string) (
 	return acmeClient, nil
 }
 
-func NewConfigWithProxy(user registration.User, proxy string) *lego.Config {
+func NewConfigWithProxy(user registration.User, accountType string, systemProxy *dto.SystemProxy) *lego.Config {
+	var (
+		caDirURL      string
+		proxyURL      string
+		proxyUser     string
+		proxyPassword string
+	)
+	switch accountType {
+	case "letsencrypt":
+		caDirURL = "https://acme-v02.api.letsencrypt.org/directory"
+	case "zerossl":
+		caDirURL = "https://acme.zerossl.com/v2/DV90"
+	case "buypass":
+		caDirURL = "https://api.buypass.com/acme/directory"
+	case "google":
+		caDirURL = "https://dv.acme-v02.api.pki.goog/directory"
+	case "freessl":
+		caDirURL = "https://acmepro.freessl.cn/v2/DV"
+	}
+	if systemProxy != nil {
+		proxyURL = fmt.Sprintf("%s:%s", systemProxy.URL, systemProxy.Port)
+		proxyUser = systemProxy.User
+		proxyPassword = systemProxy.Password
+	}
 	return &lego.Config{
-		CADirURL:   lego.LEDirectoryProduction,
+		CADirURL:   caDirURL,
+		UserAgent:  "1Panel",
 		User:       user,
-		HTTPClient: createHTTPClientWithProxy(proxy),
+		HTTPClient: createHTTPClientWithProxy(proxyURL, proxyUser, proxyPassword),
 		Certificate: lego.CertificateConfig{
 			KeyType: certcrypto.RSA2048,
-			Timeout: 30 * time.Second,
+			Timeout: 60 * time.Second,
 		},
 	}
 }
@@ -185,13 +210,18 @@ func initCertPool() *x509.CertPool {
 	return certPool
 }
 
-func createHTTPClientWithProxy(proxyURL string) *http.Client {
+func createHTTPClientWithProxy(proxyURL, username, password string) *http.Client {
 	var proxyFunc func(*http.Request) (*url.URL, error)
 	if proxyURL != "" {
 		parsedURL, err := url.Parse(proxyURL)
 		if err != nil {
 			proxyFunc = http.ProxyFromEnvironment
 		} else {
+			if username != "" && password != "" {
+				parsedURL.User = url.UserPassword(username, password)
+			} else if username != "" {
+				parsedURL.User = url.User(username)
+			}
 			proxyFunc = http.ProxyURL(parsedURL)
 		}
 	} else {
@@ -205,35 +235,17 @@ func createHTTPClientWithProxy(proxyURL string) *http.Client {
 		Transport: &http.Transport{
 			Proxy: proxyFunc,
 			DialContext: (&net.Dialer{
-				Timeout:   30 * time.Second,
-				KeepAlive: 30 * time.Second,
+				Timeout:   60 * time.Second,
+				KeepAlive: 60 * time.Second,
 			}).DialContext,
-			TLSHandshakeTimeout:   30 * time.Second,
-			ResponseHeaderTimeout: 30 * time.Second,
+			TLSHandshakeTimeout:   60 * time.Second,
+			ResponseHeaderTimeout: 60 * time.Second,
 			TLSClientConfig: &tls.Config{
 				ServerName: os.Getenv("LEGO_CA_SERVER_NAME"),
 				RootCAs:    initCertPool(),
 			},
 		},
 	}
-}
-
-func newConfig(user *AcmeUser, accountType, proxyURL string) *lego.Config {
-	config := NewConfigWithProxy(user, proxyURL)
-	switch accountType {
-	case "letsencrypt":
-		config.CADirURL = "https://acme-v02.api.letsencrypt.org/directory"
-	case "zerossl":
-		config.CADirURL = "https://acme.zerossl.com/v2/DV90"
-	case "buypass":
-		config.CADirURL = "https://api.buypass.com/acme/directory"
-	case "google":
-		config.CADirURL = "https://dv.acme-v02.api.pki.goog/directory"
-	}
-
-	config.UserAgent = "1Panel"
-	config.Certificate.KeyType = certcrypto.RSA2048
-	return config
 }
 
 func getZeroSSLEabCredentials(email string) (*zeroSSLRes, error) {

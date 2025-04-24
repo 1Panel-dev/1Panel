@@ -2383,6 +2383,8 @@ const message = {
             'Di sini hanya mencipta peraturan keseimbangan beban, untuk menggunakan peraturan sila proksi terbalik http(s)://<nama keseimbangan beban>',
         favorite: 'Kegemaran',
         cancelFavorite: 'Batalkan Kegemaran',
+        useProxy: 'Gunakan Proksi',
+        useProxyHelper: 'Gunakan alamat pelayan proksi dalam tetapan panel',
     },
     php: {
         short_open_tag: 'Sokongan tag pendek',

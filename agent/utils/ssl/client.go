@@ -3,6 +3,7 @@ package ssl
 import (
 	"crypto"
 	"encoding/json"
+	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/go-acme/lego/v4/providers/dns/clouddns"
 	"github.com/go-acme/lego/v4/providers/dns/freemyip"
 	"github.com/go-acme/lego/v4/providers/dns/huaweicloud"
@@ -49,6 +50,18 @@ func (u *AcmeUser) GetPrivateKey() crypto.PrivateKey {
 	return u.Key
 }
 
+type AcmeClientOption func(*AcmeClientOptions)
+
+type AcmeClientOptions struct {
+	SystemProxy *dto.SystemProxy
+}
+
+func WithSystemProxy(proxy *dto.SystemProxy) AcmeClientOption {
+	return func(opts *AcmeClientOptions) {
+		opts.SystemProxy = proxy
+	}
+}
+
 type AcmeClient struct {
 	Config   *lego.Config
 	Client   *lego.Client
@@ -56,11 +69,12 @@ type AcmeClient struct {
 	ProxyURL string
 }
 
-func NewAcmeClient(acmeAccount *model.WebsiteAcmeAccount, ProxyURL string) (*AcmeClient, error) {
+func NewAcmeClient(acmeAccount *model.WebsiteAcmeAccount, systemProxy *dto.SystemProxy) (*AcmeClient, error) {
 	if acmeAccount.Email == "" {
 		return nil, errors.New("email can not blank")
 	}
-	client, err := NewRegisterClient(acmeAccount, ProxyURL)
+
+	client, err := NewRegisterClient(acmeAccount, systemProxy)
 	if err != nil {
 		return nil, err
 	}

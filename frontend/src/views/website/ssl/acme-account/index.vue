@@ -4,7 +4,7 @@
             <div class="mb-1.5">
                 <el-alert :title="$t('ssl.acmeHelper')" type="info" :closable="false" />
             </div>
-            <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()" v-loading="loading">
+            <ComplexTable :data="data" :pagination-config="paginationConfig" v-loading="loading">
                 <template #toolbar>
                     <el-button type="primary" @click="openCreate">{{ $t('commons.button.create') }}</el-button>
                 </template>
@@ -20,9 +20,14 @@
                         {{ getAccountName(row.type) }}
                     </template>
                 </el-table-column>
-                <el-table-column :label="$t('website.keyType')" fix show-overflow-tooltip prop="keyType">
+                <el-table-column :label="$t('website.keyType')" prop="keyType">
                     <template #default="{ row }">
                         {{ getKeyName(row.keyType) }}
+                    </template>
+                </el-table-column>
+                <el-table-column :label="$t('website.useProxy')" min-width="100px">
+                    <template #default="{ row }">
+                        <el-switch v-model="row.useProxy" @change="update(row)"></el-switch>
                     </template>
                 </el-table-column>
                 <el-table-column label="URL" show-overflow-tooltip prop="url" min-width="300px"></el-table-column>
@@ -42,11 +47,12 @@
 
 <script lang="ts" setup>
 import { Website } from '@/api/interface/website';
-import { deleteAcmeAccount, searchAcmeAccount } from '@/api/modules/website';
+import { deleteAcmeAccount, searchAcmeAccount, updateAcmeAccount } from '@/api/modules/website';
 import i18n from '@/lang';
 import { reactive, ref } from 'vue';
 import Create from './create/index.vue';
 import { getAccountName, getKeyName } from '@/utils/util';
+import { MsgSuccess } from '@/utils/message';
 
 const open = ref(false);
 const loading = ref(false);
@@ -82,6 +88,13 @@ const search = async () => {
     await searchAcmeAccount(req).then((res) => {
         data.value = res.data.items;
         paginationConfig.total = res.data.total;
+    });
+};
+
+const update = (row: Website.AcmeAccount) => {
+    updateAcmeAccount(row).then(() => {
+        search();
+        MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
     });
 };
 

@@ -9,6 +9,7 @@ type WebsiteAcmeAccount struct {
 	EabKid     string `gorm:"default:null;" json:"eabKid"`
 	EabHmacKey string `gorm:"default:null" json:"eabHmacKey"`
 	KeyType    string `gorm:"not null;default:2048" json:"keyType"`
+	UseProxy   bool   `gorm:"default:false" json:"useProxy"`
 }
 
 func (w WebsiteAcmeAccount) TableName() string {

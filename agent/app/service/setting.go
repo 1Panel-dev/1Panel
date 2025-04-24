@@ -21,6 +21,7 @@ type ISettingService interface {
 	GetSSHInfo() (string, error)
 	TestConnByInfo(req dto.SSHConnData) bool
 	SaveConnInfo(req dto.SSHConnData) error
+	GetSystemProxy() (*dto.SystemProxy, error)
 }
 
 func NewISettingService() ISettingService {
@@ -123,4 +124,15 @@ func (u *SettingService) SaveConnInfo(req dto.SSHConnData) error {
 	connAfterEncrypt, _ := encrypt.StringEncrypt(string(localConn))
 	_ = settingRepo.Update("LocalSSHConn", connAfterEncrypt)
 	return nil
+}
+
+func (u *SettingService) GetSystemProxy() (*dto.SystemProxy, error) {
+	systemProxy := dto.SystemProxy{}
+	systemProxy.Type, _ = settingRepo.GetValueByKey("ProxyType")
+	systemProxy.URL, _ = settingRepo.GetValueByKey("ProxyUrl")
+	systemProxy.Port, _ = settingRepo.GetValueByKey("ProxyPort")
+	systemProxy.User, _ = settingRepo.GetValueByKey("ProxyUser")
+	passwd, _ := settingRepo.GetValueByKey("ProxyPasswd")
+	systemProxy.Password, _ = encrypt.StringDecrypt(passwd)
+	return &systemProxy, nil
 }
