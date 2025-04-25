@@ -45,6 +45,7 @@ const (
 const (
 	SyncSystemProxy    = "SyncSystemProxy"
 	SyncBackupAccounts = "SyncBackupAccounts"
+	SyncAlertSetting   = "SyncAlertSetting"
 )
 
 var WebUrlMap = map[string]struct{}{

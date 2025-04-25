@@ -14,6 +14,8 @@ import (
 
 func Proxy(c *gin.Context, currentNode string) {}
 
+func ProxyDocker(proxyURL string) error { return nil }
+
 func UpdateGroup(name string, group, newGroup uint) error { return nil }
 
 func CheckBackupUsed(name string) error { return nil }

@@ -151,6 +151,7 @@ type ProxyUpdate struct {
 	ProxyUser       string `json:"proxyUser"`
 	ProxyPasswd     string `json:"proxyPasswd"`
 	ProxyPasswdKeep string `json:"proxyPasswdKeep"`
+	ProxyDocker     bool   `json:"proxyDocker"`
 }
 
 type CleanData struct {

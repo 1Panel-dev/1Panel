@@ -199,6 +199,9 @@ func (u *SettingService) UpdateProxy(req dto.ProxyUpdate) error {
 	if err := settingRepo.Update("ProxyPasswdKeep", req.ProxyPasswdKeep); err != nil {
 		return err
 	}
+	if err := xpack.ProxyDocker(loadDockerProxy(req)); err != nil {
+		return err
+	}
 	go func() {
 		if err := xpack.Sync(constant.SyncSystemProxy); err != nil {
 			global.LOG.Errorf("sync proxy to node failed, err: %v", err)
@@ -635,4 +638,19 @@ func (u *SettingService) GetLoginSetting() (*dto.SystemSetting, error) {
 		IsIntl:   global.CONF.Base.IsIntl,
 	}
 	return res, nil
+}
+
+func loadDockerProxy(req dto.ProxyUpdate) string {
+	if len(req.ProxyType) == 0 || req.ProxyType == "close" || !req.ProxyDocker {
+		return ""
+	}
+	proxyPasswd := ""
+	if len(req.ProxyUser) != 0 {
+		proxyPasswd = req.ProxyPasswd + "@"
+	}
+	proxyUrl := req.ProxyType + "://" + req.ProxyUser + ":" + proxyPasswd + req.ProxyUrl + req.ProxyPort
+	if req.ProxyType == "http" || req.ProxyType == "https" {
+		req.ProxyUrl = req.ProxyType + "://" + req.ProxyUrl
+	}
+	return proxyUrl
 }
