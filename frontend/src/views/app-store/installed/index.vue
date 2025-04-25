@@ -184,6 +184,34 @@
                                                                     </el-button>
                                                                 </el-tooltip>
                                                             </span>
+                                                            <span class="ml-1">
+                                                                <el-tooltip
+                                                                    effect="dark"
+                                                                    :content="$t('website.cancelFavorite')"
+                                                                    placement="top-start"
+                                                                    v-if="installed.favorite"
+                                                                >
+                                                                    <el-button
+                                                                        link
+                                                                        icon="Star"
+                                                                        type="warning"
+                                                                        @click="favoriteInstall(installed)"
+                                                                    ></el-button>
+                                                                </el-tooltip>
+                                                                <el-tooltip
+                                                                    effect="dark"
+                                                                    :content="$t('website.favorite')"
+                                                                    placement="top-start"
+                                                                    v-else
+                                                                >
+                                                                    <el-button
+                                                                        link
+                                                                        icon="Star"
+                                                                        type="info"
+                                                                        @click="favoriteInstall(installed)"
+                                                                    ></el-button>
+                                                                </el-tooltip>
+                                                            </span>
                                                         </div>
                                                         <div class="flex flex-wrap items-center justify-end gap-1">
                                                             <el-button
@@ -441,6 +469,7 @@ const operateReq = reactive({
     installId: 0,
     operate: '',
     detailId: 0,
+    favorite: false,
 });
 const backupRef = ref();
 const uploadRef = ref();
@@ -555,6 +584,13 @@ const openOperate = (row: any, op: string) => {
     } else {
         onOperate(op);
     }
+};
+
+const favoriteInstall = (row: App.AppInstalled) => {
+    operateReq.installId = row.id;
+    operateReq.operate = 'favorite';
+    operateReq.favorite = !row.favorite;
+    operate();
 };
 
 const openIgnore = () => {

@@ -80,6 +80,7 @@ type AppInstalledOperate struct {
 	DockerCompose string              `json:"dockerCompose"`
 	TaskID        string              `json:"taskID"`
 	DeleteImage   bool                `json:"deleteImage"`
+	Favorite      bool                `json:"favorite"`
 }
 
 type AppInstallUpgrade struct {

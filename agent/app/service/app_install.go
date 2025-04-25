@@ -85,6 +85,7 @@ func (a *AppInstallService) Page(req request.AppInstalledSearch) (int64, []respo
 		installs []model.AppInstall
 		err      error
 	)
+	opts = append(opts, repo.WithOrderRuleBy("favorite", "descending"))
 
 	if req.Name != "" {
 		opts = append(opts, repo.WithByLikeName(req.Name))
@@ -301,6 +302,9 @@ func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
 		return upgradeInstall(upgradeReq)
 	case constant.Reload:
 		return opNginx(install.ContainerName, constant.NginxReload)
+	case constant.Favorite:
+		install.Favorite = req.Favorite
+		return appInstallRepo.Save(context.Background(), &install)
 	default:
 		return errors.New("operate not support")
 	}

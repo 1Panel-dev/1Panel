@@ -28,14 +28,15 @@ const (
 type AppOperate string
 
 var (
-	Start   AppOperate = "start"
-	Stop    AppOperate = "stop"
-	Restart AppOperate = "restart"
-	Delete  AppOperate = "delete"
-	Sync    AppOperate = "sync"
-	Backup  AppOperate = "backup"
-	Update  AppOperate = "update"
-	Rebuild AppOperate = "rebuild"
-	Upgrade AppOperate = "upgrade"
-	Reload  AppOperate = "reload"
+	Start    AppOperate = "start"
+	Stop     AppOperate = "stop"
+	Restart  AppOperate = "restart"
+	Delete   AppOperate = "delete"
+	Sync     AppOperate = "sync"
+	Backup   AppOperate = "backup"
+	Update   AppOperate = "update"
+	Rebuild  AppOperate = "rebuild"
+	Upgrade  AppOperate = "upgrade"
+	Reload   AppOperate = "reload"
+	Favorite AppOperate = "favorite"
 )

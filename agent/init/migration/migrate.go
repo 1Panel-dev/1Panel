@@ -32,6 +32,7 @@ func InitAgentDB() {
 		migrations.AddAppIgnore,
 		migrations.UpdateWebsite,
 		migrations.UpdateWebsiteAcmeAccount,
+		migrations.UpdateAppInstall,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

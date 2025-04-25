@@ -143,6 +143,7 @@ export namespace App {
         canUpdate: boolean;
         path: string;
         httpPort?: number;
+        favorite: boolean;
         app: App;
     }
 

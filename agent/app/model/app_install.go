@@ -25,7 +25,9 @@ type AppInstall struct {
 	HttpPort      int    `json:"httpPort"`
 	HttpsPort     int    `json:"httpsPort"`
 	WebUI         string `json:"webUI"`
-	App           App    `json:"app" gorm:"-:migration"`
+	Favorite      bool   `json:"favorite"`
+
+	App App `json:"app" gorm:"-:migration"`
 }
 
 func (i *AppInstall) GetPath() string {

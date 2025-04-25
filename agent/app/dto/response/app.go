@@ -124,6 +124,7 @@ type AppInstallDTO struct {
 	DockerCompose string    `json:"dockerCompose"`
 	WebUI         string    `json:"webUI"`
 	CreatedAt     time.Time `json:"createdAt"`
+	Favorite      bool      `json:"favorite"`
 	App           AppDetail `json:"app"`
 }
 

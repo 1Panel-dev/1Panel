@@ -352,3 +352,13 @@ var UpdateWebsiteAcmeAccount = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var UpdateAppInstall = &gormigrate.Migration{
+	ID: "20250425-update-appInstall",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.AppInstall{}); err != nil {
+			return err
+		}
+		return nil
+	},
+}
