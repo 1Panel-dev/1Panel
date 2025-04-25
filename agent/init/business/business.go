@@ -1,6 +1,8 @@
 package business
 
 import (
+	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/service"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
@@ -12,6 +14,7 @@ func Init() {
 	go syncRuntime()
 	go syncSSL()
 	go syncTask()
+	go initAcmeAccount()
 }
 
 func syncApp() {
@@ -43,5 +46,24 @@ func syncSSL() {
 func syncTask() {
 	if err := service.NewITaskService().SyncForRestart(); err != nil {
 		global.LOG.Errorf("sync task status error : %s", err.Error())
+	}
+}
+
+func initAcmeAccount() {
+	acmeAccountService := service.NewIWebsiteAcmeAccountService()
+	search := dto.PageInfo{
+		Page:     1,
+		PageSize: 10,
+	}
+	count, _, _ := acmeAccountService.Page(search)
+	if count == 0 {
+		createAcmeAccount := request.WebsiteAcmeAccountCreate{
+			Email:   "acme@1paneldev.com",
+			Type:    "letsencrypt",
+			KeyType: "2048",
+		}
+		if _, err := acmeAccountService.Create(createAcmeAccount); err != nil {
+			global.LOG.Errorf("create acme account error: %s", err.Error())
+		}
 	}
 }
