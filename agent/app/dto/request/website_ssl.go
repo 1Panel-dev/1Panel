@@ -47,11 +47,12 @@ type WebsiteSSLApply struct {
 
 type WebsiteAcmeAccountCreate struct {
 	Email      string `json:"email" validate:"required"`
-	Type       string `json:"type" validate:"required,oneof=letsencrypt zerossl buypass google freessl"`
+	Type       string `json:"type" validate:"required,oneof=letsencrypt zerossl buypass google custom"`
 	KeyType    string `json:"keyType" validate:"required,oneof=P256 P384 2048 3072 4096 8192"`
 	EabKid     string `json:"eabKid"`
 	EabHmacKey string `json:"eabHmacKey"`
 	UseProxy   bool   `json:"useProxy"`
+	CaDirURL   string `json:"caDirURL"`
 }
 
 type WebsiteAcmeAccountUpdate struct {

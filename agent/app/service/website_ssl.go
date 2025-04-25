@@ -348,7 +348,9 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 		websiteSSL.ExpireDate = cert.NotAfter
 		websiteSSL.StartDate = cert.NotBefore
 		websiteSSL.Type = cert.Issuer.CommonName
-		websiteSSL.Organization = cert.Issuer.Organization[0]
+		if len(cert.Issuer.Organization) > 0 {
+			websiteSSL.Organization = cert.Issuer.Organization[0]
+		}
 		websiteSSL.Status = constant.SSLReady
 		printSSLLog(logger, "ApplySSLSuccess", map[string]interface{}{"domain": strings.Join(domains, ",")}, apply.DisableLog)
 		saveCertificateFile(websiteSSL, logger)

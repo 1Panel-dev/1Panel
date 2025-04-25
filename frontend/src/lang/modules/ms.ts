@@ -2501,6 +2501,8 @@ const message = {
         shell: 'Kandungan skrip',
         shellHelper:
             'Direktori pelaksanaan lalai skrip adalah direktori pemasangan 1Panel. Jika sijil ditolak ke direktori tempatan, direktori pelaksanaan akan menjadi direktori tolak sijil. Tamat masa pelaksanaan lalai ialah 30 minit.',
+        customAcme: 'Perkhidmatan ACME Tersuai',
+        customAcmeURL: 'URL Perkhidmatan ACME',
     },
     firewall: {
         create: 'Buat peraturan',

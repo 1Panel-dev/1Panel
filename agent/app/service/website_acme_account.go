@@ -54,6 +54,9 @@ func (w WebsiteAcmeAccountService) Create(create request.WebsiteAcmeAccountCreat
 		acmeAccount.EabKid = create.EabKid
 		acmeAccount.EabHmacKey = create.EabHmacKey
 	}
+	if create.Type == "custom" && create.CaDirURL != "" {
+		acmeAccount.CaDirURL = create.CaDirURL
+	}
 
 	client, err := ssl.NewAcmeClient(acmeAccount, getSystemProxy(acmeAccount.UseProxy))
 	if err != nil {

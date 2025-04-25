@@ -152,6 +152,7 @@ export const AcmeAccountTypes = [
     { label: 'ZeroSSL', value: 'zerossl' },
     { label: 'Buypass', value: 'buypass' },
     { label: 'Google Cloud', value: 'google' },
+    { label: i18n.global.t('ssl.customAcme'), value: 'custom' },
 ];
 
 export const KeyTypes = [

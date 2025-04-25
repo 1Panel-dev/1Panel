@@ -2555,6 +2555,8 @@ const message = {
         shell: 'Script content',
         shellHelper:
             'The default execution directory of the script is the 1Panel installation directory. If a certificate is pushed, the execution directory is the certificate push directory. The default timeout is 30 minutes',
+        customAcme: 'Custom ACME Service',
+        customAcmeURL: 'ACME Service URL',
     },
     firewall: {
         create: 'Create Rule',

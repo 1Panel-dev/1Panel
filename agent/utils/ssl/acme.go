@@ -109,7 +109,7 @@ func NewRegisterClient(acmeAccount *model.WebsiteAcmeAccount, proxy *dto.SystemP
 		Email: acmeAccount.Email,
 		Key:   priKey,
 	}
-	config := NewConfigWithProxy(myUser, acmeAccount.Type, proxy)
+	config := NewConfigWithProxy(myUser, acmeAccount.Type, acmeAccount.CaDirURL, proxy)
 	client, err := lego.NewClient(config)
 	if err != nil {
 		return nil, err
@@ -156,7 +156,7 @@ func NewRegisterClient(acmeAccount *model.WebsiteAcmeAccount, proxy *dto.SystemP
 	return acmeClient, nil
 }
 
-func NewConfigWithProxy(user registration.User, accountType string, systemProxy *dto.SystemProxy) *lego.Config {
+func NewConfigWithProxy(user registration.User, accountType, customCaURL string, systemProxy *dto.SystemProxy) *lego.Config {
 	var (
 		caDirURL      string
 		proxyURL      string
@@ -174,6 +174,8 @@ func NewConfigWithProxy(user registration.User, accountType string, systemProxy 
 		caDirURL = "https://dv.acme-v02.api.pki.goog/directory"
 	case "freessl":
 		caDirURL = "https://acmepro.freessl.cn/v2/DV"
+	case "custom":
+		caDirURL = customCaURL
 	}
 	if systemProxy != nil {
 		proxyURL = fmt.Sprintf("%s:%s", systemProxy.URL, systemProxy.Port)
@@ -241,8 +243,9 @@ func createHTTPClientWithProxy(proxyURL, username, password string) *http.Client
 			TLSHandshakeTimeout:   60 * time.Second,
 			ResponseHeaderTimeout: 60 * time.Second,
 			TLSClientConfig: &tls.Config{
-				ServerName: os.Getenv("LEGO_CA_SERVER_NAME"),
-				RootCAs:    initCertPool(),
+				InsecureSkipVerify: true,
+				//ServerName: os.Getenv("LEGO_CA_SERVER_NAME"),
+				//RootCAs:    initCertPool(),
 			},
 		},
 	}

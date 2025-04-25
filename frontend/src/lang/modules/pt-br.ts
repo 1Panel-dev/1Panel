@@ -2498,6 +2498,8 @@ const message = {
         shell: 'Conteúdo do script',
         shellHelper:
             'O diretório padrão de execução do script é o diretório de instalação do 1Panel. Se um certificado for enviado para o diretório local, o diretório de execução será o diretório de envio do certificado. O tempo limite padrão de execução é de 30 minutos.',
+        customAcme: 'Serviço ACME Personalizado',
+        customAcmeURL: 'URL do Serviço ACME',
     },
     firewall: {
         create: 'Criar regra',

@@ -344,7 +344,7 @@ var UpdateWebsite = &gormigrate.Migration{
 }
 
 var UpdateWebsiteAcmeAccount = &gormigrate.Migration{
-	ID: "20250422-update-websiteAcmeAccount",
+	ID: "20250425-update-websiteAcmeAccount",
 	Migrate: func(tx *gorm.DB) error {
 		if err := tx.AutoMigrate(&model.WebsiteAcmeAccount{}); err != nil {
 			return err

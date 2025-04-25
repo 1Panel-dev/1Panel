@@ -55,6 +55,9 @@
                             {{ $t('ssl.googleHelper') }}
                         </el-link>
                     </div>
+                    <el-form-item v-if="account.type == 'custom'" :label="$t('ssl.customAcmeURL')" prop="caDirURL">
+                        <el-input v-model.trim="account.caDirURL"></el-input>
+                    </el-form-item>
                 </el-form>
             </el-col>
         </el-row>
@@ -86,6 +89,7 @@ const rules = ref({
     eabKid: [Rules.requiredInput],
     eabHmacKey: [Rules.requiredInput],
     keyType: [Rules.requiredSelect],
+    caDirURL: [Rules.requiredInput],
 });
 
 const initData = () => ({
@@ -95,6 +99,7 @@ const initData = () => ({
     eabHmacKey: '',
     keyType: 'P256',
     useProxy: false,
+    caDirURL: '',
 });
 
 const account = ref(initData());
