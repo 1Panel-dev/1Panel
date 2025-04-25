@@ -94,11 +94,12 @@ SubTask: "서브 작업"
 ScriptLibrary: "스크립트 라이브러리"
 
 Node: "노드"
-SyncNode: "노드 데이터 동기화 {{ .name }}"
-SyncPackageBackups: "백업 계정 데이터 패키징"
-SyncPackageProxy: "시스템 프록시 데이터 패키징"
-SyncPackagePanelJson: "노드 기본 데이터 패키징"
+SyncNode: "노드 데이터 동기화"
+SyncPackageData: "동기화 데이터 패키징 [{{ .detail }}]"
 SyncPackageEncrypt: "데이터 패키지 암호화"
+SyncRequest: "노드 동기화 API 요청"
+SyncFailedRetry: "노드 데이터 동기화 실패 ({{ .index }}번째 시도), {{ .err }}"
+SyncFailed: "동기화 실패, 노드 목록에서 수동 동기화를 실행하세요!"
 
 #upgrade node
 NodeUpgrade: "{{ .name }} 노드 업그레이드"

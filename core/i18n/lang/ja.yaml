@@ -95,11 +95,12 @@ SubTask: "サブタスク"
 ScriptLibrary: "スクリプトライブラリ"
 
 Node: "ノード"
-SyncNode: "ノードデータ同期 {{ .name }}"
-SyncPackageBackups: "バックアップアカウントデータのパッケージ化"
-SyncPackageProxy: "システムプロキシデータのパッケージ化"
-SyncPackagePanelJson: "ノード基本データのパッケージ化"
+SyncNode: "ノードデータ同期"
+SyncPackageData: "同期データのパッケージ化 [{{ .detail }}]"
 SyncPackageEncrypt: "データパッケージの暗号化"
+SyncRequest: "ノード同期APIをリクエスト"
+SyncFailedRetry: "ノードデータ同期失敗 ({{ .index }}回目), {{ .err }}"
+SyncFailed: "同期に失敗しました、ノードリストで手動同期してください！"
 
 #upgrade node
 NodeUpgrade: "{{ .name }} ノードのアップグレード"

@@ -9,7 +9,6 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"net"
 	"net/http"
 	"os"
@@ -18,9 +17,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/core/app/model"
-
 	"github.com/1Panel-dev/1Panel/core/app/dto"
+	"github.com/1Panel-dev/1Panel/core/app/model"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
@@ -30,6 +28,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/core/utils/firewall"
 	"github.com/1Panel-dev/1Panel/core/utils/req_helper/proxy_local"
+	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/gin-gonic/gin"
 )
 
@@ -200,7 +199,11 @@ func (u *SettingService) UpdateProxy(req dto.ProxyUpdate) error {
 	if err := settingRepo.Update("ProxyPasswdKeep", req.ProxyPasswdKeep); err != nil {
 		return err
 	}
-	_ = xpack.Sync(constant.SyncSystemProxy)
+	go func() {
+		if err := xpack.Sync(constant.SyncSystemProxy); err != nil {
+			global.LOG.Errorf("sync proxy to node failed, err: %v", err)
+		}
+	}()
 	return nil
 }
 

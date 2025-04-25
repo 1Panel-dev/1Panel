@@ -94,11 +94,12 @@ SubTask: "Subtask"
 ScriptLibrary: "Script Library"
 
 Node: "Node"
-SyncNode: "Sync node data {{ .name }}"
-SyncPackageBackups: "Package backup account data"
-SyncPackageProxy: "Package system proxy data"
-SyncPackagePanelJson: "Package node basic data"
+SyncNode: "Sync node data"
+SyncPackageData: "Package sync data [{{ .detail }}]"
 SyncPackageEncrypt: "Data package encryption"
+SyncRequest: "Request node sync API"
+SyncFailedRetry: "Node data sync failed (attempt {{ .index }}), {{ .err }}"
+SyncFailed: "Sync failed, please manually sync in the node list!"
 
 #upgrade node
 NodeUpgrade: "Upgrade node {{ .name }}"

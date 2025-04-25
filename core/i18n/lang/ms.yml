@@ -94,11 +94,12 @@ SubTask: "Tugas Sub"
 ScriptLibrary: "Pustaka Skrip"
 
 Node: "Nod"
-SyncNode: "Segerakkan data nod {{ .name }}"
-SyncPackageBackups: "Pakej data akaun sandaran"
-SyncPackageProxy: "Pakej data proksi sistem"
-SyncPackagePanelJson: "Pakej data asas nod"
+SyncNode: "Segerakkan data nod"
+SyncPackageData: "Pakej data segerak [{{ .detail }}]"
 SyncPackageEncrypt: "Enkripsi pakej data"
+SyncRequest: "Permintaan API segerak nod"
+SyncFailedRetry: "Gagal segerak data nod (percubaan ke-{{ .index }}), {{ .err }}"
+SyncFailed: "Segerakan gagal, sila segerakkan secara manual dalam senarai nod!"
 
 #upgrade node
 NodeUpgrade: "Naik taraf node {{ .name }}"

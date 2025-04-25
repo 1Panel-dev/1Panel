@@ -94,11 +94,12 @@ SubTask: "子任務"
 ScriptLibrary: "腳本庫"
 
 Node: "節點"
-SyncNode: "同步節點數據 {{ .name }}"
-SyncPackageBackups: "打包備份帳號數據"
-SyncPackageProxy: "打包系統代理數據"
-SyncPackagePanelJson: "打包節點基礎數據"
+SyncNode: "同步節點數據"
+SyncPackageData: "打包同步數據 [{{ .detail }}]"
 SyncPackageEncrypt: "數據包加密"
+SyncRequest: "請求節點同步接口"
+SyncFailedRetry: "第 {{ .index }} 次同步節點數據失敗，{{ .err }}"
+SyncFailed: "同步失敗，請在節點列表中手動同步！"
 
 #upgrade node
 NodeUpgrade: "升級節點 {{ .name }}"

@@ -212,7 +212,9 @@ const acceptParams = async () => {
     timer = setInterval(() => {
         syncTerminal();
     }, 1000 * 5);
-    onNewLocal();
+    if (terminalTabs.value.length === 0) {
+        onNewLocal();
+    }
     if (!mobile.value) {
         screenfull.on('change', () => {
             globalStore.isFullScreen = screenfull.isFullscreen;

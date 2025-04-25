@@ -94,11 +94,12 @@ SubTask: "Подзадача"
 ScriptLibrary: "Библиотека скриптов"
 
 Node: "Узел"
-SyncNode: "Синхронизация данных узла {{ .name }}"
-SyncPackageBackups: "Упаковка данных резервных копий аккаунтов"
-SyncPackageProxy: "Упаковка данных системного прокси"
-SyncPackagePanelJson: "Упаковка базовых данных узла"
+SyncNode: "Синхронизация данных узла"
+SyncPackageData: "Упаковка данных синхронизации [{{ .detail }}]"
 SyncPackageEncrypt: "Шифрование пакета данных"
+SyncRequest: "Запрос API синхронизации узла"
+SyncFailedRetry: "Ошибка синхронизации данных узла (попытка {{ .index }}), {{ .err }}"
+SyncFailed: "Ошибка синхронизации, выполните ручную синхронизацию в списке узлов!"
 
 #upgrade node
 NodeUpgrade: "Обновление узла {{ .name }}"

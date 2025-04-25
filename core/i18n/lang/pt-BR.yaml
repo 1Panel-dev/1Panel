@@ -94,11 +94,12 @@ SubTask: "Subtarefa"
 ScriptLibrary: "Biblioteca de Scripts"
 
 Node: "Nó"
-SyncNode: "Sincronizar dados do nó {{ .name }}"
-SyncPackageBackups: "Empacotar dados da conta de backup"
-SyncPackageProxy: "Empacotar dados de proxy do sistema"
-SyncPackagePanelJson: "Empacotar dados básicos do nó"
+SyncNode: "Sincronizar dados do nó"
+SyncPackageData: "Empacotar dados de sincronização [{{ .detail }}]"
 SyncPackageEncrypt: "Criptografia de pacote de dados"
+SyncRequest: "Solicitar API de sincronização de nó"
+SyncFailedRetry: "Falha na sincronização de dados do nó (tentativa {{ .index }}), {{ .err }}"
+SyncFailed: "Falha na sincronização, por favor sincronize manualmente na lista de nós!"
 
 #upgrade node
 NodeUpgrade: "Atualizar nó {{ .name }}"
