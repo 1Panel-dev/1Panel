@@ -48,6 +48,7 @@ const message = {
             verify: '確認する',
             saveAndEnable: '保存して有効にします',
             import: '輸入',
+            power: '認可',
             search: '検索',
             refresh: 'リロード',
             get: '得る',

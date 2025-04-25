@@ -50,6 +50,7 @@ const message = {
             verify: '驗證',
             saveAndEnable: '保存並啟用',
             import: '導入',
+            power: '授權',
             search: '搜索',
             refresh: '刷新',
             get: '獲取',

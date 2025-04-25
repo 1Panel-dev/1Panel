@@ -48,6 +48,7 @@ const message = {
             verify: 'Проверить',
             saveAndEnable: 'Сохранить и включить',
             import: 'Импорт',
+            power: 'Авторизация',
             search: 'Поиск',
             refresh: 'Обновить',
             get: 'Получить',

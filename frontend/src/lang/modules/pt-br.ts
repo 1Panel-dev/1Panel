@@ -48,6 +48,7 @@ const message = {
             verify: 'Verificar',
             saveAndEnable: 'Salvar e ativar',
             import: 'Importar',
+            power: 'Autorização',
             search: 'Pesquisar',
             refresh: 'Atualizar',
             get: 'Obter',

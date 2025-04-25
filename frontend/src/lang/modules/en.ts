@@ -50,6 +50,7 @@ const message = {
             verify: 'Verify',
             saveAndEnable: 'Save and enable',
             import: 'Import',
+            power: 'Authorization',
             search: 'Search',
             refresh: 'Refresh',
             get: 'Get',

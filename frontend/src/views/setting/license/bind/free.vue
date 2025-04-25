@@ -22,9 +22,7 @@ import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { changeBind, listNodeOptions } from '@/api/modules/setting';
-import { GlobalStore } from '@/store';
 import { Setting } from '@/api/interface/setting';
-const globalStore = GlobalStore();
 
 interface DialogProps {
     licenseID: number;
@@ -61,7 +59,6 @@ const onBind = async () => {
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            globalStore.isProductPro = false;
             window.location.reload();
         })
         .catch(() => {

@@ -96,6 +96,9 @@ const nodeChangeRef = ref<DropdownInstance>();
 const props = defineProps({
     version: String,
 });
+const isMasterPro = computed(() => {
+    return globalStore.isMasterPro();
+});
 
 const emit = defineEmits(['openTask']);
 bus.on('refreshTask', () => {
@@ -128,7 +131,7 @@ const changeFilter = () => {
 };
 
 const loadNodes = async () => {
-    if (!globalStore.isMasterProductPro) {
+    if (!isMasterPro.value) {
         globalStore.currentNode = 'local';
         return;
     }
@@ -156,7 +159,7 @@ const changeNode = (command: string) => {
         globalStore.currentNode = command || 'local';
         globalStore.isOffline = false;
         router.push({ name: 'home' }).then(() => {
-            location.reload();
+            window.location.reload();
         });
         return;
     }
@@ -177,14 +180,14 @@ const changeNode = (command: string) => {
             globalStore.currentNode = command || 'local';
             globalStore.isOffline = item.isOffline;
             router.push({ name: 'home' }).then(() => {
-                location.reload();
+                window.location.reload();
             });
         }
     }
 };
 
 const showNodes = () => {
-    return nodes.value.length > 0 && globalStore.isMasterProductPro;
+    return nodes.value.length > 0 && isMasterPro;
 };
 
 const taskCount = ref(0);

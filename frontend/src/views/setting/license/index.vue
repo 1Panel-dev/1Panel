@@ -101,10 +101,7 @@ import BindXpack from '@/views/setting/license/bind/xpack.vue';
 import { dateFormat } from '@/utils/util';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
-import { GlobalStore } from '@/store';
-import { initFavicon } from '@/utils/xpack';
 
-const globalStore = GlobalStore();
 const loading = ref();
 const licenseRef = ref();
 const bindFreeRef = ref();
@@ -175,13 +172,7 @@ const submitUnbind = async () => {
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            if (unbindRow.value.freeCount !== 0) {
-                globalStore.isMasterProductPro = false;
-                initFavicon();
-                window.location.reload();
-                return;
-            }
-            search();
+            window.location.reload();
         })
         .catch(() => {
             loading.value = false;
@@ -226,7 +217,7 @@ const timestampToDate = (timestamp: number) => {
 };
 
 const toUpload = () => {
-    licenseRef.value.acceptParams();
+    licenseRef.value.acceptParams({ isImport: true });
 };
 
 const loadVersion = (row: any) => {

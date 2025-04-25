@@ -22,6 +22,9 @@ const GlobalStore = defineStore({
             logo: '',
             logoWithText: '',
             favicon: '',
+            loginImage: '',
+            loginBackground: '',
+            loginBgType: '',
         },
         openMenuTabs: false,
         isFullScreen: false,
@@ -88,6 +91,9 @@ const GlobalStore = defineStore({
         },
         isMobile() {
             return this.device === DeviceType.Mobile;
+        },
+        isMasterPro() {
+            return this.isMasterProductPro;
         },
         setLastFilePath(path: string) {
             this.lastFilePath = path;

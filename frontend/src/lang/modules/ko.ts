@@ -48,6 +48,7 @@ const message = {
             verify: '검증',
             saveAndEnable: '저장 및 활성화',
             import: '가져오기',
+            power: '권한 부여',
             search: '검색',
             refresh: '새로고침',
             get: '가져오기',

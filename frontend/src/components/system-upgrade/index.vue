@@ -18,7 +18,7 @@
                 </span>
                 <div class="flex flex-wrap items-center">
                     <el-link :underline="false" type="primary" @click="toLxware">
-                        {{ $t(!isMasterProductPro ? 'license.community' : 'license.pro') }}
+                        {{ $t(!isMasterPro ? 'license.community' : 'license.pro') }}
                     </el-link>
                     <el-link :underline="false" class="version" type="primary" @click="copyText(version)">
                         {{ version }}
@@ -52,9 +52,11 @@ import { storeToRefs } from 'pinia';
 const globalStore = GlobalStore();
 const { docsUrl } = storeToRefs(globalStore);
 const upgradeRef = ref();
+const isMasterPro = computed(() => {
+    return globalStore.isMasterPro();
+});
 
 const version = ref<string>('');
-const isMasterProductPro = ref();
 const loading = ref(false);
 const upgradeInfo = ref();
 const upgradeVersion = ref();
@@ -119,7 +121,6 @@ const onLoadUpgradeInfo = async () => {
 };
 
 onMounted(() => {
-    isMasterProductPro.value = globalStore.isMasterProductPro;
     search();
 });
 </script>

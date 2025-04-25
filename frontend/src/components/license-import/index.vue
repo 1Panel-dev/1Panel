@@ -2,7 +2,9 @@
     <div>
         <DialogPro v-model="open" class="level-up-pro" @close="handleClose">
             <div style="text-align: center" v-loading="loading">
-                <span class="text-3xl font-medium title">{{ $t('license.levelUpPro') }}</span>
+                <span class="text-3xl font-medium title">
+                    {{ isImport ? $t('license.importLicense') : $t('license.levelUpPro') }}
+                </span>
                 <el-row type="flex" justify="center" class="mt-6">
                     <el-col :span="22">
                         <el-upload
@@ -25,12 +27,12 @@
                 </el-row>
                 <el-button
                     type="primary"
-                    class="mt-3 w-52"
+                    class="mt-3 w-52 custom-button"
                     :disabled="loading || uploaderFiles.length == 0"
                     plain
                     @click="submit"
                 >
-                    {{ $t('license.power') }}
+                    {{ isImport ? $t('commons.button.confirm') : $t('commons.button.power') }}
                 </el-button>
                 <div class="mt-3 mb-5">
                     <el-button text type="primary" @click="toLxware">{{ $t('license.knowMorePro') }}</el-button>
@@ -56,16 +58,19 @@ const loading = ref(false);
 const open = ref(false);
 const uploadRef = ref<UploadInstance>();
 const uploaderFiles = ref<UploadFiles>([]);
+const isImport = ref();
 
 const oldLicense = ref();
 interface DialogProps {
     oldLicense: string;
+    isImport: boolean;
 }
 
 const acceptParams = (params: DialogProps) => {
     oldLicense.value = params?.oldLicense || '';
     uploaderFiles.value = [];
     uploadRef.value?.clearFiles();
+    isImport.value = params?.isImport;
     open.value = true;
 };
 
@@ -100,7 +105,12 @@ const submit = async () => {
     const file = uploaderFiles.value[0];
     const formData = new FormData();
     formData.append('file', file.raw);
-    formData.append('title', oldLicense.value);
+    if (oldLicense.value) {
+        formData.append('oldLicenseName', oldLicense.value);
+    }
+    if (!isImport.value) {
+        formData.append('currentNode', globalStore.currentNode);
+    }
     loading.value = true;
     await uploadLicense(oldLicense.value, formData)
         .then(async () => {
@@ -130,3 +140,8 @@ defineExpose({
     acceptParams,
 });
 </script>
+<style lang="scss" scoped>
+.custom-button {
+    letter-spacing: 4px;
+}
+</style>
