@@ -395,6 +395,7 @@ const search = async () => {
     if (!currentRecord.value) {
         currentRecord.value = records.value[0];
     } else {
+        let oldRecordID = currentRecord.value.id;
         let beDelete = true;
         for (const item of records.value) {
             if (item.id === currentRecord.value.id) {
@@ -405,6 +406,9 @@ const search = async () => {
         }
         if (beDelete) {
             currentRecord.value = records.value[0];
+        }
+        if (oldRecordID === currentRecord.value.id && currentRecord.value.status !== 'Waiting') {
+            return;
         }
     }
     if (currentRecord.value?.records) {
@@ -419,7 +423,7 @@ const forDetail = async (row: Cronjob.Record) => {
 const loadRecord = async (row: Cronjob.Record) => {
     if (row.records) {
         const res = await getRecordLog(row.id);
-        let log = res.data.replace(/\x1B\[[0-?]*[ -/]*[@-~]/g, '');
+        let log = res.data.replace(/\x1B\[[0-?]*[ -/]*[@-~]/g, '').replace(/\r/g, '');
         if (currentRecordDetail.value === log) {
             return;
         }
