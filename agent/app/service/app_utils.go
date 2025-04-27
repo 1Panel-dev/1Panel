@@ -967,8 +967,13 @@ func copyData(task *task.Task, app model.App, appDetail model.AppDetail, appInst
 		return
 	}
 	envPath := path.Join(appDir, ".env")
-
 	envParams := make(map[string]string, len(req.Params))
+	if fileOp.Stat(envPath) {
+		envs, _ := gotenv.Read(envPath)
+		for k, v := range envs {
+			envParams[k] = v
+		}
+	}
 	handleMap(req.Params, envParams)
 	if err = env.Write(envParams, envPath); err != nil {
 		return
