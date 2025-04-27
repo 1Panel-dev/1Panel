@@ -8,7 +8,7 @@
     >
         <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
             <el-form-item :label="$t('setting.bindNode')" prop="nodeID" :rules="Rules.requiredSelect">
-                <el-select filterable v-model="form.nodeID" style="width: 100%">
+                <el-select filterable v-model="form.nodeID" class="w-full" clearable>
                     <el-option v-for="item in freeNodes" :key="item.id" :label="item.name" :value="item.id" />
                 </el-select>
             </el-form-item>

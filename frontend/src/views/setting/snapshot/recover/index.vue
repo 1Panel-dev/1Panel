@@ -53,7 +53,7 @@
             </span>
         </template>
     </DialogPro>
-    <TaskLog ref="taskLogRef" width="70%" />
+    <TaskLog ref="taskLogRef" width="70%" @close="handleClose" />
 </template>
 
 <script setup lang="ts">
@@ -103,6 +103,7 @@ let recoverReq = ref({
 
 const handleClose = () => {
     open.value = false;
+    emit('search');
 };
 const acceptParams = (params: DialogProps): void => {
     recoverReq.value = {

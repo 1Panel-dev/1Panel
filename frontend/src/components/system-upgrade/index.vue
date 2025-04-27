@@ -23,7 +23,7 @@
                     <el-link :underline="false" class="version" type="primary" @click="copyText(version)">
                         {{ version }}
                     </el-link>
-                    <el-badge is-dot class="-mt-0.5" :hidden="version === 'Waiting' && globalStore.hasNewVersion">
+                    <el-badge is-dot class="-mt-0.5" :hidden="version === 'Waiting' || !globalStore.hasNewVersion">
                         <el-link class="ml-2" :underline="false" type="primary" @click="onLoadUpgradeInfo">
                             {{ $t('commons.button.update') }}
                         </el-link>

@@ -153,7 +153,7 @@
             <el-button @click="next" v-else>{{ $t('commons.button.next') }}</el-button>
         </template>
     </DrawerPro>
-    <TaskLog ref="taskLogRef" width="70%" />
+    <TaskLog ref="taskLogRef" width="70%" @close="handleClose" />
 </template>
 <script lang="ts" setup>
 import { ref } from 'vue';
@@ -226,6 +226,7 @@ const acceptParams = (): void => {
 
 const handleClose = () => {
     drawerVisible.value = false;
+    emit('search');
 };
 
 const submitForm = async (formEl: any) => {

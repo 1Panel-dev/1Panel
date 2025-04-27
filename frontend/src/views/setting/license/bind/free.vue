@@ -2,7 +2,7 @@
     <DrawerPro v-model="drawerVisible" :header="$t('setting.license')" :resource="licenseName" @close="handleClose">
         <el-form label-position="top" :model="form" @submit.prevent v-loading="loading">
             <el-form-item :label="$t('license.add')" prop="nodeID">
-                <el-select filterable multiple v-model="form.nodeIDs" class="w-full">
+                <el-select filterable multiple v-model="form.nodeIDs" clearable class="w-full">
                     <div v-for="item in unboundOptions" :key="item.id">
                         <el-option :label="item.name" :value="item.id" />
                     </div>
