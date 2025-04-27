@@ -184,7 +184,7 @@
                                                                     </el-button>
                                                                 </el-tooltip>
                                                             </span>
-                                                            <span class="ml-1">
+                                                            <span class="ml-1" v-if="mode === 'installed'">
                                                                 <el-tooltip
                                                                     effect="dark"
                                                                     :content="$t('website.cancelFavorite')"
