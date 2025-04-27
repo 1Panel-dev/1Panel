@@ -2,7 +2,6 @@
     <el-drawer
         v-model="localOpenPage"
         @close="handleClose"
-        :before-close="handleBeforeClose"
         :destroy-on-close="true"
         :size="size"
         :close-on-press-escape="true"
@@ -112,25 +111,6 @@ const handleBack = () => {
         props.back();
     } else {
         handleClose();
-    }
-};
-
-const handleBeforeClose = (done: () => void) => {
-    if (drawerContent.value) {
-        const hasForm = drawerContent.value.querySelector('.el-form') !== null;
-        const hasTerminal = drawerContent.value.querySelector('.terminal') !== null;
-        if (!hasForm && !hasTerminal) {
-            done();
-            return;
-        }
-        ElMessageBox.confirm(i18n.global.t('commons.msg.closeDrawerHelper'), i18n.global.t('commons.button.close'), {
-            confirmButtonText: i18n.global.t('commons.button.confirm'),
-            cancelButtonText: i18n.global.t('commons.button.cancel'),
-        }).then(async () => {
-            done();
-        });
-    } else {
-        done();
     }
 };
 
