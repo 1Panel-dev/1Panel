@@ -4,10 +4,19 @@ import (
 	"crypto"
 	"encoding/json"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/go-acme/lego/v4/providers/dns/alidns"
 	"github.com/go-acme/lego/v4/providers/dns/clouddns"
+	"github.com/go-acme/lego/v4/providers/dns/cloudflare"
+	"github.com/go-acme/lego/v4/providers/dns/dnspod"
 	"github.com/go-acme/lego/v4/providers/dns/freemyip"
+	"github.com/go-acme/lego/v4/providers/dns/godaddy"
 	"github.com/go-acme/lego/v4/providers/dns/huaweicloud"
+	"github.com/go-acme/lego/v4/providers/dns/namecheap"
+	"github.com/go-acme/lego/v4/providers/dns/namedotcom"
+	"github.com/go-acme/lego/v4/providers/dns/namesilo"
 	"github.com/go-acme/lego/v4/providers/dns/rainyun"
+	"github.com/go-acme/lego/v4/providers/dns/tencentcloud"
+	"github.com/go-acme/lego/v4/providers/dns/vercel"
 	"github.com/go-acme/lego/v4/providers/dns/volcengine"
 	"os"
 	"strings"
@@ -20,14 +29,6 @@ import (
 	"github.com/go-acme/lego/v4/challenge"
 	"github.com/go-acme/lego/v4/challenge/dns01"
 	"github.com/go-acme/lego/v4/lego"
-	"github.com/go-acme/lego/v4/providers/dns/alidns"
-	"github.com/go-acme/lego/v4/providers/dns/cloudflare"
-	"github.com/go-acme/lego/v4/providers/dns/dnspod"
-	"github.com/go-acme/lego/v4/providers/dns/godaddy"
-	"github.com/go-acme/lego/v4/providers/dns/namecheap"
-	"github.com/go-acme/lego/v4/providers/dns/namedotcom"
-	"github.com/go-acme/lego/v4/providers/dns/namesilo"
-	"github.com/go-acme/lego/v4/providers/dns/tencentcloud"
 	"github.com/go-acme/lego/v4/providers/http/webroot"
 	"github.com/go-acme/lego/v4/registration"
 	"github.com/pkg/errors"
@@ -97,6 +98,7 @@ const (
 	Volcengine   DnsType = "Volcengine"
 	HuaweiCloud  DnsType = "HuaweiCloud"
 	FreeMyIP     DnsType = "FreeMyIP"
+	Vercel       DnsType = "Vercel"
 )
 
 type DNSParam struct {
@@ -121,17 +123,15 @@ var (
 	dnsTimeOut         = 30 * time.Minute
 )
 
-func (c *AcmeClient) UseDns(dnsType DnsType, params string, websiteSSL model.WebsiteSSL) error {
+func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, error) {
 	var (
 		param DNSParam
 		p     challenge.Provider
 		err   error
 	)
-
-	if err = json.Unmarshal([]byte(params), &param); err != nil {
-		return err
+	if err := json.Unmarshal([]byte(params), &param); err != nil {
+		return nil, err
 	}
-
 	switch dnsType {
 	case DnsPod:
 		dnsPodConfig := dnspod.NewDefaultConfig()
@@ -234,7 +234,21 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string, websiteSSL model.Web
 		freeMyIpConfig.PropagationTimeout = propagationTimeout
 		freeMyIpConfig.PollingInterval = pollingInterval
 		p, err = freemyip.NewDNSProviderConfig(freeMyIpConfig)
+	case Vercel:
+		vercelConfig := vercel.NewDefaultConfig()
+		vercelConfig.AuthToken = param.Token
+		vercelConfig.PropagationTimeout = propagationTimeout
+		vercelConfig.PollingInterval = pollingInterval
+		p, err = vercel.NewDNSProviderConfig(vercelConfig)
 	}
+	if err != nil {
+		return nil, err
+	}
+	return p, nil
+}
+
+func (c *AcmeClient) UseDns(dnsType DnsType, params string, websiteSSL model.WebsiteSSL) error {
+	p, err := getDNSProviderConfig(dnsType, params)
 	if err != nil {
 		return err
 	}

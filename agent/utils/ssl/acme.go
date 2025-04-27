@@ -243,9 +243,8 @@ func createHTTPClientWithProxy(proxyURL, username, password string) *http.Client
 			TLSHandshakeTimeout:   60 * time.Second,
 			ResponseHeaderTimeout: 60 * time.Second,
 			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: true,
-				//ServerName: os.Getenv("LEGO_CA_SERVER_NAME"),
-				//RootCAs:    initCertPool(),
+				ServerName: os.Getenv("LEGO_CA_SERVER_NAME"),
+				RootCAs:    initCertPool(),
 			},
 		},
 	}

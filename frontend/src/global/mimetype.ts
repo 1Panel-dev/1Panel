@@ -189,6 +189,10 @@ export const DNSTypes = [
         value: 'CloudFlare',
     },
     {
+        label: 'Vercel',
+        value: 'Vercel',
+    },
+    {
         label: 'CloudDNS',
         value: 'CloudDns',
     },
