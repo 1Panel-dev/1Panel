@@ -51,6 +51,7 @@ import { searchTasks } from '@/api/modules/log';
 import { onMounted, reactive, ref } from '@vue/runtime-core';
 import { Log } from '@/api/interface/log';
 import TaskLog from '@/components/log/task/index.vue';
+import bus from '@/global/bus';
 
 const loading = ref();
 const data = ref();
@@ -79,6 +80,7 @@ const search = async () => {
         paginationConfig.total = res.data.total;
     } catch (error) {
     } finally {
+        bus.emit('refreshTask', true);
         loading.value = false;
     }
 };

@@ -154,6 +154,7 @@ var WebUrlMap = map[string]struct{}{
 	"/xpack/setting":           {},
 	"/xpack/node":              {},
 	"/xpack/waf/stat":          {},
+	"/xpack/exchange/file":     {},
 }
 
 var DynamicRoutes = []string{

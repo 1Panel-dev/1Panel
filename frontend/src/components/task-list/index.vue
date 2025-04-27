@@ -49,6 +49,7 @@ import { searchTasks } from '@/api/modules/log';
 import { reactive, ref } from '@vue/runtime-core';
 import { Log } from '@/api/interface/log';
 import TaskLog from '@/components/log/task/index.vue';
+import bus from '@/global/bus';
 
 const open = ref(false);
 const handleClose = () => {
@@ -72,6 +73,7 @@ const req = reactive({
 });
 
 const search = async () => {
+    bus.emit('refreshTask', true);
     req.page = paginationConfig.currentPage;
     req.pageSize = paginationConfig.pageSize;
     loading.value = true;
