@@ -3,7 +3,7 @@
         <LayoutContent v-loading="loading" :title="$t('logs.login')">
             <template #leftToolBar>
                 <el-button type="primary" @click="onOpenDialog('create')">
-                    {{ $t('commons.button.add') }}
+                    {{ $t('commons.button.create') }}
                 </el-button>
                 <el-button type="primary" plain @click="onSync()">
                     {{ $t('commons.button.sync') }}
@@ -244,7 +244,9 @@ const buttons = [
             let item = deepCopy(row) as Cronjob.ScriptInfo;
             item.id = 0;
             item.name += '-' + getCurrentDateFormatted();
-            onOpenDialog('create', item);
+            item.groupList = row.groupList || [];
+            item.groupBelong = row.groupBelong || [];
+            onOpenDialog('clone', item);
         },
     },
     {

@@ -8,7 +8,8 @@ import { Terminal } from '@xterm/xterm';
 import '@xterm/xterm/css/xterm.css';
 import { FitAddon } from '@xterm/addon-fit';
 import { Base64 } from 'js-base64';
-import { TerminalStore } from '@/store';
+import { GlobalStore, TerminalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const terminalElement = ref<HTMLDivElement | null>(null);
 const fitAddon = new FitAddon();
@@ -166,7 +167,7 @@ const initWebSocket = (endpoint_: string, args: string = '') => {
     const host = href.split('//')[1].split('/')[0];
     const endpoint = endpoint_.replace(/^\/+/, '');
     terminalSocket.value = new WebSocket(
-        `${protocol}://${host}/${endpoint}?cols=${term.value.cols}&rows=${term.value.rows}&${args}`,
+        `${protocol}://${host}/${endpoint}?cols=${term.value.cols}&rows=${term.value.rows}&${args}&operateNode=${globalStore.currentNode}`,
     );
     terminalSocket.value.onopen = runRealTerminal;
     terminalSocket.value.onmessage = onWSReceive;

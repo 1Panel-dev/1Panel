@@ -277,8 +277,8 @@
                     </el-table-column>
                     <el-table-column
                         :label="$t('container.ip')"
-                        :width="mobile ? 80 : 'auto'"
-                        min-width="100"
+                        :width="mobile ? 120 : 'auto'"
+                        min-width="120"
                         prop="network"
                     >
                         <template #default="{ row }">

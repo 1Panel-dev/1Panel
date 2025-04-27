@@ -32,14 +32,14 @@ func NewCommand(script string) (*LocalCommand, error) {
 	} else {
 		cmd.Env = append(os.Environ(), "TERM=xterm")
 	}
-	cmd.Env = append(cmd.Env, "INIT_SCRIPT="+script)
+	cmd.Env = append(cmd.Env, "1PANEL_INIT_SCRIPT="+script)
 	pty, err := pty.Start(cmd)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to start command")
 	}
 	if len(script) != 0 {
 		time.Sleep(100 * time.Millisecond)
-		_, _ = pty.Write([]byte("bash -c \"$INIT_SCRIPT\"\n"))
+		_, _ = pty.Write([]byte("bash -c \"$1PANEL_INIT_SCRIPT\"\n"))
 	}
 
 	lcmd := &LocalCommand{

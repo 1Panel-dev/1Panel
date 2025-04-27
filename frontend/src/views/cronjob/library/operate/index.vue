@@ -3,7 +3,7 @@
         v-model="drawerVisible"
         :header="title"
         @close="handleClose"
-        :resource="dialogData.title === 'create' ? '' : dialogData.rowData?.name"
+        :resource="dialogData.title !== 'edit' ? '' : dialogData.rowData?.name"
         size="large"
     >
         <el-form ref="formRef" v-loading="loading" label-position="top" :model="dialogData.rowData" :rules="rules">
@@ -64,7 +64,7 @@ const groupOptions = ref();
 
 const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
-    title.value = i18n.global.t('cronjob.library.' + dialogData.value.title);
+    title.value = i18n.global.t('commons.button.' + dialogData.value.title);
     loadGroupOptions();
     drawerVisible.value = true;
 };
@@ -87,9 +87,10 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         loading.value = true;
-        dialogData.value.rowData.groupList = dialogData.value.rowData.groupList || [];
-        dialogData.value.rowData.groups = dialogData.value.rowData.groupList.join(',');
-        if (dialogData.value.title === 'create') {
+        if (dialogData.value.rowData.groupList.length !== 0) {
+            dialogData.value.rowData.groups = dialogData.value.rowData.groupList?.join(',');
+        }
+        if (dialogData.value.title === 'create' || dialogData.value.title === 'clone') {
             await addScript(dialogData.value.rowData)
                 .then(() => {
                     loading.value = false;
