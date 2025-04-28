@@ -284,3 +284,8 @@ type ChangeDatabase struct {
 	DatabaseID   uint   `json:"databaseID" validate:"required"`
 	DatabaseType string `json:"databaseType" validate:"required"`
 }
+
+type WebsiteProxyDel struct {
+	ID   uint   `json:"id" validate:"required"`
+	Name string `json:"name" validate:"required"`
+}

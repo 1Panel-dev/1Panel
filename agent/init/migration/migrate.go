@@ -33,6 +33,7 @@ func InitAgentDB() {
 		migrations.UpdateWebsite,
 		migrations.UpdateWebsiteAcmeAccount,
 		migrations.UpdateAppInstall,
+		migrations.AddMcpServer,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

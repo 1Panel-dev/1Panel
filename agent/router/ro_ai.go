@@ -24,5 +24,14 @@ func (a *AIToolsRouter) InitRouter(Router *gin.RouterGroup) {
 		aiToolsRouter.POST("/domain/bind", baseApi.BindDomain)
 		aiToolsRouter.POST("/domain/get", baseApi.GetBindDomain)
 		aiToolsRouter.POST("/domain/update", baseApi.UpdateBindDomain)
+
+		aiToolsRouter.POST("/mcp/search", baseApi.PageMcpServers)
+		aiToolsRouter.POST("/mcp/server", baseApi.CreateMcpServer)
+		aiToolsRouter.POST("/mcp/server/update", baseApi.UpdateMcpServer)
+		aiToolsRouter.POST("/mcp/server/del", baseApi.DeleteMcpServer)
+		aiToolsRouter.POST("/mcp/server/op", baseApi.OperateMcpServer)
+		aiToolsRouter.POST("/mcp/domain/bind", baseApi.BindMcpDomain)
+		aiToolsRouter.GET("/mcp/domain/get", baseApi.GetMcpBindDomain)
+		aiToolsRouter.POST("/mcp/domain/update", baseApi.UpdateMcpBindDomain)
 	}
 }

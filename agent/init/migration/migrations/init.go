@@ -60,6 +60,10 @@ var AddTable = &gormigrate.Migration{
 			&model.WebsiteSSL{},
 			&model.Group{},
 			&model.AppIgnoreUpgrade{},
+			&model.McpServer{},
+			&model.MonitorBase{},
+			&model.MonitorIO{},
+			&model.MonitorNetwork{},
 		)
 	},
 }
@@ -357,6 +361,16 @@ var UpdateAppInstall = &gormigrate.Migration{
 	ID: "20250425-update-appInstall",
 	Migrate: func(tx *gorm.DB) error {
 		if err := tx.AutoMigrate(&model.AppInstall{}); err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var AddMcpServer = &gormigrate.Migration{
+	ID: "20250428-add-mcpServer",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.McpServer{}); err != nil {
 			return err
 		}
 		return nil

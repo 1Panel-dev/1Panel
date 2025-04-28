@@ -39,3 +39,35 @@ export const getBindDomain = (req: AI.BindDomainReq) => {
 export const updateBindDomain = (req: AI.BindDomain) => {
     return http.post(`/ai/domain/update`, req);
 };
+
+export const pageMcpServer = (req: AI.McpServerSearch) => {
+    return http.post<ResPage<AI.McpServer>>(`/ai/mcp/search`, req);
+};
+
+export const createMcpServer = (req: AI.McpServer) => {
+    return http.post(`/ai/mcp/server`, req);
+};
+
+export const updateMcpServer = (req: AI.McpServer) => {
+    return http.post(`/ai/mcp/server/update`, req);
+};
+
+export const deleteMcpServer = (req: AI.McpServerDelete) => {
+    return http.post(`/ai/mcp/server/del`, req);
+};
+
+export const operateMcpServer = (req: AI.McpServerOperate) => {
+    return http.post(`/ai/mcp/server/op`, req);
+};
+
+export const bindMcpDomain = (req: AI.McpBindDomain) => {
+    return http.post(`/ai/mcp/domain/bind`, req);
+};
+
+export const getMcpDomain = () => {
+    return http.get<AI.McpDomainRes>(`/ai/mcp/domain/get`);
+};
+
+export const updateMcpDomain = (req: AI.McpBindDomainUpdate) => {
+    return http.post(`/ai/mcp/domain/update`, req);
+};

@@ -109,4 +109,75 @@ export namespace AI {
         connUrl: string;
         acmeAccountID: number;
     }
+
+    export interface Environment {
+        key: string;
+        value: string;
+    }
+
+    export interface Volume {
+        source: string;
+        target: string;
+    }
+
+    export interface McpServer {
+        id: number;
+        name: string;
+        status: string;
+        baseUrl: string;
+        ssePath: string;
+        command: string;
+        port: number;
+        message: string;
+        createdAt?: string;
+        containerName: string;
+        environments: Environment[];
+        volumes: Volume[];
+        dir?: string;
+        hostIP: string;
+        protocol: string;
+        url: string;
+    }
+
+    export interface McpServerSearch extends ReqPage {
+        name: string;
+    }
+
+    export interface McpServerDelete {
+        id: number;
+    }
+
+    export interface McpServerOperate {
+        id: number;
+        operate: string;
+    }
+
+    export interface McpBindDomain {
+        domain: string;
+        sslID: number;
+        ipList: string;
+    }
+
+    export interface McpDomainRes {
+        domain: string;
+        sslID: number;
+        acmeAccountID: number;
+        allowIPs: string[];
+        websiteID?: number;
+        connUrl: string;
+    }
+
+    export interface McpBindDomainUpdate {
+        websiteID: number;
+        sslID: number;
+        ipList: string;
+    }
+
+    export interface ImportMcpServer {
+        name: string;
+        command: string;
+        ssePath: string;
+        containerName: string;
+        environments: Environment[];
+    }
 }

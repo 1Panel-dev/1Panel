@@ -21,6 +21,15 @@ const databaseRouter = {
             },
         },
         {
+            path: '/ai/mcp',
+            name: 'MCPServer',
+            component: () => import('@/views/ai/mcp/server/index.vue'),
+            meta: {
+                title: 'MCP',
+                requiresAuth: true,
+            },
+        },
+        {
             path: '/ai/gpu',
             name: 'GPU',
             component: () => import('@/views/ai/gpu/index.vue'),

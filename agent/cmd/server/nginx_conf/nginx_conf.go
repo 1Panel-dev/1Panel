@@ -46,3 +46,6 @@ var Upstream []byte
 
 //go:embed php_extensions.json
 var PHPExtensionsJson []byte
+
+//go:embed sse.conf
+var SSE []byte

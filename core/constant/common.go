@@ -58,6 +58,7 @@ var WebUrlMap = map[string]struct{}{
 	"/ai":       {},
 	"/ai/model": {},
 	"/ai/gpu":   {},
+	"/ai/mcp":   {},
 
 	"/containers":                   {},
 	"/containers/container/operate": {},

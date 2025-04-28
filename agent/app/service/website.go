@@ -93,6 +93,7 @@ type IWebsiteService interface {
 	UpdateProxyCache(req request.NginxProxyCacheUpdate) (err error)
 	GetProxyCache(id uint) (res response.NginxProxyCache, err error)
 	ClearProxyCache(req request.NginxCommonReq) error
+	DeleteProxy(req request.WebsiteProxyDel) (err error)
 
 	GetAntiLeech(id uint) (*response.NginxAntiLeechRes, error)
 	UpdateAntiLeech(req request.NginxAntiLeechUpdate) (err error)
@@ -1854,6 +1855,29 @@ func (w WebsiteService) ClearProxyCache(req request.NginxCommonReq) error {
 		return err
 	}
 	return nil
+}
+
+func (w WebsiteService) DeleteProxy(req request.WebsiteProxyDel) (err error) {
+	fileOp := files.NewFileOp()
+	website, err := websiteRepo.GetFirst(repo.WithByID(req.ID))
+	if err != nil {
+		return
+	}
+	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return
+	}
+	includeDir := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "proxy")
+	if !fileOp.Stat(includeDir) {
+		_ = fileOp.CreateDir(includeDir, 0755)
+	}
+	fileName := fmt.Sprintf("%s.conf", req.Name)
+	includePath := path.Join(includeDir, fileName)
+	backName := fmt.Sprintf("%s.bak", req.Name)
+	backPath := path.Join(includeDir, backName)
+	_ = fileOp.DeleteFile(includePath)
+	_ = fileOp.DeleteFile(backPath)
+	return updateNginxConfig(constant.NginxScopeServer, nil, &website)
 }
 
 func (w WebsiteService) GetAuthBasics(req request.NginxAuthReq) (res response.NginxAuthRes, err error) {

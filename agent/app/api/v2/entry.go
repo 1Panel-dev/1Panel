@@ -17,7 +17,8 @@ var (
 	appInstallService       = service.NewIAppInstalledService()
 	appIgnoreUpgradeService = service.NewIAppIgnoreUpgradeService()
 
-	aiToolService = service.NewIAIToolService()
+	aiToolService    = service.NewIAIToolService()
+	mcpServerService = service.NewIMcpServerService()
 
 	containerService       = service.NewIContainerService()
 	composeTemplateService = service.NewIComposeTemplateService()

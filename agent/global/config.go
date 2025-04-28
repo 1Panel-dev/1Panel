@@ -41,6 +41,7 @@ type SystemDir struct {
 	RuntimeDir           string
 	RecycleBinDir        string
 	SSLLogDir            string
+	McpDir               string
 }
 
 type LogConfig struct {

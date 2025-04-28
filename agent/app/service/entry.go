@@ -12,7 +12,8 @@ var (
 	appInstallResourceRepo = repo.NewIAppInstallResourceRpo()
 	appIgnoreUpgradeRepo   = repo.NewIAppIgnoreUpgradeRepo()
 
-	aiRepo = repo.NewIAiRepo()
+	aiRepo        = repo.NewIAiRepo()
+	mcpServerRepo = repo.NewIMcpServerRepo()
 
 	mysqlRepo      = repo.NewIMysqlRepo()
 	postgresqlRepo = repo.NewIPostgresqlRepo()

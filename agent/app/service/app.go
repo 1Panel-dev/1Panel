@@ -198,6 +198,9 @@ func (a AppService) GetApp(ctx *gin.Context, key string) (*response.AppDTO, erro
 			latestVersion = detail.Version
 			continue
 		}
+		if key == "openresty" && !common.CompareAppVersion(detail.Version, "1.27") {
+			continue
+		}
 		versionsRaw = append(versionsRaw, detail.Version)
 	}
 	appDTO.Versions = common.GetSortedVersions(versionsRaw)

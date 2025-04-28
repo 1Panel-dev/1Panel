@@ -42,11 +42,9 @@ ErrBackupLocalCreate: 'ローカル サーバーのバックアップ アカウ�
 #app
 ErrPortInUsed: '{{ .detail }} ポートはすでに使用されています!'
 ErrAppLimit: 'インストールされているアプリケーションの数が制限を超えました'
-ErrAppRequired: 'まず {{ .detail }} アプリケーションをインストールしてください'
 ErrNotInstall: 'アプリケーションがインストールされていません'
 ErrPortInOtherApp: '{{ .port }} ポートは既にアプリケーション {{ .apps }} によって使用されています!'
 ErrDbUserNotValid: '既存のデータベース、ユーザー名、およびパスワードが一致しません!'
-ErrDockerComposeNotValid: 'docker-compose ファイルの形式が正しくありません'
 ErrUpdateBuWebsite: 'アプリケーションは正常に更新されましたが、Web サイト構成ファイルの変更に失敗しました。設定を確認してください! '
 Err1PanelNetworkFailed: 'デフォルトのコンテナ ネットワークの作成に失敗しました。 {{ .detail }}'
 ErrFileParse: 'アプリケーションの docker-compose ファイルの解析に失敗しました!'
@@ -59,7 +57,6 @@ ErrFileParseApp: '{{ .name }} ファイルの解析に失敗しました {{ .err
 ErrAppDirNull: 'バージョン フォルダーが存在しません'
 LocalAppErr: 'アプリケーション {{ .name }} の同期に失敗しました! {{ .err }}'
 ErrContainerName: 'コンテナ名が既に存在します'
-ErrAppSystemRestart: '1Panel の再起動によりタスクが終了しました'
 ErrCreateHttpClient: 'リクエスト {{ .err }} の作成に失敗しました'
 ErrHttpReqTimeOut: 'リクエストがタイムアウトしました {{ .err }}'
 ErrHttpReqFailed: 'リクエストが失敗しました {{ .err }}'
@@ -69,7 +66,6 @@ ErrImagePullTimeOut: 'イメージ プル タイムアウト'
 ErrContainerNotFound: '{{ .name }} コンテナが存在しません'
 ErrContainerMsg: '{{ .name }} コンテナが異常です。詳細についてはコンテナページのログを確認してください。'
 ErrAppBackup: '{{ .name }} アプリケーションのバックアップに失敗しました。エラー {{ .err }}'
-ErrImagePull: 'イメージのプルに失敗しました {{ .err }}'
 ErrVersionTooLow: '現在の 1Panel のバージョンが低すぎるため、App Store を更新できません。操作する前にバージョンをアップグレードしてください。'
 ErrAppNameExist: 'アプリケーション名がすでに存在します'
 AppStoreIsSyncing: 'App Store が同期中です。しばらくしてからもう一度お試しください'
@@ -80,8 +76,6 @@ ErrAppUpgrade: 'アプリケーション {{ .name }} のアップグレードに
 AppRecover: 'アプリケーション {{ .name }} をロールバックします'
 PullImageStart: "イメージ {{ .name }} のプルを開始します"
 PullImageSuccess: 'イメージのプルが成功しました'
-UpgradeAppStart: 'アプリケーション {{ .name }} のアップグレードを開始します'
-UpgradeAppSuccess: 'アプリケーション {{ .name }} が正常にアップグレードされました'
 AppStoreIsLastVersion: 'App Store はすでに最新バージョンです'
 AppStoreSyncSuccess: 'App Store の同期が成功しました'
 SyncAppDetail: 'アプリケーション構成を同期する'
@@ -91,8 +85,6 @@ MoveSiteToDir: 'サイト ディレクトリを {{ .name }} に移行します'
 ErrMoveSiteDir: 'サイト ディレクトリの移行に失敗しました'
 MoveSiteDirSuccess: 'Web サイト ディレクトリの移行に成功しました'
 DeleteRuntimePHP: 'PHP ランタイムを削除する'
-CustomAppStoreNotConfig: 'アプリストアでオフライン パッケージ アドレスを設定してください'
-CustomAppStoreNotFound: 'アプリストア パッケージを取得できませんでした。存在するかどうかを確認してください'
 CustomAppStoreFileValid: 'App Store パッケージは .tar.gz 形式である必要があります'
 PullImageTimeout: 'プル イメージのタイムアウトです。イメージのアクセラレーションを増やすか、別のイメージのアクセラレーションに変更してください'
 ErrAppIsDown: '{{ .name }} アプリケーションの状態が異常です。確認してください'
@@ -115,9 +107,7 @@ ErrInvalidChar: '不正な文字は許可されません'
 ErrPathNotDelete: '選択されたディレクトリは削除できません'
 
 #website
-ErrDomainIsExist: 'ドメイン名は既に存在します'
 ErrAliasIsExist: 'エイリアスがすでに存在します'
-ErrAppDelete: '他のウェブサイトがこのアプリを使用しているため、削除できません'
 ErrBackupMatch: 'バックアップ ファイルは、現在の Web サイト データ {{ .detail }} の一部と一致しません'
 ErrBackupExist: 'バックアップ ファイル内のソース データの対応する部分が存在しません {{ .detail }}'
 ErrPHPResource: 'ローカルオペレーティング環境は切り替えをサポートしていません! '
@@ -179,7 +169,6 @@ ErrPortRules: 'ポート番号が一致しません。再入力してくださ�
 ErrPgImagePull: 'イメージのプルがタイムアウトしました。イメージのアクセラレーションを設定するか、{{ .name }} イメージを手動でプルして再試行してください'
 
 #runtime
-ErrDirNotFound: 'ビルド フォルダーが存在しません。ファイルの整合性を確認してください。'
 ErrFileNotExist: '{{ .detail }} ファイルが存在しません。ソース ファイルの整合性を確認してください。'
 ErrImageBuildErr: 'イメージのビルドに失敗しました'
 ErrImageExist: '画像がすでに存在します!'
@@ -219,6 +208,7 @@ ErrRuleNotExist: 'ルールが存在しません'
 ErrParseIP: 'IP 形式が間違っています'
 ErrDefaultIP: 'デフォルトは予約名です。別の名前に変更してください'
 ErrGroupInUse: 'IP グループはブラックリスト/ホワイトリストで使用されており、削除できません'
+ErrIPGroupAclUse: "IPグループはウェブサイト {{ .name }} のカスタムルールで使用されているため、削除できません"
 ErrGroupExist: 'IP グループ名がすでに存在します'
 ErrIPRange: 'IP 範囲が間違っています'
 ErrIPExist: 'IP がすでに存在します'
@@ -262,6 +252,7 @@ ErrDBNotExist: 'データベースが存在しません'
 allow: '許可'
 deny: '拒否'
 OpenrestyNotFound: 'Openresty がインストールされていません'
+remoteIpIsNull: "IPリストが空です"
 
 #task
 TaskStart: '{{ .name }} タスクが開始されました [START]'
@@ -387,7 +378,7 @@ ContainerStartCheck: 'コンテナが起動されているかどうかを確認�
 #task - image
 ImageBuild: 'イメージビルド'
 ImageBuildStdoutCheck: '画像出力コンテンツを解析する'
-ImaegBuildRes: 'イメージビルド出力: {{ .name }}'
+ImageBuildRes: 'イメージビルド出力: {{ .name }}'
 ImagePull: '画像をプル'
 ImageRepoAuthFromDB: 'データベースからリポジトリ認証情報を取得する'
 ImaegPullRes: "画像プル出力: {{ .name }}"
@@ -416,3 +407,6 @@ ErrAlertPush: 'アラート情報のプッシュ中にエラーが発生しま�
 ErrAlertSave: 'アラーム情報の保存中にエラーが発生しました。確認してもう一度お試しください。'
 ErrAlertSync: 'アラーム情報の同期エラーです。確認してもう一度お試しください。'
 ErrAlertRemote: 'アラーム メッセージのリモート エラーです。確認してもう一度お試しください。'
+
+#task - runtime
+ErrInstallExtension: "インストールタスクが進行中です、タスクが終了するのを待ってください"

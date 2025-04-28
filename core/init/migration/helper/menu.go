@@ -20,6 +20,7 @@ func LoadMenus() string {
 			Children: []dto.ShowMenu{
 				{ID: "41", Disabled: false, Title: "aiTools.model.model", IsShow: true, Label: "OllamaModel", Path: "/ai/model"},
 				{ID: "42", Disabled: false, Title: "aiTools.gpu.gpu", IsShow: true, Label: "GPU", Path: "/ai/gpu"},
+				{ID: "43", Disabled: false, Title: "aiTools.mcp.server", IsShow: true, Label: "MCPServer", Path: "/ai/mcp"},
 			}},
 		{ID: "5", Disabled: false, Title: "menu.database", IsShow: true, Label: "Database-Menu", Path: "/databases"},
 		{ID: "6", Disabled: false, Title: "menu.container", IsShow: true, Label: "Container-Menu", Path: "/containers"},

@@ -1,0 +1,19 @@
+services:
+  mcp-server:
+    image: supercorp/supergateway:latest
+    container_name: ${CONTAINER_NAME}
+    restart: unless-stopped
+    ports:
+      - "${HOST_IP}:${PANEL_APP_PORT_HTTP}:${PANEL_APP_PORT_HTTP}"
+    command: [
+      "--stdio", "${COMMAND}",
+      "--port", "${PANEL_APP_PORT_HTTP}",
+      "--baseUrl", "${BASE_URL}",
+      "--ssePath", "${SSE_PATH}",
+      "--messagePath", "${SSE_PATH}/messages"
+    ]
+    networks:
+      - 1panel-network
+networks:
+  1panel-network:
+    external: true
