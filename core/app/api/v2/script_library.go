@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"path"
 	"strconv"
-	"strings"
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/app/dto"
@@ -14,6 +13,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/terminal"
 	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/pkg/errors"
 )
 
@@ -159,7 +159,6 @@ func (b *BaseApi) RunScript(c *gin.Context) {
 		return
 	}
 
-	fileName := strings.ReplaceAll(scriptItem.Name, " ", "_")
 	quitChan := make(chan bool, 3)
 	if currentNode == "local" {
 		slave, err := terminal.NewCommand(scriptItem.Script)
@@ -181,8 +180,10 @@ func (b *BaseApi) RunScript(c *gin.Context) {
 		if wshandleError(wsConn, errors.WithMessage(err, "invalid param rows in request")) {
 			return
 		}
-		tmpFile := path.Join(installDir, "1panel/tmp/script")
-		initCmd := fmt.Sprintf("d=%s && mkdir -p $d && echo %s > $d/%s && clear && bash $d/%s", tmpFile, scriptItem.Script, fileName, fileName)
+
+		fileDir := path.Join(installDir, "1panel/tmp/script")
+		fileName := path.Join(fileDir, uuid.NewString())
+		initCmd := fmt.Sprintf("mkdir -p %s && cat > %s <<'EOF'\n%s\nEOF\n bash %s", fileDir, fileName, scriptItem.Script, fileName)
 		client, err := ssh.NewClient(*connInfo)
 		if wshandleError(wsConn, errors.WithMessage(err, "failed to set up the connection. Please check the host information")) {
 			return

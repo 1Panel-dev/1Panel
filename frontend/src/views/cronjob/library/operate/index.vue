@@ -87,7 +87,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         loading.value = true;
-        if (dialogData.value.rowData.groupList.length !== 0) {
+        if (dialogData.value.rowData.groupList?.length !== 0) {
             dialogData.value.rowData.groups = dialogData.value.rowData.groupList?.join(',');
         }
         if (dialogData.value.title === 'create' || dialogData.value.title === 'clone') {
