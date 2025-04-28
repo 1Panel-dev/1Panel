@@ -15,6 +15,7 @@ import (
 	"github.com/go-acme/lego/v4/providers/dns/namedotcom"
 	"github.com/go-acme/lego/v4/providers/dns/namesilo"
 	"github.com/go-acme/lego/v4/providers/dns/rainyun"
+	"github.com/go-acme/lego/v4/providers/dns/spaceship"
 	"github.com/go-acme/lego/v4/providers/dns/tencentcloud"
 	"github.com/go-acme/lego/v4/providers/dns/vercel"
 	"github.com/go-acme/lego/v4/providers/dns/volcengine"
@@ -99,6 +100,7 @@ const (
 	HuaweiCloud  DnsType = "HuaweiCloud"
 	FreeMyIP     DnsType = "FreeMyIP"
 	Vercel       DnsType = "Vercel"
+	Spaceship    DnsType = "Spaceship"
 )
 
 type DNSParam struct {
@@ -240,6 +242,14 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 		vercelConfig.PropagationTimeout = propagationTimeout
 		vercelConfig.PollingInterval = pollingInterval
 		p, err = vercel.NewDNSProviderConfig(vercelConfig)
+	case Spaceship:
+		spaceshipConfig := spaceship.NewDefaultConfig()
+		spaceshipConfig.APIKey = param.APIkey
+		spaceshipConfig.APISecret = param.APISecret
+		spaceshipConfig.PropagationTimeout = propagationTimeout
+		spaceshipConfig.PollingInterval = pollingInterval
+		spaceshipConfig.TTL = ttl
+		p, err = spaceship.NewDNSProviderConfig(spaceshipConfig)
 	}
 	if err != nil {
 		return nil, err

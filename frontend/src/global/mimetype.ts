@@ -220,6 +220,10 @@ export const DNSTypes = [
         label: i18n.global.t('website.rainyun'),
         value: 'RainYun',
     },
+    {
+        label: 'Spaceship',
+        value: 'Spaceship',
+    },
 ];
 
 export const Fields = [

@@ -54,11 +54,6 @@
                             <el-input v-model.trim="account.authorization['secretKey']"></el-input>
                         </el-form-item>
                     </div>
-                    <div v-if="account.type === 'RainYun'">
-                        <el-form-item label="API Key" prop="authorization.apiKey">
-                            <el-input v-model.trim="account.authorization['apiKey']"></el-input>
-                        </el-form-item>
-                    </div>
                     <div v-if="account.type === 'CloudDns'">
                         <el-form-item label="Client ID" prop="authorization.clientID">
                             <el-input v-model.trim="account.authorization['clientID']"></el-input>
@@ -84,14 +79,24 @@
                     <el-form-item
                         label="API Key"
                         prop="authorization.apiKey"
-                        v-if="account.type === 'NameCheap' || account.type === 'NameSilo' || account.type === 'Godaddy'"
+                        v-if="
+                            account.type === 'NameCheap' ||
+                            account.type === 'NameSilo' ||
+                            account.type === 'Godaddy' ||
+                            account.type === 'RainYun' ||
+                            account.type === 'Spaceship'
+                        "
                     >
                         <el-input v-model.trim="account.authorization['apiKey']"></el-input>
                     </el-form-item>
                     <el-form-item label="API User" prop="authorization.apiUser" v-if="account.type === 'NameCheap'">
                         <el-input v-model.trim="account.authorization['apiUser']"></el-input>
                     </el-form-item>
-                    <el-form-item label="API Secret" prop="authorization.apiSecret" v-if="account.type === 'Godaddy'">
+                    <el-form-item
+                        label="API Secret"
+                        prop="authorization.apiSecret"
+                        v-if="account.type === 'Godaddy' || account.type === 'Spaceship'"
+                    >
                         <el-input v-model.trim="account.authorization['apiSecret']"></el-input>
                     </el-form-item>
                     <div v-if="account.type === 'NameCom'">
@@ -153,6 +158,7 @@ const rules = ref<any>({
         apiKey: [Rules.requiredInput],
         apiUser: [Rules.requiredInput],
         secretID: [Rules.requiredInput],
+        apiSecret: [Rules.requiredInput],
     },
 });
 const account = ref({
