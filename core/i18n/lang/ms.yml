@@ -113,6 +113,8 @@ RestartAfterUpgrade: "Mulakan perkhidmatan selepas naik taraf"
 
 #add node
 TaskAddNode: "Tambah nod"
+LoadNodeArch: "Dapatkan maklumat seni bina nod"
+LoadNodeArchDetail: "Mengesan seni bina nod induk: {{ .local }}, seni bina nod anak: {{ .node }}"
 SyncAgentBaseInfo: "Sinkronkan maklumat asas nod"
 GenerateSSLInfo: "Cipta maklumat SSL nod"
 ConnInfoNotMatch: "Maklumat sambungan tidak sepadan"

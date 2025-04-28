@@ -154,13 +154,13 @@ func LoadScriptInfo(id uint) (model.ScriptLibrary, error) {
 }
 
 func (u *ScriptService) Sync() error {
-	syncTask, err := task.NewTaskWithOps(i18n.GetMsgByKey("LocalApp"), task.TaskSync, task.TaskScopeScript, "", 0)
+	syncTask, err := task.NewTaskWithOps(i18n.GetMsgByKey("ScriptLibrary"), task.TaskSync, task.TaskScopeScript, "", 0)
 	if err != nil {
 		global.LOG.Errorf("create sync task failed %v", err)
 		return err
 	}
 
-	syncTask.AddSubTask(task.GetTaskName(i18n.GetMsgByKey("LocalApp"), task.TaskSync, task.TaskScopeScript), func(t *task.Task) (err error) {
+	syncTask.AddSubTask(task.GetTaskName(i18n.GetMsgByKey("ScriptLibrary"), task.TaskSync, task.TaskScopeScript), func(t *task.Task) (err error) {
 		versionUrl := fmt.Sprintf("%s/scripts/version.txt", global.CONF.RemoteURL.ResourceURL)
 		_, versionRes, err := req_helper.HandleRequest(versionUrl, http.MethodGet, constant.TimeOut20s)
 		if err != nil {

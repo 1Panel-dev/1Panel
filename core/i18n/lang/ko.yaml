@@ -113,6 +113,8 @@ RestartAfterUpgrade: "업그레이드 후 서비스 시작"
 
 #add node
 TaskAddNode: "노드 추가"
+LoadNodeArch: "노드 아키텍처 정보 가져오기"
+LoadNodeArchDetail: "감지된 마스터 노드 아키텍처: {{ .local }}, 자식 노드 아키텍처: {{ .node }}"
 SyncAgentBaseInfo: "노드 기본 데이터 동기화"
 GenerateSSLInfo: "노드 SSL 정보 생성"
 ConnInfoNotMatch: "연결 정보가 일치하지 않음"

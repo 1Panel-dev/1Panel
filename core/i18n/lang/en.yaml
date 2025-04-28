@@ -113,6 +113,8 @@ RestartAfterUpgrade: "Start service after upgrade"
 
 #add node
 TaskAddNode: "Add node"
+LoadNodeArch: "Get node architecture info"
+LoadNodeArchDetail: "Detected master node architecture: {{ .local }}, child node architecture: {{ .node }}"
 SyncAgentBaseInfo: "Sync basic node info"
 GenerateSSLInfo: "Generate node SSL info"
 ConnInfoNotMatch: "Connection info mismatch"

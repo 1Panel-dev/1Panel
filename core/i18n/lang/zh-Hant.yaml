@@ -113,6 +113,8 @@ RestartAfterUpgrade: "升級後啟動服務"
 
 #add node
 TaskAddNode: "添加節點"
+LoadNodeArch: "獲取節點架構信息"
+LoadNodeArchDetail: "檢測到主節點架構：{{ .local }}，子節點架構：{{ .node }}"
 SyncAgentBaseInfo: "同步節點基礎數據"
 GenerateSSLInfo: "生成節點 SSL 信息"
 ConnInfoNotMatch: "連接信息不匹配"

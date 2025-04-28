@@ -113,6 +113,8 @@ RestartAfterUpgrade: "Запуск службы после обновления"
 
 #add node
 TaskAddNode: "Добавить узел"
+LoadNodeArch: "Получить информацию об архитектуре узла"
+LoadNodeArchDetail: "Обнаружена архитектура главного узла: {{ .local }}, архитектура дочернего узла: {{ .node }}"
 SyncAgentBaseInfo: "Синхронизировать базовую информацию узла"
 GenerateSSLInfo: "Сгенерировать SSL информацию узла"
 ConnInfoNotMatch: "Информация о соединении не совпадает"

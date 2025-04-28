@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"io"
 	"io/fs"
 	"os"
@@ -16,6 +15,8 @@ import (
 	"strings"
 	"time"
 	"unicode/utf8"
+
+	"github.com/1Panel-dev/1Panel/agent/app/dto"
 
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 
@@ -492,7 +493,7 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 		if req.TaskID != "" {
 			opts = append(opts, taskRepo.WithByID(req.TaskID))
 		} else {
-			opts = append(opts, repo.WithByType(req.TaskType), taskRepo.WithOperate(req.TaskOperate), taskRepo.WithResourceID(req.ResourceID))
+			opts = append(opts, repo.WithOrderRuleBy("created_at", "desc"), repo.WithByType(req.TaskType), taskRepo.WithOperate(req.TaskOperate), taskRepo.WithResourceID(req.ResourceID))
 		}
 		taskModel, err := taskRepo.GetFirst(opts...)
 		if err != nil {

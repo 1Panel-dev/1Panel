@@ -114,6 +114,8 @@ RestartAfterUpgrade: "アップグレード後にサービスを起動"
 
 #add node
 TaskAddNode: "ノードを追加"
+LoadNodeArch: "ノードアーキテクチャ情報を取得"
+LoadNodeArchDetail: "検出されたマスターノードアーキテクチャ: {{ .local }}, 子ノードアーキテクチャ: {{ .node }}"
 SyncAgentBaseInfo: "ノードの基本情報を同期"
 GenerateSSLInfo: "ノードのSSL情報を生成"
 ConnInfoNotMatch: "接続情報が一致しません"

@@ -113,6 +113,8 @@ RestartAfterUpgrade: "Iniciar serviço após a atualização"
 
 #add node
 TaskAddNode: "Adicionar nó"
+LoadNodeArch: "Obter informações de arquitetura do nó"
+LoadNodeArchDetail: "Arquitetura do nó mestre detectada: {{ .local }}, arquitetura do nó filho: {{ .node }}"
 SyncAgentBaseInfo: "Sincronizando dados básicos do nó"
 GenerateSSLInfo: "Gerando informações SSL do nó"
 ConnInfoNotMatch: "As informações de conexão não coincidem"

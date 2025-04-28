@@ -121,6 +121,9 @@ func LoadArch() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("std: %s, err: %s", std, err.Error())
 	}
+	return LoadArchWithStdout(std)
+}
+func LoadArchWithStdout(std string) (string, error) {
 	if strings.Contains(std, "x86_64") {
 		return "amd64", nil
 	}
