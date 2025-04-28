@@ -1476,7 +1476,8 @@ const message = {
         sessionTimeout: 'セッションタイムアウト',
         sessionTimeoutError: '最小セッションタイムアウトは300秒です',
         sessionTimeoutHelper: '{0}秒以上操作がない場合、パネルは自動的にログアウトされます。',
-        systemIP: 'システムアドレス',
+        systemIP: 'デフォルトアクセスアドレス',
+        systemIPHelper: 'このノード上のアプリケーションとコンテナリダイレクト用のデフォルトアクセスアドレス',
         proxy: 'サーバープロキシ',
         proxyHelper: 'プロキシサーバーを設定した後、次のシナリオで効果的になります。',
         proxyHelper1:

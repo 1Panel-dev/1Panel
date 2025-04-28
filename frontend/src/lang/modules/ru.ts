@@ -426,7 +426,7 @@ const message = {
         deleteHelper: '" для удаления этой базы данных',
         create: 'Создать базу данных',
         noMysql: 'Сервис базы данных (MySQL или MariaDB)',
-        noPostgresql: 'Сервис базы данных Postgresql',
+        noPostgresql: 'Сервис базы данных PostgreSQL',
         goUpgrade: 'Обновить',
         goInstall: 'Установить',
         isDelete: 'Удалено',
@@ -1508,7 +1508,8 @@ const message = {
         sessionTimeout: 'Время сессии',
         sessionTimeoutError: 'Минимальное время сессии 300 секунд',
         sessionTimeoutHelper: 'Панель автоматически выйдет из системы, если не будет операций более {0} секунд.',
-        systemIP: 'IP-адрес панели',
+        systemIP: 'Адрес доступа по умолчанию',
+        systemIPHelper: 'Адрес по умолчанию для доступа к приложениям и перенаправления контейнеров на этом узле',
         proxy: 'Прокси',
         proxyHelper: 'После настройки прокси-сервера он будет действовать в следующих сценариях:',
         proxyHelper1:

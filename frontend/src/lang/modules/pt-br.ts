@@ -429,7 +429,7 @@ const message = {
         deleteHelper: '" para excluir este banco de dados',
         create: 'Criar banco de dados',
         noMysql: 'Serviço de banco de dados (MySQL ou MariaDB)',
-        noPostgresql: 'Serviço de banco de dados Postgresql',
+        noPostgresql: 'Serviço de banco de dados PostgreSQL',
         goUpgrade: 'Ir para atualização',
         goInstall: 'Ir para instalação',
         isDelete: 'Excluído',
@@ -1506,7 +1506,8 @@ const message = {
         sessionTimeout: 'Tempo limite de sessão',
         sessionTimeoutError: 'O tempo mínimo de sessão é de 300 segundos',
         sessionTimeoutHelper: 'O painel será desconectado automaticamente após {0} segundo(s) de inatividade.',
-        systemIP: 'Endereço do sistema',
+        systemIP: 'Endereço de acesso padrão',
+        systemIPHelper: 'Endereço de acesso padrão para redirecionamento de aplicativos e containers neste nó',
         proxy: 'Proxy do servidor',
         proxyHelper: 'Será eficaz nos seguintes cenários após configurar o servidor proxy:',
         proxyHelper1:

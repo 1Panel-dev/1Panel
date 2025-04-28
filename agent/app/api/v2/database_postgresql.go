@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// @Tags Database Postgresql
+// @Tags Database PostgreSQL
 // @Summary Create postgresql database
 // @Accept json
 // @Param request body dto.PostgresqlDBCreate true "request"
@@ -40,7 +40,7 @@ func (b *BaseApi) CreatePostgresql(c *gin.Context) {
 	helper.Success(c)
 }
 
-// @Tags Database Postgresql
+// @Tags Database PostgreSQL
 // @Summary Bind postgresql user
 // @Accept json
 // @Param request body dto.PostgresqlBindUser true "request"
@@ -62,7 +62,7 @@ func (b *BaseApi) BindPostgresqlUser(c *gin.Context) {
 	helper.Success(c)
 }
 
-// @Tags Database Postgresql
+// @Tags Database PostgreSQL
 // @Summary Update postgresql database description
 // @Accept json
 // @Param request body dto.UpdateDescription true "request"
@@ -84,7 +84,7 @@ func (b *BaseApi) UpdatePostgresqlDescription(c *gin.Context) {
 	helper.Success(c)
 }
 
-// @Tags Database Postgresql
+// @Tags Database PostgreSQL
 // @Summary Change postgresql privileges
 // @Accept json
 // @Param request body dto.ChangeDBInfo true "request"
@@ -106,7 +106,7 @@ func (b *BaseApi) ChangePostgresqlPrivileges(c *gin.Context) {
 	helper.Success(c)
 }
 
-// @Tags Database Postgresql
+// @Tags Database PostgreSQL
 // @Summary Change postgresql password
 // @Accept json
 // @Param request body dto.ChangeDBInfo true "request"
@@ -137,7 +137,7 @@ func (b *BaseApi) ChangePostgresqlPassword(c *gin.Context) {
 	helper.Success(c)
 }
 
-// @Tags Database Postgresql
+// @Tags Database PostgreSQL
 // @Summary Page postgresql databases
 // @Accept json
 // @Param request body dto.PostgresqlDBSearch true "request"
@@ -163,7 +163,7 @@ func (b *BaseApi) SearchPostgresql(c *gin.Context) {
 	})
 }
 
-// @Tags Database Postgresql
+// @Tags Database PostgreSQL
 // @Summary Load postgresql database from remote
 // @Accept json
 // @Param request body dto.PostgresqlLoadDB true "request"
@@ -185,7 +185,7 @@ func (b *BaseApi) LoadPostgresqlDBFromRemote(c *gin.Context) {
 	helper.Success(c)
 }
 
-// @Tags Database Postgresql
+// @Tags Database PostgreSQL
 // @Summary Check before delete postgresql database
 // @Accept json
 // @Param request body dto.PostgresqlDBDeleteCheck true "request"
@@ -207,7 +207,7 @@ func (b *BaseApi) DeleteCheckPostgresql(c *gin.Context) {
 	helper.SuccessWithData(c, apps)
 }
 
-// @Tags Database Postgresql
+// @Tags Database PostgreSQL
 // @Summary Delete postgresql database
 // @Accept json
 // @Param request body dto.PostgresqlDBDelete true "request"

@@ -433,7 +433,7 @@ const message = {
         deleteHelper: '" to delete this database',
         create: 'Create',
         noMysql: 'Database service (MySQL or MariaDB)',
-        noPostgresql: 'Database service Postgresql',
+        noPostgresql: 'Database service PostgreSQL',
         goUpgrade: 'Go for upgrade',
         goInstall: 'Go for install',
         isDelete: 'Deleted',
@@ -1535,7 +1535,8 @@ const message = {
         sessionTimeoutError: 'The minimum timeout is 300 seconds',
         sessionTimeoutHelper:
             'If you do not operate the panel for more than {0} seconds, the panel automatically logs out',
-        systemIP: 'System Address',
+        systemIP: 'Default access address',
+        systemIPHelper: 'Default access address for application and container redirection on this node',
         proxy: 'Server Proxy',
         proxyHelper: 'After setting up the proxy server, it will be effective in the following scenarios:',
         proxyHelper1: 'Downloading and synchronizing installation packages from the app store (Professional)',

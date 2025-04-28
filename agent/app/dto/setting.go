@@ -3,6 +3,7 @@ package dto
 type SettingInfo struct {
 	DockerSockPath string `json:"dockerSockPath"`
 	SystemVersion  string `json:"systemVersion"`
+	SystemIP       string `json:"systemIP"`
 
 	LocalTime string `json:"localTime"`
 	TimeZone  string `json:"timeZone"`

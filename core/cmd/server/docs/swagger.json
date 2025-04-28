@@ -8475,7 +8475,7 @@
 				],
 				"summary": "Create postgresql database",
 				"tags": [
-					"Database Postgresql"
+					"Database PostgreSQL"
 				],
 				"x-panel-log": {
 					"BeforeFunctions": [],
@@ -8515,7 +8515,7 @@
 				],
 				"summary": "Load postgresql database from remote",
 				"tags": [
-					"Database Postgresql"
+					"Database PostgreSQL"
 				]
 			}
 		},
@@ -8550,7 +8550,7 @@
 				],
 				"summary": "Bind postgresql user",
 				"tags": [
-					"Database Postgresql"
+					"Database PostgreSQL"
 				],
 				"x-panel-log": {
 					"BeforeFunctions": [],
@@ -8595,7 +8595,7 @@
 				],
 				"summary": "Delete postgresql database",
 				"tags": [
-					"Database Postgresql"
+					"Database PostgreSQL"
 				],
 				"x-panel-log": {
 					"BeforeFunctions": [
@@ -8654,7 +8654,7 @@
 				],
 				"summary": "Check before delete postgresql database",
 				"tags": [
-					"Database Postgresql"
+					"Database PostgreSQL"
 				]
 			}
 		},
@@ -8689,7 +8689,7 @@
 				],
 				"summary": "Update postgresql database description",
 				"tags": [
-					"Database Postgresql"
+					"Database PostgreSQL"
 				],
 				"x-panel-log": {
 					"BeforeFunctions": [
@@ -8743,7 +8743,7 @@
 				],
 				"summary": "Change postgresql password",
 				"tags": [
-					"Database Postgresql"
+					"Database PostgreSQL"
 				],
 				"x-panel-log": {
 					"BeforeFunctions": [
@@ -8796,7 +8796,7 @@
 				],
 				"summary": "Change postgresql privileges",
 				"tags": [
-					"Database Postgresql"
+					"Database PostgreSQL"
 				],
 				"x-panel-log": {
 					"BeforeFunctions": [],
@@ -8844,7 +8844,7 @@
 				],
 				"summary": "Page postgresql databases",
 				"tags": [
-					"Database Postgresql"
+					"Database PostgreSQL"
 				]
 			}
 		},

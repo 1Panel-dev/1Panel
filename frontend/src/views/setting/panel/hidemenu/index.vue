@@ -68,6 +68,25 @@ const onChangeShow = async (row: any) => {
         for (const item of row.children) {
             item.isShow = row.isShow;
         }
+        return;
+    }
+    for (const item of treeData.hideMenu) {
+        if (!item.children) {
+            continue;
+        }
+        let allHide = true;
+        for (const item2 of item.children) {
+            if (item2.isShow) {
+                allHide = false;
+            }
+            if (item2.id === row.id && item2.isShow) {
+                item.isShow = true;
+                return;
+            }
+        }
+        if (allHide) {
+            item.isShow = false;
+        }
     }
 };
 

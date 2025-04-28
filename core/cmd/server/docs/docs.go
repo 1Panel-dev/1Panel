@@ -8479,7 +8479,7 @@ const docTemplate = `{
 				],
 				"summary": "Create postgresql database",
 				"tags": [
-					"Database Postgresql"
+					"Database PostgreSQL"
 				],
 				"x-panel-log": {
 					"BeforeFunctions": [],
@@ -8519,7 +8519,7 @@ const docTemplate = `{
 				],
 				"summary": "Load postgresql database from remote",
 				"tags": [
-					"Database Postgresql"
+					"Database PostgreSQL"
 				]
 			}
 		},
@@ -8554,7 +8554,7 @@ const docTemplate = `{
 				],
 				"summary": "Bind postgresql user",
 				"tags": [
-					"Database Postgresql"
+					"Database PostgreSQL"
 				],
 				"x-panel-log": {
 					"BeforeFunctions": [],
@@ -8599,7 +8599,7 @@ const docTemplate = `{
 				],
 				"summary": "Delete postgresql database",
 				"tags": [
-					"Database Postgresql"
+					"Database PostgreSQL"
 				],
 				"x-panel-log": {
 					"BeforeFunctions": [
@@ -8658,7 +8658,7 @@ const docTemplate = `{
 				],
 				"summary": "Check before delete postgresql database",
 				"tags": [
-					"Database Postgresql"
+					"Database PostgreSQL"
 				]
 			}
 		},
@@ -8693,7 +8693,7 @@ const docTemplate = `{
 				],
 				"summary": "Update postgresql database description",
 				"tags": [
-					"Database Postgresql"
+					"Database PostgreSQL"
 				],
 				"x-panel-log": {
 					"BeforeFunctions": [
@@ -8747,7 +8747,7 @@ const docTemplate = `{
 				],
 				"summary": "Change postgresql password",
 				"tags": [
-					"Database Postgresql"
+					"Database PostgreSQL"
 				],
 				"x-panel-log": {
 					"BeforeFunctions": [
@@ -8800,7 +8800,7 @@ const docTemplate = `{
 				],
 				"summary": "Change postgresql privileges",
 				"tags": [
-					"Database Postgresql"
+					"Database PostgreSQL"
 				],
 				"x-panel-log": {
 					"BeforeFunctions": [],
@@ -8848,7 +8848,7 @@ const docTemplate = `{
 				],
 				"summary": "Page postgresql databases",
 				"tags": [
-					"Database Postgresql"
+					"Database PostgreSQL"
 				]
 			}
 		},

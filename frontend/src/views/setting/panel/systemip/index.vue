@@ -18,7 +18,7 @@
 import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { updateSetting } from '@/api/modules/setting';
+import { updateAgentSetting } from '@/api/modules/setting';
 import { FormInstance } from 'element-plus';
 import { checkDomain, checkIpV4V6 } from '@/utils/util';
 
@@ -57,7 +57,7 @@ const onSaveSystemIP = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        await updateSetting({ key: 'SystemIP', value: form.systemIP })
+        await updateAgentSetting({ key: 'SystemIP', value: form.systemIP })
             .then(async () => {
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 loading.value = false;

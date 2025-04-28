@@ -194,10 +194,10 @@ func (r *Remote) Recover(info RecoverInfo) error {
 		}
 		if err != nil {
 			all, _ := io.ReadAll(stderrPipe)
-			global.LOG.Errorf("[Postgresql] DB:[%s] Recover Error: %s", info.Name, string(all))
+			global.LOG.Errorf("[PostgreSQL] DB:[%s] Recover Error: %s", info.Name, string(all))
 			return err
 		}
-		global.LOG.Infof("[Postgresql] DB:[%s] Restoring: %s", info.Name, readString)
+		global.LOG.Infof("[PostgreSQL] DB:[%s] Restoring: %s", info.Name, readString)
 	}
 
 	return nil

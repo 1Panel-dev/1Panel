@@ -118,11 +118,7 @@
                                 </span>
                             </el-form-item>
 
-                            <el-form-item
-                                v-if="globalStore.currentNode === 'local'"
-                                :label="$t('setting.systemIP')"
-                                prop="systemIP"
-                            >
+                            <el-form-item :label="$t('setting.systemIP')" prop="systemIP">
                                 <el-input disabled v-if="form.systemIP" v-model="form.systemIP">
                                     <template #append>
                                         <el-button @click="onChangeSystemIP" icon="Setting">
@@ -207,7 +203,13 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted, computed } from 'vue';
 import { ElForm, ElMessageBox } from 'element-plus';
-import { getSettingInfo, updateSetting, getSystemAvailable, updateApiConfig } from '@/api/modules/setting';
+import {
+    getSettingInfo,
+    updateSetting,
+    getSystemAvailable,
+    updateApiConfig,
+    getAgentSettingInfo,
+} from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { useTheme } from '@/global/use-theme';
@@ -306,6 +308,9 @@ if (globalStore.isIntl) {
 }
 
 const search = async () => {
+    const agentRes = await getAgentSettingInfo();
+    form.systemIP = agentRes.data.systemIP;
+
     const res = await getSettingInfo();
     form.userName = res.data.userName;
     form.password = '******';
@@ -328,7 +333,6 @@ const search = async () => {
     form.ipWhiteList = res.data.ipWhiteList;
     form.apiKeyValidityTime = res.data.apiKeyValidityTime;
     form.hideMenu = res.data.hideMenu;
-    form.systemIP = res.data.systemIP;
     form.theme = res.data.theme;
 
     if (isMasterProductPro.value) {
