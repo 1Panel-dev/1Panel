@@ -49,11 +49,9 @@ import { MsgSuccess } from '@/utils/message';
 import { uploadLicense } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import { UploadFile, UploadFiles, UploadInstance, UploadProps, UploadRawFile, genFileId } from 'element-plus';
-import { useTheme } from '@/global/use-theme';
-import { getXpackSetting, initFavicon } from '@/utils/xpack';
+import { getXpackSettingForTheme } from '@/utils/xpack';
 const globalStore = GlobalStore();
 
-const { switchTheme } = useTheme();
 const loading = ref(false);
 const open = ref(false);
 const uploadRef = ref<UploadInstance>();
@@ -115,18 +113,15 @@ const submit = async () => {
     await uploadLicense(oldLicense.value, formData)
         .then(async () => {
             globalStore.isProductPro = true;
-            const xpackRes = await getXpackSetting();
-            if (xpackRes) {
-                globalStore.themeConfig.theme = xpackRes.data.theme;
-                globalStore.themeConfig.themeColor = xpackRes.data.themeColor;
+            if (globalStore.isMaster) {
+                globalStore.isMasterProductPro = true;
             }
+            getXpackSettingForTheme();
             loading.value = false;
             uploadRef.value!.clearFiles();
             uploaderFiles.value = [];
             open.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            switchTheme();
-            initFavicon();
             window.location.reload();
         })
         .catch(() => {

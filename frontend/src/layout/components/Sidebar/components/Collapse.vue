@@ -83,6 +83,7 @@ import { countExecutingTask } from '@/api/modules/log';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 import { listNodeOptions } from '@/api/modules/setting';
+import { ref, watch } from 'vue';
 import bus from '@/global/bus';
 import { logOutApi } from '@/api/modules/auth';
 import router from '@/routers';
@@ -99,6 +100,12 @@ const props = defineProps({
 const isMasterPro = computed(() => {
     return globalStore.isMasterPro();
 });
+watch(
+    () => globalStore.isMasterPro(),
+    () => {
+        loadNodes();
+    },
+);
 
 const emit = defineEmits(['openTask']);
 bus.on('refreshTask', () => {
@@ -131,6 +138,7 @@ const changeFilter = () => {
 };
 
 const loadNodes = async () => {
+    nodes.value = [];
     if (!isMasterPro.value) {
         globalStore.currentNode = 'local';
         return;
