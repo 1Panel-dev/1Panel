@@ -2355,6 +2355,7 @@ const message = {
         cancelFavorite: 'お気に入りを解除',
         useProxy: 'プロキシを使用',
         useProxyHelper: 'パネル設定のプロキシサーバーアドレスを使用',
+        westCN: '西部デジタル',
     },
     php: {
         short_open_tag: '短いタグサポート',

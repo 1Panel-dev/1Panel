@@ -112,6 +112,25 @@
                             <el-input v-model.trim="account.authorization['token']"></el-input>
                         </el-form-item>
                     </div>
+                    <div v-if="account.type === 'ClouDNS'">
+                        <el-form-item label="Auth ID" prop="authorization.authID">
+                            <el-input v-model.trim="account.authorization['authID']"></el-input>
+                        </el-form-item>
+                        <el-form-item label="Sub Auth ID" prop="authorization.subAuthID">
+                            <el-input v-model.trim="account.authorization['subAuthID']"></el-input>
+                        </el-form-item>
+                        <el-form-item label="Auth Password" prop="authorization.authPassword">
+                            <el-input v-model.trim="account.authorization['authPassword']"></el-input>
+                        </el-form-item>
+                    </div>
+                    <div v-if="account.type === 'WestCN'">
+                        <el-form-item label="Username" prop="authorization.username">
+                            <el-input v-model.trim="account.authorization['username']"></el-input>
+                        </el-form-item>
+                        <el-form-item label="Password" prop="authorization.password">
+                            <el-input v-model.trim="account.authorization['password']"></el-input>
+                        </el-form-item>
+                    </div>
                 </el-form>
             </el-col>
         </el-row>

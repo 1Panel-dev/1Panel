@@ -36,6 +36,12 @@ func (b *BaseApi) Login(c *gin.Context) {
 	if len(entranceItem) != 0 {
 		entrance, _ = base64.StdEncoding.DecodeString(entranceItem)
 	}
+	if len(entrance) == 0 {
+		cookieValue, err := c.Cookie("SecurityEntrance")
+		if err == nil {
+			entrance, _ = base64.StdEncoding.DecodeString(cookieValue)
+		}
+	}
 
 	user, msgKey, err := authService.Login(c, req, string(entrance))
 	go saveLoginLogs(c, err)

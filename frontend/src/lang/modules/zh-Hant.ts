@@ -2272,6 +2272,7 @@ const message = {
         cancelFavorite: '取消收藏',
         useProxy: '使用代理',
         useProxyHelper: '使用面板設置中的代理服務器地址',
+        westCN: '西部數碼',
     },
     php: {
         short_open_tag: '短標簽支持',

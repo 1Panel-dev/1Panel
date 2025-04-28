@@ -7,6 +7,7 @@ import (
 	"github.com/go-acme/lego/v4/providers/dns/alidns"
 	"github.com/go-acme/lego/v4/providers/dns/clouddns"
 	"github.com/go-acme/lego/v4/providers/dns/cloudflare"
+	"github.com/go-acme/lego/v4/providers/dns/cloudns"
 	"github.com/go-acme/lego/v4/providers/dns/dnspod"
 	"github.com/go-acme/lego/v4/providers/dns/freemyip"
 	"github.com/go-acme/lego/v4/providers/dns/godaddy"
@@ -19,6 +20,7 @@ import (
 	"github.com/go-acme/lego/v4/providers/dns/tencentcloud"
 	"github.com/go-acme/lego/v4/providers/dns/vercel"
 	"github.com/go-acme/lego/v4/providers/dns/volcengine"
+	"github.com/go-acme/lego/v4/providers/dns/westcn"
 	"os"
 	"strings"
 	"time"
@@ -101,21 +103,27 @@ const (
 	FreeMyIP     DnsType = "FreeMyIP"
 	Vercel       DnsType = "Vercel"
 	Spaceship    DnsType = "Spaceship"
+	WestCN       DnsType = "WestCN"
+	ClouDNS      DnsType = "ClouDNS"
 )
 
 type DNSParam struct {
-	ID        string `json:"id"`
-	Token     string `json:"token"`
-	AccessKey string `json:"accessKey"`
-	SecretKey string `json:"secretKey"`
-	Email     string `json:"email"`
-	APIkey    string `json:"apiKey"`
-	APIUser   string `json:"apiUser"`
-	APISecret string `json:"apiSecret"`
-	SecretID  string `json:"secretID"`
-	ClientID  string `json:"clientID"`
-	Password  string `json:"password"`
-	Region    string `json:"region"`
+	ID           string `json:"id"`
+	Token        string `json:"token"`
+	AccessKey    string `json:"accessKey"`
+	SecretKey    string `json:"secretKey"`
+	Email        string `json:"email"`
+	APIkey       string `json:"apiKey"`
+	APIUser      string `json:"apiUser"`
+	APISecret    string `json:"apiSecret"`
+	SecretID     string `json:"secretID"`
+	ClientID     string `json:"clientID"`
+	Password     string `json:"password"`
+	Region       string `json:"region"`
+	Username     string `json:"username"`
+	AuthID       string `json:"authID"`
+	SubAuthID    string `json:"subAuthID"`
+	AuthPassword string `json:"authPassword"`
 }
 
 var (
@@ -250,6 +258,24 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 		spaceshipConfig.PollingInterval = pollingInterval
 		spaceshipConfig.TTL = ttl
 		p, err = spaceship.NewDNSProviderConfig(spaceshipConfig)
+	case WestCN:
+		westcnConfig := westcn.NewDefaultConfig()
+		westcnConfig.Username = param.Username
+		westcnConfig.Password = param.Password
+		westcnConfig.PropagationTimeout = propagationTimeout
+		westcnConfig.PollingInterval = pollingInterval
+		westcnConfig.TTL = ttl
+		p, err = westcn.NewDNSProviderConfig(westcnConfig)
+
+	case ClouDNS:
+		cloudnsConfig := cloudns.NewDefaultConfig()
+		cloudnsConfig.AuthID = param.AuthID
+		cloudnsConfig.SubAuthID = param.SubAuthID
+		cloudnsConfig.AuthPassword = param.AuthPassword
+		cloudnsConfig.PropagationTimeout = propagationTimeout
+		cloudnsConfig.PollingInterval = pollingInterval
+		cloudnsConfig.TTL = ttl
+		p, err = cloudns.NewDNSProviderConfig(cloudnsConfig)
 	}
 	if err != nil {
 		return nil, err

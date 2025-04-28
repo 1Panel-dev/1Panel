@@ -2409,6 +2409,7 @@ const message = {
         cancelFavorite: 'Batalkan Kegemaran',
         useProxy: 'Gunakan Proksi',
         useProxyHelper: 'Gunakan alamat pelayan proksi dalam tetapan panel',
+        westCN: 'West Digital',
     },
     php: {
         short_open_tag: 'Sokongan tag pendek',

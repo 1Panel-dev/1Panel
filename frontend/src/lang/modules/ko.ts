@@ -2316,6 +2316,7 @@ const message = {
         cancelFavorite: '즐겨찾기 취소',
         useProxy: '프록시 사용',
         useProxyHelper: '패널 설정의 프록시 서버 주소 사용',
+        westCN: '서부 디지털',
     },
     php: {
         short_open_tag: '짧은 태그 지원',

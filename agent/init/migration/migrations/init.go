@@ -61,9 +61,6 @@ var AddTable = &gormigrate.Migration{
 			&model.Group{},
 			&model.AppIgnoreUpgrade{},
 			&model.McpServer{},
-			&model.MonitorBase{},
-			&model.MonitorIO{},
-			&model.MonitorNetwork{},
 		)
 	},
 }

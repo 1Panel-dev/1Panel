@@ -221,6 +221,14 @@ export const DNSTypes = [
         value: 'RainYun',
     },
     {
+        label: i18n.global.t('website.westCN'),
+        value: 'WestCN',
+    },
+    {
+        label: 'ClouDNS',
+        value: 'ClouDNS',
+    },
+    {
         label: 'Spaceship',
         value: 'Spaceship',
     },

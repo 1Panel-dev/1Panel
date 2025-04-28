@@ -2405,6 +2405,7 @@ const message = {
         cancelFavorite: 'Cancelar Favorito',
         useProxy: 'Usar Proxy',
         useProxyHelper: 'Usar o endereço do servidor proxy nas configurações do painel',
+        westCN: 'West Digital',
     },
     php: {
         short_open_tag: 'Suporte para short tags',
