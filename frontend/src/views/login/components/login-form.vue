@@ -1,6 +1,6 @@
 <template>
     <div class="w-full h-full flex items-center justify-center px-8">
-        <div v-loading="loading" class="w-full flex-grow flex flex-col">
+        <div v-loading="loading" class="w-full flex-grow flex flex-col login-form">
             <div v-if="mfaShow">
                 <el-form @submit.prevent>
                     <div class="flex flex-col justify-center items-center mb-6">
@@ -121,20 +121,20 @@
                                 @click="login(loginFormRef)"
                                 @focus="loginButtonFocused = true"
                                 @blur="loginButtonFocused = false"
-                                class="w-full"
+                                class="w-full login-button"
                                 type="primary"
                                 size="default"
                             >
                                 {{ $t('commons.button.login') }}
                             </el-button>
                         </el-form-item>
-                        <el-text v-if="isDemo" type="danger">
+                        <el-text v-if="isDemo" type="danger" class="demo">
                             {{ $t('commons.login.username') }}:demo {{ $t('commons.login.password') }}:1panel
                         </el-text>
                         <el-form-item prop="agreeLicense" v-if="!isIntl">
                             <el-checkbox v-model="loginForm.agreeLicense">
                                 <template #default>
-                                    <span>
+                                    <span class="agree-title">
                                         {{ $t('commons.button.agree') }}
                                         <a
                                             class="agree"
@@ -461,5 +461,102 @@ onMounted(() => {
 
 :deep(.el-row) {
     padding: 0 !important;
+}
+
+.login-form {
+    .login-button {
+        background-color: #005eeb;
+        border-color: #005eeb;
+        color: #ffffff;
+        &:hover {
+            background-color: #196eed !important;
+            border-color: #196eed !important;
+            outline: none !important;
+        }
+    }
+
+    :deep(.el-input) {
+        --el-input-border-color: #dcdfe6;
+        background: none !important;
+    }
+
+    :deep(.el-input__wrapper) {
+        background: none !important;
+    }
+    :deep(.el-input__wrapper.is-focus) {
+        box-shadow: 0 0 0 1px #005eeb inset !important;
+    }
+
+    .demo {
+        text-align: center;
+        span {
+            color: red;
+        }
+    }
+
+    .agree-title {
+        color: #005eeb;
+    }
+
+    .agree {
+        white-space: pre-wrap;
+        color: #005eeb;
+    }
+
+    :deep(a) {
+        color: #005eeb;
+        &:hover {
+            opacity: 75%;
+        }
+    }
+
+    :deep(.el-checkbox__input .el-checkbox__inner) {
+        background-color: #fff !important;
+        border-color: #fff !important;
+    }
+
+    :deep(.el-checkbox__input.is-checked .el-checkbox__inner) {
+        background-color: #005eeb !important;
+        border-color: #005eeb !important;
+    }
+
+    :deep(.el-checkbox__input.is-checked .el-checkbox__inner::after) {
+        border-color: #fff !important;
+    }
+
+    :deep(.el-input__inner) {
+        color: #000 !important;
+    }
+}
+.cursor-pointer {
+    outline: none;
+}
+
+.el-dropdown:focus-visible {
+    outline: none;
+}
+
+.el-tooltip__trigger:focus-visible {
+    outline: none;
+}
+
+:deep(.el-dropdown-menu__item:not(.is-disabled):hover) {
+    color: #005eeb !important;
+    background-color: #e5eefd !important;
+}
+:deep(.el-dropdown-menu__item:not(.is-disabled):focus) {
+    color: #005eeb !important;
+    background-color: #e5eefd !important;
+}
+
+:deep(.el-loading-mask) {
+    background-color: rgba(229, 238, 253, 0.8) !important;
+}
+
+.login-footer-btn {
+    .el-button--primary {
+        border-color: #005eeb !important;
+        background-color: #005eeb !important;
+    }
 }
 </style>

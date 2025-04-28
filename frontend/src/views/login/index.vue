@@ -12,8 +12,8 @@
             :style="{ opacity: backgroundOpacity, width: containerWidth, height: containerHeight }"
             class="bg-white shadow-lg relative z-10 border border-gray-200 flex overflow-hidden"
         >
-            <div class="grid grid-cols-1 md:grid-cols-2 items-stretch w-full h-full">
-                <div v-if="showLogo" class="flex justify-center">
+            <div class="grid grid-cols-1 md:grid-cols-2 items-stretch w-full">
+                <div v-if="showLogo" class="flex justify-center" :style="{ height: containerHeight }">
                     <img
                         :src="loadImage('loginImage')"
                         class="max-w-full max-h-full object-cover bg-cover bg-center"
