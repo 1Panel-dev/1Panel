@@ -241,6 +241,9 @@
                                 <template #dropdown>
                                     <el-dropdown-menu>
                                         <template v-for="(mount, index) in hostMount" :key="mount.path">
+                                            <el-dropdown-item v-if="index == 0" @click.stop="jump(mount.path)">
+                                                {{ mount.path }} ({{ $t('file.root') }}) {{ getFileSize(mount.free) }}
+                                            </el-dropdown-item>
                                             <el-dropdown-item v-if="index != 0" @click.stop="jump(mount.path)">
                                                 {{ mount.path }} ({{ $t('home.mount') }}) {{ getFileSize(mount.free) }}
                                             </el-dropdown-item>
