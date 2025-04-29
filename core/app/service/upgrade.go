@@ -170,6 +170,7 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 		global.LOG.Info("upgrade successful!")
 		go writeLogs(req.Version)
 		_ = settingRepo.Update("SystemVersion", req.Version)
+		_ = global.AgentDB.Model(&model.Setting{}).Where("key = ?", "SystemVersion").Updates(map[string]interface{}{"value": req.Version}).Error
 		global.CONF.Base.Version = req.Version
 		_ = settingRepo.Update("SystemStatus", "Free")
 
