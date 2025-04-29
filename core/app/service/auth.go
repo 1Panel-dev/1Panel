@@ -2,6 +2,7 @@ package service
 
 import (
 	"crypto/hmac"
+	"encoding/base64"
 	"strconv"
 
 	"github.com/1Panel-dev/1Panel/core/app/dto"
@@ -62,6 +63,10 @@ func (u *AuthService) Login(c *gin.Context, info dto.Login, entrance string) (*d
 	if err != nil {
 		return nil, "", err
 	}
+	if entrance != "" {
+		entranceValue := base64.StdEncoding.EncodeToString([]byte(entrance))
+		c.SetCookie("SecurityEntrance", entranceValue, 0, "", "", false, true)
+	}
 	return res, "", nil
 }
 
@@ -98,6 +103,10 @@ func (u *AuthService) MFALogin(c *gin.Context, info dto.MFALogin, entrance strin
 	res, err := u.generateSession(c, info.Name)
 	if err != nil {
 		return nil, "", err
+	}
+	if entrance != "" {
+		entranceValue := base64.StdEncoding.EncodeToString([]byte(entrance))
+		c.SetCookie("SecurityEntrance", entranceValue, 0, "", "", false, true)
 	}
 	return res, "", nil
 }

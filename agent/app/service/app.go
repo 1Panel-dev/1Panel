@@ -130,14 +130,6 @@ func (a AppService) PageApp(ctx *gin.Context, req request.AppSearch) (interface{
 			Description: ap.GetDescription(ctx),
 		}
 		appDTOs = append(appDTOs, appDTO)
-		appTags, err := appTagRepo.GetByAppId(ap.ID)
-		if err != nil {
-			continue
-		}
-		var tagIds []uint
-		for _, at := range appTags {
-			tagIds = append(tagIds, at.TagId)
-		}
 		tags, err := getAppTags(ap.ID, lang)
 		if err != nil {
 			continue

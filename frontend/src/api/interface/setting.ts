@@ -236,5 +236,6 @@ export namespace Setting {
         version: string;
         isXpack: boolean;
         isBound: boolean;
+        name: string;
     }
 }
