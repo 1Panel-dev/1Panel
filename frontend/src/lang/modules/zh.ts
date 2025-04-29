@@ -1795,6 +1795,7 @@ const message = {
         monitor: '升级专业版可以查看网站的实时状态、访客趋势、访客来源、请求日志等信息。',
         alert: '升级专业版可通过短信接收告警信息，并查看告警日志，全面掌控各类关键事件，确保系统运行无忧。',
         node: '升级专业版可以使用 1Panel 管理多台 linux 服务器。',
+        fileExchange: '升级专业版可以在多台服务器之间快速传输文件。',
     },
     clean: {
         scan: '开始扫描',
@@ -3016,10 +3017,21 @@ const message = {
             alertContent3:
                 '为用户提供自定义手机号、每日推送次数、每日推送时间的配置，方便用户的设置来更加合理的进行推送告警。',
 
-            nodeTitle1: '多节点管理',
-            nodeContent1: '管理不同的节点',
+            nodeTitle1: '一键添加节点',
+            nodeContent1: '快速接入多台服务器节点',
             nodeTitle2: '批量升级',
-            nodeContent2: '多个节点批量升级',
+            nodeContent2: '一次操作同步升级所有节点',
+            nodeTitle3: '节点状态监控',
+            nodeContent3: '实时掌握各节点运行状态',
+            nodeTitle4: '快速远程连接',
+            nodeContent4: '一键直连节点远程终端',
+
+            fileExchangeTitle1: '密钥认证传输',
+            fileExchangeContent1: '通过 SSH 密钥进行身份验证，确保传输的安全性。',
+            fileExchangeTitle2: '高效文件同步',
+            fileExchangeContent2: '仅同步变化内容，大幅提高传输速度与稳定性。',
+            fileExchangeTitle3: '支持多节点互传',
+            fileExchangeContent3: '可在不同节点间便捷传送项目文件，灵活管理多台服务器。',
         },
         node: {
             master: '主节点',

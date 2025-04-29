@@ -1896,6 +1896,8 @@ const message = {
         monitor:
             'Upgrade para a versão profissional para visualizar o status em tempo real do site, tendências de visitantes, fontes de visitantes, logs de solicitações e outras informações.',
         alert: 'Upgrade para a versão profissional para receber informações de alarme via SMS e visualizar logs de alarmes, controlar completamente vários eventos chave e garantir a operação sem preocupações do sistema',
+        fileExchange:
+            'Atualize para a Edição Profissional para transferir arquivos rapidamente entre vários servidores.',
     },
     clean: {
         scan: 'Iniciar escaneamento',
@@ -3204,10 +3206,23 @@ const message = {
             alertContent3:
                 'Permite que os usuários configurem números de telefone personalizados, frequência de envio diário e horários de envio, facilitando a criação de alertas mais adequados.',
 
-            nodeTitle1: 'Gerenciamento de Múltiplos Nós',
-            nodeContent1: 'Gerenciar diferentes nós',
+            nodeTitle1: 'Adição de Nó com Um Clique',
+            nodeContent1: 'Integre rapidamente vários nós de servidor',
             nodeTitle2: 'Atualização em Lote',
-            nodeContent2: 'Atualizar vários nós em lote',
+            nodeContent2: 'Sincronize e atualize todos os nós com uma única operação',
+            nodeTitle3: 'Monitoramento de Status do Nó',
+            nodeContent3: 'Acompanhe em tempo real o status operacional de cada nó',
+            nodeTitle4: 'Conexão Remota Rápida',
+            nodeContent4: 'Conecte-se diretamente a terminais remotos de nós com um clique',
+
+            fileExchangeTitle1: 'Transmissão de Autenticação por Chave',
+            fileExchangeContent1: 'Autentique via chaves SSH para garantir a segurança da transmissão.',
+            fileExchangeTitle2: 'Sincronização de Arquivos Eficiente',
+            fileExchangeContent2:
+                'Sincronize apenas o conteúdo alterado para melhorar significativamente a velocidade e estabilidade da transmissão.',
+            fileExchangeTitle3: 'Suporte a Troca Entre Múltiplos Nós',
+            fileExchangeContent3:
+                'Transfira facilmente arquivos de projeto entre diferentes nós, gerencie vários servidores de forma flexível.',
         },
         node: {
             master: 'Nó Principal',

@@ -1908,6 +1908,7 @@ const message = {
         monitor:
             'Tingkatkan ke versi profesional untuk melihat status masa nyata laman web, tren pelawat, sumber pelawat, log permintaan dan maklumat lain.',
         alert: 'Tingkatkan ke versi profesional untuk menerima maklumat amaran melalui SMS dan melihat log amaran, mengawal sepenuhnya pelbagai acara utama, dan memastikan operasi sistem bebas kerisauan.',
+        fileExchange: 'Naik taraf ke Edisi Professional untuk menghantar fail dengan cepat antara pelbagai pelayan.',
     },
     clean: {
         scan: 'Mulakan imbasan',
@@ -3199,10 +3200,23 @@ const message = {
             alertContent3:
                 'Memberikan pengguna konfigurasi nombor telefon tersuai, kekerapan push harian, dan masa push harian, memudahkan pengguna untuk menetapkan amaran push yang lebih munasabah.',
 
-            nodeTitle1: 'Pengurusan Multi-Nod',
-            nodeContent1: 'Mengurus nod yang berbeza',
-            nodeTitle2: 'Peningkatan Pukal',
-            nodeContent2: 'Peningkatan secara pukal untuk beberapa nod',
+            nodeTitle1: 'Satu Klik Tambah Node',
+            nodeContent1: 'Mengintegrasikan pelbagai nod pelayan dengan cepat',
+            nodeTitle2: 'Kelompok Naik Taraf',
+            nodeContent2: 'Segerakan dan naik taraf semua nod dengan satu operasi',
+            nodeTitle3: 'Pemantauan Status Node',
+            nodeContent3: 'Memantau status operasi setiap nod secara real-time',
+            nodeTitle4: 'Sambungan Jauh Pantas',
+            nodeContent4: 'Sambung terus ke terminal jauh nod dengan satu klik',
+
+            fileExchangeTitle1: 'Pengangkutan Pengesahan Kunci',
+            fileExchangeContent1: 'Mengesahkan melalui kunci SSH untuk memastikan keselamatan pengangkutan.',
+            fileExchangeTitle2: 'Segerakan Fail Cekap',
+            fileExchangeContent2:
+                'Hanya menyegerakkan kandungan yang berubah untuk meningkatkan kelajuan dan kestabilan pengangkutan secara signifikan.',
+            fileExchangeTitle3: 'Sokongan Pertukaran Inter-Node',
+            fileExchangeContent3:
+                'Mudah memindahkan fail projek antara nod yang berbeza, mengurus pelbagai pelayan dengan fleksibiliti.',
         },
         node: {
             master: 'Nod Utama',

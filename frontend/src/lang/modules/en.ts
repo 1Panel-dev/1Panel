@@ -1942,6 +1942,7 @@ const message = {
             'Upgrade to the professional version to view the real-time status of the website, visitor trends, visitor sources, request logs and other information. ',
         alert: 'Upgrade to the professional version to receive alarm information via SMS and view alarm logs, fully control various key events, and ensure worry-free system operation',
         node: 'Upgrading to the professional version allows you to manage multiple Linux servers with 1Panel.',
+        fileExchange: 'Upgrade to the Professional Edition to quickly transfer files between multiple servers.',
     },
     clean: {
         scan: 'Start Scanning',
@@ -3270,10 +3271,23 @@ const message = {
             alertContent3:
                 'Provide users with custom phone numbers, daily push frequency, and daily push time configurations, making it easier for users to set up more reasonable push alerts.',
 
-            nodeTitle1: 'Multi-Node Management',
-            nodeContent1: 'Manage different nodes',
-            nodeTitle2: 'Bulk Upgrade',
-            nodeContent2: 'Bulk upgrade multiple nodes',
+            nodeTitle1: 'One-Click Node Addition',
+            nodeContent1: 'Quickly integrate multiple server nodes',
+            nodeTitle2: 'Batch Upgrade',
+            nodeContent2: 'Synchronize and upgrade all nodes with one operation',
+            nodeTitle3: 'Node Status Monitoring',
+            nodeContent3: "Real-time monitoring of each node's operational status",
+            nodeTitle4: 'Quick Remote Connection',
+            nodeContent4: 'One-click direct connection to node remote terminals',
+
+            fileExchangeTitle1: 'Key Authentication Transmission',
+            fileExchangeContent1: 'Authenticate via SSH keys to ensure transmission security.',
+            fileExchangeTitle2: 'Efficient File Synchronization',
+            fileExchangeContent2:
+                'Only synchronize changed content to significantly improve transmission speed and stability.',
+            fileExchangeTitle3: 'Support Multi-Node Intercommunication',
+            fileExchangeContent3:
+                'Easily transfer project files between different nodes, flexible management of multiple servers.',
         },
         node: {
             master: 'Main Node',

@@ -1821,6 +1821,7 @@ const message = {
         monitor:
             '전문 버전으로 업그레이드하면 웹사이트의 실시간 상태, 방문자 트렌드, 방문자 출처, 요청 로그 등 정보를 확인할 수 있습니다.',
         alert: '전문 버전으로 업그레이드하면 SMS 를 통해 알림 정보를 받고 알림 로그를 볼 수 있으며, 다양한 주요 이벤트를 완벽하게 제어하여 시스템 운영을 걱정 없이 유지할 수 있습니다.',
+        fileExchange: '프로페셔널 에디션으로 업그레이드하여 여러 서버 간에 파일을 빠르게 전송할 수 있습니다.',
     },
     clean: {
         scan: '스캔 시작',
@@ -3077,10 +3078,21 @@ const message = {
             alertContent3:
                 '사용자에게 전화번호, 일일 푸시 빈도, 일일 푸시 시간 등을 사용자 정의할 수 있는 설정을 제공하여 보다 합리적인 푸시 알림을 설정할 수 있도록 합니다.',
 
-            nodeTitle1: '다중 노드 관리',
-            nodeContent1: '다양한 노드 관리',
-            nodeTitle2: '대량 업그레이드',
-            nodeContent2: '여러 노드를 대량 업그레이드',
+            nodeTitle1: '원클릭 노드 추가',
+            nodeContent1: '여러 서버 노드를 빠르게 통합',
+            nodeTitle2: '일괄 업그레이드',
+            nodeContent2: '한 번의 작업으로 모든 노드를 동기화 및 업그레이드',
+            nodeTitle3: '노드 상태 모니터링',
+            nodeContent3: '각 노드의 운영 상태를 실시간으로 파악',
+            nodeTitle4: '빠른 원격 연결',
+            nodeContent4: '원클릭으로 노드 원격 터미널에 직접 연결',
+
+            fileExchangeTitle1: '키 인증 전송',
+            fileExchangeContent1: 'SSH 키를 통해 인증하여 전송 보안을 보장합니다.',
+            fileExchangeTitle2: '효율적인 파일 동기화',
+            fileExchangeContent2: '변경된 내용만 동기화하여 전송 속도와 안정성을 크게 향상시킵니다.',
+            fileExchangeTitle3: '다중 노드 상호 통신 지원',
+            fileExchangeContent3: '다른 노드 간에 프로젝트 파일을 쉽게 전송하고, 여러 서버를 유연하게 관리합니다.',
         },
         node: {
             master: '주 노드',

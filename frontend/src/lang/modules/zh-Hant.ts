@@ -1803,6 +1803,7 @@ const message = {
         monitor: '升級專業版可以查看網站的即時狀態、訪客趨勢、訪客來源、請求日誌等資訊。 ',
         alert: '陞級專業版可通過簡訊接收告警資訊，並查看告警日誌，全面掌控各類關鍵事件，確保系統運行無憂。',
         node: '升級專業版可以使用 1Panel 管理多台 linux 伺服器。',
+        fileExchange: '升級專業版可以在多台服務器之間快速傳輸文件。',
     },
     clean: {
         scan: '開始掃描',
@@ -3034,10 +3035,21 @@ const message = {
             alertContent3:
                 '為用戶提供自訂手機號、每日推送次數、每日推送時間的配寘，方便用戶的設定來更加合理的進行推送告警。',
 
-            nodeTitle1: '多節點管理',
-            nodeContent1: '管理不同的節點',
+            nodeTitle1: '一鍵添加節點',
+            nodeContent1: '快速接入多台服務器節點',
             nodeTitle2: '批量升級',
-            nodeContent2: '多個節點批量升級',
+            nodeContent2: '一次操作同步升級所有節點',
+            nodeTitle3: '節點狀態監控',
+            nodeContent3: '實時掌握各節點運行狀態',
+            nodeTitle4: '快速遠程連接',
+            nodeContent4: '一鍵直連節點遠程終端',
+
+            fileExchangeTitle1: '密鑰認證傳輸',
+            fileExchangeContent1: '通過 SSH 密鑰進行身份驗證，確保傳輸的安全性。',
+            fileExchangeTitle2: '高效文件同步',
+            fileExchangeContent2: '僅同步變化內容，大幅提高傳輸速度與穩定性。',
+            fileExchangeTitle3: '支持多節點互傳',
+            fileExchangeContent3: '可在不同節點間便捷傳送項目文件，靈活管理多台服務器。',
         },
         node: {
             master: '主節點',

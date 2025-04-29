@@ -6,6 +6,41 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "7712749",
+      "name": "node-4",
+      "font_class": "node-4",
+      "unicode": "e73c",
+      "unicode_decimal": 59196
+    },
+    {
+      "icon_id": "10055631",
+      "name": "node-3",
+      "font_class": "node-3",
+      "unicode": "e7d7",
+      "unicode_decimal": 59351
+    },
+    {
+      "icon_id": "22553639",
+      "name": "file-2",
+      "font_class": "file-2",
+      "unicode": "e6bf",
+      "unicode_decimal": 59071
+    },
+    {
+      "icon_id": "25604138",
+      "name": "file-1",
+      "font_class": "file-1",
+      "unicode": "e742",
+      "unicode_decimal": 59202
+    },
+    {
+      "icon_id": "43808299",
+      "name": "file-3",
+      "font_class": "file-3",
+      "unicode": "e607",
+      "unicode_decimal": 58887
+    },
+    {
       "icon_id": "29971586",
       "name": "火爆",
       "font_class": "huobao1",
