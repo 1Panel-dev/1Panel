@@ -19,7 +19,12 @@
                 <el-select v-model="group" @change="search()" clearable class="p-w-200">
                     <template #prefix>{{ $t('commons.table.group') }}</template>
                     <div v-for="item in groupOptions" :key="item.id">
-                        <el-option :label="item.name" :value="item.id" />
+                        <el-option
+                            v-if="item.name === 'Default'"
+                            :label="$t('commons.table.default')"
+                            :value="item.id"
+                        />
+                        <el-option v-else :label="item.name" :value="item.id" />
                     </div>
                 </el-select>
                 <TableSearch @search="search()" v-model:searchName="searchInfo" />
@@ -47,7 +52,10 @@
                             <el-button class="mr-3" size="small" v-if="row.isSystem">system</el-button>
                             <span v-if="row.groupBelong">
                                 <el-button size="small" v-for="(item, index) in row.groupBelong" :key="index">
-                                    {{ item }}
+                                    <span v-if="item === 'Default'">
+                                        {{ $t('commons.table.default') }}
+                                    </span>
+                                    <span v-else>{{ item }}</span>
                                 </el-button>
                             </span>
                         </template>

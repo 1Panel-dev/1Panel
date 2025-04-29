@@ -347,6 +347,7 @@ const message = {
         ssl: 'Certificate',
         database: 'Database',
         aiTools: 'AI',
+        mcp: 'MCP',
         container: 'Container',
         cronjob: 'Cronjob',
         system: 'System',
@@ -1874,8 +1875,7 @@ const message = {
         upgradeNotes: 'Release note',
         upgradeNow: 'Upgrade now',
         source: 'Download source',
-        versionNotSame:
-            'Node version mismatch with the main node. Please upgrade in Node Management before retrying.',
+        versionNotSame: 'Node version mismatch with the main node. Please upgrade in Node Management before retrying.',
         versionCompare:
             'Detected that node {0} is already at the latest upgradable version. Please check the primary node version and try again!',
 
@@ -1892,7 +1892,7 @@ const message = {
         license: 'License',
         bindNode: 'Bind Node',
         menuSetting: 'Menu Settings',
-        menuSettingHelper: 'If only 1 menu is kept, the sidebar will directly display that menu.',
+        menuSettingHelper: 'When only 1 submenu exists, the menu bar will display only that submenu',
         showAll: 'Show All',
         hideALL: 'Hide All',
         ifShow: 'Whether to Show',

@@ -25,7 +25,7 @@ const databaseRouter = {
             name: 'MCPServer',
             component: () => import('@/views/ai/mcp/server/index.vue'),
             meta: {
-                title: 'MCP',
+                title: 'menu.mcp',
                 requiresAuth: true,
             },
         },

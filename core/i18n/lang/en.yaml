@@ -98,7 +98,7 @@ SyncNode: "Sync node data"
 SyncPackageData: "Package sync data [{{ .detail }}]"
 SyncPackageEncrypt: "Data package encryption"
 SyncRequest: "Request node sync API"
-SyncFailedRetry: "Node data sync failed (attempt {{ .index }}), {{ .err }}"
+SyncFailedRetry: "Node data sync timeout (attempt {{ .index }}), retrying..."
 SyncFailed: "Sync failed, please manually sync in the node list!"
 
 #upgrade node

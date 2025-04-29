@@ -61,7 +61,7 @@
                     </div>
                 </div>
                 <el-input
-                    v-if="showNodes() && nodeOptions?.length > 5"
+                    v-if="showNodes() && nodes?.length > 5"
                     suffix-icon="Search"
                     v-model="filter"
                     @input="changeFilter"

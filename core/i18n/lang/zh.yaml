@@ -99,7 +99,7 @@ SyncNode: "同步节点数据"
 SyncPackageData: "打包同步数据 [{{ .detail }}]"
 SyncPackageEncrypt: "数据包加密"
 SyncRequest: "请求节点同步接口"
-SyncFailedRetry: "第 {{ .index }} 次同步节点数据失败，{{ .err }}"
+SyncFailedRetry: "第 {{ .index }} 次同步节点数据失败超时，正在重试..."
 SyncFailed: "同步失败，请在节点列表中手动同步！"
 
 #upgrade node

@@ -98,7 +98,7 @@ SyncNode: "노드 데이터 동기화"
 SyncPackageData: "동기화 데이터 패키징 [{{ .detail }}]"
 SyncPackageEncrypt: "데이터 패키지 암호화"
 SyncRequest: "노드 동기화 API 요청"
-SyncFailedRetry: "노드 데이터 동기화 실패 ({{ .index }}번째 시도), {{ .err }}"
+SyncFailedRetry: "노드 데이터 동기화 시간 초과 ({{ .index }}번째 시도), 재시도 중..."
 SyncFailed: "동기화 실패, 노드 목록에서 수동 동기화를 실행하세요!"
 
 #upgrade node

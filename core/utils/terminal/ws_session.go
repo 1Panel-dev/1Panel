@@ -89,7 +89,7 @@ func NewLogicSshWsSession(cols, rows int, sshClient *ssh.Client, wsConn *websock
 	}
 	if len(initCmd) != 0 {
 		time.Sleep(100 * time.Millisecond)
-		_, _ = stdinP.Write([]byte(initCmd + "\n"))
+		_, _ = stdinP.Write([]byte(" clear &&" + initCmd + "\n"))
 	}
 	return &LogicSshWsSession{
 		stdinPipe:       stdinP,

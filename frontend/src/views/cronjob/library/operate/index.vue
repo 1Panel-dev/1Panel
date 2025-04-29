@@ -12,7 +12,14 @@
             </el-form-item>
             <el-form-item :label="$t('commons.table.group')" prop="groupList">
                 <el-select filterable v-model="dialogData.rowData!.groupList" multiple>
-                    <el-option v-for="item in groupOptions" :key="item.id" :label="item.name" :value="item.id" />
+                    <div v-for="item in groupOptions" :key="item.id">
+                        <el-option
+                            v-if="item.name === 'Default'"
+                            :label="$t('commons.table.default')"
+                            :value="item.id"
+                        />
+                        <el-option v-else :label="item.name" :value="item.id" />
+                    </div>
                 </el-select>
                 <span class="input-help">{{ $t('cronjob.library.groupHelper') }}</span>
             </el-form-item>

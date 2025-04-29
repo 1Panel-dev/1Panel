@@ -341,6 +341,7 @@ const message = {
         ssl: '인증서 | 인증서들',
         database: '데이터베이스 | 데이터베이스들',
         aiTools: 'AI',
+        mcp: 'MCP',
         container: '컨테이너 | 컨테이너들',
         cronjob: '크론 작업 | 크론 작업들',
         system: '시스템',
@@ -1754,8 +1755,7 @@ const message = {
         upgradeNotes: '릴리스 노트',
         upgradeNow: '지금 업그레이드',
         source: '다운로드 소스',
-        versionNotSame:
-            '노드 버전이 메인 노드와 일치하지 않습니다. 노드 관리에서 업그레이드한 후 다시 시도해 주세요.',
+        versionNotSame: '노드 버전이 메인 노드와 일치하지 않습니다. 노드 관리에서 업그레이드한 후 다시 시도해 주세요.',
         versionCompare:
             '노드 {0}이(가) 이미 업그레이드 가능한 최신 버전입니다. 마스터 노드 버전을 확인 후 다시 시도하세요!',
 
@@ -1772,7 +1772,7 @@ const message = {
         license: '라이선스',
         bindNode: '노드 바인딩',
         menuSetting: '메뉴 설정',
-        menuSettingHelper: '메뉴를 1개만 유지하면 사이드바에 해당 메뉴가 직접 표시됩니다.',
+        menuSettingHelper: '하위 메뉴가 1개만 존재할 경우, 메뉴 바에는 해당 하위 메뉴만 표시됩니다',
         showAll: '모두 표시',
         hideALL: '모두 숨기기',
         ifShow: '표시 여부',

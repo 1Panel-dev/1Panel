@@ -160,7 +160,13 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 			return
 		}
 
-		if err := files.CopyItem(false, true, path.Join(tmpDir, "1panel*.service"), "/etc/systemd/system"); err != nil {
+		if err := files.CopyItem(false, true, path.Join(tmpDir, "1panel-core.service"), "/etc/systemd/system"); err != nil {
+			global.LOG.Errorf("upgrade 1panel.service failed, err: %v", err)
+			_ = settingRepo.Update("SystemStatus", "Free")
+			u.handleRollback(originalDir, 3)
+			return
+		}
+		if err := files.CopyItem(false, true, path.Join(tmpDir, "1panel-agent.service"), "/etc/systemd/system"); err != nil {
 			global.LOG.Errorf("upgrade 1panel.service failed, err: %v", err)
 			_ = settingRepo.Update("SystemStatus", "Free")
 			u.handleRollback(originalDir, 3)
@@ -191,13 +197,19 @@ func (u *UpgradeService) Rollback(req dto.OperateByID) error {
 }
 
 func (u *UpgradeService) handleBackup(originalDir string) error {
-	if err := files.CopyItem(false, true, "/usr/local/bin/1panel*", originalDir); err != nil {
+	if err := files.CopyItem(false, true, "/usr/local/bin/1panel-core", originalDir); err != nil {
+		return err
+	}
+	if err := files.CopyItem(false, true, "/usr/local/bin/1panel-agent", originalDir); err != nil {
 		return err
 	}
 	if err := files.CopyItem(false, true, "/usr/local/bin/1pctl", originalDir); err != nil {
 		return err
 	}
-	if err := files.CopyItem(false, true, "/etc/systemd/system/1panel*.service", originalDir); err != nil {
+	if err := files.CopyItem(false, true, "/etc/systemd/system/1panel-core.service", originalDir); err != nil {
+		return err
+	}
+	if err := files.CopyItem(false, true, "/etc/systemd/system/1panel-agent.service", originalDir); err != nil {
 		return err
 	}
 	if err := files.CopyItem(true, true, path.Join(global.CONF.Base.InstallDir, "1panel/db"), originalDir); err != nil {

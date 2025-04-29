@@ -98,7 +98,7 @@ SyncNode: "Segerakkan data nod"
 SyncPackageData: "Pakej data segerak [{{ .detail }}]"
 SyncPackageEncrypt: "Enkripsi pakej data"
 SyncRequest: "Permintaan API segerak nod"
-SyncFailedRetry: "Gagal segerak data nod (percubaan ke-{{ .index }}), {{ .err }}"
+SyncFailedRetry: "Segerakan data nod tamat masa (percubaan ke-{{ .index }}), mencuba semula..."
 SyncFailed: "Segerakan gagal, sila segerakkan secara manual dalam senarai nod!"
 
 #upgrade node

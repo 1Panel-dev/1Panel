@@ -99,7 +99,7 @@ SyncNode: "ノードデータ同期"
 SyncPackageData: "同期データのパッケージ化 [{{ .detail }}]"
 SyncPackageEncrypt: "データパッケージの暗号化"
 SyncRequest: "ノード同期APIをリクエスト"
-SyncFailedRetry: "ノードデータ同期失敗 ({{ .index }}回目), {{ .err }}"
+SyncFailedRetry: "ノードデータ同期タイムアウト ({{ .index }}回目)、再試行中..."
 SyncFailed: "同期に失敗しました、ノードリストで手動同期してください！"
 
 #upgrade node

@@ -218,6 +218,8 @@ const emit = defineEmits(['search']);
 const acceptParams = (): void => {
     form.downloadAccountID = '';
     form.fromAccounts = [];
+    form.description = '';
+    form.secret = '';
     nowIndex.value = 0;
     search();
     loadBackups();
