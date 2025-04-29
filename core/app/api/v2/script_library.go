@@ -147,7 +147,7 @@ func (b *BaseApi) RunScript(c *gin.Context) {
 		return
 	}
 	scriptID := c.Query("script_id")
-	currentNode := c.Query("current_node")
+	currentNode := c.Query("operateNode")
 	intNum, _ := strconv.Atoi(scriptID)
 	if intNum == 0 {
 		if wshandleError(wsConn, fmt.Errorf("   no such script %v in library, please check and try again!", scriptID)) {
@@ -183,7 +183,7 @@ func (b *BaseApi) RunScript(c *gin.Context) {
 
 		fileDir := path.Join(installDir, "1panel/tmp/script")
 		fileName := path.Join(fileDir, uuid.NewString())
-		initCmd := fmt.Sprintf("mkdir -p %s && cat > %s <<'EOF'\n%s\nEOF\n bash %s", fileDir, fileName, scriptItem.Script, fileName)
+		initCmd := fmt.Sprintf("mkdir -p %s && cat > %s <<'MYMARKER'\n%s\nMYMARKER\n bash %s", fileDir, fileName, scriptItem.Script, fileName)
 		client, err := ssh.NewClient(*connInfo)
 		if wshandleError(wsConn, errors.WithMessage(err, "failed to set up the connection. Please check the host information")) {
 			return
