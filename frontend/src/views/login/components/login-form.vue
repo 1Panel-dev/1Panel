@@ -512,7 +512,7 @@ onMounted(() => {
 
     :deep(.el-checkbox__input .el-checkbox__inner) {
         background-color: #fff !important;
-        border-color: #fff !important;
+        border-color: #e5eefd !important;
     }
 
     :deep(.el-checkbox__input.is-checked .el-checkbox__inner) {
@@ -521,7 +521,7 @@ onMounted(() => {
     }
 
     :deep(.el-checkbox__input.is-checked .el-checkbox__inner::after) {
-        border-color: #fff !important;
+        border-color: #e5eefd !important;
     }
 
     :deep(.el-input__inner) {

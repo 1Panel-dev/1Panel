@@ -648,7 +648,7 @@ func loadDockerProxy(req dto.ProxyUpdate) string {
 	if len(req.ProxyUser) != 0 {
 		proxyPasswd = req.ProxyPasswd + "@"
 	}
-	proxyUrl := req.ProxyType + "://" + req.ProxyUser + ":" + proxyPasswd + req.ProxyUrl + req.ProxyPort
+	proxyUrl := req.ProxyType + "://" + req.ProxyUser + ":" + proxyPasswd + req.ProxyUrl + ":" + req.ProxyPort
 	if req.ProxyType == "http" || req.ProxyType == "https" {
 		req.ProxyUrl = req.ProxyType + "://" + req.ProxyUrl
 	}
