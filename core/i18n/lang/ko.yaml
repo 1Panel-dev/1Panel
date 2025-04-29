@@ -95,6 +95,7 @@ ScriptLibrary: "스크립트 라이브러리"
 
 Node: "노드"
 SyncNode: "노드 데이터 동기화"
+LocalName: "'local' 이름은 시스템 로컬 식별 전용으로 사용됩니다"
 SyncPackageData: "동기화 데이터 패키징 [{{ .detail }}]"
 SyncPackageEncrypt: "데이터 패키지 암호화"
 SyncRequest: "노드 동기화 API 요청"

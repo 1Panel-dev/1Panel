@@ -95,6 +95,7 @@ ScriptLibrary: "Biblioteca de Scripts"
 
 Node: "Nó"
 SyncNode: "Sincronizar dados do nó"
+LocalName: "O nome 'local' é usado apenas para identificação local do sistema"
 SyncPackageData: "Empacotar dados de sincronização [{{ .detail }}]"
 SyncPackageEncrypt: "Criptografia de pacote de dados"
 SyncRequest: "Solicitar API de sincronização de nó"

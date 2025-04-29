@@ -1462,7 +1462,8 @@ const message = {
         sessionTimeoutError: '최소 세션 타임아웃은 300초입니다.',
         sessionTimeoutHelper: '패널에서 {0}초 이상 조작이 없을 경우 자동으로 로그아웃됩니다.',
         systemIP: '기본 접근 주소',
-        systemIPHelper: '이 노드에서 애플리케이션 및 컨테이너 전환을 위한 기본 접근 주소',
+        systemIPHelper:
+            '애플리케이션 리다이렉트, 컨테이너 접근 등의 기능은 이 주소를 사용하여 라우팅됩니다. 각 노드마다 다른 주소를 설정할 수 있습니다.',
         proxy: '서버 프록시',
         proxyHelper: '프록시 서버를 설정한 후 다음 시나리오에서 적용됩니다:',
         proxyHelper1: '설치 패키지 다운로드 및 앱 스토어 동기화 (전문 버전에서만 제공)',
@@ -1502,7 +1503,7 @@ const message = {
         confDockerProxy: 'Docker 프록시 구성',
         restartNowHelper: 'Docker 프록시 구성을 위해 Docker 서비스를 재시작해야 합니다.',
         restartNow: '즉시 재시작',
-        systemIPWarning: '서버 주소가 현재 설정되지 않았습니다. 제어 패널에서 먼저 설정하십시오.',
+        systemIPWarning: '현재 노드에 기본 접근 주소가 설정되지 않았습니다. 패널 설정에서 설정해 주세요!',
         systemIPWarning1: '현재 서버 주소는 {0}으로 설정되어 있어 빠른 리디렉션이 불가능합니다!',
         defaultNetwork: '네트워크 카드',
         syncTime: '서버 시간',
@@ -1988,7 +1989,8 @@ const message = {
         webUIPlaceholder: '예: http://example.com:8080/login',
         defaultWebDomain: '기본 접속 주소',
         defaultWebDomainHepler: '애플리케이션 포트가 8080인 경우 접속 주소는 http(s)://기본 접속 주소:8080입니다',
-        webUIConfig: '애플리케이션 매개변수 또는 앱 스토어 설정에서 접속 주소를 추가하세요',
+        webUIConfig:
+            '현재 노드에 기본 접근 주소가 설정되지 않았습니다. 애플리케이션 매개변수에서 설정하거나 패널 설정으로 이동하여 설정하세요!',
         toLink: '이동',
         customAppHelper: '사용자 정의 앱 스토어 패키지를 설치하기 전에 설치된 앱이 없는지 확인하십시오.',
         forceUninstall: '강제 제거',

@@ -96,6 +96,7 @@ ScriptLibrary: "スクリプトライブラリ"
 
 Node: "ノード"
 SyncNode: "ノードデータ同期"
+LocalName: "'local'名称はシステムのローカル識別のみに使用されます"
 SyncPackageData: "同期データのパッケージ化 [{{ .detail }}]"
 SyncPackageEncrypt: "データパッケージの暗号化"
 SyncRequest: "ノード同期APIをリクエスト"

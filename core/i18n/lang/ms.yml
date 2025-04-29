@@ -95,6 +95,7 @@ ScriptLibrary: "Pustaka Skrip"
 
 Node: "Nod"
 SyncNode: "Segerakkan data nod"
+LocalName: "Nama 'local' hanya digunakan untuk pengenalpastian tempatan sistem"
 SyncPackageData: "Pakej data segerak [{{ .detail }}]"
 SyncPackageEncrypt: "Enkripsi pakej data"
 SyncRequest: "Permintaan API segerak nod"

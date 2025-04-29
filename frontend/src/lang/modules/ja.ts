@@ -1478,7 +1478,8 @@ const message = {
         sessionTimeoutError: '最小セッションタイムアウトは300秒です',
         sessionTimeoutHelper: '{0}秒以上操作がない場合、パネルは自動的にログアウトされます。',
         systemIP: 'デフォルトアクセスアドレス',
-        systemIPHelper: 'このノード上のアプリケーションとコンテナリダイレクト用のデフォルトアクセスアドレス',
+        systemIPHelper:
+            'アプリケーションリダイレクト、コンテナアクセスなどの機能はこのアドレスを使用して転送されます。各ノードで異なるアドレスを設定できます。',
         proxy: 'サーバープロキシ',
         proxyHelper: 'プロキシサーバーを設定した後、次のシナリオで効果的になります。',
         proxyHelper1:
@@ -1516,7 +1517,8 @@ const message = {
         confDockerProxy: 'Dockerプロキシを構成します',
         restartNowHelper: 'Dockerプロキシの構成には、Dockerサービスを再起動する必要があります。',
         restartNow: 'すぐに再起動します',
-        systemIPWarning: `サーバーアドレスは現在設定されていません。最初にコントロールパネルに設定します。`,
+        systemIPWarning:
+            '現在のノードにはデフォルトアクセスアドレスが設定されていません。パネル設定から設定してください！',
         systemIPWarning1: `現在のサーバーアドレスは{0}に設定されており、クイックリダイレクトは不可能です！`,
         defaultNetwork: 'ネットワークカード',
         syncTime: 'サーバー時間',
@@ -2021,7 +2023,8 @@ const message = {
         defaultWebDomain: 'デフォルトアクセスアドレス',
         defaultWebDomainHepler:
             'アプリケーションポートが8080の場合、アドレスはhttp(s)://デフォルトアクセスアドレス:8080にジャンプします',
-        webUIConfig: 'アプリパラメータまたはアプリストア設定でアクセスアドレスを追加してください',
+        webUIConfig:
+            '現在のノードにはデフォルトアクセスアドレスが設定されていません。アプリケーションパラメータで設定するか、パネル設定から設定してください！',
         toLink: 'ジャンプ',
         customAppHelper:
             'カスタムアプリストアパッケージをインストールする前に、インストールされているアプリがないことを確認してください。',

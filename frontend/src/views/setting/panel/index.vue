@@ -133,6 +133,7 @@
                                         </el-button>
                                     </template>
                                 </el-input>
+                                <span class="input-help">{{ $t('setting.systemIPHelper') }}</span>
                             </el-form-item>
 
                             <el-form-item :label="$t('setting.proxy')" prop="proxyShow" v-if="isMaster">

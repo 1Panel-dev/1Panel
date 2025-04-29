@@ -95,6 +95,7 @@ ScriptLibrary: "Script Library"
 
 Node: "Node"
 SyncNode: "Sync node data"
+LocalName: "'local' name is only used for system local identification"
 SyncPackageData: "Package sync data [{{ .detail }}]"
 SyncPackageEncrypt: "Data package encryption"
 SyncRequest: "Request node sync API"

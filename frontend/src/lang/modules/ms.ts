@@ -1523,7 +1523,8 @@ const message = {
         sessionTimeoutError: 'Tempoh tamat sesi minimum ialah 300 saat',
         sessionTimeoutHelper: 'Panel akan log keluar secara automatik jika tiada operasi lebih daripada {0} saat.',
         systemIP: 'Alamat akses lalai',
-        systemIPHelper: 'Alamat akses lalai untuk aplikasi dan penghantaran semula kontena pada nod ini',
+        systemIPHelper:
+            'Penghantaran semula aplikasi, akses kontena dan fungsi lain akan menggunakan alamat ini untuk penghalaan. Setiap nod boleh ditetapkan dengan alamat yang berbeza.',
         proxy: 'Proksi pelayan',
         proxyHelper: 'Ia akan berkuat kuasa dalam senario berikut selepas anda menyediakan pelayan proksi:',
         proxyHelper1: 'Muat turun pakej pemasangan dan penyelarasan dari kedai aplikasi (Edisi Profesional sahaja)',
@@ -1566,7 +1567,8 @@ const message = {
         confDockerProxy: 'Konfigurasi proksi docker',
         restartNowHelper: 'Mengkonfigurasi proksi Docker memerlukan memulakan semula perkhidmatan Docker.',
         restartNow: 'Mulakan semula sekarang',
-        systemIPWarning: 'Alamat pelayan belum ditetapkan. Tetapkan di panel kawalan terlebih dahulu.',
+        systemIPWarning:
+            'Nod semasa belum mempunyai alamat akses lalai yang dikonfigurasi. Sila pergi ke tetapan panel untuk mengkonfigurasinya!',
         systemIPWarning1: 'Alamat pelayan semasa ditetapkan kepada {0}, dan pengalihan cepat tidak mungkin!',
         defaultNetwork: 'Kad rangkaian',
         syncTime: 'Waktu Pelayan',
@@ -2074,7 +2076,8 @@ const message = {
         defaultWebDomain: 'Alamat Akses Lalai',
         defaultWebDomainHepler:
             'Jika port aplikasi adalah 8080, alamat loncatan akan menjadi http(s)://alamat akses lalai:8080',
-        webUIConfig: 'Sila tambah alamat akses di parameter aplikasi atau tetapan kedai aplikasi',
+        webUIConfig:
+            'Nod semasa belum mempunyai alamat akses lalai yang dikonfigurasi. Sila tetapkan dalam parameter aplikasi atau pergi ke tetapan panel untuk mengkonfigurasinya!',
         toLink: 'Loncat',
         customAppHelper:
             'Sebelum memasang pakej kedai aplikasi tersuai, sila pastikan tidak ada aplikasi yang dipasang.',

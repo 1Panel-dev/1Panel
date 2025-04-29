@@ -1508,7 +1508,8 @@ const message = {
         sessionTimeoutError: 'O tempo mínimo de sessão é de 300 segundos',
         sessionTimeoutHelper: 'O painel será desconectado automaticamente após {0} segundo(s) de inatividade.',
         systemIP: 'Endereço de acesso padrão',
-        systemIPHelper: 'Endereço de acesso padrão para redirecionamento de aplicativos e containers neste nó',
+        systemIPHelper:
+            'Redirecionamentos de aplicativos, acesso a containers e outras funcionalidades usarão este endereço para roteamento. Cada nó pode ser configurado com um endereço diferente.',
         proxy: 'Proxy do servidor',
         proxyHelper: 'Será eficaz nos seguintes cenários após configurar o servidor proxy:',
         proxyHelper1:
@@ -1549,7 +1550,7 @@ const message = {
         restartNowHelper: 'Configurar o proxy do Docker exige reiniciar o serviço Docker.',
         restartNow: 'Reiniciar imediatamente',
         systemIPWarning:
-            'O endereço do servidor ainda não está configurado. Configure-o no painel de controle primeiro.',
+            'O nó atual não tem um endereço de acesso padrão configurado. Por favor, vá para as configurações do painel para configurá-lo!',
         systemIPWarning1:
             'O endereço atual do servidor está configurado como {0}, e o redirecionamento rápido não é possível!',
         defaultNetwork: 'Placa de rede',
@@ -2068,7 +2069,7 @@ const message = {
         defaultWebDomain: 'Endereço de Acesso Padrão',
         defaultWebDomainHepler: 'Se a porta do aplicativo for 8080, o endereço será http(s)://endereço padrão:8080',
         webUIConfig:
-            'Adicione o endereço de acesso nos parâmetros do aplicativo ou nas configurações da loja de aplicativos',
+            'O nó atual não tem um endereço de acesso padrão configurado. Por favor, defina-o nos parâmetros do aplicativo ou vá para as configurações do painel para configurar!',
         toLink: 'Ir para',
         customAppHelper:
             'Antes de instalar um pacote de loja de aplicativos personalizado, certifique-se de que não há aplicativos instalados.',

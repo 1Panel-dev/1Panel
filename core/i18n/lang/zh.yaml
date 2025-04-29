@@ -96,6 +96,7 @@ ScriptLibrary: "脚本库"
 #sync node
 Node: "节点"
 SyncNode: "同步节点数据"
+LocalName: "local 名称仅用于系统本机标识"
 SyncPackageData: "打包同步数据 [{{ .detail }}]"
 SyncPackageEncrypt: "数据包加密"
 SyncRequest: "请求节点同步接口"

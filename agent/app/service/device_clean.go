@@ -36,7 +36,6 @@ const (
 	tmpUploadPath    = "1panel/tmp/upload"
 	uploadPath       = "1panel/uploads"
 	downloadPath     = "1panel/download"
-	logPath          = "1panel/log"
 )
 
 func (u *DeviceService) Scan() dto.CleanData {
@@ -247,7 +246,7 @@ func (u *DeviceService) Clean(req []dto.Clean) {
 
 		case "system_log":
 			if len(item.Name) == 0 {
-				files, _ := os.ReadDir(path.Join(global.Dir.BaseDir, logPath))
+				files, _ := os.ReadDir(global.Dir.LogDir)
 				if len(files) == 0 {
 					continue
 				}
@@ -255,14 +254,14 @@ func (u *DeviceService) Clean(req []dto.Clean) {
 					if file.Name() == "1Panel-Core.log" || file.Name() == "1Panel.log" || file.IsDir() {
 						continue
 					}
-					dropFileOrDir(path.Join(global.Dir.BaseDir, logPath, file.Name()))
+					dropFileOrDir(path.Join(global.Dir.LogDir, file.Name()))
 				}
 			} else {
-				dropFileOrDir(path.Join(global.Dir.BaseDir, logPath, item.Name))
+				dropFileOrDir(path.Join(global.Dir.LogDir, item.Name))
 			}
 		case "task_log":
 			if len(item.Name) == 0 {
-				files, _ := os.ReadDir(path.Join(global.Dir.BaseDir, logPath))
+				files, _ := os.ReadDir(path.Join(global.Dir.TaskDir))
 				if len(files) == 0 {
 					continue
 				}
@@ -270,11 +269,11 @@ func (u *DeviceService) Clean(req []dto.Clean) {
 					if file.Name() == "ssl" || !file.IsDir() {
 						continue
 					}
-					dropFileOrDir(path.Join(global.Dir.BaseDir, logPath, file.Name()))
+					dropFileOrDir(path.Join(global.Dir.TaskDir, file.Name()))
 				}
 				_ = taskRepo.DeleteAll()
 			} else {
-				pathItem := path.Join(global.Dir.BaseDir, logPath, item.Name)
+				pathItem := path.Join(global.Dir.TaskDir, item.Name)
 				dropFileOrDir(pathItem)
 				if len(item.Name) != 0 {
 					_ = taskRepo.Delete(repo.WithByType(item.Name))
@@ -341,15 +340,14 @@ func systemClean(taskItem *task.Task) error {
 		dropWithTask(path.Join(global.Dir.BaseDir, uploadPath), taskItem, &size, &fileCount)
 		dropWithTask(path.Join(global.Dir.BaseDir, downloadPath), taskItem, &size, &fileCount)
 
-		logPath := path.Join(global.Dir.BaseDir, logPath)
-		logFiles, _ := os.ReadDir(logPath)
+		logFiles, _ := os.ReadDir(global.Dir.LogDir)
 		if len(logFiles) != 0 {
 			for i := 0; i < len(logFiles); i++ {
 				if logFiles[i].IsDir() {
 					continue
 				}
 				if logFiles[i].Name() != "1Panel.log" && logFiles[i].Name() != "1Panel-Core.log" {
-					dropWithTask(path.Join(logPath, logFiles[i].Name()), taskItem, &size, &fileCount)
+					dropWithTask(path.Join(global.Dir.LogDir, logFiles[i].Name()), taskItem, &size, &fileCount)
 				}
 			}
 		}
@@ -506,7 +504,7 @@ func loadDownloadTree(fileOp fileUtils.FileOp) []dto.CleanTree {
 
 func loadLogTree(fileOp fileUtils.FileOp) []dto.CleanTree {
 	var treeData []dto.CleanTree
-	path1 := path.Join(global.Dir.BaseDir, logPath)
+	path1 := path.Join(global.Dir.LogDir)
 	list1 := loadTreeWithAllFile(true, path1, "system_log", path1, fileOp)
 	size := uint64(0)
 	for _, file := range list1 {
@@ -514,7 +512,7 @@ func loadLogTree(fileOp fileUtils.FileOp) []dto.CleanTree {
 	}
 	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "system_log", Size: uint64(size), Children: list1, Type: "system_log", IsRecommend: true})
 
-	path2 := path.Join(global.Dir.BaseDir, logPath)
+	path2 := path.Join(global.Dir.TaskDir)
 	list2 := loadTreeWithDir(false, "task_log", path2, fileOp)
 	size2, _ := fileOp.GetDirSize(path2)
 	treeData = append(treeData, dto.CleanTree{ID: uuid.NewString(), Label: "task_log", Size: uint64(size2), Children: list2, Type: "task_log"})
@@ -575,7 +573,7 @@ func loadTreeWithDir(isCheck bool, treeType, pathItem string, fileOp fileUtils.F
 		if treeType == "old_upgrade" {
 			continue
 		}
-		if treeType == "task_log" && file.Name() == "ssl" {
+		if file.Name() == "ssl" {
 			continue
 		}
 		if file.IsDir() {

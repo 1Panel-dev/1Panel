@@ -16,7 +16,7 @@
 </template>
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { getSettingInfo } from '@/api/modules/setting';
+import { getAgentSettingInfo } from '@/api/modules/setting';
 import i18n from '@/lang';
 import { MsgError, MsgWarning } from '@/utils/message';
 import { jumpToPath } from '@/utils/util';
@@ -37,7 +37,7 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
         return;
     }
     let protocol = params.protocol === 'https' ? 'https' : 'http';
-    const res = await getSettingInfo();
+    const res = await getAgentSettingInfo();
     if (!res.data.systemIP) {
         open.value = true;
         return;

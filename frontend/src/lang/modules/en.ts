@@ -1537,7 +1537,8 @@ const message = {
         sessionTimeoutHelper:
             'If you do not operate the panel for more than {0} seconds, the panel automatically logs out',
         systemIP: 'Default access address',
-        systemIPHelper: 'Default access address for application and container redirection on this node',
+        systemIPHelper:
+            'Application redirects, container access and other functions will use this address for routing. Each node can be configured with a different address.',
         proxy: 'Server Proxy',
         proxyHelper: 'After setting up the proxy server, it will be effective in the following scenarios:',
         proxyHelper1: 'Downloading and synchronizing installation packages from the app store (Professional)',
@@ -1580,7 +1581,8 @@ const message = {
         confDockerProxy: 'Configure Docker Proxy',
         restartNowHelper: 'Configuring Docker proxy requires restarting the Docker service.',
         restartNow: 'Restart immediately',
-        systemIPWarning: 'The server address is not currently set. Please set it in the control panel first!',
+        systemIPWarning:
+            'The current node has no default access address configured. Please go to panel settings to configure it!',
         systemIPWarning1: 'The current server address is set to {0}, and quick redirection is not possible!',
         syncTime: 'Server Time',
         timeZone: 'Time Zone',
@@ -2116,7 +2118,8 @@ const message = {
         defaultWebDomain: 'Default Access Address',
         defaultWebDomainHepler:
             'If the application port is 8080, the redirect address will be http(s)://default access address:8080',
-        webUIConfig: 'Please add the access address in the application parameters or the app store settings',
+        webUIConfig:
+            'The current node has no default access address configured. Please set it in application parameters or go to panel settings to configure!',
         toLink: 'Open',
         customAppHelper:
             'Before installing a custom app store package, please ensure that there are no installed apps.',

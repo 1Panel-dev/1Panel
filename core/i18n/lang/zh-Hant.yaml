@@ -95,6 +95,7 @@ ScriptLibrary: "腳本庫"
 
 Node: "節點"
 SyncNode: "同步節點數據"
+LocalName: "'local' 名稱僅用於系統本機標識"
 SyncPackageData: "打包同步數據 [{{ .detail }}]"
 SyncPackageEncrypt: "數據包加密"
 SyncRequest: "請求節點同步接口"

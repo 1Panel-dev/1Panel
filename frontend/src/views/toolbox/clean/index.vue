@@ -643,6 +643,8 @@ function load18n(label: string) {
         case 'System':
         case 'Website':
             return i18n.global.t('menu.' + label.toLowerCase());
+        case 'Script':
+            return i18n.global.t('cronjob.library.library');
         case 'Compose':
             return i18n.global.t('container.compose');
         case 'CustomAppstore':
