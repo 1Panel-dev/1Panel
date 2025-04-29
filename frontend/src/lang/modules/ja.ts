@@ -3185,6 +3185,7 @@ const message = {
             offline: 'オフラインモード',
             freeCount: '無料枠 [{0}]',
             offlineHelper: 'ノードがオフライン環境にある場合に使用',
+            SyncCustomApp: 'カスタムアプリリポジトリを同期',
         },
         customApp: {
             name: 'カスタムアプリリポジトリ',

@@ -3260,6 +3260,7 @@ const message = {
             offline: 'Modo offline',
             freeCount: 'Cota gratuita [{0}]',
             offlineHelper: 'Usado quando o nó está em ambiente offline',
+            SyncCustomApp: 'Sincronizar Repositório de Aplicativos Personalizados',
         },
         customApp: {
             name: 'Repositório de Aplicativos Personalizados',

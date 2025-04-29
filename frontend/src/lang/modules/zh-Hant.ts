@@ -3086,6 +3086,7 @@ const message = {
             offline: '離線模式',
             freeCount: '免費額度 [{0}]',
             offlineHelper: '當節點處於離線環境時使用',
+            SyncCustomApp: '同步自訂應用倉庫',
         },
         customApp: {
             name: '自訂應用倉庫',

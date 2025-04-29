@@ -1754,8 +1754,7 @@ const message = {
         upgradeNotes: '릴리스 노트',
         upgradeNow: '지금 업그레이드',
         source: '다운로드 소스',
-        versionNotSame:
-            '노드 버전이 메인 노드와 일치하지 않습니다. 노드 관리에서 업그레이드한 후 다시 시도해 주세요.',
+        versionNotSame: '노드 버전이 메인 노드와 일치하지 않습니다. 노드 관리에서 업그레이드한 후 다시 시도해 주세요.',
         versionCompare:
             '노드 {0}이(가) 이미 업그레이드 가능한 최신 버전입니다. 마스터 노드 버전을 확인 후 다시 시도하세요!',
 
@@ -3132,6 +3131,7 @@ const message = {
             offline: '오프라인 모드',
             freeCount: '무료 할당량 [{0}]',
             offlineHelper: '노드가 오프라인 환경일 때 사용',
+            SyncCustomApp: '사용자 정의 앱 저장소 동기화',
         },
         customApp: {
             name: '사용자 정의 앱 저장소',

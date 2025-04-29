@@ -3068,6 +3068,7 @@ const message = {
             offline: '离线模式',
             freeCount: '免费额度 [{0}] ',
             offlineHelper: '节点为离线环境时使用',
+            SyncCustomApp: '同步自定义应用仓库',
         },
         customApp: {
             name: '自定义应用仓库',

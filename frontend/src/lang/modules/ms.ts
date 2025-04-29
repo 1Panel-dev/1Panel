@@ -3255,6 +3255,7 @@ const message = {
             offline: 'Mod luar talian',
             freeCount: 'Had percuma [{0}]',
             offlineHelper: 'Digunakan apabila nod berada dalam persekitaran luar talian',
+            SyncCustomApp: 'Segerakan Repositori Aplikasi Tersuai',
         },
         customApp: {
             name: 'Repositori Aplikasi Khusus',
