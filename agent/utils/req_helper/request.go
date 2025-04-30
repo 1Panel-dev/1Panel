@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"errors"
+	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 	"io"
 	"net"
 	"net/http"
@@ -52,7 +53,7 @@ func HandleRequest(url, method string, timeout int) (int, []byte, error) {
 		}
 	}()
 
-	transport := loadRequestTransport()
+	transport := xpack.LoadRequestTransport()
 	client := http.Client{Timeout: time.Duration(timeout) * time.Second, Transport: transport}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
 	defer cancel()

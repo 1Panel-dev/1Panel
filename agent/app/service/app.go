@@ -834,9 +834,10 @@ func getAppFromRepo(downloadPath string) error {
 	global.LOG.Infof("[AppStore] download file from %s", downloadUrl)
 	fileOp := files.NewFileOp()
 	packagePath := filepath.Join(global.Dir.ResourceDir, filepath.Base(downloadUrl))
-	if err := fileOp.DownloadFile(downloadUrl, packagePath); err != nil {
+	if err := files.DownloadFileWithProxy(downloadUrl, packagePath); err != nil {
 		return err
 	}
+
 	if err := fileOp.Decompress(packagePath, global.Dir.ResourceDir, files.SdkZip, ""); err != nil {
 		return err
 	}
