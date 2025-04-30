@@ -103,7 +103,7 @@ func (s *SettingRepo) UpdateOrCreate(key, value string) error {
 	result := global.DB.Where("key = ?", key).First(&setting)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return global.DB.Create(&model.Setting{Key: key, Value: value}).Error
+			return global.DB.Debug().Create(&model.Setting{Key: key, Value: value}).Error
 		}
 		return result.Error
 	}

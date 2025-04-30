@@ -413,13 +413,13 @@
     <Uploads ref="uploadRef" />
     <AppResources ref="checkRef" @close="search" />
     <AppDelete ref="deleteRef" @close="search" />
-    <AppParams ref="appParamRef" />
+    <AppParams ref="appParamRef" @close="search" />
     <AppUpgrade ref="upgradeRef" @close="search" />
     <PortJumpDialog ref="dialogPortJumpRef" />
     <AppIgnore ref="ignoreRef" @close="search" />
     <ComposeLogs ref="composeLogRef" />
     <TaskLog ref="taskLogRef" @close="search" />
-    <Detail ref="detailRef" />
+    <Detail ref="detailRef" @close="search" />
     <IgnoreApp ref="ignoreAppRef" @close="search" />
 </template>
 
@@ -430,7 +430,6 @@ import {
     syncInstalledApp,
     appInstalledDeleteCheck,
     getAppTags,
-    getAppStoreConfig,
 } from '@/api/modules/app';
 import { onMounted, onUnmounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
@@ -453,6 +452,7 @@ import { toFolder } from '@/global/business';
 import TaskLog from '@/components/log/task/index.vue';
 import Detail from '@/views/app-store/detail/index.vue';
 import IgnoreApp from '@/views/app-store/installed/ignore/create/index.vue';
+import { getAgentSettingByKey } from '@/api/modules/setting';
 
 const data = ref<any>();
 const loading = ref(false);
@@ -773,9 +773,9 @@ const openLog = (row: any) => {
 
 const getConfig = async () => {
     try {
-        const res = await getAppStoreConfig();
-        if (res.data.defaultDomain != '') {
-            defaultLink.value = res.data.defaultDomain;
+        const res = await getAgentSettingByKey('SystemIP');
+        if (res.data != '') {
+            defaultLink.value = res.data;
         }
     } catch (error) {}
 };

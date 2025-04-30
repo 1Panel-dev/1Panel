@@ -22,6 +22,7 @@ type ISettingService interface {
 	TestConnByInfo(req dto.SSHConnData) bool
 	SaveConnInfo(req dto.SSHConnData) error
 	GetSystemProxy() (*dto.SystemProxy, error)
+	GetSettingByKey(key string) string
 }
 
 func NewISettingService() ISettingService {
@@ -135,4 +136,14 @@ func (u *SettingService) GetSystemProxy() (*dto.SystemProxy, error) {
 	passwd, _ := settingRepo.GetValueByKey("ProxyPasswd")
 	systemProxy.Password, _ = encrypt.StringDecrypt(passwd)
 	return &systemProxy, nil
+}
+
+func (u *SettingService) GetSettingByKey(key string) string {
+	switch key {
+	case "SystemIP":
+		value, _ := settingRepo.GetValueByKey(key)
+		return value
+	default:
+		return ""
+	}
 }

@@ -129,5 +129,6 @@ type AppUpdateVersion struct {
 }
 
 type AppstoreUpdate struct {
-	DefaultDomain string `json:"defaultDomain"`
+	Scope  string `json:"scope" validate:"required,oneof=UninstallDeleteImage UpgradeBackup UninstallDeleteBackup"`
+	Status string `json:"status"`
 }

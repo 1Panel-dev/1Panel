@@ -2000,6 +2000,9 @@ const message = {
         specifyIP: '호스트 IP 바인딩',
         specifyIPHelper:
             '포트 바인딩을 위한 호스트 주소/네트워크 인터페이스를 설정합니다 (이 기능을 잘 모를 경우, 입력하지 마십시오)',
+        uninstallDeleteBackup: '앱 제거 및 백업 삭제',
+        uninstallDeleteImage: '앱 제거 및 이미지 삭제',
+        upgradeBackup: '앱 업그레이드 전 백업',
     },
     website: {
         primaryDomain: '기본 도메인',

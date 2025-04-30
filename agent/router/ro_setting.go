@@ -14,6 +14,7 @@ func (s *SettingRouter) InitRouter(Router *gin.RouterGroup) {
 		settingRouter.POST("/search", baseApi.GetSettingInfo)
 		settingRouter.GET("/search/available", baseApi.GetSystemAvailable)
 		settingRouter.POST("/update", baseApi.UpdateSetting)
+		settingRouter.GET("/get/:key", baseApi.GetSettingByKey)
 
 		settingRouter.GET("/snapshot/load", baseApi.LoadSnapshotData)
 		settingRouter.POST("/snapshot", baseApi.CreateSnapshot)

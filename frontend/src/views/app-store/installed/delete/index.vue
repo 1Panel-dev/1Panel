@@ -47,7 +47,7 @@
 import { FormInstance } from 'element-plus';
 import { onBeforeUnmount, ref } from 'vue';
 import { App } from '@/api/interface/app';
-import { installedOp } from '@/api/modules/app';
+import { getAppStoreConfig, installedOp } from '@/api/modules/app';
 import i18n from '@/lang';
 import bus from '@/global/bus';
 import TaskLog from '@/components/log/task/index.vue';
@@ -79,13 +79,14 @@ const handleClose = () => {
 };
 
 const acceptParams = async (app: App.AppInstallDto) => {
+    const config = await getAppStoreConfig();
     deleteReq.value = {
         operate: 'delete',
         installId: 0,
-        deleteBackup: false,
+        deleteBackup: config.data.uninstallDeleteBackup === 'True',
         forceDelete: false,
         deleteDB: true,
-        deleteImage: false,
+        deleteImage: config.data.uninstallDeleteImage === 'True',
         taskID: uuidv4(),
     };
     deleteInfo.value = '';

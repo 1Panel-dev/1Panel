@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"encoding/gob"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/core/init/db"
 	"net"
 	"net/http"
 	"os"
@@ -13,7 +14,6 @@ import (
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/i18n"
 	"github.com/1Panel-dev/1Panel/core/init/cron"
-	"github.com/1Panel-dev/1Panel/core/init/db"
 	"github.com/1Panel-dev/1Panel/core/init/hook"
 	"github.com/1Panel-dev/1Panel/core/init/lang"
 	"github.com/1Panel-dev/1Panel/core/init/log"
@@ -29,9 +29,9 @@ import (
 
 func Start() {
 	viper.Init()
+	db.Init()
 	i18n.Init()
 	log.Init()
-	db.Init()
 	migration.Init()
 	validator.Init()
 	lang.Init()

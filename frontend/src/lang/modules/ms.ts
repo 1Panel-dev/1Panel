@@ -2088,6 +2088,9 @@ const message = {
         specifyIP: 'Bind IP Hos',
         specifyIPHelper:
             'Tetapkan alamat hos/antara muka rangkaian untuk mengikat port (jika anda tidak pasti mengenai ini, jangan isi)',
+        uninstallDeleteBackup: 'Cop Terhapus Semasa Nyahpasang Aplikasi',
+        uninstallDeleteImage: 'Imej Terhapus Semasa Nyahpasang Aplikasi',
+        upgradeBackup: 'Sandaran Sebelum Naik Taraf Aplikasi',
     },
     website: {
         primaryDomain: 'Domain Utama',

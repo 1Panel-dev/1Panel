@@ -23,40 +23,36 @@
             </template>
         </el-alert>
         <el-form :model="form" ref="formRef" @submit.prevent v-loading="loading" label-position="top" :rules="rules">
-            <el-row type="flex" justify="center">
-                <el-col :span="22">
-                    <el-form-item :label="$t('setting.apiKey')" prop="apiKey">
-                        <el-input v-model="form.apiKey" readonly>
-                            <template #suffix>
-                                <CopyButton type="icon" :content="form.apiKey" class="w-30" />
-                            </template>
-                            <template #append>
-                                <el-button @click="resetApiKey()">
-                                    {{ $t('commons.button.reset') }}
-                                </el-button>
-                            </template>
-                        </el-input>
-                        <span class="input-help">{{ $t('setting.apiKeyHelper') }}</span>
-                    </el-form-item>
-                    <el-form-item :label="$t('setting.ipWhiteList')" prop="ipWhiteList">
-                        <el-input
-                            type="textarea"
-                            :placeholder="$t('setting.ipWhiteListEgs')"
-                            :rows="4"
-                            v-model="form.ipWhiteList"
-                        />
-                        <span class="input-help">{{ $t('setting.ipWhiteListHelper') }}</span>
-                    </el-form-item>
-                    <el-form-item :label="$t('setting.apiKeyValidityTime')" prop="apiKeyValidityTime">
-                        <el-input :placeholder="$t('setting.apiKeyValidityTimeEgs')" v-model="form.apiKeyValidityTime">
-                            <template #append>{{ $t('commons.units.minute') }}</template>
-                        </el-input>
-                        <span class="input-help">
-                            {{ $t('setting.apiKeyValidityTimeHelper') }}
-                        </span>
-                    </el-form-item>
-                </el-col>
-            </el-row>
+            <el-form-item :label="$t('setting.apiKey')" prop="apiKey">
+                <el-input v-model="form.apiKey" readonly>
+                    <template #suffix>
+                        <CopyButton type="icon" :content="form.apiKey" class="w-30" />
+                    </template>
+                    <template #append>
+                        <el-button @click="resetApiKey()">
+                            {{ $t('commons.button.reset') }}
+                        </el-button>
+                    </template>
+                </el-input>
+                <span class="input-help">{{ $t('setting.apiKeyHelper') }}</span>
+            </el-form-item>
+            <el-form-item :label="$t('setting.ipWhiteList')" prop="ipWhiteList">
+                <el-input
+                    type="textarea"
+                    :placeholder="$t('setting.ipWhiteListEgs')"
+                    :rows="4"
+                    v-model="form.ipWhiteList"
+                />
+                <span class="input-help">{{ $t('setting.ipWhiteListHelper') }}</span>
+            </el-form-item>
+            <el-form-item :label="$t('setting.apiKeyValidityTime')" prop="apiKeyValidityTime">
+                <el-input :placeholder="$t('setting.apiKeyValidityTimeEgs')" v-model="form.apiKeyValidityTime">
+                    <template #append>{{ $t('commons.units.minute') }}</template>
+                </el-input>
+                <span class="input-help">
+                    {{ $t('setting.apiKeyValidityTimeHelper') }}
+                </span>
+            </el-form-item>
         </el-form>
         <template #footer>
             <span class="dialog-footer">

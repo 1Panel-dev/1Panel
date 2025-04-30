@@ -60,6 +60,9 @@ export const updateAgentSetting = (param: Setting.SettingUpdate) => {
 export const getAgentSettingInfo = () => {
     return http.post<Setting.SettingInfo>(`/settings/search`);
 };
+export const getAgentSettingByKey = (key: string) => {
+    return http.get<string>(`/settings/get/${key}`);
+};
 
 // core
 export const getSettingInfo = () => {

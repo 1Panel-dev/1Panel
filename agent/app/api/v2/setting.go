@@ -142,3 +142,20 @@ func loadLocalConn() (*ssh.SSHClient, error) {
 	}
 	return ssh.NewClient(connInDB)
 }
+
+// @Tags System Setting
+// @Summary Load system setting by key
+// @Param key path string true "key"
+// @Success 200 {object} dto.SettingInfo
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /settings/get/{key} [get]
+func (b *BaseApi) GetSettingByKey(c *gin.Context) {
+	key := c.Param("key")
+	if len(key) == 0 {
+		helper.BadRequest(c, errors.New("key is empty"))
+		return
+	}
+	value := settingService.GetSettingByKey(key)
+	helper.SuccessWithData(c, value)
+}

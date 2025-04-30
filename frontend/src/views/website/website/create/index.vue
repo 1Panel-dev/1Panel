@@ -686,7 +686,7 @@ const changeType = (type: string) => {
     switch (type) {
         case 'deployment':
             website.value.appType = 'installed';
-            if (appInstalls.value && appInstalls.value.length > 0) {
+            if (appInstalls.value && appInstalls.value.length > 0 && appInstalls.value[0].status === 'Running') {
                 website.value.appInstallId = appInstalls.value[0].id;
             }
             break;
@@ -713,7 +713,12 @@ const searchAppInstalled = (appType: string) => {
     getAppInstalled({ type: appType, unused: true, all: true, page: 1, pageSize: 100 }).then((res) => {
         appInstalls.value = res.data.items;
         website.value.appInstallId = undefined;
-        if (appType == 'website' && res.data.items && res.data.items.length > 0) {
+        if (
+            appType == 'website' &&
+            res.data.items &&
+            res.data.items.length > 0 &&
+            res.data.items[0].status === 'Running'
+        ) {
             website.value.appInstallId = res.data.items[0].id;
         }
     });

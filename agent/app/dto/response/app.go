@@ -165,5 +165,7 @@ type AppConfig struct {
 }
 
 type AppstoreConfig struct {
-	DefaultDomain string `json:"defaultDomain"`
+	UninstallDeleteImage  string `json:"uninstallDeleteImage"`
+	UpgradeBackup         string `json:"upgradeBackup"`
+	UninstallDeleteBackup string `json:"uninstallDeleteBackup"`
 }

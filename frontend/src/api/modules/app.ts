@@ -115,7 +115,7 @@ export const getAppStoreConfig = () => {
     return http.get<App.AppStoreConfig>(`apps/store/config`);
 };
 
-export const updateAppStoreConfig = (req: App.AppStoreConfig) => {
+export const updateAppStoreConfig = (req: App.AppStoreConfigUpdate) => {
     return http.post(`apps/store/update`, req);
 };
 

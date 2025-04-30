@@ -12,15 +12,32 @@
             >
                 <el-row>
                     <el-col :xs="24" :sm="20" :md="15" :lg="12" :xl="12">
-                        <el-form-item :label="$t('app.defaultWebDomain')" prop="defaultDomain">
-                            <el-input v-model="config.defaultDomain" disabled>
-                                <template #append>
-                                    <el-button @click="setDefaultDomain()" icon="Setting">
-                                        {{ $t('commons.button.set') }}
-                                    </el-button>
-                                </template>
-                            </el-input>
-                            <span class="input-help">{{ $t('app.defaultWebDomainHepler') }}</span>
+                        <el-form-item :label="$t('app.uninstallDeleteBackup')" prop="uninstallDeleteBackup">
+                            <el-switch
+                                v-model="config.uninstallDeleteBackup"
+                                active-value="True"
+                                inactive-value="False"
+                                :loading="loading"
+                                @change="updateConfig('UninstallDeleteBackup', config.uninstallDeleteBackup)"
+                            />
+                        </el-form-item>
+                        <el-form-item :label="$t('app.uninstallDeleteImage')" prop="uninstallDeleteImage">
+                            <el-switch
+                                v-model="config.uninstallDeleteImage"
+                                active-value="True"
+                                inactive-value="False"
+                                :loading="loading"
+                                @change="updateConfig('UninstallDeleteImage', config.uninstallDeleteImage)"
+                            />
+                        </el-form-item>
+                        <el-form-item :label="$t('app.upgradeBackup')" prop="upgradeBackup">
+                            <el-switch
+                                v-model="config.upgradeBackup"
+                                active-value="True"
+                                inactive-value="False"
+                                :loading="loading"
+                                @change="updateConfig('UpgradeBackup', config.upgradeBackup)"
+                            />
                         </el-form-item>
                         <CustomSetting v-if="globalStore.isProductPro" />
                     </el-col>
@@ -28,46 +45,43 @@
             </el-form>
         </template>
     </LayoutContent>
-    <DefaultDomain ref="domainRef" @close="search" />
 </template>
 
 <script setup lang="ts">
-import { getAppStoreConfig, getCurrentNodeCustomAppConfig } from '@/api/modules/app';
-import { Rules } from '@/global/form-rules';
+import { getAppStoreConfig, getCurrentNodeCustomAppConfig, updateAppStoreConfig } from '@/api/modules/app';
 import { FormRules } from 'element-plus';
 import CustomSetting from '@/xpack/views/appstore/index.vue';
-import DefaultDomain from './default-domain/index.vue';
 import { GlobalStore } from '@/store';
+import { MsgSuccess } from '@/utils/message';
+import i18n from '@/lang';
 
 const globalStore = GlobalStore();
-const rules = ref<FormRules>({
-    defaultDomain: [Rules.domainOrIP],
-});
+const rules = ref<FormRules>({});
 const config = ref({
-    defaultDomain: '',
+    uninstallDeleteImage: '',
+    uninstallDeleteBackup: '',
+    upgradeBackup: '',
 });
 const loading = ref(false);
 const configForm = ref();
-const domainRef = ref();
 const useCustomApp = ref(false);
+const isInitializing = ref(true);
 
 const search = async () => {
     loading.value = true;
     try {
         const res = await getAppStoreConfig();
-        if (res.data.defaultDomain != '') {
-            config.value.defaultDomain = res.data.defaultDomain;
+        if (res && res.data) {
+            isInitializing.value = true;
+            config.value = res.data;
+            setTimeout(() => {
+                isInitializing.value = false;
+            }, 0);
         }
     } catch (error) {
     } finally {
         loading.value = false;
     }
-};
-
-const setDefaultDomain = () => {
-    domainRef.value.acceptParams({
-        domain: config.value.defaultDomain,
-    });
 };
 
 const getNodeConfig = async () => {
@@ -77,6 +91,25 @@ const getNodeConfig = async () => {
     const res = await getCurrentNodeCustomAppConfig();
     if (res && res.data) {
         useCustomApp.value = res.data.status === 'enable';
+    }
+};
+
+const updateConfig = async (scope: string, value: string) => {
+    if (isInitializing.value) {
+        return;
+    }
+    loading.value = true;
+    try {
+        const req = {
+            scope: scope,
+            status: value,
+        };
+        await updateAppStoreConfig(req);
+        MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
+        search();
+    } catch (error) {
+    } finally {
+        loading.value = false;
     }
 };
 

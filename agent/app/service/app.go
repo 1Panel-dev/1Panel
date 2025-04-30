@@ -1160,12 +1160,22 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 
 func (a AppService) UpdateAppstoreConfig(req request.AppstoreUpdate) error {
 	settingService := NewISettingService()
-	return settingService.Update("AppDefaultDomain", req.DefaultDomain)
+	return settingService.Update(req.Scope, req.Status)
 }
 
 func (a AppService) GetAppstoreConfig() (*response.AppstoreConfig, error) {
-	defaultDomain, _ := settingRepo.Get(settingRepo.WithByKey("AppDefaultDomain"))
 	res := &response.AppstoreConfig{}
-	res.DefaultDomain = defaultDomain.Value
+	res.UninstallDeleteImage, _ = settingRepo.GetValueByKey("UninstallDeleteImage")
+	if res.UninstallDeleteImage == "" {
+		res.UninstallDeleteImage = "False"
+	}
+	res.UpgradeBackup, _ = settingRepo.GetValueByKey("UpgradeBackup")
+	if res.UpgradeBackup == "" {
+		res.UpgradeBackup = "False"
+	}
+	res.UninstallDeleteBackup, _ = settingRepo.GetValueByKey("UninstallDeleteBackup")
+	if res.UninstallDeleteBackup == "" {
+		res.UninstallDeleteBackup = "False"
+	}
 	return res, nil
 }

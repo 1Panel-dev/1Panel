@@ -1960,6 +1960,9 @@ const message = {
         ignoreVersion: '忽略指定版本',
         specifyIP: '绑定主机 IP',
         specifyIPHelper: '设置端口绑定的主机地址/网卡（如果你不清楚这个的作用，请不要填写）',
+        uninstallDeleteBackup: '卸载应用删除备份',
+        uninstallDeleteImage: '卸载应用删除镜像',
+        upgradeBackup: '升级应用前备份',
     },
     website: {
         primaryDomain: '主域名',

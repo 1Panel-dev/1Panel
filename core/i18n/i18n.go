@@ -113,7 +113,7 @@ func UseI18n() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		lang := context.GetHeader("Accept-Language")
 		if lang == "" {
-			lang = "zh"
+			lang = "en"
 		}
 		global.I18n = i18n.NewLocalizer(bundle, lang)
 	}
@@ -175,4 +175,8 @@ func GetMsgWithMapForCmd(key string, maps map[string]interface{}) string {
 	} else {
 		return content
 	}
+}
+
+func GetLanguageFromDB() {
+
 }

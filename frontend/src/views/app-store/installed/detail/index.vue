@@ -14,13 +14,19 @@
                             {{ $t('commons.button.edit') }}
                         </el-button>
                     </span>
-                    <el-input v-else v-model="appConfigUpdate.webUI" :placeholder="$t('app.webUIPlaceholder')">
-                        <template #append>
-                            <el-button type="primary" @click="updateAppConfig">
-                                {{ $t('commons.button.confirm') }}
-                            </el-button>
-                        </template>
-                    </el-input>
+                    <span class="flex" v-else>
+                        <el-input v-model="webUI.domain" :placeholder="$t('app.webUIPlaceholder')">
+                            <template #prepend>
+                                <el-select v-model="webUI.protocol" class="pre-select">
+                                    <el-option label="http" value="http://" />
+                                    <el-option label="https" value="https://" />
+                                </el-select>
+                            </template>
+                        </el-input>
+                        <el-button type="primary" @click="updateAppConfig" class="ml-2">
+                            {{ $t('commons.button.confirm') }}
+                        </el-button>
+                    </span>
                 </el-descriptions-item>
                 <el-descriptions-item v-for="(param, key) in params" :label="getLabel(param)" :key="key">
                     <span>{{ param.showValue && param.showValue != '' ? param.showValue : param.value }}</span>
@@ -125,7 +131,7 @@ import { reactive, ref } from 'vue';
 import { FormInstance } from 'element-plus';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import { MsgSuccess } from '@/utils/message';
-import { getLabel } from '@/utils/util';
+import { getLabel, splitHttp } from '@/utils/util';
 import i18n from '@/lang';
 
 interface ParamProps {
@@ -141,6 +147,7 @@ interface EditForm extends App.InstallParams {
     default: any;
 }
 
+const emit = defineEmits(['close']);
 const open = ref(false);
 const loading = ref(false);
 const params = ref<EditForm[]>();
@@ -164,6 +171,10 @@ const appConfigUpdate = ref<App.AppConfigUpdate>({
     webUI: '',
 });
 const openConfig = ref(false);
+const webUI = reactive({
+    protocol: 'http://',
+    domain: '',
+});
 
 const acceptParams = async (props: ParamProps) => {
     submitModel.value.installId = props.id;
@@ -177,6 +188,7 @@ const acceptParams = async (props: ParamProps) => {
 };
 
 const handleClose = () => {
+    emit('close');
     open.value = false;
 };
 const editParam = () => {
@@ -227,6 +239,11 @@ const get = async () => {
         paramModel.value.isHostMode = res.data.hostMode;
         paramModel.value.specifyIP = res.data.specifyIP;
         appConfigUpdate.value.webUI = res.data.webUI;
+        if (res.data.webUI != '') {
+            const httpConfig = splitHttp(res.data.webUI);
+            webUI.domain = httpConfig.url;
+            webUI.protocol = httpConfig.proto;
+        }
         appType.value = res.data.type;
     } catch (error) {
     } finally {
@@ -272,10 +289,13 @@ const submit = async (formEl: FormInstance) => {
 };
 
 const updateAppConfig = async () => {
+    if (!webUI.domain || webUI.domain === '') {
+        return;
+    }
     try {
         await updateInstallConfig({
             installID: Number(paramData.value.id),
-            webUI: appConfigUpdate.value.webUI,
+            webUI: webUI.protocol + webUI.domain,
         });
         MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
         handleClose();

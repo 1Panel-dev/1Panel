@@ -1,5 +1,11 @@
 <template>
-    <DrawerPro v-model="open" size="large" :header="$t('menu.msgCenter')" @close="handleClose">
+    <DrawerPro
+        v-model="open"
+        size="large"
+        :header="$t('menu.msgCenter')"
+        :resource="globalStore.currentNode"
+        @close="handleClose"
+    >
         <template #content>
             <LayoutContent v-loading="loading" :title="$t('logs.task')">
                 <template #rightToolBar>
@@ -50,6 +56,8 @@ import { reactive, ref } from '@vue/runtime-core';
 import { Log } from '@/api/interface/log';
 import TaskLog from '@/components/log/task/index.vue';
 import bus from '@/global/bus';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const open = ref(false);
 const handleClose = () => {

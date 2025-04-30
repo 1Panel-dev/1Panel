@@ -2130,6 +2130,9 @@ const message = {
         specifyIP: 'Bind Host IP',
         specifyIPHelper:
             'Set the host address/network interface to bind the port (if you are not sure about this, please do not fill it in)',
+        uninstallDeleteBackup: 'Uninstall App Deletes Backup',
+        uninstallDeleteImage: 'Uninstall App Deletes Image',
+        upgradeBackup: 'Backup Before Upgrading App',
     },
     website: {
         primaryDomain: 'Primary Domain',

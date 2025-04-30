@@ -1970,6 +1970,9 @@ const message = {
         ignoreVersion: '忽略指定版本',
         specifyIP: '綁定主機 IP',
         specifyIPHelper: '設置端口綁定的主機地址/網卡（如果你不清楚這個的作用，請不要填寫）',
+        uninstallDeleteBackup: '卸載應用刪除備份',
+        uninstallDeleteImage: '卸載應用刪除鏡像',
+        upgradeBackup: '升級應用前備份',
     },
     website: {
         primaryDomain: '主域名',

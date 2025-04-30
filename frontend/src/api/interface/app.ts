@@ -295,7 +295,14 @@ export namespace App {
     }
 
     export interface AppStoreConfig {
-        defaultDomain: string;
+        uninstallDeleteImage: string;
+        uninstallDeleteBackup: string;
+        upgradeBackup: string;
+    }
+
+    export interface AppStoreConfigUpdate {
+        scope: string;
+        status: string;
     }
 
     export interface CustomAppStoreConfig {

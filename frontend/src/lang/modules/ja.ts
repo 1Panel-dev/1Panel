@@ -2035,6 +2035,9 @@ const message = {
         specifyIP: 'ホスト IP をバインド',
         specifyIPHelper:
             'ポートにバインドするホストアドレス/ネットワークインターフェースを設定します（この機能がわからない場合は、入力しないでください）',
+        uninstallDeleteBackup: 'アプリをアンインストールしてバックアップを削除',
+        uninstallDeleteImage: 'アプリをアンインストールしてイメージを削除',
+        upgradeBackup: 'アプリのアップグレード前にバックアップ',
     },
     website: {
         primaryDomain: 'プライマリドメイン',

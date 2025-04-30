@@ -14,8 +14,6 @@ import i18n from '@/lang';
 import { onMounted, ref } from 'vue';
 import { searchAppInstalled } from '@/api/modules/app';
 import bus from '@/global/bus';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
 let showButton = ref(false);
 
 let buttons = [
@@ -32,9 +30,6 @@ let buttons = [
         path: '/apps/upgrade',
         count: 0,
     },
-];
-
-const settingButtons = [
     {
         label: i18n.global.t('commons.button.set'),
         path: '/apps/setting',
@@ -56,10 +51,6 @@ const search = () => {
 };
 
 onMounted(() => {
-    if (globalStore.isProductPro) {
-        buttons = buttons.concat(settingButtons);
-    }
-
     search();
     bus.on('upgrade', () => {
         showButton.value = false;
