@@ -162,6 +162,7 @@ func (u *CronjobRepo) EndRecords(record model.JobRecords, status, message, recor
 	errMap["status"] = status
 	errMap["file"] = record.File
 	errMap["message"] = message
+	errMap["task_id"] = record.TaskID
 	errMap["interval"] = time.Since(record.StartTime).Milliseconds()
 	if err := global.DB.Model(&model.JobRecords{}).Where("id = ?", record.ID).Updates(errMap).Error; err != nil {
 		global.LOG.Errorf("update record status failed, err: %v", err)

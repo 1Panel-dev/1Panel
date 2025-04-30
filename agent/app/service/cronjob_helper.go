@@ -54,6 +54,10 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 			if len(message) != 0 {
 				record.Records, _ = mkdirAndWriteFile(cronjob, record.StartTime, message)
 			}
+			taskItem, _ := taskRepo.GetFirst(taskRepo.WithByID(record.TaskID))
+			if len(taskItem.ID) == 0 {
+				record.TaskID = ""
+			}
 			cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), record.Records)
 			handleCronJobAlert(cronjob)
 			return

@@ -39,8 +39,8 @@ func Start() {
 	cron.Init()
 	session.Init()
 	gin.SetMode("debug")
-	InitOthers()
 	hook.Init()
+	InitOthers()
 
 	rootRouter := router.Routers()
 
