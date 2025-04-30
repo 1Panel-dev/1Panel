@@ -20,7 +20,6 @@ func Init() {
 	}
 
 	scriptJob := job.NewScriptJob()
-	scriptJob.Run()
 	if _, err := global.Cron.AddJob(fmt.Sprintf("%v %v * * *", mathRand.Intn(60), mathRand.Intn(3)), scriptJob); err != nil {
 		global.LOG.Errorf("[core] can not add script sync corn job: %s", err.Error())
 	}

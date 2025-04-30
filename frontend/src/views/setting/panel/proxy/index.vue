@@ -6,6 +6,7 @@
                     {{ $t('setting.proxyHelper') }}
                     <ul class="-ml-5">
                         <li>{{ $t('setting.proxyHelper1') }}</li>
+                        <li>{{ $t('setting.proxyHelper5') }}</li>
                         <li>{{ $t('setting.proxyHelper2') }}</li>
                         <li>{{ $t('setting.proxyHelper4') }}</li>
                         <li>{{ $t('setting.proxyHelper3') }}</li>

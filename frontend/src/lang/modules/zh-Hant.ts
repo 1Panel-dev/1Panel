@@ -1464,6 +1464,7 @@ const message = {
         proxyHelper2: '系統版本升級及獲取更新說明（專業版功能）',
         proxyHelper3: '系統許可證的驗證和同步',
         proxyHelper4: 'Docker 的網絡訪問將通過代理伺服器進行（專業版功能）',
+        proxyHelper5: '系統類型腳本庫的統一下載與同步（專業版功能）',
         proxyType: '代理類型',
         proxyUrl: '代理地址',
         proxyPort: '代理端口',
@@ -3068,6 +3069,7 @@ const message = {
             syncHelper: '當主節點數據發生變化時，實時同步到該子節點,',
             syncBackupAccount: '備份帳號設定',
             syncProxy: '系統代理設定',
+            syncCustomApp: '同步自訂應用倉庫',
             syncAlertSetting: '系統告警設定',
             syncNodeInfo: '節點基礎數據,',
             nodeSyncHelper: '節點信息同步將同步以下信息：',
@@ -3099,7 +3101,6 @@ const message = {
             offline: '離線模式',
             freeCount: '免費額度 [{0}]',
             offlineHelper: '當節點處於離線環境時使用',
-            SyncCustomApp: '同步自訂應用倉庫',
         },
         customApp: {
             name: '自訂應用倉庫',

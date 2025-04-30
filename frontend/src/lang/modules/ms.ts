@@ -1531,6 +1531,7 @@ const message = {
         proxyHelper2: 'Kemas kini sistem dan pengambilan maklumat kemas kini (Edisi Profesional sahaja)',
         proxyHelper4: 'Rangkaian Docker akan diakses melalui pelayan proksi (Edisi Profesional sahaja)',
         proxyHelper3: 'Pengesahan dan penyelarasan lesen sistem',
+        proxyHelper5: 'Muat turun dan penyegerakan bersepadu untuk pustaka skrip jenis sistem (Ciri Edisi Profesional)',
         proxyType: 'Jenis proksi',
         proxyUrl: 'Alamat proksi',
         proxyPort: 'Port proksi',
@@ -3239,6 +3240,7 @@ const message = {
             syncHelper: 'Apabila data nod induk berubah, ia akan disegerakkan ke nod anak ini secara masa nyata,',
             syncBackupAccount: 'Tetapan akaun sandaran',
             syncProxy: 'Tetapan proksi sistem',
+            syncCustomApp: 'Segerakan Repositori Aplikasi Tersuai',
             syncAlertSetting: 'Tetapan amaran sistem',
             syncNodeInfo: 'Data asas nod,',
             nodeSyncHelper: 'Penyelarasan maklumat nod akan menyelaraskan maklumat berikut:',
@@ -3273,7 +3275,6 @@ const message = {
             offline: 'Mod luar talian',
             freeCount: 'Had percuma [{0}]',
             offlineHelper: 'Digunakan apabila nod berada dalam persekitaran luar talian',
-            SyncCustomApp: 'Segerakan Repositori Aplikasi Tersuai',
         },
         customApp: {
             name: 'Repositori Aplikasi Khusus',

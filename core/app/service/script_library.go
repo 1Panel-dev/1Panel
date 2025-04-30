@@ -162,7 +162,7 @@ func (u *ScriptService) Sync() error {
 
 	syncTask.AddSubTask(task.GetTaskName(i18n.GetMsgByKey("ScriptLibrary"), task.TaskSync, task.TaskScopeScript), func(t *task.Task) (err error) {
 		versionUrl := fmt.Sprintf("%s/scripts/version.txt", global.CONF.RemoteURL.ResourceURL)
-		_, versionRes, err := req_helper.HandleRequest(versionUrl, http.MethodGet, constant.TimeOut20s)
+		_, versionRes, err := req_helper.HandleRequestWithProxy(versionUrl, http.MethodGet, constant.TimeOut20s)
 		if err != nil {
 			return fmt.Errorf("load scripts version from remote failed, err: %v", err)
 		}

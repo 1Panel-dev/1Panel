@@ -1487,6 +1487,7 @@ const message = {
         proxyHelper2: 'システムの更新と更新情報検索（プロフェッショナルエディションのみ）',
         proxyHelper4:
             'Dockerネットワークはプロキシサーバーを通じてアクセスされます（プロフェッショナルエディションのみ）',
+        proxyHelper5: 'システムタイプスクリプトライブラリの統一下載と同期（プロフェッショナル版機能）',
         proxyHelper3: 'システムライセンスの確認と同期',
         proxyType: 'プロキシタイプ',
         proxyUrl: 'プロキシアドレス',
@@ -3169,6 +3170,7 @@ const message = {
             syncHelper: 'マスターノードのデータが変更されると、この子ノードにリアルタイムで同期されます,',
             syncBackupAccount: 'バックアップアカウント設定',
             syncProxy: 'システムプロキシ設定',
+            syncCustomApp: 'カスタムアプリリポジトリを同期',
             syncAlertSetting: 'システムアラート設定',
             syncNodeInfo: 'ノード基本データ,',
             nodeSyncHelper: 'ノード情報の同期は、以下の情報を同期します：',
@@ -3202,7 +3204,6 @@ const message = {
             offline: 'オフラインモード',
             freeCount: '無料枠 [{0}]',
             offlineHelper: 'ノードがオフライン環境にある場合に使用',
-            SyncCustomApp: 'カスタムアプリリポジトリを同期',
         },
         customApp: {
             name: 'カスタムアプリリポジトリ',

@@ -1460,6 +1460,7 @@ const message = {
         proxyHelper2: '系统版本升级及获取更新说明（专业版功能）',
         proxyHelper3: '系统许可证的验证和同步',
         proxyHelper4: 'Docker 的网络访问将通过代理服务器进行（专业版功能）',
+        proxyHelper5: '系统类型脚本库的统一下载与同步（专业版功能）',
         proxyType: '代理类型',
         proxyUrl: '代理地址',
         proxyPort: '代理端口',
@@ -3050,6 +3051,7 @@ const message = {
             syncHelper: '主节点数据发生变化时，实时同步到该子节点',
             syncBackupAccount: '备份账号设置',
             syncProxy: '系统代理设置',
+            syncCustomApp: '同步自定义应用仓库',
             syncAlertSetting: '系统告警设置',
             syncNodeInfo: '节点基础数据',
             nodeSyncHelper: '节点信息同步将同步以下信息：',
@@ -3081,7 +3083,6 @@ const message = {
             offline: '离线模式',
             freeCount: '免费额度 [{0}] ',
             offlineHelper: '节点为离线环境时使用',
-            SyncCustomApp: '同步自定义应用仓库',
         },
         customApp: {
             name: '自定义应用仓库',

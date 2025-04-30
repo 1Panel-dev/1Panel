@@ -77,6 +77,7 @@
                     </el-option-group>
                 </el-select>
                 <TableSearch @search="search()" v-model:searchName="searchName" />
+                <TableRefresh @search="search()" />
             </template>
             <template #main>
                 <ComplexTable

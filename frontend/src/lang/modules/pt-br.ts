@@ -1517,6 +1517,8 @@ const message = {
         proxyHelper2: 'Atualização do sistema e recuperação de informações de atualização (apenas edição profissional)',
         proxyHelper4: 'A rede Docker será acessada por meio de um servidor proxy (apenas edição profissional)',
         proxyHelper3: 'Verificação e sincronização da licença do sistema',
+        proxyHelper5:
+            'Download e sincronização unificados para bibliotecas de scripts do tipo sistema (Recurso da Edição Profissional)',
         proxyType: 'Tipo de proxy',
         proxyUrl: 'Endereço do proxy',
         proxyPort: 'Porta do proxy',
@@ -3244,6 +3246,7 @@ const message = {
             syncHelper: 'Quando os dados do nó mestre mudam, são sincronizados em tempo real para este nó filho,',
             syncBackupAccount: 'Configurações de conta de backup',
             syncProxy: 'Configurações de proxy do sistema',
+            syncCustomApp: 'Sincronizar Repositório de Aplicativos Personalizados',
             syncAlertSetting: 'Configurações de alerta do sistema',
             syncNodeInfo: 'Dados básicos do nó,',
             nodeSyncHelper: 'A sincronização das informações do nó irá sincronizar as seguintes informações:',
@@ -3277,7 +3280,6 @@ const message = {
             offline: 'Modo offline',
             freeCount: 'Cota gratuita [{0}]',
             offlineHelper: 'Usado quando o nó está em ambiente offline',
-            SyncCustomApp: 'Sincronizar Repositório de Aplicativos Personalizados',
         },
         customApp: {
             name: 'Repositório de Aplicativos Personalizados',

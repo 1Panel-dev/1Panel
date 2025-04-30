@@ -1470,6 +1470,7 @@ const message = {
         proxyHelper2: '시스템 업데이트 및 업데이트 정보 가져오기 (전문 버전에서만 제공)',
         proxyHelper4: 'Docker 네트워크가 프록시 서버를 통해 액세스됩니다 (전문 버전에서만 제공)',
         proxyHelper3: '시스템 라이선스 인증 및 동기화',
+        proxyHelper5: '시스템 유형 스크립트 라이브러리의 통합 다운로드 및 동기화 (프로페셔널 에디션 기능)',
         proxyType: '프록시 유형',
         proxyUrl: '프록시 주소',
         proxyPort: '프록시 포트',
@@ -3114,6 +3115,7 @@ const message = {
             syncHelper: '마스터 노드 데이터가 변경되면, 이 자식 노드에 실시간으로 동기화됩니다,',
             syncBackupAccount: '백업 계정 설정',
             syncProxy: '시스템 프록시 설정',
+            syncCustomApp: '사용자 정의 앱 저장소 동기화',
             syncAlertSetting: '시스템 경고 설정',
             syncNodeInfo: '노드 기본 데이터,',
             nodeSyncHelper: '노드 정보 동기화는 다음 정보를 동기화합니다:',
@@ -3146,7 +3148,6 @@ const message = {
             offline: '오프라인 모드',
             freeCount: '무료 할당량 [{0}]',
             offlineHelper: '노드가 오프라인 환경일 때 사용',
-            SyncCustomApp: '사용자 정의 앱 저장소 동기화',
         },
         customApp: {
             name: '사용자 정의 앱 저장소',

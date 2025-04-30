@@ -1545,6 +1545,7 @@ const message = {
         proxyHelper2: 'System version upgrades and retrieving update information (Professional)',
         proxyHelper3: 'Verification and synchronization of system licenses',
         proxyHelper4: 'Docker network access will be done through a proxy server (Professional)',
+        proxyHelper5: 'Unified download and sync for system-type script libraries (Professional Edition feature)',
         proxyType: 'Proxy Type',
         proxyUrl: 'Proxy Address',
         proxyPort: 'Proxy Port',
@@ -3310,6 +3311,7 @@ const message = {
             syncHelper: 'When master node data changes, it synchronizes to this child node in real-time',
             syncBackupAccount: 'Backup account settings',
             syncProxy: 'System proxy settings',
+            syncCustomApp: 'Sync Custom App Repository',
             syncAlertSetting: 'System alert settings',
             syncNodeInfo: 'Node basic data,',
             nodeSyncHelper: 'Node information synchronization will sync the following information:',
@@ -3343,7 +3345,6 @@ const message = {
             offline: 'Offline mode',
             freeCount: 'Free quota [{0}]',
             offlineHelper: 'Used when the node is in an offline environment',
-            SyncCustomApp: 'Sync Custom App Repository',
         },
         customApp: {
             name: 'Custom App Repository',
