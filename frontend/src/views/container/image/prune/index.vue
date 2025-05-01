@@ -70,9 +70,11 @@ const acceptParams = async (): Promise<void> => {
     unUsedList.value = [];
     for (const item of list) {
         if (
-            !item.tags ||
-            item.tags.length === 0 ||
-            (item.tags.length === 1 && item.tags[0].indexOf('<none>') !== -1 && !item.isUsed)
+            (
+                !item.tags ||
+                item.tags.length === 0 ||
+                (item.tags.length === 1 && item.tags[0].indexOf('<none>') !== -1)
+            ) && !item.isUsed
         ) {
             unTagList.value.push(item);
         }
