@@ -1844,9 +1844,6 @@ func getAppTags(appID uint, lang string) ([]response.TagDTO, error) {
 
 func handleOpenrestyFile(appInstall *model.AppInstall) error {
 	websites, _ := websiteRepo.List()
-	if len(websites) == 0 {
-		return nil
-	}
 	hasDefaultWebsite := false
 	for _, website := range websites {
 		if website.DefaultServer {
@@ -1854,18 +1851,82 @@ func handleOpenrestyFile(appInstall *model.AppInstall) error {
 			break
 		}
 	}
+	if err := handleSSLConfig(appInstall, hasDefaultWebsite); err != nil {
+		return err
+	}
+	if len(websites) == 0 {
+		return nil
+	}
 	if hasDefaultWebsite {
-		installDir := appInstall.GetPath()
-		defaultConfigPath := path.Join(installDir, "conf", "default", "00.default.conf")
-		fileOp := files.NewFileOp()
-		content, err := fileOp.GetContent(defaultConfigPath)
-		if err != nil {
-			return err
-		}
-		newContent := strings.ReplaceAll(string(content), "default_server", "")
-		if err := fileOp.WriteFile(defaultConfigPath, strings.NewReader(newContent), constant.FilePerm); err != nil {
+		if err := handleDefaultServer(appInstall); err != nil {
 			return err
 		}
 	}
 	return createAllWebsitesWAFConfig(websites)
+}
+
+func handleDefaultServer(appInstall *model.AppInstall) error {
+	installDir := appInstall.GetPath()
+	defaultConfigPath := path.Join(installDir, "conf", "default", "00.default.conf")
+	fileOp := files.NewFileOp()
+	content, err := fileOp.GetContent(defaultConfigPath)
+	if err != nil {
+		return err
+	}
+	newContent := strings.ReplaceAll(string(content), "default_server", "")
+	if err := fileOp.WriteFile(defaultConfigPath, strings.NewReader(newContent), constant.FilePerm); err != nil {
+		return err
+	}
+	return nil
+}
+
+func handleSSLConfig(appInstall *model.AppInstall, defaultWebsite bool) error {
+	sslDir := path.Join(appInstall.GetPath(), "conf", "ssl")
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(sslDir) {
+		return errors.New("ssl dir not found")
+	}
+	ca, _ := websiteCARepo.GetFirst(repo.WithByName("1Panel"))
+	if ca.ID == 0 {
+		global.LOG.Errorf("create openresty default ssl failed ca not found")
+		return nil
+	}
+	caService := NewIWebsiteCAService()
+	caRequest := request.WebsiteCAObtain{
+		ID:      ca.ID,
+		Domains: "localhost",
+		KeyType: "4096",
+		Time:    99,
+		Unit:    "year",
+		Dir:     sslDir,
+		PushDir: true,
+	}
+	websiteSSL, err := caService.ObtainSSL(caRequest)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		_ = NewIWebsiteSSLService().Delete([]uint{websiteSSL.ID})
+	}()
+	defaultConfigPath := path.Join(appInstall.GetPath(), "conf", "default", "00.default.conf")
+	content, err := os.ReadFile(defaultConfigPath)
+	if err != nil {
+		return err
+	}
+	defaultConfig, err := parser.NewStringParser(string(content)).Parse()
+	if err != nil {
+		return err
+	}
+	defaultConfig.FilePath = defaultConfigPath
+	defaultServer := defaultConfig.FindServers()[0]
+	defaultServer.UpdateListen(fmt.Sprintf("%d", appInstall.HttpsPort), defaultWebsite, "ssl")
+	defaultServer.UpdateListen(fmt.Sprintf("[::]:%d", appInstall.HttpsPort), defaultWebsite, "ssl")
+	defaultServer.UpdateDirective("include", []string{"/usr/local/openresty/nginx/conf/ssl/root_ssl.conf"})
+	defaultServer.UpdateDirective("http2", []string{"on"})
+	defaultServer.UpdateListen(fmt.Sprintf("%d", appInstall.HttpPort), defaultWebsite, "quic", "reuseport")
+	defaultServer.UpdateListen(fmt.Sprintf("[::]:%d", appInstall.HttpsPort), defaultWebsite, "quic", "reuseport")
+	if err = nginx.WriteConfig(defaultConfig, nginx.IndentedStyle); err != nil {
+		return err
+	}
+	return nil
 }

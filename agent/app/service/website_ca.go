@@ -221,7 +221,7 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) (*model.Website
 			domainArray := strings.Split(req.Domains, "\n")
 			for _, domain := range domainArray {
 				if ipAddress := net.ParseIP(domain); ipAddress == nil {
-					if !common.IsValidDomain(domain) {
+					if domain != "localhost" && !common.IsValidDomain(domain) {
 						err = buserr.WithName("ErrDomainFormat", domain)
 						return nil, err
 					}

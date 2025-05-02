@@ -121,6 +121,8 @@ func updateDefaultServerConfig(enable bool) error {
 	defaultServer := defaultConfig.FindServers()[0]
 	defaultServer.UpdateListen("80", enable)
 	defaultServer.UpdateListen("[::]:80", enable)
+	defaultServer.UpdateListen("443", enable)
+	defaultServer.UpdateListen("[::]:443", enable)
 	if err = nginx.WriteConfig(defaultConfig, nginx.IndentedStyle); err != nil {
 		return err
 	}

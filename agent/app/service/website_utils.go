@@ -571,14 +571,14 @@ func setListen(server *components.Server, port string, ipv6, http3, defaultServe
 	}
 	server.UpdateListen(port, defaultServer, params...)
 	if ssl && http3 {
-		server.UpdateListen(port, defaultServer, "quic", "reuseport")
+		server.UpdateListen(port, defaultServer, "quic")
 	}
 	if !ipv6 {
 		return
 	}
 	server.UpdateListen("[::]:"+port, defaultServer, params...)
 	if ssl && http3 {
-		server.UpdateListen("[::]:"+port, defaultServer, "quic", "reuseport")
+		server.UpdateListen("[::]:"+port, defaultServer, "quic")
 	}
 }
 
