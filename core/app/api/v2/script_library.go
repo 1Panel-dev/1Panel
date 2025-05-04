@@ -1,9 +1,11 @@
 package v2
 
 import (
+	"encoding/json"
 	"fmt"
 	"path"
 	"strconv"
+	"strings"
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/app/dto"
@@ -13,7 +15,6 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/terminal"
 	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/pkg/errors"
 )
 
@@ -182,7 +183,14 @@ func (b *BaseApi) RunScript(c *gin.Context) {
 		}
 
 		fileDir := path.Join(installDir, "1panel/tmp/script")
-		fileName := path.Join(fileDir, uuid.NewString())
+		fileName := ""
+		var translations = make(map[string]string)
+		_ = json.Unmarshal([]byte(scriptItem.Name), &translations)
+		if name, ok := translations["en"]; ok {
+			fileName = path.Join(fileDir, strings.ReplaceAll(name, " ", "_"))
+		} else {
+			fileName = path.Join(fileDir, strings.ReplaceAll(scriptItem.Name, " ", "_"))
+		}
 		initCmd := fmt.Sprintf("mkdir -p %s && cat > %s <<'MYMARKER'\n%s\nMYMARKER\n bash %s", fileDir, fileName, scriptItem.Script, fileName)
 		client, err := ssh.NewClient(*connInfo)
 		if wshandleError(wsConn, errors.WithMessage(err, "failed to set up the connection. Please check the host information")) {

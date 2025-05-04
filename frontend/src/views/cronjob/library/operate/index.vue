@@ -127,6 +127,15 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
 const loadGroupOptions = async () => {
     const res = await getGroupList('script');
     groupOptions.value = res.data || [];
+    if (dialogData.value.title !== 'create') {
+        return;
+    }
+    for (const group of groupOptions.value) {
+        if (group.isDefault) {
+            dialogData.value.rowData.groupList = [group.id];
+            break;
+        }
+    }
 };
 
 defineExpose({

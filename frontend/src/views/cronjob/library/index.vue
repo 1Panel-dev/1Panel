@@ -49,7 +49,7 @@
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.group')" min-width="120" prop="group">
                         <template #default="{ row }">
-                            <el-button class="mr-3" size="small" v-if="row.isSystem">system</el-button>
+                            <el-button class="mr-3" size="small" v-if="row.isSystem">{{ $t('menu.system') }}</el-button>
                             <span v-if="row.groupBelong">
                                 <el-button size="small" v-for="(item, index) in row.groupBelong" :key="index">
                                     <span v-if="item === 'Default'">
@@ -131,7 +131,7 @@ const groupOptions = ref();
 
 const dialogGroupRef = ref();
 const onOpenGroupDialog = () => {
-    dialogGroupRef.value!.acceptParams({ type: 'script', hideDefaultButton: true });
+    dialogGroupRef.value!.acceptParams({ type: 'script' });
 };
 
 const dialogRef = ref();
