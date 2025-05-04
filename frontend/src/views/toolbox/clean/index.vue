@@ -632,6 +632,8 @@ function load18n(label: string) {
             return i18n.global.t('clean.directory');
         case 'system_log':
             return i18n.global.t('clean.systemLog');
+        case 'script':
+            return i18n.global.t('cronjob.library.script');
         case 'docker_log':
             return i18n.global.t('clean.dockerLog');
         case 'task_log':
