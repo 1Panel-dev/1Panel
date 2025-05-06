@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 
@@ -314,7 +315,7 @@ func recoverAppData(src string, itemHelper *snapRecoverHelper) error {
 		itemHelper.Task.Log(i18n.GetMsgByKey("RecoverAppEmpty"))
 		return nil
 	}
-	std, err := cmd.RunDefaultWithStdoutBashCf("docker load < %s", path.Join(src, "images.tar.gz"))
+	std, err := cmd.NewCommandMgr(cmd.WithTimeout(10*time.Minute)).RunWithStdoutBashCf("docker load < %s", path.Join(src, "images.tar.gz"))
 	if err != nil {
 		itemHelper.Task.LogFailedWithErr(i18n.GetMsgByKey("RecoverAppImage"), errors.New(std))
 		return fmt.Errorf("docker load images failed, err: %v", err)
