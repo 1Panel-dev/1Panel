@@ -320,7 +320,7 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 		if err != nil {
 			return err
 		}
-		res, err := proxy_local.NewLocalClient("/api/v2/websites/ca/obtain", http.MethodPost, bytes.NewReader(jsonData))
+		res, err := proxy_local.NewLocalClient("/api/v2/websites/ca/obtain", http.MethodPost, bytes.NewReader(jsonData), nil)
 		if err != nil {
 			return err
 		}

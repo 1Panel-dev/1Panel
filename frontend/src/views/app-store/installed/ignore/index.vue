@@ -10,7 +10,7 @@
                             </el-col>
                             <el-col :span="12">
                                 <span>{{ app.name }}</span>
-                                <div class="app-margin">
+                                <div>
                                     <el-tag v-if="app.version != ''">{{ app.version }}</el-tag>
                                     <el-tag v-else>{{ $t('commons.table.all') + $t('app.version') }}</el-tag>
                                 </div>

@@ -5,6 +5,9 @@ import (
 	"encoding/gob"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/core/init/db"
+	"github.com/1Panel-dev/1Panel/core/init/geo"
+	"github.com/1Panel-dev/1Panel/core/init/log"
+	"github.com/1Panel-dev/1Panel/core/init/migration"
 	"net"
 	"net/http"
 	"os"
@@ -15,9 +18,6 @@ import (
 	"github.com/1Panel-dev/1Panel/core/i18n"
 	"github.com/1Panel-dev/1Panel/core/init/cron"
 	"github.com/1Panel-dev/1Panel/core/init/hook"
-	"github.com/1Panel-dev/1Panel/core/init/lang"
-	"github.com/1Panel-dev/1Panel/core/init/log"
-	"github.com/1Panel-dev/1Panel/core/init/migration"
 	"github.com/1Panel-dev/1Panel/core/init/router"
 	"github.com/1Panel-dev/1Panel/core/init/session"
 	"github.com/1Panel-dev/1Panel/core/init/session/psession"
@@ -29,12 +29,12 @@ import (
 
 func Start() {
 	viper.Init()
-	db.Init()
-	i18n.Init()
 	log.Init()
+	db.Init()
 	migration.Init()
+	i18n.Init()
 	validator.Init()
-	lang.Init()
+	geo.Init()
 	gob.Register(psession.SessionUser{})
 	cron.Init()
 	session.Init()

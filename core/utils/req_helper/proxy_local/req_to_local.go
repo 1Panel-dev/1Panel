@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"io"
 	"net"
 	"net/http"
@@ -16,7 +17,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/i18n"
 )
 
-func NewLocalClient(reqUrl, reqMethod string, body io.Reader) (interface{}, error) {
+func NewLocalClient(reqUrl, reqMethod string, body io.Reader, ctx *gin.Context) (interface{}, error) {
 	sockPath := "/etc/1panel/agent.sock"
 	if _, err := os.Stat(sockPath); err != nil {
 		return nil, fmt.Errorf("no such agent.sock find in localhost, err: %v", err)
@@ -46,6 +47,13 @@ func NewLocalClient(reqUrl, reqMethod string, body io.Reader) (interface{}, erro
 	req, err := http.NewRequest(reqMethod, rURL.String(), body)
 	if err != nil {
 		return nil, fmt.Errorf("creating request failed, err: %v", err)
+	}
+	if ctx != nil {
+		for key, values := range ctx.Request.Header {
+			for _, value := range values {
+				req.Header.Add(key, value)
+			}
+		}
 	}
 
 	resp, err := client.Do(req)

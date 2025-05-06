@@ -110,7 +110,7 @@ func (u *GroupService) Delete(id uint) error {
 		err = xpack.UpdateGroup("node", id, defaultGroup.ID)
 	case "website":
 		bodyItem := []byte(fmt.Sprintf(`{"Group":%v, "NewGroup":%v}`, id, defaultGroup.ID))
-		if _, err := proxy_local.NewLocalClient("/api/v2/websites/group/change", http.MethodPost, bytes.NewReader(bodyItem)); err != nil {
+		if _, err := proxy_local.NewLocalClient("/api/v2/websites/group/change", http.MethodPost, bytes.NewReader(bodyItem), nil); err != nil {
 			return err
 		}
 		if err := xpack.UpdateGroup("node", id, defaultGroup.ID); err != nil {

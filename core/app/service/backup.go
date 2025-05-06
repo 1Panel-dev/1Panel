@@ -170,7 +170,7 @@ func (u *BackupService) Delete(name string) error {
 	if backup.Type == constant.Local {
 		return buserr.New("ErrBackupLocal")
 	}
-	if _, err := proxy_local.NewLocalClient(fmt.Sprintf("/api/v2/backups/check/%s", name), http.MethodGet, nil); err != nil {
+	if _, err := proxy_local.NewLocalClient(fmt.Sprintf("/api/v2/backups/check/%s", name), http.MethodGet, nil, nil); err != nil {
 		global.LOG.Errorf("check used of local cronjob failed, err: %v", err)
 		return buserr.New("ErrBackupInUsed")
 	}
