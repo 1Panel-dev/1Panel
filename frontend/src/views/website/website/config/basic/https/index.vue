@@ -73,6 +73,7 @@
                                     :key="index"
                                     :label="ssl.primaryDomain"
                                     :value="ssl.id"
+                                    :disabled="ssl.pem === ''"
                                 ></el-option>
                             </el-select>
                         </el-form-item>
@@ -140,16 +141,13 @@
                     <el-divider content-position="left">{{ $t('website.SSLProConfig') }}</el-divider>
                     <el-form-item :label="$t('website.supportProtocol')" prop="SSLProtocol">
                         <el-checkbox-group v-model="form.SSLProtocol">
-                            <el-checkbox :label="'TLSv1.3'">{{ 'TLS 1.3' }}</el-checkbox>
-                            <el-checkbox :label="'TLSv1.2'">{{ 'TLS 1.2' }}</el-checkbox>
-                            <el-checkbox :label="'TLSv1.1'">{{ 'TLS 1.1' }}</el-checkbox>
-                            <el-checkbox :label="'TLSv1'">{{ 'TLS 1.0' }}</el-checkbox>
-                            <br />
-                            <el-checkbox :label="'SSLv3'">
-                                {{ 'SSL V3' + $t('website.notSecurity') }}
+                            <el-checkbox :value="'TLSv1.3'">{{ 'TLS 1.3' }}</el-checkbox>
+                            <el-checkbox :value="'TLSv1.2'">{{ 'TLS 1.2' }}</el-checkbox>
+                            <el-checkbox :value="'TLSv1.1'">
+                                {{ 'TLS 1.0' + $t('website.notSecurity') }}
                             </el-checkbox>
-                            <el-checkbox :label="'SSLv2'">
-                                {{ 'SSL V2' + $t('website.notSecurity') }}
+                            <el-checkbox :value="'TLSv1'">
+                                {{ 'TLS 1.1' + $t('website.notSecurity') }}
                             </el-checkbox>
                         </el-checkbox-group>
                     </el-form-item>
@@ -209,7 +207,7 @@ const form = reactive({
     hsts: true,
     algorithm:
         'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:!aNULL:!eNULL:!EXPORT:!DSS:!DES:!RC4:!3DES:!MD5:!PSK:!KRB5:!SRP:!CAMELLIA:!SEED',
-    SSLProtocol: ['TLSv1.3', 'TLSv1.2', 'TLSv1.1', 'TLSv1'],
+    SSLProtocol: ['TLSv1.3', 'TLSv1.2'],
     httpsPort: '443',
     http3: false,
 });
@@ -255,7 +253,12 @@ const listSSLs = () => {
                 }
             }
             if (!exist) {
-                form.websiteSSLId = ssls.value[0].id;
+                for (const ssl of ssls.value) {
+                    if (ssl.pem != '') {
+                        form.websiteSSLId = ssl.id;
+                        break;
+                    }
+                }
             }
             changeSSl(form.websiteSSLId);
         } else {
@@ -275,7 +278,12 @@ const changeSSl = (sslid: number) => {
     const res = ssls.value.filter((element: Website.SSL) => {
         return element.id == sslid;
     });
-    websiteSSL.value = res[0];
+    for (const r of res) {
+        if (r.pem != '') {
+            websiteSSL.value = r;
+            break;
+        }
+    }
 };
 
 const changeType = (type: string) => {

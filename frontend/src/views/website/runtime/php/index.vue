@@ -100,7 +100,7 @@
         <Extensions ref="extensionsRef" @close="search" />
         <AppResources ref="checkRef" @close="search" />
         <ExtManagement ref="extManagementRef" />
-        <ComposeLogs ref="composeLogRef" :highlightDiff="400" />
+        <ComposeLogs ref="composeLogRef" :highlightDiff="200" />
         <Config ref="configRef" />
         <Supervisor ref="supervisorRef" />
     </div>

@@ -118,6 +118,8 @@ ErrDefaultAlias: 'default 為保留代號，請使用其他代號'
 ErrParentWebsite: '需要先移除子網站{{ .name }}'
 ErrBuildDirNotFound: '建置目錄不存在'
 ErrImageNotExist: '執行環境{{ .name }} 映像不存在，請重新編輯執行環境'
+ErrProxyIsUsed: "負載均衡已被反向代理使用，無法刪除"
+ErrSSLValid: '證書文件異常，請檢查證書狀態！'
 
 #ssl
 ErrSSLCannotDelete: '{{ .name }} 憑證正在被網站使用，無法刪除'

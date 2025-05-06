@@ -118,6 +118,8 @@ ErrDefaultAlias: '기본값은 예약된 코드입니다. 다른 코드를 사�
 ErrParentWebsite: '먼저 하위 사이트 {{ .name }}을 삭제해야 합니다.'
 ErrBuildDirNotFound: '빌드 디렉토리가 존재하지 않습니다'
 ErrImageNotExist: '운영 환경 {{ .name }} 이미지가 존재하지 않습니다. 운영 환경을 다시 편집하세요.'
+ErrProxyIsUsed: "로드 밸런싱이 역방향 프록시에 의해 사용되었으므로 삭제할 수 없습니다"
+ErrSSLValid: '인증서 파일에 문제가 있습니다. 인증서 상태를 확인하세요!'
 
 #SSL인증
 ErrSSLCannotDelete: '{{ .name }} 인증서는 웹사이트에서 사용 중이므로 삭제할 수 없습니다.'

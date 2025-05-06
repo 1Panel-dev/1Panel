@@ -118,6 +118,8 @@ ErrDefaultAlias: 'default is a reserved code, please use another code'
 ErrParentWebsite: 'You need to delete the subsite {{ .name }} first'
 ErrBuildDirNotFound: 'The build directory does not exist'
 ErrImageNotExist: 'The operating environment {{ .name }} image does not exist, please re-edit the operating environment'
+ErrProxyIsUsed: "Load balancing has been used by reverse proxy, cannot be deleted"
+ErrSSLValid: 'Certificate file is abnormal, please check the certificate status!'
 
 #ssl
 ErrSSLCannotDelete: 'The {{ .name }} certificate is being used by a website and cannot be deleted'

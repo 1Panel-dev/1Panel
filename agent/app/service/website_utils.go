@@ -531,10 +531,17 @@ func addListenAndServerName(website model.Website, domains []model.WebsiteDomain
 	server := config.FindServers()[0]
 	http3 := isHttp3(server)
 
+	var allDomains []string
+	existDomains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithWebsiteId(website.ID))
+	for _, domain := range existDomains {
+		allDomains = append(allDomains, domain.Domain)
+	}
+
 	for _, domain := range domains {
 		setListen(server, strconv.Itoa(domain.Port), website.IPV6, http3, website.DefaultServer, website.Protocol == constant.ProtocolHTTPS && domain.SSL)
-		server.UpdateServerName([]string{domain.Domain})
+		allDomains = append(allDomains, domain.Domain)
 	}
+	server.UpdateServerName(allDomains)
 
 	if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 		return err
@@ -665,9 +672,13 @@ func applySSL(website *model.Website, websiteSSL model.WebsiteSSL, req request.W
 		return nil
 	}
 	noDefaultPort := true
+	httpPorts := make(map[int]struct{})
 	for _, domain := range domains {
 		if domain.Port == 80 {
 			noDefaultPort = false
+		}
+		if domain.Port != 80 && !domain.SSL {
+			httpPorts[domain.Port] = struct{}{}
 		}
 	}
 	config := nginxFull.SiteConfig.Config
@@ -681,6 +692,9 @@ func applySSL(website *model.Website, websiteSSL model.WebsiteSSL, req request.W
 	httpPortIPV6 := "[::]:" + httpPort
 
 	for _, port := range httpsPort {
+		if _, ok := httpPorts[port]; !ok {
+			server.DeleteListen(strconv.Itoa(port))
+		}
 		setListen(server, strconv.Itoa(port), website.IPV6, req.Http3, website.DefaultServer, true)
 	}
 
@@ -714,10 +728,10 @@ func applySSL(website *model.Website, websiteSSL model.WebsiteSSL, req request.W
 	}
 	if !req.Http3 {
 		for _, port := range httpsPort {
-			server.RemoveListen(strconv.Itoa(port), "quic", "reuseport")
+			server.RemoveListen(strconv.Itoa(port), "quic")
 			if website.IPV6 {
 				httpsPortIPV6 := "[::]:" + strconv.Itoa(port)
-				server.RemoveListen(httpsPortIPV6, "quic", "reuseport")
+				server.RemoveListen(httpsPortIPV6, "quic")
 			}
 		}
 		server.RemoveDirective("add_header", []string{"Alt-Svc"})

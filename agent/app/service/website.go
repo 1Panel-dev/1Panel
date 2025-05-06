@@ -680,10 +680,6 @@ func (w WebsiteService) CreateWebsiteDomain(create request.WebsiteDomainCreate) 
 		_ = OperateFirewallPort(nil, addPorts)
 	}()
 
-	if err = addListenAndServerName(website, domainModels); err != nil {
-		return nil, err
-	}
-
 	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
 	if err != nil {
 		return nil, err
@@ -727,6 +723,10 @@ func (w WebsiteService) CreateWebsiteDomain(create request.WebsiteDomainCreate) 
 		if err := fileOp.SaveFileWithByte(websitesConfigPath, websitesContent, constant.DirPerm); err != nil {
 			return nil, err
 		}
+	}
+
+	if err = addListenAndServerName(website, domainModels); err != nil {
+		return nil, err
 	}
 
 	return domainModels, websiteDomainRepo.BatchCreate(context.TODO(), domainModels)
@@ -1036,6 +1036,9 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 		websiteModel, err := websiteSSLRepo.GetFirst(repo.WithByID(req.WebsiteSSLID))
 		if err != nil {
 			return nil, err
+		}
+		if websiteModel.Pem == "" {
+			return nil, buserr.New("ErrSSLValid")
 		}
 		website.WebsiteSSLID = websiteModel.ID
 		res.SSL = *websiteModel

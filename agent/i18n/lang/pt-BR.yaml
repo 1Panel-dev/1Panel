@@ -118,6 +118,8 @@ ErrDefaultAlias: 'padrão é um código reservado, use outro código'
 ErrParentWebsite: 'Você precisa excluir o subsite {{ .name }} primeiro'
 ErrBuildDirNotFound: 'O diretório de compilação não existe'
 ErrImageNotExist: 'A imagem do ambiente operacional {{ .name }} não existe, edite novamente o ambiente operacional'
+ErrProxyIsUsed: "Balanceamento de carga foi usado por proxy reverso, não pode ser excluído"
+ErrSSLValid: 'O arquivo do certificado está anormal, verifique o status do certificado!'
 
 #ssl
 ErrSSLCannotDelete: 'O certificado {{ .name }} está sendo usado por um site e não pode ser excluído'
