@@ -124,7 +124,7 @@ func (u *BackupService) Create(req dto.BackupOperate) error {
 	if req.Type == constant.Local {
 		return buserr.New("ErrBackupLocalCreate")
 	}
-	if req.Type != constant.Sftp && req.BackupPath != "/" {
+	if req.Type != constant.Sftp {
 		req.BackupPath = strings.TrimPrefix(req.BackupPath, "/")
 	}
 	backup, _ := backupRepo.Get(repo.WithByName(req.Name))

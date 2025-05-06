@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strings"
 	"sync"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -190,7 +191,14 @@ func (u *BackupRecordService) ListFiles(req dto.OperateByID) []string {
 		global.LOG.Debugf("load files failed, err: %v", err)
 		return []string{}
 	}
-	return files
+	var datas []string
+	for _, file := range files {
+		fileName := path.Base(file)
+		if len(file) != 0 && (strings.HasPrefix(fileName, "1panel-v2.") || strings.HasPrefix(fileName, "snapshot-1panel-v2.")) {
+			datas = append(datas, path.Base(file))
+		}
+	}
+	return datas
 }
 
 type backupSizeHelper struct {

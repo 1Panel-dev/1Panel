@@ -65,7 +65,11 @@ func (u *SnapshotService) SnapshotImport(req dto.SnapshotImport) error {
 	if len(req.Names) == 0 {
 		return fmt.Errorf("incorrect snapshot request body: %v", req.Names)
 	}
+
 	for _, snapName := range req.Names {
+		if !strings.HasPrefix(snapName, "1panel-v2.") && !strings.HasPrefix(snapName, "snapshot-1panel-v2.") {
+			return fmt.Errorf("incorrect snapshot name format of %s", snapName)
+		}
 		snap, _ := snapshotRepo.Get(repo.WithByName(strings.ReplaceAll(snapName, ".tar.gz", "")))
 		if snap.ID != 0 {
 			return buserr.New("ErrRecordExist")
