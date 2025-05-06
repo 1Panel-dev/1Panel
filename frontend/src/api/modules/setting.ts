@@ -4,6 +4,7 @@ import { Base64 } from 'js-base64';
 import { ResPage, SearchWithPage, DescriptionUpdate, ReqPage } from '../interface';
 import { Setting } from '../interface/setting';
 import { TimeoutEnum } from '@/enums/http-enum';
+import { App } from '../interface/app';
 
 // license
 export const uploadLicense = (oldLicense: string, params: FormData) => {
@@ -120,6 +121,12 @@ export const loadMFA = (param: Setting.MFARequest) => {
 };
 export const bindMFA = (param: Setting.MFABind) => {
     return http.post(`/core/settings/mfa/bind`, param);
+};
+export const getAppStoreConfig = () => {
+    return http.get<App.AppStoreConfig>(`/core/settings/apps/store/config`);
+};
+export const updateAppStoreConfig = (req: App.AppStoreConfigUpdate) => {
+    return http.post(`/core/settings/apps/store/update`, req);
 };
 
 // snapshot

@@ -55,6 +55,9 @@ type ISettingService interface {
 	GenerateRSAKey() error
 
 	GetLoginSetting() (*dto.SystemSetting, error)
+
+	UpdateAppstoreConfig(req dto.AppstoreUpdate) error
+	GetAppstoreConfig() (*dto.AppstoreConfig, error)
 }
 
 func NewISettingService() ISettingService {
@@ -636,6 +639,27 @@ func (u *SettingService) GetLoginSetting() (*dto.SystemSetting, error) {
 		Language: settingInfo.Language,
 		IsDemo:   global.CONF.Base.IsDemo,
 		IsIntl:   global.CONF.Base.IsIntl,
+	}
+	return res, nil
+}
+
+func (u *SettingService) UpdateAppstoreConfig(req dto.AppstoreUpdate) error {
+	return settingRepo.UpdateOrCreate(req.Scope, req.Status)
+}
+
+func (u *SettingService) GetAppstoreConfig() (*dto.AppstoreConfig, error) {
+	res := &dto.AppstoreConfig{}
+	res.UninstallDeleteImage, _ = settingRepo.GetValueByKey("UninstallDeleteImage")
+	if res.UninstallDeleteImage == "" {
+		res.UninstallDeleteImage = "False"
+	}
+	res.UpgradeBackup, _ = settingRepo.GetValueByKey("UpgradeBackup")
+	if res.UpgradeBackup == "" {
+		res.UpgradeBackup = "False"
+	}
+	res.UninstallDeleteBackup, _ = settingRepo.GetValueByKey("UninstallDeleteBackup")
+	if res.UninstallDeleteBackup == "" {
+		res.UninstallDeleteBackup = "False"
 	}
 	return res, nil
 }

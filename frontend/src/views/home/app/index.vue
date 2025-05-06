@@ -174,7 +174,8 @@
 </template>
 
 <script lang="ts" setup>
-import { getAppStoreConfig, installedOp } from '@/api/modules/app';
+import { installedOp } from '@/api/modules/app';
+import { getAgentSettingByKey } from '@/api/modules/setting';
 import { changeLauncherStatus, loadAppLauncher, loadAppLauncherOption } from '@/api/modules/dashboard';
 import i18n from '@/lang';
 import { GlobalStore } from '@/store';
@@ -254,9 +255,9 @@ const toLink = (link: string) => {
 
 const getConfig = async () => {
     try {
-        const res = await getAppStoreConfig();
-        if (res.data.defaultDomain != '') {
-            defaultLink.value = res.data.defaultDomain;
+        const res = await getAgentSettingByKey('SystemIP');
+        if (res.data != '') {
+            defaultLink.value = res.data;
         }
     } catch (error) {}
 };

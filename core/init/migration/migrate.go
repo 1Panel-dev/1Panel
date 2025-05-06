@@ -25,6 +25,7 @@ func Init() {
 		migrations.InitScriptLibrary,
 		migrations.AddOperationNode,
 		migrations.AddScriptVersion,
+		migrations.AddAppStoreSetting,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

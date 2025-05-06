@@ -43,5 +43,8 @@ func (s *SettingRouter) InitRouter(Router *gin.RouterGroup) {
 		settingRouter.POST("/api/config/update", baseApi.UpdateApiConfig)
 
 		noAuthRouter.POST("/ssl/reload", baseApi.ReloadSSL)
+
+		settingRouter.POST("/apps/store/update", baseApi.UpdateAppstoreConfig)
+		settingRouter.GET("/apps/store/config", baseApi.GetAppstoreConfig)
 	}
 }

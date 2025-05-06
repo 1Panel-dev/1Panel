@@ -15,8 +15,8 @@
                         <el-form-item :label="$t('app.uninstallDeleteBackup')" prop="uninstallDeleteBackup">
                             <el-switch
                                 v-model="config.uninstallDeleteBackup"
-                                active-value="True"
-                                inactive-value="False"
+                                active-value="Enable"
+                                inactive-value="Disable"
                                 :loading="loading"
                                 @change="updateConfig('UninstallDeleteBackup', config.uninstallDeleteBackup)"
                             />
@@ -24,8 +24,8 @@
                         <el-form-item :label="$t('app.uninstallDeleteImage')" prop="uninstallDeleteImage">
                             <el-switch
                                 v-model="config.uninstallDeleteImage"
-                                active-value="True"
-                                inactive-value="False"
+                                active-value="Enable"
+                                inactive-value="Disable"
                                 :loading="loading"
                                 @change="updateConfig('UninstallDeleteImage', config.uninstallDeleteImage)"
                             />
@@ -33,8 +33,8 @@
                         <el-form-item :label="$t('app.upgradeBackup')" prop="upgradeBackup">
                             <el-switch
                                 v-model="config.upgradeBackup"
-                                active-value="True"
-                                inactive-value="False"
+                                active-value="Enable"
+                                inactive-value="Disable"
                                 :loading="loading"
                                 @change="updateConfig('UpgradeBackup', config.upgradeBackup)"
                             />
@@ -48,7 +48,8 @@
 </template>
 
 <script setup lang="ts">
-import { getAppStoreConfig, getCurrentNodeCustomAppConfig, updateAppStoreConfig } from '@/api/modules/app';
+import { getCurrentNodeCustomAppConfig } from '@/api/modules/app';
+import { getAppStoreConfig, updateAppStoreConfig } from '@/api/modules/setting';
 import { FormRules } from 'element-plus';
 import CustomSetting from '@/xpack/views/appstore/index.vue';
 import { GlobalStore } from '@/store';

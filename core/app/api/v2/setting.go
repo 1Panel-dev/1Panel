@@ -445,6 +445,42 @@ func (b *BaseApi) UpdateApiConfig(c *gin.Context) {
 	helper.Success(c)
 }
 
+// @Tags App
+// @Summary Update appstore config
+// @Accept json
+// @Param request body dto.AppstoreUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /settings/apps/store/update [post]
+func (b *BaseApi) UpdateAppstoreConfig(c *gin.Context) {
+	var req dto.AppstoreUpdate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	err := settingService.UpdateAppstoreConfig(req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags App
+// @Summary Get appstore config
+// @Success 200 {object} dto.AppstoreConfig
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /settings/apps/store/config [get]
+func (b *BaseApi) GetAppstoreConfig(c *gin.Context) {
+	res, err := settingService.GetAppstoreConfig()
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}
+
 func checkEntrancePattern(val string) bool {
 	if len(val) == 0 {
 		return true

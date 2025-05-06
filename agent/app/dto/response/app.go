@@ -163,9 +163,3 @@ type AppConfig struct {
 	Params []AppParam `json:"params"`
 	request.AppContainerConfig
 }
-
-type AppstoreConfig struct {
-	UninstallDeleteImage  string `json:"uninstallDeleteImage"`
-	UpgradeBackup         string `json:"upgradeBackup"`
-	UninstallDeleteBackup string `json:"uninstallDeleteBackup"`
-}

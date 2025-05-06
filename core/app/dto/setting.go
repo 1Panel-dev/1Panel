@@ -1,6 +1,8 @@
 package dto
 
-import "time"
+import (
+	"time"
+)
 
 type SettingInfo struct {
 	UserName      string `json:"userName"`
@@ -206,4 +208,14 @@ type TerminalInfo struct {
 	CursorStyle       string `json:"cursorStyle"`
 	Scrollback        string `json:"scrollback"`
 	ScrollSensitivity string `json:"scrollSensitivity"`
+}
+
+type AppstoreUpdate struct {
+	Scope  string `json:"scope" validate:"required,oneof=UninstallDeleteImage UpgradeBackup UninstallDeleteBackup"`
+	Status string `json:"status"  validate:"required,oneof=Disable Enable"`
+}
+type AppstoreConfig struct {
+	UninstallDeleteImage  string `json:"uninstallDeleteImage"`
+	UpgradeBackup         string `json:"upgradeBackup"`
+	UninstallDeleteBackup string `json:"uninstallDeleteBackup"`
 }

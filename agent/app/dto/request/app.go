@@ -127,8 +127,3 @@ type AppUpdateVersion struct {
 	AppInstallID  uint   `json:"appInstallID" validate:"required"`
 	UpdateVersion string `json:"updateVersion"`
 }
-
-type AppstoreUpdate struct {
-	Scope  string `json:"scope" validate:"required,oneof=UninstallDeleteImage UpgradeBackup UninstallDeleteBackup"`
-	Status string `json:"status"`
-}

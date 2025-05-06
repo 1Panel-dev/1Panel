@@ -347,3 +347,19 @@ var AddScriptVersion = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddAppStoreSetting = &gormigrate.Migration{
+	ID: "20250506-add-appstore-setting",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Create(&model.Setting{Key: "UninstallDeleteImage", Value: "Disable"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "UpgradeBackup", Value: "Enable"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "UninstallDeleteBackup", Value: "Disable"}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}

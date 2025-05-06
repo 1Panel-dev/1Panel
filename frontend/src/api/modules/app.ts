@@ -111,14 +111,6 @@ export const updateInstallConfig = (req: App.AppConfigUpdate) => {
     return http.post(`apps/installed/config/update`, req);
 };
 
-export const getAppStoreConfig = () => {
-    return http.get<App.AppStoreConfig>(`apps/store/config`);
-};
-
-export const updateAppStoreConfig = (req: App.AppStoreConfigUpdate) => {
-    return http.post(`apps/store/update`, req);
-};
-
 export const syncCutomAppStore = (req: App.AppStoreSync) => {
     return http.post(`/custom/app/sync`, req);
 };

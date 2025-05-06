@@ -85,7 +85,8 @@
 </template>
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';
-import { getAppStoreConfig, getAppUpdateVersions, ignoreUpgrade, installedOp } from '@/api/modules/app';
+import { getAppUpdateVersions, ignoreUpgrade, installedOp } from '@/api/modules/app';
+import { getAppStoreConfig } from '@/api/modules/setting';
 import i18n from '@/lang';
 import { ElMessageBox, FormInstance } from 'element-plus';
 import { reactive, ref, onBeforeUnmount } from 'vue';
@@ -160,7 +161,7 @@ const initData = async () => {
     const config = await getAppStoreConfig();
     newCompose.value = '';
     useNewCompose.value = false;
-    operateReq.backup = config.data.upgradeBackup == 'True';
+    operateReq.backup = config.data.upgradeBackup == 'Enable';
     operateReq.pullImage = true;
     operateReq.dockerCompose = '';
 };

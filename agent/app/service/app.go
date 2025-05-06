@@ -46,9 +46,6 @@ type IAppService interface {
 	GetAppUpdate() (*response.AppUpdateRes, error)
 	GetAppDetailByID(id uint) (*response.AppDetailDTO, error)
 	SyncAppListFromLocal(taskID string)
-
-	GetAppstoreConfig() (*response.AppstoreConfig, error)
-	UpdateAppstoreConfig(req request.AppstoreUpdate) error
 }
 
 func NewIAppService() IAppService {
@@ -1157,26 +1154,4 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 	}()
 
 	return nil
-}
-
-func (a AppService) UpdateAppstoreConfig(req request.AppstoreUpdate) error {
-	settingService := NewISettingService()
-	return settingService.Update(req.Scope, req.Status)
-}
-
-func (a AppService) GetAppstoreConfig() (*response.AppstoreConfig, error) {
-	res := &response.AppstoreConfig{}
-	res.UninstallDeleteImage, _ = settingRepo.GetValueByKey("UninstallDeleteImage")
-	if res.UninstallDeleteImage == "" {
-		res.UninstallDeleteImage = "False"
-	}
-	res.UpgradeBackup, _ = settingRepo.GetValueByKey("UpgradeBackup")
-	if res.UpgradeBackup == "" {
-		res.UpgradeBackup = "False"
-	}
-	res.UninstallDeleteBackup, _ = settingRepo.GetValueByKey("UninstallDeleteBackup")
-	if res.UninstallDeleteBackup == "" {
-		res.UninstallDeleteBackup = "False"
-	}
-	return res, nil
 }

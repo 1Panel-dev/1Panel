@@ -192,39 +192,3 @@ func (b *BaseApi) GetAppListUpdate(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, res)
 }
-
-// @Tags App
-// @Summary Update appstore config
-// @Accept json
-// @Param request body request.AppstoreUpdate true "request"
-// @Success 200
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /apps/store/update [post]
-func (b *BaseApi) UpdateAppstoreConfig(c *gin.Context) {
-	var req request.AppstoreUpdate
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
-		return
-	}
-	err := appService.UpdateAppstoreConfig(req)
-	if err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-	helper.Success(c)
-}
-
-// @Tags App
-// @Summary Get appstore config
-// @Success 200 {object} response.AppstoreConfig
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /apps/store/config [get]
-func (b *BaseApi) GetAppstoreConfig(c *gin.Context) {
-	res, err := appService.GetAppstoreConfig()
-	if err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-	helper.SuccessWithData(c, res)
-}
