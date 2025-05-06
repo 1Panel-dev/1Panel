@@ -42,7 +42,6 @@
 <script setup lang="ts">
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import { FormRules } from 'element-plus';
-import { defineProps } from 'vue';
 import { useVModel } from '@vueuse/core';
 
 const props = defineProps({

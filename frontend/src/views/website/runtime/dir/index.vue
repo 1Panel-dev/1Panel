@@ -61,7 +61,6 @@
 import { Runtime } from '@/api/interface/runtime';
 import { GetNodeScripts } from '@/api/modules/runtime';
 import { useVModel } from '@vueuse/core';
-import { defineProps } from 'vue';
 
 const props = defineProps({
     mode: {

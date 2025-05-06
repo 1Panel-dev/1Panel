@@ -139,14 +139,14 @@ onUnmounted(() => {
     overflow: hidden;
 }
 
-.custom-tabs >>> .el-tabs__header.is-left {
+.custom-tabs :deep(.el-tabs__header.is-left) {
     height: 100%;
     overflow-y: auto;
     overflow-x: hidden;
     flex-shrink: 0;
 }
 
-.custom-tabs >>> .el-tabs__content {
+.custom-tabs :deep(.el-tabs__content) {
     height: 100%;
     overflow-y: auto;
     overflow-x: hidden;

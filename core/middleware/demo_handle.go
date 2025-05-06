@@ -10,14 +10,18 @@ import (
 )
 
 var whiteUrlList = map[string]struct{}{
-	"/core/api/v2/auth/login":     {},
-	"/api/v2/websites/config":     {},
-	"/api/v2/websites/waf/config": {},
-	"/api/v2/files/loadfile":      {},
-	"/api/v2/files/size":          {},
-	"/api/v2/logs/operation":      {},
-	"/api/v2/logs/login":          {},
-	"/core/api/v2/auth/logout":    {},
+	"/api/v2/dashboard/app/launcher/option": {},
+	"/api/v2/websites/config":               {},
+	"/api/v2/websites/waf/config":           {},
+	"/api/v2/files/loadfile":                {},
+	"/api/v2/files/size":                    {},
+	"/api/v2/runtimes/sync":                 {},
+	"/api/v2/toolbox/device/base":           {},
+
+	"/api/v2/core/auth/login":     {},
+	"/api/v2/core/logs/login":     {},
+	"/api/v2/core/logs/operation": {},
+	"/api/v2/core/auth/logout":    {},
 
 	"/api/v2/apps/installed/loadport": {},
 	"/api/v2/apps/installed/check":    {},
@@ -27,13 +31,18 @@ var whiteUrlList = map[string]struct{}{
 	"/api/v2/databases/status":        {},
 	"/api/v2/databases/baseinfo":      {},
 
-	"/api/v2/waf/attack/stat":    {},
-	"/api/v2/waf/config/website": {},
+	"/api/v2/xpack/waf/attack/stat":    {},
+	"/api/v2/xpack/waf/config/website": {},
+	"/api/v2/xpack/waf/relation/stat":  {},
 
-	"/api/v2/monitor/stat":         {},
-	"/api/v2/monitor/visitors":     {},
-	"/api/v2/monitor/visitors/loc": {},
-	"/api/v2/monitor/qps":          {},
+	"/api/v2/xpack/monitor/stat":         {},
+	"/api/v2/xpack/monitor/visitors":     {},
+	"/api/v2/xpack/monitor/visitors/loc": {},
+	"/api/v2/xpack/monitor/qps":          {},
+	"/api/v2/xpack/monitor/logs/stat":    {},
+	"/api/v2/xpack/monitor/websites":     {},
+	"/api/v2/xpack/monitor/trend":        {},
+	"/api/v2/xpack/monitor/rank":         {},
 }
 
 func DemoHandle() gin.HandlerFunc {

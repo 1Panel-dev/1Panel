@@ -10,7 +10,6 @@
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
 import { Promotion } from '@element-plus/icons-vue';
 defineProps({
     row: {

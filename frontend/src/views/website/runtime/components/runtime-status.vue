@@ -11,7 +11,7 @@
 </template>
 
 <script setup>
-import { defineProps, computed } from 'vue';
+import { computed } from 'vue';
 import Status from '@/components/status/index.vue';
 
 const props = defineProps({

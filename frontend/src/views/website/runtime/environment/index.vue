@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, reactive } from 'vue';
+import { reactive } from 'vue';
 import { FormRules } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import { Runtime } from '@/api/interface/runtime';

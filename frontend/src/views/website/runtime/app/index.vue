@@ -34,7 +34,6 @@
 import { App } from '@/api/interface/app';
 import { getAppByKey, getAppDetail, searchApp } from '@/api/modules/app';
 import { useVModel } from '@vueuse/core';
-import { defineProps } from 'vue';
 
 const props = defineProps({
     mode: {

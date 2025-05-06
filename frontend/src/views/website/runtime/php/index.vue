@@ -120,7 +120,7 @@ import Extensions from './extension-template/index.vue';
 import AppResources from '@/views/website/runtime/php/check/index.vue';
 import CreateRuntime from '@/views/website/runtime/php/create/index.vue';
 import RouterMenu from '../index.vue';
-import Log from '@/components/log/drawer/index.vue';
+import Log from '@/components/log/file-drawer/index.vue';
 import ComposeLogs from '@/components/log/compose/index.vue';
 import Config from '@/views/website/runtime/php/config/index.vue';
 import Supervisor from '@/views/website/runtime/php/supervisor/index.vue';

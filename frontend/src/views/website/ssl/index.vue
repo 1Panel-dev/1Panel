@@ -175,7 +175,7 @@ import { MsgError, MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
 import SSLUpload from './upload/index.vue';
 import Apply from './apply/index.vue';
-import Log from '@/components/log/drawer/index.vue';
+import Log from '@/components/log/file-drawer/index.vue';
 import Obtain from './obtain/index.vue';
 import MsgInfo from '@/components/msg-info/index.vue';
 

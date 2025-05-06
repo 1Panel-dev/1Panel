@@ -112,14 +112,13 @@ const loadStatus = async () => {
             await getSystemAvailable()
                 .then((res) => {
                     if (res) {
-                        window.location.reload();
                         toLogin();
                         clearInterval(Number(timer));
                         timer = null;
                     }
                 })
                 .catch(() => {
-                    window.location.reload();
+                    toLogin();
                     clearInterval(Number(timer));
                     timer = null;
                 });

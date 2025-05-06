@@ -57,7 +57,7 @@
 
 <script setup lang="ts">
 import { deleteLoadBalance, getLoadBalances } from '@/api/modules/website';
-import { defineProps, onMounted, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import Operate from './operate/index.vue';
 import i18n from '@/lang';
 import { Website } from '@/api/interface/website';
