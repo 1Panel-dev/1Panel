@@ -47,6 +47,14 @@
                             </el-text>
                         </template>
                     </el-table-column>
+                    <el-table-column :label="$t('cronjob.library.isInteractive')" prop="isInteractive" min-width="60">
+                        <template #default="{ row }">
+                            <div class="-mb-1">
+                                <el-icon v-if="row.isInteractive"><Check /></el-icon>
+                                <el-icon v-else><Minus /></el-icon>
+                            </div>
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('commons.table.group')" min-width="120" prop="group">
                         <template #default="{ row }">
                             <el-button class="mr-3" size="small" v-if="row.isSystem">{{ $t('menu.system') }}</el-button>

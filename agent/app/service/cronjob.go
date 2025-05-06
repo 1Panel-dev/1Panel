@@ -2,6 +2,7 @@ package service
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path"
@@ -36,6 +37,8 @@ type ICronjobService interface {
 	Download(down dto.CronjobDownload) (string, error)
 	StartJob(cronjob *model.Cronjob, isUpdate bool) (string, error)
 	CleanRecord(req dto.CronjobClean) error
+
+	LoadScriptOptions() []dto.ScriptOptions
 
 	LoadInfo(req dto.OperateByID) (*dto.CronjobOperate, error)
 	LoadRecordLog(req dto.OperateByID) string
@@ -93,6 +96,27 @@ func (u *CronjobService) LoadInfo(req dto.OperateByID) (*dto.CronjobOperate, err
 		item.AlertCount = 0
 	}
 	return &item, err
+}
+
+func (u *CronjobService) LoadScriptOptions() []dto.ScriptOptions {
+	scripts, err := scriptRepo.List()
+	if err != nil {
+		return nil
+	}
+	var options []dto.ScriptOptions
+	for _, script := range scripts {
+		var item dto.ScriptOptions
+		item.ID = script.ID
+		var translations = make(map[string]string)
+		_ = json.Unmarshal([]byte(script.Name), &translations)
+		if name, ok := translations["en"]; ok {
+			item.Name = strings.ReplaceAll(name, " ", "_")
+		} else {
+			item.Name = strings.ReplaceAll(script.Name, " ", "_")
+		}
+		options = append(options, item)
+	}
+	return options
 }
 
 func (u *CronjobService) SearchRecords(search dto.SearchRecord) (int64, interface{}, error) {
@@ -362,6 +386,8 @@ func (u *CronjobService) Update(id uint, req dto.CronjobOperate) error {
 	upMap["container_name"] = req.ContainerName
 	upMap["executor"] = req.Executor
 	upMap["user"] = req.User
+
+	upMap["script_id"] = req.ScriptID
 	upMap["app_id"] = req.AppID
 	upMap["website"] = req.Website
 	upMap["exclusion_rules"] = req.ExclusionRules

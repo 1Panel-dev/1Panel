@@ -29,6 +29,7 @@ type CronjobOperate struct {
 	ContainerName string `json:"containerName"`
 	User          string `json:"user"`
 
+	ScriptID       uint   `json:"scriptID"`
 	AppID          string `json:"appID"`
 	Website        string `json:"website"`
 	ExclusionRules string `json:"exclusionRules"`
@@ -84,6 +85,7 @@ type CronjobInfo struct {
 	ContainerName string `json:"containerName"`
 	User          string `json:"user"`
 
+	ScriptID       uint   `json:"scriptID"`
 	AppID          string `json:"appID"`
 	Website        string `json:"website"`
 	ExclusionRules string `json:"exclusionRules"`
@@ -107,6 +109,11 @@ type CronjobInfo struct {
 	Secret           string `json:"secret"`
 
 	AlertCount uint `json:"alertCount"`
+}
+
+type ScriptOptions struct {
+	ID   uint   `json:"id"`
+	Name string `json:"name"`
 }
 
 type SearchRecord struct {

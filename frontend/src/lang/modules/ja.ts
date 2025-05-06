@@ -1029,6 +1029,9 @@ const message = {
         alertTitle: '計画タスク -  {0}「{1}」タスク障害アラート',
         library: {
             script: 'スクリプト',
+            isInteractive: '対話型',
+            interactive: '対話型スクリプト',
+            interactiveHelper: '実行中にユーザー入力が必要で、スケジュールタスクでは使用できません。',
             library: 'スクリプトライブラリ',
             create: 'スクリプトを追加',
             edit: 'スクリプトを編集',

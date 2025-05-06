@@ -1048,6 +1048,10 @@ const message = {
         alertTitle: 'Tarefa Planejada - {0} 「{1}」 Alerta de Falha na Tarefa',
         library: {
             script: 'Script',
+            isInteractive: 'Interativo',
+            interactive: 'Script interativo',
+            interactiveHelper:
+                'Requer entrada do usuário durante a execução e não pode ser usado em tarefas agendadas.',
             library: 'Biblioteca de Scripts',
             create: 'Adicionar Script',
             edit: 'Editar Script',

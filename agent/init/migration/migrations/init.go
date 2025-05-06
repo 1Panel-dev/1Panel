@@ -19,7 +19,7 @@ import (
 )
 
 var AddTable = &gormigrate.Migration{
-	ID: "20250413-add-table",
+	ID: "20250507-add-table",
 	Migrate: func(tx *gorm.DB) error {
 		return tx.AutoMigrate(
 			&model.AppDetail{},
@@ -43,6 +43,7 @@ var AddTable = &gormigrate.Migration{
 			&model.Firewall{},
 			&model.Ftp{},
 			&model.ImageRepo{},
+			&model.ScriptLibrary{},
 			&model.JobRecords{},
 			&model.MonitorBase{},
 			&model.MonitorIO{},

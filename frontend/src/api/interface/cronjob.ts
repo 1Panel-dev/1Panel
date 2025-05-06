@@ -105,6 +105,11 @@ export namespace Cronjob {
         recordID: number;
         backupAccountID: number;
     }
+    export interface ScriptOptions {
+        id: number;
+        name: string;
+        script: string;
+    }
     export interface SearchRecord extends ReqPage {
         cronjobID: number;
         startTime: Date;

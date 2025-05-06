@@ -8,7 +8,14 @@
     >
         <el-form ref="formRef" v-loading="loading" label-position="top" :model="dialogData.rowData" :rules="rules">
             <el-form-item :label="$t('commons.table.name')" prop="name">
-                <el-input clearable v-model="dialogData.rowData!.name" />
+                <el-tag v-if="dialogData.title === 'edit'">{{ dialogData.rowData!.name }}</el-tag>
+                <el-input v-else v-model="dialogData.rowData!.name" />
+            </el-form-item>
+            <el-form-item prop="isInteractive">
+                <el-checkbox v-model="dialogData.rowData!.isInteractive">
+                    {{ $t('cronjob.library.interactive') }}
+                </el-checkbox>
+                <span class="input-help">{{ $t('cronjob.library.interactiveHelper') }}</span>
             </el-form-item>
             <el-form-item :label="$t('commons.table.group')" prop="groupList">
                 <el-select filterable v-model="dialogData.rowData!.groupList" multiple>

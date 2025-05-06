@@ -214,7 +214,7 @@
 
                         <el-card class="mt-5">
                             <el-row :gutter="20">
-                                <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10" v-if="isWebsite()">
+                                <LayoutCol v-if="isWebsite()">
                                     <el-form-item
                                         :label="form.type === 'website' ? $t('cronjob.website') : $t('menu.website')"
                                         prop="website"
@@ -241,8 +241,8 @@
                                             {{ $t('cronjob.cutWebsiteLogHelper') }}
                                         </span>
                                     </el-form-item>
-                                </el-col>
-                                <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10" v-if="form.type === 'app'">
+                                </LayoutCol>
+                                <LayoutCol v-if="form.type === 'app'">
                                     <el-form-item :label="$t('cronjob.app')" prop="appID">
                                         <el-select clearable v-model="form.appID">
                                             <el-option
@@ -260,8 +260,8 @@
                                             </div>
                                         </el-select>
                                     </el-form-item>
-                                </el-col>
-                                <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10" v-if="form.type === 'database'">
+                                </LayoutCol>
+                                <LayoutCol v-if="form.type === 'database'">
                                     <el-form-item :label="$t('cronjob.database')">
                                         <el-select v-model="form.dbType" @change="loadDatabases">
                                             <el-option label="MySQL" value="mysql" />
@@ -269,8 +269,8 @@
                                             <el-option label="PostgreSQL" value="postgresql" />
                                         </el-select>
                                     </el-form-item>
-                                </el-col>
-                                <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10" v-if="form.type === 'database'">
+                                </LayoutCol>
+                                <LayoutCol v-if="form.type === 'database'">
                                     <el-form-item :label="$t('cronjob.database')" prop="dbName">
                                         <el-select clearable v-model="form.dbName">
                                             <el-option
@@ -298,34 +298,32 @@
                                             </el-option>
                                         </el-select>
                                     </el-form-item>
-                                </el-col>
-                                <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10" v-if="form.type === 'directory'">
+                                </LayoutCol>
+                                <LayoutCol v-if="form.type === 'directory'">
                                     <el-form-item :label="$t('cronjob.backupContent')">
-                                        <el-radio-group v-model="form.isDir">
+                                        <el-radio-group v-model="form.isDir" class="w-full">
                                             <el-radio :value="true">{{ $t('file.dir') }}</el-radio>
                                             <el-radio :value="false">{{ $t('menu.files') }}</el-radio>
                                         </el-radio-group>
                                     </el-form-item>
-                                </el-col>
-                                <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10" v-if="form.type === 'curl'">
+                                </LayoutCol>
+                                <LayoutCol v-if="form.type === 'curl'">
                                     <el-form-item :label="$t('cronjob.url')" prop="url">
                                         <el-input clearable v-model.trim="form.url" />
                                     </el-form-item>
-                                </el-col>
+                                </LayoutCol>
+                            </el-row>
 
-                                <div v-if="hasScript()" class="w-full">
-                                    <el-row :gutter="20">
-                                        <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10">
-                                            <el-form-item>
-                                                <el-checkbox v-model="form.inContainer">
-                                                    {{ $t('cronjob.containerCheckBox') }}
-                                                </el-checkbox>
-                                            </el-form-item>
-                                        </el-col>
-                                    </el-row>
+                            <el-row :gutter="20">
+                                <el-col :span="24" v-if="hasScript()">
+                                    <el-form-item>
+                                        <el-checkbox v-model="form.inContainer">
+                                            {{ $t('cronjob.containerCheckBox') }}
+                                        </el-checkbox>
+                                    </el-form-item>
 
                                     <el-row :gutter="20" v-if="form.inContainer">
-                                        <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10">
+                                        <LayoutCol>
                                             <el-form-item :label="$t('cronjob.containerName')" prop="containerName">
                                                 <el-select v-model="form.containerName">
                                                     <el-option
@@ -336,8 +334,8 @@
                                                     />
                                                 </el-select>
                                             </el-form-item>
-                                        </el-col>
-                                        <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10">
+                                        </LayoutCol>
+                                        <LayoutCol>
                                             <el-form-item
                                                 :label="$t('container.command')"
                                                 prop="command"
@@ -364,10 +362,10 @@
                                                     v-model="form.command"
                                                 />
                                             </el-form-item>
-                                        </el-col>
+                                        </LayoutCol>
                                     </el-row>
                                     <el-row :gutter="20" v-if="!form.inContainer">
-                                        <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10">
+                                        <LayoutCol>
                                             <el-form-item :label="$t('commons.table.user')" prop="user">
                                                 <el-select filterable v-model="form.user">
                                                     <div v-for="item in userOptions" :key="item">
@@ -375,8 +373,8 @@
                                                     </div>
                                                 </el-select>
                                             </el-form-item>
-                                        </el-col>
-                                        <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10">
+                                        </LayoutCol>
+                                        <LayoutCol>
                                             <el-form-item :label="$t('cronjob.executor')" prop="executor">
                                                 <el-checkbox border v-model="form.isCustom">
                                                     {{ $t('container.custom') }}
@@ -397,39 +395,51 @@
                                                     v-model="form.executor"
                                                 />
                                             </el-form-item>
-                                        </el-col>
+                                        </LayoutCol>
                                     </el-row>
 
-                                    <el-form-item :label="$t('cronjob.shellContent')" prop="script" class="mt-5">
+                                    <el-form-item :label="$t('cronjob.shellContent')" prop="scriptMode">
                                         <el-radio-group @change="form.script = ''" v-model="form.scriptMode">
                                             <el-radio value="input">{{ $t('commons.button.edit') }}</el-radio>
+                                            <el-radio value="library">{{ $t('cronjob.library.library') }}</el-radio>
                                             <el-radio value="select">{{ $t('container.pathSelect') }}</el-radio>
                                         </el-radio-group>
                                     </el-form-item>
-
-                                    <CodemirrorPro
-                                        v-if="form.scriptMode === 'input'"
-                                        v-model="form.script"
-                                        placeholder="#Define or paste the content of your shell file here"
-                                        mode="javascript"
-                                        :heightDiff="400"
-                                        class="mb-5"
-                                    />
-                                    <el-row :gutter="20" v-if="form.scriptMode === 'select'">
-                                        <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10">
-                                            <el-input
-                                                :placeholder="$t('commons.example') + '/tmp/test.sh'"
-                                                v-model="form.script"
-                                            >
-                                                <template #prepend>
-                                                    <FileList @choose="loadScriptDir" :dir="false"></FileList>
-                                                </template>
-                                            </el-input>
-                                        </el-col>
+                                    <el-form-item class="-mt-4" v-if="form.scriptMode === 'input'" prop="script">
+                                        <CodemirrorPro
+                                            v-model="form.script"
+                                            placeholder="#Define or paste the content of your shell file here"
+                                            mode="javascript"
+                                            :heightDiff="400"
+                                        />
+                                    </el-form-item>
+                                    <el-row :gutter="20" class="-mt-4">
+                                        <LayoutCol>
+                                            <el-form-item prop="scriptID" v-if="form.scriptMode === 'library'">
+                                                <el-select filterable v-model="form.scriptID">
+                                                    <el-option
+                                                        v-for="item in scriptOptions"
+                                                        :key="item.id"
+                                                        :value="item.id"
+                                                        :label="item.name"
+                                                    />
+                                                </el-select>
+                                            </el-form-item>
+                                            <el-form-item prop="script" v-if="form.scriptMode === 'select'">
+                                                <el-input
+                                                    :placeholder="$t('commons.example') + '/tmp/test.sh'"
+                                                    v-model="form.script"
+                                                >
+                                                    <template #prepend>
+                                                        <FileList @choose="loadScriptDir" :dir="false"></FileList>
+                                                    </template>
+                                                </el-input>
+                                            </el-form-item>
+                                        </LayoutCol>
                                     </el-row>
-                                </div>
+                                </el-col>
 
-                                <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10" v-if="isDir() && form.isDir">
+                                <LayoutCol v-if="isDir() && form.isDir">
                                     <el-form-item prop="sourceDir">
                                         <el-input v-model="form.sourceDir">
                                             <template #prepend>
@@ -437,8 +447,8 @@
                                             </template>
                                         </el-input>
                                     </el-form-item>
-                                </el-col>
-                                <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10" v-if="isDir() && !form.isDir">
+                                </LayoutCol>
+                                <LayoutCol v-if="isDir() && !form.isDir">
                                     <el-input class="mb-5">
                                         <template #prepend>
                                             <FileList @choose="loadFile" :dir="false" />
@@ -462,11 +472,11 @@
                                             </ComplexTable>
                                         </div>
                                     </el-form-item>
-                                </el-col>
+                                </LayoutCol>
                             </el-row>
 
                             <el-row :gutter="20">
-                                <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10" v-if="isBackup()">
+                                <LayoutCol v-if="isBackup()">
                                     <el-form-item :label="$t('setting.backupAccount')" prop="sourceAccountItems">
                                         <el-select multiple v-model="form.sourceAccountItems" @change="changeAccount">
                                             <div v-for="item in backupOptions" :key="item.id">
@@ -493,8 +503,8 @@
                                             </el-link>
                                         </span>
                                     </el-form-item>
-                                </el-col>
-                                <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10" v-if="isBackup()">
+                                </LayoutCol>
+                                <LayoutCol v-if="isBackup()">
                                     <el-form-item :label="$t('cronjob.default_download_path')" prop="downloadAccountID">
                                         <el-select v-model="form.downloadAccountID">
                                             <div v-for="item in accountOptions" :key="item.id">
@@ -510,16 +520,16 @@
                                             </div>
                                         </el-select>
                                     </el-form-item>
-                                </el-col>
+                                </LayoutCol>
                             </el-row>
 
                             <el-row :gutter="20">
-                                <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10" v-if="isBackup() && !isDatabase()">
+                                <LayoutCol v-if="isBackup() && !isDatabase()">
                                     <el-form-item :label="$t('setting.compressPassword')" prop="secret">
                                         <el-input v-model="form.secret" />
                                     </el-form-item>
-                                </el-col>
-                                <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10">
+                                </LayoutCol>
+                                <LayoutCol>
                                     <el-form-item :label="$t('cronjob.retainCopies')" prop="retainCopies">
                                         <el-input-number
                                             class="selectClass"
@@ -533,10 +543,10 @@
                                         </span>
                                         <span v-else class="input-help">{{ $t('cronjob.retainCopiesHelper') }}</span>
                                     </el-form-item>
-                                </el-col>
+                                </LayoutCol>
                             </el-row>
                             <el-row :gutter="20">
-                                <el-col :xs="24" :sm="20" :md="20" :lg="20" :xl="20" v-if="hasExclusionRules()">
+                                <LayoutCol :span="20" v-if="hasExclusionRules()">
                                     <el-form-item :label="$t('cronjob.exclusionRules')" prop="exclusionRules">
                                         <el-input
                                             :placeholder="$t('cronjob.rulesHelper')"
@@ -545,14 +555,14 @@
                                         />
                                         <span class="input-help">{{ $t('cronjob.exclusionRulesHelper') }}</span>
                                     </el-form-item>
-                                </el-col>
+                                </LayoutCol>
                             </el-row>
                         </el-card>
 
                         <el-card class="mt-5">
                             <div v-if="!globalStore.isIntl">
                                 <el-row :gutter="20">
-                                    <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10">
+                                    <LayoutCol>
                                         <el-form-item prop="hasAlert">
                                             <el-checkbox v-model="form.hasAlert" :label="$t('xpack.alert.isAlert')" />
                                             <span class="input-help">{{ $t('xpack.alert.cronJobHelper') }}</span>
@@ -564,8 +574,8 @@
                                                 </el-link>
                                             </span>
                                         </el-form-item>
-                                    </el-col>
-                                    <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10">
+                                    </LayoutCol>
+                                    <LayoutCol>
                                         <el-form-item
                                             prop="alertCount"
                                             v-if="form.hasAlert && isProductPro"
@@ -580,12 +590,12 @@
                                             ></el-input-number>
                                             <span class="input-help">{{ $t('xpack.alert.alertCountHelper') }}</span>
                                         </el-form-item>
-                                    </el-col>
+                                    </LayoutCol>
                                 </el-row>
                             </div>
 
                             <el-row :gutter="20">
-                                <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10">
+                                <LayoutCol>
                                     <el-form-item :label="$t('cronjob.timeout')" prop="timeoutItem">
                                         <el-input type="number" class="selectClass" v-model.number="form.timeoutItem">
                                             <template #append>
@@ -597,8 +607,8 @@
                                             </template>
                                         </el-input>
                                     </el-form-item>
-                                </el-col>
-                                <el-col :xs="24" :sm="10" :md="10" :lg="10" :xl="10">
+                                </LayoutCol>
+                                <LayoutCol>
                                     <el-form-item :label="$t('cronjob.retryTimes')" prop="retryTimes">
                                         <el-input-number
                                             class="selectClass"
@@ -609,7 +619,7 @@
                                         ></el-input-number>
                                         <span class="input-help">{{ $t('cronjob.retryTimesHelper') }}</span>
                                     </el-form-item>
-                                </el-col>
+                                </LayoutCol>
                             </el-row>
                         </el-card>
 
@@ -638,8 +648,9 @@ import { listBackupOptions } from '@/api/modules/backup';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { Cronjob } from '@/api/interface/cronjob';
-import { addCronjob, editCronjob, loadCronjobInfo, loadNextHandle } from '@/api/modules/cronjob';
+import { addCronjob, editCronjob, loadCronjobInfo, loadNextHandle, loadScriptOptions } from '@/api/modules/cronjob';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
+import LayoutCol from '@/components/layout-col/form.vue';
 import { listDbItems } from '@/api/modules/database';
 import { getWebsiteOptions } from '@/api/modules/website';
 import { MsgError, MsgSuccess } from '@/utils/message';
@@ -802,6 +813,7 @@ const search = async () => {
     loadShellUsers();
     loadWebsites();
     loadContainers();
+    loadScripts();
     if (form.dbType) {
         loadDatabases(form.dbType);
     } else {
@@ -819,6 +831,7 @@ const backupOptions = ref([]);
 const accountOptions = ref([]);
 const appOptions = ref([]);
 const userOptions = ref([]);
+const scriptOptions = ref([]);
 
 const dbInfo = reactive({
     isExist: false,
@@ -968,6 +981,7 @@ const rules = reactive({
     ],
 
     script: [{ validator: verifyScript, trigger: 'blur', required: true }],
+    scriptID: [Rules.requiredSelect],
     containerName: [Rules.requiredSelect],
     appID: [Rules.requiredSelect],
     website: [Rules.requiredSelect],
@@ -1038,6 +1052,11 @@ const loadNext = async (spec: any) => {
     }
     const data = await loadNextHandle(specItem);
     nextTimes.value = data.data || [];
+};
+
+const loadScripts = async () => {
+    const res = await loadScriptOptions();
+    scriptOptions.value = res.data || [];
 };
 
 const loadDatabases = async (dbType: string) => {
@@ -1288,6 +1307,7 @@ onMounted(() => {
 }
 .selectClass {
     width: 100%;
+    padding-left: 0px;
 }
 .tagClass {
     float: right;

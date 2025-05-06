@@ -1069,6 +1069,9 @@ const message = {
         alertTitle: 'Planned Task - {0} 「{1}」 Task Failure Alert',
         library: {
             script: 'Script',
+            isInteractive: 'Interactive',
+            interactive: 'Interactive script',
+            interactiveHelper: 'Requires user input during execution and cannot be used in scheduled tasks.',
             library: 'Script Library',
             create: 'Add Script',
             edit: 'Edit Script',

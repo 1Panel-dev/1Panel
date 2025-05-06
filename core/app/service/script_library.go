@@ -20,6 +20,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/1Panel-dev/1Panel/core/utils/files"
 	"github.com/1Panel-dev/1Panel/core/utils/req_helper"
+	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
 	"gopkg.in/yaml.v2"
@@ -57,7 +58,7 @@ func (u *ScriptService) Search(ctx *gin.Context, req dto.SearchPageWithGroup) (i
 	for _, itemData := range list {
 		var item dto.ScriptInfo
 		if err := copier.Copy(&item, &itemData); err != nil {
-			global.LOG.Errorf("copy backup account to dto backup info failed, err: %v", err)
+			global.LOG.Errorf("copy scripts to dto backup info failed, err: %v", err)
 		}
 		if item.IsSystem {
 			lang := strings.ToLower(common.GetLang(ctx))
@@ -117,6 +118,14 @@ func (u *ScriptService) Create(req dto.ScriptOperate) error {
 	if err := scriptRepo.Create(&itemData); err != nil {
 		return err
 	}
+	go func() {
+		if req.IsInteractive {
+			return
+		}
+		if err := xpack.Sync(constant.SyncScripts); err != nil {
+			global.LOG.Errorf("sync scripts to node failed, err: %v", err)
+		}
+	}()
 	return nil
 }
 
@@ -130,6 +139,11 @@ func (u *ScriptService) Delete(req dto.OperateByIDs) error {
 			return err
 		}
 	}
+	go func() {
+		if err := xpack.Sync(constant.SyncScripts); err != nil {
+			global.LOG.Errorf("sync scripts to node failed, err: %v", err)
+		}
+	}()
 	return nil
 }
 
@@ -142,10 +156,16 @@ func (u *ScriptService) Update(req dto.ScriptOperate) error {
 	updateMap["name"] = req.Name
 	updateMap["script"] = req.Script
 	updateMap["groups"] = req.Groups
+	updateMap["is_interactive"] = req.IsInteractive
 	updateMap["description"] = req.Description
 	if err := scriptRepo.Update(req.ID, updateMap); err != nil {
 		return err
 	}
+	go func() {
+		if err := xpack.Sync(constant.SyncScripts); err != nil {
+			global.LOG.Errorf("sync scripts to node failed, err: %v", err)
+		}
+	}()
 	return nil
 }
 
@@ -179,6 +199,7 @@ func (u *ScriptService) Sync() error {
 		if err != nil {
 			return fmt.Errorf("load scripts data.yaml from remote failed, err: %v", err)
 		}
+		fmt.Println(string(dataRes))
 
 		syncTask.Log("download successful!")
 		var scripts Scripts
@@ -205,10 +226,11 @@ func (u *ScriptService) Sync() error {
 			itemDescription, _ := json.Marshal(item.Description)
 			shell, _ := os.ReadFile(fmt.Sprintf("%s/scripts/sh/%s.sh", tmpDir, item.Key))
 			scriptItem := model.ScriptLibrary{
-				Name:        string(itemName),
-				IsSystem:    true,
-				Script:      string(shell),
-				Description: string(itemDescription),
+				Name:          string(itemName),
+				IsInteractive: item.Interactive,
+				IsSystem:      true,
+				Script:        string(shell),
+				Description:   string(itemDescription),
 			}
 			scriptsForDB = append(scriptsForDB, scriptItem)
 		}
@@ -243,5 +265,6 @@ type ScriptHelper struct {
 	Sort        uint              `json:"sort"`
 	Groups      string            `json:"groups"`
 	Name        map[string]string `json:"name"`
+	Interactive bool              `json:"interactive"`
 	Description map[string]string `json:"description"`
 }

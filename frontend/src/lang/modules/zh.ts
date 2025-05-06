@@ -1015,6 +1015,9 @@ const message = {
         alertTitle: '计划任务-{0}「 {1} 」任务失败告警',
         library: {
             script: '脚本',
+            isInteractive: '交互式',
+            interactive: '交互式脚本',
+            interactiveHelper: '在脚本执行过程中需要用户输入参数或做出选择，且无法用于计划任务中。',
             library: '脚本库',
             create: '添加脚本',
             edit: '修改脚本',

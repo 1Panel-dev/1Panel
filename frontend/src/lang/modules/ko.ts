@@ -1023,6 +1023,9 @@ const message = {
         alertTitle: '예정된 작업 - {0} 「{1}」 작업 실패 경고',
         library: {
             script: '스크립트',
+            isInteractive: '대화형',
+            interactive: '대화형 스크립트',
+            interactiveHelper: '실행 중 사용자 입력이 필요하며 예약 작업에서는 사용할 수 없습니다.',
             library: '스크립트 라이브러리',
             create: '스크립트 추가',
             edit: '스크립트 수정',

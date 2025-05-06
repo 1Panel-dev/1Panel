@@ -79,6 +79,14 @@ func (u *CronjobService) handleJob(cronjob *model.Cronjob, record model.JobRecor
 	)
 	switch cronjob.Type {
 	case "shell":
+		if cronjob.ScriptMode == "library" {
+			scriptItem, _ := scriptRepo.Get(repo.WithByID(cronjob.ScriptID))
+			if scriptItem.ID == 0 {
+				return nil, fmt.Errorf("load script from db failed, err: %v", err)
+			}
+			cronjob.Script = scriptItem.Script
+			cronjob.ScriptMode = "input"
+		}
 		if len(cronjob.Script) == 0 {
 			return nil, fmt.Errorf("the script content is empty and is skipped")
 		}

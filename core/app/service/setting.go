@@ -138,6 +138,12 @@ func (u *SettingService) Update(key, value string) error {
 		}
 	case "UserName", "Password":
 		_ = global.SESSION.Clean()
+	case "Language":
+		go func() {
+			if err := xpack.Sync(constant.SyncLanguage); err != nil {
+				global.LOG.Errorf("sync language to node failed, err: %v", err)
+			}
+		}()
 	}
 
 	return nil

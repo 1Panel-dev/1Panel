@@ -54,6 +54,16 @@ func (b *BaseApi) LoadCronjobInfo(c *gin.Context) {
 }
 
 // @Tags Cronjob
+// @Summary Load script options
+// @Success 200 {array} dto.ScriptOptions
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /cronjobs/script/options [get]
+func (b *BaseApi) LoadScriptOptions(c *gin.Context) {
+	helper.SuccessWithData(c, cronjobService.LoadScriptOptions())
+}
+
+// @Tags Cronjob
 // @Summary Load cronjob spec time
 // @Accept json
 // @Param request body dto.CronjobSpec true "request"

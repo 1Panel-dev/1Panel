@@ -1059,6 +1059,10 @@ const message = {
         alertTitle: 'Tugas Terancang - {0} 「{1}」 Amaran Kegagalan Tugas',
         library: {
             script: 'Skrip',
+            isInteractive: 'Interaktif',
+            interactive: 'Skrip interaktif',
+            interactiveHelper:
+                'Memerlukan input pengguna semasa pelaksanaan dan tidak boleh digunakan dalam tugas terjadual.',
             library: 'Perpustakaan Skrip',
             create: 'Tambah Skrip',
             edit: 'Sunting Skrip',

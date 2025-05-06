@@ -22,6 +22,7 @@ var (
 	imageRepoRepo = repo.NewIImageRepoRepo()
 	composeRepo   = repo.NewIComposeTemplateRepo()
 
+	scriptRepo  = repo.NewIScriptRepo()
 	cronjobRepo = repo.NewICronjobRepo()
 
 	hostRepo    = repo.NewIHostRepo()

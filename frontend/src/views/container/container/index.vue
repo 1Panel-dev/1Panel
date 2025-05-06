@@ -2,70 +2,25 @@
     <div v-loading="loading">
         <docker-status v-model:isActive="isActive" v-model:isExist="isExist" @search="search" />
 
-        <div class="card-interval" v-if="isExist && isActive">
-            <el-tag @click="searchWithStatus('all')" v-if="countItem.all" effect="plain" size="large">
-                {{ $t('commons.table.all') }} * {{ countItem.all }}
-            </el-tag>
-            <el-tag
-                @click="searchWithStatus('running')"
-                v-if="countItem.running"
-                effect="plain"
-                size="large"
-                class="ml-2"
-            >
-                {{ $t('commons.status.running') }} * {{ countItem.running }}
-            </el-tag>
-            <el-tag
-                @click="searchWithStatus('created')"
-                v-if="countItem.created"
-                effect="plain"
-                size="large"
-                class="ml-2"
-            >
-                {{ $t('commons.status.created') }} * {{ countItem.created }}
-            </el-tag>
-            <el-tag
-                @click="searchWithStatus('paused')"
-                v-if="countItem.paused"
-                effect="plain"
-                size="large"
-                class="ml-2"
-            >
-                {{ $t('commons.status.paused') }} * {{ countItem.paused }}
-            </el-tag>
-            <el-tag
-                @click="searchWithStatus('restarting')"
-                v-if="countItem.restarting"
-                effect="plain"
-                size="large"
-                class="ml-2"
-            >
-                {{ $t('commons.status.restarting') }} * {{ countItem.restarting }}
-            </el-tag>
-            <el-tag
-                @click="searchWithStatus('removing')"
-                v-if="countItem.removing"
-                effect="plain"
-                size="large"
-                class="ml-2"
-            >
-                {{ $t('commons.status.removing') }} * {{ countItem.removing }}
-            </el-tag>
-            <el-tag
-                @click="searchWithStatus('exited')"
-                v-if="countItem.exited"
-                effect="plain"
-                size="large"
-                class="ml-2"
-            >
-                {{ $t('commons.status.exited') }} * {{ countItem.exited }}
-            </el-tag>
-            <el-tag @click="searchWithStatus('dead')" v-if="countItem.dead" effect="plain" size="large" class="ml-2">
-                {{ $t('commons.status.dead') }} * {{ countItem.dead }}
-            </el-tag>
-        </div>
-
         <LayoutContent :title="$t('menu.container')" v-if="isExist" :class="{ mask: !isActive }">
+            <template #search>
+                <div class="card-interval" v-if="isExist && isActive">
+                    <div v-for="item in tags" :key="item.key" class="inline">
+                        <el-button
+                            v-if="item.count"
+                            class="tag-button"
+                            :class="activeTag === item.key ? '' : 'no-active'"
+                            @click="searchWithStatus(item.key)"
+                            :type="activeTag === item.key ? 'primary' : ''"
+                            :plain="activeTag !== item.key"
+                        >
+                            {{ item.key === 'all' ? $t('commons.table.all') : $t('commons.status.' + item.key) }} *
+                            {{ item.count }}
+                        </el-button>
+                    </div>
+                </div>
+            </template>
+
             <template #leftToolBar>
                 <el-button type="primary" @click="onContainerOperate('')">
                     {{ $t('container.create') }}
@@ -102,7 +57,11 @@
                 <el-tooltip
                     :content="includeAppStore ? $t('container.includeAppstore') : $t('container.excludeAppstore')"
                 >
-                    <el-button @click="searchWithAppShow(!includeAppStore)" :icon="includeAppStore ? 'View' : 'Hide'" />
+                    <el-button
+                        :type="includeAppStore ? '' : 'primary'"
+                        @click="searchWithAppShow(!includeAppStore)"
+                        :icon="includeAppStore ? 'View' : 'Hide'"
+                    />
                 </el-tooltip>
                 <TableRefresh @search="search()" />
                 <TableSetting title="container-refresh" @search="refresh()" />
@@ -455,16 +414,8 @@ const opRef = ref();
 const includeAppStore = ref();
 const columns = ref([]);
 
-const countItem = reactive({
-    all: 0,
-    created: 0,
-    running: 0,
-    paused: 0,
-    restarting: 0,
-    removing: 0,
-    exited: 0,
-    dead: 0,
-});
+const tags = ref([]);
+const activeTag = ref('all');
 
 const goDashboard = async (port: any) => {
     if (port.indexOf('127.0.0.1') !== -1) {
@@ -527,8 +478,9 @@ const search = async (column?: any) => {
         });
 };
 
-const searchWithStatus = (item: any) => {
-    paginationConfig.state = item;
+const searchWithStatus = (item: string) => {
+    activeTag.value = item;
+    paginationConfig.state = activeTag.value;
     search();
 };
 
@@ -539,14 +491,15 @@ const searchWithAppShow = (item: any) => {
 
 const loadContainerCount = async () => {
     await loadContainerStatus().then((res) => {
-        countItem.all = res.data.all;
-        countItem.running = res.data.running;
-        countItem.paused = res.data.paused;
-        countItem.restarting = res.data.restarting;
-        countItem.removing = res.data.removing;
-        countItem.created = res.data.created;
-        countItem.dead = res.data.dead;
-        countItem.exited = res.data.exited;
+        tags.value = [];
+        tags.value.push({ key: 'all', count: res.data.all });
+        tags.value.push({ key: 'running', count: res.data.running });
+        tags.value.push({ key: 'paused', count: res.data.paused });
+        tags.value.push({ key: 'restarting', count: res.data.restarting });
+        tags.value.push({ key: 'removing', count: res.data.removing });
+        tags.value.push({ key: 'created', count: res.data.created });
+        tags.value.push({ key: 'dead', count: res.data.dead });
+        tags.value.push({ key: 'exited', count: res.data.exited });
     });
 };
 
@@ -809,5 +762,13 @@ onMounted(() => {
     margin-left: -1px !important;
     position: relative !important;
     z-index: 1 !important;
+}
+.tag-button {
+    margin-top: -5px;
+    margin-right: 10px;
+    &.no-active {
+        background: none;
+        border: none;
+    }
 }
 </style>

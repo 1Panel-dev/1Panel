@@ -21,6 +21,7 @@ type Cronjob struct {
 	Script        string `json:"script"`
 	User          string `json:"user"`
 
+	ScriptID       uint   `json:"scriptID"`
 	Website        string `json:"website"`
 	AppID          string `json:"appID"`
 	DBType         string `json:"dbType"`
@@ -54,4 +55,10 @@ type JobRecords struct {
 	File      string    `json:"file"`
 	Status    string    `json:"status"`
 	Message   string    `json:"message"`
+}
+
+type ScriptLibrary struct {
+	BaseModel
+	Name   string `json:"name" gorm:"not null;"`
+	Script string `json:"script" gorm:"not null;"`
 }

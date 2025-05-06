@@ -15,6 +15,10 @@ export const loadCronjobInfo = (id: number) => {
     return http.post<Cronjob.CronjobOperate>(`/cronjobs/load/info`, { id: id });
 };
 
+export const loadScriptOptions = () => {
+    return http.get<Cronjob.ScriptOptions>(`/cronjobs/script/options`);
+};
+
 export const getRecordLog = (id: number) => {
     return http.post<string>(`/cronjobs/records/log`, { id: id });
 };

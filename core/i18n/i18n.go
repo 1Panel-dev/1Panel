@@ -176,7 +176,3 @@ func GetMsgWithMapForCmd(key string, maps map[string]interface{}) string {
 		return content
 	}
 }
-
-func GetLanguageFromDB() {
-
-}
