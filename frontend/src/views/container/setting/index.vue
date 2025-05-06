@@ -164,6 +164,7 @@
                     <CodemirrorPro
                         class="mt-5"
                         :heightDiff="loadHeight()"
+                        :minHeight="350"
                         v-model="dockerConf"
                         mode="json"
                         placeholder="# The Docker configuration file does not exist or is empty (/etc/docker/daemon.json)"

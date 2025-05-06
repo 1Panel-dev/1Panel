@@ -2,7 +2,9 @@
     <DrawerPro v-model="drawerVisible" :header="title + $t('setting.backupAccount')" @close="handleClose" size="large">
         <el-form @submit.prevent ref="formRef" v-loading="loading" label-position="top" :model="dialogData.rowData">
             <el-form-item :label="$t('commons.table.name')" prop="name" :rules="Rules.requiredInput">
-                <el-tag v-if="dialogData.title === 'edit'">{{ dialogData.rowData!.name }}</el-tag>
+                <el-tag v-if="dialogData.title === 'edit'">
+                    {{ dialogData.rowData!.name === 'localhost' ? $t('terminal.local') : dialogData.rowData!.name }}
+                </el-tag>
                 <el-input v-else v-model="dialogData.rowData!.name" />
             </el-form-item>
             <el-form-item

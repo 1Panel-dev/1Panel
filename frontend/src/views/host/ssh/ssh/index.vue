@@ -39,90 +39,89 @@
 
         <LayoutContent>
             <template #main>
-                <MainDiv :heightDiff="320">
-                    <el-radio-group v-model="confShowType" @change="changeMode">
-                        <el-radio-button value="base">{{ $t('database.baseConf') }}</el-radio-button>
-                        <el-radio-button value="all">{{ $t('database.allConf') }}</el-radio-button>
-                    </el-radio-group>
-                    <el-row class="mt-10" v-if="confShowType === 'base'">
-                        <el-col :xs="24" :sm="20" :md="20" :lg="10" :xl="10">
-                            <el-form :model="form" label-position="right" ref="formRef" label-width="100px">
-                                <el-form-item :label="$t('commons.table.port')" prop="port">
-                                    <el-input disabled v-model.number="form.port">
-                                        <template #append>
-                                            <el-button @click="onChangePort" icon="Setting">
-                                                {{ $t('commons.button.set') }}
-                                            </el-button>
-                                        </template>
-                                    </el-input>
-                                    <span class="input-help">{{ $t('ssh.portHelper') }}</span>
-                                </el-form-item>
-                                <el-form-item :label="$t('ssh.listenAddress')" prop="listenAddress">
-                                    <el-input disabled v-model="form.listenAddressItem">
-                                        <template #append>
-                                            <el-button @click="onChangeAddress" icon="Setting">
-                                                {{ $t('commons.button.set') }}
-                                            </el-button>
-                                        </template>
-                                    </el-input>
-                                    <span class="input-help">{{ $t('ssh.addressHelper') }}</span>
-                                </el-form-item>
-                                <el-form-item :label="$t('ssh.permitRootLogin')" prop="permitRootLoginItem">
-                                    <el-input disabled v-model="form.permitRootLoginItem">
-                                        <template #append>
-                                            <el-button @click="onChangeRoot" icon="Setting">
-                                                {{ $t('commons.button.set') }}
-                                            </el-button>
-                                        </template>
-                                    </el-input>
-                                    <span class="input-help">{{ $t('ssh.rootSettingHelper') }}</span>
-                                </el-form-item>
-                                <el-form-item :label="$t('ssh.passwordAuthentication')" prop="passwordAuthentication">
-                                    <el-switch
-                                        active-value="yes"
-                                        inactive-value="no"
-                                        @change="onSave(formRef, 'PasswordAuthentication', form.passwordAuthentication)"
-                                        v-model="form.passwordAuthentication"
-                                    ></el-switch>
-                                    <span class="input-help">{{ $t('ssh.pwdAuthHelper') }}</span>
-                                </el-form-item>
-                                <el-form-item :label="$t('ssh.pubkeyAuthentication')" prop="pubkeyAuthentication">
-                                    <el-switch
-                                        active-value="yes"
-                                        inactive-value="no"
-                                        @change="onSave(formRef, 'PubkeyAuthentication', form.pubkeyAuthentication)"
-                                        v-model="form.pubkeyAuthentication"
-                                    ></el-switch>
-                                    <span class="input-help">{{ $t('ssh.keyAuthHelper') }}</span>
-                                    <el-button link @click="onOpenDrawer" type="primary">
-                                        {{ $t('ssh.pubkey') }}
-                                    </el-button>
-                                </el-form-item>
-                                <el-form-item :label="$t('ssh.useDNS')" prop="useDNS">
-                                    <el-switch
-                                        active-value="yes"
-                                        inactive-value="no"
-                                        @change="onSave(formRef, 'UseDNS', form.useDNS)"
-                                        v-model="form.useDNS"
-                                    ></el-switch>
-                                    <span class="input-help">{{ $t('ssh.dnsHelper') }}</span>
-                                </el-form-item>
-                            </el-form>
-                        </el-col>
-                    </el-row>
+                <el-radio-group v-model="confShowType" @change="changeMode">
+                    <el-radio-button value="base">{{ $t('database.baseConf') }}</el-radio-button>
+                    <el-radio-button value="all">{{ $t('database.allConf') }}</el-radio-button>
+                </el-radio-group>
+                <el-row class="mt-10" v-if="confShowType === 'base'">
+                    <el-col :xs="24" :sm="20" :md="20" :lg="10" :xl="10">
+                        <el-form :model="form" label-position="right" ref="formRef" label-width="100px">
+                            <el-form-item :label="$t('commons.table.port')" prop="port">
+                                <el-input disabled v-model.number="form.port">
+                                    <template #append>
+                                        <el-button @click="onChangePort" icon="Setting">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                                <span class="input-help">{{ $t('ssh.portHelper') }}</span>
+                            </el-form-item>
+                            <el-form-item :label="$t('ssh.listenAddress')" prop="listenAddress">
+                                <el-input disabled v-model="form.listenAddressItem">
+                                    <template #append>
+                                        <el-button @click="onChangeAddress" icon="Setting">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                                <span class="input-help">{{ $t('ssh.addressHelper') }}</span>
+                            </el-form-item>
+                            <el-form-item :label="$t('ssh.permitRootLogin')" prop="permitRootLoginItem">
+                                <el-input disabled v-model="form.permitRootLoginItem">
+                                    <template #append>
+                                        <el-button @click="onChangeRoot" icon="Setting">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                                <span class="input-help">{{ $t('ssh.rootSettingHelper') }}</span>
+                            </el-form-item>
+                            <el-form-item :label="$t('ssh.passwordAuthentication')" prop="passwordAuthentication">
+                                <el-switch
+                                    active-value="yes"
+                                    inactive-value="no"
+                                    @change="onSave(formRef, 'PasswordAuthentication', form.passwordAuthentication)"
+                                    v-model="form.passwordAuthentication"
+                                ></el-switch>
+                                <span class="input-help">{{ $t('ssh.pwdAuthHelper') }}</span>
+                            </el-form-item>
+                            <el-form-item :label="$t('ssh.pubkeyAuthentication')" prop="pubkeyAuthentication">
+                                <el-switch
+                                    active-value="yes"
+                                    inactive-value="no"
+                                    @change="onSave(formRef, 'PubkeyAuthentication', form.pubkeyAuthentication)"
+                                    v-model="form.pubkeyAuthentication"
+                                ></el-switch>
+                                <span class="input-help">{{ $t('ssh.keyAuthHelper') }}</span>
+                                <el-button link @click="onOpenDrawer" type="primary">
+                                    {{ $t('ssh.pubkey') }}
+                                </el-button>
+                            </el-form-item>
+                            <el-form-item :label="$t('ssh.useDNS')" prop="useDNS">
+                                <el-switch
+                                    active-value="yes"
+                                    inactive-value="no"
+                                    @change="onSave(formRef, 'UseDNS', form.useDNS)"
+                                    v-model="form.useDNS"
+                                ></el-switch>
+                                <span class="input-help">{{ $t('ssh.dnsHelper') }}</span>
+                            </el-form-item>
+                        </el-form>
+                    </el-col>
+                </el-row>
 
-                    <div v-if="confShowType === 'all'">
-                        <CodemirrorPro
-                            :heightDiff="400"
-                            class="mt-5"
-                            v-model="sshConf"
-                            placeholder="# The SSH configuration file does not exist or is empty (/etc/ssh/sshd_config)"
-                        ></CodemirrorPro>
-                        <el-button :disabled="loading" type="primary" @click="onSaveFile" style="margin-top: 5px">
-                            {{ $t('commons.button.save') }}
-                        </el-button>
-                    </div>
-                </MainDiv>
+                <div v-if="confShowType === 'all'">
+                    <CodemirrorPro
+                        :heightDiff="450"
+                        :minHeight="350"
+                        class="mt-5"
+                        v-model="sshConf"
+                        placeholder="# The SSH configuration file does not exist or is empty (/etc/ssh/sshd_config)"
+                    ></CodemirrorPro>
+                    <el-button :disabled="loading" type="primary" @click="onSaveFile" class="mt-2.5">
+                        {{ $t('commons.button.save') }}
+                    </el-button>
+                </div>
             </template>
         </LayoutContent>
 
@@ -140,7 +139,6 @@ import PubKey from '@/views/host/ssh/ssh/pubkey/index.vue';
 import Root from '@/views/host/ssh/ssh/root/index.vue';
 import Port from '@/views/host/ssh/ssh/port/index.vue';
 import Address from '@/views/host/ssh/ssh/address/index.vue';
-import MainDiv from '@/components/main-div/index.vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { getSSHConf, getSSHInfo, operateSSH, updateSSH, updateSSHByfile } from '@/api/modules/host';

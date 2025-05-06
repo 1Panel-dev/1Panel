@@ -36,7 +36,7 @@
                     >
                         <template #default="{ row }">
                             <el-text type="primary" class="cursor-pointer" @click="onInspect(row)">
-                                {{ row.name }}
+                                {{ row.name === 'localhost' ? $t('terminal.local') : row.name }}
                             </el-text>
                         </template>
                     </el-table-column>
@@ -160,6 +160,11 @@ const search = async () => {
                     bac.varsJson = JSON.parse(bac.vars);
                 }
             }
+            data.value.sort((a, b) => {
+                if (a.name === 'localhost') return -1;
+                if (b.name === 'localhost') return 1;
+                return 0;
+            });
             paginationConfig.total = res.data.total;
         })
         .catch(() => {
