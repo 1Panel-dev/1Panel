@@ -114,7 +114,7 @@ import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { getAppConnInfo } from '@/api/modules/app';
 import { MsgSuccess } from '@/utils/message';
 import { getRandomStr } from '@/utils/util';
-import { getSettingInfo } from '@/api/modules/setting';
+import { getAgentSettingInfo } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
 
@@ -185,7 +185,7 @@ const loadSystemIP = async () => {
         form.systemIP = globalStore.currentNode || i18n.global.t('database.localIP');
         return;
     }
-    const res = await getSettingInfo();
+    const res = await getAgentSettingInfo();
     form.systemIP = res.data.systemIP || i18n.global.t('database.localIP');
 };
 
