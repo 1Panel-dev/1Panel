@@ -80,4 +80,7 @@ const dropdownVisibleChange = (visible, tabPath) => {
 :deep(.el-tabs__header) {
     margin: 0;
 }
+.common-tabs {
+    margin-bottom: 7px;
+}
 </style>
