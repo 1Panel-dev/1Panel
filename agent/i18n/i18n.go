@@ -2,6 +2,7 @@ package i18n
 
 import (
 	"embed"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/global"
@@ -113,7 +114,7 @@ func UseI18n() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		lang := context.GetHeader("Accept-Language")
 		if lang == "" {
-			lang = "en"
+			lang = GetLanguageFromDB()
 		}
 		global.I18n = i18n.NewLocalizer(bundle, lang)
 	}
@@ -132,5 +133,17 @@ func Init() {
 	_, _ = bundle.LoadMessageFileFS(fs, "lang/ru.yaml")
 	_, _ = bundle.LoadMessageFileFS(fs, "lang/ms.yaml")
 	_, _ = bundle.LoadMessageFileFS(fs, "lang/ko.yaml")
-	global.I18n = i18n.NewLocalizer(bundle, "en")
+	lang := GetLanguageFromDB()
+	global.I18n = i18n.NewLocalizer(bundle, lang)
+}
+
+func GetLanguageFromDB() string {
+	if global.DB == nil {
+		return "en"
+	}
+	lang, _ := repo.NewISettingRepo().GetValueByKey("Language")
+	if lang == "" {
+		return "en"
+	}
+	return lang
 }

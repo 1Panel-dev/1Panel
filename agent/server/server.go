@@ -3,6 +3,8 @@ package server
 import (
 	"crypto/tls"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/init/log"
+	"github.com/1Panel-dev/1Panel/agent/init/migration"
 	"net"
 	"net/http"
 	"os"
@@ -19,8 +21,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/init/db"
 	"github.com/1Panel-dev/1Panel/agent/init/dir"
 	"github.com/1Panel-dev/1Panel/agent/init/hook"
-	"github.com/1Panel-dev/1Panel/agent/init/log"
-	"github.com/1Panel-dev/1Panel/agent/init/migration"
 	"github.com/1Panel-dev/1Panel/agent/init/router"
 	"github.com/1Panel-dev/1Panel/agent/init/validator"
 	"github.com/1Panel-dev/1Panel/agent/init/viper"
@@ -32,11 +32,11 @@ import (
 func Start() {
 	viper.Init()
 	dir.Init()
-	i18n.Init()
 	log.Init()
 	db.Init()
-	cache.Init()
 	migration.Init()
+	i18n.Init()
+	cache.Init()
 	app.Init()
 	validator.Init()
 	gin.SetMode("debug")
