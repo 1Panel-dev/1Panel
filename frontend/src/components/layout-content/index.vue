@@ -127,7 +127,7 @@ const showBack = computed(() => {
 }
 
 .content-container__main {
-    margin-top: 7px;
+    margin-top: 10px;
 }
 
 .prompt {

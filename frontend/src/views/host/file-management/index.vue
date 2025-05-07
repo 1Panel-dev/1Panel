@@ -354,6 +354,8 @@
                     :data="data"
                     @search="search"
                     @sort-change="changeSort"
+                    @cell-mouse-enter="showFavorite"
+                    @cell-mouse-leave="hideFavorite"
                     :heightDiff="300"
                 >
                     <el-table-column type="selection" width="30" />
@@ -366,7 +368,7 @@
                         prop="name"
                     >
                         <template #default="{ row, $index }">
-                            <div class="file-row" @mouseenter="showFavorite($index)" @mouseleave="hideFavorite">
+                            <div class="file-row">
                                 <div>
                                     <svg-icon
                                         v-if="row.isDir"
@@ -487,20 +489,20 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, onMounted, reactive, ref, computed } from '@vue/runtime-core';
+import { computed, nextTick, onMounted, reactive, ref } from '@vue/runtime-core';
 import {
-    getFilesList,
-    getFileContent,
-    computeDirSize,
     addFavorite,
+    computeDirSize,
+    fileWgetKeys,
+    getFileContent,
+    getFilesList,
     removeFavorite,
     searchFavorite,
-    fileWgetKeys,
     searchHostMount,
 } from '@/api/modules/files';
-import { computeSize, copyText, dateFormat, getFileType, getIcon, getRandomStr, downloadFile } from '@/utils/util';
+import { computeSize, copyText, dateFormat, downloadFile, getFileType, getIcon, getRandomStr } from '@/utils/util';
 import { File } from '@/api/interface/file';
-import { Mimetypes, Languages } from '@/global/mimetype';
+import { Languages, Mimetypes } from '@/global/mimetype';
 import { useRouter } from 'vue-router';
 import { MsgWarning } from '@/utils/message';
 import { useSearchable } from './hooks/searchable';
@@ -1102,8 +1104,8 @@ const changeSort = ({ prop, order }) => {
     search();
 };
 
-const showFavorite = (index: any) => {
-    hoveredRowIndex.value = index;
+const showFavorite = (row: any) => {
+    hoveredRowIndex.value = data.value.findIndex((item) => item === row);
 };
 
 const hideFavorite = () => {

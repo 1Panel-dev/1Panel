@@ -79,6 +79,8 @@
                     :class="{ mask: nginxStatus != 'Running' }"
                     :heightDiff="310"
                     :columns="columns"
+                    @cell-mouse-enter="showFavorite"
+                    @cell-mouse-leave="hideFavorite"
                     localKey="websiteColumn"
                 >
                     <el-table-column
@@ -91,7 +93,7 @@
                         show-overflow-tooltip
                     >
                         <template #default="{ row, $index }">
-                            <div class="name-row" @mouseenter="showFavorite($index)" @mouseleave="hideFavorite">
+                            <div class="name-row">
                                 <div>
                                     <el-text type="primary" class="cursor-pointer" @click="openConfig(row.id)">
                                         {{ row.primaryDomain }}
@@ -376,8 +378,8 @@ const goRouter = async (key: string) => {
     router.push({ name: 'AppAll', query: { install: key } });
 };
 
-const showFavorite = (index: any) => {
-    hoveredRowIndex.value = index;
+const showFavorite = (row: any) => {
+    hoveredRowIndex.value = data.value.findIndex((item) => item === row);
 };
 
 const hideFavorite = () => {
