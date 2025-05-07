@@ -1964,9 +1964,9 @@ const message = {
         ignoreVersion: '忽略指定版本',
         specifyIP: '绑定主机 IP',
         specifyIPHelper: '设置端口绑定的主机地址/网卡（如果你不清楚这个的作用，请不要填写）',
-        uninstallDeleteBackup: '卸载应用删除备份',
-        uninstallDeleteImage: '卸载应用删除镜像',
-        upgradeBackup: '升级应用前备份',
+        uninstallDeleteBackup: '卸载应用-删除备份',
+        uninstallDeleteImage: '卸载应用-删除镜像',
+        upgradeBackup: '应用升级前备份应用',
     },
     website: {
         primaryDomain: '主域名',
@@ -3091,7 +3091,7 @@ const message = {
             offlineHelper: '节点为离线环境时使用',
         },
         customApp: {
-            name: '自定义应用仓库',
+            name: '自定义仓库',
             appStoreType: '仓库来源',
             appStoreUrl: '仓库地址',
             local: '本地',
@@ -3099,7 +3099,7 @@ const message = {
             imagePrefix: '镜像前缀',
             imagePrefixHelper:
                 '作用：自定义镜像前缀，修改 compose 文件中的镜像字段，例如：当镜像前缀设置为 1panel/custom 时，MaxKB 的 image 字段将变更为 1panel/custom/maxkb:v1.10.0',
-            closeHelper: '是否取消使用自定义应用仓库',
+            closeHelper: '是否取消使用自定义仓库',
             appStoreUrlHelper: '仅支持 .tar.gz 格式',
             postNode: '同步至子节点',
             postNodeHelper: '把自定义商店包同步至子节点的安装目录下的 tmp/customApp/apps.tar.gz 中',

@@ -2086,9 +2086,9 @@ const message = {
         specifyIP: 'Vincular IP do Host',
         specifyIPHelper:
             'Defina o endereço do host/interface de rede para vincular a porta (se você não tiver certeza sobre isso, por favor, não preencha)',
-        uninstallDeleteBackup: 'Desinstalar Aplicativo Deleta Backup',
-        uninstallDeleteImage: 'Desinstalar Aplicativo Deleta Imagem',
-        upgradeBackup: 'Fazer Backup Antes de Atualizar o Aplicativo',
+        uninstallDeleteBackup: 'Desinstalar Aplicativo - Excluir Backup',
+        uninstallDeleteImage: 'Desinstalar Aplicativo - Excluir Imagem',
+        upgradeBackup: 'Fazer Backup do Aplicativo Antes de Atualizar',
     },
     website: {
         primaryDomain: 'Domínio principal',

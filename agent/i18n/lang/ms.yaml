@@ -90,6 +90,7 @@ PullImageTimeout: 'Tarik tamat masa imej, sila cuba tingkatkan pecutan imej atau
 ErrAppIsDown: 'Status permohonan {{ .name }} tidak normal, sila semak'
 ErrCustomApps: 'Ada aplikasi yang dipasang, sila nyahpasangnya dahulu'
 ErrCustomRuntimes: 'Terdapat persekitaran masa jalan yang dipasang, sila padamkannya dahulu'
+ErrAppVersionDeprecated: "Aplikasi {{ .name }} tidak sesuai dengan versi 1Panel saat ini, dilewati"
 
 #fail
 ErrFileCanNotRead: 'Fail ini tidak menyokong pratonton'

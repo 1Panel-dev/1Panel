@@ -12,12 +12,12 @@
                         label="http://mirrors.aliyun.com/ubuntu/"
                     ></el-option>
                     <el-option
-                        value="https://mirrors.tuna.tsinghua.edu.cn/ubuntu/"
-                        label="https://mirrors.tuna.tsinghua.edu.cn/ubuntu/"
+                        value="http://mirrors.tuna.tsinghua.edu.cn/ubuntu/"
+                        label="http://mirrors.tuna.tsinghua.edu.cn/ubuntu/"
                     ></el-option>
                     <el-option
-                        value="https://mirrors.ustc.edu.cn/ubuntu/"
-                        label="https://mirrors.ustc.edu.cn/ubuntu/"
+                        value="http://mirrors.ustc.edu.cn/ubuntu/"
+                        label="http://mirrors.ustc.edu.cn/ubuntu/"
                     ></el-option>
                 </el-select>
             </el-form-item>

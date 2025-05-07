@@ -142,12 +142,12 @@ func NewTask(name, operate, taskScope, taskID string, resourceID uint) (*Task, e
 }
 
 func (t *Task) AddSubTask(name string, action ActionFunc, rollback RollbackFunc) {
-	subTask := &SubTask{RootTask: t, Name: name, Retry: 0, Timeout: 10 * time.Minute, Action: action, Rollback: rollback}
+	subTask := &SubTask{RootTask: t, Name: name, Retry: 0, Timeout: 30 * time.Minute, Action: action, Rollback: rollback}
 	t.SubTasks = append(t.SubTasks, subTask)
 }
 
 func (t *Task) AddSubTaskWithAlias(key string, action ActionFunc, rollback RollbackFunc) {
-	subTask := &SubTask{RootTask: t, Name: i18n.GetMsgByKey(key), StepAlias: key, Retry: 0, Timeout: 10 * time.Minute, Action: action, Rollback: rollback}
+	subTask := &SubTask{RootTask: t, Name: i18n.GetMsgByKey(key), StepAlias: key, Retry: 0, Timeout: 30 * time.Minute, Action: action, Rollback: rollback}
 	t.SubTasks = append(t.SubTasks, subTask)
 }
 
@@ -157,7 +157,7 @@ func (t *Task) AddSubTaskWithOps(name string, action ActionFunc, rollback Rollba
 }
 
 func (t *Task) AddSubTaskWithIgnoreErr(name string, action ActionFunc) {
-	subTask := &SubTask{RootTask: t, Name: name, Retry: 0, Timeout: 10 * time.Minute, Action: action, Rollback: nil, IgnoreErr: true}
+	subTask := &SubTask{RootTask: t, Name: name, Retry: 0, Timeout: 30 * time.Minute, Action: action, Rollback: nil, IgnoreErr: true}
 	t.SubTasks = append(t.SubTasks, subTask)
 }
 

@@ -49,6 +49,10 @@ func RunDefaultWithStdoutBashCf(command string, arg ...interface{}) (string, err
 	mgr := NewCommandMgr(WithTimeout(20 * time.Second))
 	return mgr.RunWithStdoutBashCf(command, arg...)
 }
+func RunDefaultWithStdoutBashCfAndTimeOut(command string, timeout time.Duration, arg ...interface{}) (string, error) {
+	mgr := NewCommandMgr(WithTimeout(timeout))
+	return mgr.RunWithStdoutBashCf(command, arg...)
+}
 
 func (c *CommandHelper) Run(name string, arg ...string) error {
 	_, err := c.run(name, arg...)

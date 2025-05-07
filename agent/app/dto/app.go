@@ -99,6 +99,7 @@ type AppProperty struct {
 	MemoryRequired     int      `json:"memoryRequired"`
 	GpuSupport         bool     `json:"gpuSupport"`
 	Version            float64  `json:"version"`
+	Deprecated         float64  `json:"deprecated"`
 }
 
 type AppConfigVersion struct {

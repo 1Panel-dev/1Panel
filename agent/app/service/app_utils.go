@@ -1185,11 +1185,16 @@ func getApps(oldApps []model.App, items []dto.AppDefine, systemVersion string, t
 		apps[old.Key] = old
 	}
 	for _, item := range items {
-		if item.AppProperty.Version > 0 && common.CompareVersion(strconv.FormatFloat(item.AppProperty.Version, 'f', -1, 64), systemVersion) {
+		config := item.AppProperty
+		if config.Version > 0 && common.CompareVersion(strconv.FormatFloat(config.Version, 'f', -1, 64), systemVersion) {
 			task.Log(i18n.GetWithName("AppVersionNotMatch", item.Name))
 			continue
 		}
-		config := item.AppProperty
+		if config.Deprecated > 0 && common.CompareAppVersion(systemVersion, strconv.FormatFloat(config.Deprecated, 'f', -1, 64)) {
+			task.Log(i18n.GetWithName("AppVersionNotMatch", item.Name))
+			continue
+		}
+
 		key := config.Key
 		app, ok := apps[key]
 		if !ok {

@@ -2,10 +2,11 @@ package compose
 
 import (
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	"time"
 )
 
 func Up(filePath string) (string, error) {
-	stdout, err := cmd.RunDefaultWithStdoutBashCf("docker compose -f %s up -d", filePath)
+	stdout, err := cmd.RunDefaultWithStdoutBashCfAndTimeOut("docker compose -f %s up -d", 20*time.Minute, filePath)
 	return stdout, err
 }
 

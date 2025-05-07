@@ -90,6 +90,7 @@ PullImageTimeout: 'Pull image timeout, please try to increase the image accelera
 ErrAppIsDown: '{{ .name }} application status is abnormal, please check'
 ErrCustomApps: 'There is an installed application, please uninstall it first'
 ErrCustomRuntimes: 'There is an installed runtime environment, please delete it first'
+ErrAppVersionDeprecated: "The {{ .name }} application is not compatible with the current 1Panel version, skipped"
 
 #file
 ErrFileCanNotRead: 'This file does not support preview'

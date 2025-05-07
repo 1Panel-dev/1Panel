@@ -117,6 +117,7 @@ const timeOptions = ref([
 const stopListening = () => {
     if (eventSource) {
         eventSource.close();
+        eventSource = null;
     }
 };
 
@@ -130,8 +131,8 @@ const searchLogs = async () => {
         MsgError(i18n.global.t('container.linesHelper'));
         return;
     }
+    stopListening();
     if (!logSearch.isWatch) {
-        stopListening();
         return;
     }
     logs.value = [];

@@ -90,6 +90,7 @@ PullImageTimeout: 'プル イメージのタイムアウトです。イメージ
 ErrAppIsDown: '{{ .name }} アプリケーションの状態が異常です。確認してください'
 ErrCustomApps: 'インストールされているアプリケーションがあります。まずアンインストールしてください'
 ErrCustomRuntimes: 'ランタイム環境がインストールされています。まずそれを削除してください'
+ErrAppVersionDeprecated: "{{ .name }} アプリケーションは現在の 1Panel バージョンと互換性がありません、スキップしました"
 
 #file
 ErrFileCanNotRead: 'このファイルはプレビューをサポートしていません'

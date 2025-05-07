@@ -148,7 +148,7 @@ func (a AppRepo) BatchDelete(ctx context.Context, apps []model.App) error {
 }
 
 func (a AppRepo) DeleteByIDs(ctx context.Context, ids []uint) error {
-	return getTx(ctx).Where("id in (?)", ids).Delete(&model.App{}).Error
+	return getTx(ctx).Debug().Where("id in (?)", ids).Delete(&model.App{}).Error
 }
 
 func (a AppRepo) DeleteBy(opts ...DBOption) error {
