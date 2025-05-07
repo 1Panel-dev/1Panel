@@ -48,6 +48,10 @@ export const listAllNodes = () => {
     return http.get<Array<Setting.NodeItem>>(`/core/nodes/all`);
 };
 
+export const getLicenseSmsInfo = () => {
+    return http.get<Setting.LicenseStatus>(`/core/licenses/sms/info`);
+};
+
 // agent
 export const loadBaseDir = () => {
     return http.get<string>(`/settings/basedir`);
