@@ -583,7 +583,8 @@ const message = {
         connAddress: '地址',
         containerConnHelper: 'PHP 執行環境/容器安裝的應用程式使用此連接地址',
         remoteConn: '外部連接',
-        remoteConnHelper2: '非容器或外部連接使用此地址',
+        remoteConnHelper2: '非容器環境或外部連接需使用此地址。',
+        remoteConnHelper3: '預設存取地址為主機IP，修改請前往面板設定頁面的「預設存取地址」配置項。',
         localIP: '本機 IP',
     },
     aiTools: {
@@ -1785,6 +1786,7 @@ const message = {
         versionConstraint: '{0} 版本買斷',
         forceUnbind: '強制解除綁定',
         forceUnbindHelper: '強制解除綁定將忽略解除過程中產生的錯誤，最終解除許可證綁定。',
+        updateForce: '強制更新（忽略解除綁定過程中的所有錯誤，確保最終操作成功）',
         trialInfo: '版本',
         authorizationId: '訂閱授權 ID',
         authorizedUser: '被授權方',

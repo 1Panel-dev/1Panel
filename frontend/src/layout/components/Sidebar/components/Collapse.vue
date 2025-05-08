@@ -165,6 +165,7 @@ const changeNode = (command: string) => {
     }
     if (command == 'local') {
         globalStore.currentNode = command || 'local';
+        globalStore.currentNodeAddr = '';
         globalStore.isOffline = false;
         router.push({ name: 'home' }).then(() => {
             window.location.reload();
@@ -186,6 +187,7 @@ const changeNode = (command: string) => {
                 return;
             }
             globalStore.currentNode = command || 'local';
+            globalStore.currentNodeAddr = item.addr;
             globalStore.isOffline = item.isOffline;
             router.push({ name: 'home' }).then(() => {
                 window.location.reload();

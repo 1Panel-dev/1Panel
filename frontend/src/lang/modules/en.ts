@@ -602,7 +602,9 @@ const message = {
         containerConnHelper:
             'This connection address is used by applications running on the PHP execution environment/container installation.',
         remoteConn: 'External Connection',
-        remoteConnHelper2: 'Use this address for non-container or external connections',
+        remoteConnHelper2: 'Use this address for non-container environments or external connections.',
+        remoteConnHelper3:
+            'The default access address is the host IP. To modify it, go to the "Default Access Address" configuration item in the panel settings page.',
         localIP: 'Local IP',
     },
     aiTools: {
@@ -1922,6 +1924,7 @@ const message = {
         forceUnbind: 'Force Unbind',
         forceUnbindHelper:
             'Forcing unbind will ignore any errors that occur during the unbinding process and ultimately release the license binding.',
+        updateForce: 'Force update (ignore all errors during unbinding to ensure final operation succeeds)',
         trialInfo: 'Version',
         authorizationId: 'Authorization ID',
         authorizedUser: 'Authorized User',

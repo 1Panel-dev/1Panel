@@ -587,8 +587,9 @@ const message = {
         containerConnHelper:
             '이 연결 주소는 웹사이트 런타임(PHP 등) 또는 컨테이너에서 실행 중인 애플리케이션에서 사용할 수 있습니다.',
         remoteConn: '외부 연결',
-        remoteConnHelper2:
-            '이 연결 주소는 컨테이너 외부 또는 외부 애플리케이션에서 실행 중인 애플리케이션에서 사용할 수 있습니다.',
+        remoteConnHelper2: '컨테이너 환경이 아닌 경우 또는 외부 연결에는 이 주소를 사용하십시오.',
+        remoteConnHelper3:
+            '기본 접근 주소는 호스트 IP입니다. 수정하려면 패널 설정 페이지의 "기본 접근 주소" 구성 항목으로 이동하세요.',
         localIP: '로컬 IP',
     },
     aiTools: {
@@ -1801,6 +1802,7 @@ const message = {
         forceUnbind: '강제 바인딩 해제',
         forceUnbindHelper:
             '강제 바인딩 해제를 수행하면 해제 과정에서 발생하는 오류를 무시하고 궁극적으로 라이센스 바인딩을 해제합니다.',
+        updateForce: '강제 업데이트 (바인딩 해제 과정의 모든 오류를 무시하고 최종 작업 성공을 보장합니다)',
         trialInfo: '버전',
         authorizationId: '구독 인증 ID',
         authorizedUser: '인증된 사용자',

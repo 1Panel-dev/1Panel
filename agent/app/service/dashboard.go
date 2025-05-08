@@ -21,6 +21,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/copier"
+	"github.com/gin-gonic/gin"
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/host"
@@ -37,7 +38,7 @@ type IDashboardService interface {
 	LoadCurrentInfoForNode() *dto.NodeCurrent
 	LoadCurrentInfo(ioOption string, netOption string) *dto.DashboardCurrent
 
-	LoadAppLauncher() ([]dto.AppLauncher, error)
+	LoadAppLauncher(ctx *gin.Context) ([]dto.AppLauncher, error)
 	ChangeShow(req dto.SettingUpdate) error
 	ListLauncherOption(filter string) ([]dto.LauncherOption, error)
 	Restart(operation string) error
@@ -263,7 +264,7 @@ func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *d
 	return &currentInfo
 }
 
-func (u *DashboardService) LoadAppLauncher() ([]dto.AppLauncher, error) {
+func (u *DashboardService) LoadAppLauncher(ctx *gin.Context) ([]dto.AppLauncher, error) {
 	var (
 		data          []dto.AppLauncher
 		recommendList []dto.AppLauncher
@@ -289,9 +290,8 @@ func (u *DashboardService) LoadAppLauncher() ([]dto.AppLauncher, error) {
 				itemData.Name = app.Name
 				itemData.Icon = app.Icon
 				itemData.Limit = app.Limit
-				itemData.ShortDescEn = app.ShortDescEn
-				itemData.ShortDescZh = app.ShortDescZh
 				itemData.Recommend = app.Recommend
+				itemData.Description = app.GetDescription(ctx)
 				break
 			}
 		}

@@ -44,6 +44,7 @@ export interface GlobalState {
     errStatus: string;
 
     currentNode: string;
+    currentNodeAddr: string;
     isOffline: boolean;
 }
 

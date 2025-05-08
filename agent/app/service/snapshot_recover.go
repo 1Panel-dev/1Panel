@@ -246,12 +246,12 @@ func backupBeforeRecover(name string, itemHelper *snapRecoverHelper) error {
 		}
 	}
 
-	err = itemHelper.FileOp.CopyFile("/usr/local/bin/1pctl", baseDir)
-	itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/usr/local/bin/1pctl"), err)
-	if err != nil {
-		return err
-	}
 	if global.IsMaster {
+		err = itemHelper.FileOp.CopyFile("/usr/local/bin/1pctl", baseDir)
+		itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/usr/local/bin/1pctl"), err)
+		if err != nil {
+			return err
+		}
 		err = itemHelper.FileOp.CopyFile("/usr/local/bin/1panel-core", baseDir)
 		itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/usr/local/bin/1panel-core"), err)
 		if err != nil {
@@ -328,13 +328,12 @@ func recoverBaseData(src string, itemHelper *snapRecoverHelper) error {
 	itemHelper.Task.Log("---------------------- 6 / 10 ----------------------")
 	itemHelper.Task.LogStart(i18n.GetMsgByKey("SnapBaseInfo"))
 
-	err := itemHelper.FileOp.CopyFile(path.Join(src, "1pctl"), "/usr/local/bin")
-	itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/usr/local/bin/1pctl"), err)
-	if err != nil {
-		return err
-	}
-
 	if global.IsMaster {
+		err := itemHelper.FileOp.CopyFile(path.Join(src, "1pctl"), "/usr/local/bin")
+		itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/usr/local/bin/1pctl"), err)
+		if err != nil {
+			return err
+		}
 		err = itemHelper.FileOp.CopyFile(path.Join(src, "1panel-core"), "/usr/local/bin")
 		itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/usr/local/bin/1panel-core"), err)
 		if err != nil {
@@ -346,7 +345,7 @@ func recoverBaseData(src string, itemHelper *snapRecoverHelper) error {
 			return err
 		}
 	}
-	err = itemHelper.FileOp.CopyFile(path.Join(src, "1panel-agent"), "/usr/local/bin")
+	err := itemHelper.FileOp.CopyFile(path.Join(src, "1panel-agent"), "/usr/local/bin")
 	itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/usr/local/bin/1panel-agent"), err)
 	if err != nil {
 		return err

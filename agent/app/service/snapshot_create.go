@@ -283,16 +283,15 @@ func snapBaseData(snap snapHelper, targetDir string) error {
 		if err != nil {
 			return err
 		}
+		err = snap.FileOp.CopyFile("/usr/local/bin/1pctl", targetDir)
+		snap.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/usr/local/bin/1pctl"), err)
+		if err != nil {
+			return err
+		}
 	}
 
 	err := snap.FileOp.CopyFile("/usr/local/bin/1panel-agent", targetDir)
 	snap.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/usr/local/bin/1panel-agent"), err)
-	if err != nil {
-		return err
-	}
-
-	err = snap.FileOp.CopyFile("/usr/local/bin/1pctl", targetDir)
-	snap.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/usr/local/bin/1pctl"), err)
 	if err != nil {
 		return err
 	}

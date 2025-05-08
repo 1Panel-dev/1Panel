@@ -21,6 +21,8 @@ import i18n from '@/lang';
 import { MsgError, MsgWarning } from '@/utils/message';
 import { jumpToPath } from '@/utils/util';
 import { useRouter } from 'vue-router';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 const router = useRouter();
 
 const open = ref();
@@ -39,8 +41,12 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     let protocol = params.protocol === 'https' ? 'https' : 'http';
     const res = await getAgentSettingInfo();
     if (!res.data.systemIP) {
-        open.value = true;
-        return;
+        if (!globalStore.currentNodeAddr) {
+            open.value = true;
+            return;
+        } else {
+            res.data.systemIP = globalStore.currentNodeAddr;
+        }
     }
     if (res.data.systemIP.indexOf(':') === -1) {
         if (params.ip && params.ip === 'ipv6') {

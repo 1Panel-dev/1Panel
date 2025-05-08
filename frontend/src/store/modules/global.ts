@@ -47,6 +47,7 @@ const GlobalStore = defineStore({
         errStatus: '',
 
         currentNode: 'local',
+        currentNodeAddr: '',
         isOffline: false,
     }),
     getters: {

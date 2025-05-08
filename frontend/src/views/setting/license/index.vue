@@ -255,7 +255,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
         click: (row: any) => {
-            licenseRef.value.acceptParams({ oldLicense: row.licenseName });
+            licenseRef.value.acceptParams({ oldLicense: row.licenseName, isImport: true });
         },
     },
     {

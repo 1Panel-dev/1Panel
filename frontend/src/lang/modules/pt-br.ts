@@ -599,8 +599,9 @@ const message = {
         containerConnHelper:
             'Este endereço de conexão pode ser utilizado por aplicações que estão em execução nos ambientes do site (PHP, etc.) ou no contêiner.',
         remoteConn: 'Conexão externa',
-        remoteConnHelper2:
-            'Este endereço de conexão pode ser utilizado por aplicações que estão fora do contêiner ou por aplicações externas.',
+        remoteConnHelper2: 'Use este endereço para ambientes não-container ou conexões externas.',
+        remoteConnHelper3:
+            'O endereço de acesso padrão é o IP do host. Para modificá-lo, acesse o item de configuração "Endereço de Acesso Padrão" na página de configurações do painel.',
         localIP: 'IP local',
     },
     aiTools: {
@@ -1876,6 +1877,8 @@ const message = {
         forceUnbind: 'Forçar Desvinculação',
         forceUnbindHelper:
             'Forçar a desvinculação ignorará quaisquer erros que ocorram durante o processo de desvinculação e, em última análise, liberará a vinculação da licença.',
+        updateForce:
+            'Atualização forçada (ignora todos os erros durante o desvinculamento para garantir o sucesso da operação final)',
         trialInfo: 'Versão',
         authorizationId: 'ID de autorização',
         authorizedUser: 'Usuário autorizado',

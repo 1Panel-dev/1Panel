@@ -590,8 +590,9 @@ const message = {
         containerConnHelper:
             'この接続アドレスは、Webサイトのランタイム（PHPなど）またはコンテナで実行されているアプリケーションで使用できます。',
         remoteConn: '外部接続',
-        remoteConnHelper2:
-            'この接続アドレスは、非コンテナまたは外部アプリケーションで実行されているアプリケーションで使用できます。',
+        remoteConnHelper2: 'コンテナ環境以外または外部接続にはこのアドレスを使用してください。',
+        remoteConnHelper3:
+            'デフォルトアクセスアドレスはホストIPです。変更するには、パネル設定ページの「デフォルトアクセスアドレス」設定項目へ移動してください。',
         localIP: 'ローカルIP',
     },
     aiTools: {
@@ -1831,6 +1832,7 @@ const message = {
         forceUnbind: '強制バインド解除',
         forceUnbindHelper:
             '強制的にバインド解除を行うと、解除プロセス中に発生するエラーを無視し、最終的にライセンスのバインドを解除します。',
+        updateForce: '強制更新（アンバインド中のすべてのエラーを無視し、最終操作の成功を保証します）',
         trialInfo: 'バージョン',
         authorizationId: 'サブスクリプション承認ID',
         authorizedUser: '認定ユーザー',

@@ -32,7 +32,7 @@ func (b *BaseApi) LoadDashboardOsInfo(c *gin.Context) {
 // @Security Timestamp
 // @Router /dashboard/app/launcher [get]
 func (b *BaseApi) LoadAppLauncher(c *gin.Context) {
-	data, err := dashboardService.LoadAppLauncher()
+	data, err := dashboardService.LoadAppLauncher(c)
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

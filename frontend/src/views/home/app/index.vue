@@ -37,9 +37,7 @@
                                     </div>
                                     <div class="h-app-desc">
                                         <span>
-                                            {{
-                                                language == 'zh' || language == 'tw' ? app.shortDescZh : app.shortDescEn
-                                            }}
+                                            {{ app.description }}
                                         </span>
                                     </div>
                                 </div>
@@ -183,12 +181,10 @@ import { MsgSuccess } from '@/utils/message';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { toFolder } from '@/global/business';
-import { getLanguage } from '@/utils/util';
 
 const router = useRouter();
 const globalStore = GlobalStore();
 
-const language = getLanguage();
 let loading = ref(false);
 let apps = ref([]);
 const options = ref([]);

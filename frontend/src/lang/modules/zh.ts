@@ -581,7 +581,8 @@ const message = {
         connAddress: '地址',
         containerConnHelper: 'PHP 运行环境/容器安装的应用使用此连接地址',
         remoteConn: '外部连接',
-        remoteConnHelper2: '非容器或外部连接使用此地址',
+        remoteConnHelper2: '非容器环境或外部连接需使用此地址。',
+        remoteConnHelper3: '默认访问地址为主机IP，修改请前往面板设置页面的「默认访问地址」配置项。',
         localIP: '本机 IP',
     },
     aiTools: {
@@ -1778,6 +1779,7 @@ const message = {
         versionConstraint: '{0} 版本买断',
         forceUnbind: '强制解绑',
         forceUnbindHelper: '强制解绑，会忽略解绑过程中产生的错误并最终解除许可证绑定',
+        updateForce: '强制更新（忽略解绑过程中的所有错误，确保最终操作成功）',
         trialInfo: '版本',
         authorizationId: '订阅授权 ID',
         authorizedUser: '被授权方',

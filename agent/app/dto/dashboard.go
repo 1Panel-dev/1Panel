@@ -140,9 +140,8 @@ type AppLauncher struct {
 	Name        string `json:"name"`
 	Icon        string `json:"icon"`
 	Limit       int    `json:"limit"`
-	ShortDescZh string `json:"shortDescZh"`
-	ShortDescEn string `json:"shortDescEn"`
-	Recommend   int    `json:"recomend"`
+	Description string `json:"description"`
+	Recommend   int    `json:"recommend"`
 
 	IsInstall   bool            `json:"isInstall"`
 	IsRecommend bool            `json:"isRecommend"`

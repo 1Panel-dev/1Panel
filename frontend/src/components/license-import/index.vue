@@ -25,6 +25,9 @@
                         </el-upload>
                     </el-col>
                 </el-row>
+                <div v-if="oldLicense">
+                    <el-checkbox v-model="isForce">{{ $t('license.updateForce') }}</el-checkbox>
+                </div>
                 <el-button
                     type="primary"
                     class="mt-3 w-52 custom-button"
@@ -57,6 +60,7 @@ const open = ref(false);
 const uploadRef = ref<UploadInstance>();
 const uploaderFiles = ref<UploadFiles>([]);
 const isImport = ref();
+const isForce = ref();
 
 const oldLicense = ref();
 interface DialogProps {
@@ -109,6 +113,7 @@ const submit = async () => {
     if (!isImport.value) {
         formData.append('currentNode', globalStore.currentNode);
     }
+    formData.append('isForce', isForce.value);
     loading.value = true;
     await uploadLicense(oldLicense.value, formData)
         .then(async () => {

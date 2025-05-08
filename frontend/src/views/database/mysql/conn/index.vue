@@ -181,12 +181,8 @@ const loadAccess = async () => {
 };
 
 const loadSystemIP = async () => {
-    if (globalStore.currentNode !== 'local') {
-        form.systemIP = globalStore.currentNode || i18n.global.t('database.localIP');
-        return;
-    }
     const res = await getAgentSettingInfo();
-    form.systemIP = res.data.systemIP || i18n.global.t('database.localIP');
+    form.systemIP = res.data.systemIP || globalStore.currentNodeAddr || i18n.global.t('database.localIP');
 };
 
 const loadPassword = async () => {

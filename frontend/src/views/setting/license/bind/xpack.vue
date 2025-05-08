@@ -12,6 +12,19 @@
                     <el-option v-for="item in freeNodes" :key="item.id" :label="item.name" :value="item.id" />
                 </el-select>
             </el-form-item>
+            <el-card class="mt-5" v-if="form.nodeID && form.nodeID !== 0">
+                <div class="mb-2">
+                    <span>{{ $t('xpack.node.syncInfo') }}</span>
+                </div>
+                <el-form-item prop="syncListItem">
+                    <el-checkbox-group v-model="form.syncListItem">
+                        <el-checkbox :label="$t('xpack.node.syncProxy')" value="SyncSystemProxy" />
+                        <el-checkbox :label="$t('xpack.node.syncAlertSetting')" value="SyncAlertSetting" />
+                        <el-checkbox :label="$t('xpack.node.syncCustomApp')" value="SyncCustomApp" />
+                    </el-checkbox-group>
+                    <span class="input-help">{{ $t('xpack.node.syncHelper') }}</span>
+                </el-form-item>
+            </el-card>
         </el-form>
         <template #footer>
             <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
@@ -43,6 +56,8 @@ const freeNodes = ref([]);
 const form = reactive({
     nodeID: null,
     licenseID: null,
+    syncList: '',
+    syncListItem: ['SyncSystemProxy', 'SyncAlertSetting', 'SyncCustomApp'],
 });
 
 const formRef = ref<FormInstance>();
@@ -59,6 +74,7 @@ const onBind = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         loading.value = true;
+        form.syncList = form.syncListItem?.join(',') || '';
         await bindLicense(form.licenseID, form.nodeID)
             .then(() => {
                 loading.value = false;

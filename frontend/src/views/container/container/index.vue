@@ -3,7 +3,7 @@
         <docker-status v-model:isActive="isActive" v-model:isExist="isExist" @search="search" />
 
         <LayoutContent :title="$t('menu.container')" v-if="isExist" :class="{ mask: !isActive }">
-            <template #search>
+            <template #search v-if="tags.length !== 0">
                 <div class="card-interval" v-if="isExist && isActive">
                     <div v-for="item in tags" :key="item.key" class="inline">
                         <el-button
@@ -492,14 +492,30 @@ const searchWithAppShow = (item: any) => {
 const loadContainerCount = async () => {
     await loadContainerStatus().then((res) => {
         tags.value = [];
-        tags.value.push({ key: 'all', count: res.data.all });
-        tags.value.push({ key: 'running', count: res.data.running });
-        tags.value.push({ key: 'paused', count: res.data.paused });
-        tags.value.push({ key: 'restarting', count: res.data.restarting });
-        tags.value.push({ key: 'removing', count: res.data.removing });
-        tags.value.push({ key: 'created', count: res.data.created });
-        tags.value.push({ key: 'dead', count: res.data.dead });
-        tags.value.push({ key: 'exited', count: res.data.exited });
+        if (res.data.all) {
+            tags.value.push({ key: 'all', count: res.data.all });
+        }
+        if (res.data.all) {
+            tags.value.push({ key: 'running', count: res.data.running });
+        }
+        if (res.data.all) {
+            tags.value.push({ key: 'paused', count: res.data.paused });
+        }
+        if (res.data.all) {
+            tags.value.push({ key: 'restarting', count: res.data.restarting });
+        }
+        if (res.data.all) {
+            tags.value.push({ key: 'removing', count: res.data.removing });
+        }
+        if (res.data.all) {
+            tags.value.push({ key: 'created', count: res.data.created });
+        }
+        if (res.data.all) {
+            tags.value.push({ key: 'dead', count: res.data.dead });
+        }
+        if (res.data.all) {
+            tags.value.push({ key: 'exited', count: res.data.exited });
+        }
     });
 };
 

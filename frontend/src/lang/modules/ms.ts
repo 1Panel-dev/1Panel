@@ -602,8 +602,9 @@ const message = {
         containerConnHelper:
             'Alamat sambungan ini boleh digunakan oleh aplikasi yang berjalan pada runtime laman web (PHP, dll.) atau kontena.',
         remoteConn: 'Sambungan luaran',
-        remoteConnHelper2:
-            'Alamat sambungan ini boleh digunakan oleh aplikasi yang berjalan di luar kontena atau aplikasi luaran.',
+        remoteConnHelper2: 'Gunakan alamat ini untuk persekitaran bukan kontena atau sambungan luar.',
+        remoteConnHelper3:
+            'Alamat akses lalai ialah IP hos. Untuk mengubahnya, pergi ke item konfigurasi "Alamat Akses Lalai" pada halaman tetapan panel.',
         localIP: 'IP Tempatan',
     },
     aiTools: {
@@ -1889,6 +1890,7 @@ const message = {
         forceUnbind: 'Paksakan Nyahikat',
         forceUnbindHelper:
             'Memaksa nyahikat akan mengabaikan sebarang ralat yang berlaku semasa proses nyahikat dan akhirnya melepaskan ikatan lesen.',
+        updateForce: 'Kemas kini paksa (abaikan semua ralat semasa nyahikatan untuk memastikan operasi akhir berjaya)',
         trialInfo: 'Versi',
         authorizationId: 'ID Kebenaran Langganan',
         authorizedUser: 'Pengguna yang Dibenarkan',
