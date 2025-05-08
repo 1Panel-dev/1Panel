@@ -63,7 +63,6 @@ func (s *SettingRepo) Get(opts ...DBOption) (model.Setting, error) {
 func (s *SettingRepo) GetValueByKey(key string) (string, error) {
 	var setting model.Setting
 	if err := global.DB.Model(&model.Setting{}).Where("key = ?", key).First(&setting).Error; err != nil {
-		global.LOG.Errorf("load %s from db setting failed, err: %v", key, err)
 		return "", err
 	}
 	return setting.Value, nil

@@ -19,6 +19,7 @@ export namespace Cronjob {
         inContainer: boolean;
         containerName: string;
         user: string;
+        scriptID: number;
         appID: string;
         website: string;
         exclusionRules: string;
@@ -58,6 +59,7 @@ export namespace Cronjob {
         specs: Array<string>;
         specObjs: Array<SpecObj>;
 
+        scriptID: number;
         appID: string;
         website: string;
         exclusionRules: string;

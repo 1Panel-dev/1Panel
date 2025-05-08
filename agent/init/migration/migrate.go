@@ -34,6 +34,7 @@ func InitAgentDB() {
 		migrations.UpdateWebsiteAcmeAccount,
 		migrations.UpdateAppInstall,
 		migrations.AddMcpServer,
+		migrations.InitLanguageSetting,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

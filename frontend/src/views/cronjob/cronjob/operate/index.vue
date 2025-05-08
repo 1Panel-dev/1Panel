@@ -300,7 +300,7 @@
                                     </el-form-item>
                                 </LayoutCol>
                                 <LayoutCol v-if="form.type === 'directory'">
-                                    <el-form-item :label="$t('cronjob.backupContent')">
+                                    <el-form-item :label="$t('commons.button.backup')">
                                         <el-radio-group v-model="form.isDir" class="w-full">
                                             <el-radio :value="true">{{ $t('file.dir') }}</el-radio>
                                             <el-radio :value="false">{{ $t('menu.files') }}</el-radio>
@@ -440,7 +440,7 @@
                                 </el-col>
 
                                 <LayoutCol v-if="isDir() && form.isDir">
-                                    <el-form-item prop="sourceDir">
+                                    <el-form-item :label="$t('cronjob.backupContent')" prop="sourceDir">
                                         <el-input v-model="form.sourceDir">
                                             <template #prepend>
                                                 <FileList @choose="loadDir" :dir="true" :path="form.sourceDir" />
@@ -449,13 +449,13 @@
                                     </el-form-item>
                                 </LayoutCol>
                                 <LayoutCol v-if="isDir() && !form.isDir">
-                                    <el-input class="mb-5">
-                                        <template #prepend>
-                                            <FileList @choose="loadFile" :dir="false" />
-                                        </template>
-                                    </el-input>
-                                    <el-form-item prop="files">
-                                        <div style="width: 100%">
+                                    <el-form-item :label="$t('cronjob.backupContent')" prop="files">
+                                        <el-input>
+                                            <template #prepend>
+                                                <FileList @choose="loadFile" :dir="false" />
+                                            </template>
+                                        </el-input>
+                                        <div class="w-full">
                                             <ComplexTable :show-header="false" :data="form.files" v-if="form.files">
                                                 <el-table-column prop="val" />
                                                 <el-table-column width="60">
@@ -698,6 +698,8 @@ const form = reactive<Cronjob.CronjobInfo>({
     inContainer: false,
     containerName: '',
     user: '',
+
+    scriptID: null,
     appID: '',
     website: '',
     exclusionRules: '',
@@ -766,6 +768,7 @@ const search = async () => {
                         form.executor !== 'python3';
                 }
 
+                form.scriptID = res.data.scriptID;
                 form.appID = res.data.appID;
                 form.website = res.data.website;
                 form.exclusionRules = res.data.exclusionRules;

@@ -374,3 +374,25 @@ var AddMcpServer = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var InitLanguageSetting = &gormigrate.Migration{
+	ID: "20240722-init-language-setting",
+	Migrate: func(tx *gorm.DB) error {
+		var langSetting model.Setting
+		_ = tx.Where("key = ?", "Language").First(&langSetting)
+		if langSetting.ID == 0 {
+			if err := tx.Create(&model.Setting{Key: "Language", Value: "zh"}).Error; err != nil {
+				return err
+			}
+		}
+
+		var systemIPSetting model.Setting
+		_ = tx.Where("key = ?", "SystemIP").First(&systemIPSetting)
+		if systemIPSetting.ID == 0 {
+			if err := tx.Create(&model.Setting{Key: "SystemIP", Value: ""}).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	},
+}

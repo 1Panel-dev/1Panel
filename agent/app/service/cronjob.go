@@ -103,13 +103,17 @@ func (u *CronjobService) LoadScriptOptions() []dto.ScriptOptions {
 	if err != nil {
 		return nil
 	}
+	lang, _ := settingRepo.GetValueByKey("Language")
+	if len(lang) == 0 {
+		lang = "en"
+	}
 	var options []dto.ScriptOptions
 	for _, script := range scripts {
 		var item dto.ScriptOptions
 		item.ID = script.ID
 		var translations = make(map[string]string)
 		_ = json.Unmarshal([]byte(script.Name), &translations)
-		if name, ok := translations["en"]; ok {
+		if name, ok := translations[lang]; ok {
 			item.Name = strings.ReplaceAll(name, " ", "_")
 		} else {
 			item.Name = strings.ReplaceAll(script.Name, " ", "_")

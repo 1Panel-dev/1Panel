@@ -44,12 +44,7 @@ func (b *BaseApi) SearchContainer(c *gin.Context) {
 // @Security Timestamp
 // @Router /containers/list [post]
 func (b *BaseApi) ListContainer(c *gin.Context) {
-	list, err := containerService.List()
-	if err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-	helper.SuccessWithData(c, list)
+	helper.SuccessWithData(c, containerService.List())
 }
 
 // @Tags Container

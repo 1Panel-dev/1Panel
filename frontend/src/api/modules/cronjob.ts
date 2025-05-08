@@ -16,7 +16,7 @@ export const loadCronjobInfo = (id: number) => {
 };
 
 export const loadScriptOptions = () => {
-    return http.get<Cronjob.ScriptOptions>(`/cronjobs/script/options`);
+    return http.get<Array<Cronjob.ScriptOptions>>(`/cronjobs/script/options`);
 };
 
 export const getRecordLog = (id: number) => {

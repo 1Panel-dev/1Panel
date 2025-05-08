@@ -52,7 +52,7 @@ type ContainerService struct{}
 
 type IContainerService interface {
 	Page(req dto.PageContainer) (int64, interface{}, error)
-	List() ([]string, error)
+	List() []string
 	LoadStatus() (dto.ContainerStatus, error)
 	PageNetwork(req dto.SearchWithPage) (int64, interface{}, error)
 	ListNetwork() ([]dto.Options, error)
@@ -219,15 +219,17 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 	return int64(total), backDatas, nil
 }
 
-func (u *ContainerService) List() ([]string, error) {
+func (u *ContainerService) List() []string {
 	client, err := docker.NewDockerClient()
 	if err != nil {
-		return nil, err
+		global.LOG.Errorf("load docker client for contianer list failed, err: %v", err)
+		return nil
 	}
 	defer client.Close()
 	containers, err := client.ContainerList(context.Background(), container.ListOptions{All: true})
 	if err != nil {
-		return nil, err
+		global.LOG.Errorf("load contianer list failed, err: %v", err)
+		return nil
 	}
 	var datas []string
 	for _, container := range containers {
@@ -238,7 +240,7 @@ func (u *ContainerService) List() ([]string, error) {
 		}
 	}
 
-	return datas, nil
+	return datas
 }
 
 func (u *ContainerService) LoadStatus() (dto.ContainerStatus, error) {
