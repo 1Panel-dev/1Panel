@@ -2422,11 +2422,11 @@ const message = {
         organizationDetail: '조직 세부 정보',
         fromWebsite: '웹사이트에서 가져오기',
         dnsMauanlHelper: '수동 해석 모드에서는 생성 후 신청 버튼을 클릭하여 DNS 해석 값을 얻어야 합니다.',
-        httpHelper: 'HTTP 모드는 OpenResty 설치가 필요합니다.',
+        httpHelper:
+            'HTTP 모드를 사용하려면 OpenResty를 설치해야 하며, 와일드카드 도메인 인증서 신청을 지원하지 않습니다.',
         buypassHelper: 'Buypass 는 중국 본토에서 접근할 수 없습니다.',
         googleHelper: 'EAB HmacKey 및 EAB kid 를 얻는 방법',
         googleCloudHelper: 'Google Cloud API 는 중국 본토 대부분에서 접근할 수 없습니다.',
-        httpHelper2: 'HTTP 모드에서 일반 도메인 이름 인증서를 신청할 수 없습니다.',
         skipDNSCheck: 'DNS 확인 건너뛰기',
         skipDNSCheckHelper: '인증 요청 중 타임아웃 문제가 발생할 경우에만 선택하세요.',
         cfHelper: 'Global API Key 를 사용하지 마세요.',

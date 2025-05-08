@@ -2465,11 +2465,11 @@ const message = {
         organizationDetail: '組織の詳細',
         fromWebsite: 'ウェブサイトから',
         dnsMauanlHelper: '手動解像度モードでは、作成後に適用ボタンをクリックしてDNS解像度値を取得する必要があります',
-        httpHelper: 'HTTPモードでは、OpenRestyをインストールする必要があります',
+        httpHelper:
+            'HTTPモードを使用するにはOpenRestyをインストールする必要があり、ワイルドカードドメイン証明書の申請はサポートされていません。',
         buypassHelper: `中国本土では、ブライパスはアクセスできません`,
         googleHelper: 'EAB HMACキーとEABキッドを取得する方法',
         googleCloudHelper: `GoogleクラウドAPIは中国本土のほとんどの地域でアクセスできません`,
-        httpHelper2: 'HTTPモードで一般的なドメイン名証明書を申請できません',
         skipDNSCheck: 'DNSチェックをスキップします',
         skipDNSCheckHelper: '認定リクエスト中にタイムアウトの問題が発生した場合にのみ、こちらを確認してください。',
         cfHelper: 'グローバルAPIキーを使用しないでください',

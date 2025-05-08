@@ -193,7 +193,8 @@
                                                                 >
                                                                     <el-button
                                                                         link
-                                                                        icon="Star"
+                                                                        size="large"
+                                                                        icon="StarFilled"
                                                                         type="warning"
                                                                         @click="favoriteInstall(installed)"
                                                                     ></el-button>

@@ -2519,11 +2519,11 @@ const message = {
         fromWebsite: 'Do site',
         dnsMauanlHelper:
             'No modo de resolução manual, você precisa clicar no botão de solicitação após a criação para obter o valor de resolução DNS',
-        httpHelper: 'O modo HTTP requer a instalação do OpenResty',
+        httpHelper:
+            'O uso do modo HTTP requer a instalação do OpenResty e não suporta a solicitação de certificados de domínio curinga.',
         buypassHelper: 'O Buypass não está acessível na China continental',
         googleHelper: 'Como obter EAB HmacKey e EAB kid',
         googleCloudHelper: 'A API do Google Cloud não está acessível na maior parte da China continental',
-        httpHelper2: 'Não é possível solicitar certificados para domínios genéricos no modo HTTP',
         skipDNSCheck: 'Pular verificação DNS',
         skipDNSCheckHelper:
             'Marque esta opção apenas se enfrentar problemas de timeout durante a solicitação de certificação.',

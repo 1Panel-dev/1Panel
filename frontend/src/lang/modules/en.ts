@@ -2575,11 +2575,11 @@ const message = {
         fromWebsite: 'From Websites',
         dnsMauanlHelper:
             'In manual resolution mode, you need to click the apply button after creation to obtain the DNS resolution value',
-        httpHelper: 'HTTP mode requires OpenResty to be installed',
+        httpHelper:
+            'Using HTTP mode requires installing OpenResty and does not support applying for wildcard domain certificates.',
         buypassHelper: 'Buypass is not accessible in mainland China',
         googleHelper: 'How to get EAB HmacKey and EAB kid',
         googleCloudHelper: 'Google Cloud API is not accessible in most parts of mainland China',
-        httpHelper2: 'Unable to apply for a generic domain name certificate in HTTP mode',
         skipDNSCheck: 'Skip DNS check',
         skipDNSCheckHelper: 'If there is an application timeout problem, please check here, otherwise do not check it',
         cfHelper: 'Do not use Global API Key',

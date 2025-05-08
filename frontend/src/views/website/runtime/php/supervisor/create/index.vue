@@ -20,9 +20,7 @@
                 <el-input v-model.trim="process.user"></el-input>
             </el-form-item>
             <el-form-item :label="$t('tool.supervisor.dir')" prop="dir">
-                <el-input v-model.trim="process.dir">
-                    <template #prepend><FileList @choose="getPath" :dir="true"></FileList></template>
-                </el-input>
+                <el-input v-model.trim="process.dir"></el-input>
             </el-form-item>
             <el-form-item :label="$t('tool.supervisor.command')" prop="command">
                 <el-input v-model="process.command"></el-input>
@@ -45,7 +43,6 @@
 <script lang="ts" setup>
 import { createSupervisorProcess } from '@/api/modules/runtime';
 import { Rules, checkNumberRange } from '@/global/form-rules';
-import FileList from '@/components/file-list/index.vue';
 import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
 import { ref } from 'vue';
@@ -78,10 +75,6 @@ const handleClose = () => {
     open.value = false;
     resetForm();
     em('close', open);
-};
-
-const getPath = (path: string) => {
-    process.value.dir = path;
 };
 
 const resetForm = () => {

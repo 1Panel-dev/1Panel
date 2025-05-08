@@ -87,8 +87,7 @@
                         :label="$t('commons.table.name')"
                         fix
                         prop="primaryDomain"
-                        min-width="120px"
-                        :width="mobile ? 220 : 'auto'"
+                        min-width="150px"
                         sortable
                         show-overflow-tooltip
                     >
@@ -136,7 +135,8 @@
                                     >
                                         <el-button
                                             link
-                                            icon="Star"
+                                            size="large"
+                                            icon="StarFilled"
                                             type="warning"
                                             @click="favoriteWebsite(row)"
                                         ></el-button>
@@ -160,7 +160,7 @@
                         </template>
                     </el-table-column>
                     <el-table-column
-                        min-width="120px"
+                        width="120px"
                         :label="$t('commons.table.type')"
                         fix
                         show-overflow-tooltip
@@ -200,18 +200,7 @@
                             />
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('website.remark')" prop="remark" min-width="150">
-                        <template #default="{ row }">
-                            <fu-read-write-switch>
-                                <template #read>
-                                    <MsgInfo :info="row.remark" :width="'150'" />
-                                </template>
-                                <template #default="{ read }">
-                                    <el-input v-model="row.remark" @blur="updateRemark(row, read)" />
-                                </template>
-                            </fu-read-write-switch>
-                        </template>
-                    </el-table-column>
+
                     <el-table-column
                         :label="$t('commons.table.protocol')"
                         prop="protocol"
@@ -221,7 +210,7 @@
                         :label="$t('website.expireDate')"
                         prop="expireDate"
                         :sortable="'custom'"
-                        min-width="150px"
+                        width="150px"
                     >
                         <template #default="{ row }">
                             <div v-if="row.showdate">
@@ -258,6 +247,18 @@
                                 {{ dateFormatSimple(row.sslExpireDate) }}
                             </el-tag>
                             <span v-else></span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('website.remark')" prop="remark" min-width="150px">
+                        <template #default="{ row }">
+                            <fu-read-write-switch>
+                                <template #read>
+                                    <MsgInfo :info="row.remark" :width="'150'" />
+                                </template>
+                                <template #default="{ read }">
+                                    <el-input v-model="row.remark" @blur="updateRemark(row, read)" />
+                                </template>
+                            </fu-read-write-switch>
                         </template>
                     </el-table-column>
                     <fu-table-operations

@@ -2522,11 +2522,11 @@ const message = {
         fromWebsite: 'Daripada laman web',
         dnsMauanlHelper:
             'Dalam mod resolusi manual, anda perlu klik butang mohon selepas penciptaan untuk mendapatkan nilai resolusi DNS',
-        httpHelper: 'Mod HTTP memerlukan OpenResty untuk dipasang',
+        httpHelper:
+            'Menggunakan mod HTTP memerlukan pemasangan OpenResty dan tidak menyokong permohonan sijil domain wildcard.',
         buypassHelper: `Buypass tidak boleh diakses di tanah besar China`,
         googleHelper: 'Cara mendapatkan EAB HmacKey dan EAB kid',
         googleCloudHelper: `Google Cloud API tidak boleh diakses di kebanyakan kawasan tanah besar China`,
-        httpHelper2: 'Tidak dapat memohon sijil nama domain generik dalam mod HTTP',
         skipDNSCheck: 'Langkau semakan DNS',
         skipDNSCheckHelper: 'Semak di sini hanya jika anda menghadapi isu tamat masa semasa permintaan pengesahan.',
         cfHelper: 'Jangan gunakan Global API Key',

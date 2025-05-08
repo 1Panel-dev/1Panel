@@ -2519,11 +2519,11 @@ const message = {
         fromWebsite: 'С веб-сайта',
         dnsMauanlHelper:
             'В режиме ручного разрешения необходимо нажать кнопку применить после создания для получения значения DNS-разрешения',
-        httpHelper: 'HTTP режим требует установки OpenResty',
+        httpHelper:
+            'Использование режима HTTP требует установки OpenResty и не поддерживает запрос сертификатов с подстановочными доменными именами.',
         buypassHelper: 'Buypass недоступен в материковом Китае',
         googleHelper: 'Как получить EAB HmacKey и EAB kid',
         googleCloudHelper: 'Google Cloud API недоступен в большинстве регионов материкового Китая',
-        httpHelper2: 'Невозможно запросить сертификат общего домена в режиме HTTP',
         skipDNSCheck: 'Пропустить проверку DNS',
         skipDNSCheckHelper: 'Отметьте здесь только если возникает проблема тайм-аута при запросе сертификата.',
         cfHelper: 'Не использовать Global API Key',
