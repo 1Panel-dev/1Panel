@@ -3001,6 +3001,7 @@ const message = {
             gatewayTimeout: 'Timeout Gateway (504)',
             belongToIpGroup: 'Tergolong dalam Kumpulan IP',
             notBelongToIpGroup: 'Tidak tergolong dalam Kumpulan IP',
+            unknownWebsiteKey: 'Domain Tidak Diketahui',
         },
         monitor: {
             name: 'Pemantauan Laman Web',

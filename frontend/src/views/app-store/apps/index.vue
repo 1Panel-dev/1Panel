@@ -92,10 +92,9 @@
                         >
                             <div class="app">
                                 <el-card>
-                                    <div class="app-wrapper">
+                                    <div class="app-wrapper" @click="openDetail(app.key)">
                                         <div class="app-image">
                                             <el-avatar
-                                                @click="openDetail(app.key)"
                                                 shape="square"
                                                 :size="60"
                                                 :src="'data:image/png;base64,' + app.icon"
@@ -406,9 +405,9 @@ onMounted(async () => {
     .app-wrapper {
         display: flex;
         height: 100%;
+        cursor: pointer;
     }
     .app-image {
-        cursor: pointer;
         flex: 0 0 100px;
         display: flex;
         justify-content: center;

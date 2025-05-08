@@ -3003,6 +3003,7 @@ const message = {
             gatewayTimeout: 'Tempo Limite da Porta de Entrada (504)',
             belongToIpGroup: 'Pertence ao Grupo de IP',
             notBelongToIpGroup: 'Não pertence ao Grupo de IP',
+            unknownWebsiteKey: 'Domínio Desconhecido',
         },
         monitor: {
             name: 'Monitoramento de Websites',

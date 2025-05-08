@@ -3074,6 +3074,7 @@ const message = {
             gatewayTimeout: 'Gateway Timeout (504)',
             belongToIpGroup: 'Belongs to IP Group',
             notBelongToIpGroup: 'Does not belong to IP Group',
+            unknownWebsiteKey: 'Unknown Domain',
         },
         monitor: {
             name: 'Website Monitoring',

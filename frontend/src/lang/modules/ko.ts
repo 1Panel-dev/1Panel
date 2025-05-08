@@ -2888,6 +2888,7 @@ const message = {
             gatewayTimeout: '게이트웨이 시간 초과 (504)',
             belongToIpGroup: 'IP 그룹에 속함',
             notBelongToIpGroup: 'IP 그룹에 속하지 않음',
+            unknownWebsiteKey: '알 수 없는 도메인',
         },
         monitor: {
             name: '웹사이트 모니터링',

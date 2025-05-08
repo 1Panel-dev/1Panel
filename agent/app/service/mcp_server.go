@@ -405,13 +405,8 @@ func addProxy(server *model.McpServer) {
 		global.LOG.Errorf("[mcp] add proxy failed, err: %v", err)
 		return
 	}
-	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
-	if err != nil {
-		global.LOG.Errorf("[mcp] add proxy failed, err: %v", err)
-		return
-	}
 	fileOp := files.NewFileOp()
-	includeDir := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "proxy")
+	includeDir := GetSitePath(website, SiteProxyDir)
 	if !fileOp.Stat(includeDir) {
 		if err = fileOp.CreateDir(includeDir, 0644); err != nil {
 			return
@@ -446,16 +441,12 @@ func addMCPProxy(websiteID uint) error {
 	if len(servers) == 0 {
 		return nil
 	}
-	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
-	if err != nil {
-		return err
-	}
 	website, err := websiteRepo.GetFirst(repo.WithByID(websiteID))
 	if err != nil {
 		return err
 	}
 	fileOp := files.NewFileOp()
-	includeDir := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "proxy")
+	includeDir := GetSitePath(website, SiteProxyDir)
 	if !fileOp.Stat(includeDir) {
 		if err = fileOp.CreateDir(includeDir, 0644); err != nil {
 			return err

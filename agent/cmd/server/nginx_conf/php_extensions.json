@@ -52,7 +52,7 @@
     "name": "imagick",
     "check": "imagick",
     "file": "imagick.so",
-    "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82"],
+    "versions": ["56", "70", "71", "72", "73", "74", "80", "81", "82","83","84"],
     "installed": false
   },
   {
@@ -327,10 +327,39 @@
     "file": "sourceguardian.so",
     "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
-  },{
-  "name": "mysqli",
+  },
+  {
+    "name": "mysqli",
     "check": "mysqli",
     "file": "mysqli.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
+    "installed": false
+  },
+  {
+    "name": "pdo_mysql",
+    "check": "pdo_mysql",
+    "file": "pdo_mysql.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
+    "installed": false
+  },
+  {
+    "name": "igbinary",
+    "check": "igbinary",
+    "file": "igbinary.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
+    "installed": false
+  },
+  {
+    "name": "zip",
+    "check": "zip",
+    "file": "zip.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
+    "installed": false
+  },
+  {
+    "name": "shmop",
+    "check": "shmop",
+    "file": "shmop.so",
     "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
   }

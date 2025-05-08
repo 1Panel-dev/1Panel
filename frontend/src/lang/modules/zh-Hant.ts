@@ -2849,6 +2849,7 @@ const message = {
             gatewayTimeout: '網關超時 (504)',
             belongToIpGroup: '屬於 IP 組',
             notBelongToIpGroup: '不屬於 IP 組',
+            unknownWebsiteKey: '未知域名',
         },
         monitor: {
             name: '網站監控',

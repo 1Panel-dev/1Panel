@@ -78,6 +78,7 @@ var WebUrlMap = map[string]struct{}{
 	"/cronjobs":         {},
 	"/cronjobs/cronjob": {},
 	"/cronjobs/library": {},
+	"/cronjobs/operate": {},
 
 	"/databases":                   {},
 	"/databases/mysql":             {},

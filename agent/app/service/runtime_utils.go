@@ -585,7 +585,8 @@ func unInstallPHPExtension(runtime *model.Runtime, delExtensions []string) error
 		for _, del := range delExtensions {
 			if ext.Name == del {
 				delMap[ext.Check] = struct{}{}
-				_ = fileOP.DeleteFile(path.Join(dir, "extensions", ext.File))
+				detail, _ := appDetailRepo.GetFirst(repo.WithByID(runtime.AppDetailID))
+				_ = fileOP.DeleteFile(path.Join(dir, "extensions", getExtensionDir(detail.Version), ext.File))
 				_ = fileOP.DeleteFile(path.Join(dir, "conf", "conf.d", "docker-php-ext-"+ext.Check+".ini"))
 				_ = removePHPIniExt(path.Join(dir, "conf", "php.ini"), ext.File)
 				break
@@ -742,4 +743,41 @@ func checkRuntimePortExist(port int, scanPort bool, runtimeID uint) error {
 		return buserr.WithDetail("ErrPortInUsed", port, nil)
 	}
 	return nil
+}
+
+func getExtensionDir(version string) string {
+	if strings.HasPrefix(version, "8.4") {
+		return "no-debug-non-zts-20240924"
+	}
+	if strings.HasPrefix(version, "8.3") {
+		return "no-debug-non-zts-20230831"
+	}
+	if strings.HasPrefix(version, "8.2") {
+		return "no-debug-non-zts-20220829"
+	}
+	if strings.HasPrefix(version, "8.1") {
+		return "no-debug-non-zts-20210902"
+	}
+	if strings.HasPrefix(version, "8.0") {
+		return "no-debug-non-zts-20200930"
+	}
+	if strings.HasPrefix(version, "7.4") {
+		return "no-debug-non-zts-20190902"
+	}
+	if strings.HasPrefix(version, "7.3") {
+		return "no-debug-non-zts-20180731"
+	}
+	if strings.HasPrefix(version, "7.2") {
+		return "no-debug-non-zts-20170718"
+	}
+	if strings.HasPrefix(version, "7.1") {
+		return "no-debug-non-zts-20160303"
+	}
+	if strings.HasPrefix(version, "7.0") {
+		return "no-debug-non-zts-20151012"
+	}
+	if strings.HasPrefix(version, "5.6") {
+		return "no-debug-non-zts-20131226"
+	}
+	return ""
 }

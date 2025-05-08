@@ -2936,6 +2936,7 @@ const message = {
             gatewayTimeout: 'ゲートウェイタイムアウト (504)',
             belongToIpGroup: 'IP グループに属しています',
             notBelongToIpGroup: 'IP グループに属していません',
+            unknownWebsiteKey: '未知のドメイン',
         },
         monitor: {
             name: 'ウェブサイトモニタリング',

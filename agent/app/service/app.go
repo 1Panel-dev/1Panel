@@ -355,7 +355,7 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 			}
 		}
 	}
-	if app.Key == "openresty" && app.Resource == "remote" && common.CompareVersion(appDetail.Version, "1.27") {
+	if app.Key == "openresty" && (app.Resource == "remote" || app.Resource == "custom") && common.CompareVersion(appDetail.Version, "1.27") {
 		if dir, ok := req.Params["WEBSITE_DIR"]; ok {
 			siteDir := dir.(string)
 			if siteDir == "" || !strings.HasPrefix(siteDir, "/") {
