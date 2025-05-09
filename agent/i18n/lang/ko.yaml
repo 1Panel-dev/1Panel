@@ -192,11 +192,13 @@ ErrConfigAlreadyExist: '같은 이름의 구성 파일이 이미 존재합니다
 ErrUserFindErr: '사용자 {{ .name }} 검색에 실패했습니다 {{ .err }}'
 
 #크론잡
-ErrCutWebsiteLog: '{{ .name }} 웹사이트 로그 잘라내기에 실패했습니다. 오류 {{ .err }}'
 CutWebsiteLogSuccess: '{{ .name }} 웹사이트 로그가 성공적으로 잘렸습니다. 백업 경로 {{ .path }}'
 HandleShell: '스크립트 {{ .name }} 실행'
 HandleNtpSync: '시스템 시간 동기화'
 HandleSystemClean: '시스템 캐시 정리'
+SystemLog: '시스템 로그'
+CutWebsiteLog: '웹사이트 로그 회전'
+FileOrDir: '디렉터리 / 파일'
 
 #도구상자
 ErrNotExistUser: '현재 사용자가 존재하지 않습니다. 수정한 후 다시 시도하세요!'

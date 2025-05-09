@@ -742,7 +742,7 @@ func (f FileOp) TarGzCompressPro(withDir bool, src, dst, secret, exclusionRules 
 		itemPrefix = ""
 	}
 	if len(secret) != 0 {
-		commands = fmt.Sprintf("tar --warning=no-file-changed --ignore-failed-read --exclude-from=<(find %s -type s -printf '%s' | sed 's|^|%s/|') -zcf - %s | openssl enc -aes-256-cbc -salt -k '%s' -out %s", src, "%P\n", itemPrefix, srcItem, secret, dst)
+		commands = fmt.Sprintf("tar --warning=no-file-changed --ignore-failed-read %s --exclude-from=<(find %s -type s -printf '%s' | sed 's|^|%s/|') -zcf - %s | openssl enc -aes-256-cbc -salt -k '%s' -out %s", exStr, src, "%P\n", itemPrefix, srcItem, secret, dst)
 		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" %s ", secret), "******"))
 	} else {
 		commands = fmt.Sprintf("tar --warning=no-file-changed --ignore-failed-read --exclude-from=<(find %s -type s -printf '%s' | sed 's|^|%s/|') -zcf %s %s %s", src, "%P\n", itemPrefix, dst, exStr, srcItem)

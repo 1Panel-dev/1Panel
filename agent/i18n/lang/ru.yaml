@@ -192,11 +192,13 @@ ErrConfigAlreadyExist: 'Файл конфигурации с таким имен
 ErrUserFindErr: 'Поиск пользователя {{ .name }} не удался {{ .err }}'
 
 #cronjob
-ErrCutWebsiteLog: '{{ .name }} не удалось вырезать журнал веб-сайта, ошибка {{ .err }}'
 CutWebsiteLogSuccess: 'Журнал веб-сайта {{ .name }} успешно вырезан, путь к резервной копии {{ .path }}'
 HandleShell: 'Выполнить скрипт {{ .name }}'
 HandleNtpSync: 'Синхронизация системного времени'
 HandleSystemClean: 'Очистка системного кэша'
+SystemLog: 'Системный лог'
+CutWebsiteLog: 'Ротация логов сайта'
+FileOrDir: 'Каталог / Файл'
 
 #ящик для инструментов
 ErrNotExistUser: 'Текущий пользователь не существует, измените его и повторите попытку!'

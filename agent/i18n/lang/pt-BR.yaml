@@ -192,11 +192,13 @@ ErrConfigAlreadyExist: 'Um arquivo de configuração com o mesmo nome já existe
 ErrUserFindErr: 'Falha na pesquisa do usuário {{ .name }} {{ .err }}'
 
 #cronjob
-ErrCutWebsiteLog: '{{ .name }} falha ao cortar o log do site, erro {{ .err }}'
 CutWebsiteLogSuccess: '{{ .name }} registro do site cortado com sucesso, caminho de backup {{ .path }}'
 HandleShell: 'Executar script {{ .name }}'
 HandleNtpSync: 'Sincronização de hora do sistema'
 HandleSystemClean: 'Limpeza de cache do sistema'
+SystemLog: 'Log do Sistema'
+CutWebsiteLog: 'Rotacionar Log do Website'
+FileOrDir: 'Diretório / Arquivo'
 
 #caixa de ferramentas
 ErrNotExistUser: 'O usuário atual não existe, modifique e tente novamente!'

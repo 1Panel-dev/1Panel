@@ -191,11 +191,13 @@ ErrConfigAlreadyExist: "已存在同名配置文件"
 ErrUserFindErr: "用户 {{ .name }} 查找失败 {{ .err }}"
 
 #cronjob
-ErrCutWebsiteLog: "{{ .name }} 网站日志切割失败，错误 {{ .err }}"
 CutWebsiteLogSuccess: "{{ .name }} 网站日志切割成功，备份路径 {{ .path }}"
 HandleShell: "执行脚本 {{ .name }}"
 HandleNtpSync: "系统时间同步"
 HandleSystemClean: "系统缓存清理"
+SystemLog: "系统日志"
+CutWebsiteLog: "切割网站日志"
+FileOrDir: "目录 / 文件"
 
 #toolbox
 ErrNotExistUser: "当前用户不存在，请修改后重试！"

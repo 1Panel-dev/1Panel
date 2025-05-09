@@ -192,11 +192,13 @@ ErrConfigAlreadyExist: 'Fail konfigurasi dengan nama yang sama sudah wujud'
 ErrUserFindErr: 'Pengguna {{ .name }} carian gagal {{ .err }}'
 
 #cronjob
-ErrCutWebsiteLog: '{{ .name }} pemotongan log tapak web gagal, ralat {{ .err }}'
 CutWebsiteLogSuccess: '{{ .name }} log tapak web berjaya dipotong, laluan sandaran {{ .path }}'
 HandleShell: 'Laksanakan skrip {{ .name }}'
 HandleNtpSync: 'Penyegerakan masa sistem'
 HandleSystemClean: 'Pembersihan cache sistem'
+SystemLog: 'Log Sistem'
+CutWebsiteLog: 'Putar Log Laman Web'
+FileOrDir: 'Direktori / Fail'
 
 #kotak alat
 ErrNotExistUser: 'Pengguna semasa tidak wujud, sila ubah suai dan cuba lagi!'

@@ -192,11 +192,13 @@ ErrConfigAlreadyExist: 'A configuration file with the same name already exists'
 ErrUserFindErr: 'User {{ .name }} search failed {{ .err }}'
 
 #cronjob
-ErrCutWebsiteLog: '{{ .name }} website log cutting failed, error {{ .err }}'
 CutWebsiteLogSuccess: '{{ .name }} website log cut successfully, backup path {{ .path }}'
 HandleShell: 'Execute script {{ .name }}'
 HandleNtpSync: 'System time synchronization'
 HandleSystemClean: 'System cache cleanup'
+SystemLog: 'System Log'
+CutWebsiteLog: 'Rotate Website Log'
+FileOrDir: 'Directory / File'
 
 #toolbox
 ErrNotExistUser: 'The current user does not exist, please modify and try again!'

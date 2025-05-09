@@ -215,79 +215,80 @@ func handleWebsiteBackup(website *model.Website, parentTask *task.Task, backupDi
 			return err
 		}
 	}
-
-	backupWebsite := func(t *task.Task) error {
-		fileOp := files.NewFileOp()
-		tmpDir := fmt.Sprintf("%s/%s", backupDir, strings.ReplaceAll(fileName, ".tar.gz", ""))
-		if !fileOp.Stat(tmpDir) {
-			if err := os.MkdirAll(tmpDir, os.ModePerm); err != nil {
-				return fmt.Errorf("mkdir %s failed, err: %v", backupDir, err)
-			}
-		}
-		defer func() {
-			_ = os.RemoveAll(tmpDir)
-		}()
-
-		remarkInfo, _ := json.Marshal(website)
-		if err = fileOp.SaveFile(tmpDir+"/website.json", string(remarkInfo), fs.ModePerm); err != nil {
-			return err
-		}
-		nginxConfFile := GetSitePath(*website, SiteConf)
-		if err = fileOp.CopyFile(nginxConfFile, tmpDir); err != nil {
-			return err
-		}
-		t.Log(i18n.GetMsgByKey("BackupNginxConfig"))
-
-		switch website.Type {
-		case constant.Deployment:
-			app, err := appInstallRepo.GetFirst(repo.WithByID(website.AppInstallID))
-			if err != nil {
-				return err
-			}
-			t.LogStart(task.GetTaskName(app.Name, task.TaskBackup, task.TaskScopeApp))
-			if err = handleAppBackup(&app, backupTask, tmpDir, fmt.Sprintf("%s.app.tar.gz", website.Alias), excludes, "", ""); err != nil {
-				return err
-			}
-			t.LogSuccess(task.GetTaskName(app.Name, task.TaskBackup, task.TaskScopeApp))
-		case constant.Runtime:
-			runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(website.RuntimeID))
-			if err != nil {
-				return err
-			}
-			t.LogStart(task.GetTaskName(runtime.Name, task.TaskBackup, task.TaskScopeRuntime))
-			if err = handleRuntimeBackup(runtime, tmpDir, fmt.Sprintf("%s.runtime.tar.gz", website.Alias), excludes, ""); err != nil {
-				return err
-			}
-			t.LogSuccess(task.GetTaskName(runtime.Name, task.TaskBackup, task.TaskScopeRuntime))
-			if website.DbID > 0 {
-				if err = backupDatabaseWithTask(t, website.DbType, tmpDir, website.Alias, website.DbID); err != nil {
-					return err
-				}
-			}
-		case constant.Static:
-			if website.DbID > 0 {
-				if err = backupDatabaseWithTask(t, website.DbType, tmpDir, website.Alias, website.DbID); err != nil {
-					return err
-				}
-			}
-		}
-
-		websiteDir := GetSitePath(*website, SiteDir)
-		t.LogStart(i18n.GetMsgByKey("CompressDir"))
-		if err = fileOp.TarGzCompressPro(true, websiteDir, path.Join(tmpDir, fmt.Sprintf("%s.web.tar.gz", website.Alias)), "", excludes); err != nil {
-			return err
-		}
-		if err = fileOp.TarGzCompressPro(true, tmpDir, path.Join(backupDir, fileName), secret, ""); err != nil {
-			return err
-		}
-		t.Log(i18n.GetWithName("CompressFileSuccess", fileName))
-		return nil
-	}
-	backupTask.AddSubTask(task.GetTaskName(website.Alias, task.TaskBackup, task.TaskScopeApp), backupWebsite, nil)
+	itemHandler := doWebsiteBackup(website, backupTask, backupDir, fileName, excludes, secret)
+	backupTask.AddSubTask(task.GetTaskName(website.Alias, task.TaskBackup, task.TaskScopeApp), func(task *task.Task) error { return itemHandler }, nil)
 	if parentTask != nil {
-		return backupWebsite(parentTask)
+		return itemHandler
 	}
 	return backupTask.Execute()
+}
+
+func doWebsiteBackup(website *model.Website, parentTask *task.Task, backupDir, fileName, excludes, secret string) error {
+	fileOp := files.NewFileOp()
+	tmpDir := fmt.Sprintf("%s/%s", backupDir, strings.ReplaceAll(fileName, ".tar.gz", ""))
+	if !fileOp.Stat(tmpDir) {
+		if err := os.MkdirAll(tmpDir, os.ModePerm); err != nil {
+			return fmt.Errorf("mkdir %s failed, err: %v", backupDir, err)
+		}
+	}
+	defer func() {
+		_ = os.RemoveAll(tmpDir)
+	}()
+
+	remarkInfo, _ := json.Marshal(website)
+	if err := fileOp.SaveFile(tmpDir+"/website.json", string(remarkInfo), fs.ModePerm); err != nil {
+		return err
+	}
+	nginxConfFile := GetSitePath(*website, SiteConf)
+	if err := fileOp.CopyFile(nginxConfFile, tmpDir); err != nil {
+		return err
+	}
+	parentTask.Log(i18n.GetMsgByKey("BackupNginxConfig"))
+
+	switch website.Type {
+	case constant.Deployment:
+		app, err := appInstallRepo.GetFirst(repo.WithByID(website.AppInstallID))
+		if err != nil {
+			return err
+		}
+		parentTask.LogStart(task.GetTaskName(app.Name, task.TaskBackup, task.TaskScopeApp))
+		if err = handleAppBackup(&app, parentTask, tmpDir, fmt.Sprintf("%s.app.tar.gz", website.Alias), excludes, "", ""); err != nil {
+			return err
+		}
+		parentTask.LogSuccess(task.GetTaskName(app.Name, task.TaskBackup, task.TaskScopeApp))
+	case constant.Runtime:
+		runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(website.RuntimeID))
+		if err != nil {
+			return err
+		}
+		parentTask.LogStart(task.GetTaskName(runtime.Name, task.TaskBackup, task.TaskScopeRuntime))
+		if err = handleRuntimeBackup(runtime, tmpDir, fmt.Sprintf("%s.runtime.tar.gz", website.Alias), excludes, ""); err != nil {
+			return err
+		}
+		parentTask.LogSuccess(task.GetTaskName(runtime.Name, task.TaskBackup, task.TaskScopeRuntime))
+		if website.DbID > 0 {
+			if err = backupDatabaseWithTask(parentTask, website.DbType, tmpDir, website.Alias, website.DbID); err != nil {
+				return err
+			}
+		}
+	case constant.Static:
+		if website.DbID > 0 {
+			if err := backupDatabaseWithTask(parentTask, website.DbType, tmpDir, website.Alias, website.DbID); err != nil {
+				return err
+			}
+		}
+	}
+
+	websiteDir := GetSitePath(*website, SiteDir)
+	parentTask.LogStart(i18n.GetMsgByKey("CompressDir"))
+	if err := fileOp.TarGzCompressPro(true, websiteDir, path.Join(tmpDir, fmt.Sprintf("%s.web.tar.gz", website.Alias)), "", excludes); err != nil {
+		return err
+	}
+	if err := fileOp.TarGzCompressPro(true, tmpDir, path.Join(backupDir, fileName), secret, ""); err != nil {
+		return err
+	}
+	parentTask.Log(i18n.GetWithName("CompressFileSuccess", fileName))
+	return nil
 }
 
 func checkValidOfWebsite(oldWebsite, website *model.Website) error {

@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -30,7 +31,7 @@ type SnapshotService struct {
 type ISnapshotService interface {
 	SearchWithPage(req dto.PageSnapshot) (int64, interface{}, error)
 	LoadSnapshotData() (dto.SnapshotData, error)
-	SnapshotCreate(req dto.SnapshotCreate, jobID uint) error
+	SnapshotCreate(parentTask *task.Task, req dto.SnapshotCreate, jobID, retry, timeout uint) error
 	SnapshotReCreate(id uint) error
 	SnapshotRecover(req dto.SnapshotRecover) error
 	SnapshotRollback(req dto.SnapshotRecover) error

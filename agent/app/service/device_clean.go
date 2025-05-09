@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/constant"
-	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
@@ -301,8 +300,8 @@ func (u *DeviceService) Clean(req []dto.Clean) {
 	}
 }
 
-func systemClean(taskItem *task.Task) error {
-	taskItem.AddSubTask(i18n.GetMsgByKey("HandleSystemClean"), func(t *task.Task) error {
+func doSystemClean(taskItem *task.Task) func(t *task.Task) error {
+	return func(t *task.Task) error {
 		size := int64(0)
 		fileCount := 0
 		dropWithTask(path.Join(global.Dir.BaseDir, "1panel_original"), taskItem, &size, &fileCount)
@@ -363,8 +362,7 @@ func systemClean(taskItem *task.Task) error {
 		_ = settingRepo.Update("LastCleanData", fmt.Sprintf("%v", fileCount))
 
 		return nil
-	}, nil)
-	return taskItem.Execute()
+	}
 }
 
 func loadSnapshotTree(fileOp fileUtils.FileOp) []dto.CleanTree {

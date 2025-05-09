@@ -192,11 +192,13 @@ ErrConfigAlreadyExist: '已存在同名設定檔'
 ErrUserFindErr: '使用者{{ .name }} 尋找失敗{{ .err }}'
 
 #cronjob
-ErrCutWebsiteLog: '{{ .name }} 網站日誌切割失敗，錯誤{{ .err }}'
 CutWebsiteLogSuccess: '{{ .name }} 網站日誌切割成功，備份路徑{{ .path }}'
 HandleShell: '執行腳本{{ .name }}'
 HandleNtpSync: '系統時間同步'
 HandleSystemClean: '系統快取清理'
+SystemLog: '系統日誌'
+CutWebsiteLog: '切割網站日誌'
+FileOrDir: '目錄 / 檔案'
 
 #toolbox
 ErrNotExistUser: '目前使用者不存在，請修改後重試！'

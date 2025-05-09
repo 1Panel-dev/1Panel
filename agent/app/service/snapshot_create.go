@@ -26,7 +26,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate, jobID uint) error {
+func (u *SnapshotService) SnapshotCreate(parentTask *task.Task, req dto.SnapshotCreate, jobID, retry, timeout uint) error {
 	versionItem, _ := settingRepo.Get(settingRepo.WithByKey("SystemVersion"))
 
 	scope := "core"
@@ -65,19 +65,23 @@ func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate, jobID uint) err
 	}
 
 	req.ID = snap.ID
-	taskItem, err := task.NewTaskWithOps(req.Name, task.TaskCreate, task.TaskScopeSnapshot, req.TaskID, req.ID)
-	if err != nil {
-		global.LOG.Errorf("new task for create snapshot failed, err: %v", err)
-		return err
+	var err error
+	taskItem := parentTask
+	if parentTask == nil {
+		taskItem, err = task.NewTaskWithOps(req.Name, task.TaskCreate, task.TaskScopeSnapshot, req.TaskID, req.ID)
+		if err != nil {
+			global.LOG.Errorf("new task for create snapshot failed, err: %v", err)
+			return err
+		}
 	}
 	if jobID == 0 {
 		go func() {
-			_ = handleSnapshot(req, taskItem, jobID)
+			_ = handleSnapshot(req, taskItem, jobID, 0, 0)
 		}()
 		return nil
 	}
 
-	return handleSnapshot(req, taskItem, jobID)
+	return handleSnapshot(req, taskItem, jobID, retry, timeout)
 }
 
 func (u *SnapshotService) SnapshotReCreate(id uint) error {
@@ -108,20 +112,23 @@ func (u *SnapshotService) SnapshotReCreate(id uint) error {
 		return err
 	}
 	go func() {
-		_ = handleSnapshot(req, taskItem, 0)
+		_ = handleSnapshot(req, taskItem, 0, 0, 0)
 	}()
 
 	return nil
 }
 
-func handleSnapshot(req dto.SnapshotCreate, taskItem *task.Task, jobID uint) error {
+func handleSnapshot(req dto.SnapshotCreate, taskItem *task.Task, jobID, retry, timeout uint) error {
 	rootDir := path.Join(global.Dir.TmpDir, "system", req.Name)
 	openrestyDir, _ := settingRepo.GetValueByKey("WEBSITE_DIR")
 	itemHelper := snapHelper{SnapID: req.ID, Task: *taskItem, FileOp: files.NewFileOp(), Ctx: context.Background(), OpenrestyDir: openrestyDir}
 	baseDir := path.Join(rootDir, "base")
 	_ = os.MkdirAll(baseDir, os.ModePerm)
 
-	taskItem.AddSubTaskWithAlias(
+	if timeout == 0 {
+		timeout = 1800
+	}
+	taskItem.AddSubTaskWithAliasAndOps(
 		"SnapDBInfo",
 		func(t *task.Task) error {
 			if err := loadDbConn(&itemHelper, rootDir, req); err != nil {
@@ -132,68 +139,65 @@ func handleSnapshot(req dto.SnapshotCreate, taskItem *task.Task, jobID uint) err
 				_ = itemHelper.snapAgentDB.Where("id = ?", jobID).Delete(&model.JobRecords{}).Error
 			}
 			return nil
-		},
-		nil,
+		}, nil, int(retry), time.Duration(timeout)*time.Second,
 	)
 
 	if len(req.InterruptStep) == 0 || req.InterruptStep == "SnapBaseInfo" {
-		taskItem.AddSubTaskWithAlias(
+		taskItem.AddSubTaskWithAliasAndOps(
 			"SnapBaseInfo",
 			func(t *task.Task) error { return snapBaseData(itemHelper, baseDir) },
-			nil,
+			nil, int(retry), time.Duration(timeout)*time.Second,
 		)
 		req.InterruptStep = ""
 	}
 	if len(req.InterruptStep) == 0 || req.InterruptStep == "SnapInstallApp" {
-		taskItem.AddSubTaskWithAlias(
+		taskItem.AddSubTaskWithAliasAndOps(
 			"SnapInstallApp",
 			func(t *task.Task) error { return snapAppImage(itemHelper, req, rootDir) },
-			nil,
+			nil, int(retry), time.Duration(timeout)*time.Second,
 		)
 		req.InterruptStep = ""
 	}
 	if len(req.InterruptStep) == 0 || req.InterruptStep == "SnapLocalBackup" {
-		taskItem.AddSubTaskWithAlias(
+		taskItem.AddSubTaskWithAliasAndOps(
 			"SnapLocalBackup",
 			func(t *task.Task) error { return snapBackupData(itemHelper, req, rootDir) },
-			nil,
+			nil, int(retry), time.Duration(timeout)*time.Second,
 		)
 		req.InterruptStep = ""
 	}
 	if len(req.InterruptStep) == 0 || req.InterruptStep == "SnapPanelData" {
-		taskItem.AddSubTaskWithAlias(
+		taskItem.AddSubTaskWithAliasAndOps(
 			"SnapPanelData",
 			func(t *task.Task) error { return snapPanelData(itemHelper, req, rootDir) },
-			nil,
+			nil, int(retry), time.Duration(timeout)*time.Second,
 		)
 		req.InterruptStep = ""
 	}
 
-	taskItem.AddSubTaskWithAlias(
+	taskItem.AddSubTaskWithAliasAndOps(
 		"SnapCloseDBConn",
 		func(t *task.Task) error {
 			taskItem.Log("---------------------- 6 / 8 ----------------------")
 			common.CloseDB(itemHelper.snapAgentDB)
 			common.CloseDB(itemHelper.snapCoreDB)
 			return nil
-		},
-		nil,
+		}, nil, int(retry), time.Duration(timeout)*time.Second,
 	)
 	if len(req.InterruptStep) == 0 || req.InterruptStep == "SnapCompress" {
-		taskItem.AddSubTaskWithAlias(
+		taskItem.AddSubTaskWithAliasAndOps(
 			"SnapCompress",
 			func(t *task.Task) error { return snapCompress(itemHelper, rootDir, req.Secret) },
-			nil,
+			nil, int(retry), time.Duration(timeout)*time.Second,
 		)
 		req.InterruptStep = ""
 	}
 	if len(req.InterruptStep) == 0 || req.InterruptStep == "SnapUpload" {
-		taskItem.AddSubTaskWithAlias(
+		taskItem.AddSubTaskWithAliasAndOps(
 			"SnapUpload",
 			func(t *task.Task) error {
 				return snapUpload(itemHelper, req.SourceAccountIDs, fmt.Sprintf("%s.tar.gz", rootDir))
-			},
-			nil,
+			}, nil, int(retry), time.Duration(timeout)*time.Second,
 		)
 		req.InterruptStep = ""
 	}

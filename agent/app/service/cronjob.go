@@ -1,7 +1,6 @@
 package service
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -460,25 +459,4 @@ func (u *CronjobService) AddCronJob(cronjob *model.Cronjob) (int, error) {
 	}
 	global.LOG.Infof("start cronjob entryID: %d", entryID)
 	return int(entryID), nil
-}
-
-func mkdirAndWriteFile(cronjob *model.Cronjob, startTime time.Time, msg []byte) (string, error) {
-	dir := fmt.Sprintf("%s/task/%s/%s", global.Dir.DataDir, cronjob.Type, cronjob.Name)
-	if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
-		if err = os.MkdirAll(dir, os.ModePerm); err != nil {
-			return "", err
-		}
-	}
-
-	path := fmt.Sprintf("%s/%s.log", dir, startTime.Format(constant.DateTimeSlimLayout))
-	global.LOG.Infof("cronjob %s has generated some logs %s", cronjob.Name, path)
-	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE, constant.FilePerm)
-	if err != nil {
-		return "", err
-	}
-	defer file.Close()
-	write := bufio.NewWriter(file)
-	_, _ = write.WriteString(string(msg))
-	write.Flush()
-	return path, nil
 }

@@ -147,9 +147,7 @@ func (u *CronjobRepo) StartRecords(cronjobID uint, targetPath, cronjobType strin
 	var record model.JobRecords
 	record.StartTime = time.Now()
 	record.CronjobID = cronjobID
-	if cronjobType != "directory" && cronjobType != "log" && cronjobType != "cutWebsiteLog" {
-		record.TaskID = uuid.New().String()
-	}
+	record.TaskID = uuid.New().String()
 	record.Status = constant.StatusWaiting
 	if err := global.DB.Create(&record).Error; err != nil {
 		global.LOG.Errorf("create record status failed, err: %v", err)

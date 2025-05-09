@@ -106,46 +106,28 @@ func (u *BackupService) MysqlRecoverByUpload(req dto.CommonRecover) error {
 
 func handleMysqlBackup(db DatabaseHelper, parentTask *task.Task, targetDir, fileName, taskID string) error {
 	var (
-		err      error
-		itemTask *task.Task
+		err        error
+		backupTask *task.Task
 	)
-	itemTask = parentTask
+	backupTask = parentTask
 	dbInfo, err := mysqlRepo.Get(repo.WithByName(db.Name), mysqlRepo.WithByMysqlName(db.Database))
 	if err != nil {
 		return err
 	}
 	itemName := fmt.Sprintf("%s[%s] - %s", db.Database, db.DBType, db.Name)
 	if parentTask == nil {
-		itemTask, err = task.NewTaskWithOps(itemName, task.TaskBackup, task.TaskScopeDatabase, taskID, dbInfo.ID)
+		backupTask, err = task.NewTaskWithOps(itemName, task.TaskBackup, task.TaskScopeDatabase, taskID, dbInfo.ID)
 		if err != nil {
 			return err
 		}
 	}
 
-	backupDatabase := func(t *task.Task) error {
-		cli, version, err := LoadMysqlClientByFrom(db.Database)
-		if err != nil {
-			return err
-		}
-		backupInfo := client.BackupInfo{
-			Name:      db.Name,
-			Type:      db.DBType,
-			Version:   version,
-			Format:    dbInfo.Format,
-			TargetDir: targetDir,
-			FileName:  fileName,
-
-			Timeout: 300,
-		}
-		return cli.Backup(backupInfo)
-	}
-
-	itemTask.AddSubTask(i18n.GetMsgByKey("TaskBackup"), backupDatabase, nil)
+	itemHandler := doMysqlBackup(db, targetDir, fileName)
+	backupTask.AddSubTask(task.GetTaskName(itemName, task.TaskBackup, task.TaskScopeApp), func(t *task.Task) error { return itemHandler }, nil)
 	if parentTask != nil {
-		return backupDatabase(parentTask)
+		return itemHandler
 	}
-
-	return itemTask.Execute()
+	return backupTask.Execute()
 }
 
 func handleMysqlRecover(req dto.CommonRecover, parentTask *task.Task, isRollback bool, taskID string) error {
@@ -238,4 +220,26 @@ func handleMysqlRecover(req dto.CommonRecover, parentTask *task.Task, isRollback
 	}
 
 	return itemTask.Execute()
+}
+
+func doMysqlBackup(db DatabaseHelper, targetDir, fileName string) error {
+	dbInfo, err := mysqlRepo.Get(repo.WithByName(db.Name), mysqlRepo.WithByMysqlName(db.Database))
+	if err != nil {
+		return err
+	}
+	cli, version, err := LoadMysqlClientByFrom(db.Database)
+	if err != nil {
+		return err
+	}
+	backupInfo := client.BackupInfo{
+		Name:      db.Name,
+		Type:      db.DBType,
+		Version:   version,
+		Format:    dbInfo.Format,
+		TargetDir: targetDir,
+		FileName:  fileName,
+
+		Timeout: 300,
+	}
+	return cli.Backup(backupInfo)
 }

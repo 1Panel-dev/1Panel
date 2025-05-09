@@ -192,11 +192,13 @@ ErrConfigAlreadyExist: '同じ名前の設定ファイルがすでに存在し�
 ErrUserFindErr: 'ユーザー {{ .name }} の検索に失敗しました {{ .err }}'
 
 #cronjob
-ErrCutWebsiteLog: '{{ .name }} ウェブサイトのログの切り取りに失敗しました。エラー {{ .err }}'
 CutWebsiteLogSuccess: '{{ .name }} ウェブサイトのログが正常にカットされました。バックアップ パス {{ .path }}'
 HandleShell: 'スクリプト {{ .name }} を実行します'
 HandleNtpSync: 'システム時刻の同期'
 HandleSystemClean: 'システム キャッシュのクリーンアップ'
+SystemLog: 'システムログ'
+CutWebsiteLog: 'ウェブサイトログのローテーション'
+FileOrDir: 'ディレクトリ / ファイル'
 
 #toolbox
 ErrNotExistUser: '現在のユーザーは存在しません。変更してもう一度お試しください。'

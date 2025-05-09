@@ -3,6 +3,7 @@ package task
 import (
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -156,6 +157,11 @@ func (t *Task) AddSubTaskWithOps(name string, action ActionFunc, rollback Rollba
 	t.SubTasks = append(t.SubTasks, subTask)
 }
 
+func (t *Task) AddSubTaskWithAliasAndOps(key string, action ActionFunc, rollback RollbackFunc, retry int, timeout time.Duration) {
+	subTask := &SubTask{RootTask: t, Name: i18n.GetMsgByKey(key), Retry: retry, Timeout: timeout, Action: action, Rollback: rollback}
+	t.SubTasks = append(t.SubTasks, subTask)
+}
+
 func (t *Task) AddSubTaskWithIgnoreErr(name string, action ActionFunc) {
 	subTask := &SubTask{RootTask: t, Name: name, Retry: 0, Timeout: 30 * time.Minute, Action: action, Rollback: nil, IgnoreErr: true}
 	t.SubTasks = append(t.SubTasks, subTask)
@@ -182,6 +188,7 @@ func (s *SubTask) Execute() error {
 		select {
 		case <-ctx.Done():
 			s.RootTask.Log(i18n.GetWithName("TaskTimeout", subTaskName))
+			err = errors.New("timeout!")
 		case err = <-done:
 			if err != nil {
 				s.RootTask.Log(i18n.GetWithNameAndErr("SubTaskFailed", subTaskName, err))

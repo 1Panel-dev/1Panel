@@ -106,38 +106,24 @@ func (u *BackupService) PostgresqlRecoverByUpload(req dto.CommonRecover) error {
 
 func handlePostgresqlBackup(db DatabaseHelper, parentTask *task.Task, targetDir, fileName, taskID string) error {
 	var (
-		err      error
-		itemTask *task.Task
+		err        error
+		backupTask *task.Task
 	)
-	itemTask = parentTask
+	backupTask = parentTask
 	itemName := fmt.Sprintf("%s - %s", db.Database, db.Name)
 	if parentTask == nil {
-		itemTask, err = task.NewTaskWithOps(itemName, task.TaskBackup, task.TaskScopeDatabase, taskID, db.ID)
+		backupTask, err = task.NewTaskWithOps(itemName, task.TaskBackup, task.TaskScopeDatabase, taskID, db.ID)
 		if err != nil {
 			return err
 		}
 	}
-	backupDatabase := func(t *task.Task) error {
-		cli, err := LoadPostgresqlClientByFrom(db.Database)
-		if err != nil {
-			return err
-		}
-		defer cli.Close()
-		backupInfo := pgclient.BackupInfo{
-			Name:      db.Name,
-			TargetDir: targetDir,
-			FileName:  fileName,
 
-			Timeout: 300,
-		}
-		return cli.Backup(backupInfo)
-	}
-	itemTask.AddSubTask(i18n.GetMsgByKey("TaskBackup"), backupDatabase, nil)
+	itemHandler := doPostgresqlgBackup(db, targetDir, fileName)
+	backupTask.AddSubTask(task.GetTaskName(itemName, task.TaskBackup, task.TaskScopeApp), func(task *task.Task) error { return itemHandler }, nil)
 	if parentTask != nil {
-		return backupDatabase(parentTask)
+		return itemHandler
 	}
-
-	return itemTask.Execute()
+	return backupTask.Execute()
 }
 
 func handlePostgresqlRecover(req dto.CommonRecover, parentTask *task.Task, isRollback bool) error {
@@ -218,4 +204,20 @@ func handlePostgresqlRecover(req dto.CommonRecover, parentTask *task.Task, isRol
 	}
 
 	return itemTask.Execute()
+}
+
+func doPostgresqlgBackup(db DatabaseHelper, targetDir, fileName string) error {
+	cli, err := LoadPostgresqlClientByFrom(db.Database)
+	if err != nil {
+		return err
+	}
+	defer cli.Close()
+	backupInfo := pgclient.BackupInfo{
+		Name:      db.Name,
+		TargetDir: targetDir,
+		FileName:  fileName,
+
+		Timeout: 300,
+	}
+	return cli.Backup(backupInfo)
 }

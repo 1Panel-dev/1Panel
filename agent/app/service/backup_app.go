@@ -143,45 +143,10 @@ func handleAppBackup(install *model.AppInstall, parentTask *task.Task, backupDir
 		}
 	}
 
-	backupApp := func(t *task.Task) error {
-		fileOp := files.NewFileOp()
-		tmpDir := fmt.Sprintf("%s/%s", backupDir, strings.ReplaceAll(fileName, ".tar.gz", ""))
-		if !fileOp.Stat(tmpDir) {
-			if err := os.MkdirAll(tmpDir, os.ModePerm); err != nil {
-				return fmt.Errorf("mkdir %s failed, err: %v", backupDir, err)
-			}
-		}
-		defer func() {
-			_ = os.RemoveAll(tmpDir)
-		}()
-
-		remarkInfo, _ := json.Marshal(install)
-		remarkInfoPath := fmt.Sprintf("%s/app.json", tmpDir)
-		if err := fileOp.SaveFile(remarkInfoPath, string(remarkInfo), fs.ModePerm); err != nil {
-			return err
-		}
-
-		appPath := install.GetPath()
-		if err := fileOp.TarGzCompressPro(true, appPath, path.Join(tmpDir, "app.tar.gz"), "", excludes); err != nil {
-			return err
-		}
-
-		resources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithAppInstallId(install.ID))
-		for _, resource := range resources {
-			if err = backupDatabaseWithTask(t, resource.Key, tmpDir, install.Name, resource.ResourceId); err != nil {
-				return err
-			}
-		}
-		t.LogStart(i18n.GetMsgByKey("CompressDir"))
-		if err := fileOp.TarGzCompressPro(true, tmpDir, path.Join(backupDir, fileName), secret, ""); err != nil {
-			return err
-		}
-		t.Log(i18n.GetWithName("CompressFileSuccess", fileName))
-		return nil
-	}
-	backupTask.AddSubTask(task.GetTaskName(install.Name, task.TaskBackup, task.TaskScopeApp), backupApp, nil)
+	itemHandler := doAppBackup(install, backupTask, backupDir, fileName, excludes, secret)
+	backupTask.AddSubTask(task.GetTaskName(install.Name, task.TaskBackup, task.TaskScopeApp), func(t *task.Task) error { return itemHandler }, nil)
 	if parentTask != nil {
-		return backupApp(parentTask)
+		return itemHandler
 	}
 	return backupTask.Execute()
 }
@@ -365,6 +330,43 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 		return recoverApp(parentTask)
 	}
 	return recoverTask.Execute()
+}
+
+func doAppBackup(install *model.AppInstall, parentTask *task.Task, backupDir, fileName, excludes, secret string) error {
+	fileOp := files.NewFileOp()
+	tmpDir := fmt.Sprintf("%s/%s", backupDir, strings.ReplaceAll(fileName, ".tar.gz", ""))
+	if !fileOp.Stat(tmpDir) {
+		if err := os.MkdirAll(tmpDir, os.ModePerm); err != nil {
+			return fmt.Errorf("mkdir %s failed, err: %v", backupDir, err)
+		}
+	}
+	defer func() {
+		_ = os.RemoveAll(tmpDir)
+	}()
+
+	remarkInfo, _ := json.Marshal(install)
+	remarkInfoPath := fmt.Sprintf("%s/app.json", tmpDir)
+	if err := fileOp.SaveFile(remarkInfoPath, string(remarkInfo), fs.ModePerm); err != nil {
+		return err
+	}
+
+	appPath := install.GetPath()
+	if err := fileOp.TarGzCompressPro(true, appPath, path.Join(tmpDir, "app.tar.gz"), "", excludes); err != nil {
+		return err
+	}
+
+	resources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithAppInstallId(install.ID))
+	for _, resource := range resources {
+		if err := backupDatabaseWithTask(parentTask, resource.Key, tmpDir, install.Name, resource.ResourceId); err != nil {
+			return err
+		}
+	}
+	parentTask.LogStart(i18n.GetMsgByKey("CompressDir"))
+	if err := fileOp.TarGzCompressPro(true, tmpDir, path.Join(backupDir, fileName), secret, ""); err != nil {
+		return err
+	}
+	parentTask.Log(i18n.GetWithName("CompressFileSuccess", fileName))
+	return nil
 }
 
 func reCreateDB(dbID uint, database model.Database, oldEnv string) (*model.DatabaseMysql, map[string]interface{}, error) {
