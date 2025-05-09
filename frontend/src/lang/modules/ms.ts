@@ -1406,7 +1406,7 @@ const message = {
         clearRecycleBinHelper: 'Adakah anda mahu membersihkan tong kitar semula?',
         favorite: 'Kegemaran',
         removeFavorite: 'Buang daripada kegemaran?',
-        addFavorite: 'Tambah ke Kegemaran',
+        addFavorite: 'Tambah/Buang ke Kegemaran',
         clearList: 'Bersihkan senarai',
         deleteRecycleHelper: 'Adakah anda pasti mahu memadam fail berikut secara kekal?',
         typeErrOrEmpty: '[{0}] jenis fail salah atau folder kosong',

@@ -188,7 +188,7 @@
                         <el-button class="btn" @click="toTerminal">
                             {{ $t('menu.terminal') }}
                         </el-button>
-                        <el-popover placement="bottom" :width="200" trigger="hover" @before-enter="getFavoriates">
+                        <el-popover placement="bottom" :width="200" trigger="hover" @before-enter="getFavorites">
                             <template #reference>
                                 <el-button @click="openFavorite">
                                     {{ $t('file.favorite') }}
@@ -453,12 +453,12 @@
                         sortable
                     ></el-table-column>
                     <fu-table-operations
-                        :ellipsis="mobile ? 0 : 3"
+                        :ellipsis="mobile ? 0 : 2"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         :min-width="mobile ? 'auto' : 200"
                         :fixed="mobile ? false : 'right'"
-                        width="300"
+                        width="270"
                         fix
                     />
                 </ComplexTable>
@@ -850,10 +850,7 @@ const getPaths = (reqPath: string) => {
 
 const handleCreate = (command: string) => {
     fileCreate.path = req.path;
-    fileCreate.isDir = false;
-    if (command === 'dir') {
-        fileCreate.isDir = true;
-    }
+    fileCreate.isDir = command === 'dir';
     createRef.value.acceptParams(fileCreate);
 };
 
@@ -1063,6 +1060,12 @@ const openMove = (type: string) => {
     moveOpen.value = true;
 };
 
+const openMoveBtn = (type: string, item: File.File) => {
+    selects.value = [];
+    selects.value.push(item);
+    openMove(type);
+};
+
 const closeMove = () => {
     selects.value = [];
     tableRef.value.clearSelects();
@@ -1075,6 +1078,13 @@ const closeMove = () => {
 
 const openPaste = () => {
     fileMove.path = req.path;
+    moveRef.value.acceptParams(fileMove);
+};
+
+const openPasteBtn = (file: File.File) => {
+    if (file.isDir) {
+        fileMove.path = file.path;
+    }
     moveRef.value.acceptParams(fileMove);
 };
 
@@ -1131,7 +1141,7 @@ const remove = async (id: number) => {
     });
 };
 
-const getFavoriates = async () => {
+const getFavorites = async () => {
     try {
         const res = await searchFavorite(req);
         favorites.value = res.data.items;
@@ -1173,6 +1183,29 @@ const buttons = [
         },
     },
     {
+        label: i18n.global.t('commons.button.copy'),
+        click: (row: File.File) => openMoveBtn('copy', row),
+    },
+    {
+        label: i18n.global.t('file.move'),
+        click: (row: File.File) => openMoveBtn('cut', row),
+    },
+    {
+        label: i18n.global.t('file.paste'),
+        click: (row: File.File) => {
+            openPasteBtn(row);
+        },
+        disabled: () => {
+            return !moveOpen.value;
+        },
+    },
+    {
+        label: i18n.global.t('file.compress'),
+        click: (row: File.File) => {
+            openCompress([row]);
+        },
+    },
+    {
         label: i18n.global.t('file.deCompress'),
         click: openDeCompress,
         disabled: (row: File.File) => {
@@ -1186,22 +1219,8 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('file.compress'),
-        click: (row: File.File) => {
-            openCompress([row]);
-        },
-    },
-    {
         label: i18n.global.t('file.rename'),
         click: openRename,
-    },
-    {
-        label: i18n.global.t('file.copyDir'),
-        click: copyDir,
-    },
-    {
-        label: i18n.global.t('file.openWithVscode'),
-        click: openWithVSCode,
     },
     {
         label: i18n.global.t('commons.button.delete'),
@@ -1209,10 +1228,30 @@ const buttons = [
             return row.name == '.1panel_clash';
         },
         click: delFile,
+        divided: true,
+    },
+    {
+        label: i18n.global.t('file.copyDir'),
+        click: copyDir,
+    },
+    {
+        label: i18n.global.t('file.addFavorite'),
+        click: (row: File.File) => {
+            if (row.favoriteID > 0) {
+                remove(row.favoriteID);
+            } else {
+                addToFavorite(row);
+            }
+        },
+    },
+    {
+        label: i18n.global.t('file.openWithVscode'),
+        click: openWithVSCode,
     },
     {
         label: i18n.global.t('file.info'),
         click: openDetail,
+        divided: true,
     },
 ];
 
@@ -1245,11 +1284,9 @@ onMounted(() => {
         req.path = String(router.currentRoute.value.query.path);
         getPaths(req.path);
         globalStore.setLastFilePath(req.path);
-    } else {
-        if (globalStore.lastFilePath && globalStore.lastFilePath != '') {
-            req.path = globalStore.lastFilePath;
-            getPaths(req.path);
-        }
+    } else if (globalStore.lastFilePath && globalStore.lastFilePath != '') {
+        req.path = globalStore.lastFilePath;
+        getPaths(req.path);
     }
     pathWidth.value = pathRef.value.offsetWidth;
     search();
@@ -1310,7 +1347,7 @@ onBeforeUnmount(() => {
 }
 
 .favorite-item {
-    height: 50vh;
+    height: 30vh;
     overflow: auto;
 }
 

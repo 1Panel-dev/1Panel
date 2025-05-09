@@ -1,21 +1,25 @@
 <template>
-    <div :class="classObj" class="app-wrapper" v-loading="loading" :element-loading-text="loadingText" fullscreen>
+    <div
+        :class="classObj"
+        class="app-wrapper relative"
+        v-loading="loading"
+        :element-loading-text="loadingText"
+        fullscreen
+    >
         <div v-if="classObj.mobile && classObj.openSidebar" class="drawer-bg" @click="handleClickOutside" />
+        <el-affix :offset="classObj.openMenuTabs ? 8 : 15" class="affix">
+            <el-tooltip :content="menuStore.isCollapse ? $t('commons.button.expand') : $t('commons.button.collapse')">
+                <el-button
+                    size="small"
+                    circle
+                    :style="{ 'margin-left': menuStore.isCollapse ? '63px' : '168px', position: 'absolute' }"
+                    :icon="menuStore.isCollapse ? 'ArrowRight' : 'ArrowLeft'"
+                    plain
+                    @click="handleCollapse()"
+                ></el-button>
+            </el-tooltip>
+        </el-affix>
         <div class="app-sidebar" v-if="!globalStore.isFullScreen">
-            <el-affix :offset="15" class="affix">
-                <el-tooltip
-                    :content="menuStore.isCollapse ? $t('commons.button.expand') : $t('commons.button.collapse')"
-                >
-                    <el-button
-                        size="small"
-                        circle
-                        :style="{ 'margin-left': menuStore.isCollapse ? '60px' : '165px', position: 'absolute' }"
-                        :icon="menuStore.isCollapse ? 'ArrowRight' : 'ArrowLeft'"
-                        plain
-                        @click="handleCollapse()"
-                    ></el-button>
-                </el-tooltip>
-            </el-affix>
             <Sidebar @menu-click="handleMenuClick" :menu-router="!classObj.openMenuTabs" @open-task="openTask" />
         </div>
 

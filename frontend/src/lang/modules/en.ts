@@ -1420,7 +1420,7 @@ const message = {
         clearRecycleBinHelper: 'Do you want to clear the Recycle Bin?',
         favorite: 'Favorites',
         removeFavorite: 'Remove from Favorites?',
-        addFavorite: 'Add to Davorites',
+        addFavorite: 'Add/Remove to Favorites',
         clearList: 'Clear list',
         deleteRecycleHelper: 'Are you sure you want to permanently delete the following files?',
         typeErrOrEmpty: '[{0}] file type is wrong or empty folder',

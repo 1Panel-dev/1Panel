@@ -1361,7 +1361,7 @@ const message = {
         clearRecycleBinHelper: 'リサイクルビンを掃除しますか？',
         favorite: 'お気に入り',
         removeFavorite: 'お気に入りから取り外しますか？',
-        addFavorite: 'お気に入りに追加します',
+        addFavorite: 'お気に入りの追加/削除',
         clearList: 'クリーンリスト',
         deleteRecycleHelper: '次のファイルを永続的に削除する必要がありますか？',
         typeErrOrEmpty: '[{0}]ファイルタイプは間違っているか、空のフォルダーです',

@@ -1390,7 +1390,7 @@ const message = {
         clearRecycleBinHelper: 'Você deseja limpar a lixeira?',
         favorite: 'Favoritos',
         removeFavorite: 'Remover dos favoritos?',
-        addFavorite: 'Adicionar aos favoritos',
+        addFavorite: 'Adicionar/Remover aos favoritos',
         clearList: 'Limpar lista',
         deleteRecycleHelper: 'Tem certeza de que deseja excluir permanentemente os seguintes arquivos?',
         typeErrOrEmpty: '[{0}] tipo de arquivo errado ou pasta vazia',

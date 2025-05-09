@@ -269,8 +269,6 @@ const form = reactive({
     proxyPasswd: '',
     proxyPasswdKeep: '',
     proxyDocker: '',
-    proxyDockerSyncToNode: '',
-    proxyDockerSyncNodes: '',
 
     apiInterfaceStatus: 'Disable',
     apiKey: '',
@@ -346,8 +344,6 @@ const search = async () => {
                 : '{"light":"#005eeb","dark":"#F0BE96"}';
             globalStore.themeConfig.theme = form.theme;
             form.proxyDocker = xpackRes.data.proxyDocker;
-            form.proxyDockerSyncToNode = xpackRes.data.proxyDockerSyncToNode;
-            form.proxyDockerSyncNodes = xpackRes.data.proxyDockerSyncNodes;
         }
     } else {
         globalStore.themeConfig.theme = form.theme;
@@ -378,8 +374,6 @@ const onChangeProxy = () => {
         passwd: form.proxyPasswd,
         passwdKeep: form.proxyPasswdKeep,
         proxyDocker: form.proxyDocker,
-        proxyDockerSyncToNode: form.proxyDockerSyncToNode,
-        proxyDockerSyncNodes: form.proxyDockerSyncNodes,
     });
 };
 

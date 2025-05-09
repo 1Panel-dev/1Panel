@@ -1395,7 +1395,7 @@ const message = {
         clearRecycleBinHelper: 'Вы хотите очистить корзину?',
         favorite: 'Избранное',
         removeFavorite: 'Удалить из избранного?',
-        addFavorite: 'Добавить в избранное',
+        addFavorite: 'Добавить/Удалить в избранное',
         clearList: 'Очистить список',
         deleteRecycleHelper: 'Вы уверены, что хотите навсегда удалить следующие файлы?',
         typeErrOrEmpty: '[{0}] неверный тип файла или пустая папка',

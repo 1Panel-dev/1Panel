@@ -1348,7 +1348,7 @@ const message = {
         clearRecycleBinHelper: '휴지통을 정리하시겠습니까?',
         favorite: '즐겨찾기',
         removeFavorite: '즐겨찾기에서 제거하시겠습니까?',
-        addFavorite: '즐겨찾기에 추가',
+        addFavorite: '즐겨찾기 추가 / 제거',
         clearList: '목록 정리',
         deleteRecycleHelper: '다음 파일을 영구적으로 삭제하시겠습니까?',
         typeErrOrEmpty: '[{0}] 파일 유형이 잘못되었거나 빈 폴더입니다.',

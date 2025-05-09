@@ -39,7 +39,7 @@
         "crypto-js": "^4.2.0",
         "echarts": "^5.5.0",
         "element-plus": "^2.9.7",
-        "fit2cloud-ui-plus": "^1.2.0",
+        "fit2cloud-ui-plus": "^1.2.2",
         "highlight.js": "^11.9.0",
         "js-base64": "^3.7.7",
         "jsencrypt": "^3.3.2",

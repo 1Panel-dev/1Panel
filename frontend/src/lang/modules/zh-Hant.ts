@@ -1348,7 +1348,7 @@ const message = {
         clearRecycleBinHelper: '是否清空回收站？',
         favorite: '收藏夾',
         removeFavorite: '是否從收藏夾移出？',
-        addFavorite: '加入收藏夾',
+        addFavorite: '添加/移出收藏夾',
         clearList: '清空列表',
         deleteRecycleHelper: '確定永久刪除以下文件？',
         typeErrOrEmpty: '【{0}】 檔案類型錯誤或為空資料夾',
