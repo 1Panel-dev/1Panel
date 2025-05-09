@@ -119,6 +119,7 @@
                     <el-form-item :label="$t('app.containerName')" prop="params.CONTAINER_NAME">
                         <el-input v-model.trim="runtime.params['CONTAINER_NAME']"></el-input>
                     </el-form-item>
+                    <Environment :environments="runtime.environments" />
                     <el-form-item>
                         <el-alert type="warning" :closable="false">
                             <template #default>
@@ -182,6 +183,7 @@
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';
 import { Runtime } from '@/api/interface/runtime';
+import Environment from '@/views/website/runtime/environment/index.vue';
 import { getAppByKey, getAppDetail, searchApp } from '@/api/modules/app';
 import { CreateRuntime, GetRuntime, ListPHPExtensions, UpdateRuntime } from '@/api/modules/runtime';
 import { Rules } from '@/global/form-rules';
@@ -265,6 +267,7 @@ const initData = (type: string) => ({
     resource: 'appstore',
     rebuild: false,
     source: phpSources[0].value,
+    environments: [],
 });
 const extensions = ref();
 const formFields = ref();

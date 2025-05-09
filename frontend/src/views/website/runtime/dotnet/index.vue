@@ -2,15 +2,6 @@
     <div>
         <RouterMenu />
         <LayoutContent :title="'.NET'" v-loading="loading">
-            <template #prompt>
-                <el-alert type="info" :closable="false">
-                    <template #title>
-                        <span class="input-help whitespace-break-spaces">
-                            {{ $t('runtime.statusHelper') }}
-                        </span>
-                    </template>
-                </el-alert>
-            </template>
             <template #leftToolBar>
                 <el-button type="primary" @click="openCreate">
                     {{ $t('runtime.create') }}

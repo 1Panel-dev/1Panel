@@ -2651,8 +2651,6 @@ const message = {
         open: 'Buka',
         operatorHelper:
             'Operasi {0} akan dilakukan pada persekitaran operasi yang dipilih. Adakah anda mahu meneruskan?',
-        statusHelper:
-            'Huraian status: Memulakan - kontena telah dimulakan, tetapi aplikasi sedang dimulakan; tidak normal - kontena telah dimulakan, tetapi status aplikasi tidak normal',
         taobao: 'Taobao',
         tencent: 'Tencent',
         imageSource: 'Sumber imej',

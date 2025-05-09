@@ -2700,8 +2700,6 @@ const message = {
         open: 'Open',
         operatorHelper:
             'The {0} operation will be performed on the selected operating environment. Do you want to continue? ',
-        statusHelper:
-            'Status description: Starting - the container has been started, but the application is starting; abnormal - the container has been started, but the application status is abnormal',
         taobao: 'Taobao',
         tencent: 'Tencent',
         imageSource: 'Image source',

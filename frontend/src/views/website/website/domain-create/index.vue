@@ -118,6 +118,9 @@ const gengerateDomains = () => {
     const lines = create.value.domainStr.split(/\r?\n/);
     lines.forEach((line) => {
         const [domain, port] = line.split(':');
+        if (domain == '') {
+            return;
+        }
         if (!checkDomain(domain)) {
             MsgError(line + i18n.global.t('commons.rule.domain'));
             return;

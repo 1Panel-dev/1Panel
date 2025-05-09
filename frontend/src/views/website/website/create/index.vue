@@ -61,7 +61,7 @@
                         <el-option
                             v-for="(group, index) in groups"
                             :key="index"
-                            :label="group.name"
+                            :label="group.name == 'Default' ? $t('commons.table.default') : group.name"
                             :value="group.id"
                         ></el-option>
                     </el-select>
@@ -863,6 +863,8 @@ const listSSLs = () => {
         acmeAccountID: String(website.value.acmeAccountID),
     }).then((res) => {
         ssls.value = res.data || [];
+        website.value.websiteSSLID = undefined;
+        websiteSSL.value = {};
         if (ssls.value.length > 0) {
             website.value.websiteSSLID = ssls.value[0].id;
             changeSSl(website.value.websiteSSLID);

@@ -213,12 +213,35 @@ func (r *RuntimeService) Page(req request.RuntimeSearch) (int64, []response.Runt
 		}
 		runtimeDTO := response.NewRuntimeDTO(runtime)
 		runtimeDTO.Params = make(map[string]interface{})
-		envMap, err := gotenv.Unmarshal(runtime.Env)
+		envs, err := gotenv.Unmarshal(runtime.Env)
 		if err != nil {
 			return 0, nil, err
 		}
-		for k, v := range envMap {
+		for k, v := range envs {
 			runtimeDTO.Params[k] = v
+			if strings.Contains(k, "CONTAINER_PORT") || strings.Contains(k, "HOST_PORT") {
+				if strings.Contains(k, "CONTAINER_PORT") {
+					r := regexp.MustCompile(`_(\d+)$`)
+					matches := r.FindStringSubmatch(k)
+					containerPort, err := strconv.Atoi(v)
+					if err != nil {
+						continue
+					}
+					hostPort, err := strconv.Atoi(envs[fmt.Sprintf("HOST_PORT_%s", matches[1])])
+					if err != nil {
+						continue
+					}
+					hostIP := envs[fmt.Sprintf("HOST_IP_%s", matches[1])]
+					if hostIP == "" {
+						hostIP = "0.0.0.0"
+					}
+					runtimeDTO.ExposedPorts = append(runtimeDTO.ExposedPorts, request.ExposedPort{
+						ContainerPort: containerPort,
+						HostPort:      hostPort,
+						HostIP:        hostIP,
+					})
+				}
+			}
 		}
 		res = append(res, runtimeDTO)
 	}

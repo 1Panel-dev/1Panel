@@ -2499,7 +2499,6 @@ const message = {
         runScriptHelper: '啟動命令是指容器啟動後運行的命令',
         open: '開啟',
         operatorHelper: '將對選取的執行環境進行 {0} 操作，是否繼續？ ',
-        statusHelper: '狀態說明：啟動中-容器已啟動，但應用正在啟動；異常-容器已啟動，但應用狀態異常',
         taobao: '淘寶',
         tencent: '騰訊',
         imageSource: '鏡像源',

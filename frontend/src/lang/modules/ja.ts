@@ -2591,8 +2591,6 @@ const message = {
         runScriptHelper: '起動コマンドリストは、ソースディレクトリのpackage.jsonファイルから解析されます。',
         open: '開ける',
         operatorHelper: '{0}操作は、選択した動作環境で実行されます。続けたいですか？',
-        statusHelper:
-            'ステータスの説明:開始 - コンテナが開始されましたが、アプリケーションが開始されています。異常 - 容器が開始されましたが、アプリケーションステータスは異常です',
         taobao: 'タオバオ',
         tencent: 'テンセント',
         imageSource: '画像ソース',

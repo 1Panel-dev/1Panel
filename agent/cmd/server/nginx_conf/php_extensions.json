@@ -343,13 +343,6 @@
     "installed": false
   },
   {
-    "name": "igbinary",
-    "check": "igbinary",
-    "file": "igbinary.so",
-    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
-    "installed": false
-  },
-  {
     "name": "zip",
     "check": "zip",
     "file": "zip.so",
@@ -360,6 +353,13 @@
     "name": "shmop",
     "check": "shmop",
     "file": "shmop.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
+    "installed": false
+  },
+  {
+    "name": "gd",
+    "check": "gd",
+    "file": "gd.so",
     "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
   }

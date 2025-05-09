@@ -2649,8 +2649,6 @@ const message = {
             'A lista de comandos de inicialização é gerada a partir do arquivo package.json no diretório de origem.',
         open: 'Abrir',
         operatorHelper: 'A operação {0} será realizada no ambiente selecionado. Deseja continuar?',
-        statusHelper:
-            'Descrição do status: Iniciando - o contêiner foi iniciado, mas a aplicação está carregando; anormal - o contêiner foi iniciado, mas o status da aplicação está incorreto.',
         taobao: 'Taobao',
         tencent: 'Tencent',
         imageSource: 'Fonte da imagem',

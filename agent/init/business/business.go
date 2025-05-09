@@ -58,13 +58,16 @@ func initAcmeAccount() {
 	count, _, _ := acmeAccountService.Page(search)
 	if count == 0 {
 		createAcmeAccount := request.WebsiteAcmeAccountCreate{
-			Email:    "acme@1paneldev.com",
-			Type:     "letsencrypt",
-			KeyType:  "2048",
-			UseProxy: true,
+			Email:   "acme@1paneldev.com",
+			Type:    "letsencrypt",
+			KeyType: "2048",
+		}
+		systemProxy, _ := service.NewISettingService().GetSystemProxy()
+		if systemProxy.URL != "" {
+			createAcmeAccount.UseProxy = true
 		}
 		if _, err := acmeAccountService.Create(createAcmeAccount); err != nil {
-			global.LOG.Errorf("create acme account error: %s", err.Error())
+			global.LOG.Warningf("create acme account error: %s", err.Error())
 		}
 	}
 }

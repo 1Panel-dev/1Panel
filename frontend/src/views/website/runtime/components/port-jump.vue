@@ -1,16 +1,14 @@
 <template>
     <div v-if="row.port != ''">
-        <span v-for="(port, index) in row.port.split(',')" :key="index">
-            <el-button link @click="jump(port, 'http')">
-                {{ port }}
-                <el-icon class="el-icon--right"><Promotion /></el-icon>
+        <span v-for="(port, index) in row.exposedPorts" :key="index">
+            <el-button icon="Position" plain size="small" @click="jump(port, 'http')">
+                {{ port.hostIP }}:{{ port.hostPort }}->{{ port.containerPort }}
             </el-button>
         </span>
     </div>
 </template>
 
 <script setup>
-import { Promotion } from '@element-plus/icons-vue';
 defineProps({
     row: {
         type: Object,

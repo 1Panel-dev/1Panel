@@ -43,9 +43,15 @@
                     {{ $t('runtime.phpsourceHelper') }}
                 </span>
             </el-form-item>
-            <PortConfig v-model="runtime" :mode="mode" />
-            <Environment :environments="runtime.environments" />
-            <Volumes :volumes="runtime.volumes" />
+            <el-tabs type="border-card">
+                <el-tab-pane :label="$t('commons.table.port')">
+                    <PortConfig v-model="runtime" :mode="mode" />
+                </el-tab-pane>
+                <el-tab-pane :label="$t('runtime.environment')">
+                    <Environment :environments="runtime.environments" />
+                </el-tab-pane>
+                <el-tab-pane :label="$t('container.mount')"><Volumes :volumes="runtime.volumes" /></el-tab-pane>
+            </el-tabs>
         </el-form>
 
         <template #footer>
