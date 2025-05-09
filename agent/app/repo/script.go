@@ -33,11 +33,15 @@ func (u *ScriptRepo) Get(opts ...DBOption) (model.ScriptLibrary, error) {
 
 func (u *ScriptRepo) List(opts ...DBOption) ([]model.ScriptLibrary, error) {
 	var ops []model.ScriptLibrary
-	itemDB := global.DB
 	if global.IsMaster {
-		itemDB = global.CoreDB
+		db := global.CoreDB.Model(&model.ScriptLibrary{})
+		for _, opt := range opts {
+			db = opt(db)
+		}
+		err := db.Where("is_interactive = ?", false).Find(&ops).Error
+		return ops, err
 	}
-	db := itemDB.Model(&model.ScriptLibrary{})
+	db := global.DB.Model(&model.ScriptLibrary{})
 	for _, opt := range opts {
 		db = opt(db)
 	}

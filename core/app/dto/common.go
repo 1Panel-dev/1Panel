@@ -51,3 +51,6 @@ type OperateByID struct {
 type OperateByIDs struct {
 	IDs []uint `json:"ids"`
 }
+type OperateByTaskID struct {
+	TaskID string `json:"taskID"`
+}

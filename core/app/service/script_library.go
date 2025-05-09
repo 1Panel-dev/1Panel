@@ -33,7 +33,7 @@ type IScriptService interface {
 	Create(req dto.ScriptOperate) error
 	Update(req dto.ScriptOperate) error
 	Delete(ids dto.OperateByIDs) error
-	Sync() error
+	Sync(req dto.OperateByTaskID) error
 }
 
 func NewIScriptService() IScriptService {
@@ -173,8 +173,8 @@ func LoadScriptInfo(id uint) (model.ScriptLibrary, error) {
 	return scriptRepo.Get(repo.WithByID(id))
 }
 
-func (u *ScriptService) Sync() error {
-	syncTask, err := task.NewTaskWithOps(i18n.GetMsgByKey("ScriptLibrary"), task.TaskSync, task.TaskScopeScript, "", 0)
+func (u *ScriptService) Sync(req dto.OperateByTaskID) error {
+	syncTask, err := task.NewTaskWithOps(i18n.GetMsgByKey("ScriptLibrary"), task.TaskSync, task.TaskScopeScript, req.TaskID, 0)
 	if err != nil {
 		global.LOG.Errorf("create sync task failed %v", err)
 		return err
@@ -189,7 +189,7 @@ func (u *ScriptService) Sync() error {
 		var scriptSetting model.Setting
 		_ = global.DB.Where("key = ?", "ScriptVersion").First(&scriptSetting).Error
 		if scriptSetting.Value == string(versionRes) {
-			syncTask.Log("The local and remote versions are detected to be consistent. Skip...")
+			syncTask.Logf("The local-%s and remote-%s versions are detected to be consistent. Skip...", scriptSetting.Value, versionRes)
 			return nil
 		}
 

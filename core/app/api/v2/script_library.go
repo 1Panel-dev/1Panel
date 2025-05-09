@@ -90,13 +90,19 @@ func (b *BaseApi) DeleteScript(c *gin.Context) {
 
 // @Tags ScriptLibrary
 // @Summary Sync script from remote
+// @Accept json
+// @Param request body dto.OperateByTaskID true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /script/sync [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"同步脚本库脚本","formatEN":"sync scripts"}
 func (b *BaseApi) SyncScript(c *gin.Context) {
-	if err := scriptService.Sync(); err != nil {
+	var req dto.OperateByTaskID
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := scriptService.Sync(req); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}

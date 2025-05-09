@@ -98,12 +98,14 @@
         <GroupDialog @search="loadGroupOptions" ref="dialogGroupRef" />
         <CodemirrorDrawer ref="myDetail" />
         <TerminalDialog ref="runRef" />
+        <TaskLog ref="taskLogRef" width="70%" @close="search" />
     </div>
 </template>
 
 <script setup lang="ts">
-import { dateFormat, deepCopy, getCurrentDateFormatted } from '@/utils/util';
+import { dateFormat, deepCopy, getCurrentDateFormatted, newUUID } from '@/utils/util';
 import GroupDialog from '@/components/group/index.vue';
+import TaskLog from '@/components/log/task/index.vue';
 import OperateDialog from '@/views/cronjob/library/operate/index.vue';
 import TerminalDialog from '@/views/cronjob/library/run/index.vue';
 import { deleteScript, searchScript, syncScript } from '@/api/modules/cronjob';
@@ -113,6 +115,7 @@ import i18n from '@/lang';
 import { GlobalStore } from '@/store';
 import { getGroupList } from '@/api/modules/group';
 import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
+import { MsgSuccess } from '@/utils/message';
 
 const globalStore = GlobalStore();
 const mobile = computed(() => {
@@ -125,6 +128,7 @@ const selects = ref<any>([]);
 const opRef = ref();
 
 const runRef = ref();
+const taskLogRef = ref();
 
 const data = ref();
 const paginationConfig = reactive({
@@ -196,15 +200,21 @@ const onSync = async () => {
         type: 'info',
     }).then(async () => {
         loading.value = true;
-        await syncScript()
+        let taskID = newUUID();
+        await syncScript(taskID)
             .then(() => {
                 loading.value = false;
-                search();
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                openTaskLog(taskID);
             })
             .catch(() => {
                 loading.value = false;
             });
     });
+};
+
+const openTaskLog = (taskID: string) => {
+    taskLogRef.value.openWithTaskID(taskID);
 };
 
 const search = async () => {

@@ -27,6 +27,6 @@ const prop = defineProps({
 });
 
 const toDoc = () => {
-    router.push({ name: 'Library' });
+    router.push({ name: 'Library', query: { uncached: 'true' } });
 };
 </script>
