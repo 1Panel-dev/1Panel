@@ -28,8 +28,8 @@ export const getMasterLicenseStatus = () => {
 export const syncLicense = (id: number) => {
     return http.post(`/core/licenses/sync`, { id: id });
 };
-export const bindLicense = (id: number, nodeID: number) => {
-    return http.post(`/core/licenses/bind`, { nodeID: nodeID, licenseID: id }, TimeoutEnum.T_60S);
+export const bindLicense = (id: number, nodeID: number, syncList: string) => {
+    return http.post(`/core/licenses/bind`, { nodeID: nodeID, licenseID: id, syncList: syncList }, TimeoutEnum.T_60S);
 };
 export const unbindLicense = (id: number, force: boolean) => {
     return http.post(`/core/licenses/unbind`, { id: id, force: force }, TimeoutEnum.T_60S);

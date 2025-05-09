@@ -21,6 +21,7 @@
                         <el-checkbox :label="$t('xpack.node.syncProxy')" value="SyncSystemProxy" />
                         <el-checkbox :label="$t('xpack.node.syncAlertSetting')" value="SyncAlertSetting" />
                         <el-checkbox :label="$t('xpack.node.syncCustomApp')" value="SyncCustomApp" />
+                        <el-checkbox :label="$t('xpack.node.syncBackupAccount')" value="SyncBackupAccounts" />
                     </el-checkbox-group>
                     <span class="input-help">{{ $t('xpack.node.syncHelper') }}</span>
                 </el-form-item>
@@ -57,7 +58,7 @@ const form = reactive({
     nodeID: null,
     licenseID: null,
     syncList: '',
-    syncListItem: ['SyncSystemProxy', 'SyncAlertSetting', 'SyncCustomApp'],
+    syncListItem: ['SyncSystemProxy', 'SyncAlertSetting', 'SyncCustomApp', 'SyncBackupAccounts'],
 });
 
 const formRef = ref<FormInstance>();
@@ -75,7 +76,7 @@ const onBind = async (formEl: FormInstance | undefined) => {
         if (!valid) return;
         loading.value = true;
         form.syncList = form.syncListItem?.join(',') || '';
-        await bindLicense(form.licenseID, form.nodeID)
+        await bindLicense(form.licenseID, form.nodeID, form.syncList)
             .then(() => {
                 loading.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
