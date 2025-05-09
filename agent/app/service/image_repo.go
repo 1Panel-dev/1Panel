@@ -222,8 +222,10 @@ func (u *ImageRepoService) handleRegistries(newHost, delHost, handle string) err
 	if err != nil {
 		return err
 	}
-	if err := json.Unmarshal(file, &daemonMap); err != nil {
-		return err
+	if len(file) != 0 {
+		if err := json.Unmarshal(file, &daemonMap); err != nil {
+			return err
+		}
 	}
 
 	iRegistries := daemonMap["insecure-registries"]
