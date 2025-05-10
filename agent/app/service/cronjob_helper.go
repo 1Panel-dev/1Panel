@@ -103,6 +103,7 @@ func (u *CronjobService) loadTask(cronjob *model.Cronjob, record *model.JobRecor
 	case "log":
 		err = u.handleSystemLog(*cronjob, record.StartTime, taskItem)
 	case "snapshot":
+		taskItem.Task.Type = task.TaskScopeSnapshot
 		_ = cronjobRepo.UpdateRecords(record.ID, map[string]interface{}{"records": record.Records})
 		err = u.handleSnapshot(*cronjob, *record, taskItem)
 	}

@@ -259,6 +259,13 @@ func loadDbConn(snap *snapHelper, targetDir string, req dto.SnapshotCreate) erro
 		if err != nil {
 			return err
 		}
+	} else {
+		taskDB, err := common.LoadDBConnByPathWithErr(path.Join(targetDir, "db/task.db"), "core.db")
+		snap.Task.LogWithStatus(i18n.GetWithName("SnapNewDB", "task"), err)
+		if err != nil {
+			return err
+		}
+		_ = taskDB.Where("id = ?", req.TaskID).Delete(&model.Task{}).Error
 	}
 	if !req.WithOperationLog {
 		err = snap.snapCoreDB.Exec("DELETE FROM operation_logs").Error
@@ -388,6 +395,7 @@ func snapBackupData(snap snapHelper, req dto.SnapshotCreate, targetDir string) e
 	snap.Task.LogStart(i18n.GetMsgByKey("SnapLocalBackup"))
 
 	excludes := loadBackupExcludes(snap, req.BackupData)
+	excludes = append(excludes, "./system_snapshot")
 	for _, item := range req.AppData {
 		for _, itemApp := range item.Children {
 			if itemApp.Label == "appBackup" {
@@ -407,14 +415,8 @@ func loadBackupExcludes(snap snapHelper, req []dto.DataTree) []string {
 			if item.IsCheck {
 				continue
 			}
-			if strings.HasPrefix(item.Path, path.Join(global.Dir.LocalBackupDir, "system_snapshot")) {
-				if err := snap.snapAgentDB.Where("name = ? AND download_account_id = ?", strings.TrimSuffix(item.Name, ".tar.gz"), "1").Delete(&model.Snapshot{}).Error; err != nil {
-					snap.Task.LogWithStatus("delete snapshot from database", err)
-				}
-			} else {
-				if err := snap.snapAgentDB.Where("file_dir = ? AND file_name = ?", strings.TrimPrefix(path.Dir(item.Path), global.Dir.LocalBackupDir+"/"), path.Base(item.Path)).Delete(&model.BackupRecord{}).Error; err != nil {
-					snap.Task.LogWithStatus("delete backup file from database", err)
-				}
+			if err := snap.snapAgentDB.Where("file_dir = ? AND file_name = ?", strings.TrimPrefix(path.Dir(item.Path), global.Dir.LocalBackupDir+"/"), path.Base(item.Path)).Delete(&model.BackupRecord{}).Error; err != nil {
+				snap.Task.LogWithStatus("delete backup file from database", err)
 			}
 			excludes = append(excludes, "."+strings.TrimPrefix(item.Path, global.Dir.LocalBackupDir))
 		} else {
@@ -456,16 +458,7 @@ func snapPanelData(snap snapHelper, req dto.SnapshotCreate, targetDir string) er
 		excludes = append(excludes, "./log/1Panel*")
 	}
 	if !req.WithTaskLog {
-		excludes = append(excludes, "./log/AI")
-		excludes = append(excludes, "./log/AppStore")
-		excludes = append(excludes, "./log/Cronjob")
-		excludes = append(excludes, "./log/Image")
-		excludes = append(excludes, "./log/Compose")
-		excludes = append(excludes, "./log/Database")
-		excludes = append(excludes, "./log/RuntimeExtension")
-		excludes = append(excludes, "./log/Website")
-		excludes = append(excludes, "./log/App")
-		excludes = append(excludes, "./log/Snapshot")
+		excludes = append(excludes, "./log/task")
 	}
 
 	rootDir := global.Dir.DataDir

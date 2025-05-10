@@ -123,10 +123,7 @@ func (u *SnapshotService) LoadSnapshotData() (dto.SnapshotData, error) {
 			data.BackupData = append(itemBackups[:i], itemBackups[i+1:]...)
 		}
 		if item.Label == "system_snapshot" {
-			itemBackups[i].IsCheck = false
-			for j := 0; j < len(item.Children); j++ {
-				itemBackups[i].Children[j].IsCheck = false
-			}
+			itemBackups = append(itemBackups[:i], itemBackups[i+1:]...)
 		}
 	}
 	data.BackupData = itemBackups
