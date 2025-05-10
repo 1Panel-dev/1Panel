@@ -1,6 +1,6 @@
 <template>
     <div>
-        <CardWithHeader :header="$t('app.app')" class="card-interval" :loading="loading">
+        <CardWithHeader :header="$t('app.app')" class="card-interval" v-loading="loading">
             <template #header-r>
                 <el-popover placement="left" :width="226" trigger="click">
                     <el-input size="small" v-model="filter" clearable @input="loadOption()" />

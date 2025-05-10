@@ -331,7 +331,11 @@ const currentInfo = ref<Dashboard.CurrentInfo>({
 
 const cpuShowAll = ref();
 
-const chartsOption = ref({ cpu: null, memory: null, load: null });
+const chartsOption = ref({
+    cpu: { title: 'CPU', data: 0 },
+    memory: { title: i18n.global.t('monitor.memory'), data: 0 },
+    load: { title: i18n.global.t('home.load'), data: 0 },
+});
 
 const acceptParams = (current: Dashboard.CurrentInfo, base: Dashboard.BaseInfo): void => {
     currentInfo.value = current;

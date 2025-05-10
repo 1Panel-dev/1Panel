@@ -87,7 +87,11 @@
                         <Status ref="statusRef" style="margin-bottom: 33px" />
                     </template>
                 </CardWithHeader>
-                <CardWithHeader :header="$t('menu.monitor')" class="card-interval">
+                <CardWithHeader
+                    :header="$t('menu.monitor')"
+                    class="card-interval chart-card"
+                    v-loading="!chartsOption['networkChart']"
+                >
                     <template #header-r>
                         <el-radio-group
                             style="float: right; margin-left: 5px"
@@ -411,7 +415,7 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
     const res = await loadBaseInfo(searchInfo.ioOption, searchInfo.netOption);
     baseInfo.value = res.data;
     currentInfo.value = baseInfo.value.currentInfo;
-    await onLoadCurrentInfo();
+    onLoadCurrentInfo();
     isStatusInit.value = false;
     statusRef.value.acceptParams(currentInfo.value, baseInfo.value);
     appRef.value.acceptParams();
@@ -633,5 +637,9 @@ onBeforeUnmount(() => {
     span {
         line-height: 20px;
     }
+}
+
+.chart-card {
+    min-height: 383px;
 }
 </style>
