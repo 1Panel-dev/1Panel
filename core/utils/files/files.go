@@ -80,6 +80,7 @@ func HandleTar(sourceDir, targetDir, name, exclusionRules string, secret string)
 		}
 	}
 
+	exMap := make(map[string]struct{})
 	excludes := strings.Split(exclusionRules, ",")
 	excludeRules := ""
 	excludes = append(excludes, "*.sock")
@@ -87,7 +88,11 @@ func HandleTar(sourceDir, targetDir, name, exclusionRules string, secret string)
 		if len(exclude) == 0 {
 			continue
 		}
-		excludeRules += " --exclude " + exclude
+		if _, ok := exMap[exclude]; ok {
+			continue
+		}
+		excludeRules += fmt.Sprintf(" --exclude '%s'", exclude)
+		exMap[exclude] = struct{}{}
 	}
 	path := ""
 	if strings.Contains(sourceDir, "/") {

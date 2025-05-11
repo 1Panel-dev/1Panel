@@ -732,8 +732,7 @@ func (f FileOp) TarGzCompressPro(withDir bool, src, dst, secret, exclusionRules 
 		if _, ok := exMap[exclude]; ok {
 			continue
 		}
-		exStr += " --exclude "
-		exStr += exclude
+		exStr += fmt.Sprintf(" --exclude '%s'", exclude)
 		exMap[exclude] = struct{}{}
 	}
 
