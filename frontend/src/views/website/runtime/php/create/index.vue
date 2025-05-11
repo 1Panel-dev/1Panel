@@ -119,6 +119,8 @@
                     <el-form-item :label="$t('app.containerName')" prop="params.CONTAINER_NAME">
                         <el-input v-model.trim="runtime.params['CONTAINER_NAME']"></el-input>
                     </el-form-item>
+                    <el-text>{{ $t('container.env') }}</el-text>
+                    <br />
                     <Environment :environments="runtime.environments" />
                     <el-form-item>
                         <el-alert type="warning" :closable="false">

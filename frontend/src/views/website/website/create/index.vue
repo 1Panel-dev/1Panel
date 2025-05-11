@@ -464,6 +464,7 @@
                                 :key="index"
                                 :label="ssl.primaryDomain"
                                 :value="ssl.id"
+                                :disabled="ssl.pem == ''"
                             ></el-option>
                         </el-select>
                     </el-form-item>
@@ -866,8 +867,13 @@ const listSSLs = () => {
         website.value.websiteSSLID = undefined;
         websiteSSL.value = {};
         if (ssls.value.length > 0) {
-            website.value.websiteSSLID = ssls.value[0].id;
-            changeSSl(website.value.websiteSSLID);
+            for (const ssl of ssls.value) {
+                if (ssl.pem != '') {
+                    website.value.websiteSSLID = ssl.id;
+                    changeSSl(website.value.websiteSSLID);
+                    break;
+                }
+            }
         }
     });
 };

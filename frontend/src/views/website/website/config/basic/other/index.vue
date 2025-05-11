@@ -13,7 +13,7 @@
                         <el-option
                             v-for="(group, index) in groups"
                             :key="index"
-                            :label="group.name"
+                            :label="group.name == 'Default' ? $t('commons.table.default') : group.name"
                             :value="group.id"
                         ></el-option>
                     </el-select>
@@ -62,6 +62,7 @@ const form = reactive({
     webSiteGroupId: 0,
     IPV6: false,
     alias: '',
+    favorite: false,
 });
 const rules = ref({
     primaryDomain: [Rules.requiredInput],
