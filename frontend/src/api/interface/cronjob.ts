@@ -98,6 +98,7 @@ export namespace Cronjob {
     export interface CronjobDelete {
         ids: Array<number>;
         cleanData: boolean;
+        cleanRemoteData: boolean;
     }
     export interface UpdateStatus {
         id: number;

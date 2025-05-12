@@ -1005,6 +1005,7 @@ const message = {
         errHandle: '任务执行失败',
         noRecord: '当前计划任务暂未产生记录',
         cleanData: '删除备份文件',
+        cleanRemoteData: '删除远程备份文件',
         cleanDataHelper: '删除该任务执行过程中产生的备份文件',
         noLogs: '暂无任务输出...',
         errPath: '备份路径 [{0}] 错误，无法下载！',

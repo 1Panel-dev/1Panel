@@ -39,8 +39,8 @@ export const searchRecords = (params: Cronjob.SearchRecord) => {
     return http.post<ResPage<Cronjob.Record>>(`cronjobs/search/records`, params);
 };
 
-export const cleanRecords = (id: number, cleanData: boolean) => {
-    return http.post(`cronjobs/records/clean`, { cronjobID: id, cleanData: cleanData });
+export const cleanRecords = (id: number, cleanData: boolean, cleanRemoteData: boolean) => {
+    return http.post(`cronjobs/records/clean`, { cronjobID: id, cleanData: cleanData, cleanRemoteData });
 };
 
 export const getRecordDetail = (params: string) => {

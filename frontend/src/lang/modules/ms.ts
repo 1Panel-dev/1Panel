@@ -1049,6 +1049,7 @@ const message = {
         errHandle: 'Kegagalan pelaksanaan tugas cron',
         noRecord: 'Picu Tugas Cron, dan anda akan melihat rekod di sini.',
         cleanData: 'Bersihkan data',
+        cleanRemoteData: 'Padam data jarak jauh',
         cleanDataHelper: 'Padam fail sandaran yang dijana semasa tugas ini.',
         noLogs: 'Tiada keluaran tugas lagi...',
         errPath: 'Laluan sandaran [{0}] salah, tidak boleh dimuat turun!',

@@ -1038,6 +1038,7 @@ const message = {
         errHandle: 'Falha na execução do Cronjob',
         noRecord: 'Acione a tarefa Cron e você verá os registros aqui.',
         cleanData: 'Limpar dados',
+        cleanRemoteData: 'Excluir dados remotos',
         cleanDataHelper: 'Excluir o arquivo de backup gerado durante esta tarefa.',
         noLogs: 'Ainda não há saída de tarefa...',
         errPath: 'Caminho de backup [{0}] com erro, não é possível fazer o download!',

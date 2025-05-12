@@ -41,7 +41,7 @@
                     </el-table-column>
                     <el-table-column :label="$t('setting.bindNode')" :min-width="120">
                         <template #default="{ row }">
-                            <div v-if="row.status !== 'Free'">
+                            <div v-if="row.status && row.status !== 'Free'">
                                 <div>
                                     {{ $t('license.pro') }}:
                                     {{ row.bindNode === '127.0.0.1' ? $t('xpack.node.master') : row.bindNode }}

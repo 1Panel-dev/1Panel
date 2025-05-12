@@ -86,7 +86,7 @@ func (u *CronjobService) loadTask(cronjob *model.Cronjob, record *model.JobRecor
 	case "ntp":
 		u.handleNtpSync(*cronjob, taskItem)
 	case "cutWebsiteLog":
-		err = u.handleCutWebsiteLog(cronjob, record, taskItem)
+		err = u.handleCutWebsiteLog(cronjob, record.StartTime, taskItem)
 	case "clean":
 		u.handleSystemClean(*cronjob, taskItem)
 	case "website":
@@ -174,26 +174,40 @@ func (u *CronjobService) handleNtpSync(cronjob model.Cronjob, taskItem *task.Tas
 	}, nil, int(cronjob.RetryTimes), time.Duration(cronjob.Timeout)*time.Second)
 }
 
-func (u *CronjobService) handleCutWebsiteLog(cronjob *model.Cronjob, record *model.JobRecords, taskItem *task.Task) error {
+func (u *CronjobService) handleCutWebsiteLog(cronjob *model.Cronjob, startTime time.Time, taskItem *task.Task) error {
 	taskItem.AddSubTaskWithOps(i18n.GetWithName("CutWebsiteLog", cronjob.Name), func(t *task.Task) error {
-		var filePaths []string
 		websites := loadWebsForJob(*cronjob)
 		fileOp := files.NewFileOp()
 		baseDir := GetOpenrestyDir(SitesRootDir)
+		clientMap, err := NewBackupClientMap([]string{fmt.Sprintf("%v", cronjob.DownloadAccountID)})
+		if err != nil {
+			return fmt.Errorf("load local backup client failed, err: %v", err)
+		}
 		for _, website := range websites {
 			taskItem.Log(website.Alias)
+			var record model.BackupRecord
+			record.From = "cronjob"
+			record.Type = "cut-website-log"
+			record.CronjobID = cronjob.ID
+			record.Name = website.Alias
+			record.DetailName = website.Alias
+			record.DownloadAccountID, record.SourceAccountIDs = cronjob.DownloadAccountID, cronjob.SourceAccountIDs
+			backupDir := pathUtils.Join(global.Dir.LocalBackupDir, "log", "website", website.Alias)
+			if !fileOp.Stat(backupDir) {
+				_ = os.MkdirAll(backupDir, constant.DirPerm)
+			}
+			record.FileDir = strings.TrimPrefix(backupDir, global.Dir.LocalBackupDir+"/")
+			record.FileName = fmt.Sprintf("%s_log_%s.gz", website.PrimaryDomain, startTime.Format(constant.DateTimeSlimLayout))
+			if err := backupRepo.CreateRecord(&record); err != nil {
+				global.LOG.Errorf("save backup record failed, err: %v", err)
+				return err
+			}
+
 			websiteLogDir := pathUtils.Join(baseDir, website.Alias, "log")
 			srcAccessLogPath := pathUtils.Join(websiteLogDir, "access.log")
 			srcErrorLogPath := pathUtils.Join(websiteLogDir, "error.log")
-			dstLogDir := pathUtils.Join(global.Dir.LocalBackupDir, "log", "website", website.Alias)
-			if !fileOp.Stat(dstLogDir) {
-				_ = os.MkdirAll(dstLogDir, constant.DirPerm)
-			}
 
-			dstName := fmt.Sprintf("%s_log_%s.gz", website.PrimaryDomain, record.StartTime.Format(constant.DateTimeSlimLayout))
-			dstFilePath := pathUtils.Join(dstLogDir, dstName)
-			filePaths = append(filePaths, dstFilePath)
-
+			dstFilePath := pathUtils.Join(backupDir, record.FileName)
 			if err := backupLogFile(dstFilePath, websiteLogDir, fileOp); err != nil {
 				taskItem.LogFailedWithErr("CutWebsiteLog", err)
 				continue
@@ -202,9 +216,8 @@ func (u *CronjobService) handleCutWebsiteLog(cronjob *model.Cronjob, record *mod
 				_ = fileOp.WriteFile(srcErrorLogPath, strings.NewReader(""), constant.DirPerm)
 			}
 			taskItem.Log(i18n.GetMsgWithMap("CutWebsiteLogSuccess", map[string]interface{}{"name": website.PrimaryDomain, "path": dstFilePath}))
+			u.removeExpiredBackup(*cronjob, clientMap, record)
 		}
-		u.removeExpiredLog(*cronjob)
-		record.File = strings.Join(filePaths, ",")
 		return nil
 	}, nil, int(cronjob.RetryTimes), time.Duration(cronjob.Timeout)*time.Second)
 	return nil
@@ -287,25 +300,8 @@ func (u *CronjobService) removeExpiredBackup(cronjob model.Cronjob, accountMap m
 	}
 }
 
-func (u *CronjobService) removeExpiredLog(cronjob model.Cronjob) {
-	records, _ := cronjobRepo.ListRecord(cronjobRepo.WithByJobID(int(cronjob.ID)), repo.WithOrderBy("created_at desc"))
-	if len(records) <= int(cronjob.RetainCopies) {
-		return
-	}
-	for i := int(cronjob.RetainCopies); i < len(records); i++ {
-		if len(records[i].File) != 0 {
-			files := strings.Split(records[i].File, ",")
-			for _, file := range files {
-				_ = os.Remove(file)
-			}
-		}
-		_ = cronjobRepo.DeleteRecord(repo.WithByID(records[i].ID))
-		_ = os.Remove(records[i].Records)
-	}
-}
-
 func hasBackup(cronjobType string) bool {
-	return cronjobType == "app" || cronjobType == "database" || cronjobType == "website" || cronjobType == "directory" || cronjobType == "snapshot" || cronjobType == "log"
+	return cronjobType == "app" || cronjobType == "database" || cronjobType == "website" || cronjobType == "directory" || cronjobType == "snapshot" || cronjobType == "log" || cronjobType == "cutWebsiteLog"
 }
 
 func handleCronJobAlert(cronjob *model.Cronjob) {

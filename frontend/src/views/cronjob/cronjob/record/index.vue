@@ -200,6 +200,7 @@
             <el-form ref="deleteForm" label-position="left" v-loading="delLoading">
                 <el-form-item>
                     <el-checkbox v-model="cleanData" :label="$t('cronjob.cleanData')" />
+                    <el-checkbox v-if="cleanData" v-model="cleanRemoteData" :label="$t('cronjob.cleanRemoteData')" />
                     <span class="input-help">
                         {{ $t('cronjob.cleanDataHelper') }}
                     </span>
@@ -231,6 +232,7 @@ import { MsgSuccess } from '@/utils/message';
 import { listDbItems } from '@/api/modules/database';
 import { listAppInstalled } from '@/api/modules/app';
 import { shortcuts } from '@/utils/shortcuts';
+import { hasBackup } from '../helper';
 
 const loading = ref();
 const refresh = ref(false);
@@ -253,6 +255,7 @@ const currentRecordDetail = ref<string>('');
 const open = ref();
 const delLoading = ref();
 const cleanData = ref();
+const cleanRemoteData = ref();
 
 const acceptParams = async (params: DialogProps): Promise<void> => {
     let itemSize = Number(localStorage.getItem(searchInfo.cacheSizeKey));
@@ -402,26 +405,30 @@ const loadRecord = async (row: Cronjob.Record) => {
 };
 
 const onClean = async () => {
-    ElMessageBox.confirm(i18n.global.t('commons.msg.clean'), i18n.global.t('commons.button.delete'), {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-        type: 'warning',
-    }).then(async () => {
-        await cleanRecords(dialogData.value.rowData.id, cleanData.value)
-            .then(() => {
-                delLoading.value = false;
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                search();
-            })
-            .catch(() => {
-                delLoading.value = false;
-            });
-    });
+    if (!hasBackup(dialogData.value.rowData.type)) {
+        ElMessageBox.confirm(i18n.global.t('commons.msg.clean'), i18n.global.t('commons.msg.deleteTitle'), {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+            type: 'warning',
+        }).then(async () => {
+            await cleanRecords(dialogData.value.rowData.id, cleanData.value, cleanRemoteData.value)
+                .then(() => {
+                    delLoading.value = false;
+                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                    search();
+                })
+                .catch(() => {
+                    delLoading.value = false;
+                });
+        });
+    } else {
+        open.value = true;
+    }
 };
 
 const cleanRecord = async () => {
     delLoading.value = true;
-    await cleanRecords(dialogData.value.rowData.id, cleanData.value)
+    await cleanRecords(dialogData.value.rowData.id, cleanData.value, false)
         .then(() => {
             delLoading.value = false;
             open.value = false;

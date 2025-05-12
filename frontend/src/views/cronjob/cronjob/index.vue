@@ -143,6 +143,11 @@
                 <el-form class="mt-4 mb-1" v-if="showClean" ref="deleteForm" label-position="left">
                     <el-form-item>
                         <el-checkbox v-model="cleanData" :label="$t('cronjob.cleanData')" />
+                        <el-checkbox
+                            v-if="cleanData"
+                            v-model="cleanRemoteData"
+                            :label="$t('cronjob.cleanRemoteData')"
+                        />
                         <span class="input-help">
                             {{ $t('cronjob.cleanDataHelper') }}
                         </span>
@@ -164,7 +169,7 @@ import i18n from '@/lang';
 import { Cronjob } from '@/api/interface/cronjob';
 import { ElMessageBox } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
-import { transSpecToStr } from './helper';
+import { hasBackup, transSpecToStr } from './helper';
 import { GlobalStore } from '@/store';
 import router from '@/routers';
 
@@ -181,6 +186,7 @@ const operateIDs = ref();
 const opRef = ref();
 const showClean = ref();
 const cleanData = ref();
+const cleanRemoteData = ref();
 
 const data = ref();
 const paginationConfig = reactive({
@@ -257,7 +263,7 @@ const onDelete = async (row: Cronjob.CronjobInfo | null) => {
 
 const onSubmitDelete = async () => {
     loading.value = true;
-    await deleteCronjob({ ids: operateIDs.value, cleanData: cleanData.value })
+    await deleteCronjob({ ids: operateIDs.value, cleanData: cleanData.value, cleanRemoteData: cleanRemoteData.value })
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
@@ -309,17 +315,6 @@ const onHandle = async (row: Cronjob.CronjobInfo) => {
         .catch(() => {
             loading.value = false;
         });
-};
-
-const hasBackup = (type: string) => {
-    return (
-        type === 'app' ||
-        type === 'website' ||
-        type === 'database' ||
-        type === 'directory' ||
-        type === 'snapshot' ||
-        type === 'log'
-    );
 };
 
 const loadDetail = (row: any) => {

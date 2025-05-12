@@ -202,10 +202,15 @@ func (u *CronjobService) CleanRecord(req dto.CronjobClean) error {
 			if err != nil {
 				return err
 			}
+			if !req.CleanRemoteData {
+				for key := range accountMap {
+					if key != constant.Local {
+						delete(accountMap, key)
+					}
+				}
+			}
 			cronjob.RetainCopies = 0
 			u.removeExpiredBackup(cronjob, accountMap, model.BackupRecord{})
-		} else {
-			u.removeExpiredLog(cronjob)
 		}
 	}
 	if req.IsDelete {
@@ -272,6 +277,13 @@ func (u *CronjobService) Create(req dto.CronjobOperate) error {
 	if err := copier.Copy(&cronjob, &req); err != nil {
 		return buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 	}
+	if cronjob.Type == "cutWebsiteLog" {
+		backupAccount, err := backupRepo.Get(repo.WithByType(constant.Local))
+		if backupAccount.ID == 0 {
+			return fmt.Errorf("load local backup dir failed, err: %v", err)
+		}
+		cronjob.DownloadAccountID, cronjob.SourceAccountIDs = backupAccount.ID, fmt.Sprintf("%v", backupAccount.ID)
+	}
 	cronjob.Status = constant.StatusEnable
 
 	global.LOG.Infof("create cronjob %s successful, spec: %s", cronjob.Name, cronjob.Spec)
@@ -334,7 +346,7 @@ func (u *CronjobService) Delete(req dto.CronjobBatchDelete) error {
 			global.Cron.Remove(cron.EntryID(idItem))
 		}
 		global.LOG.Infof("stop cronjob entryID: %s", cronjob.EntryIDs)
-		if err := u.CleanRecord(dto.CronjobClean{CronjobID: id, CleanData: req.CleanData, IsDelete: true}); err != nil {
+		if err := u.CleanRecord(dto.CronjobClean{CronjobID: id, CleanData: req.CleanData, CleanRemoteData: req.CleanRemoteData, IsDelete: true}); err != nil {
 			return err
 		}
 		if err := cronjobRepo.Delete(repo.WithByID(id)); err != nil {

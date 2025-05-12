@@ -1060,6 +1060,7 @@ const message = {
         errHandle: 'Cronjob execution failure',
         noRecord: 'The execution did not generate any logs',
         cleanData: 'Clean data',
+        cleanRemoteData: 'Delete remote data',
         cleanDataHelper: 'Delete the backup file generated during this task.',
         noLogs: 'No task output yet...',
         errPath: 'Backup path [{0}] error, cannot download!',

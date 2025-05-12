@@ -189,3 +189,15 @@ export function transSpecToStr(spec: string): string {
             return i18n.global.t('cronjob.perNSecondHelper', [loadZero(specObj.second)]);
     }
 }
+
+export function hasBackup(type: string) {
+    return (
+        type === 'app' ||
+        type === 'website' ||
+        type === 'database' ||
+        type === 'directory' ||
+        type === 'snapshot' ||
+        type === 'log' ||
+        type === 'cutWebsiteLog'
+    );
+}
