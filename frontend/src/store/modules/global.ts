@@ -48,7 +48,6 @@ const GlobalStore = defineStore({
 
         currentNode: 'local',
         currentNodeAddr: '',
-        isOffline: false,
     }),
     getters: {
         isDarkTheme: (state) =>

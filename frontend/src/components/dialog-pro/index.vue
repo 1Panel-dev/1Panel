@@ -10,7 +10,9 @@
         @opened="opened"
         :before-close="handleBeforeClose"
     >
-        <slot name="header"></slot>
+        <template #header v-if="slots.header">
+            <slot name="header"></slot>
+        </template>
         <div v-if="slots.content">
             <slot name="content"></slot>
         </div>

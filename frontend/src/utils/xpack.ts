@@ -101,7 +101,7 @@ export async function getXpackSettingForTheme() {
             globalStore.themeConfig.loginBgType = res2.data?.loginBgType;
             globalStore.themeConfig.loginBackground = res2.data?.loginBackground;
             globalStore.themeConfig.themeColor = res2.data?.themeColor;
-            globalStore.themeConfig.theme = res2.data?.theme || 'auto';
+            globalStore.themeConfig.theme = res2.data?.theme || 'light';
         } else {
             resetXSetting();
         }

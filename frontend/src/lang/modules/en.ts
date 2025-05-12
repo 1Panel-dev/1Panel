@@ -3532,14 +3532,17 @@ const message = {
             defaultPhone: 'Default to license-bound account phone number',
             noticeAlert: 'Notice Alert',
             resourceAlert: 'Resource Alert',
-            syncToNode: 'Sync to Node',
-            syncToNodeHelper: 'Sync alert settings to other nodes',
-            nodes: 'Node',
-            selectNode: 'Select Node',
-            selectNodeError: 'Please select a node',
-            syncToNodeClose: 'After closing, set the async alert settings to another node. Do you want to continue?',
             agentOfflineAlertHelper:
-                'The child node offline alert will be scanned and executed by the main node every 30 minutes',
+                'When offline alert is enabled for the node, the main node will scan every 30 minutes to execute alert tasks.',
+            offline: 'Offline Alert',
+            offlineHelper:
+                'When set to offline alert, the main node will scan every 30 minutes to execute alert tasks.',
+            offlineOff: 'Enable Offline Alert',
+            offlineOffHelper:
+                'Enabling offline alert will make the main node scan every 30 minutes to execute alert tasks.',
+            offlineClose: 'Disable Offline Alert',
+            offlineCloseHelper:
+                'Disabling offline alert requires sub-nodes to handle alerts independently. Please ensure network connectivity to avoid alert failure.',
         },
         theme: {
             lingXiaGold: 'Ling Xia Gold',

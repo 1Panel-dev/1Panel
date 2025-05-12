@@ -45,7 +45,6 @@ export interface GlobalState {
 
     currentNode: string;
     currentNodeAddr: string;
-    isOffline: boolean;
 }
 
 export interface MenuState {

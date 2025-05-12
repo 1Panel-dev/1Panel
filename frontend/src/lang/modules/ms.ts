@@ -3466,15 +3466,17 @@ const message = {
             defaultPhone: 'Secara lalai ke nombor telefon akaun terikat lesen',
             noticeAlert: 'Amaran Pemberitahuan',
             resourceAlert: 'Amaran Sumber',
-            syncToNode: 'Penyegerakan ke nod anak',
-            syncToNodeHelper: 'Penyegerakan tetapan amaran ke nod lain',
-            nodes: 'Nod',
-            selectNode: 'Pilih nod',
-            selectNodeError: 'Sila pilih nod',
-            syncToNodeClose:
-                'Menutup ini tidak akan menyegerakkan tetapan amaran ke nod lain. Adakah anda ingin meneruskan?',
             agentOfflineAlertHelper:
-                'Amaran luar talian nod anak akan diimbas dan dilaksanakan oleh nod utama setiap 30 minit',
+                'Apabila amaran luar talian diaktifkan untuk nod, nod utama akan mengimbas setiap 30 minit untuk melaksanakan tugas amaran.',
+            offline: 'Amaran Luar Talian',
+            offlineHelper:
+                'Apabila ditetapkan kepada amaran luar talian, nod utama akan mengimbas setiap 30 minit untuk melaksanakan tugas amaran.',
+            offlineOff: 'Aktifkan Amaran Luar Talian',
+            offlineOffHelper:
+                'Mengaktifkan amaran luar talian akan menyebabkan nod utama mengimbas setiap 30 minit untuk melaksanakan tugas amaran.',
+            offlineClose: 'Lumpuhkan Amaran Luar Talian',
+            offlineCloseHelper:
+                'Melumpuhkan amaran luar talian memerlukan subnod untuk mengendalikan amaran secara kendiri. Sila pastikan sambungan rangkaian adalah baik untuk mengelakkan kegagalan amaran.',
         },
         theme: {
             lingXiaGold: 'Ling Xia Emas',

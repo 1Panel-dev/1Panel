@@ -337,7 +337,6 @@ const login = (formEl: FormInstance | undefined) => {
             menuStore.setMenuList([]);
             tabsStore.removeAllTabs();
             globalStore.currentNode = 'local';
-            globalStore.isOffline = false;
             MsgSuccess(i18n.t('commons.msg.loginSuccess'));
             router.push({ name: 'home' });
             document.onkeydown = null;

@@ -3471,15 +3471,17 @@ const message = {
             defaultPhone: 'Número de telefone padrão vinculado à conta de licença',
             noticeAlert: 'Alerta de Notificação',
             resourceAlert: 'Alerta de Recursos',
-            syncToNode: 'Sincronizar para o nó filho',
-            syncToNodeHelper: 'Sincronizar configurações de alerta para outros nós',
-            nodes: 'Nós',
-            selectNode: 'Selecionar nó',
-            selectNodeError: 'Por favor, selecione um nó',
-            syncToNodeClose:
-                'Ao fechar, as configurações de alerta não serão sincronizadas para outros nós. Deseja continuar?',
             agentOfflineAlertHelper:
-                'O alerta de offline do nó filho será verificado e executado pelo nó principal a cada 30 minutos',
+                'Quando o alerta offline estiver ativado para o nó, o nó principal verificará a cada 30 minutos para executar as tarefas de alerta.',
+            offline: 'Alerta Offline',
+            offlineHelper:
+                'Ao definir como alerta offline, o nó principal verificará a cada 30 minutos para executar tarefas de alerta.',
+            offlineOff: 'Ativar Alerta Offline',
+            offlineOffHelper:
+                'Ao ativar o alerta offline, o nó principal verificará a cada 30 minutos para executar as tarefas de alerta.',
+            offlineClose: 'Desativar Alerta Offline',
+            offlineCloseHelper:
+                'Ao desativar o alerta offline, os nós secundários deverão lidar com os alertas por conta própria. Certifique-se de que a conectividade de rede está boa para evitar falhas.',
         },
         theme: {
             lingXiaGold: 'Ling Xia Gold',

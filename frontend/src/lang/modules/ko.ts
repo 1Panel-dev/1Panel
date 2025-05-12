@@ -3327,13 +3327,15 @@ const message = {
             defaultPhone: '기본적으로 라이선스에 묶인 계정의 전화번호 사용',
             noticeAlert: '공지 알림',
             resourceAlert: '리소스 알림',
-            syncToNode: '자식 노드로 동기화',
-            syncToNodeHelper: '다른 노드로 알림 설정 동기화',
-            nodes: '노드',
-            selectNode: '노드 선택',
-            selectNodeError: '노드를 선택해 주세요',
-            syncToNodeClose: '닫으면 다른 노드로 알림 설정이 동기화되지 않습니다. 계속하시겠습니까?',
-            agentOfflineAlertHelper: '자식 노드 오프라인 알림은 메인 노드가 30분마다 스캔하여 실행합니다',
+            agentOfflineAlertHelper:
+                '노드에서 오프라인 알림이 활성화되면, 메인 노드가 30분마다 스캔하여 알림 작업을 수행합니다.',
+            offline: '오프라인 알림',
+            offlineHelper: '오프라인 알림으로 설정하면, 메인 노드가 30분마다 스캔하여 알림 작업을 수행합니다.',
+            offlineOff: '오프라인 알림 활성화',
+            offlineOffHelper: '오프라인 알림을 활성화하면, 메인 노드가 30분마다 스캔하여 알림 작업을 수행합니다.',
+            offlineClose: '오프라인 알림 비활성화',
+            offlineCloseHelper:
+                '오프라인 알림을 비활성화하면, 하위 노드가 알림을 직접 처리해야 합니다. 알림 실패를 방지하려면 네트워크 연결이 원활한지 확인하세요.',
         },
         theme: {
             lingXiaGold: '링샤 골드',
