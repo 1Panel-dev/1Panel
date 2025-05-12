@@ -528,7 +528,9 @@ func (w WebsiteService) UpdateWebsite(req request.WebsiteUpdate) error {
 		}
 	}
 	website.PrimaryDomain = req.PrimaryDomain
-	website.WebsiteGroupID = req.WebsiteGroupID
+	if req.WebsiteGroupID != 0 {
+		website.WebsiteGroupID = req.WebsiteGroupID
+	}
 	website.Remark = req.Remark
 	website.IPV6 = req.IPV6
 	website.Favorite = req.Favorite
