@@ -254,11 +254,7 @@ func (u *UpgradeService) handleRollback(originalDir string, errStep int) {
 func (u *UpgradeService) loadVersionByMode(developer, currentVersion string) (string, string, string) {
 	var current, latest string
 	if global.CONF.Base.Mode == "dev" {
-		betaVersionLatest := u.loadVersion(true, currentVersion, "beta")
 		devVersionLatest := u.loadVersion(true, currentVersion, "dev")
-		if common.ComparePanelVersion(betaVersionLatest, devVersionLatest) {
-			return betaVersionLatest, "", ""
-		}
 		return devVersionLatest, "", ""
 	}
 
