@@ -196,6 +196,7 @@ const message = {
             rePassword: '확인 비밀번호가 비밀번호와 일치하지 않습니다.',
             requiredInput: '이 필드는 필수 항목입니다.',
             requiredSelect: '목록에서 항목을 선택하세요',
+            illegalChar: '현재 & ; $ \' ` ( ) " > < | 문자 주입은 지원되지 않습니다',
             illegalInput: '이 필드에는 유효하지 않은 문자가 포함될 수 없습니다.',
             commonName:
                 '이 필드는 특수 문자로 시작할 수 없으며, 영어, 한자, 숫자, ".", "-", "_" 문자로 구성되어야 하며 길이는 1-128자여야 합니다.',
@@ -433,6 +434,8 @@ const message = {
         permission: '권한',
         permissionForIP: 'IP',
         permissionAll: '모두(%)',
+        localhostHelper:
+            '컨테이너 배포 시 데이터베이스 권한을 "localhost"로 설정하면 컨테이너 외부에서 접근할 수 없게 됩니다. 신중하게 선택하세요!',
         databaseConnInfo: '연결 정보',
         rootPassword: '루트 비밀번호',
         serviceName: '서비스 이름',
@@ -444,6 +447,7 @@ const message = {
         remoteConnHelper:
             'MySQL 의 root 사용자로 원격 접속은 보안 위험을 초래할 수 있습니다. 따라서 이 작업은 신중히 수행해야 합니다.',
         changePassword: '비밀번호',
+        changeConnHelper: '이 작업은 현재 데이터베이스 {0}을(를) 수정합니다. 계속하시겠습니까?',
         changePasswordHelper:
             '데이터베이스가 애플리케이션과 연결되어 있습니다. 비밀번호를 변경하면 애플리케이션의 데이터베이스 비밀번호도 변경됩니다. 변경 사항은 애플리케이션이 재시작된 후에 적용됩니다.',
         confChange: '설정',
@@ -1384,6 +1388,7 @@ const message = {
         existFileHelper: '업로드한 파일에 동일한 이름의 파일이 포함되어 있습니다. 덮어쓰시겠습니까?',
         existFileSize: '파일 크기 (새로운 -> 오래된)',
         existFileDirHelper: '선택한 파일/폴더에 동일한 이름이 이미 존재합니다. 신중하게 작업하세요!',
+        noSuchFile: '파일 또는 디렉터리를 찾을 수 없습니다. 확인 후 다시 시도하세요.',
     },
     ssh: {
         setting: '설정',

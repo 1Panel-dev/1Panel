@@ -6,6 +6,7 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/app/dto"
@@ -15,6 +16,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/terminal"
 	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
 )
 
@@ -216,7 +218,7 @@ func (b *BaseApi) RunScript(c *gin.Context) {
 	<-quitChan
 
 	global.LOG.Info("websocket finished")
-	if wshandleError(wsConn, err) {
-		return
-	}
+	global.LOG.Info("websocket finished")
+	dt := time.Now().Add(time.Second)
+	_ = wsConn.WriteControl(websocket.CloseMessage, nil, dt)
 }

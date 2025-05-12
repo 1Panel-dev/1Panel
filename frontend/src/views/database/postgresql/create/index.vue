@@ -14,6 +14,7 @@
                             <el-button @click="random">{{ $t('commons.button.random') }}</el-button>
                         </template>
                     </el-input>
+                    <span class="input-help">{{ $t('commons.rule.illegalChar') }}</span>
                 </el-form-item>
                 <el-form-item :label="$t('database.permission')" prop="superUser">
                     <el-checkbox v-model="form.superUser">{{ $t('database.pgSuperUser') }}</el-checkbox>
@@ -66,7 +67,7 @@ const form = reactive({
 const rules = reactive({
     name: [Rules.requiredInput, Rules.dbName],
     username: [Rules.requiredInput, Rules.name],
-    password: [Rules.paramComplexity],
+    password: [Rules.requiredInput, Rules.noSpace, Rules.illegal],
 });
 
 type FormInstance = InstanceType<typeof ElForm>;

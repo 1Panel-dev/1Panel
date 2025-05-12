@@ -59,10 +59,8 @@ func (b *BaseApi) WsSSH(c *gin.Context) {
 
 	<-quitChan
 
-	global.LOG.Info("websocket finished")
-	if wshandleError(wsConn, err) {
-		return
-	}
+	dt := time.Now().Add(time.Second)
+	_ = wsConn.WriteControl(websocket.CloseMessage, nil, dt)
 }
 
 func (b *BaseApi) ContainerWsSSH(c *gin.Context) {
@@ -125,9 +123,8 @@ func (b *BaseApi) ContainerWsSSH(c *gin.Context) {
 	<-quitChan
 
 	global.LOG.Info("websocket finished")
-	if wshandleError(wsConn, err) {
-		return
-	}
+	dt := time.Now().Add(time.Second)
+	_ = wsConn.WriteControl(websocket.CloseMessage, nil, dt)
 }
 
 func loadRedisInitCmd(c *gin.Context) (string, []string, error) {

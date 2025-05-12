@@ -14,6 +14,7 @@
                 </el-form-item>
                 <el-form-item :label="$t('commons.login.password')" prop="password">
                     <el-input type="password" clearable show-password v-model="form.password" />
+                    <span class="input-help">{{ $t('commons.rule.illegalChar') }}</span>
                 </el-form-item>
                 <el-form-item :label="$t('database.permission')" prop="superUser">
                     <el-checkbox v-model="form.superUser">{{ $t('database.pgSuperUser') }}</el-checkbox>
@@ -57,7 +58,7 @@ const confirmDialogRef = ref();
 
 const rules = reactive({
     username: [Rules.requiredInput, Rules.name],
-    password: [Rules.paramComplexity],
+    password: [Rules.requiredInput, Rules.noSpace, Rules.illegal],
 });
 
 interface DialogProps {

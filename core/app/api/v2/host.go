@@ -316,9 +316,8 @@ func (b *BaseApi) WsSsh(c *gin.Context) {
 
 	<-quitChan
 
-	if wshandleError(wsConn, err) {
-		return
-	}
+	dt := time.Now().Add(time.Second)
+	_ = wsConn.WriteControl(websocket.CloseMessage, nil, dt)
 }
 
 var upGrader = websocket.Upgrader{

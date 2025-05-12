@@ -69,6 +69,7 @@
                         {{ $t('commons.button.random') }}
                     </el-button>
                 </el-button-group>
+                <span class="input-help">{{ $t('commons.rule.illegalChar') }}</span>
             </el-form-item>
 
             <div v-if="form.from !== 'local'">
@@ -104,6 +105,7 @@ import { getAppConnInfo } from '@/api/modules/app';
 import { MsgSuccess } from '@/utils/message';
 import { getRandomStr } from '@/utils/util';
 import { getAgentSettingInfo } from '@/api/modules/setting';
+import { Rules } from '@/global/form-rules';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
 
@@ -123,20 +125,8 @@ const form = reactive({
     remoteIP: '',
 });
 const rules = reactive({
-    password: [{ validator: checkPassword, trigger: 'blur' }],
+    password: [Rules.requiredInput, Rules.noSpace, Rules.illegal],
 });
-
-function checkPassword(rule: any, value: any, callback: any) {
-    if (form.password !== '') {
-        const reg = /^[a-zA-Z0-9]{1}[a-zA-Z0-9.%@!~_-]{4,126}[a-zA-Z0-9]{1}$/;
-        if (!reg.test(value) && value !== '') {
-            callback(new Error(i18n.global.t('commons.rule.paramComplexity', ['.%@!~_-'])));
-        } else {
-            callback();
-        }
-    }
-    callback();
-}
 
 const confirmDialogRef = ref();
 

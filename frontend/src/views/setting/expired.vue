@@ -59,12 +59,8 @@ let isComplexity = ref(false);
 type FormInstance = InstanceType<typeof ElForm>;
 const passFormRef = ref<FormInstance>();
 const passRules = reactive({
-    oldPass: [Rules.noSpace, Rules.requiredInput],
-    newPass: [
-        Rules.requiredInput,
-        Rules.noSpace,
-        { min: 6, message: i18n.global.t('commons.rule.commonPassword'), trigger: 'blur' },
-    ],
+    oldPass: [Rules.requiredInput, Rules.noSpace],
+    newPass: [Rules.requiredInput, Rules.noSpace],
     newPassComplexity: [Rules.requiredInput, Rules.noSpace, Rules.password],
     rePass: [Rules.requiredInput, Rules.noSpace, { validator: checkPasswordSame, trigger: 'blur' }],
 });

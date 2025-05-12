@@ -207,6 +207,7 @@ const message = {
             rePassword: 'The passwords are inconsistent. Please check and re-enter the password',
             requiredInput: 'Please enter the required fields',
             requiredSelect: 'Please select the required fields',
+            illegalChar: 'Injection of characters & ; $ \' ` ( ) " > < | is currently not supported',
             illegalInput: 'There are illegal characters in the input box.',
             commonName:
                 'Supports non-special characters starting with English, Chinese, numbers, .- and _, length 1-128',
@@ -441,6 +442,8 @@ const message = {
         permission: 'Permission',
         permissionForIP: 'IP',
         permissionAll: 'All of them(%)',
+        localhostHelper:
+            'Configuring database permissions as "localhost" for container deployment will prevent external access to the container. Please choose carefully!',
         databaseConnInfo: 'Conn info',
         rootPassword: 'Root password',
         serviceName: 'Service Name',
@@ -452,6 +455,7 @@ const message = {
         remoteConnHelper:
             'Remote connection to mysql as user root may have security risks. Therefore, perform this operation with caution.',
         changePassword: 'Password',
+        changeConnHelper: 'This operation will modify the current database {0}. Do you want to continue?',
         changePasswordHelper:
             'The database has been associated with an application. Changing the password will change the database password of the application at the same time. The change takes effect after the application restarts.',
 
@@ -1457,6 +1461,7 @@ const message = {
         existFileHelper: 'The uploaded file contains a file with the same name, do you want to overwrite it?',
         existFileSize: 'File size (new -> old)',
         existFileDirHelper: 'The selected file/folder has a duplicate name. Please proceed with caution!',
+        noSuchFile: 'The file or directory was not found. Please check and try again.',
     },
     ssh: {
         autoStart: 'Auto Start',

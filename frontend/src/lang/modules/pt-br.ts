@@ -198,6 +198,7 @@ const message = {
             rePassword: 'A confirmação da senha não corresponde à senha.',
             requiredInput: 'Este campo é obrigatório.',
             requiredSelect: 'Selecione um item na lista',
+            illegalChar: 'Atualmente não há suporte para injeção dos caracteres & ; $ \' ` ( ) " > < |',
             illegalInput: 'Este campo não deve conter caracteres ilegais.',
             commonName:
                 'Este campo deve começar com caracteres não especiais e consistir em letras, números, ".", "-", e "_" com comprimento de 1-128.',
@@ -437,6 +438,8 @@ const message = {
         permission: 'Permissões',
         permissionForIP: 'IP',
         permissionAll: 'Todos (% de)',
+        localhostHelper:
+            'Configurar permissões de banco de dados como "localhost" para implantação em contêiner impedirá o acesso externo ao contêiner. Por favor, escolha com cuidado!',
         databaseConnInfo: 'Informações de conexão',
         rootPassword: 'Senha root',
         serviceName: 'Nome do serviço',
@@ -448,6 +451,7 @@ const message = {
         remoteConnHelper:
             'Conectar-se ao MySQL como usuário root pode representar riscos de segurança. Realize esta operação com cautela.',
         changePassword: 'Senha',
+        changeConnHelper: 'Esta operação modificará o banco de dados atual {0}. Deseja continuar?',
         changePasswordHelper:
             'O banco de dados está associado a um aplicativo. Alterar a senha alterará a senha do banco de dados do aplicativo ao mesmo tempo. A mudança surtirá efeito após a reinicialização do aplicativo.',
 
@@ -1428,6 +1432,7 @@ const message = {
         existFileHelper: 'O arquivo enviado contém um arquivo com o mesmo nome. Deseja substituí-lo?',
         existFileSize: 'Tamanho do arquivo (novo -> antigo)',
         existFileDirHelper: 'O arquivo/pasta selecionado tem um nome duplicado. Por favor, prossiga com cautela!',
+        noSuchFile: 'O arquivo ou diretório não foi encontrado. Por favor, verifique e tente novamente.',
     },
     ssh: {
         setting: 'configuração',

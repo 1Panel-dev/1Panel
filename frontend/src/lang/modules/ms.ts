@@ -199,6 +199,7 @@ const message = {
             rePassword: 'Pengesahan kata laluan tidak sepadan dengan kata laluan.',
             requiredInput: 'Ruangan ini wajib diisi.',
             requiredSelect: 'Pilih satu item dalam senarai',
+            illegalChar: 'Suntikan aksara & ; $ \' ` ( ) " > < | tidak disokong buat masa ini',
             illegalInput: 'Ruangan ini tidak boleh mengandungi aksara tidak sah.',
             commonName:
                 'Ruangan ini mesti bermula dengan aksara bukan khas dan mesti terdiri daripada aksara rumi, Cina, nombor, ".", "-", dan "_" dengan panjang 1-128 aksara.',
@@ -439,6 +440,8 @@ const message = {
         permission: 'Kebenaran',
         permissionForIP: 'IP',
         permissionAll: 'Kesemuanya(%)',
+        localhostHelper:
+            'Mengkonfigurasi kebenaran pangkalan data sebagai "localhost" untuk penyebaran kontena akan menghalang akses luar ke kontena. Sila pilih dengan teliti!',
         databaseConnInfo: 'Maklumat sambungan',
         rootPassword: 'Kata laluan root',
         serviceName: 'Nama Perkhidmatan',
@@ -450,6 +453,7 @@ const message = {
         remoteConnHelper:
             'Sambungan jauh ke MySQL sebagai pengguna root mungkin mempunyai risiko keselamatan. Oleh itu, lakukan operasi ini dengan berhati-hati.',
         changePassword: 'Kata laluan',
+        changeConnHelper: 'Operasi ini akan mengubah pangkalan data semasa {0}. Adakah anda ingin meneruskan?',
         changePasswordHelper:
             'Pangkalan data telah dikaitkan dengan aplikasi. Menukar kata laluan akan menukar kata laluan pangkalan data aplikasi pada masa yang sama. Perubahan ini akan berkuat kuasa selepas aplikasi dimulakan semula.',
 
@@ -1442,6 +1446,7 @@ const message = {
         existFileHelper: 'Fail yang dimuat naik mengandungi fail dengan nama yang sama. Adakah anda mahu menimpanya?',
         existFileSize: 'Saiz fail (baru -> lama)',
         existFileDirHelper: 'Fail/folder yang dipilih mempunyai nama yang sama. Sila berhati-hati!',
+        noSuchFile: 'Fail atau direktori tidak ditemui. Sila periksa dan cuba lagi.',
     },
     ssh: {
         setting: 'tetapan',

@@ -138,7 +138,8 @@ const checkIllegal = (rule: any, value: any, callback: any) => {
         value.indexOf('`') !== -1 ||
         value.indexOf('(') !== -1 ||
         value.indexOf(')') !== -1 ||
-        value.indexOf("'") !== -1
+        value.indexOf('>') !== -1 ||
+        value.indexOf('<') !== -1
     ) {
         callback(new Error(i18n.global.t('commons.rule.illegalInput')));
     } else {

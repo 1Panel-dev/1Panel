@@ -43,8 +43,9 @@ import i18n from '@/lang';
 import { snapshotImport } from '@/api/modules/setting';
 import { listBackupOptions, getFilesFromBackup } from '@/api/modules/backup';
 import { Rules } from '@/global/form-rules';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import router from '@/routers';
+import { checkFile } from '@/api/modules/files';
 
 const drawerVisible = ref(false);
 const loading = ref();
@@ -92,7 +93,12 @@ const checkDisable = (val: string) => {
     return false;
 };
 const toFolder = async () => {
-    router.push({ path: '/hosts/files', query: { path: backupPath.value } });
+    const res = await checkFile(backupPath.value, true);
+    if (res.data) {
+        router.push({ path: '/hosts/files', query: { path: backupPath.value } });
+    } else {
+        MsgError(i18n.global.t('file.noSuchFile'));
+    }
 };
 
 const submitImport = async (formEl: FormInstance | undefined) => {

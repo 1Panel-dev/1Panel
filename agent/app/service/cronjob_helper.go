@@ -258,7 +258,8 @@ func (u *CronjobService) uploadCronjobBackFile(cronjob model.Cronjob, accountMap
 		if len(account) != 0 {
 			global.LOG.Debugf("start upload file to %s, dir: %s", accountMap[account].name, pathUtils.Join(accountMap[account].backupPath, cloudSrc))
 			if _, err := accountMap[account].client.Upload(file, pathUtils.Join(accountMap[account].backupPath, cloudSrc)); err != nil {
-				return "", err
+				global.LOG.Errorf("upload file to %s failed, err: %v", accountMap[account].name, err)
+				continue
 			}
 			global.LOG.Debugf("upload successful!")
 		}
@@ -285,6 +286,9 @@ func (u *CronjobService) removeExpiredBackup(cronjob model.Cronjob, accountMap m
 		if cronjob.Type == "snapshot" {
 			for _, account := range accounts {
 				if len(account) != 0 {
+					if _, ok := accountMap[account]; !ok {
+						continue
+					}
 					_, _ = accountMap[account].client.Delete(pathUtils.Join(accountMap[account].backupPath, "system_snapshot", records[i].FileName))
 				}
 			}
@@ -292,6 +296,9 @@ func (u *CronjobService) removeExpiredBackup(cronjob model.Cronjob, accountMap m
 		} else {
 			for _, account := range accounts {
 				if len(account) != 0 {
+					if _, ok := accountMap[account]; !ok {
+						continue
+					}
 					_, _ = accountMap[account].client.Delete(pathUtils.Join(accountMap[account].backupPath, records[i].FileDir, records[i].FileName))
 				}
 			}

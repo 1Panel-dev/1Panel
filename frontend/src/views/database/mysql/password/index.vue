@@ -13,8 +13,9 @@
                         <el-input disabled v-model="changeForm.userName"></el-input>
                     </el-form-item>
                     <el-form-item :label="$t('commons.login.password')" prop="password">
-                        <el-input type="password" clearable show-password v-model="changeForm.password"></el-input>
+                        <el-input type="password" clearable show-password v-model="changeForm.password" />
                     </el-form-item>
+                    <span class="input-help">{{ $t('commons.rule.illegalChar') }}</span>
                 </div>
                 <div v-if="changeForm.operation === 'privilege'">
                     <el-form-item :label="$t('database.permission')" prop="privilege">
@@ -23,10 +24,13 @@
                             <el-option
                                 v-if="changeForm.from !== 'local'"
                                 value="localhost"
-                                :label="$t('terminal.localhost')"
+                                :label="$t('terminal.localhost') + '(localhost)'"
                             />
                             <el-option value="ip" :label="$t('database.permissionForIP')" />
                         </el-select>
+                        <span v-if="changeForm.from !== 'local'" class="input-help">
+                            {{ $t('database.localhostHelper') }}
+                        </span>
                     </el-form-item>
                     <el-form-item v-if="changeForm.privilege === 'ip'" prop="privilegeIPs">
                         <el-input clearable :rows="3" type="textarea" v-model="changeForm.privilegeIPs" />
@@ -56,13 +60,14 @@ import { ElForm } from 'element-plus';
 import { deleteCheckMysqlDB, updateMysqlAccess, updateMysqlPassword } from '@/api/modules/database';
 import { Rules } from '@/global/form-rules';
 import { MsgSuccess } from '@/utils/message';
-import { checkIp } from '@/utils/util';
 
 const loading = ref();
 const changeVisible = ref(false);
 type FormInstance = InstanceType<typeof ElForm>;
 const changeFormRef = ref<FormInstance>();
 const title = ref();
+const oldPrivilege = ref();
+const oldPrivilegeIPs = ref();
 const changeForm = reactive({
     id: 0,
     from: '',
@@ -79,19 +84,9 @@ const changeForm = reactive({
 const confirmDialogRef = ref();
 
 const rules = reactive({
-    password: [Rules.paramComplexity],
-    privilegeIPs: [{ validator: checkIPs, trigger: 'blur', required: true }],
+    password: [Rules.requiredInput, Rules.noSpace, Rules.illegal],
+    privilegeIPs: [Rules.requiredInput, Rules.noSpace, Rules.illegal],
 });
-
-function checkIPs(rule: any, value: any, callback: any) {
-    let ips = changeForm.privilegeIPs.split(',');
-    for (const item of ips) {
-        if (checkIp(item)) {
-            return callback(new Error(i18n.global.t('commons.rule.ip')));
-        }
-    }
-    callback();
-}
 
 interface DialogProps {
     id: number;
@@ -123,6 +118,8 @@ const acceptParams = (params: DialogProps): void => {
     changeForm.privilegeIPs = params.privilegeIPs;
     changeForm.value = params.value;
     changeVisible.value = true;
+    oldPrivilege.value = params.privilege;
+    oldPrivilegeIPs.value = params.privilegeIPs;
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -164,6 +161,10 @@ const submitChangeInfo = async (formEl: FormInstance | undefined) => {
                         loading.value = false;
                     });
             }
+            return;
+        }
+        if (changeForm.privilege === oldPrivilege.value && changeForm.privilegeIPs === oldPrivilegeIPs.value) {
+            changeVisible.value = false;
             return;
         }
         if (changeForm.privilege !== 'ip') {

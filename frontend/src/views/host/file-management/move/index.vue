@@ -220,7 +220,7 @@ const acceptParams = async (props: MoveProps) => {
     type.value = props.type;
     if (props.name && props.name != '') {
         oldName.value = props.name;
-        const res = await checkFile(props.path + '/' + props.name);
+        const res = await checkFile(props.path + '/' + props.name, false);
         if (res.data) {
             changeName.value = true;
             addForm.cover = false;

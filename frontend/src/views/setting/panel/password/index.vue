@@ -47,12 +47,8 @@ import { logOutApi } from '@/api/modules/auth';
 const globalStore = GlobalStore();
 const passFormRef = ref<FormInstance>();
 const passRules = reactive({
-    oldPassword: [Rules.noSpace, Rules.requiredInput],
-    newPassword: [
-        Rules.requiredInput,
-        Rules.noSpace,
-        { min: 6, message: i18n.global.t('commons.rule.commonPassword'), trigger: 'blur' },
-    ],
+    oldPassword: [Rules.requiredInput, Rules.noSpace],
+    newPassword: [Rules.requiredInput, Rules.noSpace],
     newPasswordComplexity: [Rules.requiredInput, Rules.noSpace, Rules.password],
     retryPassword: [Rules.requiredInput, Rules.noSpace, { validator: checkPassword, trigger: 'blur' }],
 });

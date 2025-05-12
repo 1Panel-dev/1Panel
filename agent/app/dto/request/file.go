@@ -76,7 +76,8 @@ type FileRename struct {
 }
 
 type FilePathCheck struct {
-	Path string `json:"path" validate:"required"`
+	Path     string `json:"path" validate:"required"`
+	WithInit bool   `json:"withInit"`
 }
 
 type FilePathsCheck struct {

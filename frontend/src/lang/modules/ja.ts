@@ -197,6 +197,7 @@ const message = {
             rePassword: 'パスワードがパスワードと矛盾することを確認してください。',
             requiredInput: 'この項目は必須です。',
             requiredSelect: 'リスト内のアイテムを選択します',
+            illegalChar: '現在、文字 & ; $ \' ` ( ) " > < | の注入はサポートされていません',
             illegalInput: `このフィールドには違法なキャラクターが含まれてはなりません。`,
             commonName:
                 'このフィールドは、特別なキャラクターではなく、英語、中国語、数字で構成されている必要があります。「。」、「」、および「_」文字が1〜128の文字で構成されている必要があります。',
@@ -430,6 +431,8 @@ const message = {
         permission: '権限',
         permissionForIP: 'ip',
         permissionAll: 'それらすべて（％）',
+        localhostHelper:
+            'コンテナ展開でデータベース権限を"localhost"に設定すると、コンテナ外部からのアクセスができなくなります。慎重に選択してください！',
         databaseConnInfo: '接続情報',
         rootPassword: 'ルートパスワード',
         serviceName: 'サービス名',
@@ -441,6 +444,7 @@ const message = {
         remoteConnHelper:
             'ユーザールートとしてのMySQLへのリモート接続には、セキュリティリスクがある場合があります。したがって、この操作を慎重に実行します。',
         changePassword: 'パスワード',
+        changeConnHelper: 'この操作は現在のデータベース {0} を変更します。続行しますか？',
         changePasswordHelper:
             'データベースはアプリケーションに関連付けられています。パスワードを変更すると、アプリケーションのデータベースパスワードが同時に変更されます。アプリケーションが再起動した後、変更は有効になります。',
 
@@ -1398,6 +1402,7 @@ const message = {
         existFileHelper: 'アップロードしたファイルに同じ名前のファイルが含まれています。上書きしますか？',
         existFileSize: 'ファイルサイズ（新しい -> 古い）',
         existFileDirHelper: '選択したファイル/フォルダーには同じ名前のものが既に存在します。慎重に操作してください！',
+        noSuchFile: 'ファイルまたはディレクトリが見つかりませんでした。確認して再試行してください。',
     },
     ssh: {
         setting: '設定',
