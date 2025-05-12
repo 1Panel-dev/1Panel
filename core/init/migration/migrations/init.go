@@ -297,7 +297,7 @@ var AddMFAInterval = &gormigrate.Migration{
 }
 
 var UpdateXpackHideMemu = &gormigrate.Migration{
-	ID: "20250429-update-xpack-hide-menu",
+	ID: "20250511-update-xpack-hide-menu",
 	Migrate: func(tx *gorm.DB) error {
 		if err := tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Updates(map[string]interface{}{"key": "HideMenu", "value": helper.LoadMenus()}).Error; err != nil {
 			return err
