@@ -178,7 +178,7 @@ func NewConfigWithProxy(user registration.User, accountType, customCaURL string,
 		caDirURL = customCaURL
 	}
 	if systemProxy != nil {
-		proxyURL = fmt.Sprintf("%s:%s", systemProxy.URL, systemProxy.Port)
+		proxyURL = fmt.Sprintf("%s://%s:%s", systemProxy.Type, systemProxy.URL, systemProxy.Port)
 		proxyUser = systemProxy.User
 		proxyPassword = systemProxy.Password
 	}

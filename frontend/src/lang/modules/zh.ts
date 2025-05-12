@@ -1466,6 +1466,7 @@ const message = {
         proxyHelper3: '系统许可证的验证和同步',
         proxyHelper4: 'Docker 的网络访问将通过代理服务器进行（专业版功能）',
         proxyHelper5: '系统类型脚本库的统一下载与同步（专业版功能）',
+        proxyHelper6: '申请证书（专业版功能）',
         proxyType: '代理类型',
         proxyUrl: '代理地址',
         proxyPort: '代理端口',

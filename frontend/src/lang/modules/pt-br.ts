@@ -1525,6 +1525,7 @@ const message = {
         proxyHelper3: 'Verificação e sincronização da licença do sistema',
         proxyHelper5:
             'Download e sincronização unificados para bibliotecas de scripts do tipo sistema (Recurso da Edição Profissional)',
+        proxyHelper6: 'Solicitar certificado (Funcionalidade da versão Pro)',
         proxyType: 'Tipo de proxy',
         proxyUrl: 'Endereço do proxy',
         proxyPort: 'Porta do proxy',

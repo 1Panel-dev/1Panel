@@ -1538,6 +1538,7 @@ const message = {
         proxyHelper4: 'Rangkaian Docker akan diakses melalui pelayan proksi (Edisi Profesional sahaja)',
         proxyHelper3: 'Pengesahan dan penyelarasan lesen sistem',
         proxyHelper5: 'Muat turun dan penyegerakan bersepadu untuk pustaka skrip jenis sistem (Ciri Edisi Profesional)',
+        proxyHelper6: 'Mohon sijil (Fungsi versi Pro)',
         proxyType: 'Jenis proksi',
         proxyUrl: 'Alamat proksi',
         proxyPort: 'Port proksi',

@@ -1476,6 +1476,7 @@ const message = {
         proxyHelper4: 'Docker 네트워크가 프록시 서버를 통해 액세스됩니다 (전문 버전에서만 제공)',
         proxyHelper3: '시스템 라이선스 인증 및 동기화',
         proxyHelper5: '시스템 유형 스크립트 라이브러리의 통합 다운로드 및 동기화 (프로페셔널 에디션 기능)',
+        proxyHelper6: '인증서 신청 (프로 버전 기능)',
         proxyType: '프록시 유형',
         proxyUrl: '프록시 주소',
         proxyPort: '프록시 포트',

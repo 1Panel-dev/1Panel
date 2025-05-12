@@ -1470,6 +1470,7 @@ const message = {
         proxyHelper3: '系統許可證的驗證和同步',
         proxyHelper4: 'Docker 的網絡訪問將通過代理伺服器進行（專業版功能）',
         proxyHelper5: '系統類型腳本庫的統一下載與同步（專業版功能）',
+        proxyHelper6: '申請證書（專業版功能）',
         proxyType: '代理類型',
         proxyUrl: '代理地址',
         proxyPort: '代理端口',

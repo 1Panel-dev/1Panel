@@ -1493,6 +1493,7 @@ const message = {
         proxyHelper4:
             'Dockerネットワークはプロキシサーバーを通じてアクセスされます（プロフェッショナルエディションのみ）',
         proxyHelper5: 'システムタイプスクリプトライブラリの統一下載と同期（プロフェッショナル版機能）',
+        proxyHelper6: '証明書を申請する（プロ版機能）',
         proxyHelper3: 'システムライセンスの確認と同期',
         proxyType: 'プロキシタイプ',
         proxyUrl: 'プロキシアドレス',
