@@ -49,6 +49,8 @@ interface LogProps {
     taskType?: string;
     taskOperate?: string;
     resourceID?: number;
+
+    operateNode?: string;
 }
 
 const props = defineProps({
@@ -64,6 +66,8 @@ const props = defineProps({
             taskOperate: '',
             resourceID: 0,
             taskID: '',
+
+            operateNode: '',
         }),
     },
     defaultButton: {
@@ -201,7 +205,7 @@ const getContent = async (pre: boolean) => {
     isLoading.value = true;
     emit('update:isReading', true);
 
-    const res = await readByLine(readReq);
+    const res = await readByLine(readReq, props.config.operateNode || '');
     logPath.value = res.data.path;
     firstLoading.value = false;
 

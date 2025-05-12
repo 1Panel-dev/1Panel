@@ -122,7 +122,10 @@ export const addFavorite = (path: string) => {
     return http.post<any>('files/favorite', { path: path });
 };
 
-export const readByLine = (req: File.FileReadByLine) => {
+export const readByLine = (req: File.FileReadByLine, operateNode?: string) => {
+    if (operateNode) {
+        return http.post<any>('files/read', req, TimeoutEnum.T_40S, { CurrentNode: operateNode });
+    }
     return http.post<any>('files/read', req);
 };
 

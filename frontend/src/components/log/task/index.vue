@@ -42,25 +42,29 @@ const config = reactive({
     taskType: '',
     tail: true,
     colorMode: 'task',
+
+    operateNode: '',
 });
 const open = ref(false);
 const showTail = ref(true);
 
-const openWithTaskID = (id: string, tail: boolean) => {
+const openWithTaskID = (id: string, tail: boolean, operateNode?: string) => {
     config.taskID = id;
     if (tail === undefined) {
         config.tail = true;
     } else {
         config.tail = tail;
     }
+    config.operateNode = operateNode || '';
     open.value = true;
     bus.emit('refreshTask', true);
 };
 
-const openWithResourceID = (taskType: string, taskOperate: string, resourceID: number) => {
+const openWithResourceID = (taskType: string, taskOperate: string, resourceID: number, operateNode?: string) => {
     config.taskType = taskType;
     config.resourceID = resourceID;
     config.taskOperate = taskOperate;
+    config.operateNode = operateNode || '';
     open.value = true;
 };
 

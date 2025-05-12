@@ -214,7 +214,7 @@ const onSync = async () => {
 };
 
 const openTaskLog = (taskID: string) => {
-    taskLogRef.value.openWithTaskID(taskID);
+    taskLogRef.value.openWithTaskID(taskID, true, 'local');
 };
 
 const search = async () => {

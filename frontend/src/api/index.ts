@@ -120,12 +120,17 @@ class RequestHttp {
     get<T>(url: string, params?: object, _object = {}): Promise<ResultData<T>> {
         return this.service.get(url, { params, ..._object });
     }
-    post<T>(url: string, params?: object, timeout?: number): Promise<ResultData<T>> {
-        return this.service.post(url, params, {
+    post<T>(url: string, params?: object, timeout?: number, headers?: object): Promise<ResultData<T>> {
+        let config = {
             baseURL: import.meta.env.VITE_API_URL as string,
             timeout: timeout ? timeout : (ResultEnum.TIMEOUT as number),
             withCredentials: true,
-        });
+            headers: headers,
+        };
+        if (headers) {
+            config.headers = headers;
+        }
+        return this.service.post(url, params, config);
     }
     postLocalNode<T>(url: string, params?: object, timeout?: number): Promise<ResultData<T>> {
         return this.service.post(url, params, {
