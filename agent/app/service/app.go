@@ -954,7 +954,10 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 
 		t.LogStart(i18n.GetMsgByKey("SyncAppDetail"))
 		for _, l := range list.Apps {
-			app := appsMap[l.AppProperty.Key]
+			app, ok := appsMap[l.AppProperty.Key]
+			if !ok {
+				continue
+			}
 			iconStr := ""
 			_, iconRes, err := req_helper.HandleRequest(l.Icon, http.MethodGet, constant.TimeOut20s)
 			if err == nil {
