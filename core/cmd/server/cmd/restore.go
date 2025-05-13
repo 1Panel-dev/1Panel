@@ -46,17 +46,23 @@ var restoreCmd = &cobra.Command{
 		tmpPath = path.Join(upgradeDir, tmpPath, "original")
 
 		fmt.Println(i18n.GetMsgWithMapForCmd("RestoreStep1", map[string]interface{}{"name": tmpPath}))
-		if err := files.CopyFile(path.Join(tmpPath, "1panel-agent"), "/usr/local/bin/1panel-agent", true); err != nil {
+		if err := files.CopyItem(false, true, path.Join(tmpPath, "1panel-agent"), "/usr/local/bin"); err != nil {
 			return err
 		}
-		if err := files.CopyFile(path.Join(tmpPath, "1panel-core"), "/usr/local/bin/1panel-core", true); err != nil {
+		if err := files.CopyItem(false, true, path.Join(tmpPath, "1panel-core"), "/usr/local/bin"); err != nil {
+			return err
+		}
+		if err := files.CopyItem(true, true, path.Join(tmpPath, "lang"), "/usr/local/bin"); err != nil {
+			return err
+		}
+		if err := files.CopyItem(false, true, path.Join(tmpPath, "GeoIP.mmdb"), path.Join(baseDir, "1panel/geo")); err != nil {
 			return err
 		}
 		sudo := cmdUtils.SudoHandleCmd()
 		_, _ = cmdUtils.RunDefaultWithStdoutBashCf("%s chmod 755 /usr/local/bin/1panel-agent /usr/local/bin/1panel-core", sudo)
 
 		fmt.Println(i18n.GetMsgByKeyForCmd("RestoreStep2"))
-		if err := files.CopyFile(path.Join(tmpPath, "1pctl"), "/usr/local/bin/1pctl", true); err != nil {
+		if err := files.CopyItem(false, true, path.Join(tmpPath, "1pctl"), "/usr/local/bin"); err != nil {
 			return err
 		}
 		_, _ = cmdUtils.RunDefaultWithStdoutBashCf("%s chmod 755 /usr/local/bin/1pctl", sudo)
@@ -65,10 +71,10 @@ var restoreCmd = &cobra.Command{
 		_, _ = cmdUtils.RunDefaultWithStdoutBashCf("mkdir %s && cp %s %s/", geoPath, path.Join(tmpPath, "GeoIP.mmdb"), geoPath)
 
 		fmt.Println(i18n.GetMsgByKeyForCmd("RestoreStep3"))
-		if err := files.CopyFile(path.Join(tmpPath, "1panel-core.service"), "/etc/systemd/system/1panel-core.service", true); err != nil {
+		if err := files.CopyItem(false, true, path.Join(tmpPath, "1panel-core.service"), "/etc/systemd/system"); err != nil {
 			return err
 		}
-		if err := files.CopyFile(path.Join(tmpPath, "1panel-agent.service"), "/etc/systemd/system/1panel-agent.service", true); err != nil {
+		if err := files.CopyItem(false, true, path.Join(tmpPath, "1panel-agent.service"), "/etc/systemd/system"); err != nil {
 			return err
 		}
 		fmt.Println(i18n.GetMsgByKeyForCmd("RestoreStep4"))

@@ -173,6 +173,17 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 			return
 		}
 
+		if err := files.CopyItem(true, true, path.Join(tmpDir, "lang"), "/usr/local/bin"); err != nil {
+			global.LOG.Errorf("Update language files failed: %v", err)
+			_ = settingRepo.Update("SystemStatus", "Free")
+			u.handleRollback(originalDir, 4)
+		}
+		if err := files.CopyItem(false, true, path.Join(tmpDir, "GeoIP.mmdb"), path.Join(global.CONF.Base.InstallDir, "1panel/geo")); err != nil {
+			global.LOG.Warnf("Update GeoIP database failed: %v", err)
+			_ = settingRepo.Update("SystemStatus", "Free")
+			u.handleRollback(originalDir, 4)
+		}
+
 		global.LOG.Info("upgrade successful!")
 		go writeLogs(req.Version)
 		_ = settingRepo.Update("SystemVersion", req.Version)
@@ -207,6 +218,9 @@ func (u *UpgradeService) handleBackup(originalDir string) error {
 	if err := files.CopyItem(false, true, "/usr/local/bin/1pctl", originalDir); err != nil {
 		return err
 	}
+	if err := files.CopyItem(true, true, "/usr/local/bin/lang", originalDir); err != nil {
+		return err
+	}
 	if err := files.CopyItem(false, true, "/etc/systemd/system/1panel-core.service", originalDir); err != nil {
 		return err
 	}
@@ -216,13 +230,16 @@ func (u *UpgradeService) handleBackup(originalDir string) error {
 	if err := files.CopyItem(true, true, path.Join(global.CONF.Base.InstallDir, "1panel/db"), originalDir); err != nil {
 		return err
 	}
+	if err := files.CopyItem(false, true, path.Join(global.CONF.Base.InstallDir, "1panel/geo/GeoIP.mmdb"), originalDir); err != nil {
+		return err
+	}
 	return nil
 }
 
 func (u *UpgradeService) handleRollback(originalDir string, errStep int) {
 	_ = settingRepo.Update("SystemStatus", "Free")
 
-	dbPath := path.Join(global.CONF.Base.InstallDir, "1panel/db")
+	dbPath := path.Join(global.CONF.Base.InstallDir, "1panel")
 	if _, err := os.Stat(path.Join(originalDir, "db")); err == nil {
 		if err := files.CopyItem(true, true, path.Join(originalDir, "db"), dbPath); err != nil {
 			global.LOG.Errorf("rollback 1panel db failed, err: %v", err)
@@ -248,6 +265,15 @@ func (u *UpgradeService) handleRollback(originalDir string, errStep int) {
 	}
 	if err := files.CopyItem(false, true, path.Join(originalDir, "1panel-agent.service"), "/etc/systemd/system"); err != nil {
 		global.LOG.Errorf("rollback 1panel-agent.service failed, err: %v", err)
+	}
+	if errStep == 3 {
+		return
+	}
+	if err := files.CopyItem(true, true, path.Join(originalDir, "lang"), "/usr/local/bin"); err != nil {
+		global.LOG.Errorf("rollback language files failed, err: %v", err)
+	}
+	if err := files.CopyItem(false, true, path.Join(originalDir, "GeoIP.mmdb"), path.Join(global.CONF.Base.InstallDir, "1panel/geo")); err != nil {
+		global.LOG.Errorf("rollback GeoIP database failed, err: %v", err)
 	}
 }
 

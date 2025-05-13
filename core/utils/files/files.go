@@ -57,9 +57,9 @@ func CopyItem(isDir, withName bool, src, dst string) error {
 	if err != nil {
 		return err
 	}
-	if _, err := os.Stat(path.Dir(dst)); err != nil {
+	if _, err := os.Stat(dst); err != nil {
 		if os.IsNotExist(err) {
-			_ = os.MkdirAll(path.Dir(dst), srcInfo.Mode())
+			_ = os.MkdirAll(dst, srcInfo.Mode())
 		}
 	}
 	cmdStr := fmt.Sprintf(`cp -rf %s %s`, src, dst+"/")
