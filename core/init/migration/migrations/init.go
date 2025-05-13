@@ -95,8 +95,7 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "ProxyPasswdKeep", Value: ""}).Error; err != nil {
 			return err
 		}
-		val := `{"id":"1","label":"/xpack","isCheck":true,"title":"xpack.menu","children":[{"id":"2","label":"Dashboard","isCheck":true,"title":"xpack.waf.name","path":"/xpack/waf/dashboard"},{"id":"3","label":"Tamper","isCheck":true,"title":"xpack.tamper.tamper","path":"/xpack/tamper"},{"id":"4","label":"GPU","isCheck":true,"title":"xpack.gpu.gpu","path":"/xpack/gpu"},{"id":"5","label":"XSetting","isCheck":true,"title":"xpack.setting.setting","path":"/xpack/setting"},{"id":"6","label":"MonitorDashboard","isCheck":true,"title":"xpack.monitor.name","path":"/xpack/monitor/dashboard"},{"id":"7","label":"XAlertDashboard","isCheck":true,"title":"xpack.alert.alert","path":"/xpack/alert/dashboard"},{"id":"8","label":"Node","isCheck":true,"title":"xpack.node.nodeManagement","path":"/xpack/node"}]}`
-		if err := tx.Create(&model.Setting{Key: "HideMenu", Value: val}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "HideMenu", Value: helper.LoadMenus()}).Error; err != nil {
 			return err
 		}
 
@@ -118,6 +117,9 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "ExpirationDays", Value: "0"}).Error; err != nil {
 			return err
 		}
+		if err := tx.Create(&model.Setting{Key: "SystemIP", Value: ""}).Error; err != nil {
+			return err
+		}
 		if err := tx.Create(&model.Setting{Key: "ComplexityVerification", Value: constant.StatusEnable}).Error; err != nil {
 			return err
 		}
@@ -125,6 +127,9 @@ var InitSetting = &gormigrate.Migration{
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "MFASecret", Value: ""}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "MFAInterval", Value: "30"}).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "SystemVersion", Value: global.CONF.Base.Version}).Error; err != nil {
@@ -160,46 +165,17 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "ApiKeyValidityTime", Value: "120"}).Error; err != nil {
 			return err
 		}
-		return nil
-	},
-}
+		if err := tx.Create(&model.Setting{Key: "ScriptVersion", Value: ""}).Error; err != nil {
+			return err
+		}
 
-var InitHost = &gormigrate.Migration{
-	ID: "20240816-init-host",
-	Migrate: func(tx *gorm.DB) error {
-		if err := tx.Create(&model.Group{Name: "Default", Type: "host", IsDefault: true}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "UninstallDeleteImage", Value: "Disable"}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Group{Name: "Default", Type: "node", IsDefault: true}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "UpgradeBackup", Value: "Enable"}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Group{Name: "Default", Type: "command", IsDefault: true}).Error; err != nil {
-			return err
-		}
-		if err := tx.Create(&model.Group{Name: "Default", Type: "website", IsDefault: true}).Error; err != nil {
-			return err
-		}
-		if err := tx.Create(&model.Group{Name: "Default", Type: "redis", IsDefault: true}).Error; err != nil {
-			return err
-		}
-		return nil
-	},
-}
-
-var InitOneDrive = &gormigrate.Migration{
-	ID: "20240808-init-one-drive",
-	Migrate: func(tx *gorm.DB) error {
-		if err := tx.Create(&model.Setting{Key: "OneDriveID", Value: "MDEwOTM1YTktMWFhOS00ODU0LWExZGMtNmU0NWZlNjI4YzZi"}).Error; err != nil {
-			return err
-		}
-		if err := tx.Create(&model.Setting{Key: "OneDriveSc", Value: "akpuOFF+YkNXOU1OLWRzS1ZSRDdOcG1LT2ZRM0RLNmdvS1RkVWNGRA=="}).Error; err != nil {
-			return err
-		}
-		if err := tx.Create(&model.BackupAccount{
-			Name: "localhost",
-			Type: "LOCAL",
-			Vars: fmt.Sprintf("{\"dir\":\"%s\"}", path.Join(global.CONF.Base.InstallDir, "1panel/backup")),
-		}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "UninstallDeleteBackup", Value: "Disable"}).Error; err != nil {
 			return err
 		}
 		return nil
@@ -234,10 +210,48 @@ var InitTerminalSetting = &gormigrate.Migration{
 	},
 }
 
-var InitBackup = &gormigrate.Migration{
-	ID: "20241107-init-backup",
+var InitHost = &gormigrate.Migration{
+	ID: "20240816-init-host",
 	Migrate: func(tx *gorm.DB) error {
-		return tx.AutoMigrate(&model.BackupAccount{})
+		if err := tx.Create(&model.Group{Name: "Default", Type: "host", IsDefault: true}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Group{Name: "Default", Type: "node", IsDefault: true}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Group{Name: "Default", Type: "command", IsDefault: true}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Group{Name: "Default", Type: "website", IsDefault: true}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Group{Name: "Default", Type: "redis", IsDefault: true}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Group{Name: "Default", Type: "script", IsDefault: true}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var InitOneDrive = &gormigrate.Migration{
+	ID: "20240808-init-one-drive",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Create(&model.Setting{Key: "OneDriveID", Value: "MDEwOTM1YTktMWFhOS00ODU0LWExZGMtNmU0NWZlNjI4YzZi"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "OneDriveSc", Value: "akpuOFF+YkNXOU1OLWRzS1ZSRDdOcG1LT2ZRM0RLNmdvS1RkVWNGRA=="}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.BackupAccount{
+			Name: "localhost",
+			Type: "LOCAL",
+			Vars: fmt.Sprintf("{\"dir\":\"%s\"}", path.Join(global.CONF.Base.InstallDir, "1panel/backup")),
+		}).Error; err != nil {
+			return err
+		}
+		return nil
 	},
 }
 
@@ -260,107 +274,5 @@ var AddTaskDB = &gormigrate.Migration{
 		return global.TaskDB.AutoMigrate(
 			&model.Task{},
 		)
-	},
-}
-
-var UpdateSettingStatus = &gormigrate.Migration{
-	ID: "20241218-update-setting-status",
-	Migrate: func(tx *gorm.DB) error {
-		if err := tx.Model(model.Setting{}).Where("value = ?", "enable").Update("value", constant.StatusEnable).Error; err != nil {
-			return err
-		}
-		if err := tx.Model(model.Setting{}).Where("value = ?", "disable").Update("value", constant.StatusDisable).Error; err != nil {
-			return err
-		}
-		return nil
-	},
-}
-
-var RemoveLocalBackup = &gormigrate.Migration{
-	ID: "20250109-remove-local-backup",
-	Migrate: func(tx *gorm.DB) error {
-		if err := tx.Where("`type` = ?", constant.Local).Delete(&model.BackupAccount{}).Error; err != nil {
-			return err
-		}
-		return nil
-	},
-}
-
-var AddMFAInterval = &gormigrate.Migration{
-	ID: "20250207-add-mfa-interval",
-	Migrate: func(tx *gorm.DB) error {
-		if err := tx.Create(&model.Setting{Key: "MFAInterval", Value: "30"}).Error; err != nil {
-			return err
-		}
-		return nil
-	},
-}
-
-var UpdateXpackHideMemu = &gormigrate.Migration{
-	ID: "20250511-update-xpack-hide-menu",
-	Migrate: func(tx *gorm.DB) error {
-		if err := tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Updates(map[string]interface{}{"key": "HideMenu", "value": helper.LoadMenus()}).Error; err != nil {
-			return err
-		}
-		return nil
-	},
-}
-
-var AddSystemIP = &gormigrate.Migration{
-	ID: "20250227-add-system-ip",
-	Migrate: func(tx *gorm.DB) error {
-		if err := tx.Create(&model.Setting{Key: "SystemIP", Value: ""}).Error; err != nil {
-			return err
-		}
-		return nil
-	},
-}
-
-var InitScriptLibrary = &gormigrate.Migration{
-	ID: "20250408-init-script-library",
-	Migrate: func(tx *gorm.DB) error {
-		if err := tx.AutoMigrate(&model.ScriptLibrary{}); err != nil {
-			return err
-		}
-		if err := tx.Create(&model.Group{Name: "Default", Type: "script", IsDefault: true}).Error; err != nil {
-			return err
-		}
-		return nil
-	},
-}
-
-var AddOperationNode = &gormigrate.Migration{
-	ID: "20250321-add-operation-node",
-	Migrate: func(tx *gorm.DB) error {
-		if err := tx.AutoMigrate(&model.OperationLog{}); err != nil {
-			return err
-		}
-		return nil
-	},
-}
-
-var AddScriptVersion = &gormigrate.Migration{
-	ID: "20250410-add-script-version",
-	Migrate: func(tx *gorm.DB) error {
-		if err := tx.Create(&model.Setting{Key: "ScriptVersion", Value: ""}).Error; err != nil {
-			return err
-		}
-		return nil
-	},
-}
-
-var AddAppStoreSetting = &gormigrate.Migration{
-	ID: "20250506-add-appstore-setting",
-	Migrate: func(tx *gorm.DB) error {
-		if err := tx.Create(&model.Setting{Key: "UninstallDeleteImage", Value: "Disable"}).Error; err != nil {
-			return err
-		}
-		if err := tx.Create(&model.Setting{Key: "UpgradeBackup", Value: "Enable"}).Error; err != nil {
-			return err
-		}
-		if err := tx.Create(&model.Setting{Key: "UninstallDeleteBackup", Value: "Disable"}).Error; err != nil {
-			return err
-		}
-		return nil
 	},
 }

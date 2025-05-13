@@ -14,18 +14,8 @@ func Init() {
 		migrations.InitOneDrive,
 		migrations.InitHost,
 		migrations.InitTerminalSetting,
-		migrations.InitBackup,
 		migrations.InitGoogle,
 		migrations.AddTaskDB,
-		migrations.UpdateSettingStatus,
-		migrations.RemoveLocalBackup,
-		migrations.AddMFAInterval,
-		migrations.UpdateXpackHideMemu,
-		migrations.AddSystemIP,
-		migrations.InitScriptLibrary,
-		migrations.AddOperationNode,
-		migrations.AddScriptVersion,
-		migrations.AddAppStoreSetting,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

@@ -29,6 +29,7 @@ var AddTable = &gormigrate.Migration{
 			&model.Tag{},
 			&model.App{},
 			&model.AppLauncher{},
+			&model.OllamaModel{},
 			&model.BackupAccount{},
 			&model.BackupRecord{},
 			&model.Clam{},
@@ -115,6 +116,12 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "SystemStatus", Value: "Free"}).Error; err != nil {
 			return err
 		}
+		if err := tx.Create(&model.Setting{Key: "Language", Value: "zh"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "SystemIP", Value: ""}).Error; err != nil {
+			return err
+		}
 
 		if err := tx.Create(&model.Setting{Key: "LocalTime", Value: ""}).Error; err != nil {
 			return err
@@ -139,7 +146,7 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "DefaultNetwork", Value: "all"}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "MonitorStatus", Value: "enable"}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "MonitorStatus", Value: constant.StatusEnable}).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "MonitorStoreDays", Value: "7"}).Error; err != nil {
@@ -159,10 +166,14 @@ var InitSetting = &gormigrate.Migration{
 			return err
 		}
 
-		if err := tx.Create(&model.Setting{Key: "FileRecycleBin", Value: "enable"}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "FileRecycleBin", Value: constant.StatusEnable}).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "SnapshotIgnore", Value: "*.sock"}).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Create(&model.Setting{Key: "LocalSSHConn", Value: ""}).Error; err != nil {
 			return err
 		}
 
@@ -248,49 +259,6 @@ var InitBackup = &gormigrate.Migration{
 	},
 }
 
-var UpdateAppTag = &gormigrate.Migration{
-	ID: "20250206-update-app-tag",
-	Migrate: func(tx *gorm.DB) error {
-		if err := tx.AutoMigrate(&model.Tag{}); err != nil {
-			return err
-		}
-		return nil
-	},
-}
-
-var UpdateApp = &gormigrate.Migration{
-	ID: "20250206-update-app",
-	Migrate: func(tx *gorm.DB) error {
-		if err := tx.AutoMigrate(&model.App{}); err != nil {
-			return err
-		}
-		return nil
-	},
-}
-
-var AddOllamaModel = &gormigrate.Migration{
-	ID: "20250218-add-ollama-model",
-	Migrate: func(tx *gorm.DB) error {
-		if err := tx.AutoMigrate(&model.OllamaModel{}); err != nil {
-			return err
-		}
-		return nil
-	},
-}
-
-var UpdateSettingStatus = &gormigrate.Migration{
-	ID: "20250227-update-setting-status",
-	Migrate: func(tx *gorm.DB) error {
-		if err := tx.Model(model.Setting{}).Where("value = ?", "enable").Update("value", constant.StatusEnable).Error; err != nil {
-			return err
-		}
-		if err := tx.Model(model.Setting{}).Where("value = ?", "disable").Update("value", constant.StatusDisable).Error; err != nil {
-			return err
-		}
-		return nil
-	},
-}
-
 var InitDefault = &gormigrate.Migration{
 	ID: "20250301-init-default",
 	Migrate: func(tx *gorm.DB) error {
@@ -310,88 +278,6 @@ var UpdateWebsiteExpireDate = &gormigrate.Migration{
 			Where("expire_date = ?", time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)).
 			Update("expire_date", targetDate).Error; err != nil {
 			return err
-		}
-		return nil
-	},
-}
-
-var AddLocalSSHSetting = &gormigrate.Migration{
-	ID: "20250417-add-local-ssh-setting",
-	Migrate: func(tx *gorm.DB) error {
-		if err := tx.Create(&model.Setting{Key: "LocalSSHConn", Value: ""}).Error; err != nil {
-			return err
-		}
-		return nil
-	},
-}
-
-var AddAppIgnore = &gormigrate.Migration{
-	ID: "20250408-add-app-ignore",
-	Migrate: func(tx *gorm.DB) error {
-		if err := tx.AutoMigrate(&model.AppIgnoreUpgrade{}); err != nil {
-			return err
-		}
-		return nil
-	},
-}
-
-var UpdateWebsite = &gormigrate.Migration{
-	ID: "20250424-update-website",
-	Migrate: func(tx *gorm.DB) error {
-		if err := tx.AutoMigrate(&model.Website{}); err != nil {
-			return err
-		}
-		return nil
-	},
-}
-
-var UpdateWebsiteAcmeAccount = &gormigrate.Migration{
-	ID: "20250425-update-websiteAcmeAccount",
-	Migrate: func(tx *gorm.DB) error {
-		if err := tx.AutoMigrate(&model.WebsiteAcmeAccount{}); err != nil {
-			return err
-		}
-		return nil
-	},
-}
-
-var UpdateAppInstall = &gormigrate.Migration{
-	ID: "20250425-update-appInstall",
-	Migrate: func(tx *gorm.DB) error {
-		if err := tx.AutoMigrate(&model.AppInstall{}); err != nil {
-			return err
-		}
-		return nil
-	},
-}
-
-var AddMcpServer = &gormigrate.Migration{
-	ID: "20250428-add-mcpServer",
-	Migrate: func(tx *gorm.DB) error {
-		if err := tx.AutoMigrate(&model.McpServer{}); err != nil {
-			return err
-		}
-		return nil
-	},
-}
-
-var InitLanguageSetting = &gormigrate.Migration{
-	ID: "20240722-init-language-setting",
-	Migrate: func(tx *gorm.DB) error {
-		var langSetting model.Setting
-		_ = tx.Where("key = ?", "Language").First(&langSetting)
-		if langSetting.ID == 0 {
-			if err := tx.Create(&model.Setting{Key: "Language", Value: "zh"}).Error; err != nil {
-				return err
-			}
-		}
-
-		var systemIPSetting model.Setting
-		_ = tx.Where("key = ?", "SystemIP").First(&systemIPSetting)
-		if systemIPSetting.ID == 0 {
-			if err := tx.Create(&model.Setting{Key: "SystemIP", Value: ""}).Error; err != nil {
-				return err
-			}
 		}
 		return nil
 	},

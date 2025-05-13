@@ -22,19 +22,8 @@ func InitAgentDB() {
 		migrations.InitDefaultCA,
 		migrations.InitPHPExtensions,
 		migrations.InitBackup,
-		migrations.UpdateAppTag,
-		migrations.UpdateApp,
-		migrations.AddOllamaModel,
-		migrations.UpdateSettingStatus,
 		migrations.InitDefault,
 		migrations.UpdateWebsiteExpireDate,
-		migrations.AddLocalSSHSetting,
-		migrations.AddAppIgnore,
-		migrations.UpdateWebsite,
-		migrations.UpdateWebsiteAcmeAccount,
-		migrations.UpdateAppInstall,
-		migrations.AddMcpServer,
-		migrations.InitLanguageSetting,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)
