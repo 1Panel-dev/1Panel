@@ -254,6 +254,9 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.edit'),
+        disabled: (row: any) => {
+            return row.status === 'Free';
+        },
         click: (row: any) => {
             licenseRef.value.acceptParams({ oldLicense: row.licenseName, isImport: true });
         },
