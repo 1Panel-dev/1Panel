@@ -66,8 +66,11 @@ func (i *App) GetDescription(ctx *gin.Context) string {
 	if desc, ok := translations[lang]; ok && desc != "" {
 		return desc
 	}
-	if lang == "zh" {
+	if lang == "zh" && i.ShortDescZh != "" {
 		return i.ShortDescZh
+	}
+	if desc, ok := translations["en"]; ok && desc != "" {
+		return desc
 	}
 	return i.ShortDescEn
 }
