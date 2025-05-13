@@ -44,7 +44,7 @@
                             <div v-if="row.status && row.status !== 'Free'">
                                 <div>
                                     {{ $t('license.pro') }}:
-                                    {{ row.bindNode === '127.0.0.1' ? $t('xpack.node.master') : row.bindNode }}
+                                    {{ loadBindNode(row) }}
                                 </div>
                                 <div>
                                     {{ $t('license.oss') }}:
@@ -150,6 +150,18 @@ const onBindFree = async (row: any) => {
         licenseName: row.licenseName,
         freeNodes: row.freeNodes || [],
     });
+};
+
+const loadBindNode = (row: any) => {
+    if (!row.bindNode && row.freeNodes?.length) {
+        return row.bindNode;
+    }
+    for (const item of row.freeNodes) {
+        if (item.addr === row.bindNode) {
+            return item.name === 'local' ? i18n.global.t('xpack.node.master') : item.addr;
+        }
+    }
+    return row.bindNode;
 };
 
 const onUnbind = async (row: any) => {
