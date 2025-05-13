@@ -2533,6 +2533,7 @@ const message = {
         pythonHelper:
             '请填写完整启动命令，例如：pip install -r requirements.txt && python  manage.py runserver 0.0.0.0:5000',
         donetHelper: '请填写完整启动命令，例如 dotnet MyWebApp.dll',
+        dirHelper: '说明：请填写容器内的目录路径',
     },
     process: {
         pid: '进程ID',

@@ -2541,7 +2541,8 @@ const message = {
         environment: '環境變數',
         pythonHelper:
             '請填寫完整啟動指令，例如：pip install -r requirements.txt && python  manage.py runserver 0.0.0.0:5000',
-        donetHelper: '請填入完整啟動指令，例如 dotnet MyWebApp.dll',
+        donetHelper: '請填寫完整的啟動命令，例如 dotnet MyWebApp.dll',
+        dirHelper: '說明：請填寫容器內的目錄路徑',
     },
     process: {
         pid: '進程ID',

@@ -2571,7 +2571,8 @@ const message = {
         goDirHelper: '디렉터리 또는 하위 디렉터리는 Go 또는 바이너리 파일을 포함해야 합니다.',
         pythonHelper:
             '전체 시작 명령을 제공하세요. 예: "pip install -r requirements.txt && python manage.py runserver 0.0.0.0:5000".',
-        dotnetHelper: '전체 시작 명령을 제공하세요. 예: "dotnet MyWebApp.dll".',
+        donetHelper: '완전한 시작 명령을 입력하세요. 예: dotnet MyWebApp.dll',
+        dirHelper: '주의: 컨테이너 내의 디렉토리 경로를 입력하세요',
     },
     process: {
         pid: '프로세스 ID',

@@ -2675,7 +2675,8 @@ const message = {
         goDirHelper: 'O diretório ou subdiretório deve conter arquivos Go ou binários.',
         pythonHelper:
             'Forneça um comando completo de inicialização. Por exemplo, "pip install -r requirements.txt && python manage.py runserver 0.0.0.0:5000".',
-        dotnetHelper: 'Forneça um comando completo de inicialização. Por exemplo, "dotnet MyWebApp.dll".',
+        donetHelper: 'Por favor, preencha o comando completo de inicialização, por exemplo, dotnet MyWebApp.dll',
+        dirHelper: 'Nota: Preencha o caminho do diretório dentro do contêiner',
     },
     process: {
         pid: 'ID do Processo',

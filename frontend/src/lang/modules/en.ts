@@ -2749,7 +2749,8 @@ const message = {
         environment: 'Environment Variable',
         pythonHelper:
             'Please provide a complete start command, for example: pip install -r requirements.txt && python  manage.py runserver 0.0.0.0:5000',
-        donetHelper: 'Please fill in the complete startup comman, for example: dotnet MyWebApp.dll',
+        donetHelper: 'Please fill in the complete startup command, for example dotnet MyWebApp.dll',
+        dirHelper: 'Note: Please fill in the directory path inside the container',
     },
     process: {
         pid: 'Process ID',

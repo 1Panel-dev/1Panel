@@ -2675,7 +2675,8 @@ const message = {
         goDirHelper: 'Direktori atau subdirektori mesti mengandungi fail Go atau binari.',
         pythonHelper:
             'Sediakan arahan permulaan penuh. Contohnya, "pip install -r requirements.txt && python manage.py runserver 0.0.0.0:5000".',
-        dotnetHelper: 'Sediakan arahan permulaan penuh. Contohnya, "dotnet MyWebApp.dll".',
+        donetHelper: 'Sila isi arahan pelancaran lengkap, contohnya dotnet MyWebApp.dll',
+        dirHelper: 'Nota: Sila isi laluan direktori di dalam bekas',
     },
     process: {
         pid: 'Process ID',

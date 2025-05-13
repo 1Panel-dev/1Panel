@@ -2668,7 +2668,8 @@ const message = {
         goDirHelper: 'Директория или поддиректория должна содержать файлы Go или бинарные файлы.',
         pythonHelper:
             'Укажите полную команду запуска. Например, "pip install -r requirements.txt && python manage.py runserver 0.0.0.0:5000".',
-        dotnetHelper: 'Укажите полную команду запуска. Например, "dotnet MyWebApp.dll".',
+        donetHelper: 'Пожалуйста, укажите полную команду запуска, например, dotnet MyWebApp.dll',
+        dirHelper: 'Примечание: Укажите путь к каталогу внутри контейнера',
     },
     process: {
         pid: 'ID процесса',

@@ -21,6 +21,7 @@
             </el-form-item>
             <el-form-item :label="$t('tool.supervisor.dir')" prop="dir">
                 <el-input v-model.trim="process.dir"></el-input>
+                <span class="input-help">{{ $t('runtime.dirHelper') }}</span>
             </el-form-item>
             <el-form-item :label="$t('tool.supervisor.command')" prop="command">
                 <el-input v-model="process.command"></el-input>
