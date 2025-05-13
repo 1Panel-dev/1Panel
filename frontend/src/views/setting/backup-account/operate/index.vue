@@ -27,17 +27,17 @@
             <el-form-item :label="$t('commons.table.type')" prop="type" :rules="Rules.requiredSelect">
                 <el-tag v-if="dialogData.title === 'edit'">{{ $t('setting.' + dialogData.rowData!.type) }}</el-tag>
                 <el-select v-else v-model="dialogData.rowData!.type" @change="changeType">
-                    <el-option :label="$t('setting.COS')" value="COS"></el-option>
-                    <el-option :label="$t('setting.KODO')" value="KODO"></el-option>
-                    <el-option :label="$t('setting.MINIO')" value="MINIO"></el-option>
-                    <el-option :label="$t('setting.OneDrive')" value="OneDrive"></el-option>
                     <el-option :label="$t('setting.OSS')" value="OSS"></el-option>
+                    <el-option :label="$t('setting.COS')" value="COS"></el-option>
                     <el-option :label="$t('setting.S3')" value="S3"></el-option>
-                    <el-option :label="$t('setting.SFTP')" value="SFTP"></el-option>
-                    <el-option :label="$t('setting.WebDAV')" value="WebDAV"></el-option>
-                    <el-option :label="$t('setting.UPYUN')" value="UPYUN"></el-option>
-                    <el-option :label="$t('setting.ALIYUN')" value="ALIYUN"></el-option>
+                    <el-option :label="$t('setting.OneDrive')" value="OneDrive"></el-option>
                     <el-option :label="$t('setting.GoogleDrive')" value="GoogleDrive"></el-option>
+                    <el-option :label="$t('setting.ALIYUN')" value="ALIYUN"></el-option>
+                    <el-option :label="$t('setting.MINIO')" value="MINIO"></el-option>
+                    <el-option :label="$t('setting.WebDAV')" value="WebDAV"></el-option>
+                    <el-option :label="$t('setting.SFTP')" value="SFTP"></el-option>
+                    <el-option :label="$t('setting.KODO')" value="KODO"></el-option>
+                    <el-option :label="$t('setting.UPYUN')" value="UPYUN"></el-option>
                 </el-select>
                 <span v-if="isALIYUNYUN()" class="input-help">{{ $t('setting.ALIYUNHelper') }}</span>
             </el-form-item>
