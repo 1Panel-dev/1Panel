@@ -10,7 +10,7 @@
         <div v-if="isExist" :class="{ mask: !isActive }">
             <CardWithHeader :header="$t('menu.container')" class="card-interval">
                 <template #body>
-                    <span class="count" @click="goRouter('Container')">{{ countItem.containerCount }}</span>
+                    <span class="count" @click="goRouter('ContainerItem')">{{ countItem.containerCount }}</span>
                 </template>
                 <template #header-l>
                     <el-tag size="small" class="ml-5" v-if="countItem.all" effect="plain">
