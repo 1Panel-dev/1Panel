@@ -422,6 +422,9 @@ func handleParams(create request.RuntimeCreate, projectDir string) (composeConte
 		}
 		create.Params["CONTAINER_PACKAGE_URL"] = create.Source
 		siteDir, _ := settingRepo.Get(settingRepo.WithByKey("WEBSITE_DIR"))
+		if siteDir.Value == "" {
+			siteDir.Value = path.Join(global.Dir.BaseDir, "1panel", "www")
+		}
 		create.Params["PANEL_WEBSITE_DIR"] = siteDir.Value
 		composeContent, err = handleEnvironments(composeContent, create, projectDir)
 		if err != nil {
@@ -840,4 +843,27 @@ func getExtensionDir(version string) string {
 		return "no-debug-non-zts-20131226"
 	}
 	return ""
+}
+
+func RestartPHPRuntime() {
+	runtimes, err := runtimeRepo.List(repo.WithByType(constant.RuntimePHP))
+	if err != nil {
+		return
+	}
+	websiteDir, _ := settingRepo.GetValueByKey("WEBSITE_DIR")
+	for _, runtime := range runtimes {
+		envs, err := gotenv.Unmarshal(runtime.Env)
+		if err != nil {
+			global.LOG.Warningf("restart php runtime failed %v", err)
+			continue
+		}
+		envs["PANEL_WEBSITE_DIR"] = websiteDir
+		if err = gotenv.Write(envs, runtime.GetEnvPath()); err != nil {
+			global.LOG.Warningf("restart php runtime failed %v", err)
+			continue
+		}
+		go func() {
+			_ = restartRuntime(&runtime)
+		}()
+	}
 }

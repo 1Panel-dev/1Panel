@@ -375,6 +375,7 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 			if err != nil {
 				return
 			}
+			go RestartPHPRuntime()
 		}
 	}
 	for key := range req.Params {
