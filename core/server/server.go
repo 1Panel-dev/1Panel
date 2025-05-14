@@ -4,14 +4,16 @@ import (
 	"crypto/tls"
 	"encoding/gob"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/core/init/db"
-	"github.com/1Panel-dev/1Panel/core/init/geo"
-	"github.com/1Panel-dev/1Panel/core/init/log"
-	"github.com/1Panel-dev/1Panel/core/init/migration"
 	"net"
 	"net/http"
 	"os"
 	"path"
+
+	"github.com/1Panel-dev/1Panel/core/init/db"
+	"github.com/1Panel-dev/1Panel/core/init/geo"
+	"github.com/1Panel-dev/1Panel/core/init/log"
+	"github.com/1Panel-dev/1Panel/core/init/migration"
+	"github.com/1Panel-dev/1Panel/core/init/run"
 
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
@@ -41,6 +43,8 @@ func Start() {
 	gin.SetMode("debug")
 	hook.Init()
 	InitOthers()
+
+	run.Init()
 
 	rootRouter := router.Routers()
 

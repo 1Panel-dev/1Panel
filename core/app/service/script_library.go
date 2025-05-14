@@ -195,7 +195,7 @@ func (u *ScriptService) Sync(req dto.OperateByTaskID) error {
 
 		syncTask.Log("start to download data.yaml")
 		dataUrl := fmt.Sprintf("%s/scripts/data.yaml", global.CONF.RemoteURL.ResourceURL)
-		_, dataRes, err := req_helper.HandleRequest(dataUrl, http.MethodGet, constant.TimeOut20s)
+		_, dataRes, err := req_helper.HandleRequestWithProxy(dataUrl, http.MethodGet, constant.TimeOut20s)
 		if err != nil {
 			return fmt.Errorf("load scripts data.yaml from remote failed, err: %v", err)
 		}
@@ -213,7 +213,7 @@ func (u *ScriptService) Sync(req dto.OperateByTaskID) error {
 			_ = os.MkdirAll(tmpDir, 0755)
 		}
 		scriptsUrl := fmt.Sprintf("%s/scripts/scripts.tar.gz", global.CONF.RemoteURL.ResourceURL)
-		if err := files.DownloadFile(scriptsUrl, tmpDir+"/scripts.tar.gz"); err != nil {
+		if err := files.DownloadFileWithProxy(scriptsUrl, tmpDir+"/scripts.tar.gz"); err != nil {
 			return fmt.Errorf("download scripts.tar.gz failed, err: %v", err)
 		}
 		syncTask.Log("download successful! now start to decompress...")
