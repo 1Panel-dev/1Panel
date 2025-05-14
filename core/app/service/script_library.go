@@ -199,7 +199,6 @@ func (u *ScriptService) Sync(req dto.OperateByTaskID) error {
 		if err != nil {
 			return fmt.Errorf("load scripts data.yaml from remote failed, err: %v", err)
 		}
-		fmt.Println(string(dataRes))
 
 		syncTask.Log("download successful!")
 		var scripts Scripts
@@ -243,6 +242,11 @@ func (u *ScriptService) Sync(req dto.OperateByTaskID) error {
 		if err := global.DB.Model(&model.Setting{}).Where("key = ?", "ScriptVersion").Updates(map[string]interface{}{"value": string(versionRes)}).Error; err != nil {
 			return fmt.Errorf("update script version in db failed, err: %v", err)
 		}
+		go func() {
+			if err := xpack.Sync(constant.SyncScripts); err != nil {
+				global.LOG.Errorf("sync scripts to node failed, err: %v", err)
+			}
+		}()
 		return nil
 	}, nil)
 
