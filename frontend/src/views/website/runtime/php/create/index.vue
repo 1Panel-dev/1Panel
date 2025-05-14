@@ -122,6 +122,7 @@
                     <el-text>{{ $t('container.env') }}</el-text>
                     <br />
                     <Environment :environments="runtime.environments" />
+                    <br />
                     <el-form-item>
                         <el-alert type="warning" :closable="false">
                             <template #default>

@@ -7,12 +7,15 @@
                     <el-input v-model="env.key" :placeholder="$t('runtime.envKey')" />
                 </el-form-item>
             </el-col>
+            <el-col :span="1">
+                <div class="mt-1">=</div>
+            </el-col>
             <el-col :span="7">
                 <el-form-item :prop="`environments.${index}.value`" :rules="rules.value">
                     <el-input v-model="env.value" :placeholder="$t('runtime.envValue')" />
                 </el-form-item>
             </el-col>
-            <el-col :span="4">
+            <el-col :span="3">
                 <el-form-item>
                     <el-button type="primary" @click="removeEnv(index)" link class="mt-1">
                         {{ $t('commons.button.delete') }}

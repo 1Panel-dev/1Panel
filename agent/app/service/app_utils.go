@@ -1191,7 +1191,6 @@ func getApps(oldApps []model.App, items []dto.AppDefine, systemVersion string, t
 			continue
 		}
 		if config.Deprecated > 0 && common.CompareAppVersion(systemVersion, strconv.FormatFloat(config.Deprecated, 'f', -1, 64)) {
-			task.Log(i18n.GetWithName("AppVersionNotMatch", item.Name))
 			continue
 		}
 
