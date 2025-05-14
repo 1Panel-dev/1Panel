@@ -64,6 +64,11 @@ class RequestHttp {
                     window.location.reload();
                     return Promise.reject(data);
                 }
+                if (data.code == ResultEnum.NodeUnBind) {
+                    globalStore.currentNode = 'local';
+                    window.location.reload();
+                    return;
+                }
                 if (data.code == ResultEnum.ERRGLOBALLOADDING) {
                     globalStore.setGlobalLoading(true);
                     globalStore.setLoadingText(data.message);
