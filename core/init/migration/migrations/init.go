@@ -105,9 +105,6 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "SecurityEntrance", Value: global.CONF.Conn.Entrance}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "JWTSigningKey", Value: common.RandStr(16)}).Error; err != nil {
-			return err
-		}
 		if err := tx.Create(&model.Setting{Key: "EncryptKey", Value: encryptKey}).Error; err != nil {
 			return err
 		}
@@ -115,9 +112,6 @@ var InitSetting = &gormigrate.Migration{
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "ExpirationDays", Value: "0"}).Error; err != nil {
-			return err
-		}
-		if err := tx.Create(&model.Setting{Key: "SystemIP", Value: ""}).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "ComplexityVerification", Value: constant.StatusEnable}).Error; err != nil {

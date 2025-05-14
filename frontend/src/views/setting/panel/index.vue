@@ -313,12 +313,11 @@ const search = async () => {
     const res = await getSettingInfo();
     form.userName = res.data.userName;
     form.password = '******';
-    form.sessionTimeout = Number(res.data.sessionTimeout);
-    form.panelName = res.data.panelName;
+    form.theme = res.data.theme;
     form.menuTabs = res.data.menuTabs;
+    form.panelName = res.data.panelName;
     form.language = res.data.language;
-    form.complexityVerification = res.data.complexityVerification;
-    form.developerMode = res.data.developerMode;
+    form.sessionTimeout = Number(res.data.sessionTimeout);
 
     form.proxyUrl = res.data.proxyUrl;
     form.proxyType = res.data.proxyType;
@@ -327,12 +326,16 @@ const search = async () => {
     form.proxyUser = res.data.proxyUser;
     form.proxyPasswd = res.data.proxyPasswd;
     form.proxyPasswdKeep = res.data.proxyPasswdKeep;
+
     form.apiInterfaceStatus = res.data.apiInterfaceStatus;
     form.apiKey = res.data.apiKey;
     form.ipWhiteList = res.data.ipWhiteList;
     form.apiKeyValidityTime = res.data.apiKeyValidityTime;
+
+    form.developerMode = res.data.developerMode;
     form.hideMenu = res.data.hideMenu;
-    form.theme = res.data.theme;
+
+    form.complexityVerification = res.data.complexityVerification;
 
     if (isMasterProductPro.value) {
         const xpackRes = await getXpackSetting();
