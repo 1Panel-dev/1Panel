@@ -125,7 +125,7 @@ func (u *CommandService) Delete(ids []uint) error {
 
 func (u *CommandService) Update(req dto.CommandOperate) error {
 	command, _ := commandRepo.Get(repo.WithByName(req.Name), repo.WithByType(req.Type))
-	if command.ID != req.ID {
+	if command.ID != 0 && command.ID != req.ID {
 		return buserr.New("ErrRecordExist")
 	}
 	upMap := make(map[string]interface{})

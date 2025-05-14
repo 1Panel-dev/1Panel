@@ -22,6 +22,7 @@ type CommandInfo struct {
 	ID          uint   `json:"id"`
 	GroupID     uint   `json:"groupID"`
 	Name        string `json:"name"`
+	Type        string `json:"type"`
 	Command     string `json:"command"`
 	GroupBelong string `json:"groupBelong"`
 }
