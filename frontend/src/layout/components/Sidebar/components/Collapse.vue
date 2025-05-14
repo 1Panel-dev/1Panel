@@ -118,7 +118,13 @@ const openChangeNode = () => {
 
 const loadCurrentName = () => {
     if (globalStore.currentNode) {
-        return globalStore.currentNode === 'local' ? i18n.global.t('xpack.node.master') : globalStore.currentNode;
+        if (globalStore.currentNode === 'local') {
+            return i18n.global.t('xpack.node.master');
+        }
+        if (globalStore.currentNode.length <= 15) {
+            return globalStore.currentNode;
+        }
+        return globalStore.currentNode.substring(0, 12) + '...';
     }
     return i18n.global.t('xpack.node.master');
 };
