@@ -1845,7 +1845,7 @@ func (w WebsiteService) ClearProxyCache(req request.NginxCommonReq) error {
 	if err != nil {
 		return err
 	}
-	cacheDir := GetSitePath(website, SiteProxyDir)
+	cacheDir := GetSitePath(website, SiteCacheDir)
 	fileOp := files.NewFileOp()
 	if fileOp.Stat(cacheDir) {
 		if err = fileOp.CleanDir(cacheDir); err != nil {
