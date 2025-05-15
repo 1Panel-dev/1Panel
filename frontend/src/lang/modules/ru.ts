@@ -2078,7 +2078,7 @@ const message = {
         gpuConfigHelper:
             'Убедитесь, что на машине установлен NVIDIA GPU и драйверы NVIDIA, а также NVIDIA Docker Container Toolkit',
         webUI: 'Веб-адрес доступа',
-        webUIPlaceholder: 'Например: http://example.com:8080/login',
+        webUIPlaceholder: 'Например: example.com:8080/login',
         defaultWebDomain: 'Адрес доступа по умолчанию',
         defaultWebDomainHepler: 'Если порт приложения 8080, то адрес будет http(s)://адрес по умолчанию:8080',
         webUIConfig:

@@ -122,6 +122,13 @@
                                             </template>
                                             <span v-if="defaultLink == '' && app.currentRow.webUI == ''">
                                                 {{ $t('app.webUIConfig') }}
+                                                <el-link
+                                                    icon="Position"
+                                                    @click="jumpToPath(router, '/settings/panel')"
+                                                    type="primary"
+                                                >
+                                                    {{ $t('firewall.quickJump') }}
+                                                </el-link>
                                             </span>
                                             <div v-else>
                                                 <div>
@@ -181,6 +188,7 @@ import { MsgSuccess } from '@/utils/message';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { toFolder } from '@/global/business';
+import { jumpToPath } from '@/utils/util';
 
 const router = useRouter();
 const globalStore = GlobalStore();

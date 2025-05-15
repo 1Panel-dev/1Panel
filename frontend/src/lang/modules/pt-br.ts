@@ -2081,7 +2081,7 @@ const message = {
         gpuConfigHelper:
             'Certifique-se de que a máquina possui uma GPU NVIDIA e tenha os drivers NVIDIA e NVIDIA Docker Container Toolkit instalados',
         webUI: 'Endereço de Acesso Web',
-        webUIPlaceholder: 'Exemplo: http://example.com:8080/login',
+        webUIPlaceholder: 'Exemplo: example.com:8080/login',
         defaultWebDomain: 'Endereço de Acesso Padrão',
         defaultWebDomainHepler: 'Se a porta do aplicativo for 8080, o endereço será http(s)://endereço padrão:8080',
         webUIConfig:

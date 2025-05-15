@@ -2086,7 +2086,7 @@ const message = {
         gpuConfigHelper:
             'Pastikan mesin mempunyai NVIDIA GPU dan memasang pemacu NVIDIA serta NVIDIA Docker Container Toolkit',
         webUI: 'Alamat Akses Web',
-        webUIPlaceholder: 'Contoh: http://example.com:8080/login',
+        webUIPlaceholder: 'Contoh: example.com:8080/login',
         defaultWebDomain: 'Alamat Akses Lalai',
         defaultWebDomainHepler:
             'Jika port aplikasi adalah 8080, alamat loncatan akan menjadi http(s)://alamat akses lalai:8080',

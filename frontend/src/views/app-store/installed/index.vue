@@ -360,6 +360,13 @@
                                                         </table>
                                                         <span v-if="defaultLink == '' && installed.webUI == ''">
                                                             {{ $t('app.webUIConfig') }}
+                                                            <el-link
+                                                                icon="Position"
+                                                                @click="jumpToPath(router, '/settings/panel')"
+                                                                type="primary"
+                                                            >
+                                                                {{ $t('firewall.quickJump') }}
+                                                            </el-link>
                                                         </span>
                                                     </el-popover>
                                                 </div>

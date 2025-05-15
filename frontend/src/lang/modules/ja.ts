@@ -2032,7 +2032,7 @@ const message = {
         gpuConfigHelper:
             'マシンにNVIDIA GPUが搭載され、NVIDIAドライバーとNVIDIA Docker Container Toolkitがインストールされていることを確認してください',
         webUI: 'Webアクセスアドレス',
-        webUIPlaceholder: '例：http://example.com:8080/login',
+        webUIPlaceholder: '例：example.com:8080/login',
         defaultWebDomain: 'デフォルトアクセスアドレス',
         defaultWebDomainHepler:
             'アプリケーションポートが8080の場合、アドレスはhttp(s)://デフォルトアクセスアドレス:8080にジャンプします',

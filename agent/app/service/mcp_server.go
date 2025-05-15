@@ -100,6 +100,7 @@ func (m McpServerService) Update(req request.McpServerUpdate) error {
 			return err
 		}
 	}
+	req.Command = strings.TrimSuffix(req.Command, "\n")
 	mcpServer.Name = req.Name
 	mcpServer.ContainerName = req.ContainerName
 	mcpServer.Port = req.Port
@@ -144,6 +145,7 @@ func (m McpServerService) Create(create request.McpServerCreate) error {
 			return buserr.New("ErrSsePath")
 		}
 	}
+	create.Command = strings.TrimSuffix(create.Command, "\n")
 	if err := checkPortExist(create.Port); err != nil {
 		return err
 	}

@@ -1999,7 +1999,7 @@ const message = {
         gpuConfigHelper:
             'NVIDIA GPU가 장착되어 있으며 NVIDIA 드라이버와 NVIDIA Docker Container Toolkit이 설치되어 있는지 확인하세요',
         webUI: '웹 접속 주소',
-        webUIPlaceholder: '예: http://example.com:8080/login',
+        webUIPlaceholder: '예: example.com:8080/login',
         defaultWebDomain: '기본 접속 주소',
         defaultWebDomainHepler: '애플리케이션 포트가 8080인 경우 접속 주소는 http(s)://기본 접속 주소:8080입니다',
         webUIConfig:

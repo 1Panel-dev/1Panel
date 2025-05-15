@@ -1,5 +1,5 @@
 <template>
-    <el-text type="info">{{ $t('php.date_timezone') }}: TZ=Asia/Shaghai</el-text>
+    <el-text type="info">{{ $t('php.date_timezone') }}: TZ=Asia/Shanghai</el-text>
     <div class="mt-1.5">
         <el-row :gutter="20" v-for="(env, index) in environments" :key="index">
             <el-col :span="7">

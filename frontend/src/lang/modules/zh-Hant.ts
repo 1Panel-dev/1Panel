@@ -1969,7 +1969,7 @@ const message = {
         gpuConfig: '開啟 GPU 支援',
         gpuConfigHelper: '請確保機器有 NVIDIA GPU 並且安裝 NVIDIA 驅動 和 NVIDIA docker Container Toolkit',
         webUI: 'Web 訪問地址',
-        webUIPlaceholder: '例如：http://example.com:8080/login',
+        webUIPlaceholder: '例如：example.com:8080/login',
         defaultWebDomain: '默認訪問地址',
         defaultWebDomainHepler:
             '默認訪問用於應用端口跳轉，例如應用端口為 8080 則跳轉地址為 http(s)://默認訪問地址:8080',

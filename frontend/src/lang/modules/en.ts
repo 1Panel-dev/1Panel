@@ -2128,7 +2128,7 @@ const message = {
         gpuConfigHelper:
             'Please ensure the machine has an NVIDIA GPU and that NVIDIA drivers and the NVIDIA Docker Container Toolkit are installed',
         webUI: 'Web Access Address',
-        webUIPlaceholder: 'For example: http://example.com:8080/login',
+        webUIPlaceholder: 'For example: example.com:8080/login',
         defaultWebDomain: 'Default Access Address',
         defaultWebDomainHepler:
             'If the application port is 8080, the redirect address will be http(s)://default access address:8080',
