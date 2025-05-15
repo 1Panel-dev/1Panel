@@ -1296,44 +1296,36 @@ func (w WebsiteService) ChangeDefaultServer(id uint) error {
 			return err
 		}
 	}
-	if id > 0 {
-		website, err := websiteRepo.GetFirst(repo.WithByID(id))
-		if err != nil {
-			return err
-		}
-		params, err := getNginxParamsByKeys(constant.NginxScopeServer, []string{"listen"}, &website)
-		if err != nil {
-			return err
-		}
-		httpPort, httpsPort, err := getAppInstallPort(constant.AppOpenresty)
-		if err != nil {
-			return err
-		}
-
-		var changeParams []dto.NginxParam
-		for _, param := range params {
-			paramLen := len(param.Params)
-			bind := param.Params[0]
-			var newParam []string
-			if bind == strconv.Itoa(httpPort) || bind == strconv.Itoa(httpsPort) || bind == "[::]:"+strconv.Itoa(httpPort) || bind == "[::]:"+strconv.Itoa(httpsPort) {
-				if param.Params[paramLen-1] == components.DefaultServer {
-					newParam = param.Params
-				} else {
-					newParam = append(param.Params, components.DefaultServer)
-				}
-			}
-			changeParams = append(changeParams, dto.NginxParam{
-				Name:   param.Name,
-				Params: newParam,
-			})
-		}
-		if err := updateNginxConfig(constant.NginxScopeServer, changeParams, &website); err != nil {
-			return err
-		}
-		website.DefaultServer = true
-		return websiteRepo.Save(context.Background(), &website)
+	if err := updateDefaultServerConfig(!(id > 0)); err != nil {
+		return err
 	}
-	return nil
+	if id == 0 {
+		return nil
+	}
+	website, err := websiteRepo.GetFirst(repo.WithByID(id))
+	if err != nil {
+		return err
+	}
+	params, err := getNginxParamsByKeys(constant.NginxScopeServer, []string{"listen"}, &website)
+	if err != nil {
+		return err
+	}
+	var changeParams []dto.NginxParam
+	for _, param := range params {
+		if hasHttp3(param.Params) || hasDefaultServer(param.Params) {
+			continue
+		}
+		newParam := append(param.Params, components.DefaultServer)
+		changeParams = append(changeParams, dto.NginxParam{
+			Name:   param.Name,
+			Params: newParam,
+		})
+	}
+	if err := updateNginxConfig(constant.NginxScopeServer, changeParams, &website); err != nil {
+		return err
+	}
+	website.DefaultServer = true
+	return websiteRepo.Save(context.Background(), &website)
 }
 
 func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) error {

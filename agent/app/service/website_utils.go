@@ -1395,3 +1395,21 @@ func getSystemProxy(useProxy bool) *dto.SystemProxy {
 	systemProxy, _ := settingService.GetSystemProxy()
 	return systemProxy
 }
+
+func hasHttp3(params []string) bool {
+	for _, param := range params {
+		if param == "quic" {
+			return true
+		}
+	}
+	return false
+}
+
+func hasDefaultServer(params []string) bool {
+	for _, param := range params {
+		if param == "default_server" {
+			return true
+		}
+	}
+	return false
+}

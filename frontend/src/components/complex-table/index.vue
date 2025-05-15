@@ -99,13 +99,6 @@ defineExpose({
 });
 
 onMounted(() => {
-    if (props.paginationConfig?.cacheSizeKey) {
-        let itemSize = Number(localStorage.getItem(props.paginationConfig.cacheSizeKey));
-        if (itemSize) {
-            props.paginationConfig.pageSize = itemSize;
-            sizeChange();
-        }
-    }
     let heightDiff = 320;
     if (props.heightDiff) {
         heightDiff = props.heightDiff;

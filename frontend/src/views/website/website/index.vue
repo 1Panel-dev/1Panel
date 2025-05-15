@@ -160,7 +160,7 @@
                         </template>
                     </el-table-column>
                     <el-table-column
-                        width="120px"
+                        width="180px"
                         :label="$t('commons.table.type')"
                         fix
                         show-overflow-tooltip

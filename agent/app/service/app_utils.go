@@ -1855,7 +1855,7 @@ func handleOpenrestyFile(appInstall *model.AppInstall) error {
 			break
 		}
 	}
-	if err := handleSSLConfig(appInstall); err != nil {
+	if err := handleSSLConfig(appInstall, hasDefaultWebsite); err != nil {
 		return err
 	}
 	if len(websites) == 0 {
@@ -1884,7 +1884,7 @@ func handleDefaultServer(appInstall *model.AppInstall) error {
 	return nil
 }
 
-func handleSSLConfig(appInstall *model.AppInstall) error {
+func handleSSLConfig(appInstall *model.AppInstall, hasDefaultWebsite bool) error {
 	sslDir := path.Join(appInstall.GetPath(), "conf", "ssl")
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(sslDir) {
@@ -1923,9 +1923,11 @@ func handleSSLConfig(appInstall *model.AppInstall) error {
 	}
 	defaultConfig.FilePath = defaultConfigPath
 	defaultServer := defaultConfig.FindServers()[0]
-	defaultServer.UpdateListen(fmt.Sprintf("%d", appInstall.HttpsPort), false, "ssl")
+	defaultServer.UpdateListen(fmt.Sprintf("%d", appInstall.HttpPort), !hasDefaultWebsite)
+	defaultServer.UpdateListen(fmt.Sprintf("[::]:%d", appInstall.HttpPort), !hasDefaultWebsite)
+	defaultServer.UpdateListen(fmt.Sprintf("%d", appInstall.HttpsPort), !hasDefaultWebsite, "ssl")
+	defaultServer.UpdateListen(fmt.Sprintf("[::]:%d", appInstall.HttpsPort), !hasDefaultWebsite, "ssl")
 	defaultServer.UpdateListen(fmt.Sprintf("%d", appInstall.HttpsPort), false, "quic", "reuseport")
-	defaultServer.UpdateListen(fmt.Sprintf("[::]:%d", appInstall.HttpsPort), false, "ssl")
 	defaultServer.UpdateListen(fmt.Sprintf("[::]:%d", appInstall.HttpsPort), false, "quic", "reuseport")
 	defaultServer.UpdateDirective("include", []string{"/usr/local/openresty/nginx/conf/ssl/root_ssl.conf"})
 	defaultServer.UpdateDirective("http2", []string{"on"})
