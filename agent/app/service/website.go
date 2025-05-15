@@ -1296,9 +1296,6 @@ func (w WebsiteService) ChangeDefaultServer(id uint) error {
 			return err
 		}
 	}
-	if err := updateDefaultServerConfig(!(id > 0)); err != nil {
-		return err
-	}
 	if id > 0 {
 		website, err := websiteRepo.GetFirst(repo.WithByID(id))
 		if err != nil {

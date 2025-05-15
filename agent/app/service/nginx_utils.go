@@ -103,32 +103,6 @@ func getNginxParamsByKeys(scope string, keys []string, website *model.Website) (
 	return res, nil
 }
 
-func updateDefaultServerConfig(enable bool) error {
-	nginxInstall, err := getAppInstallByKey("openresty")
-	if err != nil {
-		return err
-	}
-	defaultConfigPath := path.Join(nginxInstall.GetPath(), "conf", "default", "00.default.conf")
-	content, err := os.ReadFile(defaultConfigPath)
-	if err != nil {
-		return err
-	}
-	defaultConfig, err := parser.NewStringParser(string(content)).Parse()
-	if err != nil {
-		return err
-	}
-	defaultConfig.FilePath = defaultConfigPath
-	defaultServer := defaultConfig.FindServers()[0]
-	defaultServer.UpdateListen("80", enable)
-	defaultServer.UpdateListen("[::]:80", enable)
-	defaultServer.UpdateListen("443", enable)
-	defaultServer.UpdateListen("[::]:443", enable)
-	if err = nginx.WriteConfig(defaultConfig, nginx.IndentedStyle); err != nil {
-		return err
-	}
-	return nginxCheckAndReload(string(content), defaultConfigPath, nginxInstall.ContainerName)
-}
-
 func updateNginxConfig(scope string, params []dto.NginxParam, website *model.Website) error {
 	nginxFull, err := getNginxFull(website)
 	if err != nil {
