@@ -91,7 +91,7 @@
                         <template #default="{ row }">
                             <div>
                                 <el-button
-                                    @click="openWithResource(row, 'create')"
+                                    @click="openTaskLog(row.taskID)"
                                     link
                                     v-if="row.status === 'Waiting'"
                                     type="primary"
@@ -99,7 +99,7 @@
                                     {{ $t('setting.snapshot') }}{{ $t('commons.status.waiting') }}
                                 </el-button>
                                 <el-button
-                                    @click="openWithResource(row, 'create')"
+                                    @click="openTaskLog(row.taskID)"
                                     link
                                     v-if="row.status === 'Failed'"
                                     type="danger"
@@ -115,7 +115,7 @@
                                     @click="reCreate(row)"
                                 />
                                 <el-button
-                                    @click="openWithResource(row, 'create')"
+                                    @click="openTaskLog(row.taskID)"
                                     link
                                     v-if="row.status === 'Success'"
                                     type="success"
