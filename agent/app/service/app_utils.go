@@ -1923,12 +1923,7 @@ func handleSSLConfig(appInstall *model.AppInstall, hasDefaultWebsite bool) error
 	}
 	defaultConfig.FilePath = defaultConfigPath
 	defaultServer := defaultConfig.FindServers()[0]
-	defaultServer.UpdateListen(fmt.Sprintf("%d", appInstall.HttpPort), !hasDefaultWebsite)
-	defaultServer.UpdateListen(fmt.Sprintf("[::]:%d", appInstall.HttpPort), !hasDefaultWebsite)
-	defaultServer.UpdateListen(fmt.Sprintf("%d", appInstall.HttpsPort), !hasDefaultWebsite, "ssl")
-	defaultServer.UpdateListen(fmt.Sprintf("[::]:%d", appInstall.HttpsPort), !hasDefaultWebsite, "ssl")
-	defaultServer.UpdateListen(fmt.Sprintf("%d", appInstall.HttpsPort), false, "quic", "reuseport")
-	defaultServer.UpdateListen(fmt.Sprintf("[::]:%d", appInstall.HttpsPort), false, "quic", "reuseport")
+	updateDefaultServer(defaultServer, appInstall.HttpPort, appInstall.HttpsPort, !hasDefaultWebsite)
 	defaultServer.UpdateDirective("include", []string{"/usr/local/openresty/nginx/conf/ssl/root_ssl.conf"})
 	defaultServer.UpdateDirective("http2", []string{"on"})
 	if err = nginx.WriteConfig(defaultConfig, nginx.IndentedStyle); err != nil {

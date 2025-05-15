@@ -405,7 +405,7 @@ export const StatusStrategy = [
     },
 ];
 
-export const WebsiteTypes = [
+export const getWebsiteTypes = () => [
     {
         label: i18n.global.t('website.deployment'),
         value: 'deployment',

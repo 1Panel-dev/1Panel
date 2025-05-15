@@ -119,10 +119,7 @@ func updateDefaultServerConfig(enable bool) error {
 	}
 	defaultConfig.FilePath = defaultConfigPath
 	defaultServer := defaultConfig.FindServers()[0]
-	defaultServer.UpdateListen(fmt.Sprintf("%d", nginxInstall.HttpPort), enable)
-	defaultServer.UpdateListen(fmt.Sprintf("[::]:%d", nginxInstall.HttpPort), enable)
-	defaultServer.UpdateListen(fmt.Sprintf("%d", nginxInstall.HttpsPort), enable, "ssl")
-	defaultServer.UpdateListen(fmt.Sprintf("[::]:%d", nginxInstall.HttpsPort), enable, "ssl")
+	updateDefaultServer(defaultServer, nginxInstall.HttpPort, nginxInstall.HttpsPort, enable)
 	if err = nginx.WriteConfig(defaultConfig, nginx.IndentedStyle); err != nil {
 		return err
 	}
@@ -263,4 +260,13 @@ func nginxCheckAndReload(oldContent string, filePath string, containerName strin
 		return err
 	}
 	return nil
+}
+
+func updateDefaultServer(server *components.Server, httpPort int, httpsPort int, defaultServer bool) {
+	server.UpdateListen(fmt.Sprintf("%d", httpPort), defaultServer)
+	server.UpdateListen(fmt.Sprintf("[::]:%d", httpPort), defaultServer)
+	server.UpdateListen(fmt.Sprintf("%d", httpsPort), defaultServer, "ssl")
+	server.UpdateListen(fmt.Sprintf("[::]:%d", httpsPort), defaultServer, "ssl")
+	server.UpdateListen(fmt.Sprintf("%d", httpsPort), defaultServer, "quic", "reuseport")
+	server.UpdateListen(fmt.Sprintf("[::]:%d", httpsPort), defaultServer, "quic", "reuseport")
 }

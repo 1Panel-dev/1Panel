@@ -198,18 +198,7 @@ func (c Client) PullImageWithProcessAndOptions(task *task.Task, imageName string
 		}
 		status, _ := progress["status"].(string)
 		if status == "Downloading" || status == "Extracting" {
-			id, _ := progress["id"].(string)
-			progressDetail, _ := progress["progressDetail"].(map[string]interface{})
-			current, _ := progressDetail["current"].(float64)
-			progressStr := ""
-			total, ok := progressDetail["total"].(float64)
-			timeStr := time.Now().Format("2006/01/02 15:04:05")
-			if ok {
-				progressStr = fmt.Sprintf("%s %s [%s] --- %.2f%%", timeStr, status, id, (current/total)*100)
-			} else {
-				progressStr = fmt.Sprintf("%s %s [%s] --- %.2f%%", timeStr, status, id, current)
-			}
-			_ = setLog(id, progressStr, task)
+			logProcess(progress, task)
 		}
 		if status == "Pull complete" || status == "Download complete" {
 			id, _ := progress["id"].(string)
@@ -327,4 +316,40 @@ func (c Client) BuildImageWithProcessAndOptions(task *task.Task, tar io.ReadClos
 
 func (c Client) PullImageWithProcess(task *task.Task, imageName string) error {
 	return c.PullImageWithProcessAndOptions(task, imageName, image.PullOptions{})
+}
+
+func formatBytes(bytes uint64) string {
+	const (
+		KB = 1024
+		MB = 1024 * KB
+		GB = 1024 * MB
+		TB = 1024 * GB
+	)
+
+	switch {
+	case bytes < MB:
+		return fmt.Sprintf("%.0fKB", float64(bytes)/KB)
+	case bytes < GB:
+		return fmt.Sprintf("%.1fMB", float64(bytes)/MB)
+	case bytes < TB:
+		return fmt.Sprintf("%.1fGB", float64(bytes)/GB)
+	default:
+		return fmt.Sprintf("%.2fTB", float64(bytes)/TB)
+	}
+}
+
+func logProcess(progress map[string]interface{}, task *task.Task) {
+	status, _ := progress["status"].(string)
+	id, _ := progress["id"].(string)
+	progressDetail, _ := progress["progressDetail"].(map[string]interface{})
+	current, _ := progressDetail["current"].(float64)
+	progressStr := ""
+	total, ok := progressDetail["total"].(float64)
+	timeStr := time.Now().Format("2006/01/02 15:04:05")
+	if ok {
+		progressStr = fmt.Sprintf("%s %s [%s] --- %.2f%%", timeStr, status, id, (current/total)*100)
+	} else {
+		progressStr = fmt.Sprintf("%s %s [%s] --- %s ", timeStr, status, id, formatBytes(uint64(current)))
+	}
+	_ = setLog(id, progressStr, task)
 }

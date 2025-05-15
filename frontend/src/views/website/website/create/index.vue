@@ -548,7 +548,7 @@ import { dateFormatSimple, getProvider, getAccountName } from '@/utils/util';
 import { Website } from '@/api/interface/website';
 import DomainCreate from '@/views/website/website/domain-create/index.vue';
 import { getPathByType } from '@/api/modules/files';
-import { WebsiteTypes } from '@/global/mimetype';
+import { getWebsiteTypes } from '@/global/mimetype';
 
 const websiteForm = ref<FormInstance>();
 
@@ -669,6 +669,7 @@ const websiteSSL = ref();
 const parentWebsites = ref();
 const dirs = ref([]);
 const runtimePorts = ref([]);
+const WebsiteTypes = getWebsiteTypes();
 
 const handleClose = () => {
     open.value = false;
