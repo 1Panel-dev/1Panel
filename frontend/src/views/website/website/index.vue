@@ -315,7 +315,7 @@ import { useI18n } from 'vue-i18n';
 import { getAgentGroupList } from '@/api/modules/group';
 import { Group } from '@/api/interface/group';
 import { GlobalStore } from '@/store';
-import { WebsiteTypes } from '@/global/mimetype';
+import { getWebsiteTypes } from '@/global/mimetype';
 const globalStore = GlobalStore();
 
 const shortcuts = [
@@ -334,7 +334,7 @@ const shortcuts = [
         },
     },
 ];
-
+const WebsiteTypes = getWebsiteTypes();
 const loading = ref(false);
 const maskShow = ref(true);
 const createRef = ref();
