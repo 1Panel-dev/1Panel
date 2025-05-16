@@ -95,6 +95,10 @@ export const Languages = [
         label: 'css',
         value: ['css'],
     },
+    {
+        label: 'ini',
+        value: ['ini'],
+    },
 ];
 
 export const Rewrites = [

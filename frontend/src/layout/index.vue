@@ -7,7 +7,7 @@
         fullscreen
     >
         <div v-if="classObj.mobile && classObj.openSidebar" class="drawer-bg" @click="handleClickOutside" />
-        <el-affix :offset="classObj.openMenuTabs ? 8 : 15" class="affix">
+        <el-affix v-if="!classObj.mobile" :offset="classObj.openMenuTabs ? 8 : 15" class="affix">
             <el-tooltip :content="menuStore.isCollapse ? $t('commons.button.expand') : $t('commons.button.collapse')">
                 <el-button
                     size="small"

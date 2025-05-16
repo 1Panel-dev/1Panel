@@ -4,7 +4,7 @@ const menuStore = MenuStore();
 </script>
 <template>
     <div class="mobile-header">
-        <svg-icon class="caidan" iconName="p-caidan" @click="menuStore.setCollapse()"></svg-icon>
+        <svg-icon class="mobile-menu" iconName="p-caidan" @click="menuStore.setCollapse()"></svg-icon>
     </div>
 </template>
 
@@ -14,8 +14,8 @@ const menuStore = MenuStore();
     box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.2);
     padding: 10px;
     text-align: left;
-    z-index: 999;
-    .caidan {
+    z-index: 99;
+    .mobile-menu {
         margin-left: 10px;
         font-size: 10px;
         cursor: pointer;

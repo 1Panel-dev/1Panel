@@ -578,6 +578,13 @@ onBeforeUnmount(() => {
         color: var(--el-text-color-regular);
     }
 
+    @media only screen and (max-width: 1300px) {
+        span:first-child {
+            font-size: 12px;
+            color: var(--el-text-color-regular);
+        }
+    }
+
     .count {
         margin-top: 10px;
         span {
