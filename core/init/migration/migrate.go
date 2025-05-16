@@ -16,6 +16,7 @@ func Init() {
 		migrations.InitTerminalSetting,
 		migrations.InitGoogle,
 		migrations.AddTaskDB,
+		migrations.UpdateDeveloperMode,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

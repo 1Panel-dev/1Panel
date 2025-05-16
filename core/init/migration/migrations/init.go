@@ -270,3 +270,13 @@ var AddTaskDB = &gormigrate.Migration{
 		)
 	},
 }
+
+var UpdateDeveloperMode = &gormigrate.Migration{
+	ID: "20240516-update-developer-mode",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Model(&model.Setting{}).Where("key = ?", "DeveloperMode").Update("value", constant.StatusEnable).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
