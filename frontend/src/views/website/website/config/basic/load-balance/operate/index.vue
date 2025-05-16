@@ -70,7 +70,7 @@
                     >
                         <el-select v-model="item.servers[index].flag" clearable>
                             <el-option
-                                v-for="flag in StatusStrategy"
+                                v-for="flag in getStatusStrategy()"
                                 :label="flag.label"
                                 :key="flag.value"
                                 :value="flag.value"
@@ -112,7 +112,7 @@ import { FormInstance } from 'element-plus';
 import { ref } from 'vue';
 import { MsgSuccess } from '@/utils/message';
 import { Rules, checkNumberRange } from '@/global/form-rules';
-import { Algorithms, StatusStrategy } from '@/global/mimetype';
+import { getAlgorithms, getStatusStrategy } from '@/global/mimetype';
 import { Website } from '@/api/interface/website';
 
 const rules = ref<any>({
@@ -158,7 +158,7 @@ const handleClose = () => {
 };
 
 const helper = ref();
-
+const Algorithms = getAlgorithms();
 const getHelper = (key: string) => {
     Algorithms.forEach((algorithm) => {
         if (algorithm.value === key) {

@@ -61,7 +61,7 @@ import { onMounted, ref } from 'vue';
 import Operate from './operate/index.vue';
 import i18n from '@/lang';
 import { Website } from '@/api/interface/website';
-import { Algorithms } from '@/global/mimetype';
+import { getAlgorithms } from '@/global/mimetype';
 import File from './file/index.vue';
 
 const props = defineProps({
@@ -76,6 +76,7 @@ const loading = ref(false);
 const operateRef = ref();
 const delRef = ref();
 const fileRef = ref();
+const Algorithms = getAlgorithms();
 
 const buttons = [
     {
