@@ -28,7 +28,9 @@ class RequestHttp {
                     ...config.headers,
                 };
                 if (config.headers.CurrentNode == undefined) {
-                    config.headers.CurrentNode = globalStore.currentNode;
+                    config.headers.CurrentNode = encodeURIComponent(globalStore.currentNode);
+                } else {
+                    config.headers.CurrentNode = encodeURIComponent(String(config.headers.CurrentNode));
                 }
                 if (config.url === '/core/auth/login' || config.url === '/core/auth/mfalogin') {
                     let entrance = Base64.encode(globalStore.entrance);

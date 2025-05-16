@@ -3323,7 +3323,7 @@ const message = {
             addNode: 'Add Node',
             connInfo: 'Connection Information',
             nodeInfo: 'Node Information',
-            syncInfo: 'Data synchronization',
+            syncInfo: 'Sync',
             syncHelper: 'When master node data changes, it synchronizes to this child node in real-time',
             syncBackupAccount: 'Backup account settings',
             syncProxy: 'System proxy settings',

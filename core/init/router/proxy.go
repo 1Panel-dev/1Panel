@@ -2,17 +2,19 @@ package router
 
 import (
 	"context"
+	"net"
+	"net/http"
+	"net/http/httputil"
+	"net/url"
+	"os"
+	"strconv"
+	"strings"
+
 	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/cmd/server/res"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/security"
-	"net"
-	"net/http"
-	"net/http/httputil"
-	"os"
-	"strconv"
-	"strings"
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/utils/xpack"
@@ -30,12 +32,17 @@ func Proxy() gin.HandlerFunc {
 			c.Next()
 			return
 		}
-		var currentNode string
+		var nodeItem string
 		queryNode := c.Query("operateNode")
 		if queryNode != "" && queryNode != "undefined" {
-			currentNode = queryNode
+			nodeItem = queryNode
 		} else {
-			currentNode = c.Request.Header.Get("CurrentNode")
+			nodeItem = c.Request.Header.Get("CurrentNode")
+		}
+		currentNode, err := url.QueryUnescape(nodeItem)
+		if err != nil {
+			helper.ErrorWithDetail(c, http.StatusBadRequest, "ErrProxy", err)
+			return
 		}
 
 		apiReq := c.GetBool("API_AUTH")
