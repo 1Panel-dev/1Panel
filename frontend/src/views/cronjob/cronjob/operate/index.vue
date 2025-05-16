@@ -217,9 +217,17 @@
                                 <LayoutCol v-if="isWebsite()">
                                     <el-form-item
                                         :label="form.type === 'website' ? $t('cronjob.website') : $t('menu.website')"
-                                        prop="website"
+                                        prop="websiteList"
                                     >
-                                        <el-select v-model="form.website">
+                                        <el-select
+                                            v-model="form.websiteList"
+                                            multiple
+                                            @change="
+                                                form.websiteList = form.websiteList.includes('all')
+                                                    ? ['all']
+                                                    : form.websiteList
+                                            "
+                                        >
                                             <el-option
                                                 :disabled="websiteOptions.length === 0"
                                                 :label="$t('commons.table.all')"
@@ -243,8 +251,17 @@
                                     </el-form-item>
                                 </LayoutCol>
                                 <LayoutCol v-if="form.type === 'app'">
-                                    <el-form-item :label="$t('cronjob.app')" prop="appID">
-                                        <el-select clearable v-model="form.appID">
+                                    <el-form-item :label="$t('cronjob.app')" prop="appIdList">
+                                        <el-select
+                                            clearable
+                                            v-model="form.appIdList"
+                                            multiple
+                                            @change="
+                                                form.appIdList = form.appIdList.includes('all')
+                                                    ? ['all']
+                                                    : form.appIdList
+                                            "
+                                        >
                                             <el-option
                                                 :disabled="appOptions.length === 0"
                                                 :label="$t('commons.table.all')"
@@ -271,8 +288,17 @@
                                     </el-form-item>
                                 </LayoutCol>
                                 <LayoutCol v-if="form.type === 'database'">
-                                    <el-form-item :label="$t('cronjob.database')" prop="dbName">
-                                        <el-select clearable v-model="form.dbName">
+                                    <el-form-item :label="$t('cronjob.database')" prop="dbNameList">
+                                        <el-select
+                                            clearable
+                                            v-model="form.dbNameList"
+                                            multiple
+                                            @change="
+                                                form.dbNameList = form.dbNameList.includes('all')
+                                                    ? ['all']
+                                                    : form.dbNameList
+                                            "
+                                        >
                                             <el-option
                                                 :disabled="dbInfo.dbs.length === 0"
                                                 :label="$t('commons.table.all')"
@@ -716,6 +742,10 @@ const form = reactive<Cronjob.CronjobInfo>({
     downloadAccountID: 0,
     sourceAccountItems: [],
 
+    websiteList: [],
+    appIdList: [],
+    dbNameList: [],
+
     retainCopies: 7,
     retryTimes: 0,
     timeout: 300,
@@ -770,10 +800,13 @@ const search = async () => {
 
                 form.scriptID = res.data.scriptID;
                 form.appID = res.data.appID;
+                form.appIdList = res.data.appID.split(',') || [];
                 form.website = res.data.website;
+                form.websiteList = res.data.website.split(',') || [];
                 form.exclusionRules = res.data.exclusionRules;
                 form.dbType = res.data.dbType;
                 form.dbName = res.data.dbName;
+                form.dbNameList = res.data.dbName.split(',') || [];
                 form.url = res.data.url;
 
                 form.isDir = res.data.isDir;
@@ -986,9 +1019,9 @@ const rules = reactive({
     script: [{ validator: verifyScript, trigger: 'blur', required: true }],
     scriptID: [Rules.requiredSelect],
     containerName: [Rules.requiredSelect],
-    appID: [Rules.requiredSelect],
-    website: [Rules.requiredSelect],
-    dbName: [Rules.requiredSelect],
+    websiteList: [Rules.requiredSelect],
+    appIdList: [Rules.requiredSelect],
+    dbNameList: [Rules.requiredSelect],
     url: [Rules.requiredInput],
     files: [{ validator: verifyFiles, trigger: 'blur', required: true }],
     sourceDir: [Rules.requiredInput],
@@ -1241,6 +1274,15 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             form.containerName = '';
         }
         form.timeout = transferTimeToSecond(form.timeoutItem + form.timeoutUint);
+        if (form.appIdList) {
+            form.appID = form.appIdList.join(',');
+        }
+        if (form.websiteList) {
+            form.website = form.websiteList.join(',');
+        }
+        if (form.dbNameList) {
+            form.dbName = form.dbNameList.join(',');
+        }
 
         form.alertCount = form.hasAlert && isProductPro.value ? form.alertCount : 0;
         form.alertTitle =

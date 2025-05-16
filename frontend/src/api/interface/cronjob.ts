@@ -30,6 +30,10 @@ export namespace Cronjob {
         files: Array<Item>;
         sourceDir: string;
 
+        websiteList: Array<string>;
+        appIdList: Array<string>;
+        dbNameList: Array<string>;
+
         sourceAccounts: Array<string>;
         downloadAccount: string;
         sourceAccountIDs: string;
