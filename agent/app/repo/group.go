@@ -14,6 +14,7 @@ type IGroupRepo interface {
 	Create(group *model.Group) error
 	Update(id uint, vars map[string]interface{}) error
 	Delete(opts ...DBOption) error
+	CancelDefault(groupType string) error
 	WithByDefault(isDefault bool) DBOption
 	WithByWebsiteDefault() DBOption
 }
@@ -68,4 +69,10 @@ func (g *GroupRepo) WithByWebsiteDefault() DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("is_default = ? AND type = ?", 1, "website")
 	}
+}
+
+func (g *GroupRepo) CancelDefault(groupType string) error {
+	return global.DB.Model(&model.Group{}).
+		Where("is_default = ? AND type = ?", 1, groupType).
+		Updates(map[string]interface{}{"is_default": 0}).Error
 }

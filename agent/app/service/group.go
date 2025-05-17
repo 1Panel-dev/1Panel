@@ -81,6 +81,11 @@ func (u *GroupService) Delete(id uint) error {
 }
 
 func (u *GroupService) Update(req dto.GroupUpdate) error {
+	if req.IsDefault {
+		if err := groupRepo.CancelDefault(req.Type); err != nil {
+			return err
+		}
+	}
 	upMap := make(map[string]interface{})
 	upMap["name"] = req.Name
 	upMap["is_default"] = req.IsDefault
