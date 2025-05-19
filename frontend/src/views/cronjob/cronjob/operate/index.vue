@@ -748,8 +748,8 @@ const form = reactive<Cronjob.CronjobInfo>({
 
     retainCopies: 7,
     retryTimes: 0,
-    timeout: 300,
-    timeoutItem: 300,
+    timeout: 3600,
+    timeoutItem: 3600,
     timeoutUint: 's',
     status: '',
     secret: '',
@@ -834,7 +834,7 @@ const search = async () => {
                 form.retainCopies = res.data.retainCopies;
                 form.retryTimes = res.data.retryTimes;
                 form.timeout = res.data.timeout;
-                form.timeoutItem = res.data.timeout || 300;
+                form.timeoutItem = res.data.timeout || 3600;
                 form.secret = res.data.secret;
                 form.hasAlert = res.data.alertCount > 0;
                 form.alertCount = res.data.alertCount || 3;
