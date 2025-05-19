@@ -219,8 +219,8 @@ const checkStatus = (status: HostTool.ProcessStatus[]): string => {
 const operate = async (operation: string, name: string) => {
     try {
         ElMessageBox.confirm(
-            i18n.global.t('tool.supervisor.operatorHelper', [name, i18n.global.t('app.' + operation)]),
-            i18n.global.t('app.' + operation),
+            i18n.global.t('tool.supervisor.operatorHelper', [name, i18n.global.t('commons.operate.' + operation)]),
+            i18n.global.t('commons.operate.' + operation),
             {
                 confirmButtonText: i18n.global.t('commons.button.confirm'),
                 cancelButtonText: i18n.global.t('commons.button.cancel'),
@@ -248,7 +248,7 @@ const getFile = (name: string, file: string, runtimeID: number) => {
 };
 
 const edit = (row: HostTool.SupersivorProcess) => {
-    createRef.value.acceptParams('update', row);
+    createRef.value.acceptParams('update', row, runtimeID.value);
 };
 
 const buttons = [
