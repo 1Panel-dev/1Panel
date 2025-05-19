@@ -64,12 +64,18 @@ func (c *CommandHelper) RunBashCWithArgs(arg ...string) error {
 	return err
 }
 func (c *CommandHelper) RunBashC(command string) error {
-	_, err := c.run("bash", "-c", command)
-	return err
+	std, err := c.run("bash", "-c", command)
+	if err != nil {
+		return fmt.Errorf("handle failed, std: %s, err: %v", std, err)
+	}
+	return nil
 }
 func (c *CommandHelper) RunBashCf(command string, arg ...interface{}) error {
-	_, err := c.run("bash", "-c", fmt.Sprintf(command, arg...))
-	return err
+	std, err := c.run("bash", "-c", fmt.Sprintf(command, arg...))
+	if err != nil {
+		return fmt.Errorf("handle failed, std: %s, err: %v", std, err)
+	}
+	return nil
 }
 
 func (c *CommandHelper) RunWithStdout(name string, arg ...string) (string, error) {

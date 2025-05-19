@@ -983,8 +983,7 @@ const message = {
         ntp_helper: 'Você pode configurar o servidor NTP na página de Configuração Rápida da Caixa de Ferramentas.',
         app: 'Backup de app',
         website: 'Backup de site',
-        rulesHelper:
-            'Quando existem múltiplas regras de exclusão de compactação, separe-as com [,]. Exemplo: *.log,*.sql',
+        rulesHelper: 'Suporta múltiplas regras de exclusão, separadas por vírgulas inglesas , ex.: *.log,*.sql',
         lastRecordTime: 'Última execução',
         all: 'Todos',
         failedRecord: 'Registros de falha',

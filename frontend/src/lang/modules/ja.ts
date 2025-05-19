@@ -966,7 +966,7 @@ const message = {
         ntp_helper: 'ツールボックスのクイックセットアップページでNTPサーバーを構成できます。',
         app: 'バックアップアプリ',
         website: 'バックアップウェブサイト',
-        rulesHelper: '複数の圧縮除外ルールがある場合、[,]で区切ります。例: *.log,*.sql',
+        rulesHelper: '複数の除外ルールをサポート、英語のカンマ , で区切ります。例：*.log,*.sql',
         lastRecordTime: '最後の実行時間',
         all: '全て',
         failedRecord: '失敗記録',

@@ -988,8 +988,7 @@ const message = {
         ntp_helper: 'Anda boleh mengkonfigurasi pelayan NTP di halaman Tetapan Pantas Alat.',
         app: 'Aplikasi sandaran',
         website: 'Laman web sandaran',
-        rulesHelper:
-            'Apabila terdapat pelbagai peraturan pengecualian mampatan, gunakan [,] sebagai pemisah. Contoh: *.log,*.sql',
+        rulesHelper: 'Menyokong pelbagai peraturan pengecualian, dipisahkan dengan koma Inggeris , contoh: *.log,*.sql',
         lastRecordTime: 'Waktu pelaksanaan terakhir',
         all: 'Semua',
         failedRecord: 'Rekod kegagalan',

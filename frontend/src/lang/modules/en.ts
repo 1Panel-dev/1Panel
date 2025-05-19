@@ -998,7 +998,7 @@ const message = {
         ntp_helper: 'You can configure the NTP server on the Quick Setup page of the Toolbox.',
         app: 'Backup App',
         website: 'Backup Website',
-        rulesHelper: 'When multiple compression exclusion rules exist, separate them with [,]. Example: *.log,*.sql',
+        rulesHelper: 'Supports multiple exclusion rules, separated by English commas , e.g.: *.log,*.sql',
         lastRecordTime: 'Last Execution',
         all: 'All',
         failedRecord: 'Failed Records',

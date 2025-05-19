@@ -403,7 +403,7 @@ func snapBackupData(snap snapHelper, req dto.SnapshotCreate, targetDir string) e
 			}
 		}
 	}
-	err := snap.FileOp.TarGzCompressPro(false, global.Dir.LocalBackupDir, path.Join(targetDir, "1panel_backup.tar.gz"), "", strings.Join(excludes, ";"))
+	err := snap.FileOp.TarGzCompressPro(false, global.Dir.LocalBackupDir, path.Join(targetDir, "1panel_backup.tar.gz"), "", strings.Join(excludes, ","))
 	snap.Task.LogWithStatus(i18n.GetMsgByKey("SnapCompressBackup"), err)
 
 	return err
@@ -476,7 +476,7 @@ func snapPanelData(snap snapHelper, req dto.SnapshotCreate, targetDir string) er
 		}
 		excludes = append(excludes, "."+strings.ReplaceAll(ignore, rootDir, ""))
 	}
-	err := snap.FileOp.TarGzCompressPro(false, rootDir, path.Join(targetDir, "1panel_data.tar.gz"), "", strings.Join(excludes, ";"))
+	err := snap.FileOp.TarGzCompressPro(false, rootDir, path.Join(targetDir, "1panel_data.tar.gz"), "", strings.Join(excludes, ","))
 	snap.Task.LogWithStatus(i18n.GetMsgByKey("SnapCompressPanel"), err)
 	if err != nil {
 		return err

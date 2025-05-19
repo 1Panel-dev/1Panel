@@ -956,7 +956,7 @@ const message = {
         ntp_helper: 'Toolbox 의 빠른 설정 페이지에서 NTP 서버를 구성할 수 있습니다.',
         app: '백업 앱',
         website: '백업 웹사이트',
-        rulesHelper: '여러 개의 압축 제외 규칙이 있는 경우 [,]로 구분하세요. 예: *.log,*.sql',
+        rulesHelper: '여러 개의 제외 규칙 지원, 영어 쉼표 , 로 구분. 예: *.log,*.sql',
         lastRecordTime: '마지막 실행 시간',
         all: '전체',
         failedRecord: '실패한 레코드',

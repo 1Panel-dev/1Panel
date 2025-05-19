@@ -949,7 +949,7 @@ const message = {
         ntp_helper: '您可以在工具箱的快速設定頁面配置 NTP 伺服器',
         app: '備份應用',
         website: '備份網站',
-        rulesHelper: '當存在多個壓縮排除規則時，使用[,]分隔，例：*.log,*.sql',
+        rulesHelper: '支援多個排除規則，使用英文逗號 , 分隔，例如：*.log,*.sql',
         lastRecordTime: '上次執行情況',
         database: '備份數據庫',
         missBackupAccount: '未能找到備份賬號',

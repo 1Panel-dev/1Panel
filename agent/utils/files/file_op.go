@@ -724,7 +724,7 @@ func (f FileOp) TarGzCompressPro(withDir bool, src, dst, secret, exclusionRules 
 
 	exMap := make(map[string]struct{})
 	exStr := ""
-	excludes := strings.Split(exclusionRules, ";")
+	excludes := strings.Split(exclusionRules, ",")
 	for _, exclude := range excludes {
 		if len(exclude) == 0 {
 			continue
