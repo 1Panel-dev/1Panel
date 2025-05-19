@@ -280,6 +280,7 @@ import { loadBaseInfo, loadCurrentInfo } from '@/api/modules/dashboard';
 import { getIOOptions, getNetworkOptions } from '@/api/modules/host';
 import { getSettingInfo, loadUpgradeInfo } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
+import { storeToRefs } from 'pinia';
 const router = useRouter();
 const globalStore = GlobalStore();
 
@@ -305,7 +306,7 @@ const ioOptions = ref();
 const netOptions = ref();
 
 const licenseRef = ref();
-const isProductPro = ref();
+const { isProductPro } = storeToRefs(globalStore);
 
 const searchInfo = reactive({
     ioOption: 'all',
@@ -551,7 +552,6 @@ const toUpload = () => {
 };
 
 onMounted(() => {
-    isProductPro.value = globalStore.isProductPro;
     window.addEventListener('focus', onFocus);
     window.addEventListener('blur', onBlur);
     loadSafeStatus();
