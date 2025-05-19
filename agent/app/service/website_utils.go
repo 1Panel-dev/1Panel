@@ -886,14 +886,14 @@ func opWebsite(website *model.Website, operate string) error {
 		website.Status = constant.WebStopped
 	}
 	if operate == constant.StartWeb {
-		absoluteIncludeDir := path.Join(nginxInstall.Install.GetPath(), fmt.Sprintf("/www/sites/%s/proxy", website.Alias))
+		absoluteIncludeDir := GetSitePath(*website, SiteProxyDir)
 		fileOp := files.NewFileOp()
 		if fileOp.Stat(absoluteIncludeDir) && !files.IsEmptyDir(absoluteIncludeDir) {
 			proxyInclude := fmt.Sprintf("/www/sites/%s/proxy/*.conf", website.Alias)
 			server.UpdateDirective("include", []string{proxyInclude})
 		}
 		rewriteInclude := fmt.Sprintf("/www/sites/%s/rewrite/%s.conf", website.Alias, website.Alias)
-		absoluteRewritePath := path.Join(nginxInstall.Install.GetPath(), rewriteInclude)
+		absoluteRewritePath := GetSitePath(*website, SiteReWritePath)
 		if fileOp.Stat(absoluteRewritePath) {
 			server.UpdateDirective("include", []string{rewriteInclude})
 		}
@@ -924,7 +924,7 @@ func opWebsite(website *model.Website, operate string) error {
 			}
 			if runtime.Type == constant.RuntimePHP {
 				if website.ProxyType == constant.RuntimeProxyUnix || website.ProxyType == constant.RuntimeProxyTcp {
-					localPath = path.Join(nginxInstall.Install.GetPath(), rootIndex, "index.php")
+					localPath = path.Join(GetSitePath(*website, SiteIndexDir), "index.php")
 				}
 				server.UpdatePHPProxy([]string{website.Proxy}, localPath)
 			} else {
