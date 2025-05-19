@@ -1,6 +1,8 @@
 package helper
 
 import (
+	"fmt"
+	"github.com/1Panel-dev/1Panel/core/cmd/server/res"
 	"net/http"
 
 	"github.com/1Panel-dev/1Panel/core/app/dto"
@@ -70,5 +72,25 @@ func CheckBindAndValidate(req interface{}, c *gin.Context) error {
 
 func ErrResponse(ctx *gin.Context, code int) {
 	ctx.JSON(code, nil)
+	ctx.Abort()
+}
+
+func ErrWithHtml(ctx *gin.Context, code int, scope string) {
+	if code == 444 {
+		ctx.String(444, "")
+		ctx.Abort()
+		return
+	}
+	file := fmt.Sprintf("html/%d.html", code)
+	if code == 200 && scope != "" {
+		file = fmt.Sprintf("html/200_%s.html", scope)
+	}
+	data, err := res.ErrorMsg.ReadFile(file)
+	if err != nil {
+		ctx.String(http.StatusInternalServerError, "Internal Server Error")
+		ctx.Abort()
+		return
+	}
+	ctx.Data(code, "text/html; charset=utf-8", data)
 	ctx.Abort()
 }
