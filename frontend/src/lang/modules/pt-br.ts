@@ -1433,9 +1433,9 @@ const message = {
         existFileSize: 'Tamanho do arquivo (novo -> antigo)',
         existFileDirHelper: 'O arquivo/pasta selecionado tem um nome duplicado. Por favor, prossiga com cautela!',
         noSuchFile: 'O arquivo ou diretório não foi encontrado. Por favor, verifique e tente novamente.',
+        setting: 'configuração',
     },
     ssh: {
-        setting: 'configuração',
         autoStart: 'Início automático',
         enable: 'Habilitar início automático',
         disable: 'Desabilitar início automático',

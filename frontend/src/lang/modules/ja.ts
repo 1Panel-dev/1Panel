@@ -1403,9 +1403,9 @@ const message = {
         existFileSize: 'ファイルサイズ（新しい -> 古い）',
         existFileDirHelper: '選択したファイル/フォルダーには同じ名前のものが既に存在します。慎重に操作してください！',
         noSuchFile: 'ファイルまたはディレクトリが見つかりませんでした。確認して再試行してください。',
+        setting: '設定',
     },
     ssh: {
-        setting: '設定',
         autoStart: 'オートスタート',
         enable: 'AutoStartを有効にします',
         disable: 'AutoStartを無効にします',

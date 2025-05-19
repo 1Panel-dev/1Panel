@@ -1388,6 +1388,7 @@ const message = {
         existFileSize: '文件大小（新->舊）',
         existFileDirHelper: '選擇的檔案/資料夾存在同名，請謹慎操作！',
         noSuchFile: '找不到該檔案或目錄，請檢查後重試。',
+        setting: '设置',
     },
     ssh: {
         autoStart: '開機自啟',

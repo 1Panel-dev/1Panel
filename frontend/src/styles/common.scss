@@ -345,3 +345,9 @@ html {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+.code-dialog {
+    .el-dialog__header {
+        --el-dialog-padding-primary: 0px !important;
+    }
+}

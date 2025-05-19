@@ -1389,9 +1389,9 @@ const message = {
         existFileSize: '파일 크기 (새로운 -> 오래된)',
         existFileDirHelper: '선택한 파일/폴더에 동일한 이름이 이미 존재합니다. 신중하게 작업하세요!',
         noSuchFile: '파일 또는 디렉터리를 찾을 수 없습니다. 확인 후 다시 시도하세요.',
+        setting: '설정',
     },
     ssh: {
-        setting: '설정',
         autoStart: '자동 시작',
         enable: '자동 시작 활성화',
         disable: '자동 시작 비활성화',

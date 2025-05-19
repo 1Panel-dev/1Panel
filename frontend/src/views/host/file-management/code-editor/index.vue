@@ -1,8 +1,15 @@
 <template>
-    <DialogPro v-model="open" size="w-70" @opened="onOpen" :show-close="false" :top="'5vh'" :fullscreen="isFullscreen">
+    <DialogPro
+        v-model="open"
+        size="w-70"
+        class="code-dialog !p-0"
+        @opened="onOpen"
+        :show-close="false"
+        :fullscreen="isFullscreen"
+    >
         <template #header>
-            <div ref="dialogHeader" class="flex items-center justify-between">
-                <span class="truncate-text">{{ $t('commons.button.edit') + ' - ' + form.path }}</span>
+            <div ref="dialogHeader" class="flex items-center justify-between code-header px-4 rounded-t">
+                <span class="truncate-text">{{ $t('home.dir') + ' - ' + form.path }}</span>
                 <el-space alignment="center" :size="1" class="dialog-header-icon">
                     <el-tooltip :content="loadTooltip()" placement="top">
                         <el-button
@@ -21,54 +28,82 @@
             </div>
         </template>
         <template #content>
-            <div ref="dialogForm">
-                <el-form :inline="true" :model="config" class="mt-1.5">
-                    <el-form-item :label="$t('file.theme')">
-                        <el-select v-model="config.theme" @change="changeTheme()" class="p-w-200">
-                            <el-option
-                                v-for="item in themes"
-                                :key="item.label"
-                                :value="item.value"
-                                :label="item.label"
-                            />
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item :label="$t('file.language')">
-                        <el-select v-model="config.language" @change="changeLanguage()" class="!w-32">
-                            <el-option
-                                v-for="lang in Languages"
-                                :key="lang.label"
-                                :value="lang.label"
-                                :label="lang.label"
-                            />
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item :label="$t('file.eol')">
-                        <el-select v-model="config.eol" @change="changeEOL()" class="p-w-150">
-                            <el-option v-for="eol in eols" :key="eol.label" :value="eol.value" :label="eol.label" />
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item :label="$t('file.wordWrap')">
-                        <el-select v-model="config.wordWrap" @change="changeWarp()" class="p-w-100">
-                            <el-option :label="$t('commons.button.enable')" value="on"></el-option>
-                            <el-option :label="$t('commons.button.disable')" value="off"></el-option>
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item :label="$t('file.minimap')">
-                        <el-select v-model="config.minimap" @change="changeMinimap()" class="p-w-100">
-                            <el-option :label="$t('commons.button.enable')" :value="true"></el-option>
-                            <el-option :label="$t('commons.button.disable')" :value="false"></el-option>
-                        </el-select>
-                    </el-form-item>
-                </el-form>
+            <div ref="dialogForm" class="px-4 py-2">
+                <div class="flex justify-start items-center gap-x-4 card-action">
+                    <el-text @click="handleReset">{{ $t('commons.button.reset') }}</el-text>
+                    <el-text @click="saveContent()" class="ml-0">{{ $t('commons.button.save') }}</el-text>
+                    <el-dropdown trigger="click" max-height="300" placement="bottom-start" @command="changeTheme">
+                        <span class="el-dropdown-link">{{ $t('file.theme') }}</span>
+                        <template #dropdown>
+                            <el-dropdown-menu>
+                                <el-dropdown-item v-for="item in themes" :key="item.label" :command="item.value">
+                                    <div class="flex items-center justify-between gap-4 w-full">
+                                        {{ item.label }}
+                                        <el-icon v-if="config.theme == item.value"><Check /></el-icon>
+                                    </div>
+                                </el-dropdown-item>
+                            </el-dropdown-menu>
+                        </template>
+                    </el-dropdown>
+                    <el-dropdown trigger="click" max-height="300" placement="bottom-start" @command="changeLanguage">
+                        <span class="el-dropdown-link">{{ $t('file.language') }}</span>
+                        <template #dropdown>
+                            <el-dropdown-menu>
+                                <el-dropdown-item
+                                    v-for="item in Languages"
+                                    :key="item.label"
+                                    @click="changeLanguage()"
+                                    :command="item.label"
+                                >
+                                    <div class="flex items-center justify-between gap-4 w-full">
+                                        {{ item.label }}
+                                        <el-icon v-if="config.language == item.label"><Check /></el-icon>
+                                    </div>
+                                </el-dropdown-item>
+                            </el-dropdown-menu>
+                        </template>
+                    </el-dropdown>
+                    <el-dropdown trigger="click" max-height="300" placement="bottom-start" @command="changeEOL">
+                        <span class="el-dropdown-link">{{ $t('file.eol') }}</span>
+                        <template #dropdown>
+                            <el-dropdown-menu>
+                                <el-dropdown-item v-for="item in eols" :key="item.label" :command="item.value">
+                                    <div class="flex items-center justify-between gap-4 w-full">
+                                        {{ item.label }}
+                                        <el-icon v-if="config.eol == item.value"><Check /></el-icon>
+                                    </div>
+                                </el-dropdown-item>
+                            </el-dropdown-menu>
+                        </template>
+                    </el-dropdown>
+                    <el-dropdown trigger="click" max-height="300" placement="bottom-start">
+                        <span class="el-dropdown-link">{{ $t('file.setting') }}</span>
+                        <template #dropdown>
+                            <el-dropdown-menu>
+                                <el-dropdown-item @click="changeMinimap(!config.minimap)">
+                                    <div class="flex items-center justify-between gap-4 w-full">
+                                        {{ $t('file.minimap') }}
+                                        <el-icon v-if="config.minimap"><Check /></el-icon>
+                                    </div>
+                                </el-dropdown-item>
+                                <el-dropdown-item @click="changeWarp(config.wordWrap)">
+                                    <div class="flex items-center justify-between gap-4 w-full">
+                                        {{ $t('file.wordWrap') }}
+                                        <el-icon v-if="config.wordWrap == 'on'"><Check /></el-icon>
+                                    </div>
+                                </el-dropdown-item>
+                            </el-dropdown-menu>
+                        </template>
+                    </el-dropdown>
+                </div>
             </div>
-            <div v-loading="loading">
+            <div v-loading="loading" class="">
                 <div class="flex">
                     <div
                         class="monaco-editor sm:w-48 w-1/3 monaco-editor-background border-0 tree-container"
                         v-if="isShow"
                     >
-                        <div class="flex items-center justify-between pl-1 sm:pr-4 pr-1 pt-1">
+                        <div class="flex items-center justify-between pl-1 sm:pr-4 pr-1 py-0.5 h-6">
                             <el-tooltip :content="$t('file.top')" placement="top">
                                 <el-text size="small" @click="getUpData()" class="cursor-pointer">
                                     <el-icon>
@@ -87,7 +122,7 @@
                                 </el-text>
                             </el-tooltip>
                         </div>
-                        <el-divider class="!my-1" />
+                        <el-divider class="!my-0" />
                         <el-tree-v2
                             ref="treeRef"
                             :data="treeData"
@@ -119,40 +154,157 @@
                         <el-divider
                             v-if="isShow"
                             direction="vertical"
-                            :style="{ height: codeHeight }"
+                            style="height: 100%; width: 0"
                             class="!m-0 p-0"
                             :class="isShow ? 'opacity-100' : 'opacity-0'"
                         ></el-divider>
-                        <el-icon
-                            v-if="isShow"
-                            class="cursor-pointer absolute bg-gray-100 py-2 rounded-l-sm block top-1/3 -left-[9px]"
-                            size="9"
-                            @click="toggleShow"
-                        >
-                            <DArrowLeft />
-                        </el-icon>
-                        <el-icon
-                            v-else
-                            class="cursor-pointer absolute bg-gray-100 py-2 rounded-r-sm block top-1/3 right-[7px]"
-                            size="9"
-                            @click="toggleShow"
-                        >
-                            <DArrowRight />
-                        </el-icon>
                     </div>
-                    <div
-                        ref="codeBox"
-                        id="codeBox"
-                        :style="{ height: codeHeight }"
-                        class="flex-1 sm:w-4/5 w-2/3 relative"
-                    ></div>
+                    <div class="flex-1 sm:w-4/5 w-2/3 relative">
+                        <CodeTabs
+                            class="monaco-editor monaco-editor-background"
+                            ref="codeTabsRef"
+                            :select-tab="selectTab"
+                            :file-tabs="fileTabs"
+                            :on-remove-tab="removeTab"
+                            :on-change-tab="changeTab"
+                            :on-remove-all-tab="removeAllTab"
+                            :on-remove-other-tab="removeOtherTab"
+                        ></CodeTabs>
+                        <div ref="codeBox" class="relative" :style="{ height: codeHeight }">
+                            <el-icon
+                                v-if="isShow"
+                                class="cursor-pointer absolute bg-gray-100 py-2 rounded-l-sm block top-1/3 -left-[9px]"
+                                size="9"
+                                @click="toggleShow"
+                            >
+                                <DArrowLeft />
+                            </el-icon>
+                            <el-icon
+                                v-else
+                                class="cursor-pointer absolute bg-gray-100 py-2 rounded-r-sm block top-1/3 z-50"
+                                size="9"
+                                @click="toggleShow"
+                            >
+                                <DArrowRight />
+                            </el-icon>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </template>
-        <template #footer>
-            <div class="dialog-footer" ref="dialogFooter">
-                <el-button @click="handleReset">{{ $t('commons.button.reset') }}</el-button>
-                <el-button type="primary" @click="saveContent()">{{ $t('commons.button.confirm') }}</el-button>
+                <div class="code-footer pl-4 h-6 flex justify-end items-center gap-4 rounded-b">
+                    <el-divider direction="vertical" class="!h-6" v-if="config.theme" />
+                    <el-dropdown trigger="click" max-height="300" placement="top" @command="changeTheme">
+                        <span class="el-dropdown-link">
+                            {{ themes.find((item) => item.value === config.theme)?.label || $t('file.theme') }}
+                        </span>
+                        <template #dropdown>
+                            <el-dropdown-menu>
+                                <el-dropdown-item v-for="item in themes" :key="item.label" :command="item.value">
+                                    <div class="flex items-center justify-between gap-4 w-full">
+                                        {{ item.label }}
+                                        <el-icon v-if="config.theme == item.value"><Check /></el-icon>
+                                    </div>
+                                </el-dropdown-item>
+                            </el-dropdown-menu>
+                        </template>
+                    </el-dropdown>
+                    <el-divider direction="vertical" class="!h-6" />
+                    <el-dropdown trigger="click" max-height="300" placement="top" @command="changeEOL">
+                        <span class="el-dropdown-link">
+                            {{ eols.find((item) => item.value === config.eol)?.label || $t('file.eol') }}
+                        </span>
+                        <template #dropdown>
+                            <el-dropdown-menu>
+                                <el-dropdown-item v-for="item in eols" :key="item.label" :command="item.value">
+                                    <div class="flex items-center justify-between gap-4 w-full">
+                                        {{ item.label }}
+                                        <el-icon v-if="config.eol == item.value"><Check /></el-icon>
+                                    </div>
+                                </el-dropdown-item>
+                            </el-dropdown-menu>
+                        </template>
+                    </el-dropdown>
+                    <el-divider direction="vertical" class="!h-6" />
+                    <el-dropdown trigger="click" max-height="300" placement="top" @command="changeLanguage">
+                        <span class="el-dropdown-link">
+                            {{
+                                config.language
+                                    ? `${$t('file.language')}: ${
+                                          Languages.find((item) => item.label === config.language)?.label ||
+                                          config.language
+                                      }`
+                                    : $t('file.language')
+                            }}
+                        </span>
+                        <template #dropdown>
+                            <el-dropdown-menu>
+                                <el-dropdown-item
+                                    v-for="item in Languages"
+                                    :key="item.label"
+                                    @click="changeLanguage()"
+                                    :command="item.label"
+                                >
+                                    <div class="flex items-center justify-between gap-4 w-full">
+                                        {{ item.label }}
+                                        <el-icon v-if="config.language == item.label"><Check /></el-icon>
+                                    </div>
+                                </el-dropdown-item>
+                            </el-dropdown-menu>
+                        </template>
+                    </el-dropdown>
+                    <el-divider direction="vertical" class="!h-6" />
+                    <el-dropdown trigger="click" max-height="300" placement="top">
+                        <span class="el-dropdown-link">
+                            {{
+                                $t('file.wordWrap') +
+                                ': ' +
+                                $t(config.wordWrap === 'on' ? 'commons.button.enable' : 'commons.button.disable')
+                            }}
+                        </span>
+                        <template #dropdown>
+                            <el-dropdown-menu>
+                                <el-dropdown-item @click="changeWarp('off')">
+                                    <div class="flex items-center justify-between gap-4 w-full">
+                                        {{ $t('commons.button.enable') }}
+                                        <el-icon v-if="config.wordWrap == 'on'"><Check /></el-icon>
+                                    </div>
+                                </el-dropdown-item>
+                                <el-dropdown-item @click="changeWarp('on')">
+                                    <div class="flex items-center justify-between gap-4 w-full">
+                                        {{ $t('commons.button.disable') }}
+                                        <el-icon v-if="config.wordWrap == 'off'"><Check /></el-icon>
+                                    </div>
+                                </el-dropdown-item>
+                            </el-dropdown-menu>
+                        </template>
+                    </el-dropdown>
+                    <el-divider direction="vertical" class="!h-6" />
+                    <el-dropdown trigger="click" max-height="300" placement="top">
+                        <span class="el-dropdown-link">
+                            {{
+                                $t('file.minimap') +
+                                ': ' +
+                                $t(config.minimap ? 'commons.button.enable' : 'commons.button.disable')
+                            }}
+                        </span>
+                        <template #dropdown>
+                            <el-dropdown-menu>
+                                <el-dropdown-item @click="changeMinimap(true)">
+                                    <div class="flex items-center justify-between gap-4 w-full">
+                                        {{ $t('commons.button.enable') }}
+                                        <el-icon v-if="config.minimap"><Check /></el-icon>
+                                    </div>
+                                </el-dropdown-item>
+                                <el-dropdown-item @click="changeMinimap(false)">
+                                    <div class="flex items-center justify-between gap-4 w-full">
+                                        {{ $t('commons.button.disable') }}
+                                        <el-icon v-if="!config.minimap"><Check /></el-icon>
+                                    </div>
+                                </el-dropdown-item>
+                            </el-dropdown-menu>
+                        </template>
+                    </el-dropdown>
+                    <el-divider direction="vertical" class="!h-6 !mr-3.5" />
+                </div>
             </div>
         </template>
     </DialogPro>
@@ -179,7 +331,10 @@ import { TreeKey, TreeNodeData } from 'element-plus/es/components/tree-v2/src/ty
 import { Top, Refresh, DArrowLeft, DArrowRight } from '@element-plus/icons-vue';
 import { loadBaseDir } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
+import CodeTabs from './tabs/index.vue';
+import type { TabPaneName } from 'element-plus';
 
+const codeTabsRef = ref();
 let editor: monaco.editor.IStandaloneCodeEditor | undefined;
 
 self.MonacoEnvironment = {
@@ -238,9 +393,9 @@ const fileExtension = ref('');
 const baseDir = ref();
 const treeData = ref([]);
 const codeBox = ref();
-const defaultHeight = ref(55);
+const defaultHeight = ref(56);
 const treeHeight = ref(0);
-const codeHeight = ref('55vh');
+const codeHeight = ref('56vh');
 const codeReq = reactive({ path: '', expand: false, page: 1, pageSize: 100 });
 const isShow = ref(true);
 const isEdit = ref(false);
@@ -269,6 +424,170 @@ const config = reactive<EditorConfig>({
     wordWrap: 'on',
     minimap: false,
 });
+
+const selectTab = ref();
+const fileTabs = ref([]);
+const removeTab = (targetPath: TabPaneName) => {
+    if (isEdit.value) {
+        ElMessageBox.confirm(i18n.global.t('file.saveContentAndClose'), {
+            confirmButtonText: i18n.global.t('commons.button.save'),
+            cancelButtonText: i18n.global.t('commons.button.notSave'),
+            type: 'info',
+            distinguishCancelAndClose: true,
+        })
+            .then(() => {
+                const tabs = fileTabs.value;
+                let activeName = selectTab.value;
+                if (activeName === targetPath) {
+                    tabs.forEach((tab, index) => {
+                        if (tab.path === targetPath) {
+                            const nextTab = tabs[index + 1] || tabs[index - 1];
+                            if (nextTab) {
+                                activeName = nextTab.path;
+                            }
+                        }
+                    });
+                }
+
+                selectTab.value = activeName;
+                fileTabs.value = tabs.filter((tab) => tab.path !== targetPath);
+                saveContent();
+            })
+            .finally(() => {});
+    } else {
+        const tabs = fileTabs.value;
+        let activeName = selectTab.value;
+        if (activeName === targetPath) {
+            tabs.forEach((tab, index) => {
+                if (tab.path === targetPath) {
+                    const nextTab = tabs[index + 1] || tabs[index - 1];
+                    if (nextTab) {
+                        activeName = nextTab.path;
+                    }
+                }
+            });
+        }
+        selectTab.value = activeName;
+        fileTabs.value = tabs.filter((tab) => tab.path !== targetPath);
+    }
+    getContent(selectTab.value, '');
+};
+
+const removeAllTab = (targetPath: string, type: string) => {
+    if (isEdit.value) {
+        ElMessageBox.confirm(i18n.global.t('file.saveContentAndClose'), {
+            confirmButtonText: i18n.global.t('commons.button.save'),
+            cancelButtonText: i18n.global.t('commons.button.notSave'),
+            type: 'info',
+            distinguishCancelAndClose: true,
+        })
+            .then(() => {
+                const tabs = fileTabs.value;
+                let activeName = selectTab.value;
+                if (activeName !== targetPath) {
+                    tabs.forEach((tab, index) => {
+                        if (tab.path === targetPath) {
+                            const nextTab = tabs[index];
+                            if (nextTab) {
+                                activeName = nextTab.path;
+                            }
+                        }
+                    });
+                }
+
+                selectTab.value = activeName;
+                if (type === 'left') {
+                    fileTabs.value = fileTabs.value.filter((tab, index, arr) => {
+                        const targetIndex = arr.findIndex((t) => t.path === targetPath);
+                        return index >= targetIndex;
+                    });
+                } else if (type === 'right') {
+                    fileTabs.value = fileTabs.value.filter((tab, index, arr) => {
+                        const targetIndex = arr.findIndex((t) => t.path === targetPath);
+                        return index <= targetIndex;
+                    });
+                }
+                saveContent();
+            })
+            .finally(() => {});
+    } else {
+        const tabs = fileTabs.value;
+        let activeName = selectTab.value;
+        if (activeName !== targetPath) {
+            tabs.forEach((tab, index) => {
+                if (tab.path === targetPath) {
+                    const nextTab = tabs[index];
+                    if (nextTab) {
+                        activeName = nextTab.path;
+                    }
+                }
+            });
+        }
+        selectTab.value = activeName;
+        if (type === 'left') {
+            fileTabs.value = fileTabs.value.filter((tab, index, arr) => {
+                const targetIndex = arr.findIndex((t) => t.path === targetPath);
+                return index >= targetIndex;
+            });
+        } else if (type === 'right') {
+            fileTabs.value = fileTabs.value.filter((tab, index, arr) => {
+                const targetIndex = arr.findIndex((t) => t.path === targetPath);
+                return index <= targetIndex;
+            });
+        }
+    }
+    getContent(selectTab.value, '');
+};
+
+const removeOtherTab = (targetPath: string) => {
+    if (isEdit.value) {
+        ElMessageBox.confirm(i18n.global.t('file.saveContentAndClose'), {
+            confirmButtonText: i18n.global.t('commons.button.save'),
+            cancelButtonText: i18n.global.t('commons.button.notSave'),
+            type: 'info',
+            distinguishCancelAndClose: true,
+        })
+            .then(() => {
+                const tabs = fileTabs.value;
+                let activeName = selectTab.value;
+                if (activeName !== targetPath) {
+                    tabs.forEach((tab, index) => {
+                        if (tab.path === targetPath) {
+                            const nextTab = tabs[index];
+                            if (nextTab) {
+                                activeName = nextTab.path;
+                            }
+                        }
+                    });
+                }
+
+                selectTab.value = activeName;
+                fileTabs.value = tabs.filter((tab) => tab.path === targetPath);
+                saveContent();
+            })
+            .finally(() => {});
+    } else {
+        const tabs = fileTabs.value;
+        let activeName = selectTab.value;
+        if (activeName !== targetPath) {
+            tabs.forEach((tab, index) => {
+                if (tab.path === targetPath) {
+                    const nextTab = tabs[index];
+                    if (nextTab) {
+                        activeName = nextTab.path;
+                    }
+                }
+            });
+        }
+        selectTab.value = activeName;
+        fileTabs.value = tabs.filter((tab) => tab.path === targetPath);
+    }
+    getContent(selectTab.value, '');
+};
+
+const changeTab = (targetPath: TabPaneName) => {
+    getContent(targetPath.toString(), '');
+};
 
 const eols = [
     {
@@ -375,11 +694,13 @@ const toggleFullscreen = () => {
     updateHeights();
 };
 
-const changeLanguage = () => {
+const changeLanguage = (command: string) => {
+    config.language = command;
     monaco.editor.setModelLanguage(editor.getModel(), config.language);
 };
 
-const changeTheme = () => {
+const changeTheme = (command: string) => {
+    config.theme = command;
     monaco.editor.setTheme(config.theme);
     const themes = {
         vs: 'monaco-editor-tree-light',
@@ -399,18 +720,21 @@ const changeTheme = () => {
     localStorage.setItem(codeThemeKey, config.theme);
 };
 
-const changeEOL = () => {
+const changeEOL = (command: number) => {
+    config.eol = command;
     editor.getModel().pushEOL(config.eol);
 };
 
-const changeWarp = () => {
+const changeWarp = (command: string) => {
+    config.wordWrap = command === 'on' ? 'off' : 'on';
     localStorage.setItem(warpKey, config.wordWrap);
     editor.updateOptions({
         wordWrap: config.wordWrap,
     });
 };
 
-const changeMinimap = () => {
+const changeMinimap = (command: boolean) => {
+    config.minimap = command;
     localStorage.setItem(minimapKey, JSON.stringify(config.minimap));
     editor.updateOptions({
         minimap: {
@@ -486,6 +810,13 @@ const acceptParams = (props: EditProps) => {
     directoryPath.value = getDirectoryPath(props.path);
     fileExtension.value = props.extension;
     fileName.value = props.name;
+    fileTabs.value = [];
+    selectTab.value = '';
+    fileTabs.value.push({
+        name: fileName.value,
+        path: props.path,
+    });
+    selectTab.value = props.path;
     config.language = props.language;
     config.eol = monaco.editor.EndOfLineSequence.LF;
     config.theme = localStorage.getItem(codeThemeKey) || 'vs-dark';
@@ -521,7 +852,7 @@ const getDirectoryPath = (filePath: string) => {
 
 const onOpen = () => {
     initEditor();
-    changeTheme();
+    changeTheme(config.theme);
     search(directoryPath.value).then((res) => {
         handleSearchResult(res);
     });
@@ -577,6 +908,22 @@ const getContent = (path: string, extension: string) => {
                 fileExtension.value = res.data.extension;
                 fileName.value = res.data.name;
                 initEditor();
+                if (extension == '') {
+                    Languages.forEach((language) => {
+                        const ext = fileExtension.value.substring(1);
+                        if (language.value.indexOf(ext) > -1) {
+                            config.language = language.label;
+                        }
+                    });
+                }
+                const exists = fileTabs.value.some((tab) => tab.path === path);
+                if (!exists) {
+                    fileTabs.value.push({
+                        name: res.data.name,
+                        path: path,
+                    });
+                }
+                selectTab.value = res.data.path;
             })
             .catch(() => {});
     };
@@ -725,5 +1072,43 @@ defineExpose({ acceptParams });
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+.code-header {
+    background-color: var(--panel-color-primary-light-9);
+}
+.code-footer {
+    background-color: var(--panel-color-primary-light-9);
+}
+.card-action {
+    .el-button + .el-button {
+        margin-left: 0 !important;
+    }
+    .el-button.is-link {
+        padding: 0;
+    }
+}
+.code-dialog {
+    .el-dialog__footer {
+        padding-top: 0 !important;
+    }
+}
+
+:deep(.el-tabs) {
+    --el-tabs-header-height: 28px;
+    --el-text-color-primary: var(--el-text-color-regular);
+    .el-tabs__header {
+        height: 28px;
+        margin: 0;
+    }
+    .el-tabs__nav-wrap {
+        height: 27px;
+        line-height: 27px;
+    }
+    .el-tabs__nav,
+    .el-tabs__nav-next,
+    .el-tabs__nav-prev {
+        height: 28px;
+        line-height: 28px;
+    }
 }
 </style>

@@ -1447,9 +1447,9 @@ const message = {
         existFileSize: 'Saiz fail (baru -> lama)',
         existFileDirHelper: 'Fail/folder yang dipilih mempunyai nama yang sama. Sila berhati-hati!',
         noSuchFile: 'Fail atau direktori tidak ditemui. Sila periksa dan cuba lagi.',
+        setting: 'tetapan',
     },
     ssh: {
-        setting: 'tetapan',
         autoStart: 'Mula automatik',
         enable: 'Aktifkan Mula Automatik',
         disable: 'Nyahaktif Mula Automatik',
