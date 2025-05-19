@@ -120,7 +120,7 @@ func (u *SnapshotService) LoadSnapshotData() (dto.SnapshotData, error) {
 	}
 	for i, item := range itemBackups {
 		if item.Label == "app" {
-			data.BackupData = append(itemBackups[:i], itemBackups[i+1:]...)
+			itemBackups = append(itemBackups[:i], itemBackups[i+1:]...)
 		}
 		if item.Label == "system_snapshot" {
 			itemBackups = append(itemBackups[:i], itemBackups[i+1:]...)
