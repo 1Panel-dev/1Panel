@@ -122,10 +122,10 @@ func handleMysqlBackup(db DatabaseHelper, parentTask *task.Task, targetDir, file
 		}
 	}
 
-	itemHandler := doMysqlBackup(db, targetDir, fileName)
-	backupTask.AddSubTask(task.GetTaskName(itemName, task.TaskBackup, task.TaskScopeApp), func(t *task.Task) error { return itemHandler }, nil)
+	itemHandler := func() error { return doMysqlBackup(db, targetDir, fileName) }
+	backupTask.AddSubTask(task.GetTaskName(itemName, task.TaskBackup, task.TaskScopeDatabase), func(t *task.Task) error { return itemHandler() }, nil)
 	if parentTask != nil {
-		return itemHandler
+		return itemHandler()
 	}
 	return backupTask.Execute()
 }

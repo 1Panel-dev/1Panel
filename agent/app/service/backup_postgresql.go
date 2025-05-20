@@ -118,10 +118,10 @@ func handlePostgresqlBackup(db DatabaseHelper, parentTask *task.Task, targetDir,
 		}
 	}
 
-	itemHandler := doPostgresqlgBackup(db, targetDir, fileName)
-	backupTask.AddSubTask(task.GetTaskName(itemName, task.TaskBackup, task.TaskScopeApp), func(task *task.Task) error { return itemHandler }, nil)
+	itemHandler := func() error { return doPostgresqlgBackup(db, targetDir, fileName) }
+	backupTask.AddSubTask(task.GetTaskName(itemName, task.TaskBackup, task.TaskScopeWebsite), func(task *task.Task) error { return itemHandler() }, nil)
 	if parentTask != nil {
-		return itemHandler
+		return itemHandler()
 	}
 	return backupTask.Execute()
 }

@@ -215,10 +215,10 @@ func handleWebsiteBackup(website *model.Website, parentTask *task.Task, backupDi
 			return err
 		}
 	}
-	itemHandler := doWebsiteBackup(website, backupTask, backupDir, fileName, excludes, secret)
-	backupTask.AddSubTask(task.GetTaskName(website.Alias, task.TaskBackup, task.TaskScopeApp), func(task *task.Task) error { return itemHandler }, nil)
+	itemHandler := func() error { return doWebsiteBackup(website, backupTask, backupDir, fileName, excludes, secret) }
+	backupTask.AddSubTask(task.GetTaskName(website.Alias, task.TaskBackup, task.TaskScopeWebsite), func(t *task.Task) error { return itemHandler() }, nil)
 	if parentTask != nil {
-		return itemHandler
+		return itemHandler()
 	}
 	return backupTask.Execute()
 }

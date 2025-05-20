@@ -143,10 +143,10 @@ func handleAppBackup(install *model.AppInstall, parentTask *task.Task, backupDir
 		}
 	}
 
-	itemHandler := doAppBackup(install, backupTask, backupDir, fileName, excludes, secret)
-	backupTask.AddSubTask(task.GetTaskName(install.Name, task.TaskBackup, task.TaskScopeApp), func(t *task.Task) error { return itemHandler }, nil)
+	itemHandler := func() error { return doAppBackup(install, backupTask, backupDir, fileName, excludes, secret) }
+	backupTask.AddSubTask(task.GetTaskName(install.Name, task.TaskBackup, task.TaskScopeApp), func(t *task.Task) error { return itemHandler() }, nil)
 	if parentTask != nil {
-		return itemHandler
+		return itemHandler()
 	}
 	return backupTask.Execute()
 }
