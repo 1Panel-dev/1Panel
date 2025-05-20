@@ -49,12 +49,7 @@
                         <span class="el-dropdown-link">{{ $t('file.language') }}</span>
                         <template #dropdown>
                             <el-dropdown-menu>
-                                <el-dropdown-item
-                                    v-for="item in Languages"
-                                    :key="item.label"
-                                    @click="changeLanguage()"
-                                    :command="item.label"
-                                >
+                                <el-dropdown-item v-for="item in Languages" :key="item.label" :command="item.label">
                                     <div class="flex items-center justify-between gap-4 w-full">
                                         {{ item.label }}
                                         <el-icon v-if="config.language == item.label"><Check /></el-icon>
@@ -237,12 +232,7 @@
                         </span>
                         <template #dropdown>
                             <el-dropdown-menu>
-                                <el-dropdown-item
-                                    v-for="item in Languages"
-                                    :key="item.label"
-                                    @click="changeLanguage()"
-                                    :command="item.label"
-                                >
+                                <el-dropdown-item v-for="item in Languages" :key="item.label" :command="item.label">
                                     <div class="flex items-center justify-between gap-4 w-full">
                                         {{ item.label }}
                                         <el-icon v-if="config.language == item.label"><Check /></el-icon>
