@@ -78,6 +78,7 @@
         <ComposeLogs ref="composeLogRef" />
         <PortJumpDialog ref="dialogPortJumpRef" />
         <AppResources ref="checkRef" @close="search" />
+        <Terminal ref="terminalRef" />
     </div>
 </template>
 
@@ -97,6 +98,7 @@ import AppResources from '@/views/website/runtime/php/check/index.vue';
 import { ElMessageBox } from 'element-plus';
 import RuntimeStatus from '@/views/website/runtime/components/runtime-status.vue';
 import PortJump from '@/views/website/runtime/components/port-jump.vue';
+import Terminal from '@/views/website/runtime/components/terminal.vue';
 import { disabledButton } from '@/utils/runtime';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
@@ -111,6 +113,7 @@ const deleteRef = ref();
 const dialogPortJumpRef = ref();
 const composeLogRef = ref();
 const checkRef = ref();
+const terminalRef = ref();
 
 const paginationConfig = reactive({
     cacheSizeKey: 'runtime-page-size',
@@ -159,6 +162,15 @@ const buttons = [
         },
         disabled: function (row: Runtime.Runtime) {
             return disabledButton(row, 'edit');
+        },
+    },
+    {
+        label: i18n.global.t('menu.terminal'),
+        click: function (row: Runtime.Runtime) {
+            openTerminal(row);
+        },
+        disabled: function (row: Runtime.Runtime) {
+            return disabledButton(row, 'config');
         },
     },
     {
@@ -212,6 +224,11 @@ const openLog = (row: any) => {
 
 const goDashboard = async (port: any, protocol: string) => {
     dialogPortJumpRef.value.acceptParams({ port: port, protocol: protocol });
+};
+
+const openTerminal = (row: Runtime.Runtime) => {
+    const container = row.params['CONTAINER_NAME'];
+    terminalRef.value.acceptParams({ containerID: container, container: container });
 };
 
 const operateRuntime = async (operate: string, ID: number) => {

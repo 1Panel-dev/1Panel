@@ -103,6 +103,7 @@
         <ComposeLogs ref="composeLogRef" :highlightDiff="200" />
         <Config ref="configRef" />
         <Supervisor ref="supervisorRef" />
+        <Terminal ref="terminalRef" />
     </div>
 </template>
 
@@ -125,6 +126,7 @@ import ComposeLogs from '@/components/log/compose/index.vue';
 import Config from '@/views/website/runtime/php/config/index.vue';
 import Supervisor from '@/views/website/runtime/php/supervisor/index.vue';
 import RuntimeStatus from '@/views/website/runtime/components/runtime-status.vue';
+import Terminal from '@/views/website/runtime/components/terminal.vue';
 import { disabledButton } from '@/utils/runtime';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
@@ -155,6 +157,7 @@ const items = ref<Runtime.RuntimeDTO[]>([]);
 const composeLogRef = ref();
 const configRef = ref();
 const supervisorRef = ref();
+const terminalRef = ref();
 
 const buttons = [
     {
@@ -221,6 +224,15 @@ const buttons = [
         },
     },
     {
+        label: i18n.global.t('menu.terminal'),
+        click: function (row: Runtime.Runtime) {
+            openTerminal(row);
+        },
+        disabled: function (row: Runtime.Runtime) {
+            return disabledButton(row, 'config');
+        },
+    },
+    {
         label: i18n.global.t('commons.button.delete'),
         click: function (row: Runtime.Runtime) {
             openDelete(row);
@@ -256,6 +268,11 @@ const openConfig = (row: Runtime.Runtime) => {
 
 const openSupervisor = (row: Runtime.Runtime) => {
     supervisorRef.value.acceptParams(row.id);
+};
+
+const openTerminal = (row: Runtime.Runtime) => {
+    const container = row.params['CONTAINER_NAME'];
+    terminalRef.value.acceptParams({ containerID: container, container: container });
 };
 
 const openLog = (row: Runtime.RuntimeDTO) => {

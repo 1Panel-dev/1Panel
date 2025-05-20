@@ -552,7 +552,7 @@ func operateSupervisorCtl(operate, name, group, includeDir, containerName string
 		err    error
 	)
 	if containerName != "" {
-		cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(2 * time.Second))
+		cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(30 * time.Second))
 		output, err = cmdMgr.RunWithStdoutBashCf("docker exec  %s supervisorctl %s", containerName, strings.Join(processNames, " "))
 	} else {
 		var out []byte
