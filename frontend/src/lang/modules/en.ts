@@ -154,7 +154,7 @@ const message = {
             createSuccess: 'Create Success',
             updateSuccess: 'Update Success',
             uploadSuccess: 'Update Success',
-            operateConfirm: 'If you are sure about the operation, please input it manually',
+            operateConfirm: 'If you are sure about the operation, please input it manually ',
             inputOrSelect: 'Please select or enter',
             copyFailed: 'Copy failed',
             operatorHelper: 'Would you like to continue performing {1} operation on {0}?',

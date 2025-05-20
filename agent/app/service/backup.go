@@ -281,7 +281,7 @@ func (u *BackupService) RefreshToken(req dto.OperateByID) error {
 	}
 	varMap := make(map[string]interface{})
 	if err := json.Unmarshal([]byte(backup.Vars), &varMap); err != nil {
-		return fmt.Errorf("Failed to refresh %s - %s token, please retry, err: %v", backup.Type, backup.Name, err)
+		return fmt.Errorf("failed to refresh %s - %s token, please retry, err: %v", backup.Type, backup.Name, err)
 	}
 	var (
 		refreshToken string
@@ -298,7 +298,7 @@ func (u *BackupService) RefreshToken(req dto.OperateByID) error {
 	if err != nil {
 		varMap["refresh_status"] = constant.StatusFailed
 		varMap["refresh_msg"] = err.Error()
-		return fmt.Errorf("Failed to refresh %s-%s token, please retry, err: %v", backup.Type, backup.Name, err)
+		return fmt.Errorf("failed to refresh %s-%s token, please retry, err: %v", backup.Type, backup.Name, err)
 	}
 	varMap["refresh_status"] = constant.StatusSuccess
 	varMap["refresh_time"] = time.Now().Format(constant.DateTimeLayout)

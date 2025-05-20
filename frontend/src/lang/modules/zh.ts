@@ -151,7 +151,7 @@ const message = {
             createSuccess: '创建成功',
             updateSuccess: '更新成功',
             uploadSuccess: '上传成功',
-            operateConfirm: '如果确认操作，请手动输入',
+            operateConfirm: '如果确认操作，请手动输入 ',
             inputOrSelect: '请选择或输入',
             copyFailed: '复制失败',
             operatorHelper: '将对以下{0}进行 {1} 操作，是否继续？',

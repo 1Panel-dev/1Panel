@@ -146,7 +146,7 @@ const message = {
             createSuccess: 'Berjaya dicipta',
             updateSuccess: 'Berjaya dikemas kini',
             uploadSuccess: 'Berjaya dimuat naik',
-            operateConfirm: 'Jika anda pasti dengan operasi ini, sila masukkan secara manual:',
+            operateConfirm: 'Jika anda pasti dengan operasi ini, sila masukkan secara manual: ',
             inputOrSelect: 'Sila pilih atau masukkan',
             copyFailed: 'Gagal disalin',
             operatorHelper:

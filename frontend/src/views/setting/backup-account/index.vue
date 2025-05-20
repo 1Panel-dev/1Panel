@@ -277,9 +277,16 @@ const onInspect = (row: any) => {
 };
 
 const refreshItemToken = async (row: any) => {
-    await refreshToken({ id: row.id, name: row.name, isPublic: row.isPublic });
-    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-    search();
+    loading.value = true;
+    await refreshToken({ id: row.id, name: row.name, isPublic: row.isPublic })
+        .then(() => {
+            loading.value = false;
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            search();
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const buttons = [

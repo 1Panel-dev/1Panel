@@ -30,7 +30,7 @@ func (b *backup) Run() {
 		global.LOG.Infof("Start to refresh %s-%s access_token ...", backupItem.Type, backupItem.Name)
 		varMap := make(map[string]interface{})
 		if err := json.Unmarshal([]byte(backupItem.Vars), &varMap); err != nil {
-			global.LOG.Errorf("Failed to refresh %s - %s token, please retry, err: %v", backupItem.Type, backupItem.Name, err)
+			global.LOG.Errorf("failed to refresh %s - %s token, please retry, err: %v", backupItem.Type, backupItem.Name, err)
 			continue
 		}
 		var (
@@ -48,7 +48,7 @@ func (b *backup) Run() {
 		if err != nil {
 			varMap["refresh_status"] = constant.StatusFailed
 			varMap["refresh_msg"] = err.Error()
-			global.LOG.Errorf("Failed to refresh %s-%s token, please retry, err: %v", backupItem.Type, backupItem.Name, err)
+			global.LOG.Errorf("failed to refresh %s-%s token, please retry, err: %v", backupItem.Type, backupItem.Name, err)
 			continue
 		}
 		varMap["refresh_status"] = constant.StatusSuccess

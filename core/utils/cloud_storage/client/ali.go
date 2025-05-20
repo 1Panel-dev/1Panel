@@ -338,7 +338,7 @@ func (a *aliClient) completeUpload(uploadID, fileID string) error {
 }
 
 type tokenResp struct {
-	AccessToken string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
 }
 
 func RefreshALIToken(varMap map[string]interface{}) (string, error) {
@@ -367,5 +367,5 @@ func RefreshALIToken(varMap map[string]interface{}) (string, error) {
 	if err := json.Unmarshal(resp.Body(), &respItem); err != nil {
 		return "", err
 	}
-	return respItem.AccessToken, nil
+	return respItem.RefreshToken, nil
 }
