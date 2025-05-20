@@ -131,6 +131,7 @@ var (
 	pollingInterval    = 10 * time.Second
 	ttl                = 3600
 	dnsTimeOut         = 30 * time.Minute
+	manualDnsTimeout   = 10 * time.Minute
 )
 
 func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, error) {
@@ -311,7 +312,11 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string, websiteSSL model.Web
 }
 
 func (c *AcmeClient) UseManualDns(websiteSSL model.WebsiteSSL) error {
-	p, err := dns01.NewDNSProviderManual()
+	p, err := NewCustomDNSProviderManual(&ManualConfig{
+		PropagationTimeout: propagationTimeout,
+		PollingInterval:    pollingInterval,
+		TTL:                ttl,
+	})
 	if err != nil {
 		return err
 	}
@@ -376,16 +381,34 @@ type Resolve struct {
 	Err   string
 }
 
-type manualDnsProvider struct {
-	Resolve *Resolve
+type ManualConfig struct {
+	TTL                int
+	PropagationTimeout time.Duration
+	PollingInterval    time.Duration
 }
 
-func (p *manualDnsProvider) Present(domain, token, keyAuth string) error {
+type CustomManualDnsProvider struct {
+	config *ManualConfig
+}
+
+func NewCustomDNSProviderManual(config *ManualConfig) (*CustomManualDnsProvider, error) {
+	return &CustomManualDnsProvider{config}, nil
+}
+
+func (p *CustomManualDnsProvider) Present(domain, token, keyAuth string) error {
 	return nil
 }
 
-func (p *manualDnsProvider) CleanUp(domain, token, keyAuth string) error {
+func (p *CustomManualDnsProvider) CleanUp(domain, token, keyAuth string) error {
 	return nil
+}
+
+func (p *CustomManualDnsProvider) Sequential() time.Duration {
+	return manualDnsTimeout
+}
+
+func (p *CustomManualDnsProvider) Timeout() (timeout, interval time.Duration) {
+	return p.config.PropagationTimeout, p.config.PollingInterval
 }
 
 func (c *AcmeClient) GetDNSResolve(domains []string) (map[string]Resolve, error) {
