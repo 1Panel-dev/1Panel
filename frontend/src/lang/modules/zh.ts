@@ -3091,6 +3091,8 @@ const message = {
             fixAPI: '排查节点日志，检查防火墙端口是否正常放行',
             forceDelete: '强制删除',
             operateHelper: '将对以下节点进行 {0} 操作，是否继续？',
+            uninstall: '卸载服务',
+            uninstallHelper: '将卸载子节点 1Panel 服务，删除相关数据，谨慎选择！',
             forceDeleteHelper: '强制删除将会忽略节点删除错误，删除数据库元数据',
             baseDir: '安装目录',
             baseDirHelper: '安装目录为空时，默认安装在 /opt 目录下',

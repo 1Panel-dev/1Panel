@@ -3110,6 +3110,8 @@ const message = {
             forceDelete: '強制刪除',
             operateHelper: '將對以下節點執行 {0} 操作，是否繼續？',
             forceDeleteHelper: '強制刪除將忽略節點刪除錯誤並刪除資料庫元資料',
+            uninstall: '卸載服務',
+            uninstallHelper: '將卸載子節點 1Panel 服務，刪除相關數據，請謹慎選擇！',
             baseDir: '安裝目錄',
             baseDirHelper: '安裝目錄為空時，預設安裝於 /opt 目錄下',
             nodePort: '節點端口',

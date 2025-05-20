@@ -3213,6 +3213,9 @@ const message = {
             forceDelete: '強制削除',
             operateHelper: '以下のノードに{0}操作を行います。続行しますか？',
             forceDeleteHelper: '強制削除はノード削除エラーを無視し、データベースメタデータを削除します',
+            uninstall: 'サービスをアンインストール',
+            uninstallHelper:
+                '子ノードの1Panelサービスをアンインストールし、関連データを削除します。慎重に選択してください！',
             baseDir: 'インストールディレクトリ',
             baseDirHelper: 'インストールディレクトリが空の場合、デフォルトで/optディレクトリにインストールされます',
             nodePort: 'ノードポート',

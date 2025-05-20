@@ -166,7 +166,7 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Ti
 }
 
 func (u *CronjobService) handleDirectory(cronjob model.Cronjob, startTime time.Time, taskItem *task.Task) error {
-	taskItem.AddSubTaskWithOps(task.GetTaskName(i18n.GetMsgByKey("BackupFileOrDir"), task.TaskBackup, task.TaskScopeCronjob), func(task *task.Task) error {
+	taskItem.AddSubTaskWithOps(task.GetTaskName(cronjob.SourceDir, task.TaskBackup, task.TaskScopeCronjob), func(task *task.Task) error {
 		accountMap, err := NewBackupClientMap(strings.Split(cronjob.SourceAccountIDs, ","))
 		if err != nil {
 			return err

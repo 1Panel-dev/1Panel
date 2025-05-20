@@ -3290,6 +3290,9 @@ const message = {
             operateHelper: 'A operação {0} será realizada nos seguintes nós, deseja continuar?',
             forceDeleteHelper:
                 'Excluir forçadamente ignorará erros de exclusão do nó e removerá os metadados do banco de dados',
+            uninstall: 'Desinstalar serviço',
+            uninstallHelper:
+                'Isso desinstalará o serviço 1Panel do nó filho e excluirá os dados relacionados. Escolha com cuidado!',
             baseDir: 'Diretório de Instalação',
             baseDirHelper: 'Quando o diretório de instalação está vazio, será instalado por padrão no diretório /opt',
             nodePort: 'Porta do Nó',

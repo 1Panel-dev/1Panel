@@ -3284,6 +3284,9 @@ const message = {
             operateHelper: 'Operasi {0} akan dilakukan pada nod berikut, adakah anda ingin meneruskan?',
             forceDeleteHelper:
                 'Hapus secara paksa akan mengabaikan ralat penghapusan nod dan menghapus metadata pangkalan data',
+            uninstall: 'Nyahpasang perkhidmatan',
+            uninstallHelper:
+                'Akan nyahpasang perkhidmatan 1Panel nod anak dan padam data berkaitan. Pilih dengan berhati-hati!',
             baseDir: 'Direktori Pemasangan',
             baseDirHelper: 'Apabila direktori pemasangan kosong, secara lalai akan dipasang di direktori /opt',
             nodePort: 'Port Nod',

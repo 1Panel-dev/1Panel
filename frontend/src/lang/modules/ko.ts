@@ -3157,6 +3157,8 @@ const message = {
             forceDelete: '강제 삭제',
             operateHelper: '다음 노드에 대해 {0} 작업을 수행합니다. 계속하시겠습니까?',
             forceDeleteHelper: '강제 삭제는 노드 삭제 오류를 무시하고 데이터베이스 메타데이터를 삭제합니다',
+            uninstall: '서비스 제거',
+            uninstallHelper: '자식 노드의 1Panel 서비스를 제거하고 관련 데이터를 삭제합니다. 신중하게 선택하세요!',
             baseDir: '설치 디렉토리',
             baseDirHelper: '설치 디렉토리가 비어 있으면 기본적으로 /opt 디렉토리에 설치됩니다',
             nodePort: '노드 포트',

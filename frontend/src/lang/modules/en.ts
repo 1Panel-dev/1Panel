@@ -3355,6 +3355,9 @@ const message = {
             forceDelete: 'Force Delete',
             operateHelper: 'The following nodes will undergo {0} operation, do you want to continue?',
             forceDeleteHelper: 'Force delete will ignore node deletion errors and delete database metadata',
+            uninstall: 'Uninstall service',
+            uninstallHelper:
+                'This will uninstall the child node 1Panel service and delete related data. Choose carefully!',
             baseDir: 'Installation Directory',
             baseDirHelper:
                 'When the installation directory is empty, it will be installed in the /opt directory by default',
