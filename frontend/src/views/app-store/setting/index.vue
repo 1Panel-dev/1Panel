@@ -51,10 +51,19 @@
 import { getCurrentNodeCustomAppConfig } from '@/api/modules/app';
 import { getAppStoreConfig, updateAppStoreConfig } from '@/api/modules/setting';
 import { FormRules } from 'element-plus';
-import CustomSetting from '@/xpack/views/appstore/index.vue';
 import { GlobalStore } from '@/store';
 import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
+import { defineAsyncComponent } from 'vue';
+
+const CustomSetting = defineAsyncComponent(async () => {
+    const modules = import.meta.glob('@/xpack/views/appstore/index.vue');
+    const loader = modules['/src/xpack/views/appstore/index.vue'];
+    if (loader) {
+        return ((await loader()) as any).default;
+    }
+    return { template: '<div></div>' };
+});
 
 const globalStore = GlobalStore();
 const rules = ref<FormRules>({});

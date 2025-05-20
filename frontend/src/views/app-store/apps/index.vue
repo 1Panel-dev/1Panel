@@ -1,56 +1,7 @@
 <template>
     <LayoutContent v-loading="loading" v-if="!showDetail" :title="$t('app.app')">
         <template #search>
-            <el-row :gutter="5">
-                <el-col :xs="24" :sm="20" :md="20" :lg="20" :xl="20">
-                    <el-button
-                        class="tag-button"
-                        :class="activeTag === 'all' ? '' : 'no-active'"
-                        @click="changeTag('all')"
-                        :type="activeTag === 'all' ? 'primary' : ''"
-                        :plain="activeTag !== 'all'"
-                    >
-                        {{ $t('app.all') }}
-                    </el-button>
-                    <div v-for="item in tags.slice(0, 7)" :key="item.key" class="inline">
-                        <el-button
-                            class="tag-button"
-                            :class="activeTag === item.key ? '' : 'no-active'"
-                            @click="changeTag(item.key)"
-                            :type="activeTag === item.key ? 'primary' : ''"
-                            :plain="activeTag !== item.key"
-                        >
-                            {{ item.name }}
-                        </el-button>
-                    </div>
-                    <div class="inline">
-                        <el-dropdown v-if="tags.length > 7">
-                            <el-button
-                                class="tag-button"
-                                :type="moreTag !== '' ? 'primary' : ''"
-                                :class="moreTag !== '' ? '' : 'no-active'"
-                            >
-                                {{ moreTag == '' ? $t('tabs.more') : getTagValue(moreTag) }}
-                                <el-icon class="el-icon--right">
-                                    <arrow-down />
-                                </el-icon>
-                            </el-button>
-                            <template #dropdown>
-                                <el-dropdown-menu>
-                                    <el-dropdown-item
-                                        v-for="item in tags.slice(7)"
-                                        @click="changeTag(item.key)"
-                                        :key="item.key"
-                                    >
-                                        {{ item.name }}
-                                    </el-dropdown-item>
-                                </el-dropdown-menu>
-                            </template>
-                        </el-dropdown>
-                    </div>
-                </el-col>
-                <el-col :xs="24" :sm="4" :md="4" :lg="4" :xl="4"></el-col>
-            </el-row>
+            <Tags @change="changeTag" />
         </template>
         <template #leftToolBar>
             <el-button @click="sync" type="primary" plain :disabled="syncing">
@@ -172,14 +123,7 @@
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';
 import { onMounted, reactive, ref, computed } from 'vue';
-import {
-    getAppTags,
-    searchApp,
-    syncApp,
-    syncCutomAppStore,
-    syncLocalApp,
-    getCurrentNodeCustomAppConfig,
-} from '@/api/modules/app';
+import { searchApp, syncApp, syncCutomAppStore, syncLocalApp, getCurrentNodeCustomAppConfig } from '@/api/modules/app';
 import Install from '../detail/install/index.vue';
 import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
@@ -189,6 +133,7 @@ import Detail from '../detail/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
 import { storeToRefs } from 'pinia';
 import bus from '@/global/bus';
+import Tags from '@/views/app-store/components/tag.vue';
 
 const globalStore = GlobalStore();
 const { isProductPro } = storeToRefs(globalStore);
@@ -214,15 +159,12 @@ const req = reactive({
 });
 
 const apps = ref<App.AppDTO[]>([]);
-const tags = ref<App.Tag[]>([]);
 const loading = ref(false);
-const activeTag = ref('all');
 const showDetail = ref(false);
 const canUpdate = ref(false);
 const syncing = ref(false);
 const installRef = ref();
 const installKey = ref('');
-const moreTag = ref('');
 const mainHeight = ref(0);
 const detailRef = ref();
 const taskLogRef = ref();
@@ -257,9 +199,6 @@ const search = async (req: App.AppReq) => {
         .finally(() => {
             loading.value = false;
         });
-    getAppTags().then((res) => {
-        tags.value = res.data;
-    });
 };
 
 const openInstall = (app: App.App) => {
@@ -332,24 +271,10 @@ const syncLocal = () => {
 
 const changeTag = (key: string) => {
     req.tags = [];
-    activeTag.value = key;
     if (key !== 'all') {
         req.tags = [key];
     }
-    const index = tags.value.findIndex((tag) => tag.key === key);
-    if (index > 6) {
-        moreTag.value = key;
-    } else {
-        moreTag.value = '';
-    }
     search(req);
-};
-
-const getTagValue = (key: string) => {
-    const tag = tags.value.find((tag) => tag.key === key);
-    if (tag) {
-        return tag.name;
-    }
 };
 
 const searchByName = () => {

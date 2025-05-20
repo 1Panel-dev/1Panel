@@ -1,53 +1,7 @@
 <template>
     <LayoutContent v-loading="loading || syncLoading" :title="activeName">
         <template #search>
-            <div>
-                <el-button
-                    class="tag-button"
-                    :class="activeTag === 'all' ? '' : 'no-active'"
-                    @click="changeTag('all')"
-                    :type="activeTag === 'all' ? 'primary' : ''"
-                    :plain="activeTag !== 'all'"
-                >
-                    {{ $t('app.all') }}
-                </el-button>
-                <div v-for="item in tags.slice(0, 7)" :key="item.key" class="inline">
-                    <el-button
-                        class="tag-button"
-                        :class="activeTag === item.key ? '' : 'no-active'"
-                        @click="changeTag(item.key)"
-                        :type="activeTag === item.key ? 'primary' : ''"
-                        :plain="activeTag !== item.key"
-                    >
-                        {{ item.name }}
-                    </el-button>
-                </div>
-                <div class="inline">
-                    <el-dropdown>
-                        <el-button
-                            class="tag-button"
-                            :type="moreTag !== '' ? 'primary' : ''"
-                            :class="moreTag !== '' ? '' : 'no-active'"
-                        >
-                            {{ moreTag == '' ? $t('tabs.more') : getTagValue(moreTag) }}
-                            <el-icon class="el-icon--right">
-                                <arrow-down />
-                            </el-icon>
-                        </el-button>
-                        <template #dropdown>
-                            <el-dropdown-menu>
-                                <el-dropdown-item
-                                    v-for="item in tags.slice(7)"
-                                    @click="changeTag(item.key)"
-                                    :key="item.key"
-                                >
-                                    {{ item.name }}
-                                </el-dropdown-item>
-                            </el-dropdown-menu>
-                        </template>
-                    </el-dropdown>
-                </div>
-            </div>
+            <Tags @change="changeTag" hideKey="Runtime" />
         </template>
         <template #leftToolBar>
             <el-button @click="sync" type="primary" plain v-if="mode === 'installed' && data != null">
@@ -432,13 +386,7 @@
 </template>
 
 <script lang="ts" setup>
-import {
-    searchAppInstalled,
-    installedOp,
-    syncInstalledApp,
-    appInstalledDeleteCheck,
-    getAppTags,
-} from '@/api/modules/app';
+import { searchAppInstalled, installedOp, syncInstalledApp, appInstalledDeleteCheck } from '@/api/modules/app';
 import { onMounted, onUnmounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
@@ -461,6 +409,7 @@ import TaskLog from '@/components/log/task/index.vue';
 import Detail from '@/views/app-store/detail/index.vue';
 import IgnoreApp from '@/views/app-store/installed/ignore/create/index.vue';
 import { getAgentSettingByKey } from '@/api/modules/setting';
+import Tags from '@/views/app-store/components/tag.vue';
 
 const data = ref<any>();
 const loading = ref(false);
@@ -489,8 +438,6 @@ const ignoreRef = ref();
 const dialogPortJumpRef = ref();
 const composeLogRef = ref();
 const taskLogRef = ref();
-const tags = ref<App.Tag[]>([]);
-const activeTag = ref('all');
 const searchReq = reactive({
     page: 1,
     pageSize: 20,
@@ -502,7 +449,6 @@ const searchReq = reactive({
 const router = useRouter();
 const activeName = ref(i18n.global.t('app.installed'));
 const mode = ref('installed');
-const moreTag = ref('');
 const defaultLink = ref('');
 const detailRef = ref();
 const ignoreAppRef = ref();
@@ -544,24 +490,10 @@ const sync = () => {
 
 const changeTag = (key: string) => {
     searchReq.tags = [];
-    activeTag.value = key;
     if (key !== 'all') {
         searchReq.tags = [key];
     }
-    const index = tags.value.findIndex((tag) => tag.key === key);
-    if (index > 6) {
-        moreTag.value = key;
-    } else {
-        moreTag.value = '';
-    }
     search();
-};
-
-const getTagValue = (key: string) => {
-    const tag = tags.value.find((tag) => tag.key === key);
-    if (tag) {
-        return tag.name;
-    }
 };
 
 const search = async () => {
@@ -570,9 +502,6 @@ const search = async () => {
     const res = await searchAppInstalled(searchReq);
     data.value = res.data.items;
     paginationConfig.total = res.data.total;
-    getAppTags().then((res) => {
-        tags.value = res.data;
-    });
 };
 
 const openOperate = (row: any, op: string) => {
