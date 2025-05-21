@@ -80,6 +80,7 @@ const message = {
             fix: 'Fix',
             down: 'Stop',
             up: 'Start',
+            sure: 'Confirm',
         },
         operate: {
             start: 'Start',
@@ -1342,6 +1343,7 @@ const message = {
         taskRunning: 'Running',
     },
     file: {
+        currentDir: 'Directory',
         dir: 'Folder',
         fileName: 'File name',
         search: 'Find',

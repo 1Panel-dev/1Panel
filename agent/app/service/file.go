@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"github.com/jinzhu/copier"
 	"io"
 	"io/fs"
 	"os"
@@ -51,6 +52,7 @@ type IFileService interface {
 	SaveContent(edit request.FileEdit) error
 	FileDownload(d request.FileDownload) (string, error)
 	DirSize(req request.DirSizeReq) (response.DirSizeRes, error)
+	DepthDirSize(req request.DirSizeReq) ([]response.DepthDirSizeRes, error)
 	ChangeName(req request.FileRename) error
 	Wget(w request.FileWget) (string, error)
 	MvFile(m request.FileMove) error
@@ -440,6 +442,22 @@ func (f *FileService) DirSize(req request.DirSizeReq) (response.DirSizeRes, erro
 		return res, err
 	}
 	res.Size = size
+	return res, nil
+}
+
+func (f *FileService) DepthDirSize(req request.DirSizeReq) ([]response.DepthDirSizeRes, error) {
+	var (
+		res []response.DepthDirSizeRes
+	)
+	if req.Path == "/proc" {
+		return res, nil
+	}
+	fo := files.NewFileOp()
+	dirSizes, err := fo.GetDepthDirSize(req.Path)
+	_ = copier.Copy(&res, &dirSizes)
+	if err != nil {
+		return res, err
+	}
 	return res, nil
 }
 

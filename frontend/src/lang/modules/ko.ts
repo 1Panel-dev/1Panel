@@ -77,6 +77,7 @@ const message = {
             fix: '수정',
             down: '중지',
             up: '시작',
+            sure: '확인',
         },
         operate: {
             start: '시작',
@@ -1265,6 +1266,7 @@ const message = {
         errLog: '에러 로그',
     },
     file: {
+        currentDir: '현재 디렉터리',
         dir: '폴더',
         upload: '업로드',
         uploadFile: '@:file.upload @.lower:file.file',

@@ -80,6 +80,7 @@ const message = {
             fix: '修復',
             down: '停止',
             up: '啟動',
+            sure: '確定',
         },
         operate: {
             start: '啟動',
@@ -1270,6 +1271,7 @@ const message = {
         taskRunning: '運行中',
     },
     file: {
+        currentDir: '當前目錄',
         dir: '文件夾',
         upload: '上傳',
         download: '下載',

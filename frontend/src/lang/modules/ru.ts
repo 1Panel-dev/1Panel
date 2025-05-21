@@ -77,6 +77,7 @@ const message = {
             fix: 'Исправить',
             down: 'Остановить',
             up: 'Запустить',
+            sure: 'Подтвердить',
         },
         operate: {
             start: 'Запустить',
@@ -1308,6 +1309,7 @@ const message = {
         errLog: 'Логи ошибок',
     },
     file: {
+        currentDir: 'Текущий каталог',
         dir: 'Папка',
         upload: 'Загрузить',
         uploadFile: '@:file.upload @.lower:file.file',

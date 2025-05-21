@@ -252,6 +252,9 @@
                                 </template>
                             </el-dropdown>
                         </template>
+                        <el-button class="btn" @click="calculateSize(req.path)" :disabled="disableBtn">
+                            {{ $t('file.calculate') }}
+                        </el-button>
                     </el-button-group>
 
                     <el-badge :value="processCount" class="btn" v-if="processCount > 0">
@@ -432,7 +435,7 @@
                                     type="primary"
                                     link
                                     small
-                                    @click="getDirSize(row, $index)"
+                                    @click="getDirSize(row.path, $index)"
                                     :loading="row.btnLoading"
                                 >
                                     <span v-if="row.dirSize == undefined">
@@ -461,6 +464,16 @@
                         width="270"
                         fix
                     />
+                    <template #paginationLeft>
+                        <el-button type="primary" link small @click="getDirTotalSize(req.path)">
+                            <span v-if="dirTotalSize == -1">
+                                {{ $t('file.calculate') }}
+                            </span>
+                            <span v-else>
+                                {{ $t('file.currentDir') + $t('file.size') + ': ' + getFileSize(dirTotalSize) }}
+                            </span>
+                        </el-button>
+                    </template>
                 </ComplexTable>
             </template>
 
@@ -492,6 +505,7 @@
 import { computed, nextTick, onMounted, reactive, ref } from '@vue/runtime-core';
 import {
     addFavorite,
+    computeDepthDirSize,
     computeDirSize,
     fileWgetKeys,
     getFileContent,
@@ -602,6 +616,8 @@ const previewRef = ref();
 const processRef = ref();
 const hostMount = ref<Dashboard.DiskInfo[]>([]);
 let resizeObserver: ResizeObserver;
+const dirTotalSize = ref(-1);
+const disableBtn = ref(false);
 
 const { searchableStatus, searchablePath, searchableInputRef, searchableInputBlur } = useSearchable(paths);
 
@@ -617,6 +633,7 @@ const mobile = computed(() => {
 });
 
 const search = async () => {
+    dirTotalSize.value = -1;
     getWgetProcess();
     loading.value = true;
     if (req.search != '') {
@@ -638,6 +655,7 @@ const search = async () => {
 
 const searchFile = async () => {
     loading.value = true;
+    dirTotalSize.value = -1;
     try {
         return await getFilesList(req);
     } finally {
@@ -866,9 +884,9 @@ const getFileSize = (size: number) => {
     return computeSize(size);
 };
 
-const getDirSize = async (row: any, index: number) => {
+const getDirSize = async (path: string, index: number) => {
     const req = {
-        path: row.path,
+        path: path,
     };
     data.value[index].btnLoading = true;
     await computeDirSize(req)
@@ -880,6 +898,34 @@ const getDirSize = async (row: any, index: number) => {
         .finally(() => {
             data.value[index].btnLoading = false;
         });
+};
+
+const getDirTotalSize = async (path: string) => {
+    const req = {
+        path: path,
+    };
+    const res = await computeDirSize(req);
+    dirTotalSize.value = res.data.size;
+};
+
+const calculateSize = (path: string) => {
+    const req = { path };
+    disableBtn.value = true;
+    setTimeout(async () => {
+        try {
+            const res = await computeDepthDirSize(req);
+            const sizeMap = new Map(res.data.map((dir) => [dir.path, dir.size]));
+            data.value.forEach((item) => {
+                if (sizeMap.has(item.path)) {
+                    item.dirSize = sizeMap.get(item.path)!;
+                }
+            });
+        } catch (err) {
+            console.error('Error computing dir size:', err);
+        } finally {
+            disableBtn.value = false;
+        }
+    }, 0);
 };
 
 const getIconName = (extension: string) => {

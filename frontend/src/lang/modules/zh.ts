@@ -80,6 +80,7 @@ const message = {
             fix: '修复',
             down: '停止',
             up: '启动',
+            sure: '确定',
         },
         operate: {
             start: '启动',
@@ -1268,6 +1269,7 @@ const message = {
         taskRunning: '执行中',
     },
     file: {
+        currentDir: '当前目录',
         dir: '文件夹',
         fileName: '文件名',
         search: '在当前目录下查找',

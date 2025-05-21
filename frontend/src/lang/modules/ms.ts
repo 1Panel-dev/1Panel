@@ -77,6 +77,7 @@ const message = {
             fix: 'Betulkan',
             down: 'Hentikan',
             up: 'Mulakan',
+            sure: 'Sahkan',
         },
         operate: {
             start: 'Mula',
@@ -1320,6 +1321,7 @@ const message = {
         errLog: 'Log Ralat',
     },
     file: {
+        currentDir: 'Direktori Semasa',
         dir: 'Folder',
         upload: 'Muat naik',
         uploadFile: 'Muat naik fail',

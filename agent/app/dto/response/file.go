@@ -64,3 +64,8 @@ type UserGroupResponse struct {
 	Users  []UserInfo `json:"users"`
 	Groups []string   `json:"groups"`
 }
+
+type DepthDirSizeRes struct {
+	Path string `json:"path"`
+	Size int64  `json:"size"`
+}

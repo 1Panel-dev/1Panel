@@ -628,6 +628,28 @@ func (b *BaseApi) Size(c *gin.Context) {
 	helper.SuccessWithData(c, res)
 }
 
+// @Tags File
+// @Summary Multi file size
+// @Accept json
+// @Param request body request.DirSizeReq true "request"
+// @Success 200 {array} response.DepthDirSizeRes
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /files/depth/size [post]
+// @x-panel-log {"bodyKeys":["path"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"获取目录及其第一层子目录文件夹大小 [path]","formatEN":"Multi file size [path]"}
+func (b *BaseApi) DepthDirSize(c *gin.Context) {
+	var req request.DirSizeReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	res, err := fileService.DepthDirSize(req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}
+
 func mergeChunks(fileName string, fileDir string, dstDir string, chunkCount int, overwrite bool) error {
 	defer func() {
 		_ = os.RemoveAll(fileDir)

@@ -21,7 +21,12 @@
             </fu-table>
         </div>
 
-        <div class="complex-table__pagination" v-if="props.paginationConfig">
+        <div
+            class="complex-table__pagination flex items-center w-full"
+            v-if="props.paginationConfig"
+            :class="{ '!justify-between': slots.paginationLeft, '!justify-end': !slots.paginationLeft }"
+        >
+            <slot name="paginationLeft"></slot>
             <slot name="pagination">
                 <el-pagination
                     v-model:current-page="paginationConfig.currentPage"
@@ -100,21 +105,25 @@ defineExpose({
 
 onMounted(() => {
     let heightDiff = 320;
+    let tabHeight = 0;
     if (props.heightDiff) {
         heightDiff = props.heightDiff;
     }
+    if (globalStore.openMenuTabs) {
+        tabHeight = 48;
+    }
     if (props.height) {
-        tableHeight.value = props.height;
+        tableHeight.value = props.height - tabHeight;
     } else {
-        tableHeight.value = window.innerHeight - heightDiff;
+        tableHeight.value = window.innerHeight - heightDiff - tabHeight;
     }
 
     window.onresize = () => {
         return (() => {
             if (props.height) {
-                tableHeight.value = props.height;
+                tableHeight.value = props.height - tabHeight;
             } else {
-                tableHeight.value = window.innerHeight - heightDiff;
+                tableHeight.value = window.innerHeight - heightDiff - tabHeight;
             }
         })();
     };

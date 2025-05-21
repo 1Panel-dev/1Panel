@@ -77,6 +77,7 @@ const message = {
             fix: 'Corrigir',
             down: 'Parar',
             up: 'Iniciar',
+            sure: 'Confirmar',
         },
         operate: {
             start: 'Iniciar',
@@ -1304,6 +1305,7 @@ const message = {
         errLog: 'Logs de erro',
     },
     file: {
+        currentDir: 'Diretório atual',
         dir: 'Pasta',
         upload: 'Carregar',
         uploadFile: '@:file.upload @.lower:file.file',

@@ -77,6 +77,7 @@ const message = {
             fix: '修正',
             down: '停止',
             up: '起動',
+            sure: '確認',
         },
         operate: {
             start: '開始',
@@ -1278,6 +1279,7 @@ const message = {
         errLog: 'エラーログ',
     },
     file: {
+        currentDir: '現在のディレクトリ',
         dir: 'フォルダ',
         upload: 'アップロード',
         uploadFile: '@:file.upload@.lower:file.file',

@@ -98,6 +98,10 @@ export const computeDirSize = (params: File.DirSizeReq) => {
     return http.post<File.DirSizeRes>('files/size', params, TimeoutEnum.T_5M);
 };
 
+export const computeDepthDirSize = (params: File.DirSizeReq) => {
+    return http.post<File.DepthDirSizeRes[]>('files/depth/size', params, TimeoutEnum.T_5M);
+};
+
 export const fileWgetKeys = () => {
     return http.get<File.FileKeys>('files/wget/process/keys');
 };

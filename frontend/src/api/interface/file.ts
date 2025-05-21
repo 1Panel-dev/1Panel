@@ -152,6 +152,11 @@ export namespace File {
         size: number;
     }
 
+    export interface DepthDirSizeRes {
+        size: number;
+        path: string;
+    }
+
     export interface FilePath {
         path: string;
     }
