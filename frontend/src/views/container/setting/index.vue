@@ -442,8 +442,7 @@ const onOperator = async (operation: string) => {
         await dockerOperate(operation)
             .then(() => {
                 loading.value = false;
-                search();
-                changeMode();
+                window.location.reload();
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             })
             .catch(() => {
