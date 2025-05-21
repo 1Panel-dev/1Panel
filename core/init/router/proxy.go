@@ -1,22 +1,18 @@
 package router
 
 import (
-	"context"
-	"net"
+	"github.com/1Panel-dev/1Panel/core/init/proxy"
 	"net/http"
-	"net/http/httputil"
 	"net/url"
 	"os"
 	"strconv"
 	"strings"
 
+	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/cmd/server/res"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
-	"github.com/1Panel-dev/1Panel/core/utils/security"
-
-	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/gin-gonic/gin"
 )
@@ -54,35 +50,13 @@ func Proxy() gin.HandlerFunc {
 			return
 		}
 
-		if !strings.HasPrefix(c.Request.URL.Path, "/api/v2/core") && (currentNode == "local" || len(currentNode) == 0 || currentNode == "127.0.0.1") {
+		if !strings.HasPrefix(c.Request.URL.Path, "/api/v2/core") && (currentNode == "local" || len(currentNode) == 0) {
 			sockPath := "/etc/1panel/agent.sock"
 			if _, err := os.Stat(sockPath); err != nil {
 				helper.ErrorWithDetail(c, http.StatusBadRequest, "ErrProxy", err)
 				return
 			}
-			dialUnix := func() (conn net.Conn, err error) {
-				return net.Dial("unix", sockPath)
-			}
-			transport := &http.Transport{
-				DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
-					return dialUnix()
-				},
-			}
-			proxy := &httputil.ReverseProxy{
-				Director: func(req *http.Request) {
-					req.URL.Scheme = "http"
-					req.URL.Host = "unix"
-				},
-				Transport: transport,
-				ModifyResponse: func(response *http.Response) error {
-					if response.StatusCode == 404 {
-						security.HandleNotSecurity(c, "")
-						c.Abort()
-					}
-					return nil
-				},
-			}
-			proxy.ServeHTTP(c.Writer, c.Request)
+			proxy.LocalAgentProxy.ServeHTTP(c.Writer, c.Request)
 			c.Abort()
 			return
 		}

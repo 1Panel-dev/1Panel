@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"encoding/gob"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/core/init/proxy"
 	"net"
 	"net/http"
 	"os"
@@ -45,6 +46,7 @@ func Start() {
 	InitOthers()
 
 	run.Init()
+	proxy.Init()
 
 	rootRouter := router.Routers()
 
