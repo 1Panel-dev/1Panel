@@ -638,6 +638,18 @@ func (f FileOp) Compress(srcRiles []string, dst string, name string, cType Compr
 			_ = f.DeleteFile(dstFile)
 			return err
 		}
+	case Rar:
+		err = NewRarArchiver().Compress(srcRiles, dstFile, secret)
+		if err != nil {
+			_ = f.DeleteFile(dstFile)
+			return err
+		}
+	case X7z:
+		err = NewX7zArchiver().Compress(srcRiles, dstFile, secret)
+		if err != nil {
+			_ = f.DeleteFile(dstFile)
+			return err
+		}
 	default:
 		err = format.Archive(context.Background(), out, files)
 		if err != nil {
@@ -716,7 +728,7 @@ func (f FileOp) decompressWithSDK(srcFile string, dst string, cType CompressType
 }
 
 func (f FileOp) Decompress(srcFile string, dst string, cType CompressType, secret string) error {
-	if cType == Tar || cType == Zip || cType == TarGz {
+	if cType == Tar || cType == Zip || cType == TarGz || cType == Rar || cType == X7z {
 		shellArchiver, err := NewShellArchiver(cType)
 		if !f.Stat(dst) {
 			_ = f.CreateDir(dst, 0755)
@@ -724,6 +736,10 @@ func (f FileOp) Decompress(srcFile string, dst string, cType CompressType, secre
 		if err == nil {
 			if err = shellArchiver.Extract(srcFile, dst, secret); err == nil {
 				return nil
+			}
+		} else {
+			if cType == Rar || cType == X7z {
+				return err
 			}
 		}
 	}

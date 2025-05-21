@@ -465,4 +465,6 @@ const (
 	Xz       CompressType = "xz"
 	SdkZip   CompressType = "sdkZip"
 	SdkTarGz CompressType = "sdkTarGz"
+	Rar      CompressType = "rar"
+	X7z      CompressType = "7z"
 )

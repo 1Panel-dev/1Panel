@@ -546,6 +546,7 @@ import VscodeOpenDialog from '@/components/vscode-open/index.vue';
 import { debounce } from 'lodash-es';
 import TerminalDialog from './terminal/index.vue';
 import { Dashboard } from '@/api/interface/dashboard';
+import { CompressExtension, MimetypeByExtensionObject } from '@/enums/files';
 
 const globalStore = GlobalStore();
 
@@ -962,10 +963,15 @@ const openDeCompress = (item: File.File) => {
         return;
     }
 
+    if (CompressExtension[Mimetypes.get(item.mimeType)] != item.extension) {
+        fileDeCompress.mimeType = MimetypeByExtensionObject[item.extension];
+    } else {
+        fileDeCompress.mimeType = item.mimeType;
+    }
+
     fileDeCompress.name = item.name;
     fileDeCompress.path = item.path;
     fileDeCompress.dst = req.path;
-    fileDeCompress.mimeType = item.mimeType;
 
     deCompressRef.value.acceptParams(fileDeCompress);
 };

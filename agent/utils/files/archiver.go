@@ -24,6 +24,16 @@ func NewShellArchiver(compressType CompressType) (ShellArchiver, error) {
 			return nil, err
 		}
 		return NewZipArchiver(), nil
+	case Rar:
+		if err := checkCmdAvailability("unrar"); err != nil {
+			return nil, err
+		}
+		return NewRarArchiver(), nil
+	case X7z:
+		if err := checkCmdAvailability("7z"); err != nil {
+			return nil, err
+		}
+		return NewX7zArchiver(), nil
 	default:
 		return nil, buserr.New("unsupported compress type")
 	}
