@@ -3336,12 +3336,13 @@ const message = {
             nodeSyncHelper: 'Node information synchronization will sync the following information:',
             nodeSyncHelper1: '1. Public backup account information',
             nodeSyncHelper2: '2. Connection information between the main node and sub-nodes',
+
             panelExist:
-                '1Panel service already exists on this node. Please upgrade to V2 using the upgrade script before adding!',
-            coreExist:
-                'Detected that there is already 1panel-core service on this node. Unable to add this node, please check and try again!',
+                '1Panel V1 service is running on this node. Please upgrade to V2 using the migration script before adding.',
+            coreExist: 'This node already has 1Panel V2 service deployed and cannot be added as a secondary node.',
             agentExist:
-                'Detected that the 1panel-agent service already exists on this node. Continuing to add will retain the node data and only replace the 1panel-agent service. Do you want to continue?',
+                '1panel-agent is already installed on this node. Continuing will preserve existing data and only replace the 1panel-agent service. Proceed?',
+            dataExist: '1Panel historical data exists on this node. Confirm to continue adding?',
             errLicense: 'The license bound to this node is unavailable. Please check and try again!',
             reinstallHelper: 'Reinstall node {0}, do you want to continue?',
             unhealthyCheck: 'Abnormal Check',
@@ -3357,9 +3358,8 @@ const message = {
             forceDelete: 'Force Delete',
             operateHelper: 'The following nodes will undergo {0} operation, do you want to continue?',
             forceDeleteHelper: 'Force delete will ignore node deletion errors and delete database metadata',
-            uninstall: 'Uninstall service',
-            uninstallHelper:
-                'This will uninstall the child node 1Panel service and delete related data. Choose carefully!',
+            uninstall: 'Delete node data',
+            uninstallHelper: 'This will delete all 1Panel related data of the node. Proceed with caution!',
             baseDir: 'Installation Directory',
             baseDirHelper:
                 'When the installation directory is empty, it will be installed in the /opt directory by default',

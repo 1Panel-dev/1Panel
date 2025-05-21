@@ -3138,12 +3138,13 @@ const message = {
             nodeSyncHelper: '노드 정보 동기화는 다음 정보를 동기화합니다:',
             nodeSyncHelper1: '1. 공용 백업 계정 정보',
             nodeSyncHelper2: '2. 주 노드와 하위 노드 간의 연결 정보',
+
             panelExist:
-                '이 노드에 1Panel 서비스가 이미 존재합니다. 추가하기 전에 업그레이드 스크립트로 V2로 업그레이드하세요!',
-            coreExist:
-                '이 노드에 이미 1panel-core 서비스가 존재합니다. 이 노드를 추가할 수 없습니다. 확인 후 다시 시도하십시오!',
+                '이 노드에서 1Panel V1 서비스가 실행 중입니다. 추가하기 전에 마이그레이션 스크립트로 V2로 업그레이드하세요.',
+            coreExist: '이 노드에는 이미 1Panel V2 서비스가 배포되어 있어 보조 노드로 추가할 수 없습니다.',
             agentExist:
-                '이 노드에 1panel-agent 서비스가 이미 존재하는 것으로 감지되었습니다. 추가를 계속하면 노드 데이터는 유지되고 1panel-agent 서비스만 교체됩니다. 계속하시겠습니까?',
+                '이 노드에 1panel-agent가 이미 설치되어 있습니다. 계속하면 기존 데이터는 유지되고 1panel-agent 서비스만 교체됩니다. 계속하시겠습니까?',
+            dataExist: '이 노드에 1Panel 이전 데이터가 존재합니다. 추가를 계속하시겠습니까?',
             errLicense: '이 노드에 연결된 라이선스를 사용할 수 없습니다. 확인 후 다시 시도하세요!',
             reinstallHelper: '노드 {0}를 재설치합니다. 계속하시겠습니까?',
             unhealthyCheck: '비정상 체크',
@@ -3159,8 +3160,8 @@ const message = {
             forceDelete: '강제 삭제',
             operateHelper: '다음 노드에 대해 {0} 작업을 수행합니다. 계속하시겠습니까?',
             forceDeleteHelper: '강제 삭제는 노드 삭제 오류를 무시하고 데이터베이스 메타데이터를 삭제합니다',
-            uninstall: '서비스 제거',
-            uninstallHelper: '자식 노드의 1Panel 서비스를 제거하고 관련 데이터를 삭제합니다. 신중하게 선택하세요!',
+            uninstall: '노드 데이터 삭제',
+            uninstallHelper: '이 작업은 노드의 모든 1Panel 관련 데이터를 삭제합니다. 신중하게 선택하세요!',
             baseDir: '설치 디렉토리',
             baseDirHelper: '설치 디렉토리가 비어 있으면 기본적으로 /opt 디렉토리에 설치됩니다',
             nodePort: '노드 포트',

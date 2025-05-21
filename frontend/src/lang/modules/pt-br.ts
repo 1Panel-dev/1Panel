@@ -3270,12 +3270,13 @@ const message = {
             nodeSyncHelper: 'A sincronização das informações do nó irá sincronizar as seguintes informações:',
             nodeSyncHelper1: '1. Informações da conta de backup pública',
             nodeSyncHelper2: '2. Informações de conexão entre o nó principal e os sub-nós',
+
             panelExist:
-                'O serviço 1Panel já existe neste nó. Por favor, atualize para V2 usando o script de atualização antes de adicionar!',
-            coreExist:
-                'Detectado que já existe um serviço 1panel-core neste nó. Não é possível adicionar este nó, por favor verifique e tente novamente!',
+                'O serviço 1Panel V1 está em execução neste nó. Atualize para V2 usando o script de migração antes de adicionar.',
+            coreExist: 'Este nó já tem o serviço 1Panel V2 implantado e não pode ser adicionado como nó secundário.',
             agentExist:
-                'Detectado que o serviço 1panel-agent já existe neste nó. Continuar a adicionar irá manter os dados do nó e apenas substituir o serviço 1panel-agent. Você deseja continuar?',
+                '1panel-agent já está instalado neste nó. Continuar preservará os dados existentes e substituirá apenas o serviço 1panel-agent. Prosseguir?',
+            dataExist: 'Existem dados históricos do 1Panel neste nó. Confirmar para continuar a adição?',
             errLicense: 'A licença vinculada a este nó não está disponível. Por favor, verifique e tente novamente!',
             reinstallHelper: 'Reinstalar o nó {0}, deseja continuar?',
             unhealthyCheck: 'Verificação Anormal',
@@ -3292,9 +3293,8 @@ const message = {
             operateHelper: 'A operação {0} será realizada nos seguintes nós, deseja continuar?',
             forceDeleteHelper:
                 'Excluir forçadamente ignorará erros de exclusão do nó e removerá os metadados do banco de dados',
-            uninstall: 'Desinstalar serviço',
-            uninstallHelper:
-                'Isso desinstalará o serviço 1Panel do nó filho e excluirá os dados relacionados. Escolha com cuidado!',
+            uninstall: 'Excluir dados do nó',
+            uninstallHelper: 'Isso excluirá todos os dados relacionados ao 1Panel do nó. Escolha com cuidado!',
             baseDir: 'Diretório de Instalação',
             baseDirHelper: 'Quando o diretório de instalação está vazio, será instalado por padrão no diretório /opt',
             nodePort: 'Porta do Nó',

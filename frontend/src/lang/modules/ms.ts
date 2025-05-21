@@ -3263,12 +3263,14 @@ const message = {
             nodeSyncHelper: 'Penyelarasan maklumat nod akan menyelaraskan maklumat berikut:',
             nodeSyncHelper1: '1. Maklumat akaun sandaran awam',
             nodeSyncHelper2: '2. Maklumat sambungan antara nod utama dan nod sub',
+
             panelExist:
-                'Perkhidmatan 1Panel sudah wujud pada nod ini. Sila naik taraf ke V2 menggunakan skrip naik taraf sebelum menambah!',
+                'Mengesan perkhidmatan 1Panel V1 sedang berjalan pada nod ini. Sila naik taraf ke V2 menggunakan skrip migrasi sebelum menambah.',
             coreExist:
-                'Dikesan bahawa terdapat perkhidmatan 1panel-core yang sudah ada pada nod ini. Tidak dapat menambah nod ini, sila semak dan cuba lagi!',
+                'Nod ini telah mempunyai perkhidmatan 1Panel V2 dipasang, tidak boleh ditambah sebagai nod sekunder.',
             agentExist:
-                'Terbukti bahawa perkhidmatan 1panel-agent sudah wujud pada nod ini. Melanjutkan penambahan akan mengekalkan data nod dan hanya menggantikan perkhidmatan 1panel-agent. Adakah anda ingin meneruskan?',
+                'Mengesan 1panel-agent telah dipasang pada nod ini. Jika diteruskan, data sedia ada akan dikekalkan dan hanya perkhidmatan 1panel-agent akan diganti. Teruskan?',
+            dataExist: 'Mengesan data sejarah 1Panel wujud pada nod ini. Sahkan untuk terus menambah?',
             errLicense: 'Lesen yang terikat pada nod ini tidak tersedia. Sila periksa dan cuba lagi!',
             reinstallHelper: 'Pasang semula nod {0}, adakah anda ingin meneruskan?',
             unhealthyCheck: 'Pemeriksaan Tidak Normal',
@@ -3286,9 +3288,8 @@ const message = {
             operateHelper: 'Operasi {0} akan dilakukan pada nod berikut, adakah anda ingin meneruskan?',
             forceDeleteHelper:
                 'Hapus secara paksa akan mengabaikan ralat penghapusan nod dan menghapus metadata pangkalan data',
-            uninstall: 'Nyahpasang perkhidmatan',
-            uninstallHelper:
-                'Akan nyahpasang perkhidmatan 1Panel nod anak dan padam data berkaitan. Pilih dengan berhati-hati!',
+            uninstall: 'Padam data nod',
+            uninstallHelper: 'Ini akan memadamkan semua data berkaitan 1Panel bagi nod. Pilih dengan berhati-hati!',
             baseDir: 'Direktori Pemasangan',
             baseDirHelper: 'Apabila direktori pemasangan kosong, secara lalai akan dipasang di direktori /opt',
             nodePort: 'Port Nod',
