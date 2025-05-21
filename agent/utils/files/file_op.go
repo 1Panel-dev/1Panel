@@ -520,45 +520,12 @@ type DirSize struct {
 func (f FileOp) GetDepthDirSize(path string) ([]DirSize, error) {
 	var result []DirSize
 	sizeMap := make(map[string]int64)
-	duCmd := exec.Command("du", "-k", "--max-depth=1", path)
+	duCmd := exec.Command("du", "-k", "--max-depth=1", "--exclude=proc", path)
 	output, err := duCmd.Output()
 	if err == nil {
-		lines := strings.Split(string(output), "\n")
-		for _, line := range lines {
-			if strings.TrimSpace(line) == "" {
-				continue
-			}
-			fields := strings.Fields(line)
-			if len(fields) == 2 {
-				var sizeKB int64
-				dir := fields[1]
-				_, err := fmt.Sscanf(fields[0], "%d", &sizeKB)
-				if err == nil {
-					sizeMap[dir] = sizeKB * 1024
-				}
-			}
-		}
+		parseDUOutput(output, sizeMap)
 	} else {
-		_ = filepath.Walk(path, func(p string, info os.FileInfo, err error) error {
-			if err != nil {
-				return nil
-			}
-			if !info.IsDir() {
-				rel, err := filepath.Rel(path, p)
-				if err != nil {
-					return nil
-				}
-				parts := strings.Split(rel, string(os.PathSeparator))
-				var topLevel string
-				if len(parts) == 0 || parts[0] == "." {
-					topLevel = path
-				} else {
-					topLevel = filepath.Join(path, parts[0])
-				}
-				sizeMap[topLevel] += info.Size()
-			}
-			return nil
-		})
+		calculateDirSizeFallback(path, sizeMap)
 	}
 
 	for dir, size := range sizeMap {
@@ -569,6 +536,45 @@ func (f FileOp) GetDepthDirSize(path string) ([]DirSize, error) {
 	}
 
 	return result, nil
+}
+
+func parseDUOutput(output []byte, sizeMap map[string]int64) {
+	lines := strings.Split(string(output), "\n")
+	for _, line := range lines {
+		if strings.TrimSpace(line) == "" {
+			continue
+		}
+		fields := strings.Fields(line)
+		if len(fields) == 2 {
+			if sizeKB, err := strconv.ParseInt(fields[0], 10, 64); err == nil {
+				dir := fields[1]
+				sizeMap[dir] = sizeKB * 1024
+			}
+		}
+	}
+}
+
+func calculateDirSizeFallback(path string, sizeMap map[string]int64) {
+	_ = filepath.Walk(path, func(p string, info os.FileInfo, err error) error {
+		if err != nil {
+			return nil
+		}
+		if !info.IsDir() {
+			rel, err := filepath.Rel(path, p)
+			if err != nil {
+				return nil
+			}
+			parts := strings.Split(rel, string(os.PathSeparator))
+			var topLevel string
+			if len(parts) == 0 || parts[0] == "." {
+				topLevel = path
+			} else {
+				topLevel = filepath.Join(path, parts[0])
+			}
+			sizeMap[topLevel] += info.Size()
+		}
+		return nil
+	})
 }
 
 func getFormat(cType CompressType) archiver.CompressedArchive {
