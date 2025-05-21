@@ -4,29 +4,28 @@
         :header="$t('menu.terminal')"
         @close="handleClose"
         :resource="title"
-        size="large"
+        fullScreen
+        :size="globalStore.isFullScreen ? 'full' : 'large'"
     >
         <template #content>
-            <el-form ref="formRef" :model="form" label-position="top">
-                <el-button v-if="!terminalOpen" @click="initTerm(formRef)">
-                    {{ $t('commons.button.conn') }}
+            <Terminal style="height: calc(100vh - 180px)" ref="terminalRef" v-if="terminalOpen"></Terminal>
+        </template>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button type="primary" @click="handleClose">
+                    {{ $t('commons.button.disConn') }}
                 </el-button>
-                <el-button v-else @click="onClose()">{{ $t('commons.button.disConn') }}</el-button>
-                <Terminal
-                    style="height: calc(100vh - 200px); margin-top: 18px"
-                    ref="terminalRef"
-                    v-if="terminalOpen"
-                ></Terminal>
-            </el-form>
+            </span>
         </template>
     </DrawerPro>
 </template>
 
 <script lang="ts" setup>
 import { reactive, ref, nextTick } from 'vue';
-import { ElForm, FormInstance } from 'element-plus';
 import Terminal from '@/components/terminal/index.vue';
+import { GlobalStore } from '@/store';
 
+const globalStore = GlobalStore();
 const title = ref();
 const terminalVisible = ref(false);
 const terminalOpen = ref(false);
@@ -36,7 +35,6 @@ const form = reactive({
     user: '',
     containerID: '',
 });
-const formRef = ref();
 const terminalRef = ref<InstanceType<typeof Terminal> | null>(null);
 
 interface DialogProps {
@@ -50,22 +48,17 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     form.isCustom = false;
     form.user = '';
     form.command = '/bin/bash';
-    terminalOpen.value = false;
-    initTerm(formRef.value);
+    initTerm();
 };
 
-const initTerm = (formEl: FormInstance | undefined) => {
-    if (!formEl) return;
-    formEl.validate(async (valid) => {
-        if (!valid) return;
-        terminalOpen.value = true;
-        await nextTick();
-        terminalRef.value!.acceptParams({
-            endpoint: '/api/v2/containers/exec',
-            args: `source=container&containerid=${form.containerID}&user=${form.user}&command=${form.command}`,
-            error: '',
-            initCmd: '',
-        });
+const initTerm = async () => {
+    terminalOpen.value = true;
+    await nextTick();
+    terminalRef.value!.acceptParams({
+        endpoint: '/api/v2/containers/exec',
+        args: `source=container&containerid=${form.containerID}&user=${form.user}&command=${form.command}`,
+        error: '',
+        initCmd: '',
     });
 };
 

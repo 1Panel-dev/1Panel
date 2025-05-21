@@ -79,12 +79,12 @@
                         :label="$t('commons.table.date')"
                         :formatter="dateFormat"
                         show-overflow-tooltip
-                        min-width="120"
+                        width="180"
                         fix
                     />
                     <fu-table-operations
-                        :ellipsis="mobile ? 0 : 5"
-                        :min-width="mobile ? 'auto' : 300"
+                        :ellipsis="mobile ? 0 : 3"
+                        :width="mobile ? 'auto' : 200"
                         :buttons="buttons"
                         fixed="right"
                         :label="$t('commons.table.operate')"
@@ -161,12 +161,30 @@ const terminalRef = ref();
 
 const buttons = [
     {
+        label: i18n.global.t('commons.button.edit'),
+        click: function (row: Runtime.Runtime) {
+            openDetail(row);
+        },
+        disabled: function (row: Runtime.Runtime) {
+            return disabledButton(row, 'edit');
+        },
+    },
+    {
         label: i18n.global.t('runtime.extension'),
         click: function (row: Runtime.Runtime) {
             openExtensionsManagement(row);
         },
         disabled: function (row: Runtime.Runtime) {
             return disabledButton(row, 'extension');
+        },
+    },
+    {
+        label: i18n.global.t('menu.terminal'),
+        click: function (row: Runtime.Runtime) {
+            openTerminal(row);
+        },
+        disabled: function (row: Runtime.Runtime) {
+            return disabledButton(row, 'config');
         },
     },
     {
@@ -197,15 +215,6 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('commons.button.edit'),
-        click: function (row: Runtime.Runtime) {
-            openDetail(row);
-        },
-        disabled: function (row: Runtime.Runtime) {
-            return disabledButton(row, 'edit');
-        },
-    },
-    {
         label: i18n.global.t('menu.config'),
         click: function (row: Runtime.Runtime) {
             openConfig(row);
@@ -223,15 +232,7 @@ const buttons = [
             return disabledButton(row, 'config');
         },
     },
-    {
-        label: i18n.global.t('menu.terminal'),
-        click: function (row: Runtime.Runtime) {
-            openTerminal(row);
-        },
-        disabled: function (row: Runtime.Runtime) {
-            return disabledButton(row, 'config');
-        },
-    },
+
     {
         label: i18n.global.t('commons.button.delete'),
         click: function (row: Runtime.Runtime) {
