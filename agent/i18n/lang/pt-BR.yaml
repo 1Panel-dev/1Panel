@@ -91,6 +91,7 @@ ErrAppIsDown: 'O status do aplicativo {{ .name }} é anormal, verifique'
 ErrCustomApps: 'Há um aplicativo instalado, desinstale-o primeiro'
 ErrCustomRuntimes: 'Há um ambiente de execução instalado, exclua-o primeiro'
 ErrAppVersionDeprecated: "O aplicativo {{ .name }} não é compatível com a versão atual do 1Panel, ignorado"
+ErrDockerFailed: "O estado do Docker está anormal, verifique o status do serviço"
 
 #arquivo
 ErrFileCanNotRead: 'Este arquivo não suporta visualização'

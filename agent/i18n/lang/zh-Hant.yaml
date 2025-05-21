@@ -91,6 +91,7 @@ ErrAppIsDown: '{{ .name }} 應用程式狀態異常，請檢查'
 ErrCustomApps: '存在已安裝的應用程式，請先解除安裝'
 ErrCustomRuntimes: '存在已安裝的運作環境，請先刪除'
 ErrAppVersionDeprecated: "{{ .name }} 應用不適配當前 1Panel 版本，跳過"
+ErrDockerFailed: "Docker 狀態異常，請檢查服務狀態"
 
 #file
 ErrFileCanNotRead: '此檔案不支援預覽'

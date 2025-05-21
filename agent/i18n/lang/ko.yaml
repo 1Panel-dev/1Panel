@@ -91,6 +91,7 @@ ErrAppIsDown: '{{ .name }} 애플리케이션 상태가 비정상적입니다. �
 ErrCustomApps: '설치된 애플리케이션이 있습니다. 먼저 제거해 주세요'
 ErrCustomRuntimes: '설치된 런타임 환경이 있습니다. 먼저 삭제해 주세요'
 ErrAppVersionDeprecated: "{{ .name }} 응용 프로그램은 현재 1Panel 버전과 호환되지 않아 건너뛰었습니다"
+ErrDockerFailed: "Docker의 상태가 비정상입니다. 서비스 상태를 확인하세요"
 
 #파일
 ErrFileCanNotRead: '이 파일은 미리보기를 지원하지 않습니다'

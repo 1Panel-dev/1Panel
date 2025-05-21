@@ -1441,17 +1441,15 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool)
 	)
 	if sync {
 		cli, err := docker.NewClient()
-		if err != nil {
-			return nil, err
-		}
-		defer cli.Close()
-		containers, err := cli.ListAllContainers()
-		if err != nil {
-			return nil, err
-		}
-		containersMap = make(map[string]types.Container, len(containers))
-		for _, contain := range containers {
-			containersMap[contain.Names[0]] = contain
+		if err == nil {
+			defer cli.Close()
+			containers, err := cli.ListAllContainers()
+			if err == nil {
+				containersMap = make(map[string]types.Container, len(containers))
+				for _, contain := range containers {
+					containersMap[contain.Names[0]] = contain
+				}
+			}
 		}
 	}
 

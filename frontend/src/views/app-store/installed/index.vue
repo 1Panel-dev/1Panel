@@ -386,7 +386,7 @@
 </template>
 
 <script lang="ts" setup>
-import { searchAppInstalled, installedOp, syncInstalledApp, appInstalledDeleteCheck } from '@/api/modules/app';
+import { searchAppInstalled, installedOp, appInstalledDeleteCheck } from '@/api/modules/app';
 import { onMounted, onUnmounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
@@ -469,25 +469,6 @@ const openDetail = (key: string) => {
     detailRef.value.acceptParams(key, 'install');
 };
 
-const sync = () => {
-    ElMessageBox.confirm(i18n.global.t('app.syncAllAppHelper'), i18n.global.t('commons.button.sync'), {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-        type: 'info',
-    })
-        .then(async () => {
-            syncLoading.value = true;
-            try {
-                await syncInstalledApp();
-                MsgSuccess(i18n.global.t('app.syncSuccess'));
-                search();
-            } finally {
-                syncLoading.value = false;
-            }
-        })
-        .catch(() => {});
-};
-
 const changeTag = (key: string) => {
     searchReq.tags = [];
     if (key !== 'all') {
@@ -500,6 +481,22 @@ const search = async () => {
     searchReq.page = paginationConfig.currentPage;
     searchReq.pageSize = paginationConfig.pageSize;
     const res = await searchAppInstalled(searchReq);
+    data.value = res.data.items;
+    paginationConfig.total = res.data.total;
+};
+
+const sync = async () => {
+    loading.value = true;
+    const searchItem = {
+        page: paginationConfig.currentPage,
+        pageSize: paginationConfig.pageSize,
+        name: searchReq.name,
+        tags: searchReq.tags,
+        update: false,
+        sync: true,
+    };
+    const res = await searchAppInstalled(searchItem);
+    loading.value = false;
     data.value = res.data.items;
     paginationConfig.total = res.data.total;
 };
@@ -576,20 +573,6 @@ const onOperate = async (operation: string) => {
 };
 
 const buttons = [
-    {
-        label: i18n.global.t('commons.operate.sync'),
-        click: (row: any) => {
-            openOperate(row, 'sync');
-        },
-        disabled: (row: any) => {
-            return (
-                row.status === 'DownloadErr' ||
-                row.status === 'Upgrading' ||
-                row.status === 'Rebuilding' ||
-                row.status === 'Uninstalling'
-            );
-        },
-    },
     {
         label: i18n.global.t('commons.operate.rebuild'),
         click: (row: any) => {
