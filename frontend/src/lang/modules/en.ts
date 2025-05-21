@@ -3335,7 +3335,7 @@ const message = {
             nodeSyncHelper1: '1. Public backup account information',
             nodeSyncHelper2: '2. Connection information between the main node and sub-nodes',
             panelExist:
-                'Detected that there is already 1panel service on this node. Adding this node will use the original service port and installation directory of 1panel. Do you want to continue?',
+                '1Panel service already exists on this node. Please upgrade to V2 using the upgrade script before adding!',
             coreExist:
                 'Detected that there is already 1panel-core service on this node. Unable to add this node, please check and try again!',
             agentExist:

@@ -50,7 +50,7 @@ func (u *HostService) TestByInfo(req dto.HostConnTest) bool {
 		req.PrivateKey = string(privateKey)
 	}
 	if len(req.Password) == 0 && len(req.PrivateKey) == 0 {
-		host, err := hostRepo.Get(hostRepo.WithByAddr(req.Addr))
+		host, err := hostRepo.Get(hostRepo.WithByAddr(req.Addr), hostRepo.WithByPort(req.Port))
 		if err != nil {
 			return false
 		}

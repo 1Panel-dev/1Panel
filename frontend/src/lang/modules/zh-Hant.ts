@@ -3090,8 +3090,7 @@ const message = {
             nodeSyncHelper: '節點信息同步將同步以下信息：',
             nodeSyncHelper1: '1. 公用的備份帳號信息',
             nodeSyncHelper2: '2. 主節點與子節點的連接信息',
-            panelExist:
-                '已檢測到該節點上已存在 1panel 服務，新增該節點將沿用 1panel 原服務的埠號及安裝目錄，是否繼續？',
+            panelExist: '檢測到該節點上已存在 1panel 服務，請先透過升級腳本升級到 V2 後再新增！',
             coreExist: '已檢測到該節點上已存在 1panel-core 服務，無法新增該節點，請檢查後再試！',
             agentExist:
                 '檢測到該節點上已存在 1panel-agent 服務，繼續添加將保留該節點數據，僅替換 1panel-agent 服務，是否繼續？',

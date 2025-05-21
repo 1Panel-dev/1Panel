@@ -3137,7 +3137,7 @@ const message = {
             nodeSyncHelper1: '1. 공용 백업 계정 정보',
             nodeSyncHelper2: '2. 주 노드와 하위 노드 간의 연결 정보',
             panelExist:
-                '이 노드에 이미 1panel 서비스가 존재합니다. 이 노드를 추가하면 1panel의 원래 서비스 포트와 설치 디렉토리를 사용합니다. 계속하시겠습니까?',
+                '이 노드에 1Panel 서비스가 이미 존재합니다. 추가하기 전에 업그레이드 스크립트로 V2로 업그레이드하세요!',
             coreExist:
                 '이 노드에 이미 1panel-core 서비스가 존재합니다. 이 노드를 추가할 수 없습니다. 확인 후 다시 시도하십시오!',
             agentExist:

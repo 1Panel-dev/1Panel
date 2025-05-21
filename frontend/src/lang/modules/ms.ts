@@ -3262,7 +3262,7 @@ const message = {
             nodeSyncHelper1: '1. Maklumat akaun sandaran awam',
             nodeSyncHelper2: '2. Maklumat sambungan antara nod utama dan nod sub',
             panelExist:
-                'Dikesan bahawa terdapat perkhidmatan 1panel yang sudah ada pada nod ini. Menambah nod ini akan menggunakan port dan direktori pemasangan perkhidmatan asal 1panel. Adakah anda ingin meneruskan?',
+                'Perkhidmatan 1Panel sudah wujud pada nod ini. Sila naik taraf ke V2 menggunakan skrip naik taraf sebelum menambah!',
             coreExist:
                 'Dikesan bahawa terdapat perkhidmatan 1panel-core yang sudah ada pada nod ini. Tidak dapat menambah nod ini, sila semak dan cuba lagi!',
             agentExist:

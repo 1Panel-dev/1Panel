@@ -3269,7 +3269,7 @@ const message = {
             nodeSyncHelper1: '1. Informações da conta de backup pública',
             nodeSyncHelper2: '2. Informações de conexão entre o nó principal e os sub-nós',
             panelExist:
-                'Detectado que já existe um serviço 1panel neste nó. Adicionar este nó usará a porta e o diretório de instalação do serviço original do 1panel. Deseja continuar?',
+                'O serviço 1Panel já existe neste nó. Por favor, atualize para V2 usando o script de atualização antes de adicionar!',
             coreExist:
                 'Detectado que já existe um serviço 1panel-core neste nó. Não é possível adicionar este nó, por favor verifique e tente novamente!',
             agentExist:
