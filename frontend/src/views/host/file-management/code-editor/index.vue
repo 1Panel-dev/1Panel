@@ -30,10 +30,12 @@
         <template #content>
             <div ref="dialogForm" class="px-4 py-2">
                 <div class="flex justify-start items-center gap-x-4 card-action">
-                    <el-text @click="handleReset">{{ $t('commons.button.reset') }}</el-text>
-                    <el-text @click="saveContent()" class="ml-0">{{ $t('commons.button.save') }}</el-text>
+                    <el-text class="cursor-pointer" @click="handleReset">{{ $t('commons.button.reset') }}</el-text>
+                    <el-text class="cursor-pointer ml-0" @click="saveContent()">
+                        {{ $t('commons.button.save') }}
+                    </el-text>
                     <el-dropdown trigger="click" max-height="300" placement="bottom-start" @command="changeTheme">
-                        <span class="el-dropdown-link">{{ $t('file.theme') }}</span>
+                        <span class="el-dropdown-link cursor-pointer">{{ $t('file.theme') }}</span>
                         <template #dropdown>
                             <el-dropdown-menu>
                                 <el-dropdown-item v-for="item in themes" :key="item.label" :command="item.value">
@@ -46,7 +48,7 @@
                         </template>
                     </el-dropdown>
                     <el-dropdown trigger="click" max-height="300" placement="bottom-start" @command="changeLanguage">
-                        <span class="el-dropdown-link">{{ $t('file.language') }}</span>
+                        <span class="el-dropdown-link cursor-pointer">{{ $t('file.language') }}</span>
                         <template #dropdown>
                             <el-dropdown-menu>
                                 <el-dropdown-item v-for="item in Languages" :key="item.label" :command="item.label">
@@ -59,7 +61,7 @@
                         </template>
                     </el-dropdown>
                     <el-dropdown trigger="click" max-height="300" placement="bottom-start" @command="changeEOL">
-                        <span class="el-dropdown-link">{{ $t('file.eol') }}</span>
+                        <span class="el-dropdown-link cursor-pointer">{{ $t('file.eol') }}</span>
                         <template #dropdown>
                             <el-dropdown-menu>
                                 <el-dropdown-item v-for="item in eols" :key="item.label" :command="item.value">
@@ -72,7 +74,7 @@
                         </template>
                     </el-dropdown>
                     <el-dropdown trigger="click" max-height="300" placement="bottom-start">
-                        <span class="el-dropdown-link">{{ $t('file.setting') }}</span>
+                        <span class="el-dropdown-link cursor-pointer">{{ $t('file.setting') }}</span>
                         <template #dropdown>
                             <el-dropdown-menu>
                                 <el-dropdown-item @click="changeMinimap(!config.minimap)">
@@ -92,7 +94,7 @@
                     </el-dropdown>
                 </div>
             </div>
-            <div v-loading="loading" class="">
+            <div v-loading="loading">
                 <div class="flex">
                     <div
                         class="monaco-editor sm:w-48 w-1/3 monaco-editor-background border-0 tree-container"
@@ -182,10 +184,13 @@
                             >
                                 <DArrowRight />
                             </el-icon>
+                            <div class="flex justify-center items-center h-full" v-if="fileTabs.length === 0">
+                                <el-empty :image="noUpdateImage" />
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="code-footer pl-4 h-6 flex justify-end items-center gap-4 rounded-b">
+                <div class="code-footer pl-4 h-6 flex justify-end items-center gap-4 rounded-b" ref="dialogFooter">
                     <el-divider direction="vertical" class="!h-6" v-if="config.theme" />
                     <el-dropdown trigger="click" max-height="300" placement="top" @command="changeTheme">
                         <span class="el-dropdown-link">
@@ -303,7 +308,7 @@
 <script lang="ts" setup>
 import { getFileContent, getFilesTree, saveFileContent } from '@/api/modules/files';
 import i18n from '@/lang';
-import { MsgError, MsgInfo, MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess, MsgWarning } from '@/utils/message';
 import * as monaco from 'monaco-editor';
 import { nextTick, onBeforeUnmount, reactive, ref, onMounted, computed } from 'vue';
 import { Languages } from '@/global/mimetype';
@@ -323,6 +328,7 @@ import { loadBaseDir } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import CodeTabs from './tabs/index.vue';
 import type { TabPaneName } from 'element-plus';
+import noUpdateImage from '@/assets/images/no_update_app.svg';
 
 const codeTabsRef = ref();
 let editor: monaco.editor.IStandaloneCodeEditor | undefined;
@@ -496,6 +502,9 @@ const removeAllTab = (targetPath: string, type: string) => {
                         const targetIndex = arr.findIndex((t) => t.path === targetPath);
                         return index <= targetIndex;
                     });
+                } else if (type === 'all') {
+                    fileTabs.value = [];
+                    selectTab.value = '';
                 }
                 saveContent();
             })
@@ -524,9 +533,16 @@ const removeAllTab = (targetPath: string, type: string) => {
                 const targetIndex = arr.findIndex((t) => t.path === targetPath);
                 return index <= targetIndex;
             });
+        } else if (type === 'all') {
+            fileTabs.value = [];
+            selectTab.value = '';
         }
     }
-    getContent(selectTab.value, '');
+    if (type === 'all') {
+        editor.dispose();
+    } else {
+        getContent(selectTab.value, '');
+    }
 };
 
 const removeOtherTab = (targetPath: string) => {
@@ -648,7 +664,7 @@ const handleReset = () => {
         MsgSuccess(i18n.global.t('commons.msg.resetSuccess'));
         loading.value = false;
     } else {
-        MsgInfo(i18n.global.t('file.noEdit'));
+        MsgWarning(i18n.global.t('file.noEdit'));
     }
 };
 
@@ -665,7 +681,7 @@ onMounted(() => {
 const updateHeights = () => {
     const vh = window.innerHeight / 100;
     if (isFullscreen.value) {
-        let paddingHeight = 75;
+        let paddingHeight = 30;
         const headerHeight = dialogHeader.value.offsetHeight;
         const formHeight = dialogForm.value.offsetHeight;
         const footerHeight = dialogFooter.value.offsetHeight;
@@ -789,7 +805,7 @@ const saveContent = () => {
                 loading.value = false;
             });
     } else {
-        MsgInfo(i18n.global.t('file.noEdit'));
+        MsgWarning(i18n.global.t('file.noEdit'));
     }
 };
 
@@ -920,7 +936,7 @@ const getContent = (path: string, extension: string) => {
 
     if (isEdit.value) {
         ElMessageBox.confirm(i18n.global.t('file.saveAndOpenNewFile'), {
-            confirmButtonText: i18n.global.t('commons.button.open'),
+            confirmButtonText: i18n.global.t('commons.button.sure'),
             cancelButtonText: i18n.global.t('commons.button.cancel'),
             type: 'info',
         })
@@ -962,7 +978,7 @@ const search = async (path: string) => {
 
 const getUpData = async () => {
     if ('/' === directoryPath.value) {
-        MsgInfo(i18n.global.t('commons.msg.rootInfoErr'));
+        MsgWarning(i18n.global.t('commons.msg.rootInfoErr'));
         return;
     }
     let pathParts = directoryPath.value.split('/');
@@ -1085,7 +1101,6 @@ defineExpose({ acceptParams });
 
 :deep(.el-tabs) {
     --el-tabs-header-height: 28px;
-    --el-text-color-primary: var(--el-text-color-regular);
     .el-tabs__header {
         height: 28px;
         margin: 0;
@@ -1094,11 +1109,25 @@ defineExpose({ acceptParams });
         height: 27px;
         line-height: 27px;
     }
+    .el-tabs__nav {
+        border-right: 1px solid var(--el-border-color-light);
+        border-top: none;
+        border-left: none;
+        border-bottom: none;
+        border-radius: 0;
+        box-sizing: border-box;
+    }
     .el-tabs__nav,
     .el-tabs__nav-next,
     .el-tabs__nav-prev {
         height: 28px;
         line-height: 28px;
+    }
+    .el-tabs__item.is-active {
+        color: var(--el-color-primary);
+        .el-dropdown {
+            color: var(--el-color-primary);
+        }
     }
 }
 </style>
