@@ -606,6 +606,7 @@ const removeOtherTab = (targetPath: string) => {
 };
 
 const changeTab = (targetPath: TabPaneName) => {
+    selectTab.value = targetPath.toString();
     getContent(targetPath.toString(), '');
 };
 
@@ -957,6 +958,9 @@ const getContent = (path: string, extension: string) => {
             .then(() => {
                 saveContent();
                 fetchFileContent();
+            })
+            .catch(() => {
+                selectTab.value = form.value.path;
             })
             .finally(() => {});
     } else {
