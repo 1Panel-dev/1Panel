@@ -1309,6 +1309,7 @@ const message = {
         errLog: 'Логи ошибок',
     },
     file: {
+        fileDirNum: '{0} каталогов, {1} файлов,',
         currentDir: 'Текущий каталог',
         dir: 'Папка',
         upload: 'Загрузить',

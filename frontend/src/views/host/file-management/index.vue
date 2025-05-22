@@ -227,6 +227,9 @@
                                 </el-table>
                             </div>
                         </el-popover>
+                        <el-button class="btn" @click="calculateSize(req.path)" :loading="disableBtn">
+                            {{ $t('file.calculate') }}
+                        </el-button>
                         <template v-if="hostMount.length == 1">
                             <el-button class="btn" @click.stop="jump(hostMount[0]?.path)">
                                 {{ hostMount[0]?.path }} ({{ $t('file.root') }}) {{ getFileSize(hostMount[0]?.free) }}
@@ -252,9 +255,6 @@
                                 </template>
                             </el-dropdown>
                         </template>
-                        <el-button class="btn" @click="calculateSize(req.path)" :disabled="disableBtn">
-                            {{ $t('file.calculate') }}
-                        </el-button>
                     </el-button-group>
 
                     <el-badge :value="processCount" class="btn" v-if="processCount > 0">
@@ -465,14 +465,22 @@
                         fix
                     />
                     <template #paginationLeft>
-                        <el-button type="primary" link small @click="getDirTotalSize(req.path)">
-                            <span v-if="dirTotalSize == -1">
-                                {{ $t('file.calculate') }}
-                            </span>
-                            <span v-else>
-                                {{ $t('file.currentDir') + $t('file.size') + ': ' + getFileSize(dirTotalSize) }}
-                            </span>
-                        </el-button>
+                        <div class="flex justify-start items-center">
+                            <el-text small>
+                                {{ $t('file.fileDirNum', [dirNum, fileNum]) }}
+                            </el-text>
+                            <el-text small>
+                                {{ $t('file.currentDir') + $t('file.size') + ' ' }}
+                            </el-text>
+                            <el-button type="primary" link small :loading="calculateBtn">
+                                <span v-if="dirTotalSize == -1" @click="getDirTotalSize(req.path)">
+                                    {{ $t('file.calculate') }}
+                                </span>
+                                <span v-else>
+                                    {{ getFileSize(dirTotalSize) }}
+                                </span>
+                            </el-button>
+                        </div>
                     </template>
                 </ComplexTable>
             </template>
@@ -619,6 +627,9 @@ const hostMount = ref<Dashboard.DiskInfo[]>([]);
 let resizeObserver: ResizeObserver;
 const dirTotalSize = ref(-1);
 const disableBtn = ref(false);
+const calculateBtn = ref(false);
+const dirNum = ref(0);
+const fileNum = ref(0);
 
 const { searchableStatus, searchablePath, searchableInputRef, searchableInputBlur } = useSearchable(paths);
 
@@ -667,6 +678,8 @@ const searchFile = async () => {
 const handleSearchResult = (res: ResultData<File.File>) => {
     paginationConfig.total = res.data.itemTotal;
     data.value = res.data.items;
+    dirNum.value = data.value.filter((item) => item.isDir).length;
+    fileNum.value = data.value.filter((item) => !item.isDir).length;
     req.path = res.data.path;
 };
 
@@ -905,8 +918,10 @@ const getDirTotalSize = async (path: string) => {
     const req = {
         path: path,
     };
+    calculateBtn.value = true;
     const res = await computeDirSize(req);
     dirTotalSize.value = res.data.size;
+    calculateBtn.value = false;
 };
 
 const calculateSize = (path: string) => {

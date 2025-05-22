@@ -1279,6 +1279,7 @@ const message = {
         errLog: 'エラーログ',
     },
     file: {
+        fileDirNum: '{0} 個のディレクトリ、{1} 個のファイル、',
         currentDir: '現在のディレクトリ',
         dir: 'フォルダ',
         upload: 'アップロード',

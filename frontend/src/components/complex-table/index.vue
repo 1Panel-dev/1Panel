@@ -22,7 +22,7 @@
         </div>
 
         <div
-            class="complex-table__pagination flex items-center w-full"
+            class="complex-table__pagination flex items-center w-full sm:flex-row flex-col text-xs sm:text-sm"
             v-if="props.paginationConfig"
             :class="{ '!justify-between': slots.paginationLeft, '!justify-end': !slots.paginationLeft }"
         >

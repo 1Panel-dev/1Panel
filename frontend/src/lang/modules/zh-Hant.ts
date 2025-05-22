@@ -1271,6 +1271,7 @@ const message = {
         taskRunning: '運行中',
     },
     file: {
+        fileDirNum: '共 {0} 個目錄，{1} 個檔案，',
         currentDir: '當前目錄',
         dir: '文件夾',
         upload: '上傳',

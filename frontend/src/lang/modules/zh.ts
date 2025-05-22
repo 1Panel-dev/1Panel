@@ -1269,6 +1269,7 @@ const message = {
         taskRunning: '执行中',
     },
     file: {
+        fileDirNum: '共 {0} 个目录，{1} 个文件，',
         currentDir: '当前目录',
         dir: '文件夹',
         fileName: '文件名',

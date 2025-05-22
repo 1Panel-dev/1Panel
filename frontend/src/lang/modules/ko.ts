@@ -1266,6 +1266,7 @@ const message = {
         errLog: '에러 로그',
     },
     file: {
+        fileDirNum: '총 {0}개 디렉터리, {1}개 파일,',
         currentDir: '현재 디렉터리',
         dir: '폴더',
         upload: '업로드',

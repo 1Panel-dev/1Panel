@@ -28,7 +28,7 @@
             </div>
         </template>
         <template #content>
-            <div ref="dialogForm" class="px-4 py-2">
+            <div ref="dialogForm" class="px-4 py-2 code-action">
                 <div class="flex justify-start items-center gap-x-4 card-action">
                     <el-text class="cursor-pointer" @click="handleReset">{{ $t('commons.button.reset') }}</el-text>
                     <el-text class="cursor-pointer ml-0" @click="saveContent()">
@@ -419,6 +419,20 @@ const config = reactive<EditorConfig>({
     eol: monaco.editor.EndOfLineSequence.LF,
     wordWrap: 'on',
     minimap: false,
+});
+
+monaco.editor.defineTheme('vs', {
+    base: 'vs',
+    inherit: true,
+    rules: [{ token: '', foreground: 'FFFFFF' }],
+    colors: {
+        'editor.background': '#FFFFFF',
+        'minimap.background': '#f4f4f4',
+        'scrollbar.shadow': '#e1e1e1',
+        'scrollbarSlider.background': '#e1e1e1',
+        'scrollbarSlider.hoverBackground': '#cccccc',
+        'scrollbarSlider.activeBackground': '#bfbfbf',
+    },
 });
 
 const selectTab = ref();
@@ -1098,6 +1112,9 @@ defineExpose({ acceptParams });
         padding-top: 0 !important;
     }
 }
+.code-action {
+    border-bottom: 1px solid var(--el-border-color-light) !important;
+}
 
 :deep(.el-tabs) {
     --el-tabs-header-height: 28px;
@@ -1110,12 +1127,12 @@ defineExpose({ acceptParams });
         line-height: 27px;
     }
     .el-tabs__nav {
-        border-right: 1px solid var(--el-border-color-light);
-        border-top: none;
-        border-left: none;
-        border-bottom: none;
-        border-radius: 0;
-        box-sizing: border-box;
+        border-right: 1px solid var(--el-border-color-light) !important;
+        border-top: none !important;
+        border-left: none !important;
+        border-bottom: none !important;
+        border-radius: 0 !important;
+        box-sizing: border-box !important;
     }
     .el-tabs__nav,
     .el-tabs__nav-next,
@@ -1123,10 +1140,16 @@ defineExpose({ acceptParams });
         height: 28px;
         line-height: 28px;
     }
-    .el-tabs__item.is-active {
-        color: var(--el-color-primary);
+    .el-tabs__item:hover {
+        color: var(--el-color-primary) !important;
         .el-dropdown {
-            color: var(--el-color-primary);
+            color: var(--el-color-primary) !important;
+        }
+    }
+    .el-tabs__item.is-active {
+        color: var(--el-color-primary) !important;
+        .el-dropdown {
+            color: var(--el-color-primary) !important;
         }
     }
 }

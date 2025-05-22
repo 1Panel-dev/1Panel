@@ -1305,6 +1305,7 @@ const message = {
         errLog: 'Logs de erro',
     },
     file: {
+        fileDirNum: '{0} diretórios, {1} arquivos,',
         currentDir: 'Diretório atual',
         dir: 'Pasta',
         upload: 'Carregar',

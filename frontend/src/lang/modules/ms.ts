@@ -1321,6 +1321,7 @@ const message = {
         errLog: 'Log Ralat',
     },
     file: {
+        fileDirNum: '{0} direktori, {1} fail,',
         currentDir: 'Direktori Semasa',
         dir: 'Folder',
         upload: 'Muat naik',

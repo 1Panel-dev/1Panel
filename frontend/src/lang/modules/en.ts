@@ -1343,6 +1343,7 @@ const message = {
         taskRunning: 'Running',
     },
     file: {
+        fileDirNum: '{0} directories, {1} files,',
         currentDir: 'Directory',
         dir: 'Folder',
         fileName: 'File name',
