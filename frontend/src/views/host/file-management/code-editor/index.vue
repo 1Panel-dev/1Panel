@@ -424,9 +424,9 @@ const config = reactive<EditorConfig>({
 monaco.editor.defineTheme('vs', {
     base: 'vs',
     inherit: true,
-    rules: [{ token: '', foreground: 'FFFFFF' }],
+    rules: [{ token: '' }],
     colors: {
-        'editor.background': '#FFFFFF',
+        'editor.background': '#f8f6f6',
         'minimap.background': '#f4f4f4',
         'scrollbar.shadow': '#e1e1e1',
         'scrollbarSlider.background': '#e1e1e1',
