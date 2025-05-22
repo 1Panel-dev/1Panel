@@ -73,6 +73,7 @@ const handleClose = () => {
     em('close', true);
     open.value = false;
     bus.emit('refreshTask', true);
+    bus.emit('refreshApp', true);
 };
 
 defineExpose({ openWithResourceID, openWithTaskID });

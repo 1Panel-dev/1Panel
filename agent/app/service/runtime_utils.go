@@ -188,6 +188,7 @@ func SyncRuntimesStatus(runtimes []model.Runtime) error {
 			case "restarting":
 				runtimes[index].Status = constant.StatusRestarting
 			}
+			_ = runtimeRepo.Save(&runtimes[index])
 			delete(runtimeContainer, contain.Names[0])
 		}
 	}

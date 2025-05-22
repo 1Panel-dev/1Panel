@@ -349,6 +349,13 @@ func createAllWebsitesWAFConfig(websites []model.Website) error {
 	return nil
 }
 
+func createPHPConfig(website *model.Website) {
+	fileOp := files.NewFileOp()
+	userIniPath := path.Join(GetSitePath(*website, SiteIndexDir), ".user.ini")
+	_ = fileOp.CreateFile(userIniPath)
+	_ = fileOp.SaveFile(userIniPath, fmt.Sprintf("open_basedir=/www/sites/%s/index", website.Alias), 0644)
+}
+
 func createWafConfig(website *model.Website, domains []model.WebsiteDomain) error {
 	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
 	if err != nil {

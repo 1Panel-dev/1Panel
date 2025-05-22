@@ -282,7 +282,7 @@ const searchByName = () => {
 };
 
 onMounted(async () => {
-    bus.on('refreshTask', () => {
+    bus.on('refreshApp', () => {
         search(req);
     });
     if (router.currentRoute.value.query.install) {

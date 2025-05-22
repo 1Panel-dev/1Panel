@@ -46,6 +46,23 @@ const (
 	KeyRSA4096 = certcrypto.RSA4096
 )
 
+type AcmeUser struct {
+	Email        string
+	Registration *registration.Resource
+	Key          crypto.PrivateKey
+}
+
+func (u *AcmeUser) GetEmail() string {
+	return u.Email
+}
+
+func (u *AcmeUser) GetRegistration() *registration.Resource {
+	return u.Registration
+}
+func (u *AcmeUser) GetPrivateKey() crypto.PrivateKey {
+	return u.Key
+}
+
 func GetPrivateKey(priKey crypto.PrivateKey, keyType KeyType) ([]byte, error) {
 	var (
 		marshal []byte

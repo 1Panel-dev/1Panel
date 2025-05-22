@@ -422,6 +422,15 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		if err = createWafConfig(website, domains); err != nil {
 			return err
 		}
+		if create.Type == constant.Runtime {
+			runtime, err = runtimeRepo.GetFirst(context.Background(), repo.WithByID(create.RuntimeID))
+			if err != nil {
+				return err
+			}
+			if runtime.Type == constant.RuntimePHP && runtime.Resource == constant.ResourceAppstore {
+				createPHPConfig(website)
+			}
+		}
 		tx, ctx := helper.GetTxAndContext()
 		defer tx.Rollback()
 		if err = websiteRepo.Create(ctx, website); err != nil {
