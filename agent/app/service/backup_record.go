@@ -132,12 +132,12 @@ func (u *BackupRecordService) DeleteRecordByName(backupType, name, detailName st
 	}
 
 	for _, record := range records {
-		_, client, err := NewBackupClientWithID(record.DownloadAccountID)
+		backup, client, err := NewBackupClientWithID(record.DownloadAccountID)
 		if err != nil {
 			global.LOG.Errorf("new client for backup account failed, err: %v", err)
 			continue
 		}
-		if _, err = client.Delete(path.Join(record.FileDir, record.FileName)); err != nil {
+		if _, err = client.Delete(path.Join(backup.BackupPath, record.FileDir, record.FileName)); err != nil {
 			global.LOG.Errorf("remove file %s failed, err: %v", path.Join(record.FileDir, record.FileName), err)
 		}
 		_ = backupRepo.DeleteRecord(context.Background(), repo.WithByID(record.ID))
@@ -151,12 +151,12 @@ func (u *BackupRecordService) BatchDeleteRecord(ids []uint) error {
 		return err
 	}
 	for _, record := range records {
-		_, client, err := NewBackupClientWithID(record.DownloadAccountID)
+		backup, client, err := NewBackupClientWithID(record.DownloadAccountID)
 		if err != nil {
 			global.LOG.Errorf("new client for backup account failed, err: %v", err)
 			continue
 		}
-		if _, err = client.Delete(path.Join(record.FileDir, record.FileName)); err != nil {
+		if _, err = client.Delete(path.Join(backup.BackupPath, record.FileDir, record.FileName)); err != nil {
 			global.LOG.Errorf("remove file %s failed, err: %v", path.Join(record.FileDir, record.FileName), err)
 		}
 	}
