@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"bytes"
+	"context"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -79,7 +81,17 @@ func (c *CommandHelper) RunWithStdoutBashCf(command string, arg ...interface{}) 
 }
 
 func (c *CommandHelper) run(name string, arg ...string) (string, error) {
-	cmd := exec.Command(name, arg...)
+	var cmd *exec.Cmd
+	var ctx context.Context
+	var cancel context.CancelFunc
+
+	if c.timeout != 0 {
+		ctx, cancel = context.WithTimeout(context.Background(), c.timeout)
+		defer cancel()
+		cmd = exec.CommandContext(ctx, name, arg...)
+	} else {
+		cmd = exec.Command(name, arg...)
+	}
 
 	customWriter := &CustomWriter{taskItem: c.taskItem}
 	var stdout, stderr bytes.Buffer
@@ -112,25 +124,15 @@ func (c *CommandHelper) run(name string, arg ...string) (string, error) {
 	}
 
 	if c.timeout != 0 {
-		if err := cmd.Start(); err != nil {
-			return "", err
+		err := cmd.Run()
+		if c.taskItem != nil {
+			customWriter.Flush()
 		}
-		done := make(chan error, 1)
-		go func() {
-			done <- cmd.Wait()
-			if c.taskItem != nil {
-				customWriter.Flush()
-			}
-		}()
-		after := time.After(c.timeout)
-		select {
-		case <-after:
-			_ = cmd.Process.Kill()
+		if ctx != nil && errors.Is(ctx.Err(), context.DeadlineExceeded) {
 			return "", buserr.New("ErrCmdTimeout")
-		case err := <-done:
-			if err != nil {
-				return handleErr(stdout, stderr, err)
-			}
+		}
+		if err != nil {
+			return handleErr(stdout, stderr, err)
 		}
 		return stdout.String(), nil
 	}
