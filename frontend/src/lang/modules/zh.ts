@@ -2602,6 +2602,7 @@ const message = {
             statusCode: '状态码',
             manage: '管理',
             autoRestart: '自动重启',
+            EXITED: '已退出',
         },
     },
     xpack: {

@@ -2740,6 +2740,7 @@ const message = {
             statusCode: 'Код статуса',
             manage: 'Управление',
             autoRestart: 'Автоматический перезапуск',
+            EXITED: 'Вышел',
         },
     },
     xpack: {

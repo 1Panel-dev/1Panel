@@ -2611,6 +2611,7 @@ const message = {
             statusCode: '狀態碼',
             manage: '管理',
             autoRestart: '自動重啟',
+            EXITED: '已退出',
         },
     },
     xpack: {

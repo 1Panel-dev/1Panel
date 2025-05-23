@@ -2687,6 +2687,7 @@ const message = {
             statusCode: 'ステータスコード',
             manage: '管理',
             autoRestart: '自動再起動',
+            EXITED: '終了しました',
         },
     },
     xpack: {

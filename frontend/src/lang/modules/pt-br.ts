@@ -2747,6 +2747,7 @@ const message = {
             statusCode: 'Código de status',
             manage: 'Gerenciamento',
             autoRestart: 'Reinicialização Automática',
+            EXITED: 'Saiu',
         },
     },
     xpack: {

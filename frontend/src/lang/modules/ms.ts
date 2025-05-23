@@ -2747,6 +2747,7 @@ const message = {
             statusCode: 'Kod status',
             manage: 'Pengurusan',
             autoRestart: 'Auto Restart',
+            EXITED: 'Telah keluar',
         },
     },
     xpack: {

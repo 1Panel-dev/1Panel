@@ -2643,6 +2643,7 @@ const message = {
             statusCode: '상태 코드',
             manage: '관리',
             autoRestart: '자동 재시작',
+            EXITED: '종료됨',
         },
     },
     xpack: {

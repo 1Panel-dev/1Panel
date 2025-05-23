@@ -2821,6 +2821,7 @@ const message = {
             statusCode: 'Status code',
             manage: 'Management',
             autoRestart: 'Auto Restart',
+            EXITED: 'Exited',
         },
     },
     xpack: {
