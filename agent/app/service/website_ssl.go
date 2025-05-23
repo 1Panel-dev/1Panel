@@ -2,10 +2,10 @@ package service
 
 import (
 	"context"
-	"crypto"
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"github.com/go-acme/lego/v4/certificate"
 	"log"
 	"os"
 	"path"
@@ -26,7 +26,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
 	"github.com/1Panel-dev/1Panel/agent/utils/ssl"
-	"github.com/go-acme/lego/v4/certcrypto"
 	legoLogger "github.com/go-acme/lego/v4/log"
 	"github.com/jinzhu/gorm"
 )
@@ -230,10 +229,13 @@ func reloadSystemSSL(websiteSSL *model.WebsiteSSL, logger *log.Logger) {
 
 func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 	var (
-		err         error
-		websiteSSL  *model.WebsiteSSL
-		acmeAccount *model.WebsiteAcmeAccount
-		dnsAccount  *model.WebsiteDnsAccount
+		err          error
+		websiteSSL   *model.WebsiteSSL
+		acmeAccount  *model.WebsiteAcmeAccount
+		dnsAccount   *model.WebsiteDnsAccount
+		client       *ssl.AcmeClient
+		manualClient *ssl.ManualClient
+		resource     certificate.Resource
 	)
 
 	websiteSSL, err = websiteSSLRepo.GetFirst(repo.WithByID(apply.ID))
@@ -244,75 +246,43 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 	if err != nil {
 		return err
 	}
-	client, err := ssl.NewAcmeClient(acmeAccount, getSystemProxy(acmeAccount.UseProxy))
-	if err != nil {
-		return err
-	}
-
 	domains := []string{websiteSSL.PrimaryDomain}
 	if websiteSSL.Domains != "" {
 		domains = append(domains, strings.Split(websiteSSL.Domains, ",")...)
 	}
+	if websiteSSL.Provider != constant.DnsManual {
+		client, err = ssl.NewAcmeClient(acmeAccount, getSystemProxy(acmeAccount.UseProxy))
+		if err != nil {
+			return err
+		}
 
-	switch websiteSSL.Provider {
-	case constant.DNSAccount:
-		dnsAccount, err = websiteDnsRepo.GetFirst(repo.WithByID(websiteSSL.DnsAccountID))
-		if err != nil {
-			return err
-		}
-		if err = client.UseDns(ssl.DnsType(dnsAccount.Type), dnsAccount.Authorization, *websiteSSL); err != nil {
-			return err
-		}
-	case constant.Http:
-		appInstall, err := getAppInstallByKey(constant.AppOpenresty)
-		if err != nil {
-			if gorm.IsRecordNotFoundError(err) {
-				return buserr.New("ErrOpenrestyNotFound")
+		switch websiteSSL.Provider {
+		case constant.DNSAccount:
+			dnsAccount, err = websiteDnsRepo.GetFirst(repo.WithByID(websiteSSL.DnsAccountID))
+			if err != nil {
+				return err
 			}
-			return err
-		}
-		for _, domain := range domains {
-			if strings.Contains(domain, "*") {
-				return buserr.New("ErrWildcardDomain")
+			if err = client.UseDns(ssl.DnsType(dnsAccount.Type), dnsAccount.Authorization, *websiteSSL); err != nil {
+				return err
 			}
-		}
-		if err := client.UseHTTP(path.Join(appInstall.GetPath(), "root")); err != nil {
-			return err
-		}
-	case constant.DnsManual:
-		if err := client.UseManualDns(*websiteSSL); err != nil {
-			return err
+		case constant.Http:
+			appInstall, err := getAppInstallByKey(constant.AppOpenresty)
+			if err != nil {
+				if gorm.IsRecordNotFoundError(err) {
+					return buserr.New("ErrOpenrestyNotFound")
+				}
+				return err
+			}
+			for _, domain := range domains {
+				if strings.Contains(domain, "*") {
+					return buserr.New("ErrWildcardDomain")
+				}
+			}
+			if err := client.UseHTTP(path.Join(appInstall.GetPath(), "root")); err != nil {
+				return err
+			}
 		}
 	}
-
-	var privateKey crypto.PrivateKey
-	if websiteSSL.PrivateKey == "" {
-		privateKey, err = certcrypto.GeneratePrivateKey(ssl.KeyType(websiteSSL.KeyType))
-		if err != nil {
-			return err
-		}
-	} else {
-		block, _ := pem.Decode([]byte(websiteSSL.PrivateKey))
-		if block == nil {
-			return buserr.New("invalid PEM block")
-		}
-		var privKey crypto.PrivateKey
-		keyType := ssl.KeyType(websiteSSL.KeyType)
-		switch keyType {
-		case certcrypto.EC256, certcrypto.EC384:
-			privKey, err = x509.ParseECPrivateKey(block.Bytes)
-			if err != nil {
-				return nil
-			}
-		case certcrypto.RSA2048, certcrypto.RSA3072, certcrypto.RSA4096:
-			privKey, err = x509.ParsePKCS1PrivateKey(block.Bytes)
-			if err != nil {
-				return nil
-			}
-		}
-		privateKey = privKey
-	}
-
 	websiteSSL.Status = constant.SSLApply
 	err = websiteSSLRepo.Save(websiteSSL)
 	if err != nil {
@@ -329,13 +299,32 @@ func (w WebsiteSSLService) ObtainSSL(apply request.WebsiteSSLApply) error {
 			if websiteSSL.Provider == constant.DNSAccount {
 				startMsg = startMsg + i18n.GetMsgWithMap("DNSAccountName", map[string]interface{}{"name": dnsAccount.Name, "type": dnsAccount.Type})
 			}
-			legoLogger.Logger.Println(startMsg)
+			logger.Println(startMsg)
 		}
-		resource, err := client.ObtainSSL(domains, privateKey)
-		if err != nil {
-			handleError(websiteSSL, err)
-			return
+		if websiteSSL.Provider != constant.DnsManual {
+			privateKey, err := ssl.GetPrivateKeyByType(websiteSSL.KeyType, websiteSSL.PrivateKey)
+			if err != nil {
+				handleError(websiteSSL, err)
+				return
+			}
+			resource, err = client.ObtainSSL(domains, privateKey)
+			if err != nil {
+				handleError(websiteSSL, err)
+				return
+			}
+		} else {
+			manualClient, err = ssl.NewCustomAcmeClient(acmeAccount, logger)
+			if err != nil {
+				handleError(websiteSSL, err)
+				return
+			}
+			resource, err = manualClient.RequestCertificate(context.Background(), websiteSSL)
+			if err != nil {
+				handleError(websiteSSL, err)
+				return
+			}
 		}
+
 		websiteSSL.PrivateKey = string(resource.PrivateKey)
 		websiteSSL.Pem = string(resource.Certificate)
 		websiteSSL.CertURL = resource.CertURL
@@ -414,12 +403,15 @@ func (w WebsiteSSLService) GetDNSResolve(req request.WebsiteDNSReq) ([]response.
 	if err != nil {
 		return nil, err
 	}
-
-	client, err := ssl.NewAcmeClient(acmeAccount, getSystemProxy(acmeAccount.UseProxy))
+	client, err := ssl.NewCustomAcmeClient(acmeAccount, nil)
 	if err != nil {
 		return nil, err
 	}
-	resolves, err := client.GetDNSResolve(req.Domains)
+	websiteSSL, err := websiteSSLRepo.GetFirst(repo.WithByID(req.WebsiteSSLID))
+	if err != nil {
+		return nil, err
+	}
+	resolves, err := client.GetDNSResolve(context.TODO(), websiteSSL)
 	if err != nil {
 		return nil, err
 	}

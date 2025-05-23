@@ -30,8 +30,8 @@ type WebsiteSSLCreate struct {
 }
 
 type WebsiteDNSReq struct {
-	Domains       []string `json:"domains" validate:"required"`
-	AcmeAccountID uint     `json:"acmeAccountId"  validate:"required"`
+	AcmeAccountID uint `json:"acmeAccountId"  validate:"required"`
+	WebsiteSSLID  uint `json:"websiteSSLId"  validate:"required"`
 }
 
 type WebsiteSSLRenew struct {
@@ -43,6 +43,11 @@ type WebsiteSSLApply struct {
 	SkipDNSCheck bool     `json:"skipDNSCheck"`
 	Nameservers  []string `json:"nameservers"`
 	DisableLog   bool     `json:"disableLog"`
+}
+
+type WebsiteSSLObtain struct {
+	ID         uint `json:"ID" validate:"required"`
+	TXTRecords map[string]string
 }
 
 type WebsiteAcmeAccountCreate struct {

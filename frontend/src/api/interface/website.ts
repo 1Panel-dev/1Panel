@@ -281,8 +281,8 @@ export namespace Website {
     }
 
     export interface DNSResolveReq {
-        domains: string[];
         acmeAccountId: number;
+        websiteSSLId: number;
     }
 
     export interface DNSResolve {

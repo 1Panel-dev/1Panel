@@ -65,14 +65,8 @@ const acceptParams = async (props: RenewProps) => {
 
 const getDnsResolveRes = async (row: Website.SSL) => {
     loading.value = true;
-
-    let domains = [row.primaryDomain];
-    if (row.domains != '') {
-        let otherDomains = row.domains.split(',');
-        domains = domains.concat(otherDomains);
-    }
     try {
-        const res = await getDnsResolve({ acmeAccountId: row.acmeAccountId, domains: domains });
+        const res = await getDnsResolve({ acmeAccountId: row.acmeAccountId, websiteSSLId: row.id });
         if (res.data) {
             dnsResolve.value = res.data;
         }

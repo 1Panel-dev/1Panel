@@ -10,6 +10,8 @@ import (
 	"encoding/pem"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
+	"golang.org/x/crypto/acme"
 	"io"
 	"net"
 	"net/http"
@@ -24,6 +26,8 @@ import (
 	"github.com/go-acme/lego/v4/lego"
 	"github.com/go-acme/lego/v4/registration"
 )
+
+var Orders = make(map[uint]*acme.Order)
 
 type domainError struct {
 	Domain string
@@ -173,13 +177,8 @@ func NewRegisterClient(acmeAccount *model.WebsiteAcmeAccount, proxy *dto.SystemP
 	return acmeClient, nil
 }
 
-func NewConfigWithProxy(user registration.User, accountType, customCaURL string, systemProxy *dto.SystemProxy) *lego.Config {
-	var (
-		caDirURL      string
-		proxyURL      string
-		proxyUser     string
-		proxyPassword string
-	)
+func getCaDirURL(accountType, customCaURL string) string {
+	var caDirURL string
 	switch accountType {
 	case "letsencrypt":
 		caDirURL = "https://acme-v02.api.letsencrypt.org/directory"
@@ -194,6 +193,17 @@ func NewConfigWithProxy(user registration.User, accountType, customCaURL string,
 	case "custom":
 		caDirURL = customCaURL
 	}
+	return caDirURL
+}
+
+func NewConfigWithProxy(user registration.User, accountType, customCaURL string, systemProxy *dto.SystemProxy) *lego.Config {
+	var (
+		caDirURL      string
+		proxyURL      string
+		proxyUser     string
+		proxyPassword string
+	)
+	caDirURL = getCaDirURL(accountType, customCaURL)
 	if systemProxy != nil {
 		proxyURL = fmt.Sprintf("%s://%s:%s", systemProxy.Type, systemProxy.URL, systemProxy.Port)
 		proxyUser = systemProxy.User
@@ -304,4 +314,46 @@ func getZeroSSLEabCredentials(email string) (*zeroSSLRes, error) {
 	}
 
 	return &result, nil
+}
+
+func GetPrivateKeyByType(keyType, sslPrivateKey string) (crypto.PrivateKey, error) {
+	var (
+		privateKey crypto.PrivateKey
+		err        error
+	)
+	kType := KeyType(keyType)
+	if sslPrivateKey == "" {
+		privateKey, err = certcrypto.GeneratePrivateKey(kType)
+		if err != nil {
+			return nil, err
+		}
+		return privateKey, nil
+	}
+	block, _ := pem.Decode([]byte(sslPrivateKey))
+	if block == nil {
+		return nil, buserr.New("invalid PEM block")
+	}
+	var privKey crypto.PrivateKey
+	switch kType {
+	case certcrypto.EC256, certcrypto.EC384:
+		privKey, err = x509.ParseECPrivateKey(block.Bytes)
+		if err != nil {
+			return nil, err
+		}
+	case certcrypto.RSA2048, certcrypto.RSA3072, certcrypto.RSA4096:
+		privKey, err = x509.ParsePKCS1PrivateKey(block.Bytes)
+		if err != nil {
+			return nil, err
+		}
+	}
+	privateKey = privKey
+	return privateKey, nil
+}
+
+func getWebsiteSSLDomains(websiteSSL *model.WebsiteSSL) []string {
+	domains := []string{websiteSSL.PrimaryDomain}
+	if websiteSSL.Domains != "" {
+		domains = append(domains, strings.Split(websiteSSL.Domains, ",")...)
+	}
+	return domains
 }
