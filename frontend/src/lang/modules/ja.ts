@@ -3243,6 +3243,7 @@ const message = {
             nodes: 'ノードを選択',
             selectNode: 'ノードを選択',
             selectNodeError: 'ノードを選択してください',
+            licenseHelper: 'プロバージョンはカスタムアプリケーションリポジトリ機能をサポートしています',
         },
         alert: {
             isAlert: 'アラート',

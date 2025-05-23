@@ -3188,6 +3188,7 @@ const message = {
             nodes: '노드 선택',
             selectNode: '노드 선택',
             selectNodeError: '노드를 선택하세요',
+            licenseHelper: '프로 버전은 사용자 정의 애플리케이션 저장소 기능을 지원합니다',
         },
         alert: {
             isAlert: '알림',

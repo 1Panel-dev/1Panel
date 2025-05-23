@@ -3321,6 +3321,7 @@ const message = {
             nodes: 'Selecionar Nós',
             selectNode: 'Selecionar Node',
             selectNodeError: 'Por favor, selecione um nó',
+            licenseHelper: 'A versão Pro suporta o recurso de repositório de aplicativos personalizados',
         },
         alert: {
             isAlert: 'Alerta',

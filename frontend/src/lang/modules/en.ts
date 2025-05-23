@@ -3387,6 +3387,7 @@ const message = {
             nodes: 'Nodes',
             selectNode: 'Select Node',
             selectNodeError: 'Please select a node',
+            licenseHelper: 'The Pro version supports the custom application repository feature',
         },
         alert: {
             isAlert: 'Alert',

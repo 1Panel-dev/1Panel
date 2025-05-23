@@ -3139,6 +3139,7 @@ const message = {
             nodes: '節點',
             selectNode: '選擇節點',
             selectNodeError: '請選擇節點',
+            licenseHelper: '專業版支持自定義應用倉庫功能',
         },
         alert: {
             isAlert: '是否告警',

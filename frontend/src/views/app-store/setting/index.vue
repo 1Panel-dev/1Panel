@@ -40,11 +40,18 @@
                             />
                         </el-form-item>
                         <CustomSetting v-if="globalStore.isProductPro" />
+                        <span class="input-help logText" v-else>
+                            {{ $t('xpack.customApp.licenseHelper') }}
+                            <el-link class="link" @click="toUpload" type="primary">
+                                {{ $t('license.levelUpPro') }}
+                            </el-link>
+                        </span>
                     </el-col>
                 </el-row>
             </el-form>
         </template>
     </LayoutContent>
+    <LicenseImport ref="licenseRef" />
 </template>
 
 <script setup lang="ts">
@@ -76,6 +83,7 @@ const loading = ref(false);
 const configForm = ref();
 const useCustomApp = ref(false);
 const isInitializing = ref(true);
+const licenseRef = ref();
 
 const search = async () => {
     loading.value = true;
@@ -92,6 +100,10 @@ const search = async () => {
     } finally {
         loading.value = false;
     }
+};
+
+const toUpload = () => {
+    licenseRef.value.acceptParams();
 };
 
 const getNodeConfig = async () => {
@@ -128,3 +140,14 @@ onMounted(() => {
     getNodeConfig();
 });
 </script>
+
+<style lang="css" scoped>
+.logText {
+    line-height: 22px;
+    font-size: 12px;
+    .link {
+        font-size: 12px !important;
+        margin-top: -3px;
+    }
+}
+</style>

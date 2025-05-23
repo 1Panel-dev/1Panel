@@ -3316,6 +3316,7 @@ const message = {
             nodes: 'Pilih Node',
             selectNode: 'Pilih Node',
             selectNodeError: 'Sila pilih node',
+            licenseHelper: 'Versi Pro menyokong fungsi gudang aplikasi tersuai',
         },
         alert: {
             isAlert: 'Amaran',

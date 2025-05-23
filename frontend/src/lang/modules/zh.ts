@@ -3120,6 +3120,7 @@ const message = {
             nodes: '节点',
             selectNode: '选择节点',
             selectNodeError: '请选择节点',
+            licenseHelper: '专业版支持自定义应用仓库功能',
         },
         alert: {
             isAlert: '是否告警',
