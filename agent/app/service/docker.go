@@ -222,15 +222,18 @@ func (u *DockerService) UpdateConf(req dto.SettingUpdate) error {
 		}
 	}
 	if len(daemonMap) == 0 {
-		_ = os.Remove(constant.DaemonJsonPath)
-		if err := restartDocker(); err != nil {
-			return err
+		if len(file) == 0 {
+			return nil
 		}
-		return nil
+		_ = os.Remove(constant.DaemonJsonPath)
+		return restartDocker()
 	}
 	newJson, err := json.MarshalIndent(daemonMap, "", "\t")
 	if err != nil {
 		return err
+	}
+	if string(newJson) == string(file) {
+		return nil
 	}
 	if err := os.WriteFile(constant.DaemonJsonPath, newJson, 0640); err != nil {
 		return err
@@ -239,10 +242,7 @@ func (u *DockerService) UpdateConf(req dto.SettingUpdate) error {
 		return err
 	}
 
-	if err := restartDocker(); err != nil {
-		return err
-	}
-	return nil
+	return restartDocker()
 }
 func createIfNotExistDaemonJsonFile() error {
 	if _, err := os.Stat(constant.DaemonJsonPath); err != nil && os.IsNotExist(err) {
