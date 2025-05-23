@@ -12,7 +12,8 @@ import (
 
 func SessionAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if strings.HasPrefix(c.Request.URL.Path, "/api/v2/core/auth") {
+		apiReq := c.GetBool("API_AUTH")
+		if strings.HasPrefix(c.Request.URL.Path, "/api/v2/core/auth") || apiReq {
 			c.Next()
 			return
 		}
