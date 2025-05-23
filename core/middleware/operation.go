@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"path"
 	"reflect"
 	"strings"
@@ -32,7 +33,8 @@ func OperationLog() gin.HandlerFunc {
 		source := loadLogInfo(c.Request.URL.Path)
 		pathItem := strings.TrimPrefix(c.Request.URL.Path, "/api/v2")
 		pathItem = strings.TrimPrefix(pathItem, "/api/v2/core")
-		currentNode := c.Request.Header.Get("CurrentNode")
+		currentNodeItem := c.Request.Header.Get("CurrentNode")
+		currentNode, _ := url.QueryUnescape(currentNodeItem)
 		record := &model.OperationLog{
 			Source:    source,
 			Node:      currentNode,
