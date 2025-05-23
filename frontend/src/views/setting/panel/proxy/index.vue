@@ -90,6 +90,7 @@ const rules = reactive({
 
 const loading = ref(false);
 const proxyVisible = ref<boolean>(false);
+const proxyDockerVisible = ref<boolean>(false);
 const form = reactive({
     proxyUrl: '',
     proxyType: '',
@@ -126,7 +127,7 @@ const acceptParams = (params: DialogProps): void => {
     form.proxyUser = params.user;
     form.proxyPasswd = params.passwd;
     form.proxyDocker = params.proxyDocker !== '';
-
+    proxyDockerVisible.value = params.proxyDocker !== '';
     proxyVisible.value = true;
     form.proxyPasswdKeepItem = params.passwdKeep === 'Enable';
 };
@@ -151,7 +152,7 @@ const submitChangePassword = async (formEl: FormInstance | undefined) => {
         if (form.proxyType === 'http' || form.proxyType === 'https') {
             params.proxyUrl = form.proxyType + '://' + form.proxyUrl;
         }
-        if (isMasterProductPro.value && params.proxyDocker) {
+        if (isMasterProductPro.value && (params.proxyDocker || proxyDockerVisible.value)) {
             let confirmParams = {
                 header: i18n.global.t('setting.confDockerProxy'),
                 operationInfo: i18n.global.t('setting.restartNowHelper'),
