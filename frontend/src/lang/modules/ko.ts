@@ -1518,6 +1518,7 @@ const message = {
         confDockerProxy: 'Docker 프록시 구성',
         restartNowHelper: 'Docker 프록시 구성을 위해 Docker 서비스를 재시작해야 합니다.',
         restartNow: '즉시 재시작',
+        restartLater: '나중에 수동으로 재시작',
         systemIPWarning: '현재 노드에 기본 접근 주소가 설정되지 않았습니다. 패널 설정에서 설정해 주세요!',
         systemIPWarning1: '현재 서버 주소는 {0}으로 설정되어 있어 빠른 리디렉션이 불가능합니다!',
         defaultNetwork: '네트워크 카드',
@@ -3133,7 +3134,16 @@ const message = {
             syncInfo: '데이터 동기화,',
             syncHelper: '마스터 노드 데이터가 변경되면, 이 자식 노드에 실시간으로 동기화됩니다,',
             syncBackupAccount: '백업 계정 설정',
+            syncWithMaster:
+                '프로 버전으로 업그레이드 후 모든 데이터가 기본적으로 동기화됩니다. 노드 관리에서 동기화 정책을 수동으로 조정할 수 있습니다.',
             syncProxy: '시스템 프록시 설정',
+            syncProxyHelper: '시스템 프록시 설정 동기화에는 Docker 재시작이 필요합니다',
+            syncProxyHelper1: 'Docker 재시작은 현재 실행 중인 컨테이너 서비스에 영향을 줄 수 있습니다.',
+            syncProxyHelper2: '컨테이너 - 설정 페이지에서 수동으로 재시작할 수 있습니다.',
+            syncProxyHelper3:
+                '시스템 프록시 설정 동기화에는 Docker 재시작이 필요하며, 현재 실행 중인 컨테이너 서비스에 영향을 줄 수 있습니다',
+            syncProxyHelper4:
+                '시스템 프록시 설정 동기화에는 Docker 재시작이 필요합니다. 나중에 컨테이너 - 설정 페이지에서 수동으로 재시작할 수 있습니다.',
             syncCustomApp: '사용자 정의 앱 저장소 동기화',
             syncAlertSetting: '시스템 경고 설정',
             syncNodeInfo: '노드 기본 데이터,',

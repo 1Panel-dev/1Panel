@@ -23,8 +23,17 @@
                                 {{ $t('license.importHelper') }}
                             </div>
                         </el-upload>
+
+                        <span v-if="!isImport" class="input-help">{{ $t('xpack.node.syncWithMaster') }}</span>
+                        <DockerProxy
+                            v-if="!isImport"
+                            class="w-full mt-2"
+                            v-model:with-docker-restart="withDockerRestart"
+                            syncList="SyncSystemProxy"
+                        />
                     </el-col>
                 </el-row>
+
                 <div v-if="oldLicense">
                     <el-checkbox v-model="isForce">{{ $t('license.updateForce') }}</el-checkbox>
                 </div>
@@ -50,6 +59,7 @@ import i18n from '@/lang';
 import { ref } from 'vue';
 import { MsgSuccess } from '@/utils/message';
 import { uploadLicense } from '@/api/modules/setting';
+import DockerProxy from '@/components/docker-proxy/index.vue';
 import { GlobalStore } from '@/store';
 import { UploadFile, UploadFiles, UploadInstance, UploadProps, UploadRawFile, genFileId } from 'element-plus';
 import { getXpackSettingForTheme } from '@/utils/xpack';
@@ -61,6 +71,8 @@ const uploadRef = ref<UploadInstance>();
 const uploaderFiles = ref<UploadFiles>([]);
 const isImport = ref();
 const isForce = ref();
+
+const withDockerRestart = ref();
 
 const oldLicense = ref();
 interface DialogProps {
@@ -112,6 +124,7 @@ const submit = async () => {
     }
     if (!isImport.value) {
         formData.append('currentNode', globalStore.currentNode);
+        formData.append('withDockerRestart', withDockerRestart.value);
     }
     formData.append('isForce', isForce.value);
     loading.value = true;

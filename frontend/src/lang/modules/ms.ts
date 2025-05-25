@@ -1582,6 +1582,7 @@ const message = {
         confDockerProxy: 'Konfigurasi proksi docker',
         restartNowHelper: 'Mengkonfigurasi proksi Docker memerlukan memulakan semula perkhidmatan Docker.',
         restartNow: 'Mulakan semula sekarang',
+        restartLater: 'Mulakan semula secara manual nanti',
         systemIPWarning:
             'Nod semasa belum mempunyai alamat akses lalai yang dikonfigurasi. Sila pergi ke tetapan panel untuk mengkonfigurasinya!',
         systemIPWarning1: 'Alamat pelayan semasa ditetapkan kepada {0}, dan pengalihan cepat tidak mungkin!',
@@ -3258,7 +3259,16 @@ const message = {
             syncInfo: 'Penyegerakan data,',
             syncHelper: 'Apabila data nod induk berubah, ia akan disegerakkan ke nod anak ini secara masa nyata,',
             syncBackupAccount: 'Tetapan akaun sandaran',
+            syncWithMaster:
+                'Selepas menaik taraf ke Pro, semua data akan diselaraskan secara lalai. Dasar penyelarasan boleh disesuaikan secara manual dalam pengurusan nod.',
             syncProxy: 'Tetapan proksi sistem',
+            syncProxyHelper: 'Penyelarasan tetapan proksi sistem memerlukan mulakan semula Docker',
+            syncProxyHelper1: 'Memulakan semula Docker mungkin menjejaskan perkhidmatan kontena yang sedang berjalan.',
+            syncProxyHelper2: 'Anda boleh mulakan semula secara manual di halaman Kontena - Konfigurasi.',
+            syncProxyHelper3:
+                'Penyelarasan tetapan proksi sistem memerlukan mulakan semula Docker, yang mungkin menjejaskan perkhidmatan kontena yang sedang berjalan',
+            syncProxyHelper4:
+                'Penyelarasan tetapan proksi sistem memerlukan mulakan semula Docker. Anda boleh mulakan semula secara manual di halaman Kontena - Konfigurasi nanti.',
             syncCustomApp: 'Segerakan Repositori Aplikasi Tersuai',
             syncAlertSetting: 'Tetapan amaran sistem',
             syncNodeInfo: 'Data asas nod,',

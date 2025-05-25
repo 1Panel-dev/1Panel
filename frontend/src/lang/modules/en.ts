@@ -1598,6 +1598,7 @@ const message = {
         confDockerProxy: 'Configure Docker Proxy',
         restartNowHelper: 'Configuring Docker proxy requires restarting the Docker service.',
         restartNow: 'Restart immediately',
+        restartLater: 'Restart manually later',
         systemIPWarning:
             'The current node has no default access address configured. Please go to panel settings to configure it!',
         systemIPWarning1: 'The current server address is set to {0}, and quick redirection is not possible!',
@@ -3331,7 +3332,16 @@ const message = {
             syncInfo: 'Sync',
             syncHelper: 'When master node data changes, it synchronizes to this child node in real-time',
             syncBackupAccount: 'Backup account settings',
+            syncWithMaster:
+                'After upgrading to Pro, all data will be synced by default. Sync policies can be manually adjusted in node management.',
             syncProxy: 'System proxy settings',
+            syncProxyHelper: 'Syncing system proxy settings requires Docker restart',
+            syncProxyHelper1: 'Restarting Docker may affect currently running container services.',
+            syncProxyHelper2: 'You can manually restart in the Containers - Configuration page.',
+            syncProxyHelper3:
+                'Syncing system proxy settings requires Docker restart, which may affect currently running container services',
+            syncProxyHelper4:
+                'Syncing system proxy settings requires Docker restart. You can manually restart later in the Containers - Configuration page.',
             syncCustomApp: 'Sync Custom App Repository',
             syncAlertSetting: 'System alert settings',
             syncNodeInfo: 'Node basic data,',

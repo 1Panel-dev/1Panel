@@ -1532,6 +1532,7 @@ const message = {
         confDockerProxy: 'Dockerプロキシを構成します',
         restartNowHelper: 'Dockerプロキシの構成には、Dockerサービスを再起動する必要があります。',
         restartNow: 'すぐに再起動します',
+        restartLater: '後で手動で再起動',
         systemIPWarning:
             '現在のノードにはデフォルトアクセスアドレスが設定されていません。パネル設定から設定してください！',
         systemIPWarning1: `現在のサーバーアドレスは{0}に設定されており、クイックリダイレクトは不可能です！`,
@@ -3188,7 +3189,16 @@ const message = {
             syncInfo: 'データ同期,',
             syncHelper: 'マスターノードのデータが変更されると、この子ノードにリアルタイムで同期されます,',
             syncBackupAccount: 'バックアップアカウント設定',
+            syncWithMaster:
+                'プロ版にアップグレード後、すべてのデータがデフォルトで同期されます。ノード管理で同期ポリシーを手動調整できます。',
             syncProxy: 'システムプロキシ設定',
+            syncProxyHelper: 'システムプロキシ設定の同期にはDockerの再起動が必要です',
+            syncProxyHelper1: 'Dockerの再起動は現在実行中のコンテナサービスに影響する可能性があります。',
+            syncProxyHelper2: 'コンテナ - 設定 ページで手動で再起動できます。',
+            syncProxyHelper3:
+                'システムプロキシ設定の同期にはDockerの再起動が必要で、現在実行中のコンテナサービスに影響する可能性があります',
+            syncProxyHelper4:
+                'システムプロキシ設定の同期にはDockerの再起動が必要です。後でコンテナ - 設定 ページで手動で再起動できます。',
             syncCustomApp: 'カスタムアプリリポジトリを同期',
             syncAlertSetting: 'システムアラート設定',
             syncNodeInfo: 'ノード基本データ,',

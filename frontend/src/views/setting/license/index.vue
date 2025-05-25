@@ -86,6 +86,12 @@
                             {{ $t('license.forceUnbindHelper') }}
                         </span>
                     </el-form-item>
+
+                    <DockerProxy
+                        class="w-full"
+                        v-model:with-docker-restart="withDockerRestart"
+                        syncList="SyncSystemProxy"
+                    />
                 </el-form>
             </template>
         </OpDialog>
@@ -96,6 +102,7 @@
 import { ref, reactive, onMounted } from 'vue';
 import { deleteLicense, searchLicense, syncLicense, unbindLicense } from '@/api/modules/setting';
 import LicenseImport from '@/components/license-import/index.vue';
+import DockerProxy from '@/components/docker-proxy/index.vue';
 import BindFree from '@/views/setting/license/bind/free.vue';
 import BindXpack from '@/views/setting/license/bind/xpack.vue';
 import { dateFormat } from '@/utils/util';
@@ -110,6 +117,8 @@ const opRef = ref();
 const opRef2 = ref();
 const forceUnbind = ref();
 const unbindRow = ref();
+
+const withDockerRestart = ref();
 
 const data = ref();
 const paginationConfig = reactive({

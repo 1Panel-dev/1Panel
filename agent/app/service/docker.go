@@ -21,7 +21,7 @@ import (
 type DockerService struct{}
 
 type IDockerService interface {
-	UpdateConf(req dto.SettingUpdate) error
+	UpdateConf(req dto.SettingUpdate, withRestart bool) error
 	UpdateLogOption(req dto.LogOption) error
 	UpdateIpv6Option(req dto.Ipv6Option) error
 	UpdateConfByFile(info dto.DaemonJsonUpdateByFile) error
@@ -136,7 +136,7 @@ func (u *DockerService) LoadDockerConf() (*dto.DaemonJsonConf, error) {
 	return &data, nil
 }
 
-func (u *DockerService) UpdateConf(req dto.SettingUpdate) error {
+func (u *DockerService) UpdateConf(req dto.SettingUpdate, withRestart bool) error {
 	err := createIfNotExistDaemonJsonFile()
 	if err != nil {
 		return err
@@ -222,15 +222,21 @@ func (u *DockerService) UpdateConf(req dto.SettingUpdate) error {
 		}
 	}
 	if len(daemonMap) == 0 {
+		if len(file) == 0 {
+			return nil
+		}
 		_ = os.Remove(constant.DaemonJsonPath)
-		if err := restartDocker(); err != nil {
-			return err
+		if withRestart {
+			return restartDocker()
 		}
 		return nil
 	}
 	newJson, err := json.MarshalIndent(daemonMap, "", "\t")
 	if err != nil {
 		return err
+	}
+	if string(newJson) == string(file) {
+		return nil
 	}
 	if err := os.WriteFile(constant.DaemonJsonPath, newJson, 0640); err != nil {
 		return err
@@ -239,8 +245,8 @@ func (u *DockerService) UpdateConf(req dto.SettingUpdate) error {
 		return err
 	}
 
-	if err := restartDocker(); err != nil {
-		return err
+	if withRestart {
+		return restartDocker()
 	}
 	return nil
 }

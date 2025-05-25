@@ -18,10 +18,18 @@
                 </div>
                 <el-form-item prop="syncListItem">
                     <el-checkbox-group v-model="form.syncListItem">
-                        <el-checkbox :label="$t('xpack.node.syncProxy')" value="SyncSystemProxy" />
-                        <el-checkbox :label="$t('xpack.node.syncAlertSetting')" value="SyncAlertSetting" />
-                        <el-checkbox :label="$t('xpack.node.syncCustomApp')" value="SyncCustomApp" />
-                        <el-checkbox :label="$t('xpack.node.syncBackupAccount')" value="SyncBackupAccounts" />
+                        <div class="ml-5">
+                            <el-checkbox :label="$t('xpack.node.syncProxy')" value="SyncSystemProxy" />
+                        </div>
+                        <div class="ml-5">
+                            <el-checkbox :label="$t('xpack.node.syncAlertSetting')" value="SyncAlertSetting" />
+                        </div>
+                        <div class="ml-5">
+                            <el-checkbox :label="$t('xpack.node.syncCustomApp')" value="SyncCustomApp" />
+                        </div>
+                        <div class="ml-5">
+                            <el-checkbox :label="$t('xpack.node.syncBackupAccount')" value="SyncBackupAccounts" />
+                        </div>
                     </el-checkbox-group>
                     <span class="input-help">{{ $t('xpack.node.syncHelper') }}</span>
                 </el-form-item>
@@ -34,12 +42,15 @@
             </el-button>
         </template>
     </DrawerPro>
+
+    <DockerProxyDialog ref="dockerProxyRef" @submit="submit" v-model:with-docker-restart="withDockerRestart" />
 </template>
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { bindLicense, listNodeOptions } from '@/api/modules/setting';
+import DockerProxyDialog from '@/components/docker-proxy/dialog.vue';
 import { FormInstance } from 'element-plus';
 import { GlobalStore } from '@/store';
 import { Rules } from '@/global/form-rules';
@@ -53,6 +64,9 @@ const drawerVisible = ref();
 const loading = ref();
 const licenseName = ref();
 const freeNodes = ref([]);
+
+const dockerProxyRef = ref();
+const withDockerRestart = ref(true);
 
 const form = reactive({
     nodeID: null,
@@ -74,18 +88,22 @@ const onBind = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        loading.value = true;
         form.syncList = form.syncListItem?.join(',') || '';
-        await bindLicense(form.licenseID, form.nodeID, form.syncList)
-            .then(() => {
-                loading.value = false;
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                window.location.reload();
-            })
-            .catch(() => {
-                loading.value = false;
-            });
+        dockerProxyRef.value.acceptParams({ syncList: form.syncList });
     });
+};
+
+const submit = async () => {
+    loading.value = true;
+    await bindLicense(form.licenseID, form.nodeID, form.syncList)
+        .then(() => {
+            loading.value = false;
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            window.location.reload();
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const loadNodes = async () => {

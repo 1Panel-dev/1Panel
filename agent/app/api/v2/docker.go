@@ -72,7 +72,7 @@ func (b *BaseApi) UpdateDaemonJson(c *gin.Context) {
 		return
 	}
 
-	if err := dockerService.UpdateConf(req); err != nil {
+	if err := dockerService.UpdateConf(req, true); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}

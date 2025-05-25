@@ -1565,6 +1565,7 @@ const message = {
         confDockerProxy: 'Configurar proxy do Docker',
         restartNowHelper: 'Configurar o proxy do Docker exige reiniciar o serviço Docker.',
         restartNow: 'Reiniciar imediatamente',
+        restartLater: 'Reiniciar manualmente mais tarde',
         systemIPWarning:
             'O nó atual não tem um endereço de acesso padrão configurado. Por favor, vá para as configurações do painel para configurá-lo!',
         systemIPWarning1:
@@ -3265,7 +3266,16 @@ const message = {
             syncInfo: 'Sincronização de dados,',
             syncHelper: 'Quando os dados do nó mestre mudam, são sincronizados em tempo real para este nó filho,',
             syncBackupAccount: 'Configurações de conta de backup',
+            syncWithMaster:
+                'Após atualizar para Pro, todos os dados serão sincronizados por padrão. As políticas de sincronização podem ser ajustadas manualmente no gerenciamento de nós.',
             syncProxy: 'Configurações de proxy do sistema',
+            syncProxyHelper: 'Sincronizar configurações de proxy do sistema requer reinicialização do Docker',
+            syncProxyHelper1: 'Reiniciar o Docker pode afetar os serviços de contêiner em execução.',
+            syncProxyHelper2: 'Você pode reiniciar manualmente na página Contêineres - Configuração.',
+            syncProxyHelper3:
+                'Sincronizar configurações de proxy do sistema requer reinicialização do Docker, o que pode afetar os serviços de contêiner em execução',
+            syncProxyHelper4:
+                'Sincronizar configurações de proxy do sistema requer reinicialização do Docker. Você pode reiniciar manualmente mais tarde na página Contêineres - Configuração.',
             syncCustomApp: 'Sincronizar Repositório de Aplicativos Personalizados',
             syncAlertSetting: 'Configurações de alerta do sistema',
             syncNodeInfo: 'Dados básicos do nó,',
