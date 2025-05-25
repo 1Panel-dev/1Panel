@@ -70,6 +70,10 @@ Compared to the OSS Edition, 1Panel Pro Edition provides users with a wealth of 
 
 If you discover any security issues, please refer to [SECURITY.md](/SECURITY.md).
 
+## GitAds Sponsored
+
+[![Sponsored by GitAds](https://gitads.dev/v1/ad-serve?source=1panel-dev/1panel@github)](https://gitads.dev/v1/ad-track?source=1panel-dev/1panel@github)
+
 ## License
 
 Licensed under The GNU General Public License version 3 (GPLv3)  (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
@@ -79,3 +83,5 @@ Licensed under The GNU General Public License version 3 (GPLv3)  (the "License")
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 
 <!-- GitAds-Verify: 9M8AMBB11GYJ3RUNXGB5R1MR71KPATU9 -->
+
+
