@@ -95,12 +95,11 @@ const onBind = async (formEl: FormInstance | undefined) => {
 
 const submit = async () => {
     loading.value = true;
-    console.log(withDockerRestart.value);
     await bindLicense({
         licenseID: form.licenseID,
         nodeID: form.nodeID,
         syncList: form.syncList,
-        withRestartDocker: withDockerRestart.value,
+        withDockerRestart: withDockerRestart.value,
     })
         .then(() => {
             loading.value = false;

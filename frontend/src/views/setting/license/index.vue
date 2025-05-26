@@ -192,7 +192,7 @@ const submitUnbind = async () => {
     await unbindLicense({
         id: unbindRow.value.id,
         force: forceUnbind.value,
-        withRestartDocker: withDockerRestart.value,
+        withDockerRestart: withDockerRestart.value,
     })
         .then(() => {
             loading.value = false;

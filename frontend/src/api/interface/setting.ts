@@ -245,11 +245,11 @@ export namespace Setting {
         nodeID: number;
         licenseID: number;
         syncList: string;
-        withRestartDocker: boolean;
+        withDockerRestart: boolean;
     }
     export interface LicenseUnbind {
         id: number;
         force: boolean;
-        withRestartDocker: boolean;
+        withDockerRestart: boolean;
     }
 }

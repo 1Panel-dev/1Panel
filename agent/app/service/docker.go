@@ -147,7 +147,6 @@ func (u *DockerService) UpdateConf(req dto.SettingUpdate, withRestart bool) erro
 	}
 	daemonMap := make(map[string]interface{})
 	_ = json.Unmarshal(file, &daemonMap)
-
 	switch req.Key {
 	case "Registries":
 		req.Value = strings.TrimSuffix(req.Value, ",")
@@ -480,6 +479,7 @@ func getDockerRestartCommand() (string, error) {
 }
 
 func restartDocker() error {
+	global.LOG.Info("restart docker")
 	restartCmd, err := getDockerRestartCommand()
 	if err != nil {
 		return err
