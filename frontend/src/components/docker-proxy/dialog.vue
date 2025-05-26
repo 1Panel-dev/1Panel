@@ -33,38 +33,37 @@ const em = defineEmits(['update:withDockerRestart', 'submit']);
 interface DialogProps {
     syncList: string;
 }
+const emit = () => {
+    em('update:withDockerRestart', false);
+    em('submit');
+};
 const acceptParams = async (props: DialogProps): Promise<void> => {
     if (props.syncList.indexOf('SyncSystemProxy') === -1) {
-        em('update:withDockerRestart', false);
-        em('submit');
+        emit();
         return;
     }
-    await getSettingInfo()
-        .then((res) => {
-            if (res.data.proxyType === '' || res.data.proxyType === 'close') {
-                em('update:withDockerRestart', false);
-                em('submit');
-                return;
-            }
-        })
-        .catch(() => {
-            em('update:withDockerRestart', false);
-            em('submit');
+    try {
+        const res = await getSettingInfo();
+        if (res.data.proxyType === '' || res.data.proxyType === 'close') {
+            emit();
             return;
-        });
+        }
+    } catch (error) {
+        emit();
+        return;
+    }
+
     let searchXSetting;
     const xpackModules = import.meta.glob('../../xpack/api/modules/setting.ts', { eager: true });
     if (xpackModules['../../xpack/api/modules/setting.ts']) {
         searchXSetting = xpackModules['../../xpack/api/modules/setting.ts']['searchXSetting'] || {};
         const res = await searchXSetting();
         if (!res) {
-            em('update:withDockerRestart', false);
-            em('submit');
+            emit();
             return;
         }
         if (res.data.proxyDocker === '') {
-            em('update:withDockerRestart', false);
-            em('submit');
+            emit();
             return;
         }
         open.value = true;
