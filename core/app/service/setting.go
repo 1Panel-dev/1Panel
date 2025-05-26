@@ -212,7 +212,11 @@ func (u *SettingService) UpdateProxy(req dto.ProxyUpdate) error {
 		return err
 	}
 	go func() {
-		if err := xpack.Sync(constant.SyncSystemProxy); err != nil {
+		syncScope := constant.SyncSystemProxy
+		if req.WithDockerRestart {
+			syncScope = constant.SyncSystemProxyWithRestartDocker
+		}
+		if err := xpack.Sync(syncScope); err != nil {
 			global.LOG.Errorf("sync proxy to node failed, err: %v", err)
 		}
 	}()
