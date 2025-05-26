@@ -210,6 +210,17 @@ const submit = async (formEl: FormInstance | undefined) => {
         if (!valid) {
             return;
         }
+        for (const server of item.value.servers) {
+            if (!server.weight || server.weight == '') {
+                server.weight = 0;
+            }
+            if (!server.maxFails || server.maxFails == '') {
+                server.maxFails = 0;
+            }
+            if (!server.maxConns || server.maxConns == '') {
+                server.maxConns = 0;
+            }
+        }
         loading.value = true;
         try {
             if (item.value.operate === 'edit') {
