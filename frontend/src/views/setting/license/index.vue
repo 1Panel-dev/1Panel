@@ -189,7 +189,11 @@ const onUnbind = async (row: any) => {
 };
 const submitUnbind = async () => {
     loading.value = true;
-    await unbindLicense(unbindRow.value.id, forceUnbind.value)
+    await unbindLicense({
+        id: unbindRow.value.id,
+        force: forceUnbind.value,
+        withRestartDocker: withDockerRestart.value,
+    })
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));

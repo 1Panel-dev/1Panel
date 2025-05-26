@@ -1,4 +1,5 @@
 import { DateTimeFormats } from '@intlify/core-base';
+import { b } from 'vite/dist/node/types.d-aGj9QkWt';
 
 export namespace Setting {
     export interface SettingInfo {
@@ -83,6 +84,7 @@ export namespace Setting {
         proxyUser: string;
         proxyPasswd: string;
         proxyPasswdKeep: string;
+        withDockerRestart: boolean;
     }
     export interface ApiConfig {
         apiInterfaceStatus: string;
@@ -237,5 +239,17 @@ export namespace Setting {
         isXpack: boolean;
         isBound: boolean;
         name: string;
+    }
+
+    export interface LicenseBind {
+        nodeID: number;
+        licenseID: number;
+        syncList: string;
+        withRestartDocker: boolean;
+    }
+    export interface LicenseUnbind {
+        id: number;
+        force: boolean;
+        withRestartDocker: boolean;
     }
 }

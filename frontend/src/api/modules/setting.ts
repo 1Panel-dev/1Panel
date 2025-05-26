@@ -28,11 +28,11 @@ export const getMasterLicenseStatus = () => {
 export const syncLicense = (id: number) => {
     return http.post(`/core/licenses/sync`, { id: id });
 };
-export const bindLicense = (id: number, nodeID: number, syncList: string) => {
-    return http.post(`/core/licenses/bind`, { nodeID: nodeID, licenseID: id, syncList: syncList }, TimeoutEnum.T_60S);
+export const bindLicense = (params: Setting.LicenseBind) => {
+    return http.post(`/core/licenses/bind`, params, TimeoutEnum.T_60S);
 };
-export const unbindLicense = (id: number, force: boolean) => {
-    return http.post(`/core/licenses/unbind`, { id: id, force: force }, TimeoutEnum.T_60S);
+export const unbindLicense = (params: Setting.LicenseUnbind) => {
+    return http.post(`/core/licenses/unbind`, params, TimeoutEnum.T_60S);
 };
 export const changeBind = (id: number, nodeIDs: Array<number>) => {
     return http.post(`/core/licenses/bind/free`, { licenseID: id, nodeIDs: nodeIDs }, TimeoutEnum.T_60S);

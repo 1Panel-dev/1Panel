@@ -64,6 +64,7 @@
     </DrawerPro>
 
     <ConfirmDialog ref="confirmDialogRef" @confirm="onSubmit" />
+    <DockerProxyDialog ref="dockerProxyRef" @submit="onSubmit" v-model:with-docker-restart="withDockerRestart" />
 </template>
 
 <script lang="ts" setup>
@@ -76,6 +77,7 @@ import { updateProxy } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
+import DockerProxyDialog from '@/components/docker-proxy/dialog.vue';
 
 const globalStore = GlobalStore();
 const emit = defineEmits<{ (e: 'search'): void }>();
@@ -103,6 +105,8 @@ const form = reactive({
     proxyPasswdKeepItem: false,
     proxyDocker: false,
 });
+const withDockerRestart = ref(false);
+const dockerProxyRef = ref();
 
 interface DialogProps {
     url: string;
@@ -146,6 +150,7 @@ const submitChangePassword = async (formEl: FormInstance | undefined) => {
             proxyPasswd: isClose ? '' : form.proxyPasswd,
             proxyPasswdKeep: '',
             proxyDocker: isClose ? false : form.proxyDocker,
+            withDockerRestart: false,
         };
         if (!isClose) {
             params.proxyPasswdKeep = form.proxyPasswdKeepItem ? 'Enable' : 'Disable';
@@ -154,12 +159,9 @@ const submitChangePassword = async (formEl: FormInstance | undefined) => {
             params.proxyUrl = form.proxyType + '://' + form.proxyUrl;
         }
         if (isMasterProductPro.value && (params.proxyDocker || proxyDockerVisible.value)) {
-            let confirmParams = {
-                header: i18n.global.t('setting.confDockerProxy'),
-                operationInfo: i18n.global.t('setting.restartNowHelper'),
-                submitInputInfo: i18n.global.t('setting.restartNow'),
-            };
-            confirmDialogRef.value!.acceptParams(confirmParams);
+            dockerProxyRef.value.acceptParams({
+                syncList: 'SyncSystemProxy',
+            });
         } else {
             loading.value = true;
             await updateProxy(params)
@@ -188,6 +190,7 @@ const onSubmit = async () => {
             proxyPasswd: isClose ? '' : form.proxyPasswd,
             proxyPasswdKeep: '',
             proxyDocker: isClose ? false : form.proxyDocker,
+            withDockerRestart: withDockerRestart.value,
         };
         if (!isClose) {
             params.proxyPasswdKeep = form.proxyPasswdKeepItem ? 'Enable' : 'Disable';

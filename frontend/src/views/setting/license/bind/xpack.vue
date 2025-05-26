@@ -66,7 +66,7 @@ const licenseName = ref();
 const freeNodes = ref([]);
 
 const dockerProxyRef = ref();
-const withDockerRestart = ref(true);
+const withDockerRestart = ref(false);
 
 const form = reactive({
     nodeID: null,
@@ -95,7 +95,13 @@ const onBind = async (formEl: FormInstance | undefined) => {
 
 const submit = async () => {
     loading.value = true;
-    await bindLicense(form.licenseID, form.nodeID, form.syncList)
+    console.log(withDockerRestart.value);
+    await bindLicense({
+        licenseID: form.licenseID,
+        nodeID: form.nodeID,
+        syncList: form.syncList,
+        withRestartDocker: withDockerRestart.value,
+    })
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));

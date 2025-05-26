@@ -146,13 +146,14 @@ type Upgrade struct {
 }
 
 type ProxyUpdate struct {
-	ProxyUrl        string `json:"proxyUrl"`
-	ProxyType       string `json:"proxyType"`
-	ProxyPort       string `json:"proxyPort"`
-	ProxyUser       string `json:"proxyUser"`
-	ProxyPasswd     string `json:"proxyPasswd"`
-	ProxyPasswdKeep string `json:"proxyPasswdKeep"`
-	ProxyDocker     bool   `json:"proxyDocker"`
+	ProxyUrl          string `json:"proxyUrl"`
+	ProxyType         string `json:"proxyType"`
+	ProxyPort         string `json:"proxyPort"`
+	ProxyUser         string `json:"proxyUser"`
+	ProxyPasswd       string `json:"proxyPasswd"`
+	ProxyPasswdKeep   string `json:"proxyPasswdKeep"`
+	ProxyDocker       bool   `json:"proxyDocker"`
+	WithDockerRestart bool   `json:"withDockerRestart"`
 }
 
 type CleanData struct {
