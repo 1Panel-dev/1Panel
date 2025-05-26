@@ -302,6 +302,8 @@ export namespace Container {
         name: string;
         path: string;
         content: string;
+        env: Array<string>;
+        createdBy: string;
     }
 
     export interface TemplateCreate {

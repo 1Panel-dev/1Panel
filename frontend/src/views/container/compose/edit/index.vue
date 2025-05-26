@@ -73,21 +73,19 @@ const onSubmitEdit = async () => {
         name: name.value,
         path: path.value,
         content: content.value,
-        env: environmentStr.value,
         createdBy: createdBy.value,
+        env: environmentStr.value?.split('\n') || [],
     };
-    if (environmentStr.value != undefined) {
-        param.env = environmentStr.value.split('\n');
-        emit('search');
-    }
     loading.value = true;
     await composeUpdate(param)
         .then(() => {
-            loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             composeVisible.value = false;
+            if (environmentStr.value) {
+                emit('search');
+            }
         })
-        .catch(() => {
+        .finally(() => {
             loading.value = false;
         });
 };
