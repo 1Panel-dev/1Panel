@@ -438,52 +438,21 @@ monaco.editor.defineTheme('vs', {
 const selectTab = ref();
 const fileTabs = ref([]);
 const removeTab = (targetPath: TabPaneName) => {
-    if (isEdit.value) {
-        ElMessageBox.confirm(i18n.global.t('file.saveContentAndClose'), {
-            confirmButtonText: i18n.global.t('commons.button.save'),
-            cancelButtonText: i18n.global.t('commons.button.notSave'),
-            type: 'info',
-            distinguishCancelAndClose: true,
-        })
-            .then(() => {
-                const tabs = fileTabs.value;
-                let activeName = selectTab.value;
-                if (activeName === targetPath) {
-                    tabs.forEach((tab, index) => {
-                        if (tab.path === targetPath) {
-                            const nextTab = tabs[index + 1] || tabs[index - 1];
-                            if (nextTab) {
-                                activeName = nextTab.path;
-                            }
-                        }
-                    });
-                }
+    const tabs = fileTabs.value;
+    let activeName = selectTab.value;
 
-                selectTab.value = activeName;
-                fileTabs.value = tabs.filter((tab) => tab.path !== targetPath);
-                saveContent();
-            })
-            .finally(() => {});
-    } else {
-        const tabs = fileTabs.value;
-        let activeName = selectTab.value;
+    const updateTabs = () => {
         if (activeName === targetPath) {
-            tabs.forEach((tab, index) => {
-                if (tab.path === targetPath) {
-                    const nextTab = tabs[index + 1] || tabs[index - 1];
-                    if (nextTab) {
-                        activeName = nextTab.path;
-                    }
-                }
-            });
+            const index = tabs.findIndex((tab) => tab.path === targetPath);
+            const nextTab = tabs[index + 1] || tabs[index - 1];
+            if (nextTab) {
+                activeName = nextTab.path;
+            }
         }
         selectTab.value = activeName;
         fileTabs.value = tabs.filter((tab) => tab.path !== targetPath);
-    }
-    getContent(selectTab.value, '');
-};
+    };
 
-const removeAllTab = (targetPath: string, type: string) => {
     if (isEdit.value) {
         ElMessageBox.confirm(i18n.global.t('file.saveContentAndClose'), {
             confirmButtonText: i18n.global.t('commons.button.save'),
@@ -492,74 +461,62 @@ const removeAllTab = (targetPath: string, type: string) => {
             distinguishCancelAndClose: true,
         })
             .then(() => {
-                const tabs = fileTabs.value;
-                let activeName = selectTab.value;
-                if (activeName !== targetPath) {
-                    tabs.forEach((tab, index) => {
-                        if (tab.path === targetPath) {
-                            const nextTab = tabs[index];
-                            if (nextTab) {
-                                activeName = nextTab.path;
-                            }
-                        }
-                    });
-                }
-
-                selectTab.value = activeName;
-                if (type === 'left') {
-                    fileTabs.value = fileTabs.value.filter((tab, index, arr) => {
-                        const targetIndex = arr.findIndex((t) => t.path === targetPath);
-                        return index >= targetIndex;
-                    });
-                } else if (type === 'right') {
-                    fileTabs.value = fileTabs.value.filter((tab, index, arr) => {
-                        const targetIndex = arr.findIndex((t) => t.path === targetPath);
-                        return index <= targetIndex;
-                    });
-                } else if (type === 'all') {
-                    fileTabs.value = [];
-                    selectTab.value = '';
-                }
+                updateTabs();
                 saveContent();
+                getContent(selectTab.value, '');
             })
-            .finally(() => {});
-    } else {
-        const tabs = fileTabs.value;
-        let activeName = selectTab.value;
-        if (activeName !== targetPath) {
-            tabs.forEach((tab, index) => {
-                if (tab.path === targetPath) {
-                    const nextTab = tabs[index];
-                    if (nextTab) {
-                        activeName = nextTab.path;
-                    }
+            .catch(() => {
+                isEdit.value = false;
+                editor.setValue(oldFileContent.value);
+                updateTabs();
+                if (fileTabs.value.length > 0) {
+                    getContent(selectTab.value, '');
                 }
             });
-        }
-        selectTab.value = activeName;
-        if (type === 'left') {
-            fileTabs.value = fileTabs.value.filter((tab, index, arr) => {
-                const targetIndex = arr.findIndex((t) => t.path === targetPath);
-                return index >= targetIndex;
-            });
-        } else if (type === 'right') {
-            fileTabs.value = fileTabs.value.filter((tab, index, arr) => {
-                const targetIndex = arr.findIndex((t) => t.path === targetPath);
-                return index <= targetIndex;
-            });
-        } else if (type === 'all') {
-            fileTabs.value = [];
-            selectTab.value = '';
-        }
-    }
-    if (type === 'all') {
-        editor.dispose();
     } else {
+        updateTabs();
         getContent(selectTab.value, '');
     }
 };
 
-const removeOtherTab = (targetPath: string) => {
+const removeAllTab = (targetPath: string, type: 'left' | 'right' | 'all') => {
+    const tabs = fileTabs.value;
+    const targetIndex = tabs.findIndex((tab) => tab.path === targetPath);
+    let activeName = selectTab.value;
+
+    const filterTabs = (): typeof fileTabs.value => {
+        if (type === 'left') return tabs.slice(targetIndex);
+        if (type === 'right') return tabs.slice(0, targetIndex + 1);
+        return [];
+    };
+
+    const updateTabs = () => {
+        if (activeName !== targetPath && type !== 'all') {
+            activeName = tabs[targetIndex]?.path || '';
+        }
+        const newTabs = type === 'all' ? [] : filterTabs();
+        fileTabs.value = newTabs;
+        selectTab.value = activeName;
+
+        if (type === 'all') {
+            selectTab.value = '';
+            editor.dispose();
+        } else if (newTabs.length > 0) {
+            getContent(activeName, '');
+        }
+    };
+
+    const onConfirm = () => {
+        updateTabs();
+        saveContent();
+    };
+
+    const onCancel = () => {
+        isEdit.value = false;
+        editor.setValue(oldFileContent.value);
+        updateTabs();
+    };
+
     if (isEdit.value) {
         ElMessageBox.confirm(i18n.global.t('file.saveContentAndClose'), {
             confirmButtonText: i18n.global.t('commons.button.save'),
@@ -567,42 +524,49 @@ const removeOtherTab = (targetPath: string) => {
             type: 'info',
             distinguishCancelAndClose: true,
         })
-            .then(() => {
-                const tabs = fileTabs.value;
-                let activeName = selectTab.value;
-                if (activeName !== targetPath) {
-                    tabs.forEach((tab, index) => {
-                        if (tab.path === targetPath) {
-                            const nextTab = tabs[index];
-                            if (nextTab) {
-                                activeName = nextTab.path;
-                            }
-                        }
-                    });
-                }
-
-                selectTab.value = activeName;
-                fileTabs.value = tabs.filter((tab) => tab.path === targetPath);
-                saveContent();
-            })
-            .finally(() => {});
+            .then(onConfirm)
+            .catch(onCancel);
     } else {
-        const tabs = fileTabs.value;
-        let activeName = selectTab.value;
-        if (activeName !== targetPath) {
-            tabs.forEach((tab, index) => {
-                if (tab.path === targetPath) {
-                    const nextTab = tabs[index];
-                    if (nextTab) {
-                        activeName = nextTab.path;
-                    }
-                }
-            });
-        }
-        selectTab.value = activeName;
-        fileTabs.value = tabs.filter((tab) => tab.path === targetPath);
+        updateTabs();
+        if (type === 'all') editor.dispose();
+        else getContent(activeName, '');
     }
-    getContent(selectTab.value, '');
+};
+
+const removeOtherTab = (targetPath: string) => {
+    const tabs = fileTabs.value;
+    const targetTab = tabs.find((tab) => tab.path === targetPath);
+    if (!targetTab) return;
+
+    const updateTabs = () => {
+        fileTabs.value = [targetTab];
+        selectTab.value = targetTab.path;
+        getContent(targetTab.path, '');
+    };
+
+    const onConfirm = () => {
+        updateTabs();
+        saveContent();
+    };
+
+    const onCancel = () => {
+        isEdit.value = false;
+        editor.setValue(oldFileContent.value);
+        updateTabs();
+    };
+
+    if (isEdit.value) {
+        ElMessageBox.confirm(i18n.global.t('file.saveContentAndClose'), {
+            confirmButtonText: i18n.global.t('commons.button.save'),
+            cancelButtonText: i18n.global.t('commons.button.notSave'),
+            type: 'info',
+            distinguishCancelAndClose: true,
+        })
+            .then(onConfirm)
+            .catch(onCancel);
+    } else {
+        updateTabs();
+    }
 };
 
 const changeTab = (targetPath: TabPaneName) => {
@@ -646,6 +610,9 @@ const em = defineEmits(['close']);
 const handleClose = () => {
     const closeEditor = () => {
         open.value = false;
+        selectTab.value = '';
+        fileTabs.value = [];
+        isEdit.value = false;
         if (editor) {
             editor.dispose();
         }
