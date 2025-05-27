@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="flex gap-y-2 items-center gap-x-4">
+        <div class="flex gap-y-2 items-center gap-x-4" ref="toolRef">
             <div class="flex-shrink-0 flex items-center justify-between">
                 <el-tooltip :content="$t('file.back')" placement="top">
                     <el-button icon="Back" @click="back" circle />
@@ -179,9 +179,25 @@
                             </el-dropdown-menu>
                         </template>
                     </el-dropdown>
+                    <el-dropdown class="mr-2.5">
+                        <el-button>
+                            {{ $t('commons.button.upload') }}/{{ $t('commons.button.download') }}
+                            <el-icon><arrow-down /></el-icon>
+                        </el-button>
+                        <template #dropdown>
+                            <el-dropdown-menu>
+                                <el-dropdown-item @click="openUpload">
+                                    <el-icon><ElUpload /></el-icon>
+                                    {{ $t('commons.button.upload') }}
+                                </el-dropdown-item>
+                                <el-dropdown-item @click="openWget">
+                                    <el-icon><ElDownload /></el-icon>
+                                    {{ $t('file.remoteFile') }}
+                                </el-dropdown-item>
+                            </el-dropdown-menu>
+                        </template>
+                    </el-dropdown>
                     <el-button-group>
-                        <el-button plain @click="openUpload">{{ $t('commons.button.upload') }}</el-button>
-                        <el-button plain @click="openWget">{{ $t('file.remoteFile') }}</el-button>
                         <el-button class="btn mr-2.5" @click="openRecycleBin">
                             {{ $t('file.recycleBin') }}
                         </el-button>
@@ -232,23 +248,26 @@
                         </el-button>
                         <template v-if="hostMount.length == 1">
                             <el-button class="btn" @click.stop="jump(hostMount[0]?.path)">
-                                {{ hostMount[0]?.path }} ({{ $t('file.root') }}) {{ getFileSize(hostMount[0]?.free) }}
+                                {{ hostMount[0]?.path }} ({{ $t('file.root') }})
+                                {{ formatFileSize(hostMount[0]?.free) }}
                             </el-button>
                         </template>
                         <template v-else>
                             <el-dropdown class="mr-2.5" style="border-left: 1px solid #ccc">
                                 <el-button class="btn">
                                     {{ hostMount[0]?.path }} ({{ $t('file.root') }})
-                                    {{ getFileSize(hostMount[0]?.free) }}
+                                    {{ formatFileSize(hostMount[0]?.free) }}
                                 </el-button>
                                 <template #dropdown>
                                     <el-dropdown-menu>
                                         <template v-for="(mount, index) in hostMount" :key="mount.path">
                                             <el-dropdown-item v-if="index == 0" @click.stop="jump(mount.path)">
-                                                {{ mount.path }} ({{ $t('file.root') }}) {{ getFileSize(mount.free) }}
+                                                {{ mount.path }} ({{ $t('file.root') }})
+                                                {{ formatFileSize(mount.free) }}
                                             </el-dropdown-item>
                                             <el-dropdown-item v-if="index != 0" @click.stop="jump(mount.path)">
-                                                {{ mount.path }} ({{ $t('home.mount') }}) {{ getFileSize(mount.free) }}
+                                                {{ mount.path }} ({{ $t('home.mount') }})
+                                                {{ formatFileSize(mount.free) }}
                                             </el-dropdown-item>
                                         </template>
                                     </el-dropdown-menu>
@@ -430,21 +449,23 @@
                     </el-table-column>
                     <el-table-column :label="$t('file.size')" prop="size" min-width="100" sortable>
                         <template #default="{ row, $index }">
-                            <span v-if="row.isDir">
-                                <el-button
-                                    type="primary"
-                                    link
-                                    small
-                                    @click="getDirSize(row.path, $index)"
-                                    :loading="row.btnLoading"
-                                >
-                                    <span v-if="row.dirSize == undefined">
+                            <el-button
+                                type="primary"
+                                link
+                                small
+                                :loading="row.btnLoading"
+                                @click="row.isDir ? getDirSize(row.path, $index) : getFileSize(row.path, $index)"
+                            >
+                                <span v-if="row.isDir">
+                                    <span v-if="row.dirSize === undefined">
                                         {{ $t('file.calculate') }}
                                     </span>
-                                    <span v-else>{{ getFileSize(row.dirSize) }}</span>
-                                </el-button>
-                            </span>
-                            <span v-else>{{ getFileSize(row.size) }}</span>
+                                    <span v-else>{{ formatFileSize(row.dirSize) }}</span>
+                                </span>
+                                <span v-else>
+                                    {{ formatFileSize(row.size) }}
+                                </span>
+                            </el-button>
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -477,7 +498,7 @@
                                     {{ $t('file.calculate') }}
                                 </span>
                                 <span v-else>
-                                    {{ getFileSize(dirTotalSize) }}
+                                    {{ formatFileSize(dirTotalSize) }}
                                 </span>
                             </el-button>
                         </div>
@@ -530,6 +551,7 @@ import { MsgWarning } from '@/utils/message';
 import { useSearchable } from './hooks/searchable';
 import { ResultData } from '@/api/interface';
 import { GlobalStore } from '@/store';
+import { Download as ElDownload, Upload as ElUpload } from '@element-plus/icons-vue';
 
 import i18n from '@/lang';
 import CreateFile from './create/index.vue';
@@ -593,7 +615,7 @@ const fileCompress = reactive({ files: [''], name: '', dst: '', operate: 'compre
 const fileDeCompress = reactive({ path: '', name: '', dst: '', mimeType: '' });
 const fileEdit = reactive({ content: '', path: '', name: '', language: 'plaintext', extension: '' });
 const filePreview = reactive({ path: '', name: '', extension: '', fileType: '' });
-const codeReq = reactive({ path: '', expand: false, page: 1, pageSize: 100 });
+const codeReq = reactive({ path: '', expand: false, page: 1, pageSize: 100, isDetail: false });
 const fileUpload = reactive({ path: '' });
 const fileRename = reactive({ path: '', oldName: '' });
 const fileWget = reactive({ path: '' });
@@ -611,6 +633,7 @@ const wgetRef = ref();
 const moveRef = ref();
 const downloadRef = ref();
 const pathRef = ref();
+const toolRef = ref();
 const breadCrumbRef = ref();
 const chownRef = ref();
 const moveOpen = ref(false);
@@ -744,9 +767,9 @@ const moreButtons = ref([]);
 const updateButtons = async () => {
     await nextTick();
     if (!btnWrapper.value) return;
-    const pathWidth = pathRef.value.offsetWidth;
+    const pathWidth = toolRef.value.offsetWidth;
     const leftWidth = leftWrapper.value.offsetWidth;
-    let num = Math.floor((pathWidth - leftWidth - 420) / 70);
+    let num = Math.floor((pathWidth - leftWidth - 450) / 100);
     if (num < 0) {
         visibleButtons.value = toolButtons.value;
         moreButtons.value = [];
@@ -759,7 +782,7 @@ const updateButtons = async () => {
 const handlePath = () => {
     nextTick(function () {
         let breadCrumbWidth = breadCrumbRef.value.offsetWidth;
-        let pathWidth = pathRef.value.offsetWidth;
+        let pathWidth = toolRef.value.offsetWidth;
         if (pathWidth - breadCrumbWidth < 50 && paths.value.length > 1) {
             const removed = paths.value.shift();
             if (removed) hidePaths.value.push(removed);
@@ -896,8 +919,24 @@ const batchDelFiles = () => {
     deleteRef.value.acceptParams(selects.value);
 };
 
-const getFileSize = (size: number) => {
+const formatFileSize = (size: number) => {
     return computeSize(size);
+};
+
+const getFileSize = async (path: string, index: number) => {
+    codeReq.path = path;
+    codeReq.expand = true;
+    codeReq.isDetail = true;
+    data.value[index].btnLoading = true;
+    await getFileContent(codeReq)
+        .then(async (res) => {
+            let newData = [...data.value];
+            newData[index].size = res.data.size;
+            data.value = newData;
+        })
+        .finally(() => {
+            data.value[index].btnLoading = false;
+        });
 };
 
 const getDirSize = async (path: string, index: number) => {
