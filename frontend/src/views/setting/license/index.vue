@@ -165,9 +165,11 @@ const loadBindNode = (row: any) => {
     if (!row.bindNode && row.freeNodes?.length) {
         return row.bindNode;
     }
-    for (const item of row.freeNodes) {
-        if (item.addr === row.bindNode) {
-            return item.name === 'local' ? i18n.global.t('xpack.node.master') : item.addr;
+    if (row.freeNodes) {
+        for (const item of row.freeNodes) {
+            if (item.addr === row.bindNode) {
+                return item.name === 'local' ? i18n.global.t('xpack.node.master') : item.addr;
+            }
         }
     }
     return row.bindNode;
@@ -214,6 +216,7 @@ const search = async () => {
         .then((res) => {
             loading.value = false;
             data.value = res.data.items || [];
+            console.log(data.value);
             for (const item of data.value) {
                 item.productName = 'product-1panel-pro';
                 item.expiresAt = item.productPro === '0' ? '' : timestampToDate(Number(item.productPro));

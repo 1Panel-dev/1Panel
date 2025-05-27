@@ -32,6 +32,7 @@ const restart = ref(true);
 const em = defineEmits(['update:withDockerRestart', 'submit']);
 interface DialogProps {
     syncList: string;
+    open: boolean;
 }
 const emit = () => {
     em('update:withDockerRestart', false);
@@ -40,6 +41,10 @@ const emit = () => {
 const acceptParams = async (props: DialogProps): Promise<void> => {
     if (props.syncList.indexOf('SyncSystemProxy') === -1) {
         emit();
+        return;
+    }
+    if (props.open) {
+        open.value = true;
         return;
     }
     try {

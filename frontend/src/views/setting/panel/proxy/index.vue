@@ -161,6 +161,7 @@ const submitChangePassword = async (formEl: FormInstance | undefined) => {
         if (isMasterProductPro.value && (params.proxyDocker || proxyDockerVisible.value)) {
             dockerProxyRef.value.acceptParams({
                 syncList: 'SyncSystemProxy',
+                open: true,
             });
         } else {
             loading.value = true;
