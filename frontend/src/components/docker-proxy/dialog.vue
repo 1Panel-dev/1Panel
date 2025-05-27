@@ -38,6 +38,10 @@ const emit = () => {
     em('submit');
 };
 const acceptParams = async (props: DialogProps): Promise<void> => {
+    if (props.syncList.includes('SyncSystemProxyDocker')) {
+        open.value = true;
+        return;
+    }
     if (props.syncList.indexOf('SyncSystemProxy') === -1) {
         emit();
         return;

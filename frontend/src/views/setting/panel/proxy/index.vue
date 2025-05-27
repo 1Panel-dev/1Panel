@@ -57,13 +57,12 @@
             <el-button :disabled="loading" @click="proxyVisible = false">
                 {{ $t('commons.button.cancel') }}
             </el-button>
-            <el-button :disabled="loading" type="primary" @click="submitChangePassword(formRef)">
+            <el-button :disabled="loading" type="primary" @click="onSubmitProxy(formRef)">
                 {{ $t('commons.button.confirm') }}
             </el-button>
         </template>
     </DrawerPro>
 
-    <ConfirmDialog ref="confirmDialogRef" @confirm="onSubmit" />
     <DockerProxyDialog ref="dockerProxyRef" @submit="onSubmit" v-model:with-docker-restart="withDockerRestart" />
 </template>
 
@@ -76,14 +75,12 @@ import { reactive, ref } from 'vue';
 import { updateProxy } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import { storeToRefs } from 'pinia';
-import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import DockerProxyDialog from '@/components/docker-proxy/dialog.vue';
 
 const globalStore = GlobalStore();
 const emit = defineEmits<{ (e: 'search'): void }>();
 const { isMasterProductPro } = storeToRefs(globalStore);
 
-const confirmDialogRef = ref();
 const formRef = ref<FormInstance>();
 const rules = reactive({
     proxyType: [Rules.requiredSelect],
@@ -137,7 +134,7 @@ const acceptParams = (params: DialogProps): void => {
     form.proxyPasswdKeepItem = params.passwdKeep === 'Enable';
 };
 
-const submitChangePassword = async (formEl: FormInstance | undefined) => {
+const onSubmitProxy = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
@@ -160,7 +157,7 @@ const submitChangePassword = async (formEl: FormInstance | undefined) => {
         }
         if (isMasterProductPro.value && (params.proxyDocker || proxyDockerVisible.value)) {
             dockerProxyRef.value.acceptParams({
-                syncList: 'SyncSystemProxy',
+                syncList: 'SyncSystemProxyDocker',
             });
         } else {
             loading.value = true;
