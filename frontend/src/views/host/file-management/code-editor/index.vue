@@ -466,9 +466,8 @@ const removeTab = (targetPath: TabPaneName) => {
                 getContent(selectTab.value, '');
             })
             .catch(() => {
-                isEdit.value = false;
-                editor.setValue(oldFileContent.value);
                 updateTabs();
+                isEdit.value = false;
                 if (fileTabs.value.length > 0) {
                     getContent(selectTab.value, '');
                 }
@@ -512,8 +511,10 @@ const removeAllTab = (targetPath: string, type: 'left' | 'right' | 'all') => {
     };
 
     const onCancel = () => {
+        if (type === 'left' || type === 'right') {
+            editor.setValue(oldFileContent.value);
+        }
         isEdit.value = false;
-        editor.setValue(oldFileContent.value);
         updateTabs();
     };
 
@@ -550,8 +551,8 @@ const removeOtherTab = (targetPath: string) => {
     };
 
     const onCancel = () => {
-        isEdit.value = false;
         editor.setValue(oldFileContent.value);
+        isEdit.value = false;
         updateTabs();
     };
 
