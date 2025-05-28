@@ -87,7 +87,7 @@
                         :label="$t('commons.table.name')"
                         fix
                         prop="primaryDomain"
-                        min-width="150px"
+                        min-width="250px"
                         sortable
                         show-overflow-tooltip
                     >

@@ -147,7 +147,7 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "NoAuthSetting", Value: "200"}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "ApiInterfaceStatus", Value: "disable"}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "ApiInterfaceStatus", Value: constant.StatusDisable}).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "ApiKey", Value: ""}).Error; err != nil {
@@ -163,13 +163,13 @@ var InitSetting = &gormigrate.Migration{
 			return err
 		}
 
-		if err := tx.Create(&model.Setting{Key: "UninstallDeleteImage", Value: "Disable"}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "UninstallDeleteImage", Value: constant.StatusDisable}).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "UpgradeBackup", Value: "Enable"}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "UninstallDeleteBackup", Value: "Disable"}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "UninstallDeleteBackup", Value: constant.StatusDisable}).Error; err != nil {
 			return err
 		}
 		return nil

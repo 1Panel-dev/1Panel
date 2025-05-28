@@ -177,6 +177,7 @@ const acceptParams = (params: DialogProps): void => {
     detailName.value = params.detailName;
     backupVisible.value = true;
     status.value = params.status;
+    secret.value = '';
     search();
 };
 const handleClose = () => {
@@ -312,6 +313,7 @@ const onBackup = async () => {
 };
 
 const onRecover = async (row: Backup.RecordInfo) => {
+    secret.value = '';
     isBackup.value = false;
     if (type.value !== 'app' && type.value !== 'website') {
         ElMessageBox.confirm(
