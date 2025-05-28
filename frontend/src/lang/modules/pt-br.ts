@@ -2433,6 +2433,9 @@ const message = {
         useProxy: 'Usar Proxy',
         useProxyHelper: 'Usar o endereço do servidor proxy nas configurações do painel',
         westCN: 'West Digital',
+        openBaseDir: 'Prevenir Ataques entre Sites',
+        openBaseDirHelper:
+            'open_basedir é usado para restringir o caminho de acesso a arquivos PHP, ajudando a prevenir acesso entre sites e aumentar a segurança',
     },
     php: {
         short_open_tag: 'Suporte para short tags',

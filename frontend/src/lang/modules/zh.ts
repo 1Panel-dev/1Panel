@@ -2286,6 +2286,8 @@ const message = {
         useProxy: '使用代理',
         useProxyHelper: '使用面板设置中的代理服务器地址',
         westCN: '西部数码',
+        openBaseDir: '防跨站攻击',
+        openBaseDirHelper: 'open_basedir 用于限制 PHP 文件访问路径，有助于防止跨站访问和提升安全性',
     },
     php: {
         short_open_tag: '短标签支持',

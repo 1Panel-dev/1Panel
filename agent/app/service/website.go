@@ -124,6 +124,8 @@ type IWebsiteService interface {
 	GetWebsiteResource(websiteID uint) ([]response.Resource, error)
 	ListDatabases() ([]response.Database, error)
 	ChangeDatabase(req request.ChangeDatabase) error
+
+	OperateCrossSiteAccess(req request.CrossSiteAccessOp) error
 }
 
 func NewIWebsiteService() IWebsiteService {
@@ -428,7 +430,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 				return err
 			}
 			if runtime.Type == constant.RuntimePHP && runtime.Resource == constant.ResourceAppstore {
-				createPHPConfig(website)
+				createOpenBasedirConfig(website)
 			}
 		}
 		tx, ctx := helper.GetTxAndContext()
@@ -573,6 +575,9 @@ func (w WebsiteService) GetWebsite(id uint) (response.WebsiteDTO, error) {
 		}
 		res.RuntimeType = runtime.Type
 		res.RuntimeName = runtime.Name
+		if runtime.Type == constant.RuntimePHP {
+			res.OpenBaseDir = files.NewFileOp().Stat(path.Join(GetSitePath(website, SiteIndexDir), ".user.ini"))
+		}
 	}
 	return res, nil
 }
@@ -3277,4 +3282,19 @@ func (w WebsiteService) ChangeDatabase(req request.ChangeDatabase) error {
 	website.DbID = req.DatabaseID
 	website.DbType = req.DatabaseType
 	return websiteRepo.Save(context.Background(), &website)
+}
+
+func (w WebsiteService) OperateCrossSiteAccess(req request.CrossSiteAccessOp) error {
+	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
+	if err != nil {
+		return err
+	}
+	if req.Operation == constant.StatusEnable {
+		createOpenBasedirConfig(&website)
+	}
+	if req.Operation == constant.StatusDisable {
+		fileOp := files.NewFileOp()
+		return fileOp.DeleteFile(path.Join(GetSitePath(website, SiteIndexDir), ".user.ini"))
+	}
+	return nil
 }

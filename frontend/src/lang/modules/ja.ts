@@ -2382,6 +2382,9 @@ const message = {
         useProxy: 'プロキシを使用',
         useProxyHelper: 'パネル設定のプロキシサーバーアドレスを使用',
         westCN: '西部デジタル',
+        openBaseDir: 'クロスサイト攻撃を防ぐ',
+        openBaseDirHelper:
+            'open_basedir は PHP ファイルのアクセスパスを制限し、クロスサイトアクセスを防ぎセキュリティを向上させるために使用されます',
     },
     php: {
         short_open_tag: '短いタグサポート',

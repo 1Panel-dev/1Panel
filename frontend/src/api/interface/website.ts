@@ -36,6 +36,7 @@ export namespace Website {
         appName: string;
         runtimeName: string;
         runtimeType: string;
+        openBaseDir: boolean;
     }
     export interface WebsiteRes extends CommonModel {
         protocol: string;
@@ -645,5 +646,10 @@ export namespace Website {
         websiteID: number;
         databaseID: number;
         databaseType: string;
+    }
+
+    export interface CrossSiteAccessOp {
+        websiteID: number;
+        operation: string;
     }
 }

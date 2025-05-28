@@ -1101,3 +1101,23 @@ func (b *BaseApi) ClearProxyCache(c *gin.Context) {
 	}
 	helper.Success(c)
 }
+
+// @Tags Website
+// @Summary Operate Cross Site Access
+// @Accept json
+// @Param request body request.CrossSiteAccessOp true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /websites/crosssite [post]
+func (b *BaseApi) OperateCrossSiteAccess(c *gin.Context) {
+	var req request.CrossSiteAccessOp
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := websiteService.OperateCrossSiteAccess(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}

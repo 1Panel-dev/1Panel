@@ -289,3 +289,8 @@ type WebsiteProxyDel struct {
 	ID   uint   `json:"id" validate:"required"`
 	Name string `json:"name" validate:"required"`
 }
+
+type CrossSiteAccessOp struct {
+	WebsiteID uint   `json:"websiteID" validate:"required"`
+	Operation string `json:"operation" validate:"required,oneof=Enable Disable"`
+}

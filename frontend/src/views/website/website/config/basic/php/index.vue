@@ -2,28 +2,39 @@
     <div v-loading="loading">
         <el-row>
             <el-col :xs="20" :sm="12" :md="10" :lg="10" :xl="8">
-                <el-form label-position="right" label-width="80px">
+                <el-form label-position="right" label-width="120px">
                     <el-form-item>
-                        <div v-if="website.type === 'static'">
-                            <el-text type="info">{{ $t('website.staticChangePHPHelper') }}</el-text>
-                        </div>
+                        <el-text type="info" v-if="website.type === 'static'">
+                            {{ $t('website.staticChangePHPHelper') }}
+                        </el-text>
                     </el-form-item>
-
                     <el-form-item :label="$t('website.changeVersion')">
-                        <el-select v-model="versionReq.runtimeID" class="w-full">
-                            <el-option :key="-1" :label="$t('website.static')" :value="0"></el-option>
-                            <el-option
-                                v-for="(item, index) in versions"
-                                :key="index"
-                                :label="item.label"
-                                :value="item.value"
-                            ></el-option>
-                        </el-select>
+                        <el-row :gutter="20">
+                            <el-col :span="20">
+                                <el-select v-model="versionReq.runtimeID" class="p-w-200">
+                                    <el-option :key="-1" :label="$t('website.static')" :value="0"></el-option>
+                                    <el-option
+                                        v-for="(item, index) in versions"
+                                        :key="index"
+                                        :label="item.label"
+                                        :value="item.value"
+                                    ></el-option>
+                                </el-select>
+                            </el-col>
+                            <el-col :span="4">
+                                <el-button
+                                    type="primary"
+                                    @click="submit()"
+                                    :disabled="versionReq.runtimeID === oldRuntimeID"
+                                >
+                                    {{ $t('commons.button.save') }}
+                                </el-button>
+                            </el-col>
+                        </el-row>
                     </el-form-item>
-                    <el-form-item>
-                        <el-button type="primary" @click="submit()" :disabled="versionReq.runtimeID === oldRuntimeID">
-                            {{ $t('commons.button.save') }}
-                        </el-button>
+                    <el-form-item :label="$t('website.openBaseDir')">
+                        <el-switch v-model="openBaseDir" @change="operateCrossSite"></el-switch>
+                        <span class="input-help">{{ $t('website.openBaseDirHelper') }}</span>
                     </el-form-item>
                 </el-form>
             </el-col>
@@ -36,7 +47,7 @@ import { SearchRuntimes } from '@/api/modules/runtime';
 import { onMounted, reactive, ref } from 'vue';
 import { Runtime } from '@/api/interface/runtime';
 import { Website } from '@/api/interface/website';
-import { changePHPVersion, getWebsite } from '@/api/modules/website';
+import { changePHPVersion, getWebsite, operateCrossSiteAccess } from '@/api/modules/website';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 const props = defineProps({
@@ -56,7 +67,9 @@ const loading = ref(false);
 const oldRuntimeID = ref(0);
 const website = ref({
     type: '',
+    openBaseDir: false,
 });
+const openBaseDir = ref(false);
 
 const getRuntimes = async () => {
     try {
@@ -95,6 +108,18 @@ const getWebsiteDetail = async () => {
     versionReq.runtimeID = res.data.runtimeID;
     oldRuntimeID.value = res.data.runtimeID;
     website.value = res.data;
+    openBaseDir.value = res.data.openBaseDir || false;
+};
+
+const operateCrossSite = async () => {
+    try {
+        await operateCrossSiteAccess({
+            websiteID: props.id,
+            operation: openBaseDir.value ? 'Enable' : 'Disable',
+        });
+        MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
+        getWebsiteDetail();
+    } catch (error) {}
 };
 
 onMounted(() => {

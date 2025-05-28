@@ -2476,6 +2476,9 @@ const message = {
         useProxy: 'Use Proxy',
         useProxyHelper: 'Use the proxy server address in the panel settings',
         westCN: 'West Digital',
+        openBaseDir: 'Prevent Cross-Site Attacks',
+        openBaseDirHelper:
+            'open_basedir is used to restrict the PHP file access path, which helps prevent cross-site access and enhance security',
     },
     php: {
         short_open_tag: 'Short tag support',

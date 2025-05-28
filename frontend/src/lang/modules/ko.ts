@@ -2341,6 +2341,9 @@ const message = {
         useProxy: '프록시 사용',
         useProxyHelper: '패널 설정의 프록시 서버 주소 사용',
         westCN: '서부 디지털',
+        openBaseDir: '사이트 간 공격 방지',
+        openBaseDirHelper:
+            'open_basedir는 PHP 파일 액세스 경로를 제한하여 사이트 간 액세스를 방지하고 보안을 향상시키는 데 사용됩니다',
     },
     php: {
         short_open_tag: '짧은 태그 지원',

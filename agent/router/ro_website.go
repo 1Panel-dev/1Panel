@@ -84,5 +84,7 @@ func (a *WebsiteRouter) InitRouter(Router *gin.RouterGroup) {
 		websiteRouter.GET("/resource/:id", baseApi.GetWebsiteResource)
 		websiteRouter.GET("/databases", baseApi.GetWebsiteDatabase)
 		websiteRouter.POST("/databases", baseApi.ChangeWebsiteDatabase)
+
+		websiteRouter.POST("/crosssite", baseApi.OperateCrossSiteAccess)
 	}
 }

@@ -15,6 +15,7 @@ type WebsiteDTO struct {
 	RuntimeName   string `json:"runtimeName"`
 	RuntimeType   string `json:"runtimeType"`
 	SiteDir       string `json:"siteDir"`
+	OpenBaseDir   bool   `json:"openBaseDir"`
 }
 
 type WebsiteRes struct {

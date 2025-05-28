@@ -2436,6 +2436,9 @@ const message = {
         useProxy: 'Gunakan Proksi',
         useProxyHelper: 'Gunakan alamat pelayan proksi dalam tetapan panel',
         westCN: 'West Digital',
+        openBaseDir: 'Pencegahan Serangan Lintas Situs',
+        openBaseDirHelper:
+            'open_basedir digunakan untuk membatasi jalur akses file PHP, yang membantu mencegah akses lintas situs dan meningkatkan keamanan',
     },
     php: {
         short_open_tag: 'Sokongan tag pendek',

@@ -343,3 +343,7 @@ export const operateCustomRewrite = (req: Website.CustomRewirte) => {
 export const listCustomRewrite = () => {
     return http.get<string[]>(`/websites/rewrite/custom`);
 };
+
+export const operateCrossSiteAccess = (req: Website.CrossSiteAccessOp) => {
+    return http.post(`/websites/crosssite`, req);
+};
