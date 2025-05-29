@@ -345,7 +345,7 @@ const changeApp = (appId: number) => {
 };
 
 const changePHPVersion = (version: string) => {
-    runtime.image = 'php:' + version;
+    runtime.image = '1panel-php-fpm:' + version;
 };
 
 const changeVersion = () => {
@@ -363,7 +363,7 @@ const changeVersion = () => {
                 formFields.value[fileds[index]['envKey']] = fileds[index];
                 runtime.params[fileds[index]['envKey']] = fileds[index]['default'];
                 if (fileds[index]['envKey'] == 'PHP_VERSION') {
-                    runtime.image = 'php:' + fileds[index]['default'];
+                    runtime.image = '1panel-php-fpm:' + fileds[index]['default'];
                 }
             }
             initParam.value = true;
