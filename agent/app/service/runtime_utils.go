@@ -83,6 +83,13 @@ func handlePHP(create request.RuntimeCreate, runtime *model.Runtime, fileOp file
 			_ = fileOp.DeleteDir(projectDir)
 		}
 	}()
+
+	version, ok := create.Params["PHP_VERSION"]
+	if ok {
+		extensionsDir := path.Join(projectDir, "extensions", getExtensionDir(version.(string)))
+		_ = fileOp.CreateDir(extensionsDir, 0644)
+	}
+
 	composeContent, envContent, forms, err := handleParams(create, projectDir)
 	if err != nil {
 		return
