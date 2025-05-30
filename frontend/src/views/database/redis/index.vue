@@ -31,7 +31,13 @@
                 </el-button>
             </template>
             <template #rightToolBar v-if="!isOnSetting">
-                <el-select v-model="currentDBName" @change="changeDatabase()" class="p-w-200 ml-5" v-if="currentDB">
+                <el-select
+                    v-model="currentDBName"
+                    @change="changeDatabase()"
+                    class="p-w-200 ml-5"
+                    v-if="currentDB"
+                    placement="bottom-end"
+                >
                     <template #prefix>{{ $t('commons.table.type') }}</template>
                     <el-option-group :label="$t('commons.table.local')">
                         <div v-for="(item, index) in dbOptionsLocal" :key="index">

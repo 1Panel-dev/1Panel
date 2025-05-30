@@ -81,7 +81,7 @@ func (u *RedisService) CheckHasCli() bool {
 func (u *RedisService) InstallCli() error {
 	item := dto.ContainerOperate{
 		Name:    "1Panel-redis-cli-tools",
-		Image:   "redis:7.2.4",
+		Image:   "redis:7.4.4",
 		Network: "1panel-network",
 	}
 	return NewIContainerService().ContainerCreate(item)

@@ -510,7 +510,11 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerOperate) error {
 		global.LOG.Errorf("new task for create container failed, err: %v", err)
 		return err
 	}
+
+	var wg sync.WaitGroup
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		taskItem.AddSubTask(i18n.GetWithName("ContainerImagePull", req.Image), func(t *task.Task) error {
 			if !checkImageExist(client, req.Image) || req.ForcePull {
 				if err := pullImages(taskItem, client, req.Image); err != nil {
@@ -562,6 +566,7 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerOperate) error {
 			global.LOG.Error(err.Error())
 		}
 	}()
+	wg.Wait()
 	return nil
 }
 

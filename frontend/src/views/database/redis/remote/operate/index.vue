@@ -15,6 +15,7 @@
                 <el-radio-group v-model="dialogData.rowData!.version" @change="isOK = false">
                     <el-radio label="6.x" value="6.x" />
                     <el-radio label="7.x" value="7.x" />
+                    <el-radio label="8.x" value="8.x" />
                 </el-radio-group>
             </el-form-item>
             <el-form-item :label="$t('database.address')" prop="address">
@@ -79,6 +80,9 @@ const acceptParams = (params: DialogProps): void => {
     }
     if (dialogData.value.rowData.version.startsWith('7.')) {
         dialogData.value.rowData.version = '7.x';
+    }
+    if (dialogData.value.rowData.version.startsWith('8.')) {
+        dialogData.value.rowData.version = '8.x';
     }
     title.value = i18n.global.t('database.' + dialogData.value.title + 'RemoteDB');
     drawerVisible.value = true;
