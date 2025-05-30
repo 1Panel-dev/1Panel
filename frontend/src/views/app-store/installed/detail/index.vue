@@ -242,7 +242,7 @@ const get = async () => {
         if (res.data.webUI != '') {
             const httpConfig = splitHttp(res.data.webUI);
             webUI.domain = httpConfig.url;
-            webUI.protocol = httpConfig.proto;
+            webUI.protocol = httpConfig.proto + '://';
         }
         appType.value = res.data.type;
     } catch (error) {
@@ -289,14 +289,15 @@ const submit = async (formEl: FormInstance) => {
 };
 
 const updateAppConfig = async () => {
-    if (!webUI.domain || webUI.domain === '') {
-        return;
-    }
     try {
-        await updateInstallConfig({
+        let req = {
             installID: Number(paramData.value.id),
             webUI: webUI.protocol + webUI.domain,
-        });
+        };
+        if (!webUI.domain || webUI.domain === '') {
+            req.webUI = '';
+        }
+        await updateInstallConfig(req);
         MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
         handleClose();
     } catch (error) {}

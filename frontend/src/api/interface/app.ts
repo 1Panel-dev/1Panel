@@ -143,8 +143,10 @@ export namespace App {
         canUpdate: boolean;
         path: string;
         httpPort?: number;
+        httpsPort?: number;
         favorite: boolean;
         app: App;
+        webUI: string;
     }
 
     export interface AppInstallDto {

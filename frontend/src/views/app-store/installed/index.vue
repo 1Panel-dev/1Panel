@@ -249,7 +249,12 @@
                                                         :width="400"
                                                     >
                                                         <template #reference>
-                                                            <el-button plain icon="Promotion" size="small">
+                                                            <el-button
+                                                                plain
+                                                                icon="Promotion"
+                                                                size="small"
+                                                                @click="openLink(defaultLink, installed)"
+                                                            >
                                                                 {{ $t('app.toLink') }}
                                                             </el-button>
                                                         </template>
@@ -277,6 +282,8 @@
                                                                             }}
                                                                         </el-button>
                                                                     </td>
+                                                                </tr>
+                                                                <tr v-if="defaultLink != ''">
                                                                     <td v-if="installed.httpsPort > 0">
                                                                         <el-button
                                                                             type="primary"
@@ -698,6 +705,27 @@ const getConfig = async () => {
             defaultLink.value = res.data;
         }
     } catch (error) {}
+};
+
+const openLink = (defaultLink: string, installed: App.AppInstalled) => {
+    if (defaultLink != '' && installed.webUI != '') {
+        return;
+    }
+    if (defaultLink == '' && installed.webUI == '') {
+        return;
+    }
+    if (installed.webUI != '') {
+        toLink(installed.webUI);
+        return;
+    }
+    if (installed.httpsPort > 0) {
+        toLink('https://' + defaultLink + ':' + installed.httpsPort);
+        return;
+    }
+    if (installed.httpPort > 0) {
+        toLink('http://' + defaultLink + ':' + installed.httpPort);
+        return;
+    }
 };
 
 onMounted(() => {
