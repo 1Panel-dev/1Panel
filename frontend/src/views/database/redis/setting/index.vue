@@ -2,9 +2,6 @@
     <div v-show="settingShow" v-loading="loading">
         <LayoutContent :title="database + ' ' + $t('commons.button.set')" :reload="true">
             <template #buttons>
-                <el-button type="primary" :plain="activeName !== 'conf'" @click="changeTab('conf')">
-                    {{ $t('database.confChange') }}
-                </el-button>
                 <el-button
                     type="primary"
                     :disabled="redisStatus !== 'Running'"
@@ -12,6 +9,9 @@
                     @click="changeTab('status')"
                 >
                     {{ $t('database.currentStatus') }}
+                </el-button>
+                <el-button type="primary" :plain="activeName !== 'conf'" @click="changeTab('conf')">
+                    {{ $t('database.confChange') }}
                 </el-button>
                 <el-button
                     type="primary"
@@ -170,7 +170,7 @@ const rules = reactive({
     maxmemory: [Rules.number, checkNumberRange(0, 999999)],
 });
 
-const activeName = ref('conf');
+const activeName = ref('status');
 const statusRef = ref();
 const persistenceRef = ref();
 
@@ -217,7 +217,7 @@ const acceptParams = (prop: DialogProps): void => {
     redisStatus.value = prop.status;
     database.value = prop.database;
     settingShow.value = true;
-    loadConfFile();
+    changeTab('status');
 };
 
 const portRef = ref();
