@@ -4,9 +4,6 @@
             <template #title>
                 <back-button name="MySQL" :header="props.database + ' ' + $t('commons.button.set')">
                     <template #buttons>
-                        <el-button type="primary" :plain="activeName !== 'conf'" @click="jumpToConf">
-                            {{ $t('database.confChange') }}
-                        </el-button>
                         <el-button
                             type="primary"
                             :disabled="mysqlStatus !== 'Running'"
@@ -14,6 +11,9 @@
                             @click="activeName = 'status'"
                         >
                             {{ $t('database.currentStatus') }}
+                        </el-button>
+                        <el-button type="primary" :plain="activeName !== 'conf'" @click="jumpToConf">
+                            {{ $t('database.confChange') }}
                         </el-button>
                         <el-button
                             type="primary"
@@ -159,7 +159,7 @@ const globalStore = GlobalStore();
 const loading = ref(false);
 
 const extensions = [javascript(), oneDark];
-const activeName = ref('conf');
+const activeName = ref('status');
 
 const baseInfo = reactive({
     name: '',
