@@ -309,12 +309,13 @@ func loadDbsForJob(cronjob model.Cronjob) []DatabaseHelper {
 	var dbs []DatabaseHelper
 	if cronjob.DBName == "all" {
 		if cronjob.DBType == "mysql" || cronjob.DBType == "mariadb" {
-			mysqlItems, _ := mysqlRepo.List()
+			databaseService := NewIDatabaseService()
+			mysqlItems, _ := databaseService.LoadItems(cronjob.DBType)
 			for _, mysql := range mysqlItems {
 				dbs = append(dbs, DatabaseHelper{
 					ID:       mysql.ID,
 					DBType:   cronjob.DBType,
-					Database: mysql.MysqlName,
+					Database: mysql.Name,
 					Name:     mysql.Name,
 				})
 			}
