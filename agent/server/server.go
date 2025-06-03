@@ -3,15 +3,12 @@ package server
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/init/log"
-	"github.com/1Panel-dev/1Panel/agent/init/migration"
 	"net"
 	"net/http"
 	"os"
 
-	"github.com/1Panel-dev/1Panel/agent/constant"
-
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/cron"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
@@ -21,11 +18,13 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/init/db"
 	"github.com/1Panel-dev/1Panel/agent/init/dir"
 	"github.com/1Panel-dev/1Panel/agent/init/hook"
+	"github.com/1Panel-dev/1Panel/agent/init/lang"
+	"github.com/1Panel-dev/1Panel/agent/init/log"
+	"github.com/1Panel-dev/1Panel/agent/init/migration"
 	"github.com/1Panel-dev/1Panel/agent/init/router"
 	"github.com/1Panel-dev/1Panel/agent/init/validator"
 	"github.com/1Panel-dev/1Panel/agent/init/viper"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -38,6 +37,7 @@ func Start() {
 	i18n.Init()
 	cache.Init()
 	app.Init()
+	lang.Init()
 	validator.Init()
 	gin.SetMode("debug")
 	cron.Run()
