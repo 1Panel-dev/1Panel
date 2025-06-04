@@ -236,17 +236,33 @@ var InitDefaultCA = &gormigrate.Migration{
 var InitPHPExtensions = &gormigrate.Migration{
 	ID: "20240722-add-php-extensions",
 	Migrate: func(tx *gorm.DB) error {
-		if err := tx.Create(&model.PHPExtensions{Name: "Default", Extensions: "bcmath,ftp,gd,gettext,intl,mysqli,pcntl,pdo_mysql,shmop,soap,sockets,sysvsem,xmlrpc,zip"}).Error; err != nil {
-			return err
+		phpExtensions := []model.PHPExtensions{
+			{
+				Name:       "Default",
+				Extensions: "bcmath,ftp,gd,gettext,intl,mysqli,pcntl,pdo_mysql,shmop,soap,sockets,sysvsem,xmlrpc,zip",
+			},
+			{
+				Name:       "WordPress",
+				Extensions: "exif,igbinary,imagick,intl,zip,apcu,memcached,opcache,redis,shmop,mysqli,pdo_mysql,gd",
+			},
+			{
+				Name:       "Flarum",
+				Extensions: "curl,gd,pdo_mysql,mysqli,bz2,exif,yaf,imap",
+			},
+			{
+				Name:       "SeaCMS",
+				Extensions: "mysqli,pdo_mysql,gd,curl",
+			},
+			{
+				Name:       "Dev",
+				Extensions: "bcmath,ftp,gd,gettext,intl,mysqli,pcntl,pdo_mysql,shmop,soap,sockets,sysvsem,xmlrpc,zip,exif,igbinary,imagick,apcu,memcached,opcache,redis,bc,image,dom,iconv,mbstring,mysqlnd,openssl,pdo,tokenizer,xml,curl,bz2,yaf,imap,xdebug,swoole,pdo_pgsql,fileinfo,pgsql,calendar,gmp",
+			},
 		}
-		if err := tx.Create(&model.PHPExtensions{Name: "WordPress", Extensions: "exif,igbinary,imagick,intl,zip,apcu,memcached,opcache,redis,shmop,mysqli,pdo_mysql,gd"}).Error; err != nil {
-			return err
-		}
-		if err := tx.Create(&model.PHPExtensions{Name: "Flarum", Extensions: "curl,gd,pdo_mysql,mysqli,bz2,exif,yaf,imap"}).Error; err != nil {
-			return err
-		}
-		if err := tx.Create(&model.PHPExtensions{Name: "SeaCMS", Extensions: "mysqli,pdo_mysql,gd,curl"}).Error; err != nil {
-			return err
+
+		for _, ext := range phpExtensions {
+			if err := tx.Create(&ext).Error; err != nil {
+				return err
+			}
 		}
 		return nil
 	},
