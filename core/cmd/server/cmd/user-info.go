@@ -22,9 +22,13 @@ var userinfoCmd = &cobra.Command{
 			fmt.Println(i18n.GetMsgWithMapForCmd("SudoHelper", map[string]interface{}{"cmd": "sudo 1pctl user-info"}))
 			return nil
 		}
-		db, err := loadDBConn()
+		db, err := loadDBConn("core.db")
 		if err != nil {
 			return fmt.Errorf("init my db conn failed, err: %v \n", err)
+		}
+		agentDB, err := loadDBConn("agent.db")
+		if err != nil {
+			return fmt.Errorf("init my agent db conn failed, err: %v \n", err)
 		}
 		user := getSettingByKey(db, "UserName")
 		pass := "********"
@@ -39,7 +43,7 @@ var userinfoCmd = &cobra.Command{
 		port := getSettingByKey(db, "ServerPort")
 		ssl := getSettingByKey(db, "SSL")
 		entrance := getSettingByKey(db, "SecurityEntrance")
-		address := getSettingByKey(db, "SystemIP")
+		address := getSettingByKey(agentDB, "SystemIP")
 
 		protocol := "http"
 		if ssl == constant.StatusEnable {

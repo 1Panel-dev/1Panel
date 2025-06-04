@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os/user"
+	"path"
 	"strings"
 	"time"
 
@@ -36,7 +37,7 @@ type setting struct {
 	About     string    `json:"about" gorm:"type:longText"`
 }
 
-func loadDBConn() (*gorm.DB, error) {
+func loadDBConn(dbName string) (*gorm.DB, error) {
 	stdout, err := cmdUtils.RunDefaultWithStdoutBashC("grep '^BASE_DIR=' /usr/local/bin/1pctl | cut -d'=' -f2")
 	if err != nil {
 		return nil, fmt.Errorf("handle load `BASE_DIR` failed, err: %v", err)
@@ -49,7 +50,7 @@ func loadDBConn() (*gorm.DB, error) {
 		baseDir = baseDir[:strings.LastIndex(baseDir, "/")]
 	}
 
-	db, err := gorm.Open(sqlite.Open(baseDir+"/1panel/db/core.db"), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open(path.Join(baseDir, "1panel/db", dbName)), &gorm.Config{})
 	if err != nil {
 		return nil, fmt.Errorf("init my db conn failed, err: %v \n", err)
 	}

@@ -99,7 +99,7 @@ func username() {
 		return
 	}
 
-	db, err := loadDBConn()
+	db, err := loadDBConn("core.db")
 	if err != nil {
 		fmt.Println(i18n.GetMsgWithMapForCmd("DBConnErr", map[string]interface{}{"err": err.Error()}))
 		return
@@ -131,7 +131,7 @@ func password() {
 		fmt.Println("\n" + i18n.GetMsgByKeyForCmd("UpdateUPasswordBlank"))
 		return
 	}
-	db, err := loadDBConn()
+	db, err := loadDBConn("core.db")
 	if err != nil {
 		fmt.Println("\n" + i18n.GetMsgWithMapForCmd("DBConnErr", map[string]interface{}{"err": err.Error()}))
 		return
@@ -196,7 +196,7 @@ func port() {
 		fmt.Println(i18n.GetMsgByKeyForCmd("UpdatePortUsed"))
 		return
 	}
-	db, err := loadDBConn()
+	db, err := loadDBConn("core.db")
 	if err != nil {
 		fmt.Println(i18n.GetMsgWithMapForCmd("DBConnErr", map[string]interface{}{"err": err.Error()}))
 		return

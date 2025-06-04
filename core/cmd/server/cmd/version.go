@@ -23,7 +23,7 @@ var versionCmd = &cobra.Command{
 			fmt.Println(i18n.GetMsgWithMapForCmd("SudoHelper", map[string]interface{}{"cmd": "sudo 1pctl version"}))
 			return nil
 		}
-		db, err := loadDBConn()
+		db, err := loadDBConn("core.db")
 		if err != nil {
 			return err
 		}

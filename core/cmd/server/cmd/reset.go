@@ -39,7 +39,7 @@ var resetMFACmd = &cobra.Command{
 			fmt.Println(i18n.GetMsgWithMapForCmd("SudoHelper", map[string]interface{}{"cmd": "sudo 1pctl reset mfa"}))
 			return nil
 		}
-		db, err := loadDBConn()
+		db, err := loadDBConn("core.db")
 		if err != nil {
 			return err
 		}
@@ -55,7 +55,7 @@ var resetSSLCmd = &cobra.Command{
 			fmt.Println(i18n.GetMsgWithMapForCmd("SudoHelper", map[string]interface{}{"cmd": "sudo 1pctl reset https"}))
 			return nil
 		}
-		db, err := loadDBConn()
+		db, err := loadDBConn("core.db")
 		if err != nil {
 			return err
 		}
@@ -71,7 +71,7 @@ var resetEntranceCmd = &cobra.Command{
 			fmt.Println(i18n.GetMsgWithMapForCmd("SudoHelper", map[string]interface{}{"cmd": "sudo 1pctl reset entrance"}))
 			return nil
 		}
-		db, err := loadDBConn()
+		db, err := loadDBConn("core.db")
 		if err != nil {
 			return err
 		}
@@ -87,7 +87,7 @@ var resetBindIpsCmd = &cobra.Command{
 			fmt.Println(i18n.GetMsgWithMapForCmd("SudoHelper", map[string]interface{}{"cmd": "sudo 1pctl reset ips"}))
 			return nil
 		}
-		db, err := loadDBConn()
+		db, err := loadDBConn("core.db")
 		if err != nil {
 			return err
 		}
@@ -103,7 +103,7 @@ var resetDomainCmd = &cobra.Command{
 			fmt.Println(i18n.GetMsgWithMapForCmd("SudoHelper", map[string]interface{}{"cmd": "sudo 1pctl reset domain"}))
 			return nil
 		}
-		db, err := loadDBConn()
+		db, err := loadDBConn("core.db")
 		if err != nil {
 			return err
 		}
