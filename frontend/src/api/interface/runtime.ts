@@ -41,6 +41,7 @@ export namespace Runtime {
         exposedPorts?: ExposedPort[];
         environments?: Environment[];
         volumes?: Volume[];
+        container: string;
     }
 
     export interface RuntimeCreate {

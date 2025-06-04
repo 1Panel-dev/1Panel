@@ -203,7 +203,11 @@ const openCreate = () => {
 };
 
 const openLog = (row: AI.McpServer) => {
-    composeLogRef.value.acceptParams({ compose: row.dir + '/docker-compose.yml', resource: row.name });
+    composeLogRef.value.acceptParams({
+        compose: row.dir + '/docker-compose.yml',
+        resource: row.name,
+        container: row.containerName,
+    });
 };
 
 const deleteServer = async (row: AI.McpServer) => {

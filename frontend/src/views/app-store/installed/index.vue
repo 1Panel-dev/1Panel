@@ -694,7 +694,11 @@ const openLog = (row: any) => {
             taskLogRef.value.openWithResourceID('App', 'TaskInstall', row.id);
             break;
         default:
-            composeLogRef.value.acceptParams({ compose: row.path + '/docker-compose.yml', resource: row.name });
+            composeLogRef.value.acceptParams({
+                compose: row.path + '/docker-compose.yml',
+                resource: row.name,
+                container: row.container,
+            });
     }
 };
 

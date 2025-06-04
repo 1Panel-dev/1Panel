@@ -225,7 +225,11 @@ const openTerminal = (row: Runtime.Runtime) => {
 };
 
 const openLog = (row: any) => {
-    composeLogRef.value.acceptParams({ compose: row.path + '/docker-compose.yml', resource: row.name });
+    composeLogRef.value.acceptParams({
+        compose: row.path + '/docker-compose.yml',
+        resource: row.name,
+        container: row.container,
+    });
 };
 
 const goDashboard = async (port: any, protocol: string) => {

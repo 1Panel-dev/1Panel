@@ -219,7 +219,11 @@ const openDelete = (row: Runtime.Runtime) => {
 };
 
 const openLog = (row: any) => {
-    composeLogRef.value.acceptParams({ compose: row.path + '/docker-compose.yml', resource: row.name });
+    composeLogRef.value.acceptParams({
+        compose: row.path + '/docker-compose.yml',
+        resource: row.name,
+        container: row.container,
+    });
 };
 
 const openTerminal = (row: Runtime.Runtime) => {

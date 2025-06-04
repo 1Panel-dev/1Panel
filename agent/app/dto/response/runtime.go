@@ -29,6 +29,7 @@ type RuntimeDTO struct {
 	Environments    []request.Environment  `json:"environments"`
 	Volumes         []request.Volume       `json:"volumes"`
 	ContainerStatus string                 `json:"containerStatus"`
+	Container       string                 `json:"container"`
 }
 
 type PackageScripts struct {
@@ -51,6 +52,7 @@ func NewRuntimeDTO(runtime model.Runtime) RuntimeDTO {
 		Version:     runtime.Version,
 		Port:        runtime.Port,
 		Path:        runtime.GetPath(),
+		Container:   runtime.ContainerName,
 	}
 }
 

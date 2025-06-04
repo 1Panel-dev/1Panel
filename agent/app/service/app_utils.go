@@ -1483,7 +1483,8 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool)
 				Website:  installed.App.Website,
 				Document: installed.App.Document,
 			},
-			Favorite: installed.Favorite,
+			Favorite:  installed.Favorite,
+			Container: installed.ContainerName,
 		}
 		if updated {
 			installDTO.DockerCompose = installed.DockerCompose

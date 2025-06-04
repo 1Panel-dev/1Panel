@@ -12,7 +12,12 @@
             </el-tooltip>
         </template>
         <template #content>
-            <ContainerLog :compose="compose" :resource="resource" :highlightDiff="highlightDiff" />
+            <ContainerLog
+                :compose="compose"
+                :resource="resource"
+                :container="container"
+                :highlightDiff="highlightDiff"
+            />
         </template>
     </DrawerPro>
 </template>
@@ -26,6 +31,7 @@ import ContainerLog from '@/components/log/container/index.vue';
 
 const open = ref(false);
 const resource = ref('');
+const container = ref('');
 const globalStore = GlobalStore();
 const logVisible = ref(false);
 const compose = ref('');
@@ -34,6 +40,7 @@ const highlightDiff = ref(320);
 interface DialogProps {
     compose: string;
     resource: string;
+    container: string;
 }
 
 const defaultProps = defineProps({
@@ -67,6 +74,7 @@ const acceptParams = (props: DialogProps): void => {
     highlightDiff.value = defaultProps.highlightDiff;
     compose.value = props.compose;
     resource.value = props.resource;
+    container.value = props.container;
     open.value = true;
 };
 

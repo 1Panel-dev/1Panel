@@ -126,6 +126,7 @@ type AppInstallDTO struct {
 	CreatedAt     time.Time `json:"createdAt"`
 	Favorite      bool      `json:"favorite"`
 	App           AppDetail `json:"app"`
+	Container     string    `json:"container"`
 }
 
 type DatabaseConn struct {

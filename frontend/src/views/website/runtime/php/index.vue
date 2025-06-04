@@ -278,7 +278,11 @@ const openTerminal = (row: Runtime.Runtime) => {
 
 const openLog = (row: Runtime.RuntimeDTO) => {
     if (row.status == 'Running') {
-        composeLogRef.value.acceptParams({ compose: row.path + '/docker-compose.yml', resource: row.name });
+        composeLogRef.value.acceptParams({
+            compose: row.path + '/docker-compose.yml',
+            resource: row.name,
+            container: row.container,
+        });
     } else {
         logRef.value.acceptParams({ id: row.id, type: 'php', tail: row.status == 'Building' });
     }
