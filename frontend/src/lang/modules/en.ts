@@ -81,6 +81,8 @@ const message = {
             down: 'Stop',
             up: 'Start',
             sure: 'Confirm',
+            show: 'Show',
+            hide: 'Hide',
         },
         operate: {
             start: 'Start',
@@ -1964,6 +1966,7 @@ const message = {
         alert: 'Upgrade to the professional version to receive alarm information via SMS and view alarm logs, fully control various key events, and ensure worry-free system operation',
         node: 'Upgrading to the professional version allows you to manage multiple Linux servers with 1Panel.',
         fileExchange: 'Upgrade to the Professional Edition to quickly transfer files between multiple servers.',
+        app: 'Upgrade to the professional version to view service information, abnormal monitoring, etc. through the mobile APP. ',
     },
     clean: {
         scan: 'Start Scanning',
@@ -2834,6 +2837,19 @@ const message = {
         expiresAlert:
             'Friendly reminder: Your Pro license will expire in {0} days, and all Pro features will no longer be accessible. Please renew promptly to ensure continued usage.',
         menu: 'Pro',
+        app: {
+            app: 'APP',
+            title: 'Panel Alias',
+            titleHelper: 'The panel alias is used for display in the APP (default panel alias)',
+            qrCode: 'QR Code',
+            apiStatusHelper: 'The Panel APP needs to enable the API interface feature',
+            apiInterfaceHelper:
+                'Supports panel API interface access (this feature needs to be enabled for the panel app)',
+            apiInterfaceHelper1:
+                "Panel app access requires adding the visitor to the whitelist; for non-fixed IPs, it's recommended to add 0.0.0.0/0",
+            qrCodeExpired: 'Refresh time',
+            apiLeakageHelper: 'Do not disclose the QR code. Ensure it is used only in trusted environments.',
+        },
         waf: {
             name: 'WAF',
             blackWhite: 'Black and White List',
@@ -3317,6 +3333,15 @@ const message = {
             fileExchangeTitle3: 'Support Multi-Node Intercommunication',
             fileExchangeContent3:
                 'Easily transfer project files between different nodes, flexible management of multiple servers.',
+
+            appTitle1: 'Flexible Panel Management',
+            appContent1: 'Easily manage your 1Panel server anytime, anywhere.',
+            appTitle2: 'Comprehensive Service Information',
+            appContent2:
+                'Manage basic applications, websites, Docker, databases, etc., and quickly create applications and websites via the mobile app.',
+            appTitle3: 'Real-Time Abnormal Monitoring',
+            appContent3:
+                'View real-time server status, WAF security monitoring, website traffic statistics, and process health status on the mobile app.',
         },
         node: {
             master: 'Main Node',

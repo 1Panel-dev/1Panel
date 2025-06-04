@@ -90,7 +90,7 @@ FailedStatus: "{{ .name }} falhou {{ .err }}"
 Start: "Iniciar"
 SubTask: "Subtarefa"
 
-#script 
+#script
 ScriptLibrary: "Biblioteca de Scripts"
 
 Node: "Nó"
@@ -187,3 +187,8 @@ UserInfoPassHelp: "Dica: Para alterar a senha, você pode executar o comando: "
 DBConnErr: "Erro: Falha ao inicializar a conexão com o banco de dados, {{ .err }}"
 SystemVersion: "versão: "
 SystemMode: "modo: "
+
+#mobile app
+ErrVerifyToken: 'Erro de verificação do token, por favor, reinicie e escaneie novamente.'
+ErrInvalidToken: 'Token inválido, por favor, reinicie e escaneie novamente.'
+ErrExpiredToken: 'O token expirou, por favor, reinicie e escaneie novamente.'

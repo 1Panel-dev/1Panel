@@ -81,6 +81,8 @@ const message = {
             down: '停止',
             up: '啟動',
             sure: '確定',
+            show: '顯示',
+            hide: '隱藏',
         },
         operate: {
             start: '啟動',
@@ -1821,6 +1823,7 @@ const message = {
         alert: '陞級專業版可通過簡訊接收告警資訊，並查看告警日誌，全面掌控各類關鍵事件，確保系統運行無憂。',
         node: '升級專業版可以使用 1Panel 管理多台 linux 伺服器。',
         fileExchange: '升級專業版可以在多台服務器之間快速傳輸文件。',
+        app: '升級專業版可通過手機APP，查看服務資訊、异常監控等。',
     },
     clean: {
         scan: '開始掃描',
@@ -2623,6 +2626,17 @@ const message = {
         expiresAlert:
             '溫馨提醒：您的專業版許可證將在 {0} 天後到期，屆時所有專業版功能將無法繼續使用，請及時續費以保證正常使用。',
         menu: '高級功能',
+        app: {
+            app: 'APP',
+            title: '面板別名',
+            titleHelper: '面板別名用於 APP 端的顯示（默認面板別名）',
+            qrCode: '二維碼',
+            apiStatusHelper: '面板 APP 需要開啟 API 接口功能',
+            apiInterfaceHelper: '支持面板 API 接口訪問功能（面板 APP 需要開啟該功能）',
+            apiInterfaceHelper1: '面板 APP 訪問需將訪問者添加至白名單，非固定 IP 建議添加 0.0.0.0/0',
+            qrCodeExpired: '刷新時間',
+            apiLeakageHelper: '請勿洩露二維碼，確保僅在受信任的環境中使用',
+        },
         waf: {
             name: 'WAF',
             blackWhite: '黑白名單',
@@ -3073,6 +3087,13 @@ const message = {
             fileExchangeContent2: '僅同步變化內容，大幅提高傳輸速度與穩定性。',
             fileExchangeTitle3: '支持多節點互傳',
             fileExchangeContent3: '可在不同節點間便捷傳送項目文件，靈活管理多台服務器。',
+
+            appTitle1: '靈活管理面板',
+            appContent1: '隨時隨地輕鬆管理你的 1Panel 伺服器。',
+            appTitle2: '全面服務資訊',
+            appContent2: '在移動端進行應用、網站、Docker、資料庫等基礎管理，支持快速創建應用與網站。',
+            appTitle3: '實時異常監控',
+            appContent3: '移動端實時查看伺服器狀態、WAF 安全監控、網站訪問統計與進程健康狀況。',
         },
         node: {
             master: '主節點',

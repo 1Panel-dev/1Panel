@@ -78,6 +78,8 @@ const message = {
             down: 'Hentikan',
             up: 'Mulakan',
             sure: 'Sahkan',
+            show: 'Tunjukkan',
+            hide: 'Sembunyikan',
         },
         operate: {
             start: 'Mula',
@@ -1928,6 +1930,7 @@ const message = {
             'Tingkatkan ke versi profesional untuk melihat status masa nyata laman web, tren pelawat, sumber pelawat, log permintaan dan maklumat lain.',
         alert: 'Tingkatkan ke versi profesional untuk menerima maklumat amaran melalui SMS dan melihat log amaran, mengawal sepenuhnya pelbagai acara utama, dan memastikan operasi sistem bebas kerisauan.',
         fileExchange: 'Naik taraf ke Edisi Professional untuk menghantar fail dengan cepat antara pelbagai pelayan.',
+        app: 'Tingkatkan ke versi profesional untuk melihat maklumat perkhidmatan, pemantauan abnormal, dll melalui aplikasi mudah alih.',
     },
     clean: {
         scan: 'Mulakan imbasan',
@@ -2760,6 +2763,19 @@ const message = {
         expiresAlert:
             'Peringatan mesra: Lesen Pro anda akan tamat dalam {0} hari, dan semua ciri Pro tidak lagi dapat diakses. Sila perbaharui segera untuk memastikan penggunaan berterusan.',
         menu: 'Pro',
+        app: {
+            app: 'APP',
+            title: 'Nama Panel',
+            titleHelper: 'Alias panel digunakan untuk paparan di APP (alias panel lalai)',
+            qrCode: 'Kod QR',
+            apiStatusHelper: 'APP Panel perlu mengaktifkan fungsi API',
+            apiInterfaceHelper:
+                'Menyokong akses antara muka API panel (fungsi ini perlu diaktifkan untuk aplikasi panel)',
+            apiInterfaceHelper1:
+                'Akses aplikasi panel memerlukan penambahan pelawat ke dalam senarai putih, untuk IP yang tidak tetap, disyorkan untuk menambah 0.0.0.0/0',
+            qrCodeExpired: 'Masa penyegaran',
+            apiLeakageHelper: 'Jangan dedahkan kod QR. Pastikan ia hanya digunakan di persekitaran yang dipercayai.',
+        },
         waf: {
             name: 'WAF',
             blackWhite: 'Senarai Hitam dan Putih',
@@ -3244,6 +3260,15 @@ const message = {
             fileExchangeTitle3: 'Sokongan Pertukaran Inter-Node',
             fileExchangeContent3:
                 'Mudah memindahkan fail projek antara nod yang berbeza, mengurus pelbagai pelayan dengan fleksibiliti.',
+
+            appTitle1: 'Pengurusan Panel yang Fleksibel',
+            appContent1: 'Uruskan pelayan 1Panel anda dengan mudah pada bila-bila masa dan di mana sahaja.',
+            appTitle2: 'Maklumat Perkhidmatan Komprehensif',
+            appContent2:
+                'Uruskan aplikasi, laman web, Docker, pangkalan data, dll melalui aplikasi mudah alih dan sokong pembinaan pantas aplikasi dan laman web.',
+            appTitle3: 'Pemantauan Anomali Masa Nyata',
+            appContent3:
+                'Lihat status pelayan, pemantauan keselamatan WAF, statistik pelawat laman web dan status kesihatan proses di aplikasi mudah alih secara masa nyata.',
         },
         node: {
             master: 'Nod Utama',

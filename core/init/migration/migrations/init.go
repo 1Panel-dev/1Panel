@@ -1,8 +1,11 @@
 package migrations
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"path"
+	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/core/app/model"
@@ -278,5 +281,59 @@ var UpdateDeveloperMode = &gormigrate.Migration{
 			return err
 		}
 		return nil
+	},
+}
+
+var AddXpackHideMenu = &gormigrate.Migration{
+	ID: "20250529-add-xpack-hide-menu",
+	Migrate: func(tx *gorm.DB) error {
+		var menuJSON string
+		if err := tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Pluck("value", &menuJSON).Error; err != nil {
+			return err
+		}
+		if strings.Contains(menuJSON, `"XApp"`) && strings.Contains(menuJSON, `"/xpack/app"`) {
+			return nil
+		}
+
+		var menus []dto.ShowMenu
+		if err := json.Unmarshal([]byte(menuJSON), &menus); err != nil {
+			return tx.Model(&model.Setting{}).
+				Where("key = ?", "HideMenu").
+				Update("value", helper.LoadMenus()).Error
+		}
+
+		newItem := dto.ShowMenu{
+			ID:       "118",
+			Disabled: false,
+			Title:    "xpack.app.app",
+			IsShow:   true,
+			Label:    "XApp",
+			Path:     "/xpack/app",
+		}
+
+		for i, menu := range menus {
+			if menu.ID == "11" {
+				exists := false
+				for _, child := range menu.Children {
+					if child.ID == newItem.ID {
+						exists = true
+						break
+					}
+				}
+				if !exists {
+					menus[i].Children = append(menus[i].Children, newItem)
+				}
+				break
+			}
+		}
+
+		updatedJSON, err := json.Marshal(menus)
+		if err != nil {
+			return tx.Model(&model.Setting{}).
+				Where("key = ?", "HideMenu").
+				Update("value", helper.LoadMenus()).Error
+		}
+
+		return tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Update("value", string(updatedJSON)).Error
 	},
 }

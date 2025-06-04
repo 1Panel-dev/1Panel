@@ -90,7 +90,7 @@ FailedStatus: "{{ .name }} 失敗 {{ .err }}"
 Start: "開始"
 SubTask: "子任務"
 
-#script 
+#script
 ScriptLibrary: "腳本庫"
 
 Node: "節點"
@@ -187,3 +187,8 @@ UserInfoPassHelp: "提示: 修改密碼可執行命令: "
 DBConnErr: "錯誤: 初始化資料庫連接失敗，{{ .err }}"
 SystemVersion: "版本: "
 SystemMode: "模式: "
+
+#mobile app
+ErrVerifyToken: '令牌驗證錯誤，請重置後再次掃碼'
+ErrInvalidToken: '無效的令牌，請重置後再次掃碼'
+ErrExpiredToken: '令牌過期，請重置後再次掃碼'

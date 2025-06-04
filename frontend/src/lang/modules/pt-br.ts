@@ -78,6 +78,8 @@ const message = {
             down: 'Parar',
             up: 'Iniciar',
             sure: 'Confirmar',
+            show: 'Exibir',
+            hide: 'Ocultar',
         },
         operate: {
             start: 'Iniciar',
@@ -1918,6 +1920,7 @@ const message = {
         alert: 'Upgrade para a versão profissional para receber informações de alarme via SMS e visualizar logs de alarmes, controlar completamente vários eventos chave e garantir a operação sem preocupações do sistema',
         fileExchange:
             'Atualize para a Edição Profissional para transferir arquivos rapidamente entre vários servidores.',
+        app: 'Upgrade para a versão profissional para visualizar informações do serviço, monitoramento anômalo, etc., através do aplicativo móvel.',
     },
     clean: {
         scan: 'Iniciar escaneamento',
@@ -2760,6 +2763,19 @@ const message = {
         expiresAlert:
             'Lembrete: Sua licença profissional expirará em {0} dias. Após isso, todas as funcionalidades da versão profissional não estarão mais disponíveis. Por favor, renove sua licença para garantir o uso contínuo.',
         menu: 'Pro',
+        app: {
+            app: 'APP',
+            title: 'Apelido do Painel',
+            titleHelper: 'O alias do painel é usado para exibição no APP (alias do painel padrão)',
+            qrCode: 'QR Code',
+            apiStatusHelper: 'O APP do Painel precisa habilitar a funcionalidade da interface API',
+            apiInterfaceHelper:
+                'Suporta acesso à interface de API do painel (essa funcionalidade precisa ser ativada no aplicativo do painel)',
+            apiInterfaceHelper1:
+                'O acesso ao aplicativo do painel requer que o visitante seja adicionado à lista de permissões; para IPs não fixos, recomenda-se adicionar 0.0.0.0/0',
+            qrCodeExpired: 'Tempo de atualização',
+            apiLeakageHelper: 'Não revele o QR code. Garanta que ele seja usado apenas em ambientes confiáveis.',
+        },
         waf: {
             name: 'WAF',
             blackWhite: 'Lista negra e branca',
@@ -3250,6 +3266,15 @@ const message = {
             fileExchangeTitle3: 'Suporte a Troca Entre Múltiplos Nós',
             fileExchangeContent3:
                 'Transfira facilmente arquivos de projeto entre diferentes nós, gerencie vários servidores de forma flexível.',
+
+            appTitle1: 'Gerenciamento Flexível do Painel',
+            appContent1: 'Gerencie facilmente seu servidor 1Panel a qualquer hora e em qualquer lugar.',
+            appTitle2: 'Informações Completas do Serviço',
+            appContent2:
+                'Gerencie aplicativos, sites, Docker, bancos de dados, etc. pelo app móvel e crie rapidamente aplicativos e sites.',
+            appTitle3: 'Monitoramento Anômalo em Tempo Real',
+            appContent3:
+                'Veja o status do servidor, monitoramento de segurança WAF, estatísticas de visitas ao site e saúde dos processos em tempo real no aplicativo móvel.',
         },
         node: {
             master: 'Nó Principal',

@@ -90,7 +90,7 @@ FailedStatus: "{{ .name }} failed {{ .err }}"
 Start: "Start"
 SubTask: "Subtask"
 
-#script 
+#script
 ScriptLibrary: "Script Library"
 
 Node: "Node"
@@ -187,3 +187,8 @@ UserInfoPassHelp: "Tip: To change the password, you can execute the command: "
 DBConnErr: "Error: Failed to initialize database connection, {{ .err }}"
 SystemVersion: "version: "
 SystemMode: "mode: "
+
+#mobile app
+ErrVerifyToken: 'Token verification error, please reset and scan again.'
+ErrInvalidToken: 'Invalid token, please reset and scan again.'
+ErrExpiredToken: 'Token has expired, please reset and scan again.'

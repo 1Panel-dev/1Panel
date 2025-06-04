@@ -90,7 +90,7 @@ FailedStatus: "{{ .name }} 실패 {{ .err }}"
 Start: "시작"
 SubTask: "서브 작업"
 
-#script 
+#script
 ScriptLibrary: "스크립트 라이브러리"
 
 Node: "노드"
@@ -187,3 +187,8 @@ UserInfoPassHelp: "팁: 비밀번호를 변경하려면 다음 명령어를 실�
 DBConnErr: "오류: 데이터베이스 연결 초기화 실패 {{ .err }}"
 SystemVersion: "버전: "
 SystemMode: "모드: "
+
+#mobile app
+ErrVerifyToken: '토큰 검증 오류가 발생했습니다. 재설정 후 다시 스캔해 주세요.'
+ErrInvalidToken: '유효하지 않은 토큰입니다. 재설정 후 다시 스캔해 주세요.'
+ErrExpiredToken: '토큰이 만료되었습니다. 재설정 후 다시 스캔해 주세요.'

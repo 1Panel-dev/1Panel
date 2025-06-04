@@ -32,7 +32,7 @@ ErrLocalDelete: "无法删除本地节点！"
 ErrPortInUsed: "{{ .name }} 端口已被占用！"
 ErrInternalServerKey: "服务内部错误:"
 
-#app 
+#app
 CustomAppStoreFileValid: "应用商店包需要 .tar.gz 格式"
 ErrFileNotFound: '{{ .name }} 文件不存在'
 
@@ -85,12 +85,12 @@ SubTaskFailed: "{{ .name }} 失败: {{ .err }}"
 TaskInstall: "安装"
 TaskUpgrade: "升级"
 TaskSync: "同步"
-SuccessStatus: "{{ .name }} 成功" 
+SuccessStatus: "{{ .name }} 成功"
 FailedStatus: "{{ .name }} 失败 {{ .err }}"
 Start: "开始"
 SubTask: "子任务"
 
-#script 
+#script
 ScriptLibrary: "脚本库"
 
 #sync node
@@ -196,3 +196,8 @@ HandlePublicKey: "处理节点公钥"
 ExchangeFile: "开始从 {{ .source }} 节点同步 {{ .sourcePath }} 到 {{ .dest  }} 节点 {{ .destPath }}"
 TaskRsync: "同步"
 NodeFile: "节点文件"
+
+#mobile app
+ErrVerifyToken: '令牌验证错误，请重置后再次扫码'
+ErrInvalidToken: '无效的令牌，请重置后再次扫码'
+ErrExpiredToken: '令牌过期，请重置后再次扫码'

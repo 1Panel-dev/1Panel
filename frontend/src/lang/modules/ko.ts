@@ -78,6 +78,8 @@ const message = {
             down: '중지',
             up: '시작',
             sure: '확인',
+            show: '보기',
+            hide: '숨기기',
         },
         operate: {
             start: '시작',
@@ -1840,6 +1842,7 @@ const message = {
             '전문 버전으로 업그레이드하면 웹사이트의 실시간 상태, 방문자 트렌드, 방문자 출처, 요청 로그 등 정보를 확인할 수 있습니다.',
         alert: '전문 버전으로 업그레이드하면 SMS 를 통해 알림 정보를 받고 알림 로그를 볼 수 있으며, 다양한 주요 이벤트를 완벽하게 제어하여 시스템 운영을 걱정 없이 유지할 수 있습니다.',
         fileExchange: '프로페셔널 에디션으로 업그레이드하여 여러 서버 간에 파일을 빠르게 전송할 수 있습니다.',
+        app: '프로페셔널 버전으로 업그레이드하면 모바일 APP을 통해 서비스 정보, 이상 모니터링 등을 확인할 수 있습니다.',
     },
     clean: {
         scan: '스캔 시작',
@@ -2656,6 +2659,18 @@ const message = {
         expiresAlert:
             '친절한 알림: 귀하의 Pro 라이선스가 {0}일 후 만료되며, 모든 Pro 기능에 더 이상 접근할 수 없습니다. 지속적인 사용을 위해 신속하게 갱신하시기 바랍니다.',
         menu: 'Pro',
+        app: {
+            app: 'APP',
+            title: '패널 별칭',
+            titleHelper: '패널 별칭은 APP 에서 표시되는 데 사용됩니다(기본 패널 별칭)',
+            qrCode: 'QR 코드',
+            apiStatusHelper: '패널 APP 는 API 인터페이스 기능을 활성화해야 합니다',
+            apiInterfaceHelper: '패널 API 인터페이스 액세스를 지원합니다(패널 앱에서 이 기능을 활성화해야 합니다)',
+            apiInterfaceHelper1:
+                '패널 앱의 액세스에는 방문자를 화이트리스트에 추가해야 하며, 고정 IP가 아닌 경우 0.0.0.0/0 을 추가하는 것이 좋습니다',
+            qrCodeExpired: '새로 고침 시간',
+            apiLeakageHelper: 'QR 코드를 누출하지 마십시오. 신뢰할 수 있는 환경에서만 사용하십시오.',
+        },
         waf: {
             WAF: 'WAF',
             blackWhite: '블랙 및 화이트 목록',
@@ -3119,6 +3134,15 @@ const message = {
             fileExchangeContent2: '변경된 내용만 동기화하여 전송 속도와 안정성을 크게 향상시킵니다.',
             fileExchangeTitle3: '다중 노드 상호 통신 지원',
             fileExchangeContent3: '다른 노드 간에 프로젝트 파일을 쉽게 전송하고, 여러 서버를 유연하게 관리합니다.',
+
+            appTitle1: '유연한 패널 관리',
+            appContent1: '언제 어디서나 1Panel 서버를 쉽게 관리하세요.',
+            appTitle2: '종합적인 서비스 정보',
+            appContent2:
+                '모바일 앱에서 애플리케이션, 웹사이트, Docker, 데이터베이스 등의 기본 관리를 하고, 애플리케이션과 웹사이트의 빠른 생성을 지원합니다.',
+            appTitle3: '실시간 이상 모니터링',
+            appContent3:
+                '모바일 앱에서 서버 상태, WAF 보안 모니터링, 웹사이트 방문 통계 및 프로세스 건강 상태를 실시간으로 확인하세요.',
         },
         node: {
             master: '주 노드',

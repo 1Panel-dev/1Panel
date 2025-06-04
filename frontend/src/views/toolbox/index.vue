@@ -34,12 +34,13 @@ const confirmDialogRef = ref();
 const globalStore = GlobalStore();
 
 const onRestart = (type: string) => {
+    let header = i18n.global.t('home.restart_' + type);
     if (globalStore.currentNode != 'local' && type === '1panel') {
         type = '1panel-agent';
     }
     restartType.value = type;
     let params = {
-        header: i18n.global.t('home.restart_' + type),
+        header: header,
         operationInfo: '',
         submitInputInfo: i18n.global.t('database.restartNow'),
     };

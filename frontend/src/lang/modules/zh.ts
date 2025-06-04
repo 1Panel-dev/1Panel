@@ -81,6 +81,8 @@ const message = {
             down: '停止',
             up: '启动',
             sure: '确定',
+            show: '显示',
+            hide: '隐藏',
         },
         operate: {
             start: '启动',
@@ -1813,6 +1815,7 @@ const message = {
         alert: '升级专业版可通过短信接收告警信息，并查看告警日志，全面掌控各类关键事件，确保系统运行无忧。',
         node: '升级专业版可以使用 1Panel 管理多台 linux 服务器。',
         fileExchange: '升级专业版可以在多台服务器之间快速传输文件。',
+        app: '升级专业版可通过手机 APP，查看服务信息、异常监控等。',
     },
     clean: {
         scan: '开始扫描',
@@ -3055,6 +3058,13 @@ const message = {
             fileExchangeContent2: '仅同步变化内容，大幅提高传输速度与稳定性。',
             fileExchangeTitle3: '支持多节点互传',
             fileExchangeContent3: '可在不同节点间便捷传送项目文件，灵活管理多台服务器。',
+
+            appTitle1: '灵活管理面板',
+            appContent1: '随时随地轻松管理你的 1Panel 服务器。',
+            appTitle2: '全面服务信息',
+            appContent2: '在移动端进行应用、网站、Docker、数据库等基础管理，支持快速创建应用与网站。',
+            appTitle3: '实时异常监控',
+            appContent3: '移动端实时查看服务器状态、WAF 安全监控、网站访问统计与进程健康状况。',
         },
         node: {
             master: '主节点',
@@ -3292,6 +3302,17 @@ const message = {
             customColor: '自定义主题色',
             setDefaultHelper: '即将恢复主题配色到初始状态，是否继续？',
             setHelper: '即将保存当前选定的主题配色，是否继续？',
+        },
+        app: {
+            app: 'APP',
+            title: '面板别名',
+            titleHelper: '面板别名用于 APP 端的显示（默认面板别名）',
+            qrCode: '二维码',
+            apiStatusHelper: '面板 APP 需要开启 API 接口功能',
+            apiInterfaceHelper: '支持面板 API 接口访问功能（面板 APP 需要开启该功能）',
+            apiInterfaceHelper1: '面板 APP 访问需将访问者添加至白名单，非固定 IP 建议添加 0.0.0.0/0',
+            qrCodeExpired: '刷新时间',
+            apiLeakageHelper: '请勿泄露二维码，确保仅在受信任的环境中使用',
         },
         exchange: {
             exchange: '文件对传',
