@@ -6,9 +6,6 @@
                     {{ props.database }}
                 </el-text>
                 <el-divider direction="vertical" />
-                <el-button type="primary" :plain="activeName !== 'conf'" @click="jumpToConf">
-                    {{ $t('database.confChange') }}
-                </el-button>
                 <el-button
                     type="primary"
                     :disabled="mysqlStatus !== 'Running'"
@@ -16,6 +13,9 @@
                     @click="changeTab('status')"
                 >
                     {{ $t('database.currentStatus') }}
+                </el-button>
+                <el-button type="primary" :plain="activeName !== 'conf'" @click="jumpToConf">
+                    {{ $t('database.confChange') }}
                 </el-button>
                 <el-button
                     type="primary"
@@ -136,7 +136,7 @@ import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 
 const loading = ref(false);
 
-const activeName = ref('conf');
+const activeName = ref('status');
 
 const baseInfo = reactive({
     name: '',
