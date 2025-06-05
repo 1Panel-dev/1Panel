@@ -267,10 +267,14 @@ func loadDbConn(snap *snapHelper, targetDir string, req dto.SnapshotCreate) erro
 		}
 		_ = taskDB.Where("id = ?", req.TaskID).Delete(&model.Task{}).Error
 	}
-	if !req.WithOperationLog {
-		_ = snap.snapCoreDB.Exec("DELETE FROM operation_logs").Error
+	if !req.WithOperationLog && global.IsMaster {
+		err = snap.snapCoreDB.Exec("DELETE FROM operation_logs").Error
+		snap.Task.LogWithStatus(i18n.GetMsgByKey("SnapDeleteOperationLog"), err)
+		if err != nil {
+			return err
+		}
 	}
-	if !req.WithLoginLog {
+	if !req.WithLoginLog && global.IsMaster {
 		err = snap.snapCoreDB.Exec("DELETE FROM login_logs").Error
 		snap.Task.LogWithStatus(i18n.GetMsgByKey("SnapDeleteLoginLog"), err)
 		if err != nil {

@@ -118,15 +118,14 @@ func (u *SnapshotService) LoadSnapshotData() (dto.SnapshotData, error) {
 	if err != nil {
 		return data, err
 	}
-	for i, item := range itemBackups {
-		if item.Label == "app" {
-			itemBackups = append(itemBackups[:i], itemBackups[i+1:]...)
-		}
-		if item.Label == "system_snapshot" {
-			itemBackups = append(itemBackups[:i], itemBackups[i+1:]...)
+	i := 0
+	for _, item := range itemBackups {
+		if item.Label != "app" && item.Label != "system_snapshot" {
+			itemBackups[i] = item
+			i++
 		}
 	}
-	data.BackupData = itemBackups
+	data.BackupData = itemBackups[:i]
 
 	return data, nil
 }
@@ -329,7 +328,7 @@ func loadPanelFile(fileOp fileUtils.FileOp) ([]dto.DataTree, error) {
 			itemData.IsDisable = true
 		case "clamav", "download", "resource":
 			panelPath := path.Join(global.Dir.DataDir, itemData.Label)
-			itemData.Children, _ = loadFile(panelPath, 5, fileOp)
+			itemData.Children, _ = loadFile(panelPath, 3, fileOp)
 		case "apps", "backup", "log", "db", "tmp":
 			continue
 		}
@@ -376,7 +375,6 @@ func loadFile(pathItem string, index int, fileOp fileUtils.FileOp) ([]dto.DataTr
 	if err != nil {
 		return data, err
 	}
-	i := 0
 	for _, fileItem := range snapFiles {
 		itemData := dto.DataTree{
 			ID:      uuid.NewString(),
@@ -391,7 +389,9 @@ func loadFile(pathItem string, index int, fileOp fileUtils.FileOp) ([]dto.DataTr
 				continue
 			}
 			itemData.Size = uint64(sizeItem)
-			itemData.Children, _ = loadFile(path.Join(pathItem, itemData.Label), index-1, fileOp)
+			if index > 1 {
+				itemData.Children, _ = loadFile(path.Join(pathItem, itemData.Label), index-1, fileOp)
+			}
 		} else {
 			fileInfo, err := fileItem.Info()
 			if err != nil {
@@ -400,7 +400,6 @@ func loadFile(pathItem string, index int, fileOp fileUtils.FileOp) ([]dto.DataTr
 			itemData.Size = uint64(fileInfo.Size())
 		}
 		data = append(data, itemData)
-		i++
 	}
 	return data, nil
 }

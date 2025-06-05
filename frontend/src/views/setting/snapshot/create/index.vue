@@ -147,7 +147,7 @@
         <template #footer>
             <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
             <el-button @click="prev" v-if="nowIndex !== 0">{{ $t('commons.button.prev') }}</el-button>
-            <el-button type="primary" v-if="nowIndex === 4" @click="submitAddSnapshot">
+            <el-button type="primary" v-if="nowIndex === 4" :disabled="loading" @click="submitAddSnapshot">
                 {{ $t('commons.button.create') }}
             </el-button>
             <el-button @click="next" v-else>{{ $t('commons.button.next') }}</el-button>
