@@ -493,3 +493,45 @@ func (b *BaseApi) OperateSupervisorProcessFile(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, res)
 }
+
+// @Tags Runtime
+// @Summary Update PHP container config
+// @Accept json
+// @Param request body request.PHPContainerUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /runtimes/php/container/update [post]
+func (b *BaseApi) UpdatePHPContainer(c *gin.Context) {
+	var req request.PHPContainerConfig
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := runtimeService.UpdatePHPContainer(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags Runtime
+// @Summary Get PHP container config
+// @Accept json
+// @Param id path integer true "request"
+// @Success 200 {object} response.PHPContainerConfig
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /runtimes/php/container/:id [get]
+func (b *BaseApi) GetPHPContainerConfig(c *gin.Context) {
+	id, err := helper.GetParamID(c)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	data, err := runtimeService.GetPHPContainerConfig(id)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}

@@ -210,4 +210,12 @@ export namespace Runtime {
         numprocs: string;
         id: number;
     }
+
+    export interface PHPContainerConfig {
+        id: number;
+        containerName: string;
+        exposedPorts: ExposedPort[];
+        environments: Environment[];
+        volumes: Volume[];
+    }
 }

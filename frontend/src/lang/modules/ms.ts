@@ -2467,6 +2467,9 @@ const message = {
         extension: 'Sambungan',
         extensionHelper: 'Gunakan pemisah untuk banyak sambungan',
         toExtensionsList: 'Lihat senarai sambungan',
+        containerConfig: 'Konfigurasi Bekas',
+        containerConfigHelper:
+            'Pembolehubah persekitaran dan maklumat lain boleh diubah suai dalam Konfigurasi - Konfigurasi Bekas selepas penciptaan',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: 'Saiz jadual hash nama pelayan',

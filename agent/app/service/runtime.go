@@ -56,12 +56,16 @@ type IRuntimeService interface {
 	GetPHPExtensions(runtimeID uint) (response.PHPExtensionRes, error)
 	InstallPHPExtension(req request.PHPExtensionInstallReq) error
 	UnInstallPHPExtension(req request.PHPExtensionInstallReq) error
+
 	GetPHPConfig(id uint) (*response.PHPConfig, error)
 	UpdatePHPConfig(req request.PHPConfigUpdate) (err error)
 	UpdatePHPConfigFile(req request.PHPFileUpdate) error
 	GetPHPConfigFile(req request.PHPFileReq) (*response.FileInfo, error)
 	UpdateFPMConfig(req request.FPMConfig) error
 	GetFPMConfig(id uint) (*request.FPMConfig, error)
+
+	UpdatePHPContainer(req request.PHPContainerConfig) error
+	GetPHPContainerConfig(id uint) (*request.PHPContainerConfig, error)
 
 	GetSupervisorProcess(id uint) ([]response.SupervisorProcessConfig, error)
 	OperateSupervisorProcess(req request.PHPSupervisorProcessConfig) error
@@ -383,76 +387,8 @@ func (r *RuntimeService) Get(id uint) (*response.RuntimeDTO, error) {
 		}
 		res.AppParams = appParams
 	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo, constant.RuntimePython, constant.RuntimeDotNet:
-		res.Params = make(map[string]interface{})
-		envs, err := gotenv.Unmarshal(runtime.Env)
-		if err != nil {
+		if err := handleRuntimeDTO(&res, *runtime); err != nil {
 			return nil, err
-		}
-		for k, v := range envs {
-			if strings.Contains(k, "CONTAINER_PORT") || strings.Contains(k, "HOST_PORT") {
-				if strings.Contains(k, "CONTAINER_PORT") {
-					r := regexp.MustCompile(`_(\d+)$`)
-					matches := r.FindStringSubmatch(k)
-					containerPort, err := strconv.Atoi(v)
-					if err != nil {
-						return nil, err
-					}
-					hostPort, err := strconv.Atoi(envs[fmt.Sprintf("HOST_PORT_%s", matches[1])])
-					if err != nil {
-						return nil, err
-					}
-					hostIP := envs[fmt.Sprintf("HOST_IP_%s", matches[1])]
-					if hostIP == "" {
-						hostIP = "0.0.0.0"
-					}
-					res.ExposedPorts = append(res.ExposedPorts, request.ExposedPort{
-						ContainerPort: containerPort,
-						HostPort:      hostPort,
-						HostIP:        hostIP,
-					})
-				}
-			} else {
-				res.Params[k] = v
-			}
-		}
-		if v, ok := envs["CONTAINER_PACKAGE_URL"]; ok {
-			res.Source = v
-		}
-		composeByte, err := files.NewFileOp().GetContent(runtime.GetComposePath())
-		if err != nil {
-			return nil, err
-		}
-		res.Environments, err = getDockerComposeEnvironments(composeByte)
-		if err != nil {
-			return nil, err
-		}
-		volumes, err := getDockerComposeVolumes(composeByte)
-		if err != nil {
-			return nil, err
-		}
-
-		defaultVolumes := make(map[string]string)
-		switch runtime.Type {
-		case constant.RuntimeNode:
-			defaultVolumes = constant.RuntimeDefaultVolumes
-		case constant.RuntimeJava:
-			defaultVolumes = constant.RuntimeDefaultVolumes
-		case constant.RuntimeGo:
-			defaultVolumes = constant.GoDefaultVolumes
-		case constant.RuntimePython:
-			defaultVolumes = constant.RuntimeDefaultVolumes
-		}
-		for _, volume := range volumes {
-			exist := false
-			for key, value := range defaultVolumes {
-				if key == volume.Source && value == volume.Target {
-					exist = true
-					break
-				}
-			}
-			if !exist {
-				res.Volumes = append(res.Volumes, volume)
-			}
 		}
 	}
 
@@ -1077,6 +1013,100 @@ func (r *RuntimeService) GetFPMConfig(id uint) (*request.FPMConfig, error) {
 		}
 	}
 	res := &request.FPMConfig{Params: params}
+	return res, nil
+}
+
+func (r *RuntimeService) UpdatePHPContainer(req request.PHPContainerConfig) error {
+	runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(req.ID))
+	if err != nil {
+		return err
+	}
+	var (
+		hostPorts      []string
+		composeContent []byte
+	)
+	for _, export := range req.ExposedPorts {
+		hostPorts = append(hostPorts, strconv.Itoa(export.HostPort))
+		if err = checkRuntimePortExist(export.HostPort, false, runtime.ID); err != nil {
+			return err
+		}
+	}
+	if req.ContainerName != "" && req.ContainerName != getRuntimeEnv(runtime.Env, "CONTAINER_NAME") {
+		if err := checkContainerName(req.ContainerName); err != nil {
+			return err
+		}
+		runtime.ContainerName = req.ContainerName
+	}
+	fileOp := files.NewFileOp()
+	projectDir := path.Join(global.Dir.RuntimeDir, runtime.Type, runtime.Name)
+	composeContent, err = fileOp.GetContent(path.Join(projectDir, "docker-compose.yml"))
+	if err != nil {
+		return err
+	}
+	envPath := path.Join(projectDir, ".env")
+	if !fileOp.Stat(envPath) {
+		_ = fileOp.CreateFile(envPath)
+	}
+	envs, err := gotenv.Read(envPath)
+	if err != nil {
+		return err
+	}
+	for k := range envs {
+		if strings.HasPrefix(k, "CONTAINER_PORT_") || strings.HasPrefix(k, "HOST_PORT_") || strings.HasPrefix(k, "HOST_IP_") || strings.Contains(k, "APP_PORT") {
+			delete(envs, k)
+		}
+	}
+	create := request.RuntimeCreate{
+		Image:  runtime.Image,
+		Type:   runtime.Type,
+		Params: make(map[string]interface{}),
+		NodeConfig: request.NodeConfig{
+			ExposedPorts: req.ExposedPorts,
+			Environments: req.Environments,
+			Volumes:      req.Volumes,
+		},
+	}
+	composeContent, err = handleCompose(envs, composeContent, create, projectDir)
+	if err != nil {
+		return err
+	}
+	newMap := make(map[string]string)
+	handleMap(create.Params, newMap)
+	for k, v := range newMap {
+		envs[k] = v
+	}
+	envStr, err := gotenv.Marshal(envs)
+	if err != nil {
+		return err
+	}
+	if err = gotenv.Write(envs, envPath); err != nil {
+		return err
+	}
+	envContent := []byte(envStr)
+	runtime.Env = string(envContent)
+	runtime.DockerCompose = string(composeContent)
+	runtime.Status = constant.StatusReCreating
+	_ = runtimeRepo.Save(runtime)
+	go reCreateRuntime(runtime)
+	return nil
+}
+
+func (r *RuntimeService) GetPHPContainerConfig(id uint) (*request.PHPContainerConfig, error) {
+	runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(id))
+	if err != nil {
+		return nil, err
+	}
+	runtimeDTO := response.NewRuntimeDTO(*runtime)
+	if err := handleRuntimeDTO(&runtimeDTO, *runtime); err != nil {
+		return nil, err
+	}
+	res := &request.PHPContainerConfig{
+		ID:            runtime.ID,
+		ContainerName: runtime.ContainerName,
+		ExposedPorts:  runtimeDTO.ExposedPorts,
+		Environments:  runtimeDTO.Environments,
+		Volumes:       runtimeDTO.Volumes,
+	}
 	return res, nil
 }
 

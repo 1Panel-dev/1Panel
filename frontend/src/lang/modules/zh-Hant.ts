@@ -2324,6 +2324,8 @@ const message = {
         extension: '擴充',
         extensionHelper: '多個擴充功能,分割',
         toExtensionsList: '檢視擴充清單',
+        containerConfig: '容器配置',
+        containerConfigHelper: '環境變量等信息可以在創建完成之後在配置-容器配置中修改',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: '服務器名字的hash表大小',

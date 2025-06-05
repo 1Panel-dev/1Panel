@@ -119,10 +119,9 @@
                     <el-form-item :label="$t('app.containerName')" prop="params.CONTAINER_NAME">
                         <el-input v-model.trim="runtime.params['CONTAINER_NAME']"></el-input>
                     </el-form-item>
-                    <el-text>{{ $t('container.env') }}</el-text>
-                    <br />
-                    <Environment :environments="runtime.environments" />
-                    <br />
+                    <el-form-item>
+                        <el-alert :title="$t('php.containerConfigHelper')" type="info" :closable="false" />
+                    </el-form-item>
                     <el-form-item>
                         <el-alert type="warning" :closable="false">
                             <template #default>
@@ -186,7 +185,6 @@
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';
 import { Runtime } from '@/api/interface/runtime';
-import Environment from '@/views/website/runtime/environment/index.vue';
 import { getAppByKey, getAppDetail, searchApp } from '@/api/modules/app';
 import { CreateRuntime, GetRuntime, ListPHPExtensions, UpdateRuntime } from '@/api/modules/runtime';
 import { Rules } from '@/global/form-rules';

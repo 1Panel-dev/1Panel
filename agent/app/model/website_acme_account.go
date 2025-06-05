@@ -6,11 +6,11 @@ type WebsiteAcmeAccount struct {
 	URL        string `gorm:"not null" json:"url"`
 	PrivateKey string `gorm:"not null" json:"-"`
 	Type       string `gorm:"not null;default:letsencrypt" json:"type"`
-	EabKid     string `gorm:"default:null;" json:"eabKid"`
-	EabHmacKey string `gorm:"default:null" json:"eabHmacKey"`
+	EabKid     string `json:"eabKid"`
+	EabHmacKey string `json:"eabHmacKey"`
 	KeyType    string `gorm:"not null;default:2048" json:"keyType"`
 	UseProxy   bool   `gorm:"default:false" json:"useProxy"`
-	CaDirURL   string `gorm:"default:null" json:"caDirURL"`
+	CaDirURL   string `json:"caDirURL"`
 }
 
 func (w WebsiteAcmeAccount) TableName() string {

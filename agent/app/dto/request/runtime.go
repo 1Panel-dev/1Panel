@@ -123,3 +123,11 @@ type PHPSupervisorProcessFileReq struct {
 	ID uint `json:"id" validate:"required"`
 	SupervisorProcessFileReq
 }
+
+type PHPContainerConfig struct {
+	ID            uint          `json:"id" validate:"required"`
+	ContainerName string        `json:"containerName"`
+	ExposedPorts  []ExposedPort `json:"exposedPorts"`
+	Environments  []Environment `json:"environments"`
+	Volumes       []Volume      `json:"volumes"`
+}

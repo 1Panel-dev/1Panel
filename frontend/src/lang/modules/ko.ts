@@ -2370,6 +2370,8 @@ const message = {
         extension: '확장',
         extensionHelper: '여러 확장은 쉼표로 구분하여 입력하세요.',
         toExtensionsList: '확장 목록 보기',
+        containerConfig: '컨테이너 구성',
+        containerConfigHelper: '환경 변수 및 기타 정보는 생성 후 구성 - 컨테이너 구성에서 수정할 수 있습니다',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: '서버 이름의 해시 테이블 크기',

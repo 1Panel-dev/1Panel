@@ -26,6 +26,9 @@
                 <el-tab-pane :label="'FPM ' + $t('website.source')" name="3">
                     <PHP :id="runtime.id" v-if="index == '3'" :type="'fpm'"></PHP>
                 </el-tab-pane>
+                <el-tab-pane :label="$t('php.containerConfig')" name="6">
+                    <Container :id="runtime.id" v-if="index == '6'"></Container>
+                </el-tab-pane>
             </el-tabs>
         </template>
     </DrawerPro>
@@ -39,6 +42,7 @@ import Function from './function/index.vue';
 import Upload from './upload/index.vue';
 import PHP from './php-fpm/index.vue';
 import Performance from './performance/index.vue';
+import Container from './container/index.vue';
 
 const index = ref('0');
 const open = ref(false);

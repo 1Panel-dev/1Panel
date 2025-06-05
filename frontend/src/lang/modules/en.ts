@@ -2506,6 +2506,9 @@ const message = {
         extension: 'Extension',
         extensionHelper: 'Please use multiple extensions, split',
         toExtensionsList: 'View extension list',
+        containerConfig: 'Container Configuration',
+        containerConfigHelper:
+            'Environment variables and other information can be modified in Configuration - Container Configuration after creation',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: 'The hash table size of the server name',

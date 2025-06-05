@@ -121,3 +121,11 @@ export const operateSupervisorProcessFile = (req: Runtime.ProcessFileReq) => {
 export const createSupervisorProcess = (req: Runtime.SupersivorProcess) => {
     return http.post(`/runtimes/supervisor/process`, req);
 };
+
+export const getPHPContainerConfig = (id: number) => {
+    return http.get<Runtime.PHPContainerConfig>(`/runtimes/php/container/${id}`);
+};
+
+export const updatePHPContainerConfig = (req: Runtime.PHPContainerConfig) => {
+    return http.post<any>(`/runtimes/php/container/update`, req);
+};

@@ -2412,6 +2412,8 @@ const message = {
         extension: '拡大',
         extensionHelper: '複数の拡張機能を使用して、分割してください',
         toExtensionsList: '拡張リストを表示します',
+        containerConfig: 'コンテナ設定',
+        containerConfigHelper: '環境変数などの情報は、作成完了後に設定 - コンテナ設定で変更できます',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: 'サーバー名のハッシュテーブルサイズ',

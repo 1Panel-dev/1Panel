@@ -12,6 +12,8 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -564,7 +566,14 @@ func handleCompose(env gotenv.Env, composeContent []byte, create request.Runtime
 				create.Params[hostPortStr] = port.HostPort
 				create.Params[hostIPStr] = port.HostIP
 			}
+			if create.Type == constant.RuntimePHP {
+				ports = append(ports, fmt.Sprintf("127.0.0.1:${PANEL_APP_PORT_HTTP}:9000"))
+			}
 			serviceValue["ports"] = ports
+		} else {
+			if create.Type == constant.RuntimePHP {
+				serviceValue["ports"] = []interface{}{fmt.Sprintf("127.0.0.1:${PANEL_APP_PORT_HTTP}:9000")}
+			}
 		}
 		var environments []interface{}
 		for _, e := range create.Environments {
@@ -581,6 +590,8 @@ func handleCompose(env gotenv.Env, composeContent []byte, create request.Runtime
 			defaultVolumes = constant.RuntimeDefaultVolumes
 		case constant.RuntimeGo:
 			defaultVolumes = constant.GoDefaultVolumes
+		case constant.RuntimePHP:
+			defaultVolumes = constant.PHPDefaultVolumes
 		}
 		for k, v := range defaultVolumes {
 			volumes = append(volumes, fmt.Sprintf("%s:%s", k, v))
@@ -874,4 +885,77 @@ func RestartPHPRuntime() {
 			_ = restartRuntime(&runtime)
 		}()
 	}
+}
+
+func handleRuntimeDTO(res *response.RuntimeDTO, runtime model.Runtime) error {
+	res.Params = make(map[string]interface{})
+	envs, err := gotenv.Unmarshal(runtime.Env)
+	if err != nil {
+		return err
+	}
+	for k, v := range envs {
+		if strings.Contains(k, "CONTAINER_PORT") || strings.Contains(k, "HOST_PORT") {
+			if strings.Contains(k, "CONTAINER_PORT") {
+				r := regexp.MustCompile(`_(\d+)$`)
+				matches := r.FindStringSubmatch(k)
+				containerPort, err := strconv.Atoi(v)
+				if err != nil {
+					return err
+				}
+				hostPort, err := strconv.Atoi(envs[fmt.Sprintf("HOST_PORT_%s", matches[1])])
+				if err != nil {
+					return err
+				}
+				hostIP := envs[fmt.Sprintf("HOST_IP_%s", matches[1])]
+				if hostIP == "" {
+					hostIP = "0.0.0.0"
+				}
+				res.ExposedPorts = append(res.ExposedPorts, request.ExposedPort{
+					ContainerPort: containerPort,
+					HostPort:      hostPort,
+					HostIP:        hostIP,
+				})
+			}
+		} else {
+			res.Params[k] = v
+		}
+	}
+	if v, ok := envs["CONTAINER_PACKAGE_URL"]; ok {
+		res.Source = v
+	}
+	composeByte, err := files.NewFileOp().GetContent(runtime.GetComposePath())
+	if err != nil {
+		return err
+	}
+	res.Environments, err = getDockerComposeEnvironments(composeByte)
+	if err != nil {
+		return err
+	}
+	volumes, err := getDockerComposeVolumes(composeByte)
+	if err != nil {
+		return err
+	}
+
+	defaultVolumes := make(map[string]string)
+	switch runtime.Type {
+	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimePython, constant.RuntimeDotNet:
+		defaultVolumes = constant.RuntimeDefaultVolumes
+	case constant.RuntimeGo:
+		defaultVolumes = constant.GoDefaultVolumes
+	case constant.RuntimePHP:
+		defaultVolumes = constant.PHPDefaultVolumes
+	}
+	for _, volume := range volumes {
+		exist := false
+		for key, value := range defaultVolumes {
+			if key == volume.Source && value == volume.Target {
+				exist = true
+				break
+			}
+		}
+		if !exist {
+			res.Volumes = append(res.Volumes, volume)
+		}
+	}
+	return nil
 }

@@ -2464,6 +2464,9 @@ const message = {
         extension: 'Extensão',
         extensionHelper: 'Para múltiplas extensões, separe com vírgulas',
         toExtensionsList: 'Ver lista de extensões',
+        containerConfig: 'Configuração do Contêiner',
+        containerConfigHelper:
+            'Variáveis de ambiente e outras informações podem ser modificadas em Configuração - Configuração do Contêiner após a criação',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: 'The hash table size of the server name',
