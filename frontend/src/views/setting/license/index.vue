@@ -216,11 +216,20 @@ const search = async () => {
         .then((res) => {
             loading.value = false;
             data.value = res.data.items || [];
-            console.log(data.value);
             for (const item of data.value) {
                 item.productName = 'product-1panel-pro';
                 item.expiresAt = item.productPro === '0' ? '' : timestampToDate(Number(item.productPro));
             }
+            data.value.sort((a, b) => {
+                const masterLabel = i18n.global.t('xpack.node.master');
+                const nodeA = loadBindNode(a);
+                const nodeB = loadBindNode(b);
+
+                if (nodeA === masterLabel || nodeB === masterLabel) {
+                    return Number(nodeB === masterLabel) - Number(nodeA === masterLabel);
+                }
+                return a.status.localeCompare(b.status);
+            });
             paginationConfig.total = res.data.total;
         })
         .catch(() => {
