@@ -253,7 +253,7 @@
                             </el-button>
                         </template>
                         <template v-else>
-                            <el-dropdown class="mr-2.5" style="border-left: 1px solid #ccc">
+                            <el-dropdown class="mr-2.5">
                                 <el-button class="btn">
                                     {{ hostMount[0]?.path }} ({{ $t('file.root') }})
                                     {{ formatFileSize(hostMount[0]?.free) }}
@@ -314,7 +314,7 @@
                                     </el-button>
                                 </template>
 
-                                <el-dropdown v-if="moreButtons.length" style="border-left: 1px solid #ccc">
+                                <el-dropdown v-if="moreButtons.length">
                                     <el-button>
                                         {{ $t('tabs.more') }}
                                         <i class="el-icon-arrow-down el-icon--right" />
@@ -614,7 +614,7 @@ const fileCreate = reactive({ path: '/', isDir: false, mode: 0o755 });
 const fileCompress = reactive({ files: [''], name: '', dst: '', operate: 'compress' });
 const fileDeCompress = reactive({ path: '', name: '', dst: '', mimeType: '' });
 const fileEdit = reactive({ content: '', path: '', name: '', language: 'plaintext', extension: '' });
-const filePreview = reactive({ path: '', name: '', extension: '', fileType: '' });
+const filePreview = reactive({ path: '', name: '', extension: '', fileType: '', imageFiles: [] });
 const codeReq = reactive({ path: '', expand: false, page: 1, pageSize: 100, isDetail: false });
 const fileUpload = reactive({ path: '' });
 const fileRename = reactive({ path: '', oldName: '' });
@@ -653,6 +653,7 @@ const disableBtn = ref(false);
 const calculateBtn = ref(false);
 const dirNum = ref(0);
 const fileNum = ref(0);
+const imageFiles = ref([]);
 
 const { searchableStatus, searchablePath, searchableInputRef, searchableInputBlur } = useSearchable(paths);
 
@@ -1034,6 +1035,12 @@ const openDeCompress = (item: File.File) => {
 
 const openView = (item: File.File) => {
     const fileType = getFileType(item.extension);
+    if (fileType === 'image') {
+        imageFiles.value = data.value
+            .filter((item) => !item.isDir)
+            .filter((item) => getFileType(item.extension) == 'image')
+            .map((item) => (item.isSymlink ? item.linkPath : item.path));
+    }
 
     const previewTypes = ['image', 'video', 'audio', 'word', 'excel'];
     if (previewTypes.includes(fileType)) {
@@ -1058,6 +1065,7 @@ const openPreview = (item: File.File, fileType: string) => {
     filePreview.name = item.name;
     filePreview.extension = item.extension;
     filePreview.fileType = fileType;
+    filePreview.imageFiles = imageFiles.value;
 
     previewRef.value.acceptParams(filePreview);
 };
@@ -1481,5 +1489,8 @@ onBeforeUnmount(() => {
 }
 .search-button {
     width: 20vw;
+}
+.el-button-group > .el-dropdown > .el-button {
+    border-left-color: var(--el-border-color);
 }
 </style>
