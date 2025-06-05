@@ -264,12 +264,6 @@ func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
 		}
 		return syncAppInstallStatus(&install, false)
 	case constant.Restart:
-		if install.App.Key == "openresty" {
-			websites, _ := websiteRepo.GetBy()
-			if len(websites) > 0 {
-				_ = createAllWebsitesWAFConfig(websites)
-			}
-		}
 		out, err := compose.Restart(dockerComposePath)
 		if err != nil {
 			return handleErr(install, err, out)
