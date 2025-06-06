@@ -335,6 +335,7 @@ const onLoadInfo = async () => {
 };
 
 onMounted(() => {
+    changeTab('status');
     onLoadInfo();
 });
 </script>
