@@ -183,6 +183,8 @@ ErrScriptsNotFound: 'package.json에서 스크립트 구성 항목을 찾을 수
 ErrContainerNameNotFound: '컨테이너 이름을 가져올 수 없습니다. .env 파일을 확인하세요.'
 ErrNodeModulesNotFound: 'node_modules 폴더가 없습니다! 런타임 환경을 편집하거나 런타임 환경이 성공적으로 시작될 때까지 기다리십시오'
 ErrContainerNameIsNull: '컨테이너 이름이 존재하지 않습니다'
+ErrPHPPortIsDefault: "9000 포트는 기본 포트입니다. 수정 후 다시 시도하세요"
+ErrPHPRuntimePortFailed: "포트 {{ .name }} 는 현재 런타임 환경에서 이미 사용 중입니다. 수정 후 다시 시도하세요"
 
 #도구
 ErrConfigNotFound: '구성 파일이 존재하지 않습니다'

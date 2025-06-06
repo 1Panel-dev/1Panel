@@ -64,8 +64,13 @@ func (r *RuntimeRepo) WithNotId(id uint) DBOption {
 func (r *RuntimeRepo) WithPort(port int) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		portStr := fmt.Sprintf("%d", port)
-		regexPattern := fmt.Sprintf("(^|,)%s(,|$)", portStr)
-		return g.Where("port REGEXP ?", regexPattern)
+		return g.Debug().Where(
+			"port = ? OR port LIKE ? OR port LIKE ? OR port LIKE ?",
+			portStr,
+			portStr+",%",
+			"%,"+portStr,
+			"%,"+portStr+",%",
+		)
 	}
 }
 

@@ -183,6 +183,8 @@ ErrScriptsNotFound: 'スクリプト構成項目が package.json に見つかり
 ErrContainerNameNotFound: 'コンテナ名を取得できません。.env ファイルを確認してください'
 ErrNodeModulesNotFound: 'node_modules フォルダが存在しません。ランタイム環境を編集するか、ランタイム環境が正常に起動するまでお待ちください。'
 ErrContainerNameIsNull: 'コンテナ名が存在しません'
+ErrPHPPortIsDefault: "ポート9000はデフォルトポートです。修正してから再試行してください"
+ErrPHPRuntimePortFailed: "ポート {{ .name }} は現在のランタイム環境で使用されています。修正してから再試行してください"
 
 #tool
 ErrConfigNotFound: '構成ファイルが存在しません'

@@ -183,6 +183,8 @@ ErrScriptsNotFound: 'O item de configuração de scripts não foi encontrado em 
 ErrContainerNameNotFound: 'Não foi possível obter o nome do contêiner, verifique o arquivo .env'
 ErrNodeModulesNotFound: 'A pasta node_modules não existe! Edite o ambiente de execução ou aguarde até que o ambiente de execução inicie com sucesso'
 ErrContainerNameIsNull: 'O nome do contêiner não existe'
+ErrPHPPortIsDefault: "Port 9000 adalah port lalai, sila ubah dan cuba lagi"
+ErrPHPRuntimePortFailed: "Port {{ .name }} telah digunakan oleh persekitaran runtime semasa, sila ubah dan cuba lagi"
 
 #ferramenta
 ErrConfigNotFound: 'O arquivo de configuração não existe'

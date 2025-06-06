@@ -183,6 +183,8 @@ ErrScriptsNotFound: 'Элемент конфигурации скриптов н
 ErrContainerNameNotFound: 'Не удалось получить имя контейнера, проверьте файл .env'
 ErrNodeModulesNotFound: 'Папка node_modules не существует! Измените среду выполнения или дождитесь ее успешного запуска'
 ErrContainerNameIsNull: 'Имя контейнера не существует'
+ErrPHPPortIsDefault: "A porta 9000 é a porta padrão, por favor, modifique e tente novamente"
+ErrPHPRuntimePortFailed: "A porta {{ .name }} já está sendo usada pelo ambiente de tempo de execução atual, por favor, modifique e tente novamente"
 
 #инструмент
 ErrConfigNotFound: 'Файл конфигурации не существует'

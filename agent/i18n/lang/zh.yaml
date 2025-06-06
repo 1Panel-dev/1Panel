@@ -182,6 +182,8 @@ ErrScriptsNotFound: "没有在 package.json 中找到 scripts 配置项"
 ErrContainerNameNotFound: "无法获取容器名称，请检查 .env 文件"
 ErrNodeModulesNotFound: "node_modules 文件夹不存在！请编辑运行环境或者等待运行环境启动成功"
 ErrContainerNameIsNull: "容器名称不存在"
+ErrPHPPortIsDefault: "9000 端口为默认端口，请修改后重试"
+ErrPHPRuntimePortFailed: "{{ .name }} 端口已被当前运行环境使用，请修改后重试"
 
 #tool
 ErrConfigNotFound: "配置文件不存在"

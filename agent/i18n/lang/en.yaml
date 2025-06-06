@@ -183,6 +183,8 @@ ErrScriptsNotFound: 'The scripts configuration item was not found in package.jso
 ErrContainerNameNotFound: 'Unable to get container name, please check .env file'
 ErrNodeModulesNotFound: 'The node_modules folder does not exist! Please edit the runtime environment or wait for the runtime environment to start successfully'
 ErrContainerNameIsNull: 'Container name does not exist'
+ErrPHPPortIsDefault: "Port 9000 is the default port, please modify and try again"
+ErrPHPRuntimePortFailed: "The port {{ .name }} is already used by the current runtime environment, please modify and try again"
 
 #tool
 ErrConfigNotFound: 'Configuration file does not exist'

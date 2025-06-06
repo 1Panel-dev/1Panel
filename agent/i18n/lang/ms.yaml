@@ -183,6 +183,8 @@ ErrScriptsNotFound: 'Item konfigurasi skrip tidak ditemui dalam package.json'
 ErrContainerNameNotFound: 'Tidak dapat mendapatkan nama kontena, sila semak fail .env'
 ErrNodeModulesNotFound: 'Folder node_modules tidak wujud! Sila edit persekitaran masa jalan atau tunggu persekitaran masa jalan berjaya dimulakan'
 ErrContainerNameIsNull: 'Nama kontena tidak wujud'
+ErrPHPPortIsDefault: "Порт 9000 является портом по умолчанию, пожалуйста, измените и попробуйте снова"
+ErrPHPRuntimePortFailed: "Порт {{ .name }} уже используется текущей средой выполнения, пожалуйста, измените и попробуйте снова"
 
 #alat
 ErrConfigNotFound: 'Fail konfigurasi tidak wujud'

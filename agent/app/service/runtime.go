@@ -1022,11 +1022,15 @@ func (r *RuntimeService) UpdatePHPContainer(req request.PHPContainerConfig) erro
 		return err
 	}
 	var (
-		hostPorts      []string
 		composeContent []byte
 	)
 	for _, export := range req.ExposedPorts {
-		hostPorts = append(hostPorts, strconv.Itoa(export.HostPort))
+		if strconv.Itoa(export.HostPort) == runtime.Port {
+			return buserr.WithName("ErrPHPRuntimePortFailed", strconv.Itoa(export.HostPort))
+		}
+		if export.ContainerPort == 9000 {
+			return buserr.New("ErrPHPPortIsDefault")
+		}
 		if err = checkRuntimePortExist(export.HostPort, false, runtime.ID); err != nil {
 			return err
 		}
@@ -1075,6 +1079,7 @@ func (r *RuntimeService) UpdatePHPContainer(req request.PHPContainerConfig) erro
 	for k, v := range newMap {
 		envs[k] = v
 	}
+	envs["PANEL_APP_PORT_HTTP"] = runtime.Port
 	envStr, err := gotenv.Marshal(envs)
 	if err != nil {
 		return err
