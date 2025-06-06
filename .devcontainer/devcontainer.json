@@ -1,0 +1,4 @@
+curl -sSL https://resource.1panel.pro/quick_start.sh -o quick_start.sh && bash quick_start.sh{
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "features": {}
+}
