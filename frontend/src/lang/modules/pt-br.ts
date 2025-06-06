@@ -1438,6 +1438,8 @@ const message = {
         existFileDirHelper: 'O arquivo/pasta selecionado tem um nome duplicado. Por favor, prossiga com cautela!',
         noSuchFile: 'O arquivo ou diretório não foi encontrado. Por favor, verifique e tente novamente.',
         setting: 'configuração',
+        showHide: 'Mostrar arquivos ocultos',
+        noShowHide: 'Não mostrar arquivos ocultos',
     },
     ssh: {
         autoStart: 'Início automático',

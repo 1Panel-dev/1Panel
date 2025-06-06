@@ -66,7 +66,8 @@ func GetGroup(gid uint32) string {
 const dotCharacter = 46
 
 func IsHidden(path string) bool {
-	return path[0] == dotCharacter
+	base := filepath.Base(path)
+	return len(base) > 1 && base[0] == dotCharacter
 }
 
 func countLines(path string) (int, error) {

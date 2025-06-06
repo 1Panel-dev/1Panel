@@ -1452,6 +1452,8 @@ const message = {
         existFileDirHelper: 'Fail/folder yang dipilih mempunyai nama yang sama. Sila berhati-hati!',
         noSuchFile: 'Fail atau direktori tidak ditemui. Sila periksa dan cuba lagi.',
         setting: 'tetapan',
+        showHide: 'Tunjukkan fail tersembunyi',
+        noShowHide: 'Jangan tunjukkan fail tersembunyi',
     },
     ssh: {
         autoStart: 'Mula automatik',

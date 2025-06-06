@@ -1409,6 +1409,8 @@ const message = {
         existFileDirHelper: '選択したファイル/フォルダーには同じ名前のものが既に存在します。慎重に操作してください！',
         noSuchFile: 'ファイルまたはディレクトリが見つかりませんでした。確認して再試行してください。',
         setting: '設定',
+        showHide: '隠しファイルを表示',
+        noShowHide: '隠しファイルを表示しない',
     },
     ssh: {
         autoStart: 'オートスタート',

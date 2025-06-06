@@ -11,6 +11,7 @@ export namespace File {
         size: number;
         isDir: boolean;
         isSymlink: boolean;
+        isHidden: boolean;
         linkPath: string;
         type: string;
         updateTime: string;

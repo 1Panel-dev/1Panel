@@ -1395,6 +1395,8 @@ const message = {
         existFileDirHelper: '선택한 파일/폴더에 동일한 이름이 이미 존재합니다. 신중하게 작업하세요!',
         noSuchFile: '파일 또는 디렉터리를 찾을 수 없습니다. 확인 후 다시 시도하세요.',
         setting: '설정',
+        showHide: '숨김 파일 표시',
+        noShowHide: '숨김 파일 숨기기',
     },
     ssh: {
         autoStart: '자동 시작',

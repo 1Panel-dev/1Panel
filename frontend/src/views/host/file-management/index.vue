@@ -1,7 +1,7 @@
 <template>
     <div>
-        <div class="flex gap-y-2 items-center gap-x-4" ref="toolRef">
-            <div class="flex-shrink-0 flex items-center justify-between">
+        <div class="flex sm:flex-row flex-col justify-start gap-y-2 items-center gap-x-4" ref="toolRef">
+            <div class="flex-shrink-0 flex sm:w-min w-full items-center justify-start">
                 <el-tooltip :content="$t('file.back')" placement="top">
                     <el-button icon="Back" @click="back" circle />
                 </el-tooltip>
@@ -14,8 +14,11 @@
                 <el-tooltip :content="$t('commons.button.refresh')" placement="top">
                     <el-button icon="Refresh" circle @click="search" />
                 </el-tooltip>
+                <el-tooltip :content="isHidden ? $t('file.showHide') : $t('file.noShowHide')" placement="top">
+                    <el-button class="btn" circle :icon="isHidden ? Hide : View" @click="viewHideFile" />
+                </el-tooltip>
             </div>
-            <div class="flex-1 hidden sm:block" ref="pathRef">
+            <div class="flex-1 sm:w-min w-full hidden sm:block" ref="pathRef">
                 <div
                     v-show="!searchableStatus"
                     @click="searchableStatus = true"
@@ -94,7 +97,7 @@
                     "
                 />
             </div>
-            <div class="flex-1 sm:hidden block">
+            <div class="flex-1 sm:w-min w-full sm:hidden block">
                 <div class="address-bar shadow-md rounded-md px-4 py-2 flex items-center flex-grow">
                     <div class="flex items-center address-url">
                         <span class="root mr-2">
@@ -197,8 +200,8 @@
                             </el-dropdown-menu>
                         </template>
                     </el-dropdown>
-                    <el-button-group>
-                        <el-button class="btn mr-2.5" @click="openRecycleBin">
+                    <el-button-group class="sm:!inline-block !flex flex-wrap gap-y-2">
+                        <el-button class="btn" @click="openRecycleBin">
                             {{ $t('file.recycleBin') }}
                         </el-button>
                         <el-button class="btn" @click="toTerminal">
@@ -551,7 +554,7 @@ import { MsgWarning } from '@/utils/message';
 import { useSearchable } from './hooks/searchable';
 import { ResultData } from '@/api/interface';
 import { GlobalStore } from '@/store';
-import { Download as ElDownload, Upload as ElUpload } from '@element-plus/icons-vue';
+import { Download as ElDownload, Upload as ElUpload, View, Hide } from '@element-plus/icons-vue';
 
 import i18n from '@/lang';
 import CreateFile from './create/index.vue';
@@ -654,6 +657,7 @@ const calculateBtn = ref(false);
 const dirNum = ref(0);
 const fileNum = ref(0);
 const imageFiles = ref([]);
+const isHidden = ref(true);
 
 const { searchableStatus, searchablePath, searchableInputRef, searchableInputBlur } = useSearchable(paths);
 
@@ -701,10 +705,20 @@ const searchFile = async () => {
 
 const handleSearchResult = (res: ResultData<File.File>) => {
     paginationConfig.total = res.data.itemTotal;
-    data.value = res.data.items;
+    if (isHidden.value) {
+        data.value = res.data.items.filter((item) => !item.isHidden);
+    } else {
+        data.value = res.data.items;
+    }
     dirNum.value = data.value.filter((item) => item.isDir).length;
     fileNum.value = data.value.filter((item) => !item.isDir).length;
     req.path = res.data.path;
+};
+
+const viewHideFile = async () => {
+    isHidden.value = !isHidden.value;
+    let searchResult = await searchFile();
+    handleSearchResult(searchResult);
 };
 
 const open = async (row: File.File) => {
@@ -1446,7 +1460,6 @@ onBeforeUnmount(() => {
 }
 
 .copy-button {
-    margin-left: 10px;
     .close {
         width: 10px;
         .close-icon {

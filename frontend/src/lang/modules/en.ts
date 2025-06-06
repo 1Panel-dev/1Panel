@@ -1468,6 +1468,8 @@ const message = {
         existFileDirHelper: 'The selected file/folder has a duplicate name. Please proceed with caution!',
         noSuchFile: 'The file or directory was not found. Please check and try again.',
         setting: 'Setting',
+        showHide: 'Show hidden files',
+        noShowHide: 'Don’t show hidden files',
     },
     ssh: {
         autoStart: 'Auto Start',

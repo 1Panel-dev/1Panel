@@ -30,7 +30,10 @@
         >
             <template v-if="fileType === 'image'">
                 <div class="flex h-full">
-                    <aside class="w-[200px] overflow-y-auto p-2 sm:block hidden left-aside rounded">
+                    <aside
+                        class="w-[200px] overflow-y-auto p-2 sm:block hidden left-aside rounded"
+                        v-if="imageFiles.length > 1"
+                    >
                         <template v-for="(item, index) in imageFiles" :key="index">
                             <el-tooltip :content="item.path" placement="right">
                                 <div

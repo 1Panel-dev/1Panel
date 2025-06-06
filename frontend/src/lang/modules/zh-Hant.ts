@@ -1394,6 +1394,8 @@ const message = {
         existFileDirHelper: '選擇的檔案/資料夾存在同名，請謹慎操作！',
         noSuchFile: '找不到該檔案或目錄，請檢查後重試。',
         setting: '设置',
+        showHide: '顯示隱藏檔案',
+        noShowHide: '不顯示隱藏檔案',
     },
     ssh: {
         autoStart: '開機自啟',
