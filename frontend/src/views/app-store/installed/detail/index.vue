@@ -130,8 +130,8 @@ import { getAppInstallParams, updateAppInstallParams, updateInstallConfig } from
 import { reactive, ref } from 'vue';
 import { FormInstance } from 'element-plus';
 import { Rules, checkNumberRange } from '@/global/form-rules';
-import { MsgSuccess } from '@/utils/message';
-import { getLabel, splitHttp } from '@/utils/util';
+import { MsgError, MsgSuccess } from '@/utils/message';
+import { getLabel, splitHttp, checkIpV4V6, checkDomain } from '@/utils/util';
 import i18n from '@/lang';
 
 interface ParamProps {
@@ -175,6 +175,31 @@ const webUI = reactive({
     protocol: 'http://',
     domain: '',
 });
+
+function checkWebUI() {
+    if (webUI.domain !== '') {
+        let domain = webUI.domain;
+        let port = null;
+        if (domain.includes(':')) {
+            const parts = domain.split(':');
+            domain = parts[0];
+            port = parts[1];
+
+            if (!checkPort(port)) {
+                return false;
+            }
+        }
+        if (checkIpV4V6(domain) && checkDomain(domain)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function checkPort(port: string) {
+    const portNum = parseInt(port, 10);
+    return !isNaN(portNum) && portNum > 0 && portNum <= 65535;
+}
 
 const acceptParams = async (props: ParamProps) => {
     submitModel.value.installId = props.id;
@@ -296,6 +321,10 @@ const updateAppConfig = async () => {
         };
         if (!webUI.domain || webUI.domain === '') {
             req.webUI = '';
+        }
+        if (!checkWebUI()) {
+            MsgError(i18n.global.t('commons.rule.host'));
+            return;
         }
         await updateInstallConfig(req);
         MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
