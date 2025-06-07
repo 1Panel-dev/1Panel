@@ -72,6 +72,7 @@
                     </div>
                     <el-form-item prop="name" class="no-border">
                         <el-input
+                            name="username"
                             v-model.trim="loginForm.name"
                             :placeholder="$t('commons.login.username')"
                             class="form-input"
@@ -85,6 +86,7 @@
                     </el-form-item>
                     <el-form-item prop="password" class="no-border">
                         <el-input
+                            name="password"
                             type="password"
                             clearable
                             v-model.trim="loginForm.password"
