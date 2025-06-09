@@ -56,7 +56,12 @@ func CheckSecurity(c *gin.Context) bool {
 func ToIndexHtml(c *gin.Context) {
 	c.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 	c.Writer.WriteHeader(http.StatusOK)
-	_, _ = c.Writer.Write(web.IndexByte)
+	data, err := web.IndexHtml.ReadFile("index.html")
+	if err != nil {
+		c.String(http.StatusInternalServerError, "index.html not found")
+		return
+	}
+	_, _ = c.Writer.Write(data)
 	c.Writer.Flush()
 }
 
