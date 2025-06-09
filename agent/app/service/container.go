@@ -945,7 +945,7 @@ func collectLogs(params dto.StreamLog, messageChan chan<- string, errorChan chan
 		message := scanner.Text()
 		select {
 		case messageChan <- message:
-		case <-time.After(time.Second):
+		case <-time.After(5 * time.Second):
 			errorChan <- fmt.Errorf("message channel blocked")
 			return
 		}
