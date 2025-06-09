@@ -16,7 +16,6 @@ func Init() {
 		migrations.InitTerminalSetting,
 		migrations.InitGoogle,
 		migrations.AddTaskDB,
-		migrations.UpdateDeveloperMode,
 		migrations.AddXpackHideMenu,
 	})
 	if err := m.Migrate(); err != nil {

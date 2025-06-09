@@ -3,10 +3,11 @@ package migrations
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"path"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/core/app/dto"
 
 	"github.com/1Panel-dev/1Panel/core/app/model"
 	"github.com/1Panel-dev/1Panel/core/constant"
@@ -271,16 +272,6 @@ var AddTaskDB = &gormigrate.Migration{
 		return global.TaskDB.AutoMigrate(
 			&model.Task{},
 		)
-	},
-}
-
-var UpdateDeveloperMode = &gormigrate.Migration{
-	ID: "20240516-update-developer-mode",
-	Migrate: func(tx *gorm.DB) error {
-		if err := tx.Model(&model.Setting{}).Where("key = ?", "DeveloperMode").Update("value", constant.StatusEnable).Error; err != nil {
-			return err
-		}
-		return nil
 	},
 }
 
