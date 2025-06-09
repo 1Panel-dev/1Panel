@@ -230,7 +230,7 @@
                                 ></el-date-picker>
                             </div>
                             <div v-else>
-                                <el-link type="primary" :underline="false" @click.stop="openDatePicker(row)">
+                                <el-link type="primary" underline="never" @click.stop="openDatePicker(row)">
                                     <span v-if="isEver(row.expireDate)">
                                         {{ $t('website.neverExpire') }}
                                     </span>

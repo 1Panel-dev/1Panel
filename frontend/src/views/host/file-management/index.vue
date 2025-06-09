@@ -433,19 +433,19 @@
                     </el-table-column>
                     <el-table-column :label="$t('file.mode')" prop="mode" min-width="110">
                         <template #default="{ row }">
-                            <el-link :underline="false" @click="openMode(row)">{{ row.mode }}</el-link>
+                            <el-link underline="never" @click="openMode(row)">{{ row.mode }}</el-link>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.user')" prop="user" show-overflow-tooltip min-width="90">
                         <template #default="{ row }">
-                            <el-link :underline="false" @click="openChown(row)">
+                            <el-link underline="never" @click="openChown(row)">
                                 {{ row.user ? row.user : '-' }} ({{ row.uid }})
                             </el-link>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('file.group')" prop="group" show-overflow-tooltip>
                         <template #default="{ row }">
-                            <el-link :underline="false" @click="openChown(row)">
+                            <el-link underline="never" @click="openChown(row)">
                                 {{ row.group ? row.group : '-' }} ({{ row.gid }})
                             </el-link>
                         </template>
@@ -706,9 +706,10 @@ const searchFile = async () => {
 const handleSearchResult = (res: ResultData<File.File>) => {
     paginationConfig.total = res.data.itemTotal;
     if (isHidden.value) {
-        data.value = res.data.items.filter((item) => !item.isHidden);
+        const items = res.data.items || [];
+        data.value = items.filter((item) => !item.isHidden);
     } else {
-        data.value = res.data.items;
+        data.value = res.data.items || [];
     }
     dirNum.value = data.value.filter((item) => item.isDir).length;
     fileNum.value = data.value.filter((item) => !item.isDir).length;

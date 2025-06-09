@@ -38,7 +38,7 @@
                 ></el-option>
             </el-select>
             <span v-if="p.type === 'service' && p.services.length === 0" class="ml-1.5">
-                <el-link type="primary" :underline="false" @click="toPage(p.key)">
+                <el-link type="primary" underline="never" @click="toPage(p.key)">
                     {{ $t('app.toInstall') }}
                 </el-link>
             </span>
@@ -110,7 +110,7 @@
                 </el-col>
                 <el-col>
                     <span v-if="p.child.type === 'service' && p.services.length === 0">
-                        <el-link type="primary" :underline="false" @click="toPage(form[p.envKey])">
+                        <el-link type="primary" underline="never" @click="toPage(form[p.envKey])">
                             {{ $t('app.toInstall') }}
                         </el-link>
                     </span>

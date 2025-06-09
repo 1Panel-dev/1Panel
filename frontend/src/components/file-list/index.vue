@@ -22,7 +22,7 @@
                     <div class="hidden-paths">
                         <div v-for="(item, index) in paths.slice(1, -1)" :key="index">
                             <svg-icon :class="'table-icon'" iconName="p-file-folder"></svg-icon>
-                            <el-link :underline="false" @click="jump(index + 1)">{{ item }}</el-link>
+                            <el-link underline="never" @click="jump(index + 1)">{{ item }}</el-link>
                         </div>
                     </div>
                 </el-popover>
@@ -60,7 +60,7 @@
                             ></svg-icon>
 
                             <template v-if="!row.isCreate">
-                                <el-link :underline="false" @click="open(row)">
+                                <el-link underline="never" @click="open(row)">
                                     {{ row.name }}
                                 </el-link>
                             </template>
