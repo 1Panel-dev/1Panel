@@ -388,7 +388,7 @@
     <AppIgnore ref="ignoreRef" @close="search" />
     <ComposeLogs ref="composeLogRef" />
     <TaskLog ref="taskLogRef" @close="search" />
-    <Detail ref="detailRef" @close="search" />
+    <Detail ref="detailRef" />
     <IgnoreApp ref="ignoreAppRef" @close="search" />
 </template>
 

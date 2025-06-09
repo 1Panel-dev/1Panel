@@ -39,7 +39,8 @@
                 </div>
                 <el-button
                     type="primary"
-                    class="mt-3 w-52 custom-button"
+                    class="mt-3"
+                    size="large"
                     :disabled="loading || uploaderFiles.length == 0"
                     plain
                     @click="submit"
@@ -153,8 +154,3 @@ defineExpose({
     acceptParams,
 });
 </script>
-<style lang="scss" scoped>
-.custom-button {
-    letter-spacing: 4px;
-}
-</style>
