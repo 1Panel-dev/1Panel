@@ -15,7 +15,7 @@ const message = {
             create: 'Create ',
             add: 'Add ',
             save: 'Save ',
-            set: 'Edit config',
+            set: 'Set',
             sync: 'Sync ',
             delete: 'Delete',
             edit: 'Edit ',
@@ -1730,7 +1730,7 @@ const message = {
         entranceInputHelper: 'Leave it blank to disable the security entrance.',
         randomGenerate: 'Random',
         expirationTime: 'Expiration Date',
-        unSetting: 'Unset',
+        unSetting: 'Not set',
         noneSetting:
             'Set the expiration time for the panel password. After the expiration, you need to reset the password',
         expirationHelper: 'If the password expiration time is [0] days, the password expiration function is disabled',

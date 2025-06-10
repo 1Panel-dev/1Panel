@@ -1,8 +1,5 @@
 <template>
-    <DrawerPro
-        v-model="open"
-        size="50%"
-    >
+    <DrawerPro v-model="open" size="50%">
         <template #header>
             <DrawerHeader
                 :header="$t('runtime.' + mode)"
@@ -158,10 +155,6 @@ import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { reactive, ref, watch } from 'vue';
-import PortConfig from '@/views/website/runtime/port/index.vue';
-import Environment from '@/views/website/runtime/environment/index.vue';
-import Volumes from '@/views/website/runtime/volume/index.vue';
-import AppConfig from '@/views/website/runtime/app/index.vue';
 
 interface OperateRrops {
     id?: number;
