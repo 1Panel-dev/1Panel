@@ -296,11 +296,11 @@ func (u *UpgradeService) loadVersionByMode(developer, currentVersion string) (st
 
 	versionPart := strings.Split(current, ".")
 	if len(versionPart) < 3 {
-		return betaVersionLatest, current, latest
+		return betaVersionLatest, "", latest
 	}
 	num, _ := strconv.Atoi(versionPart[1])
 	if num == 0 {
-		return betaVersionLatest, current, latest
+		return betaVersionLatest, "", latest
 	}
 	if num >= 10 {
 		if current[:6] == currentVersion[:6] {
@@ -309,7 +309,7 @@ func (u *UpgradeService) loadVersionByMode(developer, currentVersion string) (st
 		return betaVersionLatest, "", latest
 	}
 	if current[:5] == currentVersion[:5] {
-		return betaVersionLatest, current, ""
+		return betaVersionLatest, "", ""
 	}
 	return betaVersionLatest, "", latest
 }
