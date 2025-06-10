@@ -315,7 +315,7 @@ func loadDbsForJob(cronjob model.Cronjob) []DatabaseHelper {
 				dbs = append(dbs, DatabaseHelper{
 					ID:       mysql.ID,
 					DBType:   cronjob.DBType,
-					Database: mysql.Name,
+					Database: mysql.Database,
 					Name:     mysql.Name,
 				})
 			}
