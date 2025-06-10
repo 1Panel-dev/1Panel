@@ -144,10 +144,10 @@
                             <el-checkbox :value="'TLSv1.3'">{{ 'TLS 1.3' }}</el-checkbox>
                             <el-checkbox :value="'TLSv1.2'">{{ 'TLS 1.2' }}</el-checkbox>
                             <el-checkbox :value="'TLSv1.1'">
-                                {{ 'TLS 1.0' + $t('website.notSecurity') }}
+                                {{ 'TLS 1.1' + $t('website.notSecurity') }}
                             </el-checkbox>
                             <el-checkbox :value="'TLSv1'">
-                                {{ 'TLS 1.1' + $t('website.notSecurity') }}
+                                {{ 'TLS 1.0' + $t('website.notSecurity') }}
                             </el-checkbox>
                         </el-checkbox-group>
                     </el-form-item>

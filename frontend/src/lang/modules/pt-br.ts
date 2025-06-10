@@ -3318,7 +3318,7 @@ const message = {
 
             panelExist:
                 'O serviço 1Panel V1 está em execução neste nó. Atualize para V2 usando o script de migração antes de adicionar.',
-            coreExist: 'Este nó já tem o serviço 1Panel V2 implantado e não pode ser adicionado como nó secundário.',
+            coreExist: 'Este nó já foi ativado como nó principal e não pode ser adicionado como um nó escravo.',
             agentExist:
                 '1panel-agent já está instalado neste nó. Continuar preservará os dados existentes e substituirá apenas o serviço 1panel-agent. Prosseguir?',
             dataExist: 'Existem dados históricos do 1Panel neste nó. Confirmar para continuar a adição?',

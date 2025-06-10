@@ -3311,8 +3311,7 @@ const message = {
 
             panelExist:
                 'Mengesan perkhidmatan 1Panel V1 sedang berjalan pada nod ini. Sila naik taraf ke V2 menggunakan skrip migrasi sebelum menambah.',
-            coreExist:
-                'Nod ini telah mempunyai perkhidmatan 1Panel V2 dipasang, tidak boleh ditambah sebagai nod sekunder.',
+            coreExist: 'Node ini telah diaktifkan sebagai nod utama dan tidak boleh ditambah sebagai nod hamba.',
             agentExist:
                 'Mengesan 1panel-agent telah dipasang pada nod ini. Jika diteruskan, data sedia ada akan dikekalkan dan hanya perkhidmatan 1panel-agent akan diganti. Teruskan?',
             dataExist: 'Mengesan data sejarah 1Panel wujud pada nod ini. Sahkan untuk terus menambah?',

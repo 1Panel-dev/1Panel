@@ -3130,7 +3130,7 @@ const message = {
             nodeSyncHelper2: '2. 主節點與子節點的連接信息',
 
             panelExist: '檢測到該節點正在運行 1Panel V1 服務，請先透過遷移腳本升級至 V2 後再進行新增。',
-            coreExist: '該節點已部署 1Panel V2 服務，無法作為從屬節點新增。',
+            coreExist: '該節點已作為主節點啟用，無法作為從節點添加。',
             agentExist: '檢測到該節點已安裝 1panel-agent，繼續新增將保留現有數據，僅替換 1panel-agent 服務，是否繼續？',
             dataExist: '檢測到該節點存在 1Panel 歷史數據，是否確認繼續新增？',
             errLicense: '檢測到該節點綁定的許可證不可用，請檢查後重試！',

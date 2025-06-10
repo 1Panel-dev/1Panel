@@ -3100,7 +3100,7 @@ const message = {
             nodeSyncHelper1: '1. 公用的备份账号信息',
             nodeSyncHelper2: '2. 主节点与子节点的连接信息',
             panelExist: '检测到该节点正在运行 1Panel V1 服务，请先通过迁移脚本升级至 V2 后再进行添加。',
-            coreExist: '该节点已部署 1Panel V2 服务，无法作为从节点添加。',
+            coreExist: '该节点已作为主节点启用，无法作为从节点添加。',
             agentExist: '检测到该节点已安装 1panel-agent，继续添加将保留现有数据，仅替换 1panel-agent 服务，是否继续？',
             dataExist: '检测到该节点存在 1Panel 历史数据，是否确认继续添加？',
             errLicense: '检测到该节点绑定的许可证不可用，请检查后重试！',

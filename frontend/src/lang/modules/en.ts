@@ -3384,7 +3384,7 @@ const message = {
 
             panelExist:
                 '1Panel V1 service is running on this node. Please upgrade to V2 using the migration script before adding.',
-            coreExist: 'This node already has 1Panel V2 service deployed and cannot be added as a secondary node.',
+            coreExist: 'This node has already been enabled as the main node and cannot be added as a slave node.',
             agentExist:
                 '1panel-agent is already installed on this node. Continuing will preserve existing data and only replace the 1panel-agent service. Proceed?',
             dataExist: '1Panel historical data exists on this node. Confirm to continue adding?',

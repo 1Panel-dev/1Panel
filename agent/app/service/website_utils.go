@@ -761,7 +761,7 @@ func applySSL(website *model.Website, websiteSSL model.WebsiteSSL, req request.W
 		if param.Name == "ssl_protocols" {
 			nginxParams[i].Params = req.SSLProtocol
 			if len(req.SSLProtocol) == 0 {
-				nginxParams[i].Params = []string{"TLSv1.3", "TLSv1.2", "TLSv1.1", "TLSv1"}
+				nginxParams[i].Params = []string{"TLSv1.3", "TLSv1.2"}
 			}
 		}
 		if param.Name == "ssl_ciphers" {
