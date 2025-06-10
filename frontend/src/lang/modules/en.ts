@@ -8,7 +8,6 @@ const message = {
         example: 'For example, ',
         fit2cloud: 'FIT2CLOUD',
         lingxia: 'Lingxia',
-        colon: ': ',
         button: {
             run: 'Run',
             prev: 'Previous',
@@ -225,7 +224,6 @@ const message = {
                 'This field must consist of English, numbers, ".", "-", and "_" characters with a length of 2-30.',
             supervisorName:
                 'This field must start with non-special characters and must consist of English, numbers, "-", and "_" characters with a length of 1-128.',
-                'Supports non-special characters starting with English, Chinese, numbers, .- and _, length 1-128',
             composeName:
                 'Supports non-special characters at the beginning, lowercase letters, numbers, - and _, length 1-256',
             complexityPassword:
@@ -359,7 +357,6 @@ const message = {
         mcp: 'MCP',
         container: 'Container | Containers',
         cronjob: 'Cron Job | Cron Jobs',
-        system: 'System',
         system: 'System',
         security: 'Security',
         files: 'File Browser',
@@ -611,11 +608,10 @@ const message = {
         containerConn: 'Container connection',
         connAddress: 'Address',
         containerConnHelper:
-            'This connection address can be used by applications that are running on the PHP execution environment or container.',
+            'This connection address is used by applications running on the PHP execution environment/container installation.',
         remoteConn: 'External connection',
         remoteConnHelper2:
             'This connnection address can be used by applications running on non-container or external applications.',
-            'This connection address is used by applications running on the PHP execution environment/container installation.',
         remoteConnHelper3:
             'The default access address is the host IP. To modify it, go to the "Default Access Address" configuration item in the panel settings page.',
         localIP: 'Local IP',
@@ -2341,7 +2337,8 @@ const message = {
         proxyPassHelper: 'The target URL must be valid and accessible.',
         proxyHostHelper: 'Pass the domain name in the request header to the proxy server.',
         modifier: 'Matching rules',
-        modifierHelper: 'Example: "=" is exact match, "~" is regular match, "^~" matches the beginning of the path, etc.',
+        modifierHelper:
+            'Example: "=" is exact match, "~" is regular match, "^~" matches the beginning of the path, etc.',
         replace: 'Text replacements',
         addReplace: 'Add',
         replaced: 'Search String (cannot be empty)',

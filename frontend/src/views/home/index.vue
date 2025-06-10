@@ -209,8 +209,7 @@
                                     </template>
                                     {{ baseInfo.kernelArch }}
                                 </el-descriptions-item>
-                                <el-descriptions-item class-name="system-content"label-class-name="system-label"
-                                >
+                                <el-descriptions-item class-name="system-content" label-class-name="system-label">
                                     <template #label>
                                         <span>{{ $t('home.ip') }}</span>
                                     </template>

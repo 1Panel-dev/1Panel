@@ -8,7 +8,6 @@ const message = {
         example: '例如：',
         fit2cloud: '飞致云',
         lingxia: '凌霞',
-        colon: '： ',
         button: {
             run: '執行',
             prev: '上一步',
@@ -349,7 +348,6 @@ const message = {
         mcp: 'MCP',
         container: '容器',
         cronjob: '計劃任務',
-        system: '系統',
         system: '系統',
         files: '文件',
         monitor: '監控',
