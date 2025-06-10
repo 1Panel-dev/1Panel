@@ -362,5 +362,12 @@
     "file": "gd.so",
     "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
     "installed": false
+  },
+  {
+    "name": "bcmath",
+    "check": "bcmath",
+    "file": "bcmath.so",
+    "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
+    "installed": false
   }
 ]

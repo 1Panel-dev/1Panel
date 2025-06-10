@@ -15,7 +15,13 @@
                     <el-button icon="Refresh" circle @click="search" />
                 </el-tooltip>
                 <el-tooltip :content="isHidden ? $t('file.showHide') : $t('file.noShowHide')" placement="top">
-                    <el-button class="btn" circle :icon="isHidden ? Hide : View" @click="viewHideFile" />
+                    <el-button
+                        class="btn"
+                        circle
+                        :type="isHidden ? 'primary' : ''"
+                        :icon="isHidden ? Hide : View"
+                        @click="viewHideFile"
+                    />
                 </el-tooltip>
             </div>
             <div class="flex-1 sm:w-min w-full hidden sm:block" ref="pathRef">
@@ -657,7 +663,7 @@ const calculateBtn = ref(false);
 const dirNum = ref(0);
 const fileNum = ref(0);
 const imageFiles = ref([]);
-const isHidden = ref(true);
+const isHidden = ref(false);
 
 const { searchableStatus, searchablePath, searchableInputRef, searchableInputBlur } = useSearchable(paths);
 
