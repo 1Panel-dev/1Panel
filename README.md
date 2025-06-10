@@ -50,7 +50,7 @@ curl -sSL https://resource.1panel.pro/quick_start.sh -o quick_start.sh && bash q
 
 Please refer to our [documentation](https://docs.1panel.pro/quick_start/) for more details.
 
-中国用户请使用这个 [安装脚本](https://1panel.cn/docs/installation/online_installation/)，其应用数量比国际版本更丰富。
+中国用户请使用此 [安装脚本](https://1panel.cn/docs/v2/installation/online_installation/)，默认安装 V2 版本，应用数量相较国际版本更丰富。
 
 ## Screenshot
 
