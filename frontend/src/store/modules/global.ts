@@ -49,7 +49,7 @@ const GlobalStore = defineStore({
             state.themeConfig.theme === 'dark' ||
             (state.themeConfig.theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches),
         isDarkGoldTheme: (state) => state.themeConfig.primary === '#F0BE96' && state.isProductPro,
-        docsUrl: (state) => (state.isIntl ? 'https://docs.1panel.pro' : 'https://1panel.cn/docs'),
+        docsUrl: (state) => (state.isIntl ? 'https://docs.1panel.pro' : 'https://1panel.cn/docs/v1'),
     },
     actions: {
         setOpenMenuTabs(openMenuTabs: boolean) {
