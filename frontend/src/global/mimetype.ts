@@ -212,6 +212,10 @@ export const DNSTypes = [
         value: 'NameCom',
     },
     {
+        label: 'reg.ru',
+        value: 'RegRu',
+    },
+    {
         label: 'FreeMyIP',
         value: 'FreeMyIP',
     },

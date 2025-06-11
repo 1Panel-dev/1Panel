@@ -15,6 +15,7 @@ import (
 	"github.com/go-acme/lego/v4/providers/dns/namedotcom"
 	"github.com/go-acme/lego/v4/providers/dns/namesilo"
 	"github.com/go-acme/lego/v4/providers/dns/rainyun"
+	"github.com/go-acme/lego/v4/providers/dns/regru"
 	"github.com/go-acme/lego/v4/providers/dns/spaceship"
 	"github.com/go-acme/lego/v4/providers/dns/tencentcloud"
 	"github.com/go-acme/lego/v4/providers/dns/vercel"
@@ -43,6 +44,7 @@ const (
 	Spaceship    DnsType = "Spaceship"
 	WestCN       DnsType = "WestCN"
 	ClouDNS      DnsType = "ClouDNS"
+	RegRu        DnsType = "RegRu"
 )
 
 type DNSParam struct {
@@ -215,7 +217,16 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 		cloudnsConfig.PollingInterval = pollingInterval
 		cloudnsConfig.TTL = ttl
 		p, err = cloudns.NewDNSProviderConfig(cloudnsConfig)
+	case RegRu:
+		regRuConfig := regru.NewDefaultConfig()
+		regRuConfig.Username = param.Username
+		regRuConfig.Password = param.Password
+		regRuConfig.PropagationTimeout = propagationTimeout
+		regRuConfig.PollingInterval = pollingInterval
+		regRuConfig.TTL = ttl
+		p, err = regru.NewDNSProviderConfig(regRuConfig)
 	}
+
 	if err != nil {
 		return nil, err
 	}

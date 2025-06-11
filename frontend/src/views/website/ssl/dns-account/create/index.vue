@@ -123,7 +123,7 @@
                             <el-input v-model.trim="account.authorization['authPassword']"></el-input>
                         </el-form-item>
                     </div>
-                    <div v-if="account.type === 'WestCN'">
+                    <div v-if="account.type === 'WestCN' || account.type === 'RegRu'">
                         <el-form-item label="Username" prop="authorization.username">
                             <el-input v-model.trim="account.authorization['username']"></el-input>
                         </el-form-item>
@@ -178,6 +178,8 @@ const rules = ref<any>({
         apiUser: [Rules.requiredInput],
         secretID: [Rules.requiredInput],
         apiSecret: [Rules.requiredInput],
+        username: [Rules.requiredInput],
+        password: [Rules.requiredInput],
     },
 });
 const account = ref({

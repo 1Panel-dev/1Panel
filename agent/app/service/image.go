@@ -280,7 +280,7 @@ func (u *ImageService) ImageLoad(req dto.ImageLoad) error {
 		return err
 	}
 	defer client.Close()
-	res, err := client.ImageLoad(context.TODO(), file, true)
+	res, err := client.ImageLoad(context.TODO(), file)
 	if err != nil {
 		return err
 	}
