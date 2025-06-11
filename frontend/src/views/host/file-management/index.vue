@@ -1344,7 +1344,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('file.mode'),
+        label: i18n.global.t('file.editPermissions'),
         click: (row: File.File) => {
             openBatchRole([row]);
         },

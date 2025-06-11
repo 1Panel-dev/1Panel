@@ -1,7 +1,7 @@
 <template>
     <div>
         <FireRouter />
-        <LayoutContent :title="$t('ssh.session')">
+        <LayoutContent :title="$t('ssh.session', 2)">
             <template #rightToolBar>
                 <TableSearch @search="search()" v-model:searchName="sshSearch.loginUser" />
             </template>

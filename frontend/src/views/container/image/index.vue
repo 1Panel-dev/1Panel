@@ -8,7 +8,7 @@
             @mounted="loadRepos"
         />
 
-        <LayoutContent v-if="isExist" :title="$t('container.image')" :class="{ mask: !isActive }">
+        <LayoutContent v-if="isExist" :title="$t('container.image', 2)" :class="{ mask: !isActive }">
             <template #leftToolBar>
                 <el-button type="primary" plain @click="onOpenPull">
                     {{ $t('container.imagePull') }}
