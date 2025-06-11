@@ -43,6 +43,15 @@
                             </el-text>
                         </template>
                     </el-table-column>
+                    <el-table-column :label="$t('home.dir')" prop="codeDir" width="80px">
+                        <template #default="{ row }">
+                            <el-button type="primary" link @click="toFolder(row.path)">
+                                <el-icon>
+                                    <FolderOpened />
+                                </el-icon>
+                            </el-button>
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('app.source')" prop="resource">
                         <template #default="{ row }">
                             <span v-if="row.resource == 'appstore'">{{ $t('menu.apps') }}</span>
@@ -129,6 +138,7 @@ import RuntimeStatus from '@/views/website/runtime/components/runtime-status.vue
 import Terminal from '@/views/website/runtime/components/terminal.vue';
 import { disabledButton } from '@/utils/runtime';
 import { GlobalStore } from '@/store';
+import router from '@/routers/router';
 const globalStore = GlobalStore();
 const mobile = computed(() => {
     return globalStore.isMobile();
@@ -363,6 +373,10 @@ const onOpenBuildCache = () => {
                 loading.value = false;
             });
     });
+};
+
+const toFolder = (folder: string) => {
+    router.push({ path: '/hosts/files', query: { path: folder } });
 };
 
 onMounted(() => {

@@ -12,7 +12,7 @@
             </el-tooltip>
         </template>
         <template #content>
-            <ContainerLog :container="config.container" />
+            <ContainerLog :container="config.container" :highlightDiff="highlightDiff" />
         </template>
         <template #footer>
             <span class="dialog-footer">
@@ -40,6 +40,13 @@ const logSearch = reactive({
     containerID: '',
     mode: 'all',
     tail: 100,
+});
+
+defineProps({
+    highlightDiff: {
+        type: Number,
+        default: 320,
+    },
 });
 
 function toggleFullscreen() {
