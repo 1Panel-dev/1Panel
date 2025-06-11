@@ -25,7 +25,7 @@
                     {{ $t('commons.button.log') }}
                 </el-button>
                 <el-button type="primary" :plain="index !== 'resource'" @click="changeTab('resource')">
-                    {{ $t('website.source', 2) }}
+                    {{ $t('website.source') }}
                 </el-button>
             </template>
             <template #main>

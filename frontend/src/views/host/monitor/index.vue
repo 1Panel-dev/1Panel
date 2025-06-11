@@ -16,7 +16,7 @@ const buttons = [
         path: '/hosts/monitor/monitor',
     },
     {
-        label: i18n.global.t('menu.settings', 2),
+        label: i18n.global.t('commons.button.set'),
         path: '/hosts/monitor/setting',
     },
 ];

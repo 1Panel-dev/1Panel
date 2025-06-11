@@ -1,7 +1,7 @@
 <template>
     <div>
         <RouterButton :buttons="routerButton" />
-        <LayoutContent :title="$t('website.ssl', 2)">
+        <LayoutContent :title="$t('website.ssl')">
             <template #leftToolBar>
                 <el-button type="primary" @click="openSSL()">
                     {{ $t('ssl.create') }}
@@ -206,7 +206,7 @@ const req = reactive({
 
 const routerButton = [
     {
-        label: i18n.global.t('website.ssl', 2),
+        label: i18n.global.t('website.ssl'),
         path: '/websites/ssl',
     },
 ];

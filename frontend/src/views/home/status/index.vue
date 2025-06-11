@@ -47,8 +47,7 @@
                 </template>
             </el-popover>
             <span class="input-help">
-                ( {{ formatNumber(currentInfo.cpuUsed) }} / {{ currentInfo.cpuTotal }} )
-                {{ $t('commons.units.core', currentInfo.cpuTotal) }}
+                ( {{ formatNumber(currentInfo.cpuUsed) }} / {{ currentInfo.cpuTotal }} ) {{ $t('commons.units.core') }}
             </span>
         </el-col>
         <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center">
@@ -91,10 +90,14 @@
         </el-col>
         <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center">
             <el-popover placement="bottom" :width="200" trigger="hover" v-if="chartsOption['load']">
-                <el-tag class="tagClass">{{ $t('home.loadAverage', 1) }}: {{ formatNumber(currentInfo.load1) }}</el-tag>
-                <el-tag class="tagClass">{{ $t('home.loadAverage', 5) }}: {{ formatNumber(currentInfo.load5) }}</el-tag>
                 <el-tag class="tagClass">
-                    {{ $t('home.loadAverage', 15) }}: {{ formatNumber(currentInfo.load15) }}
+                    {{ $t('home.loadAverage', [1]) }}: {{ formatNumber(currentInfo.load1) }}
+                </el-tag>
+                <el-tag class="tagClass">
+                    {{ $t('home.loadAverage', [5]) }}: {{ formatNumber(currentInfo.load5) }}
+                </el-tag>
+                <el-tag class="tagClass">
+                    {{ $t('home.loadAverage', [15]) }}: {{ formatNumber(currentInfo.load15) }}
                 </el-tag>
                 <template #reference>
                     <v-charts

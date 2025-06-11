@@ -7,7 +7,7 @@
             @search="search"
         />
 
-        <LayoutContent v-if="isExist" :title="$t('container.repo', 2)" :class="{ mask: !isActive }">
+        <LayoutContent v-if="isExist" :title="$t('container.repo')" :class="{ mask: !isActive }">
             <template #leftToolBar>
                 <el-button type="primary" @click="onOpenDialog('add')">
                     {{ $t('container.createRepo') }}

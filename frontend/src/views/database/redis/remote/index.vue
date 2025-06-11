@@ -1,6 +1,6 @@
 <template>
     <div v-loading="loading">
-        <LayoutContent :title="$t('database.remoteDB', 2)" backName="Redis">
+        <LayoutContent :title="$t('database.remoteDB')" backName="Redis">
             <template #leftToolBar>
                 <el-button type="primary" @click="onOpenDialog('create')">
                     {{ $t('database.createRemoteDB') }}

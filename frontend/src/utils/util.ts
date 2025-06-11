@@ -521,17 +521,17 @@ export function getAge(d1: string): string {
 
     let res = '';
     if (dayDiff > 0) {
-        res += String(dayDiff) + ' ' + i18n.global.t('commons.units.day', dayDiff) + ' ';
+        res += String(dayDiff) + ' ' + i18n.global.t('commons.units.day') + ' ';
         if (hours <= 0) {
             return res;
         }
     }
     if (hours > 0) {
-        res += String(hours) + ' ' + i18n.global.t('commons.units.hour', hours);
+        res += String(hours) + ' ' + i18n.global.t('commons.units.hour');
         return res;
     }
     if (minutes > 0) {
-        res += String(minutes) + ' ' + i18n.global.t('commons.units.minute', minutes);
+        res += String(minutes) + ' ' + i18n.global.t('commons.units.minute');
         return res;
     }
     return i18n.global.t('app.less1Minute');

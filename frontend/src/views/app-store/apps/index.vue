@@ -1,5 +1,5 @@
 <template>
-    <LayoutContent v-loading="loading" v-if="!showDetail" :title="$t('app.app', 2)">
+    <LayoutContent v-loading="loading" v-if="!showDetail" :title="$t('app.app')">
         <template #search>
             <Tags @change="changeTag" />
         </template>

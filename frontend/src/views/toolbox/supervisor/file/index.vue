@@ -125,9 +125,9 @@ const acceptParams = (name: string, file: string, operate: string) => {
 const cleanLog = async () => {
     let log = req.file === 'out.log' ? i18n.global.t('logs.runLog') : i18n.global.t('logs.errLog');
     opRef.value.acceptParams({
-        title: i18n.global.t('commons.button.clean'),
+        title: i18n.global.t('commons.msg.clean'),
         names: [req.name],
-        msg: i18n.global.t('commons.msg.operatorHelper', [log, i18n.global.t('commons.button.clean')]),
+        msg: i18n.global.t('commons.msg.operatorHelper', [log, i18n.global.t('commons.msg.clean')]),
         api: operateSupervisorProcessFile,
         params: { name: req.name, operate: 'clear', file: req.file },
     });

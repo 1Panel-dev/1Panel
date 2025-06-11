@@ -1,142 +1,59 @@
 <template>
-    <DrawerPro v-model="open" size="50%">
-        <template #header>
-            <DrawerHeader
-                :header="$t('runtime.' + mode)"
-                :hideResource="mode == 'create'"
-                :resource="runtime.name"
-                :back="handleClose"
-            />
-        </template>
-        <el-row v-loading="loading">
-            <el-col :span="22" :offset="1">
-                <el-form
-                    ref="runtimeForm"
-                    label-position="top"
-                    :model="runtime"
-                    label-width="125px"
-                    :rules="rules"
-                    :validate-on-rule-change="false"
-                >
-                    <el-form-item :label="$t('commons.table.name')" prop="name">
-                        <el-input :disabled="mode === 'edit'" v-model="runtime.name"></el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('runtime.app')" prop="appID">
-                        <el-row :gutter="20">
-                            <el-col :span="12">
-                                <el-select
-                                    v-model="runtime.appID"
-                                    :disabled="mode === 'edit'"
-                                    @change="changeApp(runtime.appID)"
-                                    class="p-w-200"
-                                >
-                                    <el-option
-                                        v-for="(app, index) in apps"
-                                        :key="index"
-                                        :label="app.name"
-                                        :value="app.id"
-                                    ></el-option>
-                                </el-select>
-                            </el-col>
-                            <el-col :span="12">
-                                <el-select
-                                    v-model="runtime.version"
-                                    :disabled="mode === 'edit'"
-                                    @change="changeVersion()"
-                                    class="p-w-200"
-                                >
-                                    <el-option
-                                        v-for="(version, index) in appVersions"
-                                        :key="index"
-                                        :label="version"
-                                        :value="version"
-                                    ></el-option>
-                                </el-select>
-                            </el-col>
-                        </el-row>
-                    </el-form-item>
-                    <el-form-item :label="$t('tool.supervisor.dir')" prop="codeDir">
-                        <el-input v-model.trim="runtime.codeDir" :disabled="mode === 'edit'">
-                            <template #prepend>
-                                <FileList
-                                    :disabled="mode === 'edit'"
-                                    :path="runtime.codeDir"
-                                    @choose="getPath"
-                                    :dir="true"
-                                ></FileList>
-                            </template>
-                        </el-input>
-                        <span class="input-help">
-                            {{ $t('runtime.goDirHelper') }}
-                        </span>
-                    </el-form-item>
-                    <el-form-item :label="$t('runtime.runScript')" prop="params.EXEC_SCRIPT">
-                        <el-input v-model="runtime.params['EXEC_SCRIPT']"></el-input>
-                        <span class="input-help">
-                            {{ $t('runtime.goHelper') }}
-                        </span>
-                    </el-form-item>
-                    <el-row :gutter="20">
-                        <el-col :span="7">
-                            <el-form-item :label="$t('runtime.appPort')" prop="params.GO_APP_PORT">
-                                <el-input v-model.number="runtime.params['GO_APP_PORT']" />
-                                <span class="input-help">{{ $t('runtime.appPortHelper') }}</span>
-                            </el-form-item>
-                        </el-col>
-                        <el-col :span="7">
-                            <el-form-item :label="$t('runtime.externalPort')" prop="port">
-                                <el-input v-model.number="runtime.port" />
-                                <span class="input-help">{{ $t('runtime.externalPortHelper') }}</span>
-                            </el-form-item>
-                        </el-col>
-                        <el-col :span="4">
-                            <el-form-item :label="$t('commons.button.add') + $t('commons.table.port')">
-                                <el-button @click="addPort">
-                                    <el-icon><Plus /></el-icon>
-                                </el-button>
-                            </el-form-item>
-                        </el-col>
-                        <el-col :span="6">
-                            <el-form-item :label="$t('app.allowPort')" prop="params.HOST_IP">
-                                <el-switch
-                                    v-model="runtime.params['HOST_IP']"
-                                    :active-value="'0.0.0.0'"
-                                    :inactive-value="'127.0.0.1'"
-                                />
-                            </el-form-item>
-                        </el-col>
-                    </el-row>
-                    <el-row :gutter="20" v-for="(port, index) of runtime.exposedPorts" :key="index">
-                        <el-col :span="7">
-                            <el-form-item
-                                :prop="'exposedPorts.' + index + '.containerPort'"
-                                :rules="rules.params.GO_APP_PORT"
-                            >
-                                <el-input v-model.number="port.containerPort" :placeholder="$t('runtime.appPort')" />
-                            </el-form-item>
-                        </el-col>
-                        <el-col :span="7">
-                            <el-form-item
-                                :prop="'exposedPorts.' + index + '.hostPort'"
-                                :rules="rules.params.GO_APP_PORT"
-                            >
-                                <el-input v-model.number="port.hostPort" :placeholder="$t('runtime.externalPort')" />
-                            </el-form-item>
-                        </el-col>
-                        <el-col :span="4">
-                            <el-form-item>
-                                <el-button type="primary" @click="removePort(index)" link>
-                                    {{ $t('commons.button.delete') }}
-                                </el-button>
-                            </el-form-item>
-                        </el-col>
-                    </el-row>
-                    <el-form-item :label="$t('app.containerName')" prop="params.CONTAINER_NAME">
-                        <el-input v-model.trim="runtime.params['CONTAINER_NAME']"></el-input>
-                    </el-form-item>
-                </el-form>
-            </el-col>
-        </el-row>
+    <DrawerPro
+        v-model="open"
+        :header="$t('runtime.' + mode)"
+        size="large"
+        :resource="mode === 'edit' ? runtime.name : ''"
+        @close="handleClose"
+    >
+        <el-form
+            v-loading="loading"
+            ref="runtimeForm"
+            label-position="top"
+            :model="runtime"
+            label-width="125px"
+            :rules="rules"
+            :validate-on-rule-change="false"
+        >
+            <el-form-item :label="$t('commons.table.name')" prop="name">
+                <el-input :disabled="mode === 'edit'" v-model="runtime.name"></el-input>
+            </el-form-item>
+            <AppConfig v-model="runtime" :mode="mode" appKey="go" />
+            <el-form-item :label="$t('tool.supervisor.dir')" prop="codeDir">
+                <el-input v-model.trim="runtime.codeDir" :disabled="mode === 'edit'">
+                    <template #prepend>
+                        <FileList
+                            :disabled="mode === 'edit'"
+                            :path="runtime.codeDir"
+                            @choose="getPath"
+                            :dir="true"
+                        ></FileList>
+                    </template>
+                </el-input>
+                <span class="input-help">
+                    {{ $t('runtime.goDirHelper') }}
+                </span>
+            </el-form-item>
+            <el-form-item :label="$t('runtime.runScript')" prop="params.EXEC_SCRIPT">
+                <el-input v-model="runtime.params['EXEC_SCRIPT']"></el-input>
+                <span class="input-help">
+                    {{ $t('runtime.goHelper') }}
+                </span>
+            </el-form-item>
+            <el-form-item :label="$t('app.containerName')" prop="params.CONTAINER_NAME">
+                <el-input v-model.trim="runtime.params['CONTAINER_NAME']"></el-input>
+            </el-form-item>
+            <el-tabs type="border-card">
+                <el-tab-pane :label="$t('commons.table.port')">
+                    <PortConfig v-model="runtime" :mode="mode" />
+                </el-tab-pane>
+                <el-tab-pane :label="$t('runtime.environment')">
+                    <Environment :environments="runtime.environments" />
+                </el-tab-pane>
+                <el-tab-pane :label="$t('container.mount')"><Volumes :volumes="runtime.volumes" /></el-tab-pane>
+            </el-tabs>
+        </el-form>
+
         <template #footer>
             <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
             <el-button type="primary" @click="submit(runtimeForm)" :disabled="loading">
@@ -155,6 +72,10 @@ import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { reactive, ref, watch } from 'vue';
+import PortConfig from '@/views/website/runtime/port/index.vue';
+import Environment from '@/views/website/runtime/environment/index.vue';
+import Volumes from '@/views/website/runtime/volume/index.vue';
+import AppConfig from '@/views/website/runtime/app/index.vue';
 
 interface OperateRrops {
     id?: number;

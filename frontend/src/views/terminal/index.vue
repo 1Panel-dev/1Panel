@@ -3,13 +3,13 @@
         <el-card class="router_card">
             <el-radio-group v-model="activeNames" @change="handleChange">
                 <el-radio-button class="router_card_button" size="large" value="terminal">
-                    {{ $t('menu.terminal', 2) }}
+                    {{ $t('menu.terminal') }}
                 </el-radio-button>
                 <el-radio-button class="router_card_button" size="large" value="host">
-                    {{ $t('terminal.host', 2) }}
+                    {{ $t('terminal.host') }}
                 </el-radio-button>
                 <el-radio-button class="router_card_button" size="large" value="command">
-                    {{ $t('terminal.quickCommand', 2) }}
+                    {{ $t('terminal.quickCommand') }}
                 </el-radio-button>
                 <el-radio-button class="router_card_button" size="large" value="setting">
                     {{ $t('container.setting') }}

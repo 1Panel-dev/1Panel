@@ -228,8 +228,7 @@
                                                     class="d-description flex flex-wrap items-center justify-start gap-1.5"
                                                 >
                                                     <el-button class="mr-1" plain size="small">
-                                                        {{ $t('app.version') }}{{ $t('commons.colon')
-                                                        }}{{ installed.version }}
+                                                        {{ $t('app.version') }}：{{ installed.version }}
                                                     </el-button>
                                                     <el-button
                                                         v-if="installed.httpPort > 0"
@@ -237,8 +236,7 @@
                                                         plain
                                                         size="small"
                                                     >
-                                                        {{ $t('app.busPort') }}{{ $t('commons.colon')
-                                                        }}{{ installed.httpPort }}
+                                                        {{ $t('app.busPort') }}：{{ installed.httpPort }}
                                                     </el-button>
                                                     <el-button v-if="installed.httpsPort > 0" plain size="small">
                                                         {{ $t('app.busPort') }}：{{ installed.httpsPort }}

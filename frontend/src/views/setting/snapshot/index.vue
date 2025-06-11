@@ -1,6 +1,6 @@
 <template>
     <div>
-        <LayoutContent v-loading="loading" v-if="!isRecordShow" :title="$t('setting.snapshot', 2)">
+        <LayoutContent v-loading="loading" v-if="!isRecordShow" :title="$t('setting.snapshot')">
             <template #leftToolBar>
                 <el-button type="primary" @click="onCreate()">
                     {{ $t('setting.createSnapshot') }}
@@ -9,7 +9,7 @@
                     {{ $t('setting.importSnapshot') }}
                 </el-button>
                 <el-button type="primary" plain @click="onIgnore()">
-                    {{ $t('setting.editIgnoreRule') }}
+                    {{ $t('setting.ignoreRule') }}
                 </el-button>
                 <el-button type="primary" plain :disabled="selects.length === 0" @click="batchDelete(null)">
                     {{ $t('commons.button.delete') }}

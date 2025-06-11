@@ -1,7 +1,7 @@
 <template>
     <div>
         <FireRouter />
-        <LayoutContent :title="$t('menu.network', 2)" v-loading="loading">
+        <LayoutContent :title="$t('menu.network')" v-loading="loading">
             <template #rightToolBar>
                 <div class="w-full">
                     <el-form-item class="float-right">

@@ -16,10 +16,10 @@
                     <span>{{ $t('firewall.firewallNotStart') }}</span>
                 </el-card>
 
-                <LayoutContent :title="$t('firewall.forwardRule', 2)" :class="{ mask: !isActive }">
+                <LayoutContent :title="$t('firewall.forwardRule')" :class="{ mask: !isActive }">
                     <template #leftToolBar>
                         <el-button type="primary" @click="onOpenDialog('create')">
-                            {{ $t('firewall.createForwardRule') }}
+                            {{ $t('commons.button.create') }}{{ $t('firewall.forwardRule') }}
                         </el-button>
                         <el-button @click="onDelete(null)" plain :disabled="selects.length === 0">
                             {{ $t('commons.button.delete') }}

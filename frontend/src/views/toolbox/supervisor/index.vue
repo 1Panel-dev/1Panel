@@ -3,7 +3,7 @@
         <el-card v-if="showStopped" class="mask-prompt">
             <span>{{ $t('tool.supervisor.notStartWarn') }}</span>
         </el-card>
-        <LayoutContent :title="$t('tool.supervisor.list', 2)" v-loading="loading">
+        <LayoutContent :title="$t('tool.supervisor.list')" v-loading="loading">
             <template #app>
                 <SuperVisorStatus
                     @setting="setting"
@@ -14,7 +14,7 @@
             </template>
             <template v-if="showTable" #leftToolBar>
                 <el-button type="primary" @click="openCreate" :disabled="showStopped">
-                    {{ $t('commons.button.create') + $t('tool.supervisor.list').toLowerCase() }}
+                    {{ $t('commons.button.create') + $t('tool.supervisor.list') }}
                 </el-button>
             </template>
             <template #main v-if="showTable">
@@ -315,7 +315,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('website.sourceFile'),
+        label: i18n.global.t('website.proxyFile'),
         click: function (row: HostTool.SupersivorProcess) {
             getFile(row.name, 'config');
         },

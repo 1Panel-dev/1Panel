@@ -11,7 +11,7 @@
             @search="search"
         />
 
-        <LayoutContent v-if="!isOnDetail && isExist" :title="$t('container.compose', 2)" :class="{ mask: !isActive }">
+        <LayoutContent v-if="!isOnDetail && isExist" :title="$t('container.compose')" :class="{ mask: !isActive }">
             <template #leftToolBar>
                 <el-button type="primary" @click="onOpenDialog()">
                     {{ $t('container.createCompose') }}

@@ -12,15 +12,15 @@ import i18n from '@/lang';
 
 const buttons = [
     {
-        label: i18n.global.t('firewall.portRule', 2),
+        label: i18n.global.t('firewall.portRule'),
         path: '/hosts/firewall/port',
     },
     {
-        label: i18n.global.t('firewall.forwardRule', 2),
+        label: i18n.global.t('firewall.forwardRule'),
         path: '/hosts/firewall/forward',
     },
     {
-        label: i18n.global.t('firewall.ipRule', 2),
+        label: i18n.global.t('firewall.ipRule'),
         path: '/hosts/firewall/ip',
     },
 ];

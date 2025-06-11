@@ -16,35 +16,35 @@ const buttons = [
         path: '/containers/dashboard',
     },
     {
-        label: i18n.global.t('menu.container', 2),
+        label: i18n.global.t('menu.container'),
         path: '/containers/container',
     },
     {
-        label: i18n.global.t('container.compose', 2),
+        label: i18n.global.t('container.compose'),
         path: '/containers/compose',
     },
     {
-        label: i18n.global.t('container.image', 2),
+        label: i18n.global.t('container.image'),
         path: '/containers/image',
     },
     {
-        label: i18n.global.t('container.network', 2),
+        label: i18n.global.t('container.network'),
         path: '/containers/network',
     },
     {
-        label: i18n.global.t('container.volume', 2),
+        label: i18n.global.t('container.volume'),
         path: '/containers/volume',
     },
     {
-        label: i18n.global.t('container.repo', 2),
+        label: i18n.global.t('container.repo'),
         path: '/containers/repo',
     },
     {
-        label: i18n.global.t('container.composeTemplate', 2),
+        label: i18n.global.t('container.composeTemplate'),
         path: '/containers/template',
     },
     {
-        label: i18n.global.t('container.setting', 2),
+        label: i18n.global.t('container.setting'),
         path: '/containers/setting',
     },
 ];

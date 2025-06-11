@@ -7,7 +7,7 @@
             @search="search"
         />
 
-        <LayoutContent v-if="isExist" :title="$t('container.composeTemplate', 2)" :class="{ mask: !isActive }">
+        <LayoutContent v-if="isExist" :title="$t('container.composeTemplate')" :class="{ mask: !isActive }">
             <template #leftToolBar>
                 <el-button type="primary" @click="onOpenDialog('create')">
                     {{ $t('container.createComposeTemplate') }}

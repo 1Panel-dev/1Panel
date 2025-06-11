@@ -72,7 +72,7 @@ const hasCache = ref(false);
 
 const buttons = [
     {
-        label: i18n.global.t('website.sourceFile'),
+        label: i18n.global.t('website.proxyFile'),
         click: function (row: Website.ProxyConfig) {
             openEditFile(row);
         },
@@ -141,7 +141,7 @@ const deleteProxy = async (proxyConfig: Website.ProxyConfig) => {
         names: [proxyConfig.name],
         msg: i18n.global.t('commons.msg.operatorHelper', [
             i18n.global.t('website.proxy'),
-            i18n.global.t('commons.button.delete'),
+            i18n.global.t('commons.msg.delete'),
         ]),
         api: operateProxyConfig,
         params: proxyConfig,

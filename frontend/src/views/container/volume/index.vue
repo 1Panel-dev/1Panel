@@ -7,7 +7,7 @@
             @search="search"
         />
 
-        <LayoutContent v-if="isExist" :title="$t('container.volume', 2)" :class="{ mask: !isActive }">
+        <LayoutContent v-if="isExist" :title="$t('container.volume')" :class="{ mask: !isActive }">
             <template #leftToolBar>
                 <el-button type="primary" @click="onCreate()">
                     {{ $t('container.createVolume') }}

@@ -1,10 +1,5 @@
 <template>
-    <DrawerPro
-        v-model="open"
-        :header="$t('website.sourceFile')"
-        @close="handleClose"
-        :size="mobile ? 'full' : 'normal'"
-    >
+    <DrawerPro v-model="open" :header="$t('website.proxyFile')" @close="handleClose" :size="mobile ? 'full' : 'normal'">
         <CodemirrorPro v-model="req.content" mode="nginx"></CodemirrorPro>
         <template #footer>
             <span class="dialog-footer">

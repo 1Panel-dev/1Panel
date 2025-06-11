@@ -1,7 +1,7 @@
 <template>
     <DrawerPro v-model="drawerVisible" :header="$t('ssh.listenAddress')" @close="handleClose" size="small">
         <el-form ref="formRef" label-position="top" :rules="rules" :model="form" @submit.prevent v-loading="loading">
-            <el-alert class="common-prompt" :closable="false" type="warning">
+            <el-alert class="common-prompt" :closable="false" type="error">
                 <template #default>
                     <span>
                         {{ $t('ssh.listenHelper', [form.port]) }}

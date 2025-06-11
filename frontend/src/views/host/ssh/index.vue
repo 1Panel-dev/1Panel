@@ -12,15 +12,15 @@ import i18n from '@/lang';
 
 const buttons = [
     {
-        label: i18n.global.t('menu.settings', 2),
+        label: i18n.global.t('menu.config'),
         path: '/hosts/ssh/ssh',
     },
     {
-        label: i18n.global.t('ssh.session', 2),
+        label: i18n.global.t('ssh.session'),
         path: '/hosts/ssh/session',
     },
     {
-        label: i18n.global.t('ssh.loginLogs', 2),
+        label: i18n.global.t('ssh.loginLogs'),
         path: '/hosts/ssh/log',
     },
 ];

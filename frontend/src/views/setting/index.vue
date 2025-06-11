@@ -20,11 +20,11 @@ const buttons = [
         path: '/settings/safe',
     },
     {
-        label: i18n.global.t('setting.backupAccount', 2),
+        label: i18n.global.t('setting.backupAccount'),
         path: '/settings/backupaccount',
     },
     {
-        label: i18n.global.t('setting.snapshot', 2),
+        label: i18n.global.t('setting.snapshot'),
         path: '/settings/snapshot',
     },
     {

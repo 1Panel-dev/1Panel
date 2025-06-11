@@ -23,10 +23,10 @@
             </el-card>
         </div>
         <div v-if="form.isExist">
-            <LayoutContent v-loading="loading" :title="$t('toolbox.ftp.ftp', 2)" :class="{ mask: !form.isActive }">
+            <LayoutContent v-loading="loading" title="FTP" :class="{ mask: !form.isActive }">
                 <template #leftToolBar>
                     <el-button type="primary" @click="onOpenDialog('add')">
-                        {{ $t('commons.button.add') }} {{ $t('toolbox.ftp.ftp') }}
+                        {{ $t('commons.button.add') }} FTP
                     </el-button>
                     <el-button @click="onSync()">
                         {{ $t('commons.button.sync') }}

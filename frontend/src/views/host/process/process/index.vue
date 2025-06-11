@@ -1,7 +1,7 @@
 <template>
     <div>
         <FireRouter />
-        <LayoutContent :title="$t('menu.process', 2)" v-loading="loading">
+        <LayoutContent :title="$t('menu.process')" v-loading="loading">
             <template #rightToolBar>
                 <div class="w-full">
                     <el-form-item class="float-right">
@@ -137,7 +137,7 @@ const opRef = ref();
 
 const buttons = [
     {
-        label: i18n.global.t('process.viewDetails'),
+        label: i18n.global.t('app.detail'),
         click: function (row: any) {
             openDetail(row);
         },

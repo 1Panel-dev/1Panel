@@ -146,7 +146,7 @@
                 </div>
                 <div class="app-warn" v-show="!hasRecords">
                     <div>
-                        <span>{{ $t('toolbox.clam.noRecords') }}</span>
+                        <span>{{ $t('cronjob.noRecord') }}</span>
                         <div>
                             <img src="@/assets/images/no_app.svg" />
                         </div>

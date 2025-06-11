@@ -1,6 +1,6 @@
 <template>
     <div>
-        <LayoutContent v-loading="loading" :title="$t('ssh.loginLogs', 2)">
+        <LayoutContent v-loading="loading" :title="$t('ssh.loginLogs')">
             <template #prompt>
                 <el-alert type="info" :title="$t('ssh.sshAlert2')" :closable="false" />
                 <div class="mt-2"><el-alert type="info" :title="$t('ssh.sshAlert')" :closable="false" /></div>

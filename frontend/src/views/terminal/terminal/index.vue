@@ -400,7 +400,7 @@ const onConnTerminal = async (title: string, wsID: number) => {
                 endpoint: '/api/v2/core/hosts/terminal',
                 args: `id=${wsID}`,
                 initCmd: initCmd.value,
-                error: res.data ? '' : 'Authentication failed. Please check the host information!',
+                error: res.data ? '' : 'Authentication failed.  Please check the host information !',
             });
         initCmd.value = '';
     });
