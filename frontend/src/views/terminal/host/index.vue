@@ -1,12 +1,12 @@
 <template>
     <div>
-        <LayoutContent v-loading="loading" :title="$t('terminal.host')">
+        <LayoutContent v-loading="loading" :title="$t('terminal.host', 2)">
             <template #leftToolBar>
                 <el-button type="primary" @click="onOpenDialog('create')">
                     {{ $t('terminal.addHost') }}
                 </el-button>
                 <el-button type="primary" plain @click="onOpenGroupDialog()">
-                    {{ $t('commons.table.group') }}
+                    {{ $t('commons.table.manageGroup') }}
                 </el-button>
                 <el-button type="primary" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
                     {{ $t('commons.button.delete') }}

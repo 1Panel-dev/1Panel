@@ -3,12 +3,12 @@
         <RouterButton
             :buttons="[
                 {
-                    label: i18n.global.t('menu.website'),
+                    label: i18n.global.t('menu.website', 2),
                     path: '/websites',
                 },
             ]"
         />
-        <LayoutContent :title="$t('menu.website')" v-loading="loading">
+        <LayoutContent :title="$t('menu.website', 2)" v-loading="loading">
             <template #app>
                 <AppStatus
                     :app-key="'openresty'"
@@ -23,7 +23,7 @@
                     {{ $t('website.create') }}
                 </el-button>
                 <el-button type="primary" plain @click="openGroup" :disabled="nginxStatus != 'Running'">
-                    {{ $t('commons.table.group') }}
+                    {{ $t('commons.table.manageGroup') }}
                 </el-button>
                 <el-button type="primary" plain @click="openDefault" :disabled="nginxStatus != 'Running'">
                     {{ $t('website.defaultServer') }}

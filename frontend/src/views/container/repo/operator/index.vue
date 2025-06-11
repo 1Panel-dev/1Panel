@@ -1,7 +1,7 @@
 <template>
     <DrawerPro
         v-model="drawerVisible"
-        :header="title + $t('container.repo')"
+        :header="title + $t('container.repo').toLowerCase()"
         :resource="dialogData.rowData?.name"
         @close="handleClose"
         size="small"
@@ -45,7 +45,7 @@
                     :placeholder="'172.16.10.10:8081'"
                 ></el-input>
                 <span v-if="dialogData.rowData!.downloadUrl" class="input-help">
-                    docker pull {{ dialogData.rowData!.downloadUrl }}/nginx
+                    Pull example: docker pull {{ dialogData.rowData!.downloadUrl }}/nginx
                 </span>
             </el-form-item>
             <el-form-item :label="$t('commons.table.protocol')" prop="protocol">

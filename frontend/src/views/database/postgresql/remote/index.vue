@@ -1,6 +1,6 @@
 <template>
     <div v-loading="loading">
-        <LayoutContent :title="$t('database.remoteDB')" backName="PostgreSQL">
+        <LayoutContent :title="$t('database.remoteDB', 2)" backName="PostgreSQL">
             <template #leftToolBar>
                 <el-button type="primary" @click="onOpenDialog('create')">
                     {{ $t('database.createRemoteDB') }}

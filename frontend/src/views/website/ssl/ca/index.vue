@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('ssl.ca')" size="large" @close="handleClose">
+    <DrawerPro v-model="open" :header="$t('ssl.selfSigned')" size="large" @close="handleClose">
         <template #content>
             <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()" v-loading="loading">
                 <template #toolbar>
@@ -119,7 +119,7 @@ const deleteca = async (row: any) => {
         title: i18n.global.t('commons.button.delete'),
         names: [row.name],
         msg: i18n.global.t('commons.msg.operatorHelper', [
-            i18n.global.t('website.ca'),
+            i18n.global.t('ssl.ca'),
             i18n.global.t('commons.button.delete'),
         ]),
         api: deleteCA,

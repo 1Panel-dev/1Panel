@@ -2,7 +2,7 @@
     <div v-loading="loading">
         <docker-status v-model:isActive="isActive" v-model:isExist="isExist" @search="search" />
 
-        <LayoutContent :title="$t('menu.container')" v-if="isExist" :class="{ mask: !isActive }">
+        <LayoutContent :title="$t('menu.container', 2)" v-if="isExist" :class="{ mask: !isActive }">
             <template #search v-if="tags.length !== 0">
                 <div class="card-interval" v-if="isExist && isActive">
                     <div v-for="item in tags" :key="item.key" class="inline">

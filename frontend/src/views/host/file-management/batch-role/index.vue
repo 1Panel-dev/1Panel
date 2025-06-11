@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('file.setRole')" @close="handleClose" size="large">
+    <DrawerPro v-model="open" :header="$t('file.editPermissions')" @close="handleClose" size="large">
         <div v-loading="loading">
             <FileRole :mode="mode" @get-mode="getMode" :key="open.toString()"></FileRole>
             <el-form ref="fileForm" label-position="left" :model="addForm" label-width="100px" :rules="rules">

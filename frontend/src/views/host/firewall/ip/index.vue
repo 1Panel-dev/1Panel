@@ -17,10 +17,10 @@
                     <span>{{ $t('firewall.firewallNotStart') }}</span>
                 </el-card>
 
-                <LayoutContent :title="$t('firewall.ipRule')" :class="{ mask: !isActive }">
+                <LayoutContent :title="$t('firewall.ipRule', 2)" :class="{ mask: !isActive }">
                     <template #leftToolBar>
                         <el-button type="primary" @click="onOpenDialog('create')">
-                            {{ $t('commons.button.create') }} {{ $t('firewall.ipRule') }}
+                            {{ $t('firewall.createIpRule') }}
                         </el-button>
                         <el-button @click="onDelete(null)" plain :disabled="selects.length === 0">
                             {{ $t('commons.button.delete') }}
