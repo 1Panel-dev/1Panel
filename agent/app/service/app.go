@@ -108,7 +108,7 @@ func (a AppService) PageApp(ctx *gin.Context, req request.AppSearch) (interface{
 	lang := strings.ToLower(common.GetLang(ctx))
 	for _, ap := range apps {
 		if req.Type == "php" {
-			if ap.RequiredPanelVersion == 0 || !common.CompareAppVersion(fmt.Sprintf("%f", ap.RequiredPanelVersion), common.GetSystemVersion(info.SystemVersion)) {
+			if ap.RequiredPanelVersion == 0 || !common.CompareAppVersion(common.GetSystemVersion(info.SystemVersion), fmt.Sprintf("%f", ap.RequiredPanelVersion)) {
 				continue
 			}
 		}
