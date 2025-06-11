@@ -41,11 +41,25 @@
             <template #main>
                 <div class="app-warn">
                     <div class="flex flex-col gap-2 items-center justify-center w-full sm:flex-row">
-                        <span v-if="!data.isExist">{{ $t('tool.supervisor.notSupport') }}</span>
-                        <span v-else-if="!data.ctlExist">{{ $t('tool.supervisor.notSupportCrl') }}</span>
-                        <span v-else-if="data.init">{{ $t('tool.supervisor.initHelper') }}</span>
+                        <template v-if="!data.isExist">
+                            <span>{{ $t('tool.supervisor.notSupport') }}</span>
+                        </template>
+
+                        <template v-else-if="!data.ctlExist">
+                            <span>{{ $t('tool.supervisor.notSupportCrl') }}</span>
+                            <el-link class="ml-1 text-xs" @click="toDoc()" type="primary">
+                                {{ $t('commons.button.helpDoc') }}
+                            </el-link>
+                        </template>
+
+                        <template v-else-if="data.init">
+                            <span>{{ $t('tool.supervisor.initHelper') }}</span>
+                            <el-link class="ml-1 text-xs" @click="toDoc()" type="primary">
+                                {{ $t('commons.button.helpDoc') }}
+                            </el-link>
+                        </template>
                         <span
-                            @click="toDoc()"
+                            @click="toLibrary()"
                             v-if="!data.isExist || !data.ctlExist"
                             class="flex items-center justify-center gap-0.5"
                         >
@@ -72,6 +86,9 @@ import { MsgSuccess } from '@/utils/message';
 import { HostTool } from '@/api/interface/host-tool';
 import InitPage from './init/index.vue';
 import router from '@/routers';
+import { GlobalStore } from '@/store';
+
+const globalStore = GlobalStore();
 
 let operateReq = reactive({
     installId: 0,
@@ -95,8 +112,12 @@ const setting = () => {
     em('setting', true);
 };
 
+const toLibrary = () => {
+    router.push({ name: 'Library', query: { uncached: 'true' } });
+};
+
 const toDoc = () => {
-    router.push({ name: 'Library' });
+    window.open(globalStore.docsUrl + '/user_manual/toolbox/supervisor/', '_blank', 'noopener,noreferrer');
 };
 
 const init = async () => {

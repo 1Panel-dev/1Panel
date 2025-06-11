@@ -242,7 +242,7 @@ const toFolder = (folder: string) => {
 };
 
 const toDoc = () => {
-    router.push({ name: 'Library' });
+    window.open(globalStore.docsUrl + '/user_manual/toolbox/clam/', '_blank', 'noopener,noreferrer');
 };
 
 const onChange = async (row: any) => {

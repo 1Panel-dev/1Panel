@@ -1148,6 +1148,9 @@ const message = {
         emptyTerminal: 'Tiada terminal yang sedang disambungkan.',
     },
     toolbox: {
+        common: {
+            toolboxHelper: 'Untuk beberapa isu pemasangan dan penggunaan, sila rujuk kepada',
+        },
         swap: {
             swap: 'Partition Swap',
             swapHelper1:
@@ -2729,7 +2732,7 @@ const message = {
     tool: {
         supervisor: {
             loadStatusErr: 'Gagal mendapatkan status proses, sila semak status perkhidmatan supervisor.',
-            notSupport: 'Supervisor tidak dikesan. Rujuk dokumen rasmi untuk pemasangan.',
+            notSupport: 'Perkhidmatan Supervisor tidak dikesan. Sila pergi ke halaman pustaka skrip untuk pemasangan manual',
             list: 'Proses Daemon | Proses Daemon',
             config: 'Konfigurasi Supervisor',
             primaryConfig: 'Lokasi fail konfigurasi utama',
@@ -2744,7 +2747,7 @@ const message = {
             uptime: 'Masa berjalan',
             notStartWarn: 'Supervisor belum dimulakan. Mulakan dahulu.',
             serviceName: 'Nama perkhidmatan',
-            initHelper: 'Perkhidmatan Supervisor belum diinisialisasi. Klik "Inisialisasi" untuk memulakan.',
+            initHelper: 'Perkhidmatan Supervisor dikesan tetapi belum dimulakan. Sila rujuk panduan konfigurasi',
             serviceNameHelper:
                 'Nama perkhidmatan Supervisor yang diuruskan oleh systemctl, biasanya supervisor atau supervisord',
             restartHelper:

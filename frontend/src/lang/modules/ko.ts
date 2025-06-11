@@ -1111,6 +1111,9 @@ const message = {
         emptyTerminal: '현재 연결된 터미널이 없습니다.',
     },
     toolbox: {
+        common: {
+            toolboxHelper: '일부 설치 및 사용 문제는 다음을 참고하세요',
+        },
         swap: {
             swap: '스왑 파티션',
             swapHelper1: '스왑 크기는 물리적 메모리의 1~2배로 설정해야 하며, 특정 요구 사항에 따라 조정 가능합니다.',
@@ -2625,7 +2628,7 @@ const message = {
     tool: {
         supervisor: {
             loadStatusErr: '프로세스 상태를 가져오지 못했습니다. supervisor 서비스의 상태를 확인하세요.',
-            notSupport: `Supervisor 가 감지되지 않았습니다. 설치하려면 공식 문서를 참조하세요.`,
+            notSupport: 'Supervisor 서비스를 감지하지 못했습니다. 스크립트 라이브러리 페이지에서 수동으로 설치하세요',
             list: '데몬 프로세스 | 데몬 프로세스들',
             config: 'Supervisor 설정',
             primaryConfig: '주 설정 파일 위치',
@@ -2640,7 +2643,7 @@ const message = {
             uptime: '운영 시간',
             notStartWarn: `Supervisor 가 시작되지 않았습니다. 먼저 시작하세요.`,
             serviceName: '서비스 이름',
-            initHelper: `Supervisor 서비스가 초기화되지 않았습니다. "초기화"를 클릭하여 초기화하세요.`,
+            initHelper: 'Supervisor 서비스가 감지되었지만 초기화되지 않았습니다. 구성 가이드를 참고하세요',
             serviceNameHelper: 'systemctl 로 관리되는 Supervisor 서비스 이름, 보통 supervisor 또는 supervisord입니다.',
             restartHelper:
                 '이 작업은 초기화 후 서비스를 재시작합니다. 이로 인해 기존의 모든 데몬 프로세스가 중지됩니다.',

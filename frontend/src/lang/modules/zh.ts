@@ -1031,7 +1031,7 @@ const message = {
             edit: '修改脚本',
             groupHelper: '针对脚本特征设置不同的分组，可以更加快速的对脚本进行筛选操作。',
             handleHelper: '将在 {0} 上执行 {1} 脚本，是否继续？',
-            noSuchApp: '未检测到 {0} 服务，请先使用脚本库安装脚本快速安装！',
+            noSuchApp: '未检测到 {0} 服务，请前往脚本库页面手动安装！',
             syncHelper: '即将同步系统脚本库，该操作仅针对系统脚本，是否继续？',
         },
     },
@@ -1113,6 +1113,9 @@ const message = {
         saveHelper: '是否确认保存当前终端配置？',
     },
     toolbox: {
+        common: {
+            toolboxHelper: '部分安装和使用问题，可参考',
+        },
         swap: {
             swap: 'Swap 分区',
             swapHelper1: 'Swap 的大小应该是物理内存的 1 到 2 倍，可根据具体情况进行调整；',
@@ -1197,8 +1200,7 @@ const message = {
             enableMsg: '启用定时执行会让该扫描任务定期自动执行。是否继续？',
             showFresh: '显示病毒库服务',
             hideFresh: '隐藏病毒库服务',
-            clamHelper:
-                'ClamAV 的最低建议配置为：3 GiB 以上的 RAM，2.0 GHz 以上的单核 CPU，以及至少 5 GiB 的可用硬盘空间',
+            clamHelper: 'ClamAV 建议最低配置：3 GiB 以上内存、单核 2.0 GHz 以上 CPU，以及至少 5 GiB 可用硬盘空间。',
             notStart: '当前未开启 ClamAV 服务，请先开启！',
             removeRecord: '删除报告文件',
             removeResultHelper: '删除任务执行过程中生成的报告文件，以清理存储空间。',
@@ -2584,7 +2586,7 @@ const message = {
     tool: {
         supervisor: {
             loadStatusErr: '获取进程状态失败，请检查 supervisor 服务状态',
-            notSupport: '未检测到 Supervisor，请参考官方文档进行安装',
+            notSupport: '未检测到 Supervisor 服务，请前往脚本库页面手动安装',
             list: '守护进程',
             config: 'Supervisor 配置',
             primaryConfig: '主配置文件位置',
@@ -2599,7 +2601,7 @@ const message = {
             uptime: '运行时长',
             notStartWarn: '当前未开启 Supervisor ，请先启动',
             serviceName: '服务名称',
-            initHelper: '尚未初始化 Supervisor ，请先初始化',
+            initHelper: '检测到 Supervisor 服务未初始化，具体配置参考',
             serviceNameHelper: 'systemctl 管理的 Supervisor 服务名称，一般为 supervisor、supervisord',
             restartHelper: '初始化会重启服务，导致原有的守护进程全部关闭',
             RUNNING: '运行中',

@@ -1139,6 +1139,9 @@ const message = {
         emptyTerminal: 'Nenhum terminal está conectado no momento.',
     },
     toolbox: {
+        common: {
+            toolboxHelper: 'Para alguns problemas de instalação e uso, consulte',
+        },
         swap: {
             swap: 'Partição Swap',
             swapHelper1:
@@ -2729,7 +2732,8 @@ const message = {
     tool: {
         supervisor: {
             loadStatusErr: 'Falha ao recuperar o status do processo, verifique o status do serviço do supervisor.',
-            notSupport: `Supervisor não detectado. Consulte o documento oficial para instalação.`,
+            notSupport:
+                'Serviço Supervisor não detectado. Vá para a página da biblioteca de scripts para instalar manualmente',
             list: 'Processo daemon | Processos daemon',
             config: 'Configuração do Supervisor',
             primaryConfig: 'Localização do arquivo de configuração principal',
@@ -2744,7 +2748,7 @@ const message = {
             uptime: 'Tempo de execução',
             notStartWarn: `O Supervisor não foi iniciado. Inicie-o primeiro.`,
             serviceName: 'Nome do serviço',
-            initHelper: `O serviço do Supervisor não foi inicializado. Clique em "Inicializar" para configurar.`,
+            initHelper: 'Serviço Supervisor detectado, mas não inicializado. Consulte o guia de configuração',
             serviceNameHelper:
                 'Nome do serviço do Supervisor gerenciado pelo systemctl, geralmente supervisor ou supervisord',
             restartHelper:

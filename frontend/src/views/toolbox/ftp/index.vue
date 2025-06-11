@@ -24,6 +24,16 @@
         </div>
         <div v-if="form.isExist">
             <LayoutContent v-loading="loading" title="FTP" :class="{ mask: !form.isActive }">
+                <template #prompt>
+                    <el-alert type="info" :closable="false">
+                        <template #title>
+                            {{ $t('toolbox.common.toolboxHelper') }}
+                            <el-link class="ml-1 text-xs" @click="toDoc()" type="primary">
+                                {{ $t('commons.button.helpDoc') }}
+                            </el-link>
+                        </template>
+                    </el-alert>
+                </template>
                 <template #leftToolBar>
                     <el-button type="primary" @click="onOpenDialog('add')">
                         {{ $t('commons.button.add') }} FTP
@@ -146,6 +156,9 @@ import OperateDialog from '@/views/toolbox/ftp/operate/index.vue';
 import LogDialog from '@/views/toolbox/ftp/log/index.vue';
 import { Toolbox } from '@/api/interface/toolbox';
 import router from '@/routers';
+import { GlobalStore } from '@/store';
+
+const globalStore = GlobalStore();
 
 const loading = ref();
 const selects = ref<any>([]);
@@ -338,6 +351,10 @@ const buttons = [
         },
     },
 ];
+
+const toDoc = () => {
+    window.open(globalStore.docsUrl + '/user_manual/toolbox/ftp/', '_blank', 'noopener,noreferrer');
+};
 
 onMounted(() => {
     search();

@@ -1033,7 +1033,7 @@ const message = {
             edit: '修改腳本',
             groupHelper: '根據腳本特徵設置不同的分組，可以更快地對腳本進行篩選操作。',
             handleHelper: '將在 {0} 上執行 {1} 腳本，是否繼續？',
-            noSuchApp: '未檢測到 {0} 服務，請先使用腳本庫快速安裝！',
+            noSuchApp: '未檢測到 {0} 服務，請前往腳本庫頁面手動安裝！',
             syncHelper: '即將同步系統腳本庫，該操作僅針對系統腳本，是否繼續？',
         },
     },
@@ -1115,6 +1115,9 @@ const message = {
         saveHelper: '是否確認保存當前終端配置？',
     },
     toolbox: {
+        common: {
+            toolboxHelper: '部分安装和使用问题，可参考',
+        },
         swap: {
             swap: 'Swap',
             swapHelper1: 'Swap 的大小應該是物理內存的 1 到 2 倍，可根據具體情況進行調整；',
@@ -1199,8 +1202,7 @@ const message = {
             enableMsg: '啟用定時執行會讓該掃描任務定期自動執行。是否繼續？',
             showFresh: '顯示病毒庫服務',
             hideFresh: '隱藏病毒庫服務',
-            clamHelper:
-                'ClamAV 的最低建議配置為：3 GiB 以上的 RAM，2.0 GHz 以上的單核 CPU，以及至少 5 GiB 的可用硬盤空間。',
+            clamHelper: 'ClamAV 建議最低配置：3 GiB 以上記憶體、單核 2.0 GHz 以上 CPU，以及至少 5 GiB 可用硬盤空間。',
             notStart: '當前未 ClamAV 服務，請先開啟！',
             removeRecord: '刪除報告文件',
             removeResultHelper: '刪除任務執行過程中生成的報告文件，以清理存儲空間。',
@@ -2593,7 +2595,7 @@ const message = {
     tool: {
         supervisor: {
             loadStatusErr: '獲取進程狀態失敗，請檢查 supervisor 服務狀態',
-            notSupport: '未檢測到 Supervisor，請參考官方文檔進行安裝',
+            notSupport: '未檢測到 Supervisor 服務，請前往腳本庫頁面手動安裝',
             list: '守護進程',
             config: 'Supervisor 配置',
             primaryConfig: '主配置文件位置',
@@ -2608,7 +2610,7 @@ const message = {
             uptime: '運行時長',
             notStartWarn: 'Supervisor 未啟動，請先啟動',
             serviceName: '服務名稱',
-            initHelper: '尚未初始化 Supervisor ，請先初始化',
+            initHelper: '檢測到 Supervisor 服務未初始化，具體配寘參攷',
             serviceNameHelper: 'systemctl 管理的 Supervisor 服務名稱，一般為 supervisor 或 supervisord',
             restartHelper: '初始化會重啟服務，導致原有的守護進程全部關閉',
             RUNNING: '運行中',

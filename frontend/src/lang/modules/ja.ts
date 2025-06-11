@@ -1119,6 +1119,9 @@ const message = {
         emptyTerminal: '現在接続されている端子はありません。',
     },
     toolbox: {
+        common: {
+            toolboxHelper: '一部のインストールおよび使用に関する問題については、以下を参照してください',
+        },
         swap: {
             swap: 'パーティションを交換します',
             swapHelper1: 'スワップのサイズは、特定の要件に基づいて調整可能な物理メモリの1〜2倍である必要があります。',
@@ -2670,7 +2673,8 @@ const message = {
         supervisor: {
             loadStatusErr:
                 'プロセスステータスの取得に失敗しました。スーパーバイザーサービスのステータスを確認してください。',
-            notSupport: `監督者は検出されません。インストールする公式ドキュメントを参照してください。`,
+            notSupport:
+                'Supervisor サービスが検出されませんでした。スクリプトライブラリページに移動して手動でインストールしてください',
             list: 'デーモンプロセス|デーモンプロセス',
             config: 'スーパーバイザー構成',
             primaryConfig: 'メイン構成ファイルの場所',
@@ -2685,7 +2689,7 @@ const message = {
             uptime: '実行時間',
             notStartWarn: `スーパーバイザーは開始されません。最初に開始します。`,
             serviceName: 'サービス名',
-            initHelper: `スーパーバイザーサービスは初期化されていません。[初期化]をクリックして初期化します。`,
+            initHelper: 'Supervisor サービスは検出されましたが、初期化されていません。設定ガイドを参照してください',
             serviceNameHelper: 'Systemctlが管理するスーパーバイザーサービス名、通常は監督者または監督者',
             restartHelper: 'これにより、初期化後にサービスが再起動され、既存のすべてのデーモンプロセスが停止します。',
             RUNNING: 'ランニング',

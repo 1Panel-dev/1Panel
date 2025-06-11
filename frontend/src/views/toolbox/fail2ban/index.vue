@@ -38,6 +38,16 @@
 
         <div v-if="form.isExist">
             <LayoutContent title="Fail2ban" :divider="true">
+                <template #prompt>
+                    <el-alert type="info" :closable="false">
+                        <template #title>
+                            {{ $t('toolbox.common.toolboxHelper') }}
+                            <el-link class="ml-1 text-xs" @click="toDoc()" type="primary">
+                                {{ $t('commons.button.helpDoc') }}
+                            </el-link>
+                        </template>
+                    </el-alert>
+                </template>
                 <template #leftToolBar>
                     <el-button :disabled="!form.isActive" type="primary" plain @click="onLoadList('ignore')">
                         {{ $t('toolbox.fail2ban.ignoreIP') }}
@@ -157,6 +167,9 @@ import { MsgSuccess } from '@/utils/message';
 import { getFail2banConf, getFail2banBase, operateFail2ban, updateFail2banByFile } from '@/api/modules/toolbox';
 import { ElMessageBox } from 'element-plus';
 import { transTimeUnit } from '@/utils/util';
+import { GlobalStore } from '@/store';
+
+const globalStore = GlobalStore();
 
 const loading = ref(false);
 const formRef = ref();
@@ -284,6 +297,10 @@ const search = async () => {
     form.findTimeItem = transTimeUnit(form.findTime);
     form.banAction = res.data.banAction;
     form.logPath = res.data.logPath;
+};
+
+const toDoc = () => {
+    window.open(globalStore.docsUrl + '/user_manual/toolbox/fail2ban/', '_blank', 'noopener,noreferrer');
 };
 
 onMounted(() => {
