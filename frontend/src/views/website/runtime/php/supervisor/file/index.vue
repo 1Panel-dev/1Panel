@@ -122,7 +122,7 @@ const cleanLog = async () => {
         names: [req.name],
         msg: i18n.global.t('commons.msg.operatorHelper', [log, i18n.global.t('commons.msg.clean')]),
         api: operateSupervisorProcessFile,
-        params: { name: req.name, operate: 'clear', file: req.file },
+        params: { name: req.name, operate: 'clear', file: req.file, id: req.id },
     });
 };
 
