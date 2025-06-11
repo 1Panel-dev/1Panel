@@ -2732,7 +2732,8 @@ const message = {
     tool: {
         supervisor: {
             loadStatusErr: 'Gagal mendapatkan status proses, sila semak status perkhidmatan supervisor.',
-            notSupport: 'Perkhidmatan Supervisor tidak dikesan. Sila pergi ke halaman pustaka skrip untuk pemasangan manual',
+            notSupport:
+                'Perkhidmatan Supervisor tidak dikesan. Sila pergi ke halaman pustaka skrip untuk pemasangan manual',
             list: 'Proses Daemon | Proses Daemon',
             config: 'Konfigurasi Supervisor',
             primaryConfig: 'Lokasi fail konfigurasi utama',
