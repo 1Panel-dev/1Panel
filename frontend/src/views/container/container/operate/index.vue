@@ -24,7 +24,7 @@
                     <el-row type="flex" justify="center" :gutter="20">
                         <el-col :span="20">
                             <el-card>
-                                <el-button v-if="isCreate" type="primary" icon="EditPen" plain @click="openDialog()">
+                                <el-button v-if="isCreate" type="primary" icon="EditPen" plain @click="toTerminal()">
                                     {{ $t('container.commandInput') }}
                                 </el-button>
                                 <el-form-item class="mt-5" :label="$t('commons.table.name')" prop="name">
@@ -423,9 +423,9 @@
                 </el-form>
             </template>
         </LayoutContent>
-        <Command ref="commandRef" />
         <Confirm ref="confirmRef" @submit="submit" />
         <TaskLog ref="taskLogRef" width="70%" @close="goBack" />
+        <TerminalDialog ref="dialogTerminalRef" />
     </div>
 </template>
 
@@ -434,7 +434,6 @@ import { reactive, ref } from 'vue';
 import { Rules, checkFloatNumberRange, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
-import Command from '@/views/container/container/command/index.vue';
 import Confirm from '@/views/container/container/operate/confirm.vue';
 import {
     listImage,
@@ -451,6 +450,7 @@ import { MsgError } from '@/utils/message';
 import TaskLog from '@/components/log/task/index.vue';
 import { checkIpV4V6, checkPort, newUUID } from '@/utils/util';
 import router from '@/routers';
+import TerminalDialog from '@/views/host/file-management/terminal/index.vue';
 
 const loading = ref(false);
 const isCreate = ref();
@@ -559,7 +559,6 @@ const search = async () => {
     loadNetworkOptions();
 };
 
-const commandRef = ref();
 const taskLogRef = ref();
 const images = ref();
 const volumes = ref();
@@ -584,8 +583,9 @@ const goBack = () => {
     router.push({ name: 'ContainerItem' });
 };
 
-const openDialog = () => {
-    commandRef.value.acceptParams();
+const dialogTerminalRef = ref();
+const toTerminal = () => {
+    dialogTerminalRef.value!.acceptParams({ cwd: '$HOME', command: '/bin/sh' });
 };
 
 const handlePortsAdd = () => {
