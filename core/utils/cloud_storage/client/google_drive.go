@@ -55,7 +55,6 @@ func (g *googleDriveClient) Upload(src, target string) (bool, error) {
 	}
 	urlItem := "https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&supportsAllDrives=true"
 	client := resty.New()
-	client.SetProxy("http://127.0.0.1:7890")
 	resp, err := client.R().
 		SetHeader("Authorization", "Bearer "+g.accessToken).
 		SetBody(data).
@@ -225,7 +224,6 @@ type reqCallback func(req *resty.Request)
 
 func (g *googleDriveClient) googleRequest(urlItem, method string, callback reqCallback, resp interface{}) ([]byte, error) {
 	client := resty.New()
-	client.SetProxy("http://127.0.0.1:7890")
 	req := client.R()
 	req.SetHeader("Authorization", "Bearer "+g.accessToken)
 	if callback != nil {
@@ -251,7 +249,6 @@ type googleTokenRes struct {
 
 func RefreshGoogleToken(grantType string, tokenType string, varMap map[string]interface{}) (string, error) {
 	client := resty.New()
-	client.SetProxy("http://127.0.0.1:7890")
 	data := map[string]interface{}{
 		"client_id":     loadParamFromVars("client_id", varMap),
 		"client_secret": loadParamFromVars("client_secret", varMap),
