@@ -2,15 +2,14 @@
     <div :id="id" ref="LineChartRef" :style="{ height: height, width: width }" />
 </template>
 <script lang="ts" setup>
-import { onMounted, nextTick, watch, onBeforeUnmount } from 'vue';
+import { onMounted, nextTick, watch, onBeforeUnmount, ref } from 'vue';
 import * as echarts from 'echarts';
 import { GlobalStore } from '@/store';
 import { computeSizeFromKBs, computeSizeFromKB, computeSizeFromMB } from '@/utils/util';
-import { storeToRefs } from 'pinia';
 import i18n from '@/lang';
 const globalStore = GlobalStore();
-const { isDarkTheme } = storeToRefs(globalStore);
-
+const isDarkTheme = ref(false);
+let mediaQuery: MediaQueryList;
 const props = defineProps({
     id: {
         type: String,
@@ -39,13 +38,11 @@ const seriesStyle = [
         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
             {
                 offset: 0,
-                color: getComputedStyle(document.documentElement).getPropertyValue('--panel-color-primary').trim(),
+                color: isDarkTheme.value ? '#3d8eff' : '#005eeb',
             },
             {
                 offset: 1,
-                color: getComputedStyle(document.documentElement)
-                    .getPropertyValue('--panel-color-primary-light-9')
-                    .trim(),
+                color: isDarkTheme.value ? '#3364ad' : '#4c8ef1',
             },
         ]),
     },
@@ -100,6 +97,11 @@ const seriesStyle = [
 ];
 
 function initChart() {
+    if (globalStore.themeConfig.theme === 'auto') {
+        isDarkTheme.value = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    } else {
+        isDarkTheme.value = globalStore.themeConfig.theme === 'dark';
+    }
     let itemChart = echarts?.getInstanceByDom(document.getElementById(props.id) as HTMLElement);
     const optionItem = itemChart?.getOption();
     const itemSelect = optionItem?.legend;
@@ -245,11 +247,17 @@ watch(
     },
 );
 
+function handleThemeChange() {
+    nextTick(() => initChart());
+}
+
 onMounted(() => {
     nextTick(() => {
         initChart();
         window.addEventListener('resize', changeChartSize);
     });
+    mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    mediaQuery.addEventListener('change', handleThemeChange);
 });
 
 onBeforeUnmount(() => {

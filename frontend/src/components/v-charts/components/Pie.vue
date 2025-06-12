@@ -2,12 +2,12 @@
     <div :id="id" ref="PieChartRef" :style="{ height: height, width: width }" />
 </template>
 <script lang="ts" setup>
-import { onMounted, nextTick, watch, onBeforeUnmount } from 'vue';
+import { onMounted, nextTick, watch, onBeforeUnmount, ref } from 'vue';
 import * as echarts from 'echarts';
 import { GlobalStore } from '@/store';
-import { storeToRefs } from 'pinia';
 const globalStore = GlobalStore();
-const { isDarkTheme } = storeToRefs(globalStore);
+const isDarkTheme = ref(false);
+let mediaQuery: MediaQueryList;
 
 const props = defineProps({
     id: {
@@ -27,19 +27,34 @@ const props = defineProps({
         required: true,
     },
 });
+function changeChartSize() {
+    echarts.getInstanceByDom(document.getElementById(props.id) as HTMLElement)?.resize();
+}
+function getThemeColors() {
+    return {
+        primaryLight2: isDarkTheme.value ? '#3364ad' : '#4c8ef1',
+        primaryLight1: isDarkTheme.value ? '#3d8eff' : '#005eeb',
+        pieBgColor: isDarkTheme.value ? '#434552' : '#ffffff',
+        textColor: isDarkTheme.value ? '#ffffff' : '#0f0f0f',
+        subtextColor: isDarkTheme.value ? '#BBBFC4' : '#646A73',
+        shadowColor: isDarkTheme.value ? '#16191D' : 'rgba(0, 94, 235, 0.1)',
+        backgroundStyleColor: isDarkTheme.value ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 94, 235, 0.05)',
+    };
+}
 
 function initChart() {
+    if (globalStore.themeConfig.theme === 'auto') {
+        isDarkTheme.value = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    } else {
+        isDarkTheme.value = globalStore.themeConfig.theme === 'dark';
+    }
     let myChart = echarts?.getInstanceByDom(document.getElementById(props.id) as HTMLElement);
     if (myChart === null || myChart === undefined) {
         myChart = echarts.init(document.getElementById(props.id) as HTMLElement);
     }
     let percentText = String(props.option.data).split('.');
-    const primaryLight2 = getComputedStyle(document.documentElement)
-        .getPropertyValue('--panel-color-primary-light-3')
-        .trim();
-    const primaryLight1 = getComputedStyle(document.documentElement).getPropertyValue('--panel-color-primary').trim();
-    const pieBgColor = getComputedStyle(document.documentElement).getPropertyValue('--panel-pie-bg-color').trim();
-
+    const { primaryLight2, primaryLight1, pieBgColor, textColor, subtextColor, shadowColor, backgroundStyleColor } =
+        getThemeColors();
     const option = {
         title: [
             {
@@ -55,7 +70,7 @@ function initChart() {
                         },
                     },
 
-                    color: isDarkTheme.value ? '#ffffff' : '#0f0f0f',
+                    color: textColor,
                     lineHeight: 25,
                     // fontSize: 20,
                     fontWeight: 500,
@@ -64,7 +79,7 @@ function initChart() {
                 top: '32%',
                 subtext: props.option.title,
                 subtextStyle: {
-                    color: isDarkTheme.value ? '#BBBFC4' : '#646A73',
+                    color: subtextColor,
                     fontSize: 13,
                 },
                 textAlign: 'center',
@@ -99,7 +114,7 @@ function initChart() {
                 showBackground: true,
                 coordinateSystem: 'polar',
                 backgroundStyle: {
-                    color: isDarkTheme.value ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 94, 235, 0.05)',
+                    color: backgroundStyleColor,
                 },
                 color: [
                     new echarts.graphic.LinearGradient(0, 1, 0, 0, [
@@ -130,7 +145,7 @@ function initChart() {
                     {
                         value: 0,
                         itemStyle: {
-                            shadowColor: isDarkTheme.value ? '#16191D' : 'rgba(0, 94, 235, 0.1)',
+                            shadowColor: shadowColor,
                             shadowBlur: 5,
                         },
                     },
@@ -140,10 +155,6 @@ function initChart() {
     };
     // 渲染数据
     myChart.setOption(option, true);
-}
-
-function changeChartSize() {
-    echarts.getInstanceByDom(document.getElementById(props.id) as HTMLElement)?.resize();
 }
 
 watch(
@@ -157,11 +168,17 @@ watch(
     },
 );
 
+function handleThemeChange() {
+    nextTick(() => initChart());
+}
+
 onMounted(() => {
     nextTick(() => {
         initChart();
         window.addEventListener('resize', changeChartSize);
     });
+    mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    mediaQuery.addEventListener('change', handleThemeChange);
 });
 
 onBeforeUnmount(() => {

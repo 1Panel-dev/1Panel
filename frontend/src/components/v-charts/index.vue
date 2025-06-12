@@ -18,7 +18,7 @@ defineProps({
     option: {
         type: Object,
         required: true,
-    }, // { title , xData, yData, formatStr  }
+    },
 });
 
 const typeComponentMap = { line, pie };
