@@ -125,6 +125,7 @@ const message = {
             selectColumn: '열 선택',
             local: '로컬',
             serialNumber: '일련 번호',
+            manageGroup: '그룹 관리',
         },
         loadingText: {
             Upgrading: '시스템 업그레이드 중입니다. 잠시만 기다려 주십시오...',
@@ -2667,6 +2668,7 @@ const message = {
         expiresAlert:
             '친절한 알림: 귀하의 Pro 라이선스가 {0}일 후 만료되며, 모든 Pro 기능에 더 이상 접근할 수 없습니다. 지속적인 사용을 위해 신속하게 갱신하시기 바랍니다.',
         menu: 'Pro',
+        upage: 'AI 웹사이트 빌더',
         app: {
             app: 'APP',
             title: '패널 별칭',

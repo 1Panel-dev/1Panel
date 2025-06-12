@@ -130,6 +130,7 @@ const message = {
             selectColumn: '選擇列',
             local: '本地',
             serialNumber: '序號',
+            manageGroup: '管理群組',
         },
         loadingText: {
             Upgrading: '系統升級中，請稍候...',
@@ -2643,6 +2644,7 @@ const message = {
         expiresAlert:
             '溫馨提醒：您的專業版許可證將在 {0} 天後到期，屆時所有專業版功能將無法繼續使用，請及時續費以保證正常使用。',
         menu: '高級功能',
+        upage: 'AI 建站',
         app: {
             app: 'APP',
             title: '面板別名',

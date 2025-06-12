@@ -28,6 +28,11 @@
                 <span v-else style="margin-left: 10px">{{ $t(subItem.meta?.title as string, 2) }}</span>
             </template>
         </el-menu-item>
+        <el-menu-item :index="''" v-if="subItem.path === '/xpack/node'" @click="goUpage">
+            <template #title>
+                <span style="margin-left: 10px">{{ $t('xpack.upage') }}</span>
+            </template>
+        </el-menu-item>
     </template>
 </template>
 
@@ -36,6 +41,10 @@ import { RouteRecordRaw } from 'vue-router';
 import SvgIcon from '@/components/svg-icon/svg-icon.vue';
 
 defineProps<{ menuList: RouteRecordRaw[] }>();
+
+const goUpage = () => {
+    window.open('https://www.lxware.cn/upage', '_blank', 'noopener,noreferrer');
+};
 </script>
 
 <style scoped lang="scss">

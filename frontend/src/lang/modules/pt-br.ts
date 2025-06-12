@@ -125,6 +125,7 @@ const message = {
             selectColumn: 'Selecionar coluna',
             local: 'Local',
             serialNumber: 'Número de série',
+            manageGroup: 'Gerenciar Grupos',
         },
         loadingText: {
             Upgrading: 'Atualizando o sistema, por favor, aguarde...',
@@ -2773,6 +2774,7 @@ const message = {
         expiresAlert:
             'Lembrete: Sua licença profissional expirará em {0} dias. Após isso, todas as funcionalidades da versão profissional não estarão mais disponíveis. Por favor, renove sua licença para garantir o uso contínuo.',
         menu: 'Pro',
+        upage: 'Construtor de Sites com IA',
         app: {
             app: 'APP',
             title: 'Apelido do Painel',

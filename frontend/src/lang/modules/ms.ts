@@ -125,6 +125,7 @@ const message = {
             selectColumn: 'Pilih lajur',
             local: 'Tempatan',
             serialNumber: 'Nombor siri',
+            manageGroup: 'Urus Kumpulan',
         },
         loadingText: {
             Upgrading: 'Peningkatan sistem, sila tunggu...',
@@ -2773,6 +2774,7 @@ const message = {
         expiresAlert:
             'Peringatan mesra: Lesen Pro anda akan tamat dalam {0} hari, dan semua ciri Pro tidak lagi dapat diakses. Sila perbaharui segera untuk memastikan penggunaan berterusan.',
         menu: 'Pro',
+        upage: 'Pembina Laman Web AI',
         app: {
             app: 'APP',
             title: 'Nama Panel',

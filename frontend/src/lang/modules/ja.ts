@@ -125,6 +125,7 @@ const message = {
             selectColumn: '列を選択します',
             local: 'ローカル',
             serialNumber: 'シリアル番号',
+            manageGroup: 'グループ管理',
         },
         loadingText: {
             Upgrading: 'システムのアップグレード、待ってください...',
@@ -2712,6 +2713,7 @@ const message = {
         expiresAlert:
             'ご注意: あなたのProライセンスは{0}日後に終了し、すべてのPro機能が使用できなくなります。継続的な使用のために速やかに更新してください。',
         menu: 'Рro',
+        upage: 'AIウェブサイトビルダー',
         app: {
             app: 'APP',
             title: 'パネルの別名',

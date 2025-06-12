@@ -133,6 +133,7 @@ const message = {
             selectColumn: 'Select column',
             local: 'local',
             serialNumber: 'Serial number',
+            manageGroup: 'Manage Groups',
         },
         loadingText: {
             Upgrading: 'System upgrade, please wait...',
@@ -2835,6 +2836,7 @@ const message = {
         expiresAlert:
             'Friendly reminder: Your Pro license will expire in {0} days, and all Pro features will no longer be accessible. Please renew promptly to ensure continued usage.',
         menu: 'Pro',
+        upage: 'AI Website Builder',
         app: {
             app: 'APP',
             title: 'Panel Alias',

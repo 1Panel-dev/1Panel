@@ -130,6 +130,7 @@ const message = {
             selectColumn: '选择列',
             local: '本地',
             serialNumber: '序号',
+            manageGroup: '管理分组',
         },
         loadingText: {
             Upgrading: '系统升级中，请稍候...',
@@ -2630,6 +2631,7 @@ const message = {
         expiresAlert: '温馨提醒：专业版试用将于 [{0}] 天后到期，届时将停止使用所有专业版功能。',
         name: '专业版',
         menu: '高级功能',
+        upage: 'AI 建站',
         waf: {
             name: 'WAF',
             blackWhite: '黑白名单',
