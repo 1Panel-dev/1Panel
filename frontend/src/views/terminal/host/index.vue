@@ -6,7 +6,7 @@
                     {{ $t('terminal.addHost') }}
                 </el-button>
                 <el-button type="primary" plain @click="onOpenGroupDialog()">
-                    {{ $t('commons.table.manageGroup') }}
+                    {{ $t('commons.table.group') }}
                 </el-button>
                 <el-button type="primary" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
                     {{ $t('commons.button.delete') }}

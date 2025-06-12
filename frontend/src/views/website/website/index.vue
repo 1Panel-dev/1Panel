@@ -23,7 +23,7 @@
                     {{ $t('website.create') }}
                 </el-button>
                 <el-button type="primary" plain @click="openGroup" :disabled="nginxStatus != 'Running'">
-                    {{ $t('commons.table.manageGroup') }}
+                    {{ $t('commons.table.group') }}
                 </el-button>
                 <el-button type="primary" plain @click="openDefault" :disabled="nginxStatus != 'Running'">
                     {{ $t('website.defaultServer') }}

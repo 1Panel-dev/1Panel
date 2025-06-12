@@ -262,7 +262,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('website.proxyFile'),
+        label: i18n.global.t('website.sourceFile'),
         click: function (row: HostTool.SupersivorProcess) {
             getFile(row.name, 'config', runtimeID.value);
         },

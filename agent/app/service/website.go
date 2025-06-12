@@ -469,7 +469,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 				WebsiteSSLID: websiteModel.ID,
 				Type:         "existed",
 				HttpConfig:   "HTTPToHTTPS",
-				SSLProtocol:  []string{"TLSv1.3", "TLSv1.2", "TLSv1.1", "TLSv1"},
+				SSLProtocol:  []string{"TLSv1.3", "TLSv1.2"},
 				Algorithm:    "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:!aNULL:!eNULL:!EXPORT:!DSS:!DES:!RC4:!3DES:!MD5:!PSK:!KRB5:!SRP:!CAMELLIA:!SEED",
 				Hsts:         true,
 			}
