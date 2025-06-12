@@ -2632,7 +2632,7 @@ const message = {
             list: '데몬 프로세스 | 데몬 프로세스들',
             config: 'Supervisor 설정',
             primaryConfig: '주 설정 파일 위치',
-            notSupportCrl: `supervisorctl 이 감지되지 않았습니다. 설치하려면 공식 문서를 참조하세요.`,
+            notSupportCtl: `supervisorctl 이 감지되지 않았습니다.  스크립트 라이브러리 페이지에서 수동으로 설치하세요.`,
             user: '사용자',
             command: '명령어',
             dir: '디렉토리',
@@ -2643,7 +2643,8 @@ const message = {
             uptime: '운영 시간',
             notStartWarn: `Supervisor 가 시작되지 않았습니다. 먼저 시작하세요.`,
             serviceName: '서비스 이름',
-            initHelper: 'Supervisor 서비스가 감지되었지만 초기화되지 않았습니다. 구성 가이드를 참고하세요',
+            initHelper:
+                'Supervisor 서비스가 감지되었지만 초기화되지 않았습니다. 상단 상태 표시줄의 초기화 버튼을 클릭하여 구성하세요.',
             serviceNameHelper: 'systemctl 로 관리되는 Supervisor 서비스 이름, 보통 supervisor 또는 supervisord입니다.',
             restartHelper:
                 '이 작업은 초기화 후 서비스를 재시작합니다. 이로 인해 기존의 모든 데몬 프로세스가 중지됩니다.',

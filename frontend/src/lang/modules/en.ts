@@ -2800,7 +2800,7 @@ const message = {
             list: 'Daemon process',
             config: 'Supervisor configuration',
             primaryConfig: 'Main configuration file location',
-            notSupportCrl: `The supervisorctl isn't detected. Refer to the official document to install.`,
+            notSupportCtl: `The supervisorctl isn't detected, please go to the script library page to install it manually`,
             user: 'User',
             command: 'Command',
             dir: 'Directory',
@@ -2811,7 +2811,8 @@ const message = {
             uptime: 'Running time',
             notStartWarn: `Supervisor isn't started. Start it first.`,
             serviceName: 'Service name',
-            initHelper: 'Supervisor service detected but not initialized, please refer to the configuration guide',
+            initHelper:
+                'Supervisor service is detected but not initialized. Please click the initialization button in the top status bar to configure it.',
             serviceNameHelper: 'Supervisor service name managed by systemctl, usually supervisor or supervisord',
             restartHelper:
                 'This will restart the service after initialization, which causes all the existing daemon processes to stop.',

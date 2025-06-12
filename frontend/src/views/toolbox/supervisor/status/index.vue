@@ -46,17 +46,15 @@
                         </template>
 
                         <template v-else-if="!data.ctlExist">
-                            <span>{{ $t('tool.supervisor.notSupportCrl') }}</span>
-                            <el-link class="ml-1 text-xs" @click="toDoc()" type="primary">
-                                {{ $t('commons.button.helpDoc') }}
-                            </el-link>
+                            <span>{{ $t('tool.supervisor.notSupportCtl') }}</span>
                         </template>
 
                         <template v-else-if="data.init">
                             <span>{{ $t('tool.supervisor.initHelper') }}</span>
-                            <el-link class="ml-1 text-xs" @click="toDoc()" type="primary">
+                            <span class="flex items-center justify-center gap-0.5" @click="toDoc()">
+                                <el-icon><Position /></el-icon>
                                 {{ $t('commons.button.helpDoc') }}
-                            </el-link>
+                            </span>
                         </template>
                         <span
                             @click="toLibrary()"

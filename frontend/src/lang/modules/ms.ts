@@ -2737,7 +2737,7 @@ const message = {
             list: 'Proses Daemon | Proses Daemon',
             config: 'Konfigurasi Supervisor',
             primaryConfig: 'Lokasi fail konfigurasi utama',
-            notSupportCrl: 'supervisorctl tidak dikesan. Rujuk dokumen rasmi untuk pemasangan.',
+            notSupportCtl: 'supervisorctl tidak dikesan. Sila pergi ke halaman pustaka skrip untuk pemasangan manual.',
             user: 'Pengguna',
             command: 'Perintah',
             dir: 'Direktori',
@@ -2748,7 +2748,8 @@ const message = {
             uptime: 'Masa berjalan',
             notStartWarn: 'Supervisor belum dimulakan. Mulakan dahulu.',
             serviceName: 'Nama perkhidmatan',
-            initHelper: 'Perkhidmatan Supervisor dikesan tetapi belum dimulakan. Sila rujuk panduan konfigurasi',
+            initHelper:
+                'Perkhidmatan Supervisor dikesan tetapi belum dimulakan. Sila klik butang permulaan di bar status atas untuk konfigurasi.',
             serviceNameHelper:
                 'Nama perkhidmatan Supervisor yang diuruskan oleh systemctl, biasanya supervisor atau supervisord',
             restartHelper:

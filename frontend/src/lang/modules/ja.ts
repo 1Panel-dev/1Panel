@@ -2678,7 +2678,7 @@ const message = {
             list: 'デーモンプロセス|デーモンプロセス',
             config: 'スーパーバイザー構成',
             primaryConfig: 'メイン構成ファイルの場所',
-            notSupportCrl: `Supervisorctlは検出されません。インストールする公式ドキュメントを参照してください。`,
+            notSupportCtl: `supervisorctlは検出されません。スクリプトライブラリページに移動して手動でインストールしてください。`,
             user: 'ユーザー',
             command: '指示',
             dir: 'ディレクトリ',
@@ -2689,7 +2689,8 @@ const message = {
             uptime: '実行時間',
             notStartWarn: `スーパーバイザーは開始されません。最初に開始します。`,
             serviceName: 'サービス名',
-            initHelper: 'Supervisor サービスは検出されましたが、初期化されていません。設定ガイドを参照してください',
+            initHelper:
+                'Supervisor サービスが検出されましたが、初期化されていません。上部のステータスバーにある初期化ボタンをクリックして設定してください。',
             serviceNameHelper: 'Systemctlが管理するスーパーバイザーサービス名、通常は監督者または監督者',
             restartHelper: 'これにより、初期化後にサービスが再起動され、既存のすべてのデーモンプロセスが停止します。',
             RUNNING: 'ランニング',

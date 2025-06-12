@@ -4,6 +4,16 @@
             <span>{{ $t('tool.supervisor.notStartWarn') }}</span>
         </el-card>
         <LayoutContent :title="$t('tool.supervisor.list', 2)" v-loading="loading">
+            <template #prompt>
+                <el-alert type="info" :closable="false">
+                    <template #title>
+                        {{ $t('toolbox.common.toolboxHelper') }}
+                        <el-link class="ml-1 text-xs" @click="toDoc()" type="primary">
+                            {{ $t('commons.button.helpDoc') }}
+                        </el-link>
+                    </template>
+                </el-alert>
+            </template>
             <template #app>
                 <SuperVisorStatus
                     @setting="setting"
@@ -339,6 +349,10 @@ const buttons = [
         },
     },
 ];
+
+const toDoc = () => {
+    window.open(globalStore.docsUrl + '/user_manual/toolbox/supervisor/', '_blank', 'noopener,noreferrer');
+};
 
 onMounted(() => {
     search();
