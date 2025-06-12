@@ -38,11 +38,13 @@ const seriesStyle = [
         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
             {
                 offset: 0,
-                color: isDarkTheme.value ? '#3d8eff' : '#005eeb',
+                color: getComputedStyle(document.documentElement)
+                    .getPropertyValue('--panel-color-primary-light-9')
+                    .trim(),
             },
             {
                 offset: 1,
-                color: isDarkTheme.value ? '#3364ad' : '#4c8ef1',
+                color: getComputedStyle(document.documentElement).getPropertyValue('--panel-color-primary').trim(),
             },
         ]),
     },
@@ -253,16 +255,17 @@ function handleThemeChange() {
 
 onMounted(() => {
     nextTick(() => {
+        mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        mediaQuery.addEventListener('change', handleThemeChange);
         initChart();
         window.addEventListener('resize', changeChartSize);
     });
-    mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    mediaQuery.addEventListener('change', handleThemeChange);
 });
 
 onBeforeUnmount(() => {
     echarts.getInstanceByDom(document.getElementById(props.id) as HTMLElement).dispose();
     window.removeEventListener('resize', changeChartSize);
+    mediaQuery.removeEventListener('change', handleThemeChange);
 });
 </script>
 <style lang="scss" scoped></style>

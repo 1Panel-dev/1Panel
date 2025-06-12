@@ -32,8 +32,10 @@ function changeChartSize() {
 }
 function getThemeColors() {
     return {
-        primaryLight2: isDarkTheme.value ? '#3364ad' : '#4c8ef1',
-        primaryLight1: isDarkTheme.value ? '#3d8eff' : '#005eeb',
+        primaryLight2: getComputedStyle(document.documentElement)
+            .getPropertyValue('--panel-color-primary-light-3')
+            .trim(),
+        primaryLight1: getComputedStyle(document.documentElement).getPropertyValue('--panel-color-primary').trim(),
         pieBgColor: isDarkTheme.value ? '#434552' : '#ffffff',
         textColor: isDarkTheme.value ? '#ffffff' : '#0f0f0f',
         subtextColor: isDarkTheme.value ? '#BBBFC4' : '#646A73',
@@ -174,16 +176,17 @@ function handleThemeChange() {
 
 onMounted(() => {
     nextTick(() => {
+        mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        mediaQuery.addEventListener('change', handleThemeChange);
         initChart();
         window.addEventListener('resize', changeChartSize);
     });
-    mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    mediaQuery.addEventListener('change', handleThemeChange);
 });
 
 onBeforeUnmount(() => {
     echarts.getInstanceByDom(document.getElementById(props.id) as HTMLElement).dispose();
     window.removeEventListener('resize', changeChartSize);
+    mediaQuery.removeEventListener('change', handleThemeChange);
 });
 </script>
 <style lang="scss" scoped></style>
