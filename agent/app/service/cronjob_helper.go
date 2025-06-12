@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path"
 	pathUtils "path"
 	"strings"
 	"time"
@@ -78,17 +79,21 @@ func (u *CronjobService) loadTask(cronjob *model.Cronjob, record *model.JobRecor
 			return fmt.Errorf("the script content is empty and is skipped")
 		}
 		u.handleShell(*cronjob, taskItem)
+		u.removeExpiredLog(*cronjob)
 	case "curl":
 		if len(cronjob.URL) == 0 {
 			return fmt.Errorf("the url is empty and is skipped")
 		}
 		u.handleCurl(*cronjob, taskItem)
+		u.removeExpiredLog(*cronjob)
 	case "ntp":
 		u.handleNtpSync(*cronjob, taskItem)
+		u.removeExpiredLog(*cronjob)
 	case "cutWebsiteLog":
 		err = u.handleCutWebsiteLog(cronjob, record.StartTime, taskItem)
 	case "clean":
 		u.handleSystemClean(*cronjob, taskItem)
+		u.removeExpiredLog(*cronjob)
 	case "website":
 		err = u.handleWebsite(*cronjob, record.StartTime, taskItem)
 	case "app":
@@ -303,6 +308,24 @@ func (u *CronjobService) removeExpiredBackup(cronjob model.Cronjob, accountMap m
 			}
 		}
 		_ = backupRepo.DeleteRecord(context.Background(), repo.WithByID(records[i].ID))
+	}
+}
+
+func (u *CronjobService) removeExpiredLog(cronjob model.Cronjob) {
+	records, _ := cronjobRepo.ListRecord(cronjobRepo.WithByJobID(int(cronjob.ID)), repo.WithOrderBy("created_at desc"))
+	if len(records) <= int(cronjob.RetainCopies) {
+		return
+	}
+	for i := int(cronjob.RetainCopies); i < len(records); i++ {
+		if len(records[i].File) != 0 {
+			files := strings.Split(records[i].File, ",")
+			for _, file := range files {
+				_ = os.Remove(file)
+			}
+		}
+		_ = cronjobRepo.DeleteRecord(repo.WithByID(uint(records[i].ID)))
+		_ = taskRepo.Delete(taskRepo.WithByID(records[i].TaskID))
+		_ = os.Remove(path.Join(global.CONF.Base.InstallDir, "1panel/log/task/Cronjob", records[i].TaskID+".log"))
 	}
 }
 
