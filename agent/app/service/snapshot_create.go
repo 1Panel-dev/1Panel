@@ -76,7 +76,7 @@ func (u *SnapshotService) SnapshotCreate(parentTask *task.Task, req dto.Snapshot
 	}
 	if jobID == 0 {
 		go func() {
-			_ = handleSnapshot(req, taskItem, jobID, 0, 0)
+			_ = handleSnapshot(req, taskItem, jobID, 3, 0)
 		}()
 		return nil
 	}

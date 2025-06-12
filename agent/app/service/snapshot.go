@@ -326,7 +326,7 @@ func loadPanelFile(fileOp fileUtils.FileOp) ([]dto.DataTree, error) {
 		switch itemData.Label {
 		case "agent", "runtime", "docker", "task", "geo", "secret", "uploads":
 			itemData.IsDisable = true
-		case "clamav", "download", "resource":
+		case "clamav", "download":
 			panelPath := path.Join(global.Dir.DataDir, itemData.Label)
 			itemData.Children, _ = loadFile(panelPath, 3, fileOp)
 		case "apps", "backup", "log", "db", "tmp":
