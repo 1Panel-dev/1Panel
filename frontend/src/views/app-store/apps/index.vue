@@ -1,120 +1,124 @@
 <template>
-    <LayoutContent v-loading="loading" v-if="!showDetail" :title="$t('app.app', 2)">
-        <template #search>
-            <Tags @change="changeTag" />
-        </template>
-        <template #leftToolBar>
-            <el-button @click="sync" type="primary" plain :disabled="syncing">
-                <span>{{ syncCustomAppstore ? $t('app.syncCustomApp') : $t('app.syncAppList') }}</span>
-            </el-button>
-            <el-button @click="syncLocal" type="primary" plain :disabled="syncing" class="ml-2">
-                {{ $t('app.syncLocalApp') }}
-            </el-button>
-        </template>
-        <template #rightToolBar>
-            <el-checkbox class="!mr-2.5" v-model="req.showCurrentArch" @change="search(req)">
-                {{ $t('app.showCurrentArch') }}
-            </el-checkbox>
-            <el-checkbox
-                class="!mr-2.5"
-                v-model="req.resource"
-                true-value="all"
-                false-value="remote"
-                @change="search(req)"
-            >
-                {{ $t('app.showLocal') }}
-            </el-checkbox>
-            <TableSearch @search="searchByName()" v-model:searchName="req.name" />
-        </template>
-        <template #main>
-            <div>
-                <MainDiv :heightDiff="300">
-                    <el-alert type="info" :title="$t('app.appHelper')" :closable="false" />
-                    <el-row :gutter="5">
-                        <el-col
-                            class="app-col-12"
-                            v-for="(app, index) in apps"
-                            :key="index"
-                            :xs="24"
-                            :sm="12"
-                            :md="8"
-                            :lg="8"
-                            :xl="6"
-                        >
-                            <div class="app">
-                                <el-card>
-                                    <div class="app-wrapper" @click="openDetail(app.key)">
-                                        <div class="app-image">
-                                            <el-avatar
-                                                shape="square"
-                                                :size="60"
-                                                :src="'data:image/png;base64,' + app.icon"
-                                            />
-                                        </div>
-                                        <div class="app-content">
-                                            <div class="content-top">
-                                                <el-space wrap :size="1">
-                                                    <span class="app-title">{{ app.name }}</span>
-                                                    <el-tag
-                                                        type="success"
-                                                        v-if="app.installed"
-                                                        round
-                                                        size="small"
-                                                        class="!ml-2"
-                                                    >
-                                                        {{ $t('app.allReadyInstalled') }}
-                                                    </el-tag>
-                                                </el-space>
+    <div>
+        <docker-status v-model:isActive="isActive" v-model:isExist="isExist" @search="search" />
+        <LayoutContent v-loading="loading" v-if="isExist" :title="$t('app.app', 2)">
+            <template #search>
+                <Tags @change="changeTag" />
+            </template>
+            <template #leftToolBar>
+                <el-button @click="sync" type="primary" plain :disabled="syncing">
+                    <span>{{ syncCustomAppstore ? $t('app.syncCustomApp') : $t('app.syncAppList') }}</span>
+                </el-button>
+                <el-button @click="syncLocal" type="primary" plain :disabled="syncing" class="ml-2">
+                    {{ $t('app.syncLocalApp') }}
+                </el-button>
+            </template>
+            <template #rightToolBar>
+                <el-checkbox class="!mr-2.5" v-model="req.showCurrentArch" @change="search(req)">
+                    {{ $t('app.showCurrentArch') }}
+                </el-checkbox>
+                <el-checkbox
+                    class="!mr-2.5"
+                    v-model="req.resource"
+                    true-value="all"
+                    false-value="remote"
+                    @change="search(req)"
+                >
+                    {{ $t('app.showLocal') }}
+                </el-checkbox>
+                <TableSearch @search="searchByName()" v-model:searchName="req.name" />
+            </template>
+            <template #main>
+                <div>
+                    <MainDiv :heightDiff="300">
+                        <el-alert type="info" :title="$t('app.appHelper')" :closable="false" />
+                        <el-row :gutter="5">
+                            <el-col
+                                class="app-col-12"
+                                v-for="(app, index) in apps"
+                                :key="index"
+                                :xs="24"
+                                :sm="12"
+                                :md="8"
+                                :lg="8"
+                                :xl="6"
+                            >
+                                <div class="app">
+                                    <el-card>
+                                        <div class="app-wrapper" @click="openDetail(app.key)">
+                                            <div class="app-image">
+                                                <el-avatar
+                                                    shape="square"
+                                                    :size="60"
+                                                    :src="'data:image/png;base64,' + app.icon"
+                                                />
                                             </div>
-                                            <div class="content-middle">
-                                                <span class="app-description">
-                                                    {{ app.description }}
-                                                </span>
-                                            </div>
-                                            <div class="content-bottom">
-                                                <div class="app-tags">
-                                                    <el-tag v-for="(tag, ind) in app.tags" :key="ind" type="info">
-                                                        <span>
-                                                            {{ tag.name }}
-                                                        </span>
-                                                    </el-tag>
-                                                    <el-tag v-if="app.status === 'TakeDown'" class="p-mr-5">
-                                                        <span style="color: red">{{ $t('app.takeDown') }}</span>
-                                                    </el-tag>
+                                            <div class="app-content">
+                                                <div class="content-top">
+                                                    <el-space wrap :size="1">
+                                                        <span class="app-title">{{ app.name }}</span>
+                                                        <el-tag
+                                                            type="success"
+                                                            v-if="app.installed"
+                                                            round
+                                                            size="small"
+                                                            class="!ml-2"
+                                                        >
+                                                            {{ $t('app.allReadyInstalled') }}
+                                                        </el-tag>
+                                                    </el-space>
                                                 </div>
-                                                <el-button
-                                                    type="primary"
-                                                    size="small"
-                                                    plain
-                                                    round
-                                                    :disabled="
-                                                        (app.installed && app.limit == 1) || app.status === 'TakeDown'
-                                                    "
-                                                    @click.stop="openInstall(app)"
-                                                >
-                                                    {{ $t('commons.button.install') }}
-                                                </el-button>
+                                                <div class="content-middle">
+                                                    <span class="app-description">
+                                                        {{ app.description }}
+                                                    </span>
+                                                </div>
+                                                <div class="content-bottom">
+                                                    <div class="app-tags">
+                                                        <el-tag v-for="(tag, ind) in app.tags" :key="ind" type="info">
+                                                            <span>
+                                                                {{ tag.name }}
+                                                            </span>
+                                                        </el-tag>
+                                                        <el-tag v-if="app.status === 'TakeDown'" class="p-mr-5">
+                                                            <span style="color: red">{{ $t('app.takeDown') }}</span>
+                                                        </el-tag>
+                                                    </div>
+                                                    <el-button
+                                                        type="primary"
+                                                        size="small"
+                                                        plain
+                                                        round
+                                                        :disabled="
+                                                            (app.installed && app.limit == 1) ||
+                                                            app.status === 'TakeDown'
+                                                        "
+                                                        @click.stop="openInstall(app)"
+                                                    >
+                                                        {{ $t('commons.button.install') }}
+                                                    </el-button>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </el-card>
-                            </div>
-                        </el-col>
-                    </el-row>
-                </MainDiv>
-                <div class="page-button">
-                    <fu-table-pagination
-                        v-model:current-page="paginationConfig.currentPage"
-                        v-model:page-size="paginationConfig.pageSize"
-                        v-bind="paginationConfig"
-                        @change="search(req)"
-                        :page-sizes="[30, 60, 90]"
-                        :layout="mobile ? 'total, prev, pager, next' : 'total, sizes, prev, pager, next, jumper'"
-                    />
+                                    </el-card>
+                                </div>
+                            </el-col>
+                        </el-row>
+                    </MainDiv>
+                    <div class="page-button">
+                        <fu-table-pagination
+                            v-model:current-page="paginationConfig.currentPage"
+                            v-model:page-size="paginationConfig.pageSize"
+                            v-bind="paginationConfig"
+                            @change="search(req)"
+                            :page-sizes="[30, 60, 90]"
+                            :layout="mobile ? 'total, prev, pager, next' : 'total, sizes, prev, pager, next, jumper'"
+                        />
+                    </div>
                 </div>
-            </div>
-        </template>
-    </LayoutContent>
+            </template>
+        </LayoutContent>
+    </div>
     <Install ref="installRef" />
     <Detail ref="detailRef" />
     <TaskLog ref="taskLogRef" @close="refresh" />
@@ -134,6 +138,7 @@ import TaskLog from '@/components/log/task/index.vue';
 import { storeToRefs } from 'pinia';
 import bus from '@/global/bus';
 import Tags from '@/views/app-store/components/tag.vue';
+import DockerStatus from '@/views/container/docker-status/index.vue';
 
 const globalStore = GlobalStore();
 const { isProductPro } = storeToRefs(globalStore);
@@ -160,7 +165,6 @@ const req = reactive({
 
 const apps = ref<App.AppDTO[]>([]);
 const loading = ref(false);
-const showDetail = ref(false);
 const canUpdate = ref(false);
 const syncing = ref(false);
 const installRef = ref();
@@ -169,6 +173,8 @@ const mainHeight = ref(0);
 const detailRef = ref();
 const taskLogRef = ref();
 const syncCustomAppstore = ref(false);
+const isActive = ref(false);
+const isExist = ref(false);
 
 const refresh = () => {
     search(req);
