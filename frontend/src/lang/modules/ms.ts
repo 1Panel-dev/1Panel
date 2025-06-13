@@ -2476,6 +2476,7 @@ const message = {
         containerConfig: 'Konfigurasi Bekas',
         containerConfigHelper:
             'Pembolehubah persekitaran dan maklumat lain boleh diubah suai dalam Konfigurasi - Konfigurasi Bekas selepas penciptaan',
+        dateTimezoneHelper: 'Contoh: TZ=Asia/Shanghai (Sila tambahkan jika perlu)',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: 'Saiz jadual hash nama pelayan',

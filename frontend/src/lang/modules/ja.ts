@@ -2420,6 +2420,7 @@ const message = {
         toExtensionsList: '拡張リストを表示します',
         containerConfig: 'コンテナ設定',
         containerConfigHelper: '環境変数などの情報は、作成完了後に設定 - コンテナ設定で変更できます',
+        dateTimezoneHelper: '例：TZ=Asia/Shanghai（必要に応じて追加してください）',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: 'サーバー名のハッシュテーブルサイズ',

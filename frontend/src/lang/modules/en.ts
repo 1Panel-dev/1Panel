@@ -2506,6 +2506,7 @@ const message = {
         containerConfig: 'Container Configuration',
         containerConfigHelper:
             'Environment variables and other information can be modified in Configuration - Container Configuration after creation',
+        dateTimezoneHelper: 'Example: TZ=Asia/Shanghai (Please add as needed)',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: 'The hash table size of the server name',

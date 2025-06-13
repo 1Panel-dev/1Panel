@@ -2471,6 +2471,7 @@ const message = {
         containerConfig: 'Конфигурация контейнера',
         containerConfigHelper:
             'Переменные окружения и другие данные можно изменить в разделе Конфигурация - Конфигурация контейнера после создания',
+        dateTimezoneHelper: 'Пример: TZ=Asia/Shanghai (Пожалуйста, добавьте по мере необходимости)',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: 'Размер хэш-таблицы для имен серверов',

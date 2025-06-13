@@ -2473,6 +2473,7 @@ const message = {
         containerConfig: 'Configuração do Contêiner',
         containerConfigHelper:
             'Variáveis de ambiente e outras informações podem ser modificadas em Configuração - Configuração do Contêiner após a criação',
+        dateTimezoneHelper: 'Exemplo: TZ=Asia/Shanghai (Adicione conforme necessário)',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: 'The hash table size of the server name',
