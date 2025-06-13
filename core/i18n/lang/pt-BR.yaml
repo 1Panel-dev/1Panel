@@ -52,6 +52,7 @@ ErrLicenseCheck: "Falha na verificação da licença, por favor verifique e tent
 ErrXpackVersion: "Falha na verificação da licença, esta licença é restrita a uma versão específica, por favor verifique e tente novamente!"
 ErrLicenseSave: "Falha ao salvar as informações da licença {{ .err }}, por favor tente novamente!"
 ErrLicenseSync: "Falha ao sincronizar as informações da licença, nenhuma informação foi encontrada no banco de dados!"
+ErrLicenseExist: "Este registro de licença já existe. Você pode ir diretamente para a página de licenças para vincular nós."
 ErrXpackNotFound: "Esta parte é uma funcionalidade profissional, por favor importe a licença em Configurações do Painel - Licença."
 ErrXpackExceptional: "Esta parte é uma funcionalidade profissional, por favor sincronize a licença em Configurações do Painel - Licença."
 ErrXpackOutOfDate: "A licença atual expirou, por favor importe uma nova em Configurações do Painel - Licença."
