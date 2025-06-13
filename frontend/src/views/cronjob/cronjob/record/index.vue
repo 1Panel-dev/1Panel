@@ -406,7 +406,7 @@ const loadRecord = async (row: Cronjob.Record) => {
 
 const onClean = async () => {
     if (!hasBackup(dialogData.value.rowData.type)) {
-        ElMessageBox.confirm(i18n.global.t('commons.msg.clean'), i18n.global.t('commons.msg.deleteTitle'), {
+        ElMessageBox.confirm(i18n.global.t('commons.msg.clean'), i18n.global.t('commons.button.clean'), {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
             cancelButtonText: i18n.global.t('commons.button.cancel'),
             type: 'warning',
