@@ -912,7 +912,7 @@ func (u *ContainerService) StreamLogs(ctx *gin.Context, params dto.StreamLog) {
     })
 }
 
-unc collectLogs(
+func collectLogs(
     done <-chan struct{},
     params dto.StreamLog,
     messageChan chan<- string,
