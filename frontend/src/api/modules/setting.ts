@@ -40,8 +40,8 @@ export const changeBind = (id: number, nodeIDs: Array<number>) => {
 export const loadLicenseOptions = () => {
     return http.get<Array<Setting.LicenseOptions>>(`/core/licenses/options`);
 };
-export const listNodeOptions = () => {
-    return http.get<Array<Setting.NodeItem>>(`/core/nodes/list`);
+export const listNodeOptions = (type: string) => {
+    return http.post<Array<Setting.NodeItem>>(`/core/nodes/list`, { type: type });
 };
 
 export const listAllNodes = () => {

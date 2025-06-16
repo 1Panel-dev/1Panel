@@ -67,7 +67,7 @@ const onBind = async () => {
 };
 
 const loadNodes = async () => {
-    await listNodeOptions().then((res) => {
+    await listNodeOptions('free').then((res) => {
         let nodeOptions = res.data || [];
         for (const item of nodeOptions) {
             if (!item.isBound) {

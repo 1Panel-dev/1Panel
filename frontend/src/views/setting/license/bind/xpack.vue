@@ -116,7 +116,7 @@ const loadNodes = async () => {
         freeNodes.value = [{ id: 0, name: i18n.global.t('xpack.node.master') }];
         return;
     }
-    await listNodeOptions()
+    await listNodeOptions('free')
         .then((res) => {
             freeNodes.value = res.data || [];
         })
