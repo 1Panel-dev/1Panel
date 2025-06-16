@@ -682,7 +682,7 @@ func (r *RuntimeService) GetPHPExtensions(runtimeID uint) (response.PHPExtension
 		}
 	}
 	var phpExtensions []response.SupportExtension
-	if err = json.Unmarshal(nginx_conf.PHPExtensionsJson, &phpExtensions); err != nil {
+	if err = json.Unmarshal(nginx_conf.GetWebsiteFile("php_extensions.json"), &phpExtensions); err != nil {
 		return res, err
 	}
 	for _, ext := range phpExtensions {

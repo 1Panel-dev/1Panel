@@ -3,6 +3,7 @@ package nginx_conf
 import (
 	"embed"
 	_ "embed"
+	"io"
 )
 
 //go:embed ssl.conf
@@ -44,8 +45,18 @@ var PathAuth []byte
 //go:embed upstream.conf
 var Upstream []byte
 
-//go:embed php_extensions.json
-var PHPExtensionsJson []byte
-
 //go:embed sse.conf
 var SSE []byte
+
+//go:embed *.json
+var websitesFiles embed.FS
+
+func GetWebsiteFile(filename string) []byte {
+	file, err := websitesFiles.Open(filename)
+	if err != nil {
+		return nil
+	}
+	defer file.Close()
+	res, _ := io.ReadAll(file)
+	return res
+}

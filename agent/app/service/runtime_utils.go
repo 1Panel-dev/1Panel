@@ -657,7 +657,7 @@ func unInstallPHPExtension(runtime *model.Runtime, delExtensions []string) error
 	dir := runtime.GetPath()
 	fileOP := files.NewFileOp()
 	var phpExtensions []response.SupportExtension
-	if err := json.Unmarshal(nginx_conf.PHPExtensionsJson, &phpExtensions); err != nil {
+	if err := json.Unmarshal(nginx_conf.GetWebsiteFile("php_extensions.json"), &phpExtensions); err != nil {
 		return err
 	}
 	phpVersion := getRuntimeEnv(runtime.Env, "PHP_VERSION")
