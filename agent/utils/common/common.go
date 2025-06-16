@@ -6,6 +6,7 @@ import (
 	"io"
 	mathRand "math/rand"
 	"net"
+	"os/exec"
 	"reflect"
 	"regexp"
 	"sort"
@@ -406,6 +407,22 @@ func GetSystemVersion(versionString string) string {
 	match := re.FindStringSubmatch(versionString)
 	if len(match) > 1 {
 		return match[1]
+	}
+	return ""
+}
+
+func isCommandAvailable(name string, args ...string) bool {
+	execCmd := exec.Command(name, args...)
+	err := execCmd.Run()
+	return err == nil
+}
+
+func GetDockerComposeCommand() string {
+	if isCommandAvailable("docker", "compose", "version") {
+		return "docker compose"
+	}
+	if isCommandAvailable("docker-compose", "version") {
+		return "docker-compose"
 	}
 	return ""
 }

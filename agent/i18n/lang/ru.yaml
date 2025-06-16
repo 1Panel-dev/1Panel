@@ -92,6 +92,7 @@ ErrCustomApps: 'Установлено приложение. Сначала уд
 ErrCustomRuntimes: 'Установлена среда выполнения. Сначала удалите ее'
 ErrAppVersionDeprecated: "Приложение {{ .name }} несовместимо с текущей версией 1Panel, пропущено"
 ErrDockerFailed: "Состояние Docker аномально, проверьте состояние сервиса"
+ErrDockerComposeCmdNotFound: "Команда Docker Compose отсутствует, пожалуйста, установите эту команду на хост-машине сначала"
 
 #файл
 ErrFileCanNotRead: 'Этот файл не поддерживает предварительный просмотр'

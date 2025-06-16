@@ -92,6 +92,7 @@ ErrCustomApps: 'There is an installed application, please uninstall it first'
 ErrCustomRuntimes: 'There is an installed runtime environment, please delete it first'
 ErrAppVersionDeprecated: "The {{ .name }} application is not compatible with the current 1Panel version, skipped"
 ErrDockerFailed: "The state of Docker is abnormal, please check the service status"
+ErrDockerComposeCmdNotFound: "The Docker Compose command does not exist, please install this command on the host machine first"
 
 #file
 ErrFileCanNotRead: 'This file does not support preview'

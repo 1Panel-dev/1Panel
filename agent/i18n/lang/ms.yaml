@@ -92,6 +92,7 @@ ErrCustomApps: 'Ada aplikasi yang dipasang, sila nyahpasangnya dahulu'
 ErrCustomRuntimes: 'Terdapat persekitaran masa jalan yang dipasang, sila padamkannya dahulu'
 ErrAppVersionDeprecated: "Aplikasi {{ .name }} tidak sesuai dengan versi 1Panel saat ini, dilewati"
 ErrDockerFailed: "Keadaan Docker tidak normal, sila periksa status perkhidmatan"
+ErrDockerComposeCmdNotFound: "Perintah Docker Compose tidak wujud, sila pasang perintah ini di mesin tuan terlebih dahulu"
 
 #fail
 ErrFileCanNotRead: 'Fail ini tidak menyokong pratonton'

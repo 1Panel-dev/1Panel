@@ -1,9 +1,10 @@
 package global
 
 type ServerConfig struct {
-	Base      Base      `mapstructure:"base"`
-	RemoteURL RemoteURL `mapstructure:"remote_url"`
-	Log       LogConfig `mapstructure:"log"`
+	Base         Base      `mapstructure:"base"`
+	RemoteURL    RemoteURL `mapstructure:"remote_url"`
+	Log          LogConfig `mapstructure:"log"`
+	DockerConfig DockerConfig
 }
 
 type Base struct {
@@ -50,4 +51,8 @@ type LogConfig struct {
 	LogName   string `mapstructure:"log_name"`
 	LogSuffix string `mapstructure:"log_suffix"`
 	MaxBackup int    `mapstructure:"max_backup"`
+}
+
+type DockerConfig struct {
+	Command string
 }

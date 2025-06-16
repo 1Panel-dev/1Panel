@@ -91,6 +91,7 @@ ErrCustomApps: "存在已经安装的应用，请先卸载"
 ErrCustomRuntimes: "存在已经安装的运行环境，请先删除"
 ErrAppVersionDeprecated: " {{ .name }} 应用不适配当前 1Panel 版本，跳过"
 ErrDockerFailed: "Docker 状态异常，请检查服务状态"
+ErrDockerComposeCmdNotFound: "Docker Compose 命令不存在，请先在宿主机安装此命令"
 
 #file
 ErrFileCanNotRead: "此文件不支持预览"

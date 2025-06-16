@@ -6,6 +6,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/service"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/common"
 )
 
 func Init() {
@@ -15,6 +16,7 @@ func Init() {
 	go syncSSL()
 	go syncTask()
 	go initAcmeAccount()
+	go checkDockerCompose()
 }
 
 func syncApp() {
@@ -69,5 +71,18 @@ func initAcmeAccount() {
 		if _, err := acmeAccountService.Create(createAcmeAccount); err != nil {
 			global.LOG.Warningf("create acme account error: %s", err.Error())
 		}
+	}
+}
+
+func checkDockerCompose() {
+	dockerComposCmd := common.GetDockerComposeCommand()
+	if dockerComposCmd == "" {
+		global.LOG.Errorf("Docker Compose command not found, please install Docker Compose Plugin")
+		return
+	}
+	global.CONF.DockerConfig.Command = dockerComposCmd
+	if err := service.NewISettingService().Update("DockerComposeCommand", dockerComposCmd); err != nil {
+		global.LOG.Errorf("update docker compose command error: %s", err.Error())
+		return
 	}
 }
