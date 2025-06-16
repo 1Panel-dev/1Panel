@@ -11,7 +11,7 @@ import (
 // @Success 200 {object} dto.SSHInfo
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /host/ssh/search [post]
+// @Router /hosts/ssh/search [post]
 func (b *BaseApi) GetSSHInfo(c *gin.Context) {
 	info, err := sshService.GetSSHInfo()
 	if err != nil {
@@ -28,7 +28,7 @@ func (b *BaseApi) GetSSHInfo(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /host/ssh/operate [post]
+// @Router /hosts/ssh/operate [post]
 // @x-panel-log {"bodyKeys":["operation"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"[operation] SSH ","formatEN":"[operation] SSH"}
 func (b *BaseApi) OperateSSH(c *gin.Context) {
 	var req dto.Operate
@@ -50,7 +50,7 @@ func (b *BaseApi) OperateSSH(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /host/ssh/update [post]
+// @Router /hosts/ssh/update [post]
 // @x-panel-log {"bodyKeys":["key","value"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"修改 SSH 配置 [key] => [value]","formatEN":"update SSH setting [key] => [value]"}
 func (b *BaseApi) UpdateSSH(c *gin.Context) {
 	var req dto.SSHUpdate
@@ -72,7 +72,7 @@ func (b *BaseApi) UpdateSSH(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /host/conffile/update [post]
+// @Router /hosts/conffile/update [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"修改 SSH 配置文件","formatEN":"update SSH conf"}
 func (b *BaseApi) UpdateSSHByfile(c *gin.Context) {
 	var req dto.SSHConf
@@ -94,7 +94,7 @@ func (b *BaseApi) UpdateSSHByfile(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /host/ssh/generate [post]
+// @Router /hosts/ssh/generate [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"生成 SSH 密钥 ","formatEN":"generate SSH secret"}
 func (b *BaseApi) GenerateSSH(c *gin.Context) {
 	var req dto.GenerateSSH
@@ -116,7 +116,7 @@ func (b *BaseApi) GenerateSSH(c *gin.Context) {
 // @Success 200 {string} secret
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /host/ssh/secret [post]
+// @Router /hosts/ssh/secret [post]
 func (b *BaseApi) LoadSSHSecret(c *gin.Context) {
 	var req dto.GenerateLoad
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -138,7 +138,7 @@ func (b *BaseApi) LoadSSHSecret(c *gin.Context) {
 // @Success 200 {object} dto.SSHLog
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /host/ssh/log [post]
+// @Router /hosts/ssh/log [post]
 func (b *BaseApi) LoadSSHLogs(c *gin.Context) {
 	var req dto.SearchSSHLog
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -158,7 +158,7 @@ func (b *BaseApi) LoadSSHLogs(c *gin.Context) {
 // @Success 200 {string} conf
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /host/ssh/conf [get]
+// @Router /hosts/ssh/conf [get]
 func (b *BaseApi) LoadSSHConf(c *gin.Context) {
 	data, err := sshService.LoadSSHConf()
 	if err != nil {
