@@ -436,14 +436,14 @@ func (w WebsiteCAService) DownloadFile(id uint) (*os.File, error) {
 	if err = fileOp.CreateDir(dir, constant.DirPerm); err != nil {
 		return nil, err
 	}
-	if err = fileOp.WriteFile(path.Join(dir, "ca.csr"), strings.NewReader(ca.CSR), constant.DirPerm); err != nil {
+	if err = fileOp.WriteFile(path.Join(dir, "ca.crt"), strings.NewReader(ca.CSR), constant.DirPerm); err != nil {
 		return nil, err
 	}
-	if err = fileOp.WriteFile(path.Join(dir, "private.key"), strings.NewReader(ca.PrivateKey), constant.DirPerm); err != nil {
+	if err = fileOp.WriteFile(path.Join(dir, "ca.key"), strings.NewReader(ca.PrivateKey), constant.DirPerm); err != nil {
 		return nil, err
 	}
 	fileName := ca.Name + ".zip"
-	if err = fileOp.Compress([]string{path.Join(dir, "ca.csr"), path.Join(dir, "private.key")}, dir, fileName, files.SdkZip, ""); err != nil {
+	if err = fileOp.Compress([]string{path.Join(dir, "ca.crt"), path.Join(dir, "ca.key")}, dir, fileName, files.SdkZip, ""); err != nil {
 		return nil, err
 	}
 	return os.Open(path.Join(dir, fileName))
