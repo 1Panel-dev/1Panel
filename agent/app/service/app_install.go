@@ -703,6 +703,7 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 				Rule:     form.Rule,
 				Type:     form.Type,
 				Multiple: form.Multiple,
+				Required: form.Required,
 			}
 			if form.Edit {
 				appParam.Edit = true
@@ -761,6 +762,7 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 				Value:    form.Default,
 				Values:   form.Values,
 				Multiple: form.Multiple,
+				Required: form.Required,
 			})
 		}
 	}

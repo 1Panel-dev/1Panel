@@ -234,6 +234,7 @@ const get = async () => {
                 if (d.type === 'number') {
                     value = Number(value);
                 }
+                console.log('d', d);
                 params.value.push({
                     default: value,
                     labelEn: d.labelEn,
@@ -247,8 +248,13 @@ const get = async () => {
                     showValue: d.showValue,
                     multiple: d.multiple,
                     label: d.label,
+                    required: d.required,
                 });
-                rules.params[d.key] = [Rules.requiredInput];
+                if (d.required) {
+                    rules.params[d.key] = [Rules.requiredInput];
+                } else {
+                    rules.params[d.key] = [];
+                }
                 if (d.rule) {
                     rules.params[d.key].push(Rules[d.rule]);
                 }
