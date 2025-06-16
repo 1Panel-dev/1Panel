@@ -91,7 +91,7 @@
     "installed": false
   },
   {
-    "name": "Swoole",
+    "name": "swoole",
     "check": "swoole",
     "file": "swoole.so",
     "versions": ["56","70", "71", "72",  "73", "74",  "80", "81", "82", "83","84"],
