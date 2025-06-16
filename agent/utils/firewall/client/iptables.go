@@ -202,8 +202,9 @@ func (iptables *Iptables) NatRemove(num string, protocol, srcPort, dest, destPor
 
 	if dest != "" && dest != "127.0.0.1" && dest != "localhost" {
 		if err := iptables.runf(NatTab, fmt.Sprintf(
-			"-D %s -p %s --dport %s -j DNAT MASQUERADE",
+			"-D %s -d %s -p %s --dport %s -j MASQUERADE",
 			PostRoutingChain,
+			dest,
 			protocol,
 			destPort,
 		)); err != nil {

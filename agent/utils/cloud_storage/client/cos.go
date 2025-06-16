@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"regexp"
 
 	cosSDK "github.com/tencentyun/cos-go-sdk-v5"
 )
@@ -18,6 +19,7 @@ type cosClient struct {
 
 func NewCosClient(vars map[string]interface{}) (*cosClient, error) {
 	region := loadParamFromVars("region", vars)
+	endpoint := loadParamFromVars("endpoint", vars)
 	accessKey := loadParamFromVars("accessKey", vars)
 	secretKey := loadParamFromVars("secretKey", vars)
 	bucket := loadParamFromVars("bucket", vars)
@@ -26,7 +28,15 @@ func NewCosClient(vars map[string]interface{}) (*cosClient, error) {
 		scType = "Standard"
 	}
 
-	u, _ := url.Parse(fmt.Sprintf("https://cos.%s.myqcloud.com", region))
+	endpointType := "cos"
+	if len(endpoint) != 0 {
+		re := regexp.MustCompile(`.*cos-dualstack\..*`)
+		if re.MatchString(endpoint) {
+			endpointType = "cos-dualstack"
+		}
+	}
+
+	u, _ := url.Parse(fmt.Sprintf("https://%s.%s.myqcloud.com", endpointType, region))
 	b := &cosSDK.BaseURL{BucketURL: u}
 	client := cosSDK.NewClient(b, &http.Client{
 		Transport: &cosSDK.AuthorizationTransport{
@@ -36,7 +46,7 @@ func NewCosClient(vars map[string]interface{}) (*cosClient, error) {
 	})
 
 	if len(bucket) != 0 {
-		u2, _ := url.Parse(fmt.Sprintf("https://%s.cos.%s.myqcloud.com", bucket, region))
+		u2, _ := url.Parse(fmt.Sprintf("https://%s.%s.%s.myqcloud.com", bucket, endpointType, region))
 		b2 := &cosSDK.BaseURL{BucketURL: u2}
 		clientWithBucket := cosSDK.NewClient(b2, &http.Client{
 			Transport: &cosSDK.AuthorizationTransport{
