@@ -186,6 +186,7 @@ const getRuntime = async (id: number) => {
             port: data.port,
         });
         runtime.exposedPorts = data.exposedPorts || [];
+        runtime.environments = data.environments || [];
         editParams.value = data.appParams;
         open.value = true;
     } catch (error) {}
