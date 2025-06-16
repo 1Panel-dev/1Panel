@@ -4,6 +4,7 @@
         :header="$t('menu.terminal')"
         @close="handleClose"
         :resource="title"
+        :autoClose="!terminalOpen"
         size="large"
     >
         <template #content>

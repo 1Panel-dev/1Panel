@@ -5,6 +5,7 @@
         @close="handleClose"
         :resource="title"
         :size="globalStore.isFullScreen ? 'full' : 'large'"
+        :autoClose="false"
     >
         <Terminal class="mt-2" style="height: calc(100vh - 175px)" ref="terminalRef"></Terminal>
 

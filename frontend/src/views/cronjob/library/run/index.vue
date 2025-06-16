@@ -5,6 +5,7 @@
         @close="handleClose"
         :resource="scriptName"
         size="large"
+        :autoClose="false"
     >
         <template #content>
             <Terminal style="height: calc(100vh - 175px); margin-top: 18px" ref="terminalRef"></Terminal>

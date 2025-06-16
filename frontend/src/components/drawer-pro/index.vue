@@ -4,7 +4,8 @@
         @close="handleClose"
         :destroy-on-close="true"
         :size="size"
-        :close-on-press-escape="true"
+        :close-on-press-escape="autoClose"
+        :close-on-click-modal="autoClose"
     >
         <template #header>
             <el-page-header @back="handleBack">
@@ -72,6 +73,10 @@ const props = defineProps({
     fullScreen: {
         type: Boolean,
         default: false,
+    },
+    autoClose: {
+        type: Boolean,
+        default: true,
     },
 });
 

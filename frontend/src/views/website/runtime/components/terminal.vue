@@ -6,6 +6,7 @@
         :resource="title"
         fullScreen
         :size="globalStore.isFullScreen ? 'full' : 'large'"
+        :autoClose="false"
     >
         <template #content>
             <Terminal style="height: calc(100vh - 180px)" ref="terminalRef" v-if="terminalOpen"></Terminal>

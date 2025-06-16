@@ -84,7 +84,12 @@
                             <span v-else>{{ row.retainCopies }}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('cronjob.lastRecordTime')" :min-width="120" prop="lastRecordTime">
+                    <el-table-column
+                        :label="$t('cronjob.lastRecordTime')"
+                        :min-width="120"
+                        show-overflow-tooltip
+                        prop="lastRecordTime"
+                    >
                         <template #default="{ row }">
                             <el-button v-if="row.lastRecordStatus === 'Success'" icon="Select" link type="success" />
                             <el-button v-if="row.lastRecordStatus === 'Failed'" icon="CloseBold" link type="danger" />

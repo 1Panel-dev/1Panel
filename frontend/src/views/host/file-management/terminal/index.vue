@@ -4,7 +4,7 @@
         :header="$t('menu.terminal')"
         @close="handleClose"
         size="large"
-        :close-on-click-modal="false"
+        :autoClose="false"
     >
         <template #content>
             <Terminal style="height: calc(100vh - 100px)" ref="terminalRef"></Terminal>
