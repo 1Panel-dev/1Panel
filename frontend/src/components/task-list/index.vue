@@ -52,7 +52,7 @@
 <script setup lang="ts">
 import { dateFormat } from '@/utils/util';
 import { searchTasks } from '@/api/modules/log';
-import { reactive, ref } from '@vue/runtime-core';
+import { reactive, ref } from 'vue';
 import { Log } from '@/api/interface/log';
 import TaskLog from '@/components/log/task/index.vue';
 import bus from '@/global/bus';

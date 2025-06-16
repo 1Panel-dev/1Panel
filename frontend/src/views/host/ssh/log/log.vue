@@ -54,7 +54,7 @@
 
 <script setup lang="ts">
 import { dateFormat } from '@/utils/util';
-import { onMounted, reactive, ref } from '@vue/runtime-core';
+import { onMounted, reactive, ref } from 'vue';
 import { loadSSHLogs } from '@/api/modules/host';
 
 const loading = ref();

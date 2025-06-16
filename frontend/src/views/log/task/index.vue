@@ -48,7 +48,7 @@
 import LogRouter from '@/views/log/router/index.vue';
 import { dateFormat } from '@/utils/util';
 import { searchTasks } from '@/api/modules/log';
-import { onMounted, reactive, ref } from '@vue/runtime-core';
+import { onMounted, reactive, ref } from 'vue';
 import { Log } from '@/api/interface/log';
 import TaskLog from '@/components/log/task/index.vue';
 import bus from '@/global/bus';

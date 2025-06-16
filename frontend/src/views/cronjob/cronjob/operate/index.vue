@@ -363,7 +363,7 @@
                                         </LayoutCol>
                                         <LayoutCol>
                                             <el-form-item
-                                                :label="$t('container.command')"
+                                                :label="$t('container.command') + 123"
                                                 prop="command"
                                                 :rules="Rules.requiredInput"
                                             >

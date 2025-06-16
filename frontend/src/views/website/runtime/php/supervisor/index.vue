@@ -119,7 +119,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from '@vue/runtime-core';
+import { ref } from 'vue';
 import { computed } from 'vue';
 import Create from './create/index.vue';
 import File from './file/index.vue';

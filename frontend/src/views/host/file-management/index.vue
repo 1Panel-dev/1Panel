@@ -540,7 +540,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, reactive, ref } from '@vue/runtime-core';
+import { computed, nextTick, onMounted, reactive, ref } from 'vue';
 import {
     addFavorite,
     computeDepthDirSize,

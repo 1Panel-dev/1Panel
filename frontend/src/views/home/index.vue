@@ -189,7 +189,7 @@
                                 </el-descriptions-item>
                                 <el-descriptions-item class-name="system-content" label-class-name="system-label">
                                     <template #label>
-                                        <span>{{ $t('home.platformVersion') }}</span>
+                                        <span class="system-label">{{ $t('home.platformVersion') }}</span>
                                     </template>
                                     {{
                                         baseInfo.platformVersion
@@ -199,19 +199,19 @@
                                 </el-descriptions-item>
                                 <el-descriptions-item class-name="system-content" label-class-name="system-label">
                                     <template #label>
-                                        <span>{{ $t('home.kernelVersion') }}</span>
+                                        <span class="system-label">{{ $t('home.kernelVersion') }}</span>
                                     </template>
                                     {{ baseInfo.kernelVersion }}
                                 </el-descriptions-item>
                                 <el-descriptions-item class-name="system-content" label-class-name="system-label">
                                     <template #label>
-                                        <span>{{ $t('home.kernelArch') }}</span>
+                                        <span class="system-label">{{ $t('home.kernelArch') }}</span>
                                     </template>
                                     {{ baseInfo.kernelArch }}
                                 </el-descriptions-item>
                                 <el-descriptions-item class-name="system-content" label-class-name="system-label">
                                     <template #label>
-                                        <span>{{ $t('home.ip') }}</span>
+                                        <span class="system-label">{{ $t('home.ip') }}</span>
                                     </template>
                                     {{ baseInfo.ipV4Addr }}
                                 </el-descriptions-item>
@@ -221,19 +221,19 @@
                                     label-class-name="system-label"
                                 >
                                     <template #label>
-                                        <span>{{ $t('home.proxy') }}</span>
+                                        <span class="system-label">{{ $t('home.proxy') }}</span>
                                         {{ baseInfo.httpProxy }}
                                     </template>
                                 </el-descriptions-item>
                                 <el-descriptions-item class-name="system-content" label-class-name="system-label">
                                     <template #label>
-                                        <span>{{ $t('home.uptime') }}</span>
+                                        <span class="system-label">{{ $t('home.uptime') }}</span>
                                     </template>
                                     {{ currentInfo.timeSinceUptime }}
                                 </el-descriptions-item>
                                 <el-descriptions-item class-name="system-content" label-class-name="system-label">
                                     <template #label>
-                                        <span>{{ $t('home.runningTime') }}</span>
+                                        <span class="system-label">{{ $t('home.runningTime') }}</span>
                                     </template>
                                     {{ loadUpTime(currentInfo.uptime) }}
                                 </el-descriptions-item>

@@ -48,7 +48,7 @@ import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import LogRouter from '@/views/log/router/index.vue';
 import { dateFormat } from '@/utils/util';
 import { cleanLogs, getLoginLogs } from '@/api/modules/log';
-import { onMounted, reactive, ref } from '@vue/runtime-core';
+import { onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 

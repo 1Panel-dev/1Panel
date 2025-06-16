@@ -109,7 +109,7 @@ import TaskLog from '@/components/log/task/index.vue';
 import OperateDialog from '@/views/cronjob/library/operate/index.vue';
 import TerminalDialog from '@/views/cronjob/library/run/index.vue';
 import { deleteScript, searchScript, syncScript } from '@/api/modules/cronjob';
-import { onMounted, reactive, ref } from '@vue/runtime-core';
+import { onMounted, reactive, ref } from 'vue';
 import { Cronjob } from '@/api/interface/cronjob';
 import i18n from '@/lang';
 import { GlobalStore } from '@/store';

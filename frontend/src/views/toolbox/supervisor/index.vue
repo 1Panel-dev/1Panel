@@ -150,7 +150,7 @@
 
 <script setup lang="ts">
 import SuperVisorStatus from './status/index.vue';
-import { ref } from '@vue/runtime-core';
+import { ref } from 'vue';
 import ConfigSuperVisor from './config/index.vue';
 import { computed, onMounted } from 'vue';
 import Create from './create/index.vue';
