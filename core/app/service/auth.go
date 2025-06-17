@@ -37,7 +37,7 @@ func (u *AuthService) Login(c *gin.Context, info dto.Login, entrance string) (*d
 		return nil, "", buserr.New("ErrRecordNotFound")
 	}
 	if nameSetting.Value != info.Name {
-		return nil, "ErrAuth", nil
+		return nil, "ErrAuth", buserr.New("ErrAuth")
 	}
 	if err = checkPassword(info.Password); err != nil {
 		return nil, "ErrAuth", err
@@ -47,7 +47,7 @@ func (u *AuthService) Login(c *gin.Context, info dto.Login, entrance string) (*d
 		return nil, "", err
 	}
 	if len(entranceSetting.Value) != 0 && entranceSetting.Value != entrance {
-		return nil, "ErrEntrance", nil
+		return nil, "ErrEntrance", buserr.New("ErrEntrance")
 	}
 	mfa, err := settingRepo.Get(repo.WithByKey("MFAStatus"))
 	if err != nil {

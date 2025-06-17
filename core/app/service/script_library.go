@@ -188,8 +188,11 @@ func (u *ScriptService) Sync(req dto.OperateByTaskID) error {
 		}
 		var scriptSetting model.Setting
 		_ = global.DB.Where("key = ?", "ScriptVersion").First(&scriptSetting).Error
-		if scriptSetting.Value == string(versionRes) {
-			syncTask.Logf("The local-%s and remote-%s versions are detected to be consistent. Skip...", scriptSetting.Value, versionRes)
+		localVersion := strings.ReplaceAll(string(versionRes), "\n", "")
+		remoteVersion := strings.ReplaceAll(scriptSetting.Value, "\n", "")
+
+		syncTask.Log(i18n.GetMsgWithMap("ScriptVersion", map[string]interface{}{"localVersion": localVersion, "remoteVersion": remoteVersion}))
+		if localVersion == remoteVersion {
 			return nil
 		}
 

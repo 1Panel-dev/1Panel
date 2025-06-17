@@ -120,9 +120,9 @@ func (c *CommandHelper) run(name string, arg ...string) (string, error) {
 		cmd.Stdout = file
 		cmd.Stderr = file
 	} else if len(c.scriptPath) != 0 {
+		cmd = exec.Command("bash", c.scriptPath)
 		cmd.Stdout = &stdout
 		cmd.Stderr = &stderr
-		cmd = exec.Command("bash", c.scriptPath)
 	} else {
 		cmd.Stdout = &stdout
 		cmd.Stderr = &stderr

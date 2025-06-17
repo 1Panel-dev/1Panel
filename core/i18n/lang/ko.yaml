@@ -93,6 +93,7 @@ SubTask: "서브 작업"
 
 #script
 ScriptLibrary: "스크립트 라이브러리"
+ScriptVersion: "로컬: {{ .localVersion }}, 원격: {{ .remoteVersion }}"
 
 Node: "노드"
 SyncNode: "노드 데이터 동기화"

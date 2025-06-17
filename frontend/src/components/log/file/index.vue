@@ -205,7 +205,14 @@ const getContent = async (pre: boolean) => {
     isLoading.value = true;
     emit('update:isReading', true);
 
-    const res = await readByLine(readReq, props.config.operateNode || '');
+    let res;
+    try {
+        res = await readByLine(readReq, props.config.operateNode || '');
+    } catch (error) {
+        isLoading.value = false;
+        firstLoading.value = false;
+    }
+
     logPath.value = res.data.path;
     firstLoading.value = false;
 

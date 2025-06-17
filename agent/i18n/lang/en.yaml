@@ -108,6 +108,7 @@ ErrSourcePathNotFound: 'Source directory does not exist'
 ErrFavoriteExist: 'This path has already been favorited'
 ErrInvalidChar: 'Illegal characters are not allowed'
 ErrPathNotDelete: 'The selected directory cannot be deleted'
+ErrLogFileToLarge: "The log file exceeds 500MB and cannot be opened"
 
 #website
 ErrAliasIsExist: 'Alias already exists'

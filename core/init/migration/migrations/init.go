@@ -312,7 +312,119 @@ var AddXpackHideMenu = &gormigrate.Migration{
 					}
 				}
 				if !exists {
-					menus[i].Children = append(menus[i].Children, newItem)
+					menus[i].Children = append([]dto.ShowMenu{newItem}, menus[i].Children...)
+				}
+				break
+			}
+		}
+
+		updatedJSON, err := json.Marshal(menus)
+		if err != nil {
+			return tx.Model(&model.Setting{}).
+				Where("key = ?", "HideMenu").
+				Update("value", helper.LoadMenus()).Error
+		}
+
+		return tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Update("value", string(updatedJSON)).Error
+	},
+}
+
+var UpdateXpackHideMenu = &gormigrate.Migration{
+	ID: "20250617-update-xpack-hide-menu",
+	Migrate: func(tx *gorm.DB) error {
+		var menuJSON string
+		if err := tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Pluck("value", &menuJSON).Error; err != nil {
+			return err
+		}
+		var menus []dto.ShowMenu
+		if err := json.Unmarshal([]byte(menuJSON), &menus); err != nil {
+			return tx.Model(&model.Setting{}).
+				Where("key = ?", "HideMenu").
+				Update("value", helper.LoadMenus()).Error
+		}
+		newItem := dto.ShowMenu{
+			ID:       "119",
+			Disabled: false,
+			Title:    "xpack.upage",
+			IsShow:   true,
+			Label:    "Upage",
+			Path:     "/xpack/upage",
+		}
+
+		for i, menu := range menus {
+			if menu.ID == "11" {
+				exists := false
+				for _, child := range menu.Children {
+					if child.ID == newItem.ID {
+						exists = true
+						break
+					}
+				}
+				if exists {
+					break
+				}
+
+				insertIndex := -1
+				for j, child := range menu.Children {
+					if child.ID == "111" {
+						insertIndex = j
+						break
+					}
+				}
+
+				if insertIndex != -1 {
+					children := menu.Children
+					menus[i].Children = append(children[:insertIndex+1], append([]dto.ShowMenu{newItem}, children[insertIndex+1:]...)...)
+				} else {
+					menus[i].Children = append([]dto.ShowMenu{newItem}, menus[i].Children...)
+				}
+				break
+			}
+		}
+
+		for i, menu := range menus {
+			if menu.ID == "11" {
+				existsIndex := -1
+				for j, child := range menu.Children {
+					if child.ID == "118" {
+						existsIndex = j
+						break
+					}
+				}
+
+				if existsIndex == 0 {
+					break
+				}
+
+				var item118 dto.ShowMenu
+				if existsIndex != -1 {
+					item118 = menu.Children[existsIndex]
+					menus[i].Children = append(menu.Children[:existsIndex], menu.Children[existsIndex+1:]...)
+				} else {
+					item118 = dto.ShowMenu{
+						ID:       "118",
+						Disabled: false,
+						Title:    "xpack.app.app",
+						IsShow:   true,
+						Label:    "XApp",
+						Path:     "/xpack/app",
+					}
+				}
+
+				menus[i].Children = append([]dto.ShowMenu{item118}, menus[i].Children...)
+				break
+			}
+		}
+
+		for i, menu := range menus {
+			if menu.ID == "7" {
+				for j, child := range menu.Children {
+					if child.ID == "75" {
+						if child.Title != "menu.processManage" {
+							menus[i].Children[j].Title = "menu.processManage"
+						}
+						break
+					}
 				}
 				break
 			}

@@ -108,6 +108,7 @@ ErrSourcePathNotFound: 'ソース ディレクトリが存在しません'
 ErrFavoriteExist: 'このパスはすでにお気に入りに登録されています'
 ErrInvalidChar: '不正な文字は許可されません'
 ErrPathNotDelete: '選択されたディレクトリは削除できません'
+ErrLogFileToLarge: "ログファイルが500MBを超えており、開くことができません"
 
 #website
 ErrAliasIsExist: 'エイリアスがすでに存在します'

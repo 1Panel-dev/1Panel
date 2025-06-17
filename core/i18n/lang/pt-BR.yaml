@@ -93,6 +93,7 @@ SubTask: "Subtarefa"
 
 #script
 ScriptLibrary: "Biblioteca de Scripts"
+ScriptVersion: "Local: {{ .localVersion }}, Remoto: {{ .remoteVersion }}"
 
 Node: "Nó"
 SyncNode: "Sincronizar dados do nó"

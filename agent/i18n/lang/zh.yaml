@@ -107,6 +107,7 @@ ErrSourcePathNotFound:  "源目录不存在"
 ErrFavoriteExist: "已收藏此路径"
 ErrInvalidChar: "禁止使用非法字符"
 ErrPathNotDelete: "所选目录不可删除"
+ErrLogFileToLarge: "日志文件超过 500M，无法打开"
 
 #website
 ErrAliasIsExist: "代号已存在"

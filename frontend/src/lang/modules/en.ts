@@ -3378,13 +3378,22 @@ const message = {
             nodeSyncHelper1: '1. Public backup account information',
             nodeSyncHelper2: '2. Connection information between the main node and sub-nodes',
 
+            nodeCheck: 'Availability check',
+            checkSSH: 'Check node SSH connection',
+            checkLicense: 'Check node license status',
+            checkService: 'Check existing service information on node',
+            checkPort: 'Check node port reachability',
             panelExist:
-                '1Panel V1 service is running on this node. Please upgrade to V2 using the migration script before adding.',
-            coreExist: 'This node has already been enabled as the main node and cannot be added as a slave node.',
+                'Detected that this node is running 1Panel V1 service. Please upgrade to V2 using the migration script before adding.',
+            coreExist: 'This node is already enabled as a master node and cannot be added as a slave node.',
             agentExist:
-                '1panel-agent is already installed on this node. Continuing will preserve existing data and only replace the 1panel-agent service. Proceed?',
-            dataExist: '1Panel historical data exists on this node. Confirm to continue adding?',
+                'Detected that 1panel-agent is already installed on this node. Continuing will retain existing data and only replace the 1panel-agent service.',
+            oldDataExist:
+                'Detected historical 1Panel V2 data on this node. The following information will be used to overwrite current settings:',
             errLicense: 'The license bound to this node is unavailable. Please check and try again!',
+            errNodePort:
+                'Node port [ {0} ] is detected as inaccessible. Please check if the firewall or security group has allowed this port.',
+
             reinstallHelper: 'Reinstall node {0}, do you want to continue?',
             unhealthyCheck: 'Abnormal Check',
             fixOperation: 'Fix Operation',

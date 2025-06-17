@@ -237,17 +237,20 @@
                                                         plain
                                                         size="small"
                                                     >
-                                                        {{ $t('app.busPort') }}{{ $t('commons.colon')
+                                                        {{ $t('commons.table.port') }}{{ $t('commons.colon')
                                                         }}{{ installed.httpPort }}
                                                     </el-button>
                                                     <el-button v-if="installed.httpsPort > 0" plain size="small">
-                                                        {{ $t('app.busPort') }}：{{ installed.httpsPort }}
+                                                        {{ $t('commons.table.port') }}：{{ installed.httpsPort }}
                                                     </el-button>
 
                                                     <el-popover
                                                         placement="top-start"
                                                         trigger="hover"
-                                                        v-if="installed.appType == 'website'"
+                                                        v-if="
+                                                            installed.appType == 'website' ||
+                                                            installed.appKey?.startsWith('local')
+                                                        "
                                                         :width="400"
                                                     >
                                                         <template #reference>

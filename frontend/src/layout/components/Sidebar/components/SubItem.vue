@@ -18,7 +18,11 @@
                 <span>{{ $t(subItem.meta?.title as string, 2) }}</span>
             </template>
         </el-menu-item>
-
+        <el-menu-item :index="''" v-else-if="subItem.path === '/xpack/upage'" @click="goUpage">
+            <template #title>
+                <span style="margin-left: 10px">{{ $t('xpack.upage') }}</span>
+            </template>
+        </el-menu-item>
         <el-menu-item v-else :index="subItem.path">
             <el-icon v-if="subItem.meta?.icon">
                 <SvgIcon :iconName="(subItem.meta?.icon as string)" />
@@ -26,11 +30,6 @@
             <template #title>
                 <span v-if="subItem.meta?.icon">{{ $t(subItem.meta?.title as string, 2) }}</span>
                 <span v-else style="margin-left: 10px">{{ $t(subItem.meta?.title as string, 2) }}</span>
-            </template>
-        </el-menu-item>
-        <el-menu-item :index="''" v-if="subItem.path === '/xpack/node'" @click="goUpage">
-            <template #title>
-                <span style="margin-left: 10px">{{ $t('xpack.upage') }}</span>
             </template>
         </el-menu-item>
     </template>

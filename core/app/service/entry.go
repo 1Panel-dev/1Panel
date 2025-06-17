@@ -11,7 +11,6 @@ var (
 	groupRepo      = repo.NewIGroupRepo()
 	upgradeLogRepo = repo.NewIUpgradeLogRepo()
 
-	taskRepo   = repo.NewITaskRepo()
 	agentRepo  = repo.NewIAgentRepo()
 	scriptRepo = repo.NewIScriptRepo()
 )
