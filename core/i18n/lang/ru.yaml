@@ -93,6 +93,7 @@ SubTask: "Подзадача"
 
 #script
 ScriptLibrary: "Библиотека скриптов"
+ScriptVersion: "Локальная: {{ .localVersion }}, Удалённая: {{ .remoteVersion }}"
 
 Node: "Узел"
 SyncNode: "Синхронизация данных узла"

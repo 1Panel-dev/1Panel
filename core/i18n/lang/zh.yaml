@@ -93,6 +93,7 @@ SubTask: "子任务"
 
 #script
 ScriptLibrary: "脚本库"
+ScriptVersion: "本地：{{ .localVersion }}， 远程：{{ .remoteVersion }}"
 
 #sync node
 Node: "节点"

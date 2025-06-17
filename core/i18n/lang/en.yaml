@@ -93,6 +93,7 @@ SubTask: "Subtask"
 
 #script
 ScriptLibrary: "Script Library"
+ScriptVersion: "Local: {{ .localVersion }}, Remote: {{ .remoteVersion }}"
 
 Node: "Node"
 SyncNode: "Sync node data"

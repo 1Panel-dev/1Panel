@@ -94,6 +94,7 @@ SubTask: "サブタスク"
 
 #script
 ScriptLibrary: "スクリプトライブラリ"
+ScriptVersion: "ローカル: {{ .localVersion }}， リモート: {{ .remoteVersion }}"
 
 Node: "ノード"
 SyncNode: "ノードデータ同期"

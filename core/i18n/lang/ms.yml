@@ -93,6 +93,7 @@ SubTask: "Tugas Sub"
 
 #script 
 ScriptLibrary: "Pustaka Skrip"
+ScriptVersion: "Tempatan: {{ .localVersion }}, Jauh: {{ .remoteVersion }}"
 
 Node: "Nod"
 SyncNode: "Segerakkan data nod"
