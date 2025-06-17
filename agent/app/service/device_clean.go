@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"path/filepath"
 	"sort"
 	"strings"
 	"time"
@@ -338,7 +339,7 @@ func doSystemClean(taskItem *task.Task) func(t *task.Task) error {
 		}
 
 		dropWithTask(path.Join(global.Dir.BaseDir, tmpUploadPath), taskItem, &size, &fileCount)
-		dropWithTask(path.Join(global.Dir.BaseDir, uploadPath), taskItem, &size, &fileCount)
+		dropWithExclude(path.Join(global.Dir.BaseDir, uploadPath), []string{"theme"}, taskItem, &size, &fileCount)
 		dropWithTask(path.Join(global.Dir.BaseDir, downloadPath), taskItem, &size, &fileCount)
 
 		logFiles, _ := os.ReadDir(global.Dir.LogDir)
@@ -711,6 +712,30 @@ func dropVolumes() {
 	_, err = client.VolumesPrune(context.Background(), pruneFilters)
 	if err != nil {
 		global.LOG.Errorf("drop volumes failed, err %v", err)
+	}
+}
+
+func dropWithExclude(pathToDelete string, excludeSubDirs []string, taskItem *task.Task, size *int64, count *int) {
+	entries, err := os.ReadDir(pathToDelete)
+	if err != nil {
+		taskItem.LogFailed(fmt.Sprintf("read dir %s failed: %v", pathToDelete, err))
+		return
+	}
+
+	for _, entry := range entries {
+		name := entry.Name()
+		fullPath := filepath.Join(pathToDelete, name)
+		excluded := false
+		for _, ex := range excludeSubDirs {
+			if name == ex {
+				excluded = true
+				break
+			}
+		}
+		if excluded {
+			continue
+		}
+		dropWithTask(fullPath, taskItem, size, count)
 	}
 }
 
