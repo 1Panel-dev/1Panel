@@ -246,18 +246,23 @@ func (u *DeviceService) UpdateSwap(req dto.SwapHelper) error {
 		}
 		return operateSwapWithFile(true, req)
 	}
-	std1, err := cmd.RunDefaultWithStdoutBashCf("%s dd if=/dev/zero of=%s bs=1024 count=%d", cmd.SudoHandleCmd(), req.Path, req.Size)
+	stdDD, err := cmd.RunDefaultWithStdoutBashCf("%s dd if=/dev/zero of=%s bs=1024 count=%d", cmd.SudoHandleCmd(), req.Path, req.Size)
 	if err != nil {
-		return fmt.Errorf("handle dd path %s failed, err: %s", req.Path, std1)
+		return fmt.Errorf("handle dd %s failed, std: %s, err: %s", req.Path, stdDD, err)
 	}
-	std2, err := cmd.RunDefaultWithStdoutBashCf("%s mkswap -f %s", cmd.SudoHandleCmd(), req.Path)
+	stdChmod, err := cmd.RunDefaultWithStdoutBashCf("%s chmod 0600 %s", cmd.SudoHandleCmd(), req.Path)
 	if err != nil {
-		return fmt.Errorf("handle dd path %s failed, err: %s", req.Path, std2)
+		return fmt.Errorf("handle chmod 0600 %s failed,std: %s, err: %s", req.Path, stdChmod, err)
 	}
-	std3, err := cmd.RunDefaultWithStdoutBashCf("%s swapon %s", cmd.SudoHandleCmd(), req.Path)
+	stdMkswap, err := cmd.RunDefaultWithStdoutBashCf("%s mkswap -f %s", cmd.SudoHandleCmd(), req.Path)
+	if err != nil {
+		return fmt.Errorf("handle mkswap -f %s failed, std: %s, err: %s", req.Path, stdMkswap, err)
+	}
+
+	stdSwapon, err := cmd.RunDefaultWithStdoutBashCf("%s swapon %s", cmd.SudoHandleCmd(), req.Path)
 	if err != nil {
 		_, _ = cmd.RunDefaultWithStdoutBashCf("%s swapoff %s", cmd.SudoHandleCmd(), req.Path)
-		return fmt.Errorf("handle dd path %s failed, err: %s", req.Path, std3)
+		return fmt.Errorf("handle swapoff %s failed,std: %s, err: %s", req.Path, stdSwapon, err)
 	}
 	return operateSwapWithFile(false, req)
 }
