@@ -17,6 +17,8 @@ func Init() {
 		migrations.InitGoogle,
 		migrations.AddTaskDB,
 		migrations.AddXpackHideMenu,
+		migrations.AddXpackHideMenuUpage,
+		migrations.UpdateXpackHideMenuTitleAndSort,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)
