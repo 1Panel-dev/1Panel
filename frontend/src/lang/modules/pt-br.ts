@@ -3324,13 +3324,22 @@ const message = {
             nodeSyncHelper1: '1. Informações da conta de backup pública',
             nodeSyncHelper2: '2. Informações de conexão entre o nó principal e os sub-nós',
 
+            nodeCheck: 'Verificação de disponibilidade',
+            checkSSH: 'Verificar conexão SSH do nó',
+            checkLicense: 'Verificar status da licença do nó',
+            checkService: 'Verificar informações de serviço existentes no nó',
+            checkPort: 'Verificar acessibilidade da porta do nó',
             panelExist:
-                'O serviço 1Panel V1 está em execução neste nó. Atualize para V2 usando o script de migração antes de adicionar.',
-            coreExist: 'Este nó já foi ativado como nó principal e não pode ser adicionado como um nó escravo.',
+                'Detectado que este nó está executando o serviço 1Panel V1. Atualize para V2 usando o script de migração antes de adicionar.',
+            coreExist: 'Este nó já está habilitado como nó mestre e não pode ser adicionado como nó escravo.',
             agentExist:
-                '1panel-agent já está instalado neste nó. Continuar preservará os dados existentes e substituirá apenas o serviço 1panel-agent. Prosseguir?',
-            dataExist: 'Existem dados históricos do 1Panel neste nó. Confirmar para continuar a adição?',
-            errLicense: 'A licença vinculada a este nó não está disponível. Por favor, verifique e tente novamente!',
+                'Detectado que 1panel-agent já está instalado neste nó. Continuar irá reter os dados existentes e apenas substituir o serviço 1panel-agent.',
+            oldDataExist:
+                'Detectados dados históricos do 1Panel V2 neste nó. As seguintes informações serão usadas para sobrescrever as configurações atuais:',
+            errLicense: 'A licença vinculada a este nó está indisponível. Por favor verifique e tente novamente!',
+            errNodePort:
+                'A porta do nó [ {0} ] foi detectada como inacessível. Verifique se o firewall ou grupo de segurança liberou esta porta.',
+
             reinstallHelper: 'Reinstalar o nó {0}, deseja continuar?',
             unhealthyCheck: 'Verificação Anormal',
             fixOperation: 'Operação de Correção',

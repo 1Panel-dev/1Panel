@@ -3317,13 +3317,22 @@ const message = {
             nodeSyncHelper1: '1. Maklumat akaun sandaran awam',
             nodeSyncHelper2: '2. Maklumat sambungan antara nod utama dan nod sub',
 
+            nodeCheck: 'Semakan ketersediaan',
+            checkSSH: 'Periksa sambungan SSH nod',
+            checkLicense: 'Periksa status lesen nod',
+            checkService: 'Periksa maklumat perkhidmatan sedia ada pada nod',
+            checkPort: 'Periksa kebolehcapaian port nod',
             panelExist:
-                'Mengesan perkhidmatan 1Panel V1 sedang berjalan pada nod ini. Sila naik taraf ke V2 menggunakan skrip migrasi sebelum menambah.',
-            coreExist: 'Node ini telah diaktifkan sebagai nod utama dan tidak boleh ditambah sebagai nod hamba.',
+                'Mengesan nod ini sedang menjalankan perkhidmatan 1Panel V1. Sila naik taraf ke V2 menggunakan skrip migrasi sebelum menambah.',
+            coreExist: 'Nod ini telah didayakan sebagai nod induk dan tidak boleh ditambah sebagai nod hamba.',
             agentExist:
-                'Mengesan 1panel-agent telah dipasang pada nod ini. Jika diteruskan, data sedia ada akan dikekalkan dan hanya perkhidmatan 1panel-agent akan diganti. Teruskan?',
-            dataExist: 'Mengesan data sejarah 1Panel wujud pada nod ini. Sahkan untuk terus menambah?',
-            errLicense: 'Lesen yang terikat pada nod ini tidak tersedia. Sila periksa dan cuba lagi!',
+                'Mengesan 1panel-agent telah dipasang pada nod ini. Penerusan akan mengekalkan data sedia ada dan hanya menggantikan perkhidmatan 1panel-agent.',
+            oldDataExist:
+                'Mengesan data sejarah 1Panel V2 pada nod ini. Maklumat berikut akan digunakan untuk menimpa tetapan semasa:',
+            errLicense: 'Lesen yang terikat pada nod ini tidak tersedia. Sila semak dan cuba lagi!',
+            errNodePort:
+                'Port nod [ {0} ] dikesan tidak boleh diakses. Sila semak sama ada firewall atau kumpulan keselamatan telah membenarkan port ini.',
+
             reinstallHelper: 'Pasang semula nod {0}, adakah anda ingin meneruskan?',
             unhealthyCheck: 'Pemeriksaan Tidak Normal',
             fixOperation: 'Operasi Pembetulan',

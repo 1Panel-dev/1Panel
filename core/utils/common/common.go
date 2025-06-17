@@ -66,6 +66,19 @@ func ScanPort(port int) bool {
 	return false
 }
 
+func CheckPort(host string, port string, timeout time.Duration) bool {
+	target := net.JoinHostPort(host, port)
+	conn, err := net.DialTimeout("tcp", target, timeout)
+	if err != nil {
+		if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
+			return false
+		}
+		return strings.Contains(err.Error(), "connection refused")
+	}
+	defer conn.Close()
+	return true
+}
+
 func ComparePanelVersion(version1, version2 string) bool {
 	if version1 == version2 {
 		return false
