@@ -41,6 +41,8 @@ func NewCloudStorageClient(backupType string, vars map[string]interface{}) (Clou
 		return client.NewUpClient(vars)
 	case constant.ALIYUN:
 		return client.NewALIClient(vars)
+	case constant.GoogleDrive:
+		return client.NewGoogleDriveClient(vars)
 	default:
 		return nil, buserr.WithName("ErrNotSupportType", backupType)
 	}

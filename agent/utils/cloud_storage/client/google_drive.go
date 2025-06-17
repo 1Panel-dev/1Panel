@@ -393,7 +393,6 @@ func RefreshGoogleToken(grantType string, tokenType string, varMap map[string]in
 	if err := json.Unmarshal(resp.Body(), &respItem); err != nil {
 		return "", err
 	}
-	fmt.Println(respItem)
 	if tokenType == "accessToken" {
 		return respItem.AccessToken, nil
 	}
