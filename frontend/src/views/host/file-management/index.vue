@@ -710,7 +710,6 @@ const searchFile = async () => {
 };
 
 const handleSearchResult = (res: ResultData<File.File>) => {
-    paginationConfig.total = res.data.itemTotal;
     if (isHidden.value) {
         const items = res.data.items || [];
         data.value = items.filter((item) => !item.isHidden);
@@ -719,6 +718,7 @@ const handleSearchResult = (res: ResultData<File.File>) => {
     }
     dirNum.value = data.value.filter((item) => item.isDir).length;
     fileNum.value = data.value.filter((item) => !item.isDir).length;
+    paginationConfig.total = data.value.length;
     req.path = res.data.path;
 };
 
