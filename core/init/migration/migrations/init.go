@@ -329,24 +329,19 @@ var AddXpackHideMenu = &gormigrate.Migration{
 	},
 }
 
-var AddXpackHideMenuUpage = &gormigrate.Migration{
-	ID: "20250615-add-xpack-hide-menu-upage",
+var UpdateXpackHideMenu = &gormigrate.Migration{
+	ID: "20250617-update-xpack-hide-menu",
 	Migrate: func(tx *gorm.DB) error {
 		var menuJSON string
 		if err := tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Pluck("value", &menuJSON).Error; err != nil {
 			return err
 		}
-		if strings.Contains(menuJSON, `"Upage"`) && strings.Contains(menuJSON, `"/xpack/upage"`) {
-			return nil
-		}
-
 		var menus []dto.ShowMenu
 		if err := json.Unmarshal([]byte(menuJSON), &menus); err != nil {
 			return tx.Model(&model.Setting{}).
 				Where("key = ?", "HideMenu").
 				Update("value", helper.LoadMenus()).Error
 		}
-
 		newItem := dto.ShowMenu{
 			ID:       "119",
 			Disabled: false,
@@ -379,38 +374,12 @@ var AddXpackHideMenuUpage = &gormigrate.Migration{
 
 				if insertIndex != -1 {
 					children := menu.Children
-					newChildren := append(children[:insertIndex+1], append([]dto.ShowMenu{newItem}, children[insertIndex+1:]...)...)
-					menus[i].Children = newChildren
+					menus[i].Children = append(children[:insertIndex+1], append([]dto.ShowMenu{newItem}, children[insertIndex+1:]...)...)
 				} else {
 					menus[i].Children = append([]dto.ShowMenu{newItem}, menus[i].Children...)
 				}
 				break
 			}
-		}
-
-		updatedJSON, err := json.Marshal(menus)
-		if err != nil {
-			return tx.Model(&model.Setting{}).
-				Where("key = ?", "HideMenu").
-				Update("value", helper.LoadMenus()).Error
-		}
-
-		return tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Update("value", string(updatedJSON)).Error
-	},
-}
-
-var UpdateXpackHideMenuTitleAndSort = &gormigrate.Migration{
-	ID: "20250617-update-xpack-hide-menu-title-and-sort",
-	Migrate: func(tx *gorm.DB) error {
-		var menuJSON string
-		if err := tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Pluck("value", &menuJSON).Error; err != nil {
-			return err
-		}
-		var menus []dto.ShowMenu
-		if err := json.Unmarshal([]byte(menuJSON), &menus); err != nil {
-			return tx.Model(&model.Setting{}).
-				Where("key = ?", "HideMenu").
-				Update("value", helper.LoadMenus()).Error
 		}
 
 		for i, menu := range menus {
