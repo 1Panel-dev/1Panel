@@ -91,9 +91,8 @@ func (u *ImageRepoService) Create(req dto.ImageRepoCreate) error {
 		if err := u.handleRegistries(req.DownloadUrl, "", "create"); err != nil {
 			return fmt.Errorf("create registry %s failed, err: %v", req.DownloadUrl, err)
 		}
-		stdout, err := cmd.RunDefaultWithStdoutBashC("systemctl restart docker")
-		if err != nil {
-			return errors.New(string(stdout))
+		if err := restartDocker(); err != nil {
+			return err
 		}
 		ticker := time.NewTicker(3 * time.Second)
 		defer ticker.Stop()

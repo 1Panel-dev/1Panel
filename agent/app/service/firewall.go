@@ -182,6 +182,7 @@ func (u *FirewallService) OperateFirewall(operation string) error {
 	if err != nil {
 		return err
 	}
+	needRestartDocker := false
 	switch operation {
 	case "start":
 		if err := client.Start(); err != nil {
@@ -191,26 +192,30 @@ func (u *FirewallService) OperateFirewall(operation string) error {
 			_ = client.Stop()
 			return err
 		}
-		_, _ = cmd.RunDefaultWithStdoutBashC("systemctl restart docker")
-		return nil
+		needRestartDocker = true
 	case "stop":
 		if err := client.Stop(); err != nil {
 			return err
 		}
-		_, _ = cmd.RunDefaultWithStdoutBashC("systemctl restart docker")
-		return nil
+		needRestartDocker = true
 	case "restart":
 		if err := client.Restart(); err != nil {
 			return err
 		}
-		_, _ = cmd.RunDefaultWithStdoutBashC("systemctl restart docker")
-		return nil
+		needRestartDocker = true
 	case "disablePing":
 		return u.updatePingStatus("0")
 	case "enablePing":
 		return u.updatePingStatus("1")
+	default:
+		return fmt.Errorf("not supported operation: %s", operation)
 	}
-	return fmt.Errorf("not support such operation: %s", operation)
+	if needRestartDocker {
+		if err := restartDocker(); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) error {

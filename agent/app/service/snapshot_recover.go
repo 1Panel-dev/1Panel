@@ -371,7 +371,9 @@ func recoverBaseData(src string, itemHelper *snapRecoverHelper) error {
 		}
 	}
 
-	_, _ = cmd.RunDefaultWithStdoutBashC("systemctl restart docker")
+	if err := restartDocker(); err != nil {
+		return err
+	}
 	return nil
 }
 
