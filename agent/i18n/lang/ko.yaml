@@ -108,6 +108,7 @@ ErrSourcePathNotFound: '소스 디렉토리가 존재하지 않습니다'
 ErrFavoriteExist: '이 경로는 이미 즐겨찾기되었습니다'
 ErrInvalidChar: '불법 문자는 허용되지 않습니다'
 ErrPathNotDelete: '선택한 디렉토리를 삭제할 수 없습니다'
+ErrLogFileToLarge: "로그 파일이 500MB를 초과하여 열 수 없습니다"
 
 #웹사이트
 ErrAliasIsExist: '별칭이 이미 존재합니다'

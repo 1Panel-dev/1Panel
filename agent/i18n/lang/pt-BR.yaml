@@ -108,6 +108,7 @@ ErrSourcePathNotFound: 'O diretório de origem não existe'
 ErrFavoriteExist: 'Este caminho já foi favorito'
 ErrInvalidChar: 'Caracteres ilegais não são permitidos'
 ErrPathNotDelete: 'O diretório selecionado não pode ser excluído'
+ErrLogFileToLarge: "Fail log melebihi 500MB, tidak boleh dibuka"
 
 #site
 ErrAliasIsExist: 'Alias já existe'

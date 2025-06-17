@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
 	"io"
@@ -102,6 +103,16 @@ func ReadFileByLine(filename string, page, pageSize int, latest bool) (lines []s
 		return
 	}
 	defer file.Close()
+
+	fi, err := file.Stat()
+	if err != nil {
+		return
+	}
+
+	if fi.Size() > 500*1024*1024 {
+		err = buserr.New("ErrLogFileToLarge")
+		return
+	}
 
 	totalLines, err := countLines(filename)
 	if err != nil {
