@@ -27,7 +27,10 @@
                     <el-table-column :label="$t('logs.loginAgent')" show-overflow-tooltip prop="agent" />
                     <el-table-column :label="$t('logs.loginStatus')" prop="status">
                         <template #default="{ row }">
-                            <Status :status="row.status" :msg="row.message" />
+                            <Status
+                                :status="row.status"
+                                :msg="row.message === 'ErrAuth' ? $t('commons.login.errorAuthInfo') : row.message"
+                            />
                         </template>
                     </el-table-column>
                     <el-table-column
