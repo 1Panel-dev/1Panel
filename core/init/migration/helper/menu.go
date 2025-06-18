@@ -33,8 +33,8 @@ func LoadMenus() string {
 				{ID: "76", Disabled: false, Title: "menu.ssh", IsShow: true, Label: "SSH", Path: "/hosts/ssh/ssh"},
 			}},
 		{ID: "8", Disabled: false, Title: "menu.terminal", IsShow: true, Label: "Terminal-Menu", Path: "/hosts/terminal"},
-		{ID: "9", Disabled: false, Title: "menu.toolbox", IsShow: true, Label: "Toolbox-Menu", Path: "/toolbox"},
 		{ID: "10", Disabled: false, Title: "menu.cronjob", IsShow: true, Label: "Cronjob-Menu", Path: "/cronjobs"},
+		{ID: "9", Disabled: false, Title: "menu.toolbox", IsShow: true, Label: "Toolbox-Menu", Path: "/toolbox"},
 		{ID: "11", Disabled: false, Title: "xpack.menu", IsShow: true, Label: "Xpack-Menu",
 			Children: []dto.ShowMenu{
 				{ID: "118", Disabled: false, Title: "xpack.app.app", IsShow: true, Label: "XApp", Path: "/xpack/app"},

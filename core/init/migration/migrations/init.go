@@ -416,6 +416,19 @@ var UpdateXpackHideMenu = &gormigrate.Migration{
 			}
 		}
 
+		var idx9, idx10 = -1, -1
+		for i, menu := range menus {
+			if menu.ID == "9" && menu.Path == "/toolbox" {
+				idx9 = i
+			}
+			if menu.ID == "10" && menu.Path == "/cronjobs" {
+				idx10 = i
+			}
+		}
+		if idx9 != -1 && idx10 != -1 && idx10 > idx9 {
+			menus[idx9], menus[idx10] = menus[idx10], menus[idx9]
+		}
+
 		for i, menu := range menus {
 			if menu.ID == "7" {
 				for j, child := range menu.Children {
