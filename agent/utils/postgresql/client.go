@@ -33,7 +33,7 @@ func NewPostgresqlClient(conn client.DBInfo) (PostgresqlClient, error) {
 	}
 	escapedUsername := url.QueryEscape(conn.Username)
 	escapedPassword := url.QueryEscape(conn.Password)
-	connArgs := fmt.Sprintf("postgres://%s:%s@%s:%d/?sslmode=disable", escapedUsername, escapedPassword, conn.Address, conn.Port)
+	connArgs := fmt.Sprintf("postgres://%s:%s@%s:%d/postgres?sslmode=disable", escapedUsername, escapedPassword, conn.Address, conn.Port)
 	db, err := sql.Open("pgx", connArgs)
 	if err != nil {
 		return nil, err
