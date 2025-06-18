@@ -5,9 +5,11 @@
                 <div style="text-align: center; margin-top: 20px">
                     <div style="justify-self: center" class="logo">
                         <img
-                            v-if="globalStore.themeConfig.logo"
+                            v-if="globalStore.themeConfig.logo && !logoLoadFailed"
                             style="width: 80px"
                             :src="`/api/v2/images/logo?t=${Date.now()}`"
+                            @error="logoLoadFailed = true"
+                            alt=""
                         />
                         <PrimaryLogo v-else />
                     </div>
@@ -49,6 +51,7 @@ import { storeToRefs } from 'pinia';
 const globalStore = GlobalStore();
 const { docsUrl } = storeToRefs(globalStore);
 const loading = ref();
+const logoLoadFailed = ref(false);
 
 const toDoc = () => {
     window.open(docsUrl.value, '_blank', 'noopener,noreferrer');
