@@ -149,7 +149,7 @@ const loadNodes = async () => {
         globalStore.currentNode = 'local';
         return;
     }
-    await listNodeOptions()
+    await listNodeOptions('')
         .then((res) => {
             if (!res) {
                 nodes.value = [];

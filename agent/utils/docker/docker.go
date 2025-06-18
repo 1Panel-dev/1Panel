@@ -144,14 +144,14 @@ func (c Client) NetworkExist(name string) bool {
 func CreateDefaultDockerNetwork() error {
 	cli, err := NewClient()
 	if err != nil {
-		global.LOG.Errorf("init docker client error %s", err.Error())
+		global.LOG.Warnf("init docker client error %s", err.Error())
 		return err
 	}
 
 	defer cli.Close()
 	if !cli.NetworkExist("1panel-network") {
 		if err := cli.CreateNetwork("1panel-network"); err != nil {
-			global.LOG.Errorf("create default docker network  error %s", err.Error())
+			global.LOG.Warnf("create default docker network  error %s", err.Error())
 			return err
 		}
 	}

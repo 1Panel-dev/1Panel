@@ -165,7 +165,7 @@ const loadDetail = (log: string) => {
 };
 
 const loadNodes = async () => {
-    await listNodeOptions()
+    await listNodeOptions('')
         .then((res) => {
             if (!res) {
                 nodes.value = [];

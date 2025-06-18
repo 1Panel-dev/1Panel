@@ -747,7 +747,7 @@ const form = reactive<Cronjob.CronjobInfo>({
     dbNameList: [],
 
     retainCopies: 7,
-    retryTimes: 0,
+    retryTimes: 3,
     timeout: 3600,
     timeoutItem: 3600,
     timeoutUint: 's',
