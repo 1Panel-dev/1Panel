@@ -153,7 +153,9 @@ const searchLogs = async () => {
     };
     eventSource.onerror = (event: MessageEvent) => {
         stopListening();
-        MsgError(event.data);
+        if (event.data && event.data != '') {
+            MsgError(event.data);
+        }
     };
 };
 
