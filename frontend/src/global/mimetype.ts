@@ -212,12 +212,20 @@ export const DNSTypes = [
         value: 'NameCom',
     },
     {
+        label: 'Dynu',
+        value: 'Dynu',
+    },
+    {
         label: 'reg.ru',
         value: 'RegRu',
     },
     {
         label: 'FreeMyIP',
         value: 'FreeMyIP',
+    },
+    {
+        label: i18n.global.t('website.baiduCloud'),
+        value: 'BaiduCloud',
     },
     {
         label: i18n.global.t('website.rainyun'),

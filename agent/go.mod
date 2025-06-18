@@ -64,6 +64,7 @@ require (
 	github.com/alex-ant/gomath v0.0.0-20160516115720-89013a210a82 // indirect
 	github.com/aliyun/alibaba-cloud-sdk-go v1.63.100 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
+	github.com/baidubce/bce-sdk-go v0.9.223 // indirect
 	github.com/bodgit/plumbing v1.2.0 // indirect
 	github.com/bodgit/sevenzip v1.3.0 // indirect
 	github.com/bodgit/windows v1.0.0 // indirect

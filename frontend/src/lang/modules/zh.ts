@@ -2428,6 +2428,7 @@ const message = {
             '脚本默认执行目录为 1Panel 安装目录，如果有推送证书，那么执行目录为证书推送目录。默认超时时间 30 分钟',
         customAcme: '自定义 ACME 服务',
         customAcmeURL: 'ACME 服务 URL',
+        baiduCloud: '百度云',
     },
     firewall: {
         create: '创建规则',

@@ -2470,6 +2470,7 @@ const message = {
             '스크립트의 기본 실행 디렉토리는 1Panel 설치 디렉토리입니다. 인증서가 로컬 디렉토리에 푸시되는 경우 실행 디렉토리는 인증서 푸시 디렉토리가 됩니다. 기본 실행 제한 시간은 30분입니다.',
         customAcme: '사용자 정의 ACME 서비스',
         customAcmeURL: 'ACME 서비스 URL',
+        baiduCloud: '바이두 클라우드',
     },
     firewall: {
         create: '규칙 만들기',

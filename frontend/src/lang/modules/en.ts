@@ -2616,6 +2616,7 @@ const message = {
             'The default execution directory of the script is the 1Panel installation directory. If a certificate is pushed into local directory, the execution directory will be the certificate push directory. The default execution timeout is 30 minutes.',
         customAcme: 'Custom ACME Service',
         customAcmeURL: 'ACME Service URL',
+        baiduCloud: 'Baidu Cloud',
     },
     firewall: {
         create: 'Create rule',

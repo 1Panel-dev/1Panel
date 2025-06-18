@@ -4,10 +4,12 @@ import (
 	"encoding/json"
 	"github.com/go-acme/lego/v4/challenge"
 	"github.com/go-acme/lego/v4/providers/dns/alidns"
+	"github.com/go-acme/lego/v4/providers/dns/baiducloud"
 	"github.com/go-acme/lego/v4/providers/dns/clouddns"
 	"github.com/go-acme/lego/v4/providers/dns/cloudflare"
 	"github.com/go-acme/lego/v4/providers/dns/cloudns"
 	"github.com/go-acme/lego/v4/providers/dns/dnspod"
+	"github.com/go-acme/lego/v4/providers/dns/dynu"
 	"github.com/go-acme/lego/v4/providers/dns/freemyip"
 	"github.com/go-acme/lego/v4/providers/dns/godaddy"
 	"github.com/go-acme/lego/v4/providers/dns/huaweicloud"
@@ -45,6 +47,8 @@ const (
 	WestCN       DnsType = "WestCN"
 	ClouDNS      DnsType = "ClouDNS"
 	RegRu        DnsType = "RegRu"
+	Dynu         DnsType = "Dynu"
+	BaiduCloud   DnsType = "BaiduCloud"
 )
 
 type DNSParam struct {
@@ -85,146 +89,163 @@ func getDNSProviderConfig(dnsType DnsType, params string) (challenge.Provider, e
 	}
 	switch dnsType {
 	case DnsPod:
-		dnsPodConfig := dnspod.NewDefaultConfig()
-		dnsPodConfig.LoginToken = param.ID + "," + param.Token
-		dnsPodConfig.PropagationTimeout = propagationTimeout
-		dnsPodConfig.PollingInterval = pollingInterval
-		dnsPodConfig.TTL = ttl
-		p, err = dnspod.NewDNSProviderConfig(dnsPodConfig)
+		config := dnspod.NewDefaultConfig()
+		config.LoginToken = param.ID + "," + param.Token
+		config.PropagationTimeout = propagationTimeout
+		config.PollingInterval = pollingInterval
+		config.TTL = ttl
+		p, err = dnspod.NewDNSProviderConfig(config)
 	case AliYun:
-		alidnsConfig := alidns.NewDefaultConfig()
-		alidnsConfig.SecretKey = param.SecretKey
-		alidnsConfig.APIKey = param.AccessKey
-		alidnsConfig.PropagationTimeout = propagationTimeout
-		alidnsConfig.PollingInterval = pollingInterval
-		alidnsConfig.TTL = ttl
-		p, err = alidns.NewDNSProviderConfig(alidnsConfig)
+		config := alidns.NewDefaultConfig()
+		config.SecretKey = param.SecretKey
+		config.APIKey = param.AccessKey
+		config.PropagationTimeout = propagationTimeout
+		config.PollingInterval = pollingInterval
+		config.TTL = ttl
+		p, err = alidns.NewDNSProviderConfig(config)
 	case CloudFlare:
-		cloudflareConfig := cloudflare.NewDefaultConfig()
-		cloudflareConfig.AuthEmail = param.Email
-		cloudflareConfig.AuthToken = param.APIkey
-		cloudflareConfig.PropagationTimeout = propagationTimeout
-		cloudflareConfig.PollingInterval = pollingInterval
-		cloudflareConfig.TTL = ttl
-		p, err = cloudflare.NewDNSProviderConfig(cloudflareConfig)
+		config := cloudflare.NewDefaultConfig()
+		config.AuthEmail = param.Email
+		config.AuthToken = param.APIkey
+		config.PropagationTimeout = propagationTimeout
+		config.PollingInterval = pollingInterval
+		config.TTL = ttl
+		p, err = cloudflare.NewDNSProviderConfig(config)
 	case CloudDns:
-		clouddnsConfig := clouddns.NewDefaultConfig()
-		clouddnsConfig.ClientID = param.ClientID
-		clouddnsConfig.Email = param.Email
-		clouddnsConfig.Password = param.Password
-		clouddnsConfig.PropagationTimeout = propagationTimeout
-		clouddnsConfig.PollingInterval = pollingInterval
-		clouddnsConfig.TTL = ttl
-		p, err = clouddns.NewDNSProviderConfig(clouddnsConfig)
+		config := clouddns.NewDefaultConfig()
+		config.ClientID = param.ClientID
+		config.Email = param.Email
+		config.Password = param.Password
+		config.PropagationTimeout = propagationTimeout
+		config.PollingInterval = pollingInterval
+		config.TTL = ttl
+		p, err = clouddns.NewDNSProviderConfig(config)
 	case NameCheap:
-		namecheapConfig := namecheap.NewDefaultConfig()
-		namecheapConfig.APIKey = param.APIkey
-		namecheapConfig.APIUser = param.APIUser
-		namecheapConfig.PropagationTimeout = propagationTimeout
-		namecheapConfig.PollingInterval = pollingInterval
-		namecheapConfig.TTL = ttl
-		p, err = namecheap.NewDNSProviderConfig(namecheapConfig)
+		config := namecheap.NewDefaultConfig()
+		config.APIKey = param.APIkey
+		config.APIUser = param.APIUser
+		config.PropagationTimeout = propagationTimeout
+		config.PollingInterval = pollingInterval
+		config.TTL = ttl
+		p, err = namecheap.NewDNSProviderConfig(config)
 	case NameSilo:
-		nameSiloConfig := namesilo.NewDefaultConfig()
-		nameSiloConfig.APIKey = param.APIkey
-		nameSiloConfig.PropagationTimeout = propagationTimeout
-		nameSiloConfig.PollingInterval = pollingInterval
-		nameSiloConfig.TTL = ttl
-		p, err = namesilo.NewDNSProviderConfig(nameSiloConfig)
+		config := namesilo.NewDefaultConfig()
+		config.APIKey = param.APIkey
+		config.PropagationTimeout = propagationTimeout
+		config.PollingInterval = pollingInterval
+		config.TTL = ttl
+		p, err = namesilo.NewDNSProviderConfig(config)
 	case Godaddy:
-		godaddyConfig := godaddy.NewDefaultConfig()
-		godaddyConfig.APIKey = param.APIkey
-		godaddyConfig.APISecret = param.APISecret
-		godaddyConfig.PropagationTimeout = propagationTimeout
-		godaddyConfig.PollingInterval = pollingInterval
-		godaddyConfig.TTL = ttl
-		p, err = godaddy.NewDNSProviderConfig(godaddyConfig)
+		config := godaddy.NewDefaultConfig()
+		config.APIKey = param.APIkey
+		config.APISecret = param.APISecret
+		config.PropagationTimeout = propagationTimeout
+		config.PollingInterval = pollingInterval
+		config.TTL = ttl
+		p, err = godaddy.NewDNSProviderConfig(config)
 	case NameCom:
-		nameComConfig := namedotcom.NewDefaultConfig()
-		nameComConfig.APIToken = param.Token
-		nameComConfig.Username = param.APIUser
-		nameComConfig.PropagationTimeout = propagationTimeout
-		nameComConfig.PollingInterval = pollingInterval
-		nameComConfig.TTL = ttl
-		p, err = namedotcom.NewDNSProviderConfig(nameComConfig)
+		config := namedotcom.NewDefaultConfig()
+		config.APIToken = param.Token
+		config.Username = param.APIUser
+		config.PropagationTimeout = propagationTimeout
+		config.PollingInterval = pollingInterval
+		config.TTL = ttl
+		p, err = namedotcom.NewDNSProviderConfig(config)
 	case TencentCloud:
-		tencentCloudConfig := tencentcloud.NewDefaultConfig()
-		tencentCloudConfig.SecretID = param.SecretID
-		tencentCloudConfig.SecretKey = param.SecretKey
-		tencentCloudConfig.PropagationTimeout = propagationTimeout
-		tencentCloudConfig.PollingInterval = pollingInterval
-		tencentCloudConfig.TTL = ttl
-		p, err = tencentcloud.NewDNSProviderConfig(tencentCloudConfig)
+		config := tencentcloud.NewDefaultConfig()
+		config.SecretID = param.SecretID
+		config.SecretKey = param.SecretKey
+		config.PropagationTimeout = propagationTimeout
+		config.PollingInterval = pollingInterval
+		config.TTL = ttl
+		p, err = tencentcloud.NewDNSProviderConfig(config)
 	case RainYun:
-		rainyunConfig := rainyun.NewDefaultConfig()
-		rainyunConfig.APIKey = param.APIkey
-		rainyunConfig.PropagationTimeout = propagationTimeout
-		rainyunConfig.PollingInterval = pollingInterval
-		rainyunConfig.TTL = ttl
-		p, err = rainyun.NewDNSProviderConfig(rainyunConfig)
+		config := rainyun.NewDefaultConfig()
+		config.APIKey = param.APIkey
+		config.PropagationTimeout = propagationTimeout
+		config.PollingInterval = pollingInterval
+		config.TTL = ttl
+		p, err = rainyun.NewDNSProviderConfig(config)
 	case Volcengine:
-		volcConfig := volcengine.NewDefaultConfig()
-		volcConfig.SecretKey = param.SecretKey
-		volcConfig.AccessKey = param.AccessKey
-		volcConfig.PropagationTimeout = propagationTimeout
-		volcConfig.PollingInterval = pollingInterval
-		volcConfig.TTL = ttl
-		p, err = volcengine.NewDNSProviderConfig(volcConfig)
+		config := volcengine.NewDefaultConfig()
+		config.SecretKey = param.SecretKey
+		config.AccessKey = param.AccessKey
+		config.PropagationTimeout = propagationTimeout
+		config.PollingInterval = pollingInterval
+		config.TTL = ttl
+		p, err = volcengine.NewDNSProviderConfig(config)
 	case HuaweiCloud:
-		huaweiCloudConfig := huaweicloud.NewDefaultConfig()
-		huaweiCloudConfig.AccessKeyID = param.AccessKey
-		huaweiCloudConfig.SecretAccessKey = param.SecretKey
-		huaweiCloudConfig.Region = param.Region
-		huaweiCloudConfig.PropagationTimeout = propagationTimeout
-		huaweiCloudConfig.PollingInterval = pollingInterval
-		huaweiCloudConfig.TTL = int32(ttl)
-		p, err = huaweicloud.NewDNSProviderConfig(huaweiCloudConfig)
+		config := huaweicloud.NewDefaultConfig()
+		config.AccessKeyID = param.AccessKey
+		config.SecretAccessKey = param.SecretKey
+		config.Region = param.Region
+		if config.Region == "" {
+			config.Region = "cn-north-1"
+		}
+		config.PropagationTimeout = propagationTimeout
+		config.PollingInterval = pollingInterval
+		config.TTL = int32(ttl)
+		p, err = huaweicloud.NewDNSProviderConfig(config)
 	case FreeMyIP:
-		freeMyIpConfig := freemyip.NewDefaultConfig()
-		freeMyIpConfig.Token = param.Token
-		freeMyIpConfig.PropagationTimeout = propagationTimeout
-		freeMyIpConfig.PollingInterval = pollingInterval
-		p, err = freemyip.NewDNSProviderConfig(freeMyIpConfig)
+		config := freemyip.NewDefaultConfig()
+		config.Token = param.Token
+		config.PropagationTimeout = propagationTimeout
+		config.PollingInterval = pollingInterval
+		p, err = freemyip.NewDNSProviderConfig(config)
 	case Vercel:
-		vercelConfig := vercel.NewDefaultConfig()
-		vercelConfig.AuthToken = param.Token
-		vercelConfig.PropagationTimeout = propagationTimeout
-		vercelConfig.PollingInterval = pollingInterval
-		p, err = vercel.NewDNSProviderConfig(vercelConfig)
+		config := vercel.NewDefaultConfig()
+		config.AuthToken = param.Token
+		config.PropagationTimeout = propagationTimeout
+		config.PollingInterval = pollingInterval
+		p, err = vercel.NewDNSProviderConfig(config)
 	case Spaceship:
-		spaceshipConfig := spaceship.NewDefaultConfig()
-		spaceshipConfig.APIKey = param.APIkey
-		spaceshipConfig.APISecret = param.APISecret
-		spaceshipConfig.PropagationTimeout = propagationTimeout
-		spaceshipConfig.PollingInterval = pollingInterval
-		spaceshipConfig.TTL = ttl
-		p, err = spaceship.NewDNSProviderConfig(spaceshipConfig)
+		config := spaceship.NewDefaultConfig()
+		config.APIKey = param.APIkey
+		config.APISecret = param.APISecret
+		config.PropagationTimeout = propagationTimeout
+		config.PollingInterval = pollingInterval
+		config.TTL = ttl
+		p, err = spaceship.NewDNSProviderConfig(config)
 	case WestCN:
-		westcnConfig := westcn.NewDefaultConfig()
-		westcnConfig.Username = param.Username
-		westcnConfig.Password = param.Password
-		westcnConfig.PropagationTimeout = propagationTimeout
-		westcnConfig.PollingInterval = pollingInterval
-		westcnConfig.TTL = ttl
-		p, err = westcn.NewDNSProviderConfig(westcnConfig)
-
+		config := westcn.NewDefaultConfig()
+		config.Username = param.Username
+		config.Password = param.Password
+		config.PropagationTimeout = propagationTimeout
+		config.PollingInterval = pollingInterval
+		config.TTL = ttl
+		p, err = westcn.NewDNSProviderConfig(config)
 	case ClouDNS:
-		cloudnsConfig := cloudns.NewDefaultConfig()
-		cloudnsConfig.AuthID = param.AuthID
-		cloudnsConfig.SubAuthID = param.SubAuthID
-		cloudnsConfig.AuthPassword = param.AuthPassword
-		cloudnsConfig.PropagationTimeout = propagationTimeout
-		cloudnsConfig.PollingInterval = pollingInterval
-		cloudnsConfig.TTL = ttl
-		p, err = cloudns.NewDNSProviderConfig(cloudnsConfig)
+		config := cloudns.NewDefaultConfig()
+		config.AuthID = param.AuthID
+		config.SubAuthID = param.SubAuthID
+		config.AuthPassword = param.AuthPassword
+		config.PropagationTimeout = propagationTimeout
+		config.PollingInterval = pollingInterval
+		config.TTL = ttl
+		p, err = cloudns.NewDNSProviderConfig(config)
 	case RegRu:
-		regRuConfig := regru.NewDefaultConfig()
-		regRuConfig.Username = param.Username
-		regRuConfig.Password = param.Password
-		regRuConfig.PropagationTimeout = propagationTimeout
-		regRuConfig.PollingInterval = pollingInterval
-		regRuConfig.TTL = ttl
-		p, err = regru.NewDNSProviderConfig(regRuConfig)
+		config := regru.NewDefaultConfig()
+		config.Username = param.Username
+		config.Password = param.Password
+		config.PropagationTimeout = propagationTimeout
+		config.PollingInterval = pollingInterval
+		config.TTL = ttl
+		p, err = regru.NewDNSProviderConfig(config)
+	case Dynu:
+		config := dynu.NewDefaultConfig()
+		config.APIKey = param.APIkey
+		config.PropagationTimeout = propagationTimeout
+		config.PollingInterval = pollingInterval
+		config.TTL = ttl
+		p, err = dynu.NewDNSProviderConfig(config)
+	case BaiduCloud:
+		config := baiducloud.NewDefaultConfig()
+		config.AccessKeyID = param.AccessKey
+		config.SecretAccessKey = param.SecretKey
+		config.PropagationTimeout = propagationTimeout
+		config.PollingInterval = pollingInterval
+		config.TTL = ttl
+		p, err = baiducloud.NewDNSProviderConfig(config)
 	}
 
 	if err != nil {
