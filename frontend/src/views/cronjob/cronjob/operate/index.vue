@@ -343,7 +343,7 @@
                             <el-row :gutter="20">
                                 <el-col :span="24" v-if="hasScript()">
                                     <el-form-item>
-                                        <el-checkbox v-model="form.inContainer">
+                                        <el-checkbox @change="loadUserOptions(false)" v-model="form.inContainer">
                                             {{ $t('cronjob.containerCheckBox') }}
                                         </el-checkbox>
                                     </el-form-item>
@@ -351,7 +351,10 @@
                                     <el-row :gutter="20" v-if="form.inContainer">
                                         <LayoutCol>
                                             <el-form-item :label="$t('cronjob.containerName')" prop="containerName">
-                                                <el-select v-model="form.containerName">
+                                                <el-select
+                                                    @change="loadUserOptions(false)"
+                                                    v-model="form.containerName"
+                                                >
                                                     <el-option
                                                         v-for="item in containerOptions"
                                                         :key="item"
@@ -363,7 +366,7 @@
                                         </LayoutCol>
                                         <LayoutCol>
                                             <el-form-item
-                                                :label="$t('container.command') + 123"
+                                                :label="$t('container.command')"
                                                 prop="command"
                                                 :rules="Rules.requiredInput"
                                             >
@@ -390,7 +393,7 @@
                                             </el-form-item>
                                         </LayoutCol>
                                     </el-row>
-                                    <el-row :gutter="20" v-if="!form.inContainer">
+                                    <el-row :gutter="20">
                                         <LayoutCol>
                                             <el-form-item :label="$t('commons.table.user')" prop="user">
                                                 <el-select filterable v-model="form.user">
@@ -400,7 +403,7 @@
                                                 </el-select>
                                             </el-form-item>
                                         </LayoutCol>
-                                        <LayoutCol>
+                                        <LayoutCol v-if="!form.inContainer">
                                             <el-form-item :label="$t('cronjob.executor')" prop="executor">
                                                 <el-checkbox border v-model="form.isCustom">
                                                     {{ $t('container.custom') }}
@@ -693,6 +696,7 @@ import {
     weekOptions,
 } from '../helper';
 import { loadUsers } from '@/api/modules/toolbox';
+import { loadContainerUsers } from '@/api/modules/container';
 import { storeToRefs } from 'pinia';
 import { GlobalStore } from '@/store';
 import LicenseImport from '@/components/license-import/index.vue';
@@ -784,13 +788,13 @@ const search = async () => {
                 form.scriptMode = res.data.scriptMode;
 
                 form.containerName = res.data.containerName;
+                form.user = res.data.user;
                 if (form.containerName.length !== 0) {
                     form.inContainer = true;
                     form.command = res.data.command || 'sh';
                     form.isCustom = form.command !== 'sh' && form.command !== 'bash' && form.command !== 'ash';
                 } else {
                     form.executor = res.data.executor || 'bash';
-                    form.user = res.data.user;
                     form.isCustom =
                         form.executor !== 'sh' &&
                         form.executor !== 'bash' &&
@@ -846,7 +850,7 @@ const search = async () => {
     }
     loadBackups();
     loadAppInstalls();
-    loadShellUsers();
+    loadUserOptions(true);
     loadWebsites();
     loadContainers();
     loadScripts();
@@ -1205,9 +1209,19 @@ const changeAccount = async () => {
     }
 };
 
-const loadShellUsers = async () => {
-    const res = await loadUsers();
-    userOptions.value = res.data || [];
+const loadUserOptions = async (isInit: boolean) => {
+    if (!form.inContainer) {
+        const res = await loadUsers();
+        userOptions.value = res.data || [];
+    } else {
+        if (!isInit) {
+            form.user = '';
+        }
+        if (form.containerName) {
+            const res = await loadContainerUsers(form.containerName);
+            userOptions.value = res.data || [];
+        }
+    }
 };
 
 const loadAppInstalls = async () => {

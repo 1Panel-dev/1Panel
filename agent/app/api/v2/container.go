@@ -36,6 +36,29 @@ func (b *BaseApi) SearchContainer(c *gin.Context) {
 }
 
 // @Tags Container
+// @Summary Load container users
+// @Accept json
+// @Param request body dto.OperationWithName true "request"
+// @Produce json
+// @Success 200 {array} string
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /containers/users [post]
+func (b *BaseApi) LoadContainerUsers(c *gin.Context) {
+	var req dto.OperationWithName
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	list, err := containerService.LoadUsers(req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, list)
+}
+
+// @Tags Container
 // @Summary List containers
 // @Accept json
 // @Produce json

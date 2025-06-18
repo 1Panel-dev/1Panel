@@ -118,11 +118,21 @@ func (u *CronjobService) handleShell(cronjob model.Cronjob, taskItem *task.Task)
 	cmdMgr := cmd.NewCommandMgr(cmd.WithTask(*taskItem))
 	taskItem.AddSubTaskWithOps(i18n.GetWithName("HandleShell", cronjob.Name), func(t *task.Task) error {
 		if len(cronjob.ContainerName) != 0 {
+			scriptItem := cronjob.Script
+			if cronjob.ScriptMode == "select" {
+				scriptItem = path.Join("/tmp", path.Base(cronjob.Script))
+				if err := cmdMgr.Run("docker", "cp", cronjob.Script, cronjob.ContainerName+":"+scriptItem); err != nil {
+					return err
+				}
+			}
 			command := "sh"
 			if len(cronjob.Command) != 0 {
 				command = cronjob.Command
 			}
-			return cmdMgr.Run("docker", "exec", cronjob.ContainerName, command, "-c", strings.ReplaceAll(cronjob.Script, "\"", "\\\""))
+			if len(cronjob.User) != 0 {
+				return cmdMgr.Run("docker", "exec", "-u", cronjob.User, cronjob.ContainerName, command, "-c", strings.ReplaceAll(scriptItem, "\"", "\\\""))
+			}
+			return cmdMgr.Run("docker", "exec", cronjob.ContainerName, command, "-c", strings.ReplaceAll(scriptItem, "\"", "\\\""))
 		}
 		if len(cronjob.Executor) == 0 {
 			cronjob.Executor = "bash"

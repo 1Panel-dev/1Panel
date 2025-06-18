@@ -33,6 +33,8 @@ func (s *ContainerRouter) InitRouter(Router *gin.RouterGroup) {
 		baRouter.POST("/operate", baseApi.ContainerOperation)
 		baRouter.POST("/prune", baseApi.ContainerPrune)
 
+		baRouter.POST("/users", baseApi.LoadContainerUsers)
+
 		baRouter.GET("/repo", baseApi.ListRepo)
 		baRouter.POST("/repo/status", baseApi.CheckRepoStatus)
 		baRouter.POST("/repo/search", baseApi.SearchRepo)

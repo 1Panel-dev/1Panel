@@ -83,6 +83,8 @@ type IContainerService interface {
 	ComposeUpdate(req dto.ComposeUpdate) error
 	Prune(req dto.ContainerPrune) (dto.ContainerPruneReport, error)
 
+	LoadUsers(req dto.OperationWithName) ([]string, error)
+
 	StreamLogs(ctx *gin.Context, params dto.StreamLog)
 }
 
@@ -1081,6 +1083,21 @@ func (u *ContainerService) ContainerStats(id string) (*dto.ContainerStats, error
 	data.NetworkRX, data.NetworkTX = calculateNetwork(stats.Networks)
 	data.ShotTime = stats.Read
 	return &data, nil
+}
+
+func (u *ContainerService) LoadUsers(req dto.OperationWithName) ([]string, error) {
+	std, err := cmd.RunDefaultWithStdoutBashCf("docker exec %s cat /etc/passwd", req.Name)
+	if err != nil {
+		return nil, err
+	}
+	var users []string
+	lines := strings.Split(string(std), "\n")
+	for _, line := range lines {
+		if strings.Contains(line, ":") {
+			users = append(users, strings.Split(line, ":")[0])
+		}
+	}
+	return users, nil
 }
 
 func stringsToMap(list []string) map[string]string {

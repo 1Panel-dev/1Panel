@@ -9,6 +9,9 @@ export const searchContainer = (params: Container.ContainerSearch) => {
 export const listContainer = () => {
     return http.post<Array<string>>(`/containers/list`, {});
 };
+export const loadContainerUsers = (name: string) => {
+    return http.post<Array<string>>(`/containers/users`, { name: name });
+};
 export const loadContainerStatus = () => {
     return http.get<Container.ContainerStatus>(`/containers/status`);
 };
