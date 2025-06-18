@@ -219,3 +219,12 @@ type AppstoreConfig struct {
 	UpgradeBackup         string `json:"upgradeBackup"`
 	UninstallDeleteBackup string `json:"uninstallDeleteBackup"`
 }
+
+type LoginSetting struct {
+	IsDemo    bool   `json:"isDemo"`
+	IsIntl    bool   `json:"isIntl"`
+	Language  string `json:"language"`
+	MenuTabs  string `json:"menuTabs"`
+	PanelName string `json:"panelName"`
+	Theme     string `json:"theme"`
+}

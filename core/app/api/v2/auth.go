@@ -6,6 +6,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/model"
 	"github.com/1Panel-dev/1Panel/core/constant"
+	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/captcha"
 	"github.com/gin-gonic/gin"
 )
@@ -133,7 +134,15 @@ func (b *BaseApi) GetLoginSetting(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithData(c, settingInfo)
+	res := &dto.LoginSetting{
+		IsDemo:    global.CONF.Base.IsDemo,
+		IsIntl:    global.CONF.Base.IsIntl,
+		Language:  settingInfo.Language,
+		MenuTabs:  settingInfo.MenuTabs,
+		PanelName: settingInfo.PanelName,
+		Theme:     settingInfo.Theme,
+	}
+	helper.SuccessWithData(c, res)
 }
 
 func saveLoginLogs(c *gin.Context, err error) {

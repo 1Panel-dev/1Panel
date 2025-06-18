@@ -17,6 +17,12 @@ var whiteUrlList = map[string]struct{}{
 	"/api/v2/files/size":                    {},
 	"/api/v2/runtimes/sync":                 {},
 	"/api/v2/toolbox/device/base":           {},
+	"/api/v2/files/user/group":              {},
+	"/api/v2/files/mount":                   {},
+	"/api/v2/hosts/ssh/log":                 {},
+	"/api/v2/toolbox/clam/base":             {},
+	"/api/v2/hosts/too":                     {},
+	"/api/v2/backups/record/size":           {},
 
 	"/api/v2/core/auth/login":     {},
 	"/api/v2/core/logs/login":     {},
@@ -43,11 +49,14 @@ var whiteUrlList = map[string]struct{}{
 	"/api/v2/xpack/monitor/websites":     {},
 	"/api/v2/xpack/monitor/trend":        {},
 	"/api/v2/xpack/monitor/rank":         {},
+	"/api/v2/xpack/waf/cdn":              {},
+
+	"/api/v2/core/nodes/list": {},
 }
 
 func DemoHandle() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if strings.Contains(c.Request.URL.Path, "search") || c.Request.Method == http.MethodGet {
+		if strings.Contains(c.Request.URL.Path, "search") || (c.Request.Method == http.MethodGet && c.Request.URL.Path != "/api/v2/containers/exec") {
 			c.Next()
 			return
 		}
