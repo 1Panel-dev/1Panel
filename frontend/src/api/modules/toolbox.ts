@@ -25,7 +25,7 @@ export const updateDevicePasswd = (user: string, passwd: string) => {
     return http.post(`/toolbox/device/update/passwd`, { user: user, passwd: Base64.encode(passwd) }, TimeoutEnum.T_60S);
 };
 export const updateDeviceSwap = (params: Toolbox.SwapHelper) => {
-    return http.post(`/toolbox/device/update/swap`, params, TimeoutEnum.T_60S);
+    return http.post(`/toolbox/device/update/swap`, params, TimeoutEnum.T_10M);
 };
 export const updateDeviceByConf = (name: string, file: string) => {
     return http.post(`/toolbox/device/update/byconf`, { name: name, file: file }, TimeoutEnum.T_5M);
