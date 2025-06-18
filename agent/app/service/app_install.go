@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/docker/docker/api/types/container"
 	"math"
 	"net/http"
 	"os"
@@ -16,7 +17,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
-	"github.com/docker/docker/api/types"
 	"gopkg.in/yaml.v3"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/env"
@@ -791,15 +791,15 @@ func syncAppInstallStatus(appInstall *model.AppInstall, force bool) error {
 	defer cli.Close()
 
 	var (
-		containers     []types.Container
-		containersMap  map[string]types.Container
+		containers     []container.Summary
+		containersMap  map[string]container.Summary
 		containerNames = strings.Split(appInstall.ContainerName, ",")
 	)
 	containers, err = cli.ListContainersByName(containerNames)
 	if err != nil {
 		return err
 	}
-	containersMap = make(map[string]types.Container)
+	containersMap = make(map[string]container.Summary)
 	for _, con := range containers {
 		containersMap[con.Names[0]] = con
 	}

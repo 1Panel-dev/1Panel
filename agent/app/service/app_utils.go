@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/compose-spec/compose-go/v2/types"
 	"log"
 	"math"
 	"net/http"
@@ -24,8 +25,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 
 	"github.com/1Panel-dev/1Panel/agent/app/task"
-
-	"github.com/docker/docker/api/types"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
 	"github.com/docker/docker/api/types/container"
@@ -786,6 +785,15 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 	return appInstallRepo.Save(context.Background(), &install)
 }
 
+func skipCheckStatus(service types.ServiceConfig) bool {
+	for key := range service.Labels {
+		if key == "skipStatusCheck" {
+			return true
+		}
+	}
+	return false
+}
+
 func getContainerNames(install model.AppInstall) ([]string, error) {
 	envStr, err := coverEnvJsonToStr(install.Env)
 	if err != nil {
@@ -797,7 +805,7 @@ func getContainerNames(install model.AppInstall) ([]string, error) {
 	}
 	containerMap := make(map[string]struct{})
 	for _, service := range project.AllServices() {
-		if service.ContainerName == "${CONTAINER_NAME}" || service.ContainerName == "" {
+		if service.ContainerName == "${CONTAINER_NAME}" || service.ContainerName == "" || skipCheckStatus(service) {
 			continue
 		}
 		containerMap[service.ContainerName] = struct{}{}
@@ -1363,7 +1371,7 @@ func doNotNeedSync(installed model.AppInstall) bool {
 		installed.Status == constant.StatusSyncing || installed.Status == constant.StatusUninstalling || installed.Status == constant.StatusInstallErr
 }
 
-func synAppInstall(containers map[string]types.Container, appInstall *model.AppInstall, force bool) {
+func synAppInstall(containers map[string]container.Summary, appInstall *model.AppInstall, force bool) {
 	oldStatus := appInstall.Status
 	containerNames := strings.Split(appInstall.ContainerName, ",")
 	if len(containers) == 0 {
@@ -1437,7 +1445,7 @@ func synAppInstall(containers map[string]types.Container, appInstall *model.AppI
 func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool) ([]response.AppInstallDTO, error) {
 	var (
 		res           []response.AppInstallDTO
-		containersMap map[string]types.Container
+		containersMap map[string]container.Summary
 	)
 	if sync {
 		cli, err := docker.NewClient()
@@ -1445,7 +1453,7 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool)
 			defer cli.Close()
 			containers, err := cli.ListAllContainers()
 			if err == nil {
-				containersMap = make(map[string]types.Container, len(containers))
+				containersMap = make(map[string]container.Summary, len(containers))
 				for _, contain := range containers {
 					containersMap[contain.Names[0]] = contain
 				}
