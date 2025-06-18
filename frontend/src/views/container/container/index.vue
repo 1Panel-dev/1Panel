@@ -112,7 +112,7 @@
                     <el-table-column :label="$t('commons.table.status')" min-width="100" prop="state" sortable>
                         <template #default="{ row }">
                             <el-dropdown placement="bottom">
-                                <Status :key="row.state" :status="row.state"></Status>
+                                <Status :key="row.state" :status="row.state" :operate="true"></Status>
                                 <template #dropdown>
                                     <el-dropdown-menu>
                                         <el-dropdown-item
