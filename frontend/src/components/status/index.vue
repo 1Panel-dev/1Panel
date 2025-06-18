@@ -1,5 +1,5 @@
 <template>
-    <el-tooltip v-if="msg" effect="dark" placement="bottom">
+    <el-tooltip v-if="msg && msg != ''" effect="dark" placement="bottom">
         <template #content>
             <div class="content">{{ msg }}</div>
         </template>
@@ -12,19 +12,30 @@
             </span>
         </el-tag>
     </el-tooltip>
-
-    <el-tag size="small" v-else :type="getType(statusItem)" round effect="light">
-        <span class="flx-align-center">
+    <span v-else>
+        <el-tag size="small" :type="getType(statusItem)" round effect="light" v-if="!operate">
+            <span class="flx-align-center">
+                {{ $t('commons.status.' + statusItem) }}
+                <el-icon v-if="loadingIcon(statusItem)" class="is-loading">
+                    <Loading />
+                </el-icon>
+            </span>
+        </el-tag>
+        <el-button size="small" v-else :type="getType(statusItem)" plain round>
             {{ $t('commons.status.' + statusItem) }}
             <el-icon v-if="loadingIcon(statusItem)" class="is-loading">
                 <Loading />
             </el-icon>
-            <el-icon size="15" v-if="operate">
-                <CaretRight v-if="statusItem == 'running'" />
-                <CaretBottom v-if="statusItem == 'stopped'" />
+            <el-icon size="15" v-else>
+                <svg-icon
+                    iconName="p-stop"
+                    class="status-icon"
+                    v-if="statusItem == 'stopped' || statusItem == 'exited'"
+                ></svg-icon>
+                <svg-icon iconName="p-start" class="svg-icon" v-if="statusItem == 'running'"></svg-icon>
             </el-icon>
-        </span>
-    </el-tag>
+        </el-button>
+    </span>
 </template>
 
 <script lang="ts" setup>
@@ -33,6 +44,7 @@ import { computed } from 'vue';
 const props = defineProps({
     status: String,
     msg: String,
+    hasIcon: Boolean,
     operate: {
         type: Boolean,
         default: false,
@@ -64,9 +76,9 @@ const getType = (status: string) => {
         case 'unhealthy':
         case 'failed':
         case 'lost':
+        case 'exited':
             return 'danger';
         case 'paused':
-        case 'exited':
         case 'dead':
         case 'removing':
         case 'deleted':
@@ -104,5 +116,10 @@ const loadingIcon = (status: string): boolean => {
 .content {
     width: 300px;
     word-break: break-all;
+}
+
+.status-icon {
+    width: 1em;
+    height: 1em;
 }
 </style>
