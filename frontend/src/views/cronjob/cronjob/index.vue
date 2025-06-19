@@ -51,8 +51,14 @@
                                 v-if="row.status === 'Enable'"
                                 @click="onChangeStatus(row.id, 'disable')"
                                 :status="row.status"
+                                :operate="true"
                             />
-                            <Status v-else @click="onChangeStatus(row.id, 'enable')" :status="row.status" />
+                            <Status
+                                v-else
+                                @click="onChangeStatus(row.id, 'enable')"
+                                :status="row.status"
+                                :operate="true"
+                            />
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('cronjob.cronSpec')" show-overflow-tooltip :min-width="120">

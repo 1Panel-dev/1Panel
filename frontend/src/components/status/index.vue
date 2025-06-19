@@ -26,10 +26,8 @@
             <el-icon v-if="loadingIcon(statusItem)" class="is-loading">
                 <Loading />
             </el-icon>
-            <el-icon size="15" v-else class="status-icon">
-                <svg-icon iconName="p-stop" v-if="statusItem == 'stopped' || statusItem == 'exited'"></svg-icon>
-                <svg-icon iconName="p-start" class="svg-icon" v-if="statusItem == 'running'"></svg-icon>
-            </el-icon>
+            <svg-icon iconName="p-stop" className="status-icon" v-if="stopIcon(statusItem)"></svg-icon>
+            <svg-icon iconName="p-start" className="status-icon" v-if="runningIcon(statusItem)"></svg-icon>
         </el-button>
     </span>
 </template>
@@ -103,8 +101,17 @@ const loadingStatus = [
     'executing',
 ];
 
+const stopStatus = ['stopped', 'exited', 'disable'];
+const runningStatus = ['running', 'enable'];
+
 const loadingIcon = (status: string): boolean => {
     return loadingStatus.indexOf(status) > -1;
+};
+const stopIcon = (status: string): boolean => {
+    return stopStatus.indexOf(status.toLocaleLowerCase()) > -1;
+};
+const runningIcon = (status: string): boolean => {
+    return runningStatus.indexOf(status.toLocaleLowerCase()) > -1;
 };
 </script>
 
