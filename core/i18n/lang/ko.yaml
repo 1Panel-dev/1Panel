@@ -93,7 +93,10 @@ SubTask: "서브 작업"
 
 #script
 ScriptLibrary: "스크립트 라이브러리"
-ScriptVersion: "로컬: {{ .localVersion }}, 원격: {{ .remoteVersion }}"
+ScriptSyncSkip: "현재 스크립트 라이브러리가 이미 최신 버전입니다!"
+DownloadData: "스크립트 라이브러리 파일 data.yaml 다운로드 중"
+DownloadPackage: "스크립트 라이브러리 패키지 다운로드 중"
+AnalyticCompletion: "분석 완료, 데이터베이스에 동기화 중..."
 
 Node: "노드"
 SyncNode: "노드 데이터 동기화"

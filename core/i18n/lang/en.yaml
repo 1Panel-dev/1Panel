@@ -93,7 +93,10 @@ SubTask: "Subtask"
 
 #script
 ScriptLibrary: "Script Library"
-ScriptVersion: "Local: {{ .localVersion }}, Remote: {{ .remoteVersion }}"
+ScriptSyncSkip: "Current script library is already the latest version!"
+DownloadData: "Downloading script library file data.yaml"
+DownloadPackage: "Downloading script library package"
+AnalyticCompletion: "Analysis completed, now syncing to database..."
 
 Node: "Node"
 SyncNode: "Sync node data"

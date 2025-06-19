@@ -93,7 +93,10 @@ SubTask: "子任务"
 
 #script
 ScriptLibrary: "脚本库"
-ScriptVersion: "本地：{{ .localVersion }}， 远程：{{ .remoteVersion }}"
+ScriptSyncSkip: "检查到当前脚本库已是最新版本！"
+DownloadData: "下载脚本库文件 data.yaml"
+DownloadPackage: "下载脚本库压缩包"
+AnalyticCompletion: "解析成功，现在开始同步到数据库..."
 
 #sync node
 Node: "节点"

@@ -93,7 +93,10 @@ SubTask: "Подзадача"
 
 #script
 ScriptLibrary: "Библиотека скриптов"
-ScriptVersion: "Локальная: {{ .localVersion }}, Удалённая: {{ .remoteVersion }}"
+ScriptSyncSkip: "Текущая библиотека скриптов уже является последней версией!"
+DownloadData: "Загрузка файла библиотеки скриптов data.yaml"
+DownloadPackage: "Загрузка архива библиотеки скриптов"
+AnalyticCompletion: "Анализ завершён, начинается синхронизация с базой данных..."
 
 Node: "Узел"
 SyncNode: "Синхронизация данных узла"

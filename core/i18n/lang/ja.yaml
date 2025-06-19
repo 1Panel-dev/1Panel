@@ -94,7 +94,10 @@ SubTask: "サブタスク"
 
 #script
 ScriptLibrary: "スクリプトライブラリ"
-ScriptVersion: "ローカル: {{ .localVersion }}， リモート: {{ .remoteVersion }}"
+ScriptSyncSkip: "現在のスクリプトライブラリは最新バージョンです！"
+DownloadData: "スクリプトライブラリファイル data.yaml をダウンロード中"
+DownloadPackage: "スクリプトライブラリパッケージをダウンロード中"
+AnalyticCompletion: "解析が完了しました、データベースに同期しています..."
 
 Node: "ノード"
 SyncNode: "ノードデータ同期"

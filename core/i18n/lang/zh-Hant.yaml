@@ -93,7 +93,10 @@ SubTask: "子任務"
 
 #script
 ScriptLibrary: "腳本庫"
-ScriptVersion: "本地: {{ .localVersion }}， 遠端: {{ .remoteVersion }}"
+ScriptSyncSkip: "當前腳本庫已是最新版本！"
+DownloadData: "下載腳本庫文件 data.yaml"
+DownloadPackage: "下載腳本庫壓縮包"
+AnalyticCompletion: "解析成功，現在開始同步到資料庫..."
 
 #sync node
 Node: "節點"

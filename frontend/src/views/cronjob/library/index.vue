@@ -42,7 +42,7 @@
                     <el-table-column type="selection" fix />
                     <el-table-column :label="$t('commons.table.name')" show-overflow-tooltip prop="name" min-width="60">
                         <template #default="{ row }">
-                            <el-text type="primary" class="cursor-pointer" @click="showScript(row.script)">
+                            <el-text type="primary" class="cursor-pointer" @click="showScript(row)">
                                 {{ row.name }}
                             </el-text>
                         </template>
@@ -160,10 +160,10 @@ const onOpenDialog = async (
     dialogRef.value!.acceptParams(params);
 };
 
-const showScript = async (script: string) => {
+const showScript = async (row: any) => {
     let param = {
-        header: i18n.global.t('commons.button.view'),
-        detailInfo: script,
+        header: i18n.global.t('commons.button.view') + ' - ' + row.name,
+        detailInfo: row.script,
         mode: 'shell',
     };
     myDetail.value!.acceptParams(param);

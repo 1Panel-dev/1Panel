@@ -93,7 +93,10 @@ SubTask: "Subtarefa"
 
 #script
 ScriptLibrary: "Biblioteca de Scripts"
-ScriptVersion: "Local: {{ .localVersion }}, Remoto: {{ .remoteVersion }}"
+ScriptSyncSkip: "A biblioteca de scripts atual já é a versão mais recente!"
+DownloadData: "Baixando arquivo data.yaml da biblioteca de scripts"
+DownloadPackage: "Baixando pacote da biblioteca de scripts"
+AnalyticCompletion: "Análise concluída, agora sincronizando com o banco de dados..."
 
 Node: "Nó"
 SyncNode: "Sincronizar dados do nó"

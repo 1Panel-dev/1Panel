@@ -191,34 +191,34 @@ func (u *ScriptService) Sync(req dto.OperateByTaskID) error {
 		localVersion := strings.ReplaceAll(string(versionRes), "\n", "")
 		remoteVersion := strings.ReplaceAll(scriptSetting.Value, "\n", "")
 
-		syncTask.Log(i18n.GetMsgWithMap("ScriptVersion", map[string]interface{}{"localVersion": localVersion, "remoteVersion": remoteVersion}))
 		if localVersion == remoteVersion {
+			syncTask.Log(i18n.GetMsgByKey("ScriptSyncSkip"))
 			return nil
 		}
 
-		syncTask.Log("start to download data.yaml")
 		dataUrl := fmt.Sprintf("%s/scripts/data.yaml", global.CONF.RemoteURL.ResourceURL)
 		_, dataRes, err := req_helper.HandleRequestWithProxy(dataUrl, http.MethodGet, constant.TimeOut20s)
+		syncTask.LogWithStatus(i18n.GetMsgByKey("DownloadData"), err)
 		if err != nil {
 			return fmt.Errorf("load scripts data.yaml from remote failed, err: %v", err)
 		}
 
-		syncTask.Log("download successful!")
 		var scripts Scripts
 		if err = yaml.Unmarshal(dataRes, &scripts); err != nil {
 			return fmt.Errorf("the format of data.yaml is err: %v", err)
 		}
 
-		syncTask.Log("start to download scripts.tar.gz")
 		tmpDir := path.Join(global.CONF.Base.InstallDir, "1panel/tmp/script")
 		if _, err := os.Stat(tmpDir); err != nil {
 			_ = os.MkdirAll(tmpDir, 0755)
 		}
 		scriptsUrl := fmt.Sprintf("%s/scripts/scripts.tar.gz", global.CONF.RemoteURL.ResourceURL)
-		if err := files.DownloadFileWithProxy(scriptsUrl, tmpDir+"/scripts.tar.gz"); err != nil {
+		err = files.DownloadFileWithProxy(scriptsUrl, tmpDir+"/scripts.tar.gz")
+		syncTask.LogWithStatus(i18n.GetMsgByKey("DownloadPackage"), err)
+		if err != nil {
 			return fmt.Errorf("download scripts.tar.gz failed, err: %v", err)
 		}
-		syncTask.Log("download successful! now start to decompress...")
+
 		if err := files.HandleUnTar(tmpDir+"/scripts.tar.gz", tmpDir, ""); err != nil {
 			return fmt.Errorf("handle decompress scripts.tar.gz failed, err: %v", err)
 		}
@@ -237,7 +237,7 @@ func (u *ScriptService) Sync(req dto.OperateByTaskID) error {
 			scriptsForDB = append(scriptsForDB, scriptItem)
 		}
 
-		syncTask.Log("analytic completion! now start to refresh database...")
+		syncTask.Log(i18n.GetMsgByKey("AnalyticCompletion"))
 		if err := scriptRepo.SyncAll(scriptsForDB); err != nil {
 			return fmt.Errorf("sync script with db failed, err: %v", err)
 		}

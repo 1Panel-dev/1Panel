@@ -93,7 +93,10 @@ SubTask: "Tugas Sub"
 
 #script 
 ScriptLibrary: "Pustaka Skrip"
-ScriptVersion: "Tempatan: {{ .localVersion }}, Jauh: {{ .remoteVersion }}"
+ScriptSyncSkip: "Pustaka skrip semasa sudah versi terkini!"
+DownloadData: "Muat turun fail pustaka skrip data.yaml"
+DownloadPackage: "Muat turun pakej pustaka skrip"
+AnalyticCompletion: "Analisis selesai, sedang menyegerakkan ke pangkalan data..."
 
 Node: "Nod"
 SyncNode: "Segerakkan data nod"
