@@ -26,12 +26,8 @@
             <el-icon v-if="loadingIcon(statusItem)" class="is-loading">
                 <Loading />
             </el-icon>
-            <el-icon size="15" v-else>
-                <svg-icon
-                    iconName="p-stop"
-                    class="status-icon"
-                    v-if="statusItem == 'stopped' || statusItem == 'exited'"
-                ></svg-icon>
+            <el-icon size="15" v-else class="status-icon">
+                <svg-icon iconName="p-stop" v-if="statusItem == 'stopped' || statusItem == 'exited'"></svg-icon>
                 <svg-icon iconName="p-start" class="svg-icon" v-if="statusItem == 'running'"></svg-icon>
             </el-icon>
         </el-button>

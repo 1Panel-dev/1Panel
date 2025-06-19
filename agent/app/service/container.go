@@ -933,6 +933,7 @@ func collectLogs(done <-chan struct{}, params dto.StreamLog, messageChan chan<- 
 	}
 
 	dockerCmd := exec.Command("docker", cmdArgs...)
+	dockerCmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 
 	stdout, err := dockerCmd.StdoutPipe()
 	if err != nil {
@@ -949,7 +950,11 @@ func collectLogs(done <-chan struct{}, params dto.StreamLog, messageChan chan<- 
 
 	defer func() {
 		if dockerCmd.Process != nil {
+			if pgid, err := syscall.Getpgid(dockerCmd.Process.Pid); err == nil {
+				_ = syscall.Kill(-pgid, syscall.SIGKILL)
+			}
 			_ = dockerCmd.Process.Kill()
+			_ = dockerCmd.Wait()
 		}
 	}()
 
@@ -960,6 +965,9 @@ func collectLogs(done <-chan struct{}, params dto.StreamLog, messageChan chan<- 
 		<-done
 		if !processKilled && dockerCmd.Process != nil {
 			processKilled = true
+			if pgid, err := syscall.Getpgid(dockerCmd.Process.Pid); err == nil {
+				_ = syscall.Kill(-pgid, syscall.SIGKILL)
+			}
 			_ = dockerCmd.Process.Kill()
 		}
 	}()
