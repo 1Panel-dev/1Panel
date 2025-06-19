@@ -985,7 +985,7 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 	if err != nil {
 		return nil, err
 	}
-	if err = ChangeHSTSConfig(req.Hsts, website); err != nil {
+	if err = ChangeHSTSConfig(req.Hsts, req.Http3, website); err != nil {
 		return nil, err
 	}
 	res.Enable = req.Enable

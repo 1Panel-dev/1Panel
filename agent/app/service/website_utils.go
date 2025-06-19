@@ -1162,7 +1162,7 @@ func UpdateSSLConfig(websiteSSL model.WebsiteSSL) error {
 	return nil
 }
 
-func ChangeHSTSConfig(enable bool, website model.Website) error {
+func ChangeHSTSConfig(enable bool, http3Enable bool, website model.Website) error {
 	includeDir := GetSitePath(website, SiteProxyDir)
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(includeDir) {
@@ -1192,6 +1192,11 @@ func ChangeHSTSConfig(enable bool, website model.Website) error {
 					location.UpdateDirective("add_header", []string{"Strict-Transport-Security", "\"max-age=31536000\""})
 				} else {
 					location.RemoveDirective("add_header", []string{"Strict-Transport-Security", "\"max-age=31536000\""})
+				}
+				if http3Enable {
+					location.UpdateDirective("add_header", []string{"Alt-Svc", "'h3=\":443\"; ma=2592000'"})
+				} else {
+					location.RemoveDirective("add_header", []string{"Alt-Svc", "'h3=\":443\"; ma=2592000'"})
 				}
 				if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 					return buserr.WithErr("ErrUpdateBuWebsite", err)
