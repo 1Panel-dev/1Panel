@@ -224,7 +224,7 @@ export const DNSTypes = [
         value: 'FreeMyIP',
     },
     {
-        label: i18n.global.t('website.baiduCloud'),
+        label: i18n.global.t('ssl.baiduCloud'),
         value: 'BaiduCloud',
     },
     {

@@ -1,9 +1,9 @@
 package main
 
 import (
-	_ "net/http/pprof"
-
-	"github.com/1Panel-dev/1Panel/agent/server"
+	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/cmd/server/cmd"
+	"os"
 )
 
 // @title 1Panel
@@ -15,5 +15,8 @@ import (
 // @host localhost
 // @BasePath /api/v2
 func main() {
-	server.Start()
+	if err := cmd.RootCmd.Execute(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 }
