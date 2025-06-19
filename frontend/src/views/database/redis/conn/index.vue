@@ -1,6 +1,6 @@
 <template>
     <DrawerPro v-model="dialogVisible" :header="$t('database.databaseConnInfo')" @close="handleClose" size="small">
-        <el-form @submit.prevent v-loading="loading" ref="formRef" :model="form" label-position="top" :rules="rules">
+        <el-form @submit.prevent v-loading="loading" ref="formRef" :model="form" label-position="top">
             <el-form-item :label="$t('database.containerConn')" v-if="form.from === 'local'">
                 <el-card class="mini-border-card">
                     <el-descriptions :column="1">
@@ -61,7 +61,7 @@
                     type="password"
                     show-password
                     clearable
-                    v-model="form.password"
+                    v-model.trim="form.password"
                 />
                 <el-button-group>
                     <CopyButton class="copy_button" :content="form.password" />
@@ -69,7 +69,6 @@
                         {{ $t('commons.button.random') }}
                     </el-button>
                 </el-button-group>
-                <span class="input-help">{{ $t('commons.rule.illegalChar') }}</span>
             </el-form-item>
 
             <div v-if="form.from !== 'local'">
@@ -105,7 +104,6 @@ import { getAppConnInfo } from '@/api/modules/app';
 import { MsgSuccess } from '@/utils/message';
 import { getRandomStr } from '@/utils/util';
 import { getAgentSettingInfo } from '@/api/modules/setting';
-import { Rules } from '@/global/form-rules';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
 
@@ -123,9 +121,6 @@ const form = reactive({
     from: '',
     database: '',
     remoteIP: '',
-});
-const rules = reactive({
-    password: [Rules.requiredInput, Rules.noSpace, Rules.illegal],
 });
 
 const confirmDialogRef = ref();
