@@ -14,12 +14,12 @@
                 <el-tooltip :content="$t('commons.button.refresh')" placement="top">
                     <el-button icon="Refresh" circle @click="search" />
                 </el-tooltip>
-                <el-tooltip :content="isHidden ? $t('file.showHide') : $t('file.noShowHide')" placement="top">
+                <el-tooltip :content="req.showHidden ? $t('file.noShowHide') : $t('file.showHide')" placement="top">
                     <el-button
                         class="btn"
                         circle
-                        :type="isHidden ? 'primary' : ''"
-                        :icon="isHidden ? Hide : View"
+                        :type="req.showHidden ? '' : 'primary'"
+                        :icon="req.showHidden ? View : Hide"
                         @click="viewHideFile"
                     />
                 </el-tooltip>
@@ -603,7 +603,7 @@ let selects = ref<any>([]);
 const initData = () => ({
     path: '/',
     expand: true,
-    showHidden: true,
+    showHidden: false,
     page: 1,
     pageSize: 100,
     search: '',
@@ -663,7 +663,6 @@ const calculateBtn = ref(false);
 const dirNum = ref(0);
 const fileNum = ref(0);
 const imageFiles = ref([]);
-const isHidden = ref(false);
 
 const { searchableStatus, searchablePath, searchableInputRef, searchableInputBlur } = useSearchable(paths);
 
@@ -710,20 +709,15 @@ const searchFile = async () => {
 };
 
 const handleSearchResult = (res: ResultData<File.File>) => {
-    if (isHidden.value) {
-        const items = res.data.items || [];
-        data.value = items.filter((item) => !item.isHidden);
-    } else {
-        data.value = res.data.items || [];
-    }
+    data.value = res.data.items || [];
+    paginationConfig.total = res.data.itemTotal;
     dirNum.value = data.value.filter((item) => item.isDir).length;
     fileNum.value = data.value.filter((item) => !item.isDir).length;
-    paginationConfig.total = data.value.length;
     req.path = res.data.path;
 };
 
 const viewHideFile = async () => {
-    isHidden.value = !isHidden.value;
+    req.showHidden = !req.showHidden;
     let searchResult = await searchFile();
     handleSearchResult(searchResult);
 };

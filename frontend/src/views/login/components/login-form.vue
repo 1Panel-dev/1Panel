@@ -1,6 +1,6 @@
 <template>
-    <div class="w-full h-full flex items-center justify-center px-8">
-        <div v-loading="loading" class="w-full flex-grow flex flex-col login-form">
+    <div v-loading="loading" class="w-full h-full flex items-center justify-center px-8">
+        <div class="w-full flex-grow flex flex-col login-form">
             <div v-if="mfaShow">
                 <el-form @submit.prevent>
                     <div class="flex flex-col justify-center items-center mb-6">
