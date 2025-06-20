@@ -65,7 +65,17 @@ func OperationLog() gin.HandlerFunc {
 				c.Request.Body = io.NopCloser(bytes.NewBuffer(body))
 			}
 			bodyMap := make(map[string]interface{})
-			_ = json.Unmarshal(body, &bodyMap)
+			if strings.Contains(c.Request.Header.Get("Content-Type"), "multipart/form-data") {
+				if form, form_err := c.MultipartForm(); form_err == nil {
+					for key, value := range form.Value {
+						if len(value) != 0 {
+							bodyMap[key] = value[0]
+						}
+					}
+				}
+			} else {
+				_ = json.Unmarshal(body, &bodyMap)
+			}
 			for _, key := range operationDic.BodyKeys {
 				if _, ok := bodyMap[key]; ok {
 					formatMap[key] = bodyMap[key]
