@@ -1672,12 +1672,13 @@
 	},
 	"/files/upload": {
 		"bodyKeys": [
-			"path"
+			"path",
+			"file"
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "上传文件[path]",
-		"formatEN": "Uploadfile[path]"
+		"formatZH": "上传文件[path]/[file]",
+		"formatEN": "Uploadfile[path]/[file]"
 	},
 	"/files/wget": {
 		"bodyKeys": [
