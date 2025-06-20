@@ -497,6 +497,7 @@ func (a *aliClient) completeUpload(uploadID, fileID string) error {
 
 type tokenResp struct {
 	RefreshToken string `json:"refresh_token"`
+	AccessToken  string `json:"access_token"`
 }
 
 func loadToken(refresh_token string) (string, error) {
@@ -524,7 +525,7 @@ func loadToken(refresh_token string) (string, error) {
 	if err := json.Unmarshal(resp.Body(), &respItem); err != nil {
 		return "", err
 	}
-	return respItem.RefreshToken, nil
+	return respItem.AccessToken, nil
 }
 
 func RefreshALIToken(varMap map[string]interface{}) (string, error) {

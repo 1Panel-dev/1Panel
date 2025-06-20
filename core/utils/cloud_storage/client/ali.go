@@ -20,9 +20,10 @@ type aliClient struct {
 }
 
 func NewALIClient(vars map[string]interface{}) (*aliClient, error) {
+	refresh_token := loadParamFromVars("refresh_token", vars)
 	drive_id := loadParamFromVars("drive_id", vars)
 
-	token, err := RefreshALIToken(vars)
+	token, err := loadToken(refresh_token)
 	if err != nil {
 		return nil, err
 	}
@@ -355,6 +356,35 @@ func (a *aliClient) completeUpload(uploadID, fileID string) error {
 
 type tokenResp struct {
 	RefreshToken string `json:"refresh_token"`
+	AccessToken  string `json:"access_token"`
+}
+
+func loadToken(refresh_token string) (string, error) {
+	client := resty.New()
+	client.SetTLSClientConfig(&tls.Config{
+		InsecureSkipVerify: true,
+	})
+	data := map[string]interface{}{
+		"grant_type":    "refresh_token",
+		"refresh_token": refresh_token,
+	}
+
+	url := "https://api.aliyundrive.com/token/refresh"
+	resp, err := client.R().
+		SetBody(data).
+		Post(url)
+
+	if err != nil {
+		return "", fmt.Errorf("load account token failed, err: %v", err)
+	}
+	if resp.StatusCode() != 200 {
+		return "", fmt.Errorf("load account token failed, code: %v", resp.StatusCode())
+	}
+	var respItem tokenResp
+	if err := json.Unmarshal(resp.Body(), &respItem); err != nil {
+		return "", err
+	}
+	return respItem.AccessToken, nil
 }
 
 func RefreshALIToken(varMap map[string]interface{}) (string, error) {

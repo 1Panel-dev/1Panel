@@ -284,7 +284,15 @@ func (u *BackupService) RefreshToken(req dto.OperateByName) error {
 
 	varsItem, _ := json.Marshal(varMap)
 	backup.Vars = string(varsItem)
-	return backupRepo.Save(&backup)
+	if err := backupRepo.Save(&backup); err != nil {
+		return err
+	}
+	go func() {
+		if err := xpack.Sync(constant.SyncBackupAccounts); err != nil {
+			global.LOG.Errorf("sync backup account to node failed, err: %v", err)
+		}
+	}()
+	return nil
 }
 
 func (u *BackupService) NewClient(backup *model.BackupAccount) (cloud_storage.CloudStorageClient, error) {
