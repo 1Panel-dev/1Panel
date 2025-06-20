@@ -337,7 +337,7 @@ func (f *FileService) GetContent(op request.FileContentReq) (response.FileInfo, 
 	}
 	if !utf8.Valid(content) {
 		_, decodeName, _ := charset.DetermineEncoding(content, "")
-		if decodeName == "windows-1252" {
+		if decodeName == "windows-1252" || strings.ToLower(decodeName) == "gbk" {
 			reader := strings.NewReader(info.Content)
 			item := transform.NewReader(reader, simplifiedchinese.GBK.NewDecoder())
 			contents, err := io.ReadAll(item)
