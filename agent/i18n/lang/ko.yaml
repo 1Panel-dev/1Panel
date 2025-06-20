@@ -204,6 +204,7 @@ HandleSystemClean: '시스템 캐시 정리'
 SystemLog: '시스템 로그'
 CutWebsiteLog: '웹사이트 로그 회전'
 FileOrDir: '디렉터리 / 파일'
+UploadFile: '백업 파일 {{ .file }} 을(를) {{ .backup }}(으)로 업로드 중'
 
 #도구상자
 ErrNotExistUser: '현재 사용자가 존재하지 않습니다. 수정한 후 다시 시도하세요!'

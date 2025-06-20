@@ -204,6 +204,7 @@ HandleSystemClean: 'System cache cleanup'
 SystemLog: 'System Log'
 CutWebsiteLog: 'Rotate Website Log'
 FileOrDir: 'Directory / File'
+UploadFile: 'Uploading backup file {{ .file }} to {{ .backup }}'
 
 #toolbox
 ErrNotExistUser: 'The current user does not exist, please modify and try again!'

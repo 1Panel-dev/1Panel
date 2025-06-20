@@ -203,6 +203,7 @@ HandleSystemClean: "系统缓存清理"
 SystemLog: "系统日志"
 CutWebsiteLog: "切割网站日志"
 FileOrDir: "目录 / 文件"
+UploadFile: "上传备份文件 {{ .file }} 到 {{ .backup }}"
 
 #toolbox
 ErrNotExistUser: "当前用户不存在，请修改后重试！"

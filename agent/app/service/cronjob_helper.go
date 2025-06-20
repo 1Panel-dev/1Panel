@@ -262,23 +262,28 @@ func (u *CronjobService) handleSystemClean(cronjob model.Cronjob, taskItem *task
 	taskItem.AddSubTaskWithOps(i18n.GetMsgByKey("HandleSystemClean"), cleanTask, nil, int(cronjob.RetryTimes), time.Duration(cronjob.Timeout)*time.Second)
 }
 
-func (u *CronjobService) uploadCronjobBackFile(cronjob model.Cronjob, accountMap map[string]backupClientHelper, file string) (string, error) {
+func (u *CronjobService) uploadCronjobBackFile(cronjob model.Cronjob, task *task.Task, accountMap map[string]backupClientHelper, file string) (string, error) {
 	defer func() {
 		_ = os.Remove(file)
 	}()
+	var errItem error
 	accounts := strings.Split(cronjob.SourceAccountIDs, ",")
 	cloudSrc := strings.TrimPrefix(file, global.Dir.TmpDir+"/")
 	for _, account := range accounts {
 		if len(account) != 0 {
-			global.LOG.Debugf("start upload file to %s, dir: %s", accountMap[account].name, pathUtils.Join(accountMap[account].backupPath, cloudSrc))
-			if _, err := accountMap[account].client.Upload(file, pathUtils.Join(accountMap[account].backupPath, cloudSrc)); err != nil {
-				global.LOG.Errorf("upload file to %s failed, err: %v", accountMap[account].name, err)
+			_, err := accountMap[account].client.Upload(file, pathUtils.Join(accountMap[account].backupPath, cloudSrc))
+			task.LogWithStatus(
+				i18n.GetMsgWithMap("UploadFile", map[string]interface{}{
+					"file":   pathUtils.Join(accountMap[account].backupPath, cloudSrc),
+					"backup": accountMap[account].name,
+				}), err)
+			if err != nil {
+				errItem = err
 				continue
 			}
-			global.LOG.Debugf("upload successful!")
 		}
 	}
-	return cloudSrc, nil
+	return cloudSrc, errItem
 }
 
 func (u *CronjobService) removeExpiredBackup(cronjob model.Cronjob, accountMap map[string]backupClientHelper, record model.BackupRecord) {

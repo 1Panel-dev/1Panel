@@ -60,7 +60,7 @@ func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time, t
 			if err := doAppBackup(&app, task, backupDir, record.FileName, cronjob.ExclusionRules, cronjob.Secret); err != nil {
 				return err
 			}
-			downloadPath, err := u.uploadCronjobBackFile(cronjob, accountMap, path.Join(backupDir, record.FileName))
+			downloadPath, err := u.uploadCronjobBackFile(cronjob, task, accountMap, path.Join(backupDir, record.FileName))
 			if err != nil {
 				return err
 			}
@@ -101,7 +101,7 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, startTime time.Tim
 				return err
 			}
 
-			downloadPath, err := u.uploadCronjobBackFile(cronjob, accountMap, path.Join(backupDir, record.FileName))
+			downloadPath, err := u.uploadCronjobBackFile(cronjob, task, accountMap, path.Join(backupDir, record.FileName))
 			if err != nil {
 				return err
 			}
@@ -149,7 +149,7 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Ti
 				}
 			}
 
-			downloadPath, err := u.uploadCronjobBackFile(cronjob, accountMap, path.Join(backupDir, record.FileName))
+			downloadPath, err := u.uploadCronjobBackFile(cronjob, task, accountMap, path.Join(backupDir, record.FileName))
 			if err != nil {
 				return err
 			}
@@ -193,7 +193,7 @@ func (u *CronjobService) handleDirectory(cronjob model.Cronjob, startTime time.T
 		record.CronjobID = cronjob.ID
 		record.Name = cronjob.Name
 		record.DownloadAccountID, record.SourceAccountIDs = cronjob.DownloadAccountID, cronjob.SourceAccountIDs
-		downloadPath, err := u.uploadCronjobBackFile(cronjob, accountMap, path.Join(backupDir, fileName))
+		downloadPath, err := u.uploadCronjobBackFile(cronjob, task, accountMap, path.Join(backupDir, fileName))
 		if err != nil {
 			taskItem.LogFailedWithErr("Upload backup file", err)
 			return err
@@ -228,7 +228,7 @@ func (u *CronjobService) handleSystemLog(cronjob model.Cronjob, startTime time.T
 		record.CronjobID = cronjob.ID
 		record.Name = cronjob.Name
 		record.DownloadAccountID, record.SourceAccountIDs = cronjob.DownloadAccountID, cronjob.SourceAccountIDs
-		downloadPath, err := u.uploadCronjobBackFile(cronjob, accountMap, path.Join(path.Dir(backupDir), fileName))
+		downloadPath, err := u.uploadCronjobBackFile(cronjob, task, accountMap, path.Join(path.Dir(backupDir), fileName))
 		if err != nil {
 			taskItem.LogFailedWithErr("Upload backup file", err)
 			return err

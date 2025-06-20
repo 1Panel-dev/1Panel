@@ -203,6 +203,7 @@ HandleSystemClean: '系統快取清理'
 SystemLog: '系統日誌'
 CutWebsiteLog: '切割網站日誌'
 FileOrDir: '目錄 / 檔案'
+UploadFile: '上傳備份文件 {{ .file }} 到 {{ .backup }}'
 
 #toolbox
 ErrNotExistUser: '目前使用者不存在，請修改後重試！'

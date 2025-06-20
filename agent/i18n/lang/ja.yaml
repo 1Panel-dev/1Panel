@@ -204,6 +204,7 @@ HandleSystemClean: 'システム キャッシュのクリーンアップ'
 SystemLog: 'システムログ'
 CutWebsiteLog: 'ウェブサイトログのローテーション'
 FileOrDir: 'ディレクトリ / ファイル'
+UploadFile: 'バックアップファイル {{ .file }} を {{ .backup }} にアップロード中'
 
 #toolbox
 ErrNotExistUser: '現在のユーザーは存在しません。変更してもう一度お試しください。'

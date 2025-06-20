@@ -204,6 +204,7 @@ HandleSystemClean: 'Limpeza de cache do sistema'
 SystemLog: 'Log do Sistema'
 CutWebsiteLog: 'Rotacionar Log do Website'
 FileOrDir: 'Diretório / Arquivo'
+UploadFile: 'Enviando arquivo de backup {{ .file }} para {{ .backup }}'
 
 #caixa de ferramentas
 ErrNotExistUser: 'O usuário atual não existe, modifique e tente novamente!'
