@@ -1,7 +1,7 @@
 <template>
     <div>
-        <docker-status v-model:isActive="isActive" v-model:isExist="isExist" @search="search" />
-        <LayoutContent v-loading="loading" v-if="isExist" :title="$t('app.app', 2)">
+        <docker-status v-model:isActive="isActive" v-model:isExist="isExist" />
+        <LayoutContent v-loading="loading" v-if="isExist" :class="{ mask: !isActive }" :title="$t('app.app', 2)">
             <template #search>
                 <Tags @change="changeTag" />
             </template>
