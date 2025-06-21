@@ -20,8 +20,8 @@ const prop = defineProps({
 });
 
 const em = defineEmits(['search', 'mounted', 'update:is-active', 'update:is-exist', 'update:loading']);
-const isActive = ref();
-const isExist = ref();
+const isActive = ref(true);
+const isExist = ref(true);
 const loadStatus = async () => {
     em('update:loading', true);
     await loadDockerStatus()
