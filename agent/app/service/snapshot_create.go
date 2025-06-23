@@ -118,12 +118,26 @@ func (u *SnapshotService) SnapshotReCreate(id uint) error {
 	return nil
 }
 
+type appInstall struct {
+	Name string
+	Path string
+}
+
 func handleSnapshot(req dto.SnapshotCreate, taskItem *task.Task, jobID, retry, timeout uint) error {
 	rootDir := path.Join(global.Dir.TmpDir, "system", req.Name)
 	openrestyDir, _ := settingRepo.GetValueByKey("WEBSITE_DIR")
 	itemHelper := snapHelper{SnapID: req.ID, Task: *taskItem, FileOp: files.NewFileOp(), Ctx: context.Background(), OpenrestyDir: openrestyDir}
 	baseDir := path.Join(rootDir, "base")
 	_ = os.MkdirAll(baseDir, os.ModePerm)
+
+	var appList []appInstall
+	for _, item := range req.AppData {
+		for _, itemApp := range item.Children {
+			if itemApp.Label == "appData" && itemApp.IsCheck {
+				appList = append(appList, appInstall{Name: item.Name, Path: path.Join(global.CONF.Base.InstallDir, "1panel/apps", item.Key, item.Name)})
+			}
+		}
+	}
 
 	if timeout == 0 {
 		timeout = 1800
@@ -150,14 +164,42 @@ func handleSnapshot(req dto.SnapshotCreate, taskItem *task.Task, jobID, retry, t
 		)
 		req.InterruptStep = ""
 	}
-	if len(req.InterruptStep) == 0 || req.InterruptStep == "SnapInstallApp" {
+
+	if len(req.InterruptStep) == 0 || req.InterruptStep == "SnapInstallAppImage" {
 		taskItem.AddSubTaskWithAliasAndOps(
-			"SnapInstallApp",
+			"SnapInstallAppImage",
 			func(t *task.Task) error { return snapAppImage(itemHelper, req, rootDir) },
 			nil, int(retry), time.Duration(timeout)*time.Second,
 		)
 		req.InterruptStep = ""
 	}
+
+	if len(req.InterruptStep) == 0 || strings.HasPrefix(req.InterruptStep, "SnapInstallApp-") {
+		taskItem.AddSubTaskWithAliasAndOps(
+			"SnapInstallApp",
+			func(t *task.Task) error {
+				itemHelper.Task.Log("---------------------- 4 / 9 ----------------------")
+				itemHelper.Task.LogStart(i18n.GetMsgByKey("SnapInstallApp"))
+				start := false
+				for _, itemApp := range appList {
+					if !start && (req.InterruptStep == "SnapInstallApp-"+itemApp.Name || len(req.InterruptStep) == 0) {
+						start = true
+					}
+					if !start {
+						continue
+					}
+					taskItem.Log(i18n.GetMsgWithMap("SnapBackup", map[string]interface{}{"app": itemApp.Name}))
+					if err := itemHelper.FileOp.TarGzCompressPro(false, itemApp.Path, path.Join(rootDir, "apps", itemApp.Name+".tar.gz"), "", ""); err != nil {
+						return err
+					}
+				}
+				return nil
+			},
+			nil, int(retry), time.Duration(timeout)*time.Second,
+		)
+		req.InterruptStep = ""
+	}
+
 	if len(req.InterruptStep) == 0 || req.InterruptStep == "SnapLocalBackup" {
 		taskItem.AddSubTaskWithAliasAndOps(
 			"SnapLocalBackup",
@@ -178,7 +220,7 @@ func handleSnapshot(req dto.SnapshotCreate, taskItem *task.Task, jobID, retry, t
 	taskItem.AddSubTaskWithAliasAndOps(
 		"SnapCloseDBConn",
 		func(t *task.Task) error {
-			taskItem.Log("---------------------- 6 / 8 ----------------------")
+			taskItem.Log("---------------------- 7 / 9 ----------------------")
 			common.CloseDB(itemHelper.snapAgentDB)
 			common.CloseDB(itemHelper.snapCoreDB)
 			return nil
@@ -224,7 +266,7 @@ type snapHelper struct {
 }
 
 func loadDbConn(snap *snapHelper, targetDir string, req dto.SnapshotCreate) error {
-	snap.Task.Log("---------------------- 1 / 8 ----------------------")
+	snap.Task.Log("---------------------- 1 / 9 ----------------------")
 	snap.Task.LogStart(i18n.GetMsgByKey("SnapDBInfo"))
 	pathDB := path.Join(global.Dir.DataDir, "db")
 
@@ -285,7 +327,7 @@ func loadDbConn(snap *snapHelper, targetDir string, req dto.SnapshotCreate) erro
 }
 
 func snapBaseData(snap snapHelper, targetDir string) error {
-	snap.Task.Log("---------------------- 2 / 8 ----------------------")
+	snap.Task.Log("---------------------- 2 / 9 ----------------------")
 	snap.Task.LogStart(i18n.GetMsgByKey("SnapBaseInfo"))
 
 	if global.IsMaster {
@@ -344,8 +386,8 @@ func snapBaseData(snap snapHelper, targetDir string) error {
 }
 
 func snapAppImage(snap snapHelper, req dto.SnapshotCreate, targetDir string) error {
-	snap.Task.Log("---------------------- 3 / 8 ----------------------")
-	snap.Task.LogStart(i18n.GetMsgByKey("SnapInstallApp"))
+	snap.Task.Log("---------------------- 3 / 9 ----------------------")
+	snap.Task.LogStart(i18n.GetMsgByKey("SnapInstallAppImage"))
 
 	var appInstalls []model.AppInstall
 	_ = snap.snapAgentDB.Where("1 = 1").Find(&appInstalls).Error
@@ -377,8 +419,8 @@ func snapAppImage(snap snapHelper, req dto.SnapshotCreate, targetDir string) err
 		}
 	}
 
-	snap.Task.Log(strings.Join(imageList, " "))
 	if len(imageList) != 0 {
+		snap.Task.Log(strings.Join(imageList, " "))
 		snap.Task.Logf("docker save %s | gzip -c > %s", strings.Join(imageList, " "), path.Join(targetDir, "images.tar.gz"))
 		std, err := cmd.NewCommandMgr(cmd.WithTimeout(10*time.Minute)).RunWithStdoutBashCf("docker save %s | gzip -c > %s", strings.Join(imageList, " "), path.Join(targetDir, "images.tar.gz"))
 		if err != nil {
@@ -386,12 +428,14 @@ func snapAppImage(snap snapHelper, req dto.SnapshotCreate, targetDir string) err
 			return errors.New(std)
 		}
 		snap.Task.LogSuccess(i18n.GetMsgByKey("SnapDockerSave"))
+	} else {
+		snap.Task.Log(i18n.GetMsgByKey("SnapInstallAppImageEmpty"))
 	}
 	return nil
 }
 
 func snapBackupData(snap snapHelper, req dto.SnapshotCreate, targetDir string) error {
-	snap.Task.Log("---------------------- 4 / 8 ----------------------")
+	snap.Task.Log("---------------------- 5 / 9 ----------------------")
 	snap.Task.LogStart(i18n.GetMsgByKey("SnapLocalBackup"))
 
 	excludes := loadBackupExcludes(snap, req.BackupData)
@@ -440,19 +484,13 @@ func loadAppBackupExcludes(req []dto.DataTree) []string {
 }
 
 func snapPanelData(snap snapHelper, req dto.SnapshotCreate, targetDir string) error {
-	snap.Task.Log("---------------------- 5 / 8 ----------------------")
+	snap.Task.Log("---------------------- 6 / 9 ----------------------")
 	snap.Task.LogStart(i18n.GetMsgByKey("SnapPanelData"))
 
 	excludes := loadPanelExcludes(req.PanelData)
-	for _, item := range req.AppData {
-		for _, itemApp := range item.Children {
-			if itemApp.Label == "appData" {
-				excludes = append(excludes, loadPanelExcludes([]dto.DataTree{itemApp})...)
-			}
-		}
-	}
 	excludes = append(excludes, "./cache")
 	excludes = append(excludes, "./db")
+	excludes = append(excludes, "./apps")
 	excludes = append(excludes, "./tmp")
 	if !req.WithSystemLog {
 		excludes = append(excludes, "./log/1Panel*")
@@ -506,7 +544,7 @@ func loadPanelExcludes(req []dto.DataTree) []string {
 }
 
 func snapCompress(snap snapHelper, rootDir string, secret string) error {
-	snap.Task.Log("---------------------- 7 / 8 ----------------------")
+	snap.Task.Log("---------------------- 8 / 9 ----------------------")
 	snap.Task.LogStart(i18n.GetMsgByKey("SnapCompress"))
 
 	tmpDir := path.Join(global.Dir.TmpDir, "system")
@@ -530,7 +568,7 @@ func snapCompress(snap snapHelper, rootDir string, secret string) error {
 }
 
 func snapUpload(snap snapHelper, accounts string, file string) error {
-	snap.Task.Log("---------------------- 8 / 8 ----------------------")
+	snap.Task.Log("---------------------- 9 / 9 ----------------------")
 	snap.Task.LogStart(i18n.GetMsgByKey("SnapUpload"))
 
 	source := path.Join(global.Dir.TmpDir, "system", path.Base(file))
