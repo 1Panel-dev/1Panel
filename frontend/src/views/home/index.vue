@@ -193,8 +193,8 @@
                                     </template>
                                     {{
                                         baseInfo.platformVersion
-                                            ? baseInfo.platform
-                                            : baseInfo.platform + '-' + baseInfo.platformVersion
+                                            ? baseInfo.platform + '-' + baseInfo.platformVersion
+                                            : baseInfo.platform
                                     }}
                                 </el-descriptions-item>
                                 <el-descriptions-item class-name="system-content" label-class-name="system-label">
