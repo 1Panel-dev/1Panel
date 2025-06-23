@@ -41,7 +41,7 @@
                     <el-table-column prop="version" :label="$t('app.version')" />
                     <el-table-column :label="$t('setting.backupAccount')" min-width="80" prop="from">
                         <template #default="{ row }">
-                            <div>
+                            <div class="flex items-center justify-start gap-0.5">
                                 <div v-for="(item, index) of row.sourceAccounts" :key="index" class="mt-1">
                                     <div v-if="row.expand || (!row.expand && index < 3)">
                                         <span type="info">
@@ -68,9 +68,6 @@
                                         {{ $t('commons.button.collapse') }}
                                     </el-button>
                                 </div>
-                            </div>
-                            <div v-if="!row.hasLoad">
-                                <el-button link loading></el-button>
                             </div>
                         </template>
                     </el-table-column>

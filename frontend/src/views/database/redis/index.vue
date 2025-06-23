@@ -101,7 +101,7 @@
                     </div>
                 </div>
 
-                <div class="app-warn" v-if="dbOptionsLocal.length === 0 && dbOptionsRemote.length === 0">
+                <div class="app-warn" v-if="isLoaded && dbOptionsLocal.length === 0 && dbOptionsRemote.length === 0">
                     <div class="flex flex-col gap-2 items-center justify-center w-full sm:flex-row">
                         <span>{{ $t('app.checkInstalledWarn', ['Redis']) }}</span>
                         <span @click="goRouter('app')" class="flex items-center justify-center gap-0.5">
@@ -171,6 +171,8 @@ const redisCliExist = ref();
 
 const appKey = ref('redis');
 const appName = ref();
+
+const isLoaded = ref(false);
 const dbOptionsLocal = ref<Array<Database.DatabaseOption>>([]);
 const dbOptionsRemote = ref<Array<Database.DatabaseOption>>([]);
 const currentDB = ref<Database.DatabaseOption>();
@@ -241,41 +243,45 @@ const changeDatabase = async () => {
 };
 
 const loadDBOptions = async () => {
-    const res = await listDatabases('redis');
-    let datas = res.data || [];
-    dbOptionsLocal.value = [];
-    dbOptionsRemote.value = [];
-    currentDBName.value = globalStore.currentDB;
-    for (const item of datas) {
-        if (currentDBName.value && item.database === currentDBName.value) {
-            currentDB.value = item;
+    try {
+        const res = await listDatabases('redis');
+        let datas = res.data || [];
+        dbOptionsLocal.value = [];
+        dbOptionsRemote.value = [];
+        currentDBName.value = globalStore.currentDB;
+        for (const item of datas) {
+            if (currentDBName.value && item.database === currentDBName.value) {
+                currentDB.value = item;
+                if (item.from === 'local') {
+                    appKey.value = item.type;
+                    appName.value = item.database;
+                }
+            }
             if (item.from === 'local') {
-                appKey.value = item.type;
-                appName.value = item.database;
+                dbOptionsLocal.value.push(item);
+            } else {
+                dbOptionsRemote.value.push(item);
             }
         }
-        if (item.from === 'local') {
-            dbOptionsLocal.value.push(item);
-        } else {
-            dbOptionsRemote.value.push(item);
+        if (currentDB.value) {
+            reOpenTerminal();
+            return;
         }
-    }
-    if (currentDB.value) {
-        reOpenTerminal();
-        return;
-    }
-    if (dbOptionsLocal.value.length !== 0) {
-        currentDB.value = dbOptionsLocal.value[0];
-        currentDBName.value = dbOptionsLocal.value[0].database;
-        appKey.value = dbOptionsLocal.value[0].type;
-        appName.value = dbOptionsLocal.value[0].database;
-    }
-    if (!currentDB.value && dbOptionsRemote.value.length !== 0) {
-        currentDB.value = dbOptionsRemote.value[0];
-        currentDBName.value = dbOptionsRemote.value[0].database;
-    }
-    if (currentDB.value) {
-        reOpenTerminal();
+        if (dbOptionsLocal.value.length !== 0) {
+            currentDB.value = dbOptionsLocal.value[0];
+            currentDBName.value = dbOptionsLocal.value[0].database;
+            appKey.value = dbOptionsLocal.value[0].type;
+            appName.value = dbOptionsLocal.value[0].database;
+        }
+        if (!currentDB.value && dbOptionsRemote.value.length !== 0) {
+            currentDB.value = dbOptionsRemote.value[0];
+            currentDBName.value = dbOptionsRemote.value[0].database;
+        }
+        if (currentDB.value) {
+            reOpenTerminal();
+        }
+    } finally {
+        isLoaded.value = true;
     }
 };
 

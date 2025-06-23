@@ -336,7 +336,7 @@ const shortcuts = [
 ];
 const WebsiteTypes = getWebsiteTypes();
 const loading = ref(false);
-const maskShow = ref(true);
+const maskShow = ref(false);
 const createRef = ref();
 const deleteRef = ref();
 const groupRef = ref();

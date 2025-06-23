@@ -187,8 +187,8 @@ const autoStart = ref('enable');
 
 const fail2banConf = ref();
 const form = reactive({
-    isEnable: false,
-    isActive: false,
+    isEnable: true,
+    isActive: true,
     isExist: false,
     version: '-',
 

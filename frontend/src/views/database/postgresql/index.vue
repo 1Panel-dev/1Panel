@@ -173,7 +173,7 @@
                         fix
                     />
                 </ComplexTable>
-                <div class="app-warn" v-if="dbOptionsLocal.length === 0 && dbOptionsRemote.length === 0">
+                <div class="app-warn" v-if="isLoaded && dbOptionsLocal.length === 0 && dbOptionsRemote.length === 0">
                     <div class="flex flex-col gap-2 items-center justify-center w-full sm:flex-row">
                         <span>{{ $t('app.checkInstalledWarn', [$t('database.noPostgresql')]) }}</span>
                         <span @click="goRouter('app')" class="flex items-center justify-center gap-0.5">
@@ -264,6 +264,7 @@ const maskShow = ref(true);
 const appKey = ref('postgresql');
 const appName = ref();
 
+const isLoaded = ref(false);
 const dbOptionsLocal = ref<Array<Database.DatabaseOption>>([]);
 const dbOptionsRemote = ref<Array<Database.DatabaseOption>>([]);
 const currentDB = ref<Database.DatabaseOption>();
@@ -443,48 +444,52 @@ const checkExist = (data: App.CheckInstalled) => {
 };
 
 const loadDBOptions = async () => {
-    const res = await listDatabases('postgresql');
-    let datas = res.data || [];
-    dbOptionsLocal.value = [];
-    dbOptionsRemote.value = [];
-    currentDBName.value = globalStore.currentDB;
-    for (const item of datas) {
-        if (currentDBName.value && item.database === currentDBName.value) {
-            currentDB.value = item;
+    try {
+        const res = await listDatabases('postgresql');
+        let datas = res.data || [];
+        dbOptionsLocal.value = [];
+        dbOptionsRemote.value = [];
+        currentDBName.value = globalStore.currentDB;
+        for (const item of datas) {
+            if (currentDBName.value && item.database === currentDBName.value) {
+                currentDB.value = item;
+                if (item.from === 'local') {
+                    appKey.value = item.type;
+                    appName.value = item.database;
+                }
+            }
             if (item.from === 'local') {
-                appKey.value = item.type;
-                appName.value = item.database;
+                dbOptionsLocal.value.push(item);
+            } else {
+                dbOptionsRemote.value.push(item);
             }
         }
-        if (item.from === 'local') {
-            dbOptionsLocal.value.push(item);
-        } else {
-            dbOptionsRemote.value.push(item);
+        if (currentDB.value) {
+            if (currentDB.value?.from === 'remote') {
+                maskShow.value = false;
+            }
+            globalStore.setCurrentDB('');
+            search();
+            return;
         }
-    }
-    if (currentDB.value) {
+        if (dbOptionsLocal.value.length !== 0) {
+            currentDB.value = dbOptionsLocal.value[0];
+            currentDBName.value = dbOptionsLocal.value[0].database;
+            appKey.value = dbOptionsLocal.value[0].type;
+            appName.value = dbOptionsLocal.value[0].database;
+        }
+        if (!currentDB.value && dbOptionsRemote.value.length !== 0) {
+            currentDB.value = dbOptionsRemote.value[0];
+            currentDBName.value = dbOptionsRemote.value[0].database;
+        }
+        if (currentDB.value) {
+            await search();
+        }
         if (currentDB.value?.from === 'remote') {
             maskShow.value = false;
         }
-        globalStore.setCurrentDB('');
-        search();
-        return;
-    }
-    if (dbOptionsLocal.value.length !== 0) {
-        currentDB.value = dbOptionsLocal.value[0];
-        currentDBName.value = dbOptionsLocal.value[0].database;
-        appKey.value = dbOptionsLocal.value[0].type;
-        appName.value = dbOptionsLocal.value[0].database;
-    }
-    if (!currentDB.value && dbOptionsRemote.value.length !== 0) {
-        currentDB.value = dbOptionsRemote.value[0];
-        currentDBName.value = dbOptionsRemote.value[0].database;
-    }
-    if (currentDB.value) {
-        search();
-    }
-    if (currentDB.value?.from === 'remote') {
-        maskShow.value = false;
+    } finally {
+        isLoaded.value = true;
     }
 };
 const onDelete = async (row: Database.PostgresqlDBInfo) => {

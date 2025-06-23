@@ -209,7 +209,7 @@ const globalStore = GlobalStore();
 
 const loading = ref(false);
 const selects = ref<any>([]);
-const maskShow = ref(true);
+const maskShow = ref(false);
 const addRef = ref();
 const detailRef = ref();
 const delRef = ref();

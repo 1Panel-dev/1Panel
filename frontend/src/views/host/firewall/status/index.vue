@@ -46,7 +46,7 @@ import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
 import { ref } from 'vue';
 
-const baseInfo = ref<Host.FirewallBase>({ isActive: false, isExist: false, name: '', version: '', pingStatus: '' });
+const baseInfo = ref<Host.FirewallBase>({ isActive: false, isExist: true, name: '', version: '', pingStatus: '' });
 const onPing = ref('Disable');
 const oldStatus = ref();
 

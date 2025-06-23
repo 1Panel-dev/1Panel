@@ -316,7 +316,7 @@ onMounted(async () => {
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .header {
     padding-bottom: 10px;
 }

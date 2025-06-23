@@ -75,8 +75,8 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 
 const data = ref({
-    isExist: false,
-    isActive: false,
+    isExist: true,
+    isActive: true,
     version: '',
 
     freshIsExist: false,

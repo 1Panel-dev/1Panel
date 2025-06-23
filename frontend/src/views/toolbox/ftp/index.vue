@@ -175,8 +175,8 @@ const paginationConfig = reactive({
 const searchName = ref();
 
 const form = reactive({
-    isActive: false,
-    isExist: false,
+    isActive: true,
+    isExist: true,
 });
 
 const opRef = ref();
