@@ -54,7 +54,7 @@
                     <el-text type="warning">{{ $t('app.backupAppHelper') }}</el-text>
                 </span>
             </el-form-item>
-            <el-form-item pro="pullImage" v-if="operateReq.operate === 'upgrade'">
+            <el-form-item prop="pullImage" v-if="operateReq.operate === 'upgrade'">
                 <el-checkbox v-model="operateReq.pullImage" :label="$t('app.pullImage')" size="large" />
                 <span class="input-help">{{ $t('app.pullImageHelper') }}</span>
             </el-form-item>
@@ -62,7 +62,8 @@
 
         <div v-if="operateReq.operate === 'upgrade'">
             <el-text type="warning">{{ $t('app.upgradeWarn') }}</el-text>
-            <el-button class="ml-1.5" link @click="openDiff()">{{ $t('app.showDiff') }}</el-button>
+            <br />
+            <el-button @click="openDiff()" type="primary">{{ $t('app.showDiff') }}</el-button>
             <div>
                 <el-checkbox v-model="useNewCompose" :label="$t('app.useCustom')" size="large" />
             </div>
