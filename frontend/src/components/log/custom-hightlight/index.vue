@@ -112,6 +112,11 @@ const defaultRules: TokenRule[] = [
         color: '#4A90E2',
     },
     {
+        type: 'ipv6',
+        pattern: /\b(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}\b/g,
+        color: '#4A90E2',
+    },
+    {
         type: 'server-host',
         pattern: /(?:server|host):\s*[^,\s]+/g,
         color: '#5D6D7E',
