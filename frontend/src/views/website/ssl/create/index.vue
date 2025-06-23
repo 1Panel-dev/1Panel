@@ -34,8 +34,16 @@
                         :label="acme.email + ' [' + getAccountName(acme.type) + '] '"
                         :value="acme.id"
                     >
-                        <span>{{ acme.email }}</span>
-                        <el-tag type="success" class="ml-2">{{ getAccountName(acme.type) }}</el-tag>
+                        <el-row>
+                            <el-col :span="20">
+                                <span>{{ acme.email }}</span>
+                            </el-col>
+                            <el-col :span="4">
+                                <span>
+                                    <el-tag type="success">{{ getAccountName(acme.type) }}</el-tag>
+                                </span>
+                            </el-col>
+                        </el-row>
                     </el-option>
                 </el-select>
             </el-form-item>
@@ -71,10 +79,10 @@
                         :value="dns.id"
                     >
                         <el-row>
-                            <el-col :span="6">
+                            <el-col :span="20">
                                 <span>{{ dns.name }}</span>
                             </el-col>
-                            <el-col :span="11">
+                            <el-col :span="4">
                                 <span>
                                     <el-tag type="success">{{ getDNSName(dns.type) }}</el-tag>
                                 </span>
