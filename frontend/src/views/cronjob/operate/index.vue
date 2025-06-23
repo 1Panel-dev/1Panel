@@ -452,10 +452,11 @@ import { storeToRefs } from 'pinia';
 import { GlobalStore } from '@/store';
 import LicenseImport from '@/components/license-import/index.vue';
 import { Codemirror } from 'vue-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
+import { javascript } from '@codemirror/legacy-modes/mode/javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
+import { StreamLanguage } from '@codemirror/language';
 
-const extensions = [javascript(), oneDark];
+const extensions = [StreamLanguage.define(javascript), oneDark];
 
 const router = useRouter();
 
