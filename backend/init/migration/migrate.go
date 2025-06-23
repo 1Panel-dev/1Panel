@@ -108,6 +108,7 @@ func Init() {
 		migrations.AddLicenseVerify,
 
 		migrations.AddMcpServer,
+		migrations.AddPbootCMSPHPExtensions,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

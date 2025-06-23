@@ -469,3 +469,19 @@ var AddMcpServer = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddPbootCMSPHPExtensions = &gormigrate.Migration{
+	ID: "20250625-add-php-extensions",
+	Migrate: func(tx *gorm.DB) error {
+		item := &model.PHPExtensions{
+			Name: "PbootCMS",
+		}
+		if err := tx.Where("name = ?", "PbootCMS").FirstOrCreate(item, &model.PHPExtensions{
+			Name:       "PbootCMS",
+			Extensions: "curl,gd,mbstring,mysqli,openssl,pdo_mysql,pdo_sqlite,sqlite3",
+		}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
