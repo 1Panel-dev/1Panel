@@ -54,6 +54,18 @@
                             <span v-else>-</span>
                         </template>
                     </el-table-column>
+                    <el-table-column :label="$t('website.remark')" prop="remark" min-width="150px">
+                        <template #default="{ row }">
+                            <fu-read-write-switch>
+                                <template #read>
+                                    <MsgInfo :info="row.remark" :width="'150'" />
+                                </template>
+                                <template #default="{ read }">
+                                    <el-input v-model="row.remark" @blur="updateRuntimeRemark(row, read)" />
+                                </template>
+                            </fu-read-write-switch>
+                        </template>
+                    </el-table-column>
                     <el-table-column
                         prop="createdAt"
                         :label="$t('commons.table.date')"
@@ -85,7 +97,7 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue';
 import { Runtime } from '@/api/interface/runtime';
-import { OperateRuntime, RuntimeDeleteCheck, SearchRuntimes, SyncRuntime } from '@/api/modules/runtime';
+import { RuntimeDeleteCheck, SearchRuntimes, SyncRuntime } from '@/api/modules/runtime';
 import { dateFormat } from '@/utils/util';
 import Operate from '@/views/website/runtime/python/operate/index.vue';
 import Delete from '@/views/website/runtime/delete/index.vue';
@@ -95,12 +107,12 @@ import router from '@/routers/router';
 import ComposeLogs from '@/components/log/compose/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import AppResources from '@/views/website/runtime/php/check/index.vue';
-import { ElMessageBox } from 'element-plus';
 import RuntimeStatus from '@/views/website/runtime/components/runtime-status.vue';
 import PortJump from '@/views/website/runtime/components/port-jump.vue';
 import Terminal from '@/views/website/runtime/components/terminal.vue';
 import { disabledButton } from '@/utils/runtime';
 import { GlobalStore } from '@/store';
+import { operateRuntime, updateRuntimeRemark } from '../common/utils';
 const globalStore = GlobalStore();
 const mobile = computed(() => {
     return globalStore.isMobile();
@@ -131,7 +143,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.operate.stop'),
         click: function (row: Runtime.Runtime) {
-            operateRuntime('down', row.id);
+            operateRuntime('down', row.id, loading, search);
         },
         disabled: function (row: Runtime.Runtime) {
             return disabledButton(row, 'stop');
@@ -140,7 +152,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.operate.start'),
         click: function (row: Runtime.Runtime) {
-            operateRuntime('up', row.id);
+            operateRuntime('up', row.id, loading, search);
         },
         disabled: function (row: Runtime.Runtime) {
             return disabledButton(row, 'start');
@@ -149,7 +161,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.restart'),
         click: function (row: Runtime.Runtime) {
-            operateRuntime('restart', row.id);
+            operateRuntime('restart', row.id, loading, search);
         },
         disabled: function (row: Runtime.Runtime) {
             return disabledButton(row, 'restart');
@@ -233,28 +245,6 @@ const goDashboard = async (port: any, protocol: string) => {
 const openTerminal = (row: Runtime.Runtime) => {
     const container = row.params['CONTAINER_NAME'];
     terminalRef.value.acceptParams({ containerID: container, container: container });
-};
-
-const operateRuntime = async (operate: string, ID: number) => {
-    try {
-        const action = await ElMessageBox.confirm(
-            i18n.global.t('runtime.operatorHelper', [i18n.global.t('commons.operate.' + operate)]),
-            i18n.global.t('commons.operate.' + operate),
-            {
-                confirmButtonText: i18n.global.t('commons.button.confirm'),
-                cancelButtonText: i18n.global.t('commons.button.cancel'),
-                type: 'info',
-            },
-        );
-        if (action === 'confirm') {
-            loading.value = true;
-            await OperateRuntime({ operate: operate, ID: ID });
-            search();
-        }
-    } catch (error) {
-    } finally {
-        loading.value = false;
-    }
 };
 
 const toFolder = (folder: string) => {

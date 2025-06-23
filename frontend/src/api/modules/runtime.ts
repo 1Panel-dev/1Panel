@@ -129,3 +129,7 @@ export const getPHPContainerConfig = (id: number) => {
 export const updatePHPContainerConfig = (req: Runtime.PHPContainerConfig) => {
     return http.post<any>(`/runtimes/php/container/update`, req);
 };
+
+export const updateRemark = (req: Runtime.RemarkUpdate) => {
+    return http.post(`/runtimes/remark`, req);
+};

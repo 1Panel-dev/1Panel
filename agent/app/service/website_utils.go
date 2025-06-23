@@ -1078,7 +1078,7 @@ func getWebsiteDomains(domains []request.WebsiteDomain, defaultPort int, website
 				err = buserr.WithMap("ErrPortExist", errMap, nil)
 				return
 			}
-			if common.ScanPort(port) {
+			if port != 443 && common.ScanPort(port) {
 				err = buserr.WithDetail("ErrPortInUsed", port, nil)
 				return
 			}

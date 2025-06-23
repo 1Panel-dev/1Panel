@@ -535,3 +535,23 @@ func (b *BaseApi) GetPHPContainerConfig(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, data)
 }
+
+// @Tags Runtime
+// @Summary Update runtime remark
+// @Accept json
+// @Param request body request.RuntimeRemarkUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /runtimes/remark [post]
+func (b *BaseApi) UpdateRuntimeRemark(c *gin.Context) {
+	var req request.RuntimeRemark
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := runtimeService.UpdateRemark(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}

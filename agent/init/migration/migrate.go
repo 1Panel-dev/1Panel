@@ -24,6 +24,7 @@ func InitAgentDB() {
 		migrations.InitBackup,
 		migrations.InitDefault,
 		migrations.UpdateWebsiteExpireDate,
+		migrations.UpdateRuntime,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

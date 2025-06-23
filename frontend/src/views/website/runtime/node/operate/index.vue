@@ -23,6 +23,9 @@
             <el-form-item :label="$t('app.containerName')" prop="params.CONTAINER_NAME">
                 <el-input v-model.trim="runtime.params['CONTAINER_NAME']"></el-input>
             </el-form-item>
+            <el-form-item :label="$t('website.remark')" prop="remark">
+                <el-input type="textarea" :rows="1" clearable v-model="runtime.remark" />
+            </el-form-item>
             <el-form-item :label="$t('runtime.packageManager')" prop="params.PACKAGE_MANAGER">
                 <el-select v-model="runtime.params['PACKAGE_MANAGER']">
                     <el-option label="npm" value="npm"></el-option>
@@ -109,6 +112,7 @@ const initData = (type: string) => ({
     exposedPorts: [],
     environments: [],
     volumes: [],
+    remark: '',
 });
 let runtime = reactive<Runtime.RuntimeCreate>(initData('node'));
 const rules = ref<any>({
@@ -229,6 +233,7 @@ const getRuntime = async (id: number) => {
             params: data.params,
             codeDir: data.codeDir,
             port: data.port,
+            remark: data.remark,
         });
         runtime.exposedPorts = data.exposedPorts || [];
         runtime.environments = data.environments || [];

@@ -119,6 +119,9 @@
                     <el-form-item :label="$t('app.containerName')" prop="params.CONTAINER_NAME">
                         <el-input v-model.trim="runtime.params['CONTAINER_NAME']"></el-input>
                     </el-form-item>
+                    <el-form-item :label="$t('website.remark')" prop="remark">
+                        <el-input type="textarea" :rows="1" clearable v-model="runtime.remark" />
+                    </el-form-item>
                     <el-form-item>
                         <el-alert :title="$t('php.containerConfigHelper')" type="info" :closable="false" />
                     </el-form-item>
@@ -269,6 +272,7 @@ const initData = (type: string) => ({
     rebuild: false,
     source: phpSources[0].value,
     environments: [],
+    remark: '',
 });
 const extensions = ref();
 const formFields = ref();
@@ -433,6 +437,7 @@ const getRuntime = async (id: number) => {
             version: data.version,
             rebuild: true,
             source: data.source,
+            remark: data.remark,
         });
 
         const fileds = data.appParams;

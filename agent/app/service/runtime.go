@@ -52,6 +52,7 @@ type IRuntimeService interface {
 	SyncForRestart() error
 	SyncRuntimeStatus() error
 	DeleteCheck(installID uint) ([]dto.AppResource, error)
+	UpdateRemark(req request.RuntimeRemark) error
 
 	GetPHPExtensions(runtimeID uint) (response.PHPExtensionRes, error)
 	InstallPHPExtension(req request.PHPExtensionInstallReq) error
@@ -108,6 +109,7 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, e
 				Type:     create.Type,
 				Version:  create.Version,
 				Status:   constant.StatusNormal,
+				Remark:   create.Remark,
 			}
 			return nil, runtimeRepo.Create(context.Background(), runtime)
 		}
@@ -168,6 +170,7 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (*model.Runtime, e
 		Version:       create.Version,
 		ContainerName: containerName.(string),
 		Port:          strings.Join(hostPorts, ","),
+		Remark:        create.Remark,
 	}
 
 	switch create.Type {
@@ -454,6 +457,7 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 		Params:  req.Params,
 		CodeDir: req.CodeDir,
 		Version: req.Version,
+		Remark:  req.Remark,
 		NodeConfig: request.NodeConfig{
 			Install:      true,
 			ExposedPorts: req.ExposedPorts,
@@ -465,6 +469,7 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 	if err != nil {
 		return err
 	}
+	runtime.Remark = req.Remark
 	runtime.Env = string(envContent)
 	runtime.DockerCompose = string(composeContent)
 
@@ -1142,4 +1147,13 @@ func (r *RuntimeService) OperateSupervisorProcessFile(req request.PHPSupervisorP
 	configDir := path.Join(supervisorDir, "supervisor.d")
 	logFile := path.Join(supervisorDir, "log", fmt.Sprintf("%s.out.log", req.SupervisorProcessFileReq.Name))
 	return handleSupervisorFile(req.SupervisorProcessFileReq, configDir, runtime.ContainerName, logFile)
+}
+
+func (r *RuntimeService) UpdateRemark(req request.RuntimeRemark) error {
+	runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(req.ID))
+	if err != nil {
+		return err
+	}
+	runtime.Remark = req.Remark
+	return runtimeRepo.Save(runtime)
 }

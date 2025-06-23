@@ -83,6 +83,18 @@
                             </el-button>
                         </template>
                     </el-table-column>
+                    <el-table-column :label="$t('website.remark')" prop="remark" min-width="150px">
+                        <template #default="{ row }">
+                            <fu-read-write-switch>
+                                <template #read>
+                                    <MsgInfo :info="row.remark" :width="'150'" />
+                                </template>
+                                <template #default="{ read }">
+                                    <el-input v-model="row.remark" @blur="updateRuntimeRemark(row, read)" />
+                                </template>
+                            </fu-read-write-switch>
+                        </template>
+                    </el-table-column>
                     <el-table-column
                         prop="createdAt"
                         :label="$t('commons.table.date')"
@@ -119,7 +131,7 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue';
 import { Runtime } from '@/api/interface/runtime';
-import { DeleteRuntime, OperateRuntime, RuntimeDeleteCheck, SearchRuntimes } from '@/api/modules/runtime';
+import { DeleteRuntime, RuntimeDeleteCheck, SearchRuntimes } from '@/api/modules/runtime';
 import { dateFormat } from '@/utils/util';
 import { ElMessageBox } from 'element-plus';
 import { containerPrune } from '@/api/modules/container';
@@ -139,6 +151,7 @@ import Terminal from '@/views/website/runtime/components/terminal.vue';
 import { disabledButton } from '@/utils/runtime';
 import { GlobalStore } from '@/store';
 import router from '@/routers/router';
+import { operateRuntime, updateRuntimeRemark } from '../common/utils';
 const globalStore = GlobalStore();
 const mobile = computed(() => {
     return globalStore.isMobile();
@@ -200,7 +213,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.operate.stop'),
         click: function (row: Runtime.Runtime) {
-            operateRuntime('down', row.id);
+            operateRuntime('down', row.id, loading, search);
         },
         disabled: function (row: Runtime.Runtime) {
             return disabledButton(row, 'stop');
@@ -209,7 +222,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.operate.start'),
         click: function (row: Runtime.Runtime) {
-            operateRuntime('up', row.id);
+            operateRuntime('up', row.id, loading, search);
         },
         disabled: function (row: Runtime.Runtime) {
             return disabledButton(row, 'start');
@@ -218,7 +231,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.restart'),
         click: function (row: Runtime.Runtime) {
-            operateRuntime('restart', row.id);
+            operateRuntime('restart', row.id, loading, search);
         },
         disabled: function (row: Runtime.Runtime) {
             return disabledButton(row, 'restart');
@@ -328,28 +341,6 @@ const openDelete = async (row: Runtime.Runtime) => {
             });
         }
     });
-};
-
-const operateRuntime = async (operate: string, ID: number) => {
-    try {
-        const action = await ElMessageBox.confirm(
-            i18n.global.t('runtime.operatorHelper', [i18n.global.t('commons.button.' + operate)]),
-            i18n.global.t('commons.button.' + operate),
-            {
-                confirmButtonText: i18n.global.t('commons.button.confirm'),
-                cancelButtonText: i18n.global.t('commons.button.cancel'),
-                type: 'info',
-            },
-        );
-        if (action === 'confirm') {
-            loading.value = true;
-            await OperateRuntime({ operate: operate, ID: ID });
-            search();
-        }
-    } catch (error) {
-    } finally {
-        loading.value = false;
-    }
 };
 
 const onOpenBuildCache = () => {

@@ -314,3 +314,12 @@ var UpdateWebsiteExpireDate = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var UpdateRuntime = &gormigrate.Migration{
+	ID: "20250624-update-runtime",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(
+			&model.Runtime{},
+		)
+	},
+}

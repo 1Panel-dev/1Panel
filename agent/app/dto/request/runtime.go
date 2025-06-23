@@ -12,15 +12,17 @@ type RuntimeSearch struct {
 }
 
 type RuntimeCreate struct {
-	AppDetailID uint                   `json:"appDetailId"`
-	Name        string                 `json:"name"`
-	Params      map[string]interface{} `json:"params"`
-	Resource    string                 `json:"resource"`
-	Image       string                 `json:"image"`
-	Type        string                 `json:"type"`
-	Version     string                 `json:"version"`
-	Source      string                 `json:"source"`
-	CodeDir     string                 `json:"codeDir"`
+	AppDetailID uint   `json:"appDetailId"`
+	Name        string `json:"name"`
+	Resource    string `json:"resource"`
+	Image       string `json:"image"`
+	Type        string `json:"type"`
+	Version     string `json:"version"`
+	Source      string `json:"source"`
+	CodeDir     string `json:"codeDir"`
+	Remark      string `json:"remark"`
+
+	Params map[string]interface{} `json:"params"`
 	NodeConfig
 }
 
@@ -53,14 +55,16 @@ type RuntimeDelete struct {
 }
 
 type RuntimeUpdate struct {
-	Name    string                 `json:"name"`
-	ID      uint                   `json:"id"`
-	Params  map[string]interface{} `json:"params"`
-	Image   string                 `json:"image"`
-	Version string                 `json:"version"`
-	Rebuild bool                   `json:"rebuild"`
-	Source  string                 `json:"source"`
-	CodeDir string                 `json:"codeDir"`
+	Name    string `json:"name"`
+	ID      uint   `json:"id"`
+	Image   string `json:"image"`
+	Version string `json:"version"`
+	Rebuild bool   `json:"rebuild"`
+	Source  string `json:"source"`
+	CodeDir string `json:"codeDir"`
+	Remark  string `json:"remark"`
+
+	Params map[string]interface{} `json:"params"`
 	NodeConfig
 }
 
@@ -130,4 +134,9 @@ type PHPContainerConfig struct {
 	ExposedPorts  []ExposedPort `json:"exposedPorts"`
 	Environments  []Environment `json:"environments"`
 	Volumes       []Volume      `json:"volumes"`
+}
+
+type RuntimeRemark struct {
+	ID     uint   `json:"id" validate:"required"`
+	Remark string `json:"remark"`
 }

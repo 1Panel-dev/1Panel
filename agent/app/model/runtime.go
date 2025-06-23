@@ -23,6 +23,7 @@ type Runtime struct {
 	Message       string `json:"message"`
 	CodeDir       string `json:"codeDir"`
 	ContainerName string `json:"containerName"`
+	Remark        string `json:"remark"`
 }
 
 func (r *Runtime) GetComposePath() string {

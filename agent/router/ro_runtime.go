@@ -48,5 +48,7 @@ func (r *RuntimeRouter) InitRouter(Router *gin.RouterGroup) {
 		groupRouter.GET("/supervisor/process/:id", baseApi.GetSupervisorProcess)
 		groupRouter.POST("/supervisor/process", baseApi.OperateSupervisorProcess)
 		groupRouter.POST("/supervisor/process/file", baseApi.OperateSupervisorProcessFile)
+
+		groupRouter.POST("/remark", baseApi.UpdateRuntimeRemark)
 	}
 }

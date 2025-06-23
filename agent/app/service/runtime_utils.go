@@ -142,9 +142,21 @@ func reCreateRuntime(runtime *model.Runtime) {
 }
 
 func runComposeCmdWithLog(operate string, composePath string, logPath string) error {
-	cmd := exec.Command("docker", "compose", "-f", composePath, operate)
-	if operate == "up" {
-		cmd = exec.Command("docker", "compose", "-f", composePath, operate, "-d")
+	var cmd *exec.Cmd
+	dockerCommand := global.CONF.DockerConfig.Command
+
+	if dockerCommand == "docker-compose" {
+		if operate == "up" {
+			cmd = exec.Command("docker-compose", "-f", composePath, operate, "-d")
+		} else {
+			cmd = exec.Command("docker-compose", "-f", composePath, operate)
+		}
+	} else {
+		if operate == "up" {
+			cmd = exec.Command("docker", "compose", "-f", composePath, operate, "-d")
+		} else {
+			cmd = exec.Command("docker", "compose", "-f", composePath, operate)
+		}
 	}
 	logFile, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, constant.FilePerm)
 	if err != nil {

@@ -16,6 +16,7 @@ export namespace Runtime {
         codeDir: string;
         port: string;
         appID: number;
+        remark: string;
     }
 
     export interface RuntimeReq extends ReqPage {
@@ -61,6 +62,7 @@ export namespace Runtime {
         exposedPorts?: ExposedPort[];
         environments?: Environment[];
         volumes?: Volume[];
+        remark?: string;
     }
 
     export interface ExposedPort {
@@ -217,5 +219,10 @@ export namespace Runtime {
         exposedPorts: ExposedPort[];
         environments: Environment[];
         volumes: Volume[];
+    }
+
+    export interface RemarkUpdate {
+        id: number;
+        remark: string;
     }
 }
