@@ -34,7 +34,7 @@ func (u *SnapshotService) SnapshotCreate(parentTask *task.Task, req dto.Snapshot
 		scope = "agent"
 	}
 	if jobID == 0 {
-		req.Name = fmt.Sprintf("1panel-%s-%s-linux-%s-%s", versionItem.Value, scope, loadOs(), time.Now().Format(constant.DateTimeSlimLayout))
+		req.Name = fmt.Sprintf("1panel-%s-%s-linux-%s-%s", scope, versionItem.Value, loadOs(), time.Now().Format(constant.DateTimeSlimLayout))
 	}
 	appItem, _ := json.Marshal(req.AppData)
 	panelItem, _ := json.Marshal(req.PanelData)

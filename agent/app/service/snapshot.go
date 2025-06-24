@@ -68,7 +68,7 @@ func (u *SnapshotService) SnapshotImport(req dto.SnapshotImport) error {
 	}
 
 	for _, snapName := range req.Names {
-		if !strings.HasPrefix(snapName, "1panel-v2.") && !strings.HasPrefix(snapName, "snapshot-1panel-v2.") {
+		if !checkSnapshotIsOk(snapName) {
 			return fmt.Errorf("incorrect snapshot name format of %s", snapName)
 		}
 		snap, _ := snapshotRepo.Get(repo.WithByName(strings.ReplaceAll(snapName, ".tar.gz", "")))
@@ -77,11 +77,11 @@ func (u *SnapshotService) SnapshotImport(req dto.SnapshotImport) error {
 		}
 	}
 	for _, snap := range req.Names {
-		shortName := strings.TrimPrefix(snap, "snapshot_")
-		nameItems := strings.Split(shortName, "-")
-		if !strings.HasPrefix(shortName, "1panel-v") || !strings.HasSuffix(shortName, ".tar.gz") || len(nameItems) < 3 {
-			return fmt.Errorf("incorrect snapshot name format of %s", shortName)
-		}
+		shortName := strings.ReplaceAll(snap, "snapshot-", "")
+		shortName = strings.ReplaceAll(shortName, "1panel-", "")
+		shortName = strings.ReplaceAll(shortName, "core-", "")
+		shortName = strings.ReplaceAll(shortName, "agent-", "")
+		nameItems := strings.Split(shortName, "-linux")
 		if strings.HasSuffix(snap, ".tar.gz") {
 			snap = strings.ReplaceAll(snap, ".tar.gz", "")
 		}
@@ -89,7 +89,7 @@ func (u *SnapshotService) SnapshotImport(req dto.SnapshotImport) error {
 			Name:              snap,
 			SourceAccountIDs:  fmt.Sprintf("%v", req.BackupAccountID),
 			DownloadAccountID: req.BackupAccountID,
-			Version:           nameItems[1],
+			Version:           nameItems[0],
 			Description:       req.Description,
 			Status:            constant.StatusSuccess,
 		}
@@ -402,4 +402,14 @@ func loadFile(pathItem string, index int, fileOp fileUtils.FileOp) ([]dto.DataTr
 		data = append(data, itemData)
 	}
 	return data, nil
+}
+
+func checkSnapshotIsOk(name string) bool {
+	names := []string{"1panel-core-v2.", "1panel-agent-v2.", "1panel-v2.", "snapshot-1panel-core-v2.", "snapshot-1panel-agent-v2."}
+	for _, item := range names {
+		if strings.HasPrefix(name, item) {
+			return true
+		}
+	}
+	return false
 }

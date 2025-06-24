@@ -38,6 +38,18 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 		_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"recover_status": constant.StatusFailed, "recover_message": errInfo})
 		return errors.New(errInfo)
 	}
+	if !strings.Contains(snap.Name, "-v2.") {
+		return errors.New("snapshots are currently not supported for recovery across major versions")
+	}
+	if !strings.Contains(snap.Name, "-core") && !strings.Contains(snap.Name, "-agent") {
+		return errors.New("the name of the snapshot file does not conform to the format")
+	}
+	if strings.Contains(snap.Name, "-core") && !global.IsMaster {
+		return errors.New("the snapshot of the master node cannot be restored on the agent nodes")
+	}
+	if strings.Contains(snap.Name, "-agent") && global.IsMaster {
+		return errors.New("the snapshot of the agent node cannot be restored on the master node")
+	}
 	if len(snap.RollbackStatus) != 0 && snap.RollbackStatus != constant.StatusSuccess {
 		req.IsNew = true
 	}
