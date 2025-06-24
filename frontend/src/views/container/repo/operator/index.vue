@@ -81,6 +81,8 @@
             </span>
         </template>
     </el-drawer>
+
+    <ConfirmDialog ref="confirmDialog" @confirm="submit" />
 </template>
 
 <script lang="ts" setup>
@@ -105,6 +107,8 @@ const drawerVisible = ref(false);
 const dialogData = ref<DialogProps>({
     title: '',
 });
+const confirmDialog = ref();
+
 const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
     title.value = i18n.global.t('commons.button.' + dialogData.value.title);
@@ -114,6 +118,7 @@ const emit = defineEmits<{ (e: 'search'): void }>();
 
 const handleClose = () => {
     drawerVisible.value = false;
+    emit('search');
 };
 const rules = reactive({
     name: [Rules.requiredInput, Rules.name],
@@ -142,21 +147,23 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        loading.value = true;
-        if (dialogData.value.title === 'add') {
-            await createImageRepo(dialogData.value.rowData!)
-                .then(() => {
-                    loading.value = false;
-                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                    emit('search');
-                    drawerVisible.value = false;
-                })
-                .catch(() => {
-                    loading.value = false;
-                });
+        if (dialogData.value.rowData.protocol === 'https') {
+            submit();
             return;
         }
-        await updateImageRepo(dialogData.value.rowData!)
+        let params = {
+            header: i18n.global.t('container.createRepo'),
+            operationInfo: i18n.global.t('container.createRepoHelper'),
+            submitInputInfo: i18n.global.t('database.restartNow'),
+        };
+        confirmDialog.value!.acceptParams(params);
+    });
+};
+
+const submit = async () => {
+    loading.value = true;
+    if (dialogData.value.title === 'add') {
+        await createImageRepo(dialogData.value.rowData!)
             .then(() => {
                 loading.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
@@ -166,9 +173,19 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             .catch(() => {
                 loading.value = false;
             });
-    });
+        return;
+    }
+    await updateImageRepo(dialogData.value.rowData!)
+        .then(() => {
+            loading.value = false;
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            emit('search');
+            drawerVisible.value = false;
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
-
 defineExpose({
     acceptParams,
 });

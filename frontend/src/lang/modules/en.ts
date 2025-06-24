@@ -833,6 +833,7 @@ const message = {
 
         repo: 'Registries',
         createRepo: 'Add',
+        createRepoHelper: 'Adding an HTTP-type repository requires restarting the Docker service.',
         httpRepo: 'Choosing HTTP protocol requires restarting the Docker service to add it into insecure registries.',
         delInsecure: 'Deletion of credit',
         delInsecureHelper:
