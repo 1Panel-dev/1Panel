@@ -958,7 +958,7 @@ func collectLogs(done <-chan struct{}, params dto.StreamLog, messageChan chan<- 
 		}
 	}()
 
-	scanner := bufio.NewScanner(stdout)
+	reader := bufio.NewReader(stdout)
 
 	processKilled := false
 	go func() {
@@ -972,19 +972,30 @@ func collectLogs(done <-chan struct{}, params dto.StreamLog, messageChan chan<- 
 		}
 	}()
 
-	for scanner.Scan() {
-		message := scanner.Text()
+	for {
+		line, err := reader.ReadString('\n')
+		if err != nil {
+			if err == io.EOF {
+				if len(line) > 0 {
+					line = strings.TrimSuffix(line, "\n")
+					select {
+					case messageChan <- line:
+					case <-done:
+						return
+					}
+				}
+				break
+			}
+			errorChan <- fmt.Errorf("reader error: %v", err)
+			return
+		}
+		line = strings.TrimSuffix(line, "\n")
 		select {
-		case messageChan <- message:
+		case messageChan <- line:
 		case <-done:
 			return
 		}
 	}
-
-	if err = scanner.Err(); err != nil && err != io.EOF {
-		errorChan <- fmt.Errorf("scanner error: %v", err)
-	}
-
 	_ = dockerCmd.Wait()
 }
 
