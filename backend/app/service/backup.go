@@ -518,47 +518,40 @@ func (u *BackupService) loadAccessToken(backup *model.BackupAccount) error {
 }
 
 func (u *BackupService) loadRecordSize(records []model.BackupRecord) ([]dto.BackupFile, error) {
-	var datas []dto.BackupFile
+	data := make([]dto.BackupFile, len(records))
 	clientMap := make(map[string]loadSizeHelper)
 	var wg sync.WaitGroup
 	for i := 0; i < len(records); i++ {
-		var item dto.BackupFile
-		item.ID = records[i].ID
-		item.Name = records[i].FileName
+		data[i].ID = records[i].ID
+		data[i].Name = records[i].FileName
 		itemPath := path.Join(records[i].FileDir, records[i].FileName)
 		if _, ok := clientMap[records[i].Source]; !ok {
 			backup, err := backupRepo.Get(commonRepo.WithByType(records[i].Source))
 			if err != nil {
 				global.LOG.Errorf("load backup model %s from db failed, err: %v", records[i].Source, err)
 				clientMap[records[i].Source] = loadSizeHelper{}
-				datas = append(datas, item)
 				continue
 			}
 			client, err := u.NewClient(&backup)
 			if err != nil {
 				global.LOG.Errorf("load backup client %s from db failed, err: %v", records[i].Source, err)
 				clientMap[records[i].Source] = loadSizeHelper{}
-				datas = append(datas, item)
 				continue
 			}
-			item.Size, _ = client.Size(path.Join(strings.TrimLeft(backup.BackupPath, "/"), itemPath))
-			datas = append(datas, item)
+			data[i].Size, _ = client.Size(path.Join(strings.TrimLeft(backup.BackupPath, "/"), itemPath))
 			clientMap[records[i].Source] = loadSizeHelper{backupPath: strings.TrimLeft(backup.BackupPath, "/"), client: client, isOk: true}
 			continue
 		}
 		if clientMap[records[i].Source].isOk {
 			wg.Add(1)
 			go func(index int) {
-				item.Size, _ = clientMap[records[index].Source].client.Size(path.Join(clientMap[records[index].Source].backupPath, itemPath))
-				datas = append(datas, item)
+				data[i].Size, _ = clientMap[records[index].Source].client.Size(path.Join(clientMap[records[index].Source].backupPath, itemPath))
 				wg.Done()
 			}(i)
-		} else {
-			datas = append(datas, item)
 		}
 	}
 	wg.Wait()
-	return datas, nil
+	return data, nil
 }
 
 func loadLocalDir() (string, error) {
