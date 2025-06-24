@@ -2980,6 +2980,7 @@ const message = {
             belongToIpGroup: 'IP グループに属しています',
             notBelongToIpGroup: 'IP グループに属していません',
             unknownWebsiteKey: '未知のドメイン',
+            special: '特別な文字は使用できません',
         },
         monitor: {
             name: 'ウェブサイトモニタリング',

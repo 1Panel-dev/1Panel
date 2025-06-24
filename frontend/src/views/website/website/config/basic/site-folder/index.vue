@@ -114,7 +114,7 @@ const search = () => {
             updatePermission.id = website.value.id;
             updatePermission.group = website.value.group === '' ? '1000' : website.value.group;
             updatePermission.user = website.value.user === '' ? '1000' : website.value.user;
-            if (website.value.type === 'static' || website.value.runtimeID > 0) {
+            if ((website.value.type === 'static' || website.value.runtimeID > 0) && website.value.type != 'subsite') {
                 configDir.value = true;
                 getConfig();
             }

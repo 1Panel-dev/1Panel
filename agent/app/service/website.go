@@ -415,6 +415,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 			return err
 		}
 		website.ParentWebsiteID = parentWebsite.ID
+		website.SiteDir = create.SiteDir
 	}
 
 	configNginx := func(t *task.Task) error {

@@ -3048,6 +3048,7 @@ const message = {
             belongToIpGroup: 'Pertence ao Grupo de IP',
             notBelongToIpGroup: 'Não pertence ao Grupo de IP',
             unknownWebsiteKey: 'Domínio Desconhecido',
+            special: 'Domínio Especial',
         },
         monitor: {
             name: 'Monitoramento de Websites',

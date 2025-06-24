@@ -3109,6 +3109,7 @@ const message = {
             belongToIpGroup: 'Belongs to IP Group',
             notBelongToIpGroup: 'Does not belong to IP Group',
             unknownWebsiteKey: 'Unknown Domain',
+            special: 'Special',
         },
         monitor: {
             name: 'Website Monitoring',

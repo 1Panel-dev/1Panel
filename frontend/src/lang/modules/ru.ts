@@ -3040,6 +3040,7 @@ const message = {
             belongToIpGroup: 'Принадлежит к группе IP',
             notBelongToIpGroup: 'Не принадлежит к группе IP',
             unknownWebsiteKey: 'Неизвестный домен',
+            special: 'Специальный',
         },
         monitor: {
             name: 'Мониторинг веб-сайта',

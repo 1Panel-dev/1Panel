@@ -2899,6 +2899,7 @@ const message = {
             belongToIpGroup: '屬於 IP 組',
             notBelongToIpGroup: '不屬於 IP 組',
             unknownWebsiteKey: '未知域名',
+            special: '指定',
         },
         monitor: {
             name: '網站監控',

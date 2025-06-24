@@ -3045,6 +3045,7 @@ const message = {
             belongToIpGroup: 'Tergolong dalam Kumpulan IP',
             notBelongToIpGroup: 'Tidak tergolong dalam Kumpulan IP',
             unknownWebsiteKey: 'Domain Tidak Diketahui',
+            special: 'Peraturan Khas',
         },
         monitor: {
             name: 'Pemantauan Laman Web',

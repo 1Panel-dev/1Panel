@@ -32,6 +32,8 @@ type WebsiteCreate struct {
 	TaskID          string `json:"taskID"`
 	ParentWebsiteID uint   `json:"parentWebsiteID"`
 
+	SiteDir string `json:"siteDir"`
+
 	RuntimeConfig
 	FtpConfig
 	DataBaseConfig

@@ -2874,6 +2874,7 @@ const message = {
             belongToIpGroup: '属于 IP 组',
             notBelongToIpGroup: '不属于 IP 组',
             unknownWebsiteKey: '未知域名',
+            special: '指定',
         },
         monitor: {
             name: '网站监控',
