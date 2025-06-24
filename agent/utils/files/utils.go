@@ -7,6 +7,13 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
+	"golang.org/x/text/encoding"
+	"golang.org/x/text/encoding/charmap"
+	"golang.org/x/text/encoding/japanese"
+	"golang.org/x/text/encoding/korean"
+	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/encoding/traditionalchinese"
+	"golang.org/x/text/encoding/unicode"
 	"io"
 	"net/http"
 	"os"
@@ -200,4 +207,69 @@ func DownloadFileWithProxy(url, dst string) error {
 		return fmt.Errorf("save download file [%s] error, err %s", dst, err.Error())
 	}
 	return nil
+}
+
+func GetDecoderByName(name string) encoding.Encoding {
+	switch strings.ToLower(name) {
+	case "gbk":
+		return simplifiedchinese.GBK
+	case "gb18030":
+		return simplifiedchinese.GB18030
+	case "big5":
+		return traditionalchinese.Big5
+	case "euc-jp":
+		return japanese.EUCJP
+	case "iso-2022-jp":
+		return japanese.ISO2022JP
+	case "shift_jis":
+		return japanese.ShiftJIS
+	case "euc-kr":
+		return korean.EUCKR
+	case "utf-16be":
+		return unicode.UTF16(unicode.BigEndian, unicode.ExpectBOM)
+	case "utf-16le":
+		return unicode.UTF16(unicode.LittleEndian, unicode.ExpectBOM)
+	case "windows-1250":
+		return charmap.Windows1250
+	case "windows-1251":
+		return charmap.Windows1251
+	case "windows-1252":
+		return charmap.Windows1252
+	case "windows-1253":
+		return charmap.Windows1253
+	case "windows-1254":
+		return charmap.Windows1254
+	case "windows-1255":
+		return charmap.Windows1255
+	case "windows-1256":
+		return charmap.Windows1256
+	case "windows-1257":
+		return charmap.Windows1257
+	case "windows-1258":
+		return charmap.Windows1258
+	case "iso-8859-1":
+		return charmap.ISO8859_1
+	case "iso-8859-2":
+		return charmap.ISO8859_2
+	case "iso-8859-3":
+		return charmap.ISO8859_3
+	case "iso-8859-4":
+		return charmap.ISO8859_4
+	case "iso-8859-5":
+		return charmap.ISO8859_5
+	case "iso-8859-6":
+		return charmap.ISO8859_6
+	case "iso-8859-7":
+		return charmap.ISO8859_7
+	case "iso-8859-8":
+		return charmap.ISO8859_8
+	case "iso-8859-9":
+		return charmap.ISO8859_9
+	case "iso-8859-13":
+		return charmap.ISO8859_13
+	case "iso-8859-15":
+		return charmap.ISO8859_15
+	default:
+		return encoding.Nop
+	}
 }

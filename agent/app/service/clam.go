@@ -639,10 +639,7 @@ func handleAlert(stdout, clamName string, clamId uint) {
 						EntryID:   clamId,
 						Param:     strconv.Itoa(infectedFiles),
 					}
-					err := xpack.PushAlert(pushAlert)
-					if err != nil {
-						global.LOG.Errorf("clamdscan push failed, err: %v", err)
-					}
+					_ = xpack.PushAlert(pushAlert)
 					break
 				}
 			}

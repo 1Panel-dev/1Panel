@@ -359,9 +359,5 @@ func handleCronJobAlert(cronjob *model.Cronjob) {
 		EntryID:   cronjob.ID,
 		Param:     cronjob.Type,
 	}
-	err := xpack.PushAlert(pushAlert)
-	if err != nil {
-		global.LOG.Errorf("cronjob alert push failed, err: %v", err)
-		return
-	}
+	_ = xpack.PushAlert(pushAlert)
 }

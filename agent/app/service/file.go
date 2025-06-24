@@ -4,7 +4,10 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/jinzhu/copier"
+	"golang.org/x/text/encoding"
+	"golang.org/x/text/encoding/simplifiedchinese"
 	"io"
 	"io/fs"
 	"os"
@@ -15,9 +18,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"unicode/utf8"
-
-	"github.com/1Panel-dev/1Panel/agent/app/dto"
 
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 
@@ -27,7 +27,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"golang.org/x/net/html/charset"
 	"golang.org/x/sys/unix"
-	"golang.org/x/text/encoding/simplifiedchinese"
 	"golang.org/x/text/transform"
 
 	"github.com/1Panel-dev/1Panel/agent/global"
@@ -335,17 +334,22 @@ func (f *FileService) GetContent(op request.FileContentReq) (response.FileInfo, 
 	if len(content) > 1024 {
 		content = content[:1024]
 	}
-	if !utf8.Valid(content) {
-		_, decodeName, _ := charset.DetermineEncoding(content, "")
-		if decodeName == "windows-1252" || strings.ToLower(decodeName) == "gbk" {
-			reader := strings.NewReader(info.Content)
-			item := transform.NewReader(reader, simplifiedchinese.GBK.NewDecoder())
-			contents, err := io.ReadAll(item)
-			if err != nil {
-				return response.FileInfo{}, err
-			}
-			info.Content = string(contents)
+	_, decodeName, _ := charset.DetermineEncoding(content, "")
+	decoder := files.GetDecoderByName(decodeName)
+	if decoder != nil {
+		reader := strings.NewReader(info.Content)
+		var dec *encoding.Decoder
+		if decodeName == "windows-1252" {
+			dec = simplifiedchinese.GBK.NewDecoder()
+		} else {
+			dec = decoder.NewDecoder()
 		}
+		decodedReader := transform.NewReader(reader, dec)
+		contents, err := io.ReadAll(decodedReader)
+		if err != nil {
+			return response.FileInfo{}, err
+		}
+		info.Content = string(contents)
 	}
 	return response.FileInfo{FileInfo: *info}, nil
 }
