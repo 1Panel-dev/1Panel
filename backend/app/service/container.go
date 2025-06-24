@@ -558,10 +558,7 @@ func (u *ContainerService) ContainerUpgrade(req dto.ContainerUpgrade) error {
 	hostConf := oldContainer.HostConfig
 	var networkConf network.NetworkingConfig
 	if oldContainer.NetworkSettings != nil {
-		for networkKey := range oldContainer.NetworkSettings.Networks {
-			networkConf.EndpointsConfig = map[string]*network.EndpointSettings{networkKey: {}}
-			break
-		}
+		networkConf.EndpointsConfig = oldContainer.NetworkSettings.Networks
 	}
 	if err := client.ContainerRemove(ctx, req.Name, container.RemoveOptions{Force: true}); err != nil {
 		return err
@@ -1215,10 +1212,7 @@ func reCreateAfterUpdate(name string, client *client.Client, config *container.C
 
 	var oldNetworkConf network.NetworkingConfig
 	if networkConf != nil {
-		for networkKey := range networkConf.Networks {
-			oldNetworkConf.EndpointsConfig = map[string]*network.EndpointSettings{networkKey: {}}
-			break
-		}
+		oldNetworkConf.EndpointsConfig = networkConf.Networks
 	}
 
 	oldContainer, err := client.ContainerCreate(ctx, config, hostConf, &oldNetworkConf, &v1.Platform{}, name)
