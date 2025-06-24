@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/task"
@@ -17,12 +18,13 @@ import (
 )
 
 type CommandHelper struct {
-	workDir    string
-	outputFile string
-	scriptPath string
-	timeout    time.Duration
-	taskItem   *task.Task
-	logger     *log.Logger
+	workDir      string
+	outputFile   string
+	scriptPath   string
+	timeout      time.Duration
+	taskItem     *task.Task
+	logger       *log.Logger
+	IgnoreExist1 bool
 }
 
 type Option func(*CommandHelper)
@@ -65,6 +67,7 @@ func (c *CommandHelper) RunBashCWithArgs(arg ...string) error {
 	_, err := c.run("bash", arg...)
 	return err
 }
+
 func (c *CommandHelper) RunBashC(command string) error {
 	std, err := c.run("bash", "-c", command)
 	if err != nil {
@@ -142,14 +145,15 @@ func (c *CommandHelper) run(name string, arg ...string) (string, error) {
 			return "", buserr.New("ErrCmdTimeout")
 		}
 		if err != nil {
-			return handleErr(stdout, stderr, err)
+
+			return handleErr(stdout, stderr, c.IgnoreExist1, err)
 		}
 		return stdout.String(), nil
 	}
 
 	err := cmd.Run()
 	if err != nil {
-		return handleErr(stdout, stderr, err)
+		return handleErr(stdout, stderr, c.IgnoreExist1, err)
 	}
 	return stdout.String(), nil
 }
@@ -184,6 +188,11 @@ func WithScriptPath(scriptPath string) Option {
 		s.scriptPath = scriptPath
 	}
 }
+func WithIgnoreExist1() Option {
+	return func(s *CommandHelper) {
+		s.IgnoreExist1 = true
+	}
+}
 
 type CustomWriter struct {
 	taskItem *task.Task
@@ -209,7 +218,15 @@ func (cw *CustomWriter) Flush() {
 	}
 }
 
-func handleErr(stdout, stderr bytes.Buffer, err error) (string, error) {
+func handleErr(stdout, stderr bytes.Buffer, ignoreExist1 bool, err error) (string, error) {
+	var exitError *exec.ExitError
+	if ignoreExist1 && errors.As(err, &exitError) {
+		if status, ok := exitError.Sys().(syscall.WaitStatus); ok {
+			if status.ExitStatus() == 1 {
+				return "", nil
+			}
+		}
+	}
 	errMsg := ""
 	if len(stderr.String()) != 0 {
 		errMsg = fmt.Sprintf("stderr: %s", stderr.String())

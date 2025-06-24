@@ -83,7 +83,6 @@ func HandleTar(sourceDir, targetDir, name, exclusionRules string, secret string)
 	exMap := make(map[string]struct{})
 	excludes := strings.Split(exclusionRules, ",")
 	excludeRules := ""
-	excludes = append(excludes, "*.sock")
 	for _, exclude := range excludes {
 		if len(exclude) == 0 {
 			continue
@@ -110,13 +109,13 @@ func HandleTar(sourceDir, targetDir, name, exclusionRules string, secret string)
 
 	if len(secret) != 0 {
 		extraCmd := "| openssl enc -aes-256-cbc -salt -k '" + secret + "' -out"
-		commands = fmt.Sprintf("tar --warning=no-file-changed --ignore-failed-read -zcf %s %s %s %s", " -"+excludeRules, path, extraCmd, targetDir+"/"+name)
+		commands = fmt.Sprintf("tar -zcf %s %s %s %s", " -"+excludeRules, path, extraCmd, targetDir+"/"+name)
 		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" %s ", secret), "******"))
 	} else {
-		commands = fmt.Sprintf("tar --warning=no-file-changed --ignore-failed-read -zcf %s %s %s", targetDir+"/"+name, excludeRules, path)
+		commands = fmt.Sprintf("tar -zcf %s %s %s", targetDir+"/"+name, excludeRules, path)
 		global.LOG.Debug(commands)
 	}
-	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(24 * time.Hour))
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(24*time.Hour), cmd.WithIgnoreExist1())
 	stdout, err := cmdMgr.RunWithStdoutBashC(commands)
 	if err != nil {
 		if len(stdout) != 0 {

@@ -271,6 +271,10 @@ func (u *CronjobService) uploadCronjobBackFile(cronjob model.Cronjob, task *task
 	cloudSrc := strings.TrimPrefix(file, global.Dir.TmpDir+"/")
 	for _, account := range accounts {
 		if len(account) != 0 {
+			task.LogStart(i18n.GetMsgWithMap("UploadFile", map[string]interface{}{
+				"file":   pathUtils.Join(accountMap[account].backupPath, cloudSrc),
+				"backup": accountMap[account].name,
+			}))
 			_, err := accountMap[account].client.Upload(file, pathUtils.Join(accountMap[account].backupPath, cloudSrc))
 			task.LogWithStatus(
 				i18n.GetMsgWithMap("UploadFile", map[string]interface{}{
