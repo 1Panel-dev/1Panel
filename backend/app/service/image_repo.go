@@ -14,6 +14,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
+	"github.com/1Panel-dev/1Panel/backend/utils/systemctl"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
 )
@@ -105,8 +106,7 @@ func (u *ImageRepoService) Create(req dto.ImageRepoCreate) error {
 					cancel()
 					return errors.New("the docker service cannot be restarted")
 				default:
-					stdout, err := cmd.Exec("systemctl is-active docker")
-					if string(stdout) == "active\n" && err == nil {
+					if ok, _ := systemctl.IsActive("docker"); ok {
 						global.LOG.Info("docker restart with new conf successful!")
 						return nil
 					}
