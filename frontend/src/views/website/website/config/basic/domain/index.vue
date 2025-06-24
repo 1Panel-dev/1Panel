@@ -2,7 +2,6 @@
     <ComplexTable :data="data" @search="search" v-loading="loading" :heightDiff="400">
         <template #toolbar>
             <el-button type="primary" plain @click="openCreate">{{ $t('website.addDomain') }}</el-button>
-            <el-text type="info" class="!ml-2">{{ $t('website.domainSSLHelper') }}</el-text>
         </template>
         <el-table-column width="30px">
             <template #default="{ row }">

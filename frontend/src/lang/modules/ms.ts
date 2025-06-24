@@ -2384,8 +2384,6 @@ const message = {
         enableSSLHelper: 'Kegagalan mengaktifkan SSL tidak akan menjejaskan penciptaan laman web.',
         batchAdd: 'Tambah Domain Secara Batch',
         generateDomain: 'Hasilkan',
-        domainSSLHelper:
-            'Mengaktifkan SSL pada port selain 443 akan menghapus pendengar port 443. Untuk terus mendengar port 443, sila tambah domain:443.',
         global: 'Global',
         subsite: 'Sublaman',
         subsiteHelper:

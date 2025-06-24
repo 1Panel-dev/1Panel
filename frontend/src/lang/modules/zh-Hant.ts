@@ -2255,7 +2255,6 @@ const message = {
         enableSSLHelper: '開啟失敗不會影響網站創建',
         batchAdd: '批量添加域名',
         generateDomain: '生成',
-        domainSSLHelper: '非 443 端口開啟 SSL 會導致 443 端口移除監聽，如需 443 端口繼續監聽，請添加域名:443',
         global: '全局',
         subsite: '子網站',
         subsiteHelper: '子網站可以選擇已存在的 PHP 和靜態網站的目錄作為主目錄。',

@@ -922,18 +922,12 @@ func (w WebsiteService) GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, 
 		res        response.WebsiteHTTPS
 		httpsPorts []string
 	)
-	websiteDomains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithWebsiteId(websiteId))
-	for _, domain := range websiteDomains {
-		if domain.SSL {
-			httpsPorts = append(httpsPorts, strconv.Itoa(domain.Port))
-		}
+
+	httpsPortsMap := getHttpsPort(websiteId)
+	for port := range httpsPortsMap {
+		httpsPorts = append(httpsPorts, strconv.Itoa(port))
 	}
-	if len(httpsPorts) == 0 {
-		nginxInstall, _ := getAppInstallByKey(constant.AppOpenresty)
-		res.HttpsPort = strconv.Itoa(nginxInstall.HttpsPort)
-	} else {
-		res.HttpsPort = strings.Join(httpsPorts, ",")
-	}
+	res.HttpsPort = strings.Join(httpsPorts, ",")
 	if website.WebsiteSSLID == 0 {
 		res.Enable = false
 		return res, nil
@@ -981,10 +975,6 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 		res        response.WebsiteHTTPS
 		websiteSSL model.WebsiteSSL
 	)
-	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
-	if err != nil {
-		return nil, err
-	}
 	if err = ChangeHSTSConfig(req.Hsts, req.Http3, website); err != nil {
 		return nil, err
 	}
@@ -995,24 +985,27 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 		website.Protocol = constant.ProtocolHTTP
 		website.WebsiteSSLID = 0
 
-		httpsPorts, err := getHttpsPort(&website)
+		websiteDomains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithWebsiteId(website.ID))
+
+		ports := make(map[int]struct{})
+		for _, domain := range websiteDomains {
+			ports[domain.Port] = struct{}{}
+		}
+		for port := range ports {
+			if err = removeSSLListen(website, []string{strconv.Itoa(port)}); err != nil {
+				return nil, err
+			}
+		}
+		nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
 		if err != nil {
 			return nil, err
 		}
-		if len(httpsPorts) == 1 && httpsPorts[0] == nginxInstall.HttpsPort {
-			httpsPortStr := strconv.Itoa(httpsPorts[0])
+		if _, ok := ports[nginxInstall.HttpsPort]; !ok {
+			httpsPortStr := strconv.Itoa(nginxInstall.HttpsPort)
 			if err = deleteListenAndServerName(website, []string{httpsPortStr, "[::]:" + httpsPortStr}, []string{}); err != nil {
 				return nil, err
 			}
-		} else {
-			for _, port := range httpsPorts {
-				httpsPortStr := strconv.Itoa(port)
-				if err = removeSSLListen(website, []string{httpsPortStr}); err != nil {
-					return nil, err
-				}
-			}
 		}
-
 		nginxParams := getNginxParamsFromStaticFile(dto.SSL, nil)
 		nginxParams = append(nginxParams,
 			dto.NginxParam{

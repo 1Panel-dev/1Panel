@@ -2331,8 +2331,6 @@ const message = {
         enableSSLHelper: 'SSLの有効化に失敗しても、ウェブサイトの作成には影響しません。',
         batchAdd: 'ドメインを一括追加',
         generateDomain: '生成',
-        domainSSLHelper:
-            '443以外のポートでSSLを有効にすると、443ポートのリスナーが削除されます。443ポートを引き続きリスニングするには、ドメイン:443を追加してください。',
         global: 'グローバル',
         subsite: 'サブサイト',
         subsiteHelper:

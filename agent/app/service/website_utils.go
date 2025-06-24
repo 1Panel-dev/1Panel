@@ -651,22 +651,33 @@ func createPemFile(website model.Website, websiteSSL model.WebsiteSSL) error {
 	return nil
 }
 
-func getHttpsPort(website *model.Website) ([]int, error) {
-	websiteDomains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithWebsiteId(website.ID))
-	var httpsPorts []int
-	for _, domain := range websiteDomains {
-		if domain.SSL {
-			httpsPorts = append(httpsPorts, domain.Port)
+func getHttpsPort(websiteID uint) map[int]struct{} {
+	domains, err := websiteDomainRepo.GetBy(websiteDomainRepo.WithWebsiteId(websiteID))
+	if err != nil {
+		return nil
+	}
+	httpsPorts := make(map[int]struct{})
+	nginxInstall, _ := getAppInstallByKey(constant.AppOpenresty)
+	hasDefaultPort := false
+	for _, domain := range domains {
+		if domain.Port == nginxInstall.HttpPort {
+			hasDefaultPort = true
 		}
+		if domain.SSL {
+			httpsPorts[domain.Port] = struct{}{}
+		}
+	}
+	if hasDefaultPort {
+		httpsPorts[nginxInstall.HttpsPort] = struct{}{}
 	}
 	if len(httpsPorts) == 0 {
-		nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
-		if err != nil {
-			return nil, err
+		for _, domain := range domains {
+			if !domain.SSL {
+				httpsPorts[domain.Port] = struct{}{}
+			}
 		}
-		httpsPorts = append(httpsPorts, nginxInstall.HttpsPort)
 	}
-	return httpsPorts, nil
+	return httpsPorts
 }
 
 func applySSL(website *model.Website, websiteSSL model.WebsiteSSL, req request.WebsiteHTTPSOp) error {
@@ -678,63 +689,71 @@ func applySSL(website *model.Website, websiteSSL model.WebsiteSSL, req request.W
 	if err != nil {
 		return nil
 	}
-	noDefaultPort := true
 	httpPorts := make(map[int]struct{})
+	httpsPorts := make(map[int]struct{})
+
+	hasDefaultPort := false
 	for _, domain := range domains {
-		if domain.Port == 80 {
-			noDefaultPort = false
+		if domain.Port == nginxFull.Install.HttpPort {
+			hasDefaultPort = true
 		}
-		if domain.Port != 80 && !domain.SSL {
+		if domain.SSL {
+			httpsPorts[domain.Port] = struct{}{}
+		} else {
 			httpPorts[domain.Port] = struct{}{}
+		}
+	}
+	if hasDefaultPort {
+		httpsPorts[nginxFull.Install.HttpsPort] = struct{}{}
+	}
+	if len(httpsPorts) == 0 {
+		for port := range httpPorts {
+			httpsPorts[port] = struct{}{}
 		}
 	}
 	config := nginxFull.SiteConfig.Config
 	server := config.FindServers()[0]
 
-	httpPort := strconv.Itoa(nginxFull.Install.HttpPort)
-	httpsPort, err := getHttpsPort(website)
-	if err != nil {
-		return err
-	}
-	httpPortIPV6 := "[::]:" + httpPort
+	defaultHttpPort := strconv.Itoa(nginxFull.Install.HttpPort)
+	defaultHttpPortIPV6 := "[::]:" + defaultHttpPort
 
-	for _, port := range httpsPort {
-		if _, ok := httpPorts[port]; !ok {
-			server.DeleteListen(strconv.Itoa(port))
-		}
-		setListen(server, strconv.Itoa(port), website.IPV6, req.Http3, website.DefaultServer, true)
+	for port := range httpsPorts {
+		portStr := strconv.Itoa(port)
+		server.RemoveListenByBind(portStr)
+		server.RemoveListenByBind("[::]:" + portStr)
+		setListen(server, portStr, website.IPV6, req.Http3, website.DefaultServer, true)
 	}
 
 	server.UpdateDirective("http2", []string{"on"})
 
 	switch req.HttpConfig {
 	case constant.HTTPSOnly:
-		server.RemoveListenByBind(httpPort)
-		server.RemoveListenByBind(httpPortIPV6)
+		server.RemoveListenByBind(defaultHttpPort)
+		server.RemoveListenByBind(defaultHttpPortIPV6)
 		server.RemoveDirective("if", []string{"($scheme"})
 	case constant.HTTPToHTTPS:
-		if !noDefaultPort {
-			server.UpdateListen(httpPort, website.DefaultServer)
-		}
-		if website.IPV6 {
-			server.UpdateListen(httpPortIPV6, website.DefaultServer)
+		if hasDefaultPort {
+			server.UpdateListen(defaultHttpPort, website.DefaultServer)
+			if website.IPV6 {
+				server.UpdateListen(defaultHttpPortIPV6, website.DefaultServer)
+			}
 		}
 		server.AddHTTP2HTTPS()
 	case constant.HTTPAlso:
-		if !noDefaultPort {
-			server.UpdateListen(httpPort, website.DefaultServer)
+		if hasDefaultPort {
+			server.UpdateListen(defaultHttpPort, website.DefaultServer)
+			if website.IPV6 {
+				server.UpdateListen(defaultHttpPortIPV6, website.DefaultServer)
+			}
 		}
 		server.RemoveDirective("if", []string{"($scheme"})
-		if website.IPV6 {
-			server.UpdateListen(httpPortIPV6, website.DefaultServer)
-		}
 	}
 
 	if !req.Hsts {
 		server.RemoveDirective("add_header", []string{"Strict-Transport-Security", "\"max-age=31536000\""})
 	}
 	if !req.Http3 {
-		for _, port := range httpsPort {
+		for port := range httpsPorts {
 			server.RemoveListen(strconv.Itoa(port), "quic")
 			if website.IPV6 {
 				httpsPortIPV6 := "[::]:" + strconv.Itoa(port)

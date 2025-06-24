@@ -2381,8 +2381,6 @@ const message = {
         enableSSLHelper: 'A falha ao ativar o SSL não afetará a criação do site.',
         batchAdd: 'Adicionar Domínios em Lote',
         generateDomain: 'Gerar',
-        domainSSLHelper:
-            'Ativar o SSL em portas que não sejam a 443 removerá o ouvinte da porta 443. Para manter a porta 443 ouvindo, adicione o domínio:443.',
         global: 'Global',
         subsite: 'Subsite',
         subsiteHelper:

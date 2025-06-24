@@ -2243,7 +2243,6 @@ const message = {
         enableSSLHelper: '开启失败不会影响网站创建',
         batchAdd: '批量添加域名',
         generateDomain: '生成',
-        domainSSLHelper: '非 443 端口开启 SSL 会导致 443 端口去掉监听，如需 443 端口继续监听，请添加域名:443',
         global: '全局',
         subsite: '子网站',
         subsiteHelper: '子网站可以选择已存在的 PHP 和静态网站的目录作为主目录',

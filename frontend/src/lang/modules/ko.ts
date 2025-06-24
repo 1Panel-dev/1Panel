@@ -2291,8 +2291,6 @@ const message = {
         enableSSLHelper: 'SSL 활성화 실패는 웹사이트 생성에 영향을 미치지 않습니다.',
         batchAdd: '도메인 일괄 추가',
         generateDomain: '생성',
-        domainSSLHelper:
-            '443이 아닌 포트에서 SSL을 활성화하면 443 포트 리스너가 제거됩니다. 443 포트를 계속 리스닝하려면 도메인:443을 추가하세요.',
         global: '글로벌',
         subsite: '하위 사이트',
         subsiteHelper: '하위 사이트는 기존 PHP 또는 정적 웹사이트의 디렉토리를 루트 디렉토리로 선택할 수 있습니다.',

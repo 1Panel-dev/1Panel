@@ -55,6 +55,7 @@
                 label-width="125px"
                 :rules="rules"
                 :validate-on-rule-change="false"
+                v-loading="loading"
             >
                 <el-form-item :label="$t('commons.table.group')" prop="webSiteGroupId">
                     <el-select v-model="website.webSiteGroupId">
@@ -888,7 +889,7 @@ const changeSSl = (sslid: number) => {
 
 const submit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
-    await formEl.validate((valid) => {
+    await formEl.validate(async (valid) => {
         if (!valid) {
             return;
         }
@@ -897,35 +898,29 @@ const submit = async (formEl: FormInstance | undefined) => {
             return;
         }
         loading.value = true;
-        preCheck({})
-            .then((res) => {
-                if (res.data) {
-                    loading.value = false;
-                    preCheckRef.value.acceptParams({ items: res.data });
-                } else {
-                    if (website.value.type === 'proxy') {
-                        website.value.proxy = website.value.proxyProtocol + website.value.proxyAddress;
-                    }
-                    if (!website.value.enableFtp) {
-                        website.value.ftpUser = '';
-                        website.value.ftpPassword = '';
-                    }
-                    const taskID = uuidv4();
-                    website.value.taskID = taskID;
-                    createWebsite(website.value)
-                        .then(() => {
-                            MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
-                            handleClose();
-                        })
-                        .finally(() => {
-                            loading.value = false;
-                        });
-                    openTaskLog(taskID);
+        try {
+            const res = await preCheck({});
+            if (res.data) {
+                preCheckRef.value.acceptParams({ items: res.data });
+            } else {
+                if (website.value.type === 'proxy') {
+                    website.value.proxy = website.value.proxyProtocol + website.value.proxyAddress;
                 }
-            })
-            .catch(() => {
-                loading.value = false;
-            });
+                if (!website.value.enableFtp) {
+                    website.value.ftpUser = '';
+                    website.value.ftpPassword = '';
+                }
+                const taskID = uuidv4();
+                website.value.taskID = taskID;
+                await createWebsite(website.value);
+                MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
+                handleClose();
+                openTaskLog(taskID);
+            }
+        } catch (error) {
+        } finally {
+            loading.value = false;
+        }
     });
 };
 
