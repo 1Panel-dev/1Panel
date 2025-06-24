@@ -153,7 +153,7 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 		}{
 			{path.Join(tmpDir, "1panel"), path.Join(binDir, "1panel"), 1},
 			{path.Join(tmpDir, "1pctl"), path.Join(binDir, "1pctl"), 2},
-			{selectInitScript(tmpDir, currentServiceName), servicePath, 3},
+			{selectInitScript(path.Join(tmpDir, "initscript"), currentServiceName), servicePath, 3},
 		}
 
 		for _, update := range criticalUpdates {
