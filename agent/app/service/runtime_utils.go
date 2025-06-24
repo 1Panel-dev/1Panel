@@ -141,10 +141,9 @@ func reCreateRuntime(runtime *model.Runtime) {
 	}
 }
 
-func runComposeCmdWithLog(operate string, composePath string, logPath string) error {
-	var cmd *exec.Cmd
+func getComposeCmd(composePath, operate string) *exec.Cmd {
 	dockerCommand := global.CONF.DockerConfig.Command
-
+	var cmd *exec.Cmd
 	if dockerCommand == "docker-compose" {
 		if operate == "up" {
 			cmd = exec.Command("docker-compose", "-f", composePath, operate, "-d")
@@ -158,6 +157,11 @@ func runComposeCmdWithLog(operate string, composePath string, logPath string) er
 			cmd = exec.Command("docker", "compose", "-f", composePath, operate)
 		}
 	}
+	return cmd
+}
+
+func runComposeCmdWithLog(operate string, composePath string, logPath string) error {
+	cmd := getComposeCmd(composePath, operate)
 	logFile, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, constant.FilePerm)
 	if err != nil {
 		global.LOG.Errorf("Failed to open log file: %v", err)
@@ -299,10 +303,22 @@ func buildRuntime(runtime *model.Runtime, oldImageID string, oldEnv string, rebu
 		_ = logFile.Close()
 	}()
 
+	newPHPVersion := getRuntimeEnv(runtime.Env, "PHP_VERSION")
+	oldPHPVersion := getRuntimeEnv(oldEnv, "PHP_VERSION")
+	if newPHPVersion != oldPHPVersion {
+		_ = os.Rename(path.Join(runtimePath, "extensions", getExtensionDir(oldPHPVersion)), path.Join(runtimePath, "extensions", getExtensionDir(newPHPVersion)))
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Hour)
 	defer cancel()
 
-	cmd := exec.CommandContext(ctx, "docker", "compose", "-f", composePath, "build")
+	dockerCommand := global.CONF.DockerConfig.Command
+	var cmd *exec.Cmd
+	if dockerCommand == "docker-compose" {
+		cmd = exec.CommandContext(ctx, "docker-compose", "-f", composePath, "build")
+	} else {
+		cmd = exec.CommandContext(ctx, "docker", "compose", "-f", composePath, "build")
+	}
 	cmd.Stdout = logFile
 	var stderrBuf bytes.Buffer
 	multiWriterStderr := io.MultiWriter(&stderrBuf, logFile)
