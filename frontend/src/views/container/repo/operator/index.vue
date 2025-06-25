@@ -152,7 +152,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             return;
         }
         let params = {
-            header: i18n.global.t('container.createRepo'),
+            header: i18n.global.t('container.imageRepo'),
             operationInfo: i18n.global.t('container.createRepoHelper'),
             submitInputInfo: i18n.global.t('database.restartNow'),
         };

@@ -367,7 +367,7 @@ func (h *ServiceHandler) executeAction(action, successMsg string) (ServiceResult
 		return ServiceResult{}, fmt.Errorf("service manager not initialized")
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), defaultCommandTimeout)
 	defer cancel()
 
 	cmdArgs, err := manager.BuildCommand(action, h.config)
