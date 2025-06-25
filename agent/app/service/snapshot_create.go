@@ -106,13 +106,14 @@ func (u *SnapshotService) SnapshotReCreate(id uint) error {
 		return err
 	}
 	req.TaskID = taskModel.ID
-	taskItem, err := task.NewTaskWithOps(req.Name, task.TaskCreate, task.TaskScopeSnapshot, req.TaskID, req.ID)
+	taskItem, err := task.ReNewTaskWithOps(req.Name, task.TaskCreate, task.TaskScopeSnapshot, req.TaskID, req.ID)
 	if err != nil {
 		global.LOG.Errorf("new task for create snapshot failed, err: %v", err)
 		return err
 	}
+	_ = snapshotRepo.Update(req.ID, map[string]interface{}{"status": constant.StatusWaiting, "message": ""})
 	go func() {
-		_ = handleSnapshot(req, taskItem, 0, 0, 0)
+		_ = handleSnapshot(req, taskItem, 0, 3, 0)
 	}()
 
 	return nil

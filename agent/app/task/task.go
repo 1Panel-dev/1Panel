@@ -142,6 +142,40 @@ func NewTask(name, operate, taskScope, taskID string, resourceID uint) (*Task, e
 	return task, nil
 }
 
+func ReNewTaskWithOps(resourceName, operate, scope, taskID string, resourceID uint) (*Task, error) {
+	return ReNewTask(GetTaskName(resourceName, operate, scope), operate, scope, taskID, resourceID)
+}
+func ReNewTask(name, operate, taskScope, taskID string, resourceID uint) (*Task, error) {
+	if taskID == "" {
+		return NewTask(name, operate, taskScope, taskID, resourceID)
+	}
+	logDir := path.Join(global.Dir.TaskDir, taskScope)
+	if _, err := os.Stat(logDir); err != nil {
+		if err = os.MkdirAll(logDir, constant.DirPerm); err != nil {
+			return nil, fmt.Errorf("failed to create log directory: %w", err)
+		}
+	}
+	logPath := path.Join(global.Dir.TaskDir, taskScope, taskID+".log")
+	file, err := os.OpenFile(logPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, constant.FilePerm)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open log file: %w", err)
+	}
+	writer := bufio.NewWriter(file)
+	logger := log.New(file, "", log.LstdFlags)
+	taskModel := &model.Task{
+		ID:         taskID,
+		Name:       name,
+		Type:       taskScope,
+		LogFile:    logPath,
+		Status:     constant.StatusExecuting,
+		ResourceID: resourceID,
+		Operate:    operate,
+	}
+	taskRepo := repo.NewITaskRepo()
+	task := &Task{Name: name, logFile: file, Logger: logger, taskRepo: taskRepo, Task: taskModel, Writer: writer}
+	return task, nil
+}
+
 func (t *Task) AddSubTask(name string, action ActionFunc, rollback RollbackFunc) {
 	subTask := &SubTask{RootTask: t, Name: name, Retry: 0, Timeout: 30 * time.Minute, Action: action, Rollback: rollback}
 	t.SubTasks = append(t.SubTasks, subTask)
@@ -158,7 +192,7 @@ func (t *Task) AddSubTaskWithOps(name string, action ActionFunc, rollback Rollba
 }
 
 func (t *Task) AddSubTaskWithAliasAndOps(key string, action ActionFunc, rollback RollbackFunc, retry int, timeout time.Duration) {
-	subTask := &SubTask{RootTask: t, Name: i18n.GetMsgByKey(key), Retry: retry, Timeout: timeout, Action: action, Rollback: rollback}
+	subTask := &SubTask{RootTask: t, Name: i18n.GetMsgByKey(key), StepAlias: key, Retry: retry, Timeout: timeout, Action: action, Rollback: rollback}
 	t.SubTasks = append(t.SubTasks, subTask)
 }
 

@@ -67,7 +67,13 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 	} else {
 		_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"task_recover_id": req.TaskID})
 	}
-	taskItem, err := task.NewTaskWithOps(snap.Name, task.TaskRecover, task.TaskScopeSnapshot, req.TaskID, snap.ID)
+
+	var taskItem *task.Task
+	if req.IsNew {
+		taskItem, err = task.NewTaskWithOps(snap.Name, task.TaskRecover, task.TaskScopeSnapshot, req.TaskID, snap.ID)
+	} else {
+		taskItem, err = task.ReNewTaskWithOps(snap.Name, task.TaskRecover, task.TaskScopeSnapshot, req.TaskID, snap.ID)
+	}
 	if err != nil {
 		global.LOG.Errorf("new task for create snapshot failed, err: %v", err)
 		return err
