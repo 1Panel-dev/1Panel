@@ -96,7 +96,7 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 			taskItem.AddSubTaskWithAlias(
 				"RecoverDecompress",
 				func(t *task.Task) error {
-					itemHelper.Task.Log("---------------------- 2 / 10 ----------------------")
+					itemHelper.Task.Log("---------------------- 2 / 11 ----------------------")
 					itemHelper.Task.LogStart(i18n.GetWithName("RecoverDecompress", snap.Name))
 					err := itemHelper.FileOp.TarGzExtractPro(fmt.Sprintf("%s/%s.tar.gz", rootDir, snap.Name), rootDir, req.Secret)
 					itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("Decompress"), err)
@@ -152,9 +152,27 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 			taskItem.AddSubTaskWithAlias(
 				"RecoverBackups",
 				func(t *task.Task) error {
-					itemHelper.Task.Log("---------------------- 8 / 10 ----------------------")
+					itemHelper.Task.Log("---------------------- 8 / 11 ----------------------")
 					itemHelper.Task.LogStart(i18n.GetWithName("RecoverBackups", snap.Name))
 					err := itemHelper.FileOp.TarGzExtractPro(path.Join(rootDir, snap.Name, "/1panel_backup.tar.gz"), snapJson.BackupDataDir, "")
+					itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("Decompress"), err)
+					return err
+				},
+				nil,
+			)
+			req.IsNew = true
+		}
+		if req.IsNew || snap.InterruptStep == "RecoverWebsite" {
+			taskItem.AddSubTaskWithAlias(
+				"RecoverWebsite",
+				func(t *task.Task) error {
+					itemHelper.Task.Log("---------------------- 9 / 11 ----------------------")
+					itemHelper.Task.LogStart(i18n.GetWithName("RecoverWebsite", snap.Name))
+					webFile := path.Join(rootDir, snap.Name, "/website.tar.gz")
+					var err error
+					if itemHelper.FileOp.Stat(webFile) {
+						err = itemHelper.FileOp.TarGzExtractPro(webFile, snapJson.OperestyDir, "")
+					}
 					itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("Decompress"), err)
 					return err
 				},
@@ -166,7 +184,7 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 			taskItem.AddSubTaskWithAlias(
 				"RecoverPanelData",
 				func(t *task.Task) error {
-					itemHelper.Task.Log("---------------------- 9 / 10 ----------------------")
+					itemHelper.Task.Log("---------------------- 10 / 11 ----------------------")
 					itemHelper.Task.LogStart(i18n.GetWithName("RecoverPanelData", snap.Name))
 					err := itemHelper.FileOp.TarGzExtractPro(path.Join(rootDir, snap.Name, "/1panel_data.tar.gz"), path.Join(snapJson.BaseDir, "1panel"), "")
 					itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("Decompress"), err)
@@ -207,7 +225,7 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 }
 
 func handleDownloadSnapshot(itemHelper *snapRecoverHelper, snap model.Snapshot, targetDir string) error {
-	itemHelper.Task.Log("---------------------- 1 / 10 ----------------------")
+	itemHelper.Task.Log("---------------------- 1 / 11 ----------------------")
 	itemHelper.Task.LogStart(i18n.GetMsgByKey("RecoverDownload"))
 
 	account, client, err := NewBackupClientWithID(snap.DownloadAccountID)
@@ -226,7 +244,7 @@ func handleDownloadSnapshot(itemHelper *snapRecoverHelper, snap model.Snapshot, 
 }
 
 func backupBeforeRecover(name string, itemHelper *snapRecoverHelper) error {
-	itemHelper.Task.Log("---------------------- 3 / 10 ----------------------")
+	itemHelper.Task.Log("---------------------- 3 / 11 ----------------------")
 	itemHelper.Task.LogStart(i18n.GetMsgByKey("BackupBeforeRecover"))
 
 	rootDir := fmt.Sprintf("%s/1panel_original/original_%s", global.Dir.BaseDir, name)
@@ -296,7 +314,7 @@ func backupBeforeRecover(name string, itemHelper *snapRecoverHelper) error {
 }
 
 func readFromJson(rootDir string, itemHelper *snapRecoverHelper) (SnapshotJson, error) {
-	itemHelper.Task.Log("---------------------- 4 / 10 ----------------------")
+	itemHelper.Task.Log("---------------------- 4 / 11 ----------------------")
 	itemHelper.Task.LogStart(i18n.GetMsgByKey("Readjson"))
 
 	snapJsonPath := path.Join(rootDir, "base/snapshot.json")
@@ -320,7 +338,7 @@ func readFromJson(rootDir string, itemHelper *snapRecoverHelper) (SnapshotJson, 
 }
 
 func recoverAppData(src string, itemHelper *snapRecoverHelper) error {
-	itemHelper.Task.Log("---------------------- 5 / 10 ----------------------")
+	itemHelper.Task.Log("---------------------- 5 / 11 ----------------------")
 	itemHelper.Task.LogStart(i18n.GetMsgByKey("RecoverApp"))
 
 	if _, err := os.Stat(path.Join(src, "images.tar.gz")); err != nil {
@@ -337,7 +355,7 @@ func recoverAppData(src string, itemHelper *snapRecoverHelper) error {
 }
 
 func recoverBaseData(src string, itemHelper *snapRecoverHelper) error {
-	itemHelper.Task.Log("---------------------- 6 / 10 ----------------------")
+	itemHelper.Task.Log("---------------------- 6 / 11 ----------------------")
 	itemHelper.Task.LogStart(i18n.GetMsgByKey("SnapBaseInfo"))
 
 	if global.IsMaster {
@@ -390,7 +408,7 @@ func recoverBaseData(src string, itemHelper *snapRecoverHelper) error {
 }
 
 func recoverDBData(src string, itemHelper *snapRecoverHelper) error {
-	itemHelper.Task.Log("---------------------- 7 / 10 ----------------------")
+	itemHelper.Task.Log("---------------------- 7 / 11 ----------------------")
 	itemHelper.Task.LogStart(i18n.GetMsgByKey("RecoverDBData"))
 	err := itemHelper.FileOp.CopyDirWithExclude(src, global.Dir.DataDir, nil)
 
@@ -399,7 +417,7 @@ func recoverDBData(src string, itemHelper *snapRecoverHelper) error {
 }
 
 func restartCompose(composePath string, itemHelper *snapRecoverHelper) error {
-	itemHelper.Task.Log("---------------------- 10 / 10 ----------------------")
+	itemHelper.Task.Log("---------------------- 11 / 11 ----------------------")
 	itemHelper.Task.LogStart(i18n.GetMsgByKey("RecoverCompose"))
 
 	composes, err := composeRepo.ListRecord()
