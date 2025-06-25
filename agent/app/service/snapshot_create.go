@@ -321,9 +321,9 @@ func snapBaseData(snap snapHelper, targetDir string) error {
 		return err
 	}
 
-	if snap.FileOp.Stat("/etc/docker/daemon.json") {
-		err = snap.FileOp.CopyFile("/etc/docker/daemon.json", targetDir)
-		snap.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/etc/docker/daemon.json"), err)
+	if snap.FileOp.Stat(constant.DaemonJsonPath) {
+		err = snap.FileOp.CopyFile(constant.DaemonJsonPath, targetDir)
+		snap.Task.LogWithStatus(i18n.GetWithName("SnapCopy", constant.DaemonJsonPath), err)
 		if err != nil {
 			return err
 		}

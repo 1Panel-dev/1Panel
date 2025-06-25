@@ -285,9 +285,9 @@ func backupBeforeRecover(name string, itemHelper *snapRecoverHelper) error {
 	if err != nil {
 		return err
 	}
-	if itemHelper.FileOp.Stat("/etc/docker/daemon.json") {
-		err = itemHelper.FileOp.CopyFile("/etc/docker/daemon.json", baseDir)
-		itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", "/etc/docker/daemon.json"), err)
+	if itemHelper.FileOp.Stat(constant.DaemonJsonPath) {
+		err = itemHelper.FileOp.CopyFile(constant.DaemonJsonPath, baseDir)
+		itemHelper.Task.LogWithStatus(i18n.GetWithName("SnapCopy", constant.DaemonJsonPath), err)
 		if err != nil {
 			return err
 		}
@@ -368,15 +368,15 @@ func recoverBaseData(src string, itemHelper *snapRecoverHelper) error {
 		return err
 	}
 
-	daemonJsonPath := "/etc/docker/daemon.json"
-	_, errSrc := os.Stat(path.Join(src, "docker/daemon.json"))
+	daemonJsonPath := constant.DaemonJsonPath
+	_, errSrc := os.Stat(path.Join(src, "daemon.json"))
 	_, errPath := os.Stat(daemonJsonPath)
 	if os.IsNotExist(errSrc) && os.IsNotExist(errPath) {
 		itemHelper.Task.Log(i18n.GetMsgByKey("RecoverDaemonJsonEmpty"))
 		return nil
 	}
 	if errSrc == nil {
-		err = itemHelper.FileOp.CopyFile(path.Join(src, "docker/daemon.json"), "/etc/docker")
+		err = itemHelper.FileOp.CopyFile(path.Join(src, "daemon.json"), "/etc/docker")
 		itemHelper.Task.Log(i18n.GetMsgByKey("RecoverDaemonJson"))
 		if err != nil {
 			return fmt.Errorf("recover docker daemon.json failed, err: %v", err)
