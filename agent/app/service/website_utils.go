@@ -182,8 +182,8 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 		return err
 	}
 	configPath := GetSitePath(*website, SiteConf)
-	nginxContent := string(nginx_conf.WebsiteDefault)
-	config, err := parser.NewStringParser(nginxContent).Parse()
+	nginxContent := nginx_conf.GetWebsiteFile("website_default.conf")
+	config, err := parser.NewStringParser(string(nginxContent)).Parse()
 	if err != nil {
 		return err
 	}

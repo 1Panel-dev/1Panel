@@ -9,9 +9,6 @@ import (
 //go:embed ssl.conf
 var SSL []byte
 
-//go:embed  website_default.conf
-var WebsiteDefault []byte
-
 //go:embed index.html
 var Index []byte
 
@@ -48,7 +45,7 @@ var Upstream []byte
 //go:embed sse.conf
 var SSE []byte
 
-//go:embed *.json
+//go:embed *.json *.conf
 var websitesFiles embed.FS
 
 func GetWebsiteFile(filename string) []byte {
