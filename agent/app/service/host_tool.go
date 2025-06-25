@@ -602,7 +602,7 @@ func getProcessStatus(config *response.SupervisorProcessConfig, containerName st
 		out, err = exec.Command("supervisorctl", processNames...).Output()
 		output = string(out)
 	}
-	if containerName == "" && err != nil {
+	if output == "" && err != nil {
 		return err
 	}
 	lines := strings.Split(output, "\n")
