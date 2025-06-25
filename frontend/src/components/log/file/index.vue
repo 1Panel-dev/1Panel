@@ -1,7 +1,7 @@
 <template>
     <div v-loading="firstLoading">
         <div v-if="defaultButton">
-            <el-checkbox border v-model="tailLog" class="float-left" @change="changeTail(false)" v-if="showTail">
+            <el-checkbox border v-model="tailLog" class="float-left" @change="changeTail()" v-if="showTail">
                 {{ $t('commons.button.watch') }}
             </el-checkbox>
             <el-button
@@ -17,26 +17,23 @@
                 <slot name="button"></slot>
             </span>
         </div>
-        <div class="log-container" ref="logContainer" @scroll="onScroll" :style="containerStyle">
-            <div class="log-spacer" :style="{ height: `${totalHeight}px` }"></div>
-            <div
-                v-for="(log, index) in visibleLogs"
-                :key="startIndex + index"
-                class="log-item"
-                :style="{ top: `${(startIndex + index) * logHeight}px` }"
-            >
-                <hightlight :log="log" :type="config.colorMode ?? 'nginx'"></hightlight>
-            </div>
+        <div class="log-container" ref="logContainer" :style="containerStyle">
+            <CodemirrorPro
+                v-if="true"
+                v-model="logInfo"
+                :lineWrapping="true"
+                :heightDiff="330"
+                :disabled="true"
+            ></CodemirrorPro>
         </div>
     </div>
 </template>
 <script lang="ts" setup>
-import { nextTick, onMounted, onUnmounted, reactive, ref } from 'vue';
+import { onMounted, onUnmounted, reactive, ref } from 'vue';
 import { downloadFile } from '@/utils/util';
 import { readByLine } from '@/api/modules/files';
 import { GlobalStore } from '@/store';
 import bus from '@/global/bus';
-import hightlight from '@/components/log/custom-hightlight/index.vue';
 const globalStore = GlobalStore();
 
 interface LogProps {
@@ -129,34 +126,10 @@ const minPage = ref(0);
 let timer: NodeJS.Timer | null = null;
 const logPath = ref('');
 
+const logInfo = ref<string>('');
 const firstLoading = ref(false);
 const logs = ref<string[]>([]);
-const logContainer = ref<HTMLElement | null>(null);
-const logHeight = 20;
 const logCount = ref(0);
-const totalHeight = computed(() => logHeight * logCount.value);
-const containerHeight = ref(500);
-const visibleCount = computed(() => Math.ceil(containerHeight.value / logHeight));
-const startIndex = ref(0);
-
-const visibleLogs = computed(() => {
-    return logs.value.slice(startIndex.value, startIndex.value + visibleCount.value);
-});
-
-const onScroll = () => {
-    if (logContainer.value) {
-        const scrollTop = logContainer.value.scrollTop;
-        if (scrollTop == 0) {
-            readReq.page = minPage.value - 1;
-            if (readReq.page < 1) {
-                return;
-            }
-            minPage.value = readReq.page;
-            getContent(true);
-        }
-        startIndex.value = Math.floor(scrollTop / logHeight);
-    }
-};
 
 const changeLoading = () => {
     loading.value = !loading.value;
@@ -169,10 +142,8 @@ const onDownload = async () => {
     changeLoading();
 };
 
-const changeTail = (fromOutSide: boolean) => {
-    if (fromOutSide) {
-        tailLog.value = !tailLog.value;
-    }
+const changeTail = () => {
+    tailLog.value = !tailLog.value;
     if (tailLog.value) {
         timer = setInterval(() => {
             getContent(false);
@@ -212,7 +183,7 @@ const getContent = async (pre: boolean) => {
         isLoading.value = false;
         firstLoading.value = false;
     }
-
+    logInfo.value = res.data.content;
     logPath.value = res.data.path;
     firstLoading.value = false;
 
@@ -255,15 +226,6 @@ const getContent = async (pre: boolean) => {
                 logs.value = pre ? [...newLogs, ...logs.value] : [...logs.value, ...newLogs];
             }
         }
-
-        nextTick(() => {
-            if (pre) {
-                logContainer.value.scrollTop = 2000;
-            } else {
-                logContainer.value.scrollTop = totalHeight.value;
-                containerHeight.value = logContainer.value.getBoundingClientRect().height;
-            }
-        });
     }
 
     logCount.value = logs.value.length;
@@ -317,7 +279,7 @@ const init = async () => {
         tailLog.value = false;
     }
     if (tailLog.value) {
-        changeTail(false);
+        changeTail();
     }
     readReq.latest = true;
     await getContent(false);
@@ -331,12 +293,6 @@ onMounted(async () => {
     logs.value = [];
     firstLoading.value = true;
     await init();
-    nextTick(() => {
-        if (logContainer.value) {
-            logContainer.value.scrollTop = totalHeight.value;
-            containerHeight.value = logContainer.value.getBoundingClientRect().height;
-        }
-    });
 });
 
 onUnmounted(() => {
@@ -347,7 +303,7 @@ defineExpose({ changeTail, onDownload, clearLog });
 </script>
 <style lang="scss" scoped>
 .log-container {
-    overflow-y: auto;
+    overflow-y: hidden;
     overflow-x: auto;
     position: relative;
     background-color: var(--panel-logs-bg-color);

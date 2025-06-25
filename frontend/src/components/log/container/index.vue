@@ -25,15 +25,7 @@
         </el-button>
     </div>
     <div class="log-container" :style="styleVars" ref="logContainer">
-        <div class="log-spacer" :style="{ height: `${totalHeight}px` }"></div>
-        <div
-            v-for="(log, index) in visibleLogs"
-            :key="startIndex + index"
-            class="log-item"
-            :style="{ top: `${(startIndex + index) * logHeight}px` }"
-        >
-            <hightlight :log="log" type="container"></hightlight>
-        </div>
+        <CodemirrorPro v-model="logInfo" :lineWrapping="true" :heightDiff="230" :disabled="true"></CodemirrorPro>
     </div>
 </template>
 
@@ -44,7 +36,6 @@ import { dateFormatForName } from '@/utils/util';
 import { onUnmounted, reactive, ref } from 'vue';
 import { ElMessageBox } from 'element-plus';
 import { MsgError, MsgSuccess } from '@/utils/message';
-import hightlight from '@/components/log/custom-hightlight/index.vue';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
 
@@ -72,8 +63,6 @@ const styleVars = computed(() => ({
 }));
 
 const logVisible = ref(false);
-const logContainer = ref<HTMLElement | null>(null);
-const logs = ref<string[]>([]);
 let eventSource: EventSource | null = null;
 const logSearch = reactive({
     isWatch: true,
@@ -82,17 +71,7 @@ const logSearch = reactive({
     tail: 100,
     compose: '',
 });
-const logHeight = 20;
-const logCount = computed(() => logs.value.length);
-const totalHeight = computed(() => logHeight * logCount.value);
-const startIndex = ref(0);
-const containerHeight = ref(500);
-const visibleCount = computed(() => Math.ceil(containerHeight.value / logHeight) + 2);
-const visibleLogs = computed(() => {
-    const start = Math.max(0, startIndex.value - 1);
-    const end = startIndex.value + visibleCount.value + 1;
-    return logs.value.slice(start, end);
-});
+const logInfo = ref<string>('');
 
 const timeOptions = ref([
     { label: i18n.global.t('commons.table.all'), value: 'all' },
@@ -135,7 +114,7 @@ const searchLogs = async () => {
     if (!logSearch.isWatch) {
         return;
     }
-    logs.value = [];
+    logInfo.value = '';
     let currentNode = globalStore.currentNode;
     let url = `/api/v2/containers/search/log?container=${logSearch.container}&since=${logSearch.mode}&tail=${logSearch.tail}&follow=${logSearch.isWatch}&operateNode=${currentNode}`;
     if (logSearch.compose !== '') {
@@ -143,13 +122,7 @@ const searchLogs = async () => {
     }
     eventSource = new EventSource(url);
     eventSource.onmessage = (event: MessageEvent) => {
-        const data = event.data;
-        logs.value.push(data);
-        nextTick(() => {
-            if (logContainer.value) {
-                logContainer.value.scrollTop = logContainer.value.scrollHeight;
-            }
-        });
+        logInfo.value += event.data.replace(/\x1B\[[0-?]*[ -/]*[@-~]/g, '') + '\n';
     };
     eventSource.onerror = (event: MessageEvent) => {
         stopListening();
@@ -199,49 +172,23 @@ const onClean = async () => {
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',
     }).then(async () => {
-        console.log(logSearch);
         await cleanContainerLog(logSearch.container);
-        searchLogs();
+        await searchLogs();
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     });
 };
 
-const handleScroll = () => {
-    if (logContainer.value) {
-        const scrollTop = logContainer.value.scrollTop;
-        startIndex.value = Math.max(0, Math.floor(scrollTop / logHeight) - 1);
-    }
-};
-
 onUnmounted(() => {
     handleClose();
-    if (logContainer.value) {
-        logContainer.value.removeEventListener('scroll', handleScroll);
-    }
 });
-
-const resizeObserver = ref<ResizeObserver | null>(null);
 
 onMounted(() => {
     logSearch.container = props.container;
     logSearch.compose = props.compose;
-
     logVisible.value = true;
     logSearch.tail = 100;
     logSearch.mode = 'all';
     logSearch.isWatch = true;
-
-    nextTick(() => {
-        if (logContainer.value) {
-            containerHeight.value = logContainer.value.clientHeight;
-            logContainer.value.addEventListener('scroll', handleScroll);
-            resizeObserver.value = new ResizeObserver((entries) => {
-                containerHeight.value = entries[0].contentRect.height;
-            });
-            resizeObserver.value.observe(logContainer.value);
-        }
-    });
-
     searchLogs();
 });
 </script>
@@ -264,8 +211,7 @@ onMounted(() => {
 }
 
 .log-container {
-    height: calc(100vh - var(--custom-height, 320px));
-    overflow-y: auto;
+    overflow-y: hidden;
     overflow-x: auto;
     position: relative;
     background-color: #1e1e1e;
