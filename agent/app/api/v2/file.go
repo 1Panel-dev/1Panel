@@ -296,7 +296,7 @@ func (b *BaseApi) SaveContent(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /files/upload [post]
-// @x-panel-log {"bodyKeys":["path"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"上传文件 [path]","formatEN":"Upload file [path]"}
+// @x-panel-log {"bodyKeys":["path", "file"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"上传文件 [path]/[file]","formatEN":"Upload file [path]/[file]"}
 func (b *BaseApi) UploadFiles(c *gin.Context) {
 	form, err := c.MultipartForm()
 	if err != nil {

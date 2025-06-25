@@ -97,6 +97,13 @@
 		"formatZH": "同步Ollama模型列表",
 		"formatEN": "syncOllamamodellist"
 	},
+	"/apps/ignored/cancel": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "取消忽略应用升级",
+		"formatEN": "Cancelignoreapplicationupgrade"
+	},
 	"/apps/install": {
 		"bodyKeys": [
 			"name"
@@ -117,13 +124,11 @@
 		"formatEN": "Applicationconfigupdate[installID]"
 	},
 	"/apps/installed/ignore": {
-		"bodyKeys": [
-			"installId"
-		],
+		"bodyKeys": [],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "忽略应用[installId]版本升级",
-		"formatEN": "Applicationparamupdate[installId]"
+		"formatZH": "忽略应用升级",
+		"formatEN": "Ignoreapplicationupgrade"
 	},
 	"/apps/installed/op": {
 		"bodyKeys": [
@@ -649,16 +654,6 @@
 		"formatZH": "删除容器存储卷[names]",
 		"formatEN": "deletecontainervolume[names]"
 	},
-	"/core/app/launcher/show": {
-		"bodyKeys": [
-			"key",
-			"value"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "首页应用[key]=\u003e显示：[value]",
-		"formatEN": "applauncher[key]=\u003eshow:[value]"
-	},
 	"/core/backups": {
 		"bodyKeys": [
 			"type"
@@ -839,6 +834,13 @@
 		"beforeFunctions": [],
 		"formatZH": "绑定许可证",
 		"formatEN": "bindlicense"
+	},
+	"/core/licenses/bind/free": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "修改许可证免费节点绑定",
+		"formatEN": "changebindoffreenodeforlicense"
 	},
 	"/core/licenses/del": {
 		"bodyKeys": [],
@@ -1232,6 +1234,16 @@
 		"formatZH": "更新计划任务[name]",
 		"formatEN": "updatecronjob[name]"
 	},
+	"/dashboard/app/launcher/show": {
+		"bodyKeys": [
+			"key",
+			"value"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "首页应用[key]=\u003e显示：[value]",
+		"formatEN": "applauncher[key]=\u003eshow:[value]"
+	},
 	"/databases": {
 		"bodyKeys": [
 			"name"
@@ -1568,6 +1580,15 @@
 		"formatZH": "删除文件/文件夹[path]",
 		"formatEN": "Deletedirorfile[path]"
 	},
+	"/files/depth/size": {
+		"bodyKeys": [
+			"path"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "获取目录及其第一层子目录文件夹大小[path]",
+		"formatEN": "Multifilesize[path]"
+	},
 	"/files/favorite": {
 		"bodyKeys": [
 			"path"
@@ -1691,84 +1712,12 @@
 		"formatZH": "下载url=\u003e[path]/[name]",
 		"formatEN": "Downloadurl=\u003e[path]/[name]"
 	},
-	"/host/conffile/update": {
+	"/hosts/conffile/update": {
 		"bodyKeys": [],
 		"paramKeys": [],
 		"beforeFunctions": [],
 		"formatZH": "修改SSH配置文件",
 		"formatEN": "updateSSHconf"
-	},
-	"/host/ssh/generate": {
-		"bodyKeys": [],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "生成SSH密钥",
-		"formatEN": "generateSSHsecret"
-	},
-	"/host/ssh/operate": {
-		"bodyKeys": [
-			"operation"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "[operation]SSH",
-		"formatEN": "[operation]SSH"
-	},
-	"/host/ssh/update": {
-		"bodyKeys": [
-			"key",
-			"value"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "修改SSH配置[key]=\u003e[value]",
-		"formatEN": "updateSSHsetting[key]=\u003e[value]"
-	},
-	"/host/tool/config": {
-		"bodyKeys": [
-			"operate"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "[operate]主机工具配置文件",
-		"formatEN": "[operate]toolconfig"
-	},
-	"/host/tool/create": {
-		"bodyKeys": [
-			"type"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "创建[type]配置",
-		"formatEN": "create[type]config"
-	},
-	"/host/tool/operate": {
-		"bodyKeys": [
-			"operate",
-			"type"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "[operate][type]",
-		"formatEN": "[operate][type]"
-	},
-	"/host/tool/supervisor/process": {
-		"bodyKeys": [
-			"operate"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "[operate]守护进程",
-		"formatEN": "[operate]process"
-	},
-	"/host/tool/supervisor/process/file": {
-		"bodyKeys": [
-			"operate"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "[operate]Supervisor进程文件",
-		"formatEN": "[operate]SupervisorProcessConfigfile"
 	},
 	"/hosts/firewall/forward": {
 		"bodyKeys": [
@@ -1824,6 +1773,78 @@
 		"beforeFunctions": [],
 		"formatZH": "修改默认监控网卡[name]-[value]",
 		"formatEN": "updatedefaultmonitor[name]-[value]"
+	},
+	"/hosts/ssh/generate": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "生成SSH密钥",
+		"formatEN": "generateSSHsecret"
+	},
+	"/hosts/ssh/operate": {
+		"bodyKeys": [
+			"operation"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "[operation]SSH",
+		"formatEN": "[operation]SSH"
+	},
+	"/hosts/ssh/update": {
+		"bodyKeys": [
+			"key",
+			"value"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "修改SSH配置[key]=\u003e[value]",
+		"formatEN": "updateSSHsetting[key]=\u003e[value]"
+	},
+	"/hosts/tool/config": {
+		"bodyKeys": [
+			"operate"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "[operate]主机工具配置文件",
+		"formatEN": "[operate]toolconfig"
+	},
+	"/hosts/tool/create": {
+		"bodyKeys": [
+			"type"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建[type]配置",
+		"formatEN": "create[type]config"
+	},
+	"/hosts/tool/operate": {
+		"bodyKeys": [
+			"operate",
+			"type"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "[operate][type]",
+		"formatEN": "[operate][type]"
+	},
+	"/hosts/tool/supervisor/process": {
+		"bodyKeys": [
+			"operate"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "[operate]守护进程",
+		"formatEN": "[operate]process"
+	},
+	"/hosts/tool/supervisor/process/file": {
+		"bodyKeys": [
+			"operate"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "[operate]Supervisor进程文件",
+		"formatEN": "[operate]SupervisorProcessConfigfile"
 	},
 	"/openresty/build": {
 		"bodyKeys": [],
@@ -1989,6 +2010,13 @@
 		],
 		"formatZH": "删除脚本库脚本[names]",
 		"formatEN": "deletescript[names]"
+	},
+	"/script/sync": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "同步脚本库脚本",
+		"formatEN": "syncscripts"
 	},
 	"/script/update": {
 		"bodyKeys": [
@@ -2417,6 +2445,24 @@
 		],
 		"formatZH": "删除网站acme[email]",
 		"formatEN": "Deletewebsiteacme[email]"
+	},
+	"/websites/acme/update": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "website_acme_accounts",
+				"output_column": "email",
+				"output_value": "email"
+			}
+		],
+		"formatZH": "更新acme[email]",
+		"formatEN": "Updateacme[email]"
 	},
 	"/websites/ca": {
 		"bodyKeys": [
@@ -3020,12 +3066,13 @@
 	"/xpack/tampers/update": {
 		"bodyKeys": [
 			"website",
-			"status"
+			"status",
+			"path"
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "更新防篡改信息[website]=\u003e[status]",
-		"formatEN": "updatetamperinfo[website]=\u003e[status]"
+		"formatZH": "更新防篡改信息[website][path]=\u003e[status]",
+		"formatEN": "updatetamperinfo[website][path]=\u003e[status]"
 	},
 	"/xpack/waf/acl/create": {
 		"bodyKeys": [
