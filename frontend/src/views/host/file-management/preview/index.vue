@@ -101,6 +101,7 @@ interface EditProps {
     name: string;
     extension: string;
     imageFiles: [];
+    currentNode: string;
 }
 
 const open = ref(false);
@@ -109,6 +110,7 @@ const filePath = ref('');
 const fileName = ref('');
 const fileType = ref('');
 const fileUrl = ref('');
+const currentNode = ref('');
 const imageFiles = ref([]);
 
 const fileExtension = ref('');
@@ -140,7 +142,7 @@ const getDownloadUrl = (path: string) => {
     const baseUrl = `${import.meta.env.VITE_API_URL as string}/files/download`;
     const encodedPath = encodeURIComponent(path);
     const timestamp = new Date().getTime();
-    return `${baseUrl}?path=${encodedPath}&timestamp=${timestamp}`;
+    return `${baseUrl}?operateNode=${currentNode.value}&path=${encodedPath}&timestamp=${timestamp}`;
 };
 
 const acceptParams = (props: EditProps) => {
@@ -149,6 +151,7 @@ const acceptParams = (props: EditProps) => {
     fileName.value = props.name;
     filePath.value = props.path;
     fileType.value = props.fileType;
+    currentNode.value = props.currentNode;
     isFullscreen.value = fileType.value === 'excel';
 
     loading.value = true;
