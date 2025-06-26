@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"path/filepath"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/global"
@@ -148,102 +147,6 @@ func (h *ServiceHandler) ExecuteAction(action string) (ServiceResult, error) {
 	return h.executeAction(action, successMsg)
 }
 
-func (h *ServiceHandler) CheckStatus() (ServiceStatus, error) {
-	manager := GetGlobalManager()
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	type result struct {
-		isActive  bool
-		isEnabled bool
-		output    string
-		err       error
-	}
-	var status ServiceStatus
-	var errs []error
-
-	results := make(chan result, 2)
-	var wg sync.WaitGroup
-	wg.Add(2)
-
-	go func() {
-		defer wg.Done()
-		res := result{}
-		cmd, err := manager.BuildCommand("status", h.config)
-		if err != nil {
-			res.err = fmt.Errorf("build status command failed: %w", err)
-			results <- res
-			return
-		}
-
-		output, err := executeCommand(ctx, cmd[0], cmd[1:]...)
-		if err != nil {
-			res.err = fmt.Errorf("status check failed: %w", err)
-			results <- res
-			return
-		}
-
-		isActive, err := manager.ParseStatus(string(output), h.config, "active")
-		if err != nil {
-			res.err = fmt.Errorf("parse status failed: %w", err)
-			results <- res
-			return
-		}
-		res.isActive = isActive
-		res.output = string(output)
-		results <- res
-	}()
-
-	go func() {
-		defer wg.Done()
-		res := result{}
-		cmd, err := manager.BuildCommand("is-enabled", h.config)
-		if err != nil {
-			res.err = fmt.Errorf("build is-enabled command failed: %w", err)
-			results <- res
-			return
-		}
-
-		output, err := executeCommand(ctx, cmd[0], cmd[1:]...)
-		if err != nil {
-			res.err = fmt.Errorf("enabled check failed: %w", err)
-			results <- res
-			return
-		}
-
-		isEnabled, err := manager.ParseStatus(string(output), h.config, "enabled")
-		if err != nil {
-			res.err = fmt.Errorf("parse enabled status failed: %w", err)
-			results <- res
-			return
-		}
-		res.isEnabled = isEnabled
-		results <- res
-	}()
-
-	go func() {
-		wg.Wait()
-		close(results)
-	}()
-
-	for res := range results {
-		if res.err != nil {
-			errs = append(errs, res.err)
-			continue
-		}
-		status.IsActive = res.isActive
-		status.IsEnabled = res.isEnabled
-		if res.output != "" {
-			status.Output = res.output
-		}
-	}
-
-	if len(errs) > 0 {
-		return status, errors.Join(errs...)
-	}
-	return status, nil
-}
-
 func (h *ServiceHandler) IsExists() (ServiceStatus, error) {
 	manager := GetGlobalManager()
 	isExist, _ := manager.ServiceExists(h.config)
@@ -378,16 +281,3 @@ func (h *ServiceHandler) executeAction(action, successMsg string) (ServiceResult
 		Output:  string(output),
 	}, nil
 }
-
-func (h *ServiceHandler) ReloadManager() error {
-	if err := ReinitializeManager(); err != nil {
-		global.LOG.Errorf("Failed to reload service manager: %v", err)
-		return fmt.Errorf("failed to reload service manager: %w", err)
-	}
-	global.LOG.Info("Service manager reloaded successfully")
-	return nil
-}
-
-var (
-	ExecuteCommand = executeCommand
-)

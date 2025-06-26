@@ -372,7 +372,7 @@ func (u *DockerService) OperateDocker(req dto.DockerOperation) error {
 	if req.Operation == "stop" {
 		socketHandle, err := systemctl.DefaultHandler("docker.socket")
 		if err == nil {
-			status, err := socketHandle.CheckStatus()
+			status, err := socketHandle.IsActive()
 			if err == nil && status.IsActive {
 				if std, err := socketHandle.ExecuteAction("stop"); err != nil {
 					global.LOG.Errorf("handle stop docker.socket failed, err: %v", std)

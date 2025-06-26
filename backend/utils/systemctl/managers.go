@@ -438,18 +438,3 @@ func (e CommandError) Error() string {
 	return fmt.Sprintf("command %q failed: %v \nOutput: %s",
 		e.Cmd, e.Err, e.Output)
 }
-
-func (e CommandError) Unwrap() error { return e.Err }
-
-func ReinitializeManager() error {
-	mu.Lock()
-	defer mu.Unlock()
-	globalManager = nil
-	return InitializeGlobalManager()
-}
-
-func SetManagerPriority(order []string) {
-	mu.Lock()
-	defer mu.Unlock()
-	managerPriority = order
-}
