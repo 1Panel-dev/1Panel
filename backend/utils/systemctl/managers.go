@@ -60,7 +60,6 @@ func (b *baseManager) commonServiceExists(config *ServiceConfig, checkFn func(st
 	if name := config.ServiceName[b.name]; name != "" {
 		exists, checkErr := checkFn(name)
 		if checkErr != nil {
-			// global.LOG.Warnf("Service existence check failed %s: %v", b.name, checkErr)
 			return false, nil
 		}
 		return exists, nil
@@ -317,10 +316,8 @@ func (m *sysvinitManager) ParseStatus(output string, config *ServiceConfig, stat
 		if strings.Contains(output, "no such file or directory") {
 			return false, nil
 		}
-		// 关键逻辑：如果 find 命令有输出（找到符号链接），则服务已启用
 		return strings.TrimSpace(output) != "", nil
 	case "active":
-		// 关键逻辑：如果输出包含 "running" 或 "active"，则服务处于活动状态
 		if strings.Contains(output, "not found") {
 			return false, nil
 		}
@@ -444,16 +441,13 @@ func (e CommandError) Error() string {
 
 func (e CommandError) Unwrap() error { return e.Err }
 
-// ReinitializeManager for test
 func ReinitializeManager() error {
 	mu.Lock()
 	defer mu.Unlock()
-	// initOnce = sync.Once{}
 	globalManager = nil
 	return InitializeGlobalManager()
 }
 
-// SetManagerPriority for test
 func SetManagerPriority(order []string) {
 	mu.Lock()
 	defer mu.Unlock()

@@ -134,7 +134,6 @@ func smartServiceName(keyword string) (string, error) {
 }
 func handleServiceNaming(mgr ServiceManager, keyword string) string {
 	keyword = strings.ToLower(keyword)
-	// 处理 .service.socket 后缀
 	if strings.HasSuffix(keyword, ".service.socket") {
 		keyword = strings.TrimSuffix(keyword, ".service.socket") + ".socket"
 	}
@@ -142,7 +141,6 @@ func handleServiceNaming(mgr ServiceManager, keyword string) string {
 		keyword = strings.TrimSuffix(keyword, ".service")
 		return keyword
 	}
-	// 自动补全 .service 后缀
 	if !strings.HasSuffix(keyword, ".service") &&
 		!strings.HasSuffix(keyword, ".socket") {
 		keyword += ".service"
@@ -152,18 +150,17 @@ func handleServiceNaming(mgr ServiceManager, keyword string) string {
 func validateCandidatesConcurrently(candidates []string) (string, error) {
 	var (
 		g     errgroup.Group
-		found = make(chan string, 1) // 缓冲确保首个结果不阻塞
+		found = make(chan string, 1)
 	)
 
-	// 启动并发检查
 	for _, candidate := range candidates {
-		cand := candidate // 避免闭包循环引用
+		cand := candidate
 		g.Go(func() error {
 			confirmed, _ := confirmServiceExists(cand)
 			if confirmed {
 				select {
-				case found <- cand: // 发送首个成功结果
-				default: // 如果已有结果，忽略后续
+				case found <- cand:
+				default:
 				}
 				return nil
 			}
@@ -171,7 +168,6 @@ func validateCandidatesConcurrently(candidates []string) (string, error) {
 		})
 	}
 
-	// 处理结果
 	resultErr := make(chan error, 1)
 	go func() {
 		defer close(found)
@@ -220,17 +216,15 @@ func selectBestMatch(keyword string, candidates []string) (string, error) {
 	lowerKeyword := strings.ToLower(keyword)
 	var exactMatch string
 	var firstContainMatch string
-	// 第一轮遍历：严格匹配完全一致的名称（不区分大小写）
 	for _, name := range candidates {
 		if strings.EqualFold(name, keyword) {
 			exactMatch = name
-			break // 完全匹配直接终止循环
+			break
 		}
 	}
 	if exactMatch != "" {
 		return exactMatch, nil
 	}
-	// 第二轮遍历：寻找首个包含关键字的名称（不区分大小写）
 	for _, name := range candidates {
 		if strings.Contains(strings.ToLower(name), lowerKeyword) {
 			firstContainMatch = name
@@ -241,7 +235,6 @@ func selectBestMatch(keyword string, candidates []string) (string, error) {
 	if firstContainMatch != "" {
 		return firstContainMatch, nil
 	}
-	// 无任何匹配项时返回明确错误
 	return "", fmt.Errorf("%w: %q (no exact or partial match)", ErrNoValidService, keyword)
 }
 
@@ -394,7 +387,6 @@ func ViewConfig(path string, opt ConfigOption) (string, error) {
 
 	output, err := executeCommand(ctx, cmd[0], cmd[1:]...)
 	if err != nil {
-		// global.LOG.Errorf("View config command failed: %v", err)
 		return "", fmt.Errorf("view config failed: %w", err)
 	}
 	return string(output), nil

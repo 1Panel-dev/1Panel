@@ -50,8 +50,6 @@ func (h *HostToolService) GetToolStatus(req request.HostToolReq) (*response.Host
 
 func (h *HostToolService) getSupervisorStatus(res *response.HostToolRes) (*response.HostToolRes, error) {
 	supervisorConfig := &response.Supervisor{}
-
-	// 1. 检查supervisord是否安装
 	if !cmd.Which(constant.Supervisord) {
 		supervisorConfig.IsExist = false
 		res.Config = supervisorConfig
@@ -59,7 +57,6 @@ func (h *HostToolService) getSupervisorStatus(res *response.HostToolRes) (*respo
 	}
 	supervisorConfig.IsExist = true
 
-	// 2. 获取服务名称（兼容不同平台）
 	serviceName, err := h.determineServiceName()
 	if err != nil || serviceName == "" {
 		supervisorConfig.IsExist = false
@@ -68,28 +65,23 @@ func (h *HostToolService) getSupervisorStatus(res *response.HostToolRes) (*respo
 	}
 	supervisorConfig.ServiceName = serviceName
 
-	// 3. 从数据库获取自定义服务名
 	if nameSetting, _ := settingRepo.Get(settingRepo.WithByKey(constant.SupervisorServiceName)); nameSetting.Value != "" {
 		supervisorConfig.ServiceName = nameSetting.Value
 	}
 
-	// 4. 获取版本信息
 	if version, err := cmd.Exec("supervisord -v"); err == nil {
 		supervisorConfig.Version = strings.TrimSpace(version)
 	}
 
-	// 5. 检查supervisorctl是否存在
 	_, errCtl := exec.LookPath("supervisorctl")
 	supervisorConfig.CtlExist = errCtl == nil
 
-	// 6. 检查服务状态
 	if active, err := systemctl.IsActive(supervisorConfig.ServiceName); err == nil && active {
 		supervisorConfig.Status = "running"
 	} else {
 		supervisorConfig.Status = "stopped"
 	}
 
-	// 7. 获取配置文件路径
 	h.resolveConfigPath(supervisorConfig)
 
 	res.Config = supervisorConfig
@@ -97,7 +89,6 @@ func (h *HostToolService) getSupervisorStatus(res *response.HostToolRes) (*respo
 }
 
 func (h *HostToolService) determineServiceName() (string, error) {
-	// 优先级 1: 数据库配置
 	if setting, _ := settingRepo.Get(settingRepo.WithByKey(constant.SupervisorServiceName)); setting.Value != "" {
 		serviceName, err := systemctl.GetServiceName(setting.Value)
 		if err != nil {
@@ -105,7 +96,6 @@ func (h *HostToolService) determineServiceName() (string, error) {
 		}
 		return serviceName, nil
 	}
-	// 优先级 2: 自动检测服务名
 	if serviceName, err := systemctl.GetServiceName(constant.Supervisord); err == nil {
 		return serviceName, nil
 	}
@@ -113,16 +103,13 @@ func (h *HostToolService) determineServiceName() (string, error) {
 }
 
 func (h *HostToolService) resolveConfigPath(config *response.Supervisor) {
-	// 1. 数据库配置优先
 	if pathSetting, _ := settingRepo.Get(settingRepo.WithByKey(constant.SupervisorConfigPath)); pathSetting.Value != "" {
 		config.ConfigPath = pathSetting.Value
 		return
 	}
 
-	// 2. 标记需要初始化配置
 	config.Init = true
 
-	// 3. 尝试获取服务文件路径
 	if servicePath, err := systemctl.GetServicePath(config.ServiceName); err == nil {
 		if startCmd, _ := ini_conf.GetIniValue(servicePath, "Service", "ExecStart"); startCmd != "" {
 			if path := parseConfigPathFromCommand(startCmd); path != "" {
@@ -132,7 +119,6 @@ func (h *HostToolService) resolveConfigPath(config *response.Supervisor) {
 		}
 	}
 
-	// 4. 尝试默认路径
 	defaultPaths := []string{
 		"/etc/supervisord.conf",
 		"/etc/supervisor/supervisord.conf",

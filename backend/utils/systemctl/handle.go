@@ -12,18 +12,15 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/global"
 )
 
-// ServiceConfig 服务配置结构
 type ServiceConfig struct {
 	ServiceName map[string]string
 }
 
-// ServiceHandler 服务操作处理器
 type ServiceHandler struct {
 	config  *ServiceConfig
 	manager ServiceManager
 }
 
-// NewServiceHandler 创建服务处理器
 func NewServiceHandler(serviceNames map[string]string) *ServiceHandler {
 	mgr := GetGlobalManager()
 	if mgr == nil {
@@ -38,7 +35,6 @@ func NewServiceHandler(serviceNames map[string]string) *ServiceHandler {
 	}
 }
 
-// ServiceStatus 服务状态返回结构
 type ServiceStatus struct {
 	IsActive  bool   `json:"isActive"`
 	IsEnabled bool   `json:"isEnabled"`
@@ -55,7 +51,6 @@ type ServiceIsEnabled struct {
 	Output    string `json:"output"`
 }
 
-// ServiceResult 通用操作结果
 type ServiceResult struct {
 	Success bool   `json:"success"`
 	Message string `json:"message"`
@@ -67,7 +62,6 @@ var (
 	ErrServiceNotExist = errors.New("service does not exist")
 )
 
-// 默认服务配置生成器（自动映射服务名到当前管理器）
 func defaultServiceConfig(serviceName string) map[string]string {
 	mgr := getManagerName()
 	if mgr == "" {
@@ -97,7 +91,6 @@ func (h *ServiceHandler) GetServiceName() string {
 	return h.config.ServiceName[manager]
 }
 
-// GetServicePath 获取服务路径
 func (h *ServiceHandler) GetServicePath() (string, error) {
 	manager := h.ManagerName()
 	serviceName := h.config.ServiceName[manager]
@@ -155,7 +148,6 @@ func (h *ServiceHandler) ExecuteAction(action string) (ServiceResult, error) {
 	return h.executeAction(action, successMsg)
 }
 
-// CheckStatus 检查服务状态
 func (h *ServiceHandler) CheckStatus() (ServiceStatus, error) {
 	manager := GetGlobalManager()
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -174,7 +166,6 @@ func (h *ServiceHandler) CheckStatus() (ServiceStatus, error) {
 	var wg sync.WaitGroup
 	wg.Add(2)
 
-	// 任务1：检查服务是否活跃（status）
 	go func() {
 		defer wg.Done()
 		res := result{}
@@ -203,7 +194,6 @@ func (h *ServiceHandler) CheckStatus() (ServiceStatus, error) {
 		results <- res
 	}()
 
-	// 任务2：检查服务是否启用（is-enabled）
 	go func() {
 		defer wg.Done()
 		res := result{}
@@ -335,27 +325,22 @@ func (h *ServiceHandler) IsEnabled() (ServiceStatus, error) {
 	}, nil
 }
 
-// StartService 启动服务
 func (h *ServiceHandler) StartService() (ServiceResult, error) {
 	return h.ExecuteAction("start")
 }
 
-// StopService 停止服务
 func (h *ServiceHandler) StopService() (ServiceResult, error) {
 	return h.ExecuteAction("stop")
 }
 
-// RestartService 重启服务
 func (h *ServiceHandler) RestartService() (ServiceResult, error) {
 	return h.ExecuteAction("restart")
 }
 
-// EnableService 启用开机启动
 func (h *ServiceHandler) EnableService() (ServiceResult, error) {
 	return h.ExecuteAction("enable")
 }
 
-// DisableService 禁用开机启动
 func (h *ServiceHandler) DisableService() (ServiceResult, error) {
 	return h.ExecuteAction("disable")
 }
@@ -394,7 +379,6 @@ func (h *ServiceHandler) executeAction(action, successMsg string) (ServiceResult
 	}, nil
 }
 
-// ReloadManager 重新加载服务管理器（仅用于测试/调试）
 func (h *ServiceHandler) ReloadManager() error {
 	if err := ReinitializeManager(); err != nil {
 		global.LOG.Errorf("Failed to reload service manager: %v", err)

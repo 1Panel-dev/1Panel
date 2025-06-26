@@ -12,7 +12,6 @@ import (
 func DefaultHandler(serviceName string) (*ServiceHandler, error) {
 	svcName, err := smartServiceName(serviceName)
 	if err != nil {
-		// global.LOG.Errorf("SmartServiceName failed for %s: %v", serviceName, err)
 		return nil, ErrServiceNotFound
 	}
 	return NewServiceHandler(defaultServiceConfig(svcName)), nil
@@ -21,7 +20,6 @@ func DefaultHandler(serviceName string) (*ServiceHandler, error) {
 func GetServiceName(serviceName string) (string, error) {
 	serviceName, err := smartServiceName(serviceName)
 	if err != nil {
-		// global.LOG.Errorf("GetServiceName validation failed: %v", err)
 		return "", ErrServiceNotFound
 	}
 	return serviceName, nil
@@ -30,7 +28,6 @@ func GetServiceName(serviceName string) (string, error) {
 func GetServicePath(serviceName string) (string, error) {
 	handler, err := DefaultHandler(serviceName)
 	if err != nil {
-		// global.LOG.Errorf("GetServicePath handler init failed: %v", err)
 		return "", ErrServiceNotFound
 	}
 	return handler.GetServicePath()
