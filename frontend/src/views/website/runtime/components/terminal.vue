@@ -41,13 +41,14 @@ const terminalRef = ref<InstanceType<typeof Terminal> | null>(null);
 interface DialogProps {
     containerID: string;
     container: string;
+    user: string;
 }
 const acceptParams = async (params: DialogProps): Promise<void> => {
     terminalVisible.value = true;
     form.containerID = params.containerID;
     title.value = params.container;
     form.isCustom = false;
-    form.user = '';
+    form.user = params.user;
     form.command = '/bin/bash';
     initTerm();
 };

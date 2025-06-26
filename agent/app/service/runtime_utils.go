@@ -89,7 +89,7 @@ func handlePHP(create request.RuntimeCreate, runtime *model.Runtime, fileOp file
 	version, ok := create.Params["PHP_VERSION"]
 	if ok {
 		extensionsDir := path.Join(projectDir, "extensions", getExtensionDir(version.(string)))
-		_ = fileOp.CreateDir(extensionsDir, 0644)
+		_ = fileOp.CreateDir(extensionsDir, 0755)
 	}
 
 	composeContent, envContent, forms, err := handleParams(create, projectDir)
@@ -401,6 +401,7 @@ func buildRuntime(runtime *model.Runtime, oldImageID string, oldEnv string, rebu
 	if deleteImageID != "" {
 		deleteImageByID(deleteImageID, runtime.Image, client)
 	}
+	handlePHPDir(*runtime)
 	if out, err := compose.DownAndUp(composePath); err != nil {
 		runtime.Status = constant.StatusStartErr
 		runtime.Message = out
@@ -986,4 +987,18 @@ func handleRuntimeDTO(res *response.RuntimeDTO, runtime model.Runtime) error {
 		}
 	}
 	return nil
+}
+
+func handlePHPDir(runtime model.Runtime) {
+	fileOp := files.NewFileOp()
+	dirs := []string{
+		path.Join(runtime.GetPath(), "conf"),
+		path.Join(runtime.GetPath(), "extensions"),
+		path.Join(runtime.GetPath(), "composer"),
+		path.Join(runtime.GetPath(), "log"),
+	}
+	for _, dir := range dirs {
+		_ = fileOp.ChmodR(dir, 0755, true)
+		_ = fileOp.ChownR(dir, strconv.Itoa(1000), strconv.Itoa(1000), true)
+	}
 }

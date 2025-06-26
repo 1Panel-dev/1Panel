@@ -296,7 +296,7 @@ const openSupervisor = (row: Runtime.Runtime) => {
 
 const openTerminal = (row: Runtime.Runtime) => {
     const container = row.params['CONTAINER_NAME'];
-    terminalRef.value.acceptParams({ containerID: container, container: container });
+    terminalRef.value.acceptParams({ containerID: container, container: container, user: 'www-data' });
 };
 
 const openLog = (row: Runtime.RuntimeDTO) => {

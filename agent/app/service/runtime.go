@@ -743,6 +743,7 @@ func (r *RuntimeService) InstallPHPExtension(req request.PHPExtensionInstallReq)
 				}
 			}
 		}
+		handlePHPDir(*runtime)
 		if err = restartRuntime(runtime); err != nil {
 			return err
 		}
