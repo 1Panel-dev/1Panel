@@ -23,7 +23,7 @@ var (
 )
 
 const (
-	defaultCommandTimeout = 30 * time.Second
+	defaultCommandTimeout = 60 * time.Second
 	serviceCheckTimeout   = 5 * time.Second
 )
 
@@ -207,11 +207,11 @@ func (m *systemdManager) ServiceExists(config *ServiceConfig) (bool, error) {
 	return m.commonServiceExists(config, func(name string) (bool, error) {
 		ctx, cancel := context.WithTimeout(context.Background(), serviceCheckTimeout)
 		defer cancel()
-		out, cmdErr := executeCommand(ctx, m.cmdTool, "list-unit-files", name)
-		if cmdErr != nil {
-			return false, fmt.Errorf("systemctl list-unit-files failed: %w", cmdErr)
+		out, cmdErr := executeCommand(ctx, m.cmdTool, "is-enabled", name)
+		if cmdErr == nil || strings.Contains(string(out), "disabled") {
+			return true, nil
 		}
-		return bytes.Contains(out, []byte(name)), nil
+		return false, nil
 	})
 }
 
