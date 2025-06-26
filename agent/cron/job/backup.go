@@ -18,7 +18,7 @@ func NewBackupJob() *backup {
 
 func (b *backup) Run() {
 	var backups []model.BackupAccount
-	_ = global.DB.Where("`type` in (?) AND is_public = 0", []string{constant.OneDrive, constant.ALIYUN, constant.GoogleDrive}).Find(&backups)
+	_ = global.DB.Where("`type` in (?) AND is_public = 0", []string{constant.OneDrive, constant.ALIYUN}).Find(&backups)
 	if len(backups) == 0 {
 		return
 	}
@@ -39,8 +39,6 @@ func (b *backup) Run() {
 		switch backupItem.Type {
 		case constant.OneDrive:
 			refreshToken, err = client.RefreshToken("refresh_token", "refreshToken", varMap)
-		case constant.GoogleDrive:
-			refreshToken, err = client.RefreshGoogleToken("refresh_token", "refreshToken", varMap)
 		case constant.ALIYUN:
 			refreshToken, err = client.RefreshALIToken(varMap)
 		}

@@ -183,7 +183,7 @@ const loadEndpoint = (row: any) => {
 };
 
 const hasTokenRefresh = (row: any) => {
-    return row.type === 'OneDrive' || row.type === 'ALIYUN' || row.type === 'GoogleDrive';
+    return row.type === 'OneDrive' || row.type === 'ALIYUN';
 };
 
 const onDelete = async (row: Backup.BackupInfo) => {

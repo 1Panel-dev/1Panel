@@ -268,8 +268,6 @@ func (u *BackupService) RefreshToken(req dto.OperateByName) error {
 	switch backup.Type {
 	case constant.OneDrive:
 		refreshToken, err = client.RefreshToken("refresh_token", "refreshToken", varMap)
-	case constant.GoogleDrive:
-		refreshToken, err = client.RefreshGoogleToken("refresh_token", "refreshToken", varMap)
 	case constant.ALIYUN:
 		refreshToken, err = client.RefreshALIToken(varMap)
 	}
