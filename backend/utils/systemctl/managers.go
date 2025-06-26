@@ -177,7 +177,7 @@ func executeCommand(ctx context.Context, command string, args ...string) ([]byte
 	cmd.Stderr = &buf
 
 	if err := cmd.Run(); err != nil {
-		return nil, &CommandError{
+		return buf.Bytes(), &CommandError{
 			Cmd:    cmd.String(),
 			Output: buf.String(),
 			Err:    err,
