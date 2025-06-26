@@ -5,7 +5,7 @@
             :show-arrow="false"
             :offset="0"
             :width="200"
-            trigger="hover"
+            trigger="click"
             @before-enter="showPopover"
             popper-class="custom-popover-dropdown"
         >
