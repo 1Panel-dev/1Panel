@@ -119,7 +119,10 @@ func (h *HostToolService) resolveConfigPath(config *response.Supervisor) {
 		return
 	}
 
-	// 2. 尝试获取服务文件路径
+	// 2. 标记需要初始化配置
+	config.Init = true
+
+	// 3. 尝试获取服务文件路径
 	if servicePath, err := systemctl.GetServicePath(config.ServiceName); err == nil {
 		if startCmd, _ := ini_conf.GetIniValue(servicePath, "Service", "ExecStart"); startCmd != "" {
 			if path := parseConfigPathFromCommand(startCmd); path != "" {
@@ -129,7 +132,7 @@ func (h *HostToolService) resolveConfigPath(config *response.Supervisor) {
 		}
 	}
 
-	// 3. 尝试默认路径
+	// 4. 尝试默认路径
 	defaultPaths := []string{
 		"/etc/supervisord.conf",
 		"/etc/supervisor/supervisord.conf",
@@ -141,9 +144,6 @@ func (h *HostToolService) resolveConfigPath(config *response.Supervisor) {
 			return
 		}
 	}
-
-	// 4. 标记需要初始化配置
-	config.Init = true
 }
 
 func parseConfigPathFromCommand(cmd string) string {
