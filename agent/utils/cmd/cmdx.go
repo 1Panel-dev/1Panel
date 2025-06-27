@@ -136,22 +136,15 @@ func (c *CommandHelper) run(name string, arg ...string) (string, error) {
 		cmd.Dir = c.workDir
 	}
 
+	err := cmd.Run()
+	if c.taskItem != nil {
+		customWriter.Flush()
+	}
 	if c.timeout != 0 {
-		err := cmd.Run()
-		if c.taskItem != nil {
-			customWriter.Flush()
-		}
 		if ctx != nil && errors.Is(ctx.Err(), context.DeadlineExceeded) {
 			return "", buserr.New("ErrCmdTimeout")
 		}
-		if err != nil {
-
-			return handleErr(stdout, stderr, c.IgnoreExist1, err)
-		}
-		return stdout.String(), nil
 	}
-
-	err := cmd.Run()
 	if err != nil {
 		return handleErr(stdout, stderr, c.IgnoreExist1, err)
 	}
