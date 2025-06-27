@@ -724,23 +724,24 @@ func (r *RuntimeService) InstallPHPExtension(req request.PHPExtensionInstallReq)
 			return err
 		}
 		client, err := docker.NewClient()
+		if err != nil {
+			return err
+		}
 		defer client.Close()
-		if err == nil {
-			oldImageID, err := client.GetImageIDByName(runtime.Image)
-			if err != nil {
-				return err
-			}
-			err = cmdMgr.RunBashCf("docker commit %s %s", runtime.ContainerName, runtime.Image)
-			if err != nil {
-				return err
-			}
-			newImageID, err := client.GetImageIDByName(runtime.Image)
-			if err == nil && newImageID != oldImageID {
-				if err := client.DeleteImage(oldImageID); err != nil {
-					t.Log(fmt.Sprintf("delete old image error %v", err))
-				} else {
-					t.Log("delete old image success")
-				}
+		oldImageID, err := client.GetImageIDByName(runtime.Image)
+		if err != nil {
+			return err
+		}
+		err = cmdMgr.RunBashCf("docker commit %s %s", runtime.ContainerName, runtime.Image)
+		if err != nil {
+			return err
+		}
+		newImageID, err := client.GetImageIDByName(runtime.Image)
+		if err == nil && newImageID != oldImageID {
+			if err := client.DeleteImage(oldImageID); err != nil {
+				t.Log(fmt.Sprintf("delete old image error %v", err))
+			} else {
+				t.Log("delete old image success")
 			}
 		}
 		handlePHPDir(*runtime)
@@ -893,7 +894,6 @@ func (r *RuntimeService) UpdatePHPConfig(req request.PHPConfigUpdate) (err error
 			pattern := "^" + regexp.QuoteMeta("disable_functions") + "\\s*=\\s*.*$"
 			if matched, _ := regexp.MatchString(pattern, line); matched {
 				lines[i] = "disable_functions" + " = " + strings.Join(req.DisableFunctions, ",")
-				break
 			}
 		case "upload_max_filesize":
 			pattern := "^" + regexp.QuoteMeta("post_max_size") + "\\s*=\\s*.*$"

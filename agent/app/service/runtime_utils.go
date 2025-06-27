@@ -6,7 +6,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	cmd2 "github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"io"
 	"os"
 	"os/exec"
@@ -16,6 +15,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	cmd2 "github.com/1Panel-dev/1Panel/agent/utils/cmd"
 
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
@@ -582,7 +583,7 @@ func handleCompose(env gotenv.Env, composeContent []byte, create request.Runtime
 		serviceName = name
 		serviceValue = service.(map[string]interface{})
 		delete(serviceValue, "ports")
-		if create.ExposedPorts != nil && len(create.ExposedPorts) > 0 {
+		if len(create.ExposedPorts) > 0 {
 			var ports []interface{}
 			for i, port := range create.ExposedPorts {
 				containerPortStr := fmt.Sprintf("CONTAINER_PORT_%d", i)
@@ -596,12 +597,12 @@ func handleCompose(env gotenv.Env, composeContent []byte, create request.Runtime
 				create.Params[hostIPStr] = port.HostIP
 			}
 			if create.Type == constant.RuntimePHP {
-				ports = append(ports, fmt.Sprintf("127.0.0.1:${PANEL_APP_PORT_HTTP}:9000"))
+				ports = append(ports, "127.0.0.1:${PANEL_APP_PORT_HTTP}:9000")
 			}
 			serviceValue["ports"] = ports
 		} else {
 			if create.Type == constant.RuntimePHP {
-				serviceValue["ports"] = []interface{}{fmt.Sprintf("127.0.0.1:${PANEL_APP_PORT_HTTP}:9000")}
+				serviceValue["ports"] = []interface{}{"127.0.0.1:${PANEL_APP_PORT_HTTP}:9000"}
 			}
 		}
 		var environments []interface{}

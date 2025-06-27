@@ -22,7 +22,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/build"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/registry"
@@ -189,7 +189,7 @@ func (u *ImageService) ImageBuild(req dto.ImageBuild) error {
 		return err
 	}
 
-	opts := types.ImageBuildOptions{
+	opts := build.ImageBuildOptions{
 		Dockerfile: fileName,
 		Tags:       []string{req.Name},
 		Remove:     true,
@@ -432,7 +432,7 @@ func formatFileSize(fileSize int64) (size string) {
 	}
 }
 
-func checkUsed(imageID string, containers []types.Container) bool {
+func checkUsed(imageID string, containers []container.Summary) bool {
 	for _, container := range containers {
 		if container.ImageID == imageID {
 			return true

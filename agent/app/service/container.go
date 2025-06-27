@@ -33,7 +33,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/build"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/image"
@@ -94,8 +94,8 @@ func NewIContainerService() IContainerService {
 
 func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, error) {
 	var (
-		records []types.Container
-		list    []types.Container
+		records []container.Summary
+		list    []container.Summary
 	)
 	client, err := docker.NewDockerClient()
 	if err != nil {
@@ -165,7 +165,7 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 
 	total, start, end := len(list), (req.Page-1)*req.PageSize, req.Page*req.PageSize
 	if start > total {
-		records = make([]types.Container, 0)
+		records = make([]container.Summary, 0)
 	} else {
 		if end >= total {
 			end = total
@@ -307,7 +307,7 @@ func (u *ContainerService) ContainerListStats() ([]dto.ContainerListStats, error
 	var wg sync.WaitGroup
 	wg.Add(len(list))
 	for i := 0; i < len(list); i++ {
-		go func(item types.Container) {
+		go func(item container.Summary) {
 			datas = append(datas, loadCpuAndMem(client, item.ID))
 			wg.Done()
 		}(list[i])
@@ -466,7 +466,7 @@ func (u *ContainerService) Prune(req dto.ContainerPrune) (dto.ContainerPruneRepo
 		report.DeletedNumber = len(rep.VolumesDeleted)
 		report.SpaceReclaimed = int(rep.SpaceReclaimed)
 	case "buildcache":
-		opts := types.BuildCachePruneOptions{}
+		opts := build.CachePruneOptions{}
 		opts.All = true
 		rep, err := client.BuildCachePrune(context.Background(), opts)
 		if err != nil {
@@ -1311,7 +1311,7 @@ func checkPortStats(ports []dto.PortHelper) (nat.PortMap, error) {
 	return portMap, nil
 }
 
-func loadConfigInfo(isCreate bool, req dto.ContainerOperate, oldContainer *types.ContainerJSON) (*container.Config, *container.HostConfig, *network.NetworkingConfig, error) {
+func loadConfigInfo(isCreate bool, req dto.ContainerOperate, oldContainer *container.InspectResponse) (*container.Config, *container.HostConfig, *network.NetworkingConfig, error) {
 	var config container.Config
 	var hostConf container.HostConfig
 	if !isCreate {
@@ -1394,7 +1394,7 @@ func loadConfigInfo(isCreate bool, req dto.ContainerOperate, oldContainer *types
 	return &config, &hostConf, &networkConf, nil
 }
 
-func reCreateAfterUpdate(name string, client *client.Client, config *container.Config, hostConf *container.HostConfig, networkConf *types.NetworkSettings) {
+func reCreateAfterUpdate(name string, client *client.Client, config *container.Config, hostConf *container.HostConfig, networkConf *container.NetworkSettings) {
 	ctx := context.Background()
 
 	var oldNetworkConf network.NetworkingConfig
@@ -1416,7 +1416,7 @@ func reCreateAfterUpdate(name string, client *client.Client, config *container.C
 	global.LOG.Info("recreate after container update successful")
 }
 
-func loadVolumeBinds(binds []types.MountPoint) []dto.VolumeHelper {
+func loadVolumeBinds(binds []container.MountPoint) []dto.VolumeHelper {
 	var datas []dto.VolumeHelper
 	for _, bind := range binds {
 		var volumeItem dto.VolumeHelper
@@ -1436,13 +1436,13 @@ func loadVolumeBinds(binds []types.MountPoint) []dto.VolumeHelper {
 	return datas
 }
 
-func loadPortByInspect(id string, client *client.Client) ([]types.Port, error) {
-	container, err := client.ContainerInspect(context.Background(), id)
+func loadPortByInspect(id string, client *client.Client) ([]container.Port, error) {
+	containerItem, err := client.ContainerInspect(context.Background(), id)
 	if err != nil {
 		return nil, err
 	}
-	var itemPorts []types.Port
-	for key, val := range container.ContainerJSONBase.HostConfig.PortBindings {
+	var itemPorts []container.Port
+	for key, val := range containerItem.ContainerJSONBase.HostConfig.PortBindings {
 		if !strings.Contains(string(key), "/") {
 			continue
 		}
@@ -1451,15 +1451,15 @@ func loadPortByInspect(id string, client *client.Client) ([]types.Port, error) {
 
 		for _, itemVal := range val {
 			publicPort, _ := strconv.ParseUint(itemVal.HostPort, 10, 16)
-			itemPorts = append(itemPorts, types.Port{PrivatePort: uint16(itemPort), Type: item[1], PublicPort: uint16(publicPort), IP: itemVal.HostIP})
+			itemPorts = append(itemPorts, container.Port{PrivatePort: uint16(itemPort), Type: item[1], PublicPort: uint16(publicPort), IP: itemVal.HostIP})
 		}
 	}
 	return itemPorts, nil
 }
-func transPortToStr(ports []types.Port) []string {
+func transPortToStr(ports []container.Port) []string {
 	var (
-		ipv4Ports []types.Port
-		ipv6Ports []types.Port
+		ipv4Ports []container.Port
+		ipv6Ports []container.Port
 	)
 	for _, port := range ports {
 		if strings.Contains(port.IP, ":") {
@@ -1472,7 +1472,7 @@ func transPortToStr(ports []types.Port) []string {
 	list2 := simplifyPort(ipv6Ports)
 	return append(list1, list2...)
 }
-func simplifyPort(ports []types.Port) []string {
+func simplifyPort(ports []container.Port) []string {
 	var datas []string
 	if len(ports) == 0 {
 		return datas
@@ -1568,7 +1568,7 @@ func loadComposeCount(client *client.Client) int {
 
 	return len(composeMap)
 }
-func loadContainerPortForInfo(itemPorts []types.Port) []dto.PortHelper {
+func loadContainerPortForInfo(itemPorts []container.Port) []dto.PortHelper {
 	var exposedPorts []dto.PortHelper
 	samePortMap := make(map[string]dto.PortHelper)
 	ports := transPortToStr(itemPorts)

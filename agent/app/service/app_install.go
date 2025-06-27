@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/docker/docker/api/types/container"
 	"math"
 	"net/http"
 	"os"
@@ -15,28 +14,25 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/1Panel-dev/1Panel/agent/utils/files"
-	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
-	"gopkg.in/yaml.v3"
-
-	"github.com/1Panel-dev/1Panel/agent/utils/env"
-	"github.com/1Panel-dev/1Panel/agent/utils/nginx"
-	"github.com/joho/godotenv"
-
+	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
-	"github.com/1Panel-dev/1Panel/agent/buserr"
-
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
-
-	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/compose"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
+	"github.com/1Panel-dev/1Panel/agent/utils/env"
+	"github.com/1Panel-dev/1Panel/agent/utils/files"
+	"github.com/1Panel-dev/1Panel/agent/utils/nginx"
+	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
+	"github.com/docker/docker/api/types/container"
+	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
+	"gopkg.in/yaml.v3"
 )
 
 type AppInstallService struct {
@@ -124,7 +120,7 @@ func (a *AppInstallService) Page(req request.AppInstalledSearch) (int64, []respo
 		}
 	}
 
-	installDTOs, err := handleInstalled(installs, req.Update, req.Sync)
+	installDTOs, _ := handleInstalled(installs, req.Update, req.Sync)
 	if req.Update {
 		total = int64(len(installDTOs))
 	}

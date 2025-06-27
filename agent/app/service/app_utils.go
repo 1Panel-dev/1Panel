@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/compose-spec/compose-go/v2/types"
 	"log"
 	"math"
 	"net/http"
@@ -19,39 +18,33 @@ import (
 	"strings"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
-	"github.com/1Panel-dev/1Panel/agent/utils/nginx"
-	"github.com/1Panel-dev/1Panel/agent/utils/nginx/parser"
-	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
-
-	"github.com/1Panel-dev/1Panel/agent/app/task"
-
-	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
-	"github.com/docker/docker/api/types/container"
-
-	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
-
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
-	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
-	"github.com/1Panel-dev/1Panel/agent/i18n"
-	"github.com/subosito/gotenv"
-	"gopkg.in/yaml.v3"
-
-	"github.com/1Panel-dev/1Panel/agent/utils/env"
-
-	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
-	"github.com/1Panel-dev/1Panel/agent/buserr"
-
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
+	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/app/task"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/i18n"
+	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/compose"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	composeV2 "github.com/1Panel-dev/1Panel/agent/utils/docker"
+	"github.com/1Panel-dev/1Panel/agent/utils/env"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
+	"github.com/1Panel-dev/1Panel/agent/utils/nginx"
+	"github.com/1Panel-dev/1Panel/agent/utils/nginx/parser"
+	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
+	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
+	"github.com/compose-spec/compose-go/v2/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/pkg/errors"
+	"github.com/subosito/gotenv"
+	"gopkg.in/yaml.v3"
 )
 
 type DatabaseOp string
@@ -617,7 +610,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		if err != nil {
 			return err
 		}
-		dockerCLi, err := docker.NewClient()
+		dockerCLi, _ := docker.NewClient()
 		if req.PullImage {
 			images, err := composeV2.GetDockerComposeImagesV2(content, []byte(detail.DockerCompose))
 			if err != nil {
@@ -1802,10 +1795,7 @@ func ignoreUpdate(installed model.AppInstall) bool {
 		return true
 	}
 	ignores, _ := appIgnoreUpgradeRepo.List(appDetailRepo.WithAppId(installed.AppId), appIgnoreUpgradeRepo.WithScope("all"))
-	if len(ignores) > 0 {
-		return true
-	}
-	return false
+	return len(ignores) > 0
 }
 
 func RequestDownloadCallBack(downloadCallBackUrl string) {

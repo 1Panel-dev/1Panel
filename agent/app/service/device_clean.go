@@ -13,6 +13,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/build"
 	"github.com/docker/docker/api/types/filters"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -663,7 +664,7 @@ func dropBuildCache() {
 	if err != nil {
 		global.LOG.Errorf("do not get docker client")
 	}
-	opts := types.BuildCachePruneOptions{}
+	opts := build.CachePruneOptions{}
 	opts.All = true
 	_, err = client.BuildCachePrune(context.Background(), opts)
 	if err != nil {
