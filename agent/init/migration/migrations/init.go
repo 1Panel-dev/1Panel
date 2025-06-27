@@ -332,3 +332,11 @@ var AddSnapshotRule = &gormigrate.Migration{
 		)
 	},
 }
+
+var UpdatePHPRuntime = &gormigrate.Migration{
+	ID: "20250624-update-php-runtime",
+	Migrate: func(tx *gorm.DB) error {
+		service.HandleOldPHPRuntime()
+		return nil
+	},
+}

@@ -26,6 +26,7 @@ func InitAgentDB() {
 		migrations.UpdateWebsiteExpireDate,
 		migrations.UpdateRuntime,
 		migrations.AddSnapshotRule,
+		migrations.UpdatePHPRuntime,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

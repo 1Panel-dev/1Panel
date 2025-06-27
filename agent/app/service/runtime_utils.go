@@ -1003,3 +1003,23 @@ func handlePHPDir(runtime model.Runtime) {
 		_ = fileOp.ChownR(dir, strconv.Itoa(1000), strconv.Itoa(1000), true)
 	}
 }
+
+func HandleOldPHPRuntime() {
+	runtimes, _ := runtimeRepo.List(repo.WithByType(constant.RuntimePHP))
+	if len(runtimes) == 0 {
+		return
+	}
+	fileOp := files.NewFileOp()
+	for _, runtime := range runtimes {
+		composePtah := runtime.GetComposePath()
+		composeBytes, _ := fileOp.GetContent(composePtah)
+		composeContent := strings.ReplaceAll(string(composeBytes), "./conf:/usr/local/etc/php", "./conf/php.ini:/usr/local/etc/php/php.ini")
+		composeContent = strings.ReplaceAll(composeContent, "./conf/php-fpm.conf:/usr/local/etc/php-fpm.d/www.conf", "./conf/php-fpm.conf:/usr/local/etc/php-fpm.conf")
+		composeContent = strings.ReplaceAll(composeContent, "./extensions:${EXTENSION_DIR}", "./extensions:/usr/local/lib/php/extensions")
+		_ = fileOp.WriteFile(composePtah, strings.NewReader(composeContent), constant.DirPerm)
+		_ = fileOp.WriteFile(runtime.GetFPMPath(), bytes.NewReader(nginx_conf.GetWebsiteFile("php-fpm.conf")), constant.DirPerm)
+		go func() {
+			_ = restartRuntime(&runtime)
+		}()
+	}
+}
