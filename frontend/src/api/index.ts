@@ -96,7 +96,8 @@ class RequestHttp {
             async (error: AxiosError) => {
                 globalStore.errStatus = '';
                 const { response } = error;
-                if (error.message.indexOf('timeout') !== -1) MsgError('请求超时！请您稍后重试');
+
+                if (error.message.indexOf('timeout') !== -1) MsgError(i18n.global.t('commons.msg.requestTimeout'));
                 if (response) {
                     switch (response.status) {
                         case 313:
