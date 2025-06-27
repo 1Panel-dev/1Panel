@@ -143,11 +143,14 @@
                 </div>
             </fu-step>
             <template #footer></template>
+            <fu-step id="ignoreFiles" :title="$t('cronjob.exclusionRules')">
+                <IgnoreFile v-model:files="form.ignoreFiles"></IgnoreFile>
+            </fu-step>
         </fu-steps>
         <template #footer>
             <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
             <el-button @click="prev" v-if="nowIndex !== 0">{{ $t('commons.button.prev') }}</el-button>
-            <el-button type="primary" v-if="nowIndex === 4" :disabled="loading" @click="submitAddSnapshot">
+            <el-button type="primary" v-if="nowIndex === 5" :disabled="loading" @click="submitAddSnapshot">
                 {{ $t('commons.button.create') }}
             </el-button>
             <el-button @click="next" v-else>{{ $t('commons.button.next') }}</el-button>
@@ -161,6 +164,7 @@ import { loadSnapshotInfo, snapshotCreate } from '@/api/modules/setting';
 import { computeSize, newUUID } from '@/utils/util';
 import i18n from '@/lang';
 import TaskLog from '@/components/log/task/index.vue';
+import IgnoreFile from '@/components/file-batch/index.vue';
 import { listBackupOptions } from '@/api/modules/backup';
 import { Rules } from '@/global/form-rules';
 import { ElForm } from 'element-plus';
@@ -200,6 +204,7 @@ const form = reactive({
     panelData: [],
     backupData: [],
     appData: [],
+    ignoreFiles: [],
 });
 const rules = reactive({
     fromAccounts: [Rules.requiredSelect],
@@ -272,6 +277,7 @@ const beforeLeave = async (stepItem: any) => {
             }
             return true;
     }
+    return true;
 };
 
 function next() {

@@ -23,6 +23,7 @@ type Snapshot struct {
 	WithOperationLog bool   `json:"withOperationLog"`
 	WithSystemLog    bool   `json:"withSystemLog"`
 	WithTaskLog      bool   `json:"withTaskLog"`
+	IgnoreFiles      string `json:"ignoreFiles"`
 
 	InterruptStep   string `json:"interruptStep"`
 	RecoverStatus   string `json:"recoverStatus"`

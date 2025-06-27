@@ -23,8 +23,6 @@ type SettingInfo struct {
 	AppStoreSyncStatus   string `json:"appStoreSyncStatus"`
 
 	FileRecycleBin string `json:"fileRecycleBin"`
-
-	SnapshotIgnore string `json:"snapshotIgnore"`
 }
 
 type SettingUpdate struct {

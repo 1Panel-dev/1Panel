@@ -285,6 +285,7 @@ func (u *CronjobService) handleSnapshot(cronjob model.Cronjob, jobRecord model.J
 		WithOperationLog:  true,
 		WithSystemLog:     true,
 		WithTaskLog:       true,
+		IgnoreFiles:       strings.Split(cronjob.ExclusionRules, ","),
 	}
 
 	if err := NewISnapshotService().SnapshotCreate(taskItem, req, jobRecord.ID, cronjob.RetryTimes, cronjob.Timeout); err != nil {

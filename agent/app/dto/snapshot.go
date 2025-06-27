@@ -28,6 +28,8 @@ type SnapshotCreate struct {
 	WithOperationLog bool `json:"withOperationLog"`
 	WithSystemLog    bool `json:"withSystemLog"`
 	WithTaskLog      bool `json:"withTaskLog"`
+
+	IgnoreFiles []string `json:"ignoreFiles"`
 }
 
 type SnapshotData struct {
@@ -35,11 +37,12 @@ type SnapshotData struct {
 	BackupData []DataTree `json:"backupData"`
 	PanelData  []DataTree `json:"panelData"`
 
-	WithMonitorData  bool `json:"withMonitorData"`
-	WithLoginLog     bool `json:"withLoginLog"`
-	WithOperationLog bool `json:"withOperationLog"`
-	WithSystemLog    bool `json:"withSystemLog"`
-	WithTaskLog      bool `json:"withTaskLog"`
+	WithMonitorData  bool     `json:"withMonitorData"`
+	WithLoginLog     bool     `json:"withLoginLog"`
+	WithOperationLog bool     `json:"withOperationLog"`
+	WithSystemLog    bool     `json:"withSystemLog"`
+	WithTaskLog      bool     `json:"withTaskLog"`
+	IgnoreFiles      []string `json:"ignoreFiles"`
 }
 type DataTree struct {
 	ID        string `json:"id"`

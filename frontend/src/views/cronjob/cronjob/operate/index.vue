@@ -601,11 +601,7 @@
                             <el-row :gutter="20">
                                 <LayoutCol :span="20" v-if="hasExclusionRules()">
                                     <el-form-item :label="$t('cronjob.exclusionRules')" prop="exclusionRules">
-                                        <el-input
-                                            :placeholder="$t('cronjob.rulesHelper')"
-                                            clearable
-                                            v-model="form.exclusionRules"
-                                        />
+                                        <IgnoreFile class="w-full" v-model:files="form.ignoreFiles"></IgnoreFile>
                                         <span class="input-help">{{ $t('cronjob.exclusionRulesHelper') }}</span>
                                     </el-form-item>
                                 </LayoutCol>
@@ -703,6 +699,7 @@ import { ElForm } from 'element-plus';
 import { Cronjob } from '@/api/interface/cronjob';
 import { addCronjob, editCronjob, loadCronjobInfo, loadNextHandle, loadScriptOptions } from '@/api/modules/cronjob';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
+import IgnoreFile from '@/components/file-batch/index.vue';
 import LayoutCol from '@/components/layout-col/form.vue';
 import { listDbItems } from '@/api/modules/database';
 import { getWebsiteOptions } from '@/api/modules/website';
@@ -756,6 +753,7 @@ const form = reactive<Cronjob.CronjobInfo>({
     scriptID: null,
     appID: '',
     website: '',
+    ignoreFiles: [],
     exclusionRules: '',
     dbType: 'mysql',
     dbName: '',
@@ -835,6 +833,7 @@ const search = async () => {
                 form.website = res.data.website;
                 form.websiteList = res.data.website.split(',') || [];
                 form.exclusionRules = res.data.exclusionRules;
+                form.ignoreFiles = res.data.exclusionRules.split(',');
                 form.dbType = res.data.dbType;
                 form.dbName = res.data.dbName;
                 form.dbNameList = res.data.dbName.split(',') || [];
@@ -1280,7 +1279,12 @@ function isBackup() {
 }
 
 function hasExclusionRules() {
-    return form.type === 'app' || form.type === 'website' || (form.type === 'directory' && form.isDir);
+    return (
+        form.type === 'app' ||
+        form.type === 'website' ||
+        form.type === 'snapshot' ||
+        (form.type === 'directory' && form.isDir)
+    );
 }
 
 function hasScript() {
@@ -1327,6 +1331,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             form.dbName = form.dbNameList.join(',');
         }
 
+        form.exclusionRules = form.ignoreFiles.join(',');
         form.snapshotRule = { withImage: form.withImage, ignoreAppIDs: form.ignoreAppIDs };
         form.alertCount = form.hasAlert && isProductPro.value ? form.alertCount : 0;
         form.alertTitle =

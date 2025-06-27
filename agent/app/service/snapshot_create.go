@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"sync"
 	"time"
@@ -55,6 +56,7 @@ func (u *SnapshotService) SnapshotCreate(parentTask *task.Task, req dto.Snapshot
 		WithOperationLog: req.WithOperationLog,
 		WithTaskLog:      req.WithTaskLog,
 		WithSystemLog:    req.WithSystemLog,
+		IgnoreFiles:      strings.Join(req.IgnoreFiles, ","),
 
 		Version: versionItem.Value,
 		Status:  constant.StatusWaiting,
@@ -398,6 +400,7 @@ func snapBackupData(snap snapHelper, req dto.SnapshotCreate, targetDir string) e
 	snap.Task.LogStart(i18n.GetMsgByKey("SnapLocalBackup"))
 
 	excludes := loadBackupExcludes(snap, req.BackupData)
+	excludes = append(excludes, req.IgnoreFiles...)
 	excludes = append(excludes, "./system_snapshot")
 	for _, item := range req.AppData {
 		for _, itemApp := range item.Children {
@@ -421,7 +424,8 @@ func loadBackupExcludes(snap snapHelper, req []dto.DataTree) []string {
 			if err := snap.snapAgentDB.Where("file_dir = ? AND file_name = ?", strings.TrimPrefix(path.Dir(item.Path), global.Dir.LocalBackupDir+"/"), path.Base(item.Path)).Delete(&model.BackupRecord{}).Error; err != nil {
 				snap.Task.LogWithStatus("delete backup file from database", err)
 			}
-			excludes = append(excludes, "."+strings.TrimPrefix(item.Path, global.Dir.LocalBackupDir))
+			itemDir, _ := filepath.Rel(item.Path, global.Dir.LocalBackupDir)
+			excludes = append(excludes, itemDir)
 		} else {
 			excludes = append(excludes, loadBackupExcludes(snap, item.Children)...)
 		}
@@ -433,7 +437,8 @@ func loadAppBackupExcludes(req []dto.DataTree) []string {
 	for _, item := range req {
 		if len(item.Children) == 0 {
 			if !item.IsCheck {
-				excludes = append(excludes, "."+strings.TrimPrefix(item.Path, path.Join(global.Dir.LocalBackupDir)))
+				itemDir, _ := filepath.Rel(item.Path, global.Dir.LocalBackupDir)
+				excludes = append(excludes, itemDir)
 			}
 		} else {
 			excludes = append(excludes, loadAppBackupExcludes(item.Children)...)
@@ -466,26 +471,21 @@ func snapPanelData(snap snapHelper, req dto.SnapshotCreate, targetDir string) er
 
 	rootDir := global.Dir.DataDir
 	if strings.Contains(global.Dir.LocalBackupDir, rootDir) {
-		excludes = append(excludes, "."+strings.ReplaceAll(global.Dir.LocalBackupDir, rootDir, ""))
+		itemDir, _ := filepath.Rel(rootDir, global.Dir.LocalBackupDir)
+		excludes = append(excludes, itemDir)
 	}
 	if len(snap.OpenrestyDir) != 0 && strings.Contains(snap.OpenrestyDir, rootDir) {
-		excludes = append(excludes, "."+strings.ReplaceAll(snap.OpenrestyDir, rootDir, ""))
+		itemDir, _ := filepath.Rel(rootDir, snap.OpenrestyDir)
+		excludes = append(excludes, itemDir)
 	}
-	ignoreVal, _ := settingRepo.Get(settingRepo.WithByKey("SnapshotIgnore"))
-	rules := strings.Split(ignoreVal.Value, ",")
-	for _, ignore := range rules {
-		if len(ignore) == 0 || cmd.CheckIllegal(ignore) {
-			continue
-		}
-		excludes = append(excludes, "."+strings.ReplaceAll(ignore, rootDir, ""))
-	}
+	excludes = append(excludes, req.IgnoreFiles...)
 	err := snap.FileOp.TarGzCompressPro(false, rootDir, path.Join(targetDir, "1panel_data.tar.gz"), "", strings.Join(excludes, ","))
 	snap.Task.LogWithStatus(i18n.GetMsgByKey("SnapCompressPanel"), err)
 	if err != nil {
 		return err
 	}
 	if len(snap.OpenrestyDir) != 0 {
-		err := snap.FileOp.TarGzCompressPro(false, snap.OpenrestyDir, path.Join(targetDir, "website.tar.gz"), "", "")
+		err := snap.FileOp.TarGzCompressPro(false, snap.OpenrestyDir, path.Join(targetDir, "website.tar.gz"), "", strings.Join(req.IgnoreFiles, ","))
 		snap.Task.LogWithStatus(i18n.GetMsgByKey("SnapWebsite"), err)
 		if err != nil {
 			return err
@@ -499,7 +499,8 @@ func loadPanelExcludes(req []dto.DataTree) []string {
 	for _, item := range req {
 		if len(item.Children) == 0 {
 			if !item.IsCheck {
-				excludes = append(excludes, "."+strings.TrimPrefix(item.Path, path.Join(global.Dir.BaseDir, "1panel")))
+				itemDir, _ := filepath.Rel(item.Path, path.Join(global.Dir.BaseDir, "1panel"))
+				excludes = append(excludes, itemDir)
 			}
 		} else {
 			excludes = append(excludes, loadPanelExcludes(item.Children)...)

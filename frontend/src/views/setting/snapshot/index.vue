@@ -8,9 +8,6 @@
                 <el-button type="primary" plain @click="onImport()">
                     {{ $t('setting.importSnapshot') }}
                 </el-button>
-                <el-button type="primary" plain @click="onIgnore()">
-                    {{ $t('setting.editIgnoreRule') }}
-                </el-button>
                 <el-button type="primary" plain :disabled="selects.length === 0" @click="batchDelete(null)">
                     {{ $t('commons.button.delete') }}
                 </el-button>
@@ -205,7 +202,6 @@
         <RecoverStatus ref="recoverStatusRef" @search="search()"></RecoverStatus>
         <SnapshotCreate ref="createRef" @search="search()" />
         <SnapshotImport ref="importRef" @search="search()" />
-        <IgnoreRule ref="ignoreRef" @search="search()" />
 
         <OpDialog ref="opRef" @search="search" @submit="onSubmitDelete()">
             <template #content>
@@ -220,7 +216,7 @@
             </template>
         </OpDialog>
         <TaskLog ref="taskLogRef" width="70%" @close="search()" />
-        <SnapRecover ref="recoverRef" />
+        <SnapRecover ref="recoverRef" @search="search" />
     </div>
 </template>
 
@@ -235,7 +231,6 @@ import {
 import { onMounted, reactive, ref } from 'vue';
 import { computeSize, dateFormat, newUUID } from '@/utils/util';
 import { ElForm } from 'element-plus';
-import IgnoreRule from '@/views/setting/snapshot/ignore-rule/index.vue';
 import i18n from '@/lang';
 import { Setting } from '@/api/interface/setting';
 import TaskLog from '@/components/log/task/index.vue';
@@ -263,7 +258,6 @@ const searchName = ref();
 const opRef = ref();
 
 const createRef = ref();
-const ignoreRef = ref();
 const recoverStatusRef = ref();
 const importRef = ref();
 const isRecordShow = ref();
@@ -333,10 +327,6 @@ const reRollback = (row: any) => {
                 loading.value = false;
             });
     });
-};
-
-const onIgnore = () => {
-    ignoreRef.value.acceptParams();
 };
 
 const onChange = async (info: any) => {

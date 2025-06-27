@@ -185,9 +185,6 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "FileRecycleBin", Value: constant.StatusEnable}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "SnapshotIgnore", Value: "*.sock"}).Error; err != nil {
-			return err
-		}
 
 		if err := tx.Create(&model.Setting{Key: "LocalSSHConn", Value: ""}).Error; err != nil {
 			return err
@@ -332,11 +329,18 @@ var AddSnapshotRule = &gormigrate.Migration{
 		)
 	},
 }
-
 var UpdatePHPRuntime = &gormigrate.Migration{
 	ID: "20250624-update-php-runtime",
 	Migrate: func(tx *gorm.DB) error {
 		service.HandleOldPHPRuntime()
 		return nil
+	},
+}
+var AddSnapshotIgnore = &gormigrate.Migration{
+	ID: "20250627-add-snapshot-ignore",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(
+			&model.Snapshot{},
+		)
 	},
 }

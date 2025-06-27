@@ -815,6 +815,9 @@ func (f FileOp) TarGzCompressPro(withDir bool, src, dst, secret, exclusionRules 
 		if len(exclude) == 0 {
 			continue
 		}
+		if strings.HasPrefix(exclude, "/") {
+			exclude, _ = filepath.Rel(src, exclude)
+		}
 		if _, ok := exMap[exclude]; ok {
 			continue
 		}
@@ -822,10 +825,6 @@ func (f FileOp) TarGzCompressPro(withDir bool, src, dst, secret, exclusionRules 
 		exMap[exclude] = struct{}{}
 	}
 
-	itemPrefix := filepath.Base(src)
-	if itemPrefix == "/" {
-		itemPrefix = ""
-	}
 	if len(secret) != 0 {
 		commands = fmt.Sprintf("tar %s -zcf - %s | openssl enc -aes-256-cbc -salt -k '%s' -out %s", exStr, srcItem, secret, dst)
 		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" %s ", secret), "******"))

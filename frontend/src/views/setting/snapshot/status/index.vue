@@ -131,6 +131,7 @@ import { snapshotRollback } from '@/api/modules/setting';
 import { MsgSuccess } from '@/utils/message';
 import { loadOsInfo } from '@/api/modules/dashboard';
 import SnapRecover from '@/views/setting/snapshot/recover/index.vue';
+import { newUUID } from '@/utils/util';
 
 const drawerVisible = ref(false);
 const snapInfo = ref();
@@ -181,7 +182,8 @@ const rollbackSnapshot = async () => {
         type: 'info',
     }).then(async () => {
         loading.value = true;
-        await snapshotRollback({ id: snapInfo.value.id, isNew: false, reDownload: false, secret: '' })
+        let taskID = newUUID();
+        await snapshotRollback({ id: snapInfo.value.id, isNew: false, reDownload: false, secret: '', taskID: taskID })
             .then(() => {
                 emit('search');
                 loading.value = false;

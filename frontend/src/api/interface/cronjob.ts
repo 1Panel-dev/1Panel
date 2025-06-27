@@ -23,6 +23,7 @@ export namespace Cronjob {
         appID: string;
         website: string;
         exclusionRules: string;
+        ignoreFiles: Array<string>;
         dbType: string;
         dbName: string;
         url: string;

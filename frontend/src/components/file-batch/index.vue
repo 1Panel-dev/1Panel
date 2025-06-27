@@ -1,6 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('setting.ignoreRule')" @close="handleClose" size="small">
-        <el-alert :closable="false" type="warning">{{ $t('setting.ignoreHelper') }}</el-alert>
+    <div>
         <el-form ref="formRef" :model="form" :rules="rules" v-loading="loading" class="mt-2">
             <el-form-item prop="tmpRule">
                 <div class="w-full">
@@ -13,6 +12,7 @@
                     />
                     <FileList @choose="loadDir" :path="baseDir" :isAll="true"></FileList>
                 </div>
+                <span class="input-help">{{ $t('cronjob.exclusionRulesHelper') }}</span>
             </el-form-item>
         </el-form>
 
@@ -30,26 +30,26 @@
                 </template>
             </el-table-column>
         </el-table>
-        <template #footer>
-            <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-            <el-button :disabled="loading" type="primary" @click="onSave()">
-                {{ $t('commons.button.save') }}
-            </el-button>
-        </template>
-    </DrawerPro>
+    </div>
 </template>
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import i18n from '@/lang';
-import { MsgSuccess } from '@/utils/message';
 import FileList from '@/components/file-list/index.vue';
 import { FormInstance } from 'element-plus';
-import { getAgentSettingInfo, loadBaseDir, updateAgentSetting } from '@/api/modules/setting';
+import { loadBaseDir } from '@/api/modules/setting';
 
 const loading = ref();
 const baseDir = ref();
-const drawerVisible = ref(false);
 const tableList = ref();
+const em = defineEmits(['update:files']);
+
+const props = defineProps({
+    files: {
+        type: Array<String>,
+        default: [],
+    },
+});
 
 const form = reactive({
     tmpRule: '',
@@ -76,17 +76,6 @@ function checkData(rule: any, value: any, callback: any) {
     callback();
 }
 
-const acceptParams = async (): Promise<void> => {
-    loadPath();
-    const res = await getAgentSettingInfo();
-    tableList.value = [];
-    let items = res.data.snapshotIgnore.split(',');
-    for (const item of items) {
-        tableList.value.push({ value: item });
-    }
-    drawerVisible.value = true;
-};
-
 const loadPath = async () => {
     const pathRes = await loadBaseDir();
     baseDir.value = pathRes.data;
@@ -106,35 +95,25 @@ const handleAdd = (formEl: FormInstance | undefined) => {
                 tableList.value.push({ value: item });
             }
         }
+        em(
+            'update:files',
+            tableList.value.map((item) => item.value),
+        );
         form.tmpRule = '';
     });
 };
 const handleDelete = (index: number) => {
     tableList.value.splice(index, 1);
+    em(
+        'update:files',
+        tableList.value.map((item) => item.value),
+    );
 };
 
-const onSave = async () => {
-    let list = [];
-    for (const item of tableList.value) {
-        list.push(item.value);
-    }
-    await updateAgentSetting({ key: 'SnapshotIgnore', value: list.join(',') })
-        .then(async () => {
-            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            loading.value = false;
-            drawerVisible.value = false;
-            return;
-        })
-        .catch(() => {
-            loading.value = false;
-        });
-};
-
-const handleClose = () => {
-    drawerVisible.value = false;
-};
-
-defineExpose({
-    acceptParams,
+onMounted(() => {
+    loadPath();
+    tableList.value = props.files.map((item) => {
+        return { value: item };
+    });
 });
 </script>
