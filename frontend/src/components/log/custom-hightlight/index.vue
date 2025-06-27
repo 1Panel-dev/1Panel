@@ -1,7 +1,7 @@
 <template>
     <span v-for="(token, index) in tokens" :key="index" :class="['token', token.type]" :style="{ color: token.color }">
-        <span v-if="token.type != 'html'">{{ token.text }}</span>
-        <span v-else v-html="token.text"></span>
+        <span v-if="token.type != 'html'" class="whitespace-pre">{{ token.text }}</span>
+        <span v-else v-html="token.text" class="whitespace-pre"></span>
     </span>
 </template>
 <script setup lang="ts">
@@ -194,8 +194,9 @@ function tokenizeLog(log: string): Token[] {
     });
 
     if (lastIndex < log.length) {
+        const rest = log.substring(lastIndex).replace(/\n?$/, '\n');
         tokens.push({
-            text: log.substring(lastIndex),
+            text: rest,
             type: 'plain',
             color: '#666666',
         });
