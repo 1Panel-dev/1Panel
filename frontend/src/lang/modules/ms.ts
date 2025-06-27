@@ -1406,7 +1406,8 @@ const message = {
         existFileTitle: 'Amaran fail dengan nama yang sama',
         existFileHelper: 'Fail yang dimuat naik mengandungi fail dengan nama yang sama. Adakah anda mahu menimpanya?',
         existFileSize: 'Saiz fail (baru -> lama)',
-        existFileDirHelper: 'Fail/folder yang dipilih mempunyai nama yang sama. Sila berhati-hati!',
+        existFileDirHelper: 'Fail/folder yang dipilih mempunyai nama yang sama. Sila berhati-hati!\n',
+        coverDirHelper: 'Folder yang dipilih untuk ditimpa akan disalin ke laluan destinasi!',
         noSuchFile: 'Fail atau direktori tidak ditemui. Sila periksa dan cuba lagi.',
     },
     ssh: {

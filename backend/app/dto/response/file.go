@@ -53,4 +53,5 @@ type ExistFileInfo struct {
 	Path    string    `json:"path"`
 	Size    float64   `json:"size"`
 	ModTime time.Time `json:"modTime"`
+	IsDir   bool      `json:"isDir"`
 }

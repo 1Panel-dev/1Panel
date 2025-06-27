@@ -1322,6 +1322,7 @@ const message = {
         existFileHelper: '上传的文件存在同名文件，是否覆盖？',
         existFileSize: '文件大小 (新 -> 旧)',
         existFileDirHelper: '选择的文件/文件夹存在同名，请谨慎操作！',
+        coverDirHelper: '选中覆盖的文件夹，将复制到目标路径！',
         noSuchFile: '未能找到该文件或目录，请检查后重试',
     },
     ssh: {
