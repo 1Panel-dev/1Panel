@@ -996,6 +996,10 @@ const message = {
         saveLocal: 'ローカルバックアップを保持します（クラウドストレージコピーの数と同じ）',
         url: 'URLアドレス',
         targetHelper: 'バックアップアカウントは、パネル設定で維持されます。',
+        withImageHelper:
+            'アプリストアのイメージをバックアップしますが、スナップショットファイルのサイズが大きくなります。',
+        ignoreApp: 'アプリを除外',
+        withImage: 'すべてのアプリイメージをバックアップ',
         retainCopies: '記録を保持します',
         retryTimes: 'リトライ回数',
         timeout: 'タイムアウト',

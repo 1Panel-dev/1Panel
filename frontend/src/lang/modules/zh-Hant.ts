@@ -977,6 +977,8 @@ const message = {
         saveLocal: '同時保留本地備份（和雲存儲保留份數一致）',
         url: 'URL 地址',
         targetHelper: '備份賬號可在面板設置中維護',
+        ignoreApp: '排除應用',
+        withImage: '備份所有應用鏡像',
         retainCopies: '保留份數',
         retryTimes: '失敗重試次數',
         timeout: '逾時時間',

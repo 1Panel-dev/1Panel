@@ -73,6 +73,9 @@ func (u *CronjobService) SearchWithPage(search dto.PageCronjob) (int64, interfac
 		} else {
 			item.AlertCount = 0
 		}
+		if cronjob.Type == "snapshot" && len(cronjob.SnapshotRule) != 0 {
+			_ = json.Unmarshal([]byte(cronjob.SnapshotRule), &item.SnapshotRule)
+		}
 		dtoCronjobs = append(dtoCronjobs, item)
 	}
 	return total, dtoCronjobs, err
@@ -93,6 +96,9 @@ func (u *CronjobService) LoadInfo(req dto.OperateByID) (*dto.CronjobOperate, err
 		item.AlertCount = alertCount
 	} else {
 		item.AlertCount = 0
+	}
+	if cronjob.Type == "snapshot" && len(cronjob.SnapshotRule) != 0 {
+		_ = json.Unmarshal([]byte(cronjob.SnapshotRule), &item.SnapshotRule)
 	}
 	return &item, err
 }
@@ -279,6 +285,13 @@ func (u *CronjobService) Create(req dto.CronjobOperate) error {
 	if err := copier.Copy(&cronjob, &req); err != nil {
 		return buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 	}
+	if cronjob.Type == "snapshot" {
+		rule, err := json.Marshal(req.SnapshotRule)
+		if err != nil {
+			return err
+		}
+		cronjob.SnapshotRule = string(rule)
+	}
 	if cronjob.Type == "cutWebsiteLog" {
 		backupAccount, err := backupRepo.Get(repo.WithByType(constant.Local))
 		if backupAccount.ID == 0 {
@@ -372,6 +385,13 @@ func (u *CronjobService) Update(id uint, req dto.CronjobOperate) error {
 	if err := copier.Copy(&cronjob, &req); err != nil {
 		return buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 	}
+	if req.Type == "snapshot" {
+		itemRule, err := json.Marshal(req.SnapshotRule)
+		if err != nil {
+			return err
+		}
+		cronjob.SnapshotRule = string(itemRule)
+	}
 	cronModel, err := cronjobRepo.Get(repo.WithByID(id))
 	if err != nil {
 		return buserr.New("ErrRecordNotFound")
@@ -412,6 +432,7 @@ func (u *CronjobService) Update(id uint, req dto.CronjobOperate) error {
 	upMap["db_name"] = req.DBName
 	upMap["url"] = req.URL
 	upMap["source_dir"] = req.SourceDir
+	upMap["snapshot_rule"] = cronjob.SnapshotRule
 
 	upMap["source_account_ids"] = req.SourceAccountIDs
 	upMap["download_account_id"] = req.DownloadAccountID

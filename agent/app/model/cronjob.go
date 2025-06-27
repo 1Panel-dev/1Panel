@@ -29,6 +29,7 @@ type Cronjob struct {
 	URL            string `json:"url"`
 	IsDir          bool   `json:"isDir"`
 	SourceDir      string `json:"sourceDir"`
+	SnapshotRule   string `json:"snapshotRule"`
 	ExclusionRules string `json:"exclusionRules"`
 
 	SourceAccountIDs  string `json:"sourceAccountIDs"`

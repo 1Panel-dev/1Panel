@@ -29,15 +29,16 @@ type CronjobOperate struct {
 	ContainerName string `json:"containerName"`
 	User          string `json:"user"`
 
-	ScriptID       uint   `json:"scriptID"`
-	AppID          string `json:"appID"`
-	Website        string `json:"website"`
-	ExclusionRules string `json:"exclusionRules"`
-	DBType         string `json:"dbType"`
-	DBName         string `json:"dbName"`
-	URL            string `json:"url"`
-	IsDir          bool   `json:"isDir"`
-	SourceDir      string `json:"sourceDir"`
+	ScriptID       uint         `json:"scriptID"`
+	AppID          string       `json:"appID"`
+	Website        string       `json:"website"`
+	ExclusionRules string       `json:"exclusionRules"`
+	DBType         string       `json:"dbType"`
+	DBName         string       `json:"dbName"`
+	URL            string       `json:"url"`
+	IsDir          bool         `json:"isDir"`
+	SourceDir      string       `json:"sourceDir"`
+	SnapshotRule   SnapshotRule `json:"snapshotRule"`
 
 	SourceAccountIDs  string `json:"sourceAccountIDs"`
 	DownloadAccountID uint   `json:"downloadAccountID"`
@@ -48,6 +49,11 @@ type CronjobOperate struct {
 
 	AlertCount uint   `json:"alertCount"`
 	AlertTitle string `json:"alertTitle"`
+}
+
+type SnapshotRule struct {
+	WithImage    bool   `json:"withImage"`
+	IgnoreAppIDs []uint `json:"ignoreAppIDs"`
 }
 
 type CronjobUpdateStatus struct {
@@ -87,18 +93,19 @@ type CronjobInfo struct {
 	ContainerName string `json:"containerName"`
 	User          string `json:"user"`
 
-	ScriptID       uint   `json:"scriptID"`
-	AppID          string `json:"appID"`
-	Website        string `json:"website"`
-	ExclusionRules string `json:"exclusionRules"`
-	DBType         string `json:"dbType"`
-	DBName         string `json:"dbName"`
-	URL            string `json:"url"`
-	IsDir          bool   `json:"isDir"`
-	SourceDir      string `json:"sourceDir"`
-	RetainCopies   int    `json:"retainCopies"`
-	RetryTimes     int    `json:"retryTimes"`
-	Timeout        uint   `json:"timeout"`
+	ScriptID       uint         `json:"scriptID"`
+	AppID          string       `json:"appID"`
+	Website        string       `json:"website"`
+	ExclusionRules string       `json:"exclusionRules"`
+	DBType         string       `json:"dbType"`
+	DBName         string       `json:"dbName"`
+	URL            string       `json:"url"`
+	IsDir          bool         `json:"isDir"`
+	SourceDir      string       `json:"sourceDir"`
+	RetainCopies   int          `json:"retainCopies"`
+	RetryTimes     int          `json:"retryTimes"`
+	Timeout        uint         `json:"timeout"`
+	SnapshotRule   SnapshotRule `json:"snapshotRule"`
 
 	SourceAccounts    []string `json:"sourceAccounts"`
 	DownloadAccount   string   `json:"downloadAccount"`

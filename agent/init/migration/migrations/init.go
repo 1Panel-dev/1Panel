@@ -323,3 +323,12 @@ var UpdateRuntime = &gormigrate.Migration{
 		)
 	},
 }
+
+var AddSnapshotRule = &gormigrate.Migration{
+	ID: "20250627-add-snapshot-rule",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(
+			&model.Cronjob{},
+		)
+	},
+}

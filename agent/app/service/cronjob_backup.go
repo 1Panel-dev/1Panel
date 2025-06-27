@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path"
@@ -250,10 +251,6 @@ func (u *CronjobService) handleSnapshot(cronjob model.Cronjob, jobRecord model.J
 	if err != nil {
 		return err
 	}
-	itemData, err := NewISnapshotService().LoadSnapshotData()
-	if err != nil {
-		return err
-	}
 
 	var record model.BackupRecord
 	record.From = "cronjob"
@@ -267,6 +264,11 @@ func (u *CronjobService) handleSnapshot(cronjob model.Cronjob, jobRecord model.J
 	scope := "core"
 	if !global.IsMaster {
 		scope = "agent"
+	}
+
+	itemData, err := loadSnapWithRule(cronjob)
+	if err != nil {
+		return err
 	}
 	req := dto.SnapshotCreate{
 		Name:   fmt.Sprintf("snapshot-1panel-%s-%s-linux-%s-%s", scope, versionItem.Value, loadOs(), jobRecord.StartTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5)),
@@ -450,4 +452,53 @@ func handleBackupLogs(taskItem *task.Task, targetDir, fileName string, secret st
 		_ = os.RemoveAll(targetDir)
 	}()
 	return nil
+}
+
+func loadSnapWithRule(cronjob model.Cronjob) (dto.SnapshotData, error) {
+	itemData, err := NewISnapshotService().LoadSnapshotData()
+	if err != nil {
+		return itemData, err
+	}
+
+	if len(cronjob.SnapshotRule) == 0 {
+		return itemData, nil
+	}
+	var snapRule dto.SnapshotRule
+	if err := json.Unmarshal([]byte(cronjob.SnapshotRule), &snapRule); err != nil {
+		return itemData, err
+	}
+	if len(snapRule.IgnoreAppIDs) == 0 && !snapRule.WithImage {
+		return itemData, nil
+	}
+
+	var ignoreApps []model.AppInstall
+	if len(snapRule.IgnoreAppIDs) != 0 {
+		ignoreApps, _ = appInstallRepo.ListBy(context.Background(), repo.WithByIDs(snapRule.IgnoreAppIDs))
+	}
+	if len(ignoreApps) == 0 && !snapRule.WithImage {
+		return itemData, nil
+	}
+	for i := 0; i < len(itemData.AppData); i++ {
+		isIgnore := false
+		for _, ignore := range ignoreApps {
+			if ignore.App.Key == itemData.AppData[i].Key && ignore.Name == itemData.AppData[i].Name {
+				isIgnore = true
+				itemData.AppData[i].IsCheck = false
+				for j := 0; j < len(itemData.AppData[i].Children); j++ {
+					if itemData.AppData[i].Children[j].Label == "appData" {
+						itemData.AppData[i].Children[j].IsCheck = false
+					}
+				}
+				break
+			}
+		}
+		if snapRule.WithImage && !isIgnore {
+			for j := 0; j < len(itemData.AppData[i].Children); j++ {
+				if itemData.AppData[i].Children[j].Label == "appImage" {
+					itemData.AppData[i].Children[j].IsCheck = true
+				}
+			}
+		}
+	}
+	return itemData, nil
 }

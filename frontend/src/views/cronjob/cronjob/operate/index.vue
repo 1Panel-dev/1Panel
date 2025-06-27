@@ -504,6 +504,30 @@
                                 </LayoutCol>
                             </el-row>
 
+                            <el-row :gutter="20" v-if="form.type === 'snapshot'">
+                                <LayoutCol>
+                                    <el-form-item prop="withImage">
+                                        <el-checkbox v-model="form.withImage" :label="$t('cronjob.withImage')" />
+                                    </el-form-item>
+                                </LayoutCol>
+                            </el-row>
+                            <el-row :gutter="20" v-if="form.type === 'snapshot'">
+                                <LayoutCol>
+                                    <el-form-item :label="$t('cronjob.ignoreApp')" prop="ignoreAppIDs">
+                                        <el-select v-model="form.ignoreAppIDs" multiple cleanable>
+                                            <div v-for="item in appOptions" :key="item.id">
+                                                <el-option :value="item.id" :label="item.name">
+                                                    <span>{{ item.name }}</span>
+                                                    <el-tag class="tagClass">
+                                                        {{ item.key }}
+                                                    </el-tag>
+                                                </el-option>
+                                            </div>
+                                        </el-select>
+                                    </el-form-item>
+                                </LayoutCol>
+                            </el-row>
+
                             <el-row :gutter="20">
                                 <LayoutCol v-if="isBackup()">
                                     <el-form-item :label="$t('setting.backupAccount')" prop="sourceAccountItems">
@@ -739,6 +763,9 @@ const form = reactive<Cronjob.CronjobInfo>({
     isDir: true,
     files: [],
     sourceDir: '',
+    snapshotRule: { withImage: false, ignoreAppIDs: [] },
+    ignoreAppIDs: [],
+    withImage: false,
 
     sourceAccounts: [],
     downloadAccount: '',
@@ -812,6 +839,8 @@ const search = async () => {
                 form.dbName = res.data.dbName;
                 form.dbNameList = res.data.dbName.split(',') || [];
                 form.url = res.data.url;
+                form.withImage = res.data.snapshotRule.withImage;
+                form.ignoreAppIDs = res.data.snapshotRule.ignoreAppIDs;
 
                 form.isDir = res.data.isDir;
                 form.sourceDir = res.data.sourceDir;
@@ -1298,6 +1327,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             form.dbName = form.dbNameList.join(',');
         }
 
+        form.snapshotRule = { withImage: form.withImage, ignoreAppIDs: form.ignoreAppIDs };
         form.alertCount = form.hasAlert && isProductPro.value ? form.alertCount : 0;
         form.alertTitle =
             form.hasAlert && isProductPro.value

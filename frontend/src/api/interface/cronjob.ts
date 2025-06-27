@@ -29,6 +29,9 @@ export namespace Cronjob {
         isDir: boolean;
         files: Array<Item>;
         sourceDir: string;
+        snapshotRule: snapshotRule;
+        ignoreAppIDs: Array<Number>;
+        withImage: boolean;
 
         websiteList: Array<string>;
         appIdList: Array<string>;
@@ -72,6 +75,7 @@ export namespace Cronjob {
         url: string;
         isDir: boolean;
         sourceDir: string;
+        snapshotRule: snapshotRule;
 
         //shell
         executor: string;
@@ -90,6 +94,10 @@ export namespace Cronjob {
 
         alertCount: number;
         alertTitle: string;
+    }
+    export interface snapshotRule {
+        withImage: boolean;
+        ignoreAppIDs: Array<Number>;
     }
     export interface SpecObj {
         specType: string;
