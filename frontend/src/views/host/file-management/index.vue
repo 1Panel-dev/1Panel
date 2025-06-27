@@ -603,7 +603,7 @@ let selects = ref<any>([]);
 const initData = () => ({
     path: '/',
     expand: true,
-    showHidden: false,
+    showHidden: true,
     page: 1,
     pageSize: 100,
     search: '',
@@ -718,6 +718,7 @@ const handleSearchResult = (res: ResultData<File.File>) => {
 
 const viewHideFile = async () => {
     req.showHidden = !req.showHidden;
+    localStorage.setItem('show-hidden', req.showHidden ? 'true' : 'false');
     let searchResult = await searchFile();
     handleSearchResult(searchResult);
 };
@@ -1411,6 +1412,10 @@ const getHostMount = async () => {
 };
 
 onMounted(() => {
+    if (localStorage.getItem('show-hidden') === null) {
+        localStorage.setItem('show-hidden', 'true');
+    }
+    req.showHidden = localStorage.getItem('show-hidden') === 'true';
     getHostMount();
     if (router.currentRoute.value.query.path) {
         req.path = String(router.currentRoute.value.query.path);

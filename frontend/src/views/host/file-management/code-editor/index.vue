@@ -753,7 +753,7 @@ const initEditor = () => {
             lineNumbersMinChars: 6,
         });
         if (editor.getModel().getValue() === '') {
-            let defaultContent = '\n\n\n\n';
+            let defaultContent = '';
             editor.getModel().setValue(defaultContent);
         }
 

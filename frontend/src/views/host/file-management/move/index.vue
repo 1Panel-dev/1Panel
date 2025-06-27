@@ -246,6 +246,7 @@ const acceptParams = async (props: MoveProps) => {
     addForm.name = '';
     addForm.allNames = props.allNames;
     type.value = props.type;
+    existFiles.value = [];
     if (props.name && props.name != '') {
         oldName.value = props.name;
         const res = await checkFile(props.path + '/' + props.name, false);
