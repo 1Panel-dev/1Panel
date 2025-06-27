@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="open" :header="title" @close="handleClose" size="675">
+    <DrawerPro v-model="open" :header="title" @close="handleClose" size="690">
         <el-form
             @submit.prevent
             ref="fileForm"
@@ -8,6 +8,16 @@
             :rules="rules"
             v-loading="loading"
         >
+            <el-alert
+                v-if="type == 'cut' && existFiles?.length == 0 && addForm.cover && changeName"
+                show-icon
+                type="warning"
+                :closable="false"
+            >
+                <template #title>
+                    <span class="whitespace-break-spaces">{{ $t('file.coverDirHelper') }}</span>
+                </template>
+            </el-alert>
             <el-form-item :label="$t('file.path')" prop="newPath">
                 <el-input v-model="addForm.newPath">
                     <template #prepend><FileList @choose="getPath" :dir="true"></FileList></template>
@@ -23,10 +33,12 @@
                 </el-radio-group>
             </div>
             <div v-if="existFiles.length > 0 && !changeName" class="text-center">
-                <el-alert :show-icon="true" type="warning" :closable="false">
-                    <div class="whitespace-break-spaces">
-                        <span>{{ $t('file.existFileDirHelper') }}</span>
-                    </div>
+                <el-alert show-icon type="warning" :closable="false">
+                    <template #title>
+                        <span class="whitespace-break-spaces">
+                            {{ $t('file.existFileDirHelper') + $t('file.coverDirHelper') }}
+                        </span>
+                    </template>
                 </el-alert>
                 <el-transfer
                     v-model="skipFiles"
@@ -60,6 +72,7 @@ import { ref, reactive, computed, ComputedRef } from 'vue';
 import FileList from '@/components/file-list/index.vue';
 import { MsgSuccess } from '@/utils/message';
 import { getDateStr } from '@/utils/util';
+import { File } from '@/api/interface/file';
 
 interface MoveProps {
     oldPaths: Array<string>;
@@ -76,7 +89,7 @@ const open = ref(false);
 const type = ref('cut');
 const changeName = ref(false);
 const oldName = ref('');
-const existFiles = ref([]);
+const existFiles = ref<File.ExistFileInfo[]>([]);
 const skipFiles = ref([]);
 const transferData = ref([]);
 
@@ -96,6 +109,7 @@ const addForm = reactive({
     allNames: [] as string[],
     isDir: false,
     cover: false,
+    coverPaths: [] as string[],
 });
 
 const rules = reactive<FormRules>({
@@ -122,7 +136,20 @@ const getFileName = (filePath: string) => {
 };
 
 const coverFiles: ComputedRef<string[]> = computed(() => {
-    return addForm.oldPaths.filter((item) => !skipFiles.value.includes(getFileName(item))).map((item) => item);
+    const existingNames = new Set(
+        existFiles.value.filter((item) => !skipFiles.value.includes(item.name) && item.isDir).map((item) => item.name),
+    );
+    return addForm.oldPaths.filter((path) => existingNames.has(getFileName(path)));
+});
+
+const mvFiles: ComputedRef<string[]> = computed(() => {
+    const skipSet = new Set(skipFiles.value);
+    const coverSet = new Set(coverFiles.value.map(getFileName));
+
+    return addForm.oldPaths.filter((path) => {
+        const name = getFileName(path);
+        return !skipSet.has(name) && !coverSet.has(name);
+    });
 });
 
 const getPath = (path: string) => {
@@ -159,7 +186,8 @@ const submit = async (formEl: FormInstance | undefined) => {
             return;
         }
         loading.value = true;
-        addForm.oldPaths = coverFiles.value;
+        addForm.coverPaths = coverFiles.value;
+        addForm.oldPaths = mvFiles.value;
         mvFile();
     });
 };
@@ -247,7 +275,7 @@ defineExpose({ acceptParams });
 
 <style lang="scss" scoped>
 :deep(.el-transfer) {
-    --el-transfer-panel-width: 250px;
+    --el-transfer-panel-width: 260px;
     .el-button {
         padding: 4px 7px;
     }

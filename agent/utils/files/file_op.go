@@ -329,25 +329,30 @@ func (f FileOp) DownloadFile(url, dst string) error {
 }
 
 func (f FileOp) Cut(oldPaths []string, dst, name string, cover bool) error {
-	for _, p := range oldPaths {
-		var dstPath string
-		if name != "" {
-			dstPath = filepath.Join(dst, name)
-			if f.Stat(dstPath) {
-				dstPath = dst
-			}
-		} else {
-			base := filepath.Base(p)
-			dstPath = filepath.Join(dst, base)
+	if len(oldPaths) == 0 {
+		return nil
+	}
+	var dstPath string
+	coverFlag := ""
+	if name != "" {
+		dstPath = filepath.Join(dst, name)
+		if f.Stat(dstPath) {
+			dstPath = dst
 		}
-		coverFlag := ""
 		if cover {
 			coverFlag = "-f"
 		}
-
-		if err := cmd.RunDefaultBashCf(`mv %s '%s' '%s'`, coverFlag, p, dstPath); err != nil {
-			return err
-		}
+	} else {
+		dstPath = dst
+		coverFlag = "-f"
+	}
+	var quotedPaths []string
+	for _, p := range oldPaths {
+		quotedPaths = append(quotedPaths, fmt.Sprintf("'%s'", p))
+	}
+	mvCommand := fmt.Sprintf("mv %s %s '%s'", coverFlag, strings.Join(quotedPaths, " "), dstPath)
+	if err := cmd.RunDefaultBashCf(mvCommand); err != nil {
+		return err
 	}
 	return nil
 }

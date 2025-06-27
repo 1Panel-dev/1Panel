@@ -168,6 +168,7 @@ export namespace File {
         size: number;
         uploadSize: number;
         modTime: string;
+        isDir: boolean;
     }
 
     export interface RecycleBin {

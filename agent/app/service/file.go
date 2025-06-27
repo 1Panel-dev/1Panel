@@ -394,10 +394,18 @@ func (f *FileService) MvFile(m request.FileMove) error {
 			return buserr.New("ErrMovePathFailed")
 		}
 	}
+	var errs []error
 	if m.Type == "cut" {
+		if len(m.CoverPaths) > 0 {
+			for _, src := range m.CoverPaths {
+				if err := fo.CopyAndReName(src, m.NewPath, "", true); err != nil {
+					errs = append(errs, err)
+					global.LOG.Errorf("cut copy file [%s] to [%s] failed, err: %s", src, m.NewPath, err.Error())
+				}
+			}
+		}
 		return fo.Cut(m.OldPaths, m.NewPath, m.Name, m.Cover)
 	}
-	var errs []error
 	if m.Type == "copy" {
 		for _, src := range m.OldPaths {
 			if err := fo.CopyAndReName(src, m.NewPath, m.Name, m.Cover); err != nil {
@@ -569,6 +577,7 @@ func (f *FileService) BatchCheckFiles(req request.FilePathsCheck) []response.Exi
 				Name:    info.Name(),
 				Path:    filePath,
 				ModTime: info.ModTime(),
+				IsDir:   info.IsDir(),
 			})
 		}
 	}
