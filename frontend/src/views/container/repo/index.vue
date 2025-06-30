@@ -52,8 +52,9 @@
             </template>
         </LayoutContent>
 
-        <OpDialog ref="opRef" @search="search" />
+        <OpDialog ref="opRef" @search="search" @submit="submitDelete" />
         <OperatorDialog @search="search" ref="dialogRef" />
+        <ConfirmDialog ref="confirmDialog" @confirm="submitDelete" />
     </div>
 </template>
 
@@ -78,6 +79,8 @@ const paginationConfig = reactive({
 const searchName = ref();
 
 const opRef = ref();
+const confirmDialog = ref();
+const currentRepo = ref();
 
 const isActive = ref();
 const isExist = ref();
@@ -118,7 +121,16 @@ const onOpenDialog = async (
 };
 
 const onDelete = async (row: Container.RepoInfo) => {
-    let ids = [row.id];
+    currentRepo.value = row.id;
+    if (row.protocol === 'http') {
+        let params = {
+            header: i18n.global.t('container.repo'),
+            operationInfo: i18n.global.t('container.httpRepoHelper'),
+            submitInputInfo: i18n.global.t('database.restartNow'),
+        };
+        confirmDialog.value!.acceptParams(params);
+        return;
+    }
     opRef.value.acceptParams({
         title: i18n.global.t('commons.button.delete'),
         names: [row.name],
@@ -126,9 +138,19 @@ const onDelete = async (row: Container.RepoInfo) => {
             i18n.global.t('container.repo'),
             i18n.global.t('commons.button.delete'),
         ]),
-        api: deleteImageRepo,
-        params: { ids: ids },
     });
+};
+
+const submitDelete = async () => {
+    loading.value = true;
+    await deleteImageRepo(currentRepo.value)
+        .then(() => {
+            loading.value = false;
+            search();
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const onCheckConn = async (row: Container.RepoInfo) => {

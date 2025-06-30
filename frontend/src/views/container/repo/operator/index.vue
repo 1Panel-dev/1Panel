@@ -70,6 +70,8 @@
             </span>
         </template>
     </DrawerPro>
+
+    <ConfirmDialog ref="confirmDialog" @confirm="submit" />
 </template>
 
 <script lang="ts" setup>
@@ -88,6 +90,10 @@ interface DialogProps {
     rowData?: Container.RepoInfo;
     getTableList?: () => Promise<any>;
 }
+const confirmDialog = ref();
+const oldUrl = ref();
+const oldProto = ref();
+
 const title = ref<string>('');
 const drawerVisible = ref(false);
 const dialogData = ref<DialogProps>({
@@ -95,12 +101,15 @@ const dialogData = ref<DialogProps>({
 });
 const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
+    oldUrl.value = params.rowData.downloadUrl;
+    oldProto.value = params.rowData.protocol;
     title.value = i18n.global.t('commons.button.' + dialogData.value.title);
     drawerVisible.value = true;
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 const handleClose = () => {
+    emit('search');
     drawerVisible.value = false;
 };
 const rules = reactive({
@@ -130,21 +139,33 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        loading.value = true;
-        if (dialogData.value.title === 'add') {
-            await createImageRepo(dialogData.value.rowData!)
-                .then(() => {
-                    loading.value = false;
-                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                    emit('search');
-                    drawerVisible.value = false;
-                })
-                .catch(() => {
-                    loading.value = false;
-                });
+        let newProto = dialogData.value.rowData.protocol;
+        if (newProto === 'https' && dialogData.value.title === 'add') {
+            submit();
             return;
         }
-        await updateImageRepo(dialogData.value.rowData!)
+        if (newProto === oldProto.value) {
+            if (
+                (oldProto.value === 'http' && dialogData.value.rowData.downloadUrl === oldUrl.value) ||
+                oldProto.value === 'https'
+            ) {
+                submit();
+                return;
+            }
+        }
+        let params = {
+            header: i18n.global.t('container.repo'),
+            operationInfo: i18n.global.t('container.httpRepoHelper'),
+            submitInputInfo: i18n.global.t('database.restartNow'),
+        };
+        confirmDialog.value!.acceptParams(params);
+    });
+};
+
+const submit = async () => {
+    loading.value = true;
+    if (dialogData.value.title === 'add') {
+        await createImageRepo(dialogData.value.rowData!)
             .then(() => {
                 loading.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
@@ -154,7 +175,18 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             .catch(() => {
                 loading.value = false;
             });
-    });
+        return;
+    }
+    await updateImageRepo(dialogData.value.rowData!)
+        .then(() => {
+            loading.value = false;
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            emit('search');
+            drawerVisible.value = false;
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 defineExpose({

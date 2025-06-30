@@ -246,9 +246,6 @@ export namespace Container {
         password: string;
         auth: boolean;
     }
-    export interface RepoDelete {
-        ids: Array<number>;
-    }
     export interface RepoInfo {
         id: number;
         createdAt: Date;

@@ -878,6 +878,7 @@ const message = {
 
         repo: 'Pendaftaran',
         createRepo: 'Tambah',
+        httpRepoHelper: 'Mengoperasikan repositori jenis HTTP memerlukan mulakan semula perkhidmatan Docker.',
         httpRepo:
             'Memilih protokol HTTP memerlukan memulakan semula perkhidmatan Docker untuk menambahkannya ke pendaftaran tidak selamat.',
         delInsecure: 'Padamkan pendaftaran tidak selamat',

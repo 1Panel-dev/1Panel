@@ -98,20 +98,20 @@ func (b *BaseApi) CreateRepo(c *gin.Context) {
 // @Tags Container Image-repo
 // @Summary Delete image repo
 // @Accept json
-// @Param request body dto.ImageRepoDelete true "request"
+// @Param request body dto.OperateByID true "request"
 // @Produce json
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /containers/repo/del [post]
-// @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"ids","isList":true,"db":"image_repos","output_column":"name","output_value":"names"}],"formatZH":"删除镜像仓库 [names]","formatEN":"delete image repo [names]"}
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"image_repos","output_column":"name","output_value":"name"}],"formatZH":"删除镜像仓库 [name]","formatEN":"delete image repo [name]"}
 func (b *BaseApi) DeleteRepo(c *gin.Context) {
-	var req dto.ImageRepoDelete
+	var req dto.OperateByID
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 
-	if err := imageRepoService.BatchDelete(req); err != nil {
+	if err := imageRepoService.Delete(req); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}

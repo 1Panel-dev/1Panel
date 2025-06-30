@@ -28,7 +28,7 @@ type IImageRepoService interface {
 	Login(req dto.OperateByID) error
 	Create(req dto.ImageRepoCreate) error
 	Update(req dto.ImageRepoUpdate) error
-	BatchDelete(req dto.ImageRepoDelete) error
+	Delete(req dto.OperateByID) error
 }
 
 func NewIImageRepoService() IImageRepoService {
@@ -91,28 +91,7 @@ func (u *ImageRepoService) Create(req dto.ImageRepoCreate) error {
 		if err := u.handleRegistries(req.DownloadUrl, "", "create"); err != nil {
 			return fmt.Errorf("create registry %s failed, err: %v", req.DownloadUrl, err)
 		}
-		if err := restartDocker(); err != nil {
-			return err
-		}
-		ticker := time.NewTicker(3 * time.Second)
-		defer ticker.Stop()
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
-		if err := func() error {
-			for range ticker.C {
-				select {
-				case <-ctx.Done():
-					cancel()
-					return errors.New("the docker service cannot be restarted")
-				default:
-					stdout, err := cmd.RunDefaultWithStdoutBashC("systemctl is-active docker")
-					if string(stdout) == "active\n" && err == nil {
-						global.LOG.Info("docker restart with new conf successful!")
-						return nil
-					}
-				}
-			}
-			return nil
-		}(); err != nil {
+		if err := stopBeforeUpdateRepo(); err != nil {
 			return err
 		}
 	}
@@ -131,15 +110,32 @@ func (u *ImageRepoService) Create(req dto.ImageRepoCreate) error {
 	return imageRepoRepo.Create(&imageRepo)
 }
 
-func (u *ImageRepoService) BatchDelete(req dto.ImageRepoDelete) error {
-	for _, id := range req.Ids {
-		if id == 1 {
-			return errors.New("The default value cannot be edit !")
-		}
+func (u *ImageRepoService) Delete(req dto.OperateByID) error {
+	if req.ID == 1 {
+		return errors.New("The default value cannot be edit !")
 	}
-	if err := imageRepoRepo.Delete(repo.WithByIDs(req.Ids)); err != nil {
+	itemRepo, _ := imageRepoRepo.Get(repo.WithByID(req.ID))
+	if itemRepo.ID == 0 {
+		return buserr.New("ErrRecordNotFound")
+	}
+	if itemRepo.Auth {
+		_, _ = cmd.NewCommandMgr().RunWithStdout("docker", "logout", "-i", itemRepo.DownloadUrl)
+	}
+	if itemRepo.Protocol == "https" {
+		return imageRepoRepo.Delete(repo.WithByID(req.ID))
+	}
+	if err := u.handleRegistries("", itemRepo.DownloadUrl, "delete"); err != nil {
+		return fmt.Errorf("delete registry %s failed, err: %v", itemRepo.DownloadUrl, err)
+	}
+	if err := validateDockerConfig(); err != nil {
 		return err
 	}
+	if err := imageRepoRepo.Delete(repo.WithByID(req.ID)); err != nil {
+		return err
+	}
+	go func() {
+		_ = restartDocker()
+	}()
 	return nil
 }
 
@@ -154,38 +150,37 @@ func (u *ImageRepoService) Update(req dto.ImageRepoUpdate) error {
 	if err != nil {
 		return err
 	}
+	needRestart := false
 	if repo.Protocol == "http" && req.Protocol == "https" {
 		if err := u.handleRegistries("", repo.DownloadUrl, "delete"); err != nil {
 			return fmt.Errorf("delete registry %s failed, err: %v", repo.DownloadUrl, err)
 		}
+		needRestart = true
 	}
 	if repo.Protocol == "http" && req.Protocol == "http" {
 		if err := u.handleRegistries(req.DownloadUrl, repo.DownloadUrl, "update"); err != nil {
 			return fmt.Errorf("update registry %s => %s failed, err: %v", repo.DownloadUrl, req.DownloadUrl, err)
 		}
+		needRestart = repo.DownloadUrl == req.DownloadUrl
 	}
 	if repo.Protocol == "https" && req.Protocol == "http" {
 		if err := u.handleRegistries(req.DownloadUrl, "", "create"); err != nil {
 			return fmt.Errorf("create registry %s failed, err: %v", req.DownloadUrl, err)
 		}
+		needRestart = true
 	}
-	if repo.Auth != req.Auth || repo.DownloadUrl != req.DownloadUrl {
-		if repo.Auth {
-			cmdMgr := cmd.NewCommandMgr()
-			_, _ = cmdMgr.RunWithStdout("docker", "logout", "-i", repo.DownloadUrl)
-		}
-		if req.Auth {
-			if err := u.CheckConn(req.DownloadUrl, req.Username, req.Password); err != nil {
-				return err
-			}
+	if needRestart {
+		if err := stopBeforeUpdateRepo(); err != nil {
+			return err
 		}
 	}
-
-	if err := validateDockerConfig(); err != nil {
-		return err
+	if repo.Auth {
+		_, _ = cmd.NewCommandMgr().RunWithStdout("docker", "logout", "-i", repo.DownloadUrl)
 	}
-	if err := restartDocker(); err != nil {
-		return err
+	if req.Auth {
+		if err := u.CheckConn(req.DownloadUrl, req.Username, req.Password); err != nil {
+			return err
+		}
 	}
 
 	upMap := make(map[string]interface{})
@@ -256,6 +251,37 @@ func (u *ImageRepoService) handleRegistries(newHost, delHost, handle string) err
 		return err
 	}
 	if err := os.WriteFile(constant.DaemonJsonPath, newJson, 0640); err != nil {
+		return err
+	}
+	return nil
+}
+
+func stopBeforeUpdateRepo() error {
+	if err := validateDockerConfig(); err != nil {
+		return err
+	}
+	if err := restartDocker(); err != nil {
+		return err
+	}
+	ticker := time.NewTicker(3 * time.Second)
+	defer ticker.Stop()
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
+	if err := func() error {
+		for range ticker.C {
+			select {
+			case <-ctx.Done():
+				cancel()
+				return errors.New("the docker service cannot be restarted")
+			default:
+				stdout, err := cmd.RunDefaultWithStdoutBashC("systemctl is-active docker")
+				if string(stdout) == "active\n" && err == nil {
+					global.LOG.Info("docker restart with new conf successful!")
+					return nil
+				}
+			}
+		}
+		return nil
+	}(); err != nil {
 		return err
 	}
 	return nil

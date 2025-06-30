@@ -872,6 +872,7 @@ const message = {
 
         repo: 'Registries',
         createRepo: 'Adicionar',
+        httpRepoHelper: 'Operar um repositório do tipo HTTP requer reinicialização do serviço Docker.',
         httpRepo:
             'Escolher o protocolo HTTP requer reiniciar o serviço Docker para adicioná-lo a registries inseguros.',
         delInsecure: 'Remover da lista de segurança',

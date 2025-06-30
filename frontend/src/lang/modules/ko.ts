@@ -852,6 +852,7 @@ const message = {
 
         repo: '레지스트리',
         createRepo: '추가',
+        httpRepoHelper: 'HTTP 타입 저장소 작업 시 Docker 서비스 재시작이 필요합니다.',
         httpRepo: 'HTTP 프로토콜을 선택하면 Docker 서비스를 재시작하여 불안정한 레지스트리에 추가해야 합니다.',
         delInsecure: '신뢰할 수 없는 항목 삭제',
         delInsecureHelper:

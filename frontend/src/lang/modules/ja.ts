@@ -861,6 +861,7 @@ const message = {
 
         repo: 'レジストリ',
         createRepo: '追加',
+        httpRepoHelper: 'HTTPタイプのリポジトリを操作するにはDockerサービスの再起動が必要です。',
         httpRepo:
             'HTTPプロトコルを選択するには、Dockerサービスを再起動して不安定なレジストリに追加する必要があります。',
         delInsecure: 'クレジットの削除',

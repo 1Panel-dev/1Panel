@@ -854,6 +854,7 @@ const message = {
 
         repo: '倉庫',
         createRepo: '添加倉庫',
+        httpRepoHelper: '操作 HTTP 類型倉庫需要重啟 Docker 服務。',
         downloadUrl: '下載地址',
         imageRepo: '鏡像倉庫',
         repoHelper: '是否包含鏡像倉庫/組織/項目?',
