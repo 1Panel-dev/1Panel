@@ -44,8 +44,6 @@ const GlobalStore = defineStore({
         productProExpires: 0,
         isMasterProductPro: false,
 
-        errStatus: '',
-
         currentNode: 'local',
         currentNodeAddr: '',
     }),

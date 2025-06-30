@@ -1971,8 +1971,6 @@ const message = {
         takeDown: '내리기',
         allReadyInstalled: '설치됨',
         installHelper: '이미지 풀 문제 시 이미지 가속을 구성하세요.',
-        upgradeHelper:
-            '업그레이드 전에 비정상적인 애플리케이션을 정상 상태로 복원하세요. 업그레이드 실패 시 "로그 > 시스템 로그"에서 실패 원인을 확인하세요.',
         installWarn:
             '외부 접근이 활성화되지 않아 애플리케이션이 외부 네트워크에서 접근할 수 없습니다. 계속 하시겠습니까?',
         showIgnore: '무시된 애플리케이션 보기',

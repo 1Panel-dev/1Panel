@@ -2062,7 +2062,6 @@ const message = {
         takeDown: 'Henti Operasi',
         allReadyInstalled: 'Telah Dipasang',
         installHelper: 'Jika terdapat isu tarikan imej, konfigurasikan pecutan imej.',
-        upgradeHelper: 'Bawa aplikasi yang tidak normal kembali ke status normal sebelum meningkatkan.',
         installWarn:
             'Akses luaran tidak diaktifkan, yang menghalang aplikasi daripada diakses melalui rangkaian luaran. Adakah anda mahu meneruskan?',
         showIgnore: 'Lihat aplikasi yang diabaikan',

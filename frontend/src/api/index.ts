@@ -47,7 +47,6 @@ class RequestHttp {
 
         this.service.interceptors.response.use(
             (response: AxiosResponse) => {
-                globalStore.errStatus = '';
                 const { data } = response;
                 if (data.code == ResultEnum.OVERDUE || data.code == ResultEnum.FORBIDDEN) {
                     globalStore.setLogStatus(false);
@@ -94,7 +93,6 @@ class RequestHttp {
                 return data;
             },
             async (error: AxiosError) => {
-                globalStore.errStatus = '';
                 const { response } = error;
 
                 if (error.message.indexOf('timeout') !== -1) MsgError(i18n.global.t('commons.msg.requestTimeout'));
@@ -111,11 +109,6 @@ class RequestHttp {
                             );
                             return Promise.reject(error);
                         default:
-                            globalStore.errStatus = 'code-' + response.status;
-                            router.push({
-                                name: 'entrance',
-                                params: { code: globalStore.entrance },
-                            });
                             return;
                     }
                 }

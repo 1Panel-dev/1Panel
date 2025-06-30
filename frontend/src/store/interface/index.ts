@@ -41,8 +41,6 @@ export interface GlobalState {
     productProExpires: number;
     isMasterProductPro: boolean;
 
-    errStatus: string;
-
     currentNode: string;
     currentNodeAddr: string;
 }

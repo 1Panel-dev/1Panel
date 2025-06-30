@@ -17,13 +17,6 @@
         <template #main>
             <div>
                 <MainDiv :heightDiff="mode === 'upgrade' ? 270 : 300">
-                    <el-alert
-                        type="info"
-                        :title="$t('app.upgradeHelper')"
-                        :closable="false"
-                        v-if="mode === 'upgrade'"
-                    />
-
                     <el-alert type="info" :closable="false" v-if="mode === 'installed'">
                         <template #title>
                             <span class="flx-align-center">

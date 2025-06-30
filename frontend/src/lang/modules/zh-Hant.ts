@@ -1954,7 +1954,6 @@ const message = {
         takeDown: '已廢棄',
         allReadyInstalled: '已安裝',
         installHelper: '配置鏡像加速可以解決鏡像拉取失敗的問題',
-        upgradeHelper: '異常應用程式需要先同步到正常狀態，升級失敗請在日誌審計-系統日誌中查看失敗原因',
         installWarn: '當前未勾選端口外部訪問，將無法通過外網IP:端口訪問，是否繼續？ ',
         showIgnore: '查看忽略應用',
         cancelIgnore: '取消忽略',

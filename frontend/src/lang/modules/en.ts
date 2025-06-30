@@ -2092,8 +2092,6 @@ const message = {
         takeDown: 'TakeDown',
         allReadyInstalled: 'Installed',
         installHelper: 'If you have image pull issues, configure image acceleration.',
-        upgradeHelper:
-            'Bring abnormal applications back to normal status before upgrading. If the upgrade fails, go to "Logs > System Logs" to check the failure reason.',
         installWarn: `The external access isn't checked, and it will make the application unable to access through external network. Do you want to continue?`,
         showIgnore: 'View ignored applications',
         cancelIgnore: 'Cancel ignore',
