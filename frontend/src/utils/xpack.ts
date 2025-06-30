@@ -14,7 +14,7 @@ export function resetXSetting() {
 export function initFavicon() {
     document.title = globalStore.themeConfig.panelName;
     const favicon = globalStore.themeConfig.favicon;
-    const isPro = globalStore.isProductPro;
+    const isPro = globalStore.isMasterProductPro;
     const themeColor = globalStore.themeConfig.primary;
 
     const customFaviconUrl = `/api/v2/images/favicon?t=${Date.now()}`;
