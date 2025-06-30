@@ -94,10 +94,12 @@
                                     <el-table-column>
                                         <template #default="{ row }">
                                             <span v-if="row.id === currentRecord.id" class="select-sign"></span>
-                                            <Status :status="row.status" />
-                                            <span>
-                                                {{ row.startTime }}
-                                            </span>
+                                            <Status class="mr-2 ml-1 float-left" :status="row.status" />
+                                            <div class="mt-0.5">
+                                                <span>
+                                                    {{ row.startTime }}
+                                                </span>
+                                            </div>
                                         </template>
                                     </el-table-column>
                                 </el-table>
@@ -131,6 +133,7 @@
                                         <template #label>
                                             <span class="status-label">{{ $t('commons.table.interval') }}</span>
                                         </template>
+                                        <el-button link v-if="!currentRecord?.interval" :loading="true" />
                                         <span class="status-count" v-if="currentRecord?.interval! <= 1000">
                                             {{ currentRecord?.interval }} ms
                                         </span>
@@ -142,15 +145,7 @@
                                         <template #label>
                                             <span class="status-label">{{ $t('commons.table.status') }}</span>
                                         </template>
-                                        <el-tag type="danger" v-if="currentRecord?.status === 'Failed'">
-                                            {{ $t('commons.status.failed') }}
-                                        </el-tag>
-                                        <el-tag type="success" v-if="currentRecord?.status === 'Success'">
-                                            {{ $t('commons.status.success') }}
-                                        </el-tag>
-                                        <el-tag type="info" v-if="currentRecord?.status === 'Waiting'">
-                                            {{ $t('commons.status.waiting') }}
-                                        </el-tag>
+                                        <Status :status="currentRecord?.status" />
                                     </el-form-item>
                                 </el-row>
                                 <el-row v-if="currentRecord?.status === 'Failed'">

@@ -76,10 +76,10 @@ var WebUrlMap = map[string]struct{}{
 	"/containers/setting":           {},
 	"/containers/dashboard":         {},
 
-	"/cronjobs":         {},
-	"/cronjobs/cronjob": {},
-	"/cronjobs/library": {},
-	"/cronjobs/operate": {},
+	"/cronjobs":                 {},
+	"/cronjobs/cronjob":         {},
+	"/cronjobs/library":         {},
+	"/cronjobs/cronjob/operate": {},
 
 	"/databases":                   {},
 	"/databases/mysql":             {},
