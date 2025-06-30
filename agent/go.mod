@@ -51,6 +51,7 @@ require (
 	golang.org/x/oauth2 v0.29.0
 	golang.org/x/sys v0.33.0
 	golang.org/x/text v0.26.0
+	google.golang.org/genproto v0.0.0-20241021214115-324edc3d5d38
 	gopkg.in/ini.v1 v1.67.0
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/gorm v1.30.0
