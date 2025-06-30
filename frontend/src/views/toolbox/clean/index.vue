@@ -144,7 +144,12 @@
                                     </div>
                                 </div>
                                 <div class="large_button">
-                                    <el-button type="primary" size="large" @click="onSubmitClean">
+                                    <el-button
+                                        type="primary"
+                                        size="large"
+                                        :disabled="selectSize <= 0"
+                                        @click="onSubmitClean"
+                                    >
                                         {{ $t('clean.clean') }}
                                     </el-button>
                                 </div>
