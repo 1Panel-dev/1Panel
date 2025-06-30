@@ -3331,6 +3331,8 @@ const message = {
 
             nodeCheck: 'Verificação de disponibilidade',
             checkSSH: 'Verificar conexão SSH do nó',
+            checkUserPermission: 'Verificar permissões de usuário do nó',
+            isNotRoot: 'Detectado que sudo sem senha não é suportado neste nó e o usuário atual não é root',
             checkLicense: 'Verificar status da licença do nó',
             checkService: 'Verificar informações de serviço existentes no nó',
             checkPort: 'Verificar acessibilidade da porta do nó',

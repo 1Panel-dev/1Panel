@@ -75,6 +75,14 @@ func (c *SSHClient) SudoHandleCmd() string {
 	return ""
 }
 
+func (c *SSHClient) IsRoot(user string) bool {
+	if user == "root" {
+		return true
+	}
+	_, err := c.Run("sudo -n true")
+	return err == nil
+}
+
 func (c *SSHClient) Runf(shell string, args ...interface{}) (string, error) {
 	session, err := c.Client.NewSession()
 	if err != nil {

@@ -3323,6 +3323,8 @@ const message = {
 
             nodeCheck: 'Semakan ketersediaan',
             checkSSH: 'Periksa sambungan SSH nod',
+            checkUserPermission: 'Semak kebenaran pengguna nod',
+            isNotRoot: 'Dikesan sudo tanpa kata laluan tidak disokong pada nod ini dan pengguna semasa bukan root',
             checkLicense: 'Periksa status lesen nod',
             checkService: 'Periksa maklumat perkhidmatan sedia ada pada nod',
             checkPort: 'Periksa kebolehcapaian port nod',

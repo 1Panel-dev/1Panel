@@ -3253,6 +3253,9 @@ const message = {
 
             nodeCheck: '可用性チェック',
             checkSSH: 'ノードSSH接続を確認',
+            checkUserPermission: 'ノードユーザー権限を確認',
+            isNotRoot:
+                'このノードではパスワードなしsudoがサポートされておらず、現在のユーザーがrootではないことが検出されました',
             checkLicense: 'ノードライセンス状態を確認',
             checkService: 'ノードの既存サービス情報を確認',
             checkPort: 'ノードポート到達性を確認',

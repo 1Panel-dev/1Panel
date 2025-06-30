@@ -3195,6 +3195,9 @@ const message = {
 
             nodeCheck: '가용성 확인',
             checkSSH: '노드 SSH 연결 확인',
+            checkUserPermission: '노드 사용자 권한 확인',
+            isNotRoot:
+                '이 노드에서 비밀번호 없이 sudo를 사용할 수 없으며 현재 사용자가 root가 아닌 것으로 감지되었습니다',
             checkLicense: '노드 라이선스 상태 확인',
             checkService: '노드의 기존 서비스 정보 확인',
             checkPort: '노드 포트 접근 가능 여부 확인',

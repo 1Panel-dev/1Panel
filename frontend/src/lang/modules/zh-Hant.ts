@@ -3151,6 +3151,8 @@ const message = {
 
             nodeCheck: '可用性檢查',
             checkSSH: '檢查節點 SSH 連接',
+            checkUserPermission: '檢查節點用戶權限',
+            isNotRoot: '檢測到該節點不支持免密 sudo，且當前為非 root 用戶',
             checkLicense: '檢查節點許可證狀態',
             checkService: '檢查節點已存在服務信息',
             checkPort: '檢查節點端口可達',
