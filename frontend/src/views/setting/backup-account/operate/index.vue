@@ -78,7 +78,7 @@
                     <el-link
                         style="font-size: 12px; margin-left: 5px"
                         icon="Position"
-                        @click="toWebDAVDoc()"
+                        @click="toDoc('webdav')"
                         type="primary"
                     >
                         {{ $t('firewall.quickJump') }}
@@ -284,7 +284,7 @@
                             <el-link
                                 style="font-size: 12px; margin-left: 5px"
                                 icon="Position"
-                                @click="toDoc(true)"
+                                @click="toDoc('ali-pan')"
                                 type="primary"
                             >
                                 {{ $t('firewall.quickJump') }}
@@ -311,7 +311,7 @@
                         <el-link
                             style="font-size: 12px; margin-left: 5px"
                             icon="Position"
-                            @click="toDoc(true)"
+                            @click="toDoc('onedrive')"
                             type="primary"
                         >
                             {{ $t('firewall.quickJump') }}
@@ -353,7 +353,7 @@
                         <el-link
                             style="font-size: 12px; margin-left: 5px"
                             icon="Position"
-                            @click="toDoc(false)"
+                            @click="toDoc(dialogData.rowData!.type === 'OneDrive' ? 'onedrive-bind' : 'google-drive')"
                             type="primary"
                         >
                             {{ $t('firewall.quickJump') }}
@@ -474,15 +474,25 @@ const acceptParams = (params: DialogProps): void => {
     }
     drawerVisible.value = true;
 };
-const toDoc = (isConf: boolean) => {
-    let item = isConf ? '#32-onedrive' : '#33-onedrive';
-    if (globalStore.isIntl) {
-        item = isConf ? '#using-your-own-client-info-for-onedrive' : '#auth-code-of-onedrive';
+const toDoc = (type: string) => {
+    let uri = '';
+    switch (type) {
+        case 'onedrive':
+            uri = '#32-onedrive';
+            break;
+        case 'onedrive-bind':
+            uri = '#33-onedrive';
+            break;
+        case 'ali-pan':
+            uri = '#34';
+            break;
+        case 'google-drive':
+            uri = '#35';
+            break;
+        case 'webdav':
+            uri = '#36-webdav-alist';
+            break;
     }
-    window.open(globalStore.docsUrl + '/user_manual/settings/' + item, '_blank', 'noopener,noreferrer');
-};
-const toWebDAVDoc = () => {
-    const uri = globalStore.isIntl ? '#webdav-with-alist' : '#34-webdav-alist';
     window.open(globalStore.docsUrl + '/user_manual/settings/' + uri, '_blank', 'noopener,noreferrer');
 };
 const jumpForCode = async (formEl: FormInstance | undefined) => {
