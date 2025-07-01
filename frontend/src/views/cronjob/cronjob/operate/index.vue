@@ -1233,7 +1233,7 @@ const changeAccount = async () => {
         }
     }
     if (!isInAccounts) {
-        form.downloadAccountID = undefined;
+        form.downloadAccountID = form.sourceAccountItems.length === 0 ? undefined : form.sourceAccountItems[0];
     }
 };
 

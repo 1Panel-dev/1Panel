@@ -411,7 +411,7 @@ const dialogUpgradeRef = ref();
 const dialogCommitRef = ref();
 const dialogPortJumpRef = ref();
 const opRef = ref();
-const includeAppStore = ref();
+const includeAppStore = ref(true);
 const columns = ref([]);
 
 const tags = ref([]);
