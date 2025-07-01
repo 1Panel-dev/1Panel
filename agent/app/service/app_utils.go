@@ -482,17 +482,14 @@ func deleteLink(del dto.DelAppLink) error {
 	return appInstallResourceRepo.DeleteBy(del.Ctx, appInstallResourceRepo.WithAppInstallId(install.ID))
 }
 
-func getUpgradeCompose(install model.AppInstall, detail model.AppDetail) (string, error) {
-	if detail.DockerCompose == "" {
-		return "", nil
-	}
+func handleUpgradeCompose(install model.AppInstall, detail model.AppDetail) (map[string]interface{}, error) {
 	composeMap := make(map[string]interface{})
 	if err := yaml.Unmarshal([]byte(detail.DockerCompose), &composeMap); err != nil {
-		return "", err
+		return nil, err
 	}
 	value, ok := composeMap["services"]
 	if !ok || value == nil {
-		return "", buserr.New("ErrFileParse")
+		return nil, buserr.New("ErrFileParse")
 	}
 	servicesMap := value.(map[string]interface{})
 	if len(servicesMap) == 1 {
@@ -509,6 +506,34 @@ func getUpgradeCompose(install model.AppInstall, detail model.AppDetail) (string
 		if install.ServiceName != oldServiceName {
 			delete(servicesMap, oldServiceName)
 		}
+	}
+	serviceValue := servicesMap[install.ServiceName].(map[string]interface{})
+
+	oldComposeMap := make(map[string]interface{})
+	if err := yaml.Unmarshal([]byte(install.DockerCompose), &oldComposeMap); err != nil {
+		return nil, err
+	}
+	oldValue, ok := oldComposeMap["services"]
+	if !ok || oldValue == nil {
+		return nil, buserr.New("ErrFileParse")
+	}
+	oldValueMap := oldValue.(map[string]interface{})
+	oldServiceValue := oldValueMap[install.ServiceName].(map[string]interface{})
+	if oldServiceValue["deploy"] != nil {
+		serviceValue["deploy"] = oldServiceValue["deploy"]
+	}
+	servicesMap[install.ServiceName] = serviceValue
+	composeMap["services"] = servicesMap
+	return composeMap, nil
+}
+
+func getUpgradeCompose(install model.AppInstall, detail model.AppDetail) (string, error) {
+	if detail.DockerCompose == "" {
+		return "", nil
+	}
+	composeMap, err := handleUpgradeCompose(install, detail)
+	if err != nil {
+		return "", err
 	}
 	envs := make(map[string]interface{})
 	if err := json.Unmarshal([]byte(install.Env), &envs); err != nil {
@@ -667,63 +692,6 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		}
 		envParams := make(map[string]string, len(envs))
 		handleMap(envs, envParams)
-		if install.App.Key == "openresty" && install.App.Resource == "remote" && !common.CompareVersion(install.Version, "1.25.3.2-0-1") {
-			t.Log(i18n.GetMsgByKey("MoveSiteDir"))
-			siteDir := path.Join(global.Dir.DataDir, "www")
-			envParams["WEBSITE_DIR"] = siteDir
-			oldSiteDir := path.Join(install.GetPath(), "www")
-			t.Log(i18n.GetWithName("MoveSiteToDir", siteDir))
-			if err := fileOp.CopyDir(oldSiteDir, global.Dir.DataDir); err != nil {
-				t.Log(i18n.GetMsgByKey("ErrMoveSiteDir"))
-				return err
-			}
-			newConfDir := path.Join(global.Dir.DataDir, "www", "conf.d")
-			_ = fileOp.CreateDir(newConfDir, constant.DirPerm)
-			oldConfDir := path.Join(install.GetPath(), "conf/conf.d")
-			items, err := os.ReadDir(oldConfDir)
-			if err != nil {
-				return err
-			}
-			for _, item := range items {
-				itemPath := path.Join(oldConfDir, item.Name())
-				if item.IsDir() {
-					_ = fileOp.Mv(itemPath, newConfDir)
-				}
-				if item.Name() != "default.conf" && item.Name() != "00.default.conf" {
-					_ = fileOp.Mv(itemPath, newConfDir)
-				}
-			}
-			nginxConfPath := path.Join(install.GetPath(), "conf", "nginx.conf")
-			parse, err := parser.NewParser(nginxConfPath)
-			if err != nil {
-				return err
-			}
-			config, err := parse.Parse()
-			if err != nil {
-				return err
-			}
-			config.FilePath = nginxConfPath
-			httpDirective := config.FindHttp()
-			httpDirective.UpdateDirective("include", []string{"/usr/local/openresty/nginx/conf/default/*.conf"})
-
-			if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
-				return buserr.WithErr("ErrUpdateBuWebsite", err)
-			}
-			t.Log(i18n.GetMsgByKey("DeleteRuntimePHP"))
-			_ = fileOp.DeleteDir(path.Join(global.Dir.RuntimeDir, "php"))
-			websites, _ := websiteRepo.List(repo.WithByType("runtime"))
-			for _, website := range websites {
-				runtime, _ := runtimeRepo.GetFirst(context.Background(), repo.WithByID(website.RuntimeID))
-				if runtime != nil && runtime.Type == "php" {
-					website.Type = constant.Static
-					website.RuntimeID = 0
-					_ = websiteRepo.SaveWithoutCtx(&website)
-				}
-			}
-			_ = runtimeRepo.DeleteBy(repo.WithByType("php"))
-			t.Log(i18n.GetMsgByKey("MoveSiteDirSuccess"))
-		}
-
 		if err = env.Write(envParams, install.GetEnvPath()); err != nil {
 			return err
 		}
