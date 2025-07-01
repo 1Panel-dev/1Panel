@@ -9,6 +9,11 @@
     >
         <template #content>
             <el-form ref="formRef" :model="form" label-position="top">
+                <el-form-item :label="$t('menu.container')" prop="containerID" v-if="form.containerIDList.length > 1">
+                    <el-select placeholder="container" clearable v-model="form.containerID">
+                        <el-option v-for="item in form.containerIDList" :key="item" :label="item" :value="item" />
+                    </el-select>
+                </el-form-item>
                 <el-form-item :label="$t('commons.table.user')" prop="user">
                     <el-input placeholder="root" clearable v-model="form.user" />
                 </el-form-item>
@@ -67,18 +72,20 @@ const form = reactive({
     command: '',
     user: '',
     containerID: '',
+    containerIDList: [],
 });
 const formRef = ref();
 const terminalRef = ref<InstanceType<typeof Terminal> | null>(null);
 
 interface DialogProps {
     containerID: string;
-    container: string;
+    title: string;
 }
 const acceptParams = async (params: DialogProps): Promise<void> => {
     terminalVisible.value = true;
-    form.containerID = params.containerID;
-    title.value = params.container;
+    form.containerIDList = params.containerID.split(',');
+    form.containerID = form.containerIDList[0];
+    title.value = params.title;
     form.isCustom = false;
     form.user = '';
     form.command = '/bin/sh';

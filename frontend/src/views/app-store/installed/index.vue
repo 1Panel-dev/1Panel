@@ -731,7 +731,8 @@ const openLog = (row: any) => {
 };
 
 const openTerminal = (row: any) => {
-    dialogTerminalRef.value!.acceptParams({ containerID: row.container, container: row.container });
+    const title = i18n.global.t('app.app') + ' ' + row.name;
+    dialogTerminalRef.value!.acceptParams({ containerID: row.container, title: title });
 };
 
 const getConfig = async () => {

@@ -614,7 +614,8 @@ const onMonitor = (row: any) => {
 
 const dialogTerminalRef = ref();
 const onTerminal = (row: any) => {
-    dialogTerminalRef.value!.acceptParams({ containerID: row.containerID, container: row.name });
+    const title = i18n.global.t('menu.container') + ' ' + row.name;
+    dialogTerminalRef.value!.acceptParams({ containerID: row.containerID, title: title });
 };
 
 const onInspect = async (id: string) => {
