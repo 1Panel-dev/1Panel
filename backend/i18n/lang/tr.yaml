@@ -1,0 +1,296 @@
+ErrInvalidParams: "İstek parametresi hatası: {{ .detail }}"
+ErrTokenParse: "Token oluşturma hatası: {{ .detail }}"
+ErrInitialPassword: "Başlangıç şifresi hatası"
+ErrInternalServer: "Servis dahili hatası: {{ .detail }}"
+ErrRecordExist: "Kayıt zaten mevcut"
+ErrRecordNotFound: "Kayıtlar bulunamadı"
+ErrStructTransform: "Tip dönüştürme hatası: {{ .detail }}"
+ErrNotLogin: "Kullanıcı giriş yapmamış: {{ .detail }}"
+ErrPasswordExpired: "Mevcut şifrenin süresi dolmuş: {{ .detail }}"
+ErrNotSupportType: "Sistem mevcut tipi desteklemiyor: {{ .detail }}"
+ErrApiConfigStatusInvalid: "API Arayüz erişimi yasak: {{ .detail }}"
+ErrApiConfigKeyInvalid: "API Arayüz anahtarı hatası: {{ .detail }}"
+ErrApiConfigIPInvalid: "API Arayüz IP'si beyaz listede değil: {{ .detail }}"
+ErrApiConfigDisable: "Bu arayüz API Arayüz çağrılarının kullanımını yasaklıyor: {{ .detail }}"
+ErrApiConfigKeyTimeInvalid: "API Arayüz zaman damgası hatası: {{ .detail }}"
+
+#common
+ErrNameIsExist: "İsim zaten mevcut"
+ErrDemoEnvironment: "Demo sunucu, bu işlem yasak!"
+ErrCmdTimeout: "Komut yürütme zaman aşımı!"
+ErrCmdIllegal: "Komut yasak karakterler içeriyor. Lütfen değiştirip tekrar deneyin!"
+ErrPortExist: '{{ .port }} portu zaten {{ .type }} [{{ .name }}] tarafından kullanılıyor'
+TYPE_APP: "Uygulama"
+TYPE_RUNTIME: "Çalışma zamanı ortamı"
+TYPE_DOMAIN: "Domain adı"
+ErrTypePort: 'Port {{ .name }} format hatası'
+ErrTypePortRange: 'Port aralığı 1-65535 arasında olmalı'
+Success: "Başarılı"
+Failed: "Başarısız"
+SystemRestart: "Sistem yeniden başlatması görev kesintisine neden oldu"
+
+#app
+ErrPortInUsed: "{{ .detail }} portu zaten kullanımda"
+ErrAppLimit: "Uygulama kurulum sınırını aştı"
+ErrAppRequired: "{{ .detail }} uygulaması gerekli"
+ErrNotInstall: "Uygulama kurulu değil"
+ErrPortInOtherApp: "{{ .port }} portu zaten {{ .apps }} uygulaması tarafından kullanılıyor"
+ErrDbUserNotValid: "Mevcut veritabanı, kullanıcı adı ve şifre eşleşmiyor!"
+ErrDockerComposeNotValid: "docker-compose dosya formatı hatası!"
+ErrUpdateBuWebsite: 'Uygulama başarıyla güncellendi, ancak web sitesi yapılandırma dosyasının değiştirilmesi başarısız oldu, lütfen yapılandırmayı kontrol edin!'
+Err1PanelNetworkFailed: 'Varsayılan konteyner ağ oluşturma başarısız! {{ .detail }}'
+ErrFileParse: 'Uygulama docker-compose dosya ayrıştırması başarısız!'
+ErrInstallDirNotFound: 'kurulum dizini mevcut değil'
+AppStoreIsUpToDate: 'Güncel'
+LocalAppVersionNull: '{{.name}} uygulaması sürüme senkronize edilmedi! Uygulama listesine eklenemedi'
+LocalAppVersionErr: '{{.name}} sürüm {{.version}} senkronizasyonu başarısız! {{.err}}'
+ErrFileNotFound: '{{.name}} dosyası mevcut değil'
+ErrFileParseApp: '{{.name}} dosyasını ayrıştırma başarısız {{.err}}'
+ErrAppDirNull: 'sürüm klasörü mevcut değil'
+LocalAppErr: "Uygulama {{.name}} senkronizasyonu başarısız! {{.err}}"
+ErrContainerName: "KonteynerAdı zaten mevcut"
+ErrAppSystemRestart: "1Panel yeniden başlatması görevin sonlanmasına neden oldu"
+ErrCreateHttpClient: "HTTP isteği oluşturma başarısız {{.err}}"
+ErrHttpReqTimeOut: "İstek zaman aşımı {{.err}}"
+ErrHttpReqFailed: "İstek başarısız {{.err}}"
+ErrHttpReqNotFound: "Dosya mevcut değil"
+ErrNoSuchHost: "Ağ bağlantısı başarısız"
+ErrImagePullTimeOut: 'İmaj çekme zaman aşımı'
+ErrContainerNotFound: '{{ .name }} konteyneri mevcut değil'
+ErrContainerMsg: '{{ .name }} konteyneri anormal durumda, lütfen ayrıntılar için konteyner sayfasındaki günlüğü kontrol edin'
+ErrAppBackup: '{{ .name }} uygulama yedekleme başarısız err {{.err}}'
+ErrImagePull: '{{ .name }} imaj çekme başarısız err {{.err}}'
+ErrVersionTooLow: 'Mevcut 1Panel sürümü uygulama mağazasını güncellemek için çok düşük, lütfen sürümü yükseltin'
+ErrAppNameExist: 'Uygulama adı zaten mevcut'
+AppStoreIsSyncing: 'Uygulama Mağazası senkronize ediliyor, lütfen daha sonra tekrar deneyin'
+ErrGetCompose: "docker-compose.yml dosyası alınamadı! {{ .detail }}"
+ErrAppWarn: "Anormal durum, lütfen günlüğü kontrol edin"
+ErrAppParamKey: "Parametre {{ .name }} alan istisnası"
+ErrAppUpgrade: "Uygulama yükseltme başarısız {{ .name }} {{ .err }}"
+AppRecover: "Uygulama {{ .name }} geri alındı "
+PullImageStart: "İmaj çekmeye başla {{ .name }}"
+PullImageSuccess: "İmaj başarıyla çekildi"
+UpgradeAppStart: "Uygulama yükseltmeye başla {{ .name }}"
+UpgradeAppSuccess: "Uygulama {{ .name }} başarıyla yükseltildi"
+
+#file
+ErrFileCanNotRead: "Dosya okunamıyor"
+ErrFileToLarge: "dosya çok büyük"
+ErrPathNotFound: "Yol bulunamadı"
+ErrMovePathFailed: "Hedef yol orijinal yolu içeremez!"
+ErrLinkPathNotFound: "Hedef yol mevcut değil!"
+ErrFileIsExist: "Dosya veya dizin zaten mevcut!"
+ErrFileUpload: "Dosya yükleme başarısız {{.name}}  {{.detail}}"
+ErrFileDownloadDir: "Klasör indirme desteklenmiyor"
+ErrCmdNotFound: "{{ .name}} komutu mevcut değil, lütfen önce bu komutu host üzerine kurun"
+ErrSourcePathNotFound:  "Kaynak dizin mevcut değil"
+ErrFavoriteExist: "Bu yol zaten toplanmış"
+ErrInvalidChar: "Yasak karakterler yasaklı"
+ErrPathNotDelete: "Seçilen dizin silinemez"
+
+#website
+ErrDomainIsExist: "Domain adı zaten mevcut"
+ErrAliasIsExist: "Takma ad zaten mevcut"
+ErrAppDelete: 'Diğer Web Sitesi bu Uygulamayı kullanıyor'
+ErrGroupIsUsed: "Grup kullanımda ve silinemez"
+ErrBackupMatch: "yedek dosyası web sitesinin mevcut kısmi verileriyle eşleşmiyor: {{ .detail}}"
+ErrBackupExist: 'yedek dosyası mevcut olmayan orijinal verilerin bir kısmına karşılık geliyor: {{ .detail}}'
+ErrPHPResource: 'Yerel çalışma zamanı geçiş yapmayı desteklemiyor!'
+ErrPathPermission: 'Dizin klasöründe 1000:1000 olmayan izinli bir klasör tespit edildi, bu web sitesine erişirken Erişim reddedildi hatasına neden olabilir. Lütfen yukarıdaki kaydet düğmesine tıklayın'
+ErrDomainIsUsed: "Domain zaten {{ .name }} web sitesi tarafından kullanılıyor"
+ErrDomainFormat: "{{ .name }} domain format hatası"
+ErrDefaultAlias: "default ayrılmış bir kod adıdır, lütfen başka bir kod adı kullanın"
+ErrImageNotExist: "Çalışma ortamı {{.name}} imajı mevcut değil, lütfen çalışma ortamını yeniden düzenleyin"
+
+#ssl
+ErrSSLCannotDelete: "{{ .name }} sertifikası web sitesi tarafından kullanılıyor ve kaldırılamaz"
+ErrAccountCannotDelete: "Hesapla ilişkili sertifika silinemez"
+ErrSSLApply: "Sertifika başarıyla imzalanmaya devam ediyor, ancak openresty yeniden yükleme başarısız, lütfen yapılandırmayı kontrol edin!"
+ErrEmailIsExist: 'E-posta zaten mevcut'
+ErrSSLKeyNotFound: 'Özel anahtar dosyası mevcut değil'
+ErrSSLCertificateNotFound: 'Sertifika dosyası mevcut değil'
+ErrSSLKeyFormat: 'Özel anahtar dosyası doğrulama hatası'
+ErrSSLCertificateFormat: 'Sertifika dosyası format hatası, lütfen pem formatını kullanın'
+ErrEabKidOrEabHmacKeyCannotBlank: 'EabKid veya EabHmacKey boş olamaz'
+ErrOpenrestyNotFound: 'Http modu önce Openresty kurulmasını gerektirir'
+ApplySSLStart: 'Sertifika başvurusuna başla, domain adı [{{ .domain }}] başvuru yöntemi [{{ .type }}] '
+dnsAccount: "DNS Otomatik"
+dnsManual: "DNS Manuel"
+http: "HTTP"
+ApplySSLFailed: '[{{ .domain }}] sertifika başvurusu başarısız, {{.detail}} '
+ApplySSLSuccess: '[{{ .domain }}] sertifika başvurusu başarılı! ! '
+DNSAccountName: 'DNS hesabı [{{ .name }}] üretici [{{.type}}]'
+PushDirLog: 'Sertifika [{{ .path }}] dizinine gönderildi {{ .status }}'
+ErrDeleteCAWithSSL: "Mevcut kuruluş altında verilmiş sertifika var ve silinemez"
+ErrDeleteWithPanelSSL: "Panel SSL yapılandırması bu sertifikayı kullanıyor ve silinemez"
+ErrDefaultCA: "Varsayılan Sertifika Otoritesi silinemez"
+ApplyWebSiteSSLLog: "{{ .name }} web sitesi sertifikasını güncellemeye başla"
+ErrUpdateWebsiteSSL: "{{ .name }} web sitesi sertifika güncelleme başarısız: {{ .err }}"
+ApplyWebSiteSSLSuccess: "Web sitesi sertifikası başarıyla güncellendi"
+ErrExecShell: "Betik yürütme başarısız {{ .err }}"
+ExecShellStart: "Betik yürütmeye başla"
+ExecShellSuccess: "Betik başarıyla yürütüldü"
+StartUpdateSystemSSL: "Sistem sertifikasını güncellemeye başla"
+UpdateSystemSSLSuccess: "Sistem sertifikası başarıyla güncellendi"
+
+#mysql
+ErrUserIsExist: "Mevcut kullanıcı zaten var. Lütfen yeni bir kullanıcı girin"
+ErrDatabaseIsExist: "Mevcut veritabanı zaten var. Lütfen yeni bir veritabanı girin"
+ErrExecTimeOut: "SQL yürütme zaman aşımı, lütfen veritabanını kontrol edin"
+ErrRemoteExist: "Uzak veritabanı bu adla zaten mevcut, lütfen değiştirip tekrar deneyin"
+ErrLocalExist: "Yerel veritabanı bu adla zaten mevcut, lütfen değiştirip tekrar deneyin"
+
+#redis
+ErrTypeOfRedis: "Kurtarma dosyası türü mevcut kalıcılık moduyla eşleşmiyor. Dosya türünü değiştirip tekrar deneyin"
+
+#container
+ErrInUsed: "{{ .detail }} kullanımda ve silinemez"
+ErrObjectInUsed: "Bu nesne kullanımda ve silinemez"
+ErrObjectBeDependent: "Bu imaj diğer imajlara bağımlı ve silinemez"
+ErrPortRules: "Port sayısı eşleşmiyor, lütfen tekrar girin!"
+ErrPgImagePull: "İmaj çekme zaman aşımı. Lütfen imaj hızlandırma yapılandırın veya postgres:16.0-alpine imajını manuel olarak çekip tekrar deneyin"
+
+#runtime
+ErrDirNotFound: "Yapı klasörü mevcut değil! Lütfen dosyanın bütünlüğünü kontrol edin!"
+ErrFileNotExist: "{{ .detail }} dosyası mevcut değil! Lütfen kaynak dosyanın bütünlüğünü kontrol edin!"
+ErrImageBuildErr: "İmaj yapı başarısız"
+ErrImageExist: "İmaj zaten mevcut!"
+ErrDelWithWebsite: "İşletim ortamı bir web sitesiyle ilişkili ve silinemez"
+ErrRuntimeStart: "Başlatma başarısız"
+ErrPackageJsonNotFound: "package.json dosyası mevcut değil"
+ErrScriptsNotFound: "package.json'da script yapılandırma öğesi bulunamadı"
+ErrContainerNameNotFound: "Konteyner adı alınamadı, lütfen .env dosyasını kontrol edin"
+ErrNodeModulesNotFound: "node_modules klasörü mevcut değil! Lütfen çalışma ortamını düzenleyin veya çalışma ortamının başarıyla başlamasını bekleyin"
+
+#setting
+ErrBackupInUsed: "Yedek hesabı zaten bir cron işinde kullanılıyor ve silinemez."
+ErrBackupCheck: "Yedek hesabı test bağlantısı başarısız {{ .err}}"
+ErrOSSConn: "En son sürüm alınamadı, lütfen sunucunun dış ağa bağlanıp bağlanamadığını kontrol edin."
+ErrEntrance: "Güvenlik girişi bilgi hatası. Lütfen kontrol edip tekrar deneyin!"
+
+#tool
+ErrConfigNotFound: "Yapılandırma dosyası mevcut değil"
+ErrConfigParse: "Yapılandırma dosyası format hatası"
+ErrConfigIsNull: "Yapılandırma dosyasının boş olmasına izin verilmez"
+ErrConfigDirNotFound: "Çalışma dizini mevcut değil"
+ErrConfigAlreadyExist: "Aynı adda bir yapılandırma dosyası zaten mevcut"
+ErrUserFindErr: "Kullanıcı {{ .name }} bulunamadı {{ .err }}"
+
+#ssh
+ErrFirewallNone: "Sistemde firewalld veya ufw hizmeti tespit edilmedi. Lütfen kontrol edip tekrar deneyin!"
+ErrFirewallBoth: "Sistemde hem firewalld hem de ufw hizmetleri tespit edildi. Çakışmaları önlemek için lütfen birini kaldırıp tekrar deneyin!"
+
+#cronjob
+ErrBashExecute: "Betik yürütme hatası, lütfen görev çıktı metin alanındaki belirli bilgileri kontrol edin."
+ErrCutWebsiteLog: "{{ .name }} web sitesi günlük kesme başarısız, hata {{ .err }}"
+CutWebsiteLogSuccess: "{{ .name }} web sitesi günlüğü başarıyla kesildi, yedek yolu {{ .path }}"
+
+#toolbox
+ErrNotExistUser: "Mevcut kullanıcı mevcut değil. Lütfen değiştirip tekrar deneyin!"
+ErrBanAction: "Ayarlama başarısız, mevcut {{ .name }} hizmeti kullanılamıyor, lütfen kontrol edip tekrar deneyin!"
+ErrClamdscanNotFound: "clamdscan komutu tespit edilmedi, lütfen kurulumu için belgelere başvurun!"
+
+#waf
+ErrScope: "Bu yapılandırmanın değiştirilmesi desteklenmiyor"
+ErrStateChange: "Durum değiştirme başarısız"
+ErrRuleExist: "Kural Mevcut"
+ErrRuleNotExist: "Kural Mevcut Değil"
+ErrParseIP: "IP format hatası"
+ErrDefaultIP: "default ayrılmış bir addır, lütfen başka bir adla değiştirin"
+ErrGroupInUse: "IP grubu kara/beyaz liste tarafından kullanılıyor ve silinemez"
+ErrGroupExist: "IP grubu adı zaten mevcut"
+ErrIPRange: "Yanlış IP aralığı"
+ErrIPExist: "IP mevcut"
+
+#license
+ErrLicense: "Lisans format hatası, lütfen kontrol edip tekrar deneyin!"
+ErrLicenseCheck: "Lisans doğrulama başarısız, lütfen kontrol edip tekrar deneyin!"
+ErrXpackVersion: "Lisans doğrulama başarısız, bu lisans sürüm kısıtlı ve başarıyla içe aktarılamaz. Lütfen kontrol edip tekrar deneyin!"
+ErrLicenseSave: "Lisans bilgilerini kaydetme başarısız, hata {{ .err }}, lütfen tekrar deneyin!"
+ErrLicenseSync: "Lisans bilgilerini senkronize etme başarısız, veritabanında lisans bilgisi tespit edilmedi!"
+ErrXpackNotFound: "Bu bölüm profesyonel sürüm özelliğidir, lütfen önce Panel Ayarları-Lisans arayüzünden lisansı içe aktarın"
+ErrXpackNotActive: "Bu bölüm profesyonel sürüm özelliğidir, lütfen önce Panel Ayarları-Lisans arayüzünden lisans durumunu senkronize edin"
+ErrXpackOutOfDate: "Mevcut lisansın süresi dolmuş, lütfen Panel Ayarları-Lisans arayüzünde lisansı yeniden içe aktarın"
+ErrXpackLost: "Lisans maksimum yeniden deneme sayısına ulaştı. Lütfen [Ayarlar] [Lisans] sayfasına gidip profesyonel sürüm özelliklerinin düzgün çalıştığından emin olmak için senkronize düğmesini manuel olarak tıklayın."
+ErrXpackTimeout: "İstek zaman aşımı, ağ bağlantısı kararsız olabilir, lütfen daha sonra tekrar deneyin!"
+
+#alert
+ErrAlert: "Uyarı bilgisi format hatası, lütfen kontrol edip tekrar deneyin!"
+ErrAlertPush: "Uyarı gönderme hatası, lütfen kontrol edip tekrar deneyin!"
+ErrAlertSave: "Uyarı kaydetme hatası, lütfen kontrol edip tekrar deneyin!"
+ErrAlertSync: "Uyarı senkronize etme hatası, lütfen kontrol edip tekrar deneyin!"
+ErrAlertRemote: "Uzak uyarı hatası, lütfen kontrol edip tekrar deneyin!"
+
+#cmd
+AppVersion: "Uygulama sürümü"
+AppCommands: "Uygulama ile ilgili komutlar"
+AppInit: "Uygulamayı başlat"
+AppKeyVal: "Uygulama anahtarı (sadece İngilizce destekler)"
+AppCreateFileErr: "Dosya {{ .name }} oluşturma başarısız {{ .err }}"
+AppCreateDirErr: "Klasör {{ .name }} oluşturma başarısız {{ .err }}"
+AppMissKey: "Uygulama anahtarı eksik, belirtmek için -k kullanın"
+AppMissVersion: "Uygulama sürümü eksik, belirtmek için -v kullanın"
+AppVersionExist: "Sürüm zaten mevcut!"
+AppCreateSuccessful: "Oluşturma başarılı!"
+AppWriteErr: "Dosya {{ .name }} yazma başarısız {{ .err }}"
+SudoHelper: "Lütfen {{ .cmd }} kullanın veya root kullanıcısına geçin"
+ListenIPCommands: "Dinleme IP'sini değiştir"
+ListenIPv4: "IPv4'te dinle"
+ListenIPv6: "IPv6'da dinle"
+ListenChangeSuccessful: "Değiştirme başarılı! Şimdi {{ .value }} üzerinde dinleniyor"
+ResetCommands: "Sistem bilgilerini sıfırla"
+ResetMFA: "1Panel iki faktörlü kimlik doğrulamayı iptal et"
+ResetHttps: "1Panel https girişini iptal et"
+ResetEntrance: "1Panel güvenli girişi iptal et"
+ResetIPs: "1Panel yetkili IP kısıtlamalarını iptal et"
+ResetDomain: "1Panel domain bağlamayı iptal et"
+RestoreCommands: "1Panel hizmet ve verilerini geri al"
+RestoreNoSuchFile: "Geri alma için kullanılabilir dosya yok"
+RestoreStep1: "(1/5) {{ .name }} dizininden 1Panel hizmet ve veri geri alımı başlatılıyor..."
+RestoreStep2: "(2/5) 1Panel binary geri alımı başarılı"
+RestoreStep3: "(3/5) 1Panel script geri alımı başarılı"
+RestoreStep4: "(4/5) 1Panel hizmet geri alımı başarılı"
+RestoreStep5: "(5/5) 1Panel veri geri alımı başarılı"
+RestoreSuccessful: "Geri alma başarılı! Hizmet yeniden başlatılıyor, lütfen bekleyin..."
+UpdateCommands: "Panel bilgilerini güncelle"
+UpdateUser: "Panel kullanıcısını güncelle"
+UpdatePassword: "Panel şifresini güncelle"
+UpdatePort: "Panel portunu güncelle"
+UpdateUserNull: "Hata: panel kullanıcısı boş!"
+UpdateUserBlank: "Hata: panel kullanıcısı boşluk içeriyor!"
+UpdateUserFormat: "Hata: Geçersiz panel kullanıcısı formatı! Sadece İngilizce, Çince, sayılar ve _ destekler, uzunluk 3-30"
+UpdateUserErr: "Hata: Panel kullanıcısını güncelleme başarısız, {{ .err }}"
+UpdateSuccessful: "Güncelleme başarılı!"
+UpdateUserResult: "Panel kullanıcısı: {{ .name }}"
+UpdatePasswordRead: "Hata: Panel şifre bilgilerini okuma başarısız, {{ .err }}"
+UpdatePasswordNull: "Hata: Panel şifresi boş!"
+UpdateUPasswordBlank: "Hata: Panel şifresi boşluk içeriyor!"
+UpdatePasswordFormat: "Hata: Panel şifresi sadece harfler, sayılar, özel karakterler !@#$%*_,.? destekler, uzunluk 8-30!"
+UpdatePasswordLen: "Hata: Lütfen 6 karakterden uzun bir şifre girin!"
+UpdatePasswordRe: "Şifreyi onayla:"
+UpdatePasswordErr: "Hata: Panel şifresini güncelleme başarısız, {{ .err }}"
+UpdatePasswordSame: "Hata: İki şifre eşleşmiyor, lütfen kontrol edip tekrar deneyin!"
+UpdatePasswordResult: "Panel şifresi: {{ .name }}"
+UpdatePortFormat: "Hata: Girilen port numarası 1 ile 65535 arasında olmalı!"
+UpdatePortUsed: "Hata: Port numarası zaten kullanımda, lütfen kontrol edip tekrar deneyin!"
+UpdatePortErr: "Hata: Panel portunu güncelleme başarısız, {{ .err }}"
+UpdatePortResult: "Panel Portu: {{ .name }}"
+UpdatePortFirewallAdd: "Firewall port kuralı ekleme başarısız, {{ .err }}, lütfen {{ .name }} portunu firewall kurallarına manuel olarak ekleyin."
+UpdatePortFirewallDel: "Hata: Firewall portunu silme başarısız, {{ .err }}"
+UpdatePortFirewallReload: "Firewall yeniden yükleme başarısız, {{ .err }}, lütfen firewall'ı manuel olarak yeniden yükleyin."
+UserInfo: "Panel bilgilerini al"
+UserInfoAddr: "Panel adresi: "
+UserInfoPassHelp: "İpucu: Şifreyi değiştirmek için şu komutu çalıştırabilirsiniz: "
+DBConnErr: "Hata: Veritabanı bağlantısını başlatma başarısız, {{ .err }}"
+SystemVersion: "sürüm: "
+SystemMode: "mod: "
+
+#ai-tool
+ErrOpenrestyInstall: 'Lütfen önce Openresty kurun'
+ErrSSL: "Sertifika içeriği boş, lütfen sertifikayı kontrol edin!"
+ErrSsePath: "SSE yolu tekrarlanıyor"
+
+#mobile app
+ErrVerifyToken: 'Token doğrulama hatası, lütfen sıfırlayın ve tekrar tarayın.'
+ErrInvalidToken: 'Geçersiz token, lütfen sıfırlayın ve tekrar tarayın.'
+ErrExpiredToken: 'Token süresi dolmuş, lütfen sıfırlayın ve tekrar tarayın.'
