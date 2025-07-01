@@ -379,21 +379,25 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 		}
 
 		resources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithAppInstallId(install.ID))
-		if deleteReq.DeleteDB && len(resources) > 0 {
-			del := dto.DelAppLink{
-				Ctx:         ctx,
-				Install:     &install,
-				ForceDelete: deleteReq.ForceDelete,
-				Task:        uninstallTask,
-			}
-			t.LogWithOps(task.TaskDelete, i18n.GetMsgByKey("Database"))
-			if err = deleteLink(del); err != nil {
-				t.LogFailedWithOps(task.TaskDelete, i18n.GetMsgByKey("Database"), err)
-				if !deleteReq.ForceDelete {
-					return err
+		if len(resources) > 0 {
+			if deleteReq.DeleteDB {
+				del := dto.DelAppLink{
+					Ctx:         ctx,
+					Install:     &install,
+					ForceDelete: deleteReq.ForceDelete,
+					Task:        uninstallTask,
 				}
+				t.LogWithOps(task.TaskDelete, i18n.GetMsgByKey("Database"))
+				if err = deleteLink(del); err != nil {
+					t.LogFailedWithOps(task.TaskDelete, i18n.GetMsgByKey("Database"), err)
+					if !deleteReq.ForceDelete {
+						return err
+					}
+				}
+				t.LogSuccessWithOps(task.TaskDelete, i18n.GetMsgByKey("Database"))
+			} else {
+				_ = appInstallResourceRepo.DeleteBy(ctx, appInstallResourceRepo.WithAppInstallId(install.ID))
 			}
-			t.LogSuccessWithOps(task.TaskDelete, i18n.GetMsgByKey("Database"))
 		}
 
 		if DatabaseKeys[install.App.Key] > 0 {
