@@ -442,17 +442,14 @@ func deleteLink(ctx context.Context, install *model.AppInstall, deleteDB bool, f
 	return appInstallResourceRepo.DeleteBy(ctx, appInstallResourceRepo.WithAppInstallId(install.ID))
 }
 
-func getUpgradeCompose(install model.AppInstall, detail model.AppDetail) (string, error) {
-	if detail.DockerCompose == "" {
-		return "", nil
-	}
+func handleUpgradeCompose(install model.AppInstall, detail model.AppDetail) (map[string]interface{}, error) {
 	composeMap := make(map[string]interface{})
 	if err := yaml.Unmarshal([]byte(detail.DockerCompose), &composeMap); err != nil {
-		return "", err
+		return nil, err
 	}
 	value, ok := composeMap["services"]
 	if !ok || value == nil {
-		return "", buserr.New(constant.ErrFileParse)
+		return nil, buserr.New("ErrFileParse")
 	}
 	servicesMap := value.(map[string]interface{})
 	if len(servicesMap) == 1 {
@@ -469,6 +466,34 @@ func getUpgradeCompose(install model.AppInstall, detail model.AppDetail) (string
 		if install.ServiceName != oldServiceName {
 			delete(servicesMap, oldServiceName)
 		}
+	}
+	serviceValue := servicesMap[install.ServiceName].(map[string]interface{})
+
+	oldComposeMap := make(map[string]interface{})
+	if err := yaml.Unmarshal([]byte(install.DockerCompose), &oldComposeMap); err != nil {
+		return nil, err
+	}
+	oldValue, ok := oldComposeMap["services"]
+	if !ok || oldValue == nil {
+		return nil, buserr.New("ErrFileParse")
+	}
+	oldValueMap := oldValue.(map[string]interface{})
+	oldServiceValue := oldValueMap[install.ServiceName].(map[string]interface{})
+	if oldServiceValue["deploy"] != nil {
+		serviceValue["deploy"] = oldServiceValue["deploy"]
+	}
+	servicesMap[install.ServiceName] = serviceValue
+	composeMap["services"] = servicesMap
+	return composeMap, nil
+}
+
+func getUpgradeCompose(install model.AppInstall, detail model.AppDetail) (string, error) {
+	if detail.DockerCompose == "" {
+		return "", nil
+	}
+	composeMap, err := handleUpgradeCompose(install, detail)
+	if err != nil {
+		return "", err
 	}
 	envs := make(map[string]interface{})
 	if err := json.Unmarshal([]byte(install.Env), &envs); err != nil {
