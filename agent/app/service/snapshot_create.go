@@ -51,6 +51,7 @@ func (u *SnapshotService) SnapshotCreate(parentTask *task.Task, req dto.Snapshot
 		AppData:          string(appItem),
 		PanelData:        string(panelItem),
 		BackupData:       string(backupItem),
+		WithDockerConf:   req.WithDockerConf,
 		WithMonitorData:  req.WithMonitorData,
 		WithLoginLog:     req.WithLoginLog,
 		WithOperationLog: req.WithOperationLog,
@@ -148,7 +149,7 @@ func handleSnapshot(req dto.SnapshotCreate, taskItem *task.Task, jobID, retry, t
 	if len(req.InterruptStep) == 0 || req.InterruptStep == "SnapBaseInfo" {
 		taskItem.AddSubTaskWithAliasAndOps(
 			"SnapBaseInfo",
-			func(t *task.Task) error { return snapBaseData(itemHelper, baseDir) },
+			func(t *task.Task) error { return snapBaseData(itemHelper, baseDir, req.WithDockerConf) },
 			nil, int(retry), time.Duration(timeout)*time.Second,
 		)
 		req.InterruptStep = ""
@@ -287,7 +288,7 @@ func loadDbConn(snap *snapHelper, targetDir string, req dto.SnapshotCreate) erro
 	return nil
 }
 
-func snapBaseData(snap snapHelper, targetDir string) error {
+func snapBaseData(snap snapHelper, targetDir string, withDockerConf bool) error {
 	snap.Task.Log("---------------------- 2 / 8 ----------------------")
 	snap.Task.LogStart(i18n.GetMsgByKey("SnapBaseInfo"))
 
@@ -324,11 +325,13 @@ func snapBaseData(snap snapHelper, targetDir string) error {
 		return err
 	}
 
-	if snap.FileOp.Stat(constant.DaemonJsonPath) {
-		err = snap.FileOp.CopyFile(constant.DaemonJsonPath, targetDir)
-		snap.Task.LogWithStatus(i18n.GetWithName("SnapCopy", constant.DaemonJsonPath), err)
-		if err != nil {
-			return err
+	if withDockerConf {
+		if snap.FileOp.Stat(constant.DaemonJsonPath) {
+			err = snap.FileOp.CopyFile(constant.DaemonJsonPath, targetDir)
+			snap.Task.LogWithStatus(i18n.GetWithName("SnapCopy", constant.DaemonJsonPath), err)
+			if err != nil {
+				return err
+			}
 		}
 	}
 

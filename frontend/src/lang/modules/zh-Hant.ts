@@ -1638,6 +1638,7 @@ const message = {
         systemLog: '保留系統日誌',
         taskLog: '保留任務日誌',
         monitorData: '保留監控數據',
+        dockerConf: '保留 Docker 配置',
         selectAllImage: '備份所有應用鏡像',
         logLabel: '日誌',
         agentLabel: '節點配置',

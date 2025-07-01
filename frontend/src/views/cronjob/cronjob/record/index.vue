@@ -134,11 +134,13 @@
                                             <span class="status-label">{{ $t('commons.table.interval') }}</span>
                                         </template>
                                         <el-button link v-if="!currentRecord?.interval" :loading="true" />
-                                        <span class="status-count" v-if="currentRecord?.interval! <= 1000">
-                                            {{ currentRecord?.interval }} ms
-                                        </span>
-                                        <span class="status-count" v-if="currentRecord?.interval! > 1000">
-                                            {{ currentRecord?.interval! / 1000 }} s
+                                        <span v-else>
+                                            <span class="status-count" v-if="currentRecord?.interval! <= 1000">
+                                                {{ currentRecord?.interval }} ms
+                                            </span>
+                                            <span class="status-count" v-if="currentRecord?.interval! > 1000">
+                                                {{ currentRecord?.interval! / 1000 }} s
+                                            </span>
                                         </span>
                                     </el-form-item>
                                     <el-form-item class="description">

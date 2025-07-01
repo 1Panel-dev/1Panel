@@ -1629,6 +1629,7 @@ const message = {
         stepBackupData: '备份数据',
         stepOtherData: '其他数据',
         monitorData: '监控数据',
+        dockerConf: 'Docker 配置',
         selectAllImage: '备份所有应用镜像',
         logLabel: '日志',
         agentLabel: '节点配置',

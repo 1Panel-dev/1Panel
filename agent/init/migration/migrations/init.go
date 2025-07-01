@@ -337,7 +337,7 @@ var UpdatePHPRuntime = &gormigrate.Migration{
 	},
 }
 var AddSnapshotIgnore = &gormigrate.Migration{
-	ID: "20250627-add-snapshot-ignore",
+	ID: "20250628-add-snapshot-ignore",
 	Migrate: func(tx *gorm.DB) error {
 		return tx.AutoMigrate(
 			&model.Snapshot{},

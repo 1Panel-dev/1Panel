@@ -110,6 +110,7 @@ func (u *SnapshotService) LoadSnapshotData() (dto.SnapshotData, error) {
 	if err != nil {
 		return data, err
 	}
+	data.WithDockerConf = true
 	data.PanelData, err = loadPanelFile(fileOp)
 	if err != nil {
 		return data, err

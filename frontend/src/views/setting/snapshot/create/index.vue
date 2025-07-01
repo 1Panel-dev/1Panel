@@ -127,6 +127,9 @@
             </fu-step>
             <fu-step id="otherData" :title="$t('setting.stepOtherData')">
                 <div class="ml-5">
+                    <el-checkbox v-model="form.withDockerConf" :label="$t('setting.dockerConf')" size="large" />
+                </div>
+                <div class="ml-5">
                     <el-checkbox v-model="form.withOperationLog" :label="$t('logs.operation')" size="large" />
                 </div>
                 <div class="ml-5">
@@ -195,6 +198,7 @@ const form = reactive({
     secret: '',
 
     backupAllImage: false,
+    withDockerConf: true,
     withLoginLog: false,
     withOperationLog: false,
     withSystemLog: false,

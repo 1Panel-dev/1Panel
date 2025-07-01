@@ -15,9 +15,11 @@ type Snapshot struct {
 	TaskRecoverID  string `json:"taskRecoverID"`
 	TaskRollbackID string `json:"taskRollbackID"`
 
-	AppData          string `json:"appData"`
-	PanelData        string `json:"panelData"`
-	BackupData       string `json:"backupData"`
+	AppData    string `json:"appData"`
+	PanelData  string `json:"panelData"`
+	BackupData string `json:"backupData"`
+
+	WithDockerConf   bool   `json:"withDockerConf"`
 	WithMonitorData  bool   `json:"withMonitorData"`
 	WithLoginLog     bool   `json:"withLoginLog"`
 	WithOperationLog bool   `json:"withOperationLog"`

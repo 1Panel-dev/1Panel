@@ -1749,6 +1749,7 @@ const message = {
         systemLog: 'システムログを保持',
         taskLog: 'タスクログを保持',
         monitorData: '監視データを保持',
+        dockerConf: 'Docker設定保持',
         selectAllImage: 'すべてのアプリイメージをバックアップ',
         logLabel: 'ログ',
         agentLabel: 'ノード設定',
