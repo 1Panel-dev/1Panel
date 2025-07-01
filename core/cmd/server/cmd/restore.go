@@ -87,6 +87,12 @@ var restoreCmd = &cobra.Command{
 
 		fmt.Println(i18n.GetMsgByKeyForCmd("RestoreStep5"))
 		fmt.Println(i18n.GetMsgByKeyForCmd("RestoreSuccessful"))
+
+		_, _ = cmdUtils.RunDefaultWithStdoutBashC("systemctl daemon-reload")
+		std, err := cmdUtils.RunDefaultWithStdoutBashC("1pctl restart all")
+		if err != nil {
+			fmt.Println(std)
+		}
 		return nil
 	},
 }
