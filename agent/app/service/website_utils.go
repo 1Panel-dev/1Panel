@@ -1136,7 +1136,6 @@ func saveCertificateFile(websiteSSL *model.WebsiteSSL, logger *log.Logger) {
 func GetSystemSSL() (bool, uint) {
 	sslSetting, err := settingRepo.Get(settingRepo.WithByKey("SSL"))
 	if err != nil {
-		global.LOG.Errorf("load service ssl from setting failed, err: %v", err)
 		return false, 0
 	}
 	if sslSetting.Value == "enable" {

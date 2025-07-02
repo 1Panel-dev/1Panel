@@ -1018,6 +1018,12 @@ func HandleOldPHPRuntime() {
 		composeContent = strings.ReplaceAll(composeContent, "./extensions:${EXTENSION_DIR}", "./extensions:/usr/local/lib/php/extensions")
 		_ = fileOp.WriteFile(composePtah, strings.NewReader(composeContent), constant.DirPerm)
 		_ = fileOp.WriteFile(runtime.GetFPMPath(), bytes.NewReader(nginx_conf.GetWebsiteFile("php-fpm.conf")), constant.DirPerm)
+		supervisorConfigPath := path.Join(runtime.GetPath(), "supervisor", "supervisor.d", "php-fpm.ini")
+		supervisorConfigBytes, _ := fileOp.GetContent(supervisorConfigPath)
+		if !strings.Contains(string(supervisorConfigBytes), "nodaemonize") {
+			newConfigContent := strings.ReplaceAll(string(supervisorConfigBytes), "command=php-fpm", "command=php-fpm --nodaemonize")
+			_ = fileOp.WriteFile(supervisorConfigPath, bytes.NewReader([]byte(newConfigContent)), constant.DirPerm)
+		}
 		go func() {
 			_ = restartRuntime(&runtime)
 		}()
