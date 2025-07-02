@@ -1722,6 +1722,7 @@ const message = {
         systemLog: '시스템 로그 유지',
         taskLog: '작업 로그 유지',
         monitorData: '모니터링 데이터 유지',
+        dockerConf: 'Docker 설정',
         selectAllImage: '모든 앱 이미지를 백업',
         logLabel: '로그',
         agentLabel: '노드 설정',

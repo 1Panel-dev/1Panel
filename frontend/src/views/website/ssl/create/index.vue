@@ -36,7 +36,7 @@
                     >
                         <el-row>
                             <el-col :span="20">
-                                <span>{{ acme.email }}</span>
+                                <span class="dns-name">{{ acme.email }}</span>
                             </el-col>
                             <el-col :span="4">
                                 <span>
@@ -80,7 +80,7 @@
                     >
                         <el-row>
                             <el-col :span="20">
-                                <span>{{ dns.name }}</span>
+                                <span class="dns-name">{{ dns.name }}</span>
                             </el-col>
                             <el-col :span="4">
                                 <span>
@@ -378,3 +378,13 @@ defineExpose({
     acceptParams,
 });
 </script>
+<style lang="scss" scoped>
+.dns-name {
+    display: inline-block;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: top;
+}
+</style>

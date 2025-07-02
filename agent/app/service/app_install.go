@@ -631,10 +631,14 @@ func (a *AppInstallService) DeleteCheck(installID uint) ([]dto.AppResource, erro
 	resources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithLinkId(appInstall.ID), repo.WithByFrom(constant.AppResourceLocal))
 	for _, resource := range resources {
 		linkInstall, _ := appInstallRepo.GetFirst(repo.WithByID(resource.AppInstallId))
-		res = append(res, dto.AppResource{
-			Type: "app",
-			Name: linkInstall.Name,
-		})
+		if linkInstall.ID > 0 {
+			res = append(res, dto.AppResource{
+				Type: "app",
+				Name: linkInstall.Name,
+			})
+		} else {
+			_ = appInstallResourceRepo.DeleteBy(context.Background(), appInstallResourceRepo.WithAppInstallId(resource.AppInstallId))
+		}
 	}
 	return res, nil
 }

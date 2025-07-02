@@ -14,7 +14,7 @@
                     <el-badge is-dot :value="taskCount" :show-zero="false" :offset="[5, 5]">
                         <el-button link @click="openChangeNode" @mouseenter="openChangeNode">
                             <SvgIcon class="icon" iconName="p-gerenzhongxin1" />
-                            {{ loadCurrentName() }}
+                            <span class="ellipsis-text">{{ loadCurrentName() }}</span>
                         </el-button>
                     </el-badge>
                 </div>
@@ -121,10 +121,7 @@ const loadCurrentName = () => {
         if (globalStore.currentNode === 'local') {
             return i18n.global.t('xpack.node.master');
         }
-        if (globalStore.currentNode.length <= 15) {
-            return globalStore.currentNode;
-        }
-        return globalStore.currentNode.substring(0, 12) + '...';
+        return globalStore.currentNode;
     }
     return i18n.global.t('xpack.node.master');
 };
@@ -314,5 +311,12 @@ onMounted(() => {
 }
 .dropdown-item:hover {
     background: var(--el-menu-item-bg-color-active);
+}
+.ellipsis-text {
+    display: inline-block;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 </style>

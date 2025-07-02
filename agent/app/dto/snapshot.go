@@ -23,6 +23,7 @@ type SnapshotCreate struct {
 	BackupData []DataTree `json:"backupData"`
 	PanelData  []DataTree `json:"panelData"`
 
+	WithDockerConf   bool `json:"withDockerConf"`
 	WithMonitorData  bool `json:"withMonitorData"`
 	WithLoginLog     bool `json:"withLoginLog"`
 	WithOperationLog bool `json:"withOperationLog"`
@@ -37,6 +38,7 @@ type SnapshotData struct {
 	BackupData []DataTree `json:"backupData"`
 	PanelData  []DataTree `json:"panelData"`
 
+	WithDockerConf   bool     `json:"withDockerConf"`
 	WithMonitorData  bool     `json:"withMonitorData"`
 	WithLoginLog     bool     `json:"withLoginLog"`
 	WithOperationLog bool     `json:"withOperationLog"`

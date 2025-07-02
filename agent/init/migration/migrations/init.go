@@ -330,17 +330,33 @@ var AddSnapshotRule = &gormigrate.Migration{
 	},
 }
 var UpdatePHPRuntime = &gormigrate.Migration{
-	ID: "20250624-update-php-runtime",
+	ID: "20250702-update-php-runtime",
 	Migrate: func(tx *gorm.DB) error {
 		service.HandleOldPHPRuntime()
 		return nil
 	},
 }
 var AddSnapshotIgnore = &gormigrate.Migration{
-	ID: "20250627-add-snapshot-ignore",
+	ID: "20250628-add-snapshot-ignore",
 	Migrate: func(tx *gorm.DB) error {
 		return tx.AutoMigrate(
 			&model.Snapshot{},
 		)
+	},
+}
+
+var InitAppLauncher = &gormigrate.Migration{
+	ID: "20250702-init-app-launcher",
+	Migrate: func(tx *gorm.DB) error {
+		launchers := []string{"openresty", "mysql", "halo", "redis", "maxkb", "wordpress"}
+		for _, val := range launchers {
+			var item model.AppLauncher
+			_ = tx.Model(&model.AppLauncher{}).Where("key = ?", val).First(&item).Error
+			if item.ID == 0 {
+				item.Key = val
+				_ = tx.Create(&item).Error
+			}
+		}
+		return nil
 	},
 }

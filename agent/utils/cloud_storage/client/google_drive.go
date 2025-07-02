@@ -57,11 +57,9 @@ func (g *googleDriveClient) Delete(pathItem string) (bool, error) {
 	if len(fileInfo.ID) == 0 {
 		return false, fmt.Errorf("no such file %s", pathItem)
 	}
-	res, err := g.googleRequest("https://www.googleapis.com/drive/v3/files/"+fileInfo.ID, http.MethodDelete, nil, nil)
-	if err != nil {
+	if _, err = g.googleRequest("https://www.googleapis.com/drive/v3/files/"+fileInfo.ID, http.MethodDelete, nil, nil); err != nil {
 		return false, err
 	}
-	fmt.Println(string(res))
 	return true, nil
 }
 
@@ -99,12 +97,49 @@ func (g *googleDriveClient) Upload(src, target string) (bool, error) {
 		return false, err
 	}
 	uploadUrl := resp.Header().Get("location")
-	if _, err := g.googleRequest(uploadUrl, http.MethodPut, func(req *resty.Request) {
-		req.SetHeader("Content-Length", strconv.FormatInt(fileInfo.Size(), 10)).SetBody(file)
-	}, nil); err != nil {
-		return false, err
+
+	buf := make([]byte, 5*1024*1024)
+	var offset int64 = 0
+	for {
+		n, err := file.Read(buf)
+		if err != nil && err != io.EOF {
+			return false, fmt.Errorf("read file failed, err: %v", err)
+		}
+		if n == 0 {
+			break
+		}
+		chunk := buf[:n]
+		start := offset
+		end := offset + int64(n) - 1
+		if err = uploadChunk(client, uploadUrl, chunk, start, end, fileInfo.Size()); err != nil {
+			return false, err
+		}
+		offset += int64(n)
+		if err == io.EOF {
+			break
+		}
 	}
 	return true, nil
+}
+
+func uploadChunk(client *resty.Client, uploadURL string, chunk []byte, start, end, total int64) error {
+	contentRange := fmt.Sprintf("bytes %d-%d/%d", start, end, total)
+
+	resp, err := client.R().
+		SetHeader("Content-Length", strconv.Itoa(len(chunk))).
+		SetHeader("Content-Range", contentRange).
+		SetBody(chunk).
+		Put(uploadURL)
+
+	if err != nil {
+		return fmt.Errorf("new request for upload chunk failed: %v", err)
+	}
+
+	if resp.StatusCode() != 200 && resp.StatusCode() != 308 {
+		return fmt.Errorf("upload chunk failed: %s, %s", resp.Status(), string(resp.Body()))
+	}
+
+	return nil
 }
 
 func (g *googleDriveClient) Download(src, target string) (bool, error) {

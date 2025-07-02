@@ -21,7 +21,7 @@
                     :rules="rules"
                 >
                     <el-form-item :label="$t('setting.backupAccount')" prop="fromAccounts">
-                        <el-select multiple @change="changeAccount" v-model="form.fromAccounts" clearable>
+                        <el-select multiple @change="changeAccount(false)" v-model="form.fromAccounts" clearable>
                             <div v-for="item in backupOptions" :key="item.id">
                                 <el-option v-if="item.type !== $t('setting.LOCAL')" :value="item.id" :label="item.name">
                                     {{ item.name }}
@@ -127,6 +127,9 @@
             </fu-step>
             <fu-step id="otherData" :title="$t('setting.stepOtherData')">
                 <div class="ml-5">
+                    <el-checkbox v-model="form.withDockerConf" :label="$t('setting.dockerConf')" size="large" />
+                </div>
+                <div class="ml-5">
                     <el-checkbox v-model="form.withOperationLog" :label="$t('logs.operation')" size="large" />
                 </div>
                 <div class="ml-5">
@@ -195,6 +198,7 @@ const form = reactive({
     secret: '',
 
     backupAllImage: false,
+    withDockerConf: true,
     withLoginLog: false,
     withOperationLog: false,
     withSystemLog: false,
@@ -307,7 +311,7 @@ const loadBackups = async () => {
             backupOptions.value.push({ id: item.id, type: i18n.global.t('setting.' + item.type), name: item.name });
         }
     }
-    changeAccount();
+    changeAccount(true);
 };
 
 const changeStep = (currentStep: any) => {
@@ -342,7 +346,7 @@ const changeStep = (currentStep: any) => {
     }
 };
 
-const changeAccount = async () => {
+const changeAccount = async (isInit: boolean) => {
     accountOptions.value = [];
     let isInAccounts = false;
     for (const item of backupOptions.value) {
@@ -360,8 +364,8 @@ const changeAccount = async () => {
             accountOptions.value.push(item);
         }
     }
-    if (!isInAccounts) {
-        form.downloadAccountID = form.downloadAccountID ? undefined : form.downloadAccountID;
+    if (!isInAccounts && !isInit) {
+        form.downloadAccountID = form.fromAccounts.length === 0 ? undefined : form.fromAccounts[0];
     }
 };
 

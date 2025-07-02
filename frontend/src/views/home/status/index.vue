@@ -1,6 +1,25 @@
 <template>
     <el-row :gutter="10">
         <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center">
+            <el-popover placement="bottom" :width="200" trigger="hover" v-if="chartsOption['load']">
+                <el-tag class="tagClass">{{ $t('home.loadAverage', 1) }}: {{ formatNumber(currentInfo.load1) }}</el-tag>
+                <el-tag class="tagClass">{{ $t('home.loadAverage', 5) }}: {{ formatNumber(currentInfo.load5) }}</el-tag>
+                <el-tag class="tagClass">
+                    {{ $t('home.loadAverage', 15) }}: {{ formatNumber(currentInfo.load15) }}
+                </el-tag>
+                <template #reference>
+                    <v-charts
+                        height="160px"
+                        id="load"
+                        type="pie"
+                        :option="chartsOption['load']"
+                        v-if="chartsOption['load']"
+                    />
+                </template>
+            </el-popover>
+            <span class="input-help">{{ loadStatus(currentInfo.loadUsagePercent) }}</span>
+        </el-col>
+        <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center">
             <el-popover placement="bottom" :width="loadWidth()" trigger="hover" v-if="chartsOption['cpu']">
                 <div>
                     <el-tooltip
@@ -88,25 +107,6 @@
             <span class="input-help">
                 {{ computeSize(currentInfo.memoryUsed) }} / {{ computeSize(currentInfo.memoryTotal) }}
             </span>
-        </el-col>
-        <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center">
-            <el-popover placement="bottom" :width="200" trigger="hover" v-if="chartsOption['load']">
-                <el-tag class="tagClass">{{ $t('home.loadAverage', 1) }}: {{ formatNumber(currentInfo.load1) }}</el-tag>
-                <el-tag class="tagClass">{{ $t('home.loadAverage', 5) }}: {{ formatNumber(currentInfo.load5) }}</el-tag>
-                <el-tag class="tagClass">
-                    {{ $t('home.loadAverage', 15) }}: {{ formatNumber(currentInfo.load15) }}
-                </el-tag>
-                <template #reference>
-                    <v-charts
-                        height="160px"
-                        id="load"
-                        type="pie"
-                        :option="chartsOption['load']"
-                        v-if="chartsOption['load']"
-                    />
-                </template>
-            </el-popover>
-            <span class="input-help">{{ loadStatus(currentInfo.loadUsagePercent) }}</span>
         </el-col>
         <template v-for="(item, index) of currentInfo.diskData" :key="index">
             <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center" v-if="isShow('disk', index)">

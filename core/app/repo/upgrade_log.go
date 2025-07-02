@@ -16,6 +16,7 @@ type IUpgradeLogRepo interface {
 	Delete(opts ...global.DBOption) error
 
 	WithByNodeID(nodeID uint) global.DBOption
+	WithByUpgradeVersion(oldVersion, newVersion string) global.DBOption
 }
 
 func NewIUpgradeLogRepo() IUpgradeLogRepo {
@@ -77,5 +78,11 @@ func (u *UpgradeLogRepo) Page(page, size int, opts ...global.DBOption) (int64, [
 func (c *UpgradeLogRepo) WithByNodeID(nodeID uint) global.DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("node_id = ?", nodeID)
+	}
+}
+
+func (c *UpgradeLogRepo) WithByUpgradeVersion(oldVersion, newVersion string) global.DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("old_version = ? AND new_version = ?", oldVersion, newVersion)
 	}
 }

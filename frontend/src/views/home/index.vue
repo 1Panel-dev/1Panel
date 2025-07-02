@@ -403,14 +403,19 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
     currentInfo.value = baseInfo.value.currentInfo;
     onLoadCurrentInfo();
     isStatusInit.value = false;
-    statusRef.value.acceptParams(currentInfo.value, baseInfo.value);
-    appRef.value.acceptParams();
+    statusRef.value?.acceptParams(currentInfo.value, baseInfo.value);
+    appRef.value?.acceptParams();
     if (isInit) {
-        timer = setInterval(async () => {
-            if (isActive.value && !globalStore.isOnRestart) {
-                await onLoadCurrentInfo();
-            }
-        }, 3000);
+        try {
+            timer = setInterval(async () => {
+                if (isActive.value && !globalStore.isOnRestart) {
+                    await onLoadCurrentInfo();
+                }
+            }, 3000);
+        } finally {
+            clearInterval(Number(timer));
+            timer = null;
+        }
     }
 };
 
@@ -470,7 +475,7 @@ const onLoadCurrentInfo = async () => {
     }
     loadData();
     currentInfo.value = res.data;
-    statusRef.value.acceptParams(currentInfo.value, baseInfo.value);
+    statusRef.value?.acceptParams(currentInfo.value, baseInfo.value);
 };
 
 const loadData = async () => {

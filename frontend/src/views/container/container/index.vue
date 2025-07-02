@@ -411,7 +411,7 @@ const dialogUpgradeRef = ref();
 const dialogCommitRef = ref();
 const dialogPortJumpRef = ref();
 const opRef = ref();
-const includeAppStore = ref();
+const includeAppStore = ref(true);
 const columns = ref([]);
 
 const tags = ref([]);
@@ -614,7 +614,8 @@ const onMonitor = (row: any) => {
 
 const dialogTerminalRef = ref();
 const onTerminal = (row: any) => {
-    dialogTerminalRef.value!.acceptParams({ containerID: row.containerID, container: row.name });
+    const title = i18n.global.t('menu.container') + ' ' + row.name;
+    dialogTerminalRef.value!.acceptParams({ containerID: row.containerID, title: title });
 };
 
 const onInspect = async (id: string) => {

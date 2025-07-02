@@ -131,6 +131,25 @@
                                                                     </el-button>
                                                                 </el-tooltip>
                                                             </span>
+                                                            <span class="ml-1">
+                                                                <el-tooltip
+                                                                    v-if="mode !== 'upgrade'"
+                                                                    effect="dark"
+                                                                    :content="$t('menu.terminal')"
+                                                                    placement="top"
+                                                                >
+                                                                    <el-button
+                                                                        type="primary"
+                                                                        link
+                                                                        @click="openTerminal(installed)"
+                                                                        :disabled="installed.status !== 'Running'"
+                                                                    >
+                                                                        <el-icon>
+                                                                            <SvgIcon iconName="p-terminal2" />
+                                                                        </el-icon>
+                                                                    </el-button>
+                                                                </el-tooltip>
+                                                            </span>
                                                             <span class="ml-1" v-if="mode === 'installed'">
                                                                 <el-tooltip
                                                                     effect="dark"
@@ -385,6 +404,7 @@
     <PortJumpDialog ref="dialogPortJumpRef" />
     <AppIgnore ref="ignoreRef" @close="search" />
     <ComposeLogs ref="composeLogRef" />
+    <TerminalDialog ref="dialogTerminalRef" />
     <TaskLog ref="taskLogRef" @close="search" />
     <Detail ref="detailRef" />
     <IgnoreApp ref="ignoreAppRef" @close="search" />
@@ -404,6 +424,7 @@ import AppParams from './detail/index.vue';
 import AppUpgrade from './upgrade/index.vue';
 import AppIgnore from './ignore/index.vue';
 import ComposeLogs from '@/components/log/compose/index.vue';
+import TerminalDialog from '@/views/container/container/terminal/index.vue';
 import { App } from '@/api/interface/app';
 import Status from '@/components/status/index.vue';
 import { getAge, jumpToPath, toLink } from '@/utils/util';
@@ -415,6 +436,7 @@ import Detail from '@/views/app-store/detail/index.vue';
 import IgnoreApp from '@/views/app-store/installed/ignore/create/index.vue';
 import { getAgentSettingByKey } from '@/api/modules/setting';
 import Tags from '@/views/app-store/components/tag.vue';
+import SvgIcon from '@/components/svg-icon/svg-icon.vue';
 
 const data = ref<any>();
 const loading = ref(false);
@@ -442,6 +464,7 @@ const upgradeRef = ref();
 const ignoreRef = ref();
 const dialogPortJumpRef = ref();
 const composeLogRef = ref();
+const dialogTerminalRef = ref();
 const taskLogRef = ref();
 const searchReq = reactive({
     page: 1,
@@ -700,6 +723,11 @@ const openLog = (row: any) => {
     }
 };
 
+const openTerminal = (row: any) => {
+    const title = i18n.global.t('app.app') + ' ' + row.name;
+    dialogTerminalRef.value!.acceptParams({ containerID: row.container, title: title });
+};
+
 const getConfig = async () => {
     try {
         const res = await getAgentSettingByKey('SystemIP');
@@ -777,5 +805,10 @@ onUnmounted(() => {
     .el-button + .el-button {
         margin-left: 0;
     }
+}
+.svg-icon {
+    width: 100%;
+    height: 100%;
+    padding: 0;
 }
 </style>

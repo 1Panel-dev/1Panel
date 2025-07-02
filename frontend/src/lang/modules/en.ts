@@ -1828,6 +1828,7 @@ const message = {
         systemLog: 'Retain System Log',
         taskLog: 'Retain Task Log',
         monitorData: 'Retain Monitoring Data',
+        dockerConf: 'Retain Docker Configuration',
         selectAllImage: 'Backup All Application Images',
         logLabel: 'Log',
         agentLabel: 'Node Configuration',

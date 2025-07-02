@@ -1805,6 +1805,7 @@ const message = {
         systemLog: 'Simpan log sistem',
         taskLog: 'Simpan log tugas',
         monitorData: 'Simpan data pemantauan',
+        dockerConf: 'Simpan Konfigurasi Docker',
         selectAllImage: 'Simpan semua imej aplikasi',
         logLabel: 'Log',
         agentLabel: 'Konfigurasi Nod',

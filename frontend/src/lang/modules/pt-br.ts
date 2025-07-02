@@ -1790,6 +1790,7 @@ const message = {
         systemLog: 'Manter logs do sistema',
         taskLog: 'Manter logs de tarefas',
         monitorData: 'Manter dados de monitoramento',
+        dockerConf: 'Manter Configuração do Docker',
         selectAllImage: 'Fazer backup de todas as imagens de aplicativos',
         logLabel: 'Log',
         agentLabel: 'Configuração do Nó',
