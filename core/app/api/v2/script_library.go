@@ -3,7 +3,6 @@ package v2
 import (
 	"encoding/json"
 	"fmt"
-	"path"
 	"strconv"
 	"strings"
 	"time"
@@ -185,26 +184,33 @@ func (b *BaseApi) RunScript(c *gin.Context) {
 		tty.Start(quitChan)
 		go slave.Wait(quitChan)
 	} else {
-		connInfo, installDir, err := xpack.LoadNodeInfo(currentNode)
+		connInfo, _, err := xpack.LoadNodeInfo(currentNode)
 		if wshandleError(wsConn, errors.WithMessage(err, "invalid param rows in request")) {
 			return
 		}
 
-		fileDir := path.Join(installDir, "1panel/tmp/script")
 		fileName := ""
 		var translations = make(map[string]string)
 		_ = json.Unmarshal([]byte(scriptItem.Name), &translations)
 		if name, ok := translations["en"]; ok {
-			fileName = path.Join(fileDir, strings.ReplaceAll(name, " ", "_"))
+			fileName = strings.ReplaceAll(name, " ", "_")
 		} else {
-			fileName = path.Join(fileDir, strings.ReplaceAll(scriptItem.Name, " ", "_"))
+			fileName = strings.ReplaceAll(scriptItem.Name, " ", "_")
 		}
-		initCmd := fmt.Sprintf("mkdir -p %s && cat > %s <<'MYMARKER'\n%s\nMYMARKER\n bash %s", fileDir, fileName, scriptItem.Script, fileName)
 		client, err := ssh.NewClient(*connInfo)
-		if wshandleError(wsConn, errors.WithMessage(err, "failed to set up the connection. Please check the host information")) {
+		if wshandleError(wsConn, errors.WithMessage(err, "set up the connection failed. Please check the host information")) {
 			return
 		}
-		defer client.Close()
+		sudoItem := client.SudoHandleCmd()
+		defer func() {
+			_, _ = client.Runf("%s rm -rf %s", sudoItem, fileName)
+			client.Close()
+		}()
+		std, err := client.Runf("%s touch %s && %s chmod 777 %s && %s cat > %s <<'MYMARKER'\n%s\nMYMARKER\n", sudoItem, fileName, sudoItem, fileName, sudoItem, fileName, scriptItem.Script)
+		if wshandleError(wsConn, errors.WithMessage(err, fmt.Sprintf("touch script file failed, err: %s. Please check and retry", std))) {
+			return
+		}
+		initCmd := fmt.Sprintf("%s bash %s", sudoItem, fileName)
 
 		sws, err := terminal.NewLogicSshWsSession(cols, rows, client.Client, wsConn, initCmd)
 		if wshandleError(wsConn, err) {
