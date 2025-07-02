@@ -280,6 +280,7 @@ func (u *CronjobService) handleSnapshot(cronjob model.Cronjob, jobRecord model.J
 		AppData:           itemData.AppData,
 		PanelData:         itemData.PanelData,
 		BackupData:        itemData.BackupData,
+		WithDockerConf:    true,
 		WithMonitorData:   true,
 		WithLoginLog:      true,
 		WithOperationLog:  true,

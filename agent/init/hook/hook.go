@@ -2,12 +2,14 @@ package hook
 
 import (
 	"os"
+	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 )
 
@@ -18,6 +20,8 @@ func Init() {
 	handleOllamaModelStatus()
 
 	loadLocalDir()
+
+	initDockerConf()
 }
 
 func initGlobalData() {
@@ -107,5 +111,16 @@ func loadLocalDir() {
 		if err = os.MkdirAll(account.BackupPath, os.ModePerm); err != nil {
 			global.LOG.Errorf("mkdir %s failed, err: %v", account.BackupPath, err)
 		}
+	}
+}
+
+func initDockerConf() {
+	stdout, err := cmd.RunDefaultWithStdoutBashC("which docker")
+	if err != nil {
+		return
+	}
+	dockerPath := stdout
+	if strings.Contains(dockerPath, "snap") {
+		constant.DaemonJsonPath = "/var/snap/docker/current/config/daemon.json"
 	}
 }

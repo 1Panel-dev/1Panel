@@ -396,7 +396,7 @@ func recoverBaseData(src string, itemHelper *snapRecoverHelper) error {
 		itemHelper.Task.Log(i18n.GetMsgByKey("RecoverDaemonJsonEmpty"))
 		return nil
 	} else {
-		err = itemHelper.FileOp.CopyFile(path.Join(src, "daemon.json"), "/etc/docker")
+		err = itemHelper.FileOp.CopyFile(path.Join(src, "daemon.json"), path.Dir(constant.DaemonJsonPath))
 		itemHelper.Task.Log(i18n.GetMsgByKey("RecoverDaemonJson"))
 		if err != nil {
 			return fmt.Errorf("recover docker daemon.json failed, err: %v", err)

@@ -79,7 +79,7 @@ func (u *SnapshotService) SnapshotRollback(req dto.SnapshotRecover) error {
 			i18n.GetWithName("SnapCopy", constant.DaemonJsonPath),
 			func(t *task.Task) error {
 				if FileOp.Stat(path.Join(baseDir, "daemon.json")) {
-					return FileOp.CopyFile(path.Join(baseDir, "daemon.json"), "/etc/docker")
+					return FileOp.CopyFile(path.Join(baseDir, "daemon.json"), path.Dir(constant.DaemonJsonPath))
 				}
 				return nil
 			},

@@ -167,7 +167,7 @@
                         :minHeight="350"
                         v-model="dockerConf"
                         mode="json"
-                        placeholder="# The Docker configuration file does not exist or is empty (/etc/docker/daemon.json)"
+                        placeholder="# The Docker configuration file does not exist or is empty"
                     ></CodemirrorPro>
                     <el-button :disabled="loading" type="primary" @click="onSaveFile" class="mt-2.5">
                         {{ $t('commons.button.save') }}

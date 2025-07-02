@@ -13,6 +13,6 @@ const (
 	ComposeOpStop    = "stop"
 	ComposeOpRestart = "restart"
 	ComposeOpRemove  = "remove"
-
-	DaemonJsonPath = "/etc/docker/daemon.json"
 )
+
+var DaemonJsonPath = "/etc/docker/daemon.json"
