@@ -406,11 +406,16 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
     statusRef.value?.acceptParams(currentInfo.value, baseInfo.value);
     appRef.value?.acceptParams();
     if (isInit) {
-        timer = setInterval(async () => {
-            if (isActive.value && !globalStore.isOnRestart) {
-                await onLoadCurrentInfo();
-            }
-        }, 3000);
+        try {
+            timer = setInterval(async () => {
+                if (isActive.value && !globalStore.isOnRestart) {
+                    await onLoadCurrentInfo();
+                }
+            }, 3000);
+        } finally {
+            clearInterval(Number(timer));
+            timer = null;
+        }
     }
 };
 
