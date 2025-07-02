@@ -205,6 +205,7 @@ const getRuntime = async (id: number) => {
         });
         runtime.exposedPorts = data.exposedPorts || [];
         runtime.environments = data.environments || [];
+        runtime.volumes = data.volumes || [];
         editParams.value = data.appParams;
         open.value = true;
     } catch (error) {}
