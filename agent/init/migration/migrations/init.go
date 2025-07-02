@@ -344,3 +344,19 @@ var AddSnapshotIgnore = &gormigrate.Migration{
 		)
 	},
 }
+
+var InitAppLauncher = &gormigrate.Migration{
+	ID: "20250702-init-app-launcher",
+	Migrate: func(tx *gorm.DB) error {
+		launchers := []string{"openresty", "mysql", "halo", "redis", "maxkb", "wordpress"}
+		for _, val := range launchers {
+			var item model.AppLauncher
+			_ = tx.Model(&model.AppLauncher{}).Where("key = ?", val).First(&item).Error
+			if item.ID == 0 {
+				item.Key = val
+				_ = tx.Create(&item).Error
+			}
+		}
+		return nil
+	},
+}
