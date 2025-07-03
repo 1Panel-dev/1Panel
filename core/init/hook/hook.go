@@ -36,12 +36,13 @@ func Init() {
 }
 
 func handleUserInfo(tags string, settingRepo repo.ISettingRepo) {
+	global.LOG.Debug("change-user-info", tags)
 	if len(tags) == 0 {
 		return
 	}
 	settingMap := make(map[string]string)
 	if tags == "use_existing" {
-		settingMap["Port"] = global.CONF.Conn.Port
+		settingMap["ServerPort"] = common.LoadParams("ORIGINAL_PORT")
 		settingMap["UserName"] = global.CONF.Base.Username
 		settingMap["Password"] = global.CONF.Base.Password
 		settingMap["SecurityEntrance"] = global.CONF.Conn.Entrance
@@ -63,6 +64,7 @@ func handleUserInfo(tags string, settingRepo repo.ISettingRepo) {
 		settingMap["SecurityEntrance"] = common.RandStrAndNum(10)
 	}
 	for key, val := range settingMap {
+		global.LOG.Debug("update --- ", key, val)
 		if len(val) == 0 {
 			continue
 		}
@@ -70,12 +72,12 @@ func handleUserInfo(tags string, settingRepo repo.ISettingRepo) {
 			val, _ = encrypt.StringEncrypt(val)
 		}
 		if err := settingRepo.Update(key, val); err != nil {
-			global.LOG.Fatalf("update %s before start failed, err: %v", key, err)
+			global.LOG.Errorf("update %s before start failed, err: %v", key, err)
 		}
 	}
 
 	_, _ = cmd.RunDefaultWithStdoutBashCf("%s sed -i '/CHANGE_USER_INFO=%v/d' /usr/local/bin/1pctl", cmd.SudoHandleCmd(), global.CONF.Base.ChangeUserInfo)
-	_, _ = cmd.RunDefaultWithStdoutBashCf("%s sed -i '/ORIGINAL_PASSWORD=%v/d' /usr/local/bin/1pctl", cmd.SudoHandleCmd(), "******")
+	_, _ = cmd.RunDefaultWithStdoutBashCf("%s sed -i -e 's#ORIGINAL_PASSWORD=.*#ORIGINAL_PASSWORD=**********#g' /usr/local/bin/1pctl", cmd.SudoHandleCmd())
 }
 
 func generateKey() {

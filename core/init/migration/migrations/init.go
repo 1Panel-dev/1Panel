@@ -53,7 +53,7 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "Password", Value: pass}).Error; err != nil {
 			return err
 		}
-		_, _ = cmd.RunDefaultWithStdoutBashCf("%s sed -i '/ORIGINAL_PASSWORD=%v/d' /usr/local/bin/1pctl", cmd.SudoHandleCmd(), "******")
+		_, _ = cmd.RunDefaultWithStdoutBashCf("%s sed -i -e 's#ORIGINAL_PASSWORD=.*#ORIGINAL_PASSWORD=**********#g' /usr/local/bin/1pctl", cmd.SudoHandleCmd())
 		if err := tx.Create(&model.Setting{Key: "Theme", Value: "light"}).Error; err != nil {
 			return err
 		}
