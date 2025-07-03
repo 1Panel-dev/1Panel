@@ -36,17 +36,18 @@ func Init() {
 }
 
 func handleUserInfo(tags string, settingRepo repo.ISettingRepo) {
-	global.LOG.Debug("change-user-info", tags)
 	if len(tags) == 0 {
 		return
 	}
 	settingMap := make(map[string]string)
 	if tags == "use_existing" {
 		settingMap["ServerPort"] = common.LoadParams("ORIGINAL_PORT")
+		global.CONF.Conn.Port = settingMap["ServerPort"]
 		settingMap["UserName"] = global.CONF.Base.Username
 		settingMap["Password"] = global.CONF.Base.Password
 		settingMap["SecurityEntrance"] = global.CONF.Conn.Entrance
-		settingMap["SystemVersion"] = global.CONF.Base.Version
+		settingMap["SystemVersion"] = common.LoadParams("ORIGINAL_VERSION")
+		global.CONF.Base.Version = settingMap["SystemVersion"]
 		settingMap["Language"] = global.CONF.Base.Language
 	}
 	if tags == "all" {
@@ -64,7 +65,6 @@ func handleUserInfo(tags string, settingRepo repo.ISettingRepo) {
 		settingMap["SecurityEntrance"] = common.RandStrAndNum(10)
 	}
 	for key, val := range settingMap {
-		global.LOG.Debug("update --- ", key, val)
 		if len(val) == 0 {
 			continue
 		}
