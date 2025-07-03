@@ -1021,6 +1021,8 @@ const message = {
         retainCopies: 'Manter cópias',
         retryTimes: 'Tentativas de Repetição',
         timeout: 'Tempo Limite',
+        ignoreErr: 'Ignorar erros',
+        ignoreErrHelper: 'Ignorar erros durante o backup para garantir a execução de todas as tarefas de backup',
         retryTimesHelper: '0 significa não repetir após falha',
         retainCopiesHelper: 'Número de cópias a serem mantidas para registros de execução e logs',
         retainCopiesHelper1: 'Número de cópias a serem mantidas para arquivos de backup',

@@ -1025,6 +1025,8 @@ const message = {
         retainCopies: 'Simpan salinan',
         retryTimes: 'Bilangan Cubaan Semula',
         timeout: 'Masa Tamat',
+        ignoreErr: 'Abaikan ralat',
+        ignoreErrHelper: 'Abaikan ralat semasa sandaran untuk memastikan semua tugas sandaran dilaksanakan',
         retryTimesHelper: '0 bermaksud tiada cubaan semula selepas gagal',
         retainCopiesHelper: 'Bilangan salinan untuk menyimpan rekod pelaksanaan dan log',
         retainCopiesHelper1: 'Bilangan salinan untuk menyimpan fail sandaran',

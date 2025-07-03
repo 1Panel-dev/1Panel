@@ -45,6 +45,7 @@ type CronjobOperate struct {
 	RetainCopies      int    `json:"retainCopies" validate:"number,min=1"`
 	RetryTimes        int    `json:"retryTimes" validate:"number,min=0"`
 	Timeout           uint   `json:"timeout" validate:"number,min=1"`
+	IgnoreErr         bool   `json:"ignoreErr"`
 	Secret            string `json:"secret"`
 
 	AlertCount uint   `json:"alertCount"`
@@ -105,6 +106,7 @@ type CronjobInfo struct {
 	RetainCopies   int          `json:"retainCopies"`
 	RetryTimes     int          `json:"retryTimes"`
 	Timeout        uint         `json:"timeout"`
+	IgnoreErr      bool         `json:"ignoreErr"`
 	SnapshotRule   SnapshotRule `json:"snapshotRule"`
 
 	SourceAccounts    []string `json:"sourceAccounts"`

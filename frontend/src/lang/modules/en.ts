@@ -1035,6 +1035,8 @@ const message = {
         retainCopies: 'Retain records',
         retryTimes: 'Retry Attempts',
         timeout: 'Timeout',
+        ignoreErr: 'Ignore errors',
+        ignoreErrHelper: 'Ignore errors during backup to ensure all backup tasks complete',
         retryTimesHelper: '0 means no retry after failure',
         retainCopiesHelper: 'Number of copies to retain for execution records and logs',
         retainCopiesHelper1: 'Number of copies to retain for backup files',

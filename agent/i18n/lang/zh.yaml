@@ -204,6 +204,8 @@ SystemLog: "系统日志"
 CutWebsiteLog: "切割网站日志"
 FileOrDir: "目录 / 文件"
 UploadFile: "上传备份文件 {{ .file }} 到 {{ .backup }}"
+IgnoreBackupErr: "备份失败，错误：{{ .detail }}，忽略本次错误..."
+IgnoreUploadErr: "上传失败，错误：{{ .detail }}，忽略本次错误..."
 
 #toolbox
 ErrNotExistUser: "当前用户不存在，请修改后重试！"

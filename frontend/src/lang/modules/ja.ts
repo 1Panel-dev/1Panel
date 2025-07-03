@@ -1004,6 +1004,8 @@ const message = {
         retainCopies: '記録を保持します',
         retryTimes: 'リトライ回数',
         timeout: 'タイムアウト',
+        ignoreErr: 'エラーを無視',
+        ignoreErrHelper: 'バックアップ中のエラーを無視し、全てのバックアップタスクを確実に実行します',
         retryTimesHelper: '0は失敗後リトライしないことを意味します',
         retainCopiesHelper: '実行記録とログのために保持するコピーの数',
         retainCopiesHelper1: 'バックアップファイル用に保持するコピーの数',

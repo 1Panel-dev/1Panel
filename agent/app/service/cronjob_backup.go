@@ -48,6 +48,7 @@ func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time, t
 		return err
 	}
 	for _, app := range apps {
+		retry := 0
 		taskItem.AddSubTaskWithOps(task.GetTaskName(app.Name, task.TaskBackup, task.TaskScopeCronjob), func(task *task.Task) error {
 			var record model.BackupRecord
 			record.From = "cronjob"
@@ -59,11 +60,22 @@ func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time, t
 			backupDir := path.Join(global.Dir.TmpDir, fmt.Sprintf("app/%s/%s", app.App.Key, app.Name))
 			record.FileName = fmt.Sprintf("app_%s_%s.tar.gz", app.Name, startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5))
 			if err := doAppBackup(&app, task, backupDir, record.FileName, cronjob.ExclusionRules, cronjob.Secret); err != nil {
-				return err
+				if retry < int(cronjob.RetryTimes) || !cronjob.IgnoreErr {
+					retry++
+					return err
+				} else {
+					task.Log(i18n.GetMsgWithDetail("IgnoreBackupErr", err.Error()))
+					return nil
+				}
 			}
 			downloadPath, err := u.uploadCronjobBackFile(cronjob, task, accountMap, path.Join(backupDir, record.FileName))
 			if err != nil {
-				return err
+				if retry < int(cronjob.RetryTimes) || !cronjob.IgnoreErr {
+					retry++
+					return err
+				}
+				task.Log(i18n.GetMsgWithDetail("IgnoreUploadErr", err.Error()))
+				return nil
 			}
 			record.FileDir = path.Dir(downloadPath)
 			if err := backupRepo.CreateRecord(&record); err != nil {
@@ -87,6 +99,7 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, startTime time.Tim
 		return err
 	}
 	for _, web := range webs {
+		retry := 0
 		taskItem.AddSubTaskWithOps(task.GetTaskName(web.Alias, task.TaskBackup, task.TaskScopeCronjob), func(task *task.Task) error {
 			var record model.BackupRecord
 			record.From = "cronjob"
@@ -99,12 +112,23 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, startTime time.Tim
 			record.FileName = fmt.Sprintf("website_%s_%s.tar.gz", web.Alias, startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5))
 
 			if err := doWebsiteBackup(&web, taskItem, backupDir, record.FileName, cronjob.ExclusionRules, cronjob.Secret); err != nil {
-				return err
+				if retry < int(cronjob.RetryTimes) || !cronjob.IgnoreErr {
+					retry++
+					return err
+				} else {
+					task.Log(i18n.GetMsgWithDetail("IgnoreBackupErr", err.Error()))
+					return nil
+				}
 			}
 
 			downloadPath, err := u.uploadCronjobBackFile(cronjob, task, accountMap, path.Join(backupDir, record.FileName))
 			if err != nil {
-				return err
+				if retry < int(cronjob.RetryTimes) || !cronjob.IgnoreErr {
+					retry++
+					return err
+				}
+				task.Log(i18n.GetMsgWithDetail("IgnoreUploadErr", err.Error()))
+				return nil
 			}
 			record.FileDir = path.Dir(downloadPath)
 			if err := backupRepo.CreateRecord(&record); err != nil {
@@ -128,6 +152,7 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Ti
 		return err
 	}
 	for _, dbInfo := range dbs {
+		retry := 0
 		itemName := fmt.Sprintf("%s[%s] - %s", dbInfo.Database, dbInfo.DBType, dbInfo.Name)
 		taskItem.AddSubTaskWithOps(task.GetTaskName(itemName, task.TaskBackup, task.TaskScopeCronjob), func(task *task.Task) error {
 			var record model.BackupRecord
@@ -142,17 +167,34 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Ti
 			record.FileName = fmt.Sprintf("db_%s_%s.sql.gz", dbInfo.Name, startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5))
 			if cronjob.DBType == "mysql" || cronjob.DBType == "mariadb" {
 				if err := doMysqlBackup(dbInfo, backupDir, record.FileName); err != nil {
-					return err
+					if retry < int(cronjob.RetryTimes) || !cronjob.IgnoreErr {
+						retry++
+						return err
+					} else {
+						task.Log(i18n.GetMsgWithDetail("IgnoreBackupErr", err.Error()))
+						return nil
+					}
 				}
 			} else {
 				if err := doPostgresqlgBackup(dbInfo, backupDir, record.FileName); err != nil {
-					return err
+					if retry < int(cronjob.RetryTimes) || !cronjob.IgnoreErr {
+						retry++
+						return err
+					} else {
+						task.Log(i18n.GetMsgWithDetail("IgnoreBackupErr", err.Error()))
+						return nil
+					}
 				}
 			}
 
 			downloadPath, err := u.uploadCronjobBackFile(cronjob, task, accountMap, path.Join(backupDir, record.FileName))
 			if err != nil {
-				return err
+				if retry < int(cronjob.RetryTimes) || !cronjob.IgnoreErr {
+					retry++
+					return err
+				}
+				task.Log(i18n.GetMsgWithDetail("IgnoreUploadErr", err.Error()))
+				return nil
 			}
 			record.FileDir = path.Dir(downloadPath)
 			if err := backupRepo.CreateRecord(&record); err != nil {
@@ -280,6 +322,7 @@ func (u *CronjobService) handleSnapshot(cronjob model.Cronjob, jobRecord model.J
 		AppData:           itemData.AppData,
 		PanelData:         itemData.PanelData,
 		BackupData:        itemData.BackupData,
+		WithDockerConf:    true,
 		WithMonitorData:   true,
 		WithLoginLog:      true,
 		WithOperationLog:  true,

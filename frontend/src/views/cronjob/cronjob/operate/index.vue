@@ -644,6 +644,12 @@
                             </div>
 
                             <el-row :gutter="20">
+                                <LayoutCol :span="20" v-if="hasIgnore()">
+                                    <el-form-item>
+                                        <el-checkbox v-model="form.ignoreErr" :label="$t('cronjob.ignoreErr')" />
+                                        <span class="input-help">{{ $t('cronjob.ignoreErrHelper') }}</span>
+                                    </el-form-item>
+                                </LayoutCol>
                                 <LayoutCol>
                                     <el-form-item :label="$t('cronjob.timeout')" prop="timeoutItem">
                                         <el-input type="number" class="selectClass" v-model.number="form.timeoutItem">
@@ -776,6 +782,7 @@ const form = reactive<Cronjob.CronjobInfo>({
     dbNameList: [],
 
     retainCopies: 7,
+    ignoreErr: false,
     retryTimes: 3,
     timeout: 3600,
     timeoutItem: 3600,
@@ -863,6 +870,7 @@ const search = async () => {
                     }
                 }
 
+                form.ignoreErr = res.data.ignoreErr;
                 form.retainCopies = res.data.retainCopies;
                 form.retryTimes = res.data.retryTimes;
                 form.timeout = res.data.timeout;
@@ -1285,6 +1293,10 @@ function hasExclusionRules() {
         form.type === 'snapshot' ||
         (form.type === 'directory' && form.isDir)
     );
+}
+
+function hasIgnore() {
+    return form.type === 'app' || form.type === 'website' || form.type === 'database';
 }
 
 function hasScript() {

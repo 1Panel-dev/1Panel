@@ -439,6 +439,7 @@ func (u *CronjobService) Update(id uint, req dto.CronjobOperate) error {
 	upMap["retain_copies"] = req.RetainCopies
 	upMap["retry_times"] = req.RetryTimes
 	upMap["timeout"] = req.Timeout
+	upMap["ignore_err"] = req.IgnoreErr
 	upMap["secret"] = req.Secret
 	err = cronjobRepo.Update(id, upMap)
 	if err != nil {

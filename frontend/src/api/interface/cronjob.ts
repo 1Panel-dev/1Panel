@@ -45,6 +45,7 @@ export namespace Cronjob {
         sourceAccountItems: Array<number>;
 
         retainCopies: number;
+        ignoreErr: boolean;
         retryTimes: number;
         timeout: number;
         timeoutItem: number;
@@ -91,6 +92,7 @@ export namespace Cronjob {
         retainCopies: number;
         retryTimes: number;
         timeout: number;
+        ignoreErr: boolean;
         secret: string;
 
         alertCount: number;

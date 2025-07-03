@@ -205,6 +205,8 @@ SystemLog: 'Log do Sistema'
 CutWebsiteLog: 'Rotacionar Log do Website'
 FileOrDir: 'Diretório / Arquivo'
 UploadFile: 'Enviando arquivo de backup {{ .file }} para {{ .backup }}'
+IgnoreBackupErr: 'Backup falhou, erro: {{ .detail }}, ignorando este erro...'
+IgnoreUploadErr: 'Upload falhou, erro: {{ .detail }}, ignorando este erro...'
 
 #caixa de ferramentas
 ErrNotExistUser: 'O usuário atual não existe, modifique e tente novamente!'

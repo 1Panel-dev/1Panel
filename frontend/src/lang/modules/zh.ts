@@ -982,6 +982,8 @@ const message = {
         retainCopies: '保留份数',
         retryTimes: '失败重试次数',
         timeout: '超时时间',
+        ignoreErr: '忽略错误',
+        ignoreErrHelper: '忽略备份过程中出现的错误，保证所有备份任务执行',
         retryTimesHelper: '为 0 表示失败后不重试',
         retainCopiesHelper: '执行记录及日志保留份数',
         retainCopiesHelper1: '备份文件保留份数',

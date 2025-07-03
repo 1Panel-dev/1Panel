@@ -204,6 +204,8 @@ SystemLog: 'Log Sistem'
 CutWebsiteLog: 'Putar Log Laman Web'
 FileOrDir: 'Direktori / Fail'
 UploadFile: 'Muat naik fail sandaran {{ .file }} ke {{ .backup }}'
+IgnoreBackupErr: 'Sandaran gagal, ralat: {{ .detail }}, abaikan ralat ini...'
+IgnoreUploadErr: 'Muat naik gagal, ralat: {{ .detail }}, abaikan ralat ini...'
 
 #kotak alat
 ErrNotExistUser: 'Pengguna semasa tidak wujud, sila ubah suai dan cuba lagi!'

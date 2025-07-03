@@ -991,6 +991,8 @@ const message = {
         retainCopies: '기록 보관',
         retryTimes: '재시도 횟수',
         timeout: '타임아웃',
+        ignoreErr: '오류 무시',
+        ignoreErrHelper: '백업 과정에서 발생하는 오류를 무시하여 모든 백업 작업이 실행되도록 합니다',
         retryTimesHelper: '0은 실패 후 재시도 안 함을 의미합니다',
         retainCopiesHelper: '실행 기록과 로그에 대해 보관할 복사본 수',
         retainCopiesHelper1: '백업 파일에 대해 보관할 복사본 수',

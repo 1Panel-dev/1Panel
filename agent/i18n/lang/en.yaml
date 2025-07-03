@@ -205,6 +205,8 @@ SystemLog: 'System Log'
 CutWebsiteLog: 'Rotate Website Log'
 FileOrDir: 'Directory / File'
 UploadFile: 'Uploading backup file {{ .file }} to {{ .backup }}'
+IgnoreBackupErr: 'Backup failed, error: {{ .detail }}, ignoring this error...'
+IgnoreUploadErr: 'Upload failed, error: {{ .detail }}, ignoring this error...'
 
 #toolbox
 ErrNotExistUser: 'The current user does not exist, please modify and try again!'
