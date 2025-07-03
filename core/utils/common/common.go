@@ -4,14 +4,12 @@ import (
 	"fmt"
 	mathRand "math/rand"
 	"net"
-	"net/http"
 	"os"
 	"path"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/gin-gonic/gin"
 
 	"github.com/1Panel-dev/1Panel/core/global"
@@ -225,13 +223,14 @@ func HandleIPList(content string) ([]string, error) {
 	return res, nil
 }
 
-func deleteCookie(w http.ResponseWriter) {
-	cookie := &http.Cookie{
-		Name:    constant.SessionName,
-		Value:   "",
-		Path:    "/",
-		Expires: time.Unix(0, 0),
-		MaxAge:  -1,
+func LoadParams(param string) string {
+	stdout, err := cmd.RunDefaultWithStdoutBashCf("grep '^%s=' /usr/local/bin/1pctl | cut -d'=' -f2", param)
+	if err != nil {
+		panic(err)
 	}
-	http.SetCookie(w, cookie)
+	info := strings.ReplaceAll(stdout, "\n", "")
+	if len(info) == 0 || info == `""` {
+		panic(fmt.Sprintf("error `%s` find in /usr/local/bin/1pctl", param))
+	}
+	return info
 }

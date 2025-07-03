@@ -10,6 +10,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/cmd/server/conf"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/utils/cmd"
+	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v3"
@@ -39,13 +40,13 @@ func Init() {
 			panic(fmt.Errorf("Fatal error config file: %s \n", err))
 		}
 	} else {
-		baseDir = loadParams("BASE_DIR")
-		port = loadParams("ORIGINAL_PORT")
-		version = loadParams("ORIGINAL_VERSION")
-		username = loadParams("ORIGINAL_USERNAME")
-		password = loadParams("ORIGINAL_PASSWORD")
-		entrance = loadParams("ORIGINAL_ENTRANCE")
-		language = loadParams("LANGUAGE")
+		baseDir = common.LoadParams("BASE_DIR")
+		port = common.LoadParams("ORIGINAL_PORT")
+		version = common.LoadParams("ORIGINAL_VERSION")
+		username = common.LoadParams("ORIGINAL_USERNAME")
+		password = common.LoadParams("ORIGINAL_PASSWORD")
+		entrance = common.LoadParams("ORIGINAL_ENTRANCE")
+		language = common.LoadParams("LANGUAGE")
 
 		reader := bytes.NewReader(conf.AppYaml)
 		if err := v.ReadConfig(reader); err != nil {
@@ -98,18 +99,6 @@ func Init() {
 	global.CONF.Conn.Entrance = entrance
 	global.CONF.Conn.Port = port
 	global.Viper = v
-}
-
-func loadParams(param string) string {
-	stdout, err := cmd.RunDefaultWithStdoutBashCf("grep '^%s=' /usr/local/bin/1pctl | cut -d'=' -f2", param)
-	if err != nil {
-		panic(err)
-	}
-	info := strings.ReplaceAll(stdout, "\n", "")
-	if len(info) == 0 || info == `""` {
-		panic(fmt.Sprintf("error `%s` find in /usr/local/bin/1pctl", param))
-	}
-	return info
 }
 
 func loadChangeInfo() string {

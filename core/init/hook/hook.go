@@ -32,47 +32,65 @@ func Init() {
 	handleUserInfo(global.CONF.Base.ChangeUserInfo, settingRepo)
 
 	generateKey()
+	initDockerConf()
 }
 
 func handleUserInfo(tags string, settingRepo repo.ISettingRepo) {
 	if len(tags) == 0 {
 		return
 	}
+	settingMap := make(map[string]string)
+	if tags == "use_existing" {
+		settingMap["Port"] = global.CONF.Conn.Port
+		settingMap["UserName"] = global.CONF.Base.Username
+		settingMap["Password"] = global.CONF.Base.Password
+		settingMap["SecurityEntrance"] = global.CONF.Conn.Entrance
+		settingMap["SystemVersion"] = global.CONF.Base.Version
+		settingMap["Language"] = global.CONF.Base.Language
+	}
 	if tags == "all" {
-		if err := settingRepo.Update("UserName", common.RandStrAndNum(10)); err != nil {
-			global.LOG.Fatalf("init username before start failed, err: %v", err)
-		}
-		pass, _ := encrypt.StringEncrypt(common.RandStrAndNum(10))
-		if err := settingRepo.Update("Password", pass); err != nil {
-			global.LOG.Fatalf("init password before start failed, err: %v", err)
-		}
-		if err := settingRepo.Update("SecurityEntrance", common.RandStrAndNum(10)); err != nil {
-			global.LOG.Fatalf("init entrance before start failed, err: %v", err)
-		}
-		return
+		settingMap["UserName"] = common.RandStrAndNum(10)
+		settingMap["Password"] = common.RandStrAndNum(10)
+		settingMap["SecurityEntrance"] = common.RandStrAndNum(10)
 	}
 	if strings.Contains(global.CONF.Base.ChangeUserInfo, "username") {
-		if err := settingRepo.Update("UserName", common.RandStrAndNum(10)); err != nil {
-			global.LOG.Fatalf("init username before start failed, err: %v", err)
-		}
+		settingMap["UserName"] = common.RandStrAndNum(10)
 	}
 	if strings.Contains(global.CONF.Base.ChangeUserInfo, "password") {
-		pass, _ := encrypt.StringEncrypt(common.RandStrAndNum(10))
-		if err := settingRepo.Update("Password", pass); err != nil {
-			global.LOG.Fatalf("init password before start failed, err: %v", err)
-		}
+		settingMap["Password"] = common.RandStrAndNum(10)
 	}
 	if strings.Contains(global.CONF.Base.ChangeUserInfo, "entrance") {
-		if err := settingRepo.Update("SecurityEntrance", common.RandStrAndNum(10)); err != nil {
-			global.LOG.Fatalf("init entrance before start failed, err: %v", err)
+		settingMap["SecurityEntrance"] = common.RandStrAndNum(10)
+	}
+	for key, val := range settingMap {
+		if len(val) == 0 {
+			continue
+		}
+		if key == "Password" {
+			val, _ = encrypt.StringEncrypt(val)
+		}
+		if err := settingRepo.Update(key, val); err != nil {
+			global.LOG.Fatalf("update %s before start failed, err: %v", key, err)
 		}
 	}
 
 	_, _ = cmd.RunDefaultWithStdoutBashCf("%s sed -i '/CHANGE_USER_INFO=%v/d' /usr/local/bin/1pctl", cmd.SudoHandleCmd(), global.CONF.Base.ChangeUserInfo)
+	_, _ = cmd.RunDefaultWithStdoutBashCf("%s sed -i '/ORIGINAL_PASSWORD=%v/d' /usr/local/bin/1pctl", cmd.SudoHandleCmd(), "******")
 }
 
 func generateKey() {
 	if err := service.NewISettingService().GenerateRSAKey(); err != nil {
 		global.LOG.Errorf("generate rsa key error : %s", err.Error())
+	}
+}
+
+func initDockerConf() {
+	stdout, err := cmd.RunDefaultWithStdoutBashC("which docker")
+	if err != nil {
+		return
+	}
+	dockerPath := stdout
+	if strings.Contains(dockerPath, "snap") {
+		constant.DaemonJsonPath = "/var/snap/docker/current/config/daemon.json"
 	}
 }

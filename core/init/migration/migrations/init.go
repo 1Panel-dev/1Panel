@@ -13,6 +13,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/init/migration/helper"
+	"github.com/1Panel-dev/1Panel/core/utils/cmd"
 	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
 	"github.com/go-gormigrate/gormigrate/v2"
@@ -52,6 +53,7 @@ var InitSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "Password", Value: pass}).Error; err != nil {
 			return err
 		}
+		_, _ = cmd.RunDefaultWithStdoutBashCf("%s sed -i '/ORIGINAL_PASSWORD=%v/d' /usr/local/bin/1pctl", cmd.SudoHandleCmd(), "******")
 		if err := tx.Create(&model.Setting{Key: "Theme", Value: "light"}).Error; err != nil {
 			return err
 		}
