@@ -220,16 +220,6 @@ func (u *DockerService) UpdateConf(req dto.SettingUpdate, withRestart bool) erro
 			daemonMap["proxies"] = proxies
 		}
 	}
-	if len(daemonMap) == 0 {
-		if len(file) == 0 {
-			return nil
-		}
-		_ = os.Remove(constant.DaemonJsonPath)
-		if withRestart {
-			return restartDocker()
-		}
-		return nil
-	}
 	newJson, err := json.MarshalIndent(daemonMap, "", "\t")
 	if err != nil {
 		return err
@@ -277,11 +267,6 @@ func (u *DockerService) UpdateLogOption(req dto.LogOption) error {
 	_ = json.Unmarshal(file, &daemonMap)
 
 	changeLogOption(daemonMap, req.LogMaxFile, req.LogMaxSize)
-	if len(daemonMap) == 0 {
-		_ = os.Remove(constant.DaemonJsonPath)
-		_ = restartDocker()
-		return nil
-	}
 	newJson, err := json.MarshalIndent(daemonMap, "", "\t")
 	if err != nil {
 		return err
@@ -321,11 +306,6 @@ func (u *DockerService) UpdateIpv6Option(req dto.Ipv6Option) error {
 	if req.Experimental {
 		daemonMap["experimental"] = req.Experimental
 	}
-	if len(daemonMap) == 0 {
-		_ = os.Remove(constant.DaemonJsonPath)
-		_ = restartDocker()
-		return nil
-	}
 	newJson, err := json.MarshalIndent(daemonMap, "", "\t")
 	if err != nil {
 		return err
@@ -345,13 +325,6 @@ func (u *DockerService) UpdateIpv6Option(req dto.Ipv6Option) error {
 }
 
 func (u *DockerService) UpdateConfByFile(req dto.DaemonJsonUpdateByFile) error {
-	if len(req.File) == 0 {
-		_ = os.Remove(constant.DaemonJsonPath)
-		if err := restartDocker(); err != nil {
-			return err
-		}
-		return nil
-	}
 	err := createIfNotExistDaemonJsonFile()
 	if err != nil {
 		return err
