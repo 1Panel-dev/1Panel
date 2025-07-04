@@ -237,6 +237,7 @@ func loadDbConn(snap *snapHelper, targetDir string, req dto.SnapshotCreate) erro
 	if err != nil {
 		return err
 	}
+	_ = os.Remove(path.Join(targetDir, "db/session.db"))
 
 	agentDb, err := common.LoadDBConnByPathWithErr(path.Join(targetDir, "db/agent.db"), "agent.db")
 	snap.Task.LogWithStatus(i18n.GetWithName("SnapNewDB", "agent"), err)
