@@ -390,10 +390,10 @@ type diskInfo struct {
 func loadDiskInfo() []dto.DiskInfo {
 	var datas []dto.DiskInfo
 	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(2 * time.Second))
-	stdout, err := cmdMgr.RunWithStdoutBashC("df -hT -P|grep '/'|grep -v tmpfs|grep -v 'snap/core'|grep -v udev")
+	stdout, err := cmdMgr.RunWithStdoutBashC("timeout 2 df -hT -P | awk 'NR>1 && !/tmpfs|snap\\/core|udev/ {print}'")
 	if err != nil {
 		cmdMgr2 := cmd.NewCommandMgr(cmd.WithTimeout(1 * time.Second))
-		stdout, err = cmdMgr2.RunWithStdoutBashC("df -lhT -P|grep '/'|grep -v tmpfs|grep -v 'snap/core'|grep -v udev")
+		stdout, err = cmdMgr2.RunWithStdoutBashC("timeout 1 df -lhT -P | awk 'NR>1 && !/tmpfs|snap\\/core|udev/ {print}'")
 		if err != nil {
 			return datas
 		}
