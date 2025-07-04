@@ -915,9 +915,6 @@ func collectLogs(done <-chan struct{}, params dto.StreamLog, messageChan chan<- 
 	defer close(messageChan)
 	defer close(errorChan)
 	var cmdArgs []string
-	if params.Type == "compose" {
-		cmdArgs = []string{"compose", "-f", params.Compose}
-	}
 	cmdArgs = append(cmdArgs, "logs")
 	if params.Follow {
 		cmdArgs = append(cmdArgs, "-f")
@@ -932,7 +929,20 @@ func collectLogs(done <-chan struct{}, params dto.StreamLog, messageChan chan<- 
 		cmdArgs = append(cmdArgs, params.Container)
 	}
 
-	dockerCmd := exec.Command("docker", cmdArgs...)
+	var dockerCmd *exec.Cmd
+	if params.Type == "compose" {
+		dockerComposCmd := common.GetDockerComposeCommand()
+		if dockerComposCmd == "docker-compose" {
+			newCmdArgs := append([]string{"-f", params.Compose}, cmdArgs...)
+			dockerCmd = exec.Command(dockerComposCmd, newCmdArgs...)
+		} else {
+			newCmdArgs := append([]string{"compose", "-f", params.Compose}, cmdArgs...)
+			dockerCmd = exec.Command("docker", newCmdArgs...)
+		}
+	} else {
+		dockerCmd = exec.Command("docker", cmdArgs...)
+	}
+
 	dockerCmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 
 	stdout, err := dockerCmd.StdoutPipe()

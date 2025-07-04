@@ -4,6 +4,7 @@
         :header="$t('commons.button.' + operateReq.operate)"
         :resource="resourceName"
         @close="handleClose"
+        v-loading="loading"
     >
         <el-descriptions direction="vertical">
             <el-descriptions-item>
@@ -25,14 +26,7 @@
                 </el-link>
             </el-descriptions-item>
         </el-descriptions>
-        <el-form
-            @submit.prevent
-            ref="updateRef"
-            :rules="rules"
-            label-position="top"
-            :model="operateReq"
-            v-loading="loading"
-        >
+        <el-form @submit.prevent ref="updateRef" :rules="rules" label-position="top" :model="operateReq">
             <el-form-item :label="$t('app.versionSelect')" prop="detailId">
                 <el-select v-model="operateReq.version" @change="getVersions(operateReq.version)">
                     <el-option
