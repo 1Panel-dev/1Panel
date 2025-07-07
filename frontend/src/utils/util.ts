@@ -819,3 +819,25 @@ export const preloadImage = (url: string): Promise<string> => {
         img.src = url;
     });
 };
+
+export const isSensitiveLinuxPath = (path) => {
+    let sensitivePath = [
+        '/',
+        '/bin',
+        '/sbin',
+        '/usr/bin',
+        '/usr/sbin',
+        '/usr/local/bin',
+        '/etc',
+        '/lib',
+        '/lib64',
+        '/usr/lib',
+        '/home',
+        '/tmp',
+        '/var',
+        '/dev',
+        '/proc',
+        '/sys',
+    ];
+    return sensitivePath.indexOf(path) !== -1;
+};

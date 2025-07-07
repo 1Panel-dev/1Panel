@@ -1247,6 +1247,10 @@ const message = {
             disableHelper:
                 'Melumpuhkan akaun FTP yang dipilih akan membatalkan kebenaran aksesnya. Adakah anda mahu meneruskan?',
             syncHelper: 'Selaraskan data akaun FTP antara pelayan dan pangkalan data. Adakah anda mahu meneruskan?',
+            dirSystem:
+                'Direktori ini dikhaskan untuk sistem. Pengubahsuaian mungkin menyebabkan sistem rosak, sila ubah dan cuba lagi!',
+            dirHelper: 'Membolehkan FTP memerlukan perubahan kebenaran direktori - sila pilih dengan berhati-hati',
+            dirMsg: 'Membolehkan FTP akan mengubah kebenaran untuk seluruh direktori {0}. Teruskan?',
         },
         clam: {
             clam: 'Imbasan virus',

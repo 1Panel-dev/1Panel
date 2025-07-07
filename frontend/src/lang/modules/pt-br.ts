@@ -1233,6 +1233,10 @@ const message = {
         enableHelper: 'Ativar a conta FTP selecionada restaurará suas permissões de acesso. Deseja continuar?',
         disableHelper: 'Desativar a conta FTP selecionada revogará suas permissões de acesso. Deseja continuar?',
         syncHelper: 'Sincronizar os dados da conta FTP entre o servidor e o banco de dados. Deseja continuar?',
+        dirSystem:
+            'Este diretório é reservado do sistema. Modificações podem causar falhas no sistema. Por favor, modifique e tente novamente!',
+        dirHelper: 'Habilitar FTP requer alterações nas permissões do diretório - por favor, escolha com cuidado',
+        dirMsg: 'Habilitar FTP modificará as permissões de todo o diretório {0}. Continuar?',
     },
     clam: {
         clam: 'Scan de vírus',

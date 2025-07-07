@@ -1200,6 +1200,9 @@ const message = {
             enableHelper: '啟用選取的 FTP 帳號後，該 FTP 帳號將恢復訪問權限，是否繼續操作？',
             disableHelper: '停用選取的 FTP 帳號後，該 FTP 帳號將失去訪問權限，是否繼續操作？',
             syncHelper: '同步伺服器與資料庫中的 FTP 帳戶資料，是否繼續操作？',
+            dirSystem: '該目錄為系統保留目錄，修改可能導致系統崩潰，請修改後重試！',
+            dirHelper: '開啟 FTP 需要修改目錄權限，請謹慎選擇',
+            dirMsg: '開啟 FTP 將修改整個 {0} 目錄權限，是否繼續？',
         },
         clam: {
             clam: '病毒掃描',

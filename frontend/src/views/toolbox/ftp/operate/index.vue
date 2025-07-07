@@ -23,6 +23,7 @@
                         <FileList @choose="loadDir" :dir="true"></FileList>
                     </template>
                 </el-input>
+                <span class="input-help">{{ $t('toolbox.ftp.dirHelper') }}</span>
             </el-form-item>
             <el-form-item :label="$t('commons.table.description')" prop="description">
                 <el-input type="textarea" :rows="3" clearable v-model="dialogData.rowData!.description" />
@@ -48,7 +49,7 @@ import { ElForm } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
 import { Toolbox } from '@/api/interface/toolbox';
 import { createFtp, updateFtp } from '@/api/modules/toolbox';
-import { getRandomStr } from '@/utils/util';
+import { getRandomStr, isSensitiveLinuxPath } from '@/utils/util';
 
 interface DialogProps {
     title: string;
@@ -77,10 +78,18 @@ const handleClose = () => {
     drawerVisible.value = false;
 };
 
+const verifyPath = (rule: any, value: any, callback: any) => {
+    if (isSensitiveLinuxPath(dialogData.value.rowData.path)) {
+        callback(new Error(i18n.global.t('toolbox.ftp.dirSystem')));
+        return;
+    }
+    callback();
+};
+
 const rules = reactive({
     user: [Rules.simpleName],
     password: [Rules.simplePassword],
-    path: [Rules.requiredInput, Rules.noSpace],
+    path: [Rules.requiredInput, Rules.noSpace, { validator: verifyPath, trigger: 'change', required: true }],
 });
 
 type FormInstance = InstanceType<typeof ElForm>;
@@ -94,32 +103,37 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        loading.value = true;
-        if (dialogData.value.title === 'edit') {
-            await updateFtp(dialogData.value.rowData)
+        ElMessageBox.confirm(i18n.global.t('toolbox.ftp.dirMsg', [dialogData.value.rowData.path]), 'FTP', {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+        }).then(async () => {
+            loading.value = true;
+            if (dialogData.value.title === 'edit') {
+                await updateFtp(dialogData.value.rowData)
+                    .then(() => {
+                        loading.value = false;
+                        drawerVisible.value = false;
+                        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                        emit('search');
+                    })
+                    .catch(() => {
+                        loading.value = false;
+                    });
+
+                return;
+            }
+
+            await createFtp(dialogData.value.rowData)
                 .then(() => {
                     loading.value = false;
-                    drawerVisible.value = false;
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                     emit('search');
+                    drawerVisible.value = false;
                 })
                 .catch(() => {
                     loading.value = false;
                 });
-
-            return;
-        }
-
-        await createFtp(dialogData.value.rowData)
-            .then(() => {
-                loading.value = false;
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                emit('search');
-                drawerVisible.value = false;
-            })
-            .catch(() => {
-                loading.value = false;
-            });
+        });
     });
 };
 

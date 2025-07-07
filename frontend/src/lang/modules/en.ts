@@ -1263,6 +1263,10 @@ const message = {
             disableHelper:
                 'Disabling the selected FTP account will revoke its access permissions. Do you want to continue?',
             syncHelper: 'Sync FTP account data between server and database. Do you want to continue?',
+            dirSystem:
+                'This directory is system-reserved. Modification may cause system crash, please modify and try again!',
+            dirHelper: 'Enabling FTP requires directory permission changes - please choose carefully',
+            dirMsg: 'Enabling FTP will modify permissions for the entire {0} directory. Continue?',
         },
         clam: {
             clam: 'Virus scan',

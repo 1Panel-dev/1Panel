@@ -1199,6 +1199,9 @@ const message = {
             enableHelper: '启用选中的 FTP 账号后，该 FTP 账号恢复访问权限，是否继续操作？',
             disableHelper: '停用选中的 FTP 账号后，该 FTP 账号将失去访问权限，是否继续操作？',
             syncHelper: '同步服务器与数据库中的 FTP 账户数据，是否继续操作？',
+            dirSystem: '该目录为系统保留目录，修改可能导致系统崩溃，请修改后重试！',
+            dirHelper: '开启 FTP 需要修改目录权限，请谨慎选择',
+            dirMsg: '开启 FTP 将修改整个 {0} 目录权限，是否继续？',
         },
         clam: {
             clam: '病毒扫描',
