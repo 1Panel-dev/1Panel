@@ -283,11 +283,19 @@ func (m McpServerService) BindDomain(req request.McpBindDomain) error {
 		}
 	}
 	group, _ := groupRepo.Get(groupRepo.WithByWebsiteDefault())
+
+	domain, err := ParseDomain(req.Domain)
+	if err != nil {
+		return err
+	}
+	if domain.Port == 0 {
+		domain.Port = nginxInstall.HttpPort
+	}
 	createWebsiteReq := request.WebsiteCreate{
 		Domains: []request.WebsiteDomain{
 			{
-				Domain: req.Domain,
-				Port:   80,
+				Domain: domain.Domain,
+				Port:   domain.Port,
 			},
 		},
 		Alias:          strings.ToLower(req.Domain),

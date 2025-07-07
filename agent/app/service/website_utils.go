@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net"
 	"os"
 	"path"
 	"path/filepath"
@@ -1442,4 +1443,23 @@ func hasDefaultServer(params []string) bool {
 		}
 	}
 	return false
+}
+
+func ParseDomain(domain string) (*model.WebsiteDomain, error) {
+	host, portStr, err := net.SplitHostPort(domain)
+	if err != nil {
+		return &model.WebsiteDomain{
+			Domain: domain,
+			Port:   0,
+		}, nil
+	}
+
+	port, err := strconv.Atoi(portStr)
+	if err != nil {
+		return nil, fmt.Errorf("invalid port in domain %s: %v", domain, err)
+	}
+	return &model.WebsiteDomain{
+		Domain: host,
+		Port:   port,
+	}, nil
 }
