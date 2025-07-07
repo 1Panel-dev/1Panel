@@ -102,6 +102,13 @@ func handlePHP(create request.RuntimeCreate, runtime *model.Runtime, fileOp file
 	runtime.Params = string(forms)
 	runtime.Status = constant.StatusBuilding
 
+	go func() {
+		appDetail, err := appDetailRepo.GetFirst(repo.WithByID(runtime.AppDetailID))
+		if err == nil {
+			RequestDownloadCallBack(appDetail.DownloadCallBackUrl)
+		}
+	}()
+
 	go buildRuntime(runtime, "", "", false)
 	return
 }
