@@ -492,3 +492,20 @@ var DeleteV2Openresty = &gormigrate.Migration{
 		return tx.Delete(&model.AppDetail{}).Where("version = '1.27.1.2-0-1-focal'").Error
 	},
 }
+
+var UpdateOnedrive = &gormigrate.Migration{
+	ID: "20250704-update-onedrive",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Model(&model.Setting{}).
+			Where("key = ?", "OneDriveID").
+			Update("value", "NTQ0NmNmZTMtNGM3OS00N2EwLWFlMjUtZmM2NDU0NzhlMmQ5").Error; err != nil {
+			return err
+		}
+		if err := tx.Model(&model.Setting{}).
+			Where("key = ?", "OneDriveSc").
+			Update("value", "bGRlOFF+WEVrR1M0b25Vb1VsRWpMYzE2MW9rTXZEM25KdnZ1MGN6MA==").Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}

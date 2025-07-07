@@ -110,6 +110,7 @@ func Init() {
 		migrations.AddMcpServer,
 		migrations.AddPbootCMSPHPExtensions,
 		migrations.DeleteV2Openresty,
+		migrations.UpdateOnedrive,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)
