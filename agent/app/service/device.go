@@ -120,7 +120,7 @@ func (u *DeviceService) Update(key, value string) error {
 		if err := ntp.UpdateSystemTimeZone(value); err != nil {
 			return err
 		}
-		go common.RestartService(true, true, false)
+		go common.RestartService(global.IsMaster, true, false)
 	case "DNS":
 		if err := updateDNS(strings.Split(value, ",")); err != nil {
 			return err

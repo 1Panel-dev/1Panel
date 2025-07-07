@@ -100,9 +100,14 @@ const onSave = async (formEl: FormInstance | undefined) => {
                 .then(async () => {
                     loading.value = false;
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                    globalStore.isLogin = false;
-                    let href = window.location.href;
-                    window.open(href, '_self');
+                    if (globalStore.currentNode === 'local') {
+                        globalStore.isLogin = false;
+                        let href = window.location.href;
+                        window.open(href, '_self');
+                    } else {
+                        globalStore.currentNode = 'local';
+                        location.reload();
+                    }
                 })
                 .catch(() => {
                     loading.value = false;
