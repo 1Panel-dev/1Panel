@@ -279,6 +279,7 @@ let timer: NodeJS.Timer | null = null;
 let isInit = ref<boolean>(true);
 let isStatusInit = ref<boolean>(true);
 let isActive = ref(true);
+let isCurrentActive = ref(true);
 
 const ioReadBytes = ref<Array<number>>([]);
 const ioWriteBytes = ref<Array<number>>([]);
@@ -406,16 +407,19 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
     statusRef.value?.acceptParams(currentInfo.value, baseInfo.value);
     appRef.value?.acceptParams();
     if (isInit) {
-        try {
-            timer = setInterval(async () => {
+        timer = setInterval(async () => {
+            try {
+                if (!isCurrentActive.value) {
+                    throw new Error('jump out');
+                }
                 if (isActive.value && !globalStore.isOnRestart) {
                     await onLoadCurrentInfo();
                 }
-            }, 3000);
-        } finally {
-            clearInterval(Number(timer));
-            timer = null;
-        }
+            } catch {
+                clearInterval(Number(timer));
+                timer = null;
+            }
+        }, 3000);
     }
 };
 
@@ -554,6 +558,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
     window.removeEventListener('focus', onFocus);
     window.removeEventListener('blur', onBlur);
+    isCurrentActive.value = false;
     clearInterval(Number(timer));
     timer = null;
 });
