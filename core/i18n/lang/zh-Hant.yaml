@@ -58,6 +58,7 @@ ErrXpackExceptional: "該部分為專業版功能，請先在 面板設定-許�
 ErrXpackOutOfDate: "目前許可證已過期，請重新在 面板設定-許可證 介面匯入許可證"
 ErrXpackLost: "許可證已達到最大重試次數，請進入【面板設定】【許可證】頁面手動點擊同步按鈕，以確保專業版功能正常使用"
 ErrDeviceLost: "許可證校驗必要檔案遺失，請檢查後重試！"
+ErrDeviceErr: "當前環境與許可證導入環境不一致，請編輯許可證重新導入！"
 ErrXpackTimeout: "請求超時，網路連接可能不穩定，請稍後再試！"
 ErrUnbindMaster: "檢測到節點管理內存在節點，無法解綁目前許可證，請先移除後重試！"
 ErrFreeNodeLimit: "社區版節點數量已達免費上限，請前往 www.lxware.cn/1panel 購買後重試！"
