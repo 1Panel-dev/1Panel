@@ -31,7 +31,7 @@ func Down(filePath string) (string, error) {
 	if err := checkCmd(); err != nil {
 		return "", err
 	}
-	stdout, err := cmd.RunDefaultWithStdoutBashCf(global.CONF.DockerConfig.Command+" -f %s down --remove-orphans", filePath)
+	stdout, err := cmd.RunDefaultWithStdoutBashCfAndTimeOut(global.CONF.DockerConfig.Command+" -f %s down --remove-orphans", 20*time.Minute, filePath)
 	return stdout, err
 }
 
