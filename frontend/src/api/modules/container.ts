@@ -135,8 +135,8 @@ export const createImageRepo = (params: Container.RepoCreate) => {
 export const updateImageRepo = (params: Container.RepoUpdate) => {
     return http.post(`/containers/repo/update`, params, TimeoutEnum.T_40S);
 };
-export const deleteImageRepo = (params: Container.RepoDelete) => {
-    return http.post(`/containers/repo/del`, params, TimeoutEnum.T_40S);
+export const deleteImageRepo = (id: Number) => {
+    return http.post(`/containers/repo/del`, { id: id }, TimeoutEnum.T_40S);
 };
 
 // composeTemplate

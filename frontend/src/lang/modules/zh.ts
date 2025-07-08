@@ -806,7 +806,7 @@ const message = {
 
         repo: '仓库',
         createRepo: '添加仓库',
-        createRepoHelper: '添加 http 类型仓库需要重启 Docker 服务。',
+        httpRepoHelper: '操作 http 类型仓库需要重启 Docker 服务。',
         downloadUrl: '下载地址',
         imageRepo: '镜像仓库',
         repoHelper: '是否包含镜像仓库/组织/项目?',

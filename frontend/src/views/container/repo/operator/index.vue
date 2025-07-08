@@ -108,6 +108,8 @@ const dialogData = ref<DialogProps>({
     title: '',
 });
 const confirmDialog = ref();
+const oldUrl = ref();
+const oldProto = ref();
 
 const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
@@ -147,13 +149,23 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        if (dialogData.value.rowData.protocol === 'https') {
+        let newProto = dialogData.value.rowData.protocol;
+        if (newProto === 'https' && dialogData.value.title === 'add') {
             submit();
             return;
         }
+        if (newProto === oldProto.value) {
+            if (
+                (oldProto.value === 'http' && dialogData.value.rowData.downloadUrl === oldUrl.value) ||
+                oldProto.value === 'https'
+            ) {
+                submit();
+                return;
+            }
+        }
         let params = {
-            header: i18n.global.t('container.imageRepo'),
-            operationInfo: i18n.global.t('container.createRepoHelper'),
+            header: i18n.global.t('container.repo'),
+            operationInfo: i18n.global.t('container.httpRepoHelper'),
             submitInputInfo: i18n.global.t('database.restartNow'),
         };
         confirmDialog.value!.acceptParams(params);
