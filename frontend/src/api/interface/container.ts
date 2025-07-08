@@ -16,6 +16,7 @@ export namespace Container {
         comment: string;
         author: string;
         pause: boolean;
+        taskID: string;
     }
     export interface ContainerSearch extends ReqPage {
         name: string;

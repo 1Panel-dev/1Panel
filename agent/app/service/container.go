@@ -809,10 +809,23 @@ func (u *ContainerService) ContainerCommit(req dto.ContainerCommit) error {
 		Pause:     req.Pause,
 		Config:    nil,
 	}
-	_, err = client.ContainerCommit(ctx, req.ContainerId, options)
+
+	taskItem, err := task.NewTaskWithOps(req.NewImageName, task.TaskCommit, task.TaskScopeContainer, req.TaskID, 1)
 	if err != nil {
-		return fmt.Errorf("failed to commit container, err: %v", err)
+		return fmt.Errorf("new task for container commit failed, err: %v", err)
 	}
+
+	go func() {
+		taskItem.AddSubTask(i18n.GetWithName("TaskCommit", req.NewImageName), func(t *task.Task) error {
+			res, err := client.ContainerCommit(ctx, req.ContainerId, options)
+			if err != nil {
+				return fmt.Errorf("failed to commit container, err: %v", err)
+			}
+			taskItem.Log(res.ID)
+			return nil
+		}, nil)
+		_ = taskItem.Execute()
+	}()
 	return nil
 }
 

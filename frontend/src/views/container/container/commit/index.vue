@@ -42,6 +42,7 @@
             </span>
         </template>
     </DrawerPro>
+    <TaskLog ref="taskLogRef" width="70%" />
 </template>
 
 <script setup lang="ts">
@@ -50,7 +51,9 @@ import { ElForm } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { commitContainer } from '@/api/modules/container';
+import TaskLog from '@/components/log/task/index.vue';
 import { MsgSuccess } from '@/utils/message';
+import { newUUID } from '@/utils/util';
 
 const drawerVisible = ref<boolean>(false);
 const emit = defineEmits<{ (e: 'search'): void }>();
@@ -62,7 +65,10 @@ const form = reactive({
     comment: '',
     author: '',
     pause: false,
+    taskID: '',
 });
+
+const taskLogRef = ref();
 
 interface DialogProps {
     containerID: string;
@@ -89,11 +95,13 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             cancelButtonText: i18n.global.t('commons.button.cancel'),
         }).then(async () => {
             loading.value = true;
+            form.taskID = newUUID();
             await commitContainer(form)
                 .then(() => {
                     loading.value = false;
                     emit('search');
                     drawerVisible.value = false;
+                    openTaskLog(form.taskID);
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 })
                 .catch(() => {
@@ -101,6 +109,10 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
                 });
         });
     });
+};
+
+const openTaskLog = (taskID: string) => {
+    taskLogRef.value.openWithTaskID(taskID);
 };
 
 const handleClose = async () => {

@@ -164,6 +164,8 @@ type ContainerCommit struct {
 	Comment       string `json:"comment"`
 	Author        string `json:"author"`
 	Pause         bool   `json:"pause"`
+
+	TaskID string `json:"taskID"`
 }
 
 type ContainerPrune struct {
