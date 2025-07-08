@@ -138,6 +138,8 @@ const onDelete = async (row: Container.RepoInfo) => {
             i18n.global.t('container.repo'),
             i18n.global.t('commons.button.delete'),
         ]),
+        api: null,
+        params: null,
     });
 };
 
