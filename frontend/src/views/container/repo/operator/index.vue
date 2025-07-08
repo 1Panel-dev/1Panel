@@ -113,6 +113,8 @@ const oldProto = ref();
 
 const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
+    oldUrl.value = params.rowData.downloadUrl;
+    oldProto.value = params.rowData.protocol;
     title.value = i18n.global.t('commons.button.' + dialogData.value.title);
     drawerVisible.value = true;
 };
