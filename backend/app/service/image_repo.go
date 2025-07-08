@@ -155,10 +155,12 @@ func (u *ImageRepoService) Update(req dto.ImageRepoUpdate) error {
 		needRestart = true
 	}
 	if repo.Protocol == "http" && req.Protocol == "http" {
-		if err := u.handleRegistries(req.DownloadUrl, repo.DownloadUrl, "update"); err != nil {
-			return fmt.Errorf("update registry %s => %s failed, err: %v", repo.DownloadUrl, req.DownloadUrl, err)
+		if repo.DownloadUrl != req.DownloadUrl {
+			if err := u.handleRegistries(req.DownloadUrl, repo.DownloadUrl, "update"); err != nil {
+				return fmt.Errorf("update registry %s => %s failed, err: %v", repo.DownloadUrl, req.DownloadUrl, err)
+			}
+			needRestart = true
 		}
-		needRestart = repo.DownloadUrl == req.DownloadUrl
 	}
 	if repo.Protocol == "https" && req.Protocol == "http" {
 		if err := u.handleRegistries(req.DownloadUrl, "", "create"); err != nil {
