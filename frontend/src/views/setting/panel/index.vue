@@ -300,6 +300,7 @@ const languageOptions = ref([
     { value: 'ko', label: '한국어' },
     { value: 'ru', label: 'Русский' },
     { value: 'ms', label: 'Bahasa Melayu' },
+    { value: 'tr', label: 'Turkish' },
 ]);
 
 if (globalStore.isIntl) {

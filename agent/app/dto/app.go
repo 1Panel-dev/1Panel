@@ -126,6 +126,7 @@ type Locale struct {
 	ZhHant string `json:"zh-hant" yaml:"zh-hant"`
 	Zh     string `json:"zh"`
 	Ko     string `json:"ko"`
+	Tr     string `json:"tr"`
 }
 
 type AppForm struct {

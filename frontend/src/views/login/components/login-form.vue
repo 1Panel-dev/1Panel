@@ -64,6 +64,7 @@
                                         <el-dropdown-item command="ko">한국어</el-dropdown-item>
                                         <el-dropdown-item command="ru">Русский</el-dropdown-item>
                                         <el-dropdown-item command="ms">Bahasa Melayu</el-dropdown-item>
+                                        <el-dropdown-item command="Tr">Turkish</el-dropdown-item>
                                     </el-dropdown-menu>
                                 </template>
                             </el-dropdown>
@@ -285,6 +286,8 @@ function handleCommand(command: string) {
         dropdownText.value = 'Русский';
     } else if (command === 'ms') {
         dropdownText.value = 'Bahasa Melayu';
+    } else if (command === 'tr') {
+        dropdownText.value = 'Turkish';
     }
 }
 
