@@ -18,6 +18,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 
@@ -334,22 +335,24 @@ func (f *FileService) GetContent(op request.FileContentReq) (response.FileInfo, 
 	if len(content) > 1024 {
 		content = content[:1024]
 	}
-	_, decodeName, _ := charset.DetermineEncoding(content, "")
-	decoder := files.GetDecoderByName(decodeName)
-	if decoder != nil {
-		reader := strings.NewReader(info.Content)
-		var dec *encoding.Decoder
-		if decodeName == "windows-1252" {
-			dec = simplifiedchinese.GBK.NewDecoder()
-		} else {
-			dec = decoder.NewDecoder()
+	if !utf8.Valid(content) {
+		_, decodeName, _ := charset.DetermineEncoding(content, "")
+		decoder := files.GetDecoderByName(decodeName)
+		if decoder != nil {
+			reader := strings.NewReader(info.Content)
+			var dec *encoding.Decoder
+			if decodeName == "windows-1252" {
+				dec = simplifiedchinese.GBK.NewDecoder()
+			} else {
+				dec = decoder.NewDecoder()
+			}
+			decodedReader := transform.NewReader(reader, dec)
+			contents, err := io.ReadAll(decodedReader)
+			if err != nil {
+				return response.FileInfo{}, err
+			}
+			info.Content = string(contents)
 		}
-		decodedReader := transform.NewReader(reader, dec)
-		contents, err := io.ReadAll(decodedReader)
-		if err != nil {
-			return response.FileInfo{}, err
-		}
-		info.Content = string(contents)
 	}
 	return response.FileInfo{FileInfo: *info}, nil
 }
