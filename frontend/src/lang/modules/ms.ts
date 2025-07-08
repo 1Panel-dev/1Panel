@@ -2448,7 +2448,7 @@ const message = {
         runtimePortWarn: 'Persekitaran runtime semasa tidak mempunyai port, tidak dapat proksi',
         cacheWarn: 'Sila matikan suis cache dalam pembalikan proksi terlebih dahulu',
         loadBalanceHelper:
-            'Di sini hanya mencipta peraturan keseimbangan beban, untuk menggunakan peraturan sila proksi terbalik http(s)://<nama keseimbangan beban>',
+            'Setelah mencipta pengimbang beban, sila pergi ke "Reverse Proxy", tambahkan proksi dan tetapkan alamat backend ke: http://<nama pengimbang beban>.',
         favorite: 'Kegemaran',
         cancelFavorite: 'Batalkan Kegemaran',
         useProxy: 'Gunakan Proksi',

@@ -2478,7 +2478,7 @@ const message = {
         runtimePortWarn: 'The current runtime environment has no ports, unable to proxy',
         cacheWarn: 'Please turn off the cache switch in the reverse proxy first',
         loadBalanceHelper:
-            'This section only creates load balancing rules, to use the rules please reverse proxy http(s)://<load balance name>',
+            'After creating the load balancing, please go to "Reverse Proxy", add a proxy and set the backend address to: http://<load balancing name>',
         favorite: 'Favorite',
         cancelFavorite: 'Cancel Favorite',
         useProxy: 'Use Proxy',

@@ -2394,7 +2394,7 @@ const message = {
         runtimePortWarn: '現在の実行環境にはポートがありません。プロキシできません',
         cacheWarn: 'まずリバースプロキシのキャッシュスイッチをオフにしてください',
         loadBalanceHelper:
-            'This section only creates load balancing rules, to use the rules please reverse proxy http(s)://<load balance name>',
+            '負荷分散を作成した後、「リバースプロキシ」に移動し、プロキシを追加してバックエンドアドレスを次のように設定してください：http://<負荷分散名>。',
         favorite: 'お気に入り',
         cancelFavorite: 'お気に入りを解除',
         useProxy: 'プロキシを使用',

@@ -2302,7 +2302,7 @@ const message = {
         runtimePortHelper: '当前运行环境存在多个端口，请选择一个代理端口',
         runtimePortWarn: '当前运行环境没有端口，无法代理',
         cacheWarn: '请先关闭反代中的缓存开关',
-        loadBalanceHelper: '此处只是创建负载均衡规则，使用规则请反向代理 http://<负载均衡名称>',
+        loadBalanceHelper: '创建负载均衡后，请前往‘反向代理’，添加代理并将后端地址设置为：http://<负载均衡名称>。',
         favorite: '收藏',
         cancelFavorite: '取消收藏',
         useProxy: '使用代理',
