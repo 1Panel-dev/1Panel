@@ -334,6 +334,7 @@ const message = {
         ssl: '인증서 | 인증서들',
         database: '데이터베이스 | 데이터베이스들',
         ai_tools: 'AI',
+        mcp: 'MCP',
         container: '컨테이너 | 컨테이너들',
         cronjob: '크론 작업 | 크론 작업들',
         host: '호스트 | 호스트들',

@@ -327,6 +327,7 @@ const message = {
         ssl: '證書',
         database: '資料庫',
         ai_tools: 'AI',
+        mcp: 'MCP',
         container: '容器',
         cronjob: '計劃任務',
         host: '主機',

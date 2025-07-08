@@ -333,6 +333,7 @@ const message = {
         ssl: '証明書|証明書',
         database: 'データベース|データベース',
         ai_tools: 'AI',
+        mcp: 'MCP',
         container: 'コンテナ|コンテナ',
         cronjob: 'クロンジョブ|クロンの仕事',
         host: 'ホスト|ホスト',

@@ -289,6 +289,7 @@ const chartOption = ref('network');
 let timer: NodeJS.Timer | null = null;
 let isInit = ref<boolean>(true);
 let isActive = ref(true);
+let isCurrentActive = ref(true);
 
 const ioReadBytes = ref<Array<number>>([]);
 const ioWriteBytes = ref<Array<number>>([]);
@@ -426,12 +427,20 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
     currentInfo.value.uptime = resData.uptime;
 
     loadAppCurrentInfo();
-    statusRef.value.acceptParams(currentInfo.value, baseInfo.value);
-    appRef.value.acceptParams();
+    statusRef.value?.acceptParams(currentInfo.value, baseInfo.value);
+    appRef.value?.acceptParams();
     if (isInit) {
         timer = setInterval(async () => {
-            if (isActive.value && !globalStore.isOnRestart) {
-                loadAppCurrentInfo();
+            try {
+                if (!isCurrentActive.value) {
+                    throw new Error('jump out');
+                }
+                if (isActive.value && !globalStore.isOnRestart) {
+                    await loadAppCurrentInfo();
+                }
+            } catch {
+                clearInterval(Number(timer));
+                timer = null;
             }
         }, 3000);
     }
@@ -439,7 +448,7 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
 
 const loadAppCurrentInfo = async () => {
     await Promise.all([onLoadCurrentInfo('gpu'), onLoadCurrentInfo('basic'), onLoadCurrentInfo('ioNet')]);
-    statusRef.value.acceptParams(currentInfo.value, baseInfo.value);
+    statusRef.value?.acceptParams(currentInfo.value, baseInfo.value);
 };
 
 const onLoadCurrentInfo = async (scope: string) => {
@@ -661,6 +670,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
     window.removeEventListener('focus', onFocus);
     window.removeEventListener('blur', onBlur);
+    isCurrentActive.value = false;
     clearInterval(Number(timer));
     timer = null;
 });

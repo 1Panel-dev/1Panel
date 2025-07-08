@@ -326,6 +326,7 @@ const message = {
         ssl: '证书',
         database: '数据库',
         ai_tools: 'AI',
+        mcp: 'MCP',
         container: '容器',
         cronjob: '计划任务',
         host: '主机',

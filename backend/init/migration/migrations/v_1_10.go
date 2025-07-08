@@ -489,7 +489,7 @@ var AddPbootCMSPHPExtensions = &gormigrate.Migration{
 var DeleteV2Openresty = &gormigrate.Migration{
 	ID: "20250701-delete-v2-openresty",
 	Migrate: func(tx *gorm.DB) error {
-		return tx.Delete(&model.AppDetail{}).Where("version = '1.27.1.2-0-1-focal'").Error
+		return tx.Where("version = '1.27.1.2-0-1-focal'").Delete(&model.AppDetail{}).Error
 	},
 }
 

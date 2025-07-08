@@ -338,6 +338,7 @@ const message = {
         ssl: 'Certificado | Certificados',
         database: 'Banco de Dados | Bancos de Dados',
         ai_tools: 'AI',
+        mcp: 'MCP',
         container: 'Container | Containers',
         cronjob: 'Tarefa Cron | Tarefas Cron',
         host: 'Host | Hosts',
