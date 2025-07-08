@@ -9,7 +9,16 @@
         :autoClose="false"
     >
         <template #content>
-            <Terminal style="height: calc(100vh - 180px)" ref="terminalRef" v-if="terminalOpen"></Terminal>
+            <el-form ref="formRef" :model="form" label-position="top">
+                <el-form-item :label="$t('commons.table.user')" prop="user">
+                    <el-input placeholder="root" clearable v-model="form.user">
+                        <template #append>
+                            <el-button @click="reConnect">{{ $t('commons.button.conn') }}</el-button>
+                        </template>
+                    </el-input>
+                </el-form-item>
+            </el-form>
+            <Terminal class="terminal" ref="terminalRef" v-if="terminalOpen"></Terminal>
         </template>
         <template #footer>
             <span class="dialog-footer">
@@ -48,7 +57,9 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     form.containerID = params.containerID;
     title.value = params.container;
     form.isCustom = false;
-    form.user = params.user;
+    if (params.user && params.user != '') {
+        form.user = params.user;
+    }
     form.command = '/bin/bash';
     initTerm();
 };
@@ -62,6 +73,15 @@ const initTerm = async () => {
         error: '',
         initCmd: '',
     });
+};
+
+const reConnect = async () => {
+    if (terminalRef.value) {
+        terminalRef.value.onClose();
+    }
+    terminalOpen.value = false;
+    await nextTick();
+    initTerm();
 };
 
 const onClose = () => {
@@ -78,3 +98,8 @@ defineExpose({
     acceptParams,
 });
 </script>
+<style lang="scss" scoped>
+.terminal {
+    height: calc(100vh - 180px);
+}
+</style>
