@@ -50,7 +50,6 @@ func Init() {
 	}
 
 	global.CONF = serverConfig
-	global.CONF.Base.IsDemo = v.GetBool("system.is_demo")
 
 	initBaseInfo()
 	global.Viper = v

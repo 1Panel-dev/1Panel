@@ -1,6 +1,7 @@
 base:
   install_dir: /opt
   mode: dev
+  is_demo: false
 
 remote_url:
   app_repo: https://apps-assets.fit2cloud.com

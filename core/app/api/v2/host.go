@@ -276,6 +276,12 @@ func (b *BaseApi) WsSsh(c *gin.Context) {
 	}
 	defer wsConn.Close()
 
+	if global.CONF.Base.IsDemo {
+		if wshandleError(wsConn, errors.New("   demo server, prohibit this operation!")) {
+			return
+		}
+	}
+
 	id, err := strconv.Atoi(c.Query("id"))
 	if wshandleError(wsConn, errors.WithMessage(err, "invalid param id in request")) {
 		return
