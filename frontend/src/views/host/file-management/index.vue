@@ -395,10 +395,10 @@
                         min-width="250"
                         fix
                         show-overflow-tooltip
-                        sortable
+                        :sortable="'custom'"
                         prop="name"
                     >
-                        <template #default="{ row, $index }">
+                        <template #default="{ row }">
                             <div class="file-row">
                                 <div>
                                     <svg-icon
@@ -427,7 +427,7 @@
                                     ></el-button>
                                     <div v-else>
                                         <el-button
-                                            v-if="hoveredRowIndex === $index"
+                                            v-if="hoveredRowPath === row.path"
                                             link
                                             icon="Star"
                                             @click="addToFavorite(row)"
@@ -456,14 +456,14 @@
                             </el-link>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('file.size')" prop="size" min-width="100" sortable>
-                        <template #default="{ row, $index }">
+                    <el-table-column :label="$t('file.size')" prop="size" min-width="100" :sortable="'custom'">
+                        <template #default="{ row }">
                             <el-button
                                 type="primary"
                                 link
                                 small
                                 :loading="row.btnLoading"
-                                @click="row.isDir ? getDirSize(row.path, $index) : getFileSize(row.path, $index)"
+                                @click="row.isDir ? getDirSize(row.path) : getFileSize(row.path)"
                             >
                                 <span v-if="row.isDir">
                                     <span v-if="row.dirSize === undefined">
@@ -483,7 +483,7 @@
                         width="180"
                         :formatter="dateFormat"
                         show-overflow-tooltip
-                        sortable
+                        :sortable="'custom'"
                     ></el-table-column>
                     <fu-table-operations
                         :ellipsis="mobile ? 0 : 2"
@@ -649,7 +649,7 @@ const moveOpen = ref(false);
 const deleteRef = ref();
 const recycleBinRef = ref();
 const favoriteRef = ref();
-const hoveredRowIndex = ref(-1);
+const hoveredRowPath = ref(null);
 const favorites = ref([]);
 const batchRoleRef = ref();
 const dialogVscodeOpenRef = ref();
@@ -940,36 +940,34 @@ const formatFileSize = (size: number) => {
     return computeSize(size);
 };
 
-const getFileSize = async (path: string, index: number) => {
+const getFileSize = async (path: string) => {
     codeReq.path = path;
     codeReq.expand = true;
     codeReq.isDetail = true;
-    data.value[index].btnLoading = true;
-    await getFileContent(codeReq)
-        .then(async (res) => {
-            let newData = [...data.value];
-            newData[index].size = res.data.size;
-            data.value = newData;
-        })
-        .finally(() => {
-            data.value[index].btnLoading = false;
-        });
+    updateByPath(path, { btnLoading: true });
+    try {
+        const res = await getFileContent(codeReq);
+        updateByPath(path, { dirSize: res.data.size });
+    } finally {
+        updateByPath(path, { btnLoading: false });
+    }
 };
 
-const getDirSize = async (path: string, index: number) => {
+const getDirSize = async (path: string) => {
     const req = {
         path: path,
     };
-    data.value[index].btnLoading = true;
-    await computeDirSize(req)
-        .then(async (res) => {
-            let newData = [...data.value];
-            newData[index].dirSize = res.data.size;
-            data.value = newData;
-        })
-        .finally(() => {
-            data.value[index].btnLoading = false;
-        });
+    updateByPath(path, { btnLoading: true });
+    try {
+        const res = await computeDirSize(req);
+        updateByPath(path, { dirSize: res.data.size });
+    } finally {
+        updateByPath(path, { btnLoading: false });
+    }
+};
+
+const updateByPath = (path: string, patch: Partial<(typeof data.value)[0]>) => {
+    data.value = data.value.map((item) => (item.path === path ? { ...item, ...patch } : item));
 };
 
 const getDirTotalSize = async (path: string) => {
@@ -1247,18 +1245,18 @@ const changeSort = ({ prop, order }) => {
     search();
 };
 
-const showFavorite = (row: any) => {
-    hoveredRowIndex.value = data.value.findIndex((item) => item === row);
+const showFavorite = (row: File.File) => {
+    hoveredRowPath.value = row.path;
 };
 
 const hideFavorite = () => {
-    hoveredRowIndex.value = -1;
+    hoveredRowPath.value = null;
 };
 
 const addToFavorite = async (row: File.File) => {
     try {
         await addFavorite(row.path);
-        search();
+        await search();
     } catch (error) {}
 };
 
@@ -1269,7 +1267,7 @@ const remove = async (id: number) => {
     }).then(async () => {
         try {
             await removeFavorite(id);
-            search();
+            await search();
         } catch (error) {}
     });
 };
