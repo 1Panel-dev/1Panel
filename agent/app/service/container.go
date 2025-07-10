@@ -12,6 +12,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -1064,9 +1065,11 @@ func (u *ContainerService) DownloadContainerLogs(containerType, container, since
 	errCh := make(chan error)
 	go func() {
 		scanner := bufio.NewScanner(stdout)
+		var ansiRegex = regexp.MustCompile(`\x1b\[[0-9;?]*[A-Za-z]|\x1b=|\x1b>`)
 		for scanner.Scan() {
 			line := scanner.Text()
-			if _, err := tempFile.WriteString(line + "\n"); err != nil {
+			cleanLine := ansiRegex.ReplaceAllString(line, "")
+			if _, err := tempFile.WriteString(cleanLine + "\n"); err != nil {
 				errCh <- err
 				return
 			}
