@@ -268,6 +268,9 @@ const acceptParams = (op: string, websiteSSL: Website.SSLDTO) => {
         ssl.value.keyType = websiteSSL.keyType;
         ssl.value.execShell = websiteSSL.execShell;
         ssl.value.shell = websiteSSL.shell;
+        if (ssl.value.provider == 'selfSigned') {
+            rules.value.primaryDomain = [];
+        }
     }
     ssl.value.websiteId = Number(id.value);
     getAcmeAccounts();

@@ -524,7 +524,7 @@ func (w WebsiteSSLService) Update(update request.WebsiteSSLUpdate) error {
 	if update.OtherDomains != "" {
 		otherDomainArray := strings.Split(update.OtherDomains, "\n")
 		for _, domain := range otherDomainArray {
-			if !common.IsValidDomain(domain) {
+			if websiteSSL.Provider != constant.SelfSigned && !common.IsValidDomain(domain) {
 				return buserr.WithName("ErrDomainFormat", domain)
 			}
 			domains = append(domains, domain)
