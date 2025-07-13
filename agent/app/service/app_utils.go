@@ -974,8 +974,8 @@ func runScript(task *task.Task, appInstall *model.AppInstall, operate string) er
 	logStr := i18n.GetWithName("ExecShell", operate)
 	task.LogStart(logStr)
 
-	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(10*time.Minute), cmd.WithScriptPath(scriptPath), cmd.WithWorkDir(workDir))
-	out, err := cmdMgr.RunWithStdout("bash")
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(10*time.Minute), cmd.WithWorkDir(workDir))
+	out, err := cmdMgr.RunWithStdoutBashCf(scriptPath)
 	if err != nil {
 		if out != "" {
 			err = errors.New(out)

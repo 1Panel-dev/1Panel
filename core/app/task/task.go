@@ -45,16 +45,19 @@ type SubTask struct {
 }
 
 const (
-	TaskUpgrade = "TaskUpgrade"
-	TaskAddNode = "TaskAddNode"
-	TaskSync    = "TaskSync"
-	TaskRsync   = "TaskRsync"
+	TaskUpgrade        = "TaskUpgrade"
+	TaskAddNode        = "TaskAddNode"
+	TaskSync           = "TaskSync"
+	TaskRsync          = "TaskRsync"
+	TaskInstallCluster = "TaskInstallCluster"
+	TaskCreateCluster  = "TaskCreateCluster"
 )
 
 const (
-	TaskScopeSystem = "System"
-	TaskScopeScript = "Script"
+	TaskScopeSystem   = "System"
+	TaskScopeScript   = "Script"
 	TaskScopeNodeFile = "NodeFile"
+	TaskScopeCluster  = "Cluster"
 )
 
 func GetTaskName(resourceName, operate, scope string) string {

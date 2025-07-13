@@ -2,6 +2,10 @@ package helper
 
 import (
 	"encoding/json"
+	"fmt"
+	"github.com/1Panel-dev/1Panel/core/app/model"
+	"gorm.io/gorm"
+	"strings"
 
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 )
@@ -52,4 +56,42 @@ func LoadMenus() string {
 	}
 	menu, _ := json.Marshal(item)
 	return string(menu)
+}
+
+func AddMenu(newMenu dto.ShowMenu, parentMenuID string, tx *gorm.DB) error {
+	var menuJSON string
+	if err := tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Pluck("value", &menuJSON).Error; err != nil {
+		return err
+	}
+	if strings.Contains(menuJSON, fmt.Sprintf(`"%s"`, newMenu.Label)) && strings.Contains(menuJSON, fmt.Sprintf(`"%s"`, newMenu.Path)) {
+		return nil
+	}
+	var menus []dto.ShowMenu
+	if err := json.Unmarshal([]byte(menuJSON), &menus); err != nil {
+		return tx.Model(&model.Setting{}).
+			Where("key = ?", "HideMenu").
+			Update("value", LoadMenus()).Error
+	}
+	for i, menu := range menus {
+		if menu.ID == parentMenuID {
+			exists := false
+			for _, child := range menu.Children {
+				if child.ID == newMenu.ID {
+					exists = true
+					break
+				}
+			}
+			if !exists {
+				menus[i].Children = append([]dto.ShowMenu{newMenu}, menus[i].Children...)
+			}
+			break
+		}
+	}
+	updatedJSON, err := json.Marshal(menus)
+	if err != nil {
+		return tx.Model(&model.Setting{}).
+			Where("key = ?", "HideMenu").
+			Update("value", LoadMenus()).Error
+	}
+	return tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Update("value", string(updatedJSON)).Error
 }

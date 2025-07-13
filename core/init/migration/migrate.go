@@ -20,6 +20,7 @@ func Init() {
 		migrations.UpdateGoogle,
 		migrations.UpdateXpackHideMenu,
 		migrations.UpdateOnedrive,
+		migrations.AddClusterMenu,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

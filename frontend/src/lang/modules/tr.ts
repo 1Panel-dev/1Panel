@@ -3669,6 +3669,14 @@ const message = {
             exchange: 'Dosya Değişimi',
             exchangeConfirm: '{0} düğümünden {1} dosya/klasörünü {2} düğümünün {3} dizinine aktarmak istiyor musunuz?',
         },
+        cluster: {
+            cluster: 'Высокая доступность приложений',
+            name: 'Имя кластера',
+            addCluster: 'Добавить кластер',
+            installNode: 'Установить узел',
+            master: 'Главный узел',
+            slave: 'Подчиненный узел',
+        },
     },
 };
 

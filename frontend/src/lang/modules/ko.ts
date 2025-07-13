@@ -3429,6 +3429,14 @@ const message = {
             exchange: '파일 교환',
             exchangeConfirm: '{0} 노드의 파일/폴더 {1}을(를) {2} 노드의 {3} 디렉토리로 전송하시겠습니까?',
         },
+        cluster: {
+            cluster: '애플리케이션 고가용성',
+            name: '클러스터 이름',
+            addCluster: '클러스터 추가',
+            installNode: '노드 설치',
+            master: '마스터 노드',
+            slave: '슬레이브 노드',
+        },
     },
 };
 

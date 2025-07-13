@@ -129,6 +129,19 @@ type AppInstallDTO struct {
 	Container     string    `json:"container"`
 }
 
+type AppInstallInfo struct {
+	ID          uint   `json:"id"`
+	Name        string `json:"name"`
+	Version     string `json:"version"`
+	Status      string `json:"status"`
+	Message     string `json:"message"`
+	HttpPort    int    `json:"HttpPort"`
+	Container   string `json:"container"`
+	ComposePath string `json:"composePath"`
+
+	Env map[string]interface{} `json:"env"`
+}
+
 type DatabaseConn struct {
 	Status        string `json:"status"`
 	Username      string `json:"username"`

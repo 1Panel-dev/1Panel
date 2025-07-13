@@ -56,6 +56,7 @@ type IAppInstallService interface {
 
 	UpdateAppConfig(req request.AppConfigUpdate) error
 	GetInstallList() ([]dto.AppInstallInfo, error)
+	GetAppInstallInfo(appInstallID uint) (*response.AppInstallInfo, error)
 }
 
 func NewIAppInstalledService() IAppInstallService {
@@ -897,4 +898,30 @@ func updateInstallInfoInDB(appKey, appName, param string, value interface{}) err
 		return errors.New(stdout)
 	}
 	return nil
+}
+
+func (a *AppInstallService) GetAppInstallInfo(installID uint) (*response.AppInstallInfo, error) {
+	appInstall, _ := appInstallRepo.GetFirst(repo.WithByID(installID))
+	if appInstall.ID == 0 {
+		return &response.AppInstallInfo{
+			Status: constant.StatusDeleted,
+		}, nil
+	}
+	var envMap map[string]interface{}
+	err := json.Unmarshal([]byte(appInstall.Env), &envMap)
+	if err != nil {
+		return nil, err
+	}
+	res := &response.AppInstallInfo{
+		ID:          appInstall.ID,
+		Name:        appInstall.Name,
+		Version:     appInstall.Version,
+		Container:   appInstall.ContainerName,
+		HttpPort:    appInstall.HttpPort,
+		Status:      appInstall.Status,
+		Message:     appInstall.Message,
+		Env:         envMap,
+		ComposePath: appInstall.GetComposePath(),
+	}
+	return res, nil
 }

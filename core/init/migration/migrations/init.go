@@ -489,3 +489,17 @@ var UpdateOnedrive = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddClusterMenu = &gormigrate.Migration{
+	ID: "20250707-add-cluster-menu",
+	Migrate: func(tx *gorm.DB) error {
+		return helper.AddMenu(dto.ShowMenu{
+			ID:       "120",
+			Disabled: false,
+			Title:    "xpack.cluster.cluster",
+			IsShow:   true,
+			Label:    "Cluster",
+			Path:     "/xpack/cluster",
+		}, "11", tx)
+	},
+}

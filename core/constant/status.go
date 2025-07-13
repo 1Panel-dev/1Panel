@@ -19,4 +19,8 @@ const (
 
 	StatusEnable  = "Enable"
 	StatusDisable = "Disable"
+
+	StatusInstalling = "Installing"
+	StatusNormal     = "Normal"
+	StatusDeleted    = "Deleted"
 )

@@ -151,6 +151,17 @@ export namespace App {
         webUI: string;
     }
 
+    export interface AppInstalledInfo {
+        id: number;
+        name: string;
+        version: string;
+        status: string;
+        message: string;
+        httpPort: number;
+        container: string;
+        env: { [key: string]: string };
+    }
+
     export interface AppInstallDto {
         id: number;
         name: string;

@@ -132,13 +132,14 @@ import Install from '../detail/install/index.vue';
 import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
 import { GlobalStore } from '@/store';
-import { newUUID, jumpToPath } from '@/utils/util';
+import { newUUID } from '@/utils/util';
 import Detail from '../detail/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
 import { storeToRefs } from 'pinia';
 import bus from '@/global/bus';
 import Tags from '@/views/app-store/components/tag.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
+import { jumpToInstall } from '@/utils/app';
 
 const globalStore = GlobalStore();
 const { isProductPro } = storeToRefs(globalStore);
@@ -208,20 +209,11 @@ const search = async (req: App.AppReq) => {
 };
 
 const openInstall = (app: App.App) => {
-    switch (app.type) {
-        case 'php':
-        case 'node':
-        case 'java':
-        case 'go':
-        case 'python':
-        case 'dotnet':
-            jumpToPath(router, '/websites/runtimes/' + app.type);
-            break;
-        default:
-            const params = {
-                app: app,
-            };
-            installRef.value.acceptParams(params);
+    if (!jumpToInstall(app.type, app.key)) {
+        const params = {
+            app: app,
+        };
+        installRef.value.acceptParams(params);
     }
 };
 

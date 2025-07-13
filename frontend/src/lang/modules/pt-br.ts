@@ -3579,6 +3579,14 @@ const message = {
             exchange: 'Troca de Arquivos',
             exchangeConfirm: 'Deseja transferir o arquivo/pasta {1} do nó {0} para o diretório {3} do nó {2}?',
         },
+        cluster: {
+            cluster: 'Alta Disponibilidade de Aplicações',
+            name: 'Nome do Cluster',
+            addCluster: 'Adicionar Cluster',
+            installNode: 'Instalar Nó',
+            master: 'Nó Mestre',
+            slave: 'Nó Escravo',
+        },
     },
 };
 

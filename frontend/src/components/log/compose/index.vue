@@ -16,6 +16,7 @@
                 :compose="compose"
                 :resource="resource"
                 :container="container"
+                :node="node"
                 :highlightDiff="highlightDiff"
             />
         </template>
@@ -36,11 +37,13 @@ const globalStore = GlobalStore();
 const logVisible = ref(false);
 const compose = ref('');
 const highlightDiff = ref(320);
+const node = ref('');
 
 interface DialogProps {
     compose: string;
     resource: string;
     container: string;
+    node: string;
 }
 
 const defaultProps = defineProps({
@@ -75,6 +78,7 @@ const acceptParams = (props: DialogProps): void => {
     compose.value = props.compose;
     resource.value = props.resource;
     container.value = props.container;
+    node.value = props.node;
     open.value = true;
 };
 

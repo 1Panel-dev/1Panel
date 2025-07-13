@@ -327,3 +327,25 @@ func (b *BaseApi) UpdateAppConfig(c *gin.Context) {
 	}
 	helper.Success(c)
 }
+
+// @Tags App
+// @Summary Get app install info
+// @Accept json
+// @Param appInstallId path integer true "App install id"
+// @Success 200 {object} dto.AppInstallInfo
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /apps/installed/info/:appInstallId [get]
+func (b *BaseApi) GetAppInstallInfo(c *gin.Context) {
+	appInstallId, err := helper.GetIntParamByKey(c, "appInstallId")
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	info, err := appInstallService.GetAppInstallInfo(appInstallId)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, info)
+}

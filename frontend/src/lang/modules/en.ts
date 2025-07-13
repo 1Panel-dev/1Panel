@@ -3628,6 +3628,14 @@ const message = {
             exchange: 'File Exchange',
             exchangeConfirm: "Do you want to transfer the file/folder {1} from {0} node to {2} node's {3} directory?",
         },
+        cluster: {
+            cluster: 'Application High Availability',
+            name: 'Cluster Name',
+            addCluster: 'Add Cluster',
+            installNode: 'Install Node',
+            master: 'Master Node',
+            slave: 'Slave Node',
+        },
     },
 };
 

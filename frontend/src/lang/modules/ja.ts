@@ -3491,6 +3491,14 @@ const message = {
             exchange: 'ファイル交換',
             exchangeConfirm: '{0} ノードのファイル/フォルダ {1} を {2} ノードの {3} ディレクトリに転送しますか？',
         },
+        cluster: {
+            cluster: 'アプリケーションの高可用性',
+            name: 'クラスタ名',
+            addCluster: 'クラスタを追加',
+            installNode: 'ノードをインストール',
+            master: 'マスターノード',
+            slave: 'スレーブノード',
+        },
     },
 };
 export default {

@@ -70,10 +70,10 @@ import { getAppByKey, getAppDetail } from '@/api/modules/app';
 import MdEditor from 'md-editor-v3';
 import { ref } from 'vue';
 import Install from './install/index.vue';
-import router from '@/routers';
 import { GlobalStore } from '@/store';
-import { computeSizeFromMB, jumpToPath } from '@/utils/util';
+import { computeSizeFromMB } from '@/utils/util';
 import { storeToRefs } from 'pinia';
+import { jumpToInstall } from '@/utils/app';
 
 const globalStore = GlobalStore();
 const { isDarkTheme } = storeToRefs(globalStore);
@@ -131,21 +131,12 @@ const toLink = (link: string) => {
 };
 
 const openInstall = () => {
-    switch (app.value.type) {
-        case 'php':
-        case 'node':
-        case 'java':
-        case 'go':
-        case 'python':
-        case 'dotnet':
-            jumpToPath(router, '/websites/runtimes/' + app.value.type);
-            break;
-        default:
-            const params = {
-                app: app.value,
-            };
-            installRef.value.acceptParams(params);
-            open.value = false;
+    if (!jumpToInstall(app.value.type, app.value.key)) {
+        const params = {
+            app: app.value,
+        };
+        installRef.value.acceptParams(params);
+        open.value = false;
     }
 };
 

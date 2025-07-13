@@ -176,3 +176,8 @@ var DynamicRoutes = []string{
 var CertStore atomic.Value
 
 var DaemonJsonPath = "/etc/docker/daemon.json"
+
+const (
+	RoleMaster = "master"
+	RoleSlave  = "slave"
+)

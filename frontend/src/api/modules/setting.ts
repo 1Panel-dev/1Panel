@@ -126,8 +126,9 @@ export const loadMFA = (param: Setting.MFARequest) => {
 export const bindMFA = (param: Setting.MFABind) => {
     return http.post(`/core/settings/mfa/bind`, param);
 };
-export const getAppStoreConfig = () => {
-    return http.get<App.AppStoreConfig>(`/core/settings/apps/store/config`);
+export const getAppStoreConfig = (node?: string) => {
+    const params = node ? `?operateNode=${node}` : '';
+    return http.get<App.AppStoreConfig>(`/core/settings/apps/store/config${params}`);
 };
 export const updateAppStoreConfig = (req: App.AppStoreConfigUpdate) => {
     return http.post(`/core/settings/apps/store/update`, req);

@@ -3572,6 +3572,14 @@ const message = {
             exchange: 'Pertukaran Fail',
             exchangeConfirm: 'Adakah anda mahu memindahkan fail/folder {1} dari node {0} ke direktori {3} node {2}?',
         },
+        cluster: {
+            cluster: 'Aplikasi Tinggi Ketersediaan',
+            name: 'Nama Kluster',
+            addCluster: 'Tambah Kluster',
+            installNode: 'Pasang Node',
+            master: 'Node Utama',
+            slave: 'Node Hamba',
+        },
     },
 };
 

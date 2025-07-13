@@ -65,6 +65,10 @@ const props = defineProps({
         type: Number,
         default: 320,
     },
+    node: {
+        type: String,
+        default: '',
+    },
 });
 
 const styleVars = computed(() => ({
@@ -137,6 +141,9 @@ const searchLogs = async () => {
     }
     logs.value = [];
     let currentNode = globalStore.currentNode;
+    if (props.node && props.node !== '') {
+        currentNode = props.node;
+    }
     let url = `/api/v2/containers/search/log?container=${logSearch.container}&since=${logSearch.mode}&tail=${logSearch.tail}&follow=${logSearch.isWatch}&operateNode=${currentNode}`;
     if (logSearch.compose !== '') {
         url = `/api/v2/containers/search/log?compose=${logSearch.compose}&since=${logSearch.mode}&tail=${logSearch.tail}&follow=${logSearch.isWatch}&operateNode=${currentNode}`;

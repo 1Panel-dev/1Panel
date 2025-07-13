@@ -189,6 +189,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { toFolder } from '@/global/business';
 import { jumpToPath } from '@/utils/util';
+import { jumpToInstall } from '@/utils/app';
 
 const router = useRouter();
 const globalStore = GlobalStore();
@@ -209,17 +210,8 @@ const acceptParams = (): void => {
 };
 
 const goInstall = (key: string, type: string) => {
-    switch (type) {
-        case 'php':
-        case 'node':
-        case 'java':
-        case 'go':
-        case 'python':
-        case 'dotnet':
-            router.push({ path: '/websites/runtimes/' + type });
-            break;
-        default:
-            router.push({ name: 'AppAll', query: { install: key } });
+    if (!jumpToInstall(type, key)) {
+        router.push({ name: 'AppAll', query: { install: key } });
     }
 };
 

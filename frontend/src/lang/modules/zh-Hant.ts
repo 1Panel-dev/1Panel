@@ -3377,6 +3377,14 @@ const message = {
             exchange: '文件對傳',
             exchangeConfirm: '是否將 {0} 節點文件/文件夾 {1} 傳輸到 {2} 節點 {3} 目錄？',
         },
+        cluster: {
+            cluster: '應用高可用',
+            name: '集群名稱',
+            addCluster: '添加集群',
+            installNode: '安裝節點',
+            master: '主節點',
+            slave: '從節點',
+        },
     },
 };
 export default {
