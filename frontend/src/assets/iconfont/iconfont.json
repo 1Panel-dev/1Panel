@@ -6,6 +6,27 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "88609",
+      "name": "cluster-3",
+      "font_class": "cluster-3",
+      "unicode": "e706",
+      "unicode_decimal": 59142
+    },
+    {
+      "icon_id": "663330",
+      "name": "cluster-2",
+      "font_class": "cluster-2",
+      "unicode": "e61f",
+      "unicode_decimal": 58911
+    },
+    {
+      "icon_id": "4766884",
+      "name": "cluster-1",
+      "font_class": "cluster-1",
+      "unicode": "e7d8",
+      "unicode_decimal": 59352
+    },
+    {
       "icon_id": "15838584",
       "name": "arrow-right-filling",
       "font_class": "start",

@@ -486,7 +486,7 @@ const checkExist = (data: App.CheckInstalled) => {
 
 const loadDBOptions = async () => {
     try {
-        const res = await listDatabases('mysql,mariadb');
+        const res = await listDatabases('mysql,mariadb,mysql-cluster');
         let datas = res.data || [];
         dbOptionsLocal.value = [];
         dbOptionsRemote.value = [];

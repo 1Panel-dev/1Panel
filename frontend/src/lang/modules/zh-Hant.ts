@@ -1846,6 +1846,7 @@ const message = {
         node: '升級專業版可以使用 1Panel 管理多台 linux 伺服器。',
         fileExchange: '升級專業版可以在多台服務器之間快速傳輸文件。',
         app: '升級專業版可通過手機APP，查看服務資訊、异常監控等。',
+        cluster: '升級專業版可以管理 MySQL/Postgres/Reids 主從集群。',
     },
     clean: {
         scan: '開始掃描',
@@ -3124,6 +3125,13 @@ const message = {
             appContent2: '在移動端進行應用、網站、Docker、資料庫等基礎管理，支持快速創建應用與網站。',
             appTitle3: '實時異常監控',
             appContent3: '移動端實時查看伺服器狀態、WAF 安全監控、網站訪問統計與進程健康狀況。',
+
+            clusterTitle1: '主從部署',
+            clusterContent1: '支持在不同節點創建 MySQL/Postgres/Redis 主從實例，自動完成主從關聯與初始化',
+            clusterTitle2: '主從管理',
+            clusterContent2: '統一頁面集中管理多個主從節點，查看其角色、運行狀態等信息',
+            clusterTitle3: '複製狀態',
+            clusterContent3: '展示主從複製狀態與延遲信息，輔助排查同步異常問題',
         },
         node: {
             master: '主節點',

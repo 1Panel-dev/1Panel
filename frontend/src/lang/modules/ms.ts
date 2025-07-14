@@ -1949,6 +1949,8 @@ const message = {
         alert: 'Tingkatkan ke versi profesional untuk menerima maklumat amaran melalui SMS dan melihat log amaran, mengawal sepenuhnya pelbagai acara utama, dan memastikan operasi sistem bebas kerisauan.',
         fileExchange: 'Naik taraf ke Edisi Professional untuk menghantar fail dengan cepat antara pelbagai pelayan.',
         app: 'Tingkatkan ke versi profesional untuk melihat maklumat perkhidmatan, pemantauan abnormal, dll melalui aplikasi mudah alih.',
+        cluster:
+            'Versi Profesional menaik taraf membolehkan anda menguruskan kelompok induk-hamba MySQL/Postgres/Reids.',
     },
     clean: {
         scan: 'Mulakan imbasan',
@@ -3293,6 +3295,16 @@ const message = {
             appTitle3: 'Pemantauan Anomali Masa Nyata',
             appContent3:
                 'Lihat status pelayan, pemantauan keselamatan WAF, statistik pelawat laman web dan status kesihatan proses di aplikasi mudah alih secara masa nyata.',
+
+            clusterTitle1: 'Penyebaran Utama-Hamba',
+            clusterContent1:
+                'Menyokong penciptaan contoh utama-hamba MySQL/Postgres/Redis pada nod yang berbeza, secara automatik melengkapkan perhubungan utama-hamba dan permulaan',
+            clusterTitle2: 'Pengurusan Utama-Hamba',
+            clusterContent2:
+                'Halaman terpadu untuk menguruskan pelbagai nod utama-hamba, lihat peranan, status berjalan, dsb.',
+            clusterTitle3: 'Status Replikasi',
+            clusterContent3:
+                'Memaparkan status replikasi utama-hamba dan maklumat kelewatan, membantu menyelesaikan masalah sinkronisasi',
         },
         node: {
             master: 'Nod Utama',

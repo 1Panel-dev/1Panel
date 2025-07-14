@@ -1997,6 +1997,7 @@ const message = {
         node: 'Profesyonel sürüme yükseltme, birden fazla Linux sunucusunu 1Panel ile yönetmenize olanak tanır.',
         fileExchange: 'Profesyonel Sürüme yükseltme, birden fazla sunucu arasında hızlı dosya aktarımı sağlar.',
         app: 'Profesyonel sürüme yükseltme, mobil uygulama üzerinden hizmet bilgilerini, anormal izlemeyi vb. görüntülemenize olanak tanır. ',
+        cluster: 'Profesyonel Sürüme Yükseltme, MySQL/Postgers/Reids ana-çalışan kümelerini yönetmenizi sağlar.',
     },
     clean: {
         scan: 'Taramayı başlat',
@@ -3389,6 +3390,16 @@ const message = {
             appTitle3: 'Gerçek Zamanlı Anormallik İzleme',
             appContent3:
                 'Mobil uygulama üzerinden gerçek zamanlı sunucu durumu, WAF güvenlik izleme, web sitesi trafik istatistikleri ve işlem sağlığı durumunu görüntüleyin.',
+
+            clusterTitle1: 'Ana-Çalışan Dağıtımı',
+            clusterContent1:
+                'Farklı düğümlerde MySQL/Postgres/Redis ana-çalışan örnekleri oluşturmayı destekler, ana-çalışan ilişkisi ve başlatmayı otomatik olarak tamamlar',
+            clusterTitle2: 'Ana-Çalışan Yönetimi',
+            clusterContent2:
+                'Birleşik bir sayfa ile birden çok ana-çalışan düğümünü merkezi olarak yönetin, rollerini, çalışma durumlarını vb. görüntüleyin',
+            clusterTitle3: 'Çoğaltma Durumu',
+            clusterContent3:
+                'Ana-çalışan çoğaltma durumunu ve gecikme bilgilerini görüntüleyerek senkronizasyon sorunlarını gidermeye yardımcı olur',
         },
         node: {
             master: 'Ana Düğüm',

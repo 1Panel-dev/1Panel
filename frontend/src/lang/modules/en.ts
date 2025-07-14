@@ -1977,6 +1977,8 @@ const message = {
         node: 'Upgrading to the professional version allows you to manage multiple Linux servers with 1Panel.',
         fileExchange: 'Upgrade to the Professional Edition to quickly transfer files between multiple servers.',
         app: 'Upgrade to the professional version to view service information, abnormal monitoring, etc. through the mobile APP. ',
+        cluster:
+            'Upgrading to the Professional Edition allows you to manage MySQL/Postgres/Reids master-slave clusters.',
     },
     clean: {
         scan: 'Start scanning',
@@ -3353,6 +3355,16 @@ const message = {
             appTitle3: 'Real-Time Abnormal Monitoring',
             appContent3:
                 'View real-time server status, WAF security monitoring, website traffic statistics, and process health status on the mobile app.',
+
+            clusterTitle1: 'Master-Slave Deployment',
+            clusterContent1:
+                'Supports creating MySQL/Postgres/Redis master-slave instances on different nodes, automatically completing master-slave association and initialization',
+            clusterTitle2: 'Master-Slave Management',
+            clusterContent2:
+                'Unified page to centrally manage multiple master-slave nodes, view their roles, running status, etc.',
+            clusterTitle3: 'Replication Status',
+            clusterContent3:
+                'Displays master-slave replication status and delay information, assisting in troubleshooting synchronization issues',
         },
         node: {
             master: 'Main Node',

@@ -1837,6 +1837,7 @@ const message = {
         node: '升级专业版可以使用 1Panel 管理多台 linux 服务器。',
         fileExchange: '升级专业版可以在多台服务器之间快速传输文件。',
         app: '升级专业版可通过手机 APP，查看服务信息、异常监控等。',
+        cluster: '升级专业版可以管理 MySQL/Postgres/Reids 主从集群。',
     },
     clean: {
         scan: '开始扫描',
@@ -3094,6 +3095,13 @@ const message = {
             appContent2: '在移动端进行应用、网站、Docker、数据库等基础管理，支持快速创建应用与网站。',
             appTitle3: '实时异常监控',
             appContent3: '移动端实时查看服务器状态、WAF 安全监控、网站访问统计与进程健康状况。',
+
+            clusterTitle1: '主从部署',
+            clusterContent1: '支持在不同节点创建 MySQL/Postgres/Redis 主从实例，自动完成主从关联与初始化',
+            clusterTitle2: '主从管理',
+            clusterContent2: '统一页面集中管理多个主从节点，查看其角色、运行状态等信息',
+            clusterTitle3: '复制状态',
+            clusterContent3: '展示主从复制状态与延迟信息，辅助排查同步异常问题',
         },
         node: {
             master: '主节点',

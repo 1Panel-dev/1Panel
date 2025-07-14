@@ -116,13 +116,15 @@ func checkPortExist(port int) error {
 }
 
 var DatabaseKeys = map[string]uint{
-	constant.AppMysql:      3306,
-	constant.AppMariaDB:    3306,
-	constant.AppPostgresql: 5432,
-	constant.AppPostgres:   5432,
-	constant.AppMongodb:    27017,
-	constant.AppRedis:      6379,
-	constant.AppMemcached:  11211,
+	constant.AppMysql:             3306,
+	constant.AppMariaDB:           3306,
+	constant.AppPostgresql:        5432,
+	constant.AppPostgres:          5432,
+	constant.AppMongodb:           27017,
+	constant.AppRedis:             6379,
+	constant.AppMemcached:         11211,
+	constant.AppMysqlCluster:      3306,
+	constant.AppPostgresqlCluster: 5432,
 }
 
 var ToolKeys = map[string]uint{

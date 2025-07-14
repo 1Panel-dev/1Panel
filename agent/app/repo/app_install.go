@@ -206,17 +206,17 @@ func (a *AppInstallRepo) LoadBaseInfo(key string, name string) (*RootInfo, error
 		return nil, err
 	}
 	switch app.Key {
-	case "mysql", "mariadb":
+	case "mysql", "mariadb", constant.AppMysqlCluster:
 		password, ok := envMap["PANEL_DB_ROOT_PASSWORD"].(string)
 		if ok {
 			info.Password = password
 		}
-	case "redis":
+	case "redis", constant.AppRedisCluster:
 		password, ok := envMap["PANEL_REDIS_ROOT_PASSWORD"].(string)
 		if ok {
 			info.Password = password
 		}
-	case "mongodb", constant.AppPostgresql:
+	case "mongodb", constant.AppPostgresql, constant.AppPostgresqlCluster:
 		user, ok := envMap["PANEL_DB_ROOT_USER"].(string)
 		if ok {
 			info.UserName = user

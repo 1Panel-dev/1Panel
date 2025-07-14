@@ -1940,6 +1940,8 @@ const message = {
         fileExchange:
             'Atualize para a Edição Profissional para transferir arquivos rapidamente entre vários servidores.',
         app: 'Upgrade para a versão profissional para visualizar informações do serviço, monitoramento anômalo, etc., através do aplicativo móvel.',
+        cluster:
+            'A atualização para a Edição Profissional permite gerenciar clusters mestre-escravo MySQL/Postgres/Reids.',
     },
     clean: {
         scan: 'Iniciar escaneamento',
@@ -3301,6 +3303,16 @@ const message = {
             appTitle3: 'Monitoramento Anômalo em Tempo Real',
             appContent3:
                 'Veja o status do servidor, monitoramento de segurança WAF, estatísticas de visitas ao site e saúde dos processos em tempo real no aplicativo móvel.',
+
+            clusterTitle1: 'Implantação Mestre-Escravo',
+            clusterContent1:
+                'Suporta a criação de instâncias mestre-escravo MySQL/Postgres/Redis em diferentes nós, completando automaticamente a associação e inicialização mestre-escravo',
+            clusterTitle2: 'Gestão Mestre-Escravo',
+            clusterContent2:
+                'Página unificada para gerir centralmente vários nós mestre-escravo, visualizar seus papéis, status de execução, etc.',
+            clusterTitle3: 'Estado de Replicação',
+            clusterContent3:
+                'Exibe o estado de replicação mestre-escravo e informações de atraso, auxiliando na resolução de problemas de sincronização',
         },
         node: {
             master: 'Nó Principal',
