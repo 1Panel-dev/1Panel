@@ -476,7 +476,11 @@ func (a *AppInstallService) GetServices(key string) ([]response.AppService, erro
 		if key == constant.AppPostgres {
 			key = constant.AppPostgresql
 		}
-		dbs, _ := databaseRepo.GetList(repo.WithByType(key))
+		types := []string{key}
+		if key == constant.AppMysql {
+			types = []string{constant.AppMysql, constant.AppMysqlCluster}
+		}
+		dbs, _ := databaseRepo.GetList(repo.WithTypes(types))
 		if len(dbs) == 0 {
 			return res, nil
 		}
@@ -659,7 +663,7 @@ func (a *AppInstallService) GetDefaultConfigByKey(key, name string) (string, err
 		return "", buserr.New("ErrPathNotFound")
 	}
 
-	if key == constant.AppMysql || key == constant.AppMariaDB {
+	if key == constant.AppMysql || key == constant.AppMariaDB || key == constant.AppMysqlCluster {
 		filePath = path.Join(filePath, "my.cnf")
 	}
 	if key == constant.AppRedis {

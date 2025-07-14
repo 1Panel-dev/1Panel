@@ -34,7 +34,7 @@ func (u *DBCommonService) LoadBaseInfo(req dto.OperationWithNameAndType) (*dto.D
 	}
 	data.ContainerName = app.ContainerName
 	data.Name = app.Name
-	data.Port = int64(app.Port)
+	data.Port = app.Port
 
 	return &data, nil
 }
@@ -42,6 +42,8 @@ func (u *DBCommonService) LoadBaseInfo(req dto.OperationWithNameAndType) (*dto.D
 func (u *DBCommonService) LoadDatabaseFile(req dto.OperationWithNameAndType) (string, error) {
 	filePath := ""
 	switch req.Type {
+	case "mysql-cluster-conf":
+		filePath = path.Join(global.Dir.DataDir, fmt.Sprintf("apps/mysql-cluster/%s/conf/my.cnf", req.Name))
 	case "mysql-conf":
 		filePath = path.Join(global.Dir.DataDir, fmt.Sprintf("apps/mysql/%s/conf/my.cnf", req.Name))
 	case "mariadb-conf":

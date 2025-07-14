@@ -534,7 +534,7 @@ func (u *MysqlService) LoadStatus(req dto.OperationWithNameAndType) (*dto.MysqlS
 	info.File = "OFF"
 	info.Position = "OFF"
 	masterStatus := "show master status;"
-	if common.CompareAppVersion(app.Version, "8.4.0") && req.Type == constant.AppMysql {
+	if common.CompareAppVersion(app.Version, "8.4.0") && (req.Type == constant.AppMysql || req.Type == constant.AppMysqlCluster) {
 		masterStatus = "show binary log status;"
 	}
 	rows, err := executeSqlForRows(app.ContainerName, app.Key, app.Password, masterStatus)
@@ -553,10 +553,13 @@ func (u *MysqlService) LoadStatus(req dto.OperationWithNameAndType) (*dto.MysqlS
 }
 
 func executeSqlForMaps(containerName, dbType, password, command string) (map[string]string, error) {
+	if dbType == "mysql-cluster" {
+		dbType = "mysql"
+	}
 	cmd := exec.Command("docker", "exec", containerName, dbType, "-uroot", "-p"+password, "-e", command)
 	stdout, err := cmd.CombinedOutput()
 	stdStr := strings.ReplaceAll(string(stdout), "mysql: [Warning] Using a password on the command line interface can be insecure.\n", "")
-	if err != nil || strings.HasPrefix(string(stdStr), "ERROR ") {
+	if err != nil || strings.HasPrefix(stdStr, "ERROR ") {
 		return nil, errors.New(stdStr)
 	}
 
@@ -572,10 +575,13 @@ func executeSqlForMaps(containerName, dbType, password, command string) (map[str
 }
 
 func executeSqlForRows(containerName, dbType, password, command string) ([]string, error) {
+	if dbType == "mysql-cluster" {
+		dbType = "mysql"
+	}
 	cmd := exec.Command("docker", "exec", containerName, dbType, "-uroot", "-p"+password, "-e", command)
 	stdout, err := cmd.CombinedOutput()
 	stdStr := strings.ReplaceAll(string(stdout), "mysql: [Warning] Using a password on the command line interface can be insecure.\n", "")
-	if err != nil || strings.HasPrefix(string(stdStr), "ERROR ") {
+	if err != nil || strings.HasPrefix(stdStr, "ERROR ") {
 		return nil, errors.New(stdStr)
 	}
 	return strings.Split(stdStr, "\n"), nil

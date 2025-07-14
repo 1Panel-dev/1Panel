@@ -3372,6 +3372,7 @@ const message = {
             installNode: '安装节点',
             master: '主节点',
             slave: '从节点',
+            replicaStatus: '主从状态',
         },
     },
 };

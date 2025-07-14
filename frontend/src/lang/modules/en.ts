@@ -3647,6 +3647,7 @@ const message = {
             installNode: 'Install Node',
             master: 'Master Node',
             slave: 'Slave Node',
+            replicaStatus: 'Master-Slave Status',
         },
     },
 };

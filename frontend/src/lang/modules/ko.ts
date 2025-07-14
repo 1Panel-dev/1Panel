@@ -3448,6 +3448,7 @@ const message = {
             installNode: '노드 설치',
             master: '마스터 노드',
             slave: '슬레이브 노드',
+            replicaStatus: '마스터-슬레이브 상태',
         },
     },
 };

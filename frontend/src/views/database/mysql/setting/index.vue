@@ -40,6 +40,7 @@
                     type="primary"
                     :disabled="mysqlStatus !== 'Running'"
                     @click="changeTab('slowLog')"
+                    v-if="type != 'mysql-cluster'"
                     :plain="activeName !== 'slowLog'"
                 >
                     {{ $t('database.slowLog') }}
@@ -94,7 +95,7 @@
                 <SlowLog
                     @loading="changeLoading"
                     @refresh="loadBaseInfo"
-                    v-if="activeName === 'slowLog'"
+                    v-if="activeName === 'slowLog' && type != 'mysql-cluster'"
                     ref="slowLogRef"
                 />
             </template>

@@ -3589,6 +3589,7 @@ const message = {
             installNode: 'Установить узел',
             master: 'Главный узел',
             slave: 'Подчиненный узел',
+            replicaStatus: 'Состояние мастер-слейв',
         },
     },
 };

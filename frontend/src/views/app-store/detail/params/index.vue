@@ -56,8 +56,8 @@
                     :label="service.label"
                 ></el-option>
             </el-select>
-            <el-row :gutter="10" v-if="p.type == 'apps'">
-                <el-col :span="12">
+            <div v-if="p.type == 'apps'" class="flex space-x-4">
+                <div class="flex-1">
                     <el-form-item :prop="p.prop">
                         <el-select
                             v-model="form[p.envKey]"
@@ -72,14 +72,14 @@
                             ></el-option>
                         </el-select>
                     </el-form-item>
-                </el-col>
-                <el-col :span="12">
+                </div>
+                <div class="flex-2">
                     <el-form-item :prop="p.childProp">
                         <el-select
                             v-model="form[p.child.envKey]"
                             v-if="p.child.type == 'service'"
                             @change="changeService(form[p.child.envKey], p.services)"
-                            class="p-w-300"
+                            class="p-w-400"
                         >
                             <el-option
                                 v-for="service in p.services"
@@ -89,33 +89,33 @@
                                 :disabled="service.status != 'Running'"
                             >
                                 <el-row :gutter="5">
-                                    <el-col :span="10">
+                                    <el-col :span="18">
                                         <span>{{ service.label }}</span>
                                     </el-col>
-                                    <el-col :span="8">
+                                    <el-col :span="6">
                                         <span v-if="service.from != ''">
                                             <el-tag v-if="service.from === 'local'">
                                                 {{ $t('commons.table.local') }}
                                             </el-tag>
                                             <el-tag v-else type="success">{{ $t('database.remote') }}</el-tag>
+                                            <Status
+                                                class="ml-2"
+                                                :key="service.status"
+                                                :status="service.status"
+                                            ></Status>
                                         </span>
-                                    </el-col>
-                                    <el-col :span="6">
-                                        <Status :key="service.status" :status="service.status"></Status>
                                     </el-col>
                                 </el-row>
                             </el-option>
                         </el-select>
                     </el-form-item>
-                </el-col>
-                <el-col>
-                    <span v-if="p.child.type === 'service' && p.services.length === 0">
-                        <el-link type="primary" underline="never" @click="toPage(form[p.envKey])">
-                            {{ $t('app.toInstall') }}
-                        </el-link>
-                    </span>
-                </el-col>
-            </el-row>
+                </div>
+                <span v-if="p.child.type === 'service' && p.services.length === 0">
+                    <el-link type="primary" underline="never" @click="toPage(form[p.envKey])">
+                        {{ $t('app.toInstall') }}
+                    </el-link>
+                </span>
+            </div>
             <span class="input-help" v-if="p.description">{{ getDescription(p) }}</span>
         </el-form-item>
     </div>

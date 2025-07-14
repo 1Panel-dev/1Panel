@@ -254,7 +254,7 @@ func createLink(ctx context.Context, installTask *task.Task, app model.App, appI
 			var resourceId uint
 			if dbConfig.DbName != "" && dbConfig.DbUser != "" && dbConfig.Password != "" {
 				switch database.Type {
-				case constant.AppPostgresql, constant.AppPostgres:
+				case constant.AppPostgresql, constant.AppPostgres, constant.AppPostgresqlCluster:
 					oldPostgresqlDb, _ := postgresqlRepo.Get(repo.WithByName(dbConfig.DbName), repo.WithByFrom(constant.ResourceLocal))
 					resourceId = oldPostgresqlDb.ID
 					if oldPostgresqlDb.ID > 0 {
@@ -276,7 +276,7 @@ func createLink(ctx context.Context, installTask *task.Task, app model.App, appI
 						}
 						resourceId = pgdb.ID
 					}
-				case constant.AppMysql, constant.AppMariaDB:
+				case constant.AppMysql, constant.AppMariaDB, constant.AppMysqlCluster:
 					oldMysqlDb, _ := mysqlRepo.Get(repo.WithByName(dbConfig.DbName), repo.WithByFrom(constant.ResourceLocal))
 					resourceId = oldMysqlDb.ID
 					if oldMysqlDb.ID > 0 {
@@ -407,9 +407,9 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 		}
 
 		switch install.App.Key {
-		case constant.AppMysql, constant.AppMariaDB:
+		case constant.AppMysql, constant.AppMariaDB, constant.AppMysqlCluster:
 			_ = mysqlRepo.Delete(ctx, mysqlRepo.WithByMysqlName(install.Name))
-		case constant.AppPostgresql:
+		case constant.AppPostgresql, constant.AppPostgresqlCluster:
 			_ = postgresqlRepo.Delete(ctx, postgresqlRepo.WithByPostgresqlName(install.Name))
 		}
 
@@ -1494,7 +1494,7 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool, sync bool)
 			continue
 		}
 		lastVersion := versions[0]
-		if app.Key == constant.AppMysql {
+		if app.Key == constant.AppMysql || app.Key == constant.AppMysqlCluster {
 			for _, version := range versions {
 				majorVersion := getMajorVersion(installed.Version)
 				if !strings.HasPrefix(version, majorVersion) {

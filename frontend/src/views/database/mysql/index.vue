@@ -12,7 +12,7 @@
                 </div>
             </el-card>
         </div>
-        <LayoutContent :title="currentDB?.type === 'mysql' ? 'MySQL ' : 'MariaDB '">
+        <LayoutContent>
             <template #app v-if="currentDB?.from === 'local'">
                 <AppStatus
                     :app-key="appKey"
@@ -74,7 +74,7 @@
                                     <span>{{ item.database.substring(0, 25) }}...</span>
                                 </el-tooltip>
                                 <el-tag class="tagClass">
-                                    {{ item.type === 'mysql' ? 'MySQL' : 'MariaDB' }}
+                                    {{ mysqlName(item.type) }}
                                 </el-tag>
                             </el-option>
                         </div>
@@ -90,7 +90,7 @@
                                     <span>{{ item.database.substring(0, 25) }}...</span>
                                 </el-tooltip>
                                 <el-tag class="tagClass">
-                                    {{ item.type === 'mysql' ? 'MySQL' : 'MariaDB' }}
+                                    {{ mysqlName(item.type) }}
                                 </el-tag>
                             </el-option>
                         </div>
@@ -227,7 +227,7 @@
             class="mask-prompt"
         >
             <span>
-                {{ $t('commons.service.serviceNotStarted', [currentDB.type === 'mysql' ? 'MySQL' : 'Mariadb']) }}
+                {{ $t('commons.service.serviceNotStarted', [mysqlName(currentDB.type)]) }}
             </span>
         </el-card>
 
@@ -353,6 +353,14 @@ const onChangeConn = async () => {
         type: currentDB.value.type,
         database: currentDBName.value,
     });
+};
+
+const mysqlName = (appType: string) => {
+    if (appType === 'mysql' || appType === 'mysql-cluster') {
+        return 'MySQL';
+    } else {
+        return 'MariaDB';
+    }
 };
 
 const goRemoteDB = async () => {

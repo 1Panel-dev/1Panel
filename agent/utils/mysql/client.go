@@ -30,7 +30,11 @@ type MysqlClient interface {
 
 func NewMysqlClient(conn client.DBInfo) (MysqlClient, error) {
 	if conn.From == "local" {
-		connArgs := []string{"exec", conn.Address, conn.Type, "-u" + conn.Username, "-p" + conn.Password, "-e"}
+		mysqlCli := conn.Type
+		if mysqlCli == "mysql-cluster" {
+			mysqlCli = "mysql"
+		}
+		connArgs := []string{"exec", conn.Address, mysqlCli, "-u" + conn.Username, "-p" + conn.Password, "-e"}
 		return client.NewLocal(connArgs, conn.Type, conn.Address, conn.Password, conn.Database), nil
 	}
 

@@ -3687,6 +3687,7 @@ const message = {
             installNode: 'Установить узел',
             master: 'Главный узел',
             slave: 'Подчиненный узел',
+            replicaStatus: 'Ana-Çalışan Durumu',
         },
     },
 };

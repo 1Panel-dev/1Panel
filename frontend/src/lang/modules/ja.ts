@@ -3510,6 +3510,7 @@ const message = {
             installNode: 'ノードをインストール',
             master: 'マスターノード',
             slave: 'スレーブノード',
+            replicaStatus: 'マスタースレーブステータス',
         },
     },
 };

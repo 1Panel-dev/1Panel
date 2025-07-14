@@ -234,7 +234,6 @@ const get = async () => {
                 if (d.type === 'number') {
                     value = Number(value);
                 }
-                console.log('d', d);
                 params.value.push({
                     default: value,
                     labelEn: d.labelEn,

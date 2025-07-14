@@ -3591,6 +3591,7 @@ const message = {
             installNode: 'Pasang Node',
             master: 'Node Utama',
             slave: 'Node Hamba',
+            replicaStatus: 'Utama-Hamba Status',
         },
     },
 };

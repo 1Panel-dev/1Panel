@@ -3598,6 +3598,7 @@ const message = {
             installNode: 'Instalar Nó',
             master: 'Nó Mestre',
             slave: 'Nó Escravo',
+            replicaStatus: 'Status Mestre-Escravo',
         },
     },
 };

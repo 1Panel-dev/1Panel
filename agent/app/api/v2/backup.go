@@ -371,12 +371,12 @@ func (b *BaseApi) Backup(c *gin.Context) {
 			helper.InternalServer(c, err)
 			return
 		}
-	case "mysql", "mariadb":
+	case "mysql", "mariadb", constant.AppMysqlCluster:
 		if err := backupService.MysqlBackup(req); err != nil {
 			helper.InternalServer(c, err)
 			return
 		}
-	case constant.AppPostgresql:
+	case constant.AppPostgresql, constant.AppPostgresqlCluster:
 		if err := backupService.PostgresqlBackup(req); err != nil {
 			helper.InternalServer(c, err)
 			return
@@ -386,7 +386,7 @@ func (b *BaseApi) Backup(c *gin.Context) {
 			helper.InternalServer(c, err)
 			return
 		}
-	case "redis":
+	case "redis", constant.AppRedisCluster:
 		if err := backupService.RedisBackup(req); err != nil {
 			helper.InternalServer(c, err)
 			return

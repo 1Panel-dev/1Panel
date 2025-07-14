@@ -14,7 +14,6 @@ export const jumpToInstall = (type: string, key: string) => {
     }
     switch (key) {
         case 'mysql-cluster':
-            console.log('jumpToInstall mysql-cluster');
             jumpToPath(router, '/xpack/cluster/mysql');
             return true;
         case 'redis-cluster':

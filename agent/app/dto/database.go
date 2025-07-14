@@ -4,14 +4,14 @@ import "time"
 
 // common
 type DBConfUpdateByFile struct {
-	Type     string `json:"type" validate:"required,oneof=mysql mariadb postgresql redis"`
+	Type     string `json:"type" validate:"required,oneof=mysql mariadb postgresql redis mysql-cluster postgresql-cluster"`
 	Database string `json:"database" validate:"required"`
 	File     string `json:"file"`
 }
 type ChangeDBInfo struct {
 	ID       uint   `json:"id"`
 	From     string `json:"from" validate:"required,oneof=local remote"`
-	Type     string `json:"type" validate:"required,oneof=mysql mariadb postgresql"`
+	Type     string `json:"type" validate:"required,oneof=mysql mariadb postgresql mysql-cluster postgresql-cluster"`
 	Database string `json:"database" validate:"required"`
 	Value    string `json:"value" validate:"required"`
 }
@@ -74,19 +74,19 @@ type BindUser struct {
 
 type MysqlLoadDB struct {
 	From     string `json:"from" validate:"required,oneof=local remote"`
-	Type     string `json:"type" validate:"required,oneof=mysql mariadb"`
+	Type     string `json:"type" validate:"required,oneof=mysql mariadb mysql-cluster"`
 	Database string `json:"database" validate:"required"`
 }
 
 type MysqlDBDeleteCheck struct {
 	ID       uint   `json:"id" validate:"required"`
-	Type     string `json:"type" validate:"required,oneof=mysql mariadb"`
+	Type     string `json:"type" validate:"required,oneof=mysql mariadb mysql-cluster"`
 	Database string `json:"database" validate:"required"`
 }
 
 type MysqlDBDelete struct {
 	ID           uint   `json:"id" validate:"required"`
-	Type         string `json:"type" validate:"required,oneof=mysql mariadb"`
+	Type         string `json:"type" validate:"required,oneof=mysql mariadb mysql-cluster"`
 	Database     string `json:"database" validate:"required"`
 	ForceDelete  bool   `json:"forceDelete"`
 	DeleteBackup bool   `json:"deleteBackup"`
@@ -153,7 +153,7 @@ type MysqlVariables struct {
 }
 
 type MysqlVariablesUpdate struct {
-	Type      string                       `json:"type" validate:"required,oneof=mysql mariadb"`
+	Type      string                       `json:"type" validate:"required,oneof=mysql mariadb mysql-cluster"`
 	Database  string                       `json:"database" validate:"required"`
 	Variables []MysqlVariablesUpdateHelper `json:"variables"`
 }

@@ -1,9 +1,11 @@
 package helper
 
 import (
+	"errors"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/core/cmd/server/res"
 	"net/http"
+	"strconv"
 
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/global"
@@ -70,11 +72,6 @@ func CheckBindAndValidate(req interface{}, c *gin.Context) error {
 	return nil
 }
 
-func ErrResponse(ctx *gin.Context, code int) {
-	ctx.JSON(code, nil)
-	ctx.Abort()
-}
-
 func ErrWithHtml(ctx *gin.Context, code int, scope string) {
 	if code == 444 {
 		ctx.String(444, "")
@@ -93,4 +90,13 @@ func ErrWithHtml(ctx *gin.Context, code int, scope string) {
 	}
 	ctx.Data(code, "text/html; charset=utf-8", data)
 	ctx.Abort()
+}
+
+func GetParamID(c *gin.Context) (uint, error) {
+	idParam, ok := c.Params.Get("id")
+	if !ok {
+		return 0, errors.New("error id in path")
+	}
+	intNum, _ := strconv.Atoi(idParam)
+	return uint(intNum), nil
 }

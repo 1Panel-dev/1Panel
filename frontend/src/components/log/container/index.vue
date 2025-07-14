@@ -206,7 +206,6 @@ const onClean = async () => {
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',
     }).then(async () => {
-        console.log(logSearch);
         await cleanContainerLog(logSearch.container);
         searchLogs();
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
