@@ -4,7 +4,7 @@
         :header="resource"
         @close="handleClose"
         :size="globalStore.isFullScreen ? 'full' : 'large'"
-        :resource="resource"
+        :resource="container"
     >
         <template #extra v-if="!mobile">
             <el-tooltip :content="loadTooltip()" placement="top">
