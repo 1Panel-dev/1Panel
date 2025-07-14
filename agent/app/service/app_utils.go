@@ -170,7 +170,7 @@ func createLink(ctx context.Context, installTask *task.Task, app model.App, appI
 			}
 
 			switch app.Key {
-			case constant.AppMysql, constant.AppMariaDB, constant.AppPostgresql, constant.AppMongodb:
+			case constant.AppMysql, constant.AppMariaDB, constant.AppPostgresql, constant.AppMongodb, constant.AppMysqlCluster, constant.AppPostgresqlCluster:
 				if password, ok := params["PANEL_DB_ROOT_PASSWORD"]; ok {
 					if password != "" {
 						database.Password = password.(string)
@@ -192,7 +192,7 @@ func createLink(ctx context.Context, installTask *task.Task, app model.App, appI
 
 					}
 				}
-			case constant.AppRedis:
+			case constant.AppRedis, constant.AppRedisCluster:
 				if password, ok := params["PANEL_REDIS_ROOT_PASSWORD"]; ok {
 					authParam := dto.RedisAuthParam{
 						RootPassword: "",
@@ -968,9 +968,11 @@ func runScript(task *task.Task, appInstall *model.AppInstall, operate string) er
 	case "uninstall":
 		scriptPath = path.Join(workDir, "scripts", "uninstall.sh")
 	}
-	if !files.NewFileOp().Stat(scriptPath) {
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(scriptPath) {
 		return nil
 	}
+	_ = fileOp.ChmodR(scriptPath, constant.DirPerm, false)
 	logStr := i18n.GetWithName("ExecShell", operate)
 	task.LogStart(logStr)
 
