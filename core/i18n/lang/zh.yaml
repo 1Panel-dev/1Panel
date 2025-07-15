@@ -207,3 +207,7 @@ NodeFile: "节点文件"
 ErrVerifyToken: '令牌验证错误，请重置后再次扫码'
 ErrInvalidToken: '无效的令牌，请重置后再次扫码'
 ErrExpiredToken: '令牌过期，请重置后再次扫码'
+
+#cluster
+ErrMasterDelete: "无法删除主节点，请先删除从节点"
+ClusterNameIsExist: "集群名称已存在"

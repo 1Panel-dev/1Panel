@@ -198,3 +198,7 @@ SystemMode: "mode: "
 ErrVerifyToken: 'Token verification error, please reset and scan again.'
 ErrInvalidToken: 'Invalid token, please reset and scan again.'
 ErrExpiredToken: 'Token has expired, please reset and scan again.'
+
+#cluster
+ErrMasterDelete: "Unable to delete the master node, please delete the slave nodes first."
+ClusterNameIsExist: "Cluster name already exists."

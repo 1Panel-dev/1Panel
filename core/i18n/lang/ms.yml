@@ -193,3 +193,7 @@ UserInfoPassHelp: "Petua: Untuk menukar kata laluan, anda boleh menjalankan arah
 DBConnErr: "Ralat: Gagal memulakan sambungan pangkalan data, {{ .err }}"
 SystemVersion: "Versi: "
 SystemMode: "Mod: "
+
+#cluster
+ErrMasterDelete: "Tidak dapat menghapus nod utama, sila hapuskan nod perantara dahulu."
+ClusterNameIsExist: "Nama kluster sudah wujud."

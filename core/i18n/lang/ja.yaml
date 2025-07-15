@@ -199,3 +199,7 @@ SystemMode: "モード: "
 ErrVerifyToken: 'トークンの検証エラーです。リセット後、再度QRコードをスキャンしてください。'
 ErrInvalidToken: '無効なトークンです。リセット後、再度QRコードをスキャンしてください。'
 ErrExpiredToken: 'トークンの有効期限が切れました。リセット後、再度QRコードをスキャンしてください。'
+
+#cluster
+ErrMasterDelete: "マスターノードを削除できません。スレーブノードを先に削除してください。"
+ClusterNameIsExist: "クラスタ名は既に存在します。"

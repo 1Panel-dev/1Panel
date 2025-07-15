@@ -198,3 +198,7 @@ SystemMode: "모드: "
 ErrVerifyToken: '토큰 검증 오류가 발생했습니다. 재설정 후 다시 스캔해 주세요.'
 ErrInvalidToken: '유효하지 않은 토큰입니다. 재설정 후 다시 스캔해 주세요.'
 ErrExpiredToken: '토큰이 만료되었습니다. 재설정 후 다시 스캔해 주세요.'
+
+#cluster
+ErrMasterDelete: "마스터 노드를 삭제할 수 없습니다. 슬레이브 노드를 먼저 삭제하세요."
+ClusterNameIsExist: "클러스터 이름이 이미 존재합니다."

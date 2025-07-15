@@ -27,8 +27,9 @@ export const getAppTags = () => {
     return http.get<App.Tag[]>('apps/tags');
 };
 
-export const getAppDetail = (appID: number, version: string, type: string) => {
-    return http.get<App.AppDetail>(`apps/detail/${appID}/${version}/${type}`);
+export const getAppDetail = (appID: number, version: string, type: string, node?: string) => {
+    const params = node ? `?operateNode=${node}` : '';
+    return http.get<App.AppDetail>(`apps/detail/${appID}/${version}/${type}${params}`);
 };
 
 export const getAppDetailByID = (id: number) => {

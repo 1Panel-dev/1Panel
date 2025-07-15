@@ -198,3 +198,7 @@ SystemMode: "modo: "
 ErrVerifyToken: 'Erro de verificação do token, por favor, reinicie e escaneie novamente.'
 ErrInvalidToken: 'Token inválido, por favor, reinicie e escaneie novamente.'
 ErrExpiredToken: 'O token expirou, por favor, reinicie e escaneie novamente.'
+
+#cluster
+ErrMasterDelete: "Não é possível excluir o nó mestre, exclua os nós escravos primeiro."
+ClusterNameIsExist: "O nome do cluster já existe."

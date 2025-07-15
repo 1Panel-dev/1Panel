@@ -715,6 +715,7 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 			}
 			appParam.LabelZh = form.LabelZh
 			appParam.LabelEn = form.LabelEn
+			appParam.Label = form.Label
 			appParam.Value = v
 			if form.Type == "service" {
 				appInstall, _ := appInstallRepo.GetFirst(appInstallRepo.WithServiceName(v.(string)))
@@ -768,6 +769,7 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 				Values:   form.Values,
 				Multiple: form.Multiple,
 				Required: form.Required,
+				Label:    form.Label,
 			})
 		}
 	}

@@ -171,6 +171,7 @@ type AppParam struct {
 	ShowValue string      `json:"showValue"`
 	Required  bool        `json:"required"`
 	Multiple  bool        `json:"multiple"`
+	Label     dto.Locale  `json:"label"`
 }
 
 type AppConfig struct {
