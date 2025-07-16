@@ -259,10 +259,7 @@
                                                     <el-popover
                                                         placement="top-start"
                                                         trigger="hover"
-                                                        v-if="
-                                                            installed.appType == 'website' ||
-                                                            installed.appKey?.startsWith('local')
-                                                        "
+                                                        v-if="hasLinkButton(installed)"
                                                         :width="400"
                                                     >
                                                         <template #reference>
@@ -503,6 +500,13 @@ const changeTag = (key: string) => {
         searchReq.tags = [key];
     }
     search();
+};
+
+const hasLinkButton = (installed: any) => {
+    return (
+        (installed.appType == 'website' || installed.appKey?.startsWith('local')) &&
+        (installed.httpPort > 0 || installed.httpsPort > 0 || installed.webUI != '')
+    );
 };
 
 const search = async () => {
