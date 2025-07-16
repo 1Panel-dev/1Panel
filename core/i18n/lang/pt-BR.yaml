@@ -87,10 +87,12 @@ SubTaskFailed: "{{ .name }} falhou: {{ .err }}"
 TaskInstall: "Instalar"
 TaskUpgrade: "Atualizar"
 TaskSync: 'Sincronizar'
+TaskBackup: "Backup"
 SuccessStatus: "{{ .name }} bem-sucedido"
 FailedStatus: "{{ .name }} falhou {{ .err }}"
 Start: "Iniciar"
 SubTask: "Subtarefa"
+Skip: "Ignorar erros e continuar..."
 
 #script
 ScriptLibrary: "Biblioteca de Scripts"
@@ -119,6 +121,11 @@ UploadUpgradeFile: "Distribuir arquivos necessários para a atualização"
 RestartAfterUpgrade: "Iniciar serviço após a atualização"
 
 #add node
+MasterData: "Dados do Nó Mestre"
+LoadSftpClient: "Carregar Cliente SFTP"
+PackageMasterData: "Gerar pacote de backup do nó mestre"
+UploadBackup: "Carregar dados de backup"
+MvBackup: "Mover dados para diretório de backup"
 TaskAddNode: "Adicionar nó"
 LoadNodeArch: "Obter informações de arquitetura do nó"
 LoadNodeArchDetail: "Arquitetura do nó mestre detectada: {{ .local }}, arquitetura do nó filho: {{ .node }}"

@@ -20,7 +20,8 @@ type ConnInfo struct {
 }
 
 type SSHClient struct {
-	Client *gossh.Client `json:"client"`
+	Client   *gossh.Client `json:"client"`
+	SudoItem string        `json:"sudoItem"`
 }
 
 func NewClient(c ConnInfo) (*SSHClient, error) {
@@ -54,10 +55,16 @@ func NewClient(c ConnInfo) (*SSHClient, error) {
 	if nil != err {
 		return nil, err
 	}
-	return &SSHClient{Client: client}, nil
+	sshClient := &SSHClient{Client: client}
+	if _, err := sshClient.Run("sudo -n ls"); err == nil {
+		sshClient.SudoItem = "sudo"
+	}
+	return sshClient, nil
 }
 
 func (c *SSHClient) Run(shell string) (string, error) {
+	shell = c.SudoItem + " " + shell
+	shell = strings.ReplaceAll(shell, " && ", fmt.Sprintf(" && %s ", c.SudoItem))
 	session, err := c.Client.NewSession()
 	if err != nil {
 		return "", err
@@ -84,6 +91,8 @@ func (c *SSHClient) IsRoot(user string) bool {
 }
 
 func (c *SSHClient) Runf(shell string, args ...interface{}) (string, error) {
+	shell = c.SudoItem + " " + shell
+	shell = strings.ReplaceAll(shell, " && ", fmt.Sprintf(" && %s ", c.SudoItem))
 	session, err := c.Client.NewSession()
 	if err != nil {
 		return "", err

@@ -51,6 +51,7 @@ const (
 	TaskRsync          = "TaskRsync"
 	TaskInstallCluster = "TaskInstallCluster"
 	TaskCreateCluster  = "TaskCreateCluster"
+	TaskBackup         = "TaskBackup"
 )
 
 const (

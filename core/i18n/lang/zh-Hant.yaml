@@ -87,10 +87,12 @@ SubTaskFailed: "{{ .name }} 失敗: {{ .err }}"
 TaskInstall: "安裝"
 TaskUpgrade: "升級"
 TaskSync: '同步'
+TaskBackup: "備份"
 SuccessStatus: "{{ .name }} 成功"
 FailedStatus: "{{ .name }} 失敗 {{ .err }}"
 Start: "開始"
 SubTask: "子任務"
+Skip: "忽略錯誤並繼續..."
 
 #script
 ScriptLibrary: "腳本庫"
@@ -120,6 +122,11 @@ UploadUpgradeFile: "發送升級所需文件"
 RestartAfterUpgrade: "升級後啟動服務"
 
 #add node
+MasterData: "主節點數據"
+LoadSftpClient: "獲取上傳客戶端"
+PackageMasterData: "生成主節點備份壓縮包"
+UploadBackup: "上傳備份數據"
+MvBackup: "移動數據到備份目錄"
 TaskAddNode: "新增節點"
 LoadNodeArch: "取得節點架構資訊"
 LoadNodeArchDetail: "檢測到主節點架構: {{ .local }}，子節點架構: {{ .node }}"

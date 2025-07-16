@@ -3105,6 +3105,12 @@ const message = {
         },
         node: {
             master: '主节点',
+            masterBackup: '主节点备份',
+            backupNode: '备份节点',
+            backupFrequency: '备份频率（小时）',
+            backupCopies: '备份记录保留份数',
+            masterBackupAlert:
+                '当前未配置主节点备份，为保障数据安全，请尽快设置备份节点，便于主节点故障时可人工切换新主节点。',
             node: '节点',
             addr: '地址',
             nodeUnhealthy: '节点状态异常',

@@ -3316,6 +3316,12 @@ const message = {
         },
         node: {
             master: 'Nó Principal',
+            masterBackup: 'Backup do Nó Mestre',
+            backupNode: 'Nó de Backup',
+            backupFrequency: 'Frequência de Backup (horas)',
+            backupCopies: 'Número de cópias de backup a reter',
+            masterBackupAlert:
+                'O backup do nó mestre não está configurado atualmente. Para garantir a segurança dos dados, configure um nó de backup o mais rápido possível para facilitar a troca manual para um novo nó mestre em caso de falha.',
             node: 'Nó',
             addr: 'Endereço',
             nodeUnhealthy: 'Estado do nó anormal',

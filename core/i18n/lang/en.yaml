@@ -87,10 +87,12 @@ SubTaskFailed: "{{ .name }} failed: {{ .err }}"
 TaskInstall: "Install"
 TaskUpgrade: "Upgrade"
 TaskSync: 'Synchronize'
+TaskBackup: "Backup"
 SuccessStatus: "{{ .name }} succeeded"
 FailedStatus: "{{ .name }} failed {{ .err }}"
 Start: "Start"
 SubTask: "Subtask"
+Skip: "Skip errors and continue..."
 
 #script
 ScriptLibrary: "Script Library"
@@ -119,6 +121,11 @@ UploadUpgradeFile: "Distribute upgrade files"
 RestartAfterUpgrade: "Start service after upgrade"
 
 #add node
+MasterData: "Master Node Data"
+LoadSftpClient: "Load SFTP Client"
+PackageMasterData: "Generate master node backup package"
+UploadBackup: "Upload backup data"
+MvBackup: "Move data to backup directory"
 TaskAddNode: "Add node"
 LoadNodeArch: "Get node architecture info"
 LoadNodeArchDetail: "Detected master node architecture: {{ .local }}, child node architecture: {{ .node }}"

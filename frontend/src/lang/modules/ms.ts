@@ -3308,6 +3308,12 @@ const message = {
         },
         node: {
             master: 'Nod Utama',
+            masterBackup: 'Sandaran Nod Master',
+            backupNode: 'Nod Sandaran',
+            backupFrequency: 'Kekerapan Sandaran (jam)',
+            backupCopies: 'Bilangan salinan sandaran yang disimpan',
+            masterBackupAlert:
+                'Sandaran nod master belum dikonfigurasikan. Untuk memastikan keselamatan data, sila sediakan nod sandaran secepat mungkin untuk memudahkan pertukaran manual ke nod master baru sekiranya berlaku kegagalan.',
             node: 'Nod',
             addr: 'Alamat',
             nodeUnhealthy: 'Status nod tidak normal',

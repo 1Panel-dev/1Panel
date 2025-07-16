@@ -36,7 +36,11 @@
                     @size-change="sizeChange"
                     @current-change="currentChange"
                     :size="mobile || paginationConfig.small ? 'small' : 'default'"
-                    :layout="mobile ? 'total, prev, pager, next' : 'total, sizes, prev, pager, next, jumper'"
+                    :layout="
+                        mobile || paginationConfig.small
+                            ? 'total, prev, pager, next'
+                            : 'total, sizes, prev, pager, next, jumper'
+                    "
                 />
             </slot>
         </div>

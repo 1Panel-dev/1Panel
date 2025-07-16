@@ -827,7 +827,7 @@ func (f FileOp) TarGzCompressPro(withDir bool, src, dst, secret, exclusionRules 
 
 	if len(secret) != 0 {
 		commands = fmt.Sprintf("tar %s -zcf - %s | openssl enc -aes-256-cbc -salt -k '%s' -out %s", exStr, srcItem, secret, dst)
-		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" %s ", secret), "******"))
+		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" '%s' ", secret), " ****** "))
 	} else {
 		commands = fmt.Sprintf("tar -zcf %s %s %s", dst, exStr, srcItem)
 		global.LOG.Debug(commands)
@@ -850,7 +850,7 @@ func (f FileOp) TarGzFilesWithCompressPro(list []string, dst, secret string) err
 	commands := ""
 	if len(secret) != 0 {
 		commands = fmt.Sprintf("tar -zcf - %s | openssl enc -aes-256-cbc -salt -k '%s' -out %s", strings.Join(filelist, " "), secret, dst)
-		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" %s ", secret), "******"))
+		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" '%s' ", secret), " ****** "))
 	} else {
 		commands = fmt.Sprintf("tar -zcf %s %s", dst, strings.Join(filelist, " "))
 		global.LOG.Debug(commands)
@@ -869,7 +869,7 @@ func (f FileOp) TarGzExtractPro(src, dst string, secret string) error {
 	commands := ""
 	if len(secret) != 0 {
 		commands = fmt.Sprintf("openssl enc -d -aes-256-cbc -salt -k '%s' -in %s | tar -zxf - > /root/log", secret, src)
-		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" %s ", secret), "******"))
+		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" '%s' ", secret), " ****** "))
 	} else {
 		commands = fmt.Sprintf("tar zxvf %s", src)
 		global.LOG.Debug(commands)

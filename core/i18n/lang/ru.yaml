@@ -87,10 +87,12 @@ SubTaskFailed: "{{ .name }} не удалось: {{ .err }}"
 TaskInstall: "Установить"
 TaskUpgrade: "Обновить"
 TaskSync: 'Синхронизация'
+TaskBackup: "Резервная копия"
 SuccessStatus: "{{ .name }} успешно"
 FailedStatus: "{{ .name }} не удалось {{ .err }}"
 Start: "Начать"
 SubTask: "Подзадача"
+Skip: "Пропустить ошибки и продолжить..."
 
 #script
 ScriptLibrary: "Библиотека скриптов"
@@ -119,6 +121,11 @@ UploadUpgradeFile: "Распределение файлов обновления
 RestartAfterUpgrade: "Запуск службы после обновления"
 
 #add node
+MasterData: "Данные главного узла"
+LoadSftpClient: "Загрузить SFTP-клиент"
+PackageMasterData: "Создать архив резервной копии главного узла"
+UploadBackup: "Загрузить резервные данные"
+MvBackup: "Переместить данные в резервный каталог"
 TaskAddNode: "Добавить узел"
 LoadNodeArch: "Получить информацию об архитектуре узла"
 LoadNodeArchDetail: "Обнаружена архитектура главного узла: {{ .local }}, архитектура дочернего узла: {{ .node }}"

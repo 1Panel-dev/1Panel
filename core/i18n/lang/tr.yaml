@@ -86,10 +86,12 @@ SubTaskFailed: "{{ .name }} başarısız: {{ .err }}"
 TaskInstall: "Kurulum"
 TaskUpgrade: "Yükseltme"
 TaskSync: 'Senkronize'
+TaskBackup: "Yedekleme"
 SuccessStatus: "{{ .name }} başarılı"
 FailedStatus: "{{ .name }} başarısız {{ .err }}"
 Start: "Başla"
 SubTask: "Alt görev"
+Skip: "Hataları atla ve devam et..."
 
 #script
 ScriptLibrary: "Betik Kütüphanesi"
@@ -117,6 +119,11 @@ UploadUpgradeFile: "Yükseltme dosyalarını dağıt"
 RestartAfterUpgrade: "Yükseltme sonrası servisi başlat"
 
 #add node
+MasterData: "Ana Düğüm Verisi"
+LoadSftpClient: "SFTP İstemcisini Yükle"
+PackageMasterData: "Ana düğüm yedek paketi oluştur"
+UploadBackup: "Yedek verileri yükle"
+MvBackup: "Verileri yedek dizinine taşı"
 TaskAddNode: "Düğüm ekle"
 LoadNodeArch: "Düğüm mimari bilgilerini al"
 LoadNodeArchDetail: "Ana düğüm mimarisi tespit edildi: {{ .local }}, alt düğüm mimarisi: {{ .node }}"

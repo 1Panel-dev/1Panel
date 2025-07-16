@@ -87,10 +87,12 @@ SubTaskFailed: "{{ .name }} 실패: {{ .err }}"
 TaskInstall: "설치"
 TaskUpgrade: "업그레이드"
 TaskSync: '동기화'
+TaskBackup: "백업"
 SuccessStatus: "{{ .name }} 성공"
 FailedStatus: "{{ .name }} 실패 {{ .err }}"
 Start: "시작"
 SubTask: "서브 작업"
+Skip: "오류 무시하고 계속..."
 
 #script
 ScriptLibrary: "스크립트 라이브러리"
@@ -119,6 +121,11 @@ UploadUpgradeFile: "업그레이드에 필요한 파일 전송"
 RestartAfterUpgrade: "업그레이드 후 서비스 시작"
 
 #add node
+MasterData: "마스터 노드 데이터"
+LoadSftpClient: "SFTP 클라이언트 가져오기"
+PackageMasterData: "마스터 노드 백업 패키지 생성"
+UploadBackup: "백업 데이터 업로드"
+MvBackup: "데이터를 백업 디렉터리로 이동"
 TaskAddNode: "노드 추가"
 LoadNodeArch: "노드 아키텍처 정보 가져오기"
 LoadNodeArchDetail: "감지된 마스터 노드 아키텍처: {{ .local }}, 자식 노드 아키텍처: {{ .node }}"

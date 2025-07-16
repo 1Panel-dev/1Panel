@@ -3368,6 +3368,12 @@ const message = {
         },
         node: {
             master: 'Main Node',
+            masterBackup: 'Master Node Backup',
+            backupNode: 'Backup Node',
+            backupFrequency: 'Backup Frequency (hours)',
+            backupCopies: 'Backup Retention Copies',
+            masterBackupAlert:
+                'Master node backup is not currently configured. To ensure data security, please set up a backup node as soon as possible to facilitate manual switching to a new master node in case of failure.',
             node: 'Node',
             addr: 'Address',
             nodeUnhealthy: 'Node status abnormal',

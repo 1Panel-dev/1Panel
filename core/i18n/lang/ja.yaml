@@ -88,10 +88,12 @@ SubTaskFailed: "{{ .name }} 失敗: {{ .err }}"
 TaskInstall: "インストール"
 TaskUpgrade: "アップグレード"
 TaskSync: '同期'
+TaskBackup: "バックアップ"
 SuccessStatus: "{{ .name }} 成功"
 FailedStatus: "{{ .name }} 失敗 {{ .err }}"
 Start: "開始"
 SubTask: "サブタスク"
+Skip: "エラーを無視して続行..."
 
 #script
 ScriptLibrary: "スクリプトライブラリ"
@@ -120,6 +122,11 @@ UploadUpgradeFile: "アップグレードに必要なファイルを配布"
 RestartAfterUpgrade: "アップグレード後にサービスを起動"
 
 #add node
+MasterData: "マスターノードデータ"
+LoadSftpClient: "SFTPクライアントの取得"
+PackageMasterData: "マスターノードのバックアップパッケージを生成"
+UploadBackup: "バックアップデータをアップロード"
+MvBackup: "データをバックアップディレクトリに移動"
 TaskAddNode: "ノードを追加"
 LoadNodeArch: "ノードアーキテクチャ情報を取得"
 LoadNodeArchDetail: "検出されたマスターノードアーキテクチャ: {{ .local }}, 子ノードアーキテクチャ: {{ .node }}"

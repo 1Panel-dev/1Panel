@@ -3135,6 +3135,12 @@ const message = {
         },
         node: {
             master: '主節點',
+            masterBackup: '主節點備份',
+            backupNode: '備份節點',
+            backupFrequency: '備份頻率（小時）',
+            backupCopies: '備份記錄保留份數',
+            masterBackupAlert:
+                '當前未配置主節點備份，為保障數據安全，請盡快設置備份節點，便於主節點故障時可人工切換新主節點。',
             node: '節點',
             addr: '地址',
             nodeUnhealthy: '節點狀態異常',

@@ -87,10 +87,12 @@ SubTaskFailed: "{{ .name }} gagal: {{ .err }}"
 TaskInstall: "Pasang"
 TaskUpgrade: "Kemas kini"
 TaskSync: 'Selaraskan'
+TaskBackup: "Sandaran"
 SuccessStatus: "{{ .name }} berjaya"
 FailedStatus: "{{ .name }} gagal {{ .err }}"
 Start: "Mula"
 SubTask: "Tugas Sub"
+Skip: "Abaikan ralat dan teruskan..."
 
 #script 
 ScriptLibrary: "Pustaka Skrip"
@@ -119,6 +121,11 @@ UploadUpgradeFile: "Sebarkan fail naik taraf"
 RestartAfterUpgrade: "Mulakan perkhidmatan selepas naik taraf"
 
 #add node
+MasterData: "Data Nod Master"
+LoadSftpClient: "Dapatkan Klien SFTP"
+PackageMasterData: "Hasilkan pakej sandaran nod master"
+UploadBackup: "Muat naik data sandaran"
+MvBackup: "Alihkan data ke direktori sandaran"
 TaskAddNode: "Tambah nod"
 LoadNodeArch: "Dapatkan maklumat seni bina nod"
 LoadNodeArchDetail: "Mengesan seni bina nod induk: {{ .local }}, seni bina nod anak: {{ .node }}"

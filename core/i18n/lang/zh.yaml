@@ -87,10 +87,12 @@ SubTaskFailed: "{{ .name }} 失败: {{ .err }}"
 TaskInstall: "安装"
 TaskUpgrade: "升级"
 TaskSync: "同步"
+TaskBackup: "备份"
 SuccessStatus: "{{ .name }} 成功"
 FailedStatus: "{{ .name }} 失败 {{ .err }}"
 Start: "开始"
 SubTask: "子任务"
+Skip: "忽略错误并继续..."
 
 #script
 ScriptLibrary: "脚本库"
@@ -120,6 +122,9 @@ UploadUpgradeFile: "下发升级所需文件"
 RestartAfterUpgrade: "升级后启动服务"
 
 #add node
+MasterData: "主节点数据"
+LoadSftpClient: "获取上传客户端"
+UploadBackup: "上传备份数据"
 TaskAddNode: "添加节点"
 LoadNodeArch: "获取节点架构信息"
 LoadNodeArchDetail: "检测到主节点架构: {{ .local }}，子节点架构: {{ .node }}"

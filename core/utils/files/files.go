@@ -110,7 +110,7 @@ func HandleTar(sourceDir, targetDir, name, exclusionRules string, secret string)
 	if len(secret) != 0 {
 		extraCmd := "| openssl enc -aes-256-cbc -salt -k '" + secret + "' -out"
 		commands = fmt.Sprintf("tar -zcf %s %s %s %s", " -"+excludeRules, path, extraCmd, targetDir+"/"+name)
-		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" %s ", secret), "******"))
+		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" '%s' ", secret), " ****** "))
 	} else {
 		commands = fmt.Sprintf("tar -zcf %s %s %s", targetDir+"/"+name, excludeRules, path)
 		global.LOG.Debug(commands)
@@ -136,7 +136,7 @@ func HandleUnTar(sourceFile, targetDir string, secret string) error {
 	if len(secret) != 0 {
 		extraCmd := "openssl enc -d -aes-256-cbc -k '" + secret + "' -in " + sourceFile + " | "
 		commands = fmt.Sprintf("%s tar -zxvf - -C %s", extraCmd, targetDir+" > /dev/null 2>&1")
-		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" %s ", secret), "******"))
+		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" '%s' ", secret), " ****** "))
 	} else {
 		commands = fmt.Sprintf("tar zxvfC %s %s", sourceFile, targetDir)
 		global.LOG.Debug(commands)

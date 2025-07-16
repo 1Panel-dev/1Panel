@@ -3403,6 +3403,12 @@ const message = {
         },
         node: {
             master: 'Ana Düğüm',
+            masterBackup: 'Ana Düğüm Yedekleme',
+            backupNode: 'Yedek Düğüm',
+            backupFrequency: 'Yedekleme Sıklığı (saat)',
+            backupCopies: 'Saklanacak yedek kopya sayısı',
+            masterBackupAlert:
+                'Ana düğüm yedeklemesi şu anda yapılandırılmamış. Veri güvenliği için, lütfen arıza durumunda yeni bir ana düğüme manuel geçiş yapabilmek amacıyla en kısa sürede bir yedek düğüm ayarlayın.',
             node: 'Düğüm',
             addr: 'Adres',
             nodeUnhealthy: 'Düğüm durumu anormal',

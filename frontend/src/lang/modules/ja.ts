@@ -3237,6 +3237,12 @@ const message = {
         },
         node: {
             master: '主ノード',
+            masterBackup: 'マスターノードバックアップ',
+            backupNode: 'バックアップノード',
+            backupFrequency: 'バックアップ頻度（時間）',
+            backupCopies: 'バックアップ保持数',
+            masterBackupAlert:
+                '現在マスターノードのバックアップが設定されていません。データセキュリティを確保するため、障害時に新しいマスターノードに手動で切り替えられるよう、速やかにバックアップノードを設定してください。',
             node: 'ノード',
             addr: 'アドレス',
             nodeUnhealthy: 'ノード状態異常',

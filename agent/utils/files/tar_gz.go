@@ -47,7 +47,7 @@ func (t TarGzArchiver) Compress(sourcePaths []string, dstFile string, secret str
 	if len(secret) != 0 {
 		extraCmd := fmt.Sprintf("| openssl enc -aes-256-cbc -salt -k '%s' -out '%s'", secret, dstFile)
 		commands = fmt.Sprintf("tar -zcf - -C \"%s\" %s %s", aheadDir, itemDir, extraCmd)
-		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" %s ", secret), "******"))
+		global.LOG.Debug(strings.ReplaceAll(commands, fmt.Sprintf(" '%s' ", secret), " ****** "))
 	} else {
 		commands = fmt.Sprintf("tar -zcf \"%s\" -C \"%s\" %s", dstFile, aheadDir, itemDir)
 		global.LOG.Debug(commands)
