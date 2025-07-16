@@ -165,7 +165,7 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Ti
 
 			backupDir := path.Join(global.Dir.TmpDir, fmt.Sprintf("database/%s/%s/%s", dbInfo.DBType, record.Name, dbInfo.Name))
 			record.FileName = fmt.Sprintf("db_%s_%s.sql.gz", dbInfo.Name, startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5))
-			if cronjob.DBType == "mysql" || cronjob.DBType == "mariadb" {
+			if cronjob.DBType == "mysql" || cronjob.DBType == "mariadb" || cronjob.DBType == "mysql-cluster" {
 				if err := doMysqlBackup(dbInfo, backupDir, record.FileName); err != nil {
 					if retry < int(cronjob.RetryTimes) || !cronjob.IgnoreErr {
 						retry++
@@ -354,7 +354,7 @@ type DatabaseHelper struct {
 func loadDbsForJob(cronjob model.Cronjob) []DatabaseHelper {
 	var dbs []DatabaseHelper
 	if cronjob.DBName == "all" {
-		if cronjob.DBType == "mysql" || cronjob.DBType == "mariadb" {
+		if cronjob.DBType == "mysql" || cronjob.DBType == "mariadb" || cronjob.DBType == "mysql-cluster" {
 			databaseService := NewIDatabaseService()
 			mysqlItems, _ := databaseService.LoadItems(cronjob.DBType)
 			for _, mysql := range mysqlItems {
@@ -381,7 +381,7 @@ func loadDbsForJob(cronjob model.Cronjob) []DatabaseHelper {
 	dbNames := strings.Split(cronjob.DBName, ",")
 	for _, name := range dbNames {
 		itemID, _ := strconv.Atoi(name)
-		if cronjob.DBType == "mysql" || cronjob.DBType == "mariadb" {
+		if cronjob.DBType == "mysql" || cronjob.DBType == "mariadb" || cronjob.DBType == "mysql-cluster" {
 			mysqlItem, _ := mysqlRepo.Get(repo.WithByID(uint(itemID)))
 			dbs = append(dbs, DatabaseHelper{
 				ID:       mysqlItem.ID,

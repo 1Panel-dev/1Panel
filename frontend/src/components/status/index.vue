@@ -99,6 +99,7 @@ const loadingStatus = [
     'sending',
     'waiting',
     'executing',
+    'loading',
 ];
 
 const stopStatus = ['stopped', 'exited', 'disable'];

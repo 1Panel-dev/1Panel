@@ -200,3 +200,5 @@ ErrExpiredToken: 'Token süresi dolmuş, lütfen sıfırlayın ve tekrar tarayı
 #cluster
 ErrMasterDelete: "Ana düğümü silinemiyor, lütfen önce alt düğümleri silin."
 ClusterNameIsExist: "Küme adı zaten var."
+AppStatusUnHealthy: "Uygulama durumu alımı anormal, lütfen düğüm listesindeki yükleme düğümü durumunu kontrol edin."
+MasterNodePortNotAvailable: "Düğüm {{ .name }} portu {{ .port }} bağlantı doğrulaması başarısız oldu, lütfen güvenlik duvarı/güvenlik grubu ayarlarını ve ana düğüm durumunu kontrol edin."

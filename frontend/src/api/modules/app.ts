@@ -73,8 +73,9 @@ export const getAppInstalled = (search: App.AppInstalledSearch) => {
     return http.post<ResPage<App.AppInstalled>>('apps/installed/search', search);
 };
 
-export const getAppInstalledByID = (installID: number, node: string) => {
-    return http.get<App.AppInstalledInfo>(`apps/installed/info/${installID}?operateNode=${node}`);
+export const getAppInstalledByID = (installID: number, node?: string) => {
+    const params = node ? `?operateNode=${node}` : '';
+    return http.get<App.AppInstalledInfo>(`apps/installed/info/${installID}${params}`);
 };
 
 export const installedOp = (op: App.AppInstalledOp) => {

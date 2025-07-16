@@ -23,4 +23,5 @@ const (
 	StatusInstalling = "Installing"
 	StatusNormal     = "Normal"
 	StatusDeleted    = "Deleted"
+	StatusLoading    = "Loading"
 )

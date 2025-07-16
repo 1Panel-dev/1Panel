@@ -282,8 +282,10 @@
                                     <el-form-item :label="$t('cronjob.database')">
                                         <el-select v-model="form.dbType" @change="loadDatabases">
                                             <el-option label="MySQL" value="mysql" />
+                                            <el-option label="MySQL-Cluster" value="mysql-cluster" />
                                             <el-option label="Mariadb" value="mariadb" />
                                             <el-option label="PostgreSQL" value="postgresql" />
+                                            <el-option label="PostgreSQL-Cluster" value="postgresql-cluster" />
                                         </el-select>
                                     </el-form-item>
                                 </LayoutCol>

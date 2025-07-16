@@ -202,3 +202,5 @@ ErrExpiredToken: 'Token has expired, please reset and scan again.'
 #cluster
 ErrMasterDelete: "Unable to delete the master node, please delete the slave nodes first."
 ClusterNameIsExist: "Cluster name already exists."
+AppStatusUnHealthy: "Application status acquisition is abnormal, please check the installation node status in the node list."
+MasterNodePortNotAvailable: "Node {{ .name }} port {{ .port }} connectivity verification failed, please check firewall/security group settings and master node status."

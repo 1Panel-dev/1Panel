@@ -658,10 +658,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		}
 
 		command := exec.Command("/bin/bash", "-c", fmt.Sprintf("cp -rn %s/* %s || true", detailDir, install.GetPath()))
-		stdout, _ := command.CombinedOutput()
-		if stdout != nil {
-			t.Logger.Printf("upgrade app [%s] [%s] cp file log : %s ", install.App.Key, install.Name, string(stdout))
-		}
+		_, _ = command.CombinedOutput()
 		sourceScripts := path.Join(detailDir, "scripts")
 		if fileOp.Stat(sourceScripts) {
 			dstScripts := path.Join(install.GetPath(), "scripts")

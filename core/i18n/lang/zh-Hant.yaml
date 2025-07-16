@@ -211,3 +211,5 @@ ErrExpiredToken: '令牌過期，請重設後再次掃碼'
 #cluster
 ErrMasterDelete: "無法刪除主節點，請先刪除從節點。"
 ClusterNameIsExist: "集群名稱已存在。"
+AppStatusUnHealthy: "應用獲取狀態異常，請在節點列表檢查安裝節點狀態。"
+MasterNodePortNotAvailable: "節點 {{ .name }} 端口 {{ .port }} 連通性校驗失敗，請檢查防火牆/安全組設置和主節點狀態。"

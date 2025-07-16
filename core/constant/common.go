@@ -164,6 +164,10 @@ var WebUrlMap = map[string]struct{}{
 	"/xpack/node":            {},
 	"/xpack/exchange/file":   {},
 	"/xpack/app":             {},
+
+	"/xpack/cluster/mysql":    {},
+	"/xpack/cluster/postgres": {},
+	"/xpack/cluster/redis":    {},
 }
 
 var DynamicRoutes = []string{

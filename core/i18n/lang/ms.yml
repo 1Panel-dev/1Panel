@@ -197,3 +197,5 @@ SystemMode: "Mod: "
 #cluster
 ErrMasterDelete: "Tidak dapat menghapus nod utama, sila hapuskan nod perantara dahulu."
 ClusterNameIsExist: "Nama kluster sudah wujud."
+AppStatusUnHealthy: "Pengambilan status aplikasi tidak normal, sila periksa status nod pemasangan dalam senarai nod."
+MasterNodePortNotAvailable: "Pengesahan kesambungan pelabuhan {{ .name }} nod {{ .port }} gagal, sila periksa tetapan firewall/kumpulan keselamatan dan status nod utama."
