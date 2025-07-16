@@ -10,6 +10,7 @@ type Snapshot struct {
 	Status            string `json:"status"`
 	Message           string `json:"message"`
 	Version           string `json:"version"`
+	Timeout           uint   `json:"timeout"`
 
 	TaskID         string `json:"taskID"`
 	TaskRecoverID  string `json:"taskRecoverID"`

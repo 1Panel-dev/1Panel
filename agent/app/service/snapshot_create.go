@@ -61,6 +61,7 @@ func (u *SnapshotService) SnapshotCreate(parentTask *task.Task, req dto.Snapshot
 
 		Version: versionItem.Value,
 		Status:  constant.StatusWaiting,
+		Timeout: req.Timeout,
 	}
 	if err := snapshotRepo.Create(&snap); err != nil {
 		global.LOG.Errorf("create snapshot record to db failed, err: %v", err)
@@ -79,7 +80,7 @@ func (u *SnapshotService) SnapshotCreate(parentTask *task.Task, req dto.Snapshot
 	}
 	if jobID == 0 {
 		go func() {
-			_ = handleSnapshot(req, taskItem, jobID, 3, 0)
+			_ = handleSnapshot(req, taskItem, jobID, 3, snap.Timeout)
 		}()
 		return nil
 	}
@@ -128,10 +129,6 @@ func handleSnapshot(req dto.SnapshotCreate, taskItem *task.Task, jobID, retry, t
 	itemHelper := snapHelper{SnapID: req.ID, Task: *taskItem, FileOp: files.NewFileOp(), Ctx: context.Background(), OpenrestyDir: openrestyDir}
 	baseDir := path.Join(rootDir, "base")
 	_ = os.MkdirAll(baseDir, os.ModePerm)
-
-	if timeout == 0 {
-		timeout = 1800
-	}
 	taskItem.AddSubTaskWithAliasAndOps(
 		"SnapDBInfo",
 		func(t *task.Task) error {

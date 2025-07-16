@@ -175,6 +175,7 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 					itemHelper.Task.Log("---------------------- 9 / 11 ----------------------")
 					itemHelper.Task.LogStart(i18n.GetWithName("RecoverWebsite", snap.Name))
 					webFile := path.Join(rootDir, snap.Name, "/website.tar.gz")
+					_ = itemHelper.FileOp.CreateDir(snapJson.OperestyDir, os.ModePerm)
 					var err error
 					if itemHelper.FileOp.Stat(webFile) {
 						err = itemHelper.FileOp.TarGzExtractPro(webFile, snapJson.OperestyDir, "")

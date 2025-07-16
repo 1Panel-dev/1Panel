@@ -45,6 +45,17 @@
                     <el-form-item :label="$t('setting.compressPassword')" prop="secret">
                         <el-input v-model="form.secret"></el-input>
                     </el-form-item>
+                    <el-form-item :label="$t('cronjob.timeout')" prop="timeoutItem">
+                        <el-input type="number" class="selectClass" v-model.number="form.timeoutItem">
+                            <template #append>
+                                <el-select v-model="form.timeoutUint" style="width: 80px">
+                                    <el-option :label="$t('commons.units.second')" value="s" />
+                                    <el-option :label="$t('commons.units.minute')" value="m" />
+                                    <el-option :label="$t('commons.units.hour')" value="h" />
+                                </el-select>
+                            </template>
+                        </el-input>
+                    </el-form-item>
                     <el-form-item :label="$t('commons.table.description')" prop="description">
                         <el-input type="textarea" clearable v-model="form.description" />
                     </el-form-item>
@@ -164,7 +175,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import { loadSnapshotInfo, snapshotCreate } from '@/api/modules/setting';
-import { computeSize, newUUID } from '@/utils/util';
+import { computeSize, newUUID, transferTimeToSecond } from '@/utils/util';
 import i18n from '@/lang';
 import TaskLog from '@/components/log/task/index.vue';
 import IgnoreFile from '@/components/file-batch/index.vue';
@@ -197,6 +208,10 @@ const form = reactive({
     description: '',
     secret: '',
 
+    timeout: 3600,
+    timeoutItem: 3600,
+    timeoutUint: 's',
+
     backupAllImage: false,
     withDockerConf: true,
     withLoginLog: false,
@@ -213,6 +228,8 @@ const form = reactive({
 const rules = reactive({
     fromAccounts: [Rules.requiredSelect],
     downloadAccountID: [Rules.requiredSelect],
+
+    timeoutItem: [Rules.number],
 });
 
 const defaultProps = {
@@ -403,6 +420,7 @@ const submitAddSnapshot = async () => {
     loading.value = true;
     form.taskID = newUUID();
     form.sourceAccountIDs = form.fromAccounts.join(',');
+    form.timeout = transferTimeToSecond(form.timeoutItem + form.timeoutUint);
     await snapshotCreate(form)
         .then(() => {
             loading.value = false;

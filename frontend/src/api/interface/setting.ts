@@ -1,5 +1,4 @@
 import { DateTimeFormats } from '@intlify/core-base';
-import { b } from 'vite/dist/node/types.d-aGj9QkWt';
 
 export namespace Setting {
     export interface SettingInfo {
@@ -135,6 +134,7 @@ export namespace Setting {
         downloadAccountID: string;
         description: string;
         secret: string;
+        timeout: number;
 
         appData: Array<DataTree>;
         panelData: Array<DataTree>;
@@ -167,6 +167,7 @@ export namespace Setting {
         createdAt: DateTimeFormats;
         version: string;
         secret: string;
+        timeout: number;
 
         taskID: string;
         taskRecoverID: string;

@@ -18,6 +18,7 @@ type SnapshotCreate struct {
 	Description       string `json:"description" validate:"max=256"`
 	Secret            string `json:"secret"`
 	InterruptStep     string `json:"interruptStep"`
+	Timeout           uint   `json:"timeout"`
 
 	AppData    []DataTree `json:"appData"`
 	BackupData []DataTree `json:"backupData"`
