@@ -216,7 +216,6 @@ const ssls = ref();
 const acmeAccounts = ref();
 const websiteSSL = ref();
 const rules = ref({
-    hsts: [Rules.requiredInput],
     type: [Rules.requiredSelect],
     privateKey: [Rules.requiredInput],
     certificate: [Rules.requiredInput],
