@@ -136,7 +136,7 @@ func (r *Local) Backup(info BackupInfo) error {
 	}
 	defer outfile.Close()
 	global.LOG.Infof("start to pg_dump | gzip > %s.gzip", info.TargetDir+"/"+info.FileName)
-	cmd := exec.Command("docker", "exec", r.ContainerName, "pg_dump", "-F", "c", "-U", r.Username, "-d", info.Name)
+	cmd := exec.Command("docker", "exec", "-e", fmt.Sprintf("PGPASSWORD=%s", r.Password), r.ContainerName, "pg_dump", "-F", "c", "-U", r.Username, "-d", info.Name)
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
 

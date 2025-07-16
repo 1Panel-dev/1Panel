@@ -28,7 +28,7 @@ type PostgresqlClient interface {
 
 func NewPostgresqlClient(conn client.DBInfo) (PostgresqlClient, error) {
 	if conn.From == "local" {
-		connArgs := []string{"exec", conn.Address, "psql", "-t", "-U", conn.Username, "-c"}
+		connArgs := []string{"exec", "-e", fmt.Sprintf("PGPASSWORD=%s", conn.Password), conn.Address, "psql", "-t", "-U", conn.Username, "-c"}
 		return client.NewLocal(connArgs, conn.Address, conn.Username, conn.Password, conn.Database), nil
 	}
 	escapedUsername := url.QueryEscape(conn.Username)

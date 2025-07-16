@@ -92,7 +92,7 @@ func (u *DatabaseService) LoadItems(dbType string) ([]dto.DatabaseItem, error) {
 	dbs, err := databaseRepo.GetList(databaseRepo.WithTypeList(dbType))
 	var datas []dto.DatabaseItem
 	for _, db := range dbs {
-		if dbType == "postgresql" {
+		if dbType == constant.AppPostgresql || dbType == constant.AppPostgresqlCluster {
 			items, _ := postgresqlRepo.List(postgresqlRepo.WithByPostgresqlName(db.Name))
 			for _, item := range items {
 				var dItem dto.DatabaseItem

@@ -44,6 +44,8 @@ func (u *DBCommonService) LoadDatabaseFile(req dto.OperationWithNameAndType) (st
 	switch req.Type {
 	case "mysql-cluster-conf":
 		filePath = path.Join(global.Dir.DataDir, fmt.Sprintf("apps/mysql-cluster/%s/conf/my.cnf", req.Name))
+	case "postgresql-cluster-conf":
+		filePath = path.Join(global.Dir.DataDir, fmt.Sprintf("apps/postgresql-cluster/%s/data/postgresql.conf", req.Name))
 	case "mysql-conf":
 		filePath = path.Join(global.Dir.DataDir, fmt.Sprintf("apps/mysql/%s/conf/my.cnf", req.Name))
 	case "mariadb-conf":

@@ -11,6 +11,7 @@ type DBInfo struct {
 	Port     uint   `json:"port"`
 	Username string `json:"userName"`
 	Password string `json:"password"`
+	AppKey   string `json:"appKey"`
 
 	Timeout uint `json:"timeout"` // second
 }

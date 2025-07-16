@@ -445,7 +445,7 @@ const checkExist = (data: App.CheckInstalled) => {
 
 const loadDBOptions = async () => {
     try {
-        const res = await listDatabases('postgresql');
+        const res = await listDatabases('postgresql,postgresql-cluster');
         let datas = res.data || [];
         dbOptionsLocal.value = [];
         dbOptionsRemote.value = [];

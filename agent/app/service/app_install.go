@@ -473,13 +473,17 @@ func (a *AppInstallService) SyncAll(systemInit bool) error {
 func (a *AppInstallService) GetServices(key string) ([]response.AppService, error) {
 	var res []response.AppService
 	if DatabaseKeys[key] > 0 {
+		types := []string{key}
 		if key == constant.AppPostgres {
 			key = constant.AppPostgresql
 		}
-		types := []string{key}
-		if key == constant.AppMysql {
+		switch key {
+		case constant.AppMysql:
 			types = []string{constant.AppMysql, constant.AppMysqlCluster}
+		case constant.AppPostgresql:
+			types = []string{constant.AppPostgresql, constant.AppPostgresqlCluster}
 		}
+
 		dbs, _ := databaseRepo.GetList(repo.WithTypes(types))
 		if len(dbs) == 0 {
 			return res, nil
