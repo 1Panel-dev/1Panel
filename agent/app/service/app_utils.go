@@ -256,6 +256,9 @@ func createLink(ctx context.Context, installTask *task.Task, app model.App, appI
 				switch database.Type {
 				case constant.AppPostgresql, constant.AppPostgres, constant.AppPostgresqlCluster:
 					oldPostgresqlDb, _ := postgresqlRepo.Get(repo.WithByName(dbConfig.DbName), repo.WithByFrom(constant.ResourceLocal))
+					if oldPostgresqlDb.ID == 0 {
+						oldPostgresqlDb, _ = postgresqlRepo.Get(repo.WithByName(dbConfig.DbName), repo.WithByFrom(constant.AppResourceRemote))
+					}
 					resourceId = oldPostgresqlDb.ID
 					if oldPostgresqlDb.ID > 0 {
 						if oldPostgresqlDb.Username != dbConfig.DbUser || oldPostgresqlDb.Password != dbConfig.Password {
