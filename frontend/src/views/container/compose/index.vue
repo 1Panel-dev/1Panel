@@ -3,7 +3,6 @@
         <div v-show="isOnDetail">
             <ComposeDetail ref="composeDetailRef" />
         </div>
-
         <docker-status
             v-model:isActive="isActive"
             v-model:isExist="isExist"

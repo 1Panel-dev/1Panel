@@ -1,12 +1,12 @@
 <template>
     <div v-loading="loading">
-        <div class="app-content" style="margin-top: 20px">
-            <el-card class="app-card">
-                <el-row :gutter="20">
-                    <div>
+        <div class="app-status card-interval">
+            <el-card>
+                <el-row :gutter="20" class="items-center">
+                    <div class="ml-5">
                         <el-tag effect="dark" type="success">{{ composeName }}</el-tag>
                     </div>
-                    <div v-if="createdBy === '1Panel'" style="margin-left: 50px">
+                    <div v-if="createdBy === '1Panel'" class="ml-10">
                         <el-button link type="primary" @click="onComposeOperate('up')">
                             {{ $t('commons.operate.start') }}
                         </el-button>
@@ -32,7 +32,7 @@
             </el-card>
         </div>
         <LayoutContent
-            style="margin-top: 30px"
+            style="margin-top: 10px"
             back-name="Compose"
             :title="$t('container.containerList')"
             :reload="true"
@@ -335,11 +335,6 @@ defineExpose({
 </script>
 
 <style lang="scss" scoped>
-.app-card {
-    font-size: 14px;
-    height: 60px;
-}
-
 .app-content {
     height: 50px;
 }

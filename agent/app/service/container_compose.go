@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"os/exec"
 	"path"
 	"sort"
 	"strings"
@@ -174,7 +173,7 @@ func (u *ContainerService) TestCompose(req dto.ComposeCreate) (bool, error) {
 	if err := newComposeEnv(req.Path, req.Env); err != nil {
 		return false, err
 	}
-	cmd := exec.Command("docker", "compose", "-f", req.Path, "config")
+	cmd := getComposeCmd(req.Path, "config")
 	stdout, err := cmd.CombinedOutput()
 	if err != nil {
 		return false, errors.New(string(stdout))
@@ -201,7 +200,7 @@ func (u *ContainerService) CreateCompose(req dto.ComposeCreate) error {
 	}
 	go func() {
 		taskItem.AddSubTask(i18n.GetMsgByKey("ComposeCreate"), func(t *task.Task) error {
-			cmd := exec.Command("docker", "compose", "-f", req.Path, "up", "-d")
+			cmd := getComposeCmd(req.Path, "up")
 			out, err := cmd.CombinedOutput()
 			taskItem.Log(i18n.GetWithName("ComposeCreateRes", string(out)))
 			if err != nil {
