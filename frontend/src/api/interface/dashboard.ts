@@ -77,6 +77,9 @@ export namespace Dashboard {
         memoryTotal: number;
         memoryAvailable: number;
         memoryUsed: number;
+        memoryFree: number;
+        memoryShard: number;
+        memoryCache: number;
         memoryUsedPercent: number;
         swapMemoryTotal: number;
         swapMemoryAvailable: number;

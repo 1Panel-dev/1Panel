@@ -75,7 +75,12 @@
                 <el-tag style="font-weight: 500">{{ $t('home.mem') }}:</el-tag>
                 <el-tag class="tagClass">{{ $t('home.total') }}: {{ computeSize(currentInfo.memoryTotal) }}</el-tag>
                 <el-tag class="tagClass">{{ $t('home.used') }}: {{ computeSize(currentInfo.memoryUsed) }}</el-tag>
-                <el-tag class="tagClass">{{ $t('home.free') }}: {{ computeSize(currentInfo.memoryAvailable) }}</el-tag>
+                <el-tag class="tagClass">{{ $t('home.free') }}: {{ computeSize(currentInfo.memoryFree) }}</el-tag>
+                <el-tag class="tagClass">{{ $t('home.shard') }}: {{ computeSize(currentInfo.memoryShard) }}</el-tag>
+                <el-tag class="tagClass">{{ $t('home.cache') }}: {{ computeSize(currentInfo.memoryCache) }}</el-tag>
+                <el-tag class="tagClass">
+                    {{ $t('home.available') }}: {{ computeSize(currentInfo.memoryAvailable) }}
+                </el-tag>
                 <el-tag class="tagClass">
                     {{ $t('home.percent') }}: {{ formatNumber(currentInfo.memoryUsedPercent) }}%
                 </el-tag>
@@ -304,6 +309,9 @@ const currentInfo = ref<Dashboard.CurrentInfo>({
 
     memoryTotal: 0,
     memoryAvailable: 0,
+    memoryCache: 0,
+    memoryFree: 0,
+    memoryShard: 0,
     memoryUsed: 0,
     memoryUsedPercent: 0,
     swapMemoryTotal: 0,

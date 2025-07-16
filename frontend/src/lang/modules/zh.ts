@@ -403,7 +403,10 @@ const message = {
         fileSystem: '文件系统',
         total: '总数',
         used: '已用',
-        free: '可用',
+        cache: '缓存',
+        free: '空闲',
+        shard: '共享',
+        available: '可用',
         percent: '使用率',
         goInstall: '去安装',
 

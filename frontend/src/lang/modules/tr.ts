@@ -420,7 +420,10 @@ const message = {
         fileSystem: 'Dosya sistemi',
         total: 'Toplam',
         used: 'Kullanılan',
+        cache: 'Önbellek',
         free: 'Boş',
+        shard: 'Parçalı',
+        available: 'Kullanılabilir',
         percent: 'Kullanım',
         goInstall: 'Yüklemeye git',
 

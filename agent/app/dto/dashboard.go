@@ -74,8 +74,11 @@ type DashboardCurrent struct {
 	CPUTotal       int       `json:"cpuTotal"`
 
 	MemoryTotal       uint64  `json:"memoryTotal"`
-	MemoryAvailable   uint64  `json:"memoryAvailable"`
 	MemoryUsed        uint64  `json:"memoryUsed"`
+	MemoryFree        uint64  `json:"memoryFree"`
+	MemoryShard       uint64  `json:"memoryShard"`
+	MemoryCache       uint64  `json:"memoryCache"`
+	MemoryAvailable   uint64  `json:"memoryAvailable"`
 	MemoryUsedPercent float64 `json:"memoryUsedPercent"`
 
 	SwapMemoryTotal       uint64  `json:"swapMemoryTotal"`

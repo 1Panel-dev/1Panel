@@ -411,7 +411,10 @@ const message = {
         fileSystem: 'Sistem Fail',
         total: 'Jumlah',
         used: 'Digunakan',
-        free: 'Percuma',
+        cache: 'Cache',
+        free: 'Bebas',
+        shard: 'Shard',
+        available: 'Tersedia',
         percent: 'Penggunaan',
         goInstall: 'Pergi pasang',
 

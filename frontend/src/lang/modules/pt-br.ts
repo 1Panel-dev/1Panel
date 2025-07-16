@@ -409,7 +409,10 @@ const message = {
         fileSystem: 'Sistema de arquivos',
         total: 'Total',
         used: 'Usado',
+        cache: 'Cache',
         free: 'Livre',
+        shard: 'Fragmentado',
+        available: 'Disponível',
         percent: 'Utilização',
         goInstall: 'Ir para instalação',
 

@@ -415,7 +415,10 @@ const message = {
         fileSystem: 'File system',
         total: 'Total',
         used: 'Used',
+        cache: 'Cache',
         free: 'Free',
+        shard: 'Sharded',
+        available: 'Available',
         percent: 'Utilization',
         goInstall: 'Go install',
 

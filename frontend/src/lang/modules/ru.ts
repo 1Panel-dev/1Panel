@@ -406,7 +406,10 @@ const message = {
         fileSystem: 'Файловая система',
         total: 'Всего',
         used: 'Использовано',
+        cache: 'Кэш',
         free: 'Свободно',
+        shard: 'Шардированный',
+        available: 'Доступно',
         percent: 'Утилизация',
         goInstall: 'Установить',
 

@@ -402,7 +402,10 @@ const message = {
         fileSystem: 'ファイルシステム',
         total: '合計',
         used: '使用済み',
-        free: '無料',
+        cache: 'キャッシュ',
+        free: '空き',
+        shard: 'シャーディング',
+        available: '利用可能',
         percent: '利用',
         goInstall: 'インストールします',
 
