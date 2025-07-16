@@ -78,7 +78,7 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 		global.LOG.Errorf("new task for create snapshot failed, err: %v", err)
 		return err
 	}
-	rootDir := path.Join(global.Dir.TmpDir, "system", snap.Name)
+	rootDir := path.Join(global.Dir.LocalBackupDir, "tmp/system", snap.Name)
 	if _, err := os.Stat(rootDir); err != nil && os.IsNotExist(err) {
 		_ = os.MkdirAll(rootDir, os.ModePerm)
 	}

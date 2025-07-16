@@ -268,7 +268,7 @@ func (u *CronjobService) uploadCronjobBackFile(cronjob model.Cronjob, task *task
 	}()
 	var errItem error
 	accounts := strings.Split(cronjob.SourceAccountIDs, ",")
-	cloudSrc := strings.TrimPrefix(file, global.Dir.TmpDir+"/")
+	cloudSrc := strings.TrimPrefix(file, global.Dir.LocalBackupDir+"/")
 	for _, account := range accounts {
 		if len(account) != 0 {
 			task.LogStart(i18n.GetMsgWithMap("UploadFile", map[string]interface{}{

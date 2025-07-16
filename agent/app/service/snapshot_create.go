@@ -123,7 +123,7 @@ func (u *SnapshotService) SnapshotReCreate(id uint) error {
 }
 
 func handleSnapshot(req dto.SnapshotCreate, taskItem *task.Task, jobID, retry, timeout uint) error {
-	rootDir := path.Join(global.Dir.TmpDir, "system", req.Name)
+	rootDir := path.Join(global.Dir.LocalBackupDir, "tmp/system", req.Name)
 	openrestyDir, _ := settingRepo.GetValueByKey("WEBSITE_DIR")
 	itemHelper := snapHelper{SnapID: req.ID, Task: *taskItem, FileOp: files.NewFileOp(), Ctx: context.Background(), OpenrestyDir: openrestyDir}
 	baseDir := path.Join(rootDir, "base")
@@ -406,6 +406,7 @@ func snapBackupData(snap snapHelper, req dto.SnapshotCreate, targetDir string) e
 	excludes := loadBackupExcludes(snap, req.BackupData)
 	excludes = append(excludes, req.IgnoreFiles...)
 	excludes = append(excludes, "./system_snapshot")
+	excludes = append(excludes, "./tmp")
 	for _, item := range req.AppData {
 		for _, itemApp := range item.Children {
 			if itemApp.Label == "appBackup" {
@@ -517,7 +518,7 @@ func snapCompress(snap snapHelper, rootDir string, secret string) error {
 	snap.Task.Log("---------------------- 7 / 8 ----------------------")
 	snap.Task.LogStart(i18n.GetMsgByKey("SnapCompress"))
 
-	tmpDir := path.Join(global.Dir.TmpDir, "system")
+	tmpDir := path.Join(global.Dir.LocalBackupDir, "tmp/system")
 	fileName := fmt.Sprintf("%s.tar.gz", path.Base(rootDir))
 	err := snap.FileOp.TarGzCompressPro(true, rootDir, path.Join(tmpDir, fileName), secret, "")
 	snap.Task.LogWithStatus(i18n.GetMsgByKey("SnapCompressFile"), err)
@@ -541,7 +542,7 @@ func snapUpload(snap snapHelper, accounts string, file string) error {
 	snap.Task.Log("---------------------- 8 / 8 ----------------------")
 	snap.Task.LogStart(i18n.GetMsgByKey("SnapUpload"))
 
-	source := path.Join(global.Dir.TmpDir, "system", path.Base(file))
+	source := path.Join(global.Dir.LocalBackupDir, "tmp/system", path.Base(file))
 	accountMap, err := NewBackupClientMap(strings.Split(accounts, ","))
 	snap.Task.LogWithStatus(i18n.GetMsgByKey("SnapLoadBackup"), err)
 	if err != nil {

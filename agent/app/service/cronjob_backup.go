@@ -57,7 +57,7 @@ func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time, t
 			record.Name = app.App.Key
 			record.DetailName = app.Name
 			record.DownloadAccountID, record.SourceAccountIDs = cronjob.DownloadAccountID, cronjob.SourceAccountIDs
-			backupDir := path.Join(global.Dir.TmpDir, fmt.Sprintf("app/%s/%s", app.App.Key, app.Name))
+			backupDir := path.Join(global.Dir.LocalBackupDir, fmt.Sprintf("app/%s/%s", app.App.Key, app.Name))
 			record.FileName = fmt.Sprintf("app_%s_%s.tar.gz", app.Name, startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5))
 			if err := doAppBackup(&app, task, backupDir, record.FileName, cronjob.ExclusionRules, cronjob.Secret); err != nil {
 				if retry < int(cronjob.RetryTimes) || !cronjob.IgnoreErr {
@@ -108,7 +108,7 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, startTime time.Tim
 			record.Name = web.Alias
 			record.DetailName = web.Alias
 			record.DownloadAccountID, record.SourceAccountIDs = cronjob.DownloadAccountID, cronjob.SourceAccountIDs
-			backupDir := path.Join(global.Dir.TmpDir, fmt.Sprintf("website/%s", web.Alias))
+			backupDir := path.Join(global.Dir.LocalBackupDir, fmt.Sprintf("website/%s", web.Alias))
 			record.FileName = fmt.Sprintf("website_%s_%s.tar.gz", web.Alias, startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5))
 
 			if err := doWebsiteBackup(&web, taskItem, backupDir, record.FileName, cronjob.ExclusionRules, cronjob.Secret); err != nil {
@@ -163,7 +163,7 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, startTime time.Ti
 			record.DetailName = dbInfo.Name
 			record.DownloadAccountID, record.SourceAccountIDs = cronjob.DownloadAccountID, cronjob.SourceAccountIDs
 
-			backupDir := path.Join(global.Dir.TmpDir, fmt.Sprintf("database/%s/%s/%s", dbInfo.DBType, record.Name, dbInfo.Name))
+			backupDir := path.Join(global.Dir.LocalBackupDir, fmt.Sprintf("database/%s/%s/%s", dbInfo.DBType, record.Name, dbInfo.Name))
 			record.FileName = fmt.Sprintf("db_%s_%s.sql.gz", dbInfo.Name, startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5))
 			if cronjob.DBType == "mysql" || cronjob.DBType == "mariadb" || cronjob.DBType == "mysql-cluster" {
 				if err := doMysqlBackup(dbInfo, backupDir, record.FileName); err != nil {
@@ -215,7 +215,7 @@ func (u *CronjobService) handleDirectory(cronjob model.Cronjob, startTime time.T
 			return err
 		}
 		fileName := fmt.Sprintf("%s.tar.gz", startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5))
-		backupDir := path.Join(global.Dir.TmpDir, fmt.Sprintf("%s/%s", cronjob.Type, cronjob.Name))
+		backupDir := path.Join(global.Dir.LocalBackupDir, fmt.Sprintf("%s/%s", cronjob.Type, cronjob.Name))
 
 		fileOp := files.NewFileOp()
 		if cronjob.IsDir {
@@ -261,7 +261,7 @@ func (u *CronjobService) handleSystemLog(cronjob model.Cronjob, startTime time.T
 		}
 		nameItem := startTime.Format(constant.DateTimeSlimLayout) + common.RandStrAndNum(5)
 		fileName := fmt.Sprintf("system_log_%s.tar.gz", nameItem)
-		backupDir := path.Join(global.Dir.TmpDir, "log", nameItem)
+		backupDir := path.Join(global.Dir.LocalBackupDir, "log", nameItem)
 		if err := handleBackupLogs(taskItem, backupDir, fileName, cronjob.Secret); err != nil {
 			return err
 		}
