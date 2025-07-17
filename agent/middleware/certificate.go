@@ -3,6 +3,7 @@ package middleware
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/global"
@@ -25,9 +26,14 @@ func Certificate() gin.HandlerFunc {
 			helper.InternalServer(c, fmt.Errorf("err certificate"))
 			return
 		}
-		masterProxyID := c.Request.Header.Get("Proxy-ID")
+		conn := c.Request.Header.Get("Connection")
+		if conn == "Upgrade" {
+			c.Next()
+			return
+		}
+		masterProxyID := c.Request.Header.Get("Proxy-Id")
 		proxyID, err := cmd.RunDefaultWithStdoutBashC("cat /etc/1panel/.nodeProxyID")
-		if err == nil && len(proxyID) != 0 && proxyID != masterProxyID {
+		if err == nil && len(proxyID) != 0 && strings.TrimSpace(proxyID) != strings.TrimSpace(masterProxyID) {
 			helper.InternalServer(c, fmt.Errorf("err proxy id"))
 			return
 		}
