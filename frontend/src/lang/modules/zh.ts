@@ -3382,6 +3382,8 @@ const message = {
             master: '主节点',
             slave: '从节点',
             replicaStatus: '主从状态',
+            unhealthyDeleteError: '安装节点状态异常，请在节点列表检查后重试！',
+            replicaStatusError: '状态获取异常 请检查主节点',
         },
     },
 };

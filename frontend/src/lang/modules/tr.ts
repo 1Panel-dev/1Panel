@@ -3697,6 +3697,9 @@ const message = {
             master: 'Главный узел',
             slave: 'Подчиненный узел',
             replicaStatus: 'Ana-Çalışan Durumu',
+            unhealthyDeleteError:
+                'Yükleme düğümü durumu anormal, lütfen düğüm listesini kontrol edin ve tekrar deneyin!',
+            replicaStatusError: 'Durum alımı anormal, lütfen ana düğümü kontrol edin.',
         },
     },
 };

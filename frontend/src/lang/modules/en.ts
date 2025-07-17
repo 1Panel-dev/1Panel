@@ -3657,6 +3657,8 @@ const message = {
             master: 'Master Node',
             slave: 'Slave Node',
             replicaStatus: 'Master-Slave Status',
+            unhealthyDeleteError: 'The installation node status is abnormal, please check the node list and try again!',
+            replicaStatusError: 'Status acquisition is abnormal, please check the master node.',
         },
     },
 };

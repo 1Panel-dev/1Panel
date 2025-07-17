@@ -125,6 +125,7 @@ var DatabaseKeys = map[string]uint{
 	constant.AppMemcached:         11211,
 	constant.AppMysqlCluster:      3306,
 	constant.AppPostgresqlCluster: 5432,
+	constant.AppRedisCluster:      6379,
 }
 
 var ToolKeys = map[string]uint{

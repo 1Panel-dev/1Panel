@@ -28,7 +28,7 @@ type IRedisService interface {
 	UpdatePersistenceConf(req dto.RedisConfPersistenceUpdate) error
 	ChangePassword(info dto.ChangeRedisPass) error
 
-	LoadStatus(req dto.OperationWithName) (*dto.RedisStatus, error)
+	LoadStatus(req dto.LoadRedisStatus) (*dto.RedisStatus, error)
 	LoadConf(req dto.OperationWithName) (*dto.RedisConf, error)
 	LoadPersistenceConf(req dto.OperationWithName) (*dto.RedisPersistence, error)
 
@@ -129,8 +129,8 @@ func (u *RedisService) UpdatePersistenceConf(req dto.RedisConfPersistenceUpdate)
 	return nil
 }
 
-func (u *RedisService) LoadStatus(req dto.OperationWithName) (*dto.RedisStatus, error) {
-	redisInfo, err := appInstallRepo.LoadBaseInfo("redis", req.Name)
+func (u *RedisService) LoadStatus(req dto.LoadRedisStatus) (*dto.RedisStatus, error) {
+	redisInfo, err := appInstallRepo.LoadBaseInfo(req.Type, req.Name)
 	if err != nil {
 		return nil, err
 	}

@@ -3608,6 +3608,9 @@ const message = {
             master: 'Nó Mestre',
             slave: 'Nó Escravo',
             replicaStatus: 'Status Mestre-Escravo',
+            unhealthyDeleteError:
+                'O status do nó de instalação está anormal, verifique a lista de nós e tente novamente!',
+            replicaStatusError: 'A aquisição do status está anormal, verifique o nó mestre.',
         },
     },
 };

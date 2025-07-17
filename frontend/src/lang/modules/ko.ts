@@ -3458,6 +3458,8 @@ const message = {
             master: '마스터 노드',
             slave: '슬레이브 노드',
             replicaStatus: '마스터-슬레이브 상태',
+            unhealthyDeleteError: '설치 노드 상태가 비정상입니다. 노드 목록을 확인한 후 다시 시도하세요!',
+            replicaStatusError: '상태 획득이 비정상입니다. 마스터 노드를 확인하세요.',
         },
     },
 };

@@ -153,6 +153,7 @@ const useOld = ref(false);
 
 const redisStatus = ref();
 const database = ref();
+const dbType = ref('redis');
 
 const formRef = ref<FormInstance>();
 const redisConf = ref();
@@ -163,6 +164,7 @@ const settingShow = ref<boolean>(false);
 interface DialogProps {
     database: string;
     status: string;
+    type: string;
 }
 
 const changeTab = (val: string) => {
@@ -179,7 +181,7 @@ const changeTab = (val: string) => {
             loadForm();
             break;
         case 'status':
-            statusRef.value!.acceptParams({ status: redisStatus.value, database: database.value });
+            statusRef.value!.acceptParams({ status: redisStatus.value, database: database.value, type: dbType.value });
             break;
     }
 };
@@ -191,6 +193,7 @@ const changeLoading = (status: boolean) => {
 const acceptParams = (prop: DialogProps): void => {
     redisStatus.value = prop.status;
     database.value = prop.database;
+    dbType.value = prop.type;
     settingShow.value = true;
     changeTab('status');
 };
@@ -274,7 +277,7 @@ const submitForm = async () => {
 
 const getDefaultConfig = async () => {
     loading.value = true;
-    await getAppDefaultConfig('redis', '')
+    await getAppDefaultConfig(dbType.value, '')
         .then((res) => {
             redisConf.value = res.data;
             useOld.value = true;
@@ -323,7 +326,7 @@ const loadForm = async () => {
 const loadConfFile = async () => {
     useOld.value = false;
     loading.value = true;
-    await loadDBFile('redis-conf', database.value)
+    await loadDBFile(dbType.value + '-conf', database.value)
         .then((res) => {
             loading.value = false;
             redisConf.value = res.data;

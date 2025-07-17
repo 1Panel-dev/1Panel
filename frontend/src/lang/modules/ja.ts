@@ -3520,6 +3520,9 @@ const message = {
             master: 'マスターノード',
             slave: 'スレーブノード',
             replicaStatus: 'マスタースレーブステータス',
+            unhealthyDeleteError:
+                'インストールノードのステータスが異常です。ノードリストを確認してから再試行してください！',
+            replicaStatusError: 'ステータスの取得が異常です。マスターノードを確認してください。',
         },
     },
 };

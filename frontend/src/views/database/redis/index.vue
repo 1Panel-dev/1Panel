@@ -188,7 +188,7 @@ const onSetting = async () => {
     isOnSetting.value = true;
     terminalRef.value?.onClose(false);
     terminalShow.value = false;
-    settingRef.value!.acceptParams({ status: redisStatus.value, database: currentDBName.value });
+    settingRef.value!.acceptParams({ status: redisStatus.value, database: currentDBName.value, type: appKey.value });
 };
 
 const loadHeight = () => {
@@ -244,7 +244,7 @@ const changeDatabase = async () => {
 
 const loadDBOptions = async () => {
     try {
-        const res = await listDatabases('redis');
+        const res = await listDatabases('redis,redis-cluster');
         let datas = res.data || [];
         dbOptionsLocal.value = [];
         dbOptionsRemote.value = [];
@@ -318,8 +318,10 @@ const initTerminal = async () => {
         isRefresh.value = !isRefresh.value;
         return;
     }
-    await checkAppInstalled('redis', currentDBName.value)
+    console.log(currentDBName.value);
+    await checkAppInstalled(currentDB.value.type, currentDBName.value)
         .then((res) => {
+            console.log(res.data);
             redisIsExist.value = res.data.isExist;
             redisStatus.value = res.data.status;
             loading.value = false;
@@ -328,7 +330,7 @@ const initTerminal = async () => {
                     terminalShow.value = true;
                     terminalRef.value.acceptParams({
                         endpoint: '/api/v2/containers/exec',
-                        args: `source=redis&name=${currentDBName.value}&from=${currentDB.value.from}`,
+                        args: `source=${currentDB.value.type}&name=${currentDBName.value}&from=${currentDB.value.from}`,
                         error: '',
                         initCmd: '',
                     });

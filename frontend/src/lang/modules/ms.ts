@@ -3601,6 +3601,8 @@ const message = {
             master: 'Node Utama',
             slave: 'Node Hamba',
             replicaStatus: 'Utama-Hamba Status',
+            unhealthyDeleteError: 'Status nod pemasangan tidak normal, sila periksa senarai nod dan cuba lagi!',
+            replicaStatusError: 'Pengambilan status tidak normal, sila periksa nod utama.',
         },
     },
 };

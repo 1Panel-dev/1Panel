@@ -482,6 +482,8 @@ func (a *AppInstallService) GetServices(key string) ([]response.AppService, erro
 			types = []string{constant.AppMysql, constant.AppMysqlCluster}
 		case constant.AppPostgresql:
 			types = []string{constant.AppPostgresql, constant.AppPostgresqlCluster}
+		case constant.AppRedis:
+			types = []string{constant.AppRedis, constant.AppRedisCluster}
 		}
 
 		dbs, _ := databaseRepo.GetList(repo.WithTypes(types))

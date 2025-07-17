@@ -163,21 +163,25 @@ const redisStatus = reactive({
 
 const database = ref();
 const statusShow = ref(false);
+const dbType = ref('redis');
 
 interface DialogProps {
     database: string;
     status: string;
+    type: string;
 }
 const acceptParams = (prop: DialogProps): void => {
     statusShow.value = true;
     database.value = prop.database;
+    dbType.value = prop.type;
     if (prop.status === 'Running') {
         loadStatus();
     }
 };
 
 const loadStatus = async () => {
-    const res = await loadRedisStatus(database.value);
+    console.log('loadStatus', database.value);
+    const res = await loadRedisStatus(dbType.value, database.value);
     let hit = (
         (Number(res.data.keyspace_hits) / (Number(res.data.keyspace_hits) + Number(res.data.keyspace_misses))) *
         100

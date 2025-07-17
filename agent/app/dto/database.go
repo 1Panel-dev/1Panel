@@ -319,3 +319,8 @@ type DatabaseDelete struct {
 	ForceDelete  bool `json:"forceDelete"`
 	DeleteBackup bool `json:"deleteBackup"`
 }
+
+type LoadRedisStatus struct {
+	Name string `json:"name" validate:"required"`
+	Type string `json:"type" validate:"required"`
+}

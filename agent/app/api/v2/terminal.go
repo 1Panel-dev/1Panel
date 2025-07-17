@@ -89,8 +89,8 @@ func (b *BaseApi) ContainerWsSSH(c *gin.Context) {
 	var containerID string
 	var initCmd []string
 	switch source {
-	case "redis":
-		containerID, initCmd, err = loadRedisInitCmd(c)
+	case "redis", "redis-cluster":
+		containerID, initCmd, err = loadRedisInitCmd(c, source)
 	case "ollama":
 		containerID, initCmd, err = loadOllamaInitCmd(c)
 	case "container":
@@ -127,7 +127,7 @@ func (b *BaseApi) ContainerWsSSH(c *gin.Context) {
 	_ = wsConn.WriteControl(websocket.CloseMessage, nil, dt)
 }
 
-func loadRedisInitCmd(c *gin.Context) (string, []string, error) {
+func loadRedisInitCmd(c *gin.Context, redisType string) (string, []string, error) {
 	name := c.Query("name")
 	from := c.Query("from")
 	commands := []string{"exec", "-it"}
@@ -136,7 +136,7 @@ func loadRedisInitCmd(c *gin.Context) (string, []string, error) {
 		return "", nil, fmt.Errorf("no such database in db, err: %v", err)
 	}
 	if from == "local" {
-		redisInfo, err := appInstallService.LoadConnInfo(dto.OperationWithNameAndType{Name: name, Type: "redis"})
+		redisInfo, err := appInstallService.LoadConnInfo(dto.OperationWithNameAndType{Name: name, Type: redisType})
 		if err != nil {
 			return "", nil, fmt.Errorf("no such app in db, err: %v", err)
 		}

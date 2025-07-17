@@ -3402,6 +3402,8 @@ const message = {
             master: '主節點',
             slave: '從節點',
             replicaStatus: '主從狀態',
+            unhealthyDeleteError: '安裝節點狀態異常，請在節點列表檢查後重試！',
+            replicaStatusError: '狀態獲取異常，請檢查主節點。',
         },
     },
 };
