@@ -136,9 +136,6 @@ const searchLogs = async () => {
         return;
     }
     stopListening();
-    if (!logSearch.isWatch) {
-        return;
-    }
     logs.value = [];
     let currentNode = globalStore.currentNode;
     if (props.node && props.node !== '') {
