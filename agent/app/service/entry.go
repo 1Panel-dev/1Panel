@@ -50,4 +50,5 @@ var (
 	taskRepo = repo.NewITaskRepo()
 
 	groupRepo = repo.NewIGroupRepo()
+	alertRepo = repo.NewIAlertRepo()
 )

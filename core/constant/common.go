@@ -116,6 +116,7 @@ var WebUrlMap = map[string]struct{}{
 	"/settings/license":       {},
 	"/settings/about":         {},
 	"/settings/safe":          {},
+	"/settings/alert":         {},
 	"/settings/snapshot":      {},
 	"/settings/expired":       {},
 

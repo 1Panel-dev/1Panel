@@ -423,3 +423,17 @@ ErrAlertRemote: 'Alarm mesajı uzak hata, lütfen kontrol edin ve tekrar deneyin
 
 #task - runtime
 ErrInstallExtension: "Zaten devam eden bir kurulum görevi var, görevin bitmesini bekleyin"
+
+# alert mail template
+PanelAlertTitle: "Panel Uyarı Bildirimi"
+TestAlertTitle: "Test E-postası - E-posta Bağlantısını Doğrula"
+TestAlert: "Bu, e-posta gönderim ayarlarınızın doğru yapılandırıldığını doğrulamak için gönderilen bir test e-postasıdır."
+LicenseExpirationAlert: "1Panel lisansınız {{ .day }} gün içinde sona erecek. Detaylar için panele giriş yapın."
+CronJobFailedAlert: "1Panel zamanlanmış görevi '{{ .name }}' başarısız oldu. Detaylar için panele giriş yapın."
+ClamAlert: "1Panel virüs taraması {{ .num }} enfekte dosya tespit etti. Detaylar için panele giriş yapın."
+WebSiteAlert: "1Panel üzerindeki {{ .num }} web sitesi {{ .day }} gün içinde sona erecek. Detaylar için panele giriş yapın."
+SSLAlert: "1Panel üzerindeki {{ .num }} SSL sertifikası {{ .day }} gün içinde sona erecek. Detaylar için panele giriş yapın."
+DiskUsedAlert: "1Panel diski '{{ .name }}' {{ .used }} kullanıldı. Detaylar için panele giriş yapın."
+ResourceAlert: "1Panel üzerinde ortalama {{ .time }} dakikalık {{ .name }} kullanım oranı {{ .used }}. Detaylar için panele giriş yapın."
+PanelVersionAlert: "1Panel için yeni bir sürüm mevcut. Güncellemek için panele giriş yapın."
+PanelPwdExpirationAlert: "1Panel şifreniz {{ .day }} gün içinde sona erecek. Detaylar için panele giriş yapın."

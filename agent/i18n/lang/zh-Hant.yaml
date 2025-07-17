@@ -424,3 +424,17 @@ ErrAlertRemote: '警告訊息遠端錯誤，請檢查後重試！'
 
 #task - runtime
 ErrInstallExtension: "已有安裝任務正在進行，請等待任務結束"
+
+# alert mail template
+PanelAlertTitle: "面板警示通知"
+TestAlertTitle: "測試郵件 - 驗證郵箱連通性"
+TestAlert: "這是一封測試郵件，用於確認您的郵件發送設定是否正確。"
+LicenseExpirationAlert: "您的 1Panel 授權將於 {{ .day }} 天後到期，詳情請登入面板查看。"
+CronJobFailedAlert: "您的 1Panel 面板中，計畫任務 '{{ .name }}' 執行失敗，詳情請登入面板查看。"
+ClamAlert: "您的 1Panel 面板病毒掃描任務發現 {{ .num }} 個受感染的檔案，詳情請登入面板查看。"
+WebSiteAlert: "您的 1Panel 面板中有 {{ .num }} 個網站將於 {{ .day }} 天後到期，詳情請登入面板查看。"
+SSLAlert: "您的 1Panel 面板中有 {{ .num }} 張 SSL 憑證將於 {{ .day }} 天後到期，詳情請登入面板查看。"
+DiskUsedAlert: "您的 1Panel 面板磁碟 '{{ .name }}' 已使用 {{ .used }}，詳情請登入面板查看。"
+ResourceAlert: "您的 1Panel 面板於 {{ .time }} 分鐘內的平均 {{ .name }} 使用率為 {{ .used }}，詳情請登入面板查看。"
+PanelVersionAlert: "您的 1Panel 面板有可升級的新版本，詳情請登入面板查看。"
+PanelPwdExpirationAlert: "您的 1Panel 面板密碼將於 {{ .day }} 天後到期，詳情請登入面板查看。"

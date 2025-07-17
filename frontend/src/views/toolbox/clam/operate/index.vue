@@ -139,8 +139,28 @@
                             </el-button>
                         </el-form-item>
                         <el-form-item
+                            :label="$t('xpack.alert.alertMethod')"
+                            v-if="dialogData.rowData!.hasAlert"
+                            prop="alertMethodItems"
+                        >
+                            <el-select
+                                class="selectClass"
+                                v-model="dialogData.rowData!.alertMethodItems"
+                                multiple
+                                cleanable
+                            >
+                                <el-option value="mail" :label="$t('xpack.alert.mail')" />
+                                <el-option
+                                    value="sms"
+                                    v-if="!globalStore.isIntl"
+                                    :disabled="!dialogData.rowData!.hasAlert || !isProductPro"
+                                    :label="$t('xpack.alert.sms')"
+                                />
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item
                             prop="alertCount"
-                            v-if="dialogData.rowData!.hasAlert && isProductPro"
+                            v-if="dialogData.rowData!.hasAlert"
                             :label="$t('xpack.alert.alertCount')"
                         >
                             <el-input-number
@@ -217,6 +237,11 @@ const acceptParams = (params: DialogProps): void => {
     }
     dialogData.value.rowData.hasAlert = dialogData.value.rowData!.alertCount > 0;
     dialogData.value.rowData!.alertCount = dialogData.value.rowData!.alertCount || 3;
+    if (dialogData.value.rowData!.alertMethod) {
+        dialogData.value.rowData!.alertMethodItems = dialogData.value.rowData!.alertMethod.split(',') || [];
+    } else {
+        dialogData.value.rowData!.alertMethodItems = [];
+    }
     title.value = i18n.global.t('commons.button.' + dialogData.value.title);
     drawerVisible.value = true;
 };
@@ -329,6 +354,7 @@ const rules = reactive({
         { validator: verifySpec, trigger: 'change', required: true },
     ],
     alertCount: [Rules.integerNumber, { validator: checkSendCount, trigger: 'blur' }],
+    alertMethodItems: [Rules.requiredSelect],
 });
 
 type FormInstance = InstanceType<typeof ElForm>;
@@ -407,10 +433,13 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             dialogData.value.rowData.alertTitle = i18n.global.t('toolbox.clam.alertTitle', [
                 dialogData.value.rowData.name,
             ]);
+            dialogData.value.rowData.alertMethod = dialogData.value.rowData.alertMethodItems.join(',');
         } else {
             dialogData.value.rowData.alertTitle = '';
             dialogData.value.rowData.alertCount = 0;
             dialogData.value.rowData.hasAlert = false;
+            dialogData.value.rowData.alertMethod = '';
+            dialogData.value.rowData.alertMethodItems = [];
         }
 
         if (dialogData.value.title === 'edit') {

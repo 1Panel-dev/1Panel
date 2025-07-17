@@ -55,6 +55,8 @@ export namespace Cronjob {
         hasAlert: boolean;
         alertCount: number;
         alertTitle: string;
+        alertMethod: string;
+        alertMethodItems: Array<string>;
     }
     export interface Item {
         val: string;
@@ -97,6 +99,7 @@ export namespace Cronjob {
 
         alertCount: number;
         alertTitle: string;
+        alertMethod: string;
     }
     export interface snapshotRule {
         withImage: boolean;

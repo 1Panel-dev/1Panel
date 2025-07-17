@@ -29,6 +29,9 @@ func InitAgentDB() {
 		migrations.UpdatePHPRuntime,
 		migrations.AddSnapshotIgnore,
 		migrations.InitAppLauncher,
+		migrations.AddTableAlert,
+		migrations.InitAlertConfig,
+		migrations.AddMethodToAlertLog,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

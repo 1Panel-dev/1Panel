@@ -611,40 +611,62 @@
                         </el-card>
 
                         <el-card class="mt-5">
-                            <div v-if="!globalStore.isIntl">
-                                <el-row :gutter="20">
-                                    <LayoutCol>
-                                        <el-form-item prop="hasAlert">
-                                            <el-checkbox v-model="form.hasAlert" :label="$t('xpack.alert.isAlert')" />
-                                            <span class="input-help">{{ $t('xpack.alert.cronJobHelper') }}</span>
+                            <el-row :gutter="20">
+                                <LayoutCol :span="8">
+                                    <el-form-item prop="hasAlert">
+                                        <el-checkbox v-model="form.hasAlert" :label="$t('xpack.alert.isAlert')" />
+                                        <span class="input-help">{{ $t('xpack.alert.cronJobHelper') }}</span>
 
-                                            <span class="input-help logText" v-if="form.hasAlert && !isProductPro">
-                                                {{ $t('xpack.alert.licenseHelper') }}
-                                                <el-link class="link" @click="toUpload" type="primary">
-                                                    {{ $t('license.levelUpPro') }}
-                                                </el-link>
-                                            </span>
-                                        </el-form-item>
-                                    </LayoutCol>
-                                    <LayoutCol>
-                                        <el-form-item
-                                            prop="alertCount"
-                                            v-if="form.hasAlert && isProductPro"
-                                            :label="$t('xpack.alert.alertCount')"
+                                        <span class="input-help logText" v-if="form.hasAlert && !isProductPro">
+                                            {{ $t('xpack.alert.licenseHelper') }}
+                                            <el-link class="link" @click="toUpload" type="primary">
+                                                {{ $t('license.levelUpPro') }}
+                                            </el-link>
+                                        </span>
+                                    </el-form-item>
+                                </LayoutCol>
+                                <LayoutCol :span="6">
+                                    <el-form-item
+                                        :label="$t('xpack.alert.alertMethod')"
+                                        v-if="form.hasAlert"
+                                        prop="alertMethodItems"
+                                    >
+                                        <el-select
+                                            class="selectClass"
+                                            v-model="form.alertMethodItems"
+                                            multiple
+                                            cleanable
                                         >
-                                            <el-input-number
-                                                class="selectClass"
-                                                :min="1"
-                                                step-strictly
-                                                :step="1"
-                                                v-model.number="form.alertCount"
-                                            ></el-input-number>
-                                            <span class="input-help">{{ $t('xpack.alert.alertCountHelper') }}</span>
-                                        </el-form-item>
-                                    </LayoutCol>
-                                </el-row>
-                            </div>
+                                            <el-option value="mail" :label="$t('xpack.alert.mail')" />
+                                            <el-option
+                                                value="sms"
+                                                v-if="!globalStore.isIntl"
+                                                :disabled="!form.hasAlert || !isProductPro"
+                                                :label="$t('xpack.alert.sms')"
+                                            />
+                                        </el-select>
+                                    </el-form-item>
+                                </LayoutCol>
+                                <LayoutCol :span="6">
+                                    <el-form-item
+                                        prop="alertCount"
+                                        v-if="form.hasAlert"
+                                        :label="$t('xpack.alert.alertCount')"
+                                    >
+                                        <el-input-number
+                                            class="selectClass"
+                                            :min="1"
+                                            step-strictly
+                                            :step="1"
+                                            v-model.number="form.alertCount"
+                                        ></el-input-number>
+                                        <span class="input-help">{{ $t('xpack.alert.alertCountHelper') }}</span>
+                                    </el-form-item>
+                                </LayoutCol>
+                            </el-row>
+                        </el-card>
 
+                        <el-card class="mt-5">
                             <el-row :gutter="20">
                                 <LayoutCol :span="20" v-if="hasIgnore()">
                                     <el-form-item>
@@ -794,6 +816,8 @@ const form = reactive<Cronjob.CronjobInfo>({
     hasAlert: false,
     alertCount: 0,
     alertTitle: '',
+    alertMethod: '',
+    alertMethodItems: [],
 });
 
 const search = async () => {
@@ -881,6 +905,11 @@ const search = async () => {
                 form.hasAlert = res.data.alertCount > 0;
                 form.alertCount = res.data.alertCount || 3;
                 form.alertTitle = res.data.alertTitle;
+                if (res.data.alertMethod) {
+                    form.alertMethodItems = res.data.alertMethod.split(',') || [];
+                } else {
+                    form.alertMethodItems = [];
+                }
             })
             .catch(() => {
                 loading.value = false;
@@ -1074,6 +1103,7 @@ const rules = reactive({
     timeoutItem: [Rules.number],
     timeoutUint: [Rules.requiredSelect],
     alertCount: [Rules.integerNumber, { validator: checkSendCount, trigger: 'blur' }],
+    alertMethodItems: [Rules.requiredSelect],
 });
 
 type FormInstance = InstanceType<typeof ElForm>;
@@ -1348,6 +1378,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         form.exclusionRules = form.ignoreFiles.join(',');
         form.snapshotRule = { withImage: form.withImage, ignoreAppIDs: form.ignoreAppIDs };
         form.alertCount = form.hasAlert && isProductPro.value ? form.alertCount : 0;
+        form.alertMethod = form.alertMethodItems.join(',');
         form.alertTitle =
             form.hasAlert && isProductPro.value
                 ? i18n.global.t('cronjob.alertTitle', [i18n.global.t('cronjob.' + form.type), form.name])

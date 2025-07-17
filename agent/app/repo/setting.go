@@ -26,6 +26,7 @@ type ISettingRepo interface {
 	DelMonitorIO(timeForDelete time.Time) error
 	DelMonitorNet(timeForDelete time.Time) error
 	UpdateOrCreate(key, value string) error
+	GetByName(name string) (string, error)
 }
 
 func NewISettingRepo() ISettingRepo {
@@ -107,4 +108,12 @@ func (s *SettingRepo) UpdateOrCreate(key, value string) error {
 		return result.Error
 	}
 	return global.DB.Model(&setting).UpdateColumn("value", value).Error
+}
+
+func (s *SettingRepo) GetByName(name string) (string, error) {
+	var setting model.Setting
+	if err := global.DB.Model(&model.Setting{}).Where("key = ?", name).First(&setting).Error; err != nil {
+		return "", err
+	}
+	return setting.Value, nil
 }

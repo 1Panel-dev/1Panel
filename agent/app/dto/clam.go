@@ -34,6 +34,7 @@ type ClamInfo struct {
 	Spec             string `json:"spec"`
 	Description      string `json:"description"`
 	AlertCount       uint   `json:"alertCount"`
+	AlertMethod      string `json:"alertMethod"`
 }
 
 type ClamLogSearch struct {
@@ -74,6 +75,7 @@ type ClamCreate struct {
 	Description      string `json:"description"`
 	AlertCount       uint   `json:"alertCount"`
 	AlertTitle       string `json:"alertTitle"`
+	AlertMethod      string `json:"alertMethod"`
 }
 
 type ClamUpdate struct {
@@ -87,6 +89,7 @@ type ClamUpdate struct {
 	Description      string `json:"description"`
 	AlertCount       uint   `json:"alertCount"`
 	AlertTitle       string `json:"alertTitle"`
+	AlertMethod      string `json:"alertMethod"`
 }
 
 type ClamUpdateStatus struct {

@@ -425,3 +425,17 @@ ErrAlertRemote: 'Erro remoto na mensagem de alarme, verifique e tente novamente!
 
 #task - runtime
 ErrInstallExtension: "Já existe uma tarefa de instalação em andamento, aguarde a conclusão da tarefa"
+
+# alert mail template
+PanelAlertTitle: "Notificação de Alerta do Painel"
+TestAlertTitle: "E-mail de Teste - Verificar Conectividade de E-mail"
+TestAlert: "Este é um e-mail de teste para verificar se sua configuração de envio de e-mails está correta."
+LicenseExpirationAlert: "A licença do seu 1Panel expirará em {{ .day }} dias. Acesse o painel para mais detalhes."
+CronJobFailedAlert: "A tarefa agendada '{{ .name }}' do seu 1Panel falhou. Acesse o painel para mais detalhes."
+ClamAlert: "A verificação de vírus do 1Panel detectou {{ .num }} arquivos infectados. Acesse o painel para mais detalhes."
+WebSiteAlert: "{{ .num }} sites do seu 1Panel expirarão em {{ .day }} dias. Acesse o painel para mais detalhes."
+SSLAlert: "{{ .num }} certificados SSL do seu 1Panel expirarão em {{ .day }} dias. Acesse o painel para mais detalhes."
+DiskUsedAlert: "O disco '{{ .name }}' do seu 1Panel está com uso de {{ .used }}. Acesse o painel para mais detalhes."
+ResourceAlert: "O uso médio de {{ .name }} em {{ .time }} minutos no seu 1Panel é de {{ .used }}. Acesse o painel para mais detalhes."
+PanelVersionAlert: "Uma nova versão do 1Panel está disponível. Acesse o painel para atualizá-lo."
+PanelPwdExpirationAlert: "A senha do 1Panel expirará em {{ .day }} dias. Acesse o painel para mais detalhes."

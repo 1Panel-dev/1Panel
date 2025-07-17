@@ -15,6 +15,7 @@ var (
 	MonitorDB *gorm.DB
 	TaskDB    *gorm.DB
 	CoreDB    *gorm.DB
+	AlertDB   *gorm.DB
 
 	LOG   *logrus.Logger
 	CONF  ServerConfig
@@ -30,4 +31,7 @@ var (
 	IsMaster bool
 
 	I18n *i18n.Localizer
+
+	AlertBaseJobID     cron.EntryID
+	AlertResourceJobID cron.EntryID
 )

@@ -142,6 +142,8 @@ export namespace Toolbox {
         hasAlert: boolean;
         alertCount: number;
         alertTitle: string;
+        alertMethod: string;
+        alertMethodItems: Array<string>;
     }
     export interface ClamCreate {
         name: string;

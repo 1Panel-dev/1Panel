@@ -10,3 +10,18 @@ const (
 	AlertPushError   = "PushError"
 	AlertPushSuccess = "PushSuccess"
 )
+
+const (
+	CommonConfig = "common"
+	SMSConfig    = "sms"
+	EmailConfig  = "email"
+)
+
+const (
+	WeChat   = "wechat"
+	SMS      = "sms"
+	Email    = "mail"
+	WeCom    = "weCom"
+	DingTalk = "dingTalk"
+	FeiShu   = "feiShu"
+)

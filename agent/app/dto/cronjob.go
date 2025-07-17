@@ -48,8 +48,9 @@ type CronjobOperate struct {
 	IgnoreErr         bool   `json:"ignoreErr"`
 	Secret            string `json:"secret"`
 
-	AlertCount uint   `json:"alertCount"`
-	AlertTitle string `json:"alertTitle"`
+	AlertCount  uint   `json:"alertCount"`
+	AlertTitle  string `json:"alertTitle"`
+	AlertMethod string `json:"alertMethod"`
 }
 
 type SnapshotRule struct {

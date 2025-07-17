@@ -12,6 +12,7 @@ import (
 
 var (
 	DB      *gorm.DB
+	AlertDB *gorm.DB
 	TaskDB  *gorm.DB
 	AgentDB *gorm.DB
 	LOG     *logrus.Logger

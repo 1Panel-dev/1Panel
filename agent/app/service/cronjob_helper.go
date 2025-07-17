@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/utils/alert_push"
 	"os"
 	"path"
 	pathUtils "path"
@@ -19,7 +20,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/1Panel-dev/1Panel/agent/utils/ntp"
-	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 )
 
 func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
@@ -359,5 +359,5 @@ func handleCronJobAlert(cronjob *model.Cronjob) {
 		EntryID:   cronjob.ID,
 		Param:     cronjob.Type,
 	}
-	_ = xpack.PushAlert(pushAlert)
+	_ = alert_push.PushAlert(pushAlert)
 }

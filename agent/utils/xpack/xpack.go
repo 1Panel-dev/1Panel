@@ -52,20 +52,11 @@ func IsUseCustomApp() bool {
 	return false
 }
 
-// alert
-func CreateAlert(createAlert dto.CreateOrUpdateAlert) error {
+func CreateTaskScanSMSAlertLog(alert dto.AlertDTO, create dto.AlertLogCreate, pushAlert dto.PushAlert, method string) error {
 	return nil
 }
-func UpdateAlert(updateAlert dto.CreateOrUpdateAlert) error {
-	return nil
-}
-func DeleteAlert(alertBase dto.AlertBase) error {
-	return nil
-}
-func GetAlert(alertBase dto.AlertBase) uint {
-	return 0
-}
-func PushAlert(pushAlert dto.PushAlert) error {
+
+func CreateSMSAlertLog(info dto.AlertDTO, create dto.AlertLogCreate, project string, params []dto.Param, method string) error {
 	return nil
 }
 

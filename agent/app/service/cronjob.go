@@ -9,12 +9,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
-	"github.com/1Panel-dev/1Panel/agent/buserr"
-	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
-
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/jinzhu/copier"
@@ -67,9 +65,9 @@ func (u *CronjobService) SearchWithPage(search dto.PageCronjob) (int64, interfac
 			AlertType: cronjob.Type,
 			EntryID:   cronjob.ID,
 		}
-		alertCount := xpack.GetAlert(alertBase)
-		if alertCount != 0 {
-			item.AlertCount = alertCount
+		alertInfo, _ := alertRepo.Get(alertRepo.WithByType(alertBase.AlertType), alertRepo.WithByProject(strconv.Itoa(int(alertBase.EntryID))), alertRepo.WithByStatus(constant.AlertEnable))
+		if alertInfo.SendCount != 0 {
+			item.AlertCount = alertInfo.SendCount
 		} else {
 			item.AlertCount = 0
 		}
@@ -91,9 +89,10 @@ func (u *CronjobService) LoadInfo(req dto.OperateByID) (*dto.CronjobOperate, err
 		AlertType: cronjob.Type,
 		EntryID:   cronjob.ID,
 	}
-	alertCount := xpack.GetAlert(alertBase)
-	if alertCount != 0 {
-		item.AlertCount = alertCount
+	alertInfo, _ := alertRepo.Get(alertRepo.WithByType(alertBase.AlertType), alertRepo.WithByProject(strconv.Itoa(int(alertBase.EntryID))), alertRepo.WithByStatus(constant.AlertEnable))
+	item.AlertMethod = alertInfo.Method
+	if alertInfo.SendCount != 0 {
+		item.AlertCount = alertInfo.SendCount
 	} else {
 		item.AlertCount = 0
 	}
@@ -313,13 +312,15 @@ func (u *CronjobService) Create(req dto.CronjobOperate) error {
 		return err
 	}
 	if req.AlertCount != 0 {
-		createAlert := dto.CreateOrUpdateAlert{
-			AlertTitle: req.AlertTitle,
-			AlertCount: req.AlertCount,
-			AlertType:  cronjob.Type,
-			EntryID:    cronjob.ID,
+		createAlert := dto.AlertCreate{
+			Title:     req.AlertTitle,
+			SendCount: req.AlertCount,
+			Method:    req.AlertMethod,
+			Type:      cronjob.Type,
+			Project:   strconv.Itoa(int(cronjob.ID)),
+			Status:    constant.AlertEnable,
 		}
-		err := xpack.CreateAlert(createAlert)
+		err := NewIAlertService().CreateAlert(createAlert)
 		if err != nil {
 			return err
 		}
@@ -367,11 +368,7 @@ func (u *CronjobService) Delete(req dto.CronjobBatchDelete) error {
 		if err := cronjobRepo.Delete(repo.WithByID(id)); err != nil {
 			return err
 		}
-		alertBase := dto.AlertBase{
-			AlertType: cronjob.Type,
-			EntryID:   cronjob.ID,
-		}
-		err := xpack.DeleteAlert(alertBase)
+		err := alertRepo.Delete(alertRepo.WithByProject(strconv.Itoa(int(cronjob.ID))), alertRepo.WithByType(cronjob.Type))
 		if err != nil {
 			return err
 		}
@@ -445,13 +442,14 @@ func (u *CronjobService) Update(id uint, req dto.CronjobOperate) error {
 	if err != nil {
 		return err
 	}
-	updateAlert := dto.CreateOrUpdateAlert{
-		AlertTitle: req.AlertTitle,
-		AlertType:  cronModel.Type,
-		AlertCount: req.AlertCount,
-		EntryID:    cronModel.ID,
+	updateAlert := dto.AlertCreate{
+		Title:     req.AlertTitle,
+		SendCount: req.AlertCount,
+		Method:    req.AlertMethod,
+		Type:      cronjob.Type,
+		Project:   strconv.Itoa(int(cronModel.ID)),
 	}
-	err = xpack.UpdateAlert(updateAlert)
+	err = NewIAlertService().ExternalUpdateAlert(updateAlert)
 	if err != nil {
 		return err
 	}

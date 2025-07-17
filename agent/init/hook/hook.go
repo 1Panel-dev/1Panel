@@ -1,6 +1,7 @@
 package hook
 
 import (
+	"github.com/1Panel-dev/1Panel/agent/utils/alert_push"
 	"os"
 	"strings"
 
@@ -96,7 +97,7 @@ func handleCronJobAlert(cronjob *model.Cronjob) {
 		EntryID:   cronjob.ID,
 		Param:     cronjob.Type,
 	}
-	_ = xpack.PushAlert(pushAlert)
+	_ = alert_push.PushAlert(pushAlert)
 }
 
 func loadLocalDir() {

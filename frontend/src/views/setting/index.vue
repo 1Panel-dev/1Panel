@@ -20,6 +20,10 @@ const buttons = [
         path: '/settings/safe',
     },
     {
+        label: i18n.global.t('xpack.alert.alertNotice'),
+        path: '/settings/alert',
+    },
+    {
         label: i18n.global.t('setting.backupAccount', 2),
         path: '/settings/backupaccount',
     },

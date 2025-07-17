@@ -424,3 +424,17 @@ ErrAlertRemote: 'Ralat jauh mesej penggera, sila semak dan cuba lagi!'
 
 #task - runtime
 ErrInstallExtension: "Tugas pemasangan sudah sedang berjalan, silakan tunggu tugas selesai"
+
+# alert mail template
+PanelAlertTitle: "Notifikasi Amaran Panel"
+TestAlertTitle: "E-mel Ujian - Sahkan Sambungan E-mel"
+TestAlert: "Ini adalah e-mel ujian untuk mengesahkan konfigurasi penghantaran e-mel anda betul."
+LicenseExpirationAlert: "Lesen 1Panel anda akan tamat dalam {{ .day }} hari. Sila log masuk ke panel untuk maklumat lanjut."
+CronJobFailedAlert: "Tugas berjadual 1Panel '{{ .name }}' gagal dilaksanakan. Sila log masuk ke panel untuk butiran lanjut."
+ClamAlert: "Tugas imbasan virus 1Panel menemui {{ .num }} fail yang dijangkiti. Sila log masuk ke panel untuk maklumat lanjut."
+WebSiteAlert: "Terdapat {{ .num }} laman web dalam 1Panel anda yang akan tamat dalam {{ .day }} hari. Sila log masuk ke panel untuk maklumat lanjut."
+SSLAlert: "Terdapat {{ .num }} sijil SSL dalam 1Panel anda yang akan tamat dalam {{ .day }} hari. Sila log masuk ke panel untuk maklumat lanjut."
+DiskUsedAlert: "Cakera '{{ .name }}' dalam 1Panel anda telah menggunakan {{ .used }}. Sila log masuk ke panel untuk maklumat lanjut."
+ResourceAlert: "Penggunaan purata {{ .name }} selama {{ .time }} minit dalam 1Panel anda ialah {{ .used }}. Sila log masuk ke panel untuk maklumat lanjut."
+PanelVersionAlert: "Versi baru 1Panel tersedia. Sila log masuk ke panel untuk menaik taraf."
+PanelPwdExpirationAlert: "Kata laluan 1Panel anda akan tamat dalam {{ .day }} hari. Sila log masuk ke panel untuk maklumat lanjut."

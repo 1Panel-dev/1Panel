@@ -326,7 +326,7 @@ CustomAppstore: 'カスタム アプリケーション ウェアハウス'
 OllamaModelPull: 'Ollama モデル {{ .name }} をプルします'
 OllamaModelSize: "Ollama モデル {{ .name }} のサイズを取得します"
 
-#task - snapshot 
+#task - snapshot
 Snapshot: 'スナップショット'
 SnapDBInfo: '1Panel データベース情報を書き込む'
 SnapCopy: 'ファイルとディレクトリ {{ .name }} をコピーします'
@@ -425,3 +425,17 @@ ErrAlertRemote: 'アラーム メッセージのリモート エラーです。�
 
 #task - runtime
 ErrInstallExtension: "インストールタスクが進行中です、タスクが終了するのを待ってください"
+
+# alert mail template
+PanelAlertTitle: "パネルアラート通知"
+TestAlertTitle: "テストメール - メール接続の確認"
+TestAlert: "これはテストメールです。メール送信設定が正しく構成されているかを確認します。"
+LicenseExpirationAlert: "お使いの 1Panel ライセンスは {{ .day }} 日後に有効期限が切れます。詳細はパネルにログインしてご確認ください。"
+CronJobFailedAlert: "1Panel のスケジュールタスク '{{ .name }}' の実行に失敗しました。詳細はパネルでご確認ください。"
+ClamAlert: "1Panel のウイルススキャンで {{ .num }} 件の感染ファイルが検出されました。詳細はパネルでご確認ください。"
+WebSiteAlert: "1Panel にある {{ .num }} 件のウェブサイトが {{ .day }} 日後に有効期限を迎えます。詳細はパネルでご確認ください。"
+SSLAlert: "1Panel にある {{ .num }} 枚のSSL証明書が {{ .day }} 日後に有効期限を迎えます。詳細はパネルでご確認ください。"
+DiskUsedAlert: "1Panel のディスク '{{ .name }}' は {{ .used }} 使用されています。詳細はパネルでご確認ください。"
+ResourceAlert: "1Panel の {{ .time }} 分間の平均 {{ .name }} 使用率は {{ .used }} です。詳細はパネルでご確認ください。"
+PanelVersionAlert: "1Panel に新しいバージョンが利用可能です。アップグレードはパネルから行ってください。"
+PanelPwdExpirationAlert: "1Panel のパスワードは {{ .day }} 日後に期限切れとなります。詳細はパネルでご確認ください。"

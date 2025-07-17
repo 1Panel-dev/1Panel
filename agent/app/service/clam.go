@@ -3,6 +3,7 @@ package service
 import (
 	"bufio"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/utils/alert_push"
 	"os"
 	"os/exec"
 	"path"
@@ -158,9 +159,10 @@ func (c *ClamService) SearchWithPage(req dto.SearchClamWithPage) (int64, interfa
 			AlertType: "clams",
 			EntryID:   datas[i].ID,
 		}
-		alertCount := xpack.GetAlert(alertBase)
-		if alertCount != 0 {
-			datas[i].AlertCount = alertCount
+		alertInfo, _ := alertRepo.Get(alertRepo.WithByType(alertBase.AlertType), alertRepo.WithByProject(strconv.Itoa(int(alertBase.EntryID))), alertRepo.WithByStatus(constant.AlertEnable))
+		datas[i].AlertMethod = alertInfo.Method
+		if alertInfo.SendCount != 0 {
+			datas[i].AlertCount = alertInfo.SendCount
 		} else {
 			datas[i].AlertCount = 0
 		}
@@ -191,13 +193,15 @@ func (c *ClamService) Create(req dto.ClamCreate) error {
 		return err
 	}
 	if req.AlertCount != 0 {
-		createAlert := dto.CreateOrUpdateAlert{
-			AlertTitle: req.AlertTitle,
-			AlertCount: req.AlertCount,
-			AlertType:  "clams",
-			EntryID:    clam.ID,
+		createAlert := dto.AlertCreate{
+			Title:     req.AlertTitle,
+			SendCount: req.AlertCount,
+			Method:    req.AlertMethod,
+			Type:      "clams",
+			Project:   strconv.Itoa(int(clam.ID)),
+			Status:    constant.AlertEnable,
 		}
-		err := xpack.CreateAlert(createAlert)
+		err := NewIAlertService().CreateAlert(createAlert)
 		if err != nil {
 			return err
 		}
@@ -247,13 +251,14 @@ func (c *ClamService) Update(req dto.ClamUpdate) error {
 	if err := clamRepo.Update(req.ID, upMap); err != nil {
 		return err
 	}
-	updateAlert := dto.CreateOrUpdateAlert{
-		AlertTitle: req.AlertTitle,
-		AlertType:  "clams",
-		AlertCount: req.AlertCount,
-		EntryID:    clam.ID,
+	updateAlert := dto.AlertCreate{
+		Title:     req.AlertTitle,
+		SendCount: req.AlertCount,
+		Method:    req.AlertMethod,
+		Type:      "clams",
+		Project:   strconv.Itoa(int(clam.ID)),
 	}
-	err := xpack.UpdateAlert(updateAlert)
+	err := NewIAlertService().ExternalUpdateAlert(updateAlert)
 	if err != nil {
 		return err
 	}
@@ -297,11 +302,7 @@ func (c *ClamService) Delete(req dto.ClamDelete) error {
 		if err := clamRepo.Delete(repo.WithByID(id)); err != nil {
 			return err
 		}
-		alertBase := dto.AlertBase{
-			AlertType: "clams",
-			EntryID:   clam.ID,
-		}
-		err := xpack.DeleteAlert(alertBase)
+		err := alertRepo.Delete(alertRepo.WithByProject(strconv.Itoa(int(clam.ID))), alertRepo.WithByType("clams"))
 		if err != nil {
 			return err
 		}
@@ -639,7 +640,7 @@ func handleAlert(stdout, clamName string, clamId uint) {
 						EntryID:   clamId,
 						Param:     strconv.Itoa(infectedFiles),
 					}
-					_ = xpack.PushAlert(pushAlert)
+					_ = alert_push.PushAlert(pushAlert)
 					break
 				}
 			}

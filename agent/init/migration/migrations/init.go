@@ -360,3 +360,49 @@ var InitAppLauncher = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddTableAlert = &gormigrate.Migration{
+	ID: "20250122-add-table-alert",
+	Migrate: func(tx *gorm.DB) error {
+		return global.AlertDB.AutoMigrate(&model.Alert{}, &model.AlertTask{}, model.AlertLog{}, model.AlertConfig{})
+	},
+}
+
+var InitAlertConfig = &gormigrate.Migration{
+	ID: "20250705-init-alert-config",
+	Migrate: func(tx *gorm.DB) error {
+		records := []model.AlertConfig{
+			{
+				Type:   "sms",
+				Title:  "xpack.alert.smsConfig",
+				Status: "Enable",
+				Config: "{}",
+			},
+			{
+				Type:   "common",
+				Title:  "xpack.alert.commonConfig",
+				Status: "Enable",
+				Config: `{"AlertDailyNum":50,"IsOffline":"Disable","AlertSendTimeRange":{"noticeAlert":{"sendTimeRange":"08:00:00 - 23:59:59","type":["ssl","siteEndTime","panelPwdEndTime","panelUpdate"]},"resourceAlert":{"sendTimeRange":"00:00:00 - 23:59:59","type":["clams","cronJob","cpu","memory","load","disk"]}}}`,
+			},
+		}
+		for _, r := range records {
+			if err := global.AlertDB.Model(&model.AlertConfig{}).Create(&r).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	},
+}
+
+var AddMethodToAlertLog = &gormigrate.Migration{
+	ID: "20250713-add-method-to-alert_log",
+	Migrate: func(tx *gorm.DB) error {
+		if err := global.AlertDB.AutoMigrate(&model.AlertLog{}); err != nil {
+			return err
+		}
+		if err := global.AlertDB.Model(&model.AlertLog{}).Where("method IS NULL OR method = ''").Update("method", "sms").Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}

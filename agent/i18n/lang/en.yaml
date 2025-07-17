@@ -425,3 +425,17 @@ ErrAlertRemote: 'Alarm message remote error, please check and try again!'
 
 #task - runtime
 ErrInstallExtension: "An installation task is already in progress, please wait for the task to finish"
+
+# alert mail template
+PanelAlertTitle: "Panel Alert Notification"
+TestAlertTitle: "Test Email - Verify Email Connectivity"
+TestAlert: "This is a test email to verify that your email sending configuration is correct."
+LicenseExpirationAlert: "Your 1Panel license will expire in {{ .day }} days. Please log in to the panel for details."
+CronJobFailedAlert: "Your 1Panel scheduled task '{{ .name }}' has failed. Please log in to the panel for details."
+ClamAlert: "Your 1Panel virus scan task has detected {{ .num }} infected files. Please log in to the panel for details."
+WebSiteAlert: "There are {{ .num }} websites on your 1Panel that will expire in {{ .day }} days. Please log in to the panel for details."
+SSLAlert: "There are {{ .num }} SSL certificates on your 1Panel that will expire in {{ .day }} days. Please log in to the panel for details."
+DiskUsedAlert: "Your 1Panel disk '{{ .name }}' has used {{ .used }}. Please log in to the panel for details."
+ResourceAlert: "The average {{ .name }} usage over {{ .time }} minutes on your 1Panel is {{ .used }}. Please log in to the panel for details."
+PanelVersionAlert: "A new version of 1Panel is available. Please log in to the panel to upgrade."
+PanelPwdExpirationAlert: "Your 1Panel password will expire in {{ .day }} days. Please log in to the panel for details."

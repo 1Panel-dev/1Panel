@@ -29,6 +29,16 @@ const settingRouter = {
                     },
                 },
                 {
+                    path: 'alert',
+                    name: 'Alert',
+                    component: () => import('@/views/setting/alert/index.vue'),
+                    hidden: true,
+                    meta: {
+                        requiresAuth: true,
+                        activeMenu: '/settings',
+                    },
+                },
+                {
                     path: 'backupaccount',
                     name: 'BackupAccount',
                     component: () => import('@/views/setting/backup-account/index.vue'),
