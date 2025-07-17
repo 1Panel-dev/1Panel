@@ -1,12 +1,13 @@
 package router
 
 import (
-	"github.com/1Panel-dev/1Panel/core/init/proxy"
 	"net/http"
 	"net/url"
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/core/init/proxy"
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
@@ -56,6 +57,11 @@ func Proxy() gin.HandlerFunc {
 				helper.ErrorWithDetail(c, http.StatusBadRequest, "ErrProxy", err)
 				return
 			}
+			defer func() {
+				if err := recover(); err != nil && err != http.ErrAbortHandler {
+					global.LOG.Debug(err)
+				}
+			}()
 			proxy.LocalAgentProxy.ServeHTTP(c.Writer, c.Request)
 			c.Abort()
 			return
