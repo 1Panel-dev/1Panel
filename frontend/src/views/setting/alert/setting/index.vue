@@ -4,7 +4,9 @@
             <template #title>
                 <div class="flex items-center justify-between">
                     <span>{{ $t('xpack.alert.commonConfig') }}</span>
-                    <el-button plain icon="Edit" @click="onChangeCommon(commonConfig.id)" />
+                    <el-button plain round size="default" @click="onChangeCommon(commonConfig.id)">
+                        {{ $t('commons.button.edit') }}
+                    </el-button>
                 </div>
             </template>
             <template #main>
@@ -50,16 +52,22 @@
                             <div>
                                 <el-button
                                     plain
-                                    icon="Edit"
+                                    round
+                                    size="default"
                                     :disabled="!emailConfig.id"
                                     @click="onChangeEmail(emailConfig.id)"
-                                />
+                                >
+                                    {{ $t('commons.button.edit') }}
+                                </el-button>
                                 <el-button
+                                    size="default"
                                     plain
-                                    icon="Delete"
+                                    round
                                     :disabled="!emailConfig.id"
                                     @click="onDelete(emailConfig.id)"
-                                />
+                                >
+                                    {{ $t('commons.button.delete') }}
+                                </el-button>
                             </div>
                         </div>
                         <div class="text-sm mb-2">{{ $t('xpack.alert.emailConfigHelper') }}</div>
@@ -94,7 +102,9 @@
                         <div class="flex items-center justify-between mb-2">
                             <div class="text-lg font-semibold">{{ $t('xpack.alert.smsConfig') }}</div>
                             <div>
-                                <el-button plain icon="Edit" @click="onChangePhone(smsConfig.id)" />
+                                <el-button plain round @click="onChangePhone(smsConfig.id)">
+                                    {{ $t('commons.button.edit') }}
+                                </el-button>
                             </div>
                         </div>
                         <div class="text-sm mb-2">{{ $t('xpack.alert.smsConfigHelper') }}</div>
@@ -165,8 +175,8 @@ const defaultEmailConfig: EmailConfig = {
         sender: '',
         password: '',
         host: '',
-        port: 465,
-        encryption: 'SSL',
+        port: 25,
+        encryption: 'NONE',
         status: '',
         recipient: '',
     },
@@ -193,11 +203,11 @@ const defaultCommonConfig: CommonConfig = {
         alertDailyNum: 50,
         alertSendTimeRange:
             i18n.global.t('xpack.alert.noticeAlert') +
-            ':' +
+            ': ' +
             '08:00:00 - 23:59:59' +
             ' | ' +
             i18n.global.t('xpack.alert.resourceAlert') +
-            ':' +
+            ': ' +
             '00:00:00 - 23:59:59',
         isOffline: 'Disable',
     },
@@ -280,11 +290,11 @@ const search = async () => {
         const resourceTimeRange = sendTimeRangeValue.value.resourceAlert.sendTimeRange || '00:00:00 - 23:59:59';
         sendTimeRange.value =
             i18n.global.t('xpack.alert.noticeAlert') +
-            ':' +
+            ': ' +
             noticeTimeRange +
             ' | ' +
             i18n.global.t('xpack.alert.resourceAlert') +
-            ':' +
+            ': ' +
             resourceTimeRange;
         isInitialized.value = true;
     } finally {
