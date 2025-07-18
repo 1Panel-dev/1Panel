@@ -18,7 +18,7 @@
                     <el-row>
                         <el-col>
                             <el-form-item :label="$t('xpack.alert.dailyAlertNum')" prop="dailyAlertNum">
-                                {{ commonConfig.config.AlertDailyNum }}
+                                {{ commonConfig.config.alertDailyNum }}
                             </el-form-item>
 
                             <el-form-item :label="$t('xpack.alert.sendTimeRange')" prop="sendTimeRange">
@@ -179,19 +179,19 @@ export interface CommonConfig {
     title: string;
     status: string;
     config: {
-        IsOffline?: string;
-        AlertDailyNum?: number;
-        AlertSendTimeRange?: string;
+        isOffline?: string;
+        alertDailyNum?: number;
+        alertSendTimeRange?: string;
     };
 }
 const defaultCommonConfig: CommonConfig = {
     id: undefined,
     type: 'common',
     title: 'xpack.alert.commonConfig',
-    status: 'Enable',
+    status: 'Ena      ble',
     config: {
-        AlertDailyNum: 50,
-        AlertSendTimeRange:
+        alertDailyNum: 50,
+        alertSendTimeRange:
             i18n.global.t('xpack.alert.noticeAlert') +
             ':' +
             '08:00:00 - 23:59:59' +
@@ -199,7 +199,7 @@ const defaultCommonConfig: CommonConfig = {
             i18n.global.t('xpack.alert.resourceAlert') +
             ':' +
             '00:00:00 - 23:59:59',
-        IsOffline: 'Disable',
+        isOffline: 'Disable',
     },
 };
 
@@ -275,7 +275,7 @@ const search = async () => {
 
         const smsFound = res.data.find((s: any) => s.type === 'sms');
         assignConfig(smsFound, smsConfig, defaultSmsConfig);
-        sendTimeRangeValue.value = commonConfig.value.config.AlertSendTimeRange;
+        sendTimeRangeValue.value = commonConfig.value.config.alertSendTimeRange;
         const noticeTimeRange = sendTimeRangeValue.value.noticeAlert.sendTimeRange || '08:00:00 - 23:59:59';
         const resourceTimeRange = sendTimeRangeValue.value.resourceAlert.sendTimeRange || '00:00:00 - 23:59:59';
         sendTimeRange.value =
@@ -299,9 +299,9 @@ const onChangePhone = (id: any) => {
 const onChangeCommon = (id: any) => {
     sendTimeRangeRef.value.acceptParams({
         id: id,
-        dailyAlertNum: commonConfig.value.config.AlertDailyNum,
+        dailyAlertNum: commonConfig.value.config.alertDailyNum,
         sendTimeRange: sendTimeRangeValue.value,
-        isOffline: commonConfig.value.config.IsOffline,
+        isOffline: commonConfig.value.config.isOffline,
     });
 };
 
@@ -311,13 +311,13 @@ const onChangeEmail = (id: number) => {
 
 const onChangeOffline = async () => {
     if (!isInitialized.value) return;
-    if (!isMaster.value && commonConfig.value.config.IsOffline != '') {
+    if (!isMaster.value && commonConfig.value.config.isOffline != '') {
         let title =
-            commonConfig.value.config.IsOffline == 'Enable'
+            commonConfig.value.config.isOffline == 'Enable'
                 ? i18n.global.t('xpack.alert.offlineOff')
                 : i18n.global.t('xpack.alert.offlineClose');
         let content =
-            commonConfig.value.config.IsOffline == 'Enable'
+            commonConfig.value.config.isOffline == 'Enable'
                 ? i18n.global.t('xpack.alert.offlineOffHelper')
                 : i18n.global.t('xpack.alert.offlineCloseHelper');
         ElMessageBox.confirm(content, title, {
@@ -341,8 +341,8 @@ const onChangeOffline = async () => {
                 }
             })
             .catch(() => {
-                commonConfig.value.config.IsOffline =
-                    commonConfig.value.config.IsOffline == 'Enable' ? 'Disable' : 'Enable';
+                commonConfig.value.config.isOffline =
+                    commonConfig.value.config.isOffline == 'Enable' ? 'Disable' : 'Enable';
             });
     }
 };

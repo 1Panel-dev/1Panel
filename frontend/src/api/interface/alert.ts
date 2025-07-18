@@ -158,8 +158,8 @@ export namespace Alert {
     }
 
     export interface CommonConfig {
-        IsOffline?: string;
-        AlertDailyNum?: number;
-        AlertSendTimeRange?: string;
+        isOffline?: string;
+        alertDailyNum?: number;
+        alertSendTimeRange?: string;
     }
 }

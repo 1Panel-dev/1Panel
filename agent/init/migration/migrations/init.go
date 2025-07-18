@@ -382,7 +382,7 @@ var InitAlertConfig = &gormigrate.Migration{
 				Type:   "common",
 				Title:  "xpack.alert.commonConfig",
 				Status: "Enable",
-				Config: `{"AlertDailyNum":50,"IsOffline":"Disable","AlertSendTimeRange":{"noticeAlert":{"sendTimeRange":"08:00:00 - 23:59:59","type":["ssl","siteEndTime","panelPwdEndTime","panelUpdate"]},"resourceAlert":{"sendTimeRange":"00:00:00 - 23:59:59","type":["clams","cronJob","cpu","memory","load","disk"]}}}`,
+				Config: `{"alertDailyNum":50,"isOffline":"Disable","alertSendTimeRange":{"noticeAlert":{"sendTimeRange":"08:00:00 - 23:59:59","type":["ssl","siteEndTime","panelPwdEndTime","panelUpdate"]},"resourceAlert":{"sendTimeRange":"00:00:00 - 23:59:59","type":["clams","cronJob","cpu","memory","load","disk"]}}}`,
 			},
 		}
 		for _, r := range records {

@@ -91,6 +91,7 @@ import { ElMessageBox } from 'element-plus';
 
 const globalStore = GlobalStore();
 const { t } = i18n.global;
+const isProductPro = ref(false);
 const loading = ref(false);
 const data = ref();
 const isOffline = ref('Disable');
@@ -265,7 +266,7 @@ const searchAlertInfo = async () => {
             const res = await ListAlertConfigs();
             const commonFound = res.data.find((s: any) => s.type === 'common');
             const config: Alert.CommonConfig = JSON.parse(commonFound.config);
-            isOffline.value = config.IsOffline;
+            isOffline.value = config.isOffline;
         } finally {
             loading.value = false;
         }
@@ -274,6 +275,9 @@ const searchAlertInfo = async () => {
 
 onMounted(async () => {
     await searchAlertInfo();
-    await syncAllAlert();
+    isProductPro.value = globalStore.isProductPro;
+    if (globalStore.isProductPro) {
+        await syncAllAlert();
+    }
 });
 </script>

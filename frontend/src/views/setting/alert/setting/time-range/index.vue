@@ -111,9 +111,9 @@ interface DialogProps {
 }
 
 interface ConfigInfo {
-    AlertDailyNum: number;
-    AlertSendTimeRange: SendTimeRange;
-    IsOffline: string;
+    alertDailyNum: number;
+    alertSendTimeRange: SendTimeRange;
+    isOffline: string;
 }
 
 const drawerVisible = ref(false);
@@ -124,9 +124,9 @@ const form = reactive({
 const isOffline = ref();
 const id = ref();
 const configInfo = ref<ConfigInfo>({
-    AlertDailyNum: 0,
-    IsOffline: '',
-    AlertSendTimeRange: {
+    alertDailyNum: 0,
+    isOffline: '',
+    alertSendTimeRange: {
         noticeAlert: { sendTimeRange: '', type: [] },
         resourceAlert: { sendTimeRange: '', type: [] },
     },
@@ -187,15 +187,15 @@ const onSave = async (formEl: FormInstance | undefined) => {
             resourceTimeRange.value !== null
         ) {
             loading.value = true;
-            configInfo.value.AlertSendTimeRange = {
+            configInfo.value.alertSendTimeRange = {
                 noticeAlert: { sendTimeRange: stringifyTimeRange(noticeTimeRange.value), type: noticeValue.value },
                 resourceAlert: {
                     sendTimeRange: stringifyTimeRange(resourceTimeRange.value),
                     type: resourceValue.value,
                 },
             };
-            configInfo.value.IsOffline = isOffline.value;
-            configInfo.value.AlertDailyNum = form.dailyAlertNum;
+            configInfo.value.isOffline = isOffline.value;
+            configInfo.value.alertDailyNum = form.dailyAlertNum;
             try {
                 config.value.id = id.value;
                 config.value.type = 'common';
