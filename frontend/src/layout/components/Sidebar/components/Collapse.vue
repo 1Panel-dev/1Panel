@@ -169,9 +169,7 @@ const changeNode = (command: string) => {
     if (command == 'local') {
         globalStore.currentNode = command || 'local';
         globalStore.currentNodeAddr = '';
-        router.push({ name: 'home' }).then(() => {
-            window.location.reload();
-        });
+        router.push({ name: 'home' });
         return;
     }
     for (const item of nodes.value) {
@@ -190,9 +188,7 @@ const changeNode = (command: string) => {
             }
             globalStore.currentNode = command || 'local';
             globalStore.currentNodeAddr = item.addr;
-            router.push({ name: 'home' }).then(() => {
-                window.location.reload();
-            });
+            router.push({ name: 'home' });
         }
     }
 };
