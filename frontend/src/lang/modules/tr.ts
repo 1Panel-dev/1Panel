@@ -3700,10 +3700,9 @@ const message = {
             senderHelper: 'E-posta göndermek için kullanılan adres',
             passwordHelper: 'E-posta servisinin yetkilendirme kodu',
             hostHelper: 'SMTP sunucu adresi, örneğin: smtp.qq.com',
-            portHelper: 'SSL genellikle 465, TLS genellikle 587, şifreleme yoksa genellikle 25',
+            portHelper: 'SSL genellikle 465, TLS genellikle 587',
             sslHelper: 'SMTP portu 465 ise genellikle SSL gerekir',
             tlsHelper: 'SMTP portu 587 ise genellikle TLS gerekir',
-            none: 'Yok',
         },
         theme: {
             lingXiaGold: 'Ling Xia Altın',

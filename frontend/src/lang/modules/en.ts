@@ -3659,10 +3659,9 @@ const message = {
             senderHelper: 'Email address used to send messages',
             passwordHelper: 'Authorization code for the email service',
             hostHelper: 'SMTP server address, e.g., smtp.qq.com',
-            portHelper: 'SSL usually uses 465, TLS usually uses 587, no encryption usually uses 25',
+            portHelper: 'SSL usually uses 465, TLS usually uses 587',
             sslHelper: 'If the SMTP port is 465, SSL is usually required',
             tlsHelper: 'If the SMTP port is 587, TLS is usually required',
-            none: 'None',
         },
         theme: {
             lingXiaGold: 'Ling Xia Gold',

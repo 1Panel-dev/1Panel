@@ -3375,10 +3375,9 @@ const message = {
             senderHelper: '用于发送邮件的邮箱地址',
             passwordHelper: '邮件服务的授权码',
             hostHelper: 'SMTP 服务器地址，例如: smtp.qq.com',
-            portHelper: 'SSL 通常为465，TLS 通常为587，无加密方式通常为25',
+            portHelper: 'SSL 通常为465，TLS 通常为587',
             sslHelper: '如果 SMTP 端口是 465，通常需要启用 SSL',
             tlsHelper: '如果 SMTP 端口是 587，通常需要启用 TLS',
-            none: '无',
         },
         theme: {
             lingXiaGold: '凌霞金',

@@ -17,41 +17,53 @@
                         </span>
                     </el-form-item>
                     <el-form-item :label="$t('xpack.alert.sender')" prop="sender">
-                        <el-input v-model="form.config.sender" />
+                        <el-input v-model.trim="form.config.sender" />
                         <span class="input-help">
                             {{ $t('xpack.alert.senderHelper') }}
                         </span>
                     </el-form-item>
                     <el-form-item :label="$t('xpack.alert.password')" prop="password">
-                        <el-input v-model="form.config.password" type="password" show-password />
+                        <el-input v-model.trim="form.config.password" type="password" show-password />
                         <span class="input-help">
                             {{ $t('xpack.alert.passwordHelper') }}
                         </span>
                     </el-form-item>
                     <el-form-item :label="$t('xpack.alert.host')" prop="host">
-                        <el-input v-model="form.config.host" placeholder="smtp.qq.com" />
+                        <el-input v-model.trim="form.config.host" placeholder="smtp.qq.com" />
                         <span class="input-help">
                             {{ $t('xpack.alert.hostHelper') }}
                         </span>
                     </el-form-item>
                     <el-form-item :label="$t('xpack.alert.port')" prop="port">
-                        <el-input v-model="form.config.port" :min="1" :max="65535" />
+                        <el-input v-model.number="form.config.port" :min="1" :max="65535" />
                         <span class="input-help">
                             {{ $t('xpack.alert.portHelper') }}
                         </span>
                     </el-form-item>
                     <el-form-item :label="$t('xpack.alert.encryption')" prop="encryption">
-                        <el-select v-model="form.config.encryption" :placeholder="$t('commons.rule.requiredSelect')">
-                            <el-option label="SSL" value="SSL" />
-                            <el-option label="TLS" value="TLS" />
-                            <el-option :label="$t('xpack.alert.none')" value="NONE" />
-                        </el-select>
+                        <div class="flex items-center gap-2">
+                            <span>SSL</span>
+                            <el-switch
+                                v-model="form.config.encryption"
+                                :active-value="'SSL'"
+                                :inactive-value="form.config.encryption === 'SSL' ? 'NONE' : form.config.encryption"
+                                @change="handleEncryptionSwitch('SSL')"
+                            />
+                        </div>
                         <span class="input-help">
-                            {{
-                                form.config.encryption == 'SSL'
-                                    ? $t('xpack.alert.sslHelper')
-                                    : $t('xpack.alert.tlsHelper')
-                            }}
+                            {{ $t('xpack.alert.sslHelper') }}
+                        </span>
+                        <div class="flex items-center gap-2">
+                            <span>TLS</span>
+                            <el-switch
+                                v-model="form.config.encryption"
+                                :active-value="'TLS'"
+                                :inactive-value="form.config.encryption === 'TLS' ? 'NONE' : form.config.encryption"
+                                @change="handleEncryptionSwitch('TLS')"
+                            />
+                        </div>
+                        <span class="input-help">
+                            {{ $t('xpack.alert.tlsHelper') }}
                         </span>
                     </el-form-item>
                     <el-form-item :label="$t('xpack.alert.recipient')" prop="recipient">
@@ -118,7 +130,7 @@ const form = reactive({
         host: '',
         port: 465,
         encryption: 'NONE',
-        status: '',
+        status: 'Enable',
         recipient: '',
     },
 });

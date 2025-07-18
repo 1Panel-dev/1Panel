@@ -3405,10 +3405,9 @@ const message = {
             senderHelper: '用於發送郵件的電子信箱地址',
             passwordHelper: '郵件服務的授權碼',
             hostHelper: 'SMTP 伺服器地址，例如：smtp.qq.com',
-            portHelper: 'SSL 通常為 465，TLS 通常為 587，無加密則通常為 25',
+            portHelper: 'SSL 通常為 465，TLS 通常為 587',
             sslHelper: '若 SMTP 連接埠為 465，通常需要啟用 SSL',
             tlsHelper: '若 SMTP 連接埠為 587，通常需要啟用 TLS',
-            none: '無',
         },
         theme: {
             lingXiaGold: '凌霞金',

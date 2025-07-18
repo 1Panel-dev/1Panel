@@ -3604,10 +3604,9 @@ const message = {
             senderHelper: 'Alamat e-mel yang digunakan untuk menghantar e-mel',
             passwordHelper: 'Kod kebenaran untuk perkhidmatan e-mel',
             hostHelper: 'Alamat pelayan SMTP, contoh: smtp.qq.com',
-            portHelper: 'SSL biasanya 465, TLS biasanya 587, tanpa penyulitan biasanya 25',
+            portHelper: 'SSL biasanya 465, TLS biasanya 587',
             sslHelper: 'Jika port SMTP ialah 465, SSL biasanya diperlukan',
             tlsHelper: 'Jika port SMTP ialah 587, TLS biasanya diperlukan',
-            none: 'Tiada',
         },
         theme: {
             lingXiaGold: 'Ling Xia Emas',

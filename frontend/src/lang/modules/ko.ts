@@ -3461,10 +3461,9 @@ const message = {
             senderHelper: '이메일 발송에 사용되는 주소',
             passwordHelper: '메일 서비스의 인증 코드',
             hostHelper: 'SMTP 서버 주소, 예: smtp.qq.com',
-            portHelper: 'SSL 은 일반적으로 465, TLS 는 587, 암호화 없음은 일반적으로 25',
+            portHelper: 'SSL 은 일반적으로 465, TLS 는 587',
             sslHelper: 'SMTP 포트가 465 이면 일반적으로 SSL 이 필요합니다',
             tlsHelper: 'SMTP 포트가 587 이면 일반적으로 TLS 가 필요합니다',
-            none: '없음',
         },
         theme: {
             lingXiaGold: '링샤 골드',

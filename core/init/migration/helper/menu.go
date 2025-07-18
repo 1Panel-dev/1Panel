@@ -94,3 +94,19 @@ func AddMenu(newMenu dto.ShowMenu, parentMenuID string, tx *gorm.DB) error {
 	}
 	return tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Update("value", string(updatedJSON)).Error
 }
+
+func RemoveMenuByID(menus []dto.ShowMenu, id string) []dto.ShowMenu {
+	var result []dto.ShowMenu
+	for _, menu := range menus {
+		if menu.ID == id {
+			continue
+		}
+
+		if len(menu.Children) > 0 {
+			menu.Children = RemoveMenuByID(menu.Children, id)
+		}
+
+		result = append(result, menu)
+	}
+	return result
+}

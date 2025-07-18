@@ -3523,10 +3523,9 @@ const message = {
             senderHelper: 'メール送信に使用するメールアドレス',
             passwordHelper: 'メールサービスの認証コード',
             hostHelper: 'SMTP サーバーアドレス（例：smtp.qq.com）',
-            portHelper: 'SSLは通常465、TLSは通常587、暗号化なしは通常25',
+            portHelper: 'SSLは通常465、TLSは通常587',
             sslHelper: 'SMTPポートが465の場合、通常はSSLが必要です',
             tlsHelper: 'SMTPポートが587の場合、通常はTLSが必要です',
-            none: 'なし',
         },
         theme: {
             lingXiaGold: '凌霞金',

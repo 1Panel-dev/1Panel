@@ -3602,10 +3602,9 @@ const message = {
             senderHelper: 'Адрес электронной почты для отправки сообщений',
             passwordHelper: 'Код авторизации почтового сервиса',
             hostHelper: 'Адрес SMTP-сервера, например: smtp.qq.com',
-            portHelper: 'SSL обычно использует 465, TLS — 587, без шифрования — 25',
+            portHelper: 'SSL обычно использует 465, TLS — 587',
             sslHelper: 'Если порт SMTP — 465, обычно требуется SSL',
             tlsHelper: 'Если порт SMTP — 587, обычно требуется TLS',
-            none: 'Нет',
         },
         theme: {
             lingXiaGold: 'Лин Ся Золотой',

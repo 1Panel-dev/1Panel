@@ -21,6 +21,7 @@ func Init() {
 		migrations.UpdateXpackHideMenu,
 		migrations.UpdateOnedrive,
 		migrations.AddClusterMenu,
+		migrations.DeleteXpackHideMenu,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

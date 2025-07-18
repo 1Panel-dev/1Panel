@@ -73,24 +73,32 @@
                         <div class="text-sm mb-2">{{ $t('xpack.alert.emailConfigHelper') }}</div>
                         <el-divider class="!mb-2 !mt-3" />
                         <div class="text-sm email-form" v-if="emailConfig.id">
-                            <el-form-item :label="$t('xpack.alert.displayName')" prop="displayName">
-                                {{ emailConfig.config.displayName }}
-                            </el-form-item>
-                            <el-form-item :label="$t('xpack.alert.sender')" prop="sender">
-                                {{ emailConfig.config.sender }}
-                            </el-form-item>
-                            <el-form-item :label="$t('xpack.alert.host')" prop="host">
-                                {{ emailConfig.config.host }}
-                            </el-form-item>
-                            <el-form-item :label="$t('xpack.alert.port')" prop="port">
-                                {{ emailConfig.config.port }}
-                            </el-form-item>
-                            <el-form-item :label="$t('xpack.alert.encryption')" prop="encryption">
-                                {{ emailConfig.config.encryption }}
-                            </el-form-item>
-                            <el-form-item :label="$t('xpack.alert.recipient')" prop="recipient">
-                                {{ emailConfig.config.recipient }}
-                            </el-form-item>
+                            <el-form
+                                :model="form"
+                                @submit.prevent
+                                ref="alertFormRef"
+                                :label-position="mobile ? 'top' : 'left'"
+                                label-width="110px"
+                            >
+                                <el-form-item :label="$t('xpack.alert.displayName')" prop="displayName">
+                                    {{ emailConfig.config.displayName }}
+                                </el-form-item>
+                                <el-form-item :label="$t('xpack.alert.sender')" prop="sender">
+                                    {{ emailConfig.config.sender }}
+                                </el-form-item>
+                                <el-form-item :label="$t('xpack.alert.host')" prop="host">
+                                    {{ emailConfig.config.host }}
+                                </el-form-item>
+                                <el-form-item :label="$t('xpack.alert.port')" prop="port">
+                                    {{ emailConfig.config.port }}
+                                </el-form-item>
+                                <el-form-item :label="$t('xpack.alert.encryption')" prop="encryption">
+                                    {{ emailConfig.config.encryption }}
+                                </el-form-item>
+                                <el-form-item :label="$t('xpack.alert.recipient')" prop="recipient">
+                                    {{ emailConfig.config.recipient }}
+                                </el-form-item>
+                            </el-form>
                         </div>
                         <el-alert v-else center class="alert" style="height: 257px" :closable="false">
                             <el-button size="large" round plain type="primary" @click="onChangeEmail(0)">
