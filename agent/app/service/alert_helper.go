@@ -396,7 +396,6 @@ func loadPanelUpdate(alert dto.AlertDTO) {
 		version = info.LatestVersion
 	}
 	if version == "" {
-		global.LOG.Info("no new version, skip")
 		return
 	}
 
