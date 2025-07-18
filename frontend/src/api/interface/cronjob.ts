@@ -151,6 +151,7 @@ export namespace Cronjob {
         name: string;
         script: string;
         groups: string;
+        isInteractive: boolean;
         groupList: Array<number>;
         groupBelong: Array<string>;
         description: string;

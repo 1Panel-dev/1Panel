@@ -5,6 +5,7 @@
         :resource="dialogData.title === 'create' ? '' : dialogData.rowData?.name"
         @close="handleClose"
         size="large"
+        :autoClose="false"
     >
         <el-form
             v-loading="loading"

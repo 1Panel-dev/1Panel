@@ -5,6 +5,7 @@
         @close="handleClose"
         :resource="name"
         size="large"
+        :autoClose="false"
     >
         <div v-loading="loading">
             <el-form ref="formRef" @submit.prevent label-position="top">
@@ -12,7 +13,7 @@
                     <CodemirrorPro
                         v-model="content"
                         mode="yaml"
-                        :heightDiff="225"
+                        :heightDiff="175"
                         placeholder="#Define or paste the content of your docker-compose file here"
                     ></CodemirrorPro>
                 </el-form-item>

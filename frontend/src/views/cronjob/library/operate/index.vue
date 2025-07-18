@@ -5,6 +5,7 @@
         @close="handleClose"
         :resource="dialogData.title !== 'edit' ? '' : dialogData.rowData?.name"
         size="large"
+        :autoClose="false"
     >
         <el-form ref="formRef" v-loading="loading" label-position="top" :model="dialogData.rowData" :rules="rules">
             <el-form-item :label="$t('commons.table.name')" prop="name">

@@ -1,5 +1,11 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('container.compose')" @close="handleClose" size="large">
+    <DrawerPro
+        v-model="drawerVisible"
+        :header="$t('container.compose')"
+        @close="handleClose"
+        size="large"
+        :autoClose="false"
+    >
         <el-form ref="formRef" @submit.prevent label-position="top" :model="form" :rules="rules" v-loading="loading">
             <el-form-item :label="$t('app.source')">
                 <el-radio-group v-model="form.from" @change="onEdit('form')">
