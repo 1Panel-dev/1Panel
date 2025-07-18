@@ -5,7 +5,7 @@
         </template>
         <el-tag size="small" :type="getType(statusItem)" round effect="light">
             <span class="flx-align-center">
-                {{ $t('commons.status.' + statusItem) }}
+                <span v-if="statusItem != ''">{{ $t('commons.status.' + statusItem) }}</span>
                 <el-icon v-if="loadingIcon(statusItem)" class="is-loading">
                     <Loading />
                 </el-icon>
@@ -15,14 +15,14 @@
     <span v-else>
         <el-tag size="small" :type="getType(statusItem)" round effect="light" v-if="!operate">
             <span class="flx-align-center">
-                {{ $t('commons.status.' + statusItem) }}
+                <span v-if="statusItem != ''">{{ $t('commons.status.' + statusItem) }}</span>
                 <el-icon v-if="loadingIcon(statusItem)" class="is-loading">
                     <Loading />
                 </el-icon>
             </span>
         </el-tag>
         <el-button size="small" v-else :type="getType(statusItem)" plain round>
-            {{ $t('commons.status.' + statusItem) }}
+            <span v-if="statusItem != ''">{{ $t('commons.status.' + statusItem) }}</span>
             <el-icon v-if="loadingIcon(statusItem)" class="is-loading">
                 <Loading />
             </el-icon>

@@ -1024,12 +1024,12 @@ func upApp(task *task.Task, appInstall *model.AppInstall, pullImages bool) error
 			errMsg string
 		)
 		if pullImages && appInstall.App.Type != "php" {
-			projectName := strings.ToLower(appInstall.Name)
+			//projectName := strings.ToLower(appInstall.Name)
 			envByte, err := files.NewFileOp().GetContent(appInstall.GetEnvPath())
 			if err != nil {
 				return err
 			}
-			images, err := composeV2.GetDockerComposeImages(projectName, envByte, []byte(appInstall.DockerCompose))
+			images, err := composeV2.GetImagesFromDockerCompose(envByte, []byte(appInstall.DockerCompose))
 			if err != nil {
 				return err
 			}
