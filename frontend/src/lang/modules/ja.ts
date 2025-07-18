@@ -3249,6 +3249,7 @@ const message = {
             node: 'ノード',
             addr: 'アドレス',
             nodeUnhealthy: 'ノード状態異常',
+            deletedNode: '削除済みノード {0} は現在アップグレード操作をサポートしていません！',
             nodeUnhealthyHelper: 'ノード状態異常を検出しました。[ノード管理]で確認してから再試行してください！',
             nodeUnbind: 'ノードがライセンスにバインドされていません',
             nodeUnbindHelper:

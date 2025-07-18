@@ -3117,6 +3117,7 @@ const message = {
             node: '节点',
             addr: '地址',
             nodeUnhealthy: '节点状态异常',
+            deletedNode: '已删除节点 {0} 暂不支持升级操作！',
             nodeUnhealthyHelper: '检测到该节点状态异常，请在 [节点管理] 中检查后重试！',
             nodeUnbind: '节点未绑定许可证',
             nodeUnbindHelper: '检测到该节点未绑定许可证，请在 [ 面板设置 - 许可证 ] 菜单中绑定后重试！',

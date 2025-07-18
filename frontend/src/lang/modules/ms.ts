@@ -3320,6 +3320,7 @@ const message = {
             node: 'Nod',
             addr: 'Alamat',
             nodeUnhealthy: 'Status nod tidak normal',
+            deletedNode: 'Nod {0} yang telah dipadam tidak menyokong operasi naik taraf buat masa ini!',
             nodeUnhealthyHelper: 'Status nod tidak normal dikesan. Sila semak dalam [Pengurusan Nod] dan cuba lagi!',
             nodeUnbind: 'Nod tidak terikat pada lesen',
             nodeUnbindHelper:

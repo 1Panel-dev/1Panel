@@ -3328,6 +3328,7 @@ const message = {
             node: 'Nó',
             addr: 'Endereço',
             nodeUnhealthy: 'Estado do nó anormal',
+            deletedNode: 'O nó excluído {0} não suporta atualmente operações de atualização!',
             nodeUnhealthyHelper:
                 'Estado anormal do nó detectado. Por favor verifique em [Gestão de Nós] e tente novamente!',
             nodeUnbind: 'Nó não vinculado à licença',

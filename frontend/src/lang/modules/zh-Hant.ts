@@ -3147,6 +3147,7 @@ const message = {
             node: '節點',
             addr: '地址',
             nodeUnhealthy: '節點狀態異常',
+            deletedNode: '已刪除節點 {0} 暫不支援升級操作！',
             nodeUnhealthyHelper: '檢測到該節點狀態異常，請在 [節點管理] 中檢查後重試！',
             nodeUnbind: '節點未綁定許可證',
             nodeUnbindHelper: '檢測到該節點未綁定許可證，請在 [面板設定 - 許可證] 選單中綁定後重試！',

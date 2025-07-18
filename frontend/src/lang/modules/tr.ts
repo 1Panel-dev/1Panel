@@ -3415,6 +3415,7 @@ const message = {
             node: 'Düğüm',
             addr: 'Adres',
             nodeUnhealthy: 'Düğüm durumu anormal',
+            deletedNode: 'Silinmiş düğüm {0} şu anda yükseltme işlemlerini desteklemiyor!',
             nodeUnhealthyHelper:
                 'Anormal düğüm durumu algılandı. Lütfen [Düğüm Yönetimi]’nde kontrol edin ve tekrar deneyin!',
             nodeUnbind: 'Düğüm lisansa bağlı değil',

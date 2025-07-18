@@ -3380,6 +3380,7 @@ const message = {
             node: 'Node',
             addr: 'Address',
             nodeUnhealthy: 'Node status abnormal',
+            deletedNode: 'Deleted node {0} does not currently support upgrade operations!',
             nodeUnhealthyHelper: 'Abnormal node status detected. Please check in [Node Management] and try again!',
             nodeUnbind: 'Node not bound to license',
             nodeUnbindHelper:

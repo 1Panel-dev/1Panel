@@ -3191,6 +3191,7 @@ const message = {
             node: '노드',
             addr: '주소',
             nodeUnhealthy: '노드 상태 이상',
+            deletedNode: '삭제된 노드 {0}은(는) 현재 업그레이드 작업을 지원하지 않습니다!',
             nodeUnhealthyHelper: '노드 상태 이상이 감지되었습니다. [노드 관리]에서 확인 후 다시 시도하세요!',
             nodeUnbind: '노드가 라이선스에 바인딩되지 않음',
             nodeUnbindHelper:
