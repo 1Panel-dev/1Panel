@@ -55,7 +55,7 @@ func (a AlertService) PageAlert(search dto.AlertSearch) (int64, []dto.AlertDTO, 
 		result []dto.AlertDTO
 	)
 	if search.Status != "" {
-		opts = append(opts, alertRepo.WithByStatus(search.Status))
+		opts = append(opts, repo.WithByStatus(search.Status))
 	}
 	if search.Type != "" {
 		opts = append(opts, alertRepo.WithByType(search.Type))
@@ -92,7 +92,7 @@ func (a AlertService) GetAlerts() ([]dto.AlertDTO, error) {
 		opts   []repo.DBOption
 		result []dto.AlertDTO
 	)
-	opts = append(opts, alertRepo.WithByStatus(constant.AlertEnable))
+	opts = append(opts, repo.WithByStatus(constant.AlertEnable))
 	alerts, err := alertRepo.List(opts...)
 	if err != nil {
 		return nil, err
@@ -166,7 +166,7 @@ func (a AlertService) UpdateAlert(req dto.AlertUpdate) error {
 	upMap["status"] = req.Status
 	upMap["send_count"] = req.SendCount
 
-	if err := alertRepo.Update(upMap, alertRepo.WithByID(req.ID)); err != nil {
+	if err := alertRepo.Update(upMap, repo.WithByID(req.ID)); err != nil {
 		return err
 	}
 	NewIAlertTaskHelper().InitTask(req.Type)
@@ -174,12 +174,12 @@ func (a AlertService) UpdateAlert(req dto.AlertUpdate) error {
 }
 
 func (a AlertService) DeleteAlert(id uint) error {
-	return alertRepo.Delete(alertRepo.WithByID(id))
+	return alertRepo.Delete(repo.WithByID(id))
 }
 
 func (a AlertService) GetAlert(id uint) (dto.AlertDTO, error) {
 	var res dto.AlertDTO
-	alertInfo, err := alertRepo.Get(alertRepo.WithByID(id))
+	alertInfo, err := alertRepo.Get(repo.WithByID(id))
 	if err != nil {
 		return res, err
 	}
@@ -188,11 +188,11 @@ func (a AlertService) GetAlert(id uint) (dto.AlertDTO, error) {
 }
 
 func (a AlertService) UpdateStatus(id uint, status string) error {
-	alertInfo, _ := alertRepo.Get(alertRepo.WithByID(id))
+	alertInfo, _ := alertRepo.Get(repo.WithByID(id))
 	if alertInfo.ID == 0 {
 		return buserr.New("ErrRecordNotFound")
 	}
-	err := alertRepo.Update(map[string]interface{}{"status": status}, alertRepo.WithByID(alertInfo.ID))
+	err := alertRepo.Update(map[string]interface{}{"status": status}, repo.WithByID(alertInfo.ID))
 	if err != nil {
 		return err
 	}
@@ -318,7 +318,7 @@ func (a AlertService) PageAlertLogs(search dto.AlertLogSearch) (int64, []dto.Ale
 		result []dto.AlertLogDTO
 	)
 	if search.Status != "" {
-		opts = append(opts, alertRepo.WithByStatus(search.Status))
+		opts = append(opts, repo.WithByStatus(search.Status))
 	}
 	if search.Count != 0 {
 		opts = append(opts, alertRepo.WithByCount(search.Count))
@@ -425,7 +425,7 @@ func (a AlertService) GetAlertConfig() ([]model.AlertConfig, error) {
 		opts    []repo.DBOption
 		configs []model.AlertConfig
 	)
-	opts = append(opts, alertRepo.WithByStatus(constant.AlertEnable))
+	opts = append(opts, repo.WithByStatus(constant.AlertEnable))
 	configs, err := alertRepo.AlertConfigList(opts...)
 	return configs, err
 }
@@ -438,7 +438,7 @@ func (a AlertService) UpdateAlertConfig(req dto.AlertConfigUpdate) error {
 		upMap["title"] = req.Title
 		upMap["status"] = req.Status
 		upMap["config"] = req.Config
-		if err := alertRepo.UpdateAlertConfig(upMap, alertRepo.WithByID(req.ID)); err != nil {
+		if err := alertRepo.UpdateAlertConfig(upMap, repo.WithByID(req.ID)); err != nil {
 			return err
 		}
 	} else {
@@ -455,7 +455,7 @@ func (a AlertService) UpdateAlertConfig(req dto.AlertConfigUpdate) error {
 }
 
 func (a AlertService) DeleteAlertConfig(id uint) error {
-	return alertRepo.DeleteAlertConfig(alertRepo.WithByID(id))
+	return alertRepo.DeleteAlertConfig(repo.WithByID(id))
 }
 
 func (a AlertService) TestAlertConfig(req dto.AlertConfigTest) (bool, error) {

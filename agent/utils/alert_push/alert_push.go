@@ -22,7 +22,7 @@ func PushAlert(pushAlert dto.PushAlert) error {
 	}
 
 	alertRepo := repo.NewIAlertRepo()
-	alertInfo, err := alertRepo.Get(alertRepo.WithByType(pushAlert.AlertType), alertRepo.WithByProject(strconv.Itoa(int(pushAlert.EntryID))), alertRepo.WithByStatus(constant.AlertEnable))
+	alertInfo, err := alertRepo.Get(alertRepo.WithByType(pushAlert.AlertType), alertRepo.WithByProject(strconv.Itoa(int(pushAlert.EntryID))), repo.WithByStatus(constant.AlertEnable))
 	if err != nil {
 		return err
 	}

@@ -285,10 +285,6 @@ type AlertConfigUpdate struct {
 	Config string `json:"config"`
 }
 
-type IDRequest struct {
-	ID uint `json:"id" validate:"required"`
-}
-
 type AlertConfigTest struct {
 	Host        string `json:"host"`
 	Port        int    `json:"port"`

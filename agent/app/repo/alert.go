@@ -12,10 +12,7 @@ import (
 type AlertRepo struct{}
 
 type IAlertRepo interface {
-	WithByID(id uint) DBOption
-	WithByIDs(ids []uint) DBOption
 	WithByType(alertType string) DBOption
-	WithByStatus(status string) DBOption
 	WithByStatusIn(status []string) DBOption
 	WithByProject(project string) DBOption
 	WithByCount(count uint) DBOption
@@ -61,27 +58,9 @@ func NewIAlertRepo() IAlertRepo {
 	return &AlertRepo{}
 }
 
-func (a *AlertRepo) WithByID(id uint) DBOption {
-	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("id = ?", id)
-	}
-}
-
-func (a *AlertRepo) WithByIDs(ids []uint) DBOption {
-	return func(db *gorm.DB) *gorm.DB {
-		return db.Where("id in (?)", ids)
-	}
-}
-
 func (a *AlertRepo) WithByType(alertType string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("`type` = ?", alertType)
-	}
-}
-
-func (a *AlertRepo) WithByStatus(status string) DBOption {
-	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("status = ?", status)
 	}
 }
 
@@ -241,12 +220,12 @@ func (a *AlertRepo) LoadTaskCount(alertType string, project string) (uint, uint,
 		todayCount int64
 		totalCount int64
 	)
-	_ = global.AlertDB.Model(&model.AlertTask{}).Where("type = ? and quota_type = ?", alertType, project).Count(&totalCount).Error
+	_ = global.AlertDB.Model(&model.AlertTask{}).Where("type = ? AND quota_type = ?", alertType, project).Count(&totalCount).Error
 
 	now := time.Now()
 	todayMidnight := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
 	tomorrowMidnight := todayMidnight.Add(24 * time.Hour)
-	err := global.AlertDB.Model(&model.AlertTask{}).Where("type =  ? and quota_type = ? AND created_at > ? AND created_at < ?", alertType, project, todayMidnight, tomorrowMidnight).Count(&todayCount).Error
+	err := global.AlertDB.Model(&model.AlertTask{}).Where("type =  ? AND quota_type = ? AND created_at > ? AND created_at < ?", alertType, project, todayMidnight, tomorrowMidnight).Count(&todayCount).Error
 	return uint(todayCount), uint(totalCount), err
 }
 
@@ -257,7 +236,7 @@ func (a *AlertRepo) GetTaskLog(alertType string, alertId uint) (time.Time, error
 	todayMidnight := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
 	tomorrowMidnight := todayMidnight.Add(24 * time.Hour)
 	err := global.AlertDB.Model(&model.AlertLog{}).
-		Where("type = ? and alert_id = ? and status in ? AND created_at > ? AND created_at < ?", alertType, alertId, status, todayMidnight, tomorrowMidnight).
+		Where("type = ? AND alert_id = ? AND status in ? AND created_at > ? AND created_at < ?", alertType, alertId, status, todayMidnight, tomorrowMidnight).
 		Order("created_at DESC").
 		Limit(1).
 		Pluck("created_at", &newDate).Error

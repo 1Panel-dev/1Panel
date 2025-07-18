@@ -42,7 +42,7 @@ func (b *BaseApi) CreateAlert(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithData(c, nil)
+	helper.Success(c)
 }
 
 func (b *BaseApi) DeleteAlert(c *gin.Context) {
@@ -55,7 +55,7 @@ func (b *BaseApi) DeleteAlert(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithData(c, nil)
+	helper.Success(c)
 }
 
 func (b *BaseApi) UpdateAlert(c *gin.Context) {
@@ -67,7 +67,7 @@ func (b *BaseApi) UpdateAlert(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithData(c, nil)
+	helper.Success(c)
 }
 
 func (b *BaseApi) GetAlert(c *gin.Context) {
@@ -94,7 +94,7 @@ func (b *BaseApi) UpdateAlertStatus(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithData(c, nil)
+	helper.Success(c)
 }
 
 func (b *BaseApi) GetDisks(c *gin.Context) {
@@ -127,7 +127,7 @@ func (b *BaseApi) CleanAlertLogs(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithData(c, nil)
+	helper.Success(c)
 }
 
 func (b *BaseApi) GetClams(c *gin.Context) {
@@ -170,7 +170,7 @@ func (b *BaseApi) UpdateAlertConfig(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithData(c, nil)
+	helper.Success(c)
 }
 
 func (b *BaseApi) DeleteAlertConfig(c *gin.Context) {
@@ -183,7 +183,7 @@ func (b *BaseApi) DeleteAlertConfig(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithData(c, nil)
+	helper.Success(c)
 }
 
 func (b *BaseApi) TestAlertConfig(c *gin.Context) {

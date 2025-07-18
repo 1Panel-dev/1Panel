@@ -159,7 +159,7 @@ func (c *ClamService) SearchWithPage(req dto.SearchClamWithPage) (int64, interfa
 			AlertType: "clams",
 			EntryID:   datas[i].ID,
 		}
-		alertInfo, _ := alertRepo.Get(alertRepo.WithByType(alertBase.AlertType), alertRepo.WithByProject(strconv.Itoa(int(alertBase.EntryID))), alertRepo.WithByStatus(constant.AlertEnable))
+		alertInfo, _ := alertRepo.Get(alertRepo.WithByType(alertBase.AlertType), alertRepo.WithByProject(strconv.Itoa(int(alertBase.EntryID))), repo.WithByStatus(constant.AlertEnable))
 		datas[i].AlertMethod = alertInfo.Method
 		if alertInfo.SendCount != 0 {
 			datas[i].AlertCount = alertInfo.SendCount

@@ -65,7 +65,7 @@ func (u *CronjobService) SearchWithPage(search dto.PageCronjob) (int64, interfac
 			AlertType: cronjob.Type,
 			EntryID:   cronjob.ID,
 		}
-		alertInfo, _ := alertRepo.Get(alertRepo.WithByType(alertBase.AlertType), alertRepo.WithByProject(strconv.Itoa(int(alertBase.EntryID))), alertRepo.WithByStatus(constant.AlertEnable))
+		alertInfo, _ := alertRepo.Get(alertRepo.WithByType(alertBase.AlertType), alertRepo.WithByProject(strconv.Itoa(int(alertBase.EntryID))), repo.WithByStatus(constant.AlertEnable))
 		if alertInfo.SendCount != 0 {
 			item.AlertCount = alertInfo.SendCount
 		} else {
@@ -89,7 +89,7 @@ func (u *CronjobService) LoadInfo(req dto.OperateByID) (*dto.CronjobOperate, err
 		AlertType: cronjob.Type,
 		EntryID:   cronjob.ID,
 	}
-	alertInfo, _ := alertRepo.Get(alertRepo.WithByType(alertBase.AlertType), alertRepo.WithByProject(strconv.Itoa(int(alertBase.EntryID))), alertRepo.WithByStatus(constant.AlertEnable))
+	alertInfo, _ := alertRepo.Get(alertRepo.WithByType(alertBase.AlertType), alertRepo.WithByProject(strconv.Itoa(int(alertBase.EntryID))), repo.WithByStatus(constant.AlertEnable))
 	item.AlertMethod = alertInfo.Method
 	if alertInfo.SendCount != 0 {
 		item.AlertCount = alertInfo.SendCount
