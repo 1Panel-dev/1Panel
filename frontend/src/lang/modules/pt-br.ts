@@ -3323,6 +3323,8 @@ const message = {
             backupNode: 'Nó de Backup',
             backupFrequency: 'Frequência de Backup (horas)',
             backupCopies: 'Número de cópias de backup a reter',
+            noBackupNode:
+                'O nó de backup está vazio atualmente. Selecione um nó de backup para salvar e tente novamente!',
             masterBackupAlert:
                 'O backup do nó mestre não está configurado atualmente. Para garantir a segurança dos dados, configure um nó de backup o mais rápido possível para facilitar a troca manual para um novo nó mestre em caso de falha.',
             node: 'Nó',
@@ -3368,7 +3370,8 @@ const message = {
             checkPort: 'Verificar acessibilidade da porta do nó',
             panelExist:
                 'Detectado que este nó está executando o serviço 1Panel V1. Atualize para V2 usando o script de migração antes de adicionar.',
-            coreExist: 'Este nó já está habilitado como nó mestre e não pode ser adicionado como nó escravo.',
+            coreExist:
+                'O nó atual já está habilitado como nó mestre e não pode ser adicionado diretamente como nó escravo. Por favor, faça o downgrade para nó escravo primeiro antes de adicionar, consulte a documentação para detalhes.',
             agentExist:
                 'Detectado que 1panel-agent já está instalado neste nó. Continuar irá reter os dados existentes e apenas substituir o serviço 1panel-agent.',
             oldDataExist:

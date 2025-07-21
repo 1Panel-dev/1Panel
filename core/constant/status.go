@@ -7,6 +7,7 @@ const (
 	// node
 	StatusWaiting     = "Waiting"
 	StatusHealthy     = "Healthy"
+	StatusStarting    = "Starting"
 	StatusUnhealthy   = "Unhealthy"
 	StatusUpgrading   = "Upgrading"
 	StatusRunning     = "Running"

@@ -3112,6 +3112,7 @@ const message = {
             backupNode: '备份节点',
             backupFrequency: '备份频率（小时）',
             backupCopies: '备份记录保留份数',
+            noBackupNode: '当前备份节点为空，请选择备份节点保存后重试！',
             masterBackupAlert:
                 '当前未配置主节点备份，为保障数据安全，请尽快设置备份节点，便于主节点故障时可人工切换新主节点。',
             node: '节点',
@@ -3151,7 +3152,8 @@ const message = {
             checkService: '检查节点已存在服务信息',
             checkPort: '检查节点端口可达',
             panelExist: '检查到该节点正在运行 1Panel V1 服务，请先通过迁移脚本升级至 V2 后再进行添加。',
-            coreExist: '该节点已作为主节点启用，无法作为从节点添加。',
+            coreExist:
+                '当前节点已作为主节点启用，无法直接作为从节点添加。请先将其降级为从节点后再添加，具体可参考文档。',
             agentExist: '检查到该节点已安装 1panel-agent，继续添加将保留现有数据，仅替换 1panel-agent 服务。',
             oldDataExist: '检查到该节点存在 1Panel V2 历史数据，将使用以下信息覆盖当前设置',
             errLicense: '检查到该节点绑定的许可证不可用，请检查后重试！',

@@ -3315,6 +3315,7 @@ const message = {
             backupNode: 'Nod Sandaran',
             backupFrequency: 'Kekerapan Sandaran (jam)',
             backupCopies: 'Bilangan salinan sandaran yang disimpan',
+            noBackupNode: 'Nod sandaran kosong. Sila pilih nod sandaran untuk disimpan dan cuba lagi!',
             masterBackupAlert:
                 'Sandaran nod master belum dikonfigurasikan. Untuk memastikan keselamatan data, sila sediakan nod sandaran secepat mungkin untuk memudahkan pertukaran manual ke nod master baru sekiranya berlaku kegagalan.',
             node: 'Nod',
@@ -3359,7 +3360,8 @@ const message = {
             checkPort: 'Periksa kebolehcapaian port nod',
             panelExist:
                 'Mengesan nod ini sedang menjalankan perkhidmatan 1Panel V1. Sila naik taraf ke V2 menggunakan skrip migrasi sebelum menambah.',
-            coreExist: 'Nod ini telah didayakan sebagai nod induk dan tidak boleh ditambah sebagai nod hamba.',
+            coreExist:
+                'Nod semasa telah didayakan sebagai nod induk dan tidak boleh ditambah terus sebagai nod hamba. Sila turun taraf kepada nod hamba terlebih dahulu sebelum menambah, rujuk dokumentasi untuk butiran.',
             agentExist:
                 'Mengesan 1panel-agent telah dipasang pada nod ini. Penerusan akan mengekalkan data sedia ada dan hanya menggantikan perkhidmatan 1panel-agent.',
             oldDataExist:

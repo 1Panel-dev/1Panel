@@ -3375,6 +3375,7 @@ const message = {
             backupNode: 'Backup Node',
             backupFrequency: 'Backup Frequency (hours)',
             backupCopies: 'Backup Retention Copies',
+            noBackupNode: 'The backup node is currently empty. Please select a backup node to save and try again!',
             masterBackupAlert:
                 'Master node backup is not currently configured. To ensure data security, please set up a backup node as soon as possible to facilitate manual switching to a new master node in case of failure.',
             node: 'Node',
@@ -3419,7 +3420,8 @@ const message = {
             checkPort: 'Check node port reachability',
             panelExist:
                 'Detected that this node is running 1Panel V1 service. Please upgrade to V2 using the migration script before adding.',
-            coreExist: 'This node is already enabled as a master node and cannot be added as a slave node.',
+            coreExist:
+                'The current node is already enabled as a master node and cannot be directly added as a slave node. Please downgrade it to a slave node first before adding, refer to the documentation for details.',
             agentExist:
                 'Detected that 1panel-agent is already installed on this node. Continuing will retain existing data and only replace the 1panel-agent service.',
             oldDataExist:

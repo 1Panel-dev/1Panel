@@ -3142,6 +3142,7 @@ const message = {
             backupNode: '備份節點',
             backupFrequency: '備份頻率（小時）',
             backupCopies: '備份記錄保留份數',
+            noBackupNode: '當前備份節點為空，請選擇備份節點保存後重試！',
             masterBackupAlert:
                 '當前未配置主節點備份，為保障數據安全，請盡快設置備份節點，便於主節點故障時可人工切換新主節點。',
             node: '節點',
@@ -3181,7 +3182,8 @@ const message = {
             checkService: '檢查節點已存在服務信息',
             checkPort: '檢查節點端口可達',
             panelExist: '檢查到該節點正在運行 1Panel V1 服務，請先通過遷移腳本升級至 V2 後再進行添加。',
-            coreExist: '該節點已作為主節點啟用，無法作為從節點添加。',
+            coreExist:
+                '當前節點已作為主節點啟用，無法直接作為從節點添加。請先將其降級為從節點後再添加，具體可參考文件。',
             agentExist: '檢查到該節點已安裝 1panel-agent，繼續添加將保留現有數據，僅替換 1panel-agent 服務。',
             oldDataExist: '檢查到該節點存在 1Panel V2 歷史數據，將使用以下信息覆蓋當前設置',
             errLicense: '檢查到該節點綁定的許可證不可用，請檢查後重試！',

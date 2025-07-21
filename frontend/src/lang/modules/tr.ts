@@ -3410,6 +3410,7 @@ const message = {
             backupNode: 'Yedek Düğüm',
             backupFrequency: 'Yedekleme Sıklığı (saat)',
             backupCopies: 'Saklanacak yedek kopya sayısı',
+            noBackupNode: 'Yedek düğüm şu anda boş. Lütfen kaydetmek için bir yedek düğüm seçin ve tekrar deneyin!',
             masterBackupAlert:
                 'Ana düğüm yedeklemesi şu anda yapılandırılmamış. Veri güvenliği için, lütfen arıza durumunda yeni bir ana düğüme manuel geçiş yapabilmek amacıyla en kısa sürede bir yedek düğüm ayarlayın.',
             node: 'Düğüm',
@@ -3455,7 +3456,8 @@ const message = {
             checkPort: 'Düğüm port erişilebilirliğini kontrol et',
             panelExist:
                 'Bu düğümde 1Panel V1 hizmeti çalıştığı algılandı. Lütfen eklemeden önce geçiş betiğini kullanarak V2’ye yükseltin.',
-            coreExist: 'Bu düğüm zaten ana düğüm olarak etkinleştirildi ve alt düğüm olarak eklenemez.',
+            coreExist:
+                'Mevcut düğüm zaten ana düğüm olarak etkinleştirilmiş durumda ve doğrudan alt düğüm olarak eklenemez. Lütfen eklemeden önce alt düğüme dönüştürün, ayrıntılar için belgelere bakın.',
             agentExist:
                 'Bu düğümde 1panel-agent’ın zaten kurulu olduğu algılandı. Devam edilmesi mevcut verileri koruyacak ve yalnızca 1panel-agent hizmetini değiştirecektir.',
             oldDataExist:
