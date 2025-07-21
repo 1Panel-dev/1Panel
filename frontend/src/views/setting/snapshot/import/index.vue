@@ -2,8 +2,14 @@
     <DrawerPro v-model="drawerVisible" :header="$t('setting.importSnapshot')" @close="handleClose" size="small">
         <el-form ref="formRef" label-position="top" :model="form" :rules="rules" v-loading="loading">
             <el-form-item :label="$t('setting.backupAccount')" prop="from">
-                <el-select v-model="form.backupAccountID" @change="loadFiles" clearable>
-                    <el-option v-for="item in backupOptions" :key="item.label" :value="item.id" :label="item.label" />
+                <el-select @change="loadFiles()" v-model="form.backupAccountID" clearable>
+                    <div v-for="item in backupOptions" :key="item.id">
+                        <el-option v-if="item.type !== $t('setting.LOCAL')" :value="item.id" :label="item.name">
+                            {{ item.name }}
+                            <el-tag class="tagClass" type="primary">{{ item.type }}</el-tag>
+                        </el-option>
+                        <el-option v-else :value="item.id" :label="item.type" />
+                    </div>
                 </el-select>
                 <div v-if="form.backupAccountID === 0">
                     <span class="import-help">{{ $t('setting.importHelper') }}</span>
@@ -128,8 +134,8 @@ const loadBackups = async () => {
             for (const item of res.data) {
                 backupOptions.value.push({
                     id: item.id,
-                    label: i18n.global.t('setting.' + item.type),
-                    value: item.type,
+                    type: i18n.global.t('setting.' + item.type),
+                    name: item.name,
                 });
             }
         })
@@ -161,5 +167,12 @@ defineExpose({
 
 .import-link-help:hover {
     opacity: 0.6;
+}
+
+.tagClass {
+    float: right;
+    margin-right: 10px;
+    font-size: 12px;
+    margin-top: 5px;
 }
 </style>
