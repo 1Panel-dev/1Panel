@@ -126,6 +126,8 @@ const message = {
             local: 'ローカル',
             serialNumber: 'シリアル番号',
             manageGroup: 'グループ管理',
+            backToList: 'リストに戻る',
+            keepEdit: '編集を続ける',
         },
         loadingText: {
             Upgrading: 'システムのアップグレード、待ってください...',

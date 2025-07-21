@@ -134,6 +134,8 @@ const message = {
             local: 'yerel',
             serialNumber: 'Seri numarası',
             manageGroup: 'Grupları Yönet',
+            backToList: 'Listeye Dön',
+            keepEdit: 'Düzenlemeye Devam Et',
         },
         loadingText: {
             Upgrading: 'Sistem yükseltiliyor, lütfen bekleyin...',

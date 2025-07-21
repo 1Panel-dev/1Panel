@@ -424,7 +424,12 @@
             </template>
         </LayoutContent>
         <Confirm ref="confirmRef" @submit="submit" />
-        <TaskLog ref="taskLogRef" width="70%" @close="goBack" />
+        <TaskLog ref="taskLogRef" width="70%" :show-close="false">
+            <template #task-footer>
+                <el-button @click="goBack">{{ $t('commons.table.backToList') }}</el-button>
+                <el-button type="primary" @click="closeTask">{{ $t('commons.table.keepEdit') }}</el-button>
+            </template>
+        </TaskLog>
         <TerminalDialog ref="dialogTerminalRef" />
     </div>
 </template>
@@ -582,7 +587,9 @@ const formRef = ref<FormInstance>();
 const goBack = () => {
     router.push({ name: 'ContainerItem' });
 };
-
+const closeTask = () => {
+    taskLogRef.value.handleClose();
+};
 const dialogTerminalRef = ref();
 const toTerminal = () => {
     dialogTerminalRef.value!.acceptParams({ cwd: '$HOME', command: '/bin/sh' });

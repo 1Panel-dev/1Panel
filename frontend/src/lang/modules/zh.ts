@@ -131,6 +131,8 @@ const message = {
             local: '本地',
             serialNumber: '序号',
             manageGroup: '管理分组',
+            backToList: '返回列表',
+            keepEdit: '继续编辑',
         },
         loadingText: {
             Upgrading: '系统升级中，请稍候...',

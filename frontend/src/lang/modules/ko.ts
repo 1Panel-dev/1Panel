@@ -126,6 +126,8 @@ const message = {
             local: '로컬',
             serialNumber: '일련 번호',
             manageGroup: '그룹 관리',
+            backToList: '목록으로 돌아가기',
+            keepEdit: '계속 편집',
         },
         loadingText: {
             Upgrading: '시스템 업그레이드 중입니다. 잠시만 기다려 주십시오...',

@@ -126,6 +126,8 @@ const message = {
             local: 'Tempatan',
             serialNumber: 'Nombor siri',
             manageGroup: 'Urus Kumpulan',
+            backToList: 'Kembali ke Senarai',
+            keepEdit: 'Teruskan Mengedit',
         },
         loadingText: {
             Upgrading: 'Peningkatan sistem, sila tunggu...',

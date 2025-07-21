@@ -134,6 +134,8 @@ const message = {
             local: 'local',
             serialNumber: 'Serial number',
             manageGroup: 'Manage Groups',
+            backToList: 'Back to List',
+            keepEdit: 'Continue Editing',
         },
         loadingText: {
             Upgrading: 'System upgrade, please wait...',

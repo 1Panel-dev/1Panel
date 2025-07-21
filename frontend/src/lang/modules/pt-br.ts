@@ -126,6 +126,8 @@ const message = {
             local: 'Local',
             serialNumber: 'Número de série',
             manageGroup: 'Gerenciar Grupos',
+            backToList: 'Voltar à Lista',
+            keepEdit: 'Continuar Editando',
         },
         loadingText: {
             Upgrading: 'Atualizando o sistema, por favor, aguarde...',

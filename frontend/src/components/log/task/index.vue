@@ -10,6 +10,9 @@
         <div v-if="open">
             <LogFile :config="config" :showTail="showTail"></LogFile>
         </div>
+        <template #footer>
+            <slot name="task-footer"></slot>
+        </template>
     </el-dialog>
 </template>
 <script lang="ts" setup>
@@ -76,5 +79,5 @@ const handleClose = () => {
     bus.emit('refreshApp', true);
 };
 
-defineExpose({ openWithResourceID, openWithTaskID });
+defineExpose({ openWithResourceID, openWithTaskID, handleClose });
 </script>
