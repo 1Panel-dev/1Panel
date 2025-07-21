@@ -174,7 +174,11 @@ const changeTab = (val: string) => {
             loadConfFile();
             break;
         case 'persistence':
-            persistenceRef.value!.acceptParams({ status: redisStatus.value, database: database.value });
+            persistenceRef.value!.acceptParams({
+                status: redisStatus.value,
+                database: database.value,
+                type: dbType.value,
+            });
             break;
         case 'tuning':
         case 'port':
@@ -228,7 +232,7 @@ const onChangePort = async (formEl: FormInstance | undefined) => {
         return;
     }
     let params = {
-        key: 'redis',
+        key: dbType.value,
         name: form.name,
         port: form.port,
     };
@@ -298,7 +302,7 @@ const onSaveFile = async () => {
 };
 const submitFile = async () => {
     let param = {
-        type: 'redis',
+        type: dbType.value,
         database: database.value,
         file: redisConf.value,
     };
@@ -315,7 +319,7 @@ const submitFile = async () => {
 };
 
 const loadForm = async () => {
-    const res = await loadRedisConf(database.value);
+    const res = await loadRedisConf(dbType.value, database.value);
     form.name = res.data?.name;
     form.timeout = Number(res.data?.timeout);
     form.maxclients = Number(res.data?.maxclients);

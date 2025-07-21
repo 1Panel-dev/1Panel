@@ -232,6 +232,7 @@ export namespace Database {
         appendonly: string;
         appendfsync: string;
         save: string;
+        dbType: string;
     }
     export interface RedisStatus {
         tcp_port: string;

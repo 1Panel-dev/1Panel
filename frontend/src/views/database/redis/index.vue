@@ -13,7 +13,7 @@
         <LayoutContent title="Redis">
             <template #app v-if="currentDB?.from === 'local'">
                 <AppStatus
-                    :app-key="'redis'"
+                    :app-key="currentDB.type"
                     :app-name="appName"
                     v-model:loading="loading"
                     @before="onBefore"

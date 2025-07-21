@@ -19,7 +19,7 @@ export const jumpToInstall = (type: string, key: string) => {
         case 'redis-cluster':
             jumpToPath(router, '/xpack/cluster/redis');
             return true;
-        case 'postgres-cluster':
+        case 'postgresql-cluster':
             jumpToPath(router, '/xpack/cluster/postgres');
             return true;
     }

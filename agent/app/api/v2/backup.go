@@ -421,12 +421,12 @@ func (b *BaseApi) Recover(c *gin.Context) {
 	}
 	req.File = downloadPath
 	switch req.Type {
-	case "mysql", "mariadb":
+	case "mysql", "mariadb", constant.AppMysqlCluster:
 		if err := backupService.MysqlRecover(req); err != nil {
 			helper.InternalServer(c, err)
 			return
 		}
-	case constant.AppPostgresql:
+	case constant.AppPostgresql, constant.AppPostgresqlCluster:
 		if err := backupService.PostgresqlRecover(req); err != nil {
 			helper.InternalServer(c, err)
 			return
@@ -436,7 +436,7 @@ func (b *BaseApi) Recover(c *gin.Context) {
 			helper.InternalServer(c, err)
 			return
 		}
-	case "redis":
+	case "redis", constant.AppRedisCluster:
 		if err := backupService.RedisRecover(req); err != nil {
 			helper.InternalServer(c, err)
 			return

@@ -174,6 +174,7 @@ type RedisConfUpdate struct {
 	Timeout    string `json:"timeout"`
 	Maxclients string `json:"maxclients"`
 	Maxmemory  string `json:"maxmemory"`
+	DBType     string `json:"dbType" validate:"required,oneof=redis redis-cluster"`
 }
 type RedisConfPersistenceUpdate struct {
 	Database    string `json:"database" validate:"required"`
@@ -181,6 +182,7 @@ type RedisConfPersistenceUpdate struct {
 	Appendonly  string `json:"appendonly"`
 	Appendfsync string `json:"appendfsync"`
 	Save        string `json:"save"`
+	DBType      string `json:"dbType" validate:"required,oneof=redis redis-cluster"`
 }
 
 type RedisConf struct {

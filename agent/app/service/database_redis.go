@@ -29,8 +29,8 @@ type IRedisService interface {
 	ChangePassword(info dto.ChangeRedisPass) error
 
 	LoadStatus(req dto.LoadRedisStatus) (*dto.RedisStatus, error)
-	LoadConf(req dto.OperationWithName) (*dto.RedisConf, error)
-	LoadPersistenceConf(req dto.OperationWithName) (*dto.RedisPersistence, error)
+	LoadConf(req dto.LoadRedisStatus) (*dto.RedisConf, error)
+	LoadPersistenceConf(req dto.LoadRedisStatus) (*dto.RedisPersistence, error)
 
 	CheckHasCli() bool
 	InstallCli() error
@@ -41,7 +41,7 @@ func NewIRedisService() IRedisService {
 }
 
 func (u *RedisService) UpdateConf(req dto.RedisConfUpdate) error {
-	redisInfo, err := appInstallRepo.LoadBaseInfo("redis", req.Database)
+	redisInfo, err := appInstallRepo.LoadBaseInfo(req.DBType, req.Database)
 	if err != nil {
 		return err
 	}
@@ -50,7 +50,7 @@ func (u *RedisService) UpdateConf(req dto.RedisConfUpdate) error {
 	confs = append(confs, redisConfig{key: "timeout", value: req.Timeout})
 	confs = append(confs, redisConfig{key: "maxclients", value: req.Maxclients})
 	confs = append(confs, redisConfig{key: "maxmemory", value: req.Maxmemory})
-	if err := confSet(redisInfo.Name, "", confs); err != nil {
+	if err := confSet(redisInfo.Name, req.DBType, "", confs); err != nil {
 		return err
 	}
 	if _, err := compose.Restart(fmt.Sprintf("%s/redis/%s/docker-compose.yml", global.Dir.AppInstallDir, redisInfo.Name)); err != nil {
@@ -107,7 +107,7 @@ func (u *RedisService) ChangePassword(req dto.ChangeRedisPass) error {
 }
 
 func (u *RedisService) UpdatePersistenceConf(req dto.RedisConfPersistenceUpdate) error {
-	redisInfo, err := appInstallRepo.LoadBaseInfo("redis", req.Database)
+	redisInfo, err := appInstallRepo.LoadBaseInfo(req.DBType, req.Database)
 	if err != nil {
 		return err
 	}
@@ -119,10 +119,10 @@ func (u *RedisService) UpdatePersistenceConf(req dto.RedisConfPersistenceUpdate)
 		confs = append(confs, redisConfig{key: "appendonly", value: req.Appendonly})
 		confs = append(confs, redisConfig{key: "appendfsync", value: req.Appendfsync})
 	}
-	if err := confSet(redisInfo.Name, req.Type, confs); err != nil {
+	if err := confSet(redisInfo.Name, req.DBType, req.Type, confs); err != nil {
 		return err
 	}
-	if _, err := compose.Restart(fmt.Sprintf("%s/redis/%s/docker-compose.yml", global.Dir.AppInstallDir, redisInfo.Name)); err != nil {
+	if _, err := compose.Restart(fmt.Sprintf("%s/%s/%s/docker-compose.yml", global.Dir.AppInstallDir, req.DBType, redisInfo.Name)); err != nil {
 		return err
 	}
 
@@ -157,8 +157,8 @@ func (u *RedisService) LoadStatus(req dto.LoadRedisStatus) (*dto.RedisStatus, er
 	return &info, nil
 }
 
-func (u *RedisService) LoadConf(req dto.OperationWithName) (*dto.RedisConf, error) {
-	redisInfo, err := appInstallRepo.LoadBaseInfo("redis", req.Name)
+func (u *RedisService) LoadConf(req dto.LoadRedisStatus) (*dto.RedisConf, error) {
+	redisInfo, err := appInstallRepo.LoadBaseInfo(req.Type, req.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -174,8 +174,8 @@ func (u *RedisService) LoadConf(req dto.OperationWithName) (*dto.RedisConf, erro
 	return &item, nil
 }
 
-func (u *RedisService) LoadPersistenceConf(req dto.OperationWithName) (*dto.RedisPersistence, error) {
-	redisInfo, err := appInstallRepo.LoadBaseInfo("redis", req.Name)
+func (u *RedisService) LoadPersistenceConf(req dto.LoadRedisStatus) (*dto.RedisPersistence, error) {
+	redisInfo, err := appInstallRepo.LoadBaseInfo(req.Type, req.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -214,8 +214,8 @@ type redisConfig struct {
 	value string
 }
 
-func confSet(redisName string, updateType string, changeConf []redisConfig) error {
-	path := fmt.Sprintf("%s/redis/%s/conf/redis.conf", global.Dir.AppInstallDir, redisName)
+func confSet(redisName string, redisType string, updateType string, changeConf []redisConfig) error {
+	path := fmt.Sprintf("%s/%s/%s/conf/redis.conf", global.Dir.AppInstallDir, redisType, redisName)
 	lineBytes, err := os.ReadFile(path)
 	if err != nil {
 		return err

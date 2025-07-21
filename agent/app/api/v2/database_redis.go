@@ -33,13 +33,13 @@ func (b *BaseApi) LoadRedisStatus(c *gin.Context) {
 // @Tags Database Redis
 // @Summary Load redis conf
 // @Accept json
-// @Param request body dto.OperationWithName true "request"
+// @Param request body dto.LoadRedisStatus true "request"
 // @Success 200 {object} dto.RedisConf
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /databases/redis/conf [post]
 func (b *BaseApi) LoadRedisConf(c *gin.Context) {
-	var req dto.OperationWithName
+	var req dto.LoadRedisStatus
 	if err := helper.CheckBind(&req, c); err != nil {
 		return
 	}
@@ -55,13 +55,13 @@ func (b *BaseApi) LoadRedisConf(c *gin.Context) {
 // @Tags Database Redis
 // @Summary Load redis persistence conf
 // @Accept json
-// @Param request body dto.OperationWithName true "request"
+// @Param request body dto.LoadRedisStatus true "request"
 // @Success 200 {object} dto.RedisPersistence
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /databases/redis/persistence/conf [post]
 func (b *BaseApi) LoadPersistenceConf(c *gin.Context) {
-	var req dto.OperationWithName
+	var req dto.LoadRedisStatus
 	if err := helper.CheckBind(&req, c); err != nil {
 		return
 	}

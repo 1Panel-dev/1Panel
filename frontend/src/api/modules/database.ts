@@ -111,11 +111,14 @@ export const loadRemoteAccess = (type: string, database: string) => {
 export const loadRedisStatus = (type: string, database: string) => {
     return http.post<Database.RedisStatus>(`/databases/redis/status`, { type: type, name: database });
 };
-export const loadRedisConf = (database: string) => {
-    return http.post<Database.RedisConf>(`/databases/redis/conf`, { name: database });
+export const loadRedisConf = (type: string, database: string) => {
+    return http.post<Database.RedisConf>(`/databases/redis/conf`, { type: type, name: database });
 };
-export const redisPersistenceConf = (database: string) => {
-    return http.post<Database.RedisPersistenceConf>(`/databases/redis/persistence/conf`, { name: database });
+export const redisPersistenceConf = (type: string, database: string) => {
+    return http.post<Database.RedisPersistenceConf>(`/databases/redis/persistence/conf`, {
+        type: type,
+        name: database,
+    });
 };
 export const checkRedisCli = () => {
     return http.get<boolean>(`/databases/redis/check`);

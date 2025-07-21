@@ -23,7 +23,7 @@ import (
 )
 
 func (u *BackupService) RedisBackup(req dto.CommonBackup) error {
-	redisInfo, err := appInstallRepo.LoadBaseInfo("redis", req.Name)
+	redisInfo, err := appInstallRepo.LoadBaseInfo(req.Type, req.Name)
 	if err != nil {
 		return err
 	}
@@ -64,7 +64,7 @@ func (u *BackupService) RedisBackup(req dto.CommonBackup) error {
 }
 
 func (u *BackupService) RedisRecover(req dto.CommonRecover) error {
-	redisInfo, err := appInstallRepo.LoadBaseInfo("redis", req.Name)
+	redisInfo, err := appInstallRepo.LoadBaseInfo(req.Type, req.Name)
 	if err != nil {
 		return err
 	}
@@ -76,6 +76,7 @@ func (u *BackupService) RedisRecover(req dto.CommonRecover) error {
 }
 
 func handleRedisBackup(redisInfo *repo.RootInfo, parentTask *task.Task, backupDir, fileName, secret, taskID string) error {
+
 	var (
 		err      error
 		itemTask *task.Task
@@ -102,7 +103,7 @@ func handleRedisBackup(redisInfo *repo.RootInfo, parentTask *task.Task, backupDi
 		}
 
 		if strings.HasSuffix(fileName, ".tar.gz") {
-			redisDataDir := fmt.Sprintf("%s/%s/%s/data/appendonlydir", global.Dir.AppInstallDir, "redis", redisInfo.Name)
+			redisDataDir := fmt.Sprintf("%s/%s/%s/data/appendonlydir", global.Dir.AppInstallDir, redisInfo.Key, redisInfo.Name)
 			if err := fileOp.TarGzCompressPro(true, redisDataDir, path.Join(backupDir, fileName), secret, ""); err != nil {
 				return err
 			}
@@ -111,14 +112,14 @@ func handleRedisBackup(redisInfo *repo.RootInfo, parentTask *task.Task, backupDi
 		if strings.HasSuffix(fileName, ".aof") {
 			stdout1, err := cmd.RunDefaultWithStdoutBashCf("docker cp %s:/data/appendonly.aof %s/%s", redisInfo.ContainerName, backupDir, fileName)
 			if err != nil {
-				return errors.New(string(stdout1))
+				return errors.New(stdout1)
 			}
 			return nil
 		}
 
 		stdout1, err1 := cmd.RunDefaultWithStdoutBashCf("docker cp %s:/data/dump.rdb %s/%s", redisInfo.ContainerName, backupDir, fileName)
 		if err1 != nil {
-			return errors.New(string(stdout1))
+			return errors.New(stdout1)
 		}
 		return nil
 	}
@@ -196,12 +197,12 @@ func handleRedisRecover(redisInfo *repo.RootInfo, parentTask *task.Task, recover
 				}
 			}()
 		}
-		composeDir := fmt.Sprintf("%s/redis/%s", global.Dir.AppInstallDir, redisInfo.Name)
+		composeDir := fmt.Sprintf("%s/%s/%s", global.Dir.AppInstallDir, redisInfo.Key, redisInfo.Name)
 		if _, err := compose.Down(composeDir + "/docker-compose.yml"); err != nil {
 			return err
 		}
 		if appendonly == "yes" && strings.HasPrefix(redisInfo.Version, "7.") {
-			redisDataDir := fmt.Sprintf("%s/%s/%s/data", global.Dir.AppInstallDir, "redis", redisInfo.Name)
+			redisDataDir := fmt.Sprintf("%s/%s/%s/data", global.Dir.AppInstallDir, redisInfo.Key, redisInfo.Name)
 			if err := fileOp.TarGzExtractPro(recoverFile, redisDataDir, secret); err != nil {
 				return err
 			}

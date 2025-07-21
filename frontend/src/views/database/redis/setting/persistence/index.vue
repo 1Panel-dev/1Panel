@@ -145,13 +145,16 @@ const rules = reactive({
 const formRef = ref<FormInstance>();
 const database = ref();
 const opRef = ref();
+const dbType = ref('redis');
 
 interface DialogProps {
     database: string;
     status: string;
+    type: string;
 }
 const persistenceShow = ref(false);
 const acceptParams = (prop: DialogProps): void => {
+    dbType.value = prop.type;
     persistenceShow.value = true;
     database.value = prop.database;
     if (prop.status === 'Running') {
@@ -197,7 +200,7 @@ const search = async () => {
 };
 const onBackup = async () => {
     emit('loading', true);
-    await handleBackup({ name: database.value, detailName: '', type: 'redis', secret: '', taskID: '' })
+    await handleBackup({ name: database.value, detailName: '', type: dbType.value, secret: '', taskID: '' })
         .then(() => {
             emit('loading', false);
             search();
@@ -210,7 +213,7 @@ const onBackup = async () => {
 const onRecover = async () => {
     let param = {
         downloadAccountID: currentRow.value.downloadAccountID,
-        type: 'redis',
+        type: dbType.value,
         name: database.value,
         detailName: '',
         file: currentRow.value.fileDir + '/' + currentRow.value.fileName,
@@ -283,6 +286,7 @@ const onSave = async (formEl: FormInstance | undefined, type: string) => {
             param.type = type;
             param.appendfsync = form.appendfsync;
             param.appendonly = form.appendonly;
+            param.dbType = dbType.value;
             emit('loading', true);
             await updateRedisPersistenceConf(param)
                 .then(() => {
@@ -305,6 +309,7 @@ const onSave = async (formEl: FormInstance | undefined, type: string) => {
     }
     param.type = type;
     param.save = itemSaves.join(',');
+    param.dbType = dbType.value;
     emit('loading', true);
     await updateRedisPersistenceConf(param)
         .then(() => {
@@ -318,7 +323,7 @@ const onSave = async (formEl: FormInstance | undefined, type: string) => {
 
 const loadform = async () => {
     form.saves = [];
-    const res = await redisPersistenceConf(database.value);
+    const res = await redisPersistenceConf(dbType.value, database.value);
     form.appendonly = res.data?.appendonly;
     form.appendfsync = res.data?.appendfsync;
     let itemSaves = res.data?.save.split(' ');

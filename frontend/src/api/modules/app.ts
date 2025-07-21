@@ -78,8 +78,9 @@ export const getAppInstalledByID = (installID: number, node?: string) => {
     return http.get<App.AppInstalledInfo>(`apps/installed/info/${installID}${params}`);
 };
 
-export const installedOp = (op: App.AppInstalledOp) => {
-    return http.post<any>('apps/installed/op', op, TimeoutEnum.T_40S);
+export const installedOp = (op: App.AppInstalledOp, node?: string) => {
+    const params = node ? `?operateNode=${node}` : '';
+    return http.post<any>(`apps/installed/op${params}`, op, TimeoutEnum.T_40S);
 };
 
 export const syncInstalledApp = () => {
