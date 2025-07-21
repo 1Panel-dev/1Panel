@@ -73,15 +73,18 @@ func (iptables *Iptables) runf(tab, rule string, a ...any) error {
 func (iptables *Iptables) Check() error {
 	stdout, err := cmd.RunDefaultWithStdoutBashC("cat /proc/sys/net/ipv4/ip_forward")
 	if err != nil {
-		return fmt.Errorf("%s, %s", err, stdout)
+		return fmt.Errorf("check ip_forward error: %w, output: %s", err, stdout)
 	}
-	if stdout == "0" {
-		return fmt.Errorf("ipv4 forward disable")
+	if strings.TrimSpace(stdout) == "0" {
+		return fmt.Errorf("ipv4 forward disabled")
 	}
 
-	chain, _ := iptables.outf(NatTab, "-L -n | grep 'Chain %s'", PreRoutingChain)
-	if len(strings.ReplaceAll(chain, "\n", "")) != 0 {
-		return fmt.Errorf("chain enabled")
+	chain, err := iptables.outf(NatTab, "-L -n | grep 'Chain %s'", PreRoutingChain)
+	if err != nil {
+		return fmt.Errorf("failed to check chain: %w", err)
+	}
+	if strings.TrimSpace(chain) != "" {
+		return fmt.Errorf("chain %s already exists", PreRoutingChain)
 	}
 
 	return nil
