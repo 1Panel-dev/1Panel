@@ -501,7 +501,7 @@ const search = async () => {
                 form.network = res.data.network;
                 form.hostname = res.data.hostname;
                 form.domainName = res.data.domainName;
-                form.dns = res.data.dns;
+                form.dns = res.data.dns || [];
                 form.ipv4 = res.data.ipv4;
                 form.ipv6 = res.data.ipv6;
                 form.openStdin = res.data.openStdin;
