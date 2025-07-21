@@ -36,9 +36,6 @@
                     </el-form-item>
                     <el-form-item :label="$t('xpack.alert.port')" prop="port">
                         <el-input v-model.number="form.config.port" :min="1" :max="65535" />
-                        <span class="input-help">
-                            {{ $t('xpack.alert.portHelper') }}
-                        </span>
                     </el-form-item>
                     <el-form-item :label="$t('xpack.alert.encryption')" prop="encryption">
                         <div class="flex items-center gap-2">
