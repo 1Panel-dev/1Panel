@@ -177,7 +177,7 @@ func createLink(ctx context.Context, installTask *task.Task, app model.App, appI
 				if password, ok := params["PANEL_DB_ROOT_PASSWORD"]; ok {
 					if password != "" {
 						database.Password = password.(string)
-						if app.Key == "mysql" || app.Key == "mariadb" {
+						if app.Key == "mysql" || app.Key == "mariadb" || app.Key == constant.AppMysqlCluster {
 							database.Username = "root"
 						}
 						if rootUser, ok := params["PANEL_DB_ROOT_USER"]; ok {
@@ -282,6 +282,9 @@ func createLink(ctx context.Context, installTask *task.Task, app model.App, appI
 					}
 				case constant.AppMysql, constant.AppMariaDB, constant.AppMysqlCluster:
 					oldMysqlDb, _ := mysqlRepo.Get(repo.WithByName(dbConfig.DbName), repo.WithByFrom(constant.ResourceLocal))
+					if oldMysqlDb.ID == 0 {
+						oldMysqlDb, _ = mysqlRepo.Get(repo.WithByName(dbConfig.DbName), repo.WithByFrom(constant.AppResourceRemote))
+					}
 					resourceId = oldMysqlDb.ID
 					if oldMysqlDb.ID > 0 {
 						if oldMysqlDb.Username != dbConfig.DbUser || oldMysqlDb.Password != dbConfig.Password {
