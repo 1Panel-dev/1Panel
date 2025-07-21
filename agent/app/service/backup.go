@@ -541,11 +541,17 @@ func changeLocalBackup(oldPath, newPath string) error {
 			return err
 		}
 	}
+	if fileOp.Stat(path.Join(oldPath, "master")) {
+		if err := fileOp.CopyDir(path.Join(oldPath, "master"), newPath); err != nil {
+			return err
+		}
+	}
 	_ = fileOp.RmRf(path.Join(oldPath, "app"))
 	_ = fileOp.RmRf(path.Join(oldPath, "database"))
 	_ = fileOp.RmRf(path.Join(oldPath, "directory"))
 	_ = fileOp.RmRf(path.Join(oldPath, "system_snapshot"))
 	_ = fileOp.RmRf(path.Join(oldPath, "website"))
 	_ = fileOp.RmRf(path.Join(oldPath, "log"))
+	_ = fileOp.RmRf(path.Join(oldPath, "master"))
 	return nil
 }

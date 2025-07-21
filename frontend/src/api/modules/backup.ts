@@ -84,7 +84,7 @@ export const editBackup = (params: Backup.BackupOperate) => {
     if (!params.isPublic) {
         urlItem = '/backups/update';
     }
-    return http.post(urlItem, request);
+    return http.post(urlItem, request, TimeoutEnum.T_60S);
 };
 export const deleteBackup = (params: { id: number; name: string; isPublic: boolean }) => {
     if (!params.isPublic) {
