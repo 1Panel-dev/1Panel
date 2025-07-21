@@ -677,7 +677,7 @@ func (u *ContainerService) ContainerUpdate(req dto.ContainerOperate) error {
 
 		taskItem.AddSubTask(i18n.GetWithName("ContainerCreate", req.Name), func(t *task.Task) error {
 			err := client.ContainerRemove(ctx, req.ContainerID, container.RemoveOptions{Force: true})
-			taskItem.LogWithStatus(i18n.GetMsgByKey("ContainerRemoveOld"), err)
+			taskItem.LogWithStatus(i18n.GetWithName("ContainerRemoveOld", req.Name), err)
 			if err != nil {
 				return err
 			}
@@ -753,7 +753,7 @@ func (u *ContainerService) ContainerUpgrade(req dto.ContainerUpgrade) error {
 				}
 			}
 			err := client.ContainerRemove(ctx, req.Name, container.RemoveOptions{Force: true})
-			taskItem.LogWithStatus(i18n.GetMsgByKey("ContainerRemoveOld"), err)
+			taskItem.LogWithStatus(i18n.GetWithName("ContainerRemoveOld", req.Name), err)
 			if err != nil {
 				return err
 			}

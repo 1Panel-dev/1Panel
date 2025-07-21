@@ -4,14 +4,6 @@
             back-name="ContainerItem"
             :title="isCreate ? $t('container.create') : $t('commons.button.edit') + ' - ' + form.name"
         >
-            <template #prompt>
-                <el-alert
-                    v-if="!isCreate && isFromApp(form)"
-                    :title="$t('container.containerFromAppHelper')"
-                    :closable="false"
-                    type="error"
-                />
-            </template>
             <template #main>
                 <el-form
                     ref="formRef"
@@ -24,6 +16,13 @@
                     <el-row type="flex" justify="center" :gutter="20">
                         <el-col :span="20">
                             <el-card>
+                                <el-alert
+                                    v-if="!isCreate && isFromApp(form)"
+                                    :title="$t('container.containerFromAppHelper')"
+                                    :closable="false"
+                                    type="error"
+                                />
+
                                 <el-button v-if="isCreate" type="primary" icon="EditPen" plain @click="toTerminal()">
                                     {{ $t('container.commandInput') }}
                                 </el-button>
