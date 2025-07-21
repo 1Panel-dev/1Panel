@@ -113,7 +113,7 @@
                 <el-form-item
                     :label="$t('setting.compressPassword')"
                     class="mt-5"
-                    v-if="type === 'mysql' || type === 'mariadb' || type === 'postgresql'"
+                    v-if="type === 'app' || type === 'website'"
                 >
                     <el-input v-model="secret" :placeholder="$t('setting.backupRecoverMessage')" />
                 </el-form-item>
