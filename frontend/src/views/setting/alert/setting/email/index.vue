@@ -42,24 +42,22 @@
                     </el-form-item>
                     <el-form-item :label="$t('xpack.alert.encryption')" prop="encryption">
                         <div class="flex items-center gap-2">
-                            <span>SSL</span>
+                            <span class="el-form-item__label">SSL</span>
                             <el-switch
                                 v-model="form.config.encryption"
                                 :active-value="'SSL'"
                                 :inactive-value="form.config.encryption === 'SSL' ? 'NONE' : form.config.encryption"
-                                @change="handleEncryptionSwitch('SSL')"
                             />
                         </div>
                         <span class="input-help">
                             {{ $t('xpack.alert.sslHelper') }}
                         </span>
                         <div class="flex items-center gap-2">
-                            <span>TLS</span>
+                            <span class="el-form-item__label">TLS</span>
                             <el-switch
                                 v-model="form.config.encryption"
                                 :active-value="'TLS'"
                                 :inactive-value="form.config.encryption === 'TLS' ? 'NONE' : form.config.encryption"
-                                @change="handleEncryptionSwitch('TLS')"
                             />
                         </div>
                         <span class="input-help">

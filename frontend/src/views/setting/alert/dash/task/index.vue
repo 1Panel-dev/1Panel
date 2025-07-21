@@ -288,10 +288,6 @@
                         <el-select class="selectClass" v-model="dialogData.rowData!.sendMethod" multiple cleanable>
                             <el-option value="mail" :label="$t('xpack.alert.mail')" />
                             <el-option value="sms" :label="$t('xpack.alert.sms')" />
-                            <el-option value="wechat" disabled :label="$t('xpack.alert.wechat')" />
-                            <el-option value="weCom" disabled :label="$t('xpack.alert.weCom')" />
-                            <el-option value="dingTalk" disabled :label="$t('xpack.alert.dingTalk')" />
-                            <el-option value="feiShu" disabled :label="$t('xpack.alert.feiShu')" />
                         </el-select>
                     </el-form-item>
                     <span class="input-help">

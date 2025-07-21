@@ -48,6 +48,7 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 			global.LOG.Debugf("preper to handle cron job [%s] %s failed, err: %v", cronjob.Type, cronjob.Name, err)
 			record.TaskID = ""
 			cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), record.Records)
+			handleCronJobAlert(cronjob)
 			return
 		}
 		if err := taskItem.Execute(); err != nil {
