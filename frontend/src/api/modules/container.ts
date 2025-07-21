@@ -36,8 +36,9 @@ export const commitContainer = (params: Container.ContainerCommit) => {
 export const loadContainerInfo = (name: string) => {
     return http.post<Container.ContainerHelper>(`/containers/info`, { name: name });
 };
-export const cleanContainerLog = (containerName: string) => {
-    return http.post(`/containers/clean/log`, { name: containerName });
+export const cleanContainerLog = (containerName: string, operateNode?: string) => {
+    const params = operateNode ? `?operateNode=${operateNode}` : '';
+    return http.post(`/containers/clean/log${params}`, { name: containerName });
 };
 export const containerListStats = () => {
     return http.get<Array<Container.ContainerListStats>>(`/containers/list/stats`);

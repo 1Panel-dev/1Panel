@@ -1028,9 +1028,15 @@ func (u *ContainerService) DownloadContainerLogs(containerType, container, since
 		return buserr.New("ErrCmdIllegal")
 	}
 	commandArg := []string{"logs", container}
+	dockerCommand := global.CONF.DockerConfig.Command
 	if containerType == "compose" {
-		commandArg = []string{"compose", "-f", container, "logs"}
+		if dockerCommand == "docker-compose" {
+			commandArg = []string{"-f", container, "logs"}
+		} else {
+			commandArg = []string{"compose", "-f", container, "logs"}
+		}
 	}
+
 	if tail != "0" {
 		commandArg = append(commandArg, "--tail")
 		commandArg = append(commandArg, tail)
@@ -1039,16 +1045,20 @@ func (u *ContainerService) DownloadContainerLogs(containerType, container, since
 		commandArg = append(commandArg, "--since")
 		commandArg = append(commandArg, since)
 	}
-
-	cmd := exec.Command("docker", commandArg...)
-	stdout, err := cmd.StdoutPipe()
+	var dockerCmd *exec.Cmd
+	if containerType == "compose" && dockerCommand == "docker-compose" {
+		dockerCmd = exec.Command("docker-compose", commandArg...)
+	} else {
+		dockerCmd = exec.Command("docker", commandArg...)
+	}
+	stdout, err := dockerCmd.StdoutPipe()
 	if err != nil {
-		_ = cmd.Process.Signal(syscall.SIGTERM)
+		_ = dockerCmd.Process.Signal(syscall.SIGTERM)
 		return err
 	}
-	cmd.Stderr = cmd.Stdout
-	if err := cmd.Start(); err != nil {
-		_ = cmd.Process.Signal(syscall.SIGTERM)
+	dockerCmd.Stderr = dockerCmd.Stdout
+	if err := dockerCmd.Start(); err != nil {
+		_ = dockerCmd.Process.Signal(syscall.SIGTERM)
 		return err
 	}
 

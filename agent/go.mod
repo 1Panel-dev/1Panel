@@ -48,7 +48,7 @@ require (
 	github.com/upyun/go-sdk v2.1.0+incompatible
 	golang.org/x/crypto v0.39.0
 	golang.org/x/net v0.41.0
-	golang.org/x/oauth2 v0.29.0
+	golang.org/x/oauth2 v0.30.0
 	golang.org/x/sys v0.33.0
 	golang.org/x/text v0.26.0
 	google.golang.org/genproto v0.0.0-20241021214115-324edc3d5d38

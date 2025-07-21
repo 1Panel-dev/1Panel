@@ -180,7 +180,6 @@ const acceptParams = (prop: DialogProps): void => {
 };
 
 const loadStatus = async () => {
-    console.log('loadStatus', database.value);
     const res = await loadRedisStatus(dbType.value, database.value);
     let hit = (
         (Number(res.data.keyspace_hits) / (Number(res.data.keyspace_hits) + Number(res.data.keyspace_misses))) *

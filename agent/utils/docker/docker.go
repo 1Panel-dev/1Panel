@@ -63,11 +63,11 @@ func (c Client) Close() {
 	_ = c.cli.Close()
 }
 
-func (c Client) ListContainersByName(names []string) ([]types.Container, error) {
+func (c Client) ListContainersByName(names []string) ([]container.Summary, error) {
 	var (
 		options  container.ListOptions
 		namesMap = make(map[string]bool)
-		res      []types.Container
+		res      []container.Summary
 	)
 	options.All = true
 	if len(names) > 0 {
@@ -89,7 +89,7 @@ func (c Client) ListContainersByName(names []string) ([]types.Container, error) 
 	}
 	return res, nil
 }
-func (c Client) ListAllContainers() ([]types.Container, error) {
+func (c Client) ListAllContainers() ([]container.Summary, error) {
 	var (
 		options container.ListOptions
 	)

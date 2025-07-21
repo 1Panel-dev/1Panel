@@ -203,7 +203,11 @@ const onClean = async () => {
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',
     }).then(async () => {
-        await cleanContainerLog(logSearch.container);
+        let currentNode = globalStore.currentNode;
+        if (props.node && props.node !== '') {
+            currentNode = props.node;
+        }
+        await cleanContainerLog(logSearch.container, currentNode);
         searchLogs();
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     });

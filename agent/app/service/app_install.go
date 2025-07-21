@@ -919,6 +919,8 @@ func (a *AppInstallService) GetAppInstallInfo(installID uint) (*response.AppInst
 			Status: constant.StatusDeleted,
 		}, nil
 	}
+	_ = syncAppInstallStatus(&appInstall, false)
+	appInstall, _ = appInstallRepo.GetFirst(repo.WithByID(installID))
 	var envMap map[string]interface{}
 	err := json.Unmarshal([]byte(appInstall.Env), &envMap)
 	if err != nil {

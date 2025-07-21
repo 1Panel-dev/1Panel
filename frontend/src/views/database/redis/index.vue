@@ -318,10 +318,8 @@ const initTerminal = async () => {
         isRefresh.value = !isRefresh.value;
         return;
     }
-    console.log(currentDBName.value);
     await checkAppInstalled(currentDB.value.type, currentDBName.value)
         .then((res) => {
-            console.log(res.data);
             redisIsExist.value = res.data.isExist;
             redisStatus.value = res.data.status;
             loading.value = false;
