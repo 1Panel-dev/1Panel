@@ -24,7 +24,7 @@
                     </el-badge>
                 </div>
             </template>
-            <div class="dropdown-menu">
+            <div class="dropdown-menu" v-loading="loading">
                 <div class="dropdown-item mb-2" @click="openTask">
                     {{ $t('menu.msgCenter') }}
                     <el-tag class="msg-tag" v-if="taskCount !== 0" size="small" round>{{ taskCount }}</el-tag>
@@ -93,6 +93,7 @@ const globalStore = GlobalStore();
 const menuStore = MenuStore();
 const nodes = ref([]);
 const nodeOptions = ref([]);
+const loading = ref();
 const nodeChangeRef = ref<DropdownInstance>();
 const props = defineProps({
     version: String,
@@ -128,6 +129,7 @@ const loadCurrentName = () => {
 
 const showPopover = () => {
     filter.value = '';
+    loadNodes();
     changeFilter();
 };
 
@@ -141,15 +143,18 @@ const changeFilter = () => {
 };
 
 const loadNodes = async () => {
+    loading.value = true;
     nodes.value = [];
     if (!isMasterPro.value) {
         globalStore.currentNode = 'local';
+        loading.value = false;
         return;
     }
     await listNodeOptions('')
         .then((res) => {
             if (!res) {
                 nodes.value = [];
+                loading.value = false;
                 return;
             }
             nodes.value = res.data || [];
@@ -157,9 +162,11 @@ const loadNodes = async () => {
                 globalStore.currentNode = 'local';
             }
             nodeOptions.value = nodes.value || [];
+            loading.value = false;
         })
         .catch(() => {
             nodes.value = [];
+            loading.value = false;
         });
 };
 const changeNode = (command: string) => {
