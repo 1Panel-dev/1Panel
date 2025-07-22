@@ -1,7 +1,8 @@
 <template>
     <div>
         <RouterMenu />
-        <LayoutContent :title="'.NET'" v-loading="loading">
+        <DockerStatus v-model:isActive="isActive" v-model:isExist="isExist" />
+        <LayoutContent v-loading="loading" v-if="isExist" :class="{ mask: !isActive }">
             <template #leftToolBar>
                 <el-button type="primary" @click="openCreate">
                     {{ $t('runtime.create') }}
@@ -111,6 +112,7 @@ import { GlobalStore } from '@/store';
 import RuntimeStatus from '@/views/website/runtime/components/runtime-status.vue';
 import PortJump from '@/views/website/runtime/components/port-jump.vue';
 import Terminal from '@/views/website/runtime/components/terminal.vue';
+import DockerStatus from '@/views/container/docker-status/index.vue';
 import { disabledButton } from '@/utils/runtime';
 import { operateRuntime, updateRuntimeRemark } from '../common/utils';
 
@@ -122,6 +124,8 @@ const dialogPortJumpRef = ref();
 const composeLogRef = ref();
 const checkRef = ref();
 const terminalRef = ref();
+const isActive = ref(false);
+const isExist = ref(false);
 
 const globalStore = GlobalStore();
 const mobile = computed(() => {

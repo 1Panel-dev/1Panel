@@ -1,8 +1,8 @@
 <template>
     <div>
         <RouterMenu />
-        <LayoutContent :title="'PHP'" v-loading="loading">
-            <template #prompt></template>
+        <DockerStatus v-model:isActive="isActive" v-model:isExist="isExist" />
+        <LayoutContent v-loading="loading" v-if="isExist" :class="{ mask: !isActive }">
             <template #leftToolBar>
                 <el-button type="primary" @click="openCreate">
                     {{ $t('runtime.create') }}
@@ -151,6 +151,7 @@ import Terminal from '@/views/website/runtime/components/terminal.vue';
 import { disabledButton } from '@/utils/runtime';
 import { GlobalStore } from '@/store';
 import router from '@/routers/router';
+import DockerStatus from '@/views/container/docker-status/index.vue';
 import { operateRuntime, updateRuntimeRemark } from '../common/utils';
 const globalStore = GlobalStore();
 const mobile = computed(() => {
@@ -181,6 +182,8 @@ const composeLogRef = ref();
 const configRef = ref();
 const supervisorRef = ref();
 const terminalRef = ref();
+const isActive = ref(false);
+const isExist = ref(false);
 
 const buttons = [
     {
