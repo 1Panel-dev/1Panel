@@ -266,7 +266,7 @@ func (b *BaseApi) ContainerCreate(c *gin.Context) {
 		return
 	}
 
-	if err := containerService.ContainerCreate(req); err != nil {
+	if err := containerService.ContainerCreate(req, true); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}

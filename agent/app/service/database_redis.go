@@ -84,7 +84,7 @@ func (u *RedisService) InstallCli() error {
 		Image:   "redis:7.4.4",
 		Network: "1panel-network",
 	}
-	return NewIContainerService().ContainerCreate(item)
+	return NewIContainerService().ContainerCreate(item, false)
 }
 
 func (u *RedisService) ChangePassword(req dto.ChangeRedisPass) error {

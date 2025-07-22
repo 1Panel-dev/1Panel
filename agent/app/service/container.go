@@ -62,7 +62,7 @@ type IContainerService interface {
 	PageCompose(req dto.SearchWithPage) (int64, interface{}, error)
 	CreateCompose(req dto.ComposeCreate) error
 	ComposeOperation(req dto.ComposeOperation) error
-	ContainerCreate(req dto.ContainerOperate) error
+	ContainerCreate(req dto.ContainerOperate, inThread bool) error
 	ContainerCreateByCommand(req dto.ContainerCreateByCommand) error
 	ContainerUpdate(req dto.ContainerOperate) error
 	ContainerUpgrade(req dto.ContainerUpgrade) error
@@ -496,7 +496,7 @@ func (u *ContainerService) LoadResourceLimit() (*dto.ResourceLimit, error) {
 	return &data, nil
 }
 
-func (u *ContainerService) ContainerCreate(req dto.ContainerOperate) error {
+func (u *ContainerService) ContainerCreate(req dto.ContainerOperate, inThread bool) error {
 	client, err := docker.NewDockerClient()
 	if err != nil {
 		return err
@@ -514,63 +514,62 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerOperate) error {
 		return err
 	}
 
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		taskItem.AddSubTask(i18n.GetWithName("ContainerImagePull", req.Image), func(t *task.Task) error {
-			if !checkImageExist(client, req.Image) || req.ForcePull {
-				if err := pullImages(taskItem, client, req.Image); err != nil {
-					if !req.ForcePull {
-						return err
-					}
+	taskItem.AddSubTask(i18n.GetWithName("ContainerImagePull", req.Image), func(t *task.Task) error {
+		if !checkImageExist(client, req.Image) || req.ForcePull {
+			if err := pullImages(taskItem, client, req.Image); err != nil {
+				if !req.ForcePull {
+					return err
 				}
 			}
-			return nil
-		}, nil)
-
-		taskItem.AddSubTask(i18n.GetMsgByKey("ContainerImageCheck"), func(t *task.Task) error {
-			imageInfo, _, err := client.ImageInspectWithRaw(ctx, req.Image)
-			if err != nil {
-				return err
-			}
-			if len(req.Entrypoint) == 0 {
-				req.Entrypoint = imageInfo.Config.Entrypoint
-			}
-			if len(req.Cmd) == 0 {
-				req.Cmd = imageInfo.Config.Cmd
-			}
-			return nil
-		}, nil)
-
-		taskItem.AddSubTask(i18n.GetWithName("ContainerCreate", req.Name), func(t *task.Task) error {
-			config, hostConf, networkConf, err := loadConfigInfo(true, req, nil)
-			taskItem.LogWithStatus(i18n.GetMsgByKey("ContainerLoadInfo"), err)
-			if err != nil {
-				return err
-			}
-			con, err := client.ContainerCreate(ctx, config, hostConf, networkConf, &v1.Platform{}, req.Name)
-			if err != nil {
-				taskItem.Log(i18n.GetMsgByKey("ContainerCreateFailed"))
-				_ = client.ContainerRemove(ctx, req.Name, container.RemoveOptions{RemoveVolumes: true, Force: true})
-				return err
-			}
-			err = client.ContainerStart(ctx, con.ID, container.StartOptions{})
-			taskItem.LogWithStatus(i18n.GetMsgByKey("ContainerStartCheck"), err)
-			if err != nil {
-				taskItem.Log(i18n.GetMsgByKey("ContainerCreateFailed"))
-				_ = client.ContainerRemove(ctx, req.Name, container.RemoveOptions{RemoveVolumes: true, Force: true})
-				return fmt.Errorf("create successful but start failed, err: %v", err)
-			}
-			return nil
-		}, nil)
-
-		if err := taskItem.Execute(); err != nil {
-			global.LOG.Error(err.Error())
 		}
-	}()
-	wg.Wait()
-	return nil
+		return nil
+	}, nil)
+
+	taskItem.AddSubTask(i18n.GetMsgByKey("ContainerImageCheck"), func(t *task.Task) error {
+		imageInfo, _, err := client.ImageInspectWithRaw(ctx, req.Image)
+		if err != nil {
+			return err
+		}
+		if len(req.Entrypoint) == 0 {
+			req.Entrypoint = imageInfo.Config.Entrypoint
+		}
+		if len(req.Cmd) == 0 {
+			req.Cmd = imageInfo.Config.Cmd
+		}
+		return nil
+	}, nil)
+
+	taskItem.AddSubTask(i18n.GetWithName("ContainerCreate", req.Name), func(t *task.Task) error {
+		config, hostConf, networkConf, err := loadConfigInfo(true, req, nil)
+		taskItem.LogWithStatus(i18n.GetMsgByKey("ContainerLoadInfo"), err)
+		if err != nil {
+			return err
+		}
+		con, err := client.ContainerCreate(ctx, config, hostConf, networkConf, &v1.Platform{}, req.Name)
+		if err != nil {
+			taskItem.Log(i18n.GetMsgByKey("ContainerCreateFailed"))
+			_ = client.ContainerRemove(ctx, req.Name, container.RemoveOptions{RemoveVolumes: true, Force: true})
+			return err
+		}
+		err = client.ContainerStart(ctx, con.ID, container.StartOptions{})
+		taskItem.LogWithStatus(i18n.GetMsgByKey("ContainerStartCheck"), err)
+		if err != nil {
+			taskItem.Log(i18n.GetMsgByKey("ContainerCreateFailed"))
+			_ = client.ContainerRemove(ctx, req.Name, container.RemoveOptions{RemoveVolumes: true, Force: true})
+			return fmt.Errorf("create successful but start failed, err: %v", err)
+		}
+		return nil
+	}, nil)
+
+	if inThread {
+		go func() {
+			if err := taskItem.Execute(); err != nil {
+				global.LOG.Error(err.Error())
+			}
+		}()
+		return nil
+	}
+	return taskItem.Execute()
 }
 
 func (u *ContainerService) ContainerInfo(req dto.OperationWithName) (*dto.ContainerOperate, error) {
