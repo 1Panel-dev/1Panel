@@ -125,7 +125,7 @@ const buttons = [
             syncAlert(row);
         },
         disabled: (row: Alert.AlertLog) => {
-            return row.status != 'PushSuccess' && row.status != 'SyncError';
+            return row.method != 'sms' && row.status != 'PushSuccess' && row.status != 'SyncError';
         },
     },
 ];

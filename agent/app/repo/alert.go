@@ -20,6 +20,7 @@ type IAlertRepo interface {
 	WithByCreateAt(date *date.Date) DBOption
 	WithByLicenseId(licenseId string) DBOption
 	WithByRecordId(recordId uint) DBOption
+	WithByMethod(method string) DBOption
 
 	Create(alert *model.Alert) error
 	Get(opts ...DBOption) (model.Alert, error)
@@ -97,6 +98,12 @@ func (a *AlertRepo) WithByLicenseId(licenseId string) DBOption {
 func (a *AlertRepo) WithByRecordId(recordId uint) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("record_id = ?", recordId)
+	}
+}
+
+func (a *AlertRepo) WithByMethod(method string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("method = ?", method)
 	}
 }
 

@@ -69,5 +69,5 @@ export const SyncAlertAll = () => {
 };
 
 export const SyncOfflineAlert = () => {
-    return http.post<any>(`/xpack/core/alert/offline/sync`);
+    return http.post<any>(`/core/xpack/alert/offline/sync`);
 };
