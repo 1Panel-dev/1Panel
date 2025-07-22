@@ -262,6 +262,7 @@ const onSubmitForm = async (formEl: FormInstance | undefined) => {
 };
 const submitForm = async () => {
     let param = {
+        dbType: 'redis',
         database: database.value,
         timeout: form.timeout + '',
         maxclients: form.maxclients + '',
