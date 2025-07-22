@@ -290,7 +290,7 @@ func isWithinTimeRange(savedTimeString string) bool {
 func GetEmailContent(alertType string, params []dto.Param) string {
 	switch GetCronJobType(alertType) {
 	case "ssl":
-		return i18n.GetMsgWithMap("SSLAlert", map[string]interface{}{"day": getValueByIndex(params, "1")})
+		return i18n.GetMsgWithMap("SSLAlert", map[string]interface{}{"num": getValueByIndex(params, "1"), "day": getValueByIndex(params, "2")})
 	case "siteEndTime":
 		return i18n.GetMsgWithMap("WebSiteAlert", map[string]interface{}{"num": getValueByIndex(params, "1"), "day": getValueByIndex(params, "2")})
 	case "panelPwdEndTime":

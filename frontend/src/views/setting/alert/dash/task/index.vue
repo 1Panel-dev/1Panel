@@ -389,7 +389,7 @@ const rules = reactive({
     cycle: [Rules.requiredInput, Rules.integerNumber, { validator: checkCycle, trigger: 'blur' }],
     count: [Rules.requiredInput, Rules.integerNumber, { validator: checkCount, trigger: 'blur' }],
     sendCount: [Rules.requiredInput, Rules.integerNumber, { validator: checkSendCount, trigger: 'blur' }],
-    method: [Rules.requiredSelect],
+    sendMethod: [Rules.requiredSelect],
 });
 
 function checkCycle(rule: any, value: any, callback: any) {

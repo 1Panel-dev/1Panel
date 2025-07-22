@@ -4,7 +4,9 @@
             <template #toolbar>
                 <div class="flex justify-between gap-2 flex-wrap sm:flex-row">
                     <div class="flex flex-wrap gap-3">
-                        <el-button type="primary" @click="syncAll">{{ $t('commons.button.sync') }}</el-button>
+                        <el-button type="primary" @click="syncAll" v-if="isProductPro">
+                            {{ $t('commons.button.sync') }}
+                        </el-button>
                         <el-button type="primary" plain @click="onClean">{{ $t('xpack.alert.cleanLog') }}</el-button>
                     </div>
                 </div>
@@ -59,6 +61,7 @@
                         </template>
                     </el-table-column>
                     <fu-table-operations
+                        v-if="isProductPro"
                         :ellipsis="2"
                         width="130px"
                         :buttons="buttons"

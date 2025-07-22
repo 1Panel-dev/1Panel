@@ -1377,12 +1377,11 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
 
         form.exclusionRules = form.ignoreFiles.join(',');
         form.snapshotRule = { withImage: form.withImage, ignoreAppIDs: form.ignoreAppIDs };
-        form.alertCount = form.hasAlert && isProductPro.value ? form.alertCount : 0;
+        form.alertCount = form.hasAlert ? form.alertCount : 0;
         form.alertMethod = form.alertMethodItems.join(',');
-        form.alertTitle =
-            form.hasAlert && isProductPro.value
-                ? i18n.global.t('cronjob.alertTitle', [i18n.global.t('cronjob.' + form.type), form.name])
-                : '';
+        form.alertTitle = form.hasAlert
+            ? i18n.global.t('cronjob.alertTitle', [i18n.global.t('cronjob.' + form.type), form.name])
+            : '';
         if (!form) return;
 
         if (isCreate.value) {
