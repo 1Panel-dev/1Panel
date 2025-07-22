@@ -274,6 +274,7 @@ const searchAlertInfo = async () => {
             loading.value = false;
         }
     }
+    await search();
 };
 
 onMounted(async () => {
