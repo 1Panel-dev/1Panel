@@ -211,3 +211,4 @@ ErrMasterDelete: "Unable to delete the master node, please delete the slave node
 ClusterNameIsExist: "Cluster name already exists."
 AppStatusUnHealthy: "Application status acquisition is abnormal, please check the installation node status in the node list."
 MasterNodePortNotAvailable: "Node {{ .name }} port {{ .port }} connectivity verification failed, please check firewall/security group settings and master node status."
+ClusterMasterNotExist: "The master node of the cluster is disconnected, please delete the child nodes."

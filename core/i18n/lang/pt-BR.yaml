@@ -211,3 +211,4 @@ ErrMasterDelete: "Não é possível excluir o nó mestre, exclua os nós escravo
 ClusterNameIsExist: "O nome do cluster já existe."
 AppStatusUnHealthy: "A aquisição do status do aplicativo está anormal, verifique o status dos nós de instalação na lista de nós."
 MasterNodePortNotAvailable: "A verificação de conectividade da porta {{ .port }} do nó {{ .name }} falhou, verifique as configurações de firewall/grupo de segurança e o status do nó mestre."
+ClusterMasterNotExist: "O nó mestre do cluster está desconectado, por favor, exclua os nós filhos."
