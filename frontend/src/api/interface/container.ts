@@ -119,6 +119,10 @@ export namespace Container {
         cpuPercent: number;
         memoryPercent: number;
     }
+    export interface ContainerInfo {
+        name: string;
+        state: string;
+    }
     export interface ContainerListStats {
         containerID: string;
         cpuTotalUsage: number;

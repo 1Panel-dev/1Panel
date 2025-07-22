@@ -50,12 +50,7 @@ func (b *BaseApi) LoadContainerUsers(c *gin.Context) {
 		return
 	}
 
-	list, err := containerService.LoadUsers(req)
-	if err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-	helper.SuccessWithData(c, list)
+	helper.SuccessWithData(c, containerService.LoadUsers(req))
 }
 
 // @Tags Container

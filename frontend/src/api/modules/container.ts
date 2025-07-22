@@ -7,7 +7,7 @@ export const searchContainer = (params: Container.ContainerSearch) => {
     return http.post<ResPage<Container.ContainerInfo>>(`/containers/search`, params, TimeoutEnum.T_40S);
 };
 export const listContainer = () => {
-    return http.post<Array<string>>(`/containers/list`, {});
+    return http.post<Array<Container.ContainerInfo>>(`/containers/list`, {});
 };
 export const loadContainerUsers = (name: string) => {
     return http.post<Array<string>>(`/containers/users`, { name: name });

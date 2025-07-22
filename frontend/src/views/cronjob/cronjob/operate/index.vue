@@ -354,15 +354,19 @@
                                         <LayoutCol>
                                             <el-form-item :label="$t('cronjob.containerName')" prop="containerName">
                                                 <el-select
-                                                    @change="loadUserOptions(false)"
                                                     v-model="form.containerName"
+                                                    @change="loadUserOptions(false)"
                                                 >
-                                                    <el-option
-                                                        v-for="item in containerOptions"
-                                                        :key="item"
-                                                        :value="item"
-                                                        :label="item"
-                                                    />
+                                                    <div v-for="item in containerOptions" :key="item.name">
+                                                        <el-option :value="item.name" :label="item.name">
+                                                            {{ item.name }}
+                                                            <Status
+                                                                class="float-right"
+                                                                :key="item.state"
+                                                                :status="item.state"
+                                                            />
+                                                        </el-option>
+                                                    </div>
                                                 </el-select>
                                             </el-form-item>
                                         </LayoutCol>
@@ -1278,6 +1282,7 @@ const changeAccount = async () => {
 };
 
 const loadUserOptions = async (isInit: boolean) => {
+    userOptions.value = [];
     if (!form.inContainer) {
         const res = await loadUsers();
         userOptions.value = res.data || [];

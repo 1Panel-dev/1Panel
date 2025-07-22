@@ -39,6 +39,11 @@ type ContainerInfo struct {
 	Websites       []string `json:"websites"`
 }
 
+type ContainerOptions struct {
+	Name  string `json:"name"`
+	State string `json:"state"`
+}
+
 type ContainerStatus struct {
 	All        uint `json:"all"`
 	Created    uint `json:"created"`
