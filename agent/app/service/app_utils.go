@@ -141,7 +141,6 @@ func createLink(ctx context.Context, installTask *task.Task, app model.App, appI
 		}
 		_ = deleteLink(del)
 	}
-	var dbConfig dto.AppDatabase
 	if DatabaseKeys[app.Key] > 0 {
 		handleDataBaseApp := func(task *task.Task) error {
 			database := &model.Database{
@@ -232,6 +231,7 @@ func createLink(ctx context.Context, installTask *task.Task, app model.App, appI
 		}
 	}
 
+	var dbConfig dto.AppDatabase
 	if app.Type == "website" || app.Type == "tool" {
 		paramByte, err := json.Marshal(params)
 		if err != nil {
@@ -258,7 +258,7 @@ func createLink(ctx context.Context, installTask *task.Task, app model.App, appI
 				case constant.AppPostgresql, constant.AppPostgres, constant.AppPostgresqlCluster:
 					oldPostgresqlDb, _ := postgresqlRepo.Get(repo.WithByName(dbConfig.DbName), repo.WithByFrom(constant.ResourceLocal))
 					if oldPostgresqlDb.ID == 0 {
-						oldPostgresqlDb, _ = postgresqlRepo.Get(repo.WithByName(dbConfig.DbName), repo.WithByFrom(constant.AppResourceRemote))
+						oldPostgresqlDb, _ = postgresqlRepo.Get(repo.WithByName(dbConfig.DbName), postgresqlRepo.WithByPostgresqlName(dbConfig.DatabaseName), repo.WithByFrom(constant.AppResourceRemote))
 					}
 					resourceId = oldPostgresqlDb.ID
 					if oldPostgresqlDb.ID > 0 {
@@ -283,7 +283,7 @@ func createLink(ctx context.Context, installTask *task.Task, app model.App, appI
 				case constant.AppMysql, constant.AppMariaDB, constant.AppMysqlCluster:
 					oldMysqlDb, _ := mysqlRepo.Get(repo.WithByName(dbConfig.DbName), repo.WithByFrom(constant.ResourceLocal))
 					if oldMysqlDb.ID == 0 {
-						oldMysqlDb, _ = mysqlRepo.Get(repo.WithByName(dbConfig.DbName), repo.WithByFrom(constant.AppResourceRemote))
+						oldMysqlDb, _ = mysqlRepo.Get(repo.WithByName(dbConfig.DbName), mysqlRepo.WithByMysqlName(dbConfig.DatabaseName), repo.WithByFrom(constant.AppResourceRemote))
 					}
 					resourceId = oldMysqlDb.ID
 					if oldMysqlDb.ID > 0 {

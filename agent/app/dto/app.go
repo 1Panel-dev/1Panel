@@ -7,10 +7,11 @@ import (
 )
 
 type AppDatabase struct {
-	ServiceName string `json:"PANEL_DB_HOST"`
-	DbName      string `json:"PANEL_DB_NAME"`
-	DbUser      string `json:"PANEL_DB_USER"`
-	Password    string `json:"PANEL_DB_USER_PASSWORD"`
+	ServiceName  string `json:"PANEL_DB_HOST"`
+	DbName       string `json:"PANEL_DB_NAME"`
+	DbUser       string `json:"PANEL_DB_USER"`
+	Password     string `json:"PANEL_DB_USER_PASSWORD"`
+	DatabaseName string `json:"DATABASE_NAME"`
 }
 
 type AuthParam struct {

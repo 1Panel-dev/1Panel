@@ -483,6 +483,7 @@ func (a AppService) Install(req request.AppInstallCreate) (appInstall *model.App
 			req.Params["PANEL_DB_HOST"] = database.Address
 			req.Params["PANEL_DB_PORT"] = database.Port
 			req.Params["PANEL_DB_HOST_NAME"] = hostName
+			req.Params["DATABASE_NAME"] = database.Name
 		}
 	}
 	paramByte, err = json.Marshal(req.Params)
