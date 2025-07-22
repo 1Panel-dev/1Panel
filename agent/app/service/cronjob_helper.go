@@ -3,12 +3,13 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/utils/alert_push"
 	"os"
 	"path"
 	pathUtils "path"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/utils/alert_push"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -269,7 +270,7 @@ func (u *CronjobService) uploadCronjobBackFile(cronjob model.Cronjob, task *task
 	}()
 	var errItem error
 	accounts := strings.Split(cronjob.SourceAccountIDs, ",")
-	cloudSrc := strings.TrimPrefix(file, global.Dir.LocalBackupDir+"/")
+	cloudSrc := strings.TrimPrefix(file, global.Dir.LocalBackupDir+"/tmp/")
 	for _, account := range accounts {
 		if len(account) != 0 {
 			task.LogStart(i18n.GetMsgWithMap("UploadFile", map[string]interface{}{
