@@ -287,7 +287,12 @@
                     <el-form-item :label="$t('xpack.alert.alertMethod')" prop="sendMethod">
                         <el-select class="selectClass" v-model="dialogData.rowData!.sendMethod" multiple cleanable>
                             <el-option value="mail" :label="$t('xpack.alert.mail')" />
-                            <el-option value="sms" :label="$t('xpack.alert.sms')" />
+                            <el-option
+                                value="sms"
+                                v-if="!globalStore.isIntl"
+                                :disabled="!globalStore.isProductPro"
+                                :label="$t('xpack.alert.sms')"
+                            />
                         </el-select>
                     </el-form-item>
                     <span class="input-help">

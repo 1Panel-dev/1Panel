@@ -106,7 +106,10 @@
                             </el-button>
                         </el-alert>
                     </el-card>
-                    <el-card class="rounded-2xl shadow hover:shadow-md transition-all" v-if="globalStore.isProductPro">
+                    <el-card
+                        class="rounded-2xl shadow hover:shadow-md transition-all"
+                        v-if="globalStore.isProductPro && !globalStore.isIntl"
+                    >
                         <div class="flex items-center justify-between mb-2">
                             <div class="text-lg font-semibold">{{ $t('xpack.alert.smsConfig') }}</div>
                             <div>

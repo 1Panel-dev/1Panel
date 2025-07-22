@@ -11,13 +11,6 @@ router.beforeEach((to, from, next) => {
     NProgress.start();
     axiosCanceler.removeAllPending();
     const globalStore = GlobalStore();
-
-    if (globalStore.isIntl && to.path.includes('/xpack/alert')) {
-        next({ name: '404' });
-        NProgress.done();
-        return;
-    }
-
     if (to.name !== 'entrance' && !globalStore.isLogin) {
         next({
             name: 'entrance',

@@ -205,11 +205,9 @@ func stopResourceJob() {
 
 func loadSSLInfo(alert dto.AlertDTO) {
 	var opts []repo.DBOption
-	if !strings.Contains(alert.Project, "all") {
-		var ids []uint
+	if alert.Project != "all" {
 		itemID, _ := strconv.Atoi(alert.Project)
-		ids = append(ids, uint(itemID))
-		opts = append(opts, repo.WithByIDs(ids))
+		opts = append(opts, repo.WithByID(uint(itemID)))
 	}
 
 	sslList, _ := repo.NewISSLRepo().List(opts...)
@@ -267,11 +265,9 @@ func loadSSLInfo(alert dto.AlertDTO) {
 
 func loadWebsiteInfo(alert dto.AlertDTO) {
 	var opts []repo.DBOption
-	if !strings.Contains(alert.Project, "all") {
-		var ids []uint
+	if alert.Project != "all" {
 		itemID, _ := strconv.Atoi(alert.Project)
-		ids = append(ids, uint(itemID))
-		opts = append(opts, repo.WithByIDs(ids))
+		opts = append(opts, repo.WithByID(uint(itemID)))
 	}
 
 	websiteList, _ := websiteRepo.List(opts...)
@@ -282,6 +278,7 @@ func loadWebsiteInfo(alert dto.AlertDTO) {
 		daysDifference := int(website.ExpireDate.Sub(currentDate).Hours() / 24)
 		if daysDifference > 0 && int(alert.Cycle) >= daysDifference {
 			daysDifferenceMap[daysDifference] = append(daysDifferenceMap[daysDifference], website.PrimaryDomain)
+			projectMap[website.ID] = append(projectMap[website.ID], website.ExpireDate)
 		}
 	}
 	projectJSON := serializeAndSortProjects(projectMap)

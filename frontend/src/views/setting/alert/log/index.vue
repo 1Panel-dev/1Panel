@@ -4,7 +4,7 @@
             <template #toolbar>
                 <div class="flex justify-between gap-2 flex-wrap sm:flex-row">
                     <div class="flex flex-wrap gap-3">
-                        <el-button type="primary" @click="syncAll" v-if="isProductPro">
+                        <el-button type="primary" @click="syncAll" v-if="isProductPro && !globalStore.isIntl">
                             {{ $t('commons.button.sync') }}
                         </el-button>
                         <el-button type="primary" plain @click="onClean">{{ $t('xpack.alert.cleanLog') }}</el-button>
@@ -61,7 +61,7 @@
                         </template>
                     </el-table-column>
                     <fu-table-operations
-                        v-if="isProductPro"
+                        v-if="isProductPro && !globalStore.isIntl"
                         :ellipsis="2"
                         width="130px"
                         :buttons="buttons"
@@ -280,7 +280,7 @@ const searchAlertInfo = async () => {
 onMounted(async () => {
     await searchAlertInfo();
     isProductPro.value = globalStore.isProductPro;
-    if (globalStore.isProductPro) {
+    if (globalStore.isProductPro && !globalStore.isIntl) {
         await syncAllAlert();
     }
 });
