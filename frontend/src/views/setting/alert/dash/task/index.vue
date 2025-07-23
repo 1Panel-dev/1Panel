@@ -307,11 +307,11 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="visible = false">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button :disabled="loading" @click="visible = false">{{ $t('commons.button.cancel') }}</el-button>
                 <el-button
                     type="primary"
                     @click="onSubmit(formRef)"
-                    :disabled="dialogData.rowData?.type === 'panelPwdEndTime' && expirationDays === 0"
+                    :disabled="dialogData.rowData?.type === 'panelPwdEndTime' && expirationDays === 0 && loading"
                 >
                     {{ $t('commons.button.confirm') }}
                 </el-button>
@@ -345,7 +345,7 @@ const dialogData = ref<DialogProps>({
     title: '',
 });
 const { t } = i18n.global;
-
+const loading = ref(false);
 const visible = ref(false);
 const websiteOptions = ref();
 const expirationDays = ref(0);
@@ -684,6 +684,8 @@ const formatCronJobName = (id: number) => {
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 const onSubmit = async (formEl: FormInstance | undefined) => {
+    if (loading.value) return;
+    loading.value = true;
     if (!formEl) return;
     await formEl.validate(async (valid) => {
         if (!valid) return;
@@ -693,16 +695,22 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         if (dialogData.value.rowData.type === 'cronJob') {
             dialogData.value.rowData.type = dialogData.value.rowData.subType;
         }
-        if (dialogData.value.title === 'create') {
-            await CreateAlert(dialogData.value.rowData);
-            MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
+        try {
+            if (dialogData.value.title === 'create') {
+                await CreateAlert(dialogData.value.rowData);
+                loading.value = false;
+                MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
+            }
+            if (dialogData.value.title === 'edit') {
+                await UpdateAlert(dialogData.value.rowData);
+                loading.value = false;
+                MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
+            }
+            emit('search');
+            visible.value = false;
+        } finally {
+            loading.value = false; // ✅ 确保任何路径都能解除禁用
         }
-        if (dialogData.value.title === 'edit') {
-            await UpdateAlert(dialogData.value.rowData);
-            MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
-        }
-        emit('search');
-        visible.value = false;
     });
 };
 

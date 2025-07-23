@@ -42,7 +42,7 @@ type IAlertRepo interface {
 	CreateAlertTask(alertTaskBase *model.AlertTask) error
 	DeleteAlertTask(opts ...DBOption) error
 	GetAlertTask(opts ...DBOption) (model.AlertTask, error)
-	LoadTaskCount(alertType string, project string) (uint, uint, error)
+	LoadTaskCount(alertType string, project string, method string) (uint, uint, error)
 	GetTaskLog(alertType string, alertId uint) (time.Time, error)
 	GetLicensePushCount(method string) (uint, error)
 
@@ -222,17 +222,17 @@ func (a *AlertRepo) GetAlertTask(opts ...DBOption) (model.AlertTask, error) {
 	return data, err
 }
 
-func (a *AlertRepo) LoadTaskCount(alertType string, project string) (uint, uint, error) {
+func (a *AlertRepo) LoadTaskCount(alertType string, project string, method string) (uint, uint, error) {
 	var (
 		todayCount int64
 		totalCount int64
 	)
-	_ = global.AlertDB.Model(&model.AlertTask{}).Where("type = ? AND quota_type = ?", alertType, project).Count(&totalCount).Error
+	_ = global.AlertDB.Model(&model.AlertTask{}).Where("type = ? AND quota_type = ? AND method = ?", alertType, project, method).Count(&totalCount).Error
 
 	now := time.Now()
 	todayMidnight := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
 	tomorrowMidnight := todayMidnight.Add(24 * time.Hour)
-	err := global.AlertDB.Model(&model.AlertTask{}).Where("type =  ? AND quota_type = ? AND created_at > ? AND created_at < ?", alertType, project, todayMidnight, tomorrowMidnight).Count(&todayCount).Error
+	err := global.AlertDB.Model(&model.AlertTask{}).Where("type =  ? AND quota_type = ?  AND method = ? AND created_at > ? AND created_at < ?", alertType, project, method, todayMidnight, tomorrowMidnight).Count(&todayCount).Error
 	return uint(todayCount), uint(totalCount), err
 }
 

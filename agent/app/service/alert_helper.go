@@ -219,32 +219,42 @@ func loadSSLInfo(alert dto.AlertDTO) {
 	if projectJSON == "" {
 		return
 	}
-	todayCount, totalCount, err := alertRepo.LoadTaskCount(alert.Type, projectJSON)
-	if err != nil || todayCount >= 1 || alert.SendCount <= totalCount {
-		return
-	}
 	if len(daysDifferenceMap) > 0 {
-		create := dto.AlertLogCreate{
-			Status:  constant.AlertSuccess,
-			Count:   totalCount + 1,
-			AlertId: alert.ID,
-			Type:    alert.Type,
-		}
-		methods := strings.Split(alert.Method, ",")
-		for _, m := range methods {
-			m = strings.TrimSpace(m)
-			for daysDifference, domain := range daysDifferenceMap {
-				primaryDomain := strings.Join(domain, ",")
-				var params []dto.Param
-				params = createAlertBaseParams(strconv.Itoa(len(primaryDomain)), strconv.Itoa(daysDifference))
+		for daysDifference, ssl := range daysDifferenceMap {
+			primaryDomain := strings.Join(ssl, ",")
+			var params []dto.Param
+			params = createAlertBaseParams(strconv.Itoa(len(ssl)), strconv.Itoa(daysDifference))
+			methods := strings.Split(alert.Method, ",")
+			for _, m := range methods {
+				m = strings.TrimSpace(m)
 				switch m {
 				case constant.SMS:
+					todayCount, totalCount, err := alertRepo.LoadTaskCount(alert.Type, projectJSON, constant.SMS)
+					if err != nil || todayCount >= 1 || alert.SendCount <= totalCount {
+						continue
+					}
+					create := dto.AlertLogCreate{
+						Status:  constant.AlertSuccess,
+						Count:   totalCount + 1,
+						AlertId: alert.ID,
+						Type:    alert.Type,
+					}
 					if !alertUtil.CheckTaskFrequency(constant.SMS) {
 						continue
 					}
 					_ = xpack.CreateSMSAlertLog(alert, create, primaryDomain, params, constant.SMS)
 					alertUtil.CreateNewAlertTask(alert.Project, alert.Type, projectJSON, constant.SMS)
 				case constant.Email:
+					todayCount, totalCount, err := alertRepo.LoadTaskCount(alert.Type, projectJSON, constant.Email)
+					if err != nil || todayCount >= 1 || alert.SendCount <= totalCount {
+						continue
+					}
+					create := dto.AlertLogCreate{
+						Status:  constant.AlertSuccess,
+						Count:   totalCount + 1,
+						AlertId: alert.ID,
+						Type:    alert.Type,
+					}
 					alertDetail := alertUtil.ProcessAlertDetail(alert, primaryDomain, params, constant.Email)
 					alertRule := alertUtil.ProcessAlertRule(alert)
 					create.AlertRule = alertRule
@@ -282,32 +292,42 @@ func loadWebsiteInfo(alert dto.AlertDTO) {
 	if projectJSON == "" {
 		return
 	}
-	todayCount, totalCount, err := alertRepo.LoadTaskCount(alert.Type, projectJSON)
-	if err != nil || todayCount >= 1 || alert.SendCount <= totalCount {
-		return
-	}
 	if len(daysDifferenceMap) > 0 {
-		create := dto.AlertLogCreate{
-			Status:  constant.AlertSuccess,
-			Count:   totalCount + 1,
-			AlertId: alert.ID,
-			Type:    alert.Type,
-		}
 		methods := strings.Split(alert.Method, ",")
-		for _, m := range methods {
-			m = strings.TrimSpace(m)
-			for daysDifference, websites := range daysDifferenceMap {
-				primaryDomain := strings.Join(websites, ",")
-				var params []dto.Param
-				params = createAlertBaseParams(strconv.Itoa(len(websites)), strconv.Itoa(daysDifference))
+		for daysDifference, websites := range daysDifferenceMap {
+			primaryDomain := strings.Join(websites, ",")
+			var params []dto.Param
+			params = createAlertBaseParams(strconv.Itoa(len(websites)), strconv.Itoa(daysDifference))
+			for _, m := range methods {
+				m = strings.TrimSpace(m)
 				switch m {
 				case constant.SMS:
 					if !alertUtil.CheckTaskFrequency(constant.SMS) {
 						continue
 					}
+					todayCount, totalCount, err := alertRepo.LoadTaskCount(alert.Type, projectJSON, constant.SMS)
+					if err != nil || todayCount >= 1 || alert.SendCount <= totalCount {
+						continue
+					}
+					create := dto.AlertLogCreate{
+						Status:  constant.AlertSuccess,
+						Count:   totalCount + 1,
+						AlertId: alert.ID,
+						Type:    alert.Type,
+					}
 					_ = xpack.CreateSMSAlertLog(alert, create, primaryDomain, params, constant.SMS)
 					alertUtil.CreateNewAlertTask(alert.Project, alert.Type, projectJSON, constant.SMS)
 				case constant.Email:
+					todayCount, totalCount, err := alertRepo.LoadTaskCount(alert.Type, projectJSON, constant.Email)
+					if err != nil || todayCount >= 1 || alert.SendCount <= totalCount {
+						continue
+					}
+					create := dto.AlertLogCreate{
+						Status:  constant.AlertSuccess,
+						Count:   totalCount + 1,
+						AlertId: alert.ID,
+						Type:    alert.Type,
+					}
 					alertDetail := alertUtil.ProcessAlertDetail(alert, primaryDomain, params, constant.Email)
 					alertRule := alertUtil.ProcessAlertRule(alert)
 					create.AlertDetail = alertDetail
@@ -339,15 +359,6 @@ func loadPanelPwd(alert dto.AlertDTO) {
 		global.LOG.Errorf("load %s from db setting failed, err: %v", "ExpirationTime", err)
 		return
 	}
-	todayCount, totalCount, err := alertRepo.LoadTaskCount(alert.Type, expirationTime.Value)
-	if err != nil || todayCount >= 1 || alert.SendCount <= totalCount {
-		return
-	}
-	create := dto.AlertLogCreate{
-		Count:   totalCount + 1,
-		AlertId: alert.ID,
-		Type:    alert.Type,
-	}
 
 	var params []dto.Param
 	defaultDate, _ := time.Parse(constant.DateTimeLayout, expirationTime.Value)
@@ -362,9 +373,27 @@ func loadPanelPwd(alert dto.AlertDTO) {
 				if !alertUtil.CheckTaskFrequency(constant.SMS) {
 					continue
 				}
+				todayCount, totalCount, err := alertRepo.LoadTaskCount(alert.Type, expirationTime.Value, constant.SMS)
+				if err != nil || todayCount >= 1 || alert.SendCount <= totalCount {
+					continue
+				}
+				create := dto.AlertLogCreate{
+					Count:   totalCount + 1,
+					AlertId: alert.ID,
+					Type:    alert.Type,
+				}
 				_ = xpack.CreateSMSAlertLog(alert, create, strconv.Itoa(daysDifference), params, constant.SMS)
 				alertUtil.CreateNewAlertTask(expirationTime.Value, alert.Type, expirationTime.Value, constant.SMS)
 			case constant.Email:
+				todayCount, totalCount, err := alertRepo.LoadTaskCount(alert.Type, expirationTime.Value, constant.Email)
+				if err != nil || todayCount >= 1 || alert.SendCount <= totalCount {
+					continue
+				}
+				create := dto.AlertLogCreate{
+					Count:   totalCount + 1,
+					AlertId: alert.ID,
+					Type:    alert.Type,
+				}
 				alertDetail := alertUtil.ProcessAlertDetail(alert, strconv.Itoa(daysDifference), params, constant.Email)
 				alertRule := alertUtil.ProcessAlertRule(alert)
 				create.AlertRule = alertRule
@@ -401,15 +430,6 @@ func loadPanelUpdate(alert dto.AlertDTO) {
 		return
 	}
 
-	todayCount, totalCount, err := alertRepo.LoadTaskCount(alert.Type, version)
-	if err != nil || todayCount >= 1 || alert.SendCount <= totalCount {
-		return
-	}
-	var create = dto.AlertLogCreate{
-		Type:    alert.Type,
-		AlertId: alert.ID,
-		Count:   1,
-	}
 	var params []dto.Param
 	methods := strings.Split(alert.Method, ",")
 	for _, m := range methods {
@@ -419,9 +439,27 @@ func loadPanelUpdate(alert dto.AlertDTO) {
 			if !alertUtil.CheckTaskFrequency(constant.SMS) {
 				continue
 			}
+			todayCount, totalCount, err := alertRepo.LoadTaskCount(alert.Type, version, constant.SMS)
+			if err != nil || todayCount >= 1 || alert.SendCount <= totalCount {
+				continue
+			}
+			var create = dto.AlertLogCreate{
+				Type:    alert.Type,
+				AlertId: alert.ID,
+				Count:   totalCount + 1,
+			}
 			_ = xpack.CreateSMSAlertLog(alert, create, version, params, constant.SMS)
 			alertUtil.CreateNewAlertTask(version, alert.Type, version, constant.SMS)
 		case constant.Email:
+			todayCount, totalCount, err := alertRepo.LoadTaskCount(alert.Type, version, constant.Email)
+			if err != nil || todayCount >= 1 || alert.SendCount <= totalCount {
+				continue
+			}
+			var create = dto.AlertLogCreate{
+				Type:    alert.Type,
+				AlertId: alert.ID,
+				Count:   totalCount + 1,
+			}
 			alertDetail := alertUtil.ProcessAlertDetail(alert, version, params, constant.Email)
 			alertRule := alertUtil.ProcessAlertRule(alert)
 			create.AlertRule = alertRule
@@ -501,46 +539,38 @@ func loadMemUsage(alert dto.AlertDTO) {
 
 // 获取系统负载数据并发送到通道
 func loadLoadInfo(alert dto.AlertDTO) {
-	todayCount, isValid := checkTaskFrequency(alert.Type, strconv.Itoa(int(alert.Cycle)), alert.SendCount)
-	if isValid {
-		avgStat, err := load.Avg()
-		if err != nil {
-			global.LOG.Errorf("error getting load usage, err: %v", err)
-			return
-		}
-		var loadValue float64
-		CPUTotal, _ := cpu.Counts(true)
-		switch alert.Cycle {
-		case 1:
-			loadValue = avgStat.Load1 / (float64(CPUTotal*2) * 0.75) * 100
-		case 5:
-			loadValue = avgStat.Load5 / (float64(CPUTotal*2) * 0.75) * 100
-		case 15:
-			loadValue = avgStat.Load15 / (float64(CPUTotal*2) * 0.75) * 100
-		default:
-			return
-		}
-		newDate, err := alertRepo.GetTaskLog(alert.Type, alert.ID)
-		if err != nil {
-			global.LOG.Errorf("task log record not found, err: %v", err)
-		}
-		if newDate.IsZero() || calculateMinutesDifference(newDate) > ResourceAlertInterval {
-			if loadValue >= float64(alert.Count) {
-				global.LOG.Infof("%d minute load: %f,detail: %v", alert.Cycle, loadValue, avgStat)
-				createAndLogAlert(alert, loadValue, todayCount)
-				global.LOG.Info("load alert task push successful")
-			}
+	avgStat, err := load.Avg()
+	if err != nil {
+		global.LOG.Errorf("error getting load usage, err: %v", err)
+		return
+	}
+	var loadValue float64
+	CPUTotal, _ := cpu.Counts(true)
+	switch alert.Cycle {
+	case 1:
+		loadValue = avgStat.Load1 / (float64(CPUTotal*2) * 0.75) * 100
+	case 5:
+		loadValue = avgStat.Load5 / (float64(CPUTotal*2) * 0.75) * 100
+	case 15:
+		loadValue = avgStat.Load15 / (float64(CPUTotal*2) * 0.75) * 100
+	default:
+		return
+	}
+	newDate, err := alertRepo.GetTaskLog(alert.Type, alert.ID)
+	if err != nil {
+		global.LOG.Errorf("task log record not found, err: %v", err)
+	}
+	if newDate.IsZero() || calculateMinutesDifference(newDate) > ResourceAlertInterval {
+		if loadValue >= float64(alert.Count) {
+			global.LOG.Infof("%d minute load: %f,detail: %v", alert.Cycle, loadValue, avgStat)
+			createAndLogAlert(alert, loadValue)
+			global.LOG.Info("load alert task push successful")
 		}
 	}
-
 }
 
 // 内存/cpu检查是否需要发送告警并处理相关逻辑
 func checkAndSendAlert(alert dto.AlertDTO, currentUsage float64, usageLoad *[]float64, threshold int) bool {
-	todayCount, isValid := checkTaskFrequency(alert.Type, strconv.Itoa(int(alert.Cycle)), alert.SendCount)
-	if !isValid {
-		return false
-	}
 	newDate, err := alertRepo.GetTaskLog(alert.Type, alert.ID)
 	if err != nil {
 		global.LOG.Errorf("record not found, err: %v", err)
@@ -558,7 +588,7 @@ func checkAndSendAlert(alert dto.AlertDTO, currentUsage float64, usageLoad *[]fl
 			avgUsage := average(*usageLoad)
 			if avgUsage >= float64(alert.Count) {
 				global.LOG.Infof("%d minute %s: %f , usage: %v", threshold, alert.Type, avgUsage, usageLoad)
-				createAndLogAlert(alert, avgUsage, todayCount)
+				createAndLogAlert(alert, avgUsage)
 				return true
 			}
 		}
@@ -567,8 +597,8 @@ func checkAndSendAlert(alert dto.AlertDTO, currentUsage float64, usageLoad *[]fl
 }
 
 // 检查是否超过今日发送次数限制
-func checkTaskFrequency(alertType, quotaType string, sendCount uint) (uint, bool) {
-	todayCount, _, err := alertRepo.LoadTaskCount(alertType, quotaType)
+func checkTaskFrequency(alertType, quotaType string, sendCount uint, method string) (uint, bool) {
+	todayCount, _, err := alertRepo.LoadTaskCount(alertType, quotaType, method)
 	if err != nil {
 		global.LOG.Errorf("error getting task info, err: %v", err)
 		return todayCount, false
@@ -581,13 +611,7 @@ func checkTaskFrequency(alertType, quotaType string, sendCount uint) (uint, bool
 }
 
 // 创建告警日志和详情
-func createAndLogAlert(alert dto.AlertDTO, avgUsage float64, todayCount uint) {
-	create := dto.AlertLogCreate{
-		Status:  constant.AlertSuccess,
-		Count:   todayCount + 1,
-		AlertId: alert.ID,
-		Type:    alert.Type,
-	}
+func createAndLogAlert(alert dto.AlertDTO, avgUsage float64) {
 	avgUsagePercent := common.FormatPercent(avgUsage)
 	params := createAlertAvgParams(strconv.Itoa(int(alert.Cycle)), getModule(alert.Type), avgUsagePercent)
 	methods := strings.Split(alert.Method, ",")
@@ -598,9 +622,29 @@ func createAndLogAlert(alert dto.AlertDTO, avgUsage float64, todayCount uint) {
 			if !alertUtil.CheckTaskFrequency(constant.SMS) {
 				continue
 			}
+			todayCount, isValid := checkTaskFrequency(alert.Type, strconv.Itoa(int(alert.Cycle)), alert.SendCount, constant.SMS)
+			if !isValid {
+				continue
+			}
+			create := dto.AlertLogCreate{
+				Status:  constant.AlertSuccess,
+				Count:   todayCount + 1,
+				AlertId: alert.ID,
+				Type:    alert.Type,
+			}
 			_ = xpack.CreateSMSAlertLog(alert, create, avgUsagePercent, params, constant.SMS)
 			alertUtil.CreateNewAlertTask(avgUsagePercent, alert.Type, strconv.Itoa(int(alert.Cycle)), constant.SMS)
 		case constant.Email:
+			todayCount, isValid := checkTaskFrequency(alert.Type, strconv.Itoa(int(alert.Cycle)), alert.SendCount, constant.Email)
+			if !isValid {
+				continue
+			}
+			create := dto.AlertLogCreate{
+				Status:  constant.AlertSuccess,
+				Count:   todayCount + 1,
+				AlertId: alert.ID,
+				Type:    alert.Type,
+			}
 			alertDetail := alertUtil.ProcessAlertDetail(alert, avgUsagePercent, params, constant.Email)
 			alertRule := alertUtil.ProcessAlertRule(alert)
 			create.AlertRule = alertRule
@@ -628,28 +672,24 @@ func getModule(alertType string) string {
 }
 
 func loadDiskUsage(alert dto.AlertDTO) {
-	todayCount, isValid := checkTaskFrequency(alert.Type, alert.Project, alert.SendCount)
-	if isValid {
-		newDate, err := alertRepo.GetTaskLog(alert.Type, alert.ID)
-		if err != nil {
-			global.LOG.Errorf("record not found, err: %v", err)
-		}
-
-		if newDate.IsZero() || calculateMinutesDifference(newDate) > ResourceAlertInterval {
-			if strings.Contains(alert.Project, "all") {
-				err = processAllDisks(alert, todayCount)
-			} else {
-				err = processSingleDisk(alert, todayCount)
-			}
-			if err != nil {
-				global.LOG.Errorf("error processing disk usage, err: %v", err)
-			}
-		}
+	newDate, err := alertRepo.GetTaskLog(alert.Type, alert.ID)
+	if err != nil {
+		global.LOG.Errorf("record not found, err: %v", err)
 	}
 
+	if newDate.IsZero() || calculateMinutesDifference(newDate) > ResourceAlertInterval {
+		if strings.Contains(alert.Project, "all") {
+			err = processAllDisks(alert)
+		} else {
+			err = processSingleDisk(alert)
+		}
+		if err != nil {
+			global.LOG.Errorf("error processing disk usage, err: %v", err)
+		}
+	}
 }
 
-func processAllDisks(alert dto.AlertDTO, todayCount uint) error {
+func processAllDisks(alert dto.AlertDTO) error {
 	diskList, err := NewIAlertService().GetDisks()
 	if err != nil {
 		global.LOG.Errorf("error getting disk list, err: %v", err)
@@ -658,7 +698,7 @@ func processAllDisks(alert dto.AlertDTO, todayCount uint) error {
 
 	var flag bool
 	for _, item := range diskList {
-		if success, err := checkAndCreateDiskAlert(alert, item.Path, todayCount); err == nil && success {
+		if success, err := checkAndCreateDiskAlert(alert, item.Path); err == nil && success {
 			flag = true
 		}
 	}
@@ -668,8 +708,8 @@ func processAllDisks(alert dto.AlertDTO, todayCount uint) error {
 	return nil
 }
 
-func processSingleDisk(alert dto.AlertDTO, todayCount uint) error {
-	success, err := checkAndCreateDiskAlert(alert, alert.Project, todayCount)
+func processSingleDisk(alert dto.AlertDTO) error {
+	success, err := checkAndCreateDiskAlert(alert, alert.Project)
 	if err != nil {
 		return err
 	}
@@ -679,7 +719,7 @@ func processSingleDisk(alert dto.AlertDTO, todayCount uint) error {
 	return nil
 }
 
-func checkAndCreateDiskAlert(alert dto.AlertDTO, path string, todayCount uint) (bool, error) {
+func checkAndCreateDiskAlert(alert dto.AlertDTO, path string) (bool, error) {
 	usageStat, err := disk.Usage(path)
 	if err != nil {
 		global.LOG.Errorf("error getting disk usage for %s, err: %v", path, err)
@@ -695,12 +735,6 @@ func checkAndCreateDiskAlert(alert dto.AlertDTO, path string, todayCount uint) (
 		return false, nil
 	}
 	global.LOG.Infof("disk「 %s 」usage: %s", path, usedStr)
-	create := dto.AlertLogCreate{
-		Status:  constant.AlertSuccess,
-		Count:   todayCount + 1,
-		AlertId: alert.ID,
-		Type:    alert.Type,
-	}
 	var params []dto.Param
 	params = createAlertDiskParams(path, usedStr)
 	methods := strings.Split(alert.Method, ",")
@@ -711,9 +745,29 @@ func checkAndCreateDiskAlert(alert dto.AlertDTO, path string, todayCount uint) (
 			if !alertUtil.CheckTaskFrequency(constant.SMS) {
 				continue
 			}
+			todayCount, isValid := checkTaskFrequency(alert.Type, alert.Project, alert.SendCount, constant.SMS)
+			if !isValid {
+				continue
+			}
+			create := dto.AlertLogCreate{
+				Status:  constant.AlertSuccess,
+				Count:   todayCount + 1,
+				AlertId: alert.ID,
+				Type:    alert.Type,
+			}
 			_ = xpack.CreateSMSAlertLog(alert, create, path, params, constant.SMS)
 			alertUtil.CreateNewAlertTask(strconv.Itoa(int(alert.Cycle)), alert.Type, alert.Project, constant.SMS)
 		case constant.Email:
+			todayCount, isValid := checkTaskFrequency(alert.Type, alert.Project, alert.SendCount, constant.Email)
+			if !isValid {
+				continue
+			}
+			create := dto.AlertLogCreate{
+				Status:  constant.AlertSuccess,
+				Count:   todayCount + 1,
+				AlertId: alert.ID,
+				Type:    alert.Type,
+			}
 			alertDetail := alertUtil.ProcessAlertDetail(alert, path, params, constant.Email)
 			alertRule := alertUtil.ProcessAlertRule(alert)
 			create.AlertRule = alertRule
