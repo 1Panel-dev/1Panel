@@ -134,6 +134,7 @@ ConnInfoNotMatch: "Bağlantı bilgisi uyuşmuyor"
 MakeAgentPackage: "Düğüm kurulum paketini oluştur"
 SendAgent: "Düğüm kurulum paketini dağıt"
 StartService: "Servisi başlat"
+NoBackupNode: "Yedek düğüm şu anda boş. Lütfen kaydetmek için bir yedek düğüm seçin ve tekrar deneyin!"
 
 #cmd
 AppVersion: "Uygulama sürümü"

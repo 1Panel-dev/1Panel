@@ -136,6 +136,7 @@ ConnInfoNotMatch: "连接信息不匹配"
 MakeAgentPackage: "生成节点安装包"
 SendAgent: "下发节点安装包"
 StartService: "启动服务"
+NoBackupNode: "当前备份节点为空，请选择备份节点保存后重试！"
 
 #cmd
 AppVersion: "应用版本"

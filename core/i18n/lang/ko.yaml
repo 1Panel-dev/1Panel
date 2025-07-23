@@ -136,6 +136,7 @@ ConnInfoNotMatch: "연결 정보가 일치하지 않음"
 MakeAgentPackage: "노드 설치 패키지 생성"
 SendAgent: "노드 설치 패키지 배포"
 StartService: "서비스 시작"
+NoBackupNode: "현재 백업 노드가 비어 있습니다. 저장할 백업 노드를 선택한 후 다시 시도하십시오!"
 
 # CMD
 AppVersion: "앱 버전"

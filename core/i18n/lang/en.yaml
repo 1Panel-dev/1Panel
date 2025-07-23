@@ -136,6 +136,7 @@ ConnInfoNotMatch: "Connection info mismatch"
 MakeAgentPackage: "Generate node installation package"
 SendAgent: "Distribute node installation package"
 StartService: "Start service"
+NoBackupNode: "The backup node is currently empty. Please select a backup node to save and try again!"
 
 #cmd
 AppVersion: "App version"

@@ -136,6 +136,7 @@ ConnInfoNotMatch: "As informações de conexão não coincidem"
 MakeAgentPackage: "Gerando pacote de instalação do nó"
 SendAgent: "Enviando pacote de instalação do nó"
 StartService: "Iniciando serviço"
+NoBackupNode: "O nó de backup está vazio atualmente. Selecione um nó de backup para salvar e tente novamente!"
 
 #cmd
 AppVersion: "Versão do aplicativo"

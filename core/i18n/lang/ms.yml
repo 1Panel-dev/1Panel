@@ -136,6 +136,7 @@ ConnInfoNotMatch: "Maklumat sambungan tidak sepadan"
 MakeAgentPackage: "Cipta pakej pemasangan nod"
 SendAgent: "Muat naik pakej pemasangan nod"
 StartService: "Mulakan perkhidmatan"
+NoBackupNode: "Nod sandaran kosong. Sila pilih nod sandaran untuk disimpan dan cuba lagi!"
 
 #cmd
 AppVersion: "Versi aplikasi"

@@ -137,6 +137,7 @@ ConnInfoNotMatch: "接続情報が一致しません"
 MakeAgentPackage: "ノードインストールパッケージを生成"
 SendAgent: "ノードインストールパッケージを送信"
 StartService: "サービスを開始"
+NoBackupNode: "現在バックアップノードが空です。保存するバックアップノードを選択して再試行してください！"
 
 #cmd
 AppVersion: "アプリバージョン"
