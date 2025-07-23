@@ -177,7 +177,7 @@ ErrPgImagePull: 'Image çekme zaman aşımı, lütfen image hızlandırma yapıl
 #runtime
 ErrFileNotExist: '{{ .detail }} dosyası mevcut değil! Lütfen kaynak dosyanın bütünlüğünü kontrol edin!'
 ErrImageBuildErr: 'Image yapı başarısız'
-ErrImageExist: 'Image zaten mevcut!'
+ErrImageExist: "Görüntü zaten var! Lütfen görüntü adını değiştirin."
 ErrDelWithWebsite: 'İşletim ortamı zaten bir web sitesiyle ilişkili ve silinemez'
 ErrRuntimeStart: 'Başlatma başarısız'
 ErrPackageJsonNotFound: 'package.json dosyası mevcut değil'

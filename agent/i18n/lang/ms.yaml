@@ -176,7 +176,7 @@ ErrPgImagePull: 'Tarikh imej tamat masa, sila konfigurasikan pecutan imej atau t
 #masa berjalan
 ErrFileNotExist: 'Fail {{ .detail }} tidak wujud! Sila semak integriti fail sumber!'
 ErrImageBuildErr: 'Pembinaan imej gagal'
-ErrImageExist: 'Imej sudah wujud!'
+ErrImageExist: "Imej sudah wujud! Sila ubah nama imej."
 ErrDelWithWebsite: 'Persekitaran pengendalian sudah dikaitkan dengan tapak web dan tidak boleh dipadamkan'
 ErrRuntimeStart: 'Permulaan gagal'
 ErrPackageJsonNotFound: 'fail package.json tidak wujud'

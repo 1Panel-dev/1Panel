@@ -1800,24 +1800,15 @@ func getAppTags(appID uint, lang string) ([]response.TagDTO, error) {
 	}
 	var res []response.TagDTO
 	for _, t := range tags {
-		if t.Name != "" {
+		var translations = make(map[string]string)
+		_ = json.Unmarshal([]byte(t.Translations), &translations)
+		if name, ok := translations[lang]; ok {
 			tagDTO := response.TagDTO{
 				ID:   t.ID,
 				Key:  t.Key,
-				Name: t.Name,
+				Name: name,
 			}
 			res = append(res, tagDTO)
-		} else {
-			var translations = make(map[string]string)
-			_ = json.Unmarshal([]byte(t.Translations), &translations)
-			if name, ok := translations[lang]; ok {
-				tagDTO := response.TagDTO{
-					ID:   t.ID,
-					Key:  t.Key,
-					Name: name,
-				}
-				res = append(res, tagDTO)
-			}
 		}
 	}
 	return res, nil

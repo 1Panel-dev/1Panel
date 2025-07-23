@@ -177,7 +177,7 @@ ErrPgImagePull: '이미지 풀링 시간이 초과되었습니다. 이미지 가
 #실행 시간
 ErrFileNotExist: '{{ .detail }} 파일이 존재하지 않습니다! 소스 파일의 무결성을 확인하세요!'
 ErrImageBuildErr: '이미지 빌드 실패'
-ErrImageExist: '이미지가 이미 존재합니다!'
+ErrImageExist: "이미지가 이미 존재합니다! 이미지 이름을 수정하세요."
 ErrDelWithWebsite: '운영 환경이 이미 웹사이트와 연결되어 있어 삭제할 수 없습니다'
 ErrRuntimeStart: '시작 실패'
 ErrPackageJsonNotFound: 'package.json 파일이 존재하지 않습니다'

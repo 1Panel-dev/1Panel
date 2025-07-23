@@ -176,7 +176,7 @@ ErrPgImagePull: "镜像拉取超时，请配置镜像加速或手动拉取 {{ .n
 #runtime
 ErrFileNotExist: "{{ .detail }} 文件不存在！请检查源文件完整性！"
 ErrImageBuildErr: "镜像 build 失败"
-ErrImageExist: "镜像已存在！"
+ErrImageExist: "镜像已存在！请修改镜像名称"
 ErrDelWithWebsite: "运行环境已经关联网站，无法删除"
 ErrRuntimeStart: "启动失败"
 ErrPackageJsonNotFound: "package.json 文件不存在"

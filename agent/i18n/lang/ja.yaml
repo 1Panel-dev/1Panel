@@ -177,7 +177,7 @@ ErrPgImagePull: 'イメージのプルがタイムアウトしました。イメ
 #runtime
 ErrFileNotExist: '{{ .detail }} ファイルが存在しません。ソース ファイルの整合性を確認してください。'
 ErrImageBuildErr: 'イメージのビルドに失敗しました'
-ErrImageExist: '画像がすでに存在します!'
+ErrImageExist: "イメージはすでに存在します！イメージ名を変更してください。"
 ErrDelWithWebsite: 'オペレーティング環境は既に Web サイトに関連付けられているため、削除できません'
 ErrRuntimeStart: '起動に失敗しました'
 ErrPackageJsonNotFound: 'package.json ファイルが存在しません'

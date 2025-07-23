@@ -177,7 +177,7 @@ ErrPgImagePull: 'Image pull timed out, please configure image acceleration or ma
 #runtime
 ErrFileNotExist: '{{ .detail }} file does not exist! Please check the integrity of the source file!'
 ErrImageBuildErr: 'Image build failed'
-ErrImageExist: 'Image already exists!'
+ErrImageExist: "Image already exists! Please modify the image name."
 ErrDelWithWebsite: 'The operating environment is already associated with a website and cannot be deleted'
 ErrRuntimeStart: 'Startup failed'
 ErrPackageJsonNotFound: 'package.json file does not exist'

@@ -177,7 +177,7 @@ ErrPgImagePull: 'Tempo limite para extração de imagem. Configure a aceleraçã
 #tempo de execução
 ErrFileNotExist: 'O arquivo {{ .detail }} não existe! Verifique a integridade do arquivo de origem!'
 ErrImageBuildErr: 'Falha na criação da imagem'
-ErrImageExist: 'A imagem já existe!'
+ErrImageExist: "A imagem já existe! Por favor, modifique o nome da imagem."
 ErrDelWithWebsite: 'O ambiente operacional já está associado a um site e não pode ser excluído'
 ErrRuntimeStart: 'Falha na inicialização'
 ErrPackageJsonNotFound: 'o arquivo package.json não existe'
