@@ -44,7 +44,7 @@ type IAlertRepo interface {
 	GetAlertTask(opts ...DBOption) (model.AlertTask, error)
 	LoadTaskCount(alertType string, project string) (uint, uint, error)
 	GetTaskLog(alertType string, alertId uint) (time.Time, error)
-	GetLicensePushCount() (uint, error)
+	GetLicensePushCount(method string) (uint, error)
 
 	GetConfig(opts ...DBOption) (model.AlertConfig, error)
 	AlertConfigList(opts ...DBOption) ([]model.AlertConfig, error)
@@ -267,14 +267,14 @@ func getAlertDB(opts ...DBOption) (*gorm.DB, error) {
 	return db, nil
 }
 
-func (a *AlertRepo) GetLicensePushCount() (uint, error) {
+func (a *AlertRepo) GetLicensePushCount(method string) (uint, error) {
 	var (
 		todayCount int64
 	)
 	now := time.Now()
 	todayMidnight := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
 	tomorrowMidnight := todayMidnight.Add(24 * time.Hour)
-	err := global.AlertDB.Model(&model.AlertTask{}).Where("created_at > ? AND created_at < ?", todayMidnight, tomorrowMidnight).Count(&todayCount).Error
+	err := global.AlertDB.Model(&model.AlertTask{}).Where("created_at > ? AND created_at < ? AND method = ?", todayMidnight, tomorrowMidnight, method).Count(&todayCount).Error
 	return uint(todayCount), err
 }
 

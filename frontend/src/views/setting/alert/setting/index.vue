@@ -19,10 +19,6 @@
                 >
                     <el-row>
                         <el-col>
-                            <el-form-item :label="$t('xpack.alert.dailyAlertNum')" prop="dailyAlertNum">
-                                {{ commonConfig.config.alertDailyNum }}
-                            </el-form-item>
-
                             <el-form-item :label="$t('xpack.alert.sendTimeRange')" prop="sendTimeRange">
                                 {{ sendTimeRange }}
                             </el-form-item>
@@ -111,19 +107,40 @@
                         v-if="globalStore.isProductPro && !globalStore.isIntl"
                     >
                         <div class="flex items-center justify-between mb-2">
-                            <div class="text-lg font-semibold">{{ $t('xpack.alert.smsConfig') }}</div>
+                            <div class="text-lg font-semibold">
+                                {{ $t('xpack.alert.smsConfig') }}
+                            </div>
                             <div>
                                 <el-button plain round @click="onChangePhone(smsConfig.id)">
                                     {{ $t('commons.button.edit') }}
                                 </el-button>
                             </div>
                         </div>
-                        <div class="text-sm mb-2">{{ $t('xpack.alert.smsConfigHelper') }}</div>
+                        <!--                        <div class="text-sm mb-2">{{ $t('xpack.alert.smsConfigHelper') }}</div>-->
+                        <div class="text-sm mb-2">
+                            {{ $t('xpack.alert.alertSmsHelper', [totalSms, usedSms]) }}
+                            <el-link class="ml-1 text-xs" @click="goBuy" type="primary" icon="Position">
+                                <span class="ml-0.5">{{ $t('xpack.alert.goBuy') }}</span>
+                            </el-link>
+                        </div>
                         <el-divider class="!mb-2 !mt-3" />
-                        <el-form-item :label="$t('xpack.alert.phone')">
-                            <span v-if="smsConfig.config.phone">{{ smsConfig.config.phone }}</span>
-                            <span v-else class="label">{{ $t('xpack.alert.defaultPhone') }}</span>
-                        </el-form-item>
+                        <div class="text-sm email-form">
+                            <el-form
+                                :model="form"
+                                @submit.prevent
+                                ref="alertFormRef"
+                                :label-position="mobile ? 'top' : 'left'"
+                                label-width="110px"
+                            >
+                                <el-form-item :label="$t('xpack.alert.phone')">
+                                    <span v-if="smsConfig.config.phone">{{ smsConfig.config.phone }}</span>
+                                    <span v-else class="label">{{ $t('xpack.alert.defaultPhone') }}</span>
+                                </el-form-item>
+                                <el-form-item :label="$t('xpack.alert.dailyAlertNum')" prop="dailyAlertNum">
+                                    {{ smsConfig.config.alertDailyNum }}
+                                </el-form-item>
+                            </el-form>
+                        </div>
                     </el-card>
                 </div>
             </template>
@@ -147,6 +164,7 @@ import { storeToRefs } from 'pinia';
 import { MsgSuccess } from '@/utils/message';
 import EmailDrawer from '@/views/setting/alert/setting/email/index.vue';
 import { Alert } from '@/api/interface/alert';
+import { getLicenseSmsInfo } from '@/api/modules/setting';
 
 const globalStore = GlobalStore();
 const { isMaster } = storeToRefs(globalStore);
@@ -201,7 +219,6 @@ export interface CommonConfig {
     status: string;
     config: {
         isOffline?: string;
-        alertDailyNum?: number;
         alertSendTimeRange?: string;
     };
 }
@@ -209,9 +226,8 @@ const defaultCommonConfig: CommonConfig = {
     id: undefined,
     type: 'common',
     title: 'xpack.alert.commonConfig',
-    status: 'Ena      ble',
+    status: 'Enable',
     config: {
-        alertDailyNum: 50,
         alertSendTimeRange:
             i18n.global.t('xpack.alert.noticeAlert') +
             ': ' +
@@ -233,6 +249,7 @@ export interface SmsConfig {
     status: string;
     config: {
         phone?: string;
+        alertDailyNum?: number;
     };
 }
 const defaultSmsConfig: SmsConfig = {
@@ -242,6 +259,7 @@ const defaultSmsConfig: SmsConfig = {
     status: 'Enable',
     config: {
         phone: '',
+        alertDailyNum: 50,
     },
 };
 const smsConfig = ref<SmsConfig>({ ...defaultSmsConfig });
@@ -253,6 +271,9 @@ const config = ref<Alert.AlertConfigInfo>({
     status: '',
     config: '',
 });
+const licenseName = ref('-');
+const totalSms = ref(0);
+const usedSms = ref(0);
 const mobile = computed(() => {
     return globalStore.isMobile();
 });
@@ -314,13 +335,16 @@ const search = async () => {
 };
 
 const onChangePhone = (id: any) => {
-    phoneRef.value.acceptParams({ id: id, phone: smsConfig.value.config.phone });
+    phoneRef.value.acceptParams({
+        id: id,
+        phone: smsConfig.value.config.phone,
+        dailyAlertNum: smsConfig.value.config.alertDailyNum,
+    });
 };
 
 const onChangeCommon = (id: any) => {
     sendTimeRangeRef.value.acceptParams({
         id: id,
-        dailyAlertNum: commonConfig.value.config.alertDailyNum,
         sendTimeRange: sendTimeRangeValue.value,
         isOffline: commonConfig.value.config.isOffline,
     });
@@ -378,8 +402,24 @@ const onDelete = (id: number) => {
         await search();
     });
 };
+
+const getSmsInfo = async () => {
+    const res = await getLicenseSmsInfo();
+    licenseName.value = res.data.licenseName;
+    usedSms.value = res.data.smsUsed;
+    totalSms.value = res.data.smsTotal;
+};
+
+const goBuy = async () => {
+    const uri = licenseName.value === '-' ? '' : `${licenseName.value}/buy-sms`;
+    window.open('https://www.lxware.cn/uc/cloud/licenses/' + uri, '_blank', 'noopener,noreferrer');
+};
+
 onMounted(async () => {
     await search();
+    if (globalStore.isProductPro && !globalStore.isIntl) {
+        await getSmsInfo();
+    }
 });
 </script>
 <style scoped lang="scss">

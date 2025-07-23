@@ -307,13 +307,13 @@ type AlertSendTimeRange struct {
 }
 
 type AlertCommonConfig struct {
-	AlertDailyNum      uint               `json:"alertDailyNum"`
 	IsOffline          string             `json:"isOffline"`
 	AlertSendTimeRange AlertSendTimeRange `json:"alertSendTimeRange"`
 }
 
 type AlertSmsConfig struct {
-	Phone string `json:"phone"`
+	Phone         string `json:"phone"`
+	AlertDailyNum uint   `json:"alertDailyNum"`
 }
 
 type AlertEmailConfig struct {

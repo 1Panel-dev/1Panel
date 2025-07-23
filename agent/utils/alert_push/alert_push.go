@@ -13,10 +13,6 @@ import (
 )
 
 func PushAlert(pushAlert dto.PushAlert) error {
-	if !alertUtil.CheckTaskFrequency() {
-		return nil
-	}
-
 	if !alertUtil.CheckSendTimeRange(alertUtil.GetCronJobType(pushAlert.AlertType)) {
 		return nil
 	}
@@ -45,18 +41,21 @@ func PushAlert(pushAlert dto.PushAlert) error {
 		m = strings.TrimSpace(m)
 		switch m {
 		case constant.SMS:
+			if !alertUtil.CheckTaskFrequency(constant.SMS) {
+				continue
+			}
 			_ = xpack.CreateTaskScanSMSAlertLog(alert, create, pushAlert, constant.SMS)
+			alertUtil.CreateNewAlertTask(strconv.Itoa(int(pushAlert.EntryID)), alertUtil.GetCronJobType(alert.Type), strconv.Itoa(int(pushAlert.EntryID)), constant.SMS)
 		case constant.Email:
 			transport := xpack.LoadRequestTransport()
 			err := alertUtil.CreateTaskScanEmailAlertLog(alert, create, pushAlert, constant.Email, transport)
 			if err != nil {
 				return err
 			}
+			alertUtil.CreateNewAlertTask(strconv.Itoa(int(pushAlert.EntryID)), alertUtil.GetCronJobType(alert.Type), strconv.Itoa(int(pushAlert.EntryID)), constant.Email)
 		default:
 		}
 	}
-	// 处理告警任务
-	alertUtil.CreateNewAlertTask(strconv.Itoa(int(pushAlert.EntryID)), alertUtil.GetCronJobType(alert.Type), strconv.Itoa(int(pushAlert.EntryID)))
 	global.LOG.Infof("%s alert push successful", alert.Type)
 	return nil
 }

@@ -376,13 +376,13 @@ var InitAlertConfig = &gormigrate.Migration{
 				Type:   "sms",
 				Title:  "xpack.alert.smsConfig",
 				Status: "Enable",
-				Config: "{}",
+				Config: `{"alertDailyNum":50}`,
 			},
 			{
 				Type:   "common",
 				Title:  "xpack.alert.commonConfig",
 				Status: "Enable",
-				Config: `{"alertDailyNum":50,"isOffline":"Disable","alertSendTimeRange":{"noticeAlert":{"sendTimeRange":"08:00:00 - 23:59:59","type":["ssl","siteEndTime","panelPwdEndTime","panelUpdate"]},"resourceAlert":{"sendTimeRange":"00:00:00 - 23:59:59","type":["clams","cronJob","cpu","memory","load","disk"]}}}`,
+				Config: `{"isOffline":"Disable","alertSendTimeRange":{"noticeAlert":{"sendTimeRange":"08:00:00 - 23:59:59","type":["ssl","siteEndTime","panelPwdEndTime","panelUpdate"]},"resourceAlert":{"sendTimeRange":"00:00:00 - 23:59:59","type":["clams","cronJob","cpu","memory","load","disk"]}}}`,
 			},
 		}
 		for _, r := range records {
@@ -401,6 +401,19 @@ var AddMethodToAlertLog = &gormigrate.Migration{
 			return err
 		}
 		if err := global.AlertDB.Model(&model.AlertLog{}).Where("method IS NULL OR method = ''").Update("method", "sms").Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var AddMethodToAlertTask = &gormigrate.Migration{
+	ID: "20250723-add-method-to-alert_task",
+	Migrate: func(tx *gorm.DB) error {
+		if err := global.AlertDB.AutoMigrate(&model.AlertTask{}); err != nil {
+			return err
+		}
+		if err := global.AlertDB.Model(&model.AlertTask{}).Where("method IS NULL OR method = ''").Update("method", "sms").Error; err != nil {
 			return err
 		}
 		return nil

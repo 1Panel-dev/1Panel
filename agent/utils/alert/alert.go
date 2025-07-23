@@ -100,12 +100,13 @@ func SaveAlertLog(create dto.AlertLogCreate, alertLog *model.AlertLog) error {
 	return nil
 }
 
-func CreateNewAlertTask(quota, alertType, quotaType string) {
+func CreateNewAlertTask(quota, alertType, quotaType, method string) {
 	alertRepo := repo.NewIAlertRepo()
 	taskBase := model.AlertTask{
 		Type:      alertType,
 		Quota:     quota,
 		QuotaType: quotaType,
+		Method:    method,
 	}
 	err := alertRepo.CreateAlertTask(&taskBase)
 	if err != nil {
@@ -190,20 +191,20 @@ func CreateAlertParams(param string) []dto.Param {
 
 var checkTaskMutex sync.Mutex
 
-func CheckTaskFrequency() bool {
+func CheckTaskFrequency(method string) bool {
 	alertRepo := repo.NewIAlertRepo()
-	config, err := alertRepo.GetConfig(alertRepo.WithByType(constant.CommonConfig))
+	config, err := alertRepo.GetConfig(alertRepo.WithByType(constant.SMSConfig))
 	if err != nil {
 		return false
 	}
-	var cfg dto.AlertCommonConfig
+	var cfg dto.AlertSmsConfig
 	err = json.Unmarshal([]byte(config.Config), &cfg)
 	if err != nil {
 		return false
 	}
 	limitCount := cfg.AlertDailyNum
 	checkTaskMutex.Lock()
-	todayCount, err := repo.NewIAlertRepo().GetLicensePushCount()
+	todayCount, err := alertRepo.GetLicensePushCount(method)
 	defer checkTaskMutex.Unlock()
 	if err != nil {
 		global.LOG.Errorf("error getting license push count info, err: %v", err)

@@ -253,4 +253,10 @@ export namespace Setting {
         force: boolean;
         withDockerRestart: boolean;
     }
+
+    export interface SmsInfo {
+        licenseName: string;
+        smsUsed: number;
+        smsTotal: number;
+    }
 }

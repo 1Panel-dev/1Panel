@@ -87,9 +87,6 @@ func (m *AlertTaskHelper) InitTask(alertType string) {
 
 func resourceTask(resourceAlert []dto.AlertDTO) {
 	for _, alert := range resourceAlert {
-		if !alertUtil.CheckTaskFrequency() {
-			return
-		}
 		if !alertUtil.CheckSendTimeRange(alert.Type) {
 			continue
 		}
@@ -109,9 +106,6 @@ func resourceTask(resourceAlert []dto.AlertDTO) {
 
 func baseTask(baseAlert []dto.AlertDTO) {
 	for _, alert := range baseAlert {
-		if !alertUtil.CheckTaskFrequency() {
-			return
-		}
 		if !alertUtil.CheckSendTimeRange(alert.Type) {
 			continue
 		}
@@ -245,7 +239,11 @@ func loadSSLInfo(alert dto.AlertDTO) {
 				params = createAlertBaseParams(strconv.Itoa(len(primaryDomain)), strconv.Itoa(daysDifference))
 				switch m {
 				case constant.SMS:
+					if !alertUtil.CheckTaskFrequency(constant.SMS) {
+						continue
+					}
 					_ = xpack.CreateSMSAlertLog(alert, create, primaryDomain, params, constant.SMS)
+					alertUtil.CreateNewAlertTask(alert.Project, alert.Type, projectJSON, constant.SMS)
 				case constant.Email:
 					alertDetail := alertUtil.ProcessAlertDetail(alert, primaryDomain, params, constant.Email)
 					alertRule := alertUtil.ProcessAlertRule(alert)
@@ -253,12 +251,11 @@ func loadSSLInfo(alert dto.AlertDTO) {
 					create.AlertDetail = alertDetail
 					transport := xpack.LoadRequestTransport()
 					_ = alertUtil.CreateEmailAlertLog(create, alert, params, transport)
+					alertUtil.CreateNewAlertTask(alert.Project, alert.Type, projectJSON, constant.Email)
 				default:
 				}
 			}
 		}
-
-		alertUtil.CreateNewAlertTask(alert.Project, alert.Type, projectJSON)
 		global.LOG.Info("SSL alert push successful")
 	}
 }
@@ -305,7 +302,11 @@ func loadWebsiteInfo(alert dto.AlertDTO) {
 				params = createAlertBaseParams(strconv.Itoa(len(websites)), strconv.Itoa(daysDifference))
 				switch m {
 				case constant.SMS:
+					if !alertUtil.CheckTaskFrequency(constant.SMS) {
+						continue
+					}
 					_ = xpack.CreateSMSAlertLog(alert, create, primaryDomain, params, constant.SMS)
+					alertUtil.CreateNewAlertTask(alert.Project, alert.Type, projectJSON, constant.SMS)
 				case constant.Email:
 					alertDetail := alertUtil.ProcessAlertDetail(alert, primaryDomain, params, constant.Email)
 					alertRule := alertUtil.ProcessAlertRule(alert)
@@ -313,11 +314,11 @@ func loadWebsiteInfo(alert dto.AlertDTO) {
 					create.AlertRule = alertRule
 					transport := xpack.LoadRequestTransport()
 					_ = alertUtil.CreateEmailAlertLog(create, alert, params, transport)
+					alertUtil.CreateNewAlertTask(alert.Project, alert.Type, projectJSON, constant.Email)
 				default:
 				}
 			}
 		}
-		alertUtil.CreateNewAlertTask(alert.Project, alert.Type, projectJSON)
 		global.LOG.Info("website expiration alert push successful")
 	}
 }
@@ -358,7 +359,11 @@ func loadPanelPwd(alert dto.AlertDTO) {
 			m = strings.TrimSpace(m)
 			switch m {
 			case constant.SMS:
+				if !alertUtil.CheckTaskFrequency(constant.SMS) {
+					continue
+				}
 				_ = xpack.CreateSMSAlertLog(alert, create, strconv.Itoa(daysDifference), params, constant.SMS)
+				alertUtil.CreateNewAlertTask(expirationTime.Value, alert.Type, expirationTime.Value, constant.SMS)
 			case constant.Email:
 				alertDetail := alertUtil.ProcessAlertDetail(alert, strconv.Itoa(daysDifference), params, constant.Email)
 				alertRule := alertUtil.ProcessAlertRule(alert)
@@ -366,10 +371,10 @@ func loadPanelPwd(alert dto.AlertDTO) {
 				create.AlertDetail = alertDetail
 				transport := xpack.LoadRequestTransport()
 				_ = alertUtil.CreateEmailAlertLog(create, alert, params, transport)
+				alertUtil.CreateNewAlertTask(expirationTime.Value, alert.Type, expirationTime.Value, constant.Email)
 			default:
 			}
 		}
-		alertUtil.CreateNewAlertTask(expirationTime.Value, alert.Type, expirationTime.Value)
 		global.LOG.Info("panel password expiration alert push successful")
 	}
 }
@@ -411,7 +416,11 @@ func loadPanelUpdate(alert dto.AlertDTO) {
 		m = strings.TrimSpace(m)
 		switch m {
 		case constant.SMS:
+			if !alertUtil.CheckTaskFrequency(constant.SMS) {
+				continue
+			}
 			_ = xpack.CreateSMSAlertLog(alert, create, version, params, constant.SMS)
+			alertUtil.CreateNewAlertTask(version, alert.Type, version, constant.SMS)
 		case constant.Email:
 			alertDetail := alertUtil.ProcessAlertDetail(alert, version, params, constant.Email)
 			alertRule := alertUtil.ProcessAlertRule(alert)
@@ -419,10 +428,10 @@ func loadPanelUpdate(alert dto.AlertDTO) {
 			create.AlertDetail = alertDetail
 			transport := xpack.LoadRequestTransport()
 			_ = alertUtil.CreateEmailAlertLog(create, alert, params, transport)
+			alertUtil.CreateNewAlertTask(version, alert.Type, version, constant.Email)
 		default:
 		}
 	}
-	alertUtil.CreateNewAlertTask(version, alert.Type, version)
 	global.LOG.Info("panel update alert push successful")
 }
 
@@ -586,7 +595,11 @@ func createAndLogAlert(alert dto.AlertDTO, avgUsage float64, todayCount uint) {
 		m = strings.TrimSpace(m)
 		switch m {
 		case constant.SMS:
+			if !alertUtil.CheckTaskFrequency(constant.SMS) {
+				continue
+			}
 			_ = xpack.CreateSMSAlertLog(alert, create, avgUsagePercent, params, constant.SMS)
+			alertUtil.CreateNewAlertTask(avgUsagePercent, alert.Type, strconv.Itoa(int(alert.Cycle)), constant.SMS)
 		case constant.Email:
 			alertDetail := alertUtil.ProcessAlertDetail(alert, avgUsagePercent, params, constant.Email)
 			alertRule := alertUtil.ProcessAlertRule(alert)
@@ -594,10 +607,10 @@ func createAndLogAlert(alert dto.AlertDTO, avgUsage float64, todayCount uint) {
 			create.AlertDetail = alertDetail
 			transport := xpack.LoadRequestTransport()
 			_ = alertUtil.CreateEmailAlertLog(create, alert, params, transport)
+			alertUtil.CreateNewAlertTask(avgUsagePercent, alert.Type, strconv.Itoa(int(alert.Cycle)), constant.Email)
 		default:
 		}
 	}
-	alertUtil.CreateNewAlertTask(avgUsagePercent, alert.Type, strconv.Itoa(int(alert.Cycle)))
 }
 
 func getModule(alertType string) string {
@@ -649,25 +662,20 @@ func processAllDisks(alert dto.AlertDTO, todayCount uint) error {
 			flag = true
 		}
 	}
-
 	if flag {
-		alertUtil.CreateNewAlertTask(strconv.Itoa(int(alert.Cycle)), alert.Type, alert.Project)
 		global.LOG.Info("all disk alert push successful")
 	}
 	return nil
 }
 
 func processSingleDisk(alert dto.AlertDTO, todayCount uint) error {
-
 	success, err := checkAndCreateDiskAlert(alert, alert.Project, todayCount)
 	if err != nil {
 		return err
 	}
 	if success {
-		alertUtil.CreateNewAlertTask(strconv.Itoa(int(alert.Cycle)), alert.Type, alert.Project)
 		global.LOG.Info("disk alert push successful")
 	}
-
 	return nil
 }
 
@@ -700,7 +708,11 @@ func checkAndCreateDiskAlert(alert dto.AlertDTO, path string, todayCount uint) (
 		m = strings.TrimSpace(m)
 		switch m {
 		case constant.SMS:
+			if !alertUtil.CheckTaskFrequency(constant.SMS) {
+				continue
+			}
 			_ = xpack.CreateSMSAlertLog(alert, create, path, params, constant.SMS)
+			alertUtil.CreateNewAlertTask(strconv.Itoa(int(alert.Cycle)), alert.Type, alert.Project, constant.SMS)
 		case constant.Email:
 			alertDetail := alertUtil.ProcessAlertDetail(alert, path, params, constant.Email)
 			alertRule := alertUtil.ProcessAlertRule(alert)
@@ -708,6 +720,7 @@ func checkAndCreateDiskAlert(alert dto.AlertDTO, path string, todayCount uint) (
 			create.AlertDetail = alertDetail
 			transport := xpack.LoadRequestTransport()
 			_ = alertUtil.CreateEmailAlertLog(create, alert, params, transport)
+			alertUtil.CreateNewAlertTask(strconv.Itoa(int(alert.Cycle)), alert.Type, alert.Project, constant.Email)
 		default:
 		}
 	}

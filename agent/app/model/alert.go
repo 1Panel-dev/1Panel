@@ -18,6 +18,7 @@ type AlertTask struct {
 	Type      string `gorm:"type:varchar(64);not null" json:"type"`
 	Quota     string `gorm:"type:varchar(64)" json:"quota"`
 	QuotaType string `gorm:"type:varchar(64)" json:"quotaType"`
+	Method    string `gorm:"type:varchar(64);not null;default:'sms" json:"method"`
 }
 
 type AlertLog struct {

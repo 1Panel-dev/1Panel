@@ -32,6 +32,7 @@ func InitAgentDB() {
 		migrations.AddTableAlert,
 		migrations.InitAlertConfig,
 		migrations.AddMethodToAlertLog,
+		migrations.AddMethodToAlertTask,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

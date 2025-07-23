@@ -1,14 +1,6 @@
 <template>
     <DrawerPro v-model="drawerVisible" :header="$t('xpack.alert.sendTimeRange')" @close="handleClose" size="736">
-        <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
-            <el-form-item
-                :label="$t('xpack.alert.dailyAlertNum')"
-                :rules="[Rules.integerNumber, checkNumberRange(20, 100)]"
-                prop="dailyAlertNum"
-            >
-                <el-input clearable v-model.number="form.dailyAlertNum" min="20" max="100" />
-                <span class="input-help">{{ $t('xpack.alert.dailyAlertNumHelper') }}</span>
-            </el-form-item>
+        <el-form ref="formRef" label-position="top" @submit.prevent v-loading="loading">
             <el-form-item :label="$t('xpack.alert.sendTimeRange')" prop="sendTimeRange">
                 <div class="text-center">
                     <el-transfer
@@ -64,7 +56,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button :disabled="loading" type="primary" @click="onSave(formRef)">
+                <el-button :disabled="loading" type="primary" @click="onSave()">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -72,12 +64,11 @@
     </DrawerPro>
 </template>
 <script lang="ts" setup>
-import { computed, ComputedRef, reactive, ref } from 'vue';
+import { computed, ComputedRef, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { UpdateAlertConfig } from '@/api/modules/alert';
-import { checkNumberRange, Rules } from '@/global/form-rules';
 import { Alert } from '@/api/interface/alert';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
@@ -105,26 +96,20 @@ interface SendTimeRange {
 
 interface DialogProps {
     id: any;
-    dailyAlertNum: number;
     sendTimeRange: SendTimeRange;
     isOffline: string;
 }
 
 interface ConfigInfo {
-    alertDailyNum: number;
     alertSendTimeRange: SendTimeRange;
     isOffline: string;
 }
 
 const drawerVisible = ref(false);
 const loading = ref(false);
-const form = reactive({
-    dailyAlertNum: 50,
-});
 const isOffline = ref();
 const id = ref();
 const configInfo = ref<ConfigInfo>({
-    alertDailyNum: 0,
     isOffline: '',
     alertSendTimeRange: {
         noticeAlert: { sendTimeRange: '', type: [] },
@@ -170,53 +155,45 @@ const acceptParams = (params: DialogProps): void => {
         resourceTimeRange.value = parseTimeRange(params.sendTimeRange.resourceAlert.sendTimeRange);
         resourceValue.value = params.sendTimeRange.resourceAlert.type;
     }
-    form.dailyAlertNum = Number(params.dailyAlertNum);
     isOffline.value = params.isOffline;
     id.value = params.id;
     drawerVisible.value = true;
 };
 
-const onSave = async (formEl: FormInstance | undefined) => {
-    if (!formEl) return;
-    formEl.validate(async (valid) => {
-        if (!valid) return;
-        if (
-            typeof noticeTimeRange.value === 'object' &&
-            noticeTimeRange.value !== null &&
-            typeof resourceTimeRange.value === 'object' &&
-            resourceTimeRange.value !== null
-        ) {
-            loading.value = true;
-            configInfo.value.alertSendTimeRange = {
-                noticeAlert: { sendTimeRange: stringifyTimeRange(noticeTimeRange.value), type: noticeValue.value },
-                resourceAlert: {
-                    sendTimeRange: stringifyTimeRange(resourceTimeRange.value),
-                    type: resourceValue.value,
-                },
-            };
-            configInfo.value.isOffline = isOffline.value;
-            configInfo.value.alertDailyNum = form.dailyAlertNum;
-            try {
-                config.value.id = id.value;
-                config.value.type = 'common';
-                config.value.title = 'xpack.alert.commonConfig';
-                config.value.status = 'Enable';
-                config.value.config = JSON.stringify(configInfo.value);
-                await UpdateAlertConfig(config.value);
+const onSave = async () => {
+    if (
+        typeof noticeTimeRange.value === 'object' &&
+        noticeTimeRange.value !== null &&
+        typeof resourceTimeRange.value === 'object' &&
+        resourceTimeRange.value !== null
+    ) {
+        loading.value = true;
+        configInfo.value.alertSendTimeRange = {
+            noticeAlert: { sendTimeRange: stringifyTimeRange(noticeTimeRange.value), type: noticeValue.value },
+            resourceAlert: {
+                sendTimeRange: stringifyTimeRange(resourceTimeRange.value),
+                type: resourceValue.value,
+            },
+        };
+        configInfo.value.isOffline = isOffline.value;
+        try {
+            config.value.id = id.value;
+            config.value.type = 'common';
+            config.value.title = 'xpack.alert.commonConfig';
+            config.value.status = 'Enable';
+            config.value.config = JSON.stringify(configInfo.value);
+            await UpdateAlertConfig(config.value);
 
-                loading.value = false;
-                handleClose();
-                emit('search');
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            } catch (error) {
-                loading.value = false;
-            }
-        } else {
-            MsgError(
-                i18n.global.t('commons.msg.confirmNoNull', [i18n.global.t('xpack.alert.timeRange').toLowerCase()]),
-            );
+            loading.value = false;
+            handleClose();
+            emit('search');
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        } catch (error) {
+            loading.value = false;
         }
-    });
+    } else {
+        MsgError(i18n.global.t('commons.msg.confirmNoNull', [i18n.global.t('xpack.alert.timeRange').toLowerCase()]));
+    }
 };
 
 const parseTimeRange = (timeRangeStr: string): [Date, Date] => {

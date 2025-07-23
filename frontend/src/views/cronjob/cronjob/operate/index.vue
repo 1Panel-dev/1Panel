@@ -818,7 +818,7 @@ const form = reactive<Cronjob.CronjobInfo>({
     status: '',
     secret: '',
     hasAlert: false,
-    alertCount: 0,
+    alertCount: 3,
     alertTitle: '',
     alertMethod: '',
     alertMethodItems: [],

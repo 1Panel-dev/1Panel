@@ -49,7 +49,7 @@ export const listAllNodes = () => {
 };
 
 export const getLicenseSmsInfo = () => {
-    return http.get<Setting.LicenseStatus>(`/core/licenses/sms/info`);
+    return http.get<Setting.SmsInfo>(`/core/licenses/sms/info`);
 };
 
 // agent
