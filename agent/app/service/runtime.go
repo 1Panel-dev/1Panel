@@ -211,6 +211,9 @@ func (r *RuntimeService) Page(req request.RuntimeSearch) (int64, []response.Runt
 	if err != nil {
 		return 0, nil, err
 	}
+	if len(runtimes) == 0 {
+		return 0, res, nil
+	}
 	if err = SyncRuntimesStatus(runtimes); err != nil {
 		return 0, nil, err
 	}
