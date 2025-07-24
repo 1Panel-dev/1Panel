@@ -87,6 +87,7 @@ import { ref, watch } from 'vue';
 import bus from '@/global/bus';
 import { logOutApi } from '@/api/modules/auth';
 import router from '@/routers';
+import { loadProductProFromDB } from '@/utils/xpack';
 
 const filter = ref();
 const globalStore = GlobalStore();
@@ -176,6 +177,7 @@ const changeNode = (command: string) => {
     if (command == 'local') {
         globalStore.currentNode = command || 'local';
         globalStore.currentNodeAddr = '';
+        loadProductProFromDB();
         router.push({ name: 'home' });
         return;
     }
@@ -195,6 +197,7 @@ const changeNode = (command: string) => {
             }
             globalStore.currentNode = command || 'local';
             globalStore.currentNodeAddr = item.addr;
+            loadProductProFromDB();
             router.push({ name: 'home' });
         }
     }
