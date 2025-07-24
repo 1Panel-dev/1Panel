@@ -56,6 +56,9 @@ func NewClient(c ConnInfo) (*SSHClient, error) {
 		return nil, err
 	}
 	sshClient := &SSHClient{Client: client}
+	if c.User == "root" {
+		return sshClient, nil
+	}
 	if _, err := sshClient.Run("sudo -n ls"); err == nil {
 		sshClient.SudoItem = "sudo"
 	}
