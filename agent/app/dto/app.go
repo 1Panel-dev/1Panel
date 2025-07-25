@@ -128,7 +128,7 @@ type Locale struct {
 	Zh     string `json:"zh"`
 	Ko     string `json:"ko"`
 	Tr     string `json:"tr"`
-	Es     string `json:"es"`
+	Es     string `json:"es-es" yaml:"es-es"`
 }
 
 type AppForm struct {
