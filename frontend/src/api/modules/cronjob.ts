@@ -11,6 +11,13 @@ export const loadNextHandle = (spec: string) => {
     return http.post<Array<String>>(`/cronjobs/next`, { spec: spec });
 };
 
+export const importCronjob = (trans: Array<Cronjob.CronjobTrans>) => {
+    return http.post('cronjobs/import', { cronjobs: trans }, TimeoutEnum.T_60S);
+};
+export const exportCronjob = (params: { ids: Array<number> }) => {
+    return http.download<BlobPart>('cronjobs/export', params, { responseType: 'blob', timeout: TimeoutEnum.T_40S });
+};
+
 export const loadCronjobInfo = (id: number) => {
     return http.post<Cronjob.CronjobOperate>(`/cronjobs/load/info`, { id: id });
 };

@@ -101,6 +101,48 @@ export namespace Cronjob {
         alertTitle: string;
         alertMethod: string;
     }
+    export interface CronjobTrans {
+        name: string;
+        type: string;
+        specCustom: boolean;
+        spec: string;
+        group: string;
+
+        executor: string;
+        scriptMode: string;
+        script: string;
+        command: string;
+        containerName: string;
+        user: string;
+        url: string;
+
+        scriptName: string;
+        apps: Array<TransHelper>;
+        websites: Array<string>;
+        dbType: string;
+        dbNames: Array<TransHelper>;
+
+        exclusionRules: string;
+
+        isDir: boolean;
+        sourceDir: string;
+
+        retainCopies: number;
+        retryTimes: number;
+        timeout: number;
+        ignoreErr: boolean;
+        snapshotRule: string;
+        secret: string;
+
+        sourceAccounts: Array<string>;
+        downloadAccount: string;
+
+        alertCount: number;
+    }
+    export interface TransHelper {
+        name: string;
+        detailName: string;
+    }
     export interface snapshotRule {
         withImage: boolean;
         ignoreAppIDs: Array<Number>;

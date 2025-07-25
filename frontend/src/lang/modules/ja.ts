@@ -48,6 +48,7 @@ const message = {
             verify: '確認する',
             saveAndEnable: '保存して有効にします',
             import: '輸入',
+            export: 'エクスポート',
             power: '認可',
             search: '検索',
             refresh: 'リロード',
@@ -287,6 +288,7 @@ const message = {
             normal: '普通',
             building: '建物',
             upgrading: 'アップグレード',
+            pending: '編集待ち',
             rebuilding: '再構築',
             deny: '拒否されました',
             accept: '受け入れられました',
@@ -958,6 +960,9 @@ const message = {
     cronjob: {
         create: 'Cronジョブを作成します',
         edit: 'Cronジョブを編集します',
+        errImport: 'ファイル内容異常:',
+        importHelper:
+            'インポート時に同名のスケジュールタスクは自動的にスキップされます。タスクはデフォルトで【無効】状態に設定され、データ関連付け異常時には【編集待ち】状態に設定されます。',
         changeStatus: 'ステータスを変更します',
         disableMsg: 'これにより、スケジュールされたタスクが自動的に実行されなくなります。続けたいですか？',
         enableMsg: 'これにより、スケジュールされたタスクが自動的に実行されます。続けたいですか？',

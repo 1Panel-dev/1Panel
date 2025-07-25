@@ -123,6 +123,53 @@ type CronjobInfo struct {
 	AlertCount uint `json:"alertCount"`
 }
 
+type CronjobImport struct {
+	Cronjobs []CronjobTrans `json:"cronjobs"`
+}
+type CronjobTrans struct {
+	Name       string `json:"name"`
+	Type       string `json:"type"`
+	SpecCustom bool   `json:"specCustom"`
+	Spec       string `json:"spec"`
+
+	Executor      string `json:"executor"`
+	ScriptMode    string `json:"scriptMode"`
+	Script        string `json:"script"`
+	Command       string `json:"command"`
+	ContainerName string `json:"containerName"`
+	User          string `json:"user"`
+	URL           string `json:"url"`
+
+	ScriptName string        `json:"scriptName"`
+	Apps       []TransHelper `json:"apps"`
+	Websites   []string      `json:"websites"`
+	DBType     string        `json:"dbType"`
+	DBNames    []TransHelper `json:"dbName"`
+
+	ExclusionRules string `json:"exclusionRules"`
+
+	IsDir     bool   `json:"isDir"`
+	SourceDir string `json:"sourceDir"`
+
+	RetainCopies uint64 `json:"retainCopies"`
+	RetryTimes   uint   `json:"retryTimes"`
+	Timeout      uint   `json:"timeout"`
+	IgnoreErr    bool   `json:"ignoreErr"`
+	SnapshotRule string `json:"snapshotRule"`
+	Secret       string `json:"secret"`
+
+	SourceAccounts  []string `json:"sourceAccounts"`
+	DownloadAccount string   `json:"downloadAccount"`
+
+	AlertCount  uint   `json:"alertCount"`
+	AlertTitle  string `json:"alertTitle"`
+	AlertMethod string `json:"alertMethod"`
+}
+type TransHelper struct {
+	Name       string `json:"name"`
+	DetailName string `json:"detailName"`
+}
+
 type ScriptOptions struct {
 	ID   uint   `json:"id"`
 	Name string `json:"name"`

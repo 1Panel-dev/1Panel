@@ -50,6 +50,7 @@ const message = {
             verify: '验证',
             saveAndEnable: '保存并启用',
             import: '导入',
+            export: '导出',
             power: '授权',
             search: '搜索',
             refresh: '刷新',
@@ -287,6 +288,7 @@ const message = {
             normal: '正常',
             building: '制作镜像中',
             upgrading: '升级中',
+            pending: '待编辑',
             rebuilding: '重建中',
             deny: '已屏蔽',
             accept: '已放行',
@@ -940,6 +942,9 @@ const message = {
     cronjob: {
         create: '创建计划任务',
         edit: '编辑计划任务',
+        errImport: '文件内容异常：',
+        importHelper:
+            '导入时将自动跳过重名计划任务。任务默认设置为【停用】状态，数据关联异常时，设置为【待编辑】状态。',
         changeStatus: '状态修改',
         disableMsg: '停止计划任务会导致该任务不再自动执行。是否继续？',
         enableMsg: '启用计划任务会让该任务定期自动执行。是否继续？',

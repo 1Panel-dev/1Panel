@@ -48,6 +48,7 @@ const message = {
             verify: 'Verificar',
             saveAndEnable: 'Salvar e ativar',
             import: 'Importar',
+            export: 'Exportar',
             power: 'Autorização',
             search: 'Pesquisar',
             refresh: 'Atualizar',
@@ -293,6 +294,7 @@ const message = {
             normal: 'Normal',
             building: 'Construindo',
             upgrading: 'Atualizando',
+            pending: 'Aguardando Edição',
             rebuilding: 'Reconstruindo',
             deny: 'Negado',
             accept: 'Aceito',
@@ -975,6 +977,9 @@ const message = {
     cronjob: {
         create: 'Criar tarefa cron',
         edit: 'Editar tarefa cron',
+        errImport: 'Conteúdo do arquivo anormal:',
+        importHelper:
+            'Tarefas agendadas duplicadas serão automaticamente ignoradas durante a importação. As tarefas serão definidas como status 【Desativado】 por padrão, e como status 【Aguardando Edição】 quando a associação de dados for anormal.',
         changeStatus: 'Alterar status',
         disableMsg: 'Isso irá parar a execução automática da tarefa agendada. Você deseja continuar?',
         enableMsg: 'Isso permitirá que a tarefa agendada seja executada automaticamente. Você deseja continuar?',

@@ -51,6 +51,7 @@ const message = {
             saveAndEnable: '保存並啟用',
             import: '導入',
             power: '授權',
+            export: '導出',
             search: '搜索',
             refresh: '刷新',
             get: '獲取',
@@ -289,6 +290,7 @@ const message = {
             normal: '正常',
             building: '製作鏡像中',
             upgrading: '升級中',
+            pending: '待編輯',
             rebuilding: '重建中',
             deny: '已屏蔽',
             accept: '已放行',
@@ -942,6 +944,9 @@ const message = {
     cronjob: {
         create: '創建計劃任務',
         edit: '編輯計劃任務',
+        errImport: '文件內容異常:',
+        importHelper:
+            '導入時將自動跳過重名計劃任務。任務默認設置為【停用】狀態，數據關聯異常時，設置為【待編輯】狀態。',
         changeStatus: '狀態修改',
         disableMsg: '停止計劃任務會導致該任務不再自動執行。是否繼續？',
         enableMsg: '啟用計劃任務會讓該任務定期自動執行。是否繼續？',

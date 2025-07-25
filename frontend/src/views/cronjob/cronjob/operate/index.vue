@@ -866,14 +866,14 @@ const search = async () => {
 
                 form.scriptID = res.data.scriptID;
                 form.appID = res.data.appID;
-                form.appIdList = res.data.appID.split(',') || [];
+                form.appIdList = res.data.appID ? res.data.appID.split(',') : [];
                 form.website = res.data.website;
-                form.websiteList = res.data.website.split(',') || [];
+                form.websiteList = res.data.website ? res.data.website.split(',') : [];
                 form.exclusionRules = res.data.exclusionRules;
-                form.ignoreFiles = res.data.exclusionRules.split(',');
+                form.ignoreFiles = res.data.exclusionRules ? res.data.exclusionRules.split(',') : [];
                 form.dbType = res.data.dbType;
                 form.dbName = res.data.dbName;
-                form.dbNameList = res.data.dbName.split(',') || [];
+                form.dbNameList = res.data.dbName ? res.data.dbName.split(',') : [];
                 form.url = res.data.url;
                 form.withImage = res.data.snapshotRule.withImage;
                 form.ignoreAppIDs = res.data.snapshotRule.ignoreAppIDs;

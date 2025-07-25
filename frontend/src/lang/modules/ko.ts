@@ -48,6 +48,7 @@ const message = {
             verify: '검증',
             saveAndEnable: '저장 및 활성화',
             import: '가져오기',
+            export: '내보내기',
             power: '권한 부여',
             search: '검색',
             refresh: '새로고침',
@@ -289,6 +290,7 @@ const message = {
             normal: '정상',
             building: '빌드 중',
             upgrading: '업그레이드 중',
+            pending: '편집 대기',
             rebuilding: '재빌드 중',
             deny: '거부됨',
             accept: '수락됨',
@@ -948,6 +950,9 @@ const message = {
     cronjob: {
         create: '크론 작업 생성',
         edit: '크론 작업 수정',
+        errImport: '파일 내용 이상:',
+        importHelper:
+            '가져오기 시 동일한 이름의 예약 작업은 자동으로 건너뜁니다. 작업은 기본적으로 【비활성화】 상태로 설정되며, 데이터 연동 이상 시 【편집 대기】 상태로 설정됩니다.',
         changeStatus: '상태 변경',
         disableMsg: '이 작업은 예약된 작업이 자동으로 실행되지 않도록 멈춥니다. 계속하시겠습니까?',
         enableMsg: '이 작업은 예약된 작업이 자동으로 실행되도록 허용합니다. 계속하시겠습니까?',

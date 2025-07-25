@@ -28,6 +28,9 @@ type OperationWithName struct {
 type OperateByID struct {
 	ID uint `json:"id" validate:"required"`
 }
+type OperateByIDs struct {
+	IDs []uint `json:"ids"`
+}
 
 type Operate struct {
 	Operation string `json:"operation" validate:"required"`

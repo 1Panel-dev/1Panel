@@ -48,6 +48,7 @@ const message = {
             verify: 'Sahkan',
             saveAndEnable: 'Simpan dan aktifkan',
             import: 'Import',
+            export: 'Eksport',
             power: 'Pemberian Kuasa',
             search: 'Cari',
             refresh: 'Segarkan',
@@ -295,6 +296,7 @@ const message = {
             normal: 'Normal',
             building: 'Sedang Membina',
             upgrading: 'Sedang Meningkatkan',
+            pending: 'Menunggu Edit',
             rebuilding: 'Sedang Membina Semula',
             deny: 'Ditolak',
             accept: 'Diterima',
@@ -979,6 +981,9 @@ const message = {
     cronjob: {
         create: 'Cipta tugas cron',
         edit: 'Edit tugas cron',
+        errImport: 'Kandungan fail tidak normal:',
+        importHelper:
+            'Tugas terjadual dengan nama sama akan dilangkau secara automatik semasa import. Tugas akan ditetapkan ke status 【Lumpuh】 secara lalai, dan ditetapkan ke status 【Menunggu Edit】 apabila perkaitan data tidak normal.',
         changeStatus: 'Tukar status',
         disableMsg:
             'Ini akan menghentikan tugas berjadual daripada dilaksanakan secara automatik. Adakah anda mahu meneruskan?',

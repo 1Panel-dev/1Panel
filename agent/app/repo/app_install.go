@@ -36,6 +36,7 @@ type IAppInstallRepo interface {
 	Page(page, size int, opts ...DBOption) (int64, []model.AppInstall, error)
 	BatchUpdateBy(maps map[string]interface{}, opts ...DBOption) error
 	LoadBaseInfo(key string, name string) (*RootInfo, error)
+	LoadInstallAppByKeyAndName(key string, name string) (*model.AppInstall, error)
 	GetFirstByCtx(ctx context.Context, opts ...DBOption) (model.AppInstall, error)
 }
 
@@ -245,4 +246,24 @@ func (a *AppInstallRepo) LoadBaseInfo(key string, name string) (*RootInfo, error
 	info.AppPath = appInstall.GetAppPath()
 	info.Status = appInstall.Status
 	return &info, nil
+}
+
+func (a *AppInstallRepo) LoadInstallAppByKeyAndName(key string, name string) (*model.AppInstall, error) {
+	var (
+		app        model.App
+		appInstall model.AppInstall
+	)
+	if err := global.DB.Where("key = ?", key).First(&app).Error; err != nil {
+		return nil, err
+	}
+	if len(name) == 0 {
+		if err := global.DB.Where("app_id = ?", app.ID).First(&appInstall).Error; err != nil {
+			return nil, err
+		}
+	} else {
+		if err := global.DB.Where("app_id = ? AND name = ?", app.ID, name).First(&appInstall).Error; err != nil {
+			return nil, err
+		}
+	}
+	return &appInstall, nil
 }

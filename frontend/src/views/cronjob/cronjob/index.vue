@@ -16,6 +16,15 @@
                         {{ $t('commons.button.delete') }}
                     </el-button>
                 </el-button-group>
+
+                <el-button-group class="ml-4">
+                    <el-button @click="onImport">
+                        {{ $t('commons.button.import') }}
+                    </el-button>
+                    <el-button :disabled="selects.length === 0" @click="onExport">
+                        {{ $t('commons.button.export') }}
+                    </el-button>
+                </el-button-group>
             </template>
             <template #rightToolBar>
                 <TableSearch @search="search()" v-model:searchName="searchName" />
@@ -54,11 +63,12 @@
                                 :operate="true"
                             />
                             <Status
-                                v-else
+                                v-if="row.status === 'Disable'"
                                 @click="onChangeStatus(row.id, 'enable')"
                                 :status="row.status"
                                 :operate="true"
                             />
+                            <Status v-if="row.status === 'Pending'" :status="row.status" />
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('cronjob.cronSpec')" show-overflow-tooltip :min-width="120">
@@ -166,7 +176,9 @@
                 </el-form>
             </template>
         </OpDialog>
+        <OpDialog ref="opExportRef" @search="search" @submit="onSubmitExport()" />
         <Records @search="search" ref="dialogRecordRef" />
+        <Import @search="search" ref="dialogImportRef" />
         <Backups @search="search" ref="dialogBackupRef" />
     </div>
 </template>
@@ -174,8 +186,9 @@
 <script lang="ts" setup>
 import Records from '@/views/cronjob/cronjob/record/index.vue';
 import Backups from '@/views/cronjob/cronjob/backup/index.vue';
+import Import from '@/views/cronjob/cronjob/import/index.vue';
 import { computed, onMounted, reactive, ref } from 'vue';
-import { deleteCronjob, getCronjobPage, handleOnce, updateStatus } from '@/api/modules/cronjob';
+import { deleteCronjob, exportCronjob, getCronjobPage, handleOnce, updateStatus } from '@/api/modules/cronjob';
 import i18n from '@/lang';
 import { Cronjob } from '@/api/interface/cronjob';
 import { ElMessageBox } from 'element-plus';
@@ -183,6 +196,7 @@ import { MsgSuccess } from '@/utils/message';
 import { hasBackup, transSpecToStr } from './helper';
 import { GlobalStore } from '@/store';
 import router from '@/routers';
+import { getCurrentDateFormatted } from '@/utils/util';
 
 const globalStore = GlobalStore();
 const mobile = computed(() => {
@@ -198,6 +212,8 @@ const opRef = ref();
 const showClean = ref();
 const cleanData = ref();
 const cleanRemoteData = ref();
+const opExportRef = ref();
+const dialogImportRef = ref();
 
 const data = ref();
 const paginationConfig = reactive({
@@ -282,6 +298,47 @@ const onSubmitDelete = async () => {
             search();
         })
         .catch(() => {
+            loading.value = false;
+        });
+};
+
+const onImport = () => {
+    dialogImportRef.value.acceptParams();
+};
+
+const onExport = async () => {
+    let names = [];
+    let ids = [];
+    for (const item of selects.value) {
+        names.push(item.name);
+        ids.push(item.id);
+    }
+    operateIDs.value = ids;
+    opExportRef.value.acceptParams({
+        title: i18n.global.t('commons.button.export'),
+        names: names,
+        msg: i18n.global.t('commons.msg.operatorHelper', [
+            i18n.global.t('menu.cronjob'),
+            i18n.global.t('commons.button.export'),
+        ]),
+        api: null,
+        params: null,
+    });
+};
+
+const onSubmitExport = async () => {
+    loading.value = true;
+    await exportCronjob({ ids: operateIDs.value })
+        .then((res) => {
+            const downloadUrl = window.URL.createObjectURL(new Blob([res]));
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = downloadUrl;
+            a.download = '1panel-cronjob-' + getCurrentDateFormatted() + '.json';
+            const event = new MouseEvent('click');
+            a.dispatchEvent(event);
+        })
+        .finally(() => {
             loading.value = false;
         });
 };

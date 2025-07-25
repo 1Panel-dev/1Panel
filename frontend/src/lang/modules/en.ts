@@ -50,6 +50,7 @@ const message = {
             verify: 'Verify',
             saveAndEnable: 'Save and enable',
             import: 'Import',
+            export: 'Export',
             power: 'Authorization',
             search: 'Search',
             refresh: 'Refresh',
@@ -298,6 +299,7 @@ const message = {
             normal: 'Normal',
             building: 'Building',
             upgrading: 'Upgrading',
+            pending: 'Pending Edit',
             rebuilding: 'Rebuilding',
             deny: 'Denied',
             accept: 'Accepted',
@@ -988,6 +990,9 @@ const message = {
     cronjob: {
         create: 'Create cron job',
         edit: 'Edit cron job',
+        errImport: 'File content exception:',
+        importHelper:
+            'Duplicate scheduled tasks will be automatically skipped during import. Tasks will be set to [Disabled] status by default, and set to [Pending Edit] status when data association is abnormal.',
         changeStatus: 'Change status',
         disableMsg: 'This will stop the scheduled task from automatically executing. Do you want to continue?',
         enableMsg: 'This will allow the scheduled task to automatically execute. Do you want to continue?',

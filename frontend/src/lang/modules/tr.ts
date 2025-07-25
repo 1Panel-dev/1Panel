@@ -50,6 +50,7 @@ const message = {
             verify: 'Doğrula',
             saveAndEnable: 'Kaydet ve etkinleştir',
             import: 'İçe Aktar',
+            export: 'Dışa Aktar',
             power: 'Yetkilendirme',
             search: 'Ara',
             refresh: 'Yenile',
@@ -302,6 +303,7 @@ const message = {
             normal: 'Normal',
             building: 'İnşa Ediliyor',
             upgrading: 'Yükseltiliyor',
+            pending: 'Düzenleme Bekliyor',
             rebuilding: 'Yeniden İnşa Ediliyor',
             deny: 'Reddedildi',
             accept: 'Kabul Edildi',
@@ -1000,6 +1002,9 @@ const message = {
     cronjob: {
         create: 'Cron görevi oluştur',
         edit: 'Cron görevini düzenle',
+        errImport: 'Dosya içeriği anormal:',
+        importHelper:
+            'İçe aktarım sırasında aynı isimli zamanlanmış görevler otomatik olarak atlanacaktır. Görevler varsayılan olarak 【Devre Dışı】 durumuna ayarlanır ve veri ilişkilendirme anormalse 【Düzenleme Bekliyor】 durumuna ayarlanır.',
         changeStatus: 'Durumu değiştir',
         disableMsg: 'Bu, zamanlanmış görevin otomatik olarak yürütülmesini durduracaktır. Devam etmek istiyor musunuz?',
         enableMsg:

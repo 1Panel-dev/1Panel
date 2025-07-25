@@ -1,6 +1,8 @@
 package v2
 
 import (
+	"net/http"
+	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
@@ -51,6 +53,49 @@ func (b *BaseApi) LoadCronjobInfo(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithData(c, data)
+}
+
+// @Tags Cronjob
+// @Summary Export cronjob list
+// @Accept json
+// @Param request body dto.OperateByIDs true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /cronjobs/export [post]
+func (b *BaseApi) ExportCronjob(c *gin.Context) {
+	var req dto.OperateByIDs
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	content, err := cronjobService.Export(req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	http.ServeContent(c.Writer, c.Request, "", time.Now(), strings.NewReader(content))
+}
+
+// @Tags Cronjob
+// @Summary Import cronjob list
+// @Accept json
+// @Param request body dto.CronjobImport true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /cronjobs/import [post]
+func (b *BaseApi) ImportCronjob(c *gin.Context) {
+	var req dto.CronjobImport
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := cronjobService.Import(req.Cronjobs); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
 }
 
 // @Tags Cronjob

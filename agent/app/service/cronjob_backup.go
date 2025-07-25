@@ -24,22 +24,7 @@ import (
 )
 
 func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time, taskItem *task.Task) error {
-	var apps []model.AppInstall
-	if cronjob.AppID == "all" {
-		apps, _ = appInstallRepo.ListBy(context.Background())
-	} else {
-		appIds := strings.Split(cronjob.AppID, ",")
-		var idItems []uint
-		for i := 0; i < len(appIds); i++ {
-			itemID, _ := strconv.Atoi(appIds[i])
-			idItems = append(idItems, uint(itemID))
-		}
-		appItems, err := appInstallRepo.ListBy(context.Background(), repo.WithByIDs(idItems))
-		if err != nil {
-			return err
-		}
-		apps = appItems
-	}
+	apps := loadAppsForJob(cronjob)
 	if len(apps) == 0 {
 		return errors.New("no such app in database!")
 	}
@@ -342,6 +327,23 @@ func (u *CronjobService) handleSnapshot(cronjob model.Cronjob, jobRecord model.J
 	}
 	u.removeExpiredBackup(cronjob, accountMap, record)
 	return nil
+}
+
+func loadAppsForJob(cronjob model.Cronjob) []model.AppInstall {
+	var apps []model.AppInstall
+	if cronjob.AppID == "all" {
+		apps, _ = appInstallRepo.ListBy(context.Background())
+	} else {
+		appIds := strings.Split(cronjob.AppID, ",")
+		var idItems []uint
+		for i := 0; i < len(appIds); i++ {
+			itemID, _ := strconv.Atoi(appIds[i])
+			idItems = append(idItems, uint(itemID))
+		}
+		appItems, _ := appInstallRepo.ListBy(context.Background(), repo.WithByIDs(idItems))
+		apps = appItems
+	}
+	return apps
 }
 
 type DatabaseHelper struct {
