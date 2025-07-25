@@ -106,7 +106,7 @@ const stopSignals = [
     'image push successful!',
     '[TASK-END]',
 ];
-const emit = defineEmits(['update:loading', 'update:hasContent', 'update:isReading']);
+const emit = defineEmits(['update:loading', 'update:hasContent', 'update:isReading', 'stop-reading']);
 const tailLog = ref(true);
 const loading = ref(props.loading);
 const readReq = reactive({
@@ -298,6 +298,7 @@ const onCloseLog = async () => {
         timer = null;
     }
     timer = null;
+    emit('stop-reading');
     isLoading.value = false;
     emit('update:isReading', false);
     bus.emit('refreshTask', true);

@@ -63,7 +63,7 @@
             <template #rightToolBar>
                 <el-date-picker
                     class="mr-2.5"
-                    @change="search()"
+                    @change="search(true)"
                     v-model="timeRangeLoad"
                     type="datetimerange"
                     range-separator="-"
@@ -71,7 +71,7 @@
                     :end-placeholder="$t('commons.search.timeEnd')"
                     :shortcuts="shortcuts"
                 ></el-date-picker>
-                <el-select @change="search()" v-model="searchInfo.status" class="p-w-200">
+                <el-select @change="search(true)" v-model="searchInfo.status" class="p-w-200">
                     <template #prefix>{{ $t('commons.table.status') }}</template>
                     <el-option :label="$t('commons.table.all')" value="" />
                     <el-option :label="$t('commons.status.success')" value="Success" />
@@ -119,7 +119,7 @@
                             </div>
                         </el-col>
                         <el-col :span="17">
-                            <el-form label-position="top" :v-key="refresh">
+                            <el-form label-position="top">
                                 <el-row type="flex" justify="center">
                                     <el-form-item class="descriptionWide">
                                         <template #label>
@@ -158,22 +158,12 @@
                                         {{ currentRecord?.message }}
                                     </el-form-item>
                                 </el-row>
-                                <el-row v-if="currentRecord?.records">
-                                    <span>{{ $t('commons.table.records') }}</span>
-                                    <div class="editor-main">
-                                        <highlightjs
-                                            ref="mymirror"
-                                            language="JavaScript"
-                                            :autodetect="false"
-                                            :code="currentRecordDetail"
-                                        ></highlightjs>
-                                    </div>
-                                </el-row>
                                 <el-row v-if="currentRecord?.taskID && currentRecord?.taskID != ''">
                                     <LogFile
-                                        :defaultButton="false"
+                                        :defaultButton="true"
                                         class="w-full"
                                         :key="currentRecord?.taskID"
+                                        @stop-reading="search(false)"
                                         :heightDiff="410"
                                         :config="{ type: 'task', taskID: currentRecord?.taskID, tail: true }"
                                     />
@@ -218,9 +208,9 @@
 </template>
 
 <script lang="ts" setup>
-import { nextTick, onBeforeUnmount, reactive, ref } from 'vue';
+import { reactive, ref } from 'vue';
 import { Cronjob } from '@/api/interface/cronjob';
-import { searchRecords, handleOnce, updateStatus, cleanRecords, getRecordLog } from '@/api/modules/cronjob';
+import { searchRecords, handleOnce, updateStatus, cleanRecords } from '@/api/modules/cronjob';
 import { dateFormat } from '@/utils/util';
 import LogFile from '@/components/log/file/index.vue';
 import i18n from '@/lang';
@@ -232,13 +222,7 @@ import { shortcuts } from '@/utils/shortcuts';
 import { hasBackup } from '../helper';
 
 const loading = ref();
-const refresh = ref(false);
 const hasRecords = ref();
-
-let timer: NodeJS.Timer | null = null;
-
-const mymirror = ref();
-const scrollerElement = ref<HTMLElement | null>(null);
 
 interface DialogProps {
     rowData: Cronjob.CronjobInfo;
@@ -247,7 +231,6 @@ const recordShow = ref(false);
 const dialogData = ref();
 const records = ref<Array<Cronjob.Record>>([]);
 const currentRecord = ref<Cronjob.Record>();
-const currentRecordDetail = ref<string>('');
 
 const open = ref();
 const delLoading = ref();
@@ -282,20 +265,17 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
             }
         }
     }
-    search();
-    timer = setInterval(() => {
-        search();
-    }, 1000 * 5);
+    search(true);
 };
 
 const handleSizeChange = (val: number) => {
     searchInfo.pageSize = val;
     localStorage.setItem(searchInfo.cacheSizeKey, val + '');
-    search();
+    search(true);
 };
 const handleCurrentChange = (val: number) => {
     searchInfo.page = val;
-    search();
+    search(false);
 };
 
 const timeRangeLoad = ref<[Date, Date]>([
@@ -319,7 +299,7 @@ const onHandle = async (row: Cronjob.CronjobInfo) => {
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            search();
+            search(true);
         })
         .catch(() => {
             loading.value = false;
@@ -338,7 +318,7 @@ const onChangeStatus = async (id: number, status: string) => {
     });
 };
 
-const search = async () => {
+const search = async (changeToLatest: boolean) => {
     if (timeRangeLoad.value && timeRangeLoad.value.length === 2) {
         searchInfo.startTime = timeRangeLoad.value[0];
         searchInfo.endTime = timeRangeLoad.value[1];
@@ -361,44 +341,13 @@ const search = async () => {
     if (!hasRecords.value) {
         return;
     }
-    if (!currentRecord.value) {
+    if (changeToLatest) {
         currentRecord.value = records.value[0];
-    } else {
-        let beDelete = true;
-        for (const item of records.value) {
-            if (item.id === currentRecord.value.id) {
-                beDelete = false;
-                currentRecord.value = item;
-                break;
-            }
-        }
-        if (beDelete) {
-            currentRecord.value = records.value[0];
-        }
-    }
-    if (currentRecord.value?.records) {
-        loadRecord(currentRecord.value);
     }
 };
 
 const forDetail = async (row: Cronjob.Record) => {
     currentRecord.value = row;
-    loadRecord(row);
-};
-const loadRecord = async (row: Cronjob.Record) => {
-    currentRecord.value = row;
-    if (row.records) {
-        const res = await getRecordLog(row.id);
-        let log = res.data.replace(/\x1B\[[0-?]*[ -/]*[@-~]/g, '');
-        if (currentRecordDetail.value === log) {
-            return;
-        }
-        currentRecordDetail.value = log;
-        nextTick(() => {
-            initLog();
-            scrollerElement.value.scrollTop = scrollerElement.value.scrollHeight;
-        });
-    }
 };
 
 const onClean = async () => {
@@ -412,7 +361,7 @@ const onClean = async () => {
                 .then(() => {
                     delLoading.value = false;
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                    search();
+                    search(true);
                 })
                 .catch(() => {
                     delLoading.value = false;
@@ -430,25 +379,12 @@ const cleanRecord = async () => {
             delLoading.value = false;
             open.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            search();
+            search(true);
         })
         .catch(() => {
             delLoading.value = false;
         });
 };
-
-const initLog = () => {
-    if (mymirror.value && scrollerElement.value == undefined) {
-        scrollerElement.value = mymirror.value.$el as HTMLElement;
-        let hljsDom = scrollerElement.value.querySelector('.hljs') as HTMLElement;
-        hljsDom.style['min-height'] = '500px';
-    }
-};
-
-onBeforeUnmount(() => {
-    clearInterval(Number(timer));
-    timer = null;
-});
 
 defineExpose({
     acceptParams,
