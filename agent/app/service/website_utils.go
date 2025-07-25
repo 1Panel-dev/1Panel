@@ -1031,7 +1031,7 @@ func chownRootDir(path string) error {
 	return nil
 }
 
-func getWebsiteDomains(domains []request.WebsiteDomain, defaultPort int, websiteID uint) (domainModels []model.WebsiteDomain, addPorts []int, addDomains []string, err error) {
+func getWebsiteDomains(domains []request.WebsiteDomain, defaultHTTPPort, defaultHTTPsPort int, websiteID uint) (domainModels []model.WebsiteDomain, addPorts []int, addDomains []string, err error) {
 	var (
 		ports     = make(map[int]struct{})
 		existPort = make(map[int]struct{})
@@ -1056,7 +1056,7 @@ func getWebsiteDomains(domains []request.WebsiteDomain, defaultPort int, website
 		domainModel.Domain = strings.ToLower(domainModel.Domain)
 		domainModel.Port = domain.Port
 		if domain.Port == 0 {
-			domain.Port = defaultPort
+			domain.Port = defaultHTTPPort
 		}
 		domainModel.SSL = domain.SSL
 		domainModel.WebsiteID = websiteID
@@ -1077,7 +1077,7 @@ func getWebsiteDomains(domains []request.WebsiteDomain, defaultPort int, website
 	}
 
 	for port := range ports {
-		if port == defaultPort {
+		if port == defaultHTTPPort || port == defaultHTTPsPort {
 			addPorts = append(addPorts, port)
 			continue
 		}
@@ -1098,7 +1098,7 @@ func getWebsiteDomains(domains []request.WebsiteDomain, defaultPort int, website
 				err = buserr.WithMap("ErrPortExist", errMap, nil)
 				return
 			}
-			if port != 443 && common.ScanPort(port) {
+			if port != defaultHTTPsPort && common.ScanPort(port) {
 				err = buserr.WithDetail("ErrPortInUsed", port, nil)
 				return
 			}

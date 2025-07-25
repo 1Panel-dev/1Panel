@@ -257,7 +257,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 	var (
 		domains []model.WebsiteDomain
 	)
-	domains, _, _, err = getWebsiteDomains(create.Domains, defaultHttpPort, 0)
+	domains, _, _, err = getWebsiteDomains(create.Domains, defaultHttpPort, nginxInstall.HttpsPort, 0)
 	if err != nil {
 		return err
 	}
@@ -680,7 +680,7 @@ func (w WebsiteService) CreateWebsiteDomain(create request.WebsiteDomainCreate) 
 		domainModels []model.WebsiteDomain
 		addPorts     []int
 	)
-	httpPort, _, err := getAppInstallPort(constant.AppOpenresty)
+	httpPort, httpsPort, err := getAppInstallPort(constant.AppOpenresty)
 	if err != nil {
 		return nil, err
 	}
@@ -689,7 +689,7 @@ func (w WebsiteService) CreateWebsiteDomain(create request.WebsiteDomainCreate) 
 		return nil, err
 	}
 
-	domainModels, addPorts, _, err = getWebsiteDomains(create.Domains, httpPort, create.WebsiteID)
+	domainModels, addPorts, _, err = getWebsiteDomains(create.Domains, httpPort, httpsPort, create.WebsiteID)
 	if err != nil {
 		return nil, err
 	}
