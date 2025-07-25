@@ -68,6 +68,7 @@
 </template>
 
 <script lang="ts" setup>
+import { checkAppInstalled } from '@/api/modules/app';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgError } from '@/utils/message';
@@ -89,9 +90,10 @@ const rules = ref({
         type: Array,
     },
 });
+const defaultPort = ref(80);
 const initDomain = () => ({
     domain: '',
-    port: 80,
+    port: defaultPort.value,
     ssl: false,
 });
 const create = ref({
@@ -128,16 +130,16 @@ const gengerateDomains = () => {
         const exists = (domain: string, port: number): boolean => {
             return create.value.domains.some((info) => info.domain === domain && info.port === port);
         };
-        if (exists(domain, port ? Number(port) : 80)) {
+        if (exists(domain, port ? Number(port) : defaultPort.value)) {
             return;
         }
         if (create.value.domains[0].domain == '') {
             create.value.domains[0].domain = domain;
-            create.value.domains[0].port = port ? Number(port) : 80;
+            create.value.domains[0].port = port ? Number(port) : defaultPort.value;
         } else {
             create.value.domains.push({
                 domain,
-                port: port ? Number(port) : 80,
+                port: port ? Number(port) : defaultPort.value,
                 ssl: false,
             });
         }
@@ -149,7 +151,19 @@ const handleParams = () => {
     props.form.domains = create.value.domains;
 };
 
+const getOprensty = async () => {
+    try {
+        await checkAppInstalled('openresty', '')
+            .then((res) => {
+                defaultPort.value = res.data.httpPort || 80;
+                create.value.domains[0].port = defaultPort.value;
+            })
+            .catch(() => {});
+    } catch (error) {}
+};
+
 onMounted(() => {
+    getOprensty();
     handleParams();
 });
 </script>
