@@ -1716,10 +1716,11 @@ const message = {
         typeStandard_IA: 'Standard_IA',
         typeArchive: 'Archive',
         typeDeep_Archive: 'Deep_Archive',
+        scLighthouse: 'Default, Lightweight object storage only supports this storage type',
         scStandard:
-            'Standard Storage is suitable for business scenarios with a large number of hot files that require real-time access, frequent data interaction, and so on.',
+            'Standard storage, suitable for business scenarios with large amounts of frequently accessed hot files and frequent data interactions.',
         scStandard_IA:
-            'Low-frequency storage is suitable for business scenarios with relatively low access frequency, and stores data for at least 30 days.',
+            'Infrequent access storage, suitable for business scenarios with lower access frequency (e.g., average monthly access frequency of 1-2 times), minimum storage duration of 30 days.',
         scArchive: 'Archival storage is suitable for business scenarios with extremely low access frequency.',
         scDeep_Archive: 'Durable cold storage is suitable for business scenarios with extremely low access frequency.',
         archiveHelper:

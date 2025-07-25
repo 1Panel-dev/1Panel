@@ -1637,6 +1637,7 @@ const message = {
         typeStandard_IA: '低頻度ストレージ',
         typeArchive: 'アーカイブストレージ',
         typeDeep_Archive: '深層アーカイブストレージ',
+        scLighthouse: 'デフォルト：軽量オブジェクトストレージはこのストレージタイプのみサポートしています',
         scStandard:
             '標準ストレージは、リアルタイムアクセスが多いホットファイルや頻繁なデータ交換などの業務シナリオに適しています。',
         scStandard_IA:

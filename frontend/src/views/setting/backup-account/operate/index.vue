@@ -200,6 +200,7 @@
                 :rules="[Rules.requiredSelect]"
             >
                 <el-select v-model="dialogData.rowData!.varsJson['scType']">
+                    <el-option value="DEFAULT" :label="$t('setting.scLighthouse')" />
                     <el-option value="Standard" :label="$t('setting.scStandard')" />
                     <el-option value="Standard_IA" :label="$t('setting.scStandard_IA')" />
                     <el-option value="Archive" :label="$t('setting.scArchive')" />

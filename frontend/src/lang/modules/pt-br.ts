@@ -1673,6 +1673,7 @@ const message = {
         typeStandard_IA: 'Padrão_IA',
         typeArchive: 'Arquivo',
         typeDeep_Archive: 'Arquivo Profundo',
+        scLighthouse: 'Padrão, O armazenamento de objetos leve só suporta este tipo de armazenamento',
         scStandard:
             'O armazenamento padrão é adequado para cenários de negócios com grande volume de arquivos quentes que exigem acesso em tempo real, interação frequente de dados, etc.',
         scStandard_IA:

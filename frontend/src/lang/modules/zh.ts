@@ -1615,6 +1615,7 @@ const message = {
         typeStandard_IA: '低频存储',
         typeArchive: '归档存储',
         typeDeep_Archive: '深度归档存储',
+        scLighthouse: '默认，轻量对象存储仅支持该存储类型',
         scStandard: '标准存储，适用于实时访问的大量热点文件、频繁的数据交互等业务场景。',
         scStandard_IA: '低频存储，适用于较低访问频率（例如平均每月访问频率1到2次）的业务场景，最少存储30天。',
         scArchive: '归档存储，适用于极低访问频率（例如半年访问1次）的业务场景。',

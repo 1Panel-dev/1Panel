@@ -1620,6 +1620,7 @@ const message = {
         typeStandard_IA: '低頻存儲',
         typeArchive: '歸檔存儲',
         typeDeep_Archive: '深度歸檔存儲',
+        scLighthouse: '預設，輕量物件儲存僅支援該儲存類型',
         scStandard: '標準存儲，適用於實時訪問的大量熱點文件、頻繁的數據交互等業務場景。',
         scStandard_IA: '低頻存儲，適用於較低訪問頻率（例如平均每月訪問頻率1到2次）的業務場景，最少存儲30天。',
         scArchive: '歸檔存儲，適用於極低訪問頻率（例如半年訪問1次）的業務場景。',

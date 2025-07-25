@@ -1689,6 +1689,7 @@ const message = {
         typeStandard_IA: 'Standard_IA',
         typeArchive: 'Archive',
         typeDeep_Archive: 'Deep_Archive',
+        scLighthouse: 'Lalai, Penyimpanan objek ringan hanya menyokong jenis penyimpanan ini',
         scStandard:
             'Storan Standard sesuai untuk senario perniagaan dengan sejumlah besar fail panas yang memerlukan akses masa nyata, interaksi data yang kerap, dan sebagainya.',
         scStandard_IA:

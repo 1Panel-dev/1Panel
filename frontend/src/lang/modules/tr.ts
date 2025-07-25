@@ -1735,6 +1735,7 @@ const message = {
         typeStandard_IA: 'Standart_IA',
         typeArchive: 'Arşiv',
         typeDeep_Archive: 'Derin_Arşiv',
+        scLighthouse: 'Varsayılan, Hafif nesne depolama yalnızca bu depolama türünü destekler',
         scStandard:
             'Standart Depolama, gerçek zamanlı erişim gerektiren çok sayıda sıcak dosya içeren iş senaryoları için uygundur, sık veri etkileşimi vb.',
         scStandard_IA:

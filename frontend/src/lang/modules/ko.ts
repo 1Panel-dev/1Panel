@@ -1620,6 +1620,7 @@ const message = {
         typeStandard_IA: '저빈도 표준',
         typeArchive: '아카이브',
         typeDeep_Archive: '심층 아카이브',
+        scLighthouse: '기본값: 경량 오브젝트 스토리지는 이 스토리지 유형만 지원합니다',
         scStandard:
             '표준 스토리지는 실시간 접근, 빈번한 데이터 상호작용이 필요한 핫 파일이 많은 비즈니스 시나리오에 적합합니다.',
         scStandard_IA:
