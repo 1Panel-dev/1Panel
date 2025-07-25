@@ -28,7 +28,7 @@ type Login struct {
 	IgnoreCaptcha bool   `json:"ignoreCaptcha"`
 	Captcha       string `json:"captcha"`
 	CaptchaID     string `json:"captchaID"`
-	Language      string `json:"language" validate:"required,oneof=zh en 'zh-Hant' ko ja ru ms 'pt-BR' tr"`
+	Language      string `json:"language" validate:"required,oneof=zh en 'zh-Hant' ko ja ru ms 'pt-BR' tr 'es-ES'"`
 }
 
 type MFALogin struct {
