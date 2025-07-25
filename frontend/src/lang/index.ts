@@ -8,6 +8,7 @@ import ru from './modules/ru';
 import ms from './modules/ms';
 import ko from './modules/ko';
 import tr from './modules/tr';
+import esES from './modules/es-es';
 
 const i18n = createI18n({
     legacy: false,
@@ -24,6 +25,7 @@ const i18n = createI18n({
         ms,
         ko,
         tr,
+        'es-ES': esES,
     },
     warnHtmlMessage: false,
 });
