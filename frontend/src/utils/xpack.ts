@@ -114,6 +114,7 @@ export async function getXpackSettingForTheme() {
             globalStore.themeConfig.loginImage = res2.data?.loginImage;
             globalStore.themeConfig.loginBgType = res2.data?.loginBgType;
             globalStore.themeConfig.loginBackground = res2.data?.loginBackground;
+            globalStore.themeConfig.loginBtnLinkColor = res2.data?.loginBtnLinkColor;
             globalStore.themeConfig.themeColor = res2.data?.themeColor;
             if (res2.data?.theme) {
                 globalStore.themeConfig.theme = res2.data.theme;

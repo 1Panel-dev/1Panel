@@ -1556,7 +1556,7 @@ const message = {
         apiKeyHelper: 'APIキーは、サードパーティアプリケーションに使用されてAPIにアクセスします。',
         ipWhiteList: 'IP AllowList',
         ipWhiteListEgs: '1行に1つ。たとえば、 n172.161.10.111  n172.161.10.0/24',
-        ipWhiteListHelper: 'AllowList内のIPSはAPIにアクセスできます。',
+        ipWhiteListHelper: 'AllowList内のIPSはAPIにアクセスできます、0.0.0.0/0（すべての IPv4）、::/0（すべての IPv6）',
         apiKeyReset: 'インターフェイスキーリセット',
         apiKeyResetHelper: '関連するキーサービスは無効になります。サービスに新しいキーを追加してください',
         confDockerProxy: 'Dockerプロキシを構成します',
@@ -2746,7 +2746,7 @@ const message = {
             apiInterfaceHelper:
                 'パネルAPIインターフェースアクセスをサポート（この機能はパネルアプリで有効にする必要があります）',
             apiInterfaceHelper1:
-                'パネルアプリのアクセスには訪問者をホワイトリストに追加する必要があります。固定IPでない場合、0.0.0.0/0 を追加することをお勧めします',
+                'パネルアプリのアクセスには訪問者をホワイトリストに追加する必要があります。固定IPでない場合、0.0.0.0/0（すべての IPv4）、::/0（すべての IPv6）を追加することをお勧めします',
             qrCodeExpired: 'リフレッシュ時間',
             apiLeakageHelper: 'QRコードを漏洩しないでください。信頼できる環境でのみ使用してください。',
         },
@@ -3156,6 +3156,9 @@ const message = {
             loginBgColorHelper: 'ログインページの背景色として表示されます',
             image: '画像',
             bgColor: '背景色',
+            loginGroup: 'ログインページ',
+            loginBtnLinkColor: 'ボタン／リンクの色',
+            loginBtnLinkColorHelper: 'ログインページに表示されるボタン／リンクの色になります',
         },
         helper: {
             wafTitle1: 'インターセプションマップ',

@@ -25,6 +25,7 @@ const GlobalStore = defineStore({
             loginImage: '',
             loginBackground: '',
             loginBgType: '',
+            loginBtnLinkColor: '',
         },
         openMenuTabs: false,
         isFullScreen: false,

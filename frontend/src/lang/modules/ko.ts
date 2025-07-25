@@ -1537,7 +1537,7 @@ const message = {
         apiKeyHelper: 'API 키는 서드파티 애플리케이션이 API 에 접근하는 데 사용됩니다.',
         ipWhiteList: 'IP 허용 목록',
         ipWhiteListEgs: '한 줄에 하나씩 입력하십시오. 예:\n172.161.10.111\n172.161.10.0/24',
-        ipWhiteListHelper: '허용 목록에 있는 IP만 API 에 접근할 수 있습니다.',
+        ipWhiteListHelper: '허용 목록에 있는 IP만 API 에 접근할 수 있습니다. 0.0.0.0/0(모든 IPv4), ::/0(모든 IPv6)',
         apiKeyValidityTime: '인터페이스 키 유효 기간',
         apiKeyValidityTimeEgs: '인터페이스 키 유효 기간 (분 단위)',
         apiKeyValidityTimeHelper:
@@ -2699,7 +2699,7 @@ const message = {
             apiStatusHelper: '패널 APP 는 API 인터페이스 기능을 활성화해야 합니다',
             apiInterfaceHelper: '패널 API 인터페이스 액세스를 지원합니다(패널 앱에서 이 기능을 활성화해야 합니다)',
             apiInterfaceHelper1:
-                '패널 앱의 액세스에는 방문자를 화이트리스트에 추가해야 하며, 고정 IP가 아닌 경우 0.0.0.0/0 을 추가하는 것이 좋습니다',
+                '패널 앱의 액세스에는 방문자를 화이트리스트에 추가해야 하며, 고정 IP가 아닌 경우 0.0.0.0/0(모든 IPv4), ::/0(모든 IPv6) 을 추가하는 것이 좋습니다',
             qrCodeExpired: '새로 고침 시간',
             apiLeakageHelper: 'QR 코드를 누출하지 마십시오. 신뢰할 수 있는 환경에서만 사용하십시오.',
         },
@@ -3104,6 +3104,9 @@ const message = {
             loginBgColorHelper: '로그인 페이지의 배경 색상으로 표시됩니다',
             image: '이미지',
             bgColor: '배경 색상',
+            loginGroup: '로그인 페이지',
+            loginBtnLinkColor: '버튼/링크 색상',
+            loginBtnLinkColorHelper: '로그인 페이지의 버튼/링크 색상으로 표시됩니다',
         },
         helper: {
             wafTitle1: '차단 지도',

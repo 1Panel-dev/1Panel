@@ -200,6 +200,7 @@ const errMfaInfo = ref(false);
 const isDemo = ref(false);
 const isIntl = ref(true);
 const open = ref(false);
+const loginBtnLinkColor = ref<string | null>(null);
 
 type FormInstance = InstanceType<typeof ElForm>;
 const _isMobile = () => {
@@ -420,6 +421,47 @@ const getSetting = async () => {
     } catch (error) {}
 };
 
+function adjustColorToRGBA(color: string, percent: number, opacity: number): string {
+    let r = 0,
+        g = 0,
+        b = 0,
+        a = opacity;
+
+    color = color.trim();
+
+    if (color.startsWith('#')) {
+        if (color.length === 4) {
+            r = parseInt(color[1] + color[1], 16);
+            g = parseInt(color[2] + color[2], 16);
+            b = parseInt(color[3] + color[3], 16);
+        } else if (color.length === 7) {
+            r = parseInt(color.slice(1, 3), 16);
+            g = parseInt(color.slice(3, 5), 16);
+            b = parseInt(color.slice(5, 7), 16);
+        } else {
+            return color;
+        }
+    } else if (color.startsWith('rgb')) {
+        const result = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([0-9.]+))?\)/);
+        if (!result) return color;
+        r = parseInt(result[1], 10);
+        g = parseInt(result[2], 10);
+        b = parseInt(result[3], 10);
+        if (result[4] !== undefined) {
+            a = parseFloat(result[4]);
+        }
+    } else {
+        return color;
+    }
+
+    r = Math.min(255, Math.max(0, Math.round(r * (1 + percent / 100))));
+    g = Math.min(255, Math.max(0, Math.round(g * (1 + percent / 100))));
+    b = Math.min(255, Math.max(0, Math.round(b * (1 + percent / 100))));
+    a = Math.min(1, Math.max(0, opacity / 100));
+
+    return `rgba(${r}, ${g}, ${b}, ${a})`;
+}
+
 onMounted(() => {
     globalStore.isOnRestart = false;
     getSetting();
@@ -428,6 +470,17 @@ onMounted(() => {
         loginVerify();
     }
     document.title = globalStore.themeConfig.panelName;
+    loginBtnLinkColor.value = globalStore.themeConfig.loginBtnLinkColor || '#005eeb';
+    document.documentElement.style.setProperty('--login-btn-link-color', loginBtnLinkColor.value);
+    document.documentElement.style.setProperty(
+        '--login-btn-link-hover-color',
+        adjustColorToRGBA(loginBtnLinkColor.value, -10, 80),
+    );
+    document.documentElement.style.setProperty(
+        '--login-loading-mask-color',
+        adjustColorToRGBA(loginBtnLinkColor.value, 30, 15),
+    );
+
     loginForm.agreeLicense = globalStore.agreeLicense;
     document.onkeydown = (e: any) => {
         e = window.event || e;
@@ -467,12 +520,12 @@ onMounted(() => {
 
 .login-form {
     .login-button {
-        background-color: #005eeb;
-        border-color: #005eeb;
+        background-color: var(--login-btn-link-color);
+        border-color: var(--login-btn-link-color);
         color: #ffffff;
         &:hover {
-            background-color: #196eed !important;
-            border-color: #196eed !important;
+            background-color: var(--login-btn-link-hover-color) !important;
+            border-color: var(--login-btn-link-hover-color) !important;
             outline: none !important;
         }
     }
@@ -486,7 +539,7 @@ onMounted(() => {
         background: none !important;
     }
     :deep(.el-input__wrapper.is-focus) {
-        box-shadow: 0 0 0 1px #005eeb inset !important;
+        box-shadow: 0 0 0 1px var(--login-btn-link-color) inset !important;
     }
 
     .demo {
@@ -497,16 +550,16 @@ onMounted(() => {
     }
 
     .agree-title {
-        color: #005eeb;
+        color: var(--login-btn-link-color);
     }
 
     .agree {
         white-space: pre-wrap;
-        color: #005eeb;
+        color: var(--login-btn-link-color);
     }
 
     :deep(a) {
-        color: #005eeb;
+        color: var(--login-btn-link-color);
         &:hover {
             opacity: 75%;
         }
@@ -514,16 +567,16 @@ onMounted(() => {
 
     :deep(.el-checkbox__input .el-checkbox__inner) {
         background-color: #fff !important;
-        border-color: #e5eefd !important;
+        border-color: var(--login-btn-link-color) !important;
     }
 
     :deep(.el-checkbox__input.is-checked .el-checkbox__inner) {
-        background-color: #005eeb !important;
-        border-color: #005eeb !important;
+        background-color: var(--login-btn-link-color) !important;
+        border-color: var(--login-btn-link-color) !important;
     }
 
     :deep(.el-checkbox__input.is-checked .el-checkbox__inner::after) {
-        border-color: #e5eefd !important;
+        border-color: #ffffff !important;
     }
 
     :deep(.el-input__inner) {
@@ -543,22 +596,25 @@ onMounted(() => {
 }
 
 :deep(.el-dropdown-menu__item:not(.is-disabled):hover) {
-    color: #005eeb !important;
-    background-color: #e5eefd !important;
+    background-color: var(--login-btn-link-color) !important;
+    color: #fff !important;
 }
 :deep(.el-dropdown-menu__item:not(.is-disabled):focus) {
-    color: #005eeb !important;
-    background-color: #e5eefd !important;
+    background-color: var(--login-btn-link-color) !important;
+    color: #fff !important;
 }
 
 :deep(.el-loading-mask) {
-    background-color: rgba(229, 238, 253, 0.8) !important;
+    background-color: var(--login-loading-mask-color) !important;
+    .el-loading-spinner .path {
+        stroke: var(--login-btn-link-color);
+    }
 }
 
 .login-footer-btn {
     .el-button--primary {
-        border-color: #005eeb !important;
-        background-color: #005eeb !important;
+        border-color: var(--login-btn-link-color) !important;
+        background-color: var(--login-btn-link-color) !important;
     }
 }
 </style>

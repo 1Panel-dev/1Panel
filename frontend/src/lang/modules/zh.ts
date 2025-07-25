@@ -1528,7 +1528,8 @@ const message = {
         apiKeyHelper: '接口密钥用于外部应用访问 API 接口',
         ipWhiteList: 'IP 白名单',
         ipWhiteListEgs: '当存在多个 IP 时，需要换行显示，例： \n172.16.10.111 \n172.16.10.0/24',
-        ipWhiteListHelper: '必需在 IP 白名单列表中的 IP 才能访问面板 API 接口',
+        ipWhiteListHelper:
+            '必需在 IP 白名单列表中的 IP 才能访问面板 API 接口，0.0.0.0/0（所有 IPv4），::/0（所有 IPv6）',
         apiKeyValidityTime: '接口密钥有效期',
         apiKeyValidityTimeEgs: '接口密钥有效期（单位分）',
         apiKeyValidityTimeHelper: '接口时间戳到请求时的当前时间戳之间有效（单位分），设置为 0 时，不做时间戳校验',
@@ -3037,6 +3038,9 @@ const message = {
             loginBgColorHelper: '将会显示在登录页面背景颜色',
             image: '图片',
             bgColor: '背景色',
+            loginGroup: '登录页',
+            loginBtnLinkColor: '按钮/链接颜色',
+            loginBtnLinkColorHelper: '将会显示在登录页面按钮/链接颜色',
         },
         helper: {
             wafTitle1: '拦截地图',
@@ -3404,7 +3408,8 @@ const message = {
             qrCode: '二维码',
             apiStatusHelper: '面板 APP 需要开启 API 接口功能',
             apiInterfaceHelper: '支持面板 API 接口访问功能（面板 APP 需要开启该功能）',
-            apiInterfaceHelper1: '面板 APP 访问需将访问者添加至白名单，非固定 IP 建议添加 0.0.0.0/0',
+            apiInterfaceHelper1:
+                '面板 APP 访问需将访问者添加至白名单，非固定 IP 建议添加 0.0.0.0/0（所有 IPv4），::/0（所有 IPv6）',
             qrCodeExpired: '刷新时间',
             apiLeakageHelper: '请勿泄露二维码，确保仅在受信任的环境中使用',
         },

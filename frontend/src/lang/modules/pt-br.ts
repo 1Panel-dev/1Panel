@@ -1588,7 +1588,8 @@ const message = {
         apiKeyHelper: 'A chave da API é usada para aplicativos de terceiros acessarem a API.',
         ipWhiteList: 'Lista de IPs permitidos',
         ipWhiteListEgs: 'Um por linha. Exemplo: \n172.161.10.111\n172.161.10.0/24',
-        ipWhiteListHelper: 'IPs na lista de permitidos podem acessar a API.',
+        ipWhiteListHelper:
+            'IPs na lista de permitidos podem acessar a API, 0.0.0.0/0 (todos os IPv4), ::/0 (todos os IPv6)',
         apiKeyReset: 'Redefinir chave da interface',
         apiKeyResetHelper:
             'O serviço associado à chave se tornará inválido. Por favor, adicione uma nova chave ao serviço',
@@ -2809,7 +2810,7 @@ const message = {
             apiInterfaceHelper:
                 'Suporta acesso à interface de API do painel (essa funcionalidade precisa ser ativada no aplicativo do painel)',
             apiInterfaceHelper1:
-                'O acesso ao aplicativo do painel requer que o visitante seja adicionado à lista de permissões; para IPs não fixos, recomenda-se adicionar 0.0.0.0/0',
+                'O acesso ao aplicativo do painel requer que o visitante seja adicionado à lista de permissões; para IPs não fixos, recomenda-se adicionar 0.0.0.0/0(todos os IPv4), ::/0 (todos os IPv6)',
             qrCodeExpired: 'Tempo de atualização',
             apiLeakageHelper: 'Não revele o QR code. Garanta que ele seja usado apenas em ambientes confiáveis.',
         },
@@ -3234,6 +3235,9 @@ const message = {
             loginBgColorHelper: 'Será exibida como cor de fundo na página de login',
             image: 'Imagem',
             bgColor: 'Cor de Fundo',
+            loginGroup: 'Página de login',
+            loginBtnLinkColor: 'Cor do botão/link',
+            loginBtnLinkColorHelper: 'Será exibido como a cor do botão/link na página de login',
         },
         helper: {
             wafTitle1: 'Mapa de Interceptação',

@@ -1600,7 +1600,7 @@ const message = {
         apiKeyHelper: 'Kunci API digunakan untuk aplikasi pihak ketiga mengakses API.',
         ipWhiteList: 'Senarai putih IP',
         ipWhiteListEgs: 'Satu per baris. Contoh,\n172.161.10.111\n172.161.10.0/24',
-        ipWhiteListHelper: 'IP dalam senarai putih boleh mengakses API.',
+        ipWhiteListHelper: 'IP dalam senarai putih boleh mengakses API, 0.0.0.0/0 (semua IPv4), ::/0 (semua IPv6)',
         apiKeyValidityTime: 'Tempoh sah kunci antara muka',
         apiKeyValidityTimeEgs: 'Tempoh sah kunci antara muka (dalam minit)',
         apiKeyValidityTimeHelper:
@@ -2807,7 +2807,7 @@ const message = {
             apiInterfaceHelper:
                 'Menyokong akses antara muka API panel (fungsi ini perlu diaktifkan untuk aplikasi panel)',
             apiInterfaceHelper1:
-                'Akses aplikasi panel memerlukan penambahan pelawat ke dalam senarai putih, untuk IP yang tidak tetap, disyorkan untuk menambah 0.0.0.0/0',
+                'Akses aplikasi panel memerlukan penambahan pelawat ke dalam senarai putih, untuk IP yang tidak tetap, disyorkan untuk menambah 0.0.0.0/0(semua IPv4), ::/0 (semua IPv6)',
             qrCodeExpired: 'Masa penyegaran',
             apiLeakageHelper: 'Jangan dedahkan kod QR. Pastikan ia hanya digunakan di persekitaran yang dipercayai.',
         },
@@ -3227,6 +3227,9 @@ const message = {
             loginBgColorHelper: 'Akan dipaparkan sebagai warna latar belakang halaman log masuk',
             image: 'Imej',
             bgColor: 'Warna Latar',
+            loginGroup: 'Halaman Log Masuk',
+            loginBtnLinkColor: 'Warna Butang/Pautan',
+            loginBtnLinkColorHelper: 'Akan dipaparkan sebagai warna butang/pautan di halaman log masuk',
         },
         helper: {
             wafTitle1: 'Peta Pencegahan',

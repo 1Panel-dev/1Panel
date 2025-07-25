@@ -12,6 +12,7 @@ export const useLogo = async () => {
         globalStore.themeConfig.loginImage = res.data?.loginImage;
         globalStore.themeConfig.loginBgType = res.data?.loginBgType;
         globalStore.themeConfig.loginBackground = res.data?.loginBackground;
+        globalStore.themeConfig.loginBtnLinkColor = res.data?.loginBtnLinkColor;
         globalStore.themeConfig.favicon = res.data.favicon;
     }
 

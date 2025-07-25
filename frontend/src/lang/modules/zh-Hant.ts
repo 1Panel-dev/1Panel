@@ -1533,7 +1533,8 @@ const message = {
         apiKeyHelper: '接口密钥用於外部應用訪問 API 接口',
         ipWhiteList: 'IP白名單',
         ipWhiteListEgs: '當存在多個 IP 時，需要換行顯示，例：\n172.16.10.111 \n172.16.10.0/24',
-        ipWhiteListHelper: '必需在 IP 白名單清單中的 IP 才能訪問面板 API 接口',
+        ipWhiteListHelper:
+            '必需在 IP 白名單清單中的 IP 才能訪問面板 API 接口，0.0.0.0/0（所有 IPv4），::/0（所有 IPv6）',
         apiKeyValidityTime: '介面金鑰有效期',
         apiKeyValidityTimeEgs: '介面金鑰有效期（組織分）',
         apiKeyValidityTimeHelper: '介面時間戳記到請求時的當前時間戳之間有效（組織分），設定為0時，不做時間戳記校驗',
@@ -2673,7 +2674,8 @@ const message = {
             qrCode: '二維碼',
             apiStatusHelper: '面板 APP 需要開啟 API 接口功能',
             apiInterfaceHelper: '支持面板 API 接口訪問功能（面板 APP 需要開啟該功能）',
-            apiInterfaceHelper1: '面板 APP 訪問需將訪問者添加至白名單，非固定 IP 建議添加 0.0.0.0/0',
+            apiInterfaceHelper1:
+                '面板 APP 訪問需將訪問者添加至白名單，非固定 IP 建議添加 0.0.0.0/0（所有 IPv4），::/0（所有 IPv6）',
             qrCodeExpired: '刷新時間',
             apiLeakageHelper: '請勿洩露二維碼，確保僅在受信任的環境中使用',
         },
@@ -3067,6 +3069,9 @@ const message = {
             loginBgColorHelper: '將會顯示在登入頁面背景顏色',
             image: '圖片',
             bgColor: '背景色',
+            loginGroup: '登入頁面',
+            loginBtnLinkColor: '按鈕顏色',
+            loginBtnLinkColorHelper: '將顯示為登入頁面上的按鈕顏色',
         },
         helper: {
             wafTitle1: '攔截地圖',

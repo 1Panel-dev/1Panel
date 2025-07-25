@@ -13,6 +13,7 @@ export interface ThemeConfigProp {
     loginImage: string;
     loginBgType: string;
     loginBackground: string;
+    loginBtnLinkColor: string;
     themeColor: string;
 }
 

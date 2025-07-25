@@ -1629,7 +1629,7 @@ const message = {
         apiKeyHelper: 'API anahtarı, üçüncü taraf uygulamaların API’ye erişmesi için kullanılır.',
         ipWhiteList: 'IP izin listesi',
         ipWhiteListEgs: 'Her satıra bir tane. Örneğin,\n172.161.10.111\n172.161.10.0/24',
-        ipWhiteListHelper: 'İzin listesindeki IP’ler API’ye erişebilir.',
+        ipWhiteListHelper: 'İzin listesindeki IP’ler API’ye erişebilir, 0.0.0.0/0 (tüm IPv4), ::/0 (tüm IPv6)',
         apiKeyValidityTime: 'Arayüz anahtarının geçerlilik süresi',
         apiKeyValidityTimeEgs: 'Arayüz anahtarının geçerlilik süresi (dakika cinsinden)',
         apiKeyValidityTimeHelper:
@@ -2905,7 +2905,7 @@ const message = {
             apiInterfaceHelper:
                 'Panel API arayüz erişimini destekler (bu özellik, panel uygulaması için etkinleştirilmelidir)',
             apiInterfaceHelper1:
-                'Panel uygulama erişimi, ziyaretçinin beyaz listeye eklenmesini gerektirir; sabit olmayan IP’ler için 0.0.0.0/0 eklenmesi önerilir',
+                'Panel uygulama erişimi, ziyaretçinin beyaz listeye eklenmesini gerektirir; sabit olmayan IP’ler için 0.0.0.0/0(tüm IPv4), ::/0 (tüm IPv6) eklenmesi önerilir',
             qrCodeExpired: 'Yenileme zamanı',
             apiLeakageHelper: 'QR kodunu paylaşmayın. Yalnızca güvenilir ortamlarda kullanıldığından emin olun.',
         },
@@ -3321,6 +3321,9 @@ const message = {
             loginBgColorHelper: 'Giriş sayfasında arka plan rengi olarak gösterilir',
             image: 'Görüntü',
             bgColor: 'Arka Plan Rengi',
+            loginGroup: 'Giriş Sayfası',
+            loginBtnLinkColor: 'Buton/Bağlantı Rengi',
+            loginBtnLinkColorHelper: 'Giriş sayfasındaki buton/bağlantı rengi olarak gösterilecektir',
         },
         helper: {
             wafTitle1: 'Engelleme Haritası',

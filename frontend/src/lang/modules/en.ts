@@ -1612,7 +1612,7 @@ const message = {
         apiKeyHelper: 'API key is used for third-party applications to access the API.',
         ipWhiteList: 'IP allowlist',
         ipWhiteListEgs: 'One per line. For example,\n172.161.10.111\n172.161.10.0/24',
-        ipWhiteListHelper: 'IPs within the allowlist can access the API.',
+        ipWhiteListHelper: 'IPs within the allowlist can access the API,0.0.0.0/0 (all IPv4), ::/0 (all IPv6)',
         apiKeyValidityTime: 'Validity period of interface key',
         apiKeyValidityTimeEgs: 'Validity period of interface key (in minutes)',
         apiKeyValidityTimeHelper:
@@ -2868,7 +2868,7 @@ const message = {
             apiInterfaceHelper:
                 'Supports panel API interface access (this feature needs to be enabled for the panel app)',
             apiInterfaceHelper1:
-                "Panel app access requires adding the visitor to the whitelist; for non-fixed IPs, it's recommended to add 0.0.0.0/0",
+                "Panel app access requires adding the visitor to the whitelist; for non-fixed IPs, it's recommended to add 0.0.0.0/0 (all IPv4), ::/0 (all IPv6)",
             qrCodeExpired: 'Refresh time',
             apiLeakageHelper: 'Do not disclose the QR code. Ensure it is used only in trusted environments.',
         },
@@ -3287,6 +3287,9 @@ const message = {
             loginBgColorHelper: 'Displayed as background color on the login page',
             image: 'Image',
             bgColor: 'Background Color',
+            loginGroup: 'Login Page',
+            loginBtnLinkColor: 'Button/Link Color',
+            loginBtnLinkColorHelper: 'Will be displayed as the button/link color on the login page',
         },
         helper: {
             wafTitle1: 'Interception Map',
