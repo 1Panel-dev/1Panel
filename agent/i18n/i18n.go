@@ -134,6 +134,7 @@ func Init() {
 	_, _ = bundle.LoadMessageFileFS(fs, "lang/ms.yaml")
 	_, _ = bundle.LoadMessageFileFS(fs, "lang/ko.yaml")
 	_, _ = bundle.LoadMessageFileFS(fs, "lang/tr.yaml")
+	_, _ = bundle.LoadMessageFileFS(fs, "lang/es.yaml")
 	lang := GetLanguageFromDB()
 	global.I18n = i18n.NewLocalizer(bundle, lang)
 }
