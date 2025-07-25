@@ -450,6 +450,7 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 		if err := checkContainerName(containerName.(string)); err != nil {
 			return err
 		}
+		runtime.ContainerName = containerName.(string)
 	}
 
 	projectDir := path.Join(global.Dir.RuntimeDir, runtime.Type, runtime.Name)
