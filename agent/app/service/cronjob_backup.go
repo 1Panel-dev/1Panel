@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -214,7 +215,10 @@ func (u *CronjobService) handleDirectory(cronjob model.Cronjob, startTime time.T
 		if err != nil {
 			return err
 		}
-		fileName := fmt.Sprintf("%s.tar.gz", startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(5))
+		fileName := fmt.Sprintf("%s.tar.gz", startTime.Format(constant.DateTimeSlimLayout)+common.RandStrAndNum(2))
+		if cronjob.IsDir || len(strings.Split(cronjob.SourceDir, ",")) == 1 {
+			fileName = loadFileName(cronjob.SourceDir)
+		}
 		backupDir := path.Join(global.Dir.LocalBackupDir, fmt.Sprintf("tmp/%s/%s", cronjob.Type, cronjob.Name))
 
 		fileOp := files.NewFileOp()
@@ -545,4 +549,15 @@ func loadSnapWithRule(cronjob model.Cronjob) (dto.SnapshotData, error) {
 		}
 	}
 	return itemData, nil
+}
+
+func loadFileName(src string) string {
+	dirs := strings.Split(filepath.ToSlash(src), "/")
+	var keyPart string
+	if len(dirs) >= 3 {
+		keyPart = filepath.Join(dirs[len(dirs)-3], dirs[len(dirs)-2], dirs[len(dirs)-1])
+	}
+	cleanName := strings.ReplaceAll(keyPart, string(filepath.Separator), "_")
+	timestamp := time.Now().Format(constant.DateTimeSlimLayout)
+	return fmt.Sprintf("%s_%s_%s.tar.gz", cleanName, timestamp, common.RandStrAndNum(2))
 }

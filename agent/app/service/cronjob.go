@@ -428,6 +428,7 @@ func (u *CronjobService) Update(id uint, req dto.CronjobOperate) error {
 	upMap["db_type"] = req.DBType
 	upMap["db_name"] = req.DBName
 	upMap["url"] = req.URL
+	upMap["is_dir"] = req.IsDir
 	upMap["source_dir"] = req.SourceDir
 	upMap["snapshot_rule"] = cronjob.SnapshotRule
 
