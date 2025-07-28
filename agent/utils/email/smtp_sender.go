@@ -132,7 +132,7 @@ func isValidHeader(key, value string) bool {
 func sendWithSSL(config SMTPConfig, addr string, toList []string, msg string, transport *http.Transport) error {
 	var err error
 	var conn net.Conn
-	if transport != nil {
+	if transport != nil && transport.DialContext != nil {
 		conn, err = transport.DialContext(context.Background(), "tcp", addr)
 	} else {
 		conn, err = net.Dial("tcp", addr)
@@ -163,7 +163,7 @@ func sendWithSSL(config SMTPConfig, addr string, toList []string, msg string, tr
 func sendWithStartTLS(config SMTPConfig, addr string, toList []string, msg string, transport *http.Transport) error {
 	var err error
 	var conn net.Conn
-	if transport != nil {
+	if transport != nil && transport.DialContext != nil {
 		conn, err = transport.DialContext(context.Background(), "tcp", addr)
 	} else {
 		conn, err = net.Dial("tcp", addr)
@@ -192,7 +192,7 @@ func sendWithStartTLS(config SMTPConfig, addr string, toList []string, msg strin
 func sendPlaintext(config SMTPConfig, addr string, toList []string, msg string, transport *http.Transport) error {
 	var err error
 	var conn net.Conn
-	if transport != nil {
+	if transport != nil && transport.DialContext != nil {
 		conn, err = transport.DialContext(context.Background(), "tcp", addr)
 	} else {
 		conn, err = net.Dial("tcp", addr)

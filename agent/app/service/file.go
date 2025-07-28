@@ -4,10 +4,6 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/dto"
-	"github.com/jinzhu/copier"
-	"golang.org/x/text/encoding"
-	"golang.org/x/text/encoding/simplifiedchinese"
 	"io"
 	"io/fs"
 	"os"
@@ -19,6 +15,11 @@ import (
 	"strings"
 	"time"
 	"unicode/utf8"
+
+	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/jinzhu/copier"
+	"golang.org/x/text/encoding"
+	"golang.org/x/text/encoding/simplifiedchinese"
 
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 
@@ -478,6 +479,7 @@ func (f *FileService) DepthDirSize(req request.DirSizeReq) ([]response.DepthDirS
 
 func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.FileLineContent, error) {
 	logFilePath := ""
+	taskStatus := ""
 	switch req.Type {
 	case constant.TypeWebsite:
 		website, err := websiteRepo.GetFirst(repo.WithByID(req.ID))
@@ -533,6 +535,7 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 			return nil, err
 		}
 		logFilePath = taskModel.LogFile
+		taskStatus = taskModel.Status
 	case "mysql-slow-logs":
 		logFilePath = path.Join(global.Dir.DataDir, fmt.Sprintf("apps/mysql/%s/data/1Panel-slow.log", req.Name))
 	case "mariadb-slow-logs":
@@ -551,11 +554,12 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 		lines = append(preLines, lines...)
 	}
 	res := &response.FileLineContent{
-		Content: strings.Join(lines, "\n"),
-		End:     isEndOfFile,
-		Path:    logFilePath,
-		Total:   total,
-		Lines:   lines,
+		Content:    strings.Join(lines, "\n"),
+		End:        isEndOfFile,
+		Path:       logFilePath,
+		Total:      total,
+		TaskStatus: taskStatus,
+		Lines:      lines,
 	}
 	return res, nil
 }
