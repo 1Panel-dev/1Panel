@@ -2,6 +2,7 @@ package server
 
 import (
 	"crypto/tls"
+	"crypto/x509"
 	"fmt"
 	"net"
 	"net/http"
@@ -78,9 +79,17 @@ func Start() {
 			fmt.Printf("failed to load X.509 key pair: %s\n", err)
 			return
 		}
+
 		server.TLSConfig = &tls.Config{
 			Certificates: []tls.Certificate{tlsCert},
-			ClientAuth:   tls.RequireAnyClientCert,
+			ClientAuth:   tls.RequireAndVerifyClientCert,
+		}
+		caItem, _ := settingRepo.GetValueByKey("RootCrt")
+		if len(caItem) != 0 {
+			caCertPool := x509.NewCertPool()
+			rootCrt, _ := encrypt.StringDecrypt(caItem)
+			caCertPool.AppendCertsFromPEM([]byte(rootCrt))
+			server.TLSConfig.ClientCAs = caCertPool
 		}
 		business.Init()
 		global.LOG.Infof("listen at https://0.0.0.0:%s", global.CONF.Base.Port)

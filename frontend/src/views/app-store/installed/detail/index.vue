@@ -78,7 +78,12 @@
                         ></el-input>
                     </el-form-item>
                     <el-form-item prop="allowPort" v-if="!paramModel.isHostMode">
-                        <el-checkbox v-model="paramModel.allowPort" :label="$t('app.allowPort')" size="large" />
+                        <el-checkbox
+                            v-model="paramModel.allowPort"
+                            :label="$t('app.allowPort')"
+                            size="large"
+                            @change="changeAllowPort"
+                        />
                         <span class="input-help">{{ $t('app.allowPortHelper') }}</span>
                     </el-form-item>
                     <el-form-item :label="$t('app.specifyIP')" v-if="paramModel.allowPort" prop="specifyIP">
@@ -221,6 +226,12 @@ const editParam = () => {
         paramModel.value.params[param.key] = param.value;
     });
     edit.value = !edit.value;
+};
+
+const changeAllowPort = () => {
+    if (paramModel.value.allowPort) {
+        paramModel.value.specifyIP = '';
+    }
 };
 
 const get = async () => {

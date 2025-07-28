@@ -15,6 +15,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	"github.com/gin-gonic/gin"
 )
 
 func RemoveTamper(website string) {}
@@ -71,4 +72,8 @@ func LoadRequestTransport() *http.Transport {
 		ResponseHeaderTimeout: 10 * time.Second,
 		IdleConnTimeout:       15 * time.Second,
 	}
+}
+
+func ValidateCertificate(c *gin.Context) bool {
+	return true
 }

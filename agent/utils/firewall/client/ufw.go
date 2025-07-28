@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/buserr"
+	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 )
 
@@ -99,7 +100,9 @@ func (f *Ufw) ListPort() ([]FireInfo, error) {
 }
 
 func (f *Ufw) ListForward() ([]FireInfo, error) {
-	_ = f.EnableForward()
+	if err := f.EnableForward(); err != nil {
+		global.LOG.Errorf("init port forward failed, err: %v", err)
+	}
 	iptables, err := NewIptables()
 	if err != nil {
 		return nil, err
