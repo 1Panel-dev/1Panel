@@ -1,7 +1,14 @@
 <template>
     <div v-loading="firstLoading">
         <div v-if="defaultButton">
-            <el-checkbox border v-model="tailLog" class="float-left" @change="changeTail(false)" v-if="showTail">
+            <el-checkbox
+                border
+                :disabled="isTailDisabled"
+                v-model="tailLog"
+                class="float-left"
+                @change="changeTail(false)"
+                v-if="showTail"
+            >
                 {{ $t('commons.button.watch') }}
             </el-checkbox>
             <el-button
@@ -129,6 +136,8 @@ const minPage = ref(0);
 let timer: NodeJS.Timer | null = null;
 const logPath = ref('');
 
+const isTailDisabled = ref();
+
 const firstLoading = ref(false);
 const logs = ref<string[]>([]);
 const logContainer = ref<HTMLElement | null>(null);
@@ -211,6 +220,10 @@ const getContent = async (pre: boolean) => {
     } catch (error) {
         isLoading.value = false;
         firstLoading.value = false;
+    }
+
+    if (res.data.taskStatus && res.data.taskStatus !== 'Executing') {
+        isTailDisabled.value = true;
     }
 
     logPath.value = res.data.path;
@@ -330,6 +343,7 @@ const containerStyle = computed(() => ({
 
 onMounted(async () => {
     logs.value = [];
+    isTailDisabled.value = false;
     firstLoading.value = true;
     await init();
     nextTick(() => {

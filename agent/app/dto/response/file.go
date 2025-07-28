@@ -1,8 +1,9 @@
 package response
 
 import (
-	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/utils/files"
 )
 
 type FileInfo struct {
@@ -37,11 +38,12 @@ type FileWgetRes struct {
 }
 
 type FileLineContent struct {
-	Content string   `json:"content"`
-	End     bool     `json:"end"`
-	Path    string   `json:"path"`
-	Total   int      `json:"total"`
-	Lines   []string `json:"lines"`
+	Content    string   `json:"content"`
+	End        bool     `json:"end"`
+	Path       string   `json:"path"`
+	Total      int      `json:"total"`
+	TaskStatus string   `json:"taskStatus"`
+	Lines      []string `json:"lines"`
 }
 
 type FileExist struct {
