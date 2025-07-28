@@ -1240,6 +1240,25 @@ func checkImageExist(client *client.Client, imageItem string) bool {
 	return false
 }
 
+func checkImageLike(imageName string) bool {
+	cli, err := docker.NewDockerClient()
+	if err != nil {
+		return false
+	}
+	images, err := cli.ImageList(context.Background(), image.ListOptions{})
+	if err != nil {
+		return false
+	}
+	for _, img := range images {
+		for _, tag := range img.RepoTags {
+			if strings.Contains(tag, imageName) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func pullImages(task *task.Task, client *client.Client, imageName string) error {
 	dockerCli := docker.NewClientWithExist(client)
 	options := image.PullOptions{}
