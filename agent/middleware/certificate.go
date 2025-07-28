@@ -1,13 +1,15 @@
 package middleware
 
 import (
-	"errors"
 	"fmt"
+	"net"
+	"net/http"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,13 +19,8 @@ func Certificate() gin.HandlerFunc {
 			c.Next()
 			return
 		}
-		if !c.Request.TLS.HandshakeComplete || len(c.Request.TLS.PeerCertificates) == 0 {
-			helper.InternalServer(c, errors.New("no such tls peer certificates"))
-			return
-		}
-		cert := c.Request.TLS.PeerCertificates[0]
-		if cert.Subject.CommonName != "panel_client" {
-			helper.InternalServer(c, fmt.Errorf("err certificate"))
+		if !xpack.ValidateCertificate(c) {
+			CloseDirectly(c)
 			return
 		}
 		conn := c.Request.Header.Get("Connection")
@@ -39,4 +36,19 @@ func Certificate() gin.HandlerFunc {
 		}
 		c.Next()
 	}
+}
+
+func CloseDirectly(c *gin.Context) {
+	hijacker, ok := c.Writer.(http.Hijacker)
+	if !ok {
+		c.AbortWithStatus(http.StatusForbidden)
+		return
+	}
+	conn, _, err := hijacker.Hijack()
+	if err != nil {
+		c.AbortWithStatus(http.StatusForbidden)
+		return
+	}
+	_ = conn.(*net.TCPConn).SetLinger(0)
+	conn.Close()
 }
