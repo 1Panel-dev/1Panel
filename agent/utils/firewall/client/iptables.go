@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/global"
@@ -38,20 +39,9 @@ func NewIptables() (*Iptables, error) {
 	return iptables, nil
 }
 
-func (iptables *Iptables) run(rule string) error {
-	stdout, err := cmd.RunDefaultWithStdoutBashCf("%s iptables -t nat %s", iptables.CmdStr, rule)
-	if err != nil {
-		return fmt.Errorf("%s, %s", err, stdout)
-	}
-	if stdout != "" {
-		return fmt.Errorf("iptables error: %s", stdout)
-	}
-
-	return nil
-}
-
 func (iptables *Iptables) outf(tab, rule string, a ...any) (stdout string, err error) {
-	stdout, err = cmd.RunDefaultWithStdoutBashCf("%s iptables -t %s %s", iptables.CmdStr, tab, fmt.Sprintf(rule, a...))
+	cmdMgr := cmd.NewCommandMgr(cmd.WithIgnoreExist1(), cmd.WithTimeout(20*time.Second))
+	stdout, err = cmdMgr.RunWithStdoutBashCf("%s iptables -t %s %s", iptables.CmdStr, tab, fmt.Sprintf(rule, a...))
 	if err != nil && stdout != "" {
 		global.LOG.Errorf("iptables failed, err: %s", stdout)
 	}
