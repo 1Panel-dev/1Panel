@@ -80,3 +80,7 @@ type NginxBuildConfig struct {
 	Mirror  string        `json:"mirror"`
 	Modules []NginxModule `json:"modules"`
 }
+
+type NginxConfigRes struct {
+	Https bool `json:"https"`
+}

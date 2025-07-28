@@ -2383,6 +2383,8 @@ const message = {
         packagesHelper: '例如：git,curl 按,分割',
         scriptHelper: '编译之前执行的脚本，一般为下载模块源码，安装依赖等',
         buildHelper: '添加/修改模块之后点击构建，构建成功后会自动重启 OpenResty',
+        defaultHttps: 'HTTPS 防窜站',
+        defaultHttpsHelper1: '开启后可以解决 HTTPS 窜站问题',
     },
     ssl: {
         create: '申请证书',

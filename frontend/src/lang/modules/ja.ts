@@ -2465,6 +2465,24 @@ const message = {
         clearProxyCache: '逆プロキシキャッシュをきれいにします',
         clearProxyCacheWarn:
             'キャッシュで構成されたすべてのWebサイトが影響を受け、「OpenResty」が再起動されます。続けたいですか？',
+        create: 'モジュールを追加',
+        update: 'モジュールを編集',
+        params: 'パラメータ',
+        packages: 'パッケージ',
+        script: 'スクリプト',
+        module: 'モジュール',
+        build: 'ビルド',
+        buildWarn:
+            'OpenRestyのビルドには一定量のCPUとメモリを確保する必要があり、時間がかかる場合がありますので、お待ちください。',
+        mirrorUrl: 'ソフトウェアソース',
+        paramsHelper: '例：--add-module=/tmp/ngx_brotli',
+        packagesHelper: '例：git,curl カンマ区切り',
+        scriptHelper:
+            'コンパイル前に実行するスクリプト、通常はモジュールソースコードのダウンロード、依存関係のインストールなど',
+        buildHelper:
+            'モジュールの追加/変更後にビルドをクリックします。ビルドが成功すると、OpenRestyは自動的に再起動します。',
+        defaultHttps: 'HTTPS 改ざん防止',
+        defaultHttpsHelper1: 'これを有効にすると、HTTPS 改ざん問題を解決できます。',
     },
     ssl: {
         create: 'リクエスト',

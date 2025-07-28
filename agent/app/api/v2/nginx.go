@@ -157,3 +157,39 @@ func (b *BaseApi) GetNginxModules(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, modules)
 }
+
+// @Tags OpenResty
+// @Summary Operate default HTTPs
+// @Accept json
+// @Param request body request.NginxOperateReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /openresty/https [post]
+func (b *BaseApi) OperateDefaultHTTPs(c *gin.Context) {
+	var req request.NginxOperateReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := nginxService.OperateDefaultHTTPs(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags OpenResty
+// @Summary Get default HTTPs status
+// @Success 200 {object} response.NginxConfigRes
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /openresty/https [get]
+func (b *BaseApi) GetDefaultHTTPsStatus(c *gin.Context) {
+	res, err := nginxService.GetDefaultHttpsStatus()
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}

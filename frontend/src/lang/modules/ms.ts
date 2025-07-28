@@ -2521,6 +2521,24 @@ const message = {
         clearProxyCache: 'Bersihkan cache proksi terbalik',
         clearProxyCacheWarn:
             'Semua laman web yang dikonfigurasi dengan cache akan terjejas dan "OpenResty" akan dimulakan semula. Adakah anda mahu meneruskan?',
+        create: 'Tambah Modul',
+        update: 'Edit Modul',
+        params: 'Parameter',
+        packages: 'Pakej',
+        script: 'Script',
+        module: 'Modul',
+        build: 'Bina',
+        buildWarn:
+            'Membina OpenResty memerlukan menyediakan sejumlah CPU dan memori, dan prosesnya mengambil masa yang lama, sila bersabar.',
+        mirrorUrl: 'Sumber Perisian',
+        paramsHelper: 'Contoh: --add-module=/tmp/ngx_brotli',
+        packagesHelper: 'Contoh: git,curl dipisahkan oleh koma',
+        scriptHelper:
+            'Skrip yang dilaksanakan sebelum penyusunan, biasanya untuk memuat turun sumber kod modul, memasang kebergantungan, dll.',
+        buildHelper:
+            'Klik Bina selepas menambah/mengubah suai modul. Pembinaan yang berjaya akan memulakan semula OpenResty secara automatik.',
+        defaultHttps: 'HTTPS Anti-tampering',
+        defaultHttpsHelper1: 'Mengaktifkan ini dapat menyelesaikan masalah tampering HTTPS.',
     },
     ssl: {
         create: 'Permintaan',

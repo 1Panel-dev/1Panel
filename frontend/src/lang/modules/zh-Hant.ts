@@ -2394,6 +2394,8 @@ const message = {
         packagesHelper: '例如：git,curl 以逗號分割',
         scriptHelper: '編譯之前執行的腳本，通常用於下載模組原始碼，安裝依賴等',
         buildHelper: '添加/修改模組後點擊構建，構建成功後會自動重啟 OpenResty',
+        defaultHttps: 'HTTPS 防竄站',
+        defaultHttpsHelper1: '開啟後可以解決 HTTPS 竄站問題',
     },
     ssl: {
         create: '申請證書',

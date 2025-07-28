@@ -50,4 +50,12 @@ export namespace Nginx {
     export interface NginxModuleUpdate extends NginxModule {
         operate: string;
     }
+
+    export interface NginxHttpsStatus {
+        https: boolean;
+    }
+
+    export interface NginxOperateReq {
+        operate: string;
+    }
 }

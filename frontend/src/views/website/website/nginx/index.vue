@@ -26,6 +26,9 @@
             <el-button type="primary" :plain="activeName !== '5'" @click="changeTab('5')">
                 {{ $t('runtime.module') }}
             </el-button>
+            <el-button type="primary" :plain="activeName !== '6'" @click="changeTab('6')">
+                {{ $t('website.other') }}
+            </el-button>
         </template>
         <template #main>
             <Status v-if="activeName === '1'" :status="status" />
@@ -33,6 +36,7 @@
             <NginxPer v-if="activeName === '3'" />
             <ContainerLog v-if="activeName === '4'" :container="containerName" :highlightDiff="350" />
             <Module v-if="activeName === '5'" />
+            <Other v-if="activeName === '6'" />
         </template>
     </LayoutContent>
 </template>
@@ -44,6 +48,7 @@ import ContainerLog from '@/components/log/container/index.vue';
 import NginxPer from './performance/index.vue';
 import Status from './status/index.vue';
 import Module from './module/index.vue';
+import Other from './other/index.vue';
 
 const activeName = ref('1');
 

@@ -33,3 +33,11 @@ export const getNginxModules = () => {
 export const updateNginxModule = (req: Nginx.NginxModuleUpdate) => {
     return http.post(`/openresty/modules/update`, req);
 };
+
+export const getHttpsStatus = () => {
+    return http.get<Nginx.NginxHttpsStatus>(`/openresty/https`);
+};
+
+export const operateHttps = (req: Nginx.NginxOperateReq) => {
+    return http.post(`/openresty/https`, req);
+};

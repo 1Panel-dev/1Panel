@@ -2521,6 +2521,24 @@ const message = {
         clearProxyCache: 'Clean reverse proxy cache',
         clearProxyCacheWarn:
             'All websites that have configured with cache will be affected and "OpenResty" will be restarted. Do you want to continue?',
+        create: 'Criar Módulo',
+        update: 'Editar Módulo',
+        params: 'Parâmetros',
+        packages: 'Pacotes',
+        script: 'Script',
+        module: 'Módulo',
+        build: 'Construir',
+        buildWarn:
+            'Construir OpenResty requer a reserva de certa quantidade de CPU e memória, e o processo pode ser demorado, por favor, seja paciente.',
+        mirrorUrl: 'Fonte de Software',
+        paramsHelper: 'Por exemplo: --add-module=/tmp/ngx_brotli',
+        packagesHelper: 'Por exemplo: git,curl separados por vírgulas',
+        scriptHelper:
+            'Script a ser executado antes da compilação, geralmente para baixar o código-fonte do módulo, instalar dependências, etc.',
+        buildHelper:
+            'Clique em Construir após adicionar/modificar um módulo. Construção bem-sucedida reiniciará automaticamente o OpenResty.',
+        defaultHttps: 'HTTPS Anti-tampering',
+        defaultHttpsHelper1: 'A ativação desta opção pode resolver problemas de adulteração HTTPS.',
     },
     ssl: {
         create: 'Solicitar',

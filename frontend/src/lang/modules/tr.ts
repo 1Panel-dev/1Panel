@@ -2596,6 +2596,8 @@ const message = {
             'Derlemeden önce çalıştırılacak betikler, genellikle modül kaynak kodunu indirmek, bağımlılıkları kurmak vb. için',
         buildHelper:
             'Modül ekledikten/düzenledikten sonra oluştur’a tıklayın. OpenResty, başarılı oluşturma üzerine otomatik olarak yeniden başlatılacaktır.',
+        defaultHttps: 'HTTPS Anti-sızdırma',
+        defaultHttpsHelper1: 'Bu özelliği etkinleştirerek HTTPS sızdırma sorunlarını çözebilirsiniz.',
     },
     ssl: {
         create: 'İstek',
