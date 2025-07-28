@@ -834,7 +834,7 @@ const search = async () => {
                 form.type = res.data.type;
                 form.specCustom = res.data.specCustom;
                 form.spec = res.data.spec;
-                form.specs = res.data.specs;
+                form.specs = res.data.specs || [];
                 if (!form.specCustom && form.spec) {
                     let objs = [];
                     for (const item of res.data.spec.split(',')) {
