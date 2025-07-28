@@ -388,7 +388,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		switch runtime.Type {
 		case constant.RuntimePHP:
 			if runtime.Resource == constant.ResourceAppstore {
-				if !checkImageLike(runtime.Image) {
+				if !checkImageLike(nil, runtime.Image) {
 					return buserr.WithName("ErrImageNotExist", runtime.Name)
 				}
 				website.Proxy = fmt.Sprintf("127.0.0.1:%s", runtime.Port)
@@ -1354,7 +1354,7 @@ func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) error
 			return err
 		}
 		defer client.Close()
-		if !checkImageExist(client, oldRuntime.Image) {
+		if !checkImageLike(client, oldRuntime.Image) {
 			return buserr.WithName("ErrImageNotExist", oldRuntime.Name)
 		}
 	}
