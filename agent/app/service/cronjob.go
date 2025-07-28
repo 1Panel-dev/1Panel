@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -15,6 +16,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
 	"github.com/robfig/cron/v3"
@@ -159,6 +161,14 @@ func (u *CronjobService) Export(req dto.OperateByIDs) (string, error) {
 			for _, db := range databases {
 				item.DBNames = append(item.DBNames, dto.TransHelper{Name: db.Database, DetailName: db.Name})
 			}
+		case "shell":
+			if cronjob.ScriptMode == "library" {
+				script, err := scriptRepo.Get(repo.WithByID(cronjob.ScriptID))
+				if err != nil {
+					return "", err
+				}
+				item.ScriptName = script.Name
+			}
 		}
 		item.SourceAccounts, item.DownloadAccount, _ = loadBackupNamesByID(cronjob.SourceAccountIDs, cronjob.DownloadAccountID)
 		alertInfo, _ := alertRepo.Get(alertRepo.WithByType(cronjob.Type), alertRepo.WithByProject(strconv.Itoa(int(cronjob.ID))), repo.WithByStatus(constant.AlertEnable))
@@ -191,7 +201,6 @@ func (u *CronjobService) Import(req []dto.CronjobTrans) error {
 			Spec:           item.Spec,
 			Executor:       item.Executor,
 			ScriptMode:     item.ScriptMode,
-			Script:         item.Script,
 			Command:        item.Command,
 			ContainerName:  item.ContainerName,
 			User:           item.User,
@@ -265,6 +274,36 @@ func (u *CronjobService) Import(req []dto.CronjobTrans) error {
 				}
 			}
 			cronjob.DBName = strings.Join(dbIDs, ",")
+		case "shell":
+			if len(item.ContainerName) != 0 {
+				client, err := docker.NewDockerClient()
+				if err != nil {
+					hasNotFound = true
+					continue
+				}
+				defer client.Close()
+				if _, err := client.ContainerStats(context.Background(), item.ContainerName, false); err != nil {
+					hasNotFound = true
+					continue
+				}
+			}
+			switch item.ScriptMode {
+			case "library":
+				library, _ := scriptRepo.Get(repo.WithByName(item.ScriptName))
+				if library.ID == 0 {
+					hasNotFound = true
+					continue
+				}
+				cronjob.ScriptID = library.ID
+			case "select":
+				if _, err := os.Stat(item.Script); err != nil {
+					hasNotFound = true
+					continue
+				}
+				cronjob.Script = item.Script
+			case "input":
+				cronjob.Script = item.Script
+			}
 		}
 		var acIDs []string
 		for _, ac := range item.SourceAccounts {
