@@ -466,12 +466,12 @@ func (b *BaseApi) RecoverByUpload(c *gin.Context) {
 	}
 
 	switch req.Type {
-	case "mysql", "mariadb":
+	case "mysql", "mariadb", constant.AppMysqlCluster:
 		if err := backupService.MysqlRecoverByUpload(req); err != nil {
 			helper.InternalServer(c, err)
 			return
 		}
-	case constant.AppPostgresql:
+	case constant.AppPostgresql, constant.AppPostgresqlCluster:
 		if err := backupService.PostgresqlRecoverByUpload(req); err != nil {
 			helper.InternalServer(c, err)
 			return

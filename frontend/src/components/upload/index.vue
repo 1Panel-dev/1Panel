@@ -188,6 +188,8 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
         case 'mysql':
         case 'mariadb':
         case 'postgresql':
+        case 'mysql-cluster':
+        case 'postgresql-cluster':
             title.value = name.value + ' [ ' + detailName.value + ' ]';
             if (detailName.value) {
                 baseDir.value = `${pathRes.data}/uploads/database/${type.value}/${name.value}/${detailName.value}/`;
