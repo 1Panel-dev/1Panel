@@ -991,6 +991,7 @@ const message = {
         create: 'Create cron job',
         edit: 'Edit cron job',
         errImport: 'File content exception:',
+        errImportFormat: 'The scheduled task data or format is abnormal. Please check and try again!',
         importHelper:
             'Duplicate scheduled tasks will be automatically skipped during import. Tasks will be set to [Disabled] status by default, and set to [Pending Edit] status when data association is abnormal.',
         changeStatus: 'Change status',

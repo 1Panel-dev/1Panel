@@ -9,6 +9,7 @@
                 class="upload mt-2"
                 :show-file-list="false"
                 :limit="1"
+                :accept="'.json'"
                 :on-change="fileOnChange"
                 :on-exceed="handleExceed"
                 v-model:file-list="uploaderFiles"
@@ -110,8 +111,20 @@ const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
     reader.onload = (e) => {
         try {
             const content = e.target.result as string;
-            data.value = JSON.parse(content) as Cronjob.CronjobTrans;
-            console.log(data.value);
+            const parsed = JSON.parse(content) as Cronjob.CronjobTrans;
+            if (!Array.isArray(parsed)) {
+                MsgError(i18n.global.t('cronjob.errImportFormat'));
+                loading.value = false;
+                return;
+            }
+            for (const item of parsed) {
+                if (!checkDataFormat(item)) {
+                    MsgError(i18n.global.t('cronjob.errImportFormat'));
+                    loading.value = false;
+                    return;
+                }
+            }
+            data.value = parsed;
             loading.value = false;
         } catch (error) {
             MsgError(i18n.global.t('cronjob.errImport') + error.message);
@@ -126,6 +139,29 @@ const handleExceed: UploadProps['onExceed'] = (files) => {
     const file = files[0] as UploadRawFile;
     file.uid = genFileId();
     uploadRef.value!.handleStart(file);
+};
+
+const checkDataFormat = (item: any) => {
+    if (!item.name) {
+        return false;
+    }
+    const cronjobTypes = [
+        'shell',
+        'app',
+        'website',
+        'database',
+        'directory',
+        'log',
+        'curl',
+        'cutWebsiteLog',
+        'clean',
+        'snapshot',
+        'ntp',
+    ];
+    if (!item.type || cronjobTypes.indexOf(item.type) === -1) {
+        return false;
+    }
+    return true;
 };
 
 const onImport = async () => {

@@ -945,6 +945,7 @@ const message = {
         create: '創建計劃任務',
         edit: '編輯計劃任務',
         errImport: '文件內容異常:',
+        errImportFormat: '導入的計劃任務數據或格式異常，請檢查後重試！',
         importHelper:
             '導入時將自動跳過重名計劃任務。任務默認設置為【停用】狀態，數據關聯異常時，設置為【待編輯】狀態。',
         changeStatus: '狀態修改',

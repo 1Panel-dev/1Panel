@@ -982,6 +982,7 @@ const message = {
         create: 'Cipta tugas cron',
         edit: 'Edit tugas cron',
         errImport: 'Kandungan fail tidak normal:',
+        errImportFormat: 'Data atau format tugas terjadual yang diimport tidak normal. Sila semak dan cuba lagi!',
         importHelper:
             'Tugas terjadual dengan nama sama akan dilangkau secara automatik semasa import. Tugas akan ditetapkan ke status 【Lumpuh】 secara lalai, dan ditetapkan ke status 【Menunggu Edit】 apabila perkaitan data tidak normal.',
         changeStatus: 'Tukar status',

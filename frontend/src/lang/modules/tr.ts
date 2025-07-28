@@ -1003,6 +1003,7 @@ const message = {
         create: 'Cron görevi oluştur',
         edit: 'Cron görevini düzenle',
         errImport: 'Dosya içeriği anormal:',
+        errImportFormat: 'Zamanlanmış görev verileri veya biçimi anormal. Lütfen kontrol edip tekrar deneyin!',
         importHelper:
             'İçe aktarım sırasında aynı isimli zamanlanmış görevler otomatik olarak atlanacaktır. Görevler varsayılan olarak 【Devre Dışı】 durumuna ayarlanır ve veri ilişkilendirme anormalse 【Düzenleme Bekliyor】 durumuna ayarlanır.',
         changeStatus: 'Durumu değiştir',

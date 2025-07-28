@@ -943,6 +943,7 @@ const message = {
         create: '创建计划任务',
         edit: '编辑计划任务',
         errImport: '文件内容异常：',
+        errImportFormat: '导入的计划任务数据或格式异常，请检查后重试！',
         importHelper:
             '导入时将自动跳过重名计划任务。任务默认设置为【停用】状态，数据关联异常时，设置为【待编辑】状态。',
         changeStatus: '状态修改',

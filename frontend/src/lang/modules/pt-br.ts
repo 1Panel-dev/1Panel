@@ -978,6 +978,8 @@ const message = {
         create: 'Criar tarefa cron',
         edit: 'Editar tarefa cron',
         errImport: 'Conteúdo do arquivo anormal:',
+        errImportFormat:
+            'Os dados ou formato da tarefa agendada estão anormais. Por favor, verifique e tente novamente!',
         importHelper:
             'Tarefas agendadas duplicadas serão automaticamente ignoradas durante a importação. As tarefas serão definidas como status 【Desativado】 por padrão, e como status 【Aguardando Edição】 quando a associação de dados for anormal.',
         changeStatus: 'Alterar status',

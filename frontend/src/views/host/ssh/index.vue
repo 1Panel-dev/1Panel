@@ -12,7 +12,7 @@ import i18n from '@/lang';
 
 const buttons = [
     {
-        label: i18n.global.t('menu.settings', 2),
+        label: i18n.global.t('menu.config', 2),
         path: '/hosts/ssh/ssh',
     },
     {
