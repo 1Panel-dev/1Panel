@@ -1764,6 +1764,10 @@ func ignoreUpdate(installed model.AppInstall) bool {
 	if installed.App.Type == "php" || installed.Status == constant.StatusInstalling {
 		return true
 	}
+	ignores, _ := appIgnoreUpgradeRepo.List(appDetailRepo.WithAppId(installed.AppId), appIgnoreUpgradeRepo.WithScope("all"))
+	if len(ignores) > 0 {
+		return true
+	}
 	if installed.App.Key == constant.AppMysql {
 		majorVersion := getMajorVersion(installed.Version)
 		appDetails, _ := appDetailRepo.GetBy(appDetailRepo.WithAppId(installed.App.ID))
@@ -1774,8 +1778,7 @@ func ignoreUpdate(installed model.AppInstall) bool {
 		}
 		return true
 	}
-	ignores, _ := appIgnoreUpgradeRepo.List(appDetailRepo.WithAppId(installed.AppId), appIgnoreUpgradeRepo.WithScope("all"))
-	return len(ignores) > 0
+	return false
 }
 
 func RequestDownloadCallBack(downloadCallBackUrl string) {

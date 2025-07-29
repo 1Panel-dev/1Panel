@@ -6,5 +6,5 @@ type AppIgnoreUpgradeDTO struct {
 	AppDetailID uint   `json:"appDetailID"`
 	Scope       string `json:"scope"`
 	Version     string `json:"version"`
-	Icon        string `json:"icon"`
+	Name        string `json:"name"`
 }
