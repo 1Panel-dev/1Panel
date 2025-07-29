@@ -348,6 +348,13 @@ const search = async (changeToLatest: boolean) => {
     }
     if (changeToLatest) {
         currentRecord.value = records.value[0];
+        return;
+    }
+    for (const item of records.value) {
+        if (item.id === currentRecord.value.id) {
+            currentRecord.value = item;
+            break;
+        }
     }
 };
 
