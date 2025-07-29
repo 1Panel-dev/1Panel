@@ -266,7 +266,7 @@ func (u *CronjobService) Import(req []dto.CronjobTrans) error {
 				break
 			}
 			var dbIDs []string
-			if cronjob.DBType == "postgresql" {
+			if strings.Contains(cronjob.DBType, "postgresql") {
 				for _, db := range item.DBNames {
 					dbItem, err := postgresqlRepo.Get(postgresqlRepo.WithByPostgresqlName(db.Name), repo.WithByName(db.DetailName))
 					if err != nil {
@@ -323,6 +323,7 @@ func (u *CronjobService) Import(req []dto.CronjobTrans) error {
 					hasNotFound = true
 					break
 				}
+				cronjob.SourceDir = item.SourceDir
 			} else {
 				fileList := strings.Split(item.SourceDir, ",")
 				var newFiles []string
