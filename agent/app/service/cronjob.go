@@ -134,7 +134,6 @@ func (u *CronjobService) Export(req dto.OperateByIDs) (string, error) {
 			Timeout:        cronjob.Timeout,
 			IgnoreErr:      cronjob.IgnoreErr,
 			Secret:         cronjob.Secret,
-			SnapshotRule:   cronjob.SnapshotRule,
 		}
 		switch cronjob.Type {
 		case "app":
@@ -145,7 +144,7 @@ func (u *CronjobService) Export(req dto.OperateByIDs) (string, error) {
 			for _, app := range apps {
 				item.Apps = append(item.Apps, dto.TransHelper{Name: app.App.Key, DetailName: app.Name})
 			}
-		case "website":
+		case "website", "cutWebsiteLog":
 			if cronjob.Website == "all" {
 				break
 			}
@@ -168,6 +167,21 @@ func (u *CronjobService) Export(req dto.OperateByIDs) (string, error) {
 					return "", err
 				}
 				item.ScriptName = script.Name
+			}
+		case "snapshot":
+			if len(cronjob.SnapshotRule) == 0 {
+				break
+			}
+			var snapRule dto.SnapshotRule
+			if err := json.Unmarshal([]byte(cronjob.SnapshotRule), &snapRule); err != nil {
+				return "", err
+			}
+			item.SnapshotRule.WithImage = snapRule.WithImage
+			if len(snapRule.IgnoreAppIDs) != 0 {
+				ignoreApps, _ := appInstallRepo.ListBy(context.Background(), repo.WithByIDs(snapRule.IgnoreAppIDs))
+				for _, app := range ignoreApps {
+					item.SnapshotRule.IgnoreApps = append(item.SnapshotRule.IgnoreApps, dto.TransHelper{Name: app.App.Key, DetailName: app.Name})
+				}
 			}
 		}
 		item.SourceAccounts, item.DownloadAccount, _ = loadBackupNamesByID(cronjob.SourceAccountIDs, cronjob.DownloadAccountID)
@@ -208,13 +222,11 @@ func (u *CronjobService) Import(req []dto.CronjobTrans) error {
 			DBType:         item.DBType,
 			ExclusionRules: item.ExclusionRules,
 			IsDir:          item.IsDir,
-			SourceDir:      item.SourceDir,
 			RetainCopies:   item.RetainCopies,
 			RetryTimes:     item.RetryTimes,
 			Timeout:        item.Timeout,
 			IgnoreErr:      item.IgnoreErr,
 			Secret:         item.Secret,
-			SnapshotRule:   item.SnapshotRule,
 		}
 		hasNotFound := false
 		switch item.Type {
@@ -233,7 +245,7 @@ func (u *CronjobService) Import(req []dto.CronjobTrans) error {
 				appIDs = append(appIDs, fmt.Sprintf("%v", appItem.ID))
 			}
 			cronjob.AppID = strings.Join(appIDs, ",")
-		case "website":
+		case "website", "cutWebsiteLog":
 			if len(item.Websites) == 0 {
 				cronjob.Website = "all"
 				break
@@ -305,6 +317,43 @@ func (u *CronjobService) Import(req []dto.CronjobTrans) error {
 			case "input":
 				cronjob.Script = item.Script
 			}
+		case "directory":
+			if item.IsDir {
+				if _, err := os.Stat(item.SourceDir); err != nil {
+					hasNotFound = true
+					break
+				}
+			} else {
+				fileList := strings.Split(item.SourceDir, ",")
+				var newFiles []string
+				for _, item := range fileList {
+					if len(item) == 0 {
+						continue
+					}
+					if _, err := os.Stat(item); err != nil {
+						hasNotFound = true
+						continue
+					}
+					newFiles = append(newFiles, item)
+				}
+				cronjob.SourceDir = strings.Join(newFiles, ",")
+			}
+		case "snapshot":
+			if len(item.SnapshotRule.IgnoreApps) == 0 && !item.SnapshotRule.WithImage {
+				break
+			}
+			var itemRules dto.SnapshotRule
+			itemRules.WithImage = item.SnapshotRule.WithImage
+			for _, app := range item.SnapshotRule.IgnoreApps {
+				appItem, err := appInstallRepo.LoadInstallAppByKeyAndName(app.Name, app.DetailName)
+				if err != nil {
+					hasNotFound = true
+					continue
+				}
+				itemRules.IgnoreAppIDs = append(itemRules.IgnoreAppIDs, appItem.ID)
+			}
+			itemRulesStr, _ := json.Marshal(itemRules)
+			cronjob.SnapshotRule = string(itemRulesStr)
 		}
 		var acIDs []string
 		for _, ac := range item.SourceAccounts {
@@ -324,6 +373,7 @@ func (u *CronjobService) Import(req []dto.CronjobTrans) error {
 		} else {
 			cronjob.Status = constant.StatusDisable
 		}
+		_ = cronjobRepo.Create(&cronjob)
 		if item.AlertCount != 0 {
 			createAlert := dto.AlertCreate{
 				Title:     item.AlertTitle,
@@ -335,7 +385,6 @@ func (u *CronjobService) Import(req []dto.CronjobTrans) error {
 			}
 			_ = NewIAlertService().CreateAlert(createAlert)
 		}
-		_ = cronjobRepo.Create(&cronjob)
 	}
 	return nil
 }

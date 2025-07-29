@@ -400,6 +400,9 @@ const buttons = [
         click: (row: Cronjob.CronjobInfo) => {
             onHandle(row);
         },
+        disabled: (row: any) => {
+            return row.status === 'Pending';
+        },
     },
     {
         label: i18n.global.t('commons.button.edit'),

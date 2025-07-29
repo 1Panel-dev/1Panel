@@ -143,6 +143,10 @@ export namespace Cronjob {
         name: string;
         detailName: string;
     }
+    export interface snapshotTransHelper {
+        withImage: boolean;
+        ignoreApps: Array<TransHelper>;
+    }
     export interface snapshotRule {
         withImage: boolean;
         ignoreAppIDs: Array<Number>;

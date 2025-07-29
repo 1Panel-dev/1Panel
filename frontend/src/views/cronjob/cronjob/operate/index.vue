@@ -864,7 +864,7 @@ const search = async () => {
                         form.executor !== 'python3';
                 }
 
-                form.scriptID = res.data.scriptID;
+                form.scriptID = res.data.scriptID || null;
                 form.appID = res.data.appID;
                 form.appIdList = res.data.appID ? res.data.appID.split(',') : [];
                 form.website = res.data.website;
