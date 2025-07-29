@@ -276,15 +276,16 @@ func (u *CronjobService) Import(req []dto.CronjobTrans) error {
 			cronjob.DBName = strings.Join(dbIDs, ",")
 		case "shell":
 			if len(item.ContainerName) != 0 {
+				cronjob.Script = item.Script
 				client, err := docker.NewDockerClient()
 				if err != nil {
 					hasNotFound = true
-					continue
+					break
 				}
 				defer client.Close()
 				if _, err := client.ContainerStats(context.Background(), item.ContainerName, false); err != nil {
 					hasNotFound = true
-					continue
+					break
 				}
 			}
 			switch item.ScriptMode {
@@ -292,13 +293,13 @@ func (u *CronjobService) Import(req []dto.CronjobTrans) error {
 				library, _ := scriptRepo.Get(repo.WithByName(item.ScriptName))
 				if library.ID == 0 {
 					hasNotFound = true
-					continue
+					break
 				}
 				cronjob.ScriptID = library.ID
 			case "select":
 				if _, err := os.Stat(item.Script); err != nil {
 					hasNotFound = true
-					continue
+					break
 				}
 				cronjob.Script = item.Script
 			case "input":
