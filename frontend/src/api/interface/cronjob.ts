@@ -5,6 +5,7 @@ export namespace Cronjob {
         id: number;
         name: string;
         type: string;
+        groupID: number;
         specCustom: boolean;
         spec: string;
         specs: Array<string>;

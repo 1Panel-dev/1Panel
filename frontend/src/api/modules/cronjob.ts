@@ -3,12 +3,16 @@ import { ResPage, SearchWithPage } from '../interface';
 import { Cronjob } from '../interface/cronjob';
 import { TimeoutEnum } from '@/enums/http-enum';
 
-export const getCronjobPage = (params: SearchWithPage) => {
+export const searchCronjobPage = (params: SearchWithPage) => {
     return http.post<ResPage<Cronjob.CronjobInfo>>(`/cronjobs/search`, params);
 };
 
 export const loadNextHandle = (spec: string) => {
     return http.post<Array<String>>(`/cronjobs/next`, { spec: spec });
+};
+
+export const editCronjobGroup = (id: number, groupID: number) => {
+    return http.post(`/cronjobs/group/update`, { id: id, groupID: groupID });
 };
 
 export const importCronjob = (trans: Array<Cronjob.CronjobTrans>) => {

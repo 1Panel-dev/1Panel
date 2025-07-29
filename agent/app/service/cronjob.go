@@ -32,6 +32,7 @@ type ICronjobService interface {
 	HandleOnce(id uint) error
 	Update(id uint, req dto.CronjobOperate) error
 	UpdateStatus(id uint, status string) error
+	UpdateGroup(req dto.ChangeGroup) error
 	Delete(req dto.CronjobBatchDelete) error
 	Download(down dto.CronjobDownload) (string, error)
 	StartJob(cronjob *model.Cronjob, isUpdate bool) (string, error)
@@ -50,7 +51,11 @@ func NewICronjobService() ICronjobService {
 }
 
 func (u *CronjobService) SearchWithPage(search dto.PageCronjob) (int64, interface{}, error) {
-	total, cronjobs, err := cronjobRepo.Page(search.Page, search.PageSize, repo.WithByLikeName(search.Info), repo.WithOrderRuleBy(search.OrderBy, search.Order))
+	total, cronjobs, err := cronjobRepo.Page(search.Page,
+		search.PageSize,
+		repo.WithByGroups(search.GroupIDs),
+		repo.WithByLikeName(search.Info),
+		repo.WithOrderRuleBy(search.OrderBy, search.Order))
 	var dtoCronjobs []dto.CronjobInfo
 	for _, cronjob := range cronjobs {
 		var item dto.CronjobInfo
@@ -116,6 +121,7 @@ func (u *CronjobService) Export(req dto.OperateByIDs) (string, error) {
 		item := dto.CronjobTrans{
 			Name:           cronjob.Name,
 			Type:           cronjob.Type,
+			GroupID:        cronjob.GroupID,
 			SpecCustom:     cronjob.SpecCustom,
 			Spec:           cronjob.Spec,
 			Executor:       cronjob.Executor,
@@ -211,6 +217,7 @@ func (u *CronjobService) Import(req []dto.CronjobTrans) error {
 		cronjob := model.Cronjob{
 			Name:           item.Name,
 			Type:           item.Type,
+			GroupID:        item.GroupID,
 			SpecCustom:     item.SpecCustom,
 			Spec:           item.Spec,
 			Executor:       item.Executor,
@@ -772,6 +779,14 @@ func (u *CronjobService) UpdateStatus(id uint, status string) error {
 		global.LOG.Infof("stop cronjob entryID: %s", cronjob.EntryIDs)
 	}
 	return cronjobRepo.Update(cronjob.ID, map[string]interface{}{"status": status, "entry_ids": entryIDs})
+}
+
+func (u *CronjobService) UpdateGroup(req dto.ChangeGroup) error {
+	cronjob, _ := cronjobRepo.Get(repo.WithByID(req.ID))
+	if cronjob.ID == 0 {
+		return buserr.New("ErrRecordNotFound")
+	}
+	return cronjobRepo.Update(cronjob.ID, map[string]interface{}{"group_id": req.GroupID})
 }
 
 func (u *CronjobService) AddCronJob(cronjob *model.Cronjob) (int, error) {

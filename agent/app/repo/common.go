@@ -104,6 +104,15 @@ func WithByDate(startTime, endTime time.Time) DBOption {
 	}
 }
 
+func WithByGroups(groupIDs []uint) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		if len(groupIDs) == 0 {
+			return g
+		}
+		return g.Where("group_id in (?)", groupIDs)
+	}
+}
+
 func WithByCreatedAt(startTime, endTime time.Time) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("created_at > ? AND created_at < ?", startTime, endTime)

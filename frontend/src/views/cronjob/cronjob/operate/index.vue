@@ -70,14 +70,27 @@
                                     </el-link>
                                 </span>
                             </el-form-item>
-                            <el-form-item :label="$t('cronjob.taskName')" prop="name">
-                                <el-input
-                                    class="mini-form-item"
-                                    :disabled="!isCreate"
-                                    clearable
-                                    v-model.trim="form.name"
-                                />
-                            </el-form-item>
+                            <el-row :gutter="20">
+                                <LayoutCol>
+                                    <el-form-item :label="$t('cronjob.taskName')" prop="name">
+                                        <el-input :disabled="!isCreate" clearable v-model.trim="form.name" />
+                                    </el-form-item>
+                                </LayoutCol>
+                                <LayoutCol>
+                                    <el-form-item :label="$t('commons.table.group')" prop="groupID">
+                                        <el-select filterable v-model="form.groupID" clearable>
+                                            <div v-for="item in groupOptions" :key="item.id">
+                                                <el-option
+                                                    v-if="item.name === 'Default'"
+                                                    :label="$t('commons.table.default')"
+                                                    :value="item.id"
+                                                />
+                                                <el-option v-else :label="item.name" :value="item.id" />
+                                            </div>
+                                        </el-select>
+                                    </el-form-item>
+                                </LayoutCol>
+                            </el-row>
                         </el-card>
 
                         <el-card class="mt-5">
@@ -593,10 +606,11 @@
                                         <el-input-number
                                             class="selectClass"
                                             :min="1"
+                                            :precision="0"
                                             step-strictly
                                             :step="1"
                                             v-model.number="form.retainCopies"
-                                        ></el-input-number>
+                                        />
                                         <span v-if="isBackup()" class="input-help">
                                             {{ $t('cronjob.retainCopiesHelper1') }}
                                         </span>
@@ -629,7 +643,9 @@
                                         </span>
                                     </el-form-item>
                                 </LayoutCol>
-                                <LayoutCol :span="6">
+                            </el-row>
+                            <el-row :gutter="20">
+                                <LayoutCol>
                                     <el-form-item
                                         :label="$t('xpack.alert.alertMethod')"
                                         v-if="form.hasAlert"
@@ -651,7 +667,7 @@
                                         </el-select>
                                     </el-form-item>
                                 </LayoutCol>
-                                <LayoutCol :span="6">
+                                <LayoutCol>
                                     <el-form-item
                                         prop="alertCount"
                                         v-if="form.hasAlert"
@@ -660,10 +676,11 @@
                                         <el-input-number
                                             class="selectClass"
                                             :min="1"
+                                            :precision="0"
                                             step-strictly
                                             :step="1"
                                             v-model.number="form.alertCount"
-                                        ></el-input-number>
+                                        />
                                         <span class="input-help">{{ $t('xpack.alert.alertCountHelper') }}</span>
                                     </el-form-item>
                                 </LayoutCol>
@@ -696,10 +713,11 @@
                                         <el-input-number
                                             class="selectClass"
                                             :min="0"
+                                            :precision="0"
                                             step-strictly
                                             :step="1"
                                             v-model.number="form.retryTimes"
-                                        ></el-input-number>
+                                        />
                                         <span class="input-help">{{ $t('cronjob.retryTimesHelper') }}</span>
                                     </el-form-item>
                                 </LayoutCol>
@@ -756,6 +774,7 @@ import { storeToRefs } from 'pinia';
 import { GlobalStore } from '@/store';
 import LicenseImport from '@/components/license-import/index.vue';
 import { transferTimeToSecond } from '@/utils/util';
+import { getGroupList } from '@/api/modules/group';
 const router = useRouter();
 
 const globalStore = GlobalStore();
@@ -769,6 +788,7 @@ const form = reactive<Cronjob.CronjobInfo>({
     id: 0,
     name: '',
     type: 'shell',
+    groupID: null,
     specCustom: false,
     spec: '',
     specs: [],
@@ -943,6 +963,7 @@ const accountOptions = ref([]);
 const appOptions = ref([]);
 const userOptions = ref([]);
 const scriptOptions = ref([]);
+const groupOptions = ref([]);
 
 const dbInfo = reactive({
     isExist: false,
@@ -1119,6 +1140,19 @@ const loadDir = async (path: string) => {
 
 const loadScriptDir = async (path: string) => {
     form.script = path;
+};
+
+const loadGroups = async () => {
+    const res = await getGroupList('cronjob');
+    groupOptions.value = res.data || [];
+    if (isCreate.value) {
+        for (const item of groupOptions.value) {
+            if (item.isDefault) {
+                form.groupID = item.id;
+                break;
+            }
+        }
+    }
 };
 
 const goBack = () => {
@@ -1411,6 +1445,7 @@ onMounted(() => {
     } else {
         isCreate.value = true;
     }
+    loadGroups();
     search();
 });
 </script>

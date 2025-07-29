@@ -5,7 +5,10 @@
                 <el-button type="primary" @click="onOpenDialog('')">
                     {{ $t('commons.button.create') }}{{ $t('menu.cronjob') }}
                 </el-button>
-                <el-button-group class="ml-4">
+                <el-button @click="onOpenGroupDialog()">
+                    {{ $t('commons.table.group') }}
+                </el-button>
+                <el-button-group>
                     <el-button plain :disabled="selects.length === 0" @click="onBatchChangeStatus('enable')">
                         {{ $t('commons.button.enable') }}
                     </el-button>
@@ -17,7 +20,7 @@
                     </el-button>
                 </el-button-group>
 
-                <el-button-group class="ml-4">
+                <el-button-group>
                     <el-button @click="onImport">
                         {{ $t('commons.button.import') }}
                     </el-button>
@@ -27,6 +30,17 @@
                 </el-button-group>
             </template>
             <template #rightToolBar>
+                <el-select v-model="searchGroupID" @change="search()" clearable class="p-w-200">
+                    <template #prefix>{{ $t('commons.table.group') }}</template>
+                    <div v-for="item in groupOptions" :key="item.id">
+                        <el-option
+                            v-if="item.name === 'Default'"
+                            :label="$t('commons.table.default')"
+                            :value="item.id"
+                        />
+                        <el-option v-else :label="item.name" :value="item.id" />
+                    </div>
+                </el-select>
                 <TableSearch @search="search()" v-model:searchName="searchName" />
                 <TableRefresh @search="search()" />
                 <TableSetting title="cronjob-refresh" @search="search()" />
@@ -52,6 +66,23 @@
                             <el-text type="primary" class="cursor-pointer" @click="loadDetail(row)">
                                 {{ row.name }}
                             </el-text>
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('commons.table.group')" min-width="120" prop="group">
+                        <template #default="{ row }">
+                            <fu-select-rw-switch v-model="row.groupID" @change="updateGroup(row)">
+                                <template #read>
+                                    {{ row.groupBelong === 'Default' ? $t('commons.table.default') : row.groupBelong }}
+                                </template>
+                                <div v-for="item in groupOptions" :key="item.id">
+                                    <el-option
+                                        v-if="item.name === 'Default'"
+                                        :label="$t('commons.table.default')"
+                                        :value="item.id"
+                                    />
+                                    <el-option v-else :label="item.name" :value="item.id" />
+                                </div>
+                            </fu-select-rw-switch>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" :min-width="80" prop="status" sortable>
@@ -177,6 +208,7 @@
             </template>
         </OpDialog>
         <OpDialog ref="opExportRef" @search="search" @submit="onSubmitExport()" />
+        <GroupDialog @search="loadGroups" ref="dialogGroupRef" />
         <Records @search="search" ref="dialogRecordRef" />
         <Import @search="search" ref="dialogImportRef" />
         <Backups @search="search" ref="dialogBackupRef" />
@@ -188,15 +220,24 @@ import Records from '@/views/cronjob/cronjob/record/index.vue';
 import Backups from '@/views/cronjob/cronjob/backup/index.vue';
 import Import from '@/views/cronjob/cronjob/import/index.vue';
 import { computed, onMounted, reactive, ref } from 'vue';
-import { deleteCronjob, exportCronjob, getCronjobPage, handleOnce, updateStatus } from '@/api/modules/cronjob';
+import {
+    deleteCronjob,
+    editCronjobGroup,
+    exportCronjob,
+    searchCronjobPage,
+    handleOnce,
+    updateStatus,
+} from '@/api/modules/cronjob';
 import i18n from '@/lang';
 import { Cronjob } from '@/api/interface/cronjob';
+import GroupDialog from '@/components/group/index.vue';
 import { ElMessageBox } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
 import { hasBackup, transSpecToStr } from './helper';
 import { GlobalStore } from '@/store';
 import router from '@/routers';
 import { getCurrentDateFormatted } from '@/utils/util';
+import { getGroupList } from '@/api/modules/group';
 
 const globalStore = GlobalStore();
 const mobile = computed(() => {
@@ -226,21 +267,32 @@ const paginationConfig = reactive({
 });
 const searchName = ref();
 
+const defaultGroupID = ref<number>();
+const searchGroupID = ref<number>();
+const groupOptions = ref();
+const dialogGroupRef = ref();
+
 const search = async (column?: any) => {
     paginationConfig.orderBy = column?.order ? column.prop : paginationConfig.orderBy;
     paginationConfig.order = column?.order ? column.order : paginationConfig.order;
+    let groupIDs;
+    if (searchGroupID.value) {
+        groupIDs = searchGroupID.value === defaultGroupID.value ? [searchGroupID.value, 0] : [searchGroupID.value];
+    }
     let params = {
         info: searchName.value,
+        groupIDs: groupIDs,
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
         orderBy: paginationConfig.orderBy,
         order: paginationConfig.order,
     };
     loading.value = true;
-    await getCronjobPage(params)
+    await searchCronjobPage(params)
         .then((res) => {
             loading.value = false;
             data.value = res.data.items || [];
+            loadGroups();
             paginationConfig.total = res.data.total;
         })
         .catch(() => {
@@ -341,6 +393,41 @@ const onSubmitExport = async () => {
         .finally(() => {
             loading.value = false;
         });
+};
+
+const loadGroups = async () => {
+    const res = await getGroupList('cronjob');
+    groupOptions.value = res.data || [];
+    for (const item of data.value) {
+        if (item.groupID === 0) {
+            item.groupBelong = 'Default';
+            continue;
+        }
+        let hasGroup = false;
+        for (const group of groupOptions.value) {
+            if (group.name === 'Default') {
+                defaultGroupID.value = group.id;
+            }
+            if (item.groupID === group.id) {
+                hasGroup = true;
+                item.groupBelong = group.name;
+            }
+        }
+        if (!hasGroup) {
+            item.groupID = null;
+            item.groupBelong = '-';
+        }
+    }
+};
+
+const updateGroup = async (row: any) => {
+    await editCronjobGroup(row.id, row.groupID);
+    search();
+    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+};
+
+const onOpenGroupDialog = () => {
+    dialogGroupRef.value!.acceptParams({ type: 'cronjob', hideDefaultButton: true });
 };
 
 const onChangeStatus = async (id: number, status: string) => {
