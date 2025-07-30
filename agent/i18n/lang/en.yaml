@@ -156,6 +156,7 @@ ExecShellSuccess: 'Script execution successful'
 StartUpdateSystemSSL: 'Start updating system certificate'
 UpdateSystemSSLSuccess: 'Update system certificate successfully'
 ErrWildcardDomain: 'Unable to apply for wildcard domain name certificate in HTTP mode'
+ErrApplySSLCanNotDelete: "The certificate {{.name}} being applied for cannot be deleted, please try again later."
 
 #mysql
 ErrUserIsExist: 'The current user already exists, please re-enter'

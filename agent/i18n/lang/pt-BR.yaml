@@ -156,6 +156,7 @@ ExecShellSuccess: 'Execução do script bem-sucedida'
 StartUpdateSystemSSL: 'Iniciar atualização do certificado do sistema'
 UpdateSystemSSLSuccess: 'Atualizar certificado do sistema com sucesso'
 ErrWildcardDomain: 'Não é possível solicitar certificado de nome de domínio curinga no modo HTTP'
+ErrApplySSLCanNotDelete: "O certificado {{.name}} que está sendo solicitado não pode ser excluído, tente novamente mais tarde."
 
 #mysql
 ErrUserIsExist: 'O usuário atual já existe, digite novamente'

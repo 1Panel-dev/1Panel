@@ -156,6 +156,7 @@ ExecShellSuccess: 'Betik yürütme başarılı'
 StartUpdateSystemSSL: 'Sistem sertifikası güncellemeyi başlat'
 UpdateSystemSSLSuccess: 'Sistem sertifikası güncelleme başarılı'
 ErrWildcardDomain: 'HTTP modunda joker alan adı sertifikası başvurusu yapılamıyor'
+ErrApplySSLCanNotDelete: "İşlemde olan sertifika {{.name}} silinemez, lütfen daha sonra tekrar deneyin."
 
 #mysql
 ErrUserIsExist: 'Mevcut kullanıcı zaten mevcut, lütfen yeniden girin'

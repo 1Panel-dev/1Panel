@@ -155,6 +155,7 @@ ExecShellSuccess: '腳本執行成功'
 StartUpdateSystemSSL: '開始更新系統憑證'
 UpdateSystemSSLSuccess: '更新系統憑證成功'
 ErrWildcardDomain: 'HTTP 模式無法申請泛網域憑證'
+ErrApplySSLCanNotDelete: "正在申請的證書 {{.name}} 無法刪除，請稍後再試"
 
 #mysql
 ErrUserIsExist: '目前使用者已存在，請重新輸入'

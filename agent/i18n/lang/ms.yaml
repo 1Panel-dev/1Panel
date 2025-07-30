@@ -155,6 +155,7 @@ ExecShellSuccess: 'Pelaksanaan skrip berjaya'
 StartUpdateSystemSSL: 'Mula mengemas kini sijil sistem'
 UpdateSystemSSLSuccess: 'Berjaya kemas kini sijil sistem'
 ErrWildcardDomain: 'Tidak dapat memohon sijil nama domain kad bebas dalam mod HTTP'
+ErrApplySSLCanNotDelete: "Sertifikat {{.name}} yang sedang diajukan tidak dapat dihapus, sila cuba lagi kemudian."
 
 #mysql
 ErrUserIsExist: 'Pengguna semasa sudah wujud, sila masukkan semula'

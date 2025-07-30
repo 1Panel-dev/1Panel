@@ -442,12 +442,15 @@ func (w WebsiteSSLService) GetWebsiteSSL(websiteId uint) (response.WebsiteSSLDTO
 }
 
 func (w WebsiteSSLService) Delete(ids []uint) error {
-	var names []string
+	var (
+		websiteSSLS []string
+		applySSLS   []string
+	)
 	for _, id := range ids {
 		if websites, _ := websiteRepo.GetBy(websiteRepo.WithWebsiteSSLID(id)); len(websites) > 0 {
 			oldSSL, _ := websiteSSLRepo.GetFirst(repo.WithByID(id))
 			if oldSSL.ID > 0 {
-				names = append(names, oldSSL.PrimaryDomain)
+				websiteSSLS = append(websiteSSLS, oldSSL.PrimaryDomain)
 			}
 			continue
 		}
@@ -462,6 +465,10 @@ func (w WebsiteSSLService) Delete(ids []uint) error {
 		websiteSSL, err := websiteSSLRepo.GetFirst(repo.WithByID(id))
 		if err != nil {
 			return err
+		}
+		if websiteSSL.Status == constant.SSLApply {
+			applySSLS = append(applySSLS, websiteSSL.PrimaryDomain)
+			continue
 		}
 		if websiteSSL.Provider != constant.Manual && websiteSSL.Provider != constant.SelfSigned {
 			acmeAccount, err := websiteAcmeRepo.GetFirst(repo.WithByID(websiteSSL.AcmeAccountID))
@@ -478,8 +485,11 @@ func (w WebsiteSSLService) Delete(ids []uint) error {
 		}
 		_ = websiteSSLRepo.DeleteBy(repo.WithByID(id))
 	}
-	if len(names) > 0 {
-		return buserr.WithName("ErrSSLCannotDelete", strings.Join(names, ","))
+	if len(websiteSSLS) > 0 {
+		return buserr.WithName("ErrSSLCannotDelete", strings.Join(websiteSSLS, ","))
+	}
+	if len(applySSLS) > 0 {
+		return buserr.WithName("ErrApplySSLCanNotDelete", strings.Join(applySSLS, ","))
 	}
 	return nil
 }
