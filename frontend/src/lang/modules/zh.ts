@@ -679,6 +679,9 @@ const message = {
             importMcpJson: '导入 MCP Server 配置',
             importMcpJsonError: 'mcpServers 结构不正确',
             bindDomainHelper: '绑定网站之后会修改所有已安装 MCP Server 的访问地址，并关闭端口的外部访问',
+            outputTransport: '输出类型',
+            streamableHttpPath: '流式传输路径',
+            streamableHttpPathHelper: '例如：/mcp, 注意不要与其他 Server 重复',
         },
     },
     container: {

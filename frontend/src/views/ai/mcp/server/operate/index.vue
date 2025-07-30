@@ -91,10 +91,26 @@
             <el-form-item :label="$t('app.containerName')" prop="containerName">
                 <el-input v-model.trim="mcpServer.containerName"></el-input>
             </el-form-item>
-            <el-form-item :label="$t('aiTools.mcp.ssePath')" prop="ssePath">
+            <el-form-item :label="$t('aiTools.mcp.outputTransport')" prop="outputTransport">
+                <el-select v-model="mcpServer.outputTransport">
+                    <el-option label="sse" value="sse" />
+                    <el-option label="streamableHttp" value="streamableHttp" />
+                </el-select>
+            </el-form-item>
+            <el-form-item :label="$t('aiTools.mcp.ssePath')" prop="ssePath" v-if="mcpServer.outputTransport === 'sse'">
                 <el-input v-model.trim="mcpServer.ssePath"></el-input>
                 <span class="input-help">
                     {{ $t('aiTools.mcp.ssePathHelper') }}
+                </span>
+            </el-form-item>
+            <el-form-item
+                :label="$t('aiTools.mcp.streamableHttpPath')"
+                prop="streamableHttpPath"
+                v-if="mcpServer.outputTransport === 'streamableHttp'"
+            >
+                <el-input v-model.trim="mcpServer.streamableHttpPath"></el-input>
+                <span class="input-help">
+                    {{ $t('aiTools.mcp.streamableHttpPathHelper') }}
                 </span>
             </el-form-item>
         </el-form>
@@ -142,6 +158,8 @@ const newMcpServer = () => {
         hostIP: '127.0.0.1',
         protocol: 'http://',
         url: '',
+        outputTransport: 'sse',
+        streamableHttpPath: '',
     };
 };
 const em = defineEmits(['close']);
@@ -155,6 +173,8 @@ const rules = ref({
     ssePath: [Rules.requiredInput],
     key: [Rules.requiredInput],
     value: [Rules.requiredInput],
+    outputTransport: [Rules.requiredSelect],
+    streamableHttpPath: [Rules.requiredInput],
 });
 const hasWebsite = ref(false);
 
@@ -180,6 +200,7 @@ const acceptParams = async (params: AI.McpServer) => {
         const parts = mcpServer.value.baseUrl.split(/(https?:\/\/)/).filter(Boolean);
         mcpServer.value.protocol = parts[0];
         mcpServer.value.url = parts[1];
+        mcpServer.value.outputTransport = mcpServer.value.outputTransport || 'sse';
     } else {
         mcpServer.value = newMcpServer();
         if (params.port) {

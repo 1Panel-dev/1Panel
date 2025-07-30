@@ -705,6 +705,9 @@ const message = {
             importMcpJsonError: 'Struktur mcpServers tidak betul',
             bindDomainHelper:
                 'Setelah mengikat laman web, ia akan mengubah alamat akses semua Pelayan MCP yang dipasang dan menutup akses luaran ke pelabuhan',
+            outputTransport: 'Jenis Output',
+            streamableHttpPath: 'Laluan Streaming',
+            streamableHttpPathHelper: 'Contoh: /mcp, elakkan daripada bertindan dengan pelayan lain',
         },
     },
     container: {

@@ -9,15 +9,17 @@ type McpServerSearch struct {
 }
 
 type McpServerCreate struct {
-	Name          string        `json:"name" validate:"required"`
-	Command       string        `json:"command" validate:"required"`
-	Environments  []Environment `json:"environments"`
-	Volumes       []Volume      `json:"volumes"`
-	Port          int           `json:"port" validate:"required"`
-	ContainerName string        `json:"containerName"`
-	BaseURL       string        `json:"baseUrl"`
-	SsePath       string        `json:"ssePath"`
-	HostIP        string        `json:"hostIP"`
+	Name               string        `json:"name" validate:"required"`
+	Command            string        `json:"command" validate:"required"`
+	Environments       []Environment `json:"environments"`
+	Volumes            []Volume      `json:"volumes"`
+	Port               int           `json:"port" validate:"required"`
+	ContainerName      string        `json:"containerName"`
+	BaseURL            string        `json:"baseUrl"`
+	SsePath            string        `json:"ssePath"`
+	HostIP             string        `json:"hostIP"`
+	StreamableHttpPath string        `json:"streamableHttpPath"`
+	OutputTransport    string        `json:"outputTransport" validate:"required"`
 }
 
 type McpServerUpdate struct {

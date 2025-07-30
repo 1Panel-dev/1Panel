@@ -701,6 +701,9 @@ const message = {
             importMcpJsonError: 'A estrutura mcpServers está incorreta',
             bindDomainHelper:
                 'Após vincular o site, ele modificará o endereço de acesso de todos os servidores MCP instalados e fechará o acesso externo às portas',
+            outputTransport: 'Tipo de Saída',
+            streamableHttpPath: 'Caminho de Streaming',
+            streamableHttpPathHelper: 'Por exemplo: /mcp, certifique-se de que não se sobreponha a outros Servidores',
         },
     },
     container: {

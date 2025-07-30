@@ -7,9 +7,11 @@ services:
       - "${HOST_IP}:${PANEL_APP_PORT_HTTP}:${PANEL_APP_PORT_HTTP}"
     command: [
       "--stdio", "${COMMAND}",
+      "--outputTransport","${OUTPUT_TRANSPORT}",
       "--port", "${PANEL_APP_PORT_HTTP}",
       "--baseUrl", "${BASE_URL}",
       "--ssePath", "${SSE_PATH}",
+      "--streamableHttpPath", "${STREAMABLE_HTTP_PATH}",
       "--messagePath", "${SSE_PATH}/messages"
     ]
     networks:

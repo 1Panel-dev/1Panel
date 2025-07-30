@@ -716,6 +716,9 @@ const message = {
             importMcpJsonError: 'mcpServers yapısı yanlış',
             bindDomainHelper:
                 'Web sitesini bağladıktan sonra, kurulu tüm MCP Sunucularının erişim adresini değiştirecek ve portlara harici erişimi kapatacaktır',
+            outputTransport: 'Çıktı Türü',
+            streamableHttpPath: 'Akış Yolu',
+            streamableHttpPathHelper: 'Örneğin: /mcp, diğer Sunucularla çakışmaması gerektiğine dikkat edin',
         },
     },
     container: {

@@ -353,3 +353,15 @@ func logProcess(progress map[string]interface{}, task *task.Task) {
 	}
 	_ = setLog(id, progressStr, task)
 }
+
+func PullImage(imageName string) error {
+	cli, err := NewDockerClient()
+	if err != nil {
+		return err
+	}
+	defer cli.Close()
+	if _, err := cli.ImagePull(context.Background(), imageName, image.PullOptions{}); err != nil {
+		return err
+	}
+	return nil
+}

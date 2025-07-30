@@ -86,6 +86,11 @@ func (m McpServerService) Page(req request.McpServerSearch) response.McpServersR
 }
 
 func (m McpServerService) Update(req request.McpServerUpdate) error {
+	go func() {
+		if err := docker.PullImage("supercorp/supergateway:latest"); err != nil {
+			global.LOG.Errorf("docker pull mcp image error: %s", err.Error())
+		}
+	}()
 	mcpServer, err := mcpServerRepo.GetFirst(repo.WithByID(req.ID))
 	if err != nil {
 		return err
@@ -108,6 +113,8 @@ func (m McpServerService) Update(req request.McpServerUpdate) error {
 	mcpServer.BaseURL = req.BaseURL
 	mcpServer.SsePath = req.SsePath
 	mcpServer.HostIP = req.HostIP
+	mcpServer.StreamableHttpPath = req.StreamableHttpPath
+	mcpServer.OutputTransport = req.OutputTransport
 	if err := handleCreateParams(mcpServer, req.Environments, req.Volumes); err != nil {
 		return err
 	}
@@ -130,6 +137,11 @@ func (m McpServerService) Update(req request.McpServerUpdate) error {
 }
 
 func (m McpServerService) Create(create request.McpServerCreate) error {
+	go func() {
+		if err := docker.PullImage("supercorp/supergateway:latest"); err != nil {
+			global.LOG.Errorf("docker pull mcp image error: %s", err.Error())
+		}
+	}()
 	servers, _ := mcpServerRepo.List()
 	for _, server := range servers {
 		if server.Port == create.Port {
@@ -154,15 +166,17 @@ func (m McpServerService) Create(create request.McpServerCreate) error {
 	}
 	mcpDir := path.Join(global.Dir.McpDir, create.Name)
 	mcpServer := &model.McpServer{
-		Name:          create.Name,
-		ContainerName: create.ContainerName,
-		Port:          create.Port,
-		Command:       create.Command,
-		Status:        constant.StatusStarting,
-		BaseURL:       create.BaseURL,
-		SsePath:       create.SsePath,
-		Dir:           mcpDir,
-		HostIP:        create.HostIP,
+		Name:               create.Name,
+		ContainerName:      create.ContainerName,
+		Port:               create.Port,
+		Command:            create.Command,
+		Status:             constant.StatusStarting,
+		BaseURL:            create.BaseURL,
+		SsePath:            create.SsePath,
+		Dir:                mcpDir,
+		HostIP:             create.HostIP,
+		StreamableHttpPath: create.StreamableHttpPath,
+		OutputTransport:    create.OutputTransport,
 	}
 	if err := handleCreateParams(mcpServer, create.Environments, create.Volumes); err != nil {
 		return err
@@ -524,6 +538,8 @@ func handleEnv(mcpServer *model.McpServer) gotenv.Env {
 	env["BASE_URL"] = mcpServer.BaseURL
 	env["SSE_PATH"] = mcpServer.SsePath
 	env["HOST_IP"] = mcpServer.HostIP
+	env["STREAMABLE_HTTP_PATH"] = mcpServer.StreamableHttpPath
+	env["OUTPUT_TRANSPORT"] = mcpServer.OutputTransport
 	envStr, _ := gotenv.Marshal(env)
 	mcpServer.Env = envStr
 	return env

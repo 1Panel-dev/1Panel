@@ -698,6 +698,9 @@ const message = {
             importMcpJsonError: 'Структура mcpServers некорректна',
             bindDomainHelper:
                 'После привязки веб-сайта он изменит адрес доступа для всех установленных серверов MCP и закроет внешний доступ к портам',
+            outputTransport: 'Тип вывода',
+            streamableHttpPath: 'Путь потоковой передачи',
+            streamableHttpPathHelper: 'Например: /mcp, обратите внимание, чтобы не перекрывать другие серверы',
         },
     },
     container: {

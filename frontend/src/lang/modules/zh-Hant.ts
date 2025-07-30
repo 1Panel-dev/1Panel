@@ -680,6 +680,9 @@ const message = {
             importMcpJson: '導入 MCP Server配置',
             importMcpJsonError: 'mcpServers 結構不正確',
             bindDomainHelper: '綁定網站之後會修改所有已安裝 MCP Server 的訪問地址，並關閉端口的外部訪問',
+            outputTransport: '輸出類型',
+            streamableHttpPath: '流式傳輸路徑',
+            streamableHttpPathHelper: '例如：/mcp, 注意不要與其他 Server 重複',
         },
     },
     container: {

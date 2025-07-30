@@ -706,6 +706,9 @@ const message = {
             importMcpJsonError: 'mcpServers structure is incorrect',
             bindDomainHelper:
                 'After binding the website, it will modify the access address of all installed MCP Servers and close external access to the ports',
+            outputTransport: 'Output Type',
+            streamableHttpPath: 'Streaming Path',
+            streamableHttpPathHelper: 'For example: /mcp, note that it should not overlap with other Servers',
         },
     },
     container: {

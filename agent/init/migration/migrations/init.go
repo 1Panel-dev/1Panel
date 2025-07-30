@@ -419,3 +419,16 @@ var AddMethodToAlertTask = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var UpdateMcpServer = &gormigrate.Migration{
+	ID: "20250729-update-mcp-server",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.McpServer{}); err != nil {
+			return err
+		}
+		if err := tx.Model(&model.McpServer{}).Where("1=1").Update("output_transport", "sse").Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}

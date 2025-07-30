@@ -688,6 +688,9 @@ const message = {
             importMcpJsonError: 'mcpServers 構造が正しくありません',
             bindDomainHelper:
                 '웹사이트를 바인딩한 후, 설치된 모든 MCP 서버의 접근 주소를 수정하고 포트의 외부 접근을 닫습니다',
+            outputTransport: '출력 유형',
+            streamableHttpPath: '스트리밍 경로',
+            streamableHttpPathHelper: '예: /mcp, 다른 서버와 중복되지 않도록 주의하세요',
         },
     },
     container: {
