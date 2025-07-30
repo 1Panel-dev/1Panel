@@ -62,7 +62,6 @@ ErrHttpReqTimeOut: "请求超时 {{ .err }}"
 ErrHttpReqFailed: "请求失败 {{ .err }}"
 ErrNoSuchHost: "无法找到请求的服务器 {{ .err }}"
 ErrHttpReqNotFound: "无法找到请求的资源 {{ .err }}"
-ErrImagePullTimeOut: '镜像拉取超时'
 ErrContainerNotFound: '{{ .name }} 容器不存在'
 ErrContainerMsg: '{{ .name }} 容器异常，具体请在容器页面查看日志'
 ErrAppBackup: '{{ .name }} 应用备份失败 {{ .err }}'

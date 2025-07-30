@@ -1028,7 +1028,6 @@ func upApp(task *task.Task, appInstall *model.AppInstall, pullImages bool) error
 			errMsg string
 		)
 		if pullImages && appInstall.App.Type != "php" {
-			//projectName := strings.ToLower(appInstall.Name)
 			envByte, err := files.NewFileOp().GetContent(appInstall.GetEnvPath())
 			if err != nil {
 				return err
@@ -1058,8 +1057,8 @@ func upApp(task *task.Task, appInstall *model.AppInstall, pullImages bool) error
 						if strings.Contains(errOur, "no such host") {
 							errMsg = i18n.GetMsgByKey("ErrNoSuchHost") + ":"
 						}
-						if strings.Contains(errOur, "timeout") {
-							errMsg = i18n.GetMsgByKey("ErrImagePullTimeOut") + ":"
+						if strings.Contains(errOur, "Error response from daemon") {
+							errMsg = i18n.GetMsgByKey("PullImageTimeout") + ":"
 						}
 					}
 					appInstall.Message = errMsg + errOur

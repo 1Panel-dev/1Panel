@@ -62,7 +62,6 @@ ErrHttpReqTimeOut: 'Истекло время ожидания запроса {{
 ErrHttpReqFailed: 'Запрос не выполнен {{ .err }}'
 ErrNoSuchHost: 'Не удалось найти запрошенный сервер {{ .err }}'
 ErrHttpReqNotFound: 'Запрошенный ресурс {{ .err }} не найден'
-ErrImagePullTimeOut: 'Истекло время ожидания извлечения изображения'
 ErrContainerNotFound: 'Контейнер {{ .name }} не существует'
 ErrContainerMsg: 'Контейнер {{ .name }} ненормален. Подробности смотрите в журнале на странице контейнера.'
 ErrAppBackup: '{{ .name }} резервное копирование приложения не удалось {{ .err }}'
