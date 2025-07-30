@@ -542,24 +542,48 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 		logFilePath = path.Join(global.Dir.DataDir, fmt.Sprintf("apps/mariadb/%s/db/data/1Panel-slow.log", req.Name))
 	}
 
-	lines, isEndOfFile, total, err := files.ReadFileByLine(logFilePath, req.Page, req.PageSize, req.Latest)
+	file, err := os.Open(logFilePath)
 	if err != nil {
 		return nil, err
 	}
-	if req.Latest && req.Page == 1 && len(lines) < 1000 && total > 1 {
-		preLines, _, _, err := files.ReadFileByLine(logFilePath, total-1, req.PageSize, false)
+	defer file.Close()
+	stat, err := file.Stat()
+	if err != nil {
+		return nil, err
+	}
+	var (
+		lines       []string
+		isEndOfFile bool
+		total       int
+		scope       string
+	)
+
+	if stat.Size() > 500*1024*1024 {
+		lines, err = files.TailFromEnd(logFilePath, req.PageSize)
+		isEndOfFile = true
+		scope = "tail"
+	} else {
+		lines, isEndOfFile, total, err = files.ReadFileByLine(logFilePath, req.Page, req.PageSize, req.Latest)
 		if err != nil {
 			return nil, err
 		}
-		lines = append(preLines, lines...)
+		if req.Latest && req.Page == 1 && len(lines) < 1000 && total > 1 {
+			preLines, _, _, err := files.ReadFileByLine(logFilePath, total-1, req.PageSize, false)
+			if err != nil {
+				return nil, err
+			}
+			lines = append(preLines, lines...)
+		}
+		scope = "page"
 	}
+
 	res := &response.FileLineContent{
-		Content:    strings.Join(lines, "\n"),
 		End:        isEndOfFile,
 		Path:       logFilePath,
 		Total:      total,
 		TaskStatus: taskStatus,
 		Lines:      lines,
+		Scope:      scope,
 	}
 	return res, nil
 }

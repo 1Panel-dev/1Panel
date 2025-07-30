@@ -38,12 +38,12 @@ type FileWgetRes struct {
 }
 
 type FileLineContent struct {
-	Content    string   `json:"content"`
 	End        bool     `json:"end"`
 	Path       string   `json:"path"`
 	Total      int      `json:"total"`
 	TaskStatus string   `json:"taskStatus"`
 	Lines      []string `json:"lines"`
+	Scope      string   `json:"scope"`
 }
 
 type FileExist struct {

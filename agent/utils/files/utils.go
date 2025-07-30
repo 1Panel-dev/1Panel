@@ -101,6 +101,66 @@ func countLines(path string) (int, error) {
 	}
 }
 
+func TailFromEnd(filename string, lines int) ([]string, error) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	stat, err := file.Stat()
+	if err != nil {
+		return nil, err
+	}
+	fileSize := stat.Size()
+
+	bufSize := int64(4096)
+	var result []string
+	var leftover string
+
+	for offset := fileSize; offset > 0 && len(result) < lines; {
+		readSize := bufSize
+		if offset < bufSize {
+			readSize = offset
+		}
+		offset -= readSize
+
+		buf := make([]byte, readSize)
+		_, err := file.ReadAt(buf, offset)
+		if err != nil && err != io.EOF {
+			return nil, err
+		}
+
+		data := string(buf) + leftover
+		linesInChunk := strings.Split(data, "\n")
+
+		if offset > 0 {
+			leftover = linesInChunk[0]
+			linesInChunk = linesInChunk[1:]
+		} else {
+			leftover = ""
+		}
+
+		for i := len(linesInChunk) - 1; i >= 0; i-- {
+			if len(result) < lines {
+				if !(i == len(linesInChunk)-1 && linesInChunk[i] == "" && len(result) == 0) {
+					result = append([]string{linesInChunk[i]}, result...)
+				}
+			}
+		}
+	}
+
+	if leftover != "" && len(result) < lines {
+		result = append([]string{leftover}, result...)
+	}
+
+	if len(result) > lines {
+		result = result[len(result)-lines:]
+	}
+
+	return result, nil
+}
+
 func ReadFileByLine(filename string, page, pageSize int, latest bool) (lines []string, isEndOfFile bool, total int, err error) {
 	if !NewFileOp().Stat(filename) {
 		return
