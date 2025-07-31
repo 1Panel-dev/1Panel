@@ -1901,3 +1901,59 @@ func handleSSLConfig(appInstall *model.AppInstall, hasDefaultWebsite bool) error
 	}
 	return nil
 }
+
+func SyncTags(remoteProperties dto.ExtraProperties) error {
+	tx, ctx := getTxAndContext()
+	defer tx.Rollback()
+	localTags, _ := tagRepo.All()
+	localTagsMap := make(map[string]*model.Tag)
+	for i := range localTags {
+		localTagsMap[localTags[i].Key] = &localTags[i]
+	}
+	var err error
+	remoteTagsMap := make(map[string]*dto.Tag)
+	for i := range remoteProperties.Tags {
+		remoteTagsMap[remoteProperties.Tags[i].Key] = &remoteProperties.Tags[i]
+	}
+
+	for key, localTag := range localTagsMap {
+		if _, exists := remoteTagsMap[key]; !exists {
+			_ = tagRepo.DeleteByID(ctx, localTag.ID)
+		}
+	}
+
+	for _, remoteTag := range remoteProperties.Tags {
+		translations, _ := json.Marshal(remoteTag.Locales)
+
+		if existTag, exists := localTagsMap[remoteTag.Key]; exists {
+			if needsUpdate(existTag, remoteTag, string(translations)) {
+				existTag.Name = remoteTag.Name
+				existTag.Sort = remoteTag.Sort
+				existTag.Translations = string(translations)
+
+				if err = tagRepo.Save(ctx, existTag); err != nil {
+					return err
+				}
+			}
+		} else {
+			newTag := &model.Tag{
+				Key:          remoteTag.Key,
+				Name:         remoteTag.Name,
+				Sort:         remoteTag.Sort,
+				Translations: string(translations),
+			}
+			if err = tagRepo.Create(ctx, newTag); err != nil {
+				return err
+			}
+		}
+	}
+
+	tx.Commit()
+	return nil
+}
+
+func needsUpdate(localTag *model.Tag, remoteTag dto.Tag, translations string) bool {
+	return localTag.Name != remoteTag.Name ||
+		localTag.Sort != remoteTag.Sort ||
+		localTag.Translations != translations
+}

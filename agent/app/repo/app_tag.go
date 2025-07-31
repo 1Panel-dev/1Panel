@@ -17,8 +17,10 @@ type IAppTagRepo interface {
 	GetByAppId(appId uint) ([]model.AppTag, error)
 	GetByTagIds(tagIds []uint) ([]model.AppTag, error)
 	DeleteBy(ctx context.Context, opts ...DBOption) error
+	GetFirst(opts ...DBOption) (*model.AppTag, error)
 
 	WithByTagID(tagID uint) DBOption
+	WithByAppID(appId uint) DBOption
 }
 
 func NewIAppTagRepo() IAppTagRepo {
@@ -28,6 +30,12 @@ func NewIAppTagRepo() IAppTagRepo {
 func (a AppTagRepo) WithByTagID(tagID uint) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("tag_id = ?", tagID)
+	}
+}
+
+func (a AppTagRepo) WithByAppID(appId uint) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("app_id = ?", appId)
 	}
 }
 
@@ -61,4 +69,13 @@ func (a AppTagRepo) GetByTagIds(tagIds []uint) ([]model.AppTag, error) {
 
 func (a AppTagRepo) DeleteBy(ctx context.Context, opts ...DBOption) error {
 	return getTx(ctx, opts...).Delete(&model.AppTag{}).Error
+}
+
+func (a AppTagRepo) GetFirst(opts ...DBOption) (*model.AppTag, error) {
+	var appTag model.AppTag
+	if err := getDb(opts...).First(&appTag).Error; err != nil {
+		return nil, err
+	}
+	return &appTag, nil
+
 }

@@ -928,18 +928,11 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 			return err
 		}
 		var (
-			tags      []*model.Tag
 			appTags   []*model.AppTag
 			oldAppIds []uint
 		)
-		for _, tag := range list.Extra.Tags {
-			translations, _ := json.Marshal(tag.Locales)
-			tags = append(tags, &model.Tag{
-				Name:         tag.Name,
-				Translations: string(translations),
-				Sort:         tag.Sort,
-				Key:          tag.Key,
-			})
+		if err = SyncTags(list.Extra); err != nil {
+			return err
 		}
 		deleteCustomApp()
 		oldApps, err := appRepo.GetBy(appRepo.WithNotLocal())
@@ -1015,6 +1008,7 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 		}
 		t.LogSuccess(i18n.GetMsgByKey("SyncAppDetail"))
 
+		tags, _ := tagRepo.All()
 		var (
 			addAppArray    []model.App
 			updateAppArray []model.App
@@ -1061,16 +1055,8 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 				return
 			}
 		}
-		if err = tagRepo.DeleteAll(ctx); err != nil {
-			return
-		}
-		if len(tags) > 0 {
-			if err = tagRepo.BatchCreate(ctx, tags); err != nil {
-				return
-			}
-			for _, tag := range tags {
-				tagMap[tag.Key] = tag.ID
-			}
+		for _, tag := range tags {
+			tagMap[tag.Key] = tag.ID
 		}
 		for _, update := range updateAppArray {
 			if err = appRepo.Save(ctx, &update); err != nil {
@@ -1088,10 +1074,13 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 			for _, tag := range app.TagsKey {
 				tagId, ok := tagMap[tag]
 				if ok {
-					appTags = append(appTags, &model.AppTag{
-						AppId: app.ID,
-						TagId: tagId,
-					})
+					exist, _ := appTagRepo.GetFirst(appTagRepo.WithByTagID(tagId), appTagRepo.WithByAppID(app.ID))
+					if exist.ID == 0 {
+						appTags = append(appTags, &model.AppTag{
+							AppId: app.ID,
+							TagId: tagId,
+						})
+					}
 				}
 			}
 			for _, d := range app.Details {
@@ -1134,7 +1123,7 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 		}
 
 		if len(oldAppIds) > 0 {
-			if err = appTagRepo.DeleteByAppIds(ctx, oldAppIds); err != nil {
+			if err = appTagRepo.DeleteByAppIds(ctx, deleteIds); err != nil {
 				return
 			}
 		}
