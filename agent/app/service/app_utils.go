@@ -650,7 +650,11 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		}
 		dockerCLi, _ := docker.NewClient()
 		if req.PullImage {
-			images, err := composeV2.GetDockerComposeImagesV2(content, []byte(detail.DockerCompose))
+			composeContent := []byte(detail.DockerCompose)
+			if req.DockerCompose != "" {
+				composeContent = []byte(req.DockerCompose)
+			}
+			images, err := composeV2.GetDockerComposeImagesV2(content, composeContent)
 			if err != nil {
 				return err
 			}
