@@ -8,7 +8,7 @@ require (
 	github.com/compose-spec/compose-go/v2 v2.6.4
 	github.com/creack/pty v1.1.24
 	github.com/docker/compose/v2 v2.37.0
-	github.com/docker/docker v28.2.2+incompatible
+	github.com/docker/docker v28.3.3+incompatible
 	github.com/docker/go-connections v0.5.0
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/gin-gonic/gin v1.10.0
