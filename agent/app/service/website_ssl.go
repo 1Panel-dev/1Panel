@@ -471,16 +471,22 @@ func (w WebsiteSSLService) Delete(ids []uint) error {
 			continue
 		}
 		if websiteSSL.Provider != constant.Manual && websiteSSL.Provider != constant.SelfSigned {
-			acmeAccount, err := websiteAcmeRepo.GetFirst(repo.WithByID(websiteSSL.AcmeAccountID))
-			if err != nil {
-				return err
-			}
-			client, err := ssl.NewAcmeClient(acmeAccount, getSystemProxy(acmeAccount.UseProxy))
-			if err != nil {
-				return err
-			}
 			go func() {
-				_ = client.RevokeSSL([]byte(websiteSSL.Pem))
+				acmeAccount, err := websiteAcmeRepo.GetFirst(repo.WithByID(websiteSSL.AcmeAccountID))
+				if err != nil {
+					global.LOG.Errorf("Failed to get acme account for SSL revoke, err: %v", err)
+					return
+				}
+				client, err := ssl.NewAcmeClient(acmeAccount, getSystemProxy(acmeAccount.UseProxy))
+				if err != nil {
+					global.LOG.Errorf("Failed to create ACME client for SSL revoke, err: %v", err)
+					return
+				}
+				err = client.RevokeSSL([]byte(websiteSSL.Pem))
+				if err != nil {
+					global.LOG.Errorf("Failed to revoke SSL for domain %s, err: %v", websiteSSL.PrimaryDomain, err)
+					return
+				}
 			}()
 		}
 		_ = websiteSSLRepo.DeleteBy(repo.WithByID(id))
