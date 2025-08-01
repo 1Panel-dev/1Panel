@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div :key="$route.fullPath">
         <RouterButton
             :buttons="[
                 {
@@ -339,6 +339,9 @@ const currentInfo = ref<Dashboard.CurrentInfo>({
     memoryTotal: 0,
     memoryAvailable: 0,
     memoryUsed: 0,
+    memoryFree: 0,
+    memoryShard: 0,
+    memoryCache: 0,
     memoryUsedPercent: 0,
     swapMemoryTotal: 0,
     swapMemoryAvailable: 0,
@@ -545,7 +548,7 @@ const toUpload = () => {
     licenseRef.value.acceptParams();
 };
 
-onMounted(() => {
+const fetchData = () => {
     window.addEventListener('focus', onFocus);
     window.addEventListener('blur', onBlur);
     loadSafeStatus();
@@ -553,6 +556,17 @@ onMounted(() => {
     onLoadNetworkOptions();
     onLoadIOOptions();
     onLoadBaseInfo(true, 'all');
+};
+
+onBeforeRouteUpdate((to, from, next) => {
+    if (to.name === 'home') {
+        fetchData();
+    }
+    next();
+});
+
+onMounted(() => {
+    fetchData();
 });
 
 onBeforeUnmount(() => {
