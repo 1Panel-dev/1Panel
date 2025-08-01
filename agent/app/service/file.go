@@ -98,19 +98,25 @@ func (f *FileService) SearchUploadWithPage(req request.SearchUploadWithPage) (in
 		files    []response.UploadInfo
 		backData []response.UploadInfo
 	)
-	_ = filepath.Walk(req.Path, func(path string, info os.FileInfo, err error) error {
+	fileList, err := os.ReadDir(req.Path)
+	if err != nil {
+		return 0, files, nil
+	}
+	for _, item := range fileList {
+		if item.IsDir() {
+			continue
+		}
+		fileItem, err := item.Info()
 		if err != nil {
-			return nil
+			continue
 		}
-		if !info.IsDir() {
-			files = append(files, response.UploadInfo{
-				CreatedAt: info.ModTime().Format(constant.DateTimeLayout),
-				Size:      int(info.Size()),
-				Name:      info.Name(),
-			})
-		}
-		return nil
-	})
+		files = append(files, response.UploadInfo{
+			CreatedAt: fileItem.ModTime().Format(constant.DateTimeLayout),
+			Size:      int(fileItem.Size()),
+			Name:      item.Name(),
+		})
+	}
+
 	total, start, end := len(files), (req.Page-1)*req.PageSize, req.Page*req.PageSize
 	if start > total {
 		backData = make([]response.UploadInfo, 0)
