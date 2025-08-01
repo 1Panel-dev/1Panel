@@ -38,13 +38,14 @@
             </span>
         </template>
     </DrawerPro>
+    <TaskLog ref="taskLogRef" width="70%" @close="onSearch" />
 </template>
 
 <script lang="ts" setup>
 import { containerPrune, imageRemove, listAllImage } from '@/api/modules/container';
+import TaskLog from '@/components/log/task/index.vue';
 import i18n from '@/lang';
-import { MsgSuccess } from '@/utils/message';
-import { computeSize } from '@/utils/util';
+import { newUUID } from '@/utils/util';
 import { ref } from 'vue';
 
 const dialogVisible = ref(false);
@@ -54,6 +55,7 @@ const loading = ref();
 const unTagList = ref([]);
 const unUsedList = ref([]);
 const data = ref([]);
+const taskLogRef = ref();
 
 const checkAll = ref(false);
 const isIndeterminate = ref(false);
@@ -120,6 +122,10 @@ const handleClose = () => {
     dialogVisible.value = false;
 };
 
+const onSearch = () => {
+    emit('search');
+};
+
 const onClean = async () => {
     loading.value = true;
     if (checkAll.value) {
@@ -131,41 +137,34 @@ const onClean = async () => {
 
 const prune = async () => {
     let params = {
+        taskID: newUUID(),
         pruneType: 'image',
         withTagAll: scope.value === 'unused',
     };
     await containerPrune(params)
-        .then((res) => {
+        .then(() => {
             loading.value = false;
             dialogVisible.value = false;
-            MsgSuccess(
-                i18n.global.t('container.cleanSuccessWithSpace', [
-                    res.data.deletedNumber,
-                    computeSize(res.data.spaceReclaimed),
-                ]),
-            );
-            emit('search');
+            openTaskLog(params.taskID);
         })
         .catch(() => {
             loading.value = false;
         });
 };
+const openTaskLog = (taskID: string) => {
+    taskLogRef.value.openWithTaskID(taskID);
+};
 
 const removeImage = async () => {
     let params = {
+        taskID: newUUID(),
         names: checkedLists.value,
     };
     await imageRemove(params)
-        .then((res) => {
+        .then(() => {
             loading.value = false;
             dialogVisible.value = false;
-            MsgSuccess(
-                i18n.global.t('container.cleanSuccessWithSpace', [
-                    res.data.deletedNumber,
-                    computeSize(res.data.spaceReclaimed),
-                ]),
-            );
-            emit('search');
+            openTaskLog(params.taskID);
         })
         .catch(() => {
             loading.value = false;

@@ -173,6 +173,11 @@ ErrObjectInUsed: 'The object is in use and cannot be deleted'
 ErrObjectBeDependent: 'This image depends on other images and cannot be deleted'
 ErrPortRules: 'Port number does not match, please re-enter!'
 ErrPgImagePull: 'Image pull timed out, please configure image acceleration or manually pull the {{ .name }} image and try again'
+PruneHelper: "This cleanup removed {{ .name }} {{ .count }} items, freeing {{ .size }} disk space"
+ImageRemoveHelper: "Deleted image {{ .name }}, freeing {{ .size }} disk space"
+BuildCache: "Build cache"
+Volume: "Storage volume"
+Network: "Network"
 
 #runtime
 ErrFileNotExist: '{{ .detail }} file does not exist! Please check the integrity of the source file!'
@@ -290,6 +295,7 @@ TaskPull: 'Pull'
 TaskCommit: 'Commit'
 TaskBuild: 'Build'
 TaskPush: 'Push'
+TaskClean: "Cleanup"
 TaskHandle: 'Execute'
 Website: 'Website'
 App: 'Application'

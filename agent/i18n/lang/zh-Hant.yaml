@@ -172,6 +172,11 @@ ErrObjectInUsed: '該物件正被使用，無法刪除'
 ErrObjectBeDependent: '此鏡像依賴其他鏡像，無法刪除'
 ErrPortRules: '連接埠數目不匹配，請重新輸入！'
 ErrPgImagePull: '鏡像拉取逾時，請配置鏡像加速或手動拉取{{ .name }} 鏡像後重試'
+PruneHelper: "本次清理 {{ .name }} {{ .count }} 個，釋放磁盤空間 {{ .size }}"
+ImageRemoveHelper: "刪除鏡像 {{ .name }} ，釋放磁盤空間 {{ .size }}"
+BuildCache: "構建緩存"
+Volume: "存儲卷"
+Network: "網絡"
 
 #runtime
 ErrFileNotExist: '{{ .detail }} 檔案不存在！請檢查來源檔案完整性！'
@@ -289,6 +294,7 @@ TaskPull: '拉取'
 TaskCommit: '制作'
 TaskBuild: '建置'
 TaskPush: '推送'
+TaskClean: "清理"
 TaskHandle: '執行'
 Website: '網站'
 App: '應用程式'

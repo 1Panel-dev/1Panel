@@ -172,6 +172,11 @@ ErrObjectInUsed: 'Objek sedang digunakan dan tidak boleh dipadamkan'
 ErrObjectBeDependent: 'Imej ini bergantung pada imej lain dan tidak boleh dipadamkan'
 ErrPortRules: 'Nombor port tidak sepadan, sila masukkan semula!'
 ErrPgImagePull: 'Tarikh imej tamat masa, sila konfigurasikan pecutan imej atau tarik imej {{ .name }} secara manual dan cuba lagi'
+PruneHelper: "Pembersihan ini membuang {{ .name }} {{ .count }} item, membebaskan {{ .size }} ruang cakera"
+ImageRemoveHelper: "Padam imej {{ .name }}, membebaskan {{ .size }} ruang cakera"
+BuildCache: "Cache binaan"
+Volume: "Jilid storan"
+Network: "Rangkaian"
 
 #masa berjalan
 ErrFileNotExist: 'Fail {{ .detail }} tidak wujud! Sila semak integriti fail sumber!'
@@ -289,6 +294,7 @@ TaskPull: 'Tarik'
 TaskCommit: 'Komit'
 TaskBuild: 'Bina'
 TaskPush: 'Tolak'
+TaskClean: "Pembersihan"
 TaskHandle: 'Laksanakan'
 Website: 'Laman web'
 App: 'Aplikasi'

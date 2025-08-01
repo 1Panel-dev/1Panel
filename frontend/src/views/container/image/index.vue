@@ -33,7 +33,7 @@
             </template>
             <template #main>
                 <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search" :heightDiff="300">
-                    <el-table-column label="ID" prop="id" width="140" show-overflow-tooltip>
+                    <el-table-column label="ID" prop="id" width="140">
                         <template #default="{ row }">
                             <el-text type="primary" class="cursor-pointer" @click="onInspect(row.id)">
                                 {{ row.id.replaceAll('sha256:', '').substring(0, 12) }}
@@ -92,12 +92,13 @@
         <Build ref="dialogBuildRef" @search="search" />
         <Delete ref="dialogDeleteRef" @search="search" />
         <Prune ref="dialogPruneRef" @search="search" />
+        <TaskLog ref="taskLogRef" width="70%" />
     </div>
 </template>
 
 <script lang="ts" setup>
 import { reactive, ref, computed } from 'vue';
-import { dateFormat } from '@/utils/util';
+import { dateFormat, newUUID } from '@/utils/util';
 import { Container } from '@/api/interface/container';
 import Pull from '@/views/container/image/pull/index.vue';
 import Tag from '@/views/container/image/tag/index.vue';
@@ -109,13 +110,14 @@ import Delete from '@/views/container/image/delete/index.vue';
 import Prune from '@/views/container/image/prune/index.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
+import TaskLog from '@/components/log/task/index.vue';
 import { searchImage, listImageRepo, imageRemove, inspect, containerPrune } from '@/api/modules/container';
 import i18n from '@/lang';
 import { GlobalStore } from '@/store';
 import { ElMessageBox } from 'element-plus';
-import { MsgSuccess } from '@/utils/message';
 const globalStore = GlobalStore();
 
+const taskLogRef = ref();
 const mobile = computed(() => {
     return globalStore.isMobile();
 });
@@ -220,19 +222,23 @@ const onOpenBuildCache = () => {
     }).then(async () => {
         loading.value = true;
         let params = {
+            taskID: newUUID(),
             pruneType: 'buildcache',
             withTagAll: false,
         };
         await containerPrune(params)
-            .then((res) => {
+            .then(() => {
                 loading.value = false;
-                MsgSuccess(i18n.global.t('container.cleanSuccess', [res.data.deletedNumber]));
+                openTaskLog(params.taskID);
                 search();
             })
             .catch(() => {
                 loading.value = false;
             });
     });
+};
+const openTaskLog = (taskID: string) => {
+    taskLogRef.value.openWithTaskID(taskID);
 };
 
 const onOpenload = () => {

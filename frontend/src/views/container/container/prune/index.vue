@@ -18,41 +18,44 @@
             </span>
         </template>
     </DialogPro>
+    <TaskLog ref="taskLogRef" width="70%" @close="onSearch" />
 </template>
 
 <script lang="ts" setup>
 import { containerPrune } from '@/api/modules/container';
-import i18n from '@/lang';
-import { MsgSuccess } from '@/utils/message';
+import TaskLog from '@/components/log/task/index.vue';
 import { ref } from 'vue';
-import { computeSize } from '@/utils/util';
+import { newUUID } from '@/utils/util';
 
 const loading = ref(false);
 const open = ref<boolean>(false);
+const taskLogRef = ref();
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 const onClean = async () => {
     loading.value = true;
     let params = {
+        taskID: newUUID(),
         pruneType: 'container',
         withTagAll: false,
     };
     await containerPrune(params)
-        .then((res) => {
+        .then(() => {
             loading.value = false;
-            MsgSuccess(
-                i18n.global.t('container.cleanSuccessWithSpace', [
-                    res.data.deletedNumber,
-                    computeSize(res.data.spaceReclaimed),
-                ]),
-            );
             open.value = false;
-            emit('search');
+            openTaskLog(params.taskID);
         })
         .catch(() => {
             loading.value = false;
         });
+};
+const openTaskLog = (taskID: string) => {
+    taskLogRef.value.openWithTaskID(taskID);
+};
+
+const onSearch = () => {
+    emit('search');
 };
 
 const acceptParams = (): void => {

@@ -125,6 +125,7 @@
         <Config ref="configRef" />
         <Supervisor ref="supervisorRef" />
         <Terminal ref="terminalRef" />
+        <TaskLog ref="taskLogRef" width="70%" @close="search" />
     </div>
 </template>
 
@@ -132,10 +133,10 @@
 import { onMounted, reactive, ref } from 'vue';
 import { Runtime } from '@/api/interface/runtime';
 import { DeleteRuntime, RuntimeDeleteCheck, SearchRuntimes } from '@/api/modules/runtime';
-import { dateFormat } from '@/utils/util';
+import { dateFormat, newUUID } from '@/utils/util';
 import { ElMessageBox } from 'element-plus';
 import { containerPrune } from '@/api/modules/container';
-import { MsgSuccess } from '@/utils/message';
+import TaskLog from '@/components/log/task/index.vue';
 import i18n from '@/lang';
 import ExtManagement from './extension-management/index.vue';
 import Extensions from './extension-template/index.vue';
@@ -158,6 +159,7 @@ const mobile = computed(() => {
     return globalStore.isMobile();
 });
 
+const taskLogRef = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'runtime-page-size',
     currentPage: 1,
@@ -354,19 +356,22 @@ const onOpenBuildCache = () => {
     }).then(async () => {
         loading.value = true;
         let params = {
+            taskID: newUUID(),
             pruneType: 'buildcache',
             withTagAll: false,
         };
         await containerPrune(params)
-            .then((res) => {
+            .then(() => {
                 loading.value = false;
-                MsgSuccess(i18n.global.t('container.cleanSuccess', [res.data.deletedNumber]));
-                search();
+                openTaskLog(params.taskID);
             })
             .catch(() => {
                 loading.value = false;
             });
     });
+};
+const openTaskLog = (taskID: string) => {
+    taskLogRef.value.openWithTaskID(taskID);
 };
 
 const toFolder = (folder: string) => {

@@ -53,7 +53,7 @@ export const containerOperator = (params: Container.ContainerOperate) => {
     return http.post(`/containers/operate`, params);
 };
 export const containerPrune = (params: Container.ContainerPrune) => {
-    return http.post<Container.ContainerPruneReport>(`/containers/prune`, params);
+    return http.post(`/containers/prune`, params);
 };
 export const inspect = (params: Container.ContainerInspect) => {
     return http.post<string>(`/containers/inspect`, params);
@@ -95,7 +95,7 @@ export const imageTag = (params: Container.ImageTag) => {
     return http.post(`/containers/image/tag`, params);
 };
 export const imageRemove = (params: Container.BatchDelete) => {
-    return http.post<Container.ContainerPruneReport>(`/containers/image/remove`, params);
+    return http.post(`/containers/image/remove`, params);
 };
 
 // network

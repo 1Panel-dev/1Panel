@@ -173,6 +173,11 @@ ErrObjectInUsed: 'オブジェクトは使用中のため削除できません'
 ErrObjectBeDependent: 'このイメージは他のイメージに依存しているため、削除できません'
 ErrPortRules: 'ポート番号が一致しません。再入力してください。'
 ErrPgImagePull: 'イメージのプルがタイムアウトしました。イメージのアクセラレーションを設定するか、{{ .name }} イメージを手動でプルして再試行してください'
+PruneHelper: "今回のクリーンアップで{{ .name }} {{ .count }}個を削除し、{{ .size }}のディスク領域を解放しました"
+ImageRemoveHelper: "イメージ{{ .name }}を削除し、{{ .size }}のディスク領域を解放しました"
+BuildCache: "ビルドキャッシュ"
+Volume: "ストレージボリューム"
+Network: "ネットワーク"
 
 #runtime
 ErrFileNotExist: '{{ .detail }} ファイルが存在しません。ソース ファイルの整合性を確認してください。'
@@ -290,6 +295,7 @@ TaskPull: 'プル'
 TaskCommit: 'コミット'
 TaskBuild: 'ビルド'
 TaskPush: 'プッシュ'
+TaskClean: "クリーンアップ"
 TaskHandle: '実行'
 Website: 'ウェブサイト'
 App: 'アプリケーション'

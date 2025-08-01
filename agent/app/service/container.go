@@ -82,7 +82,7 @@ type IContainerService interface {
 	CreateVolume(req dto.VolumeCreate) error
 	TestCompose(req dto.ComposeCreate) (bool, error)
 	ComposeUpdate(req dto.ComposeUpdate) error
-	Prune(req dto.ContainerPrune) (dto.ContainerPruneReport, error)
+	Prune(req dto.ContainerPrune) error
 
 	LoadUsers(req dto.OperationWithName) []string
 
@@ -417,66 +417,93 @@ func (u *ContainerService) Inspect(req dto.InspectReq) (string, error) {
 	return string(bytes), nil
 }
 
-func (u *ContainerService) Prune(req dto.ContainerPrune) (dto.ContainerPruneReport, error) {
-	report := dto.ContainerPruneReport{}
+func (u *ContainerService) Prune(req dto.ContainerPrune) error {
 	client, err := docker.NewDockerClient()
 	if err != nil {
-		return report, err
+		return err
 	}
 	defer client.Close()
-	pruneFilters := filters.NewArgs()
-	if req.WithTagAll {
-		pruneFilters.Add("dangling", "false")
-		if req.PruneType != "image" {
-			pruneFilters.Add("until", "24h")
-		}
-	}
+	name := ""
 	switch req.PruneType {
 	case "container":
-		rep, err := client.ContainersPrune(context.Background(), pruneFilters)
-		if err != nil {
-			return report, err
-		}
-		report.DeletedNumber = len(rep.ContainersDeleted)
-		report.SpaceReclaimed = int(rep.SpaceReclaimed)
+		name = "Container"
 	case "image":
-		rep, err := client.ImagesPrune(context.Background(), pruneFilters)
-		if err != nil {
-			return report, err
-		}
-		report.DeletedNumber = len(rep.ImagesDeleted)
-		report.SpaceReclaimed = int(rep.SpaceReclaimed)
-	case "network":
-		rep, err := client.NetworksPrune(context.Background(), pruneFilters)
-		if err != nil {
-			return report, err
-		}
-		report.DeletedNumber = len(rep.NetworksDeleted)
+		name = "Image"
 	case "volume":
-		versions, err := client.ServerVersion(context.Background())
-		if err != nil {
-			return report, err
-		}
-		if common.ComparePanelVersion(versions.APIVersion, "1.42") {
-			pruneFilters.Add("all", "true")
-		}
-		rep, err := client.VolumesPrune(context.Background(), pruneFilters)
-		if err != nil {
-			return report, err
-		}
-		report.DeletedNumber = len(rep.VolumesDeleted)
-		report.SpaceReclaimed = int(rep.SpaceReclaimed)
+		name = "Volume"
 	case "buildcache":
-		opts := build.CachePruneOptions{}
-		opts.All = true
-		rep, err := client.BuildCachePrune(context.Background(), opts)
-		if err != nil {
-			return report, err
-		}
-		report.DeletedNumber = len(rep.CachesDeleted)
-		report.SpaceReclaimed = int(rep.SpaceReclaimed)
+		name = "BuildCache"
+	case "network":
+		name = "Network"
 	}
-	return report, nil
+	taskItem, err := task.NewTaskWithOps(i18n.GetMsgByKey(name), task.TaskClean, task.TaskScopeContainer, req.TaskID, 1)
+	if err != nil {
+		global.LOG.Errorf("new task for create container failed, err: %v", err)
+		return err
+	}
+
+	taskItem.AddSubTask(i18n.GetMsgByKey("TaskClean"), func(t *task.Task) error {
+		pruneFilters := filters.NewArgs()
+		if req.WithTagAll {
+			pruneFilters.Add("dangling", "false")
+			if req.PruneType != "image" {
+				pruneFilters.Add("until", "24h")
+			}
+		}
+		DeletedNumber := 0
+		SpaceReclaimed := 0
+		switch req.PruneType {
+		case "container":
+			rep, err := client.ContainersPrune(context.Background(), pruneFilters)
+			if err != nil {
+				return err
+			}
+			DeletedNumber = len(rep.ContainersDeleted)
+			SpaceReclaimed = int(rep.SpaceReclaimed)
+		case "image":
+			rep, err := client.ImagesPrune(context.Background(), pruneFilters)
+			if err != nil {
+				return err
+			}
+			DeletedNumber = len(rep.ImagesDeleted)
+			SpaceReclaimed = int(rep.SpaceReclaimed)
+		case "network":
+			rep, err := client.NetworksPrune(context.Background(), pruneFilters)
+			if err != nil {
+				return err
+			}
+			DeletedNumber = len(rep.NetworksDeleted)
+		case "volume":
+			versions, err := client.ServerVersion(context.Background())
+			if err != nil {
+				return err
+			}
+			if common.ComparePanelVersion(versions.APIVersion, "1.42") {
+				pruneFilters.Add("all", "true")
+			}
+			rep, err := client.VolumesPrune(context.Background(), pruneFilters)
+			if err != nil {
+				return err
+			}
+			DeletedNumber = len(rep.VolumesDeleted)
+			SpaceReclaimed = int(rep.SpaceReclaimed)
+		case "buildcache":
+			opts := build.CachePruneOptions{}
+			opts.All = true
+			rep, err := client.BuildCachePrune(context.Background(), opts)
+			if err != nil {
+				return err
+			}
+			DeletedNumber = len(rep.CachesDeleted)
+			SpaceReclaimed = int(rep.SpaceReclaimed)
+		}
+		taskItem.Log(i18n.GetMsgWithMap("PruneHelper", map[string]interface{}{"name": i18n.GetMsgByKey(name), "count": DeletedNumber, "size": common.LoadSizeUnit2F(float64(SpaceReclaimed))}))
+		return nil
+	}, nil)
+	go func() {
+		_ = taskItem.Execute()
+	}()
+	return nil
 }
 
 func (u *ContainerService) LoadResourceLimit() (*dto.ResourceLimit, error) {
@@ -1241,29 +1268,29 @@ func checkImageExist(client *client.Client, imageItem string) bool {
 }
 
 func checkImageLike(client *client.Client, imageName string) bool {
-    if client == nil {
-        var err error
-        client, err = docker.NewDockerClient()
-        if err != nil {
-            return false
-        }
-    }
-    images, err := client.ImageList(context.Background(), image.ListOptions{})
-    if err != nil {
-        return false
-    }
+	if client == nil {
+		var err error
+		client, err = docker.NewDockerClient()
+		if err != nil {
+			return false
+		}
+	}
+	images, err := client.ImageList(context.Background(), image.ListOptions{})
+	if err != nil {
+		return false
+	}
 
-    for _, img := range images {
-        for _, tag := range img.RepoTags {
-            parts := strings.Split(tag, "/")
-            imageNameWithTag := parts[len(parts)-1]
+	for _, img := range images {
+		for _, tag := range img.RepoTags {
+			parts := strings.Split(tag, "/")
+			imageNameWithTag := parts[len(parts)-1]
 
-            if imageNameWithTag == imageName {
-                return true
-            }
-        }
-    }
-    return false
+			if imageNameWithTag == imageName {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func pullImages(task *task.Task, client *client.Client, imageName string) error {

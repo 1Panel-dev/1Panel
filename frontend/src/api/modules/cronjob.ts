@@ -3,7 +3,7 @@ import { ResPage, SearchWithPage } from '../interface';
 import { Cronjob } from '../interface/cronjob';
 import { TimeoutEnum } from '@/enums/http-enum';
 
-export const searchCronjobPage = (params: SearchWithPage) => {
+export const searchCronjobPage = (params: Cronjob.Search) => {
     return http.post<ResPage<Cronjob.CronjobInfo>>(`/cronjobs/search`, params);
 };
 

@@ -138,7 +138,7 @@ func (b *BaseApi) ImagePush(c *gin.Context) {
 // @Summary Delete image
 // @Accept json
 // @Param request body dto.BatchDelete true "request"
-// @Success 200 {object} dto.ContainerPruneReport
+// @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /containers/image/remove [post]
@@ -149,13 +149,12 @@ func (b *BaseApi) ImageRemove(c *gin.Context) {
 		return
 	}
 
-	data, err := imageService.ImageRemove(req)
-	if err != nil {
+	if err := imageService.ImageRemove(req); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
 
-	helper.SuccessWithData(c, data)
+	helper.Success(c)
 }
 
 // @Tags Container Image

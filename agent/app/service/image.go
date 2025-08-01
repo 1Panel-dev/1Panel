@@ -21,6 +21,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
+	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/docker/docker/api/types/build"
 	"github.com/docker/docker/api/types/container"
@@ -41,7 +42,7 @@ type IImageService interface {
 	ImageLoad(req dto.ImageLoad) error
 	ImageSave(req dto.ImageSave) error
 	ImagePush(req dto.ImagePush) error
-	ImageRemove(req dto.BatchDelete) (dto.ContainerPruneReport, error)
+	ImageRemove(req dto.BatchDelete) error
 	ImageTag(req dto.ImageTag) error
 }
 
@@ -386,34 +387,44 @@ func (u *ImageService) ImagePush(req dto.ImagePush) error {
 	return nil
 }
 
-func (u *ImageService) ImageRemove(req dto.BatchDelete) (dto.ContainerPruneReport, error) {
-	report := dto.ContainerPruneReport{}
+func (u *ImageService) ImageRemove(req dto.BatchDelete) error {
 	client, err := docker.NewDockerClient()
 	if err != nil {
-		return report, err
+		return err
 	}
 	defer client.Close()
-	for _, id := range req.Names {
-		imageItem, _, err := client.ImageInspectWithRaw(context.TODO(), id)
-		if err != nil {
-			return report, err
-		}
-		if _, err := client.ImageRemove(context.TODO(), id, image.RemoveOptions{Force: req.Force, PruneChildren: true}); err != nil {
-			if strings.Contains(err.Error(), "image is being used") || strings.Contains(err.Error(), "is using") {
-				if strings.Contains(id, "sha256:") {
-					return report, buserr.New("ErrObjectInUsed")
-				}
-				return report, buserr.WithDetail("ErrInUsed", id, nil)
-			}
-			if strings.Contains(err.Error(), "image has dependent") {
-				return report, buserr.New("ErrObjectBeDependent")
-			}
-			return report, err
-		}
-		report.DeletedNumber++
-		report.SpaceReclaimed += int(imageItem.Size)
+	taskItem, err := task.NewTaskWithOps(task.TaskScopeImage, task.TaskDelete, task.TaskScopeContainer, req.TaskID, 1)
+	if err != nil {
+		global.LOG.Errorf("new task for create container failed, err: %v", err)
+		return err
 	}
-	return report, nil
+
+	for _, id := range req.Names {
+		taskItem.AddSubTask(i18n.GetMsgByKey("TaskDelete")+id, func(t *task.Task) error {
+			imageItem, err := client.ImageInspect(context.TODO(), id)
+			if err != nil {
+				return err
+			}
+			if _, err := client.ImageRemove(context.TODO(), id, image.RemoveOptions{Force: req.Force, PruneChildren: true}); err != nil {
+				if strings.Contains(err.Error(), "image is being used") || strings.Contains(err.Error(), "is using") {
+					if strings.Contains(id, "sha256:") {
+						return buserr.New("ErrObjectInUsed")
+					}
+					return buserr.WithDetail("ErrInUsed", id, nil)
+				}
+				if strings.Contains(err.Error(), "image has dependent") {
+					return buserr.New("ErrObjectBeDependent")
+				}
+				return err
+			}
+			taskItem.Log(i18n.GetMsgWithMap("ImageRemoveHelper", map[string]interface{}{"name": id, "size": common.LoadSizeUnit2F(float64(imageItem.Size))}))
+			return nil
+		}, nil)
+	}
+	go func() {
+		_ = taskItem.Execute()
+	}()
+	return nil
 }
 
 func formatFileSize(fileSize int64) (size string) {

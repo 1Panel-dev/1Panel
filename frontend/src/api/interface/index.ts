@@ -20,7 +20,6 @@ export interface ReqPage {
 }
 export interface SearchWithPage {
     info: string;
-    groupIDs: Array<number>;
     page: number;
     pageSize: number;
     orderBy?: string;

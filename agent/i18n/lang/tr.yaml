@@ -173,6 +173,11 @@ ErrObjectInUsed: 'Nesne kullanımda ve silinemez'
 ErrObjectBeDependent: 'Bu image diğer imagelere bağlı ve silinemez'
 ErrPortRules: 'Port numarası eşleşmiyor, lütfen yeniden girin!'
 ErrPgImagePull: 'Image çekme zaman aşımı, lütfen image hızlandırma yapılandırın veya manuel olarak {{ .name }} imageını çekin ve tekrar deneyin'
+PruneHelper: "Bu temizleme {{ .name }} {{ .count }} öğe kaldırdı, {{ .size }} disk alanı boşalttı"
+ImageRemoveHelper: "{{ .name }} imajı silindi, {{ .size }} disk alanı boşalttı"
+BuildCache: "Derleme önbelleği"
+Volume: "Depolama hacmi"
+Network: "Ağ"
 
 #runtime
 ErrFileNotExist: '{{ .detail }} dosyası mevcut değil! Lütfen kaynak dosyanın bütünlüğünü kontrol edin!'
@@ -288,6 +293,7 @@ TaskPull: 'Çek'
 TaskCommit: 'işleme'
 TaskBuild: 'Yapı'
 TaskPush: 'Gönder'
+TaskClean: "Temizleme"
 TaskHandle: 'Yürüt'
 Website: 'Web Sitesi'
 App: 'Uygulama'

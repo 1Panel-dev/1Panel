@@ -173,6 +173,11 @@ ErrObjectInUsed: 'O objeto está em uso e não pode ser excluído'
 ErrObjectBeDependent: 'Esta imagem depende de outras imagens e não pode ser excluída'
 ErrPortRules: 'O número da porta não corresponde, digite novamente!'
 ErrPgImagePull: 'Tempo limite para extração de imagem. Configure a aceleração de imagem ou extraia manualmente a imagem {{ .name }} e tente novamente'
+PruneHelper: "Esta limpeza removeu {{ .name }} {{ .count }} itens, liberando {{ .size }} de espaço em disco"
+ImageRemoveHelper: "Excluída a imagem {{ .name }}, liberando {{ .size }} de espaço em disco"
+BuildCache: "Cache de construção"
+Volume: "Volume de armazenamento"
+Network: "Rede"
 
 #tempo de execução
 ErrFileNotExist: 'O arquivo {{ .detail }} não existe! Verifique a integridade do arquivo de origem!'
@@ -290,6 +295,7 @@ TaskPull: 'Puxar'
 TaskCommit: 'Commit'
 TaskBuild: 'Construir'
 TaskPush: 'Empurrar'
+TaskClean: "Limpeza"
 TaskHandle: 'Executar'
 Website: 'Site'
 App: 'Aplicativo'

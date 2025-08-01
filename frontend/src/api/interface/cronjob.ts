@@ -1,6 +1,12 @@
 import { ReqPage } from '.';
 
 export namespace Cronjob {
+    export interface Search extends ReqPage {
+        info: string;
+        groupIDs: Array<number>;
+        orderBy?: string;
+        order?: string;
+    }
     export interface CronjobInfo {
         id: number;
         name: string;
