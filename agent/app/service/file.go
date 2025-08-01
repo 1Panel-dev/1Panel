@@ -417,6 +417,14 @@ func (f *FileService) MvFile(m request.FileMove) error {
 				global.LOG.Errorf("copy file [%s] to [%s] failed, err: %s", src, m.NewPath, err.Error())
 			}
 		}
+		if len(m.CoverPaths) > 0 {
+			for _, src := range m.CoverPaths {
+				if err := fo.CopyAndReName(src, m.NewPath, "", true); err != nil {
+					errs = append(errs, err)
+					global.LOG.Errorf("copy file [%s] to [%s] failed, err: %s", src, m.NewPath, err.Error())
+				}
+			}
+		}
 	}
 
 	var errString string
