@@ -1,7 +1,9 @@
 import http from '@/api';
-import { ResPage } from '../interface';
+import { ResPage, ReqPage } from '../interface';
 import { Host } from '../interface/host';
 import { TimeoutEnum } from '@/enums/http-enum';
+import { deepCopy } from '@/utils/util';
+import { Base64 } from 'js-base64';
 
 // firewall
 export const loadFireBaseInfo = () => {
@@ -71,11 +73,27 @@ export const updateSSH = (params: Host.SSHUpdate) => {
 export const updateSSHByfile = (file: string) => {
     return http.post(`/hosts/ssh/conffile/update`, { file: file }, TimeoutEnum.T_40S);
 };
-export const generateSecret = (params: Host.SSHGenerate) => {
-    return http.post(`/hosts/ssh/generate`, params);
+export const createCert = (params: Host.RootCert) => {
+    let request = deepCopy(params) as Host.RootCert;
+    if (request.passPhrase) {
+        request.passPhrase = Base64.encode(request.passPhrase);
+    }
+    if (request.privateKey) {
+        request.privateKey = Base64.encode(request.privateKey);
+    }
+    if (request.publicKey) {
+        request.publicKey = Base64.encode(request.publicKey);
+    }
+    return http.post(`/hosts/ssh/cert`, request);
 };
-export const loadSecret = (mode: string) => {
-    return http.post<string>(`/hosts/ssh/secret`, { encryptionMode: mode });
+export const searchCert = (params: ReqPage) => {
+    return http.post<ResPage<Host.RootCertInfo>>(`/hosts/ssh/cert/search`, params);
+};
+export const deleteCert = (ids: Array<number>, forceDelete: boolean) => {
+    return http.post(`/hosts/ssh/cert/delete`, { ids: ids, forceDelete: forceDelete });
+};
+export const syncCert = () => {
+    return http.post(`/hosts/ssh/cert/sync`);
 };
 export const loadSSHLogs = (params: Host.searchSSHLog) => {
     return http.post<Host.sshLog>(`/hosts/ssh/log`, params);

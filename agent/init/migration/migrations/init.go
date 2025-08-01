@@ -63,6 +63,7 @@ var AddTable = &gormigrate.Migration{
 			&model.Group{},
 			&model.AppIgnoreUpgrade{},
 			&model.McpServer{},
+			&model.RootCert{},
 		)
 	},
 }

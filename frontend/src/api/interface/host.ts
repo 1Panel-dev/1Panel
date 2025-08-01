@@ -161,15 +161,31 @@ export namespace Host {
         primaryKey: string;
         permitRootLogin: string;
         useDNS: string;
+        currentUser: string;
     }
     export interface SSHUpdate {
         key: string;
         oldValue: string;
         newValue: string;
     }
-    export interface SSHGenerate {
+    export interface RootCert {
+        name: string;
+        mode: string;
         encryptionMode: string;
-        password: string;
+        passPhrase: string;
+        privateKey: string;
+        publicKey: string;
+        description: string;
+    }
+    export interface RootCertInfo {
+        id: number;
+        createAt: Date;
+        name: string;
+        encryptionMode: string;
+        passPhrase: string;
+        description: string;
+        publicKey: string;
+        privateKey: string;
     }
     export interface searchSSHLog extends ReqPage {
         info: string;

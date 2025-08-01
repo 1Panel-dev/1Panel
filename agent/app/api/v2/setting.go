@@ -113,7 +113,7 @@ func loadLocalConn() (*ssh.SSHClient, error) {
 		itemPath = path.Join(currentInfo.HomeDir, ".ssh/id_ed25519_1panel")
 	}
 	if _, err := os.Stat(itemPath); err != nil {
-		_ = sshService.GenerateSSH(dto.GenerateSSH{EncryptionMode: "ed25519", Name: "_1panel"})
+		_ = sshService.CreateRootCert(dto.CreateRootCert{EncryptionMode: "ed25519", Name: "1panel", Description: "1Panel Terminal"})
 	}
 
 	privateKey, _ := os.ReadFile(itemPath)

@@ -43,6 +43,8 @@
                     <el-radio-button value="base">{{ $t('database.baseConf') }}</el-radio-button>
                     <el-radio-button value="all">{{ $t('database.allConf') }}</el-radio-button>
                 </el-radio-group>
+
+                <el-button @click="onOpenDrawer" class="mt-2 ml-2">{{ $t('ssh.pubkey') }}</el-button>
                 <el-row class="mt-10" v-if="confShowType === 'base'">
                     <el-col :xs="24" :sm="20" :md="20" :lg="10" :xl="10">
                         <el-form :model="form" label-position="right" ref="formRef" label-width="100px">
@@ -93,9 +95,6 @@
                                     v-model="form.pubkeyAuthentication"
                                 ></el-switch>
                                 <span class="input-help">{{ $t('ssh.keyAuthHelper') }}</span>
-                                <el-button link @click="onOpenDrawer" type="primary">
-                                    {{ $t('ssh.pubkey') }}
-                                </el-button>
                             </el-form-item>
                             <el-form-item :label="$t('ssh.useDNS')" prop="useDNS">
                                 <el-switch
@@ -125,7 +124,7 @@
             </template>
         </LayoutContent>
 
-        <PubKey ref="pubKeyRef" @search="search" />
+        <Cert ref="pubKeyRef" @search="search" />
         <Port ref="portRef" @search="search" />
         <Address ref="addressRef" @search="search" />
         <Root ref="rootsRef" @search="search" />
@@ -135,7 +134,7 @@
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue';
 import FireRouter from '@/views/host/ssh/index.vue';
-import PubKey from '@/views/host/ssh/ssh/pubkey/index.vue';
+import Cert from '@/views/host/ssh/ssh/certification/index.vue';
 import Root from '@/views/host/ssh/ssh/root/index.vue';
 import Port from '@/views/host/ssh/ssh/port/index.vue';
 import Address from '@/views/host/ssh/ssh/address/index.vue';
@@ -169,6 +168,7 @@ const form = reactive({
     permitRootLogin: 'yes',
     permitRootLoginItem: 'yes',
     useDNS: 'no',
+    currentUser: 'root',
 });
 
 const onSaveFile = async () => {
@@ -190,7 +190,7 @@ const onSaveFile = async () => {
 };
 
 const onOpenDrawer = () => {
-    pubKeyRef.value.acceptParams();
+    pubKeyRef.value.acceptParams(form.currentUser);
 };
 
 const onChangePort = () => {
@@ -312,6 +312,7 @@ const search = async () => {
     form.permitRootLogin = res.data.permitRootLogin;
     form.permitRootLoginItem = loadPermitLabel(res.data.permitRootLogin);
     form.useDNS = res.data.useDNS;
+    form.currentUser = res.data.currentUser;
 };
 
 const loadPermitLabel = (value: string) => {

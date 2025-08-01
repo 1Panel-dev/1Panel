@@ -1,6 +1,8 @@
 package service
 
 import (
+	"bytes"
+	"encoding/base64"
 	"fmt"
 	"os"
 	"os/user"
@@ -9,16 +11,19 @@ import (
 	"strings"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/agent/utils/copier"
+	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/agent/utils/geo"
 	"github.com/gin-gonic/gin"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
-	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/1Panel-dev/1Panel/agent/utils/systemctl"
 	"github.com/pkg/errors"
 )
@@ -32,11 +37,13 @@ type ISSHService interface {
 	OperateSSH(operation string) error
 	UpdateByFile(value string) error
 	Update(req dto.SSHUpdate) error
-	GenerateSSH(req dto.GenerateSSH) error
-	LoadSSHSecret(mode string) (string, error)
 	LoadLog(ctx *gin.Context, req dto.SearchSSHLog) (*dto.SSHLog, error)
-
 	LoadSSHConf() (string, error)
+
+	SyncRootCert() error
+	CreateRootCert(req dto.CreateRootCert) error
+	SearchRootCerts(req dto.SearchWithPage) (int64, interface{}, error)
+	DeleteRootCerts(req dto.ForceDelete) error
 }
 
 func NewISSHService() ISSHService {
@@ -110,6 +117,14 @@ func (u *SSHService) GetSSHInfo() (*dto.SSHInfo, error) {
 			data.UseDNS = strings.ReplaceAll(line, "UseDNS ", "")
 		}
 	}
+
+	currentUser, err := user.Current()
+	if err != nil || len(currentUser.Name) == 0 {
+		data.CurrentUser = "root"
+	} else {
+		data.CurrentUser = currentUser.Name
+	}
+
 	return &data, nil
 }
 
@@ -214,68 +229,170 @@ func (u *SSHService) UpdateByFile(value string) error {
 	return nil
 }
 
-func (u *SSHService) GenerateSSH(req dto.GenerateSSH) error {
-	if cmd.CheckIllegal(req.EncryptionMode, req.Password) {
+func (u *SSHService) SyncRootCert() error {
+	currentUser, err := user.Current()
+	if err != nil {
+		return fmt.Errorf("load current user failed, err: %v", err)
+	}
+	sshDir := fmt.Sprintf("%s/.ssh", currentUser.HomeDir)
+	authFilePath := currentUser.HomeDir + "/.ssh/authorized_keys"
+	authItem, err := os.ReadFile(authFilePath)
+	if err != nil {
+		return err
+	}
+
+	fileList, err := os.ReadDir(sshDir)
+	if err != nil {
+		return err
+	}
+	var rootCerts []model.RootCert
+	fileMap := make(map[string]bool)
+	for _, item := range fileList {
+		if !item.IsDir() {
+			fileMap[item.Name()] = true
+		}
+	}
+	for item := range fileMap {
+		if !strings.HasSuffix(item, ".pub") {
+			continue
+		}
+		if !fileMap[strings.TrimSuffix(item, ".pub")] {
+			continue
+		}
+		cert := model.RootCert{Name: strings.TrimSuffix(item, ".pub"), PublicKeyPath: path.Join(sshDir, item), PrivateKeyPath: path.Join(sshDir, strings.TrimSuffix(item, ".pub"))}
+		pubItem, err := os.ReadFile(path.Join(sshDir, item))
+		if err != nil {
+			global.LOG.Errorf("read pubic key of %s for sync failed, err: %v", item, err)
+			continue
+		}
+		cert.EncryptionMode = loadEncryptioMode(string(pubItem))
+		if !bytes.Contains(authItem, pubItem) {
+			global.LOG.Error("the public key is not in authorized_keys, skip...")
+			continue
+		}
+		rootCerts = append(rootCerts, cert)
+	}
+	return hostRepo.SyncCert(rootCerts)
+}
+
+func (u *SSHService) CreateRootCert(req dto.CreateRootCert) error {
+	if cmd.CheckIllegal(req.EncryptionMode, req.PassPhrase) {
 		return buserr.New("ErrCmdIllegal")
+	}
+	certItem, _ := hostRepo.GetCert(repo.WithByName(req.Name))
+	if certItem.ID != 0 {
+		return buserr.New("ErrRecordExist")
 	}
 	currentUser, err := user.Current()
 	if err != nil {
 		return fmt.Errorf("load current user failed, err: %v", err)
 	}
-	secretFile := fmt.Sprintf("%s/.ssh/id_item_%s", currentUser.HomeDir, req.EncryptionMode)
-	secretPubFile := fmt.Sprintf("%s/.ssh/id_item_%s.pub", currentUser.HomeDir, req.EncryptionMode)
+	var cert model.RootCert
+	if err := copier.Copy(&cert, req); err != nil {
+		return err
+	}
+	privatePath := fmt.Sprintf("%s/.ssh/%s", currentUser.HomeDir, req.Name)
+	publicPath := fmt.Sprintf("%s/.ssh/%s.pub", currentUser.HomeDir, req.Name)
 	authFilePath := currentUser.HomeDir + "/.ssh/authorized_keys"
 
-	command := fmt.Sprintf("ssh-keygen -t %s -f %s/.ssh/id_item_%s | echo y", req.EncryptionMode, currentUser.HomeDir, req.EncryptionMode)
-	if len(req.Password) != 0 {
-		command = fmt.Sprintf("ssh-keygen -t %s -P %s -f %s/.ssh/id_item_%s | echo y", req.EncryptionMode, req.Password, currentUser.HomeDir, req.EncryptionMode)
+	if req.Mode == "input" || req.Mode == "import" {
+		if err := os.WriteFile(privatePath, []byte(req.PrivateKey), constant.FilePerm); err != nil {
+			return err
+		}
+		if err := os.WriteFile(publicPath, []byte(req.PublicKey), constant.FilePerm); err != nil {
+			return err
+		}
+	} else {
+		command := fmt.Sprintf("ssh-keygen -t %s -f %s/.ssh/%s -N ''", req.EncryptionMode, currentUser.HomeDir, req.Name)
+		if len(req.PassPhrase) != 0 {
+			command = fmt.Sprintf("ssh-keygen -t %s -P %s -f %s/.ssh/%s | echo y", req.EncryptionMode, req.PassPhrase, currentUser.HomeDir, req.Name)
+		}
+		stdout, err := cmd.RunDefaultWithStdoutBashC(command)
+		if err != nil {
+			return fmt.Errorf("generate failed, err: %v, message: %s", err, stdout)
+		}
 	}
-	stdout, err := cmd.RunDefaultWithStdoutBashC(command)
+
+	stdout, err := cmd.RunDefaultWithStdoutBashCf("cat %s >> %s", publicPath, authFilePath)
 	if err != nil {
 		return fmt.Errorf("generate failed, err: %v, message: %s", err, stdout)
 	}
-	defer func() {
-		_ = os.Remove(secretFile)
-	}()
-	defer func() {
-		_ = os.Remove(secretPubFile)
-	}()
 
-	if _, err := os.Stat(authFilePath); err != nil && errors.Is(err, os.ErrNotExist) {
-		authFile, err := os.Create(authFilePath)
-		if err != nil {
+	cert.PrivateKeyPath = privatePath
+	cert.PublicKeyPath = publicPath
+	if len(cert.PassPhrase) != 0 {
+		cert.PassPhrase, _ = encrypt.StringEncrypt(cert.PassPhrase)
+	}
+	return hostRepo.CreateCert(&cert)
+}
+
+func (u *SSHService) SearchRootCerts(req dto.SearchWithPage) (int64, interface{}, error) {
+	total, records, err := hostRepo.PageCert(req.Page, req.PageSize)
+	if err != nil {
+		return 0, nil, err
+	}
+	var datas []dto.RootCert
+	for i := 0; i < len(records); i++ {
+		publicItem, err := os.ReadFile(records[i].PublicKeyPath)
+		var publicBase64 string
+		if err == nil && len(publicItem) != 0 {
+			publicBase64 = base64.StdEncoding.EncodeToString(publicItem)
+		}
+		privateItem, _ := os.ReadFile(records[i].PrivateKeyPath)
+		var privateBase64 string
+		if err == nil && len(publicItem) != 0 {
+			privateBase64 = base64.StdEncoding.EncodeToString(privateItem)
+		}
+		passPhrase, _ := encrypt.StringDecryptWithBase64(records[i].PassPhrase)
+		datas = append(datas, dto.RootCert{
+			ID:             records[i].ID,
+			CreatedAt:      records[i].CreatedAt,
+			Name:           records[i].Name,
+			EncryptionMode: records[i].EncryptionMode,
+			PassPhrase:     passPhrase,
+			PublicKey:      publicBase64,
+			PrivateKey:     privateBase64,
+			Description:    records[i].Description,
+		})
+	}
+	return total, datas, err
+}
+
+func (u *SSHService) DeleteRootCerts(req dto.ForceDelete) error {
+	currentUser, err := user.Current()
+	if err != nil && !req.ForceDelete {
+		return fmt.Errorf("load current user failed, err: %v", err)
+	}
+	authFilePath := currentUser.HomeDir + "/.ssh/authorized_keys"
+	authItem, err := os.ReadFile(authFilePath)
+	if err != nil && !req.ForceDelete {
+		return err
+	}
+	for _, id := range req.IDs {
+		cert, _ := hostRepo.GetCert(repo.WithByID(id))
+		if cert.ID == 0 {
+			if !req.ForceDelete {
+				return buserr.New("ErrRecordNotFound")
+			} else {
+				continue
+			}
+		}
+		publicItem, err := os.ReadFile(cert.PublicKeyPath)
+		if err != nil && !req.ForceDelete {
 			return err
 		}
-		defer authFile.Close()
-	}
-	stdout1, err := cmd.RunDefaultWithStdoutBashCf("cat %s >> %s/.ssh/authorized_keys", secretPubFile, currentUser.HomeDir)
-	if err != nil {
-		return fmt.Errorf("generate failed, err: %v, message: %s", err, stdout1)
-	}
-
-	fileOp := files.NewFileOp()
-	if err := fileOp.Rename(secretFile, fmt.Sprintf("%s/.ssh/id_%s%s", currentUser.HomeDir, req.EncryptionMode, req.Name)); err != nil {
-		return err
-	}
-	if err := fileOp.Rename(secretPubFile, fmt.Sprintf("%s/.ssh/id_%s%s.pub", currentUser.HomeDir, req.EncryptionMode, req.Name)); err != nil {
-		return err
+		newFile := bytes.ReplaceAll(authItem, publicItem, nil)
+		if err := os.WriteFile(authFilePath, newFile, constant.FilePerm); err != nil && !req.ForceDelete {
+			return fmt.Errorf("refresh authorized_keys failed, err: %v", err)
+		}
+		_ = os.Remove(cert.PublicKeyPath)
+		_ = os.Remove(cert.PrivateKeyPath)
+		if err := hostRepo.DeleteCert(repo.WithByID(id)); err != nil && !req.ForceDelete {
+			return err
+		}
 	}
 
 	return nil
-}
-
-func (u *SSHService) LoadSSHSecret(mode string) (string, error) {
-	currentUser, err := user.Current()
-	if err != nil {
-		return "", fmt.Errorf("load current user failed, err: %v", err)
-	}
-
-	homeDir := currentUser.HomeDir
-	if _, err := os.Stat(fmt.Sprintf("%s/.ssh/id_%s", homeDir, mode)); err != nil {
-		return "", nil
-	}
-	file, err := os.ReadFile(fmt.Sprintf("%s/.ssh/id_%s", homeDir, mode))
-	return string(file), err
 }
 
 type sshFileItem struct {
@@ -575,4 +692,20 @@ func analyzeDateStr(parts []string) (int, string) {
 		return 0, ""
 	}
 	return 2, fmt.Sprintf("%s %s %s", parts[0], parts[1], parts[2])
+}
+
+func loadEncryptioMode(content string) string {
+	if strings.HasPrefix(content, "ssh-rsa") {
+		return "rsa"
+	}
+	if strings.HasPrefix(content, "ssh-ed25519") {
+		return "ed25519"
+	}
+	if strings.HasPrefix(content, "ssh-ecdsa") {
+		return "ecdsa"
+	}
+	if strings.HasPrefix(content, "ssh-dsa") {
+		return "dsa"
+	}
+	return ""
 }
