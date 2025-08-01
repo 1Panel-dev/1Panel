@@ -156,7 +156,7 @@ const submitChangePassword = async (formEl: FormInstance | undefined) => {
             params.proxyPasswdKeep = form.proxyPasswdKeepItem ? 'Enable' : 'Disable';
         }
         if (form.proxyType === 'http' || form.proxyType === 'https') {
-            params.proxyUrl = form.proxyType + '://' + form.proxyUrl;
+            params.proxyUrl = form.proxyUrl;
         }
         if (isMasterProductPro.value && (params.proxyDocker || proxyDockerVisible.value)) {
             dockerProxyRef.value.acceptParams({
@@ -197,7 +197,7 @@ const onSubmit = async () => {
             params.proxyPasswdKeep = form.proxyPasswdKeepItem ? 'Enable' : 'Disable';
         }
         if (form.proxyType === 'http' || form.proxyType === 'https') {
-            params.proxyUrl = form.proxyType + '://' + form.proxyUrl;
+            params.proxyUrl = form.proxyUrl;
         }
         await updateProxy(params);
         emit('search');

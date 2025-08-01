@@ -189,7 +189,11 @@ func (u *SettingService) UpdateBindInfo(req dto.BindInfo) error {
 }
 
 func (u *SettingService) UpdateProxy(req dto.ProxyUpdate) error {
-	if err := settingRepo.Update("ProxyUrl", req.ProxyUrl); err != nil {
+	proxyUrl := req.ProxyUrl
+	if req.ProxyType == "https" || req.ProxyType == "http" {
+		proxyUrl = req.ProxyType + "://" + req.ProxyUrl
+	}
+	if err := settingRepo.Update("ProxyUrl", proxyUrl); err != nil {
 		return err
 	}
 	if err := settingRepo.Update("ProxyType", req.ProxyType); err != nil {
@@ -675,16 +679,17 @@ func (u *SettingService) GetAppstoreConfig() (*dto.AppstoreConfig, error) {
 }
 
 func loadDockerProxy(req dto.ProxyUpdate) string {
-	if len(req.ProxyType) == 0 || req.ProxyType == "close" || !req.ProxyDocker {
+	if req.ProxyType == "" || req.ProxyType == "close" || !req.ProxyDocker {
 		return ""
 	}
-	proxyPasswd := ""
-	if len(req.ProxyUser) != 0 {
-		proxyPasswd = req.ProxyPasswd + "@"
+	var account string
+	if req.ProxyUser != "" {
+		account = req.ProxyUser
+		if req.ProxyPasswd != "" {
+			account += ":" + req.ProxyPasswd
+		}
+		account += "@"
 	}
-	proxyUrl := req.ProxyType + "://" + req.ProxyUser + ":" + proxyPasswd + req.ProxyUrl + ":" + req.ProxyPort
-	if req.ProxyType == "http" || req.ProxyType == "https" {
-		req.ProxyUrl = req.ProxyType + "://" + req.ProxyUrl
-	}
-	return proxyUrl
+
+	return fmt.Sprintf("%s://%s%s:%s", req.ProxyType, account, req.ProxyUrl, req.ProxyPort)
 }
