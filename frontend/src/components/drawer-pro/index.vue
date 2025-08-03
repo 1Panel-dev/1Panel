@@ -48,7 +48,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, useSlots } from 'vue';
+import { computed, useSlots, ref } from 'vue';
 defineOptions({ name: 'DrawerPro' });
 import i18n from '@/lang';
 import { GlobalStore } from '@/store';

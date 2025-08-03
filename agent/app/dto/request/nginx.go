@@ -126,3 +126,7 @@ type NginxModuleUpdate struct {
 	Enable   bool   `json:"enable"`
 	Params   string `json:"params"`
 }
+
+type NginxOperateReq struct {
+	Operate string `json:"operate" validate:"required,oneof=enable disable"`
+}

@@ -4,10 +4,6 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/app/dto"
-	"github.com/jinzhu/copier"
-	"golang.org/x/text/encoding"
-	"golang.org/x/text/encoding/simplifiedchinese"
 	"io"
 	"io/fs"
 	"os"
@@ -19,6 +15,11 @@ import (
 	"strings"
 	"time"
 	"unicode/utf8"
+
+	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/jinzhu/copier"
+	"golang.org/x/text/encoding"
+	"golang.org/x/text/encoding/simplifiedchinese"
 
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 
@@ -97,19 +98,25 @@ func (f *FileService) SearchUploadWithPage(req request.SearchUploadWithPage) (in
 		files    []response.UploadInfo
 		backData []response.UploadInfo
 	)
-	_ = filepath.Walk(req.Path, func(path string, info os.FileInfo, err error) error {
+	fileList, err := os.ReadDir(req.Path)
+	if err != nil {
+		return 0, files, nil
+	}
+	for _, item := range fileList {
+		if item.IsDir() {
+			continue
+		}
+		fileItem, err := item.Info()
 		if err != nil {
-			return nil
+			continue
 		}
-		if !info.IsDir() {
-			files = append(files, response.UploadInfo{
-				CreatedAt: info.ModTime().Format(constant.DateTimeLayout),
-				Size:      int(info.Size()),
-				Name:      info.Name(),
-			})
-		}
-		return nil
-	})
+		files = append(files, response.UploadInfo{
+			CreatedAt: fileItem.ModTime().Format(constant.DateTimeLayout),
+			Size:      int(fileItem.Size()),
+			Name:      item.Name(),
+		})
+	}
+
 	total, start, end := len(files), (req.Page-1)*req.PageSize, req.Page*req.PageSize
 	if start > total {
 		backData = make([]response.UploadInfo, 0)
@@ -416,6 +423,14 @@ func (f *FileService) MvFile(m request.FileMove) error {
 				global.LOG.Errorf("copy file [%s] to [%s] failed, err: %s", src, m.NewPath, err.Error())
 			}
 		}
+		if len(m.CoverPaths) > 0 {
+			for _, src := range m.CoverPaths {
+				if err := fo.CopyAndReName(src, m.NewPath, "", true); err != nil {
+					errs = append(errs, err)
+					global.LOG.Errorf("copy file [%s] to [%s] failed, err: %s", src, m.NewPath, err.Error())
+				}
+			}
+		}
 	}
 
 	var errString string
@@ -478,6 +493,7 @@ func (f *FileService) DepthDirSize(req request.DirSizeReq) ([]response.DepthDirS
 
 func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.FileLineContent, error) {
 	logFilePath := ""
+	taskStatus := ""
 	switch req.Type {
 	case constant.TypeWebsite:
 		website, err := websiteRepo.GetFirst(repo.WithByID(req.ID))
@@ -533,29 +549,55 @@ func (f *FileService) ReadLogByLine(req request.FileReadByLineReq) (*response.Fi
 			return nil, err
 		}
 		logFilePath = taskModel.LogFile
+		taskStatus = taskModel.Status
 	case "mysql-slow-logs":
 		logFilePath = path.Join(global.Dir.DataDir, fmt.Sprintf("apps/mysql/%s/data/1Panel-slow.log", req.Name))
 	case "mariadb-slow-logs":
 		logFilePath = path.Join(global.Dir.DataDir, fmt.Sprintf("apps/mariadb/%s/db/data/1Panel-slow.log", req.Name))
 	}
 
-	lines, isEndOfFile, total, err := files.ReadFileByLine(logFilePath, req.Page, req.PageSize, req.Latest)
+	file, err := os.Open(logFilePath)
 	if err != nil {
 		return nil, err
 	}
-	if req.Latest && req.Page == 1 && len(lines) < 1000 && total > 1 {
-		preLines, _, _, err := files.ReadFileByLine(logFilePath, total-1, req.PageSize, false)
+	defer file.Close()
+	stat, err := file.Stat()
+	if err != nil {
+		return nil, err
+	}
+	var (
+		lines       []string
+		isEndOfFile bool
+		total       int
+		scope       string
+	)
+
+	if stat.Size() > 500*1024*1024 {
+		lines, err = files.TailFromEnd(logFilePath, req.PageSize)
+		isEndOfFile = true
+		scope = "tail"
+	} else {
+		lines, isEndOfFile, total, err = files.ReadFileByLine(logFilePath, req.Page, req.PageSize, req.Latest)
 		if err != nil {
 			return nil, err
 		}
-		lines = append(preLines, lines...)
+		if req.Latest && req.Page == 1 && len(lines) < 1000 && total > 1 {
+			preLines, _, _, err := files.ReadFileByLine(logFilePath, total-1, req.PageSize, false)
+			if err != nil {
+				return nil, err
+			}
+			lines = append(preLines, lines...)
+		}
+		scope = "page"
 	}
+
 	res := &response.FileLineContent{
-		Content: strings.Join(lines, "\n"),
-		End:     isEndOfFile,
-		Path:    logFilePath,
-		Total:   total,
-		Lines:   lines,
+		End:        isEndOfFile,
+		Path:       logFilePath,
+		Total:      total,
+		TaskStatus: taskStatus,
+		Lines:      lines,
+		Scope:      scope,
 	}
 	return res, nil
 }

@@ -62,7 +62,6 @@ ErrHttpReqTimeOut: "请求超时 {{ .err }}"
 ErrHttpReqFailed: "请求失败 {{ .err }}"
 ErrNoSuchHost: "无法找到请求的服务器 {{ .err }}"
 ErrHttpReqNotFound: "无法找到请求的资源 {{ .err }}"
-ErrImagePullTimeOut: '镜像拉取超时'
 ErrContainerNotFound: '{{ .name }} 容器不存在'
 ErrContainerMsg: '{{ .name }} 容器异常，具体请在容器页面查看日志'
 ErrAppBackup: '{{ .name }} 应用备份失败 {{ .err }}'
@@ -155,6 +154,7 @@ ExecShellSuccess: "脚本执行成功"
 StartUpdateSystemSSL: "开始更新系统证书"
 UpdateSystemSSLSuccess: "更新系统证书成功"
 ErrWildcardDomain: "HTTP 模式无法申请泛域名证书"
+ErrApplySSLCanNotDelete: "正在申请的证书{{.name}}无法删除，请稍后再试"
 
 #mysql
 ErrUserIsExist: "当前用户已存在，请重新输入"
@@ -172,6 +172,11 @@ ErrObjectInUsed: "该对象正被使用，无法删除"
 ErrObjectBeDependent: "该镜像依赖于其他镜像，无法删除"
 ErrPortRules: "端口数目不匹配，请重新输入！"
 ErrPgImagePull: "镜像拉取超时，请配置镜像加速或手动拉取 {{ .name }} 镜像后重试"
+PruneHelper: "本次清理 {{ .name }} {{ .count }} 个，释放磁盘空间 {{ .size }}"
+ImageRemoveHelper: "删除镜像 {{ .name }} ，释放磁盘空间 {{ .size }}"
+BuildCache: "构建缓存"
+Volume: "存储卷"
+Network: "网络"
 
 #runtime
 ErrFileNotExist: "{{ .detail }} 文件不存在！请检查源文件完整性！"
@@ -289,6 +294,7 @@ TaskPull: "拉取"
 TaskCommit: "制作"
 TaskBuild: "构建"
 TaskPush: "推送"
+TaskClean: "清理"
 TaskHandle: "执行"
 Website: "网站"
 App: "应用"

@@ -62,7 +62,6 @@ ErrHttpReqTimeOut: '요청 시간이 초과되었습니다 {{ .err }}'
 ErrHttpReqFailed: '요청이 실패했습니다 {{ .err }}'
 ErrNoSuchHost: '요청한 서버 {{ .err }}을 찾을 수 없습니다'
 ErrHttpReqNotFound: '요청한 리소스 {{ .err }}을 찾을 수 없습니다.'
-ErrImagePullTimeOut: '이미지 풀링 시간 초과'
 ErrContainerNotFound: '{{ .name }} 컨테이너가 존재하지 않습니다'
 ErrContainerMsg: '{{ .name }} 컨테이너가 비정상입니다. 자세한 내용은 컨테이너 페이지의 로그를 확인하세요.'
 ErrAppBackup: '{{ .name }} 애플리케이션 백업에 실패했습니다 {{ .err }}'
@@ -156,6 +155,7 @@ ExecShellSuccess: '스크립트 실행 성공'
 StartUpdateSystemSSL: '시스템 인증서 업데이트 시작'
 UpdateSystemSSLSuccess: '시스템 인증서 업데이트가 성공적으로 완료되었습니다.'
 ErrWildcardDomain: 'HTTP 모드에서 와일드카드 도메인 이름 인증서를 신청할 수 없습니다'
+ErrApplySSLCanNotDelete: "신청 중인 인증서 {{.name}}는 삭제할 수 없습니다. 나중에 다시 시도해 주세요."
 
 #마이SQL
 ErrUserIsExist: '현재 사용자가 이미 존재합니다. 다시 입력하세요'
@@ -173,6 +173,11 @@ ErrObjectInUsed: '개체가 사용 중이므로 삭제할 수 없습니다'
 ErrObjectBeDependent: '이 이미지는 다른 이미지에 의존하므로 삭제할 수 없습니다'
 ErrPortRules: '포트 번호가 일치하지 않습니다. 다시 입력하세요!'
 ErrPgImagePull: '이미지 풀링 시간이 초과되었습니다. 이미지 가속을 구성하거나 {{ .name }} 이미지를 수동으로 풀링한 다음 다시 시도하세요.'
+PruneHelper: "이번 정리에서 {{ .name }} {{ .count }}개를 제거하여 {{ .size }} 디스크 공간을 확보했습니다"
+ImageRemoveHelper: "이미지 {{ .name }} 삭제, {{ .size }} 디스크 공간 확보"
+BuildCache: "빌드 캐시"
+Volume: "스토리지 볼륨"
+Network: "네트워크"
 
 #실행 시간
 ErrFileNotExist: '{{ .detail }} 파일이 존재하지 않습니다! 소스 파일의 무결성을 확인하세요!'
@@ -290,6 +295,7 @@ TaskPull: '당기기'
 TaskCommit: '커밋'
 TaskBuild: '빌드'
 TaskPush: '푸시'
+TaskClean: "정리"
 TaskHandle: '실행'
 Website: '웹사이트'
 App: '애플리케이션'

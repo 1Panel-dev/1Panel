@@ -62,7 +62,6 @@ ErrHttpReqTimeOut: 'Request timed out {{ .err }}'
 ErrHttpReqFailed: 'Request failed {{ .err }}'
 ErrNoSuchHost: 'Unable to find the requested server {{ .err }}'
 ErrHttpReqNotFound: 'The requested resource {{ .err }} could not be found'
-ErrImagePullTimeOut: 'Image pull timeout'
 ErrContainerNotFound: '{{ .name }} container does not exist'
 ErrContainerMsg: '{{ .name }} container is abnormal. Please check the log on the container page for details'
 ErrAppBackup: '{{ .name }} application backup failed {{ .err }}'
@@ -156,6 +155,7 @@ ExecShellSuccess: 'Script execution successful'
 StartUpdateSystemSSL: 'Start updating system certificate'
 UpdateSystemSSLSuccess: 'Update system certificate successfully'
 ErrWildcardDomain: 'Unable to apply for wildcard domain name certificate in HTTP mode'
+ErrApplySSLCanNotDelete: "The certificate {{.name}} being applied for cannot be deleted, please try again later."
 
 #mysql
 ErrUserIsExist: 'The current user already exists, please re-enter'
@@ -173,6 +173,11 @@ ErrObjectInUsed: 'The object is in use and cannot be deleted'
 ErrObjectBeDependent: 'This image depends on other images and cannot be deleted'
 ErrPortRules: 'Port number does not match, please re-enter!'
 ErrPgImagePull: 'Image pull timed out, please configure image acceleration or manually pull the {{ .name }} image and try again'
+PruneHelper: "This cleanup removed {{ .name }} {{ .count }} items, freeing {{ .size }} disk space"
+ImageRemoveHelper: "Deleted image {{ .name }}, freeing {{ .size }} disk space"
+BuildCache: "Build cache"
+Volume: "Storage volume"
+Network: "Network"
 
 #runtime
 ErrFileNotExist: '{{ .detail }} file does not exist! Please check the integrity of the source file!'
@@ -290,6 +295,7 @@ TaskPull: 'Pull'
 TaskCommit: 'Commit'
 TaskBuild: 'Build'
 TaskPush: 'Push'
+TaskClean: "Cleanup"
 TaskHandle: 'Execute'
 Website: 'Website'
 App: 'Application'

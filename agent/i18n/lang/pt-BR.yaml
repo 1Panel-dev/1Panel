@@ -62,7 +62,6 @@ ErrHttpReqTimeOut: 'Tempo limite da solicitação esgotado {{ .err }}'
 ErrHttpReqFailed: 'Falha na solicitação {{ .err }}'
 ErrNoSuchHost: 'Não foi possível encontrar o servidor solicitado {{ .err }}'
 ErrHttpReqNotFound: 'O recurso solicitado {{ .err }} não pôde ser encontrado'
-ErrImagePullTimeOut: 'Tempo limite de extração de imagem'
 ErrContainerNotFound: '{{ .name }} container não existe'
 ErrContainerMsg: 'O contêiner {{ .name }} está anormal. Por favor, verifique o log na página do contêiner para obter detalhes.'
 ErrAppBackup: '{{ .name }} falha no backup do aplicativo {{ .err }}'
@@ -156,6 +155,7 @@ ExecShellSuccess: 'Execução do script bem-sucedida'
 StartUpdateSystemSSL: 'Iniciar atualização do certificado do sistema'
 UpdateSystemSSLSuccess: 'Atualizar certificado do sistema com sucesso'
 ErrWildcardDomain: 'Não é possível solicitar certificado de nome de domínio curinga no modo HTTP'
+ErrApplySSLCanNotDelete: "O certificado {{.name}} que está sendo solicitado não pode ser excluído, tente novamente mais tarde."
 
 #mysql
 ErrUserIsExist: 'O usuário atual já existe, digite novamente'
@@ -173,6 +173,11 @@ ErrObjectInUsed: 'O objeto está em uso e não pode ser excluído'
 ErrObjectBeDependent: 'Esta imagem depende de outras imagens e não pode ser excluída'
 ErrPortRules: 'O número da porta não corresponde, digite novamente!'
 ErrPgImagePull: 'Tempo limite para extração de imagem. Configure a aceleração de imagem ou extraia manualmente a imagem {{ .name }} e tente novamente'
+PruneHelper: "Esta limpeza removeu {{ .name }} {{ .count }} itens, liberando {{ .size }} de espaço em disco"
+ImageRemoveHelper: "Excluída a imagem {{ .name }}, liberando {{ .size }} de espaço em disco"
+BuildCache: "Cache de construção"
+Volume: "Volume de armazenamento"
+Network: "Rede"
 
 #tempo de execução
 ErrFileNotExist: 'O arquivo {{ .detail }} não existe! Verifique a integridade do arquivo de origem!'
@@ -290,6 +295,7 @@ TaskPull: 'Puxar'
 TaskCommit: 'Commit'
 TaskBuild: 'Construir'
 TaskPush: 'Empurrar'
+TaskClean: "Limpeza"
 TaskHandle: 'Executar'
 Website: 'Site'
 App: 'Aplicativo'

@@ -706,6 +706,9 @@ const message = {
             importMcpJsonError: 'mcpServers structure is incorrect',
             bindDomainHelper:
                 'After binding the website, it will modify the access address of all installed MCP Servers and close external access to the ports',
+            outputTransport: 'Output Type',
+            streamableHttpPath: 'Streaming Path',
+            streamableHttpPathHelper: 'For example: /mcp, note that it should not overlap with other Servers',
         },
     },
     container: {
@@ -991,6 +994,7 @@ const message = {
         create: 'Create cron job',
         edit: 'Edit cron job',
         errImport: 'File content exception:',
+        errImportFormat: 'The scheduled task data or format is abnormal. Please check and try again!',
         importHelper:
             'Duplicate scheduled tasks will be automatically skipped during import. Tasks will be set to [Disabled] status by default, and set to [Pending Edit] status when data association is abnormal.',
         changeStatus: 'Change status',
@@ -1523,12 +1527,18 @@ const message = {
         passwordAuthentication: 'Password auth',
         pwdAuthHelper: 'Whether to enable password authentication. This parameter is enabled by default.',
         pubkeyAuthentication: 'Key auth',
-        key: 'Key',
+        privateKey: 'Private Key',
+        publicKey: 'Public Key',
         password: 'Password',
+        createMode: 'Creation Method',
+        generate: 'Auto-generate',
+        unSyncPass: 'Key password cannot be synchronized',
+        input: 'Manual Input',
+        import: 'File Upload',
         pubkey: 'Key info',
+        pubKeyHelper: 'The current key information only takes effect for user {0}',
         encryptionMode: 'Encryption mode',
         passwordHelper: 'Can contain 6 to 10 digits and English cases',
-        generate: 'Generate key',
         reGenerate: 'Regenerate key',
         keyAuthHelper: 'Whether to enable key authentication.',
         useDNS: 'useDNS',
@@ -2565,6 +2575,8 @@ const message = {
             'Scripts to execute before compilation, usually for downloading module source code, installing dependencies, etc.',
         buildHelper:
             'Click build after adding/modifying a module. OpenResty will automatically restart upon successful build.',
+        defaultHttps: 'HTTPS Anti-tampering',
+        defaultHttpsHelper1: 'Enabling this can resolve HTTPS tampering issues.',
     },
     ssl: {
         create: 'Request',

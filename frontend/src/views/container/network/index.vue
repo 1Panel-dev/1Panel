@@ -88,6 +88,7 @@
         <OpDialog ref="opRef" @search="search" />
         <CodemirrorDrawer ref="myDetail" />
         <CreateDialog @search="search" ref="dialogCreateRef" />
+        <TaskLog ref="taskLogRef" width="70%" @close="search" />
     </div>
 </template>
 
@@ -95,16 +96,17 @@
 import CreateDialog from '@/views/container/network/create/index.vue';
 import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
 import { reactive, ref } from 'vue';
-import { dateFormat } from '@/utils/util';
+import { dateFormat, newUUID } from '@/utils/util';
 import { deleteNetwork, searchNetwork, inspect, containerPrune } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
+import TaskLog from '@/components/log/task/index.vue';
 import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
-import { MsgSuccess } from '@/utils/message';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 
 const loading = ref();
 const myDetail = ref();
+const taskLogRef = ref();
 
 const data = ref();
 const selects = ref<any>([]);
@@ -136,19 +138,22 @@ const onClean = () => {
     }).then(async () => {
         loading.value = true;
         let params = {
+            taskID: newUUID(),
             pruneType: 'network',
             withTagAll: false,
         };
         await containerPrune(params)
-            .then((res) => {
+            .then(() => {
                 loading.value = false;
-                MsgSuccess(i18n.global.t('container.cleanSuccess', [res.data.deletedNumber]));
-                search();
+                openTaskLog(params.taskID);
             })
             .catch(() => {
                 loading.value = false;
             });
     });
+};
+const openTaskLog = (taskID: string) => {
+    taskLogRef.value.openWithTaskID(taskID);
 };
 
 function selectable(row) {

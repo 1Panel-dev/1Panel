@@ -174,13 +174,9 @@ type ContainerCommit struct {
 }
 
 type ContainerPrune struct {
+	TaskID     string `json:"taskID"`
 	PruneType  string `json:"pruneType" validate:"required,oneof=container image volume network buildcache"`
 	WithTagAll bool   `json:"withTagAll"`
-}
-
-type ContainerPruneReport struct {
-	DeletedNumber  int `json:"deletedNumber"`
-	SpaceReclaimed int `json:"spaceReclaimed"`
 }
 
 type Network struct {
@@ -227,8 +223,9 @@ type VolumeCreate struct {
 }
 
 type BatchDelete struct {
-	Force bool     `json:"force"`
-	Names []string `json:"names" validate:"required"`
+	TaskID string   `json:"taskID"`
+	Force  bool     `json:"force"`
+	Names  []string `json:"names" validate:"required"`
 }
 
 type ComposeInfo struct {

@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/utils/nginx"
+	"github.com/1Panel-dev/1Panel/agent/utils/nginx/parser"
 	"io"
 	"net/http"
 	"os"
@@ -42,6 +44,9 @@ type INginxService interface {
 	Build(req request.NginxBuildReq) error
 	GetModules() (*response.NginxBuildConfig, error)
 	UpdateModule(req request.NginxModuleUpdate) error
+
+	OperateDefaultHTTPs(req request.NginxOperateReq) error
+	GetDefaultHttpsStatus() (*response.NginxConfigRes, error)
 }
 
 func NewINginxService() INginxService {
@@ -347,4 +352,71 @@ func (n NginxService) UpdateModule(req request.NginxModuleUpdate) error {
 		return err
 	}
 	return fileOp.SaveFileWithByte(moduleConfigPath, moduleByte, constant.DirPerm)
+}
+
+func (n NginxService) OperateDefaultHTTPs(req request.NginxOperateReq) error {
+	appInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return err
+	}
+	websites, _ := websiteRepo.List()
+	hasDefaultWebsite := false
+	for _, website := range websites {
+		if website.DefaultServer {
+			hasDefaultWebsite = true
+			break
+		}
+	}
+	defaultConfigPath := path.Join(appInstall.GetPath(), "conf", "default", "00.default.conf")
+	content, err := os.ReadFile(defaultConfigPath)
+	if err != nil {
+		return err
+	}
+	if req.Operate == "enable" {
+		if err := handleSSLConfig(&appInstall, hasDefaultWebsite); err != nil {
+			return err
+		}
+	} else if req.Operate == "disable" {
+		defaultConfig, err := parser.NewStringParser(string(content)).Parse()
+		if err != nil {
+			return err
+		}
+		defaultConfig.FilePath = defaultConfigPath
+		defaultServer := defaultConfig.FindServers()[0]
+		defaultServer.RemoveListen(fmt.Sprintf("%d", appInstall.HttpsPort))
+		defaultServer.RemoveListen(fmt.Sprintf("[::]:%d", appInstall.HttpsPort))
+		defaultServer.RemoveDirective("include", []string{"/usr/local/openresty/nginx/conf/ssl/root_ssl.conf"})
+		defaultServer.RemoveDirective("http2", []string{"on"})
+		if err = nginx.WriteConfig(defaultConfig, nginx.IndentedStyle); err != nil {
+			return err
+		}
+	}
+	return nginxCheckAndReload(string(content), defaultConfigPath, appInstall.ContainerName)
+}
+
+func (n NginxService) GetDefaultHttpsStatus() (*response.NginxConfigRes, error) {
+	appInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return nil, err
+	}
+	defaultConfigPath := path.Join(appInstall.GetPath(), "conf", "default", "00.default.conf")
+	content, err := os.ReadFile(defaultConfigPath)
+	if err != nil {
+		return nil, err
+	}
+	defaultConfig, err := parser.NewStringParser(string(content)).Parse()
+	if err != nil {
+		return nil, err
+	}
+	defaultConfig.FilePath = defaultConfigPath
+	defaultServer := defaultConfig.FindServers()[0]
+	res := &response.NginxConfigRes{}
+	for _, directive := range defaultServer.GetDirectives() {
+		if directive.GetName() == "include" && directive.GetParameters()[0] == "/usr/local/openresty/nginx/conf/ssl/root_ssl.conf" {
+			return &response.NginxConfigRes{
+				Https: true,
+			}, nil
+		}
+	}
+	return res, nil
 }

@@ -137,6 +137,8 @@ export namespace AI {
         hostIP: string;
         protocol: string;
         url: string;
+        outputTransport: string;
+        streamableHttpPath: string;
     }
 
     export interface McpServerSearch extends ReqPage {

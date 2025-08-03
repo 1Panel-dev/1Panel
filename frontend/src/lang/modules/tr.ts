@@ -716,6 +716,9 @@ const message = {
             importMcpJsonError: 'mcpServers yapısı yanlış',
             bindDomainHelper:
                 'Web sitesini bağladıktan sonra, kurulu tüm MCP Sunucularının erişim adresini değiştirecek ve portlara harici erişimi kapatacaktır',
+            outputTransport: 'Çıktı Türü',
+            streamableHttpPath: 'Akış Yolu',
+            streamableHttpPathHelper: 'Örneğin: /mcp, diğer Sunucularla çakışmaması gerektiğine dikkat edin',
         },
     },
     container: {
@@ -1003,6 +1006,7 @@ const message = {
         create: 'Cron görevi oluştur',
         edit: 'Cron görevini düzenle',
         errImport: 'Dosya içeriği anormal:',
+        errImportFormat: 'Zamanlanmış görev verileri veya biçimi anormal. Lütfen kontrol edip tekrar deneyin!',
         importHelper:
             'İçe aktarım sırasında aynı isimli zamanlanmış görevler otomatik olarak atlanacaktır. Görevler varsayılan olarak 【Devre Dışı】 durumuna ayarlanır ve veri ilişkilendirme anormalse 【Düzenleme Bekliyor】 durumuna ayarlanır.',
         changeStatus: 'Durumu değiştir',
@@ -1541,12 +1545,18 @@ const message = {
         pwdAuthHelper:
             'Parola kimlik doğrulamasının etkinleştirilip etkinleştirilmeyeceği. Bu parametre varsayılan olarak etkindir.',
         pubkeyAuthentication: 'Anahtar kimlik doğrulaması',
-        key: 'Anahtar',
+        privateKey: 'Özel Anahtar',
+        publicKey: 'Genel Anahtar',
         password: 'Parola',
+        createMode: 'Oluşturma Yöntemi',
+        generate: 'Otomatik Oluştur',
+        unSyncPass: 'Anahtar parolası senkronize edilemez',
+        input: 'Manuel Giriş',
+        import: 'Dosya Yükleme',
         pubkey: 'Anahtar bilgisi',
+        pubKeyHelper: 'Mevcut anahtar bilgileri yalnızca {0} kullanıcısı için geçerlidir',
         encryptionMode: 'Şifreleme modu',
         passwordHelper: '6 ila 10 hane ve İngilizce harfler içerebilir',
-        generate: 'Anahtar oluştur',
         reGenerate: 'Anahtarı yeniden oluştur',
         keyAuthHelper: 'Anahtar kimlik doğrulamasının etkinleştirilip etkinleştirilmeyeceği.',
         useDNS: 'DNS kullanımı',
@@ -2596,6 +2606,8 @@ const message = {
             'Derlemeden önce çalıştırılacak betikler, genellikle modül kaynak kodunu indirmek, bağımlılıkları kurmak vb. için',
         buildHelper:
             'Modül ekledikten/düzenledikten sonra oluştur’a tıklayın. OpenResty, başarılı oluşturma üzerine otomatik olarak yeniden başlatılacaktır.',
+        defaultHttps: 'HTTPS Anti-sızdırma',
+        defaultHttpsHelper1: 'Bu özelliği etkinleştirerek HTTPS sızdırma sorunlarını çözebilirsiniz.',
     },
     ssl: {
         create: 'İstek',

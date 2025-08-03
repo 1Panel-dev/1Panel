@@ -33,6 +33,7 @@ func InitAgentDB() {
 		migrations.InitAlertConfig,
 		migrations.AddMethodToAlertLog,
 		migrations.AddMethodToAlertTask,
+		migrations.UpdateMcpServer,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

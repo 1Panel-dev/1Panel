@@ -650,7 +650,11 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		}
 		dockerCLi, _ := docker.NewClient()
 		if req.PullImage {
-			images, err := composeV2.GetDockerComposeImagesV2(content, []byte(detail.DockerCompose))
+			composeContent := []byte(detail.DockerCompose)
+			if req.DockerCompose != "" {
+				composeContent = []byte(req.DockerCompose)
+			}
+			images, err := composeV2.GetDockerComposeImagesV2(content, composeContent)
 			if err != nil {
 				return err
 			}
@@ -1028,7 +1032,6 @@ func upApp(task *task.Task, appInstall *model.AppInstall, pullImages bool) error
 			errMsg string
 		)
 		if pullImages && appInstall.App.Type != "php" {
-			//projectName := strings.ToLower(appInstall.Name)
 			envByte, err := files.NewFileOp().GetContent(appInstall.GetEnvPath())
 			if err != nil {
 				return err
@@ -1058,8 +1061,8 @@ func upApp(task *task.Task, appInstall *model.AppInstall, pullImages bool) error
 						if strings.Contains(errOur, "no such host") {
 							errMsg = i18n.GetMsgByKey("ErrNoSuchHost") + ":"
 						}
-						if strings.Contains(errOur, "timeout") {
-							errMsg = i18n.GetMsgByKey("ErrImagePullTimeOut") + ":"
+						if strings.Contains(errOur, "Error response from daemon") {
+							errMsg = i18n.GetMsgByKey("PullImageTimeout") + ":"
 						}
 					}
 					appInstall.Message = errMsg + errOur
@@ -1764,6 +1767,10 @@ func ignoreUpdate(installed model.AppInstall) bool {
 	if installed.App.Type == "php" || installed.Status == constant.StatusInstalling {
 		return true
 	}
+	ignores, _ := appIgnoreUpgradeRepo.List(appDetailRepo.WithAppId(installed.AppId), appIgnoreUpgradeRepo.WithScope("all"))
+	if len(ignores) > 0 {
+		return true
+	}
 	if installed.App.Key == constant.AppMysql {
 		majorVersion := getMajorVersion(installed.Version)
 		appDetails, _ := appDetailRepo.GetBy(appDetailRepo.WithAppId(installed.App.ID))
@@ -1774,8 +1781,7 @@ func ignoreUpdate(installed model.AppInstall) bool {
 		}
 		return true
 	}
-	ignores, _ := appIgnoreUpgradeRepo.List(appDetailRepo.WithAppId(installed.AppId), appIgnoreUpgradeRepo.WithScope("all"))
-	return len(ignores) > 0
+	return false
 }
 
 func RequestDownloadCallBack(downloadCallBackUrl string) {
@@ -1898,4 +1904,60 @@ func handleSSLConfig(appInstall *model.AppInstall, hasDefaultWebsite bool) error
 		return err
 	}
 	return nil
+}
+
+func SyncTags(remoteProperties dto.ExtraProperties) error {
+	tx, ctx := getTxAndContext()
+	defer tx.Rollback()
+	localTags, _ := tagRepo.All()
+	localTagsMap := make(map[string]*model.Tag)
+	for i := range localTags {
+		localTagsMap[localTags[i].Key] = &localTags[i]
+	}
+	var err error
+	remoteTagsMap := make(map[string]*dto.Tag)
+	for i := range remoteProperties.Tags {
+		remoteTagsMap[remoteProperties.Tags[i].Key] = &remoteProperties.Tags[i]
+	}
+
+	for key, localTag := range localTagsMap {
+		if _, exists := remoteTagsMap[key]; !exists {
+			_ = tagRepo.DeleteByID(ctx, localTag.ID)
+		}
+	}
+
+	for _, remoteTag := range remoteProperties.Tags {
+		translations, _ := json.Marshal(remoteTag.Locales)
+
+		if existTag, exists := localTagsMap[remoteTag.Key]; exists {
+			if needsUpdate(existTag, remoteTag, string(translations)) {
+				existTag.Name = remoteTag.Name
+				existTag.Sort = remoteTag.Sort
+				existTag.Translations = string(translations)
+
+				if err = tagRepo.Save(ctx, existTag); err != nil {
+					return err
+				}
+			}
+		} else {
+			newTag := &model.Tag{
+				Key:          remoteTag.Key,
+				Name:         remoteTag.Name,
+				Sort:         remoteTag.Sort,
+				Translations: string(translations),
+			}
+			if err = tagRepo.Create(ctx, newTag); err != nil {
+				return err
+			}
+		}
+	}
+
+	tx.Commit()
+	return nil
+}
+
+func needsUpdate(localTag *model.Tag, remoteTag dto.Tag, translations string) bool {
+	return localTag.Name != remoteTag.Name ||
+		localTag.Sort != remoteTag.Sort ||
+		localTag.Translations != translations
 }

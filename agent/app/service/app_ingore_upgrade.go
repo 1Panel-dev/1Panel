@@ -40,7 +40,7 @@ func (a AppIgnoreUpgradeService) List() ([]response.AppIgnoreUpgradeDTO, error) 
 			_ = appIgnoreUpgradeRepo.Delete(repo.WithByID(ignore.ID))
 			continue
 		}
-		dto.Icon = app.Icon
+		dto.Name = app.Name
 		if ignore.Scope == "version" {
 			appDetail, err := appDetailRepo.GetFirst(repo.WithByID(ignore.AppDetailID))
 			if errors.Is(err, gorm.ErrRecordNotFound) {

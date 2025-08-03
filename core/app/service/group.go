@@ -116,8 +116,6 @@ func (u *GroupService) Delete(id uint) error {
 		if err := xpack.UpdateGroup("node", id, defaultGroup.ID); err != nil {
 			return err
 		}
-	default:
-		return buserr.New("ErrNotSupportType")
 	}
 	if err != nil {
 		return err

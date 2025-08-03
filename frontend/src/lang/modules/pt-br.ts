@@ -701,6 +701,9 @@ const message = {
             importMcpJsonError: 'A estrutura mcpServers está incorreta',
             bindDomainHelper:
                 'Após vincular o site, ele modificará o endereço de acesso de todos os servidores MCP instalados e fechará o acesso externo às portas',
+            outputTransport: 'Tipo de Saída',
+            streamableHttpPath: 'Caminho de Streaming',
+            streamableHttpPathHelper: 'Por exemplo: /mcp, certifique-se de que não se sobreponha a outros Servidores',
         },
     },
     container: {
@@ -978,6 +981,8 @@ const message = {
         create: 'Criar tarefa cron',
         edit: 'Editar tarefa cron',
         errImport: 'Conteúdo do arquivo anormal:',
+        errImportFormat:
+            'Os dados ou formato da tarefa agendada estão anormais. Por favor, verifique e tente novamente!',
         importHelper:
             'Tarefas agendadas duplicadas serão automaticamente ignoradas durante a importação. As tarefas serão definidas como status 【Desativado】 por padrão, e como status 【Aguardando Edição】 quando a associação de dados for anormal.',
         changeStatus: 'Alterar status',
@@ -1496,12 +1501,18 @@ const message = {
         passwordAuthentication: 'Autenticação por senha',
         pwdAuthHelper: 'Se deve ou não habilitar a autenticação por senha. Esse parâmetro está habilitado por padrão.',
         pubkeyAuthentication: 'Autenticação por chave',
-        key: 'Chave',
+        privateKey: 'Chave Privada',
+        publicKey: 'Chave Pública',
         password: 'Senha',
+        createMode: 'Método de Criação',
+        generate: 'Gerar Automaticamente',
+        unSyncPass: 'Senha da chave não pode ser sincronizada',
+        input: 'Entrada Manual',
+        import: 'Upload de Arquivo',
         pubkey: 'Informações da chave',
+        pubKeyHelper: 'A informação da chave atual só tem efeito para o usuário {0}',
         encryptionMode: 'Modo de criptografia',
         passwordHelper: 'Pode conter de 6 a 10 dígitos e letras maiúsculas e minúsculas',
-        generate: 'Gerar chave',
         reGenerate: 'Regenerar chave',
         keyAuthHelper: 'Se deve ou não habilitar a autenticação por chave.',
         useDNS: 'Usar DNS',
@@ -2521,6 +2532,24 @@ const message = {
         clearProxyCache: 'Clean reverse proxy cache',
         clearProxyCacheWarn:
             'All websites that have configured with cache will be affected and "OpenResty" will be restarted. Do you want to continue?',
+        create: 'Criar Módulo',
+        update: 'Editar Módulo',
+        params: 'Parâmetros',
+        packages: 'Pacotes',
+        script: 'Script',
+        module: 'Módulo',
+        build: 'Construir',
+        buildWarn:
+            'Construir OpenResty requer a reserva de certa quantidade de CPU e memória, e o processo pode ser demorado, por favor, seja paciente.',
+        mirrorUrl: 'Fonte de Software',
+        paramsHelper: 'Por exemplo: --add-module=/tmp/ngx_brotli',
+        packagesHelper: 'Por exemplo: git,curl separados por vírgulas',
+        scriptHelper:
+            'Script a ser executado antes da compilação, geralmente para baixar o código-fonte do módulo, instalar dependências, etc.',
+        buildHelper:
+            'Clique em Construir após adicionar/modificar um módulo. Construção bem-sucedida reiniciará automaticamente o OpenResty.',
+        defaultHttps: 'HTTPS Anti-tampering',
+        defaultHttpsHelper1: 'A ativação desta opção pode resolver problemas de adulteração HTTPS.',
     },
     ssl: {
         create: 'Solicitar',

@@ -178,7 +178,7 @@ const changeNode = (command: string) => {
         globalStore.currentNode = command || 'local';
         globalStore.currentNodeAddr = '';
         loadProductProFromDB();
-        router.push({ name: 'home' });
+        router.push({ name: 'home', query: { t: Date.now() } });
         return;
     }
     for (const item of nodes.value) {
@@ -198,7 +198,7 @@ const changeNode = (command: string) => {
             globalStore.currentNode = command || 'local';
             globalStore.currentNodeAddr = item.addr;
             loadProductProFromDB();
-            router.push({ name: 'home' });
+            router.push({ name: 'home', query: { t: Date.now() } });
         }
     }
 };

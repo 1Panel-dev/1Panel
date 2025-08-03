@@ -62,7 +62,6 @@ ErrHttpReqTimeOut: 'リクエストがタイムアウトしました {{ .err }}'
 ErrHttpReqFailed: 'リクエストが失敗しました {{ .err }}'
 ErrNoSuchHost: '要求されたサーバー {{ .err }} が見つかりません'
 ErrHttpReqNotFound: '要求されたリソース {{ .err }} が見つかりませんでした'
-ErrImagePullTimeOut: 'イメージ プル タイムアウト'
 ErrContainerNotFound: '{{ .name }} コンテナが存在しません'
 ErrContainerMsg: '{{ .name }} コンテナが異常です。詳細についてはコンテナページのログを確認してください。'
 ErrAppBackup: '{{ .name }} アプリケーションのバックアップに失敗しました。エラー {{ .err }}'
@@ -156,6 +155,7 @@ ExecShellSuccess: 'スクリプトの実行が成功しました'
 StartUpdateSystemSSL: 'システム証明書の更新を開始します'
 UpdateSystemSSLSuccess: 'システム証明書を正常に更新しました'
 ErrWildcardDomain: 'HTTP モードでワイルドカード ドメイン名証明書を申請できません'
+ErrApplySSLCanNotDelete: "申請中の証明書 {{.name}} は削除できません。しばらくしてからもう一度お試しください。"
 
 #mysql
 ErrUserIsExist: '現在のユーザーは既に存在します。再入力してください'
@@ -173,6 +173,11 @@ ErrObjectInUsed: 'オブジェクトは使用中のため削除できません'
 ErrObjectBeDependent: 'このイメージは他のイメージに依存しているため、削除できません'
 ErrPortRules: 'ポート番号が一致しません。再入力してください。'
 ErrPgImagePull: 'イメージのプルがタイムアウトしました。イメージのアクセラレーションを設定するか、{{ .name }} イメージを手動でプルして再試行してください'
+PruneHelper: "今回のクリーンアップで{{ .name }} {{ .count }}個を削除し、{{ .size }}のディスク領域を解放しました"
+ImageRemoveHelper: "イメージ{{ .name }}を削除し、{{ .size }}のディスク領域を解放しました"
+BuildCache: "ビルドキャッシュ"
+Volume: "ストレージボリューム"
+Network: "ネットワーク"
 
 #runtime
 ErrFileNotExist: '{{ .detail }} ファイルが存在しません。ソース ファイルの整合性を確認してください。'
@@ -290,6 +295,7 @@ TaskPull: 'プル'
 TaskCommit: 'コミット'
 TaskBuild: 'ビルド'
 TaskPush: 'プッシュ'
+TaskClean: "クリーンアップ"
 TaskHandle: '実行'
 Website: 'ウェブサイト'
 App: 'アプリケーション'

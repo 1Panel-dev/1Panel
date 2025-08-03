@@ -21,5 +21,7 @@ func (a *NginxRouter) InitRouter(Router *gin.RouterGroup) {
 		groupRouter.POST("/build", baseApi.BuildNginx)
 		groupRouter.POST("/modules/update", baseApi.UpdateNginxModule)
 		groupRouter.GET("/modules", baseApi.GetNginxModules)
+		groupRouter.POST("/https", baseApi.OperateDefaultHTTPs)
+		groupRouter.GET("/https", baseApi.GetDefaultHTTPsStatus)
 	}
 }

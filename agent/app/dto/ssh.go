@@ -19,12 +19,27 @@ type SSHInfo struct {
 	PubkeyAuthentication   string `json:"pubkeyAuthentication"`
 	PermitRootLogin        string `json:"permitRootLogin"`
 	UseDNS                 string `json:"useDNS"`
+	CurrentUser            string `json:"currentUser"`
 }
 
-type GenerateSSH struct {
-	EncryptionMode string `json:"encryptionMode" validate:"required,oneof=rsa ed25519 ecdsa dsa"`
-	Password       string `json:"password"`
+type CreateRootCert struct {
 	Name           string `json:"name"`
+	Mode           string `json:"mode"`
+	EncryptionMode string `json:"encryptionMode" validate:"required,oneof=rsa ed25519 ecdsa dsa"`
+	PassPhrase     string `json:"passPhrase"`
+	PublicKey      string `json:"publicKey"`
+	PrivateKey     string `json:"privateKey"`
+	Description    string `json:"description"`
+}
+type RootCert struct {
+	ID             uint      `json:"id"`
+	CreatedAt      time.Time `json:"createdAt"`
+	Name           string    `json:"name"`
+	EncryptionMode string    `json:"encryptionMode"`
+	PassPhrase     string    `json:"passPhrase"`
+	PublicKey      string    `json:"publicKey"`
+	PrivateKey     string    `json:"privateKey"`
+	Description    string    `json:"description"`
 }
 
 type GenerateLoad struct {

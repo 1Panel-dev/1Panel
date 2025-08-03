@@ -6,9 +6,10 @@ import (
 
 type PageCronjob struct {
 	PageInfo
-	Info    string `json:"info"`
-	OrderBy string `json:"orderBy" validate:"required,oneof=name status createdAt"`
-	Order   string `json:"order" validate:"required,oneof=null ascending descending"`
+	Info     string `json:"info"`
+	GroupIDs []uint `json:"groupIDs"`
+	OrderBy  string `json:"orderBy" validate:"required,oneof=name status createdAt"`
+	Order    string `json:"order" validate:"required,oneof=null ascending descending"`
 }
 
 type CronjobSpec struct {
@@ -19,6 +20,7 @@ type CronjobOperate struct {
 	ID         uint   `json:"id"`
 	Name       string `json:"name" validate:"required"`
 	Type       string `json:"type" validate:"required"`
+	GroupID    uint   `json:"groupID"`
 	SpecCustom bool   `json:"specCustom"`
 	Spec       string `json:"spec" validate:"required"`
 
@@ -85,6 +87,7 @@ type CronjobInfo struct {
 	ID         uint   `json:"id"`
 	Name       string `json:"name"`
 	Type       string `json:"type"`
+	GroupID    uint   `json:"groupID"`
 	SpecCustom bool   `json:"specCustom"`
 	Spec       string `json:"spec"`
 
@@ -129,6 +132,7 @@ type CronjobImport struct {
 type CronjobTrans struct {
 	Name       string `json:"name"`
 	Type       string `json:"type"`
+	GroupID    uint   `json:"groupID"`
 	SpecCustom bool   `json:"specCustom"`
 	Spec       string `json:"spec"`
 
@@ -151,12 +155,12 @@ type CronjobTrans struct {
 	IsDir     bool   `json:"isDir"`
 	SourceDir string `json:"sourceDir"`
 
-	RetainCopies uint64 `json:"retainCopies"`
-	RetryTimes   uint   `json:"retryTimes"`
-	Timeout      uint   `json:"timeout"`
-	IgnoreErr    bool   `json:"ignoreErr"`
-	SnapshotRule string `json:"snapshotRule"`
-	Secret       string `json:"secret"`
+	RetainCopies uint64              `json:"retainCopies"`
+	RetryTimes   uint                `json:"retryTimes"`
+	Timeout      uint                `json:"timeout"`
+	IgnoreErr    bool                `json:"ignoreErr"`
+	SnapshotRule SnapshotTransHelper `json:"snapshotRule"`
+	Secret       string              `json:"secret"`
 
 	SourceAccounts  []string `json:"sourceAccounts"`
 	DownloadAccount string   `json:"downloadAccount"`
@@ -168,6 +172,10 @@ type CronjobTrans struct {
 type TransHelper struct {
 	Name       string `json:"name"`
 	DetailName string `json:"detailName"`
+}
+type SnapshotTransHelper struct {
+	WithImage  bool          `json:"withImage"`
+	IgnoreApps []TransHelper `json:"ignoreApps"`
 }
 
 type ScriptOptions struct {

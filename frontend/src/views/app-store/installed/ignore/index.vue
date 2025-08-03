@@ -1,29 +1,22 @@
 <template>
     <DrawerPro v-model="open" :header="$t('app.ignoreList')" @close="handleClose" size="small">
         <template #content>
-            <el-row :gutter="5">
-                <el-col v-for="(app, index) in apps" :key="index">
-                    <el-card class="app-margin">
-                        <el-row :gutter="20">
-                            <el-col :span="6">
-                                <el-avatar shape="square" :size="60" :src="'data:image/png;base64,' + app.icon" />
-                            </el-col>
-                            <el-col :span="12">
-                                <span>{{ app.name }}</span>
-                                <div>
-                                    <el-tag v-if="app.version != ''">{{ app.version }}</el-tag>
-                                    <el-tag v-else>{{ $t('commons.table.all') + $t('app.version') }}</el-tag>
-                                </div>
-                            </el-col>
-                            <el-col :span="6">
-                                <el-button type="primary" link @click="cancelIgnore(app.ID)">
-                                    {{ $t('app.cancelIgnore') }}
-                                </el-button>
-                            </el-col>
-                        </el-row>
-                    </el-card>
-                </el-col>
-            </el-row>
+            <el-table :data="apps">
+                <el-table-column prop="name" :label="$t('app.app')" />
+                <el-table-column prop="scope" :label="$t('license.trialInfo')">
+                    <template #default="{ row }">
+                        <el-tag v-if="row.version != ''">{{ row.version }}</el-tag>
+                        <el-tag v-else>{{ $t('commons.table.all') + $t('app.version') }}</el-tag>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="scope" :label="$t('commons.table.operate')">
+                    <template #default="{ row }">
+                        <el-button type="primary" link @click="cancelIgnore(row.ID)">
+                            {{ $t('app.cancelIgnore') }}
+                        </el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
         </template>
         <template #footer>
             <span class="dialog-footer">
@@ -58,6 +51,7 @@ const getApps = async () => {
     try {
         const res = await getIgnoredApp();
         apps.value = res.data;
+        console.log(apps.value);
     } catch (error) {}
 };
 

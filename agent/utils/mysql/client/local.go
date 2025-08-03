@@ -253,7 +253,12 @@ func (r *Local) Backup(info BackupInfo) error {
 func (r *Local) Recover(info RecoverInfo) error {
 	fi, _ := os.Open(info.SourceFile)
 	defer fi.Close()
-	cmd := exec.Command("docker", "exec", "-i", r.ContainerName, r.Type, "-uroot", "-p"+r.Password, "--default-character-set="+info.Format, info.Name)
+	mysqlCli := r.Type
+	if mysqlCli == "mysql-cluster" {
+		mysqlCli = "mysql"
+	}
+
+	cmd := exec.Command("docker", "exec", "-i", r.ContainerName, mysqlCli, "-uroot", "-p"+r.Password, "--default-character-set="+info.Format, info.Name)
 	if strings.HasSuffix(info.SourceFile, ".gz") {
 		gzipFile, err := os.Open(info.SourceFile)
 		if err != nil {
@@ -271,7 +276,7 @@ func (r *Local) Recover(info RecoverInfo) error {
 	}
 	stdout, err := cmd.CombinedOutput()
 	stdStr := strings.ReplaceAll(string(stdout), "mysql: [Warning] Using a password on the command line interface can be insecure.\n", "")
-	if err != nil || strings.HasPrefix(string(stdStr), "ERROR ") {
+	if err != nil || strings.HasPrefix(stdStr, "ERROR ") {
 		return errors.New(stdStr)
 	}
 

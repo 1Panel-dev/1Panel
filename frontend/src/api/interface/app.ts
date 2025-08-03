@@ -283,7 +283,7 @@ export namespace App {
         name: string;
         detailID: number;
         version: string;
-        icon: string;
+        scope: string;
     }
 
     export interface AppUpdateVersionReq {

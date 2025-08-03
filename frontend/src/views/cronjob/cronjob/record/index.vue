@@ -30,10 +30,15 @@
                         <Status class="mt-0.5" :status="dialogData.rowData.status" />
                     </div>
                     <div class="mt-0.5">
-                        <el-button type="primary" @click="onHandle(dialogData.rowData)" link>
+                        <el-button
+                            type="primary"
+                            :disabled="dialogData.rowData.status === 'Pending'"
+                            @click="onHandle(dialogData.rowData)"
+                            link
+                        >
                             {{ $t('commons.button.handle') }}
                         </el-button>
-                        <el-divider direction="vertical" />
+                        <el-divider direction="vertical" v-if="dialogData.rowData.status !== 'Pending'" />
                         <el-button
                             type="primary"
                             v-if="dialogData.rowData.status === 'Enable'"
@@ -343,6 +348,13 @@ const search = async (changeToLatest: boolean) => {
     }
     if (changeToLatest) {
         currentRecord.value = records.value[0];
+        return;
+    }
+    for (const item of records.value) {
+        if (item.id === currentRecord.value.id) {
+            currentRecord.value = item;
+            break;
+        }
     }
 };
 

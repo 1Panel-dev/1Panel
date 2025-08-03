@@ -112,6 +112,7 @@ const loading = ref(false);
 const dialogVisible = ref(false);
 const form = reactive({
     status: '',
+    type: '',
     systemIP: '',
     password: '',
     serviceName: '',
@@ -132,11 +133,13 @@ const formRef = ref<FormInstance>();
 
 interface DialogProps {
     from: string;
+    type: string;
     database: string;
 }
 const acceptParams = (params: DialogProps): void => {
     form.password = '';
     form.from = params.from;
+    form.type = params.type;
     form.database = params.database;
     loadPassword();
     dialogVisible.value = true;
@@ -151,7 +154,7 @@ const random = async () => {
 
 const loadPassword = async () => {
     if (form.from === 'local') {
-        const res = await getAppConnInfo('redis', form.database);
+        const res = await getAppConnInfo(form.type, form.database);
         form.status = res.data.status;
         form.password = res.data.password || '';
         form.port = res.data.port || 3306;

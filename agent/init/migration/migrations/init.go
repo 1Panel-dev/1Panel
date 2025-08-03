@@ -19,7 +19,7 @@ import (
 )
 
 var AddTable = &gormigrate.Migration{
-	ID: "20250507-add-table",
+	ID: "20250729-add-table",
 	Migrate: func(tx *gorm.DB) error {
 		return tx.AutoMigrate(
 			&model.AppDetail{},
@@ -63,6 +63,7 @@ var AddTable = &gormigrate.Migration{
 			&model.Group{},
 			&model.AppIgnoreUpgrade{},
 			&model.McpServer{},
+			&model.RootCert{},
 		)
 	},
 }
@@ -414,6 +415,19 @@ var AddMethodToAlertTask = &gormigrate.Migration{
 			return err
 		}
 		if err := global.AlertDB.Model(&model.AlertTask{}).Where("method IS NULL OR method = ''").Update("method", "sms").Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var UpdateMcpServer = &gormigrate.Migration{
+	ID: "20250729-update-mcp-server",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.McpServer{}); err != nil {
+			return err
+		}
+		if err := tx.Model(&model.McpServer{}).Where("1=1").Update("output_transport", "sse").Error; err != nil {
 			return err
 		}
 		return nil

@@ -271,6 +271,28 @@ func (b *BaseApi) UpdateCronjob(c *gin.Context) {
 }
 
 // @Tags Cronjob
+// @Summary Update cronjob group
+// @Accept json
+// @Param request body dto.ChangeGroup true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /cronjobs/group/update [post]
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"id","isList":false,"db":"cronjobs","output_column":"name","output_value":"name"}],"formatZH":"更新计划任务分组 [name]","formatEN":"update cronjob group [name]"}
+func (b *BaseApi) UpdateCronjobGroup(c *gin.Context) {
+	var req dto.ChangeGroup
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+
+	if err := cronjobService.UpdateGroup(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags Cronjob
 // @Summary Update cronjob status
 // @Accept json
 // @Param request body dto.CronjobUpdateStatus true "request"

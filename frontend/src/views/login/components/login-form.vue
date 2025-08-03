@@ -77,6 +77,8 @@
                                 :placeholder="$t('commons.login.username')"
                                 class="w-full"
                                 size="large"
+                                name="username"
+                                autocomplete="username"
                             ></el-input>
                         </el-form-item>
                         <el-form-item prop="password" class="w-full">
@@ -87,6 +89,8 @@
                                 class="w-full"
                                 size="large"
                                 :placeholder="$t('commons.login.password')"
+                                name="password"
+                                autocomplete="current-password"
                             ></el-input>
                         </el-form-item>
                         <el-row :gutter="10">

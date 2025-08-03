@@ -136,7 +136,11 @@ func (r *Local) Backup(info BackupInfo) error {
 	}
 	defer outfile.Close()
 	global.LOG.Infof("start to pg_dump | gzip > %s.gzip", info.TargetDir+"/"+info.FileName)
-	cmd := exec.Command("docker", "exec", "-e", fmt.Sprintf("PGPASSWORD=%s", r.Password), r.ContainerName, "pg_dump", "-F", "c", "-U", r.Username, "-d", info.Name)
+	cmd := exec.Command(
+		"docker", "exec", "-i", r.ContainerName,
+		"sh", "-c",
+		fmt.Sprintf("PGPASSWORD=%s pg_dump -F c -U %s -d %s", r.Password, r.Username, info.Name),
+	)
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
 
@@ -155,7 +159,9 @@ func (r *Local) Backup(info BackupInfo) error {
 func (r *Local) Recover(info RecoverInfo) error {
 	fi, _ := os.Open(info.SourceFile)
 	defer fi.Close()
-	cmd := exec.Command("docker", "exec", "-i", r.ContainerName, "pg_restore", "-F", "c", "-c", "-U", r.Username, "-d", info.Name)
+	cmd := exec.Command("docker", "exec", r.ContainerName, "sh", "-c",
+		fmt.Sprintf("PGPASSWORD=%s pg_dump -F c -U %s -d %s", r.Password, r.Username, info.Name),
+	)
 	if strings.HasSuffix(info.SourceFile, ".gz") {
 		gzipFile, err := os.Open(info.SourceFile)
 		if err != nil {

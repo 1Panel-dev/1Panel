@@ -65,6 +65,7 @@ const (
 	TaskPull      = "TaskPull"
 	TaskCommit    = "TaskCommit"
 	TaskPush      = "TaskPush"
+	TaskClean     = "TaskClean"
 	TaskHandle    = "TaskHandle"
 )
 

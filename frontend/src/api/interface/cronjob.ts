@@ -1,10 +1,17 @@
 import { ReqPage } from '.';
 
 export namespace Cronjob {
+    export interface Search extends ReqPage {
+        info: string;
+        groupIDs: Array<number>;
+        orderBy?: string;
+        order?: string;
+    }
     export interface CronjobInfo {
         id: number;
         name: string;
         type: string;
+        groupID: number;
         specCustom: boolean;
         spec: string;
         specs: Array<string>;
@@ -142,6 +149,10 @@ export namespace Cronjob {
     export interface TransHelper {
         name: string;
         detailName: string;
+    }
+    export interface snapshotTransHelper {
+        withImage: boolean;
+        ignoreApps: Array<TransHelper>;
     }
     export interface snapshotRule {
         withImage: boolean;

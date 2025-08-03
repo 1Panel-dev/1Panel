@@ -32,11 +32,14 @@ func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 		hostRouter.GET("/ssh/conf", baseApi.LoadSSHConf)
 		hostRouter.POST("/ssh/search", baseApi.GetSSHInfo)
 		hostRouter.POST("/ssh/update", baseApi.UpdateSSH)
-		hostRouter.POST("/ssh/generate", baseApi.GenerateSSH)
-		hostRouter.POST("/ssh/secret", baseApi.LoadSSHSecret)
 		hostRouter.POST("/ssh/log", baseApi.LoadSSHLogs)
 		hostRouter.POST("/ssh/conffile/update", baseApi.UpdateSSHByfile)
 		hostRouter.POST("/ssh/operate", baseApi.OperateSSH)
+
+		hostRouter.POST("/ssh/cert", baseApi.CreateRootCert)
+		hostRouter.POST("/ssh/cert/sync", baseApi.SyncRootCert)
+		hostRouter.POST("/ssh/cert/search", baseApi.SearchRootCert)
+		hostRouter.POST("/ssh/cert/delete", baseApi.DeleteRootCert)
 
 		hostRouter.POST("/tool", baseApi.GetToolStatus)
 		hostRouter.POST("/tool/init", baseApi.InitToolConfig)

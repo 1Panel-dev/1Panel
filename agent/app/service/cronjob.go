@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -15,6 +16,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
 	"github.com/robfig/cron/v3"
@@ -30,6 +32,7 @@ type ICronjobService interface {
 	HandleOnce(id uint) error
 	Update(id uint, req dto.CronjobOperate) error
 	UpdateStatus(id uint, status string) error
+	UpdateGroup(req dto.ChangeGroup) error
 	Delete(req dto.CronjobBatchDelete) error
 	Download(down dto.CronjobDownload) (string, error)
 	StartJob(cronjob *model.Cronjob, isUpdate bool) (string, error)
@@ -48,7 +51,11 @@ func NewICronjobService() ICronjobService {
 }
 
 func (u *CronjobService) SearchWithPage(search dto.PageCronjob) (int64, interface{}, error) {
-	total, cronjobs, err := cronjobRepo.Page(search.Page, search.PageSize, repo.WithByLikeName(search.Info), repo.WithOrderRuleBy(search.OrderBy, search.Order))
+	total, cronjobs, err := cronjobRepo.Page(search.Page,
+		search.PageSize,
+		repo.WithByGroups(search.GroupIDs),
+		repo.WithByLikeName(search.Info),
+		repo.WithOrderRuleBy(search.OrderBy, search.Order))
 	var dtoCronjobs []dto.CronjobInfo
 	for _, cronjob := range cronjobs {
 		var item dto.CronjobInfo
@@ -114,6 +121,7 @@ func (u *CronjobService) Export(req dto.OperateByIDs) (string, error) {
 		item := dto.CronjobTrans{
 			Name:           cronjob.Name,
 			Type:           cronjob.Type,
+			GroupID:        cronjob.GroupID,
 			SpecCustom:     cronjob.SpecCustom,
 			Spec:           cronjob.Spec,
 			Executor:       cronjob.Executor,
@@ -132,7 +140,6 @@ func (u *CronjobService) Export(req dto.OperateByIDs) (string, error) {
 			Timeout:        cronjob.Timeout,
 			IgnoreErr:      cronjob.IgnoreErr,
 			Secret:         cronjob.Secret,
-			SnapshotRule:   cronjob.SnapshotRule,
 		}
 		switch cronjob.Type {
 		case "app":
@@ -143,7 +150,7 @@ func (u *CronjobService) Export(req dto.OperateByIDs) (string, error) {
 			for _, app := range apps {
 				item.Apps = append(item.Apps, dto.TransHelper{Name: app.App.Key, DetailName: app.Name})
 			}
-		case "website":
+		case "website", "cutWebsiteLog":
 			if cronjob.Website == "all" {
 				break
 			}
@@ -158,6 +165,29 @@ func (u *CronjobService) Export(req dto.OperateByIDs) (string, error) {
 			databases := loadDbsForJob(cronjob)
 			for _, db := range databases {
 				item.DBNames = append(item.DBNames, dto.TransHelper{Name: db.Database, DetailName: db.Name})
+			}
+		case "shell":
+			if cronjob.ScriptMode == "library" {
+				script, err := scriptRepo.Get(repo.WithByID(cronjob.ScriptID))
+				if err != nil {
+					return "", err
+				}
+				item.ScriptName = script.Name
+			}
+		case "snapshot":
+			if len(cronjob.SnapshotRule) == 0 {
+				break
+			}
+			var snapRule dto.SnapshotRule
+			if err := json.Unmarshal([]byte(cronjob.SnapshotRule), &snapRule); err != nil {
+				return "", err
+			}
+			item.SnapshotRule.WithImage = snapRule.WithImage
+			if len(snapRule.IgnoreAppIDs) != 0 {
+				ignoreApps, _ := appInstallRepo.ListBy(context.Background(), repo.WithByIDs(snapRule.IgnoreAppIDs))
+				for _, app := range ignoreApps {
+					item.SnapshotRule.IgnoreApps = append(item.SnapshotRule.IgnoreApps, dto.TransHelper{Name: app.App.Key, DetailName: app.Name})
+				}
 			}
 		}
 		item.SourceAccounts, item.DownloadAccount, _ = loadBackupNamesByID(cronjob.SourceAccountIDs, cronjob.DownloadAccountID)
@@ -187,11 +217,11 @@ func (u *CronjobService) Import(req []dto.CronjobTrans) error {
 		cronjob := model.Cronjob{
 			Name:           item.Name,
 			Type:           item.Type,
+			GroupID:        item.GroupID,
 			SpecCustom:     item.SpecCustom,
 			Spec:           item.Spec,
 			Executor:       item.Executor,
 			ScriptMode:     item.ScriptMode,
-			Script:         item.Script,
 			Command:        item.Command,
 			ContainerName:  item.ContainerName,
 			User:           item.User,
@@ -199,13 +229,11 @@ func (u *CronjobService) Import(req []dto.CronjobTrans) error {
 			DBType:         item.DBType,
 			ExclusionRules: item.ExclusionRules,
 			IsDir:          item.IsDir,
-			SourceDir:      item.SourceDir,
 			RetainCopies:   item.RetainCopies,
 			RetryTimes:     item.RetryTimes,
 			Timeout:        item.Timeout,
 			IgnoreErr:      item.IgnoreErr,
 			Secret:         item.Secret,
-			SnapshotRule:   item.SnapshotRule,
 		}
 		hasNotFound := false
 		switch item.Type {
@@ -224,7 +252,7 @@ func (u *CronjobService) Import(req []dto.CronjobTrans) error {
 				appIDs = append(appIDs, fmt.Sprintf("%v", appItem.ID))
 			}
 			cronjob.AppID = strings.Join(appIDs, ",")
-		case "website":
+		case "website", "cutWebsiteLog":
 			if len(item.Websites) == 0 {
 				cronjob.Website = "all"
 				break
@@ -245,7 +273,7 @@ func (u *CronjobService) Import(req []dto.CronjobTrans) error {
 				break
 			}
 			var dbIDs []string
-			if cronjob.DBType == "postgresql" {
+			if strings.Contains(cronjob.DBType, "postgresql") {
 				for _, db := range item.DBNames {
 					dbItem, err := postgresqlRepo.Get(postgresqlRepo.WithByPostgresqlName(db.Name), repo.WithByName(db.DetailName))
 					if err != nil {
@@ -265,6 +293,75 @@ func (u *CronjobService) Import(req []dto.CronjobTrans) error {
 				}
 			}
 			cronjob.DBName = strings.Join(dbIDs, ",")
+		case "shell":
+			if len(item.ContainerName) != 0 {
+				cronjob.Script = item.Script
+				client, err := docker.NewDockerClient()
+				if err != nil {
+					hasNotFound = true
+					break
+				}
+				defer client.Close()
+				if _, err := client.ContainerStats(context.Background(), item.ContainerName, false); err != nil {
+					hasNotFound = true
+					break
+				}
+			}
+			switch item.ScriptMode {
+			case "library":
+				library, _ := scriptRepo.Get(repo.WithByName(item.ScriptName))
+				if library.ID == 0 {
+					hasNotFound = true
+					break
+				}
+				cronjob.ScriptID = library.ID
+			case "select":
+				if _, err := os.Stat(item.Script); err != nil {
+					hasNotFound = true
+					break
+				}
+				cronjob.Script = item.Script
+			case "input":
+				cronjob.Script = item.Script
+			}
+		case "directory":
+			if item.IsDir {
+				if _, err := os.Stat(item.SourceDir); err != nil {
+					hasNotFound = true
+					break
+				}
+				cronjob.SourceDir = item.SourceDir
+			} else {
+				fileList := strings.Split(item.SourceDir, ",")
+				var newFiles []string
+				for _, item := range fileList {
+					if len(item) == 0 {
+						continue
+					}
+					if _, err := os.Stat(item); err != nil {
+						hasNotFound = true
+						continue
+					}
+					newFiles = append(newFiles, item)
+				}
+				cronjob.SourceDir = strings.Join(newFiles, ",")
+			}
+		case "snapshot":
+			if len(item.SnapshotRule.IgnoreApps) == 0 && !item.SnapshotRule.WithImage {
+				break
+			}
+			var itemRules dto.SnapshotRule
+			itemRules.WithImage = item.SnapshotRule.WithImage
+			for _, app := range item.SnapshotRule.IgnoreApps {
+				appItem, err := appInstallRepo.LoadInstallAppByKeyAndName(app.Name, app.DetailName)
+				if err != nil {
+					hasNotFound = true
+					continue
+				}
+				itemRules.IgnoreAppIDs = append(itemRules.IgnoreAppIDs, appItem.ID)
+			}
+			itemRulesStr, _ := json.Marshal(itemRules)
+			cronjob.SnapshotRule = string(itemRulesStr)
 		}
 		var acIDs []string
 		for _, ac := range item.SourceAccounts {
@@ -284,6 +381,7 @@ func (u *CronjobService) Import(req []dto.CronjobTrans) error {
 		} else {
 			cronjob.Status = constant.StatusDisable
 		}
+		_ = cronjobRepo.Create(&cronjob)
 		if item.AlertCount != 0 {
 			createAlert := dto.AlertCreate{
 				Title:     item.AlertTitle,
@@ -295,7 +393,6 @@ func (u *CronjobService) Import(req []dto.CronjobTrans) error {
 			}
 			_ = NewIAlertService().CreateAlert(createAlert)
 		}
-		_ = cronjobRepo.Create(&cronjob)
 	}
 	return nil
 }
@@ -682,6 +779,14 @@ func (u *CronjobService) UpdateStatus(id uint, status string) error {
 		global.LOG.Infof("stop cronjob entryID: %s", cronjob.EntryIDs)
 	}
 	return cronjobRepo.Update(cronjob.ID, map[string]interface{}{"status": status, "entry_ids": entryIDs})
+}
+
+func (u *CronjobService) UpdateGroup(req dto.ChangeGroup) error {
+	cronjob, _ := cronjobRepo.Get(repo.WithByID(req.ID))
+	if cronjob.ID == 0 {
+		return buserr.New("ErrRecordNotFound")
+	}
+	return cronjobRepo.Update(cronjob.ID, map[string]interface{}{"group_id": req.GroupID})
 }
 
 func (u *CronjobService) AddCronJob(cronjob *model.Cronjob) (int, error) {

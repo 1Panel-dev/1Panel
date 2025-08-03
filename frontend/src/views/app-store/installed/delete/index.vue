@@ -1,6 +1,12 @@
 <template>
     <DialogPro v-model="open" :title="$t('commons.button.uninstall') + ' - ' + appInstallName" @close="handleClose">
-        <el-form ref="deleteForm" label-position="left" v-loading="loading">
+        <el-form
+            ref="deleteForm"
+            label-position="left"
+            v-loading="loading"
+            @submit.prevent="handleFormSubmit"
+            @keyup.enter="handleFormSubmit"
+        >
             <el-form-item>
                 <el-checkbox v-model="deleteReq.forceDelete" :label="$t('app.forceUninstall')" />
                 <span class="input-help">
@@ -27,7 +33,7 @@
             </el-form-item>
             <el-form-item>
                 <span v-html="deleteHelper"></span>
-                <el-input v-model="deleteInfo" :placeholder="appInstallName" />
+                <el-input v-model="deleteInfo" :placeholder="appInstallName" @keyup.enter="handleFormSubmit" />
             </el-form-item>
         </el-form>
         <template #footer>
@@ -77,6 +83,12 @@ const em = defineEmits(['close']);
 const handleClose = () => {
     open.value = false;
     em('close', open);
+};
+
+const handleFormSubmit = () => {
+    if (!loading.value && deleteInfo.value === appInstallName.value) {
+        submit();
+    }
 };
 
 const acceptParams = async (app: App.AppInstallDto) => {

@@ -79,3 +79,8 @@ type ForceDelete struct {
 	IDs         []uint `json:"ids"`
 	ForceDelete bool   `json:"forceDelete"`
 }
+
+type ChangeGroup struct {
+	ID      uint `json:"id" validate:"required"`
+	GroupID uint `json:"groupID" validate:"required"`
+}

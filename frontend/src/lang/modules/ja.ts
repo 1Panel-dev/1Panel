@@ -692,6 +692,9 @@ const message = {
             importMcpJsonError: 'mcpServers 構造が正しくありません',
             bindDomainHelper:
                 'ウェブサイトをバインドした後、インストールされたすべての MCP サーバーのアクセスアドレスを変更し、ポートへの外部アクセスを閉じます',
+            outputTransport: '出力タイプ',
+            streamableHttpPath: 'ストリーミングパス',
+            streamableHttpPathHelper: '例：/mcp、他のサーバーと重複しないように注意してください',
         },
     },
     container: {
@@ -961,6 +964,7 @@ const message = {
         create: 'Cronジョブを作成します',
         edit: 'Cronジョブを編集します',
         errImport: 'ファイル内容異常:',
+        errImportFormat: 'インポートしたスケジュールタスクのデータまたは形式が異常です。確認して再試行してください！',
         importHelper:
             'インポート時に同名のスケジュールタスクは自動的にスキップされます。タスクはデフォルトで【無効】状態に設定され、データ関連付け異常時には【編集待ち】状態に設定されます。',
         changeStatus: 'ステータスを変更します',
@@ -1467,12 +1471,18 @@ const message = {
         passwordAuthentication: 'パスワード認証',
         pwdAuthHelper: 'パスワード認証を有効にするかどうか。このパラメーターはデフォルトで有効になります。',
         pubkeyAuthentication: '重要な認証',
-        key: '鍵',
+        privateKey: '秘密鍵',
+        publicKey: '公開鍵',
         password: 'パスワード',
+        createMode: '作成方法',
+        generate: '自動生成',
+        unSyncPass: '鍵パスワードは同期できません',
+        input: '手動入力',
+        import: 'ファイルアップロード',
         pubkey: '重要な情報',
         encryptionMode: '暗号化モード',
+        pubKeyHelper: '現在の鍵情報はユーザー {0} にのみ有効です',
         passwordHelper: '6〜10桁と英語のケースを含めることができます',
-        generate: 'キーを生成します',
         reGenerate: 'キーを再生します',
         keyAuthHelper: 'キー認証を有効にするかどうか。',
         useDNS: '使用済み',
@@ -2465,6 +2475,24 @@ const message = {
         clearProxyCache: '逆プロキシキャッシュをきれいにします',
         clearProxyCacheWarn:
             'キャッシュで構成されたすべてのWebサイトが影響を受け、「OpenResty」が再起動されます。続けたいですか？',
+        create: 'モジュールを追加',
+        update: 'モジュールを編集',
+        params: 'パラメータ',
+        packages: 'パッケージ',
+        script: 'スクリプト',
+        module: 'モジュール',
+        build: 'ビルド',
+        buildWarn:
+            'OpenRestyのビルドには一定量のCPUとメモリを確保する必要があり、時間がかかる場合がありますので、お待ちください。',
+        mirrorUrl: 'ソフトウェアソース',
+        paramsHelper: '例：--add-module=/tmp/ngx_brotli',
+        packagesHelper: '例：git,curl カンマ区切り',
+        scriptHelper:
+            'コンパイル前に実行するスクリプト、通常はモジュールソースコードのダウンロード、依存関係のインストールなど',
+        buildHelper:
+            'モジュールの追加/変更後にビルドをクリックします。ビルドが成功すると、OpenRestyは自動的に再起動します。',
+        defaultHttps: 'HTTPS 改ざん防止',
+        defaultHttpsHelper1: 'これを有効にすると、HTTPS 改ざん問題を解決できます。',
     },
     ssl: {
         create: 'リクエスト',

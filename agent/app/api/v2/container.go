@@ -315,7 +315,7 @@ func (b *BaseApi) ContainerUpgrade(c *gin.Context) {
 // @Summary Clean container
 // @Accept json
 // @Param request body dto.ContainerPrune true "request"
-// @Success 200 {object} dto.ContainerPruneReport
+// @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /containers/prune [post]
@@ -326,12 +326,11 @@ func (b *BaseApi) ContainerPrune(c *gin.Context) {
 		return
 	}
 
-	report, err := containerService.Prune(req)
-	if err != nil {
+	if err := containerService.Prune(req); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithData(c, report)
+	helper.Success(c)
 }
 
 // @Tags Container

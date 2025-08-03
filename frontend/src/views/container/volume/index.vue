@@ -83,6 +83,7 @@
 
         <CodemirrorDrawer ref="myDetail" />
         <CreateDialog @search="search" ref="dialogCreateRef" />
+        <TaskLog ref="taskLogRef" width="70%" @close="search" />
     </div>
 </template>
 
@@ -91,16 +92,17 @@ import CreateDialog from '@/views/container/volume/create/index.vue';
 import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import { reactive, ref, computed } from 'vue';
-import { computeSize, dateFormat } from '@/utils/util';
+import { dateFormat, newUUID } from '@/utils/util';
 import { deleteVolume, searchVolume, inspect, containerPrune } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
+import TaskLog from '@/components/log/task/index.vue';
 import i18n from '@/lang';
 import router from '@/routers';
-import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
 
+const taskLogRef = ref();
 const mobile = computed(() => {
     return globalStore.isMobile();
 });
@@ -174,24 +176,22 @@ const onClean = () => {
     }).then(async () => {
         loading.value = true;
         let params = {
+            taskID: newUUID(),
             pruneType: 'volume',
             withTagAll: false,
         };
         await containerPrune(params)
-            .then((res) => {
+            .then(() => {
                 loading.value = false;
-                MsgSuccess(
-                    i18n.global.t('container.cleanSuccessWithSpace', [
-                        res.data.deletedNumber,
-                        computeSize(res.data.spaceReclaimed),
-                    ]),
-                );
-                search();
+                openTaskLog(params.taskID);
             })
             .catch(() => {
                 loading.value = false;
             });
     });
+};
+const openTaskLog = (taskID: string) => {
+    taskLogRef.value.openWithTaskID(taskID);
 };
 
 const batchDelete = async (row: Container.VolumeInfo | null) => {

@@ -531,3 +531,13 @@ var DeleteXpackHideMenu = &gormigrate.Migration{
 		return tx.Model(&model.Setting{}).Where("key = ?", "HideMenu").Update("value", string(updatedJSON)).Error
 	},
 }
+
+var AddCronjobGroup = &gormigrate.Migration{
+	ID: "20250729-add-cronjob-group",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Create(&model.Group{Name: "Default", Type: "cronjob", IsDefault: true}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
