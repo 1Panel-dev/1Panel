@@ -1,5 +1,5 @@
 <p align="center"><a href="https://1panel.pro"><img src="https://resource.1panel.pro/img/1panel-logo.png" alt="1Panel" width="300" /></a></p>
-<p align="center"><b>Herramienta de gestión de servidores Linux basada en la web mejor valorada</b></p>
+<p align="center"><b>La herramienta de gestión más valorada para administrar servidores Linux.</b></p>
 <p align="center">
   <a href="https://trendshift.io/repositories/2462" target="_blank"><img src="https://trendshift.io/api/badge/repositories/2462" alt="1Panel-dev%2F1Panel | Trendshift" style="width: 180px; height: auto;" /></a>
   <a href="https://www.producthunt.com/posts/1panel?embed=true&utm_source=badge-featured&utm_medium=badge&utm_souce=badge-1panel" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=639696&theme=light" alt="1Panel - Top&#0045;Rated&#0032;web&#0045;based&#0032;Linux&#0032;server&#0032;management&#0032;tool | Product Hunt" style="width: 180px; height: auto;" /></a>
@@ -32,9 +32,9 @@
 
 ------------------------------
 
-1Panel es un panel de control moderno y de código abierto basado en la web para la gestión de servidores Linux.
+1Panel es un panel de control moderno y de código abierto basado en web para la gestión de servidores Linux.
 
-- **Gestión eficiente**: los usuarios pueden gestionar fácilmente servidores Linux a través de una interfaz web, como monitoreo de hosts, gestión de archivos, gestión de bases de datos, gestión de contenedores, entre otros;  
+- **Gestión eficiente**: los usuarios pueden gestionar fácilmente servidores Linux a través de una interfaz web, como monitorización de hosts, gestión de archivos, gestión de bases de datos, gestión de contenedores, entre otros;  
 - **Creación rápida de sitios web**: integración profunda con el software de creación de sitios web de código abierto WordPress y Halo, operaciones como vinculación de dominios y configuración de certificados SSL se realizan con un solo clic;  
 - **Tienda de aplicaciones**: selección de diversas herramientas y software de código abierto de alta calidad, ayudando a los usuarios a instalar y actualizar fácilmente;  
 - **Seguro y confiable**: basado en la gestión de contenedores y el despliegue de aplicaciones, se logra la mínima exposición a vulnerabilidades, al tiempo que se ofrecen funciones como protección contra virus, cortafuegos y auditoría de registros;  
@@ -42,13 +42,13 @@
 
 ## Inicio Rápido
 
-Ejecute el script a continuación y siga las indicaciones para instalar 1Panel:
+Ejecute el siguiente script y siga las indicaciones para instalar 1Panel:
 
 ```bash
 curl -sSL https://resource.1panel.pro/quick_start.sh -o quick_start.sh && bash quick_start.sh
 ```
 
-Por favor, consulte nuestra [dokumentasi](https://docs.1panel.pro/quick_start/) para más detalles.
+Por favor, consulte nuestra [documentación](https://docs.1panel.pro/quick_start/) para más detalles.
 
 ## Captura de Pantalla
 
