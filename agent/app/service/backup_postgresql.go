@@ -119,7 +119,7 @@ func handlePostgresqlBackup(db DatabaseHelper, parentTask *task.Task, targetDir,
 	}
 
 	itemHandler := func() error { return doPostgresqlgBackup(db, targetDir, fileName) }
-	backupTask.AddSubTask(task.GetTaskName(itemName, task.TaskBackup, task.TaskScopeWebsite), func(task *task.Task) error { return itemHandler() }, nil)
+	backupTask.AddSubTask(task.GetTaskName(itemName, task.TaskBackup, task.TaskScopeDatabase), func(task *task.Task) error { return itemHandler() }, nil)
 	if parentTask != nil {
 		return itemHandler()
 	}
@@ -137,7 +137,7 @@ func handlePostgresqlRecover(req dto.CommonRecover, parentTask *task.Task, isRol
 	}
 	itemTask = parentTask
 	if parentTask == nil {
-		itemTask, err = task.NewTaskWithOps("Redis", task.TaskRecover, task.TaskScopeDatabase, req.TaskID, dbInfo.ID)
+		itemTask, err = task.NewTaskWithOps(req.Name, task.TaskRecover, task.TaskScopeDatabase, req.TaskID, dbInfo.ID)
 		if err != nil {
 			return err
 		}

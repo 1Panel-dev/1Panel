@@ -6,19 +6,17 @@ import (
 	"os"
 	"path"
 
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
-
-	"github.com/1Panel-dev/1Panel/agent/utils/postgresql"
-	pgclient "github.com/1Panel-dev/1Panel/agent/utils/postgresql/client"
-	redisclient "github.com/1Panel-dev/1Panel/agent/utils/redis"
-
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/agent/utils/mysql"
 	"github.com/1Panel-dev/1Panel/agent/utils/mysql/client"
+	"github.com/1Panel-dev/1Panel/agent/utils/postgresql"
+	pgclient "github.com/1Panel-dev/1Panel/agent/utils/postgresql/client"
+	redisclient "github.com/1Panel-dev/1Panel/agent/utils/redis"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
 )
@@ -118,6 +116,9 @@ func (u *DatabaseService) LoadItems(dbType string) ([]dto.DatabaseItem, error) {
 }
 
 func (u *DatabaseService) CheckDatabase(req dto.DatabaseCreate) bool {
+	if req.Timeout == 0 {
+		req.Timeout = 30
+	}
 	switch req.Type {
 	case constant.AppPostgresql:
 		_, err := postgresql.NewPostgresqlClient(pgclient.DBInfo{
@@ -126,7 +127,7 @@ func (u *DatabaseService) CheckDatabase(req dto.DatabaseCreate) bool {
 			Port:     req.Port,
 			Username: req.Username,
 			Password: req.Password,
-			Timeout:  6,
+			Timeout:  req.Timeout,
 		})
 		return err == nil
 	case constant.AppRedis:
@@ -149,7 +150,7 @@ func (u *DatabaseService) CheckDatabase(req dto.DatabaseCreate) bool {
 			ClientKey:  req.ClientKey,
 			ClientCert: req.ClientCert,
 			SkipVerify: req.SkipVerify,
-			Timeout:    6,
+			Timeout:    req.Timeout,
 		})
 		return err == nil
 	}
@@ -158,6 +159,9 @@ func (u *DatabaseService) CheckDatabase(req dto.DatabaseCreate) bool {
 }
 
 func (u *DatabaseService) Create(req dto.DatabaseCreate) error {
+	if req.Timeout == 0 {
+		req.Timeout = 30
+	}
 	db, _ := databaseRepo.Get(repo.WithByName(req.Name))
 	if db.ID != 0 {
 		if db.From == "local" {
@@ -173,7 +177,7 @@ func (u *DatabaseService) Create(req dto.DatabaseCreate) error {
 			Port:     req.Port,
 			Username: req.Username,
 			Password: req.Password,
-			Timeout:  6,
+			Timeout:  req.Timeout,
 		}); err != nil {
 			return err
 		}
@@ -198,7 +202,7 @@ func (u *DatabaseService) Create(req dto.DatabaseCreate) error {
 			ClientKey:  req.ClientKey,
 			ClientCert: req.ClientCert,
 			SkipVerify: req.SkipVerify,
-			Timeout:    6,
+			Timeout:    req.Timeout,
 		}); err != nil {
 			return err
 		}
@@ -273,7 +277,7 @@ func (u *DatabaseService) Update(req dto.DatabaseUpdate) error {
 			Port:     req.Port,
 			Username: req.Username,
 			Password: req.Password,
-			Timeout:  300,
+			Timeout:  req.Timeout,
 		}); err != nil {
 			return err
 		}
@@ -298,7 +302,7 @@ func (u *DatabaseService) Update(req dto.DatabaseUpdate) error {
 			ClientKey:  req.ClientKey,
 			ClientCert: req.ClientCert,
 			SkipVerify: req.SkipVerify,
-			Timeout:    300,
+			Timeout:    req.Timeout,
 		}); err != nil {
 			return err
 		}

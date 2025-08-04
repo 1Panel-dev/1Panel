@@ -283,6 +283,7 @@ export namespace Database {
         clientCert: string;
         skipVerify: boolean;
 
+        timeout: number;
         description: string;
     }
     export interface SearchDatabasePage {
@@ -322,6 +323,7 @@ export namespace Database {
         clientCert: string;
         skipVerify: boolean;
 
+        timeout: number;
         description: string;
     }
     export interface DatabaseUpdate {
@@ -338,6 +340,7 @@ export namespace Database {
         clientCert: string;
         skipVerify: boolean;
 
+        timeout: number;
         description: string;
     }
     export interface DatabaseDelete {
