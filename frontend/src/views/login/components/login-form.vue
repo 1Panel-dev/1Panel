@@ -182,7 +182,6 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from 'vue';
-import { useRouter } from 'vue-router';
 import type { ElForm } from 'element-plus';
 import { loginApi, getCaptcha, mfaLoginApi, getLoginSetting } from '@/api/modules/auth';
 import { GlobalStore, MenuStore, TabsStore } from '@/store';
@@ -269,7 +268,6 @@ const captcha = reactive({
 
 const loading = ref<boolean>(false);
 const mfaShow = ref<boolean>(false);
-const router = useRouter();
 const dropdownText = ref('中文(简体)');
 
 function handleCommand(command: string) {

@@ -11,7 +11,7 @@ type Cronjob struct {
 
 	Name       string `gorm:"not null" json:"name"`
 	Type       string `gorm:"not null" json:"type"`
-	GroupID    uint   `json:"groupID"`
+	GroupID    uint   `gorm:"not null;default:0" json:"groupID"`
 	SpecCustom bool   `json:"specCustom"`
 	Spec       string `gorm:"not null" json:"spec"`
 

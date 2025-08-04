@@ -852,6 +852,7 @@ const search = async () => {
             .then((res) => {
                 loading.value = false;
                 form.name = res.data.name;
+                form.groupID = res.data.groupID || null;
                 form.type = res.data.type;
                 form.specCustom = res.data.specCustom;
                 form.spec = res.data.spec;

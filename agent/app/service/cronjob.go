@@ -710,6 +710,7 @@ func (u *CronjobService) Update(id uint, req dto.CronjobOperate) error {
 		upMap["status"] = constant.StatusEnable
 	}
 	upMap["name"] = req.Name
+	upMap["group_id"] = req.GroupID
 	upMap["spec_custom"] = req.SpecCustom
 	upMap["spec"] = spec
 	upMap["script"] = req.Script

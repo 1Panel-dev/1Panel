@@ -71,6 +71,7 @@ export namespace Cronjob {
     export interface CronjobOperate {
         id: number;
         name: string;
+        groupID: number;
         type: string;
         specCustom: boolean;
         spec: string;

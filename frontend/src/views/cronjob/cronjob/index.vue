@@ -398,16 +398,20 @@ const onSubmitExport = async () => {
 const loadGroups = async () => {
     const res = await getGroupList('cronjob');
     groupOptions.value = res.data || [];
+    for (const group of groupOptions.value) {
+        if (group.name === 'Default') {
+            defaultGroupID.value = group.id;
+            break;
+        }
+    }
     for (const item of data.value) {
         if (item.groupID === 0) {
             item.groupBelong = 'Default';
+            item.groupID = defaultGroupID.value;
             continue;
         }
         let hasGroup = false;
         for (const group of groupOptions.value) {
-            if (group.name === 'Default') {
-                defaultGroupID.value = group.id;
-            }
             if (item.groupID === group.id) {
                 hasGroup = true;
                 item.groupBelong = group.name;
