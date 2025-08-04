@@ -1507,6 +1507,8 @@ const message = {
         createMode: 'Método de Criação',
         generate: 'Gerar Automaticamente',
         unSyncPass: 'Senha da chave não pode ser sincronizada',
+        syncHelper:
+            'A operação de sincronização limpará chaves inválidas e sincronizará novos pares de chaves completos. Continuar?',
         input: 'Entrada Manual',
         import: 'Upload de Arquivo',
         pubkey: 'Informações da chave',

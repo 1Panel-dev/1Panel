@@ -1551,6 +1551,8 @@ const message = {
         createMode: 'Oluşturma Yöntemi',
         generate: 'Otomatik Oluştur',
         unSyncPass: 'Anahtar parolası senkronize edilemez',
+        syncHelper:
+            'Eşitleme işlemi geçersiz anahtarları temizleyecek ve yeni tam anahtar çiftlerini eşitleyecek. Devam edilsin mi?',
         input: 'Manuel Giriş',
         import: 'Dosya Yükleme',
         pubkey: 'Anahtar bilgisi',

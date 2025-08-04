@@ -1455,6 +1455,7 @@ const message = {
         createMode: '创建方式',
         generate: '自动生成',
         unSyncPass: '密钥密码无法同步',
+        syncHelper: '同步操作将清理失效密钥并同步新增的完整密钥对，是否继续？',
         input: '手动输入',
         import: '文件上传',
         pubkey: '密钥信息',

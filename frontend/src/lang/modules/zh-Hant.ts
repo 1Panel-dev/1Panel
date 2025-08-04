@@ -1460,6 +1460,7 @@ const message = {
         createMode: '創建方式',
         generate: '自動生成',
         unSyncPass: '密鑰密碼無法同步',
+        syncHelper: '同步操作將清理失效密鑰並同步新增的完整密鑰對，是否繼續？',
         input: '手動輸入',
         import: '文件上傳',
         pubkey: '密鑰信息',

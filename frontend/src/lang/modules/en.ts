@@ -1533,6 +1533,7 @@ const message = {
         createMode: 'Creation Method',
         generate: 'Auto-generate',
         unSyncPass: 'Key password cannot be synchronized',
+        syncHelper: 'The sync operation will clean invalid keys and sync new complete key pairs. Continue?',
         input: 'Manual Input',
         import: 'File Upload',
         pubkey: 'Key info',

@@ -1461,6 +1461,7 @@ const message = {
         createMode: '생성 방식',
         generate: '자동 생성',
         unSyncPass: '키 비밀번호 동기화 불가',
+        syncHelper: '동기화 작업으로 유효하지 않은 키를 정리하고 새로운 완전한 키 쌍을 동기화합니다. 계속하시겠습니까?',
         input: '수동 입력',
         import: '파일 업로드',
         pubkey: '키 정보',

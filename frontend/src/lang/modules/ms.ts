@@ -1519,6 +1519,8 @@ const message = {
         createMode: 'Kaedah Penciptaan',
         generate: 'Jana Automatik',
         unSyncPass: 'Kata laluan kunci tidak dapat diselaraskan',
+        syncHelper:
+            'Operasi segerak akan membersihkan kunci tidak sah dan menyegerakkan pasangan kunci baru yang lengkap. Teruskan?',
         input: 'Input Manual',
         import: 'Muat Naik Fail',
         pubkey: 'Maklumat kunci',

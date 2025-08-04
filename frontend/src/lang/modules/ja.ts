@@ -1477,6 +1477,7 @@ const message = {
         createMode: '作成方法',
         generate: '自動生成',
         unSyncPass: '鍵パスワードは同期できません',
+        syncHelper: '同期操作は無効なキーをクリーンアップし、新しい完全なキーペアを同期します。続行しますか？',
         input: '手動入力',
         import: 'ファイルアップロード',
         pubkey: '重要な情報',

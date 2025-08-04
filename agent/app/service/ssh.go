@@ -235,11 +235,6 @@ func (u *SSHService) SyncRootCert() error {
 		return fmt.Errorf("load current user failed, err: %v", err)
 	}
 	sshDir := fmt.Sprintf("%s/.ssh", currentUser.HomeDir)
-	authFilePath := currentUser.HomeDir + "/.ssh/authorized_keys"
-	authItem, err := os.ReadFile(authFilePath)
-	if err != nil {
-		return err
-	}
 
 	fileList, err := os.ReadDir(sshDir)
 	if err != nil {
@@ -266,10 +261,6 @@ func (u *SSHService) SyncRootCert() error {
 			continue
 		}
 		cert.EncryptionMode = loadEncryptioMode(string(pubItem))
-		if !bytes.Contains(authItem, pubItem) {
-			global.LOG.Error("the public key is not in authorized_keys, skip...")
-			continue
-		}
 		rootCerts = append(rootCerts, cert)
 	}
 	return hostRepo.SyncCert(rootCerts)
