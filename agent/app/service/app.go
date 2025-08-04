@@ -1075,7 +1075,7 @@ func (a AppService) SyncAppListFromRemote(taskID string) (err error) {
 				tagId, ok := tagMap[tag]
 				if ok {
 					exist, _ := appTagRepo.GetFirst(appTagRepo.WithByTagID(tagId), appTagRepo.WithByAppID(app.ID))
-					if exist.ID == 0 {
+					if exist != nil {
 						appTags = append(appTags, &model.AppTag{
 							AppId: app.ID,
 							TagId: tagId,
