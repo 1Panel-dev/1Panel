@@ -269,6 +269,7 @@ allow: 'izin ver'
 deny: 'reddet'
 OpenrestyNotFound: 'Openresty yüklü değil'
 remoteIpIsNull: "IP listesi boş"
+OpenrestyVersionErr: "Openresty sürümü çok düşük, lütfen Openresty'i 1.27.1.2-2-2-focal olarak güncelleyin"
 
 #task
 TaskStart: '{{ .name }} görevi başlıyor [BAŞLAT]'

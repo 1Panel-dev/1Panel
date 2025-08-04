@@ -271,6 +271,7 @@ allow: 'allow'
 deny: 'deny'
 OpenrestyNotFound: 'Openresty is not installed'
 remoteIpIsNull: "IP list is empty"
+OpenrestyVersionErr: "Openresty version is too low, please upgrade Openresty to 1.27.1.2-2-2-focal"
 
 #task
 TaskStart: '{{ .name }} task starts [START]'

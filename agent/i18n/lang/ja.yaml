@@ -271,6 +271,7 @@ allow: '許可'
 deny: '拒否'
 OpenrestyNotFound: 'Openresty がインストールされていません'
 remoteIpIsNull: "IPリストが空です"
+OpenrestyVersionErr: "Openrestyのバージョンが低すぎます。Openrestyを1.27.1.2-2-2-focalにアップグレードしてください"
 
 #task
 TaskStart: '{{ .name }} タスクが開始されました [START]'

@@ -271,6 +271,7 @@ allow: '허용하다'
 deny: '거부하다'
 OpenrestyNotFound: 'Openresty가 설치되지 않았습니다'
 remoteIpIsNull: "IP 목록이 비어 있습니다"
+OpenrestyVersionErr: "Openresty 버전이 너무 낮습니다. Openresty를 1.27.1.2-2-2-focal로 업그레이드하세요"
 
 #일
 TaskStart: '[START] {{ .name }} 작업이 시작됩니다.'

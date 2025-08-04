@@ -271,6 +271,7 @@ allow: 'разрешить'
 deny: 'отрицать'
 OpenrestyNotFound: 'Openresty не установлен'
 remoteIpIsNull: "Список IP пуст"
+OpenrestyVersionErr: "Версия Openresty слишком низкая, пожалуйста, обновите Openresty до 1.27.1.2-2-2-focal"
 
 #задача
 TaskStart: '{{ .name }} Задача начинается [START]'

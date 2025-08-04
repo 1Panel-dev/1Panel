@@ -270,6 +270,7 @@ allow: '允許'
 deny: '禁止'
 OpenrestyNotFound: 'Openresty 未安裝'
 remoteIpIsNull: "IP 列表為空"
+OpenrestyVersionErr: "Openresty 版本過低，請升級 Openresty 至 1.27.1.2-2-2-focal"
 
 #task
 TaskStart: '{{ .name }} 任務開始[START]'

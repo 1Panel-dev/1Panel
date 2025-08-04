@@ -270,6 +270,7 @@ allow: 'membenarkan'
 deny: 'menafikan'
 OpenrestyNotFound: 'Openresty tidak dipasang'
 remoteIpIsNull: "Senarai IP kosong"
+OpenrestyVersionErr: "Versi Openresty terlalu rendah, sila naik taraf Openresty ke 1.27.1.2-2-2-focal"
 
 #tugas
 TaskStart: '{{ .name }} Task mula [MULA]'
